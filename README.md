@@ -4,18 +4,18 @@
 
 ![ck8s-cluster](https://github.com/elastisys/ck8s-pipelines/workflows/ck8s-cluster/badge.svg)
 
-ck8s-apps: TODO
+compliantkubernetes-apps: TODO
 
 ## Overview
 
-This repository is part of the [Compliant Kubernetes][compliantkubernetes] (ck8s) platform.
+This repository is part of the [Compliant Kubernetes][compliantkubernetes] (compliantkubernetes) platform.
 The platform consists of the following repositories:
 
 * [ck8s-cluster][ck8s-cluster] - Code for managing Kubernetes clusters and the infrastructure around them.
-* [ck8s-apps][ck8s-apps] - Code, configuration and tools for running various services and applications on top of service and workload ck8s-cluster.
+* [compliantkubernetes-apps][compliantkubernetes-apps] - Code, configuration and tools for running various services and applications on top of service and workload ck8s-cluster.
 * [ck8s-base-vm][ck8s-base-vm] - A virtual machine template with relevant Kubernetes packages pre-installed.
 
-The Elastisys Compliant Kubernetes (ck8s) platform runs two Kubernetes clusters.
+The Elastisys Compliant Kubernetes (compliantkubernetes) platform runs two Kubernetes clusters.
 One called "service" and one called "workload".
 
 The _service cluster_ provides observability, log aggregation, private container registry with vulnerability scanning and authentication using the following services:
@@ -34,7 +34,7 @@ The _workload cluster_ manages the user applications as well as providing intrus
 
 [compliantkubernetes]: https://compliantkubernetes.com/
 [ck8s-cluster]: https://github.com/elastisys/ck8s-cluster
-[ck8s-apps]: https://github.com/elastisys/ck8s-apps
+[compliantkubernetes-apps]: https://github.com/elastisys/compliantkubernetes-apps
 [ck8s-base-vm]: https://github.com/elastisys/ck8s-base-vm
 
 This repository installs all the applications of ck8s on top of already created clusters.
@@ -100,7 +100,7 @@ If this is all new to you, here's a [link](https://riseup.net/en/security/messag
 
 ### Quickstart
 
-**You probably want to check the [ck8s-cluster][ck8s-cluster] repository first, since ck8s-apps depends on having two clusters already set up.**
+**You probably want to check the [ck8s-cluster][ck8s-cluster] repository first, since compliantkubernetes-apps depends on having two clusters already set up.**
 Assuming you already have everything needed to install the apps, this is what you need to do.
 
 1. Decide on a name for this environment, the cloud provider to use and set them as environment variables:

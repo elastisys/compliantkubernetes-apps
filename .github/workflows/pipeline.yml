@@ -21,7 +21,7 @@ jobs:
         cloud: ["safespring", "exoscale", "citycloud", "aws"]
         flavor: ["prod", "dev"]
     steps:
-    - name: Checkout ck8s-apps
+    - name: Checkout compliantkubernetes-apps
       uses: actions/checkout@v2
       with:
         fetch-depth: 0 # Fetches all tags
@@ -29,7 +29,7 @@ jobs:
       uses: ./pipeline
       with:
         args: ./pipeline/sops-pgp-setup.bash
-    - name: Init and configure config for ck8s-apps
+    - name: Init and configure config for compliantkubernetes-apps
       uses: ./pipeline
       with:
         args: ./pipeline/init-unit-tests.bash

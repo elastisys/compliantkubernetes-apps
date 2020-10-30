@@ -27,4 +27,4 @@ jobs:
           tag_name: ${{ steps.get_version.outputs.VERSION }}
           release_name: ${{ steps.get_version.outputs.VERSION }}
           body: |
-            See [CHANGELOG.md](https://github.com/elastisys/ck8s-apps/blob/${{ steps.get_version.outputs.VERSION }}/CHANGELOG.md) for details.
+            See [CHANGELOG.md](https://github.com/elastisys/compliantkubernetes-apps/blob/${{ steps.get_version.outputs.VERSION }}/CHANGELOG.md) for details.
