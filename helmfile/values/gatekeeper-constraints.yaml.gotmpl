@@ -1,0 +1,11 @@
+restrictImageRegistry:
+    enable: {{ .Values.opa.imageRegistry.enabled }}
+    enforcementAction: {{ .Values.opa.imageRegistry.enforcement }}
+requireNetworkpolicies:
+    enable: {{ .Values.opa.networkPolicies.enabled }}
+    enforcementAction: {{ .Values.opa.networkPolicies.enforcement }}
+requireResourceRequests:
+    enable: {{ .Values.opa.resourceRequests.enabled }}
+    enforcementAction: {{ .Values.opa.resourceRequests.enforcement }}
+
+imageRegistryURL: {{ .Values.opa.imageRegistry.URL }}

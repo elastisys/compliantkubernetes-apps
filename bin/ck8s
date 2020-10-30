@@ -1,0 +1,103 @@
+#!/bin/bash
+
+# This is the main entrypoint to Compliant Kubernetes.
+
+set -e -o pipefail
+
+here="$(dirname "$(readlink -f "$0")")"
+# shellcheck disable=SC1090
+source "${here}/common.bash"
+
+usage() {
+    echo "COMMANDS:" 1>&2
+    echo "  init                                        initialize the config path" 1>&2
+    echo "  bootstrap <wc|sc>                           bootstrap the cluster" 1>&2
+    echo "  apps <wc|sc>                                deploy the applications" 1>&2
+    echo "  apply <wc|sc>                               bootstrap and apps" 1>&2
+    echo "  test <wc|sc>                                test the applications" 1>&2
+    echo "  dry-run <wc|sc>                             runs helmfile diff" 1>&2
+    echo "  team add-pgp <fp>                           add a new PGP key to secrets" 1>&2
+    echo "  team remove-pgp <fp>                        remove a PGP key from secrets and rotate the data encryption key" 1>&2
+    # TODO: We might want to make this command less visible once we have proper
+    #       support for OIDC logins.
+    echo "  ops kubectl <wc|sc>                         run kubectl as cluster admin" 1>&2
+    # TODO: We might want to make this command less visible once we feel
+    #       confident that the apply command and migrations are good enough
+    #       that direct Helmfile access is not necessary.
+    echo "  ops helmfile <wc|sc>                        run helmfile as cluster admin" 1>&2
+    echo "  s3cmd [cmd]                                 run s3cmd" 1>&2
+    echo "  user-kubeconfig                             generate user kubeconfig, stored at CK8S_CONFIG_PATH/user/"
+    echo "  completion bash                             output shell completion code for bash" 1>&2
+    echo "  validate <wc|sc>                            validates config files" 1>&2
+    exit 1
+}
+
+case "${1}" in
+    init)
+        "${here}/init.bash"
+        ;;
+    bootstrap)
+        [[ "${2}" =~ ^(wc|sc)$ ]] || usage
+        "${here}/bootstrap.bash" "${2}"
+        ;;
+    apps)
+        [[ "${2}" =~ ^(wc|sc)$ ]] || usage
+        "${here}/apps.bash" "${2}"
+        ;;
+    apply)
+        [[ "${2}" =~ ^(wc|sc)$ ]] || usage
+        "${here}/bootstrap.bash" "${2}"
+        "${here}/apps.bash" "${2}"
+        ;;
+    test)
+        [[ "${2}" =~ ^(wc|sc)$ ]] || usage
+        "${here}/test.bash" "${2}"
+        ;;
+    dry-run)
+        [[ "${2}" =~ ^(wc|sc)$ ]] || usage
+        "${here}/dry-run.bash" "${2}"
+        ;;
+    team)
+        case "${2}" in
+            add-pgp|remove-pgp)
+                [ -n "${3}" ] || usage
+                "${here}/team.bash" "${2}" "${3}"
+                ;;
+            *) usage ;;
+        esac
+        ;;
+    ops)
+        case "${2}" in
+            kubectl)
+                [[ "${3}" =~ ^(wc|sc)$ ]] || usage
+                shift 2
+                "${here}/ops.bash" kubectl "${@}"
+            ;;
+            helmfile)
+                [[ "${3}" =~ ^(wc|sc)$ ]] || usage
+                shift 2
+                "${here}/ops.bash" helmfile "${@}"
+            ;;
+            *) usage ;;
+        esac
+    ;;
+    s3cmd)
+        shift
+        : "${secrets[s3cfg_file]:?Missing s3cfg file}"
+        sops_exec_file "${secrets[s3cfg_file]}" 's3cmd --config="{}" '"${*}"
+    ;;
+    user-kubeconfig)
+        "${here}/user-kubeconfig.bash"
+        ;;
+    completion)
+        [ -f "${here}/../completion/${2}" ] || usage
+        cat "${here}/../completion/${2}"
+        ;;
+    validate)
+        [[ "${2}" =~ ^(wc|sc)$ ]] || usage
+        config_load "$2"
+        config_load "$2"
+        echo "Config validation successful"
+        ;;
+    *) usage ;;
+esac

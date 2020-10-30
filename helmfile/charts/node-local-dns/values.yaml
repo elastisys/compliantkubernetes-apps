@@ -1,0 +1,10 @@
+localIP: 169.254.20.10
+
+# IP of the cluster DNS in kubernetes
+clusterDNS: 10.43.0.10
+
+# Local DNS dynamic resource allocation
+resources:
+  requests:
+    cpu: 25m
+    memory: 40Mi

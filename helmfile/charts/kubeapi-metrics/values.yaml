@@ -1,0 +1,16 @@
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 6443
+
+ingress:
+  enabled: false
+  issuer: "letsencrypt-staging"
+  clusterDomain: ""
+  username: ""
+  password: ""
+  extraAnnotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"

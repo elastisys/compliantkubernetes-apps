@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ck8s-integration-test
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: test
+  name: test
+  namespace: ck8s-integration-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+      - image: nginxinc/nginx-unprivileged
+        name: nginx-unprivileged
+        ports:
+          - name: http
+            containerPort: 8080
+        resources: {}
+        readinessProbe:
+          httpGet:
+            port: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: test
+  name: test
+  namespace: ck8s-integration-test
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+  selector:
+    app: test
+  type: LoadBalancer

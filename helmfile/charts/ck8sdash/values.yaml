@@ -1,0 +1,76 @@
+service:
+  port: 8080
+
+ingress:
+  enabled: false
+  issuer: "letsencrypt-staging"
+  clusterDomain: ""
+  extraAnnotations: {}
+
+nginx:
+  image:
+    repository: elastisys/ck8sdash-nginx
+    tag: v0.3.2
+    pullPolicy: Always
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 50m
+    limits:
+      memory: 128Mi
+      cpu: 100m
+  port: 8080
+
+server:
+  image:
+    repository: elastisys/ck8sdash-server
+    tag: v0.3.2
+    pullPolicy: Always
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 50m
+    limits:
+      memory: 128Mi
+      cpu: 100m
+  port: 9090
+
+grafana:
+  url: ""
+  username: "admin"
+  password: ""
+  apiKeyName: ""
+  datasource: ""
+harbor:
+  url: ""
+  username: "admin"
+  password: ""
+kibana:
+  url: ""
+elastic:
+  url: ""
+  kubernetesIndexPrefix: "kubernetes-default"
+  componentsIndexDefault: "kubernetes-default"
+oidc:
+  url: ""
+  clientId: "kubelogin"
+  secret: ""
+opa:
+  enabled: true
+falco:
+  enabled: true
+
+imagePullSecrets: []
+
+serviceAccount:
+  create: true
+  name: "" # Defaults to {{ include "ck8sdash.fullname" . }}
+
+nameOverride: ""
+fullnameOverride: ""
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

@@ -1,0 +1,21 @@
+namespaces: []
+commonLabels: {}
+commonAnnotations: {}
+# exampe
+# namespaces:
+# - name: monitoring
+# - name: cert-manager
+#   labels:
+#     common-label-key1: common-label-value1
+#     common-label-key2: common-label-value2
+# - name: something
+#   annotations:
+#     annotation-key1: annotation-value1
+#     annotation-key2: annotation-value2
+# the following labels and annotations applies to all the namespaces
+# commonLabels:
+#   common-label-key1: common-label-value1
+#   common-label-key2: common-label-value2
+# commonAnnotations:
+#   common-annotation-key1: common-annotation-value1
+#   common-annotation-key2: commonannotation-value2

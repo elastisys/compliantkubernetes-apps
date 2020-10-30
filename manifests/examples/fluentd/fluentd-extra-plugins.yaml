@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: fluentd
+    app.kubernetes.io/name: fluentd-elasticsearch
+  name: fluentd-extra-plugins
+  namespace: fluentd
+data:
+  your_plugin_1.rb: |-
+    # Your code goes here
+    # ...
+  your_plugin_2.rb: |-
+    # Your code goes here
+    # ...

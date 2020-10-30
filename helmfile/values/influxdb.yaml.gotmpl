@@ -1,0 +1,144 @@
+elastisys_custom:
+  # The following values must be set in order to use the chart.
+  influx_addr: {{ .Values.influxDB.address }}
+  s3_region: {{ .Values.s3.region }}
+  s3_region_endpoint: {{ .Values.s3.regionEndpoint }}
+  s3_influx_bucket_name: {{ .Values.s3.buckets.influxDB }}
+  s3_access_key: {{ .Values.s3.accessKey }}
+  s3_secret_key: {{ .Values.s3.secretKey }}
+  influxdb_user: {{ .Values.influxDB.user }}
+  influxdb_password: {{ .Values.influxDB.password }}
+  s3_credentials: |+
+    [default]
+    aws_access_key_id={{ .Values.s3.accessKey }}
+    aws_secret_access_key={{ .Values.s3.secretKey }}
+    region={{ .Values.s3.region }}
+
+  metrics:
+    jobs:
+      service_cluster:
+        data_size_limit: {{ .Values.influxDB.metrics.sizeSc }}
+      workload_cluster:
+        data_size_limit: {{ .Values.influxDB.metrics.sizeSc }}
+
+serviceAccount:
+  create: false
+
+image:
+  tag: "1.8.0-alpine"
+
+persistence:
+  size: {{ .Values.influxDB.persistence.size }}
+
+setDefaultUser:
+  # NOTE: the Job to create this user is actually disabled, this only creates
+  # the secret that we set env vars from below.
+  # In fact, it is not possible to create the user through the setDefaultUser
+  # Job when http auth is enabled.
+  enabled: false
+
+env:
+# Set credentials from Secret so that it is not possible to read them directly
+# with `kubectl get pod -o yaml`
+- name: INFLUXDB_ADMIN_USER
+  valueFrom:
+    secretKeyRef:
+      name: influxdb-auth
+      key: INFLUXDB_USER
+- name: INFLUXDB_ADMIN_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: influxdb-auth
+      key: INFLUXDB_PWD
+
+config:
+  data:
+    index-version: tsi1
+  http:
+    auth-enabled: true
+    log-enabled: false
+
+resources:
+{{- toYaml .Values.influxDB.resources | nindent 2  }}
+
+nodeSelector:
+{{- toYaml .Values.influxDB.nodeSelector | nindent 2  }}
+
+affinity:
+{{- toYaml .Values.influxDB.affinity | nindent 2  }}
+
+tolerations:
+{{- toYaml .Values.influxDB.tolerations | nindent 2  }}
+
+
+# TODO: don't run when restoring the cluster
+initScripts:
+  enabled: true
+  scripts:
+    init.iql: |+
+      CREATE DATABASE "service_cluster" WITH DURATION {{ .Values.influxDB.retention.ageSc }} REPLICATION 1 NAME service_cluster_rp;
+      CREATE DATABASE "workload_cluster" WITH DURATION {{ .Values.influxDB.retention.ageSc }} REPLICATION 1 NAME workload_cluster_rp;
+
+extraContainers:
+  - name: influxdb-node-exporter
+    image: prom/node-exporter:v1.0.1
+    args: ["--collector.textfile.directory=/textfile-collector", "--no-collector.arp", "--no-collector.bcache", "--no-collector.bonding", "--no-collector.conntrack", "--no-collector.cpu", "--no-collector.cpufreq", "--no-collector.diskstats", "--no-collector.edac", "--no-collector.entropy", "--no-collector.filefd", "--no-collector.filesystem", "--no-collector.hwmon", "--no-collector.infiniband", "--no-collector.ipvs", "--no-collector.loadavg", "--no-collector.mdadm", "--no-collector.meminfo", "--no-collector.netclass", "--no-collector.netdev", "--no-collector.nfs", "--no-collector.nfsd", "--no-collector.netstat", "--no-collector.pressure", "--no-collector.stat", "--no-collector.sockstat", "--no-collector.timex", "--no-collector.vmstat", "--no-collector.xfs", "--no-collector.zfs"]
+      # enabled collectors: textfile, time, uname
+    ports:
+    - containerPort: 9100
+      name: web
+    volumeMounts:
+      - name: textfile-collector-dir
+        mountPath: /textfile-collector
+  - name: influxdb-cronjob
+    image: bambash/docker-cron
+    volumeMounts:
+      - name: influxdb-data #TODO: use influxdb.fullname from _helpers.tpl instead hardcoded "influxdb"
+        mountPath: /var/lib/influxdb
+      - name: textfile-collector-dir
+        mountPath: /textfile-collector
+      - name: scripts
+        mountPath: /scripts
+      - name: cronfiles
+        mountPath: /etc/cron.d/
+      - name: config-volume
+        mountPath: /etc/config
+
+volumes:
+  - name: textfile-collector-dir
+    emptyDir: {}
+  - name: scripts
+    configMap:
+      name: influxdb-du-monitoring-script #TODO: use influxdb.fullname from _helpers.tpl instead hardcoded "influxdb"
+  - name: cronfiles
+    configMap:
+      name: influxdb-du-monitoring-cronjob #TODO: use influxdb.fullname from _helpers.tpl instead hardcoded "influxdb"
+  - name: config-volume
+    configMap:
+      name: influxdb-common-env-vars-cm #TODO: use influxdb.fullname from _helpers.tpl instead hardcoded "influxdb"
+      items:
+      - key: influxdb-retention-database
+        path: influxdb-retention-database
+      - key: prometheus-influxdb-retention-metric-name
+        path: prometheus-influxdb-retention-metric-name
+
+backup:
+  enabled: true
+  resources:
+    requests:
+      cpu: 50m
+      memory: 100Mi
+    limits:
+      cpu: 250m
+      memory: 300Mi
+  persistence:
+    enabled: true
+    storageClass: {{ .Values.global.storageClass }}
+    accessMode: ReadWriteOnce
+    size: {{ add .Values.influxDB.metrics.sizeWc .Values.influxDB.metrics.sizeSc -}}Ki # the sum of influxDB.metrics.sizeWc and influxDB.metrics.sizeWc (all values in KB)
+  schedule: "0 0 * * *"
+  startingDeadlineSeconds: 200
+  s3:
+    credentialsSecret: influxdb-backup-secret #TODO: use influxdb.fullname from _helpers.tpl instead hardcoded "influxdb"
+    destination: s3://{{ .Values.s3.buckets.influxDB }}
+    endpointUrl: {{ .Values.s3.regionEndpoint }}

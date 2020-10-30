@@ -1,0 +1,54 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-cronjob
+spec:
+  schedule: {{ .Values.schedule }}
+  startingDeadlineSeconds: {{ .Values.startingDeadlineSeconds }}
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            release: {{ .Release.Name }}
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: run
+              image: elastisys/backup-postgres:1.0.0
+              command: ['/bin/bash', '/scripts/harbor-backup.sh']
+              env:
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: harbor-backup-secret
+                      key: aws-access-key-id
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: harbor-backup-secret
+                      key: aws-secret-access-key
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: harbor-backup-secret
+                      key: db-password
+                - name: PG_HOSTNAME
+                  value: {{ .Values.pgHostname }}
+                - name: S3_BUCKET
+                  value: {{ .Values.s3.bucket }}
+                - name: S3_REGION_ENDPOINT
+                  value: {{ .Values.s3.endpoint }}
+                - name: DAYS_TO_RETAIN
+                  value: "{{ .Values.retentionDays }}"
+              volumeMounts:
+                - name: scripts
+                  mountPath: /scripts
+                - name: backup
+                  mountPath: /backup
+          volumes:
+          - name: scripts
+            configMap:
+              name: {{ .Release.Name }}-cm
+          - name: backup
+            emptyDir: {}

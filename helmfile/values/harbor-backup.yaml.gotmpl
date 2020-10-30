@@ -1,0 +1,6 @@
+dbPassword: {{ .Values.harbor.databasePassword }}
+s3:
+  accessKey: {{ .Values.s3.accessKey }}
+  secretKey: {{ .Values.s3.secretKey }}
+  bucket: {{ .Values.s3.buckets.harbor }}
+  endpoint: {{ .Values.s3.regionEndpoint }}

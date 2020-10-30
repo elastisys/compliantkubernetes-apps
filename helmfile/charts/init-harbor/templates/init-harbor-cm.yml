@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-cm
+data:
+  init-harbor.sh: |
+    #!/bin/sh
+    set -e
+
+    echo "testing curl address {{ .Values.endpoint }}"
+    # Set up initial state for harbor.
+    exists=$(curl -k {{ .Values.endpoint }}/projects/1 | jq '.code') || {
+      echo "ERROR L.${LINENO} - Harbor url {{ .Values.endpoint }}/projects/1 cannot be reached."
+      exit 1
+    }
+    if [ -z "$exists" ]
+    then
+      echo "ERROR - Harbor url {{ .Values.endpoint }}/projects/1 did not return any code (probably canot be reached)"
+      exit 1
+    fi
+    echo "Setting up initial harbor state"
+    if [ "$exists" != "404" ]
+    then
+        name=$(curl -k -X GET {{ .Values.endpoint }}/projects/1 | jq '.name')
+
+        if [ "$name" == "\"library\"" ]
+        then
+            # Deletes the default project "library"
+            echo Removing project library from harbor
+            # Curl will retrun status 500 even though it successfully removed the project.
+            curl -k -X DELETE -u admin:${HARBOR_PASSWORD} {{ .Values.endpoint }}/projects/1 > /dev/null
+
+            # Creates new private project "default"
+            echo "Creating new private project default"
+            curl -k -X POST -u admin:${HARBOR_PASSWORD} {{ .Values.endpoint }}/projects --header 'Content-Type: application/json' --header 'Accept: application/json' --data '{
+                "project_name": "default",
+                "metadata": {
+                    "public": "0",
+                    "enable_content_trust": "false",
+                    "prevent_vul": "false",
+                    "severity": "low",
+                    "auto_scan": "true"
+                }
+            }'
+            echo "Private default project created"
+        fi
+      else
+        echo "Harbor already created default project"
+      fi
+      echo "Configuring oidc support"
+      err=$(curl -k -X PUT "{{ .Values.endpoint }}/configurations" \
+        -u admin:${HARBOR_PASSWORD} \
+        -H "accept: application/json" \
+        -H "Content-Type: application/json" \
+        -d "{ \"oidc_verify_cert\": {{ .Values.oidc.verifyCert }},
+              \"auth_mode\": \"oidc_auth\",
+              \"self_registration\": false,
+              \"oidc_scope\": \"{{ .Values.oidc.scope }}\",
+              \"oidc_name\": \"dex\",
+              \"oidc_client_id\": \"harbor\",
+              \"oidc_endpoint\": \"{{ .Values.oidc.endpoint }}\",
+              \"oidc_client_secret\": \"${OIDC_CLIENT_SECRET}\"}")
+
+      if [ -n "$err" ]
+      then
+        echo "ERROR when configuring oidc: $err"
+        exit 1
+      fi
+      echo "Harbor initialized"

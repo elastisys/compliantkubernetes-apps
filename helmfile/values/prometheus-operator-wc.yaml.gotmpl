@@ -1,0 +1,172 @@
+global:
+  rbac:
+    pspEnabled: true
+
+alertmanager:
+  enabled: false
+
+grafana:
+  enabled: false
+
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+
+prometheusOperator:
+  createCustomResource: false
+
+kube-state-metrics:
+  podSecurityPolicy:
+    enabled: true
+
+kubeApiServer:
+  serviceMonitor:
+    metricRelabelings:
+      - action: keep
+        sourceLabels: [__name__]
+        regex: '(apiserver_request_count|apiserver_request_latencies_bucket|apiserver_client_certificate_expiration_seconds_count|apiserver_request_duration_seconds_sum|apiserver_request_duration_seconds_count|APIServiceRegistrationController_depth)'
+kubeEtcd:
+  service:
+    port: 4001
+    targetPort: 4001
+
+defaultRules:
+  create: false
+
+
+prometheus:
+  ingress:
+    enabled: true
+    annotations:
+      # type of authentication
+      nginx.ingress.kubernetes.io/auth-type: basic
+      # name of the secret that contains the user/password definitions
+      nginx.ingress.kubernetes.io/auth-secret: prometheus-auth
+      # message to display with an appropriate context why the authentication is required
+      nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
+      cert-manager.io/issuer: {{ .Values.global.issuer }}
+  {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.prometheus }}
+      nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.prometheus }}
+  {{ end }}
+    labels: {}
+    hosts:
+    - prometheus.{{ .Values.global.baseDomain }}
+    paths:
+    - /
+    tls:
+    - secretName: prometheus-general-tls
+      hosts:
+      - prometheus.{{ .Values.global.baseDomain }}
+
+  prometheusSpec:
+    image:
+      tag: v2.19.2
+    externalLabels:
+      cluster: workload_cluster
+
+    # Dont add prometheus labels.
+    prometheusExternalLabelNameClear: true
+    replicaExternalLabelNameClear: true
+
+    # Empty selector to select all namespaces
+    serviceMonitorNamespaceSelector:
+      matchLabels: {}
+    # Select all service monitors
+    serviceMonitorSelector:
+      matchLabels: {}
+    podMonitorNamespaceSelector:
+      matchLabels: {}
+    podMonitorSelector:
+      matchLabels: {}
+    ruleNamespaceSelector:
+      matchLabels: {}
+    ruleSelector:
+      matchLabels: {}
+
+    {{ if .Values.user.alertmanager.enabled }}
+    # Connect to separately managed alertmanager
+    alertingEndpoints:
+      - name: alertmanager-operated
+        namespace: monitoring
+        port: web
+        pathPrefix: /
+    {{ end }}
+    resources: {{- toYaml .Values.prometheus.resources | nindent 8  }}
+    nodeSelector: {{- toYaml .Values.prometheus.nodeSelector | nindent 8 }}
+    affinity: {{- toYaml .Values.prometheus.affinity | nindent 8 }}
+    tolerations: {{- toYaml .Values.prometheus.tolerations | nindent 8 }}
+
+    ## How long to retain metrics
+    ##
+    retention: {{ .Values.prometheus.retention.age }}
+
+    ## Maximum size of metrics
+    ##
+    retentionSize: {{ .Values.prometheus.retention.size }}
+
+    ## Prometheus StorageSpec for persistent data
+    ## ref: https://github.com/coreos/prometheus-operator/blob/release-0.29/Documentation/user-guides/storage.md
+    ##
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: {{ .Values.global.storageClass }}
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: {{ .Values.prometheus.storage.size }}
+
+    additionalScrapeConfigs:
+    {{ if eq .Values.global.storageClass "nfs-client"  }}
+    - job_name: 'node-exporter'
+      scrape_interval: 30s
+      metrics_path: /metrics
+      scheme: http
+      static_configs:
+      - targets:
+        - '{{ requiredEnv "NFS_WC_SERVER_IP" }}:9100'
+    {{ end }}
+
+    {{ if .Values.user.alertmanager.enabled }}
+    - job_name: 'monitoring/alertmanager-operated'
+      scrape_interval: 30s
+      metrics_path: /metrics
+      scheme: http
+      kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+          - monitoring
+        selectors:
+          - role: endpoints
+            label: 'operated-alertmanager=true'
+      relabel_configs:
+        - source_labels: [__meta_kubernetes_endpoint_port_name]
+          action: keep
+          regex: web # keep only the web port (9093 by default) and drop the remaining (for example 9094)
+        - source_labels: [__meta_kubernetes_endpoints_name]
+          action: replace
+          target_label: job # needed to make Prometheus realize that it is the alertmanager
+        - source_labels: [__meta_kubernetes_namespace]
+          action: replace
+          target_label: namespace # needed to make Prometheus realize that it is the alertmanager
+        # The remaining items are to keep the set of labels for this target consistent with the other targets.
+        # Without replacing them, the labels with __ prefix are dropped.
+        - source_labels: [__meta_kubernetes_endpoint_port_name]
+          action: replace
+          target_label: endpoint
+        - source_labels: [__address__]
+          action: replace
+          target_label: instance
+        - source_labels: [__meta_kubernetes_service_name]
+          action: replace
+          target_label: service
+        - source_labels: [__meta_kubernetes_pod_name]
+          action: replace
+          target_label: pod
+    {{ end }}
+
+    {{- with .Values.prometheus.additionalScrapeConfigs }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}

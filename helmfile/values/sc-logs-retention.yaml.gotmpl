@@ -1,0 +1,16 @@
+
+s3:
+  region: {{ .Values.s3.region | quote }}
+  regionEndpoint: {{ .Values.s3.regionEndpoint | quote }}
+  bucket: {{ .Values.s3.buckets.scFluentd | quote }}
+  retentionDays: {{ .Values.logRetention.days }}
+  accessKey: {{ .Values.s3.accessKey | quote }}
+  secretKey: {{ .Values.s3.secretKey | quote }}
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 50Mi
+  limits:
+    memory: 100Mi
+    cpu: 200m

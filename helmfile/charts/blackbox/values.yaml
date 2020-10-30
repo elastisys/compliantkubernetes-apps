@@ -1,0 +1,31 @@
+# Default values for blackbox.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+prometheus-blackbox-exporter:
+  secretConfig: true
+  config:
+    # See https://github.com/prometheus/blackbox_exporter/blob/master/CONFIGURATION.md
+    modules:
+      http_2xx:
+        prober: http
+        timeout: 5s
+        http:
+          valid_http_versions: ["HTTP/1.1", "HTTP/2"]
+          no_follow_redirects: false
+          preferred_ip_protocol: "ip4"
+
+# Set labels on the ServiceMonitor.
+# Make sure your prometheus instance is configured to select these labels.
+labels:
+  release: prometheus-operator
+targets:
+  - name: example
+    url: https://example.com/healthz
+    interval: 60s
+    scrapeTimeout: 30s
+    module: http_2xx

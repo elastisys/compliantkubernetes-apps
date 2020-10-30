@@ -1,0 +1,17 @@
+esNodeCount: {{ add .Values.elasticsearch.dataNode.count .Values.elasticsearch.clientNode.count .Values.elasticsearch.masterNode.count }}
+alertmanagerJob: prometheus-operator-alertmanager
+alertmanagerNamespace: monitoring
+prometheusJob: prometheus-operator-prometheus
+operatorJob: prometheus-operator-operator
+
+prometheusNamespace: monitoring
+
+defaultRules:
+  labels:
+    cluster: workload
+  rules:
+    elasticsearch: false
+    alertmanager: {{ .Values.user.alertmanager.enabled }}
+  {{ if eq .Environment.Name "service_cluster" }}
+    certMonitor: false
+  {{ end }}

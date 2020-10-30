@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ck8sdash.fullname" . }}
+  labels:
+{{ include "ck8sdash.labels" . | indent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "ck8sdash.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "ck8sdash.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "ck8sdash.serviceAccountName" . }}
+      initContainers:
+      - name: create-grafana-api-key
+        image: elastisys/curl-jq
+        command: ['sh', '/scripts/init.sh']
+        env:
+        - name: GRAFANA_USERNAME
+          value: {{ .Values.grafana.username }}
+        - name: GRAFANA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{include "ck8sdash.fullname" . }}-secrets
+              key: grafana-password
+        - name: GRAFANA_URL
+          value: {{ .Values.grafana.url }}
+        - name: GRAFANA_API_KEY_NAME
+          value: {{ .Values.grafana.apiKeyName }}
+        - name: NAMESPACE
+          value: {{ .Release.Namespace }}
+        volumeMounts:
+        - name: grafana-init-script
+          mountPath: /scripts
+      containers:
+      - name: ck8sdash-nginx
+        image: {{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}
+        imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
+        resources:
+          {{- toYaml .Values.nginx.resources | nindent 12 }}
+        # Note that these values are not reloaded if the secret is changed
+        # The pod needs to be restarted to load new values
+        env:
+        - name: API_SERVER #ck8sdash-server port
+          value: localhost:{{ .Values.server.port }}
+        - name: PORT
+          value: "{{ .Values.nginx.port }}"
+        ports:
+        - containerPort: {{ .Values.nginx.port }}
+      - name: ck8sdash-server
+        image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag }}
+        imagePullPolicy: {{ .Values.server.image.pullPolicy }}
+        resources:
+          {{- toYaml .Values.server.resources | nindent 12 }}
+        volumeMounts:
+        - name: config
+          mountPath: /etc/ck8sdash
+        # Note that these values are not reloaded if the secret is changed
+        # The pod needs to be restarted to load new values
+        env:
+        - name: GRAFANA_APIKEY
+          valueFrom:
+            secretKeyRef:
+              name: ck8sdash-grafana-api-key
+              key: grafana-api-key
+        - name: HARBOR_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{include "ck8sdash.fullname" . }}-secrets
+              key: harbor-password
+        - name: OIDC_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{include "ck8sdash.fullname" . }}-secrets
+              key: oidc-secret
+        ports:
+        - containerPort: {{ .Values.server.port }}
+      volumes:
+      - name: grafana-init-script
+        configMap:
+          name: {{ include "ck8sdash.fullname" . }}-grafana-init-script
+      - name: config
+        configMap:
+          name: {{ include "ck8sdash.fullname" . }}-config
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

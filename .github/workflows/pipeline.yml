@@ -1,0 +1,49 @@
+name: UnitTests-pipeline
+
+on:
+  pull_request:
+    branches:
+      - master
+    paths-ignore:
+      - '**.md'
+  push:
+    branches:
+      - 'pre-release-*'
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    env:
+      CK8S_CONFIG_PATH: ./ck8s-config
+    strategy:
+      fail-fast: false
+      matrix:
+        cloud: ["safespring", "exoscale", "citycloud", "aws"]
+        flavor: ["prod", "dev"]
+    steps:
+    - name: Checkout ck8s-apps
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0 # Fetches all tags
+    - name: Setup pgp key for sops
+      uses: ./pipeline
+      with:
+        args: ./pipeline/sops-pgp-setup.bash
+    - name: Init and configure config for ck8s-apps
+      uses: ./pipeline
+      with:
+        args: ./pipeline/init-unit-tests.bash
+      env:
+        CK8S_CLOUD_PROVIDER: ${{ matrix.cloud }}
+        CI_CK8S_FLAVOR: ${{ matrix.flavor }}
+        CK8S_PGP_FP: 529D964DE0BBD900C4A395DA09986C297F8B7757
+    - name: Run unit tests for OPA policies
+      uses: ./pipeline
+      with:
+        args: ./pipeline/test/services/unit-tests/test-opa.sh
+    - name: Run linters
+      uses: ./pipeline
+      with:
+        args: ./pipeline/lint.bash
+      # TODO: Remove this when charts are updated to make the linter happy.
+      continue-on-error: true

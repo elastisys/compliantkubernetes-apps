@@ -1,0 +1,79 @@
+  - name: Download ck8s-apps requirements
+    hosts: localhost
+    vars:
+      install_path: /usr/local/bin
+      install_user: "{{ lookup('env','USER') }}"
+      kubectl_version: 1.15.2
+      helm_version: 3.3.4
+      helmfile_version: 0.129.3
+      helmdiff_version: 3.1.1
+      helmsecrets_version: 2.0.2
+      jq_version: 1.6
+      s3cmd_version: 2.0.1-2
+      sops_version: 3.6.1
+      yq_version: 3.3.2
+    connection: local
+    become: yes
+    become_user: root
+    tasks:
+    - name: Get curl
+      apt:
+        name: curl
+    - name: Get Kubectl
+      unarchive:
+        src: https://dl.k8s.io/v{{ kubectl_version }}/kubernetes-client-linux-amd64.tar.gz
+        dest: "{{ install_path }}"
+        remote_src: yes
+        extra_opts: [--strip-components=3]
+    - name: Get Helm
+      unarchive:
+        src: https://get.helm.sh/helm-v{{ helm_version }}-linux-amd64.tar.gz
+        dest: "{{ install_path }}"
+        mode: 0775
+        remote_src: yes
+        extra_opts:
+        - "--strip-components=1"
+        - "--no-wildcards"
+        - "--no-anchored"
+        - "helm"
+    - name: Get Helmfile
+      get_url:
+        url: https://github.com/roboll/helmfile/releases/download/v{{ helmfile_version }}/helmfile_linux_amd64
+        dest: "{{ install_path }}/helmfile"
+        mode: 0775
+    - name: Check if helm-diff plugin exists
+      stat:
+        path: "/home/{{ install_user }}/.local/share/helm/plugins/helm-diff"
+      register: helm_diff_exists
+    - name: Get helm-diff
+      become: "{{ install_user }}"
+      command: "helm plugin install https://github.com/databus23/helm-diff --version v{{ helmdiff_version }}"
+      register: "output"
+      when: not helm_diff_exists.stat.exists
+    - name: Check if helm-secrets plugin exists
+      stat:
+        path: "/home/{{ install_user }}/.local/share/helm/plugins/helm-secrets"
+      register: helm_secrets_exists
+    - name: Get helm-secrets
+      become: "{{ install_user }}"
+      command: "helm plugin install https://github.com/zendesk/helm-secrets --version v{{ helmsecrets_version }}"
+      register: "output"
+      when: not helm_secrets_exists.stat.exists
+    - name: Get jq
+      get_url:
+        url: https://github.com/stedolan/jq/releases/download/jq-{{ jq_version }}/jq-linux64
+        dest: "{{ install_path }}/jq"
+        mode: 0775
+    - name: Get s3cmd
+      apt:
+        name: s3cmd={{ s3cmd_version }}
+    - name: Get sops
+      get_url:
+        url: https://github.com/mozilla/sops/releases/download/v{{ sops_version }}/sops-v{{ sops_version }}.linux
+        dest: "{{ install_path }}/sops"
+        mode: 0775
+    - name: Get yq
+      get_url:
+        url: https://github.com/mikefarah/yq/releases/download/{{ yq_version }}/yq_linux_amd64
+        dest: "{{ install_path }}/yq"
+        mode: 0775

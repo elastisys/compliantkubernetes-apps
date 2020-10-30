@@ -1,0 +1,33 @@
+{{- if .Values.ingress.enabled -}}
+{{- $fullName := include "kubeapi-metrics.fullname" . -}}
+{{- $host := printf "%s.%s" "kube-apiserver" (required "Cluster domain required" .Values.ingress.clusterDomain) -}}
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "kubeapi-metrics.labels" . | nindent 4 }}
+  annotations:
+    cert-manager.io/issuer: "{{ .Values.ingress.issuer }}"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/auth-type: "basic"
+    nginx.ingress.kubernetes.io/auth-secret: "{{ $fullName }}-auth"
+    nginx.ingress.kubernetes.io/limit-connections: "5"
+    nginx.ingress.kubernetes.io/limit-rps: "5"
+    {{- if .Values.ingress.extraAnnotations -}}
+    {{- toYaml .Values.ingress.extraAnnotations | nindent 4 }}
+    {{- end }}
+spec:
+  tls:
+    - hosts:
+        - "{{ $host }}"
+      secretName: "{{ $fullName }}-cert"
+  rules:
+    - host: "{{ $host }}"
+      http:
+        paths:
+          - path: "/healthz"
+            backend:
+              serviceName: {{ $fullName }}
+              servicePort: {{ .Values.service.port }}
+  {{- end }}

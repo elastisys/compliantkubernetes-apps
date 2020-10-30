@@ -1,0 +1,52 @@
+# Default values for alerts.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+esNodeCount: 4
+alertmanagerJob: prometheus-operator-alertmanager
+alertmanagerNamespace: monitoring
+prometheusJob: prometheus-operator-prometheus
+operatorJob: prometheus-operator-operator
+prometheusNamespace: monitoring
+defaultRules:
+  create: true
+  ## Any labels to add to the alerts
+  # labels:
+  #   key: value
+  rules:
+    elasticsearch: true
+    alertmanager: true
+    blackbox: true
+    certManagerCertificateAlerts: true
+    prometheusOperator: true
+    kubeControllerManager: false
+    kubeApiserverErrorAlerts: true
+    etcd: false
+    general: true
+    k8s: true
+    kubeApiserver: true
+    kubeApiserverError: true
+    kubePrometheusNodeAlerting: true
+    kubePrometheusNodeRecording: true
+    kubernetesAbsent: true
+    kubernetesApps: true
+    kubernetesResources: true
+    kubernetesStorage: true
+    kubernetesSystem: true
+    kubeScheduler: false
+    network: true
+    nodeExporter: true
+    prometheus: true
+    time: true
+    kubeStateMetrics: true
+    kubeletService: false
+    coreDNS: false
+    certMonitor: true
+
+certMonitor:
+  name: "cert-monitor"
+  instance: "ck8s"
+  namespace: "cert-manager"
+  target:
+    name: "cert-manager"
+    instance: "cert-manager"
+  port: 9402

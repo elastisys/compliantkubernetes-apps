@@ -1,0 +1,12 @@
+resources: {{- toYaml .Values.nfsProvisioner.resources | nindent 2  }}
+nodeSelector: {{- toYaml .Values.nfsProvisioner.nodeSelector | nindent 2 }}
+affinity: {{- toYaml .Values.nfsProvisioner.affinity | nindent 2 }}
+tolerations: {{- toYaml .Values.nfsProvisioner.tolerations | nindent 2 }}
+
+storageClass:
+  defaultClass: true
+serviceAccount:
+  name: nfs-client-provisioner
+nfs:
+  path: "/nfs"
+  #server: Will be set outside

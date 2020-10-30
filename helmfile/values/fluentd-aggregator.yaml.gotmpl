@@ -1,0 +1,77 @@
+image:
+  repository: quay.io/fluentd_elasticsearch/fluentd
+  tag: v2.9.0
+
+resources: {{- toYaml .Values.fluentd.aggregator.resources | nindent 2  }}
+nodeSelector: {{- toYaml .Values.fluentd.aggregator.nodeSelector | nindent 2  }}
+affinity: {{- toYaml .Values.fluentd.aggregator.affinity | nindent 2  }}
+tolerations: {{- toYaml .Values.fluentd.aggregator.tolerations | nindent 2 }}
+
+plugins:
+  enabled: true
+  pluginsList:
+    # TODO: pin version
+    - fluent-plugin-s3
+
+service:
+  type: ClusterIP
+  ports:
+    - name: "monitor-agent"
+      protocol: TCP
+      containerPort: 24220
+    - name: "forward"
+      protocol: TCP
+      containerPort: 24224
+
+# Persist buffer so that the last chunks of logs can be retrieved in case of a
+# disaster.
+persistence:
+  enabled: true
+  size: 10Gi
+
+extraEnvVars:
+ - name: AWS_ACCESS_KEY_ID
+   valueFrom:
+     secretKeyRef:
+       name: s3-credentials
+       key: s3_access_key
+ - name: AWS_ACCESS_SECRET_KEY
+   valueFrom:
+     secretKeyRef:
+       name: s3-credentials
+       key: s3_secret_key
+
+configMaps:
+  output.conf: |
+    <match kubernetes.var.log.containers.fluentd-aggregator-**>
+      @type null
+    </match>
+    <match **>
+      @id output-s3
+      @type s3
+
+      aws_key_id "#{ENV['AWS_ACCESS_KEY_ID']}"
+      aws_sec_key "#{ENV['AWS_ACCESS_SECRET_KEY']}"
+      {{ if eq .Values.elasticsearch.useRegionEndpoint true -}}
+      s3_endpoint {{ .Values.s3.regionEndpoint }}
+      force_path_style true
+      {{ else -}}
+      s3_region {{ .Values.s3.region }}
+      {{ end -}}
+      s3_bucket {{ .Values.s3.buckets.scFluentd }}
+
+      path logs/%Y%m%d/${tag}/
+
+      <buffer tag,time>
+        @type file
+
+        path /var/log/fluentd-buffers/s3
+        overflow_action block
+        total_limit_size 9GB
+
+        timekey 10m
+        timekey_wait 1m
+        timekey_use_utc true
+        chunk_limit_size 50m
+      </buffer>
+    </match>

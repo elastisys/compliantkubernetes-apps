@@ -1,0 +1,14 @@
+# This ClusterRole contains privileges needed for using Prometheus.
+# E.g. the user should be able to create ServiceMonitors in order to
+# make Prometheus scrape metrics from their apps.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: user-admin
+  labels:
+    # Add these permissions to the "admin" role.
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+rules:
+- apiGroups: ["monitoring.coreos.com"]
+  resources: ["servicemonitors", "podmonitors", "prometheusrules"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]

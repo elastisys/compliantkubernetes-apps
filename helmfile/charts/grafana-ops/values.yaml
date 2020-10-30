@@ -1,0 +1,12 @@
+# Key for the labels we add to the ConfigMaps
+# This will be used to set the labels like this:
+# labels:
+#   {{ .Values.labelKey }}: nameOfDashboard
+labelKey: grafana_dashboard
+
+# Dashboards to include + settings if needed
+dashboards:
+  elasticsearch:
+    enabled: true
+  falco:
+    enabled: true

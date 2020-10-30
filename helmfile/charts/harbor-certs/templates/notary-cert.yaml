@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: harbor-notary-cert
+  namespace: {{ .Release.namespace }}
+spec:
+  secretName: harbor-notary-cert
+  dnsNames:
+    - harbor-harbor-notary-signer
+    - {{ .Values.notary.domain }}
+  commonName: {{ .Values.notary.domain }}
+  isCA: false
+  issuerRef:
+    name: selfsigning-issuer
+    kind: Issuer

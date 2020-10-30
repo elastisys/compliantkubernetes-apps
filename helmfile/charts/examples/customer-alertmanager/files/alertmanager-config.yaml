@@ -1,0 +1,51 @@
+# Note: Alertmanager instances require the secret resource naming to follow
+# the format alertmanager-{ALERTMANAGER_NAME}.
+# This config should be stored in a secret with a proper name to be picked
+# up by your alertmanager instance. The name of the file in the secret
+# must be `alertmanager.yaml`.
+#
+# See  the following URL for more details on how to configure alertmanager
+# https://prometheus.io/docs/alerting/configuration/
+global:
+  resolve_timeout: 5m
+route:
+  group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 12h
+  # Default receiver
+  receiver: slack
+  # Specify other receivers depending on match
+  routes:
+  - match:
+      # The watchdog alert is always active, send it to null.
+      alertname: Watchdog
+    receiver: 'null'
+receivers:
+- name: 'null'
+- name: slack
+  slack_configs:
+  # Note: the channel here does not apply if the webhook URL is for a specific channel
+  - channel: notifications
+    # Webhook URL for slack, see https://api.slack.com/apps
+    api_url: https://alertmanagerwebhook.example.com
+    # Do you want only alerts firing or also alerts resolved?
+    send_resolved: true
+    # Alertmanager templating: https://prometheus.io/docs/alerting/notifications/
+    text: |-
+      <!channel>
+      Attention! You have an alert!
+
+      *Common summary:* {{ .CommonAnnotations.summary }}
+      *Common description:* {{ .CommonAnnotations.description }}
+      {{ range .CommonLabels.SortedPairs }}
+      *{{ .Name }}:* {{ .Value }}
+      {{ end }}
+
+      *Individual alerts below*
+      {{ range .Alerts }}
+      *Status:* {{ .Status }}
+      {{ range .Annotations.SortedPairs }}
+      *{{ .Name }}:* {{ .Value }}
+      {{ end }}
+      {{ end }}

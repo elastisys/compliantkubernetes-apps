@@ -1,0 +1,50 @@
+repositories:
+- name: stable
+  url: https://kubernetes-charts.storage.googleapis.com
+
+helmDefaults:
+  timeout: 600
+  createNamespace: false
+
+environments:
+  workload_cluster:
+    values:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/wc-config.yaml"
+    secrets:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
+  service_cluster:
+    values:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/sc-config.yaml"
+    secrets:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
+
+releases:
+# NFS
+- name: nfs-client-provisioner
+  namespace: kube-system
+  labels:
+    app: nfs-client-provisioner
+  chart: stable/nfs-client-provisioner
+  version: 1.2.6
+  missingFileHandler: Error
+  wait: true
+  values:
+  - values/nfs-client-provisioner.yaml.gotmpl
+  - nfs:
+{{ if eq .Environment.Name "service_cluster" }}
+      server: {{ requiredEnv "NFS_SC_SERVER_IP" }}
+{{ end }}
+{{ if eq .Environment.Name "workload_cluster" }}
+      server: {{ requiredEnv "NFS_WC_SERVER_IP" }}
+{{ end }}
+
+# Local volume provisioner
+- name: local-volume-provisioner
+  namespace: kube-system
+  labels:
+    app: local-volume-provisioner
+  chart: ./charts/local-volume-provisioner
+  version: 2.3.4
+  missingFileHandler: Info
+  values:
+  - values/local-volume-provisioner.yaml.gotmpl

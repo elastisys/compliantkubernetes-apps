@@ -1,0 +1,27 @@
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.blackbox }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "blackbox" | trunc 63 | trimSuffix "-" }}
+  labels:
+    app: {{ template "prometheus-alerts.fullname" . }}
+    {{- include "prometheus-alerts.labels" . | nindent 4 }}
+    {{- if .Values.defaultRules.labels -}}
+    {{- toYaml .Values.defaultRules.labels | nindent 4 }}
+    {{- end }}
+  {{- if .Values.defaultRules.annotations }}
+  annotations:
+    {{- toYaml .Values.defaultRules.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  groups:
+    - name: blackbox
+      rules:
+        - alert: EndpointDown
+          expr: probe_success == 0
+          for: 15s
+          labels:
+            severity: "critical"
+          annotations:
+            summary: "Endpoint {{`{{ $labels.name }}`}} at {{`{{ $labels.target }}`}} down"
+{{- end }}

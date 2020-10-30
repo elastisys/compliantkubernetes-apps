@@ -1,0 +1,89 @@
+adminPassword: {{ .Values.user.grafanaPassword }}
+
+image:
+  repository: grafana/grafana
+  tag: 7.0.3
+
+testFramework:
+  enabled: false
+
+ingress:
+  enabled: true
+  annotations:
+    cert-manager.io/issuer: {{ .Values.global.issuer }}
+  {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.userGrafana }}
+    nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.userGrafana }}
+  {{ end }}
+  hosts:
+  - grafana.{{ .Values.global.baseDomain }}
+  tls:
+  - secretName: user-grafana-tls
+    hosts:
+    - grafana.{{ .Values.global.baseDomain }}
+rbac:
+  pspUseAppArmor: false
+  pspEnabled: true
+  namespaced: true
+
+persistence:
+  type: pvc
+  enabled: true
+  size: 10Gi
+  accessModes:
+    - ReadWriteOnce
+
+sidecar:
+  dashboards:
+    enabled: true
+    # This will pick up the prometheus-operator dashboards
+    label: grafana_dashboard
+  datasources:
+    enabled: false
+    defaultDatasourceEnabled: false
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - name: ck8s-metrics
+      type: prometheus
+      access: proxy
+      url: http://wc-scraper-prometheus-instance.monitoring.svc.cluster.local:9090
+      basicAuth: false
+      editable: false
+      isDefault: true
+      orgId: 1
+      version: 1
+
+
+grafana.ini:
+  server:
+    root_url: https://grafana.{{ .Values.global.baseDomain }}
+  auth.generic_oauth:
+    name: dex
+    enabled: true
+    client_id: grafana
+    client_secret: {{ .Values.grafana.clientSecret }}
+    scopes: profile email openid
+    auth_url: https://dex.{{ .Values.global.baseDomain }}/auth
+    token_url: https://dex.{{ .Values.global.baseDomain }}/token
+    api_url: https://dex.{{ .Values.global.baseDomain }}/api
+    allowed_domains: {{ join " " .Values.dex.allowedDomains }}
+    allow_sign_up: true
+    tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}
+
+# Velero backup
+
+labels:
+  velero: backup
+
+podLabels:
+  velero: backup
+
+podAnnotations:
+  backup.velero.io/backup-volumes: storage
+
+resources: {{- toYaml .Values.user.grafana.resources | nindent 2 }}
+nodeSelector: {{- toYaml .Values.user.grafana.nodeSelector | nindent 2 }}
+affinity: {{- toYaml .Values.user.grafana.affinity | nindent 2  }}
+tolerations: {{- toYaml .Values.user.grafana.tolerations | nindent 2  }}

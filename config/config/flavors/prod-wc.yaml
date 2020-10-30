@@ -1,0 +1,17 @@
+global:
+  issuer: letsencrypt-prod
+  verifyTls: true
+
+user:
+  namespaces:
+    - production
+    - staging
+  adminUsers:
+    # Fill this out
+
+prometheus:
+  storage:
+    size: 15Gi
+  retention:
+    size: 12GiB
+    age:  3d

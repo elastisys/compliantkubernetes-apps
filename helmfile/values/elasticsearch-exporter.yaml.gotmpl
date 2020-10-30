@@ -1,0 +1,56 @@
+es:
+  # Set to null! This is set through env instead.
+  # See https://github.com/justwatchcom/elasticsearch_exporter/issues/307
+  uri:
+  all: true
+  indices: true
+  indices_settings: true
+  shards: true
+  snapshots: true
+  cluster_settings: false
+  timeout: 30s
+  sslSkipVerify: true
+
+# Load credentials from secret, used in uri below
+envFromSecret: opendistro-es-metrics-exporter-user
+
+env:
+  ES_URI: http://$(username):$(password)@opendistro-es-client-service:9200
+
+serviceMonitor:
+  enabled: true
+  namespace: elastic-system
+  labels:
+    release: prometheus-operator
+  interval: 30s
+  scrapeTimeout: 30s
+  scheme: http
+
+prometheusRule:
+  enabled: true
+  namespace: monitoring
+  labels:
+    release: prometheus-operator
+    role: operator
+  rules:
+  - alert: CuratorFailedToRemoveAuditLogs
+    expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"kubeaudit-(.+)"}))/(1024*1024*1024) > {{ .Values.elasticsearch.retention.kubeAuditSize }}
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: Curator failed to remove 'kubeudit' logs. Cumulated size is > {{ .Values.elasticsearch.retention.kubeAuditSize }} GB
+  - alert: CuratorFailedToRemoveContainerLogs
+    expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"kubernetes-(.+)"}))/(1024*1024*1024) > {{ .Values.elasticsearch.retention.kubernetesSize }}
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: Curator failed to remove 'kubernetes' logs. Cumulated size is > {{ .Values.elasticsearch.retention.kubernetesSize }} GB
+  - alert: CuratorFailedToRemoveOtherLogs
+    expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"other-(.+)"}))/(1024*1024*1024) > {{ .Values.elasticsearch.retention.otherSize }}
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: Curator failed to remove 'other' logs. Cumulated size is > {{ .Values.elasticsearch.retention.otherSize }} GB

@@ -1,0 +1,90 @@
+expose:
+  type: ingress
+  tls:
+    enabled: true
+    secretName: harbor-core-ingress-cert
+    notarySecretName: harbor-notary-ingress-cert
+  ingress:
+    annotations:
+      cert-manager.io/issuer: {{ .Values.global.issuer }}
+      {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.harbor }}
+      nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.harbor }}
+      {{ end }}
+    hosts:
+      core: harbor.{{ .Values.global.baseDomain }}
+      notary: notary.harbor.{{ .Values.global.baseDomain }}
+
+persistence:
+  enabled: true
+  resourcePolicy: "keep"
+  persistentVolumeClaim:
+    chartmuseum:
+      size: 5Gi
+    registry:
+      size: 5Gi
+    jobservice:
+      size: 1Gi
+    database:
+      size: 1Gi
+    redis:
+      size: 1Gi
+  imageChartStorage:
+    {{ if eq .Values.harbor.persistence.type "swift" }}
+    type: swift
+    swift:
+      authurl: {{ .Values.citycloud.authURL }}/v3
+      username: {{ .Values.citycloud.username }}
+      password: {{ .Values.citycloud.password }}
+      container: {{ .Values.s3.buckets.harbor }}
+      region: {{ .Values.citycloud.regionName }}
+      authversion: {{ .Values.citycloud.authVersion }}
+      tenant: {{ .Values.citycloud.tenantName }}
+      domain: {{ .Values.citycloud.projectDomainName }}
+    disableredirect: true
+    {{ else }}
+    type: s3
+    s3:
+      region: {{ .Values.s3.region }}
+      regionendpoint: {{ .Values.s3.regionEndpoint }}
+      bucket: {{ .Values.s3.buckets.harbor }}
+      secretkey: {{ .Values.s3.secretKey }}
+      accesskey: {{ .Values.s3.accessKey }}
+    {{ end }}
+
+externalURL: https://harbor.{{ .Values.global.baseDomain }}
+
+harborAdminPassword: {{ .Values.harbor.password }}
+
+core:
+  secret: {{ .Values.harbor.coreSecret }}
+  secretName: harbor-core-cert
+  xsrfKey: {{ .Values.harbor.xsrf }}
+  resources: {{- toYaml .Values.harbor.core.resources | nindent 4 }}
+  nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
+  affinity: {{- toYaml .Values.harbor.affinity | nindent 4 }}
+  tolerations: {{- toYaml .Values.harbor.tolerations | nindent 4 }}
+
+jobservice:
+  secret: {{ .Values.harbor.jobserviceSecret }}
+  resources: {{- toYaml .Values.harbor.jobservice.resources | nindent 4 }}
+  nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
+  affinity: {{- toYaml .Values.harbor.affinity | nindent 4 }}
+  tolerations: {{- toYaml .Values.harbor.tolerations | nindent 4 }}
+
+registry:
+  secret: {{ .Values.harbor.registrySecret }}
+  resources: {{- toYaml .Values.harbor.registry.resources | nindent 4 }}
+  nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
+  affinity: {{- toYaml .Values.harbor.affinity | nindent 4 }}
+  tolerations: {{- toYaml .Values.harbor.tolerations | nindent 4 }}
+
+notary:
+  secretName: harbor-notary-cert
+  resources: {{- toYaml .Values.harbor.notary.resources | nindent 4 }}
+  nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
+  affinity: {{- toYaml .Values.harbor.affinity | nindent 4 }}
+  tolerations: {{- toYaml .Values.harbor.tolerations | nindent 4 }}
+
+database:
+  internal:
+    password: {{ .Values.harbor.databasePassword }}

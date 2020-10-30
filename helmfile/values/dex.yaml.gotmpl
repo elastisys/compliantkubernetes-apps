@@ -1,0 +1,104 @@
+imageTag: "v2.21.0"
+
+#crds are installed in the k8s apply step
+crd:
+  present: true
+
+ingress:
+  enabled: true
+  annotations:
+    cert-manager.io/issuer: {{ .Values.global.issuer }}
+    {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.dex }}
+    nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.dex }}
+    {{ end }}
+  tls:
+  - secretName: dex-tls
+    hosts:
+    - dex.{{ .Values.global.baseDomain }}
+  hosts:
+  - dex.{{ .Values.global.baseDomain }}
+
+# https termination by ingress instead of through dex
+https: false
+
+config:
+  issuer: https://dex.{{ .Values.global.baseDomain }}
+  connectors:
+  {{ if eq .Values.dex.oidcProvider "google" }}
+  - type: oidc
+    id: google
+    name: Google
+    config:
+      # Canonical URL of the provider, also used for configuration discovery.
+      # This value MUST match the value returned in the provider config discovery.
+      #
+      # See: https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig
+      issuer: https://accounts.google.com
+      redirectURI: https://dex.{{ .Values.global.baseDomain }}/callback
+      clientID: {{ .Values.dex.googleClientID }}
+      clientSecret: {{ .Values.dex.googleClientSecret }}
+      hostedDomains: {{ toYaml .Values.dex.allowedDomains | nindent 6 }}
+  {{ end }}
+  {{ if eq .Values.dex.oidcProvider "aaa" }}
+  - name: AAA
+    id: aaa
+    type: oidc
+    config:
+      clientID: {{ .Values.dex.aaaClientID }}
+      clientSecret: {{ .Values.dex.aaaClientSecret }}
+      issuer: https://asmp-test.a1.net/oauth2
+      redirectURI: https://dex.{{.Values.global.baseDomain }}/callback
+      insecureSkipEmailVerified: true
+  {{ end }}
+  staticClients:
+    - id: kubelogin
+      name: 'Kubernetes CLI'
+      secret: {{ .Values.dex.kubeloginClientSecret }}
+      redirectURIs:
+      - http://localhost:8000
+      - http://localhost:8080/oauth2/callback
+      - https://ck8sdash.{{ .Values.global.baseDomain }}/oauth2/callback
+      - https://ck8sdash.{{ .Values.global.opsDomain }}/oauth2/callback
+    - id: grafana
+      secret: {{ .Values.grafana.clientSecret }}
+      name: 'Grafana'
+      redirectURIs:
+        - https://grafana.{{ .Values.global.baseDomain }}/login/generic_oauth
+{{ if .Values.harbor.enabled }}
+    - id: harbor
+      secret: {{ .Values.harbor.clientSecret }}
+      name: 'Harbor'
+      redirectURIs:
+        - https://harbor.{{ .Values.global.baseDomain }}/c/oidc/callback
+{{ end }}
+{{ if .Values.elasticsearch.sso.enabled }}
+    - id: kibana-sso
+      secret: {{ .Values.elasticsearch.clientSecret }}
+      name: 'kibana-sso'
+      redirectURIs:
+        - https://kibana.{{ .Values.global.baseDomain }}
+        - https://kibana.{{ .Values.global.baseDomain }}/auth/openid/login
+        - https://kibana.{{ .Values.global.baseDomain }}/app/kibana
+{{ end }}
+
+{{ if .Values.dex.enableStaticLogin }}
+  enablePasswordDB: true
+  staticPasswords:
+    - email: "admin@example.com"
+      # bcrypt hash of the string "password"
+      hash: {{ .Values.dex.staticPassword | default "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W" }}
+      username: "admin"
+      userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
+{{ end }}
+
+resources:
+{{- toYaml .Values.dex.resources | nindent 2 }}
+
+nodeSelector:
+{{- toYaml .Values.dex.nodeSelector | nindent 2  }}
+
+affinity:
+{{- toYaml .Values.dex.affinity | nindent 2  }}
+
+tolerations:
+{{- toYaml .Values.dex.tolerations | nindent 2  }}

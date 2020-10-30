@@ -1,0 +1,16 @@
+config:
+  debug: false
+  {{ if eq .Values.falco.alerts.type "slack" }}
+  slack:
+    webhookurl: {{ .Values.falco.alerts.slackWebhook }}
+    outputformat: "all"
+    footer: ""
+    icon: ""
+    minimumpriority: {{ .Values.falco.alerts.priority }}
+    messageformat: "Falco Alert : rule *{{`{{ .Rule }}`}}*"
+  {{ end }}
+  {{ if eq .Values.falco.alerts.type "alertmanager" }}
+  alertmanager:
+    hostport: {{ .Values.falco.alerts.hostPort }}
+    minimumpriority: {{ .Values.falco.alerts.priority }}
+  {{ end }}

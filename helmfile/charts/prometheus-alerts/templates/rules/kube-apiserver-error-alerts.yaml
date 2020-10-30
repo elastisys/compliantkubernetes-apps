@@ -1,0 +1,61 @@
+# Generated from 'kube-apiserver.rules' group from https://raw.githubusercontent.com/coreos/kube-prometheus/master/manifests/prometheus-rules.yaml
+# Do not change in-place! In order to change this file first read following link:
+# https://github.com/helm/charts/tree/master/stable/prometheus-alerts/hack
+{{- if and .Values.defaultRules.create  .Values.defaultRules.rules.kubeApiserverErrorAlerts}}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "prometheus-alerts" | trunc 63 | trimSuffix "-" }}
+  labels:
+    app: {{ template "prometheus-alerts.name" . }}
+{{ include "prometheus-alerts.labels" . | indent 4 }}
+{{- if .Values.defaultRules.labels }}
+{{ toYaml .Values.defaultRules.labels | indent 4 }}
+{{- end }}
+{{- if .Values.defaultRules.annotations }}
+  annotations:
+{{ toYaml .Values.defaultRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  groups:
+  - name: kube-apiserver-error-alerts
+    rules:
+    - alert: ErrorBudgetBurn
+      annotations:
+        message: 'High requests error budget burn for job=apiserver (current value: {{`{{`}} $value {{`}}`}})'
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-errorbudgetburn
+      expr: |-
+        (
+          status_class_5xx:apiserver_request_total:ratio_rate1h{job="apiserver"} > (14.4*0.010000)
+          and
+          status_class_5xx:apiserver_request_total:ratio_rate5m{job="apiserver"} > (14.4*0.010000)
+        )
+        or
+        (
+          status_class_5xx:apiserver_request_total:ratio_rate6h{job="apiserver"} > (6*0.010000)
+          and
+          status_class_5xx:apiserver_request_total:ratio_rate30m{job="apiserver"} > (6*0.010000)
+        )
+      labels:
+        job: apiserver
+        severity: critical
+    - alert: ErrorBudgetBurn
+      annotations:
+        message: 'High requests error budget burn for job=apiserver (current value: {{`{{`}} $value {{`}}`}})'
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-errorbudgetburn
+      expr: |-
+        (
+          status_class_5xx:apiserver_request_total:ratio_rate1d{job="apiserver"} > (3*0.010000)
+          and
+          status_class_5xx:apiserver_request_total:ratio_rate2h{job="apiserver"} > (3*0.010000)
+        )
+        or
+        (
+          status_class_5xx:apiserver_request_total:ratio_rate3d{job="apiserver"} > (0.010000)
+          and
+          status_class_5xx:apiserver_request_total:ratio_rate6h{job="apiserver"} > (0.010000)
+        )
+      labels:
+        job: apiserver
+        severity: warning
+{{- end }}

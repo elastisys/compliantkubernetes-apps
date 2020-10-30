@@ -1,0 +1,22 @@
+namespaces:
+- name: cert-manager
+  labels:
+      certmanager.k8s.io/disable-validation: "true"
+- name: dex
+- name: elastic-system
+- name: fluentd
+- name: influxdb-prometheus
+- name: kube-node-lease
+- name: kube-public
+- name: kube-system
+- name: monitoring
+- name: nginx-ingress
+- name: velero
+{{ if .Values.ck8sdash.enabled }}
+- name: ck8sdash
+{{ end }}
+{{ if .Values.harbor.enabled }}
+- name: harbor
+{{ end }}
+commonLabels:
+  owner: operator

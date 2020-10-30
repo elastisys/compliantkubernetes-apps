@@ -1,0 +1,27 @@
+{{- $common_annotations := .Values.commonAnnotations -}}
+{{- $common_labels := .Values.commonLabels -}}
+{{- range $key := .Values.namespaces}}
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .name  }}
+  labels:
+{{- with $common_labels }}
+    {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- if .labels -}}
+    {{ toYaml .labels | nindent 4 }}
+{{- end }}
+{{- if and .annotations $common_annotations }}
+  annotations:
+{{- end }}
+{{- with $common_annotations }}
+
+{{ toYaml . | indent 4 }}
+{{- end }}
+{{- if .annotations -}}
+    {{ toYaml .annotations | nindent 4 }}
+{{- end }}
+{{- end -}}

@@ -1,0 +1,30 @@
+{{ if eq .Values.ingress.enabled true }}
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/issuer: self-signed
+    # type of authentication
+    nginx.ingress.kubernetes.io/auth-type: basic
+    # name of the secret that contains the user/password definitions
+    nginx.ingress.kubernetes.io/auth-secret: user-alertmanager-auth
+    # message to display with an appropriate context why the authentication is required
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
+  labels:
+    app: alertmanager
+  name: alertmanager
+spec:
+  rules:
+  - host: alertmanager.{{ .Values.baseDomain }}
+    http:
+      paths:
+      - backend:
+          # This service is created automatically by the operator
+          serviceName: alertmanager-operated
+          servicePort: web
+        path: /
+  tls:
+  - hosts:
+    - alertmanager.{{ .Values.baseDomain }}
+    secretName: alertmanager-certs
+{{ end }}

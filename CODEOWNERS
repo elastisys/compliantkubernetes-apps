@@ -1,0 +1,94 @@
+# Specify users with e-mail or GitHub username.
+
+# Note: if many patterns match the same file, the latest pattern
+# will override the previous ones.
+
+# Default for files with no matching pattern later
+*   @elastisys/vulcan
+
+# CLI
+/bin/         @simonklb @vanneback
+/completion/  @simonklb @vanneback
+
+# Pipeline
+/pipeline/          @viktor-f @vanneback
+.github/workflows/  @viktor-f @vanneback
+
+# Harbor
+/helmfile/charts/*harbor*/    @vanneback @viktor-f
+/helmfile/values/*harbor*     @vanneback @viktor-f
+
+# Elastic/Kibana
+/helmfile/values/opendistro*    @OlleLarsson @ewnetu
+
+# Elastic misc (backup/slm)
+/helmfile/charts/elasticsearch*/    @OlleLarsson @danielharr
+/helmfile/values/elasticsearch*     @OlleLarsson @danielharr
+
+# InfluxDB
+/helmfile/values/influxdb*    @jakubkrzywda
+
+# Dex
+/helmfile/values/dex*   @lentzi90 @vanneback
+
+# OPA and Gatekeeper
+/helmfile/charts/gatekeeper*/                     @viktor-f @simonklb
+/helmfile/values/gatekeeper*                      @viktor-f @simonklb
+/pipeline/test/services/unit-tests/test-opa.sh    @viktor-f @simonklb
+
+# Falco
+/helmfile/charts/falco*/    @vanneback
+/helmfile/values/falco*     @vanneback
+
+# ck8s-dash
+/helmfile/charts/ck8sdash/    @JonasKop @emilhallberg @vanneback
+/helmfile/values/ck8sdash*    @JonasKop @emilhallberg @vanneback
+
+# Prometheus and Grafana
+/helmfile/charts/kubeapi-metrics/   @lentzi90 @OlleLarsson @vanneback
+/helmfile/charts/prometheus*/       @lentzi90 @OlleLarsson @vanneback
+/helmfile/values/grafana*           @lentzi90 @OlleLarsson @vanneback
+/helmfile/values/kubeapi-metrics*   @lentzi90 @OlleLarsson @vanneback
+/helmfile/values/prometheus*        @lentzi90 @OlleLarsson @vanneback
+
+# Alerts
+/helmfile/charts/examples/user-alertmanager/      @OlleLarsson @pettersv
+/helmfile/charts/*alert*/                         @OlleLarsson @pettersv
+/helmfile/values/*alert*                          @OlleLarsson @pettersv
+
+# Velero
+/helmfile/values/velero*    @viktor-f
+
+# Fluentd
+/helmfile/values/fluentd*   @OlleLarsson @ewnetu
+
+# Cert-manager
+/bootstrap/issuers/   @lentzi90 @danielharr
+
+# Nginx
+/helmfile/values/nginx*   @lentzi90 @viktor-f @Xartos
+
+# core DNS / node-local DNS
+/helmfile/charts/node-local-dns/  @Xartos @simonklb
+/helmfile/values/node-local-dns*  @Xartos @simonklb
+
+# Blackbox exporter / Metrics server
+/helmfile/charts/blackbox/        @lentzi90
+/helmfile/values/blackbox*        @lentzi90
+/helmfile/values/metrics-server*  @lentzi90
+
+# Pod Security Policies
+/helmfile/charts/*psp*/   @viktor-f @lentzi90
+/helmfile/values/*psp*    @viktor-f @lentzi90
+/helmfile/*psp*           @viktor-f @lentzi90
+
+# RBAC
+/helmfile/charts/*rbac*/    @lentzi90 @danielharr @vanneback @viktor-f
+/helmfile/values/*rbac*     @lentzi90 @danielharr @vanneback @viktor-f
+
+# Tests and linters
+/pipeline/test/           @danielharr @lentzi90 @geoff-elastisys @pettersv
+.editorconfig             @danielharr @lentzi90 @geoff-elastisys @pettersv
+.mdl*                     @danielharr @lentzi90 @geoff-elastisys @pettersv
+.pre-commit-config.yaml   @danielharr @lentzi90 @geoff-elastisys @pettersv
+.shellcheckrc             @danielharr @lentzi90 @geoff-elastisys @pettersv

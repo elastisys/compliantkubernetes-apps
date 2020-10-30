@@ -1,0 +1,25 @@
+helmDefaults:
+  timeout: 600
+  createNamespace: false
+
+# Environments
+environments:
+  workload_cluster:
+    values:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/wc-config.yaml"
+  service_cluster:
+    values:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/sc-config.yaml"
+
+# The desired state of Helm releases.
+releases:
+
+# Letsencrypt for both production and staging environments
+- name: letsencrypt
+  labels:
+    app: letsencrypt
+  chart: ./charts/letsencrypt
+  version: 0.1.0
+  missingFileHandler: Error
+  values:
+  - values/letsencrypt.yaml.gotmpl

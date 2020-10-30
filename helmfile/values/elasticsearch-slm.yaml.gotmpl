@@ -1,0 +1,15 @@
+snapshots:
+  min: {{ .Values.elasticsearch.snapshot.min }}
+  max: {{ .Values.elasticsearch.snapshot.max }}
+  maxAgeSeconds: {{ .Values.elasticsearch.snapshot.ageSeconds }}
+  schedule: {{ .Values.elasticsearch.snapshot.retentionSchedule | quote }}
+
+snapshotRepository: {{ .Values.elasticsearch.snapshotRepository }}
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 10m
+    memory: 32Mi

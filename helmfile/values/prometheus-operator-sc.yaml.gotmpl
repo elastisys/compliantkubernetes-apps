@@ -1,0 +1,346 @@
+global:
+  rbac:
+    pspEnabled: true
+
+kube-state-metrics:
+  podSecurityPolicy:
+    enabled: true
+
+kubeApiServer:
+  serviceMonitor:
+    metricRelabelings:
+      - action: keep
+        sourceLabels: [__name__]
+        regex: '(apiserver_request_count|apiserver_request_latencies_bucket|apiserver_client_certificate_expiration_seconds_count|apiserver_request_duration_seconds_sum|apiserver_request_duration_seconds_count|APIServiceRegistrationController_depth)'
+
+  relabelings:
+  - targetLabel: cluster
+    replacement: service_cluster
+
+kubeEtcd:
+  relabelings:
+  - targetLabel: cluster
+    replacement: service_cluster
+  service:
+    port: 4001
+    targetPort: 4001
+
+alertmanager:
+  config:
+    # See https://prometheus.io/docs/alerting/configuration/
+    route:
+      group_by: [cluster, alertname, severity]
+      # default receiver
+      receiver: '{{ .Values.alerts.alertTo }}'
+      routes:
+      - match:
+          # The watchdog alert is always active to show that things are working
+          alertname: Watchdog
+        # Repeat often to integreate with opsgenies heartbeat feture.
+        # If this goes silent, opsgenie will send out alerts.
+        repeat_interval: 1m
+        group_interval: 1m
+        {{ if .Values.alerts.opsGenieHeartbeat.enabled }}
+        receiver: heartbeat
+        {{ else }}
+        receiver: 'null'
+        {{ end }}
+      {{ if not .Values.user.alertmanager.enabled }}
+      - match:
+          # TODO: it would be nice to do this some other way.
+          # The workload_cluster does not have an alertmanager, send to null.
+          alertname: AlertmanagerDown
+          cluster: workload_cluster
+        receiver: 'null'
+      {{ end }}
+      - match:
+          # TODO: it would be nice to do this some other way.
+          # The workload_cluster does not have an alertmanager, send to null.
+          alertname: PrometheusNotConnectedToAlertmanagers
+          cluster: workload_cluster
+        receiver: 'null'
+      - match:
+          # This alert is a bit over sensitive at the moment
+          # See this: https://github.com/kubernetes-monitoring/kubernetes-mixin/issues/108
+          alertname: CPUThrottlingHigh
+        receiver: 'null'
+      - match:
+          # This alert is a bit over sensitive at the moment (always active for a cluster with one worker node), send to null.
+          alertname: KubeCPUOvercommit
+        receiver: 'null'
+      - match:
+          # This alert is a bit over sensitive at the moment (always active for a cluster with one worker node), send to null.
+          alertname: KubeMemOvercommit
+        receiver: 'null'
+    receivers:
+    - name: 'null'
+    - name: heartbeat
+      {{ if .Values.alerts.opsGenieHeartbeat.enabled }}
+      webhook_configs:
+        - url: {{ .Values.alerts.opsGenieHeartbeat.url }}/{{ .Values.alerts.opsGenieHeartbeat.name }}/ping
+          send_resolved: false
+          http_config:
+            basic_auth:
+              # https://docs.opsgenie.com/docs/authentication
+              # username: no username
+              password: {{ .Values.opsgenie.apiKey }}
+      {{ end }}
+    - name: slack
+      {{ if eq .Values.alerts.alertTo "slack" }}
+      slack_configs:
+      # Note: the channel here does not apply if the webhook URL is for a specific channel
+      - channel: {{ .Values.alerts.slack.channel }}
+        # Webhook URL for slack
+        api_url: {{ .Values.alerts.slack.apiUrl }}
+        send_resolved: true
+        # Alertmanager templating: https://prometheus.io/docs/alerting/notifications/
+        # We need to escape the templating brackets for alertmanager here with
+        # {{``}} to prevent helm from parsing them.
+        # See: https://github.com/helm/helm/issues/2798#issuecomment-467319526
+        text: |-
+          <!channel>
+          *Cluster:* grafana.{{ .Values.global.opsDomain }}
+          {{`
+          *Common summary:* {{ .CommonAnnotations.summary }}
+          *Common description:* {{ .CommonAnnotations.description }}
+          {{ range .CommonLabels.SortedPairs }}
+          *{{ .Name }}:* {{ .Value }}
+          {{ end }}
+
+          *Individual alerts below*
+          {{ range .Alerts }}
+          *Status:* {{ .Status }}
+          {{ range .Annotations.SortedPairs }}
+          *{{ .Name }}:* {{ .Value }}
+          {{ end }}
+          {{ end }}`}}
+      {{ end }}
+    - name: opsgenie
+      {{ if eq .Values.alerts.alertTo "opsgenie" }}
+      opsgenie_configs:
+        # See https://prometheus.io/docs/alerting/configuration/#opsgenie_config
+        - api_key: {{ .Values.alerts.opsGenie.apiKey }}
+          api_url: {{ .Values.alerts.opsGenie.apiUrl }}
+          source: grafana.{{ .Values.global.opsDomain }}
+          priority: {{`'{{ if eq .GroupLabels.severity "critical"}}P1{{else if eq .GroupLabels.severity "warning"}}P2{{else if eq .GroupLabels.severity "medium"}}P3{{else if eq .GroupLabels.severity "low"}}P4{{else}}P5{{end}}'`}}
+      {{ end }}
+
+  serviceMonitor:
+    relabelings:
+    - targetLabel: cluster
+      replacement: service_cluster
+
+  alertmanagerSpec:
+    ## Time duration Alertmanager shall retain data for. Default is '120h', and must match the regular expression
+    ## [0-9]+(ms|s|m|h) (milliseconds seconds minutes hours).
+    ##
+    retention: {{ .Values.prometheus.retention.alertmanager }}
+
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+
+grafana:
+
+  image:
+    repository: grafana/grafana
+    tag: 7.0.3
+
+  # admin username is "admin"
+  adminPassword: {{ .Values.grafana.password }}
+
+  ingress:
+    enabled: true
+    annotations:
+      ingress.kubernetes.io/rewrite-target: /
+      cert-manager.io/issuer: {{ .Values.global.issuer }}
+    {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.opsGrafana }}
+      nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.opsGrafana }}
+    {{ end }}
+    hosts:
+    - grafana.{{ .Values.global.opsDomain }}
+    ## TLS configuration for grafana Ingress
+    ## Secret must be manually created in the namespace
+    tls:
+    - secretName: grafana-ops-general-tls
+      hosts:
+      - grafana.{{ .Values.global.opsDomain }}
+  rbac:
+    pspUseAppArmor: false
+    pspEnabled: true
+
+  persistence:
+    type: pvc
+    enabled: true
+    size: 10Gi
+    accessModes:
+      - ReadWriteOnce
+
+  serviceAccount:
+    create: true
+    name:
+    nameTest:
+
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+    datasources:
+      enabled: true
+      defaultDatasourceEnabled: false
+
+  additionalDataSources:
+  - name: prometheus-wc-reader
+    access: proxy
+    basicAuth: false
+    editable: false
+    isDefault: false
+    orgId: 1
+    type: prometheus
+    url: http://wc-scraper-prometheus-instance:9090
+    version: 1
+  - name: prometheus-sc
+    access: proxy
+    basicAuth: false
+    editable: false
+    isDefault: false
+    orgId: 1
+    type: prometheus
+    url: http://prometheus-operator-prometheus:9090
+    version: 1
+
+  grafana.ini:
+    server:
+      root_url: https://grafana.{{ .Values.global.opsDomain }}
+    auth.generic_oauth:
+      name: dex
+      enabled: true
+      client_id: grafana
+      client_secret: {{ .Values.grafana.clientSecret }}
+      scopes: profile email openid
+      auth_url: https://dex.{{ .Values.global.baseDomain }}/auth
+      token_url: https://dex.{{ .Values.global.baseDomain }}/token
+      api_url: https://dex.{{ .Values.global.baseDomain }}/api
+      allowed_domains: {{ join " " .Values.dex.allowedDomains }}
+      allow_sign_up: true
+      tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}
+
+  serviceMonitor:
+    relabelings:
+    - targetLabel: cluster
+      replacement: service_cluster
+
+prometheusOperator:
+  createCustomResource: false
+
+  serviceMonitor:
+    relabelings:
+    - targetLabel: cluster
+      replacement: service_cluster
+
+defaultRules:
+  create: false
+
+prometheus:
+  prometheusSpec:
+    image:
+      tag: v2.19.2
+    resources: {{- toYaml .Values.prometheus.resources | nindent 8  }}
+    nodeSelector: {{- toYaml .Values.prometheus.nodeSelector | nindent 8 }}
+    affinity: {{- toYaml .Values.prometheus.affinity | nindent 8 }}
+    tolerations: {{- toYaml .Values.prometheus.tolerations | nindent 8 }}
+
+
+    remoteRead:
+    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u=admin&p={{ .Values.influxDB.password }}
+    remoteWrite:
+    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=service_cluster&u=admin&p={{ .Values.influxDB.password }}
+
+    # Don't add prometheus info.
+    prometheusExternalLabelNameClear: true
+    replicaExternalLabelNameClear: true
+
+    # Empty selector to select all namespaces
+    podMonitorNamespaceSelector: {}
+    ruleNamespaceSelector: {}
+    serviceMonitorNamespaceSelector: {}
+
+    # Select all service monitors
+    serviceMonitorSelector:
+      matchLabels: {}
+
+    ruleSelector:
+      matchLabels:
+        cluster: service
+
+    ## How long to retain metrics
+    ##
+    retention: {{ .Values.prometheus.retention.age }}
+
+    ## Maximum size of metrics
+    ##
+    retentionSize: {{ .Values.prometheus.retention.size }}
+
+    ## Prometheus StorageSpec for persistent data
+    ## ref: https://github.com/coreos/prometheus-operator/blob/release-0.29/Documentation/user-guides/storage.md
+    ##
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: {{ .Values.global.storageClass }}
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: {{ .Values.prometheus.storage.size }}
+
+    {{ if eq .Values.global.storageClass "nfs-client"  }}
+    additionalScrapeConfigs:
+    - job_name: 'node-exporter'
+      scrape_interval: 30s
+      metrics_path: /metrics
+      scheme: http
+      static_configs:
+      - targets:
+        - '{{ requiredEnv "NFS_SC_SERVER_IP" }}:9100'
+    {{ end }}
+
+  serviceMonitor:
+    relabelings:
+    - targetLabel: cluster
+      replacement: service_cluster
+
+kubelet:
+  enabled: true
+  namespace: kube-system
+
+  serviceMonitor:
+    cAdvisorRelabelings:
+    - sourceLabels: [__metrics_path__]
+      targetLabel: metrics_path
+    - targetLabel: cluster
+      replacement: service_cluster
+
+    relabelings:
+    - sourceLabels: [__metrics_path__]
+      targetLabel: metrics_path
+    - targetLabel: cluster
+      replacement: service_cluster
+
+nodeExporter:
+  serviceMonitor:
+    relabelings:
+    - targetLabel: cluster
+      replacement: service_cluster
+
+kubeStateMetrics:
+  serviceMonitor:
+    relabelings:
+    - targetLabel: cluster
+      replacement: service_cluster
+
+coreDns:
+  serviceMonitor:
+    relabelings:
+    - targetLabel: cluster
+      replacement: service_cluster

@@ -1,0 +1,22 @@
+# https://editorconfig.org/
+# EditorConfig files are read top to bottom and the most recent rules found take precedence.
+# Properties from matching EditorConfig sections are applied in the order they were read, so properties in closer files take precedence.
+
+# top-most EditorConfig file
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+[Makefile]
+intent_style = tab
+tab_width = 4
+
+[*.md]
+# Setting max_line_length=off would use the local editor default.
+# Therefore, set to a high number to allow long lines.
+max_line_length = 10000

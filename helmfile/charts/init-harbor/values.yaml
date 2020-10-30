@@ -1,0 +1,9 @@
+endpoint: harbor-harbor-core/api/v2.0
+#Should be overwritten with more secure password
+password: "Harbor12345"
+
+oidc:
+  scope: "openid,email,profile,offline_access"
+  clientSecret: ""
+  endpoint: ""
+  verifyCert: true

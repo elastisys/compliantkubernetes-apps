@@ -1,0 +1,13 @@
+# https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#alertmanager
+apiVersion: monitoring.coreos.com/v1
+kind: Alertmanager
+metadata:
+  name: alertmanager
+  labels:
+    app: alertmanager
+spec:
+  replicas: 1
+  securityContext:
+    fsGroup: 2000
+    runAsNonRoot: true
+    runAsUser: 1000

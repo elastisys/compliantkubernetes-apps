@@ -1,0 +1,35 @@
+{{- if and .Values.defaultRules.create  .Values.defaultRules.rules.certManagerCertificateAlerts}}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "cert-manager-certificates" | trunc 63 | trimSuffix "-" }}
+  namespace: "cert-manager"
+  labels:
+    app: {{ template "prometheus-alerts.name" . }}
+{{ include "prometheus-alerts.labels" . | indent 4 }}
+{{- if .Values.defaultRules.labels }}
+{{ toYaml .Values.defaultRules.labels | indent 4 }}
+{{- end }}
+  annotations:
+{{ toYaml .Values.defaultRules.annotations | indent 4 }}
+spec:
+  groups:
+  - name: cert-manager-certificate.rules
+    rules:
+    - alert: CertificateExpiringSoon
+      annotations:
+        message: The Certificate {{`{{$labels.name}}`}} is expiring withing 20 days.
+      # Fire the alert when there are less than 20 days = 60*60*24*20 seconds left
+      expr: certmanager_certificate_expiration_timestamp_seconds - time() < 60*60*24*20
+      for: 10m
+      labels:
+        severity: low
+    - alert: CertificateNotReady
+      annotations:
+        message: The Certificate {{`{{$labels.name}}`}} is not ready!
+      # Fire the alert when the Certificaet is not ready
+      expr: certmanager_certificate_ready_status{condition="False"} > 0
+      for: 10m
+      labels:
+        severity: critical
+{{- end }}

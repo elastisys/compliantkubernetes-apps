@@ -1,0 +1,34 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-job
+spec:
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      labels:
+        release: {{ .Release.Name }}
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: run
+          image: elastisys/curl-jq:latest
+          command: ['/bin/sh', '/scripts/init-harbor.sh']
+          env:
+            - name: HARBOR_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name:  harbor-init-secret
+                  key: harbor-password
+            - name: OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name:  harbor-init-secret
+                  key: oidc-client-secret
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+      volumes:
+      - name: scripts
+        configMap:
+          name: {{ .Release.Name }}-cm

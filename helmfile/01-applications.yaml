@@ -1,0 +1,559 @@
+# Chart repositories used from within this state file.
+repositories:
+- name: stable
+  url: https://kubernetes-charts.storage.googleapis.com
+- name: jetstack
+  url: https://charts.jetstack.io
+- name: kiwigrid
+  url: https://kiwigrid.github.io
+- name: vmware-tanzu
+  url: https://vmware-tanzu.github.io/helm-charts
+- name: falcosecurity
+  url: https://falcosecurity.github.io/charts
+
+# workload_cluster specfic repositories
+{{ if eq .Environment.Name "workload_cluster" }}
+- name: falcosecurity
+  url: https://falcosecurity.github.io/charts
+{{ end }}
+
+# service_cluster specific repositories
+{{ if eq .Environment.Name "service_cluster" }}
+- name: harbor
+  url: https://helm.goharbor.io
+- name: elastisys
+  url: https://elastisys.github.io/chart-repo
+{{ end }}
+
+# Defult settings to use with helm.
+helmDefaults:
+  timeout: 600
+  createNamespace: false
+
+# Environments
+environments:
+  workload_cluster:
+    values:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/wc-config.yaml"
+    secrets:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
+  service_cluster:
+    values:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/sc-config.yaml"
+    secrets:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
+
+# The desired state of Helm releases.
+releases:
+# Nginx-ingress
+- name: nginx-ingress
+  namespace: nginx-ingress
+  labels:
+    app: nginx-ingress
+  chart: stable/nginx-ingress
+  version: 1.26.2
+  missingFileHandler: Error
+  wait: true
+  values:
+  - values/nginx-ingress.yaml.gotmpl
+
+# Cert-manager
+- name: cert-manager
+  namespace: cert-manager
+  labels:
+    app: cert-manager
+  chart: jetstack/cert-manager
+  version: v0.14.1
+  missingFileHandler: Error
+  wait: true
+
+# Prometheus-operator
+- name: prometheus-operator
+  namespace: monitoring
+  labels:
+    app: prometheus-operator
+  chart: stable/prometheus-operator
+  version: 8.15.11
+  missingFileHandler: Error
+  needs:
+  - cert-manager/cert-manager
+  values:
+{{ if eq .Environment.Name "service_cluster" }}
+  - values/prometheus-operator-sc.yaml.gotmpl
+{{ end }}
+{{ if eq .Environment.Name "workload_cluster" }}
+  - values/prometheus-operator-wc.yaml.gotmpl
+{{ end }}
+
+
+{{ if .Values.ck8sdash.enabled }}
+- name: ck8sdash
+  namespace: ck8sdash
+  labels:
+    app: ck8sdash
+  chart: ./charts/ck8sdash
+  version: 0.3.1
+  missingFileHandler: Error
+  needs:
+  - cert-manager/cert-manager
+  values:
+  - values/ck8sdash-common.yaml.gotmpl
+{{ if eq .Environment.Name "service_cluster" }}
+  - values/ck8sdash-sc.yaml.gotmpl
+{{ end }}
+{{ if eq .Environment.Name "workload_cluster" }}
+  - values/ck8sdash-wc.yaml.gotmpl
+{{ end }}
+{{ end }}
+
+# Velero
+- name: velero
+  namespace: velero
+  labels:
+    app: velero
+  chart: vmware-tanzu/velero
+  version: 2.8.2
+  missingFileHandler: Error
+  values:
+  - values/velero.yaml.gotmpl
+  - configuration:
+      backupStorageLocation:
+{{ if eq .Environment.Name "service_cluster" }}
+        prefix: service-cluster
+{{ end }}
+{{ if eq .Environment.Name "workload_cluster" }}
+        prefix: workload-cluster
+{{ end }}
+
+- name: node-local-dns
+  namespace: kube-system
+  labels:
+    app: node-local-dns
+  chart: ./charts/node-local-dns
+  version: 0.1.0
+  missingFileHandler: Error
+  values:
+  - values/node-local-dns.yaml.gotmpl
+
+# metrics-server
+- name: metrics-server
+  namespace: kube-system
+  labels:
+    app: metrics-server
+  chart: stable/metrics-server
+  version: 2.10.0
+  missingFileHandler: Error
+  values:
+  - values/metrics-server.yaml.gotmpl
+
+# Service cluster releases
+{{ if eq .Environment.Name "service_cluster" }}
+# Dex
+- name: dex
+  namespace: dex
+  labels:
+    app: dex
+  chart: stable/dex
+  version: 2.5.0
+  missingFileHandler: Error
+  wait: true
+  needs:
+  - cert-manager/cert-manager
+  values:
+  - values/dex.yaml.gotmpl
+
+# Prometheus-instance for scraping workload cluster metrics
+- name: wc-scraper
+  namespace: monitoring
+  labels:
+    app: wc-scraper
+  chart: ./charts/prometheus-instance
+  version: 0.1.0
+  missingFileHandler: Error
+  values:
+  - values/prometheus-wc-federate-scraper.yaml.gotmpl
+
+# prometheus wc-scraper alerts
+- name: wc-scraper-alerts
+  namespace: monitoring
+  labels:
+    app: prometheus-alerts
+    prometheus: wc-scraper
+  chart: ./charts/prometheus-alerts
+  version: 0.1.0
+  missingFileHandler: Error
+  values:
+{{ if eq .Environment.Name "service_cluster" }}
+  # Note: we want to have alerts for WC since this is wc-scraper, even if it is
+  # running in SC.
+  - values/prometheus-alerts-wc.yaml.gotmpl
+{{ end }}
+
+# prometheus sc-alerts
+- name: sc-alerts
+  namespace: monitoring
+  labels:
+    app: prometheus-alerts
+    prometheus: sc
+  chart: ./charts/prometheus-alerts
+  version: 0.1.0
+  missingFileHandler: Error
+  values:
+  - values/prometheus-alerts-sc.yaml.gotmpl
+
+# grafana-ops dashboard
+- name: grafana-ops
+  namespace: monitoring
+  labels:
+    app: grafana-ops
+    prometheus: sc
+  chart: ./charts/grafana-ops
+  version: 0.1.0
+  missingFileHandler: Error
+
+{{ if .Values.user.grafana.enabled }}
+# Grafana instance for user
+- name: user-grafana
+  namespace: monitoring
+  labels:
+    app: user-grafana
+    app.kubernetes.io/instance: user-grafana
+    app.kubernetes.io/name: grafana
+  chart: stable/grafana
+  version: 5.3.4
+  missingFileHandler: Error
+  needs:
+  - cert-manager/cert-manager
+  values:
+  - values/grafana-user.yaml.gotmpl
+{{ end }}
+
+
+#Elasticsearch-prometheus-exporter
+- name: elasticsearch-exporter
+  namespace: elastic-system
+  labels:
+    app: elasticsearch-exporter
+  chart: stable/elasticsearch-exporter
+  version: 3.3.0
+  missingFileHandler: Error
+  needs:
+  - elastic-system/opendistro-es
+  values:
+  - values/elasticsearch-exporter.yaml.gotmpl
+
+# opendistro elasticsearch snapshot lifecycle management
+- name: elasticsearch-slm
+  namespace: elastic-system
+  labels:
+    app: elasticsearch-slm
+  chart: ./charts/elasticsearch-slm
+  version: 0.1.0
+  missingFileHandler: Error
+  needs:
+  - elastic-system/opendistro-es
+  values:
+  - values/elasticsearch-slm.yaml.gotmpl
+
+# opendistro elasticsearch backup job
+- name: elasticsearch-backup
+  namespace: elastic-system
+  labels:
+    app: elasticsearch-backup
+  chart: ./charts/elasticsearch-backup
+  version: 0.1.0
+  missingFileHandler: Error
+  needs:
+  - elastic-system/opendistro-es
+  values:
+  - values/elasticsearch-backup.yaml.gotmpl
+
+{{ if .Values.harbor.enabled }}
+# Harbor
+- name: harbor-certs
+  namespace: harbor
+  labels:
+    app: harbor
+  chart: ./charts/harbor-certs
+  version: 0.1.0
+  missingFileHandler: Error
+  needs:
+  - cert-manager/cert-manager
+  values:
+  - values/harbor-certs.yaml.gotmpl
+
+- name: harbor
+  namespace: harbor
+  labels:
+    app: harbor
+  chart: harbor/harbor
+  version: 1.4.0
+  missingFileHandler: Error
+  wait: true
+  timeout: 600
+  needs:
+  - cert-manager/cert-manager
+  values:
+  - values/harbor.yaml.gotmpl
+
+- name: init-harbor
+  namespace: harbor
+  labels:
+    app: harbor
+  chart: ./charts/init-harbor
+  version: 0.1.0
+  missingFileHandler: Error
+  needs:
+  - harbor/harbor
+  values:
+  - values/init-harbor.yaml.gotmpl
+
+- name: harbor-backup
+  namespace: harbor
+  labels:
+    app: harbor
+    component: backup
+  chart: ./charts/harbor-backup
+  version: 0.1.0
+  missingFileHandler: Error
+  values:
+  - values/harbor-backup.yaml.gotmpl
+{{ end }}
+
+# InfluxDB with disk usage monitoring and metrics retention
+- name: influxdb
+  namespace: influxdb-prometheus
+  labels:
+    app: influxdb
+  chart: elastisys/influxdb
+  version: 4.8.1
+  missingFileHandler: Error
+  values:
+  - values/influxdb.yaml.gotmpl
+
+- name: blackbox
+  namespace: monitoring
+  labels:
+    app: blackbox
+  chart: ./charts/blackbox
+  version: 0.1.0
+  missingFileHandler: Error
+  values:
+  - values/blackbox.yaml.gotmpl
+
+# Fluentd
+- name: fluentd
+  namespace: fluentd
+  labels:
+    app: fluentd
+  chart: kiwigrid/fluentd-elasticsearch
+  version: 5.1.1
+  missingFileHandler: Error
+  values:
+  - values/fluentd-sc.yaml.gotmpl
+
+# Fluentd aggregator
+- name: fluentd-aggregator
+  namespace: fluentd
+  labels:
+    app: fluentd-aggregator
+  chart: stable/fluentd
+  version: 2.3.2
+  missingFileHandler: Error
+  values:
+  - values/fluentd-aggregator.yaml.gotmpl
+
+# Logs backup retention
+- name: sc-logs-retention
+  namespace: fluentd
+  labels:
+    app: sc-logs-retention
+  chart: ./charts/sc-logs-retention
+  version: 0.1.0
+  missingFileHandler: Error
+  needs:
+  - fluentd/fluentd-aggregator
+  values:
+  - values/sc-logs-retention.yaml.gotmpl
+
+# Opendistro
+- name: opendistro-es
+  namespace: elastic-system
+  labels:
+    app: opendistro
+  chart: elastisys/opendistro-es
+  version: 1.10.1
+  missingFileHandler: Error
+  needs:
+  - cert-manager/cert-manager
+  values:
+  - values/opendistro-es.yaml.gotmpl
+
+# End of system services releases
+{{ end }}
+
+# Workload cluster releases
+{{ if eq .Environment.Name "workload_cluster" }}
+{{ if .Values.falco.enabled }}
+# Falco
+- name: falco
+  namespace: falco
+  labels:
+    app: falco
+  chart: falcosecurity/falco
+  version: 1.5.2
+  missingFileHandler: Error
+  values:
+  - values/falco.yaml.gotmpl
+
+# Falco-exporter
+- name: falco-exporter
+  namespace: falco
+  labels:
+    app: falco-exporter
+  chart: falcosecurity/falco-exporter
+  version: 0.3.8
+  missingFileHandler: Error
+  values:
+    - values/falco-exporter.yaml.gotmpl
+{{ end }}
+
+#Basic auth credentials for accessing workload cluster prometheus
+- name: prometheus-auth
+  namespace: monitoring
+  labels:
+    app: prometheus-auth
+  chart: ./charts/basic-auth-secret
+  version: 0.1.0
+  missingFileHandler: Error
+  values:
+  - values/prometheus-auth.yaml.gotmpl
+
+{{ if .Values.user.alertmanager.enabled }}
+- name: user-alertmanager
+  namespace: monitoring
+  labels:
+    app: user-alertmanager
+  chart: ./charts/examples/user-alertmanager
+  version: 0.1.0
+  missingFileHandler: Error
+  needs:
+  - cert-manager/cert-manager
+  values:
+  - values/user-alertmanager.yaml.gotmpl
+{{ end }}
+
+{{ if .Values.falco.alerts.enabled }}
+- name: falcosidekick
+  namespace: falco
+  labels:
+    app: falco
+  chart: ./charts/falcosidekick
+  version: 0.1.14
+  missingFileHandler: Error
+  values:
+  - values/falcosidekick.yaml.gotmpl
+{{ end }}
+
+# Fluentd
+- name: fluentd-system
+  namespace: kube-system
+  labels:
+    app: fluentd
+  chart: kiwigrid/fluentd-elasticsearch
+  version: 5.1.1
+  missingFileHandler: Error
+  values:
+  - values/fluentd-wc.yaml.gotmpl
+
+# Fluentd configurable by the user
+- name: fluentd
+  namespace: fluentd
+  labels:
+    app: fluentd
+  chart: kiwigrid/fluentd-elasticsearch
+  version: 5.1.1
+  missingFileHandler: Error
+  values:
+  - values/fluentd-user.yaml.gotmpl
+
+{{ if .Values.opa.enabled }}
+# gatekeeper-operator
+- name: gatekeeper-operator
+  namespace: gatekeeper-system
+  labels:
+    app: gatekeeper-operator
+  chart: ./charts/gatekeeper-operator
+  version: 1.6.0
+  missingFileHandler: Error
+  wait: true
+  values:
+  - values/gatekeeper-operator.yaml.gotmpl
+
+# gatekeeper-templates
+- name: gatekeeper-templates
+  namespace: gatekeeper-system
+  labels:
+    app: gatekeeper-templates
+  chart: ./charts/gatekeeper-templates
+  version: 1.6.0
+  missingFileHandler: Error
+  needs:
+  - gatekeeper-system/gatekeeper-operator
+  values:
+  - values/gatekeeper-templates.yaml.gotmpl
+
+# gatekeeper-constraints
+- name: gatekeeper-constraints
+  namespace: gatekeeper-system
+  labels:
+    app: gatekeeper-constraints
+  chart: ./charts/gatekeeper-constraints
+  version: 1.6.0
+  missingFileHandler: Error
+  needs:
+  - gatekeeper-system/gatekeeper-templates
+  values:
+  - values/gatekeeper-constraints.yaml.gotmpl
+{{ end }}
+
+# TODO: Make this optional! Users may not want any alerts by default.
+# It should also be separate from the alerts we use. Users should not need
+# to care about system components that they cannot touch anyway.
+# prometheus user-alerts
+- name: ck8s-alerts
+  namespace: monitoring
+  labels:
+    app: prometheus-alerts
+  chart: ./charts/prometheus-alerts
+  version: 0.1.0
+  missingFileHandler: Info
+  values:
+  - values/prometheus-alerts-wc.yaml.gotmpl
+
+# User RBAC
+- name: user-rbac
+  namespace: kube-system
+  labels:
+    app: user-rbac
+  chart: ./charts/user-rbac
+  version: 0.1.0
+  missingFileHandler: Error
+  {{ if .Values.opa.enabled }}
+  needs:
+  - gatekeeper-system/gatekeeper-constraints
+  {{ end }}
+  values:
+  - values/user-rbac.yaml.gotmpl
+
+# kube apiserver metrics ingress
+- name: kubeapi-metrics
+  namespace: kube-system
+  labels:
+    app: kubeapi-metrics
+  chart: ./charts/kubeapi-metrics
+  version: 0.1.0
+  missingFileHandler: Error
+  values:
+  - values/kubeapi-metrics.yaml.gotmpl
+{{ end }}

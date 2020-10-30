@@ -1,0 +1,28 @@
+# Docs: https://pre-commit.com/
+#
+# Quickstart:
+# $ pip3 install pre-commit
+# $ pre-commit install
+# < edit json, yaml, (ba)sh, add trailing whitespace etc >
+# $ git add .
+# $ git commit
+#
+# If the pre-commit hook is broken, it can be removed by deleting the file
+# at .git/hooks/pre-commit
+
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v3.2.0
+  hooks:
+  - id: check-json
+  - id: check-yaml
+    exclude: helmfile/|bootstrap/
+    args: [--allow-multiple-documents]
+  - id: end-of-file-fixer
+  - id: trailing-whitespace
+  - id: check-merge-conflict
+- repo: https://github.com/jumanjihouse/pre-commit-hooks
+  rev: 2.1.4
+  hooks:
+  - id: shellcheck
+  - id: markdownlint

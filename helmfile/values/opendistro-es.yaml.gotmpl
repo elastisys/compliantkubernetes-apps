@@ -1,0 +1,610 @@
+# Elasticsearch deployment configuration
+elasticsearch:
+  ssl:
+    transport:
+      existingCertSecret: opendistro-es-es-transport-cert
+      existingCertSecretCertSubPath: tls.crt
+      existingCertSecretKeySubPath: tls.key
+      existingCertSecretRootCASubPath: ca.crt
+
+    admin:
+      enabled: true
+      existingCertSecret: opendistro-es-es-admin-cert
+      existingCertSecretCertSubPath: tls.crt
+      existingCertSecretKeySubPath: tls.key
+      existingCertSecretRootCASubPath: ca.crt
+
+  s3:
+    enabled: true
+    useExistingSecret: false
+    secretName: opendistro-es-s3-credentials
+    accessKey: {{ .Values.s3.accessKey }}
+    secretKey: {{ .Values.s3.secretKey }}
+    bucketName: {{ .Values.s3.buckets.elasticsearch }}
+    provider: {{ .Values.global.cloudProvider }}
+
+  extraVolumes:
+  - emptyDir: {}
+    name: internal-elasticsearch-config-local
+  - emptyDir: {}
+    name: internal-elasticsearch-plugins-local
+  - name: s3-credentials
+    secret:
+      secretName: opendistro-es-s3-credentials
+
+  extraVolumeMounts:
+  - mountPath: /usr/share/elasticsearch/config
+    name: internal-elasticsearch-config-local
+  - mountPath: /usr/share/elasticsearch/plugins
+    name: internal-elasticsearch-plugins-local
+
+  extraInitContainers:
+  - name: install-s3
+    image: amazon/opendistro-for-elasticsearch:1.10.1
+    command:
+    - sh
+    - -c
+    - |
+      /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch repository-s3
+
+      /usr/share/elasticsearch/bin/elasticsearch-keystore create
+      /usr/share/elasticsearch/bin/elasticsearch-keystore add-file s3.client.default.access_key /mnt/elastic-internal/s3-credentials/s3.client.default.access_key
+      /usr/share/elasticsearch/bin/elasticsearch-keystore add-file s3.client.default.secret_key /mnt/elastic-internal/s3-credentials/s3.client.default.secret_key
+
+      # Disable performance_analyzer due to issue where disk is being filled up
+      /usr/share/elasticsearch/bin/elasticsearch-plugin remove opendistro_performance_analyzer
+
+      if [[ -z "$(ls -A /usr/share/elasticsearch/config)" ]]; then
+        echo "Empty dir /usr/share/elasticsearch/config"
+      else
+        echo "Copying /usr/share/elasticsearch/config/* to /mnt/elastic-internal/elasticsearch-config-local/"
+        cp -av /usr/share/elasticsearch/config/* /mnt/elastic-internal/elasticsearch-config-local/
+      fi
+
+      if [[ -z "$(ls -A /usr/share/elasticsearch/plugins)" ]]; then
+        echo "Empty dir /usr/share/elasticsearch/plugins"
+      else
+        echo "Copying /usr/share/elasticsearch/plugins/* to /mnt/elastic-internal/elasticsearch-plugins-local/"
+        cp -av /usr/share/elasticsearch/plugins/* /mnt/elastic-internal/elasticsearch-plugins-local/
+      fi
+
+    volumeMounts:
+    - mountPath: /mnt/elastic-internal/elasticsearch-config-local
+      name: internal-elasticsearch-config-local
+    - mountPath: /mnt/elastic-internal/elasticsearch-plugins-local
+      name: internal-elasticsearch-plugins-local
+    - mountPath: /mnt/elastic-internal/s3-credentials
+      name: s3-credentials
+
+  securityConfig:
+    config:
+      securityConfigSecret: opendistro-es-security-config-secret
+      data:
+        # Define admin, kibana, and configurer users, roles, and mappings
+        internal_users.yml: |-
+          _meta:
+            type: "internalusers"
+            config_version: 2
+
+          admin:
+            hash: {{ .Values.elasticsearch.adminHash }}
+            reserved: true
+            backend_roles:
+            - "admin"
+            description: "Admin user"
+
+          kibanaserver:
+            hash: {{ .Values.elasticsearch.kibanaHash }}
+            reserved: true
+            description: "Kibana server user"
+
+          configurer:
+            hash: {{ .Values.elasticsearch.configurerHash }}
+            reserved: true
+            description: "Configurer user"
+
+        roles_mapping.yml: |-
+          _meta:
+            type: "rolesmapping"
+            config_version: 2
+
+          all_access:
+            reserved: true
+            backend_roles:
+            - "admin"
+            description: "Maps admin to all_access"
+
+          kibana_server:
+            reserved: true
+            users:
+            - "kibanaserver"
+            description: "Maps kibanaserver user with the static kibana_server role"
+
+          configurer:
+            reserved: false
+            users:
+            - "configurer"
+            description: "Maps kibanaserver user with configurer role"
+
+          kibana_user:
+            reserved: false
+            users:
+            - "configurer"
+            description: "Maps configurer user with the static kibana_server role"
+
+        config.yml: |-
+          _meta:
+            type: "config"
+            config_version: 2
+
+          config:
+            dynamic:
+              authc:
+                basic_internal_auth_domain:
+                  description: "Authenticate via HTTP Basic against internal users database"
+                  http_enabled: true
+                  transport_enabled: true
+                  order: 0
+                  http_authenticator:
+                    type: basic
+                    challenge: false
+                  authentication_backend:
+                    type: internal
+        {{ if .Values.elasticsearch.sso.enabled }}
+                openid_auth_domain:
+                  description: "openid connect"
+                  http_enabled: true
+                  transport_enabled: true
+                  order: 1
+                  http_authenticator:
+                    type: openid
+                    challenge: false
+                    config:
+                      openid_connect_url: http://dex.dex.svc.cluster.local:32000/.well-known/openid-configuration
+                      openid_connect_idp.verify_hostnames: false
+                      openid_connect_idp.enable_ssl: false
+                      subject_key: name
+                      roles_key: groups
+                  authentication_backend:
+                    type: noop
+        {{ end }}
+
+        roles.yml: |-
+          _meta:
+            type: "roles"
+            config_version: 2
+
+          # Can probably be locked down further
+          configurer:
+            static: false
+            hidden: false
+            reserved: false
+            cluster_permissions:
+            - "cluster:admin/repository/put"
+            - "cluster_manage_index_templates"
+            index_permissions:
+            - index_patterns:
+              - "*"
+              allowed_actions:
+              - "create_index"
+              - "crud"
+              - "manage_aliases"
+
+        # These need to be specified even though they are empty.
+        tenants.yml: |-
+          _meta:
+            type: "tenants"
+            config_version: 2
+
+        action_groups.yml: |-
+          _meta:
+            type: "actiongroups"
+            config_version: 2
+
+        nodes_dn.yml: |-
+          _meta:
+            type: "nodesdn"
+            config_version: 2
+
+  config:
+
+    ############## Open Distro Security configuration ###############
+
+    # Most options are listed here:
+    # https://github.com/opendistro-for-elasticsearch/security/blob/master/securityconfig/elasticsearch.yml.example
+    # For more details checkout the official search guard documentation:
+    # https://docs.search-guard.com/latest/
+
+
+    # Audit logging configuration settings
+    opendistro_security.audit.type: internal_elasticsearch
+    opendistro_security.audit.ignore_users: ["kibanaserver"]
+
+
+    # REST Management API configuration settings
+    opendistro_security.restapi.roles_enabled: ["all_access", "configurer"]
+
+    # Constrain configurer. Nessecary?
+    opendistro_security.restapi.endpoints_disabled.configurer.CACHE: ["GET","PUT","POST","DELETE","PATCH"]
+    opendistro_security.restapi.endpoints_disabled.configurer.CONFIG: ["GET","PUT","POST","DELETE","PATCH"]
+    opendistro_security.restapi.endpoints_disabled.configurer.ACTIONGROUPS: ["GET","PUT","POST","DELETE","PATCH"]
+    opendistro_security.restapi.endpoints_disabled.configurer.INTERNALUSERS: ["POST","DELETE","PATCH"]
+    opendistro_security.restapi.endpoints_disabled.configurer.ROLESMAPPING: ["POST","DELETE","PATCH"]
+    opendistro_security.restapi.endpoints_disabled.configurer.ROLES: ["POST","DELETE","PATCH"]
+
+
+    # Common configuration settings
+    opendistro_security.nodes_dn:
+    - 'CN=nodes.elastic-system.cluster.local,O=compliantkubernetes'
+    opendistro_security.authcz.admin_dn:
+    - 'CN=admin.elastic-system.cluster.local,O=compliantkubernetes'
+
+
+    # Transport layer SSL configuration settings
+
+    # https://github.com/opendistro-for-elasticsearch/deprecated-security-ssl/blob/master/opendistrosecurity-ssl-config-template.yml
+    opendistro_security.ssl.transport.pemcert_filepath: elk-transport-crt.pem
+    opendistro_security.ssl.transport.pemkey_filepath: elk-transport-key.pem
+    opendistro_security.ssl.transport.pemtrustedcas_filepath: elk-transport-root-ca.pem
+    opendistro_security.ssl.transport.enforce_hostname_verification: false
+
+
+    # Expert settings
+    opendistro_security.allow_default_init_securityindex: true
+
+
+    ############## Elasticsearch configuration settings ##############
+    action.auto_create_index: ".opendistro-*,.kibana*,security-auditlog-*"
+
+    node:
+      attr.box_type: hot
+
+    s3.client.default.endpoint: {{ .Values.s3.regionEndpoint }}
+    s3.client.default.path_style_access: true
+
+
+
+  # Master nodes configuration
+  master:
+    replicas: {{ .Values.elasticsearch.masterNode.count }}
+
+    javaOpts: {{ .Values.elasticsearch.masterNode.javaOpts }}
+
+    resources:
+    {{- toYaml .Values.elasticsearch.masterNode.resources | nindent 6 }}
+
+    affinity:
+     podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 1
+          podAffinityTerm:
+            topologyKey: "kubernetes.io/hostname"
+            labelSelector:
+              matchLabels:
+                role: master
+
+    persistence:
+      size: {{ .Values.elasticsearch.masterNode.storageSize }}
+
+  # Data nodes configuration
+  data:
+    replicas: {{ .Values.elasticsearch.dataNode.count }}
+
+    javaOpts: {{ .Values.elasticsearch.dataNode.javaOpts }}
+
+    resources:
+    {{- toYaml .Values.elasticsearch.dataNode.resources | nindent 6 }}
+
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 1
+          podAffinityTerm:
+            topologyKey: "kubernetes.io/hostname"
+            labelSelector:
+              matchLabels:
+                role: data
+
+    persistence:
+      storageClass: {{ .Values.elasticsearch.storageClass }}
+      size: {{ .Values.elasticsearch.dataNode.storageSize }}
+
+
+  # Client nodes configuration
+  client:
+    replicas: {{ .Values.elasticsearch.clientNode.count }}
+
+    javaOpts: {{ .Values.elasticsearch.clientNode.javaOpts }}
+
+    resources:
+    {{- toYaml .Values.elasticsearch.clientNode.resources | nindent 6 }}
+
+    ingress:
+      enabled: true
+      annotations:
+        nginx.ingress.kubernetes.io/backend-protocol: HTTP
+        cert-manager.io/issuer: {{ .Values.global.issuer }}
+        nginx.ingress.kubernetes.io/proxy-body-size: 8m
+        {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.elasticsearch }}
+        nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.elasticsearch }}
+        {{ end }}
+      path: /
+      hosts:
+      - elastic.{{ .Values.global.opsDomain }}
+      tls:
+      - secretName: opendistro-es-es-ingress-cert
+        hosts:
+        - elastic.{{ .Values.global.opsDomain }}
+
+    affinity:
+     podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 1
+          podAffinityTerm:
+            topologyKey: "kubernetes.io/hostname"
+            labelSelector:
+              matchLabels:
+                role: client
+
+
+# Kibana deployment configuration
+kibana:
+  ingress:
+    enabled: true
+    annotations:
+      nginx.ingress.kubernetes.io/backend-protocol: HTTP
+      cert-manager.io/issuer: {{ .Values.global.issuer }}
+      {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.kibana }}
+      nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.kibana }}
+      {{ end }}
+    path: /
+    hosts:
+    - kibana.{{ .Values.global.baseDomain }}
+    tls:
+    - secretName: opendistro-es-kibana-ingress-cert
+      hosts:
+        - kibana.{{ .Values.global.baseDomain }}
+
+  # Secret specifying kibana server user, password, and cookie encyrption key
+  elasticsearchAccount:
+    useExistingSecret: false
+    username: kibanaserver
+    password: {{ .Values.elasticsearch.kibanaPassword }}
+    cookie: {{ .Values.elasticsearch.kibanaCookieEncKey }}
+    secret: opendistro-es-kibanaserver-user
+
+  config:
+    server.name: kibana
+    server.host: "0"
+
+    # Env read from kibana.elasticsearchAccount.secret
+    elasticsearch.password: ${ELASTICSEARCH_PASSWORD}
+    elasticsearch.username: ${ELASTICSEARCH_USERNAME}
+    opendistro_security.cookie.password: ${COOKIE_PASS}
+    opendistro_security.cookie.secure: false
+
+    # Multitenancy disabled due to some "issues" in current version
+    opendistro_security.multitenancy.enabled: false
+    # opendistro_security.multitenancy.tenants.enable_global: true
+    # opendistro_security.multitenancy.tenants.enable_private: true
+    # opendistro_security.multitenancy.tenants.preferred: ["Global", "Private"]
+    # elasticsearch.requestHeadersWhitelist: ["securitytenant","Authorization"]
+
+    elasticsearch.hosts: http://opendistro-es-client-service:9200
+    elasticsearch.requestTimeout: 60000
+
+    {{ if .Values.elasticsearch.sso.enabled }}
+    # https://docs.search-guard.com/latest/kibana-authentication-openid
+    opendistro_security.auth.type: "openid"
+    opendistro_security.openid.scope: "openid profile email"
+    opendistro_security.openid.connect_url: https://dex.{{ .Values.global.baseDomain }}/.well-known/openid-configuration
+    opendistro_security.openid.client_id: "kibana-sso"
+    opendistro_security.openid.client_secret: {{ .Values.elasticsearch.clientSecret }}
+    opendistro_security.openid.base_redirect_url: https://kibana.{{ .Values.global.baseDomain }}
+    opendistro_security.openid.logout_url: https://kibana.{{ .Values.global.baseDomain }}
+    {{ end }}
+
+    newsfeed.enabled: false
+    telemetry.optIn: false
+    telemetry.enabled: false
+
+
+# Certmanager certificates configuration
+certmanager:
+  enabled: true
+
+  ca:
+    commonName: {{ .Values.global.baseDomain }}
+    organization:
+    - compliantkubernetes
+
+  elasticsearch:
+    transport:
+      commonName: nodes.elastic-system.cluster.local
+      organization:
+      - compliantkubernetes
+
+    admin:
+      commonName: admin.elastic-system.cluster.local
+      organization:
+      - compliantkubernetes
+
+
+# Curator conjob configuration
+curator:
+  enabled: true
+
+  startingDeadlineSeconds: 600
+  resources:
+    limits:
+     cpu: 100m
+     memory: 128Mi
+    requests:
+     cpu: 10m
+     memory: 32Mi
+
+  elasticsearchAccount:
+    useExistingSecret: false
+    username: curator
+    password: {{ .Values.elasticsearch.curatorPassword }}
+    secret: opendistro-es-curator-user
+
+  retention:
+    other_gb: {{ .Values.elasticsearch.retention.otherSize }}
+    other_days: {{ .Values.elasticsearch.retention.otherAge }}
+    kubernetes_gb: {{ .Values.elasticsearch.retention.kubernetesSize }}
+    kubernetes_days: {{ .Values.elasticsearch.retention.kubernetesAge }}
+    kubeaudit_gb: {{ .Values.elasticsearch.retention.kubeAuditSize }}
+    kubeaudit_days: {{ .Values.elasticsearch.retention.kubeAuditAge }}
+
+
+# Elasticsearch and kibana configurer job configuration
+configurer:
+  enabled: true
+
+  helm:
+    deletePolicy: before-hook-creation
+
+  ism:
+    rolloverSize: {{ .Values.elasticsearch.retention.rolloverSize }}
+    rolloverAge: {{ .Values.elasticsearch.retention.rolloverAge }}
+
+  resources:
+    limits:
+     cpu: 100m
+     memory: 128Mi
+    requests:
+     cpu: 10m
+     memory: 32Mi
+
+  elasticsearchAccount:
+    useExistingSecret: false
+    username: configurer
+    password: {{ .Values.elasticsearch.configurerPassword }}
+    secret: opendistro-es-configurer-user
+
+  # Create users and roles for ck8s application
+  securityPlugin:
+    users:
+    - username: fluentd
+      definition:
+        password: {{ .Values.elasticsearch.fluentdPassword }}
+        backend_roles:
+        - log_forwarder
+    - username: curator
+      definition:
+        password: {{ .Values.elasticsearch.curatorPassword }}
+    - username: snapshotter
+      definition:
+        password: {{ .Values.elasticsearch.snapshotterPassword }}
+        backend_roles:
+        - snapshotter
+    - username: metrics_exporter
+      definition:
+        password: {{ .Values.elasticsearch.metricsExporterPassword }}
+        backend_roles:
+        - metrics-exporter
+
+    roles:
+    - role_name: log_forwarder
+      definition:
+        cluster_permissions:
+        - "cluster:monitor/main"
+        - "indices:data/write/bulk"
+        index_permissions:
+        - index_patterns:
+          - "kubernetes-*"
+          - "kubeaudit-*"
+          - "other-*"
+          allowed_actions:
+          - "index"
+    - role_name: curator
+      definition:
+        cluster_permissions:
+        - "cluster_monitor"
+        - "cluster_composite_ops_ro"
+        index_permissions:
+        - index_patterns:
+          - "*"
+          allowed_actions:
+          - "indices_monitor"
+        - index_patterns:
+          - "kubernetes-*"
+          - "other-*"
+          - "kubeaudit-*"
+          allowed_actions:
+          - "indices:admin/delete"
+    - role_name: kubernetes_log_reader
+      definition:
+        index_permissions:
+        - index_patterns:
+          - "kubernetes-*"
+          - "kubeaudit-*"
+          allowed_actions:
+          - "read"
+    - role_name: backup_exporter
+      definition:
+        cluster_permissions:
+        - "cluster:monitor/state"
+        - "cluster:monitor/health"
+        index_permissions:
+        - index_patterns:
+          - "*"
+          allowed_actions:
+          - "monitor"
+        - index_patterns:
+          - "kubernetes-*"
+          - "kubeaudit-*"
+          allowed_actions:
+          - "read"
+    - role_name: metrics_exporter
+      definition:
+        cluster_permissions:
+        - "cluster_monitor"
+        - "cluster:admin/repository/get"
+        - "cluster:admin/snapshot/get"
+        index_permissions:
+        - index_patterns:
+          - "*"
+          allowed_actions:
+          - "indices:monitor/stats"
+          - "indices:monitor/settings/get"
+
+    roles_mapping:
+    - mapping_name: log_forwarder
+      definition:
+        backend_roles:
+        - log_forwarder
+    - mapping_name: curator
+      definition:
+        users:
+        - curator
+    - mapping_name: manage_snapshots
+      definition:
+        backend_roles:
+        - snapshotter
+    - mapping_name: metrics_exporter
+      definition:
+        users:
+        - metrics_exporter
+    {{- with .Values.elasticsearch.extraRoleMappings }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+
+
+# Create secret with credentials for the metrics exporter
+metricsExporter:
+  elasticsearchAccount:
+    useExistingSecret: false
+    username: metrics_exporter
+    password: {{ .Values.elasticsearch.metricsExporterPassword }}
+    secret: opendistro-es-metrics-exporter-user
+
+
+# Create secret with credentials for the snapshot manager user
+slm:
+  elasticsearchAccount:
+    useExistingSecret: false
+    username: snapshotter
+    password: {{ .Values.elasticsearch.snapshotterPassword }}
+    secret: opendistro-es-snapshotter-user

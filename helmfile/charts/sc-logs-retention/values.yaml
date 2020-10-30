@@ -1,0 +1,34 @@
+image:
+  repository: amazon/aws-cli
+  pullPolicy: IfNotPresent
+  tag: "2.0.45"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+schedule: "@daily"
+startingDeadlineSeconds: 1200
+
+serviceAccountName: "fluentd-aggregator"
+
+s3:
+  region: ""
+  regionEndpoint: ""
+  bucket: ""
+  retentionDays: 7
+  accessKey: ""
+  secretKey: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+securityContext: {}
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

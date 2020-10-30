@@ -1,0 +1,67 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "sc-logs-retention.fullname" . }}
+  labels:
+    {{- include "sc-logs-retention.labels" . | nindent 4 }}
+spec:
+  schedule: "{{ .Values.schedule }}"
+  startingDeadlineSeconds: {{ .Values.startingDeadlineSeconds }}
+  suspend: false
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            {{- include "sc-logs-retention.selectorLabels" . | nindent 12 }}
+          {{- with .Values.podAnnotations }}
+          annotations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        spec:
+          restartPolicy: OnFailure
+          serviceAccountName: {{ .Values.serviceAccountName }}
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+          containers:
+            - name: aws-cli
+              image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              securityContext:
+                {{- toYaml .Values.securityContext | nindent 16 }}
+              command: ['/bin/bash', '/scripts/logs-retention.sh']
+              env:
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: s3_access_key
+                      name:  {{ include "sc-logs-retention.fullname" . }}
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: s3_secret_key
+                      name:  {{ include "sc-logs-retention.fullname" . }}
+              envFrom:
+                - configMapRef:
+                    name: {{ include "sc-logs-retention.fullname" . }}-env
+              resources:
+                {{- toYaml .Values.resources | nindent 16 }}
+              volumeMounts:
+                - name: scripts
+                  mountPath: /scripts
+          volumes:
+            - name: scripts
+              configMap:
+                name: {{ include "sc-logs-retention.fullname" . }}-script
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}

@@ -1,0 +1,226 @@
+global:
+  ck8sVersion: ${CK8S_VERSION}
+  cloudProvider: ${CK8S_CLOUD_PROVIDER}
+  environmentName: ${CK8S_ENVIRONMENT_NAME}
+  dnsPrefix: ${CK8S_ENVIRONMENT_NAME}
+  baseDomain: "set-me"
+  opsDomain: "set-me"
+  issuer: letsencrypt-staging
+  verifyTls: true
+  storageClass: "set-me"
+  clusterDns: "10.43.0.10"
+
+s3:
+  region: "set-me"
+  regionAddress: "set-me"
+  regionEndpoint: "set-me"
+  buckets:
+    harbor: "${CK8S_ENVIRONMENT_NAME}-harbor"
+    velero: "${CK8S_ENVIRONMENT_NAME}-velero"
+    elasticsearch: "${CK8S_ENVIRONMENT_NAME}-es-backup"
+    influxDB: "${CK8S_ENVIRONMENT_NAME}-influxdb"
+    scFluentd: "${CK8S_ENVIRONMENT_NAME}-sc-logs"
+
+user:
+  namespaces:
+    - demo
+  adminUsers:
+    - admin@example.com
+  alertmanager:
+    enabled: false
+    ingress:
+      enabled: false
+
+falco:
+  enabled: true
+  resources:
+    limits:
+      cpu: 200m
+      memory: 1024Mi
+    requests:
+      cpu: 100m
+      memory: 512Mi
+  tolerations:
+    - key: "node-role.kubernetes.io/master"
+      effect: "NoSchedule"
+  affinity: {}
+  nodeSelector: {}
+  alerts:
+    enabled: true
+    # supported: alertmanager|slack
+    type: alertmanager
+    priority: notice
+    hostPort: "http://prometheus-operator-alertmanager.monitoring:9093"
+    # if type=slack falco.alerts.slackWebhook must be set in the secrets yaml file
+
+prometheus:
+  storage:
+    size: 5Gi
+  retention:
+    size: 4GiB
+    age:  3d
+    alertManager: 72h
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 300m
+    limits:
+      memory: 2Gi
+      cpu: "1"
+  tolerations: []
+  affinity: {}
+  nodeSelector: {}
+  additionalScrapeConfigs: []
+
+opa:
+  enabled: true
+  imageRegistry:
+    enabled: true
+    enforcement: dryrun
+    URL: "harbor.set-me"
+  networkPolicies:
+    enabled: true
+    enforcement: dryrun
+  resourceRequests:
+    enabled: true
+    enforcement: dryrun
+  enforcements:
+    imageRegistry: dryrun
+    networkPolicies: dryrun
+    resources: dryrun
+
+elasticsearch:
+  masterNode:
+    count: 1
+  dataNode:
+    count: 2
+  clientNode:
+    count: 1
+
+fluentd:
+  resources:
+    limits:
+      cpu: 200m
+      memory: 500Mi
+    requests:
+      cpu: 200m
+      memory: 500Mi
+  tolerations: []
+  affinity: {}
+  nodeSelector: {}
+  extraConfigMaps: {}
+  user:
+    resources:
+      limits:
+        cpu: 200m
+        memory: 500Mi
+      requests:
+        cpu: 200m
+        memory: 500Mi
+    tolerations: []
+    affinity: {}
+    nodeSelector: {}
+
+ck8sdash:
+  enabled: true
+  tolerations: []
+  affinity: {}
+  nodeSelector: {}
+  nginx:
+    resources:
+      requests:
+        memory: 64Mi
+        cpu: 50m
+      limits:
+        memory: 128Mi
+        cpu: 100m
+  server:
+    resources:
+      requests:
+        memory: 64Mi
+        cpu: 50m
+      limits:
+        memory: 128Mi
+        cpu: 100m
+
+externalTrafficPolicy:
+  local: false
+  whitelistRange:
+    global: "0.0.0.0/0"
+    ck8sdash: false
+    prometheus: false
+
+nfsProvisioner:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  tolerations: []
+  affinity: {}
+  nodeSelector: {}
+
+nginxIngress:
+  controller:
+  # Chart deploys correctly but does not work with resourceRequests
+    resources: {}
+      # limits:
+      #   cpu: 100m
+      #   memory: 64Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 64Mi
+    tolerations:
+      - key: "nodeType"
+        operator: "Exists"
+        effect: "NoSchedule"
+    affinity: {}
+    nodeSelector: {}
+    config:
+      useProxyProtocol: "set-me"
+    daemonset:
+      useHostPort: "set-me"
+    service:
+      enabled: "set-me"
+      type: "set-me"
+      annotations: "set-me"
+
+  defaultBackend:
+  # Chart deploys correctly but does not work with resourceRequests
+    resources: {}
+      # limits:
+      #   cpu: 100m
+      #   memory: 64Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 64Mi
+    tolerations:
+      - key: "nodeType"
+        operator: "Equal"
+        value: "elastisys"
+        effect: "NoSchedule"
+    affinity: {}
+    nodeSelector: {}
+
+velero:
+  resources:
+    limits:
+      cpu: 200m
+      memory: 200Mi
+    requests:
+      cpu: 100m
+      memory: 100Mi
+  tolerations: []
+  affinity: {}
+  nodeSelector: {}
+
+issuers:
+  letsencrypt:
+    enabled: true
+    prod:
+      email: "set-me"
+    staging:
+      email: "set-me"
+  extraIssuers: []

@@ -1,0 +1,9 @@
+# Default values for harbor-certs.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+core:
+  domain: harbor.example.com
+
+notary:
+  domain: notary.harbor.example.com

@@ -1,0 +1,5 @@
+password: {{ .Values.harbor.password }}
+oidc:
+  clientSecret: {{ .Values.harbor.clientSecret }}
+  endpoint: "https://dex.{{ .Values.global.baseDomain }}"
+  verifyCert: {{ .Values.global.verifyTls }}

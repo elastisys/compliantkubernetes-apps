@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ck8s-nodeport-test
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: ck8s-nodeport-test
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - image: nginxinc/nginx-unprivileged
+        name: nginx-unprivileged
+        ports:
+          - name: http
+            containerPort: 8080
+        resources: {}
+        readinessProbe:
+          httpGet:
+            port: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: nginx
+  name: nginx-deployment-68c7f5464c-whnjq
+  namespace: ck8s-nodeport-test
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+  - nodePort: 32116
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: nginx
+  type: NodePort

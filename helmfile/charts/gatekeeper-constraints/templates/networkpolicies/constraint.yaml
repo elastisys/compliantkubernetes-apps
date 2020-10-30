@@ -1,0 +1,24 @@
+{{- if .Values.requireNetworkpolicies.enable -}}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequireNetworkPolicy
+metadata:
+  name: require-networkpolicy
+spec:
+  enforcementAction: {{ .Values.requireNetworkpolicies.enforcementAction }}
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod", "ReplicationController"]
+      - apiGroups: ["apps"]
+        kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
+      - apiGroups: ["extensions"]
+        kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
+      - apiGroups: ["batch"]
+        kinds: ["Job", "CronJob"]
+    namespaceSelector:
+      matchExpressions:
+      - key: owner
+        operator: NotIn
+        values:
+        - operator
+{{- end }}

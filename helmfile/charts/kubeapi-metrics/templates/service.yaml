@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kubeapi-metrics.fullname" . }}
+  labels:
+    {{- include "kubeapi-metrics.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 6443
+      protocol: TCP
+      name: api
+  selector:
+    component: kube-apiserver
+    tier: control-plane

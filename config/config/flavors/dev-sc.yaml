@@ -1,0 +1,67 @@
+global:
+  issuer: letsencrypt-staging
+  verifyTls: false
+
+dex:
+  enableStaticLogin: true
+
+alerts:
+  alertTo: "null"
+  opsGenieHeartbeat:
+    enable: false
+    name: "set-me"
+
+prometheus:
+  storage:
+    size: 2Gi
+  retention:
+    size: 1GiB
+    age:  3d
+
+elasticsearch:
+  masterNode:
+    storageSize: 1Gi
+    javaOpts: "-Xms512m -Xmx512m"
+    resources:
+      requests:
+        memory: 1024Mi
+        cpu: 100m
+      limits:
+        memory: 1024Mi
+        cpu: 1
+  dataNode:
+    storageSize: 18Gi
+    javaOpts: "-Xms512m -Xmx512m"
+    resources:
+      requests:
+        memory: 1024Mi
+        cpu: 200m
+      limits:
+        memory: 1024Mi
+        cpu: 1
+  clientNode:
+    javaOpts: "-Xms512m -Xmx512m"
+    resources:
+      requests:
+        memory: 1024Mi
+        cpu: 200m
+      limits:
+        memory: 1024Mi
+        cpu: 1
+  retention:
+    kubeAuditSize: 4
+    kubeAuditAge: 3
+    kubernetesSize: 10
+    kubernetesAge: 3
+    otherSize: 1
+    otherAge: 7
+    rolloverSize: 1
+    rolloverAge: 1
+
+influxDB:
+  retention:
+    ageWc: 2d
+    ageSc: 3d
+  metrics:
+    sizeWc: 5000000
+    sizeSc: 5000000

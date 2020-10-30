@@ -1,0 +1,18 @@
+global:
+  issuer: letsencrypt-staging
+  verifyTls: false
+
+user:
+  namespaces:
+    - demo1
+    - demo2
+    - demo3
+  adminUsers:
+    - admin@example.com
+
+prometheus:
+  storage:
+    size: 2Gi
+  retention:
+    size: 1GiB
+    age:  3d

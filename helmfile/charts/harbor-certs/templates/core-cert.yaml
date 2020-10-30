@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: harbor-core-cert
+  namespace: {{ .Release.namespace }}
+spec:
+  secretName: harbor-core-cert
+  commonName: {{ .Values.core.domain }}
+  isCA: false
+  issuerRef:
+    name: selfsigning-issuer
+    kind: Issuer

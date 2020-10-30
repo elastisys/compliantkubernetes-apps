@@ -1,0 +1,25 @@
+image:
+  repository: elastisys/curl-jq
+  tag: ubuntu
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+snapshotApiAccountSecret: opendistro-es-snapshotter-user
+
+startingDeadlineSeconds: 300
+activeDeadlineSeconds: 300
+
+schedule: "@daily"
+esEndpoint: "opendistro-es-client-service:9200"
+snapshotRepository: "s3"
+
+indices: "*"
+
+restartPolicy: Never
+
+resources:
+  limits: {}
+  requests: {}

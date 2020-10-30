@@ -1,0 +1,23 @@
+namespaces:
+- name: cert-manager
+  labels:
+    certmanager.k8s.io/disable-validation: "true"
+- name: fluentd
+- name: kube-node-lease
+- name: kube-public
+- name: kube-system
+- name: monitoring
+- name: nginx-ingress
+- name: velero
+{{ if .Values.falco.enabled }}
+- name: falco
+{{ end }}
+{{ if .Values.opa.enabled }}
+- name: gatekeeper
+- name: gatekeeper-system
+{{ end }}
+{{ if .Values.ck8sdash.enabled }}
+- name: ck8sdash
+{{ end }}
+commonLabels:
+  owner: operator

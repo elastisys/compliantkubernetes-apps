@@ -1,0 +1,75 @@
+image:
+  tag: 0.26.1
+  pullPolicy: IfNotPresent
+falco:
+  jsonOutput: true
+  syscallEventDrops:
+    # Should be removed when fixed. Probably in 1.0.0 https://github.com/falcosecurity/falco/milestone/3
+    actions:
+      - ignore
+{{ if .Values.falco.alerts.enabled }}
+  programOutput:
+    enabled: true
+    program: "curl -d @- falcosidekick:2801/"
+{{ end }}
+  grpc:
+    enabled: true
+    unixSocketPath: "unix:///var/run/falco/falco.sock"
+    threadiness: 8
+
+  grpcOutput:
+    enabled: true
+
+auditLog:
+  # Need to change api-server arguments if enabled
+  # https://kubernetes.io/docs/tasks/debug-application-cluster/falco/#configure-kubernetes-audit
+  enabled: false
+
+resources: {{- toYaml .Values.falco.resources | nindent 2  }}
+nodeSelector: {{- toYaml .Values.falco.nodeSelector | nindent 2  }}
+affinity: {{- toYaml .Values.falco.affinity | nindent 2  }}
+tolerations: {{- toYaml .Values.falco.tolerations | nindent 2  }}
+
+customRules:
+  ssh-trafic.yaml: |-
+    - rule: Inbound SSH Connection
+      desc: Detect Inbound SSH Connection
+      condition: >
+        ((evt.type in (accept,listen) and evt.dir=<) or
+          (evt.type in (recvfrom,recvmsg))) and ssh_port
+      output: >
+        Inbound SSH connection (user=%user.name client_ip=%fd.cip client_port=%fd.cport server_ip=%fd.sip)
+      priority: WARNING
+      tags: [network]
+    - rule: Outbound SSH Connection
+      desc: Detect Outbound SSH Connection
+      condition: >
+        ((evt.type = connect and evt.dir=<) or
+          (evt.type in (sendto,sendmsg))) and ssh_port
+      output: >
+        Outbound SSH connection (user=%user.name server_ip=%fd.sip server_port=%fd.sport client_ip=%fd.cip)
+      priority: WARNING
+      tags: [network]
+  overwrites.yaml: |-
+    - macro: k8s_containers
+      condition: >
+        (container.image.repository in (gcr.io/google_containers/hyperkube-amd64,
+        gcr.io/google_containers/kube2sky, sysdig/agent, sysdig/falco,
+        sysdig/sysdig, falcosecurity/falco, elastisys/ck8sdash-nginx, quay.io/fluentd_elasticsearch/fluentd) or (k8s.ns.name = "kube-system"))
+    - list: falco_privileged_images
+      items: [
+        docker.io/sysdig/agent, docker.io/sysdig/falco, docker.io/sysdig/sysdig,
+        gcr.io/google_containers/kube-proxy, docker.io/calico/node, quay.io/calico/node,
+        docker.io/rook/toolbox, docker.io/cloudnativelabs/kube-router, docker.io/mesosphere/mesos-slave,
+        docker.io/docker/ucp-agent, sematext_images, k8s.gcr.io/kube-proxy, calico/node,falcosecurity/falco, k8s.gcr.io/k8s-dns-node-cache
+    ]
+    - list: falco_sensitive_mount_images
+      items: [
+        docker.io/sysdig/agent, docker.io/sysdig/falco, docker.io/sysdig/sysdig,falcosecurity/falco,
+        gcr.io/google_containers/hyperkube,
+        gcr.io/google_containers/kube-proxy, docker.io/calico/node,
+        docker.io/rook/toolbox, docker.io/cloudnativelabs/kube-router, docker.io/consul,
+        docker.io/datadog/docker-dd-agent, docker.io/datadog/agent, docker.io/docker/ucp-agent, docker.io/gliderlabs/logspout,
+        docker.io/netdata/netdata, docker.io/google/cadvisor, docker.io/prom/node-exporter,
+        amazon/amazon-ecs-agent, quay.io/prometheus/node-exporter
+        ]

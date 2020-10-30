@@ -1,0 +1,6 @@
+baseDomain: {{ .Values.global.baseDomain }}
+ingress:
+  enabled: {{ .Values.user.alertmanager.ingress.enabled }}
+basic_auth:
+  username: alertmanager
+  password: {{ .Values.user.prometheusPassword }}

@@ -1,0 +1,27 @@
+{{- if .Values.restrictImageRegistry.enable -}}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sAllowedRepos
+metadata:
+  name: require-harbor-repo
+spec:
+  enforcementAction: {{ .Values.restrictImageRegistry.enforcementAction }}
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod", "ReplicationController"]
+      - apiGroups: ["apps"]
+        kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
+      - apiGroups: ["extensions"]
+        kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
+      - apiGroups: ["batch"]
+        kinds: ["Job", "CronJob"]
+    namespaceSelector:
+      matchExpressions:
+      - key: owner
+        operator: NotIn
+        values:
+        - operator
+  parameters:
+    repos:
+      - {{ .Values.imageRegistryURL }}
+{{- end }}

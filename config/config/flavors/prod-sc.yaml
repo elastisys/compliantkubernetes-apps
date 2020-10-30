@@ -1,0 +1,69 @@
+global:
+  issuer: letsencrypt-prod
+  verifyTls: true
+
+dex:
+  enableStaticLogin: false
+
+alerts:
+  alertTo: "opsgenie"
+  opsGenieHeartbeat:
+    enable: true
+    name: #Fill this out
+
+prometheus:
+  storage:
+    size: 15Gi
+  retention:
+    size: 12GiB
+    age:  7d
+
+elasticsearch:
+  masterNode:
+    storageSize: 8Gi
+    javaOpts: "-Xms1024m -Xmx1024m"
+    resources:
+      requests:
+        memory: 2Gi
+        cpu: 100m
+      limits:
+        memory: 3GiMi
+        cpu: 1
+  dataNode:
+    storageSize: 130Gi
+    javaOpts: "-Xms2048m -Xmx2048m"
+    resources:
+      requests:
+        memory: 4Gi
+        cpu: 200m
+      limits:
+        memory: 5Gi
+        cpu: 1
+  clientNode:
+    javaOpts: "-Xms1024m -Xmx1024m"
+    resources:
+      requests:
+        memory: 2Gi
+        cpu: 200m
+      limits:
+        memory: 2.5Gi
+        cpu: 1
+  retention:
+    kubeAuditSize: 50
+    kubeAuditAge: 30
+    kubernetesSize: 50
+    kubernetesAge: 30
+    otherSize: 5
+    otherAge: 30
+    rolloverSize: 5
+    rolloverAge: 1
+
+influxDB:
+  retention:
+    ageWc: 30d
+    ageSc: 7d
+  metrics:
+    sizeWc: 19500000
+    sizeSc: 9500000
+  persistence:
+    size: 30Gi

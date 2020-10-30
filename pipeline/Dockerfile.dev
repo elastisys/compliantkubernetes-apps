@@ -1,0 +1,13 @@
+FROM elastisys/ck8s-ops:latest
+ARG velero=v1.2.0
+
+# Add utilities not needed for the pipeline but nice to have when using manually.
+RUN  apt-get update \
+  && apt-get install -y git vim
+
+RUN wget https://github.com/vmware-tanzu/velero/releases/download/${velero}/velero-${velero}-linux-amd64.tar.gz
+RUN tar -xvf velero-${velero}-linux-amd64.tar.gz && \
+    mv velero-${velero}-linux-amd64/velero /usr/local/bin/velero && \
+    rm -rf velero-${velero}-linux-amd64*
+
+WORKDIR /home

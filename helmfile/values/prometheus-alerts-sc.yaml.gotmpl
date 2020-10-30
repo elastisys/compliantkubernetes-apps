@@ -1,0 +1,5 @@
+esNodeCount: {{ add .Values.elasticsearch.dataNode.count .Values.elasticsearch.clientNode.count .Values.elasticsearch.masterNode.count }}
+
+defaultRules:
+  labels:
+    cluster: service

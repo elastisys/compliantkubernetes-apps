@@ -1,0 +1,9 @@
+ingress:
+  enabled: true
+  issuer: "{{ .Values.global.issuer }}"
+  clusterDomain: "{{ .Values.global.baseDomain }}"
+  username: "kubeapiuser"
+  password: "{{ .Values.kubeapiMetricsPassword }}"
+  ## TODO: ingress whitelist
+  #extraAnnotations:
+  #  nginx.ingress.kubernetes.io/whitelist-source-range: ...

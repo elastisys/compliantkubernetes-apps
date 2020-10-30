@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ include "ck8sdash.fullname" . }}
+  labels:
+{{ include "ck8sdash.labels" . | indent 4 }}
+spec:
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.nginx.port }}
+  selector:
+    app.kubernetes.io/name: {{ include "ck8sdash.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}

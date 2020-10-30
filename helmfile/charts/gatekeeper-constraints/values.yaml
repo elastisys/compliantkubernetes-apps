@@ -1,0 +1,11 @@
+restrictImageRegistry:
+    enable: true
+    enforcementAction: dryrun
+requireNetworkpolicies:
+    enable: true
+    enforcementAction: dryrun
+requireResourceRequests:
+    enable: true
+    enforcementAction: dryrun
+
+imageRegistryURL: registry.example.com
