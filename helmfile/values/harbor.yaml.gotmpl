@@ -19,15 +19,15 @@ persistence:
   resourcePolicy: "keep"
   persistentVolumeClaim:
     chartmuseum:
-      size: 5Gi
+      size: {{ .Values.harbor.chartmuseum.persistentVolumeClaim.size }}
     registry:
-      size: 5Gi
+      size: {{ .Values.harbor.registry.persistentVolumeClaim.size }}
     jobservice:
-      size: 1Gi
+      size: {{ .Values.harbor.jobservice.persistentVolumeClaim.size }}
     database:
-      size: 1Gi
+      size: {{ .Values.harbor.database.persistentVolumeClaim.size }}
     redis:
-      size: 1Gi
+      size: {{ .Values.harbor.redis.persistentVolumeClaim.size }}
   imageChartStorage:
     {{ if eq .Values.harbor.persistence.type "swift" }}
     type: swift

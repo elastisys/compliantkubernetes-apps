@@ -58,6 +58,11 @@ elasticsearch:
     rolloverSize: 5
     rolloverAge: 1
 
+harbor:
+  database:
+    persistentVolumeClaim:
+      size: 5Gi
+
 influxDB:
   retention:
     ageWc: 30d

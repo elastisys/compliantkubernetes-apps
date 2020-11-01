@@ -1,9 +1,11 @@
 ### Release notes
 
 - Configuration for the certificate issuers has been changed and requires running the [migration script](migration/v0.6.x-v0.7.x/migrate-issuer-config.sh).
+- Configuration for harbor has been changed and requires running init and apply again.
 
 ### Added
 
+- Configurable persistence size in Harbor
 - Support for providing certificate issuer manifests to override default issuers.
 - Configurable extra role mappings in Elasticsearch
 - Added falco exporter to workload cluster
