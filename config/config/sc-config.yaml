@@ -45,6 +45,9 @@ harbor:
   tolerations: []
   affinity: {}
   nodeSelector: {}
+  chartmuseum:
+    persistentVolumeClaim:
+      size: 5Gi
   core:
     resources:
       requests:
@@ -53,7 +56,12 @@ harbor:
       limits:
         memory: 512Mi
         cpu: 200m
+  database:
+    persistentVolumeClaim:
+      size: 1Gi
   jobservice:
+    persistentVolumeClaim:
+      size: 1Gi
     resources:
       requests:
         memory: 256Mi
@@ -62,6 +70,8 @@ harbor:
         memory: 512Mi
         cpu: 200m
   registry:
+    persistentVolumeClaim:
+      size: 5Gi
     resources:
       requests:
         memory: 256Mi
@@ -69,6 +79,9 @@ harbor:
       limits:
         memory: 512Mi
         cpu: 200m
+  redis:
+    persistentVolumeClaim:
+      size: 1Gi
   notary:
     resources:
       requests:
