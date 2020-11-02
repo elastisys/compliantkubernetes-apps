@@ -52,7 +52,7 @@ configMaps:
 
       aws_key_id "#{ENV['AWS_ACCESS_KEY_ID']}"
       aws_sec_key "#{ENV['AWS_ACCESS_SECRET_KEY']}"
-      {{ if eq .Values.elasticsearch.useRegionEndpoint true -}}
+      {{ if eq .Values.fluentd.useRegionEndpoint true -}}
       s3_endpoint {{ .Values.s3.regionEndpoint }}
       force_path_style true
       {{ else -}}

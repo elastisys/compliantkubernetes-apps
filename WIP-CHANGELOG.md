@@ -11,6 +11,7 @@
 See [migrations docs for nginx](migration/v0.7.x-v0.8.x/nginx.md) for instruction on how to perform the upgrade.
 - The config option `nginxIngress.controller.daemonset.useHostPort` has been replaced by `ingressNginx.controller.useHostPort`.
 Make sure to remove the old option from your config when upgrading.
+- Move useRegionEndpoint from elasticsearch to fluentd in sc-config.yaml before upgrading.
 
 ### Added
 
@@ -29,6 +30,7 @@ Make sure to remove the old option from your config when upgrading.
 - Helm has been upgraded to v3.4.1
 - Grafana has been updated to a new chart repo and bumped to version 5.8.16
 - Bump `kubectl` to 1.17.11
+- useRegionEndpoint moved to fluentd conf.
 
 ### Fixed
 
