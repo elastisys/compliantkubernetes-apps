@@ -4,7 +4,7 @@ The pipeline is now using a ubuntu based docker image now located at dockerhub o
 pipeline will generate its own image using the commit hash. Once a release is made
 it will also tag a image with the same tag.
 
-The pipeline will run on pull requests to master and on push to branches named
+The pipeline will run on pull requests to main and on push to branches named
 `Release-x`. The pipeline workflow is in `.github/workflows` and the scripts used are located in the `pipeline` directory.
 
 ## Ops image
@@ -27,7 +27,7 @@ on an old version of ck8s.
 #### Example scenario
 
 You have a user running on version 0.1.0 of ck8s. In 0.1.0 helm 2.14 is used in
-the cluster. In master helm has been upgraded to helm 3. You need to run maintenance
+the cluster. In main helm has been upgraded to helm 3. You need to run maintenance
 on the users cluster. Instead of downgrading your binary to helm 2.14 you do these steps.
 
 ```

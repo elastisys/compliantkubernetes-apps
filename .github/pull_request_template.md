@@ -9,7 +9,7 @@
 
 **Checklist:**
 
-- [ ] Added relevant notes to [WIP-CHANGELOG.md](https://github.com/elastisys/compliantkubernetes-apps/blob/master/WIP-CHANGELOG.md)
+- [ ] Added relevant notes to [WIP-CHANGELOG.md](https://github.com/elastisys/compliantkubernetes-apps/blob/main/WIP-CHANGELOG.md)
 - [ ] Proper commit message prefix on all commits
 - [ ] Updated the [public facing documentation](https://github.com/elastisys/compliantkubernetes)
 - Is this changeset backwards compatible for existing clusters? Applying:
