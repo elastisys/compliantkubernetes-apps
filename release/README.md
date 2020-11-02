@@ -16,7 +16,7 @@ git push -u origin release-X.Y
 2. Checkout the branch to cut the release from.
 
 ```bash
-git checkout master
+git checkout main
 git pull
 git checkout -b branch_name
 ```
@@ -59,7 +59,7 @@ git push
 git checkout release-X.Y
 git pull
 git checkout -b branch_name
-git cherry-pick [some fix in master]
+git cherry-pick [some fix in main]
 git add -p file-with-some-new-fixes
 git commit
 ```
