@@ -199,8 +199,7 @@ elasticsearch:
   tolerations: []
   affinity: {}
   nodeSelector: {}
-  snapshotRepository: "set-me"
-  useRegionEndpoint: "set-me"
+  snapshotRepository: elastic-snapshots
 
 fluentd:
   resources:
@@ -213,6 +212,7 @@ fluentd:
   tolerations: []
   affinity: {}
   nodeSelector: {}
+  useRegionEndpoint: "set-me"
   aggregator:
     resources:
       limits:
