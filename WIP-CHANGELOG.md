@@ -5,3 +5,7 @@
 ### Added
 
 - Configurable persistence size in Harbor
+
+### Changed
+
+- Ingress nginx has been updated to a new chart repo and bumped to version 2.10
