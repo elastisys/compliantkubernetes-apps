@@ -122,6 +122,8 @@ prometheus:
     tolerations: []
     affinity: {}
     nodeSelector: {}
+    volumes: []
+    volumeMounts: []
 
 dex:
   # supported: google|aaa

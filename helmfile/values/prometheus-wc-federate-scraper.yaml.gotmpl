@@ -32,6 +32,11 @@ prometheusSpec:
           requests:
             storage: {{ .Values.prometheus.storage.size }}
 
+  volumes:
+    {{- toYaml .Values.prometheus.wcScraper.volumes | nindent 4 }}
+  volumeMounts:
+    {{- toYaml .Values.prometheus.wcScraper.volumeMounts | nindent 4}}
+
   enableAdminAPI: false
   logFormat: logfmt
   logLevel: info
