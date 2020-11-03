@@ -73,24 +73,16 @@ generate_base_sc_config() {
     file=$1
     tmpfile=$(mktemp)
 
+    envsubst > "$tmpfile" < "${config_defaults_path}/config/sc-config.yaml"
     if [[ ${CK8S_CLOUD_PROVIDER} == "citycloud" ]]; then
-        if [[ -f $file ]]; then
-            yq merge -i "$file" "${config_defaults_path}/config/citycloud.yaml"
-        else
-            cat "${config_defaults_path}/config/citycloud.yaml" > "$file"
-        fi
-        echo "" >> "$file"
-        yq merge "$file" "${config_defaults_path}/config/sc-config.yaml" > "$tmpfile"
-        envsubst > "$file" < "$tmpfile"
-    else
-        if [[ -f $file ]]; then
-            yq merge "$file" "${config_defaults_path}/config/sc-config.yaml" > "$tmpfile"
-            envsubst > "$file" < "$tmpfile"
-        else
-            envsubst > "$file" < "${config_defaults_path}/config/sc-config.yaml"
-        fi
+        yq merge -i "$tmpfile" "${config_defaults_path}/config/citycloud.yaml"
     fi
-    yq merge -i --overwrite "$file" "${config_defaults_path}/config/flavors/${CK8S_FLAVOR}-sc.yaml"
+    yq merge -i --overwrite "$tmpfile" "${config_defaults_path}/config/flavors/${CK8S_FLAVOR}-sc.yaml"
+    if [[ -f $file ]]; then
+        yq merge -i "$file" "$tmpfile"
+    else
+        cat "$tmpfile" > "$file"
+    fi
 }
 
 generate_base_wc_config() {
@@ -100,13 +92,14 @@ generate_base_wc_config() {
     fi
     file=$1
     tmpfile=$(mktemp)
+
+    envsubst > "$tmpfile" < "${config_defaults_path}/config/wc-config.yaml"
+    yq merge -i --overwrite "$tmpfile" "${config_defaults_path}/config/flavors/${CK8S_FLAVOR}-wc.yaml"
     if [[ -f $file ]]; then
-        yq merge "$file" "${config_defaults_path}/config/wc-config.yaml" > "$tmpfile"
-        envsubst > "$file" < "$tmpfile"
+        yq merge -i "$file" "$tmpfile"
     else
-        envsubst > "$file" < "${config_defaults_path}/config/wc-config.yaml"
+        cat "$tmpfile" > "$file"
     fi
-    yq merge -i --overwrite "$file" "${config_defaults_path}/config/flavors/${CK8S_FLAVOR}-wc.yaml"
 }
 
 # Usage: set_storage_class <config-file>
