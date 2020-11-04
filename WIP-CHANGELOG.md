@@ -22,3 +22,4 @@
 
 - Kibana OIDC logout not redirecting correctly.
 - Getting stuck at selecting tenant when logging in to Kibana.
+- The user fluentd configuration uses its dedicated values for tolerations, affinity and nodeselector.
