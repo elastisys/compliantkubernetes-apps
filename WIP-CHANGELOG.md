@@ -8,6 +8,7 @@
 - Configurable extra role mappings in Elasticsearch
 - Added falco exporter to workload cluster
 - Falco dashboard added to Grafana
+- Config option to disable redirection when pushing to Harbor image storage.
 
 ### Changed
 
@@ -21,3 +22,4 @@
 - Kibana OIDC logout not redirecting correctly.
 - Getting stuck at selecting tenant when logging in to Kibana.
 - Typo in elasticsearch slm config for the schedule.
+- Pushing images to Harbor on Safespring

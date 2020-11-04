@@ -79,6 +79,7 @@ harbor:
         cpu: 200m
   persistence:
     type: "set-me"
+    disableRedirect: set-me
 
 prometheus:
   storage:

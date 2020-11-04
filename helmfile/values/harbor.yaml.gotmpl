@@ -29,6 +29,7 @@ persistence:
     redis:
       size: 1Gi
   imageChartStorage:
+    disableredirect: {{ .Values.harbor.persistence.disableRedirect }}
     {{ if eq .Values.harbor.persistence.type "swift" }}
     type: swift
     swift:
@@ -40,7 +41,6 @@ persistence:
       authversion: {{ .Values.citycloud.authVersion }}
       tenant: {{ .Values.citycloud.tenantName }}
       domain: {{ .Values.citycloud.projectDomainName }}
-    disableredirect: true
     {{ else }}
     type: s3
     s3:
