@@ -5,12 +5,6 @@ global:
 dex:
   enableStaticLogin: true
 
-alerts:
-  alertTo: "null"
-  opsGenieHeartbeat:
-    enable: false
-    name: "set-me"
-
 prometheus:
   storage:
     size: 2Gi
