@@ -1,6 +1,8 @@
 ### Release notes
 
-- Configuration for the certificate issuers has been changed and requires running the [migration script](migration/v0.6.x-v0.7.x/migrate-issuer-config.sh).
+- Configuration for the certificate issuers has been changed and requires running the [migration script](migration/v0.6.x-v0.7.x/migrate-issuer-config.sh).'
+- Remove `alerts.opsGenieHeartbeat.enable` and `alerts.opsGenieHeartbeat.enabled` from your config file `sc-config.yaml`.
+- Run `ck8s init` again to update your config files with new options (after checking out v0.7.0).
 
 ### Added
 
@@ -23,3 +25,4 @@
 - Getting stuck at selecting tenant when logging in to Kibana.
 - Typo in elasticsearch slm config for the schedule.
 - Pushing images to Harbor on Safespring
+- Typo in Alertmanager config regarding connection to Opsgenie heartbeat
