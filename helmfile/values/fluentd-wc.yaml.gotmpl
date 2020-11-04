@@ -176,6 +176,9 @@ extraConfigMaps:
         scheme "#{ENV['OUTPUT_SCHEME']}"
         ssl_verify "#{ENV['OUTPUT_SSL_VERIFY']}"
         ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
+        {{- if ( .Values | get "fluentd.caFile" nil ) }}
+        ca_file {{ .Values.fluentd.caFile }}
+        {{- end }}
         user "#{ENV['OUTPUT_USER']}"
         password "#{ENV['OUTPUT_PASSWORD']}"
         reconnect_on_error true
@@ -211,6 +214,9 @@ extraConfigMaps:
         scheme "#{ENV['OUTPUT_SCHEME']}"
         ssl_verify "#{ENV['OUTPUT_SSL_VERIFY']}"
         ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
+        {{- if ( .Values | get "fluentd.caFile" nil ) }}
+        ca_file {{ .Values.fluentd.caFile }}
+        {{- end }}
         user "#{ENV['OUTPUT_USER']}"
         password "#{ENV['OUTPUT_PASSWORD']}"
         reconnect_on_error true
@@ -246,6 +252,9 @@ extraConfigMaps:
         scheme "#{ENV['OUTPUT_SCHEME']}"
         ssl_verify "#{ENV['OUTPUT_SSL_VERIFY']}"
         ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
+        {{- if ( .Values | get "fluentd.caFile" nil ) }}
+        ca_file {{ .Values.fluentd.caFile }}
+        {{- end }}
         user "#{ENV['OUTPUT_USER']}"
         password "#{ENV['OUTPUT_PASSWORD']}"
         reconnect_on_error true

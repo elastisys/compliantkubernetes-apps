@@ -116,6 +116,7 @@ fluentd:
   extraConfigMaps: {}
   extraVolumes: []
   extraVolumeMounts: []
+  #caFile: ""
   user:
     resources:
       limits:
@@ -129,6 +130,7 @@ fluentd:
     nodeSelector: {}
     extraVolumes: []
     extraVolumeMounts: []
+    #caFile: ""
 
 ck8sdash:
   enabled: true

@@ -11,6 +11,7 @@
 - Possibility to configure pod placement and resourcess for velero
 - Ability to add extra volumes and volumemounts to prometheus wc scraper.
 - Ability to add extra volumes and volumemounts to fluentd in the workload cluster.
+- Ability to specify certificate authority in fluentd in the workload cluster.
 
 ### Changed
 
