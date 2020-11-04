@@ -59,8 +59,8 @@ echo
 echo "Testing user RBAC"
 echo "====================="
 
-user_namespaces=$(yq r "$CONFIG_FILE" 'user.namespaces' | sed 's/-//' - )
-user_admin_users=$(yq r "$CONFIG_FILE" 'user.adminUsers' | sed 's/-//' - )
+user_namespaces=$(yq r "$CONFIG_FILE" 'user.namespaces[*]')
+user_admin_users=$(yq r "$CONFIG_FILE" 'user.adminUsers[*]')
 
 for user in ${user_admin_users}; do
     testCanUserDo "get" "node" "$user"
