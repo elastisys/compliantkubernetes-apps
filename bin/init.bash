@@ -200,16 +200,24 @@ set_harbor_config() {
         exit 1
     fi
     case ${CK8S_CLOUD_PROVIDER} in
-        aws | exoscale | safespring)
+        aws | exoscale)
           persistence_type=s3
+          disable_redirect=false
+          ;;
+
+        safespring)
+          persistence_type=s3
+          disable_redirect=true
           ;;
 
         citycloud)
           persistence_type=swift
+          disable_redirect=true
           ;;
 
     esac
     replace_set_me "$1" 'harbor.persistence.type' "$persistence_type"
+    replace_set_me "$1" 'harbor.persistence.disableRedirect' "$disable_redirect"
 }
 
 # Usage: generate_secrets <config-file>
