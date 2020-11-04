@@ -1,7 +1,9 @@
-resources:    {{- toYaml .Values.fluentd.resources | nindent 2  }}
-nodeSelector: {{- toYaml .Values.fluentd.nodeSelector | nindent 2  }}
-affinity:     {{- toYaml .Values.fluentd.affinity | nindent 2  }}
-tolerations:  {{- toYaml .Values.fluentd.tolerations | nindent 2  }}
+resources:          {{- toYaml .Values.fluentd.resources | nindent 2  }}
+nodeSelector:       {{- toYaml .Values.fluentd.nodeSelector | nindent 2  }}
+affinity:           {{- toYaml .Values.fluentd.affinity | nindent 2  }}
+tolerations:        {{- toYaml .Values.fluentd.tolerations | nindent 2  }}
+extraVolumes:       {{- toYaml .Values.fluentd.extraVolumes | nindent 2 }}
+extraVolumeMounts:  {{- toYaml .Values.fluentd.extraVolumeMounts | nindent 2 }}
 
 elasticsearch:
   scheme: https

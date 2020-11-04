@@ -1,7 +1,7 @@
 ### Release notes
 
 - Configuration for harbor and cert-manager has been changed and requires running init and apply again.
-- Configuration for velero and prometheus wc scraper has been changed and requires running init again.
+- Configuration for velero, prometheus wc scraper and fluentd has been changed and requires running init again.
 
 ### Added
 
@@ -10,6 +10,7 @@
 - Configuration options regarding pod placement and resources for cert-manager
 - Possibility to configure pod placement and resourcess for velero
 - Ability to add extra volumes and volumemounts to prometheus wc scraper.
+- Ability to add extra volumes and volumemounts to fluentd in the workload cluster.
 
 ### Changed
 

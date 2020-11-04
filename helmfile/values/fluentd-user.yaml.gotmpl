@@ -277,6 +277,9 @@ extraVolumes:
     configMap:
       defaultMode: 420
       name: fluentd-extra-plugins
+  {{- with .Values.fluentd.user.extraVolumes }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
 
 extraVolumeMounts:
   - name: extra-config
@@ -285,3 +288,6 @@ extraVolumeMounts:
   - name: fluentd-extra-plugins
     mountPath: /etc/fluent/plugin
     readOnly: true
+  {{- with .Values.fluentd.user.extraVolumeMounts }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}

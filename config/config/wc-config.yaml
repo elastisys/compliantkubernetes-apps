@@ -114,6 +114,8 @@ fluentd:
       memory: 500Mi
   affinity: {}
   extraConfigMaps: {}
+  extraVolumes: []
+  extraVolumeMounts: []
   user:
     resources:
       limits:
@@ -125,6 +127,8 @@ fluentd:
     tolerations: []
     affinity: {}
     nodeSelector: {}
+    extraVolumes: []
+    extraVolumeMounts: []
 
 ck8sdash:
   enabled: true
