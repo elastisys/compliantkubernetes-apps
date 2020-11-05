@@ -4,8 +4,10 @@ repositories:
   url: https://charts.helm.sh/stable
 - name: jetstack
   url: https://charts.jetstack.io
-- name: kiwigrid
-  url: https://kiwigrid.github.io
+- name: bitnami
+  url: https://charts.bitnami.com/bitnami
+- name: kokuwa
+  url: https://kokuwaio.github.io/helm-charts
 - name: vmware-tanzu
   url: https://vmware-tanzu.github.io/helm-charts
 - name: ingress-nginx
@@ -405,10 +407,12 @@ releases:
   namespace: fluentd
   labels:
     app: fluentd
-  chart: kiwigrid/fluentd-elasticsearch
-  version: 5.1.1
+  chart: bitnami/fluentd
+  version: 2.4.0
   installed: {{ .Values.fluentd.enabled }}
   missingFileHandler: Error
+  needs:
+  - fluentd/fluentd-configmap
   values:
   - values/fluentd-sc.yaml.gotmpl
 
@@ -419,10 +423,22 @@ releases:
     app: fluentd-aggregator
   chart: stable/fluentd
   version: 2.3.2
-  installed: {{ .Values.fluentd.enabled }}
+  installed: false
   missingFileHandler: Error
   values:
   - values/fluentd-aggregator.yaml.gotmpl
+
+# configmap for fluentd (for both aggregator and forwarder)
+- name: fluentd-configmap
+  namespace: fluentd
+  labels:
+    app: fluentd-configmap
+  chart: ./charts/fluentd-configmap
+  version: 0.1.0
+  installed: {{ .Values.fluentd.enabled }}
+  missingFileHandler: Error
+  values:
+  - values/fluentd-configmap.yaml.gotmpl
 
 # Logs backup retention
 - name: sc-logs-retention
@@ -434,7 +450,7 @@ releases:
   installed: {{ .Values.fluentd.enabled }}
   missingFileHandler: Error
   needs:
-  - fluentd/fluentd-aggregator
+  - fluentd/fluentd
   values:
   - values/sc-logs-retention.yaml.gotmpl
 
@@ -509,8 +525,8 @@ releases:
   namespace: kube-system
   labels:
     app: fluentd
-  chart: kiwigrid/fluentd-elasticsearch
-  version: 5.1.1
+  chart: kokuwa/fluentd-elasticsearch
+  version: 10.2.1
   missingFileHandler: Error
   values:
   - values/fluentd-wc.yaml.gotmpl
@@ -520,8 +536,8 @@ releases:
   namespace: fluentd
   labels:
     app: fluentd
-  chart: kiwigrid/fluentd-elasticsearch
-  version: 5.1.1
+  chart: kokuwa/fluentd-elasticsearch
+  version: 10.2.1
   missingFileHandler: Error
   values:
   - values/fluentd-user.yaml.gotmpl
