@@ -2,7 +2,8 @@ snapshots:
   min: {{ .Values.elasticsearch.snapshot.min }}
   max: {{ .Values.elasticsearch.snapshot.max }}
   maxAgeSeconds: {{ .Values.elasticsearch.snapshot.ageSeconds }}
-  schedule: {{ .Values.elasticsearch.snapshot.retentionSchedule | quote }}
+
+schedule: {{ .Values.elasticsearch.snapshot.retentionSchedule | quote }}
 
 snapshotRepository: {{ .Values.elasticsearch.snapshotRepository }}
 

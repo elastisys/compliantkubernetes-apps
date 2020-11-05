@@ -20,3 +20,4 @@
 
 - Kibana OIDC logout not redirecting correctly.
 - Getting stuck at selecting tenant when logging in to Kibana.
+- Typo in elasticsearch slm config for the schedule.
