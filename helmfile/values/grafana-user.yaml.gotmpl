@@ -87,3 +87,4 @@ resources: {{- toYaml .Values.user.grafana.resources | nindent 2 }}
 nodeSelector: {{- toYaml .Values.user.grafana.nodeSelector | nindent 2 }}
 affinity: {{- toYaml .Values.user.grafana.affinity | nindent 2  }}
 tolerations: {{- toYaml .Values.user.grafana.tolerations | nindent 2  }}
+extraConfigmapMounts: {{- toYaml .Values.user.grafana.extraConfigmapMounts | nindent 2 }}

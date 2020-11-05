@@ -1,7 +1,7 @@
 ### Release notes
 
 - Configuration for harbor and cert-manager has been changed and requires running init and apply again.
-- Configuration for velero, prometheus wc scraper and fluentd has been changed and requires running init again.
+- Configuration for velero, prometheus wc scraper, fluentd and grafana has been changed and requires running init again.
 
 ### Added
 
@@ -12,6 +12,7 @@
 - Ability to add extra volumes and volumemounts to prometheus wc scraper.
 - Ability to add extra volumes and volumemounts to fluentd in the workload cluster.
 - Ability to specify certificate authority in fluentd in the workload cluster.
+- Extra Configmap mounts can be configured for the user Grafana.
 
 ### Changed
 

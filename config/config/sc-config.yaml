@@ -34,6 +34,7 @@ user:
     tolerations: []
     affinity: {}
     nodeSelector: {}
+    extraConfigmapMounts: []
   # Todo remove dependencie on alertmanager from service cluster
   alertmanager:
     enabled: false
