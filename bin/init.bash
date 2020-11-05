@@ -189,6 +189,7 @@ set_elasticsearch_config() {
     esac
 
     replace_set_me "$1" 'elasticsearch.useRegionEndpoint' "$use_regionendpoint"
+    replace_set_me "$1" 'elasticsearch.snapshotRepository' "s3_${CK8S_CLOUD_PROVIDER}_7.x"
 }
 
 # Usage: set_harbor_config <config-file>

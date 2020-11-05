@@ -462,6 +462,8 @@ curator:
 configurer:
   enabled: true
 
+  snapshotRepository: {{ .Values.elasticsearch.snapshotRepository }}
+
   helm:
     deletePolicy: before-hook-creation
 
