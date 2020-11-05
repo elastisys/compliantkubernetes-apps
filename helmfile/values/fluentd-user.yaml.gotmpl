@@ -5,12 +5,11 @@ tolerations:  {{- toYaml .Values.fluentd.user.tolerations | nindent 2  }}
 
 elasticsearch:
   scheme: https
-  port: 443
   auth:
     enabled: true
     user: fluentd
-    password: ""
-  host: elastic.{{ .Values.global.opsDomain }}
+    password: null
+  hosts: ["elastic.{{ .Values.global.opsDomain }}"]
   sslVerify: {{ .Values.global.verifyTls }}
   logLevel: "info"
 
@@ -28,12 +27,7 @@ secret:
 env:
   LIVENESS_THRESHOLD_SECONDS: 900
   STUCK_THRESHOLD_SECONDS: 1200
-
-additionalPlugins:
-  # New version due to https://github.com/fluent/fluent-plugin-prometheus/issues/119
-  # default: gem 'fluent-plugin-prometheus', '~>1.4.0'
-- name: fluent-plugin-prometheus
-  version: 1.6.1
+  OUTPUT_PORT: 443
 
 serviceMonitor:
   enabled: true
@@ -176,7 +170,7 @@ extraConfigMaps:
         @log_level "#{ENV['OUTPUT_LOG_LEVEL']}"
         include_tag_key true
         type_name _doc
-        host "#{ENV['OUTPUT_HOST']}"
+        host "#{ENV['OUTPUT_HOSTS']}"
         port "#{ENV['OUTPUT_PORT']}"
         path "#{ENV['OUTPUT_PATH']}"
         scheme "#{ENV['OUTPUT_SCHEME']}"
@@ -190,6 +184,9 @@ extraConfigMaps:
         reload_connections false
         include_timestamp true # defaults to false
         index_name kubeaudit
+        default_elasticsearch_version 7
+        # https://github.com/uken/fluent-plugin-elasticsearch/issues/785
+        suppress_type_name true
         # Custom parameters --END--
         <buffer>
           @type file
@@ -211,7 +208,7 @@ extraConfigMaps:
         @log_level "#{ENV['OUTPUT_LOG_LEVEL']}"
         include_tag_key true
         type_name _doc
-        host "#{ENV['OUTPUT_HOST']}"
+        host "#{ENV['OUTPUT_HOSTS']}"
         port "#{ENV['OUTPUT_PORT']}"
         path "#{ENV['OUTPUT_PATH']}"
         scheme "#{ENV['OUTPUT_SCHEME']}"
@@ -225,6 +222,9 @@ extraConfigMaps:
         reload_connections false
         include_timestamp true # defaults to false
         index_name kubernetes
+        default_elasticsearch_version 7
+        # https://github.com/uken/fluent-plugin-elasticsearch/issues/785
+        suppress_type_name true
         # Custom parameters --END--
         <buffer>
           @type file
@@ -246,7 +246,7 @@ extraConfigMaps:
         @log_level "#{ENV['OUTPUT_LOG_LEVEL']}"
         include_tag_key true
         type_name _doc
-        host "#{ENV['OUTPUT_HOST']}"
+        host "#{ENV['OUTPUT_HOSTS']}"
         port "#{ENV['OUTPUT_PORT']}"
         path "#{ENV['OUTPUT_PATH']}"
         scheme "#{ENV['OUTPUT_SCHEME']}"
@@ -260,6 +260,9 @@ extraConfigMaps:
         reload_connections false
         include_timestamp true # defaults to false
         index_name other
+        default_elasticsearch_version 7
+        # https://github.com/uken/fluent-plugin-elasticsearch/issues/785
+        suppress_type_name true
         # Custom parameters --END--
         <buffer>
           @type file

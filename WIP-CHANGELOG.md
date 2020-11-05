@@ -7,9 +7,9 @@
 See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate-elasticsearch-exporter.md) for instructions on how to perform the upgrade.
 - Configuration regarding backups (in general) and harbor storage have been changed and requires running init again. If `harbor.persistence.type` equals `s3` or `gcs` in your config you must update it to `objectStorage`.
 - Some configuration options must be manually updated.
-  See [the complete migration guide for all details](migration/v0.8.x-v0.9.x/migrate-apps.md)
+  See [the complete migration guide for all details](migration/v0.8.x-v0.9.x/upgrade-apps.md)
 - A few applications require additional steps.
-  See [the complete migration guide for all details](migration/v0.8.x-v0.9.x/migrate-apps.md)
+  See [the complete migration guide for all details](migration/v0.8.x-v0.9.x/upgrade-apps.md)
 
 ### Added
 
@@ -38,6 +38,8 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
 - `kube-prometheus-stack` updated to version `12.8.0`.
 - Bump prometheus to `2.23.0`.
 - Added example config for Kibana group mapping from an OIDC provider
+- Replaced `kiwigrid/fluentd-elasticsearch` helm chart with `kokuwa/fluentd-elasticsearch`.
+- Replaced `stable/fluentd` helm chart with `bitnami/fluentd`.
 
 ### Fixed
 
@@ -45,7 +47,10 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
 - Retention setting for wc scraper always overriding the user config and being set to 10 days.
 
 ### Removed
-
-- Release `prometheus-auth` has been removed.
+- The following helm release has been deprecated and will be uninstalled when upgrading:
+  - `wc-scraper`
+  - `prometheus-auth`
+  - `wc-scraper-alerts`
+  - `fluentd-aggregator`
 - Helm chart `basic-auth-secret` has been removed.
 - Unused config option `dnsPrefix`.

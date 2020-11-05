@@ -337,20 +337,19 @@ elasticsearch:
     tolerations: []
 
 fluentd:
-  # Enable log collection in the service cluster
-  # and store in object storage via fluentd aggregator.
   enabled: true
-  resources:
-    limits:
-      cpu: 500m
-      memory: 200Mi
-    requests:
-      cpu: 100m
-      memory: 200Mi
-  tolerations: []
-  affinity: {}
-  nodeSelector: {}
-  useRegionEndpoint: "set-me"
+  forwarder:
+    resources:
+      limits:
+        cpu: 500m
+        memory: 200Mi
+      requests:
+        cpu: 100m
+        memory: 200Mi
+    tolerations: []
+    affinity: {}
+    nodeSelector: {}
+    useRegionEndpoint: "set-me"
   aggregator:
     resources:
       limits:

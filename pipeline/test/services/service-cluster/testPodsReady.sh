@@ -39,8 +39,7 @@ deployments=(
     "elastic-system opendistro-es-client"
     "elastic-system opendistro-es-kibana"
 )
-if [ "$cloud_provider" == "exoscale" ]
-then
+if [ "$cloud_provider" == "exoscale" ]; then
     deployments+=("kube-system nfs-client-provisioner")
 fi
 if [ "$enable_harbor" == true ]; then
@@ -61,17 +60,14 @@ fi
 if [ "$enable_user_grafana" == true ]; then
     deployments+=("monitoring user-grafana")
 fi
-if [ "$enable_fluentd" == true ]; then
-    deployments+=("fluentd fluentd-aggregator")
-fi
 if [ "$enable_velero" == true ]; then
     deployments+=("velero velero")
 fi
+
 resourceKind="Deployment"
 # Get json data in a smaller dataset
 simpleData="$(getStatus $resourceKind)"
-for deployment in "${deployments[@]}"
-do
+for deployment in "${deployments[@]}"; do
     read -r -a arr <<< "$deployment"
     namespace="${arr[0]}"
     name="${arr[1]}"
@@ -103,8 +99,7 @@ fi
 resourceKind="DaemonSet"
 # Get json data in a smaller dataset
 simpleData="$(getStatus $resourceKind)"
-for daemonset in "${daemonsets[@]}"
-do
+for daemonset in "${daemonsets[@]}"; do
     read -r -a arr <<< "$daemonset"
     namespace="${arr[0]}"
     name="${arr[1]}"
@@ -130,12 +125,14 @@ if [ "$enable_harbor" == true ]; then
         "harbor harbor-harbor-redis"
     )
 fi
+if [ "$enable_fluentd" == true ]; then
+    statefulsets+=("fluentd fluentd")
+fi
 
 resourceKind="StatefulSet"
 # Get json data in a smaller dataset
 simpleData="$(getStatus $resourceKind)"
-for statefulset in "${statefulsets[@]}"
-do
+for statefulset in "${statefulsets[@]}"; do
     read -r -a arr <<< "$statefulset"
     namespace="${arr[0]}"
     name="${arr[1]}"
@@ -148,9 +145,7 @@ jobs=(
     "elastic-system opendistro-es-configurer 120s"
 )
 if [ "$enable_harbor" == true ]; then
-    jobs+=(
-        "harbor init-harbor-job 120s"
-    )
+    jobs+=("harbor init-harbor-job 120s")
 fi
 
 echo
@@ -158,15 +153,13 @@ echo
 echo "Testing jobs"
 echo "===================="
 
-for job in "${jobs[@]}"
-do
+for job in "${jobs[@]}"; do
     read -r -a arr <<< "$job"
     namespace="${arr[0]}"
     name="${arr[1]}"
     timeout="${arr[2]}"
     echo -n -e "\n${name}\t"
-    if testResourceExistence job "${namespace}" "${name}"
-    then
+    if testResourceExistence job "${namespace}" "${name}"; then
         testJobStatus "${namespace}" "${name}" "${timeout}"
     fi
 done
@@ -195,20 +188,21 @@ fi
 if [ "$enable_influxdb_backup_retention" == true ]; then
     cronjobs+=("influxdb-prometheus influxdb-backup-retention")
 fi
+if [ "$enable_fluentd" == true ]; then
+    cronjobs+=("fluentd sc-logs-retention")
+fi
 
 echo
 echo
 echo "Testing cronjobs"
 echo "===================="
 
-for cronjob in "${cronjobs[@]}"
-do
+for cronjob in "${cronjobs[@]}"; do
     read -r -a arr <<< "$cronjob"
     namespace="${arr[0]}"
     name="${arr[1]}"
     echo -n -e "\n${name}\t"
-    if testResourceExistence cronjob "${namespace}" "${name}"
-    then
+    if testResourceExistence cronjob "${namespace}" "${name}"; then
         logCronJob "${namespace}" "${name}"
     fi
 done

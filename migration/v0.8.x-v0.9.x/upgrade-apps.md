@@ -10,17 +10,27 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
     - `user.prometheusPassword`
     - `externalTrafficPolicy.whitelistRange.prometheus`
     - `global.dnsPrefix`
-  - Replace
-    - `influxDB.user` -> `influxDB.users.adminUser`
+  - Replace in `sc-config.yaml`
+    - `influxDB.user`     -> `influxDB.users.adminUser`
     - `influxDB.password` -> `influxDB.users.adminPassword`
+    - `fluentd.resources`         -> `fluentd.forwarder.resources`
+    - `fluentd.tolerations`       -> `fluentd.forwarder.tolerations`
+    - `fluentd.affinity`          -> `fluentd.forwarder.affinity`
+    - `fluentd.nodeSelector`      -> `fluentd.forwarder.nodeSelector`
+    - `fluentd.useRegionEndpoint` -> `fluentd.forwarder.useRegionEndpoint`
 
 3. Upgrade workload cluster applications
-  ```
+  ```bash
   ./bin/ck8s apply wc
   ```
 
 4. Upgrade service cluster applications
-  ```
+  ```bash
+  # Destroy old fluentd releases
+  ./bin/ck8s ops helmfile sc -l app=fluentd destroy
+  ./bin/ck8s ops helmfile sc -l app=fluentd-aggregator destroy
+
+  # Upgrade
   ./bin/ck8s apply sc
 
   # Create new InfluxDB users
