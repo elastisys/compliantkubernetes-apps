@@ -186,7 +186,7 @@ elasticsearch:
   tolerations: []
   affinity: {}
   nodeSelector: {}
-  snapshotRepository: elastic-snapshots
+  snapshotRepository: "set-me"
   useRegionEndpoint: "set-me"
 
 fluentd:
