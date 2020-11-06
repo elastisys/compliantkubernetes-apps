@@ -3,6 +3,7 @@
 - Configuration for the certificate issuers has been changed and requires running the [migration script](migration/v0.6.x-v0.7.x/migrate-issuer-config.sh).'
 - Remove `alerts.opsGenieHeartbeat.enable` and `alerts.opsGenieHeartbeat.enabled` from your config file `sc-config.yaml`.
 - Run `ck8s init` again to update your config files with new options (after checking out v0.7.0).
+- Update your `yq` binary to version `3.4.1`.
 
 ### Added
 
@@ -18,6 +19,7 @@
 - Certificate issuer configuration has been changed from `letsencrypt` to `issuers.letsencrypt` and extended to support more issuers.
 - Explicitly disabled multitenancy in Kibana.
 - Cloud provider dependencies are removed from the templates, instead, keys are added to the sc|wc-config.yaml by the init script so no more "hidden" config. This requires a re-run of ck8s init or manully adding the missing keys.
+- Version of `yq` have been updated to `3.4.1`.
 
 ### Fixed
 
