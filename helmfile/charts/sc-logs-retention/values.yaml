@@ -13,12 +13,19 @@ startingDeadlineSeconds: 1200
 serviceAccountName: "fluentd-aggregator"
 
 s3:
+  enabled: false
   region: ""
   regionEndpoint: ""
   bucket: ""
   retentionDays: 7
   accessKey: ""
   secretKey: ""
+
+gcs:
+  enabled: false
+  retentionDays: 7
+  bucket: ""
+  keyfileData: ""
 
 podAnnotations: {}
 

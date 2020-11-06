@@ -38,33 +38,98 @@ create_tarball() {
 }
 
 s3_upload() {
-
-    : "${S3_BUCKET:?Missing S3_BUCKET}"
+    : "${BUCKET_NAME:?Missing BUCKET_NAME}"
     : "${S3_REGION_ENDPOINT:?Missing S3_REGION_ENDPOINT}"
-    echo "Uploading to s3 bucket s3://${S3_BUCKET}/backups/$(date +%s).sql.gz" >&2
+    echo "Uploading to s3 bucket s3://${BUCKET_NAME}/backups/$(date +%s).sql.gz" >&2
 
-    PATH_TO_BACKUP=s3://${S3_BUCKET}"/backups/"$(date +%s).sql.gz
+    PATH_TO_BACKUP=s3://${BUCKET_NAME}"/backups/"$(date +%s).sql.gz
 
     aws s3 cp /backup/harbor.tgz "$PATH_TO_BACKUP" --endpoint-url="$S3_REGION_ENDPOINT"
 }
 
-get_records() {
+s3_get_records() {
     before_date="$1"
 
     aws s3api list-objects \
-        --bucket "${S3_BUCKET}" \
+        --bucket "${BUCKET_NAME}" \
         --endpoint-url "${S3_REGION_ENDPOINT}" \
         --prefix "backups/" \
         --query "Contents[?LastModified<='${before_date}'][].{Key: Key}"
 }
 
+s3_remove_path() {
+  path=$1
+
+  echo "deleting s3://${BUCKET_NAME}/${path}"
+  aws s3 rm "s3://${BUCKET_NAME}/${path}" \
+      --endpoint-url "${S3_REGION_ENDPOINT}"
+}
+
+gcs_upload() {
+  : "${GCS_KEYFILE:?Missing GCS_KEYFILE}"
+  : "${BUCKET_NAME:?Missing BUCKET_NAME}"
+  echo "Uploading to gcs bucket gs://${BUCKET_NAME}/backups/$(date +%s).sql.gz" >&2
+
+  PATH_TO_BACKUP="gs://${BUCKET_NAME}/backups/$(date +%s).sql.gz"
+
+  gsutil -o "Credentials:gs_service_key_file=${GCS_KEYFILE}" cp /backup/harbor.tgz "${PATH_TO_BACKUP}"
+}
+
+gcs_get_records() {
+  : "${GCS_KEYFILE:?Missing GCS_KEYFILE}"
+  : "${BUCKET_NAME:?Missing BUCKET_NAME}"
+
+  if [ $# -lt 1 ]; then
+    echo "ERROR: Need to supply date to gcs_get_records" >&1
+    exit 1
+  fi
+
+  before_date="$1"
+  PATH_TO_BACKUPS="gs://${BUCKET_NAME}/backups/"
+
+  # The jq command will do the following:
+  # * Select all backups in the backups/ folder
+  # * Select only entries older than given date (epoch time)
+  # * Save name of path to key "Key"
+  gsutil -o "Credentials:gs_service_key_file=${GCS_KEYFILE}" ls -L "${PATH_TO_BACKUPS}" | \
+    yq r - -j | \
+    jq '[to_entries | .[] | ' \
+       'select(( .key | test("^gs:\/\/[^\/]+\/backups\/.+")) and ' \
+       '(.value."Update time" | strptime("%a, %d %b %Y %H:%M:%S %Z") | mktime <= '"${before_date}"') ) | ' \
+       '{Key: (.key | match("^gs:\/\/[^\/]+\/(.+)").captures[0].string)}]'
+}
+
+gcs_remove_path() {
+  : "${GCS_KEYFILE:?Missing GCS_KEYFILE}"
+  : "${BUCKET_NAME:?Missing BUCKET_NAME}"
+
+  if [ $# -lt 1 ]; then
+    echo "ERROR: Need to supply path to gcs_remove_path" >&1
+    exit 1
+  fi
+
+  path=$1
+
+  echo "deleting gs://${BUCKET_NAME}/${path}"
+  gsutil -o "Credentials:gs_service_key_file=${GCS_KEYFILE}" rm "${BUCKET_NAME}/${path}"
+}
+
 remove_old_backups () {
     : "${DAYS_TO_RETAIN:?Missing DAYS_TO_RETAIN}"
-    before_date=$(date --iso-8601=seconds -d "-${DAYS_TO_RETAIN} days")
-    now=$(date --iso-8601=seconds)
 
-    del_records=$(get_records "${before_date}")
-    all_records=$(get_records "${now}")
+    if [[ ${S3_BACKUP} == "true" ]]; then
+      before_date=$(date --iso-8601=seconds -d "-${DAYS_TO_RETAIN} days")
+      now=$(date --iso-8601=seconds)
+
+      del_records=$(s3_get_records "${before_date}")
+      all_records=$(s3_get_records "${now}")
+    elif [[ ${GCS_BACKUP} == "true" ]]; then
+      before_date=$(date -d "-${DAYS_TO_RETAIN} days" +%s)
+      now=$(date +%s)
+
+      del_records=$(gcs_get_records "${before_date}")
+      all_records=$(gcs_get_records "${now}")
+    fi
 
     del_paths=()
     all_paths=()
@@ -92,9 +157,11 @@ remove_old_backups () {
     fi
 
     for path in "${del_paths[@]::${num_to_delete}}"; do
-        echo "deleting s3://${S3_BUCKET}/${path}"
-        aws s3 rm "s3://${S3_BUCKET}/${path}" \
-            --endpoint-url "${S3_REGION_ENDPOINT}"
+      if [[ ${S3_BACKUP} == "true" ]]; then
+          s3_remove_path "${path}"
+      elif [[ ${GCS_BACKUP} == "true" ]]; then
+          gcs_remove_path "${path}"
+      fi
     done
 }
 
@@ -102,5 +169,10 @@ create_dir
 wait_for_db_ready
 dump_database
 create_tarball
-s3_upload
+if [[ ${S3_BACKUP} == "true" ]]; then
+  s3_upload
+fi
+if [[ ${GCS_BACKUP} == "true" ]]; then
+  gcs_upload
+fi
 remove_old_backups

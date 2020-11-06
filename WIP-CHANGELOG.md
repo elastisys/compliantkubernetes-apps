@@ -16,6 +16,7 @@ Make sure to remove the old option from your config when upgrading.
 Make sure to remove the option from your config when upgrading.
 - With the replacement of the helm chart `stable/prometheus-operator` to `prometheus-community/kube-prometheus-stack`, it is required to manually execute some steps to upgrade.
 See [migrations docs for prometheus-operator](migration/v0.7.x-v0.8.x/migrate-prometheus-operator.md) for instructions on how to perform the upgrade.
+- Migrate existing config to the new object storage config by running the script `migration/v0.7.x-v0.8.x/migrate-object-storage.sh`
 
 ### Added
 
@@ -26,6 +27,7 @@ See [migrations docs for prometheus-operator](migration/v0.7.x-v0.8.x/migrate-pr
 - Add `./bin/ck8s ops helm` to allow investigating issues between `helmfile` and `kubectl`.
 - Allow nginx config options to be set in the ingress controller.
 - Allow user-alertmanager to be deployed in custom namespace and not only in `monitoring`.
+- Support for GCS
 
 ### Changed
 

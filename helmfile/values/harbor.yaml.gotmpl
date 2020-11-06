@@ -38,19 +38,26 @@ persistence:
       authurl: {{ .Values.citycloud.authURL }}/v3
       username: {{ .Values.citycloud.username }}
       password: {{ .Values.citycloud.password }}
-      container: {{ .Values.s3.buckets.harbor }}
+      container: {{ .Values.objectStorage.buckets.harbor }}
       region: {{ .Values.citycloud.regionName }}
       authversion: {{ .Values.citycloud.authVersion }}
       tenant: {{ .Values.citycloud.tenantName }}
       domain: {{ .Values.citycloud.projectDomainName }}
     {{ else }}
+    {{ if eq .Values.objectStorage.type "s3" }}
     type: s3
     s3:
-      region: {{ .Values.s3.region }}
-      regionendpoint: {{ .Values.s3.regionEndpoint }}
-      bucket: {{ .Values.s3.buckets.harbor }}
-      secretkey: {{ .Values.s3.secretKey }}
-      accesskey: {{ .Values.s3.accessKey }}
+      region: {{ .Values.objectStorage.s3.region }}
+      regionendpoint: {{ .Values.objectStorage.s3.regionEndpoint }}
+      bucket: {{ .Values.objectStorage.buckets.harbor }}
+      secretkey: {{ .Values.objectStorage.s3.secretKey }}
+      accesskey: {{ .Values.objectStorage.s3.accessKey }}
+    {{ else if eq .Values.objectStorage.type "gcs" }}
+    type: gcs
+    gcs:
+      bucket: {{ .Values.objectStorage.buckets.harbor }}
+      encodedkey: {{ .Values.objectStorage.gcs.keyfileData | b64enc }}
+    {{- end }}
     {{ end }}
 
 externalURL: https://harbor.{{ .Values.global.baseDomain }}

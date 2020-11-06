@@ -1,6 +1,17 @@
 dbPassword: {{ .Values.harbor.databasePassword }}
+{{ if eq .Values.objectStorage.type "s3" -}}
 s3:
-  accessKey: {{ .Values.s3.accessKey }}
-  secretKey: {{ .Values.s3.secretKey }}
-  bucket: {{ .Values.s3.buckets.harbor }}
-  endpoint: {{ .Values.s3.regionEndpoint }}
+  enabled: true
+  accessKey: {{ .Values.objectStorage.s3.accessKey }}
+  secretKey: {{ .Values.objectStorage.s3.secretKey }}
+  bucket: {{ .Values.objectStorage.buckets.harbor }}
+  endpoint: {{ .Values.objectStorage.s3.regionEndpoint }}
+{{ else if eq .Values.objectStorage.type "gcs" -}}
+# TODO
+# Fix harbor backup chart to support gcs
+gcs:
+  enabled: true
+  bucket: {{ .Values.objectStorage.buckets.harbor }}
+  keyfileData: |
+    {{ .Values.objectStorage.gcs.keyfileData | nindent 4 }}
+{{- end }}

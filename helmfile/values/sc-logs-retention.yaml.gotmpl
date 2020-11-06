@@ -1,12 +1,3 @@
-
-s3:
-  region: {{ .Values.s3.region | quote }}
-  regionEndpoint: {{ .Values.s3.regionEndpoint | quote }}
-  bucket: {{ .Values.s3.buckets.scFluentd | quote }}
-  retentionDays: {{ .Values.logRetention.days }}
-  accessKey: {{ .Values.s3.accessKey | quote }}
-  secretKey: {{ .Values.s3.secretKey | quote }}
-
 resources:
   requests:
     cpu: 100m
@@ -14,3 +5,29 @@ resources:
   limits:
     memory: 100Mi
     cpu: 200m
+
+{{ if eq .Values.objectStorage.type "s3" -}}
+s3:
+  enabled: true
+  region: {{ .Values.objectStorage.s3.region | quote }}
+  regionEndpoint: {{ .Values.objectStorage.s3.regionEndpoint | quote }}
+  bucket: {{ .Values.objectStorage.buckets.scFluentd | quote }}
+  retentionDays: {{ .Values.logRetention.days }}
+  accessKey: {{ .Values.objectStorage.s3.accessKey | quote }}
+  secretKey: {{ .Values.objectStorage.s3.secretKey | quote }}
+
+image:
+  repository: amazon/aws-cli
+  tag: "2.0.45"
+
+{{ else if eq .Values.objectStorage.type "gcs" -}}
+gcs:
+  enabled: true
+  bucket: {{ .Values.objectStorage.buckets.scFluentd | quote }}
+  keyfileData: |
+    {{ .Values.objectStorage.gcs.keyfileData | nindent 4 }}
+
+image:
+  repository: google/cloud-sdk
+  tag: "318.0.0-slim"
+{{- end }}

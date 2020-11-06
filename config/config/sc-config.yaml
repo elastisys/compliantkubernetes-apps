@@ -10,10 +10,14 @@ global:
   storageClass: "set-me"
   clusterDns: "10.43.0.10"
 
-s3:
-  region: "set-me"
-  regionAddress: "set-me"
-  regionEndpoint: "set-me"
+objectStorage:
+  type: "s3"
+  # gcs:
+  #   project: "set-me"
+  # s3:
+  #   region: "set-me"
+  #   regionAddress: "set-me"
+  #   regionEndpoint: "set-me"
   buckets:
     harbor: "${CK8S_ENVIRONMENT_NAME}-harbor"
     velero: "${CK8S_ENVIRONMENT_NAME}-velero"

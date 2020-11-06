@@ -1,18 +1,17 @@
 elastisys_custom:
   # The following values must be set in order to use the chart.
   influx_addr: {{ .Values.influxDB.address }}
-  s3_region: {{ .Values.s3.region }}
-  s3_region_endpoint: {{ .Values.s3.regionEndpoint }}
-  s3_influx_bucket_name: {{ .Values.s3.buckets.influxDB }}
-  s3_access_key: {{ .Values.s3.accessKey }}
-  s3_secret_key: {{ .Values.s3.secretKey }}
   influxdb_user: {{ .Values.influxDB.user }}
   influxdb_password: {{ .Values.influxDB.password }}
   s3_credentials: |+
+  {{- if eq .Values.objectStorage.type "s3" }}
     [default]
-    aws_access_key_id={{ .Values.s3.accessKey }}
-    aws_secret_access_key={{ .Values.s3.secretKey }}
-    region={{ .Values.s3.region }}
+    aws_access_key_id={{ .Values.objectStorage.s3.accessKey }}
+    aws_secret_access_key={{ .Values.objectStorage.s3.secretKey }}
+    region={{ .Values.objectStorage.s3.region }}
+  {{- else if eq .Values.objectStorage.type "gcs" }}
+    {{ .Values.objectStorage.gcs.keyfileData | nindent 4 }}
+  {{- end }}
 
   metrics:
     jobs:
@@ -138,7 +137,14 @@ backup:
     size: {{ add .Values.influxDB.metrics.sizeWc .Values.influxDB.metrics.sizeSc -}}Ki # the sum of influxDB.metrics.sizeWc and influxDB.metrics.sizeWc (all values in KB)
   schedule: "0 0 * * *"
   startingDeadlineSeconds: 200
+  {{- if eq .Values.objectStorage.type "s3" }}
   s3:
     credentialsSecret: influxdb-backup-secret #TODO: use influxdb.fullname from _helpers.tpl instead hardcoded "influxdb"
-    destination: s3://{{ .Values.s3.buckets.influxDB }}
-    endpointUrl: {{ .Values.s3.regionEndpoint }}
+    destination: s3://{{ .Values.objectStorage.buckets.influxDB }}
+    endpointUrl: {{ .Values.objectStorage.s3.regionEndpoint }}
+  {{- else if eq .Values.objectStorage.type "gcs" }}
+  gcs:
+    destination: gs://{{ .Values.objectStorage.buckets.influxDB }}
+    serviceAccountSecretKey: credentials
+    serviceAccountSecret: influxdb-backup-secret
+  {{- end }}

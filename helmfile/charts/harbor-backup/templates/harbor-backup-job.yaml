@@ -15,9 +15,12 @@ spec:
           restartPolicy: OnFailure
           containers:
             - name: run
-              image: elastisys/backup-postgres:1.0.0
+              image: elastisys/backup-postgres:1.1.0
               command: ['/bin/bash', '/scripts/harbor-backup.sh']
               env:
+              {{- if .Values.s3.enabled }}
+                - name: S3_BACKUP
+                  value: "true"
                 - name: AWS_ACCESS_KEY_ID
                   valueFrom:
                     secretKeyRef:
@@ -28,6 +31,18 @@ spec:
                     secretKeyRef:
                       name: harbor-backup-secret
                       key: aws-secret-access-key
+                - name: BUCKET_NAME
+                  value: {{ .Values.s3.bucket }}
+                - name: S3_REGION_ENDPOINT
+                  value: {{ .Values.s3.endpoint }}
+              {{- else if .Values.gcs.enabled }}
+                - name: GCS_BACKUP
+                  value: "true"
+                - name: GCS_KEYFILE
+                  value: /etc/gcs/gcs-credentials.json
+                - name: BUCKET_NAME
+                  value: {{ .Values.gcs.bucket }}
+              {{- end }}
                 - name: PGPASSWORD
                   valueFrom:
                     secretKeyRef:
@@ -35,10 +50,6 @@ spec:
                       key: db-password
                 - name: PG_HOSTNAME
                   value: {{ .Values.pgHostname }}
-                - name: S3_BUCKET
-                  value: {{ .Values.s3.bucket }}
-                - name: S3_REGION_ENDPOINT
-                  value: {{ .Values.s3.endpoint }}
                 - name: DAYS_TO_RETAIN
                   value: "{{ .Values.retentionDays }}"
               volumeMounts:
@@ -46,9 +57,18 @@ spec:
                   mountPath: /scripts
                 - name: backup
                   mountPath: /backup
+                {{ if .Values.gcs.enabled -}}
+                - name: gcs-credentials
+                  mountPath: /etc/gcs
+                {{- end }}
           volumes:
           - name: scripts
             configMap:
               name: {{ .Release.Name }}-cm
           - name: backup
             emptyDir: {}
+          {{- if .Values.gcs.enabled }}
+          - name: gcs-credentials
+            secret:
+              secretName: harbor-backup-secret
+          {{- end }}

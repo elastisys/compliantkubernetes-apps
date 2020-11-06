@@ -10,8 +10,13 @@ tolerations: {{- toYaml .Values.fluentd.aggregator.tolerations | nindent 2 }}
 plugins:
   enabled: true
   pluginsList:
+    {{ if eq .Values.objectStorage.type "s3" -}}
     # TODO: pin version
     - fluent-plugin-s3
+    {{ else if eq .Values.objectStorage.type "gcs" -}}
+    - digest-crc -v "0.5.1"
+    - fluent-plugin-gcs
+    {{- end }}
 
 service:
   type: ClusterIP
@@ -29,6 +34,7 @@ persistence:
   enabled: true
   size: 10Gi
 
+{{ if eq .Values.objectStorage.type "s3" -}}
 extraEnvVars:
  - name: AWS_ACCESS_KEY_ID
    valueFrom:
@@ -40,6 +46,7 @@ extraEnvVars:
      secretKeyRef:
        name: s3-credentials
        key: s3_secret_key
+{{- end }}
 
 configMaps:
   output.conf: |
@@ -48,17 +55,26 @@ configMaps:
     </match>
     <match **>
       @id output-s3
+      {{ if eq .Values.objectStorage.type "gcs" -}}
+      @type gcs
+
+      project {{ .Values.objectStorage.gcs.project }}
+      keyfile /etc/fluent/config.d/gcp_credentials.json
+      bucket {{ .Values.objectStorage.buckets.scFluentd }}
+      object_key_format %{path}%{time_slice}_%{index}.%{file_extension}
+      {{ else if eq .Values.objectStorage.type "s3" -}}
       @type s3
 
       aws_key_id "#{ENV['AWS_ACCESS_KEY_ID']}"
       aws_sec_key "#{ENV['AWS_ACCESS_SECRET_KEY']}"
       {{ if eq .Values.fluentd.useRegionEndpoint true -}}
-      s3_endpoint {{ .Values.s3.regionEndpoint }}
+      s3_endpoint {{ .Values.objectStorage.s3.regionEndpoint }}
       force_path_style true
       {{ else -}}
-      s3_region {{ .Values.s3.region }}
+      s3_region {{ .Values.objectStorage.s3.region }}
       {{ end -}}
-      s3_bucket {{ .Values.s3.buckets.scFluentd }}
+      s3_bucket {{ .Values.objectStorage.buckets.scFluentd }}
+      {{- end }}
 
       path logs/%Y%m%d/${tag}/
 
@@ -75,3 +91,8 @@ configMaps:
         chunk_limit_size 50m
       </buffer>
     </match>
+
+  {{ if eq .Values.objectStorage.type "gcs" -}}
+  gcp_credentials.json: |
+    {{ .Values.objectStorage.gcs.keyfileData | nindent 4 }}
+  {{- end }}

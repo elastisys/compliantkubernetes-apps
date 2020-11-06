@@ -17,7 +17,7 @@ config_file="$CK8S_CONFIG_PATH/$1-config.yaml"
 cloud_provider=$(yq r "$config_file" 'global.cloudProvider')
 
 # In config:
-# s3.buckets.<bucket>
+# objectStorage.buckets.<bucket>
 buckets=(
   harbor
   velero
@@ -45,6 +45,6 @@ S3_BUCKET_LIST=$(with_s3cfg "${secrets[s3cfg_file]}" "s3cmd --config {} ls")
 
 for bucket in "${buckets[@]}"
 do
-  bucket_name=$(yq r "$config_file" "s3.buckets.$bucket")
+  bucket_name=$(yq r "$config_file" "objectStorage.buckets.$bucket")
   check_if_bucket_exists "$bucket_name"
 done

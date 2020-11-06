@@ -5,7 +5,12 @@ metadata:
   labels:
     {{- include "sc-logs-retention.labels" . | nindent 4 }}
 data:
+{{- if .Values.s3.enabled }}
   AWS_DEFAULT_REGION: {{ .Values.s3.region }}
   S3_REGION_ENDPOINT: {{ .Values.s3.regionEndpoint }}
-  S3_BUCKET: {{ .Values.s3.bucket }}
   RETENTION_DAYS: {{ .Values.s3.retentionDays | quote }}
+  BUCKET_NAME: {{ .Values.s3.bucket }}
+{{- else if .Values.gcs.enabled }}
+  BUCKET_NAME: {{ .Values.gcs.bucket }}
+  RETENTION_DAYS: {{ .Values.gcs.retentionDays | quote }}
+{{- end }}

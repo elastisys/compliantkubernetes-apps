@@ -31,6 +31,9 @@ spec:
                 {{- toYaml .Values.securityContext | nindent 16 }}
               command: ['/bin/bash', '/scripts/logs-retention.sh']
               env:
+              {{- if .Values.s3.enabled }}
+                - name: S3_BACKUP
+                  value: "true"
                 - name: AWS_ACCESS_KEY_ID
                   valueFrom:
                     secretKeyRef:
@@ -41,6 +44,12 @@ spec:
                     secretKeyRef:
                       key: s3_secret_key
                       name:  {{ include "sc-logs-retention.fullname" . }}
+              {{- else if .Values.gcs.enabled }}
+                - name: GCS_BACKUP
+                  value: "true"
+                - name: GCS_KEYFILE
+                  value: /etc/gcs/gcs-credentials.json
+              {{- end }}
               envFrom:
                 - configMapRef:
                     name: {{ include "sc-logs-retention.fullname" . }}-env
@@ -49,10 +58,19 @@ spec:
               volumeMounts:
                 - name: scripts
                   mountPath: /scripts
+                {{- if .Values.gcs.enabled }}
+                - name: gcs-credentials
+                  mountPath: /etc/gcs
+                {{- end }}
           volumes:
             - name: scripts
               configMap:
                 name: {{ include "sc-logs-retention.fullname" . }}-script
+            {{- if .Values.gcs.enabled }}
+            - name: gcs-credentials
+              secret:
+                secretName: {{ include "sc-logs-retention.fullname" . }}
+            {{- end }}
           {{- with .Values.nodeSelector }}
           nodeSelector:
             {{- toYaml . | nindent 12 }}

@@ -14,23 +14,41 @@ elasticsearch:
       existingCertSecretKeySubPath: tls.key
       existingCertSecretRootCASubPath: ca.crt
 
+  {{ if eq .Values.objectStorage.type "s3" -}}
   s3:
     enabled: true
     useExistingSecret: false
     secretName: opendistro-es-s3-credentials
-    accessKey: {{ .Values.s3.accessKey }}
-    secretKey: {{ .Values.s3.secretKey }}
-    bucketName: {{ .Values.s3.buckets.elasticsearch }}
+    accessKey: {{ .Values.objectStorage.s3.accessKey }}
+    secretKey: {{ .Values.objectStorage.s3.secretKey }}
     provider: {{ .Values.global.cloudProvider }}
+    bucketName: {{ .Values.objectStorage.buckets.elasticsearch }}
+  {{ else if eq .Values.objectStorage.type "gcs" -}}
+  s3:
+    enabled: false
+  gcs:
+    enabled: true
+    useExistingSecret: false
+    secretName: opendistro-es-gcs-credentials
+    bucketName: {{ .Values.objectStorage.buckets.elasticsearch }}
+    keyfileData: |
+      {{ .Values.objectStorage.gcs.keyfileData | nindent 6 }}
+  {{- end }}
 
   extraVolumes:
   - emptyDir: {}
     name: internal-elasticsearch-config-local
   - emptyDir: {}
     name: internal-elasticsearch-plugins-local
+  {{ if eq .Values.objectStorage.type "s3" -}}
   - name: s3-credentials
     secret:
       secretName: opendistro-es-s3-credentials
+  {{ else if eq .Values.objectStorage.type "gcs" -}}
+  - name: gcs-credentials
+    secret:
+      secretName: opendistro-es-gcs-credentials
+  {{- end }}
 
   extraVolumeMounts:
   - mountPath: /usr/share/elasticsearch/config
@@ -39,17 +57,23 @@ elasticsearch:
     name: internal-elasticsearch-plugins-local
 
   extraInitContainers:
-  - name: install-s3
+  - name: install-object-storage-plugin
     image: amazon/opendistro-for-elasticsearch:1.10.1
     command:
     - sh
     - -c
     - |
-      /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch repository-s3
+      {{ if eq .Values.objectStorage.type "s3" -}}
+      /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch repository-s3 || exit 1
 
       /usr/share/elasticsearch/bin/elasticsearch-keystore create
       /usr/share/elasticsearch/bin/elasticsearch-keystore add-file s3.client.default.access_key /mnt/elastic-internal/s3-credentials/s3.client.default.access_key
       /usr/share/elasticsearch/bin/elasticsearch-keystore add-file s3.client.default.secret_key /mnt/elastic-internal/s3-credentials/s3.client.default.secret_key
+      {{ else if eq .Values.objectStorage.type "gcs" -}}
+      /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch repository-gcs || exit 1
+
+      /usr/share/elasticsearch/bin/elasticsearch-keystore add-file --force gcs.client.default.credentials_file /mnt/elastic-internal/gcs-credentials.json
+      {{- end }}
 
       # Disable performance_analyzer due to issue where disk is being filled up
       /usr/share/elasticsearch/bin/elasticsearch-plugin remove opendistro_performance_analyzer
@@ -73,8 +97,13 @@ elasticsearch:
       name: internal-elasticsearch-config-local
     - mountPath: /mnt/elastic-internal/elasticsearch-plugins-local
       name: internal-elasticsearch-plugins-local
+    {{ if eq .Values.objectStorage.type "s3" -}}
     - mountPath: /mnt/elastic-internal/s3-credentials
       name: s3-credentials
+    {{ else if eq .Values.objectStorage.type "gcs" -}}
+    - mountPath: /mnt/elastic-internal/
+      name: gcs-credentials
+    {{- end }}
 
   securityConfig:
     config:
@@ -259,8 +288,13 @@ elasticsearch:
     node:
       attr.box_type: hot
 
-    s3.client.default.endpoint: {{ .Values.s3.regionEndpoint }}
+    {{ if eq .Values.objectStorage.type "s3" -}}
+    s3.client.default.endpoint: {{ .Values.objectStorage.s3.regionEndpoint }}
     s3.client.default.path_style_access: true
+    {{ else if eq .Values.objectStorage.type "gcs" -}}
+    # TODO
+    # Add config related to gcs (if any)
+    {{- end }}
 
 
 
