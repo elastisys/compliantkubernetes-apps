@@ -57,6 +57,10 @@ externalURL: https://harbor.{{ .Values.global.baseDomain }}
 
 harborAdminPassword: {{ .Values.harbor.password }}
 
+{{- if ( .Values | get "harbor.caBundleSecretName" nil ) }}
+caBundleSecretName: {{ .Values.harbor.caBundleSecretName }}
+{{- end }}
+
 core:
   secret: {{ .Values.harbor.coreSecret }}
   secretName: harbor-core-cert

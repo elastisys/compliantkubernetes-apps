@@ -46,6 +46,7 @@ harbor:
   tolerations: []
   affinity: {}
   nodeSelector: {}
+  #caBundleSecretName: ""
   chartmuseum:
     persistentVolumeClaim:
       size: 5Gi

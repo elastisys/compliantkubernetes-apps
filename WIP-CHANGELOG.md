@@ -13,6 +13,7 @@
 - Ability to add extra volumes and volumemounts to fluentd in the workload cluster.
 - Ability to specify certificate authority in fluentd in the workload cluster.
 - Extra Configmap mounts can be configured for the user Grafana.
+- Harbor can be configured to trust a specific CA bundle
 
 ### Changed
 
