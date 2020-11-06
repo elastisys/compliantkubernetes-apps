@@ -5,6 +5,7 @@
 ### Added
 
 - Configurable persistence size in Harbor
+- `any` can be used as configuration version to disabled version check
 
 ### Changed
 
