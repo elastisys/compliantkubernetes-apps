@@ -72,6 +72,7 @@ generate_base_sc_config() {
     fi
     file=$1
     tmpfile=$(mktemp)
+    append_trap "rm $tmpfile" EXIT
 
     envsubst > "$tmpfile" < "${config_defaults_path}/config/sc-config.yaml"
     if [[ ${CK8S_CLOUD_PROVIDER} == "citycloud" ]]; then
@@ -91,6 +92,7 @@ generate_base_wc_config() {
     fi
     file=$1
     tmpfile=$(mktemp)
+    append_trap "rm $tmpfile" EXIT
 
     envsubst > "$tmpfile" < "${config_defaults_path}/config/wc-config.yaml"
     yq merge --inplace --overwrite "$tmpfile" "${config_defaults_path}/config/flavors/${CK8S_FLAVOR}-wc.yaml"
