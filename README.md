@@ -2,9 +2,7 @@
 
 ## Build status
 
-![ck8s-cluster](https://github.com/elastisys/ck8s-pipelines/workflows/ck8s-cluster/badge.svg)
-
-compliantkubernetes-apps: TODO
+![compliantkubernetes-apps](https://github.com/elastisys/ck8s-pipelines/workflows/ck8s-apps/badge.svg)
 
 ## Overview
 
@@ -39,7 +37,7 @@ The _workload cluster_ manages the user applications as well as providing intrus
 
 This repository installs all the applications of ck8s on top of already created clusters.
 To setup the clusters see [ck8s-cluster](https://github.com/elastisys/ck8s-cluster).
-A service-cluster (sc) or workload-cluster (wc) can be created seperately but all of the applications will not work correctly unless both are running.
+A service-cluster (sc) or workload-cluster (wc) can be created separately but all of the applications will not work correctly unless both are running.
 
 All config files will be located under `CK8S_CONFIG_PATH`.
 There will be three config files: `wc-config.yaml`, `sc-config.yaml` and `secrets.yaml`.
@@ -47,7 +45,7 @@ See [Quickstart](#Quickstart) for instructions on how to initialize the repo
 
 ### Cloud providers
 
-Currently we support four cloud providers: Exoscale, Safespring, Citycloud and AWS.
+Currently we support four cloud providers: Exoscale, Safespring, Citycloud and AWS (beta).
 This is controlled by the value `global.cloudProvider` in the config files.
 
 ## Setup
@@ -101,13 +99,26 @@ If this is all new to you, here's a [link](https://riseup.net/en/security/messag
 ### Quickstart
 
 **You probably want to check the [ck8s-cluster][ck8s-cluster] repository first, since compliantkubernetes-apps depends on having two clusters already set up.**
+In addition to this, you will need to set up the following DNS entries (replace `example.com` with your domain).
+- Point these domains to the workload cluster ingress controller:
+  - `*.example.com`
+  - `prometheus.ops.example.com`
+- Point these domains to the service cluster ingress controller:
+  - `*.ops.example.com`
+  - `grafana.example.com`
+  - `harbor.example.com`
+  - `kibana.example.com`
+  - `dex.example.com`
+  - `notary.harbor.example.com`
+
 Assuming you already have everything needed to install the apps, this is what you need to do.
 
-1. Decide on a name for this environment, the cloud provider to use and set them as environment variables:
+1. Decide on a name for this environment, the cloud provider to use as well as the flavor and set them as environment variables:
 
    ```bash
    export CK8S_ENVIRONMENT_NAME=my-ck8s-cluster
    export CK8S_CLOUD_PROVIDER=[exoscale|safespring|citycloud|aws]
+   export CK8S_FLAVOR=[dev|prod] # defaults to dev
    ```
 
 2. Then set the path to where the ck8s configuration should be stored and the PGP fingerprint of the key(s) to use for encryption:
@@ -142,12 +153,67 @@ Assuming you already have everything needed to install the apps, this is what yo
    ./bin/ck8s test wc
    ```
 
-7. Check the [onboarding document](docs/onboarding.md) for any extra steps necessary.
+7. You should now have a fully working environment.
+   Check the next section for some additional steps to finalize it and set up user access.
 
-### Accessing the clusters
+### On-boarding and final touches
+
+If you followed the steps in the quickstart above, you should now have deployed the applications and have a fully functioning environment.
+However, there are a few steps remaining to make all applications ready for the user.
+
+#### User access
+
+After the cluster setup has completed RBAC resources and namespaces will have been created for the user.
+You can configure what namespaces should be created and which users that should get access using the following configuration options:
+
+```yaml
+user:
+  namespaces:
+    - demo1
+    - demo2
+  adminUsers:
+    - admin1@example.com
+    - admin2@example.com"
+```
+
+A **kubeconfig file for the user** (`${CK8S_CONFIG_PATH}/user/kubeconfig.yaml`) can be created by running the script `bin/user-kubeconfig.bash`.
+The user kubeconfig will be configured to use the first namespace by default.
+
+**Kibana** access for the user can be provided either by setting up OIDC or using the internal user database in Elasticsearch:
+- OIDC:
+  - Set `elasticsearch.sso.enabled=true` in `sc-config.yaml`.
+  - Configure extra role mappings under `elasticsearch.extraRoleMappings` to give the users the necessary roles.
+    ```yaml
+    extraRoleMappings:
+      - mapping_name: kibana_user
+        definition:
+          users:
+            - "configurer"
+            - "User Name"
+      - mapping_name: kubernetes_log_reader
+        definition:
+          users:
+            - "User Name"
+    ```
+- Internal user database:
+  - Log in to Kibana using the admin account.
+  - Create an account for the user.
+  - Give the `kibana_user` and `kubernetes_log_reader` roles to the user.
+
+Users will be able to log in to **Grafana** using dex, but they will have read only access by default.
+To give them more privileges, you need to first ask them to log in (so that they show up in the users list) and then change their roles.
+
+**Harbor** works in a multi-tenant way so that each logged in user will be able to create their own projects and manage them as admins (including adding more users as members).
+However, users will not be able to see each others (private) projects (unless explicitly invited) and won't have global admin access in Harbor.
+This also naturally means that container images uploaded to these private registries cannot automatically be pulled in to the Kubernetes cluster.
+The user will first need to add pull secrets that gives some ServiceAccount access to them before they can be used.
+
+For more details and a list of available services see the [user guide](https://compliantkubernetes.io/user-guide/).
+
+### Management of the clusters
 
 The [`bin/ck8s`](bin/ck8s) script provides an entrypoint to the clusters.
-It should be used instead of using for example `kubectl`or `helmfile` directly.
+It should be used instead of using for example `kubectl`or `helmfile` directly as an operator.
 To use the script, set the `CK8S_CONFIG_PATH` to the environment you want to access:
 
 ```bash
@@ -179,7 +245,7 @@ Run the script to see what options are available.
 * Run `helmfile diff` on a helm release:
 
   ```bash
-  ./bin/ck8s ops helmfile sc -l app=<release> diff
+  ./bin/ck8s ops helmfile sc -l <label=selector> diff
   ```
 
 #### Autocompletion for ck8s in bash
@@ -191,28 +257,9 @@ CK8S_APPS_PATH= # fill this in
 source <($CK8S_APPS_PATH/bin/ck8s completion bash)
 ```
 
-### User access
+### Operator manual
 
-After the cluster setup has completed RBAC resources, namespaces and a kubeconfig file (`${CK8S_CONFIG_PATH}/user/kubeconfig.yaml`) will have been created for the user.
-You can configure what namespaces should be created and which users that should get access using the following configuration options:
-
-```yaml
-user:
-  namespaces:
-    - demo1
-    - demo2
-  adminUsers:
-    - admin1@example.com
-    - admin2@example.com"
-```
-
-The user kubeconfig will be configured to use the first namespace by default.
-
-For more details and a list of available services see [docs/user-access.md](docs/user-access.md).
-
-### Operator access
-
-See [docs/operator-access.md](docs/operator-access.md).
+See <https://compliantkubernetes.io/operator-manual/>.
 
 ### Setting up Google as identity provider for dex
 
@@ -232,11 +279,12 @@ See [docs/operator-access.md](docs/operator-access.md).
        googleClientSecret:
    ```
 
-### OpenID Connect with kubectl
+## Known issues
 
-For using OpenID Connect with kubectl, see [kubelogin/README.md](kubelogin/README.md).
+- Elasticsearch SSO is currently hard coded to use the users real name as identifier, as opposed to a username or email address.
+  This will be addressed in the future.
+- Users must explicitly be given privileges in Grafana, Elasticsearch and Kubernetes instead of automatically getting assigned roles based on group membership when logging in using OIDC.
+- The OPA policies are not enforced by default.
+  Unfortunately the policies breaks cert-manager so they have been set to "dry-run" by default.
 
-### OpenID Connect with Harbor
-
-When using Harbor as a reqistry and authenticating with OIDC docker need to be logged in to that user.
-For more information how to use it see [Using OIDC from the Docker or Helm CLI](https://github.com/goharbor/harbor/blob/master/docs/1.10/administration/configure-authentication/oidc-auth.md#using-oidc-from-the-docker-or-helm-cli)
+For more, please the the public GitHub issues: <https://github.com/elastisys/compliantkubernetes-apps/issues>.
