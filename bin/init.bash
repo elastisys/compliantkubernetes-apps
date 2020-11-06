@@ -59,8 +59,8 @@ replace_set_me(){
         log_error "ERROR: number of args in replace_set_me must be 3. #=[$#]"
         exit 1
     fi
-    if [[ $(yq r "$1" "$2") == "set-me" ]]; then
-       yq w -i "$1" "$2" "$3"
+    if [[ $(yq read "$1" "$2") == "set-me" ]]; then
+       yq write --inplace "$1" "$2" "$3"
     fi
 
 }
@@ -126,8 +126,8 @@ set_storage_class() {
     esac
     replace_set_me "$1" 'global.storageClass' "$storage_class"
     # Only write if field exists already
-    if yq r -e "$file" 'elasticsearch.storageClass' > /dev/null 2> /dev/null; then
-       yq w -i "$file" 'elasticsearch.storageClass' "$es_storage_class"
+    if yq read --exitStatus "$file" 'elasticsearch.storageClass' > /dev/null 2> /dev/null; then
+       yq write --inplace "$file" 'elasticsearch.storageClass' "$es_storage_class"
     fi
 }
 
@@ -227,16 +227,16 @@ generate_secrets() {
     file=$1
     if [[ -f $file ]]; then
         sops_decrypt "$file"
-        yq m -i "$file" "${config_defaults_path}/secrets/sc-secrets.yaml"
+        yq merge --inplace "$file" "${config_defaults_path}/secrets/sc-secrets.yaml"
     else
         cat "${config_defaults_path}/secrets/sc-secrets.yaml" > "$file"
     fi
-    yq m -i "$file" "${config_defaults_path}/secrets/wc-secrets.yaml"
+    yq merge --inplace "$file" "${config_defaults_path}/secrets/wc-secrets.yaml"
     case ${CK8S_CLOUD_PROVIDER} in
 
         safespring | citycloud)
           cloud_file="${config_defaults_path}/secrets/citycloud.yaml"
-          yq m -i "$file" "$cloud_file"
+          yq merge --inplace "$file" "$cloud_file"
           ;;
 
     esac
