@@ -19,6 +19,7 @@
 - Explicitly disabled multitenancy in Kibana.
 - Cloud provider dependencies are removed from the templates, instead, keys are added to the sc|wc-config.yaml by the init script so no more "hidden" config. This requires a re-run of ck8s init or manully adding the missing keys.
 - Ingress nginx has been updated to a new chart repo and bumped to version 2.10
+- Harbor chart has been upgraded to version 1.5.1
 
 ### Fixed
 
