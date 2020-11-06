@@ -10,6 +10,7 @@
 - Configurable extra role mappings in Elasticsearch
 - Added falco exporter to workload cluster
 - Falco dashboard added to Grafana
+- `any` can be used as configuration version to disabled version check
 
 ### Changed
 
