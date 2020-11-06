@@ -63,7 +63,7 @@ The apps are installed using a combination of helm charts and manifests with the
 * [jq](https://github.com/stedolan/jq) (tested with jq-1.6)
 * [sops](https://github.com/mozilla/sops) (tested with 3.6.1)
 * [s3cmd](https://s3tools.org/s3cmd) available directly in ubuntus repositories (tested with 2.0.1)
-* [yq](https://github.com/mikefarah/yq) (tested with 3.3.2)
+* [yq](https://github.com/mikefarah/yq) (tested with 3.4.1)
 
 Installs requirements using the ansible playbook get-requirements.yaml
 

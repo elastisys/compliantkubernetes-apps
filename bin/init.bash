@@ -75,14 +75,13 @@ generate_base_sc_config() {
 
     envsubst > "$tmpfile" < "${config_defaults_path}/config/sc-config.yaml"
     if [[ ${CK8S_CLOUD_PROVIDER} == "citycloud" ]]; then
-        yq merge -i "$tmpfile" "${config_defaults_path}/config/citycloud.yaml"
+        yq merge --inplace "$tmpfile" "${config_defaults_path}/config/citycloud.yaml"
     fi
-    yq merge -i --overwrite "$tmpfile" "${config_defaults_path}/config/flavors/${CK8S_FLAVOR}-sc.yaml"
+    yq merge --inplace --overwrite "$tmpfile" "${config_defaults_path}/config/flavors/${CK8S_FLAVOR}-sc.yaml"
     if [[ -f $file ]]; then
-        yq merge -i "$file" "$tmpfile"
-    else
-        cat "$tmpfile" > "$file"
+        yq merge "$tmpfile" "$file" --inplace -a=overwrite --overwrite --prettyPrint
     fi
+    cat "$tmpfile" > "$file"
 }
 
 generate_base_wc_config() {
@@ -94,12 +93,11 @@ generate_base_wc_config() {
     tmpfile=$(mktemp)
 
     envsubst > "$tmpfile" < "${config_defaults_path}/config/wc-config.yaml"
-    yq merge -i --overwrite "$tmpfile" "${config_defaults_path}/config/flavors/${CK8S_FLAVOR}-wc.yaml"
+    yq merge --inplace --overwrite "$tmpfile" "${config_defaults_path}/config/flavors/${CK8S_FLAVOR}-wc.yaml"
     if [[ -f $file ]]; then
-        yq merge -i "$file" "$tmpfile"
-    else
-        cat "$tmpfile" > "$file"
+        yq merge "$tmpfile" "$file" --inplace -a=overwrite --overwrite --prettyPrint
     fi
+    cat "$tmpfile" > "$file"
 }
 
 # Usage: set_storage_class <config-file>

@@ -54,7 +54,7 @@ RUN wget "https://github.com/s3tools/s3cmd/releases/download/v${S3CMD_VERSION}/s
     rm "s3cmd-${S3CMD_VERSION}.tar.gz"
 
 # yq
-ENV YQ_VERSION "3.3.2"
+ENV YQ_VERSION "3.4.1"
 RUN wget "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" && \
     chmod +x yq_linux_amd64 && \
     mv yq_linux_amd64 /usr/local/bin/yq
