@@ -90,7 +90,8 @@ validate_version() {
         log_error "ERROR: global.ck8sVersion is not set in ${file}"
         will_exit="true"
     fi
-    if [ "${version}" != "${ck8s_version}" ]; then
+    if [ "${ck8s_version}" != "any" ] \
+        && [ "${version}" != "${ck8s_version}" ]; then
         log_error "ERROR: Version mismatch!"
         log_error "Config version: ${ck8s_version}"
         log_error "CK8S version: ${version}"
