@@ -2,8 +2,10 @@ expose:
   type: ingress
   tls:
     enabled: true
-    secretName: harbor-core-ingress-cert
-    notarySecretName: harbor-notary-ingress-cert
+    certSource: secret
+    secret:
+      secretName: harbor-core-ingress-cert
+      notarySecretName: harbor-notary-ingress-cert
   ingress:
     annotations:
       cert-manager.io/issuer: {{ .Values.global.issuer }}

@@ -10,6 +10,7 @@
 ### Changed
 
 - Ingress nginx has been updated to a new chart repo and bumped to version 2.10
+- Harbor chart has been upgraded to version 1.5.1
 
 ### Fixed
 
