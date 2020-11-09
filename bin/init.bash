@@ -236,7 +236,7 @@ generate_secrets() {
     yq merge --inplace "$file" "${config_defaults_path}/secrets/wc-secrets.yaml"
     case ${CK8S_CLOUD_PROVIDER} in
 
-        safespring | citycloud)
+        citycloud)
           cloud_file="${config_defaults_path}/secrets/citycloud.yaml"
           yq merge --inplace "$file" "$cloud_file"
           ;;
