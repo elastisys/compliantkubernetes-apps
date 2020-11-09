@@ -1,7 +1,6 @@
-installCRDs: false
-
-resources:
-{{- toYaml .Values.velero.resources | nindent 4  }}
+resources:    {{- toYaml .Values.velero.resources | nindent 2  }}
+tolerations:  {{- toYaml .Values.velero.tolerations | nindent 2  }}
+nodeSelector: {{- toYaml .Values.velero.nodeSelector | nindent 2  }}
 
 initContainers:
   - name: velero-plugin-for-aws
@@ -15,82 +14,33 @@ configuration:
   # Cloud provider being used (e.g. aws, azure, gcp).
   provider: aws
 
-  # Parameters for the `default` BackupStorageLocation. See
   # https://velero.io/docs/v1.0.0/api-types/backupstoragelocation/
   backupStorageLocation:
-    # Cloud provider where backups should be stored. Usually should
-    # match `configuration.provider`. Required.
     name: aws
-    # Bucket to store backups in. Required.
     bucket: {{ .Values.s3.buckets.velero }}
-    # Prefix within bucket under which to store backups. Optional.
-    #prefix: will be set outside of values file.
-    # Additional provider-specific configuration. See link above
-    # for details of required/optional fields for your provider.
     config:
       region: {{ .Values.s3.region }}
       s3ForcePathStyle: "true"
       s3Url: {{ .Values.s3.regionEndpoint }}
-  # Parameters for the `default` VolumeSnapshotLocation. See
   # https://velero.io/docs/v1.0.0/api-types/volumesnapshotlocation/
   volumeSnapshotLocation:
     config:
       region: {{ .Values.s3.region }}
 
-# Info about the secret to be used by the Velero deployment, which
-# should contain credentials for the cloud provider IAM account you've
-# set up for Velero.
 credentials:
-  # Whether a secret should be used as the source of IAM account
-  # credentials. Set to false if, for example, using kube2iam or
-  # kiam to provide IAM credentials for the Velero pod.
-  useSecret: true
-  # Name of a pre-existing secret (if any) in the Velero namespace
-  # that should be used to get IAM account credentials. Optional.
-  existingSecret:
-  # Data to be stored in the Velero secret, if `useSecret` is
-  # true and `existingSecret` is empty. This should be the contents
-  # of your IAM credentials file.
+  # Create secret with credentials
   secretContents:
     cloud: |
       [default]
       aws_access_key_id: {{ .Values.s3.accessKey }}
       aws_secret_access_key: {{ .Values.s3.secretKey }}
 
-# Whether to deploy the restic daemonset.
 deployRestic: true
 
 restic:
-  podVolumePath: /var/lib/kubelet/pods
-  resources:
-    limits:
-      cpu: 200m
-      memory: 200Mi
-    requests:
-      cpu: 100m
-      memory: 100Mi
+  resources:   {{- toYaml .Values.velero.restic.resources | nindent 4  }}
+  tolerations: {{- toYaml .Values.velero.restic.tolerations | nindent 4  }}
 
-# Backup schedules to create.
-# Eg:
-# schedules:
-#   mybackup:
-#     schedule: "0 0 * * *"
-#     template:
-#       excludedNamespaces: null
-#       excludedResources: null
-#       hooks:
-#         resources: null
-#       includeClusterResources: null
-#       includedNamespaces:
-#       - default
-#       includedResources: null
-#       labelSelector:
-#         matchLabels:
-#           app: test
-#           velero: backup
-#       storageLocation: ""
-#       ttl: 720h0m0s
-#       volumeSnapshotLocations: null
 schedules:
   daily-backup:
     schedule: "0 0 * * *" #once per day

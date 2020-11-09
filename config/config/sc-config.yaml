@@ -351,6 +351,8 @@ nginxIngress:
     nodeSelector: {}
 
 velero:
+  tolerations: []
+  nodeSelector: {}
   resources:
     limits:
       cpu: 200m
@@ -358,9 +360,15 @@ velero:
     requests:
       cpu: 100m
       memory: 100Mi
-  tolerations: []
-  affinity: {}
-  nodeSelector: {}
+  restic:
+    tolerations: []
+    resources:
+      limits:
+        cpu: 200m
+        memory: 200Mi
+      requests:
+        cpu: 100m
+        memory: 100Mi
 
 restore:
   cluster: false
