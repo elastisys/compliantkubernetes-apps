@@ -375,3 +375,21 @@ issuers:
     staging:
       email: "set-me"
   extraIssuers: []
+
+certmanager:
+  resources: {}
+  nodeSelector: {}
+  tolerations: {}
+  affinity: {}
+
+  webhook:
+    resources: {}
+    nodeSelector: {}
+    tolerations: {}
+    affinity: {}
+
+  cainjector:
+    resources: {}
+    nodeSelector: {}
+    tolerations: {}
+    affinity: {}

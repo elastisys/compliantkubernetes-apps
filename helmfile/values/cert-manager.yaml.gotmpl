@@ -1,0 +1,16 @@
+resources:    {{- toYaml .Values.certmanager.resources | nindent 2 }}
+nodeSelector: {{- toYaml .Values.certmanager.nodeSelector | nindent 2 }}
+affinity:     {{- toYaml .Values.certmanager.affinity | nindent 2 }}
+tolerations:  {{- toYaml .Values.certmanager.tolerations | nindent 2 }}
+
+webhook:
+  resources:    {{- toYaml .Values.certmanager.webhook.resources | nindent 4 }}
+  nodeSelector: {{- toYaml .Values.certmanager.webhook.nodeSelector | nindent 4 }}
+  affinity:     {{- toYaml .Values.certmanager.webhook.affinity | nindent 4 }}
+  tolerations:  {{- toYaml .Values.certmanager.webhook.tolerations | nindent 4 }}
+
+cainjector:
+  resources:    {{- toYaml .Values.certmanager.cainjector.resources | nindent 4 }}
+  nodeSelector: {{- toYaml .Values.certmanager.cainjector.nodeSelector | nindent 4 }}
+  affinity:     {{- toYaml .Values.certmanager.cainjector.affinity | nindent 4 }}
+  tolerations:  {{- toYaml .Values.certmanager.cainjector.tolerations | nindent 4 }}
