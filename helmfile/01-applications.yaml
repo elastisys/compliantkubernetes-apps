@@ -66,6 +66,8 @@ releases:
   version: v0.14.1
   missingFileHandler: Error
   wait: true
+  values:
+  - values/cert-manager.yaml.gotmpl
 
 # Prometheus-operator
 - name: prometheus-operator
