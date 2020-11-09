@@ -1,7 +1,7 @@
 ### Release notes
 
 - Configuration for the certificate issuers has been changed and requires running the [migration script](migration/v0.6.x-v0.7.x/migrate-issuer-config.sh).
-- Configuration for harbor has been changed and requires running init and apply again.
+- Configuration for harbor and cert-manager has been changed and requires running init and apply again.
 
 ### Added
 
@@ -11,6 +11,7 @@
 - Added falco exporter to workload cluster
 - Falco dashboard added to Grafana
 - `any` can be used as configuration version to disabled version check
+- Configuration options regarding pod placement and resources for cert-manager
 
 ### Changed
 
