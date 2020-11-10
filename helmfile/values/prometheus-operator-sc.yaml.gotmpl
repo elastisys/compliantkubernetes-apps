@@ -231,6 +231,8 @@ grafana:
     - targetLabel: cluster
       replacement: service_cluster
 
+  extraConfigmapMounts: {{- toYaml .Values.grafana.extraConfigmapMounts | nindent 4 }}
+
 prometheusOperator:
   createCustomResource: false
 

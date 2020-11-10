@@ -96,6 +96,9 @@ harbor:
     type: "set-me"
     disableRedirect: set-me
 
+grafana:
+  extraConfigmapMounts: []
+
 prometheus:
   storage:
     size: 5Gi
