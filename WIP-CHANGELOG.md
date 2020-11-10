@@ -14,6 +14,7 @@
 - `any` can be used as configuration version to disabled version check
 - Configuration options regarding pod placement and resources for cert-manager
 - Possibility to configure pod placement and resourcess for velero
+- Add `./bin/ck8s ops helm` to allow investigating issues between `helmfile` and `kubectl`.
 
 ### Changed
 
