@@ -6,6 +6,8 @@
 
 : "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
 
+CK8S_AUTO_APPROVE=${CK8S_AUTO_APPROVE:-"false"}
+
 if [ "${SOPS_PGP_FP+x}" != "" ]; then
     echo "SOPS_PGP_FP is deprecated." >&2
     echo "Set CK8S_PGP_UID or CK8S_PGP_FP and run \`ck8s init\` to" \
@@ -88,7 +90,7 @@ validate_version() {
     ck8s_version=$(yq r "${file}" 'global.ck8sVersion')
     if [[ -z "$ck8s_version" ]]; then
         log_error "ERROR: global.ck8sVersion is not set in ${file}"
-        will_exit="true"
+        exit 1
     fi
     if [ "${ck8s_version}" != "any" ] \
         && [ "${version}" != "${ck8s_version}" ]; then
@@ -136,18 +138,23 @@ validate_config() {
 
         file="${1}"
         options=$(yq r -p p "${2}" '**')
-        # Loop all lines in $2 and throws error if same option is not
+        # Loop all lines in $2 and warns if same option is not
         # available in $1
-        will_exit="false"
+        maybe_exit="false"
         for opt in ${options}; do
             value=$(yq r "${file}" "${opt}")
             if [[ -z "$value" ]]; then
-                log_error "ERROR: ${opt} is not set in ${file}"
-                will_exit="true"
+                log_warning "WARN: ${opt} is not set in ${file}"
+                maybe_exit="true"
             fi
         done
-        if [[ "${will_exit}" == "true" ]]; then
-            exit 1
+
+        if ${maybe_exit} && ! ${CK8S_AUTO_APPROVE}; then
+            echo -n -e "[\e[34mck8s\e[0m] Do you want to abort? (y/n): " 1>&2
+            read -r reply
+            if [[ "${reply}" == "y" ]]; then
+                exit 1
+            fi
         fi
     }
 
