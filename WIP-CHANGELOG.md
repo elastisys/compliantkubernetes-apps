@@ -25,3 +25,7 @@
 
 - The user fluentd configuration uses its dedicated values for tolerations, affinity and nodeselector.
 - The wc fluentd tolerations and nodeSelector configuration options are now only specified in the configuration file.
+
+### Removed
+
+- Broken OIDC configuration for the ops Grafana instance has been removed.
