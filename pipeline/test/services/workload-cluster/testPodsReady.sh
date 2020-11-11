@@ -24,8 +24,8 @@ deployments=(
     "kube-system metrics-server"
     "kube-system calico-kube-controllers"
     "ingress-nginx ingress-nginx-defaultbackend"
-    "monitoring prometheus-operator-operator"
-    "monitoring prometheus-operator-kube-state-metrics"
+    "monitoring kube-prometheus-stack-operator"
+    "monitoring kube-prometheus-stack-kube-state-metrics"
     "velero velero"
 )
 if [ "$cloud_provider" == "exoscale" ]; then
@@ -63,7 +63,7 @@ daemonsets=(
     "kube-system fluentd-system-fluentd-elasticsearch"
     "kube-system node-local-dns"
     "ingress-nginx ingress-nginx-controller"
-    "monitoring prometheus-operator-prometheus-node-exporter"
+    "monitoring kube-prometheus-stack-prometheus-node-exporter"
     "velero restic"
 )
 if [ "$enable_falco" == true ]; then
@@ -87,7 +87,7 @@ echo "Testing statefulsets"
 echo "===================="
 
 statefulsets=(
-    "monitoring prometheus-prometheus-operator-prometheus"
+    "monitoring prometheus-kube-prometheus-stack-prometheus"
 )
 
 if [[ $enable_user_alertmanager == "true" ]]

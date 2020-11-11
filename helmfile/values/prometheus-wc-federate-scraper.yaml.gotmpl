@@ -3,7 +3,7 @@ prometheusSpec:
   alerting:
     # Use the default alertmanager that comes with prometheus-operator
     alertmanagers:
-    - name: prometheus-operator-alertmanager
+    - name: kube-prometheus-stack-alertmanager
       namespace: monitoring
       pathPrefix: /
       port: web
@@ -45,7 +45,7 @@ prometheusSpec:
     fsGroup: 2000
     runAsNonRoot: true
     runAsUser: 1000
-  serviceAccountName: prometheus-operator-prometheus
+  serviceAccountName: kube-prometheus-stack-prometheus
   serviceMonitorSelector:
     matchLabels:
       target: none  # so that operator wont generate new config

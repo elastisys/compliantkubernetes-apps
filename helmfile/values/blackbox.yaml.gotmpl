@@ -32,7 +32,7 @@ prometheus-blackbox-exporter:
             insecure_skip_verify: true
 
 labels:
-  release: prometheus-operator
+  release: kube-prometheus-stack
 targets:
   - name: dex
     url: https://dex.{{ .Values.global.baseDomain }}/healthz

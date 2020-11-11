@@ -6,12 +6,14 @@ echo downloading vendor crds
 echo cert-manager
 curl 'https://raw.githubusercontent.com/jetstack/cert-manager/release-0.14/deploy/manifests/00-crds.yaml' -o cert-manager/cert-manager.yaml
 echo prometheus-operator
-curl 'https://raw.githubusercontent.com/coreos/prometheus-operator/v0.38.1/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml' -o prometheus-operator/alertmanager.yaml
-curl 'https://raw.githubusercontent.com/coreos/prometheus-operator/v0.38.1/example/prometheus-operator-crd/monitoring.coreos.com_prometheuses.yaml' -o prometheus-operator/prometheus.yaml
-curl 'https://raw.githubusercontent.com/coreos/prometheus-operator/v0.38.1/example/prometheus-operator-crd/monitoring.coreos.com_prometheusrules.yaml' -o prometheus-operator/prometheusrule.yaml
-curl 'https://raw.githubusercontent.com/coreos/prometheus-operator/v0.38.1/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml' -o prometheus-operator/servicemonitor.yaml
-curl 'https://raw.githubusercontent.com/coreos/prometheus-operator/v0.38.1/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml' -o prometheus-operator/podmonitor.yaml
-curl 'https://raw.githubusercontent.com/coreos/prometheus-operator/v0.38.1/example/prometheus-operator-crd/monitoring.coreos.com_thanosrulers.yaml' -o prometheus-operator/thanosrulers.yaml
+curl 'https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/release-0.43/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml' -o prometheus-operator/alertmanagerconfigs.yaml
+curl 'https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/release-0.43/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml' -o prometheus-operator/alertmanagers.yaml
+curl 'https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/release-0.43/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml' -o prometheus-operator/podmonitors.yaml
+curl 'https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/release-0.43/example/prometheus-operator-crd/monitoring.coreos.com_probes.yaml' -o prometheus-operator/probes.yaml
+curl 'https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/release-0.43/example/prometheus-operator-crd/monitoring.coreos.com_prometheuses.yaml' -o prometheus-operator/prometheuses.yaml
+curl 'https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/release-0.43/example/prometheus-operator-crd/monitoring.coreos.com_prometheusrules.yaml' -o prometheus-operator/prometheusrules.yaml
+curl 'https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/release-0.43/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml' -o prometheus-operator/servicemonitors.yaml
+curl 'https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/release-0.43/example/prometheus-operator-crd/monitoring.coreos.com_thanosrulers.yaml' -o prometheus-operator/thanosrulers.yaml
 echo velero
 curl 'https://raw.githubusercontent.com/vmware-tanzu/helm-charts/velero-2.8.2/charts/velero/crds/backups.yaml' -o velero/backups.yaml
 curl 'https://raw.githubusercontent.com/vmware-tanzu/helm-charts/velero-2.8.2/charts/velero/crds/backupstoragelocations.yaml' -o velero/backupstoragelocations.yaml

@@ -17,17 +17,17 @@ echo "==================================="
 
 # Not using these targets atm
 # TODO: add elements to the list when they start being used.
-# "monitoring/prometheus-operator-kube-etcd/0 1"
-# "monitoring/prometheus-operator-kube-proxy/0 1"
+# "monitoring/kube-prometheus-stack-kube-etcd/0 1"
+# "monitoring/kube-prometheus-stack-kube-proxy/0 1"
 wcTargets=(
-    "monitoring/prometheus-operator-apiserver/0 ${masterNodes}"
-    "monitoring/prometheus-operator-coredns/0 2"
-    "monitoring/prometheus-operator-kube-state-metrics/0 1"
-    "monitoring/prometheus-operator-kubelet/0 ${totalNodes}"
-    "monitoring/prometheus-operator-kubelet/1 ${totalNodes}"
-    "monitoring/prometheus-operator-node-exporter/0 ${totalNodes}"
-    "monitoring/prometheus-operator-operator/0 1"
-    "monitoring/prometheus-operator-prometheus/0 1"
+    "monitoring/kube-prometheus-stack-apiserver/0 ${masterNodes}"
+    "monitoring/kube-prometheus-stack-coredns/0 2"
+    "monitoring/kube-prometheus-stack-kube-state-metrics/0 1"
+    "monitoring/kube-prometheus-stack-kubelet/0 ${totalNodes}"
+    "monitoring/kube-prometheus-stack-kubelet/1 ${totalNodes}"
+    "monitoring/kube-prometheus-stack-node-exporter/0 ${totalNodes}"
+    "monitoring/kube-prometheus-stack-operator/0 1"
+    "monitoring/kube-prometheus-stack-prometheus/0 1"
 )
 
-test_targets_retry "svc/prometheus-operator-prometheus" "${wcTargets[@]}"
+test_targets_retry "svc/kube-prometheus-stack-prometheus" "${wcTargets[@]}"

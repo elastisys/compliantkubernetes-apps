@@ -51,7 +51,7 @@ falco:
     # supported: alertmanager|slack
     type: alertmanager
     priority: notice
-    hostPort: "http://prometheus-operator-alertmanager.monitoring:9093"
+    hostPort: "http://kube-prometheus-stack-alertmanager.monitoring:9093"
     # if type=slack falco.alerts.slackWebhook must be set in the secrets yaml file
 
 prometheus:
