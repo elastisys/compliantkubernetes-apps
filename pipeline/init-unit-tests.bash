@@ -2,10 +2,8 @@
 
 set -eu -o pipefail
 
-# shellcheck disable=SC1090
 here="$(dirname "$(readlink -f "$0")")"
 ck8s="${here}/../bin/ck8s"
-# shellcheck disable=SC1090
 source "${here}/common.bash"
 
 export CK8S_FLAVOR="${CI_CK8S_FLAVOR:-dev}"
