@@ -1,8 +1,7 @@
-resources: {{- toYaml .Values.fluentd.user.resources | nindent 2  }}
-
+resources:    {{- toYaml .Values.fluentd.user.resources | nindent 2  }}
 nodeSelector: {{- toYaml .Values.fluentd.user.nodeSelector | nindent 2  }}
-affinity: {{- toYaml .Values.fluentd.user.affinity | nindent 2  }}
-tolerations: {{- toYaml .Values.fluentd.user.tolerations | nindent 2  }}
+affinity:     {{- toYaml .Values.fluentd.user.affinity | nindent 2  }}
+tolerations:  {{- toYaml .Values.fluentd.user.tolerations | nindent 2  }}
 
 elasticsearch:
   scheme: https

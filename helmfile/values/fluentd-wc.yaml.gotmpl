@@ -1,7 +1,7 @@
-resources: {{- toYaml .Values.fluentd.resources | nindent 2  }}
+resources:    {{- toYaml .Values.fluentd.resources | nindent 2  }}
 nodeSelector: {{- toYaml .Values.fluentd.nodeSelector | nindent 2  }}
-affinity: {{- toYaml .Values.fluentd.affinity | nindent 2  }}
-tolerations: {{- toYaml .Values.fluentd.tolerations | nindent 2  }}
+affinity:     {{- toYaml .Values.fluentd.affinity | nindent 2  }}
+tolerations:  {{- toYaml .Values.fluentd.tolerations | nindent 2  }}
 
 elasticsearch:
   scheme: https
@@ -285,12 +285,3 @@ extraConfigMaps:
 {{ $key | indent 2 }}: |-
 {{ $value | indent 4 }}
 {{- end }}
-
-tolerations:
-- effect: NoSchedule
-  key: "node-role.kubernetes.io/master"
-  value: ""
-
-# Only run on control plane nodes
-nodeSelector:
-  node-role.kubernetes.io/master: ""
