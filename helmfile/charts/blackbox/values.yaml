@@ -22,7 +22,7 @@ prometheus-blackbox-exporter:
 # Set labels on the ServiceMonitor.
 # Make sure your prometheus instance is configured to select these labels.
 labels:
-  release: prometheus-operator
+  release: kube-prometheus-stack
 targets:
   - name: example
     url: https://example.com/healthz

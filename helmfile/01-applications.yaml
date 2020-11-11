@@ -10,6 +10,8 @@ repositories:
   url: https://vmware-tanzu.github.io/helm-charts
 - name: ingress-nginx
   url: https://kubernetes.github.io/ingress-nginx
+- name: prometheus-community
+  url: https://prometheus-community.github.io/helm-charts
 
 # workload_cluster specfic repositories
 {{ if eq .Environment.Name "workload_cluster" }}
@@ -71,22 +73,22 @@ releases:
   values:
   - values/cert-manager.yaml.gotmpl
 
-# Prometheus-operator
-- name: prometheus-operator
+# Kube-prometheus-stack
+- name: kube-prometheus-stack
   namespace: monitoring
   labels:
-    app: prometheus-operator
-  chart: stable/prometheus-operator
-  version: 8.15.11
+    app: kube-prometheus-stack
+  chart: prometheus-community/kube-prometheus-stack
+  version: 11.0.4
   missingFileHandler: Error
   needs:
   - cert-manager/cert-manager
   values:
 {{ if eq .Environment.Name "service_cluster" }}
-  - values/prometheus-operator-sc.yaml.gotmpl
+  - values/kube-prometheus-stack-sc.yaml.gotmpl
 {{ end }}
 {{ if eq .Environment.Name "workload_cluster" }}
-  - values/prometheus-operator-wc.yaml.gotmpl
+  - values/kube-prometheus-stack-wc.yaml.gotmpl
 {{ end }}
 
 

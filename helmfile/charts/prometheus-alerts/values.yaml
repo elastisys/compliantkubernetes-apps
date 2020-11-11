@@ -2,10 +2,10 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 esNodeCount: 4
-alertmanagerJob: prometheus-operator-alertmanager
+alertmanagerJob: kube-prometheus-stack-alertmanager
 alertmanagerNamespace: monitoring
-prometheusJob: prometheus-operator-prometheus
-operatorJob: prometheus-operator-operator
+prometheusJob: kube-prometheus-stack-prometheus
+operatorJob: kube-prometheus-stack-operator
 prometheusNamespace: monitoring
 defaultRules:
   create: true

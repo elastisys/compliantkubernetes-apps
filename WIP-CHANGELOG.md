@@ -14,6 +14,8 @@ Make sure to remove the old option from your config when upgrading.
 - Move useRegionEndpoint from elasticsearch to fluentd in sc-config.yaml before upgrading.
 - The workload cluster config option `prometheus.retention.alertManager` has been removed.
 Make sure to remove the option from your config when upgrading.
+- With the replacement of the helm chart `stable/prometheus-operator` to `prometheus-community/kube-prometheus-stack`, it is required to manually execute some steps to upgrade.
+See [migrations docs for prometheus-operator](migration/v0.7.x-v0.8.x/migrate-prometheus-operator.md) for instructions on how to perform the upgrade.
 
 ### Added
 
@@ -37,6 +39,7 @@ Make sure to remove the option from your config when upgrading.
 - Dex application upgraded to v2.26.0
 - Dex chart updated to v2.15.2
 - The issuer for the user-alertmanager ingress is now taken from `global.issuer`.
+- The `stable/prometheus-operator` helm chart has been replaced by `prometheus-community/kube-prometheus-stack`
 
 ### Fixed
 

@@ -29,7 +29,7 @@ prometheusSpec:
     limits:
       memory: 2Gi
       cpu: 1
-  serviceAccountName: prometheus-operator-prometheus
+  serviceAccountName: kube-prometheus-stack-prometheus
   serviceMonitorSelector:
     matchLabels:
       target: none

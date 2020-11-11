@@ -21,7 +21,7 @@ serviceMonitor:
   enabled: true
   namespace: elastic-system
   labels:
-    release: prometheus-operator
+    release: kube-prometheus-stack
   interval: 30s
   scrapeTimeout: 30s
   scheme: http
@@ -30,7 +30,7 @@ prometheusRule:
   enabled: true
   namespace: monitoring
   labels:
-    release: prometheus-operator
+    release: kube-prometheus-stack
     role: operator
   rules:
   - alert: CuratorFailedToRemoveAuditLogs
