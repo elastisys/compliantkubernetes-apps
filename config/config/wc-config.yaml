@@ -98,6 +98,13 @@ elasticsearch:
     count: 1
 
 fluentd:
+  tolerations:
+  - effect: NoSchedule
+    key: "node-role.kubernetes.io/master"
+    value: ""
+  # Only run on control plane nodes
+  nodeSelector:
+    node-role.kubernetes.io/master: ""
   resources:
     limits:
       cpu: 200m
@@ -105,9 +112,7 @@ fluentd:
     requests:
       cpu: 200m
       memory: 500Mi
-  tolerations: []
   affinity: {}
-  nodeSelector: {}
   extraConfigMaps: {}
   user:
     resources:
