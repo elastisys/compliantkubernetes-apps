@@ -60,7 +60,7 @@ echo -e "\n-------------------------------------------------" >> temp-toc.md
 # Creating new changelog
 echo -e "# Compliant Kubernetes changelog" > "${changelog}"
 cat temp-toc.md temp-cl2.md >> "${changelog}"
-rm temp*
+rm temp-toc.md temp-toc2.md temp-cl.md temp-cl2.md
 # Clearing WIP-CHANGELOG.md
 true > "${wip_changelog}"
 
