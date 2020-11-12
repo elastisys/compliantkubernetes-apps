@@ -3,6 +3,10 @@
 - Configuration for harbor and cert-manager has been changed and requires running init and apply again.
 - Configuration for velero has been changed and requires running init again.
 - Helm has been upgraded to v3.4.1. Please upgrade the local binary.
+- The Helm repository `stable` has changed URL and has to be changed manually:
+  `helm repo add "stable" "https://charts.helm.sh/stable" --force-update`
+- The blackbox chart has a changed dependency URL and has to be updated manually:
+  `cd helmfile/charts/blackbox && helm dependency update`
 
 ### Added
 
