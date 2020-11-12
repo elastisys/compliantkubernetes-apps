@@ -2,6 +2,7 @@
 
 - Configuration for harbor and cert-manager has been changed and requires running init and apply again.
 - Configuration for velero has been changed and requires running init again.
+- Helm has been upgraded to v3.4.1. Please upgrade the local binary.
 
 ### Added
 
@@ -14,6 +15,7 @@
 
 - Ingress nginx has been updated to a new chart repo and bumped to version 2.10
 - Harbor chart has been upgraded to version 1.5.1
+- Helm has been upgraded to v3.4.1
 
 ### Fixed
 
