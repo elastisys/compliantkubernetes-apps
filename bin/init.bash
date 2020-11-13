@@ -159,14 +159,14 @@ set_nginx_config() {
           service_enabled=true
           service_type=LoadBalancer
           service_annotations='service.beta.kubernetes.io/aws-load-balancer-type: nlb'
-          replace_set_me "$1" 'nginxIngress.controller.service.type' "$service_type"
-          replace_set_me "$1" 'nginxIngress.controller.service.annotations' "$service_annotations"
+          replace_set_me "$1" 'ingressNginx.controller.service.type' "$service_type"
+          replace_set_me "$1" 'ingressNginx.controller.service.annotations' "$service_annotations"
           ;;
 
     esac
-    replace_set_me "$1" 'nginxIngress.controller.config.useProxyProtocol' "$use_proxy_protocol"
-    replace_set_me "$1" 'nginxIngress.controller.daemonset.useHostPort' "$use_host_port"
-    replace_set_me "$1" 'nginxIngress.controller.service.enabled' "$service_enabled"
+    replace_set_me "$1" 'ingressNginx.controller.config.useProxyProtocol' "$use_proxy_protocol"
+    replace_set_me "$1" 'ingressNginx.controller.daemonset.useHostPort' "$use_host_port"
+    replace_set_me "$1" 'ingressNginx.controller.service.enabled' "$service_enabled"
 }
 
 # Usage: set_nginx_config <config-file>

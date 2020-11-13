@@ -23,7 +23,7 @@ deployments=(
     "kube-system coredns"
     "kube-system metrics-server"
     "kube-system calico-kube-controllers"
-    "nginx-ingress nginx-ingress-default-backend"
+    "ingress-nginx ingress-nginx-default-backend"
     "monitoring prometheus-operator-operator"
     "monitoring prometheus-operator-kube-state-metrics"
     "velero velero"
@@ -62,7 +62,7 @@ daemonsets=(
     "kube-system calico-node"
     "kube-system fluentd-system-fluentd-elasticsearch"
     "kube-system node-local-dns"
-    "nginx-ingress nginx-ingress-controller"
+    "ingress-nginx ingress-nginx-controller"
     "monitoring prometheus-operator-prometheus-node-exporter"
     "velero restic"
 )

@@ -107,7 +107,7 @@ CK8S_NAMESPACES=(
     fluentd
     kube-system
     monitoring
-    nginx-ingress
+    ingress-nginx
     velero
 )
 
