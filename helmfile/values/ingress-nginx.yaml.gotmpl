@@ -13,7 +13,7 @@ controller:
     {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.global }}
     whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.global }}
     {{ end }}
-    use-proxy-protocol: {{ .Values.nginxIngress.controller.config.useProxyProtocol | quote }}
+    use-proxy-protocol: {{ .Values.ingressNginx.controller.config.useProxyProtocol | quote }}
 
   # Required for use with CNI based kubernetes installations (such as ones set up by kubeadm),
   # since CNI and hostport don't mix yet. Can be deprecated once https://github.com/kubernetes/kubernetes/issues/23920
@@ -27,15 +27,15 @@ controller:
 
   ## Use host ports 80 and 443
   daemonset:
-    useHostPort: {{ .Values.nginxIngress.controller.daemonset.useHostPort }}
+    useHostPort: {{ .Values.ingressNginx.controller.daemonset.useHostPort }}
     hostPorts:
       http: 80
       https: 443
 
-  resources: {{- toYaml .Values.nginxIngress.controller.resources | nindent 4  }}
-  nodeSelector: {{- toYaml .Values.nginxIngress.controller.nodeSelector | nindent 4 }}
-  affinity: {{- toYaml .Values.nginxIngress.controller.affinity | nindent 4 }}
-  tolerations: {{- toYaml .Values.nginxIngress.controller.tolerations | nindent 4 }}
+  resources:    {{- toYaml .Values.ingressNginx.controller.resources | nindent 4 }}
+  nodeSelector: {{- toYaml .Values.ingressNginx.controller.nodeSelector | nindent 4 }}
+  affinity:     {{- toYaml .Values.ingressNginx.controller.affinity | nindent 4 }}
+  tolerations:  {{- toYaml .Values.ingressNginx.controller.tolerations | nindent 4 }}
 
   ## DaemonSet or Deployment
   ##
@@ -62,11 +62,11 @@ controller:
     ## Required for IP whitelisting
     externalTrafficPolicy: "Local"
     {{ end }}
-    {{ if .Values.nginxIngress.controller.service.enabled }}
+    {{ if .Values.ingressNginx.controller.service.enabled }}
     enabled: true
-    type: {{ .Values.nginxIngress.controller.service.type }}
+    type: {{ .Values.ingressNginx.controller.service.type }}
     annotations:
-    {{- .Values.nginxIngress.controller.service.annotations | nindent 6 }}
+    {{- .Values.ingressNginx.controller.service.annotations | nindent 6 }}
     {{ else }}
     enabled: false
     {{ end }}
@@ -98,10 +98,10 @@ defaultBackend:
 
   port: 8080
 
-  resources: {{- toYaml .Values.nginxIngress.defaultBackend.resources | nindent 4  }}
-  nodeSelector: {{- toYaml .Values.nginxIngress.defaultBackend.nodeSelector | nindent 4 }}
-  affinity: {{- toYaml .Values.nginxIngress.defaultBackend.affinity | nindent 4 }}
-  tolerations: {{- toYaml .Values.nginxIngress.defaultBackend.tolerations | nindent 4 }}
+  resources:    {{- toYaml .Values.ingressNginx.defaultBackend.resources | nindent 4  }}
+  nodeSelector: {{- toYaml .Values.ingressNginx.defaultBackend.nodeSelector | nindent 4 }}
+  affinity:     {{- toYaml .Values.ingressNginx.defaultBackend.affinity | nindent 4 }}
+  tolerations:  {{- toYaml .Values.ingressNginx.defaultBackend.tolerations | nindent 4 }}
 
 # If true, create & use Pod Security Policy resources
 # https://kubernetes.io/docs/concepts/policy/pod-security-policy/

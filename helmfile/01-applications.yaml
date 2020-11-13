@@ -47,17 +47,17 @@ environments:
 
 # The desired state of Helm releases.
 releases:
-# Nginx-ingress
-- name: nginx-ingress
-  namespace: nginx-ingress
+# Ingress-nginx
+- name: ingress-nginx
+  namespace: ingress-nginx
   labels:
-    app: nginx-ingress
+    app: ingress-nginx
   chart: ingress-nginx/ingress-nginx
   version: 2.10.0
   missingFileHandler: Error
   wait: true
   values:
-  - values/nginx-ingress.yaml.gotmpl
+  - values/ingress-nginx.yaml.gotmpl
 
 # Cert-manager
 - name: cert-manager

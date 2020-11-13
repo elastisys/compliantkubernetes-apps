@@ -308,7 +308,7 @@ nfsProvisioner:
   affinity: {}
   nodeSelector: {}
 
-nginxIngress:
+ingressNginx:
   controller:
     # Chart deploys correctly but does not work with resourceRequests
     resources: {}
