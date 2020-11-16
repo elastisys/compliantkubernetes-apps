@@ -14,6 +14,9 @@ controller:
     whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.global }}
     {{ end }}
     use-proxy-protocol: {{ .Values.ingressNginx.controller.config.useProxyProtocol | quote }}
+    {{- with .Values.ingressNginx.controller.additionalConfig }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 
   # Required for use with CNI based kubernetes installations (such as ones set up by kubeadm),
   # since CNI and hostport don't mix yet. Can be deprecated once https://github.com/kubernetes/kubernetes/issues/23920
