@@ -55,7 +55,7 @@ The apps are installed using a combination of helm charts and manifests with the
 ### Requirements
 
 * A running cluster based on [ck8s-cluster](https://github.com/elastisys/ck8s-cluster)
-* [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.15.2)
+* [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.17.11)
 * [helm](https://github.com/helm/helm/releases) (tested with 3.4.1)
 * [helmfile](https://github.com/roboll/helmfile) (tested with v0.129.3)
 * [helm-diff](https://github.com/databus23/helm-diff) (tested with 3.1.1)
