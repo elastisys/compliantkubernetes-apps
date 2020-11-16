@@ -3,7 +3,7 @@
     vars:
       install_path: /usr/local/bin
       install_user: "{{ lookup('env','USER') }}"
-      kubectl_version: 1.15.2
+      kubectl_version: 1.17.11
       helm_version: 3.4.1
       helmfile_version: 0.129.3
       helmdiff_version: 3.1.1

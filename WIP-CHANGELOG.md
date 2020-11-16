@@ -28,6 +28,7 @@ Make sure to remove the old option from your config when upgrading.
 - Harbor chart has been upgraded to version 1.5.1
 - Helm has been upgraded to v3.4.1
 - Grafana has been updated to a new chart repo and bumped to version 5.8.16
+- Bump `kubectl` to 1.17.11
 
 ### Fixed
 
