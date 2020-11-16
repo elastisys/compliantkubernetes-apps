@@ -19,6 +19,7 @@ Make sure to remove the old option from your config when upgrading.
 - Configuration options regarding pod placement and resources for cert-manager
 - Possibility to configure pod placement and resourcess for velero
 - Add `./bin/ck8s ops helm` to allow investigating issues between `helmfile` and `kubectl`.
+- Allow nginx config options to be set in the ingress controller.
 
 ### Changed
 

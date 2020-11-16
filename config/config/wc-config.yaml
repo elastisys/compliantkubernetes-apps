@@ -190,6 +190,8 @@ ingressNginx:
       enabled: "set-me"
       type: "set-me"
       annotations: "set-me"
+    # Will add custom configuration options to Nginx https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
+    additionalConfig: {}
 
   defaultBackend:
   # Chart deploys correctly but does not work with resourceRequests
