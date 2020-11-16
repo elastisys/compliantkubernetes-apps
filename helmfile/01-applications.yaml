@@ -23,6 +23,8 @@ repositories:
   url: https://helm.goharbor.io
 - name: elastisys
   url: https://elastisys.github.io/chart-repo
+- name: grafana
+  url: https://grafana.github.io/helm-charts
 {{ end }}
 
 # Defult settings to use with helm.
@@ -221,8 +223,8 @@ releases:
     app: user-grafana
     app.kubernetes.io/instance: user-grafana
     app.kubernetes.io/name: grafana
-  chart: stable/grafana
-  version: 5.3.4
+  chart: grafana/grafana
+  version: 5.8.16
   missingFileHandler: Error
   needs:
   - cert-manager/cert-manager
