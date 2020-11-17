@@ -326,8 +326,7 @@ ingressNginx:
     nodeSelector: {}
     config:
       useProxyProtocol: "set-me"
-    daemonset:
-      useHostPort: "set-me"
+    useHostPort: "set-me"
     service:
       enabled: "set-me"
       type: "set-me"
