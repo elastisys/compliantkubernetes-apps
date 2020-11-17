@@ -25,12 +25,13 @@ controller:
   # to keep resolving names inside the k8s network, use ClusterFirstWithHostNet.
   dnsPolicy: ClusterFirstWithHostNet
 
-  ## Use host ports 80 and 443
-  daemonset:
-    useHostPort: {{ .Values.ingressNginx.controller.daemonset.useHostPort }}
-    hostPorts:
-      http: 80
-      https: 443
+  publishService:
+    enabled: false
+
+  hostPort:
+    enabled: {{ .Values.ingressNginx.controller.useHostPort }}
+    http: 80
+    https: 443
 
   resources:    {{- toYaml .Values.ingressNginx.controller.resources | nindent 4 }}
   nodeSelector: {{- toYaml .Values.ingressNginx.controller.nodeSelector | nindent 4 }}

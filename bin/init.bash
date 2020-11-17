@@ -165,7 +165,7 @@ set_nginx_config() {
 
     esac
     replace_set_me "$1" 'ingressNginx.controller.config.useProxyProtocol' "$use_proxy_protocol"
-    replace_set_me "$1" 'ingressNginx.controller.daemonset.useHostPort' "$use_host_port"
+    replace_set_me "$1" 'ingressNginx.controller.useHostPort' "$use_host_port"
     replace_set_me "$1" 'ingressNginx.controller.service.enabled' "$service_enabled"
 }
 

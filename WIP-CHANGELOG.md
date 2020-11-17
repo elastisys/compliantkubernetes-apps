@@ -9,6 +9,8 @@
   `cd helmfile/charts/blackbox && helm dependency update`
 - With the replacement of the helm chart `stable/nginx-ingress` to `ingress-nginx/ingress-nginx`, it is required to manually execute some steps to upgrade.
 See [migrations docs for nginx](migration/v0.7.x-v0.8.x/nginx.md) for instruction on how to perform the upgrade.
+- The config option `nginxIngress.controller.daemonset.useHostPort` has been replaced by `ingressNginx.controller.useHostPort`.
+Make sure to remove the old option from your config when upgrading.
 
 ### Added
 
