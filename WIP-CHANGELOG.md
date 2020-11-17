@@ -33,6 +33,7 @@ Make sure to remove the old option from your config when upgrading.
 
 - The user fluentd configuration uses its dedicated values for tolerations, affinity and nodeselector.
 - The wc fluentd tolerations and nodeSelector configuration options are now only specified in the configuration file.
+- Helmfile install error on `user-alertmanager` when `user.alertmanager.enabled: true`.
 
 ### Removed
 
