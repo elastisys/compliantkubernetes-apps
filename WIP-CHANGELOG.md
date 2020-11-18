@@ -36,6 +36,7 @@ Make sure to remove the option from your config when upgrading.
 - useRegionEndpoint moved to fluentd conf.
 - Dex application upgraded to v2.26.0
 - Dex chart updated to v2.15.2
+- The issuer for the user-alertmanager ingress is now taken from `global.issuer`.
 
 ### Fixed
 
