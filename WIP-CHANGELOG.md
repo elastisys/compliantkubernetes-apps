@@ -31,6 +31,8 @@ Make sure to remove the old option from your config when upgrading.
 - Grafana has been updated to a new chart repo and bumped to version 5.8.16
 - Bump `kubectl` to 1.17.11
 - useRegionEndpoint moved to fluentd conf.
+- Dex application upgraded to v2.26.0
+- Dex chart updated to v2.15.2
 
 ### Fixed
 
