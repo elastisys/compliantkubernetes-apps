@@ -193,7 +193,7 @@ validate_sops_config() {
     fi
 
     fingerprints=$(yq r - 'creation_rules[0].pgp' < "${sops_config}")
-    if ! [[ "${fingerprints}" =~ ^[A-Z0-9,]+$ ]]; then
+    if ! [[ "${fingerprints}" =~ ^[A-Z0-9,' ']+$ ]]; then
         log_error "ERROR: SOPS config contains no or invalid PGP keys."
         log_error "fingerprints=${fingerprints}"
         log_error "Fingerprints must be uppercase and separated by colon."
