@@ -88,14 +88,15 @@ prometheus:
     # Connect to separately managed alertmanager
     alertingEndpoints:
       - name: alertmanager-operated
-        namespace: monitoring
+        namespace: {{ .Values.user.alertmanager.namespace }}
         port: web
         pathPrefix: /
     {{ end }}
-    resources: {{- toYaml .Values.prometheus.resources | nindent 8  }}
-    nodeSelector: {{- toYaml .Values.prometheus.nodeSelector | nindent 8 }}
-    affinity: {{- toYaml .Values.prometheus.affinity | nindent 8 }}
-    tolerations: {{- toYaml .Values.prometheus.tolerations | nindent 8 }}
+
+    resources:    {{- toYaml .Values.prometheus.resources | nindent 6 }}
+    nodeSelector: {{- toYaml .Values.prometheus.nodeSelector | nindent 6 }}
+    affinity:     {{- toYaml .Values.prometheus.affinity | nindent 6 }}
+    tolerations:  {{- toYaml .Values.prometheus.tolerations | nindent 6 }}
 
     ## How long to retain metrics
     ##
@@ -129,7 +130,7 @@ prometheus:
     {{ end }}
 
     {{ if .Values.user.alertmanager.enabled }}
-    - job_name: 'monitoring/alertmanager-operated'
+    - job_name: '{{ .Values.user.alertmanager.namespace }}/alertmanager-operated'
       scrape_interval: 30s
       metrics_path: /metrics
       scheme: http
@@ -137,7 +138,7 @@ prometheus:
       - role: endpoints
         namespaces:
           names:
-          - monitoring
+          - {{ .Values.user.alertmanager.namespace }}
         selectors:
           - role: endpoints
             label: 'operated-alertmanager=true'

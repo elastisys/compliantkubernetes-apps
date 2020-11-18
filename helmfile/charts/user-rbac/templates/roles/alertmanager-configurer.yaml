@@ -8,7 +8,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: alertmanager-configurer
-  namespace: monitoring
+  namespace: {{ .Values.alertmanagerNamespace }}
 rules:
 # Allow editing the alertmanager-alertmanager secret
 - apiGroups:

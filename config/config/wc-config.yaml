@@ -28,6 +28,7 @@ user:
     - admin@example.com
   alertmanager:
     enabled: false
+    namespace: monitoring
     ingress:
       enabled: false
 
@@ -59,7 +60,6 @@ prometheus:
   retention:
     size: 4GiB
     age:  3d
-    alertManager: 72h
   resources:
     requests:
       memory: 1Gi

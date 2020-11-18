@@ -435,7 +435,7 @@ releases:
 
 {{ if .Values.user.alertmanager.enabled }}
 - name: user-alertmanager
-  namespace: monitoring
+  namespace: {{ .Values.user.alertmanager.namespace | default "monitoring" }}
   labels:
     app: user-alertmanager
   chart: ./charts/examples/user-alertmanager
