@@ -12,6 +12,8 @@ See [migrations docs for nginx](migration/v0.7.x-v0.8.x/nginx.md) for instructio
 - The config option `nginxIngress.controller.daemonset.useHostPort` has been replaced by `ingressNginx.controller.useHostPort`.
 Make sure to remove the old option from your config when upgrading.
 - Move useRegionEndpoint from elasticsearch to fluentd in sc-config.yaml before upgrading.
+- The workload cluster config option `prometheus.retention.alertManager` has been removed.
+Make sure to remove the option from your config when upgrading.
 
 ### Added
 
@@ -21,6 +23,7 @@ Make sure to remove the old option from your config when upgrading.
 - Possibility to configure pod placement and resourcess for velero
 - Add `./bin/ck8s ops helm` to allow investigating issues between `helmfile` and `kubectl`.
 - Allow nginx config options to be set in the ingress controller.
+- Allow user-alertmanager to be deployed in custom namespace and not only in `monitoring`.
 
 ### Changed
 
@@ -39,7 +42,9 @@ Make sure to remove the old option from your config when upgrading.
 - The user fluentd configuration uses its dedicated values for tolerations, affinity and nodeselector.
 - The wc fluentd tolerations and nodeSelector configuration options are now only specified in the configuration file.
 - Helmfile install error on `user-alertmanager` when `user.alertmanager.enabled: true`.
+- The wrong job name being used for the alertmanager rules in wc when `user.alertmanager.enabled: true`.
 
 ### Removed
 
 - Broken OIDC configuration for the ops Grafana instance has been removed.
+- Unused alertmanager retention configuration from workload cluster

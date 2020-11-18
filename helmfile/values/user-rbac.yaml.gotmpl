@@ -1,3 +1,4 @@
 namespaces: {{ toYaml .Values.user.namespaces | nindent 2 }}
 users: {{ toYaml .Values.user.adminUsers | nindent 2 }}
 enableFalcoViewer: {{ toYaml .Values.falco.enabled | nindent 2 }}
+alertmanagerNamespace: {{ .Values.user.alertmanager.namespace }}
