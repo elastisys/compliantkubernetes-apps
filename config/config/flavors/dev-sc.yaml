@@ -54,8 +54,9 @@ elasticsearch:
 
 influxDB:
   retention:
-    ageWc: 2d
-    ageSc: 3d
-  metrics:
-    sizeWc: 5000000
-    sizeSc: 5000000
+    sizeWC: 4500000
+    sizeSC: 4500000
+    durationWC: 2d
+    durationSC: 3d
+  persistence:
+    size: 10Gi
