@@ -103,6 +103,7 @@ generate_base_wc_config() {
 }
 
 # Usage: set_storage_class <config-file>
+# baremetal support is experimental, keep as separate case until stable
 set_storage_class() {
     file=$1
     if [[ ! -f "${file}" ]]; then
@@ -125,6 +126,11 @@ set_storage_class() {
           es_storage_class=ebs-gp2
           ;;
 
+        baremetal)
+	  storage_class=node-local
+	  es_storage_class=node-local
+	  ;;
+
     esac
     replace_set_me "$1" 'global.storageClass' "$storage_class"
     # Only write if field exists already
@@ -134,6 +140,7 @@ set_storage_class() {
 }
 
 # Usage: set_nginx_config <config-file>
+# baremetal support is experimental, keep as separate case until stable
 set_nginx_config() {
     file=$1
     if [[ ! -f "${file}" ]]; then
@@ -163,13 +170,20 @@ set_nginx_config() {
           replace_set_me "$1" 'ingressNginx.controller.service.annotations' "$service_annotations"
           ;;
 
+        baremetal)
+	  use_proxy_protocol=false
+	  use_host_port=true
+	  service_enabled=false
+	  ;;
+
     esac
     replace_set_me "$1" 'ingressNginx.controller.config.useProxyProtocol' "$use_proxy_protocol"
     replace_set_me "$1" 'ingressNginx.controller.useHostPort' "$use_host_port"
     replace_set_me "$1" 'ingressNginx.controller.service.enabled' "$service_enabled"
 }
 
-# Usage: set_nginx_config <config-file>
+# Usage: set_elasticsearch_config <config-file>
+# baremetal support is experimental, keep as separate case until stable
 set_elasticsearch_config() {
     file=$1
     if [[ ! -f "${file}" ]]; then
@@ -186,12 +200,17 @@ set_elasticsearch_config() {
           use_regionendpoint=false
           ;;
 
+        baremetal)
+	  use_regionendpoint=true
+	  ;;
+
     esac
 
     replace_set_me "$1" 'fluentd.useRegionEndpoint' "$use_regionendpoint"
 }
 
 # Usage: set_harbor_config <config-file>
+# baremetal support is experimental, keep as separate case until stable
 set_harbor_config() {
     file=$1
     if [[ ! -f "${file}" ]]; then
@@ -213,6 +232,11 @@ set_harbor_config() {
           persistence_type=swift
           disable_redirect=true
           ;;
+
+        baremetal)
+          persistence_type=s3
+	  disable_redirect=false
+	  ;;
 
     esac
     replace_set_me "$1" 'harbor.persistence.type' "$persistence_type"
