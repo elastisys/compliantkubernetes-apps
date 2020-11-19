@@ -65,10 +65,9 @@ harbor:
 
 influxDB:
   retention:
-    ageWc: 30d
-    ageSc: 7d
-  metrics:
-    sizeWc: 19500000
-    sizeSc: 9500000
+    sizeWC: 19500000
+    sizeSC: 9500000
+    durationWC: 30d
+    durationSC: 7d
   persistence:
     size: 30Gi

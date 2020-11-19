@@ -234,14 +234,8 @@ logRetention:
   days: 7
 
 influxDB:
-  user: "admin"
-  address: "influxdb.influxdb-prometheus.svc:8088"
-  retention:
-    ageWc: 7d
-    ageSc: 3d
-  metrics:
-    sizeWc: 4500000
-    sizeSc: 4500000
+  user: admin
+  createdb: true
   resources:
     requests:
       memory: 4Gi
@@ -254,6 +248,45 @@ influxDB:
   tolerations: []
   affinity: {}
   nodeSelector: {}
+  # Configuration for size based retention
+  retention:
+    # Enable size based retention job
+    enabled: true
+    sizeWC: 4500000
+    sizeSC: 4500000
+    resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
+      limits:
+        cpu: 250m
+        memory: 500Mi
+    # The duration of the retention policy for each database
+    durationWC: 2d
+    durationSC: 3d
+  backup:
+    enabled: true
+    schedule: "0 0 * * *"
+    startingDeadlineSeconds: 200
+    resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
+      limits:
+        cpu: 250m
+        memory: 300Mi
+  backupRetention:
+    enabled: true
+    daysToRetain: 7
+    schedule: "0 0 * * *"
+    startingDeadlineSeconds: 200
+    resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
+      limits:
+        cpu: 250m
+        memory: 300Mi
 
 alerts:
   alertTo: "null"

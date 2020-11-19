@@ -1,6 +1,4 @@
 elastisys_custom:
-  # The following values must be set in order to use the chart.
-  influx_addr: {{ .Values.influxDB.address }}
   influxdb_user: {{ .Values.influxDB.user }}
   influxdb_password: {{ .Values.influxDB.password }}
   s3_credentials: |+
@@ -13,12 +11,21 @@ elastisys_custom:
     {{ .Values.objectStorage.gcs.keyfileData | nindent 4 }}
   {{- end }}
 
+  # Deploy exporter for exposing database sizes
   metrics:
+    enabled: {{ .Values.influxDB.retention.enabled }}
+
+    # This is actually for retention and not for exporting metrics!
+    # TODO: move this to elastisys_custom.retention
     jobs:
       service_cluster:
-        data_size_limit: {{ .Values.influxDB.metrics.sizeSc }}
+        data_size_limit: {{ .Values.influxDB.retention.sizeSC }}
       workload_cluster:
-        data_size_limit: {{ .Values.influxDB.metrics.sizeSc }}
+        data_size_limit: {{ .Values.influxDB.retention.sizeWC }}
+
+  retention:
+    enabled: {{ .Values.influxDB.retention.enabled }}
+    resources: {{- toYaml .Values.influxDB.retention.resources | nindent 6 }}
 
 serviceAccount:
   create: false
@@ -57,26 +64,17 @@ config:
     auth-enabled: true
     log-enabled: false
 
-resources:
-{{- toYaml .Values.influxDB.resources | nindent 2  }}
+resources:    {{- toYaml .Values.influxDB.resources | nindent 2 }}
+nodeSelector: {{- toYaml .Values.influxDB.nodeSelector | nindent 2 }}
+affinity:     {{- toYaml .Values.influxDB.affinity | nindent 2  }}
+tolerations:  {{- toYaml .Values.influxDB.tolerations | nindent 2 }}
 
-nodeSelector:
-{{- toYaml .Values.influxDB.nodeSelector | nindent 2  }}
-
-affinity:
-{{- toYaml .Values.influxDB.affinity | nindent 2  }}
-
-tolerations:
-{{- toYaml .Values.influxDB.tolerations | nindent 2  }}
-
-
-# TODO: don't run when restoring the cluster
 initScripts:
-  enabled: true
+  enabled: {{ .Values.influxDB.createdb }}
   scripts:
     init.iql: |+
-      CREATE DATABASE "service_cluster" WITH DURATION {{ .Values.influxDB.retention.ageSc }} REPLICATION 1 NAME service_cluster_rp;
-      CREATE DATABASE "workload_cluster" WITH DURATION {{ .Values.influxDB.retention.ageSc }} REPLICATION 1 NAME workload_cluster_rp;
+      CREATE DATABASE "service_cluster" WITH DURATION {{ .Values.influxDB.retention.durationSC }} REPLICATION 1 NAME service_cluster_rp;
+      CREATE DATABASE "workload_cluster" WITH DURATION {{ .Values.influxDB.retention.durationWC }} REPLICATION 1 NAME workload_cluster_rp;
 
 extraContainers:
   - name: influxdb-node-exporter
@@ -122,21 +120,15 @@ volumes:
         path: prometheus-influxdb-retention-metric-name
 
 backup:
-  enabled: true
-  resources:
-    requests:
-      cpu: 50m
-      memory: 100Mi
-    limits:
-      cpu: 250m
-      memory: 300Mi
+  enabled: {{ .Values.influxDB.backup.enabled }}
+  resources: {{- toYaml .Values.influxDB.backup.resources | nindent 4 }}
   persistence:
     enabled: true
     storageClass: {{ .Values.global.storageClass }}
     accessMode: ReadWriteOnce
-    size: {{ add .Values.influxDB.metrics.sizeWc .Values.influxDB.metrics.sizeSc -}}Ki # the sum of influxDB.metrics.sizeWc and influxDB.metrics.sizeWc (all values in KB)
-  schedule: "0 0 * * *"
-  startingDeadlineSeconds: 200
+    size: {{ add .Values.influxDB.retention.sizeWC .Values.influxDB.retention.sizeSC -}}Ki # the sum of influxDB.metrics.sizeWc and influxDB.metrics.sizeWc (all values in KB)
+  schedule: {{ .Values.influxDB.backup.schedule | quote }}
+  startingDeadlineSeconds: {{ .Values.influxDB.backup.startingDeadlineSeconds }}
   {{- if eq .Values.objectStorage.type "s3" }}
   s3:
     credentialsSecret: influxdb-backup-secret #TODO: use influxdb.fullname from _helpers.tpl instead hardcoded "influxdb"
@@ -148,3 +140,14 @@ backup:
     serviceAccountSecretKey: credentials
     serviceAccountSecret: influxdb-backup-secret
   {{- end }}
+
+backupRetention:
+  enabled: {{ .Values.influxDB.backupRetention.enabled }}
+  daysToRetain: {{ .Values.influxDB.backupRetention.daysToRetain }}
+  resources: {{- toYaml .Values.influxDB.backupRetention.resources | nindent 4 }}
+  schedule: {{ .Values.influxDB.backupRetention.schedule | quote}}
+  startingDeadlineSeconds: {{ .Values.influxDB.backupRetention.startingDeadlineSeconds }}
+  s3:
+    credentialsSecret: influxdb-backup-secret #TODO: use influxdb.fullname from _helpers.tpl instead hardcoded "influxdb"
+    bucketName: {{ .Values.objectStorage.buckets.influxDB }}
+    endpointUrl: {{ .Values.objectStorage.s3.regionEndpoint }}

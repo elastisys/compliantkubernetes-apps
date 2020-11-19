@@ -17,6 +17,14 @@ Make sure to remove the option from your config when upgrading.
 - With the replacement of the helm chart `stable/prometheus-operator` to `prometheus-community/kube-prometheus-stack`, it is required to manually execute some steps to upgrade.
 See [migrations docs for prometheus-operator](migration/v0.7.x-v0.8.x/migrate-prometheus-operator.md) for instructions on how to perform the upgrade.
 - Migrate existing config to the new object storage config by running the script `migration/v0.7.x-v0.8.x/migrate-object-storage.sh`
+- The configuration for InfluxDB has been changed and requires running init again.
+Upon init new default values will be added to your config, please update them to match your old values.
+The following options has been removed or replaced
+  - `influxDB.address` removed
+  - `influxDB.metrics.sizeWc` replaced by `influxDB.retention.sizeWC`
+  - `influxDB.metrics.sizeSc` replaced by `influxDB.retention.sizeSC`
+  - `influxDB.retention.ageWc` replaced by `influxDB.retention.durationWC`
+  - `influxDB.retention.ageSc` replaced by `influxDB.retention.durationSC`
 
 ### Added
 
@@ -28,6 +36,7 @@ See [migrations docs for prometheus-operator](migration/v0.7.x-v0.8.x/migrate-pr
 - Allow nginx config options to be set in the ingress controller.
 - Allow user-alertmanager to be deployed in custom namespace and not only in `monitoring`.
 - Support for GCS
+- Backup retention for InfluxDB.
 
 ### Changed
 
@@ -42,6 +51,9 @@ See [migrations docs for prometheus-operator](migration/v0.7.x-v0.8.x/migrate-pr
 - Dex chart updated to v2.15.2
 - The issuer for the user-alertmanager ingress is now taken from `global.issuer`.
 - The `stable/prometheus-operator` helm chart has been replaced by `prometheus-community/kube-prometheus-stack`
+- InfluxDB helm chart upgraded to `4.8.9`
+- Rework of the InfluxDB configuration.
+- The sized based retention for InfluxDB has been lowered in the dev flavor.
 
 ### Fixed
 
