@@ -37,6 +37,7 @@ user:
   # Todo remove dependencie on alertmanager from service cluster
   alertmanager:
     enabled: false
+    namespace: monitoring
     ingress:
       enabled: false
 
