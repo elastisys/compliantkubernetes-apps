@@ -34,23 +34,23 @@ prometheusRule:
     role: operator
   rules:
   - alert: CuratorFailedToRemoveAuditLogs
-    expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"kubeaudit-(.+)"}))/(1024*1024*1024) > {{ .Values.elasticsearch.retention.kubeAuditSize }}
+    expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"kubeaudit-(.+)"}))/(1024*1024*1024) > {{ .Values.elasticsearch.curator.retention.kubeAuditSizeGB }}
     for: 5m
     labels:
       severity: critical
     annotations:
-      description: Curator failed to remove 'kubeudit' logs. Cumulated size is > {{ .Values.elasticsearch.retention.kubeAuditSize }} GB
+      description: Curator failed to remove 'kubeudit' logs. Cumulated size is > {{ .Values.elasticsearch.curator.retention.kubeAuditSizeGB }} GB
   - alert: CuratorFailedToRemoveContainerLogs
-    expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"kubernetes-(.+)"}))/(1024*1024*1024) > {{ .Values.elasticsearch.retention.kubernetesSize }}
+    expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"kubernetes-(.+)"}))/(1024*1024*1024) > {{ .Values.elasticsearch.curator.retention.kubernetesSizeGB }}
     for: 5m
     labels:
       severity: critical
     annotations:
-      description: Curator failed to remove 'kubernetes' logs. Cumulated size is > {{ .Values.elasticsearch.retention.kubernetesSize }} GB
+      description: Curator failed to remove 'kubernetes' logs. Cumulated size is > {{ .Values.elasticsearch.curator.retention.kubernetesSizeGB }} GB
   - alert: CuratorFailedToRemoveOtherLogs
-    expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"other-(.+)"}))/(1024*1024*1024) > {{ .Values.elasticsearch.retention.otherSize }}
+    expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"other-(.+)"}))/(1024*1024*1024) > {{ .Values.elasticsearch.curator.retention.otherSizeGB }}
     for: 5m
     labels:
       severity: critical
     annotations:
-      description: Curator failed to remove 'other' logs. Cumulated size is > {{ .Values.elasticsearch.retention.otherSize }} GB
+      description: Curator failed to remove 'other' logs. Cumulated size is > {{ .Values.elasticsearch.curator.retention.otherSizeGB }} GB

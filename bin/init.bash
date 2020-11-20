@@ -134,8 +134,8 @@ set_storage_class() {
     esac
     replace_set_me "$1" 'global.storageClass' "$storage_class"
     # Only write if field exists already
-    if yq read --exitStatus "$file" 'elasticsearch.storageClass' > /dev/null 2> /dev/null; then
-       yq write --inplace "$file" 'elasticsearch.storageClass' "$es_storage_class"
+    if yq read --exitStatus "$file" 'elasticsearch.dataNode.storageClass' > /dev/null 2> /dev/null; then
+       yq write --inplace "$file" 'elasticsearch.dataNode.storageClass' "$es_storage_class"
     fi
 }
 

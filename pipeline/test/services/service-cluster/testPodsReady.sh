@@ -9,7 +9,7 @@ enable_harbor=$(yq r -e "${CONFIG_FILE}" 'harbor.enabled')
 enable_ck8sdash=$(yq r -e "${CONFIG_FILE}" 'ck8sdash.enabled')
 enable_user_grafana=$(yq r -e "${CONFIG_FILE}" 'user.grafana.enabled')
 storage_class=$(yq r -e "${CONFIG_FILE}" 'global.storageClass')
-elasticsearch_storage_class=$(yq r -e "${CONFIG_FILE}" 'elasticsearch.storageClass')
+elasticsearch_storage_class=$(yq r -e "${CONFIG_FILE}" 'elasticsearch.dataNode.storageClass')
 
 echo
 echo

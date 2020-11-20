@@ -145,9 +145,26 @@ dex:
   affinity: {}
   nodeSelector: {}
 
+kibana:
+  # Note sso is enabled via `elasticsearch.sso.enabled`
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
 elasticsearch:
+  snapshotRepository: elastic-snapshots
+  # Create initial indices upon first startup
+  createIndices: true
+  # Single-sign-on using OIDC
   sso:
     enabled: false
+    # Where to find subject
+    subject_key: email
+    # Where to find roles
+    roles_key: groups
+    # Scope
+    scope: "openid profile email"
   masterNode:
     count: 1
     storageSize: 8Gi
@@ -159,9 +176,21 @@ elasticsearch:
       limits:
         memory: 1024Mi
         cpu: 1
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 1
+          podAffinityTerm:
+            topologyKey: "kubernetes.io/hostname"
+            labelSelector:
+              matchLabels:
+                role: master
+    tolerations: []
+    nodeSelector: {}
   dataNode:
     count: 2
     storageSize: 25Gi
+    storageClass: local-storage
     javaOpts: "-Xms512m -Xmx512m"
     resources:
       requests:
@@ -170,6 +199,17 @@ elasticsearch:
       limits:
         memory: 1024Mi
         cpu: 1
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 1
+          podAffinityTerm:
+            topologyKey: "kubernetes.io/hostname"
+            labelSelector:
+              matchLabels:
+                role: data
+    tolerations: []
+    nodeSelector: {}
   clientNode:
     count: 1
     javaOpts: "-Xms512m -Xmx512m"
@@ -180,31 +220,74 @@ elasticsearch:
       limits:
         memory: 1024Mi
         cpu: 1
-  storageClass: local-storage
-  retention:
-    kubeAuditSize: 50
-    kubeAuditAge: 30
-    kubernetesSize: 50
-    kubernetesAge: 50
-    otherSize: 10
-    otherAge: 30
-    rolloverSize: 1
-    rolloverAge: 1
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 1
+          podAffinityTerm:
+            topologyKey: "kubernetes.io/hostname"
+            labelSelector:
+              matchLabels:
+                role: client
+    tolerations: []
+    nodeSelector: {}
+  # Config for https://www.elastic.co/guide/en/elasticsearch/client/curator/5.8/about.html
+  curator:
+    enabled: true
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 10m
+        memory: 32Mi
+    affinity: {}
+    nodeSelector: {}
+    tolerations: []
+    retention:
+      kubeAuditSizeGB: 50
+      kubeAuditAgeDays: 30
+      kubernetesSizeGB: 50
+      kubernetesAgeDays: 50
+      otherSizeGB: 10
+      otherAgeDays: 30
+      # (Optional) retention for indices matched by 'postgresql-*'
+      # postgresql: false
+      # postgresqlSizeGB: 30
+      # postgresqlAgeDays: 30
+  # Index state management
+  ism:
+    # Overwrite ism policies
+    overwritePolicies: true
+    rolloverSizeGB: 1
+    rolloverAgeDays: 1
+    # Create default policies - kubernetes, kubeaudit, and other
+    defaultPolicies: true
+    additionalPolicies: {}
+  # Snapshot and snapshot lifecycle configuration
   snapshot:
     min: 7
     max: 14
     ageSeconds: 864000
     retentionSchedule: "@daily"
     backupSchedule: "0 */2 * * *"
+  extraRoles: []
+  # - role_name: log_reader
+  #   definition:
+  #     index_permissions:
+  #     - index_patterns:
+  #       - "kubernetes-*"
+  #       allowed_actions:
+  #       - "read"
   extraRoleMappings: []
-    #- mapping_name: readall_and_monitor
-    #  definition:
-    #    users:
-    #      - "Developer Name"
-  tolerations: []
-  affinity: {}
-  nodeSelector: {}
-  snapshotRepository: elastic-snapshots
+  # - mapping_name: readall_and_monitor
+  #   definition:
+  #    users:
+  #      - "Developer Name"
+  overwriteTemplates: true
+  # Create default index templates - kubernetes, kubeaudit, and other
+  defaultTemplates: true
+  additionalTemplates: {}
 
 fluentd:
   resources:
