@@ -23,7 +23,7 @@ deployments=(
     "kube-system coredns"
     "kube-system metrics-server"
     "kube-system calico-kube-controllers"
-    "ingress-nginx ingress-nginx-default-backend"
+    "ingress-nginx ingress-nginx-defaultbackend"
     "monitoring prometheus-operator-operator"
     "monitoring prometheus-operator-kube-state-metrics"
     "velero velero"
