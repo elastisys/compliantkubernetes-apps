@@ -109,58 +109,6 @@ elasticsearch:
     config:
       securityConfigSecret: opendistro-es-security-config-secret
       data:
-        # Define admin, kibana, and configurer users, roles, and mappings
-        internal_users.yml: |-
-          _meta:
-            type: "internalusers"
-            config_version: 2
-
-          admin:
-            hash: {{ .Values.elasticsearch.adminHash }}
-            reserved: true
-            backend_roles:
-            - "admin"
-            description: "Admin user"
-
-          kibanaserver:
-            hash: {{ .Values.elasticsearch.kibanaHash }}
-            reserved: true
-            description: "Kibana server user"
-
-          configurer:
-            hash: {{ .Values.elasticsearch.configurerHash }}
-            reserved: true
-            description: "Configurer user"
-
-        roles_mapping.yml: |-
-          _meta:
-            type: "rolesmapping"
-            config_version: 2
-
-          all_access:
-            reserved: true
-            backend_roles:
-            - "admin"
-            description: "Maps admin to all_access"
-
-          kibana_server:
-            reserved: true
-            users:
-            - "kibanaserver"
-            description: "Maps kibanaserver user with the static kibana_server role"
-
-          configurer:
-            reserved: false
-            users:
-            - "configurer"
-            description: "Maps kibanaserver user with configurer role"
-
-          kibana_user:
-            reserved: false
-            users:
-            - "configurer"
-            description: "Maps configurer user with the static kibana_server role"
-
         config.yml: |-
           _meta:
             type: "config"
@@ -192,11 +140,38 @@ elasticsearch:
                       openid_connect_url: http://dex.dex.svc.cluster.local:32000/.well-known/openid-configuration
                       openid_connect_idp.verify_hostnames: false
                       openid_connect_idp.enable_ssl: false
-                      subject_key: name
-                      roles_key: groups
+                      subject_key: {{ .Values.elasticsearch.sso.subject_key }}
+                      roles_key: {{ .Values.elasticsearch.sso.roles_key }}
                   authentication_backend:
                     type: noop
         {{ end }}
+
+        internal_users.yml: |-
+          _meta:
+            type: "internalusers"
+            config_version: 2
+
+          admin:
+            hash: {{ .Values.elasticsearch.adminHash }}
+            reserved: true
+            opendistro_security_roles:
+            - "all_access"
+            description: "Admin user"
+
+          kibanaserver:
+            hash: {{ .Values.elasticsearch.kibanaHash }}
+            reserved: true
+            opendistro_security_roles:
+            - "kibana_server"
+            description: "Kibana server user"
+
+          configurer:
+            hash: {{ .Values.elasticsearch.configurerHash }}
+            reserved: true
+            opendistro_security_roles:
+            - "kibana_user"
+            - "configurer"
+            description: "Configurer user"
 
         roles.yml: |-
           _meta:
@@ -218,22 +193,39 @@ elasticsearch:
               - "create_index"
               - "crud"
               - "manage_aliases"
+              - "indices:admin/index_template/*"
 
-        # These need to be specified even though they are empty.
+        # Needed
+        roles_mapping.yml: |-
+          _meta:
+            type: "rolesmapping"
+            config_version: 2
+
+        # Needed
         tenants.yml: |-
           _meta:
             type: "tenants"
             config_version: 2
 
+        # Needed
         action_groups.yml: |-
           _meta:
             type: "actiongroups"
             config_version: 2
 
+        # Optional
         nodes_dn.yml: |-
           _meta:
             type: "nodesdn"
             config_version: 2
+
+        # Optional
+        whitelist.yml: |-
+          _meta:
+            type: "whitelist"
+            config_version: 2
+          config:
+            enabled: false
 
   config:
 
@@ -297,25 +289,16 @@ elasticsearch:
     {{- end }}
 
 
-
   # Master nodes configuration
   master:
     replicas: {{ .Values.elasticsearch.masterNode.count }}
 
     javaOpts: {{ .Values.elasticsearch.masterNode.javaOpts }}
 
-    resources:
-    {{- toYaml .Values.elasticsearch.masterNode.resources | nindent 6 }}
-
-    affinity:
-     podAntiAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 1
-          podAffinityTerm:
-            topologyKey: "kubernetes.io/hostname"
-            labelSelector:
-              matchLabels:
-                role: master
+    resources:    {{- toYaml .Values.elasticsearch.masterNode.resources | nindent 6 }}
+    affinity:     {{- toYaml .Values.elasticsearch.masterNode.affinity | nindent 6 }}
+    tolerations:  {{- toYaml .Values.elasticsearch.masterNode.tolerations | nindent 6 }}
+    nodeSelector: {{- toYaml .Values.elasticsearch.masterNode.nodeSelector | nindent 6 }}
 
     persistence:
       size: {{ .Values.elasticsearch.masterNode.storageSize }}
@@ -326,23 +309,14 @@ elasticsearch:
 
     javaOpts: {{ .Values.elasticsearch.dataNode.javaOpts }}
 
-    resources:
-    {{- toYaml .Values.elasticsearch.dataNode.resources | nindent 6 }}
-
-    affinity:
-      podAntiAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 1
-          podAffinityTerm:
-            topologyKey: "kubernetes.io/hostname"
-            labelSelector:
-              matchLabels:
-                role: data
+    resources:    {{- toYaml .Values.elasticsearch.dataNode.resources | nindent 6 }}
+    affinity:     {{- toYaml .Values.elasticsearch.dataNode.affinity | nindent 6 }}
+    tolerations:  {{- toYaml .Values.elasticsearch.dataNode.tolerations | nindent 6 }}
+    nodeSelector: {{- toYaml .Values.elasticsearch.dataNode.nodeSelector | nindent 6 }}
 
     persistence:
-      storageClass: {{ .Values.elasticsearch.storageClass }}
+      storageClass: {{ .Values.elasticsearch.dataNode.storageClass }}
       size: {{ .Values.elasticsearch.dataNode.storageSize }}
-
 
   # Client nodes configuration
   client:
@@ -350,8 +324,10 @@ elasticsearch:
 
     javaOpts: {{ .Values.elasticsearch.clientNode.javaOpts }}
 
-    resources:
-    {{- toYaml .Values.elasticsearch.clientNode.resources | nindent 6 }}
+    resources:    {{- toYaml .Values.elasticsearch.clientNode.resources | nindent 6 }}
+    affinity:     {{- toYaml .Values.elasticsearch.clientNode.affinity | nindent 6 }}
+    tolerations:  {{- toYaml .Values.elasticsearch.clientNode.tolerations | nindent 6 }}
+    nodeSelector: {{- toYaml .Values.elasticsearch.clientNode.nodeSelector | nindent 6 }}
 
     ingress:
       enabled: true
@@ -369,16 +345,6 @@ elasticsearch:
       - secretName: opendistro-es-es-ingress-cert
         hosts:
         - elastic.{{ .Values.global.opsDomain }}
-
-    affinity:
-     podAntiAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 1
-          podAffinityTerm:
-            topologyKey: "kubernetes.io/hostname"
-            labelSelector:
-              matchLabels:
-                role: client
 
 
 # Kibana deployment configuration
@@ -407,6 +373,11 @@ kibana:
     cookie: {{ .Values.elasticsearch.kibanaCookieEncKey }}
     secret: opendistro-es-kibanaserver-user
 
+  resources:    {{- toYaml .Values.kibana.resources | nindent 4 }}
+  affinity:     {{- toYaml .Values.kibana.affinity | nindent 4 }}
+  tolerations:  {{- toYaml .Values.kibana.tolerations | nindent 4 }}
+  nodeSelector: {{- toYaml .Values.kibana.nodeSelector | nindent 4 }}
+
   config:
     server.name: kibana
     server.host: "0"
@@ -430,7 +401,7 @@ kibana:
     {{ if .Values.elasticsearch.sso.enabled }}
     # https://docs.search-guard.com/latest/kibana-authentication-openid
     opendistro_security.auth.type: "openid"
-    opendistro_security.openid.scope: "openid profile email"
+    opendistro_security.openid.scope: {{ .Values.elasticsearch.sso.scope }}
     opendistro_security.openid.connect_url: https://dex.{{ .Values.global.baseDomain }}/.well-known/openid-configuration
     opendistro_security.openid.client_id: "kibana-sso"
     opendistro_security.openid.client_secret: {{ .Values.elasticsearch.clientSecret }}
@@ -466,16 +437,13 @@ certmanager:
 
 # Curator conjob configuration
 curator:
-  enabled: true
-
+  enabled: {{ .Values.elasticsearch.curator.enabled }}
+  postgresql: {{ .Values | get "elasticsearch.curator.retention.postgresql" false }}
   startingDeadlineSeconds: 600
-  resources:
-    limits:
-     cpu: 100m
-     memory: 128Mi
-    requests:
-     cpu: 10m
-     memory: 32Mi
+  affinity:     {{- toYaml .Values.elasticsearch.curator.affinity | nindent 4 }}
+  tolerations:  {{- toYaml .Values.elasticsearch.curator.tolerations | nindent 4 }}
+  nodeSelector: {{- toYaml .Values.elasticsearch.curator.nodeSelector | nindent 4 }}
+  resources:    {{- toYaml .Values.elasticsearch.curator.resources | nindent 4 }}
 
   elasticsearchAccount:
     useExistingSecret: false
@@ -484,26 +452,37 @@ curator:
     secret: opendistro-es-curator-user
 
   retention:
-    other_gb: {{ .Values.elasticsearch.retention.otherSize }}
-    other_days: {{ .Values.elasticsearch.retention.otherAge }}
-    kubernetes_gb: {{ .Values.elasticsearch.retention.kubernetesSize }}
-    kubernetes_days: {{ .Values.elasticsearch.retention.kubernetesAge }}
-    kubeaudit_gb: {{ .Values.elasticsearch.retention.kubeAuditSize }}
-    kubeaudit_days: {{ .Values.elasticsearch.retention.kubeAuditAge }}
-
+    other_gb: {{ .Values.elasticsearch.curator.retention.otherSizeGB }}
+    other_days: {{ .Values.elasticsearch.curator.retention.otherAgeDays }}
+    kubernetes_gb: {{ .Values.elasticsearch.curator.retention.kubernetesSizeGB }}
+    kubernetes_days: {{ .Values.elasticsearch.curator.retention.kubernetesAgeDays }}
+    kubeaudit_gb: {{ .Values.elasticsearch.curator.retention.kubeAuditSizeGB }}
+    kubeaudit_days: {{ .Values.elasticsearch.curator.retention.kubeAuditAgeDays }}
+    postgresql_gb: {{ .Values | get "elasticsearch.curator.retention.postgresqlSizeGB" nil }}
+    postgresql_days: {{ .Values | get "elasticsearch.curator.retention.postgresqlAgeDays" nil }}
 
 # Elasticsearch and kibana configurer job configuration
 configurer:
   enabled: true
 
   snapshotRepository: {{ .Values.elasticsearch.snapshotRepository }}
-
   helm:
     deletePolicy: before-hook-creation
 
   ism:
-    rolloverSize: {{ .Values.elasticsearch.retention.rolloverSize }}
-    rolloverAge: {{ .Values.elasticsearch.retention.rolloverAge }}
+    rolloverSize: {{ .Values.elasticsearch.ism.rolloverSizeGB }}
+    rolloverAge: {{ .Values.elasticsearch.ism.rolloverAgeDays }}
+
+  overwriteTemplates: {{ .Values.elasticsearch.overwriteTemplates }}
+  updatePolicies: {{ .Values.elasticsearch.ism.overwritePolicies }}
+  createIndices: {{ .Values.elasticsearch.createIndices }}
+
+  defaultPolicies: {{ .Values.elasticsearch.ism.defaultPolicies }}
+  defaultTemplates: {{ .Values.elasticsearch.defaultTemplates }}
+  additionalPolicies: {{- toYaml .Values.elasticsearch.ism.additionalPolicies | nindent 4 }}
+  additionalTemplates: {{- toYaml .Values.elasticsearch.additionalTemplates | nindent 4 }}
+
+  activeDeadlineSeconds: 1200
 
   resources:
     limits:
@@ -525,21 +504,23 @@ configurer:
     - username: fluentd
       definition:
         password: {{ .Values.elasticsearch.fluentdPassword }}
-        backend_roles:
+        opendistro_security_roles:
         - log_forwarder
     - username: curator
       definition:
         password: {{ .Values.elasticsearch.curatorPassword }}
+        opendistro_security_roles:
+        - curator
     - username: snapshotter
       definition:
         password: {{ .Values.elasticsearch.snapshotterPassword }}
-        backend_roles:
-        - snapshotter
+        opendistro_security_roles:
+        - manage_snapshots
     - username: metrics_exporter
       definition:
         password: {{ .Values.elasticsearch.metricsExporterPassword }}
-        backend_roles:
-        - metrics-exporter
+        opendistro_security_roles:
+        - metrics_exporter
 
     roles:
     - role_name: log_forwarder
@@ -605,28 +586,11 @@ configurer:
           allowed_actions:
           - "indices:monitor/stats"
           - "indices:monitor/settings/get"
-
-    roles_mapping:
-    - mapping_name: log_forwarder
-      definition:
-        backend_roles:
-        - log_forwarder
-    - mapping_name: curator
-      definition:
-        users:
-        - curator
-    - mapping_name: manage_snapshots
-      definition:
-        backend_roles:
-        - snapshotter
-    - mapping_name: metrics_exporter
-      definition:
-        users:
-        - metrics_exporter
-    {{- with .Values.elasticsearch.extraRoleMappings }}
+    {{- with .Values.elasticsearch.extraRoles }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
 
+    roles_mapping: {{- toYaml .Values.elasticsearch.extraRoleMappings | nindent 6 }}
 
 # Create secret with credentials for the metrics exporter
 metricsExporter:

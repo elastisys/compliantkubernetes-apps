@@ -25,6 +25,20 @@ The following options has been removed or replaced
   - `influxDB.metrics.sizeSc` replaced by `influxDB.retention.sizeSC`
   - `influxDB.retention.ageWc` replaced by `influxDB.retention.durationWC`
   - `influxDB.retention.ageSc` replaced by `influxDB.retention.durationSC`
+- The config for opendistro has been changed and requires running init again.
+See [upgrade docs for opendistro](migration/v0.7.x-v0.8.x/opendistro.md) for instructions for the upgrade.
+Upon init new default values will be added to your config, please update them to match your old values.
+The following options has been removed or replaced
+- `elasticsearch.tolerations` removed
+- `elasticsearch.nodeSelector` removed
+- `elasticsearch.affinity` removed
+- `elasticsearch.storageClass` replaced by `elasticsearch.dataNode.storageClass`
+- `elasticsearch.retention.kubeAuditSize` replaced by `elasticsearch.retention.kubeAuditSizeGB`
+- `elasticsearch.retention.kubeAuditAge` replaced by `elasticsearch.retention.kubeAuditAgeDays`
+- `elasticsearch.retention.kubernetesSize` replaced by `elasticsearch.retention.kubernetesSizeGB`
+- `elasticsearch.retention.kubernetesAge` replaced by `elasticsearch.retention.kubernetesAgeDays`
+- `elasticsearch.retention.otherSize` replaced by `elasticsearch.retention.otherSizeGB`
+- `elasticsearch.retention.otherAge` replaced by `elasticsearch.retention.otherAgeDays`
 
 ### Added
 
@@ -55,6 +69,14 @@ The following options has been removed or replaced
 - InfluxDB helm chart upgraded to `4.8.9`
 - Rework of the InfluxDB configuration.
 - The sized based retention for InfluxDB has been lowered in the dev flavor.
+- Bump opendistro helm chart to `1.10.4`.
+- The configuration for the opendistro helm chart has been reworked.
+Check the release notes for more information on replaces and removed options.
+One can now for example configure:
+  - Role and subject key for OIDC
+  - Tolerations, affinity, nodeSelecor, and resources for most components
+  - Additional opendistro security roles, ISM policies, and index templates
+- OIDC is now enabled by default for elasticsearch and kibana when using the prod flavor
 
 ### Fixed
 
