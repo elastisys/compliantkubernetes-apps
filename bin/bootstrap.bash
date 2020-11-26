@@ -8,19 +8,11 @@ set -eu -o pipefail
 here="$(dirname "$(readlink -f "$0")")"
 # shellcheck disable=SC1090
 source "${here}/common.bash"
-: "${config[infrastructure_file]:?Missing infrastructure file}"
 : "${secrets[kube_config_sc]:?Missing service cluster kubeconfig}"
 : "${secrets[kube_config_wc]:?Missing workload cluster kubeconfig}"
 export bootstrap_path="${here}/../bootstrap"
 export scripts_path
 export common_path="${here}/common.bash"
-
-bootstrap_init() {
-    log_info "Running post infra script"
-    # shellcheck disable=SC1090
-    source "${scripts_path}/post-infra-common.sh" \
-        "${config[infrastructure_file]}"
-}
 
 bootstrap_run_sc() {
     log_info "Bootstrapping service cluster"
@@ -39,12 +31,10 @@ bootstrap_run_wc() {
 }
 
 bootstrap_sc() {
-    bootstrap_init
     bootstrap_run_sc
 }
 
 bootstrap_wc() {
-    bootstrap_init
     bootstrap_run_wc
 }
 

@@ -30,13 +30,6 @@ releases:
   wait: true
   values:
   - values/nfs-client-provisioner.yaml.gotmpl
-  - nfs:
-{{ if eq .Environment.Name "service_cluster" }}
-      server: {{ requiredEnv "NFS_SC_SERVER_IP" }}
-{{ end }}
-{{ if eq .Environment.Name "workload_cluster" }}
-      server: {{ requiredEnv "NFS_WC_SERVER_IP" }}
-{{ end }}
 
 # Local volume provisioner
 - name: local-volume-provisioner

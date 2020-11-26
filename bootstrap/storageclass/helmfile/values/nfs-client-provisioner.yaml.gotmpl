@@ -9,4 +9,4 @@ serviceAccount:
   name: nfs-client-provisioner
 nfs:
   path: "/nfs"
-  #server: Will be set outside
+  server: {{ .Values.global.nfs_server_ip }}

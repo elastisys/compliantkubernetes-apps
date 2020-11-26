@@ -111,7 +111,7 @@ prometheus:
       scheme: http
       static_configs:
       - targets:
-        - '{{ requiredEnv "NFS_WC_SERVER_IP" }}:9100'
+        - '{{ .Values.global.nfs_server_ip }}:9100'
     {{ end }}
 
     {{ if .Values.user.alertmanager.enabled }}

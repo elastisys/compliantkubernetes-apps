@@ -121,6 +121,7 @@
 - Elasticsearch credentials from ck8sdash.
 - Broken elasticsearch api key creation from ck8sdash.
 - The `ENABLE_PSP` config value is removed. "Disabling" has to be done by creating a permissive policy instead.
+- Removed post-install-script.sh and infra.json which removes the dependency between ck8s apps and cluster. 
 
 -------------------------------------------------
 ## v0.5.0 - 2020-08-06

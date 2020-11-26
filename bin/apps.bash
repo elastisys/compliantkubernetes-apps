@@ -18,15 +18,6 @@ apps_init() {
         log_error "Only helm 3 is supported"
         exit 1
     fi
-
-    # TODO: We should try to get rid of the post-infra-common script.
-
-    log_info "Running post infra script"
-    : "${scripts_path:?Missing scripts path}"
-    : "${config[infrastructure_file]:?Missing infrastructure file}"
-    # shellcheck disable=SC1090
-    source "${scripts_path}/post-infra-common.sh" \
-        "${config[infrastructure_file]}"
 }
 
 apps_run_sc() {
