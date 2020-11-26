@@ -65,6 +65,18 @@ replace_set_me(){
 
 }
 
+add_nfs_server_ip()
+{
+  file=$1
+  ip=$2
+
+  if [  "$CK8S_CLOUD_PROVIDER" == "exoscale"  ]
+  then
+    yq  w  -i "$file" global.nfs_server_ip '"set-me"'
+  fi
+
+}
+
 generate_base_sc_config() {
     if [[ $# -ne 1 ]]; then
         log_error "ERROR: number of args in generate_base_sc_config must be 1. #=[$#]"
@@ -82,7 +94,10 @@ generate_base_sc_config() {
     if [[ -f $file ]]; then
         yq merge "$tmpfile" "$file" --inplace -a=overwrite --overwrite --prettyPrint
     fi
+
     cat "$tmpfile" > "$file"
+
+    add_nfs_server_ip "$file" '.service_cluster.nfs_ip_addresses.nfs.private_ip'
 }
 
 generate_base_wc_config() {
@@ -99,7 +114,11 @@ generate_base_wc_config() {
     if [[ -f $file ]]; then
         yq merge "$tmpfile" "$file" --inplace -a=overwrite --overwrite --prettyPrint
     fi
+
     cat "$tmpfile" > "$file"
+
+    add_nfs_server_ip "$file" '.workload_cluster.nfs_ip_addresses.nfs.private_ip'
+
 }
 
 # Usage: set_storage_class <config-file>

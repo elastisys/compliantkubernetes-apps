@@ -40,7 +40,7 @@ declare -A secrets
 config["config_file"]="${CK8S_CONFIG_PATH}/config.sh"
 config["config_file_wc"]="${CK8S_CONFIG_PATH}/wc-config.yaml"
 config["config_file_sc"]="${CK8S_CONFIG_PATH}/sc-config.yaml"
-config["infrastructure_file"]="${state_path}/infra.json"
+
 
 secrets["secrets_file"]="${CK8S_CONFIG_PATH}/secrets.yaml"
 secrets["s3cfg_file"]="${state_path}/s3cfg.ini"

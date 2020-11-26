@@ -139,6 +139,13 @@ Assuming you already have everything needed to install the apps, this is what yo
 4. Edit the configuration files that have been initialized in the configuration path.
    Make sure that the `objectStorage` values are set in `sc-config.yaml`, `wc-config.yaml` and `secrets.yaml` according to your `objectStorage.type` (so `objectStorage.s3.*` if you are using s3 or `objectStorage.gcs.*` if you are using gcs.)
 
+ To set the `nfs_server_ip` value in `[wc/sc]-config.yaml` run the following command in ck8s cluster and take the value in `private_ip` field under `sc_nfs_ips.values.nfs`.
+
+ ```bash
+ ./ck8s internal terraform output --cluster [wc/sc]
+ ```
+
+
 5. OBS! for this step each cluster need to be up and running already.
    Deploy the apps:
 

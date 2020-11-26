@@ -291,7 +291,7 @@ prometheus:
       scheme: http
       static_configs:
       - targets:
-        - '{{ requiredEnv "NFS_SC_SERVER_IP" }}:9100'
+        - '{{ .Values.global.nfs_server_ip }}:9100'
     {{ end }}
 
   serviceMonitor:
