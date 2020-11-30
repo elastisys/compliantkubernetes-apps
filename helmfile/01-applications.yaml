@@ -235,18 +235,18 @@ releases:
 {{ end }}
 
 
-#Elasticsearch-prometheus-exporter
-- name: elasticsearch-exporter
+# prometheus-elasticsearch-exporter
+- name: prometheus-elasticsearch-exporter
   namespace: elastic-system
   labels:
-    app: elasticsearch-exporter
-  chart: stable/elasticsearch-exporter
-  version: 3.3.0
+    app: prometheus-elasticsearch-exporter
+  chart: prometheus-community/prometheus-elasticsearch-exporter
+  version: 4.0.0
   missingFileHandler: Error
   needs:
   - elastic-system/opendistro-es
   values:
-  - values/elasticsearch-exporter.yaml.gotmpl
+  - values/prometheus-elasticsearch-exporter.yaml.gotmpl
 
 # opendistro elasticsearch snapshot lifecycle management
 - name: elasticsearch-slm

@@ -42,6 +42,8 @@ The following options has been removed or replaced
 - Removed unused config `global.environmentName` and added `global.clusterName` to migrate there's [this script](migration/v0.7.x-v0.8.x/migrate-config.sh)
 - To udate the password for `user-alertmanager` you'll have to re-install the chart
   `./bin/ck8s ops helmfile wc -l app=user-alertmanager destroy && ./bin/ck8s ops helmfile wc -l app=user-alertmanager apply`
+- With the replacement of the helm chart `stable/elasticsearch-exporter` to `prometheus-community/prometheus-elasticsearch-exporter`, it is required to manually execute some steps to upgrade.
+See [migrations docs for elasticsearch-exporter](migration/v0.7.x-v0.8.x/migrate-elasticsearch-exporter.md) for instructions on how to perform the upgrade.
 
 ### Added
 
@@ -84,6 +86,7 @@ One can now for example configure:
   - Additional opendistro security roles, ISM policies, and index templates
 - OIDC is now enabled by default for elasticsearch and kibana when using the prod flavor
 - Updated user grafana chart to 6.1.11 and app version to 7.3.3
+- The `stable/elasticsearch-exporter` helm chart has been replaced by `prometheus-community/prometheus-elasticsearch-exporter`
 
 ### Fixed
 

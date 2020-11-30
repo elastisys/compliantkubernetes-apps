@@ -146,7 +146,7 @@
           "lineColor": "rgb(31, 120, 193)",
           "show": true
         },
-        "tableColumn": "{cluster=\"elasticsearch\", color=\"green\", endpoint=\"http\", instance=\"192.168.30.167:9108\", job=\"elasticsearch-exporter\", namespace=\"elastic-system\", pod=\"elasticsearch-exporter-7d8648b6-h8r4x\", service=\"elasticsearch-exporter\"}",
+        "tableColumn": "{cluster=\"elasticsearch\", color=\"green\", endpoint=\"http\", instance=\"192.168.30.167:9108\", job=\"prometheus-elasticsearch-exporter\", namespace=\"elastic-system\", pod=\"prometheus-elasticsearch-exporter-7d8648b6-h8r4x\", service=\"prometheus-elasticsearch-exporter\"}",
         "targets": [
           {
             "expr": "elasticsearch_cluster_health_status{instance=\"$instance\",cluster=\"$cluster\",color=\"red\"}==1 or (elasticsearch_cluster_health_status{instance=\"$instance\",cluster=\"$cluster\",color=\"green\"}==1)+4 or (elasticsearch_cluster_health_status{instance=\"$instance\",cluster=\"$cluster\",color=\"yellow\"}==1)+22",
@@ -541,7 +541,7 @@
           "lineColor": "rgb(31, 120, 193)",
           "show": false
         },
-        "tableColumn": "elasticsearch_cluster_health_number_of_nodes{cluster=\"elasticsearch\", endpoint=\"http\", instance=\"192.168.30.167:9108\", job=\"elasticsearch-exporter\", namespace=\"elastic-system\", pod=\"elasticsearch-exporter-7d8648b6-h8r4x\", service=\"elasticsearch-exporter\"}",
+        "tableColumn": "elasticsearch_cluster_health_number_of_nodes{cluster=\"elasticsearch\", endpoint=\"http\", instance=\"192.168.30.167:9108\", job=\"prometheus-elasticsearch-exporter\", namespace=\"elastic-system\", pod=\"prometheus-elasticsearch-exporter-7d8648b6-h8r4x\", service=\"prometheus-elasticsearch-exporter\"}",
         "targets": [
           {
             "expr": "elasticsearch_cluster_health_number_of_nodes{instance=\"$instance\",cluster=\"$cluster\"}",
@@ -636,7 +636,7 @@
           "lineColor": "rgb(31, 120, 193)",
           "show": false
         },
-        "tableColumn": "elasticsearch_cluster_health_number_of_data_nodes{cluster=\"elasticsearch\", endpoint=\"http\", instance=\"192.168.30.167:9108\", job=\"elasticsearch-exporter\", namespace=\"elastic-system\", pod=\"elasticsearch-exporter-7d8648b6-h8r4x\", service=\"elasticsearch-exporter\"}",
+        "tableColumn": "elasticsearch_cluster_health_number_of_data_nodes{cluster=\"elasticsearch\", endpoint=\"http\", instance=\"192.168.30.167:9108\", job=\"prometheus-elasticsearch-exporter\", namespace=\"elastic-system\", pod=\"prometheus-elasticsearch-exporter-7d8648b6-h8r4x\", service=\"prometheus-elasticsearch-exporter\"}",
         "targets": [
           {
             "expr": "elasticsearch_cluster_health_number_of_data_nodes{instance=\"$instance\",cluster=\"$cluster\"}",
@@ -732,7 +732,7 @@
           "lineColor": "rgb(31, 120, 193)",
           "show": true
         },
-        "tableColumn": "elasticsearch_cluster_health_number_of_pending_tasks{cluster=\"elasticsearch\", endpoint=\"http\", instance=\"192.168.30.167:9108\", job=\"elasticsearch-exporter\", namespace=\"elastic-system\", pod=\"elasticsearch-exporter-7d8648b6-h8r4x\", service=\"elasticsearch-exporter\"}",
+        "tableColumn": "elasticsearch_cluster_health_number_of_pending_tasks{cluster=\"elasticsearch\", endpoint=\"http\", instance=\"192.168.30.167:9108\", job=\"prometheus-elasticsearch-exporter\", namespace=\"elastic-system\", pod=\"prometheus-elasticsearch-exporter-7d8648b6-h8r4x\", service=\"prometheus-elasticsearch-exporter\"}",
         "targets": [
           {
             "expr": "elasticsearch_cluster_health_number_of_pending_tasks{instance=\"$instance\",cluster=\"$cluster\"}",
@@ -932,7 +932,7 @@
           "lineColor": "rgb(31, 120, 193)",
           "show": true
         },
-        "tableColumn": "elasticsearch_cluster_health_active_primary_shards{cluster=\"elasticsearch\", endpoint=\"http\", instance=\"192.168.30.167:9108\", job=\"elasticsearch-exporter\", namespace=\"elastic-system\", pod=\"elasticsearch-exporter-7d8648b6-h8r4x\", service=\"elasticsearch-exporter\"}",
+        "tableColumn": "elasticsearch_cluster_health_active_primary_shards{cluster=\"elasticsearch\", endpoint=\"http\", instance=\"192.168.30.167:9108\", job=\"prometheus-elasticsearch-exporter\", namespace=\"elastic-system\", pod=\"prometheus-elasticsearch-exporter-7d8648b6-h8r4x\", service=\"prometheus-elasticsearch-exporter\"}",
         "targets": [
           {
             "expr": "elasticsearch_cluster_health_active_primary_shards{instance=\"$instance\",cluster=\"$cluster\"}",
@@ -1026,7 +1026,7 @@
           "lineColor": "rgb(31, 120, 193)",
           "show": true
         },
-        "tableColumn": "elasticsearch_cluster_health_active_shards{cluster=\"elasticsearch\", endpoint=\"http\", instance=\"192.168.30.167:9108\", job=\"elasticsearch-exporter\", namespace=\"elastic-system\", pod=\"elasticsearch-exporter-7d8648b6-h8r4x\", service=\"elasticsearch-exporter\"}",
+        "tableColumn": "elasticsearch_cluster_health_active_shards{cluster=\"elasticsearch\", endpoint=\"http\", instance=\"192.168.30.167:9108\", job=\"prometheus-elasticsearch-exporter\", namespace=\"elastic-system\", pod=\"prometheus-elasticsearch-exporter-7d8648b6-h8r4x\", service=\"prometheus-elasticsearch-exporter\"}",
         "targets": [
           {
             "expr": "elasticsearch_cluster_health_active_shards{instance=\"$instance\",cluster=\"$cluster\"}",
@@ -1120,7 +1120,7 @@
           "lineColor": "rgb(31, 120, 193)",
           "show": true
         },
-        "tableColumn": "elasticsearch_cluster_health_initializing_shards{cluster=\"elasticsearch\", endpoint=\"http\", instance=\"192.168.30.167:9108\", job=\"elasticsearch-exporter\", namespace=\"elastic-system\", pod=\"elasticsearch-exporter-7d8648b6-h8r4x\", service=\"elasticsearch-exporter\"}",
+        "tableColumn": "elasticsearch_cluster_health_initializing_shards{cluster=\"elasticsearch\", endpoint=\"http\", instance=\"192.168.30.167:9108\", job=\"prometheus-elasticsearch-exporter\", namespace=\"elastic-system\", pod=\"prometheus-elasticsearch-exporter-7d8648b6-h8r4x\", service=\"prometheus-elasticsearch-exporter\"}",
         "targets": [
           {
             "expr": "elasticsearch_cluster_health_initializing_shards{instance=\"$instance\",cluster=\"$cluster\"}",
@@ -1214,7 +1214,7 @@
           "lineColor": "rgb(31, 120, 193)",
           "show": true
         },
-        "tableColumn": "elasticsearch_cluster_health_relocating_shards{cluster=\"elasticsearch\", endpoint=\"http\", instance=\"192.168.30.167:9108\", job=\"elasticsearch-exporter\", namespace=\"elastic-system\", pod=\"elasticsearch-exporter-7d8648b6-h8r4x\", service=\"elasticsearch-exporter\"}",
+        "tableColumn": "elasticsearch_cluster_health_relocating_shards{cluster=\"elasticsearch\", endpoint=\"http\", instance=\"192.168.30.167:9108\", job=\"prometheus-elasticsearch-exporter\", namespace=\"elastic-system\", pod=\"prometheus-elasticsearch-exporter-7d8648b6-h8r4x\", service=\"prometheus-elasticsearch-exporter\"}",
         "targets": [
           {
             "expr": "elasticsearch_cluster_health_relocating_shards{instance=\"$instance\",cluster=\"$cluster\"}",
@@ -1308,7 +1308,7 @@
           "lineColor": "rgb(31, 120, 193)",
           "show": true
         },
-        "tableColumn": "elasticsearch_cluster_health_delayed_unassigned_shards{cluster=\"elasticsearch\", endpoint=\"http\", instance=\"192.168.30.167:9108\", job=\"elasticsearch-exporter\", namespace=\"elastic-system\", pod=\"elasticsearch-exporter-7d8648b6-h8r4x\", service=\"elasticsearch-exporter\"}",
+        "tableColumn": "elasticsearch_cluster_health_delayed_unassigned_shards{cluster=\"elasticsearch\", endpoint=\"http\", instance=\"192.168.30.167:9108\", job=\"prometheus-elasticsearch-exporter\", namespace=\"elastic-system\", pod=\"prometheus-elasticsearch-exporter-7d8648b6-h8r4x\", service=\"prometheus-elasticsearch-exporter\"}",
         "targets": [
           {
             "expr": "elasticsearch_cluster_health_delayed_unassigned_shards{instance=\"$instance\",cluster=\"$cluster\"} ",
@@ -1402,7 +1402,7 @@
           "lineColor": "rgb(31, 120, 193)",
           "show": true
         },
-        "tableColumn": "elasticsearch_cluster_health_unassigned_shards{cluster=\"elasticsearch\", endpoint=\"http\", instance=\"192.168.30.167:9108\", job=\"elasticsearch-exporter\", namespace=\"elastic-system\", pod=\"elasticsearch-exporter-7d8648b6-h8r4x\", service=\"elasticsearch-exporter\"}",
+        "tableColumn": "elasticsearch_cluster_health_unassigned_shards{cluster=\"elasticsearch\", endpoint=\"http\", instance=\"192.168.30.167:9108\", job=\"prometheus-elasticsearch-exporter\", namespace=\"elastic-system\", pod=\"prometheus-elasticsearch-exporter-7d8648b6-h8r4x\", service=\"prometheus-elasticsearch-exporter\"}",
         "targets": [
           {
             "expr": "elasticsearch_cluster_health_unassigned_shards{instance=\"$instance\",cluster=\"$cluster\"} ",
