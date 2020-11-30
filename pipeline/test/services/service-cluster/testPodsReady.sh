@@ -31,7 +31,7 @@ deployments=(
     "monitoring blackbox-prometheus-blackbox-exporter"
     "fluentd fluentd-aggregator"
     "velero velero"
-    "elastic-system elasticsearch-exporter"
+    "elastic-system prometheus-elasticsearch-exporter"
     "elastic-system opendistro-es-client"
     "elastic-system opendistro-es-kibana"
 )
