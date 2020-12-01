@@ -129,7 +129,7 @@ prometheus:
     nodeSelector: {}
 
 dex:
-  # supported: google|aaa
+  # supported: google|okta|aaa
   oidcProvider: google
   allowedDomains:
     - example.com
