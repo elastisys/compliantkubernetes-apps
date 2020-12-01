@@ -37,6 +37,7 @@ The following options has been removed or replaced
 - Allow user-alertmanager to be deployed in custom namespace and not only in `monitoring`.
 - Support for GCS
 - Backup retention for InfluxDB.
+- Add Okta as option for OIDC provider
 
 ### Changed
 

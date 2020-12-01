@@ -29,15 +29,22 @@ config:
     id: google
     name: Google
     config:
-      # Canonical URL of the provider, also used for configuration discovery.
-      # This value MUST match the value returned in the provider config discovery.
-      #
-      # See: https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig
       issuer: https://accounts.google.com
       redirectURI: https://dex.{{ .Values.global.baseDomain }}/callback
       clientID: {{ .Values.dex.googleClientID }}
       clientSecret: {{ .Values.dex.googleClientSecret }}
       hostedDomains: {{ toYaml .Values.dex.allowedDomains | nindent 6 }}
+  {{ end }}
+  {{ if eq .Values.dex.oidcProvider "okta" }}
+  - type: oidc
+    id: okta
+    name: Okta
+    config:
+      issuer: https://{{ .Values.dex.issuer }}
+      redirectURI: https://dex.{{ .Values.global.baseDomain }}/callback
+      clientID: {{ .Values.dex.oktaClientID }}
+      clientSecret: {{ .Values.dex.oktaClientSecret }}
+      insecureSkipEmailVerified: true
   {{ end }}
   {{ if eq .Values.dex.oidcProvider "aaa" }}
   - name: AAA
