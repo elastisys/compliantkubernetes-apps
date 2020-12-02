@@ -219,12 +219,12 @@ set_harbor_config() {
     fi
     case ${CK8S_CLOUD_PROVIDER} in
         aws | exoscale)
-          persistence_type=s3
+          persistence_type=objectStorage
           disable_redirect=false
           ;;
 
         safespring)
-          persistence_type=s3
+          persistence_type=objectStorage
           disable_redirect=true
           ;;
 
@@ -234,7 +234,7 @@ set_harbor_config() {
           ;;
 
         baremetal)
-          persistence_type=s3
+          persistence_type=objectStorage
 	  disable_redirect=false
 	  ;;
 

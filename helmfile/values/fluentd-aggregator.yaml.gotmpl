@@ -1,3 +1,6 @@
+{{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") ) }}
+{{ fail "\nERROR: Fluentd aggregator requires s3 or gcs object storage, see Values.objectStorage.type" }}
+{{ end }}
 image:
   repository: quay.io/fluentd_elasticsearch/fluentd
   tag: v2.9.0
