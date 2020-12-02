@@ -11,6 +11,8 @@ global:
   clusterDns: "10.43.0.10"
 
 objectStorage:
+  # Options are "s3", "gcs", or "none"
+  # If "none", remember to disable backups (velero)
   type: "s3"
   # gcs:
   #   project: "set-me"
@@ -215,6 +217,7 @@ ingressNginx:
     nodeSelector: {}
 
 velero:
+  enabled: true
   tolerations: []
   nodeSelector: {}
   resources:

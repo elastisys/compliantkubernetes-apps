@@ -1,3 +1,6 @@
+{{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") ) }}
+{{ fail "\nERROR: Velero requires s3 or gcs object storage, see Values.objectStorage.type" }}
+{{ end }}
 resources:    {{- toYaml .Values.velero.resources | nindent 2  }}
 tolerations:  {{- toYaml .Values.velero.tolerations | nindent 2  }}
 nodeSelector: {{- toYaml .Values.velero.nodeSelector | nindent 2  }}

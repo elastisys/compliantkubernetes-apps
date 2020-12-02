@@ -1,3 +1,8 @@
+{{ if not (or (eq .Values.harbor.persistence.type "filesystem") (eq .Values.harbor.persistence.type "swift") ) }}
+{{ if not (and (eq .Values.harbor.persistence.type "objectStorage") (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") ) ) }}
+{{ fail "\nERROR: Harbor persistence type should be set to \"filesystem\" (persistent volume), \"swift\", or \"objectStorage\" (matcing global object storage, see Values.objectStorage.type)" }}
+{{ end }}
+{{ end }}
 expose:
   type: ingress
   tls:
@@ -32,7 +37,11 @@ persistence:
       size: {{ .Values.harbor.redis.persistentVolumeClaim.size }}
   imageChartStorage:
     disableredirect: {{ .Values.harbor.persistence.disableRedirect }}
-    {{ if eq .Values.harbor.persistence.type "swift" }}
+    {{ if eq .Values.harbor.persistence.type "filesystem" }}
+    type: filesystem
+    filesystem:
+      rootdirectory: /storage
+    {{ else if eq .Values.harbor.persistence.type "swift" }}
     type: swift
     swift:
       authurl: {{ .Values.citycloud.authURL }}/v3
@@ -43,7 +52,7 @@ persistence:
       authversion: {{ .Values.citycloud.authVersion }}
       tenant: {{ .Values.citycloud.tenantName }}
       domain: {{ .Values.citycloud.projectDomainName }}
-    {{ else }}
+    {{ else if eq .Values.harbor.persistence.type "objectStorage" }}
     {{ if eq .Values.objectStorage.type "s3" }}
     type: s3
     s3:
@@ -58,7 +67,7 @@ persistence:
       bucket: {{ .Values.objectStorage.buckets.harbor }}
       encodedkey: {{ .Values.objectStorage.gcs.keyfileData | b64enc }}
     {{- end }}
-    {{ end }}
+    {{- end }}
 
 externalURL: https://harbor.{{ .Values.global.baseDomain }}
 

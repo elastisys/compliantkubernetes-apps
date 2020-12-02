@@ -1,3 +1,6 @@
+{{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") ) }}
+{{ fail "\nERROR: Service cluster log retention requires s3 or gcs object storage, see Values.objectStorage.type" }}
+{{ end }}
 resources:
   requests:
     cpu: 100m

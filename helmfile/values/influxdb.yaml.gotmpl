@@ -1,3 +1,9 @@
+
+{{ if or .Values.influxDB.backup.enabled .Values.influxDB.backupRetention.enabled }}
+{{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") ) }}
+{{ fail "\nERROR: InfluxDB backup and backup retention requires s3 or gcs object storage, see Values.objectStorage.type" }}
+{{ end }}
+{{ end }}
 elastisys_custom:
   influxdb_user: {{ .Values.influxDB.user }}
   influxdb_password: {{ .Values.influxDB.password }}
@@ -119,6 +125,7 @@ volumes:
       - key: prometheus-influxdb-retention-metric-name
         path: prometheus-influxdb-retention-metric-name
 
+{{ if .Values.influxDB.backup.enabled }}
 backup:
   enabled: {{ .Values.influxDB.backup.enabled }}
   resources: {{- toYaml .Values.influxDB.backup.resources | nindent 4 }}
@@ -140,7 +147,9 @@ backup:
     serviceAccountSecretKey: credentials
     serviceAccountSecret: influxdb-backup-secret
   {{- end }}
+{{ end }}
 
+{{ if .Values.influxDB.backupRetention.enabled }}
 backupRetention:
   enabled: {{ .Values.influxDB.backupRetention.enabled }}
   daysToRetain: {{ .Values.influxDB.backupRetention.daysToRetain }}
@@ -153,3 +162,4 @@ backupRetention:
     bucketName: {{ .Values.objectStorage.buckets.influxDB }}
     endpointUrl: {{ .Values.objectStorage.s3.regionEndpoint }}
   {{- end }}
+{{ end }}

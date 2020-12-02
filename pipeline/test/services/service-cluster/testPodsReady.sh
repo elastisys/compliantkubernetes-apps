@@ -6,8 +6,14 @@ source "${INNER_SCRIPTS_PATH}/../funcs.sh"
 
 cloud_provider=$(yq r -e "${CONFIG_FILE}" 'global.cloudProvider')
 enable_harbor=$(yq r -e "${CONFIG_FILE}" 'harbor.enabled')
+enable_harbor_backup=$(yq r -e "${CONFIG_FILE}" 'harbor.backup.enabled')
 enable_ck8sdash=$(yq r -e "${CONFIG_FILE}" 'ck8sdash.enabled')
 enable_user_grafana=$(yq r -e "${CONFIG_FILE}" 'user.grafana.enabled')
+enable_fluentd=$(yq r -e "${CONFIG_FILE}" 'fluentd.enabled')
+enable_elasticsearch_snapshot=$(yq r -e "${CONFIG_FILE}" 'elasticsearch.snapshot.enabled')
+enable_influxdb_backup=$(yq r -e "${CONFIG_FILE}" 'influxDB.backup.enabled')
+enable_influxdb_backup_retention=$(yq r -e "${CONFIG_FILE}" 'influxDB.backupRetention.enabled')
+enable_velero=$(yq r -e "${CONFIG_FILE}" 'velero.enabled')
 storage_class=$(yq r -e "${CONFIG_FILE}" 'global.storageClass')
 elasticsearch_storage_class=$(yq r -e "${CONFIG_FILE}" 'elasticsearch.dataNode.storageClass')
 
@@ -29,8 +35,6 @@ deployments=(
     "monitoring kube-prometheus-stack-grafana"
     "monitoring kube-prometheus-stack-kube-state-metrics"
     "monitoring blackbox-prometheus-blackbox-exporter"
-    "fluentd fluentd-aggregator"
-    "velero velero"
     "elastic-system prometheus-elasticsearch-exporter"
     "elastic-system opendistro-es-client"
     "elastic-system opendistro-es-kibana"
@@ -57,6 +61,12 @@ fi
 if [ "$enable_user_grafana" == true ]; then
     deployments+=("monitoring user-grafana")
 fi
+if [ "$enable_fluentd" == true ]; then
+    deployments+=("fluentd fluentd-aggregator")
+fi
+if [ "$enable_velero" == true ]; then
+    deployments+=("velero velero")
+fi
 resourceKind="Deployment"
 # Get json data in a smaller dataset
 simpleData="$(getStatus $resourceKind)"
@@ -78,12 +88,16 @@ daemonsets=(
     "kube-system node-local-dns"
     "ingress-nginx ingress-nginx-controller"
     "monitoring kube-prometheus-stack-prometheus-node-exporter"
-    "fluentd fluentd"
-    "velero restic"
 )
 if [ "$storage_class" = local-storage ] || \
     [ "$elasticsearch_storage_class" = local-storage ]; then
   daemonsets+=("kube-system local-volume-provisioner")
+fi
+if [ "$enable_fluentd" == true ]; then
+    daemonsets+=("fluentd fluentd")
+fi
+if [ "$enable_velero" == true ]; then
+    daemonsets+=("velero restic")
 fi
 
 resourceKind="DaemonSet"
@@ -164,11 +178,23 @@ done
 cronjobs=(
   "influxdb-prometheus influxdb-metrics-retention-cronjob-sc"
   "influxdb-prometheus influxdb-metrics-retention-cronjob-wc"
-  "influxdb-prometheus influxdb-backup"
   "elastic-system opendistro-es-curator"
-  "elastic-system elasticsearch-slm"
-  "elastic-system elasticsearch-backup"
 )
+if [ "$enable_harbor" == true ] && [ "$enable_harbor_backup" == true ]; then
+    cronjobs+=("harbor harbor-backup-cronjob")
+fi
+if [ "$enable_elasticsearch_snapshot" == true ]; then
+    cronjobs+=(
+        "elastic-system elasticsearch-slm"
+        "elastic-system elasticsearch-backup"
+    )
+fi
+if [ "$enable_influxdb_backup" == true ]; then
+    cronjobs+=("influxdb-prometheus influxdb-backup")
+fi
+if [ "$enable_influxdb_backup_retention" == true ]; then
+    cronjobs+=("influxdb-prometheus influxdb-backup-retention")
+fi
 
 echo
 echo

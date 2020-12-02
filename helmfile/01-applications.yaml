@@ -92,13 +92,13 @@ releases:
 {{ end }}
 
 
-{{ if .Values.ck8sdash.enabled }}
 - name: ck8sdash
   namespace: ck8sdash
   labels:
     app: ck8sdash
   chart: ./charts/ck8sdash
   version: 0.3.1
+  installed: {{ .Values.ck8sdash.enabled }}
   missingFileHandler: Error
   needs:
   - cert-manager/cert-manager
@@ -110,7 +110,6 @@ releases:
 {{ if eq .Environment.Name "workload_cluster" }}
   - values/ck8sdash-wc.yaml.gotmpl
 {{ end }}
-{{ end }}
 
 # Velero
 - name: velero
@@ -119,6 +118,7 @@ releases:
     app: velero
   chart: vmware-tanzu/velero
   version: 2.8.2
+  installed: {{ .Values.velero.enabled }}
   missingFileHandler: Error
   values:
   - values/velero.yaml.gotmpl
@@ -217,7 +217,6 @@ releases:
   version: 0.1.0
   missingFileHandler: Error
 
-{{ if .Values.user.grafana.enabled }}
 # Grafana instance for user
 - name: user-grafana
   namespace: monitoring
@@ -227,12 +226,12 @@ releases:
     app.kubernetes.io/name: grafana
   chart: grafana/grafana
   version: 6.1.11
+  installed: {{ .Values.user.grafana.enabled }}
   missingFileHandler: Error
   needs:
   - cert-manager/cert-manager
   values:
   - values/grafana-user.yaml.gotmpl
-{{ end }}
 
 
 # prometheus-elasticsearch-exporter
@@ -255,6 +254,7 @@ releases:
     app: elasticsearch-slm
   chart: ./charts/elasticsearch-slm
   version: 0.1.0
+  installed: {{ .Values.elasticsearch.snapshot.enabled }}
   missingFileHandler: Error
   needs:
   - elastic-system/opendistro-es
@@ -268,13 +268,13 @@ releases:
     app: elasticsearch-backup
   chart: ./charts/elasticsearch-backup
   version: 0.1.0
+  installed: {{ .Values.elasticsearch.snapshot.enabled }}
   missingFileHandler: Error
   needs:
   - elastic-system/opendistro-es
   values:
   - values/elasticsearch-backup.yaml.gotmpl
 
-{{ if .Values.harbor.enabled }}
 # Harbor
 - name: harbor-certs
   namespace: harbor
@@ -282,6 +282,7 @@ releases:
     app: harbor
   chart: ./charts/harbor-certs
   version: 0.1.0
+  installed: {{ .Values.harbor.enabled }}
   missingFileHandler: Error
   needs:
   - cert-manager/cert-manager
@@ -294,6 +295,7 @@ releases:
     app: harbor
   chart: harbor/harbor
   version: 1.5.1
+  installed: {{ .Values.harbor.enabled }}
   missingFileHandler: Error
   wait: true
   timeout: 600
@@ -308,6 +310,7 @@ releases:
     app: harbor
   chart: ./charts/init-harbor
   version: 0.1.0
+  installed: {{ .Values.harbor.enabled }}
   missingFileHandler: Error
   needs:
   - harbor/harbor
@@ -321,10 +324,10 @@ releases:
     component: backup
   chart: ./charts/harbor-backup
   version: 0.1.0
+  installed: {{ and .Values.harbor.enabled .Values.harbor.backup.enabled }}
   missingFileHandler: Error
   values:
   - values/harbor-backup.yaml.gotmpl
-{{ end }}
 
 # InfluxDB with disk usage monitoring and metrics retention
 - name: influxdb
@@ -354,6 +357,7 @@ releases:
     app: fluentd
   chart: kiwigrid/fluentd-elasticsearch
   version: 5.1.1
+  installed: {{ .Values.fluentd.enabled }}
   missingFileHandler: Error
   values:
   - values/fluentd-sc.yaml.gotmpl
@@ -365,6 +369,7 @@ releases:
     app: fluentd-aggregator
   chart: stable/fluentd
   version: 2.3.2
+  installed: {{ .Values.fluentd.enabled }}
   missingFileHandler: Error
   values:
   - values/fluentd-aggregator.yaml.gotmpl
@@ -376,6 +381,7 @@ releases:
     app: sc-logs-retention
   chart: ./charts/sc-logs-retention
   version: 0.1.0
+  installed: {{ .Values.fluentd.enabled }}
   missingFileHandler: Error
   needs:
   - fluentd/fluentd-aggregator
@@ -400,7 +406,6 @@ releases:
 
 # Workload cluster releases
 {{ if eq .Environment.Name "workload_cluster" }}
-{{ if .Values.falco.enabled }}
 # Falco
 - name: falco
   namespace: falco
@@ -408,6 +413,7 @@ releases:
     app: falco
   chart: falcosecurity/falco
   version: 1.5.2
+  installed: {{ .Values.falco.enabled }}
   missingFileHandler: Error
   values:
   - values/falco.yaml.gotmpl
@@ -419,10 +425,10 @@ releases:
     app: falco-exporter
   chart: falcosecurity/falco-exporter
   version: 0.3.8
+  installed: {{ .Values.falco.enabled }}
   missingFileHandler: Error
   values:
     - values/falco-exporter.yaml.gotmpl
-{{ end }}
 
 #Basic auth credentials for accessing workload cluster prometheus
 - name: prometheus-auth
@@ -435,31 +441,29 @@ releases:
   values:
   - values/prometheus-auth.yaml.gotmpl
 
-{{ if .Values.user.alertmanager.enabled }}
 - name: user-alertmanager
   namespace: {{ .Values.user.alertmanager.namespace | default "monitoring" }}
   labels:
     app: user-alertmanager
   chart: ./charts/examples/user-alertmanager
   version: 0.1.0
+  installed: {{ .Values.user.alertmanager.enabled }}
   missingFileHandler: Error
   needs:
   - cert-manager/cert-manager
   values:
   - values/user-alertmanager.yaml.gotmpl
-{{ end }}
 
-{{ if .Values.falco.alerts.enabled }}
 - name: falcosidekick
   namespace: falco
   labels:
     app: falco
   chart: ./charts/falcosidekick
   version: 0.1.14
+  installed: {{ .Values.falco.alerts.enabled }}
   missingFileHandler: Error
   values:
   - values/falcosidekick.yaml.gotmpl
-{{ end }}
 
 # Fluentd
 - name: fluentd-system
@@ -483,7 +487,6 @@ releases:
   values:
   - values/fluentd-user.yaml.gotmpl
 
-{{ if .Values.opa.enabled }}
 # gatekeeper-operator
 - name: gatekeeper-operator
   namespace: gatekeeper-system
@@ -491,6 +494,7 @@ releases:
     app: gatekeeper-operator
   chart: ./charts/gatekeeper-operator
   version: 1.6.0
+  installed: {{ .Values.opa.enabled }}
   missingFileHandler: Error
   wait: true
   values:
@@ -503,6 +507,7 @@ releases:
     app: gatekeeper-templates
   chart: ./charts/gatekeeper-templates
   version: 1.6.0
+  installed: {{ .Values.opa.enabled }}
   missingFileHandler: Error
   needs:
   - gatekeeper-system/gatekeeper-operator
@@ -516,12 +521,12 @@ releases:
     app: gatekeeper-constraints
   chart: ./charts/gatekeeper-constraints
   version: 1.6.0
+  installed: {{ .Values.opa.enabled }}
   missingFileHandler: Error
   needs:
   - gatekeeper-system/gatekeeper-templates
   values:
   - values/gatekeeper-constraints.yaml.gotmpl
-{{ end }}
 
 # TODO: Make this optional! Users may not want any alerts by default.
 # It should also be separate from the alerts we use. Users should not need

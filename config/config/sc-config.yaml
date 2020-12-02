@@ -11,6 +11,11 @@ global:
   clusterDns: "10.43.0.10"
 
 objectStorage:
+  # Options are "s3", "gcs", or "none"
+  # If "none", remember to disable features that depend on object storage:
+  #   all backups (velero, harbor, influxdb, elasticsearch), sc logs (fluentd)
+  #   Also set harbor persistence to "filesystem" or "swift"
+  # Otherwise configure the features to match this type.
   type: "s3"
   # gcs:
   #   project: "set-me"
@@ -100,12 +105,15 @@ harbor:
         memory: 512Mi
         cpu: 200m
   persistence:
+    # Valid options are "filesystem" (persistent volume), "swift", or "objectStorage" (matching global config)
     type: "set-me"
     disableRedirect: set-me
   oidc:
     #group claim name used by OIDC Provider
     groupClaimName: "set-me"
     scope: openid,email,profile,offline_access,groups
+  backup:
+    enabled: true
 
 prometheus:
   storage:
@@ -279,6 +287,7 @@ elasticsearch:
     additionalPolicies: {}
   # Snapshot and snapshot lifecycle configuration
   snapshot:
+    enabled: true
     min: 7
     max: 14
     ageSeconds: 864000
@@ -312,6 +321,9 @@ elasticsearch:
     tolerations: []
 
 fluentd:
+  # Enable log collection in the service cluster
+  # and store in object storage via fluentd aggregator.
+  enabled: true
   resources:
     limits:
       cpu: 500m
@@ -335,6 +347,7 @@ fluentd:
     affinity: {}
     nodeSelector: {}
 
+# Log retention for service cluster logs stored in object storage.
 logRetention:
   days: 7
 
@@ -495,6 +508,7 @@ ingressNginx:
     nodeSelector: {}
 
 velero:
+  enabled: true
   tolerations: []
   nodeSelector: {}
   resources:

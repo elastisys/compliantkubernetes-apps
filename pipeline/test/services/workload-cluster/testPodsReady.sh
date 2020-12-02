@@ -10,6 +10,7 @@ enable_falco_alerts=$(yq r -e "${CONFIG_FILE}" 'falco.alerts.enabled')
 enable_falco=$(yq r -e "${CONFIG_FILE}" 'falco.enabled')
 enable_opa=$(yq r -e "${CONFIG_FILE}" 'opa.enabled')
 enable_user_alertmanager=$(yq r -e "${CONFIG_FILE}" 'user.alertmanager.enabled')
+enable_velero=$(yq r -e "${CONFIG_FILE}" 'velero.enabled')
 
 echo
 echo
@@ -26,7 +27,6 @@ deployments=(
     "ingress-nginx ingress-nginx-defaultbackend"
     "monitoring kube-prometheus-stack-operator"
     "monitoring kube-prometheus-stack-kube-state-metrics"
-    "velero velero"
 )
 if [ "$cloud_provider" == "exoscale" ]; then
     deployments+=("kube-system nfs-client-provisioner")
@@ -39,6 +39,9 @@ if [ "$enable_opa" == true ]; then
 fi
 if [ "$enable_falco_alerts" == true ]; then
     deployments+=("falco falcosidekick")
+fi
+if [ "$enable_velero" == true ]; then
+    deployments+=("velero velero")
 fi
 
 resourceKind="Deployment"
@@ -68,6 +71,9 @@ daemonsets=(
 )
 if [ "$enable_falco" == true ]; then
     daemonsets+=("falco falco")
+fi
+if [ "$enable_velero" == true ]; then
+    daemonsets+=("velero restic")
 fi
 
 resourceKind="DaemonSet"
