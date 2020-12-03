@@ -63,13 +63,19 @@ grafana.ini:
     enabled: true
     client_id: grafana
     client_secret: {{ .Values.grafana.clientSecret }}
+    {{ if eq .Values.dex.oidcProvider "google" }}
     scopes: profile email openid
+    {{ end }}
+    {{ if eq .Values.dex.oidcProvider "okta" }}
+    scopes: profile email openid groups
+    {{ end }}
     auth_url: https://dex.{{ .Values.global.baseDomain }}/auth
     token_url: https://dex.{{ .Values.global.baseDomain }}/token
     api_url: https://dex.{{ .Values.global.baseDomain }}/api
     allowed_domains: {{ join " " .Values.dex.allowedDomains }}
     allow_sign_up: true
     tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}
+    role_attribute_path: contains(groups[*], {{ .Values.user.grafana.userGroups.grafanaAdmin }}) && 'Admin' || contains(groups[*], {{ .Values.user.grafana.userGroups.grafanaEditor }}) && 'Editor' || contains(groups[*], {{ .Values.user.grafana.userGroups.grafanaViewer }}) && 'Viewer'
 
 # Velero backup
 

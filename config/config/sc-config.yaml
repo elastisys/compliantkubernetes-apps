@@ -38,6 +38,10 @@ user:
     tolerations: []
     affinity: {}
     nodeSelector: {}
+    userGroups:
+      grafanaAdmin: grafana_admin #maps to grafana role admin
+      grafanaEditor: grafana_editor #maps to grafana role editor
+      grafanaViewer: grafana_viewer #maps to grafana role viewer
   # Todo remove dependencie on alertmanager from service cluster
   alertmanager:
     enabled: false

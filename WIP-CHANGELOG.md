@@ -57,6 +57,7 @@ The following options has been removed or replaced
 - Add Okta as option for OIDC provider
 - Dex configuration to accept groups from Okta as an OIDC provider
 - Added record `cluster.name` in all logs to elasticsearch that matches the cluster setting `global.clusterName`
+- Role mapping from OIDC groups to roles in user grafana
 
 ### Changed
 
