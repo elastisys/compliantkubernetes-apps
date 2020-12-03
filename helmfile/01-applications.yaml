@@ -226,7 +226,7 @@ releases:
     app.kubernetes.io/instance: user-grafana
     app.kubernetes.io/name: grafana
   chart: grafana/grafana
-  version: 5.8.16
+  version: 6.1.11
   missingFileHandler: Error
   needs:
   - cert-manager/cert-manager
