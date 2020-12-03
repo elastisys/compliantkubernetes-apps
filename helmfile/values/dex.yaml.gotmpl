@@ -44,7 +44,14 @@ config:
       redirectURI: https://dex.{{ .Values.global.baseDomain }}/callback
       clientID: {{ .Values.dex.oktaClientID }}
       clientSecret: {{ .Values.dex.oktaClientSecret }}
-      insecureSkipEmailVerified: true
+      insecureSkipEmailVerified: {{ .Values.dex.insecureSkipEmailVerified }}
+      insecureEnableGroups: {{ .Values.dex.insecureEnableGroups }}
+      scopes:
+        - openid
+        - profile
+        - email
+        - groups
+      getUserInfo: true
   {{ end }}
   {{ if eq .Values.dex.oidcProvider "aaa" }}
   - name: AAA

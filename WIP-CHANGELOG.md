@@ -52,6 +52,7 @@ The following options has been removed or replaced
 - Support for GCS
 - Backup retention for InfluxDB.
 - Add Okta as option for OIDC provider
+- Dex configuration to accept groups from Okta as an OIDC provider
 
 ### Changed
 
