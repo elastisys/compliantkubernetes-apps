@@ -159,6 +159,13 @@ extraConfigMaps:
       </metric>
     </filter>
 
+    <filter **>
+      @type record_transformer
+      <record>
+        cluster.name "{{ .Values.global.clusterName }}"
+      </record>
+    </filter>
+
     # Include extra configuration files
     @include /etc/fluent/extra-config.d/*.conf
 

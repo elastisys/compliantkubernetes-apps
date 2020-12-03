@@ -146,6 +146,13 @@ extraConfigMaps:
       </metric>
     </filter>
 
+    <filter **>
+      @type record_transformer
+      <record>
+        cluster.name "{{ .Values.global.clusterName }}"
+      </record>
+    </filter>
+
   output.conf: |-
     <match **>
       @id output-forwarding
