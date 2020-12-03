@@ -147,7 +147,9 @@ backupRetention:
   resources: {{- toYaml .Values.influxDB.backupRetention.resources | nindent 4 }}
   schedule: {{ .Values.influxDB.backupRetention.schedule | quote}}
   startingDeadlineSeconds: {{ .Values.influxDB.backupRetention.startingDeadlineSeconds }}
+  {{- if eq .Values.objectStorage.type "s3" }}
   s3:
     credentialsSecret: influxdb-backup-secret #TODO: use influxdb.fullname from _helpers.tpl instead hardcoded "influxdb"
     bucketName: {{ .Values.objectStorage.buckets.influxDB }}
     endpointUrl: {{ .Values.objectStorage.s3.regionEndpoint }}
+  {{- end }}
