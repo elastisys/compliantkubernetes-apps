@@ -77,6 +77,7 @@ One can now for example configure:
   - Tolerations, affinity, nodeSelecor, and resources for most components
   - Additional opendistro security roles, ISM policies, and index templates
 - OIDC is now enabled by default for elasticsearch and kibana when using the prod flavor
+- Updated user grafana chart to 6.1.11 and app version to 7.3.3
 
 ### Fixed
 
