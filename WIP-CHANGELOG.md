@@ -39,6 +39,7 @@ The following options has been removed or replaced
 - `elasticsearch.retention.kubernetesAge` replaced by `elasticsearch.retention.kubernetesAgeDays`
 - `elasticsearch.retention.otherSize` replaced by `elasticsearch.retention.otherSizeGB`
 - `elasticsearch.retention.otherAge` replaced by `elasticsearch.retention.otherAgeDays`
+- Removed unused config `global.environmentName` and added `global.clusterName` to migrate there's [this script](migration/v0.7.x-v0.8.x/migrate-config.sh)
 
 ### Added
 

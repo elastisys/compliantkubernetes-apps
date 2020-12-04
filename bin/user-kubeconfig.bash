@@ -20,12 +20,10 @@ get_user_server() {
 
 log_info "Creating kubeconfig for the user"
 
-environment_name=$(yq r "${config[config_file_wc]}" 'global.environmentName')
-cloud_provider=$(yq r "${config[config_file_wc]}" 'global.cloudProvider')
+cluster_name=$(yq r "${config[config_file_wc]}" 'global.clusterName')
 base_domain=$(yq r "${config[config_file_wc]}" 'global.baseDomain')
 
 # Get server and certificate from the admin kubeconfig
-cluster_name="${environment_name}_${cloud_provider}"
 user_server=$(get_user_server)
 user_certificate_authority=/tmp/user-authority.pem
 append_trap "rm ${user_certificate_authority}" EXIT

@@ -9,10 +9,6 @@ source "${SCRIPTS_PATH}/../bin/common.bash"
 : "${config[config_file_wc]:?Missing config}"
 : "${secrets[secrets_file]:?Missing secrets}"
 
-environment=$(yq r -e "${config[config_file_wc]}" 'global.environmentName')
-cloud_provider=$(yq r -e "${config[config_file_wc]}" 'global.cloudProvider')
-export CLUSTER_NAME="${environment}_${cloud_provider}"
-
 # Arg for Helmfile to be interactive so that one can decide on which releases
 # to update if changes are found.
 # USE: --interactive, default is not interactive.
