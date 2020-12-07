@@ -297,6 +297,15 @@ elasticsearch:
   # Create default index templates - kubernetes, kubeaudit, and other
   defaultTemplates: true
   additionalTemplates: {}
+  exporter:
+    resources: {}
+    #   requests:
+    #     cpu: 100m
+    #     memory: 128Mi
+    #   limits:
+    #     cpu: 100m
+    #     memory: 128Mi
+    tolerations: []
 
 fluentd:
   resources:

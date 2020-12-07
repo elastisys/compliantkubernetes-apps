@@ -241,7 +241,7 @@ releases:
   labels:
     app: prometheus-elasticsearch-exporter
   chart: prometheus-community/prometheus-elasticsearch-exporter
-  version: 4.0.0
+  version: 4.0.1
   missingFileHandler: Error
   needs:
   - elastic-system/opendistro-es

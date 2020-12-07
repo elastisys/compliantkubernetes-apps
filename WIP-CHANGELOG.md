@@ -60,6 +60,7 @@ See [migrations docs for elasticsearch-exporter](migration/v0.7.x-v0.8.x/migrate
 - Dex configuration to accept groups from Okta as an OIDC provider
 - Added record `cluster.name` in all logs to elasticsearch that matches the cluster setting `global.clusterName`
 - Role mapping from OIDC groups to roles in user grafana
+- Configuration options regarding resources/tolerations for prometheus-elasticsearch-exporter
 
 ### Changed
 
