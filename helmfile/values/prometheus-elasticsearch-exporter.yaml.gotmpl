@@ -54,3 +54,7 @@ prometheusRule:
       severity: critical
     annotations:
       description: Curator failed to remove 'other' logs. Cumulated size is > {{ .Values.elasticsearch.curator.retention.otherSizeGB }} GB
+
+resources: {{- toYaml .Values.elasticsearch.exporter.resources | nindent 2 }}
+
+tolerations: {{- toYaml .Values.elasticsearch.exporter.tolerations | nindent 2 }}
