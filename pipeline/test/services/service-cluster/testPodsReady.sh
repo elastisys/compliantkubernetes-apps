@@ -118,7 +118,7 @@ echo "===================="
 
 statefulsets=(
     "monitoring prometheus-kube-prometheus-stack-prometheus"
-    "monitoring prometheus-wc-scraper-prometheus-instance"
+    "monitoring prometheus-wc-reader-prometheus-instance"
     "monitoring alertmanager-kube-prometheus-stack-alertmanager"
     "influxdb-prometheus influxdb"
     "elastic-system opendistro-es-data"

@@ -39,17 +39,3 @@ scTargets=(
 )
 
 test_targets_retry "svc/kube-prometheus-stack-prometheus" "${scTargets[@]}"
-
-# wc-scraper-prometheus
-# Set variables and array adapted for the service cluster (wc-scraper-prometheus service) and call functions in prometheus-common
-echo
-echo
-echo "Testing wc scraper prometheus"
-echo "============================="
-
-scraperTargets=(
-    "federate-kubelet 1"
-    "federate-others 1"
-)
-
-test_targets_retry "svc/wc-scraper-prometheus-instance" "${scraperTargets[@]}"

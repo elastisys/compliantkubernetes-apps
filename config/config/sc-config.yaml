@@ -132,7 +132,7 @@ prometheus:
   tolerations: []
   affinity: {}
   nodeSelector: {}
-  wcScraper:
+  wcReader:
     resources:
       requests:
         memory: 1Gi
@@ -140,6 +140,11 @@ prometheus:
       limits:
         memory: 2Gi
         cpu: "1"
+    storage:
+      size: 5Gi
+    retention:
+      size: 4GiB
+      age:  3d
     tolerations: []
     affinity: {}
     nodeSelector: {}
@@ -352,7 +357,10 @@ logRetention:
   days: 7
 
 influxDB:
-  user: admin
+  users:
+    admin: admin
+    wcWriter: wcWriter
+    scWriter: scWriter
   createdb: true
   resources:
     requests:
