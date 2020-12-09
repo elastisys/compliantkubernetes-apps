@@ -10,6 +10,7 @@ grafana:
 
 kubeControllerManager:
   enabled: false
+
 kubeScheduler:
   enabled: false
 
@@ -26,6 +27,7 @@ kubeApiServer:
       - action: keep
         sourceLabels: [__name__]
         regex: '(apiserver_request_count|apiserver_request_latencies_bucket|apiserver_client_certificate_expiration_seconds_count|apiserver_request_duration_seconds_sum|apiserver_request_duration_seconds_count|APIServiceRegistrationController_depth)'
+
 kubeEtcd:
   service:
     port: 4001
@@ -34,45 +36,28 @@ kubeEtcd:
 defaultRules:
   create: false
 
-
 prometheus:
   ingress:
-    enabled: true
-    annotations:
-      # type of authentication
-      nginx.ingress.kubernetes.io/auth-type: basic
-      # name of the secret that contains the user/password definitions
-      nginx.ingress.kubernetes.io/auth-secret: prometheus-auth
-      # message to display with an appropriate context why the authentication is required
-      nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
-      cert-manager.io/issuer: {{ .Values.global.issuer }}
-  {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.prometheus }}
-      nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.prometheus }}
-  {{ end }}
-    labels: {}
-    hosts:
-    - prometheus.{{ .Values.global.baseDomain }}
-    paths:
-    - /
-    tls:
-    - secretName: prometheus-general-tls
-      hosts:
-      - prometheus.{{ .Values.global.baseDomain }}
+    enabled: false
 
   prometheusSpec:
     image:
-      tag: v2.19.2
+      tag: v2.23.0
     externalLabels:
-      cluster: workload_cluster
+      cluster: {{ .Values.global.clusterName }}
+
+    remoteWrite:
+    - url: https://influxdb.{{ .Values.global.opsDomain }}/api/v1/prom/write?db=workload_cluster&u={{ .Values.prometheus.remoteWrite.user }}&p={{ .Values.prometheus.remoteWrite.password }}
+      tlsConfig:
+        insecureSkipVerify: {{ not .Values.global.verifyTls }}
 
     # Dont add prometheus labels.
     prometheusExternalLabelNameClear: true
     replicaExternalLabelNameClear: true
 
-    # Empty selector to select all namespaces
+    # Select everything
     serviceMonitorNamespaceSelector:
       matchLabels: {}
-    # Select all service monitors
     serviceMonitorSelector:
       matchLabels: {}
     podMonitorNamespaceSelector:

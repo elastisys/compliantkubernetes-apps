@@ -10,7 +10,7 @@ source "${common_path:?Missing common path}"
 ck8sdash=$(yq r -e "${config[config_file_sc]}" 'ck8sdash.enabled')
 harbor=$(yq r -e "${config[config_file_sc]}" 'harbor.enabled')
 
-issuer_namespaces='dex elastic-system kube-system monitoring'
+issuer_namespaces='dex elastic-system kube-system monitoring influxdb-prometheus'
 [ "$ck8sdash" = "true" ] && issuer_namespaces+=" ck8sdash"
 [ "$harbor" = "true" ] && issuer_namespaces+=" harbor"
 for ns in $issuer_namespaces

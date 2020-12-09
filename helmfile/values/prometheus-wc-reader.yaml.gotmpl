@@ -1,0 +1,65 @@
+prometheusSpec:
+  version: "v2.23.0"
+  alerting:
+    # Use the default alertmanager that comes with prometheus-operator
+    alertmanagers:
+    - name: kube-prometheus-stack-alertmanager
+      namespace: monitoring
+      pathPrefix: /
+      port: web
+
+  resources:    {{- toYaml .Values.prometheus.wcReader.resources | nindent 4  }}
+  nodeSelector: {{- toYaml .Values.prometheus.wcReader.nodeSelector | nindent 4 }}
+  affinity:     {{- toYaml .Values.prometheus.wcReader.affinity | nindent 4 }}
+  tolerations:  {{- toYaml .Values.prometheus.wcReader.tolerations | nindent 4 }}
+
+  ## How long to retain metrics
+  ##
+  retention: {{ .Values.prometheus.wcReader.retention.age }}
+
+  ## Maximum size of metrics
+  ##
+  retentionSize: {{ .Values.prometheus.wcReader.retention.size }}
+
+  ## Prometheus StorageSpec for persistent data
+  ## ref: https://github.com/coreos/prometheus-operator/blob/release-0.29/Documentation/user-guides/storage.md
+  ##
+  storage:
+    volumeClaimTemplate:
+      spec:
+        storageClassName: {{ .Values.global.storageClass }}
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: {{ .Values.prometheus.wcReader.storage.size }}
+
+  enableAdminAPI: false
+  logFormat: logfmt
+  logLevel: info
+
+  # Disable remote write
+  remoteWrite:
+  remoteRead:
+  - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=workload_cluster&u={{ .Values.influxDB.users.admin }}&p={{ .Values.influxDB.users.adminPassword }}
+    readRecent: true
+
+  replicas: 1
+
+  securityContext:
+    fsGroup: 2000
+    runAsNonRoot: true
+    runAsUser: 1000
+
+  serviceAccountName: kube-prometheus-stack-prometheus
+
+  serviceMonitorSelector:
+    matchLabels:
+      target: none  # so that operator wont generate new config
+  ruleNamespaceSelector: {}
+  ruleSelector:
+    matchLabels:
+      cluster: workload
+
+  # Don't add prometheus info.
+  prometheusExternalLabelName: ""
+  replicaExternalLabelName: ""

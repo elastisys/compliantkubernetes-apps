@@ -198,7 +198,7 @@ grafana:
     isDefault: false
     orgId: 1
     type: prometheus
-    url: http://wc-scraper-prometheus-instance:9090
+    url: http://wc-reader-prometheus-instance:9090
     version: 1
   - name: prometheus-sc
     access: proxy
@@ -233,7 +233,7 @@ defaultRules:
 prometheus:
   prometheusSpec:
     image:
-      tag: v2.19.2
+      tag: v2.23.0
     resources: {{- toYaml .Values.prometheus.resources | nindent 8  }}
     nodeSelector: {{- toYaml .Values.prometheus.nodeSelector | nindent 8 }}
     affinity: {{- toYaml .Values.prometheus.affinity | nindent 8 }}
@@ -241,9 +241,9 @@ prometheus:
 
 
     remoteRead:
-    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u=admin&p={{ .Values.influxDB.password }}
+    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u={{ .Values.influxDB.users.admin }}&p={{ .Values.influxDB.users.adminPassword }}
     remoteWrite:
-    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=service_cluster&u=admin&p={{ .Values.influxDB.password }}
+    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=service_cluster&u={{ .Values.influxDB.users.scWriter }}&p={{ .Values.influxDB.users.scWriterPassword }}
 
     # Don't add prometheus info.
     prometheusExternalLabelNameClear: true

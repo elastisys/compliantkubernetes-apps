@@ -5,8 +5,12 @@
 {{ end }}
 {{ end }}
 elastisys_custom:
-  influxdb_user: {{ .Values.influxDB.user }}
-  influxdb_password: {{ .Values.influxDB.password }}
+  influxdbAdminUser: {{ .Values.influxDB.users.admin }}
+  influxdbAdminPassword: {{ .Values.influxDB.users.adminPassword }}
+  influxdbWCWriterUser: {{ .Values.influxDB.users.wcWriter }}
+  influxdbWCWriterPassword: {{ .Values.influxDB.users.wcWriterPassword }}
+  influxdbSCWriterUser: {{ .Values.influxDB.users.scWriter }}
+  influxdbSCWriterPassword: {{ .Values.influxDB.users.scWriterPassword }}
   s3_credentials: |+
   {{- if eq .Values.objectStorage.type "s3" }}
     [default]
@@ -56,12 +60,32 @@ env:
   valueFrom:
     secretKeyRef:
       name: influxdb-auth
-      key: INFLUXDB_USER
+      key: INFLUXDB_ADMIN_USER
 - name: INFLUXDB_ADMIN_PASSWORD
   valueFrom:
     secretKeyRef:
       name: influxdb-auth
-      key: INFLUXDB_PWD
+      key: INFLUXDB_ADMIN_PWD
+- name: INFLUXDB_WCWRITER_USER
+  valueFrom:
+    secretKeyRef:
+      name: influxdb-auth
+      key: INFLUXDB_WCWRITER_USER
+- name: INFLUXDB_WCWRITER_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: influxdb-auth
+      key: INFLUXDB_WCWRITER_PWD
+- name: INFLUXDB_SCWRITER_USER
+  valueFrom:
+    secretKeyRef:
+      name: influxdb-auth
+      key: INFLUXDB_SCWRITER_USER
+- name: INFLUXDB_SCWRITER_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: influxdb-auth
+      key: INFLUXDB_SCWRITER_PWD
 
 config:
   data:
@@ -75,12 +99,30 @@ nodeSelector: {{- toYaml .Values.influxDB.nodeSelector | nindent 2 }}
 affinity:     {{- toYaml .Values.influxDB.affinity | nindent 2  }}
 tolerations:  {{- toYaml .Values.influxDB.tolerations | nindent 2 }}
 
+ingress:
+  enabled: true
+  tls: true
+  annotations:
+    cert-manager.io/issuer: {{ .Values.global.issuer }}
+  secretName: influxdb-ingress-cert
+  hostname: influxdb.{{ .Values.global.opsDomain }}
+
 initScripts:
-  enabled: {{ .Values.influxDB.createdb }}
+  enabled: true
   scripts:
-    init.iql: |+
-      CREATE DATABASE "service_cluster" WITH DURATION {{ .Values.influxDB.retention.durationSC }} REPLICATION 1 NAME service_cluster_rp;
-      CREATE DATABASE "workload_cluster" WITH DURATION {{ .Values.influxDB.retention.durationWC }} REPLICATION 1 NAME workload_cluster_rp;
+    init.iql:
+    {{- if .Values.influxDB.createdb }}
+    createdb.iql: |+
+      CREATE DATABASE "service_cluster" WITH DURATION {{ .Values.influxDB.retention.durationSC }} REPLICATION 1 NAME service_cluster_rp
+      CREATE DATABASE "workload_cluster" WITH DURATION {{ .Values.influxDB.retention.durationWC }} REPLICATION 1 NAME workload_cluster_rp
+    {{- end }}
+    createusers.sh: |+
+      influx -username ${INFLUXDB_ADMIN_USER} -password ${INFLUXDB_ADMIN_PASSWORD} -execute "CREATE USER ${INFLUXDB_WCWRITER_USER} WITH PASSWORD '${INFLUXDB_WCWRITER_PASSWORD}'"
+      influx -username ${INFLUXDB_ADMIN_USER} -password ${INFLUXDB_ADMIN_PASSWORD} -execute "CREATE USER ${INFLUXDB_SCWRITER_USER} WITH PASSWORD '${INFLUXDB_SCWRITER_PASSWORD}'"
+    {{- if .Values.influxDB.createdb }}
+      influx -username ${INFLUXDB_ADMIN_USER} -password ${INFLUXDB_ADMIN_PASSWORD} -execute "GRANT WRITE ON "workload_cluster" TO "${INFLUXDB_WCWRITER_USER}""
+      influx -username ${INFLUXDB_ADMIN_USER} -password ${INFLUXDB_ADMIN_PASSWORD} -execute "GRANT WRITE ON "service_cluster" TO "${INFLUXDB_SCWRITER_USER}""
+    {{- end }}
 
 extraContainers:
   - name: influxdb-node-exporter

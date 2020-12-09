@@ -61,6 +61,9 @@ falco:
     # if type=slack falco.alerts.slackWebhook must be set in the secrets yaml file
 
 prometheus:
+  remoteWrite:
+    # Same as 'influxDB.users.wcWriter'.
+    user: wcWriter
   storage:
     size: 5Gi
   retention:
@@ -159,7 +162,6 @@ externalTrafficPolicy:
   whitelistRange:
     global: "0.0.0.0/0"
     ck8sdash: false
-    prometheus: false
 
 nfsProvisioner:
   resources:

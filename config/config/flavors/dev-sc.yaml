@@ -11,6 +11,12 @@ prometheus:
   retention:
     size: 1GiB
     age:  3d
+  wcReader:
+    storage:
+      size: 2Gi
+    retention:
+      size: 1GiB
+      age:  3d
 
 elasticsearch:
   masterNode:

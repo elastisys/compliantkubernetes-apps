@@ -168,6 +168,9 @@ releases:
   values:
   - values/dex.yaml.gotmpl
 
+#
+# To be removed.
+#
 # Prometheus-instance for scraping workload cluster metrics
 - name: wc-scraper
   namespace: monitoring
@@ -175,10 +178,29 @@ releases:
     app: wc-scraper
   chart: ./charts/prometheus-instance
   version: 0.1.0
+  installed: false
   missingFileHandler: Error
   values:
   - values/prometheus-wc-federate-scraper.yaml.gotmpl
 
+#
+# To be removed
+#
+# Basic auth credentials for accessing workload cluster prometheus
+- name: prometheus-auth
+  namespace: monitoring
+  labels:
+    app: prometheus-auth
+  chart: ./charts/basic-auth-secret
+  version: 0.1.0
+  installed: false
+  missingFileHandler: Error
+  values:
+  - values/prometheus-auth.yaml.gotmpl
+
+#
+# To be removed
+#
 # prometheus wc-scraper alerts
 - name: wc-scraper-alerts
   namespace: monitoring
@@ -187,10 +209,38 @@ releases:
     prometheus: wc-scraper
   chart: ./charts/prometheus-alerts
   version: 0.1.0
+  installed: false
   missingFileHandler: Error
   values:
 {{ if eq .Environment.Name "service_cluster" }}
   # Note: we want to have alerts for WC since this is wc-scraper, even if it is
+  # running in SC.
+  - values/prometheus-alerts-wc.yaml.gotmpl
+{{ end }}
+
+# Prometheus-instance for reader workload cluster metrics from InfluxDB
+- name: wc-reader
+  namespace: monitoring
+  labels:
+    app: prometheus-wc-reader
+  chart: ./charts/prometheus-instance
+  version: 0.1.0
+  missingFileHandler: Error
+  values:
+  - values/prometheus-wc-reader.yaml.gotmpl
+
+# prometheus wc-reader alerts
+- name: wc-reader-alerts
+  namespace: monitoring
+  labels:
+    app: prometheus-alerts
+    prometheus: wc-reader
+  chart: ./charts/prometheus-alerts
+  version: 0.1.0
+  missingFileHandler: Error
+  values:
+{{ if eq .Environment.Name "service_cluster" }}
+  # Note: we want to have alerts for WC since this is wc-reader, even if it is
   # running in SC.
   - values/prometheus-alerts-wc.yaml.gotmpl
 {{ end }}
@@ -335,7 +385,7 @@ releases:
   labels:
     app: influxdb
   chart: elastisys/influxdb
-  version: 4.8.10
+  version: 4.8.11
   missingFileHandler: Error
   values:
   - values/influxdb.yaml.gotmpl
@@ -429,17 +479,6 @@ releases:
   missingFileHandler: Error
   values:
     - values/falco-exporter.yaml.gotmpl
-
-#Basic auth credentials for accessing workload cluster prometheus
-- name: prometheus-auth
-  namespace: monitoring
-  labels:
-    app: prometheus-auth
-  chart: ./charts/basic-auth-secret
-  version: 0.1.0
-  missingFileHandler: Error
-  values:
-  - values/prometheus-auth.yaml.gotmpl
 
 - name: user-alertmanager
   namespace: {{ .Values.user.alertmanager.namespace | default "monitoring" }}
