@@ -34,7 +34,7 @@ es_admin_pwd=$(pushd "${CK8S_CONFIG_PATH}" > /dev/null && sops exec-file secrets
 es_url="https://elastic.$(yq r ${CK8S_CONFIG_PATH}/sc-config.yaml global.opsDomain)"
 
 # Remove old legacy index templates
-curl -u "admin:${es_admin_pwd}" -k -X DELETE "${es_url}/_template/kubernetes
-curl -u "admin:${es_admin_pwd}" -k -X DELETE "${es_url}/_template/other
-curl -u "admin:${es_admin_pwd}" -k -X DELETE "${es_url}/_template/kubeaudit
+curl -u "admin:${es_admin_pwd}" -k -X DELETE "${es_url}/_template/kubernetes"
+curl -u "admin:${es_admin_pwd}" -k -X DELETE "${es_url}/_template/other"
+curl -u "admin:${es_admin_pwd}" -k -X DELETE "${es_url}/_template/kubeaudit"
 ```
