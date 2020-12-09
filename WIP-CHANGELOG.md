@@ -71,7 +71,7 @@ The following options has been removed or replaced
 - Dex chart updated to v2.15.2
 - The issuer for the user-alertmanager ingress is now taken from `global.issuer`.
 - The `stable/prometheus-operator` helm chart has been replaced by `prometheus-community/kube-prometheus-stack`
-- InfluxDB helm chart upgraded to `4.8.9`
+- InfluxDB helm chart upgraded to `4.8.10`
 - Rework of the InfluxDB configuration.
 - The sized based retention for InfluxDB has been lowered in the dev flavor.
 - Bump opendistro helm chart to `1.10.4`.
