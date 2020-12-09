@@ -4,4 +4,4 @@ ingress:
   issuer: {{ .Values.global.issuer }}
 basic_auth:
   username: alertmanager
-  password: {{ .Values.user.prometheusPassword }}
+  password: {{ .Values.user.alertmanagerPassword }}

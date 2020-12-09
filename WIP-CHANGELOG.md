@@ -29,17 +29,19 @@ The following options has been removed or replaced
 See [upgrade docs for opendistro](migration/v0.7.x-v0.8.x/opendistro.md) for instructions for the upgrade.
 Upon init new default values will be added to your config, please update them to match your old values.
 The following options has been removed or replaced
-- `elasticsearch.tolerations` removed
-- `elasticsearch.nodeSelector` removed
-- `elasticsearch.affinity` removed
-- `elasticsearch.storageClass` replaced by `elasticsearch.dataNode.storageClass`
-- `elasticsearch.retention.kubeAuditSize` replaced by `elasticsearch.retention.kubeAuditSizeGB`
-- `elasticsearch.retention.kubeAuditAge` replaced by `elasticsearch.retention.kubeAuditAgeDays`
-- `elasticsearch.retention.kubernetesSize` replaced by `elasticsearch.retention.kubernetesSizeGB`
-- `elasticsearch.retention.kubernetesAge` replaced by `elasticsearch.retention.kubernetesAgeDays`
-- `elasticsearch.retention.otherSize` replaced by `elasticsearch.retention.otherSizeGB`
-- `elasticsearch.retention.otherAge` replaced by `elasticsearch.retention.otherAgeDays`
+  - `elasticsearch.tolerations` removed
+  - `elasticsearch.nodeSelector` removed
+  - `elasticsearch.affinity` removed
+  - `elasticsearch.storageClass` replaced by `elasticsearch.dataNode.storageClass`
+  - `elasticsearch.retention.kubeAuditSize` replaced by `elasticsearch.retention.kubeAuditSizeGB`
+  - `elasticsearch.retention.kubeAuditAge` replaced by `elasticsearch.retention.kubeAuditAgeDays`
+  - `elasticsearch.retention.kubernetesSize` replaced by `elasticsearch.retention.kubernetesSizeGB`
+  - `elasticsearch.retention.kubernetesAge` replaced by `elasticsearch.retention.kubernetesAgeDays`
+  - `elasticsearch.retention.otherSize` replaced by `elasticsearch.retention.otherSizeGB`
+  - `elasticsearch.retention.otherAge` replaced by `elasticsearch.retention.otherAgeDays`
 - Removed unused config `global.environmentName` and added `global.clusterName` to migrate there's [this script](migration/v0.7.x-v0.8.x/migrate-config.sh)
+- To udate the password for `user-alertmanager` you'll have to re-install the chart
+  `./bin/ck8s ops helmfile wc -l app=user-alertmanager destroy && ./bin/ck8s ops helmfile wc -l app=user-alertmanager apply`
 
 ### Added
 
@@ -88,6 +90,7 @@ One can now for example configure:
 - The wc fluentd tolerations and nodeSelector configuration options are now only specified in the configuration file.
 - Helmfile install error on `user-alertmanager` when `user.alertmanager.enabled: true`.
 - The wrong job name being used for the alertmanager rules in wc when `user.alertmanager.enabled: true`.
+- Wrong password being used for user-alertmanager.
 
 ### Removed
 
