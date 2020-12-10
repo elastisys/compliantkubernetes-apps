@@ -137,6 +137,7 @@ Assuming you already have everything needed to install the apps, this is what yo
    ```
 
 4. Edit the configuration files that have been initialized in the configuration path.
+   Make sure that the `objectStorage` values are set in `sc-config.yaml`, `wc-config.yaml` and `secrets.yaml` according to your `objectStorage.type` (so `objectStorage.s3.*` if you are using s3 or `objectStorage.gcs.*` if you are using gcs.)
 
 5. OBS! for this step each cluster need to be up and running already.
    Deploy the apps:
