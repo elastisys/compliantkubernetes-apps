@@ -1,10 +1,10 @@
 ### Release notes
 
-- Removed unused config `global.environmentName` and added `global.clusterName` to migrate there's [this script](migration/v0.7.x-v0.8.x/migrate-config.sh)
+- Removed unused config `global.environmentName` and added `global.clusterName` to migrate there's [this script](migration/v0.8.x-v0.9.x/migrate-config.sh)
 - To udate the password for `user-alertmanager` you'll have to re-install the chart
   `./bin/ck8s ops helmfile wc -l app=user-alertmanager destroy && ./bin/ck8s ops helmfile wc -l app=user-alertmanager apply`
 - With the replacement of the helm chart `stable/elasticsearch-exporter` to `prometheus-community/prometheus-elasticsearch-exporter`, it is required to manually execute some steps to upgrade.
-See [migrations docs for elasticsearch-exporter](migration/v0.7.x-v0.8.x/migrate-elasticsearch-exporter.md) for instructions on how to perform the upgrade.
+See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate-elasticsearch-exporter.md) for instructions on how to perform the upgrade.
 - Configuration regarding backups (in general) and harbor storage have been changed and requires running init again. If `harbor.persistence.type` equals `s3` or `gcs` in your config you must update it to `objectStorage`.
 
 ### Added
