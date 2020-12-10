@@ -1,44 +1,23 @@
 ### Release notes
 
-- Configuration for harbor and cert-manager has been changed and requires running init and apply again.
-- Configuration for velero has been changed and requires running init again.
+**Note:** This upgrade will cause disruptions in some services, including the ingress controller!
+See [the complete migration guide for all details](migration/v0.7.x-v0.8.x/migrate-apps.md).
+
+You may get warnings about missing values for some fluentd options in the Workload cluster.
+This can be disregarded.
+
 - Helm has been upgraded to v3.4.1. Please upgrade the local binary.
 - The Helm repository `stable` has changed URL and has to be changed manually:
   `helm repo add "stable" "https://charts.helm.sh/stable" --force-update`
 - The blackbox chart has a changed dependency URL and has to be updated manually:
   `cd helmfile/charts/blackbox && helm dependency update`
-- With the replacement of the helm chart `stable/nginx-ingress` to `ingress-nginx/ingress-nginx`, it is required to manually execute some steps to upgrade.
-See [migrations docs for nginx](migration/v0.7.x-v0.8.x/nginx.md) for instruction on how to perform the upgrade.
-- The config option `nginxIngress.controller.daemonset.useHostPort` has been replaced by `ingressNginx.controller.useHostPort`.
-Make sure to remove the old option from your config when upgrading.
-- Move useRegionEndpoint from elasticsearch to fluentd in sc-config.yaml before upgrading.
-- The workload cluster config option `prometheus.retention.alertManager` has been removed.
-Make sure to remove the option from your config when upgrading.
-- With the replacement of the helm chart `stable/prometheus-operator` to `prometheus-community/kube-prometheus-stack`, it is required to manually execute some steps to upgrade.
-See [migrations docs for prometheus-operator](migration/v0.7.x-v0.8.x/migrate-prometheus-operator.md) for instructions on how to perform the upgrade.
-- Migrate existing config to the new object storage config by running the script `migration/v0.7.x-v0.8.x/migrate-object-storage.sh`
-- The configuration for InfluxDB has been changed and requires running init again.
-Upon init new default values will be added to your config, please update them to match your old values.
-The following options has been removed or replaced
-  - `influxDB.address` removed
-  - `influxDB.metrics.sizeWc` replaced by `influxDB.retention.sizeWC`
-  - `influxDB.metrics.sizeSc` replaced by `influxDB.retention.sizeSC`
-  - `influxDB.retention.ageWc` replaced by `influxDB.retention.durationWC`
-  - `influxDB.retention.ageSc` replaced by `influxDB.retention.durationSC`
-- The config for opendistro has been changed and requires running init again.
-See [upgrade docs for opendistro](migration/v0.7.x-v0.8.x/opendistro.md) for instructions for the upgrade.
-Upon init new default values will be added to your config, please update them to match your old values.
-The following options has been removed or replaced
-- `elasticsearch.tolerations` removed
-- `elasticsearch.nodeSelector` removed
-- `elasticsearch.affinity` removed
-- `elasticsearch.storageClass` replaced by `elasticsearch.dataNode.storageClass`
-- `elasticsearch.retention.kubeAuditSize` replaced by `elasticsearch.retention.kubeAuditSizeGB`
-- `elasticsearch.retention.kubeAuditAge` replaced by `elasticsearch.retention.kubeAuditAgeDays`
-- `elasticsearch.retention.kubernetesSize` replaced by `elasticsearch.retention.kubernetesSizeGB`
-- `elasticsearch.retention.kubernetesAge` replaced by `elasticsearch.retention.kubernetesAgeDays`
-- `elasticsearch.retention.otherSize` replaced by `elasticsearch.retention.otherSizeGB`
-- `elasticsearch.retention.otherAge` replaced by `elasticsearch.retention.otherAgeDays`
+- Configuration changes requires running init again to get new default values.
+- Run the following migration script to update the object storage configuration: `migration/v0.7.x-v0.8.x/migrate-object-storage.sh`
+- Some configuration options must be manually updated.
+  See [the complete migration guide for all details](migration/v0.7.x-v0.8.x/migrate-apps.md)
+- A few applications require additional steps.
+  See [the complete migration guide for all details](migration/v0.7.x-v0.8.x/migrate-apps.md)
+
 
 ### Added
 
