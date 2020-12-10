@@ -63,6 +63,7 @@ One can now for example configure:
 - The wc fluentd tolerations and nodeSelector configuration options are now only specified in the configuration file.
 - Helmfile install error on `user-alertmanager` when `user.alertmanager.enabled: true`.
 - The wrong job name being used for the alertmanager rules in wc when `user.alertmanager.enabled: true`.
+- Commented lines in `secrets.yaml`, showing which `objectStorage` values need to be set, now appear when running `ck8s init`.
 
 ### Removed
 
