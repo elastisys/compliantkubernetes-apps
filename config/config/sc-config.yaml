@@ -188,7 +188,7 @@ elasticsearch:
     subject_key: email
     # Where to find roles
     roles_key: groups
-    # Scope
+    # Scope - add 'groups' if groups claim is supported
     scope: "openid profile email"
   masterNode:
     count: 1
@@ -310,6 +310,18 @@ elasticsearch:
   #   definition:
   #    users:
   #      - "Developer Name"
+  #  - mapping_name: kibana_user
+  #    definition:
+  #      backend_roles:
+  #        - "kibana_dev"
+  #  - mapping_name: kubernetes_log_reader
+  #    definition:
+  #      backend_roles:
+  #        - "kibana_dev"
+  #  - mapping_name: all_access
+  #    definition:
+  #      backend_roles:
+  #        - "kibana_admin"
   overwriteTemplates: true
   # Create default index templates - kubernetes, kubeaudit, and other
   defaultTemplates: true
