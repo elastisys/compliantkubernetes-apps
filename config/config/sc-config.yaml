@@ -102,6 +102,10 @@ harbor:
   persistence:
     type: "set-me"
     disableRedirect: set-me
+  oidc:
+    #group claim name used by OIDC Provider
+    groupClaimName: "set-me"
+    scope: openid,email,profile,offline_access,groups
 
 prometheus:
   storage:

@@ -3,3 +3,5 @@ oidc:
   clientSecret: {{ .Values.harbor.clientSecret }}
   endpoint: "https://dex.{{ .Values.global.baseDomain }}"
   verifyCert: {{ .Values.global.verifyTls }}
+  groupClaimName: {{ .Values.harbor.oidc.groupClaimName }}
+  scope: {{ .Values.harbor.oidc.scope }}
