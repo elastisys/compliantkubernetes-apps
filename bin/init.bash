@@ -246,26 +246,27 @@ set_harbor_config() {
 # Usage: generate_secrets <config-file>
 generate_secrets() {
     if [[ $# -ne 1 ]]; then
-        log_error "ERROR: number of args in generates_secrets must be 1. #=[$#]"
+        log_error "ERROR: number of args in generate_secrets must be 1. #=[$#]"
         exit 1
     fi
     file=$1
-    if [[ -f $file ]]; then
-        sops_decrypt "$file"
-        yq merge --inplace "$file" "${config_defaults_path}/secrets/sc-secrets.yaml"
-    else
-        cat "${config_defaults_path}/secrets/sc-secrets.yaml" > "$file"
-    fi
-    yq merge --inplace "$file" "${config_defaults_path}/secrets/wc-secrets.yaml"
-    case ${CK8S_CLOUD_PROVIDER} in
+    tmpfile=$(mktemp)
+    append_trap "rm $tmpfile" EXIT
 
+    cat "${config_defaults_path}/secrets/sc-secrets.yaml" > "$tmpfile"
+    yq merge --inplace "$tmpfile" "${config_defaults_path}/secrets/wc-secrets.yaml"
+    case ${CK8S_CLOUD_PROVIDER} in
         citycloud)
           cloud_file="${config_defaults_path}/secrets/citycloud.yaml"
-          yq merge --inplace "$file" "$cloud_file"
+          yq merge --inplace "$tmpfile" "$cloud_file"
           ;;
-
     esac
+    if [[ -f $file ]]; then
+        sops_decrypt "$file"
+        yq merge "$tmpfile" "$file" --inplace -a=overwrite --overwrite --prettyPrint
+    fi
 
+    cat "$tmpfile" > "$file"
     sops_encrypt "$file"
 }
 
