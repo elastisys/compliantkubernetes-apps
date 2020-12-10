@@ -88,6 +88,7 @@ One can now for example configure:
 - OIDC is now enabled by default for elasticsearch and kibana when using the prod flavor
 - Updated user grafana chart to 6.1.11 and app version to 7.3.3
 - The `stable/elasticsearch-exporter` helm chart has been replaced by `prometheus-community/prometheus-elasticsearch-exporter`
+- OIDC group claims added to Harbor
 
 ### Fixed
 

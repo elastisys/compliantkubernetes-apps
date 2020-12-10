@@ -59,8 +59,8 @@ data:
               \"oidc_name\": \"dex\",
               \"oidc_client_id\": \"harbor\",
               \"oidc_endpoint\": \"{{ .Values.oidc.endpoint }}\",
-              \"oidc_client_secret\": \"${OIDC_CLIENT_SECRET}\"}")
-
+              \"oidc_client_secret\": \"${OIDC_CLIENT_SECRET}\",
+              \"oidc_groups_claim\": \"{{ .Values.oidc.groupClaimName }}\"}")
       if [ -n "$err" ]
       then
         echo "ERROR when configuring oidc: $err"
