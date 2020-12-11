@@ -45,3 +45,4 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
 
 - Release `prometheus-auth` has been removed.
 - Helm chart `basic-auth-secret` has been removed.
+- Unused config option `dnsPrefix`.
