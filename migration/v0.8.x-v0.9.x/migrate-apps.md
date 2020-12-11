@@ -9,6 +9,7 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
   - Remove
     - `user.prometheusPassword`
     - `externalTrafficPolicy.whitelistRange.prometheus`
+    - `global.dnsPrefix`
   - Replace
     - `influxDB.user` -> `influxDB.users.adminUser`
     - `influxDB.password` -> `influxDB.users.adminPassword`

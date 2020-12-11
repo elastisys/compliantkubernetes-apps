@@ -2,7 +2,6 @@ global:
   ck8sVersion: ${CK8S_VERSION}
   cloudProvider: ${CK8S_CLOUD_PROVIDER}
   clusterName: ${CK8S_ENVIRONMENT_NAME}-sc
-  dnsPrefix: ${CK8S_ENVIRONMENT_NAME}
   baseDomain: "set-me"
   opsDomain: "set-me"
   issuer: letsencrypt-staging
