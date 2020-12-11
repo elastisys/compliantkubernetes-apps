@@ -94,6 +94,7 @@ One can now for example configure:
 - The `stable/elasticsearch-exporter` helm chart has been replaced by `prometheus-community/prometheus-elasticsearch-exporter`
 - OIDC group claims added to Harbor
 - The options `s3` and `gcs` for `harbor.persistence.type` have been replaced with `objectStorage` and will then match the type set in the global object storage configuration.
+- Bump kubectl to v1.18.13
 
 ### Fixed
 

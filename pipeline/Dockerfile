@@ -12,7 +12,7 @@ RUN  apt-get update && \
      rm -rf /var/lib/apt/lists/*
 
 # Kubectl
-ENV KUBECTL_VERSION "v1.17.11"
+ENV KUBECTL_VERSION "v1.18.13"
 RUN wget "https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/kubectl
