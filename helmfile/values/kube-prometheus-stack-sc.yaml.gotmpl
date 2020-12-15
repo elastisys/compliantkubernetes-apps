@@ -233,7 +233,7 @@ defaultRules:
 prometheus:
   prometheusSpec:
     image:
-      tag: v2.23.0
+      tag: v2.19.1
     resources: {{- toYaml .Values.prometheus.resources | nindent 8  }}
     nodeSelector: {{- toYaml .Values.prometheus.nodeSelector | nindent 8 }}
     affinity: {{- toYaml .Values.prometheus.affinity | nindent 8 }}
