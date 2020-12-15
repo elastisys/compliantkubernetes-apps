@@ -6,6 +6,8 @@ namespaces:
 - name: kube-node-lease
 - name: kube-public
 - name: kube-system
+  labels:
+    control-plane: "true"
 - name: monitoring
 - name: ingress-nginx
 - name: velero
@@ -15,6 +17,8 @@ namespaces:
 {{ if .Values.opa.enabled }}
 - name: gatekeeper
 - name: gatekeeper-system
+  labels:
+    control-plane: "true"
 {{ end }}
 commonLabels:
   owner: operator
