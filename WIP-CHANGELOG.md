@@ -29,7 +29,6 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
 - OIDC group claims added to Harbor
 - The options `s3` and `gcs` for `harbor.persistence.type` have been replaced with `objectStorage` and will then match the type set in the global object storage configuration.
 - Bump kubectl to v1.18.13
-- Prometheus upgraded to 2.23.0.
 - InfluxDB is now exposed via ingress.
 - Prometheus in workload cluster now pushes metrics directly to InfluxDB.
 - The prometheus release `wc-scraper` has been renamed to `wc-reader`.
