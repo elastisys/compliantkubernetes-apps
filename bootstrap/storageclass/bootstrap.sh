@@ -20,7 +20,7 @@ esac
 storageClass=$(yq r -e "${config_file}" 'global.storageClass')
 
 cloud_provider=$(yq r -e "${config_file}" 'global.cloudProvider')
-if [ "${cloud_provider}" = "exoscale" ]
+if [ "${cloud_provider}" == "exoscale" ]
 then
     NFS_SC_SERVER_IP=$(jq -r '.service_cluster.nfs_ip_addresses.nfs.private_ip' < "${config[infrastructure_file]}")
     export NFS_SC_SERVER_IP
@@ -29,6 +29,6 @@ then
 fi
 
 install_storage_class_provider "${storageClass}" "${environment}"
-if [ "${environment}" = service_cluster ]; then
+if [ "${environment}" == service_cluster ]; then
     install_storage_class_provider "${elasticStorageClass}" service_cluster
 fi
