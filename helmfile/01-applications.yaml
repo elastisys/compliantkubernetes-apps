@@ -79,7 +79,7 @@ releases:
   labels:
     app: kube-prometheus-stack
   chart: prometheus-community/kube-prometheus-stack
-  version: 11.0.4
+  version: 12.8.0
   missingFileHandler: Error
   needs:
   - cert-manager/cert-manager

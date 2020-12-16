@@ -34,6 +34,7 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
 - The prometheus release `wc-scraper` has been renamed to `wc-reader`.
   Now wc-reader only reads from the workload_cluster database in InfluxDB.
 - InfluxDB helm chart upgraded to `4.8.11`.
+- `kube-prometheus-stack` updated to version `12.8.0`.
 
 ### Fixed
 
