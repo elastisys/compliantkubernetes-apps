@@ -36,6 +36,7 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
   Now wc-reader only reads from the workload_cluster database in InfluxDB.
 - InfluxDB helm chart upgraded to `4.8.11`.
 - `kube-prometheus-stack` updated to version `12.8.0`.
+- Bump prometheus to `2.23.0`.
 
 ### Fixed
 
