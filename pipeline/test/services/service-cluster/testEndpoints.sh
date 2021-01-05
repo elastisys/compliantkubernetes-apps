@@ -24,6 +24,7 @@ if [ "$enable_harbor" == true ]; then
 fi
 
 testEndpoint Grafana "https://grafana.${ops_domain}/"
+testEndpoint InfluxDB "https://influxdb.${ops_domain}/health"
 
 if [ "$enable_ck8sdash" == true ]; then
     testEndpoint ck8sdash "https://ck8sdash.${ops_domain}/"
