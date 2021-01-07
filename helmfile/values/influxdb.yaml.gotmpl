@@ -173,7 +173,7 @@ backup:
   resources: {{- toYaml .Values.influxDB.backup.resources | nindent 4 }}
   persistence:
     enabled: true
-    storageClass: {{ .Values.global.storageClass }}
+    storageClass: {{ .Values.storageClasses.default }}
     accessMode: ReadWriteOnce
     size: {{ add .Values.influxDB.retention.sizeWC .Values.influxDB.retention.sizeSC -}}Ki # the sum of influxDB.metrics.sizeWc and influxDB.metrics.sizeWc (all values in KB)
   schedule: {{ .Values.influxDB.backup.schedule | quote }}

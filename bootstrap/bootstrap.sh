@@ -5,7 +5,7 @@
 set -euo pipefail
 
 : "${bootstrap_path:?Missing bootstrap path}"
-environment=$1
+environment="${1}"
 export storageclass_path="${bootstrap_path}/storageclass"
 export namespaces_path="${bootstrap_path}/namespaces"
 export issuers_path="${bootstrap_path}/issuers"

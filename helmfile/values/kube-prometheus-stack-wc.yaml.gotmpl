@@ -97,21 +97,21 @@ prometheus:
     storageSpec:
       volumeClaimTemplate:
         spec:
-          storageClassName: {{ .Values.global.storageClass }}
+          storageClassName: {{ .Values.storageClasses.default }}
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
               storage: {{ .Values.prometheus.storage.size }}
 
     additionalScrapeConfigs:
-    {{ if eq .Values.global.storageClass "nfs-client"  }}
+    {{ if .Values.storageClasses.nfs.enabled }}
     - job_name: 'node-exporter'
       scrape_interval: 30s
       metrics_path: /metrics
       scheme: http
       static_configs:
       - targets:
-        - '{{ .Values.global.nfs_server_ip }}:9100'
+        - '{{ .Values.nfsProvisioner.server }}:9100'
     {{ end }}
 
     {{ if .Values.user.alertmanager.enabled }}

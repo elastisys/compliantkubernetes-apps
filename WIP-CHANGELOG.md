@@ -10,6 +10,7 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
   See [the complete migration guide for all details](migration/v0.8.x-v0.9.x/upgrade-apps.md)
 - A few applications require additional steps.
   See [the complete migration guide for all details](migration/v0.8.x-v0.9.x/upgrade-apps.md)
+- With the removal of `scripts/post-infra-common.sh` you'll now have to, if enabled, manually set the address to the nfs server in `nfsProvisioner.server`
 
 ### Added
 
@@ -40,6 +41,8 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
 - Added example config for Kibana group mapping from an OIDC provider
 - Replaced `kiwigrid/fluentd-elasticsearch` helm chart with `kokuwa/fluentd-elasticsearch`.
 - Replaced `stable/fluentd` helm chart with `bitnami/fluentd`.
+- StorageClasses are now enabled/disabled in the `{wc,sc}-cofig.yaml` files.
+- Mount path and IP/hostname is now configurable in `nfs-client-provisioner`.
 
 ### Fixed
 
@@ -54,3 +57,4 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
   - `fluentd-aggregator`
 - Helm chart `basic-auth-secret` has been removed.
 - Unused config option `dnsPrefix`.
+- Removed `scripts/post-infra-common.sh` file.

@@ -1,12 +1,18 @@
-resources: {{- toYaml .Values.nfsProvisioner.resources | nindent 2  }}
+resources:    {{- toYaml .Values.nfsProvisioner.resources | nindent 2  }}
 nodeSelector: {{- toYaml .Values.nfsProvisioner.nodeSelector | nindent 2 }}
-affinity: {{- toYaml .Values.nfsProvisioner.affinity | nindent 2 }}
-tolerations: {{- toYaml .Values.nfsProvisioner.tolerations | nindent 2 }}
+affinity:     {{- toYaml .Values.nfsProvisioner.affinity | nindent 2 }}
+tolerations:  {{- toYaml .Values.nfsProvisioner.tolerations | nindent 2 }}
 
 storageClass:
+  {{ if eq .Values.storageClasses.default "nfs-client" }}
   defaultClass: true
+  {{ else }}
+  defaultClass: false
+  {{ end }}
+
 serviceAccount:
   name: nfs-client-provisioner
+
 nfs:
-  path: "/nfs"
-  server: {{ .Values.global.nfs_server_ip }}
+  path: {{ .Values.nfsProvisioner.path }}
+  server: {{ .Values.nfsProvisioner.server }}
