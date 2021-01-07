@@ -6,8 +6,21 @@ global:
   opsDomain: "set-me"
   issuer: letsencrypt-staging
   verifyTls: true
-  storageClass: "set-me"
   clusterDns: "10.43.0.10"
+
+storageClasses:
+  # Name of the default storageclass.
+  # Normally one of 'nfs-client', 'cinder-storage', 'local-storage', 'ebs-gp2'.
+  default: "set-me"
+
+  nfs:
+    enabled: null # true | false
+  cinder:
+    enabled: null # true | false
+  local:
+    enabled: null # true | false
+  ebs:
+    enabled: null # true | false
 
 objectStorage:
   # Options are "s3", "gcs", or "none"
@@ -471,6 +484,8 @@ externalTrafficPolicy:
     prometheusWc: false
 
 nfsProvisioner:
+  server: ""
+  path: /nfs
   resources:
     limits:
       cpu: 100m

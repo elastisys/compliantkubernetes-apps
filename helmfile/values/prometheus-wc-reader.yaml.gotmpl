@@ -27,7 +27,7 @@ prometheusSpec:
   storage:
     volumeClaimTemplate:
       spec:
-        storageClassName: {{ .Values.global.storageClass }}
+        storageClassName: {{ .Values.storageClasses.default }}
         accessModes: ["ReadWriteOnce"]
         resources:
           requests:

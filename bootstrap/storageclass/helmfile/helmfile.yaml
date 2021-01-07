@@ -26,6 +26,7 @@ releases:
     app: nfs-client-provisioner
   chart: stable/nfs-client-provisioner
   version: 1.2.6
+  installed: {{ .Values.storageClasses.nfs.enabled }}
   missingFileHandler: Error
   wait: true
   values:
@@ -38,6 +39,7 @@ releases:
     app: local-volume-provisioner
   chart: ./charts/local-volume-provisioner
   version: 2.3.4
+  installed: {{ .Values.storageClasses.local.enabled }}
   missingFileHandler: Info
   values:
   - values/local-volume-provisioner.yaml.gotmpl

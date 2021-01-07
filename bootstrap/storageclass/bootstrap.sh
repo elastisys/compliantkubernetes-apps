@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 
+#
+# Todo: chartify all storageclasses and this "complicated" bootstrap logic
+#       of storageclasses can be reduced to a single "helmfile apply".
+#
+
 set -euo pipefail
 
-environment=$1
+environment="${1}"
 # shellcheck disable=SC1090
 source "${common_path:?Missing common path}"
 # shellcheck disable=SC1090
@@ -11,15 +16,23 @@ source "${storageclass_path:?Missing storageclass path}/scripts/install-storage-
 case ${environment} in
     service_cluster)
         config_file="${config["config_file_sc"]:?Missing service cluster config}"
-        elasticStorageClass=$(yq r -e "${config_file}" 'elasticsearch.dataNode.storageClass')
         ;;
     workload_cluster)
         config_file="${config["config_file_wc"]:?Missing workload cluster config}"
         ;;
 esac
-storageClass=$(yq r -e "${config_file}" 'global.storageClass')
 
-install_storage_class_provider "${storageClass}" "${environment}"
-if [ "${environment}" = service_cluster ]; then
-    install_storage_class_provider "${elasticStorageClass}" service_cluster
-fi
+# Map of storageclasses to storageclassnames
+declare -A storageClasses=(
+    ["nfs"]="nfs-client"
+    ["cinder"]="cinder-storage"
+    ["local"]="local-storage"
+    ["ebs"]="ebs-gp2"
+)
+
+# shellcheck disable=SC2068
+for storageClass in ${!storageClasses[@]}; do
+    if [ "$(yq r -e "${config_file}" 'storageClasses.'"${storageClass}"'.enabled')" = "true" ]; then
+        install_storage_class_provider "${storageClasses[${storageClass}]}" "${environment}"
+    fi
+done

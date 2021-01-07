@@ -65,18 +65,6 @@ replace_set_me(){
 
 }
 
-add_nfs_server_ip()
-{
-  file=$1
-  ip=$2
-
-  if [  "$CK8S_CLOUD_PROVIDER" == "exoscale"  ]
-  then
-    yq  w  -i "$file" global.nfs_server_ip '"set-me"'
-  fi
-
-}
-
 generate_base_sc_config() {
     if [[ $# -ne 1 ]]; then
         log_error "ERROR: number of args in generate_base_sc_config must be 1. #=[$#]"
@@ -96,8 +84,6 @@ generate_base_sc_config() {
     fi
 
     cat "$tmpfile" > "$file"
-
-    add_nfs_server_ip "$file" '.service_cluster.nfs_ip_addresses.nfs.private_ip'
 }
 
 generate_base_wc_config() {
@@ -116,9 +102,6 @@ generate_base_wc_config() {
     fi
 
     cat "$tmpfile" > "$file"
-
-    add_nfs_server_ip "$file" '.workload_cluster.nfs_ip_addresses.nfs.private_ip'
-
 }
 
 # Usage: set_storage_class <config-file>
@@ -133,28 +116,42 @@ set_storage_class() {
         safespring | citycloud)
           storage_class=cinder-storage
           es_storage_class=cinder-storage
+
+          [ "$(yq read "$file" 'storageClasses.cinder.enabled')" = "null" ] &&
+            yq write --inplace "$file" 'storageClasses.cinder.enabled' true
           ;;
 
         exoscale)
           storage_class=nfs-client
           es_storage_class=local-storage
+
+          [ "$(yq read "$file" 'storageClasses.nfs.enabled')" = "null" ] &&
+            yq write --inplace "$file" 'storageClasses.nfs.enabled' true
+          [ "$(yq read "$file" 'storageClasses.local.enabled')" = "null" ] &&
+            yq write --inplace "$file" 'storageClasses.local.enabled' true
           ;;
 
         aws)
           storage_class=ebs-gp2
           es_storage_class=ebs-gp2
+
+          [ "$(yq read "$file" 'storageClasses.ebs.enabled')" = "null" ] &&
+            yq write --inplace "$file" 'storageClasses.ebs.enabled' true
           ;;
 
         baremetal)
-	  storage_class=node-local
-	  es_storage_class=node-local
-	  ;;
-
+          storage_class=node-local
+          es_storage_class=node-local
+          [ "$(yq read "$file" 'storageClasses.local.enabled')" = "null" ] &&
+            yq write --inplace "$file" 'storageClasses.local.enabled' true
+          ;;
     esac
-    replace_set_me "$1" 'global.storageClass' "$storage_class"
+
+    replace_set_me "$1" 'storageClasses.default' "$storage_class"
+
     # Only write if field exists already
     if yq read --exitStatus "$file" 'elasticsearch.dataNode.storageClass' > /dev/null 2> /dev/null; then
-       yq write --inplace "$file" 'elasticsearch.dataNode.storageClass' "$es_storage_class"
+        yq write --inplace "$file" 'elasticsearch.dataNode.storageClass' "$es_storage_class"
     fi
 }
 
@@ -254,7 +251,7 @@ set_harbor_config() {
 
         baremetal)
           persistence_type=objectStorage
-	  disable_redirect=false
+	      disable_redirect=false
 	  ;;
 
     esac

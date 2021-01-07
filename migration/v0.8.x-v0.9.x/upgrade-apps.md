@@ -11,6 +11,7 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
     - `externalTrafficPolicy.whitelistRange.prometheus`
     - `global.dnsPrefix`
   - Replace in `sc-config.yaml`
+    - `global.storageClass` -> `storageClasses.default`
     - `influxDB.user`     -> `influxDB.users.adminUser`
     - `influxDB.password` -> `influxDB.users.adminPassword`
     - `fluentd.resources`         -> `fluentd.forwarder.resources`
@@ -18,6 +19,11 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
     - `fluentd.affinity`          -> `fluentd.forwarder.affinity`
     - `fluentd.nodeSelector`      -> `fluentd.forwarder.nodeSelector`
     - `fluentd.useRegionEndpoint` -> `fluentd.forwarder.useRegionEndpoint`
+  - Replace in `wc-config.yaml`
+    - `global.storageClass` -> `storageClasses.default`
+
+  - Pay special attention to the `storageClasses` configuration to make sure that it is configured according to what's in your cluster.
+  If you have set `storageClasses.nfs.enabled: true` then make sure that you set the ip address to the nfs server in `nfsProvisioner.server`.
 
 3. Upgrade workload cluster applications
   ```bash

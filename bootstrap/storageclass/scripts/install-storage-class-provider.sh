@@ -9,7 +9,7 @@ install_storage_class_provider() {
             -e "${2}" -l app=nfs-client-provisioner apply --suppress-diff
     ;;
     "local-storage")
-        echo "Creating local storage class for elasticsearch nodes" >&2
+        echo "Install local-storage storage class" >&2
         kubectl apply -f "${storageclass_path}/manifests/local-storage-class.yaml"
 
         echo "Install local-volume-provisioner" >&2
@@ -18,16 +18,14 @@ install_storage_class_provider() {
     ;;
     "cinder-storage")
         storage=$(kubectl get storageclasses.storage.k8s.io -o json | jq '.items[].metadata | select(.name == "cinder-storage") | .name')
-        if [ -z "$storage" ]
-        then
-            echo "Install cinder storage class" >&2
+        if [ -z "${storage}" ]; then
+            echo "Install cinder-storage storage class" >&2
             kubectl apply -f "${storageclass_path}/manifests/cinder-storage.yaml"
         fi
     ;;
     "ebs-gp2")
         storage=$(kubectl get storageclasses.storage.k8s.io -o json | jq '.items[].metadata | select(.name == "ebs-gp2") | .name')
-        if [ -z "$storage" ]
-        then
+        if [ -z "${storage}" ]; then
             echo "Install EBS GP2 storage class" >&2
             kubectl apply -f "${storageclass_path}/manifests/ebs-gp2.yaml"
         fi
