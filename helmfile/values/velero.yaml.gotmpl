@@ -94,3 +94,10 @@ schedules:
         matchLabels:
           velero: backup
       ttl: 720h0m0s
+
+metrics:
+  enabled: true
+  scrapeInterval: 30s
+
+  serviceMonitor:
+    enabled: true

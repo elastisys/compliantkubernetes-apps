@@ -281,6 +281,8 @@ releases:
   chart: ./charts/grafana-ops
   version: 0.1.0
   missingFileHandler: Error
+  values:
+  - values/grafana-ops.yaml.gotmpl
 
 # Grafana instance for user
 - name: user-grafana

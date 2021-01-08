@@ -12,16 +12,15 @@
       }
     ]
   },
-  "description": "Grafana dashboard for Falco output events",
   "editable": true,
-  "gnetId": 11914,
+  "gnetId": null,
   "graphTooltip": 0,
-  "id": 48,
-  "iteration": 1611587154795,
+  "id": 49,
+  "iteration": 1611587460227,
   "links": [],
   "panels": [
     {
-      "content": "# Detailed gatekeeper logs can be found in kibana:\n\n\n<<kibanaURL>>",
+      "content": "\n# Detailed gatekeeper logs can be found in kibana:\n\n\n<<kibanaURL>>",
       "datasource": null,
       "fieldConfig": {
         "defaults": {
@@ -35,12 +34,125 @@
         "x": 0,
         "y": 0
       },
-      "id": 7,
+      "id": 8,
       "mode": "markdown",
       "timeFrom": null,
       "timeShift": null,
-      "title": "Falco logs",
+      "title": "Gatekeeper logs",
       "type": "text"
+    },
+    {
+      "datasource": "$datasource",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 0,
+        "y": 3
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "pluginVersion": "7.0.3",
+      "targets": [
+        {
+          "expr": "increase(gatekeeper_request_count{admission_status=\"deny\", cluster=~\"$cluster\"}[$__range])",
+          "interval": "",
+          "legendFormat": "{{cluster}}",
+          "refId": "B"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Number of denied requests",
+      "type": "stat"
+    },
+    {
+      "datasource": "prometheus-wc-reader",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 10
+              },
+              {
+                "color": "red",
+                "value": 20
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 18,
+        "x": 6,
+        "y": 3
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "pluginVersion": "7.0.3",
+      "targets": [
+        {
+          "expr": "gatekeeper_violations{cluster=~\"$cluster\"}",
+          "interval": "",
+          "legendFormat": "{{enforcement_action}} - {{cluster}}",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Violations found in last audit",
+      "type": "stat"
     },
     {
       "aliasColors": {},
@@ -48,7 +160,6 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "$datasource",
-      "description": "",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -58,20 +169,114 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 11,
+        "h": 9,
         "w": 24,
         "x": 0,
-        "y": 3
+        "y": 9
+      },
+      "hiddenSeries": false,
+      "id": 4,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "rate(gatekeeper_request_count{cluster=~\"$cluster\"}[5m])",
+          "instant": false,
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "{{admission_status}} - {{cluster}}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Gatekeeper requests per second",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "prometheus-wc-reader",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 18
       },
       "hiddenSeries": false,
       "id": 2,
       "legend": {
-        "alignAsTable": true,
         "avg": false,
         "current": false,
         "max": false,
         "min": false,
-        "rightSide": true,
         "show": true,
         "total": false,
         "values": false
@@ -92,10 +297,9 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(falco_events{cluster=~\"$cluster\"}[5m])",
+          "expr": "gatekeeper_violations{cluster=~\"$cluster\"}",
           "interval": "",
-          "intervalFactor": 1,
-          "legendFormat": "{{rule}} ({{hostname}}) -  {{cluster}}",
+          "legendFormat": "{{enforcement_action}} - {{cluster}}",
           "refId": "A"
         }
       ],
@@ -103,7 +307,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Events rate (average/5m)",
+      "title": "Violations found in audit",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -139,231 +343,9 @@
         "align": false,
         "alignLevel": null
       }
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "$datasource",
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
-        "overrides": []
-      },
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 11,
-        "w": 24,
-        "x": 0,
-        "y": 14
-      },
-      "hiddenSeries": false,
-      "id": 5,
-      "legend": {
-        "alignAsTable": true,
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "rightSide": true,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "dataLinks": []
-      },
-      "percentage": false,
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "sum by (priority, cluster) (rate(falco_events{cluster=~\"$cluster\"}[5m]))",
-          "interval": "",
-          "intervalFactor": 1,
-          "legendFormat": "Priority: {{priority}} -  {{cluster}}",
-          "refId": "A"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Events rate by priority (average/5m)",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "columns": [],
-      "datasource": "$datasource",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
-        "overrides": []
-      },
-      "fontSize": "100%",
-      "gridPos": {
-        "h": 10,
-        "w": 24,
-        "x": 0,
-        "y": 25
-      },
-      "id": 4,
-      "links": [],
-      "pageSize": null,
-      "showHeader": true,
-      "sort": {
-        "col": null,
-        "desc": false
-      },
-      "styles": [
-        {
-          "alias": "Time",
-          "align": "auto",
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "pattern": "Time",
-          "type": "date"
-        },
-        {
-          "alias": "",
-          "align": "auto",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 2,
-          "link": false,
-          "mappingType": 1,
-          "pattern": "/__name__|job|kubernetes_name|(__name|helm_|app_|pod_).*/",
-          "thresholds": [],
-          "type": "hidden",
-          "unit": "short"
-        },
-        {
-          "alias": "Count",
-          "align": "auto",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 0,
-          "mappingType": 1,
-          "pattern": "Value",
-          "thresholds": [],
-          "type": "number",
-          "unit": "short"
-        },
-        {
-          "alias": "",
-          "align": "left",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 0,
-          "mappingType": 1,
-          "pattern": "priority",
-          "thresholds": [
-            ""
-          ],
-          "type": "number",
-          "unit": "none",
-          "valueMaps": [
-            {
-              "text": "5",
-              "value": "5"
-            }
-          ]
-        },
-        {
-          "alias": "",
-          "align": "left",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "decimals": 2,
-          "pattern": "/.*/",
-          "thresholds": [],
-          "type": "string",
-          "unit": "short"
-        }
-      ],
-      "targets": [
-        {
-          "expr": "falco_events{cluster=~\"$cluster\"}",
-          "format": "table",
-          "instant": true,
-          "interval": "",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Totals",
-      "transform": "table",
-      "transparent": true,
-      "type": "table-old"
     }
   ],
+  "refresh": "30s",
   "schemaVersion": 25,
   "style": "dark",
   "tags": [],
@@ -392,21 +374,22 @@
         "allValue": ".*",
         "current": {
           "selected": true,
+          "tags": [],
           "text": "All",
           "value": [
             "$__all"
           ]
         },
         "datasource": "$datasource",
-        "definition": "label_values(falco_events, cluster)",
+        "definition": "label_values(gatekeeper_request_count, cluster)",
         "hide": 0,
         "includeAll": true,
         "label": null,
         "multi": true,
         "name": "cluster",
         "options": [],
-        "query": "label_values(falco_events, cluster)",
-        "refresh": 2,
+        "query": "label_values(gatekeeper_request_count, cluster)",
+        "refresh": 0,
         "regex": "",
         "skipUrlSync": false,
         "sort": 0,
@@ -419,7 +402,7 @@
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-24h",
     "to": "now"
   },
   "timepicker": {
@@ -436,7 +419,7 @@
     ]
   },
   "timezone": "",
-  "title": "Falco",
-  "uid": "4vgvvXaGz",
+  "title": "Gatekeeper",
+  "uid": "hcEiO3aMk",
   "version": 1
 }
