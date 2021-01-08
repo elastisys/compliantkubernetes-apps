@@ -36,6 +36,14 @@ controller:
     http: 80
     https: 443
 
+  metrics:
+    port: 10254
+    # if this port is changed, change healthz-port: in extraArgs: accordingly
+    enabled: true
+
+    serviceMonitor:
+      enabled: true
+
   resources:    {{- toYaml .Values.ingressNginx.controller.resources | nindent 4 }}
   nodeSelector: {{- toYaml .Values.ingressNginx.controller.nodeSelector | nindent 4 }}
   affinity:     {{- toYaml .Values.ingressNginx.controller.affinity | nindent 4 }}

@@ -1,0 +1,20 @@
+
+dashboards:
+  backup:
+    enabled: true
+  elasticsearch:
+    enabled: true
+  falco:
+    enabled: true
+    logEndpoint: https://kibana.{{ .Values.global.baseDomain }}
+  gatekeeper:
+    enabled: true
+    logEndpoint: https://kibana.{{ .Values.global.baseDomain }}
+  kubernetesStatus:
+    enabled: true
+  nginx:
+    enabled: true
+  uptime:
+    enabled: true
+  velero:
+    enabled: true

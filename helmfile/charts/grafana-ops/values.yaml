@@ -6,7 +6,21 @@ labelKey: grafana_dashboard
 
 # Dashboards to include + settings if needed
 dashboards:
+  backup:
+    enabled: true
   elasticsearch:
     enabled: true
   falco:
+    enabled: true
+    logEndpoint: https://kibana.your.endpoint
+  gatekeeper:
+    enabled: true
+    logEndpoint: https://kibana.your.endpoint
+  kubernetesStatus:
+    enabled: true
+  nginx:
+    enabled: true
+  uptime:
+    enabled: true
+  velero:
     enabled: true
