@@ -33,6 +33,9 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
 
 3. Upgrade workload cluster applications
   ```bash
+  # Upgrade cert-manager first
+  ./bin/ck8s ops helmfile wc -l app=cert-manager apply
+
   ./bin/ck8s apply wc
   ```
 
@@ -42,7 +45,10 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
   ./bin/ck8s ops helmfile sc -l app=fluentd destroy
   ./bin/ck8s ops helmfile sc -l app=fluentd-aggregator destroy
 
-  # Upgrade
+  # Upgrade cert-manager first
+  ./bin/ck8s ops helmfile wc -l app=cert-manager apply
+
+  # Upgrade rest
   ./bin/ck8s apply sc
 
   # Create new InfluxDB users

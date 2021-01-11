@@ -1,6 +1,6 @@
 {{- if .Values.ingress.enabled -}}
 {{- if .Values.ingress.issuer.selfSigned -}}
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: self-signed
