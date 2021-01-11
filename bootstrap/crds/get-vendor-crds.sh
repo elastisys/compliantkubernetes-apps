@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Pulls vendors crds from githup. If the chart version is changed (updated) in helmfile,
+# Pulls vendors crds from github. If the chart version is changed (updated) in helmfile,
 # the crd version needs to be changed here to reflect the change.
 echo downloading vendor crds
 echo cert-manager
-curl 'https://raw.githubusercontent.com/jetstack/cert-manager/release-0.14/deploy/manifests/00-crds.yaml' -o cert-manager/cert-manager.yaml
+wget 'https://github.com/jetstack/cert-manager/releases/download/v1.1.0/cert-manager.crds.yaml' -O cert-manager/cert-manager.yaml
 echo prometheus-operator
 curl 'https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/release-0.43/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml' -o prometheus-operator/alertmanagerconfigs.yaml
 curl 'https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/release-0.43/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml' -o prometheus-operator/alertmanagers.yaml
