@@ -105,10 +105,6 @@ opa:
   resourceRequests:
     enabled: true
     enforcement: dryrun
-  enforcements:
-    imageRegistry: dryrun
-    networkPolicies: dryrun
-    resources: dryrun
 
 elasticsearch:
   masterNode:

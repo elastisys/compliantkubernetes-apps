@@ -10,6 +10,12 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
     - `user.prometheusPassword`
     - `externalTrafficPolicy.whitelistRange.prometheus`
     - `global.dnsPrefix`
+
+  - Remove from `wc-config.yaml`
+    - `opa.enforcements.imageRegistry`
+    - `opa.enforcements.networkPolicies`
+    - `opa.enforcements.resources`
+
   - Replace in `sc-config.yaml`
     - `global.storageClass` -> `storageClasses.default`
     - `influxDB.user`     -> `influxDB.users.adminUser`

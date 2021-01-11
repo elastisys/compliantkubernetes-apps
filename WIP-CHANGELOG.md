@@ -49,6 +49,7 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
 - Wrong password being used for user-alertmanager.
 - Retention setting for wc scraper always overriding the user config and being set to 10 days.
 - Blackbox exporter checks kibana correctly
+- Removed duplicate enforcement config for OPA from wc-config
 
 ### Removed
 - The following helm release has been deprecated and will be uninstalled when upgrading:
