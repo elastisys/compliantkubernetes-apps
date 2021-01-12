@@ -10,15 +10,6 @@ prometheus-blackbox-exporter:
           valid_http_versions: ["HTTP/1.1", "HTTP/2"]
           no_follow_redirects: false
           preferred_ip_protocol: "ip4"
-      kibana:
-        prober: http
-        timeout: 5s
-        http:
-          # We are not logged in, just checking that it can be reached
-          valid_status_codes: [401]
-          valid_http_versions: ["HTTP/1.1", "HTTP/2"]
-          no_follow_redirects: false
-          preferred_ip_protocol: "ip4"
       user_api_server:
         prober: http
         timeout: 5s
@@ -48,7 +39,7 @@ targets:
     url: https://kibana.{{ .Values.global.baseDomain }}/api/status
     interval: 60s
     scrapeTimeout: 30s
-    module: kibana
+    module: http_2xx
   - name: user-api-server
     url: https://kube-apiserver.{{ .Values.global.baseDomain }}:/healthz
     interval: 60s
