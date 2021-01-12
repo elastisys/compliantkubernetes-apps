@@ -1,31 +1,105 @@
+## Common kubernetes configuration options
+
+## Define resources requests and limits for single Pods.
+## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+## resources: {}
+
+## Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+## nodeSelector: {}
+
+## Tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+## tolerations: []
+
+## Affinity for pod assignment
+## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+## affinity: {}
+
+## Some common options used in various helm charts.
+##
 global:
+  ## Compliantkubernetes-apps version.
+  ## 'any', can be used when running on non-official release.
   ck8sVersion: ${CK8S_VERSION}
+
+  ## Where the cluster is running.
+  ## Supported: exoscale, safespring, citycloud, aws, baremetal
   cloudProvider: ${CK8S_CLOUD_PROVIDER}
+
+  ## The cluster name.
+  ## Used in logs and metrics as to separate these from other clusters.
   clusterName: ${CK8S_ENVIRONMENT_NAME}-wc
+
+  ## Domain intended for ingress usage in the workload cluster
+  ## and to reach user facing services such as kibana, grafana, and harbor.
+  ## E.g. with 'prod.domain.com', kibana is reached via 'kibana.prod.domain.com'.
   baseDomain: "set-me"
+
+  ## Domain intended for ingress usage in the service cluster and to reach
+  ## non-user facing services such as influxdb and elasticsearch.
+  ## E.g. with 'ops.prod.domain.com', elasticsearch is reached via 'elastic.ops.prod.domain.com'.
   opsDomain: "set-me"
+
+  ## Default cert-manager issuer to use for issuing certificates for ingresses.
+  ## Normally one of 'letsencrypt-staging' or 'letsencrypt-prod'.
   issuer: letsencrypt-staging
+
+  ## Verify ingress certificates
   verifyTls: true
+
+  ## IP of the cluster DNS in kubernetes
   clusterDns: "10.43.0.10"
 
+## Configuration of storageclasses.
 storageClasses:
-  # Name of the default storageclass.
-  # Normally one of 'nfs-client', 'cinder-storage', 'local-storage', 'ebs-gp2'.
+  ## Name of the 'default' storageclass in kubernetes.
+  ## Normally one of 'nfs-client', 'cinder-storage', 'local-storage', or 'ebs-gp2'.
   default: "set-me"
 
-  # These are set to null before the first init to be able to set defaults only once
+  ## These enabled flags are 'null' but after first init
+  ## they will be set to eihter 'true' or 'false'.
+  ## On consecutive inits they will not be touched (unless they set to 'null').
+
+  ## Enable deployment of nfsClientProvisioner
+  ## Note, 'nfs-client' is installed as a deafult storagecalss only if 'storageClasses.default: nfs-client'.
   nfs:
     enabled: null # true | false
+
+  ## Enableds installation of 'cinder-storage'  as a defaultstorageclass.
   cinder:
     enabled: null # true | false
+
+  ## Enables deployment of local-volume-provisioner and installation
+  ## of 'local-storage' storageclass.
   local:
     enabled: null # true | false
+
+  ## Enables installation of 'ebs-gp2' as a default storageclass.
   ebs:
     enabled: null # true | false
 
+## Nfs-client-provisioner configuration.
+## Deployment is controlled via 'storageClasses.nfs.enabled'.
+nfsProvisioner:
+  server: "set-me"
+  path: /nfs
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  tolerations: []
+  nodeSelector: {}
+  affinity: {}
+
+## Object storage configuration for backups.
 objectStorage:
-  # Options are "s3", "gcs", or "none"
-  # If "none", remember to disable backups (velero)
+  ## Options are 's3', 'gcs', or 'none'
+  ## If 'none', remember to disable backups (velero)
   type: "s3"
   # gcs:
   #   project: "set-me"
@@ -33,28 +107,39 @@ objectStorage:
   #   region: "set-me"
   #   regionAddress: "set-me"
   #   regionEndpoint: "set-me"
-  buckets:
-    harbor: "${CK8S_ENVIRONMENT_NAME}-harbor"
-    velero: "${CK8S_ENVIRONMENT_NAME}-velero"
-    elasticsearch: "${CK8S_ENVIRONMENT_NAME}-es-backup"
-    influxDB: "${CK8S_ENVIRONMENT_NAME}-influxdb"
-    scFluentd: "${CK8S_ENVIRONMENT_NAME}-sc-logs"
 
+  ## Buckets where each respctive application will store its backups.
+  buckets:
+    velero: "${CK8S_ENVIRONMENT_NAME}-velero"
+
+## User configuration.
 user:
-  # This only controls if the namespaces should be created, user RBAC is always created.
+  ## This only controls if the namespaces should be created, user RBAC is always created.
   createNamespaces: true
+
+  ## List of user namespaces to create.
   namespaces:
     - demo
+
+  ## List of users to create RBAC rules for.
   adminUsers:
     - admin@example.com
+
+  ## User controlled alertmanager configuration.
   alertmanager:
     enabled: false
+
+    ## Namespace in which to install alertmanager
     namespace: monitoring
+
+    ## Create basic-auth protected ingress to alertmanager
     ingress:
       enabled: false
 
+## Falco configuration.
 falco:
   enabled: true
+
   resources:
     limits:
       cpu: 200m
@@ -62,18 +147,23 @@ falco:
     requests:
       cpu: 100m
       memory: 512Mi
+
+  ## Run on master nodes.
   tolerations:
     - key: "node-role.kubernetes.io/master"
       effect: "NoSchedule"
+
   affinity: {}
   nodeSelector: {}
+
+  ## Falco alerting configuration.
   alerts:
     enabled: true
-    # supported: alertmanager|slack
+    ## supported: 'alertmanager', 'slack'.
     type: alertmanager
     priority: notice
     hostPort: "http://kube-prometheus-stack-alertmanager.monitoring:9093"
-    # if type=slack falco.alerts.slackWebhook must be set in the secrets yaml file
+
   falcoSidekick:
     resources:
       limits:
@@ -82,44 +172,13 @@ falco:
       requests:
         cpu: 10m
         memory: 25Mi
+
     tolerations: []
     affinity: {}
     nodeSelector: {}
 
-prometheus:
-  remoteWrite:
-    # Same as 'influxDB.users.wcWriter'.
-    user: wcWriter
-  storage:
-    size: 5Gi
-  retention:
-    size: 4GiB
-    age:  3d
-  resources:
-    requests:
-      memory: 1Gi
-      cpu: 300m
-    limits:
-      memory: 2Gi
-      cpu: "1"
-  tolerations: []
-  affinity: {}
-  nodeSelector: {}
-  additionalScrapeConfigs: []
-
-opa:
-  enabled: true
-  imageRegistry:
-    enabled: true
-    enforcement: dryrun
-    URL: "harbor.set-me"
-  networkPolicies:
-    enabled: true
-    enforcement: dryrun
-  resourceRequests:
-    enabled: true
-    enforcement: dryrun
-
+## Elasticsearch cluster topolgy.
+## Used in prometheus alerts.
 elasticsearch:
   masterNode:
     count: 1
@@ -128,14 +187,76 @@ elasticsearch:
   clientNode:
     count: 1
 
+## Prometheus configuration.
+## Prometheus collects metrics and pushes it to InfluxDB.
+prometheus:
+  remoteWrite:
+    ## User used when authentication against InfluxDB.
+    user: wcWriter
+
+  ## Persistence for prometheus to store metrics and wal.
+  storage:
+    size: 5Gi
+
+  ## When prometheus should start to remove metrics from local storage.
+  retention:
+    size: 4GiB
+    age:  3d
+
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 300m
+    limits:
+      memory: 2Gi
+      cpu: "1" ## Must be a string (integers might be suported in newer versions)
+
+  tolerations: []
+  affinity: {}
+  nodeSelector: {}
+
+  ## Additional prometheus scrape config.
+  ## ref: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config
+  additionalScrapeConfigs: []
+
+## Open policy agent configuration
+opa:
+  enabled: true
+
+  ## Enable rule that requires pods to come from
+  ## the image registry defined by "URL".
+  ## "enforcement" can assume either "dryrun" or "deny".
+  imageRegistry:
+    enabled: true
+    enforcement: dryrun
+    URL: "harbor.set-me"
+
+  ## Enable rule that requires pods to be targeted
+  ## by at least one network policy.
+  networkPolicies:
+    enabled: true
+    enforcement: dryrun
+
+  ## Enable rule that requires pods to have resource requests.
+  resourceRequests:
+    enabled: true
+    enforcement: dryrun
+
+## Configuration for fluentd.
+## Fluentd ships logs to elasticsearch.
+## Consists of two different deployments, one for running on master nodes
+## and and one for running on "user nodes".
 fluentd:
+  ## Tolerate master nodes.
   tolerations:
   - effect: NoSchedule
     key: "node-role.kubernetes.io/master"
     value: ""
-  # Only run on control plane nodes
+
+  ## Only run on master nodes.
   nodeSelector:
     node-role.kubernetes.io/master: ""
+
   resources:
     limits:
       cpu: 200m
@@ -143,8 +264,16 @@ fluentd:
     requests:
       cpu: 200m
       memory: 500Mi
+
   affinity: {}
+
+  ## Extra fluentd config to mount.
   extraConfigMaps: {}
+
+  ## User controllable fluentd deployment.
+  ## These pods collect logs from nodes where the user can run pods.
+  ## Users can specify additional plugins and config in the respective configmaps:
+  ## 'fluentd-extra-plugins', and 'fluentd-extra-config'.
   user:
     resources:
       limits:
@@ -153,15 +282,21 @@ fluentd:
       requests:
         cpu: 200m
         memory: 500Mi
+
     tolerations: []
     affinity: {}
     nodeSelector: {}
 
+##
+## TODO: remove when next-gen dashboards are in place.
+##
+## Ck8sdash configuration
 ck8sdash:
   enabled: true
   tolerations: []
   affinity: {}
   nodeSelector: {}
+
   nginx:
     resources:
       requests:
@@ -179,69 +314,74 @@ ck8sdash:
         memory: 128Mi
         cpu: 100m
 
+## Set external traffic policy to: "Local" to preserve source IP on
+## providers supporting it
+## Ref: https://kubernetes.io/docs/tutorials/services/source-ip/#source-ip-for-services-with-typeloadbalancer
 externalTrafficPolicy:
   local: false
+
+  ## Source IP range to allow.
   whitelistRange:
     global: "0.0.0.0/0"
     ck8sdash: false
 
-nfsProvisioner:
-  server: ""
-  path: /nfs
-  resources:
-    limits:
-      cpu: 100m
-      memory: 128Mi
-    requests:
-      cpu: 100m
-      memory: 128Mi
-  tolerations: []
-  affinity: {}
-  nodeSelector: {}
-
+## Nginx ingress controller configuration
 ingressNginx:
   controller:
-  # Chart deploys correctly but does not work with resourceRequests
     resources: {}
-      # limits:
-      #   cpu: 100m
-      #   memory: 64Mi
-      # requests:
-      #   cpu: 100m
-      #   memory: 64Mi
+
+    ##
+    ## TODO: remove, we do not label our nodes with 'nodeType' by default.
+    ##
     tolerations:
       - key: "nodeType"
         operator: "Exists"
         effect: "NoSchedule"
+
     affinity: {}
     nodeSelector: {}
+
     config:
+      ## If 'true', use PROXY protocol
+      ## ref: https://docs.nginx.com/nginx/admin-guide/load-balancer/using-proxy-protocol/
       useProxyProtocol: "set-me"
+
+    ## If 'true', nginx will use host ports 80 and 443
     useHostPort: "set-me"
+
+    ## Kubernetes service configuration.
     service:
       enabled: "set-me"
+
+      ## Type of service.
+      ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
       type: "set-me"
+
+      ## Annotations to add to service
+      ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
       annotations: "set-me"
-    # Will add custom configuration options to Nginx https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
+
+    ## Additional configuration options for Nginx
+    ## ref: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
     additionalConfig: {}
 
   defaultBackend:
-  # Chart deploys correctly but does not work with resourceRequests
     resources: {}
-      # limits:
-      #   cpu: 100m
-      #   memory: 64Mi
-      # requests:
-      #   cpu: 100m
-      #   memory: 64Mi
+
+    ##
+    ## TDOD: remove, we do not label our nodes with 'nodeType' by default.
+    ##
     tolerations:
       - key: "nodeType"
         operator: "Equal"
         value: "elastisys"
         effect: "NoSchedule"
+
     affinity: {}
     nodeSelector: {}
 
+## Configration for Velero and Restic.
+## Check out https://compliantkubernetes.io/user-guide/backup/ to see what's included in backups.
 velero:
   enabled: true
   tolerations: []
@@ -253,6 +393,7 @@ velero:
     requests:
       cpu: 100m
       memory: 100Mi
+
   restic:
     tolerations: []
     resources:
@@ -263,16 +404,36 @@ velero:
         cpu: 100m
         memory: 100Mi
 
+## Configuration for cert-manager issuers.
 issuers:
+
+  ## Deploy let's encrypt ACME issuers
+  ## "letsencrypt-prod" and "letsencrypt-staging".
   letsencrypt:
     enabled: true
+
+    ## Namespaces in which to install the letsencrypt issuers in.
     namespaces: []
+
     prod:
+      ## Mail through which letsencrypt can contact you.
       email: "set-me"
     staging:
+      ## Mail through which letsencrypt can contact you.
       email: "set-me"
-  extraIssuers: []
 
+  ## Additional issuers to create.
+  ## ref: https://cert-manager.io/docs/configuration/
+  extraIssuers: []
+  # - apiVersion: cert-manager.io/v1
+  #   kind: Issuer
+  #   metadata:
+  #     name: selfsigned-issuer
+  #     namespace: sandbox
+  #   spec:
+  #     selfSigned: {}
+
+## Configration for cert-manager and it's components.
 certmanager:
   resources: {}
   nodeSelector: {}
