@@ -33,22 +33,29 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
 
 3. Upgrade workload cluster applications
   ```bash
-  # Upgrade cert-manager first
-  ./bin/ck8s ops helmfile wc -l app=cert-manager apply
 
+  # Remove all letsencrypt relases
+  for namespace in $(./bin/ck8s ops helm wc list --all-namespaces | grep -F letsencrypt | awk '{ print $2 }'); do
+      ./bin/ck8s ops helm wc uninstall letsencrypt -n ${namespace}
+  done
+
+  # Upgrade
   ./bin/ck8s apply wc
   ```
 
 4. Upgrade service cluster applications
   ```bash
+
   # Destroy old fluentd releases
   ./bin/ck8s ops helmfile sc -l app=fluentd destroy
   ./bin/ck8s ops helmfile sc -l app=fluentd-aggregator destroy
 
-  # Upgrade cert-manager first
-  ./bin/ck8s ops helmfile wc -l app=cert-manager apply
+  # Remove all letsencrypt relases
+  for namespace in $(./bin/ck8s ops helm sc list --all-namespaces | grep -F letsencrypt | awk '{ print $2 }'); do
+      ./bin/ck8s ops helm sc uninstall letsencrypt -n ${namespace}
+  done
 
-  # Upgrade rest
+  # Upgrade
   ./bin/ck8s apply sc
 
   # Create new InfluxDB users

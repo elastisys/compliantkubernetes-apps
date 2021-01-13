@@ -1,5 +1,6 @@
 letsencrypt:
   enabled: {{ .Values.issuers.letsencrypt.enabled }}
+  namespaces: {{- toYaml .Values.issuers.letsencrypt.namespaces | nindent 4 }}
   prod:
     email: {{ .Values.issuers.letsencrypt.prod.email }}
   staging:

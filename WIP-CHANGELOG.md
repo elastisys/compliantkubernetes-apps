@@ -12,6 +12,7 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
   See [the complete migration guide for all details](migration/v0.8.x-v0.9.x/upgrade-apps.md)
 - With the removal of `scripts/post-infra-common.sh` you'll now have to, if enabled, manually set the address to the nfs server in `nfsProvisioner.server`
 - The cert-manager CustomResourceDefinitions has been upgraded to `v1`, see [API reference docs](https://cert-manager.io/docs/reference/api-docs/). It is advisable that you update your resources to `v1` in the near future to maintain functionality.
+- The cert-manager letsencrypt issuers have been updated to the `v1` API and the old `letsencrypt` releases must be removed before upgrading. Instruction are found in the [upgrade guide](migration/v0.8.x-v0.9.x/upgrade-apps.md).
 
 
 ### Added
@@ -43,12 +44,12 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
 - Added example config for Kibana group mapping from an OIDC provider
 - Replaced `kiwigrid/fluentd-elasticsearch` helm chart with `kokuwa/fluentd-elasticsearch`.
 - Replaced `stable/fluentd` helm chart with `bitnami/fluentd`.
-<<<<<<< HEAD
 - StorageClasses are now enabled/disabled in the `{wc,sc}-cofig.yaml` files.
 - Mount path and IP/hostname is now configurable in `nfs-client-provisioner`.
-=======
 - Upgraded `cert-manager` to `1.1.0`.
->>>>>>> apps: Upgrade cert-manager to 1.1.0
+- Moved the `bootstrap/letsencrypt` helm chart to the apps step and renamed it to `issuers`.
+  The issuers are now installed after cert-manager.
+  You can now select which namespaces to install the letsencrypt issuers.
 
 ### Fixed
 

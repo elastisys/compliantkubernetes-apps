@@ -51,6 +51,19 @@ environments:
 
 # The desired state of Helm releases.
 releases:
+# Cert-manager issuers
+- name: issuers
+  namespace: cert-manager
+  labels:
+    app: issuers
+  chart: ./charts/issuers
+  version: 0.1.0
+  missingFileHandler: Error
+  needs:
+  - cert-manager/cert-manager
+  values:
+  - values/letsencrypt.yaml.gotmpl
+
 # Ingress-nginx
 - name: ingress-nginx
   namespace: ingress-nginx
