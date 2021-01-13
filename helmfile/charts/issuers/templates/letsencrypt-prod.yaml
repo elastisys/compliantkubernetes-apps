@@ -1,0 +1,23 @@
+{{- if .Values.letsencrypt.enabled }}
+{{- range $namespace := .Values.letsencrypt.namespaces }}
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: letsencrypt-prod
+  namespace: {{ $namespace }}
+spec:
+  acme:
+    email: {{ $.Values.letsencrypt.prod.email | quote }}
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    server: https://acme-v02.api.letsencrypt.org/directory
+    solvers:
+    # An empty selector will 'match' all Certificate resources that
+    # reference this Issuer.
+    - selector: {}
+      http01:
+        ingress:
+          class: nginx
+{{- end }}
+{{- end }}

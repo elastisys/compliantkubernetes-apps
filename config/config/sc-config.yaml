@@ -569,6 +569,7 @@ restore:
 issuers:
   letsencrypt:
     enabled: true
+    namespaces: []
     prod:
       email: "set-me"
     staging:

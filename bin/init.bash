@@ -187,17 +187,21 @@ set_nginx_config() {
           ;;
 
         baremetal)
-	  use_proxy_protocol=false
-	  use_host_port=true
-	  service_enabled=false
-	  ;;
+          use_proxy_protocol=false
+          use_host_port=true
+          service_enabled=false
+          ;;
 
     esac
+
     replace_set_me "$1" 'ingressNginx.controller.config.useProxyProtocol' "$use_proxy_protocol"
     replace_set_me "$1" 'ingressNginx.controller.useHostPort' "$use_host_port"
     replace_set_me "$1" 'ingressNginx.controller.service.enabled' "$service_enabled"
 }
 
+##
+## TODO: rename to set_fluentd_config
+##
 # Usage: set_elasticsearch_config <config-file>
 # baremetal support is experimental, keep as separate case until stable
 set_elasticsearch_config() {
@@ -217,8 +221,8 @@ set_elasticsearch_config() {
           ;;
 
         baremetal)
-	  use_regionendpoint=true
-	  ;;
+          use_regionendpoint=true
+          ;;
 
     esac
 
@@ -251,10 +255,10 @@ set_harbor_config() {
 
         baremetal)
           persistence_type=objectStorage
-	      disable_redirect=false
-	  ;;
-
+          disable_redirect=false
+          ;;
     esac
+
     replace_set_me "$1" 'harbor.persistence.type' "$persistence_type"
     replace_set_me "$1" 'harbor.persistence.disableRedirect' "$disable_redirect"
 }
@@ -286,6 +290,38 @@ generate_secrets() {
     sops_encrypt "$file"
 }
 
+# Usage: set_issuer_namespaces <config_file> service_cluster|workload_cluster
+set_issuer_namespaces() {
+    if [[ $# -ne 2 ]]; then
+        log_error "ERROR: number of args in set_issuer_namespaces must be 2. #=[$#]"
+        exit 1
+    fi
+
+    file=$1
+    cluster=$2
+
+    if [ "${cluster}" = "service_cluster" ]; then
+        ck8sdash=$(yq r -e "${file}" 'ck8sdash.enabled')
+        harbor=$(yq r -e "${file}" 'harbor.enabled')
+
+        issuer_namespaces='dex elastic-system kube-system monitoring influxdb-prometheus'
+        [ "$ck8sdash" = "true" ] && issuer_namespaces+=" ck8sdash"
+        [ "$harbor" = "true" ] && issuer_namespaces+=" harbor"
+    elif [ "${cluster}" = "workload_cluster" ]; then
+        ck8sdash=$(yq r -e "${file}" 'ck8sdash.enabled')
+
+        issuer_namespaces='kube-system monitoring'
+        [ "$ck8sdash" == "true" ] && issuer_namespaces+=" ck8sdash"
+    else
+        log_error "ERROR: unkown cluster variable."
+    fi
+
+    if [ "$(yq read "$file" 'issuers.letsencrypt.namespaces')" = "[]" ]; then
+        for namespace in ${issuer_namespaces}; do
+            yq write --inplace "$file" "issuers.letsencrypt.namespaces.[+]" "${namespace}"
+        done
+    fi
+}
 
 log_info "Initializing CK8S configuration with flavor: $CK8S_FLAVOR"
 
@@ -309,20 +345,22 @@ export CK8S_VERSION
 if [ -f "${config[config_file_sc]}" ]; then
     log_info "${config[config_file_sc]} already exists, merging with existing config"
 fi
-generate_base_sc_config "${config[config_file_sc]}"
-set_storage_class "${config[config_file_sc]}"
-set_nginx_config "${config[config_file_sc]}"
+generate_base_sc_config  "${config[config_file_sc]}"
+set_storage_class        "${config[config_file_sc]}"
+set_nginx_config         "${config[config_file_sc]}"
 set_elasticsearch_config "${config[config_file_sc]}"
-set_harbor_config "${config[config_file_sc]}"
+set_harbor_config        "${config[config_file_sc]}"
+set_issuer_namespaces    "${config[config_file_sc]}" service_cluster
 
 if [ -f "${config[config_file_wc]}" ]; then
     log_info "${config[config_file_wc]} already exists, merging with existing config"
 fi
-generate_base_wc_config "${config[config_file_wc]}"
-set_storage_class "${config[config_file_wc]}"
-set_nginx_config "${config[config_file_wc]}"
+generate_base_wc_config  "${config[config_file_wc]}"
+set_storage_class        "${config[config_file_wc]}"
+set_nginx_config         "${config[config_file_wc]}"
 set_elasticsearch_config "${config[config_file_wc]}"
-set_harbor_config "${config[config_file_wc]}"
+set_harbor_config        "${config[config_file_wc]}"
+set_issuer_namespaces    "${config[config_file_wc]}" workload_cluster
 
 if [ -f "${secrets[secrets_file]}" ]; then
     log_info "${secrets[secrets_file]} already exists, merging with existing secrets"
