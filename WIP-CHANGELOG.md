@@ -26,6 +26,7 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
 - Object storage is now optional. There is a new option to set object storage type to `none`. If you disable object storage, then you must also disable any feature that uses object storage (mostly all backups).
 - Two new InfluxDB users to used by prometheus for writing metrics to InfluxDB.
 - Multicluster support for some dashboards in Grafana.
+- More config options for falco sidekick (tolerations, resources, affinity, and nodeSelector)
 
 ### Changed
 

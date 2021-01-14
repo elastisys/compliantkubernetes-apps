@@ -71,6 +71,17 @@ falco:
     priority: notice
     hostPort: "http://kube-prometheus-stack-alertmanager.monitoring:9093"
     # if type=slack falco.alerts.slackWebhook must be set in the secrets yaml file
+  falcoSidekick:
+    resources:
+      limits:
+        cpu: 20m
+        memory: 50Mi
+      requests:
+        cpu: 10m
+        memory: 25Mi
+    tolerations: []
+    affinity: {}
+    nodeSelector: {}
 
 prometheus:
   remoteWrite:
