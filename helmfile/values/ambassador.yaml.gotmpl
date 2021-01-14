@@ -1,0 +1,9 @@
+service:
+  type: ClusterIP
+hostNetwork: true
+dnsPolicy: ClusterFirstWithHostNet
+daemonSet: true
+
+security:
+  podSecurityContext:
+    runAsUser: 0

@@ -1,7 +1,7 @@
 # Chart repositories used from within this state file.
 repositories:
-- name: stable
-  url: https://charts.helm.sh/stable
+#- name: stable
+#  url: https://charts.helm.sh/stable
 - name: jetstack
   url: https://charts.jetstack.io
 - name: bitnami
@@ -14,6 +14,8 @@ repositories:
   url: https://kubernetes.github.io/ingress-nginx
 - name: prometheus-community
   url: https://prometheus-community.github.io/helm-charts
+- name: datawire 
+  url: https://getambassador.io
 
 # workload_cluster specfic repositories
 {{ if eq .Environment.Name "workload_cluster" }}
@@ -58,10 +60,24 @@ releases:
     app: ingress-nginx
   chart: ingress-nginx/ingress-nginx
   version: 2.10.0
+  installed: {{ .Values.ingressNginx.enabled }}
   missingFileHandler: Error
   wait: true
   values:
   - values/ingress-nginx.yaml.gotmpl
+
+# ambassador ingress controller
+- name: ambassador
+  namespace: ambassador
+  labels:
+    app: ambassador
+  chart: datawire/ambassador
+  version: 6.5.16
+  installed: {{ .Values.ambassador.enabled }}
+  missingFileHandler: Error
+  wait: true
+  values:
+  - values/ambassador.yaml.gotmpl
 
 # Cert-manager
 - name: cert-manager

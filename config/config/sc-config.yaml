@@ -483,6 +483,7 @@ nfsProvisioner:
   nodeSelector: {}
 
 ingressNginx:
+  enabled: true
   controller:
     # Chart deploys correctly but does not work with resourceRequests
     resources: {}
@@ -525,6 +526,9 @@ ingressNginx:
     affinity: {}
     nodeSelector: {}
 
+ambassador:
+  enabled: false
+  
 velero:
   enabled: true
   tolerations: []
