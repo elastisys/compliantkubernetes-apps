@@ -1,0 +1,33 @@
+{{- if .Values.ambassador.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ambassador-privileged
+  namespace: ambassador
+rules:
+- apiGroups:
+  - extensions
+  resourceNames:
+  - privileged
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ambassador-privileged
+  namespace: ambassador
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ambassador-privileged
+subjects:
+- kind: ServiceAccount
+  name: ambassador
+  namespace: ambassador
+- kind: ServiceAccount
+  name: default
+  namespace: ambassador
+{{- end }}
