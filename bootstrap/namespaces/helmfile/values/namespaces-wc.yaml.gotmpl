@@ -7,8 +7,13 @@ namespaces:
 - name: kube-public
 - name: kube-system
 - name: monitoring
-- name: ingress-nginx
 - name: velero
+{{ if .Values.ingressNginx.enabled }}
+- name: ingress-nginx
+{{ end }}
+{{ if .Values.ambassador.enabled }}
+- name: ambassador
+{{ end }}
 {{ if .Values.falco.enabled }}
 - name: falco
 {{ end }}
