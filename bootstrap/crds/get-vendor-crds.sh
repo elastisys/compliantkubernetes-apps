@@ -50,3 +50,22 @@ yq r -d1 gatekeeper-tmp.yaml | yq d - metadata.labels.app | yq d - metadata.labe
 echo "---" >> gatekeeper/gatekeeper.yaml
 yq r -d2 gatekeeper-tmp.yaml | yq d - metadata.labels.app | yq d - metadata.labels.chart | yq d - metadata.labels.heritage | yq d - metadata.labels.release >> gatekeeper/gatekeeper.yaml
 rm gatekeeper-tmp.yaml
+echo "ambassador"
+curl 'https://raw.githubusercontent.com/datawire/ambassador-chart/v6.5.15/crds/filter.yaml' -o ambassador/filter.yaml
+curl 'https://raw.githubusercontent.com/datawire/ambassador-chart/v6.5.15/crds/filterpolicy.yaml' -o ambassador/filterpolicy.yaml
+curl 'https://raw.githubusercontent.com/datawire/ambassador-chart/v6.5.15/crds/getambassador.io_devportals.yaml' -o ambassador/devportals.yaml
+curl 'https://raw.githubusercontent.com/datawire/ambassador-chart/v6.5.15/crds/getambassador.io_authservices.yaml' -o ambassador/authservices.yaml
+curl 'https://raw.githubusercontent.com/datawire/ambassador-chart/v6.5.15/crds/getambassador.io_hosts.yaml' -o ambassador/hosts.yaml
+curl 'https://raw.githubusercontent.com/datawire/ambassador-chart/v6.5.15/crds/getambassador.io_kubernetesendpointresolvers.yaml' -o ambassador/kubernetesendpointresolvers.yaml
+curl 'https://raw.githubusercontent.com/datawire/ambassador-chart/v6.5.15/crds/getambassador.io_kubernetesserviceresolvers.yaml' -o ambassador/kubernetesserviceresolvers.yaml
+curl 'https://raw.githubusercontent.com/datawire/ambassador-chart/v6.5.15/crds/getambassador.io_logservices.yaml' -o ambassador/logservices.yaml
+curl 'https://raw.githubusercontent.com/datawire/ambassador-chart/v6.5.15/crds/getambassador.io_mappings.yaml' -o ambassador/mappings.yaml
+curl 'https://raw.githubusercontent.com/datawire/ambassador-chart/v6.5.15/crds/getambassador.io_modules.yaml' -o ambassador/modules.yaml
+curl 'https://raw.githubusercontent.com/datawire/ambassador-chart/v6.5.15/crds/getambassador.io_ratelimitservices.yaml' -o ambassador/ratelimitservices.yaml
+curl 'https://raw.githubusercontent.com/datawire/ambassador-chart/v6.5.15/crds/getambassador.io_tcpmappings.yaml' -o ambassador/tcpmappings.yaml
+curl 'https://raw.githubusercontent.com/datawire/ambassador-chart/v6.5.15/crds/getambassador.io_tlscontexts.yaml' -o ambassador/tlscontexts.yaml
+curl 'https://raw.githubusercontent.com/datawire/ambassador-chart/v6.5.15/crds/getambassador.io_tracingservices.yaml' -o ambassador/tracingservices.yaml
+curl 'https://raw.githubusercontent.com/datawire/ambassador-chart/v6.5.15/crds/project.yaml' -o ambassador/project.yaml
+curl 'https://raw.githubusercontent.com/datawire/ambassador-chart/v6.5.15/crds/projectcontroller.yaml' -o ambassador/projectcontroller.yaml
+curl 'https://raw.githubusercontent.com/datawire/ambassador-chart/v6.5.15/crds/projectrevision.yaml' -o ambassador/projectrevision.yaml
+curl 'https://raw.githubusercontent.com/datawire/ambassador-chart/v6.5.15/crds/ratelimit.yaml' -o ambassador/ratelimit.yaml
