@@ -22,8 +22,8 @@ serviceMonitor:
   namespace: elastic-system
   labels:
     release: kube-prometheus-stack
-  interval: 30s
-  scrapeTimeout: 30s
+  interval: {{ .Values.elasticsearch.exporter.serviceMonitor.interval }}
+  scrapeTimeout: {{ .Values.elasticsearch.exporter.serviceMonitor.scrapeTimeout }}
   scheme: http
 
 prometheusRule:
