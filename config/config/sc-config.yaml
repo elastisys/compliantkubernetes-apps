@@ -340,6 +340,9 @@ elasticsearch:
   defaultTemplates: true
   additionalTemplates: {}
   exporter:
+    serviceMonitor:
+      interval: 30s
+      scrapeTimeout: 30s
     resources: {}
     #   requests:
     #     cpu: 100m

@@ -27,6 +27,7 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
 - Two new InfluxDB users to used by prometheus for writing metrics to InfluxDB.
 - Multicluster support for some dashboards in Grafana.
 - More config options for falco sidekick (tolerations, resources, affinity, and nodeSelector)
+- Option to configure serviceMonitor for elasticsearch exporter
 
 ### Changed
 
