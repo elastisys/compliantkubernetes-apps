@@ -13,7 +13,7 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
 - With the removal of `scripts/post-infra-common.sh` you'll now have to, if enabled, manually set the address to the nfs server in `nfsProvisioner.server`
 - The cert-manager CustomResourceDefinitions has been upgraded to `v1`, see [API reference docs](https://cert-manager.io/docs/reference/api-docs/). It is advisable that you update your resources to `v1` in the near future to maintain functionality.
 - The cert-manager letsencrypt issuers have been updated to the `v1` API and the old `letsencrypt` releases must be removed before upgrading. Instruction are found in the [upgrade guide](migration/v0.8.x-v0.9.x/upgrade-apps.md).
-
+- To get some of the new default values for resource requests on Harbor pods you will first need to remove the resource requests that you have in your Harbor config and then run `ck8s init` to get the new values.
 
 ### Added
 
@@ -30,6 +30,7 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
 - Option to configure serviceMonitor for elasticsearch exporter
 - Option to add more redirect URIs for the `kubelogin` client in dex.
 - Option to disable the creation of user namespaces (RBAC will still be created)
+- The possibility to configure resources, affinity, tolerations, and nodeSelector for all Harbor pods.
 
 ### Changed
 
@@ -56,6 +57,7 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
   You can now select which namespaces to install the letsencrypt issuers.
 - Helm upgraded to `v3.5.0`.
 - InfluxDB upgraded to `v4.8.12`.
+- Resource requests/limits have been updated for all Harbor pods.
 
 ### Fixed
 
@@ -73,3 +75,4 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
 - Helm chart `basic-auth-secret` has been removed.
 - Unused config option `dnsPrefix`.
 - Removed `scripts/post-infra-common.sh` file.
+- The image scanner Clair in Harbor, image scanning is done by the scanner Trivy
