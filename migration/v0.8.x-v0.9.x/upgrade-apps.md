@@ -3,9 +3,11 @@
 
 You will need to follow these steps in order to upgrade each Compliant Kubernetes environment from v0.8.x to v0.9.0. The instructions assume that you work from the root of the `compliantkubernetes-apps` repository, has the latest changes already pulled and configured `CK8S_CONFIG_PATH` correctly.
 
-1. Run init to get new defaults: `./bin/ck8s init`
+1. This is an optional step. The default resource requests for Harbor pods have been updated. To get these new values you must remove the current values in your config (`resources:` yaml blocks under `harbor:`) from `sc-config.yaml` before running `./bin/ck8s init` in the next step.
 
-2. The following configuration options must be manually updated in your configuration files:
+2. Run init to get new defaults: `./bin/ck8s init`
+
+3. The following configuration options must be manually updated in your configuration files:
   - Remove
     - `user.prometheusPassword`
     - `externalTrafficPolicy.whitelistRange.prometheus`
@@ -31,7 +33,7 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
   - Pay special attention to the `storageClasses` configuration to make sure that it is configured according to what's in your cluster.
   If you have set `storageClasses.nfs.enabled: true` then make sure that you set the ip address to the nfs server in `nfsProvisioner.server`.
 
-3. Upgrade workload cluster applications
+4. Upgrade workload cluster applications
   ```bash
 
   # Remove all letsencrypt relases
@@ -43,7 +45,7 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
   ./bin/ck8s apply wc
   ```
 
-4. Upgrade service cluster applications
+5. Upgrade service cluster applications
   ```bash
 
   # Destroy old fluentd releases

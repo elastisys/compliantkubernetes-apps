@@ -68,54 +68,80 @@ user:
 
 harbor:
   enabled: true
+  # The tolerations, affinity, and nodeSelector are applied to all harbor pods.
   tolerations: []
   affinity: {}
   nodeSelector: {}
   chartmuseum:
     persistentVolumeClaim:
       size: 5Gi
+    resources:
+      requests:
+        memory: 16Mi
+        cpu: 5m
   core:
     resources:
       requests:
-        memory: 256Mi
-        cpu: 100m
-      limits:
-        memory: 512Mi
-        cpu: 200m
+        memory: 64Mi
+        cpu: 10m
   database:
     persistentVolumeClaim:
       size: 1Gi
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 250m
   jobservice:
     persistentVolumeClaim:
       size: 1Gi
     resources:
       requests:
-        memory: 256Mi
-        cpu: 100m
-      limits:
-        memory: 512Mi
-        cpu: 200m
+        memory: 64Mi
+        cpu: 10m
   registry:
     persistentVolumeClaim:
       size: 5Gi
     resources:
       requests:
-        memory: 256Mi
-        cpu: 100m
-      limits:
-        memory: 512Mi
-        cpu: 200m
+        memory: 64Mi
+        cpu: 10m
+    controller:
+      resources:
+        requests:
+          memory: 16Mi
+          cpu: 1m
   redis:
     persistentVolumeClaim:
       size: 1Gi
+    resources:
+      requests:
+        memory: 32Mi
+        cpu: 10m
   notary:
     resources:
       requests:
-        memory: 256Mi
-        cpu: 100m
-      limits:
-        memory: 512Mi
+        memory: 16Mi
+        cpu: 5m
+  notarySigner:
+    resources:
+      requests:
+        memory: 16Mi
+        cpu: 5m
+  portal:
+    resources:
+      requests:
+        memory: 16Mi
+        cpu: 5m
+  trivy:
+    persistentVolumeClaim:
+      size: 5Gi
+    resources:
+      requests:
         cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: "1"
+        memory: 1024Mi
   persistence:
     # Valid options are "filesystem" (persistent volume), "swift", or "objectStorage" (matching global config)
     type: "set-me"
