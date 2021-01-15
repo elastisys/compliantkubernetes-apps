@@ -35,6 +35,8 @@ persistence:
       size: {{ .Values.harbor.database.persistentVolumeClaim.size }}
     redis:
       size: {{ .Values.harbor.redis.persistentVolumeClaim.size }}
+    trivy:
+      size: {{ .Values.harbor.trivy.persistentVolumeClaim.size }}
   imageChartStorage:
     disableredirect: {{ .Values.harbor.persistence.disableRedirect }}
     {{ if eq .Values.harbor.persistence.type "filesystem" }}
@@ -73,36 +75,80 @@ externalURL: https://harbor.{{ .Values.global.baseDomain }}
 
 harborAdminPassword: {{ .Values.harbor.password }}
 
+clair:
+  enabled: false
+
 core:
   secret: {{ .Values.harbor.coreSecret }}
   secretName: harbor-core-cert
   xsrfKey: {{ .Values.harbor.xsrf }}
-  resources: {{- toYaml .Values.harbor.core.resources | nindent 4 }}
+  resources:    {{- toYaml .Values.harbor.core.resources | nindent 4 }}
   nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
-  affinity: {{- toYaml .Values.harbor.affinity | nindent 4 }}
-  tolerations: {{- toYaml .Values.harbor.tolerations | nindent 4 }}
+  affinity:     {{- toYaml .Values.harbor.affinity | nindent 4 }}
+  tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
 
 jobservice:
   secret: {{ .Values.harbor.jobserviceSecret }}
-  resources: {{- toYaml .Values.harbor.jobservice.resources | nindent 4 }}
+  resources:    {{- toYaml .Values.harbor.jobservice.resources | nindent 4 }}
   nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
-  affinity: {{- toYaml .Values.harbor.affinity | nindent 4 }}
-  tolerations: {{- toYaml .Values.harbor.tolerations | nindent 4 }}
+  affinity:     {{- toYaml .Values.harbor.affinity | nindent 4 }}
+  tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
 
 registry:
   secret: {{ .Values.harbor.registrySecret }}
-  resources: {{- toYaml .Values.harbor.registry.resources | nindent 4 }}
+  registry:
+    resources:  {{- toYaml .Values.harbor.registry.resources | nindent 6 }}
+  controller:
+    resources:  {{- toYaml .Values.harbor.registry.controller.resources | nindent 6 }}
   nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
-  affinity: {{- toYaml .Values.harbor.affinity | nindent 4 }}
-  tolerations: {{- toYaml .Values.harbor.tolerations | nindent 4 }}
+  affinity:     {{- toYaml .Values.harbor.affinity | nindent 4 }}
+  tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
 
 notary:
   secretName: harbor-notary-cert
-  resources: {{- toYaml .Values.harbor.notary.resources | nindent 4 }}
+  resources:    {{- toYaml .Values.harbor.notary.resources | nindent 4 }}
   nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
-  affinity: {{- toYaml .Values.harbor.affinity | nindent 4 }}
-  tolerations: {{- toYaml .Values.harbor.tolerations | nindent 4 }}
+  affinity:     {{- toYaml .Values.harbor.affinity | nindent 4 }}
+  tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
 
 database:
   internal:
     password: {{ .Values.harbor.databasePassword }}
+    resources:    {{- toYaml .Values.harbor.database.resources | nindent 6 }}
+    nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 6 }}
+    affinity:     {{- toYaml .Values.harbor.affinity | nindent 6 }}
+    tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 6 }}
+
+trivy:
+  resources:    {{- toYaml .Values.harbor.trivy.resources | nindent 4 }}
+  nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
+  affinity:     {{- toYaml .Values.harbor.affinity | nindent 4 }}
+  tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
+
+portal:
+  resources:    {{- toYaml .Values.harbor.portal.resources | nindent 4 }}
+  nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
+  affinity:     {{- toYaml .Values.harbor.affinity | nindent 4 }}
+  tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
+
+chartmuseum:
+  resources:    {{- toYaml .Values.harbor.chartmuseum.resources | nindent 4 }}
+  nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
+  affinity:     {{- toYaml .Values.harbor.affinity | nindent 4 }}
+  tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
+
+notary:
+  server:
+    resources:  {{- toYaml .Values.harbor.notary.resources | nindent 6 }}
+  signer:
+    resources:  {{- toYaml .Values.harbor.notarySigner.resources | nindent 6 }}
+  nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
+  affinity:     {{- toYaml .Values.harbor.affinity | nindent 4 }}
+  tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
+
+redis:
+  internal:
+    resources:    {{- toYaml .Values.harbor.redis.resources | nindent 6 }}
+    nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 6 }}
+    affinity:     {{- toYaml .Values.harbor.affinity | nindent 6 }}
+    tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 6 }}
