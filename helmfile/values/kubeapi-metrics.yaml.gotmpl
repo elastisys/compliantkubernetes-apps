@@ -5,5 +5,8 @@ ingress:
   username: "kubeapiuser"
   password: "{{ .Values.kubeapiMetricsPassword }}"
   ## TODO: ingress whitelist
-  #extraAnnotations:
+  {{ if .Values.ambassador.enabled }}
+  extraAnnotations:
+    kubernetes.io/ingress.class: ambassador
+  {{ end }}
   #  nginx.ingress.kubernetes.io/whitelist-source-range: ...
