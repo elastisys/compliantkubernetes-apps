@@ -42,8 +42,31 @@ apps_run_wc() {
     )
 }
 
+template_validate_sc() {
+    log_info "Validating helm releases in service cluster"
+
+    kubeconfig="${secrets[kube_config_sc]}"
+
+    with_kubeconfig "${kubeconfig}" \
+        helmfile -f "${here}/../helmfile/" -e service_cluster template --validate >/dev/null
+
+    log_info "Validation of helm releases completed successfully"
+}
+
+template_validate_wc() {
+    log_info "Validating helm releases in workload cluster"
+
+    kubeconfig="${secrets[kube_config_wc]}"
+
+    with_kubeconfig "${kubeconfig}" \
+        helmfile -f "${here}/../helmfile/" -e workload_cluster template --validate >/dev/null
+
+    log_info "Validation of helm releases completed successfully"
+}
+
 apps_sc() {
     apps_init
+    [ "$1" != "--skip-template-validate" ] && template_validate_sc
     apps_run_sc
 
     log_info "Applications applied successfully!"
@@ -51,6 +74,7 @@ apps_sc() {
 
 apps_wc() {
     apps_init
+    [ "$1" != "--skip-template-validate" ] && template_validate_wc
     apps_run_wc
 
     log_info "Applications applied successfully!"
@@ -63,10 +87,10 @@ apps_wc() {
 
 if [[ $1 == "wc" ]]; then
     config_load "$1"
-    apps_wc
+    apps_wc "$2"
 elif [[ $1 == "sc" ]]; then
     config_load "$1"
-    apps_sc
+    apps_sc "$2"
 else
     echo "ERROR:  [$1] is an invalid argument:"
     echo "usage:   ck8s apps <wc|sc>. "

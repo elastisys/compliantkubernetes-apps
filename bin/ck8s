@@ -12,8 +12,8 @@ usage() {
     echo "COMMANDS:" 1>&2
     echo "  init                                        initialize the config path" 1>&2
     echo "  bootstrap <wc|sc>                           bootstrap the cluster" 1>&2
-    echo "  apps <wc|sc>                                deploy the applications" 1>&2
-    echo "  apply <wc|sc>                               bootstrap and apps" 1>&2
+    echo "  apps <wc|sc> [--skip-template-validate]     deploy the applications" 1>&2
+    echo "  apply <wc|sc> [--skip-template-validate]    bootstrap and apps" 1>&2
     echo "  test <wc|sc>                                test the applications" 1>&2
     echo "  dry-run <wc|sc>                             runs helmfile diff" 1>&2
     echo "  team add-pgp <fp>                           add a new PGP key to secrets" 1>&2
@@ -43,12 +43,12 @@ case "${1}" in
         ;;
     apps)
         [[ "${2}" =~ ^(wc|sc)$ ]] || usage
-        "${here}/apps.bash" "${2}"
+        "${here}/apps.bash" "${2}" "${3}"
         ;;
     apply)
         [[ "${2}" =~ ^(wc|sc)$ ]] || usage
         "${here}/bootstrap.bash" "${2}"
-        "${here}/apps.bash" "${2}"
+        "${here}/apps.bash" "${2}" "${3}"
         ;;
     test)
         [[ "${2}" =~ ^(wc|sc)$ ]] || usage
