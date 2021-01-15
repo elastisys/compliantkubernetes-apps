@@ -117,6 +117,12 @@ set_storage_class() {
           storage_class=cinder-storage
           es_storage_class=cinder-storage
 
+          [ "$(yq read "$file" 'storageClasses.nfs.enabled')" = "null" ] &&
+            yq write --inplace "$file" 'storageClasses.nfs.enabled' false
+          [ "$(yq read "$file" 'storageClasses.local.enabled')" = "null" ] &&
+            yq write --inplace "$file" 'storageClasses.local.enabled' false
+          [ "$(yq read "$file" 'storageClasses.ebs.enabled')" = "null" ] &&
+            yq write --inplace "$file" 'storageClasses.ebs.enabled' false
           [ "$(yq read "$file" 'storageClasses.cinder.enabled')" = "null" ] &&
             yq write --inplace "$file" 'storageClasses.cinder.enabled' true
           ;;
@@ -129,21 +135,38 @@ set_storage_class() {
             yq write --inplace "$file" 'storageClasses.nfs.enabled' true
           [ "$(yq read "$file" 'storageClasses.local.enabled')" = "null" ] &&
             yq write --inplace "$file" 'storageClasses.local.enabled' true
+          [ "$(yq read "$file" 'storageClasses.ebs.enabled')" = "null" ] &&
+            yq write --inplace "$file" 'storageClasses.ebs.enabled' false
+          [ "$(yq read "$file" 'storageClasses.cinder.enabled')" = "null" ] &&
+            yq write --inplace "$file" 'storageClasses.cinder.enabled' false
           ;;
 
         aws)
           storage_class=ebs-gp2
           es_storage_class=ebs-gp2
 
+          [ "$(yq read "$file" 'storageClasses.nfs.enabled')" = "null" ] &&
+            yq write --inplace "$file" 'storageClasses.nfs.enabled' false
+          [ "$(yq read "$file" 'storageClasses.local.enabled')" = "null" ] &&
+            yq write --inplace "$file" 'storageClasses.local.enabled' false
           [ "$(yq read "$file" 'storageClasses.ebs.enabled')" = "null" ] &&
             yq write --inplace "$file" 'storageClasses.ebs.enabled' true
+          [ "$(yq read "$file" 'storageClasses.cinder.enabled')" = "null" ] &&
+            yq write --inplace "$file" 'storageClasses.cinder.enabled' false
           ;;
 
         baremetal)
           storage_class=node-local
           es_storage_class=node-local
+
+          [ "$(yq read "$file" 'storageClasses.nfs.enabled')" = "null" ] &&
+            yq write --inplace "$file" 'storageClasses.nfs.enabled' false
           [ "$(yq read "$file" 'storageClasses.local.enabled')" = "null" ] &&
             yq write --inplace "$file" 'storageClasses.local.enabled' true
+          [ "$(yq read "$file" 'storageClasses.ebs.enabled')" = "null" ] &&
+            yq write --inplace "$file" 'storageClasses.ebs.enabled' false
+          [ "$(yq read "$file" 'storageClasses.cinder.enabled')" = "null" ] &&
+           yq write --inplace "$file" 'storageClasses.cinder.enabled' false
           ;;
     esac
 
