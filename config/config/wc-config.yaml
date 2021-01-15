@@ -13,6 +13,7 @@ storageClasses:
   # Normally one of 'nfs-client', 'cinder-storage', 'local-storage', 'ebs-gp2'.
   default: "set-me"
 
+  # These are set to null before the first init to be able to set defaults only once
   nfs:
     enabled: null # true | false
   cinder:

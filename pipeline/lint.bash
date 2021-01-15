@@ -4,13 +4,40 @@ set -eu -o pipefail
 
 here="$(dirname "$(readlink -f "$0")")"
 
-# TODO: Try to get rid of the NFS server IP.
-# We need to set the NFS server IP on Exoscale for the nfs-provisioner.
-NFS_SC_SERVER_IP=127.0.0.1 helmfile -e service_cluster -f "${here}/../helmfile/" lint
-NFS_WC_SERVER_IP=127.0.0.1 helmfile -e workload_cluster -f "${here}/../helmfile/" lint
+#We should only lint our "own" charts, not the upstream ones
+#TODO: enable linting of ck8sdash and kubeapi-metrics after the PGP issues in the pipeline have been solved (https://github.com/elastisys/compliantkubernetes-apps/issues/184)
 
-helmfile -e service_cluster -f "${here}/../bootstrap/namespaces/helmfile/" lint
-helmfile -e workload_cluster -f "${here}/../bootstrap/namespaces/helmfile/" lint
+charts_ignore_list=(
+  "app!=ck8sdash"
+  "app!=sc-logs-retention"
+  "app!=fluentd-configmap"
+  "app!=ingress-nginx"
+  "app!=cert-manager"
+  "app!=kube-prometheus-stack"
+  "app!=velero"
+  "app!=metrics-server"
+  "app!=dex"
+  "app!=wc-scraper"
+  "app!=prometheus-auth"
+  "app!=wc-reader"
+  "app!=prometheus-wc-reader"
+  "app!=user-grafana"
+  "app!=prometheus-elasticsearch-exporter"
+  "app!=harbor"
+  "app!=influxdb"
+  "app!=fluentd"
+  "app!=fluentd-aggregator"
+  "app!=opendistro"
+  "app!=falco"
+  "app!=falco-exporter"
+  "app!=user-alertmanager"
+  "app!=kubeapi-metrics")
 
-NFS_SC_SERVER_IP=127.0.0.1 helmfile -e service_cluster -f "${here}/../bootstrap/storageclass/helmfile/" lint
-NFS_WC_SERVER_IP=127.0.0.1 helmfile -e workload_cluster -f "${here}/../bootstrap/storageclass/helmfile/" lint
+helmfile -e service_cluster -f "${here}/../helmfile/" -l "$(IFS=',' ; echo "${charts_ignore_list[*]}")" lint
+helmfile -e workload_cluster -f "${here}/../helmfile/" -l "$(IFS=',' ; echo "${charts_ignore_list[*]}")" lint
+
+helmfile -e service_cluster -f "${here}/../bootstrap/namespaces/helmfile/" -l "$(IFS=',' ; echo "${charts_ignore_list[*]}")" lint
+helmfile -e workload_cluster -f "${here}/../bootstrap/namespaces/helmfile/" -l "$(IFS=',' ; echo "${charts_ignore_list[*]}")" lint
+
+helmfile -e service_cluster -f "${here}/../bootstrap/storageclass/helmfile/" -l "$(IFS=',' ; echo "${charts_ignore_list[*]}")" lint
+helmfile -e workload_cluster -f "${here}/../bootstrap/storageclass/helmfile/" -l "$(IFS=',' ; echo "${charts_ignore_list[*]}")" lint

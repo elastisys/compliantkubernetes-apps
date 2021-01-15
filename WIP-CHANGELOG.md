@@ -58,6 +58,7 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
 - Helm upgraded to `v3.5.0`.
 - InfluxDB upgraded to `v4.8.12`.
 - Resource requests/limits have been updated for all Harbor pods.
+- The pipeline now stops on lint errors.
 
 ### Fixed
 

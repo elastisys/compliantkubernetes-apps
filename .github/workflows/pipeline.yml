@@ -14,7 +14,7 @@ jobs:
   unit-tests:
     runs-on: ubuntu-latest
     env:
-      CK8S_CONFIG_PATH: ./ck8s-config
+      CK8S_CONFIG_PATH: /github/workspace/ck8s-config
     strategy:
       fail-fast: false
       matrix:
@@ -45,5 +45,3 @@ jobs:
       uses: ./pipeline
       with:
         args: ./pipeline/lint.bash
-      # TODO: Remove this when charts are updated to make the linter happy.
-      continue-on-error: true
