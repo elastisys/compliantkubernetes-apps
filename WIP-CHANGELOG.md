@@ -55,6 +55,7 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
   The issuers are now installed after cert-manager.
   You can now select which namespaces to install the letsencrypt issuers.
 - Helm upgraded to `v3.5.0`.
+- InfluxDB upgraded to `v4.8.12`.
 
 ### Fixed
 
