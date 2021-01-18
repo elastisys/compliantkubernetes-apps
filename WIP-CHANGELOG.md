@@ -28,6 +28,7 @@ See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate
 - Multicluster support for some dashboards in Grafana.
 - More config options for falco sidekick (tolerations, resources, affinity, and nodeSelector)
 - Option to configure serviceMonitor for elasticsearch exporter
+- Option to add more redirect URIs for the `kubelogin` client in dex.
 
 ### Changed
 
