@@ -40,6 +40,8 @@ objectStorage:
     scFluentd: "${CK8S_ENVIRONMENT_NAME}-sc-logs"
 
 user:
+  # This only controls if the namespaces should be created, user RBAC is always created.
+  createNamespaces: true
   namespaces:
     - demo
   adminUsers:

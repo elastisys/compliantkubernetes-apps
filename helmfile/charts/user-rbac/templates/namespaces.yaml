@@ -1,4 +1,4 @@
-{{- if .Values.create_namespaces }}
+{{- if .Values.createNamespaces }}
 {{- range $namespace := .Values.namespaces }}
 apiVersion: v1
 kind: Namespace
