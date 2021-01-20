@@ -24,7 +24,7 @@ releases:
   labels:
     app: ck8s-namespaces
   chart: ./charts/namespaces
-  version: 0.1.0
+  version: 0.1.1
   missingFileHandler: Error
   values:
   {{ if eq .Environment.Name "service_cluster"  }}
