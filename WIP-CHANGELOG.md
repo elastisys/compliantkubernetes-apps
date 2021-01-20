@@ -1,19 +1,14 @@
 ### Release notes
 
-- Removed unused config `global.environmentName` and added `global.clusterName` to migrate there's [this script](migration/v0.8.x-v0.9.x/migrate-config.sh)
-- To udate the password for `user-alertmanager` you'll have to re-install the chart
-  `./bin/ck8s ops helmfile wc -l app=user-alertmanager destroy && ./bin/ck8s ops helmfile wc -l app=user-alertmanager apply`
+- Removed unused config `global.environmentName` and added `global.clusterName` to migrate there's [this script](migration/v0.8.x-v0.9.x/migrate-config.sh).
+- To udate the password for `user-alertmanager` you'll have to re-install the chart.
 - With the replacement of the helm chart `stable/elasticsearch-exporter` to `prometheus-community/prometheus-elasticsearch-exporter`, it is required to manually execute some steps to upgrade.
-See [migrations docs for elasticsearch-exporter](migration/v0.8.x-v0.9.x/migrate-elasticsearch-exporter.md) for instructions on how to perform the upgrade.
 - Configuration regarding backups (in general) and harbor storage have been changed and requires running init again. If `harbor.persistence.type` equals `s3` or `gcs` in your config you must update it to `objectStorage`.
-- Some configuration options must be manually updated.
-  See [the complete migration guide for all details](migration/v0.8.x-v0.9.x/upgrade-apps.md)
-- A few applications require additional steps.
-  See [the complete migration guide for all details](migration/v0.8.x-v0.9.x/upgrade-apps.md)
 - With the removal of `scripts/post-infra-common.sh` you'll now have to, if enabled, manually set the address to the nfs server in `nfsProvisioner.server`
 - The cert-manager CustomResourceDefinitions has been upgraded to `v1`, see [API reference docs](https://cert-manager.io/docs/reference/api-docs/). It is advisable that you update your resources to `v1` in the near future to maintain functionality.
-- The cert-manager letsencrypt issuers have been updated to the `v1` API and the old `letsencrypt` releases must be removed before upgrading. Instruction are found in the [upgrade guide](migration/v0.8.x-v0.9.x/upgrade-apps.md).
+- The cert-manager letsencrypt issuers have been updated to the `v1` API and the old `letsencrypt` releases must be removed before upgrading.
 - To get some of the new default values for resource requests on Harbor pods you will first need to remove the resource requests that you have in your Harbor config and then run `ck8s init` to get the new values.
+- Check out the [upgrade guide](migration/v0.8.x-v0.9.x/upgrade-apps.md) for a complete set of instructions needed to upgrade.
 
 ### Added
 
