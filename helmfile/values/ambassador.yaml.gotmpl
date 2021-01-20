@@ -1,9 +1,18 @@
 service:
   type: ClusterIP
-hostNetwork: true
-dnsPolicy: ClusterFirstWithHostNet
+  ports:
+    - targetPort: 8080
+      hostPort: 80
+      port: 8080
+      name: http
+    - targetPort: 8443
+      hostPort: 443
+      port: 8443
+      name: https
+    - targetPort: 8877
+      hostPort: 8877
+      port: 8877
+      name: health
+hostNetwork: false
+dnsPolicy: ClusterFirst
 daemonSet: true
-
-security:
-  podSecurityContext:
-    runAsUser: 0
