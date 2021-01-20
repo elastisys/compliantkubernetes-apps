@@ -83,7 +83,7 @@ alertmanager:
             basic_auth:
               # https://docs.opsgenie.com/docs/authentication
               # username: no username
-              password: {{ .Values.opsgenie.apiKey }}
+              password: {{ .Values.alerts.opsGenie.apiKey }}
       {{ end }}
     - name: slack
       {{ if eq .Values.alerts.alertTo "slack" }}
