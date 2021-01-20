@@ -104,6 +104,9 @@ ingress:
   tls: true
   annotations:
     cert-manager.io/issuer: {{ .Values.global.issuer }}
+    {{ if .Values.ambassador.enabled }}
+    kubernetes.io/ingress.class: ambassador
+    {{ end }}
   secretName: influxdb-ingress-cert
   hostname: influxdb.{{ .Values.global.opsDomain }}
 

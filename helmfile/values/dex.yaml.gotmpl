@@ -11,6 +11,9 @@ ingress:
     {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.dex }}
     nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.dex }}
     {{ end }}
+    {{ if .Values.ambassador.enabled }}
+    kubernetes.io/ingress.class: ambassador
+    {{ end }}
   tls:
   - secretName: dex-tls
     hosts:

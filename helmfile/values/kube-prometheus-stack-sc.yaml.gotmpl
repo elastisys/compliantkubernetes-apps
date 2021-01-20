@@ -158,6 +158,9 @@ grafana:
     {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.opsGrafana }}
       nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.opsGrafana }}
     {{ end }}
+    {{ if .Values.ambassador.enabled }}
+      kubernetes.io/ingress.class: ambassador
+    {{ end }}
     hosts:
     - grafana.{{ .Values.global.opsDomain }}
     ## TLS configuration for grafana Ingress

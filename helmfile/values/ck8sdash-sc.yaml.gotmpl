@@ -1,8 +1,13 @@
 ingress:
   clusterDomain: {{ .Values.global.opsDomain }}
-  {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.ck8sdash}}
+  {{ if or ( .Values.ambassador.enabled ) (and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.ck8sdash) }}
   extraAnnotations:
+    {{ if .Values.ambassador.enabled }}
+    kubernetes.io/ingress.class: ambassador
+    {{ end }}
+    {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.ck8sdash }}
     nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.ck8sdash }}
+    {{ end }}
   {{ end }}
 
 grafana:

@@ -338,6 +338,9 @@ elasticsearch:
         {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.elasticsearch }}
         nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.elasticsearch }}
         {{ end }}
+        {{ if .Values.ambassador.enabled }}
+        kubernetes.io/ingress.class: ambassador
+        {{ end }}
       path: /
       hosts:
       - elastic.{{ .Values.global.opsDomain }}
@@ -356,6 +359,9 @@ kibana:
       cert-manager.io/issuer: {{ .Values.global.issuer }}
       {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.kibana }}
       nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.kibana }}
+      {{ end }}
+      {{ if .Values.ambassador.enabled }}
+      kubernetes.io/ingress.class: ambassador
       {{ end }}
     path: /
     hosts:
