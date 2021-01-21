@@ -45,7 +45,6 @@ fi
 if [ "$enable_harbor" == true ]; then
     deployments+=(
         "harbor harbor-harbor-chartmuseum"
-        "harbor harbor-harbor-clair"
         "harbor harbor-harbor-core"
         "harbor harbor-harbor-jobservice"
         "harbor harbor-harbor-notary-server"
@@ -123,6 +122,7 @@ if [ "$enable_harbor" == true ]; then
     statefulsets+=(
         "harbor harbor-harbor-database"
         "harbor harbor-harbor-redis"
+        "harbor harbor-harbor-trivy"
     )
 fi
 if [ "$enable_fluentd" == true ]; then
