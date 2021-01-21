@@ -226,7 +226,7 @@ set_elasticsearch_config() {
 
     esac
 
-    replace_set_me "$1" 'fluentd.useRegionEndpoint' "$use_regionendpoint"
+    replace_set_me "$1" 'fluentd.forwarder.useRegionEndpoint' "$use_regionendpoint"
 }
 
 # Usage: set_harbor_config <config-file>
