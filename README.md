@@ -284,6 +284,7 @@ See <https://compliantkubernetes.io/operator-manual/>.
 
 - Elasticsearch SSO is currently hard coded to use the users real name as identifier, as opposed to a username or email address.
   This will be addressed in the future.
+- When using local volumes, elasticsearch might not start properly unless all worker nodes in the cluster has a local volume attatched to it.
 - Users must explicitly be given privileges in Grafana, Elasticsearch and Kubernetes instead of automatically getting assigned roles based on group membership when logging in using OIDC.
 - The OPA policies are not enforced by default.
   Unfortunately the policies breaks cert-manager so they have been set to "dry-run" by default.
