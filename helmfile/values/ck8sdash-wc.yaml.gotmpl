@@ -10,7 +10,6 @@ ingress:
     {{ end }}
   {{ end }}
 
-
 grafana:
   url: "https://grafana.{{ .Values.global.baseDomain }}"
   password: {{ .Values.user.grafanaPassword }}
