@@ -43,31 +43,6 @@ extraConfigMaps:
       </log>
     </system>
 
-  10-kube-audit.conf: |-
-    <source>
-      @id kube-audit
-      @type tail
-      path /var/log/kube-audit/kube-apiserver.log
-      pos_file /var/log/kube-audit/fluentd-kube-apiserver.pos
-      tag kubeaudit.*
-      read_from_head true
-      <parse>
-        @type multi_format
-        <pattern>
-          format json
-          time_key time
-          time_format %Y-%m-%dT%H:%M:%S.%NZ
-        </pattern>
-      </parse>
-    </source>
-    # Remove keys that include raw data causing errors
-    # See: https://github.com/uken/fluent-plugin-elasticsearch/issues/452
-    <filter kubeaudit.**>
-      @id kube_api_audit_normalize
-      @type record_transformer
-      remove_keys responseObject,requestObject
-    </filter>
-
   containers.input.conf: |-
     #This config is taken from a default config that we have disabled
     #See the value "configMaps.useDefaults.containersInputConf: false" above
