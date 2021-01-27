@@ -50,7 +50,7 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
 
   # Optional, only if you have alertmanager installed and you want to update the basic auth password.
   ./bin/ck8s ops helmfile wc -l app=user-alertmanager destroy
-  
+
   # Remove all letsencrypt relases
   for namespace in $(./bin/ck8s ops helm wc list --all-namespaces | grep -F letsencrypt | awk '{ print $2 }'); do
       ./bin/ck8s ops helm wc uninstall letsencrypt -n ${namespace}
@@ -63,7 +63,7 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
 5. Upgrade service cluster applications
   ```bash
 
-  # Remove elasticsearch-exporter 
+  # Remove elasticsearch-exporter
   ./bin/ck8s ops helm sc uninstall elasticsearch-exporter -n elastic-system
 
   # Destroy old fluentd releases
