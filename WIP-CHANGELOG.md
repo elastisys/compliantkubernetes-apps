@@ -3,7 +3,6 @@
 ### Added
 
 ### Changed
-- The pipeline now stops on lint errors.
 
 ### Fixed
 
