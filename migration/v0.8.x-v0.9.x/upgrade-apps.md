@@ -1,5 +1,5 @@
 
-# [WIP] Upgrade v0.8.x to v0.9.0
+# Upgrade v0.8.x to v0.9.0
 
 You will need to follow these steps in order to upgrade each Compliant Kubernetes environment from v0.8.x to v0.9.0. The instructions assume that you work from the root of the `compliantkubernetes-apps` repository, has the latest changes already pulled and configured `CK8S_CONFIG_PATH` correctly.
 
