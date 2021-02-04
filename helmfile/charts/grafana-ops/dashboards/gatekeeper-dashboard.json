@@ -95,7 +95,7 @@
       "type": "stat"
     },
     {
-      "datasource": "prometheus-wc-reader",
+      "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -255,7 +255,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "prometheus-wc-reader",
+      "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
           "custom": {}
