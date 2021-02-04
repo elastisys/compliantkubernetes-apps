@@ -11,7 +11,7 @@
                 "type": "dashboard"
             },
             {
-                "datasource": "prometheus-sc",
+                "datasource": "$datasource",
                 "enable": true,
                 "expr": "sum(changes(nginx_ingress_controller_config_last_reload_successful_timestamp_seconds{instance!=\"unknown\",controller_class=~\"$controller_class\",namespace=~\"$namespace\"}[30s])) by (controller_class)",
                 "hide": false,
