@@ -4,7 +4,7 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
 
 1. Checkout the new release: `git checkout v0.10.0`.
 
-4. Run init to get new defaults: `./bin/ck8s init`
+2. Run init to get new defaults: `./bin/ck8s init`
 
 3. The following configuration options must be manually updated in your configuration files:
 
@@ -23,6 +23,25 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
 
 5. Upgrade service cluster applications
   ```bash
+
+
+  # Upgrade Elasticsearch
+  ./bin/ck8s ops helmfile sc -l app=opendistro apply
+
+  # Wait for master pod 0 to be up and for elasticsearch to have started
+
+  # Reload security config
+  ./bin/ck8s ops kubectl sc -n elastic-system exec opendistro-es-master-0 -- chmod +x ./plugins/opendistro_security/tools/securityadmin.sh
+  ./bin/ck8s ops kubectl sc -n elastic-system exec opendistro-es-master-0 -- ./plugins/opendistro_security/tools/securityadmin.sh \
+      -cd plugins/opendistro_security/securityconfig/ \
+      -icl -nhnv \
+      -cacert config/admin-root-ca.pem \
+      -cert config/admin-crt.pem \
+      -key config/admin-key.pem
+
+  # Wait for release to finish
+
+  # Upgrade rest
   ./bin/ck8s apply sc
   ```
 

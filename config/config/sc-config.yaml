@@ -234,6 +234,10 @@ elasticsearch:
   masterNode:
     count: 1
     storageSize: 8Gi
+    ## If null, no storageclass is specified in pvc and default storageClass is used
+    ## if the DefaultStorageClass admission plugin is enabled.
+    ## If "-", "" will be used as storageClassName.
+    storageClass: null
     javaOpts: "-Xms512m -Xmx512m"
     resources:
       requests:
@@ -254,9 +258,15 @@ elasticsearch:
     tolerations: []
     nodeSelector: {}
   dataNode:
+    ## Enables dedicated statefulset for data nodes.
+    ## If false, master nodes will assume data role.
+    dedicatedPods: true
     count: 2
     storageSize: 25Gi
-    storageClass: local-storage
+    ## If null, no storageclass is specified in pvc and default storageClass is used
+    ## if the DefaultStorageClass admission plugin is enabled.
+    ## If "-", "" will be used as storageClassName.
+    storageClass: null
     javaOpts: "-Xms512m -Xmx512m"
     resources:
       requests:
@@ -277,6 +287,9 @@ elasticsearch:
     tolerations: []
     nodeSelector: {}
   clientNode:
+    ## Enables dedicated deployment for client/ingest nodes.
+    ## If false, master nodes will assume client/ingest roles
+    dedicatedPods: true
     count: 1
     javaOpts: "-Xms512m -Xmx512m"
     resources:
