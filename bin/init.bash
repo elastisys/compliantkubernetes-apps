@@ -115,7 +115,6 @@ set_storage_class() {
     case ${CK8S_CLOUD_PROVIDER} in
         safespring | citycloud)
           storage_class=cinder-storage
-          es_storage_class=cinder-storage
 
           [ "$(yq read "$file" 'storageClasses.nfs.enabled')" = "null" ] &&
             yq write --inplace "$file" 'storageClasses.nfs.enabled' false
@@ -129,7 +128,6 @@ set_storage_class() {
 
         exoscale)
           storage_class=nfs-client
-          es_storage_class=local-storage
 
           [ "$(yq read "$file" 'storageClasses.nfs.enabled')" = "null" ] &&
             yq write --inplace "$file" 'storageClasses.nfs.enabled' true
@@ -143,7 +141,6 @@ set_storage_class() {
 
         aws)
           storage_class=ebs-gp2
-          es_storage_class=ebs-gp2
 
           [ "$(yq read "$file" 'storageClasses.nfs.enabled')" = "null" ] &&
             yq write --inplace "$file" 'storageClasses.nfs.enabled' false
@@ -157,7 +154,6 @@ set_storage_class() {
 
         baremetal)
           storage_class=node-local
-          es_storage_class=node-local
 
           [ "$(yq read "$file" 'storageClasses.nfs.enabled')" = "null" ] &&
             yq write --inplace "$file" 'storageClasses.nfs.enabled' false
@@ -171,11 +167,6 @@ set_storage_class() {
     esac
 
     replace_set_me "$1" 'storageClasses.default' "$storage_class"
-
-    # Only write if field exists already
-    if yq read --exitStatus "$file" 'elasticsearch.dataNode.storageClass' > /dev/null 2> /dev/null; then
-        yq write --inplace "$file" 'elasticsearch.dataNode.storageClass' "$es_storage_class"
-    fi
 }
 
 # Usage: set_nginx_config <config-file>

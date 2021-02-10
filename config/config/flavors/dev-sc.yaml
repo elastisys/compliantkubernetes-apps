@@ -20,34 +20,19 @@ prometheus:
 
 elasticsearch:
   masterNode:
-    storageSize: 1Gi
-    javaOpts: "-Xms512m -Xmx512m"
+    storageSize: 20Gi
+    javaOpts: "-Xms1536m -Xmx1536m"
     resources:
       requests:
-        memory: 1024Mi
-        cpu: 100m
+        memory: 3072Mi
+        cpu: 300m
       limits:
-        memory: 1024Mi
-        cpu: 1
+        memory: 3072Mi
+        cpu: 2
   dataNode:
-    storageSize: 18Gi
-    javaOpts: "-Xms512m -Xmx512m"
-    resources:
-      requests:
-        memory: 1024Mi
-        cpu: 200m
-      limits:
-        memory: 1024Mi
-        cpu: 1
+    dedicatedPods: false
   clientNode:
-    javaOpts: "-Xms512m -Xmx512m"
-    resources:
-      requests:
-        memory: 1024Mi
-        cpu: 200m
-      limits:
-        memory: 1024Mi
-        cpu: 1
+    dedicatedPods: false
   curator:
     retention:
       kubeAuditSizeGB: 4

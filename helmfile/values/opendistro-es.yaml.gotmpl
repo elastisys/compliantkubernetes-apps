@@ -58,7 +58,7 @@ elasticsearch:
 
   extraInitContainers:
   - name: install-object-storage-plugin
-    image: amazon/opendistro-for-elasticsearch:1.10.1
+    image: amazon/opendistro-for-elasticsearch:1.12.0
     command:
     - sh
     - -c
@@ -186,6 +186,7 @@ elasticsearch:
             cluster_permissions:
             - "cluster:admin/repository/put"
             - "cluster_manage_index_templates"
+            - "cluster:admin/opendistro/ism/policy/*"
             index_permissions:
             - index_patterns:
               - "*"
@@ -302,9 +303,14 @@ elasticsearch:
 
     persistence:
       size: {{ .Values.elasticsearch.masterNode.storageSize }}
+      storageClass: {{ toYaml .Values.elasticsearch.masterNode.storageClass }}
 
   # Data nodes configuration
   data:
+    ## Enables dedicated statefulset for data. Otherwise master nodes as data storage
+    dedicatedPod:
+      enabled: {{ .Values.elasticsearch.dataNode.dedicatedPods }}
+
     replicas: {{ .Values.elasticsearch.dataNode.count }}
 
     javaOpts: {{ .Values.elasticsearch.dataNode.javaOpts }}
@@ -315,11 +321,15 @@ elasticsearch:
     nodeSelector: {{- toYaml .Values.elasticsearch.dataNode.nodeSelector | nindent 6 }}
 
     persistence:
-      storageClass: {{ .Values.elasticsearch.dataNode.storageClass }}
       size: {{ .Values.elasticsearch.dataNode.storageSize }}
+      storageClass: {{ toYaml .Values.elasticsearch.dataNode.storageClass }}
 
   # Client nodes configuration
   client:
+    ## Enables dedicated deployment for client/ingest. Otherwise master nodes as client/ingest
+    dedicatedPod:
+      enabled: {{ .Values.elasticsearch.clientNode.dedicatedPods }}
+
     replicas: {{ .Values.elasticsearch.clientNode.count }}
 
     javaOpts: {{ .Values.elasticsearch.clientNode.javaOpts }}
