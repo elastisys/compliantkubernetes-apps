@@ -7,7 +7,7 @@ namespaces:
 - name: kube-public
 - name: kube-system
   labels:
-    control-plane: "true"
+    admission.gatekeeper.sh/ignore: "true"
 - name: monitoring
 - name: ingress-nginx
 - name: velero
@@ -18,7 +18,7 @@ namespaces:
 - name: gatekeeper
 - name: gatekeeper-system
   labels:
-    control-plane: "true"
+    admission.gatekeeper.sh/ignore: "true"
 {{ end }}
 {{ if .Values.ck8sdash.enabled }}
 - name: ck8sdash
