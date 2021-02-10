@@ -183,56 +183,6 @@ releases:
   values:
   - values/dex.yaml.gotmpl
 
-#
-# To be removed.
-#
-# Prometheus-instance for scraping workload cluster metrics
-- name: wc-scraper
-  namespace: monitoring
-  labels:
-    app: wc-scraper
-  chart: ./charts/prometheus-instance
-  version: 0.1.0
-  installed: false
-  missingFileHandler: Error
-  values:
-  - values/prometheus-wc-federate-scraper.yaml.gotmpl
-
-#
-# To be removed
-#
-# Basic auth credentials for accessing workload cluster prometheus
-- name: prometheus-auth
-  namespace: monitoring
-  labels:
-    app: prometheus-auth
-  chart: ./charts/basic-auth-secret
-  version: 0.1.0
-  installed: false
-  missingFileHandler: Error
-  values:
-  - values/prometheus-auth.yaml.gotmpl
-
-#
-# To be removed
-#
-# prometheus wc-scraper alerts
-- name: wc-scraper-alerts
-  namespace: monitoring
-  labels:
-    app: prometheus-alerts
-    prometheus: wc-scraper
-  chart: ./charts/prometheus-alerts
-  version: 0.1.0
-  installed: false
-  missingFileHandler: Error
-  values:
-{{ if eq .Environment.Name "service_cluster" }}
-  # Note: we want to have alerts for WC since this is wc-scraper, even if it is
-  # running in SC.
-  - values/prometheus-alerts-wc.yaml.gotmpl
-{{ end }}
-
 # Prometheus-instance for reader workload cluster metrics from InfluxDB
 - name: wc-reader
   namespace: monitoring
@@ -430,18 +380,6 @@ releases:
   - fluentd/fluentd-configmap
   values:
   - values/fluentd-sc.yaml.gotmpl
-
-# Fluentd aggregator
-- name: fluentd-aggregator
-  namespace: fluentd
-  labels:
-    app: fluentd-aggregator
-  chart: stable/fluentd
-  version: 2.3.2
-  installed: false
-  missingFileHandler: Error
-  values:
-  - values/fluentd-aggregator.yaml.gotmpl
 
 # configmap for fluentd (for both aggregator and forwarder)
 - name: fluentd-configmap
