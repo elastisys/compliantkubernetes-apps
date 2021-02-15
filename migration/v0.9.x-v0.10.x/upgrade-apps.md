@@ -16,30 +16,35 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
     - `ck8sdash.*`
     - `externalTrafficPolicy.whitelistRange.ck8sdash`
 
+4. Check elasticsearch configuration in sc-config.yaml
+  Make sure that the new `elasticsearch.dataNode.dedicatedPods` and `elasticsearch.clientNode.dedicatedPods` are set to the desired value (true or false) to avoid unintentional changes to the cluster topology.
+
 4. Upgrade workload cluster applications
   ```bash
   ./bin/ck8s apply wc
   ```
 
 5. Upgrade service cluster applications
+  **Note**, during the upgrade, the opendistro roles will be reloaded, so make sure you've got sufficient backups of the ones you've manually added.
+
   ```bash
-
-
   # Upgrade Elasticsearch
   ./bin/ck8s ops helmfile sc -l app=opendistro apply
 
+  # Open another teminal so that you can run kubectl while helmfile is running
+
   # Wait for master pod 0 to be up and for elasticsearch to have started
 
-  # Reload security config
+  # Reload roles.
   ./bin/ck8s ops kubectl sc -n elastic-system exec opendistro-es-master-0 -- chmod +x ./plugins/opendistro_security/tools/securityadmin.sh
   ./bin/ck8s ops kubectl sc -n elastic-system exec opendistro-es-master-0 -- ./plugins/opendistro_security/tools/securityadmin.sh \
-      -cd plugins/opendistro_security/securityconfig/ \
+      -f plugins/opendistro_security/securityconfig/roles.yml \
       -icl -nhnv \
       -cacert config/admin-root-ca.pem \
       -cert config/admin-crt.pem \
       -key config/admin-key.pem
 
-  # Wait for release to finish
+  # Wait for release to finish installing
 
   # Upgrade rest
   ./bin/ck8s apply sc
