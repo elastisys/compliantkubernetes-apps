@@ -187,14 +187,8 @@ set_nginx_config() {
         exit 1
     fi
     case ${CK8S_CLOUD_PROVIDER} in
-        citycloud | exoscale)
+        citycloud | exoscale | safespring)
           use_proxy_protocol=false
-          use_host_port=true
-          service_enabled=false
-          ;;
-
-        safespring)
-          use_proxy_protocol=true
           use_host_port=true
           service_enabled=false
           ;;
