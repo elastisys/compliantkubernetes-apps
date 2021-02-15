@@ -22,12 +22,6 @@ kubectl -n kube-system create secret generic elasticsearch \
 kubectl -n fluentd create secret generic elasticsearch \
     --from-literal=password="${elasticsearch_password}" --dry-run -o yaml | kubectl apply -f -
 
-echo "Installing helm charts" >&2
-cd "${SCRIPTS_PATH}/../helmfile"
-declare -a helmfile_opt_flags
-[[ -n "$INTERACTIVE" ]] && helmfile_opt_flags+=("$INTERACTIVE")
-helmfile -f . -e workload_cluster "${helmfile_opt_flags[@]}" apply --suppress-diff
-
 # Add example resources.
 # We use `create` here instead of `apply` to avoid overwriting any changes the
 # user may have done.
@@ -35,5 +29,11 @@ kubectl create -f "${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-c
     2> /dev/null || echo "fluentd-extra-config configmap already in place. Ignoring."
 kubectl create -f "${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-plugins.yaml" \
     2> /dev/null || echo "fluentd-extra-plugins configmap already in place. Ignoring." >&2
+
+echo "Installing helm charts" >&2
+cd "${SCRIPTS_PATH}/../helmfile"
+declare -a helmfile_opt_flags
+[[ -n "$INTERACTIVE" ]] && helmfile_opt_flags+=("$INTERACTIVE")
+helmfile -f . -e workload_cluster "${helmfile_opt_flags[@]}" apply --suppress-diff
 
 echo "Deploy wc completed!" >&2
