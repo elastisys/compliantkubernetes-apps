@@ -236,6 +236,8 @@ function testEndpoint {
     retries=6
     while [ ${retries} -gt 0 ]; do
         args=(
+            --connect-timeout 20
+            --max-time 60
             -ksIL
             -o /dev/null
             -X GET
@@ -266,6 +268,8 @@ function testEndpointProtected {
     retries=6
     while [ ${retries} -gt 0 ]; do
         args=(
+            --connect-timeout 20
+            --max-time 60
             -ksI
             -o /dev/null
             -X GET
