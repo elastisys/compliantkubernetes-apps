@@ -28,13 +28,6 @@
 <!--
 Here are the commit prefixes and comments on when to use them:
 all: (things that touch on more than one of the areas below, or don't fit any of them)
-infra: (changes to our infrastructure code that apply to more than one cloud)
-infra aws (changes to our infrastructure code that apply only to AWS)
-infra exo: (changes to our infrastructure code that apply only to Exoscale)
-infra safe: (changes to our infrastructure code that apply only to Safespring)
-infra city: (changes to our infrastructure code that apply only to CityCloud)
-lb: (things related to the HAProxy load balancer)
-k8s: (kubernetes related changes, e.g. cluster initialization or join)
 apps: (changes to the applications running in both/all clusters)
 apps sc: (changes to applications in the service cluster)
 apps wc: (changes to applications in the workload cluster)
