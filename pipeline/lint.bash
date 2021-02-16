@@ -5,10 +5,9 @@ set -eu -o pipefail
 here="$(dirname "$(readlink -f "$0")")"
 
 #We should only lint our "own" charts, not the upstream ones
-#TODO: enable linting of ck8sdash and kubeapi-metrics after the PGP issues in the pipeline have been solved (https://github.com/elastisys/compliantkubernetes-apps/issues/184)
+#TODO: enable linting of kubeapi-metrics after the PGP issues in the pipeline have been solved (https://github.com/elastisys/compliantkubernetes-apps/issues/184)
 
 charts_ignore_list=(
-  "app!=ck8sdash"
   "app!=sc-logs-retention"
   "app!=fluentd-configmap"
   "app!=ingress-nginx"

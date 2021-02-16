@@ -107,24 +107,14 @@ releases:
 {{ end }}
 
 
+## Deprecated, remove later.
 - name: ck8sdash
   namespace: ck8sdash
   labels:
     app: ck8sdash
   chart: ./charts/ck8sdash
   version: 0.3.1
-  installed: {{ .Values.ck8sdash.enabled }}
-  missingFileHandler: Error
-  needs:
-  - cert-manager/cert-manager
-  values:
-  - values/ck8sdash-common.yaml.gotmpl
-{{ if eq .Environment.Name "service_cluster" }}
-  - values/ck8sdash-sc.yaml.gotmpl
-{{ end }}
-{{ if eq .Environment.Name "workload_cluster" }}
-  - values/ck8sdash-wc.yaml.gotmpl
-{{ end }}
+  installed: false
 
 # Velero
 - name: velero

@@ -12,7 +12,6 @@ echo "=================="
 ops_domain=$(yq r -e "${CONFIG_FILE}" 'global.opsDomain')
 base_domain=$(yq r -e "${CONFIG_FILE}" 'global.baseDomain')
 enable_harbor=$(yq r -e "${CONFIG_FILE}" 'harbor.enabled')
-enable_ck8sdash=$(yq r -e "${CONFIG_FILE}" 'ck8sdash.enabled')
 enable_user_grafana=$(yq r -e "${CONFIG_FILE}" 'user.grafana.enabled')
 
 testEndpoint Elasticsearch "https://elastic.${ops_domain}/"
@@ -25,10 +24,6 @@ fi
 
 testEndpoint Grafana "https://grafana.${ops_domain}/"
 testEndpoint InfluxDB "https://influxdb.${ops_domain}/health"
-
-if [ "$enable_ck8sdash" == true ]; then
-    testEndpoint ck8sdash "https://ck8sdash.${ops_domain}/"
-fi
 
 if [ "$enable_user_grafana" == "true" ]
 then

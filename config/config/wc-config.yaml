@@ -287,33 +287,6 @@ fluentd:
     affinity: {}
     nodeSelector: {}
 
-##
-## TODO: remove when next-gen dashboards are in place.
-##
-## Ck8sdash configuration
-ck8sdash:
-  enabled: true
-  tolerations: []
-  affinity: {}
-  nodeSelector: {}
-
-  nginx:
-    resources:
-      requests:
-        memory: 64Mi
-        cpu: 50m
-      limits:
-        memory: 128Mi
-        cpu: 100m
-  server:
-    resources:
-      requests:
-        memory: 64Mi
-        cpu: 50m
-      limits:
-        memory: 128Mi
-        cpu: 100m
-
 ## Set external traffic policy to: "Local" to preserve source IP on
 ## providers supporting it
 ## Ref: https://kubernetes.io/docs/tutorials/services/source-ip/#source-ip-for-services-with-typeloadbalancer
@@ -323,7 +296,6 @@ externalTrafficPolicy:
   ## Source IP range to allow.
   whitelistRange:
     global: "0.0.0.0/0"
-    ck8sdash: false
 
 ## Nginx ingress controller configuration
 ingressNginx:

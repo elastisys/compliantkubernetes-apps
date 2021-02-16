@@ -101,7 +101,6 @@ RESOURCES=(
 )
 CK8S_NAMESPACES=(
     cert-manager
-    ck8sdash
     default
     falco
     fluentd

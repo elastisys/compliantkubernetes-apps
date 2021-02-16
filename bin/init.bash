@@ -318,17 +318,12 @@ set_issuer_namespaces() {
     cluster=$2
 
     if [ "${cluster}" = "service_cluster" ]; then
-        ck8sdash=$(yq r -e "${file}" 'ck8sdash.enabled')
         harbor=$(yq r -e "${file}" 'harbor.enabled')
 
         issuer_namespaces='dex elastic-system kube-system monitoring influxdb-prometheus'
-        [ "$ck8sdash" = "true" ] && issuer_namespaces+=" ck8sdash"
         [ "$harbor" = "true" ] && issuer_namespaces+=" harbor"
     elif [ "${cluster}" = "workload_cluster" ]; then
-        ck8sdash=$(yq r -e "${file}" 'ck8sdash.enabled')
-
         issuer_namespaces='kube-system monitoring'
-        [ "$ck8sdash" == "true" ] && issuer_namespaces+=" ck8sdash"
     else
         log_error "ERROR: unkown cluster variable."
     fi

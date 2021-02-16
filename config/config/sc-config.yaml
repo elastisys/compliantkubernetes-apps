@@ -479,33 +479,10 @@ alerts:
   opsGenie:
     apiUrl: "https://api.eu.opsgenie.com"
 
-ck8sdash:
-  enabled: true
-  tolerations: []
-  affinity: {}
-  nodeSelector: {}
-  nginx:
-    resources:
-      requests:
-        memory: 64Mi
-        cpu: 50m
-      limits:
-        memory: 128Mi
-        cpu: 100m
-  server:
-    resources:
-      requests:
-        memory: 64Mi
-        cpu: 50m
-      limits:
-        memory: 128Mi
-        cpu: 100m
-
 externalTrafficPolicy:
   local: false
   whitelistRange:
     global: "0.0.0.0/0"
-    ck8sdash: false
     dex: false
     kibana: false
     elasticsearch: false

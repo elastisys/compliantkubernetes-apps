@@ -16,8 +16,5 @@ namespaces:
 - name: gatekeeper
 - name: gatekeeper-system
 {{ end }}
-{{ if .Values.ck8sdash.enabled }}
-- name: ck8sdash
-{{ end }}
 commonLabels:
   owner: operator

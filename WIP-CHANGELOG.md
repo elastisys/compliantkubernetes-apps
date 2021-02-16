@@ -1,5 +1,9 @@
 ### Release notes
 
+- Ck8sdash has been deprecated and will be removed when upgrading.
+  Some resources like it's namespace will have to be manually removed.
+- Check out the [upgrade guide](migration/v0.9.x-v0.10.x/upgrade-apps.md) for a complete set of instructions needed to upgrade.
+
 ### Added
 
 - Several new dashboards for velero, nginx, gatekeeper, uptime of services, and kubernetes status.
@@ -14,3 +18,7 @@
 ### Fixed
 
 - Fixed issue with adding annotation to bootstrap namespace chart
+
+### Removed
+
+- Ck8sdash.
