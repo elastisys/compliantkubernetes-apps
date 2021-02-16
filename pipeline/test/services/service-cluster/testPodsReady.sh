@@ -7,7 +7,6 @@ source "${INNER_SCRIPTS_PATH}/../funcs.sh"
 cloud_provider=$(yq r -e "${CONFIG_FILE}" 'global.cloudProvider')
 enable_harbor=$(yq r -e "${CONFIG_FILE}" 'harbor.enabled')
 enable_harbor_backup=$(yq r -e "${CONFIG_FILE}" 'harbor.backup.enabled')
-enable_ck8sdash=$(yq r -e "${CONFIG_FILE}" 'ck8sdash.enabled')
 enable_user_grafana=$(yq r -e "${CONFIG_FILE}" 'user.grafana.enabled')
 enable_fluentd=$(yq r -e "${CONFIG_FILE}" 'fluentd.enabled')
 enable_elasticsearch_snapshot=$(yq r -e "${CONFIG_FILE}" 'elasticsearch.snapshot.enabled')
@@ -52,9 +51,6 @@ if [ "$enable_harbor" == true ]; then
         "harbor harbor-harbor-portal"
         "harbor harbor-harbor-registry"
     )
-fi
-if [ "$enable_ck8sdash" == true ]; then
-    deployments+=("ck8sdash ck8sdash")
 fi
 if [ "$enable_user_grafana" == true ]; then
     deployments+=("monitoring user-grafana")

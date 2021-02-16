@@ -5,7 +5,6 @@ INNER_SCRIPTS_PATH="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 source "${INNER_SCRIPTS_PATH}/../funcs.sh"
 
 cloud_provider=$(yq r -e "${CONFIG_FILE}" 'global.cloudProvider')
-enable_ck8sdash=$(yq r -e "${CONFIG_FILE}" 'ck8sdash.enabled')
 enable_falco_alerts=$(yq r -e "${CONFIG_FILE}" 'falco.alerts.enabled')
 enable_falco=$(yq r -e "${CONFIG_FILE}" 'falco.enabled')
 enable_opa=$(yq r -e "${CONFIG_FILE}" 'opa.enabled')
@@ -30,9 +29,6 @@ deployments=(
 )
 if [ "$cloud_provider" == "exoscale" ]; then
     deployments+=("kube-system nfs-client-provisioner")
-fi
-if [ "$enable_ck8sdash" == true ]; then
-    deployments+=("ck8sdash ck8sdash")
 fi
 if [ "$enable_opa" == true ]; then
     deployments+=("gatekeeper-system gatekeeper-controller-manager")

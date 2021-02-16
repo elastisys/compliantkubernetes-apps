@@ -55,7 +55,7 @@ customRules:
       condition: >
         (container.image.repository in (gcr.io/google_containers/hyperkube-amd64,
         gcr.io/google_containers/kube2sky, sysdig/agent, sysdig/falco,
-        sysdig/sysdig, falcosecurity/falco, elastisys/ck8sdash-nginx, quay.io/fluentd_elasticsearch/fluentd) or (k8s.ns.name = "kube-system"))
+        sysdig/sysdig, falcosecurity/falco, quay.io/fluentd_elasticsearch/fluentd) or (k8s.ns.name = "kube-system"))
     - list: falco_privileged_images
       items: [
         docker.io/sysdig/agent, docker.io/sysdig/falco, docker.io/sysdig/sysdig,
