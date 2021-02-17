@@ -65,7 +65,7 @@ aggregator:
       </match>
     {{ if eq .Values.objectStorage.type "gcs" -}}
     gcp_credentials.json: |
-      {{ .Values.objectStorage.gcs.keyfileData | nindent 4 }}
+      {{ .Values.objectStorage.gcs.keyfileData | nindent 6 }}
     {{- end }}
 
   plugins:
