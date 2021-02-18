@@ -11,6 +11,10 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
   - Remove from `wc-config.yaml`
     - `ck8sdash.*`
     - `externalTrafficPolicy.whitelistRange.ck8sdash`
+    - `objectStorage.buckets.harbor`
+    - `objectStorage.buckets.elasticsearch`
+    - `objectStorage.buckets.influxDB`
+    - `objectStorage.buckets.scFluentd`
 
   - Remove from `sc-config.yaml`
     - `ck8sdash.*`
