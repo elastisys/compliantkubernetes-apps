@@ -2,9 +2,6 @@
 - With the update of the opendistro helm chart you can now decide whether or not you want dedicated deployments for data and client/ingest nodes.
   By setting `elasticsearch.dataNode.dedicatedPods: false` and `elasticsearch.clientNode.dedicatedPods: false`,
   the master node statefulset will assume all roles.
-- Check out the [upgrade guide](migration/v0.9.x-v0.10.x/upgrade-apps.md) for a complete set of instructions needed to upgrade.
-
-
 - Ck8sdash has been deprecated and will be removed when upgrading.
   Some resources like it's namespace will have to be manually removed.
 - Check out the [upgrade guide](migration/v0.9.x-v0.10.x/upgrade-apps.md) for a complete set of instructions needed to upgrade.
