@@ -38,7 +38,7 @@ RUN helm plugin install https://github.com/databus23/helm-diff --version v3.1.1
 RUN helm plugin install https://github.com/futuresimple/helm-secrets --version v2.0.2
 
 # Helmfile
-ENV HELMFILE_VERSION "v0.129.3"
+ENV HELMFILE_VERSION "v0.138.4"
 RUN wget "https://github.com/roboll/helmfile/releases/download/${HELMFILE_VERSION}/helmfile_linux_amd64" && \
     chmod +x helmfile_linux_amd64 && \
     mv helmfile_linux_amd64 /usr/local/bin/helmfile
