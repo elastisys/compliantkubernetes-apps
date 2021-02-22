@@ -9,9 +9,8 @@
 This repository is part of the [Compliant Kubernetes][compliantkubernetes] (compliantkubernetes) platform.
 The platform consists of the following repositories:
 
-* [ck8s-cluster][ck8s-cluster] - Code for managing Kubernetes clusters and the infrastructure around them.
-* [compliantkubernetes-apps][compliantkubernetes-apps] - Code, configuration and tools for running various services and applications on top of service and workload ck8s-cluster.
-* [ck8s-base-vm][ck8s-base-vm] - A virtual machine template with relevant Kubernetes packages pre-installed.
+* [compliantkubernetes-kubespray][compliantkubernetes-kubespray] - Code for managing Kubernetes clusters and the infrastructure around them.
+* [compliantkubernetes-apps][compliantkubernetes-apps] - Code, configuration and tools for running various services and applications on top of Kubernetes clusters.
 
 The Elastisys Compliant Kubernetes (compliantkubernetes) platform runs two Kubernetes clusters.
 One called "service" and one called "workload".
@@ -31,12 +30,11 @@ The _workload cluster_ manages the user applications as well as providing intrus
 * Prometheus
 
 [compliantkubernetes]: https://compliantkubernetes.com/
-[ck8s-cluster]: https://github.com/elastisys/ck8s-cluster
+[compliantkubernetes-kubespray]: https://github.com/elastisys/compliantkubernetes-kubespray
 [compliantkubernetes-apps]: https://github.com/elastisys/compliantkubernetes-apps
-[ck8s-base-vm]: https://github.com/elastisys/ck8s-base-vm
 
 This repository installs all the applications of ck8s on top of already created clusters.
-To setup the clusters see [ck8s-cluster](https://github.com/elastisys/ck8s-cluster).
+To setup the clusters see [compliantkubernetes-kubespray][compliantkubernetes-kubespray].
 A service-cluster (sc) or workload-cluster (wc) can be created separately but all of the applications will not work correctly unless both are running.
 
 All config files will be located under `CK8S_CONFIG_PATH`.
@@ -54,7 +52,7 @@ The apps are installed using a combination of helm charts and manifests with the
 
 ### Requirements
 
-* A running cluster based on [ck8s-cluster](https://github.com/elastisys/ck8s-cluster)
+* A running cluster based on [compliantkubernetes-kubespray][compliantkubernetes-kubespray]
 * [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.18.13)
 * [helm](https://github.com/helm/helm/releases) (tested with 3.5.0)
 * [helmfile](https://github.com/roboll/helmfile) (tested with v0.129.3)
@@ -71,7 +69,7 @@ Installs requirements using the ansible playbook get-requirements.yaml
 ansible-playbook -e 'ansible_python_interpreter=/usr/bin/python3' --ask-become-pass --connection local --inventory 127.0.0.1, get-requirements.yaml
 ```
 
-Note that you will need a service and workload ck8s-cluster.
+Note that you will need a service and workload cluster.
 
 #### Developer requirements and guidelines
 
@@ -98,7 +96,7 @@ If this is all new to you, here's a [link](https://riseup.net/en/security/messag
 
 ### Quickstart
 
-**You probably want to check the [ck8s-cluster][ck8s-cluster] repository first, since compliantkubernetes-apps depends on having two clusters already set up.**
+**You probably want to check the [compliantkubernetes-kubespray][compliantkubernetes-kubespray] repository first, since compliantkubernetes-apps depends on having two clusters already set up.**
 In addition to this, you will need to set up the following DNS entries (replace `example.com` with your domain).
 - Point these domains to the workload cluster ingress controller:
   - `*.example.com`
