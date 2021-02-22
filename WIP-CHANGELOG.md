@@ -1,2 +1,2 @@
 ### Removed
-- Metrics collecting from fluentd in service cluster
+- Fluentd prometheus metrics.

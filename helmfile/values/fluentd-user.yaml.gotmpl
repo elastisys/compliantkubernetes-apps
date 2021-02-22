@@ -29,11 +29,6 @@ env:
   STUCK_THRESHOLD_SECONDS: 1200
   OUTPUT_PORT: 443
 
-serviceMonitor:
-  enabled: true
-  interval: 30s
-  port: 24231
-
 extraConfigMaps:
   system.conf: |-
     <system>
@@ -112,20 +107,6 @@ extraConfigMaps:
           format none
         </pattern>
       </parse>
-    </filter>
-
-    # count number of incoming records per tag
-    <filter **>
-      @type prometheus
-      <metric>
-        name fluentd_input_status_num_records_total
-        type counter
-        desc The total number of incoming records
-        <labels>
-          tag ${tag}
-          hostname ${hostname}
-        </labels>
-      </metric>
     </filter>
 
     <filter **>

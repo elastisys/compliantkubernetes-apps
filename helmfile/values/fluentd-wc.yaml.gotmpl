@@ -32,11 +32,6 @@ configMaps:
     containersInputConf: false
     outputConf: false
 
-serviceMonitor:
-  enabled: true
-  interval: 30s
-  port: 24231
-
 extraConfigMaps:
   system.conf: |-
     <system>
@@ -140,20 +135,6 @@ extraConfigMaps:
           format none
         </pattern>
       </parse>
-    </filter>
-
-    # count number of incoming records per tag
-    <filter **>
-      @type prometheus
-      <metric>
-        name fluentd_input_status_num_records_total
-        type counter
-        desc The total number of incoming records
-        <labels>
-          tag ${tag}
-          hostname ${hostname}
-        </labels>
-      </metric>
     </filter>
 
     <filter **>
@@ -277,19 +258,6 @@ extraConfigMaps:
           queue_limit_length "#{ENV['OUTPUT_BUFFER_QUEUE_LIMIT']}"
           overflow_action block
         </buffer>
-    </match>
-
-    <match **>
-        @type prometheus
-        <metric>
-          name fluentd_output_status_num_records_total
-          type counter
-          desc The total number of outgoing records
-          <labels>
-            tag ${tag}
-            hostname ${hostname}
-          </labels>
-        </metric>
     </match>
 
 {{- range $key, $value := .Values.fluentd.extraConfigMaps }}
