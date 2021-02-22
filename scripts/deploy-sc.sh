@@ -27,7 +27,7 @@ if [[ ${objectStoreProvider} == "s3" ]]; then
   kubectl create secret generic s3-credentials -n fluentd \
       --from-literal=s3_access_key="${s3_access_key}" \
       --from-literal=s3_secret_key="${s3_secret_key}" \
-      --dry-run -o yaml | kubectl apply -f -
+      --dry-run=client -o yaml | kubectl apply -f -
 fi
 
 echo "Installing helm charts" >&2
