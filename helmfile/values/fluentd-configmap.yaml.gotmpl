@@ -1,13 +1,6 @@
 aggregator:
   configMaps:
     fluentd.conf: |
-      # Prometheus Exporter Plugin
-      # input plugin that exports metrics
-      <source>
-        @type prometheus
-        port 24231
-      </source>
-
       # TCP input to receive logs from the forwarders
       <source>
         @type forward
@@ -83,37 +76,6 @@ aggregator:
 forwarder:
   configMaps:
     fluentd.conf: |
-      # Prometheus Exporter Plugin
-      # input plugin that exports metrics
-      <source>
-        @type prometheus
-        port 24231
-      </source>
-
-      # input plugin that collects metrics from MonitorAgent
-      <source>
-        @type prometheus_monitor
-        <labels>
-          host ${hostname}
-        </labels>
-      </source>
-
-      # input plugin that collects metrics for output plugin
-      <source>
-        @type prometheus_output_monitor
-        <labels>
-          host ${hostname}
-        </labels>
-      </source>
-
-      # input plugin that collects metrics for in_tail plugin
-      <source>
-        @type prometheus_tail_monitor
-        <labels>
-          host ${hostname}
-        </labels>
-      </source>
-
       # Throw the healthcheck to the standard output instead of forwarding it
       <match fluentd.healthcheck>
         @type stdout
@@ -224,20 +186,6 @@ forwarder:
             format none
           </pattern>
         </parse>
-      </filter>
-
-      # count number of incoming records per tag
-      <filter **>
-        @type prometheus
-        <metric>
-          name fluentd_input_status_num_records_total
-          type counter
-          desc The total number of incoming records
-          <labels>
-            tag ${tag}
-            hostname ${hostname}
-          </labels>
-        </metric>
       </filter>
 
       <filter **>
