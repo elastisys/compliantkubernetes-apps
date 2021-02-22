@@ -18,9 +18,9 @@ echo "Creating Elasticsearch and fluentd secrets" >&2
 elasticsearch_password=$(sops_exec_file "${secrets[secrets_file]}" 'yq r -e {} elasticsearch.fluentdPassword')
 
 kubectl -n kube-system create secret generic elasticsearch \
-    --from-literal=password="${elasticsearch_password}" --dry-run -o yaml | kubectl apply -f -
+    --from-literal=password="${elasticsearch_password}" --dry-run=client -o yaml | kubectl apply -f -
 kubectl -n fluentd create secret generic elasticsearch \
-    --from-literal=password="${elasticsearch_password}" --dry-run -o yaml | kubectl apply -f -
+    --from-literal=password="${elasticsearch_password}" --dry-run=client -o yaml | kubectl apply -f -
 
 # Add example resources.
 # We use `create` here instead of `apply` to avoid overwriting any changes the
