@@ -1,0 +1,12 @@
+calicoDataStore: "kubernetes"
+image:
+  repository: elastisys/calico-accountant
+  tag: v0.1.6
+tolerations: []
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi

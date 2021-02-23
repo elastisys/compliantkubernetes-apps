@@ -38,3 +38,7 @@ data:
   velero-dashboard.json: |-
     {{- .Files.Get "dashboards/velero-dashboard.json" | nindent 4 }}
 {{- end }}
+{{- if .Values.dashboards.networkpolicy.enabled }}
+  networkpolicy-dashboard.json: |-
+    {{- .Files.Get "dashboards/networkpolicy-dashboard.json" | nindent 4 }}
+{{- end }}

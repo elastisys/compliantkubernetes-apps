@@ -1,0 +1,75 @@
+---
+apiVersion: apps/v1
+kind: "DaemonSet"
+metadata:
+  name: "calico-accountant"
+  namespace: "kube-system"
+spec:
+  selector:
+    matchLabels:
+        app: "calico-accountant"
+  template:
+    metadata:
+      labels:
+        app: "calico-accountant"
+    spec:
+      containers:
+        - command:
+           - "/calico-accountant"
+           - "-logtostderr=true"
+           - "-v=2"
+          env:
+          - name: METRICS_SERVER_PORT
+            value: "9009"
+          {{- if eq .Values.calicoDataStore "kubernetes" }}
+          - name: DATASTORE_TYPE
+            value: "kubernetes"
+          - name: WAIT_FOR_DATASTORE
+            value: "true"
+          {{- else if eq .Values.calicoDataStore "etcd" }}
+          - name: ETCD_ENDPOINTS
+            valueFrom:
+              configMapKeyRef:
+                name: calico-config
+                key: etcd_endpoints
+          - name: ETCD_CA_CERT_FILE
+            valueFrom:
+              configMapKeyRef:
+                key: etcd_ca
+                name: calico-config
+          - name: ETCD_KEY_FILE
+            valueFrom:
+              configMapKeyRef:
+                key: etcd_key
+                name: calico-config
+          - name: ETCD_CERT_FILE
+            valueFrom:
+              configMapKeyRef:
+                key: etcd_cert
+                name: calico-config
+          {{- end }}
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          name: "calico-accountant"
+          ports:
+          - containerPort: 9009
+            name: metrics
+          securityContext:
+            privileged: true
+          volumeMounts:
+          - mountPath: /calico-secrets
+            name: etcd-certs
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+      tolerations:
+{{ toYaml .Values.tolerations | indent 8 }}
+      hostNetwork: true
+      volumes:
+      - hostPath:
+          path: /etc/calico/certs
+          type: ""
+        name: etcd-certs
+      serviceAccount: "calico-node"
