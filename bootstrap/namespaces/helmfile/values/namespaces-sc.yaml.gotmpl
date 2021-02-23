@@ -9,6 +9,8 @@ namespaces:
 - name: kube-node-lease
 - name: kube-public
 - name: kube-system
+  labels:
+    admission.gatekeeper.sh/ignore: "true"
 - name: monitoring
 - name: ingress-nginx
 - name: velero
