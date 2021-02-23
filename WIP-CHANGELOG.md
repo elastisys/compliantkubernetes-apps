@@ -1,5 +1,6 @@
 ### Fixed
 - Fixed service cluster log retention using the wrong service account.
+- Fixed upgrade of user Grafana.
 
 ### Changed
 - Bumped `helm` to `v3.5.2`.
