@@ -148,6 +148,18 @@ releases:
   values:
   - values/metrics-server.yaml.gotmpl
 
+# calico-accountant
+- name: calico-accountant
+  namespace: kube-system
+  labels:
+    app: calico-accountant
+  chart: ./charts/calico-accountant
+  version: 0.1.0
+  installed: {{ .Values.calicoAccountant.enabled }}
+  missingFileHandler: Error
+  values:
+  - values/calico-accountant.yaml.gotmpl
+
 # Service cluster releases
 {{ if eq .Environment.Name "service_cluster" }}
 # Dex

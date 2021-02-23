@@ -1,0 +1,32 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+      app: "calico-accountant"
+  name: "calico-accountant"
+  namespace: kube-system
+spec:
+  endpoints:
+  - port: metrics
+  selector:
+    matchLabels:
+      app: "calico-accountant"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+      app: "calico-accountant"
+  name: calico-accountant-metrics
+  namespace: kube-system
+spec:
+  ports:
+  - port: 9009
+    name: metrics
+    protocol: TCP
+    targetPort: 9009
+  selector:
+      app: "calico-accountant"
+  sessionAffinity: None
+  type: ClusterIP
