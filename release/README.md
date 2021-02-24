@@ -7,62 +7,78 @@ https://semver.org/
 
 1. To release a major or minor version create a release branch `release-X.Y` from the last minor release tag.
 
-```bash
-git checkout vA.B.0
-git checkout -b release-X.Y
-git push -u origin release-X.Y
-```
+    ```bash
+    git checkout vA.B.0
+    git checkout -b release-X.Y
+    git push -u origin release-X.Y
+    ```
 
 2. Checkout the branch to cut the release from.
 
-```bash
-git checkout main
-git pull
-git checkout -b branch_name
-```
+    ```bash
+    git checkout main
+    git pull
+    git checkout -b branch_name
+    ```
 
-3. Run the release script.
+3. Run QA checks on `branch_name` and commit any fixes found during QA.
 
-```bash
-./release/release.sh X.Y.Z
-```
+4. Run the release script.
 
-The release script will:
-* Append what is in `WIP-CHANGELOG.md` to `CHANGELOG.md`
-* Clear `WIP-CHANGELOG.md`
-* Create a git commit with message `Release vX.Y.Z`
-* Create a tag named `vX.Y.Z`
+    ```bash
+    ./release/release.sh X.Y.Z
+    ```
 
-4. Push the tagged commit, create a PR against the release branch and request a review.
+    The release script will:
+    * Append what is in `WIP-CHANGELOG.md` to `CHANGELOG.md`
+    * Clear `WIP-CHANGELOG.md`
+    * Create a git commit with message `Release vX.Y.Z`
+    * Create a tag named `vX.Y.Z`
 
-```bash
-git push --atomic origin branch_name vX.Y.Z
-```
+5. Push the tagged commit, create a PR against the release branch and request a review.
 
-5. Merge it to finalize the release.
-A [GitHub actions workflow pipeline](.github/workflows/release.yml) will create a GitHub release from the tag.
+    ```bash
+    git push --atomic origin branch_name vX.Y.Z
+    ```
 
-*GitHub currently does not support merging with fast-forward only.
-Merge the release PR locally and push it instead.*
+6. Merge it to finalize the release.
+    A [GitHub actions workflow pipeline](.github/workflows/release.yml) will create a GitHub release from the tag.
 
-```bash
-git checkout release-X.Y
-git merge --ff-only branch_name
-git push
-```
+    *GitHub currently does not support merging with fast-forward only.
+    Merge the release PR locally and push it instead.*
+
+    ```bash
+    git checkout release-X.Y
+    git merge --ff-only branch_name
+    git push
+
+    # If 'git merge --ff-only' isn't possible, 'git rebase' can be used.
+    git checkout release-X.Y
+    git rebase --onto branch_name
+    git push --force-with-lease
+    ```
+
+7. Merge any fixes from the release branch back to the `main` branch
+    `git cherry-pick` can be used, e.g.
+
+    ```bash
+    git checkout main
+    git checkout -b release-X.Y-fixes
+    git cherry-pick <fix 1 hash> [<fix 2 hash>..]
+    ```
 
 ## Patch releases
 
 1. Create a new branch based on a release branch and commit the patch commits to it.
 
-```bash
-git checkout release-X.Y
-git pull
-git checkout -b branch_name
-git cherry-pick [some fix in main]
-git add -p file-with-some-new-fixes
-git commit
-```
+    ```bash
+    git checkout release-X.Y
+    git pull
+    git checkout -b branch_name
+    git cherry-pick [some fix in main]
+    git add -p file-with-some-new-fixes
+    git commit
+    ```
 
 2. Continue from step 3 in the major/minor release flow.
 
