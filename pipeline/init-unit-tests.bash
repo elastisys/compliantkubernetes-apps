@@ -14,4 +14,8 @@ export CK8S_ENVIRONMENT_NAME="${CK8S_ENVIRONMENT_NAME:-apps-${CK8S_CLOUD_PROVIDE
 "${ck8s}" init
 
 # Add additional config changes here
+config_update "sc" "issuers.letsencrypt.staging.email" "me@example.com"
+config_update "sc" "issuers.letsencrypt.prod.email" "me@example.com"
+config_update "wc" "issuers.letsencrypt.staging.email" "me@example.com"
+config_update "wc" "issuers.letsencrypt.prod.email" "me@example.com"
 config_update "wc" "falco.alerts.enabled" "true"
