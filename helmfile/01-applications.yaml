@@ -33,7 +33,7 @@ repositories:
 
 # Defult settings to use with helm.
 helmDefaults:
-  timeout: 600
+  timeout: 1200
   createNamespace: false
 
 # Environments
@@ -363,7 +363,7 @@ releases:
   installed: {{ .Values.harbor.enabled }}
   missingFileHandler: Error
   wait: true
-  timeout: 600
+  timeout: 1200
   needs:
   - cert-manager/cert-manager
   values:
