@@ -106,16 +106,6 @@ releases:
   - values/kube-prometheus-stack-wc.yaml.gotmpl
 {{ end }}
 
-
-## Deprecated, remove later.
-- name: ck8sdash
-  namespace: ck8sdash
-  labels:
-    app: ck8sdash
-  chart: ./charts/ck8sdash
-  version: 0.3.1
-  installed: false
-
 # Velero
 - name: velero
   namespace: velero
