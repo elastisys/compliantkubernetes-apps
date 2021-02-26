@@ -256,6 +256,18 @@ CK8S_APPS_PATH= # fill this in
 source <($CK8S_APPS_PATH/bin/ck8s completion bash)
 ```
 
+### Removing compliantkubernetes-apps from your cluster
+There are two simple scripts that can be used to clean up you clusters.
+
+To clean up the service cluster run:
+```bash
+./scrips/clean-sc.sh
+```
+To clean up the workload cluster run:
+```bash
+./scrips/clean-wc.sh
+```
+
 ### Operator manual
 
 See <https://compliantkubernetes.io/operator-manual/>.
