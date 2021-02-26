@@ -1,6 +1,7 @@
 ### Fixed
 - Fixed service cluster log retention using the wrong service account.
 - Fixed upgrade of user Grafana.
+- Fixed incorrect ignore label on cert-manager namespace.
 
 ### Changed
 - Bumped `helm` to `v3.5.2`.
