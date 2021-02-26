@@ -9,3 +9,6 @@
 
 ### Removed
 - Fluentd prometheus metrics.
+
+### Added
+- Possibility to disable metrics server

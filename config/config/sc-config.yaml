@@ -614,3 +614,7 @@ certmanager:
     nodeSelector: {}
     tolerations: {}
     affinity: {}
+
+## Configuration for metric-server
+metricsServer:
+  enabled: true

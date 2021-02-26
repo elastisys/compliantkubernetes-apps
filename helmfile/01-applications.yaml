@@ -143,6 +143,7 @@ releases:
     app: metrics-server
   chart: stable/metrics-server
   version: 2.10.0
+  installed: {{ .Values.metricsServer.enabled }}
   missingFileHandler: Error
   values:
   - values/metrics-server.yaml.gotmpl
