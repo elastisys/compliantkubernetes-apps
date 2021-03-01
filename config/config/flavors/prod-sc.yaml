@@ -99,3 +99,8 @@ influxDB:
     durationSC: 7d
   persistence:
     size: 30Gi
+  resources:
+    requests:
+      memory: 14Gi
+    limits:
+      memory: 15Gi
