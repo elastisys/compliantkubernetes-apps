@@ -24,9 +24,8 @@
     - [ ] will break the cluster.
           I.e. full cluster migration is required.
 
-**Pipeline config PR** *(if applicable)*
-<!-- https://github.com/elastisys/ck8s-pipelines/pull/ -->
-If you change some config options (e.g. rename variable or change the default value) we may need to update the pipeline.
+**Pipeline config** *(if applicable)*
+If you change some config options (e.g. add/rename variable or change the default value) you may need to update the config used by the pipeline in `pipeline/config`.
 
 <!--
 Here are the commit prefixes and comments on when to use them:
