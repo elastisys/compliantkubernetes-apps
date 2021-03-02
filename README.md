@@ -2,7 +2,7 @@
 
 ## Build status
 
-![compliantkubernetes-apps](https://github.com/elastisys/ck8s-pipelines/workflows/ck8s-apps/badge.svg)
+![End-to-end tests](https://github.com/elastisys/compliantkubernetes-apps/actions/workflows/end-to-end.yml/badge.svg)
 
 ## Overview
 
