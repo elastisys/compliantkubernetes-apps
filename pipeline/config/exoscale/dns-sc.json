@@ -1,0 +1,23 @@
+{
+  "Comment": "Manage pipeline DNS records",
+  "Changes": [
+    {
+      "Action": "ACTION",
+      "ResourceRecordSet": {
+        "Name": "*.pipeline-exoscale.elastisys.se",
+        "Type": "A",
+        "TTL": 300,
+        "ResourceRecords": [{ "Value": "ip-address"}]
+      }
+    },
+    {
+      "Action": "ACTION",
+      "ResourceRecordSet": {
+        "Name": "*.ops.pipeline-exoscale.elastisys.se",
+        "Type": "A",
+        "TTL": 300,
+        "ResourceRecords": [{ "Value": "ip-address"}]
+      }
+    }
+  ]
+}
