@@ -1,0 +1,290 @@
+name: End-to-end
+
+on:
+  schedule:
+  # Run at 4 and 10 GMT, basically "early morning" and "lunch"
+  - cron: "0 4,10 * * *"
+
+jobs:
+
+  build-apps-image:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout compliantkubernetes-apps
+      uses: actions/checkout@v2
+      with:
+        repository: elastisys/compliantkubernetes-apps
+        ref: main
+    - name: Build docker image
+      uses: whoan/docker-build-with-cache-action@v3
+      with:
+        username: "${{ secrets.DOCKERHUB_USERNAME }}"
+        password: "${{ secrets.DOCKERHUB_PASSWORD }}"
+        image_name: elastisys/compliantkubernetes-apps-pipeline
+        image_tag: ${{ github.sha }}
+        context: pipeline
+
+  buckets:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout bucket-manager
+      uses: actions/checkout@v2
+      with:
+        repository: elastisys/bucket-manager
+        ref: main
+        token: ${{ secrets.CK8S_PIPELINE_GITHUB_TOKEN }}
+    - name: Create buckets
+      env:
+        EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
+        EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
+      run: |
+        python3 -m venv venv
+        source venv/bin/activate
+        pip install -r S3/requirements.txt
+        ./S3/gen-s3cfg.sh exoscale "${EXOSCALE_API_KEY}" "${EXOSCALE_API_SECRET}" sos-ch-gva-2.exo.io > s3cfg.ini
+        ./S3/manager.sh --s3cfg s3cfg.ini --create pipeline-exoscale-harbor pipeline-exoscale-velero pipeline-exoscale-es-backup pipeline-exoscale-influxdb pipeline-exoscale-sc-logs
+
+  apps:
+    needs: [build-apps-image, buckets]
+    runs-on: ubuntu-20.04
+    container: elastisys/compliantkubernetes-apps-pipeline:${{ github.sha }}
+    strategy:
+      fail-fast: false
+      matrix:
+        cluster:
+          - sc
+          - wc
+    env:
+      EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
+      EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
+      CK8S_CONFIG_PATH: ./apps/pipeline/config/exoscale
+      CK8S_AUTO_APPROVE: true
+    steps:
+    - name: Checkout kubespray
+      uses: actions/checkout@v2
+      with:
+        repository: kubernetes-sigs/kubespray
+        ref: master
+        path: kubespray
+    ## TODO: We cannot currently use ck8s-kubespray since the terraform code
+    ## for exoscale is not in the version we have in the submodule
+    - name: Checkout ck8s-kubespray
+      uses: actions/checkout@v2
+      with:
+        repository: elastisys/compliantkubernetes-kubespray
+        # TODO: Should we use a specific commit here?
+        ref: main
+        # submodules: recursive
+        path: compliantkubernetes-kubespray
+    - name: Checkout compliantkubernetes-apps
+      uses: actions/checkout@v2
+      with:
+        repository: elastisys/compliantkubernetes-apps
+        ref: main
+        path: apps
+        fetch-depth: 0 # Fetches all tags
+
+    - name: Generate and insert public SSH key
+      run: |
+        ssh-keygen -q -t rsa -N "" -f apps/pipeline/config/exoscale/id_rsa
+        sed -i "s!PUBLIC_SSH_KEY_HERE!$(cat apps/pipeline/config/exoscale/id_rsa.pub)!g" apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/default.tfvars
+    - name: Init terraform
+      uses: docker://hashicorp/terraform:0.14.7
+      with:
+        args: init kubespray/contrib/terraform/exoscale
+    # Note: This container doesn't run bash, so we cannot use env vars in the arguments
+    - name: Run terraform
+      uses: docker://hashicorp/terraform:0.14.7
+      with:
+        args: apply -auto-approve -var-file apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/default.tfvars -state apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/terraform.tfstate kubespray/contrib/terraform/exoscale
+
+    - name: Prepare DNS
+      if: matrix.cluster == 'sc'
+      run: |
+        ingress_controller_lb_ip_address="$(jq -r .outputs.ingress_controller_lb_ip_address.value $CK8S_CONFIG_PATH/pipeline-${{ matrix.cluster }}-config/terraform.tfstate)"
+        sed -i "s/ip-address/${ingress_controller_lb_ip_address}/g" apps/pipeline/config/exoscale/dns-${{ matrix.cluster }}.json
+        sed -i "s/ACTION/CREATE/g" apps/pipeline/config/exoscale/dns-${{ matrix.cluster }}.json
+        cat apps/pipeline/config/exoscale/dns-${{ matrix.cluster }}.json
+    - name: Create DNS records
+      if: matrix.cluster == 'sc'
+      uses: docker://amazon/aws-cli:2.1.26
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DNS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DNS_SECRET_ACCESS_KEY }}
+        # See https://github.com/aws/aws-cli/issues/5262
+        AWS_EC2_METADATA_DISABLED: true
+      with:
+        args: route53 change-resource-record-sets --hosted-zone-id Z2STJRQSJO5PZ0 --change-batch file://apps/pipeline/config/exoscale/dns-${{ matrix.cluster }}.json
+
+    - name: Install mitogen to speedup kubespray
+      uses: docker://quay.io/kubespray/kubespray:v2.15.0
+      with:
+        # Note: It is important to work from the kubespray folder since this
+        # playbook will modify the `ansible.cfg`.
+        args: /bin/bash -c "cd kubespray && ansible-playbook mitogen.yml"
+
+    - name: Run kubespray
+      uses: docker://quay.io/kubespray/kubespray:v2.15.0
+      env:
+        ANSIBLE_CONFIG: ./kubespray/ansible.cfg
+      with:
+        args: /bin/bash -c "cd kubespray && ansible-playbook -i ../$CK8S_CONFIG_PATH/pipeline-${{ matrix.cluster }}-config/inventory.ini --private-key ../$CK8S_CONFIG_PATH/id_rsa --become --become-user=root cluster.yml"
+
+    - name: Import PGP key and configure GPG agent
+      run: ./apps/pipeline/setup-pgp.bash
+      env:
+        PGP_KEY: ${{ secrets.PGP_KEY }}
+        PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+
+    - name: Prepare for apps
+      env:
+        S3_ACCESS_KEY: ${{ secrets.EXOSCALE_API_KEY }}
+        S3_SECRET_KEY: ${{ secrets.EXOSCALE_API_SECRET }}
+      run: |
+        # Set public LB IP in the kubeconfig
+        control_plane_lb_ip_address="$(jq -r .outputs.control_plane_lb_ip_address.value $CK8S_CONFIG_PATH/pipeline-${{ matrix.cluster }}-config/terraform.tfstate)"
+        yq write --inplace "$CK8S_CONFIG_PATH/pipeline-${{ matrix.cluster }}-config/artifacts/admin.conf" clusters[0].cluster.server https://${control_plane_lb_ip_address}:6443
+        # Copy to correct location and encrypt
+        mkdir "$CK8S_CONFIG_PATH/.state"
+        cp "$CK8S_CONFIG_PATH/pipeline-${{ matrix.cluster }}-config/artifacts/admin.conf" "$CK8S_CONFIG_PATH/.state/kube_config_${{ matrix.cluster }}.yaml"
+        sops --config "$CK8S_CONFIG_PATH/.sops.yaml" -e -i "$CK8S_CONFIG_PATH/.state/kube_config_${{ matrix.cluster }}.yaml"
+        # Encrypt and set necessary secrets
+        sops --config "$CK8S_CONFIG_PATH/.sops.yaml" -e -i "$CK8S_CONFIG_PATH/secrets.yaml"
+        sops --config "$CK8S_CONFIG_PATH/.sops.yaml" --set "[\"objectStorage\"] {\"s3\": {\"accessKey\": \"${S3_ACCESS_KEY}\", \"secretKey\": \"${S3_SECRET_KEY}\"}}" "$CK8S_CONFIG_PATH/secrets.yaml"
+
+    - name: Install rook
+      env:
+        KUBECONFIG: /__w/compliantkubernetes-apps/compliantkubernetes-apps/apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/artifacts/admin.conf
+      run: |
+        ./deploy-rook.sh
+      working-directory: ./compliantkubernetes-kubespray/rook
+
+    # TODO: Some kind of test of Rook before we waste time waiting for apps to fail if it is broken...
+    # We may also want to move Rook to the apps bootstrap instead.
+
+    - name: Install apps
+      run: ./apps/pipeline/apply-${{ matrix.cluster }}.bash
+      shell: bash
+      id: install-apps
+    - name: Wait for Elasticsearch to be ready
+      if: matrix.cluster == 'wc'
+      continue-on-error: true
+      shell: bash
+      run: |
+        retries=60
+        while [ ${retries} -gt 0 ]; do
+          result="$(curl --connect-timeout 20 --max-time 60 -ksIL -o /dev/null -w "%{http_code}" https://elastic.ops.pipeline-exoscale.elastisys.se)"
+          echo "Waiting for elasticsearch to be ready. Got status ${result}"
+          [[ "${result}" == "401" ]] && break
+          sleep 10
+          retries=$((retries-1))
+        done
+        ./apps/bin/ck8s ops kubectl wc -n fluentd rollout restart daemonset fluentd-fluentd-elasticsearch
+        ./apps/bin/ck8s ops kubectl wc -n kube-system rollout restart daemonset fluentd-system-fluentd-elasticsearch
+        # There seem to be no point in waiting for the pods here, as the tests already do this.
+    - name: Test apps
+      if: always() && (steps.install-apps.outcome != 'cancelled' && steps.install-apps.outcome != 'skipped')
+      run: ./apps/bin/ck8s test ${{ matrix.cluster }}
+      env:
+        PIPELINE: "true"
+
+    - name: Upload logs
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: compliantkubernetes-apps-logs
+        path: ./logs
+    - name: Upload events
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: compliantkubernetes-apps-events
+        path: ./events
+
+    - name: Destroy terraform
+      if: always()
+      uses: docker://hashicorp/terraform:0.14.7
+      with:
+        args: destroy -auto-approve -var-file apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/default.tfvars -state apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/terraform.tfstate kubespray/contrib/terraform/exoscale
+
+    - name: Prepare DNS cleanup
+      if: always() && (matrix.cluster == 'sc')
+      run: |
+        sed -i "s/CREATE/DELETE/g" apps/pipeline/config/exoscale/dns-${{ matrix.cluster }}.json
+        cat apps/pipeline/config/exoscale/dns-${{ matrix.cluster }}.json
+    - name: Delete DNS records
+      if: always() && (matrix.cluster == 'sc')
+      uses: docker://amazon/aws-cli:2.1.26
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DNS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DNS_SECRET_ACCESS_KEY }}
+        AWS_EC2_METADATA_DISABLED: true
+      with:
+        args: route53 change-resource-record-sets --hosted-zone-id Z2STJRQSJO5PZ0 --change-batch file://apps/pipeline/config/exoscale/dns-${{ matrix.cluster }}.json
+
+  buckets-cleanup:
+    needs: apps
+    if: always()
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout bucket-manager
+      uses: actions/checkout@v2
+      with:
+        repository: elastisys/bucket-manager
+        ref: main
+        token: ${{ secrets.CK8S_PIPELINE_GITHUB_TOKEN }}
+    - name: Delete buckets
+      env:
+        EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
+        EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
+      run: |
+        python3 -m venv venv
+        source venv/bin/activate
+        pip install -r S3/requirements.txt
+        ./S3/gen-s3cfg.sh exoscale "${EXOSCALE_API_KEY}" "${EXOSCALE_API_SECRET}" sos-ch-gva-2.exo.io > s3cfg.ini
+        ./S3/manager.sh --s3cfg s3cfg.ini --delete pipeline-exoscale-harbor pipeline-exoscale-velero pipeline-exoscale-es-backup pipeline-exoscale-influxdb pipeline-exoscale-sc-logs
+
+  clean-apps-image:
+    needs: apps
+    if: always()
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout compliantkubernetes-apps
+      uses: actions/checkout@v2
+      with:
+        repository: elastisys/compliantkubernetes-apps
+        ref: main
+    - name: Cleanup docker image
+      run: ./pipeline/cleanup-docker-image.bash
+      env:
+        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+        DOCKERHUB_REPOSITORY: elastisys/compliantkubernetes-apps-pipeline
+
+  alert:
+    runs-on: ubuntu-20.04
+    needs: [buckets-cleanup, clean-apps-image]
+    if: always() && github.ref == 'refs/heads/main'  # Make sure this runs even if some jobs fail, and only on main
+    steps:
+    - id: get-sha
+      run: |
+          echo ::set-output name=sha::$( curl https://api.github.com/repos/elastisys/compliantkubernetes-apps/git/ref/heads/main | jq .object.sha | tr -d '"')
+    - id: get-sha-short
+      run: |
+          echo ::set-output name=sha::$( echo ${{ steps.get-sha.outputs.sha }} | cut -c -8)
+    - uses: technote-space/workflow-conclusion-action@v1
+    - name: Send Slack alert
+      uses: elastisys/action-slack@v3
+      with:
+        status: custom
+        fields: repo,message,commit,author,action,workflow,job,took,ref
+        custom_payload: |
+          {
+            attachments: [{
+              color: `${process.env.WORKFLOW_CONCLUSION}` === 'success' ? 'good' : `${process.env.WORKFLOW_CONCLUSION}` === 'failure' ? 'danger' : 'warning',
+              text: `Pipeline: ${process.env.AS_WORKFLOW}\n\ncompliantkubernetes-apps commit: <https://github.com/elastisys/compliantkubernetes-apps/commit/${{ steps.get-sha.outputs.sha }}|${{ steps.get-sha-short.outputs.sha }}>\n\n Status: ${process.env.WORKFLOW_CONCLUSION}\nTook: ${process.env.AS_TOOK}`,
+            }]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }} # required
+      if: always()  # Notify for both successes and failures
