@@ -1,6 +1,6 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
-=======
+- [v0.11.0](#v0110---2021-03-03)
 - [v0.10.0](#v0100---2021-02-18)
 - [v0.9.0](#v090---2021-01-25)
 - [v0.8.0](#v080---2020-12-11)
@@ -8,6 +8,24 @@
 - [v0.6.0](#v060---2020-10-16)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.11.0 - 2021-03-03
+
+### Fixed
+- Fixed service cluster log retention using the wrong service account.
+- Fixed upgrade of user Grafana.
+
+### Changed
+- Bumped `helm` to `v3.5.2`.
+- Bumped `kubectl` to `v1.19.8`.
+- Bumped `helmfile` to `v0.138.4`.
+
+### Removed
+- Fluentd prometheus metrics.
+
+### Added
+- Possibility to disable metrics server
 
 -------------------------------------------------
 =======
