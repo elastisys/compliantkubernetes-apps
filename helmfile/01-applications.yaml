@@ -196,6 +196,8 @@ releases:
   chart: ./charts/prometheus-alerts
   version: 0.1.0
   missingFileHandler: Error
+  needs:
+  - monitoring/kube-prometheus-stack
   values:
 {{ if eq .Environment.Name "service_cluster" }}
   # Note: we want to have alerts for WC since this is wc-reader, even if it is
@@ -212,6 +214,8 @@ releases:
   chart: ./charts/prometheus-alerts
   version: 0.1.0
   missingFileHandler: Error
+  needs:
+  - monitoring/kube-prometheus-stack
   values:
   - values/prometheus-alerts-sc.yaml.gotmpl
 
@@ -540,6 +544,8 @@ releases:
   chart: ./charts/prometheus-alerts
   version: 0.1.0
   missingFileHandler: Info
+  needs:
+  - monitoring/kube-prometheus-stack
   values:
   - values/prometheus-alerts-wc.yaml.gotmpl
 
