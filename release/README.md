@@ -8,40 +8,56 @@ https://semver.org/
 1. To release a major or minor version create a release branch `release-X.Y` from the last minor release tag.
 
     ```bash
-    git checkout vA.B.0
+    git checkout main
     git checkout -b release-X.Y
     git push -u origin release-X.Y
     ```
 
-2. Checkout the branch to cut the release from.
+1. Reset changelog
 
     ```bash
-    git checkout main
-    git pull
-    git checkout -b branch_name
-    ```
-
-3. Run QA checks on `branch_name` and commit any fixes found during QA.
-
-4. Run the release script.
-
-    ```bash
-    ./release/release.sh X.Y.Z
+    git checkout -b reset-changelog-X.Y
+    release/reset-changelog.sh X.Y.0
     ```
 
     The release script will:
     * Append what is in `WIP-CHANGELOG.md` to `CHANGELOG.md`
     * Clear `WIP-CHANGELOG.md`
-    * Create a git commit with message `Release vX.Y.Z`
+    * Create a git commit with message `Reset changelog for release vX.Y.Z`
+
+    Make sure that the changes only include changes mentioned above, and then push.
+
+    ```
+    git diff HEAD~1
+    git push
+    ```
+
+1. Merge `reset-changelog-X.Y` into `release-X.Y` then, into `main` as soon as possible to minimize risk of conflicts
+
+    **NOTE**: The release action will fail since we haven't tagged the release commit.
+    We will do that after QA.
+
+1. Run QA checks on `branch_name` and commit any fixes found during QA into `release-X.Y`.
+
+    **NOTE**: All changes made in QA should be added to `CHANGELOG.md` and **NOT** `WIP-CHANGELOG.md`.
+
+1. Run the release script.
+
+    ```bash
+    ./release/release.sh X.Y.0
+    ```
+
+    The release script will:
+    * Amend last commit and prepend message `Release vX.Y.Z`
     * Create a tag named `vX.Y.Z`
 
-5. Push the tagged commit, create a PR against the release branch and request a review.
+1. Push the tagged commit, create a PR against the release branch and request a review.
 
     ```bash
     git push --atomic origin branch_name vX.Y.Z
     ```
 
-6. Merge it to finalize the release.
+1. Merge it to finalize the release.
     A [GitHub actions workflow pipeline](.github/workflows/release.yml) will create a GitHub release from the tag.
 
     *GitHub currently does not support merging with fast-forward only.
@@ -58,7 +74,7 @@ https://semver.org/
     git push --force-with-lease
     ```
 
-7. Merge any fixes from the release branch back to the `main` branch
+1. Merge any fixes from the release branch back to the `main` branch
     `git cherry-pick` can be used, e.g.
 
     ```bash
