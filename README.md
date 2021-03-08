@@ -297,5 +297,6 @@ See <https://compliantkubernetes.io/operator-manual/>.
 - The OPA policies are not enforced by default.
   Unfortunately the policies breaks cert-manager so they have been set to "dry-run" by default.
 - Gatekeeper needs to be disabled in order to run apps on Kubernetes v1.19 or greater.
+- Kibana Single Sign On (SSO) via OpenID/Dex requires LetsEncrypt Production.
 
 For more, please the the public GitHub issues: <https://github.com/elastisys/compliantkubernetes-apps/issues>.

@@ -223,6 +223,7 @@ elasticsearch:
   # Create initial indices upon first startup
   createIndices: true
   # Single-sign-on using OIDC
+  # NOTE: SSO using OIDC requires LetsEncrypt Production
   sso:
     enabled: false
     # Where to find subject
