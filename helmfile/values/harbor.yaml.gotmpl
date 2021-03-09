@@ -13,7 +13,7 @@ expose:
       notarySecretName: harbor-notary-ingress-cert
   ingress:
     annotations:
-      cert-manager.io/issuer: {{ .Values.global.issuer }}
+      cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
       {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.harbor }}
       nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.harbor }}
       {{ end }}

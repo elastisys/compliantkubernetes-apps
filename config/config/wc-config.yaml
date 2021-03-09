@@ -384,9 +384,6 @@ issuers:
   letsencrypt:
     enabled: true
 
-    ## Namespaces in which to install the letsencrypt issuers in.
-    namespaces: []
-
     prod:
       ## Mail through which letsencrypt can contact you.
       email: "set-me"
