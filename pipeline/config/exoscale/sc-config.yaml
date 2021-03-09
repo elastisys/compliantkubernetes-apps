@@ -154,7 +154,7 @@ harbor:
     enabled: true
 prometheus:
   storage:
-    size: 2Gi
+    enabled: false
   retention:
     size: 1GiB
     age: 3d
@@ -178,7 +178,7 @@ prometheus:
         memory: 2Gi
         cpu: "1"
     storage:
-      size: 2Gi
+      enabled: false
     retention:
       size: 1GiB
       age: 3d

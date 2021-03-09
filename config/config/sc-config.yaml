@@ -156,6 +156,7 @@ harbor:
 
 prometheus:
   storage:
+    enabled: false
     size: 5Gi
   retention:
     size: 4GiB
@@ -180,6 +181,7 @@ prometheus:
         memory: 2Gi
         cpu: "1"
     storage:
+      enabled: false
       size: 5Gi
     retention:
       size: 4GiB

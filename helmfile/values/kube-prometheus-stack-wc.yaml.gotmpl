@@ -94,6 +94,7 @@ prometheus:
     ## Prometheus StorageSpec for persistent data
     ## ref: https://github.com/coreos/prometheus-operator/blob/release-0.29/Documentation/user-guides/storage.md
     ##
+    {{- if .Values.prometheus.storage.enabled }}
     storageSpec:
       volumeClaimTemplate:
         spec:
@@ -102,6 +103,7 @@ prometheus:
           resources:
             requests:
               storage: {{ .Values.prometheus.storage.size }}
+    {{- end }}
 
     additionalScrapeConfigs:
     {{ if .Values.storageClasses.nfs.enabled }}

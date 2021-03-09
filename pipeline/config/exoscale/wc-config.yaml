@@ -175,7 +175,7 @@ prometheus:
     user: wcWriter
   ## Persistence for prometheus to store metrics and wal.
   storage:
-    size: 2Gi
+    enabled: false
   ## When prometheus should start to remove metrics from local storage.
   retention:
     size: 1GiB

@@ -13,3 +13,4 @@
 ### Changed
 
 - ClusterIssuers are used instead of Issuers
+- Persistent volumes for prometheus are now optional (disabled by default)

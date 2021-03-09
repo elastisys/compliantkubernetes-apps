@@ -24,6 +24,7 @@ prometheusSpec:
   ## Prometheus StorageSpec for persistent data
   ## ref: https://github.com/coreos/prometheus-operator/blob/release-0.29/Documentation/user-guides/storage.md
   ##
+  {{- if .Values.prometheus.wcReader.storage.enabled }}
   storage:
     volumeClaimTemplate:
       spec:
@@ -32,6 +33,7 @@ prometheusSpec:
         resources:
           requests:
             storage: {{ .Values.prometheus.wcReader.storage.size }}
+  {{- end }}
 
   enableAdminAPI: false
   logFormat: logfmt

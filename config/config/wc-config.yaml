@@ -196,6 +196,7 @@ prometheus:
 
   ## Persistence for prometheus to store metrics and wal.
   storage:
+    enabled: false
     size: 5Gi
 
   ## When prometheus should start to remove metrics from local storage.
