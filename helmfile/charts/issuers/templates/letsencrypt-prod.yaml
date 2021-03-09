@@ -1,11 +1,9 @@
 {{- if .Values.letsencrypt.enabled }}
-{{- range $namespace := .Values.letsencrypt.namespaces }}
 ---
 apiVersion: cert-manager.io/v1
-kind: Issuer
+kind: ClusterIssuer
 metadata:
   name: letsencrypt-prod
-  namespace: {{ $namespace }}
 spec:
   acme:
     email: {{ $.Values.letsencrypt.prod.email | quote }}
@@ -19,5 +17,4 @@ spec:
       http01:
         ingress:
           class: nginx
-{{- end }}
 {{- end }}

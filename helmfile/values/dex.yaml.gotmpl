@@ -7,7 +7,7 @@ crd:
 ingress:
   enabled: true
   annotations:
-    cert-manager.io/issuer: {{ .Values.global.issuer }}
+    cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
     {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.dex }}
     nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.dex }}
     {{ end }}
