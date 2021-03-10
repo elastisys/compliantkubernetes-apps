@@ -1,6 +1,5 @@
 ingress:
   enabled: true
-  issuer: "{{ .Values.global.issuer }}"
   clusterDomain: "{{ .Values.global.baseDomain }}"
   username: "kubeapiuser"
   password: "{{ .Values.kubeapiMetricsPassword }}"
