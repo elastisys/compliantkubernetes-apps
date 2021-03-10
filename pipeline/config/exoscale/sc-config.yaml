@@ -574,13 +574,6 @@ restore:
 issuers:
   letsencrypt:
     enabled: true
-    namespaces:
-      - dex
-      - elastic-system
-      - kube-system
-      - monitoring
-      - influxdb-prometheus
-      - harbor
     prod:
       email: letsencrypt@elastisys.com
     staging:

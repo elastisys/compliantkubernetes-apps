@@ -329,17 +329,7 @@ issuers:
   ## Deploy let's encrypt ACME issuers
   ## "letsencrypt-prod" and "letsencrypt-staging".
   letsencrypt:
-    enabled: true
-    ## Namespaces in which to install the letsencrypt issuers in.
-    namespaces:
-      - kube-system
-      - monitoring
-    prod:
-      ## Mail through which letsencrypt can contact you.
-      email: letsencrypt@elastisys.com
-    staging:
-      ## Mail through which letsencrypt can contact you.
-      email: letsencrypt@elastisys.com
+    enabled: false
   ## Additional issuers to create.
   ## ref: https://cert-manager.io/docs/configuration/
   extraIssuers: []
