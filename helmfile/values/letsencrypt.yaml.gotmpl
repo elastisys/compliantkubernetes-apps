@@ -1,8 +1,10 @@
 letsencrypt:
   enabled: {{ .Values.issuers.letsencrypt.enabled }}
+  {{ if .Values.issuers.letsencrypt.enabled }}
   prod:
     email: {{ .Values.issuers.letsencrypt.prod.email }}
   staging:
     email: {{ .Values.issuers.letsencrypt.staging.email }}
+  {{ end }}
 
 extraIssuers: {{- toYaml .Values.issuers.extraIssuers | nindent 2 }}

@@ -6,6 +6,8 @@
 
 1. Delete `issuers.letsencrypt.namespaces` from both `sc-config.yaml` and `wc-config.yaml`.
 
+1. Set `issuers.letsencrypt.enabled` to `false` in `wc-config.yml` and remove `issuers.letsencrypt.prod` and `issuers.letsencrypt.staging`, unless you want to use the ClusterIssuer in WC.
+
 1. Upgrade applications
   ```bash
   ./bin/ck8s apply {sc|wc}
