@@ -15,3 +15,7 @@
 - ClusterIssuers are used instead of Issuers
 - Persistent volumes for prometheus are now optional (disabled by default)
 - Updated velero chart and its CRDs to 2.15.0 (velero 1.5.0)
+
+### Removed
+
+- Removed label `certmanager.k8s.io/disable-validation` from cert-manager namespace
