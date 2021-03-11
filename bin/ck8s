@@ -102,7 +102,6 @@ case "${1}" in
     validate)
         [[ "${2}" =~ ^(wc|sc)$ ]] || usage
         config_load "$2"
-        config_load "$2"
         echo "Config validation successful"
         ;;
     *) usage ;;
