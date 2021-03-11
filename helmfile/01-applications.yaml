@@ -112,7 +112,7 @@ releases:
   labels:
     app: velero
   chart: vmware-tanzu/velero
-  version: 2.8.2
+  version: 2.15.0
   installed: {{ .Values.velero.enabled }}
   missingFileHandler: Error
   values:

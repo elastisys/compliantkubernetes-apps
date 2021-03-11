@@ -90,6 +90,11 @@ schedules:
   daily-backup:
     schedule: "0 0 * * *" #once per day
     template:
+      {{- if eq .Values.objectStorage.type "s3" }}
+      storageLocation: aws
+      {{- else if eq .Values.objectStorage.type "gcs" }}
+      storageLocation: gcs
+      {{- end }}
       labelSelector:
         matchLabels:
           velero: backup
