@@ -508,18 +508,8 @@ nfsProvisioner:
   nodeSelector: {}
 ingressNginx:
   controller:
-    # Chart deploys correctly but does not work with resourceRequests
     resources: {}
-    # limits:
-    #   cpu: 100m
-    #   memory: 64Mi
-    # requests:
-    #   cpu: 100m
-    #   memory: 64Mi
-    tolerations:
-      - key: nodeType
-        operator: Exists
-        effect: NoSchedule
+    tolerations: []
     affinity: {}
     nodeSelector: {}
     config:
@@ -532,19 +522,8 @@ ingressNginx:
     # Will add custom configuration options to Nginx https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
     additionalConfig: {}
   defaultBackend:
-    # Chart deploys correctly but does not work with resourceRequests
     resources: {}
-    # limits:
-    #   cpu: 100m
-    #   memory: 64Mi
-    # requests:
-    #   cpu: 100m
-    #   memory: 64Mi
-    tolerations:
-      - key: nodeType
-        operator: Equal
-        value: elastisys
-        effect: NoSchedule
+    tolerations: []
     affinity: {}
     nodeSelector: {}
 velero:

@@ -19,3 +19,4 @@
 ### Removed
 
 - Removed label `certmanager.k8s.io/disable-validation` from cert-manager namespace
+- Removed leftover default tolerations config for `ingress-nginx`.

@@ -263,13 +263,7 @@ externalTrafficPolicy:
 ingressNginx:
   controller:
     resources: {}
-    ##
-    ## TODO: remove, we do not label our nodes with 'nodeType' by default.
-    ##
-    tolerations:
-      - key: nodeType
-        operator: Exists
-        effect: NoSchedule
+    tolerations: []
     affinity: {}
     nodeSelector: {}
     config:
@@ -292,14 +286,7 @@ ingressNginx:
     additionalConfig: {}
   defaultBackend:
     resources: {}
-    ##
-    ## TDOD: remove, we do not label our nodes with 'nodeType' by default.
-    ##
-    tolerations:
-      - key: nodeType
-        operator: Equal
-        value: elastisys
-        effect: NoSchedule
+    tolerations: []
     affinity: {}
     nodeSelector: {}
 ## Configration for Velero and Restic.

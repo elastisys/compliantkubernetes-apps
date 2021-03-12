@@ -388,12 +388,6 @@ elasticsearch:
       interval: 30s
       scrapeTimeout: 30s
     resources: {}
-    #   requests:
-    #     cpu: 100m
-    #     memory: 128Mi
-    #   limits:
-    #     cpu: 100m
-    #     memory: 128Mi
     tolerations: []
 
 fluentd:
@@ -523,18 +517,8 @@ nfsProvisioner:
 
 ingressNginx:
   controller:
-    # Chart deploys correctly but does not work with resourceRequests
     resources: {}
-      # limits:
-      #   cpu: 100m
-      #   memory: 64Mi
-      # requests:
-      #   cpu: 100m
-      #   memory: 64Mi
-    tolerations:
-      - key: "nodeType"
-        operator: "Exists"
-        effect: "NoSchedule"
+    tolerations: []
     affinity: {}
     nodeSelector: {}
     config:
@@ -548,19 +532,8 @@ ingressNginx:
     additionalConfig: {}
 
   defaultBackend:
-  # Chart deploys correctly but does not work with resourceRequests
     resources: {}
-      # limits:
-      #   cpu: 100m
-      #   memory: 64Mi
-      # requests:
-      #   cpu: 100m
-      #   memory: 64Mi
-    tolerations:
-      - key: "nodeType"
-        operator: "Equal"
-        value: "elastisys"
-        effect: "NoSchedule"
+    tolerations: []
     affinity: {}
     nodeSelector: {}
 
