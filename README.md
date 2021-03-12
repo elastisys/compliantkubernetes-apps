@@ -128,14 +128,33 @@ Assuming you already have everything needed to install the apps, this is what yo
 
 3. Initialize your environment and configuration:
    Note that this will *not* overwrite existing values, but it will append to existing files.
-   See the [ck8s][ck8s] repository if you are uncertain about in what order you should do things.
+   See [compliantkubernetes.io](compliantkubernetes.io) if you are uncertain about in what order you should do things.
 
    ```bash
    ./bin/ck8s init
    ```
 
 4. Edit the configuration files that have been initialized in the configuration path.
-   Make sure that the `objectStorage` values are set in `sc-config.yaml`, `wc-config.yaml` and `secrets.yaml` according to your `objectStorage.type` (so `objectStorage.s3.*` if you are using s3 or `objectStorage.gcs.*` if you are using gcs.)
+   Make sure that the `objectStorage` values are set in `sc-config.yaml`, `wc-config.yaml` and `secrets.yaml` according to your `objectStorage.type` (Set `objectStorage.s3.*` if you are using s3 or `objectStorage.gcs.*` if you are using gcs.)
+   If you enable object storage you also need to make sure that the buckets specified in `objecStorage.buckets` exist.
+   You can run the following snippet to ensure that you've configured S3 correctly:
+
+   ```bash
+   (
+      access_key=$(sops exec-file ${CK8S_CONFIG_PATH}/secrets.yaml 'yq r {} "objectStorage.s3.accessKey"')
+      secret_key=$(sops exec-file ${CK8S_CONFIG_PATH}/secrets.yaml 'yq r {} "objectStorage.s3.secretKey"')
+      region=$(yq r ${CK8S_CONFIG_PATH}/sc-config.yaml 'objectStorage.s3.region')
+      host=$(yq r ${CK8S_CONFIG_PATH}/sc-config.yaml 'objectStorage.s3.regionEndpoint')
+
+      for bucket in $(yq r ${CK8S_CONFIG_PATH}/sc-config.yaml 'objectStorage.buckets.*'); do
+          s3cmd --access_key=${access_key} --secret_key=${secret_key} \
+              --region=${region} --host=${host} \
+              ls s3://${bucket} > /dev/null
+          [ ${?} = 0 ] && echo "Bucket ${bucket} exists!"
+      done
+   )
+   ```
+
 
 5. OBS! for this step each cluster need to be up and running already.
    Deploy the apps:
