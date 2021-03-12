@@ -35,9 +35,8 @@ aggregator:
         {{ if eq .Values.fluentd.forwarder.useRegionEndpoint true -}}
         s3_endpoint {{ .Values.objectStorage.s3.regionEndpoint }}
         force_path_style true
-        {{ else -}}
-        s3_region {{ .Values.objectStorage.s3.region }}
         {{ end -}}
+        s3_region {{ .Values.objectStorage.s3.region }}
         s3_bucket {{ .Values.objectStorage.buckets.scFluentd }}
         {{- end }}
 
