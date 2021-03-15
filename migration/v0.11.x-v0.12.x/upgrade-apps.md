@@ -16,6 +16,11 @@
     * `wc-config.yaml`
       * set `prometheus.storage.enabled`: `true`
 
+1. Delete the old gatekeeper chart (note this will temporarilly disable any gatekeeper policy and create a possible security issue):
+    ```bash
+    ./bin/ck8s ops helmfile wc -l app=gatekeeper-operator destroy
+    ```
+
 1. Upgrade applications
     ```bash
     ./bin/ck8s apply {sc|wc}

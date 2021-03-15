@@ -19,6 +19,8 @@ repositories:
 {{ if eq .Environment.Name "workload_cluster" }}
 - name: falcosecurity
   url: https://falcosecurity.github.io/charts
+- name: gatekeeper
+  url: https://open-policy-agent.github.io/gatekeeper/charts
 {{ end }}
 
 # service_cluster specific repositories
@@ -499,11 +501,36 @@ releases:
     app: gatekeeper-operator
   chart: ./charts/gatekeeper-operator
   version: 1.6.0
-  installed: {{ .Values.opa.enabled }}
+  installed: false
   missingFileHandler: Error
   wait: true
   values:
   - values/gatekeeper-operator.yaml.gotmpl
+
+# gatekeeper
+- name: gatekeeper
+  namespace: gatekeeper-system
+  labels:
+    app: gatekeeper
+  chart: gatekeeper/gatekeeper
+  version: 3.3.0
+  installed: {{ .Values.opa.enabled }}
+  missingFileHandler: Error
+  wait: true
+  values:
+  - values/gatekeeper.yaml.gotmpl
+
+# gatekeeper-metrics
+- name: gatekeeper-metrics
+  namespace: gatekeeper-system
+  labels:
+    app: gatekeeper-metrics
+  chart: ./charts/gatekeeper-metrics
+  version: 0.1.0
+  installed: {{ .Values.opa.enabled }}
+  missingFileHandler: Error
+  needs:
+  - gatekeeper-system/gatekeeper
 
 # gatekeeper-templates
 - name: gatekeeper-templates
@@ -515,7 +542,7 @@ releases:
   installed: {{ .Values.opa.enabled }}
   missingFileHandler: Error
   needs:
-  - gatekeeper-system/gatekeeper-operator
+  - gatekeeper-system/gatekeeper
   values:
   - values/gatekeeper-templates.yaml.gotmpl
 

@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: gatekeeper-metrics
+    chart: gatekeeper-metrics
+    control-plane: controller-manager
+    type: metrics
+  name: {{ .Release.Name }}-controller
+spec:
+  ports:
+  - port: 8888
+    name: metrics
+    protocol: TCP
+    targetPort: 8888
+  selector:
+    app: gatekeeper
+    chart: gatekeeper
+    control-plane: controller-manager
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: gatekeeper-metrics
+    chart: gatekeeper-metrics
+    control-plane: controller-manager
+  name: {{ .Release.Name }}-controller
+spec:
+  endpoints:
+  - port: metrics
+  selector:
+    matchLabels:
+      app: gatekeeper-metrics
+      chart: gatekeeper-metrics
+      control-plane: controller-manager
+      type: metrics
