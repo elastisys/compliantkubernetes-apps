@@ -100,7 +100,6 @@ If this is all new to you, here's a [link](https://riseup.net/en/security/messag
 In addition to this, you will need to set up the following DNS entries (replace `example.com` with your domain).
 - Point these domains to the workload cluster ingress controller:
   - `*.example.com`
-  - `prometheus.ops.example.com`
 - Point these domains to the service cluster ingress controller:
   - `*.ops.example.com`
   - `grafana.example.com`
@@ -119,14 +118,14 @@ Assuming you already have everything needed to install the apps, this is what yo
    export CK8S_FLAVOR=[dev|prod] # defaults to dev
    ```
 
-2. Then set the path to where the ck8s configuration should be stored and the PGP fingerprint of the key(s) to use for encryption:
+1. Then set the path to where the ck8s configuration should be stored and the PGP fingerprint of the key(s) to use for encryption:
 
    ```bash
    export CK8S_CONFIG_PATH=${HOME}/.ck8s/my-ck8s-cluster
    export CK8S_PGP_FP=<PGP-fingerprint1,PGP-fingerprint2,...>
    ```
 
-3. Initialize your environment and configuration:
+1. Initialize your environment and configuration:
    Note that this will *not* overwrite existing values, but it will append to existing files.
    See [compliantkubernetes.io](compliantkubernetes.io) if you are uncertain about in what order you should do things.
 
@@ -134,8 +133,27 @@ Assuming you already have everything needed to install the apps, this is what yo
    ./bin/ck8s init
    ```
 
-4. Edit the configuration files that have been initialized in the configuration path.
-   Make sure that the `objectStorage` values are set in `sc-config.yaml`, `wc-config.yaml` and `secrets.yaml` according to your `objectStorage.type` (Set `objectStorage.s3.*` if you are using s3 or `objectStorage.gcs.*` if you are using gcs.)
+1. Edit the configuration files that have been initialized in the configuration path.
+   Make sure that the `objectStorage` values are set in `sc-config.yaml`, `wc-config.yaml` and `secrets.yaml` according to your `objectStorage.type`.
+   Set `objectStorage.s3.*` if you are using S3 or `objectStorage.gcs.*` if you are using GCS.
+
+
+1. Create S3 buckets - optional
+   If you have set `objectStorage.type: s3`, then you need to create the buckets specified under `objectStorage.buckets` in your configuration files.
+   You can run the script `scripts/S3/entry.sh create` to create the buckets required.
+   The script uses `s3cmd` in the background and it uses the `${HOME}/.s3cfg` file for configuration and authentication for your S3 provider.
+   There's also a helper script `scripts/S3/generate-s3cfg.sh` that will allow you to generate an appropriate `s3cfg` config file for a few providers.
+
+   ```bash
+   # Use your s3cmd config file.
+   scripts/S3/entry.sh create
+
+   # Use custom config file for s3cmd.
+   scripts/S3/gen-s3cfg.sh aws ${AWS_ACCESS_KEY} ${AWS_ACCESS_SECRET_KEY} s3.eu-north-1.amazonaws.com eu-north-1 > s3cfg-aws
+   scripts/S3/entry.sh --s3cfg s3cfg-aws create
+   ```
+
+1. Test S3 configuration - optional
    If you enable object storage you also need to make sure that the buckets specified in `objecStorage.buckets` exist.
    You can run the following snippet to ensure that you've configured S3 correctly:
 
@@ -155,8 +173,7 @@ Assuming you already have everything needed to install the apps, this is what yo
    )
    ```
 
-
-5. OBS! for this step each cluster need to be up and running already.
+1. **Note**, for this step each cluster need to be up and running already.
    Deploy the apps:
 
    ```bash
@@ -164,14 +181,14 @@ Assuming you already have everything needed to install the apps, this is what yo
    ./bin/ck8s apply wc
    ```
 
-6. Test that the cluster is running correctly with:
+1. Test that the cluster is running correctly with:
 
    ```bash
    ./bin/ck8s test sc
    ./bin/ck8s test wc
    ```
 
-7. You should now have a fully working environment.
+1. You should now have a fully working environment.
    Check the next section for some additional steps to finalize it and set up user access.
 
 ### On-boarding and final touches
