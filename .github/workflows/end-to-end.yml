@@ -24,28 +24,8 @@ jobs:
         image_tag: ${{ github.sha }}
         context: pipeline
 
-  buckets:
-    runs-on: ubuntu-20.04
-    steps:
-    - name: Checkout bucket-manager
-      uses: actions/checkout@v2
-      with:
-        repository: elastisys/bucket-manager
-        ref: main
-        token: ${{ secrets.CK8S_PIPELINE_GITHUB_TOKEN }}
-    - name: Create buckets
-      env:
-        EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-        EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
-      run: |
-        python3 -m venv venv
-        source venv/bin/activate
-        pip install -r S3/requirements.txt
-        ./S3/gen-s3cfg.sh exoscale "${EXOSCALE_API_KEY}" "${EXOSCALE_API_SECRET}" sos-ch-gva-2.exo.io > s3cfg.ini
-        ./S3/manager.sh --s3cfg s3cfg.ini --create pipeline-exoscale-harbor pipeline-exoscale-velero pipeline-exoscale-es-backup pipeline-exoscale-influxdb pipeline-exoscale-sc-logs
-
   apps:
-    needs: [build-apps-image, buckets]
+    needs: [build-apps-image]
     runs-on: ubuntu-20.04
     container: elastisys/compliantkubernetes-apps-pipeline:${{ github.sha }}
     strategy:
@@ -136,6 +116,15 @@ jobs:
         PGP_KEY: ${{ secrets.PGP_KEY }}
         PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
 
+    - name: Create buckets
+      if: matrix.cluster == 'sc'
+      env:
+        EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
+        EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
+      run: |
+        ./apps/scripts/S3/generate-s3cfg.sh exoscale "${EXOSCALE_API_KEY}" "${EXOSCALE_API_SECRET}" sos-ch-gva-2.exo.io ch-gva-2 > s3cfg.ini
+        ./apps/scripts/S3/entry.sh --s3cfg s3cfg.ini create
+
     - name: Prepare for apps
       env:
         S3_ACCESS_KEY: ${{ secrets.EXOSCALE_API_KEY }}
@@ -222,27 +211,13 @@ jobs:
       with:
         args: route53 change-resource-record-sets --hosted-zone-id Z2STJRQSJO5PZ0 --change-batch file://apps/pipeline/config/exoscale/dns-${{ matrix.cluster }}.json
 
-  buckets-cleanup:
-    needs: apps
-    if: always()
-    runs-on: ubuntu-20.04
-    steps:
-    - name: Checkout bucket-manager
-      uses: actions/checkout@v2
-      with:
-        repository: elastisys/bucket-manager
-        ref: main
-        token: ${{ secrets.CK8S_PIPELINE_GITHUB_TOKEN }}
     - name: Delete buckets
+      if: always() && (matrix.cluster == 'sc')
       env:
         EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
         EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
       run: |
-        python3 -m venv venv
-        source venv/bin/activate
-        pip install -r S3/requirements.txt
-        ./S3/gen-s3cfg.sh exoscale "${EXOSCALE_API_KEY}" "${EXOSCALE_API_SECRET}" sos-ch-gva-2.exo.io > s3cfg.ini
-        ./S3/manager.sh --s3cfg s3cfg.ini --delete pipeline-exoscale-harbor pipeline-exoscale-velero pipeline-exoscale-es-backup pipeline-exoscale-influxdb pipeline-exoscale-sc-logs
+        ./apps/scripts/S3/entry.sh --s3cfg s3cfg.ini delete
 
   clean-apps-image:
     needs: apps
@@ -263,7 +238,7 @@ jobs:
 
   alert:
     runs-on: ubuntu-20.04
-    needs: [buckets-cleanup, clean-apps-image]
+    needs: [clean-apps-image]
     if: always() && github.ref == 'refs/heads/main'  # Make sure this runs even if some jobs fail, and only on main
     steps:
     - id: get-sha
