@@ -15,8 +15,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 49,
-  "iteration": 1611587460227,
+  "id": 31,
+  "iteration": 1615813966053,
   "links": [],
   "panels": [
     {
@@ -201,7 +201,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(gatekeeper_request_count{cluster=~\"$cluster\"}[5m])",
+          "expr": "sum by (admission_status, cluster)(rate(gatekeeper_request_count{cluster=~\"$cluster\"}[5m]))",
           "instant": false,
           "interval": "",
           "intervalFactor": 1,
@@ -374,7 +374,6 @@
         "allValue": ".*",
         "current": {
           "selected": true,
-          "tags": [],
           "text": "All",
           "value": [
             "$__all"
@@ -389,7 +388,7 @@
         "name": "cluster",
         "options": [],
         "query": "label_values(gatekeeper_request_count, cluster)",
-        "refresh": 0,
+        "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
         "sort": 0,
