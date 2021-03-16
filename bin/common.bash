@@ -142,8 +142,8 @@ validate_config() {
         # available in $1
         maybe_exit="false"
         for opt in ${options}; do
-            value=$(yq r "${file}" "${opt}")
-            if [[ -z "$value" ]]; then
+            value=$(yq r --unwrapScalar=false "${file}" "${opt}")
+            if [[ -z "${value}" ]] || [[ "${value}" = '"set-me"' ]] || [[ "${value}" = "set-me" ]]; then
                 log_warning "WARN: ${opt} is not set in ${file}"
                 maybe_exit="true"
             fi

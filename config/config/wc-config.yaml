@@ -82,7 +82,7 @@ storageClasses:
 ## Nfs-client-provisioner configuration.
 ## Deployment is controlled via 'storageClasses.nfs.enabled'.
 nfsProvisioner:
-  server: "set-me"
+  server: ""
   path: /nfs
   resources:
     limits:
@@ -369,10 +369,10 @@ issuers:
     enabled: false
     # prod:
     #   ## Mail through which letsencrypt can contact you.
-    #   email: ""
+    #   email: "set-me"
     # staging:
     #   ## Mail through which letsencrypt can contact you.
-    #   email: ""
+    #   email: "set-me"
 
   ## Additional issuers to create.
   ## ref: https://cert-manager.io/docs/configuration/
