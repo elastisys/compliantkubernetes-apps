@@ -21,7 +21,6 @@ elasticsearch:
     secretName: opendistro-es-s3-credentials
     accessKey: {{ .Values.objectStorage.s3.accessKey }}
     secretKey: {{ .Values.objectStorage.s3.secretKey }}
-    provider: {{ .Values.global.cloudProvider }}
     bucketName: {{ .Values.objectStorage.buckets.elasticsearch }}
   {{ else if eq .Values.objectStorage.type "gcs" -}}
   s3:
