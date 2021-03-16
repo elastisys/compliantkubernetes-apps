@@ -4,7 +4,7 @@
 
 1. Run init to get new defaults: `./bin/ck8s init`
 
-1. Delete `issuers.letsencrypt.namespaces` from both `sc-config.yaml` and `wc-config.yaml`.
+1. Delete `issuers.letsencrypt.namespaces` and `objectStorage.s3.regionAddress` from both `sc-config.yaml` and `wc-config.yaml`.
 
 1. Set `issuers.letsencrypt.enabled` to `false` in `wc-config.yml` and remove `issuers.letsencrypt.prod` and `issuers.letsencrypt.staging`, unless you want to use the ClusterIssuer in WC.
 

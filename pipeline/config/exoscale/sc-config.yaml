@@ -31,7 +31,6 @@ objectStorage:
   #   project: "set-me"
   # s3:
   #   region: "set-me"
-  #   regionAddress: "set-me"
   #   regionEndpoint: "set-me"
   buckets:
     harbor: pipeline-exoscale-harbor
@@ -41,7 +40,6 @@ objectStorage:
     scFluentd: pipeline-exoscale-sc-logs
   s3:
     region: ch-gva-2
-    regionAddress: sos-ch-gva-2.exo.io
     regionEndpoint: https://sos-ch-gva-2.exo.io
 user:
   grafana:
