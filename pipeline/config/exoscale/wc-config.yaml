@@ -90,7 +90,6 @@ objectStorage:
   #   project: "set-me"
   # s3:
   #   region: "set-me"
-  #   regionAddress: "set-me"
   #   regionEndpoint: "set-me"
 
   ## Buckets where each respctive application will store its backups.
@@ -102,7 +101,6 @@ objectStorage:
     scFluentd: pipeline-exoscale-sc-logs
   s3:
     region: ch-gva-2
-    regionAddress: sos-ch-gva-2.exo.io
     regionEndpoint: https://sos-ch-gva-2.exo.io
 ## User configuration.
 user:

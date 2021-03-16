@@ -34,7 +34,6 @@ objectStorage:
   #   project: "set-me"
   # s3:
   #   region: "set-me"
-  #   regionAddress: "set-me"
   #   regionEndpoint: "set-me"
   buckets:
     harbor: "${CK8S_ENVIRONMENT_NAME}-harbor"
