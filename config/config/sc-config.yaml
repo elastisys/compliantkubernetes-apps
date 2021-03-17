@@ -402,6 +402,8 @@ fluentd:
     tolerations: []
     affinity: {}
     nodeSelector: {}
+    # Set to 'false' when using AWS S3,
+    # and 'true' when using any other S3 provider.
     useRegionEndpoint: "set-me"
   aggregator:
     resources:
