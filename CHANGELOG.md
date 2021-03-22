@@ -32,6 +32,7 @@
 - Updated velero chart and its CRDs to 2.15.0 (velero 1.5.0)
 - Updated fluentd forwarder config to always include `s3_region`
 - Updated gatekeeper to v3.3.0 and it now uses the official chart.
+- Tweaked config default value for disabled option
 
 ### Removed
 
