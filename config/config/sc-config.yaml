@@ -484,9 +484,9 @@ alerts:
   opsGenieHeartbeat:
     enabled: false
     url: "https://api.eu.opsgenie.com/v2/heartbeats"
-    name: "set-me"
+    name: "set-me-if-enabled"
   slack:
-    channel: "set-me"
+    channel: "set-me-if-enabled"
   opsGenie:
     apiUrl: "https://api.eu.opsgenie.com"
 
