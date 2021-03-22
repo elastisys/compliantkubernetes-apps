@@ -4,7 +4,7 @@
 snapshots:
   min: {{ .Values.elasticsearch.snapshot.min }}
   max: {{ .Values.elasticsearch.snapshot.max }}
-  maxAgeSeconds: {{ .Values.elasticsearch.snapshot.ageSeconds }}
+  maxAgeSeconds: {{ .Values.elasticsearch.snapshot.ageSeconds | quote }}
 
 schedule: {{ .Values.elasticsearch.snapshot.retentionSchedule | quote }}
 
