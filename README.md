@@ -297,11 +297,11 @@ There are two simple scripts that can be used to clean up you clusters.
 
 To clean up the service cluster run:
 ```bash
-./scrips/clean-sc.sh
+./scripts/clean-sc.sh
 ```
 To clean up the workload cluster run:
 ```bash
-./scrips/clean-wc.sh
+./scripts/clean-wc.sh
 ```
 
 ### Operator manual
