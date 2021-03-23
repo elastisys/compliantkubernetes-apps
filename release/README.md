@@ -29,7 +29,7 @@ https://semver.org/
 
     ```
     git diff HEAD~1
-    git push
+    git push -u origin reset-changelog-X.Y
     ```
 
 1. Merge `reset-changelog-X.Y` into `release-X.Y` then, into `main` as soon as possible to minimize risk of conflicts
@@ -37,51 +37,54 @@ https://semver.org/
     **NOTE**: The release action will fail since we haven't tagged the release commit.
     We will do that after QA.
 
-1. Run QA checks on `branch_name` and commit any fixes found during QA into `release-X.Y`.
-
-    **NOTE**: All changes made in QA should be added to `CHANGELOG.md` and **NOT** `WIP-CHANGELOG.md`.
-
-1. Run the release script.
+1. Create a `QA-X.Y` branch and run QA checks on this branch.
 
     ```bash
-    ./release/release.sh X.Y.0
+    git checkout release-X.Y
+    git checkout -b QA-X.Y
+    git push -u origin QA-X.Y
     ```
 
-    The release script will:
-    * Amend last commit and prepend message `Release vX.Y.Z`
-    * Create a tag named `vX.Y.Z`
+    **NOTE**: All changes made in QA should be added to `CHANGELOG.md` and **NOT** `WIP-CHANGELOG.md`.
+    Also, make sure to not merge any fixes into `release-X.Y` on this step.
+
+1. When the QA is finished, create the release tag.
+
+    ```bash
+    git tag vX.Y.0
+    ```
 
 1. Push the tagged commit, create a PR against the release branch and request a review.
 
     ```bash
-    git push --atomic origin branch_name vX.Y.Z
+    git push --tags QA-X.Y
     ```
 
 1. Merge it to finalize the release.
-    A [GitHub actions workflow pipeline](.github/workflows/release.yml) will create a GitHub release from the tag.
 
-    *GitHub currently does not support merging with fast-forward only.
+    Since the tag is referencing a specific commit hash we need to retain it after the PR (via e.g. fast-forward merge).
+
+    *GitHub currently does not support merging with fast-forward only in PRs.
     Merge the release PR locally and push it instead.*
 
     ```bash
     git checkout release-X.Y
-    git merge --ff-only branch_name
+    git merge --ff-only QA-X.Y
     git push
-
-    # If 'git merge --ff-only' isn't possible, 'git rebase' can be used.
-    git checkout release-X.Y
-    git rebase --onto branch_name
-    git push --force-with-lease
     ```
 
-1. Merge any fixes from the release branch back to the `main` branch
-    `git cherry-pick` can be used, e.g.
+    A [GitHub actions workflow pipeline](.github/workflows/release.yml) will create a GitHub release from the tag.
+
+1. Merge any fixes from the release branch back to the `main` branch `git cherry-pick` can be used, e.g.
 
     ```bash
     git checkout main
     git checkout -b release-X.Y-fixes
     git cherry-pick <fix 1 hash> [<fix 2 hash>..]
+    git push -u origin release-X.Y-fixes
     ```
+
+    Create a PR and merge the fixes into main.
 
 ## Patch releases
 
