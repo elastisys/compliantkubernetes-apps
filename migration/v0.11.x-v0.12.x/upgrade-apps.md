@@ -16,12 +16,13 @@
     * `wc-config.yaml`
       * set `prometheus.storage.enabled`: `true`
 
-1. Delete the old gatekeeper chart (note this will temporarilly disable any gatekeeper policy and create a possible security issue):
+1. If you had disabled OPA/gatekeeper because it could not be run on kubernetes v1.19+, then you can now enable it again in your config.
+  Otherwise, if you have enabled OPA/gatekeeper, then delete the old gatekeeper chart (note this will temporarilly disable any gatekeeper policy and create a possible security issue):
     ```bash
     ./bin/ck8s ops helmfile wc -l app=gatekeeper-operator destroy
     ```
 
-1. Upgrade applications
+1. Upgrade applications. Note that our config validation now also warns if you have left any config value equal to "set-me", so you might see more warnings than before.
     ```bash
     ./bin/ck8s apply {sc|wc}
     ```
