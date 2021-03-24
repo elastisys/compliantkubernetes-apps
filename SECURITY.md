@@ -12,4 +12,4 @@ The key is available from [keyserver.ubuntu.com](https://keyserver.ubuntu.com/pk
 
 ## Security announcements
 
-You can subscribe to our [mailing list](http://eepurl.com/htQ4Jv) to receive updates via mail.
+You can subscribe to our [mailing list](https://eepurl.com/ht4l5n) to receive updates via mail.
