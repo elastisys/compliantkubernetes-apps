@@ -1,6 +1,7 @@
 ### Fixed
 
 - Elasticsearch SLM retention value conversion bug
+- S3
 
 ### Changed
 
