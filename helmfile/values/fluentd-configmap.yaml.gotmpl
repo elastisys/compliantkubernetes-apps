@@ -15,7 +15,7 @@ aggregator:
         port 9880
       </source>
 
-      <match kubernetes.var.log.containers.fluentd-aggregator-**>
+      <match kubernetes.var.log.containers.fluentd>
         @type null
       </match>
       <match **>
