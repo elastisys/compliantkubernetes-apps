@@ -1,6 +1,7 @@
 ### Fixed
 
 - Elasticsearch SLM retention value conversion bug
+- FluentId logs stop being shipped to S3
 
 ### Changed
 
