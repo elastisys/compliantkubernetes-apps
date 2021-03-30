@@ -46,7 +46,7 @@
         path: "/home/{{ install_user }}/.local/share/helm/plugins/helm-diff"
       register: helm_diff_exists
     - name: Get helm-diff
-      become: "{{ install_user }}"
+      become_user: "{{ install_user }}"
       command: "helm plugin install https://github.com/databus23/helm-diff --version v{{ helmdiff_version }}"
       register: "output"
       when: not helm_diff_exists.stat.exists
@@ -55,7 +55,7 @@
         path: "/home/{{ install_user }}/.local/share/helm/plugins/helm-secrets"
       register: helm_secrets_exists
     - name: Get helm-secrets
-      become: "{{ install_user }}"
+      become_user: "{{ install_user }}"
       command: "helm plugin install https://github.com/zendesk/helm-secrets --version v{{ helmsecrets_version }}"
       register: "output"
       when: not helm_secrets_exists.stat.exists
