@@ -74,7 +74,11 @@ releases:
   chart: ingress-nginx/ingress-nginx
   version: 2.10.0
   missingFileHandler: Error
-  wait: true
+{{ if eq .Environment.Name "service_cluster" }}
+  needs:
+  - monitoring/user-grafana
+  - dex/dex
+{{ end }}
   values:
   - values/ingress-nginx.yaml.gotmpl
 
@@ -100,6 +104,7 @@ releases:
   missingFileHandler: Error
   needs:
   - cert-manager/cert-manager
+  wait: true
   values:
 {{ if eq .Environment.Name "service_cluster" }}
   - values/kube-prometheus-stack-sc.yaml.gotmpl
@@ -246,6 +251,8 @@ releases:
   missingFileHandler: Error
   needs:
   - cert-manager/cert-manager
+  - monitoring/kube-prometheus-stack
+  wait: true
   values:
   - values/grafana-user.yaml.gotmpl
 
@@ -416,6 +423,7 @@ releases:
   missingFileHandler: Error
   needs:
   - cert-manager/cert-manager
+  - cert-manager/issuers
   values:
   - values/opendistro-es.yaml.gotmpl
 
