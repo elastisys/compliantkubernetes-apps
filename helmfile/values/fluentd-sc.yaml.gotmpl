@@ -1,7 +1,5 @@
-{{- if .Values.fluentd.aggregator.enabled }}
-{{- if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") ) }}
+{{- if and .Values.fluentd.aggregator.enabled (not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") ) ) }}
 {{ fail "\nERROR: Fluentd requires s3 or gcs object storage, see Values.objectStorage.type" }}
-{{- end }}
 {{- end }}
 
 aggregator:
