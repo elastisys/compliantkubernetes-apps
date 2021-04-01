@@ -1,8 +1,11 @@
-{{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") ) }}
+{{- if .Values.fluentd.aggregator.enabled }}
+{{- if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") ) }}
 {{ fail "\nERROR: Fluentd requires s3 or gcs object storage, see Values.objectStorage.type" }}
-{{ end }}
+{{- end }}
+{{- end }}
 
 aggregator:
+  enabled: {{ .Values.fluentd.aggregator.enabled }}
   replicaCount: 1
   configMap: fluentd-aggregator-configmap
   resources:    {{- toYaml .Values.fluentd.aggregator.resources | nindent 4  }}

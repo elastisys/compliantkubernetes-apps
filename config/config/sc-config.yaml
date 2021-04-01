@@ -406,6 +406,7 @@ fluentd:
     # and 'true' when using any other S3 provider.
     useRegionEndpoint: "set-me"
   aggregator:
+    enabled: true
     resources:
       limits:
         cpu: 500m

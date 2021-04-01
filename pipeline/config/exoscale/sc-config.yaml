@@ -400,6 +400,7 @@ fluentd:
     nodeSelector: {}
     useRegionEndpoint: true
   aggregator:
+    enabled: true
     resources:
       limits:
         cpu: 500m
