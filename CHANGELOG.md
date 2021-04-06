@@ -1,5 +1,6 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.13.0](#v0130---2021-04-06)
 - [v0.12.0](#v0120---2021-03-17)
 - [v0.11.0](#v0110---2021-03-03)
 - [v0.10.0](#v0100---2021-02-18)
@@ -9,6 +10,19 @@
 - [v0.6.0](#v060---2020-10-16)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.13.0 - 2021-04-06
+
+### Fixed
+
+- Elasticsearch SLM retention value conversion bug
+- FluentId logs stop being shipped to S3
+
+### Changed
+
+- Increased default active deadline for the slm job from 5 to 10 minutes
+- Updated the release documentation
 
 -------------------------------------------------
 ## v0.12.0 - 2021-03-17
