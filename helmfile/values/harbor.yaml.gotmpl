@@ -6,7 +6,7 @@
 expose:
   type: ingress
   tls:
-    enabled: true
+    enabled: {{ .Values.harbor.tls.enabled }}
     certSource: secret
     secret:
       secretName: harbor-core-ingress-cert
@@ -71,7 +71,11 @@ persistence:
     {{- end }}
     {{- end }}
 
+{{- if  .Values.harbor.tls.enabled }}
 externalURL: https://harbor.{{ .Values.global.baseDomain }}
+{{- else }}
+externalURL: http://harbor.{{ .Values.global.baseDomain }}
+{{- end }}
 
 harborAdminPassword: {{ .Values.harbor.password }}
 

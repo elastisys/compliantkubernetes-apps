@@ -150,6 +150,8 @@ harbor:
     scope: openid,email,profile,offline_access,groups
   backup:
     enabled: true
+  tls:
+    enabled: true
 prometheus:
   storage:
     enabled: false
