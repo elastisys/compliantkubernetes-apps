@@ -1,0 +1,27 @@
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.falcoAlerts }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "falco-alert" | trunc 63 | trimSuffix "-" }}
+  labels:
+    app: {{ template "prometheus-alerts.name" . }}
+{{ include "prometheus-alerts.labels" . | indent 4 }}
+{{- if .Values.defaultRules.labels }}
+{{ toYaml .Values.defaultRules.labels | indent 4 }}
+{{- end }}
+{{- if .Values.defaultRules.annotations }}
+  annotations:
+{{ toYaml .Values.defaultRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  groups:
+  - name: falco-alert
+    rules:
+    - alert: FalcoAlert
+      annotations:
+        message: 'Pod: {{`{{ $labels.pod }}`}}, Rule: {{`{{ $labels.rule }}`}}'
+      expr: |-
+        falco_events != 0
+      labels:
+        severity: warning
+{{- end }}
