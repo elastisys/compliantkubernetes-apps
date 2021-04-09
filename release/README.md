@@ -55,9 +55,11 @@ https://semver.org/
     ```
 
 1. Push the tagged commit, create a PR against the release branch and request a review.
+   If there are no changes, create the release manually instead by going to [releases](https://github.com/elastisys/compliantkubernetes-apps/releases) and clicking "Draft a new release".
+   Check older releases for how to word it.
 
     ```bash
-    git push --tags QA-X.Y
+    git push --tags
     ```
 
 1. Merge it to finalize the release.
@@ -73,7 +75,7 @@ https://semver.org/
     git push
     ```
 
-    A [GitHub actions workflow pipeline](.github/workflows/release.yml) will create a GitHub release from the tag.
+    A [GitHub actions workflow pipeline](/.github/workflows/release.yml) will create a GitHub release from the tag.
 
 1. Merge any fixes from the release branch back to the `main` branch `git cherry-pick` can be used, e.g.
 
@@ -140,7 +142,7 @@ by just writing that commits short hash or full hash.
 
 ### Release notes
 
-* To migrate the resources depending on yyyy you have to run [this script](..).
+* To migrate the resources depending on yyyy you have to run this script.
 
 ### Added
 
