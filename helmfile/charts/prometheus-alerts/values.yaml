@@ -41,6 +41,7 @@ defaultRules:
     kubeletService: false
     coreDNS: false
     certMonitor: true
+    falcoAlerts: true
 
 certMonitor:
   name: "cert-monitor"
