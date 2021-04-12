@@ -1,3 +1,7 @@
+### Added
+
+- Script to restore Harbor from backup
+
 ### Fixed
 
 - Elasticsearch slm now deletes excess snapshots also when none of them are older than the maximum age
@@ -6,7 +10,6 @@
 
 - The Service Cluster Prometheus now alerts based on Falco metrics. These alerts are sent to Alertmanager as usual so they now have the same flow as all other alerts. This is in addition to the "Falco specific alerting" through Falco sidekick.
 - Elasticsearch slm now deletes indices in bulk
-
 
 ### Removed
 
