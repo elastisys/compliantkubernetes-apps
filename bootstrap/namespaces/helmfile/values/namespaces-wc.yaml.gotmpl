@@ -13,7 +13,6 @@ namespaces:
 - name: falco
 {{ end }}
 {{ if .Values.opa.enabled }}
-- name: gatekeeper
 - name: gatekeeper-system
   labels:
     admission.gatekeeper.sh/ignore: "true"
