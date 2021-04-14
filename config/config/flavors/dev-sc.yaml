@@ -2,8 +2,18 @@ global:
   issuer: letsencrypt-staging
   verifyTls: false
 
+objectStorage:
+  type: none
+
 dex:
   enableStaticLogin: true
+
+harbor:
+  backup:
+    enabled: false
+  persistence:
+    # Valid options are "filesystem" (persistent volume), "swift", or "objectStorage" (matching global config)
+    type: "filesystem"
 
 prometheus:
   storage:
@@ -42,8 +52,12 @@ elasticsearch:
       otherSizeGB: 1
       otherAgeDays: 7
   snapshot:
+    enabled: false
     retentionSchedule: "0 1 * * *" # 1am
     backupSchedule: "0 */12 * * *" # run twice/day
+
+fluentd:
+  enabled: false
 
 influxDB:
   retention:
@@ -53,3 +67,10 @@ influxDB:
     durationSC: 3d
   persistence:
     size: 10Gi
+  backup:
+    enabled: false
+  backupRetention:
+    enabled: false
+
+velero:
+  enabled: false
