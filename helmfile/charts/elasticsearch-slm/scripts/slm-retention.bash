@@ -48,9 +48,10 @@ function get_snapshot_age {
     echo "${age_seconds}"
 }
 
-function remove_snapshot {
-    local snapshot_name=$1
-    local url="${ELASTICSEARCH_URL}/_snapshot/${SNAPSHOT_REPOSITORY}/${snapshot_name}"
+function remove_snapshots {
+    local snapshots_to_delete=$1
+    local url="${ELASTICSEARCH_URL}/_snapshot/${SNAPSHOT_REPOSITORY}/${snapshots_to_delete}"
+    echo "Deleting snapshots: ${snapshots_to_delete}"
     curl "${url}" -f -X DELETE --max-time "${REQUEST_TIMEOUT_SECONDS}" --silent \
         --basic --user "${ELASTICSEARCH_API_USER}:${ELASTICSEARCH_API_PASSWORD}"
 }
@@ -58,7 +59,7 @@ function remove_snapshot {
 function check_snapshot_count {
     local snapshot_count=$1
     if [ "${snapshot_count}" -le "${MIN_SNAPSHOTS}" ]; then
-        echo "snapshot count: ${snapshot_count} fewer than minimum: ${MIN_SNAPSHOTS}, do nothing"
+        echo "Snapshot count: ${snapshot_count} fewer than minimum: ${MIN_SNAPSHOTS}, do nothing"
         return 1
     fi
 }
@@ -66,7 +67,7 @@ function check_snapshot_count {
 function check_old_snapshots {
     local snapshots=$1
     if [ "$(get_snapshot_age "${snapshots}" 0)" -le "${MAX_AGE_SECONDS}" ]; then
-        echo "no old snapshots"
+        echo "No old snapshots"
         return 1
     fi
 }
@@ -75,12 +76,15 @@ function remove_old_snapshots {
     local idx=0
     local snapshots
     local snapshot_count
+    local snapshots_to_delete=""
+
+    echo "Checking for old snapshots."
 
     snapshots=$(get_snapshots)
     snapshot_count=$(echo "${snapshots}" | jq length)
 
-    check_snapshot_count "${snapshot_count}" || exit 0
-    check_old_snapshots  "${snapshots}"      || exit 0
+    check_snapshot_count "${snapshot_count}" || return 0
+    check_old_snapshots  "${snapshots}"      || return 0
 
     while [ $((snapshot_count - idx )) -gt "${MIN_SNAPSHOTS}" ]; do
         local age_seconds
@@ -88,31 +92,46 @@ function remove_old_snapshots {
         if [ "${age_seconds}" -gt "${MAX_AGE_SECONDS}" ]; then
             local snapshot_name
             snapshot_name=$(echo "${snapshots}" | jq -r ".[${idx}].snapshot")
-            echo "snapshot ${snapshot_name} is ${age_seconds} s old, max ${MAX_AGE_SECONDS} s"
-            remove_snapshot "${snapshot_name}"
+            echo "Snapshot ${snapshot_name} is ${age_seconds} s old, max ${MAX_AGE_SECONDS} s"
+            snapshots_to_delete="${snapshots_to_delete}${snapshot_name},"
         fi
         idx=$((idx + 1))
     done
+    if [ -n "${snapshots_to_delete}" ]; then
+        remove_snapshots "${snapshots_to_delete}"
+    fi
 }
 
 function remove_excess_snapshots {
     local idx=0
     local snapshots
     local snapshot_count
+    local snapshots_to_delete=""
+
+    echo "Checking number of snapshots."
 
     snapshots=$(get_snapshots)
     snapshot_count=$(echo "${snapshots}" | jq length)
+    echo "Number of snapshots: $snapshot_count"
 
-    check_snapshot_count "${snapshot_count}" || exit 0
+    check_snapshot_count "${snapshot_count}" || return 0
 
     while [ $((snapshot_count - idx )) -gt "${MAX_SNAPSHOTS}" ]; do
         local snapshot_name
         snapshot_name=$(echo "${snapshots}" | jq -r ".[${idx}].snapshot")
-        echo "too many snapshots: $((snapshot_count - idx )), max ${MAX_SNAPSHOTS}"
-        remove_snapshot "${snapshot_name}"
+        echo "Too many snapshots: $((snapshot_count - idx )), max ${MAX_SNAPSHOTS}"
+        snapshots_to_delete="${snapshots_to_delete}${snapshot_name},"
         idx=$((idx + 1))
     done
+    if [ -n "${snapshots_to_delete}" ]; then
+        remove_snapshots "${snapshots_to_delete}"
+    else
+        echo "Snapshot count: ${snapshot_count} is not more than maximum: ${MAX_SNAPSHOTS}, do nothing"
+    fi
 }
 
+echo "SLM retention procedure started"
+echo "Removing snapshots older than ${MAX_AGE_SECONDS} seconds but keeping at least ${MIN_SNAPSHOTS} snapshots and at most ${MAX_SNAPSHOTS} snapshots."
 remove_old_snapshots
 remove_excess_snapshots
+echo "SLM retention procedure done."
