@@ -1,0 +1,16 @@
+s3:
+  region: {{ .Values.objectStorage.s3.region | quote }}
+  regionEndpoint: {{ .Values.objectStorage.s3.regionEndpoint | quote }}
+  accessKey: {{ .Values.objectStorage.s3.accessKey | quote }}
+  secretKey: {{ .Values.objectStorage.s3.secretKey | quote }}
+  buckets: {{ values .Values.objectStorage.buckets | toYaml | nindent 2 }}
+  forcePathStyle: {{ .Values.objectStorage.s3.forcePathStyle }}
+
+serviceMonitor:
+  interval: {{ .Values.s3Exporter.interval }}
+  scrapeTimeout: {{ .Values.s3Exporter.scrapeTimeout }}
+
+resources: {{- toYaml .Values.s3Exporter.resources | nindent 2  }}
+nodeSelector: {{- toYaml .Values.s3Exporter.nodeSelector | nindent 2  }}
+tolerations: {{- toYaml .Values.s3Exporter.tolerations | nindent 2  }}
+affinity: {{- toYaml .Values.s3Exporter.affinity | nindent 2  }}

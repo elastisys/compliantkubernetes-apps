@@ -13,6 +13,7 @@
 
 - Authlog now indexed by elasticsearch
 - Added a ClusterRoleBinding for using an OIDC-based cluster admin kubeconfig and a script for generating such a kubeconfig (see `bin/ck8s kubeconfig admin`)
+- S3-exporter for collecting metrics about S3 buckets.
 
 ### Removed
 

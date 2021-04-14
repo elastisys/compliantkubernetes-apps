@@ -1,0 +1,42 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "s3-exporter.fullname" . }}
+  labels:
+    {{- include "s3-exporter.labels" . | nindent 4 }}
+spec:
+  endpoints:
+  # One endpoint per bucket so that we can pass the name of the bucket as param
+  {{- $interval := .Values.serviceMonitor.interval }}
+  {{- $scrapeTimeout := .Values.serviceMonitor.scrapeTimeout }}
+  {{- range .Values.s3.buckets }}
+  - port: http
+    scheme: http
+    path: "/probe"
+    interval: {{ $interval }}
+    scrapeTimeout: {{ $scrapeTimeout }}
+    params:
+      bucket:
+      - {{ . }}
+      # We could add a prefix here if we are just interested in specific files/folders
+      # prefix: []
+    metricRelabelings:
+      - sourceLabels: [__address__]
+        regex: '^bucket=(.*);prefix=(.*);$'
+        replacement: '${1}'
+        targetLabel: __param_target
+      - sourceLabels: [__address__]
+        regex: '^bucket=(.*);prefix=(.*);$'
+        replacement: '${2}'
+        targetLabel: '__param_prefix'
+      - targetLabel: __address__
+        replacement: 127.0.0.1:9340  # S3 exporter.
+  {{- end }}
+  jobLabel: s3_exporter
+  selector:
+    matchLabels:
+      {{- include "s3-exporter.selectorLabels" . | nindent 6 }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
