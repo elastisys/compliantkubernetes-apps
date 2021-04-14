@@ -575,3 +575,15 @@ calicoAccountant:
   enabled: true
 clusterAdmin:
   admins: []
+s3Exporter:
+  enabled: true
+  interval: 120s
+  scrapeTimeout: 30s
+  resources:
+    limits: {}
+    requests:
+      cpu: 50m
+      memory: 20Mi
+  tolerations: []
+  affinity: {}
+  nodeSelector: {}

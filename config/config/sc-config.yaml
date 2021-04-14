@@ -35,6 +35,8 @@ objectStorage:
   # s3:
   #   region: "set-me"
   #   regionEndpoint: "set-me"
+  #   # Generally false when using AWS and Exoscale and true for other providers.
+  #   forcePathStyle: true
   buckets:
     harbor: "${CK8S_ENVIRONMENT_NAME}-harbor"
     velero: "${CK8S_ENVIRONMENT_NAME}-velero"
@@ -597,3 +599,16 @@ calicoAccountant:
 
 clusterAdmin:
   admins: []
+s3Exporter:
+  # Also requries objectStorage.type=s3
+  enabled: true
+  interval: 60m
+  scrapeTimeout: 10m
+  resources:
+    limits: {}
+    requests:
+      cpu: 50m
+      memory: 20Mi
+  tolerations: []
+  affinity: {}
+  nodeSelector: {}

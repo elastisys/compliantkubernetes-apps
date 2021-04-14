@@ -379,6 +379,17 @@ releases:
   values:
   - values/blackbox.yaml.gotmpl
 
+- name: s3-exporter
+  namespace: monitoring
+  labels:
+    app: s3-exporter
+  chart: ./charts/s3-exporter
+  version: 0.1.0
+  installed: {{ and (eq .Values.objectStorage.type "s3") .Values.s3Exporter.enabled }}
+  missingFileHandler: Error
+  values:
+  - values/s3-exporter.yaml.gotmpl
+
 # Fluentd
 - name: fluentd
   namespace: fluentd

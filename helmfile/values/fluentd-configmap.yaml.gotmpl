@@ -34,8 +34,8 @@ aggregator:
         aws_sec_key "#{ENV['AWS_ACCESS_SECRET_KEY']}"
         {{ if eq .Values.fluentd.forwarder.useRegionEndpoint true -}}
         s3_endpoint {{ .Values.objectStorage.s3.regionEndpoint }}
-        force_path_style true
         {{ end -}}
+        force_path_style {{ .Values.objectStorage.s3.forcePathStyle }}
         s3_region {{ .Values.objectStorage.s3.region }}
         s3_bucket {{ .Values.objectStorage.buckets.scFluentd }}
         {{- end }}
