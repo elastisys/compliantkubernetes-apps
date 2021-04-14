@@ -4,11 +4,6 @@ helmDefaults:
 
 # Environments
 environments:
-  workload_cluster:
-    values:
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/wc-config.yaml"
-    secrets:
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
   service_cluster:
     values:
       - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/sc-config.yaml"
@@ -17,16 +12,6 @@ environments:
 
 # The desired state of Helm releases.
 releases:
-
-# Common PSP RBACs
-- name: common-psp-rbac
-  namespace: kube-system
-  labels:
-    app: common-psp-rbac
-  chart: ./charts/common-psp-rbac
-  version: 0.1.0
-  missingFileHandler: Error
-
 # Service cluster releases
 {{ if eq .Environment.Name "service_cluster" }}
 
@@ -41,20 +26,4 @@ releases:
   values:
   - values/service-cluster-psp-rbac.yaml.gotmpl
 # End of system services releases
-{{ end }}
-
-# Workload cluster releases
-{{ if eq .Environment.Name "workload_cluster"  }}
-
-# Workload cluster PSP RBACs
-- name: workload-cluster-psp-rbac
-  namespace: kube-system
-  labels:
-    app: workload-cluster-psp-rbac
-  chart: ./charts/workload-cluster-psp-rbac
-  version: 0.1.0
-  missingFileHandler: Error
-  values:
-  - values/workload-cluster-psp-rbac.yaml.gotmpl
-
 {{ end }}

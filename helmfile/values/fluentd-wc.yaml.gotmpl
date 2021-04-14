@@ -264,3 +264,6 @@ extraConfigMaps:
 {{ $key | indent 2 }}: |-
 {{ $value | indent 4 }}
 {{- end }}
+
+podSecurityPolicy:
+  enabled: true

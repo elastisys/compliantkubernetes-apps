@@ -14,6 +14,12 @@ source "${SCRIPTS_PATH}/../bin/common.bash"
 # USE: --interactive, default is not interactive.
 INTERACTIVE=${1:-""}
 
+echo "Installing helm charts" >&2
+cd "${SCRIPTS_PATH}/../helmfile"
+declare -a helmfile_opt_flags
+[[ -n "$INTERACTIVE" ]] && helmfile_opt_flags+=("$INTERACTIVE")
+helmfile -f . -e workload_cluster "${helmfile_opt_flags[@]}" apply --suppress-diff
+
 echo "Creating Elasticsearch and fluentd secrets" >&2
 elasticsearch_password=$(sops_exec_file "${secrets[secrets_file]}" 'yq r -e {} elasticsearch.fluentdPassword')
 
@@ -29,11 +35,5 @@ kubectl create -f "${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-c
     2> /dev/null || echo "fluentd-extra-config configmap already in place. Ignoring."
 kubectl create -f "${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-plugins.yaml" \
     2> /dev/null || echo "fluentd-extra-plugins configmap already in place. Ignoring." >&2
-
-echo "Installing helm charts" >&2
-cd "${SCRIPTS_PATH}/../helmfile"
-declare -a helmfile_opt_flags
-[[ -n "$INTERACTIVE" ]] && helmfile_opt_flags+=("$INTERACTIVE")
-helmfile -f . -e workload_cluster "${helmfile_opt_flags[@]}" apply --suppress-diff
 
 echo "Deploy wc completed!" >&2

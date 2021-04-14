@@ -251,3 +251,6 @@ extraVolumeMounts:
   - name: fluentd-extra-plugins
     mountPath: /etc/fluent/plugin
     readOnly: true
+
+podSecurityPolicy:
+  enabled: true
