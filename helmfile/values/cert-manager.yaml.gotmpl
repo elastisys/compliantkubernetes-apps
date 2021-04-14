@@ -2,6 +2,8 @@ global:
   podSecurityPolicy:
     enabled: false
 
+installCRDs: true
+
 resources:    {{- toYaml .Values.certmanager.resources | nindent 2 }}
 nodeSelector: {{- toYaml .Values.certmanager.nodeSelector | nindent 2 }}
 affinity:     {{- toYaml .Values.certmanager.affinity | nindent 2 }}

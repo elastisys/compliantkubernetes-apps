@@ -17,8 +17,8 @@ parse_crd_list_file() {
 
 case $environment in
     service_cluster)  parse_crd_list_file crds-sc.txt ;;
-    workload_cluster) parse_crd_list_file crds-wc.txt ;;
-    *) log_error "Invalid environment: '${environment}'"; exit 1 ;;
+    workload_cluster) exit 0 ;;
+    *) echo "Invalid environment: ${environment}"; exit 1 ;;
 esac
 
 kubectl apply "${kubectl_crd_args[@]}"

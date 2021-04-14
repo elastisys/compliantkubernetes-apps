@@ -56,6 +56,9 @@ releases:
 # Cert-manager issuers
 - name: issuers
   namespace: cert-manager
+  disableValidationOnInstall: true
+  disableValidation: true
+  disableOpenAPIValidation: true
   labels:
     app: issuers
   chart: ./charts/issuers
