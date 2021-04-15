@@ -162,6 +162,19 @@ releases:
   values:
   - values/calico-accountant.yaml.gotmpl
 
+
+# cluster-admin-rbac
+- name: cluster-admin-rbac
+  namespace: kube-system
+  labels:
+    app: cluster-admin-rbac
+  chart: ./charts/cluster-admin-rbac
+  version: 0.1.0
+  missingFileHandler: Error
+  values:
+  - values/cluster-admin-rbac.yaml.gotmpl
+
+
 # Service cluster releases
 {{ if eq .Environment.Name "service_cluster" }}
 # Dex
