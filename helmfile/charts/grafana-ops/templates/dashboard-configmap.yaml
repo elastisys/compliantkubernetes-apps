@@ -42,3 +42,7 @@ data:
   networkpolicy-dashboard.json: |-
     {{- .Files.Get "dashboards/networkpolicy-dashboard.json" | nindent 4 }}
 {{- end }}
+{{- if .Values.dashboards.daily.enabled }}
+  daily-dashboard.json: |-
+    {{- .Files.Get "dashboards/daily-dashboard.json" | nindent 4 }}
+{{- end }}
