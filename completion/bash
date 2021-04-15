@@ -10,7 +10,7 @@ _ck8s_command_ck8s() {
     opts+=("team")
     opts+=("ops")
     opts+=("s3cmd")
-    opts+=("user-kubeconfig")
+    opts+=("kubeconfig")
     opts+=("completion")
     opts+=("validate")
     COMPREPLY=($(compgen -W "${opts[*]}" -- ${cur}))

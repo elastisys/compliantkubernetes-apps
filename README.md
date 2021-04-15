@@ -196,6 +196,16 @@ Assuming you already have everything needed to install the apps, this is what yo
 If you followed the steps in the quickstart above, you should now have deployed the applications and have a fully functioning environment.
 However, there are a few steps remaining to make all applications ready for the user.
 
+#### Authentication-based cluster admin access
+
+An admin kubeconfig that requires authentication via dex can be created using:
+
+`./bin/ck8s kubeconfig admin <sc|wc> [cluster_name]`
+
+Which email addresses should be allowed can be configured by setting `clusterAdmin.admins` in `sc-config.yaml`/`wc-config.yaml`. Also make sure to set `dex.allowedDomains` in `sc-config.yaml`, and `kube_oidc_url` in your `group_vars`.
+
+This admin kubeconfig can access everything in the cluster.
+
 #### User access
 
 After the cluster setup has completed RBAC resources and namespaces will have been created for the user.
@@ -211,7 +221,7 @@ user:
     - admin2@example.com"
 ```
 
-A **kubeconfig file for the user** (`${CK8S_CONFIG_PATH}/user/kubeconfig.yaml`) can be created by running the script `bin/user-kubeconfig.bash`.
+A **kubeconfig file for the user** (`${CK8S_CONFIG_PATH}/user/kubeconfig.yaml`) can be created by running the script `bin/ck8s kubeconfig user`.
 The user kubeconfig will be configured to use the first namespace by default.
 
 **Kibana** access for the user can be provided either by setting up OIDC or using the internal user database in Elasticsearch:
