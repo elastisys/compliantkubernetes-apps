@@ -135,19 +135,19 @@ extraContainers:
     volumeMounts:
       - name: textfile-collector-dir
         mountPath: /textfile-collector
-  - name: influxdb-cronjob
-    image: bambash/docker-cron
-    volumeMounts:
-      - name: influxdb-data #TODO: use influxdb.fullname from _helpers.tpl instead hardcoded "influxdb"
-        mountPath: /var/lib/influxdb
-      - name: textfile-collector-dir
-        mountPath: /textfile-collector
-      - name: scripts
-        mountPath: /scripts
-      - name: cronfiles
-        mountPath: /etc/cron.d/
-      - name: config-volume
-        mountPath: /etc/config
+  # - name: influxdb-cronjob
+  #   image: bambash/docker-cron
+  #   volumeMounts:
+  #     - name: influxdb-data #TODO: use influxdb.fullname from _helpers.tpl instead hardcoded "influxdb"
+  #       mountPath: /var/lib/influxdb
+  #     - name: textfile-collector-dir
+  #       mountPath: /textfile-collector
+  #     - name: scripts
+  #       mountPath: /scripts
+  #     - name: cronfiles
+  #       mountPath: /etc/cron.d/
+  #     - name: config-volume
+  #       mountPath: /etc/config
 
 volumes:
   - name: textfile-collector-dir
@@ -205,3 +205,7 @@ backupRetention:
     endpointUrl: {{ .Values.objectStorage.s3.regionEndpoint }}
   {{- end }}
 {{ end }}
+
+securityContext:
+  runAsUser: 1000
+  runAsGroup: 3000

@@ -7,8 +7,5 @@ set -euo pipefail
 : "${bootstrap_path:?Missing bootstrap path}"
 environment="${1}"
 export storageclass_path="${bootstrap_path}/storageclass"
-export namespaces_path="${bootstrap_path}/namespaces"
 
 "${storageclass_path}/bootstrap.sh" "${environment}"
-"${bootstrap_path}/crds/bootstrap.sh" "${environment}"
-#"${namespaces_path}/bootstrap.sh" "${environment}"

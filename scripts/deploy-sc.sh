@@ -19,6 +19,12 @@ fi
 
 INTERACTIVE=${1:-""}
 
+echo "Installing helm charts" >&2
+cd "${SCRIPTS_PATH}/../helmfile"
+declare -a helmfile_opt_flags
+[[ -n "$INTERACTIVE" ]] && helmfile_opt_flags+=("$INTERACTIVE")
+helmfile -f . -e service_cluster "${helmfile_opt_flags[@]}" apply --suppress-diff
+
 objectStoreProvider=$(yq r -e "${config[config_file_sc]}" objectStorage.type)
 if [[ ${objectStoreProvider} == "s3" ]]; then
   echo "Creating fluentd secrets" >&2
@@ -29,12 +35,6 @@ if [[ ${objectStoreProvider} == "s3" ]]; then
       --from-literal=s3_secret_key="${s3_secret_key}" \
       --dry-run=client -o yaml | kubectl apply -f -
 fi
-
-echo "Installing helm charts" >&2
-cd "${SCRIPTS_PATH}/../helmfile"
-declare -a helmfile_opt_flags
-[[ -n "$INTERACTIVE" ]] && helmfile_opt_flags+=("$INTERACTIVE")
-helmfile -f . -e service_cluster "${helmfile_opt_flags[@]}" apply --suppress-diff
 
 # Restore InfluxDB from backup
 # Requires dropping existing databases first
