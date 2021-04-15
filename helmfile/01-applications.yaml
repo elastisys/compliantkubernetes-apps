@@ -118,8 +118,6 @@ releases:
   chart: prometheus-community/kube-prometheus-stack
   version: 12.8.0
   missingFileHandler: Error
-  needs:
-  - cert-manager/cert-manager
   disableValidationOnInstall: true
   values:
 {{ if eq .Environment.Name "service_cluster" }}
@@ -195,8 +193,6 @@ releases:
   version: 2.15.2
   missingFileHandler: Error
   wait: true
-  needs:
-  - cert-manager/cert-manager
   values:
   - values/dex.yaml.gotmpl
 
@@ -245,6 +241,7 @@ releases:
   disableValidationOnInstall: true
   needs:
   - monitoring/kube-prometheus-stack
+  - cert-manager/cert-manager
   values:
   - values/prometheus-alerts-sc.yaml.gotmpl
 
@@ -271,54 +268,13 @@ releases:
   version: 6.1.11
   installed: {{ .Values.user.grafana.enabled }}
   missingFileHandler: Error
-  needs:
-  - cert-manager/cert-manager
   values:
   - values/grafana-user.yaml.gotmpl
 
 
-# prometheus-elasticsearch-exporter
-- name: prometheus-elasticsearch-exporter
-  namespace: elastic-system
-  labels:
-    app: prometheus-elasticsearch-exporter
-  chart: prometheus-community/prometheus-elasticsearch-exporter
-  version: 4.0.1
-  missingFileHandler: Error
-  disableValidationOnInstall: true
-  needs:
-  - elastic-system/opendistro-es
-  - monitoring/kube-prometheus-stack
-  values:
-  - values/prometheus-elasticsearch-exporter.yaml.gotmpl
 
-# opendistro elasticsearch snapshot lifecycle management
-- name: elasticsearch-slm
-  namespace: elastic-system
-  labels:
-    app: elasticsearch-slm
-  chart: ./charts/elasticsearch-slm
-  version: 0.1.0
-  installed: {{ .Values.elasticsearch.snapshot.enabled }}
-  missingFileHandler: Error
-  needs:
-  - elastic-system/opendistro-es
-  values:
-  - values/elasticsearch-slm.yaml.gotmpl
 
-# opendistro elasticsearch backup job
-- name: elasticsearch-backup
-  namespace: elastic-system
-  labels:
-    app: elasticsearch-backup
-  chart: ./charts/elasticsearch-backup
-  version: 0.1.0
-  installed: {{ .Values.elasticsearch.snapshot.enabled }}
-  missingFileHandler: Error
-  needs:
-  - elastic-system/opendistro-es
-  values:
-  - values/elasticsearch-backup.yaml.gotmpl
+
 
 # Harbor
 - name: harbor-certs
@@ -456,6 +412,48 @@ releases:
   values:
   - values/opendistro-es.yaml.gotmpl
 
+# opendistro elasticsearch snapshot lifecycle management
+- name: elasticsearch-slm
+  namespace: elastic-system
+  labels:
+    app: elasticsearch-slm
+  chart: ./charts/elasticsearch-slm
+  version: 0.1.0
+  installed: {{ .Values.elasticsearch.snapshot.enabled }}
+  missingFileHandler: Error
+  needs:
+  - elastic-system/opendistro-es
+  values:
+  - values/elasticsearch-slm.yaml.gotmpl
+
+# opendistro elasticsearch backup job
+- name: elasticsearch-backup
+  namespace: elastic-system
+  labels:
+    app: elasticsearch-backup
+  chart: ./charts/elasticsearch-backup
+  version: 0.1.0
+  installed: {{ .Values.elasticsearch.snapshot.enabled }}
+  missingFileHandler: Error
+  needs:
+  - elastic-system/opendistro-es
+  values:
+  - values/elasticsearch-backup.yaml.gotmpl
+
+# prometheus-elasticsearch-exporter
+- name: prometheus-elasticsearch-exporter
+  namespace: elastic-system
+  labels:
+    app: prometheus-elasticsearch-exporter
+  chart: prometheus-community/prometheus-elasticsearch-exporter
+  version: 4.0.1
+  missingFileHandler: Error
+  disableValidationOnInstall: true
+  needs:
+  - elastic-system/opendistro-es
+  - monitoring/kube-prometheus-stack
+  values:
+  - values/prometheus-elasticsearch-exporter.yaml.gotmpl
 # End of system services releases
 {{ end }}
 
