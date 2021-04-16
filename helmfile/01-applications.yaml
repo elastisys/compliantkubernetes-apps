@@ -506,183 +506,189 @@ releases:
 
 
 
-# # Workload cluster releases
-# {{ if eq .Environment.Name "workload_cluster" }}
-# # Falco
-# - name: falco
-#   namespace: falco
-#   labels:
-#     app: falco
-#   chart: falcosecurity/falco
-#   version: 1.5.2
-#   installed: {{ .Values.falco.enabled }}
-#   missingFileHandler: Error
-#   values:
-#   - values/falco.yaml.gotmpl
+# Workload cluster releases
+{{ if eq .Environment.Name "workload_cluster" }}
+# Falco
+- name: falco
+  namespace: falco
+  labels:
+    app: falco
+  chart: falcosecurity/falco
+  version: 1.5.2
+  installed: {{ .Values.falco.enabled }}
+  missingFileHandler: Error
+  values:
+  - values/falco.yaml.gotmpl
 
-# # Falco-exporter
-# - name: falco-exporter
-#   namespace: falco
-#   labels:
-#     app: falco-exporter
-#   chart: falcosecurity/falco-exporter
-#   version: 0.3.8
-#   installed: {{ .Values.falco.enabled }}
-#   missingFileHandler: Error
-#   values:
-#     - values/falco-exporter.yaml.gotmpl
+# Falco-exporter
+- name: falco-exporter
+  namespace: falco
+  labels:
+    app: falco-exporter
+  chart: falcosecurity/falco-exporter
+  version: 0.3.8
+  installed: {{ .Values.falco.enabled }}
+  missingFileHandler: Error
+  disableValidationOnInstall: true
+  needs:
+  - monitoring/kube-prometheus-stack
+  values:
+    - values/falco-exporter.yaml.gotmpl
 
-# - name: user-alertmanager
-#   namespace: {{ .Values.user.alertmanager.namespace | default "monitoring" }}
-#   labels:
-#     app: user-alertmanager
-#   chart: ./charts/examples/user-alertmanager
-#   version: 0.1.0
-#   installed: {{ .Values.user.alertmanager.enabled }}
-#   missingFileHandler: Error
-#   needs:
-#   - cert-manager/cert-manager
-#   values:
-#   - values/user-alertmanager.yaml.gotmpl
+- name: user-alertmanager
+  namespace: {{ .Values.user.alertmanager.namespace | default "monitoring" }}
+  labels:
+    app: user-alertmanager
+  chart: ./charts/examples/user-alertmanager
+  version: 0.1.0
+  installed: {{ .Values.user.alertmanager.enabled }}
+  missingFileHandler: Error
+  disableValidationOnInstall: true
+  needs:
+  - monitoring/kube-prometheus-stack
+  values:
+  - values/user-alertmanager.yaml.gotmpl
 
-# - name: falcosidekick
-#   namespace: falco
-#   labels:
-#     app: falco
-#   chart: ./charts/falcosidekick
-#   version: 0.1.14
-#   installed: {{ .Values.falco.alerts.enabled }}
-#   missingFileHandler: Error
-#   values:
-#   - values/falcosidekick.yaml.gotmpl
+- name: falcosidekick
+  namespace: falco
+  labels:
+    app: falco
+  chart: ./charts/falcosidekick
+  version: 0.1.14
+  installed: {{ .Values.falco.alerts.enabled }}
+  missingFileHandler: Error
+  values:
+  - values/falcosidekick.yaml.gotmpl
 
-# # Fluentd
-# - name: fluentd-system
-#   namespace: kube-system
-#   labels:
-#     app: fluentd
-#   chart: kokuwa/fluentd-elasticsearch
-#   version: 10.2.1
-#   missingFileHandler: Error
-#   values:
-#   - values/fluentd-wc.yaml.gotmpl
+# Fluentd
+- name: fluentd-system
+  namespace: kube-system
+  labels:
+    app: fluentd
+  chart: kokuwa/fluentd-elasticsearch
+  version: 10.2.1
+  missingFileHandler: Error
+  values:
+  - values/fluentd-wc.yaml.gotmpl
 
-# # Fluentd configurable by the user
-# - name: fluentd
-#   namespace: fluentd
-#   labels:
-#     app: fluentd
-#   chart: kokuwa/fluentd-elasticsearch
-#   version: 10.2.1
-#   missingFileHandler: Error
-#   values:
-#   - values/fluentd-user.yaml.gotmpl
+# Fluentd configurable by the user
+- name: fluentd
+  namespace: fluentd
+  labels:
+    app: fluentd
+  chart: kokuwa/fluentd-elasticsearch
+  version: 10.2.1
+  missingFileHandler: Error
+  values:
+  - values/fluentd-user.yaml.gotmpl
 
-# # gatekeeper-operator
-# - name: gatekeeper-operator
-#   namespace: gatekeeper-system
-#   labels:
-#     app: gatekeeper-operator
-#   chart: ./charts/gatekeeper-operator
-#   version: 1.6.0
-#   installed: false
-#   missingFileHandler: Error
-#   wait: true
-#   values:
-#   - values/gatekeeper-operator.yaml.gotmpl
+# TODO: Make this optional! Users may not want any alerts by default.
+# It should also be separate from the alerts we use. Users should not need
+# to care about system components that they cannot touch anyway.
+# prometheus user-alerts
+- name: ck8s-alerts
+  namespace: monitoring
+  labels:
+    app: prometheus-alerts
+  chart: ./charts/prometheus-alerts
+  version: 0.1.0
+  missingFileHandler: Info
+  disableValidationOnInstall: true
+  needs:
+  - monitoring/kube-prometheus-stack
+  values:
+  - values/prometheus-alerts-wc.yaml.gotmpl
 
-# # gatekeeper
-# - name: gatekeeper
-#   namespace: gatekeeper-system
-#   labels:
-#     app: gatekeeper
-#   chart: gatekeeper/gatekeeper
-#   version: 3.3.0
-#   installed: {{ .Values.opa.enabled }}
-#   missingFileHandler: Error
-#   wait: true
-#   values:
-#   - values/gatekeeper.yaml.gotmpl
+# User RBAC
+- name: user-rbac
+  namespace: kube-system
+  labels:
+    app: user-rbac
+  chart: ./charts/user-rbac
+  version: 0.1.0
+  missingFileHandler: Error
+  needs:
+  - fluentd/fluentd
+  {{- if .Values.falco.enabled }}
+  - falco/falco
+  {{- end }}
+  {{- if .Values.user.alertmanager.enabled }}
+  - monitoring/kube-prometheus-stack
+  {{- end }}
+  values:
+  - values/user-rbac.yaml.gotmpl
 
-# # gatekeeper-metrics
-# - name: gatekeeper-metrics
-#   namespace: gatekeeper-system
-#   labels:
-#     app: gatekeeper-metrics
-#   chart: ./charts/gatekeeper-metrics
-#   version: 0.1.0
-#   installed: {{ .Values.opa.enabled }}
-#   missingFileHandler: Error
-#   needs:
-#   - gatekeeper-system/gatekeeper
+# kube apiserver metrics ingress
+- name: kubeapi-metrics
+  namespace: kube-system
+  labels:
+    app: kubeapi-metrics
+  chart: ./charts/kubeapi-metrics
+  version: 0.1.0
+  missingFileHandler: Error
+  values:
+  - values/kubeapi-metrics.yaml.gotmpl
 
-# # gatekeeper-templates
-# - name: gatekeeper-templates
-#   namespace: gatekeeper-system
-#   labels:
-#     app: gatekeeper-templates
-#   chart: ./charts/gatekeeper-templates
-#   version: 1.6.0
-#   installed: {{ .Values.opa.enabled }}
-#   missingFileHandler: Error
-#   needs:
-#   - gatekeeper-system/gatekeeper
-#   values:
-#   - values/gatekeeper-templates.yaml.gotmpl
+# gatekeeper
+- name: gatekeeper
+  namespace: gatekeeper-system
+  labels:
+    app: gatekeeper
+  chart: gatekeeper/gatekeeper
+  version: 3.4.0
+  installed: {{ .Values.opa.enabled }}
+  missingFileHandler: Error
+  wait: true
+  disableValidationOnInstall: true
+  needs:
+  - monitoring/ck8s-alerts
+  - kube-system/user-rbac
+  values:
+  - values/gatekeeper.yaml.gotmpl
 
-# # gatekeeper-constraints
-# - name: gatekeeper-constraints
-#   namespace: gatekeeper-system
-#   labels:
-#     app: gatekeeper-constraints
-#   chart: ./charts/gatekeeper-constraints
-#   version: 1.6.0
-#   installed: {{ .Values.opa.enabled }}
-#   missingFileHandler: Error
-#   needs:
-#   - gatekeeper-system/gatekeeper-templates
-#   values:
-#   - values/gatekeeper-constraints.yaml.gotmpl
+# gatekeeper-metrics
+- name: gatekeeper-metrics
+  namespace: gatekeeper-system
+  createNamespace: false
+  labels:
+    app: gatekeeper-metrics
+  chart: ./charts/gatekeeper-metrics
+  version: 0.1.0
+  installed: {{ .Values.opa.enabled }}
+  missingFileHandler: Error
+  disableValidationOnInstall: true
+  needs:
+  - gatekeeper-system/gatekeeper
 
-# # TODO: Make this optional! Users may not want any alerts by default.
-# # It should also be separate from the alerts we use. Users should not need
-# # to care about system components that they cannot touch anyway.
-# # prometheus user-alerts
-# - name: ck8s-alerts
-#   namespace: monitoring
-#   labels:
-#     app: prometheus-alerts
-#   chart: ./charts/prometheus-alerts
-#   version: 0.1.0
-#   missingFileHandler: Info
-#   needs:
-#   - monitoring/kube-prometheus-stack
-#   values:
-#   - values/prometheus-alerts-wc.yaml.gotmpl
+# gatekeeper-templates
+- name: gatekeeper-templates
+  namespace: gatekeeper-system
+  createNamespace: false
+  labels:
+    app: gatekeeper-templates
+  chart: ./charts/gatekeeper-templates
+  version: 1.6.0
+  installed: {{ .Values.opa.enabled }}
+  missingFileHandler: Error
+  disableValidationOnInstall: true
+  needs:
+  - gatekeeper-system/gatekeeper
+  values:
+  - values/gatekeeper-templates.yaml.gotmpl
 
-# # User RBAC
-# - name: user-rbac
-#   namespace: kube-system
-#   labels:
-#     app: user-rbac
-#   chart: ./charts/user-rbac
-#   version: 0.1.0
-#   missingFileHandler: Error
-#   {{ if .Values.opa.enabled }}
-#   needs:
-#   - gatekeeper-system/gatekeeper-constraints
-#   {{ end }}
-#   values:
-#   - values/user-rbac.yaml.gotmpl
-
-# # kube apiserver metrics ingress
-# - name: kubeapi-metrics
-#   namespace: kube-system
-#   labels:
-#     app: kubeapi-metrics
-#   chart: ./charts/kubeapi-metrics
-#   version: 0.1.0
-#   missingFileHandler: Error
-#   values:
-#   - values/kubeapi-metrics.yaml.gotmpl
-# {{ end }}
+# gatekeeper-constraints
+- name: gatekeeper-constraints
+  namespace: gatekeeper-system
+  createNamespace: false
+  labels:
+    app: gatekeeper-constraints
+  chart: ./charts/gatekeeper-constraints
+  version: 1.6.0
+  installed: {{ .Values.opa.enabled }}
+  missingFileHandler: Error
+  disableValidationOnInstall: true
+  needs:
+  - gatekeeper-system/gatekeeper-templates
+  values:
+  - values/gatekeeper-constraints.yaml.gotmpl
+{{ end }}
