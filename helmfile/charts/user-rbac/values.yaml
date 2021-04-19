@@ -2,4 +2,6 @@ namespaces: []
 users: []
 createNamespaces: true
 enableFalcoViewer: false
-alertmanagerNamespace: monitoring
+alertmanager:
+  enabled: false
+  namespace: monitoring

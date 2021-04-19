@@ -4,11 +4,12 @@
 # Note! This makes it possible for the user to break alertmanager both by adding
 # bad config and by deleting the rolebinding used to give alertmanager access to the
 # restricted PSP.
+{{- if .Values.alertmanager.enabled }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: alertmanager-configurer
-  namespace: {{ .Values.alertmanagerNamespace }}
+  namespace: {{ .Values.alertmanager.namespace }}
 rules:
 # Allow editing the alertmanager-alertmanager secret
 - apiGroups:
@@ -58,3 +59,4 @@ rules:
   - roles
   verbs:
   - bind
+{{- end }}
