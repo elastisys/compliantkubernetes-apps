@@ -65,6 +65,18 @@ extraConfigMaps:
       @type record_transformer
       remove_keys responseObject,requestObject
     </filter>
+    # Index the authlog
+    <source>
+      @id authlog
+      @type tail
+      path /var/log/auth.log
+      pos_file /var/log/auth.pos
+      tag authlog.*
+      <parse>
+        @type regexp
+        expression /^(?<time>[^ ]* {1,2}[^ ]* [^ ]*) (?<host>[^ ]*) (?<ident>[a-zA-Z0-9_\/\.\-]*)(?:\[(?<pid>[0-9]+)\])?(?:[^\:]*\:)? *(?<message>.*)$/
+      </parse>
+    </source>
 
   containers.input.conf: |-
     #This config is taken from a default config that we have disabled
@@ -145,6 +157,44 @@ extraConfigMaps:
     </filter>
 
   output.conf: |-
+    <match authlog.**>
+       @id elasticsearch_authlog
+       @type elasticsearch
+       @log_level "#{ENV['OUTPUT_LOG_LEVEL']}"
+       include_tag_key true
+       type_name _doc
+       host "#{ENV['OUTPUT_HOSTS']}"
+       port "#{ENV['OUTPUT_PORT']}"
+       path "#{ENV['OUTPUT_PATH']}"
+       scheme "#{ENV['OUTPUT_SCHEME']}"
+       ssl_verify "#{ENV['OUTPUT_SSL_VERIFY']}"
+       ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
+       user "#{ENV['OUTPUT_USER']}"
+       password "#{ENV['OUTPUT_PASSWORD']}"
+       reconnect_on_error true
+       # Custom parameters --START--
+       reload_on_failure true
+       reload_connections false
+       include_timestamp true # defaults to false
+       index_name authlog
+       default_elasticsearch_version 7
+       # https://github.com/uken/fluent-plugin-elasticsearch/issues/785
+       suppress_type_name true
+       # Custom parameters --END--
+       <buffer>
+         @type file
+         path /var/log/fluentd-buffers/kubernetes.authlog.system.buffer
+         flush_mode interval
+         retry_type exponential_backoff
+         flush_thread_count 2
+         flush_interval 5s
+         retry_forever
+         retry_max_interval 30
+         chunk_limit_size "#{ENV['OUTPUT_BUFFER_CHUNK_LIMIT']}"
+         queue_limit_length "#{ENV['OUTPUT_BUFFER_QUEUE_LIMIT']}"
+         overflow_action block
+       </buffer>
+    </match>
     <match kubeaudit.**>
         @id elasticsearch_kubeaudit
         @type elasticsearch

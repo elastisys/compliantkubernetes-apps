@@ -78,6 +78,8 @@ elasticsearch:
       kubernetesAgeDays: 50
       otherSizeGB: 5
       otherAgeDays: 30
+      authLogSizeGB: 5
+      authLogAgeDays: 30
   snapshot:
     min: 300 # 12 / day * 30 days = 360, subtract some to account for failures
     max: 500
