@@ -1,5 +1,6 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.14.0](#v0140---2021-04-20)
 - [v0.13.0](#v0130---2021-04-06)
 - [v0.12.0](#v0120---2021-03-17)
 - [v0.11.0](#v0110---2021-03-03)
@@ -10,6 +11,28 @@
 - [v0.6.0](#v060---2020-10-16)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.14.0 - 2021-04-20
+
+### Added
+
+- Script to restore Harbor from backup
+
+### Fixed
+
+- Elasticsearch slm now deletes excess snapshots also when none of them are older than the maximum age
+
+### Changed
+
+- The Service Cluster Prometheus now alerts based on Falco metrics. These alerts are sent to Alertmanager as usual so they now have the same flow as all other alerts. This is in addition to the "Falco specific alerting" through Falco sidekick.
+- Elasticsearch slm now deletes indices in bulk
+- Default to object storage disabled for the dev flavor.
+
+### Removed
+
+- Removed namespace `gatekeeper` from bootstrap.
+  The namespace can be safely removed from clusters running ck8s  v0.13.0 or later.
 
 -------------------------------------------------
 ## v0.13.0 - 2021-04-06
