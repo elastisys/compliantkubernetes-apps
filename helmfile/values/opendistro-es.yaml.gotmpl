@@ -461,6 +461,8 @@ curator:
     secret: opendistro-es-curator-user
 
   retention:
+    authlog_gb: {{ .Values.elasticsearch.curator.retention.authlogSizeGB }}
+    authlog_days: {{ .Values.elasticsearch.curator.retention.authlogAgeDays }}
     other_gb: {{ .Values.elasticsearch.curator.retention.otherSizeGB }}
     other_days: {{ .Values.elasticsearch.curator.retention.otherAgeDays }}
     kubernetes_gb: {{ .Values.elasticsearch.curator.retention.kubernetesSizeGB }}
@@ -542,6 +544,7 @@ configurer:
           - "kubernetes-*"
           - "kubeaudit-*"
           - "other-*"
+          - "authlog-*"
           allowed_actions:
           - "index"
     - role_name: curator
@@ -558,6 +561,7 @@ configurer:
           - "kubernetes-*"
           - "other-*"
           - "kubeaudit-*"
+          - "authlog-*"
           allowed_actions:
           - "indices:admin/delete"
     - role_name: kubernetes_log_reader
