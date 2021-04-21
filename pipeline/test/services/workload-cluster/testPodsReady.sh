@@ -31,7 +31,7 @@ deployments=(
 if "${enable_nfs_provisioner}"; then
     deployments+=("kube-system nfs-client-provisioner")
 fi
-if "{$enable_opa}"; then
+if "${enable_opa}"; then
     deployments+=("gatekeeper-system gatekeeper-controller-manager")
 fi
 if "${enable_falco_alerts}"; then
