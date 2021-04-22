@@ -461,8 +461,8 @@ curator:
     secret: opendistro-es-curator-user
 
   retention:
-    authlog_gb: {{ .Values.elasticsearch.curator.retention.authlogSizeGB }}
-    authlog_days: {{ .Values.elasticsearch.curator.retention.authlogAgeDays }}
+    authlog_gb: {{ .Values.elasticsearch.curator.retention.authLogSizeGB }}
+    authlog_days: {{ .Values.elasticsearch.curator.retention.authLogAgeDays }}
     other_gb: {{ .Values.elasticsearch.curator.retention.otherSizeGB }}
     other_days: {{ .Values.elasticsearch.curator.retention.otherAgeDays }}
     kubernetes_gb: {{ .Values.elasticsearch.curator.retention.kubernetesSizeGB }}
