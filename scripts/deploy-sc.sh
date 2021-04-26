@@ -36,32 +36,4 @@ declare -a helmfile_opt_flags
 [[ -n "$INTERACTIVE" ]] && helmfile_opt_flags+=("$INTERACTIVE")
 helmfile -f . -e service_cluster "${helmfile_opt_flags[@]}" apply --suppress-diff
 
-# Restore InfluxDB from backup
-# Requires dropping existing databases first
-restore=$(yq r -e "${config[config_file_sc]}" 'restore.cluster')
-if [[ $restore != "false" ]]
-then
-    echo "Restoring InfluxDB" >&2
-    envsubst < "${SCRIPTS_PATH}/../manifests/restore/restore-influx.yaml" | kubectl -n influxdb-prometheus apply -f -
-fi
-
-velero=$(yq r -e "${config[config_file_sc]}" 'restore.velero')
-if [[ $velero == "true" ]]
-then
-    user_grafana=$(yq r -e "${config[config_file_sc]}" 'user.grafana.enabled')
-    if [[ $user_grafana == "true" ]]
-    then
-        # Need to delete the user-grafana deployment and pvc created by
-        # Helm before restoring it from backup.
-        kubectl delete deployment -n monitoring user-grafana
-        kubectl delete pvc -n monitoring user-grafana
-    fi
-    velero_backup_name=$(yq r -e "${config[config_file_sc]}" 'restore.veleroBackupName')
-    if [[ "$velero_backup_name" != "latest" ]]
-    then
-        velero restore create --from-backup "$velero_backup_name" -w
-    else
-        velero restore create --from-schedule velero-daily-backup -w
-    fi
-fi
 echo "Deploy sc completed!" >&2

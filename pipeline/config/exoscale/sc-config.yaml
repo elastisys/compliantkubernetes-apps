@@ -546,10 +546,6 @@ velero:
       requests:
         cpu: 100m
         memory: 100Mi
-restore:
-  cluster: false
-  velero: false
-  veleroBackupName: latest
 issuers:
   letsencrypt:
     enabled: true
