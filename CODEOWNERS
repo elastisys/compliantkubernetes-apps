@@ -4,29 +4,29 @@
 # will override the previous ones.
 
 # CLI
-/bin/         @simonklb @vanneback
-/completion/  @simonklb @vanneback
+/bin/         @simonklb
+/completion/  @simonklb
 
 # Pipeline
-/pipeline/          @viktor-f @vanneback
-.github/workflows/  @viktor-f @vanneback
+/pipeline/          @viktor-f @lentzi90
+.github/workflows/  @viktor-f @lentzi90
 
 # Harbor
-/helmfile/charts/*harbor*/    @vanneback @viktor-f
-/helmfile/values/*harbor*     @vanneback @viktor-f
+/helmfile/charts/*harbor*/    @viktor-f
+/helmfile/values/*harbor*     @viktor-f
 
 # Elastic/Kibana
-/helmfile/values/opendistro*    @OlleLarsson @ewnetu
+/helmfile/values/opendistro*    @OlleLarsson
 
 # Elastic misc (backup/slm)
-/helmfile/charts/elasticsearch*/    @OlleLarsson @danielharr
-/helmfile/values/elasticsearch*     @OlleLarsson @danielharr
+/helmfile/charts/elasticsearch*/    @OlleLarsson
+/helmfile/values/elasticsearch*     @OlleLarsson
 
 # InfluxDB
-/helmfile/values/influxdb*    @jakubkrzywda
+/helmfile/values/influxdb*    @OlleLarsson
 
 # Dex
-/helmfile/values/dex*   @lentzi90 @vanneback
+/helmfile/values/dex*   @lentzi90
 
 # OPA and Gatekeeper
 /helmfile/charts/gatekeeper*/                     @viktor-f @simonklb
@@ -34,15 +34,15 @@
 /pipeline/test/services/unit-tests/test-opa.sh    @viktor-f @simonklb
 
 # Falco
-/helmfile/charts/falco*/    @vanneback
-/helmfile/values/falco*     @vanneback
+/helmfile/charts/falco*/    @viktor-f
+/helmfile/values/falco*     @viktor-f
 
 # Prometheus and Grafana
-/helmfile/charts/kubeapi-metrics/   @lentzi90 @OlleLarsson @vanneback
-/helmfile/charts/prometheus*/       @lentzi90 @OlleLarsson @vanneback
-/helmfile/values/grafana*           @lentzi90 @OlleLarsson @vanneback
-/helmfile/values/kubeapi-metrics*   @lentzi90 @OlleLarsson @vanneback
-/helmfile/values/prometheus*        @lentzi90 @OlleLarsson @vanneback
+/helmfile/charts/kubeapi-metrics/   @lentzi90 @OlleLarsson
+/helmfile/charts/prometheus*/       @lentzi90 @OlleLarsson
+/helmfile/values/grafana*           @lentzi90 @OlleLarsson
+/helmfile/values/kubeapi-metrics*   @lentzi90 @OlleLarsson
+/helmfile/values/prometheus*        @lentzi90 @OlleLarsson
 
 # Alerts
 /helmfile/charts/examples/user-alertmanager/      @OlleLarsson @pettersv
@@ -53,10 +53,10 @@
 /helmfile/values/velero*    @viktor-f
 
 # Fluentd
-/helmfile/values/fluentd*   @OlleLarsson @ewnetu
+/helmfile/values/fluentd*   @OlleLarsson
 
 # Cert-manager
-/bootstrap/issuers/   @lentzi90 @danielharr
+/bootstrap/issuers/   @lentzi90
 
 # Nginx
 /helmfile/values/nginx*   @lentzi90 @viktor-f @Xartos
@@ -76,12 +76,12 @@
 /helmfile/*psp*           @viktor-f @lentzi90
 
 # RBAC
-/helmfile/charts/*rbac*/    @lentzi90 @danielharr @vanneback @viktor-f
-/helmfile/values/*rbac*     @lentzi90 @danielharr @vanneback @viktor-f
+/helmfile/charts/*rbac*/    @lentzi90 @viktor-f
+/helmfile/values/*rbac*     @lentzi90 @viktor-f
 
 # Tests and linters
-/pipeline/test/           @danielharr @lentzi90 @geoff-elastisys @pettersv
-.editorconfig             @danielharr @lentzi90 @geoff-elastisys @pettersv
-.mdl*                     @danielharr @lentzi90 @geoff-elastisys @pettersv
-.pre-commit-config.yaml   @danielharr @lentzi90 @geoff-elastisys @pettersv
-.shellcheckrc             @danielharr @lentzi90 @geoff-elastisys @pettersv
+/pipeline/test/           @lentzi90 @pettersv
+.editorconfig             @lentzi90 @pettersv
+.mdl*                     @lentzi90 @pettersv
+.pre-commit-config.yaml   @lentzi90 @pettersv
+.shellcheckrc             @lentzi90 @pettersv
