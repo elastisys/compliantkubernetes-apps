@@ -46,7 +46,7 @@ spec:
         memory: 300Mi
   containers:
   - name: influxdb-restore
-    image: influxdb:1.7.6-alpine
+    image: influxdb:1.8.0-alpine
     volumeMounts:
     - name: backups
       mountPath: /backups

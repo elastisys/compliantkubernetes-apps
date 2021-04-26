@@ -162,6 +162,19 @@ releases:
   values:
   - values/calico-accountant.yaml.gotmpl
 
+
+# cluster-admin-rbac
+- name: cluster-admin-rbac
+  namespace: kube-system
+  labels:
+    app: cluster-admin-rbac
+  chart: ./charts/cluster-admin-rbac
+  version: 0.1.0
+  missingFileHandler: Error
+  values:
+  - values/cluster-admin-rbac.yaml.gotmpl
+
+
 # Service cluster releases
 {{ if eq .Environment.Name "service_cluster" }}
 # Dex
@@ -412,7 +425,7 @@ releases:
   labels:
     app: opendistro
   chart: elastisys/opendistro-es
-  version: 1.12.0
+  version: 1.12.1
   missingFileHandler: Error
   needs:
   - cert-manager/cert-manager

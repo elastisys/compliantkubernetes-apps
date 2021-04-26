@@ -332,6 +332,8 @@ elasticsearch:
       kubernetesAgeDays: 50
       otherSizeGB: 10
       otherAgeDays: 30
+      authLogSizeGB: 10
+      authLogAgeDays: 30
       # (Optional) retention for indices matched by 'postgresql-*'
       # postgresql: false
       # postgresqlSizeGB: 30
@@ -342,7 +344,7 @@ elasticsearch:
     overwritePolicies: true
     rolloverSizeGB: 1
     rolloverAgeDays: 1
-    # Create default policies - kubernetes, kubeaudit, and other
+    # Create default policies - kubernetes, kubeaudit, authlog, and other
     defaultPolicies: true
     additionalPolicies: {}
   # Snapshot and snapshot lifecycle configuration
@@ -597,3 +599,6 @@ metricsServer:
 
 calicoAccountant:
   enabled: true
+
+clusterAdmin:
+  admins: []

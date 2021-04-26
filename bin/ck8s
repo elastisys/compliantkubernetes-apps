@@ -10,26 +10,26 @@ source "${here}/common.bash"
 
 usage() {
     echo "COMMANDS:" 1>&2
-    echo "  init                                        initialize the config path" 1>&2
-    echo "  bootstrap <wc|sc>                           bootstrap the cluster" 1>&2
-    echo "  apps <wc|sc> [--skip-template-validate]     deploy the applications" 1>&2
-    echo "  apply <wc|sc> [--skip-template-validate]    bootstrap and apps" 1>&2
-    echo "  test <wc|sc>                                test the applications" 1>&2
-    echo "  dry-run <wc|sc>                             runs helmfile diff" 1>&2
-    echo "  team add-pgp <fp>                           add a new PGP key to secrets" 1>&2
-    echo "  team remove-pgp <fp>                        remove a PGP key from secrets and rotate the data encryption key" 1>&2
+    echo "  init                                            initialize the config path" 1>&2
+    echo "  bootstrap <wc|sc>                               bootstrap the cluster" 1>&2
+    echo "  apps <wc|sc> [--skip-template-validate]         deploy the applications" 1>&2
+    echo "  apply <wc|sc> [--skip-template-validate]        bootstrap and apps" 1>&2
+    echo "  test <wc|sc>                                    test the applications" 1>&2
+    echo "  dry-run <wc|sc>                                 runs helmfile diff" 1>&2
+    echo "  team add-pgp <fp>                               add a new PGP key to secrets" 1>&2
+    echo "  team remove-pgp <fp>                            remove a PGP key from secrets and rotate the data encryption key" 1>&2
     # TODO: We might want to make this command less visible once we have proper
     #       support for OIDC logins.
-    echo "  ops kubectl <wc|sc>                         run kubectl as cluster admin" 1>&2
-    echo "  ops helm <wc|sc>                            run helm as cluster admin" 1>&2
+    echo "  ops kubectl <wc|sc>                             run kubectl as cluster admin" 1>&2
+    echo "  ops helm <wc|sc>                                run helm as cluster admin" 1>&2
     # TODO: We might want to make this command less visible once we feel
     #       confident that the apply command and migrations are good enough
     #       that direct Helmfile access is not necessary.
-    echo "  ops helmfile <wc|sc>                        run helmfile as cluster admin" 1>&2
-    echo "  s3cmd [cmd]                                 run s3cmd" 1>&2
-    echo "  user-kubeconfig                             generate user kubeconfig, stored at CK8S_CONFIG_PATH/user/"
-    echo "  completion bash                             output shell completion code for bash" 1>&2
-    echo "  validate <wc|sc>                            validates config files" 1>&2
+    echo "  ops helmfile <wc|sc>                            run helmfile as cluster admin" 1>&2
+    echo "  s3cmd [cmd]                                     run s3cmd" 1>&2
+    echo "  kubeconfig <user|admin <wc|sc> [cluster_name]>  generate user/admin kubeconfig, stored at CK8S_CONFIG_PATH/user or CK8S_CONFIG_PATH/.state"
+    echo "  completion bash                                 output shell completion code for bash" 1>&2
+    echo "  validate <wc|sc>                                validates config files" 1>&2
     exit 1
 }
 
@@ -92,8 +92,10 @@ case "${1}" in
         : "${secrets[s3cfg_file]:?Missing s3cfg file}"
         sops_exec_file "${secrets[s3cfg_file]}" 's3cmd --config="{}" '"${*}"
     ;;
-    user-kubeconfig)
-        "${here}/user-kubeconfig.bash"
+    kubeconfig)
+        [[ "${2}" =~ ^(user|admin)$ ]] || usage
+        shift
+        "${here}/kubeconfig.bash" "${@}"
         ;;
     completion)
         [ -f "${here}/../completion/${2}" ] || usage
