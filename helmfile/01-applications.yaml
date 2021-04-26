@@ -323,7 +323,7 @@ releases:
   labels:
     app: harbor
   chart: harbor/harbor
-  version: 1.5.1
+  version: 1.6.1
   installed: {{ .Values.harbor.enabled }}
   missingFileHandler: Error
   wait: true
