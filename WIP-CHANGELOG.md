@@ -11,6 +11,7 @@
 - The dex chart is upgraded from stable/dex to dex/dex (v0.3.3).
   Dex is upgraded to v2.18.1
 - cert-manager upgrade from 1.1.0 to 1.4.0.
+- Increased slm cpu request slightly
 
 ### Fixed
 
