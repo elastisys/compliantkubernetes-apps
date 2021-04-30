@@ -75,7 +75,7 @@ sops_remove_pgp() {
 # Update all secrets with the public keys from the fingerprints in the SOPS
 # config file.
 sops_update_keys() {
-    : "${secrets:?Missing secrets}"
+    : "${secrets[@]:?Missing secrets}"
     for secret in "${secrets[@]}"; do
         if [ ! -f "${secret}" ]; then
             log_warning "Secret does not exist: ${secret}"
@@ -93,7 +93,7 @@ sops_update_keys() {
 
 # Rotate the data key in all secrets.
 sops_rotate_data_key() {
-    : "${secrets:?Missing secrets}"
+    : "${secrets[@]:?Missing secrets}"
     for secret in "${secrets[@]}"; do
         if [ ! -f "${secret}" ]; then
             log_warning "Secret does not exist: ${secret}"
