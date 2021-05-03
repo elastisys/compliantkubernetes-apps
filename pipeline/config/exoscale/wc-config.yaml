@@ -102,6 +102,7 @@ objectStorage:
   s3:
     region: ch-gva-2
     regionEndpoint: https://sos-ch-gva-2.exo.io
+    forcePathStyle: true
 ## User configuration.
 user:
   ## This only controls if the namespaces should be created, user RBAC is always created.

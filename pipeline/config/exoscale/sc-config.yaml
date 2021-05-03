@@ -41,6 +41,7 @@ objectStorage:
   s3:
     region: ch-gva-2
     regionEndpoint: https://sos-ch-gva-2.exo.io
+    forcePathStyle: true
 user:
   grafana:
     enabled: true
@@ -146,7 +147,7 @@ harbor:
     disableRedirect: false
   oidc:
     #group claim name used by OIDC Provider
-    groupClaimName: set-me
+    groupClaimName: not-used
     scope: openid,email,profile,offline_access,groups
   backup:
     enabled: true
@@ -477,9 +478,9 @@ alerts:
   opsGenieHeartbeat:
     enabled: false
     url: https://api.eu.opsgenie.com/v2/heartbeats
-    name: set-me
+    name: not-used
   slack:
-    channel: set-me
+    channel: not-used
   opsGenie:
     apiUrl: https://api.eu.opsgenie.com
 externalTrafficPolicy:
@@ -517,8 +518,8 @@ ingressNginx:
     useHostPort: true
     service:
       enabled: false
-      type: set-me
-      annotations: set-me
+      type: not-used
+      annotations: not-used
     # Will add custom configuration options to Nginx https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
     additionalConfig: {}
   defaultBackend:
