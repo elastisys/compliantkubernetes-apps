@@ -40,11 +40,14 @@ jobs:
       CK8S_CONFIG_PATH: ./apps/pipeline/config/exoscale
       CK8S_AUTO_APPROVE: true
     steps:
+    # Note: We use a specific commit for kubespray that includes the terraform
+    # code for Exoscale. This is only used for the terraform part, not for
+    # running kubespray!
     - name: Checkout kubespray
       uses: actions/checkout@v2
       with:
         repository: kubernetes-sigs/kubespray
-        ref: master
+        ref: b77460ec3480868530b6c0b9435d6e900edd8fe4
         path: kubespray
     ## TODO: We cannot currently use ck8s-kubespray since the terraform code
     ## for exoscale is not in the version we have in the submodule
