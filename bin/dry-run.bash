@@ -21,12 +21,19 @@ config_load "$1"
 if [[ $1 == "sc" ]]; then
   log_info "Running helmfile diff on the service cluster"
 
-  "${here}/ops.bash" helmfile sc diff
-
+  if [ ${#} -eq 2 ] && [ "$2" = "kubectl" ]; then
+    "${here}/ops.bash" helmfile sc template | "${here}/ops.bash" kubectl sc diff -f -
+  else
+    "${here}/ops.bash" helmfile sc diff
+  fi
 elif [[ $1 == "wc" ]]; then
   log_info "Running helmfile diff on the workload cluster"
 
-  "${here}/ops.bash" helmfile wc diff
+  if [ ${#} -eq 2 ] && [ "$2" = "kubectl" ]; then
+    "${here}/ops.bash" helmfile wc template | "${here}/ops.bash" kubectl wc diff -f -
+  else
+    "${here}/ops.bash" helmfile wc diff
+  fi
 else
   log_error "ERROR: unsupported option for dry-run. Supported options are <wc|sc>"
   exit 1

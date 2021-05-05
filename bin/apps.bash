@@ -22,19 +22,17 @@ apps_init() {
 
 apps_run_sc() {
     log_info "Applying applications in service cluster"
-
     (
         with_kubeconfig "${secrets[kube_config_sc]}" \
-            CONFIG_PATH="${CK8S_CONFIG_PATH}" "${scripts_path}/deploy-sc.sh"
+            CONFIG_PATH="${CK8S_CONFIG_PATH}" "${scripts_path}/deploy-sc.sh" "${1:-""}"
     )
 }
 
 apps_run_wc() {
     log_info "Applying applications in workload cluster"
-
     (
         with_kubeconfig "${secrets[kube_config_wc]}" \
-            CONFIG_PATH="${CK8S_CONFIG_PATH}" "${scripts_path}/deploy-wc.sh"
+            CONFIG_PATH="${CK8S_CONFIG_PATH}" "${scripts_path}/deploy-wc.sh" "${1:-""}"
     )
 }
 
@@ -73,16 +71,18 @@ apps_sc() {
     # but feels good enough until we figure out something smarter.
     #
     #[ "$1" != "--skip-template-validate" ] && template_validate_sc
-    apps_run_sc
+
+    apps_run_sc "${2:-""}"
 
     log_info "Applications applied successfully!"
 }
 
 apps_wc() {
     apps_init
-    # See rationale above.
+    # See rationale above
     #[ "$1" != "--skip-template-validate" ] && template_validate_wc
-    apps_run_wc
+
+    apps_run_wc "${2:-""}"
 
     log_info "Applications applied successfully!"
 }
@@ -90,14 +90,12 @@ apps_wc() {
 #
 # ENTRYPOINT
 #
-
-
 if [[ $1 == "wc" ]]; then
     config_load "$1"
-    apps_wc "$2"
+    apps_wc "$2" "$3"
 elif [[ $1 == "sc" ]]; then
     config_load "$1"
-    apps_sc "$2"
+    apps_sc "$2" "$3"
 else
     echo "ERROR:  [$1] is an invalid argument:"
     echo "usage:   ck8s apps <wc|sc>. "
