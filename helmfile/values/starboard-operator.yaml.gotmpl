@@ -1,0 +1,27 @@
+# targetNamespace defines where you want starboard-operator to operate. By
+# default it will only operate in the namespace its installed in, but you can
+# specify another namespace, or a comma separated list of namespaces, or set it
+# to a blank string to let it operate in all namespaces.
+targetNamespaces: ""
+
+operator:
+  replicas: 1
+  # vulnerabilityScannerEnabled the flag to enable vulnerability scanner
+  vulnerabilityScannerEnabled: true
+  # configAuditScannerEnabled the flag to enable configuration audit scanner
+  configAuditScannerEnabled: false
+  # kubernetesBenchmarkEnabled the flag to enable CIS Kubernetes Benchmark scanner
+  kubernetesBenchmarkEnabled: false
+
+securityContext:
+  runAsUser: 1000
+  runAsGroup: 3000
+
+resources:
+{{- toYaml .Values.starboard.resources | nindent 2 }}
+
+tolerations:
+{{- toYaml .Values.starboard.tolerations | nindent 2 }}
+
+affinity:
+{{- toYaml .Values.starboard.affinity | nindent 2 }}

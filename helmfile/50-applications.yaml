@@ -109,6 +109,29 @@ releases:
   - values/cluster-admin-rbac.yaml.gotmpl
 
 
+# starboard-operator
+- name: starboard-operator
+  namespace: monitoring
+  labels:
+    app: starboard-operator
+  chart: ./upstream/starboard-operator
+  version: 0.5.3
+  missingFileHandler: Error
+  values:
+  - values/starboard-operator.yaml.gotmpl
+
+# vulnerability-exporter (for starboard -> prometheus)
+- name: vulnerability-exporter
+  namespace: monitoring
+  labels:
+    app: vulnerability-exporter
+  chart: ./charts/vulnerability-exporter
+  version: 0.1.0
+  missingFileHandler: Error
+  values:
+  - values/vulnerability-exporter.yaml.gotmpl
+
+
 # Service cluster releases
 {{ if eq .Environment.Name "service_cluster" }}
 # Dex
