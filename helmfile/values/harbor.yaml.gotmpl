@@ -152,3 +152,6 @@ redis:
     nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 6 }}
     affinity:     {{- toYaml .Values.harbor.affinity | nindent 6 }}
     tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 6 }}
+
+updateStrategy:
+  type: Recreate
