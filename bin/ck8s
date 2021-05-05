@@ -10,30 +10,42 @@ source "${here}/common.bash"
 
 usage() {
     echo "COMMANDS:" 1>&2
-    echo "  init                                            initialize the config path" 1>&2
-    echo "  bootstrap <wc|sc>                               bootstrap the cluster" 1>&2
-    echo "  apps <wc|sc> [--skip-template-validate]         deploy the applications" 1>&2
-    echo "  apply <wc|sc> [--skip-template-validate]        bootstrap and apps" 1>&2
-    echo "  test <wc|sc>                                    test the applications" 1>&2
-    echo "  dry-run <wc|sc>                                 runs helmfile diff" 1>&2
-    echo "  team add-pgp <fp>                               add a new PGP key to secrets" 1>&2
-    echo "  team remove-pgp <fp>                            remove a PGP key from secrets and rotate the data encryption key" 1>&2
+    echo "  init                                              initialize the config path" 1>&2
+    echo "  bootstrap <wc|sc>                                 bootstrap the cluster" 1>&2
+    echo "  apps <wc|sc> [--sync] [--skip-template-validate]  deploy the applications" 1>&2
+    echo "  apply <wc|sc> [--sync] [--skip-template-validate] bootstrap and apps" 1>&2
+    echo "  test <wc|sc>                                      test the applications" 1>&2
+    echo "  dry-run <wc|sc> [--kubectl]                       runs helmfile diff" 1>&2
+    echo "  team add-pgp <fp>                                 add a new PGP key to secrets" 1>&2
+    echo "  team remove-pgp <fp>                              remove a PGP key from secrets and rotate the data encryption key" 1>&2
     # TODO: We might want to make this command less visible once we have proper
     #       support for OIDC logins.
-    echo "  ops kubectl <wc|sc>                             run kubectl as cluster admin" 1>&2
-    echo "  ops helm <wc|sc>                                run helm as cluster admin" 1>&2
+    echo "  ops kubectl <wc|sc>                               run kubectl as cluster admin" 1>&2
+    echo "  ops helm <wc|sc>                                  run helm as cluster admin" 1>&2
     # TODO: We might want to make this command less visible once we feel
     #       confident that the apply command and migrations are good enough
     #       that direct Helmfile access is not necessary.
-    echo "  ops helmfile <wc|sc>                            run helmfile as cluster admin" 1>&2
-    echo "  s3cmd [cmd]                                     run s3cmd" 1>&2
-    echo "  kubeconfig <user|admin <wc|sc> [cluster_name]>  generate user/admin kubeconfig, stored at CK8S_CONFIG_PATH/user or CK8S_CONFIG_PATH/.state"
-    echo "  completion bash                                 output shell completion code for bash" 1>&2
-    echo "  validate <wc|sc>                                validates config files" 1>&2
-    echo "  providers                                       lists supported cloud providers" 1>&2
-    echo "  flavors                                         lists supported configuration flavors" 1>&2
+    echo "  ops helmfile <wc|sc>                              run helmfile as cluster admin" 1>&2
+    echo "  s3cmd [cmd]                                       run s3cmd" 1>&2
+    echo "  kubeconfig <user|admin <wc|sc> [cluster_name]>    generate user/admin kubeconfig, stored at CK8S_CONFIG_PATH/user or CK8S_CONFIG_PATH/.state"
+    echo "  completion bash                                   output shell completion code for bash" 1>&2
+    echo "  validate <wc|sc>                                  validates config files" 1>&2
+    echo "  providers                                         lists supported cloud providers" 1>&2
+    echo "  flavors                                           lists supported configuration flavors" 1>&2
     exit 1
 }
+
+SYNC=""
+SKIP=""
+KUBECTL=""
+
+for arg in "$@"; do
+  case "$arg" in
+    "--skip-template-validate") SKIP="--skip-template-validate" ;;
+    "--sync") SYNC="sync" ;;
+    "--kubectl") KUBECTL="kubectl" ;;
+  esac
+done
 
 case "${1}" in
     init)
@@ -45,12 +57,12 @@ case "${1}" in
         ;;
     apps)
         [[ "${2}" =~ ^(wc|sc)$ ]] || usage
-        "${here}/apps.bash" "${2}" "${3}"
+        "${here}/apps.bash" "${2}" "${SKIP}" "${SYNC}"
         ;;
     apply)
         [[ "${2}" =~ ^(wc|sc)$ ]] || usage
         "${here}/bootstrap.bash" "${2}"
-        "${here}/apps.bash" "${2}" "${3}"
+        "${here}/apps.bash" "${2}" "${SKIP}" "${SYNC}"
         ;;
     test)
         [[ "${2}" =~ ^(wc|sc)$ ]] || usage
@@ -58,7 +70,7 @@ case "${1}" in
         ;;
     dry-run)
         [[ "${2}" =~ ^(wc|sc)$ ]] || usage
-        "${here}/dry-run.bash" "${2}"
+        "${here}/dry-run.bash" "${2}" "${KUBECTL}"
         ;;
     team)
         case "${2}" in
