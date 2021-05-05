@@ -46,3 +46,7 @@ data:
   daily-dashboard.json: |-
     {{- .Files.Get "dashboards/daily-dashboard.json" | nindent 4 }}
 {{- end }}
+{{- if .Values.dashboards.vulnerability.enabled }}
+  vulnerability-dashboard.json: |-
+    {{- .Files.Get "dashboards/vulnerability-dashboard.json" | nindent 4 }}
+{{- end }}

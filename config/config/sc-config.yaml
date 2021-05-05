@@ -616,3 +616,26 @@ s3Exporter:
   tolerations: []
   affinity: {}
   nodeSelector: {}
+
+starboard:
+  # Note: The developers of starboard explicitly recommend against setting your own resources
+  resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+  tolerations: []
+  affinity: {}
+
+vulnerabilityExporter:
+  resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 50m
+  #   memory: 64Mi
+  tolerations: []
+  affinity: {}

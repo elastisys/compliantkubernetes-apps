@@ -1,0 +1,315 @@
+# Default values for the starboard-operator Helm chart, these are used to render
+# the templates into valid k8s Resources.
+
+# targetNamespace defines where you want starboard-operator to operate. By
+# default it will only operate in the namespace its installed in, but you can
+# specify another namespace, or a comma separated list of namespaces, or set it
+# to a blank string to let it operate in all namespaces.
+targetNamespaces: "{{ .Release.Namespace }}"
+
+nameOverride: ""
+fullnameOverride: ""
+
+operator:
+  replicas: 1
+  # leaderElectionId determines the name of the resource that leader election
+  # will use for holding the leader lock.
+  leaderElectionId: "starboard-operator"
+  # vulnerabilityScannerEnabled the flag to enable vulnerability scanner
+  vulnerabilityScannerEnabled: true
+  # configAuditScannerEnabled the flag to enable configuration audit scanner
+  configAuditScannerEnabled: true
+  # kubernetesBenchmarkEnabled the flag to enable CIS Kubernetes Benchmark scanner
+  kubernetesBenchmarkEnabled: true
+  # vulnerabilityReportsPlugin the name of the plugin that generates vulnerability reports. Either `Trivy` or `Aqua`.
+  vulnerabilityReportsPlugin: "Trivy"
+  # configAuditReportsPlugin the name of the plugin that generates config audit reports. Either `Polaris` or `Conftest`.
+  configAuditReportsPlugin: "Polaris"
+  # batchDeleteLimit the maximum number of config audit reports deleted by the operator when the plugin's config has changed.
+  batchDeleteLimit: 10
+  # batchDeleteDelay the duration to wait before deleting another batch of config audit reports.
+  batchDeleteDelay: 10s
+image:
+  repository: "aquasec/starboard-operator"
+  # tag is an override of the image tag, which is by default set by the
+  # appVersion field in Chart.yaml.
+  tag: ""
+  pullPolicy: ""
+  pullSecrets: []
+
+# service only expose a metrics endpoint for prometheus to scrape,
+# starboard-operator does not have a user interface.
+service:
+  type: ClusterIP
+  metricsPort: 80
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /metrics
+
+# envSecret represent a k8s Secret resource that will be referenced to mount
+# environment variables.
+envSecret:
+  # create specifies whether a k8s Secret should be created with a given
+  # stringData. If this is set to false, only the keys defined in stringData
+  # will be optionally mounted from the named secret, rather than all keys in
+  # the named k8s Secret.
+  create: true
+  # name specifies the name of the k8s Secret to reference. If not set, a name
+  # is generated using the fullname template. name is currently required to be
+  # hardcoded to starboard-operator as the starboard-operator binary makes a
+  # hardcoded reference to that name:
+  # https://github.com/aquasecurity/starboard/blob/ad6b9b99931d7524806f79b1329fdda82c75a715/pkg/operator/scanner.go#L26-L28
+  name: "starboard-operator"
+  # stringData specifies key value pairs to be added to the k8s Secret and
+  # mounted by the Pod as environment variables.
+  #
+  # NOTE: OPERATOR_NAMESPACE will be set based on where this Helm chart was
+  #       installed, and you are required to specify targetNamespace instead of
+  #       OPERATOR_TARGET_NAMESPACE below for this Helm chart to function
+  #       properly.
+  stringData:
+    OPERATOR_LOG_DEV_MODE: "false"
+
+trivy:
+  imageRef: docker.io/aquasec/trivy:0.16.0
+  mode: Standalone
+  serverURL:
+  httpProxy:
+  httpsProxy:
+  noProxy:
+  severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+
+kubeBench:
+  imageRef: docker.io/aquasec/kube-bench:0.5.0
+
+polaris:
+  imageRef: quay.io/fairwinds/polaris:3.2
+  config:
+    checks:
+      # reliability
+      multipleReplicasForDeployment: ignore
+      priorityClassNotSet: ignore
+      # resources
+      cpuRequestsMissing: warning
+      cpuLimitsMissing: warning
+      memoryRequestsMissing: warning
+      memoryLimitsMissing: warning
+      # images
+      tagNotSpecified: danger
+      pullPolicyNotAlways: ignore
+      # healthChecks
+      readinessProbeMissing: warning
+      livenessProbeMissing: warning
+      # networking
+      hostNetworkSet: warning
+      hostPortSet: warning
+      # security
+      hostIPCSet: danger
+      hostPIDSet: danger
+      notReadOnlyRootFilesystem: warning
+      privilegeEscalationAllowed: danger
+      runAsRootAllowed: warning
+      runAsPrivileged: danger
+      dangerousCapabilities: danger
+      insecureCapabilities: warning
+    exemptions:
+      - controllerNames:
+        - kube-apiserver
+        - kube-proxy
+        - kube-scheduler
+        - etcd-manager-events
+        - kube-controller-manager
+        - kube-dns
+        - etcd-manager-main
+        rules:
+        - hostPortSet
+        - hostNetworkSet
+        - readinessProbeMissing
+        - livenessProbeMissing
+        - cpuRequestsMissing
+        - cpuLimitsMissing
+        - memoryRequestsMissing
+        - memoryLimitsMissing
+        - runAsRootAllowed
+        - runAsPrivileged
+        - notReadOnlyRootFilesystem
+        - hostPIDSet
+      - controllerNames:
+        - kube-flannel-ds
+        rules:
+        - notReadOnlyRootFilesystem
+        - runAsRootAllowed
+        - notReadOnlyRootFilesystem
+        - readinessProbeMissing
+        - livenessProbeMissing
+        - cpuLimitsMissing
+      - controllerNames:
+        - cert-manager
+        rules:
+        - notReadOnlyRootFilesystem
+        - runAsRootAllowed
+        - readinessProbeMissing
+        - livenessProbeMissing
+      - controllerNames:
+        - cluster-autoscaler
+        rules:
+        - notReadOnlyRootFilesystem
+        - runAsRootAllowed
+        - readinessProbeMissing
+      - controllerNames:
+        - vpa
+        rules:
+        - runAsRootAllowed
+        - readinessProbeMissing
+        - livenessProbeMissing
+        - notReadOnlyRootFilesystem
+      - controllerNames:
+        - datadog
+        rules:
+        - runAsRootAllowed
+        - readinessProbeMissing
+        - livenessProbeMissing
+        - notReadOnlyRootFilesystem
+      - controllerNames:
+        - nginx-ingress-controller
+        rules:
+        - privilegeEscalationAllowed
+        - insecureCapabilities
+        - runAsRootAllowed
+      - controllerNames:
+        - dns-controller
+        - datadog-datadog
+        - kube-flannel-ds
+        - kube2iam
+        - aws-iam-authenticator
+        - datadog
+        - kube2iam
+        rules:
+        - hostNetworkSet
+      - controllerNames:
+        - aws-iam-authenticator
+        - aws-cluster-autoscaler
+        - kube-state-metrics
+        - dns-controller
+        - external-dns
+        - dnsmasq
+        - autoscaler
+        - kubernetes-dashboard
+        - install-cni
+        - kube2iam
+        rules:
+        - readinessProbeMissing
+        - livenessProbeMissing
+      - controllerNames:
+        - aws-iam-authenticator
+        - nginx-ingress-default-backend
+        - aws-cluster-autoscaler
+        - kube-state-metrics
+        - dns-controller
+        - external-dns
+        - kubedns
+        - dnsmasq
+        - autoscaler
+        - tiller
+        - kube2iam
+        rules:
+        - runAsRootAllowed
+      - controllerNames:
+        - aws-iam-authenticator
+        - nginx-ingress-controller
+        - nginx-ingress-default-backend
+        - aws-cluster-autoscaler
+        - kube-state-metrics
+        - dns-controller
+        - external-dns
+        - kubedns
+        - dnsmasq
+        - autoscaler
+        - tiller
+        - kube2iam
+        rules:
+        - notReadOnlyRootFilesystem
+      - controllerNames:
+        - cert-manager
+        - dns-controller
+        - kubedns
+        - dnsmasq
+        - autoscaler
+        - insights-agent-goldilocks-vpa-install
+        - datadog
+        rules:
+        - cpuRequestsMissing
+        - cpuLimitsMissing
+        - memoryRequestsMissing
+        - memoryLimitsMissing
+      - controllerNames:
+        - kube2iam
+        - kube-flannel-ds
+        rules:
+        - runAsPrivileged
+      - controllerNames:
+        - kube-hunter
+        rules:
+        - hostPIDSet
+      - controllerNames:
+        - polaris
+        - kube-hunter
+        - goldilocks
+        - insights-agent-goldilocks-vpa-install
+        rules:
+        - notReadOnlyRootFilesystem
+      - controllerNames:
+        - insights-agent-goldilocks-controller
+        rules:
+        - livenessProbeMissing
+        - readinessProbeMissing
+      - controllerNames:
+        - insights-agent-goldilocks-vpa-install
+        - kube-hunter
+        rules:
+        - runAsRootAllowed
+
+conftest:
+  # imageRef the image reference
+  imageRef: docker.io/openpolicyagent/conftest:v0.25.0
+
+rbac:
+  create: true
+serviceAccount:
+  # Specifies whether a service account should be created.
+  create: true
+  annotations: {}
+  # name specifies the name of the k8s Service Account. If not set and create is
+  # true, a name is generated using the fullname template.
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext:
+  privileged: false
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
