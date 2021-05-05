@@ -21,13 +21,13 @@ if [[ $1 == "sc" ]]; then
   log_info "Running helmfile diff on the service cluster"
   : "${config[config_file_sc]:?Missing service cluster config file}"
 
-  "${here}/ops.bash" helmfile sc diff
+  "${here}/ops.bash" helmfile sc template | kubectl sc diff
 
 elif [[ $1 == "wc" ]]; then
   log_info "Running helmfile diff on the workload cluster"
   : "${config[config_file_wc]:?Missing workload cluster config file}"
 
-  "${here}/ops.bash" helmfile wc diff
+  "${here}/ops.bash" helmfile wc template | kubectl wc diff
 else
   log_error "ERROR: unsupported option for dry-run. Supported options are <wc|sc>"
   exit 1

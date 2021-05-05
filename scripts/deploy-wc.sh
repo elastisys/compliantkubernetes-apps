@@ -34,6 +34,6 @@ echo "Installing helm charts" >&2
 cd "${SCRIPTS_PATH}/../helmfile"
 declare -a helmfile_opt_flags
 [[ -n "$INTERACTIVE" ]] && helmfile_opt_flags+=("$INTERACTIVE")
-helmfile -f . -e workload_cluster "${helmfile_opt_flags[@]}" apply --suppress-diff
+helmfile -f . -e workload_cluster "${helmfile_opt_flags[@]}" sync --suppress-diff
 
 echo "Deploy wc completed!" >&2

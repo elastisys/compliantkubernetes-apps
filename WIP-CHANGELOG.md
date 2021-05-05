@@ -4,6 +4,7 @@
 - Convert all values to integers for elasticsearch slm cronjob
 - The script for generating a user kubeconfig is now `bin/ck8s kubeconfig user` (from `bin/ck8s user-kubeconfig`)
 - Harbor have been updated to v2.2.1.
+- dry-run.sh and the deploy-scripts have been changed to use sync instead of diff.
 
 ### Fixed
 
