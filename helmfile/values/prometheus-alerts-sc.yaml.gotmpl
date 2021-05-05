@@ -3,3 +3,8 @@ esNodeCount: {{ add .Values.elasticsearch.dataNode.count .Values.elasticsearch.c
 defaultRules:
   labels:
     cluster: service
+
+rookMonitor:
+  relabelings:
+  - targetLabel: cluster
+    replacement: service_cluster

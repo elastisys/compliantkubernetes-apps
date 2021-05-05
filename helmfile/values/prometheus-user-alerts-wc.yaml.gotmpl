@@ -1,0 +1,21 @@
+# Note: These values are used for setting up alerts for the *user*.
+
+esNodeCount: 0
+alertmanagerJob: alertmanager-operated
+alertmanagerNamespace: {{ .Values.user.alertmanager.namespace }}
+prometheusJob: kube-prometheus-stack-prometheus
+operatorJob: kube-prometheus-stack-operator
+
+prometheusNamespace: monitoring
+
+defaultRules:
+  # TODO: Keeping current behavior, but this should probably default to false!
+  create: true
+  # labels:
+  #   cluster: workload
+  rules:
+    elasticsearch: false
+    alertmanager: {{ .Values.user.alertmanager.enabled }}
+    # Rook is handeled by the cluster operators. Users would normally not care
+    # about these alerts, but we have no other way of gathering them currently.
+    rookMonitor: true

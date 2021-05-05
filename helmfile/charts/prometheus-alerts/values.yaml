@@ -42,6 +42,7 @@ defaultRules:
     coreDNS: false
     certMonitor: true
     falcoAlerts: true
+    rookMonitor: true
 
 certMonitor:
   name: "cert-monitor"
@@ -51,3 +52,10 @@ certMonitor:
     name: "cert-manager"
     instance: "cert-manager"
   port: 9402
+
+rookMonitor:
+  enabled: true
+  namespace: rook-ceph
+  relabelings: []
+  # - targetLabel: cluster
+  #   replacement: service_cluster

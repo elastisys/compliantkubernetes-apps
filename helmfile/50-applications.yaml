@@ -164,7 +164,7 @@ releases:
     app: prometheus-alerts
     prometheus: wc-reader
   chart: ./charts/prometheus-alerts
-  version: 0.1.0
+  version: 0.1.1
   missingFileHandler: Error
   values:
 {{ if eq .Environment.Name "service_cluster" }}
@@ -180,7 +180,7 @@ releases:
     app: prometheus-alerts
     prometheus: sc
   chart: ./charts/prometheus-alerts
-  version: 0.1.0
+  version: 0.1.1
   missingFileHandler: Error
   values:
   - values/prometheus-alerts-sc.yaml.gotmpl
@@ -503,10 +503,10 @@ releases:
   labels:
     app: prometheus-alerts
   chart: ./charts/prometheus-alerts
-  version: 0.1.0
+  version: 0.1.1
   missingFileHandler: Info
   values:
-  - values/prometheus-alerts-wc.yaml.gotmpl
+  - values/prometheus-user-alerts-wc.yaml.gotmpl
 
 # User RBAC
 - name: user-rbac

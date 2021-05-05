@@ -1,3 +1,5 @@
+# Note: These values are used for the wc reader. I.e. **in SC** despite the name
+
 esNodeCount: {{ add .Values.elasticsearch.dataNode.count .Values.elasticsearch.clientNode.count .Values.elasticsearch.masterNode.count }}
 alertmanagerJob: alertmanager-operated
 alertmanagerNamespace: {{ .Values.user.alertmanager.namespace }}
@@ -12,6 +14,10 @@ defaultRules:
   rules:
     elasticsearch: false
     alertmanager: {{ .Values.user.alertmanager.enabled }}
-  {{ if eq .Environment.Name "service_cluster" }}
+    # These are already created for monitoring SC, no need to double them for WC
     certMonitor: false
-  {{ end }}
+    rookMonitor: false
+
+rookMonitor:
+  # The monitor sits in WC, no need to add it here in SC.
+  enabled: false

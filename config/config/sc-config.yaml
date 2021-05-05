@@ -666,3 +666,7 @@ vulnerabilityExporter:
   #   memory: 64Mi
   tolerations: []
   affinity: {}
+
+monitoring:
+  rook:
+    enabled: true
