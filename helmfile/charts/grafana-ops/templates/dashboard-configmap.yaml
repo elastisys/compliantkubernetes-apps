@@ -50,3 +50,15 @@ data:
   vulnerability-dashboard.json: |-
     {{- .Files.Get "dashboards/vulnerability-dashboard.json" | nindent 4 }}
 {{- end }}
+{{- if .Values.dashboards.rook.enabled }}
+  ceph-cluster_rev14.json: |-
+    {{- .Files.Get "dashboards/ceph-cluster_rev14.json" | nindent 4 }}
+{{- end }}
+{{- if .Values.dashboards.rook.enabled }}
+  ceph-osd-single_rev5.json: |-
+    {{- .Files.Get "dashboards/ceph-osd-single_rev5.json" | nindent 4 }}
+{{- end }}
+{{- if .Values.dashboards.rook.enabled }}
+  ceph-pools_rev5.json: |-
+    {{- .Files.Get "dashboards/ceph-pools_rev5.json" | nindent 4 }}
+{{- end }}

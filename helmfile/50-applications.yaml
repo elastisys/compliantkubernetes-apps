@@ -192,7 +192,7 @@ releases:
     app: grafana-ops
     prometheus: sc
   chart: ./charts/grafana-ops
-  version: 0.2.0
+  version: 0.2.1
   missingFileHandler: Error
   values:
   - values/grafana-ops.yaml.gotmpl
