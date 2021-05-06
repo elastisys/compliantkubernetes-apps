@@ -1,0 +1,19 @@
+---
+name: Chart Upgrade
+about: Request to change a Chart version
+title: ''
+labels: improvement
+assignees: ''
+
+---
+
+**What Chart should be upgraded?**
+
+/e.g., dexidp/dex 2.15/
+
+**Acceptance criteria**
+
+- I checked the migration of the new Chart:
+    - [ ] I upgraded a Chart and determined that no migration steps are needed.
+    - [ ] I upgraded a Chart and added migration steps to [WIP-CHANGELOG.md](https://github.com/elastisys/compliantkubernetes-apps/blob/main/WIP-CHANGELOG.md).
+- [ ] I tested the functionality provided by the new Chart (e.g., Auth flow, Grafana dashboards, etc.)

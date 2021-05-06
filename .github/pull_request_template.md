@@ -23,6 +23,10 @@
           E.g. removes or changes any CK8S config options or Kubernetes APIs.
     - [ ] will break the cluster.
           I.e. full cluster migration is required.
+- Chart checklist (pick exactly one):
+    - [ ] I upgraded no Chart.
+    - [ ] I upgraded a Chart and determined that no migration steps are needed.
+    - [ ] I upgraded a Chart and added migration steps to [WIP-CHANGELOG.md](https://github.com/elastisys/compliantkubernetes-apps/blob/main/WIP-CHANGELOG.md).
 
 **Pipeline config** *(if applicable)*
 If you change some config options (e.g. add/rename variable or change the default value) you may need to update the config used by the pipeline in `pipeline/config`.
