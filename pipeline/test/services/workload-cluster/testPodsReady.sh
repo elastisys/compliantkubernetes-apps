@@ -8,6 +8,9 @@ enable_falco_alerts=$(yq r -e "${CONFIG_FILE}" 'falco.alerts.enabled')
 enable_falco=$(yq r -e "${CONFIG_FILE}" 'falco.enabled')
 enable_opa=$(yq r -e "${CONFIG_FILE}" 'opa.enabled')
 enable_user_alertmanager=$(yq r -e "${CONFIG_FILE}" 'user.alertmanager.enabled')
+if "${enable_user_alertmanager}"; then
+    alertmanager_namespace=$(yq r -e "${CONFIG_FILE}" 'user.alertmanager.namespace')
+fi
 enable_velero=$(yq r -e "${CONFIG_FILE}" 'velero.enabled')
 enable_local_pv_provisioner=$(yq r -e "${CONFIG_FILE}" 'storageClasses.local.enabled')
 enable_nfs_provisioner=$(yq r -e "${CONFIG_FILE}" 'storageClasses.nfs.enabled')
@@ -95,7 +98,7 @@ statefulsets=(
 )
 
 if "${enable_user_alertmanager}"; then
-    statefulsets+=("monitoring alertmanager-alertmanager")
+    statefulsets+=("${alertmanager_namespace} alertmanager-alertmanager")
 fi
 
 resourceKind="StatefulSet"
