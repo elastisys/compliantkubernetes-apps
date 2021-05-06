@@ -63,7 +63,6 @@ daemonsets=(
     "kube-system node-local-dns"
     "ingress-nginx ingress-nginx-controller"
     "monitoring kube-prometheus-stack-prometheus-node-exporter"
-    "velero restic"
 )
 if "${enable_falco}"; then
     daemonsets+=("falco falco")
