@@ -11,6 +11,12 @@ assignees: ''
 
 /e.g., dexidp/dex 2.15/
 
+**Why should this Chart be upgraded?**
+
+- [ ] We need to perform a security upgrade.
+- [ ] We need it for a new feature: *which feature (link to blocked issue)*.
+- [ ] We need to keep up to prevent future issues.
+
 **Acceptance criteria**
 
 - I checked the migration of the new Chart:
