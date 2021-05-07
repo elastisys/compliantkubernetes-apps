@@ -21,5 +21,5 @@ assignees: ''
 
 - I checked the migration of the new Chart:
     - [ ] I upgraded a Chart and determined that no migration steps are needed.
-    - [ ] I upgraded a Chart and added migration steps to [WIP-CHANGELOG.md](https://github.com/elastisys/compliantkubernetes-apps/blob/main/WIP-CHANGELOG.md).
+    - [ ] I upgraded a Chart and added [migration steps](https://github.com/elastisys/compliantkubernetes-apps/blob/main/migration).
 - [ ] I tested the functionality provided by the new Chart (e.g., Auth flow, Grafana dashboards, etc.)
