@@ -359,9 +359,9 @@ elasticsearch:
       kubeAuditAgeDays: 30
       kubernetesSizeGB: 50
       kubernetesAgeDays: 50
-      otherSizeGB: 10
-      otherAgeDays: 30
-      authLogSizeGB: 10
+      otherSizeGB: 1
+      otherAgeDays: 7
+      authLogSizeGB: 1
       authLogAgeDays: 30
       # (Optional) retention for indices matched by 'postgresql-*'
       # postgresql: false
