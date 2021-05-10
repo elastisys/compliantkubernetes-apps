@@ -15,6 +15,7 @@
 
 - The project now requires `helm-diff >= 3.1.2`. Remove the old one (via `rm -rf ~/.local/share/helm/plugins/helm-diff/`), before reinstalling dependencies.
 - Changed the way connectors are provided to dex
+- Default retention values for other* and authlog* are changed to fit the needs better
 
 ### Fixed
 

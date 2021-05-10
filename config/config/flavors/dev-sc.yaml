@@ -52,7 +52,7 @@ elasticsearch:
       otherSizeGB: 1
       otherAgeDays: 7
       authLogSizeGB: 1
-      authLogAgeDays: 7
+      authLogAgeDays: 30
   snapshot:
     enabled: false
     retentionSchedule: "0 1 * * *" # 1am
