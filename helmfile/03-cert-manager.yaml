@@ -1,0 +1,32 @@
+# Defult settings to use with helm.
+helmDefaults:
+  timeout: 600
+  createNamespace: false
+  skipDeps: true
+
+# Environments
+environments:
+  workload_cluster:
+    values:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/wc-config.yaml"
+    secrets:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
+  service_cluster:
+    values:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/sc-config.yaml"
+    secrets:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
+
+# The desired state of Helm releases.
+releases:
+# Cert-manager
+- name: cert-manager
+  namespace: cert-manager
+  labels:
+    app: cert-manager
+  chart: ./upstream/cert-manager
+  version: v1.1.0
+  missingFileHandler: Error
+  wait: true
+  values:
+  - values/cert-manager.yaml.gotmpl

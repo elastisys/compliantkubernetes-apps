@@ -44,18 +44,6 @@ releases:
   values:
   - values/ingress-nginx.yaml.gotmpl
 
-# Cert-manager
-- name: cert-manager
-  namespace: cert-manager
-  labels:
-    app: cert-manager
-  chart: ./upstream/cert-manager
-  version: v1.1.0
-  missingFileHandler: Error
-  wait: true
-  values:
-  - values/cert-manager.yaml.gotmpl
-
 # Velero
 - name: velero
   namespace: velero
