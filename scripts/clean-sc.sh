@@ -54,5 +54,7 @@ PROM_CRDS=$(
         -o name
     )
 if [ -n "$PROM_CRDS" ]; then
+    # shellcheck disable=SC2086
+    # We definitely want word splitting here.
     "${here}/.././bin/ck8s" ops kubectl sc delete crds $PROM_CRDS
 fi
