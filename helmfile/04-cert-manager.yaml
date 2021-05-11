@@ -27,6 +27,7 @@ releases:
   chart: ./upstream/cert-manager
   version: v1.1.0
   missingFileHandler: Error
+  disableValidationOnInstall: true
   wait: true
   values:
   - values/cert-manager.yaml.gotmpl
