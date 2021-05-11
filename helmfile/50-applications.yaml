@@ -479,19 +479,6 @@ releases:
   values:
   - values/gatekeeper-operator.yaml.gotmpl
 
-# gatekeeper
-- name: gatekeeper
-  namespace: gatekeeper-system
-  labels:
-    app: gatekeeper
-  chart: ./upstream/gatekeeper
-  version: 3.3.0
-  installed: {{ .Values.opa.enabled }}
-  missingFileHandler: Error
-  wait: true
-  values:
-  - values/gatekeeper.yaml.gotmpl
-
 # gatekeeper-metrics
 - name: gatekeeper-metrics
   namespace: gatekeeper-system
