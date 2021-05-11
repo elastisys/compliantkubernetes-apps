@@ -56,24 +56,6 @@ releases:
   values:
   - values/cert-manager.yaml.gotmpl
 
-# Kube-prometheus-stack
-- name: kube-prometheus-stack
-  namespace: monitoring
-  labels:
-    app: kube-prometheus-stack
-  chart: ./upstream/kube-prometheus-stack
-  version: 12.8.0
-  missingFileHandler: Error
-  needs:
-  - cert-manager/cert-manager
-  values:
-{{ if eq .Environment.Name "service_cluster" }}
-  - values/kube-prometheus-stack-sc.yaml.gotmpl
-{{ end }}
-{{ if eq .Environment.Name "workload_cluster" }}
-  - values/kube-prometheus-stack-wc.yaml.gotmpl
-{{ end }}
-
 # Velero
 - name: velero
   namespace: velero
