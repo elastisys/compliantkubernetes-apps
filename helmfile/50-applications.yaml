@@ -476,22 +476,6 @@ releases:
   version: 0.1.0
   installed: {{ .Values.opa.enabled }}
   missingFileHandler: Error
-  needs:
-  - gatekeeper-system/gatekeeper
-
-# gatekeeper-templates
-- name: gatekeeper-templates
-  namespace: gatekeeper-system
-  labels:
-    app: gatekeeper-templates
-  chart: ./charts/gatekeeper-templates
-  version: 1.6.0
-  installed: {{ .Values.opa.enabled }}
-  missingFileHandler: Error
-  needs:
-  - gatekeeper-system/gatekeeper
-  values:
-  - values/gatekeeper-templates.yaml.gotmpl
 
 # gatekeeper-constraints
 - name: gatekeeper-constraints
