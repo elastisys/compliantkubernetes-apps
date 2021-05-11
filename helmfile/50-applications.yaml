@@ -27,8 +27,6 @@ releases:
   chart: ./charts/issuers
   version: 0.1.0
   missingFileHandler: Error
-  needs:
-  - cert-manager/cert-manager
   values:
   - values/letsencrypt.yaml.gotmpl
 
@@ -122,8 +120,6 @@ releases:
   version: 2.15.2
   missingFileHandler: Error
   wait: true
-  needs:
-  - cert-manager/cert-manager
   values:
   - values/dex.yaml.gotmpl
 
@@ -147,8 +143,6 @@ releases:
   chart: ./charts/prometheus-alerts
   version: 0.1.0
   missingFileHandler: Error
-  needs:
-  - monitoring/kube-prometheus-stack
   values:
 {{ if eq .Environment.Name "service_cluster" }}
   # Note: we want to have alerts for WC since this is wc-reader, even if it is
@@ -165,8 +159,6 @@ releases:
   chart: ./charts/prometheus-alerts
   version: 0.1.0
   missingFileHandler: Error
-  needs:
-  - monitoring/kube-prometheus-stack
   values:
   - values/prometheus-alerts-sc.yaml.gotmpl
 
@@ -193,8 +185,6 @@ releases:
   version: 6.1.11
   installed: {{ .Values.user.grafana.enabled }}
   missingFileHandler: Error
-  needs:
-  - cert-manager/cert-manager
   values:
   - values/grafana-user.yaml.gotmpl
 
@@ -249,8 +239,6 @@ releases:
   version: 0.1.0
   installed: {{ .Values.harbor.enabled }}
   missingFileHandler: Error
-  needs:
-  - cert-manager/cert-manager
   values:
   - values/harbor-certs.yaml.gotmpl
 
@@ -264,8 +252,6 @@ releases:
   missingFileHandler: Error
   wait: true
   timeout: 600
-  needs:
-  - cert-manager/cert-manager
   values:
   - values/harbor.yaml.gotmpl
 
@@ -374,8 +360,6 @@ releases:
   chart: ./elastisys/opendistro-es
   version: 1.12.1
   missingFileHandler: Error
-  needs:
-  - cert-manager/cert-manager
   values:
   - values/opendistro-es.yaml.gotmpl
 
@@ -416,8 +400,6 @@ releases:
   version: 0.1.0
   installed: {{ .Values.user.alertmanager.enabled }}
   missingFileHandler: Error
-  needs:
-  - cert-manager/cert-manager
   values:
   - values/user-alertmanager.yaml.gotmpl
 
@@ -486,8 +468,6 @@ releases:
   version: 1.6.0
   installed: {{ .Values.opa.enabled }}
   missingFileHandler: Error
-  needs:
-  - gatekeeper-system/gatekeeper-templates
   values:
   - values/gatekeeper-constraints.yaml.gotmpl
 
@@ -502,8 +482,6 @@ releases:
   chart: ./charts/prometheus-alerts
   version: 0.1.0
   missingFileHandler: Info
-  needs:
-  - monitoring/kube-prometheus-stack
   values:
   - values/prometheus-alerts-wc.yaml.gotmpl
 
@@ -515,10 +493,6 @@ releases:
   chart: ./charts/user-rbac
   version: 0.1.0
   missingFileHandler: Error
-  {{ if .Values.opa.enabled }}
-  needs:
-  - gatekeeper-system/gatekeeper-constraints
-  {{ end }}
   values:
   - values/user-rbac.yaml.gotmpl
 
