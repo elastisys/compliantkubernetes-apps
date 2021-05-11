@@ -33,28 +33,28 @@ fi
 declare -a SC_LOG_BACKUPS_LATEST
 declare -a SC_LOG_BACKUPS_REST
 mapfile -t SC_LOG_BACKUPS_LATEST < <(echo "${SC_LOG_BACKUPS}" | tail -n "${RETENTION_DAYS}")
-mapfile -t SC_LOG_BACKUPS_REST <   <(echo "${SC_LOG_BACKUPS}" | head -n "-${RETENTION_DAYS}")
+mapfile -t SC_LOG_BACKUPS_REST < <(echo "${SC_LOG_BACKUPS}" | head -n "-${RETENTION_DAYS}")
 
-echo "Listing ${RETENTION_DAYS} latest backups"
-echo "${SC_LOG_BACKUPS_LATEST[@]}"
-echo
-echo "Listing the rest"
-echo "${SC_LOG_BACKUPS_REST[@]}"
-echo
-if [ ${#SC_LOG_BACKUPS_REST[@]} -eq 0 ]; then
+if [ ${#SC_LOG_BACKUPS_REST[*]} -eq 0 ]; then
   echo "No backups were found for automatic removal"
 else
+  echo "Listing ${RETENTION_DAYS} latest backups"
+  echo "${SC_LOG_BACKUPS_LATEST[@]}"
+  echo
+  echo "Listing the rest"
+  echo "${SC_LOG_BACKUPS_REST[@]}"
+  echo
   for BACKUP in "${SC_LOG_BACKUPS_REST[@]}"; do
-      if [[ ${S3_BACKUP} == "true" ]]; then
-          BACKUP_URI="s3://${BUCKET_NAME}/logs/${BACKUP}"
+    if [[ ${S3_BACKUP} == "true" ]]; then
+      BACKUP_URI="s3://${BUCKET_NAME}/logs/${BACKUP}"
 
-          echo "Deleting backup ${BACKUP_URI}"
-          aws s3 rm --recursive "${BACKUP_URI}" --endpoint-url="${S3_REGION_ENDPOINT}"
-      elif [[ ${GCS_BACKUP} == "true" ]]; then
-          BACKUP_URI="gs://${BUCKET_NAME}/logs/${BACKUP}"
+      echo "Deleting backup ${BACKUP_URI}"
+      aws s3 rm --recursive "${BACKUP_URI}" --endpoint-url="${S3_REGION_ENDPOINT}"
+    elif [[ ${GCS_BACKUP} == "true" ]]; then
+      BACKUP_URI="gs://${BUCKET_NAME}/logs/${BACKUP}"
 
-          echo "Deleting backup ${BACKUP_URI}"
-          gsutil -o "Credentials:gs_service_key_file=${GCS_KEYFILE}" rm "$BACKUP_URI"
-      fi
+      echo "Deleting backup ${BACKUP_URI}"
+      gsutil -o "Credentials:gs_service_key_file=${GCS_KEYFILE}" rm "$BACKUP_URI"
+    fi
   done
 fi
