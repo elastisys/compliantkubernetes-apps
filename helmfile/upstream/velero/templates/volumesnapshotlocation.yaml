@@ -1,0 +1,20 @@
+{{- if .Values.snapshotsEnabled }}
+apiVersion: velero.io/v1
+kind: VolumeSnapshotLocation
+metadata:
+  name: {{ include "velero.volumeSnapshotLocation.name" . }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+  labels:
+    app.kubernetes.io/name: {{ include "velero.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    helm.sh/chart: {{ include "velero.chart" . }}
+spec:
+  provider: {{ include "velero.volumeSnapshotLocation.provider" . }}
+{{- with .Values.configuration.volumeSnapshotLocation.config }}
+  config:
+{{ toYaml . | indent 4 }}
+{{- end -}}
+{{- end }}

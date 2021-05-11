@@ -1,0 +1,23 @@
+{{- if .Values.podSecurityPolicy.enabled }}
+{{- $striped_version := (split "-" .Capabilities.KubeVersion.GitVersion)._0 -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ template "fluentd-elasticsearch.fullname" . }}
+  labels:
+{{ include "fluentd-elasticsearch.labels" . | indent 4 }}
+    {{- if semverCompare "< 1.6" $striped_version }}
+    kubernetes.io/cluster-service: "true"
+    {{- end }}
+    addonmanager.kubernetes.io/mode: Reconcile
+rules:
+{{- if semverCompare "> 1.15" $striped_version }}
+- apiGroups: ['policy']
+{{- else }}
+- apiGroups: ['extensions']
+{{- end }}
+  resources: ['podsecuritypolicies']
+  verbs:     ['use']
+  resourceNames:
+  - {{ template "fluentd-elasticsearch.fullname" . }}
+{{- end }}

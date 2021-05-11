@@ -1,0 +1,18 @@
+{{- if .Values.elastisys_custom.metrics.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "influxdb.fullname" . }}-du-monitoring-script
+data:
+  export-influxdb-database-size.sh: |
+    #!/bin/sh
+    
+    PROMETHEUS_INFLUXDB_METRIC_FILE="/etc/config/prometheus-influxdb-retention-metric-name"
+    INFLUXDB_DATABASE_FILE="/etc/config/influxdb-retention-database"
+
+    paste $PROMETHEUS_INFLUXDB_METRIC_FILE $INFLUXDB_DATABASE_FILE | while IFS="$(printf '\t')" read -r PROMETHEUS_INFLUXDB_METRIC INFLUXDB_DATABASE
+    do
+      echo ${PROMETHEUS_INFLUXDB_METRIC} $(du -s /var/lib/influxdb/data/${INFLUXDB_DATABASE} | cut -f 1) > /textfile-collector/${PROMETHEUS_INFLUXDB_METRIC}.prom.$$
+      mv /textfile-collector/${PROMETHEUS_INFLUXDB_METRIC}.prom.$$ /textfile-collector/${PROMETHEUS_INFLUXDB_METRIC}.prom
+    done
+{{- end }}

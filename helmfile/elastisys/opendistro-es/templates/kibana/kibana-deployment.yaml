@@ -1,0 +1,172 @@
+# Copyright 2019 Viasat, Inc.
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License").
+# You may not use this file except in compliance with the License.
+# A copy of the License is located at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# or in the "license" file accompanying this file. This file is distributed
+# on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+# express or implied. See the License for the specific language governing
+# permissions and limitations under the License.
+
+# @formatter:off
+{{- if .Values.kibana.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+{{ include "opendistro-es.labels.standard" . | indent 4 }}
+    role: kibana
+  name: {{ template "opendistro-es.fullname" . }}-kibana
+spec:
+  replicas: {{ .Values.kibana.replicas }}
+  selector:
+    matchLabels:
+{{ include "opendistro-es.labels.selector" . | indent 6 }}
+      role: kibana
+  template:
+    metadata:
+      labels:
+{{ include "opendistro-es.labels.standard" . | indent 8 }}
+        role: kibana
+      annotations:
+        {{/* This forces a restart if the secret config has changed */}}
+        {{- if .Values.kibana.config }}
+        checksum/config: {{ include (print .Template.BasePath "/kibana/kibana-config-secret.yaml") . | sha256sum | trunc 63 }}
+        {{- end }}
+{{- if .Values.kibana.podAnnotations }}
+{{ toYaml .Values.kibana.podAnnotations | indent 8 }}
+{{- end }}
+    spec:
+{{- include "opendistro-es.imagePullSecrets" . | indent 6 }}
+{{- if .Values.kibana.extraInitContainers }}
+      initContainers:
+{{ toYaml .Values.kibana.extraInitContainers | indent 8 }}
+{{- end }}
+      containers:
+      - env:
+        - name: CLUSTER_NAME
+          value: {{ .Values.global.clusterName }}
+        # If no custom configuration provided, default to internal DNS
+        {{- if not .Values.kibana.config }}
+        - name: ELASTICSEARCH_HOSTS
+          value: https://{{ template "opendistro-es.fullname" . }}-client-service:9200
+        {{- end }}
+        {{- if .Values.kibana.elasticsearchAccount.secret }}
+        - name: ELASTICSEARCH_USERNAME
+          valueFrom:
+             secretKeyRef:
+               name: {{ .Values.kibana.elasticsearchAccount.secret }}
+               key: username
+        - name: ELASTICSEARCH_PASSWORD
+          valueFrom:
+             secretKeyRef:
+               name: {{ .Values.kibana.elasticsearchAccount.secret }}
+               key: password
+      {{- if and .Values.kibana.elasticsearchAccount.keyPassphrase.enabled }}
+        - name: KEY_PASSPHRASE
+          valueFrom:
+             secretKeyRef:
+               name: {{ .Values.kibana.elasticsearchAccount.secret }}
+               key: keypassphrase
+        # 32-character random string to be used as cookie password by security plugin
+      {{- end }}
+        - name: COOKIE_PASS
+          valueFrom:
+             secretKeyRef:
+               name: {{ .Values.kibana.elasticsearchAccount.secret }}
+               key: cookie
+      {{- end }}
+{{- if .Values.kibana.extraEnvs }}
+{{ toYaml .Values.kibana.extraEnvs | indent 8 }}
+{{- end }}
+        image: {{ .Values.global.registry }}/{{ .Values.kibana.image }}:{{ .Values.kibana.imageTag }}
+        imagePullPolicy: {{ .Values.kibana.imagePullPolicy | default "Always" | quote }}
+    {{- with .Values.kibana.readinessProbe}}
+        readinessProbe:
+{{ toYaml . | indent 10 }}
+    {{- end }}
+    {{- with .Values.kibana.livenessProbe}}
+        livenessProbe:
+{{ toYaml . | indent 10 }}
+    {{- end }}
+    {{- with .Values.kibana.startupProbe}}
+        startupProbe:
+{{ toYaml . | indent 10 }}
+    {{- end }}
+        resources:
+{{ toYaml .Values.kibana.resources | indent 12 }}
+        name: {{ template "opendistro-es.fullname" . }}-kibana
+        volumeMounts:
+         {{- if .Values.kibana.config }}
+          - mountPath: {{ .Values.kibana.configDirectory }}/kibana.yml
+            name: config
+            subPath: kibana.yml
+         {{- end }}
+         {{- if and .Values.kibana.ssl.kibana.enabled .Values.kibana.ssl.kibana.existingCertSecret }}
+          - mountPath: {{ .Values.kibana.certsDirectory }}/kibana-crt.pem
+            name: kibana-certs
+            subPath: {{ .Values.kibana.ssl.kibana.existingCertSecretCertSubPath }}
+          - mountPath: {{ .Values.kibana.certsDirectory }}/kibana-key.pem
+            name: kibana-certs
+            subPath: {{ .Values.kibana.ssl.kibana.existingCertSecretKeySubPath }}
+          - mountPath: {{ .Values.kibana.certsDirectory }}/kibana-root-ca.pem
+            name: kibana-certs
+            subPath: {{ .Values.kibana.ssl.kibana.existingCertSecretRootCASubPath }}
+         {{- end }}
+         {{- if and .Values.kibana.ssl.elasticsearch.enabled .Values.kibana.ssl.elasticsearch.existingCertSecret }}
+          - mountPath: {{ .Values.kibana.certsDirectory }}/elk-rest-crt.pem
+            name: elasticsearch-certs
+            subPath: {{ .Values.kibana.ssl.elasticsearch.existingCertSecretCertSubPath }}
+          - mountPath: {{ .Values.kibana.certsDirectory }}/elk-rest-key.pem
+            name: elasticsearch-certs
+            subPath: {{ .Values.kibana.ssl.elasticsearch.existingCertSecretKeySubPath }}
+          - mountPath: {{ .Values.kibana.certsDirectory }}/elk-rest-root-ca.pem
+            name: elasticsearch-certs
+            subPath: {{ .Values.kibana.ssl.elasticsearch.existingCertSecretRootCASubPath }}
+         {{- end }}
+{{- if .Values.kibana.extraVolumeMounts }}
+{{ toYaml .Values.kibana.extraVolumeMounts | indent 10 }}
+{{- end }}
+        ports:
+        - containerPort: {{ .Values.kibana.port }}
+{{- if .Values.kibana.extraContainers }}
+{{ toYaml .Values.kibana.extraContainers | indent 6 }}
+{{- end }}
+      serviceAccountName: {{ template "opendistro-es.kibana.serviceAccountName" . }}
+      volumes:
+        {{- if .Values.kibana.config }}
+        - name: config
+          secret:
+            secretName: {{ template "opendistro-es.fullname" . }}-kibana-config
+        {{- end }}
+        {{- if and .Values.kibana.ssl.kibana.enabled .Values.kibana.ssl.kibana.existingCertSecret }}
+        - name: kibana-certs
+          secret:
+            secretName: {{ .Values.kibana.ssl.kibana.existingCertSecret }}
+        {{- end }}
+        {{- if and .Values.kibana.ssl.elasticsearch.enabled .Values.kibana.ssl.elasticsearch.existingCertSecret }}
+        - name: elasticsearch-certs
+          secret:
+            secretName: {{ .Values.kibana.ssl.elasticsearch.existingCertSecret }}
+        {{- end }}
+{{- if .Values.kibana.extraVolumes }}
+{{ toYaml .Values.kibana.extraVolumes | indent 8 }}
+{{- end }}
+    {{- with .Values.kibana.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.elasticsearch.client.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.kibana.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      restartPolicy: Always
+{{ end }}

@@ -1,0 +1,20 @@
+{{- if .Values.elastisys_custom.metrics.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+    name: {{ template "influxdb.fullname" . }}-du-monitoring-service-monitor
+    namespace: monitoring
+    labels:
+        app: prometheus-operator-influxdb-du-monitoring
+        release: prometheus-operator
+spec:
+    selector:
+        matchLabels:
+            app: {{ template "influxdb.fullname" . }}-du-monitoring
+    namespaceSelector:
+        matchNames:
+        - influxdb-prometheus
+    endpoints:
+    - port: web
+      path: /metrics
+{{- end }}

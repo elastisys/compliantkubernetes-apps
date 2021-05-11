@@ -1,0 +1,11 @@
+{{- if .Values.elastisys_custom.metrics.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "influxdb.fullname" . }}-du-monitoring-cronjob
+data:
+  cronjob: |
+    ### cron file for running the export script
+    {{ .Values.elastisys_custom.metrics.schedule }} root sh /scripts/export-influxdb-database-size.sh
+    # An empty line is required at the end of this file for a valid cron file.
+{{- end }}
