@@ -27,8 +27,7 @@ releases:
   chart: ./upstream/kube-prometheus-stack
   version: 12.8.0
   missingFileHandler: Error
-  needs:
-  - cert-manager/cert-manager
+  disableValidationOnInstall: true
   values:
 {{ if eq .Environment.Name "service_cluster" }}
   - values/kube-prometheus-stack-sc.yaml.gotmpl

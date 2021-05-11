@@ -27,6 +27,7 @@ releases:
   labels:
     app: gatekeeper
   chart: ./upstream/gatekeeper
+  disableValidationOnInstall: true
   version: 3.3.0
   installed: {{ .Values.opa.enabled }}
   missingFileHandler: Error
