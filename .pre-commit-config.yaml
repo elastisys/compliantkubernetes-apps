@@ -15,15 +15,20 @@ repos:
   rev: v3.2.0
   hooks:
   - id: check-json
+    exclude: helmfile/upstream/|helmfile/elastisys/
   - id: check-yaml
     exclude: helmfile/|bootstrap/
     args: [--allow-multiple-documents]
   - id: end-of-file-fixer
+    exclude: helmfile/upstream/|helmfile/elastisys/
   - id: trailing-whitespace
+    exclude: helmfile/upstream/|helmfile/elastisys/
   - id: check-merge-conflict
 - repo: https://github.com/jumanjihouse/pre-commit-hooks
   rev: 2.1.4
   hooks:
   - id: shellcheck
     additional_dependencies: []
+    exclude: helmfile/upstream/|helmfile/elastisys/
   - id: markdownlint
+    exclude: helmfile/upstream/|helmfile/elastisys/
