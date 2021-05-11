@@ -1,0 +1,9 @@
+{{- if .Values.elastisys_custom.retention.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "influxdb.fullname" . }}-metrics-retention-script
+data:
+  influxdb_size_based_metrics_retention.py: |
+    {{ .Files.Get "files/influxdb_size_based_metrics_retention.py" | nindent 4 }}
+{{- end }}

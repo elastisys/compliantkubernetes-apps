@@ -1,42 +1,8 @@
-# Chart repositories used from within this state file.
-repositories:
-- name: stable
-  url: https://charts.helm.sh/stable
-- name: jetstack
-  url: https://charts.jetstack.io
-- name: bitnami
-  url: https://charts.bitnami.com/bitnami
-- name: kokuwa
-  url: https://kokuwaio.github.io/helm-charts
-- name: vmware-tanzu
-  url: https://vmware-tanzu.github.io/helm-charts
-- name: ingress-nginx
-  url: https://kubernetes.github.io/ingress-nginx
-- name: prometheus-community
-  url: https://prometheus-community.github.io/helm-charts
-
-# workload_cluster specfic repositories
-{{ if eq .Environment.Name "workload_cluster" }}
-- name: falcosecurity
-  url: https://falcosecurity.github.io/charts
-- name: gatekeeper
-  url: https://open-policy-agent.github.io/gatekeeper/charts
-{{ end }}
-
-# service_cluster specific repositories
-{{ if eq .Environment.Name "service_cluster" }}
-- name: harbor
-  url: https://helm.goharbor.io
-- name: elastisys
-  url: https://elastisys.github.io/chart-repo
-- name: grafana
-  url: https://grafana.github.io/helm-charts
-{{ end }}
-
 # Defult settings to use with helm.
 helmDefaults:
   timeout: 600
   createNamespace: false
+  skipDeps: true
 
 # Environments
 environments:
@@ -71,7 +37,7 @@ releases:
   namespace: ingress-nginx
   labels:
     app: ingress-nginx
-  chart: ingress-nginx/ingress-nginx
+  chart: upstream/ingress-nginx
   version: 2.10.0
   missingFileHandler: Error
   wait: true
@@ -83,7 +49,7 @@ releases:
   namespace: cert-manager
   labels:
     app: cert-manager
-  chart: jetstack/cert-manager
+  chart: upstream/cert-manager
   version: v1.1.0
   missingFileHandler: Error
   wait: true
@@ -95,7 +61,7 @@ releases:
   namespace: monitoring
   labels:
     app: kube-prometheus-stack
-  chart: prometheus-community/kube-prometheus-stack
+  chart: upstream/kube-prometheus-stack
   version: 12.8.0
   missingFileHandler: Error
   needs:
@@ -113,7 +79,7 @@ releases:
   namespace: velero
   labels:
     app: velero
-  chart: vmware-tanzu/velero
+  chart: upstream/velero
   version: 2.15.0
   installed: {{ .Values.velero.enabled }}
   missingFileHandler: Error
@@ -143,7 +109,7 @@ releases:
   namespace: kube-system
   labels:
     app: metrics-server
-  chart: stable/metrics-server
+  chart: upstream/metrics-server
   version: 2.10.0
   installed: {{ .Values.metricsServer.enabled }}
   missingFileHandler: Error
@@ -182,7 +148,7 @@ releases:
   namespace: dex
   labels:
     app: dex
-  chart: stable/dex
+  chart: upstream/dex
   version: 2.15.2
   missingFileHandler: Error
   wait: true
@@ -253,7 +219,7 @@ releases:
     app: user-grafana
     app.kubernetes.io/instance: user-grafana
     app.kubernetes.io/name: grafana
-  chart: grafana/grafana
+  chart: upstream/grafana
   version: 6.1.11
   installed: {{ .Values.user.grafana.enabled }}
   missingFileHandler: Error
@@ -268,7 +234,7 @@ releases:
   namespace: elastic-system
   labels:
     app: prometheus-elasticsearch-exporter
-  chart: prometheus-community/prometheus-elasticsearch-exporter
+  chart: upstream/prometheus-elasticsearch-exporter
   version: 4.0.1
   missingFileHandler: Error
   needs:
@@ -322,7 +288,7 @@ releases:
   namespace: harbor
   labels:
     app: harbor
-  chart: harbor/harbor
+  chart: upstream/harbor
   version: 1.6.1
   installed: {{ .Values.harbor.enabled }}
   missingFileHandler: Error
@@ -395,7 +361,7 @@ releases:
   namespace: fluentd
   labels:
     app: fluentd
-  chart: bitnami/fluentd
+  chart: upstream/fluentd
   version: 2.4.0
   installed: {{ .Values.fluentd.enabled }}
   missingFileHandler: Error
@@ -453,7 +419,7 @@ releases:
   namespace: falco
   labels:
     app: falco
-  chart: falcosecurity/falco
+  chart: upstream/falco
   version: 1.5.2
   installed: {{ .Values.falco.enabled }}
   missingFileHandler: Error
@@ -465,7 +431,7 @@ releases:
   namespace: falco
   labels:
     app: falco-exporter
-  chart: falcosecurity/falco-exporter
+  chart: upstream/falco-exporter
   version: 0.3.8
   installed: {{ .Values.falco.enabled }}
   missingFileHandler: Error
@@ -501,7 +467,7 @@ releases:
   namespace: kube-system
   labels:
     app: fluentd
-  chart: kokuwa/fluentd-elasticsearch
+  chart: upstream/fluentd-elasticsearch
   version: 10.2.1
   missingFileHandler: Error
   values:
@@ -512,7 +478,7 @@ releases:
   namespace: fluentd
   labels:
     app: fluentd
-  chart: kokuwa/fluentd-elasticsearch
+  chart: upstream/fluentd-elasticsearch
   version: 10.2.1
   missingFileHandler: Error
   values:
@@ -536,7 +502,7 @@ releases:
   namespace: gatekeeper-system
   labels:
     app: gatekeeper
-  chart: gatekeeper/gatekeeper
+  chart: upstream/gatekeeper
   version: 3.3.0
   installed: {{ .Values.opa.enabled }}
   missingFileHandler: Error

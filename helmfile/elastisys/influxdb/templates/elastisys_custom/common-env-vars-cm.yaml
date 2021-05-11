@@ -1,0 +1,13 @@
+{{- if .Values.elastisys_custom.retention.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "influxdb.fullname" . }}-common-env-vars-cm
+data:
+  influxdb-retention-database: | 
+    service_cluster
+    workload_cluster
+  prometheus-influxdb-retention-metric-name: |
+    influxdb_service_cluster_size
+    influxdb_workload_cluster_size
+{{- end }}

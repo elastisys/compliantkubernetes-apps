@@ -1,0 +1,33 @@
+{{- if .Values.backupsEnabled }}
+apiVersion: velero.io/v1
+kind: BackupStorageLocation
+metadata:
+  name: {{ include "velero.backupStorageLocation.name" . }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+  labels:
+    app.kubernetes.io/name: {{ include "velero.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    helm.sh/chart: {{ include "velero.chart" . }}
+spec:
+  provider: {{ include "velero.backupStorageLocation.provider" . }}
+{{- with .Values.configuration.backupStorageLocation }}
+  objectStorage:
+    bucket: {{ .bucket  }}
+    {{- with .prefix }}
+    prefix: {{ . }}
+    {{- end }}
+    {{- with .caCert }}
+    caCert: {{ . }}
+    {{- end }}
+{{- with .config }}
+  config:
+{{ toYaml . | indent 4}}
+{{- if .s3ForcePathStyle }}
+    s3ForcePathStyle: {{ .s3ForcePathStyle | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
