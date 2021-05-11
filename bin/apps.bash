@@ -66,7 +66,17 @@ template_validate_wc() {
 
 apps_sc() {
     apps_init
-    [ "$1" != "--skip-template-validate" ] && template_validate_sc
+    #
+    # The first few Charts install CRDs, which will make template validation
+    # fail. CRDs are "changes" to the Kubernetes API, hence validation against
+    # the Kubernetes API cannot be done. OTOH, manually adding the CRDs during
+    # bootstrap is error-prone and adds maintenance burden.
+    #
+    # While it would be nice to have some template validation before `helmfile apply`,
+    # at least Helmfile does "just in time" template validation. Not as nice,
+    # but feels good enough until we figure out something smarter.
+    #
+    #[ "$1" != "--skip-template-validate" ] && template_validate_sc
     apps_run_sc
 
     log_info "Applications applied successfully!"
@@ -74,7 +84,8 @@ apps_sc() {
 
 apps_wc() {
     apps_init
-    [ "$1" != "--skip-template-validate" ] && template_validate_wc
+    # See rationale above.
+    #[ "$1" != "--skip-template-validate" ] && template_validate_wc
     apps_run_wc
 
     log_info "Applications applied successfully!"
