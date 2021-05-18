@@ -56,7 +56,7 @@ The apps are installed using a combination of helm charts and manifests with the
 * [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.19.8)
 * [helm](https://github.com/helm/helm/releases) (tested with 3.5.2)
 * [helmfile](https://github.com/roboll/helmfile) (tested with v0.138.4)
-* [helm-diff](https://github.com/databus23/helm-diff) (tested with 3.1.1)
+* [helm-diff](https://github.com/databus23/helm-diff) (tested with 3.1.2)
 * [helm-secrets](https://github.com/futuresimple/helm-secrets) (tested with 2.0.2)
 * [jq](https://github.com/stedolan/jq) (tested with jq-1.6)
 * [sops](https://github.com/mozilla/sops) (tested with 3.6.1)
