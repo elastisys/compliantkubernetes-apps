@@ -27,6 +27,8 @@ releases:
   labels:
     app: gatekeeper
   chart: ./upstream/gatekeeper
+  # https://helm.sh/docs/chart_best_practices/custom_resource_definitions/#some-caveats-and-explanations
+  # The --dry-run flag of helm install and helm upgrade is not currently supported for CRDs.
   disableValidationOnInstall: true
   version: 3.3.0
   installed: {{ .Values.opa.enabled }}
