@@ -1,0 +1,11 @@
+- command: update
+  path: dex.connectors
+  value:
+    - config:
+        clientID: ""
+        clientSecret: ""
+        issuer: ""
+        redirectURI: ""
+      id: ""
+      name: ""
+      type: oidc
