@@ -214,6 +214,19 @@ grafana:
   grafana.ini:
     server:
       root_url: https://grafana.{{ .Values.global.opsDomain }}
+    auth.generic_oauth:
+      name: dex
+      enabled: {{ .Values.prometheus.grafana.oidc.enabled }}
+      client_id: grafana-ops
+      client_secret: {{ .Values.grafana.opsClientSecret }}
+      scopes: {{ .Values.prometheus.grafana.oidc.scopes }}
+      auth_url: https://dex.{{ .Values.global.baseDomain }}/auth
+      token_url: https://dex.{{ .Values.global.baseDomain }}/token
+      api_url: https://dex.{{ .Values.global.baseDomain }}/api
+      allowed_domains: {{ join " " .Values.prometheus.grafana.oidc.allowedDomains }}
+      allow_sign_up: true
+      tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}
+      role_attribute_path: contains(groups[*], '{{ .Values.prometheus.grafana.oidc.userGroups.grafanaAdmin }}') && 'Admin' || contains(groups[*], '{{ .Values.prometheus.grafana.oidc.userGroups.grafanaEditor }}') && 'Editor' || contains(groups[*], '{{ .Values.prometheus.grafana.oidc.userGroups.grafanaViewer }}') && 'Viewer'
 
   serviceMonitor:
     relabelings:

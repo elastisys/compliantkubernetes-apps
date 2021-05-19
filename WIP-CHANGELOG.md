@@ -7,6 +7,7 @@
 
 - A new helm chart `starboard-operator`, which creates `vulnerabilityreports` with information about image vulnerabilities.
 - Dashboard in Grafana showcasing image vulnerabilities.
+- Added option to enable dex integration for ops grafana
 
 ### Changed
 

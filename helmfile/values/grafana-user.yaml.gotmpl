@@ -73,7 +73,7 @@ grafana.ini:
     allowed_domains: {{ join " " .Values.user.grafana.oidc.allowedDomains }}
     allow_sign_up: true
     tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}
-    role_attribute_path: contains(groups[*], {{ .Values.user.grafana.userGroups.grafanaAdmin }}) && 'Admin' || contains(groups[*], {{ .Values.user.grafana.userGroups.grafanaEditor }}) && 'Editor' || contains(groups[*], {{ .Values.user.grafana.userGroups.grafanaViewer }}) && 'Viewer'
+    role_attribute_path: contains(groups[*], '{{ .Values.user.grafana.userGroups.grafanaAdmin }}') && 'Admin' || contains(groups[*], '{{ .Values.user.grafana.userGroups.grafanaEditor }}') && 'Editor' || contains(groups[*], '{{ .Values.user.grafana.userGroups.grafanaViewer }}') && 'Viewer'
 
 # Velero backup
 

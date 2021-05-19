@@ -194,6 +194,16 @@ prometheus:
     tolerations: []
     affinity: {}
     nodeSelector: {}
+  grafana:
+    oidc:
+      enabled: true
+      userGroups:
+        grafanaAdmin: grafana_admin #maps to grafana role admin
+        grafanaEditor: grafana_editor #maps to grafana role editor
+        grafanaViewer: grafana_viewer #maps to grafana role viewer
+      scopes: "openid profile email groups"
+      allowedDomains:
+        - example.com
 
 dex:
   additionalKubeloginRedirects: []
