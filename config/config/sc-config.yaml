@@ -61,6 +61,10 @@ user:
       grafanaAdmin: grafana_admin #maps to grafana role admin
       grafanaEditor: grafana_editor #maps to grafana role editor
       grafanaViewer: grafana_viewer #maps to grafana role viewer
+    oidc:
+      scopes: "profile email openid"
+      allowedDomains:
+        - example.com
   # Todo remove dependencie on alertmanager from service cluster
   alertmanager:
     enabled: false
@@ -192,10 +196,6 @@ prometheus:
     nodeSelector: {}
 
 dex:
-  # supported: google|okta|aaa
-  oidcProvider: google
-  allowedDomains:
-    - example.com
   additionalKubeloginRedirects: []
   enableStaticLogin: true
   resources:
@@ -208,11 +208,15 @@ dex:
   tolerations: []
   affinity: {}
   nodeSelector: {}
-  # These two settings are curently only used by okta. If you don't need the groups claims, both options can be set to 'false'.
-  # 'insecureSkipEmailVerified' should only be set to 'true' if the user's okta
-  # configuration does not require a user to verify their identity to okta when their okta account is being created. This is not recommended.
-  insecureSkipEmailVerified: false
-  insecureEnableGroups: true
+  google:
+    # Enables extra config needed to enable google connector to fetch group info.
+    # When this is enabled the SASecretName needs to be set.
+    groupSupport: false
+    # Name of the secret that includes the key file for the service account that is used for fetching group info.
+    # The secret will be mounted to the folder /etc/dex/google/ this means that multiple files from the same secret can be used.
+    # Simply add `serviceAccountFilePath: /etc/dex/google/secret-key` for each google connector.
+    # For more details, see https://elastisys.com/elastisys-engineering-how-to-use-dex-with-google-accounts-to-manage-access-in-kubernetes/
+    # SASecretName: "set-me"
 
 kibana:
   # Note sso is enabled via `elasticsearch.sso.enabled`
