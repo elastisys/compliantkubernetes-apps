@@ -24,46 +24,7 @@ https: false
 config:
   issuer: https://dex.{{ .Values.global.baseDomain }}
   connectors:
-  {{ if eq .Values.dex.oidcProvider "google" }}
-  - type: oidc
-    id: google
-    name: Google
-    config:
-      issuer: https://accounts.google.com
-      redirectURI: https://dex.{{ .Values.global.baseDomain }}/callback
-      clientID: {{ .Values.dex.googleClientID }}
-      clientSecret: {{ .Values.dex.googleClientSecret }}
-      hostedDomains: {{ toYaml .Values.dex.allowedDomains | nindent 6 }}
-  {{ end }}
-  {{ if eq .Values.dex.oidcProvider "okta" }}
-  - type: oidc
-    id: okta
-    name: Okta
-    config:
-      issuer: https://{{ .Values.dex.issuer }}
-      redirectURI: https://dex.{{ .Values.global.baseDomain }}/callback
-      clientID: {{ .Values.dex.oktaClientID }}
-      clientSecret: {{ .Values.dex.oktaClientSecret }}
-      insecureSkipEmailVerified: {{ .Values.dex.insecureSkipEmailVerified }}
-      insecureEnableGroups: {{ .Values.dex.insecureEnableGroups }}
-      scopes:
-        - openid
-        - profile
-        - email
-        - groups
-      getUserInfo: true
-  {{ end }}
-  {{ if eq .Values.dex.oidcProvider "aaa" }}
-  - name: AAA
-    id: aaa
-    type: oidc
-    config:
-      clientID: {{ .Values.dex.aaaClientID }}
-      clientSecret: {{ .Values.dex.aaaClientSecret }}
-      issuer: https://asmp-test.a1.net/oauth2
-      redirectURI: https://dex.{{.Values.global.baseDomain }}/callback
-      insecureSkipEmailVerified: true
-  {{ end }}
+  {{- toYaml .Values.dex.connectors | nindent 4 }}
   staticClients:
     - id: kubelogin
       name: 'Kubernetes CLI'

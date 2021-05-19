@@ -192,10 +192,6 @@ prometheus:
     nodeSelector: {}
 
 dex:
-  # supported: google|okta|aaa
-  oidcProvider: google
-  allowedDomains:
-    - example.com
   additionalKubeloginRedirects: []
   enableStaticLogin: true
   resources:
@@ -208,11 +204,6 @@ dex:
   tolerations: []
   affinity: {}
   nodeSelector: {}
-  # These two settings are curently only used by okta. If you don't need the groups claims, both options can be set to 'false'.
-  # 'insecureSkipEmailVerified' should only be set to 'true' if the user's okta
-  # configuration does not require a user to verify their identity to okta when their okta account is being created. This is not recommended.
-  insecureSkipEmailVerified: false
-  insecureEnableGroups: true
 
 kibana:
   # Note sso is enabled via `elasticsearch.sso.enabled`
