@@ -152,6 +152,7 @@ harbor:
   oidc:
     #group claim name used by OIDC Provider
     groupClaimName: not-used
+    adminGroupName: ""
     scope: openid,email,profile,offline_access,groups
   backup:
     enabled: true

@@ -153,8 +153,11 @@ harbor:
     type: "set-me"
     disableRedirect: set-me
   oidc:
-    #group claim name used by OIDC Provider
+    # group claim name used by OIDC Provider
     groupClaimName: "set-me"
+    # Name of the group that autmatically will get admin
+    # Set to "" to disable
+    adminGroupName: "set-me"
     scope: openid,email,profile,offline_access,groups
   backup:
     enabled: true

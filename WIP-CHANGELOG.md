@@ -9,6 +9,7 @@
 - Dashboard in Grafana showcasing image vulnerabilities.
 - Added option to enable dex integration for ops grafana
 - Added resource request/limits for ops grafana
+- Added support for admin group for harbor
 
 ### Changed
 

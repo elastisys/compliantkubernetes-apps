@@ -4,4 +4,5 @@ oidc:
   endpoint: "https://dex.{{ .Values.global.baseDomain }}"
   verifyCert: {{ .Values.global.verifyTls }}
   groupClaimName: {{ .Values.harbor.oidc.groupClaimName }}
+  adminGroupName: {{ .Values.harbor.oidc.adminGroupName }}
   scope: {{ .Values.harbor.oidc.scope }}
