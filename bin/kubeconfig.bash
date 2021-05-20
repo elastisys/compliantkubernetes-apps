@@ -93,7 +93,8 @@ kubectl --kubeconfig="${user_kubeconfig}" config set-credentials "${1}@${cluster
     --exec-arg=--oidc-issuer-url="https://dex.${base_domain}" \
     --exec-arg=--oidc-client-id=kubelogin \
     --exec-arg=--oidc-client-secret="$(sops -d --extract '["dex"]["kubeloginClientSecret"]' "${secrets[secrets_file]}")" \
-    --exec-arg=--oidc-extra-scope=email
+    --exec-arg=--oidc-extra-scope=email \
+    --exec-arg=--oidc-extra-scope=groups
 
 # Create context with relavant namespace
 # Pick the first namespace

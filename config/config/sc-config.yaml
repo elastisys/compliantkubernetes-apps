@@ -208,6 +208,15 @@ dex:
   tolerations: []
   affinity: {}
   nodeSelector: {}
+  google:
+    # Enables extra config needed to enable google connector to fetch group info.
+    # When this is enabled the SASecretName needs to be set.
+    groupSupport: false
+    # Name of the secret that includes the key file for the service account that is used for fetching group info.
+    # The secret will be mounted to the folder /etc/dex/google/ this means that multiple files from the same secret can be used.
+    # Simply add `serviceAccountFilePath: /etc/dex/google/secret-key` for each google connector.
+    # For more details, see https://elastisys.com/elastisys-engineering-how-to-use-dex-with-google-accounts-to-manage-access-in-kubernetes/
+    # SASecretName: "set-me"
 
 kibana:
   # Note sso is enabled via `elasticsearch.sso.enabled`

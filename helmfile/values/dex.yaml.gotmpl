@@ -21,6 +21,16 @@ ingress:
 # https termination by ingress instead of through dex
 https: false
 
+{{- if .Values.dex.google.groupSupport }}
+extraVolumeMounts:
+- mountPath: /etc/dex/google
+  name: google-sa
+extraVolumes:
+- name: google-sa
+  secret:
+      secretName: {{ .Values.dex.google.SASecretName }}
+{{- end }}
+
 config:
   issuer: https://dex.{{ .Values.global.baseDomain }}
   connectors:
