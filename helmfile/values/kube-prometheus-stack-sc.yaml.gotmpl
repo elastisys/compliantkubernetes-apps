@@ -214,6 +214,7 @@ grafana:
   grafana.ini:
     server:
       root_url: https://grafana.{{ .Values.global.opsDomain }}
+    {{ if .Values.prometheus.grafana.oidc.enabled -}}
     auth.generic_oauth:
       name: dex
       enabled: {{ .Values.prometheus.grafana.oidc.enabled }}
@@ -227,11 +228,16 @@ grafana:
       allow_sign_up: true
       tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}
       role_attribute_path: contains(groups[*], '{{ .Values.prometheus.grafana.oidc.userGroups.grafanaAdmin }}') && 'Admin' || contains(groups[*], '{{ .Values.prometheus.grafana.oidc.userGroups.grafanaEditor }}') && 'Editor' || contains(groups[*], '{{ .Values.prometheus.grafana.oidc.userGroups.grafanaViewer }}') && 'Viewer'
+      {{- end }}
 
   serviceMonitor:
     relabelings:
     - targetLabel: cluster
       replacement: service_cluster
+  resources: {{- toYaml .Values.prometheus.grafana.resources | nindent 4  }}
+  tolerations: {{- toYaml .Values.prometheus.grafana.tolerations | nindent 4  }}
+  affinity: {{- toYaml .Values.prometheus.grafana.affinity | nindent 4  }}
+  nodeSelector: {{- toYaml .Values.prometheus.grafana.nodeSelector | nindent 4  }}
 
 prometheusOperator:
   createCustomResource: false

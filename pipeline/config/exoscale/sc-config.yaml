@@ -188,6 +188,16 @@ prometheus:
     tolerations: []
     affinity: {}
     nodeSelector: {}
+  grafana:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    oidc:
+      enabled: false
 dex:
   additionalKubeloginRedirects: []
   enableStaticLogin: true

@@ -195,15 +195,25 @@ prometheus:
     affinity: {}
     nodeSelector: {}
   grafana:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    tolerations: []
+    affinity: {}
+    nodeSelector: {}
     oidc:
-      enabled: true
-      userGroups:
-        grafanaAdmin: grafana_admin #maps to grafana role admin
-        grafanaEditor: grafana_editor #maps to grafana role editor
-        grafanaViewer: grafana_viewer #maps to grafana role viewer
-      scopes: "openid profile email groups"
-      allowedDomains:
-        - example.com
+      enabled: false
+      # Only used if the above is true
+      # userGroups:
+      #   grafanaAdmin: grafana_admin #maps to grafana role admin
+      #   grafanaEditor: grafana_editor #maps to grafana role editor
+      #   grafanaViewer: grafana_viewer #maps to grafana role viewer
+      # scopes: "openid profile email groups"
+      # allowedDomains: []
 
 dex:
   additionalKubeloginRedirects: []
