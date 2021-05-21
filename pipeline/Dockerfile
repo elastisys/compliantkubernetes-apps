@@ -34,7 +34,7 @@ RUN wget "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz" && \
 # TODO Change when this is closed https://github.com/helm/helm/issues/7919
 # Should come with v3.3.0, see https://github.com/helm/helm/pull/7983
 ENV XDG_DATA_HOME=/root/.config
-RUN helm plugin install https://github.com/databus23/helm-diff --version v3.1.1
+RUN helm plugin install https://github.com/databus23/helm-diff --version v3.1.2
 RUN helm plugin install https://github.com/futuresimple/helm-secrets --version v2.0.2
 
 # Helmfile
