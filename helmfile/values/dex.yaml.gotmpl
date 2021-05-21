@@ -1,8 +1,10 @@
 imageTag: "v2.26.0"
 
-#crds are installed in the k8s apply step
 crd:
-  present: true
+  present: false
+
+rbac:
+  create: true
 
 ingress:
   enabled: true
