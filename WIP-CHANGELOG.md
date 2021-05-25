@@ -17,6 +17,7 @@
 - Changed the way connectors are provided to dex
 - Default retention values for other* and authlog* are changed to fit the needs better
 - CK8S version validation accepts version number if exactly at the release tag, otherwise commit hash of current commit. "any" can still be used to disable validation.
+- The node-local-dns chart have been updated to match the upstream manifest. force_tcp have been removed to improve performence and the container image have beve been updated from 1.15.10 to 1.17.0.
 
 ### Fixed
 
