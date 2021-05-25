@@ -16,6 +16,7 @@
 - The project now requires `helm-diff >= 3.1.2`. Remove the old one (via `rm -rf ~/.local/share/helm/plugins/helm-diff/`), before reinstalling dependencies.
 - Changed the way connectors are provided to dex
 - Default retention values for other* and authlog* are changed to fit the needs better
+- CK8S version validation accepts version number if exactly at the release tag, otherwise commit hash of current commit. "any" can still be used to disable validation.
 
 ### Fixed
 
