@@ -69,7 +69,7 @@ log_error() {
 
 version_get() {
     pushd "${root_path}" > /dev/null || exit 1
-    git describe --tags --abbrev=0 HEAD | sed 's/^v//'
+    git describe --exact-match --tags 2> /dev/null || git rev-parse HEAD
     popd > /dev/null || exit 1
 }
 

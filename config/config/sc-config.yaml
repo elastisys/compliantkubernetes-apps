@@ -1,4 +1,8 @@
 global:
+  ## Compliantkubernetes-apps version.
+  ## Use version number if you are exactly at a release tag.
+  ## Otherwise use full commit hash of current commit.
+  ## 'any', can be used to disable this validation.
   ck8sVersion: ${CK8S_VERSION}
   cloudProvider: ${CK8S_CLOUD_PROVIDER}
   clusterName: ${CK8S_ENVIRONMENT_NAME}-sc
