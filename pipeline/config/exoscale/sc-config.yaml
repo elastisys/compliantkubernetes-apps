@@ -197,6 +197,9 @@ prometheus:
       limits:
         cpu: 100m
         memory: 128Mi
+    tolerations: []
+    affinity: {}
+    nodeSelector: {}
     oidc:
       enabled: false
 dex:
