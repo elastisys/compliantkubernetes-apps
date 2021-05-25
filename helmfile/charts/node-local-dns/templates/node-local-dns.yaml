@@ -52,9 +52,6 @@ metadata:
 data:
   Corefile: |
     cluster.local:53 {
-        log {
-          class error
-        }
         errors
         cache {
                 success 9984 30
@@ -70,9 +67,6 @@ data:
         health {{ .Values.localIP }}:8080
         }
     in-addr.arpa:53 {
-        log {
-          class error
-        }
         errors
         cache 30
         reload
@@ -84,9 +78,6 @@ data:
         prometheus :9253
         }
     ip6.arpa:53 {
-        log {
-          class error
-        }
         errors
         cache 30
         reload
@@ -98,17 +89,12 @@ data:
         prometheus :9253
         }
     .:53 {
-        log {
-          class error
-        }
         errors
         cache 30
         reload
         loop
         bind {{ .Values.localIP }} {{ .Values.clusterDNS }}
-        forward . __PILLAR__UPSTREAM__SERVERS__ {
-                force_tcp
-        }
+        forward . __PILLAR__UPSTREAM__SERVERS__
         prometheus :9253
         }
 ---
@@ -131,16 +117,24 @@ spec:
     metadata:
        labels:
           k8s-app: node-local-dns
+       annotations:
+        prometheus.io/port: "9253"
+        prometheus.io/scrape: "true"
     spec:
       priorityClassName: system-node-critical
       serviceAccountName: node-local-dns
       hostNetwork: true
       dnsPolicy: Default  # Don't use cluster DNS.
       tolerations:
-      - operator: Exists
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
+      - effect: "NoExecute"
+        operator: "Exists"
+      - effect: "NoSchedule"
+        operator: "Exists"
       containers:
       - name: node-cache
-        image: k8s.gcr.io/k8s-dns-node-cache:1.15.10
+        image: k8s.gcr.io/dns/k8s-dns-node-cache:1.17.0
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
         args: [ "-localip", "{{ .Values.localIP }},{{ .Values.clusterDNS }}", "-conf", "/etc/Corefile", "-upstreamsvc", "kube-dns-upstream"]
@@ -186,3 +180,23 @@ spec:
           items:
             - key: Corefile
               path: Corefile.base
+---
+# A headless service is a service with a service IP but instead of load-balancing it will return the IPs of our associated Pods.
+# We use this to expose metrics to Prometheus.
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "9253"
+    prometheus.io/scrape: "true"
+  labels:
+    k8s-app: node-local-dns
+  name: node-local-dns
+spec:
+  clusterIP: None
+  ports:
+    - name: metrics
+      port: 9253
+      targetPort: 9253
+  selector:
+    k8s-app: node-local-dns
