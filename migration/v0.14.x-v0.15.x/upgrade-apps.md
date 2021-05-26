@@ -9,8 +9,6 @@
 
 1. Delete `restore.*` from `sc-config.yaml`.
 
-1. Set `monitoring.rook.enabled` to `false` in both `sc-config.yaml` and `wc-config.yaml` if you don't want or need to monitor Rook.
-
 1. Upgrade applications:
     ```bash
     ./bin/ck8s apply {sc|wc}
