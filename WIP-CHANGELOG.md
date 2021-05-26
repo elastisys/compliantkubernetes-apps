@@ -20,6 +20,7 @@
 - Configuration option `dex.additionalStaticClients` in `secrets.yaml` can now be used to define additional static clients for Dex.
 - ck8s providers command
 - ck8s flavors command
+- Added script to make it easier to generate secrets
 
 ### Removed
 

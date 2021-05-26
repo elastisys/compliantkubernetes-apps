@@ -136,6 +136,7 @@ Assuming you already have everything needed to install the apps, this is what yo
    Make sure that the `objectStorage` values are set in `sc-config.yaml`, `wc-config.yaml` and `secrets.yaml` according to your `objectStorage.type`.
    Set `objectStorage.s3.*` if you are using S3 or `objectStorage.gcs.*` if you are using GCS.
 
+   > TIP: If you want to generate random passwords for all services, you can run the script `scripts/generate-secrets.sh`
 
 1. Create S3 buckets - optional
    If you have set `objectStorage.type: s3`, then you need to create the buckets specified under `objectStorage.buckets` in your configuration files.
