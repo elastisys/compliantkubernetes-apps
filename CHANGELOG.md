@@ -1,5 +1,6 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.16.0](#v0160---2021-05-27)
 - [v0.15.0](#v0150---2021-05-05)
 - [v0.14.0](#v0140---2021-04-20)
 - [v0.13.0](#v0130---2021-04-06)
@@ -12,6 +13,36 @@
 - [v0.6.0](#v060---2020-10-16)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.16.0 - 2021-05-27
+
+### Release notes
+
+- Support for multiple connectors for dex and better support for OIDC groups.
+- Check out the [upgrade guide](migration/v0.15.x-v0.16.x/upgrade-apps.md) for a complete set of instructions needed to upgrade.
+
+### Added
+
+- A new helm chart `starboard-operator`, which creates `vulnerabilityreports` with information about image vulnerabilities.
+- Dashboard in Grafana showcasing image vulnerabilities.
+- Added option to enable dex integration for ops grafana
+- Added resource request/limits for ops grafana
+- Added support for admin group for harbor
+- Rook monitoring (ServiceMonitor and PrometheusRules) and dashboards.
+
+### Changed
+
+- The project now requires `helm-diff >= 3.1.2`. Remove the old one (via `rm -rf ~/.local/share/helm/plugins/helm-diff/`), before reinstalling dependencies.
+- Changed the way connectors are provided to dex
+- Default retention values for other* and authlog* are changed to fit the needs better
+- CK8S version validation accepts version number if exactly at the release tag, otherwise commit hash of current commit. "any" can still be used to disable validation.
+- The node-local-dns chart have been updated to match the upstream manifest. force_tcp have been removed to improve performence and the container image have beve been updated from 1.15.10 to 1.17.0.
+
+### Fixed
+
+- Fixed issue where you couldn't configure dex google connector to support groups
+- Fixed issue where groups wouldn't be fetched for kubelogin
 
 -------------------------------------------------
 ## v0.15.0 - 2021-05-05
