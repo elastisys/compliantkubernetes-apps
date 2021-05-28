@@ -115,7 +115,7 @@ releases:
   labels:
     app: starboard-operator
   chart: ./upstream/starboard-operator
-  version: 0.5.3
+  version: 0.5.1
   missingFileHandler: Error
   values:
   - values/starboard-operator.yaml.gotmpl
