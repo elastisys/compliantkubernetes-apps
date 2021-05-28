@@ -150,6 +150,9 @@ grafana:
   # admin username is "admin"
   adminPassword: {{ .Values.grafana.password }}
 
+  deploymentStrategy:
+    type: Recreate
+
   ingress:
     enabled: true
     annotations:
