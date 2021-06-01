@@ -44,6 +44,7 @@
 - Fixed issue where you couldn't configure dex google connector to support groups
 - Fixed issue where groups wouldn't be fetched for kubelogin
 - Fixed issue where grafana would get stuck on upgrade
+- Rook monitor for the alertmanagers is no longer hard-coded to true.
 
 -------------------------------------------------
 ## v0.15.0 - 2021-05-05
