@@ -18,4 +18,7 @@ defaultRules:
     alertmanager: {{ .Values.user.alertmanager.enabled }}
     # Rook is handeled by the cluster operators. Users would normally not care
     # about these alerts, but we have no other way of gathering them currently.
-    rookMonitor: true
+    rookMonitor: {{ .Values.monitoring.rook.enabled }}
+
+rookMonitor:
+  enabled: {{ .Values.monitoring.rook.enabled }}
