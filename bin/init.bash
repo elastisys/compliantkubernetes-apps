@@ -75,9 +75,6 @@ generate_base_sc_config() {
     append_trap "rm $tmpfile" EXIT
 
     envsubst > "$tmpfile" < "${config_defaults_path}/config/sc-config.yaml"
-    if [[ ${CK8S_CLOUD_PROVIDER} == "citycloud" ]]; then
-        yq merge --inplace "$tmpfile" "${config_defaults_path}/config/citycloud.yaml"
-    fi
     yq merge --inplace --overwrite "$tmpfile" "${config_defaults_path}/config/flavors/${CK8S_FLAVOR}-sc.yaml"
     if [[ -f $file ]]; then
         yq merge "$tmpfile" "$file" --inplace -a=overwrite --overwrite --prettyPrint
@@ -259,6 +256,25 @@ set_harbor_config() {
         citycloud)
           persistence_type=swift
           disable_redirect=true
+
+          [ -z "$(yq read "$file" 'harbor.persistence.swift.identityApiVersion')" ] &&
+            yq write --inplace "$file" 'harbor.persistence.swift.identityApiVersion' 3
+          [ -z "$(yq read "$file" 'harbor.persistence.swift.authURL')" ] &&
+            yq write --inplace "$file" 'harbor.persistence.swift.authURL' "set-me"
+          [ -z "$(yq read "$file" 'harbor.persistence.swift.regionName')" ] &&
+            yq write --inplace "$file" 'harbor.persistence.swift.regionName' "set-me"
+          [ -z "$(yq read "$file" 'harbor.persistence.swift.projectDomainName')" ] &&
+            yq write --inplace "$file" 'harbor.persistence.swift.projectDomainName' "set-me"
+          [ -z "$(yq read "$file" 'harbor.persistence.swift.userDomainName')" ] &&
+            yq write --inplace "$file" 'harbor.persistence.swift.userDomainName' "set-me"
+          [ -z "$(yq read "$file" 'harbor.persistence.swift.projectName')" ] &&
+            yq write --inplace "$file" 'harbor.persistence.swift.projectName' "set-me"
+          [ -z "$(yq read "$file" 'harbor.persistence.swift.projectID')" ] &&
+            yq write --inplace "$file" 'harbor.persistence.swift.projectID' "set-me"
+          [ -z "$(yq read "$file" 'harbor.persistence.swift.tenantName')" ] &&
+            yq write --inplace "$file" 'harbor.persistence.swift.tenantName' "set-me"
+          [ -z "$(yq read "$file" 'harbor.persistence.swift.authVersion')" ] &&
+            yq write --inplace "$file" 'harbor.persistence.swift.authVersion' 3
           ;;
 
         baremetal)
@@ -283,12 +299,6 @@ generate_secrets() {
 
     cat "${config_defaults_path}/secrets/sc-secrets.yaml" > "$tmpfile"
     yq merge --inplace "$tmpfile" "${config_defaults_path}/secrets/wc-secrets.yaml"
-    case ${CK8S_CLOUD_PROVIDER} in
-        citycloud)
-          cloud_file="${config_defaults_path}/secrets/citycloud.yaml"
-          yq merge --inplace "$tmpfile" "$cloud_file"
-          ;;
-    esac
     if [[ -f $file ]]; then
         sops_decrypt "$file"
         yq merge "$tmpfile" "$file" --inplace -a=overwrite --overwrite --prettyPrint
@@ -332,8 +342,6 @@ fi
 generate_base_wc_config  "${config[config_file_wc]}"
 set_storage_class        "${config[config_file_wc]}"
 set_nginx_config         "${config[config_file_wc]}"
-set_elasticsearch_config "${config[config_file_wc]}"
-set_harbor_config        "${config[config_file_wc]}"
 
 if [ -f "${secrets[secrets_file]}" ]; then
     log_info "${secrets[secrets_file]} already exists, merging with existing secrets"

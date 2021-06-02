@@ -46,14 +46,14 @@ persistence:
     {{ else if eq .Values.harbor.persistence.type "swift" }}
     type: swift
     swift:
-      authurl: {{ .Values.citycloud.authURL }}/v3
-      username: {{ .Values.citycloud.username }}
-      password: {{ .Values.citycloud.password }}
+      authurl: {{ .Values.harbor.persistence.swift.authURL }}/v3
+      username: {{ .Values.harbor.persistence.swift.username }}
+      password: {{ .Values.harbor.persistence.swift.password }}
       container: {{ .Values.objectStorage.buckets.harbor }}
-      region: {{ .Values.citycloud.regionName }}
-      authversion: {{ .Values.citycloud.authVersion }}
-      tenant: {{ .Values.citycloud.tenantName }}
-      domain: {{ .Values.citycloud.projectDomainName }}
+      region: {{ .Values.harbor.persistence.swift.regionName }}
+      authversion: {{ .Values.harbor.persistence.swift.authVersion }}
+      tenant: {{ .Values.harbor.persistence.swift.tenantName }}
+      domain: {{ .Values.harbor.persistence.swift.projectDomainName }}
     {{ else if eq .Values.harbor.persistence.type "objectStorage" }}
     {{ if eq .Values.objectStorage.type "s3" }}
     type: s3
