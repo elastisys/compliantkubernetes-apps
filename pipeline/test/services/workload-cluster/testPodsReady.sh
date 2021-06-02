@@ -32,7 +32,7 @@ deployments=(
     "monitoring kube-prometheus-stack-kube-state-metrics"
 )
 if "${enable_nfs_provisioner}"; then
-    deployments+=("kube-system nfs-client-provisioner")
+    deployments+=("kube-system nfs-subdir-external-provisioner")
 fi
 if "${enable_opa}"; then
     deployments+=("gatekeeper-system gatekeeper-controller-manager")

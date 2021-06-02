@@ -42,7 +42,7 @@ if "${enable_es_client_deploy}"; then
     deployments+=("elastic-system opendistro-es-client")
 fi
 if "${enable_nfs_provisioner}"; then
-    deployments+=("kube-system nfs-client-provisioner")
+    deployments+=("kube-system nfs-subdir-external-provisioner")
 fi
 if "${enable_harbor}"; then
     deployments+=(

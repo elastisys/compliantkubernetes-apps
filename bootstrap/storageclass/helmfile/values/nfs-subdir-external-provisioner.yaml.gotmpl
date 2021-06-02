@@ -11,7 +11,7 @@ storageClass:
   {{ end }}
 
 serviceAccount:
-  name: nfs-client-provisioner
+  name: nfs-subdir-external-provisioner
 
 nfs:
   path: {{ .Values.nfsProvisioner.path }}

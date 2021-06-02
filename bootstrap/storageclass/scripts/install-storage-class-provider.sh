@@ -4,9 +4,12 @@ install_storage_class_provider() {
     : "${storageclass_path:?Missing storageclass path}"
     case "${1}" in
     "nfs-client")
-        echo "Install nfs-client-provisioner" >&2
+        echo "Install nfs-subdir-external-provisioner" >&2
+        # TODO Remove this when we removed this chart from the helmfile
         helmfile -f "${storageclass_path}/helmfile/helmfile.yaml" \
             -e "${2}" -l app=nfs-client-provisioner apply --suppress-diff
+        helmfile -f "${storageclass_path}/helmfile/helmfile.yaml" \
+            -e "${2}" -l app=nfs-subdir-external-provisioner apply --suppress-diff
     ;;
     "local-storage")
         echo "Install local-storage storage class" >&2

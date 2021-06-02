@@ -24,5 +24,5 @@ roleRef:
   name: nfs-provisioner-privileged
 subjects:
 - kind: ServiceAccount
-  name: nfs-client-provisioner
+  name: nfs-subdir-external-provisioner
   namespace: kube-system
