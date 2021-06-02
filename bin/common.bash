@@ -162,20 +162,12 @@ validate_config() {
         validate "${config[config_file_sc]}" "${config_defaults_path}/config/sc-config.yaml"
 
         validate "${secrets[secrets_file]}" "${config_defaults_path}/secrets/sc-secrets.yaml"
-
-        if [[ $CLOUD_PROVIDER == "citycloud" ]]; then
-            validate "${config[config_file_sc]}" "${config_defaults_path}/config/citycloud.yaml"
-        fi
     elif [[ $1 == "wc" ]]; then
         validate "${config[config_file_wc]}" "${config_defaults_path}/config/wc-config.yaml"
         validate "${secrets[secrets_file]}" "${config_defaults_path}/secrets/wc-secrets.yaml"
     else
         log_error "Error: usage validate_config <sc|wc>"
         exit 1
-    fi
-
-    if [[ $CLOUD_PROVIDER == "citycloud" ]]; then
-        validate "${secrets[secrets_file]}" "${config_defaults_path}/secrets/citycloud.yaml"
     fi
 
 }
