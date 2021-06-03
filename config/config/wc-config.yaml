@@ -25,10 +25,6 @@ global:
   ## 'any', can be used to disable this validation.
   ck8sVersion: ${CK8S_VERSION}
 
-  ## Where the cluster is running.
-  ## Supported: exoscale, safespring, citycloud, aws, baremetal
-  cloudProvider: ${CK8S_CLOUD_PROVIDER}
-
   ## The cluster name.
   ## Used in logs and metrics as to separate these from other clusters.
   clusterName: ${CK8S_ENVIRONMENT_NAME}-wc

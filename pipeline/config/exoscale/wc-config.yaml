@@ -22,9 +22,6 @@ global:
   ## Compliantkubernetes-apps version.
   ## 'any', can be used when running on non-official release.
   ck8sVersion: any
-  ## Where the cluster is running.
-  ## Supported: exoscale, safespring, citycloud, aws, baremetal
-  cloudProvider: exoscale
   ## The cluster name.
   ## Used in logs and metrics as to separate these from other clusters.
   clusterName: pipeline-exoscale-wc

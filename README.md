@@ -44,7 +44,6 @@ See [Quickstart](#Quickstart) for instructions on how to initialize the repo
 ### Cloud providers
 
 Currently we support four cloud providers: Exoscale, Safespring, Citycloud and AWS (beta). In addition to this we support running Compliant Kubernetes on bare metal (beta).
-Which provider to use is controlled by the value `global.cloudProvider` in the config files.
 
 ## Setup
 

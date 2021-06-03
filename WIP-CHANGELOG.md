@@ -16,3 +16,7 @@
 ### Added
 
 - Option to set cluster admin groups
+
+### Removed
+
+- The configuration option `global.cloudProvider` is no longer needed.

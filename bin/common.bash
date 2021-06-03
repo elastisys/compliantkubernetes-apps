@@ -197,19 +197,7 @@ validate_sops_config() {
 
 # Load and validate all configuration options from the config path.
 config_load() {
-    if [[ "${1}" == "sc" ]]; then
-        CLOUD_PROVIDER=$(yq r -e "${config[config_file_sc]}" 'global.cloudProvider')
-        export CLOUD_PROVIDER
-    elif [[ "${1}" == "wc" ]]; then
-        CLOUD_PROVIDER=$(yq r -e "${config[config_file_wc]}" 'global.cloudProvider')
-        export CLOUD_PROVIDER
-    else
-      echo log_error "Error: usage config_load <wc|sc>"
-      exit 1
-    fi
-
     validate_version "$1"
-    validate_cloud "${CLOUD_PROVIDER}"
     validate_config "$1"
     validate_sops_config
 }
