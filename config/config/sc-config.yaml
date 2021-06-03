@@ -4,7 +4,6 @@ global:
   ## Otherwise use full commit hash of current commit.
   ## 'any', can be used to disable this validation.
   ck8sVersion: ${CK8S_VERSION}
-  cloudProvider: ${CK8S_CLOUD_PROVIDER}
   clusterName: ${CK8S_ENVIRONMENT_NAME}-sc
   baseDomain: "set-me"
   opsDomain: "set-me"
