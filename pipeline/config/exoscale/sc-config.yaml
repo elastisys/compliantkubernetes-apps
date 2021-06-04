@@ -6,7 +6,7 @@ global:
   opsDomain: ops.pipeline-exoscale.elastisys.se
   issuer: letsencrypt-staging
   verifyTls: false
-  clusterDns: 10.43.0.10
+  clusterDns: 10.233.0.3
 storageClasses:
   # Name of the default storageclass.
   # Normally one of 'nfs-client', 'cinder-storage', 'local-storage', 'ebs-gp2'.
