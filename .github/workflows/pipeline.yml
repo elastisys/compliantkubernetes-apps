@@ -40,7 +40,7 @@ jobs:
     - name: Run unit tests for OPA policies
       uses: ./pipeline
       with:
-        args: ./pipeline/test/services/unit-tests/test-opa.sh
+        args: ./pipeline/test-opa.bash
     - name: Run linters
       uses: ./pipeline
       with:
