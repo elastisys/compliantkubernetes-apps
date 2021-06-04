@@ -347,7 +347,8 @@ metricsServer:
 calicoAccountant:
   enabled: true
 clusterAdmin:
-  admins: []
+  users: []
+  groups: []
 starboard:
   resources: {}
   tolerations: []

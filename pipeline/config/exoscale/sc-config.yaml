@@ -586,7 +586,8 @@ metricsServer:
 calicoAccountant:
   enabled: true
 clusterAdmin:
-  admins: []
+  users: []
+  groups: []
 s3Exporter:
   enabled: true
   interval: 120s

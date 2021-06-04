@@ -629,7 +629,8 @@ calicoAccountant:
   enabled: true
 
 clusterAdmin:
-  admins: []
+  users: []
+  groups: []
 s3Exporter:
   # Also requries objectStorage.type=s3
   enabled: true
