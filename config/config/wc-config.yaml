@@ -32,12 +32,12 @@ global:
   ## Domain intended for ingress usage in the workload cluster
   ## and to reach user facing services such as kibana, grafana, and harbor.
   ## E.g. with 'prod.domain.com', kibana is reached via 'kibana.prod.domain.com'.
-  baseDomain: "set-me"
+  baseDomain: set-me
 
   ## Domain intended for ingress usage in the service cluster and to reach
   ## non-user facing services such as influxdb and elasticsearch.
   ## E.g. with 'ops.prod.domain.com', elasticsearch is reached via 'elastic.ops.prod.domain.com'.
-  opsDomain: "set-me"
+  opsDomain: set-me
 
   ## Default cert-manager issuer to use for issuing certificates for ingresses.
   ## Normally one of 'letsencrypt-staging' or 'letsencrypt-prod'.
@@ -47,13 +47,13 @@ global:
   verifyTls: true
 
   ## IP of the cluster DNS in kubernetes
-  clusterDns: "10.233.0.3"
+  clusterDns: 10.233.0.3
 
 ## Configuration of storageclasses.
 storageClasses:
   ## Name of the 'default' storageclass in kubernetes.
   ## Normally one of 'nfs-client', 'cinder-storage', 'local-storage', or 'ebs-gp2'.
-  default: "set-me"
+  default: set-me
 
   ## These enabled flags are 'null' but after first init
   ## they will be set to eihter 'true' or 'false'.
@@ -98,17 +98,17 @@ nfsProvisioner:
 objectStorage:
   ## Options are 's3', 'gcs', or 'none'
   ## If 'none', remember to disable backups (velero)
-  type: "s3"
+  type: s3
   # gcs:
-  #   project: "set-me"
+  #   project: set-me
   # s3:
-  #   region: "set-me"
-  #   regionEndpoint: "set-me"
+  #   region: set-me
+  #   regionEndpoint: set-me
   #   forcePathStyle: true
 
   ## Buckets where each respctive application will store its backups.
   buckets:
-    velero: "${CK8S_ENVIRONMENT_NAME}-velero"
+    velero: ${CK8S_ENVIRONMENT_NAME}-velero
 
 ## User configuration.
 user:
@@ -148,8 +148,8 @@ falco:
 
   ## Run on master nodes.
   tolerations:
-    - key: "node-role.kubernetes.io/master"
-      effect: "NoSchedule"
+    - key: node-role.kubernetes.io/master
+      effect: NoSchedule
 
   affinity: {}
   nodeSelector: {}
@@ -160,7 +160,7 @@ falco:
     ## supported: 'alertmanager', 'slack'.
     type: alertmanager
     priority: notice
-    hostPort: "http://kube-prometheus-stack-alertmanager.monitoring:9093"
+    hostPort: http://kube-prometheus-stack-alertmanager.monitoring:9093
 
   falcoSidekick:
     resources:
@@ -228,7 +228,7 @@ opa:
   imageRegistry:
     enabled: true
     enforcement: dryrun
-    URL: "harbor.set-me"
+    URL: harbor.set-me
 
   ## Enable rule that requires pods to be targeted
   ## by at least one network policy.
@@ -249,7 +249,7 @@ fluentd:
   ## Tolerate master nodes.
   tolerations:
   - effect: NoSchedule
-    key: "node-role.kubernetes.io/master"
+    key: node-role.kubernetes.io/master
     value: ""
 
   ## Only run on master nodes.
@@ -294,7 +294,7 @@ externalTrafficPolicy:
 
   ## Source IP range to allow.
   whitelistRange:
-    global: "0.0.0.0/0"
+    global: 0.0.0.0/0
 
 ## Nginx ingress controller configuration
 ingressNginx:
@@ -307,22 +307,22 @@ ingressNginx:
     config:
       ## If 'true', use PROXY protocol
       ## ref: https://docs.nginx.com/nginx/admin-guide/load-balancer/using-proxy-protocol/
-      useProxyProtocol: "set-me"
+      useProxyProtocol: set-me
 
     ## If 'true', nginx will use host ports 80 and 443
-    useHostPort: "set-me"
+    useHostPort: set-me
 
     ## Kubernetes service configuration.
     service:
-      enabled: "set-me"
+      enabled: set-me
 
       ## Type of service.
       ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
-      type: "set-me"
+      type: set-me
 
       ## Annotations to add to service
       ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
-      annotations: "set-me"
+      annotations: set-me
 
     ## Additional configuration options for Nginx
     ## ref: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
@@ -367,10 +367,10 @@ issuers:
     enabled: false
     # prod:
     #   ## Mail through which letsencrypt can contact you.
-    #   email: "set-me"
+    #   email: set-me
     # staging:
     #   ## Mail through which letsencrypt can contact you.
-    #   email: "set-me"
+    #   email: set-me
 
   ## Additional issuers to create.
   ## ref: https://cert-manager.io/docs/configuration/

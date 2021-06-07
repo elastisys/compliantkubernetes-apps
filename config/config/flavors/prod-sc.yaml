@@ -6,7 +6,7 @@ dex:
   enableStaticLogin: false
 
 alerts:
-  alertTo: "opsgenie"
+  alertTo: opsgenie
   opsGenieHeartbeat:
     enabled: true
     name: #Fill this out
@@ -29,10 +29,10 @@ elasticsearch:
     enabled: true
     subject_key: email
     roles_key: groups
-    scope: "openid profile email"
+    scope: openid profile email
   masterNode:
     storageSize: 8Gi
-    javaOpts: "-Xms1024m -Xmx1024m"
+    javaOpts: -Xms1024m -Xmx1024m
     resources:
       requests:
         memory: 2Gi
@@ -42,7 +42,7 @@ elasticsearch:
         cpu: 1
   dataNode:
     storageSize: 130Gi
-    javaOpts: "-Xms2048m -Xmx2048m"
+    javaOpts: -Xms2048m -Xmx2048m
     resources:
       requests:
         memory: 4Gi
@@ -51,7 +51,7 @@ elasticsearch:
         memory: 5Gi
         cpu: 1
   clientNode:
-    javaOpts: "-Xms1024m -Xmx1024m"
+    javaOpts: -Xms1024m -Xmx1024m
     resources:
       requests:
         memory: 2Gi
@@ -84,9 +84,9 @@ elasticsearch:
     min: 300 # 12 / day * 30 days = 360, subtract some to account for failures
     max: 500
     ageSeconds: 2592000 # 30 days
-    retentionSchedule: "@daily"
-    backupSchedule: "30 */2 * * *" # 30 min past every 2nd hour
-                                   # To avoid collision with retention
+    retentionSchedule: '@daily'
+    backupSchedule: 30 */2 * * * # 30 min past every 2nd hour
+                                 # To avoid collision with retention
 
 harbor:
   database:
