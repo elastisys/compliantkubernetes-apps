@@ -13,7 +13,7 @@ harbor:
     enabled: false
   persistence:
     # Valid options are "filesystem" (persistent volume), "swift", or "objectStorage" (matching global config)
-    type: "filesystem"
+    type: filesystem
 
 prometheus:
   storage:
@@ -31,7 +31,7 @@ prometheus:
 elasticsearch:
   masterNode:
     storageSize: 20Gi
-    javaOpts: "-Xms1536m -Xmx1536m"
+    javaOpts: -Xms1536m -Xmx1536m
     resources:
       requests:
         memory: 3072Mi
@@ -55,8 +55,8 @@ elasticsearch:
       authLogAgeDays: 30
   snapshot:
     enabled: false
-    retentionSchedule: "0 1 * * *" # 1am
-    backupSchedule: "0 */12 * * *" # run twice/day
+    retentionSchedule: 0 1 * * * # 1am
+    backupSchedule: 0 */12 * * * # run twice/day
 
 fluentd:
   enabled: false

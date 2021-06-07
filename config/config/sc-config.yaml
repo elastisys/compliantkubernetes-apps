@@ -5,16 +5,16 @@ global:
   ## 'any', can be used to disable this validation.
   ck8sVersion: ${CK8S_VERSION}
   clusterName: ${CK8S_ENVIRONMENT_NAME}-sc
-  baseDomain: "set-me"
-  opsDomain: "set-me"
+  baseDomain: set-me
+  opsDomain: set-me
   issuer: letsencrypt-staging
   verifyTls: true
-  clusterDns: "10.233.0.3"
+  clusterDns: 10.233.0.3
 
 storageClasses:
   # Name of the default storageclass.
   # Normally one of 'nfs-client', 'cinder-storage', 'local-storage', 'ebs-gp2'.
-  default: "set-me"
+  default: set-me
 
   # These are set to null before the first init to be able to set defaults only once
   nfs:
@@ -32,20 +32,20 @@ objectStorage:
   #   all backups (velero, harbor, influxdb, elasticsearch), sc logs (fluentd)
   #   Also set harbor persistence to "filesystem" or "swift"
   # Otherwise configure the features to match this type.
-  type: "s3"
+  type: s3
   # gcs:
-  #   project: "set-me"
+  #   project: set-me
   # s3:
-  #   region: "set-me"
-  #   regionEndpoint: "set-me"
+  #   region: set-me
+  #   regionEndpoint: set-me
   #   # Generally false when using AWS and Exoscale and true for other providers.
   #   forcePathStyle: true
   buckets:
-    harbor: "${CK8S_ENVIRONMENT_NAME}-harbor"
-    velero: "${CK8S_ENVIRONMENT_NAME}-velero"
-    elasticsearch: "${CK8S_ENVIRONMENT_NAME}-es-backup"
-    influxDB: "${CK8S_ENVIRONMENT_NAME}-influxdb"
-    scFluentd: "${CK8S_ENVIRONMENT_NAME}-sc-logs"
+    harbor: ${CK8S_ENVIRONMENT_NAME}-harbor
+    velero: ${CK8S_ENVIRONMENT_NAME}-velero
+    elasticsearch: ${CK8S_ENVIRONMENT_NAME}-es-backup
+    influxDB: ${CK8S_ENVIRONMENT_NAME}-influxdb
+    scFluentd: ${CK8S_ENVIRONMENT_NAME}-sc-logs
 
 user:
   grafana:
@@ -65,7 +65,7 @@ user:
       grafanaEditor: grafana_editor #maps to grafana role editor
       grafanaViewer: grafana_viewer #maps to grafana role viewer
     oidc:
-      scopes: "profile email openid"
+      scopes: profile email openid
       allowedDomains:
         - example.com
   # Todo remove dependencie on alertmanager from service cluster
@@ -153,14 +153,14 @@ harbor:
         memory: 1024Mi
   persistence:
     # Valid options are "filesystem" (persistent volume), "swift", or "objectStorage" (matching global config)
-    type: "set-me"
+    type: set-me
     disableRedirect: set-me
   oidc:
     # group claim name used by OIDC Provider
-    groupClaimName: "set-me"
+    groupClaimName: set-me
     # Name of the group that autmatically will get admin
     # Set to "" to disable
-    adminGroupName: "set-me"
+    adminGroupName: set-me
     scope: openid,email,profile,offline_access,groups
   backup:
     enabled: true
@@ -242,7 +242,7 @@ dex:
     # The secret will be mounted to the folder /etc/dex/google/ this means that multiple files from the same secret can be used.
     # Simply add `serviceAccountFilePath: /etc/dex/google/secret-key` for each google connector.
     # For more details, see https://elastisys.com/elastisys-engineering-how-to-use-dex-with-google-accounts-to-manage-access-in-kubernetes/
-    # SASecretName: "set-me"
+    # SASecretName: set-me
 
 kibana:
   # Note sso is enabled via `elasticsearch.sso.enabled`
@@ -264,7 +264,7 @@ elasticsearch:
     # Where to find roles
     roles_key: groups
     # Scope - add 'groups' if groups claim is supported
-    scope: "openid profile email"
+    scope: openid profile email
   masterNode:
     count: 1
     storageSize: 8Gi
@@ -272,7 +272,7 @@ elasticsearch:
     ## if the DefaultStorageClass admission plugin is enabled.
     ## If "-", "" will be used as storageClassName.
     storageClass: null
-    javaOpts: "-Xms512m -Xmx512m"
+    javaOpts: -Xms512m -Xmx512m
     resources:
       requests:
         memory: 1024Mi
@@ -285,7 +285,7 @@ elasticsearch:
         preferredDuringSchedulingIgnoredDuringExecution:
         - weight: 1
           podAffinityTerm:
-            topologyKey: "kubernetes.io/hostname"
+            topologyKey: kubernetes.io/hostname
             labelSelector:
               matchLabels:
                 role: master
@@ -301,7 +301,7 @@ elasticsearch:
     ## if the DefaultStorageClass admission plugin is enabled.
     ## If "-", "" will be used as storageClassName.
     storageClass: null
-    javaOpts: "-Xms512m -Xmx512m"
+    javaOpts: -Xms512m -Xmx512m
     resources:
       requests:
         memory: 1024Mi
@@ -314,7 +314,7 @@ elasticsearch:
         preferredDuringSchedulingIgnoredDuringExecution:
         - weight: 1
           podAffinityTerm:
-            topologyKey: "kubernetes.io/hostname"
+            topologyKey: kubernetes.io/hostname
             labelSelector:
               matchLabels:
                 role: data
@@ -325,7 +325,7 @@ elasticsearch:
     ## If false, master nodes will assume client/ingest roles
     dedicatedPods: true
     count: 1
-    javaOpts: "-Xms512m -Xmx512m"
+    javaOpts: -Xms512m -Xmx512m
     resources:
       requests:
         memory: 1024Mi
@@ -338,7 +338,7 @@ elasticsearch:
         preferredDuringSchedulingIgnoredDuringExecution:
         - weight: 1
           podAffinityTerm:
-            topologyKey: "kubernetes.io/hostname"
+            topologyKey: kubernetes.io/hostname
             labelSelector:
               matchLabels:
                 role: client
@@ -385,8 +385,8 @@ elasticsearch:
     min: 7
     max: 14
     ageSeconds: 864000
-    retentionSchedule: "@daily"
-    backupSchedule: "0 */2 * * *"
+    retentionSchedule: '@daily'
+    backupSchedule: 0 */2 * * *
   extraRoles: []
   # - role_name: log_reader
   #   definition:
@@ -438,7 +438,7 @@ fluentd:
     nodeSelector: {}
     # Set to 'false' when using AWS S3,
     # and 'true' when using any other S3 provider.
-    useRegionEndpoint: "set-me"
+    useRegionEndpoint: set-me
   aggregator:
     resources:
       limits:
@@ -491,7 +491,7 @@ influxDB:
     durationSC: 3d
   backup:
     enabled: true
-    schedule: "0 0 * * *"
+    schedule: 0 0 * * *
     startingDeadlineSeconds: 200
     resources:
       requests:
@@ -503,7 +503,7 @@ influxDB:
   backupRetention:
     enabled: true
     daysToRetain: 7
-    schedule: "0 0 * * *"
+    schedule: 0 0 * * *
     startingDeadlineSeconds: 200
     resources:
       requests:
@@ -517,17 +517,17 @@ alerts:
   alertTo: "null"
   opsGenieHeartbeat:
     enabled: false
-    url: "https://api.eu.opsgenie.com/v2/heartbeats"
-    name: "set-me-if-enabled"
+    url: https://api.eu.opsgenie.com/v2/heartbeats
+    name: set-me-if-enabled
   slack:
-    channel: "set-me-if-enabled"
+    channel: set-me-if-enabled
   opsGenie:
-    apiUrl: "https://api.eu.opsgenie.com"
+    apiUrl: https://api.eu.opsgenie.com
 
 externalTrafficPolicy:
   local: false
   whitelistRange:
-    global: "0.0.0.0/0"
+    global: 0.0.0.0/0
     dex: false
     kibana: false
     elasticsearch: false
@@ -557,12 +557,12 @@ ingressNginx:
     affinity: {}
     nodeSelector: {}
     config:
-      useProxyProtocol: "set-me"
-    useHostPort: "set-me"
+      useProxyProtocol: set-me
+    useHostPort: set-me
     service:
-      enabled: "set-me"
-      type: "set-me"
-      annotations: "set-me"
+      enabled: set-me
+      type: set-me
+      annotations: set-me
     # Will add custom configuration options to Nginx https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
     additionalConfig: {}
 
@@ -597,9 +597,9 @@ issuers:
   letsencrypt:
     enabled: true
     prod:
-      email: "set-me"
+      email: set-me
     staging:
-      email: "set-me"
+      email: set-me
   extraIssuers: []
 
 certmanager:
