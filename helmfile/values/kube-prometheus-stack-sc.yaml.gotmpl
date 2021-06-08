@@ -99,7 +99,7 @@ alertmanager:
         # See: https://github.com/helm/helm/issues/2798#issuecomment-467319526
         text: |-
           <!channel>
-          *Cluster:* grafana.{{ .Values.global.opsDomain }}
+          *Cluster:* {{ .Values.prometheus.grafana.ingress.subdomain }}.{{ .Values.global.opsDomain }}
           {{`
           *Common summary:* {{ .CommonAnnotations.summary }}
           *Common description:* {{ .CommonAnnotations.description }}
@@ -121,7 +121,7 @@ alertmanager:
         # See https://prometheus.io/docs/alerting/configuration/#opsgenie_config
         - api_key: {{ .Values.alerts.opsGenie.apiKey }}
           api_url: {{ .Values.alerts.opsGenie.apiUrl }}
-          source: grafana.{{ .Values.global.opsDomain }}
+          source: {{ .Values.prometheus.grafana.ingress.subdomain }}.{{ .Values.global.opsDomain }}
           priority: {{`'{{ if eq .GroupLabels.severity "critical"}}P1{{else if eq .GroupLabels.severity "warning"}}P2{{else if eq .GroupLabels.severity "medium"}}P3{{else if eq .GroupLabels.severity "low"}}P4{{else}}P5{{end}}'`}}
       {{ end }}
 
@@ -162,13 +162,13 @@ grafana:
       nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.opsGrafana }}
     {{ end }}
     hosts:
-    - grafana.{{ .Values.global.opsDomain }}
+    - {{ .Values.prometheus.grafana.ingress.subdomain }}.{{ .Values.global.opsDomain }}
     ## TLS configuration for grafana Ingress
     ## Secret must be manually created in the namespace
     tls:
     - secretName: grafana-ops-general-tls
       hosts:
-      - grafana.{{ .Values.global.opsDomain }}
+      - {{ .Values.prometheus.grafana.ingress.subdomain }}.{{ .Values.global.opsDomain }}
   rbac:
     pspUseAppArmor: false
     pspEnabled: true
@@ -216,7 +216,7 @@ grafana:
 
   grafana.ini:
     server:
-      root_url: https://grafana.{{ .Values.global.opsDomain }}
+      root_url: https://{{ .Values.prometheus.grafana.ingress.subdomain }}.{{ .Values.global.opsDomain }}
     {{ if .Values.prometheus.grafana.oidc.enabled -}}
     auth.generic_oauth:
       name: dex

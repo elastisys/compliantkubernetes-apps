@@ -220,6 +220,8 @@ prometheus:
       #   grafanaViewer: grafana_viewer #maps to grafana role viewer
       # scopes: "openid profile email groups"
       # allowedDomains: []
+    ingress:
+      subdomain: "grafana"
 
 dex:
   additionalKubeloginRedirects: []
@@ -422,6 +424,8 @@ elasticsearch:
       scrapeTimeout: 30s
     resources: {}
     tolerations: []
+  ingress:
+    subdomain: "elastic"
 
 fluentd:
   enabled: true
@@ -512,6 +516,8 @@ influxDB:
       limits:
         cpu: 250m
         memory: 300Mi
+  ingress:
+    subdomain: "influxdb"
 
 alerts:
   alertTo: "null"

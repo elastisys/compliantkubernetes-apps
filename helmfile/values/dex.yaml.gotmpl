@@ -57,7 +57,7 @@ config:
       secret: {{ .Values.grafana.opsClientSecret }}
       name: 'Grafana ops'
       redirectURIs:
-        - https://grafana.{{ .Values.global.opsDomain }}/login/generic_oauth
+        - https://{{ .Values.prometheus.grafana.ingress.subdomain }}.{{ .Values.global.opsDomain }}/login/generic_oauth
 {{- end }}
 {{ if .Values.harbor.enabled }}
     - id: harbor

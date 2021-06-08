@@ -16,6 +16,7 @@
 ### Added
 
 - Option to set cluster admin groups
+- Option to change subdomain of ops services
 
 ### Removed
 

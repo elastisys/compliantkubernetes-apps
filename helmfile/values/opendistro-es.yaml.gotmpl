@@ -349,11 +349,11 @@ elasticsearch:
         {{ end }}
       path: /
       hosts:
-      - elastic.{{ .Values.global.opsDomain }}
+      - {{ .Values.elasticsearch.ingress.subdomain }}.{{ .Values.global.opsDomain }}
       tls:
       - secretName: opendistro-es-es-ingress-cert
         hosts:
-        - elastic.{{ .Values.global.opsDomain }}
+        - {{ .Values.elasticsearch.ingress.subdomain }}.{{ .Values.global.opsDomain }}
 
 
 # Kibana deployment configuration
