@@ -26,7 +26,7 @@ labels:
   release: kube-prometheus-stack
 targets:
   - name: dex
-    url: https://dex.{{ .Values.global.baseDomain }}/healthz
+    url: https://{{ .Values.dex.ingress.subdomain }}.{{ .Values.global.baseDomain }}/healthz
     interval: 60s
     scrapeTimeout: 30s
     module: http_2xx

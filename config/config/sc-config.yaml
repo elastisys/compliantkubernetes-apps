@@ -245,6 +245,8 @@ dex:
     # Simply add `serviceAccountFilePath: /etc/dex/google/secret-key` for each google connector.
     # For more details, see https://elastisys.com/elastisys-engineering-how-to-use-dex-with-google-accounts-to-manage-access-in-kubernetes/
     # SASecretName: "set-me"
+  ingress:
+    subdomain: "dex"
 
 kibana:
   # Note sso is enabled via `elasticsearch.sso.enabled`

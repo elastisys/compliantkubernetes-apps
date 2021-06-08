@@ -16,9 +16,9 @@ ingress:
   tls:
   - secretName: dex-tls
     hosts:
-    - dex.{{ .Values.global.baseDomain }}
+    - {{ .Values.dex.ingress.subdomain }}.{{ .Values.global.baseDomain }}
   hosts:
-  - dex.{{ .Values.global.baseDomain }}
+  - {{ .Values.dex.ingress.subdomain }}.{{ .Values.global.baseDomain }}
 
 # https termination by ingress instead of through dex
 https: false
@@ -34,7 +34,7 @@ extraVolumes:
 {{- end }}
 
 config:
-  issuer: https://dex.{{ .Values.global.baseDomain }}
+  issuer: https://{{ .Values.dex.ingress.subdomain }}.{{ .Values.global.baseDomain }}
   connectors:
   {{- toYaml .Values.dex.connectors | nindent 4 }}
   staticClients:

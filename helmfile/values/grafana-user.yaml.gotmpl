@@ -67,9 +67,9 @@ grafana.ini:
     client_id: grafana
     client_secret: {{ .Values.grafana.clientSecret }}
     scopes: {{ .Values.user.grafana.oidc.scopes }}
-    auth_url: https://dex.{{ .Values.global.baseDomain }}/auth
-    token_url: https://dex.{{ .Values.global.baseDomain }}/token
-    api_url: https://dex.{{ .Values.global.baseDomain }}/api
+    auth_url: https://{{ .Values.dex.ingress.subdomain }}.{{ .Values.global.baseDomain }}/auth
+    token_url: https://{{ .Values.dex.ingress.subdomain }}.{{ .Values.global.baseDomain }}/token
+    api_url: https://{{ .Values.dex.ingress.subdomain }}.{{ .Values.global.baseDomain }}/api
     allowed_domains: {{ join " " .Values.user.grafana.oidc.allowedDomains }}
     allow_sign_up: true
     tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}

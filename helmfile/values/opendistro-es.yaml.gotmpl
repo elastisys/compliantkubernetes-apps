@@ -411,7 +411,7 @@ kibana:
     # https://docs.search-guard.com/latest/kibana-authentication-openid
     opendistro_security.auth.type: "openid"
     opendistro_security.openid.scope: {{ .Values.elasticsearch.sso.scope }}
-    opendistro_security.openid.connect_url: https://dex.{{ .Values.global.baseDomain }}/.well-known/openid-configuration
+    opendistro_security.openid.connect_url: https://{{ .Values.dex.ingress.subdomain }}.{{ .Values.global.baseDomain }}/.well-known/openid-configuration
     opendistro_security.openid.client_id: "kibana-sso"
     opendistro_security.openid.client_secret: {{ .Values.elasticsearch.clientSecret }}
     opendistro_security.openid.base_redirect_url: https://kibana.{{ .Values.global.baseDomain }}
