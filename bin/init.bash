@@ -37,11 +37,12 @@ generate_sops_config() {
             exit 1
         fi
         fingerprint="${CK8S_PGP_FP}"
-    elif [ "${CK8S_PGP_UID+x}" != "" ]; then
+    elif [ -n "${CK8S_PGP_UID:-}" ]; then
         fingerprint=$(gpg --list-keys --with-colons "${CK8S_PGP_UID}" | \
-                      awk -F: '$1 == "fpr" {print $10;}' | head -n 1)
+                      awk -F: '$1 == "fpr" {print $10;}' | head -n 1 || \
+                      echo "")
         if [ -z "${fingerprint}" ]; then
-            log_error "ERROR: Unable to get fingerprint from gpg keyring."
+            log_error "ERROR: Unable to get fingerprint from gpg keyring using UID."
             log_error "CK8S_PGP_UID=${CK8S_PGP_UID}"
             exit 1
         fi
