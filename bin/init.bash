@@ -30,7 +30,12 @@ if ! array_contains "${CK8S_FLAVOR}" "${ck8s_flavors[@]}"; then
 fi
 
 generate_sops_config() {
-    if [ "${CK8S_PGP_FP+x}" != "" ]; then
+    if [ -n "${CK8S_PGP_FP:-}" ]; then
+        if ! gpg --list-keys | grep "${CK8S_PGP_FP}" > /dev/null 2>&1; then
+            log_error "ERROR: Fingerprint does not exist in gpg keyring."
+            log_error "CK8S_PGP_FP=${CK8S_PGP_FP}"
+            exit 1
+        fi
         fingerprint="${CK8S_PGP_FP}"
     elif [ "${CK8S_PGP_UID+x}" != "" ]; then
         fingerprint=$(gpg --list-keys --with-colons "${CK8S_PGP_UID}" | \
