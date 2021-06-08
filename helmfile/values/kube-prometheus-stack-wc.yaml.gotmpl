@@ -47,7 +47,7 @@ prometheus:
       cluster: {{ .Values.global.clusterName }}
 
     remoteWrite:
-    - url: https://influxdb.{{ .Values.global.opsDomain }}/api/v1/prom/write?db=workload_cluster&u={{ .Values.prometheus.remoteWrite.user }}&p={{ .Values.prometheus.remoteWrite.password }}
+    - url: https://influxdb-{{ .Values.global.opsDomain }}/api/v1/prom/write?db=workload_cluster&u={{ .Values.prometheus.remoteWrite.user }}&p={{ .Values.prometheus.remoteWrite.password }}
       tlsConfig:
         insecureSkipVerify: {{ not .Values.global.verifyTls }}
 

@@ -17,9 +17,11 @@ expose:
       {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.harbor }}
       nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.harbor }}
       {{ end }}
+      ingress.kubernetes.io/ssl-redirect: "false"
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
     hosts:
       core: harbor.{{ .Values.global.baseDomain }}
-      notary: notary.harbor.{{ .Values.global.baseDomain }}
+      notary: notary-harbor.{{ .Values.global.baseDomain }}
 
 persistence:
   enabled: true
