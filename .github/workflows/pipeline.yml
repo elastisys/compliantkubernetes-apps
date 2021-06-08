@@ -51,3 +51,15 @@ jobs:
       uses: ./pipeline
       with:
         args: ./pipeline/test-opa.bash
+
+  bats:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout compliantkubernetes-apps
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Run Bats tests
+        uses: ./pipeline
+        with:
+          args: bash -c "./pipeline/sops-pgp-setup.bash && bats ./pipeline"

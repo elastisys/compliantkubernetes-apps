@@ -64,3 +64,10 @@ ENV OPA_VERSION "v0.17.2"
 RUN wget "https://github.com/open-policy-agent/opa/releases/download/${OPA_VERSION}/opa_linux_amd64" && \
     chmod +x opa_linux_amd64 && \
     mv opa_linux_amd64 /usr/local/bin/opa
+
+# Bats
+ENV BATS_VERSION "1.3.0"
+RUN wget https://github.com/bats-core/bats-core/archive/refs/tags/v${BATS_VERSION}.tar.gz && \
+    tar -zxvf "v${BATS_VERSION}.tar.gz" && \
+    cd ./bats-core-${BATS_VERSION} && \
+    ./install.sh /usr/local
