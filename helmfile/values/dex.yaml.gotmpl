@@ -75,6 +75,9 @@ config:
         - https://kibana.{{ .Values.global.baseDomain }}/auth/openid/login
         - https://kibana.{{ .Values.global.baseDomain }}/app/kibana
 {{ end }}
+{{ if .Values.dex.additionalStaticClients }}
+  {{- toYaml .Values.dex.additionalStaticClients | nindent 4 }}
+{{ end }}
 
 {{ if .Values.dex.enableStaticLogin }}
   enablePasswordDB: true
