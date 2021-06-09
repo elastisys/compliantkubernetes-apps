@@ -31,6 +31,7 @@ usage() {
     echo "  completion bash                                 output shell completion code for bash" 1>&2
     echo "  validate <wc|sc>                                validates config files" 1>&2
     echo "  providers                                       lists supported cloud providers" 1>&2
+    echo "  flavors                                         lists supported configuration flavors" 1>&2
     exit 1
 }
 
@@ -107,5 +108,6 @@ case "${1}" in
         echo "Config validation successful"
         ;;
     providers) echo "${ck8s_cloud_providers[@]}" ;;
+    flavors) echo "${ck8s_flavors[@]}" ;;
     *) usage ;;
 esac

@@ -23,9 +23,9 @@ if ! array_contains "${CK8S_CLOUD_PROVIDER}" "${ck8s_cloud_providers[@]}"; then
 fi
 
 # Validate the flavor
-if [ "${CK8S_FLAVOR}" != "dev" ] &&
-   [ "${CK8S_FLAVOR}" != "prod" ]; then
+if ! array_contains "${CK8S_FLAVOR}" "${ck8s_flavors[@]}"; then
     log_error "ERROR: Unsupported flavor: ${CK8S_FLAVOR}"
+    log_error "Supported flavors: ${ck8s_flavors[*]}"
     exit 1
 fi
 
