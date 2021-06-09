@@ -143,12 +143,11 @@ kubeScheduler:
 
 grafana:
 
-  image:
-    repository: grafana/grafana
-    tag: 7.0.3
-
   # admin username is "admin"
   adminPassword: {{ .Values.grafana.password }}
+
+  initChownData:
+    enabled: false
 
   deploymentStrategy:
     type: Recreate
@@ -255,8 +254,6 @@ defaultRules:
 
 prometheus:
   prometheusSpec:
-    image:
-      tag: v2.23.0
     resources: {{- toYaml .Values.prometheus.resources | nindent 8  }}
     nodeSelector: {{- toYaml .Values.prometheus.nodeSelector | nindent 8 }}
     affinity: {{- toYaml .Values.prometheus.affinity | nindent 8 }}

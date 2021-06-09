@@ -17,6 +17,17 @@
 
 1. Verify if the script added all your custom static clients under `dex.additionalStaticClients`. If so, delete the backup at `${CK8S_CONFIG_PATH}/secrets.yaml.bak`.
 
+1. To upgrade kube-prometheus-stack from 12.8.0 to 16.6.1 you need to run:
+
+   ```bash
+   ./bin/ck8s ops kubectl sc apply -f 'helmfile/upstream/kube-prometheus-stack/crds'
+   ```
+   ```bash
+   ./bin/ck8s ops kubectl wc apply -f 'helmfile/upstream/kube-prometheus-stack/crds'
+   ```
+
+   and then apply the new changes.
+
 1. Run init to get new defaults:
 
     ```bash
