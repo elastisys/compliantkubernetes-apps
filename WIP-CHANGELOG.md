@@ -16,6 +16,7 @@
 ### Added
 
 - Option to set cluster admin groups
+- Configuration option `dex.additionalStaticClients` in `secrets.yaml` can now be used to define additional static clients for Dex.
 
 ### Removed
 
