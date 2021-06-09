@@ -8,13 +8,6 @@
 
 CK8S_AUTO_APPROVE=${CK8S_AUTO_APPROVE:-"false"}
 
-if [ "${SOPS_PGP_FP+x}" != "" ]; then
-    echo "SOPS_PGP_FP is deprecated." >&2
-    echo "Set CK8S_PGP_UID or CK8S_PGP_FP and run \`ck8s init\` to" \
-         "generate a sops config file instead." >&2
-    exit 1
-fi
-
 # Create CK8S_CONFIG_PATH if it does not exist and make it absolute
 mkdir -p "${CK8S_CONFIG_PATH}"
 CK8S_CONFIG_PATH=$(readlink -f "${CK8S_CONFIG_PATH}")
