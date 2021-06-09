@@ -13,6 +13,7 @@ _ck8s_command_ck8s() {
     opts+=("kubeconfig")
     opts+=("completion")
     opts+=("validate")
+    opts+=("providers")
     COMPREPLY=($(compgen -W "${opts[*]}" -- ${cur}))
 }
 

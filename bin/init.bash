@@ -15,7 +15,12 @@ here="$(dirname "$(readlink -f "$0")")"
 # shellcheck source=bin/common.bash
 source "${here}/common.bash"
 
-validate_cloud "${CK8S_CLOUD_PROVIDER}"
+# Validate the cloud provider
+if ! array_contains "${CK8S_CLOUD_PROVIDER}" "${ck8s_cloud_providers[@]}"; then
+    log_error "ERROR: Unsupported cloud provider: ${CK8S_CLOUD_PROVIDER}"
+    log_error "Supported providers: ${ck8s_cloud_providers[*]}"
+    exit 1
+fi
 
 # Validate the flavor
 if [ "${CK8S_FLAVOR}" != "dev" ] &&

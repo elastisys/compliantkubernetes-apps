@@ -6,6 +6,15 @@
 
 : "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
 
+# shellcheck disable=SC2034
+ck8s_cloud_providers=(
+    "aws"
+    "baremetal"
+    "citycloud"
+    "exoscale"
+    "safespring"
+)
+
 CK8S_AUTO_APPROVE=${CK8S_AUTO_APPROVE:-"false"}
 
 # Create CK8S_CONFIG_PATH if it does not exist and make it absolute
@@ -60,6 +69,15 @@ log_error() {
     echo -e "[\e[31mck8s\e[0m] ${*}" 1>&2
 }
 
+array_contains() {
+    local value="${1}"
+    shift
+    for element in "${@}"; do
+        [ "${element}" = "${value}" ] && return 0
+    done
+    return 1
+}
+
 version_get() {
     pushd "${root_path}" > /dev/null || exit 1
     git describe --exact-match --tags 2> /dev/null || git rev-parse HEAD
@@ -89,18 +107,6 @@ validate_version() {
         log_error "ERROR: Version mismatch!"
         log_error "Config version: ${ck8s_version}"
         log_error "CK8S version: ${version}"
-        exit 1
-    fi
-}
-
-# Check if the cloud provider is supported.
-validate_cloud() {
-    if [ "${1}" != "exoscale" ] &&
-       [ "${1}" != "safespring" ] &&
-       [ "${1}" != "citycloud" ] &&
-       [ "${1}" != "baremetal" ] &&
-       [ "${1}" != "aws" ]; then
-        log_error "ERROR: Unsupported cloud provider: ${1}"
         exit 1
     fi
 }
