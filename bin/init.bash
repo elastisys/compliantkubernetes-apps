@@ -12,14 +12,8 @@ set -eu -o pipefail
 # Make sure flavor is set
 export CK8S_FLAVOR="${CK8S_FLAVOR:-dev}"
 here="$(dirname "$(readlink -f "$0")")"
-# shellcheck disable=1090
+# shellcheck source=bin/common.bash
 source "${here}/common.bash"
-: "${config_defaults_path:?Missing config defaults path}"
-: "${config[config_file_wc]:?Missing workload cluster config file}"
-# shellcheck disable=2154
-: "${secrets[secrets_file]:?Missing secrets file}"
-: "${sops_config:?Missing sops config}"
-: "${state_path:?Missing state path}"
 
 validate_cloud "${CK8S_CLOUD_PROVIDER}"
 

@@ -10,9 +10,9 @@ set -eu -o pipefail
 here="$(dirname "$(readlink -f "${0}")")"
 bin_path="${here}/../bin"
 
-# shellcheck disable=SC1090
+# shellcheck source=pipeline/common.bash
 source "${here}/common.bash"
-# shellcheck disable=SC1090
+# shellcheck source=bin/common.bash
 source "${bin_path}/common.bash"
 
 if [ "${#}" -ne 1 ]; then
@@ -22,7 +22,6 @@ fi
 
 cluster="${1}"
 cluster_abbr=""
-secrets=""
 
 if [ "${cluster}" = "service_cluster" ]; then
     config_load sc

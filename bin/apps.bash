@@ -6,7 +6,7 @@
 set -eu -o pipefail
 
 here="$(dirname "$(readlink -f "$0")")"
-# shellcheck disable=SC1090
+# shellcheck source=bin/common.bash
 source "${here}/common.bash"
 
 apps_init() {
@@ -24,8 +24,6 @@ apps_run_sc() {
     log_info "Applying applications in service cluster"
 
     (
-        : "${scripts_path:?Missing scripts path}"
-        : "${secrets[kube_config_sc]:?Missing service cluster kubeconfig}"
         with_kubeconfig "${secrets[kube_config_sc]}" \
             CONFIG_PATH="${CK8S_CONFIG_PATH}" "${scripts_path}/deploy-sc.sh"
     )
@@ -35,8 +33,6 @@ apps_run_wc() {
     log_info "Applying applications in workload cluster"
 
     (
-        : "${scripts_path:?Missing scripts path}"
-        : "${secrets[kube_config_wc]:?Missing workload cluster kubeconfig}"
         with_kubeconfig "${secrets[kube_config_wc]}" \
             CONFIG_PATH="${CK8S_CONFIG_PATH}" "${scripts_path}/deploy-wc.sh"
     )

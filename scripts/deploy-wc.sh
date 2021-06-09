@@ -3,7 +3,7 @@
 set -euo pipefail
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
-# shellcheck disable=SC1090 # Can't follow non-constant source.
+# shellcheck source=bin/common.bash
 source "${SCRIPTS_PATH}/../bin/common.bash"
 
 : "${config[config_file_wc]:?Missing config}"

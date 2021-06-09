@@ -7,9 +7,9 @@ pipeline_dir="${here}"
 ck8s="${here}/../bin/ck8s"
 bin_path="${here}/../bin"
 
-# shellcheck disable=SC1090
+# shellcheck source=pipeline/common.bash
 source "${here}/common.bash"
-# shellcheck disable=SC1090
+# shellcheck source=bin/common.bash
 source "${bin_path}/common.bash"
 
 "${ck8s}" apply sc

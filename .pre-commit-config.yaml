@@ -29,6 +29,8 @@ repos:
   hooks:
   - id: shellcheck
     additional_dependencies: []
+    args:
+    - "--external-sources"
     exclude: helmfile/upstream/|helmfile/elastisys/
   - id: markdownlint
     exclude: helmfile/upstream/|helmfile/elastisys/

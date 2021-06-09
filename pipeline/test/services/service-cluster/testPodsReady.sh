@@ -1,7 +1,7 @@
 #!/bin/bash
 
 INNER_SCRIPTS_PATH="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
-# shellcheck disable=SC1090
+# shellcheck source=pipeline/test/services/funcs.sh
 source "${INNER_SCRIPTS_PATH}/../funcs.sh"
 
 enable_harbor=$(yq r -e "${CONFIG_FILE}" 'harbor.enabled')

@@ -7,18 +7,25 @@
 
 set -euo pipefail
 
+here="$(dirname "$(readlink -f "$0")")"
+
+# TODO: required by install-storage-class-provider, probably better to rewrite
+# it to not require this variable.
+export storageclass_path="${here}"
+
+# shellcheck source=bootstrap/storageclass/scripts/install-storage-class-provider.sh
+source "${here}/scripts/install-storage-class-provider.sh"
+# shellcheck source=bin/common.bash
+source "${here}/../../bin/common.bash"
+
 environment="${1}"
-# shellcheck disable=SC1090
-source "${common_path:?Missing common path}"
-# shellcheck disable=SC1090
-source "${storageclass_path:?Missing storageclass path}/scripts/install-storage-class-provider.sh"
 
 case ${environment} in
     service_cluster)
-        config_file="${config["config_file_sc"]:?Missing service cluster config}"
+        config_file="${config["config_file_sc"]}"
         ;;
     workload_cluster)
-        config_file="${config["config_file_wc"]:?Missing workload cluster config}"
+        config_file="${config["config_file_wc"]}"
         ;;
 esac
 

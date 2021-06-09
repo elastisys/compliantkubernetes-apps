@@ -14,9 +14,16 @@ DEBUG_OUTPUT=("")
 DEBUG_PROMETHEUS_TARGETS=("")
 export CLUSTER="ServiceCluster"
 
+# shellcheck source=pipeline/test/services/service-cluster/testPodsReady.sh
 source "${SCRIPTS_PATH}"/service-cluster/testPodsReady.sh
+
+# shellcheck source=pipeline/test/services/common/testPersistentVolumeClaims.sh
 source "${SCRIPTS_PATH}"/common/testPersistentVolumeClaims.sh
+
+# shellcheck source=pipeline/test/services/service-cluster/testEndpoints.sh
 source "${SCRIPTS_PATH}"/service-cluster/testEndpoints.sh
+
+# shellcheck source=pipeline/test/services/service-cluster/testPrometheusTargets.sh
 source "${SCRIPTS_PATH}"/service-cluster/testPrometheusTargets.sh
 
 echo -e "\nSuccesses: $SUCCESSES"
