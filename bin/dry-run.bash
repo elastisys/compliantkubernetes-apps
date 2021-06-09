@@ -10,6 +10,7 @@ set -eu -o pipefail
 #       reassurance that the cluster will not change when deploying.
 
 here="$(dirname "$(readlink -f "$0")")"
+# shellcheck source=bin/common.bash
 source "${here}/common.bash"
 
 config_load "$1"
@@ -19,13 +20,11 @@ config_load "$1"
 #
 if [[ $1 == "sc" ]]; then
   log_info "Running helmfile diff on the service cluster"
-  : "${config[config_file_sc]:?Missing service cluster config file}"
 
   "${here}/ops.bash" helmfile sc diff
 
 elif [[ $1 == "wc" ]]; then
   log_info "Running helmfile diff on the workload cluster"
-  : "${config[config_file_wc]:?Missing workload cluster config file}"
 
   "${here}/ops.bash" helmfile wc diff
 else

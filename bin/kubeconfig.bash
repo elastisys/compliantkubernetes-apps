@@ -3,19 +3,13 @@
 set -euo pipefail
 
 here="$(dirname "$(readlink -f "$0")")"
-# shellcheck disable=SC1090
+# shellcheck source=bin/common.bash
 source "${here}/common.bash"
 
 usage() {
     echo "Usage: kubeconfig <user|admin <wc|sc> [cluster_name]>" >&2
     exit 1
 }
-
-: "${state_path:?Missing state path}"
-: "${secrets[kube_config_wc]:?Missing workload cluster kubeconfig}"
-: "${secrets[kube_config_sc]:?Missing service cluster kubeconfig}"
-: "${config[config_file_wc]:?Missing workload cluster configuration}"
-: "${config[config_file_sc]:?Missing service cluster configuration}"
 
 case "${1}" in
     user)

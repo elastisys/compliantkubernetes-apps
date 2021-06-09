@@ -3,7 +3,7 @@
 # Set variables and array adapted for the workload cluster and call functions in prometheus-common
 
 INNER_SCRIPTS_PATH="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
-# shellcheck disable=SC1090
+# shellcheck source=pipeline/test/services/prometheus-common.sh
 source "$INNER_SCRIPTS_PATH/../prometheus-common.sh"
 
 # Get amount of nodes in cluster

@@ -4,10 +4,9 @@
 
 set -euo pipefail
 
-: "${bootstrap_path:?Missing bootstrap path}"
-environment="${1}"
-export storageclass_path="${bootstrap_path}/storageclass"
-export namespaces_path="${bootstrap_path}/namespaces"
+here="$(dirname "$(readlink -f "$0")")"
 
-"${storageclass_path}/bootstrap.sh" "${environment}"
-"${namespaces_path}/bootstrap.sh" "${environment}"
+environment="${1}"
+
+"${here}/storageclass/bootstrap.sh" "${environment}"
+"${here}/namespaces/bootstrap.sh" "${environment}"

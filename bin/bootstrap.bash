@@ -6,13 +6,11 @@
 set -eu -o pipefail
 
 here="$(dirname "$(readlink -f "$0")")"
-# shellcheck disable=SC1090
+# shellcheck source=bin/common.bash
 source "${here}/common.bash"
-: "${secrets[kube_config_sc]:?Missing service cluster kubeconfig}"
-: "${secrets[kube_config_wc]:?Missing workload cluster kubeconfig}"
+
 export bootstrap_path="${here}/../bootstrap"
 export scripts_path
-export common_path="${here}/common.bash"
 
 bootstrap_run_sc() {
     log_info "Bootstrapping service cluster"

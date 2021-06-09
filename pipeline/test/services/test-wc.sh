@@ -14,11 +14,15 @@ DEBUG_OUTPUT=("")
 DEBUG_PROMETHEUS_TARGETS=("")
 export CLUSTER="WorkloadCluster"
 
-
+# shellcheck source=pipeline/test/services/workload-cluster/testPodsReady.sh
 source "${SCRIPTS_PATH}"/workload-cluster/testPodsReady.sh
+# shellcheck source=pipeline/test/services/common/testPersistentVolumeClaims.sh
 source "${SCRIPTS_PATH}"/common/testPersistentVolumeClaims.sh
+# shellcheck source=pipeline/test/services/workload-cluster/testEndpoints.sh
 source "${SCRIPTS_PATH}"/workload-cluster/testEndpoints.sh
+# shellcheck source=pipeline/test/services/workload-cluster/testPrometheusTargets.sh
 source "${SCRIPTS_PATH}"/workload-cluster/testPrometheusTargets.sh
+# shellcheck source=pipeline/test/services/workload-cluster/testUserRbac.sh
 source "${SCRIPTS_PATH}"/workload-cluster/testUserRbac.sh
 
 echo -e "\nSuccesses: $SUCCESSES"

@@ -5,7 +5,7 @@
 set -e -o pipefail
 
 here="$(dirname "$(readlink -f "$0")")"
-# shellcheck disable=SC1090
+# shellcheck source=bin/common.bash
 source "${here}/common.bash"
 
 usage() {
@@ -89,7 +89,6 @@ case "${1}" in
     ;;
     s3cmd)
         shift
-        : "${secrets[s3cfg_file]:?Missing s3cfg file}"
         sops_exec_file "${secrets[s3cfg_file]}" 's3cmd --config="{}" '"${*}"
     ;;
     kubeconfig)

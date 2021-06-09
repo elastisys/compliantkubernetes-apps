@@ -5,7 +5,7 @@
 set -eu -o pipefail
 
 here="$(dirname "$(readlink -f "$0")")"
-# shellcheck disable=SC1090
+# shellcheck source=bin/common.bash
 source "${here}/common.bash"
 
 declare -a split_fingerprints
@@ -16,7 +16,6 @@ join_by() { local IFS="${1}"; shift; echo "${*}"; }
 
 # Load fingerprints from the SOPS config file into `split_fingerprints`.
 sops_load_fingerprints() {
-    : "${sops_config:?Missing sops config}"
     fingerprints=$(yq r - 'creation_rules[0].pgp' < "$sops_config")
     IFS=',' read -r -a split_fingerprints <<< "${fingerprints}"
 }
@@ -75,7 +74,6 @@ sops_remove_pgp() {
 # Update all secrets with the public keys from the fingerprints in the SOPS
 # config file.
 sops_update_keys() {
-    : "${secrets[@]:?Missing secrets}"
     for secret in "${secrets[@]}"; do
         if [ ! -f "${secret}" ]; then
             log_warning "Secret does not exist: ${secret}"
@@ -93,7 +91,6 @@ sops_update_keys() {
 
 # Rotate the data key in all secrets.
 sops_rotate_data_key() {
-    : "${secrets[@]:?Missing secrets}"
     for secret in "${secrets[@]}"; do
         if [ ! -f "${secret}" ]; then
             log_warning "Secret does not exist: ${secret}"

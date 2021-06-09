@@ -6,11 +6,8 @@ set -eu
 
 here="$(dirname "$(readlink -f "$0")")"
 
-# shellcheck disable=SC1090
+# shellcheck source=bin/common.bash
 source "${here}/common.bash"
-
-: "${secrets[kube_config_sc]:?Missing service cluster kubeconfig}"
-: "${secrets[kube_config_wc]:?Missing workload cluster kubeconfig}"
 
 usage() {
     echo "Usage: kubectl <wc|sc> ..." >&2
