@@ -30,6 +30,7 @@ usage() {
     echo "  kubeconfig <user|admin <wc|sc> [cluster_name]>  generate user/admin kubeconfig, stored at CK8S_CONFIG_PATH/user or CK8S_CONFIG_PATH/.state"
     echo "  completion bash                                 output shell completion code for bash" 1>&2
     echo "  validate <wc|sc>                                validates config files" 1>&2
+    echo "  providers                                       lists supported cloud providers" 1>&2
     exit 1
 }
 
@@ -105,5 +106,6 @@ case "${1}" in
         config_load "$2"
         echo "Config validation successful"
         ;;
+    providers) echo "${ck8s_cloud_providers[@]}" ;;
     *) usage ;;
 esac
