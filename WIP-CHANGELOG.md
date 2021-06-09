@@ -14,6 +14,8 @@
 - The `clusterDns` config variable now matches Kubespray defaults.
   Using the wrong value causes node-local-dns to not be used.
 - Blackbox-exporter now ignores checking the harbor endpoint if harbor is disabled.
+- Kube-prometheus-stack are now being upgraded from 12.8.0 to 16.6.1 to fix dashboard errors.
+Grafana 8.0.1 and Prometheus 2.27.1.
 
 ### Added
 

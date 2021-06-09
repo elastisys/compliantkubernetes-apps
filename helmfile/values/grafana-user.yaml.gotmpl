@@ -2,8 +2,10 @@ adminPassword: {{ .Values.user.grafanaPassword }}
 
 image:
   repository: grafana/grafana
-
 testFramework:
+  enabled: false
+
+initChownData:
   enabled: false
 
 deploymentStrategy:

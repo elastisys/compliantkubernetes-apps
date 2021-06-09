@@ -41,8 +41,6 @@ prometheus:
     enabled: false
 
   prometheusSpec:
-    image:
-      tag: v2.23.0
     externalLabels:
       cluster: {{ .Values.global.clusterName }}
 

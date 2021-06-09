@@ -1,4 +1,4 @@
-{{- if and .Values.grafana.enabled .Values.grafana.sidecar.datasources.enabled }}
+{{- if or (and .Values.grafana.enabled .Values.grafana.sidecar.datasources.enabled) .Values.grafana.forceDeployDatasources }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -16,14 +16,19 @@ data:
   datasource.yaml: |-
     apiVersion: 1
     datasources:
+{{- $scrapeInterval := .Values.grafana.sidecar.datasources.defaultDatasourceScrapeInterval | default .Values.prometheus.prometheusSpec.scrapeInterval | default "30s" }}
 {{- if .Values.grafana.sidecar.datasources.defaultDatasourceEnabled }}
     - name: Prometheus
       type: prometheus
+      {{- if .Values.grafana.sidecar.datasources.url }}
+      url: {{ .Values.grafana.sidecar.datasources.url }}
+      {{- else }}
       url: http://{{ template "kube-prometheus-stack.fullname" . }}-prometheus:{{ .Values.prometheus.service.port }}/{{ trimPrefix "/" .Values.prometheus.prometheusSpec.routePrefix }}
+      {{- end }}
       access: proxy
       isDefault: true
       jsonData:
-        timeInterval: {{ .Values.prometheus.prometheusSpec.scrapeInterval | default "30s" }}
+        timeInterval: {{ $scrapeInterval }}
 {{- if .Values.grafana.sidecar.datasources.createPrometheusReplicasDatasources }}
 {{- range until (int .Values.prometheus.prometheusSpec.replicas) }}
     - name: Prometheus-{{ . }}
@@ -32,7 +37,7 @@ data:
       access: proxy
       isDefault: false
       jsonData:
-        timeInterval: {{ .Values.prometheus.prometheusSpec.scrapeInterval | default "30s" }}
+        timeInterval: {{ $scrapeInterval }}
 {{- end }}
 {{- end }}
 {{- end }}
