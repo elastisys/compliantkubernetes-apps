@@ -14,6 +14,7 @@ _ck8s_command_ck8s() {
     opts+=("completion")
     opts+=("validate")
     opts+=("providers")
+    opts+=("flavors")
     COMPREPLY=($(compgen -W "${opts[*]}" -- ${cur}))
 }
 
