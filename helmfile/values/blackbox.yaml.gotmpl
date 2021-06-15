@@ -35,11 +35,13 @@ targets:
     interval: 60s
     scrapeTimeout: 30s
     module: http_2xx
+  {{- if .Values.harbor.enabled }}
   - name: harbor
     url: https://harbor.{{ .Values.global.baseDomain }}/api/v2.0/ping
     interval: 60s
     scrapeTimeout: 30s
     module: http_2xx
+  {{- end }}
   - name: kibana
     url: https://kibana.{{ .Values.global.baseDomain }}/api/status
     interval: 60s

@@ -13,6 +13,7 @@
 
 - The `clusterDns` config variable now matches Kubespray defaults.
   Using the wrong value causes node-local-dns to not be used.
+- Blackbox-exporter now ignores checking the harbor endpoint if harbor is disabled.
 
 ### Added
 

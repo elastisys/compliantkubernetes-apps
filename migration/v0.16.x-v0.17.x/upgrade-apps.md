@@ -28,3 +28,9 @@
     ```bash
     bin/ck8s apply {sc|wc}
     ```
+
+1. Restart the blackbox-prometheus-blackbox-exporter pod to make changes active.
+
+   ```bash
+   bin/ck8s ops kubectl sc get pods -n monitoring | awk '/blackbox/{print $1}'| xargs  ./bin/ck8s ops kubectl sc delete -n monitoring pod
+   ```
