@@ -1,11 +1,3 @@
-imageTag: "v2.26.0"
-
-crd:
-  present: false
-
-rbac:
-  create: true
-
 ingress:
   enabled: true
   annotations:
@@ -14,26 +6,28 @@ ingress:
     nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.dex }}
     {{ end }}
   tls:
-  - secretName: dex-tls
-    hosts:
-    - dex.{{ .Values.global.baseDomain }}
+    - secretName: dex-tls
+      hosts:
+        - dex.{{ .Values.global.baseDomain }}
   hosts:
-  - dex.{{ .Values.global.baseDomain }}
-
-# https termination by ingress instead of through dex
-https: false
+    - host: dex.{{ .Values.global.baseDomain }}
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
 
 {{- if .Values.dex.google.groupSupport }}
-extraVolumeMounts:
+volumeMounts:
 - mountPath: /etc/dex/google
   name: google-sa
-extraVolumes:
+volumes:
 - name: google-sa
   secret:
       secretName: {{ .Values.dex.google.SASecretName }}
 {{- end }}
 
 config:
+  storage:
+    type: memory
   issuer: https://dex.{{ .Values.global.baseDomain }}
   connectors:
   {{- toYaml .Values.dex.connectors | nindent 4 }}
