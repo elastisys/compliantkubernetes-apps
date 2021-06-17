@@ -10,6 +10,7 @@
 - The dry-run and apply command now have the options to check against the state of the cluster while ran by using the flags "--sync" and "--kubectl".
 - The dex chart is upgraded from stable/dex to dex/dex (v0.3.3).
   Dex is upgraded to v2.18.1
+- cert-manager upgrade from 1.1.0 to 1.4.0.
 
 ### Fixed
 
