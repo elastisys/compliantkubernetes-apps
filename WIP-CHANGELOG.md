@@ -18,6 +18,7 @@
 - Blackbox-exporter now ignores checking the harbor endpoint if harbor is disabled.
 - Kube-prometheus-stack are now being upgraded from 12.8.0 to 16.6.1 to fix dashboard errors.
 Grafana 8.0.1 and Prometheus 2.27.1.
+- "serviceMonitor/" have been added to all prometheus targets in our tests to make them work
 
 ### Added
 
