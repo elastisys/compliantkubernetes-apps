@@ -8,10 +8,8 @@ metadata:
 {{ include "opendistro-es.labels.standard" . | indent 4 }}
 data:
   action_file.yml: {{ tpl (toYaml (.Files.Get "files/action_file.yml") | indent 2) $ }}
-
   {{- if .Values.curator.postgresql }}
-  {{ tpl (toYaml (.Files.Get "files/postgresql-actions.yml") | indent 4) $ }}
+  {{ tpl (print (.Files.Get "files/postgresql-actions.yml") | nindent 6) $ }}
   {{- end }}
-  
   config.yml: {{ tpl (toYaml .Values.curator.config_yml | indent 2) $ }}
 {{- end }}

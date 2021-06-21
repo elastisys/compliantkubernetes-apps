@@ -22,6 +22,7 @@ Grafana 8.0.1 and Prometheus 2.27.1.
 - "serviceMonitor/" have been added to all prometheus targets in our tests to make them work
 - The openid url port have been changed from 32000 to 5556 to match the current setup.
 - sc-log-rentention fixed to delete all logs within a 5 second loop.
+- Fixed issue where curator would fail if postgres retention was enabled
 
 ### Added
 
