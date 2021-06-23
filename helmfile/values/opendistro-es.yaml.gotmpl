@@ -136,7 +136,7 @@ elasticsearch:
                     type: openid
                     challenge: false
                     config:
-                      openid_connect_url: http://dex.dex.svc.cluster.local:32000/.well-known/openid-configuration
+                      openid_connect_url: http://dex.dex.svc.cluster.local:5556/.well-known/openid-configuration
                       openid_connect_idp.verify_hostnames: false
                       openid_connect_idp.enable_ssl: false
                       subject_key: {{ .Values.elasticsearch.sso.subject_key }}

@@ -20,6 +20,7 @@
 - Kube-prometheus-stack are now being upgraded from 12.8.0 to 16.6.1 to fix dashboard errors.
 Grafana 8.0.1 and Prometheus 2.27.1.
 - "serviceMonitor/" have been added to all prometheus targets in our tests to make them work
+- The openid url port have been changed from 32000 to 5556 to match the current setup.
 
 ### Added
 
