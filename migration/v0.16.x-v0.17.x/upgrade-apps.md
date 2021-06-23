@@ -45,3 +45,7 @@
    ```bash
    bin/ck8s ops kubectl sc get pods -n monitoring | awk '/blackbox/{print $1}'| xargs  ./bin/ck8s ops kubectl sc delete -n monitoring pod
    ```
+
+1. Run migration script: `./migration/v0.16.x-v0.17.x/migrate-openid.sh`
+
+   This script will reload the security config config.yml to make openid run by the new port
