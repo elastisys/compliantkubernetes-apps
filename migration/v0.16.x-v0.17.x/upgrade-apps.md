@@ -19,12 +19,12 @@
 
 1. To upgrade kube-prometheus-stack from 12.8.0 to 16.6.1 you need to run:
 
-   ```bash
-   ./bin/ck8s ops kubectl sc apply -f 'helmfile/upstream/kube-prometheus-stack/crds'
-   ```
-   ```bash
-   ./bin/ck8s ops kubectl wc apply -f 'helmfile/upstream/kube-prometheus-stack/crds'
-   ```
+    ```bash
+    bin/ck8s ops kubectl sc apply -f 'helmfile/upstream/kube-prometheus-stack/crds'
+    ```
+    ```bash
+    bin/ck8s ops kubectl wc apply -f 'helmfile/upstream/kube-prometheus-stack/crds'
+    ```
 
    and then apply the new changes.
 
@@ -32,6 +32,12 @@
 
     ```bash
     bin/ck8s init
+    ```
+
+1. Remove the old version of dex to then replace it with the new one by apply
+
+    ```bash
+    bin/ck8s ops helmfile sc -l app=dex destroy
     ```
 
 1. Upgrade applications:
@@ -42,9 +48,9 @@
 
 1. Restart the blackbox-prometheus-blackbox-exporter pod to make changes active.
 
-   ```bash
-   bin/ck8s ops kubectl sc get pods -n monitoring | awk '/blackbox/{print $1}'| xargs  ./bin/ck8s ops kubectl sc delete -n monitoring pod
-   ```
+    ```bash
+    bin/ck8s ops kubectl sc delete pod -l app.kubernetes.io/name=prometheus-blackbox-exporter -n monitoring
+    ```
 
 1. Run migration script: `./migration/v0.16.x-v0.17.x/migrate-openid.sh`
 
