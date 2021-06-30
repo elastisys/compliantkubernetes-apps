@@ -28,6 +28,12 @@
 
    and then apply the new changes.
 
+1. Remove the old version of dex to then replace it with the new one by apply
+
+       ```bash
+    bin/ck8s ops helmfile sc -l app=dex destroy
+    ```
+
 1. Run init to get new defaults:
 
     ```bash
