@@ -96,6 +96,19 @@ releases:
   values:
   - values/calico-accountant.yaml.gotmpl
 
+# calico-felix-metrics
+- name: calico-felix-metrics
+  namespace: kube-system
+  labels:
+    app: calico-felix-metrics
+  chart: ./charts/calico-felix-metrics
+  version: 0.1.0
+  installed: {{ .Values.calicoFelixMetrics.enabled }}
+  missingFileHandler: Error
+  values:
+  - values/calico-felix-metrics.yaml.gotmpl
+
+
 
 # cluster-admin-rbac
 - name: cluster-admin-rbac
