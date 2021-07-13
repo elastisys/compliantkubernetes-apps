@@ -62,3 +62,7 @@ data:
   ceph-pools_rev5.json: |-
     {{- .Files.Get "dashboards/ceph-pools_rev5.json" | nindent 4 }}
 {{- end }}
+{{- if .Values.dashboards.calicoFelix.enabled }}
+  calico-felix-dashboard.json: |-
+    {{- .Files.Get "dashboards/calico-felix-dashboard.json" | nindent 4 }}
+{{- end }}
