@@ -20,5 +20,7 @@
 - Added group support for user RBAC.
 - Added option `elasticsearch.snapshot.retentionActiveDeadlineSeconds` to control the deadline for the SLM job.
 - Added configuration properties for falco-exporter.
+- calico-felix-metrics helm chart to enable calico targets discovery and scraping
+  calico felix grafana dashboard to visualize the metrics
 
 ### Removed
