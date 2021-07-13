@@ -1,5 +1,8 @@
-# calico-accountant
+# calico-felix-metrics
 
-This helm chart deploys `calico-accountant`, an application that gathers metrics about NetworkPolicies.
+This helm chart deploys `calico-felix-metrics`, an application that gathers metrics about NetworkPolicies.
 
-Source code for `calico-accountant` [can be found here.](https://github.com/monzo/calico-accountant)
+To deploy this helm chart use:
+```
+./bin/ck8s ops helmfile <cluster> -f helmfile -l app=calico-felix-metrics apply
+```
