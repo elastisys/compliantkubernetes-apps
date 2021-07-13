@@ -10,7 +10,8 @@ spec:
   endpoints:
   - port: metrics
   namespaceSelector:
-    any: true
+    matchNames:
+    -  kube-system
   selector:
     matchLabels:
       app: "calico-felix-metrics"
