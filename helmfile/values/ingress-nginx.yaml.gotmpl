@@ -1,12 +1,9 @@
 ## nginx configuration
-## Ref: https://github.com/kubernetes/ingress/blob/master/controllers/nginx/configuration.md
+## Ref: https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/index.md
 ##
-controller:
-  image:
-    allowPrivilegeEscalation: true
-    tag: "0.28.0"
-    runAsUser: 101
 
+controller:
+  # Will add custom configuration options to Nginx https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
   config:
     disable-ipv6-dns: "true"
     proxy-body-size: "200m"
@@ -19,36 +16,32 @@ controller:
     {{- toYaml . | nindent 4 }}
     {{- end }}
 
-  # Required for use with CNI based kubernetes installations (such as ones set up by kubeadm),
-  # since CNI and hostport don't mix yet. Can be deprecated once https://github.com/kubernetes/kubernetes/issues/23920
-  # is merged
-  hostNetwork: true
-
   # Optionally change this to ClusterFirstWithHostNet in case you have 'hostNetwork: true'.
   # By default, while using host network, name resolution uses the host's DNS. If you wish nginx-controller
   # to keep resolving names inside the k8s network, use ClusterFirstWithHostNet.
+  {{ if .Values.ingressNginx.controller.useHostPort }}
   dnsPolicy: ClusterFirstWithHostNet
+  {{ end }}
 
-  publishService:
-    enabled: false
+  # Required for use with CNI based kubernetes installations (such as ones set up by kubeadm),
+  # since CNI and hostport don't mix yet. Can be deprecated once https://github.com/kubernetes/kubernetes/issues/23920
+  # is merged
+  {{ if .Values.ingressNginx.controller.useHostPort }}
+  hostNetwork: true
+  {{ end }}
 
+  ## Use host ports 80 and 443
+  ## Disabled by default
+  ##
   hostPort:
     enabled: {{ .Values.ingressNginx.controller.useHostPort }}
-    http: 80
-    https: 443
 
-  metrics:
-    port: 10254
-    # if this port is changed, change healthz-port: in extraArgs: accordingly
-    enabled: true
-
-    serviceMonitor:
-      enabled: true
-
-  resources:    {{- toYaml .Values.ingressNginx.controller.resources | nindent 4 }}
-  nodeSelector: {{- toYaml .Values.ingressNginx.controller.nodeSelector | nindent 4 }}
-  affinity:     {{- toYaml .Values.ingressNginx.controller.affinity | nindent 4 }}
-  tolerations:  {{- toYaml .Values.ingressNginx.controller.tolerations | nindent 4 }}
+  ## Allows customization of the source of the IP address or FQDN to report
+  ## in the ingress status field. By default, it reads the information provided
+  ## by the service. If disable, the status field reports the IP address of the
+  ## node or nodes where an ingress controller pod is running.
+  publishService:
+    enabled: false
 
   ## DaemonSet or Deployment
   ##
@@ -63,9 +56,32 @@ controller:
   ##
   minReadySeconds: 10
 
+
+  ## Node tolerations for server scheduling to nodes with taints
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  ##
+  tolerations: {{- toYaml .Values.ingressNginx.controller.tolerations | nindent 4 }}
+
+  ## Affinity and anti-affinity
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ##
+  affinity: {{- toYaml .Values.ingressNginx.controller.affinity | nindent 4 }}
+
   ## terminationGracePeriodSeconds
+  ## wait up to 1 minutes for the drain of connections
   ##
   terminationGracePeriodSeconds: 60
+
+  ## Node labels for controller pod assignment
+  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {{- toYaml .Values.ingressNginx.controller.nodeSelector | nindent 4 }}
+
+  # Define requests resources to avoid probe issues due to CPU utilization in busy nodes
+  # ref: https://github.com/kubernetes/ingress-nginx/issues/4735#issuecomment-551204903
+  # Ideally, there should be no limits.
+  # https://engineering.indeedblog.com/blog/2019/12/cpu-throttling-regression-fix/
+  resources: {{- toYaml .Values.ingressNginx.controller.resources | nindent 4 }}
 
   service:
     {{ if .Values.externalTrafficPolicy.local }}
@@ -84,43 +100,35 @@ controller:
     enabled: false
     {{ end }}
 
+  metrics:
+    enabled: true
+
+    serviceMonitor:
+       enabled: true
 
 ## Default 404 backend
 ##
 defaultBackend:
-
-  ## If false, controller.defaultBackendService must be provided
   ##
   enabled: true
 
   name: default-backend
-  image:
-    repository: k8s.gcr.io/defaultbackend-amd64
-    tag: "1.5"
-    pullPolicy: IfNotPresent
-    # nobody user -> uid 65534
-    runAsUser: 65534
 
-  extraArgs: {}
+  ## Node tolerations for server scheduling to nodes with taints
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  ##
+  tolerations: {{- toYaml .Values.ingressNginx.defaultBackend.tolerations | nindent 4 }}
 
-  serviceAccount:
-    create: true
-    name:
-  ## Additional environment variables to set for defaultBackend pods
-  extraEnvs: []
+  affinity: {{- toYaml .Values.ingressNginx.defaultBackend.affinity | nindent 4 }}
 
-  port: 8080
-
-  resources:    {{- toYaml .Values.ingressNginx.defaultBackend.resources | nindent 4  }}
+  ## Node labels for default backend pod assignment
+  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
   nodeSelector: {{- toYaml .Values.ingressNginx.defaultBackend.nodeSelector | nindent 4 }}
-  affinity:     {{- toYaml .Values.ingressNginx.defaultBackend.affinity | nindent 4 }}
-  tolerations:  {{- toYaml .Values.ingressNginx.defaultBackend.tolerations | nindent 4 }}
+
+  resources: {{- toYaml .Values.ingressNginx.defaultBackend.resources | nindent 4 }}
 
 # If true, create & use Pod Security Policy resources
 # https://kubernetes.io/docs/concepts/policy/pod-security-policy/
 podSecurityPolicy:
   enabled: true
-
-serviceAccount:
-  create: true
-  name:

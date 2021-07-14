@@ -6,7 +6,11 @@ metadata:
   labels:
     {{- include "ingress-nginx.labels" . | nindent 4 }}
     app.kubernetes.io/component: controller
+    {{- with .Values.controller.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
   name: {{ include "ingress-nginx.controller.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   {{- if .Values.controller.annotations }}
   annotations: {{ toYaml .Values.controller.annotations | nindent 4 }}
   {{- end }}
@@ -27,7 +31,10 @@ spec:
   template:
     metadata:
     {{- if .Values.controller.podAnnotations }}
-      annotations: {{ toYaml .Values.controller.podAnnotations | nindent 8 }}
+      annotations:
+      {{- range $key, $value := .Values.controller.podAnnotations }}
+        {{ $key }}: {{ $value | quote }}
+      {{- end }}
     {{- end }}
       labels:
         {{- include "ingress-nginx.selectorLabels" . | nindent 8 }}
@@ -60,9 +67,9 @@ spec:
     {{- end }}
     {{- end }}
       containers:
-        - name: controller
+        - name: {{ .Values.controller.containerName }}
           {{- with .Values.controller.image }}
-          image: "{{.repository}}{{- if (.digest) -}} @{{.digest}} {{- else -}} :{{ .tag }} {{- end -}}"
+          image: "{{- if .repository -}}{{ .repository }}{{ else }}{{ .registry }}/{{ .image }}{{- end -}}:{{ .tag }}{{- if (.digest) -}} @{{.digest}} {{- end -}}"
           {{- end }}
           imagePullPolicy: {{ .Values.controller.image.pullPolicy }}
         {{- if .Values.controller.lifecycle }}
@@ -71,30 +78,30 @@ spec:
           args:
             - /nginx-ingress-controller
           {{- if .Values.defaultBackend.enabled }}
-            - --default-backend-service={{ .Release.Namespace }}/{{ include "ingress-nginx.defaultBackend.fullname" . }}
+            - --default-backend-service=$(POD_NAMESPACE)/{{ include "ingress-nginx.defaultBackend.fullname" . }}
           {{- end }}
           {{- if .Values.controller.publishService.enabled }}
             - --publish-service={{ template "ingress-nginx.controller.publishServicePath" . }}
           {{- end }}
             - --election-id={{ .Values.controller.electionID }}
             - --ingress-class={{ .Values.controller.ingressClass }}
-            - --configmap={{ .Release.Namespace }}/{{ include "ingress-nginx.controller.fullname" . }}
+            - --configmap=$(POD_NAMESPACE)/{{ include "ingress-nginx.controller.fullname" . }}
           {{- if .Values.tcp }}
-            - --tcp-services-configmap={{ .Release.Namespace }}/{{ include "ingress-nginx.fullname" . }}-tcp
+            - --tcp-services-configmap=$(POD_NAMESPACE)/{{ include "ingress-nginx.fullname" . }}-tcp
           {{- end }}
           {{- if .Values.udp }}
-            - --udp-services-configmap={{ .Release.Namespace }}/{{ include "ingress-nginx.fullname" . }}-udp
+            - --udp-services-configmap=$(POD_NAMESPACE)/{{ include "ingress-nginx.fullname" . }}-udp
           {{- end }}
           {{- if .Values.controller.scope.enabled }}
-            - --watch-namespace={{ default .Release.Namespace .Values.controller.scope.namespace }}
+            - --watch-namespace={{ default "$(POD_NAMESPACE)" .Values.controller.scope.namespace }}
           {{- end }}
           {{- if and .Values.controller.reportNodeInternalIp .Values.controller.hostNetwork }}
             - --report-node-internal-ip-address={{ .Values.controller.reportNodeInternalIp }}
           {{- end }}
           {{- if .Values.controller.admissionWebhooks.enabled }}
             - --validating-webhook=:{{ .Values.controller.admissionWebhooks.port }}
-            - --validating-webhook-certificate=/usr/local/certificates/cert
-            - --validating-webhook-key=/usr/local/certificates/key
+            - --validating-webhook-certificate={{ .Values.controller.admissionWebhooks.certificate }}
+            - --validating-webhook-key={{ .Values.controller.admissionWebhooks.key }}
           {{- end }}
           {{- if .Values.controller.maxmindLicenseKey }}
             - --maxmind-license-key={{ .Values.controller.maxmindLicenseKey }}
@@ -103,10 +110,11 @@ spec:
             - --health-check-path={{ .Values.controller.healthCheckPath }}
           {{- end }}
           {{- range $key, $value := .Values.controller.extraArgs }}
-            {{- if $value }}
-            - --{{ $key }}={{ $value }}
-            {{- else }}
+            {{- /* Accept keys without values or with false as value */}}
+            {{- if eq ($value | quote | len) 2 }}
             - --{{ $key }}
+            {{- else }}
+            - --{{ $key }}={{ $value }}
             {{- end }}
           {{- end }}
           securityContext:
@@ -132,27 +140,12 @@ spec:
           {{- end }}
           {{- if .Values.controller.extraEnvs }}
             {{- toYaml .Values.controller.extraEnvs | nindent 12 }}
+          {{- end }}          
+          {{- if .Values.controller.startupProbe }}
+          startupProbe: {{ toYaml .Values.controller.startupProbe | nindent 12 }}
           {{- end }}
-          livenessProbe:
-            httpGet:
-              path: {{ .Values.controller.healthCheckPath }}
-              port: {{ .Values.controller.livenessProbe.port }}
-              scheme: HTTP
-            initialDelaySeconds: {{ .Values.controller.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.controller.livenessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.controller.livenessProbe.timeoutSeconds }}
-            successThreshold: {{ .Values.controller.livenessProbe.successThreshold }}
-            failureThreshold: {{ .Values.controller.livenessProbe.failureThreshold }}
-          readinessProbe:
-            httpGet:
-              path: {{ .Values.controller.healthCheckPath }}
-              port: {{ .Values.controller.readinessProbe.port }}
-              scheme: HTTP
-            initialDelaySeconds: {{ .Values.controller.readinessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.controller.readinessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.controller.readinessProbe.timeoutSeconds }}
-            successThreshold: {{ .Values.controller.readinessProbe.successThreshold }}
-            failureThreshold: {{ .Values.controller.readinessProbe.failureThreshold }}
+          livenessProbe: {{ toYaml .Values.controller.livenessProbe | nindent 12 }}
+          readinessProbe: {{ toYaml .Values.controller.readinessProbe | nindent 12 }}
           ports:
           {{- range $key, $value := .Values.controller.containerPort }}
             - name: {{ $key }}
@@ -224,6 +217,9 @@ spec:
     {{- end }}
     {{- if .Values.controller.affinity }}
       affinity: {{ toYaml .Values.controller.affinity | nindent 8 }}
+    {{- end }}
+    {{- if .Values.controller.topologySpreadConstraints }}
+      topologySpreadConstraints: {{ toYaml .Values.controller.topologySpreadConstraints | nindent 8 }}
     {{- end }}
       serviceAccountName: {{ template "ingress-nginx.serviceAccountName" . }}
       terminationGracePeriodSeconds: {{ .Values.controller.terminationGracePeriodSeconds }}

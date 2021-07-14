@@ -1,3 +1,12 @@
+# Release notes
+- Check out the [upgrade guide](migration/v0.17.x-v0.18.x/upgrade-apps.md) for a complete set of instructions needed to upgrade.
+- ingress-nginx chart was upgraded from 2.10.0 to 3.34.0 and ingress-nginx-controller was upgraded from v0.28.0 to v.0.48.1. With this version:
+     - only ValidatingWebhookConfiguration AdmissionReviewVersions v1 is supported
+     - the nginx-ingress-controller repository was deprecated
+     - access-log-path setting is deprecated
+     - server-tokens, ssl-session-tickets, use-gzip, upstream-keepalive-requests, upstream-keepalive-connections have new defaults
+     - TLSv1.3 is enabled by default
+
 # Updated
 
 - Updated influxdb chart 4.8.12 to 4.8.15
@@ -19,6 +28,20 @@
   1. grafana-user.yaml.gotmpl to load only the ConfiMaps that have the value of "1" fron "labelKey" [#587](https://github.com/elastisys/compliantkubernetes-apps/pull/587)
   2. added prometheus-sc as a datasource to user-grafana
 - enabled podSecurityPolicy in falco, fluentd, cert-manager, prometheus-elasticsearch-exporter helm charts
+- ingress-nginx chart was upgraded from 2.10.0 to 3.34.0. [#535](https://github.com/elastisys/compliantkubernetes-apps/pull/535)
+  ingress-nginx-controller was upgraded from v0.28.0 to v.0.48.1
+  nginx was upgraded to 1.20.1
+  > **_Breaking Changes:_** * Kubernetes v1.16 or higher is required. Only ValidatingWebhookConfiguration AdmissionReviewVersions v1 is supported. * Following the Ingress extensions/v1beta1 deprecation, please use networking.k8s.io/v1beta1 or networking.k8s.io/v1 (Kubernetes v1.19 or higher) for new Ingress definitions * The repository https://quay.io/repository/kubernetes-ingress-controller/nginx-ingress-controller is deprecated and read-only
+
+  > **_Deprecations:_** * Setting access-log-path is deprecated and will be removed in 0.35.0. Please use http-access-log-path and stream-access-log-path
+
+  > **_New defaults:_** * server-tokens is disabled * ssl-session-tickets is disabled * use-gzip is disabled * upstream-keepalive-requests is now 10000 * upstream-keepalive-connections is now 320
+
+  > **_New Features:_** * TLSv1.3 is enabled by default * OCSP stapling * New PathType and IngressClass fields * New setting to configure different access logs for http and stream sections: http-access-log-path and stream-access-log-path options in configMap * New configmap option enable-real-ip to enable realip_module * For the full list of New Features check the Full Changelog
+
+  > **_Full Changelog:_** https://github.com/kubernetes/ingress-nginx/blob/main/Changelog.md
+- enable hostNetwork and set the dnsPolicy to ClusterFirstWithHostNet only if hostPort is enabled [#535](https://github.com/elastisys/compliantkubernetes-apps/pull/535)
+  > **_Note:_** The upgrade will fail while disabling the hostNetwork when LoadBalancer type service is used, this is due removing some privileges from the PSP. See the migration steps for more details.
 
 ### Fixed
 
