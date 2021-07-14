@@ -187,7 +187,7 @@ defaultBackend:
   ## Node labels for default backend pod assignment
   ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
   ##
-  nodeSelector:{{- toYaml .Values.ingressNginx.defaultBackend.nodeSelector | nindent 4 } }
+  nodeSelector: {{- toYaml .Values.ingressNginx.defaultBackend.nodeSelector | nindent 4 }}
 
   resources: {{- toYaml .Values.ingressNginx.defaultBackend.resources | nindent 4 }}
 
