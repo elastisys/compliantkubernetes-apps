@@ -5,13 +5,10 @@ metadata:
   labels:
       app: "calico-felix-metrics"
   name: "calico-felix-metrics"
-  namespace: monitoring
+  namespace: kube-system
 spec:
   endpoints:
   - port: metrics
-  namespaceSelector:
-    matchNames:
-    -  kube-system
   selector:
     matchLabels:
       app: "calico-felix-metrics"
