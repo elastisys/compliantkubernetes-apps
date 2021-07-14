@@ -6,6 +6,7 @@ metadata:
     {{- include "ingress-nginx.labels" . | nindent 4 }}
     app.kubernetes.io/component: controller
   name: {{ include "ingress-nginx.fullname" . }}
+  namespace: {{ .Release.Namespace }}
 rules:
   - apiGroups:
       - ""
@@ -31,7 +32,6 @@ rules:
     verbs:
       - get
       - list
-      - update
       - watch
   - apiGroups:
       - extensions
@@ -75,14 +75,6 @@ rules:
   - apiGroups:
       - ""
     resources:
-      - endpoints
-    verbs:
-      - create
-      - get
-      - update
-  - apiGroups:
-      - ""
-    resources:
       - events
     verbs:
       - create
@@ -91,6 +83,10 @@ rules:
   - apiGroups:      [{{ template "podSecurityPolicy.apiGroup" . }}]
     resources:      ['podsecuritypolicies']
     verbs:          ['use']
+    {{- with .Values.controller.existingPsp }}
+    resourceNames:  [{{ . }}]
+    {{- else }}
     resourceNames:  [{{ include "ingress-nginx.fullname" . }}]
+    {{- end }}
 {{- end }}
 {{- end }}
