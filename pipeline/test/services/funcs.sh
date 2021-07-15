@@ -1,5 +1,14 @@
 #!/bin/bash
 
+if [ -z "$PIPELINE" ]
+then
+    RETRY_COUNT=6
+    RETRY_WAIT=10
+else
+    RETRY_COUNT=24
+    RETRY_WAIT=10
+fi
+
 # Args:
 #   1. kind
 #   2. namespace
@@ -64,7 +73,7 @@ function resourceReplicaCompare() {
     namespace="${2}"
     resourceName="${3}"
     simpleData="${4}"
-    retriesLeft=5
+    retriesLeft="${RETRY_COUNT}"
     while [[ "${retriesLeft}" -gt 0 ]]; do
         if [[ "${kind}" == "Deployment" || "${kind}" == "StatefulSet" ]]; then
             activeResourceStatus=$(echo "${simpleData}" |
@@ -97,8 +106,7 @@ function resourceReplicaCompare() {
             writeEvent "${namespace}" "${resourceName}" "Pod"
             return
         else
-            # retry for 30s
-            sleep 6
+            sleep "${RETRY_WAIT}"
             retriesLeft=$((retriesLeft-1))
             # refresh jsonData
             simpleData="$(getStatus "${kind}")"
@@ -233,7 +241,7 @@ function writeEvent {
 function testEndpoint {
     echo -e "Testing $1 endpoint"
 
-    retries=6
+    retries="${RETRY_COUNT}"
     while [ ${retries} -gt 0 ]; do
         args=(
             --connect-timeout 20
@@ -248,7 +256,7 @@ function testEndpoint {
         RES=$(curl "${args[@]}" "${2}")
         [[ $RES == "200" || $RES == "401" ]] && break
 
-        sleep 10
+        sleep "${RETRY_WAIT}"
         retries=$((retries-1))
     done
 
@@ -265,7 +273,7 @@ function testEndpoint {
 function testEndpointProtected {
     echo -e "Testing if $1 endpoint is protected"
 
-    retries=6
+    retries="${RETRY_COUNT}"
     while [ ${retries} -gt 0 ]; do
         args=(
             --connect-timeout 20
@@ -279,7 +287,7 @@ function testEndpointProtected {
         RES=$(curl "${args[@]}" "${2}")
         [[ $RES == "${3}" ]] && break
 
-        sleep 10
+        sleep "${RETRY_WAIT}"
         retries=$((retries-1))
     done
 

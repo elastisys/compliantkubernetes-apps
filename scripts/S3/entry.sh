@@ -3,7 +3,8 @@
 set -e
 
 # Wrapper for manager.sh, reads config from ${CK8S_CONFIG_PATH}/{sc,wc}-config.yaml
-# and creates the S3 buckets specified in 'objectStorage.buckets.*'.
+# and ${CK8S_CONFIG_PATH}/defaults/{sc,wc}-config.yaml, then creates the S3 buckets
+# specified in 'objectStorage.buckets.*'.
 
 : "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
 CK8S_AUTO_APPROVE=${CK8S_AUTO_APPROVE:-"false"}
@@ -18,8 +19,16 @@ log_error() {
     echo -e "[\e[31mck8s\e[0m] ${*}" 1>&2
 }
 
-objectstorage_type_sc=$(yq r "${CK8S_CONFIG_PATH}/sc-config.yaml" 'objectStorage.type')
-objectstorage_type_wc=$(yq r "${CK8S_CONFIG_PATH}/wc-config.yaml" 'objectStorage.type')
+sc_config_default="${CK8S_CONFIG_PATH}/defaults/sc-config.yaml"
+sc_config_override="${CK8S_CONFIG_PATH}/sc-config.yaml"
+sc_config="yq merge ${sc_config_default} ${sc_config_override} --overwrite --arrays overwrite"
+
+wc_config_default="${CK8S_CONFIG_PATH}/defaults/wc-config.yaml"
+wc_config_override="${CK8S_CONFIG_PATH}/wc-config.yaml"
+wc_config="yq merge ${wc_config_default} ${wc_config_override} --overwrite --arrays overwrite"
+
+objectstorage_type_sc=$(yq r <(${sc_config}) 'objectStorage.type')
+objectstorage_type_wc=$(yq r <(${wc_config}) 'objectStorage.type')
 
 [ "$objectstorage_type_sc" != "s3" ] && log_info "S3 is not enabled in service cluster"
 [ "$objectstorage_type_wc" != "s3" ] && log_info "S3 is not enabled in workload cluster"
@@ -29,8 +38,8 @@ if [ "$objectstorage_type_sc" != "s3" ] && [ "$objectstorage_type_wc" != "s3" ];
     exit 1
 fi
 
-[ "$objectstorage_type_sc" = "s3" ] && buckets_sc=$(yq r "${CK8S_CONFIG_PATH}/sc-config.yaml" 'objectStorage.buckets.*')
-[ "$objectstorage_type_wc" = "s3" ] && buckets_wc=$(yq r "${CK8S_CONFIG_PATH}/wc-config.yaml" 'objectStorage.buckets.*')
+[ "$objectstorage_type_sc" = "s3" ] && buckets_sc=$(yq r <(${sc_config}) 'objectStorage.buckets.*')
+[ "$objectstorage_type_wc" = "s3" ] && buckets_wc=$(yq r <(${wc_config}) 'objectStorage.buckets.*')
 
 buckets=$( { echo "$buckets_sc"; echo "$buckets_wc"; } | sort | uniq | tr '\n' ' ' | sed s'/.$//')
 
