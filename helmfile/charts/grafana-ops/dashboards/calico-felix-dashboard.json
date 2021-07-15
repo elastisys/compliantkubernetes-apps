@@ -16,8 +16,7 @@
   "editable": true,
   "gnetId": 12175,
   "graphTooltip": 0,
-  "id": 34,
-  "iteration": 1626175657697,
+  "iteration": 1626331596394,
   "links": [
     {
       "icon": "external link",
@@ -88,7 +87,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "exemplar": true,
+          "exemplar": false,
           "expr": "felix_active_local_endpoints",
           "interval": "",
           "legendFormat": "{{pod}}",
@@ -116,10 +115,6 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
@@ -155,6 +150,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
+          "exemplar": false,
           "expr": "sum(rate(felix_iptables_save_errors[5m]))",
           "interval": "",
           "legendFormat": "{{instance}}",
@@ -182,10 +178,6 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
@@ -221,6 +213,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
+          "exemplar": false,
           "expr": "sum(rate(felix_ipset_errors[5m]))",
           "interval": "",
           "legendFormat": "",
@@ -248,10 +241,6 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
@@ -287,6 +276,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
+          "exemplar": false,
           "expr": "max(felix_cluster_num_hosts)",
           "interval": "",
           "legendFormat": "Calico node",
@@ -300,62 +290,84 @@
       "type": "stat"
     },
     {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
       "datasource": "$datasource",
       "description": "This graph shows you all the errors that Calico encounters, it is important to note occasional errors are acceptable. However, rise in the number of error or constant error counters means Calico is not working properly.",
       "fieldConfig": {
         "defaults": {
-          "links": []
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
         },
         "overrides": []
       },
-      "fill": 1,
-      "fillGradient": 0,
       "gridPos": {
         "h": 4,
         "w": 7,
         "x": 17,
         "y": 1
       },
-      "hiddenSeries": false,
       "id": 28,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "hideEmpty": false,
-        "max": false,
-        "min": false,
-        "show": false,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
       "links": [],
-      "nullPointMode": "null as zero",
       "options": {
-        "alertThreshold": true
+        "legend": {
+          "calcs": [],
+          "displayMode": "hidden",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
       },
-      "percentage": false,
       "pluginVersion": "8.0.0",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
       "targets": [
         {
+          "exemplar": false,
           "expr": "rate(felix_ipset_errors[5m])",
           "interval": "",
           "legendFormat": "{{instance}} ipset errors",
           "refId": "A"
         },
         {
+          "exemplar": false,
           "expr": "rate(felix_iptables_restore_errors[5m])",
           "interval": "",
           "intervalFactor": 1,
@@ -363,6 +375,7 @@
           "refId": "B"
         },
         {
+          "exemplar": false,
           "expr": "rate(felix_iptables_save_errors[5m])",
           "interval": "",
           "legendFormat": "{{instance}} iptables save errors",
@@ -375,47 +388,11 @@
           "refId": "D"
         }
       ],
-      "thresholds": [],
       "timeFrom": null,
-      "timeRegions": [],
       "timeShift": null,
       "title": "Errors plot",
-      "tooltip": {
-        "shared": true,
-        "sort": 1,
-        "value_type": "individual"
-      },
       "transparent": true,
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
+      "type": "timeseries"
     },
     {
       "datasource": "$datasource",
@@ -458,7 +435,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "exemplar": true,
+          "exemplar": false,
           "expr": "felix_cluster_num_policies",
           "interval": "",
           "legendFormat": "{{pod}}",
@@ -486,10 +463,6 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
@@ -525,6 +498,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
+          "exemplar": false,
           "expr": "sum(rate(felix_iptables_restore_errors[5m]))",
           "interval": "",
           "legendFormat": "",
@@ -552,10 +526,6 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
@@ -591,6 +561,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
+          "exemplar": false,
           "expr": "sum(rate(felix_log_errors[5m]))",
           "interval": "",
           "legendFormat": "{{instance}}",
@@ -618,10 +589,6 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
@@ -657,6 +624,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
+          "exemplar": false,
           "expr": "sum(rate(felix_resyncs_started[5m])) ",
           "interval": "",
           "legendFormat": "",
@@ -670,100 +638,86 @@
       "type": "stat"
     },
     {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
       "datasource": "$datasource",
       "fieldConfig": {
         "defaults": {
-          "links": []
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
         },
         "overrides": []
       },
-      "fill": 1,
-      "fillGradient": 0,
       "gridPos": {
         "h": 4,
         "w": 7,
         "x": 17,
         "y": 5
       },
-      "hiddenSeries": false,
       "id": 31,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": false,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
       "options": {
-        "alertThreshold": true
+        "legend": {
+          "calcs": [],
+          "displayMode": "hidden",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
       },
-      "percentage": false,
       "pluginVersion": "8.0.0",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
       "targets": [
         {
+          "exemplar": false,
           "expr": "felix_logs_dropped",
           "interval": "",
           "legendFormat": "{{instance}}",
           "refId": "A"
         }
       ],
-      "thresholds": [],
       "timeFrom": null,
-      "timeRegions": [],
       "timeShift": null,
       "title": "Felix dropped logs",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
       "transparent": true,
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
+      "type": "timeseries"
     },
     {
       "collapsed": false,
@@ -849,7 +803,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "exemplar": true,
+          "exemplar": false,
           "expr": "felix_int_dataplane_apply_time_seconds{quantile=\"0.5\"}",
           "format": "time_series",
           "instant": false,
@@ -934,7 +888,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "exemplar": true,
+          "exemplar": false,
           "expr": "felix_int_dataplane_apply_time_seconds{quantile=\"0.9\"}",
           "interval": "",
           "legendFormat": "{{pod}}",
@@ -1016,7 +970,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "exemplar": true,
+          "exemplar": false,
           "expr": "felix_int_dataplane_apply_time_seconds{quantile=\"0.99\"}",
           "interval": "",
           "legendFormat": "{{pod}}",
@@ -1112,7 +1066,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "exemplar": true,
+          "exemplar": false,
           "expr": "felix_route_table_list_seconds{quantile=\"0.5\"}",
           "interval": "",
           "legendFormat": "{{pod}}",
@@ -1194,7 +1148,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "exemplar": true,
+          "exemplar": false,
           "expr": "felix_route_table_list_seconds{quantile=\"0.9\"}",
           "interval": "",
           "legendFormat": "{{pod}}",
@@ -1276,7 +1230,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "exemplar": true,
+          "exemplar": false,
           "expr": "felix_route_table_list_seconds{quantile=\"0.99\"}",
           "interval": "",
           "legendFormat": "{{pod}}",
@@ -1307,7 +1261,7 @@
     "list": [
       {
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "prometheus-sc",
           "value": "prometheus-sc"
         },
@@ -1320,6 +1274,7 @@
         "name": "datasource",
         "options": [],
         "query": "prometheus",
+        "queryValue": "",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -1347,5 +1302,5 @@
   },
   "timezone": "utc",
   "title": "Felix Dashboard (Calico)",
-  "version": 7
+  "version": 2
 }
