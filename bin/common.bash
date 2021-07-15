@@ -80,6 +80,28 @@ array_contains() {
     return 1
 }
 
+merged_sc_config() {
+  : "${config[config_file_sc]:?Missing config}"
+  : "${config[default_config_file_sc]:?Missing default config}"
+
+  tmpfile=$(mktemp)
+  append_trap "rm $tmpfile" EXIT
+
+  yq merge "${config[config_file_sc]}" "${config[default_config_file_sc]}" > "${tmpfile}"
+  echo "${tmpfile}"
+}
+
+merged_wc_config() {
+  : "${config[config_file_wc]:?Missing config}"
+  : "${config[default_config_file_wc]:?Missing default config}"
+
+  tmpfile=$(mktemp)
+  append_trap "rm $tmpfile" EXIT
+
+  yq merge "${config[config_file_wc]}" "${config[default_config_file_wc]}" > "${tmpfile}"
+  echo "${tmpfile}"
+}
+
 version_get() {
     pushd "${root_path}" > /dev/null || exit 1
     git describe --exact-match --tags 2> /dev/null || git rev-parse HEAD
@@ -92,16 +114,18 @@ version_get() {
 validate_version() {
     version=$(version_get)
     if [[ "${1}" == "sc" ]]; then
-        file="${config[config_file_sc]}"
+        merged_config="$(merged_sc_config)"
+        file_name="${config[config_file_sc]}"
     elif [[ "${1}" == "wc" ]]; then
-        file="${config[config_file_wc]}"
+        merged_config="$(merged_wc_config)"
+        file_name="${config[config_file_wc]}"
     else
       echo log_error "Error: usage validate_version <wc|sc>"
       exit 1
     fi
-    ck8s_version=$(yq r "${file}" 'global.ck8sVersion')
+    ck8s_version=$(yq r "${merged_config}" 'global.ck8sVersion')
     if [[ -z "$ck8s_version" ]]; then
-        log_error "ERROR: global.ck8sVersion is not set in ${file}"
+        log_error "ERROR: global.ck8sVersion is not set in ${file_name}"
         exit 1
     fi
     if [ "${ck8s_version}" != "any" ] \
@@ -124,10 +148,10 @@ validate_config() {
             log_error "ERROR: could not find file $1"
             exit 1
         fi
-        if [[ ! $1 =~ ^.*\.(yaml|yml) ]]; then
-            log_error "ERROR: file $1 must be a yaml file"
-            exit 1
-        fi
+        # if [[ ! $1 =~ ^.*\.(yaml|yml) ]]; then
+        #     log_error "ERROR: file $1 must be a yaml file"
+        #     exit 1
+        # fi
         if [[ ! -f "${2}" ]]; then
           log_error "could not find file $2"
           exit 1
@@ -137,15 +161,15 @@ validate_config() {
             exit 1
         fi
 
-        file="${1}"
+        merged_config="${1}"
         options=$(yq r -p p "${2}" '**')
         # Loop all lines in $2 and warns if same option is not
         # available in $1
         maybe_exit="false"
         for opt in ${options}; do
-            value=$(yq r --unwrapScalar=false "${file}" "${opt}")
+            value=$(yq r --unwrapScalar=false "${merged_config}" "${opt}")
             if [[ -z "${value}" ]] || [[ "${value}" = '"set-me"' ]] || [[ "${value}" = "set-me" ]]; then
-                log_warning "WARN: ${opt} is not set in ${file}"
+                log_warning "WARN: ${opt} is not set in config"
                 maybe_exit="true"
             fi
         done
@@ -160,8 +184,7 @@ validate_config() {
     }
 
     if [[ $1 == "sc" ]]; then
-        validate "${config[config_file_sc]}" "${config_template_path}/config/sc-config.yaml"
-
+        validate "$(merged_sc_config)" "${config_template_path}/config/sc-config.yaml"
         validate "${secrets[secrets_file]}" "${config_template_path}/secrets/sc-secrets.yaml"
     elif [[ $1 == "wc" ]]; then
         validate "${config[config_file_wc]}" "${config_template_path}/config/wc-config.yaml"

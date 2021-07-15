@@ -296,6 +296,25 @@ set_harbor_config() {
     replace_set_me "$1" 'harbor.persistence.disableRedirect' "$disable_redirect"
 }
 
+# Usage: add_unset_config <default_config_file> <config_file>
+add_unset_config() {
+  default_config_file=$1
+  config_file=$2
+
+  options=$(yq r -p p "${default_config_file}" '**')
+  # Loop all lines in $2 and warns if same option is not
+  # available in $1
+  maybe_exit="false"
+  for opt in ${options}; do
+      value=$(yq r --unwrapScalar=false "${default_config_file}" "${opt}")
+      if [[ -z "${value}" ]] || [[ "${value}" = '"set-me"' ]] || [[ "${value}" = "set-me" ]]; then
+        if ! yq read --exitStatus "${config_file}" "${opt}" > /dev/null 2>&1; then
+          yq write --inplace "${config_file}" "${opt}" set-me
+        fi
+      fi
+  done
+}
+
 # Usage: generate_secrets <config-file>
 generate_secrets() {
     if [[ $# -ne 1 ]]; then
@@ -345,27 +364,15 @@ set_harbor_config        "${config[default_config_file_sc]}"
 
 touch "${config[config_file_sc]}"
 
-file=${config[config_file_sc]}
-
-options=$(yq r -p p "${config[default_config_file_sc]}" '**')
-# Loop all lines in $2 and warns if same option is not
-# available in $1
-maybe_exit="false"
-for opt in ${options}; do
-    value=$(yq r --unwrapScalar=false "${config[default_config_file_sc]}" "${opt}")
-    if [[ -z "${value}" ]] || [[ "${value}" = '"set-me"' ]] || [[ "${value}" = "set-me" ]]; then
-      if ! yq read --exitStatus "${file}" "${opt}" > /dev/null 2>&1; then
-        yq write --inplace "${file}" "${opt}" set-me
-      fi
-    fi
-done
-
+add_unset_config "${config[default_config_file_sc]}" "${config[config_file_sc]}"
 
 generate_base_wc_config  "${config[default_config_file_wc]}"
 set_storage_class        "${config[default_config_file_wc]}"
 set_nginx_config         "${config[default_config_file_wc]}"
 
 touch "${config[config_file_wc]}"
+
+add_unset_config "${config[default_config_file_wc]}" "${config[config_file_wc]}"
 
 if [ -f "${secrets[secrets_file]}" ]; then
     log_info "${secrets[secrets_file]} already exists, merging with existing secrets"
