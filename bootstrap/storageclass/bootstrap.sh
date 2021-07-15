@@ -22,9 +22,11 @@ environment="${1}"
 
 case ${environment} in
     service_cluster)
+        config_load sc --skip-validation
         config_file="${config["config_file_sc"]}"
         ;;
     workload_cluster)
+        config_load wc --skip-validation
         config_file="${config["config_file_wc"]}"
         ;;
 esac

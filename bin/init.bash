@@ -77,13 +77,15 @@ generate_base_sc_config() {
     fi
     file=$1
     tmpfile=$(mktemp)
-    append_trap "rm $tmpfile" EXIT
+    append_trap "rm $tmpfile; chmod 444 $file" EXIT
 
-    envsubst > "$tmpfile" < "${config_defaults_path}/config/sc-config.yaml"
-    yq merge --inplace --overwrite "$tmpfile" "${config_defaults_path}/config/flavors/${CK8S_FLAVOR}-sc.yaml"
-    if [[ -f $file ]]; then
-        yq merge "$tmpfile" "$file" --inplace -a=overwrite --overwrite --prettyPrint
-    fi
+    touch "$file"
+    chmod 644 "$file"
+
+    envsubst > "$tmpfile" < "${config_template_path}/config/sc-config.yaml"
+
+    # Change this to use one flavor for cloud provider and one for "size" (e.g. dev, growth, enterprise)
+    yq merge --inplace --overwrite "$tmpfile" "${config_template_path}/config/flavors/${CK8S_FLAVOR}-sc.yaml" --prettyPrint
 
     cat "$tmpfile" > "$file"
 }
@@ -95,13 +97,15 @@ generate_base_wc_config() {
     fi
     file=$1
     tmpfile=$(mktemp)
-    append_trap "rm $tmpfile" EXIT
+    append_trap "rm $tmpfile; chmod 444 $file" EXIT
 
-    envsubst > "$tmpfile" < "${config_defaults_path}/config/wc-config.yaml"
-    yq merge --inplace --overwrite "$tmpfile" "${config_defaults_path}/config/flavors/${CK8S_FLAVOR}-wc.yaml"
-    if [[ -f $file ]]; then
-        yq merge "$tmpfile" "$file" --inplace -a=overwrite --overwrite --prettyPrint
-    fi
+    touch "$file"
+    chmod 644 "$file"
+
+    envsubst > "$tmpfile" < "${config_template_path}/config/wc-config.yaml"
+
+    # Change this to use one flavor for cloud provider and one for "size" (e.g. dev, growth, enterprise)
+    yq merge --inplace --overwrite "$tmpfile" "${config_template_path}/config/flavors/${CK8S_FLAVOR}-wc.yaml" --prettyPrint
 
     cat "$tmpfile" > "$file"
 }
@@ -116,7 +120,7 @@ set_storage_class() {
     fi
     case ${CK8S_CLOUD_PROVIDER} in
         safespring | citycloud)
-          storage_class=cinder-storage
+          storage_class=cinder-csi
 
           [ "$(yq read "$file" 'storageClasses.nfs.enabled')" = "null" ] &&
             yq write --inplace "$file" 'storageClasses.nfs.enabled' false
@@ -125,16 +129,16 @@ set_storage_class() {
           [ "$(yq read "$file" 'storageClasses.ebs.enabled')" = "null" ] &&
             yq write --inplace "$file" 'storageClasses.ebs.enabled' false
           [ "$(yq read "$file" 'storageClasses.cinder.enabled')" = "null" ] &&
-            yq write --inplace "$file" 'storageClasses.cinder.enabled' true
+            yq write --inplace "$file" 'storageClasses.cinder.enabled' false
           ;;
 
         exoscale)
-          storage_class=nfs-client
+          storage_class=rook-ceph-block
 
           [ "$(yq read "$file" 'storageClasses.nfs.enabled')" = "null" ] &&
-            yq write --inplace "$file" 'storageClasses.nfs.enabled' true
+            yq write --inplace "$file" 'storageClasses.nfs.enabled' false
           [ "$(yq read "$file" 'storageClasses.local.enabled')" = "null" ] &&
-            yq write --inplace "$file" 'storageClasses.local.enabled' true
+            yq write --inplace "$file" 'storageClasses.local.enabled' false
           [ "$(yq read "$file" 'storageClasses.ebs.enabled')" = "null" ] &&
             yq write --inplace "$file" 'storageClasses.ebs.enabled' false
           [ "$(yq read "$file" 'storageClasses.cinder.enabled')" = "null" ] &&
@@ -292,25 +296,144 @@ set_harbor_config() {
     replace_set_me "$1" 'harbor.persistence.disableRedirect' "$disable_redirect"
 }
 
+# Usage: update_config <default_config_file> <merged_config_file|override_config_file>
+# Updates config to only contain custom values.
+update_config() {
+    default_config=$1
+    override_config=$2
+
+    if [ ! -f "${override_config}" ]; then
+        touch "${override_config}"
+    fi
+
+    merged_config=$(mktemp)
+    append_trap "rm $merged_config" EXIT
+    new_config=$(mktemp)
+    append_trap "rm $new_config" EXIT
+
+    merge_config "${default_config}" "${override_config}" "${merged_config}"
+
+    keys=$(yq compare "${default_config}" "${merged_config}" --prettyPrint --printMode pv --stripComments -- '**' | \
+           sed -rn 's/\+([^:]+):.*/\1/p' || true)
+    for key in ${keys}; do
+	      value=$(yq read "${merged_config}" --prettyPrint --printMode v --stripComments -- "${key}")
+        # TODO: Check and remove keys with empty values?
+	      yq write "${new_config}" --inplace --prettyPrint -- "${key}" "${value}"
+    done
+
+    defaults=$(yq compare "${new_config}" "${default_config}" --prettyPrint --printMode pv --stripComments -- '**' | \
+               sed -rn 's/\+([^:]+): set-me$/\1/p' || true)
+    for default in ${defaults}; do
+        key=$(yq read "${new_config}" --prettyPrint --printMode p --stripComments -- "${default}")
+        if [[ -z "${key}" ]]; then
+            yq write "${new_config}" --inplace --prettyPrint -- "${default}" "set-me"
+        fi
+    done
+
+    preamble="# See the default configuration under \"defaults\" to see available and suggested options"
+    echo "${preamble}" | cat - "${new_config}" > "${override_config}"
+}
+
+# Usage: update_secrets <config-file> <false|true>
+update_secrets() {
+    if [[ $# -ne 2 ]]; then
+        log_error "ERROR: number of args in update_secrets must be 2. #=[$#]"
+        exit 1
+    fi
+    file=$1
+    generate_secrets=$2
+
+    tmpfile=$(mktemp)
+    append_trap "rm ${tmpfile}" EXIT
+
+    yq merge "${config_template_path}/secrets/sc-secrets.yaml" "${config_template_path}/secrets/wc-secrets.yaml" > "${tmpfile}"
+
+    if [[ -f $file ]]; then
+        sops_decrypt "${file}"
+        yq merge "${tmpfile}" "${file}" --inplace --prettyPrint --overwrite --arrays overwrite
+    fi
+
+    if [ "${generate_secrets}" = "true" ]; then
+        generate_secrets "${tmpfile}"
+    fi
+
+    cat "${tmpfile}" > "${file}"
+    sops_encrypt "${file}"
+}
+
 # Usage: generate_secrets <config-file>
 generate_secrets() {
     if [[ $# -ne 1 ]]; then
         log_error "ERROR: number of args in generate_secrets must be 1. #=[$#]"
         exit 1
     fi
-    file=$1
-    tmpfile=$(mktemp)
-    append_trap "rm $tmpfile" EXIT
+    tmpfile=$1
 
-    cat "${config_defaults_path}/secrets/sc-secrets.yaml" > "$tmpfile"
-    yq merge --inplace "$tmpfile" "${config_defaults_path}/secrets/wc-secrets.yaml"
-    if [[ -f $file ]]; then
-        sops_decrypt "$file"
-        yq merge "$tmpfile" "$file" --inplace -a=overwrite --overwrite --prettyPrint
+    # https://unix.stackexchange.com/questions/307994/compute-bcrypt-hash-from-command-line
+
+    ES_ADM_PASS=$(pwgen -cns 20 1)
+    ES_ADM_PASS_HASH=$(htpasswd -bnBC 10 "" "${ES_ADM_PASS}" | tr -d ':\n')
+
+    ES_CONF_PASS=$(pwgen -cns 20 1)
+    ES_CONF_PASS_HASH=$(htpasswd -bnBC 10 "" "${ES_CONF_PASS}" | tr -d ':\n')
+
+    ES_KIBANA_PASS=$(pwgen -cns 20 1)
+    ES_KIBANA_PASS_HASH=$(htpasswd -bnBC 10 "" "${ES_KIBANA_PASS}" | tr -d ':\n')
+
+    DEX_STATIC_PASS=$(pwgen -cns 20 1)
+    # shellcheck disable=SC2016
+    DEX_STATIC_PASS_HASH=$(htpasswd -bnBC 10 "" "${DEX_STATIC_PASS}" | tr -d ':\n' | sed 's/$2y/$2a/')
+
+    PROMETHEUS_WC_REMOTE_WRITE_PASS=$(pwgen -cns 20 1)
+
+    yq write --inplace "${tmpfile}" 'grafana.password' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'grafana.clientSecret' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'grafana.opsClientSecret' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'harbor.password' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'harbor.databasePassword' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'harbor.clientSecret' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'harbor.xsrf' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'harbor.coreSecret' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'harbor.jobserviceSecret' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'harbor.registrySecret' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'influxDB.users.adminPassword' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'influxDB.users.wcWriterPassword' "${PROMETHEUS_WC_REMOTE_WRITE_PASS}"
+    yq write --inplace "${tmpfile}" 'influxDB.users.scWriterPassword' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'elasticsearch.adminPassword' "${ES_ADM_PASS}"
+    yq write --inplace "${tmpfile}" 'elasticsearch.adminHash' "${ES_ADM_PASS_HASH}"
+    yq write --inplace "${tmpfile}" 'elasticsearch.clientSecret' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'elasticsearch.configurerPassword' "${ES_CONF_PASS}"
+    yq write --inplace "${tmpfile}" 'elasticsearch.configurerHash' "${ES_CONF_PASS_HASH}"
+    yq write --inplace "${tmpfile}" 'elasticsearch.kibanaPassword' "${ES_KIBANA_PASS}"
+    yq write --inplace "${tmpfile}" 'elasticsearch.kibanaHash' "${ES_KIBANA_PASS_HASH}"
+    yq write --inplace "${tmpfile}" 'elasticsearch.fluentdPassword' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'elasticsearch.curatorPassword' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'elasticsearch.snapshotterPassword' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'elasticsearch.metricsExporterPassword' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'elasticsearch.kibanaCookieEncKey' "$(pwgen -cns 32 1)"
+    yq write --inplace "${tmpfile}" 'kubeapiMetricsPassword' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'dex.staticPasswordNotHashed' "${DEX_STATIC_PASS}"
+    yq write --inplace "${tmpfile}" 'dex.staticPassword' "${DEX_STATIC_PASS_HASH}"
+    yq write --inplace "${tmpfile}" 'dex.kubeloginClientSecret' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'user.grafanaPassword' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'user.alertmanagerPassword' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'prometheus.remoteWrite.password' "${PROMETHEUS_WC_REMOTE_WRITE_PASS}"
+}
+
+# Usage: backup_file <file>
+backup_file() {
+    if [ ! -f "$1" ]; then
+        log_error "ERROR: args in backup_file must be a file. [$1]"
     fi
 
-    cat "$tmpfile" > "$file"
-    sops_encrypt "$file"
+    if [ ! -d "${backup_config_path}" ]; then
+        mkdir -p "${backup_config_path}"
+    fi
+
+    # Strip directroy and add timestamp
+    backup_name=$(echo "$1" | sed "s/.*\///" | sed "s/.yaml/-$(date +%y%m%d%H%M%S).yaml/")
+
+    cp "$1" "${backup_config_path}/${backup_name}"
 }
 
 log_info "Initializing CK8S configuration with flavor: $CK8S_FLAVOR"
@@ -324,6 +447,7 @@ else
 fi
 
 mkdir -p "${state_path}"
+mkdir -p "${default_config_path}"
 
 # TODO: Not a fan of this directory, we should probably have a separate script
 #       for generating user configurations and not store it as a part of
@@ -332,32 +456,52 @@ mkdir -p "${CK8S_CONFIG_PATH}/user"
 CK8S_VERSION=$(version_get)
 export CK8S_VERSION
 
-if [ -f "${config[config_file_sc]}" ]; then
-    log_info "${config[config_file_sc]} already exists, merging with existing config"
+if [ -f "${config[override_config_file_sc]}" ]; then
+    backup_file "${config[override_config_file_sc]}"
+    log_info "Updating sc config"
+else
+    log_info "Creating sc config"
 fi
-generate_base_sc_config  "${config[config_file_sc]}"
-set_storage_class        "${config[config_file_sc]}"
-set_nginx_config         "${config[config_file_sc]}"
-set_elasticsearch_config "${config[config_file_sc]}"
-set_harbor_config        "${config[config_file_sc]}"
 
-if [ -f "${config[config_file_wc]}" ]; then
-    log_info "${config[config_file_wc]} already exists, merging with existing config"
+generate_base_sc_config  "${config[default_config_file_sc]}"
+set_storage_class        "${config[default_config_file_sc]}"
+set_nginx_config         "${config[default_config_file_sc]}"
+set_elasticsearch_config "${config[default_config_file_sc]}"
+set_harbor_config        "${config[default_config_file_sc]}"
+
+update_config "${config[default_config_file_sc]}" "${config[override_config_file_sc]}"
+
+if [ -f "${config[override_config_file_wc]}" ]; then
+    backup_file "${config[override_config_file_wc]}"
+    log_info "Updating wc config"
+else
+    log_info "Creating wc config"
 fi
-generate_base_wc_config  "${config[config_file_wc]}"
-set_storage_class        "${config[config_file_wc]}"
-set_nginx_config         "${config[config_file_wc]}"
 
+generate_base_wc_config  "${config[default_config_file_wc]}"
+set_storage_class        "${config[default_config_file_wc]}"
+set_nginx_config         "${config[default_config_file_wc]}"
+
+update_config "${config[default_config_file_wc]}" "${config[override_config_file_wc]}"
+
+gen_secrets=true
 if [ -f "${secrets[secrets_file]}" ]; then
-    log_info "${secrets[secrets_file]} already exists, merging with existing secrets"
+    backup_file "${secrets[secrets_file]}"
+    if [ ${#} -gt 0 ] && [ "$1" = "--regenerate-secrets" ]; then
+        log_info "Updating and regenerating secrets"
+    else
+        log_info "Updating secrets"
+        gen_secrets=false
+    fi
+else
+    log_info "Generating secrets"
 fi
-# TODO: Generate random passwords
-generate_secrets "${secrets[secrets_file]}"
 
+update_secrets "${secrets[secrets_file]}" "${gen_secrets}"
 
 log_info "Config initialized"
 
 log_info "Time to edit the following files:"
-log_info "${config[config_file_sc]}"
-log_info "${config[config_file_wc]}"
+log_info "${config[override_config_file_sc]}"
+log_info "${config[override_config_file_wc]}"
 log_info "${secrets[secrets_file]}"

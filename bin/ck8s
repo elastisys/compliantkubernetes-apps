@@ -10,7 +10,7 @@ source "${here}/common.bash"
 
 usage() {
     echo "COMMANDS:" 1>&2
-    echo "  init                                              initialize the config path" 1>&2
+    echo "  init [--regenerate-secrets]                       initialize the config path" 1>&2
     echo "  bootstrap <wc|sc>                                 bootstrap the cluster" 1>&2
     echo "  apps <wc|sc> [--sync] [--skip-template-validate]  deploy the applications" 1>&2
     echo "  apply <wc|sc> [--sync] [--skip-template-validate] bootstrap and apps" 1>&2
@@ -38,18 +38,20 @@ usage() {
 SYNC=""
 SKIP=""
 KUBECTL=""
+REGEN_SECRETS=""
 
 for arg in "$@"; do
   case "$arg" in
     "--skip-template-validate") SKIP="--skip-template-validate" ;;
     "--sync") SYNC="sync" ;;
     "--kubectl") KUBECTL="kubectl" ;;
+    "--regenerate-secrets") REGEN_SECRETS="--regenerate-secrets" ;;
   esac
 done
 
 case "${1}" in
     init)
-        "${here}/init.bash"
+        "${here}/init.bash" "${REGEN_SECRETS}"
         ;;
     bootstrap)
         [[ "${2}" =~ ^(wc|sc)$ ]] || usage

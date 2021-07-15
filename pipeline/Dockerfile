@@ -7,7 +7,7 @@ RUN  apt-get update && \
      apt-get install -y \
          python3-pip make git wget \
          unzip ssh gettext-base \
-         jq curl apache2-utils \
+         jq pwgen curl apache2-utils \
          net-tools iputils-ping && \
      rm -rf /var/lib/apt/lists/*
 

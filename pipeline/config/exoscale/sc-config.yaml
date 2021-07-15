@@ -1,342 +1,31 @@
+# See the default configuration under "defaults" to see available and suggested options
 global:
   ck8sVersion: any
-  clusterName: pipeline-exoscale-sc
   baseDomain: pipeline-exoscale.elastisys.se
   opsDomain: ops.pipeline-exoscale.elastisys.se
-  issuer: letsencrypt-staging
-  verifyTls: false
-  clusterDns: 10.233.0.3
 storageClasses:
-  # Name of the default storageclass.
-  # Normally one of 'nfs-client', 'cinder-storage', 'local-storage', 'ebs-gp2'.
   default: rook-ceph-block
-  # These are set to null before the first init to be able to set defaults only once
   nfs:
-    enabled: false # true | false
-  cinder:
-    enabled: false # true | false
+    enabled: false
   local:
-    enabled: false # true | false
-  ebs:
-    enabled: false # true | false
+    enabled: false
 objectStorage:
-  # Options are "s3", "gcs", or "none"
-  # If "none", remember to disable features that depend on object storage:
-  #   all backups (velero, harbor, influxdb, elasticsearch), sc logs (fluentd)
-  #   Also set harbor persistence to "filesystem" or "swift"
-  # Otherwise configure the features to match this type.
   type: s3
-  # gcs:
-  #   project: "set-me"
-  # s3:
-  #   region: "set-me"
-  #   regionEndpoint: "set-me"
-  buckets:
-    harbor: pipeline-exoscale-harbor
-    velero: pipeline-exoscale-velero
-    elasticsearch: pipeline-exoscale-es-backup
-    influxDB: pipeline-exoscale-influxdb
-    scFluentd: pipeline-exoscale-sc-logs
   s3:
     region: ch-gva-2
     regionEndpoint: https://sos-ch-gva-2.exo.io
     forcePathStyle: true
-user:
-  grafana:
-    enabled: true
-    subdomain: grafana
-    resources:
-      limits:
-        cpu: 100m
-        memory: 160Mi
-      requests:
-        cpu: 50m
-        memory: 80Mi
-    tolerations: []
-    affinity: {}
-    nodeSelector: {}
-    userGroups:
-      grafanaAdmin: grafana_admin #maps to grafana role admin
-      grafanaEditor: grafana_editor #maps to grafana role editor
-      grafanaViewer: grafana_viewer #maps to grafana role viewer
-    oidc:
-      scopes: "profile email openid"
-      allowedDomains:
-        - example.com
-    sidecar:
-      resources:
-        requests:
-          cpu: 5m
-          memory: 80Mi
-        limits:
-          cpu: 10m
-          memory: 100Mi
-  # Todo remove dependencie on alertmanager from service cluster
-  alertmanager:
-    enabled: false
-    namespace: alertmanager
-    ingress:
-      enabled: false
-    group_by:
-    - cluster
-    - alertname
-    - severity
 harbor:
-  enabled: true
-  subdomain: harbor
-  # The tolerations, affinity, and nodeSelector are applied to all harbor pods.
-  tolerations: []
-  affinity: {}
-  nodeSelector: {}
-  chartmuseum:
-    persistentVolumeClaim:
-      size: 5Gi
-    resources:
-      requests:
-        cpu: 2m
-        memory: 25Mi
-      limits:
-        cpu: 5m
-        memory: 50Mi
-  core:
-    resources:
-      requests:
-        cpu: 5m
-        memory: 50Mi
-      limits:
-        cpu: 10m
-        memory: 100Mi
-  database:
-    persistentVolumeClaim:
-      size: 1Gi
-    resources:
-      requests:
-        memory: 512Mi
-        cpu: 250m
-  jobservice:
-    persistentVolumeClaim:
-      size: 1Gi
-    resources:
-      requests:
-        cpu: 2m
-        memory: 25Mi
-      limits:
-        cpu: 5m
-        memory: 50Mi
-  registry:
-    persistentVolumeClaim:
-      size: 5Gi
-    resources:
-      requests:
-        cpu: 2m
-        memory: 25Mi
-      limits:
-        cpu: 5m
-        memory: 50Mi
-    controller:
-      resources:
-        requests:
-          cpu: 2m
-          memory: 20Mi
-        limits:
-          cpu: 5m
-          memory: 40Mi
-  redis:
-    persistentVolumeClaim:
-      size: 1Gi
-    resources:
-      requests:
-        memory: 32Mi
-        cpu: 10m
-  notary:
-    subdomain: notary.harbor
-    resources:
-      requests:
-        cpu: 2m
-        memory: 15Mi
-      limits:
-        cpu: 5m
-        memory: 20Mi
-  notarySigner:
-    resources:
-      requests:
-        cpu: 2m
-        memory: 10Mi
-      limits:
-        cpu: 5m
-        memory: 20Mi
-  portal:
-    resources:
-      requests:
-        cpu: 2m
-        memory: 5Mi
-      limits:
-        cpu: 5m
-        memory: 10Mi
-  trivy:
-    persistentVolumeClaim:
-      size: 5Gi
-    resources:
-      requests:
-        cpu: 10m
-        memory: 263Mi
-      limits:
-        cpu: 20m
-        memory: 512Mi
   persistence:
-    # Valid options are "filesystem" (persistent volume), "swift", or "objectStorage" (matching global config)
     type: objectStorage
-    disableRedirect: false
   oidc:
-    #group claim name used by OIDC Provider
     groupClaimName: not-used
-    adminGroupName: ""
-    scope: openid,email,profile,offline_access,groups
+    adminGroupName: not-used
   backup:
     enabled: true
-
-prometheusBlackboxExporter:
-  resources:
-    requests:
-      cpu: 5m
-      memory: 25Mi
-    limits:
-      cpu: 10m
-      memory: 50Mi
-prometheusOperator:
-  resources:
-    requests:
-      cpu: 50m
-      memory: 100Mi
-    limits:
-      cpu: 100m
-      memory: 200Mi
-
-prometheusNodeExporter:
-  resources:
-    requests:
-      cpu: 5m
-      memory: 25Mi
-    limits:
-      cpu: 10m
-      memory: 50Mi
-
-kubeStateMetrics:
-  resources:
-    requests:
-      cpu: 5m
-      memory: 25Mi
-    limits:
-      cpu: 10m
-      memory: 50Mi
-
-prometheus:
-  storage:
-    enabled: false
-  retention:
-    size: 1GiB
-    age: 3d
-    alertmanager: 72h
-  resources:
-    requests:
-      memory: 1Gi
-      cpu: 300m
-    limits:
-      memory: 2Gi
-      cpu: "1"
-  tolerations: []
-  affinity: {}
-  nodeSelector: {}
-  wcReader:
-    resources:
-      requests:
-        memory: 1Gi
-        cpu: 300m
-      limits:
-        memory: 2Gi
-        cpu: "1"
-    storage:
-      enabled: false
-    retention:
-      size: 1GiB
-      age: 3d
-    tolerations: []
-    affinity: {}
-    nodeSelector: {}
-  alertmanagerSpec:
-    resources:
-      requests:
-        cpu: 10m
-        memory: 50Mi
-  grafana:
-    subdomain: grafana
-    resources:
-      requests:
-        cpu: 50m
-        memory: 60Mi
-      limits:
-        cpu: 100m
-        memory: 160Mi
-    tolerations: []
-    affinity: {}
-    nodeSelector: {}
-    oidc:
-      enabled: false
-    sidecar:
-      resources:
-        requests:
-          cpu: 5m
-          memory: 80Mi
-        limits:
-          cpu: 10m
-          memory: 100Mi
-dex:
-  subdomain: dex
-  additionalKubeloginRedirects: []
-  enableStaticLogin: true
-  resources:
-    limits:
-      cpu: 10m
-      memory: 50Mi
-    requests:
-      cpu: 5m
-      memory: 25Mi
-  tolerations: []
-  affinity: {}
-  nodeSelector: {}
-  google:
-    groupSupport: false
-kibana:
-  subdomain: kibana
-  # Note sso is enabled via `elasticsearch.sso.enabled`
-  resources:
-    requests:
-      cpu: 100m
-      memory: 286Mi
-  nodeSelector: {}
-  tolerations: []
-  affinity: {}
 elasticsearch:
-  subdomain: elastic
-  snapshotRepository: elastic-snapshots
-  # Create initial indices upon first startup
-  createIndices: true
-  # Single-sign-on using OIDC
-  sso:
-    enabled: false
-    # Where to find subject
-    subject_key: email
-    # Where to find roles
-    roles_key: groups
-    # Scope - add 'groups' if groups claim is supported
-    scope: openid profile email
   masterNode:
-    count: 1
     storageSize: 1Gi
-    ## If null, no storageclass is specified in pvc and default storageClass is used
-    ## if the DefaultStorageClass admission plugin is enabled.
-    ## If "-", "" will be used as storageClassName.
-    storageClass: null
     javaOpts: -Xms512m -Xmx512m
     resources:
       requests:
@@ -345,458 +34,51 @@ elasticsearch:
       limits:
         memory: 1024Mi
         cpu: 1
-    affinity:
-      podAntiAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 1
-            podAffinityTerm:
-              topologyKey: kubernetes.io/hostname
-              labelSelector:
-                matchLabels:
-                  role: master
-    tolerations: []
-    nodeSelector: {}
   dataNode:
-    ## Enables dedicated statefulset for data nodes.
-    ## If false, master nodes will assume data role.
     dedicatedPods: true
-    count: 2
     storageSize: 18Gi
-    ## If null, no storageclass is specified in pvc and default storageClass is used
-    ## if the DefaultStorageClass admission plugin is enabled.
-    ## If "-", "" will be used as storageClassName.
-    storageClass: null
-    javaOpts: -Xms512m -Xmx512m
-    resources:
-      requests:
-        memory: 1024Mi
-        cpu: 200m
-      limits:
-        memory: 1024Mi
-        cpu: 1
-    affinity:
-      podAntiAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 1
-            podAffinityTerm:
-              topologyKey: kubernetes.io/hostname
-              labelSelector:
-                matchLabels:
-                  role: data
-    tolerations: []
-    nodeSelector: {}
   clientNode:
-    ## Enables dedicated deployment for client/ingest nodes.
-    ## If false, master nodes will assume client/ingest roles
     dedicatedPods: true
-    count: 1
-    javaOpts: -Xms512m -Xmx512m
-    resources:
-      requests:
-        memory: 1024Mi
-        cpu: 200m
-      limits:
-        memory: 1024Mi
-        cpu: 1
-    affinity:
-      podAntiAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 1
-            podAffinityTerm:
-              topologyKey: kubernetes.io/hostname
-              labelSelector:
-                matchLabels:
-                  role: client
-    tolerations: []
-    nodeSelector: {}
-  # Config for https://www.elastic.co/guide/en/elasticsearch/client/curator/5.8/about.html
   curator:
-    enabled: true
-    resources:
-      limits:
-        cpu: 100m
-        memory: 128Mi
-      requests:
-        cpu: 50m
-        memory: 64Mi
-    affinity: {}
-    nodeSelector: {}
-    tolerations: []
     retention:
-      kubeAuditSizeGB: 4
-      kubeAuditAgeDays: 3
-      kubernetesSizeGB: 10
-      kubernetesAgeDays: 3
-      otherSizeGB: 1
-      otherAgeDays: 7
-      authLogSizeGB: 1
       authLogAgeDays: 7
-      # (Optional) retention for indices matched by 'postgresql-*'
-      # postgresql: false
-      # postgresqlSizeGB: 30
-      # postgresqlAgeDays: 30
-  # Index state management
-  ism:
-    # Overwrite ism policies
-    overwritePolicies: true
-    rolloverSizeGB: 1
-    rolloverAgeDays: 1
-    # Create default policies - kubernetes, kubeaudit, and other
-    defaultPolicies: true
-    additionalPolicies: {}
-  # Snapshot and snapshot lifecycle configuration
   snapshot:
     enabled: true
-    min: 7
-    max: 14
-    ageSeconds: 864000
-    retentionSchedule: 0 1 * * * # 1am
-    backupSchedule: 0 */12 * * * # run twice/day
-    retentionActiveDeadlineSeconds: 2700
-  extraRoles: []
-  # - role_name: log_reader
-  #   definition:
-  #     index_permissions:
-  #     - index_patterns:
-  #       - "kubernetes-*"
-  #       allowed_actions:
-  #       - "read"
-  extraRoleMappings: []
-  # - mapping_name: readall_and_monitor
-  #   definition:
-  #    users:
-  #      - "Developer Name"
-  #  - mapping_name: kibana_user
-  #    definition:
-  #      backend_roles:
-  #        - "kibana_dev"
-  #  - mapping_name: kubernetes_log_reader
-  #    definition:
-  #      backend_roles:
-  #        - "kibana_dev"
-  #  - mapping_name: all_access
-  #    definition:
-  #      backend_roles:
-  #        - "kibana_admin"
-  overwriteTemplates: true
-  # Create default index templates - kubernetes, kubeaudit, and other
-  defaultTemplates: true
-  additionalTemplates: {}
-  exporter:
-    serviceMonitor:
-      interval: 30s
-      scrapeTimeout: 30s
-    resources:
-      requests:
-        cpu: 15m
-        memory: 30Mi
-      limits:
-        cpu: 30m
-        memory: 60Mi
-    tolerations: []
-  ingress:
-    maxbodysize: 8m
 fluentd:
   enabled: true
-  forwarder:
-    resources:
-      limits:
-        cpu: 500m
-        memory: 572Mi
-      requests:
-        cpu: 200m
-        memory: 300Mi
-    tolerations: []
-    affinity: {}
-    nodeSelector: {}
-    livenessProbe:
-      initialDelaySeconds: 60
-      periodSeconds: 10
-      timeoutSeconds: 5
-      failureThreshold: 6
-    readinessProbe:
-      initialDelaySeconds: 5
-      periodSeconds: 10
-      timeoutSeconds: 5
-      failureThreshold: 6
-    useRegionEndpoint: true
-    chunkLimitSizeBytes: 2048
-    queueLimitSizeBytes: 4096
-  aggregator:
-    resources:
-      limits:
-        cpu: 500m
-        memory: 1000Mi
-      requests:
-        cpu: 300m
-        memory: 300Mi
-    tolerations: []
-    affinity: {}
-    nodeSelector: {}
-# Log retention for service cluster logs stored in object storage.
-logRetention:
-  days: 7
 influxDB:
-  subdomain: influxdb
-  users:
-    admin: admin
-    wcWriter: wcWriter
-    scWriter: scWriter
-  createdb: true
   resources:
     requests:
       memory: 4Gi
-      cpu: 0.5
     limits:
       memory: 4Gi
-      cpu: 2
-  persistence:
-    size: 10Gi
-  tolerations: []
-  affinity: {}
-  nodeSelector: {}
-  # Configuration for size based retention
-  retention:
-    # Enable size based retention job
-    enabled: true
-    sizeWC: 4500000
-    sizeSC: 4500000
-    resources:
-      requests:
-        cpu: 50m
-        memory: 100Mi
-      limits:
-        cpu: 250m
-        memory: 500Mi
-    # The duration of the retention policy for each database
-    durationWC: 2d
-    durationSC: 3d
   backup:
     enabled: true
-    schedule: 0 0 * * *
-    startingDeadlineSeconds: 200
-    resources:
-      requests:
-        cpu: 50m
-        memory: 100Mi
-      limits:
-        cpu: 250m
-        memory: 300Mi
   backupRetention:
     enabled: true
-    daysToRetain: 7
-    schedule: 0 0 * * *
-    startingDeadlineSeconds: 200
-    resources:
-      requests:
-        cpu: 50m
-        memory: 100Mi
-      limits:
-        cpu: 250m
-        memory: 300Mi
-
-  sidecar:
-    nodeexporter:
-      resources:
-        requests:
-          cpu: 5m
-          memory: 15Mi
-        limits:
-          cpu: 10m
-          memory: 30Mi
-    cronjob:
-      resources:
-        requests:
-          cpu: 5m
-          memory: 50Mi
-        limits:
-          cpu: 10m
-          memory: 100Mi
 alerts:
-  alertTo: "null"
   opsGenieHeartbeat:
-    enabled: false
-    url: https://api.eu.opsgenie.com/v2/heartbeats
     name: not-used
   slack:
     channel: not-used
-  opsGenie:
-    apiUrl: https://api.eu.opsgenie.com
-externalTrafficPolicy:
-  local: false
-  whitelistRange:
-    global: 0.0.0.0/0
-    dex: false
-    kibana: false
-    elasticsearch: false
-    harbor: false
-    userGrafana: false
-    opsGrafana: false
-    prometheusWc: false
 nfsProvisioner:
   server: not-used
-  path: /nfs
-  resources:
-    limits:
-      cpu: 100m
-      memory: 128Mi
-    requests:
-      cpu: 100m
-      memory: 128Mi
-  tolerations: []
-  affinity: {}
-  nodeSelector: {}
 ingressNginx:
   controller:
-    resources:
-      requests:
-        cpu: 100m
-        memory: 263Mi
-      limits:
-        cpu: 200m
-        memory: 512Mi
-    tolerations: []
-    affinity: {}
-    nodeSelector: {}
-    config:
-      useProxyProtocol: false
-    useHostPort: true
     service:
-      enabled: false
       type: not-used
       annotations: not-used
-    # Will add custom configuration options to Nginx https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
-    additionalConfig: {}
-  defaultBackend:
-    resources:
-      requests:
-        cpu: 5m
-        memory: 10Mi
-      limits:
-        cpu: 10m
-        memory: 20Mi
-    tolerations: []
-    affinity: {}
-    nodeSelector: {}
 velero:
   enabled: true
-  tolerations: []
-  nodeSelector: {}
-  schedule: 0 0 * * * #once per day
-  resources:
-    limits:
-      cpu: 500m
-      memory: 500Mi
-    requests:
-      cpu: 50m
-      memory: 100Mi
-  restic:
-    tolerations: []
-    resources:
-      limits:
-        cpu: 500m
-        memory: 500Mi
-      requests:
-        cpu: 50m
-        memory: 100Mi
 issuers:
   letsencrypt:
-    enabled: true
     prod:
       email: letsencrypt@elastisys.com
     staging:
       email: letsencrypt@elastisys.com
-  extraIssuers: []
-certmanager:
-  resources:
-    requests:
-      cpu: 25m
-      memory: 100Mi
-    limits:
-      cpu: 50m
-      memory: 200Mi
-  nodeSelector: {}
-  tolerations: {}
-  affinity: {}
-  extraArgs: []
-  webhook:
-    resources:
-      requests:
-        cpu: 25m
-        memory: 25Mi
-      limits:
-        cpu: 50m
-        memory: 50Mi
-    nodeSelector: {}
-    tolerations: {}
-    affinity: {}
-  cainjector:
-    resources:
-      requests:
-        cpu: 25m
-        memory: 100Mi
-      limits:
-        cpu: 50m
-        memory: 200Mi
-    nodeSelector: {}
-    tolerations: {}
-    affinity: {}
-metricsServer:
-  enabled: true
-  resources:
-    requests:
-      cpu: 10m
-      memory: 25Mi
-    limits:
-      cpu: 20m
-      memory: 50Mi
-calicoAccountant:
-  enabled: true
-calicoFelixMetrics:
-  enabled: true
-clusterAdmin:
-  users: []
-  groups: []
 s3Exporter:
-  enabled: true
   interval: 120s
   scrapeTimeout: 30s
-  resources:
-    limits: {}
-    requests:
-      cpu: 50m
-      memory: 20Mi
-  tolerations: []
-  affinity: {}
-  nodeSelector: {}
-starboard:
-  resources:
-    requests:
-      cpu: 5m
-      memory: 50Mi
-    limits:
-      cpu: 10m
-      memory: 128Mi
-  tolerations: []
-  affinity: {}
-vulnerabilityExporter:
-  resources:
-    requests:
-      cpu: 20m
-      memory: 15Mi
-    limits:
-      cpu: 40m
-      memory: 30Mi
-  tolerations: []
-  affinity: {}
-  curlcronjob:
-    resources:
-      requests:
-        cpu: 20m
-        memory: 64Mi
-      limits:
-        cpu: 40m
-        memory: 128Mi
 monitoring:
   rook:
     enabled: true

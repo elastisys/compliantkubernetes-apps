@@ -13,25 +13,26 @@ usage() {
 
 case "${1}" in
     user)
+        config_load wc
         cluster_config="${config[config_file_wc]}"
         kubeconfig="${secrets[kube_config_wc]}"
-        cluster_type="wc"
         user_kubeconfig=${CK8S_CONFIG_PATH}/user/kubeconfig.yaml
     ;;
     admin)
         case "${2}" in
             sc)
+                config_load sc
                 cluster_config="${config[config_file_sc]}"
                 kubeconfig="${secrets[kube_config_sc]}"
             ;;
             wc)
+                config_load wc
                 cluster_config="${config[config_file_wc]}"
                 kubeconfig="${secrets[kube_config_wc]}"
             ;;
             *) usage ;;
         esac
         cluster="$2"
-        cluster_type="$2"
         if [[ $# -gt 2 ]]; then
             kubeconfig="${state_path}/kube_config_$3.yaml"
             cluster="$3"
@@ -46,8 +47,6 @@ if [[ ! -f "${kubeconfig}" ]]; then
     usage
 fi
 
-config_load "${cluster_type}"
-
 get_user_server() {
     (
         with_kubeconfig "${kubeconfig}" \
@@ -55,7 +54,7 @@ get_user_server() {
     )
 }
 
-log_info "Creating kubeconfig for the user"
+log_info "Creating kubeconfig for the ${1}"
 
 cluster_name=$(yq r "${cluster_config}" 'global.clusterName')
 base_domain=$(yq r "${cluster_config}" 'global.baseDomain')

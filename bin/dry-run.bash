@@ -13,8 +13,6 @@ here="$(dirname "$(readlink -f "$0")")"
 # shellcheck source=bin/common.bash
 source "${here}/common.bash"
 
-config_load "$1"
-
 #
 # Helmfile diff
 #

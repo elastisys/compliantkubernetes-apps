@@ -5,6 +5,7 @@ on:
   # Run at 4 and 10 GMT, basically "early morning" and "lunch"
   - cron: "0 4,10 * * *"
 
+
 jobs:
 
   build-apps-image:
@@ -119,15 +120,6 @@ jobs:
         PGP_KEY: ${{ secrets.PGP_KEY }}
         PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
 
-    - name: Create buckets
-      if: matrix.cluster == 'sc'
-      env:
-        EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-        EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
-      run: |
-        ./apps/scripts/S3/generate-s3cfg.sh exoscale "${EXOSCALE_API_KEY}" "${EXOSCALE_API_SECRET}" sos-ch-gva-2.exo.io ch-gva-2 > s3cfg.ini
-        ./apps/scripts/S3/entry.sh --s3cfg s3cfg.ini create
-
     - name: Prepare for apps
       env:
         S3_ACCESS_KEY: ${{ secrets.EXOSCALE_API_KEY }}
@@ -144,6 +136,23 @@ jobs:
         sops --config "$CK8S_CONFIG_PATH/.sops.yaml" -e -i "$CK8S_CONFIG_PATH/secrets.yaml"
         sops --config "$CK8S_CONFIG_PATH/.sops.yaml" --set "[\"objectStorage\"] {\"s3\": {\"accessKey\": \"${S3_ACCESS_KEY}\", \"secretKey\": \"${S3_SECRET_KEY}\"}}" "$CK8S_CONFIG_PATH/secrets.yaml"
 
+    - name: Initialize apps
+      env:
+        CK8S_ENVIRONMENT_NAME: pipeline-exoscale
+        CK8S_CLOUD_PROVIDER: exoscale
+        CK8S_FLAVOR: dev
+      run: ./apps/bin/ck8s init
+      id: initialize-apps
+
+    - name: Create buckets
+      if: matrix.cluster == 'sc'
+      env:
+        EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
+        EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
+      run: |
+        ./apps/scripts/S3/generate-s3cfg.sh exoscale "${EXOSCALE_API_KEY}" "${EXOSCALE_API_SECRET}" sos-ch-gva-2.exo.io ch-gva-2 > s3cfg.ini
+        ./apps/scripts/S3/entry.sh --s3cfg s3cfg.ini create
+
     - name: Install rook
       env:
         KUBECONFIG: /__w/compliantkubernetes-apps/compliantkubernetes-apps/apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/artifacts/admin.conf
@@ -154,12 +163,30 @@ jobs:
     # TODO: Some kind of test of Rook before we waste time waiting for apps to fail if it is broken...
     # We may also want to move Rook to the apps bootstrap instead.
 
+    - name: Gather configs
+      if: always() && steps.initialize-apps.outcome == 'success' && matrix.cluster == 'sc'
+      shell: bash
+      working-directory: ./apps/pipeline/config/exoscale
+      run: |
+        cp defaults/sc-config.yaml defaults-sc-config.yaml
+        cp defaults/wc-config.yaml defaults-wc-config.yaml
+        tar -czf configs.tar.gz defaults-sc-config.yaml defaults-wc-config.yaml sc-config.yaml wc-config.yaml
+      id: gather-configs
+
+    - name: Upload configs
+      if: always() && steps.gather-configs.outcome == 'success'
+      uses: actions/upload-artifact@v2
+      with:
+        name: compliantkubernetes-apps-pipeline-config
+        path: ./apps/pipeline/config/exoscale/configs.tar.gz
+
     - name: Install apps
       run: ./apps/pipeline/apply-${{ matrix.cluster }}.bash
       shell: bash
       id: install-apps
+
     - name: Wait for Elasticsearch to be ready
-      if: matrix.cluster == 'wc'
+      if: steps.install-apps.outcome == 'success' && matrix.cluster == 'wc'
       continue-on-error: true
       shell: bash
       run: |
@@ -174,8 +201,9 @@ jobs:
         ./apps/bin/ck8s ops kubectl wc -n fluentd rollout restart daemonset fluentd-fluentd-elasticsearch
         ./apps/bin/ck8s ops kubectl wc -n kube-system rollout restart daemonset fluentd-system-fluentd-elasticsearch
         # There seem to be no point in waiting for the pods here, as the tests already do this.
+
     - name: Test apps
-      if: always() && (steps.install-apps.outcome != 'cancelled' && steps.install-apps.outcome != 'skipped')
+      if: always() && (steps.install-apps.outcome != 'cancelled' && steps.install-apps.outcome != 'skipped' && steps.install-apps.outcome != 'failure')
       run: ./apps/bin/ck8s test ${{ matrix.cluster }}
       env:
         PIPELINE: "true"

@@ -30,7 +30,7 @@ export CK8S_CONFIG_PATH
 
 here="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 root_path="${here}/.."
-config_defaults_path="${root_path}/config"
+config_template_path="${root_path}/config"
 # TODO: these are used by sourced scripts.
 # Should we export all "externally" used variables?
 # shellcheck disable=SC2034
@@ -40,14 +40,22 @@ pipeline_path="${root_path}/pipeline"
 
 sops_config="${CK8S_CONFIG_PATH}/.sops.yaml"
 state_path="${CK8S_CONFIG_PATH}/.state"
-ssh_path="${CK8S_CONFIG_PATH}/ssh"
+default_config_path="${CK8S_CONFIG_PATH}/defaults"
+# shellcheck disable=SC2034
+backup_config_path="${CK8S_CONFIG_PATH}/backups"
 
 declare -A config
 declare -A secrets
 
-config["config_file"]="${CK8S_CONFIG_PATH}/config.sh"
-config["config_file_wc"]="${CK8S_CONFIG_PATH}/wc-config.yaml"
-config["config_file_sc"]="${CK8S_CONFIG_PATH}/sc-config.yaml"
+# Reserving for the merged config files.
+config["config_file_wc"]=""
+config["config_file_sc"]=""
+
+config["default_config_file_wc"]="${default_config_path}/wc-config.yaml"
+config["default_config_file_sc"]="${default_config_path}/sc-config.yaml"
+
+config["override_config_file_wc"]="${CK8S_CONFIG_PATH}/wc-config.yaml"
+config["override_config_file_sc"]="${CK8S_CONFIG_PATH}/sc-config.yaml"
 
 secrets["secrets_file"]="${CK8S_CONFIG_PATH}/secrets.yaml"
 secrets["s3cfg_file"]="${state_path}/s3cfg.ini"
@@ -55,13 +63,7 @@ secrets["s3cfg_file"]="${state_path}/s3cfg.ini"
 secrets["kube_config_sc"]="${state_path}/kube_config_sc.yaml"
 secrets["kube_config_wc"]="${state_path}/kube_config_wc.yaml"
 
-secrets["ssh_priv_key_sc"]="${ssh_path}/id_rsa_sc"
-secrets["ssh_priv_key_wc"]="${ssh_path}/id_rsa_wc"
-
 secrets["user_kubeconfig"]="${CK8S_CONFIG_PATH}/user/kubeconfig.yaml"
-
-config["ssh_pub_key_sc"]="${secrets[ssh_priv_key_sc]}.pub"
-config["ssh_pub_key_wc"]="${secrets[ssh_priv_key_wc]}.pub"
 
 log_info() {
     echo -e "[\e[34mck8s\e[0m] ${*}" 1>&2
@@ -84,6 +86,60 @@ array_contains() {
     return 1
 }
 
+check_config()  {
+    if [[ ! -f "${1}" ]]; then
+        log_error "ERROR: could not find file $1"
+        exit 1
+    fi
+    if [[ ! $1 =~ ^.*\.(yaml|yml) ]]; then
+        log_error "ERROR: file $1 must be a yaml file"
+        exit 1
+    fi
+    if [[ ! -f "${2}" ]]; then
+        log_error "ERROR: could not find file $2"
+        exit 1
+    fi
+    if [[ ! $2 =~ ^.*\.(yaml|yml) ]]; then
+        log_error "ERROR: file $2 must be a yaml file"
+        exit 1
+    fi
+}
+
+# Usage: merge_config <default_config> <override_config> <merged_config>
+merge_config() {
+    yq merge "$1" "$2" --overwrite --arrays overwrite > "$3"
+}
+
+# Loads the default and override and merges into a tempfile at config[config_file_<wc|sc>].
+load_config() {
+    if [[ "${1}" == "sc" ]]; then
+        : "${config[default_config_file_sc]:?Missing default config}"
+        : "${config[override_config_file_sc]:?Missing config}"
+
+        check_config "${config[default_config_file_sc]}" "${config[override_config_file_sc]}"
+
+        config[config_file_sc]=$(mktemp)
+        append_trap "rm ${config[config_file_sc]}" EXIT
+
+        merge_config "${config[default_config_file_sc]}" "${config[override_config_file_sc]}" "${config[config_file_sc]}"
+
+    elif [[ "${1}" == "wc" ]]; then
+        : "${config[default_config_file_wc]:?Missing default config}"
+        : "${config[override_config_file_wc]:?Missing config}"
+
+        check_config "${config[default_config_file_wc]}" "${config[override_config_file_wc]}"
+
+        config[config_file_wc]=$(mktemp)
+        append_trap "rm ${config[config_file_wc]}" EXIT
+
+        merge_config "${config[default_config_file_wc]}" "${config[override_config_file_wc]}" "${config[config_file_wc]}"
+
+    else
+        log_error "Error: usage load_config <wc|sc>"
+        exit 1
+    fi
+}
+
 version_get() {
     pushd "${root_path}" > /dev/null || exit 1
     git describe --exact-match --tags 2> /dev/null || git rev-parse HEAD
@@ -96,21 +152,21 @@ version_get() {
 validate_version() {
     version=$(version_get)
     if [[ "${1}" == "sc" ]]; then
-        file="${config[config_file_sc]}"
+        merged_config="${config[config_file_sc]}"
     elif [[ "${1}" == "wc" ]]; then
-        file="${config[config_file_wc]}"
+        merged_config="${config[config_file_wc]}"
     else
-      echo log_error "Error: usage validate_version <wc|sc>"
-      exit 1
+        echo log_error "Error: usage validate_version <wc|sc>"
+        exit 1
     fi
-    ck8s_version=$(yq r "${file}" 'global.ck8sVersion')
+    ck8s_version=$(yq read "${merged_config}" 'global.ck8sVersion')
     if [[ -z "$ck8s_version" ]]; then
-        log_error "ERROR: global.ck8sVersion is not set in ${file}"
+        log_error "ERROR: No version set. Run init to generate config."
         exit 1
     fi
     if [ "${ck8s_version}" != "any" ] \
         && [ "${version}" != "${ck8s_version}" ]; then
-        log_error "ERROR: Version mismatch!"
+        log_error "ERROR: Version mismatch. Run init to update config."
         log_error "Config version: ${ck8s_version}"
         log_error "CK8S version: ${version}"
         exit 1
@@ -124,32 +180,23 @@ validate_version() {
 validate_config() {
     log_info "Validating $1 config"
     validate() {
-        if [[ ! -f "${1}" ]]; then
-            log_error "ERROR: could not find file $1"
-            exit 1
-        fi
-        if [[ ! $1 =~ ^.*\.(yaml|yml) ]]; then
-            log_error "ERROR: file $1 must be a yaml file"
-            exit 1
-        fi
         if [[ ! -f "${2}" ]]; then
-          log_error "could not find file $2"
-          exit 1
+            log_error "ERROR: could not find file $2"
+            exit 1
         fi
         if [[ ! $2 =~ ^.*\.(yaml|yml) ]]; then
             log_error "ERROR: file $2 must be a yaml file"
             exit 1
         fi
-
-        file="${1}"
+        merged_config="${1}"
         options=$(yq r -p p "${2}" '**')
         # Loop all lines in $2 and warns if same option is not
         # available in $1
         maybe_exit="false"
         for opt in ${options}; do
-            value=$(yq r --unwrapScalar=false "${file}" "${opt}")
+            value=$(yq r --unwrapScalar=false "${merged_config}" "${opt}")
             if [[ -z "${value}" ]] || [[ "${value}" = '"set-me"' ]] || [[ "${value}" = "set-me" ]]; then
-                log_warning "WARN: ${opt} is not set in ${file}"
+                log_warning "WARN: ${opt} is not set in config"
                 maybe_exit="true"
             fi
         done
@@ -164,14 +211,13 @@ validate_config() {
     }
 
     if [[ $1 == "sc" ]]; then
-        validate "${config[config_file_sc]}" "${config_defaults_path}/config/sc-config.yaml"
-
-        validate "${secrets[secrets_file]}" "${config_defaults_path}/secrets/sc-secrets.yaml"
+        validate "${config[config_file_sc]}" "${config_template_path}/config/sc-config.yaml"
+        validate "${secrets[secrets_file]}" "${config_template_path}/secrets/sc-secrets.yaml"
     elif [[ $1 == "wc" ]]; then
-        validate "${config[config_file_wc]}" "${config_defaults_path}/config/wc-config.yaml"
-        validate "${secrets[secrets_file]}" "${config_defaults_path}/secrets/wc-secrets.yaml"
+        validate "${config[config_file_wc]}" "${config_template_path}/config/wc-config.yaml"
+        validate "${secrets[secrets_file]}" "${config_template_path}/secrets/wc-secrets.yaml"
     else
-        log_error "Error: usage validate_config <sc|wc>"
+        log_error "ERROR: usage validate_config <sc|wc>"
         exit 1
     fi
 
@@ -201,10 +247,15 @@ validate_sops_config() {
 }
 
 # Load and validate all configuration options from the config path.
+# Usage: config_load <sc|wc> [sk]
 config_load() {
-    validate_version "$1"
-    validate_config "$1"
-    validate_sops_config
+    load_config "$1"
+
+    if [[ "--skip-validation" != "${2:-''}" ]]; then
+        validate_version "$1"
+        validate_config "$1"
+        validate_sops_config
+    fi
 }
 
 # Normally a signal handler can only run one command. Use this to be able to
@@ -233,7 +284,7 @@ append_trap() {
 # Write PGP fingerprints to SOPS config
 sops_config_write_fingerprints() {
     yq n 'creation_rules[0].pgp' "${1}" > "${sops_config}" || \
-      (log_error "Failed to write fingerprints" && rm "${sops_config}" && exit 1)
+      (log_error "ERROR: Failed to write fingerprints" && rm "${sops_config}" && exit 1)
 }
 
 # Encrypt stdin to file. If the file already exists it's overwritten.

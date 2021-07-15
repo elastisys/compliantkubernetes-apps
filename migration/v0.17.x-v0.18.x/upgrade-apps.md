@@ -19,6 +19,14 @@
     ```
 
 ## Steps
+1. Update configuration files:
+
+    This will take a backup before updating the configuration to the new split format:
+
+    ```bash
+    bin/ck8s init
+    ```
+
 1. Upgrade applications:
 
     ```bash

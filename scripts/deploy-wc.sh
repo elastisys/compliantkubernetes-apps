@@ -6,6 +6,8 @@ SCRIPTS_PATH="$(dirname "$(readlink -f "$0")")"
 # shellcheck source=bin/common.bash
 source "${SCRIPTS_PATH}/../bin/common.bash"
 
+config_load wc --skip-validation
+
 : "${config[config_file_wc]:?Missing config}"
 : "${secrets[secrets_file]:?Missing secrets}"
 
