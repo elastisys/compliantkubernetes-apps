@@ -27,7 +27,7 @@ deployments=(
     "kube-system coredns"
     "kube-system metrics-server"
     "kube-system calico-kube-controllers"
-    "ingress-nginx ingress-nginx-defaultbackend"
+    "ingress-nginx ingress-nginx-default-backend"
     "monitoring kube-prometheus-stack-operator"
     "monitoring kube-prometheus-stack-kube-state-metrics"
 )
