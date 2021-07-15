@@ -6,11 +6,13 @@ helmDefaults:
 environments:
   workload_cluster:
     values:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/wc-config.yaml"
       - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/wc-config.yaml"
     secrets:
       - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
   service_cluster:
     values:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/sc-config.yaml"
       - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/sc-config.yaml"
     secrets:
       - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"

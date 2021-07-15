@@ -77,13 +77,15 @@ generate_base_sc_config() {
     fi
     file=$1
     tmpfile=$(mktemp)
-    append_trap "rm $tmpfile" EXIT
+    append_trap "rm $tmpfile; chmod 444 $file" EXIT
 
-    envsubst > "$tmpfile" < "${config_defaults_path}/config/sc-config.yaml"
-    yq merge --inplace --overwrite "$tmpfile" "${config_defaults_path}/config/flavors/${CK8S_FLAVOR}-sc.yaml"
-    if [[ -f $file ]]; then
-        yq merge "$tmpfile" "$file" --inplace -a=overwrite --overwrite --prettyPrint
-    fi
+    touch "$file"
+    chmod 644 "$file"
+
+    envsubst > "$tmpfile" < "${config_template_path}/config/sc-config.yaml"
+
+    # Change this to use one flavor for cloud provider and one for "size" (e.g. dev, growth, enterprise)
+    yq merge --inplace --overwrite "$tmpfile" "${config_template_path}/config/flavors/${CK8S_FLAVOR}-sc.yaml" --prettyPrint
 
     cat "$tmpfile" > "$file"
 }
@@ -95,13 +97,15 @@ generate_base_wc_config() {
     fi
     file=$1
     tmpfile=$(mktemp)
-    append_trap "rm $tmpfile" EXIT
+    append_trap "rm $tmpfile; chmod 444 $file" EXIT
 
-    envsubst > "$tmpfile" < "${config_defaults_path}/config/wc-config.yaml"
-    yq merge --inplace --overwrite "$tmpfile" "${config_defaults_path}/config/flavors/${CK8S_FLAVOR}-wc.yaml"
-    if [[ -f $file ]]; then
-        yq merge "$tmpfile" "$file" --inplace -a=overwrite --overwrite --prettyPrint
-    fi
+    touch "$file"
+    chmod 644 "$file"
+
+    envsubst > "$tmpfile" < "${config_template_path}/config/wc-config.yaml"
+
+    # Change this to use one flavor for cloud provider and one for "size" (e.g. dev, growth, enterprise)
+    yq merge --inplace --overwrite "$tmpfile" "${config_template_path}/config/flavors/${CK8S_FLAVOR}-wc.yaml" --prettyPrint
 
     cat "$tmpfile" > "$file"
 }
@@ -302,8 +306,8 @@ generate_secrets() {
     tmpfile=$(mktemp)
     append_trap "rm $tmpfile" EXIT
 
-    cat "${config_defaults_path}/secrets/sc-secrets.yaml" > "$tmpfile"
-    yq merge --inplace "$tmpfile" "${config_defaults_path}/secrets/wc-secrets.yaml"
+    cat "${config_template_path}/secrets/sc-secrets.yaml" > "$tmpfile"
+    yq merge --inplace "$tmpfile" "${config_template_path}/secrets/wc-secrets.yaml"
     if [[ -f $file ]]; then
         sops_decrypt "$file"
         yq merge "$tmpfile" "$file" --inplace -a=overwrite --overwrite --prettyPrint
@@ -324,6 +328,7 @@ else
 fi
 
 mkdir -p "${state_path}"
+mkdir -p "${default_config_path}"
 
 # TODO: Not a fan of this directory, we should probably have a separate script
 #       for generating user configurations and not store it as a part of
@@ -332,21 +337,35 @@ mkdir -p "${CK8S_CONFIG_PATH}/user"
 CK8S_VERSION=$(version_get)
 export CK8S_VERSION
 
-if [ -f "${config[config_file_sc]}" ]; then
-    log_info "${config[config_file_sc]} already exists, merging with existing config"
-fi
-generate_base_sc_config  "${config[config_file_sc]}"
-set_storage_class        "${config[config_file_sc]}"
-set_nginx_config         "${config[config_file_sc]}"
-set_elasticsearch_config "${config[config_file_sc]}"
-set_harbor_config        "${config[config_file_sc]}"
+generate_base_sc_config  "${config[default_config_file_sc]}"
+set_storage_class        "${config[default_config_file_sc]}"
+set_nginx_config         "${config[default_config_file_sc]}"
+set_elasticsearch_config "${config[default_config_file_sc]}"
+set_harbor_config        "${config[default_config_file_sc]}"
 
-if [ -f "${config[config_file_wc]}" ]; then
-    log_info "${config[config_file_wc]} already exists, merging with existing config"
-fi
-generate_base_wc_config  "${config[config_file_wc]}"
-set_storage_class        "${config[config_file_wc]}"
-set_nginx_config         "${config[config_file_wc]}"
+touch "${config[config_file_sc]}"
+
+file=${config[config_file_sc]}
+
+options=$(yq r -p p "${config[default_config_file_sc]}" '**')
+# Loop all lines in $2 and warns if same option is not
+# available in $1
+maybe_exit="false"
+for opt in ${options}; do
+    value=$(yq r --unwrapScalar=false "${config[default_config_file_sc]}" "${opt}")
+    if [[ -z "${value}" ]] || [[ "${value}" = '"set-me"' ]] || [[ "${value}" = "set-me" ]]; then
+      if ! yq read --exitStatus "${file}" "${opt}" > /dev/null 2>&1; then
+        yq write --inplace "${file}" "${opt}" set-me
+      fi
+    fi
+done
+
+
+generate_base_wc_config  "${config[default_config_file_wc]}"
+set_storage_class        "${config[default_config_file_wc]}"
+set_nginx_config         "${config[default_config_file_wc]}"
+
+touch "${config[config_file_wc]}"
 
 if [ -f "${secrets[secrets_file]}" ]; then
     log_info "${secrets[secrets_file]} already exists, merging with existing secrets"
@@ -358,6 +377,6 @@ generate_secrets "${secrets[secrets_file]}"
 log_info "Config initialized"
 
 log_info "Time to edit the following files:"
-log_info "${config[config_file_sc]}"
-log_info "${config[config_file_wc]}"
+log_info "${config[default_config_file_sc]}"
+log_info "${config[default_config_file_wc]}"
 log_info "${secrets[secrets_file]}"

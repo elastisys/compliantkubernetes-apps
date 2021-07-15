@@ -30,7 +30,7 @@ export CK8S_CONFIG_PATH
 
 here="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 root_path="${here}/.."
-config_defaults_path="${root_path}/config"
+config_template_path="${root_path}/config"
 # TODO: these are used by sourced scripts.
 # Should we export all "externally" used variables?
 # shellcheck disable=SC2034
@@ -40,14 +40,16 @@ pipeline_path="${root_path}/pipeline"
 
 sops_config="${CK8S_CONFIG_PATH}/.sops.yaml"
 state_path="${CK8S_CONFIG_PATH}/.state"
-ssh_path="${CK8S_CONFIG_PATH}/ssh"
+default_config_path="${CK8S_CONFIG_PATH}/defaults"
 
 declare -A config
 declare -A secrets
 
-config["config_file"]="${CK8S_CONFIG_PATH}/config.sh"
 config["config_file_wc"]="${CK8S_CONFIG_PATH}/wc-config.yaml"
 config["config_file_sc"]="${CK8S_CONFIG_PATH}/sc-config.yaml"
+
+config["default_config_file_wc"]="${default_config_path}/wc-config.yaml"
+config["default_config_file_sc"]="${default_config_path}/sc-config.yaml"
 
 secrets["secrets_file"]="${CK8S_CONFIG_PATH}/secrets.yaml"
 secrets["s3cfg_file"]="${state_path}/s3cfg.ini"
@@ -55,13 +57,7 @@ secrets["s3cfg_file"]="${state_path}/s3cfg.ini"
 secrets["kube_config_sc"]="${state_path}/kube_config_sc.yaml"
 secrets["kube_config_wc"]="${state_path}/kube_config_wc.yaml"
 
-secrets["ssh_priv_key_sc"]="${ssh_path}/id_rsa_sc"
-secrets["ssh_priv_key_wc"]="${ssh_path}/id_rsa_wc"
-
 secrets["user_kubeconfig"]="${CK8S_CONFIG_PATH}/user/kubeconfig.yaml"
-
-config["ssh_pub_key_sc"]="${secrets[ssh_priv_key_sc]}.pub"
-config["ssh_pub_key_wc"]="${secrets[ssh_priv_key_wc]}.pub"
 
 log_info() {
     echo -e "[\e[34mck8s\e[0m] ${*}" 1>&2
@@ -164,12 +160,12 @@ validate_config() {
     }
 
     if [[ $1 == "sc" ]]; then
-        validate "${config[config_file_sc]}" "${config_defaults_path}/config/sc-config.yaml"
+        validate "${config[config_file_sc]}" "${config_template_path}/config/sc-config.yaml"
 
-        validate "${secrets[secrets_file]}" "${config_defaults_path}/secrets/sc-secrets.yaml"
+        validate "${secrets[secrets_file]}" "${config_template_path}/secrets/sc-secrets.yaml"
     elif [[ $1 == "wc" ]]; then
-        validate "${config[config_file_wc]}" "${config_defaults_path}/config/wc-config.yaml"
-        validate "${secrets[secrets_file]}" "${config_defaults_path}/secrets/wc-secrets.yaml"
+        validate "${config[config_file_wc]}" "${config_template_path}/config/wc-config.yaml"
+        validate "${secrets[secrets_file]}" "${config_template_path}/secrets/wc-secrets.yaml"
     else
         log_error "Error: usage validate_config <sc|wc>"
         exit 1
