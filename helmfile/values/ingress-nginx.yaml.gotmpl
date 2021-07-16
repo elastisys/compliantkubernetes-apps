@@ -10,6 +10,7 @@ controller:
   config:
     disable-ipv6-dns: "true"
     proxy-body-size: "200m"
+    client-body-buffer-size: "256k"
     {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.global }}
     whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.global }}
     {{ end }}
