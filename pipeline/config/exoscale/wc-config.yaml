@@ -126,10 +126,10 @@ falco:
   resources:
     limits:
       cpu: 200m
-      memory: 1024Mi
+      memory: 300Mi
     requests:
       cpu: 100m
-      memory: 512Mi
+      memory: 100Mi
   ## Run on master nodes.
   tolerations:
     - key: node-role.kubernetes.io/master
