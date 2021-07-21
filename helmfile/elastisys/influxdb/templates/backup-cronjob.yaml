@@ -58,6 +58,7 @@ spec:
             args:
             - '-c'
             - |
+              rm -rf /backup/*
               influxd backup \
                 -host {{ include "influxdb.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.config.rpc.bind_address | default 8088 }} \
                 -portable /backup/"$(date +%Y%m%d%H%M%S)"
@@ -77,7 +78,6 @@ spec:
                 gcloud auth activate-service-account --key-file $KEY_FILE
               fi
               gsutil -m cp -r /backup/* "$DST_URL"
-              rm -rf /backup/*
             volumeMounts:
             - name: backup
               mountPath: /backup
@@ -106,7 +106,6 @@ spec:
             - |
               az storage container create --name "$DST_CONTAINER"
               az storage blob upload-batch --destination "$DST_CONTAINER" --destination-path "$DST_PATH" --source "$SRC_URL"
-              rm -rf /backup/*
             volumeMounts:
             - name: backup
               mountPath: /backup
@@ -135,7 +134,6 @@ spec:
             - '-e'
             - |
               aws {{- if .Values.backup.s3.endpointUrl }} --endpoint-url={{ .Values.backup.s3.endpointUrl }} {{- end }} s3 cp --recursive "$SRC_URL" "$DST_URL"
-              rm -rf /backup/*
             volumeMounts:
             - name: backup
               mountPath: /backup
