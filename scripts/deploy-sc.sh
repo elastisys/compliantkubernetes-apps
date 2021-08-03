@@ -40,3 +40,9 @@ else
 fi
 
 echo "Deploy sc completed!" >&2
+
+isSSOenabled=$(yq r -e "${config[config_file_sc]}" elasticsearch.sso.enabled)
+
+if [[ ${isSSOenabled} == "true" ]]; then
+../bin/ck8s ops kubectl sc delete pod -n elastic-system -l role=kibana &> /dev/null
+fi
