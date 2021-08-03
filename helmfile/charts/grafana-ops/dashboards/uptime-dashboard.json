@@ -1,861 +1,937 @@
 {
-    "annotations": {
-        "list": [
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "links": [],
+  "panels": [
+    {
+      "cacheTimeout": null,
+      "datasource": "prometheus-sc",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
             {
-                "builtIn": 1,
-                "datasource": "-- Grafana --",
-                "enable": true,
-                "hide": true,
-                "iconColor": "rgba(0, 211, 255, 1)",
-                "name": "Annotations & Alerts",
-                "type": "dashboard"
+              "options": {
+                "from": 0.9,
+                "result": {
+                  "index": 0,
+                  "text": "UP"
+                },
+                "to": 1
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "from": 0.5,
+                "result": {
+                  "index": 1,
+                  "text": "SHAKY"
+                },
+                "to": 0.9
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "from": 0,
+                "result": {
+                  "index": 2,
+                  "text": "DOWN"
+                },
+                "to": 0.5
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "match": "null+nan",
+                "result": {
+                  "index": 3,
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
             }
-        ]
-    },
-    "editable": true,
-    "gnetId": null,
-    "graphTooltip": 0,
-    "id": 32,
-    "links": [],
-    "panels": [
-        {
-            "cacheTimeout": null,
-            "datasource": "prometheus-sc",
-            "description": "",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {},
-                    "mappings": [
-                        {
-                            "from": "null",
-                            "id": 0,
-                            "text": "N/A",
-                            "to": "null",
-                            "type": 2
-                        },
-                        {
-                            "from": "0.9",
-                            "id": 1,
-                            "text": "UP",
-                            "to": "1",
-                            "type": 2
-                        },
-                        {
-                            "from": "0.5",
-                            "id": 2,
-                            "text": "SHAKY",
-                            "to": "0.9",
-                            "type": 2
-                        },
-                        {
-                            "from": "0",
-                            "id": 3,
-                            "text": "DOWN",
-                            "to": "0.5",
-                            "type": 2
-                        }
-                    ],
-                    "nullValueMode": "connected",
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "#d44a3a",
-                                "value": null
-                            },
-                            {
-                                "color": "rgba(237, 129, 40, 0.89)",
-                                "value": 0.5
-                            },
-                            {
-                                "color": "#299c46",
-                                "value": 0.9
-                            }
-                        ]
-                    },
-                    "unit": "none"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 5,
-                "w": 3,
-                "x": 0,
-                "y": 0
-            },
-            "id": 12,
-            "interval": null,
-            "links": [],
-            "maxDataPoints": 100,
-            "options": {
-                "colorMode": "background",
-                "fieldOptions": {
-                    "calcs": [
-                        "lastNotNull"
-                    ]
-                },
-                "graphMode": "none",
-                "justifyMode": "auto",
-                "orientation": "horizontal",
-                "reduceOptions": {
-                    "calcs": [
-                        "last"
-                    ],
-                    "fields": "",
-                    "values": false
-                }
-            },
-            "pluginVersion": "7.0.3",
-            "targets": [
-                {
-                    "expr": "max by (name) (probe_success{name=\"user-api-server\"})",
-                    "interval": "",
-                    "legendFormat": "",
-                    "refId": "A"
-                }
-            ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "Customer API server",
-            "type": "stat"
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#d44a3a",
+                "value": null
+              },
+              {
+                "color": "rgba(237, 129, 40, 0.89)",
+                "value": 0.5
+              },
+              {
+                "color": "#299c46",
+                "value": 0.9
+              }
+            ]
+          },
+          "unit": "none"
         },
-        {
-            "cacheTimeout": null,
-            "datasource": "prometheus-sc",
-            "description": "",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {},
-                    "mappings": [
-                        {
-                            "from": "null",
-                            "id": 0,
-                            "text": "N/A",
-                            "to": "null",
-                            "type": 2
-                        },
-                        {
-                            "from": "0.9",
-                            "id": 1,
-                            "text": "UP",
-                            "to": "1",
-                            "type": 2
-                        },
-                        {
-                            "from": "0.5",
-                            "id": 2,
-                            "text": "SHAKY",
-                            "to": "0.9",
-                            "type": 2
-                        },
-                        {
-                            "from": "0",
-                            "id": 3,
-                            "text": "DOWN",
-                            "to": "0.5",
-                            "type": 2
-                        }
-                    ],
-                    "nullValueMode": "connected",
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "#d44a3a",
-                                "value": null
-                            },
-                            {
-                                "color": "rgba(237, 129, 40, 0.89)",
-                                "value": 0.5
-                            },
-                            {
-                                "color": "#299c46",
-                                "value": 0.9
-                            }
-                        ]
-                    },
-                    "unit": "none"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 5,
-                "w": 3,
-                "x": 3,
-                "y": 0
-            },
-            "id": 10,
-            "interval": null,
-            "links": [],
-            "maxDataPoints": 100,
-            "options": {
-                "colorMode": "background",
-                "fieldOptions": {
-                    "calcs": [
-                        "lastNotNull"
-                    ]
-                },
-                "graphMode": "none",
-                "justifyMode": "auto",
-                "orientation": "horizontal",
-                "reduceOptions": {
-                    "calcs": [
-                        "last"
-                    ],
-                    "fields": "",
-                    "values": false
-                }
-            },
-            "pluginVersion": "7.0.3",
-            "targets": [
-                {
-                    "expr": "max by (name) (probe_success{name=\"dex\"})",
-                    "format": "time_series",
-                    "instant": true,
-                    "intervalFactor": 1,
-                    "refId": "A"
-                }
-            ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "Dex",
-            "type": "stat"
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 0,
+        "y": 0
+      },
+      "id": 12,
+      "interval": null,
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
         },
-        {
-            "cacheTimeout": null,
-            "datasource": "prometheus-sc",
-            "description": "",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {},
-                    "mappings": [
-                        {
-                            "from": "null",
-                            "id": 0,
-                            "text": "N/A",
-                            "to": "null",
-                            "type": 2
-                        },
-                        {
-                            "from": "0.9",
-                            "id": 1,
-                            "text": "UP",
-                            "to": "1",
-                            "type": 2
-                        },
-                        {
-                            "from": "0.5",
-                            "id": 2,
-                            "text": "SHAKY",
-                            "to": "0.9",
-                            "type": 2
-                        },
-                        {
-                            "from": "0",
-                            "id": 3,
-                            "text": "DOWN",
-                            "to": "0.5",
-                            "type": 2
-                        }
-                    ],
-                    "nullValueMode": "connected",
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "#d44a3a",
-                                "value": null
-                            },
-                            {
-                                "color": "rgba(237, 129, 40, 0.89)",
-                                "value": 0.5
-                            },
-                            {
-                                "color": "#299c46",
-                                "value": 0.9
-                            }
-                        ]
-                    },
-                    "unit": "none"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 5,
-                "w": 3,
-                "x": 6,
-                "y": 0
-            },
-            "id": 11,
-            "interval": null,
-            "links": [],
-            "maxDataPoints": 100,
-            "options": {
-                "colorMode": "background",
-                "fieldOptions": {
-                    "calcs": [
-                        "lastNotNull"
-                    ]
-                },
-                "graphMode": "none",
-                "justifyMode": "auto",
-                "orientation": "horizontal",
-                "reduceOptions": {
-                    "calcs": [
-                        "last"
-                    ],
-                    "fields": "",
-                    "values": false
-                }
-            },
-            "pluginVersion": "7.0.3",
-            "targets": [
-                {
-                    "expr": "max by (name) (probe_success{name=\"grafana\"})",
-                    "format": "time_series",
-                    "instant": true,
-                    "intervalFactor": 1,
-                    "refId": "A"
-                }
-            ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "Grafana",
-            "type": "stat"
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
         },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.0.5",
+      "targets": [
         {
-            "cacheTimeout": null,
-            "datasource": "prometheus-sc",
-            "description": "",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {},
-                    "mappings": [
-                        {
-                            "from": "null",
-                            "id": 0,
-                            "text": "N/A",
-                            "to": "null",
-                            "type": 2
-                        },
-                        {
-                            "from": "0.9",
-                            "id": 1,
-                            "text": "UP",
-                            "to": "1",
-                            "type": 2
-                        },
-                        {
-                            "from": "0.5",
-                            "id": 2,
-                            "text": "SHAKY",
-                            "to": "0.9",
-                            "type": 2
-                        },
-                        {
-                            "from": "0",
-                            "id": 3,
-                            "text": "DOWN",
-                            "to": "0.5",
-                            "type": 2
-                        }
-                    ],
-                    "nullValueMode": "connected",
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "#d44a3a",
-                                "value": null
-                            },
-                            {
-                                "color": "rgba(237, 129, 40, 0.89)",
-                                "value": 0.5
-                            },
-                            {
-                                "color": "#299c46",
-                                "value": 0.9
-                            }
-                        ]
-                    },
-                    "unit": "none"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 5,
-                "w": 3,
-                "x": 9,
-                "y": 0
-            },
-            "id": 17,
-            "interval": null,
-            "links": [],
-            "maxDataPoints": 100,
-            "options": {
-                "colorMode": "background",
-                "fieldOptions": {
-                    "calcs": [
-                        "lastNotNull"
-                    ]
-                },
-                "graphMode": "none",
-                "justifyMode": "auto",
-                "orientation": "horizontal",
-                "reduceOptions": {
-                    "calcs": [
-                        "last"
-                    ],
-                    "fields": "",
-                    "values": false
-                }
-            },
-            "pluginVersion": "7.0.3",
-            "targets": [
-                {
-                    "expr": "max by (name) (probe_success{name=\"harbor\"})",
-                    "format": "time_series",
-                    "instant": true,
-                    "interval": "",
-                    "intervalFactor": 1,
-                    "legendFormat": "",
-                    "refId": "A"
-                }
-            ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "Harbor",
-            "type": "stat"
-        },
-        {
-            "cacheTimeout": null,
-            "datasource": "prometheus-sc",
-            "description": "",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {},
-                    "mappings": [
-                        {
-                            "from": "null",
-                            "id": 0,
-                            "text": "N/A",
-                            "to": "null",
-                            "type": 2
-                        },
-                        {
-                            "from": "0.9",
-                            "id": 1,
-                            "text": "UP",
-                            "to": "1",
-                            "type": 2
-                        },
-                        {
-                            "from": "0.5",
-                            "id": 2,
-                            "text": "SHAKY",
-                            "to": "0.9",
-                            "type": 2
-                        },
-                        {
-                            "from": "0",
-                            "id": 3,
-                            "text": "DOWN",
-                            "to": "0.5",
-                            "type": 2
-                        }
-                    ],
-                    "nullValueMode": "connected",
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "#d44a3a",
-                                "value": null
-                            },
-                            {
-                                "color": "rgba(237, 129, 40, 0.89)",
-                                "value": 0.5
-                            },
-                            {
-                                "color": "#299c46",
-                                "value": 0.9
-                            }
-                        ]
-                    },
-                    "unit": "none"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 5,
-                "w": 3,
-                "x": 12,
-                "y": 0
-            },
-            "id": 6,
-            "interval": null,
-            "links": [],
-            "maxDataPoints": 100,
-            "options": {
-                "colorMode": "background",
-                "fieldOptions": {
-                    "calcs": [
-                        "lastNotNull"
-                    ]
-                },
-                "graphMode": "none",
-                "justifyMode": "auto",
-                "orientation": "horizontal",
-                "reduceOptions": {
-                    "calcs": [
-                        "last"
-                    ],
-                    "fields": "",
-                    "values": false
-                }
-            },
-            "pluginVersion": "7.0.3",
-            "targets": [
-                {
-                    "expr": "max by (name) (probe_success{name=\"kibana\"})",
-                    "format": "time_series",
-                    "instant": true,
-                    "intervalFactor": 1,
-                    "refId": "A"
-                }
-            ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "Kibana",
-            "type": "stat"
-        },
-        {
-            "cacheTimeout": null,
-            "datasource": "prometheus-sc",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {},
-                    "mappings": [
-                        {
-                            "from": "null",
-                            "id": 0,
-                            "text": "N/A",
-                            "to": "null",
-                            "type": 2
-                        },
-                        {
-                            "from": "0",
-                            "id": 1,
-                            "text": "RED",
-                            "to": "0.49",
-                            "type": 2
-                        },
-                        {
-                            "from": "0.5",
-                            "id": 2,
-                            "text": "YELLOW",
-                            "to": "0.9",
-                            "type": 2
-                        },
-                        {
-                            "from": "0.9",
-                            "id": 3,
-                            "text": "GREEN",
-                            "to": "1",
-                            "type": 2
-                        }
-                    ],
-                    "nullValueMode": "connected",
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "#d44a3a",
-                                "value": null
-                            },
-                            {
-                                "color": "rgba(237, 129, 40, 0.89)",
-                                "value": 0.5
-                            },
-                            {
-                                "color": "#299c46",
-                                "value": 0.8
-                            }
-                        ]
-                    },
-                    "unit": "none"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 5,
-                "w": 3,
-                "x": 15,
-                "y": 0
-            },
-            "id": 16,
-            "interval": null,
-            "links": [],
-            "maxDataPoints": 100,
-            "options": {
-                "colorMode": "background",
-                "fieldOptions": {
-                    "calcs": [
-                        "lastNotNull"
-                    ]
-                },
-                "graphMode": "none",
-                "justifyMode": "auto",
-                "orientation": "horizontal",
-                "reduceOptions": {
-                    "calcs": [
-                        "last"
-                    ],
-                    "fields": "",
-                    "values": false
-                }
-            },
-            "pluginVersion": "7.0.3",
-            "targets": [
-                {
-                    "expr": "sum (elasticsearch_cluster_health_status{color=\"green\"} or elasticsearch_cluster_health_status{color=\"yellow\"} * 0.5)",
-                    "format": "time_series",
-                    "instant": true,
-                    "intervalFactor": 1,
-                    "refId": "A"
-                }
-            ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "Elasticsearch status",
-            "type": "stat"
-        },
-        {
-            "cacheTimeout": null,
-            "datasource": "prometheus-sc",
-            "fieldConfig": {
-                "defaults": {
-                    "color": {
-                        "mode": "thresholds"
-                    },
-                    "custom": {},
-                    "mappings": [],
-                    "max": 1,
-                    "min": 0,
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "red",
-                                "value": null
-                            },
-                            {
-                                "color": "#EAB839",
-                                "value": 0.95
-                            },
-                            {
-                                "color": "green",
-                                "value": 0.995
-                            }
-                        ]
-                    },
-                    "unit": "percentunit"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 8,
-                "w": 24,
-                "x": 0,
-                "y": 5
-            },
-            "id": 13,
-            "interval": "1m",
-            "links": [],
-            "options": {
-                "orientation": "auto",
-                "reduceOptions": {
-                    "calcs": [
-                        "mean"
-                    ],
-                    "fields": "",
-                    "values": false
-                },
-                "showThresholdLabels": false,
-                "showThresholdMarkers": true
-            },
-            "pluginVersion": "7.0.3",
-            "targets": [
-                {
-                    "expr": "max by (name) (probe_success)",
-                    "format": "time_series",
-                    "intervalFactor": 1,
-                    "legendFormat": "{{name}}",
-                    "refId": "A"
-                },
-                {
-                    "expr": "sum(elasticsearch_cluster_health_status{color=\"green\"} or absent(elasticsearch_cluster_health_status{color=\"green\"}) - 1)",
-                    "format": "time_series",
-                    "hide": true,
-                    "intervalFactor": 1,
-                    "legendFormat": "elasticsearch",
-                    "refId": "B"
-                },
-                {
-                    "expr": "sum(elasticsearch_cluster_health_status{color=\"green\"} or (elasticsearch_cluster_health_status{color=\"yellow\"} * 0.5) or (elasticsearch_cluster_health_status{color=\"red\"} * 0))",
-                    "legendFormat": "elasticsearch",
-                    "refId": "C"
-                }
-            ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "Uptime",
-            "type": "gauge"
-        },
-        {
-            "aliasColors": {},
-            "bars": false,
-            "cacheTimeout": null,
-            "dashLength": 10,
-            "dashes": false,
-            "datasource": "prometheus-sc",
-            "description": "",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {}
-                },
-                "overrides": []
-            },
-            "fill": 1,
-            "fillGradient": 0,
-            "gridPos": {
-                "h": 9,
-                "w": 24,
-                "x": 0,
-                "y": 13
-            },
-            "hiddenSeries": false,
-            "id": 2,
-            "interval": "1m",
-            "legend": {
-                "avg": false,
-                "current": false,
-                "max": false,
-                "min": false,
-                "show": true,
-                "total": false,
-                "values": false
-            },
-            "lines": true,
-            "linewidth": 1,
-            "links": [],
-            "nullPointMode": "null",
-            "options": {
-                "dataLinks": []
-            },
-            "percentage": false,
-            "pluginVersion": "6.2.5",
-            "pointradius": 2,
-            "points": false,
-            "renderer": "flot",
-            "seriesOverrides": [],
-            "spaceLength": 10,
-            "stack": false,
-            "steppedLine": false,
-            "targets": [
-                {
-                    "expr": "max by (name) (probe_success)",
-                    "format": "time_series",
-                    "intervalFactor": 1,
-                    "legendFormat": "{{name}}",
-                    "refId": "A"
-                },
-                {
-                    "expr": "sum(elasticsearch_cluster_health_status{color=\"green\"} or (elasticsearch_cluster_health_status{color=\"yellow\"}) or (elasticsearch_cluster_health_status{color=\"red\"} * 0))",
-                    "format": "time_series",
-                    "intervalFactor": 1,
-                    "legendFormat": "elasticsearch",
-                    "refId": "B"
-                }
-            ],
-            "thresholds": [],
-            "timeFrom": null,
-            "timeRegions": [],
-            "timeShift": null,
-            "title": "Up",
-            "tooltip": {
-                "shared": true,
-                "sort": 0,
-                "value_type": "individual"
-            },
-            "type": "graph",
-            "xaxis": {
-                "buckets": null,
-                "mode": "time",
-                "name": null,
-                "show": true,
-                "values": []
-            },
-            "yaxes": [
-                {
-                    "format": "short",
-                    "label": null,
-                    "logBase": 1,
-                    "max": null,
-                    "min": null,
-                    "show": true
-                },
-                {
-                    "format": "short",
-                    "label": null,
-                    "logBase": 1,
-                    "max": null,
-                    "min": null,
-                    "show": true
-                }
-            ],
-            "yaxis": {
-                "align": false,
-                "alignLevel": null
-            }
+          "exemplar": true,
+          "expr": "max by (name) (probe_success{name=\"user-api-server\"})",
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
         }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Customer API server",
+      "type": "stat"
+    },
+    {
+      "cacheTimeout": null,
+      "datasource": "prometheus-sc",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "from": 0.9,
+                "result": {
+                  "index": 0,
+                  "text": "UP"
+                },
+                "to": 1
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "from": 0.5,
+                "result": {
+                  "index": 1,
+                  "text": "SHAKY"
+                },
+                "to": 0.9
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "from": 0,
+                "result": {
+                  "index": 2,
+                  "text": "DOWN"
+                },
+                "to": 0.5
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "match": "null+nan",
+                "result": {
+                  "index": 3,
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#d44a3a",
+                "value": null
+              },
+              {
+                "color": "rgba(237, 129, 40, 0.89)",
+                "value": 0.5
+              },
+              {
+                "color": "#299c46",
+                "value": 0.9
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 3,
+        "y": 0
+      },
+      "id": 10,
+      "interval": null,
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.0.5",
+      "targets": [
+        {
+          "expr": "max by (name) (probe_success{name=\"dex\"})",
+          "format": "time_series",
+          "instant": true,
+          "intervalFactor": 1,
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Dex",
+      "type": "stat"
+    },
+    {
+      "cacheTimeout": null,
+      "datasource": "prometheus-sc",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "from": 0.9,
+                "result": {
+                  "index": 0,
+                  "text": "UP"
+                },
+                "to": 1
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "from": 0.5,
+                "result": {
+                  "index": 1,
+                  "text": "SHAKY"
+                },
+                "to": 0.9
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "from": 0,
+                "result": {
+                  "index": 2,
+                  "text": "DOWN"
+                },
+                "to": 0.5
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "match": "null+nan",
+                "result": {
+                  "index": 3,
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#d44a3a",
+                "value": null
+              },
+              {
+                "color": "rgba(237, 129, 40, 0.89)",
+                "value": 0.5
+              },
+              {
+                "color": "#299c46",
+                "value": 0.9
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 6,
+        "y": 0
+      },
+      "id": 11,
+      "interval": null,
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.0.5",
+      "targets": [
+        {
+          "expr": "max by (name) (probe_success{name=\"grafana\"})",
+          "format": "time_series",
+          "instant": true,
+          "intervalFactor": 1,
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Grafana",
+      "type": "stat"
+    },
+    {
+      "cacheTimeout": null,
+      "datasource": "prometheus-sc",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "from": 0.9,
+                "result": {
+                  "index": 0,
+                  "text": "UP"
+                },
+                "to": 1
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "from": 0.5,
+                "result": {
+                  "index": 1,
+                  "text": "SHAKY"
+                },
+                "to": 0.9
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "from": 0,
+                "result": {
+                  "index": 2,
+                  "text": "DOWN"
+                },
+                "to": 0.5
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "match": "null+nan",
+                "result": {
+                  "index": 3,
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#d44a3a",
+                "value": null
+              },
+              {
+                "color": "rgba(237, 129, 40, 0.89)",
+                "value": 0.5
+              },
+              {
+                "color": "#299c46",
+                "value": 0.9
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 9,
+        "y": 0
+      },
+      "id": 17,
+      "interval": null,
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.0.5",
+      "targets": [
+        {
+          "expr": "max by (name) (probe_success{name=\"harbor\"})",
+          "format": "time_series",
+          "instant": true,
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Harbor",
+      "type": "stat"
+    },
+    {
+      "cacheTimeout": null,
+      "datasource": "prometheus-sc",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "from": 0.9,
+                "result": {
+                  "index": 0,
+                  "text": "UP"
+                },
+                "to": 1
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "from": 0.5,
+                "result": {
+                  "index": 1,
+                  "text": "SHAKY"
+                },
+                "to": 0.9
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "from": 0,
+                "result": {
+                  "index": 2,
+                  "text": "DOWN"
+                },
+                "to": 0.5
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "match": "null+nan",
+                "result": {
+                  "index": 3,
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#d44a3a",
+                "value": null
+              },
+              {
+                "color": "rgba(237, 129, 40, 0.89)",
+                "value": 0.5
+              },
+              {
+                "color": "#299c46",
+                "value": 0.9
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 12,
+        "y": 0
+      },
+      "id": 6,
+      "interval": null,
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.0.5",
+      "targets": [
+        {
+          "expr": "max by (name) (probe_success{name=\"kibana\"})",
+          "format": "time_series",
+          "instant": true,
+          "intervalFactor": 1,
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Kibana",
+      "type": "stat"
+    },
+    {
+      "cacheTimeout": null,
+      "datasource": "prometheus-sc",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "from": 0,
+                "result": {
+                  "index": 0,
+                  "text": "RED"
+                },
+                "to": 0.49
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "from": 0.5,
+                "result": {
+                  "index": 1,
+                  "text": "YELLOW"
+                },
+                "to": 0.9
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "from": 0.9,
+                "result": {
+                  "index": 2,
+                  "text": "GREEN"
+                },
+                "to": 1
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "match": "null+nan",
+                "result": {
+                  "index": 3,
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#d44a3a",
+                "value": null
+              },
+              {
+                "color": "rgba(237, 129, 40, 0.89)",
+                "value": 0.5
+              },
+              {
+                "color": "#299c46",
+                "value": 0.8
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 15,
+        "y": 0
+      },
+      "id": 16,
+      "interval": null,
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "background",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.0.5",
+      "targets": [
+        {
+          "expr": "sum (elasticsearch_cluster_health_status{color=\"green\"} or elasticsearch_cluster_health_status{color=\"yellow\"} * 0.5)",
+          "format": "time_series",
+          "instant": true,
+          "intervalFactor": 1,
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Elasticsearch status",
+      "type": "stat"
+    },
+    {
+      "cacheTimeout": null,
+      "datasource": "prometheus-sc",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 0.95
+              },
+              {
+                "color": "green",
+                "value": 0.995
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 13,
+      "interval": "1m",
+      "links": [],
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
+      },
+      "pluginVersion": "8.0.5",
+      "targets": [
+        {
+          "expr": "max by (name) (probe_success)",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "{{name}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(elasticsearch_cluster_health_status{color=\"green\"} or absent(elasticsearch_cluster_health_status{color=\"green\"}) - 1)",
+          "format": "time_series",
+          "hide": true,
+          "intervalFactor": 1,
+          "legendFormat": "elasticsearch",
+          "refId": "B"
+        },
+        {
+          "expr": "sum(elasticsearch_cluster_health_status{color=\"green\"} or (elasticsearch_cluster_health_status{color=\"yellow\"} * 0.5) or (elasticsearch_cluster_health_status{color=\"red\"} * 0))",
+          "legendFormat": "elasticsearch",
+          "refId": "C"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Uptime",
+      "type": "gauge"
+    },
+    {
+      "cacheTimeout": null,
+      "datasource": "prometheus-sc",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 13
+      },
+      "id": 2,
+      "interval": "1m",
+      "links": [],
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "pluginVersion": "8.0.5",
+      "targets": [
+        {
+          "expr": "max by (name) (probe_success)",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "{{name}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(elasticsearch_cluster_health_status{color=\"green\"} or (elasticsearch_cluster_health_status{color=\"yellow\"}) or (elasticsearch_cluster_health_status{color=\"red\"} * 0))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "elasticsearch",
+          "refId": "B"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Up",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 30,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
     ],
-    "refresh": "1m",
-    "schemaVersion": 25,
-    "style": "dark",
-    "tags": [],
-    "templating": {
-        "list": []
-    },
-    "time": {
-        "from": "now-24h",
-        "to": "now"
-    },
-    "timepicker": {
-        "refresh_intervals": [
-            "10s",
-            "30s",
-            "1m",
-            "5m",
-            "15m",
-            "30m",
-            "1h",
-            "2h",
-            "1d"
-        ],
-        "time_options": [
-            "5m",
-            "15m",
-            "1h",
-            "6h",
-            "12h",
-            "24h",
-            "2d",
-            "7d",
-            "30d"
-        ]
-    },
-    "timezone": "",
-    "title": "Uptime and status",
-    "version": 5
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "timezone": "utc",
+  "title": "Uptime and status",
+  "version": 1
 }
