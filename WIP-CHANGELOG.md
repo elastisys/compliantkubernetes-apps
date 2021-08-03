@@ -9,6 +9,8 @@
 
 ### Fixed
 
+- added kibana restart to make dex kibana work on a fresh cluster automatically
+
 ### Added
 
 ### Removed
