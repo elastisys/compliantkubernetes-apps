@@ -394,6 +394,8 @@ releases:
   chart: ./elastisys/opendistro-es
   version: 1.12.1
   missingFileHandler: Error
+  needs:
+  - dex/dex
   values:
   - values/opendistro-es.yaml.gotmpl
 
