@@ -135,6 +135,7 @@ extraContainers:
     volumeMounts:
       - name: textfile-collector-dir
         mountPath: /textfile-collector
+    resources: {{- toYaml .Values.influxDB.sidecar.nodeexporter.resources | nindent 6 }}
   - name: influxdb-cronjob
     image: bambash/docker-cron
     volumeMounts:
@@ -148,6 +149,7 @@ extraContainers:
         mountPath: /etc/cron.d/
       - name: config-volume
         mountPath: /etc/config
+    resources: {{- toYaml .Values.influxDB.sidecar.cronjob.resources | nindent 6 }}
 
 volumes:
   - name: textfile-collector-dir

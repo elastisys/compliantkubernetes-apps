@@ -130,10 +130,10 @@ falco:
   resources:
     limits:
       cpu: 200m
-      memory: 300Mi
+      memory: 1024Mi
     requests:
       cpu: 100m
-      memory: 100Mi
+      memory: 512Mi
   ## Run on master nodes.
   tolerations:
     - key: node-role.kubernetes.io/master
@@ -159,7 +159,13 @@ falco:
     affinity: {}
     nodeSelector: {}
   falcoExporter:
-    resources: {}
+    resources:
+      requests:
+        cpu: 5m
+        memory: 15Mi
+      limits:
+        cpu: 5m
+        memory: 15Mi
     tolerations:
       - effect: NoSchedule
         key: node-role.kubernetes.io/master
@@ -176,6 +182,33 @@ elasticsearch:
     count: 1
 ## Prometheus configuration.
 ## Prometheus collects metrics and pushes it to InfluxDB.
+prometheusOperator:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 100Mi
+    limits:
+      cpu: 100m
+      memory: 200Mi
+
+prometheusNodeExporter:
+  resources:
+    requests:
+      cpu: 5m
+      memory: 25Mi
+    limits:
+      cpu: 10m
+      memory: 50Mi
+
+kubeStateMetrics:
+  resources:
+    requests:
+      cpu: 5m
+      memory: 25Mi
+    limits:
+      cpu: 10m
+      memory: 50Mi
+
 prometheus:
   remoteWrite:
     ## User used when authentication against InfluxDB.
@@ -235,11 +268,11 @@ fluentd:
     node-role.kubernetes.io/master: ""
   resources:
     limits:
-      cpu: 200m
-      memory: 500Mi
+      cpu: 500m
+      memory: 572Mi
     requests:
       cpu: 200m
-      memory: 500Mi
+      memory: 300Mi
   affinity: {}
   ## Extra fluentd config to mount.
   extraConfigMaps: {}
@@ -250,11 +283,11 @@ fluentd:
   user:
     resources:
       limits:
-        cpu: 200m
-        memory: 500Mi
+        cpu: 500m
+        memory: 572Mi
       requests:
         cpu: 200m
-        memory: 500Mi
+        memory: 300Mi
     tolerations: []
     affinity: {}
     nodeSelector: {}
@@ -269,7 +302,13 @@ externalTrafficPolicy:
 ## Nginx ingress controller configuration
 ingressNginx:
   controller:
-    resources: {}
+    resources:
+      requests:
+        cpu: 100m
+        memory: 263Mi
+      limits:
+        cpu: 200m
+        memory: 512Mi
     tolerations: []
     affinity: {}
     nodeSelector: {}
@@ -292,7 +331,13 @@ ingressNginx:
     ## ref: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
     additionalConfig: {}
   defaultBackend:
-    resources: {}
+    resources:
+      requests:
+        cpu: 5m
+        memory: 10Mi
+      limits:
+        cpu: 10m
+        memory: 20Mi
     tolerations: []
     affinity: {}
     nodeSelector: {}
@@ -304,19 +349,19 @@ velero:
   nodeSelector: {}
   resources:
     limits:
-      cpu: 200m
+      cpu: 100m
       memory: 200Mi
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 100Mi
   restic:
     tolerations: []
     resources:
       limits:
-        cpu: 200m
+        cpu: 100m
         memory: 200Mi
       requests:
-        cpu: 100m
+        cpu: 50m
         memory: 100Mi
 ## Configuration for cert-manager issuers.
 issuers:
@@ -336,22 +381,47 @@ issuers:
   #     selfSigned: {}
 ## Configration for cert-manager and it's components.
 certmanager:
-  resources: {}
+  resources:
+    requests:
+      cpu: 25m
+      memory: 100Mi
+    limits:
+      cpu: 50m
+      memory: 200Mi
   nodeSelector: {}
   tolerations: {}
   affinity: {}
   webhook:
-    resources: {}
+    resources:
+      requests:
+        cpu: 25m
+        memory: 25Mi
+      limits:
+        cpu: 50m
+        memory: 50Mi
     nodeSelector: {}
     tolerations: {}
     affinity: {}
   cainjector:
-    resources: {}
+    resources:
+      requests:
+        cpu: 15m
+        memory: 100Mi
+      limits:
+        cpu: 50m
+        memory: 200Mi
     nodeSelector: {}
     tolerations: {}
     affinity: {}
 metricsServer:
   enabled: true
+  resources:
+    requests:
+      cpu: 10m
+      memory: 25Mi
+    limits:
+      cpu: 20m
+      memory: 50Mi
 calicoAccountant:
   enabled: true
 calicoFelixMetrics:
@@ -360,13 +430,33 @@ clusterAdmin:
   users: []
   groups: []
 starboard:
-  resources: {}
+  resources:
+    requests:
+      cpu: 5m
+      memory: 50Mi
+    limits:
+      cpu: 10m
+      memory: 128Mi
   tolerations: []
   affinity: {}
 vulnerabilityExporter:
-  resources: {}
+  resources:
+    requests:
+      cpu: 20m
+      memory: 15Mi
+    limits:
+      cpu: 40m
+      memory: 30Mi
   tolerations: []
   affinity: {}
+  curlcronjob:
+    resources:
+      requests:
+        cpu: 20m
+        memory: 64Mi
+      limits:
+        cpu: 40m
+        memory: 128Mi
 monitoring:
   rook:
     enabled: true
