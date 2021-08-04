@@ -47,10 +47,10 @@ user:
     resources:
       limits:
         cpu: 100m
-        memory: 128Mi
+        memory: 160Mi
       requests:
-        cpu: 100m
-        memory: 128Mi
+        cpu: 50m
+        memory: 80Mi
     tolerations: []
     affinity: {}
     nodeSelector: {}
@@ -62,6 +62,14 @@ user:
       scopes: "profile email openid"
       allowedDomains:
         - example.com
+    sidecar:
+      resources:
+        requests:
+          cpu: 5m
+          memory: 80Mi
+        limits:
+          cpu: 10m
+          memory: 100Mi
   # Todo remove dependencie on alertmanager from service cluster
   alertmanager:
     enabled: false
@@ -83,13 +91,19 @@ harbor:
       size: 5Gi
     resources:
       requests:
-        memory: 16Mi
+        cpu: 2m
+        memory: 25Mi
+      limits:
         cpu: 5m
+        memory: 50Mi
   core:
     resources:
       requests:
-        memory: 64Mi
+        cpu: 5m
+        memory: 50Mi
+      limits:
         cpu: 10m
+        memory: 100Mi
   database:
     persistentVolumeClaim:
       size: 1Gi
@@ -102,20 +116,29 @@ harbor:
       size: 1Gi
     resources:
       requests:
-        memory: 64Mi
-        cpu: 10m
+        cpu: 2m
+        memory: 25Mi
+      limits:
+        cpu: 5m
+        memory: 50Mi
   registry:
     persistentVolumeClaim:
       size: 5Gi
     resources:
       requests:
-        memory: 64Mi
-        cpu: 10m
+        cpu: 2m
+        memory: 25Mi
+      limits:
+        cpu: 5m
+        memory: 50Mi
     controller:
       resources:
         requests:
-          memory: 16Mi
-          cpu: 1m
+          cpu: 2m
+          memory: 20Mi
+        limits:
+          cpu: 5m
+          memory: 40Mi
   redis:
     persistentVolumeClaim:
       size: 1Gi
@@ -126,28 +149,37 @@ harbor:
   notary:
     resources:
       requests:
-        memory: 16Mi
+        cpu: 2m
+        memory: 15Mi
+      limits:
         cpu: 5m
+        memory: 20Mi
   notarySigner:
     resources:
       requests:
-        memory: 16Mi
+        cpu: 2m
+        memory: 10Mi
+      limits:
         cpu: 5m
+        memory: 20Mi
   portal:
     resources:
       requests:
-        memory: 16Mi
+        cpu: 2m
+        memory: 5Mi
+      limits:
         cpu: 5m
+        memory: 10Mi
   trivy:
     persistentVolumeClaim:
       size: 5Gi
     resources:
       requests:
-        cpu: 200m
-        memory: 512Mi
+        cpu: 10m
+        memory: 263Mi
       limits:
-        cpu: "1"
-        memory: 1024Mi
+        cpu: 20m
+        memory: 512Mi
   persistence:
     # Valid options are "filesystem" (persistent volume), "swift", or "objectStorage" (matching global config)
     type: objectStorage
@@ -159,6 +191,42 @@ harbor:
     scope: openid,email,profile,offline_access,groups
   backup:
     enabled: true
+
+prometheusBlackboxExporter:
+  resources:
+    requests:
+      cpu: 5m
+      memory: 25Mi
+    limits:
+      cpu: 10m
+      memory: 50Mi
+prometheusOperator:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 100Mi
+    limits:
+      cpu: 100m
+      memory: 200Mi
+
+prometheusNodeExporter:
+  resources:
+    requests:
+      cpu: 5m
+      memory: 25Mi
+    limits:
+      cpu: 10m
+      memory: 50Mi
+
+kubeStateMetrics:
+  resources:
+    requests:
+      cpu: 5m
+      memory: 25Mi
+    limits:
+      cpu: 10m
+      memory: 50Mi
+
 prometheus:
   storage:
     enabled: false
@@ -192,29 +260,42 @@ prometheus:
     tolerations: []
     affinity: {}
     nodeSelector: {}
+  alertmanagerSpec:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 50Mi
   grafana:
     resources:
       requests:
-        cpu: 100m
-        memory: 128Mi
+        cpu: 50m
+        memory: 60Mi
       limits:
         cpu: 100m
-        memory: 128Mi
+        memory: 160Mi
     tolerations: []
     affinity: {}
     nodeSelector: {}
     oidc:
       enabled: false
+    sidecar:
+      resources:
+        requests:
+          cpu: 5m
+          memory: 80Mi
+        limits:
+          cpu: 10m
+          memory: 100Mi
 dex:
   additionalKubeloginRedirects: []
   enableStaticLogin: true
   resources:
     limits:
-      cpu: 100m
+      cpu: 10m
       memory: 50Mi
     requests:
-      cpu: 100m
-      memory: 50Mi
+      cpu: 5m
+      memory: 25Mi
   tolerations: []
   affinity: {}
   nodeSelector: {}
@@ -222,7 +303,10 @@ dex:
     groupSupport: false
 kibana:
   # Note sso is enabled via `elasticsearch.sso.enabled`
-  resources: {}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 286Mi
   nodeSelector: {}
   tolerations: []
   affinity: {}
@@ -326,8 +410,8 @@ elasticsearch:
         cpu: 100m
         memory: 128Mi
       requests:
-        cpu: 10m
-        memory: 32Mi
+        cpu: 50m
+        memory: 64Mi
     affinity: {}
     nodeSelector: {}
     tolerations: []
@@ -395,13 +479,13 @@ elasticsearch:
     serviceMonitor:
       interval: 30s
       scrapeTimeout: 30s
-    resources: {}
-    #   requests:
-    #     cpu: 100m
-    #     memory: 128Mi
-    #   limits:
-    #     cpu: 100m
-    #     memory: 128Mi
+    resources:
+      requests:
+        cpu: 15m
+        memory: 30Mi
+      limits:
+        cpu: 30m
+        memory: 60Mi
     tolerations: []
   ingress:
     maxbodysize: 8m
@@ -411,10 +495,10 @@ fluentd:
     resources:
       limits:
         cpu: 500m
-        memory: 200Mi
+        memory: 572Mi
       requests:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 200m
+        memory: 300Mi
     tolerations: []
     affinity: {}
     nodeSelector: {}
@@ -502,6 +586,24 @@ influxDB:
       limits:
         cpu: 250m
         memory: 300Mi
+
+  sidecar:
+    nodeexporter:
+      resources:
+        requests:
+          cpu: 5m
+          memory: 15Mi
+        limits:
+          cpu: 10m
+          memory: 30Mi
+    cronjob:
+      resources:
+        requests:
+          cpu: 5m
+          memory: 50Mi
+        limits:
+          cpu: 10m
+          memory: 100Mi
 alerts:
   alertTo: "null"
   opsGenieHeartbeat:
@@ -538,7 +640,13 @@ nfsProvisioner:
   nodeSelector: {}
 ingressNginx:
   controller:
-    resources: {}
+    resources:
+      requests:
+        cpu: 100m
+        memory: 263Mi
+      limits:
+        cpu: 200m
+        memory: 512Mi
     tolerations: []
     affinity: {}
     nodeSelector: {}
@@ -552,7 +660,13 @@ ingressNginx:
     # Will add custom configuration options to Nginx https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
     additionalConfig: {}
   defaultBackend:
-    resources: {}
+    resources:
+      requests:
+        cpu: 5m
+        memory: 10Mi
+      limits:
+        cpu: 10m
+        memory: 20Mi
     tolerations: []
     affinity: {}
     nodeSelector: {}
@@ -562,19 +676,19 @@ velero:
   nodeSelector: {}
   resources:
     limits:
-      cpu: 200m
+      cpu: 100m
       memory: 200Mi
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 100Mi
   restic:
     tolerations: []
     resources:
       limits:
-        cpu: 200m
+        cpu: 100m
         memory: 200Mi
       requests:
-        cpu: 100m
+        cpu: 50m
         memory: 100Mi
 issuers:
   letsencrypt:
@@ -585,22 +699,47 @@ issuers:
       email: letsencrypt@elastisys.com
   extraIssuers: []
 certmanager:
-  resources: {}
+  resources:
+    requests:
+      cpu: 25m
+      memory: 100Mi
+    limits:
+      cpu: 50m
+      memory: 200Mi
   nodeSelector: {}
   tolerations: {}
   affinity: {}
   webhook:
-    resources: {}
+    resources:
+      requests:
+        cpu: 25m
+        memory: 25Mi
+      limits:
+        cpu: 50m
+        memory: 50Mi
     nodeSelector: {}
     tolerations: {}
     affinity: {}
   cainjector:
-    resources: {}
+    resources:
+      requests:
+        cpu: 25m
+        memory: 100Mi
+      limits:
+        cpu: 50m
+        memory: 200Mi
     nodeSelector: {}
     tolerations: {}
     affinity: {}
 metricsServer:
   enabled: true
+  resources:
+    requests:
+      cpu: 10m
+      memory: 25Mi
+    limits:
+      cpu: 20m
+      memory: 50Mi
 calicoAccountant:
   enabled: true
 calicoFelixMetrics:
@@ -621,13 +760,33 @@ s3Exporter:
   affinity: {}
   nodeSelector: {}
 starboard:
-  resources: {}
+  resources:
+    requests:
+      cpu: 5m
+      memory: 50Mi
+    limits:
+      cpu: 10m
+      memory: 128Mi
   tolerations: []
   affinity: {}
 vulnerabilityExporter:
-  resources: {}
+  resources:
+    requests:
+      cpu: 20m
+      memory: 15Mi
+    limits:
+      cpu: 40m
+      memory: 30Mi
   tolerations: []
   affinity: {}
+  curlcronjob:
+    resources:
+      requests:
+        cpu: 20m
+        memory: 64Mi
+      limits:
+        cpu: 40m
+        memory: 128Mi
 monitoring:
   rook:
     enabled: true

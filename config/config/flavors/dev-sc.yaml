@@ -34,7 +34,7 @@ elasticsearch:
     javaOpts: -Xms1536m -Xmx1536m
     resources:
       requests:
-        memory: 3072Mi
+        memory: 2Gi
         cpu: 300m
       limits:
         memory: 3072Mi

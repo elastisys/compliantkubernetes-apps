@@ -5,3 +5,6 @@ rbac:
 args:
   - "--kubelet-insecure-tls"
   - "--kubelet-preferred-address-types=InternalIP"
+
+resources:
+{{- toYaml .Values.metricsServer.resources | nindent 2 }}

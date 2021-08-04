@@ -1,4 +1,5 @@
 prometheus-blackbox-exporter:
+  resources: {{- toYaml .Values.prometheusBlackboxExporter.resources | nindent 4 }}
   secretConfig: true
   config:
     # See https://github.com/prometheus/blackbox_exporter/blob/master/CONFIGURATION.md

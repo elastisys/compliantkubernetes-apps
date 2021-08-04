@@ -44,6 +44,7 @@ sidecar:
   datasources:
     enabled: false
     defaultDatasourceEnabled: false
+  resources: {{- toYaml .Values.prometheus.grafana.sidecar.resources | nindent 6 }}
 
 datasources:
   datasources.yaml:
