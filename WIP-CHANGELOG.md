@@ -1,6 +1,6 @@
 # Updated
 
-- Updated influxdb chart to 4.8.13
+- Updated influxdb chart 4.8.12 to 4.8.14
 
 ### Changed
 
@@ -8,6 +8,8 @@
 - Lowered default falco resource requests
 
 ### Fixed
+
+- Fixed influxdb-du-monitor to only select influxdb and not backup pods
 
 ### Added
 
