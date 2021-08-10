@@ -343,7 +343,7 @@ elasticsearch:
       annotations:
         nginx.ingress.kubernetes.io/backend-protocol: HTTP
         cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
-        nginx.ingress.kubernetes.io/proxy-body-size: 8m
+        nginx.ingress.kubernetes.io/proxy-body-size: {{ .Values.elasticsearch.ingress.maxbodysize }}
         {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.elasticsearch }}
         nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.elasticsearch }}
         {{ end }}

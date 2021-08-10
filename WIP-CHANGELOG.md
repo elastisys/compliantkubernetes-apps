@@ -11,4 +11,6 @@
 
 ### Added
 
+- Added the ability to configure elasticsearch ingress body size from sc config.
+
 ### Removed
