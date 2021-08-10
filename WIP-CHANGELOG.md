@@ -8,6 +8,7 @@
 - Lowered default falco resource requests
 
 ### Fixed
+- migration/v0.16.x-v0.17.x/migrate-openid.sh fix
 
 ### Added
 

@@ -10,8 +10,8 @@ set -euo pipefail
 "${here}/../../bin/ck8s" ops kubectl sc delete pod -n elastic-system -l role=master
 
 # Wait for master pod to be ready before updating the config
-"${here}/../../bin/ck8s" ops kubectl sc wait --for=condition=ready pod  -n elastic-system opendistro-es-master-0
-sleep 10
+"${here}/../../bin/ck8s" ops kubectl sc wait --for=condition=Ready pod -n elastic-system opendistro-es-master-0
+sleep 20
 # Make the script executable
 "${here}/../../bin/ck8s" ops kubectl sc -n elastic-system exec opendistro-es-master-0 -- chmod +x ./plugins/opendistro_security/tools/securityadmin.sh
 # Run the script to update the configuration
