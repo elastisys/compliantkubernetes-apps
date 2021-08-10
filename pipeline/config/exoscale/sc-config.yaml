@@ -398,6 +398,8 @@ elasticsearch:
     #     cpu: 100m
     #     memory: 128Mi
     tolerations: []
+  ingress:
+    maxbodysize: 8m
 fluentd:
   enabled: true
   forwarder:

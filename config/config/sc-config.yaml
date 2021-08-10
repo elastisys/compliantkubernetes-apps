@@ -422,6 +422,8 @@ elasticsearch:
       scrapeTimeout: 30s
     resources: {}
     tolerations: []
+  ingress:
+    maxbodysize: 8m
 
 fluentd:
   enabled: true
