@@ -25,3 +25,5 @@
 - Added JumpCloud as a IDP using dex.
 
 ### Removed
+
+- Removed unnecessary PSPs and RBAC files for wc and sc.
