@@ -24,3 +24,5 @@
   calico felix grafana dashboard to visualize the metrics
 
 ### Removed
+
+- Removed unnecessary PSPs and RBAC files for wc and sc.
