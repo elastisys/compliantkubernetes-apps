@@ -6,6 +6,7 @@
 
 - ingress-nginx increased the value for client-body-buffer-size from 16K to 256k
 - Lowered default falco resource requests
+- The timeout of the prometheus-elasticsearch-exporter is set to be 5s lower than the one of the service monitor
 
 ### Fixed
 

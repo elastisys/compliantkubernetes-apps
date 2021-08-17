@@ -8,7 +8,11 @@ es:
   shards: true
   snapshots: true
   cluster_settings: false
-  timeout: 30s
+  {{- if or (contains "m" .Values.elasticsearch.exporter.serviceMonitor.scrapeTimeout) (contains "h" .Values.elasticsearch.exporter.serviceMonitor.scrapeTimeout) }}
+  {{- fail "scrapeTimeout must only be given in seconds" }}
+  {{ else }}
+  timeout: {{ .Values.elasticsearch.exporter.serviceMonitor.scrapeTimeout | trimSuffix "s" | atoi | add -5 }}s
+  {{- end }}
   sslSkipVerify: true
 
 # Load credentials from secret, used in uri below
