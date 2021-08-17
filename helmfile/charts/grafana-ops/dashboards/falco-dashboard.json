@@ -16,19 +16,11 @@
   "editable": true,
   "gnetId": 11914,
   "graphTooltip": 0,
-  "id": 48,
-  "iteration": 1611587154795,
+  "iteration": 1635158680533,
   "links": [],
   "panels": [
     {
-      "content": "# Detailed falco logs can be found in kibana:\n\n\n<<kibanaURL>>",
       "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
-        "overrides": []
-      },
       "gridPos": {
         "h": 3,
         "w": 24,
@@ -36,158 +28,176 @@
         "y": 0
       },
       "id": 7,
-      "mode": "markdown",
+      "options": {
+        "content": "# Detailed falco logs can be found in kibana:\n\n\n<<kibanaURL>>",
+        "mode": "markdown"
+      },
+      "pluginVersion": "8.0.0",
       "timeFrom": null,
       "timeShift": null,
       "title": "Falco logs",
       "type": "text"
     },
     {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
       "datasource": "$datasource",
-      "description": "",
+      "description": "This shows all Falco events that take place according to type and time.",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
         },
         "overrides": []
       },
-      "fill": 1,
-      "fillGradient": 0,
       "gridPos": {
         "h": 11,
         "w": 24,
         "x": 0,
         "y": 3
       },
-      "hiddenSeries": false,
       "id": 2,
-      "legend": {
-        "alignAsTable": true,
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "rightSide": true,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "right"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
       },
-      "percentage": false,
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
+      "pluginVersion": "8.0.0",
       "targets": [
         {
+          "exemplar": true,
           "expr": "rate(falco_events{cluster=~\"$cluster\"}[5m])",
           "interval": "",
           "intervalFactor": 1,
-          "legendFormat": "{{rule}} ({{hostname}}) -  {{cluster}}",
+          "legendFormat": "{{rule}} - {{k8s_pod_name}},{{instance}} - {{cluster}}",
           "refId": "A"
         }
       ],
-      "thresholds": [],
       "timeFrom": null,
-      "timeRegions": [],
       "timeShift": null,
       "title": "Events rate (average/5m)",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
+      "transformations": [
         {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
+          "id": "renameByRegex",
+          "options": {
+            "regex": "<NA>,",
+            "renamePattern": ""
+          }
         }
       ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
+      "type": "timeseries"
     },
     {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
       "datasource": "$datasource",
-      "description": "",
+      "description": "This shows the rate at which Falco events takes place.",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
         },
         "overrides": []
       },
-      "fill": 1,
-      "fillGradient": 0,
       "gridPos": {
         "h": 11,
         "w": 24,
         "x": 0,
         "y": 14
       },
-      "hiddenSeries": false,
       "id": 5,
-      "legend": {
-        "alignAsTable": true,
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "rightSide": true,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "right"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
       },
-      "percentage": false,
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
+      "pluginVersion": "8.0.0",
       "targets": [
         {
           "expr": "sum by (priority, cluster) (rate(falco_events{cluster=~\"$cluster\"}[5m]))",
@@ -197,57 +207,190 @@
           "refId": "A"
         }
       ],
-      "thresholds": [],
       "timeFrom": null,
-      "timeRegions": [],
       "timeShift": null,
       "title": "Events rate by priority (average/5m)",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
+      "transformations": [
         {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
+          "id": "renameByRegex",
+          "options": {
+            "regex": "Priority: 1",
+            "renamePattern": "Emergency"
+          }
         },
         {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
+          "id": "renameByRegex",
+          "options": {
+            "regex": "Priority: 2",
+            "renamePattern": "Alert"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "Priority: 3",
+            "renamePattern": "Critical"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "Priority: 4",
+            "renamePattern": "Error"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "Priority: 5",
+            "renamePattern": "Warning"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "Priority: 6",
+            "renamePattern": "Notice"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "Priority: 7",
+            "renamePattern": "Informational"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "Priority: 8",
+            "renamePattern": "Debug"
+          }
         }
       ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
+      "type": "timeseries"
     },
     {
-      "columns": [],
       "datasource": "$datasource",
+      "description": "This shows all Falco events with details in sequential order.",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "left",
+            "displayMode": "auto"
+          },
+          "decimals": 2,
+          "displayName": "",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Time"
+              },
+              {
+                "id": "unit",
+                "value": "time: YYYY-MM-DD HH:mm:ss"
+              },
+              {
+                "id": "custom.align",
+                "value": null
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/__name__|job|kubernetes_name|(__name|helm_|app_|pod_).*/"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "short"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              },
+              {
+                "id": "custom.align",
+                "value": null
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Count"
+              },
+              {
+                "id": "unit",
+                "value": "short"
+              },
+              {
+                "id": "custom.align",
+                "value": null
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "priority"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.align",
+                "value": "left"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "rgba(245, 54, 54, 0.9)",
+                      "value": null
+                    },
+                    {
+                      "color": "rgba(237, 129, 40, 0.89)",
+                      "value": null
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
       },
-      "fontSize": "100%",
       "gridPos": {
         "h": 10,
         "w": 24,
@@ -256,96 +399,10 @@
       },
       "id": 4,
       "links": [],
-      "pageSize": null,
-      "showHeader": true,
-      "sort": {
-        "col": null,
-        "desc": false
+      "options": {
+        "showHeader": true
       },
-      "styles": [
-        {
-          "alias": "Time",
-          "align": "auto",
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "pattern": "Time",
-          "type": "date"
-        },
-        {
-          "alias": "",
-          "align": "auto",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 2,
-          "link": false,
-          "mappingType": 1,
-          "pattern": "/__name__|job|kubernetes_name|(__name|helm_|app_|pod_).*/",
-          "thresholds": [],
-          "type": "hidden",
-          "unit": "short"
-        },
-        {
-          "alias": "Count",
-          "align": "auto",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 0,
-          "mappingType": 1,
-          "pattern": "Value",
-          "thresholds": [],
-          "type": "number",
-          "unit": "short"
-        },
-        {
-          "alias": "",
-          "align": "left",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 0,
-          "mappingType": 1,
-          "pattern": "priority",
-          "thresholds": [
-            ""
-          ],
-          "type": "number",
-          "unit": "none",
-          "valueMaps": [
-            {
-              "text": "5",
-              "value": "5"
-            }
-          ]
-        },
-        {
-          "alias": "",
-          "align": "left",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "decimals": 2,
-          "pattern": "/.*/",
-          "thresholds": [],
-          "type": "string",
-          "unit": "short"
-        }
-      ],
+      "pluginVersion": "8.0.0",
       "targets": [
         {
           "expr": "falco_events{cluster=~\"$cluster\"}",
@@ -359,12 +416,20 @@
       "timeFrom": null,
       "timeShift": null,
       "title": "Totals",
-      "transform": "table",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {
+            "reducers": []
+          }
+        }
+      ],
       "transparent": true,
-      "type": "table-old"
+      "type": "table"
     }
   ],
-  "schemaVersion": 25,
+  "refresh": "30s",
+  "schemaVersion": 30,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -375,6 +440,8 @@
           "text": "prometheus-wc-reader",
           "value": "prometheus-wc-reader"
         },
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": false,
         "label": null,
@@ -392,26 +459,32 @@
         "allValue": ".*",
         "current": {
           "selected": true,
-          "text": "All",
+          "text": [
+            "All"
+          ],
           "value": [
             "$__all"
           ]
         },
         "datasource": "$datasource",
         "definition": "label_values(falco_events, cluster)",
+        "description": null,
+        "error": null,
         "hide": 0,
         "includeAll": true,
         "label": null,
         "multi": true,
         "name": "cluster",
         "options": [],
-        "query": "label_values(falco_events, cluster)",
+        "query": {
+          "query": "label_values(falco_events, cluster)",
+          "refId": "prometheus-wc-reader-cluster-Variable-Query"
+        },
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
         "sort": 0,
         "tagValuesQuery": "",
-        "tags": [],
         "tagsQuery": "",
         "type": "query",
         "useTags": false
@@ -435,7 +508,8 @@
       "1d"
     ]
   },
-  "timezone": "",
+  "timezone": "utc",
   "title": "Falco",
-  "version": 1
+  "uid": "-alRycO7z",
+  "version": 15
 }
