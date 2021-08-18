@@ -178,6 +178,14 @@ falco:
     affinity: {}
     nodeSelector: {}
 
+  falcoExporter:
+    resources: {}
+    tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+    affinity: {}
+    nodeSelector: {}
+
 ## Elasticsearch cluster topolgy.
 ## Used in prometheus alerts.
 elasticsearch:
