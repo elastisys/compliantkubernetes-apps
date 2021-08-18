@@ -41,6 +41,7 @@ sidecar:
     enabled: true
     # This will pick up the prometheus-operator dashboards
     label: grafana_dashboard
+    labelValue: "1"
   datasources:
     enabled: false
     defaultDatasourceEnabled: false
@@ -52,11 +53,20 @@ datasources:
     - name: ck8s-metrics
       type: prometheus
       access: proxy
-      url: http://wc-reader-prometheus-instance.monitoring.svc.cluster.local:9090
+      url: http://wc-reader-prometheus-instance:9090
       basicAuth: false
       editable: false
       isDefault: true
       orgId: 1
+      version: 1
+    - name: prometheus-sc
+      access: proxy
+      basicAuth: false
+      editable: false
+      isDefault: false
+      orgId: 1
+      type: prometheus
+      url: http://kube-prometheus-stack-prometheus:9090
       version: 1
 
 
