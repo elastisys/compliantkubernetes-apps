@@ -11,6 +11,13 @@
 - group_by in alertmanager changed to be configurable
 - Reworked harbor restore script into a k8s job and updated the documentation.
 - Increased slm timeout from 30 to 45 min.
+- charts/grafana-ops [#587](https://github.com/elastisys/compliantkubernetes-apps/pull/587):
+  1. create one ConfigMap for each dashboard
+  2. add differenet values for "labelKey" so we can separate the user and ops dashboards in Grafana
+  3. the chart template to automatically load the dashboards enabled in the values.yaml file
+- grafana-user.yaml.gotmpl:
+  1. grafana-user.yaml.gotmpl to load only the ConfiMaps that have the value of "1" fron "labelKey" [#587](https://github.com/elastisys/compliantkubernetes-apps/pull/587)
+  2. added prometheus-sc as a datasource to user-grafana
 
 ### Fixed
 

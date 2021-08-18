@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMapList
+items:
+{{- range $key, $value := .Values.dashboards }}
+{{- if $value.enabled }}
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: {{ printf "%s-%s" $.Release.Name $key }}
+    namespace: {{ $.Release.Namespace }}
+    labels:
+      {{- if $value.user_visible }}
+      {{ $.Values.labelKey }}: "1"
+      {{- else }}
+      {{ $.Values.labelKey }}: "ops"
+      {{- end }}
+  data:
+    {{ $key }}.json: |-
+      {{- regexReplaceAll "<<kibanaURL>>" ($.Files.Get (printf "dashboards/%s-dashboard.json" $key)) ($value.logEndpoint | toString) | nindent 6 }}
+{{- end }}
+{{- end }}
