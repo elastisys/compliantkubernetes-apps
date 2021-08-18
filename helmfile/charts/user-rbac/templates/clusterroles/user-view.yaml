@@ -4,5 +4,5 @@ metadata:
   name: user-view
 rules:
 - apiGroups: [""]
-  resources: ["nodes","namespaces"]
+  resources: ["nodes","namespaces","persistentvolumes"]
   verbs: ["get", "watch", "list"]
