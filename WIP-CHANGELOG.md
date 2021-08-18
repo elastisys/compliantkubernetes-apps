@@ -14,5 +14,6 @@
 ### Added
 
 - Added the ability to configure elasticsearch ingress body size from sc config.
+- Added RBAC to allow users to view PVs.
 
 ### Removed
