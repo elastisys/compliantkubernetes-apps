@@ -18,5 +18,6 @@
 - Added RBAC to allow users to view PVs.
 - Added group support for user RBAC.
 - Added option `elasticsearch.snapshot.retentionActiveDeadlineSeconds` to control the deadline for the SLM job.
+- Added configuration properties for falco-exporter.
 
 ### Removed
