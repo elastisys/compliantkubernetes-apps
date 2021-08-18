@@ -4,31 +4,56 @@
 #   {{ .Values.labelKey }}: nameOfDashboard
 labelKey: grafana_dashboard
 
+# We use the value for the "lablekey" to separate the ops and user dashboards in Grafana.
+# ops Grafana will load all ConfigMaps regardless of the "labelkey" value
+# user Grafana will load only the ConfigMaps that have the value for "labelkey" set to 1. Set "user_visible" to "true" for this.
+
+# We will create one ConfigMap per dashboard in the .Release.Namespace. The namespace is defined in 50-applications.yaml
+# The dashboard name defined here should be the prefix for the -dashboard.json file name located in ./dashboards
+
 # Dashboards to include + settings if needed
 dashboards:
   backup:
     enabled: true
+    user_visible: false
   elasticsearch:
     enabled: true
+    user_visible: false
   falco:
     enabled: true
+    user_visible: false
     logEndpoint: https://kibana.your.endpoint
   gatekeeper:
     enabled: true
+    user_visible: false
     logEndpoint: https://kibana.your.endpoint
-  kubernetesStatus:
+  kubernetesstatus:
     enabled: true
+    user_visible: false
   nginx:
     enabled: true
+    user_visible: false
   uptime:
     enabled: true
+    user_visible: false
   velero:
     enabled: true
+    user_visible: false
   networkpolicy:
     enabled: true
+    user_visible: false
   daily:
     enabled: true
+    user_visible: false
   vulnerability:
     enabled: true
-  rook:
+    user_visible: false
+  cephcluster:
     enabled: true
+    user_visible: false
+  cephosdsingle:
+    enabled: true
+    user_visible: false
+  cephpools:
+    enabled: true
+    user_visible: false

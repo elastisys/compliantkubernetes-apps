@@ -1,26 +1,45 @@
-
 dashboards:
   backup:
     enabled: true
+    user_visible: false
   elasticsearch:
     enabled: true
+    user_visible: false
   falco:
     enabled: true
+    user_visible: false
     logEndpoint: https://kibana.{{ .Values.global.baseDomain }}
   gatekeeper:
     enabled: true
+    user_visible: false
     logEndpoint: https://kibana.{{ .Values.global.baseDomain }}
-  kubernetesStatus:
+  kubernetesstatus:
     enabled: true
+    user_visible: true
   nginx:
     enabled: true
+    user_visible: true
   uptime:
     enabled: true
+    user_visible: false
   velero:
     enabled: true
+    user_visible: false
   networkpolicy:
     enabled: true
+    user_visible: false
   daily:
     enabled: true
-  rook:
+    user_visible: false
+  vulnerability:
+    enabled: true
+    user_visible: false
+  cephcluster:
     enabled: {{ .Values.monitoring.rook.enabled }}
+    user_visible: false
+  cephosdsingle:
+    enabled: {{ .Values.monitoring.rook.enabled }}
+    user_visible: false
+  cephpools:
+    enabled: {{ .Values.monitoring.rook.enabled }}
+    user_visible: false
