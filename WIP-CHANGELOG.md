@@ -19,6 +19,7 @@
   1. grafana-user.yaml.gotmpl to load only the ConfiMaps that have the value of "1" fron "labelKey" [#587](https://github.com/elastisys/compliantkubernetes-apps/pull/587)
   2. added prometheus-sc as a datasource to user-grafana
 - enabled podSecurityPolicy in falco, fluentd, cert-manager, prometheus-elasticsearch-exporter helm charts
+- The kibana default index pattern is changed from 'kubeaudit*' to 'kubernetes*'
 
 ### Fixed
 
