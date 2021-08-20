@@ -7,6 +7,7 @@
 - ingress-nginx increased the value for client-body-buffer-size from 16K to 256k
 - Lowered default falco resource requests
 - The timeout of the prometheus-elasticsearch-exporter is set to be 5s lower than the one of the service monitor
+- fluentd replaced the time_key value from time to requestReceivedTimestamp for kube-audit log pattern [#571](https://github.com/elastisys/compliantkubernetes-apps/pull/571)
 
 ### Fixed
 
