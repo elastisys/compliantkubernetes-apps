@@ -68,6 +68,10 @@ user:
     namespace: monitoring
     ingress:
       enabled: false
+    group_by:
+    - cluster
+    - alertname
+    - severity
 harbor:
   enabled: true
   # The tolerations, affinity, and nodeSelector are applied to all harbor pods.

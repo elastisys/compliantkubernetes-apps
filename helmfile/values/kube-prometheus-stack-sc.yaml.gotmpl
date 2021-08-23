@@ -29,7 +29,7 @@ alertmanager:
   config:
     # See https://prometheus.io/docs/alerting/configuration/
     route:
-      group_by: [cluster, alertname, severity]
+      group_by: '{{ toYaml .Values.user.alertmanager.group_by | nindent 4}}'
       # default receiver
       receiver: '{{ .Values.alerts.alertTo }}'
       routes:
