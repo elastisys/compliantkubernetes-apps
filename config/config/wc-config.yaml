@@ -123,6 +123,9 @@ user:
   adminUsers:
     - admin@example.com
 
+  ## List of groups to create RBAC rules for.
+  adminGroups: []
+
   ## User controlled alertmanager configuration.
   alertmanager:
     enabled: false
