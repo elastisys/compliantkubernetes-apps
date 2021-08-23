@@ -13,3 +13,8 @@ subjects:
   kind: User
   name: {{ $user }}
 {{- end }}
+{{- range $group := $.Values.groups }}
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: {{ $group }}
+{{- end }}
