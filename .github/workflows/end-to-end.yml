@@ -260,7 +260,7 @@ jobs:
           {
             attachments: [{
               color: `${process.env.WORKFLOW_CONCLUSION}` === 'success' ? 'good' : `${process.env.WORKFLOW_CONCLUSION}` === 'failure' ? 'danger' : 'warning',
-              text: `Pipeline: ${process.env.AS_WORKFLOW}\n\ncompliantkubernetes-apps commit: <https://github.com/elastisys/compliantkubernetes-apps/commit/${{ steps.get-sha.outputs.sha }}|${{ steps.get-sha-short.outputs.sha }}>\n\n Status: ${process.env.WORKFLOW_CONCLUSION}\nTook: ${process.env.AS_TOOK}`,
+              text: `Pipeline: ${process.env.AS_WORKFLOW}\n\ncompliantkubernetes-apps commit: <https://github.com/elastisys/compliantkubernetes-apps/commit/${{ steps.get-sha.outputs.sha }}|${{ steps.get-sha-short.outputs.sha }}>\n\n Status: ${process.env.WORKFLOW_CONCLUSION}\nTook: ${process.env.AS_TOOK}\nJob: ${process.env.AS_JOB}`,
             }]
           }
       env:
