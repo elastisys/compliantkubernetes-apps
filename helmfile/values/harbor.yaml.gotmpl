@@ -18,8 +18,8 @@ expose:
       nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.harbor }}
       {{ end }}
     hosts:
-      core: harbor.{{ .Values.global.baseDomain }}
-      notary: notary.harbor.{{ .Values.global.baseDomain }}
+      core: {{ .Values.harbor.subdomain }}.{{ .Values.global.baseDomain }}
+      notary: {{ .Values.harbor.notary.subdomain }}.{{ .Values.global.baseDomain }}
 
 persistence:
   enabled: true
@@ -71,7 +71,7 @@ persistence:
     {{- end }}
     {{- end }}
 
-externalURL: https://harbor.{{ .Values.global.baseDomain }}
+externalURL: https://{{ .Values.harbor.subdomain }}.{{ .Values.global.baseDomain }}
 
 harborAdminPassword: {{ .Values.harbor.password }}
 

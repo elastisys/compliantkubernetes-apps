@@ -349,11 +349,11 @@ elasticsearch:
         {{ end }}
       path: /
       hosts:
-      - elastic.{{ .Values.global.opsDomain }}
+      - {{ .Values.elasticsearch.subdomain }}.{{ .Values.global.opsDomain  }}
       tls:
       - secretName: opendistro-es-es-ingress-cert
         hosts:
-        - elastic.{{ .Values.global.opsDomain }}
+        - {{ .Values.elasticsearch.subdomain }}.{{ .Values.global.opsDomain  }}
 
 
 # Kibana deployment configuration
@@ -368,11 +368,11 @@ kibana:
       {{ end }}
     path: /
     hosts:
-    - kibana.{{ .Values.global.baseDomain }}
+    - {{ .Values.kibana.subdomain }}.{{ .Values.global.baseDomain }}
     tls:
     - secretName: opendistro-es-kibana-ingress-cert
       hosts:
-        - kibana.{{ .Values.global.baseDomain }}
+        - {{ .Values.kibana.subdomain }}.{{ .Values.global.baseDomain }}
 
   # Secret specifying kibana server user, password, and cookie encyrption key
   elasticsearchAccount:
@@ -411,11 +411,11 @@ kibana:
     # https://docs.search-guard.com/latest/kibana-authentication-openid
     opendistro_security.auth.type: "openid"
     opendistro_security.openid.scope: {{ .Values.elasticsearch.sso.scope }}
-    opendistro_security.openid.connect_url: https://dex.{{ .Values.global.baseDomain }}/.well-known/openid-configuration
+    opendistro_security.openid.connect_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}/.well-known/openid-configuration
     opendistro_security.openid.client_id: "kibana-sso"
     opendistro_security.openid.client_secret: {{ .Values.elasticsearch.clientSecret }}
-    opendistro_security.openid.base_redirect_url: https://kibana.{{ .Values.global.baseDomain }}
-    opendistro_security.openid.logout_url: https://kibana.{{ .Values.global.baseDomain }}
+    opendistro_security.openid.base_redirect_url: https://{{ .Values.kibana.subdomain }}.{{ .Values.global.baseDomain }}
+    opendistro_security.openid.logout_url: https://{{ .Values.kibana.subdomain }}.{{ .Values.global.baseDomain }}
     {{ end }}
 
     newsfeed.enabled: false

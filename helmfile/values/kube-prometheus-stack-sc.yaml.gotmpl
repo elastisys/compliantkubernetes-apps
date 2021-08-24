@@ -100,7 +100,7 @@ alertmanager:
         # See: https://github.com/helm/helm/issues/2798#issuecomment-467319526
         text: |-
           <!channel>
-          *Cluster:* grafana.{{ .Values.global.opsDomain }}
+          *Cluster:* {{ .Values.prometheus.grafana.subdomain }}.{{ .Values.global.opsDomain }}
           {{`
           *Common summary:* {{ .CommonAnnotations.summary }}
           *Common description:* {{ .CommonAnnotations.description }}
@@ -122,7 +122,7 @@ alertmanager:
         # See https://prometheus.io/docs/alerting/configuration/#opsgenie_config
         - api_key: {{ .Values.alerts.opsGenie.apiKey }}
           api_url: {{ .Values.alerts.opsGenie.apiUrl }}
-          source: grafana.{{ .Values.global.opsDomain }}
+          source: {{ .Values.user.grafana.subdomain }}.{{ .Values.global.opsDomain }}
           priority: {{`'{{ if eq .GroupLabels.severity "critical"}}P1{{else if eq .GroupLabels.severity "warning"}}P2{{else if eq .GroupLabels.severity "medium"}}P3{{else if eq .GroupLabels.severity "low"}}P4{{else}}P5{{end}}'`}}
       {{ end }}
 
@@ -163,13 +163,13 @@ grafana:
       nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.opsGrafana }}
     {{ end }}
     hosts:
-    - grafana.{{ .Values.global.opsDomain }}
+    - {{ .Values.prometheus.grafana.subdomain }}.{{ .Values.global.opsDomain }}
     ## TLS configuration for grafana Ingress
     ## Secret must be manually created in the namespace
     tls:
     - secretName: grafana-ops-general-tls
       hosts:
-      - grafana.{{ .Values.global.opsDomain }}
+      - {{ .Values.prometheus.grafana.subdomain }}.{{ .Values.global.opsDomain }}
   rbac:
     pspUseAppArmor: false
     pspEnabled: true
@@ -218,7 +218,7 @@ grafana:
 
   grafana.ini:
     server:
-      root_url: https://grafana.{{ .Values.global.opsDomain }}
+      root_url: https://{{ .Values.prometheus.grafana.subdomain }}.{{ .Values.global.opsDomain }}
     {{ if .Values.prometheus.grafana.oidc.enabled -}}
     auth.generic_oauth:
       name: dex
@@ -226,9 +226,9 @@ grafana:
       client_id: grafana-ops
       client_secret: {{ .Values.grafana.opsClientSecret }}
       scopes: {{ .Values.prometheus.grafana.oidc.scopes }}
-      auth_url: https://dex.{{ .Values.global.baseDomain }}/auth
-      token_url: https://dex.{{ .Values.global.baseDomain }}/token
-      api_url: https://dex.{{ .Values.global.baseDomain }}/api
+      auth_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}/auth
+      token_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}/token
+      api_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}/api
       allowed_domains: {{ join " " .Values.prometheus.grafana.oidc.allowedDomains }}
       allow_sign_up: true
       tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}
@@ -264,9 +264,9 @@ prometheus:
 
 
     remoteRead:
-    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u={{ .Values.influxDB.users.admin }}&p={{ .Values.influxDB.users.adminPassword }}
+    - url: http://{{ .Values.influxDB.subdomain }}.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u={{ .Values.influxDB.users.admin }}&p={{ .Values.influxDB.users.adminPassword }}
     remoteWrite:
-    - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=service_cluster&u={{ .Values.influxDB.users.scWriter }}&p={{ .Values.influxDB.users.scWriterPassword }}
+    - url: http://{{ .Values.influxDB.subdomain }}.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=service_cluster&u={{ .Values.influxDB.users.scWriter }}&p={{ .Values.influxDB.users.scWriterPassword }}
 
     # Don't add prometheus info.
     prometheusExternalLabelNameClear: true

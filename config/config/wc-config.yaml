@@ -194,6 +194,7 @@ falco:
 ## Elasticsearch cluster topolgy.
 ## Used in prometheus alerts.
 elasticsearch:
+  subdomain: elastic
   masterNode:
     count: 1
   dataNode:
@@ -541,3 +542,5 @@ vulnerabilityExporter:
 monitoring:
   rook:
     enabled: false
+influxDB:
+  subdomain: influxdb

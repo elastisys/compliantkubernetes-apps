@@ -50,6 +50,7 @@
 - cert-manager networkpolicy, the possibility to configure a custom public repository for the http01 challenge image and the possibility to add an OPA exception for the cert-manager-acmesolver image [#593](https://github.com/elastisys/compliantkubernetes-apps/pull/593)
   > **_NOTE:_** Possible breaking change if OPA policies are enabled
 - Added prometheus probes permission for users
+- Added the ability to set and choose subdomain of your service endpoints.
 
 ### Removed
 

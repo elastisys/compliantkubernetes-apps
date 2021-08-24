@@ -52,6 +52,7 @@ objectStorage:
 user:
   grafana:
     enabled: true
+    subdomain: grafana
     resources:
       limits:
         cpu: 100m
@@ -90,6 +91,7 @@ user:
     - severity
 harbor:
   enabled: true
+  subdomain: harbor
   # The tolerations, affinity, and nodeSelector are applied to all harbor pods.
   tolerations: []
   affinity: {}
@@ -155,6 +157,7 @@ harbor:
         memory: 32Mi
         cpu: 10m
   notary:
+    subdomain: notary.harbor
     resources:
       requests:
         cpu: 2m
@@ -278,6 +281,7 @@ prometheus:
         cpu: 10m
         memory: 50Mi
   grafana:
+    subdomain: grafana
     resources:
       requests:
         cpu: 50m
@@ -307,6 +311,7 @@ prometheus:
           cpu: 10m
           memory: 100Mi
 dex:
+  subdomain: dex
   additionalKubeloginRedirects: []
   enableStaticLogin: true
   resources:
@@ -330,6 +335,7 @@ dex:
     # SASecretName: set-me
 
 kibana:
+  subdomain: kibana
   # Note sso is enabled via `elasticsearch.sso.enabled`
   resources:
     requests:
@@ -340,6 +346,7 @@ kibana:
   affinity: {}
 
 elasticsearch:
+  subdomain: elastic
   snapshotRepository: elastic-snapshots
   # Create initial indices upon first startup
   createIndices: true
@@ -563,8 +570,8 @@ fluentd:
 # Log retention for service cluster logs stored in object storage.
 logRetention:
   days: 7
-
 influxDB:
+  subdomain: influxdb
   users:
     admin: admin
     wcWriter: wcWriter

@@ -9,7 +9,7 @@ elasticsearch:
     enabled: true
     user: fluentd
     password: null
-  hosts: ["elastic.{{ .Values.global.opsDomain }}"]
+  hosts: ["{{ .Values.elasticsearch.subdomain }}.{{ .Values.global.opsDomain  }}"]
   sslVerify: {{ .Values.global.verifyTls }}
   logLevel: "info"
 

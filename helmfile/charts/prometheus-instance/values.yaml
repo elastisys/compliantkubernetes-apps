@@ -13,9 +13,9 @@ prometheusSpec:
   version: "v2.19.2"
 
   remoteRead:
-  - url: http://influxdb:8086/api/v1/prom/read?db=workload_cluster&u=user&p=password
+  - url: http://{{ .Values.influxDB.subdomain }}:8086/api/v1/prom/read?db=workload_cluster&u=user&p=password
   remoteWrite:
-  - url: http://influxdb:8086/api/v1/prom/write?db=workload_cluster&u=user&p=password
+  - url: http://{{ .Values.influxDB.subdomain }}:8086/api/v1/prom/write?db=workload_cluster&u=user&p=password
   replicas: 1
   retention: 1d
   securityContext:
