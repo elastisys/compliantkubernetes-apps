@@ -43,19 +43,3 @@ defaultRules:
     certMonitor: true
     falcoAlerts: true
     rookMonitor: true
-
-certMonitor:
-  name: "cert-monitor"
-  instance: "ck8s"
-  namespace: "cert-manager"
-  target:
-    name: "cert-manager"
-    instance: "cert-manager"
-  port: 9402
-
-rookMonitor:
-  enabled: true
-  namespace: rook-ceph
-  relabelings: []
-  # - targetLabel: cluster
-  #   replacement: service_cluster
