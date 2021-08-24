@@ -175,11 +175,20 @@ releases:
   version: 0.1.1
   missingFileHandler: Error
   values:
-{{ if eq .Environment.Name "service_cluster" }}
   # Note: we want to have alerts for WC since this is wc-reader, even if it is
   # running in SC.
   - values/prometheus-alerts-wc.yaml.gotmpl
-{{ end }}
+
+- name: sc-servicemonitor
+  namespace: monitoring
+  labels:
+    app: prometheus-servicemonitor
+    prometheus: sc
+  chart: ./charts/prometheus-servicemonitor
+  version: 0.1.1
+  missingFileHandler: Error
+  values:
+  - values/sc-servicemonitor.yaml.gotmpl
 
 # prometheus sc-alerts
 - name: sc-alerts
@@ -401,6 +410,19 @@ releases:
 
 # Workload cluster releases
 {{ if eq .Environment.Name "workload_cluster" }}
+
+# prometheus wc-servicemonitor
+- name: wc-servicemonitor
+  namespace: monitoring
+  labels:
+    app: prometheus-servicemonitor
+    prometheus: wc-prometheus
+  chart: ./charts/prometheus-servicemonitor
+  version: 0.1.1
+  missingFileHandler: Error
+  values:
+  - values/wc-servicemonitor.yaml.gotmpl
+
 # Falco
 - name: falco
   namespace: falco

@@ -1,8 +1,8 @@
-{{- if and .Values.defaultRules.create .Values.defaultRules.rules.certMonitor }}
+{{- if .Values.certMonitor.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "cert-monitor" | trunc 63 | trimSuffix "-" }}
+  name: {{ printf "%s-%s" (include "prometheus-servicemonitor.fullname" .) "cert-monitor" | trunc 63 | trimSuffix "-" }}
   namespace: {{ .Values.certMonitor.namespace }}
   labels:
     app.kubernetes.io/name: {{ .Values.certMonitor.name }}
