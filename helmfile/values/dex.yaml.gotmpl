@@ -8,9 +8,9 @@ ingress:
   tls:
     - secretName: dex-tls
       hosts:
-        - dex.{{ .Values.global.baseDomain }}
+        - {{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}
   hosts:
-    - host: dex.{{ .Values.global.baseDomain }}
+    - host: {{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}
       paths:
         - path: /
           pathType: ImplementationSpecific
@@ -28,7 +28,7 @@ volumes:
 config:
   storage:
     type: memory
-  issuer: https://dex.{{ .Values.global.baseDomain }}
+  issuer: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}
   connectors:
   {{- toYaml .Values.dex.connectors | nindent 4 }}
   staticClients:
@@ -45,29 +45,29 @@ config:
       secret: {{ .Values.grafana.clientSecret }}
       name: 'Grafana'
       redirectURIs:
-        - https://grafana.{{ .Values.global.baseDomain }}/login/generic_oauth
+        - https://{{ .Values.user.grafana.subdomain }}.{{ .Values.global.baseDomain }}/login/generic_oauth
 {{- if .Values.prometheus.grafana.oidc.enabled }}
     - id: grafana-ops
       secret: {{ .Values.grafana.opsClientSecret }}
       name: 'Grafana ops'
       redirectURIs:
-        - https://grafana.{{ .Values.global.opsDomain }}/login/generic_oauth
+        - https://{{ .Values.prometheus.grafana.subdomain }}.{{ .Values.global.opsDomain }}/login/generic_oauth
 {{- end }}
 {{ if .Values.harbor.enabled }}
     - id: harbor
       secret: {{ .Values.harbor.clientSecret }}
       name: 'Harbor'
       redirectURIs:
-        - https://harbor.{{ .Values.global.baseDomain }}/c/oidc/callback
+        - https://{{ .Values.harbor.subdomain }}.{{ .Values.global.baseDomain }}/c/oidc/callback
 {{ end }}
 {{ if .Values.elasticsearch.sso.enabled }}
     - id: kibana-sso
       secret: {{ .Values.elasticsearch.clientSecret }}
       name: 'kibana-sso'
       redirectURIs:
-        - https://kibana.{{ .Values.global.baseDomain }}
-        - https://kibana.{{ .Values.global.baseDomain }}/auth/openid/login
-        - https://kibana.{{ .Values.global.baseDomain }}/app/kibana
+        - https://{{ .Values.kibana.subdomain }}.{{ .Values.global.baseDomain }}
+        - https://{{ .Values.kibana.subdomain }}.{{ .Values.global.baseDomain }}/auth/openid/login
+        - https://{{ .Values.kibana.subdomain }}.{{ .Values.global.baseDomain }}/app/kibana
 {{ end }}
 {{ if .Values.dex.additionalStaticClients }}
   {{- toYaml .Values.dex.additionalStaticClients | nindent 4 }}

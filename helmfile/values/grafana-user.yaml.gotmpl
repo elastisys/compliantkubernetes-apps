@@ -19,11 +19,11 @@ ingress:
     nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.userGrafana }}
   {{ end }}
   hosts:
-  - grafana.{{ .Values.global.baseDomain }}
+  - {{ .Values.user.grafana.subdomain }}.{{ .Values.global.baseDomain }}
   tls:
   - secretName: user-grafana-tls
     hosts:
-    - grafana.{{ .Values.global.baseDomain }}
+    - {{ .Values.user.grafana.subdomain }}.{{ .Values.global.baseDomain }}
 rbac:
   pspUseAppArmor: false
   pspEnabled: true
@@ -73,16 +73,16 @@ datasources:
 
 grafana.ini:
   server:
-    root_url: https://grafana.{{ .Values.global.baseDomain }}
+    root_url: https://{{ .Values.user.grafana.subdomain }}.{{ .Values.global.baseDomain }}
   auth.generic_oauth:
     name: dex
     enabled: true
     client_id: grafana
     client_secret: {{ .Values.grafana.clientSecret }}
     scopes: {{ .Values.user.grafana.oidc.scopes }}
-    auth_url: https://dex.{{ .Values.global.baseDomain }}/auth
-    token_url: https://dex.{{ .Values.global.baseDomain }}/token
-    api_url: https://dex.{{ .Values.global.baseDomain }}/api
+    auth_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}/auth
+    token_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}/token
+    api_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}/api
     allowed_domains: {{ join " " .Values.user.grafana.oidc.allowedDomains }}
     allow_sign_up: true
     tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}

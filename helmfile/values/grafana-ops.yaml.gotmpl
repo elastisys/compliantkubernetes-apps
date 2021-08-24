@@ -16,13 +16,11 @@ dashboards:
     user_visible: true
   falco:
     enabled: true
-    user_visible: false
-    logEndpoint: https://kibana.{{ .Values.global.baseDomain }}
+    logEndpoint: https://{{ .Values.kibana.subdomain }}.{{ .Values.global.baseDomain }}
   gatekeeper:
     enabled: true
-    user_visible: false
-    logEndpoint: https://kibana.{{ .Values.global.baseDomain }}
-  kubernetesstatus:
+    logEndpoint: https://{{ .Values.kibana.subdomain }}.{{ .Values.global.baseDomain }}
+  kubernetesStatus:
     enabled: true
     user_visible: true
   nginx:

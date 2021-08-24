@@ -42,7 +42,7 @@ prometheusSpec:
   # Disable remote write
   remoteWrite:
   remoteRead:
-  - url: http://influxdb.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=workload_cluster&u={{ .Values.influxDB.users.admin }}&p={{ .Values.influxDB.users.adminPassword }}
+  - url: http://{{ .Values.influxDB.subdomain }}.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=workload_cluster&u={{ .Values.influxDB.users.admin }}&p={{ .Values.influxDB.users.adminPassword }}
     readRecent: true
 
   replicas: 1

@@ -105,7 +105,7 @@ ingress:
   annotations:
     cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
   secretName: influxdb-ingress-cert
-  hostname: influxdb.{{ .Values.global.opsDomain }}
+  hostname: {{ .Values.influxDB.subdomain }}.{{ .Values.global.opsDomain }}
 
 initScripts:
   enabled: true

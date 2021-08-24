@@ -1,5 +1,5 @@
 core:
-  domain: harbor.{{ .Values.global.baseDomain }}
+  domain: {{ .Values.harbor.subdomain }}.{{ .Values.global.baseDomain }}
 
 notary:
-  domain: notary.harbor.{{ .Values.global.baseDomain }}
+  domain: {{ .Values.harbor.notary.subdomain }}.{{ .Values.global.baseDomain }}

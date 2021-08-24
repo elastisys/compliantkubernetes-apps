@@ -1,7 +1,7 @@
 password: {{ .Values.harbor.password }}
 oidc:
   clientSecret: {{ .Values.harbor.clientSecret }}
-  endpoint: "https://dex.{{ .Values.global.baseDomain }}"
+  endpoint: "https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}"
   verifyCert: {{ .Values.global.verifyTls }}
   groupClaimName: {{ .Values.harbor.oidc.groupClaimName }}
   adminGroupName: {{ .Values.harbor.oidc.adminGroupName }}
