@@ -357,6 +357,7 @@ elasticsearch:
     ageSeconds: 864000
     retentionSchedule: 0 1 * * * # 1am
     backupSchedule: 0 */12 * * * # run twice/day
+    retentionActiveDeadlineSeconds: 1800
   extraRoles: []
   # - role_name: log_reader
   #   definition:

@@ -10,6 +10,8 @@ schedule: {{ .Values.elasticsearch.snapshot.retentionSchedule | quote }}
 
 snapshotRepository: {{ .Values.elasticsearch.snapshotRepository }}
 
+activeDeadlineSeconds: {{ .Values.elasticsearch.snapshot.retentionActiveDeadlineSeconds }}
+
 resources:
   limits:
     cpu: 100m
