@@ -22,6 +22,5 @@ spec:
         values:
         - operator
   parameters:
-    repos:
-      - {{ .Values.imageRegistryURL }}
+    repos: {{- toYaml .Values.imageRegistryURL | nindent 6}}
 {{- end }}
