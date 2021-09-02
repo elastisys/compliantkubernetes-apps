@@ -2,6 +2,7 @@ resources:    {{- toYaml .Values.certmanager.resources | nindent 2 }}
 nodeSelector: {{- toYaml .Values.certmanager.nodeSelector | nindent 2 }}
 affinity:     {{- toYaml .Values.certmanager.affinity | nindent 2 }}
 tolerations:  {{- toYaml .Values.certmanager.tolerations | nindent 2 }}
+extraArgs:    {{- toYaml .Values.certmanager.extraArgs | nindent 2 }}
 
 webhook:
   resources:    {{- toYaml .Values.certmanager.webhook.resources | nindent 4 }}

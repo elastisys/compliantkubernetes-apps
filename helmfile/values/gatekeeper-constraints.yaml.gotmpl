@@ -8,4 +8,4 @@ requireResourceRequests:
     enable: {{ .Values.opa.resourceRequests.enabled }}
     enforcementAction: {{ .Values.opa.resourceRequests.enforcement }}
 
-imageRegistryURL: {{ .Values.opa.imageRegistry.URL }}
+imageRegistryURL: {{- toYaml .Values.opa.imageRegistry.URL | nindent 2}}

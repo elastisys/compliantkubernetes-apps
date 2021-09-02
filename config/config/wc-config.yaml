@@ -271,7 +271,12 @@ opa:
   imageRegistry:
     enabled: true
     enforcement: dryrun
-    URL: harbor.set-me
+    URL:
+      - harbor.set-me
+        ## Uncomment this if you want to add an OPA exception for cert-manager-acmesolver.
+        ## This should be added only as an exception, e.g: if you cannot rely on a harbor instance managed by users.
+        ## Otherwise set the correct repository for this image in the certmanager section.
+        # - quay.io/jetstack/cert-manager-acmesolver
 
   ## Enable rule that requires pods to be targeted
   ## by at least one network policy.
@@ -452,6 +457,11 @@ certmanager:
   tolerations: {}
   affinity: {}
 
+  ## when using cert-manager with HTTP01 challenge and a custom image registry the below parameter should be added in the extraArgs
+  ## !! this works only with public repositories !! see https://github.com/jetstack/cert-manager/issues/2429
+  ## update the image tag based on the version used in the helm chart
+  ## - --acme-http01-solver-image=<harbor_server_name>/<proxy_project_name>/jetstack/cert-manager-acmesolver:v1.4.0
+  extraArgs: []
   webhook:
     resources:
       requests:
