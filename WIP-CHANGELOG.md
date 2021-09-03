@@ -22,5 +22,6 @@
 - Added configuration properties for falco-exporter.
 - calico-felix-metrics helm chart to enable calico targets discovery and scraping
   calico felix grafana dashboard to visualize the metrics
+- Added JumpCloud as a IDP using dex.
 
 ### Removed
