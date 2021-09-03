@@ -250,6 +250,27 @@ jobs:
     - id: get-sha-short
       run: |
           echo ::set-output name=sha::$( echo ${{ steps.get-sha.outputs.sha }} | cut -c -8)
+    - id: result
+      run: |
+        curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs \
+        --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' \
+        --header 'Accept: application/vnd.github.v3+json' > response.json
+
+        cat response.json | jq -r '.jobs[] | select(.conclusion=="failure") | .id' > jobs.failed
+        if [ -s jobs.failed ]
+        then
+          while read i
+          do
+            cat response.json | jq --arg i $i -r '[.jobs[] | select(.id=='$i') | "The JOB: ", .name, " failed at STEPS: ", ([(.steps[] | select(.conclusion=="failure") | .name)] | join("; "))] | join("")' >> steps.failed
+          done < jobs.failed
+          export RESULT="$(cat steps.failed)"
+        else
+          export RESULT="All good."
+        fi
+        RESULT="${RESULT//'%'/'%25'}"
+        RESULT="${RESULT//$'\n'/'%0A'}"
+        RESULT="${RESULT//$'\r'/'%0D'}"
+        echo "::set-output name=result::$(echo "$RESULT")"
     - uses: technote-space/workflow-conclusion-action@v1
     - name: Send Slack alert
       uses: elastisys/action-slack@v3
@@ -260,7 +281,7 @@ jobs:
           {
             attachments: [{
               color: `${process.env.WORKFLOW_CONCLUSION}` === 'success' ? 'good' : `${process.env.WORKFLOW_CONCLUSION}` === 'failure' ? 'danger' : 'warning',
-              text: `Pipeline: ${process.env.AS_WORKFLOW}\n\ncompliantkubernetes-apps commit: <https://github.com/elastisys/compliantkubernetes-apps/commit/${{ steps.get-sha.outputs.sha }}|${{ steps.get-sha-short.outputs.sha }}>\n\n Status: ${process.env.WORKFLOW_CONCLUSION}\nTook: ${process.env.AS_TOOK}`,
+              text: `Pipeline: ${process.env.AS_WORKFLOW}\n\ncompliantkubernetes-apps commit: <https://github.com/elastisys/compliantkubernetes-apps/commit/${{ steps.get-sha.outputs.sha }}|${{ steps.get-sha-short.outputs.sha }}>\n\n Status: ${process.env.WORKFLOW_CONCLUSION}\nTook: ${process.env.AS_TOOK}\nDetails: ${{ steps.result.outputs.result }}`,
             }]
           }
       env:
