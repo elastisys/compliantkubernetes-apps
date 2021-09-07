@@ -10,6 +10,7 @@
 - fluentd replaced the time_key value from time to requestReceivedTimestamp for kube-audit log pattern [#571](https://github.com/elastisys/compliantkubernetes-apps/pull/571)
 - group_by in alertmanager changed to be configurable
 - Reworked harbor restore script into a k8s job and updated the documentation.
+- Increased slm timeout from 30 to 45 min.
 
 ### Fixed
 
@@ -29,6 +30,7 @@
   calico felix grafana dashboard to visualize the metrics
 - Added JumpCloud as a IDP using dex.
 - Setting chunk limit size and queue limit size for fluentd from sc-config file
+- Added options to set the liveness probe for fluentd forwarder.
 
 ### Removed
 

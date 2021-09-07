@@ -390,7 +390,7 @@ elasticsearch:
     ageSeconds: 864000
     retentionSchedule: '@daily'
     backupSchedule: 0 */2 * * *
-    retentionActiveDeadlineSeconds: 1800
+    retentionActiveDeadlineSeconds: 2700
   extraRoles: []
   # - role_name: log_reader
   #   definition:
@@ -442,6 +442,11 @@ fluentd:
     tolerations: []
     affinity: {}
     nodeSelector: {}
+    livenessProbe:
+      initialDelaySeconds: 60
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 6
     # Set to 'false' when using AWS S3,
     # and 'true' when using any other S3 provider.
     useRegionEndpoint: set-me
