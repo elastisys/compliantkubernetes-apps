@@ -23,5 +23,6 @@
 - calico-felix-metrics helm chart to enable calico targets discovery and scraping
   calico felix grafana dashboard to visualize the metrics
 - Added JumpCloud as a IDP using dex.
+- Setting chunk limit size and queue limit size for fluentd from sc-config file
 
 ### Removed
