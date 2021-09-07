@@ -419,6 +419,8 @@ fluentd:
     affinity: {}
     nodeSelector: {}
     useRegionEndpoint: true
+    chunkLimitSizeBytes: 2048
+    queueLimitSizeBytes: 4096
   aggregator:
     resources:
       limits:

@@ -445,6 +445,8 @@ fluentd:
     # Set to 'false' when using AWS S3,
     # and 'true' when using any other S3 provider.
     useRegionEndpoint: set-me
+    chunkLimitSizeBytes: 2048
+    queueLimitSizeBytes: 4096
   aggregator:
     resources:
       limits:
