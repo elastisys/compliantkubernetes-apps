@@ -35,6 +35,11 @@ forwarder:
   nodeSelector: {{- toYaml .Values.fluentd.forwarder.nodeSelector | nindent 4  }}
   affinity:     {{- toYaml .Values.fluentd.forwarder.affinity | nindent 4  }}
   tolerations:  {{- toYaml .Values.fluentd.forwarder.tolerations | nindent 4  }}
+  livenessProbe:
+    initialDelaySeconds: {{ .Values.fluentd.forwarder.livenessProbe.initialDelaySeconds  }}
+    periodSeconds: {{ .Values.fluentd.forwarder.livenessProbe.periodSeconds  }}
+    timeoutSeconds: {{ .Values.fluentd.forwarder.livenessProbe.timeoutSeconds  }}
+    failureThreshold: {{ .Values.fluentd.forwarder.livenessProbe.failureThreshold  }}
   rbac:
     pspEnabled: true
   extraEnv:
