@@ -320,7 +320,7 @@ releases:
   labels:
     app: influxdb
   chart: ./elastisys/influxdb
-  version: 4.8.14
+  version: 4.8.15
   missingFileHandler: Error
   values:
   - values/influxdb.yaml.gotmpl
