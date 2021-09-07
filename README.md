@@ -149,7 +149,7 @@ Assuming you already have everything needed to install the apps, this is what yo
    scripts/S3/entry.sh create
 
    # Use custom config file for s3cmd.
-   scripts/S3/gen-s3cfg.sh aws ${AWS_ACCESS_KEY} ${AWS_ACCESS_SECRET_KEY} s3.eu-north-1.amazonaws.com eu-north-1 > s3cfg-aws
+   scripts/S3/generate-s3cfg.sh aws ${AWS_ACCESS_KEY} ${AWS_ACCESS_SECRET_KEY} s3.eu-north-1.amazonaws.com eu-north-1 > s3cfg-aws
    scripts/S3/entry.sh --s3cfg s3cfg-aws create
    ```
 
