@@ -1,6 +1,6 @@
 # Updated
 
-- Updated influxdb chart 4.8.12 to 4.8.14
+- Updated influxdb chart 4.8.12 to 4.8.15
 
 ### Changed
 
@@ -14,6 +14,7 @@
 
 - Fixed influxdb-du-monitor to only select influxdb and not backup pods
 - Added dex/dex as a need for opendistro-es to make kibana available out-the-box at cluster initiation if dex is enabled
+- Fixed disabling retention cronjob for influxdb by allowing to create required resources
 
 ### Added
 
