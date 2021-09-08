@@ -1,18 +1,15 @@
 #!/bin/bash
 # Check https://compliantkubernetes.io/operator-manual/disaster-recovery/ for instructions
-# Restores latest backup from S3_BUCKET. $1 can be used to specify backup
-# To get a list of available backups use:
-# aws s3 ls ${S3_BUCKET}"/backups" --recursive --endpoint-url=$S3_REGION_ENDPOINT
 set -e
 
-HOSTNAME=localhost
+HOSTNAME=harbor-harbor-database
 backup_dir=backups
 
 s3_download() {
     : "${S3_BUCKET:?Missing S3_BUCKET}"
     : "${S3_REGION_ENDPOINT:?Missing S3_REGION_ENDPOINT}"
-    if [[ -n "$1" ]]; then
-        backup_key=$1
+    if [[ -n "$SPECIFIC_BACKUP" ]]; then
+        backup_key=$SPECIFIC_BACKUP
     else
         backup_key=$(aws s3 ls "${S3_BUCKET}/backups" \
           --recursive \
@@ -76,7 +73,7 @@ cleanup_local_files(){
   rmdir ${backup_dir}
 }
 
-s3_download "$1"
+s3_download
 extract_backup
 wait_for_db_ready
 clean_database_data
