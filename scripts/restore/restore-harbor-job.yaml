@@ -1,0 +1,51 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+ name: restore-harbor-job
+spec:
+ template:
+   metadata:
+     name: restore-harbor
+   spec:
+     volumes:
+      - name: scripts
+        configMap:
+          name: restore-harbor
+      - name: backup
+        emptyDir: {}
+     securityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+     restartPolicy: Never
+     containers:
+     - name: run
+       image: elastisys/backup-postgres:1.1.0
+       command: ['/bin/bash', '/scripts/restore-harbor.sh']
+       env:
+         - name: AWS_ACCESS_KEY_ID
+           valueFrom:
+             secretKeyRef:
+               name: harbor-backup-secret
+               key: aws-access-key-id
+         - name: AWS_SECRET_ACCESS_KEY
+           valueFrom:
+             secretKeyRef:
+               name: harbor-backup-secret
+               key: aws-secret-access-key
+         - name: S3_BUCKET
+           value: ${S3_BUCKET}
+         - name: S3_REGION_ENDPOINT
+           value: ${S3_REGION_ENDPOINT}
+         - name: SPECIFIC_BACKUP
+           value: ${SPECIFIC_BACKUP}
+         - name: PGPASSWORD
+           valueFrom:
+             secretKeyRef:
+               name: harbor-backup-secret
+               key: db-password
+       volumeMounts:
+         - name: scripts
+           mountPath: /scripts
+         - name: backup
+           mountPath: /backup

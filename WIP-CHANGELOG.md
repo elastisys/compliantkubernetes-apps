@@ -9,6 +9,7 @@
 - The timeout of the prometheus-elasticsearch-exporter is set to be 5s lower than the one of the service monitor
 - fluentd replaced the time_key value from time to requestReceivedTimestamp for kube-audit log pattern [#571](https://github.com/elastisys/compliantkubernetes-apps/pull/571)
 - group_by in alertmanager changed to be configurable
+- Reworked harbor restore script into a k8s job and updated the documentation.
 
 ### Fixed
 
