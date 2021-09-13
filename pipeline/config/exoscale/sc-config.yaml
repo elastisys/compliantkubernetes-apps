@@ -423,6 +423,11 @@ fluentd:
       periodSeconds: 10
       timeoutSeconds: 5
       failureThreshold: 6
+    readinessProbe:
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 6
     useRegionEndpoint: true
     chunkLimitSizeBytes: 2048
     queueLimitSizeBytes: 4096

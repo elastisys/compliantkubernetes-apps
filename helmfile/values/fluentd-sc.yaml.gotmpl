@@ -40,6 +40,11 @@ forwarder:
     periodSeconds: {{ .Values.fluentd.forwarder.livenessProbe.periodSeconds  }}
     timeoutSeconds: {{ .Values.fluentd.forwarder.livenessProbe.timeoutSeconds  }}
     failureThreshold: {{ .Values.fluentd.forwarder.livenessProbe.failureThreshold  }}
+  readinessProbe:
+    initialDelaySeconds: {{ .Values.fluentd.forwarder.readinessProbe.initialDelaySeconds  }}
+    periodSeconds: {{ .Values.fluentd.forwarder.readinessProbe.periodSeconds  }}
+    timeoutSeconds: {{ .Values.fluentd.forwarder.readinessProbe.timeoutSeconds  }}
+    failureThreshold: {{ .Values.fluentd.forwarder.readinessProbe.failureThreshold  }}
   rbac:
     pspEnabled: true
   extraEnv:

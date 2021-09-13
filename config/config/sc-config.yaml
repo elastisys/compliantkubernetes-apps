@@ -447,6 +447,11 @@ fluentd:
       periodSeconds: 10
       timeoutSeconds: 5
       failureThreshold: 6
+    readinessProbe:
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 6
     # Set to 'false' when using AWS S3,
     # and 'true' when using any other S3 provider.
     useRegionEndpoint: set-me
