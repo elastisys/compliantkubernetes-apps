@@ -31,6 +31,7 @@
 - Added JumpCloud as a IDP using dex.
 - Setting chunk limit size and queue limit size for fluentd from sc-config file
 - Added options to set the liveness probe for fluentd forwarder.
+- Added options to set the liveness and readiness probe for fluentd forwarder.
 
 ### Removed
 
