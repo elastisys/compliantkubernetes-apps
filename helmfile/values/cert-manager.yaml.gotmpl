@@ -16,3 +16,7 @@ cainjector:
   tolerations:  {{- toYaml .Values.certmanager.cainjector.tolerations | nindent 4 }}
 
 installCRDs: true
+
+global:
+  podSecurityPolicy:
+    enabled: true

@@ -24,6 +24,9 @@ secret:
   secret_name: elasticsearch
   secret_key: password
 
+podSecurityPolicy:
+  enabled: true
+
 env:
   LIVENESS_THRESHOLD_SECONDS: 900
   STUCK_THRESHOLD_SECONDS: 1200

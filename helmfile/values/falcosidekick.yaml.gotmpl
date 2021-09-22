@@ -19,3 +19,6 @@ resources:    {{- toYaml .Values.falco.falcoSidekick.resources | nindent 2  }}
 nodeSelector: {{- toYaml .Values.falco.falcoSidekick.nodeSelector | nindent 2  }}
 affinity:     {{- toYaml .Values.falco.falcoSidekick.affinity | nindent 2  }}
 tolerations:  {{- toYaml .Values.falco.falcoSidekick.tolerations | nindent 2  }}
+
+podSecurityPolicy:
+  create: true
