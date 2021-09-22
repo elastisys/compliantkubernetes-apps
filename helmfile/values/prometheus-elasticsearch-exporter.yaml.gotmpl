@@ -62,3 +62,6 @@ prometheusRule:
 resources: {{- toYaml .Values.elasticsearch.exporter.resources | nindent 2 }}
 
 tolerations: {{- toYaml .Values.elasticsearch.exporter.tolerations | nindent 2 }}
+
+podSecurityPolicies:
+  enabled: true

@@ -30,6 +30,9 @@ nodeSelector: {{- toYaml .Values.falco.nodeSelector | nindent 2  }}
 affinity: {{- toYaml .Values.falco.affinity | nindent 2  }}
 tolerations: {{- toYaml .Values.falco.tolerations | nindent 2  }}
 
+podSecurityPolicy:
+  create: true
+
 customRules:
   ssh-trafic.yaml: |-
     - rule: Inbound SSH Connection
