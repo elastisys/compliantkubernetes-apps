@@ -423,6 +423,8 @@ releases:
   version: 0.1.0
   installed: {{ .Values.user.alertmanager.enabled }}
   missingFileHandler: Error
+  needs:
+  - kube-system/user-rbac
   values:
   - values/user-alertmanager.yaml.gotmpl
 
