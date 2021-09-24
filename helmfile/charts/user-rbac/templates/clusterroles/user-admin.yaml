@@ -10,5 +10,5 @@ metadata:
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
 rules:
 - apiGroups: ["monitoring.coreos.com"]
-  resources: ["servicemonitors", "podmonitors", "prometheusrules"]
+  resources: ["servicemonitors", "podmonitors", "prometheusrules", "probes"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
