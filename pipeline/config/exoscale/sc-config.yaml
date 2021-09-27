@@ -676,8 +676,8 @@ velero:
   nodeSelector: {}
   resources:
     limits:
-      cpu: 100m
-      memory: 200Mi
+      cpu: 500m
+      memory: 500Mi
     requests:
       cpu: 50m
       memory: 100Mi
@@ -685,8 +685,8 @@ velero:
     tolerations: []
     resources:
       limits:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 500m
+        memory: 500Mi
       requests:
         cpu: 50m
         memory: 100Mi

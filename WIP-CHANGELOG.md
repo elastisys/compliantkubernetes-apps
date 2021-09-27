@@ -43,6 +43,7 @@
 - resource requests for apps [#551](https://github.com/elastisys/compliantkubernetes-apps/pull/551)
   !! This will cause disruptions/downtime in the cluster as many of the pods will restart to apply the new resource limits/requests. !!
   !! Check your cluster available resources before applying the new requests. The pods will remain in a pending state if not enough resources are available. !!
+- Increased Velero request limits.
 
 ### Removed
 
