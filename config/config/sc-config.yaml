@@ -714,6 +714,7 @@ velero:
   enabled: true
   tolerations: []
   nodeSelector: {}
+  schedule: 0 0 * * * #once per day
   resources:
     limits:
       cpu: 500m

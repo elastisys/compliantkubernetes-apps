@@ -45,6 +45,9 @@
   !! This will cause disruptions/downtime in the cluster as many of the pods will restart to apply the new resource limits/requests. !!
   !! Check your cluster available resources before applying the new requests. The pods will remain in a pending state if not enough resources are available. !!
 - Increased Velero request limits.
+- Velero restic backup is now default
+- Velero backups everything in user namespaces, opt out by using label compliantkubernetes.io/nobackup: velero
+- Added configuration for Velero daily backup schedule in config files
 
 ### Removed
 

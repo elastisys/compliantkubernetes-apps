@@ -1,0 +1,106 @@
+{{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") ) }}
+{{ fail "\nERROR: Velero requires s3 or gcs object storage, see Values.objectStorage.type" }}
+{{ end }}
+resources:    {{- toYaml .Values.velero.resources | nindent 2  }}
+tolerations:  {{- toYaml .Values.velero.tolerations | nindent 2  }}
+nodeSelector: {{- toYaml .Values.velero.nodeSelector | nindent 2  }}
+
+initContainers:
+  {{- if eq .Values.objectStorage.type "s3" }}
+  - name: velero-plugin-for-aws
+    image: velero/velero-plugin-for-aws:v1.0.0
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+  {{- else if eq .Values.objectStorage.type "gcs" }}
+  - name: velero-plugin-for-gcs
+    image: velero/velero-plugin-for-gcp:v1.1.0
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+  {{- end }}
+
+configuration:
+  # Cloud provider being used (e.g. aws, azure, gcp).
+  {{- if eq .Values.objectStorage.type "s3" }}
+  provider: aws
+  {{- else if eq .Values.objectStorage.type "gcs" }}
+  provider: gcp
+  {{- end }}
+
+  defaultVolumesToRestic: true
+
+  # https://velero.io/docs/v1.0.0/api-types/backupstoragelocation/
+  backupStorageLocation:
+    {{- if eq .Values.objectStorage.type "s3" }}
+    # Cloud provider where backups should be stored. Usually should
+    # match `configuration.provider`. Required.
+    name: default
+    # Bucket to store backups in. Required.
+    bucket: {{ .Values.objectStorage.buckets.velero }}
+    # Prefix within bucket under which to store backups. Optional.
+    prefix: service-cluster
+    # Additional provider-specific configuration. See link above
+    # for details of required/optional fields for your provider.
+    config:
+      region: {{ .Values.objectStorage.s3.region }}
+      s3ForcePathStyle: "true"
+      s3Url: {{ .Values.objectStorage.s3.regionEndpoint }}
+    {{- else if eq .Values.objectStorage.type "gcs" }}
+    # Cloud provider where backups should be stored. Usually should
+    # match `configuration.provider`. Required.
+    name: default
+    # Bucket to store backups in. Required.
+    bucket: {{ .Values.objectStorage.buckets.velero }}
+    # Prefix within bucket under which to store backups. Optional.
+    prefix: service-cluster
+    # Additional provider-specific configuration. See link above
+    # for details of required/optional fields for your provider.
+    {{- end }}
+
+  # Parameters for the `default` VolumeSnapshotLocation. See
+  # https://velero.io/docs/v1.0.0/api-types/volumesnapshotlocation/
+  volumeSnapshotLocation:
+    config:
+      {{- if eq .Values.objectStorage.type "s3" }}
+      region: {{ .Values.objectStorage.s3.region }}
+      {{- else if eq .Values.objectStorage.type "gcs" }}
+      project: {{ .Values.objectStorage.gcs.project }}
+      {{- end }}
+
+credentials:
+  # Create secret with credentials
+  secretContents:
+    cloud: |
+    {{- if eq .Values.objectStorage.type "s3" }}
+      [default]
+      aws_access_key_id: {{ .Values.objectStorage.s3.accessKey }}
+      aws_secret_access_key: {{ .Values.objectStorage.s3.secretKey }}
+    {{- else if eq .Values.objectStorage.type "gcs" }}
+      {{ .Values.objectStorage.gcs.keyfileData | nindent 6 }}
+    {{- end }}
+
+deployRestic: true
+
+restic:
+  resources:   {{- toYaml .Values.velero.restic.resources | nindent 4  }}
+  tolerations: {{- toYaml .Values.velero.restic.tolerations | nindent 4  }}
+
+schedules:
+  daily-backup:
+    schedule: {{ .Values.velero.schedule }}
+    template:
+      storageLocation: default
+      labelSelector:
+        matchLabels:
+          velero: backup
+      ttl: 720h0m0s
+
+metrics:
+  enabled: true
+  scrapeInterval: 30s
+
+  serviceMonitor:
+    enabled: true

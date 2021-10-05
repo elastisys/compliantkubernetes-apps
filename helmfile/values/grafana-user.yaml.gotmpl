@@ -96,9 +96,6 @@ labels:
 podLabels:
   velero: backup
 
-podAnnotations:
-  backup.velero.io/backup-volumes: storage
-
 resources: {{- toYaml .Values.user.grafana.resources | nindent 2 }}
 nodeSelector: {{- toYaml .Values.user.grafana.nodeSelector | nindent 2 }}
 affinity: {{- toYaml .Values.user.grafana.affinity | nindent 2  }}

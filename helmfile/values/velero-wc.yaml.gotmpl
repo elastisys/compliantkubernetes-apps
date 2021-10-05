@@ -30,6 +30,8 @@ configuration:
   provider: gcp
   {{- end }}
 
+  defaultVolumesToRestic: true
+
   # https://velero.io/docs/v1.0.0/api-types/backupstoragelocation/
   backupStorageLocation:
     {{- if eq .Values.objectStorage.type "s3" }}
@@ -39,7 +41,7 @@ configuration:
     # Bucket to store backups in. Required.
     bucket: {{ .Values.objectStorage.buckets.velero }}
     # Prefix within bucket under which to store backups. Optional.
-    #prefix: will be set outside of values file.
+    prefix: workload-cluster
     # Additional provider-specific configuration. See link above
     # for details of required/optional fields for your provider.
     config:
@@ -53,7 +55,7 @@ configuration:
     # Bucket to store backups in. Required.
     bucket: {{ .Values.objectStorage.buckets.velero }}
     # Prefix within bucket under which to store backups. Optional.
-    #prefix: will be set outside of values file.
+    prefix: workload-cluster
     # Additional provider-specific configuration. See link above
     # for details of required/optional fields for your provider.
     {{- end }}
@@ -88,17 +90,16 @@ restic:
 
 schedules:
   daily-backup:
-    schedule: "0 0 * * *" #once per day
+    schedule: {{ .Values.velero.schedule }}
     template:
-      {{- if eq .Values.objectStorage.type "s3" }}
       storageLocation: default
-      {{- else if eq .Values.objectStorage.type "gcs" }}
-      storageLocation: default
-      {{- end }}
-      labelSelector:
-        matchLabels:
-          velero: backup
+      includedNamespaces:
+      {{ .Values.user.namespaces | toYaml | nindent 8 }}
       ttl: 720h0m0s
+      labelSelector:
+        matchExpressions:
+        - key: compliantkubernetes.io/nobackup
+          operator: DoesNotExist
 
 metrics:
   enabled: true
