@@ -52,14 +52,11 @@ releases:
   installed: {{ .Values.velero.enabled }}
   missingFileHandler: Error
   values:
-  - values/velero.yaml.gotmpl
-  - configuration:
-      backupStorageLocation:
 {{ if eq .Environment.Name "service_cluster" }}
-        prefix: service-cluster
+  - values/velero-sc.yaml.gotmpl
 {{ end }}
 {{ if eq .Environment.Name "workload_cluster" }}
-        prefix: workload-cluster
+  - values/velero-wc.yaml.gotmpl
 {{ end }}
 
 - name: node-local-dns
