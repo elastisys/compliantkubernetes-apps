@@ -88,6 +88,14 @@ https://semver.org/
 
     Create a PR and merge the fixes into main.
 
+9. Update public release notes.
+
+    When a released is published the public [user-facing release notes](https://github.com/elastisys/compliantkubernetes/blob/main/docs/release-notes.md) needs to be updated. The new release needs to be added and the list can be trimmed down to only include the supported versions.
+
+    Add bullet points of major changes within the cluster that affects the user as defined [here](https://compliantkubernetes.io/user-guide/). This includes any change within the cluster that may impact the user experience, for example new or updated feature, or the deprecation of features.
+
+    Finish it of with one bullet point regarding the overall changes of the release in regards to updates, fixes, or other improvements.
+
 ## Patch releases
 
 1. Create a new branch based on a release branch and commit the patch commits to it.
