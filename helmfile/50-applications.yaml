@@ -541,4 +541,18 @@ releases:
   missingFileHandler: Error
   values:
   - values/kubeapi-metrics.yaml.gotmpl
+
+# Workload cluster NetworkPolicy
+- name: workload-cluster-np
+  namespace: kube-system
+  labels:
+    app: workload-cluster-np
+  chart: ./charts/networkpolicy
+  version: 0.1.0
+  missingFileHandler: Error
+  needs:
+  - kube-system/user-rbac
+  values:
+  - values/workload-cluster-networkpolicy.yaml.gotmpl
+
 {{ end }}
