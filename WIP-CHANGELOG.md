@@ -10,6 +10,7 @@
 # Updated
 
 - Updated influxdb chart 4.8.12 to 4.8.15
+- Updated starboard-operator chart from v0.5.1 (app v0.10.1) to v0.7.0 (app v0.12.0), this introduces a PSP RBAC as a subchart since the Trivy scanners were unable to run.
 
 ### Changed
 
