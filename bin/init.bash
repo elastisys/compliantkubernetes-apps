@@ -313,14 +313,14 @@ update_config() {
 
     merge_config "${default_config}" "${override_config}" "${merged_config}"
 
-    keys=$(yq compare "${default_config}" "${merged_config}" --prettyPrint --printMode pv --stripComments -- '**' | \
-           sed -rn 's/\+([^:]+):.*/\1/p' | sed -r 's/\[.+\].*/\[\]/' | uniq || true)
+    keys=$(yq compare "${default_config}" "${merged_config}" --tojson --printMode pv --stripComments -- '**' | \
+           sed -rn 's/\+\{"(.+)":.*\}/\1/p' | sed -r 's/\[.+\].*/\[\]/' | uniq || true)
 
     for key in ${keys}; do
         case "${key}" in
             *.[])
                 key=$(echo "${key}" | sed -r 's/\[\]/\*\*/')
-                entries=$(yq read "${merged_config}" --prettyPrint --printMode p --stripComments -- "${key}")
+                entries=$(yq read "${merged_config}" --printMode p -- "${key}")
                 for entry in ${entries}; do
 	                  value=$(yq read "${merged_config}" --prettyPrint --printMode v --stripComments -- "${entry}")
 	                  yq write "${new_config}" --inplace --prettyPrint -- "${entry}" "${value}"
@@ -334,10 +334,10 @@ update_config() {
         esac
     done
 
-    defaults=$(yq compare "${new_config}" "${default_config}" --prettyPrint --printMode pv --stripComments -- '**' | \
-               sed -rn 's/\+([^:]+): set-me$/\1/p' || true)
+    defaults=$(yq compare "${new_config}" "${default_config}" --tojson --printMode pv -- '**' | \
+               sed -rn 's/\+\{"(.+)":"set-me"\}/\1/p' || true)
     for default in ${defaults}; do
-        key=$(yq read "${new_config}" --prettyPrint --printMode p --stripComments -- "${default}")
+        key=$(yq read "${new_config}" --tojson --printMode p -- "${default}")
         if [[ -z "${key}" ]]; then
             yq write "${new_config}" --inplace --prettyPrint -- "${default}" "set-me"
         fi
