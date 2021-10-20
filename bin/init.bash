@@ -314,11 +314,24 @@ update_config() {
     merge_config "${default_config}" "${override_config}" "${merged_config}"
 
     keys=$(yq compare "${default_config}" "${merged_config}" --prettyPrint --printMode pv --stripComments -- '**' | \
-           sed -rn 's/\+([^:]+):.*/\1/p' || true)
+           sed -rn 's/\+([^:]+):.*/\1/p' | sed -r 's/\[.+\].*/\[\]/' | uniq || true)
+
     for key in ${keys}; do
-	      value=$(yq read "${merged_config}" --prettyPrint --printMode v --stripComments -- "${key}")
-        # TODO: Check and remove keys with empty values?
-	      yq write "${new_config}" --inplace --prettyPrint -- "${key}" "${value}"
+        case "${key}" in
+            *.[])
+                key=$(echo "${key}" | sed -r 's/\[\]/\*\*/')
+                entries=$(yq read "${merged_config}" --prettyPrint --printMode p --stripComments -- "${key}")
+                for entry in ${entries}; do
+	                  value=$(yq read "${merged_config}" --prettyPrint --printMode v --stripComments -- "${entry}")
+	                  yq write "${new_config}" --inplace --prettyPrint -- "${entry}" "${value}"
+                done
+                ;;
+            *)
+	              value=$(yq read "${merged_config}" --prettyPrint --printMode v --stripComments -- "${key}")
+                # TODO: Check and remove keys with empty values?
+	              yq write "${new_config}" --inplace --prettyPrint -- "${key}" "${value}"
+                ;;
+        esac
     done
 
     defaults=$(yq compare "${new_config}" "${default_config}" --prettyPrint --printMode pv --stripComments -- '**' | \
