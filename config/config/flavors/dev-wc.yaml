@@ -10,11 +10,10 @@ velero:
 
 user:
   namespaces:
+    - set-me
     - demo1
     - demo2
     - demo3
-  adminUsers:
-    - admin@example.com
 
 prometheus:
   storage:
