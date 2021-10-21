@@ -15,18 +15,17 @@ global:
 
 storageClasses:
   # Name of the default storageclass.
-  # Normally one of 'nfs-client', 'cinder-storage', 'local-storage', 'ebs-gp2'.
+  # Normally one of 'nfs-client', 'cinder-csi', 'local-storage', 'ebs-gp2', 'rook-ceph-block'
   default: set-me
 
-  # These are set to null before the first init to be able to set defaults only once
   nfs:
-    enabled: null # true | false
+    enabled: set-me
   cinder:
-    enabled: null # true | false
+    enabled: set-me
   local:
-    enabled: null # true | false
+    enabled: set-me
   ebs:
-    enabled: null # true | false
+    enabled: set-me
 
 objectStorage:
   # Options are "s3", "gcs", or "none"
@@ -34,14 +33,14 @@ objectStorage:
   #   all backups (velero, harbor, influxdb, elasticsearch), sc logs (fluentd)
   #   Also set harbor persistence to "filesystem" or "swift"
   # Otherwise configure the features to match this type.
-  type: s3
+  type: set-me
   # gcs:
   #   project: set-me
   # s3:
   #   region: set-me
   #   regionEndpoint: set-me
   #   # Generally false when using AWS and Exoscale and true for other providers.
-  #   forcePathStyle: true
+  #   forcePathStyle: set-me
   buckets:
     harbor: ${CK8S_ENVIRONMENT_NAME}-harbor
     velero: ${CK8S_ENVIRONMENT_NAME}-velero
@@ -70,6 +69,7 @@ user:
     oidc:
       scopes: profile email openid
       allowedDomains:
+        - set-me
         - example.com
     sidecar:
       resources:
@@ -491,11 +491,23 @@ elasticsearch:
   #       - "kubernetes-*"
   #       allowed_actions:
   #       - "read"
-  extraRoleMappings: []
+  extraRoleMappings:
   # - mapping_name: readall_and_monitor
   #   definition:
   #    users:
   #      - "Developer Name"
+    - mapping_name: kibana_user
+      definition:
+        users:
+          - set-me
+    - mapping_name: kubernetes_log_reader
+      definition:
+        users:
+          - set-me
+    - mapping_name: all_access
+      definition:
+        users:
+          - set-me
   #  - mapping_name: kibana_user
   #    definition:
   #      backend_roles:
@@ -803,7 +815,9 @@ calicoFelixMetrics:
   enabled: true
 
 clusterAdmin:
-  users: []
+  users:
+    - set-me
+    - admin@example.com
   groups: []
 s3Exporter:
   # Also requries objectStorage.type=s3

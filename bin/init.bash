@@ -120,59 +120,70 @@ set_storage_class() {
     fi
     case ${CK8S_CLOUD_PROVIDER} in
         safespring | citycloud)
-          storage_class=cinder-csi
-
-          [ "$(yq read "$file" 'storageClasses.nfs.enabled')" = "null" ] &&
-            yq write --inplace "$file" 'storageClasses.nfs.enabled' false
-          [ "$(yq read "$file" 'storageClasses.local.enabled')" = "null" ] &&
-            yq write --inplace "$file" 'storageClasses.local.enabled' false
-          [ "$(yq read "$file" 'storageClasses.ebs.enabled')" = "null" ] &&
-            yq write --inplace "$file" 'storageClasses.ebs.enabled' false
-          [ "$(yq read "$file" 'storageClasses.cinder.enabled')" = "null" ] &&
-            yq write --inplace "$file" 'storageClasses.cinder.enabled' false
-          ;;
+            storage_class=cinder-csi
+            replace_set_me "${file}" "storageClasses.nfs.enabled" false
+            replace_set_me "${file}" "storageClasses.cinder.enabled" false
+            replace_set_me "${file}" "storageClasses.local.enabled" false
+            replace_set_me "${file}" "storageClasses.ebs.enabled" false
+            ;;
 
         exoscale)
-          storage_class=rook-ceph-block
-
-          [ "$(yq read "$file" 'storageClasses.nfs.enabled')" = "null" ] &&
-            yq write --inplace "$file" 'storageClasses.nfs.enabled' false
-          [ "$(yq read "$file" 'storageClasses.local.enabled')" = "null" ] &&
-            yq write --inplace "$file" 'storageClasses.local.enabled' false
-          [ "$(yq read "$file" 'storageClasses.ebs.enabled')" = "null" ] &&
-            yq write --inplace "$file" 'storageClasses.ebs.enabled' false
-          [ "$(yq read "$file" 'storageClasses.cinder.enabled')" = "null" ] &&
-            yq write --inplace "$file" 'storageClasses.cinder.enabled' false
-          ;;
+            storage_class=rook-ceph-block
+            replace_set_me "${file}" "storageClasses.nfs.enabled" false
+            replace_set_me "${file}" "storageClasses.cinder.enabled" false
+            replace_set_me "${file}" "storageClasses.local.enabled" false
+            replace_set_me "${file}" "storageClasses.ebs.enabled" false
+            ;;
 
         aws)
-          storage_class=ebs-gp2
-
-          [ "$(yq read "$file" 'storageClasses.nfs.enabled')" = "null" ] &&
-            yq write --inplace "$file" 'storageClasses.nfs.enabled' false
-          [ "$(yq read "$file" 'storageClasses.local.enabled')" = "null" ] &&
-            yq write --inplace "$file" 'storageClasses.local.enabled' false
-          [ "$(yq read "$file" 'storageClasses.ebs.enabled')" = "null" ] &&
-            yq write --inplace "$file" 'storageClasses.ebs.enabled' true
-          [ "$(yq read "$file" 'storageClasses.cinder.enabled')" = "null" ] &&
-            yq write --inplace "$file" 'storageClasses.cinder.enabled' false
-          ;;
+            storage_class=ebs-gp2
+            replace_set_me "${file}" "storageClasses.nfs.enabled" false
+            replace_set_me "${file}" "storageClasses.cinder.enabled" false
+            replace_set_me "${file}" "storageClasses.local.enabled" false
+            replace_set_me "${file}" "storageClasses.ebs.enabled" true
+            ;;
 
         baremetal)
-          storage_class=node-local
-
-          [ "$(yq read "$file" 'storageClasses.nfs.enabled')" = "null" ] &&
-            yq write --inplace "$file" 'storageClasses.nfs.enabled' false
-          [ "$(yq read "$file" 'storageClasses.local.enabled')" = "null" ] &&
-            yq write --inplace "$file" 'storageClasses.local.enabled' true
-          [ "$(yq read "$file" 'storageClasses.ebs.enabled')" = "null" ] &&
-            yq write --inplace "$file" 'storageClasses.ebs.enabled' false
-          [ "$(yq read "$file" 'storageClasses.cinder.enabled')" = "null" ] &&
-           yq write --inplace "$file" 'storageClasses.cinder.enabled' false
-          ;;
+            storage_class=node-local
+            replace_set_me "${file}" "storageClasses.nfs.enabled" false
+            replace_set_me "${file}" "storageClasses.cinder.enabled" false
+            replace_set_me "${file}" "storageClasses.local.enabled" true
+            replace_set_me "${file}" "storageClasses.ebs.enabled" false
+            ;;
     esac
 
-    replace_set_me "$1" 'storageClasses.default' "$storage_class"
+    replace_set_me "${file}" "storageClasses.default" "${storage_class}"
+}
+
+# Usage: set_object_storage <config-file>
+# baremetal support is experimental, keep as separate case until stable
+set_object_storage() {
+    file=$1
+    if [[ ! -f "${file}" ]]; then
+        log_error "ERROR: invalid file - $file"
+        exit 1
+    fi
+    case ${CK8S_CLOUD_PROVIDER} in
+        aws | exoscale)
+            object_storage_type="s3"
+            yq write --inplace "${file}" "objectStorage.s3.region" "set-me"
+            yq write --inplace "${file}" "objectStorage.s3.regionEndpoint" "set-me"
+            yq write --inplace "${file}" "objectStorage.s3.forcePathStyle" false
+            ;;
+
+        citycloud | safespring)
+            object_storage_type="s3"
+            yq write --inplace "${file}" "objectStorage.s3.region" "set-me"
+            yq write --inplace "${file}" "objectStorage.s3.regionEndpoint" "set-me"
+            yq write --inplace "${file}" "objectStorage.s3.forcePathStyle" true
+            ;;
+
+        baremetal)
+            object_storage_type="none"
+            ;;
+    esac
+
+    replace_set_me "${file}" "objectStorage.type" "${object_storage_type}"
 }
 
 # Usage: set_nginx_config <config-file>
@@ -211,6 +222,11 @@ set_nginx_config() {
     replace_set_me "$1" 'ingressNginx.controller.config.useProxyProtocol' "$use_proxy_protocol"
     replace_set_me "$1" 'ingressNginx.controller.useHostPort' "$use_host_port"
     replace_set_me "$1" 'ingressNginx.controller.service.enabled' "$service_enabled"
+
+    if [ "${service_enabled}" = "false" ]; then
+        replace_set_me "${file}" "ingressNginx.controller.service.type" "set-me-if-ingressNginx.controller.service.enabled"
+        replace_set_me "${file}" "ingressNginx.controller.service.annotations" "set-me-if-ingressNginx.controller.service.enabled"
+    fi
 }
 
 ##
@@ -248,52 +264,43 @@ set_elasticsearch_config() {
 set_harbor_config() {
     file=$1
     if [[ ! -f "${file}" ]]; then
-        log_error "ERROR: invalid file - $file"
+        log_error "ERROR: invalid file - ${file}"
         exit 1
     fi
     case ${CK8S_CLOUD_PROVIDER} in
         aws | exoscale)
-          persistence_type=objectStorage
-          disable_redirect=false
-          ;;
+            persistence_type=objectStorage
+            disable_redirect=false
+            ;;
 
         safespring)
-          persistence_type=objectStorage
-          disable_redirect=true
-          ;;
+            persistence_type=objectStorage
+            disable_redirect=true
+            ;;
 
         citycloud)
-          persistence_type=swift
-          disable_redirect=true
+            persistence_type=swift
+            disable_redirect=true
 
-          [ -z "$(yq read "$file" 'harbor.persistence.swift.identityApiVersion')" ] &&
-            yq write --inplace "$file" 'harbor.persistence.swift.identityApiVersion' 3
-          [ -z "$(yq read "$file" 'harbor.persistence.swift.authURL')" ] &&
-            yq write --inplace "$file" 'harbor.persistence.swift.authURL' "set-me"
-          [ -z "$(yq read "$file" 'harbor.persistence.swift.regionName')" ] &&
-            yq write --inplace "$file" 'harbor.persistence.swift.regionName' "set-me"
-          [ -z "$(yq read "$file" 'harbor.persistence.swift.projectDomainName')" ] &&
-            yq write --inplace "$file" 'harbor.persistence.swift.projectDomainName' "set-me"
-          [ -z "$(yq read "$file" 'harbor.persistence.swift.userDomainName')" ] &&
-            yq write --inplace "$file" 'harbor.persistence.swift.userDomainName' "set-me"
-          [ -z "$(yq read "$file" 'harbor.persistence.swift.projectName')" ] &&
-            yq write --inplace "$file" 'harbor.persistence.swift.projectName' "set-me"
-          [ -z "$(yq read "$file" 'harbor.persistence.swift.projectID')" ] &&
-            yq write --inplace "$file" 'harbor.persistence.swift.projectID' "set-me"
-          [ -z "$(yq read "$file" 'harbor.persistence.swift.tenantName')" ] &&
-            yq write --inplace "$file" 'harbor.persistence.swift.tenantName' "set-me"
-          [ -z "$(yq read "$file" 'harbor.persistence.swift.authVersion')" ] &&
-            yq write --inplace "$file" 'harbor.persistence.swift.authVersion' 3
-          ;;
+            yq write --inplace "${file}" "harbor.persistence.swift.identityApiVersion" 3
+            yq write --inplace "${file}" "harbor.persistence.swift.authURL" "set-me"
+            yq write --inplace "${file}" "harbor.persistence.swift.regionName" "set-me"
+            yq write --inplace "${file}" "harbor.persistence.swift.projectDomainName" "set-me"
+            yq write --inplace "${file}" "harbor.persistence.swift.userDomainName" "set-me"
+            yq write --inplace "${file}" "harbor.persistence.swift.projectName" "set-me"
+            yq write --inplace "${file}" "harbor.persistence.swift.projectID" "set-me"
+            yq write --inplace "${file}" "harbor.persistence.swift.tenantName" "set-me"
+            yq write --inplace "${file}" "harbor.persistence.swift.authVersion" 3
+            ;;
 
         baremetal)
-          persistence_type=objectStorage
-          disable_redirect=false
-          ;;
+            persistence_type=objectStorage
+            disable_redirect=false
+            ;;
     esac
 
-    replace_set_me "$1" 'harbor.persistence.type' "$persistence_type"
-    replace_set_me "$1" 'harbor.persistence.disableRedirect' "$disable_redirect"
+    replace_set_me "${file}" "harbor.persistence.type" "${persistence_type}"
+    replace_set_me "${file}" "harbor.persistence.disableRedirect" "${disable_redirect}"
 }
 
 # Usage: update_config <default_config_file> <merged_config_file|override_config_file>
@@ -314,32 +321,21 @@ update_config() {
     merge_config "${default_config}" "${override_config}" "${merged_config}"
 
     keys=$(yq compare "${default_config}" "${merged_config}" --tojson --printMode pv --stripComments -- '**' | \
-           sed -rn 's/\+\{"(.+)":.*\}/\1/p' | sed -r 's/\[.+\].*/\[\]/' | uniq || true)
-
+           sed -rn 's/\+\{"(.+)":.*\}/\1/p' | sed -r 's/\[.+\].*//' | uniq || true)
     for key in ${keys}; do
-        case "${key}" in
-            *.[])
-                key=$(echo "${key}" | sed -r 's/\[\]/\*\*/')
-                entries=$(yq read "${merged_config}" --printMode p -- "${key}")
-                for entry in ${entries}; do
-	                  value=$(yq read "${merged_config}" --prettyPrint --printMode v --stripComments -- "${entry}")
-	                  yq write "${new_config}" --inplace --prettyPrint -- "${entry}" "${value}"
-                done
-                ;;
-            *)
-	              value=$(yq read "${merged_config}" --prettyPrint --printMode v --stripComments -- "${key}")
-                # TODO: Check and remove keys with empty values?
-	              yq write "${new_config}" --inplace --prettyPrint -- "${key}" "${value}"
-                ;;
-        esac
+        yq read "${merged_config}" "${key}" --tojson | \
+        yq prefix - "${key}" --tojson | \
+        yq merge "${new_config}" - --inplace --overwrite --arrays overwrite --prettyPrint
     done
 
-    defaults=$(yq compare "${new_config}" "${default_config}" --tojson --printMode pv -- '**' | \
-               sed -rn 's/\+\{"(.+)":"set-me"\}/\1/p' || true)
+    defaults=$(yq read "${default_config}" "**(.==set-me)" --tojson --printMode p | \
+               sed -r 's/\.\[.*\].*//' | uniq)
     for default in ${defaults}; do
-        key=$(yq read "${new_config}" --tojson --printMode p -- "${default}")
+        key=$(yq read "${new_config}" "${default}" --tojson --printMode p)
         if [[ -z "${key}" ]]; then
-            yq write "${new_config}" --inplace --prettyPrint -- "${default}" "set-me"
+            yq read "${default_config}" "${default}" --tojson | \
+            yq prefix - "${default}" --tojson | \
+            yq merge "${new_config}" - --inplace --overwrite --arrays overwrite --prettyPrint
         fi
     done
 
@@ -478,6 +474,7 @@ fi
 
 generate_base_sc_config  "${config[default_config_file_sc]}"
 set_storage_class        "${config[default_config_file_sc]}"
+set_object_storage       "${config[default_config_file_sc]}"
 set_nginx_config         "${config[default_config_file_sc]}"
 set_elasticsearch_config "${config[default_config_file_sc]}"
 set_harbor_config        "${config[default_config_file_sc]}"
@@ -493,6 +490,7 @@ fi
 
 generate_base_wc_config  "${config[default_config_file_wc]}"
 set_storage_class        "${config[default_config_file_wc]}"
+set_object_storage       "${config[default_config_file_wc]}"
 set_nginx_config         "${config[default_config_file_wc]}"
 
 update_config "${config[default_config_file_wc]}" "${config[override_config_file_wc]}"

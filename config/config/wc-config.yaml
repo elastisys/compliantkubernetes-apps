@@ -51,31 +51,26 @@ global:
 
 ## Configuration of storageclasses.
 storageClasses:
-  ## Name of the 'default' storageclass in kubernetes.
-  ## Normally one of 'nfs-client', 'cinder-storage', 'local-storage', or 'ebs-gp2'.
+  # Name of the default storageclass.
+  # Normally one of 'nfs-client', 'cinder-csi', 'local-storage', 'ebs-gp2', "rook-ceph-block".
   default: set-me
 
-  ## These enabled flags are 'null' but after first init
-  ## they will be set to eihter 'true' or 'false'.
-  ## On consecutive inits they will not be touched (unless they set to 'null').
-
   ## Enable deployment of nfsClientProvisioner
-  ## Note, 'nfs-client' is installed as a deafult storagecalss only if 'storageClasses.default: nfs-client'.
+  ## Note, 'nfs-client' is installed as a deafult storageclass only if 'storageClasses.default: nfs-client'.
   nfs:
-    enabled: null # true | false
+    enabled: set-me
 
-  ## Enableds installation of 'cinder-storage'  as a defaultstorageclass.
+  ## Enableds installation of 'cinder-storage' storageclass.
   cinder:
-    enabled: null # true | false
+    enabled: set-me
 
-  ## Enables deployment of local-volume-provisioner and installation
-  ## of 'local-storage' storageclass.
+  ## Enables deployment of local-volume-provisioner and installation of 'local-storage' storageclass.
   local:
-    enabled: null # true | false
+    enabled: set-me
 
-  ## Enables installation of 'ebs-gp2' as a default storageclass.
+  ## Enables installation of 'ebs-gp2' storageclass.
   ebs:
-    enabled: null # true | false
+    enabled: set-me
 
 ## Nfs-client-provisioner configuration.
 ## Deployment is controlled via 'storageClasses.nfs.enabled'.
@@ -98,13 +93,14 @@ nfsProvisioner:
 objectStorage:
   ## Options are 's3', 'gcs', or 'none'
   ## If 'none', remember to disable backups (velero)
-  type: s3
+  type: set-me
   # gcs:
   #   project: set-me
   # s3:
   #   region: set-me
   #   regionEndpoint: set-me
-  #   forcePathStyle: true
+  #   # Generally false when using AWS and Exoscale and true for other providers.
+  #   forcePathStyle: set-me
 
   ## Buckets where each respctive application will store its backups.
   buckets:
@@ -117,14 +113,17 @@ user:
 
   ## List of user namespaces to create.
   namespaces:
+    - set-me
     - demo
 
   ## List of users to create RBAC rules for.
   adminUsers:
+    - set-me
     - admin@example.com
 
   ## List of groups to create RBAC rules for.
-  adminGroups: []
+  adminGroups:
+    - set-me
 
   ## User controlled alertmanager configuration.
   alertmanager:
@@ -274,7 +273,8 @@ opa:
     enabled: true
     enforcement: dryrun
     URL:
-      - harbor.set-me
+      - set-me
+      - harbor.example.com
         ## Uncomment this if you want to add an OPA exception for cert-manager-acmesolver.
         ## This should be added only as an exception, e.g: if you cannot rely on a harbor instance managed by users.
         ## Otherwise set the correct repository for this image in the certmanager section.
@@ -506,7 +506,9 @@ calicoFelixMetrics:
   enabled: true
 
 clusterAdmin:
-  users: []
+  users:
+    - set-me
+    - admin@example.com
   groups: []
 
 starboard:

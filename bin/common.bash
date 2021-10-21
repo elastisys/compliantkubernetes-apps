@@ -189,12 +189,12 @@ validate_config() {
             exit 1
         fi
         merged_config="${1}"
-        options=$(yq r -p p "${2}" '**')
+        options=$(yq read "${2}" '**(.==set-me)'  --tojson --printMode p | sed -r 's/\.\[.*\].*//')
         # Loop all lines in $2 and warns if same option is not
         # available in $1
         maybe_exit="false"
         for opt in ${options}; do
-            value=$(yq r --unwrapScalar=false "${merged_config}" "${opt}")
+            value=$(yq read --unwrapScalar=false "${merged_config}" "${opt}" | head -n 1 | sed -r 's/- set-me/set-me/')
             if [[ -z "${value}" ]] || [[ "${value}" = '"set-me"' ]] || [[ "${value}" = "set-me" ]]; then
                 log_warning "WARN: ${opt} is not set in config"
                 maybe_exit="true"
@@ -220,7 +220,6 @@ validate_config() {
         log_error "ERROR: usage validate_config <sc|wc>"
         exit 1
     fi
-
 }
 
 validate_sops_config() {
