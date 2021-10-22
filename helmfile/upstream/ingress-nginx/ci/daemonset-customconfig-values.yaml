@@ -1,5 +1,6 @@
 controller:
   kind: DaemonSet
+  allowSnippetAnnotations: false
   admissionWebhooks:
     enabled: false
   service:

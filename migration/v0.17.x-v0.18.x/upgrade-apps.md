@@ -29,12 +29,31 @@
 
     This script removes the unused `backupstoragelocation` "aws/gcs". It has been switched to "defualt"
 
+1. When upgrading the chart and setting `useHostPort: false` we noticed that the daemonset doesn't get the hostPort removed from the metrics and webhook ports.
+   Run the following script to check and remove them manually on each cluster:
+
+   ```bash
+   bin/ck8s ops kubectl sc get ds -n ingress-nginx ingress-nginx-controller -o json  | jq -r '.spec.template.spec.containers[].ports[].hostPort | select( . != null )' > ports.txt
+   while read i
+   do
+     echo "Removing the hostPort for: $i"
+     INDEX=$(bin/ck8s ops kubectl sc get ds -n ingress-nginx ingress-nginx-controller -o json | jq --arg i $i '.spec.template.spec.containers[].ports | map(.hostPort == '$i') | index(true)')
+     bin/ck8s ops kubectl sc patch ds -n ingress-nginx ingress-nginx-controller --type='json' -p="[{'op': 'remove', 'path': '/spec/template/spec/containers/0/ports/$INDEX/hostPort'}]"
+   done < ports.txt
+   ```
+
 1. Remove the `existingPsp: ingress-nginx-tmp` from the ingress-nginx.yaml.gotmpl and re-run the ingress-nginx chart:
 
    ```bash
-   bin/ck8s ops helmfile sc -f helmfile -l app=ingress-nginx -i apply
+   vim ./helmfile/values/ingress-nginx.yaml.gotmpl
 
-   bin/ck8s ops helmfile wc -f helmfile -l app=ingress-nginx -i apply
+   # remove existingPsp: ingress-nginx-tmp
+   ```
+
+   ```bash
+   bin/ck8s ops helmfile sc -f helmfile -l app=ingress-nginx -i sync
+
+   bin/ck8s ops helmfile wc -f helmfile -l app=ingress-nginx -i sync
    ```
 
 1. Remove the temporary psp:
