@@ -131,7 +131,8 @@ user:
     enabled: false
 
     ## Namespace in which to install alertmanager
-    namespace: monitoring
+    # Ensure that the namespace is included in the namespaces list above.
+    namespace: alertmanager
 
     ## Create basic-auth protected ingress to alertmanager
     ingress:
