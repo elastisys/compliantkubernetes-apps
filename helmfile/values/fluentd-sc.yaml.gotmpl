@@ -49,9 +49,9 @@ forwarder:
     pspEnabled: true
   extraEnv:
     - name: OUTPUT_BUFFER_CHUNK_LIMIT
-      value: "{{ .Values.fluentd.forwarder.chunkLimitSizeBytes }}"
-    - name: OUTPUT_BUFFER_QUEUE_LIMIT
-      value: "{{ .Values.fluentd.forwarder.queueLimitSizeBytes }}"
+      value: "{{ .Values.fluentd.forwarder.chunkLimitSize }}"
+    - name: OUTPUT_BUFFER_TOTAL_LIMIT_SIZE
+      value: "{{ .Values.fluentd.forwarder.totalLimitSize }}"
 
 metrics:
   enabled: true

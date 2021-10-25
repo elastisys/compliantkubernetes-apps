@@ -80,7 +80,7 @@ aggregator:
           timekey 10m
           timekey_wait 1m
           timekey_use_utc true
-          chunk_limit_size 50m
+          chunk_limit_size 50MB
         </buffer>
       </match>
     {{ if eq .Values.objectStorage.type "gcs" -}}
@@ -276,7 +276,7 @@ forwarder:
           retry_forever
           retry_max_interval 30
           chunk_limit_size "#{ENV['OUTPUT_BUFFER_CHUNK_LIMIT']}"
-          queue_limit_length "#{ENV['OUTPUT_BUFFER_QUEUE_LIMIT']}"
+          total_limit_size "#{ENV['OUTPUT_BUFFER_TOTAL_LIMIT_SIZE']}"
           overflow_action block
         </buffer>
       </match>
