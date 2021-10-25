@@ -155,6 +155,7 @@ forwarder:
         @type tail
         path /var/log/kube-audit/kube-apiserver.log,/var/log/kubernetes/audit/kube-apiserver-audit.log
         pos_file /var/log/audit/fluentd-kube-apiserver.pos
+        pos_file_compaction_interval 72h
         tag kubeaudit.*
         read_from_head true
         <parse>
@@ -181,6 +182,7 @@ forwarder:
         @type tail
         path /var/log/containers/*.log
         pos_file /var/log/containers.log.pos
+        pos_file_compaction_interval 72h
         tag raw.kubernetes.*
         read_from_head true
         <parse>

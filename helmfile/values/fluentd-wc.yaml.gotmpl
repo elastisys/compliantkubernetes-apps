@@ -95,6 +95,7 @@ extraConfigMaps:
       @type tail
       path /var/log/kube-audit/kube-apiserver.log,/var/log/kubernetes/audit/kube-apiserver-audit.log
       pos_file /var/log/kube-audit/fluentd-kube-apiserver.pos
+      pos_file_compaction_interval 72h
       tag kubeaudit.*
       read_from_head true
       <parse>
@@ -119,6 +120,7 @@ extraConfigMaps:
       @type tail
       path /var/log/auth.log
       pos_file /var/log/auth.pos
+      pos_file_compaction_interval 72h
       tag authlog.*
       <parse>
         @type regexp
@@ -135,6 +137,7 @@ extraConfigMaps:
       @type tail
       path /var/log/containers/*.log
       pos_file /var/log/containers.log.pos
+      pos_file_compaction_interval 72h
       tag raw.kubernetes.*
       read_from_head true
       <parse>

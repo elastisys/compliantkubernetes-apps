@@ -18,6 +18,7 @@
 ### Added
 
 - Added fluentd metrics
+- Enabled automatic compaction (cleanup) of pos_files for fluentd
 
 ### Removed
 
