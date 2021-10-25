@@ -442,6 +442,8 @@ backup_file() {
     # Strip directroy and add timestamp
     backup_name=$(echo "$1" | sed "s/.*\///" | sed "s/.yaml/-$(date +%y%m%d%H%M%S).yaml/")
 
+    log_info "Creating backup ${backup_config_path}/${backup_name}"
+
     cp "$1" "${backup_config_path}/${backup_name}"
 }
 
