@@ -448,7 +448,7 @@ releases:
     - values/falco-exporter.yaml.gotmpl
 
 - name: user-alertmanager
-  namespace: {{ .Values.user.alertmanager.namespace | default "monitoring" }}
+  namespace: {{ .Values.user.alertmanager.namespace | default "alertmanager" }}
   labels:
     app: user-alertmanager
   chart: ./charts/examples/user-alertmanager

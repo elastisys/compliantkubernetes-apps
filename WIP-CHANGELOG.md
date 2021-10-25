@@ -48,6 +48,7 @@
 - enable hostNetwork and set the dnsPolicy to ClusterFirstWithHostNet only if hostPort is enabled [#535](https://github.com/elastisys/compliantkubernetes-apps/pull/535)
   > **_Note:_** The upgrade will fail while disabling the hostNetwork when LoadBalancer type service is used, this is due removing some privileges from the PSP. See the migration steps for more details.
 - Prometheus alert and servicemonitor was separated
+- Default user alertmanager namespace changed from monitoring to alertmanager.
 
 ### Fixed
 
