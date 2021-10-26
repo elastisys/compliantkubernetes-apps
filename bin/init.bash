@@ -195,37 +195,45 @@ set_nginx_config() {
         exit 1
     fi
     case ${CK8S_CLOUD_PROVIDER} in
-        citycloud | exoscale | safespring)
-          use_proxy_protocol=false
-          use_host_port=true
-          service_enabled=false
-          ;;
+        exoscale | safespring)
+            use_proxy_protocol=false
+            use_host_port=true
+            service_enabled=false
+            ;;
+
+        citycloud)
+            use_proxy_protocol=false
+            use_host_port=false
+            service_enabled=true
+            service_type=LoadBalancer
+            service_annotations=''
+            ;;
 
         aws)
-          use_proxy_protocol=false
-          use_host_port=false
-          service_enabled=true
-          service_type=LoadBalancer
-          service_annotations='service.beta.kubernetes.io/aws-load-balancer-type: nlb'
-          replace_set_me "$1" 'ingressNginx.controller.service.type' "$service_type"
-          replace_set_me "$1" 'ingressNginx.controller.service.annotations' "$service_annotations"
-          ;;
+            use_proxy_protocol=false
+            use_host_port=false
+            service_enabled=true
+            service_type=LoadBalancer
+            service_annotations='service.beta.kubernetes.io/aws-load-balancer-type: nlb'
+            ;;
 
         baremetal)
-          use_proxy_protocol=false
-          use_host_port=true
-          service_enabled=false
-          ;;
-
+            use_proxy_protocol=false
+            use_host_port=true
+            service_enabled=false
+            ;;
     esac
 
-    replace_set_me "$1" 'ingressNginx.controller.config.useProxyProtocol' "$use_proxy_protocol"
-    replace_set_me "$1" 'ingressNginx.controller.useHostPort' "$use_host_port"
-    replace_set_me "$1" 'ingressNginx.controller.service.enabled' "$service_enabled"
+    replace_set_me "$1" 'ingressNginx.controller.config.useProxyProtocol' "${use_proxy_protocol}"
+    replace_set_me "$1" 'ingressNginx.controller.useHostPort' "${use_host_port}"
+    replace_set_me "$1" 'ingressNginx.controller.service.enabled' "${service_enabled}"
 
-    if [ "${service_enabled}" = "false" ]; then
-        replace_set_me "${file}" "ingressNginx.controller.service.type" "set-me-if-ingressNginx.controller.service.enabled"
-        replace_set_me "${file}" "ingressNginx.controller.service.annotations" "set-me-if-ingressNginx.controller.service.enabled"
+    if [ "${service_enabled}" = 'false' ]; then
+        replace_set_me "${file}" 'ingressNginx.controller.service.type' 'set-me-if-ingressNginx.controller.service.enabled'
+        replace_set_me "${file}" 'ingressNginx.controller.service.annotations' 'set-me-if-ingressNginx.controller.service.enabled'
+    else
+        replace_set_me "$1" 'ingressNginx.controller.service.type' "${service_type}"
+        replace_set_me "$1" 'ingressNginx.controller.service.annotations' "${service_annotations}"
     fi
 }
 
@@ -429,7 +437,7 @@ generate_secrets() {
     yq write --inplace "${tmpfile}" 'prometheus.remoteWrite.password' "${PROMETHEUS_WC_REMOTE_WRITE_PASS}"
 }
 
-# Usage: backup_file <file>
+# Usage: backup_file <file> [name]
 backup_file() {
     if [ ! -f "$1" ]; then
         log_error "ERROR: args in backup_file must be a file. [$1]"
@@ -439,8 +447,13 @@ backup_file() {
         mkdir -p "${backup_config_path}"
     fi
 
-    # Strip directroy and add timestamp
-    backup_name=$(echo "$1" | sed "s/.*\///" | sed "s/.yaml/-$(date +%y%m%d%H%M%S).yaml/")
+    if [ ${#} -gt 1 ]; then
+        # Add timestamp
+        backup_name="$2-$(date +%y%m%d%H%M%S).yaml"
+    else
+        # Strip directroy and add timestamp
+        backup_name=$(echo "$1" | sed "s/.*\///" | sed "s/.yaml/-$(date +%y%m%d%H%M%S).yaml/")
+    fi
 
     log_info "Creating backup ${backup_config_path}/${backup_name}"
 
@@ -467,6 +480,9 @@ mkdir -p "${CK8S_CONFIG_PATH}/user"
 CK8S_VERSION=$(version_get)
 export CK8S_VERSION
 
+if [ -f "${config[default_config_file_sc]}" ]; then
+    backup_file "${config[default_config_file_sc]}" default-sc-config
+fi
 if [ -f "${config[override_config_file_sc]}" ]; then
     backup_file "${config[override_config_file_sc]}"
     log_info "Updating sc config"
@@ -483,6 +499,9 @@ set_harbor_config        "${config[default_config_file_sc]}"
 
 update_config "${config[default_config_file_sc]}" "${config[override_config_file_sc]}"
 
+if [ -f "${config[default_config_file_wc]}" ]; then
+    backup_file "${config[default_config_file_wc]}" default-wc-config
+fi
 if [ -f "${config[override_config_file_wc]}" ]; then
     backup_file "${config[override_config_file_wc]}"
     log_info "Updating wc config"
