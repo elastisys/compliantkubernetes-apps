@@ -7,13 +7,40 @@
 
 set -eu -o pipefail
 
-: "${CK8S_CLOUD_PROVIDER:?Missing CK8S_CLOUD_PROVIDER}"
-: "${CK8S_ENVIRONMENT_NAME:?Missing CK8S_ENVIRONMENT_NAME}"
-# Make sure flavor is set
-export CK8S_FLAVOR="${CK8S_FLAVOR:-dev}"
 here="$(dirname "$(readlink -f "$0")")"
 # shellcheck source=bin/common.bash
 source "${here}/common.bash"
+
+# Load cloud provider, environment name, and flavor from config if available.
+if [ -f "${config[default_config_file_sc]}" ]; then
+    cloud_provider=$(yq read "${config[default_config_file_sc]}" 'global.ck8sCloudProvider')
+    environment_name=$(yq read "${config[default_config_file_sc]}" 'global.ck8sEnvironmentName')
+    flavor=$(yq read "${config[default_config_file_sc]}" 'global.ck8sFlavor')
+fi
+if [ ! -v cloud_provider ] || [ -z "${cloud_provider}" ]; then
+    : "${CK8S_CLOUD_PROVIDER:?Missing CK8S_CLOUD_PROVIDER}"
+elif [ -v CK8S_CLOUD_PROVIDER ] && [ "${CK8S_CLOUD_PROVIDER}" != "${cloud_provider}" ]; then
+    log_error "ERROR: Cloud provider mismatch, '${cloud_provider}' in config and '${CK8S_CLOUD_PROVIDER}' in env"
+    exit 1
+else
+    export CK8S_CLOUD_PROVIDER="${cloud_provider}"
+fi
+if [ ! -v environment_name ] ||  [ -z "${environment_name}" ]; then
+    : "${CK8S_ENVIRONMENT_NAME:?Missing CK8S_ENVIRONMENT_NAME}"
+elif [ -v CK8S_ENVIRONMENT_NAME ] && [ "${CK8S_ENVIRONMENT_NAME}" != "${environment_name}" ]; then
+    log_error "ERROR: Environment name mismatch, '${environment_name}' in config and '${CK8S_ENVIRONMENT_NAME}' in env"
+    exit 1
+else
+    export CK8S_ENVIRONMENT_NAME="${environment_name}"
+fi
+if [ ! -v flavor ] ||  [ -z "${flavor}" ]; then
+    CK8S_FLAVOR="${CK8S_FLAVOR:-dev}"
+elif [ -v CK8S_FLAVOR ] && [ "${CK8S_FLAVOR}" != "${flavor}" ]; then
+    log_error "ERROR: Environment name mismatch, '${flavor}' in config and '${CK8S_FLAVOR}' in env"
+    exit 1
+else
+    export CK8S_FLAVOR="${flavor}"
+fi
 
 # Validate the cloud provider
 if ! array_contains "${CK8S_CLOUD_PROVIDER}" "${ck8s_cloud_providers[@]}"; then
@@ -460,8 +487,7 @@ backup_file() {
     cp "$1" "${backup_config_path}/${backup_name}"
 }
 
-log_info "Initializing CK8S configuration with flavor: $CK8S_FLAVOR"
-
+log_info "Initializing CK8S configuration for $CK8S_ENVIRONMENT_NAME with $CK8S_CLOUD_PROVIDER:$CK8S_FLAVOR"
 
 if [ -f "${sops_config}" ]; then
     log_info "SOPS config already exists: ${sops_config}"
