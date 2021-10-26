@@ -350,7 +350,7 @@ update_secrets() {
         exit 1
     fi
     file=$1
-    generate_secrets=$2
+    generate_new_secrets=$2
 
     tmpfile=$(mktemp)
     append_trap "rm ${tmpfile}" EXIT
@@ -362,7 +362,7 @@ update_secrets() {
         yq merge "${tmpfile}" "${file}" --inplace --prettyPrint --overwrite --arrays overwrite
     fi
 
-    if [ "${generate_secrets}" = "true" ]; then
+    if [ "${generate_new_secrets}" = "true" ]; then
         generate_secrets "${tmpfile}"
     fi
 
@@ -497,20 +497,20 @@ set_nginx_config         "${config[default_config_file_wc]}"
 
 update_config "${config[default_config_file_wc]}" "${config[override_config_file_wc]}"
 
-gen_secrets=true
+gen_new_secrets=true
 if [ -f "${secrets[secrets_file]}" ]; then
     backup_file "${secrets[secrets_file]}"
-    if [ ${#} -gt 0 ] && [ "$1" = "--regenerate-secrets" ]; then
-        log_info "Updating and regenerating secrets"
+    if [ ${#} -gt 0 ] && [ "$1" = "--generate-new-secrets" ]; then
+        log_info "Updating and generating new secrets"
     else
         log_info "Updating secrets"
-        gen_secrets=false
+        gen_new_secrets=false
     fi
 else
-    log_info "Generating secrets"
+    log_info "Generating new secrets"
 fi
 
-update_secrets "${secrets[secrets_file]}" "${gen_secrets}"
+update_secrets "${secrets[secrets_file]}" "${gen_new_secrets}"
 
 log_info "Config initialized"
 

@@ -128,7 +128,7 @@ Assuming you already have everything needed to install the apps, this is what yo
    Note that the configuration is split between read-only default configs found in the `defaults/` directory, and the override configs `sc-config.yaml` and `wc-config.yaml` which are editable and will override any default value.
    When new configs are created this will generate new random passwords for all services.
    When configs are updated this will *not* overwrite existing values in the override configs. It will create a backup of the old override configs placed in `backups/`, generate new default configs in `defaults/`, and clear out redundant values set in the override configs that matches the default values.
-   See [compliantkubernetes.io](compliantkubernetes.io) if you are uncertain about in what order you should do things.
+   See [compliantkubernetes.io](https://compliantkubernetes.io/) if you are uncertain about what order you should do things in.
 
    ```bash
    ./bin/ck8s init
