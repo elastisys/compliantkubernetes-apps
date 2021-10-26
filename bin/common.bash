@@ -63,8 +63,6 @@ secrets["s3cfg_file"]="${state_path}/s3cfg.ini"
 secrets["kube_config_sc"]="${state_path}/kube_config_sc.yaml"
 secrets["kube_config_wc"]="${state_path}/kube_config_wc.yaml"
 
-secrets["user_kubeconfig"]="${CK8S_CONFIG_PATH}/user/kubeconfig.yaml"
-
 log_info() {
     echo -e "[\e[34mck8s\e[0m] ${*}" 1>&2
 }
