@@ -27,6 +27,18 @@ env:
   STUCK_THRESHOLD_SECONDS: 1200
   OUTPUT_PORT: 443
 
+serviceMonitor:
+  enabled: true
+
+prometheusRule:
+  enabled: true
+
+service:
+  ports:
+  - name: metrics
+    type: ClusterIP
+    port: 24231
+
 # Default args include "-q" which sets loglevel to warning.
 fluentdArgs: "--no-supervisor -q"
 configMaps:
@@ -34,6 +46,7 @@ configMaps:
     systemConf: false
     containersInputConf: false
     outputConf: false
+    monitoringConf: false
 
 extraConfigMaps:
   system.conf: |-
@@ -43,6 +56,35 @@ extraConfigMaps:
         format json
       </log>
     </system>
+
+  10-monitoring.conf: |-
+    # Prometheus Exporter Plugin
+    # input plugin that exports metrics
+    <source>
+      @id prometheus
+      @type prometheus
+    </source>
+
+    # input plugin that collects metrics from MonitorAgent
+    <source>
+      @id prometheus_monitor
+      @type prometheus_monitor
+      <labels>
+        host ${hostname}
+      </labels>
+    </source>
+
+    # input plugin that collects metrics for output plugin
+    <source>
+      @id prometheus_output_monitor
+      @type prometheus_output_monitor
+      <labels>
+        host ${hostname}
+      </labels>
+    </source>
+
+    # Don't include prometheus_tail_monitor since this will cause number of metrics to increase indefinitely
+    # https://github.com/fluent/fluent-plugin-prometheus/issues/20
 
   10-kube-audit.conf: |-
     <source>
