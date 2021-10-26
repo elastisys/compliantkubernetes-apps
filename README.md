@@ -125,7 +125,9 @@ Assuming you already have everything needed to install the apps, this is what yo
    ```
 
 1. Initialize your environment and configuration:
-   Note that this will *not* overwrite existing values, but it will append to existing files.
+   Note that the configuration is split between read-only default configs found in the `defaults/` directory, and the override configs `sc-config.yaml` and `wc-config.yaml` which are editable and will override any default value.
+   When new configs are created this will generate new random passwords for all services.
+   When configs are updated this will *not* overwrite existing values in the override configs. It will create a backup of the old override configs placed in `backups/`, generate new default configs in `defaults/`, and clear out redundant values set in the override configs that matches the default values.
    See [compliantkubernetes.io](compliantkubernetes.io) if you are uncertain about in what order you should do things.
 
    ```bash
@@ -133,10 +135,8 @@ Assuming you already have everything needed to install the apps, this is what yo
    ```
 
 1. Edit the configuration files that have been initialized in the configuration path.
-   Make sure that the `objectStorage` values are set in `sc-config.yaml`, `wc-config.yaml` and `secrets.yaml` according to your `objectStorage.type`.
+   Make sure that the `objectStorage` values are set in `sc-config.yaml`, `wc-config.yaml` and `secrets.yaml` according to your `objectStorage.type`, the type may already be set in the default configuration found in the `default/` directory.
    Set `objectStorage.s3.*` if you are using S3 or `objectStorage.gcs.*` if you are using GCS.
-
-   > TIP: If you want to generate random passwords for all services, you can run the script `scripts/generate-secrets.sh`
 
 1. Create S3 buckets - optional
    If you have set `objectStorage.type: s3`, then you need to create the buckets specified under `objectStorage.buckets` in your configuration files.
@@ -161,10 +161,11 @@ Assuming you already have everything needed to install the apps, this is what yo
    (
       access_key=$(sops exec-file ${CK8S_CONFIG_PATH}/secrets.yaml 'yq r {} "objectStorage.s3.accessKey"')
       secret_key=$(sops exec-file ${CK8S_CONFIG_PATH}/secrets.yaml 'yq r {} "objectStorage.s3.secretKey"')
-      region=$(yq r ${CK8S_CONFIG_PATH}/sc-config.yaml 'objectStorage.s3.region')
-      host=$(yq r ${CK8S_CONFIG_PATH}/sc-config.yaml 'objectStorage.s3.regionEndpoint')
+      sc_config=$(yq m ${CK8S_CONFIG_PATH}/defaults/sc-config.yaml ${CK8S_CONFIG_PATH}/sc-config.yaml -a overwrite -x)
+      region=$(echo ${sc_config} | yq r - 'objectStorage.s3.region')
+      host=$(echo ${sc_config} | yq r -  'objectStorage.s3.regionEndpoint')
 
-      for bucket in $(yq r ${CK8S_CONFIG_PATH}/sc-config.yaml 'objectStorage.buckets.*'); do
+      for bucket in $(echo ${sc_config} | yq r -  'objectStorage.buckets.*'); do
           s3cmd --access_key=${access_key} --secret_key=${secret_key} \
               --region=${region} --host=${host} \
               ls s3://${bucket} > /dev/null
