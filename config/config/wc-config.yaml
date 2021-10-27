@@ -114,7 +114,7 @@ opa:
   ## "enforcement" can assume either "dryrun" or "deny".
   imageRegistry:
     enabled: true
-    enforcement: dryrun
+    enforcement: deny
     URL:
       - set-me
       - harbor.example.com
@@ -127,12 +127,12 @@ opa:
   ## by at least one network policy.
   networkPolicies:
     enabled: true
-    enforcement: dryrun
+    enforcement: deny
 
   ## Enable rule that requires pods to have resource requests.
   resourceRequests:
     enabled: true
-    enforcement: dryrun
+    enforcement: deny
 
 ## Configuration for fluentd.
 ## Fluentd ships logs to OpenSearch using the endpoint 'opensearch.subdomain' set in common-config.yaml.
