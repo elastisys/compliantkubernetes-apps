@@ -60,6 +60,7 @@
 - Fixed harbor backup job run as non-root
 - fixed "Uptime and status", "ElasticSearch" and "Kubernetes cluster status" grafana dashboards
 - Fixed warning from velero that the default backup location "default" was missing.
+- Fixed dex tls handshake failed
 
 ### Added
 
