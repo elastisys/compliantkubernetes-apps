@@ -65,6 +65,7 @@
 - increased the influxDB pvc size [#739](https://github.com/elastisys/compliantkubernetes-apps/pull/739)
 - Exposed velero's backup timetolive for both sc and wc.
 - disabled internal database for InfluxDB
+- OPA policies are now enforced (deny) for the prod flavor.
 
 ### Fixed
 
