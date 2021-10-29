@@ -108,6 +108,7 @@
 - Added prometheus probes permission for users
 - Added the ability to set and choose subdomain of your service endpoints.
 - Added backup function for configurations and secrets during `ck8s init`.
+- Issuers is on by default for wc.
 
 ### Removed
 
