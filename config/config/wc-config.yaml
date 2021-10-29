@@ -426,13 +426,13 @@ issuers:
   ## Deploy let's encrypt ACME issuers
   ## "letsencrypt-prod" and "letsencrypt-staging".
   letsencrypt:
-    enabled: false
-    # prod:
-    #   ## Mail through which letsencrypt can contact you.
-    #   email: set-me
-    # staging:
-    #   ## Mail through which letsencrypt can contact you.
-    #   email: set-me
+    enabled: true
+    prod:
+      ## Mail through which letsencrypt can contact you.
+      email: set-me
+    staging:
+      ## Mail through which letsencrypt can contact you.
+      email: set-me
 
   ## Additional issuers to create.
   ## ref: https://cert-manager.io/docs/configuration/
