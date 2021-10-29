@@ -38,7 +38,7 @@ To setup the clusters see [compliantkubernetes-kubespray][compliantkubernetes-ku
 A service-cluster (sc) or workload-cluster (wc) can be created separately but all of the applications will not work correctly unless both are running.
 
 All config files will be located under `CK8S_CONFIG_PATH`.
-There will be three config files: `wc-config.yaml`, `sc-config.yaml` and `secrets.yaml`.
+There will be four config files: `common-config.yaml`, `wc-config.yaml`, `sc-config.yaml` and `secrets.yaml`.
 See [Quickstart](#Quickstart) for instructions on how to initialize the repo
 
 ### Cloud providers
@@ -110,6 +110,8 @@ In addition to this, you will need to set up the following DNS entries (replace 
 Assuming you already have everything needed to install the apps, this is what you need to do.
 
 1. Decide on a name for this environment, the cloud provider to use as well as the flavor and set them as environment variables:
+   Note that these will be later kept as global values in the common defaults config to prevent them from being inadvertently changed, as they will affect the default options of the configuration when generated or updated.
+   To change them remove the common defaults config, set the new environment variables, and then generate a new configuration.
 
    ```bash
    export CK8S_ENVIRONMENT_NAME=my-ck8s-cluster
@@ -125,9 +127,10 @@ Assuming you already have everything needed to install the apps, this is what yo
    ```
 
 1. Initialize your environment and configuration:
-   Note that the configuration is split between read-only default configs found in the `defaults/` directory, and the override configs `sc-config.yaml` and `wc-config.yaml` which are editable and will override any default value.
+   Note that the configuration is split between read-only default configs found in the `defaults/` directory, and the override configs `common-config.yaml`, `sc-config.yaml` and `wc-config.yaml` which are editable and will override any default value.
+   The `common-config.yaml` will be applied to both the service and workload cluster, although it will be overriden by the any value set in the `sc-config.yaml` or `wc-config.yaml` respectively.
    When new configs are created this will generate new random passwords for all services.
-   When configs are updated this will *not* overwrite existing values in the override configs. It will create a backup of the old override configs placed in `backups/`, generate new default configs in `defaults/`, and clear out redundant values set in the override configs that matches the default values.
+   When configs are updated this will *not* overwrite existing values in the override configs. It will create a backup of the old override configs placed in `backups/`, generate new default configs in `defaults/`, merge common values into `common-config.yaml`, and clear out redundant values set in the override configs that matches the default values.
    See [compliantkubernetes.io](https://compliantkubernetes.io/) if you are uncertain about what order you should do things in.
 
    ```bash
@@ -135,7 +138,8 @@ Assuming you already have everything needed to install the apps, this is what yo
    ```
 
 1. Edit the configuration files that have been initialized in the configuration path.
-   Make sure that the `objectStorage` values are set in `sc-config.yaml`, `wc-config.yaml` and `secrets.yaml` according to your `objectStorage.type`, the type may already be set in the default configuration found in the `default/` directory.
+   Make sure that the `objectStorage` values are set in `common-config.yaml` or `sc-config.yaml` and `wc-config.yaml`, as well as required credentials in `secrets.yaml` according to your `objectStorage.type`.
+   The type may already be set in the default configuration found in the `defaults/` directory depending on your selected cloud provider.
    Set `objectStorage.s3.*` if you are using S3 or `objectStorage.gcs.*` if you are using GCS.
 
 1. Create S3 buckets - optional
@@ -161,7 +165,7 @@ Assuming you already have everything needed to install the apps, this is what yo
    (
       access_key=$(sops exec-file ${CK8S_CONFIG_PATH}/secrets.yaml 'yq r {} "objectStorage.s3.accessKey"')
       secret_key=$(sops exec-file ${CK8S_CONFIG_PATH}/secrets.yaml 'yq r {} "objectStorage.s3.secretKey"')
-      sc_config=$(yq m ${CK8S_CONFIG_PATH}/defaults/sc-config.yaml ${CK8S_CONFIG_PATH}/sc-config.yaml -a overwrite -x)
+      sc_config=$(yq m ${CK8S_CONFIG_PATH}/defaults/common-config.yaml ${CK8S_CONFIG_PATH}/defaults/sc-config.yaml ${CK8S_CONFIG_PATH}/common-config.yaml ${CK8S_CONFIG_PATH}/sc-config.yaml -a overwrite -x)
       region=$(echo ${sc_config} | yq r - 'objectStorage.s3.region')
       host=$(echo ${sc_config} | yq r -  'objectStorage.s3.regionEndpoint')
 
@@ -203,14 +207,14 @@ An admin kubeconfig that requires authentication via dex can be created using:
 
 `./bin/ck8s kubeconfig admin <sc|wc> [cluster_name]`
 
-Which email addresses should be allowed can be configured by setting `clusterAdmin.admins` in `sc-config.yaml`/`wc-config.yaml`. Also make sure to set `dex.allowedDomains` in `sc-config.yaml`, and `kube_oidc_url` in your `group_vars`.
+Which email addresses should be allowed can be configured by setting `clusterAdmin.admins` in `common-config.yaml` or `sc-config.yaml` and `wc-config.yaml`. Also make sure to set `dex.allowedDomains` in `sc-config.yaml`, and `kube_oidc_url` in your `group_vars`.
 
 This admin kubeconfig can access everything in the cluster.
 
 #### User access
 
 After the cluster setup has completed RBAC resources and namespaces will have been created for the user.
-You can configure what namespaces should be created and which users that should get access using the following configuration options:
+You can configure what namespaces should be created and which users that should get access using the following configuration options in `wc-config.yaml`:
 
 ```yaml
 user:

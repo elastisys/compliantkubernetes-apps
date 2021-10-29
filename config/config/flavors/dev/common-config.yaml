@@ -1,0 +1,14 @@
+global:
+  verifyTls: false
+
+objectStorage:
+  type: none
+
+prometheus:
+  storage:
+    size: 2Gi
+  retention:
+    size: 1GiB
+
+velero:
+  enabled: false

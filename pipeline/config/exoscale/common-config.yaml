@@ -1,0 +1,33 @@
+# Changes made here will override the default values for both the service and workload cluster.
+# See the default configuration under "defaults/" to see available and suggested options.
+global:
+  ck8sVersion: any
+  baseDomain: pipeline-exoscale.elastisys.se
+  opsDomain: ops.pipeline-exoscale.elastisys.se
+objectStorage:
+  type: s3
+  s3:
+    region: ch-gva-2
+    regionEndpoint: https://sos-ch-gva-2.exo.io
+    forcePathStyle: true
+ingressNginx:
+  controller:
+    service:
+      type: not-used
+      annotations: not-used
+nfsProvisioner:
+  server: not-used
+velero:
+  enabled: true
+issuers:
+  letsencrypt:
+    prod:
+      email: letsencrypt@elastisys.com
+    staging:
+      email: letsencrypt@elastisys.com
+clusterAdmin:
+  users:
+    - admin@example.com
+monitoring:
+  rook:
+    enabled: true

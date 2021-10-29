@@ -5,7 +5,6 @@ on:
   # Run at 4 and 10 GMT, basically "early morning" and "lunch"
   - cron: "0 4,10 * * *"
 
-
 jobs:
 
   build-apps-image:
@@ -168,9 +167,10 @@ jobs:
       shell: bash
       working-directory: ./apps/pipeline/config/exoscale
       run: |
-        cp defaults/sc-config.yaml defaults-sc-config.yaml
-        cp defaults/wc-config.yaml defaults-wc-config.yaml
-        tar -czf configs.tar.gz defaults-sc-config.yaml defaults-wc-config.yaml sc-config.yaml wc-config.yaml
+        cp defaults/common-config.yaml common-defaults.yaml
+        cp defaults/sc-config.yaml sc-defaults.yaml
+        cp defaults/wc-config.yaml wc-defaults.yaml
+        tar -czf configs.tar.gz common-defaults.yaml common-config.yaml sc-defaults.yaml sc-config.yaml wc-defaults.yaml wc-config.yaml
       id: gather-configs
 
     - name: Upload configs

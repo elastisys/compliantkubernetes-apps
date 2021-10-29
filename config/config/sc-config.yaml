@@ -1,52 +1,11 @@
-## Adjust the containers resources requests and limits based on your cluster size and usage.
-
+# This configuration applies to the service cluster.
+# It will override settings set in "defaults/common-config.yaml".
 global:
-  ## Compliantkubernetes-apps version.
-  ## Use version number if you are exactly at a release tag.
-  ## Otherwise use full commit hash of current commit.
-  ## 'any', can be used to disable this validation.
-  ck8sVersion: ${CK8S_VERSION}
-  ck8sCloudProvider: ${CK8S_CLOUD_PROVIDER}
-  ck8sEnvironmentName: ${CK8S_ENVIRONMENT_NAME}
-  ck8sFlavor: ${CK8S_FLAVOR}
   clusterName: ${CK8S_ENVIRONMENT_NAME}-sc
-  baseDomain: set-me
-  opsDomain: set-me
-  issuer: letsencrypt-staging
-  verifyTls: true
-  clusterDns: 10.233.0.3
-
-storageClasses:
-  # Name of the default storageclass.
-  # Normally one of 'nfs-client', 'cinder-csi', 'local-storage', 'ebs-gp2', 'rook-ceph-block'
-  default: set-me
-
-  nfs:
-    enabled: set-me
-  cinder:
-    enabled: set-me
-  local:
-    enabled: set-me
-  ebs:
-    enabled: set-me
 
 objectStorage:
-  # Options are "s3", "gcs", or "none"
-  # If "none", remember to disable features that depend on object storage:
-  #   all backups (velero, harbor, influxdb, elasticsearch), sc logs (fluentd)
-  #   Also set harbor persistence to "filesystem" or "swift"
-  # Otherwise configure the features to match this type.
-  type: set-me
-  # gcs:
-  #   project: set-me
-  # s3:
-  #   region: set-me
-  #   regionEndpoint: set-me
-  #   # Generally false when using AWS and Exoscale and true for other providers.
-  #   forcePathStyle: set-me
   buckets:
     harbor: ${CK8S_ENVIRONMENT_NAME}-harbor
-    velero: ${CK8S_ENVIRONMENT_NAME}-velero
     elasticsearch: ${CK8S_ENVIRONMENT_NAME}-es-backup
     influxDB: ${CK8S_ENVIRONMENT_NAME}-influxdb
     scFluentd: ${CK8S_ENVIRONMENT_NAME}-sc-logs
@@ -66,9 +25,9 @@ user:
     affinity: {}
     nodeSelector: {}
     userGroups:
-      grafanaAdmin: grafana_admin #maps to grafana role admin
-      grafanaEditor: grafana_editor #maps to grafana role editor
-      grafanaViewer: grafana_viewer #maps to grafana role viewer
+      grafanaAdmin: grafana_admin   # maps to grafana role admin
+      grafanaEditor: grafana_editor # maps to grafana role editor
+      grafanaViewer: grafana_viewer # maps to grafana role viewer
     oidc:
       scopes: profile email openid
       allowedDomains:
@@ -84,14 +43,10 @@ user:
           memory: 100Mi
   # Todo remove dependencie on alertmanager from service cluster
   alertmanager:
-    enabled: false
-    namespace: alertmanager
-    ingress:
-      enabled: false
     group_by:
-    - cluster
-    - alertname
-    - severity
+      - cluster
+      - alertname
+      - severity
 harbor:
   enabled: true
   subdomain: harbor
@@ -216,51 +171,11 @@ prometheusBlackboxExporter:
     limits:
       cpu: 10m
       memory: 50Mi
-prometheusOperator:
-  resources:
-    requests:
-      cpu: 50m
-      memory: 100Mi
-    limits:
-      cpu: 100m
-      memory: 200Mi
-
-prometheusNodeExporter:
-  resources:
-    requests:
-      cpu: 5m
-      memory: 25Mi
-    limits:
-      cpu: 10m
-      memory: 50Mi
-
-kubeStateMetrics:
-  resources:
-    requests:
-      cpu: 5m
-      memory: 25Mi
-    limits:
-      cpu: 10m
-      memory: 50Mi
 
 prometheus:
-  storage:
-    enabled: false
-    size: 5Gi
   retention:
-    size: 4GiB
-    age: 3d
     alertmanager: 72h
-  resources:
-    requests:
-      memory: 1Gi
-      cpu: 300m
-    limits:
-      memory: 2Gi
-      cpu: "1"
-  tolerations: []
-  affinity: {}
-  nodeSelector: {}
+
   wcReader:
     resources:
       requests:
@@ -278,11 +193,13 @@ prometheus:
     tolerations: []
     affinity: {}
     nodeSelector: {}
+
   alertmanagerSpec:
     resources:
       requests:
         cpu: 10m
         memory: 50Mi
+
   grafana:
     subdomain: grafana
     resources:
@@ -299,9 +216,9 @@ prometheus:
       enabled: false
       # Only used if the above is true
       # userGroups:
-      #   grafanaAdmin: grafana_admin #maps to grafana role admin
-      #   grafanaEditor: grafana_editor #maps to grafana role editor
-      #   grafanaViewer: grafana_viewer #maps to grafana role viewer
+      #   grafanaAdmin: grafana_admin   # maps to grafana role admin
+      #   grafanaEditor: grafana_editor # maps to grafana role editor
+      #   grafanaViewer: grafana_viewer # maps to grafana role viewer
       # scopes: "openid profile email groups"
       # allowedDomains: []
 
@@ -313,6 +230,7 @@ prometheus:
         limits:
           cpu: 10m
           memory: 100Mi
+
 dex:
   subdomain: dex
   additionalKubeloginRedirects: []
@@ -363,6 +281,7 @@ elasticsearch:
     roles_key: groups
     # Scope - add 'groups' if groups claim is supported
     scope: openid profile email
+
   masterNode:
     count: 1
     storageSize: 8Gi
@@ -381,14 +300,15 @@ elasticsearch:
     affinity:
       podAntiAffinity:
         preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 1
-          podAffinityTerm:
-            topologyKey: kubernetes.io/hostname
-            labelSelector:
-              matchLabels:
-                role: master
+          - weight: 1
+            podAffinityTerm:
+              topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchLabels:
+                  role: master
     tolerations: []
     nodeSelector: {}
+
   dataNode:
     ## Enables dedicated statefulset for data nodes.
     ## If false, master nodes will assume data role.
@@ -410,14 +330,15 @@ elasticsearch:
     affinity:
       podAntiAffinity:
         preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 1
-          podAffinityTerm:
-            topologyKey: kubernetes.io/hostname
-            labelSelector:
-              matchLabels:
-                role: data
+          - weight: 1
+            podAffinityTerm:
+              topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchLabels:
+                  role: data
     tolerations: []
     nodeSelector: {}
+
   clientNode:
     ## Enables dedicated deployment for client/ingest nodes.
     ## If false, master nodes will assume client/ingest roles
@@ -434,14 +355,15 @@ elasticsearch:
     affinity:
       podAntiAffinity:
         preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 1
-          podAffinityTerm:
-            topologyKey: kubernetes.io/hostname
-            labelSelector:
-              matchLabels:
-                role: client
+          - weight: 1
+            podAffinityTerm:
+              topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchLabels:
+                  role: client
     tolerations: []
     nodeSelector: {}
+
   # Config for https://www.elastic.co/guide/en/elasticsearch/client/curator/5.8/about.html
   curator:
     enabled: true
@@ -468,6 +390,7 @@ elasticsearch:
       # postgresql: false
       # postgresqlSizeGB: 30
       # postgresqlAgeDays: 30
+
   # Index state management
   ism:
     # Overwrite ism policies
@@ -477,6 +400,7 @@ elasticsearch:
     # Create default policies - kubernetes, kubeaudit, authlog, and other
     defaultPolicies: true
     additionalPolicies: {}
+
   # Snapshot and snapshot lifecycle configuration
   snapshot:
     enabled: true
@@ -486,6 +410,7 @@ elasticsearch:
     retentionSchedule: '@daily'
     backupSchedule: 0 */2 * * *
     retentionActiveDeadlineSeconds: 2700
+
   extraRoles: []
   # - role_name: log_reader
   #   definition:
@@ -494,35 +419,25 @@ elasticsearch:
   #       - "kubernetes-*"
   #       allowed_actions:
   #       - "read"
+
   extraRoleMappings:
-  # - mapping_name: readall_and_monitor
-  #   definition:
-  #    users:
-  #      - "Developer Name"
+    - mapping_name: readall_and_monitor
+      definition:
+        users:
+          - set-me # Developer Name
     - mapping_name: kibana_user
       definition:
-        users:
-          - set-me
+        backend_roles:
+          - set-me # kibana_dev
     - mapping_name: kubernetes_log_reader
       definition:
-        users:
-          - set-me
+        backend_roles:
+          - set-me # kibana_dev
     - mapping_name: all_access
       definition:
-        users:
-          - set-me
-  #  - mapping_name: kibana_user
-  #    definition:
-  #      backend_roles:
-  #        - "kibana_dev"
-  #  - mapping_name: kubernetes_log_reader
-  #    definition:
-  #      backend_roles:
-  #        - "kibana_dev"
-  #  - mapping_name: all_access
-  #    definition:
-  #      backend_roles:
-  #        - "kibana_admin"
+        backend_roles:
+          - set-me # kibana_admin
+
   overwriteTemplates: true
   # Create default index templates - kubernetes, kubeaudit, and other
   defaultTemplates: true
@@ -661,6 +576,7 @@ influxDB:
         limits:
           cpu: 10m
           memory: 100Mi
+
 alerts:
   alertTo: "null"
   opsGenieHeartbeat:
@@ -673,9 +589,7 @@ alerts:
     apiUrl: https://api.eu.opsgenie.com
 
 externalTrafficPolicy:
-  local: false
   whitelistRange:
-    global: 0.0.0.0/0
     dex: false
     kibana: false
     elasticsearch: false
@@ -698,130 +612,6 @@ nfsProvisioner:
   affinity: {}
   nodeSelector: {}
 
-ingressNginx:
-  controller:
-    resources:
-      requests:
-        cpu: 100m
-        memory: 263Mi
-      limits:
-        cpu: 200m
-        memory: 512Mi
-    tolerations: []
-    affinity: {}
-    nodeSelector: {}
-    config:
-      useProxyProtocol: set-me
-    useHostPort: set-me
-    service:
-      enabled: set-me
-      type: set-me
-      annotations: set-me
-    # Will add custom configuration options to Nginx https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
-    additionalConfig: {}
-
-  defaultBackend:
-    resources:
-      requests:
-        cpu: 5m
-        memory: 10Mi
-      limits:
-        cpu: 10m
-        memory: 20Mi
-    tolerations: []
-    affinity: {}
-    nodeSelector: {}
-
-velero:
-  enabled: true
-  tolerations: []
-  nodeSelector: {}
-  schedule: 0 0 * * * #once per day
-  resources:
-    limits:
-      cpu: 500m
-      memory: 500Mi
-    requests:
-      cpu: 50m
-      memory: 100Mi
-  restic:
-    tolerations: []
-    resources:
-      limits:
-        cpu: 500m
-        memory: 500Mi
-      requests:
-        cpu: 50m
-        memory: 100Mi
-
-issuers:
-  letsencrypt:
-    enabled: true
-    prod:
-      email: set-me
-    staging:
-      email: set-me
-  extraIssuers: []
-
-certmanager:
-  resources:
-    requests:
-      cpu: 25m
-      memory: 100Mi
-    limits:
-      cpu: 250m
-      memory: 250Mi
-  nodeSelector: {}
-  tolerations: {}
-  affinity: {}
-  extraArgs: []
-
-  webhook:
-    resources:
-      requests:
-        cpu: 25m
-        memory: 25Mi
-      limits:
-        cpu: 250m
-        memory: 250Mi
-    nodeSelector: {}
-    tolerations: {}
-    affinity: {}
-
-  cainjector:
-    resources:
-      requests:
-        cpu: 25m
-        memory: 100Mi
-      limits:
-        cpu: 250m
-        memory: 250Mi
-    nodeSelector: {}
-    tolerations: {}
-    affinity: {}
-
-## Configuration for metric-server
-metricsServer:
-  enabled: true
-  resources:
-    requests:
-      cpu: 10m
-      memory: 25Mi
-    limits:
-      cpu: 100m
-      memory: 100Mi
-
-calicoAccountant:
-  enabled: true
-
-calicoFelixMetrics:
-  enabled: true
-
-clusterAdmin:
-  users:
-    - set-me
-    - admin@example.com
-  groups: []
 s3Exporter:
   # Also requries objectStorage.type=s3
   enabled: true
@@ -835,38 +625,3 @@ s3Exporter:
   tolerations: []
   affinity: {}
   nodeSelector: {}
-
-starboard:
-  # Note: The developers of starboard explicitly recommend against setting your own resources
-  resources:
-    requests:
-      cpu: 5m
-      memory: 50Mi
-    limits:
-      cpu: 10m
-      memory: 128Mi
-  tolerations: []
-  affinity: {}
-
-vulnerabilityExporter:
-  resources:
-    requests:
-      cpu: 20m
-      memory: 15Mi
-    limits:
-      cpu: 40m
-      memory: 30Mi
-  tolerations: []
-  affinity: {}
-
-  curlcronjob:
-    resources:
-      requests:
-        cpu: 20m
-        memory: 64Mi
-      limits:
-        cpu: 40m
-        memory: 128Mi
-monitoring:
-  rook:
-    enabled: false

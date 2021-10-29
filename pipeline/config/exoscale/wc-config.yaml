@@ -1,46 +1,18 @@
-# See the default configuration under "defaults" to see available and suggested options
-global:
-  ck8sVersion: any
-  baseDomain: pipeline-exoscale.elastisys.se
-  opsDomain: ops.pipeline-exoscale.elastisys.se
-storageClasses:
-  default: rook-ceph-block
-  nfs:
-    enabled: false
-  local:
-    enabled: false
-nfsProvisioner:
-  server: not-used
-objectStorage:
-  type: s3
-  buckets:
-    harbor: pipeline-exoscale-harbor
-    elasticsearch: pipeline-exoscale-es-backup
-    influxDB: pipeline-exoscale-influxdb
-    scFluentd: pipeline-exoscale-sc-logs
-  s3:
-    region: ch-gva-2
-    regionEndpoint: https://sos-ch-gva-2.exo.io
-    forcePathStyle: true
+# Changes made here will override the default values as well as the common config for this cluster.
+# See the default configuration under "defaults/" to see available and suggested options.
 opa:
   enabled: false
   imageRegistry:
     URL:
       - harbor.pipeline-exoscale.elastisys.se
-velero:
-  enabled: true
 issuers:
   letsencrypt:
     enabled: true
-    prod:
-      email: letsencrypt@elastisys.com
-    staging:
-      email: letsencrypt@elastisys.com
-monitoring:
-  rook:
-    enabled: true
-ingressNginx:
-  controller:
-    service:
-      type: set-me
-      annotations: set-me
+user:
+  namespaces:
+    - demo1
+    - demo2
+    - demo3
+  adminUsers:
+    - user-admin@example.com
+  adminGroups: []

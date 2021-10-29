@@ -1,7 +1,3 @@
-global:
-  issuer: letsencrypt-prod
-  verifyTls: true
-
 dex:
   enableStaticLogin: false
 
@@ -12,26 +8,19 @@ alerts:
     name: set-me
 
 prometheus:
-  storage:
-    size: 15Gi
   retention:
-    size: 12GiB
-    age:  7d
+    age: 7d
   wcReader:
     storage:
       size: 15Gi
     retention:
       size: 12GiB
-      age:  7d
+      age: 7d
 
 elasticsearch:
   sso:
     enabled: true
-    subject_key: email
-    roles_key: groups
-    scope: openid profile email
   masterNode:
-    storageSize: 8Gi
     javaOpts: -Xms1024m -Xmx1024m
     resources:
       requests:
@@ -39,52 +28,37 @@ elasticsearch:
         cpu: 100m
       limits:
         memory: 3Gi
-        cpu: 1
   dataNode:
     storageSize: 130Gi
     javaOpts: -Xms2048m -Xmx2048m
     resources:
       requests:
         memory: 4Gi
-        cpu: 200m
       limits:
         memory: 5Gi
-        cpu: 1
   clientNode:
     javaOpts: -Xms1024m -Xmx1024m
     resources:
       requests:
         memory: 2Gi
-        cpu: 200m
       limits:
         memory: 2.5Gi
-        cpu: 1
   ism:
     rolloverSizeGB: 5
     rolloverAgeDays: 1
   curator:
-    enabled: true
     resources:
-      limits:
-        cpu: 100m
-        memory: 128Mi
       requests:
         cpu: 10m
         memory: 32Mi
     retention:
-      kubeAuditSizeGB: 50
-      kubeAuditAgeDays: 30
-      kubernetesSizeGB: 50
-      kubernetesAgeDays: 50
       otherSizeGB: 5
       otherAgeDays: 30
       authLogSizeGB: 5
-      authLogAgeDays: 30
   snapshot:
     min: 300 # 12 / day * 30 days = 360, subtract some to account for failures
     max: 500
     ageSeconds: 2592000 # 30 days
-    retentionSchedule: '@daily'
     backupSchedule: 30 */2 * * * # 30 min past every 2nd hour
                                  # To avoid collision with retention
 
