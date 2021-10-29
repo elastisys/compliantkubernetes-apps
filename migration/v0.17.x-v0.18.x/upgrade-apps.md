@@ -21,6 +21,8 @@
 ## Steps
 1. Update configuration files:
 
+    Make sure that the environment variables `CK8S_CLOUD_PROVIDER`, `CK8S_ENVIRONMENT_NAME` and `CK8S_FLAVOR` are set to the correct values for the environment before running this step.
+
     This will take a backup before updating the configuration to the new split format:
 
     ```bash
