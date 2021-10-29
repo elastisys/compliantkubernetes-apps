@@ -1,76 +1,9 @@
-## Common kubernetes configuration options
-
-## Define resources requests and limits for single Pods.
-## ref: https://kubernetes.io/docs/user-guide/compute-resources/
-## resources: {}
-
-## Node labels for pod assignment
-## ref: https://kubernetes.io/docs/user-guide/node-selection/
-## nodeSelector: {}
-
-## Tolerations for pod assignment
-## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-## tolerations: []
-
-## Affinity for pod assignment
-## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
-## affinity: {}
-
-## Some common options used in various helm charts.
-##
+# This configuration applies to the workload cluster.
+# It will override settings set in "defaults/common-config.yaml".
 global:
-  ## Compliantkubernetes-apps version.
-  ## Use version number if you are exactly at a release tag.
-  ## Otherwise use full commit hash of current commit.
-  ## 'any', can be used to disable this validation.
-  ck8sVersion: ${CK8S_VERSION}
-
   ## The cluster name.
   ## Used in logs and metrics as to separate these from other clusters.
   clusterName: ${CK8S_ENVIRONMENT_NAME}-wc
-
-  ## Domain intended for ingress usage in the workload cluster
-  ## and to reach user facing services such as kibana, grafana, and harbor.
-  ## E.g. with 'prod.domain.com', kibana is reached via 'kibana.prod.domain.com'.
-  baseDomain: set-me
-
-  ## Domain intended for ingress usage in the service cluster and to reach
-  ## non-user facing services such as influxdb and elasticsearch.
-  ## E.g. with 'ops.prod.domain.com', elasticsearch is reached via 'elastic.ops.prod.domain.com'.
-  opsDomain: set-me
-
-  ## Default cert-manager issuer to use for issuing certificates for ingresses.
-  ## Normally one of 'letsencrypt-staging' or 'letsencrypt-prod'.
-  issuer: letsencrypt-staging
-
-  ## Verify ingress certificates
-  verifyTls: true
-
-  ## IP of the cluster DNS in kubernetes
-  clusterDns: 10.233.0.3
-
-## Configuration of storageclasses.
-storageClasses:
-  # Name of the default storageclass.
-  # Normally one of 'nfs-client', 'cinder-csi', 'local-storage', 'ebs-gp2', "rook-ceph-block".
-  default: set-me
-
-  ## Enable deployment of nfsClientProvisioner
-  ## Note, 'nfs-client' is installed as a deafult storageclass only if 'storageClasses.default: nfs-client'.
-  nfs:
-    enabled: set-me
-
-  ## Enableds installation of 'cinder-storage' storageclass.
-  cinder:
-    enabled: set-me
-
-  ## Enables deployment of local-volume-provisioner and installation of 'local-storage' storageclass.
-  local:
-    enabled: set-me
-
-  ## Enables installation of 'ebs-gp2' storageclass.
-  ebs:
-    enabled: set-me
 
 ## Nfs-client-provisioner configuration.
 ## Deployment is controlled via 'storageClasses.nfs.enabled'.
@@ -84,27 +17,9 @@ nfsProvisioner:
     requests:
       cpu: 100m
       memory: 128Mi
-
   tolerations: []
   nodeSelector: {}
   affinity: {}
-
-## Object storage configuration for backups.
-objectStorage:
-  ## Options are 's3', 'gcs', or 'none'
-  ## If 'none', remember to disable backups (velero)
-  type: set-me
-  # gcs:
-  #   project: set-me
-  # s3:
-  #   region: set-me
-  #   regionEndpoint: set-me
-  #   # Generally false when using AWS and Exoscale and true for other providers.
-  #   forcePathStyle: set-me
-
-  ## Buckets where each respctive application will store its backups.
-  buckets:
-    velero: ${CK8S_ENVIRONMENT_NAME}-velero
 
 ## User configuration.
 user:
@@ -125,22 +40,9 @@ user:
   adminGroups:
     - set-me
 
-  ## User controlled alertmanager configuration.
-  alertmanager:
-    enabled: false
-
-    ## Namespace in which to install alertmanager
-    # Ensure that the namespace is included in the namespaces list above.
-    namespace: alertmanager
-
-    ## Create basic-auth protected ingress to alertmanager
-    ingress:
-      enabled: false
-
 ## Falco configuration.
 falco:
   enabled: true
-
   resources:
     limits:
       cpu: 200m
@@ -153,7 +55,6 @@ falco:
   tolerations:
     - key: node-role.kubernetes.io/master
       effect: NoSchedule
-
   affinity: {}
   nodeSelector: {}
 
@@ -173,7 +74,6 @@ falco:
       requests:
         cpu: 10m
         memory: 25Mi
-
     tolerations: []
     affinity: {}
     nodeSelector: {}
@@ -191,6 +91,7 @@ falco:
         key: node-role.kubernetes.io/master
     affinity: {}
     nodeSelector: {}
+
 ## Elasticsearch cluster topolgy.
 ## Used in prometheus alerts.
 elasticsearch:
@@ -204,59 +105,10 @@ elasticsearch:
 
 ## Prometheus configuration.
 ## Prometheus collects metrics and pushes it to InfluxDB.
-prometheusOperator:
-  resources:
-    requests:
-      cpu: 50m
-      memory: 100Mi
-    limits:
-      cpu: 100m
-      memory: 200Mi
-
-prometheusNodeExporter:
-  resources:
-    requests:
-      cpu: 5m
-      memory: 25Mi
-    limits:
-      cpu: 10m
-      memory: 50Mi
-
-kubeStateMetrics:
-  resources:
-    requests:
-      cpu: 5m
-      memory: 25Mi
-    limits:
-      cpu: 10m
-      memory: 50Mi
-
 prometheus:
   remoteWrite:
     ## User used when authentication against InfluxDB.
     user: wcWriter
-
-  ## Persistence for prometheus to store metrics and wal.
-  storage:
-    enabled: false
-    size: 5Gi
-
-  ## When prometheus should start to remove metrics from local storage.
-  retention:
-    size: 4GiB
-    age: 3d
-
-  resources:
-    requests:
-      memory: 1Gi
-      cpu: 300m
-    limits:
-      memory: 2Gi
-      cpu: "1" ## Must be a string (integers might be suported in newer versions)
-
-  tolerations: []
-  affinity: {}
-  nodeSelector: {}
 
   ## Additional prometheus scrape config.
   ## ref: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config
@@ -275,10 +127,10 @@ opa:
     URL:
       - set-me
       - harbor.example.com
-        ## Uncomment this if you want to add an OPA exception for cert-manager-acmesolver.
-        ## This should be added only as an exception, e.g: if you cannot rely on a harbor instance managed by users.
-        ## Otherwise set the correct repository for this image in the certmanager section.
-        # - quay.io/jetstack/cert-manager-acmesolver
+      ## Uncomment this if you want to add an OPA exception for cert-manager-acmesolver.
+      ## This should be added only as an exception, e.g: if you cannot rely on a harbor instance managed by users.
+      ## Otherwise set the correct repository for this image in the certmanager section.
+      # - quay.io/jetstack/cert-manager-acmesolver
 
   ## Enable rule that requires pods to be targeted
   ## by at least one network policy.
@@ -336,213 +188,5 @@ fluentd:
     affinity: {}
     nodeSelector: {}
 
-## Set external traffic policy to: "Local" to preserve source IP on
-## providers supporting it
-## Ref: https://kubernetes.io/docs/tutorials/services/source-ip/#source-ip-for-services-with-typeloadbalancer
-externalTrafficPolicy:
-  local: false
-
-  ## Source IP range to allow.
-  whitelistRange:
-    global: 0.0.0.0/0
-
-## Nginx ingress controller configuration
-ingressNginx:
-  controller:
-    resources:
-      requests:
-        cpu: 100m
-        memory: 263Mi
-      limits:
-        cpu: 200m
-        memory: 512Mi
-    tolerations: []
-    affinity: {}
-    nodeSelector: {}
-
-    config:
-      ## If 'true', use PROXY protocol
-      ## ref: https://docs.nginx.com/nginx/admin-guide/load-balancer/using-proxy-protocol/
-      useProxyProtocol: set-me
-
-    ## If 'true', nginx will use host ports 80 and 443
-    useHostPort: set-me
-
-    ## Kubernetes service configuration.
-    service:
-      enabled: set-me
-
-      ## Type of service.
-      ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
-      type: set-me
-
-      ## Annotations to add to service
-      ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
-      annotations: set-me
-
-    ## Additional configuration options for Nginx
-    ## ref: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
-    additionalConfig: {}
-
-  defaultBackend:
-    resources:
-      requests:
-        cpu: 5m
-        memory: 10Mi
-      limits:
-        cpu: 10m
-        memory: 20Mi
-    tolerations: []
-    affinity: {}
-    nodeSelector: {}
-
-## Configration for Velero and Restic.
-## Check out https://compliantkubernetes.io/user-guide/backup/ to see what's included in backups.
-velero:
-  enabled: true
-  tolerations: []
-  nodeSelector: {}
-  schedule: 0 0 * * * #once per day
-  resources:
-    limits:
-      cpu: 500m
-      memory: 500Mi
-    requests:
-      cpu: 50m
-      memory: 100Mi
-
-  restic:
-    tolerations: []
-    resources:
-      limits:
-        cpu: 500m
-        memory: 500Mi
-      requests:
-        cpu: 50m
-        memory: 100Mi
-
-## Configuration for cert-manager issuers.
-issuers:
-  ## Deploy let's encrypt ACME issuers
-  ## "letsencrypt-prod" and "letsencrypt-staging".
-  letsencrypt:
-    enabled: true
-    prod:
-      ## Mail through which letsencrypt can contact you.
-      email: set-me
-    staging:
-      ## Mail through which letsencrypt can contact you.
-      email: set-me
-
-  ## Additional issuers to create.
-  ## ref: https://cert-manager.io/docs/configuration/
-  extraIssuers: []
-  # - apiVersion: cert-manager.io/v1
-  #   kind: Issuer
-  #   metadata:
-  #     name: selfsigned-issuer
-  #     namespace: sandbox
-  #   spec:
-  #     selfSigned: {}
-
-## Configration for cert-manager and it's components.
-certmanager:
-  resources:
-    requests:
-      cpu: 25m
-      memory: 100Mi
-    limits:
-      cpu: 250m
-      memory: 250Mi
-  nodeSelector: {}
-  tolerations: {}
-  affinity: {}
-  ## when using cert-manager with HTTP01 challenge and a custom image registry the below parameter should be added in the extraArgs
-  ## !! this works only with public repositories !! see https://github.com/jetstack/cert-manager/issues/2429
-  ## update the image tag based on the version used in the helm chart
-  ## - --acme-http01-solver-image=<harbor_server_name>/<proxy_project_name>/jetstack/cert-manager-acmesolver:v1.4.0
-  extraArgs: []
-
-  webhook:
-    resources:
-      requests:
-        cpu: 25m
-        memory: 25Mi
-      limits:
-        cpu: 250m
-        memory: 250Mi
-    nodeSelector: {}
-    tolerations: {}
-    affinity: {}
-
-  cainjector:
-    resources:
-      requests:
-        cpu: 15m
-        memory: 100Mi
-      limits:
-        cpu: 250m
-        memory: 250Mi
-    nodeSelector: {}
-    tolerations: {}
-    affinity: {}
-
-## Configuration for metric-server
-metricsServer:
-  enabled: true
-  resources:
-    requests:
-      cpu: 10m
-      memory: 25Mi
-    limits:
-      cpu: 100m
-      memory: 100Mi
-
-calicoAccountant:
-  enabled: true
-
-calicoFelixMetrics:
-  enabled: true
-
-clusterAdmin:
-  users:
-    - set-me
-    - admin@example.com
-  groups: []
-
-starboard:
-  # Note: The developers of starboard explicitly recommend against setting your own resources
-  resources:
-    requests:
-      cpu: 5m
-      memory: 50Mi
-    limits:
-      cpu: 10m
-      memory: 128Mi
-  tolerations: []
-  affinity: {}
-
-vulnerabilityExporter:
-  resources:
-    requests:
-      cpu: 20m
-      memory: 15Mi
-    limits:
-      cpu: 40m
-      memory: 30Mi
-  tolerations: []
-  affinity: {}
-
-  curlcronjob:
-    resources:
-      requests:
-        cpu: 20m
-        memory: 64Mi
-      limits:
-        cpu: 40m
-        memory: 128Mi
-monitoring:
-  rook:
-    enabled: false
 influxDB:
   subdomain: influxdb

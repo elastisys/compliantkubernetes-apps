@@ -86,6 +86,11 @@ teardown() {
             CK8S_CONFIG_PATH="${config_2}" run ck8s init
             assert_success
 
+            run diff "${config_1}/defaults/common-config.yaml" "${config_2}/defaults/common-config.yaml"
+            assert_success
+            run diff "${config_1}/common-config.yaml" "${config_2}/common-config.yaml"
+            assert_success
+
             run diff "${config_1}/defaults/sc-config.yaml" "${config_2}/defaults/sc-config.yaml"
             assert_success
             run diff "${config_1}/sc-config.yaml" "${config_2}/sc-config.yaml"

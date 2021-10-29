@@ -1,16 +1,8 @@
 global:
   issuer: letsencrypt-prod
-  verifyTls: true
-
-user:
-  namespaces:
-    - set-me
-    - production
-    - staging
 
 prometheus:
   storage:
     size: 15Gi
   retention:
     size: 12GiB
-    age:  3d

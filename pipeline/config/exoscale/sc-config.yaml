@@ -1,20 +1,10 @@
-# See the default configuration under "defaults" to see available and suggested options
-global:
-  ck8sVersion: any
-  baseDomain: pipeline-exoscale.elastisys.se
-  opsDomain: ops.pipeline-exoscale.elastisys.se
-storageClasses:
-  default: rook-ceph-block
-  nfs:
-    enabled: false
-  local:
-    enabled: false
-objectStorage:
-  type: s3
-  s3:
-    region: ch-gva-2
-    regionEndpoint: https://sos-ch-gva-2.exo.io
-    forcePathStyle: true
+# Changes made here will override the default values as well as the common config for this cluster.
+# See the default configuration under "defaults/" to see available and suggested options.
+user:
+  grafana:
+    oidc:
+      allowedDomains:
+        - example.com
 harbor:
   persistence:
     type: objectStorage
@@ -44,6 +34,7 @@ elasticsearch:
       authLogAgeDays: 7
   snapshot:
     enabled: true
+  extraRoleMappings: []
 fluentd:
   enabled: true
 influxDB:
@@ -61,24 +52,6 @@ alerts:
     name: not-used
   slack:
     channel: not-used
-nfsProvisioner:
-  server: not-used
-ingressNginx:
-  controller:
-    service:
-      type: not-used
-      annotations: not-used
-velero:
-  enabled: true
-issuers:
-  letsencrypt:
-    prod:
-      email: letsencrypt@elastisys.com
-    staging:
-      email: letsencrypt@elastisys.com
 s3Exporter:
   interval: 120s
   scrapeTimeout: 30s
-monitoring:
-  rook:
-    enabled: true

@@ -51,11 +51,13 @@ declare -A secrets
 config["config_file_wc"]=""
 config["config_file_sc"]=""
 
-config["default_config_file_wc"]="${default_config_path}/wc-config.yaml"
-config["default_config_file_sc"]="${default_config_path}/sc-config.yaml"
+config["default_common"]="${default_config_path}/common-config.yaml"
+config["default_wc"]="${default_config_path}/wc-config.yaml"
+config["default_sc"]="${default_config_path}/sc-config.yaml"
 
-config["override_config_file_wc"]="${CK8S_CONFIG_PATH}/wc-config.yaml"
-config["override_config_file_sc"]="${CK8S_CONFIG_PATH}/sc-config.yaml"
+config["override_common"]="${CK8S_CONFIG_PATH}/common-config.yaml"
+config["override_wc"]="${CK8S_CONFIG_PATH}/wc-config.yaml"
+config["override_sc"]="${CK8S_CONFIG_PATH}/sc-config.yaml"
 
 secrets["secrets_file"]="${CK8S_CONFIG_PATH}/secrets.yaml"
 secrets["s3cfg_file"]="${state_path}/s3cfg.ini"
@@ -75,6 +77,79 @@ log_error() {
     echo -e "[\e[31mck8s\e[0m] ${*}" 1>&2
 }
 
+# Merges all yaml files in order
+# Usage: yq_merge <files...>
+yq_merge() {
+    yq merge --overwrite --arrays overwrite --prettyPrint "${@}"
+}
+
+# Reads the path to a block from one file containing the value
+# Usage: yq_read_block <source> <value>
+yq_read_block() {
+    source=$1
+    value=$2
+
+    yq read "${source}" --tojson --printMode p "**(.==${value})" | \
+             sed -r 's/\.\[.*\].*//' | sed -r 's/\\"//g' | uniq
+}
+
+# Copies a block from one file to another
+# Usage: yq_copy_block <source> <target> <key>
+yq_copy_block() {
+    yq read "${1}" "${3}" --tojson | \
+    yq prefix - "${3}" --tojson | \
+    yq merge "${2}" - --inplace --overwrite --arrays overwrite --prettyPrint
+}
+
+# Usage: yq_copy_commons <source1> <source2> <target>
+yq_copy_commons() {
+    source1=$1
+    source2=$2
+    target=$3
+
+    keys=$(yq_merge "${source1}" "${source2}" --tojson | yq read - --tojson --printMode pv '**' | \
+           sed -rn 's/\{"(.+)":.*\}/\1/p' | sed -r 's/\.\[.+\].*//' | sed -r 's/\\"//g' | uniq)
+    for key in ${keys}; do
+        compare=$(yq compare "${source1}" "${source2}" --tojson --printMode pv "${key}" || true)
+        if [[ -z "${compare}" ]]; then
+            yq_copy_block "${source1}" "${target}" "${key}"
+        fi
+    done
+}
+
+# Usage: yq_copy_changes <source1> <source2> <target>
+yq_copy_changes() {
+    source1=$1
+    source2=$2
+    target=$3
+
+    keys=$(yq read "${source2}" --tojson --printMode pv '**' | \
+           sed -rn 's/\{"(.+)":.*\}/\1/p' | sed -r 's/\.\[.+\].*//' | sed -r 's/\\"//g' | uniq)
+    for key in ${keys}; do
+        compare=$(yq compare "${source1}" "${source2}" --tojson --printMode pv "${key}" | \
+                  sed -rn 's/^\+(.*)/\1/p' || true)
+        if [[ -n "${compare}" ]]; then
+            yq_copy_block "${source2}" "${target}" "${key}"
+        fi
+    done
+}
+
+# Usage: yq_copy_values <source1> <source2> <target> <value>
+yq_copy_values() {
+    source1=$1
+    source2=$2
+    target=$3
+    value=$4
+
+    keys=$(yq_read_block "${source1}" "${value}")
+    for key in ${keys}; do
+        compare=$(yq read "${source2}" "${key}" --tojson --printMode p)
+        if [[ -z "${compare}" ]]; then
+            yq_copy_block "${source1}" "${target}" "${key}"
+        fi
+    done
+}
+
 array_contains() {
     local value="${1}"
     shift
@@ -85,52 +160,39 @@ array_contains() {
 }
 
 check_config()  {
-    if [[ ! -f "${1}" ]]; then
-        log_error "ERROR: could not find file $1"
-        exit 1
-    fi
-    if [[ ! $1 =~ ^.*\.(yaml|yml) ]]; then
-        log_error "ERROR: file $1 must be a yaml file"
-        exit 1
-    fi
-    if [[ ! -f "${2}" ]]; then
-        log_error "ERROR: could not find file $2"
-        exit 1
-    fi
-    if [[ ! $2 =~ ^.*\.(yaml|yml) ]]; then
-        log_error "ERROR: file $2 must be a yaml file"
-        exit 1
-    fi
+    for config in "${@}"; do
+        if [[ ! -f "${config}" ]]; then
+            log_error "ERROR: could not find file ${config}"
+            exit 1
+        elif [[ ! ${config} =~ ^.*\.(yaml|yml) ]]; then
+            log_error "ERROR: file ${config} must be a yaml file"
+            exit 1
+        fi
+    done
 }
 
 # Usage: merge_config <default_config> <override_config> <merged_config>
+# Merges the common-default, wc|sc-default, common-override, then wc|sc-override into one.
 merge_config() {
-    yq merge "$1" "$2" --overwrite --arrays overwrite > "$3"
+    yq_merge "${config[default_common]}" "$1" "${config[override_common]}" "$2" > "$3"
 }
 
-# Loads the default and override and merges into a tempfile at config[config_file_<wc|sc>].
+# Usage: load_config <wc|sc>
+# Loads and merges the configuration into a usable tempfile at config[config_file_<wc|sc>].
 load_config() {
+    check_config "${config[default_common]}" "${config[override_common]}"
+
     if [[ "${1}" == "sc" ]]; then
-        : "${config[default_config_file_sc]:?Missing default config}"
-        : "${config[override_config_file_sc]:?Missing config}"
-
-        check_config "${config[default_config_file_sc]}" "${config[override_config_file_sc]}"
-
+        check_config "${config[default_sc]}" "${config[override_sc]}"
         config[config_file_sc]=$(mktemp)
         append_trap "rm ${config[config_file_sc]}" EXIT
-
-        merge_config "${config[default_config_file_sc]}" "${config[override_config_file_sc]}" "${config[config_file_sc]}"
+        merge_config "${config[default_sc]}" "${config[override_sc]}" "${config[config_file_sc]}"
 
     elif [[ "${1}" == "wc" ]]; then
-        : "${config[default_config_file_wc]:?Missing default config}"
-        : "${config[override_config_file_wc]:?Missing config}"
-
-        check_config "${config[default_config_file_wc]}" "${config[override_config_file_wc]}"
-
+        check_config "${config[default_wc]}" "${config[override_wc]}"
         config[config_file_wc]=$(mktemp)
         append_trap "rm ${config[config_file_wc]}" EXIT
-
-        merge_config "${config[default_config_file_wc]}" "${config[override_config_file_wc]}" "${config[config_file_wc]}"
+        merge_config "${config[default_wc]}" "${config[override_wc]}" "${config[config_file_wc]}"
 
     else
         log_error "Error: usage load_config <wc|sc>"
@@ -161,8 +223,7 @@ validate_version() {
     if [[ -z "$ck8s_version" ]]; then
         log_error "ERROR: No version set. Run init to generate config."
         exit 1
-    fi
-    if [ "${ck8s_version}" != "any" ] \
+    elif [ "${ck8s_version}" != "any" ] \
         && [ "${version}" != "${ck8s_version}" ]; then
         log_error "ERROR: Version mismatch. Run init to update config."
         log_error "Config version: ${ck8s_version}"
@@ -178,22 +239,15 @@ validate_version() {
 validate_config() {
     log_info "Validating $1 config"
     validate() {
-        if [[ ! -f "${2}" ]]; then
-            log_error "ERROR: could not find file $2"
-            exit 1
-        fi
-        if [[ ! $2 =~ ^.*\.(yaml|yml) ]]; then
-            log_error "ERROR: file $2 must be a yaml file"
-            exit 1
-        fi
         merged_config="${1}"
-        options=$(yq read "${2}" '**(.==set-me)'  --tojson --printMode p | sed -r 's/\.\[.*\].*//')
-        # Loop all lines in $2 and warns if same option is not
-        # available in $1
+        template_config="${2}"
+
+        # Loop all lines in ${template_config} and warns if same option is not available in ${merged_config}
+        options=$(yq_read_block "${template_config}" "set-me")
         maybe_exit="false"
         for opt in ${options}; do
-            value=$(yq read --unwrapScalar=false "${merged_config}" "${opt}" | head -n 1 | sed -r 's/- set-me/set-me/')
-            if [[ -z "${value}" ]] || [[ "${value}" = '"set-me"' ]] || [[ "${value}" = "set-me" ]]; then
+            compare=$(yq compare "${template_config}" "${merged_config}" "${opt}" -j -ppv | sed -rn 's/\+(.*)/\1/p' || true)
+            if [[ -z "${compare}" ]]; then
                 log_warning "WARN: ${opt} is not set in config"
                 maybe_exit="true"
             fi
@@ -208,11 +262,26 @@ validate_config() {
         fi
     }
 
+    template_file=$(mktemp)
+    append_trap "rm ${template_file}" EXIT
+
     if [[ $1 == "sc" ]]; then
-        validate "${config[config_file_sc]}" "${config_template_path}/config/sc-config.yaml"
+        check_config "${config_template_path}/config/common-config.yaml" \
+                     "${config_template_path}/config/sc-config.yaml" \
+                     "${config_template_path}/secrets/sc-secrets.yaml"
+        yq_merge "${config_template_path}/config/common-config.yaml" \
+                 "${config_template_path}/config/sc-config.yaml" \
+                  > "${template_file}"
+        validate "${config[config_file_sc]}" "${template_file}"
         validate "${secrets[secrets_file]}" "${config_template_path}/secrets/sc-secrets.yaml"
     elif [[ $1 == "wc" ]]; then
-        validate "${config[config_file_wc]}" "${config_template_path}/config/wc-config.yaml"
+        check_config "${config_template_path}/config/common-config.yaml" \
+                     "${config_template_path}/config/wc-config.yaml" \
+                     "${config_template_path}/secrets/wc-secrets.yaml"
+        yq_merge "${config_template_path}/config/common-config.yaml" \
+                 "${config_template_path}/config/wc-config.yaml" \
+                  > "${template_file}"
+        validate "${config[config_file_wc]}" "${template_file}"
         validate "${secrets[secrets_file]}" "${config_template_path}/secrets/wc-secrets.yaml"
     else
         log_error "ERROR: usage validate_config <sc|wc>"

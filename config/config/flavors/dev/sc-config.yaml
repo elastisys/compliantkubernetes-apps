@@ -1,10 +1,3 @@
-global:
-  issuer: letsencrypt-staging
-  verifyTls: false
-
-objectStorage:
-  type: none
-
 dex:
   enableStaticLogin: true
 
@@ -12,21 +5,14 @@ harbor:
   backup:
     enabled: false
   persistence:
-    # Valid options are "filesystem" (persistent volume), "swift", or "objectStorage" (matching global config)
     type: filesystem
 
 prometheus:
-  storage:
-    size: 2Gi
-  retention:
-    size: 1GiB
-    age:  3d
   wcReader:
     storage:
       size: 2Gi
     retention:
       size: 1GiB
-      age:  3d
 
 elasticsearch:
   masterNode:
@@ -49,10 +35,6 @@ elasticsearch:
       kubeAuditAgeDays: 3
       kubernetesSizeGB: 10
       kubernetesAgeDays: 3
-      otherSizeGB: 1
-      otherAgeDays: 7
-      authLogSizeGB: 1
-      authLogAgeDays: 30
   snapshot:
     enabled: false
     retentionSchedule: 0 1 * * * # 1am
@@ -62,17 +44,9 @@ fluentd:
   enabled: false
 
 influxDB:
-  retention:
-    sizeWC: 4500000
-    sizeSC: 4500000
-    durationWC: 2d
-    durationSC: 3d
   persistence:
     size: 10Gi
   backup:
     enabled: false
   backupRetention:
     enabled: false
-
-velero:
-  enabled: false

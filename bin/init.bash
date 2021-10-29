@@ -12,12 +12,12 @@ here="$(dirname "$(readlink -f "$0")")"
 source "${here}/common.bash"
 
 # Load cloud provider, environment name, and flavor from config if available.
-if [ -f "${config[default_config_file_sc]}" ]; then
-    cloud_provider=$(yq read "${config[default_config_file_sc]}" 'global.ck8sCloudProvider')
-    environment_name=$(yq read "${config[default_config_file_sc]}" 'global.ck8sEnvironmentName')
-    flavor=$(yq read "${config[default_config_file_sc]}" 'global.ck8sFlavor')
+if [ -f "${config[default_common]}" ]; then
+    cloud_provider=$(yq read "${config[default_common]}" 'global.ck8sCloudProvider')
+    environment_name=$(yq read "${config[default_common]}" 'global.ck8sEnvironmentName')
+    flavor=$(yq read "${config[default_common]}" 'global.ck8sFlavor')
 fi
-if [ ! -v cloud_provider ] || [ -z "${cloud_provider}" ]; then
+if [ -z "${cloud_provider:-}" ]; then
     : "${CK8S_CLOUD_PROVIDER:?Missing CK8S_CLOUD_PROVIDER}"
 elif [ -v CK8S_CLOUD_PROVIDER ] && [ "${CK8S_CLOUD_PROVIDER}" != "${cloud_provider}" ]; then
     log_error "ERROR: Cloud provider mismatch, '${cloud_provider}' in config and '${CK8S_CLOUD_PROVIDER}' in env"
@@ -25,7 +25,7 @@ elif [ -v CK8S_CLOUD_PROVIDER ] && [ "${CK8S_CLOUD_PROVIDER}" != "${cloud_provid
 else
     export CK8S_CLOUD_PROVIDER="${cloud_provider}"
 fi
-if [ ! -v environment_name ] ||  [ -z "${environment_name}" ]; then
+if [ -z "${environment_name:-}" ]; then
     : "${CK8S_ENVIRONMENT_NAME:?Missing CK8S_ENVIRONMENT_NAME}"
 elif [ -v CK8S_ENVIRONMENT_NAME ] && [ "${CK8S_ENVIRONMENT_NAME}" != "${environment_name}" ]; then
     log_error "ERROR: Environment name mismatch, '${environment_name}' in config and '${CK8S_ENVIRONMENT_NAME}' in env"
@@ -33,8 +33,8 @@ elif [ -v CK8S_ENVIRONMENT_NAME ] && [ "${CK8S_ENVIRONMENT_NAME}" != "${environm
 else
     export CK8S_ENVIRONMENT_NAME="${environment_name}"
 fi
-if [ ! -v flavor ] ||  [ -z "${flavor}" ]; then
-    CK8S_FLAVOR="${CK8S_FLAVOR:-dev}"
+if [ -z "${flavor:-}" ]; then
+    export CK8S_FLAVOR="${CK8S_FLAVOR:-dev}"
 elif [ -v CK8S_FLAVOR ] && [ "${CK8S_FLAVOR}" != "${flavor}" ]; then
     log_error "ERROR: Environment name mismatch, '${flavor}' in config and '${CK8S_FLAVOR}' in env"
     exit 1
@@ -84,8 +84,7 @@ generate_sops_config() {
 }
 
 # Only writes value if it is set to "set-me"
-# Usage:
-# replace_set_me <file> <field> <value>
+# Usage: replace_set_me <file> <field> <value>
 replace_set_me(){
     if [[ $# -ne 3 ]]; then
         log_error "ERROR: number of args in replace_set_me must be 3. #=[$#]"
@@ -94,47 +93,32 @@ replace_set_me(){
     if [[ $(yq read "$1" "$2") == "set-me" ]]; then
        yq write --inplace "$1" "$2" "$3"
     fi
-
 }
 
-generate_base_sc_config() {
+# Usage: generate_default_config <default_config>
+generate_default_config() {
     if [[ $# -ne 1 ]]; then
-        log_error "ERROR: number of args in generate_base_sc_config must be 1. #=[$#]"
+        log_error "ERROR: number of args in generate_default_config must be 1. #=[$#]"
         exit 1
     fi
-    file=$1
-    tmpfile=$(mktemp)
-    append_trap "rm $tmpfile; chmod 444 $file" EXIT
 
-    touch "$file"
-    chmod 644 "$file"
-
-    envsubst > "$tmpfile" < "${config_template_path}/config/sc-config.yaml"
-
-    # Change this to use one flavor for cloud provider and one for "size" (e.g. dev, growth, enterprise)
-    yq merge --inplace --overwrite "$tmpfile" "${config_template_path}/config/flavors/${CK8S_FLAVOR}-sc.yaml" --prettyPrint
-
-    cat "$tmpfile" > "$file"
-}
-
-generate_base_wc_config() {
-    if [[ $# -ne 1 ]]; then
-        log_error "ERROR: number of args in generate_base_wc_config must be 1. #=[$#]"
-        exit 1
+    default_config=$1
+    if [ -f "${default_config}" ]; then
+        backup_file "${default_config}" default
+    else
+        touch "${default_config}"
     fi
-    file=$1
-    tmpfile=$(mktemp)
-    append_trap "rm $tmpfile; chmod 444 $file" EXIT
 
-    touch "$file"
-    chmod 644 "$file"
+    config_name=$(echo "${default_config}" | sed -r 's/.*\///')
 
-    envsubst > "$tmpfile" < "${config_template_path}/config/wc-config.yaml"
+    new_config=$(mktemp)
+    append_trap "rm ${new_config}; chmod 444 ${default_config}" EXIT
 
     # Change this to use one flavor for cloud provider and one for "size" (e.g. dev, growth, enterprise)
-    yq merge --inplace --overwrite "$tmpfile" "${config_template_path}/config/flavors/${CK8S_FLAVOR}-wc.yaml" --prettyPrint
+    envsubst < "${config_template_path}/config/${config_name}" | yq_merge -  "${config_template_path}/config/flavors/${CK8S_FLAVOR}/${config_name}" > "${new_config}"
 
-    cat "$tmpfile" > "$file"
+    chmod 644 "${default_config}"
+    cat "${new_config}" > "${default_config}"
 }
 
 # Usage: set_storage_class <config-file>
@@ -264,34 +248,29 @@ set_nginx_config() {
     fi
 }
 
-##
-## TODO: rename to set_fluentd_config
-##
-# Usage: set_elasticsearch_config <config-file>
+# Usage: set_fluentd_config <config-file>
 # baremetal support is experimental, keep as separate case until stable
-set_elasticsearch_config() {
+set_fluentd_config() {
     file=$1
     if [[ ! -f "${file}" ]]; then
         log_error "ERROR: invalid file - $file"
         exit 1
     fi
-
-        case ${CK8S_CLOUD_PROVIDER} in
+    case ${CK8S_CLOUD_PROVIDER} in
         safespring | citycloud | exoscale)
-          use_regionendpoint=true
-          ;;
+            use_region_endpoint=true
+            ;;
 
         aws)
-          use_regionendpoint=false
-          ;;
+            use_region_endpoint=false
+            ;;
 
         baremetal)
-          use_regionendpoint=true
-          ;;
-
+            use_region_endpoint=true
+            ;;
     esac
 
-    replace_set_me "$1" 'fluentd.forwarder.useRegionEndpoint' "$use_regionendpoint"
+    replace_set_me "${file}" 'fluentd.forwarder.useRegionEndpoint' "${use_region_endpoint}"
 }
 
 # Usage: set_harbor_config <config-file>
@@ -338,43 +317,64 @@ set_harbor_config() {
     replace_set_me "${file}" "harbor.persistence.disableRedirect" "${disable_redirect}"
 }
 
-# Usage: update_config <default_config_file> <merged_config_file|override_config_file>
-# Updates config to only contain custom values.
+# Usage: update_config <override_config_file>
+# Updates configs to only contain custom values.
 update_config() {
-    default_config=$1
-    override_config=$2
-
-    if [ ! -f "${override_config}" ]; then
-        touch "${override_config}"
+    if [[ $# -ne 1 ]]; then
+        log_error "ERROR: number of args in update_config must be 1. #=[$#]"
+        exit 1
     fi
 
-    merged_config=$(mktemp)
-    append_trap "rm $merged_config" EXIT
-    new_config=$(mktemp)
-    append_trap "rm $new_config" EXIT
+    override_config=$1
+    config_name=$(echo "${override_config}" | sed -r 's/.*\///' | sed -r 's/-config.yaml//')
 
-    merge_config "${default_config}" "${override_config}" "${merged_config}"
+    if [ -f "${override_config}" ]; then
+        backup_file "${override_config}"
+        log_info "Updating ${config_name} config"
+    else
+        touch "${override_config}"
+        log_info "Creating ${config_name} config"
+    fi
 
-    keys=$(yq compare "${default_config}" "${merged_config}" --tojson --printMode pv --stripComments -- '**' | \
-           sed -rn 's/\+\{"(.+)":.*\}/\1/p' | sed -r 's/\[.+\].*//' | uniq || true)
-    for key in ${keys}; do
-        yq read "${merged_config}" "${key}" --tojson | \
-        yq prefix - "${key}" --tojson | \
-        yq merge "${new_config}" - --inplace --overwrite --arrays overwrite --prettyPrint
-    done
+    if [ "${config_name}" == "common" ]; then
+        default_config="${config[default_common]}"
+        base_config="${config[default_common]}"
 
-    defaults=$(yq read "${default_config}" "**(.==set-me)" --tojson --printMode p | \
-               sed -r 's/\.\[.*\].*//' | uniq)
-    for default in ${defaults}; do
-        key=$(yq read "${new_config}" "${default}" --tojson --printMode p)
-        if [[ -z "${key}" ]]; then
-            yq read "${default_config}" "${default}" --tojson | \
-            yq prefix - "${default}" --tojson | \
-            yq merge "${new_config}" - --inplace --overwrite --arrays overwrite --prettyPrint
+        if [[ -f "${config[override_sc]}" ]] && [[ -f "${config[override_wc]}" ]]; then
+            yq_copy_commons "${config[override_sc]}" "${config[override_wc]}" "${override_config}"
         fi
-    done
+    else
+        default_config=$(mktemp)
+        append_trap "rm ${default_config}" EXIT
+        yq_merge "${config[default_common]}" "${CK8S_CONFIG_PATH}/defaults/${config_name}-config.yaml" > "${default_config}"
 
-    preamble="# See the default configuration under \"defaults\" to see available and suggested options"
+        base_config=$(mktemp)
+        append_trap "rm ${base_config}" EXIT
+        yq_merge "${default_config}" "${config[override_common]}" > "${base_config}"
+    fi
+
+    new_config=$(mktemp)
+    append_trap "rm ${new_config}" EXIT
+
+    yq_copy_changes "${base_config}" "${override_config}" "${new_config}"
+
+    if [ "${config_name}" == "common" ]; then
+        diff_config="${new_config}"
+    else
+        diff_config=$(mktemp)
+        append_trap "rm ${diff_config}" EXIT
+        yq_merge "${config[override_common]}" "${new_config}" > "${diff_config}"
+    fi
+
+    yq_copy_values "${default_config}" "${diff_config}" "${new_config}" "set-me"
+
+    if [ "${config_name}" == "common" ]; then
+        preamble="# Changes made here will override the default values for both the service and workload cluster."
+    else
+        preamble="# Changes made here will override the default values as well as the common config for this cluster."
+    fi
+    preamble="${preamble}
+# See the default configuration under \"defaults/\" to see available and suggested options."
     echo "${preamble}" | cat - "${new_config}" > "${override_config}"
 }
 
@@ -464,7 +464,7 @@ generate_secrets() {
     yq write --inplace "${tmpfile}" 'prometheus.remoteWrite.password' "${PROMETHEUS_WC_REMOTE_WRITE_PASS}"
 }
 
-# Usage: backup_file <file> [name]
+# Usage: backup_file <file> [sufix]
 backup_file() {
     if [ ! -f "$1" ]; then
         log_error "ERROR: args in backup_file must be a file. [$1]"
@@ -475,10 +475,8 @@ backup_file() {
     fi
 
     if [ ${#} -gt 1 ]; then
-        # Add timestamp
-        backup_name="$2-$(date +%y%m%d%H%M%S).yaml"
+        backup_name=$(echo "$1" | sed "s/.*\///" | sed "s/-config.yaml/-$2-$(date +%y%m%d%H%M%S).yaml/")
     else
-        # Strip directroy and add timestamp
         backup_name=$(echo "$1" | sed "s/.*\///" | sed "s/.yaml/-$(date +%y%m%d%H%M%S).yaml/")
     fi
 
@@ -506,41 +504,19 @@ mkdir -p "${CK8S_CONFIG_PATH}/user"
 CK8S_VERSION=$(version_get)
 export CK8S_VERSION
 
-if [ -f "${config[default_config_file_sc]}" ]; then
-    backup_file "${config[default_config_file_sc]}" default-sc-config
-fi
-if [ -f "${config[override_config_file_sc]}" ]; then
-    backup_file "${config[override_config_file_sc]}"
-    log_info "Updating sc config"
-else
-    log_info "Creating sc config"
-fi
+generate_default_config "${config[default_common]}"
+set_storage_class       "${config[default_common]}"
+set_object_storage      "${config[default_common]}"
+set_nginx_config        "${config[default_common]}"
+update_config           "${config[override_common]}"
 
-generate_base_sc_config  "${config[default_config_file_sc]}"
-set_storage_class        "${config[default_config_file_sc]}"
-set_object_storage       "${config[default_config_file_sc]}"
-set_nginx_config         "${config[default_config_file_sc]}"
-set_elasticsearch_config "${config[default_config_file_sc]}"
-set_harbor_config        "${config[default_config_file_sc]}"
+generate_default_config "${config[default_sc]}"
+set_fluentd_config      "${config[default_sc]}"
+set_harbor_config       "${config[default_sc]}"
+update_config           "${config[override_sc]}"
 
-update_config "${config[default_config_file_sc]}" "${config[override_config_file_sc]}"
-
-if [ -f "${config[default_config_file_wc]}" ]; then
-    backup_file "${config[default_config_file_wc]}" default-wc-config
-fi
-if [ -f "${config[override_config_file_wc]}" ]; then
-    backup_file "${config[override_config_file_wc]}"
-    log_info "Updating wc config"
-else
-    log_info "Creating wc config"
-fi
-
-generate_base_wc_config  "${config[default_config_file_wc]}"
-set_storage_class        "${config[default_config_file_wc]}"
-set_object_storage       "${config[default_config_file_wc]}"
-set_nginx_config         "${config[default_config_file_wc]}"
-
-update_config "${config[default_config_file_wc]}" "${config[override_config_file_wc]}"
+generate_default_config "${config[default_wc]}"
+update_config           "${config[override_wc]}"
 
 gen_new_secrets=true
 if [ -f "${secrets[secrets_file]}" ]; then
@@ -560,6 +536,7 @@ update_secrets "${secrets[secrets_file]}" "${gen_new_secrets}"
 log_info "Config initialized"
 
 log_info "Time to edit the following files:"
-log_info "${config[override_config_file_sc]}"
-log_info "${config[override_config_file_wc]}"
+log_info "${config[override_common]}"
+log_info "${config[override_sc]}"
+log_info "${config[override_wc]}"
 log_info "${secrets[secrets_file]}"

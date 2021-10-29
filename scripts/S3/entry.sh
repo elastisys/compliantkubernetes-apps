@@ -2,9 +2,8 @@
 
 set -e
 
-# Wrapper for manager.sh, reads config from ${CK8S_CONFIG_PATH}/{sc,wc}-config.yaml
-# and ${CK8S_CONFIG_PATH}/defaults/{sc,wc}-config.yaml, then creates the S3 buckets
-# specified in 'objectStorage.buckets.*'.
+# Wrapper for manager.sh, reads the 'objectStorage' block from the configs, then
+# creates the S3 buckets specified in 'objectStorage.buckets.*'.
 
 : "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
 CK8S_AUTO_APPROVE=${CK8S_AUTO_APPROVE:-"false"}
@@ -19,16 +18,16 @@ log_error() {
     echo -e "[\e[31mck8s\e[0m] ${*}" 1>&2
 }
 
-sc_config_default="${CK8S_CONFIG_PATH}/defaults/sc-config.yaml"
-sc_config_override="${CK8S_CONFIG_PATH}/sc-config.yaml"
-sc_config="yq merge ${sc_config_default} ${sc_config_override} --overwrite --arrays overwrite"
+common_default=$(yq r "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" -j 'objectStorage')
 
-wc_config_default="${CK8S_CONFIG_PATH}/defaults/wc-config.yaml"
-wc_config_override="${CK8S_CONFIG_PATH}/wc-config.yaml"
-wc_config="yq merge ${wc_config_default} ${wc_config_override} --overwrite --arrays overwrite"
+sc_default=$(echo "${common_default}" | yq m -x - <(yq r "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml" -j 'objectStorage'))
+sc_config=$(echo "${sc_default}" | yq m -x  - <(yq r "${CK8S_CONFIG_PATH}/common-config.yaml" -j 'objectStorage') <(yq r "${CK8S_CONFIG_PATH}/sc-config.yaml" -j 'objectStorage') | yq p - 'objectStorage')
 
-objectstorage_type_sc=$(yq r <(${sc_config}) 'objectStorage.type')
-objectstorage_type_wc=$(yq r <(${wc_config}) 'objectStorage.type')
+wc_default=$(echo "${common_default}" | yq m -x - <(yq r "${CK8S_CONFIG_PATH}/defaults/wc-config.yaml" -j 'objectStorage'))
+wc_config=$(echo "${wc_default}" | yq m -x - <(yq r "${CK8S_CONFIG_PATH}/common-config.yaml" -j 'objectStorage') <(yq r "${CK8S_CONFIG_PATH}/wc-config.yaml" -j 'objectStorage') | yq p - 'objectStorage')
+
+objectstorage_type_sc=$(echo "${sc_config}" | yq r - 'objectStorage.type')
+objectstorage_type_wc=$(echo "${wc_config}" | yq r - 'objectStorage.type')
 
 [ "$objectstorage_type_sc" != "s3" ] && log_info "S3 is not enabled in service cluster"
 [ "$objectstorage_type_wc" != "s3" ] && log_info "S3 is not enabled in workload cluster"
@@ -38,8 +37,8 @@ if [ "$objectstorage_type_sc" != "s3" ] && [ "$objectstorage_type_wc" != "s3" ];
     exit 1
 fi
 
-[ "$objectstorage_type_sc" = "s3" ] && buckets_sc=$(yq r <(${sc_config}) 'objectStorage.buckets.*')
-[ "$objectstorage_type_wc" = "s3" ] && buckets_wc=$(yq r <(${wc_config}) 'objectStorage.buckets.*')
+[ "$objectstorage_type_sc" = "s3" ] && buckets_sc=$(echo "${sc_config}" | yq r - 'objectStorage.buckets.*')
+[ "$objectstorage_type_wc" = "s3" ] && buckets_wc=$(echo "${wc_config}" | yq r - 'objectStorage.buckets.*')
 
 buckets=$( { echo "$buckets_sc"; echo "$buckets_wc"; } | sort | uniq | tr '\n' ' ' | sed s'/.$//')
 
