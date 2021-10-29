@@ -452,8 +452,8 @@ certmanager:
       cpu: 25m
       memory: 100Mi
     limits:
-      cpu: 50m
-      memory: 200Mi
+      cpu: 250m
+      memory: 250Mi
   nodeSelector: {}
   tolerations: {}
   affinity: {}
@@ -469,8 +469,8 @@ certmanager:
         cpu: 25m
         memory: 25Mi
       limits:
-        cpu: 50m
-        memory: 50Mi
+        cpu: 250m
+        memory: 250Mi
     nodeSelector: {}
     tolerations: {}
     affinity: {}
@@ -481,8 +481,8 @@ certmanager:
         cpu: 15m
         memory: 100Mi
       limits:
-        cpu: 50m
-        memory: 200Mi
+        cpu: 250m
+        memory: 250Mi
     nodeSelector: {}
     tolerations: {}
     affinity: {}
