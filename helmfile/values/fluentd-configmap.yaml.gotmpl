@@ -158,6 +158,8 @@ forwarder:
         pos_file_compaction_interval 72h
         tag kubeaudit.*
         read_from_head true
+        skip_refresh_on_startup true
+        enable_watch_timer false
         <parse>
           @type multi_format
           <pattern>
@@ -185,6 +187,8 @@ forwarder:
         pos_file_compaction_interval 72h
         tag raw.kubernetes.*
         read_from_head true
+        skip_refresh_on_startup true
+        enable_watch_timer false
         <parse>
           @type multi_format
           <pattern>

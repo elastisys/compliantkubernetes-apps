@@ -98,6 +98,8 @@ extraConfigMaps:
       pos_file_compaction_interval 72h
       tag kubeaudit.*
       read_from_head true
+      skip_refresh_on_startup true
+      enable_watch_timer false
       <parse>
         @type multi_format
         <pattern>
@@ -122,6 +124,8 @@ extraConfigMaps:
       pos_file /var/log/auth.pos
       pos_file_compaction_interval 72h
       tag authlog.*
+      skip_refresh_on_startup true
+      enable_watch_timer false
       <parse>
         @type regexp
         expression /^(?<time>[^ ]* {1,2}[^ ]* [^ ]*) (?<host>[^ ]*) (?<ident>[a-zA-Z0-9_\/\.\-]*)(?:\[(?<pid>[0-9]+)\])?(?:[^\:]*\:)? *(?<message>.*)$/
@@ -140,6 +144,8 @@ extraConfigMaps:
       pos_file_compaction_interval 72h
       tag raw.kubernetes.*
       read_from_head true
+      skip_refresh_on_startup true
+      enable_watch_timer false
       <parse>
         @type multi_format
         <pattern>
