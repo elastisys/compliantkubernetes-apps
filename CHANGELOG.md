@@ -72,6 +72,7 @@
 - Default user alertmanager namespace changed from monitoring to alertmanager.
 - Reworked configuration handling to keep a read-only default with specifics for the environment and a seperate editable override config for main configuration.
 - Integrated secrets generation script into `ck8s init` which will by default generate password and hashes when creating a new `secrets.yaml`, and can be forced to generate new ones with the flag `--generate-new-secrets`.
+- Increased metricsserver resource limits.
 
 ### Fixed
 

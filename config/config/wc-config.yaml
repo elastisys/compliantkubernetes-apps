@@ -423,7 +423,6 @@ velero:
 
 ## Configuration for cert-manager issuers.
 issuers:
-
   ## Deploy let's encrypt ACME issuers
   ## "letsencrypt-prod" and "letsencrypt-staging".
   letsencrypt:
@@ -496,8 +495,8 @@ metricsServer:
       cpu: 10m
       memory: 25Mi
     limits:
-      cpu: 20m
-      memory: 50Mi
+      cpu: 100m
+      memory: 100Mi
 
 calicoAccountant:
   enabled: true
