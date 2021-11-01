@@ -232,6 +232,8 @@ prometheus:
         limits:
           cpu: 10m
           memory: 100Mi
+  ## the percentage of use the resources are set to hit in 3 days
+  predictLinearLimit: 66
 
 dex:
   subdomain: dex

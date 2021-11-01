@@ -18,6 +18,8 @@ defaultRules:
     certMonitor: false
     rookMonitor: false
 
+predictLinearLimit: {{ .Values.prometheus.predictLinearLimit }}
+
 rookMonitor:
   # The monitor sits in WC, no need to add it here in SC.
   enabled: false
