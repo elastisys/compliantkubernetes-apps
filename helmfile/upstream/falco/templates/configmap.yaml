@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ template "falco.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     app: {{ template "falco.fullname" . }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
@@ -32,7 +33,7 @@ data:
     time_format_iso_8601: {{ .Values.falco.timeFormatISO8601 }}
 
     # Whether to output events in json or text
-    {{- if (or .Values.integrations.gcscc.enabled .Values.integrations.natsOutput.enabled .Values.integrations.snsOutput.enabled .Values.integrations.pubsubOutput.enabled) }}
+    {{- if .Values.falcosidekick.enabled }}
     json_output: true
     {{- else }}
     json_output: {{ .Values.falco.jsonOutput }}
@@ -42,11 +43,17 @@ data:
     # itself (e.g. "File below a known binary directory opened for writing
     # (user=root ....") in the json output.
 
-    {{- if (or .Values.integrations.natsOutput.enabled .Values.integrations.snsOutput.enabled .Values.integrations.pubsubOutput.enabled) }}
+    {{- if .Values.falcosidekick.enabled }}
     json_include_output_property: true
     {{- else }}
     json_include_output_property: {{ .Values.falco.jsonIncludeOutputProperty }}
     {{- end }}
+
+    # When using json output, whether or not to include the "tags" property
+    # itself in the json output. If set to true, outputs caused by rules
+    # with no tags will have a "tags" field set to an empty array. If set to
+    # false, the "tags" field will not be included in the json output at all.
+    json_include_tags_property: {{ .Values.falco.jsonIncludeTagsProperty }}
 
     # Send information logs to stderr and/or syslog Note these are *not* security
     # notification logs! These are just Falco lifecycle (and possibly error) logs.
@@ -89,6 +96,23 @@ data:
       rate: {{ .Values.falco.syscallEventDrops.rate  }}
       max_burst: {{ .Values.falco.syscallEventDrops.maxBurst }}
 
+    # Falco continuously monitors outputs performance. When an output channel does not allow
+    # to deliver an alert within a given deadline, an error is reported indicating
+    # which output is blocking notifications.
+    # The timeout error will be reported to the log according to the above log_* settings.
+    # Note that the notification will not be discarded from the output queue; thus,
+    # output channels may indefinitely remain blocked.
+    # An output timeout error indeed indicate a misconfiguration issue or I/O problems
+    # that cannot be recovered by Falco and should be fixed by the user.
+    #
+    # The "output_timeout" value specifies the duration in milliseconds to wait before
+    # considering the deadline exceed.
+    #
+    # With a 2000ms default, the notification consumer can block the Falco output
+    # for up to 2 seconds without reaching the timeout.
+
+    output_timeout: {{ .Values.falco.output_timeout }}
+
     # A throttling mechanism implemented as a token bucket limits the
     # rate of falco notifications. This throttling is controlled by the following configuration
     # options:
@@ -118,17 +142,10 @@ data:
     # Also, the file will be closed and reopened if falco is signaled with
     # SIGUSR1.
 
-    {{- if (or .Values.integrations.natsOutput.enabled .Values.integrations.snsOutput.enabled .Values.integrations.pubsubOutput.enabled) }}
-    file_output:
-      enabled: true
-      keep_alive: true
-      filename: /tmp/shared-pipe/nats
-    {{- else }}
     file_output:
       enabled: {{ .Values.falco.fileOutput.enabled }}
       keep_alive: {{ .Values.falco.fileOutput.keepAlive }}
       filename: {{ .Values.falco.fileOutput.filename }}
-    {{- end }}
 
     stdout_output:
       enabled: {{ .Values.falco.stdoutOutput.enabled }}
@@ -148,8 +165,9 @@ data:
       enabled: {{ .Values.falco.webserver.enabled }}
       listen_port: {{ .Values.falco.webserver.listenPort }}
       k8s_audit_endpoint: {{ .Values.falco.webserver.k8sAuditEndpoint }}
-      ssl_enabled: false
-      ssl_certificate: /etc/falco/falco.pem
+      k8s_healthz_endpoint: {{ .Values.falco.webserver.k8sHealthzEndpoint }}
+      ssl_enabled: {{ .Values.falco.webserver.sslEnabled }}
+      ssl_certificate: {{ .Values.falco.webserver.sslCertificate }}
 
     # Possible additional things you might want to do with program output:
     #   - send to a slack webhook:
@@ -166,22 +184,15 @@ data:
     #
     # Also, the program will be closed and reopened if falco is signaled with
     # SIGUSR1.
-    {{- if .Values.integrations.gcscc.enabled }}
-    program_output:
-      enabled: true
-      keep_alive: false
-      program: "curl -d @- -X POST --header 'Content-Type: application/json' --header 'Authorization: {{ .Values.integrations.gcscc.webhookAuthenticationToken }}' {{ .Values.integrations.gcscc.webhookUrl }}"
-    {{- else }}
     program_output:
       enabled: {{ .Values.falco.programOutput.enabled }}
       keep_alive: {{ .Values.falco.programOutput.keepAlive }}
       program: |
 {{ .Values.falco.programOutput.program | indent 8 }}
-    {{- end }}
 
     http_output:
-      enabled: {{ .Values.falco.httpOutput.enabled }}
-      url: {{ .Values.falco.httpOutput.url }}
+      enabled: {{ if .Values.falcosidekick.enabled }}true{{ else }}{{ .Values.falco.httpOutput.enabled }}{{ end }}
+      url: {{ if .Values.falcosidekick.enabled }}http://{{ template "falco.fullname" . }}-falcosidekick{{ if .Values.falcosidekick.fullfqdn }}.{{ .Release.Namespace }}.svc.cluster.local{{ end }}:{{ .Values.falcosidekick.listenport | default "2801" }}{{ else }}{{ .Values.falco.httpOutput.url }}{{ end }}
 
     grpc:
       enabled: {{ .Values.falco.grpc.enabled }}
@@ -197,9 +208,11 @@ data:
 
     grpc_output:
       enabled: {{ .Values.falco.grpcOutput.enabled }}
-
-  {{- if .Values.integrations.snsOutput.enabled }}
-  aws_default_region: {{ .Values.integrations.snsOutput.aws_default_region }}
-  {{- end }}
+    
+    # Container orchestrator metadata fetching params
+    metadata_download:
+      max_mb: {{ .Values.falco.metadataDownload.maxMb }}
+      chunk_wait_us: {{ .Values.falco.metadataDownload.chunkWaitUs }}
+      watch_freq_sec: {{ .Values.falco.metadataDownload.watchFreqSec }}
 
 {{ (.Files.Glob "rules/*").AsConfig | indent 2 }}

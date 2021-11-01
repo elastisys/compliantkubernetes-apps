@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: {{ template "falco.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     app: {{ template "falco.fullname" . }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
@@ -21,6 +22,9 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         checksum/rules: {{ include (print $.Template.BasePath "/configmap-rules.yaml") . | sha256sum }}
+        {{- if and .Values.certs (not .Values.certs.existingSecret) }}
+        checksum/certs: {{ include (print $.Template.BasePath "/secret-certs.yaml") . | sha256sum }}
+        {{- end }}
         {{- if .Values.daemonset.podAnnotations }}
 {{ toYaml .Values.daemonset.podAnnotations | indent 8 }}
         {{- end }}
@@ -60,18 +64,27 @@ spec:
             - --cri
             - /run/containerd/containerd.sock
             {{- end }}
+            {{- if .Values.kubernetesSupport.enabled }}
             - -K
-            - /var/run/secrets/kubernetes.io/serviceaccount/token
+            - {{ .Values.kubernetesSupport.apiAuth }}
             - -k
-            - "https://$(KUBERNETES_SERVICE_HOST)"
+            - {{ .Values.kubernetesSupport.apiUrl }}
+            {{- if .Values.kubernetesSupport.enableNodeFilter }}
+            - --k8s-node="${FALCO_K8S_NODE_NAME}"
+            {{- end }}
+            {{- end }}
             - -pk
         {{- if .Values.extraArgs }}
 {{ toYaml .Values.extraArgs | indent 12 }}
         {{- end }}
           env:
+            - name: FALCO_K8S_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
           {{- if .Values.ebpf.enabled }}
             - name: FALCO_BPF_PROBE
-              value:
+              value: {{ .Values.ebpf.path }}
           {{- end }}
           {{- if .Values.proxy.httpProxy }}
             - name: http_proxy
@@ -92,6 +105,28 @@ spec:
           {{- range $key, $value := .Values.daemonset.env }}
             - name: "{{ $key }}"
               value: "{{ $value }}"
+          {{- end }}
+          {{- if .Values.falco.webserver.enabled }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.falco.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.falco.livenessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.falco.livenessProbe.periodSeconds }}
+            httpGet:
+              path: {{ .Values.falco.webserver.k8sHealthzEndpoint }}
+              port: {{ .Values.falco.webserver.listenPort }}
+              {{- if .Values.falco.webserver.sslEnabled }}
+              scheme: HTTPS
+              {{- end }}
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.falco.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.falco.readinessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.falco.readinessProbe.periodSeconds }}
+            httpGet:
+              path: {{ .Values.falco.webserver.k8sHealthzEndpoint }}
+              port: {{ .Values.falco.webserver.listenPort }}
+              {{- if .Values.falco.webserver.sslEnabled }}
+              scheme: HTTPS
+              {{- end }}
           {{- end }}
           volumeMounts:
             {{- if .Values.docker.enabled }}
@@ -116,8 +151,6 @@ spec:
             - mountPath: /host/usr
               name: usr-fs
               readOnly: true
-            - mountPath: /dev/shm
-              name: dshm
             - mountPath: /host/etc
               name: etc-fs
               readOnly: true
@@ -127,94 +160,23 @@ spec:
             - mountPath: /etc/falco/rules.d
               name: rules-volume
             {{- end }}
-            {{- if (or .Values.integrations.natsOutput.enabled .Values.integrations.snsOutput.enabled .Values.integrations.pubsubOutput.enabled) }}
-            - mountPath: /tmp/shared-pipe/
-              name: shared-pipe
-              readOnly: false
-            {{- end }}
-            {{- if .Values.falco.grpc.enabled }}
-            {{- if .Values.falco.grpc.unixSocketPath }}
+            {{- if and .Values.falco.grpc.enabled .Values.falco.grpc.unixSocketPath }}
             - mountPath: {{ include "falco.unixSocketDir" . }}
               name: grpc-socket-dir
-            {{- else }}
+            {{- end }}
+            {{- if or .Values.falco.webserver.sslEnabled (and .Values.falco.grpc.enabled (not .Values.falco.grpc.unixSocketPath)) }}
             - mountPath: /etc/falco/certs
               name: certs-volume
               readOnly: true
             {{- end }}
+            {{- if .Values.extraVolumeMounts }}
+{{ toYaml .Values.extraVolumeMounts | indent 12 }}
             {{- end }}
-      {{- if .Values.integrations.natsOutput.enabled }}
-        - name: {{ .Chart.Name }}-nats
-          image: sysdig/falco-nats:latest
-          imagePullPolicy: Always
-          args: [ "/bin/falco-nats", "-s", {{ .Values.integrations.natsOutput.natsUrl | quote }}, "-f", "/tmp/shared-pipe/nats"]
-          volumeMounts:
-            - mountPath: /tmp/shared-pipe/
-              name: shared-pipe
-      {{- end }}
-      {{- if .Values.integrations.snsOutput.enabled }}
-        - name: {{ .Chart.Name }}-sns
-          image: sysdig/falco-sns:latest
-          imagePullPolicy: Always
-          args: [ "/bin/falco-sns", "-t", {{ .Values.integrations.snsOutput.topic | quote }}, "-f", "/tmp/shared-pipe/nats"]
-          volumeMounts:
-            - mountPath: /tmp/shared-pipe/
-              name: shared-pipe
-          env:
-            - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: {{ template "falco.fullname" . }}
-                  key: aws_access_key_id
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ template "falco.fullname" . }}
-                  key: aws_secret_access_key
-            - name: AWS_DEFAULT_REGION
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ template "falco.fullname" . }}
-                  key: aws_default_region
-      {{- end }}
-      {{- if .Values.integrations.pubsubOutput.enabled }}
-        - name: {{ .Chart.Name }}-pubsub
-          image: sysdiglabs/falco-pubsub:latest
-          imagePullPolicy: Always
-          args: [ "/bin/falco-pubsub", "-t", {{ .Values.integrations.pubsubOutput.topic | quote }}, "-f", "/tmp/shared-pipe/nats"]
-          volumeMounts:
-            - mountPath: /tmp/shared-pipe/
-              name: shared-pipe
-          env:
-            - name: GOOGLE_PROJECT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: {{ template "falco.fullname" . }}
-                  key: gcp-project-id
-            - name: GOOGLE_CREDENTIALS_DATA
-              valueFrom:
-                secretKeyRef:
-                  name: {{ template "falco.fullname" . }}
-                  key: gcp-credentials-data
-      {{- end }}
-      {{- if (or .Values.integrations.natsOutput.enabled .Values.integrations.snsOutput.enabled .Values.integrations.pubsubOutput.enabled .Values.extraInitContainers) }}
+      {{- if .Values.extraInitContainers }}
       initContainers:
-          {{- if .Values.extraInitContainers }}
 {{ toYaml .Values.extraInitContainers | indent 12 }}
-          {{- end }}
-          {{- if (or .Values.integrations.natsOutput.enabled .Values.integrations.snsOutput.enabled .Values.integrations.pubsubOutput.enabled) }}
-          - name: init-pipe
-            image: busybox
-            command: ['mkfifo','/tmp/shared-pipe/nats']
-            volumeMounts:
-            - mountPath: /tmp/shared-pipe/
-              name: shared-pipe
-              readOnly: false
-          {{- end }}
       {{- end }}
       volumes:
-        - name: dshm
-          emptyDir:
-            medium: Memory
         {{- if .Values.docker.enabled }}
         - name: docker-socket
           hostPath:
@@ -264,27 +226,22 @@ spec:
           configMap:
             name: {{ template "falco.fullname" . }}-rules
         {{- end }}
-        {{- if (or .Values.integrations.natsOutput.enabled .Values.integrations.snsOutput.enabled .Values.integrations.pubsubOutput.enabled) }}
-        - name: shared-pipe
-          emptyDir: {}
-        {{- end }}
-        {{- if .Values.falco.grpc.enabled }}
-        {{- if .Values.falco.grpc.unixSocketPath }}
+        {{- if and .Values.falco.grpc.enabled .Values.falco.grpc.unixSocketPath }}
         - name: grpc-socket-dir
           hostPath:
             path: {{ include "falco.unixSocketDir" . }}
-        {{- else }}
+        {{- end }}
+        {{- if or .Values.falco.webserver.sslEnabled (and .Values.falco.grpc.enabled (not .Values.falco.grpc.unixSocketPath)) }}
         - name: certs-volume
           secret:
+            {{- if .Values.certs.existingSecret }}
+            secretName: {{ .Values.certs.existingSecret }}
+            {{- else }}
             secretName: {{ template "falco.fullname" . }}-certs
-            items:
-              - key: server.key
-                path: server.key
-              - key: server.crt
-                path: server.crt
-              - key: ca.crt
-                path: ca.crt
+            {{- end }}
         {{- end }}
+        {{- if .Values.extraVolumes }}
+{{ toYaml .Values.extraVolumes | indent 8 }}
         {{- end }}
   updateStrategy:
 {{ toYaml .Values.daemonset.updateStrategy | indent 4 }}

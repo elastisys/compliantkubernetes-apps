@@ -1,17 +1,9 @@
-image:
-  tag: 0.26.1
-  pullPolicy: IfNotPresent
 falco:
   jsonOutput: true
   syscallEventDrops:
     # Should be removed when fixed. Probably in 1.0.0 https://github.com/falcosecurity/falco/milestone/3
     actions:
       - ignore
-{{ if .Values.falco.alerts.enabled }}
-  programOutput:
-    enabled: true
-    program: "curl -d @- falcosidekick:2801/"
-{{ end }}
   grpc:
     enabled: true
     unixSocketPath: "unix:///var/run/falco/falco.sock"
@@ -20,10 +12,6 @@ falco:
   grpcOutput:
     enabled: true
 
-auditLog:
-  # Need to change api-server arguments if enabled
-  # https://kubernetes.io/docs/tasks/debug-application-cluster/falco/#configure-kubernetes-audit
-  enabled: false
 
 resources: {{- toYaml .Values.falco.resources | nindent 2  }}
 nodeSelector: {{- toYaml .Values.falco.nodeSelector | nindent 2  }}
@@ -76,3 +64,29 @@ customRules:
         docker.io/netdata/netdata, docker.io/google/cadvisor, docker.io/prom/node-exporter,
         amazon/amazon-ecs-agent, quay.io/prometheus/node-exporter
         ]
+
+falcosidekick:
+  enabled: {{ .Values.falco.alerts.enabled }}
+  podSecurityPolicy:
+    create: true
+  config:
+    debug: false
+    {{ if eq .Values.falco.alerts.type "slack" }}
+    slack:
+      webhookurl: {{ .Values.falco.alerts.slackWebhook }}
+      outputformat: "all"
+      footer: ""
+      icon: ""
+      minimumpriority: {{ .Values.falco.alerts.priority }}
+      messageformat: "Falco Alert : rule *{{`{{ .Rule }}`}}*"
+    {{ end }}
+    {{ if eq .Values.falco.alerts.type "alertmanager" }}
+    alertmanager:
+      hostport: {{ .Values.falco.alerts.hostPort }}
+      minimumpriority: {{ .Values.falco.alerts.priority }}
+    {{ end }}
+
+  resources:    {{- toYaml .Values.falco.falcoSidekick.resources | nindent 4  }}
+  nodeSelector: {{- toYaml .Values.falco.falcoSidekick.nodeSelector | nindent 4  }}
+  affinity:     {{- toYaml .Values.falco.falcoSidekick.affinity | nindent 4  }}
+  tolerations:  {{- toYaml .Values.falco.falcoSidekick.tolerations | nindent 4  }}

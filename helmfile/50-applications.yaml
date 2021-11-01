@@ -431,7 +431,7 @@ releases:
   labels:
     app: falco
   chart: ./upstream/falco
-  version: 1.5.2
+  version: 1.16.0
   installed: {{ .Values.falco.enabled }}
   missingFileHandler: Error
   values:
@@ -468,7 +468,7 @@ releases:
     app: falco
   chart: ./charts/falcosidekick
   version: 0.1.14
-  installed: {{ .Values.falco.alerts.enabled }}
+  installed: false
   missingFileHandler: Error
   values:
   - values/falcosidekick.yaml.gotmpl
