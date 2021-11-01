@@ -3,6 +3,183 @@
 This file documents all notable changes to Falco Helm Chart. The release
 numbering uses [semantic versioning](http://semver.org).
 
+## v1.16.0
+
+* Upgrade to Falco 0.30.0 (see the [Falco changelog](https://github.com/falcosecurity/falco/blob/0.30.0/CHANGELOG.md))
+* Update rulesets from Falco 0.30.0
+* Add `kubernetesSupport.enableNodeFilter` configuration to enable node filtering when requesting pods metadata from Kubernetes
+* Add `falco.metadataDownload` configuration for fine-tuning container orchestrator metadata fetching params
+* Add `falco.jsonIncludeTagsProperty` configuration to include tags in the JSON output
+
+## v1.15.7
+
+* Removed `maxSurge` reference from comment in Falco's `values.yaml` file.
+
+## v1.15.6
+
+* Update `Falcosidekick` chart to 0.3.13
+
+## v1.15.4
+
+* Update `Falcosidekick` chart to 0.3.12
+
+## v1.15.3
+
+* Upgrade to Falco 0.29.1 (see the [Falco changelog](https://github.com/falcosecurity/falco/blob/0.29.1/CHANGELOG.md))
+* Update rulesets from Falco 0.29.1
+
+## v1.15.2
+
+* Add ability to use an existing secret of key, cert, ca as well as pem bundle instead of creating it from files
+
+## v1.15.1
+
+* Fixed liveness and readiness probes schema when ssl is enabled
+
+## v1.14.1
+
+* Update `Falcosidekick` chart to 0.3.8
+
+## v1.14.1
+
+* Update image tag to 0.29.0 in values.yaml
+
+## v1.14.0
+
+* Upgrade to Falco 0.29.0 (see the [Falco changelog](https://github.com/falcosecurity/falco/blob/0.29.0/CHANGELOG.md))
+* Update rulesets from Falco 0.29.0
+
+## v1.13.2
+
+* Fixed incorrect spelling of `fullfqdn`
+
+## v1.13.1
+
+* Fix port for readinessProbe and livenessProbe
+
+## v1.13.0
+
+* Add liveness and readiness probes to Falco
+
+## v1.12.0
+
+* Add `kubernetesSupport` configuration to make Kubernetes Falco support optional in the daemonset (enabled by default)
+
+## v1.11.1
+
+* Upgrade to Falco 0.28.1 (see the [Falco changelog](https://github.com/falcosecurity/falco/blob/0.28.1/CHANGELOG.md))
+
+## v1.11.0
+
+* Bump up version of chart for `Falcosidekick` dependency to `v3.5.0`
+
+## v1.10.0
+
+* Add `falcosidekick.fullfqdn` option to connect `falco` to `falcosidekick` with full FQDN
+* Bump up version of chart for `Falcosidekick` dependency
+
+## v1.9.0
+
+* Upgrade to Falco 0.28.0 (see the [Falco changelog](https://github.com/falcosecurity/falco/blob/0.28.0/CHANGELOG.md))
+* Update rulesets from Falco 0.28.0
+
+## v1.8.1
+
+* Bump up version of chart for `Falcosidekick` dependency
+
+## v1.8.0
+
+* Bump up version of chart for `Falcosidekick` dependency
+
+## v1.7.10
+
+* Update rule `Write below monitored dir` description
+
+## v1.7.9
+
+* Add a documentation section about the driver
+
+## v1.7.8
+
+* Increase CPU limit default value
+
+## v1.7.7
+
+* Add a documentation section about using init containers
+
+## v1.7.6
+
+* Correct icon URL
+## v1.7.5
+
+* Update downstream sidekick chart
+
+## v1.7.4
+
+* Add `ebpf.probe.path` configuration option
+
+## v1.7.3
+
+* Bump up version of chart for `Falcosidekick` dependency
+
+## v1.7.2
+
+* Fix `falco` configmap when `Falcosidekick` is enabled, wrong service name was used
+
+## v1.7.1
+
+* Correct image tag for Falco 0.27.0
+
+## v1.7.0
+
+* Upgrade to Falco 0.27.0 (see the [Falco changelog](https://github.com/falcosecurity/falco/blob/0.27.0/CHANGELOG.md))
+* Add `falco.output_timeout` configuration setting
+
+## v1.6.1
+
+### Minor Changes
+
+* Add `falcosidekick` as an optional dependency
+
+## v1.6.0
+
+### Minor Changes
+
+* Remove deprecated integrations (see [#123](https://github.com/falcosecurity/charts/issues/123))
+
+## v1.5.8
+
+### Minor Changes
+
+* Add value `extraVolumes`, allow adding extra volumes to falco daemonset
+* Add value `extraVolumeMounts`, allow adding extra volumeMounts to falco container in falco daemonset
+
+## v1.5.6
+
+### Minor Changes
+
+* Add `falco.webserver.sslEnabled` config, enabling SSL support
+* Add `falco.webserver.nodePort` configuration as an alternative way for exposing the AuditLog webhook (disabled by default)
+
+## v1.5.5
+
+### Minor Changes
+
+* Support release namespace configuration
+
+## v1.5.4
+
+### Minor Changes
+
+* Upgrade to Falco 0.26.2, `DRIVERS_REPO` now defaults to https://download.falco.org/driver (see the [Falco changelog](https://github.com/falcosecurity/falco/blob/0.26.2/CHANGELOG.md))
+
+## v1.5.3
+
+### Minor Changes
+
+* Deprecation notice for gcscc, natsOutput, snsOutput, pubsubOutput integrations
+* Clean up old references from documentation
+
 ## v1.5.2
 
 ### Minor Changes
