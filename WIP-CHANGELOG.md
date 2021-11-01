@@ -22,6 +22,7 @@
 - Added fluentd metrics
 - Enabled automatic compaction (cleanup) of pos_files for fluentd
 - Added and enabled by default an option for Grafana Viewers to temporarily edit dashboards and panels without saving.
+- New Prometheus rules have been added to forewarn against when memory and disk (PVC and host disk) capacity overloads
 
 ### Removed
 

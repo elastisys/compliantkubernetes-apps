@@ -34,6 +34,7 @@ defaultRules:
     kubernetesSystem: true
     kubeScheduler: false
     network: true
+    node: true
     nodeExporter: true
     prometheus: true
     time: true
@@ -43,3 +44,4 @@ defaultRules:
     certMonitor: true
     falcoAlerts: true
     rookMonitor: true
+    predictLinear: true
