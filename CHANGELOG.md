@@ -74,6 +74,7 @@
 - Integrated secrets generation script into `ck8s init` which will by default generate password and hashes when creating a new `secrets.yaml`, and can be forced to generate new ones with the flag `--generate-new-secrets`.
 - Increased metricsserver resource limits.
 - Increased cert-managers resource limits.
+- Increased harbor resource limits.
 
 ### Fixed
 
