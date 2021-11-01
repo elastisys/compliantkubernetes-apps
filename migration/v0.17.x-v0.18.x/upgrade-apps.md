@@ -29,6 +29,8 @@
     bin/ck8s init
     ```
 
+1. If you had requests (but not limits) enabled for harbor, you may have to adjust them in your override config to make sure that they are lower than the new limits.
+
 1. Upgrade applications:
 
     ```bash
@@ -48,7 +50,7 @@
    do
      echo "Removing the hostPort for: $i"
      INDEX=$(bin/ck8s ops kubectl sc get ds -n ingress-nginx ingress-nginx-controller -o json | jq --arg i $i '.spec.template.spec.containers[].ports | map(.hostPort == '$i') | index(true)')
-     bin/ck8s ops kubectl sc patch ds -n ingress-nginx ingress-nginx-controller --type='json' -p="[{'op': 'remove', 'path': '/spec/template/spec/containers/0/ports/$INDEX/hostPort'}]"
+     bin/ck8s ops kubectl sc patch ds -n ingress-nginx ingress-nginx-controller --type='json' -p="\"[{'op': 'remove', 'path': '/spec/template/spec/containers/0/ports/$INDEX/hostPort'}]\""
    done < ports.txt
    ```
 
