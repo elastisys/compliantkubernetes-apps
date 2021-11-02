@@ -107,16 +107,16 @@ harbor:
         cpu: 2m
         memory: 25Mi
       limits:
-        cpu: 100m
-        memory: 100Mi
+        cpu: 250m
+        memory: 250Mi
   core:
     resources:
       requests:
         cpu: 5m
         memory: 50Mi
       limits:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 250m
+        memory: 500Mi
   database:
     persistentVolumeClaim:
       size: 1Gi
@@ -132,8 +132,8 @@ harbor:
         cpu: 2m
         memory: 25Mi
       limits:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 250m
+        memory: 250Mi
   registry:
     persistentVolumeClaim:
       size: 5Gi
@@ -142,16 +142,16 @@ harbor:
         cpu: 2m
         memory: 25Mi
       limits:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 250m
+        memory: 250Mi
     controller:
       resources:
         requests:
           cpu: 2m
           memory: 20Mi
         limits:
-          cpu: 100m
-          memory: 200Mi
+          cpu: 250m
+          memory: 250Mi
   redis:
     persistentVolumeClaim:
       size: 1Gi
@@ -166,7 +166,7 @@ harbor:
         cpu: 2m
         memory: 15Mi
       limits:
-        cpu: 100m
+        cpu: 250m
         memory: 250Mi
   notarySigner:
     resources:
@@ -174,7 +174,7 @@ harbor:
         cpu: 2m
         memory: 10Mi
       limits:
-        cpu: 100m
+        cpu: 250m
         memory: 250Mi
   portal:
     resources:
@@ -182,8 +182,8 @@ harbor:
         cpu: 2m
         memory: 5Mi
       limits:
-        cpu: 100m
-        memory: 100Mi
+        cpu: 250m
+        memory: 250Mi
   trivy:
     persistentVolumeClaim:
       size: 5Gi
@@ -192,7 +192,7 @@ harbor:
         cpu: 10m
         memory: 263Mi
       limits:
-        cpu: 100m
+        cpu: 250m
         memory: 512Mi
   persistence:
     # Valid options are "filesystem" (persistent volume), "swift", or "objectStorage" (matching global config)
