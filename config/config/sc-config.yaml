@@ -104,16 +104,16 @@ harbor:
       size: 5Gi
     resources:
       requests:
-        cpu: 2m
-        memory: 25Mi
+        cpu: 125m
+        memory: 125Mi
       limits:
         cpu: 250m
         memory: 250Mi
   core:
     resources:
       requests:
-        cpu: 5m
-        memory: 50Mi
+        cpu: 125m
+        memory: 250Mi
       limits:
         cpu: 250m
         memory: 500Mi
@@ -129,8 +129,8 @@ harbor:
       size: 1Gi
     resources:
       requests:
-        cpu: 2m
-        memory: 25Mi
+        cpu: 125m
+        memory: 125Mi
       limits:
         cpu: 250m
         memory: 250Mi
@@ -139,16 +139,16 @@ harbor:
       size: 5Gi
     resources:
       requests:
-        cpu: 2m
-        memory: 25Mi
+        cpu: 125m
+        memory: 125Mi
       limits:
         cpu: 250m
         memory: 250Mi
     controller:
       resources:
         requests:
-          cpu: 2m
-          memory: 20Mi
+          cpu: 125m
+          memory: 125Mi
         limits:
           cpu: 250m
           memory: 250Mi
@@ -163,24 +163,24 @@ harbor:
     subdomain: notary.harbor
     resources:
       requests:
-        cpu: 2m
-        memory: 15Mi
+        cpu: 125m
+        memory: 125Mi
       limits:
         cpu: 250m
         memory: 250Mi
   notarySigner:
     resources:
       requests:
-        cpu: 2m
-        memory: 10Mi
+        cpu: 125m
+        memory: 125Mi
       limits:
         cpu: 250m
         memory: 250Mi
   portal:
     resources:
       requests:
-        cpu: 2m
-        memory: 5Mi
+        cpu: 125m
+        memory: 125Mi
       limits:
         cpu: 250m
         memory: 250Mi
@@ -189,7 +189,7 @@ harbor:
       size: 5Gi
     resources:
       requests:
-        cpu: 10m
+        cpu: 125m
         memory: 263Mi
       limits:
         cpu: 250m
