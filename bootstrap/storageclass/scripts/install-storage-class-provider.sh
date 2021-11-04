@@ -5,9 +5,6 @@ install_storage_class_provider() {
     case "${1}" in
     "nfs-client")
         echo "Install nfs-subdir-external-provisioner" >&2
-        # TODO Remove this when we removed this chart from the helmfile
-        helmfile -f "${storageclass_path}/helmfile/helmfile.yaml" \
-            -e "${2}" -l app=nfs-client-provisioner apply --suppress-diff
         helmfile -f "${storageclass_path}/helmfile/helmfile.yaml" \
             -e "${2}" -l app=nfs-subdir-external-provisioner apply --suppress-diff
     ;;

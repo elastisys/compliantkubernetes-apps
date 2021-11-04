@@ -20,16 +20,6 @@ environments:
 # The desired state of Helm releases.
 releases:
 
-# Common PSP RBACs
-- name: common-psp-rbac
-  namespace: kube-system
-  labels:
-    app: common-psp-rbac
-  chart: ./charts/common-psp-rbac
-  installed: false
-  version: 0.1.0
-  missingFileHandler: Error
-
 # Service cluster releases
 {{ if eq .Environment.Name "service_cluster" }}
 
@@ -48,17 +38,5 @@ releases:
 
 # Workload cluster releases
 {{ if eq .Environment.Name "workload_cluster"  }}
-
-# Workload cluster PSP RBACs
-- name: workload-cluster-psp-rbac
-  namespace: kube-system
-  labels:
-    app: workload-cluster-psp-rbac
-  chart: ./charts/workload-cluster-psp-rbac
-  version: 0.1.0
-  installed: false
-  missingFileHandler: Error
-  values:
-  - values/workload-cluster-psp-rbac.yaml.gotmpl
 
 {{ end }}
