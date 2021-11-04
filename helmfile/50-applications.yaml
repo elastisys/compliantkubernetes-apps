@@ -495,19 +495,6 @@ releases:
   values:
   - values/fluentd-user.yaml.gotmpl
 
-# gatekeeper-operator
-- name: gatekeeper-operator
-  namespace: gatekeeper-system
-  labels:
-    app: gatekeeper-operator
-  chart: ./charts/gatekeeper-operator
-  version: 1.6.0
-  installed: false
-  missingFileHandler: Error
-  wait: true
-  values:
-  - values/gatekeeper-operator.yaml.gotmpl
-
 # gatekeeper-metrics
 - name: gatekeeper-metrics
   namespace: gatekeeper-system
