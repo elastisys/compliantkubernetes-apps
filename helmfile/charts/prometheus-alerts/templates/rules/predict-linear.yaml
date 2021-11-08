@@ -17,6 +17,22 @@ spec:
   groups:
   - name: predict-linear
     rules:
+    - alert: NodeFilesystemSpaceFillingUp
+      annotations:
+        description: Filesystem on {{`{{`}} $labels.device {{`}}`}} at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available space left and is filling up.
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-nodefilesystemspacefillingup
+        summary: Filesystem is predicted to run out of space within the next 3 days.
+      expr: |-
+        (
+          (node_filesystem_avail_bytes{job="node-exporter",fstype!=""} / node_filesystem_size_bytes{job="node-exporter",fstype!=""} * 100) < (100-{{ .Values.predictLinearLimit }})
+        and
+          predict_linear(node_filesystem_avail_bytes{job="node-exporter",fstype!=""}[6h], 3*24*60*60) <= (node_filesystem_size_bytes*(1-{{ .Values.predictLinearLimit }}/100))
+        and
+          node_filesystem_readonly{job="node-exporter",fstype!=""} == 0
+        )
+      for: 1h
+      labels:
+        severity: warning
     - alert: PersistentVolume{{.Values.predictLinearLimit}}ProcentInThreeDays
       annotations:
         message: The PersistentVolume claimed by {{`{{ $labels.persistentvolumeclaim }}`}} in Namespace {{`{{ $labels.namespace }}`}} is full in three days.

@@ -1,3 +1,12 @@
+defaultRules:
+  create: true
+  rules:
+    # disabled rules from kube-prometheus-stack, but installed using charts/prometheus-alerts
+    alertmanager: false
+    # disabled rules from kube-prometheus-stack and not installed using another chart
+    etcd: false
+    kubeScheduler: false
+
 global:
   rbac:
     pspEnabled: true
@@ -31,15 +40,12 @@ kubeApiServer:
     metricRelabelings:
       - action: keep
         sourceLabels: [__name__]
-        regex: '(apiserver_request_count|apiserver_request_latencies_bucket|apiserver_client_certificate_expiration_seconds_count|apiserver_request_duration_seconds_sum|apiserver_request_duration_seconds_count|APIServiceRegistrationController_depth)'
+        regex: '(apiserver_request_duration_seconds_bucket|process_cpu_seconds_total|process_resident_memory_bytes|go_goroutines|workqueue_queue_duration_seconds_bucket|workqueue_adds_total|workqueue_depth|apiserver_request_total|apiserver_request_count|apiserver_request_latencies_bucket|apiserver_client_certificate_expiration_seconds_count|apiserver_request_duration_seconds_sum|apiserver_request_duration_seconds_count|apiserver_request_duration_seconds_bucket|APIServiceRegistrationController_depth)'
 
 kubeEtcd:
   service:
     port: 4001
     targetPort: 4001
-
-defaultRules:
-  create: false
 
 prometheus:
   ingress:

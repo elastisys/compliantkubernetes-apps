@@ -58,9 +58,10 @@ prometheusSpec:
     matchLabels:
       target: none  # so that operator wont generate new config
   ruleNamespaceSelector: {}
+  # for the wc reader prometheus we want to select only the relevant rules for wc
   ruleSelector:
     matchLabels:
-      cluster: workload
+      workload_cluster: "1"
 
   # Don't add prometheus info.
   prometheusExternalLabelName: ""
