@@ -10,16 +10,11 @@ prometheusNamespace: monitoring
 
 defaultRules:
   labels:
-    cluster: workload
+    workload_cluster: "1"
   rules:
     elasticsearch: false
     alertmanager: {{ .Values.user.alertmanager.enabled }}
     # These are already created for monitoring SC, no need to double them for WC
-    certMonitor: false
-    rookMonitor: false
+    rookMonitor: {{ .Values.monitoring.rook.enabled }}
 
 predictLinearLimit: {{ .Values.prometheus.predictLinearLimit }}
-
-rookMonitor:
-  # The monitor sits in WC, no need to add it here in SC.
-  enabled: false

@@ -2,14 +2,9 @@ esNodeCount: {{ add .Values.elasticsearch.dataNode.count .Values.elasticsearch.c
 
 defaultRules:
   labels:
-    cluster: service
+    service_cluster: "1"
   rules:
+    alertmanager: true
     rookMonitor: {{ .Values.monitoring.rook.enabled }}
 
 predictLinearLimit: {{ .Values.prometheus.predictLinearLimit }}
-
-rookMonitor:
-  enabled: {{ .Values.monitoring.rook.enabled }}
-  relabelings:
-  - targetLabel: cluster
-    replacement: service_cluster

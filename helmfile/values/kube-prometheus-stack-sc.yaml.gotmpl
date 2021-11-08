@@ -1,3 +1,16 @@
+defaultRules:
+  create: true
+  rules:
+    # disabled rules from kube-prometheus-stack, but installed using charts/prometheus-alerts
+    alertmanager: false
+    # disabled rules from kube-prometheus-stack and not installed using another chart
+    etcd: false
+    kubeScheduler: false
+  # we want the chart default rules to be read by both sc cluster prometheus and wc reader prometheus
+  labels:
+    service_cluster: "1"
+    workload_cluster: "1"
+
 global:
   rbac:
     pspEnabled: true
@@ -12,7 +25,7 @@ kubeApiServer:
     metricRelabelings:
       - action: keep
         sourceLabels: [__name__]
-        regex: '(apiserver_request_count|apiserver_request_latencies_bucket|apiserver_client_certificate_expiration_seconds_count|apiserver_request_duration_seconds_sum|apiserver_request_duration_seconds_count|APIServiceRegistrationController_depth)'
+        regex: '(apiserver_request_duration_seconds_bucket|process_cpu_seconds_total|process_resident_memory_bytes|go_goroutines|workqueue_queue_duration_seconds_bucket|workqueue_adds_total|workqueue_depth|apiserver_request_total|apiserver_request_count|apiserver_request_latencies_bucket|apiserver_client_certificate_expiration_seconds_count|apiserver_request_duration_seconds_sum|apiserver_request_duration_seconds_count|apiserver_request_duration_seconds_bucket|APIServiceRegistrationController_depth)'
 
   relabelings:
   - targetLabel: cluster
@@ -256,16 +269,12 @@ prometheusOperator:
     - targetLabel: cluster
       replacement: service_cluster
 
-defaultRules:
-  create: false
-
 prometheus:
   prometheusSpec:
     resources: {{- toYaml .Values.prometheus.resources | nindent 8  }}
     nodeSelector: {{- toYaml .Values.prometheus.nodeSelector | nindent 8 }}
     affinity: {{- toYaml .Values.prometheus.affinity | nindent 8 }}
     tolerations: {{- toYaml .Values.prometheus.tolerations | nindent 8 }}
-
 
     remoteRead:
     - url: http://{{ .Values.influxDB.subdomain }}.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u={{ .Values.influxDB.users.admin }}&p={{ .Values.influxDB.users.adminPassword }}
@@ -284,10 +293,10 @@ prometheus:
     # Select all service monitors
     serviceMonitorSelector:
       matchLabels: {}
-
+    # for the sc prometheus we want to select only the relevant rules for sc
     ruleSelector:
       matchLabels:
-        cluster: service
+        service_cluster: "1"
 
     ## How long to retain metrics
     ##
@@ -360,6 +369,12 @@ kubeStateMetrics:
       replacement: service_cluster
 
 coreDns:
+  serviceMonitor:
+    relabelings:
+    - targetLabel: cluster
+      replacement: service_cluster
+
+kubeProxy:
   serviceMonitor:
     relabelings:
     - targetLabel: cluster

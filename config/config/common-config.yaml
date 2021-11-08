@@ -341,11 +341,11 @@ clusterAdmin:
 starboard:
   resources:
     requests:
-      cpu: 5m
-      memory: 50Mi
-    limits:
       cpu: 10m
       memory: 128Mi
+    limits:
+      cpu: 20m
+      memory: 172Mi
   tolerations: []
   affinity: {}
 

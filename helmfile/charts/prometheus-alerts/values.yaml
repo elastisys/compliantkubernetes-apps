@@ -1,7 +1,7 @@
 # Default values for alerts.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-esNodeCount: 4
+esNodeCount: 3
 alertmanagerJob: kube-prometheus-stack-alertmanager
 alertmanagerNamespace: monitoring
 prometheusJob: kube-prometheus-stack-prometheus
@@ -15,34 +15,9 @@ defaultRules:
   #   key: value
   rules:
     elasticsearch: true
-    alertmanager: true
+    alertmanager: false
     blackbox: true
     certManagerCertificateAlerts: true
-    prometheusOperator: true
-    kubeControllerManager: false
-    kubeApiserverErrorAlerts: true
-    etcd: false
-    general: true
-    k8s: true
-    kubeApiserver: true
-    kubeApiserverError: true
-    kubePrometheusNodeAlerting: true
-    kubePrometheusNodeRecording: true
-    kubernetesAbsent: true
-    kubernetesApps: true
-    kubernetesResources: true
-    kubernetesStorage: true
-    kubernetesSystem: true
-    kubeScheduler: false
-    network: true
-    node: true
-    nodeExporter: true
-    prometheus: true
-    time: true
-    kubeStateMetrics: true
-    kubeletService: false
-    coreDNS: false
-    certMonitor: true
     falcoAlerts: true
     rookMonitor: true
     predictLinear: true

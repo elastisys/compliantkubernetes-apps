@@ -15,7 +15,7 @@ metadata:
 {{ toYaml .Values.defaultRules.annotations | indent 4 }}
 {{- end }}
   name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "prometheus-ceph-rules" | trunc 63 | trimSuffix "-" }}
-  namespace: {{ .Values.rookMonitor.namespace }}
+  namespace: "rook-ceph"
 spec:
   groups:
     # The rules contain templates for prometheus, which breaks helm if trying
