@@ -5,6 +5,7 @@
 # Updated
 
  - updated falco helm chart to version 1.16.0, this upgrades falco to version 0.30.0
+ - cert-manager 1.4.0 upgraded to 1.6.1
 
 ### Changed
 
