@@ -31,7 +31,7 @@ releases:
   labels:
     app: kube-prometheus-stack
   chart: ./upstream/kube-prometheus-stack
-  version: 16.6.1
+  version: 19.2.2
   missingFileHandler: Error
   # https://helm.sh/docs/chart_best_practices/custom_resource_definitions/#some-caveats-and-explanations
   # The --dry-run flag of helm install and helm upgrade is not currently supported for CRDs.

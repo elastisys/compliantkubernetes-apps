@@ -25,6 +25,8 @@
 
 1. If you have custom/manual Prometheus rules installed you will need to update the labels in order form them to be picked by the correct Prometheus instance. e.g. service_cluster: "1" or workload_cluster: "1"
 
+1. Run the migration script: `upgrade_prometheus_operator.sh`
+
 1. Upgrade applications:
 
     ```bash

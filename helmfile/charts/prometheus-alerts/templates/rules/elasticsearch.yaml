@@ -47,6 +47,34 @@ spec:
       annotations:
         description: Elastic Search disk full Warning
         summary: Elastic Search disk full Warning
+    - alert: CuratorFailedToRemoveAuditLogs
+      expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"kubeaudit-(.+)"}))/(1024*1024*1024) > {{ .Values.eskubeAuditSizeGB }}
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        description: Curator failed to remove 'kubeudit' logs. Cumulated size is > {{ .Values.eskubeAuditSizeGB }} GB
+    - alert: CuratorFailedToRemoveContainerLogs
+      expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"kubernetes-(.+)"}))/(1024*1024*1024) > {{ .Values.eskubernetesSizeGB }}
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        description: Curator failed to remove 'kubernetes' logs. Cumulated size is > {{ .Values.eskubernetesSizeGB }} GB
+    - alert: CuratorFailedToRemoveOtherLogs
+      expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"other-(.+)"}))/(1024*1024*1024) > {{ .Values.esotherSizeGB }}
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        description: Curator failed to remove 'other' logs. Cumulated size is > {{ .Values.esotherSizeGB }} GB
+    - alert: CuratorFailedToRemoveAuthLogs
+      expr: (sum(elasticsearch_indices_store_size_bytes_total{index=~"other-(.+)"}))/(1024*1024*1024) > {{ .Values.esauthLogSizeGB }}
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        description: Curator failed to remove 'auth' logs. Cumulated size is > {{ .Values.esauthLogSizeGB }} GB
 
 
 {{- end }}
