@@ -4,6 +4,7 @@
 schedulerName: "{{ .Values.schedulerName }}"
 {{- end }}
 serviceAccountName: {{ template "grafana.serviceAccountName" . }}
+automountServiceAccountToken: {{ .Values.serviceAccount.autoMount }}
 {{- if .Values.securityContext }}
 securityContext:
 {{ toYaml .Values.securityContext | indent 2 }}
@@ -48,7 +49,7 @@ initContainers:
     {{- end }}
     imagePullPolicy: {{ .Values.downloadDashboardsImage.pullPolicy }}
     command: ["/bin/sh"]
-    args: [ "-c", "mkdir -p /var/lib/grafana/dashboards/default && /bin/sh /etc/grafana/download_dashboards.sh" ]
+    args: [ "-c", "mkdir -p /var/lib/grafana/dashboards/default && /bin/sh -x /etc/grafana/download_dashboards.sh" ]
     resources:
 {{ toYaml .Values.downloadDashboards.resources | indent 6 }}
     env:
@@ -103,7 +104,7 @@ initContainers:
       {{- end }}
       {{- if .Values.sidecar.datasources.searchNamespace }}
       - name: NAMESPACE
-        value: "{{ .Values.sidecar.datasources.searchNamespace }}"
+        value: "{{ .Values.sidecar.datasources.searchNamespace | join "," }}"
       {{- end }}
       {{- if .Values.sidecar.skipTlsVerify }}
       - name: SKIP_TLS_VERIFY
@@ -138,7 +139,7 @@ initContainers:
       {{- end }}
       {{- if .Values.sidecar.notifiers.searchNamespace }}
       - name: NAMESPACE
-        value: "{{ .Values.sidecar.notifiers.searchNamespace }}"
+        value: "{{ .Values.sidecar.notifiers.searchNamespace | join "," }}"
       {{- end }}
       {{- if .Values.sidecar.skipTlsVerify }}
       - name: SKIP_TLS_VERIFY
@@ -159,6 +160,7 @@ imagePullSecrets:
   - name: {{ . }}
 {{- end}}
 {{- end }}
+enableServiceLinks: {{ .Values.enableServiceLinks }}
 containers:
 {{- if .Values.sidecar.dashboards.enabled }}
   - name: {{ template "grafana.name" . }}-sc-dashboard
@@ -187,7 +189,7 @@ containers:
       {{- end }}
       {{- if .Values.sidecar.dashboards.searchNamespace }}
       - name: NAMESPACE
-        value: "{{ .Values.sidecar.dashboards.searchNamespace }}"
+        value: "{{ .Values.sidecar.dashboards.searchNamespace | join "," }}"
       {{- end }}
       {{- if .Values.sidecar.skipTlsVerify }}
       - name: SKIP_TLS_VERIFY
@@ -258,19 +260,25 @@ containers:
 {{- end }}
 {{- end }}
 {{- if .Values.datasources }}
+{{- range (keys .Values.datasources | sortAlpha) }}
       - name: config
-        mountPath: "/etc/grafana/provisioning/datasources/datasources.yaml"
-        subPath: datasources.yaml
+        mountPath: "/etc/grafana/provisioning/datasources/{{ . }}"
+        subPath: {{ . | quote }}
+{{- end }}
 {{- end }}
 {{- if .Values.notifiers }}
+{{- range (keys .Values.notifiers | sortAlpha) }}
       - name: config
-        mountPath: "/etc/grafana/provisioning/notifiers/notifiers.yaml"
-        subPath: notifiers.yaml
+        mountPath: "/etc/grafana/provisioning/notifiers/{{ . }}"
+        subPath: {{ . | quote }}
+{{- end }}
 {{- end }}
 {{- if .Values.dashboardProviders }}
+{{- range (keys .Values.dashboardProviders | sortAlpha) }}
       - name: config
-        mountPath: "/etc/grafana/provisioning/dashboards/dashboardproviders.yaml"
-        subPath: dashboardproviders.yaml
+        mountPath: "/etc/grafana/provisioning/dashboards/{{ . }}"
+        subPath: {{ . | quote }}
+{{- end }}
 {{- end }}
 {{- if .Values.sidecar.dashboards.enabled }}
       - name: sc-dashboard-volume
@@ -369,15 +377,21 @@ containers:
       - name: "{{ tpl $key $ }}"
         value: "{{ tpl (print $value) $ }}"
 {{- end }}
-    {{- if .Values.envFromSecret }}
+    {{- if or .Values.envFromSecret (or .Values.envRenderSecret .Values.envFromSecrets) }}
     envFrom:
+    {{- if .Values.envFromSecret }}
       - secretRef:
           name: {{ tpl .Values.envFromSecret . }}
     {{- end }}
     {{- if .Values.envRenderSecret }}
-    envFrom:
       - secretRef:
           name: {{ template "grafana.fullname" . }}-env
+    {{- end }}
+    {{- range .Values.envFromSecrets }}
+      - secretRef:
+          name: {{ .name }}
+          optional: {{ .optional | default false }}
+    {{- end }}
     {{- end }}
     livenessProbe:
 {{ toYaml .Values.livenessProbe | indent 6 }}
