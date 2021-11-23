@@ -1,0 +1,30 @@
+nodeGroup: data
+
+roles:
+  - data
+
+replicas: {{ .Values.opensearch.dataNode.count }}
+
+opensearchJavaOpts: {{ .Values.opensearch.dataNode.javaOpts }}
+
+resources: {{- toYaml .Values.opensearch.dataNode.resources | nindent 2 }}
+
+persistence:
+  size: {{ .Values.opensearch.dataNode.storageSize }}
+  storageClass: {{ toYaml .Values.opensearch.dataNode.storageClass }}
+
+{{ if (hasKey .Values.opensearch.dataNode.affinity.podAntiAffinity "requiredDuringSchedulingIgnoredDuringExecution") -}}
+antiAffinityTopologyKey: {{ (first .Values.opensearch.dataNode.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution).podAffinityTerm.topologyKey | quote }}
+antiAffinity: hard
+{{ else if (hasKey .Values.opensearch.dataNode.affinity.podAntiAffinity "preferredDuringSchedulingIgnoredDuringExecution") -}}
+antiAffinityTopologyKey: {{ (first .Values.opensearch.dataNode.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution).podAffinityTerm.topologyKey | quote }}
+antiAffinity: soft
+{{ end -}}
+
+{{ if (hasKey .Values.opensearch.dataNode.affinity "nodeAffinity") -}}
+nodeAffinity: {{ toYaml .Values.opensearch.dataNode.affinity.nodeAffinity | nindent 2 }}
+{{ end -}}
+
+nodeSelector: {{- toYaml .Values.opensearch.dataNode.nodeSelector | nindent 2 }}
+
+tolerations:  {{- toYaml .Values.opensearch.dataNode.tolerations | nindent 2 }}

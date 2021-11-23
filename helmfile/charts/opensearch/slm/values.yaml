@@ -1,0 +1,28 @@
+image:
+  repository: elastisys/curl-jq
+  tag: ubuntu
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+opensearch:
+  userSecret: opensearch-snapshotter-user
+  clusterEndpoint: opensearch-cluster-master:9200
+
+startingDeadlineSeconds: 300
+activeDeadlineSeconds: 600
+
+schedule: "@daily"
+snapshotRepository: s3
+snapshots:
+  min: 7
+  max: 14
+  maxAgeSeconds: 864000 # = 60 * 60 * 24 * 10 = 10 days
+
+restartPolicy: OnFailure
+
+resources:
+  limits: {}
+  requests: {}

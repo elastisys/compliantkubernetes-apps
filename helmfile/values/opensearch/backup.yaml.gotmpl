@@ -1,0 +1,26 @@
+{{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") ) }}
+{{ fail "\nERROR: OpenSearch backup requires S3 or GCS object storage, see Values.objectStorage.type" }}
+{{ end }}
+
+opensearch:
+  userSecret: opensearch-snapshotter-user
+  clusterEndpoint: {{ .Values.opensearch.clusterName }}-master:9200
+
+startingDeadlineSeconds: {{ .Values.opensearch.snapshot.backupStartingDeadlineSeconds }}
+activeDeadlineSeconds: {{ .Values.opensearch.snapshot.backupActiveDeadlineSeconds }}
+
+schedule: {{ .Values.opensearch.snapshot.backupSchedule | quote }}
+
+snapshotRepository: {{ .Values.opensearch.snapshot.repository }}
+
+# Ignore security plugin index as per
+# https://opendistro.github.io/for-elasticsearch-docs/docs/elasticsearch/snapshot-restore/#security-plugin-considerations
+indices: "*,-.opendistro_security"
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 10m
+    memory: 32Mi

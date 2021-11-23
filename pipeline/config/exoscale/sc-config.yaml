@@ -14,7 +14,7 @@ harbor:
   backup:
     enabled: true
     retentionDays: 7
-elasticsearch:
+opensearch:
   masterNode:
     storageSize: 1Gi
     javaOpts: -Xms512m -Xmx512m

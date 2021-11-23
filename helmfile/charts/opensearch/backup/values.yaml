@@ -1,0 +1,26 @@
+image:
+  repository: elastisys/curl-jq
+  tag: ubuntu
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+opensearch:
+  userSecret: opensearch-snapshotter-user
+  clusterEndpoint: opensearch-cluster-master:9200
+
+startingDeadlineSeconds: 300
+activeDeadlineSeconds: 300
+
+schedule: "@daily"
+snapshotRepository: "s3"
+
+indices: "*"
+
+restartPolicy: Never
+
+resources:
+  limits: {}
+  requests: {}

@@ -392,6 +392,8 @@ update_secrets() {
 
     yq merge "${config_template_path}/secrets/sc-secrets.yaml" "${config_template_path}/secrets/wc-secrets.yaml" > "${tmpfile}"
 
+    generate_secrets "${tmpfile}"
+
     if [[ -f $file ]]; then
         sops_decrypt "${file}"
         yq merge "${tmpfile}" "${file}" --inplace --prettyPrint --overwrite --arrays overwrite
@@ -415,14 +417,14 @@ generate_secrets() {
 
     # https://unix.stackexchange.com/questions/307994/compute-bcrypt-hash-from-command-line
 
-    ES_ADM_PASS=$(pwgen -cns 20 1)
-    ES_ADM_PASS_HASH=$(htpasswd -bnBC 10 "" "${ES_ADM_PASS}" | tr -d ':\n')
+    OS_ADMIN_PASS=$(pwgen -cns 20 1)
+    OS_ADMIN_PASS_HASH=$(htpasswd -bnBC 10 "" "${OS_ADMIN_PASS}" | tr -d ':\n')
 
-    ES_CONF_PASS=$(pwgen -cns 20 1)
-    ES_CONF_PASS_HASH=$(htpasswd -bnBC 10 "" "${ES_CONF_PASS}" | tr -d ':\n')
+    OS_CONF_PASS=$(pwgen -cns 20 1)
+    OS_CONF_PASS_HASH=$(htpasswd -bnBC 10 "" "${OS_CONF_PASS}" | tr -d ':\n')
 
-    ES_KIBANA_PASS=$(pwgen -cns 20 1)
-    ES_KIBANA_PASS_HASH=$(htpasswd -bnBC 10 "" "${ES_KIBANA_PASS}" | tr -d ':\n')
+    OSD_PASS=$(pwgen -cns 20 1)
+    OSD_PASS_HASH=$(htpasswd -bnBC 10 "" "${OSD_PASS}" | tr -d ':\n')
 
     DEX_STATIC_PASS=$(pwgen -cns 20 1)
     # shellcheck disable=SC2016
@@ -443,18 +445,18 @@ generate_secrets() {
     yq write --inplace "${tmpfile}" 'influxDB.users.adminPassword' "$(pwgen -cns 20 1)"
     yq write --inplace "${tmpfile}" 'influxDB.users.wcWriterPassword' "${PROMETHEUS_WC_REMOTE_WRITE_PASS}"
     yq write --inplace "${tmpfile}" 'influxDB.users.scWriterPassword' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'elasticsearch.adminPassword' "${ES_ADM_PASS}"
-    yq write --inplace "${tmpfile}" 'elasticsearch.adminHash' "${ES_ADM_PASS_HASH}"
-    yq write --inplace "${tmpfile}" 'elasticsearch.clientSecret' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'elasticsearch.configurerPassword' "${ES_CONF_PASS}"
-    yq write --inplace "${tmpfile}" 'elasticsearch.configurerHash' "${ES_CONF_PASS_HASH}"
-    yq write --inplace "${tmpfile}" 'elasticsearch.kibanaPassword' "${ES_KIBANA_PASS}"
-    yq write --inplace "${tmpfile}" 'elasticsearch.kibanaHash' "${ES_KIBANA_PASS_HASH}"
-    yq write --inplace "${tmpfile}" 'elasticsearch.fluentdPassword' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'elasticsearch.curatorPassword' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'elasticsearch.snapshotterPassword' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'elasticsearch.metricsExporterPassword' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'elasticsearch.kibanaCookieEncKey' "$(pwgen -cns 32 1)"
+    yq write --inplace "${tmpfile}" 'opensearch.adminPassword' "${OS_ADMIN_PASS}"
+    yq write --inplace "${tmpfile}" 'opensearch.adminHash' "${OS_ADMIN_PASS_HASH}"
+    yq write --inplace "${tmpfile}" 'opensearch.clientSecret' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'opensearch.configurerPassword' "${OS_CONF_PASS}"
+    yq write --inplace "${tmpfile}" 'opensearch.configurerHash' "${OS_CONF_PASS_HASH}"
+    yq write --inplace "${tmpfile}" 'opensearch.dashboardsPassword' "${OSD_PASS}"
+    yq write --inplace "${tmpfile}" 'opensearch.dashboardsHash' "${OSD_PASS_HASH}"
+    yq write --inplace "${tmpfile}" 'opensearch.dashboardsCookieEncKey' "$(pwgen -cns 32 1)"
+    yq write --inplace "${tmpfile}" 'opensearch.fluentdPassword' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'opensearch.curatorPassword' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'opensearch.snapshotterPassword' "$(pwgen -cns 20 1)"
+    yq write --inplace "${tmpfile}" 'opensearch.metricsExporterPassword' "$(pwgen -cns 20 1)"
     yq write --inplace "${tmpfile}" 'kubeapiMetricsPassword' "$(pwgen -cns 20 1)"
     yq write --inplace "${tmpfile}" 'dex.staticPasswordNotHashed' "${DEX_STATIC_PASS}"
     yq write --inplace "${tmpfile}" 'dex.staticPassword' "${DEX_STATIC_PASS_HASH}"

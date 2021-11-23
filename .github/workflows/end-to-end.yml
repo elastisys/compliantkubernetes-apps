@@ -185,15 +185,15 @@ jobs:
       shell: bash
       id: install-apps
 
-    - name: Wait for Elasticsearch to be ready
+    - name: Wait for OpenSearch to be ready
       if: steps.install-apps.outcome == 'success' && matrix.cluster == 'wc'
       continue-on-error: true
       shell: bash
       run: |
         retries=60
         while [ ${retries} -gt 0 ]; do
-          result="$(curl --connect-timeout 20 --max-time 60 -ksIL -o /dev/null -w "%{http_code}" https://elastic.ops.pipeline-exoscale.elastisys.se)"
-          echo "Waiting for elasticsearch to be ready. Got status ${result}"
+          result="$(curl --connect-timeout 20 --max-time 60 -ksIL -o /dev/null -w "%{http_code}" https://opensearch.ops.pipeline-exoscale.elastisys.se)"
+          echo "Waiting for OpenSearch to be ready. Got status ${result}"
           [[ "${result}" == "401" ]] && break
           sleep 10
           retries=$((retries-1))

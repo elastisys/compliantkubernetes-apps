@@ -24,10 +24,16 @@
     This will save configuration and user role bindings for User Alertmanager.
     Skip this step if this is not something you want to keep.
 
-1. Run migration script `curator-retention.sh`
+1. Run migration script: `opensearch-migration-configuration.sh`
 
-    This will update the curator retention to the new configuration way.
-    This script is only relevant if you have overridden the defaults.
+    This will migrate the configuration and secrets from ODFE to OpenSearch.
+    All settings will be carried over from `elasticsearch` to `opensearch`, and from `kibana` to `opensearch.dashboards`.
+
+    Review and tweak the configuration in `sc-config.yaml` and `wc-config.yaml` according to your preferences.
+    Index template settings prefixed with `opendistro.*` must be updated and changed to use the prefix `plugins.*` instead.
+
+    By default it will configure OpenSearch using the subdomain `opensearch` on `ops.${DOMAIN}`, OpenSearch Dashboards using the subdomain `opensearch` on `${DOMAIN}`, and the snapshot repository using the bucket `${ENVIRONMENT_NAME}-opensearch`.
+    **These must be prepared for the migration.**
 
 1. Update apps configuration:
 
@@ -39,9 +45,29 @@
 
     This will generate new `defaults/common-config.yaml` and `common-config.yaml`, which will contain common configuration options set for both the service and workload cluster. Any common option set for the service and workload cluster in the `service-config.yaml` and `workload-config.yaml` will be moved to `common-config.yaml` automatically.
 
+1. Run migration script `curator-retention.sh`
+
+    This will update the curator retention to the new configuration way.
+    This script is only relevant if you have overridden the defaults.
+
 1. If using User Alertmanager: Run migration script: `user-alertmanager-run.sh`
 
     This will remove User Alertmanager, update the user namespaces and role bindings, and reinstall User Alertmanager with the default configuration.
+
+1. Migrate from ODFE to OpenSearch:
+
+    This will set up a fresh OpenSearch cluster and migrate the data from ODFE via snapshots.
+    **Note** that this will *not* carry over security settings.
+    Any user, role, or rolemapping that has been manually created must be either be added into the configuration manifests or later manually added when the data migration is complete.
+
+    If there is enough resources in the service cluster, and OpenSearch will be running under a new subdomain, then the two clusters can run in parallel during migration allowing you to verify that everything is carried over.
+    **Note** that this will introduce authentication issues later for ODFE when Dex is updated, as the connector to Kibana will be removed.
+    So make sure that you are already signed in to Kibana when you start if go with that method.
+
+    Running `init` will generate new secrets for OpenSearch, if you want set specific passwords or reuse ones used for ODFE change them now.
+
+    Run the script `opensearch-migration-run.sh` and it will perform the migration steps.
+    For each destructive task the script will prompt for confirmation.
 
 1. Delete deprecated parameter `fluentd.forwarder.queueLimitSizeBytes` in `sc-config.yaml`
 
@@ -61,3 +87,7 @@
 
     This will reconfigure User Alertmanager with the stored configuration and role bindings.
     Skip this step if the previous step saving the configuration was skipped.
+
+1. Clean up after ODFE:
+
+    Run script `opensearch-migration-clean.sh`, this will delete deprecated parameters for ODFE in `secrets.yaml`, `sc-config.yaml` and `wc-config.yaml`.

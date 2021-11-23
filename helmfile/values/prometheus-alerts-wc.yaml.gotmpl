@@ -1,6 +1,5 @@
 # Note: These values are used for the wc reader. I.e. **in SC** despite the name
 
-esNodeCount: {{ add .Values.elasticsearch.dataNode.count .Values.elasticsearch.clientNode.count .Values.elasticsearch.masterNode.count }}
 alertmanagerJob: alertmanager-operated
 alertmanagerNamespace: alertmanager
 prometheusJob: kube-prometheus-stack-prometheus
@@ -12,7 +11,7 @@ defaultRules:
   labels:
     workload_cluster: "1"
   rules:
-    elasticsearch: false
+    opensearch: false
     alertmanager: {{ .Values.user.alertmanager.enabled }}
     # These are already created for monitoring SC, no need to double them for WC
     rookMonitor: {{ .Values.monitoring.rook.enabled }}

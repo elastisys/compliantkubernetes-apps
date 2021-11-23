@@ -1,0 +1,21 @@
+{{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") ) }}
+{{ fail "\nERROR: OpenSearch slm requires s3 or gcs object storage, see Values.objectStorage.type" }}
+{{ end }}
+
+opensearch:
+  userSecret: opensearch-snapshotter-user
+  clusterEndpoint: {{ .Values.opensearch.clusterName }}-master:9200
+
+startingDeadlineSeconds: {{ .Values.opensearch.snapshot.retentionStartingDeadlineSeconds }}
+activeDeadlineSeconds: {{ .Values.opensearch.snapshot.retentionActiveDeadlineSeconds }}
+
+schedule: {{ .Values.opensearch.snapshot.retentionSchedule | quote }}
+
+snapshotRepository: {{ .Values.opensearch.snapshot.repository }}
+
+snapshots:
+  min: {{ .Values.opensearch.snapshot.min }}
+  max: {{ .Values.opensearch.snapshot.max }}
+  maxAgeSeconds: {{ .Values.opensearch.snapshot.ageSeconds | quote }}
+
+resources: {{- toYaml .Values.opensearch.snapshot.retentionResources | nindent 2 }}

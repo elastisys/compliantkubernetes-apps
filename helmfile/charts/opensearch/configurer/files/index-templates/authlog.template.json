@@ -1,0 +1,12 @@
+{
+  "index_patterns": [
+    "authlog*"
+  ],
+  "template": {
+    "settings": {
+      "index.refresh_interval": "10s",
+      "plugins.index_state_management.rollover_alias": "authlog",
+      "mapping.total_fields.limit": "1000"
+    }
+  }
+}

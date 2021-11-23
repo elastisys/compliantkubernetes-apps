@@ -43,8 +43,8 @@ targets:
     scrapeTimeout: 30s
     module: http_2xx
   {{- end }}
-  - name: kibana
-    url: https://{{ .Values.kibana.subdomain }}.{{ .Values.global.baseDomain }}/api/status
+  - name: opensearch-dashboards
+    url: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}/api/status
     interval: 60s
     scrapeTimeout: 30s
     module: http_2xx

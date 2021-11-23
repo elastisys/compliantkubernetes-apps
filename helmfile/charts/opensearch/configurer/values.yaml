@@ -1,0 +1,126 @@
+
+image: elastisys/curl-jq:latest
+
+nameOverride: ""
+fullnameOverride: ""
+
+opensearch:
+  userSecret: opensearch-configurer-user
+  clusterEndpoint: opensearch-cluster-master:9200
+  dashboardsEndpoint: opensearch-dashboards:5601
+
+activeDeadlineSeconds: 600
+backoffLimit: 10
+
+affinity: {}
+nodeSelector: {}
+tolerations: []
+
+resources:
+  limits: {}
+  requests: {}
+
+helm:
+  hook: post-install,post-upgrade
+  deletePolicy: before-hook-creation,hook-failed
+
+config:
+  ## If true, configurer will create an index for each template if there is none.
+  createIndices: true
+
+  ## If true, configurer will update/override an index policy if it already exists.
+  updatePolicies: true
+
+  ## If true, configurer will create the default ISM policices for kubernetes,
+  ## kubeaudit, and other indices.
+  defaultPolicies: true
+
+  ## Allows for specification of additional ISM policies.
+  additionalPolicies: {}
+    # # Naming must follow <policy_name>.policy.json
+    # my_policy.policy.json: |-
+    #   {
+    #     "policy": {
+    #       "policy_id": "my_policy",
+    #       "description": "My ISM policy",
+    #       "ism_template": {
+    #         "index_patterns": ["my_index*"],
+    #         "priority": 100
+    #       },
+    #       "default_state": "hot",
+    #       "states": [
+    #         {
+    #           "name": "hot",
+    #           "actions": [
+    #             {
+    #               "rollover": {
+    #                 "min_size": "1GB",
+    #                 "min_index_age": "1d"
+    #               }
+    #             }
+    #           ]
+    #         }
+    #       ]
+    #     }
+    #   }
+
+  ## If true, configurer will overwrite existing templates.
+  ## A negation of the 'create' parameter, see:
+  ## https://opendistro.github.io/for-elasticsearch-docs/docs/elasticsearch/rest-api-reference/#indicesput_template
+  overwriteTemplates: true
+
+  ## If true, configurer will create the default index templates for kubernetes,
+  ## kubeaudit, and other indices
+  defaultTemplates: true
+
+  ## Allows for specification of additional index templates.
+  additionalTemplates: {}
+    # # Naming must follow <template_name>.template.json
+    # my_template.template.json: |-
+    #   {
+    #     "index_patterns": [
+    #       "my_index*"
+    #     ],
+    #     "template": {
+    #       "settings": {
+    #         "index.refresh_interval": "10s",
+    #         "plugins.index_state_management.rollover_alias": "my_alias",
+    #         "mapping.total_fields.limit": "1000"
+    #       }
+    #     }
+    #   }
+
+  ism:
+    rolloverSize: 1
+    rolloverAge: 1
+
+  snapshotRepository: s3_snapshotRepository_7.x
+
+  s3:
+    enabled: false
+    bucketName: ""
+  gcs:
+    enabled: false
+    bucketName: ""
+
+  ## Allow specification of security plugin users, roles, and role mappings.
+  securityPlugin:
+    ## Users to create
+    users:
+    # - username: your_user
+    #   definition:
+    #     password: your_password
+
+    ## Roles to create
+    roles:
+    # - role_name: simple_monitor
+    #   definition:
+    #     cluster_permissions:
+    #     - "cluster:monitor/main"
+
+    ## Role mappings to create
+    roles_mapping:
+    # - mapping_name: simple_monitor
+    #   definition:
+    #     users:
+    #     - your_user

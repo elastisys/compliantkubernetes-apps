@@ -592,7 +592,7 @@
       "pluginVersion": "8.0.5",
       "targets": [
         {
-          "expr": "max by (name) (probe_success{name=\"kibana\"})",
+          "expr": "max by (name) (probe_success{name=\"opensearch-dashboards\"})",
           "format": "time_series",
           "instant": true,
           "intervalFactor": 1,
@@ -601,7 +601,7 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Kibana",
+      "title": "OpenSearch Dashboards",
       "type": "stat"
     },
     {
@@ -717,7 +717,7 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Elasticsearch status",
+      "title": "OpenSearch status",
       "type": "stat"
     },
     {
@@ -788,12 +788,12 @@
           "format": "time_series",
           "hide": true,
           "intervalFactor": 1,
-          "legendFormat": "elasticsearch",
+          "legendFormat": "opensearch",
           "refId": "B"
         },
         {
           "expr": "sum(elasticsearch_cluster_health_status{color=\"green\"} or (elasticsearch_cluster_health_status{color=\"yellow\"} * 0.5) or (elasticsearch_cluster_health_status{color=\"red\"} * 0))",
-          "legendFormat": "elasticsearch",
+          "legendFormat": "opensearch",
           "refId": "C"
         }
       ],
@@ -886,7 +886,7 @@
           "expr": "sum(elasticsearch_cluster_health_status{color=\"green\"} or (elasticsearch_cluster_health_status{color=\"yellow\"}) or (elasticsearch_cluster_health_status{color=\"red\"} * 0))",
           "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "elasticsearch",
+          "legendFormat": "opensearch",
           "refId": "B"
         }
       ],

@@ -92,17 +92,6 @@ falco:
     affinity: {}
     nodeSelector: {}
 
-## Elasticsearch cluster topolgy.
-## Used in prometheus alerts.
-elasticsearch:
-  subdomain: elastic
-  masterNode:
-    count: 1
-  dataNode:
-    count: 2
-  clientNode:
-    count: 1
-
 ## Prometheus configuration.
 ## Prometheus collects metrics and pushes it to InfluxDB.
 prometheus:
@@ -146,7 +135,7 @@ opa:
     enforcement: dryrun
 
 ## Configuration for fluentd.
-## Fluentd ships logs to elasticsearch.
+## Fluentd ships logs to OpenSearch using the endpoint 'opensearch.subdomain' set in common-config.yaml.
 ## Consists of two different deployments, one for running on master nodes
 ## and and one for running on "user nodes".
 fluentd:

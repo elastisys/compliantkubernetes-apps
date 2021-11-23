@@ -5,11 +5,12 @@ tolerations:  {{- toYaml .Values.fluentd.user.tolerations | nindent 2  }}
 
 elasticsearch:
   scheme: https
+  port: 443
   auth:
     enabled: true
     user: fluentd
     password: null
-  hosts: ["{{ .Values.elasticsearch.subdomain }}.{{ .Values.global.opsDomain  }}"]
+  hosts: ["{{ .Values.opensearch.subdomain }}.{{ .Values.global.opsDomain  }}"]
   sslVerify: {{ .Values.global.verifyTls }}
   logLevel: "info"
   reloadOnFailure: true
@@ -24,7 +25,7 @@ configMaps:
 
 secret:
 - name: OUTPUT_PASSWORD
-  secret_name: elasticsearch
+  secret_name: opensearch
   secret_key: password
 
 podSecurityPolicy:
@@ -93,7 +94,6 @@ extraConfigMaps:
       tag raw.kubernetes.*
       read_from_head true
       skip_refresh_on_startup true
-      enable_watch_timer false
       <parse>
         @type multi_format
         <pattern>
@@ -116,7 +116,6 @@ extraConfigMaps:
       pos_file_compaction_interval 72h
       tag authlog.*
       skip_refresh_on_startup true
-      enable_watch_timer false
       <parse>
         @type regexp
         expression /^(?<time>[^ ]* {1,2}[^ ]* [^ ]*) (?<host>[^ ]*) (?<ident>[a-zA-Z0-9_\/\.\-]*)(?:\[(?<pid>[0-9]+)\])?(?:[^\:]*\:)? *(?<message>.*)$/
@@ -267,7 +266,7 @@ extraConfigMaps:
     </match>
     <match kubernetes.**>
       @id elasticsearch_kubernetes
-      {{- if .Values.elasticsearch.indexPerNamespace }}
+      {{- if .Values.opensearch.indexPerNamespace }}
       @type elasticsearch_dynamic
       {{- else }}
       @type "#{ENV['OUTPUT_TYPE']}"
@@ -291,7 +290,7 @@ extraConfigMaps:
 
       # Custom parameters --START--
       include_timestamp true # defaults to false
-      {{- if .Values.elasticsearch.indexPerNamespace }}
+      {{- if .Values.opensearch.indexPerNamespace }}
       logstash_format true
       logstash_prefix ${record['kubernetes']['namespace_name']}
       {{- else }}

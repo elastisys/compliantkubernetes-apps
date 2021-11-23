@@ -251,8 +251,10 @@ releases:
   namespace: elastic-system
   labels:
     app: prometheus-elasticsearch-exporter
+    group: opendistro
   chart: ./upstream/prometheus-elasticsearch-exporter
   version: 4.0.1
+  installed: false
   missingFileHandler: Error
   needs:
   - elastic-system/opendistro-es
@@ -264,9 +266,10 @@ releases:
   namespace: elastic-system
   labels:
     app: elasticsearch-slm
+    group: opendistro
   chart: ./charts/elasticsearch-slm
   version: 0.1.0
-  installed: {{ .Values.elasticsearch.snapshot.enabled }}
+  installed: false
   missingFileHandler: Error
   needs:
   - elastic-system/opendistro-es
@@ -278,14 +281,156 @@ releases:
   namespace: elastic-system
   labels:
     app: elasticsearch-backup
+    group: opendistro
   chart: ./charts/elasticsearch-backup
   version: 0.1.0
-  installed: {{ .Values.elasticsearch.snapshot.enabled }}
+  installed: false
   missingFileHandler: Error
   needs:
   - elastic-system/opendistro-es
   values:
   - values/elasticsearch-backup.yaml.gotmpl
+
+# OpenSearch
+- name: opensearch-secrets
+  namespace: opensearch-system
+  labels:
+    app: opensearch-secrets
+    group: opensearch
+  chart: ./charts/opensearch/secrets
+  version: 0.1.0
+  installed: true
+  values:
+  - values/opensearch/secrets.yaml.gotmpl
+
+- name: opensearch-master
+  namespace: opensearch-system
+  labels:
+    app: opensearch-master
+    group: opensearch
+  chart: ./upstream/opensearch
+  version: 1.5.7
+  installed: true
+  needs:
+  {{- if .Values.opensearch.sso.enabled }}
+  - dex/dex
+  {{- end }}
+  - opensearch-system/opensearch-secrets
+  values:
+  - values/opensearch/common.yaml.gotmpl
+  - values/opensearch/master.yaml.gotmpl
+
+- name: opensearch-data
+  namespace: opensearch-system
+  labels:
+    app: opensearch-data
+    group: opensearch
+  chart: ./upstream/opensearch
+  version: 1.5.7
+  installed: {{ .Values.opensearch.dataNode.dedicatedPods }}
+  needs:
+  - opensearch-system/opensearch-master
+  values:
+  - values/opensearch/common.yaml.gotmpl
+  - values/opensearch/data.yaml.gotmpl
+
+- name: opensearch-client
+  namespace: opensearch-system
+  labels:
+    app: opensearch-client
+    group: opensearch
+  chart: ./upstream/opensearch
+  version: 1.5.7
+  installed: {{ .Values.opensearch.clientNode.dedicatedPods }}
+  needs:
+  - opensearch-system/opensearch-master
+  values:
+  - values/opensearch/common.yaml.gotmpl
+  - values/opensearch/client.yaml.gotmpl
+
+- name: opensearch-dashboards
+  namespace: opensearch-system
+  labels:
+    app: opensearch-dashboards
+    group: opensearch
+  chart: ./upstream/opensearch-dashboards
+  version: 1.1.2
+  installed: true
+  needs:
+  - opensearch-system/opensearch-master
+  values:
+  - values/opensearch/dashboards.yaml.gotmpl
+
+- name: opensearch-backup
+  namespace: opensearch-system
+  labels:
+    app: opensearch-backup
+    group: opensearch
+  chart: ./charts/opensearch/backup
+  version: 0.1.0
+  installed: {{ .Values.opensearch.snapshot.enabled }}
+  missingFileHandler: Error
+  needs:
+  - opensearch-system/opensearch-master
+  values:
+  - values/opensearch/backup.yaml.gotmpl
+
+- name: opensearch-slm
+  namespace: opensearch-system
+  labels:
+    app: opensearch-slm
+    group: opensearch
+  chart: ./charts/opensearch/slm
+  version: 0.1.0
+  installed: {{ .Values.opensearch.snapshot.enabled }}
+  missingFileHandler: Error
+  needs:
+  - opensearch-system/opensearch-master
+  values:
+  - values/opensearch/slm.yaml.gotmpl
+
+- name: opensearch-curator
+  namespace: opensearch-system
+  labels:
+    app: opensearch-curator
+    group: opensearch
+  chart: ./charts/opensearch/curator
+  version: 0.1.0
+  installed: {{ .Values.opensearch.curator.enabled }}
+  missingFileHandler: Error
+  needs:
+  - opensearch-system/opensearch-master
+  values:
+  - values/opensearch/curator.yaml.gotmpl
+
+- name: opensearch-configurer
+  namespace: opensearch-system
+  labels:
+    app: opensearch-configurer
+    group: opensearch
+  chart: ./charts/opensearch/configurer
+  version: 0.1.0
+  installed: true
+  needs:
+  - opensearch-system/opensearch-master
+  - opensearch-system/opensearch-dashboards
+  values:
+  - values/opensearch/configurer.yaml.gotmpl
+
+# prometheus-elasticsearch-exporter
+- name: prometheus-elasticsearch-exporter
+  namespace: opensearch-system
+  labels:
+    app: prometheus-elasticsearch-exporter
+    group: opensearch
+  chart: ./upstream/prometheus-elasticsearch-exporter
+  version: 4.0.1
+  installed: true
+  missingFileHandler: Error
+  needs:
+  - opensearch-system/opensearch-master
+  values:
+  - values/prometheus-elasticsearch-exporter.yaml.gotmpl
 
 # Harbor
 - name: harbor-certs
@@ -404,8 +549,10 @@ releases:
   namespace: elastic-system
   labels:
     app: opendistro
+    group: opendistro
   chart: ./elastisys/opendistro-es
   version: 1.13.5
+  installed: false
   missingFileHandler: Error
   needs:
   - dex/dex

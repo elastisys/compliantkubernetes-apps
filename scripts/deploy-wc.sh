@@ -16,13 +16,13 @@ config_load wc --skip-validation
 # USE: --interactive, default is not interactive.
 INTERACTIVE=${1:-""}
 
-echo "Creating Elasticsearch and fluentd secrets" >&2
-elasticsearch_password=$(sops_exec_file "${secrets[secrets_file]}" 'yq r -e {} elasticsearch.fluentdPassword')
+echo "Creating OpenSearch and Fluentd secrets" >&2
+opensearch_password=$(sops_exec_file "${secrets[secrets_file]}" 'yq r -e {} opensearch.fluentdPassword')
 
-kubectl -n kube-system create secret generic elasticsearch \
-    --from-literal=password="${elasticsearch_password}" --dry-run=client -o yaml | kubectl apply -f -
-kubectl -n fluentd create secret generic elasticsearch \
-    --from-literal=password="${elasticsearch_password}" --dry-run=client -o yaml | kubectl apply -f -
+kubectl -n kube-system create secret generic opensearch \
+    --from-literal=password="${opensearch_password}" --dry-run=client -o yaml | kubectl apply -f -
+kubectl -n fluentd create secret generic opensearch \
+    --from-literal=password="${opensearch_password}" --dry-run=client -o yaml | kubectl apply -f -
 
 # Add example resources.
 # We use `create` here instead of `apply` to avoid overwriting any changes the

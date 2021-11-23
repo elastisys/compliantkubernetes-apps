@@ -6,8 +6,8 @@ global:
 objectStorage:
   buckets:
     harbor: ${CK8S_ENVIRONMENT_NAME}-harbor
-    elasticsearch: ${CK8S_ENVIRONMENT_NAME}-es-backup
     influxDB: ${CK8S_ENVIRONMENT_NAME}-influxdb
+    opensearch: ${CK8S_ENVIRONMENT_NAME}-opensearch
     scFluentd: ${CK8S_ENVIRONMENT_NAME}-sc-logs
 
 user:
@@ -48,6 +48,7 @@ user:
       - cluster
       - alertname
       - severity
+
 harbor:
   enabled: true
   subdomain: harbor
@@ -253,41 +254,88 @@ dex:
     # For more details, see https://elastisys.com/elastisys-engineering-how-to-use-dex-with-google-accounts-to-manage-access-in-kubernetes/
     # SASecretName: set-me
 
-kibana:
-  subdomain: kibana
-  # Note sso is enabled via `elasticsearch.sso.enabled`
-  resources:
-    requests:
-      cpu: 100m
-      memory: 286Mi
-  nodeSelector: {}
-  tolerations: []
-  affinity: {}
+opensearch:
+  # 'subdomain' and 'indexPerNamespace' is set in common-config.yaml
 
-elasticsearch:
-  subdomain: elastic
-  snapshotRepository: elastic-snapshots
+  clusterName: opensearch
 
   # Create initial indices upon first startup
   createIndices: true
-  # Single-sign-on using OIDC
-  # NOTE: SSO using OIDC requires LetsEncrypt Production
+
+  dashboards:
+    subdomain: opensearch
+    # Note SSO is enabled via `opensearch.sso.enabled`
+    resources:
+      requests:
+        memory: 286Mi
+        cpu: 100m
+      limits:
+        memory: 1024Mi
+        cpu: 1
+    affinity: {}
+    nodeSelector: {}
+    tolerations: []
+
+  # Single-sign-on using OIDC, note this requires LetsEncrypt Production
   sso:
     enabled: false
     # Where to find subject
-    subject_key: email
+    subjectKey: email
     # Where to find roles
-    roles_key: groups
+    rolesKey: groups
     # Scope - add 'groups' if groups claim is supported
     scope: openid profile email
 
+  extraRoles: []
+    # - role_name: log_reader
+    #   definition:
+    #     index_permissions:
+    #       - index_patterns:
+    #           - kubernetes-*
+    #         allowed_actions:
+    #           - read
+
+  extraRoleMappings:
+    - mapping_name: readall_and_monitor
+      definition:
+        users:
+          - set-me # Developer Name
+    - mapping_name: kibana_user
+      definition:
+        backend_roles:
+          - set-me # dashboards_dev
+    - mapping_name: kubernetes_log_reader
+      definition:
+        backend_roles:
+          - set-me # dashboards_dev
+    - mapping_name: all_access
+      definition:
+        backend_roles:
+          - set-me # dashboards_admin
+
+  # Overwrite index templates
+  overwriteTemplates: true
+  # Create default index templates - kubernetes, kubeaudit, and other
+  defaultTemplates: true
+  additionalTemplates: {}
+
+  # Index state management
+  ism:
+    rolloverSizeGB: 1
+    rolloverAgeDays: 1
+    # Overwrite ism policies
+    overwritePolicies: true
+    # Create default policies - kubernetes, kubeaudit, authlog, and other
+    defaultPolicies: true
+    additionalPolicies: {}
+
   masterNode:
     count: 1
-    storageSize: 8Gi
     ## If null, no storageclass is specified in pvc and default storageClass is used
     ## if the DefaultStorageClass admission plugin is enabled.
     ## If "-", "" will be used as storageClassName.
     storageClass: null
+    storageSize: 8Gi
     javaOpts: -Xms512m -Xmx512m
     resources:
       requests:
@@ -297,27 +345,36 @@ elasticsearch:
         memory: 1024Mi
         cpu: 1
     affinity:
+      ## Note: The OpenSearch chart has some restrictions on pod anti affinity:
+      ## - Only one rule and term can be set
+      ## - The label selector is hardcoded and changing it here does not affect it
       podAntiAffinity:
         preferredDuringSchedulingIgnoredDuringExecution:
           - weight: 1
             podAffinityTerm:
               topologyKey: kubernetes.io/hostname
               labelSelector:
-                matchLabels:
-                  role: master
-    tolerations: []
+                matchExpressions:
+                  - key: app.kubernetes.io/instance
+                    operator: In
+                    values:
+                      - opensearch-master
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - opensearch
     nodeSelector: {}
+    tolerations: []
 
   dataNode:
-    ## Enables dedicated statefulset for data nodes.
-    ## If false, master nodes will assume data role.
+    ## Enables dedicated statefulset for data nodes, else the master nodes will assume data role.
     dedicatedPods: true
     count: 2
-    storageSize: 25Gi
     ## If null, no storageclass is specified in pvc and default storageClass is used
     ## if the DefaultStorageClass admission plugin is enabled.
     ## If "-", "" will be used as storageClassName.
     storageClass: null
+    storageSize: 25Gi
     javaOpts: -Xms512m -Xmx512m
     resources:
       requests:
@@ -327,20 +384,27 @@ elasticsearch:
         memory: 1024Mi
         cpu: 1
     affinity:
+      ## Note: Same restrictions applies here as on the master nodes
       podAntiAffinity:
         preferredDuringSchedulingIgnoredDuringExecution:
           - weight: 1
             podAffinityTerm:
               topologyKey: kubernetes.io/hostname
               labelSelector:
-                matchLabels:
-                  role: data
-    tolerations: []
+                matchExpressions:
+                  - key: app.kubernetes.io/instance
+                    operator: In
+                    values:
+                      - opensearch-data
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - opensearch
     nodeSelector: {}
+    tolerations: []
 
   clientNode:
-    ## Enables dedicated deployment for client/ingest nodes.
-    ## If false, master nodes will assume client/ingest roles
+    ## Enables dedicated deployment for client/ingest nodes, else the master nodes will assume client/ingest roles
     dedicatedPods: true
     count: 1
     javaOpts: -Xms512m -Xmx512m
@@ -352,30 +416,28 @@ elasticsearch:
         memory: 1024Mi
         cpu: 1
     affinity:
+      ## Note: Same restrictions applies here as on the master nodes
       podAntiAffinity:
         preferredDuringSchedulingIgnoredDuringExecution:
           - weight: 1
             podAffinityTerm:
               topologyKey: kubernetes.io/hostname
               labelSelector:
-                matchLabels:
-                  role: client
-    tolerations: []
+                matchExpressions:
+                  - key: app.kubernetes.io/instance
+                    operator: In
+                    values:
+                      - opensearch-client
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - opensearch
     nodeSelector: {}
+    tolerations: []
 
   # Config for https://www.elastic.co/guide/en/elasticsearch/client/curator/5.8/about.html
   curator:
     enabled: true
-    resources:
-      limits:
-        cpu: 100m
-        memory: 128Mi
-      requests:
-        cpu: 50m
-        memory: 64Mi
-    affinity: {}
-    nodeSelector: {}
-    tolerations: []
     retention:
       - pattern: other-*
         sizeGB: 1
@@ -389,58 +451,41 @@ elasticsearch:
       - pattern: authlog-*
         sizeGB: 1
         ageDays: 30
-
-  # Index state management
-  ism:
-    # Overwrite ism policies
-    overwritePolicies: true
-    rolloverSizeGB: 1
-    rolloverAgeDays: 1
-    # Create default policies - kubernetes, kubeaudit, authlog, and other
-    defaultPolicies: true
-    additionalPolicies: {}
+    startingDeadlineSeconds: 600
+    activeDeadlineSeconds: 2700
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    affinity: {}
+    nodeSelector: {}
+    tolerations: []
 
   # Snapshot and snapshot lifecycle configuration
+  # Requires S3 or GCS to be enabled
   snapshot:
     enabled: true
+    repository: opensearch-snapshots # Uses the bucket set in `objectStorage.buckets.opensearch`
     min: 7
     max: 14
     ageSeconds: 864000
-    retentionSchedule: '@daily'
     backupSchedule: 0 */2 * * *
+    backupStartingDeadlineSeconds: 600
+    backupActiveDeadlineSeconds: 600
+    retentionSchedule: '@daily'
+    retentionStartingDeadlineSeconds: 600
     retentionActiveDeadlineSeconds: 2700
+    retentionResources:
+      requests:
+        cpu: 50m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
 
-  extraRoles: []
-  # - role_name: log_reader
-  #   definition:
-  #     index_permissions:
-  #     - index_patterns:
-  #       - "kubernetes-*"
-  #       allowed_actions:
-  #       - "read"
-
-  extraRoleMappings:
-    - mapping_name: readall_and_monitor
-      definition:
-        users:
-          - set-me # Developer Name
-    - mapping_name: kibana_user
-      definition:
-        backend_roles:
-          - set-me # kibana_dev
-    - mapping_name: kubernetes_log_reader
-      definition:
-        backend_roles:
-          - set-me # kibana_dev
-    - mapping_name: all_access
-      definition:
-        backend_roles:
-          - set-me # kibana_admin
-
-  overwriteTemplates: true
-  # Create default index templates - kubernetes, kubeaudit, and other
-  defaultTemplates: true
-  additionalTemplates: {}
   exporter:
     serviceMonitor:
       interval: 30s
@@ -453,6 +498,7 @@ elasticsearch:
         cpu: 30m
         memory: 60Mi
     tolerations: []
+
   ingress:
     maxbodysize: 8m
 
@@ -590,9 +636,9 @@ alerts:
 externalTrafficPolicy:
   whitelistRange:
     dex: false
-    kibana: false
-    elasticsearch: false
     harbor: false
+    opensearch: false
+    opensearchDashboards: false
     userGrafana: false
     opsGrafana: false
     prometheusWc: false

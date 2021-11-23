@@ -1,0 +1,54 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "opensearch-configurer.fullname" . }}
+  labels:
+    {{- include "opensearch-configurer.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": {{ .Values.helm.hook }}
+    # Use higher value so that the secret is created before this job
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": {{ .Values.helm.deletePolicy }}
+spec:
+  activeDeadlineSeconds: {{ .Values.activeDeadlineSeconds }}
+  backoffLimit: {{ .Values.backoffLimit }}
+  template:
+    metadata:
+      labels:
+        app: configurer
+    spec:
+      restartPolicy: OnFailure
+      {{- if .Values.tolerations }}
+      tolerations: {{- toYaml .Values.tolerations | nindent 6 }}
+      {{- end }}
+      {{- if .Values.nodeSelector }}
+      nodeSelector: {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.affinity }}
+      affinity: {{- toYaml .Values.affinity | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: opensearch-configurer
+        image: {{ .Values.image }}
+        command: ['/bin/sh', '/files/configurer.sh']
+        volumeMounts:
+        - name: files
+          mountPath: /files
+        env:
+        - name: OPENSEARCH_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.opensearch.userSecret }}
+              key: username
+        - name: OPENSEARCH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.opensearch.userSecret }}
+              key: password
+        {{- if .Values.resources }}
+        resources: {{- toYaml .Values.resources | nindent 10 }}
+        {{- end }}
+      volumes:
+      - name: files
+        secret:
+          secretName: opensearch-configurer-config

@@ -1,0 +1,70 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "opensearch-curator.fullname" . }}
+  labels:
+    {{- include "opensearch-curator.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.schedule | quote }}
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: {{ .Values.startingDeadlineSeconds }}
+  failedJobsHistoryLimit: {{ .Values.failedJobsHistoryLimit }}
+  successfulJobsHistoryLimit: {{ .Values.successfulJobsHistoryLimit }}
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: {{ .Values.activeDeadlineSeconds }}
+      template:
+        metadata:
+          labels:
+            {{- include "opensearch-curator.labels" . | nindent 12 }}
+        spec:
+          restartPolicy: {{ .Values.restartPolicy }}
+          containers:
+            - name: opensearch-curator
+              image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              {{- if .Values.resources }}
+              resources: {{- toYaml .Values.resources | nindent 16 }}
+              {{- end }}
+              args:
+                - --config
+                - /etc/config/config.yml
+                - /etc/config/action_file.yml
+              env:
+                - name: OPENSEARCH_ENDPOINT
+                  value: {{ .Values.opensearch.clusterEndpoint }}
+                - name: OPENSEARCH_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.opensearch.userSecret }}
+                      key: username
+                - name: OPENSEARCH_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.opensearch.userSecret }}
+                      key: password
+              volumeMounts:
+                - name: curator-config
+                  mountPath: /etc/config
+          volumes:
+            - name: curator-config
+              configMap:
+                name: {{ include "opensearch-curator.fullname" . }}
+          {{- with .Values.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            runAsUser: 1001

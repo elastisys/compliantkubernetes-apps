@@ -1,0 +1,67 @@
+opensearchHosts: http://{{ .Values.opensearch.clusterName }}-master:9200
+
+config:
+  opensearch_dashboards.yml:
+    server:
+      host: "0"
+
+    opensearch:
+      ssl:
+        verificationMode: none
+      requestHeadersWhitelist:
+        - Authorization
+        - securitytenant
+
+    opensearchDashboards:
+      index: .opensearch_dashboards
+
+    opensearch_security:
+      {{ if .Values.opensearch.sso.enabled }}
+      auth:
+        type: "openid"
+      openid:
+        scope: {{ .Values.opensearch.sso.scope }}
+        connect_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}/.well-known/openid-configuration
+        client_id: "opensearch"
+        client_secret: {{ .Values.opensearch.clientSecret }}
+        base_redirect_url: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
+        logout_url: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
+      {{ end }}
+      multitenancy:
+        enabled: false
+      readonly_mode:
+        roles:
+          - kibana_read_only
+      # Use this setting if you are running opensearch-dashboards without https
+      cookie:
+        secure: false
+
+opensearchAccount:
+  secret: opensearch-dashboards-user
+
+ingress:
+  enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+    cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
+    nginx.ingress.kubernetes.io/proxy-body-size: {{ .Values.opensearch.ingress.maxbodysize }}
+    {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.opensearchDashboards }}
+    nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.opensearchDashboards }}
+    {{ end }}
+
+  hosts:
+    - host: {{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
+      paths:
+        - path: /
+  tls:
+    - secretName: opensearch-dashboards-ingress-cert
+      hosts:
+        - {{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
+
+resources: {{- toYaml .Values.opensearch.dashboards.resources | nindent 2 }}
+
+nodeSelector: {{- toYaml .Values.opensearch.dashboards.nodeSelector | nindent 4 }}
+
+tolerations: {{- toYaml .Values.opensearch.dashboards.tolerations | nindent 4 }}
+
+affinity: {{- toYaml .Values.opensearch.dashboards.affinity | nindent 4 }}

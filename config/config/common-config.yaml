@@ -30,13 +30,13 @@ global:
   ck8sFlavor: ${CK8S_FLAVOR}
 
   ## Domain intended for ingress usage in the workload cluster
-  ## and to reach user facing services such as kibana, grafana, and harbor.
-  ## E.g. with 'prod.domain.com', kibana is reached via 'kibana.prod.domain.com'.
+  ## and to reach user facing services such as Grafana, Harbor and OpenSearch Dashboards.
+  ## E.g. with 'prod.domain.com', OpenSearch Dashboards is reached via 'opensearch.prod.domain.com'.
   baseDomain: set-me
 
   ## Domain intended for ingress usage in the service cluster and to reach
-  ## non-user facing services such as influxdb and elasticsearch.
-  ## E.g. with 'ops.prod.domain.com', elasticsearch is reached via 'elastic.ops.prod.domain.com'.
+  ## non-user facing services such as InfluxDB and OpenSearch.
+  ## E.g. with 'ops.prod.domain.com', OpenSearch is reached via 'opensearch.ops.prod.domain.com'.
   opsDomain: set-me
 
   ## Default cert-manager issuer to use for issuing certificates for ingresses.
@@ -48,9 +48,6 @@ global:
 
   ## IP of the cluster DNS in kubernetes
   clusterDns: 10.233.0.3
-
-elasticsearch:
-  indexPerNamespace: false
 
 ## Configuration of storageclasses.
 storageClasses:
@@ -80,7 +77,7 @@ objectStorage:
   ## Options are 's3', 'gcs', or 'none'
   ## If 'none', remember to disable backups (velero)
   # If "none", remember to disable features that depend on object storage:
-  #   all backups (velero, harbor, influxdb, elasticsearch), sc logs (fluentd)
+  #   all backups (velero, harbor, influxdb, opensearch), sc logs (fluentd)
   #   Also set harbor persistence to "filesystem" or "swift"
   # Otherwise configure the features to match this type.
   type: set-me
@@ -167,6 +164,11 @@ prometheus:
   tolerations: []
   affinity: {}
   nodeSelector: {}
+
+opensearch:
+  subdomain: opensearch
+
+  indexPerNamespace: false
 
 ## Set external traffic policy to: "Local" to preserve source IP on
 ## providers supporting it

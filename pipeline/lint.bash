@@ -5,7 +5,7 @@ set -eu -o pipefail
 here="$(dirname "$(readlink -f "$0")")"
 
 #We should only lint our "own" charts, not the upstream ones
-#TODO: enable linting of kubeapi-metrics after the PGP issues in the pipeline have been solved (https://github.com/elastisys/compliantkubernetes-apps/issues/184)
+# TODO: enable linting of kubeapi-metrics, opensearch-secrets and opensearch-configurer after the PGP issues in the pipeline have been solved (https://github.com/elastisys/compliantkubernetes-apps/issues/184)
 
 charts_ignore_list=(
   "app!=sc-logs-retention"
@@ -26,7 +26,12 @@ charts_ignore_list=(
   "app!=influxdb"
   "app!=fluentd"
   "app!=fluentd-aggregator"
-  "app!=opendistro"
+  "app!=opensearch-master"
+  "app!=opensearch-data"
+  "app!=opensearch-client"
+  "app!=opensearch-dashboards"
+  "app!=opensearch-secrets"
+  "app!=opensearch-configurer"
   "app!=falco"
   "app!=falco-exporter"
   "app!=user-alertmanager"

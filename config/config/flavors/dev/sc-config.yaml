@@ -14,7 +14,7 @@ prometheus:
     retention:
       size: 1GiB
 
-elasticsearch:
+opensearch:
   masterNode:
     storageSize: 20Gi
     javaOpts: -Xms1536m -Xmx1536m
@@ -45,8 +45,8 @@ elasticsearch:
         ageDays: 30
   snapshot:
     enabled: false
-    retentionSchedule: 0 1 * * * # 1am
     backupSchedule: 0 */12 * * * # run twice/day
+    retentionSchedule: 0 1 * * * # 1am
 
 fluentd:
   enabled: false

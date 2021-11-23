@@ -1,0 +1,44 @@
+nodeGroup: client
+
+roles:
+  - ingest
+  - remote_cluster_client
+
+replicas: {{ .Values.opensearch.clientNode.count }}
+
+opensearchJavaOpts: {{ .Values.opensearch.clientNode.javaOpts }}
+
+resources: {{- toYaml .Values.opensearch.clientNode.resources | nindent 2 }}
+
+{{ if (hasKey .Values.opensearch.clientNode.affinity.podAntiAffinity "requiredDuringSchedulingIgnoredDuringExecution") -}}
+antiAffinityTopologyKey: {{ (first .Values.opensearch.clientNode.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution).podAffinityTerm.topologyKey | quote }}
+antiAffinity: hard
+{{ else if (hasKey .Values.opensearch.clientNode.affinity.podAntiAffinity "preferredDuringSchedulingIgnoredDuringExecution") -}}
+antiAffinityTopologyKey: {{ (first .Values.opensearch.clientNode.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution).podAffinityTerm.topologyKey | quote }}
+antiAffinity: soft
+{{ end -}}
+
+{{ if (hasKey .Values.opensearch.clientNode.affinity "nodeAffinity") -}}
+nodeAffinity: {{ toYaml .Values.opensearch.clientNode.affinity.nodeAffinity | nindent 2 }}
+{{ end -}}
+
+nodeSelector: {{- toYaml .Values.opensearch.clientNode.nodeSelector | nindent 2 }}
+
+tolerations:  {{- toYaml .Values.opensearch.clientNode.tolerations | nindent 2 }}
+
+ingress:
+  enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+    cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
+    nginx.ingress.kubernetes.io/proxy-body-size: {{ .Values.opensearch.ingress.maxbodysize }}
+    {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.opensearch }}
+    nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.opensearch }}
+    {{ end }}
+  path: /
+  hosts:
+    - {{ .Values.opensearch.subdomain }}.{{ .Values.global.opsDomain }}
+  tls:
+    - secretName: opensearch-ingress-cert
+      hosts:
+        - {{ .Values.opensearch.subdomain }}.{{ .Values.global.opsDomain }}

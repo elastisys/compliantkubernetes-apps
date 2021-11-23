@@ -18,7 +18,7 @@ One called "service" and one called "workload".
 The _service cluster_ provides observability, log aggregation, private container registry with vulnerability scanning and authentication using the following services:
 
 * Prometheus and Grafana
-* Elasticsearch and Kibana
+* OpenSearch and OpenSearch Dashboards
 * Harbor
 * Dex
 
@@ -103,11 +103,11 @@ In addition to this, you will need to set up the following DNS entries (replace 
   - `*.example.com`
 - Point these domains to the service cluster ingress controller:
   - `*.ops.example.com`
+  - `dex.example.com`
   - `grafana.example.com`
   - `harbor.example.com`
-  - `kibana.example.com`
-  - `dex.example.com`
   - `notary.harbor.example.com`
+  - `opensearch.example.com`
 
 Assuming you already have everything needed to install the apps, this is what you need to do.
 
@@ -132,7 +132,8 @@ Assuming you already have everything needed to install the apps, this is what yo
    Note that the configuration is split between read-only default configs found in the `defaults/` directory, and the override configs `common-config.yaml`, `sc-config.yaml` and `wc-config.yaml` which are editable and will override any default value.
    The `common-config.yaml` will be applied to both the service and workload cluster, although it will be overriden by the any value set in the `sc-config.yaml` or `wc-config.yaml` respectively.
    When new configs are created this will generate new random passwords for all services.
-   When configs are updated this will *not* overwrite existing values in the override configs. It will create a backup of the old override configs placed in `backups/`, generate new default configs in `defaults/`, merge common values into `common-config.yaml`, and clear out redundant values set in the override configs that matches the default values.
+   When configs are updated this will *not* overwrite existing values in the override configs.
+   It will create a backup of the old override configs placed in `backups/`, generate new default configs in `defaults/`, merge common values into `common-config.yaml`, and clear out redundant values set in the override configs that matches the default values.
    See [compliantkubernetes.io](https://compliantkubernetes.io/) if you are uncertain about what order you should do things in.
 
    ```bash
@@ -209,7 +210,8 @@ An admin kubeconfig that requires authentication via dex can be created using:
 
 `./bin/ck8s kubeconfig admin <sc|wc> [cluster_name]`
 
-Which email addresses should be allowed can be configured by setting `clusterAdmin.admins` in `common-config.yaml` or `sc-config.yaml` and `wc-config.yaml`. Also make sure to set `dex.allowedDomains` in `sc-config.yaml`, and `kube_oidc_url` in your `group_vars`.
+Which email addresses should be allowed can be configured by setting `clusterAdmin.admins` in `common-config.yaml` or `sc-config.yaml` and `wc-config.yaml`.
+Also make sure to set `dex.allowedDomains` in `sc-config.yaml`, and `kube_oidc_url` in your `group_vars`.
 
 This admin kubeconfig can access everything in the cluster.
 
@@ -231,10 +233,10 @@ user:
 A **kubeconfig file for the user** (`${CK8S_CONFIG_PATH}/user/kubeconfig.yaml`) can be created by running the script `bin/ck8s kubeconfig user`.
 The user kubeconfig will be configured to use the first namespace by default.
 
-**Kibana** access for the user can be provided either by setting up OIDC or using the internal user database in Elasticsearch:
+**OpenSearch Dashboards** access for the user can be provided either by setting up OIDC or using the internal user database in OpenSearch:
 - OIDC:
-  - Set `elasticsearch.sso.enabled=true` in `sc-config.yaml`.
-  - Configure extra role mappings under `elasticsearch.extraRoleMappings` to give the users the necessary roles.
+  - Set `opensearch.sso.enabled=true` in `sc-config.yaml`.
+  - Configure extra role mappings under `opensearch.extraRoleMappings` to give the users the necessary roles.
     ```yaml
     extraRoleMappings:
       - mapping_name: kibana_user
@@ -248,7 +250,7 @@ The user kubeconfig will be configured to use the first namespace by default.
             - "User Name"
     ```
 - Internal user database:
-  - Log in to Kibana using the admin account.
+  - Log in to OpenSearch Dashboards using the admin account.
   - Create an account for the user.
   - Give the `kibana_user` and `kubernetes_log_reader` roles to the user.
 
@@ -345,10 +347,10 @@ See <https://compliantkubernetes.io/operator-manual/>.
 
 ## Known issues
 
-- When using local volumes, elasticsearch might not start properly unless all worker nodes in the cluster has a local volume attatched to it.
-- Users must explicitly be given privileges in Grafana, Elasticsearch and Kubernetes instead of automatically getting assigned roles based on group membership when logging in using OIDC.
+- When using local volumes, OpenSearch might not start properly unless all worker nodes in the cluster has a local volume attatched to it.
+- Users must explicitly be given privileges in Grafana, OpenSearch and Kubernetes instead of automatically getting assigned roles based on group membership when logging in using OIDC.
 - The OPA policies are not enforced by default.
   Unfortunately the policies breaks cert-manager so they have been set to "dry-run" by default.
-- Kibana Single Sign On (SSO) via OpenID/Dex requires LetsEncrypt Production.
+- OpenSearch Dashboards Single Sign On (SSO) via OpenID/Dex requires LetsEncrypt Production.
 
 For more, please the the public GitHub issues: <https://github.com/elastisys/compliantkubernetes-apps/issues>.

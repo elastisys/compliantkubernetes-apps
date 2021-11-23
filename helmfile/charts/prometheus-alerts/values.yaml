@@ -1,7 +1,7 @@
 # Default values for alerts.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-esNodeCount: 3
+osNodeCount: 3
 alertmanagerJob: kube-prometheus-stack-alertmanager
 alertmanagerNamespace: monitoring
 prometheusJob: kube-prometheus-stack-prometheus
@@ -14,7 +14,7 @@ defaultRules:
   # labels:
   #   key: value
   rules:
-    elasticsearch: true
+    opensearch: true
     alertmanager: false
     blackbox: true
     certManagerCertificateAlerts: true

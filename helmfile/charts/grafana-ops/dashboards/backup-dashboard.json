@@ -257,7 +257,7 @@
             "pluginVersion": "7.0.3",
             "targets": [
                 {
-                    "expr": "min((time()-kube_job_status_completion_time{job_name=~\"elasticsearch-backup-.*\", cluster=~\"$cluster\"})/3600)",
+                    "expr": "min((time()-kube_job_status_completion_time{job_name=~\"opensearch-backup-.*\", cluster=~\"$cluster\"})/3600)",
                     "instant": false,
                     "interval": "",
                     "legendFormat": "{{job_name}}",
@@ -266,7 +266,7 @@
             ],
             "timeFrom": null,
             "timeShift": null,
-            "title": "Time since last successful Elasticsearch backup job",
+            "title": "Time since last successful OpenSearch backup job",
             "transformations": [],
             "type": "stat"
         },
@@ -324,7 +324,7 @@
             ],
             "timeFrom": null,
             "timeShift": null,
-            "title": "Time since last successful Elasticsearch snapshot ",
+            "title": "Time since last successful OpenSearch snapshot ",
             "type": "stat"
         }
     ],

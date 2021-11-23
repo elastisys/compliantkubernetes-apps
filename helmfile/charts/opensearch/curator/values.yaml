@@ -1,0 +1,52 @@
+# NOTE: This is the last release of elasticsearch-curator that will work with OpenSearch.
+#       Switch to opensearch-curator whenever it becomes available.
+image:
+  repository: bitnami/elasticsearch-curator
+  tag: 5.8.4
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+opensearch:
+  userSecret: opensearch-curator-user
+  clusterEndpoint: opensearch-cluster-master:9200
+
+startingDeadlineSeconds: 300
+activeDeadlineSeconds: 1800
+
+failedJobsHistoryLimit: 3
+successfulJobsHistoryLimit: 1
+
+schedule: "*/5 * * * *"
+
+retention: []
+  # - pattern: index-*
+  #   sizeGB: 10
+  #   ageDays: 20
+
+config_yml: |-
+  ---
+  client:
+    hosts:
+    - ${OPENSEARCH_ENDPOINT}
+    use_ssl: false
+    username: ${OPENSEARCH_USERNAME}
+    password: ${OPENSEARCH_PASSWORD}
+    timeout: 30
+    master_only: False
+  logging:
+    loglevel: INFO
+    logformat: default
+    blacklist: ['elasticsearch', 'urllib3']
+
+restartPolicy: Never
+
+affinity: {}
+nodeSelector: {}
+tolerations: []
+
+resources:
+  limits: {}
+  requests: {}

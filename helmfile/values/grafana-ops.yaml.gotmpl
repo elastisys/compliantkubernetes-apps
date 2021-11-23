@@ -16,10 +16,10 @@ dashboards:
     user_visible: true
   falco:
     enabled: true
-    logEndpoint: https://{{ .Values.kibana.subdomain }}.{{ .Values.global.baseDomain }}
+    logEndpoint: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
   gatekeeper:
     enabled: true
-    logEndpoint: https://{{ .Values.kibana.subdomain }}.{{ .Values.global.baseDomain }}
+    logEndpoint: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
   kubernetesstatus:
     enabled: true
     user_visible: true

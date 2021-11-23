@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "opensearch-configurer.fullname" . }}-config
+  labels:
+    {{- include "opensearch-configurer.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": {{ .Values.helm.hook }}
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": {{ .Values.helm.deletePolicy }}
+type: Opaque
+stringData:
+  configurer.sh: |-
+{{ tpl (.Files.Get "files/configurer.sh") . | indent 4 }}
+
+  dashboards.ndjson: {{ .Files.Get "files/dashboards-resources/dashboards-resources.ndjson" | quote }}
+
+{{- if .Values.config.defaultTemplates }}
+{{ (.Files.Glob "files/index-templates/*.json").AsConfig | indent 2 }}
+{{- end }}
+
+{{- if .Values.config.defaultPolicies }}
+{{ tpl ((.Files.Glob "files/ism-policies/*.json").AsConfig) . | indent 2 }}
+{{- end }}
+
+{{- range $key, $val := .Values.config.additionalTemplates }}
+  {{ $key }}: {{ $val | toPrettyJson }}
+{{- end }}
+
+{{- range $key, $val := .Values.config.additionalPolicies }}
+  {{ $key }}: {{ $val | toPrettyJson }}
+{{- end }}

@@ -1,0 +1,13 @@
+opensearch:
+  userSecret: opensearch-curator-user
+  clusterEndpoint: {{ .Values.opensearch.clusterName }}-master:9200
+
+startingDeadlineSeconds: {{ .Values.opensearch.curator.startingDeadlineSeconds }}
+activeDeadlineSeconds: {{ .Values.opensearch.curator.activeDeadlineSeconds }}
+
+affinity:     {{- toYaml .Values.opensearch.curator.affinity | nindent 2 }}
+tolerations:  {{- toYaml .Values.opensearch.curator.tolerations | nindent 2 }}
+nodeSelector: {{- toYaml .Values.opensearch.curator.nodeSelector | nindent 2 }}
+resources:    {{- toYaml .Values.opensearch.curator.resources | nindent 2 }}
+
+retention: {{ toYaml .Values.opensearch.curator.retention | nindent 2 }}

@@ -31,6 +31,6 @@ repos:
     additional_dependencies: []
     args:
     - "--external-sources"
-    exclude: helmfile/upstream/|helmfile/elastisys/
+    exclude: helmfile/upstream/|helmfile/elastisys/|helmfile/charts/opensearch/configurer/
   - id: markdownlint
     exclude: helmfile/upstream/|helmfile/elastisys/

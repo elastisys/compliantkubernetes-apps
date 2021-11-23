@@ -4,6 +4,7 @@
     Enabling it makes fluentd log to indices in elasticsearch based on the namespace from which the container log originates.
 * Check out the [upgrade guide](https://github.com/elastisys/compliantkubernetes-apps/blob/main/migration/v0.18.x-v0.19.x/upgrade-apps.md) for a complete set of instructions needed to upgrade.
 * CK8S_FLAVOR is now mandatory on init
+* This release migrates from Open Distro for Elasticsearch to OpenSearch.
 
 # Updated
 
@@ -44,6 +45,15 @@
 - Moved the User Alertmanager RBAC to `user-alertmanager` chart
 - Made CK8S_FLAVOR mandatory on init
 - Exposed harbor's backup retention period as config.
+- Migrated from OpenDistro for Elasticsearch to OpenSearch.
+  - This will be a breaking change as some API, specifically related to plugins and security, have been renamed in OpenSearch.
+    The impact will be minimal as the function of the API will stay mostly the same, and the configuration will basically works as is, although renamed.
+    The user experience will change slightly as this will replace Kibana with OpenSearch Dashboards, however the functionality remains the same.
+  - OpenSearch is compatible with existing tools supporting ODFE using a compatibility setting, however this will only last for version 1.x.
+    Newer versions of offical Elasticsearch tools and libraries already contain checks against unofficial Elasticsearch and will therefore not work for either ODFE or OpenSearch.
+    Older versions exists that will still work, and the OpenSearch project is working on providing their own set of tools and libraries.
+  - This will cause downtime for Elasticsearch and Kibana during the migration, and OpenSearch and OpenSearch Dashboards will replace them.
+    Data will be kept by the migration steps, except security settings, any manually created user or roles must be manually handled.
 
 ### Fixed
 
@@ -52,6 +62,8 @@
 - Fixed rendering of s3-exporter to be idempotent
 - Fixed bug where init'ing a config path a second time without the `CK8S_FLAVOR` variable set would fail.
 - Fixed relabeling for rook-ceph and cert servicemonitor.
+- Fluentd will now properly detect changes in container logs.
+- The `init` script will now properly generate secrets for new configuration options.
 
 ### Added
 

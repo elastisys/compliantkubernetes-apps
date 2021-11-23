@@ -8,29 +8,29 @@ es:
   shards: true
   snapshots: true
   cluster_settings: false
-  {{- if or (contains "m" .Values.elasticsearch.exporter.serviceMonitor.scrapeTimeout) (contains "h" .Values.elasticsearch.exporter.serviceMonitor.scrapeTimeout) }}
+  {{- if or (contains "m" .Values.opensearch.exporter.serviceMonitor.scrapeTimeout) (contains "h" .Values.opensearch.exporter.serviceMonitor.scrapeTimeout) }}
   {{- fail "scrapeTimeout must only be given in seconds" }}
   {{ else }}
-  timeout: {{ .Values.elasticsearch.exporter.serviceMonitor.scrapeTimeout | trimSuffix "s" | atoi | add -5 }}s
+  timeout: {{ .Values.opensearch.exporter.serviceMonitor.scrapeTimeout | trimSuffix "s" | atoi | add -5 }}s
   {{- end }}
   sslSkipVerify: true
 
 # Load credentials from secret, used in uri below
-envFromSecret: opendistro-es-metrics-exporter-user
+envFromSecret: opensearch-metrics-exporter-user
 
 env:
-  ES_URI: http://$(username):$(password)@opendistro-es-client-service:9200
+  ES_URI: http://$(username):$(password)@{{ .Values.opensearch.clusterName }}-master:9200
 
 serviceMonitor:
   enabled: true
-  namespace: elastic-system
-  interval: {{ .Values.elasticsearch.exporter.serviceMonitor.interval }}
-  scrapeTimeout: {{ .Values.elasticsearch.exporter.serviceMonitor.scrapeTimeout }}
+  namespace: opensearch-system
+  interval: {{ .Values.opensearch.exporter.serviceMonitor.interval }}
+  scrapeTimeout: {{ .Values.opensearch.exporter.serviceMonitor.scrapeTimeout }}
   scheme: http
 
-resources: {{- toYaml .Values.elasticsearch.exporter.resources | nindent 2 }}
+resources: {{- toYaml .Values.opensearch.exporter.resources | nindent 2 }}
 
-tolerations: {{- toYaml .Values.elasticsearch.exporter.tolerations | nindent 2 }}
+tolerations: {{- toYaml .Values.opensearch.exporter.tolerations | nindent 2 }}
 
 podSecurityPolicies:
   enabled: true

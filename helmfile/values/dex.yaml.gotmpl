@@ -53,22 +53,22 @@ config:
       redirectURIs:
         - https://{{ .Values.prometheus.grafana.subdomain }}.{{ .Values.global.opsDomain }}/login/generic_oauth
 {{- end }}
-{{ if .Values.harbor.enabled }}
+{{- if .Values.harbor.enabled }}
     - id: harbor
       secret: {{ .Values.harbor.clientSecret }}
       name: 'Harbor'
       redirectURIs:
         - https://{{ .Values.harbor.subdomain }}.{{ .Values.global.baseDomain }}/c/oidc/callback
-{{ end }}
-{{ if .Values.elasticsearch.sso.enabled }}
-    - id: kibana-sso
-      secret: {{ .Values.elasticsearch.clientSecret }}
-      name: 'kibana-sso'
+{{- end }}
+{{- if .Values.opensearch.sso.enabled }}
+    - id: opensearch
+      secret: {{ .Values.opensearch.clientSecret }}
+      name: 'OpenSearch'
       redirectURIs:
-        - https://{{ .Values.kibana.subdomain }}.{{ .Values.global.baseDomain }}
-        - https://{{ .Values.kibana.subdomain }}.{{ .Values.global.baseDomain }}/auth/openid/login
-        - https://{{ .Values.kibana.subdomain }}.{{ .Values.global.baseDomain }}/app/kibana
-{{ end }}
+        - https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
+        - https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}/auth/openid/login
+        - https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}/app/home
+{{- end }}
 {{ if .Values.dex.additionalStaticClients }}
   {{- toYaml .Values.dex.additionalStaticClients | nindent 4 }}
 {{ end }}
