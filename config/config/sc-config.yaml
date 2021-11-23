@@ -33,6 +33,7 @@ user:
       allowedDomains:
         - set-me
         - example.com
+    viewersCanEdit: true
     sidecar:
       resources:
         requests:
@@ -221,6 +222,7 @@ prometheus:
       #   grafanaViewer: grafana_viewer # maps to grafana role viewer
       # scopes: "openid profile email groups"
       # allowedDomains: []
+    viewersCanEdit: true
 
     sidecar:
       resources:

@@ -234,6 +234,8 @@ grafana:
       tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}
       role_attribute_path: contains(groups[*], '{{ .Values.prometheus.grafana.oidc.userGroups.grafanaAdmin }}') && 'Admin' || contains(groups[*], '{{ .Values.prometheus.grafana.oidc.userGroups.grafanaEditor }}') && 'Editor' || contains(groups[*], '{{ .Values.prometheus.grafana.oidc.userGroups.grafanaViewer }}') && 'Viewer'
       {{- end }}
+    users:
+      viewers_can_edit: {{ .Values.prometheus.grafana.viewersCanEdit }}
 
   serviceMonitor:
     relabelings:
