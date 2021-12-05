@@ -9,6 +9,10 @@
 
     This will copy over the variables set for the environment regarding cloud provider, environment name, and flavor to the new location: the common default config.
 
+1. Run migration script `remove_old_metrics_server.sh`
+
+    This will remove the old metrics-server components from the clusters.
+
 1. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.
