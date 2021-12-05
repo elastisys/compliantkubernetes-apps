@@ -81,7 +81,7 @@ releases:
   labels:
     app: metrics-server
   chart: ./upstream/metrics-server
-  version: 2.10.0
+  version: 3.7.0
   installed: {{ .Values.metricsServer.enabled }}
   missingFileHandler: Error
   values:
