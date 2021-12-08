@@ -142,6 +142,8 @@ kubeScheduler:
   enabled: false
 
 grafana:
+  image:
+    tag: 8.0.7
 
   # admin username is "admin"
   adminPassword: {{ .Values.grafana.password }}
