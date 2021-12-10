@@ -99,6 +99,7 @@ controller:
     type: {{ .Values.ingressNginx.controller.service.type }}
     annotations:
     {{- .Values.ingressNginx.controller.service.annotations | nindent 6 }}
+    loadBalancerSourceRanges: {{- toYaml .Values.ingressNginx.controller.service.loadBalancerSourceRanges | nindent 6 }}
     {{ else }}
     enabled: false
     {{ end }}
