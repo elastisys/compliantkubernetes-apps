@@ -36,12 +36,6 @@ serviceMonitor:
 prometheusRule:
   enabled: true
 
-service:
-  ports:
-  - name: metrics
-    type: ClusterIP
-    port: 24231
-
 # Default args include "-q" which sets loglevel to warning.
 fluentdArgs: "--no-supervisor -q"
 configMaps:

@@ -42,12 +42,6 @@ serviceMonitor:
 prometheusRule:
   enabled: true
 
-service:
-  ports:
-  - name: metrics
-    type: ClusterIP
-    port: 24231
-
 extraConfigMaps:
   system.conf: |-
     <system>
