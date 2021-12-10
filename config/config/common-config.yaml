@@ -49,6 +49,9 @@ global:
   ## IP of the cluster DNS in kubernetes
   clusterDns: 10.233.0.3
 
+elasticsearch:
+  indexPerNamespace: false
+
 ## Configuration of storageclasses.
 storageClasses:
   # Name of the default storageclass.

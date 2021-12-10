@@ -1,5 +1,7 @@
 # Release notes
 
+* This release introduces a new feature called "index per namespace".
+  Enabling it makes fluentd log to indices in elasticsearch based on the namespace from which the container log originates.
 * Check out the [upgrade guide](https://github.com/elastisys/compliantkubernetes-apps/blob/main/migration/v0.18.x-v0.19.x/upgrade-apps.md) for a complete set of instructions needed to upgrade.
 
 # Updated
@@ -55,6 +57,7 @@
 - Added the possibility to whitelist IP addresses to the loadbalancer service
 - Added pwgen and htpasswd as requirements
 - Added the blackbox installation in the wc cluster based on ADR to monitor the uptime of internal services as well in wc .
+- Added option to enable index per namespace feature in fluentd and elasticsearch
 
 ### Removed
 
@@ -64,3 +67,4 @@
   - `common-psp-rbac`
   - `workload-cluster-psp-rbac`
 - Removed the "prometheusBlackboxExporter" from sc config and updated the common config as it will now be required in both sc and wc cluster
+- Removed curator alerts

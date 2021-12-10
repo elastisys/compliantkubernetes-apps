@@ -275,7 +275,11 @@ elasticsearch:
 
 
     ############## Elasticsearch configuration settings ##############
+    {{- if .Values.elasticsearch.indexPerNamespace }}
+    action.auto_create_index: "-kubeaudit,-authlog,-other,+*"
+    {{- else }}
     action.auto_create_index: ".opendistro-*,.kibana*,security-auditlog-*"
+    {{- end }}
 
     node:
       attr.box_type: hot
@@ -447,7 +451,6 @@ certmanager:
 # Curator conjob configuration
 curator:
   enabled: {{ .Values.elasticsearch.curator.enabled }}
-  postgresql: {{ .Values | get "elasticsearch.curator.retention.postgresql" false }}
   startingDeadlineSeconds: 600
   affinity:     {{- toYaml .Values.elasticsearch.curator.affinity | nindent 4 }}
   tolerations:  {{- toYaml .Values.elasticsearch.curator.tolerations | nindent 4 }}
@@ -460,24 +463,8 @@ curator:
     password: {{ .Values.elasticsearch.curatorPassword }}
     secret: opendistro-es-curator-user
 
-  retention:
-    - pattern: other-*
-      sizeGB: {{ .Values.elasticsearch.curator.retention.otherSizeGB }}
-      ageDays: {{ .Values.elasticsearch.curator.retention.otherAgeDays }}
-    - pattern: kubeaudit-*
-      sizeGB: {{ .Values.elasticsearch.curator.retention.kubeAuditSizeGB }}
-      ageDays: {{ .Values.elasticsearch.curator.retention.kubeAuditAgeDays }}
-    - pattern: kubernetes-*
-      sizeGB: {{ .Values.elasticsearch.curator.retention.kubernetesSizeGB }}
-      ageDays: {{ .Values.elasticsearch.curator.retention.kubernetesAgeDays }}
-    - pattern: authlog-*
-      sizeGB: {{ .Values.elasticsearch.curator.retention.authLogSizeGB }}
-      ageDays: {{ .Values.elasticsearch.curator.retention.authLogAgeDays }}
-    {{- if ( .Values | get "elasticsearch.curator.retention.postgresql" nil ) }}
-    - pattern: postgresql-*
-      sizeGB: {{ .Values.elasticsearch.curator.retention.postgresqlSizeGB }}
-      ageDays: {{ .Values.elasticsearch.curator.retention.postgresqlAgeDays }}
-    {{- end}}
+  retention: {{ .Values | get "elasticsearch.curator.retention" nil | toYaml | nindent 4 }}
+
 
 # Elasticsearch and kibana configurer job configuration
 configurer:
@@ -547,6 +534,14 @@ configurer:
         - "cluster:monitor/main"
         - "indices:data/write/bulk"
         index_permissions:
+        {{- if .Values.elasticsearch.indexPerNamespace }}
+        - index_patterns:
+          # Only allow indices not starting with "."
+          - '/^[^.].*/'
+          allowed_actions:
+          - "indices:admin/create"
+          - "index"
+        {{- else }}
         - index_patterns:
           - "kubernetes-*"
           - "kubeaudit-*"
@@ -554,6 +549,7 @@ configurer:
           - "authlog-*"
           allowed_actions:
           - "index"
+        {{- end }}
     - role_name: curator
       definition:
         cluster_permissions:
@@ -565,20 +561,30 @@ configurer:
           allowed_actions:
           - "indices_monitor"
         - index_patterns:
+          {{- if .Values.elasticsearch.indexPerNamespace }}
+          - '/^[^.].*/'
+          {{- else }}
           - "kubernetes-*"
           - "other-*"
           - "kubeaudit-*"
           - "authlog-*"
+          {{- end }}
           allowed_actions:
           - "indices:admin/delete"
     - role_name: kubernetes_log_reader
       definition:
         index_permissions:
         - index_patterns:
+          {{- if .Values.elasticsearch.indexPerNamespace }}
+          - '/^(?!kube-system|gatekeeper-system|other|authlog|\.).*/'
+          {{- else }}
           - "kubernetes-*"
           - "kubeaudit-*"
+          {{- end }}
           allowed_actions:
           - "read"
+    # This role should be modified by removing the "read" as that can be
+    # given by the "kubernetes_log_reader" role.
     - role_name: backup_exporter
       definition:
         cluster_permissions:
@@ -590,8 +596,12 @@ configurer:
           allowed_actions:
           - "monitor"
         - index_patterns:
+          {{- if .Values.elasticsearch.indexPerNamespace }}
+          - '/^(?!kube-system|gatekeeper-system|other|authlog|\.).*/'
+          {{- else }}
           - "kubernetes-*"
           - "kubeaudit-*"
+          {{- end }}
           allowed_actions:
           - "read"
     - role_name: metrics_exporter

@@ -1,8 +1,4 @@
 esNodeCount: {{ add .Values.elasticsearch.dataNode.count .Values.elasticsearch.clientNode.count .Values.elasticsearch.masterNode.count }}
-eskubeAuditSizeGB: {{ .Values.elasticsearch.curator.retention.kubeAuditSizeGB }}
-eskubernetesSizeGB: {{ .Values.elasticsearch.curator.retention.kubernetesSizeGB }}
-esotherSizeGB: {{ .Values.elasticsearch.curator.retention.otherSizeGB }}
-esauthLogSizeGB: {{ .Values.elasticsearch.curator.retention.authLogSizeGB }}
 
 defaultRules:
   labels:

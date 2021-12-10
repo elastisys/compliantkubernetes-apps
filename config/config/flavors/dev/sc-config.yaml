@@ -31,10 +31,18 @@ elasticsearch:
     dedicatedPods: false
   curator:
     retention:
-      kubeAuditSizeGB: 4
-      kubeAuditAgeDays: 3
-      kubernetesSizeGB: 10
-      kubernetesAgeDays: 3
+      - pattern: other-*
+        sizeGB: 1
+        ageDays: 7
+      - pattern: kubeaudit-*
+        sizeGB: 4
+        ageDays: 3
+      - pattern: kubernetes-*
+        sizeGB: 10
+        ageDays: 3
+      - pattern: authlog-*
+        sizeGB: 1
+        ageDays: 30
   snapshot:
     enabled: false
     retentionSchedule: 0 1 * * * # 1am

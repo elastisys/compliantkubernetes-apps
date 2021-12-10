@@ -182,130 +182,139 @@ extraConfigMaps:
 
   output.conf: |-
     <match authlog.**>
-       @id elasticsearch_authlog
-       @type "#{ENV['OUTPUT_TYPE']}"
-       @log_level "#{ENV['OUTPUT_LOG_LEVEL']}"
-       include_tag_key "#{ENV['OUTPUT_INCLUDE_TAG_KEY']}"
-       type_name "#{ENV['OUTPUT_TYPE_NAME']}"
-       hosts "#{ENV['OUTPUT_HOSTS']}"
-       port "#{ENV['OUTPUT_PORT']}"
-       path "#{ENV['OUTPUT_PATH']}"
-       scheme "#{ENV['OUTPUT_SCHEME']}"
-       ssl_verify "#{ENV['OUTPUT_SSL_VERIFY']}"
-       ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
-       user "#{ENV['OUTPUT_USER']}"
-       password "#{ENV['OUTPUT_PASSWORD']}"
-       log_es_400_reason "#{ENV['OUTPUT_LOG_400_REASON']}"
-       reconnect_on_error "#{ENV['OUTPUT_RECONNECT_ON_ERROR']}"
-       reload_on_failure "#{ENV['OUTPUT_RELOAD_ON_FAILURE']}"
-       reload_connections "#{ENV['OUTPUT_RELOAD_CONNECTIONS']}"
-       request_timeout "#{ENV['OUTPUT_REQUEST_TIMEOUT']}"
+      @id elasticsearch_authlog
+      @type "#{ENV['OUTPUT_TYPE']}"
+      @log_level "#{ENV['OUTPUT_LOG_LEVEL']}"
+      include_tag_key "#{ENV['OUTPUT_INCLUDE_TAG_KEY']}"
+      type_name "#{ENV['OUTPUT_TYPE_NAME']}"
+      hosts "#{ENV['OUTPUT_HOSTS']}"
+      port "#{ENV['OUTPUT_PORT']}"
+      path "#{ENV['OUTPUT_PATH']}"
+      scheme "#{ENV['OUTPUT_SCHEME']}"
+      ssl_verify "#{ENV['OUTPUT_SSL_VERIFY']}"
+      ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
+      user "#{ENV['OUTPUT_USER']}"
+      password "#{ENV['OUTPUT_PASSWORD']}"
+      log_es_400_reason "#{ENV['OUTPUT_LOG_400_REASON']}"
+      reconnect_on_error "#{ENV['OUTPUT_RECONNECT_ON_ERROR']}"
+      reload_on_failure "#{ENV['OUTPUT_RELOAD_ON_FAILURE']}"
+      reload_connections "#{ENV['OUTPUT_RELOAD_CONNECTIONS']}"
+      request_timeout "#{ENV['OUTPUT_REQUEST_TIMEOUT']}"
 
-       # Custom parameters --START--
-       include_timestamp true # defaults to false
-       index_name authlog
-       default_elasticsearch_version 7
-       # https://github.com/uken/fluent-plugin-elasticsearch/issues/785
-       suppress_type_name true
-       # Custom parameters --END--
+      # Custom parameters --START--
+      include_timestamp true # defaults to false
+      index_name authlog
+      default_elasticsearch_version 7
+      # https://github.com/uken/fluent-plugin-elasticsearch/issues/785
+      suppress_type_name true
+      # Custom parameters --END--
 
-       <buffer>
-         @type "#{ENV['OUTPUT_BUFFER_TYPE']}"
-         path /var/log/fluentd-buffers/kubernetes.authlog.system.buffer
-         flush_mode "#{ENV['OUTPUT_BUFFER_FLUSH_MODE']}"
-         retry_type "#{ENV['OUTPUT_BUFFER_RETRY_TYPE']}"
-         flush_thread_count "#{ENV['OUTPUT_BUFFER_FLUSH_THREAD_TYPE']}"
-         flush_interval "#{ENV['OUTPUT_BUFFER_FLUSH_INTERVAL']}"
-         retry_forever "#{ENV['OUTPUT_BUFFER_RETRY_FOREVER']}"
-         retry_max_interval "#{ENV['OUTPUT_BUFFER_RETRY_MAX_INTERVAL']}"
-         chunk_limit_size "#{ENV['OUTPUT_BUFFER_CHUNK_LIMIT']}"
-         total_limit_size "#{ENV['OUTPUT_BUFFER_TOTAL_LIMIT']}"
-         overflow_action "#{ENV['OUTPUT_BUFFER_OVERFLOW_ACTION']}"
-       </buffer>
+      <buffer>
+        @type "#{ENV['OUTPUT_BUFFER_TYPE']}"
+        path /var/log/fluentd-buffers/kubernetes.authlog.system.buffer
+        flush_mode "#{ENV['OUTPUT_BUFFER_FLUSH_MODE']}"
+        retry_type "#{ENV['OUTPUT_BUFFER_RETRY_TYPE']}"
+        flush_thread_count "#{ENV['OUTPUT_BUFFER_FLUSH_THREAD_TYPE']}"
+        flush_interval "#{ENV['OUTPUT_BUFFER_FLUSH_INTERVAL']}"
+        retry_forever "#{ENV['OUTPUT_BUFFER_RETRY_FOREVER']}"
+        retry_max_interval "#{ENV['OUTPUT_BUFFER_RETRY_MAX_INTERVAL']}"
+        chunk_limit_size "#{ENV['OUTPUT_BUFFER_CHUNK_LIMIT']}"
+        total_limit_size "#{ENV['OUTPUT_BUFFER_TOTAL_LIMIT']}"
+        overflow_action "#{ENV['OUTPUT_BUFFER_OVERFLOW_ACTION']}"
+      </buffer>
     </match>
     <match kubeaudit.**>
-        @id elasticsearch_kubeaudit
-        @type "#{ENV['OUTPUT_TYPE']}"
-        @log_level "#{ENV['OUTPUT_LOG_LEVEL']}"
-        include_tag_key "#{ENV['OUTPUT_INCLUDE_TAG_KEY']}"
-        type_name "#{ENV['OUTPUT_TYPE_NAME']}"
-        hosts "#{ENV['OUTPUT_HOSTS']}"
-        port "#{ENV['OUTPUT_PORT']}"
-        path "#{ENV['OUTPUT_PATH']}"
-        scheme "#{ENV['OUTPUT_SCHEME']}"
-        ssl_verify "#{ENV['OUTPUT_SSL_VERIFY']}"
-        ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
-        user "#{ENV['OUTPUT_USER']}"
-        password "#{ENV['OUTPUT_PASSWORD']}"
-        log_es_400_reason "#{ENV['OUTPUT_LOG_400_REASON']}"
-        reconnect_on_error "#{ENV['OUTPUT_RECONNECT_ON_ERROR']}"
-        reload_on_failure "#{ENV['OUTPUT_RELOAD_ON_FAILURE']}"
-        reload_connections "#{ENV['OUTPUT_RELOAD_CONNECTIONS']}"
-        request_timeout "#{ENV['OUTPUT_REQUEST_TIMEOUT']}"
+      @id elasticsearch_kubeaudit
+      @type "#{ENV['OUTPUT_TYPE']}"
+      @log_level "#{ENV['OUTPUT_LOG_LEVEL']}"
+      include_tag_key "#{ENV['OUTPUT_INCLUDE_TAG_KEY']}"
+      type_name "#{ENV['OUTPUT_TYPE_NAME']}"
+      hosts "#{ENV['OUTPUT_HOSTS']}"
+      port "#{ENV['OUTPUT_PORT']}"
+      path "#{ENV['OUTPUT_PATH']}"
+      scheme "#{ENV['OUTPUT_SCHEME']}"
+      ssl_verify "#{ENV['OUTPUT_SSL_VERIFY']}"
+      ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
+      user "#{ENV['OUTPUT_USER']}"
+      password "#{ENV['OUTPUT_PASSWORD']}"
+      log_es_400_reason "#{ENV['OUTPUT_LOG_400_REASON']}"
+      reconnect_on_error "#{ENV['OUTPUT_RECONNECT_ON_ERROR']}"
+      reload_on_failure "#{ENV['OUTPUT_RELOAD_ON_FAILURE']}"
+      reload_connections "#{ENV['OUTPUT_RELOAD_CONNECTIONS']}"
+      request_timeout "#{ENV['OUTPUT_REQUEST_TIMEOUT']}"
 
-        # Custom parameters --START--
-        include_timestamp true # defaults to false
-        index_name kubeaudit
-        default_elasticsearch_version 7
-        # https://github.com/uken/fluent-plugin-elasticsearch/issues/785
-        suppress_type_name true
-        # Custom parameters --END--
+      # Custom parameters --START--
+      include_timestamp true # defaults to false
+      index_name kubeaudit
+      default_elasticsearch_version 7
+      # https://github.com/uken/fluent-plugin-elasticsearch/issues/785
+      suppress_type_name true
+      # Custom parameters --END--
 
-        <buffer>
-          @type "#{ENV['OUTPUT_BUFFER_TYPE']}"
-          path /var/log/fluentd-buffers/kubernetes.kubeaudit.system.buffer
-          flush_mode "#{ENV['OUTPUT_BUFFER_FLUSH_MODE']}"
-          retry_type "#{ENV['OUTPUT_BUFFER_RETRY_TYPE']}"
-          flush_thread_count "#{ENV['OUTPUT_BUFFER_FLUSH_THREAD_TYPE']}"
-          flush_interval "#{ENV['OUTPUT_BUFFER_FLUSH_INTERVAL']}"
-          retry_forever "#{ENV['OUTPUT_BUFFER_RETRY_FOREVER']}"
-          retry_max_interval "#{ENV['OUTPUT_BUFFER_RETRY_MAX_INTERVAL']}"
-          chunk_limit_size "#{ENV['OUTPUT_BUFFER_CHUNK_LIMIT']}"
-          total_limit_size "#{ENV['OUTPUT_BUFFER_TOTAL_LIMIT']}"
-          overflow_action "#{ENV['OUTPUT_BUFFER_OVERFLOW_ACTION']}"
-        </buffer>
+      <buffer>
+        @type "#{ENV['OUTPUT_BUFFER_TYPE']}"
+        path /var/log/fluentd-buffers/kubernetes.kubeaudit.system.buffer
+        flush_mode "#{ENV['OUTPUT_BUFFER_FLUSH_MODE']}"
+        retry_type "#{ENV['OUTPUT_BUFFER_RETRY_TYPE']}"
+        flush_thread_count "#{ENV['OUTPUT_BUFFER_FLUSH_THREAD_TYPE']}"
+        flush_interval "#{ENV['OUTPUT_BUFFER_FLUSH_INTERVAL']}"
+        retry_forever "#{ENV['OUTPUT_BUFFER_RETRY_FOREVER']}"
+        retry_max_interval "#{ENV['OUTPUT_BUFFER_RETRY_MAX_INTERVAL']}"
+        chunk_limit_size "#{ENV['OUTPUT_BUFFER_CHUNK_LIMIT']}"
+        total_limit_size "#{ENV['OUTPUT_BUFFER_TOTAL_LIMIT']}"
+        overflow_action "#{ENV['OUTPUT_BUFFER_OVERFLOW_ACTION']}"
+      </buffer>
     </match>
     <match kubernetes.**>
-        @id elasticsearch_kubernetes
-        @type "#{ENV['OUTPUT_TYPE']}"
-        @log_level "#{ENV['OUTPUT_LOG_LEVEL']}"
-        include_tag_key "#{ENV['OUTPUT_INCLUDE_TAG_KEY']}"
-        type_name "#{ENV['OUTPUT_TYPE_NAME']}"
-        hosts "#{ENV['OUTPUT_HOSTS']}"
-        port "#{ENV['OUTPUT_PORT']}"
-        path "#{ENV['OUTPUT_PATH']}"
-        scheme "#{ENV['OUTPUT_SCHEME']}"
-        ssl_verify "#{ENV['OUTPUT_SSL_VERIFY']}"
-        ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
-        user "#{ENV['OUTPUT_USER']}"
-        password "#{ENV['OUTPUT_PASSWORD']}"
-        log_es_400_reason "#{ENV['OUTPUT_LOG_400_REASON']}"
-        reconnect_on_error "#{ENV['OUTPUT_RECONNECT_ON_ERROR']}"
-        reload_on_failure "#{ENV['OUTPUT_RELOAD_ON_FAILURE']}"
-        reload_connections "#{ENV['OUTPUT_RELOAD_CONNECTIONS']}"
-        request_timeout "#{ENV['OUTPUT_REQUEST_TIMEOUT']}"
+      @id elasticsearch_kubernetes
+      {{- if .Values.elasticsearch.indexPerNamespace }}
+      @type elasticsearch_dynamic
+      {{- else }}
+      @type "#{ENV['OUTPUT_TYPE']}"
+      {{- end }}
+      @log_level "#{ENV['OUTPUT_LOG_LEVEL']}"
+      include_tag_key "#{ENV['OUTPUT_INCLUDE_TAG_KEY']}"
+      type_name "#{ENV['OUTPUT_TYPE_NAME']}"
+      hosts "#{ENV['OUTPUT_HOSTS']}"
+      port "#{ENV['OUTPUT_PORT']}"
+      path "#{ENV['OUTPUT_PATH']}"
+      scheme "#{ENV['OUTPUT_SCHEME']}"
+      ssl_verify "#{ENV['OUTPUT_SSL_VERIFY']}"
+      ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
+      user "#{ENV['OUTPUT_USER']}"
+      password "#{ENV['OUTPUT_PASSWORD']}"
+      log_es_400_reason "#{ENV['OUTPUT_LOG_400_REASON']}"
+      reconnect_on_error "#{ENV['OUTPUT_RECONNECT_ON_ERROR']}"
+      reload_on_failure "#{ENV['OUTPUT_RELOAD_ON_FAILURE']}"
+      reload_connections "#{ENV['OUTPUT_RELOAD_CONNECTIONS']}"
+      request_timeout "#{ENV['OUTPUT_REQUEST_TIMEOUT']}"
 
-        # Custom parameters --START--
-        include_timestamp true # defaults to false
-        index_name kubernetes
-        default_elasticsearch_version 7
-        # https://github.com/uken/fluent-plugin-elasticsearch/issues/785
-        suppress_type_name true
-        # Custom parameters --END--
+      # Custom parameters --START--
+      include_timestamp true # defaults to false
+      {{- if .Values.elasticsearch.indexPerNamespace }}
+      logstash_format true
+      logstash_prefix ${record['kubernetes']['namespace_name']}
+      {{- else }}
+      index_name kubernetes
+      {{- end }}
+      default_elasticsearch_version 7
+      # https://github.com/uken/fluent-plugin-elasticsearch/issues/785
+      suppress_type_name true
+      # Custom parameters --END--
 
-        <buffer>
-          @type "#{ENV['OUTPUT_BUFFER_TYPE']}"
-          path /var/log/fluentd-buffers/kubernetes.kubernetes.system.buffer
-          flush_mode "#{ENV['OUTPUT_BUFFER_FLUSH_MODE']}"
-          retry_type "#{ENV['OUTPUT_BUFFER_RETRY_TYPE']}"
-          flush_thread_count "#{ENV['OUTPUT_BUFFER_FLUSH_THREAD_TYPE']}"
-          flush_interval "#{ENV['OUTPUT_BUFFER_FLUSH_INTERVAL']}"
-          retry_forever "#{ENV['OUTPUT_BUFFER_RETRY_FOREVER']}"
-          retry_max_interval "#{ENV['OUTPUT_BUFFER_RETRY_MAX_INTERVAL']}"
-          chunk_limit_size "#{ENV['OUTPUT_BUFFER_CHUNK_LIMIT']}"
-          total_limit_size "#{ENV['OUTPUT_BUFFER_TOTAL_LIMIT']}"
-          overflow_action "#{ENV['OUTPUT_BUFFER_OVERFLOW_ACTION']}"
-        </buffer>
+      <buffer>
+        @type "#{ENV['OUTPUT_BUFFER_TYPE']}"
+        path /var/log/fluentd-buffers/kubernetes.kubernetes.system.buffer
+        flush_mode "#{ENV['OUTPUT_BUFFER_FLUSH_MODE']}"
+        retry_type "#{ENV['OUTPUT_BUFFER_RETRY_TYPE']}"
+        flush_thread_count "#{ENV['OUTPUT_BUFFER_FLUSH_THREAD_TYPE']}"
+        flush_interval "#{ENV['OUTPUT_BUFFER_FLUSH_INTERVAL']}"
+        retry_forever "#{ENV['OUTPUT_BUFFER_RETRY_FOREVER']}"
+        retry_max_interval "#{ENV['OUTPUT_BUFFER_RETRY_MAX_INTERVAL']}"
+        chunk_limit_size "#{ENV['OUTPUT_BUFFER_CHUNK_LIMIT']}"
+        total_limit_size "#{ENV['OUTPUT_BUFFER_TOTAL_LIMIT']}"
+        overflow_action "#{ENV['OUTPUT_BUFFER_OVERFLOW_ACTION']}"
+      </buffer>
     </match>
     <match **>
         @id elasticsearch

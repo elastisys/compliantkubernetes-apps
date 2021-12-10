@@ -266,6 +266,7 @@ kibana:
 elasticsearch:
   subdomain: elastic
   snapshotRepository: elastic-snapshots
+
   # Create initial indices upon first startup
   createIndices: true
   # Single-sign-on using OIDC
@@ -375,18 +376,18 @@ elasticsearch:
     nodeSelector: {}
     tolerations: []
     retention:
-      kubeAuditSizeGB: 50
-      kubeAuditAgeDays: 30
-      kubernetesSizeGB: 50
-      kubernetesAgeDays: 50
-      otherSizeGB: 1
-      otherAgeDays: 7
-      authLogSizeGB: 1
-      authLogAgeDays: 30
-      # (Optional) retention for indices matched by 'postgresql-*'
-      # postgresql: false
-      # postgresqlSizeGB: 30
-      # postgresqlAgeDays: 30
+      - pattern: other-*
+        sizeGB: 1
+        ageDays: 7
+      - pattern: kubeaudit-*
+        sizeGB: 50
+        ageDays: 30
+      - pattern: kubernetes-*
+        sizeGB: 50
+        ageDays: 50
+      - pattern: authlog-*
+        sizeGB: 1
+        ageDays: 30
 
   # Index state management
   ism:
