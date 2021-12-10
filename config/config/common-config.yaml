@@ -203,6 +203,10 @@ ingressNginx:
       ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
       annotations: set-me
 
+      ## Whitelist IP address for octavia loadbalancer
+      ## ref: https://github.com/kubernetes/cloud-provider-openstack/blob/master/docs/openstack-cloud-controller-manager/expose-applications-using-loadbalancer-type-service.md#restrict-access-for-loadbalancer-service
+      loadBalancerSourceRanges: []
+
     ## Additional configuration options for Nginx
     ## ref: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
     additionalConfig: {}
