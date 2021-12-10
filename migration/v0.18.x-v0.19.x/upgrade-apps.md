@@ -24,6 +24,11 @@
     This will save configuration and user role bindings for User Alertmanager.
     Skip this step if this is not something you want to keep.
 
+1. Run migration script `curator-retention.sh`
+
+    This will update the curator retention to the new configuration way.
+    This script is only relevant if you have overridden the defaults.
+
 1. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.
