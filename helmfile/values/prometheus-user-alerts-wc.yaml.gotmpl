@@ -20,5 +20,7 @@ defaultRules:
     # about these alerts, but we have no other way of gathering them currently.
     rookMonitor: {{ .Values.monitoring.rook.enabled }}
 
+predictLinearLimit: {{ .Values.prometheus.predictLinearLimit }}
+
 rookMonitor:
   enabled: {{ .Values.monitoring.rook.enabled }}

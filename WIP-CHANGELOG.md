@@ -17,6 +17,8 @@
 
 ### Fixed
 
+- Fixed rendering of new prometheus alert rule to allow it to be admitted by the operator
+
 ### Added
 
 - Added fluentd metrics
