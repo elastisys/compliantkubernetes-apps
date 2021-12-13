@@ -18,6 +18,7 @@
 - Enabled the default rules from kube-prometheus-stack and deleted them from `prometheus-alerts` chart [#681](https://github.com/elastisys/compliantkubernetes-apps/pull/681)
 - Enabled extra api server metrics [#681](https://github.com/elastisys/compliantkubernetes-apps/pull/681)
 - Increased resources requests and limits for Starboard-operator in the common config [#681](https://github.com/elastisys/compliantkubernetes-apps/pull/681)
+- Updated the common config as "prometheusBlackboxExporter" will now be required in both sc and wc cluster
 
 ### Fixed
 - Grafana dashboards by keeping more metrics from the kubeApiServer [#681](https://github.com/elastisys/compliantkubernetes-apps/pull/681)
@@ -33,6 +34,7 @@
 - New Prometheus rules have been added to forewarn against when memory and disk (PVC and host disk) capacity overloads
 - Added the possibility to whitelist IP addresses to the loadbalancer service
 - Added pwgen and htpasswd as requirements
+- Added the blackbox installation in the wc cluster based on ADR to monitor the uptime of internal services as well in wc .
 
 ### Removed
 
@@ -41,3 +43,4 @@
   - `gatekeeper-operator`
   - `common-psp-rbac`
   - `workload-cluster-psp-rbac`
+- Removed the "prometheusBlackboxExporter" from sc config and updated the common config as it will now be required in both sc and wc cluster

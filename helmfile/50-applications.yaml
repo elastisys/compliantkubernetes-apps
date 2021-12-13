@@ -109,7 +109,21 @@ releases:
   installed: {{ .Values.calicoFelixMetrics.enabled }}
   missingFileHandler: Error
 
-
+# Blackbox-sc-wc
+- name: blackbox
+  namespace: monitoring
+  labels:
+    app: blackbox
+  chart: ./charts/blackbox
+  version: 0.1.0
+  missingFileHandler: Error
+  values:
+{{ if eq .Environment.Name "service_cluster" }}
+  - values/blackbox-sc.yaml.gotmpl
+{{ end }}
+{{ if eq .Environment.Name "workload_cluster" }}
+  - values/blackbox-wc.yaml.gotmpl
+{{ end }}
 
 # cluster-admin-rbac
 - name: cluster-admin-rbac
@@ -121,7 +135,6 @@ releases:
   missingFileHandler: Error
   values:
   - values/cluster-admin-rbac.yaml.gotmpl
-
 
 # starboard-operator
 - name: starboard-operator
@@ -144,7 +157,6 @@ releases:
   missingFileHandler: Error
   values:
   - values/vulnerability-exporter.yaml.gotmpl
-
 
 # Service cluster releases
 {{ if eq .Environment.Name "service_cluster" }}
@@ -233,7 +245,6 @@ releases:
   missingFileHandler: Error
   values:
   - values/grafana-user.yaml.gotmpl
-
 
 # prometheus-elasticsearch-exporter
 - name: prometheus-elasticsearch-exporter
@@ -336,16 +347,6 @@ releases:
   missingFileHandler: Error
   values:
   - values/influxdb.yaml.gotmpl
-
-- name: blackbox
-  namespace: monitoring
-  labels:
-    app: blackbox
-  chart: ./charts/blackbox
-  version: 0.1.0
-  missingFileHandler: Error
-  values:
-  - values/blackbox.yaml.gotmpl
 
 - name: s3-exporter
   namespace: monitoring
