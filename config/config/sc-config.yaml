@@ -164,14 +164,7 @@ harbor:
   backup:
     enabled: true
 
-prometheusBlackboxExporter:
-  resources:
-    requests:
-      cpu: 5m
-      memory: 25Mi
-    limits:
-      cpu: 10m
-      memory: 50Mi
+
 
 prometheus:
   retention:
