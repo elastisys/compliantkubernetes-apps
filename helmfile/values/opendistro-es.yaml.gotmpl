@@ -57,7 +57,7 @@ elasticsearch:
 
   extraInitContainers:
   - name: install-object-storage-plugin
-    image: amazon/opendistro-for-elasticsearch:1.12.0
+    image: amazon/opendistro-for-elasticsearch:1.13.3
     command:
     - sh
     - -c
@@ -75,7 +75,7 @@ elasticsearch:
       {{- end }}
 
       # Disable performance_analyzer due to issue where disk is being filled up
-      /usr/share/elasticsearch/bin/elasticsearch-plugin remove opendistro_performance_analyzer
+      /usr/share/elasticsearch/bin/elasticsearch-plugin remove opendistro-performance-analyzer
 
       if [[ -z "$(ls -A /usr/share/elasticsearch/config)" ]]; then
         echo "Empty dir /usr/share/elasticsearch/config"
@@ -461,16 +461,23 @@ curator:
     secret: opendistro-es-curator-user
 
   retention:
-    authlog_gb: {{ .Values.elasticsearch.curator.retention.authLogSizeGB }}
-    authlog_days: {{ .Values.elasticsearch.curator.retention.authLogAgeDays }}
-    other_gb: {{ .Values.elasticsearch.curator.retention.otherSizeGB }}
-    other_days: {{ .Values.elasticsearch.curator.retention.otherAgeDays }}
-    kubernetes_gb: {{ .Values.elasticsearch.curator.retention.kubernetesSizeGB }}
-    kubernetes_days: {{ .Values.elasticsearch.curator.retention.kubernetesAgeDays }}
-    kubeaudit_gb: {{ .Values.elasticsearch.curator.retention.kubeAuditSizeGB }}
-    kubeaudit_days: {{ .Values.elasticsearch.curator.retention.kubeAuditAgeDays }}
-    postgresql_gb: {{ .Values | get "elasticsearch.curator.retention.postgresqlSizeGB" nil }}
-    postgresql_days: {{ .Values | get "elasticsearch.curator.retention.postgresqlAgeDays" nil }}
+    - pattern: other-*
+      sizeGB: {{ .Values.elasticsearch.curator.retention.otherSizeGB }}
+      ageDays: {{ .Values.elasticsearch.curator.retention.otherAgeDays }}
+    - pattern: kubeaudit-*
+      sizeGB: {{ .Values.elasticsearch.curator.retention.kubeAuditSizeGB }}
+      ageDays: {{ .Values.elasticsearch.curator.retention.kubeAuditAgeDays }}
+    - pattern: kubernetes-*
+      sizeGB: {{ .Values.elasticsearch.curator.retention.kubernetesSizeGB }}
+      ageDays: {{ .Values.elasticsearch.curator.retention.kubernetesAgeDays }}
+    - pattern: authlog-*
+      sizeGB: {{ .Values.elasticsearch.curator.retention.authLogSizeGB }}
+      ageDays: {{ .Values.elasticsearch.curator.retention.authLogAgeDays }}
+    {{- if ( .Values | get "elasticsearch.curator.retention.postgresql" nil ) }}
+    - pattern: postgresql-*
+      sizeGB: {{ .Values.elasticsearch.curator.retention.postgresqlSizeGB }}
+      ageDays: {{ .Values.elasticsearch.curator.retention.postgresqlAgeDays }}
+    {{- end}}
 
 # Elasticsearch and kibana configurer job configuration
 configurer:

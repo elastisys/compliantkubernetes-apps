@@ -2,6 +2,10 @@
   "policy": {
     "policy_id": "kubeaudit",
     "description": "Kubeaudit ISM policy",
+    "ism_template": {
+      "index_patterns": ["kubeaudit*"],
+      "priority": 100
+    },
     "default_state": "hot",
     "states": [
       {

@@ -2,6 +2,10 @@
   "policy": {
     "policy_id": "authlog",
     "description": "Authlog ISM policy",
+    "ism_template": {
+      "index_patterns": ["authlog*"],
+      "priority": 100
+    },
     "default_state": "hot",
     "states": [
       {
