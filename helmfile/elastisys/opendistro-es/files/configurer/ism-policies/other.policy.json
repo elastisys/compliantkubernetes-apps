@@ -2,6 +2,10 @@
   "policy": {
     "policy_id": "other",
     "description": "Other ISM policy",
+    "ism_template": {
+      "index_patterns": ["other*"],
+      "priority": 100
+    },
     "default_state": "hot",
     "states": [
       {

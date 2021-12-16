@@ -62,7 +62,7 @@ spec:
       initContainers:
 {{- if .Values.elasticsearch.sysctl.enabled }}
       - name: init-sysctl
-        image: {{ .Values.global.registry }}/{{ .Values.elasticsearch.initContainer.image }}:{{ .Values.elasticsearch.initContainer.imageTag }}
+        image: {{ .Values.global.imageRegistry }}/{{ .Values.elasticsearch.initContainer.image }}:{{ .Values.elasticsearch.initContainer.imageTag }}
         command:
         - sysctl
         - -w
@@ -70,24 +70,32 @@ spec:
         securityContext:
           privileged: true
 {{- end }}
+{{- if .Values.elasticsearch.fixmount.enabled }}
       - name: fixmount
         command: [ 'sh', '-c', 'chown -R 1000:1000 /usr/share/elasticsearch/data' ]
-        image: {{ .Values.global.registry }}/{{ .Values.elasticsearch.initContainer.image }}:{{ .Values.elasticsearch.initContainer.imageTag }}
+        image: {{ .Values.global.imageRegistry }}/{{ .Values.elasticsearch.initContainer.image }}:{{ .Values.elasticsearch.initContainer.imageTag }}
         volumeMounts:
           - mountPath: /usr/share/elasticsearch/data
             name: data
             subPath: {{ .Values.elasticsearch.master.persistence.subPath }}
+{{- end }}
 {{- if .Values.elasticsearch.extraInitContainers }}
 {{ toYaml .Values.elasticsearch.extraInitContainers| indent 6 }}
 {{- end }}
 {{- if .Values.elasticsearch.master.extraInitContainers }}
 {{ toYaml .Values.elasticsearch.master.extraInitContainers| indent 6 }}
 {{- end }}
+{{- with .Values.elasticsearch.securityContextCustom }}
+      securityContext:
+{{ toYaml . | indent 8 }}
+{{- end }}
       containers:
       - name: elasticsearch
+{{- if .Values.elasticsearch.sys_chroot.enabled }}
         securityContext:
           capabilities:
             add: ["SYS_CHROOT"]
+{{- end }}
         env:
         - name: cluster.name
           value: {{ .Values.global.clusterName }}
@@ -151,7 +159,7 @@ spec:
 {{ toYaml . | indent 10 }}
     {{- end }}
         # Official Image from Open Distro Team
-        image: {{ .Values.global.registry }}/{{ .Values.elasticsearch.image }}:{{ .Values.elasticsearch.imageTag }}
+        image: {{ .Values.global.imageRegistry }}/{{ .Values.elasticsearch.image }}:{{ .Values.elasticsearch.imageTag }}
         imagePullPolicy: {{ .Values.elasticsearch.imagePullPolicy | default "Always" | quote }}
         ports:
         - containerPort: 9300
