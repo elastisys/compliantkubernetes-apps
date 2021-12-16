@@ -33,10 +33,6 @@ kibana:
   startupProbe: []
 
   elasticsearchAccount:
-    useExistingSecret: true
-    username:
-    password:
-    cookie:
     secret: ""
     keyPassphrase:
       enabled: false
@@ -145,14 +141,16 @@ kibana:
 global:
   clusterName: elasticsearch
 
+  ## Do not create psp for non-root, as this is a cluster scoped resource
+  ## and we want this to work in namespace-scoped tenancy models
   psp:
-    create: true
+    create: false
 
   rbac:
     enabled: true
 
   # Optionally override the docker registry to use for images
-  imageRegistry: docker.io
+  registry: docker.io
 
   ## Optionally specify an array of imagePullSecrets.
   ## Secrets must be manually created in the namespace.
@@ -176,20 +174,20 @@ elasticsearch:
     #The following option simplifies securityConfig by using a single secret and specifying the respective secrets in the corresponding files instead of creating different secrets for config,internal users, roles, roles mapping and tenants
     #Note that this is an alternative to the above secrets and shouldn't be used if the above secrets are used
     config:
-      securityConfigSecret:
-      data: {}
-       # config.yml: |-
-       # internal_users.yml: |-
-       # roles.yml: |-
-       # rolesMapping.yml: |-
-       # tenants.yml: |-
+       securityConfigSecret:
+       data: {}
+        # config.yml: |-
+        # internal_users.yml: |-
+        # roles.yml: |-
+        # rolesMapping.yml: |-
+        # tenants.yml: |-
 
 
   ## securityContext to apply to the pod. Allows for running as non-root
-  securityContextCustom: {}
-  #  fsGroup: 1000
-  #  runAsUser: 1000
-  #  runAsGroup: 1000
+  securityContextCustom:
+    fsGroup: 1000
+    runAsUser: 1000
+    runAsGroup: 1000
 
   extraEnvs: []
 
@@ -214,16 +212,16 @@ elasticsearch:
   ## Set optimal sysctl's. This requires privilege. Can be disabled if
   ## the system has already been preconfigured.
   sysctl:
-    enabled: true
+    enabled: false
 
   ## Give SYS_CHROOT cap to ES pods. This might not be neccesary
   sys_chroot:
-    enabled: true
+    enabled: false
 
   ## init container to chown the mount volume. not neccesary if setting a
   ## fsGroup in the securityContext
   fixmount:
-    enabled: true
+    enabled: false
 
   ssl:
     ## TLS is mandatory for the transport layer and can not be disabled
@@ -555,244 +553,6 @@ elasticsearch:
     ## If not set and create is true, a name is generated using the fullname template
     name:
 
-  s3:
-    enabled: false
-    useExistingSecret: true
-    accessKey:
-    secretKey:
-    bucketName: ""
-
-  gcs:
-    enabled: false
-    useExistingSecret: true
-    keyfileData: ""
-    bucketName: ""
 
 nameOverride: ""
 fullnameOverride: ""
-
-
-certmanager:
-  enabled: false
-
-  ca:
-    commonName: example.com
-    duration: 21600h
-    renewBefore: 360h
-    keySize: 2048
-
-  elasticsearch:
-    transport:
-      enabled: true
-      commonName: example.com
-      duration: 21600h
-      renewBefore: 360h
-      keySize: 2048
-      usages:
-      - server auth
-      - client auth
-    admin:
-      enabled: true
-      commonName: example.com
-      duration: 21600h
-      renewBefore: 360h
-      keySize: 2048
-      usages:
-      - server auth
-      - client auth
-
-
-curator:
-  enabled: false
-
-  schedule: "*/5 * * * *"
-  image: bobrik/curator:5.8.1
-  imagePullPolicy: IfNotPresent
-  restartPolicy: Never
-  resources:
-    limits: {}
-    requests: {}
-  affinity: {}
-  nodeSelector: {}
-  tolerations: []
-  startingDeadlineSeconds:
-  failedJobsHistoryLimit:
-  successfulJobsHistoryLimit:
-
-  postgresql: false
-
-  retention:
-    - pattern: other-*
-      sizeGB: 1
-      ageDays: 10
-    - pattern: kubernetes-*
-      sizeGB: 1
-      ageDays: 10
-    - pattern: kubeaudit-*
-      sizeGB: 100
-      ageDays: 30
-    - pattern: authlog-*
-      sizeGB: 1
-      ageDays: 10
-
-  config_yml: |-
-    ---
-    client:
-      hosts:
-      - {{ template "opendistro-es.fullname" . }}-client-service
-      port: 9200
-      use_ssl: false
-      http_auth: ${ES_AUTH}
-      timeout: 30
-      master_only: False
-    logging:
-      loglevel: INFO
-      logformat: default
-      blacklist: ['elasticsearch', 'urllib3']
-
-  elasticsearchAccount:
-    useExistingSecret: true
-    username:
-    password:
-    secret: ""
-    keyPassphrase:
-      enabled: false
-
-
-configurer:
-  enabled: false
-
-  ## If true, configurer will create an index for each template if there is
-  ## none.
-  createIndices: true
-
-  ## If true, configurer will update/override an index policy if it already
-  ## exists.
-  updatePolicies: true
-
-  ## If true, configurer will create the default ISM policices for
-  ## kubernetes, kubeaudit, and other indices
-  defaultPolicies: true
-
-  ## Allows for specification of additional ISM policies
-  additionalPolicies: {}
-    # # Naming must follow <policy_name>.policy.json
-    # my_policy.policy.json: |-
-    #   {
-    #     "policy": {
-    #       "policy_id": "my_policy",
-    #       "description": "Other ISM policy",
-    #       "default_state": "hot",
-    #       "states": [
-    #         {
-    #           "name": "hot",
-    #           "actions": [
-    #             {
-    #               "rollover": {
-    #                 "min_size": "1GB",
-    #                 "min_index_age": "1d"
-    #               }
-    #             }
-    #           ]
-    #         }
-    #       ]
-    #     }
-    #   }
-
-  ## If true, configurer will create the default index templates for
-  ## kubernetes, kubeaudit, and other indices
-  defaultTemplates: true
-
-  ## Allows for specification of additional index templates
-  additionalTemplates: {}
-    # # Naming must follow <template_name>.template.json
-    # my_template.template.json: |-
-    #   {
-    #     "index_patterns": [
-    #       "my_index*"
-    #     ],
-    #     "template": {
-    #       "settings": {
-    #         "index.refresh_interval": "10s",
-    #         "opendistro.index_state_management.policy_id": "my_policy",
-    #         "opendistro.index_state_management.rollover_alias": "my_alias",
-    #         "mapping.total_fields.limit": "1000"
-    #       }
-    #     }
-    #   }
-
-  ## If true, configurer will overwrite existing templates.
-  ## A negation of the 'create' parameter, see:
-  ## https://opendistro.github.io/for-elasticsearch-docs/docs/elasticsearch/rest-api-reference/#indicesput_template
-  overwriteTemplates: true
-
-  snapshotRepository: s3_snapshotRepository_7.x
-
-  ism:
-    rolloverSize: 1
-    rolloverAge: 1
-
-  image: elastisys/curl-jq:latest
-  activeDeadlineSeconds: 600
-  backoffLimit: 10
-  resources:
-    limits: {}
-    requests: {}
-  affinity: {}
-  nodeSelector: {}
-  tolerations: []
-
-  helm:
-    hook: post-install,post-upgrade
-    deletePolicy: before-hook-creation,hook-failed
-
-  elasticsearchAccount:
-    useExistingSecret: true
-    username:
-    password:
-    secret: ""
-    keyPassphrase:
-      enabled: false
-
-  ## Allow specification of security plugin users,
-  ## roles, and role mappings.
-  securityPlugin:
-    ## Users to create
-    users:
-    # - username: your_user
-    #   definition:
-    #     password: your_password
-
-    ## Roles to create
-    roles:
-    # - role_name: simple_monitor
-    #   definition:
-    #     cluster_permissions:
-    #     - "cluster:monitor/main"
-
-    ## Role mappings to create
-    roles_mapping:
-    # - mapping_name: simple_monitor
-    #   definition:
-    #     users:
-    #     - your_user
-
-
-metricsExporter:
-  elasticsearchAccount:
-    useExistingSecret: true
-    username:
-    password:
-    secret: ""
-    keyPassphrase:
-      enabled: false
-
-
-slm:
-  elasticsearchAccount:
-    useExistingSecret: true
-    username:
-    password:
-    secret: ""
-    keyPassphrase:
-      enabled: false
