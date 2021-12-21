@@ -31,6 +31,7 @@
 - Added and enabled by default an option for Grafana Viewers to temporarily edit dashboards and panels without saving.
 - New Prometheus rules have been added to forewarn against when memory and disk (PVC and host disk) capacity overloads
 - Added the possibility to whitelist IP addresses to the loadbalancer service
+- Added pwgen and htpasswd as requirements
 
 ### Removed
 
