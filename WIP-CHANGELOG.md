@@ -23,6 +23,7 @@
 - Grafana dashboards by keeping more metrics from the kubeApiServer [#681](https://github.com/elastisys/compliantkubernetes-apps/pull/681)
 
 - Fixed rendering of new prometheus alert rule to allow it to be admitted by the operator
+- Fixed rendering of s3-exporter to be idempotent
 
 ### Added
 

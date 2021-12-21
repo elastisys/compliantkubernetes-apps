@@ -3,7 +3,7 @@ s3:
   regionEndpoint: {{ .Values.objectStorage.s3.regionEndpoint | quote }}
   accessKey: {{ .Values.objectStorage.s3.accessKey | quote }}
   secretKey: {{ .Values.objectStorage.s3.secretKey | quote }}
-  buckets: {{ values .Values.objectStorage.buckets | toYaml | nindent 2 }}
+  buckets: {{ values .Values.objectStorage.buckets | sortAlpha | toYaml | nindent 2 }}
   forcePathStyle: {{ .Values.objectStorage.s3.forcePathStyle }}
 
 serviceMonitor:
