@@ -17,5 +17,8 @@ namespaces:
   labels:
     admission.gatekeeper.sh/ignore: "true"
 {{ end }}
+{{ if .Values.user.alertmanager.enabled }}
+- name: alertmanager
+{{ end }}
 commonLabels:
   owner: operator

@@ -1,9 +1,3 @@
-{{- if .Values.alertmanager.enabled }}
-{{- if not (has .Values.alertmanager.namespace .Values.namespaces) }}
-{{- fail "The namespace for alertmanager must be listed under namespaces when enabled" }}
-{{- end }}
-{{- end }}
-
 {{- if .Values.createNamespaces }}
 {{- range $namespace := .Values.namespaces }}
 apiVersion: v1

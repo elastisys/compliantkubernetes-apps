@@ -24,6 +24,15 @@ rules:
   - watch
   - update
   - patch
+# Allow proxying alertmanager web service
+- apiGroups:
+  - ""
+  resourceNames:
+  - alertmanager-operated:web
+  resources:
+  - services/proxy
+  verbs:
+  - get
 # Allow editing the user-alertmanager-auth secret
 - apiGroups:
   - ""

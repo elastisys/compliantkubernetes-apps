@@ -5,4 +5,3 @@ createNamespaces: {{ .Values.user.createNamespaces }}
 enableFalcoViewer: {{ toYaml .Values.falco.enabled | nindent 2 }}
 alertmanager:
   enabled: {{ .Values.user.alertmanager.enabled }}
-  namespace: {{ .Values.user.alertmanager.namespace }}
