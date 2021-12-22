@@ -82,7 +82,7 @@ prometheus:
     # Connect to separately managed alertmanager
     alertingEndpoints:
       - name: alertmanager-operated
-        namespace: {{ .Values.user.alertmanager.namespace }}
+        namespace: alertmanager
         port: web
         pathPrefix: /
     {{ end }}
@@ -126,7 +126,7 @@ prometheus:
     {{ end }}
 
     {{ if .Values.user.alertmanager.enabled }}
-    - job_name: '{{ .Values.user.alertmanager.namespace }}/alertmanager-operated'
+    - job_name: 'alertmanager/alertmanager-operated'
       scrape_interval: 30s
       metrics_path: /metrics
       scheme: http
@@ -134,7 +134,7 @@ prometheus:
       - role: endpoints
         namespaces:
           names:
-          - {{ .Values.user.alertmanager.namespace }}
+          - alertmanager
         selectors:
           - role: endpoints
             label: 'operated-alertmanager=true'

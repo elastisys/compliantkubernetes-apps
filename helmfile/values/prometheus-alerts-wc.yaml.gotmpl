@@ -2,7 +2,7 @@
 
 esNodeCount: {{ add .Values.elasticsearch.dataNode.count .Values.elasticsearch.clientNode.count .Values.elasticsearch.masterNode.count }}
 alertmanagerJob: alertmanager-operated
-alertmanagerNamespace: {{ .Values.user.alertmanager.namespace }}
+alertmanagerNamespace: alertmanager
 prometheusJob: kube-prometheus-stack-prometheus
 operatorJob: kube-prometheus-stack-operator
 

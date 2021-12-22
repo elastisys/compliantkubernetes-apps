@@ -455,15 +455,13 @@ releases:
     - values/falco-exporter.yaml.gotmpl
 
 - name: user-alertmanager
-  namespace: {{ .Values.user.alertmanager.namespace | default "alertmanager" }}
+  namespace: alertmanager
   labels:
     app: user-alertmanager
-  chart: ./charts/examples/user-alertmanager
+  chart: ./charts/user-alertmanager
   version: 0.1.0
   installed: {{ .Values.user.alertmanager.enabled }}
   missingFileHandler: Error
-  needs:
-  - kube-system/user-rbac
   values:
   - values/user-alertmanager.yaml.gotmpl
 

@@ -99,10 +99,6 @@ user:
   alertmanager:
     enabled: false
 
-    ## Namespace in which to install alertmanager
-    ## Ensure that the namespace is included in workload cluster 'user.namespaces' list.
-    namespace: alertmanager
-
     ## Create basic-auth protected ingress to alertmanager
     ingress:
       enabled: false
