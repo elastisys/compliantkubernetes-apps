@@ -40,15 +40,6 @@ jobs:
       CK8S_CONFIG_PATH: ./apps/pipeline/config/exoscale
       CK8S_AUTO_APPROVE: true
     steps:
-    # Note: We use a specific commit for kubespray that includes the terraform
-    # code for Exoscale. This is only used for the terraform part, not for
-    # running kubespray!
-    - name: Checkout kubespray
-      uses: actions/checkout@v2
-      with:
-        repository: kubernetes-sigs/kubespray
-        ref: b77460ec3480868530b6c0b9435d6e900edd8fe4
-        path: kubespray
     ## TODO: We cannot currently use ck8s-kubespray since the terraform code
     ## for exoscale is not in the version we have in the submodule
     - name: Checkout ck8s-kubespray
@@ -57,7 +48,7 @@ jobs:
         repository: elastisys/compliantkubernetes-kubespray
         # TODO: Should we use a specific commit here?
         ref: main
-        # submodules: recursive
+        submodules: recursive
         path: compliantkubernetes-kubespray
     - name: Checkout compliantkubernetes-apps
       uses: actions/checkout@v2
@@ -74,12 +65,12 @@ jobs:
     - name: Init terraform
       uses: docker://hashicorp/terraform:0.14.7
       with:
-        args: init kubespray/contrib/terraform/exoscale
+        args: init compliantkubernetes-kubespray/kubespray/contrib/terraform/exoscale
     # Note: This container doesn't run bash, so we cannot use env vars in the arguments
     - name: Run terraform
       uses: docker://hashicorp/terraform:0.14.7
       with:
-        args: apply -auto-approve -var-file apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/default.tfvars -state apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/terraform.tfstate kubespray/contrib/terraform/exoscale
+        args: apply -auto-approve -var-file apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/default.tfvars -state apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/terraform.tfstate compliantkubernetes-kubespray/kubespray/contrib/terraform/exoscale
 
     - name: Prepare DNS
       if: matrix.cluster == 'sc'
@@ -100,18 +91,18 @@ jobs:
         args: route53 change-resource-record-sets --hosted-zone-id Z2STJRQSJO5PZ0 --change-batch file://apps/pipeline/config/exoscale/dns-${{ matrix.cluster }}.json
 
     - name: Install mitogen to speedup kubespray
-      uses: docker://quay.io/kubespray/kubespray:v2.15.0
+      uses: docker://quay.io/kubespray/kubespray:v2.17.1
       with:
         # Note: It is important to work from the kubespray folder since this
         # playbook will modify the `ansible.cfg`.
-        args: /bin/bash -c "cd kubespray && ansible-playbook mitogen.yml"
+        args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray && ansible-playbook mitogen.yml"
 
     - name: Run kubespray
-      uses: docker://quay.io/kubespray/kubespray:v2.15.0
+      uses: docker://quay.io/kubespray/kubespray:v2.17.1
       env:
-        ANSIBLE_CONFIG: ./kubespray/ansible.cfg
+        ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
       with:
-        args: /bin/bash -c "cd kubespray && ansible-playbook -i ../$CK8S_CONFIG_PATH/pipeline-${{ matrix.cluster }}-config/inventory.ini --private-key ../$CK8S_CONFIG_PATH/id_rsa --become --become-user=root cluster.yml"
+        args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray && ansible-playbook -i ../../$CK8S_CONFIG_PATH/pipeline-${{ matrix.cluster }}-config/inventory.ini --private-key ../../$CK8S_CONFIG_PATH/id_rsa --become --become-user=root cluster.yml"
 
     - name: Import PGP key and configure GPG agent
       run: ./apps/pipeline/setup-pgp.bash
@@ -225,7 +216,7 @@ jobs:
       if: always()
       uses: docker://hashicorp/terraform:0.14.7
       with:
-        args: destroy -auto-approve -var-file apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/default.tfvars -state apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/terraform.tfstate kubespray/contrib/terraform/exoscale
+        args: destroy -auto-approve -var-file apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/default.tfvars -state apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/terraform.tfstate compliantkubernetes-kubespray/kubespray/contrib/terraform/exoscale
 
     - name: Prepare DNS cleanup
       if: always() && (matrix.cluster == 'sc')
