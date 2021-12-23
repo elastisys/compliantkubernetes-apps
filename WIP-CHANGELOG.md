@@ -4,6 +4,7 @@
 
 # Updated
 
+- kubectl version from v1.19.8 to v1.20.7 [#725](https://github.com/elastisys/compliantkubernetes-apps/pull/725)
 - updated falco helm chart to version 1.16.0, this upgrades falco to version 0.30.0
 - cert-manager 1.4.0 upgraded to 1.6.1
 - Updated Open Distro for Elasticsearch to 1.13.3 to mitigate [CVE-2021-44228 & CVE-2021-45046](https://opendistro.github.io/for-elasticsearch/blog/2021/12/update-to-1-13-3/)
