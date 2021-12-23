@@ -52,7 +52,7 @@ The apps are installed using a combination of helm charts and manifests with the
 ### Requirements
 
 * A running cluster based on [compliantkubernetes-kubespray][compliantkubernetes-kubespray]
-* [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.19.8)
+* [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.20.7)
 * [helm](https://github.com/helm/helm/releases) (tested with 3.5.2)
 * [helmfile](https://github.com/roboll/helmfile) (tested with v0.138.4)
 * [helm-diff](https://github.com/databus23/helm-diff) (tested with 3.1.2)
