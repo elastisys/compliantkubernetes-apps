@@ -38,7 +38,7 @@ if "${enable_opa}"; then
     deployments+=("gatekeeper-system gatekeeper-controller-manager")
 fi
 if "${enable_falco_alerts}"; then
-    deployments+=("falco falcosidekick")
+    deployments+=("falco falco-falcosidekick")
 fi
 if "${enable_velero}"; then
     deployments+=("velero velero")
