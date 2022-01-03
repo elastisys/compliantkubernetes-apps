@@ -24,6 +24,7 @@
 - kube-state-metrics to v2.2.0 [full changelog](https://github.com/kubernetes/kube-state-metrics/blob/master/CHANGELOG.md)
 - node exporter to v1.2.2 [full changelog](https://github.com/prometheus/node_exporter/blob/master/CHANGELOG.md)
 - updated metrics-server helm chart to version 0.5.2, this upgrades metrics-server image to 3.7.0 [#702](https://github.com/elastisys/compliantkubernetes-apps/pull/702)
+- Updated Dex chart to v0.6.3, and Dex itself to v2.30.0
 
 ### Changed
 
