@@ -1,8 +1,9 @@
 # Release notes
 
 * This release introduces a new feature called "index per namespace".
-  Enabling it makes fluentd log to indices in elasticsearch based on the namespace from which the container log originates.
+    Enabling it makes fluentd log to indices in elasticsearch based on the namespace from which the container log originates.
 * Check out the [upgrade guide](https://github.com/elastisys/compliantkubernetes-apps/blob/main/migration/v0.18.x-v0.19.x/upgrade-apps.md) for a complete set of instructions needed to upgrade.
+* CK8S_FLAVOR is now mandatory on init
 
 # Updated
 
@@ -41,6 +42,7 @@
 - moved the elasticsearch alerts from the prometheus-elasticsearch-exporter chart to the prometheus-alerts chart [#685](https://github.com/elastisys/compliantkubernetes-apps/pull/685)
 - Changed the User Alertmanager namespace (alertmanager) to an operator namespace from an user namespace
 - Moved the User Alertmanager RBAC to `user-alertmanager` chart
+- Made CK8S_FLAVOR mandatory on init
 
 ### Fixed
 

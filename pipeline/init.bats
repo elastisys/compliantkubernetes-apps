@@ -12,6 +12,7 @@ setup() {
 
     export CK8S_CONFIG_PATH="${ck8s_config_path_tmp}"
     export CK8S_ENVIRONMENT_NAME=test
+    export CK8S_FLAVOR=dev
     export CK8S_PGP_FP=529D964DE0BBD900C4A395DA09986C297F8B7757
     export CK8S_CLOUD_PROVIDER=aws
 }
@@ -30,6 +31,12 @@ teardown() {
     CK8S_ENVIRONMENT_NAME="" run ck8s init
     assert_failure
     assert_output --partial "Missing CK8S_ENVIRONMENT_NAME"
+}
+
+@test "ck8s init requires CK8S_FLAVOR" {
+    CK8S_FLAVOR="" run ck8s init
+    assert_failure
+    assert_output --partial "Missing CK8S_FLAVOR"
 }
 
 @test "ck8s init requires valid CK8S_PGP_FP or valid CK8S_PGP_UID" {

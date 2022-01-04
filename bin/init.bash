@@ -34,7 +34,7 @@ else
     export CK8S_ENVIRONMENT_NAME="${environment_name}"
 fi
 if [ -z "${flavor:-}" ]; then
-    export CK8S_FLAVOR="${CK8S_FLAVOR:-dev}"
+    : "${CK8S_FLAVOR:?Missing CK8S_FLAVOR}"
 elif [ -v CK8S_FLAVOR ] && [ -n "${CK8S_FLAVOR}" ] && [ "${CK8S_FLAVOR}" != "${flavor}" ]; then
     log_error "ERROR: Environment flavor mismatch, '${flavor}' in config and '${CK8S_FLAVOR}' in env"
     exit 1
