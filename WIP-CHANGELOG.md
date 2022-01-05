@@ -37,7 +37,8 @@
 - Increased resources requests and limits for Starboard-operator in the common config [#681](https://github.com/elastisys/compliantkubernetes-apps/pull/681)
 - Updated the common config as "prometheusBlackboxExporter" will now be required in both sc and wc cluster
 - moved the elasticsearch alerts from the prometheus-elasticsearch-exporter chart to the prometheus-alerts chart [#685](https://github.com/elastisys/compliantkubernetes-apps/pull/685)
-- Changed the User Alertmanager namespace (alertmanager) to an operator namespace from an user namespace.
+- Changed the User Alertmanager namespace (alertmanager) to an operator namespace from an user namespace
+- Moved the User Alertmanager RBAC to `user-alertmanager` chart
 
 ### Fixed
 

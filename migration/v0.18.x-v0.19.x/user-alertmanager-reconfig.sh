@@ -6,13 +6,18 @@ set -euo pipefail
 
 here="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
+common_defaults="${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
+common_config="${CK8S_CONFIG_PATH}/common-config.yaml"
 wc_defaults="${CK8S_CONFIG_PATH}/defaults/wc-config.yaml"
 wc_config="${CK8S_CONFIG_PATH}/wc-config.yaml"
 
-am_config="${CK8S_CONFIG_PATH}/alertmanager.yaml"
-am_users="${CK8S_CONFIG_PATH}/alertmanager.users.json"
-
-if [[ ! -f "${wc_defaults}" ]]; then
+if [[ ! -f "${common_defaults}" ]]; then
+    echo "Default common-config does not exist, aborting."
+    exit 1
+elif [[ ! -f "${common_config}" ]]; then
+    echo "Override common-config does not exist, aborting."
+    exit 1
+elif [[ ! -f "${wc_defaults}" ]]; then
     echo "Default wc-config does not exist, aborting."
     exit 1
 elif [[ ! -f "${wc_config}" ]]; then
@@ -20,12 +25,15 @@ elif [[ ! -f "${wc_config}" ]]; then
     exit 1
 fi
 
-wc=$(yq m -x -a overwrite -j "${wc_defaults}" "${wc_config}" | yq r - 'user.alertmanager')
+wc=$(yq m -x -a overwrite -j "${common_defaults}" "${wc_defaults}" "${common_config}" "${wc_config}" | yq r - 'user.alertmanager')
 
 if [[ $(yq r <(echo "${wc}") 'enabled') != "true" ]]; then
     echo "User Alertmanager is not enabled, skipping."
     exit 0
 fi
+
+am_config="${CK8S_CONFIG_PATH}/alertmanager.yaml"
+am_users="${CK8S_CONFIG_PATH}/alertmanager.users.json"
 
 if [[ -f "${am_config}" ]]; then
     echo "Reconfiguring Alertmanager..."
@@ -43,7 +51,7 @@ if [[ -f "${am_config}" ]]; then
     "${here}/../../bin/ck8s" ops kubectl wc -n alertmanager patch secret alertmanager-alertmanager -p "'{\"data\":{\"alertmanager.yaml\":\"$(base64 -w 0 < "${am_config}")\"}}'"
     echo
 
-    echo "Do you want to remove the leftover configuration file? (${am_config}) [y/N]: "
+    echo -n "Do you want to remove the leftover configuration file? (${am_config}) [y/N]: "
     read -r reply
     if [[ "${reply}" == "y" ]]; then
         rm "${am_config}"
@@ -65,7 +73,7 @@ if [[ -f "${am_users}" ]]; then
     "${here}/../../bin/ck8s" ops kubectl wc -n alertmanager patch rolebinding alertmanager-configurer -p "'{\"subjects\":$(cat "${am_users}")}'"
     echo
 
-    echo "Do you want to remove the leftover configuration file? (${am_users}) [y/N]: "
+    echo -n "Do you want to remove the leftover configuration file? (${am_users}) [y/N]: "
     read -r reply
     if [[ "${reply}" == "y" ]]; then
         rm "${am_users}"
