@@ -1,17 +1,14 @@
-{{- if (eq .Values.kind "Deployment") }}
+{{- if (eq .Values.kind "DaemonSet") }}
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   name: {{ template "prometheus-blackbox-exporter.fullname" . }}
   labels:
     {{- include "prometheus-blackbox-exporter.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       {{- include "prometheus-blackbox-exporter.selectorLabels" . | nindent 6 }}
-  strategy:
-{{ toYaml .Values.strategy | indent 4 }}
   template:
     metadata:
       labels:
@@ -25,7 +22,6 @@ spec:
 {{ toYaml .Values.podAnnotations | indent 8 }}
         {{- end }}
     spec:
-      automountServiceAccountToken: {{ .Values.automountServiceAccountToken }}
       serviceAccountName: {{ template "prometheus-blackbox-exporter.serviceAccountName" . }}
     {{- if .Values.nodeSelector }}
       nodeSelector:
@@ -65,22 +61,14 @@ spec:
 {{ toYaml .Values.extraInitContainers | indent 8 }}
       {{- end }}
       containers:
-        {{- if .Values.extraContainers }}
-{{ toYaml .Values.extraContainers | indent 8 }}
-        {{- end }}
         - name: blackbox-exporter
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
             readOnlyRootFilesystem: {{ .Values.readOnlyRootFilesystem }}
-            {{- if .Values.allowIcmp }}
-            capabilities:
-              add: ["NET_RAW"]
-            {{- else }}
             runAsNonRoot: {{ .Values.runAsNonRoot  }}
-              {{- if .Values.runAsUser }}
+            {{- if .Values.runAsUser }}
             runAsUser: {{ .Values.runAsUser }}
-              {{- end }}
             {{- end }}
           env:
           {{- range $key, $value := .Values.extraEnv }}
@@ -88,7 +76,7 @@ spec:
               value: {{ $value | quote }}
           {{- end }}
           args:
-{{- if .Values.config }}
+{{- if (or .Values.config .Values.configExistingSecretName) }}
    {{- if .Values.configPath }}
             - "--config.file={{ .Values.configPath }}"
    {{- else }}
@@ -103,7 +91,7 @@ spec:
           resources:
 {{ toYaml .Values.resources | indent 12 }}
           ports:
-            - containerPort: {{ .Values.containerPort }}
+            - containerPort: {{ .Values.service.port }}
               name: http
           livenessProbe:
             {{- toYaml .Values.livenessProbe | trim | nindent 12 }}
@@ -124,9 +112,6 @@ spec:
               subPath: {{ .subPath }}
               readOnly: {{ .readOnly }}
           {{- end }}
-          {{- if .Values.extraVolumeMounts }}
-{{ toYaml .Values.extraVolumeMounts | indent 12 }}
-          {{- end }}
 {{- if .Values.dnsPolicy }}
       dnsPolicy: {{ .Values.dnsPolicy | toString }}
 {{- end }}
@@ -136,9 +121,6 @@ spec:
         {{- toYaml .Values.dnsConfig | nindent 8 }}
 {{- end }}
       volumes:
-    {{- if .Values.extraVolumes }}
-{{ toYaml .Values.extraVolumes | indent 8 }}
-    {{- end }}
         - name: config
 {{- if .Values.secretConfig }}
           secret:

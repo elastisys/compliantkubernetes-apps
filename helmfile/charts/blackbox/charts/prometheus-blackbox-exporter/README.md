@@ -4,118 +4,85 @@ Prometheus exporter for blackbox testing
 
 Learn more: [https://github.com/prometheus/blackbox_exporter](https://github.com/prometheus/blackbox_exporter)
 
-## TL;DR;
-
-```bash
-$ helm install stable/prometheus-blackbox-exporter
-```
-
-## Introduction
-
 This chart creates a Blackbox-Exporter deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
 ## Prerequisites
 
 - Kubernetes 1.8+ with Beta APIs enabled
+- Helm >= 3.0
 
-## Installing the Chart
+## Get Repo Info
 
-To install the chart with the release name `my-release`:
-
-```bash
-$ helm install --name my-release stable/prometheus-blackbox-exporter
+```console
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
 ```
 
-The command deploys Blackbox Exporter on the Kubernetes cluster using the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
+_See [helm repo](https://helm.sh/docs/helm/helm_repo/) for command documentation._
 
-## Uninstalling the Chart
+## Install Chart
 
-To uninstall/delete the `my-release` deployment:
-
-```bash
-$ helm delete --purge my-release
-```
-The command removes all the Kubernetes components associated with the chart and deletes the release.
-
-## Configuration
-
-The following table lists the configurable parameters of the Blackbox-Exporter chart and their default values.
-
-|               Parameter                |                    Description                    |            Default            |
-| -------------------------------------- | ------------------------------------------------- | ----------------------------- |
-| `config`                               | Prometheus blackbox configuration                 | {}                            |
-| `secretConfig`                         | Whether to treat blackbox configuration as secret | `false`                       |
-| `extraArgs`                            | Optional flags for blackbox                       | `[]`                          |
-| `extraConfigmapMounts`                 | Additional configmap mounts                       | `[]`                          |
-| `extraSecretMounts`                    | Additional secret mounts                          | `[]`                          |
-| `image.repository`                     | container image repository                        | `prom/blackbox-exporter`      |
-| `image.tag`                            | container image tag                               | `v0.15.1`                     |
-| `image.pullPolicy`                     | container image pull policy                       | `IfNotPresent`                |
-| `image.pullSecrets`                    | container image pull secrets                      | `[]`                          |
-| `ingress.annotations`                  | Ingress annotations                               | None                          |
-| `ingress.enabled`                      | Enables Ingress                                   | `false`                       |
-| `ingress.hosts`                        | Ingress accepted hostnames                        | None                          |
-| `ingress.tls`                          | Ingress TLS configuration                         | None                          |
-| `nodeSelector`                         | node labels for pod assignment                    | `{}`                          |
-| `runAsUser`                            | User to run blackbox-exporter container as        | `1000`                        |
-| `readOnlyRootFilesystem`               | Set blackbox-exporter file-system to read-only    | `true`                        |
-| `runAsNonRoot`                         | Run blackbox-exporter as non-root                 | `true`                        |
-| `tolerations`                          | node tolerations for pod assignment               | `[]`                          |
-| `affinity`                             | node affinity for pod assignment                  | `{}`                          |
-| `podAnnotations`                       | annotations to add to each pod                    | `{}`                          |
-| `podDisruptionBudget`                  | pod disruption budget                             | `{}`         |
-| `priorityClassName`                    | priority class name                               | None                          |
-| `resources`                            | pod resource requests & limits                    | `{}`                          |
-| `restartPolicy`                        | container restart policy                          | `Always`                      |
-| `service.annotations`                  | annotations for the service                       | `{}`                          |
-| `service.labels`                       | additional labels for the service                 | None                          |
-| `service.type`                         | type of service to create                         | `ClusterIP`                   |
-| `service.port`                         | port for the blackbox http service                | `9115`                        |
-| `service.externalIPs`                  | list of external ips                              | []                            |
-| `serviceMonitor.enabled`               | If true, a ServiceMonitor CRD is created for a prometheus operator | `false`      |
-| `serviceMonitor.labels`                | Labels for prometheus operator                    | `{}`                          |
-| `serviceMonitor.interval`              | Interval for prometheus operator endpoint         | `30s`                         |
-| `serviceMonitor.module`                | The module that blackbox will use if serviceMonitor is enabled | `http_2xx` |
-| `serviceMonitor.url`                   | The URL that blackbox will scrape if serviceMonitor is enabled | `http://example.com/healthz` |
-| `serviceMonitor.urlHumanReadable`      | Optional human readable URL that will appear in Prometheus / AlertManager | `nil` |
-| `strategy`                             | strategy used to replace old Pods with new ones   | `{"rollingUpdate":{"maxSurge":1,"maxUnavailable":0},"type":"RollingUpdate"}` |
-
-Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
-
-```bash
-$ helm install --name my-release \
-    --set key_1=value_1,key_2=value_2 \
-    stable/prometheus-blackbox-exporter
+```console
+helm install [RELEASE_NAME] prometheus-community/prometheus-blackbox-exporter
 ```
 
-Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
+_See [configuration](#configuration) below._
 
-```bash
-# example for staging
-$ helm install --name my-release -f values.yaml stable/prometheus-blackbox-exporter
+_See [helm install](https://helm.sh/docs/helm/helm_install/) for command documentation._
+
+## Uninstall Chart
+
+```console
+helm uninstall [RELEASE_NAME]
 ```
 
-> **Tip**: You can use the default [values.yaml](values.yaml)
+This removes all the Kubernetes components associated with the chart and deletes the release.
 
-## Upgrading an existing Release to a new major version
+_See [helm uninstall](https://helm.sh/docs/helm/helm_uninstall/) for command documentation._
 
-### 2.0.0
+## Upgrading Chart
+
+```console
+helm upgrade [RELEASE_NAME] [CHART] --install
+```
+
+_See [helm upgrade](https://helm.sh/docs/helm/helm_upgrade/) for command documentation._
+
+### To 5.0.0
+
+This version removes Helm 2 support. Also the ingress config has changed, so you have to adapt to the example in the values.yaml.
+
+### To 4.0.0
+
+This version create the service account by default and introduce pod security policy, it can be enabled by setting `pspEnabled: true`.
+
+### To 2.0.0
 
 This version removes the `podDisruptionBudget.enabled` parameter and changes the default value of `podDisruptionBudget` to `{}`, in order to fix Helm 3 compatibility.
 
 In order to upgrade, please remove `podDisruptionBudget.enabled` from your custom values.yaml file and set the content of `podDisruptionBudget`, for example:
+
 ```yaml
 podDisruptionBudget:
   maxUnavailable: 0
 ```
 
-### 1.0.0
+### To 1.0.0
 
 This version introduce the new recommended labels.
 
 In order to upgrade, delete the Deployment before upgrading:
+
 ```bash
-$ kubectl delete deployment my-release-prometheus-blackbox-exporter
+kubectl delete deployment [RELEASE_NAME]-prometheus-blackbox-exporter
 ```
 
 Note that this will cause downtime of the blackbox.
+
+## Configuration
+
+See [Customizing the Chart Before Installing](https://helm.sh/docs/intro/using_helm/#customizing-the-chart-before-installing). To see all configurable options with detailed comments, visit the chart's [values.yaml](./values.yaml), or run these configuration commands:
+
+```console
+helm show values prometheus-community/prometheus-blackbox-exporter
+```

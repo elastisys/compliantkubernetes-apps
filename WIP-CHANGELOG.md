@@ -5,6 +5,8 @@
 * Check out the [upgrade guide](https://github.com/elastisys/compliantkubernetes-apps/blob/main/migration/v0.18.x-v0.19.x/upgrade-apps.md) for a complete set of instructions needed to upgrade.
 * CK8S_FLAVOR is now mandatory on init
 * This release migrates from Open Distro for Elasticsearch to OpenSearch.
+* Updated Blackbox chart to v5.3.1, and blackbox app to v0.19.0
+  - HTTP probe: no_follow_redirects has been renamed to follow_redirects
 
 # Updated
 
@@ -29,6 +31,10 @@
 - node exporter to v1.2.2 [full changelog](https://github.com/prometheus/node_exporter/blob/master/CHANGELOG.md)
 - updated metrics-server helm chart to version 0.5.2, this upgrades metrics-server image to 3.7.0 [#702](https://github.com/elastisys/compliantkubernetes-apps/pull/702)
 - Updated Dex chart to v0.6.3, and Dex itself to v2.30.0
+- Updated Blackbox chart to v5.3.1, and blackbox app to v0.19.0
+  - HTTP probe: no_follow_redirects has been renamed to follow_redirects
+
+
 
 ### Changed
 
