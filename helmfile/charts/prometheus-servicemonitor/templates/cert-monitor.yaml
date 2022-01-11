@@ -14,4 +14,6 @@ spec:
       app.kubernetes.io/instance: {{ .Values.certMonitor.target.instance }}
   endpoints:
   - targetPort: {{ .Values.certMonitor.port }}
+    relabelings:
+    {{- toYaml .Values.certMonitor.relabelings | nindent 6 }}
 {{- end }}

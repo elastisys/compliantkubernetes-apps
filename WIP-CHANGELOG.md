@@ -50,6 +50,7 @@
 - Fixed rendering of new prometheus alert rule to allow it to be admitted by the operator
 - Fixed rendering of s3-exporter to be idempotent
 - Fixed bug where init'ing a config path a second time without the `CK8S_FLAVOR` variable set would fail.
+- Fixed relabeling for rook-ceph and cert servicemonitor.
 
 ### Added
 

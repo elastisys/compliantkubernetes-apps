@@ -10,6 +10,7 @@ certMonitor:
     name: "cert-manager"
     instance: "cert-manager"
   port: 9402
+  relabelings: []
 
 rookMonitor:
   enabled: false
