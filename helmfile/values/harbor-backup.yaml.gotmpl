@@ -2,6 +2,7 @@
 {{ fail "\nERROR: Harbor backup requires s3 or gcs object storage, see Values.objectStorage.type" }}
 {{ end }}
 dbPassword: {{ .Values.harbor.databasePassword }}
+retentionDays: {{ .Values.harbor.backup.retentionDays }}
 {{ if eq .Values.objectStorage.type "s3" -}}
 s3:
   enabled: true

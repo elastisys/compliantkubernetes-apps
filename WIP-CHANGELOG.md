@@ -43,6 +43,7 @@
 - Changed the User Alertmanager namespace (alertmanager) to an operator namespace from an user namespace
 - Moved the User Alertmanager RBAC to `user-alertmanager` chart
 - Made CK8S_FLAVOR mandatory on init
+- Exposed harbor's backup retention period as config.
 
 ### Fixed
 
