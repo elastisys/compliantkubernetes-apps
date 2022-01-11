@@ -13,6 +13,7 @@ harbor:
     adminGroupName: not-used
   backup:
     enabled: true
+    retentionDays: 7
 elasticsearch:
   masterNode:
     storageSize: 1Gi

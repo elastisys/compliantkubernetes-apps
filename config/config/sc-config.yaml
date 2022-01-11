@@ -163,6 +163,7 @@ harbor:
     scope: openid,email,profile,offline_access,groups
   backup:
     enabled: true
+    retentionDays: 7
 
 
 
