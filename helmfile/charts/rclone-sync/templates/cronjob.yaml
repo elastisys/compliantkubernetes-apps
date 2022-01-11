@@ -1,0 +1,48 @@
+{{- range .Values.buckets }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ $.Chart.Name }}-{{ .source }}
+  labels:
+    app: {{ $.Chart.Name }}-{{ .source }}
+spec:
+  {{- if hasKey . "schedule" }}
+  schedule: {{ .schedule }}
+  {{- else }}
+  schedule: {{ $.Values.defaultSchedule }}
+  {{- end }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: {{ $.Chart.Name }}-{{ .source }}
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: {{ $.Chart.Name }}
+              image: {{ $.Values.image.repository }}:{{ $.Values.image.tag }}
+              args:
+                - sync
+                - {{ $.Values.config.source.name }}:{{ .source }}
+                {{- if hasKey . "destination" }}
+                - {{ $.Values.config.destination.name }}:{{ .destination }}
+                {{- else }}
+                - {{ $.Values.config.destination.name }}:{{ .source }}
+                {{- end }}
+                - --log-level
+                - DEBUG
+                {{- if $.Values.config.dryrun }}
+                - --dry-run
+                {{- end }}
+              resources: {{ toYaml $.Values.resources | nindent 16 }}
+              volumeMounts:
+                - name: {{ $.Chart.Name }}-config
+                  mountPath: /home/rclone/.config/rclone/
+          volumes:
+            - name: {{ $.Chart.Name }}-config
+              secret:
+                secretName: {{ $.Chart.Name }}-config
+{{- end }}

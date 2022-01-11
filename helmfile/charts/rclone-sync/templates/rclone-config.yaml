@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Chart.Name }}-config
+type: Opaque
+data:
+  rclone.conf: {{ tpl (.Files.Get "files/rclone.conf") . | b64enc }}

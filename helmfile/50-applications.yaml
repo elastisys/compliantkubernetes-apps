@@ -559,6 +559,17 @@ releases:
   values:
   - values/opendistro-es.yaml.gotmpl
 
+- name: rclone-sync
+  namespace: kube-system
+  labels:
+    app: rclone-sync
+  chart: ./charts/rclone-sync
+  version: 0.1.0
+  installed: {{ .Values.objectStorage.sync.enabled }}
+  missingFileHandler: Error
+  values:
+  - values/rclone-sync.yaml.gotmpl
+
 # End of system services releases
 {{ end }}
 

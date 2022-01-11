@@ -15,7 +15,13 @@ items:
       {{ $.Values.labelKey }}: "ops"
       {{- end }}
   data:
+    {{- if eq $key "backup" }}
+    {{- $sync := (empty $value.sync) | ternary "**disabled**" (printf "**enabled** for bucket(s) %s" (join ", " (sortAlpha $value.sync))) }}
+    {{ $key }}.json: |-
+      {{- regexReplaceAll "<<rclone-sync-state>>" ($.Files.Get (printf "dashboards/%s-dashboard.json" $key)) $sync | nindent 6 }}
+    {{- else }}
     {{ $key }}.json: |-
       {{- regexReplaceAll "<<kibanaURL>>" ($.Files.Get (printf "dashboards/%s-dashboard.json" $key)) ($value.logEndpoint | toString) | nindent 6 }}
+    {{- end }}
 {{- end }}
 {{- end }}

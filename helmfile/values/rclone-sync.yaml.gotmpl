@@ -1,0 +1,56 @@
+{{- if or (ne .Values.objectStorage.type "s3") (ne .Values.objectStorage.sync.type "s3") }}
+{{- fail "rclone-sync is (for now) only supported using s3 on both ends" }}
+{{- end }}
+
+{{- if not (or .Values.objectStorage.sync.syncDefaultBuckets .Values.objectStorage.sync.buckets) }}
+{{- fail "rclone-sync configured without buckets to sync" }}
+{{- end }}
+
+config:
+{{- if hasKey .Values.objectStorage.sync "dryrun" }}
+  dryrun: {{ .Values.objectStorage.sync.dryrun }}
+{{- end }}
+
+  source:
+    name: default
+    type: {{ .Values.objectStorage.type }}
+  {{- if eq .Values.objectStorage.type "s3" }}
+    s3:
+      accessKey: {{ .Values.objectStorage.s3.accessKey }}
+      secretKey: {{ .Values.objectStorage.s3.secretKey }}
+      region: {{ .Values.objectStorage.s3.region }}
+      regionEndpoint: {{ .Values.objectStorage.s3.regionEndpoint }}
+      forcePathStyle: {{ .Values.objectStorage.s3.forcePathStyle }}
+    {{- if hasKey .Values.objectStorage.s3 "v2Auth" }}
+      v2Auth: {{ .Values.objectStorage.s3.v2Auth }}
+    {{- end }}
+  {{- end }}
+
+  destination:
+    name: backup
+    type: {{ .Values.objectStorage.sync.type }}
+  {{- if eq .Values.objectStorage.sync.type "s3" }}
+    s3:
+      accessKey: {{ .Values.objectStorage.sync.s3.accessKey }}
+      secretKey: {{ .Values.objectStorage.sync.s3.secretKey }}
+      region: {{ .Values.objectStorage.sync.s3.region }}
+      regionEndpoint: {{ .Values.objectStorage.sync.s3.regionEndpoint }}
+      forcePathStyle: {{ .Values.objectStorage.sync.s3.forcePathStyle }}
+    {{- if hasKey .Values.objectStorage.sync.s3 "v2Auth" }}
+      v2Auth: {{ .Values.objectStorage.sync.s3.v2Auth }}
+    {{- end }}
+  {{- end }}
+
+defaultSchedule: {{ .Values.objectStorage.sync.defaultSchedule }}
+
+buckets:
+{{- if .Values.objectStorage.sync.syncDefaultBuckets }}
+{{- range (values .Values.objectStorage.buckets | sortAlpha) }}
+  - source: {{ . }}
+{{- end }}
+{{- end }}
+{{- if .Values.objectStorage.sync.buckets }}
+{{- toYaml .Values.objectStorage.sync.buckets | nindent 2 }}
+{{- end }}
+
+resources: {{- toYaml .Values.objectStorage.sync.resources | nindent 2 }}

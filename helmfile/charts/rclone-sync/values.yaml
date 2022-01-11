@@ -1,0 +1,43 @@
+image:
+  repository: elastisys/rclone-sync
+  tag: 1.3.0
+
+config:
+  dryrun: false
+
+  source:
+    name: provider-region-a
+    type: s3
+    s3:
+      region: region
+      regionendpoint: s3.region.provider.net
+      accessKey: access-key
+      secretKey: secret-key
+      forcePathStyle: true
+      v2Auth: false
+
+  destination:
+    name: provider-region-b
+    type: s3
+    s3:
+      region: region
+      regionEndpoint: s3.region.provider.net
+      accessKey: access-key
+      secretKey: secret-key
+      forcePathStyle: true
+      v2Auth: false
+
+defaultSchedule: 0 5 * * *
+
+buckets:
+  - source: bucket
+    destination: other-bucket
+    schedule: 0 5 * * *
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 100Mi
+  limits:
+    cpu: 300m
+    memory: 300Mi

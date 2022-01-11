@@ -75,6 +75,7 @@
 - Added pwgen and htpasswd as requirements
 - Added the blackbox installation in the wc cluster based on ADR to monitor the uptime of internal services as well in wc .
 - Added option to enable index per namespace feature in fluentd and elasticsearch
+- Added optional off-site backup replication between two providers or regions using rclone sync
 
 ### Removed
 

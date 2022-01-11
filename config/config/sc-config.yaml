@@ -10,6 +10,42 @@ objectStorage:
     opensearch: ${CK8S_ENVIRONMENT_NAME}-opensearch
     scFluentd: ${CK8S_ENVIRONMENT_NAME}-sc-logs
 
+  ## Off-site backup replication between two providers or regions using rclone sync
+  sync:
+    enabled: false
+    # dryrun: false
+
+    ## Options are 's3'
+    type: none
+    # s3:
+    #   region: set-me
+    #   regionEndpoint: set-me
+    #   # Generally false when using AWS and Exoscale and true for other providers.
+    #   forcePathStyle: set-me
+    #   # v2Auth: false
+
+    ## Sync all buckets under 'objectStorage.buckets'
+    ## These will be appended to 'buckets' using the same name from source as destination, and the default schedule.
+    syncDefaultBuckets: false
+
+    ## Default schedule for sync jobs
+    defaultSchedule: 0 5 * * *
+
+    ## Buckets to sync.
+    buckets: []
+      # - source: source-bucket
+      #   # destination: destination-bucket # if unset it will be the same as 'source'
+      #   # schedule: 0 5 * * *             # if unset it will be the same as 'defaultSchedule'
+
+    ## Sync job resources
+    resources:
+      requests:
+        cpu: 100m
+        memory: 100Mi
+      limits:
+        cpu: 300m
+        memory: 300Mi
+
 user:
   grafana:
     enabled: true

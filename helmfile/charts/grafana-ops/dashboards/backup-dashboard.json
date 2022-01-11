@@ -326,6 +326,207 @@
             "timeShift": null,
             "title": "Time since last successful OpenSearch snapshot ",
             "type": "stat"
+        },
+        {
+            "collapsed": false,
+            "datasource": null,
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 14
+            },
+            "id": 10,
+            "panels": [],
+            "title": "Backup rclone sync",
+            "type": "row"
+        },
+        {
+            "datasource": "${datasource}",
+            "description": "",
+            "gridPos": {
+                "h": 2,
+                "w": 24,
+                "x": 0,
+                "y": 15
+            },
+            "id": 16,
+            "options": {
+                "content": "# Off-site backup replication is <<rclone-sync-state>>",
+                "mode": "markdown"
+            },
+            "pluginVersion": "8.2.7",
+            "type": "text"
+        },
+        {
+            "datasource": "${datasource}",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "mappings": [
+                        {
+                            "options": {
+                                "0": {
+                                    "color": "dark-yellow",
+                                    "index": 1,
+                                    "text": "suspended"
+                                },
+                                "1": {
+                                    "index": 0,
+                                    "text": "active"
+                                }
+                            },
+                            "type": "value"
+                        },
+                        {
+                            "options": {
+                                "match": "nan",
+                                "result": {
+                                    "color": "dark-red",
+                                    "index": 2,
+                                    "text": "unknown"
+                                }
+                            },
+                            "type": "special"
+                        },
+                        {
+                            "options": {
+                                "match": "null",
+                                "result": {
+                                    "color": "text",
+                                    "index": 3,
+                                    "text": "missing"
+                                }
+                            },
+                            "type": "special"
+                        }
+                    ],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "dark-green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 3,
+                "w": 24,
+                "x": 0,
+                "y": 17
+            },
+            "id": 12,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "last"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "text": {},
+                "textMode": "auto"
+            },
+            "pluginVersion": "8.2.7",
+            "targets": [
+                {
+                    "exemplar": true,
+                    "expr": "sum by (bucket) (label_replace(kube_cronjob_spec_suspend{cronjob=~\"rclone-sync-.*\"} == bool 0, \"bucket\", \"$1\", \"cronjob\", \"rclone-sync-(.*)\"))",
+                    "instant": false,
+                    "interval": "",
+                    "legendFormat": "{{bucket}}",
+                    "refId": "A"
+                }
+            ],
+            "title": "Status of backup rclone sync cronjobs",
+            "type": "stat"
+        },
+        {
+            "datasource": "${datasource}",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "decimals": 1,
+                    "mappings": [
+                        {
+                            "options": {
+                                "match": "null",
+                                "result": {
+                                    "color": "text",
+                                    "index": 0,
+                                    "text": "missing"
+                                }
+                            },
+                            "type": "special"
+                        }
+                    ],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "dark-green",
+                                "value": null
+                            },
+                            {
+                                "color": "dark-yellow",
+                                "value": 86400
+                            },
+                            {
+                                "color": "dark-red",
+                                "value": 172800
+                            }
+                        ]
+                    },
+                    "unit": "s"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 7,
+                "w": 24,
+                "x": 0,
+                "y": 20
+            },
+            "id": 14,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "last"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "text": {},
+                "textMode": "auto"
+            },
+            "pluginVersion": "8.2.7",
+            "targets": [
+                {
+                    "exemplar": true,
+                    "expr": "min by (bucket) ((time()-label_replace(kube_job_status_completion_time{job_name=~\"rclone-sync-.*\"}, \"bucket\", \"$1\", \"job_name\", \"rclone-sync-(.*?)-(manual|[0-9-])*(manual|[0-9-])*\")))",
+                    "interval": "",
+                    "legendFormat": "{{bucket}}",
+                    "refId": "A"
+                }
+            ],
+            "title": "Time since last successful backup rclone sync jobs",
+            "type": "stat"
         }
     ],
     "refresh": "30s",

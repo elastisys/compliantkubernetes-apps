@@ -11,6 +11,12 @@ dashboards:
   backup:
     enabled: true
     user_visible: false
+    {{- if .Values.objectStorage.sync.enabled }}
+    sync:
+      {{- range .Values.objectStorage.sync.buckets }}
+      - {{ .source }}
+      {{- end }}
+    {{- end }}
   elasticsearch:
     enabled: true
     user_visible: true
