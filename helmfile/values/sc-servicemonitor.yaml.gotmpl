@@ -4,6 +4,12 @@ defaultRules:
 
 rookMonitor:
   enabled: {{ .Values.monitoring.rook.enabled }}
+  relabelings:
+  - targetLabel: cluster
+    replacement: service_cluster
 
 certMonitor:
   enabled: true
+  relabelings:
+  - targetLabel: cluster
+    replacement: service_cluster
