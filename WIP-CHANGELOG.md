@@ -54,6 +54,9 @@
     Older versions exists that will still work, and the OpenSearch project is working on providing their own set of tools and libraries.
   - This will cause downtime for Elasticsearch and Kibana during the migration, and OpenSearch and OpenSearch Dashboards will replace them.
     Data will be kept by the migration steps, except security settings, any manually created user or roles must be manually handled.
+- resources requests and limits for falco-exporter, kubeStateMetrics and prometheusNodeExporter [#739](https://github.com/elastisys/compliantkubernetes-apps/pull/739)
+- increased resource requests and limits for falco-exporter, kubeStateMetrics and prometheusNodeExporter [#739](https://github.com/elastisys/compliantkubernetes-apps/pull/739)
+- increased the influxDB pvc size [#739](https://github.com/elastisys/compliantkubernetes-apps/pull/739)
 
 ### Fixed
 

@@ -127,20 +127,20 @@ prometheusOperator:
 prometheusNodeExporter:
   resources:
     requests:
-      cpu: 5m
-      memory: 25Mi
-    limits:
-      cpu: 10m
+      cpu: 25m
       memory: 50Mi
+    limits:
+      cpu: 50m
+      memory: 100Mi
 
 kubeStateMetrics:
   resources:
     requests:
       cpu: 5m
-      memory: 25Mi
+      memory: 50Mi
     limits:
       cpu: 10m
-      memory: 50Mi
+      memory: 100Mi
 
 prometheus:
   ## Persistence for prometheus to store metrics and wal.
