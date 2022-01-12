@@ -81,11 +81,11 @@ falco:
   falcoExporter:
     resources:
       requests:
-        cpu: 5m
-        memory: 15Mi
+        cpu: 30m
+        memory: 20Mi
       limits:
-        cpu: 5m
-        memory: 15Mi
+        cpu: 30m
+        memory: 20Mi
     tolerations:
       - effect: NoSchedule
         key: node-role.kubernetes.io/master
