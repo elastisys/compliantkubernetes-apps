@@ -241,6 +241,7 @@ velero:
   tolerations: []
   nodeSelector: {}
   schedule: 0 0 * * * # once per day
+  retentionPeriod: 720h0m0s
   resources:
     limits:
       cpu: 500m
