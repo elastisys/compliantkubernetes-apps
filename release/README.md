@@ -98,18 +98,58 @@ https://semver.org/
 
 ## Patch releases
 
-1. Create a new branch based on a release branch and commit the patch commits to it.
+1. Create a new branch `patch-X.Y-<patch-name>` from the release branch to patch and commit the patch to it.
 
     ```bash
-    git checkout release-X.Y
+    git switch release-X.Y
     git pull
-    git checkout -b branch_name
-    git cherry-pick [some fix in main]
-    git add -p file-with-some-new-fixes
+    git switch -c patch-X.Y-<patch-name>
+    git cherry-pick [fixed commits from main]
+    git add -p [fixed files]
     git commit
+    git push -u origin patch-X.Y-<patch-name>
     ```
 
-2. Continue from step 3 in the major/minor release flow.
+1. Reset changelog, increment `Z` from the previous version.
+
+    ```bash
+    release/reset-changelog.sh X.Y.Z
+    ```
+
+    Make sure that `CHANGELOG.md` is updated correctly.
+
+1. Run QA checks on this branch related to the introduced changes.
+
+    **NOTE**: All changes made in QA should be added to `CHANGELOG.md` and **NOT** `WIP-CHANGELOG.md`.
+    Also, make sure to not merge any fixes into `release-X.Y` on this step.
+
+1. When the QA is finished, create the release tag and push it.
+
+    ```bash
+    git tag vX.Y.Z
+    git push --tags
+    ```
+
+1. Create a PR against the release branch and request review.
+
+1. Fast-forward merge the PR to finalize the release.
+
+    This is to keep the commit hash and tag with it after the merge.
+
+    *Since GitHub currently does not support fast-forward merge of PRs this has to be done manually.*
+
+    ```bash
+    git switch release-X.Y
+    git merge --ff-only patch-X.Y-<patch-name>
+    git push
+    ```
+
+    A [GitHub actions workflow pipeline](/.github/workflows/release.yml) will create a GitHub release from the tag.
+
+    The relese action will fail if the patch branch is merged in a way that does not preserve the commit hash and tag.
+    To fix this remove the previously created tag, recreate it on the release branch, and rerun the release action workflow.
+
+1. Follow the major/minor release from step 8 to merge eventual fixes into main and to update the public release notes.
 
 ## While developing
 
