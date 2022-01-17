@@ -96,7 +96,7 @@ schedules:
       labelSelector:
         matchLabels:
           velero: backup
-      ttl: 720h0m0s
+      ttl: {{ .Values.velero.retentionPeriod }}
 
 metrics:
   enabled: true

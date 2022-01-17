@@ -95,7 +95,7 @@ schedules:
       storageLocation: default
       includedNamespaces:
       {{ .Values.user.namespaces | toYaml | nindent 8 }}
-      ttl: 720h0m0s
+      ttl: {{ .Values.velero.retentionPeriod }}
       labelSelector:
         matchExpressions:
         - key: compliantkubernetes.io/nobackup
