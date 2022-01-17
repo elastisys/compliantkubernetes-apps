@@ -34,6 +34,7 @@
 
     By default it will configure OpenSearch using the subdomain `opensearch` on `ops.${DOMAIN}`, OpenSearch Dashboards using the subdomain `opensearch` on `${DOMAIN}`, and the snapshot repository using the bucket `${ENVIRONMENT_NAME}-opensearch`.
     **These must be prepared for the migration.**
+    The bucket is not needed if snapshots are disabled.
 
 1. Update apps configuration:
 
@@ -56,7 +57,7 @@
 
 1. Migrate from ODFE to OpenSearch:
 
-    This will set up a fresh OpenSearch cluster and migrate the data from ODFE via snapshots.
+    This will set up a fresh OpenSearch cluster and migrate the data from ODFE via snapshots if enabled.
     **Note** that this will *not* carry over security settings.
     Any user, role, or rolemapping that has been manually created must be either be added into the configuration manifests or later manually added when the data migration is complete.
 

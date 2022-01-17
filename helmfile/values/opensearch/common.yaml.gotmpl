@@ -71,6 +71,7 @@ config:
               ".opendistro-asynchronous-search-response*",
             ]
 
+    {{ if .Values.opensearch.snapshot.enabled -}}
     # Object storage configuration
     {{ if eq .Values.objectStorage.type "s3" -}}
     s3:
@@ -80,6 +81,7 @@ config:
           path_style_access: true
     {{ else if eq .Values.objectStorage.type "gcs" -}}
     # TODO: Add config for GCS if any.
+    {{- end }}
     {{- end }}
 
 # To prevent the demo certs from generating: https://github.com/opensearch-project/helm-charts/issues/154
@@ -99,6 +101,7 @@ extraInitContainers:
       - vm.max_map_count=262144
     securityContext:
       privileged: true
+      runAsUser: 0
 
 secretMounts:
   - secretName: opensearch-admin-cert

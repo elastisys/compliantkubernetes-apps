@@ -37,6 +37,17 @@ fi
 
 sc_merged=$(yq m -x -a overwrite "${common_defaults}" "${sc_defaults}" "${common_config}" "${sc_config}")
 
+SNAPSHOTS=$(echo "${sc_merged}" | yq r - "elasticsearch.snapshot.enabled")
+
+if [[ "${SNAPSHOTS}" != "true" ]]; then
+    echo "WARNING: If you want to keep data while migrating from ODFE to OpenSearch you must have snapshots enabled."
+    echo -n "- continue? [y/N]: "
+    read -r reply
+    if [[ "${reply}" != "y" ]]; then
+        exit 1
+    fi
+fi
+
 ES_BUCKET=$(echo "${sc_merged}" | yq r - "objectStorage.buckets.elasticsearch")
 ES_PASSWORD=$(sops --config "${sops_config}" -d --extract '["elasticsearch"]["adminPassword"]' "${secrets}")
 ES_REPOSITORY=$(echo "${sc_merged}" | yq r - "elasticsearch.snapshotRepository")
@@ -46,12 +57,14 @@ OS_PASSWORD=$(sops --config "${sops_config}" -d --extract '["opensearch"]["admin
 OS_REPOSITORY=$(echo "${sc_merged}" | yq r - "opensearch.snapshot.repository")
 OS_CLUSTERNAME=$(echo "${sc_merged}" | yq r - "opensearch.clusterName")
 
-if [[ "${OS_BUCKET}" == "${ES_BUCKET}" ]]; then
-    echo -n "ERROR: OpenSearch cannot use the same bucket as ODFE."
-    exit 1
-elif [[ "${OS_REPOSITORY}" == "${ES_REPOSITORY}" ]]; then
-    echo -n "ERROR: OpenSearch cannot use the same repository name as ODFE."
-    exit 1
+if [[ "${SNAPSHOTS}" == "true" ]]; then
+    if [[ "${OS_BUCKET}" == "${ES_BUCKET}" ]]; then
+        echo -n "ERROR: OpenSearch cannot use the same bucket as ODFE."
+        exit 1
+    elif [[ "${OS_REPOSITORY}" == "${ES_REPOSITORY}" ]]; then
+        echo -n "ERROR: OpenSearch cannot use the same repository name as ODFE."
+        exit 1
+    fi
 fi
 
 BASE_DOMAIN=$(echo "${sc_merged}" | yq r - "global.baseDomain")
@@ -71,6 +84,23 @@ fi
 echo "---
 "
 
+# BEGIN TAKE SNAPSHOT
+if [[ "${SNAPSHOTS}" == "true" ]]; then
+
+echo "--- Waiting for ODFE snapshots in progress ---
+Elasticsearch > GET /_snapshot/_status"
+while true; do
+    res=$("${here}/../../bin/ck8s" ops kubectl sc -n elastic-system exec opendistro-es-master-0 -c elasticsearch -- \
+        curl -XGET "'http://localhost:9200/_snapshot/_status'" -u "'admin:${ES_PASSWORD}'" -s | \
+        yq r - 'snapshots')
+    if [[ "$res" == "[]" ]]; then
+        break
+    fi
+    echo -n "."
+    sleep 5
+done
+echo -e "done\n---\n"
+
 echo "--- Taking final ODFE snapshot ---
 Elasticsearch > PUT /_snapshot/${ES_REPOSITORY}/final
 -"
@@ -79,6 +109,9 @@ curl -XPUT "'http://localhost:9200/_snapshot/${ES_REPOSITORY}/final?wait_for_com
 -u "'admin:${ES_PASSWORD}'" -s
 echo "---
 "
+
+fi
+# END TAKE SNAPSHOT
 
 echo "--- Deleting Prometheus Elasticsearch Exporter.
 ck8s ops helmfile sc -l group=opendistro,app=prometheus-elasticsearch-exporter delete"
@@ -149,6 +182,9 @@ echo "---
 OpenSearch should be ready when the apply is done, verify opening: https://${OSD_SUBDOMAIN}.${BASE_DOMAIN}/
 ---
 "
+
+# BEGIN RESTORE SNAPSHOT
+if [[ "${SNAPSHOTS}" == "true" ]]; then
 
 echo "--- Deleting generated '.opensearch_dashboards*' index from OpenSearch, this will later be restored from the snapshot.
 OpenSearch > DELETE /.opensearch_dashboards*"
@@ -316,6 +352,9 @@ curl -XDELETE "'http://localhost:9200/_snapshot/${ES_REPOSITORY}?pretty=true'" \
 -u "'admin:${OS_PASSWORD}'" -s
 echo "---
 "
+
+fi
+# END RESTORE SNAPSHOT
 
 echo "--- Deleting ODFE. (Skip using option 's' if you want to keep it for now or already done so.)
 ck8s ops helmfile sc -l group=opendistro delete"

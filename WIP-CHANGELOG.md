@@ -74,6 +74,8 @@
 - Fixed relabeling for rook-ceph and cert servicemonitor.
 - Fluentd will now properly detect changes in container logs.
 - The `init` script will now properly generate secrets for new configuration options.
+- Fixed an issue preventing OpenSearch to run without snapshots enabled
+- Fixed a permission issue preventing OpenSearch init container to run sysctl
 
 ### Added
 
