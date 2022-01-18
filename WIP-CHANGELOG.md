@@ -64,6 +64,7 @@
 - increased resource requests and limits for falco-exporter, kubeStateMetrics and prometheusNodeExporter [#739](https://github.com/elastisys/compliantkubernetes-apps/pull/739)
 - increased the influxDB pvc size [#739](https://github.com/elastisys/compliantkubernetes-apps/pull/739)
 - Exposed velero's backup timetolive for both sc and wc.
+- disabled internal database for InfluxDB
 
 ### Fixed
 
