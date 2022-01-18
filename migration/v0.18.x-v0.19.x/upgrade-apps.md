@@ -92,3 +92,9 @@
 1. Clean up after ODFE:
 
     Run script `opensearch-migration-clean.sh`, this will delete deprecated parameters for ODFE in `secrets.yaml`, `sc-config.yaml` and `wc-config.yaml`.
+
+1. You will need to restart the influxdb pod in order for it to load the new configmap:
+
+   ```bash
+   bin/ck8s ops kubectl sc delete po influxdb-0 -n influxdb-prometheus
+   ```
