@@ -16,7 +16,7 @@ case "${1}" in
         config_load wc
         cluster_config="${config[config_file_wc]}"
         kubeconfig="${secrets[kube_config_wc]}"
-        user_kubeconfig=${CK8S_CONFIG_PATH}/user/kubeconfig.yaml
+        user_kubeconfig=${CK8S_CONFIG_PATH}/user/secret/kubeconfig.yaml
     ;;
     admin)
         case "${2}" in
