@@ -34,6 +34,7 @@
  - Added the new OPA policy - disallowed the latest image tag.
  - Moved `user.alertmanager.group_by` to `prometheus.alertmanagerSpec.groupBy` in `sc-config.yaml`
  - Moved `user.grafana.userGroups` to `user.grafana.oidc.userGroups` in `sc-config.yaml`
+ - kubeconfig.bash have been edited to work with the new 'secret' structure.
 
 ### Fixed
 
