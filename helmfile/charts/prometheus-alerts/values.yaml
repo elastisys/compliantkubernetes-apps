@@ -8,6 +8,9 @@ prometheusJob: kube-prometheus-stack-prometheus
 operatorJob: kube-prometheus-stack-operator
 prometheusNamespace: monitoring
 predictLinearLimit: 80
+s3BucketPercentLimit: 80
+s3BucketSizeQuotaGB: 80
+
 defaultRules:
   create: true
   ## Any labels to add to the alerts
@@ -22,3 +25,14 @@ defaultRules:
     rookMonitor: true
     predictLinear: true
     thanosMonitor: false
+    backupStatus: false
+    dailyChecks: false
+    bucketdailyChecks: false
+
+buckets:
+  harbor: set-me
+  velero: set-me
+  opensearch: set-me
+  influxDB: set-me
+  scFluentd: set-me
+  thanos: set-me

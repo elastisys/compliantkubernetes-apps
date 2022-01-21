@@ -31,3 +31,6 @@ clusterAdmin:
 monitoring:
   rook:
     enabled: true
+prometheus:
+  s3BucketPercentLimit: 80
+  s3BucketSizeQuotaGB: 1000
