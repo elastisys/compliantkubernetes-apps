@@ -16,7 +16,7 @@ prometheus-blackbox-exporter:
         timeout: 5s
         http:
           # We are not logged in, just checking that it can be reached
-          valid_status_codes: ["401"]
+          valid_status_codes: [401]
           valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
           follow_redirects: true
           preferred_ip_protocol: "ip4"
