@@ -1,0 +1,120 @@
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.backupStatus}}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "backup-status" | trunc 63 | trimSuffix "-" }}
+  labels:
+    app: {{ template "prometheus-alerts.name" . }}
+{{ include "prometheus-alerts.labels" . | indent 4 }}
+{{- if .Values.defaultRules.labels }}
+{{ toYaml .Values.defaultRules.labels | indent 4 }}
+{{- end }}
+{{- if .Values.defaultRules.annotations }}
+  annotations:
+{{ toYaml .Values.defaultRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  groups:
+  - name: backup-status
+    rules:
+    - alert: HarborBackupHaveFailed24Hours
+      annotations:
+        description: The job daily backup job harbor-backup have failed over 24 hours.
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-harborbackup
+        summary: The daily backup job harbor-backup have failed over 24 hours.
+      expr: |-
+        (
+          (min((time()-kube_job_status_completion_time{job_name=~"harbor-backup-cronjob-.*", cluster=~".*"})/3600)) > 24
+        )
+      for: 1h
+      labels:
+        severity: warning
+    - alert: HarborBackupHaveFailed48Hours
+      annotations:
+        description: The job daily backup job harbor-backup have failed over 48 hours.
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-harborbackup
+        summary: The daily backup job harbor-backup have failed over 48 hours.
+      expr: |-
+        (
+          (min((time()-kube_job_status_completion_time{job_name=~"harbor-backup-cronjob-.*", cluster=~".*"})/3600)) > 48
+        )
+      for: 1h
+      labels:
+        severity: warning
+    - alert: VeleroBackupHaveFailed24Hours
+      annotations:
+        description: The job daily backup job velero-backup have failed over 24 hours.
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-velerobackup
+        summary: The daily backup job velero-backup have failed over 24 hours.
+      expr: |-
+        (
+          (time() - velero_backup_last_successful_timestamp{schedule="velero-daily-backup", cluster=~".*"}) / 60 / 60 > 24
+        )
+      for: 1h
+      labels:
+        severity: warning
+    - alert: VeleroBackupHaveFailed48Hours
+      annotations:
+        description: The job daily backup job velero-backup have failed over 48 hours.
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-velerobackup
+        summary: The daily backup job velero-backup have failed over 48 hours.
+      expr: |-
+        (
+          (time() - velero_backup_last_successful_timestamp{schedule="velero-daily-backup", cluster=~".*"}) / 60 / 60 > 48
+        )
+      for: 1h
+      labels:
+        severity: warning
+    - alert: ElasticsearchBackupHaveFailed24Hours
+      annotations:
+        description: The job daily backup job elasticsearch-backup have failed over 24 hours.
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-elasticsearchbackup
+        summary: The daily backup job elasticsearch-backup have failed over 24 hours.
+      expr: |-
+        (
+          min((time()-kube_job_status_completion_time{job_name=~"opensearch-backup-.*", cluster=~".*"})/3600) > 24
+        )
+      for: 1h
+      labels:
+        severity: warning
+    - alert: ElasticsearchBackupHaveFailed48Hours
+      annotations:
+        description: The job daily backup job elasticsearch-backup have failed over 48 hours.
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-elasticsearchbackup
+        summary: The daily backup job elasticsearch-backup have failed over 48 hours.
+      expr: |-
+        (
+          min((time()-kube_job_status_completion_time{job_name=~"opensearch-backup-.*", cluster=~".*"})/3600) > 48
+        )
+      for: 1h
+      labels:
+        severity: warning
+    - alert: ElasticsearchSnapshotHaveFailed24Hours
+      annotations:
+        description: The job daily backup job {{`{{`}} $labels.repository {{`}}`}} have failed over 24 hours.
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-elasticsearchsnap
+        summary: The daily backup job elasticsearch snapshot have failed over 24 hours.
+      expr: |-
+        (
+          (time()-elasticsearch_snapshot_stats_snapshot_start_time_timestamp{state="SUCCESS", cluster=~".*"})/3600 > 24
+        or
+          (time()-elasticsearch_snapshot_stats_snapshot_start_time_timestamp{state="PARTIAL", cluster=~".*"})/3600 > 24
+        )
+      for: 1h
+      labels:
+        severity: warning
+    - alert: ElasticsearchSnapshotHaveFailed48Hours
+      annotations:
+        description: The job daily backup job {{`{{`}} $labels.repository {{`}}`}} have failed over 48 hours.
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-elasticsearchsnap
+        summary: The daily backup job elasticsearch snapshot have failed over 48 hours.
+      expr: |-
+        (
+          (time()-elasticsearch_snapshot_stats_snapshot_start_time_timestamp{state="SUCCESS", cluster=~".*"})/3600 > 48
+        or
+          (time()-elasticsearch_snapshot_stats_snapshot_start_time_timestamp{state="PARTIAL", cluster=~".*"})/3600 > 48
+        )
+      for: 1h
+      labels:
+        severity: warning
+{{- end }}

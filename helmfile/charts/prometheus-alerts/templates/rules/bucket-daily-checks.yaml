@@ -1,0 +1,75 @@
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.bucketdailyChecks}}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "bucket-daily-checks" | trunc 63 | trimSuffix "-" }}
+  labels:
+    app: {{ template "prometheus-alerts.name" . }}
+{{ include "prometheus-alerts.labels" . | indent 4 }}
+{{- if .Values.defaultRules.labels }}
+{{ toYaml .Values.defaultRules.labels | indent 4 }}
+{{- end }}
+{{- if .Values.defaultRules.annotations }}
+  annotations:
+{{ toYaml .Values.defaultRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  groups:
+  - name: bucket-daily-checks
+    rules:
+    - alert: HarborBucket36hActivityCheck
+      annotations:
+        description: The bucket {{.Values.buckets.harbor}} havent had any activity in 36h hours.
+        summary: The bucket {{.Values.buckets.harbor}} havent had any activity in 36h hours.
+      expr: |-
+        (
+          (time() - s3_last_modified_object_date{bucket={{.Values.buckets.harbor | quote}}}) / 3600 > 36
+        )
+      for: 1h
+      labels:
+        severity: warning
+    - alert: ThanosBucket36hActivityCheck
+      annotations:
+        description: The bucket {{.Values.buckets.thanos}} havent had any activity in 36h hours.
+        summary: The bucket {{.Values.buckets.thanos}} havent had any activity in 36h hours.
+      expr: |-
+        (
+          (time() - s3_last_modified_object_date{bucket={{.Values.buckets.thanos | quote}}}) / 3600 > 36
+        )
+      for: 1h
+      labels:
+        severity: warning
+    - alert: OpenSearchBucket36hActivityCheck
+      annotations:
+        description: The bucket {{.Values.buckets.opensearch}} havent had any activity in 36h hours.
+        summary: The bucket {{.Values.buckets.opensearch}} havent had any activity in 36h hours.
+      expr: |-
+        (
+          (time() - s3_last_modified_object_date{bucket={{.Values.buckets.opensearch | quote}}}) / 3600 > 36
+        )
+      for: 1h
+      labels:
+        severity: warning
+    - alert: VeleroBucket36hActivityCheck
+      annotations:
+        description: The bucket {{.Values.buckets.velero}} havent had any activity in 36h hours.
+        summary: The bucket {{.Values.buckets.velero}} havent had any activity in 36h hours.
+      expr: |-
+        (
+          (time() - s3_last_modified_object_date{bucket={{.Values.buckets.velero | quote}}}) / 3600 > 36
+        )
+      for: 1h
+      labels:
+        severity: warning
+    - alert: scFluentdBucket36hActivityCheck
+      annotations:
+        description: The bucket {{.Values.buckets.scFluentd}} havent had any activity in 36h hours.
+        summary: The bucket {{.Values.buckets.scFluentd}} havent had any activity in 36h hours.
+      expr: |-
+        (
+          (time() - s3_last_modified_object_date{bucket={{.Values.buckets.scFluentd | quote}}}) / 3600 > 36
+        )
+      for: 1h
+      labels:
+        severity: warning
+{{- end }}

@@ -1,0 +1,31 @@
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.dailyChecks}}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "daily-checks" | trunc 63 | trimSuffix "-" }}
+  labels:
+    app: {{ template "prometheus-alerts.name" . }}
+{{ include "prometheus-alerts.labels" . | indent 4 }}
+{{- if .Values.defaultRules.labels }}
+{{ toYaml .Values.defaultRules.labels | indent 4 }}
+{{- end }}
+{{- if .Values.defaultRules.annotations }}
+  annotations:
+{{ toYaml .Values.defaultRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  groups:
+  - name: daily-checks
+    rules:
+    - alert: S3BucketContentOver{{.Values.s3BucketPercentLimit}}Percent
+      annotations:
+        description: Over {{.Values.s3BucketPercentLimit}} percent of the total s3bucket size limit is used.
+        summary: Over {{.Values.s3BucketPercentLimit}} percent of the total s3bucket size limit is used.
+      expr: |-
+        (
+          sum(max_over_time(s3_objects_size_sum_bytes[1h])) >= ({{ .Values.s3BucketSizeQuotaGB }} * (1024^3)) * ({{ .Values.s3BucketPercentLimit }} / 100)
+        )
+      for: 1h
+      labels:
+        severity: warning
+{{- end }}
