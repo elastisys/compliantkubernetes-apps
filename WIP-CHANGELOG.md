@@ -38,6 +38,7 @@
 ### Fixed
 
 ### Added
+- Added Prometheus alerts for the 'backup status' and 'daily checks' dashboards. Also, 's3BucketPercentLimit' and 's3BucketSizeQuotaGB' parameters to set what limits the s3 rule including will alert off.
 
 ### Removed
 - Removed disabled helm releases from the application helmfile

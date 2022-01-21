@@ -12,6 +12,21 @@ defaultRules:
     {{- if not .Values.prometheus.predictLinearLimit }}
     predictLinear: false
     {{- end }}
+    thanosMonitor: {{ .Values.thanos.metrics.enabled }}
 
+    backupStatus: true
+    dailyChecks: true
+    bucketdailyChecks: true
 
 predictLinearLimit: {{ .Values.prometheus.predictLinearLimit }}
+
+s3BucketPercentLimit: {{ .Values.prometheus.s3BucketPercentLimit }}
+s3BucketSizeQuotaGB: {{ .Values.prometheus.s3BucketSizeQuotaGB }}
+
+buckets:
+  harbor: {{ .Values.objectStorage.buckets.harbor }}
+  velero: {{ .Values.objectStorage.buckets.velero }}
+  opensearch: {{ .Values.objectStorage.buckets.opensearch }}
+  influxDB: {{ .Values.objectStorage.buckets.influxDB }}
+  scFluentd: {{ .Values.objectStorage.buckets.scFluentd }}
+  thanos: {{ .Values.objectStorage.buckets.thanos }}
