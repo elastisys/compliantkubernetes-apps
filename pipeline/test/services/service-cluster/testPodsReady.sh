@@ -15,7 +15,7 @@ enable_velero=$(yq r -e "${CONFIG_FILE}" 'velero.enabled')
 enable_local_pv_provisioner=$(yq r -e "${CONFIG_FILE}" 'storageClasses.local.enabled')
 enable_nfs_provisioner=$(yq r -e "${CONFIG_FILE}" 'storageClasses.nfs.enabled')
 enable_os_data_sts=$(yq r -e "${CONFIG_FILE}" 'opensearch.dataNode.dedicatedPods')
-enable_os_client_deploy=$(yq r -e "${CONFIG_FILE}" 'opensearch.clientNode.dedicatedPods')
+enable_os_client_sts=$(yq r -e "${CONFIG_FILE}" 'opensearch.clientNode.dedicatedPods')
 
 echo
 echo
@@ -38,9 +38,6 @@ deployments=(
     "opensearch-system prometheus-elasticsearch-exporter"
     "opensearch-system opensearch-dashboards"
 )
-if "${enable_os_client_deploy}"; then
-    deployments+=("opensearch-system opensearch-client")
-fi
 if "${enable_nfs_provisioner}"; then
     deployments+=("kube-system nfs-subdir-external-provisioner")
 fi
@@ -117,6 +114,9 @@ statefulsets=(
 )
 if "${enable_os_data_sts}"; then
     statefulsets+=("opensearch-system opensearch-data")
+fi
+if "${enable_os_client_sts}"; then
+    statefulsets+=("opensearch-system opensearch-client")
 fi
 if "${enable_harbor}"; then
     statefulsets+=(
