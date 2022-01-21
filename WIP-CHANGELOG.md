@@ -10,6 +10,8 @@
  - Updated opensearch helm chart to version `1.7.1`, which upgrades opensearch  to `v1.2.4`.
  - Renamed release `blackbox` to `prometheus-blackbox-exporter`.
  - Added new panel to backup dashboard to reflect partial, failed and successful velero backups
+ - Alertmanager group-by parameters was removed and replaced by the special value `...`
+     See https://github.com/prometheus/alertmanager/blob/ec83f71/docs/configuration.md#route for more information
 
 ### Fixed
 
