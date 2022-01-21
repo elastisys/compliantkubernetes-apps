@@ -1,0 +1,4 @@
+resources: {{- toYaml .Values.grafanaLabelEnforcer.resources | nindent 4 }}
+
+upstreamUrl: "http://thanos-query-query-frontend.thanos:9090"
+enforcementLabel: "tenant_id"

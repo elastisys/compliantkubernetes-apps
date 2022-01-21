@@ -217,6 +217,7 @@ grafana:
     resources: {{- toYaml .Values.prometheus.grafana.sidecar.resources | nindent 6 }}
 
   additionalDataSources:
+  {{- if .Values.influxDB.enabled }}
   - name: prometheus-wc-reader
     access: proxy
     basicAuth: false
@@ -235,6 +236,46 @@ grafana:
     type: prometheus
     url: http://kube-prometheus-stack-prometheus:9090
     version: 1
+  {{- end }}
+  {{- if and .Values.thanos.enabled .Values.thanos.query.enabled }}
+  - name: "Thanos All"
+    access: proxy
+    basicAuth: false
+    editable: false
+    {{- if .Values.influxDB.enabled }}
+    isDefault: false
+    {{- else }}
+    isDefault: true
+    {{- end }}
+    orgId: 1
+    type: prometheus
+    url: http://thanos-query-query-frontend.thanos:9090
+    version: 1
+  - name: "Thanos SC Only"
+    access: proxy
+    basicAuth: false
+    editable: false
+    isDefault: false
+    orgId: 1
+    type: prometheus
+    url: http://grafana-label-enforcer:9090
+    jsonData:
+      customQueryParameters: "tenant_id={{ .Values.global.clusterName }}"
+    version: 1
+  {{- range .Values.global.clustersMonitoring }}
+  - name: "Thanos {{ . }} only"
+    access: proxy
+    basicAuth: false
+    editable: false
+    isDefault: false
+    orgId: 1
+    type: prometheus
+    url: http://grafana-label-enforcer:9090
+    version: 1
+    jsonData:
+      customQueryParameters: "tenant_id={{ . }}"
+  {{- end }}
+  {{- end }}
 
   grafana.ini:
     server:
@@ -285,6 +326,14 @@ prometheus:
     - url: http://{{ .Values.influxDB.subdomain }}.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u={{ .Values.influxDB.users.admin }}&p={{ .Values.influxDB.users.adminPassword }}
     remoteWrite:
     - url: http://{{ .Values.influxDB.subdomain }}.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=service_cluster&u={{ .Values.influxDB.users.scWriter }}&p={{ .Values.influxDB.users.scWriterPassword }}
+    {{- if and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
+    - url: http://thanos-receiver-receive.thanos.svc.cluster.local:19291/api/v1/receive
+      writeRelabelConfigs:
+      - targetLabel: cluster
+        replacement: service_cluster
+      headers:
+        THANOS-TENANT: {{ .Values.global.clusterName }}
+    {{- end }}
 
     # Don't add prometheus info.
     prometheusExternalLabelNameClear: true

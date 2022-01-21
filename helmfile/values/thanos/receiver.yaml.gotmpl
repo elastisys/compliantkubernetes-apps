@@ -1,0 +1,81 @@
+existingObjstoreSecret: thanos-objectstorage-secret-objstore-secret
+
+query:
+  enabled: false
+
+queryFrontend:
+  enabled: false
+
+compactor:
+  enabled: true
+  retentionResolutionRaw: {{ .Values.thanos.compactor.retentionResolutionRaw }}
+  retentionResolution5m: {{ .Values.thanos.compactor.retentionResolution5m }}
+  retentionResolution1h: {{ .Values.thanos.compactor.retentionResolution1h }}
+  resources: {{- toYaml .Values.thanos.compactor.resources | nindent 4 }}
+  persistence:
+    size: {{ .Values.thanos.compactor.persistence.size }}
+
+storegateway:
+  enabled: true
+  resources: {{- toYaml .Values.thanos.storegateway.resources | nindent 4 }}
+
+bucketweb:
+  enabled: true
+  resources: {{- toYaml .Values.thanos.bucketweb.resources | nindent 4 }}
+
+receive:
+  enabled: true
+
+  mode: {{ .Values.thanos.receiver.mode }}
+
+  # extraFlags:
+  #   - "--receive.tenant-label-name=\"cluster\""
+
+  tsdbRetention: {{ .Values.thanos.receiver.tsdbRetention }}
+
+  persistence:
+    enabled: {{ .Values.thanos.receiver.persistence.enabled }}
+    size: {{ .Values.thanos.receiver.persistence.size }}
+
+  resources: {{- toYaml .Values.thanos.receiver.resources | nindent 4 }}
+
+  replicaCount: {{ .Values.thanos.receiver.replicaCount }}
+  replicationFactor: {{  .Values.thanos.receiver.replicationFactor }}
+
+  service:
+    additionalHeadless: true
+
+  ingress:
+    enabled: true
+    hostname: {{ .Values.thanos.receiver.subdomain }}.{{ .Values.global.opsDomain }}
+    tls: true
+    annotations:
+      cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
+      nginx.ingress.kubernetes.io/auth-secret: thanos-ingress-secret-basic-auth
+      nginx.ingress.kubernetes.io/auth-type: basic
+      nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
+
+receiveDistributor:
+  resources: {{- toYaml .Values.thanos.receiveDistributor.resources | nindent 4 }}
+
+ruler:
+  enabled: {{ .Values.thanos.ruler.enabled }}
+  resources: {{- toYaml .Values.thanos.ruler.resources | nindent 4 }}
+  alertmanagers:
+    - http://kube-prometheus-stack-alertmanager.monitoring:9093
+  queries:
+    - thanos-query-query-frontend:9090
+  {{- if .Values.thanos.ruler.enabled }}
+  config: |-
+    groups:
+    - name: Thanos ruler
+      rules:
+      - alert: ThanosDroppedAlerts
+        expr: thanos_alert_sender_alerts_dropped_total > 0
+        for: 10s
+  {{- end }}
+
+metrics:
+  enabled: {{ .Values.thanos.metrics.enabled }}
+  serviceMonitor:
+    enabled: {{ .Values.thanos.metrics.serviceMonitor.enabled }}

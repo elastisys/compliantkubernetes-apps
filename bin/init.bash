@@ -432,6 +432,9 @@ generate_secrets() {
 
     PROMETHEUS_WC_REMOTE_WRITE_PASS=$(pwgen -cns 20 1)
 
+    THANOS_INGRESS_PASS=$(pwgen -cns 20 1)
+    THANOS_INGRESS_PASS_HASH=$(htpasswd -bn "" "${THANOS_INGRESS_PASS}" | tr -d ':\n')
+
     yq write --inplace "${tmpfile}" 'grafana.password' "$(pwgen -cns 20 1)"
     yq write --inplace "${tmpfile}" 'grafana.clientSecret' "$(pwgen -cns 20 1)"
     yq write --inplace "${tmpfile}" 'grafana.opsClientSecret' "$(pwgen -cns 20 1)"
@@ -464,6 +467,8 @@ generate_secrets() {
     yq write --inplace "${tmpfile}" 'user.grafanaPassword' "$(pwgen -cns 20 1)"
     yq write --inplace "${tmpfile}" 'user.alertmanagerPassword' "$(pwgen -cns 20 1)"
     yq write --inplace "${tmpfile}" 'prometheus.remoteWrite.password' "${PROMETHEUS_WC_REMOTE_WRITE_PASS}"
+    yq write --inplace "${tmpfile}" 'thanos.receiver.basic_auth.password' "${THANOS_INGRESS_PASS}"
+    yq write --inplace "${tmpfile}" 'thanos.receiver.basic_auth.passwordHash' "${THANOS_INGRESS_PASS_HASH}"
 }
 
 # Usage: backup_file <file> [sufix]

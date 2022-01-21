@@ -92,6 +92,7 @@ objectStorage:
   ## Buckets where each respctive application will store its backups.
   buckets:
     velero: ${CK8S_ENVIRONMENT_NAME}-velero
+    thanos: ${CK8S_ENVIRONMENT_NAME}-thanos
 
 ## User configuration.
 user:
@@ -164,6 +165,22 @@ prometheus:
   tolerations: []
   affinity: {}
   nodeSelector: {}
+
+thanos:
+  # Enables Thanos components.
+  # If this isn't set, no components will be deployed
+  enabled: false
+
+  receiver:
+    # Enables the Thanos receiver with the additional components it needs.
+    enabled: true
+
+    # Subdomain that will be used for the receiver ingress
+    subdomain: thanos-receiver
+
+    # Username that will be used for metrics authentication
+    basic_auth:
+      username: thanos
 
 opensearch:
   subdomain: opensearch

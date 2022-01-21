@@ -7,6 +7,8 @@
 * This release migrates from Open Distro for Elasticsearch to OpenSearch.
 * Updated Blackbox chart to v5.3.1, and blackbox app to v0.19.0
   - HTTP probe: no_follow_redirects has been renamed to follow_redirects
+* Added option to enable thanos as a metric storage solution
+    Thanos will in the future replace influxDB, we strongly encourage enabling thanos so that when influxdb is removed metrics will already be present in thanos.
 
 # Updated
 
@@ -66,6 +68,7 @@
 - Exposed velero's backup timetolive for both sc and wc.
 - disabled internal database for InfluxDB
 - OPA policies are now enforced (deny) for the prod flavor.
+- Added option to disable influxDB
 
 ### Fixed
 
@@ -90,6 +93,7 @@
 - Added the blackbox installation in the wc cluster based on ADR to monitor the uptime of internal services as well in wc .
 - Added option to enable index per namespace feature in fluentd and elasticsearch
 - Added optional off-site backup replication between two providers or regions using rclone sync
+- Added option to enable thanos as a metric storage solution
 
 ### Removed
 

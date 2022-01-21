@@ -52,6 +52,7 @@ datasources:
   datasources.yaml:
     apiVersion: 1
     datasources:
+    {{- if .Values.influxDB.enabled }}
     - name: ck8s-metrics
       type: prometheus
       access: proxy
@@ -70,6 +71,56 @@ datasources:
       type: prometheus
       url: http://kube-prometheus-stack-prometheus:9090
       version: 1
+    {{- end }}
+    {{- if and .Values.thanos.enabled .Values.thanos.query.enabled }}
+    - name: "Service Cluster"
+      access: proxy
+      basicAuth: false
+      editable: false
+      isDefault: false
+      orgId: 1
+      type: prometheus
+      url: http://grafana-label-enforcer:9090
+      jsonData:
+        customQueryParameters: "tenant_id={{ .Values.global.clusterName }}"
+      version: 1
+
+    {{- /*
+      If only one workload cluster, don't bother naming the datasource and set to default.
+      Otherwise set the name of the clusters so users know what they are looking at.
+      */}}
+    {{- if eq (len .Values.global.clustersMonitoring) 1 }}
+    - name: "Workload Cluster"
+      access: proxy
+      basicAuth: false
+      editable: false
+      {{- if .Values.influxDB.enabled }}
+      isDefault: false
+      {{- else }}
+      isDefault: true
+      {{- end }}
+      orgId: 1
+      type: prometheus
+      url: http://grafana-label-enforcer:9090
+      version: 1
+      jsonData:
+        customQueryParameters: "tenant_id={{ first .Values.global.clustersMonitoring }}"
+    {{- else }}
+    {{- range .Values.global.clustersMonitoring }}
+    - name: "{{ . }}"
+      access: proxy
+      basicAuth: false
+      editable: false
+      isDefault: false
+      orgId: 1
+      type: prometheus
+      url: http://grafana-label-enforcer:9090
+      version: 1
+      jsonData:
+        customQueryParameters: "tenant_id={{ . }}"
+    {{- end }}
+    {{- end }}
+    {{- end }}
 
 
 grafana.ini:

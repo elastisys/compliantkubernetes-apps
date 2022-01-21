@@ -19,6 +19,10 @@ harbor_subdomain=$(yq r -e "${CONFIG_FILE}" 'harbor.subdomain')
 opensearch_subdomain=$(yq r -e "${CONFIG_FILE}" 'opensearch.subdomain')
 opensearch_dashboards_subdomain=$(yq r -e "${CONFIG_FILE}" 'opensearch.dashboards.subdomain')
 influxdb_subdomain=$(yq r -e "${CONFIG_FILE}" 'influxDB.subdomain')
+enable_influxdb=$(yq r -e "${CONFIG_FILE}" 'influxDB.enabled')
+thanos_subdomain=$(yq r -e "${CONFIG_FILE}" 'thanos.receiver.subdomain')
+enable_thanos=$(yq r -e "${CONFIG_FILE}" 'thanos.enabled')
+enable_thanos_receiver=$(yq r -e "${CONFIG_FILE}" 'thanos.receiver.enabled')
 
 testEndpoint OpenSearch "https://${opensearch_subdomain}.${ops_domain}/"
 
@@ -29,7 +33,10 @@ if [ "$enable_harbor" == true ]; then
 fi
 
 testEndpoint Grafana "https://${grafana_ops_subdomain}.${ops_domain}/"
-testEndpoint InfluxDB "https://${influxdb_subdomain}.${ops_domain}/health"
+
+if [ "$enable_influxdb" == true ]; then
+    testEndpoint InfluxDB "https://${influxdb_subdomain}.${ops_domain}/health"
+fi
 
 if [ "$enable_user_grafana" == "true" ]
 then
@@ -56,3 +63,7 @@ testEndpointProtected Grafana "https://${grafana_ops_subdomain}.${ops_domain}/" 
 testEndpointProtected OpenSearch "https://${opensearch_subdomain}.${ops_domain}/" 401
 
 testEndpointProtected OpenSearchDashboards "https://${opensearch_dashboards_subdomain}.${base_domain}/" 302
+
+if [[ "${enable_thanos}" == "true" ]] && [[ "${enable_thanos_receiver}" == "true" ]]; then
+    testEndpointProtected OpenSearchDashboards "https://${thanos_subdomain}.${ops_domain}/" 401
+fi

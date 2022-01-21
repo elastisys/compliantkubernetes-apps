@@ -1,0 +1,22 @@
+existingObjstoreSecret: thanos-objectstorage-secret-objstore-secret
+
+query:
+  enabled: true
+  replicaCount: {{ .Values.thanos.query.replicaCount }}
+  dnsDiscovery:
+    enabled: false
+  stores:
+    - "thanos-receiver-storegateway:10901"
+    {{- range $i := until .Values.thanos.receiver.replicaCount }}
+    - "thanos-receiver-receive-{{ $i }}.thanos-receiver-receive-headless.thanos.svc.cluster.local:10901"
+    {{- end }}
+  resources: {{- toYaml .Values.thanos.query.resources | nindent 4 }}
+
+queryFrontend:
+  enabled: true
+  resources: {{- toYaml .Values.thanos.queryFrontend.resources | nindent 4 }}
+
+metrics:
+  enabled: {{ .Values.thanos.metrics.enabled }}
+  serviceMonitor:
+    enabled: {{ .Values.thanos.metrics.serviceMonitor.enabled }}

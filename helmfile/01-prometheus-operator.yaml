@@ -43,3 +43,18 @@ releases:
 {{ if eq .Environment.Name "workload_cluster" }}
   - values/kube-prometheus-stack-wc.yaml.gotmpl
 {{ end }}
+
+- name: thanos-ingress-secret
+{{- if eq .Environment.Name "service_cluster" }}
+  namespace: thanos
+{{- else if eq .Environment.Name "workload_cluster" }}
+  namespace: monitoring
+{{- end }}
+  labels:
+    app: thanos
+  chart: ./charts/thanos-ingress-secret
+  version: 0.1.0
+  installed: {{ .Values.thanos.enabled }}
+  missingFileHandler: Error
+  values:
+  - values/thanos/ingress-secret.yaml.gotmpl

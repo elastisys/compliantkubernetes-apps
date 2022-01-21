@@ -13,5 +13,8 @@ namespaces:
 {{ if .Values.harbor.enabled }}
 - name: harbor
 {{ end }}
+{{ if .Values.thanos.enabled }}
+- name: thanos
+{{ end }}
 commonLabels:
   owner: operator

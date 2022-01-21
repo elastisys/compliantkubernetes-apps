@@ -3,6 +3,11 @@
 global:
   clusterName: ${CK8S_ENVIRONMENT_NAME}-sc
 
+  # Names of the workload clusters that sends metrics to this cluster.
+  # Mainly used for filtering of metrics.
+  clustersMonitoring:
+    - ${CK8S_ENVIRONMENT_NAME}-wc
+
 objectStorage:
   buckets:
     harbor: ${CK8S_ENVIRONMENT_NAME}-harbor
@@ -202,7 +207,14 @@ harbor:
     enabled: true
     retentionDays: 7
 
-
+grafanaLabelEnforcer:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 50Mi
+    requests:
+      cpu: 20m
+      memory: 20Mi
 
 prometheus:
   retention:
@@ -289,6 +301,126 @@ dex:
     # Simply add `serviceAccountFilePath: /etc/dex/google/secret-key` for each google connector.
     # For more details, see https://elastisys.com/elastisys-engineering-how-to-use-dex-with-google-accounts-to-manage-access-in-kubernetes/
     # SASecretName: set-me
+
+thanos:
+  query:
+    # Enables the query/query-frontend components
+    enabled: true
+
+    # Number of query pods
+    # They are infinitly scalable
+    replicaCount: 1
+
+    resources:
+      requests:
+        cpu: 50m
+        memory: 60Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+
+  queryFrontend:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 40Mi
+      limits:
+        cpu: 300m
+        memory: 100Mi
+
+  receiveDistributor:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 200Mi
+      limits:
+        cpu: 500m
+        memory: 200Mi
+
+  ruler:
+    # Enables the ruler component
+    # This is used as an alertmanager for long term data.
+    # It's recommended to not use this if not strictly necessary
+    enabled: false
+    resources:
+      requests:
+        cpu: 50m
+        memory: 40Mi
+      limits:
+        cpu: 300m
+        memory: 100Mi
+
+  receiver:
+    persistence:
+      enabled: true
+      size: 8Gi
+
+    # Sets the mode of operation for the receiver component
+    # dual-mode: Multiple instances of the receiver. For redundancy
+    # standalone: Single instance of receiver.
+    mode: dual-mode
+
+    # Retention for the metrics in the receiver
+    tsdbRetention: 15d
+
+    # Number of receiver instances
+    replicaCount: 2
+
+    # How many nodes that a time-series needs to be written to for a write to be considered successful.
+    # It needs to write to (REPLICATION_FACTOR + 1)/2 nodes for success.
+    # For more info: https://thanos.io/v0.24/proposals-done/201812-thanos-remote-receive.md/#replication
+    replicationFactor: 1
+
+    resources:
+      requests:
+        cpu: 200m
+        memory: 2Gi
+      limits:
+        cpu: 500m
+        memory: 2Gi
+
+  compactor:
+    # Set to 0s to disable retention
+    retentionResolutionRaw: 30d
+    retentionResolution5m: 90d
+    retentionResolution1h: 0s
+
+    # Persistence is recommended for caching.
+    # https://thanos.io/v0.24/components/compact.md/#disk
+    persistence:
+      enabled: true
+      size: 8Gi
+
+    resources:
+      requests:
+        cpu: 30m
+        memory: 50Mi
+      limits:
+        cpu: 500m
+        memory: 200Mi
+
+  storegateway:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 60Mi
+      limits:
+        cpu: 300m
+        memory: 300Mi
+
+  bucketweb:
+    resources:
+      requests:
+        cpu: 20m
+        memory: 40Mi
+      limits:
+        cpu: 50m
+        memory: 40Mi
+
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
 
 opensearch:
   # 'subdomain' and 'indexPerNamespace' is set in common-config.yaml
@@ -582,6 +714,7 @@ fluentd:
 logRetention:
   days: 7
 influxDB:
+  enabled: true
   subdomain: influxdb
   users:
     admin: admin

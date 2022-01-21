@@ -59,6 +59,20 @@ prometheus:
     - url: https://{{ .Values.influxDB.subdomain }}.{{ .Values.global.opsDomain }}/api/v1/prom/write?db=workload_cluster&u={{ .Values.prometheus.remoteWrite.user }}&p={{ .Values.prometheus.remoteWrite.password }}
       tlsConfig:
         insecureSkipVerify: {{ not .Values.global.verifyTls }}
+    {{- if and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
+    - url: https://{{ .Values.thanos.receiver.subdomain }}.{{ .Values.global.opsDomain }}/api/v1/receive
+      tlsConfig:
+        insecureSkipVerify: {{ not .Values.global.verifyTls }}
+      headers:
+        THANOS-TENANT: {{ .Values.global.clusterName }}
+      basicAuth:
+        username:
+          key: username
+          name: thanos-ingress-secret-basic-auth
+        password:
+          key: password
+          name: thanos-ingress-secret-basic-auth
+    {{- end }}
 
     # Dont add prometheus labels.
     prometheusExternalLabelNameClear: true

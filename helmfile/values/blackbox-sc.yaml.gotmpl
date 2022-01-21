@@ -11,7 +11,7 @@ prometheus-blackbox-exporter:
           valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
           follow_redirects: true
           preferred_ip_protocol: "ip4"
-      user_api_server:
+      http_401:
         prober: http
         timeout: 5s
         http:
@@ -52,4 +52,11 @@ targets:
     url: https://kube-apiserver.{{ .Values.global.baseDomain }}:/healthz
     interval: 60s
     scrapeTimeout: 30s
-    module: user_api_server
+    module: http_401
+  {{- if and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
+  - name: thanos-receiver
+    url: https://{{ .Values.thanos.receiver.subdomain }}.{{ .Values.global.opsDomain }}
+    interval: 60s
+    scrapeTimeout: 30s
+    module: http_401
+  {{- end }}

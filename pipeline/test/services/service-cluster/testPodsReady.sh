@@ -16,6 +16,11 @@ enable_local_pv_provisioner=$(yq r -e "${CONFIG_FILE}" 'storageClasses.local.ena
 enable_nfs_provisioner=$(yq r -e "${CONFIG_FILE}" 'storageClasses.nfs.enabled')
 enable_os_data_sts=$(yq r -e "${CONFIG_FILE}" 'opensearch.dataNode.dedicatedPods')
 enable_os_client_sts=$(yq r -e "${CONFIG_FILE}" 'opensearch.clientNode.dedicatedPods')
+enable_thanos=$(yq r -e "${CONFIG_FILE}" 'thanos.enabled')
+enable_thanos_query=$(yq r -e "${CONFIG_FILE}" 'thanos.query.enabled')
+enable_thanos_receiver=$(yq r -e "${CONFIG_FILE}" 'thanos.receiver.enabled')
+enable_thanos_ruler=$(yq r -e "${CONFIG_FILE}" 'thanos.ruler.enabled')
+enable_influxdb=$(yq r -e "${CONFIG_FILE}" 'influxDB.enabled')
 
 echo
 echo
@@ -57,6 +62,19 @@ if "${enable_user_grafana}"; then
 fi
 if "${enable_velero}"; then
     deployments+=("velero velero")
+fi
+if [[ "${enable_thanos}" == "true" ]] && [[ "${enable_thanos_receiver}" == "true" ]]; then
+    deployments+=(
+        "thanos thanos-receiver-bucketweb"
+        "thanos thanos-receiver-compactor"
+        "thanos thanos-receiver-receive-distributor"
+    )
+fi
+if [[ "${enable_thanos}" == "true" ]] && [[ "${enable_thanos_query}" == "true" ]]; then
+    deployments+=(
+        "thanos thanos-query-query"
+        "thanos thanos-query-query-frontend"
+    )
 fi
 
 resourceKind="Deployment"
@@ -107,9 +125,7 @@ echo "===================="
 
 statefulsets=(
     "monitoring prometheus-kube-prometheus-stack-prometheus"
-    "monitoring prometheus-wc-reader-prometheus-instance"
     "monitoring alertmanager-kube-prometheus-stack-alertmanager"
-    "influxdb-prometheus influxdb"
     "opensearch-system opensearch-master"
 )
 if "${enable_os_data_sts}"; then
@@ -127,6 +143,21 @@ if "${enable_harbor}"; then
 fi
 if "${enable_fluentd}"; then
     statefulsets+=("fluentd fluentd")
+fi
+if [[ "${enable_thanos}" == "true" ]] && [[ "${enable_thanos_receiver}" == "true" ]]; then
+    statefulsets+=(
+        "thanos thanos-receiver-receive"
+        "thanos thanos-receiver-storegateway"
+    )
+fi
+if [[ "${enable_thanos}" == "true" ]] && [[ "${enable_thanos_ruler}" == "true" ]]; then
+    statefulsets+=("thanos thanos-receiver-ruler")
+fi
+if "${enable_influxdb}"; then
+    statefulsets+=(
+        "monitoring prometheus-wc-reader-prometheus-instance"
+        "influxdb-prometheus influxdb"
+    )
 fi
 
 resourceKind="StatefulSet"
@@ -169,8 +200,6 @@ done
 # influxdb cronjob is create by <template name>-metrics-retention-cronjob-<sc/wc>
 # If the template name changes this has to be changed aswell.
 cronjobs=(
-  "influxdb-prometheus influxdb-metrics-retention-cronjob-sc"
-  "influxdb-prometheus influxdb-metrics-retention-cronjob-wc"
   "opensearch-system opensearch-curator"
 )
 if "${enable_harbor}" && "${enable_harbor_backup}"; then
@@ -190,6 +219,12 @@ if "${enable_influxdb_backup_retention}"; then
 fi
 if "${enable_fluentd}"; then
     cronjobs+=("fluentd sc-logs-retention")
+fi
+if "${enable_influxdb}"; then
+    cronjobs+=(
+        "influxdb-prometheus influxdb-metrics-retention-cronjob-sc"
+        "influxdb-prometheus influxdb-metrics-retention-cronjob-wc"
+    )
 fi
 
 echo
