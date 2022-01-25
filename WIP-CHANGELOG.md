@@ -95,6 +95,7 @@
 - Added option to enable index per namespace feature in fluentd and elasticsearch
 - Added optional off-site backup replication between two providers or regions using rclone sync
 - Added option to enable thanos as a metric storage solution
+- Added node exporter full dashboard
 
 ### Removed
 
