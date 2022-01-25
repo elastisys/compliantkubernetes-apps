@@ -20,8 +20,5 @@ namespaces:
 {{ if .Values.user.alertmanager.enabled }}
 - name: alertmanager
 {{ end }}
-{{ if .Values.thanos.enabled }}
-- name: thanos
-{{ end }}
 commonLabels:
   owner: operator
