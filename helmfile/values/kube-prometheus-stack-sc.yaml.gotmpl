@@ -330,7 +330,7 @@ prometheus:
     - url: http://thanos-receiver-receive.thanos.svc.cluster.local:19291/api/v1/receive
       writeRelabelConfigs:
       - targetLabel: cluster
-        replacement: service_cluster
+        replacement: {{ .Values.global.clusterName }}
       headers:
         THANOS-TENANT: {{ .Values.global.clusterName }}
     {{- end }}
