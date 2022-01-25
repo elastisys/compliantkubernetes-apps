@@ -114,8 +114,8 @@ releases:
   namespace: monitoring
   labels:
     app: blackbox
-  chart: ./charts/blackbox
-  version: 0.1.0
+  chart: ./upstream/prometheus-blackbox-exporter
+  version: 5.3.1
   missingFileHandler: Error
   values:
 {{ if eq .Environment.Name "service_cluster" }}

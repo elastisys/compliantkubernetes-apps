@@ -1,62 +1,53 @@
-prometheus-blackbox-exporter:
-  resources: {{- toYaml .Values.prometheusBlackboxExporter.resources | nindent 4 }}
-  secretConfig: true
-  config:
-    # See https://github.com/prometheus/blackbox_exporter/blob/master/CONFIGURATION.md
-    modules:
-      http_2xx:
-        prober: http
-        timeout: 5s
-        http:
-          valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
-          follow_redirects: true
-          preferred_ip_protocol: "ip4"
-      http_401:
-        prober: http
-        timeout: 5s
-        http:
-          # We are not logged in, just checking that it can be reached
-          valid_status_codes: [401]
-          valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
-          follow_redirects: true
-          preferred_ip_protocol: "ip4"
-          tls_config:
-            insecure_skip_verify: true
+resources: {{- toYaml .Values.prometheusBlackboxExporter.resources | nindent 4 }}
 
-labels:
-  release: kube-prometheus-stack
-targets:
-  - name: dex
-    url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}/healthz
-    interval: 60s
-    scrapeTimeout: 30s
-    module: http_2xx
-  - name: grafana
-    url: https://{{ .Values.user.grafana.subdomain }}.{{ .Values.global.baseDomain }}/api/health
-    interval: 60s
-    scrapeTimeout: 30s
-    module: http_2xx
-  {{- if .Values.harbor.enabled }}
-  - name: harbor
-    url: https://{{ .Values.harbor.subdomain }}.{{ .Values.global.baseDomain }}/api/v2.0/ping
-    interval: 60s
-    scrapeTimeout: 30s
-    module: http_2xx
-  {{- end }}
-  - name: opensearch-dashboards
-    url: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}/api/status
-    interval: 60s
-    scrapeTimeout: 30s
-    module: http_2xx
-  - name: user-api-server
-    url: https://kube-apiserver.{{ .Values.global.baseDomain }}:/healthz
-    interval: 60s
-    scrapeTimeout: 30s
-    module: http_401
-  {{- if and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
-  - name: thanos-receiver
-    url: https://{{ .Values.thanos.receiver.subdomain }}.{{ .Values.global.opsDomain }}
-    interval: 60s
-    scrapeTimeout: 30s
-    module: http_401
-  {{- end }}
+config:
+  modules:
+    http_401:
+      prober: http
+      timeout: 5s
+      http:
+        # We are not logged in, just checking that it can be reached
+        valid_status_codes: [401]
+        valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+        follow_redirects: true
+        preferred_ip_protocol: "ip4"
+        tls_config:
+          insecure_skip_verify: true
+
+serviceMonitor:
+  enabled: true
+  targets:
+    - name: dex
+      url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}/healthz
+      interval: 60s
+      scrapeTimeout: 30s
+      module: http_2xx
+    - name: grafana
+      url: https://{{ .Values.user.grafana.subdomain }}.{{ .Values.global.baseDomain }}/api/health
+      interval: 60s
+      scrapeTimeout: 30s
+      module: http_2xx
+    {{- if .Values.harbor.enabled }}
+    - name: harbor
+      url: https://{{ .Values.harbor.subdomain }}.{{ .Values.global.baseDomain }}/api/v2.0/ping
+      interval: 60s
+      scrapeTimeout: 30s
+      module: http_2xx
+    {{- end }}
+    - name: opensearch-dashboards
+      url: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}/api/status
+      interval: 60s
+      scrapeTimeout: 30s
+      module: http_2xx
+    - name: user-api-server
+      url: https://kube-apiserver.{{ .Values.global.baseDomain }}:/healthz
+      interval: 60s
+      scrapeTimeout: 30s
+      module: http_401
+    {{- if and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
+    - name: thanos-receiver
+      url: https://{{ .Values.thanos.receiver.subdomain }}.{{ .Values.global.opsDomain }}
+      interval: 60s
+      scrapeTimeout: 30s
+      module: http_401
+    {{- end }}

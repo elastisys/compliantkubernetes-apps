@@ -123,7 +123,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "max by (name) (probe_success{name=\"user-api-server\"})",
+          "expr": "max by (target) (probe_success{target=\"user-api-server\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -239,7 +239,7 @@
       "pluginVersion": "8.0.5",
       "targets": [
         {
-          "expr": "max by (name) (probe_success{name=\"dex\"})",
+          "expr": "max by (target) (probe_success{target=\"dex\"})",
           "format": "time_series",
           "instant": true,
           "intervalFactor": 1,
@@ -356,7 +356,7 @@
       "pluginVersion": "8.0.5",
       "targets": [
         {
-          "expr": "max by (name) (probe_success{name=\"grafana\"})",
+          "expr": "max by (target) (probe_success{target=\"grafana\"})",
           "format": "time_series",
           "instant": true,
           "intervalFactor": 1,
@@ -473,7 +473,7 @@
       "pluginVersion": "8.0.5",
       "targets": [
         {
-          "expr": "max by (name) (probe_success{name=\"harbor\"})",
+          "expr": "max by (target) (probe_success{target=\"harbor\"})",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -592,7 +592,7 @@
       "pluginVersion": "8.0.5",
       "targets": [
         {
-          "expr": "max by (name) (probe_success{name=\"opensearch-dashboards\"})",
+          "expr": "max by (target) (probe_success{target=\"opensearch-dashboards\"})",
           "format": "time_series",
           "instant": true,
           "intervalFactor": 1,
@@ -777,10 +777,10 @@
       "pluginVersion": "8.0.5",
       "targets": [
         {
-          "expr": "max by (name) (probe_success)",
+          "expr": "max by (target) (probe_success)",
           "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "{{name}}",
+          "legendFormat": "{{target}}",
           "refId": "A"
         },
         {
@@ -876,10 +876,10 @@
       "pluginVersion": "8.0.5",
       "targets": [
         {
-          "expr": "max by (name) (probe_success)",
+          "expr": "max by (target) (probe_success)",
           "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "{{name}}",
+          "legendFormat": "{{target}}",
           "refId": "A"
         },
         {

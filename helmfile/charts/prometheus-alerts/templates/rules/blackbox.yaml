@@ -23,5 +23,5 @@ spec:
           labels:
             severity: "critical"
           annotations:
-            summary: "Endpoint {{`{{ $labels.name }}`}} at {{`{{ $labels.target }}`}} down"
+            summary: "Endpoint {{`{{ $labels.target }}`}} at {{`{{ $labels.instance }}`}} down"
 {{- end }}

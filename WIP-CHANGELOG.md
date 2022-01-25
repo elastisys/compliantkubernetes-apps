@@ -69,6 +69,7 @@
 - disabled internal database for InfluxDB
 - OPA policies are now enforced (deny) for the prod flavor.
 - Added option to disable influxDB
+- Moved prometheus-blackbox-exporter helm chart to the upstream charts folder
 
 ### Fixed
 
@@ -104,3 +105,4 @@
   - `workload-cluster-psp-rbac`
 - Removed the "prometheusBlackboxExporter" from sc config and updated the common config as it will now be required in both sc and wc cluster
 - Removed curator alerts
+- Removed `blackbox` helm chart
