@@ -1,607 +1,813 @@
 {
-    "annotations": {
-        "list": [
-            {
-                "builtIn": 1,
-                "datasource": "-- Grafana --",
-                "enable": true,
-                "hide": true,
-                "iconColor": "rgba(0, 211, 255, 1)",
-                "name": "Annotations & Alerts",
-                "type": "dashboard"
-            }
-        ]
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "iteration": 1643286437876,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 20,
+      "panels": [],
+      "title": "Time since last successful backup",
+      "type": "row"
     },
-    "editable": true,
-    "gnetId": null,
-    "graphTooltip": 0,
-    "id": 31,
-    "iteration": 1611240659732,
-    "links": [],
-    "panels": [
-        {
-            "datasource": "$datasource",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {},
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "green",
-                                "value": null
-                            },
-                            {
-                                "color": "#EAB839",
-                                "value": 24
-                            },
-                            {
-                                "color": "red",
-                                "value": 48
-                            }
-                        ]
-                    },
-                    "unit": "h"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 7,
-                "w": 8,
-                "x": 0,
-                "y": 0
-            },
-            "id": 4,
-            "options": {
-                "colorMode": "value",
-                "graphMode": "none",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                    "calcs": [
-                        "last"
-                    ],
-                    "fields": "",
-                    "values": false
-                }
-            },
-            "pluginVersion": "7.0.3",
-            "targets": [
-                {
-                    "expr": "min((time()-kube_job_status_completion_time{job_name=~\"harbor-backup-cronjob-.*\", cluster=~\"$cluster\"})/3600)",
-                    "instant": false,
-                    "interval": "",
-                    "legendFormat": "{{job_name}}",
-                    "refId": "A"
-                }
-            ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "Time since last successful Harbor backup",
-            "transformations": [],
-            "type": "stat"
+    {
+      "datasource": "$datasource",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 24
+              },
+              {
+                "color": "red",
+                "value": 48
+              }
+            ]
+          },
+          "unit": "h"
         },
-        {
-            "datasource": "$datasource",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {},
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "green",
-                                "value": null
-                            },
-                            {
-                                "color": "#EAB839",
-                                "value": 24
-                            },
-                            {
-                                "color": "red",
-                                "value": 48
-                            }
-                        ]
-                    },
-                    "unit": "h"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 7,
-                "w": 8,
-                "x": 8,
-                "y": 0
-            },
-            "id": 5,
-            "options": {
-                "colorMode": "value",
-                "graphMode": "none",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                    "calcs": [
-                        "last"
-                    ],
-                    "fields": "",
-                    "values": false
-                }
-            },
-            "pluginVersion": "7.0.3",
-            "targets": [
-                {
-                    "expr": "min((time()-kube_job_status_completion_time{job_name=~\"influxdb-backup-[0-9]*\", cluster=~\"$cluster\"})/3600)",
-                    "instant": false,
-                    "interval": "",
-                    "legendFormat": "{{job_name}}",
-                    "refId": "A"
-                }
-            ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "Time since last successful InfluxDB backup",
-            "transformations": [],
-            "type": "stat"
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 1
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
         },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.7",
+      "targets": [
         {
-            "datasource": "$datasource",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {},
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "green",
-                                "value": null
-                            },
-                            {
-                                "color": "#EAB839",
-                                "value": 24
-                            },
-                            {
-                                "color": "red",
-                                "value": 48
-                            }
-                        ]
-                    },
-                    "unit": "h"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 7,
-                "w": 8,
-                "x": 16,
-                "y": 0
-            },
-            "id": 2,
-            "options": {
-                "colorMode": "value",
-                "graphMode": "none",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                    "calcs": [
-                        "last"
-                    ],
-                    "fields": "",
-                    "values": false
-                }
-            },
-            "pluginVersion": "7.0.3",
-            "targets": [
-                {
-                    "expr": "(time() - velero_backup_last_successful_timestamp{schedule=\"velero-daily-backup\", cluster=~\"$cluster\"}) / 60 / 60",
-                    "interval": "",
-                    "intervalFactor": 1,
-                    "legendFormat": "{{schedule}}",
-                    "refId": "A"
-                }
-            ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "Time since last successful Velero backup",
-            "type": "stat"
-        },
-        {
-            "datasource": "$datasource",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {},
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "green",
-                                "value": null
-                            },
-                            {
-                                "color": "#EAB839",
-                                "value": 12
-                            },
-                            {
-                                "color": "red",
-                                "value": 24
-                            }
-                        ]
-                    },
-                    "unit": "h"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 7,
-                "w": 8,
-                "x": 0,
-                "y": 7
-            },
-            "id": 6,
-            "options": {
-                "colorMode": "value",
-                "graphMode": "none",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                    "calcs": [
-                        "last"
-                    ],
-                    "fields": "",
-                    "values": false
-                }
-            },
-            "pluginVersion": "7.0.3",
-            "targets": [
-                {
-                    "expr": "min((time()-kube_job_status_completion_time{job_name=~\"opensearch-backup-.*\", cluster=~\"$cluster\"})/3600)",
-                    "instant": false,
-                    "interval": "",
-                    "legendFormat": "{{job_name}}",
-                    "refId": "A"
-                }
-            ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "Time since last successful OpenSearch backup job",
-            "transformations": [],
-            "type": "stat"
-        },
-        {
-            "datasource": "$datasource",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {},
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "green",
-                                "value": null
-                            },
-                            {
-                                "color": "red",
-                                "value": 80
-                            }
-                        ]
-                    },
-                    "unit": "h"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 7,
-                "w": 8,
-                "x": 8,
-                "y": 7
-            },
-            "id": 8,
-            "options": {
-                "colorMode": "value",
-                "graphMode": "none",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                    "calcs": [
-                        "last"
-                    ],
-                    "fields": "",
-                    "values": false
-                }
-            },
-            "pluginVersion": "7.0.3",
-            "targets": [
-                {
-                    "expr": "(time()-elasticsearch_snapshot_stats_snapshot_start_time_timestamp{state=\"SUCCESS\", cluster=~\"$cluster\"})/3600",
-                    "interval": "",
-                    "legendFormat": "",
-                    "refId": "A"
-                }
-            ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "Time since last successful OpenSearch snapshot ",
-            "type": "stat"
-        },
-        {
-            "collapsed": false,
-            "datasource": null,
-            "gridPos": {
-                "h": 1,
-                "w": 24,
-                "x": 0,
-                "y": 14
-            },
-            "id": 10,
-            "panels": [],
-            "title": "Backup rclone sync",
-            "type": "row"
-        },
-        {
-            "datasource": "${datasource}",
-            "description": "",
-            "gridPos": {
-                "h": 2,
-                "w": 24,
-                "x": 0,
-                "y": 15
-            },
-            "id": 16,
-            "options": {
-                "content": "# Off-site backup replication is <<rclone-sync-state>>",
-                "mode": "markdown"
-            },
-            "pluginVersion": "8.2.7",
-            "type": "text"
-        },
-        {
-            "datasource": "${datasource}",
-            "fieldConfig": {
-                "defaults": {
-                    "color": {
-                        "mode": "thresholds"
-                    },
-                    "mappings": [
-                        {
-                            "options": {
-                                "0": {
-                                    "color": "dark-yellow",
-                                    "index": 1,
-                                    "text": "suspended"
-                                },
-                                "1": {
-                                    "index": 0,
-                                    "text": "active"
-                                }
-                            },
-                            "type": "value"
-                        },
-                        {
-                            "options": {
-                                "match": "nan",
-                                "result": {
-                                    "color": "dark-red",
-                                    "index": 2,
-                                    "text": "unknown"
-                                }
-                            },
-                            "type": "special"
-                        },
-                        {
-                            "options": {
-                                "match": "null",
-                                "result": {
-                                    "color": "text",
-                                    "index": 3,
-                                    "text": "missing"
-                                }
-                            },
-                            "type": "special"
-                        }
-                    ],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "dark-green",
-                                "value": null
-                            }
-                        ]
-                    }
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 3,
-                "w": 24,
-                "x": 0,
-                "y": 17
-            },
-            "id": 12,
-            "options": {
-                "colorMode": "background",
-                "graphMode": "none",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                    "calcs": [
-                        "last"
-                    ],
-                    "fields": "",
-                    "values": false
-                },
-                "text": {},
-                "textMode": "auto"
-            },
-            "pluginVersion": "8.2.7",
-            "targets": [
-                {
-                    "exemplar": true,
-                    "expr": "sum by (bucket) (label_replace(kube_cronjob_spec_suspend{cronjob=~\"rclone-sync-.*\"} == bool 0, \"bucket\", \"$1\", \"cronjob\", \"rclone-sync-(.*)\"))",
-                    "instant": false,
-                    "interval": "",
-                    "legendFormat": "{{bucket}}",
-                    "refId": "A"
-                }
-            ],
-            "title": "Status of backup rclone sync cronjobs",
-            "type": "stat"
-        },
-        {
-            "datasource": "${datasource}",
-            "fieldConfig": {
-                "defaults": {
-                    "color": {
-                        "mode": "thresholds"
-                    },
-                    "decimals": 1,
-                    "mappings": [
-                        {
-                            "options": {
-                                "match": "null",
-                                "result": {
-                                    "color": "text",
-                                    "index": 0,
-                                    "text": "missing"
-                                }
-                            },
-                            "type": "special"
-                        }
-                    ],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "dark-green",
-                                "value": null
-                            },
-                            {
-                                "color": "dark-yellow",
-                                "value": 86400
-                            },
-                            {
-                                "color": "dark-red",
-                                "value": 172800
-                            }
-                        ]
-                    },
-                    "unit": "s"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 7,
-                "w": 24,
-                "x": 0,
-                "y": 20
-            },
-            "id": 14,
-            "options": {
-                "colorMode": "background",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                    "calcs": [
-                        "last"
-                    ],
-                    "fields": "",
-                    "values": false
-                },
-                "text": {},
-                "textMode": "auto"
-            },
-            "pluginVersion": "8.2.7",
-            "targets": [
-                {
-                    "exemplar": true,
-                    "expr": "min by (bucket) ((time()-label_replace(kube_job_status_completion_time{job_name=~\"rclone-sync-.*\"}, \"bucket\", \"$1\", \"job_name\", \"rclone-sync-(.*?)-(manual|[0-9-])*(manual|[0-9-])*\")))",
-                    "interval": "",
-                    "legendFormat": "{{bucket}}",
-                    "refId": "A"
-                }
-            ],
-            "title": "Time since last successful backup rclone sync jobs",
-            "type": "stat"
+          "expr": "min((time()-kube_job_status_completion_time{job_name=~\"harbor-backup-cronjob-.*\", cluster=~\"$cluster\"})/3600)",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{job_name}}",
+          "refId": "A"
         }
-    ],
-    "refresh": "30s",
-    "schemaVersion": 25,
-    "style": "dark",
-    "tags": [],
-    "templating": {
-        "list": [
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Time since last successful Harbor backup",
+      "transformations": [],
+      "type": "stat"
+    },
+    {
+      "datasource": "$datasource",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 24
+              },
+              {
+                "color": "red",
+                "value": 48
+              }
+            ]
+          },
+          "unit": "h"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 1
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.7",
+      "targets": [
+        {
+          "expr": "min((time()-kube_job_status_completion_time{job_name=~\"influxdb-backup-[0-9]*\", cluster=~\"$cluster\"})/3600)",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{job_name}}",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Time since last successful InfluxDB backup",
+      "transformations": [],
+      "type": "stat"
+    },
+    {
+      "datasource": "$datasource",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 24
+              },
+              {
+                "color": "red",
+                "value": 48
+              }
+            ]
+          },
+          "unit": "h"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 1
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.7",
+      "targets": [
+        {
+          "expr": "(time() - velero_backup_last_successful_timestamp{schedule=\"velero-daily-backup\", cluster=~\"$cluster\"}) / 60 / 60",
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "{{schedule}}",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Time since last successful Velero backup",
+      "type": "stat"
+    },
+    {
+      "datasource": "$datasource",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 12
+              },
+              {
+                "color": "red",
+                "value": 24
+              }
+            ]
+          },
+          "unit": "h"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 8
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.7",
+      "targets": [
+        {
+          "expr": "min((time()-kube_job_status_completion_time{job_name=~\"opensearch-backup-.*\", cluster=~\"$cluster\"})/3600)",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{job_name}}",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Time since last successful OpenSearch backup job",
+      "transformations": [],
+      "type": "stat"
+    },
+    {
+      "datasource": "$datasource",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "h"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 8
+      },
+      "id": 8,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.7",
+      "targets": [
+        {
+          "expr": "(time()-elasticsearch_snapshot_stats_snapshot_start_time_timestamp{state=\"SUCCESS\", cluster=~\"$cluster\"})/3600",
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Time since last successful OpenSearch snapshot ",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 15
+      },
+      "id": 18,
+      "panels": [],
+      "title": "Backup per hour",
+      "type": "row"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "${datasource}",
+      "decimals": 0,
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "hiddenSeries": false,
+      "id": 22,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "rightSide": true,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null as zero",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.2.7",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": true,
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "sum(increase(velero_backup_success_total{schedule=~\"$schedule\", cluster=~\"$cluster\"}[1h])) by (cluster)",
+          "interval": "",
+          "legendFormat": "Backup success -  {{cluster}}",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "sum(increase(velero_backup_failure_total{schedule=~\"$schedule\", cluster=~\"$cluster\"}[1h])) by (cluster)",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Backup failure -  {{cluster}}",
+          "refId": "B"
+        },
+        {
+          "exemplar": true,
+          "expr": "sum(increase(velero_backup_partial_failure_total{schedule=~\"$schedule\", cluster=~\"$cluster\"}[1h])) by (cluster)",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Backup partial failure -  {{cluster}}",
+          "refId": "C"
+        },
+        {
+          "exemplar": true,
+          "expr": "sum(increase(velero_backup_deletion_success_total{schedule=~\"$schedule\", cluster=~\"$cluster\"}[1h])) by (cluster)",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Backup deletion success -  {{cluster}}",
+          "refId": "D"
+        },
+        {
+          "exemplar": true,
+          "expr": "sum(increase(velero_backup_deletion_failure_total{schedule=~\"$schedule\", cluster=~\"$cluster\"}[1h])) by (cluster)",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Backup deletion failure -  {{cluster}}",
+          "refId": "E"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Velero backup per hour",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:37",
+          "decimals": 0,
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:38",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 10,
+      "panels": [],
+      "title": "Backup rclone sync",
+      "type": "row"
+    },
+    {
+      "datasource": "${datasource}",
+      "description": "",
+      "gridPos": {
+        "h": 2,
+        "w": 24,
+        "x": 0,
+        "y": 25
+      },
+      "id": 16,
+      "options": {
+        "content": "# Off-site backup replication is <<rclone-sync-state>>",
+        "mode": "markdown"
+      },
+      "pluginVersion": "8.2.7",
+      "type": "text"
+    },
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
             {
-                "current": {
-                    "selected": false,
-                    "text": "prometheus-sc",
-                    "value": "prometheus-sc"
+              "options": {
+                "0": {
+                  "color": "dark-yellow",
+                  "index": 1,
+                  "text": "suspended"
                 },
-                "hide": 0,
-                "includeAll": false,
-                "label": null,
-                "multi": false,
-                "name": "datasource",
-                "options": [],
-                "query": "prometheus",
-                "queryValue": "",
-                "refresh": 1,
-                "regex": "",
-                "skipUrlSync": false,
-                "type": "datasource"
+                "1": {
+                  "index": 0,
+                  "text": "active"
+                }
+              },
+              "type": "value"
             },
             {
-                "allValue": ".*",
-                "current": {
-                    "selected": true,
-                    "text": "All",
-                    "value": [
-                        "$__all"
-                    ]
-                },
-                "datasource": "$datasource",
-                "definition": "label_values(kube_job_status_completion_time, cluster)",
-                "hide": 0,
-                "includeAll": true,
-                "label": null,
-                "multi": true,
-                "name": "cluster",
-                "options": [],
-                "query": "label_values(kube_job_status_completion_time, cluster)",
-                "refresh": 2,
-                "regex": "",
-                "skipUrlSync": false,
-                "sort": 0,
-                "tagValuesQuery": "",
-                "tags": [],
-                "tagsQuery": "",
-                "type": "query",
-                "useTags": false
+              "options": {
+                "match": "nan",
+                "result": {
+                  "color": "dark-red",
+                  "index": 2,
+                  "text": "unknown"
+                }
+              },
+              "type": "special"
+            },
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "text",
+                  "index": 3,
+                  "text": "missing"
+                }
+              },
+              "type": "special"
             }
-        ]
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 27
+      },
+      "id": 12,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.7",
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "sum by (bucket) (label_replace(kube_cronjob_spec_suspend{cronjob=~\"rclone-sync-.*\"} == bool 0, \"bucket\", \"$1\", \"cronjob\", \"rclone-sync-(.*)\"))",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{bucket}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Status of backup rclone sync cronjobs",
+      "type": "stat"
     },
-    "time": {
-        "from": "now-2d",
-        "to": "now"
-    },
-    "timepicker": {
-        "refresh_intervals": [
-            "10s",
-            "30s",
-            "1m",
-            "5m",
-            "15m",
-            "30m",
-            "1h",
-            "2h",
-            "1d"
-        ]
-    },
-    "timezone": "",
-    "title": "Backup status",
-    "version": 1
+    {
+      "datasource": "${datasource}",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "text",
+                  "index": 0,
+                  "text": "missing"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-green",
+                "value": null
+              },
+              {
+                "color": "dark-yellow",
+                "value": 86400
+              },
+              {
+                "color": "dark-red",
+                "value": 172800
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 30
+      },
+      "id": 14,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.2.7",
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "min by (bucket) ((time()-label_replace(kube_job_status_completion_time{job_name=~\"rclone-sync-.*\"}, \"bucket\", \"$1\", \"job_name\", \"rclone-sync-(.*?)-(manual|[0-9-])*(manual|[0-9-])*\")))",
+          "interval": "",
+          "legendFormat": "{{bucket}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Time since last successful backup rclone sync jobs",
+      "type": "stat"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 32,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "prometheus-sc",
+          "value": "prometheus-sc"
+        },
+        "description": null,
+        "error": null,
+        "hide": 0,
+        "includeAll": false,
+        "label": null,
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "queryValue": "",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": "$datasource",
+        "definition": "label_values(kube_job_status_completion_time, cluster)",
+        "description": null,
+        "error": null,
+        "hide": 0,
+        "includeAll": true,
+        "label": null,
+        "multi": true,
+        "name": "cluster",
+        "options": [],
+        "query": {
+          "query": "label_values(kube_job_status_completion_time, cluster)",
+          "refId": "prometheus-sc-cluster-Variable-Query"
+        },
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": "${datasource}",
+        "definition": "label_values(velero_backup_attempt_total, schedule)",
+        "description": null,
+        "error": null,
+        "hide": 0,
+        "includeAll": true,
+        "label": null,
+        "multi": true,
+        "name": "schedule",
+        "options": [],
+        "query": {
+          "query": "label_values(velero_backup_attempt_total, schedule)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-2d",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "Backup status",
+  "version": 21
 }
