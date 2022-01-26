@@ -709,10 +709,16 @@ fluentd:
     tolerations: []
     affinity: {}
     nodeSelector: {}
+  scLogsRetention:
+    days: 7
+    resources:
+      requests:
+        cpu: 200m
+        memory: 50Mi
+      limits:
+        cpu: 300m
+        memory: 100Mi
 
-# Log retention for service cluster logs stored in object storage.
-logRetention:
-  days: 7
 influxDB:
   enabled: true
   subdomain: influxdb

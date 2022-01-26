@@ -3,11 +3,11 @@
 {{ end }}
 resources:
   requests:
-    cpu: 100m
-    memory: 50Mi
+    cpu: {{ .Values.fluentd.scLogsRetention.resources.requests.cpu }}
+    memory: {{ .Values.fluentd.scLogsRetention.resources.requests.memory }}
   limits:
-    memory: 100Mi
-    cpu: 200m
+    memory: {{ .Values.fluentd.scLogsRetention.resources.limits.memory }}
+    cpu: {{ .Values.fluentd.scLogsRetention.resources.limits.cpu }}
 
 {{ if eq .Values.objectStorage.type "s3" -}}
 s3:
@@ -15,7 +15,7 @@ s3:
   region: {{ .Values.objectStorage.s3.region | quote }}
   regionEndpoint: {{ .Values.objectStorage.s3.regionEndpoint | quote }}
   bucket: {{ .Values.objectStorage.buckets.scFluentd | quote }}
-  retentionDays: {{ .Values.logRetention.days }}
+  retentionDays: {{ .Values.fluentd.scLogsRetention.days }}
   accessKey: {{ .Values.objectStorage.s3.accessKey | quote }}
   secretKey: {{ .Values.objectStorage.s3.secretKey | quote }}
 
