@@ -35,6 +35,7 @@ sc_osd=$(yq r -P -pp "${sc_config}" 'kibana.**' | sed -r "s/\.\[.*\].*//" | uniq
 
 # Saving these for later migration steps, so they will survive init.
 yq w "${sc_config}" -i -P "objectStorage.buckets.elasticsearch" "$(echo "${sc_merged}" | yq r - "objectStorage.buckets.elasticsearch")"
+yq w "${sc_config}" -i -P "elasticsearch.snapshot.enabled" "$(echo "${sc_merged}" | yq r - "elasticsearch.snapshot.enabled")"
 yq w "${sc_config}" -i -P "elasticsearch.snapshotRepository" "$(echo "${sc_merged}" | yq r - "elasticsearch.snapshotRepository")"
 
 echo "sc-config.yaml: elasticsearch.* -> opensearch.*"

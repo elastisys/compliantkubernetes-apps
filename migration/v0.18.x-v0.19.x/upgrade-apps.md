@@ -8,16 +8,10 @@
 
 ## Steps
 
-1. Run the migration script `remove_deleted_rules_prometheus_alerts.sh` to remove the old Prometheus rules and alerts from both clusters
-> **_WARNING:_** this will "hide" all the alerts until you run the `bin/ck8s apply` and recreate the rules and alerts
-
 1. Run migration script: `copy-environment-variables.sh`
 
     This will copy over the variables set for the environment regarding cloud provider, environment name, and flavor to the new location: the common default config.
 
-1. Run migration script `remove_old_metrics_server.sh`
-
-    This will remove the old metrics-server components from the clusters.
 
 1. If using User Alertmanager: Run migration script `user-alertmanager-config.sh`
 
@@ -51,6 +45,13 @@
     This will update the curator retention to the new configuration way.
     This script is only relevant if you have overridden the defaults.
 
+1. Run the migration script `remove_deleted_rules_prometheus_alerts.sh` to remove the old Prometheus rules and alerts from both clusters
+> **_WARNING:_** this will "hide" all the alerts until you run the `bin/ck8s apply` and recreate the rules and alerts
+
+1. Run migration script `remove_old_metrics_server.sh`
+
+    This will remove the old metrics-server components from the clusters.
+
 1. If using User Alertmanager: Run migration script: `user-alertmanager-run.sh`
 
     This will remove User Alertmanager, update the user namespaces and role bindings, and reinstall User Alertmanager with the default configuration.
@@ -77,6 +78,12 @@
 1. If you have custom/manual Prometheus rules installed you will need to update the labels in order form them to be picked by the correct Prometheus instance. e.g. service_cluster: "1" or workload_cluster: "1"
 
 1. Run the migration script: `upgrade_prometheus_operator.sh`
+
+1. Note on InfluxDB PVC size:
+
+    The default value for InfluxDBs PVC has changed, and if you have not previously defined a size for it then it will try and fail to patch the StatefulSet.
+    Either pin the current size by adding it into the override `sc-config.yaml` or remove the StatefulSet using `--cascade=false` to let the change apply.
+    You might have to manually edit the PVC to set the new size after the apply.
 
 1. Upgrade applications:
 

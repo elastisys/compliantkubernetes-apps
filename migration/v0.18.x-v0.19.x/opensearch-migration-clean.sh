@@ -9,6 +9,7 @@ IFS=$'\n'
 sops_config="${CK8S_CONFIG_PATH}/.sops.yaml"
 secrets="${CK8S_CONFIG_PATH}/secrets.yaml"
 secrets_tmp="${CK8S_CONFIG_PATH}/secrets_tmp.yaml"
+common_config="${CK8S_CONFIG_PATH}/common-config.yaml"
 sc_config="${CK8S_CONFIG_PATH}/sc-config.yaml"
 wc_config="${CK8S_CONFIG_PATH}/wc-config.yaml"
 
@@ -18,6 +19,9 @@ if [[ ! -f "${sops_config}" ]]; then
 elif [[ ! -f "${secrets}" ]]; then
     echo "Secrets does not exist, aborting."
     exit 1
+elif [[ ! -f "${common_config}" ]]; then
+    echo "Override common-config does not exist, aborting."
+    exit 1
 elif [[ ! -f "${sc_config}" ]]; then
     echo "Override sc-config does not exist, aborting."
     exit 1
@@ -26,7 +30,7 @@ elif [[ ! -f "${wc_config}" ]]; then
     exit 1
 fi
 
-echo "This will remove the following from secrets, sc-config and wc-config:"
+echo "This will remove the following from secrets, common-config, sc-config and wc-config:"
 echo "- 'objectStorage.buckets.elasticsearch'"
 echo "- 'kibana.*'"
 echo "- 'elasticsearch.*'"
@@ -40,6 +44,8 @@ if [[ "${reply}" != "y" ]]; then
 fi
 
 yq d -i "${sc_config}" "kibana"
+
+yq d -i "${common_config}" "elasticsearch"
 yq d -i "${sc_config}" "elasticsearch"
 yq d -i "${wc_config}" "elasticsearch"
 
