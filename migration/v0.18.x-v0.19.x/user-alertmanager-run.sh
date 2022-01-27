@@ -60,6 +60,7 @@ if [[ $(yq r <(echo "${wc}") 'namespace') == "alertmanager" ]]; then
     prompt
 
     "${here}/../../bin/ck8s" ops helmfile wc -l app=user-rbac -i sync
+    "${here}/../../bin/ck8s" ops kubectl wc delete namespace alertmanager --ignore-not-found=true
 fi
 
 echo -e "\n--- create 'alertmanager' namespace"
