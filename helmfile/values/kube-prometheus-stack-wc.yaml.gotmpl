@@ -56,9 +56,11 @@ prometheus:
       cluster: {{ .Values.global.clusterName }}
 
     remoteWrite:
+    {{- if .Values.influxDB.enabled }}
     - url: https://{{ .Values.influxDB.subdomain }}.{{ .Values.global.opsDomain }}/api/v1/prom/write?db=workload_cluster&u={{ .Values.prometheus.remoteWrite.user }}&p={{ .Values.prometheus.remoteWrite.password }}
       tlsConfig:
         insecureSkipVerify: {{ not .Values.global.verifyTls }}
+    {{- end }}
     {{- if and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
     - url: https://{{ .Values.thanos.receiver.subdomain }}.{{ .Values.global.opsDomain }}/api/v1/receive
       tlsConfig:

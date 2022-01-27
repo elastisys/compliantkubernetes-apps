@@ -714,8 +714,6 @@ fluentd:
 logRetention:
   days: 7
 influxDB:
-  enabled: true
-  subdomain: influxdb
   users:
     admin: admin
     wcWriter: wcWriter
