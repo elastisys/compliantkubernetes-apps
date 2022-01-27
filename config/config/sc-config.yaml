@@ -468,15 +468,15 @@ opensearch:
           - set-me # Developer Name
     - mapping_name: kibana_user
       definition:
-        backend_roles:
+        users:
           - set-me # dashboards_dev
     - mapping_name: kubernetes_log_reader
       definition:
-        backend_roles:
+        users:
           - set-me # dashboards_dev
     - mapping_name: all_access
       definition:
-        backend_roles:
+        users:
           - set-me # dashboards_admin
 
   # Overwrite index templates
