@@ -275,7 +275,8 @@ prometheus:
         limits:
           cpu: 10m
           memory: 100Mi
-  ## the percentage of use the resources are set to hit in 3 days
+  ## Predictive alert if the resource usage will hit the set percentage in 3 days
+  ## Set to '0', 'false', or 'null' to disable
   predictLinearLimit: 66
 
 dex:

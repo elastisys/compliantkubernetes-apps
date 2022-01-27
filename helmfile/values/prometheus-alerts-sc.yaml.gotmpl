@@ -6,6 +6,12 @@ defaultRules:
   rules:
     alertmanager: true
     rookMonitor: {{ .Values.monitoring.rook.enabled }}
+    {{- if and .Values.thanos.enabled .Values.thanos.metrics.enabled }}
     thanosMonitor: {{ .Values.thanos.metrics.enabled }}
+    {{- end }}
+    {{- if not .Values.prometheus.predictLinearLimit }}
+    predictLinear: false
+    {{- end }}
+
 
 predictLinearLimit: {{ .Values.prometheus.predictLinearLimit }}
