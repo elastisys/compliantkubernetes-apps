@@ -721,8 +721,6 @@ fluentd:
         memory: 100Mi
 
 influxDB:
-  enabled: true
-  subdomain: influxdb
   users:
     admin: admin
     wcWriter: wcWriter
