@@ -102,7 +102,8 @@ prometheus:
   ## Additional prometheus scrape config.
   ## ref: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config
   additionalScrapeConfigs: []
-  ## the percentage of use the resources are set to hit in 3 days
+  ## Predictive alert if the resource usage will hit the set percentage in 3 days
+  ## Set to '0', 'false', or 'null' to disable
   predictLinearLimit: 66
 
 ## Open policy agent configuration
