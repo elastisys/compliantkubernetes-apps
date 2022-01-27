@@ -322,10 +322,14 @@ prometheus:
     affinity: {{- toYaml .Values.prometheus.affinity | nindent 8 }}
     tolerations: {{- toYaml .Values.prometheus.tolerations | nindent 8 }}
 
+    {{- if .Values.influxDB.enabled }}
     remoteRead:
     - url: http://{{ .Values.influxDB.subdomain }}.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/read?db=service_cluster&u={{ .Values.influxDB.users.admin }}&p={{ .Values.influxDB.users.adminPassword }}
+    {{- end }}
     remoteWrite:
+    {{- if .Values.influxDB.enabled }}
     - url: http://{{ .Values.influxDB.subdomain }}.influxdb-prometheus.svc.cluster.local:8086/api/v1/prom/write?db=service_cluster&u={{ .Values.influxDB.users.scWriter }}&p={{ .Values.influxDB.users.scWriterPassword }}
+    {{- end }}
     {{- if and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
     - url: http://thanos-receiver-receive.thanos.svc.cluster.local:19291/api/v1/receive
       writeRelabelConfigs:
