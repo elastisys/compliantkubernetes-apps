@@ -91,7 +91,7 @@ echo "--- Waiting for ODFE snapshots in progress ---
 Elasticsearch > GET /_snapshot/_status"
 while true; do
     res=$("${here}/../../bin/ck8s" ops kubectl sc -n elastic-system exec opendistro-es-master-0 -c elasticsearch -- \
-        curl -XGET "'http://localhost:9200/_snapshot/_status'" -u "'admin:${ES_PASSWORD}'" -s | \
+        curl -XGET "'http://localhost:9200/_snapshot/_status'" -u "'admin:${ES_PASSWORD}'" --no-progress-meter | \
         yq r - 'snapshots')
     if [[ "$res" == "[]" ]]; then
         break
@@ -106,9 +106,17 @@ Elasticsearch > PUT /_snapshot/${ES_REPOSITORY}/final
 -"
 "${here}/../../bin/ck8s" ops kubectl sc -n elastic-system exec opendistro-es-master-0 -c elasticsearch -- \
 curl -XPUT "'http://localhost:9200/_snapshot/${ES_REPOSITORY}/final?wait_for_completion=true&pretty=true'" \
--u "'admin:${ES_PASSWORD}'" -s
+-u "'admin:${ES_PASSWORD}'" --no-progress-meter
 echo "---
 "
+
+echo "Make sure that the snapshot has the state 'SUCCESS', else you might have to manually delete it and start over"
+echo "If you've already done this step then it is expected that it will throw an 'invalid_snapshot_name_exception'"
+echo -n "- continue? [y/N]: "
+read -r reply
+if [[ "${reply}" != "y" ]]; then
+    exit 1
+fi
 
 fi
 # END TAKE SNAPSHOT
@@ -211,7 +219,7 @@ OpenSearch > PUT /_snapshot/${ES_REPOSITORY}
 -"
 "${here}/../../bin/ck8s" ops kubectl sc -n opensearch-system exec "${OS_CLUSTERNAME}-master-0" -c opensearch -- \
 curl -XPUT "'http://localhost:9200/_snapshot/${ES_REPOSITORY}?pretty=true'" \
--u "'admin:${OS_PASSWORD}'" -H "'Content-Type: application/json'" -s -d \
+-u "'admin:${OS_PASSWORD}'" -H "'Content-Type: application/json'" --no-progress-meter -d \
 "'{
     \"type\":\"s3\",
     \"settings\":{
@@ -234,7 +242,7 @@ OpenSearch > POST /_snapshot/${ES_REPOSITORY}/final/_restore
 -"
 "${here}/../../bin/ck8s" ops kubectl sc -n opensearch-system exec "${OS_CLUSTERNAME}-master-0" -c opensearch -- \
 curl -XPOST "'http://localhost:9200/_snapshot/${ES_REPOSITORY}/final/_restore?wait_for_completion=true&pretty=true'" \
--u "'admin:${OS_PASSWORD}'" -H "'Content-Type: application/json'" -s -d \
+-u "'admin:${OS_PASSWORD}'" -H "'Content-Type: application/json'" --no-progress-meter -d \
 "'{
     \"indices\": \".kibana*\",
     \"include_aliases\": false,
@@ -257,7 +265,7 @@ OpenSearch > POST /_aliases
 }'"
 "${here}/../../bin/ck8s" ops kubectl sc -n opensearch-system exec "${OS_CLUSTERNAME}-master-0" -c opensearch -- \
 curl -XPOST "'http://localhost:9200/_aliases?pretty=true'" \
--u "'admin:${OS_PASSWORD}'" -H "'Content-Type: application/json'" -s -d \
+-u "'admin:${OS_PASSWORD}'" -H "'Content-Type: application/json'" --no-progress-meter -d \
 "'{
     \"actions\": [
       {
@@ -293,7 +301,7 @@ OpenSearch > POST /_snapshot/${ES_REPOSITORY}/final/_restore
 -"
 "${here}/../../bin/ck8s" ops kubectl sc -n opensearch-system exec "${OS_CLUSTERNAME}-master-0" -c opensearch -- \
 curl -XPOST "'http://localhost:9200/_snapshot/${ES_REPOSITORY}/final/_restore?wait_for_completion=true&pretty=true'" \
--u "'admin:${OS_PASSWORD}'" -H "'Content-Type: application/json'" -s -d \
+-u "'admin:${OS_PASSWORD}'" -H "'Content-Type: application/json'" --no-progress-meter -d \
 "'{
     \"indices\": \"${index}*\",
     \"include_aliases\": false,
@@ -321,7 +329,7 @@ OpenSearch > POST /_aliases
 }'"
 "${here}/../../bin/ck8s" ops kubectl sc -n opensearch-system exec "${OS_CLUSTERNAME}-master-0" -c opensearch -- \
 curl -XPOST "'http://localhost:9200/_aliases?pretty=true'" \
--u "'admin:${OS_PASSWORD}'" -H "'Content-Type: application/json'" -s -d \
+-u "'admin:${OS_PASSWORD}'" -H "'Content-Type: application/json'" --no-progress-meter -d \
 "'{
     \"actions\": [
       {
@@ -349,7 +357,7 @@ if [[ "${reply}" != "y" ]]; then
 fi
 "${here}/../../bin/ck8s" ops kubectl sc -n opensearch-system exec "${OS_CLUSTERNAME}-master-0" -c opensearch -- \
 curl -XDELETE "'http://localhost:9200/_snapshot/${ES_REPOSITORY}?pretty=true'" \
--u "'admin:${OS_PASSWORD}'" -s
+-u "'admin:${OS_PASSWORD}'" --no-progress-meter
 echo "---
 "
 
