@@ -50,6 +50,8 @@ spec:
                   value: {{ .Values.snapshots.max | quote }}
                 - name: MAX_AGE_SECONDS
                   value: {{ .Values.snapshots.maxAgeSeconds | quote }}
+                - name: REQUEST_TIMEOUT_SECONDS
+                  value: {{ .Values.snapshots.maxRequestSeconds | quote }}
           volumes:
             - name: scripts
               configMap:

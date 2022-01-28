@@ -17,5 +17,6 @@ snapshots:
   min: {{ .Values.opensearch.snapshot.min }}
   max: {{ .Values.opensearch.snapshot.max }}
   maxAgeSeconds: {{ .Values.opensearch.snapshot.ageSeconds | quote }}
+  maxRequestSeconds: {{ .Values.opensearch.snapshot.maxRequestSeconds | quote }}
 
 resources: {{- toYaml .Values.opensearch.snapshot.retentionResources | nindent 2 }}
