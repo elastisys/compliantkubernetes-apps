@@ -641,6 +641,7 @@ opensearch:
     min: 7
     max: 14
     ageSeconds: 864000
+    maxRequestSeconds: 1200
     backupSchedule: 0 */2 * * *
     backupStartingDeadlineSeconds: 600
     backupActiveDeadlineSeconds: 600

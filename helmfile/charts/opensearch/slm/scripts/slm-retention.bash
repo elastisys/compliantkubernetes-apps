@@ -18,22 +18,24 @@ set -euo pipefail
 : "${MAX_SNAPSHOTS:?Missing MAX_SNAPSHOTS}"
 : "${MAX_AGE_SECONDS:?Missing MAX_AGE_SECONDS}"
 : "${SNAPSHOT_REPOSITORY:?Missing SNAPSHOT_REPOSITORY}"
+: "${REQUEST_TIMEOUT_SECONDS:?Missing REQUEST_TIMEOUT_SECONDS}"
 
 # Make sure variables are integers
 MAX_AGE_SECONDS=$(LC_ALL=C printf '%.0f\n' "${MAX_AGE_SECONDS}")
 MAX_SNAPSHOTS=$(LC_ALL=C printf '%.0f\n' "${MAX_SNAPSHOTS}")
 MIN_SNAPSHOTS=$(LC_ALL=C printf '%.0f\n' "${MIN_SNAPSHOTS}")
+REQUEST_TIMEOUT_SECONDS=$(LC_ALL=C printf '%.0f\n' "${REQUEST_TIMEOUT_SECONDS}")
 
 OPENSEARCH_URL="http://${OPENSEARCH_ENDPOINT}"
-REQUEST_TIMEOUT_SECONDS=600
 
 # Snapshots returned from this function should be succeeded, or depending on how it was created, partial.
 # https://opensearch.org/docs/latest/opensearch/snapshot-restore
 function get_snapshots {
     local url="${OPENSEARCH_URL}/_snapshot/${SNAPSHOT_REPOSITORY}/_all"
-    curl "${url}" -f -X GET --max-time "${REQUEST_TIMEOUT_SECONDS}" --silent \
+    curl "${url}" -f -X GET --max-time "${REQUEST_TIMEOUT_SECONDS}" --no-progress-meter \
         --basic --user "${OPENSEARCH_USERNAME}:${OPENSEARCH_PASSWORD}" \
         | jq '.snapshots | sort_by(.start_time_in_millis)'
+    echo ""
 }
 
 function get_snapshot_age {
@@ -55,8 +57,9 @@ function remove_snapshots {
     local snapshots_to_delete=$1
     local url="${OPENSEARCH_URL}/_snapshot/${SNAPSHOT_REPOSITORY}/${snapshots_to_delete}"
     echo "Deleting snapshots: ${snapshots_to_delete}"
-    curl "${url}" -f -X DELETE --max-time "${REQUEST_TIMEOUT_SECONDS}" --silent \
+    curl "${url}" -f -X DELETE --max-time "${REQUEST_TIMEOUT_SECONDS}" --no-progress-meter \
         --basic --user "${OPENSEARCH_USERNAME}:${OPENSEARCH_PASSWORD}"
+    echo ""
 }
 
 function check_snapshot_count {

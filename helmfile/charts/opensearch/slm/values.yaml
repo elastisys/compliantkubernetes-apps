@@ -11,8 +11,8 @@ opensearch:
   userSecret: opensearch-snapshotter-user
   clusterEndpoint: opensearch-cluster-master:9200
 
-startingDeadlineSeconds: 300
-activeDeadlineSeconds: 600
+startingDeadlineSeconds: 600
+activeDeadlineSeconds: 2700
 
 schedule: "@daily"
 snapshotRepository: s3
@@ -20,6 +20,7 @@ snapshots:
   min: 7
   max: 14
   maxAgeSeconds: 864000 # = 60 * 60 * 24 * 10 = 10 days
+  maxRequestSeconds: 1200
 
 restartPolicy: OnFailure
 
