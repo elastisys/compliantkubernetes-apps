@@ -12,6 +12,8 @@
  - Added new panel to backup dashboard to reflect partial, failed and successful velero backups
  - Alertmanager group-by parameters was removed and replaced by the special value `...`
      See https://github.com/prometheus/alertmanager/blob/ec83f71/docs/configuration.md#route for more information
+ - Exposed opensearch-slm-job max request seconds for curl.
+ - Made opensearch-slm-job more verbose when using curl.
 
 ### Fixed
 
