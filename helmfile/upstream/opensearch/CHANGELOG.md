@@ -13,7 +13,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 ### Security
 ---
+## [1.7.1]
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Fixed `image.pullPolicy` Helm value not setting the `imagePullPolicy` for the "opensearch" container 
+### Security
+---
+## [1.7.0]
+### Added
+### Changed
+- Bump OpenSearch version to use 1.2.4
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.6.0]
+### Added
+### Changed
+- Changed structure of `image` keys in `values.yaml` file to use helm's default (`image.repository`, `image.tag`, `image.pullPolicy`)
+### Deprecated
+### Removed
+### Fixed
+### Security
 
+---
+## [1.5.8]
+### Added
+- Added certs faqs in the opensearch documentations
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
 ## [1.5.7]
 ### Added
 ### Changed
@@ -277,7 +313,13 @@ config:
 ### Fixed
 ### Security
 
-[Unreleased]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.5.5...HEAD
+[Unreleased]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.7.1...HEAD
+[1.7.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.7.0...opensearch-1.7.1
+[1.7.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.6.0...opensearch-1.7.0
+[1.6.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.5.8...opensearch-1.6.0
+[1.5.8]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.5.7...opensearch-1.5.8
+[1.5.7]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.5.6...opensearch-1.5.7
+[1.5.6]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.5.5...opensearch-1.5.6
 [1.5.5]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.5.4...opensearch-1.5.5
 [1.5.4]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.5.3...opensearch-1.5.4
 [1.5.3]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.5.2...opensearch-1.5.3

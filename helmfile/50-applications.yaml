@@ -323,7 +323,7 @@ releases:
     app: opensearch-master
     group: opensearch
   chart: ./upstream/opensearch
-  version: 1.5.7
+  version: 1.7.1
   installed: true
   needs:
   {{- if .Values.opensearch.sso.enabled }}
@@ -340,7 +340,7 @@ releases:
     app: opensearch-data
     group: opensearch
   chart: ./upstream/opensearch
-  version: 1.5.7
+  version: 1.7.1
   installed: {{ .Values.opensearch.dataNode.dedicatedPods }}
   needs:
   - opensearch-system/opensearch-master
@@ -354,7 +354,7 @@ releases:
     app: opensearch-client
     group: opensearch
   chart: ./upstream/opensearch
-  version: 1.5.7
+  version: 1.7.1
   installed: {{ .Values.opensearch.clientNode.dedicatedPods }}
   needs:
   - opensearch-system/opensearch-master
