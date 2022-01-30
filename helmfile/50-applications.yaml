@@ -109,8 +109,28 @@ releases:
   installed: {{ .Values.calicoFelixMetrics.enabled }}
   missingFileHandler: Error
 
+#
+# OLD - to be removed
+#
 # Blackbox-sc-wc
 - name: blackbox
+  namespace: monitoring
+  labels:
+    app: blackbox
+  chart: ./upstream/prometheus-blackbox-exporter
+  version: 5.3.1
+  installed: false
+  missingFileHandler: Error
+  values:
+{{ if eq .Environment.Name "service_cluster" }}
+  - values/blackbox-sc.yaml.gotmpl
+{{ end }}
+{{ if eq .Environment.Name "workload_cluster" }}
+  - values/blackbox-wc.yaml.gotmpl
+{{ end }}
+
+# Prometheus blackboc exporter
+- name: prometheus-blackbox-exporter
   namespace: monitoring
   labels:
     app: blackbox
@@ -119,10 +139,10 @@ releases:
   missingFileHandler: Error
   values:
 {{ if eq .Environment.Name "service_cluster" }}
-  - values/blackbox-sc.yaml.gotmpl
+  - values/prometheus-blackbox-exporter-sc.yaml.gotmpl
 {{ end }}
 {{ if eq .Environment.Name "workload_cluster" }}
-  - values/blackbox-wc.yaml.gotmpl
+  - values/prometheus-blackbox-exporter-wc.yaml.gotmpl
 {{ end }}
 
 # cluster-admin-rbac

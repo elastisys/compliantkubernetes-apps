@@ -39,7 +39,7 @@ deployments=(
     "monitoring kube-prometheus-stack-operator"
     "monitoring kube-prometheus-stack-grafana"
     "monitoring kube-prometheus-stack-kube-state-metrics"
-    "monitoring blackbox-prometheus-blackbox-exporter"
+    "monitoring prometheus-blackbox-exporter"
     "opensearch-system prometheus-elasticsearch-exporter"
     "opensearch-system opensearch-dashboards"
 )
