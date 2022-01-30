@@ -5,6 +5,7 @@
 ### Changed
 
  - Exposed sc-log-retention's resource requests.
+ - Persist Dex state in Kubernetes.
 
 ### Fixed
 
