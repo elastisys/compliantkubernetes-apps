@@ -27,7 +27,9 @@ volumes:
 
 config:
   storage:
-    type: memory
+    type: kubernetes
+    config:
+      inCluster: true
   issuer: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}
   connectors:
   {{- toYaml .Values.dex.connectors | nindent 4 }}
