@@ -1,4 +1,4 @@
-apiVersion: templates.gatekeeper.sh/v1alpha1
+apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8sresourcerequests
@@ -7,9 +7,6 @@ spec:
     spec:
       names:
         kind: K8sResourceRequests
-        listKind: K8sResourceRequestsList
-        plural: k8sresourcerequests
-        singular: k8sresourcerequests
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |

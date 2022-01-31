@@ -1,4 +1,4 @@
-apiVersion: templates.gatekeeper.sh/v1beta1
+apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8sallowedrepos
@@ -7,9 +7,6 @@ spec:
     spec:
       names:
         kind: K8sAllowedRepos
-        listKind: K8sAllowedReposList
-        plural: k8sallowedrepos
-        singular: k8sallowedrepos
       validation:
         openAPIV3Schema:
           properties:
