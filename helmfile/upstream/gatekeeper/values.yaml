@@ -1,24 +1,50 @@
 replicas: 3
 auditInterval: 60
+auditMatchKindOnly: false
 constraintViolationsLimit: 20
 auditFromCache: false
-createNamespace: true
+disableMutation: false
 disableValidatingWebhook: false
 validatingWebhookTimeoutSeconds: 3
+validatingWebhookFailurePolicy: Ignore
+validatingWebhookCheckIgnoreFailurePolicy: Fail
 enableDeleteOperations: false
-auditChunkSize: 0
+enableExternalData: false
+mutatingWebhookFailurePolicy: Ignore
+mutatingWebhookTimeoutSeconds: 3
+auditChunkSize: 500
 logLevel: INFO
+logDenies: false
 emitAdmissionEvents: false
 emitAuditEvents: false
+resourceQuota: true
+postInstall:
+  labelNamespace:
+    enabled: true
+    image:
+      repository: openpolicyagent/gatekeeper-crds
+      tag: v3.7.0
+      pullPolicy: IfNotPresent
+      pullSecrets: []
 image:
   repository: openpolicyagent/gatekeeper
-  release: v3.3.0
+  crdRepository: openpolicyagent/gatekeeper-crds
+  release: v3.7.0
   pullPolicy: IfNotPresent
   pullSecrets: []
 podAnnotations:
   { container.seccomp.security.alpha.kubernetes.io/manager: runtime/default }
+podLabels: {}
+podCountLimit: 100
 secretAnnotations: {}
 controllerManager:
+  exemptNamespaces: []
+  exemptNamespacePrefixes: []
+  hostNetwork: false
+  dnsPolicy: Default
+  port: 8443
+  metricsPort: 8888
+  healthPort: 9090
   priorityClassName: system-cluster-critical
   affinity:
     podAntiAffinity:
@@ -42,10 +68,15 @@ controllerManager:
       cpu: 100m
       memory: 256Mi
 audit:
+  hostNetwork: false
+  dnsPolicy: Default
+  metricsPort: 8888
+  healthPort: 9090
   priorityClassName: system-cluster-critical
   affinity: {}
   tolerations: []
   nodeSelector: { kubernetes.io/os: linux }
+  writeToRAMDisk: false
   resources:
     limits:
       cpu: 1000m
@@ -53,5 +84,16 @@ audit:
     requests:
       cpu: 100m
       memory: 256Mi
-customResourceDefinitions:
+crds:
+  resources: {}
+pdb:
+  controllerManager:
+    minAvailable: 1
+service: {}
+disabledBuiltins:
+psp:
+  enabled: true
+upgradeCRDs:
+  enabled: true
+rbac:
   create: true
