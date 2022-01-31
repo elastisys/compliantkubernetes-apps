@@ -31,6 +31,7 @@
   - HTTP probe: no_follow_redirects has been renamed to follow_redirects
 * Added option to enable thanos as a metric storage solution
     Thanos will in the future replace influxDB, we strongly encourage enabling thanos so that when influxdb is removed metrics will already be present in thanos.
+    Removing InfluxDB is not supported in this release.
 
 ### Updated
 
