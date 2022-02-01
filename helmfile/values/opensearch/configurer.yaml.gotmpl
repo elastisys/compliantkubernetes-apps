@@ -83,7 +83,7 @@ config:
         index_permissions:
         {{- if .Values.opensearch.indexPerNamespace }}
         - index_patterns:
-          # Only allow indices not starting with "."
+          # Only allow indices not starting with ".", except ".orphaned-"
           - '/^[^.].*/'
           - ".orphaned-*"
           allowed_actions:
