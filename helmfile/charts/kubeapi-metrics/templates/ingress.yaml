@@ -1,7 +1,7 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "kubeapi-metrics.fullname" . -}}
 {{- $host := printf "%s.%s" "kube-apiserver" (required "Cluster domain required" .Values.ingress.clusterDomain) -}}
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ $fullName }}
@@ -25,8 +25,11 @@ spec:
     - host: "{{ $host }}"
       http:
         paths:
-          - path: "/healthz"
-            backend:
-              serviceName: {{ $fullName }}
-              servicePort: {{ .Values.service.port }}
+        - backend:
+            service:
+              name: {{ $fullName }}
+              port:
+                number: {{ .Values.service.port }}
+          path: /healthz
+          pathType: Exact
   {{- end }}
