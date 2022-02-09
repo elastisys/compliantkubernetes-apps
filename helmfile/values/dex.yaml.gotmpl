@@ -1,5 +1,6 @@
 ingress:
   enabled: true
+  className: nginx
   annotations:
     cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
     {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.dex }}

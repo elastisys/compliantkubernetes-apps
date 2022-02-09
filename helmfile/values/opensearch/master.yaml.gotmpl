@@ -39,6 +39,7 @@ tolerations:  {{- toYaml .Values.opensearch.masterNode.tolerations | nindent 2 }
 {{- if not .Values.opensearch.clientNode.dedicatedPods }}
 ingress:
   enabled: true
+  ingressClassName: nginx
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: HTTP
     cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
