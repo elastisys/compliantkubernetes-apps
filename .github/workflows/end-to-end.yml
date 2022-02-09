@@ -90,15 +90,8 @@ jobs:
       with:
         args: route53 change-resource-record-sets --hosted-zone-id Z2STJRQSJO5PZ0 --change-batch file://apps/pipeline/config/exoscale/dns-${{ matrix.cluster }}.json
 
-    - name: Install mitogen to speedup kubespray
-      uses: docker://quay.io/kubespray/kubespray:v2.17.1
-      with:
-        # Note: It is important to work from the kubespray folder since this
-        # playbook will modify the `ansible.cfg`.
-        args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray && ansible-playbook mitogen.yml"
-
     - name: Run kubespray
-      uses: docker://quay.io/kubespray/kubespray:v2.17.1
+      uses: docker://quay.io/kubespray/kubespray:v2.18.0
       env:
         ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
       with:
