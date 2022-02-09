@@ -17,6 +17,7 @@ metadata:
     {{- toYaml .Values.ingress.extraAnnotations | nindent 4 }}
     {{- end }}
 spec:
+  ingressClassName: nginx
   tls:
     - hosts:
         - "{{ $host }}"

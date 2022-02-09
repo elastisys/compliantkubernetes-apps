@@ -47,6 +47,7 @@ receive:
 
   ingress:
     enabled: true
+    ingressClassName: nginx
     hostname: {{ .Values.thanos.receiver.subdomain }}.{{ .Values.global.opsDomain }}
     tls: true
     annotations:

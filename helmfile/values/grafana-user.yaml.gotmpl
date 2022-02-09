@@ -14,6 +14,7 @@ deploymentStrategy:
 
 ingress:
   enabled: true
+  ingressClassName: nginx
   annotations:
     cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
   {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.userGrafana }}
