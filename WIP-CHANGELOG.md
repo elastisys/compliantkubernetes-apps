@@ -27,6 +27,7 @@
  - Fluentd can now properly handle and write orphaned documents to Opensearch when using the index per namespace feature.
   The orphaned documents will be written to `.orphaned-...` indices, which a user does not have access to read from.
  - Add `ingressClassName` in ingresses where that configuration option is available.
+ - Upgrade velero helm chart to `v2.27.3`, which also upgrades velero to `v1.7.1`.
 
 ### Fixed
 
