@@ -7,5 +7,9 @@ requireNetworkpolicies:
 requireResourceRequests:
     enable: {{ .Values.opa.resourceRequests.enabled }}
     enforcementAction: {{ .Values.opa.resourceRequests.enforcement }}
+disallowedTags:
+    enable: {{ .Values.opa.disallowedTags.enabled }}
+    enforcementAction: {{ .Values.opa.disallowedTags.enforcement }}
 
 imageRegistryURL: {{- toYaml .Values.opa.imageRegistry.URL | nindent 2}}
+imageDisallowedTags: {{- toYaml .Values.opa.disallowedTags.tags | nindent 2}}
