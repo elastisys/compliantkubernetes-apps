@@ -135,6 +135,13 @@ opa:
     enabled: true
     enforcement: deny
 
+  ## It will not allow any image with the latest tag
+  disallowedTags:
+    enabled: true
+    enforcement: dryrun
+    tags:
+     - latest
+
 ## Configuration for fluentd.
 ## Fluentd ships logs to OpenSearch using the endpoint 'opensearch.subdomain' set in common-config.yaml.
 ## Consists of two different deployments, one for running on master nodes
