@@ -14,12 +14,9 @@
      See https://github.com/prometheus/alertmanager/blob/ec83f71/docs/configuration.md#route for more information
  - Exposed opensearch-slm-job max request seconds for curl.
  - Made opensearch-slm-job more verbose when using curl.
-<<<<<<< HEAD
  - Update kubeapi-metrics ingress api version to `networking.k8s.io/v1`.
-=======
  - Fluentd can now properly handle and write orphaned documents to Opensearch when using the index per namespace feature.
   The orphaned documents will be written to `.orphaned-...` indices, which a user does not have access to read from.
->>>>>>> apps: fluentd can now create and write to .orphaned indexes
 
 ### Fixed
 
