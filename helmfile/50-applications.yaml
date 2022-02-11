@@ -54,7 +54,7 @@ releases:
   labels:
     app: velero
   chart: ./upstream/velero
-  version: 2.15.0
+  version: 2.27.3
   installed: {{ .Values.velero.enabled }}
   missingFileHandler: Error
   values:

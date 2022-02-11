@@ -1,5 +1,7 @@
 {{- if .Values.deployRestic }}
 {{- $provider := .Values.configuration.provider -}}
+{{/* 'restic.securityContext' got renamed to 'restic.containerSecurityContext', merge both dicts into one for backward compatibility */}}
+{{- $containerSecurityContext := merge (.Values.restic.containerSecurityContext | default dict) (.Values.restic.securityContext | default dict) -}}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -29,7 +31,7 @@ spec:
         app.kubernetes.io/managed-by: {{ .Release.Service }}
         helm.sh/chart: {{ include "velero.chart" . }}
       {{- if .Values.podLabels }}
-        {{ toYaml .Values.podLabels | nindent 8 }}
+        {{- toYaml .Values.podLabels | nindent 8 }}
       {{- end }}
       {{- with .Values.podAnnotations }}
       annotations:
@@ -43,8 +45,10 @@ spec:
       {{- end }}
     {{- end }}
       serviceAccountName: {{ include "velero.serverServiceAccount" . }}
+      {{- with .Values.restic.podSecurityContext }}
       securityContext:
-        runAsUser: 0
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- if .Values.restic.priorityClassName }}
       priorityClassName: {{ include "velero.restic.priorityClassName" . }}
       {{- end }}
@@ -57,8 +61,10 @@ spec:
         - name: host-pods
           hostPath:
             path: {{ .Values.restic.podVolumePath }}
+        {{- if .Values.restic.useScratchEmptyDir }}
         - name: scratch
           emptyDir: {}
+        {{- end }}
         {{- if .Values.restic.extraVolumes }}
         {{- toYaml .Values.restic.extraVolumes | nindent 8 }}
         {{- end }}
@@ -95,8 +101,10 @@ spec:
             - name: host-pods
               mountPath: /host_pods
               mountPropagation: HostToContainer
+            {{- if .Values.restic.useScratchEmptyDir }}
             - name: scratch
               mountPath: /scratch
+            {{- end }}
             {{- if .Values.restic.extraVolumeMounts }}
             {{- toYaml .Values.restic.extraVolumeMounts | nindent 12 }}
             {{- end }}
@@ -142,13 +150,13 @@ spec:
             - name: {{ default "none" $key }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "velero.fullname" $ }}
+                  name: {{ include "velero.secretName" $ }}
                   key: {{ default "none" $key }}
           {{- end }}
           {{- end }}
           securityContext:
             privileged: {{ .Values.restic.privileged }}
-            {{- with .Values.restic.securityContext }}
+            {{- with $containerSecurityContext }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
           {{- with .Values.restic.resources }}
