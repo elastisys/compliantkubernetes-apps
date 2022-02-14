@@ -10,8 +10,11 @@ It can be installed normally.
 Set these variables for the restore job:
 ```bash
 export CK8S_CONFIG_PATH=<your config path>
-export S3_BUCKET=$(yq read "${CK8S_CONFIG_PATH}/sc-config.yaml" objectStorage.buckets.harbor)
-export S3_REGION_ENDPOINT=$(yq read "${CK8S_CONFIG_PATH}/sc-config.yaml" objectStorage.s3.regionEndpoint)
+export S3_BUCKET=$(yq read "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml" objectStorage.buckets.harbor)
+export S3_REGION_ENDPOINT=$(yq read "${CK8S_CONFIG_PATH}/common-config.yaml" objectStorage.s3.regionEndpoint)
+echo $CK8S_CONFIG_PATH
+echo $S3_BUCKET
+echo $S3_REGION_ENDPOINT
 ```
 
 ##### Optional env variables
