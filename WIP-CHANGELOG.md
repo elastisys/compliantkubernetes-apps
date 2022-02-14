@@ -28,7 +28,7 @@
   The orphaned documents will be written to `.orphaned-...` indices, which a user does not have access to read from.
  - Add `ingressClassName` in ingresses where that configuration option is available.
  - Upgrade velero helm chart to `v2.27.3`, which also upgrades velero to `v1.7.1`.
-
+ - Upgrade prometheus-elasticsearch-exporter helm chart to v4.11.0 and prometheus-elasticsearch-exporter itself to v1.3.0
 ### Fixed
 
 ### Added
