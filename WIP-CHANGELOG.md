@@ -34,3 +34,4 @@
 ### Added
 
 ### Removed
+- Removed disabled helm releases from the application helmfile

@@ -280,51 +280,6 @@ releases:
   values:
   - values/grafana-label-enforcer.yaml.gotmpl
 
-# prometheus-elasticsearch-exporter
-- name: prometheus-elasticsearch-exporter
-  namespace: elastic-system
-  labels:
-    app: prometheus-elasticsearch-exporter
-    group: opendistro
-  chart: ./upstream/prometheus-elasticsearch-exporter
-  version: 4.0.1
-  installed: false
-  missingFileHandler: Error
-  needs:
-  - elastic-system/opendistro-es
-  values:
-  - values/prometheus-elasticsearch-exporter.yaml.gotmpl
-
-# opendistro elasticsearch snapshot lifecycle management
-- name: elasticsearch-slm
-  namespace: elastic-system
-  labels:
-    app: elasticsearch-slm
-    group: opendistro
-  chart: ./charts/elasticsearch-slm
-  version: 0.1.0
-  installed: false
-  missingFileHandler: Error
-  needs:
-  - elastic-system/opendistro-es
-  values:
-  - values/elasticsearch-slm.yaml.gotmpl
-
-# opendistro elasticsearch backup job
-- name: elasticsearch-backup
-  namespace: elastic-system
-  labels:
-    app: elasticsearch-backup
-    group: opendistro
-  chart: ./charts/elasticsearch-backup
-  version: 0.1.0
-  installed: false
-  missingFileHandler: Error
-  needs:
-  - elastic-system/opendistro-es
-  values:
-  - values/elasticsearch-backup.yaml.gotmpl
-
 # OpenSearch
 - name: opensearch-secrets
   namespace: opensearch-system
@@ -614,21 +569,6 @@ releases:
   values:
   - values/sc-logs-retention.yaml.gotmpl
 
-# Opendistro
-- name: opendistro-es
-  namespace: elastic-system
-  labels:
-    app: opendistro
-    group: opendistro
-  chart: ./elastisys/opendistro-es
-  version: 1.13.5
-  installed: false
-  missingFileHandler: Error
-  needs:
-  - dex/dex
-  values:
-  - values/opendistro-es.yaml.gotmpl
-
 - name: rclone-sync
   namespace: kube-system
   labels:
@@ -692,17 +632,6 @@ releases:
   missingFileHandler: Error
   values:
   - values/user-alertmanager.yaml.gotmpl
-
-- name: falcosidekick
-  namespace: falco
-  labels:
-    app: falco
-  chart: ./charts/falcosidekick
-  version: 0.1.14
-  installed: false
-  missingFileHandler: Error
-  values:
-  - values/falcosidekick.yaml.gotmpl
 
 # Fluentd
 - name: fluentd-system
