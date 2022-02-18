@@ -10,6 +10,7 @@
     When upgrading an ingressClass object called `nginx` will be installed, this class has been set as the default class in Kubernetes.
     Ingress-nginx has been configured to still handle existing ingress objects that do not specify any `ingressClassName`.
     Read more on the ingressClassName changes [here](https://kubernetes.github.io/ingress-nginx/#what-is-ingressclassname-field).
+ - Upgraded starboard-operator helm chart to `v0.9.1`, upgrading starboard-operator to `v0.14.1`
 
 ### Changed
 
@@ -29,6 +30,8 @@
  - Add `ingressClassName` in ingresses where that configuration option is available.
  - Upgrade velero helm chart to `v2.27.3`, which also upgrades velero to `v1.7.1`.
  - Upgrade prometheus-elasticsearch-exporter helm chart to v4.11.0 and prometheus-elasticsearch-exporter itself to v1.3.0
+ - Exposed options for starboard-operator to control the number of jobs it generates and to allow for it to be disabled.
+
 ### Fixed
 
 ### Added

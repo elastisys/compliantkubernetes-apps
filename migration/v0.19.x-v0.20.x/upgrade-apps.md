@@ -14,7 +14,21 @@
     bin/ck8s init
     ```
 
-3. Upgrade applications:
+3. Remove conflicting starboard secret:
+
+   This was managed by starboard-operator and from now on it is managed by helm.
+
+   ```bash
+   bin/ck8s ops kubectl {sc|wc} -n monitoring delete secret starboard
+   ```
+
+4. Update starboard-operator custom resource definitions:
+
+   ```bash
+   bin/ck8s ops kubectl {sc|wc} apply -f helmfile/upstream/starboard-operator/crds
+   ```
+
+5. Upgrade applications:
 
     ```bash
     bin/ck8s apply {sc|wc}

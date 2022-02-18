@@ -162,7 +162,8 @@ releases:
   labels:
     app: starboard-operator
   chart: ./upstream/starboard-operator
-  version: 0.7.0
+  version: 0.9.1
+  installed: {{ .Values.starboard.enabled }}
   missingFileHandler: Error
   values:
   - values/starboard-operator.yaml.gotmpl
@@ -174,6 +175,7 @@ releases:
     app: vulnerability-exporter
   chart: ./charts/vulnerability-exporter
   version: 0.1.0
+  installed: {{ .Values.starboard.enabled }}
   missingFileHandler: Error
   values:
   - values/vulnerability-exporter.yaml.gotmpl

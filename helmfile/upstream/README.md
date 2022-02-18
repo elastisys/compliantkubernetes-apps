@@ -11,7 +11,8 @@ helm fetch falcosecurity/falco --version 1.5.2 --untar
 ## To consider when upgrading a chart
 
 ### starboard-operator
-1. The Starboard Operator currently uses a subchart containing a PSP to allow the Trivy scanners to run and the RBAC to use it. Keep it until it is supported upstream.
+1. The Starboard Operator currently contains a subchart containing a PSP to allow the Trivy scanners to run and the RBAC to use it.
+   Keep it until we don't use PSP admission controller anymore.
 
 ### kube-prometheus-stack
 1. Some alerts rules (e.g alert manager) are kept and maintained separately in [prometheus-alerts chart](helmfile/charts/prometheus-alerts/)

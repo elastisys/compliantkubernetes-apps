@@ -6,12 +6,32 @@ targetNamespaces: ""
 
 operator:
   replicas: 1
-  # vulnerabilityScannerEnabled the flag to enable vulnerability scanner
-  vulnerabilityScannerEnabled: true
+
   # configAuditScannerEnabled the flag to enable configuration audit scanner
   configAuditScannerEnabled: false
+
   # kubernetesBenchmarkEnabled the flag to enable CIS Kubernetes Benchmark scanner
   kubernetesBenchmarkEnabled: false
+
+  # vulnerabilityScannerEnabled the flag to enable vulnerability scanner
+  vulnerabilityScannerEnabled: true
+  # vulnerabilityScannerReportTTL the flag to set how long a vulnerability report should exist. "" means that the vulnerabilityScannerReportTTL feature is disabled
+  vulnerabilityScannerReportTTL:  {{ .Values.starboard.vulnerabilityScanner.reportTTL }}
+  # vulnerabilityScannerScanOnlyCurrentRevisions the flag to only create vulnerability scans on the current revision of a deployment.
+  vulnerabilityScannerScanOnlyCurrentRevisions: {{ .Values.starboard.vulnerabilityScanner.scanOnlyCurrentRevisions }}
+
+  # scanJobsConcurrentLimit the maximum number of scan jobs create by the operator
+  scanJobsConcurrentLimit: {{ .Values.starboard.scanJobs.concurrentLimit }}
+  # scanJobsRetryDelay the duration to wait before retrying a failed scan job
+  scanJobsRetryDelay: {{ .Values.starboard.scanJobs.retryDelay }}
+  # scanJobTimeout the length of time to wait before giving up on a scan job
+  scanJobTimeout: {{ .Values.starboard.scanJobs.timeout }}
+
+conftest:
+  createConfig: false
+
+polaris:
+  createConfig: false
 
 securityContext:
   runAsUser: 1000

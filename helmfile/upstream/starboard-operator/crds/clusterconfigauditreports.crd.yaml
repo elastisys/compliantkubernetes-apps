@@ -4,6 +4,7 @@ metadata:
   name: clusterconfigauditreports.aquasecurity.github.io
   labels:
     app.kubernetes.io/managed-by: starboard
+    app.kubernetes.io/version: "0.14.1"
 spec:
   group: aquasecurity.github.io
   versions:
@@ -44,7 +45,6 @@ spec:
     plural: clusterconfigauditreports
     kind: ClusterConfigAuditReport
     listKind: ClusterConfigAuditReportList
-    categories:
-      - all
+    categories: []
     shortNames:
       - clusterconfigaudit
