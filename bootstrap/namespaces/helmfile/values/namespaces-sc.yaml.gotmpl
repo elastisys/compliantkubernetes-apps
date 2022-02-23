@@ -3,12 +3,12 @@ namespaces:
 - name: dex
 - name: opensearch-system
 - name: fluentd
-- name: influxdb-prometheus
 - name: kube-node-lease
 - name: kube-public
 - name: kube-system
 - name: monitoring
 - name: ingress-nginx
+- name: influxdb-prometheus
 - name: velero
 {{ if .Values.harbor.enabled }}
 - name: harbor

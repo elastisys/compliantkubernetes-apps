@@ -34,6 +34,7 @@ releases:
     app: service-cluster-psp-rbac
   chart: ./charts/service-cluster-psp-rbac
   version: 0.1.0
+  installed: false
   missingFileHandler: Error
   values:
   - values/service-cluster-psp-rbac.yaml.gotmpl

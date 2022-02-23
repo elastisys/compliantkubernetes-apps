@@ -15,7 +15,6 @@ enable_thanos_receiver=$(yq r -e "${CONFIG_FILE}" 'thanos.receiver.enabled')
 enable_thanos_query=$(yq r -e "${CONFIG_FILE}" 'thanos.query.enabled')
 enable_thanos_ruler=$(yq r -e "${CONFIG_FILE}" 'thanos.ruler.enabled')
 enable_thanos_service_monitor=$(yq r -e "${CONFIG_FILE}" 'thanos.metrics.serviceMonitor.enabled')
-enable_influxdb=$(yq r -e "${CONFIG_FILE}" 'influxDB.enabled')
 
 echo
 echo
@@ -43,9 +42,6 @@ scTargets=(
     "serviceMonitor/monitoring/kube-prometheus-stack-operator/0 1"
     "serviceMonitor/monitoring/kube-prometheus-stack-prometheus/0 1"
 )
-if "${enable_influxdb}"; then
-    scTargets+=("serviceMonitor/monitoring/influxdb-du-monitoring-service-monitor/0 1")
-fi
 if [[ "${enable_thanos}" == "true" ]] && [[ "${enable_thanos_service_monitor}" == "true" ]] && [[ "${enable_thanos_receiver}" == "true" ]]; then
     scTargets+=(
         "serviceMonitor/thanos/thanos-receiver-bucketweb/0 1"

@@ -214,7 +214,7 @@ releases:
     app: prometheus-wc-reader
   chart: ./charts/prometheus-instance
   version: 0.1.0
-  installed: {{ .Values.influxDB.enabled }}
+  installed: false
   missingFileHandler: Error
   values:
   - values/prometheus-wc-reader.yaml.gotmpl
@@ -227,7 +227,7 @@ releases:
     prometheus: wc-reader
   chart: ./charts/prometheus-alerts
   version: 0.1.1
-  installed: {{ .Values.influxDB.enabled }}
+  installed: false
   missingFileHandler: Error
   values:
   # Note: we want to have alerts for WC since this is wc-reader, even if it is
@@ -528,7 +528,7 @@ releases:
     app: influxdb
   chart: ./elastisys/influxdb
   version: 4.8.15
-  installed: {{ .Values.influxDB.enabled }}
+  installed: false
   missingFileHandler: Error
   values:
   - values/influxdb.yaml.gotmpl

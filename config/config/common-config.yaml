@@ -64,7 +64,7 @@ objectStorage:
   ## Options are 's3', 'gcs', or 'none'
   ## If 'none', remember to disable backups (velero)
   # If "none", remember to disable features that depend on object storage:
-  #   all backups (velero, harbor, influxdb, opensearch), sc logs (fluentd)
+  #   all backups (velero, harbor, opensearch), sc logs (fluentd)
   #   Also set harbor persistence to "filesystem" or "swift"
   # Otherwise configure the features to match this type.
   type: set-me
@@ -157,7 +157,7 @@ prometheus:
 thanos:
   # Enables Thanos components.
   # If this isn't set, no components will be deployed
-  enabled: false
+  enabled: true
 
   receiver:
     # Enables the Thanos receiver with the additional components it needs.
@@ -398,9 +398,6 @@ monitoring:
   rook:
     enabled: false
 
-influxDB:
-  enabled: true
-  subdomain: influxdb
 
 kured:
   enabled: false
