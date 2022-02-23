@@ -21,6 +21,8 @@
     ```
 1. Remove any potential nfs-provisioner config: `migration/v0.19.x-v0.20.x/remove-nfs-provisioner-config.sh`
 
+1. Remove any potential influxDB config: `migration/v0.19.x-v0.20.x/remove-influxdb-config.sh`
+
 1. If your cluster are using docker as container runtime, set `global.containerRuntime` in `common-config.yaml` to `docker`
 
     > To see which container runtime your nodes are running you can run `kubectl get container -owide` and check the `CONTAINER-RUNTIME` column.

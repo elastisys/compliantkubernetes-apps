@@ -409,8 +409,6 @@ generate_secrets() {
     # shellcheck disable=SC2016
     DEX_STATIC_PASS_HASH=$(htpasswd -bnBC 10 "" "${DEX_STATIC_PASS}" | tr -d ':\n' | sed 's/$2y/$2a/')
 
-    PROMETHEUS_WC_REMOTE_WRITE_PASS=$(pwgen -cns 20 1)
-
     THANOS_INGRESS_PASS=$(pwgen -cns 20 1)
     THANOS_INGRESS_PASS_HASH=$(htpasswd -bn "" "${THANOS_INGRESS_PASS}" | tr -d ':\n')
 
@@ -424,9 +422,6 @@ generate_secrets() {
     yq write --inplace "${tmpfile}" 'harbor.coreSecret' "$(pwgen -cns 20 1)"
     yq write --inplace "${tmpfile}" 'harbor.jobserviceSecret' "$(pwgen -cns 20 1)"
     yq write --inplace "${tmpfile}" 'harbor.registrySecret' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'influxDB.users.adminPassword' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'influxDB.users.wcWriterPassword' "${PROMETHEUS_WC_REMOTE_WRITE_PASS}"
-    yq write --inplace "${tmpfile}" 'influxDB.users.scWriterPassword' "$(pwgen -cns 20 1)"
     yq write --inplace "${tmpfile}" 'opensearch.adminPassword' "${OS_ADMIN_PASS}"
     yq write --inplace "${tmpfile}" 'opensearch.adminHash' "${OS_ADMIN_PASS_HASH}"
     yq write --inplace "${tmpfile}" 'opensearch.clientSecret' "$(pwgen -cns 20 1)"
@@ -445,7 +440,6 @@ generate_secrets() {
     yq write --inplace "${tmpfile}" 'dex.kubeloginClientSecret' "$(pwgen -cns 20 1)"
     yq write --inplace "${tmpfile}" 'user.grafanaPassword' "$(pwgen -cns 20 1)"
     yq write --inplace "${tmpfile}" 'user.alertmanagerPassword' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'prometheus.remoteWrite.password' "${PROMETHEUS_WC_REMOTE_WRITE_PASS}"
     yq write --inplace "${tmpfile}" 'thanos.receiver.basic_auth.password' "${THANOS_INGRESS_PASS}"
     yq write --inplace "${tmpfile}" 'thanos.receiver.basic_auth.passwordHash' "${THANOS_INGRESS_PASS_HASH}"
 }

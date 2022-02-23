@@ -38,16 +38,6 @@ opensearch:
   extraRoleMappings: []
 fluentd:
   enabled: true
-influxDB:
-  resources:
-    requests:
-      memory: 4Gi
-    limits:
-      memory: 4Gi
-  backup:
-    enabled: true
-  backupRetention:
-    enabled: true
 alerts:
   opsGenieHeartbeat:
     name: not-used
@@ -58,5 +48,3 @@ s3Exporter:
   scrapeTimeout: 30s
 prometheus:
   predictLinearLimit: 66
-thanos:
-  enabled: true

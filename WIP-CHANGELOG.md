@@ -11,7 +11,10 @@
 - Storageclass installation is not longer part of the bootstrap step.
   If you have the nfs-provisioner or the local-pv-provisioner installed, they will be left untouched when upgrading.
   You are responsible for managing them and/or removing them, and any unsused storageClasses.
-
+- InfluxDB is deprecated and Thanos is now enabled by default.
+   - With the removal of InfluxDB, the backups and buckets can eventually be removed.
+- Running without object storage is no longer supported since it is required for Thanos.
+   - The dev flavor is now updated to use s3 by default
 
 ### Updated
  - Upgraded nginx-ingress helm chart to `v4.0.17`, which upgrade nginx-ingress to `v1.1.1`.
@@ -45,6 +48,7 @@
  - kubeconfig.bash have been edited to work with the new 'secret' structure.
  - memory limit for thanos receiveDistributor and pvc size for thanos receiver
  - Increased cpu requests and limits for kube-state-metrics
+ - Thanos is now enabled by default.
 
 ### Fixed
 
@@ -62,3 +66,4 @@
 - The no longer needed rolebinding and clusterrole `metrics` has been removed.
 - Storageclass installation from bootstrap step.
 - Removed helm charts for nfs-provisioner and local-pv-provisioner.
+- Removed influxDB and dependent helm charts

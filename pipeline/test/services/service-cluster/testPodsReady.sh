@@ -9,8 +9,6 @@ enable_harbor_backup=$(yq r -e "${CONFIG_FILE}" 'harbor.backup.enabled')
 enable_user_grafana=$(yq r -e "${CONFIG_FILE}" 'user.grafana.enabled')
 enable_fluentd=$(yq r -e "${CONFIG_FILE}" 'fluentd.enabled')
 enable_opensearch_snapshot=$(yq r -e "${CONFIG_FILE}" 'opensearch.snapshot.enabled')
-enable_influxdb_backup=$(yq r -e "${CONFIG_FILE}" 'influxDB.backup.enabled')
-enable_influxdb_backup_retention=$(yq r -e "${CONFIG_FILE}" 'influxDB.backupRetention.enabled')
 enable_velero=$(yq r -e "${CONFIG_FILE}" 'velero.enabled')
 enable_os_data_sts=$(yq r -e "${CONFIG_FILE}" 'opensearch.dataNode.dedicatedPods')
 enable_os_client_sts=$(yq r -e "${CONFIG_FILE}" 'opensearch.clientNode.dedicatedPods')
@@ -18,7 +16,6 @@ enable_thanos=$(yq r -e "${CONFIG_FILE}" 'thanos.enabled')
 enable_thanos_query=$(yq r -e "${CONFIG_FILE}" 'thanos.query.enabled')
 enable_thanos_receiver=$(yq r -e "${CONFIG_FILE}" 'thanos.receiver.enabled')
 enable_thanos_ruler=$(yq r -e "${CONFIG_FILE}" 'thanos.ruler.enabled')
-enable_influxdb=$(yq r -e "${CONFIG_FILE}" 'influxDB.enabled')
 enable_kured=$(yq r -e "${CONFIG_FILE}" 'kured.enabled')
 
 echo
@@ -149,12 +146,6 @@ fi
 if [[ "${enable_thanos}" == "true" ]] && [[ "${enable_thanos_ruler}" == "true" ]]; then
     statefulsets+=("thanos thanos-receiver-ruler")
 fi
-if "${enable_influxdb}"; then
-    statefulsets+=(
-        "monitoring prometheus-wc-reader-prometheus-instance"
-        "influxdb-prometheus influxdb"
-    )
-fi
 
 resourceKind="StatefulSet"
 # Get json data in a smaller dataset
@@ -193,7 +184,6 @@ done
 
 # Format:
 # namespace cronjob-name timeout
-# influxdb cronjob is create by <template name>-metrics-retention-cronjob-<sc/wc>
 # If the template name changes this has to be changed aswell.
 cronjobs=(
   "opensearch-system opensearch-curator"
@@ -207,20 +197,8 @@ if "${enable_opensearch_snapshot}"; then
         "opensearch-system opensearch-slm"
     )
 fi
-if "${enable_influxdb_backup}"; then
-    cronjobs+=("influxdb-prometheus influxdb-backup")
-fi
-if "${enable_influxdb_backup_retention}"; then
-    cronjobs+=("influxdb-prometheus influxdb-backup-retention")
-fi
 if "${enable_fluentd}"; then
     cronjobs+=("fluentd sc-logs-retention")
-fi
-if "${enable_influxdb}"; then
-    cronjobs+=(
-        "influxdb-prometheus influxdb-metrics-retention-cronjob-sc"
-        "influxdb-prometheus influxdb-metrics-retention-cronjob-wc"
-    )
 fi
 
 echo
