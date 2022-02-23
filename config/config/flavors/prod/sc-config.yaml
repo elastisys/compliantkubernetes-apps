@@ -74,17 +74,3 @@ harbor:
   database:
     persistentVolumeClaim:
       size: 5Gi
-
-influxDB:
-  retention:
-    sizeWC: 19500000
-    sizeSC: 9500000
-    durationWC: 30d
-    durationSC: 7d
-  persistence:
-    size: 60Gi
-  resources:
-    requests:
-      memory: 14Gi
-    limits:
-      memory: 15Gi

@@ -201,7 +201,7 @@ releases:
     app: prometheus-wc-reader
   chart: ./charts/prometheus-instance
   version: 0.1.0
-  installed: {{ .Values.influxDB.enabled }}
+  installed: false
   missingFileHandler: Error
   values:
   - values/prometheus-wc-reader.yaml.gotmpl
@@ -214,7 +214,7 @@ releases:
     prometheus: wc-reader
   chart: ./charts/prometheus-alerts
   version: 0.1.1
-  installed: {{ .Values.influxDB.enabled }}
+  installed: false
   missingFileHandler: Error
   values:
   # Note: we want to have alerts for WC since this is wc-reader, even if it is
@@ -277,7 +277,7 @@ releases:
     app: grafana-label-enforcer
   chart: ./charts/grafana-label-enforcer
   version: 0.1.0
-  installed: {{ and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
+  installed: {{ .Values.thanos.receiver.enabled }}
   missingFileHandler: Error
   values:
   - values/grafana-label-enforcer.yaml.gotmpl
@@ -480,7 +480,7 @@ releases:
     app: thanos
   chart: ./upstream/thanos
   version: 9.0.1
-  installed: {{ .Values.thanos.enabled }}
+  installed: true
   missingFileHandler: Error
   values:
   - values/thanos/objectstorage-secret.yaml.gotmpl
@@ -491,7 +491,7 @@ releases:
     app: thanos
   chart: ./upstream/thanos
   version: 9.0.1
-  installed: {{ and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
+  installed: {{ .Values.thanos.receiver.enabled }}
   missingFileHandler: Error
   values:
   - values/thanos/receiver.yaml.gotmpl
@@ -503,7 +503,7 @@ releases:
     app: thanos
   chart: ./upstream/thanos
   version: 9.0.1
-  installed: {{ and .Values.thanos.enabled .Values.thanos.query.enabled }}
+  installed: {{ .Values.thanos.query.enabled }}
   missingFileHandler: Error
   values:
   - values/thanos/query.yaml.gotmpl
@@ -515,7 +515,7 @@ releases:
     app: influxdb
   chart: ./elastisys/influxdb
   version: 4.8.15
-  installed: {{ .Values.influxDB.enabled }}
+  installed: false
   missingFileHandler: Error
   values:
   - values/influxdb.yaml.gotmpl

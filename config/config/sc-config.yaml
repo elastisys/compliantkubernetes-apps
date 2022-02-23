@@ -11,7 +11,6 @@ global:
 objectStorage:
   buckets:
     harbor: ${CK8S_ENVIRONMENT_NAME}-harbor
-    influxDB: ${CK8S_ENVIRONMENT_NAME}-influxdb
     opensearch: ${CK8S_ENVIRONMENT_NAME}-opensearch
     scFluentd: ${CK8S_ENVIRONMENT_NAME}-sc-logs
 
@@ -717,82 +716,6 @@ fluentd:
       limits:
         cpu: 300m
         memory: 100Mi
-
-influxDB:
-  users:
-    admin: admin
-    wcWriter: wcWriter
-    scWriter: scWriter
-  createdb: true
-  resources:
-    requests:
-      memory: 2Gi
-      cpu: 0.5
-    limits:
-      memory: 6Gi
-      cpu: 2
-  persistence:
-    size: 10Gi
-  tolerations: []
-  affinity: {}
-  nodeSelector: {}
-  # Configuration for size based retention
-  retention:
-    # Enable size based retention job
-    enabled: true
-    sizeWC: 4500000
-    sizeSC: 4500000
-    resources:
-      requests:
-        cpu: 50m
-        memory: 100Mi
-      limits:
-        cpu: 250m
-        memory: 500Mi
-    # The duration of the retention policy for each database
-    durationWC: 2d
-    durationSC: 3d
-  backup:
-    enabled: true
-    schedule: 0 0 * * *
-    startingDeadlineSeconds: 200
-    resources:
-      requests:
-        cpu: 50m
-        memory: 100Mi
-      limits:
-        cpu: 250m
-        memory: 300Mi
-  backupRetention:
-    enabled: true
-    daysToRetain: 7
-    schedule: 0 0 * * *
-    startingDeadlineSeconds: 200
-    resources:
-      requests:
-        cpu: 50m
-        memory: 100Mi
-      limits:
-        cpu: 250m
-        memory: 300Mi
-
-  sidecar:
-    nodeexporter:
-      resources:
-        requests:
-          cpu: 5m
-          memory: 15Mi
-        limits:
-          cpu: 10m
-          memory: 30Mi
-    cronjob:
-      resources:
-        requests:
-          cpu: 5m
-          memory: 50Mi
-        limits:
-          cpu: 10m
-          memory: 100Mi
 
 alerts:
   alertTo: "null"

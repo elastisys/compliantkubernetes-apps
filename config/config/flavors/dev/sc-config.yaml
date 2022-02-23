@@ -50,11 +50,3 @@ opensearch:
 
 fluentd:
   enabled: false
-
-influxDB:
-  persistence:
-    size: 10Gi
-  backup:
-    enabled: false
-  backupRetention:
-    enabled: false

@@ -54,7 +54,7 @@ releases:
     app: thanos
   chart: ./charts/thanos-ingress-secret
   version: 0.1.0
-  installed: {{ .Values.thanos.enabled }}
+  installed: true
   missingFileHandler: Error
   values:
   - values/thanos/ingress-secret.yaml.gotmpl

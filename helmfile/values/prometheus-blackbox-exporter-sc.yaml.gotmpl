@@ -44,7 +44,7 @@ serviceMonitor:
       interval: 60s
       scrapeTimeout: 30s
       module: http_401
-    {{- if and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
+    {{- if .Values.thanos.receiver.enabled }}
     - name: thanos-receiver
       url: https://{{ .Values.thanos.receiver.subdomain }}.{{ .Values.global.opsDomain }}
       interval: 60s
