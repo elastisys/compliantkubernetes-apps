@@ -83,10 +83,6 @@ user:
         limits:
           cpu: 10m
           memory: 100Mi
-  # Todo remove dependencie on alertmanager from service cluster
-  alertmanager:
-    group_by:
-      - '...'
 harbor:
   enabled: true
   subdomain: harbor
@@ -235,7 +231,10 @@ prometheus:
     affinity: {}
     nodeSelector: {}
 
+  # Todo remove dependencie on alertmanager from service cluster
   alertmanagerSpec:
+    groupBy:
+      - '...'
     resources:
       requests:
         cpu: 10m

@@ -100,6 +100,7 @@ user:
   alertmanager:
     enabled: false
 
+    ## Todo remove dependencies on alertmanager from service cluster
     ## Create basic-auth protected ingress to alertmanager
     ingress:
       enabled: false

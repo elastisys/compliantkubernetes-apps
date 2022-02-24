@@ -32,7 +32,7 @@
  - Upgrade prometheus-elasticsearch-exporter helm chart to v4.11.0 and prometheus-elasticsearch-exporter itself to v1.3.0
  - Exposed options for starboard-operator to control the number of jobs it generates and to allow for it to be disabled.
  - Added the new OPA policy - disallowed the latest image tag.
-
+ - Moved `user.alertmanager.group_by` to `prometheus.alertmanagerSpec.groupBy` in `sc-config.yaml`
 
 ### Fixed
 
