@@ -6,7 +6,9 @@
 
 1. Run the migration script: `move_log_retention_days.sh`
 
-2. Update apps configuration:
+2. Run the migration script: `move-alertmanager-groupby.sh`
+
+3. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.
 
@@ -14,7 +16,7 @@
     bin/ck8s init
     ```
 
-3. Remove conflicting starboard secret:
+4. Remove conflicting starboard secret:
 
    This was managed by starboard-operator and from now on it is managed by helm.
 
@@ -22,13 +24,13 @@
    bin/ck8s ops kubectl {sc|wc} -n monitoring delete secret starboard
    ```
 
-4. Update starboard-operator custom resource definitions:
+5. Update starboard-operator custom resource definitions:
 
    ```bash
    bin/ck8s ops kubectl {sc|wc} apply -f helmfile/upstream/starboard-operator/crds
    ```
 
-5. Upgrade applications:
+6. Upgrade applications:
 
     ```bash
     bin/ck8s apply {sc|wc}
