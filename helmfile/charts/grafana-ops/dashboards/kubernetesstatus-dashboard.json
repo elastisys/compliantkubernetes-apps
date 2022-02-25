@@ -1801,8 +1801,8 @@
       {
         "current": {
           "selected": false,
-          "text": "prometheus-sc",
-          "value": "prometheus-sc"
+          "text": "Thanos All",
+          "value": "Thanos All"
         },
         "description": null,
         "error": null,
@@ -1842,7 +1842,7 @@
         "options": [],
         "query": {
           "query": "label_values(kube_node_info, cluster)",
-          "refId": "prometheus-wc-reader-cluster-Variable-Query"
+          "refId": "StandardVariableQuery"
         },
         "refresh": 2,
         "regex": "",
@@ -1876,7 +1876,7 @@
         "options": [],
         "query": {
           "query": "label_values(kube_namespace_status_phase, namespace)",
-          "refId": "prometheus-wc-reader-namespace-Variable-Query"
+          "refId": "StandardVariableQuery"
         },
         "refresh": 2,
         "regex": "",

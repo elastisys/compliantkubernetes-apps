@@ -20,7 +20,7 @@
   "links": [],
   "panels": [
     {
-      "content": "\n# Detailed gatekeeper logs can be found in kibana:\n\n\n<<kibanaURL>>",
+      "content": "\n# Detailed gatekeeper logs can be found in OpenSearch Dashboards:\n\n\n<<opensearchdashboardsURL>>",
       "datasource": null,
       "fieldConfig": {
         "defaults": {
@@ -29,7 +29,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 3,
+        "h": 4,
         "w": 24,
         "x": 0,
         "y": 0
@@ -354,8 +354,8 @@
       {
         "current": {
           "selected": false,
-          "text": "prometheus-wc-reader",
-          "value": "prometheus-wc-reader"
+          "text": "Thanos All",
+          "value": "Thanos All"
         },
         "hide": 0,
         "includeAll": false,

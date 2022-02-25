@@ -5193,7 +5193,7 @@
         "multi": false,
         "name": "cluster",
         "options": [],
-        "query": "label_values(cluster)",
+        "query": "label_values(ceph_health_status,cluster)",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,

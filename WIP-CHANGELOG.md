@@ -54,10 +54,12 @@
    - Unused rules have been dropped
  - Grouped thanos charts
  - Configured thanos-ruler so it is enabled by default, runs as an HA pair without persistence, and dynamically reloads its rules on changes
+ - Changed dashboards previously defaulting to wc-reader to default to "Thanos All"
 
 ### Fixed
-
 - Opensearch unable to parse `"source":{}` when gatekeeper starts up. The log including `"source":{}` from gatekeeper is excluded for now.
+- Fixed some grafana dashboards so they can retrieve the cluster label properly
+- Fixed opensearch naming on falco and gatekeeper dashboard
 
 ### Added
 - Added Prometheus alerts for the 'backup status' and 'daily checks' dashboards. Also, 's3BucketPercentLimit' and 's3BucketSizeQuotaGB' parameters to set what limits the s3 rule including will alert off.

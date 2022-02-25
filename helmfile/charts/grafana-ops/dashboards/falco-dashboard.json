@@ -22,14 +22,14 @@
     {
       "datasource": null,
       "gridPos": {
-        "h": 3,
+        "h": 4,
         "w": 24,
         "x": 0,
         "y": 0
       },
       "id": 7,
       "options": {
-        "content": "# Detailed falco logs can be found in kibana:\n\n\n<<kibanaURL>>",
+        "content": "# Detailed falco logs can be found in OpenSearch Dashboards:\n\n\n<<opensearchdashboardsURL>>",
         "mode": "markdown"
       },
       "pluginVersion": "8.0.0",
@@ -437,8 +437,8 @@
       {
         "current": {
           "selected": false,
-          "text": "prometheus-wc-reader",
-          "value": "prometheus-wc-reader"
+          "text": "Thanos All",
+          "value": "Thanos All"
         },
         "description": null,
         "error": null,
@@ -478,7 +478,7 @@
         "options": [],
         "query": {
           "query": "label_values(falco_events, cluster)",
-          "refId": "prometheus-wc-reader-cluster-Variable-Query"
+          "refId": "StandardVariableQuery"
         },
         "refresh": 2,
         "regex": "",
