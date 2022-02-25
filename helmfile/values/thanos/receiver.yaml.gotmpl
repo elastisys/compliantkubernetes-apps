@@ -61,20 +61,58 @@ receiveDistributor:
 
 ruler:
   enabled: {{ .Values.thanos.ruler.enabled }}
+
   resources: {{- toYaml .Values.thanos.ruler.resources | nindent 4 }}
+
+  persistence:
+    enabled: {{ .Values.thanos.ruler.persistence.enabled }}
+    size: {{ .Values.thanos.ruler.persistence.size }}
+
+  replicaCount: {{ .Values.thanos.ruler.replicaCount }}
+
   alertmanagers:
     - http://kube-prometheus-stack-alertmanager.monitoring:9093
+
   queries:
     - thanos-query-query-frontend:9090
-  {{- if .Values.thanos.ruler.enabled }}
-  config: |-
-    groups:
-    - name: Thanos ruler
-      rules:
-      - alert: ThanosDroppedAlerts
-        expr: thanos_alert_sender_alerts_dropped_total > 0
-        for: 10s
-  {{- end }}
+
+  clusterName: {{ .Values.global.ck8sEnvironmentName }}
+
+  existingConfigmap: thanos-ruler-thanos-ruler-rulefiles-0
+
+  extraFlags:
+    - --rule-file=/conf/rules/*.yaml
+
+  # Taken from what a thanos-ruler would get from the prometheus operator.
+  sidecars:
+    - name: config-reloader
+      image: quay.io/prometheus-operator/prometheus-config-reloader:v0.50.0
+      imagePullPolicy: IfNotPresent
+      command:
+      - /bin/prometheus-config-reloader
+      args:
+      - --reload-url=http://127.0.0.1:10902/-/reload
+      - --watched-dir=/etc/thanos/rules/thanos-ruler-thanos-ruler-rulefiles-0
+      env:
+      - name: POD_NAME
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: metadata.name
+      resources:
+        limits:
+          cpu: 100m
+          memory: 50Mi
+        requests:
+          cpu: 100m
+          memory: 50Mi
+      securityContext:
+        runAsNonRoot: true
+        runAsGroup: 65534
+        runAsUser: 65534
+      volumeMounts:
+      - mountPath: /etc/thanos/rules/thanos-ruler-thanos-ruler-rulefiles-0
+        name: ruler-config
 
 metrics:
   enabled: {{ .Values.thanos.metrics.enabled }}

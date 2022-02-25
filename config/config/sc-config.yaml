@@ -338,9 +338,11 @@ thanos:
 
   ruler:
     # Enables the ruler component
-    # This is used as an alertmanager for long term data.
-    # It's recommended to not use this if not strictly necessary
-    enabled: false
+    # Evaluates alert rules through thanos, record rules and thanos alert rules are still evaluated through prometheus.
+    enabled: true
+
+    replicaCount: 2
+
     resources:
       requests:
         cpu: 50m
@@ -348,6 +350,11 @@ thanos:
       limits:
         cpu: 300m
         memory: 100Mi
+
+    # With our configuration of rules, thanos ruler has no recording rules so it should be fine without persistence.
+    persistence:
+      enabled: false
+      size: 8Gi
 
   receiver:
     persistence:

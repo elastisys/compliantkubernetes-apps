@@ -53,6 +53,7 @@
    - Modified rules to allow for different labels for alert and record rules, and to pass the cluster label through aggregations
    - Unused rules have been dropped
  - Grouped thanos charts
+ - Configured thanos-ruler so it is enabled by default, runs as an HA pair without persistence, and dynamically reloads its rules on changes
 
 ### Fixed
 
