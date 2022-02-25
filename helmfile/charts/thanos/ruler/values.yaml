@@ -1,0 +1,14 @@
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+ruleNamespaceSelector: {}
+ruleSelector: {}
+  # matchLabels:
+  #   role: my-thanos-rules
+
+securityContext:
+  runAsNonRoot: true
+  runAsGroup: 65534
+  runAsUser: 65534

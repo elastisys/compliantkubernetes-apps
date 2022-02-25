@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ThanosRuler
+metadata:
+  name: {{ include "ruler.fullname" . }}
+  labels:
+    {{- include "ruler.labels" . | nindent 4 }}
+spec:
+  replicas: 0
+  queryEndpoints:
+    - query-endpoint
+  ruleNamespaceSelector: {{ toYaml .Values.ruleNamespaceSelector | nindent 4 }}
+  ruleSelector: {{ toYaml .Values.ruleSelector | nindent 4 }}
+  {{- with .Values.securityContext }}
+  securityContext: {{ toYaml . | nindent 4 }}
+  {{- end }}

@@ -521,6 +521,18 @@ releases:
   values:
   - values/thanos/query.yaml.gotmpl
 
+# Ruler for thanos
+- name: thanos-ruler
+  namespace: thanos
+  labels:
+    app: thanos-ruler
+  chart: ./charts/thanos/ruler
+  version: 0.1.0
+  installed: {{ and .Values.thanos.enabled .Values.thanos.ruler.enabled }}
+  missingFileHandler: Error
+  values:
+  - values/thanos/ruler.yaml.gotmpl
+
 # InfluxDB with disk usage monitoring and metrics retention
 - name: influxdb
   namespace: influxdb-prometheus

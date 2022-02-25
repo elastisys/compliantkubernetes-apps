@@ -52,7 +52,7 @@ releases:
 {{- end }}
   labels:
     app: thanos
-  chart: ./charts/thanos-ingress-secret
+  chart: ./charts/thanos/ingress-secret
   version: 0.1.0
   installed: {{ .Values.thanos.enabled }}
   missingFileHandler: Error

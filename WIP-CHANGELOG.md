@@ -52,6 +52,7 @@
  - Disabled default kube-prometheus-stack rules and copied them over to prometheus alerts
    - Modified rules to allow for different labels for alert and record rules, and to pass the cluster label through aggregations
    - Unused rules have been dropped
+ - Grouped thanos charts
 
 ### Fixed
 
@@ -65,6 +66,7 @@
 - fluentd alerts for sc [#812](https://github.com/elastisys/compliantkubernetes-apps/pull/812)
 - fluentd grafana dashboard [#812](https://github.com/elastisys/compliantkubernetes-apps/pull/812)
 - `kured` - Kubernetes Reboot Daemon. Added helm chart version `2.11.2` which defaults to `v1.9.1` of the application.
+- Added dummy thanos-ruler instance to make prometheus-operator collect rules to be evaluated by thanos
 
 ### Removed
 - Removed disabled helm releases from the application helmfile
