@@ -49,6 +49,9 @@
  - memory limit for thanos receiveDistributor and pvc size for thanos receiver
  - Increased cpu requests and limits for kube-state-metrics
  - Thanos is now enabled by default.
+ - Disabled default kube-prometheus-stack rules and copied them over to prometheus alerts
+   - Modified rules to allow for different labels for alert and record rules, and to pass the cluster label through aggregations
+   - Unused rules have been dropped
 
 ### Fixed
 

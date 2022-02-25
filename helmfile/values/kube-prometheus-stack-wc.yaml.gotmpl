@@ -1,11 +1,6 @@
 defaultRules:
-  create: true
-  rules:
-    # disabled rules from kube-prometheus-stack, but installed using charts/prometheus-alerts
-    alertmanager: false
-    # disabled rules from kube-prometheus-stack and not installed using another chart
-    etcd: false
-    kubeScheduler: false
+  # Provided by prometheus-alerts instead
+  create: false
 
 global:
   rbac:

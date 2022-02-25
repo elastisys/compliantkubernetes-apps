@@ -1,4 +1,4 @@
-{{- if and .Values.defaultRules.create  .Values.defaultRules.rules.certManagerCertificateAlerts}}
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.certManagerCertificateAlerts}}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -7,11 +7,13 @@ metadata:
   labels:
     app: {{ template "prometheus-alerts.name" . }}
 {{ include "prometheus-alerts.labels" . | indent 4 }}
-{{- if .Values.defaultRules.labels }}
-{{ toYaml .Values.defaultRules.labels | indent 4 }}
+{{- if .Values.defaultRules.alertLabels }}
+{{ toYaml .Values.defaultRules.alertLabels | indent 4 }}
 {{- end }}
+{{- if .Values.defaultRules.annotations }}
   annotations:
 {{ toYaml .Values.defaultRules.annotations | indent 4 }}
+{{- end }}
 spec:
   groups:
   - name: cert-manager-certificate.rules

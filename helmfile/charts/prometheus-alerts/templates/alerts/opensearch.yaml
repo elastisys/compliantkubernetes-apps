@@ -2,12 +2,12 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "opensearch" | trunc 63 | trimSuffix "-" }}
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "opensearch-alerts" | trunc 63 | trimSuffix "-" }}
   labels:
     app: {{ template "prometheus-alerts.fullname" . }}
 {{ include "prometheus-alerts.labels" . | indent 4 }}
-{{- if .Values.defaultRules.labels }}
-{{ toYaml .Values.defaultRules.labels | indent 4 }}
+{{- if .Values.defaultRules.alertLabels }}
+{{ toYaml .Values.defaultRules.alertLabels | indent 4 }}
 {{- end }}
 {{- if .Values.defaultRules.annotations }}
   annotations:
@@ -15,13 +15,8 @@ metadata:
 {{- end }}
 spec:
   groups:
-  - name: opensearch
+  - name: opensearch-alerts
     rules:
-    - record: elasticsearch_filesystem_data_used_percent
-      expr: 100 * (elasticsearch_filesystem_data_size_bytes - elasticsearch_filesystem_data_free_bytes)
-        / elasticsearch_filesystem_data_size_bytes
-    - record: elasticsearch_filesystem_data_free_percent
-      expr: 100 - elasticsearch_filesystem_data_used_percent
     - alert: OpenSearchTooFewNodesRunning
       expr: elasticsearch_cluster_health_number_of_nodes < {{ .Values.osNodeCount }}
       for: 5m

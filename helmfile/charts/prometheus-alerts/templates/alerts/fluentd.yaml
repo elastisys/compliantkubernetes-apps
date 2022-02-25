@@ -6,8 +6,8 @@ metadata:
   labels:
     app: {{ template "prometheus-alerts.fullname" . }}
 {{ include "prometheus-alerts.labels" . | indent 4 }}
-{{- if .Values.defaultRules.labels }}
-{{ toYaml .Values.defaultRules.labels | indent 4 }}
+{{- if .Values.defaultRules.alertLabels }}
+{{ toYaml .Values.defaultRules.alertLabels | indent 4 }}
 {{- end }}
 {{- if .Values.defaultRules.annotations }}
   annotations:
@@ -56,8 +56,8 @@ spec:
     - alert: FluentdRecordsCountsHigh
       expr: >
         sum(rate(fluentd_output_status_emit_records{job="fluentd-metrics"}[5m]))
-        BY (instance) >  (3 * sum(rate(fluentd_output_status_emit_records{job="fluentd-metrics"}[15m]))
-        BY (instance))
+        BY (cluster, instance) >  (3 * sum(rate(fluentd_output_status_emit_records{job="fluentd-metrics"}[15m]))
+        BY (cluster, instance))
       for: 10m
       labels:
         service: fluentd

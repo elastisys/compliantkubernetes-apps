@@ -696,6 +696,8 @@ releases:
 # It should also be separate from the alerts we use. Users should not need
 # to care about system components that they cannot touch anyway.
 # prometheus user-alerts
+# We should split this into two releases one for the record rules and alert rules, we are dependent on the record rules
+# being evaluated on the workload cluster for our alerts.
 - name: ck8s-alerts
   namespace: monitoring
   labels:

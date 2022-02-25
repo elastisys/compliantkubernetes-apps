@@ -1,0 +1,44 @@
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.node }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "node.rules" | trunc 63 | trimSuffix "-" }}
+  labels:
+    app: {{ template "prometheus-alerts.name" . }}
+{{ include "prometheus-alerts.labels" . | indent 4 }}
+{{- if .Values.defaultRules.recordLabels }}
+{{ toYaml .Values.defaultRules.recordLabels | indent 4 }}
+{{- end }}
+{{- if .Values.defaultRules.annotations }}
+  annotations:
+{{ toYaml .Values.defaultRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  groups:
+  - name: node.rules
+    rules:
+    - expr: |-
+        topk by(cluster, namespace, pod) (1,
+          max by (cluster, node, namespace, pod) (
+            label_replace(kube_pod_info{job="kube-state-metrics",node!=""}, "pod", "$1", "pod", "(.*)")
+        ))
+      record: 'node_namespace_pod:kube_pod_info:'
+    - expr: |-
+        count by (cluster, node) (sum by (cluster, node,cpu) (
+          node_cpu_seconds_total{job="node-exporter"}
+        * on (namespace, pod) group_left(cluster, node)
+          topk by(cluster, namespace, pod) (1, node_namespace_pod:kube_pod_info:)
+        ))
+      record: node:node_num_cpu:sum
+    - expr: |-
+        sum(
+          node_memory_MemAvailable_bytes{job="node-exporter"} or
+          (
+            node_memory_Buffers_bytes{job="node-exporter"} +
+            node_memory_Cached_bytes{job="node-exporter"} +
+            node_memory_MemFree_bytes{job="node-exporter"} +
+            node_memory_Slab_bytes{job="node-exporter"}
+          )
+        ) by (cluster)
+      record: :node_memory_MemAvailable_bytes:sum
+{{- end }}

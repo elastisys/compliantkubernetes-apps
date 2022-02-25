@@ -1,18 +1,41 @@
+# The rules are split between alert and record rules so that they can be evaluated by thanos and prometheus respectively.
+# With thanos ruler it will evaluate the alert rules on all cluster.
+# The record rules are still evaluated by prometheus due to lack of multi-tenancy support in thanos ruler and performance reasons.
+
+# TODO: We should update the rules for things with set namespace and job name to be able to monitor instances in the workload cluster.
+
 osNodeCount: {{ add .Values.opensearch.dataNode.count .Values.opensearch.clientNode.count .Values.opensearch.masterNode.count }}
 
 defaultRules:
-  labels:
-    service_cluster: "1"
+  alertLabels:
+    {{- if and .Values.thanos.enabled .Values.thanos.ruler.enabled }}
+    evaluate_thanos: "1"
+    {{- else }}
+    evaluate_prometheus: "1"
+    {{- end }}
+  recordLabels:
+    evaluate_prometheus: "1"
   rules:
     alertmanager: true
     rookMonitor: {{ .Values.monitoring.rook.enabled }}
     {{- if and .Values.thanos.enabled .Values.thanos.metrics.enabled }}
     thanosMonitor: {{ .Values.thanos.metrics.enabled }}
     {{- end }}
+    {{- if and .Values.thanos.enabled .Values.thanos.metrics.enabled .Values.thanos.ruler.enabled }}
+    thanosRulerMonitor: {{ .Values.thanos.ruler.enabled }}
+    {{- end }}
+
     predictLinear: {{ .Values.prometheus.predictLinear.enabled }}
+
     backupStatus: true
     dailyChecks: true
     bucketdailyChecks: true
+
+  {{- if and .Values.thanos.enabled .Values.thanos.ruler.enabled }}
+  thanos:
+    alertLabels:
+      evaluate_prometheus: "1"
+  {{- end }}
 
 predictLinearLimit: {{ .Values.prometheus.predictLinear.limit }}
 

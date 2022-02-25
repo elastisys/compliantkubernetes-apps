@@ -5,14 +5,14 @@ metadata:
   name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "blackbox" | trunc 63 | trimSuffix "-" }}
   labels:
     app: {{ template "prometheus-alerts.fullname" . }}
-    {{- include "prometheus-alerts.labels" . | nindent 4 }}
-    {{- if .Values.defaultRules.labels -}}
-    {{- toYaml .Values.defaultRules.labels | nindent 4 }}
-    {{- end }}
-  {{- if .Values.defaultRules.annotations }}
+{{- include "prometheus-alerts.labels" . | nindent 4 }}
+{{- if .Values.defaultRules.alertLabels -}}
+{{- toYaml .Values.defaultRules.alertLabels | nindent 4 }}
+{{- end }}
+{{- if .Values.defaultRules.annotations }}
   annotations:
-    {{- toYaml .Values.defaultRules.annotations | nindent 4 }}
-  {{- end }}
+{{- toYaml .Values.defaultRules.annotations | nindent 4 }}
+{{- end }}
 spec:
   groups:
     - name: blackbox

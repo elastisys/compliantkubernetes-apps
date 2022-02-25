@@ -1,0 +1,25 @@
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.opensearch }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "opensearch-records" | trunc 63 | trimSuffix "-" }}
+  labels:
+    app: {{ template "prometheus-alerts.fullname" . }}
+{{ include "prometheus-alerts.labels" . | indent 4 }}
+{{- if .Values.defaultRules.recordLabels }}
+{{ toYaml .Values.defaultRules.recordLabels | indent 4 }}
+{{- end }}
+{{- if .Values.defaultRules.annotations }}
+  annotations:
+{{ toYaml .Values.defaultRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  groups:
+  - name: opensearch-records
+    rules:
+    - record: elasticsearch_filesystem_data_used_percent
+      expr: 100 * (elasticsearch_filesystem_data_size_bytes - elasticsearch_filesystem_data_free_bytes)
+        / elasticsearch_filesystem_data_size_bytes
+    - record: elasticsearch_filesystem_data_free_percent
+      expr: 100 - elasticsearch_filesystem_data_used_percent
+{{- end }}

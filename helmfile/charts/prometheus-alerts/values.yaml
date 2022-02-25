@@ -8,32 +8,60 @@ prometheusJob: kube-prometheus-stack-prometheus
 operatorJob: kube-prometheus-stack-operator
 prometheusNamespace: monitoring
 predictLinearLimit: 80
+
 s3BucketPercentLimit: 80
 s3BucketSizeQuotaGB: 80
 
 defaultRules:
   create: true
-  ## Any labels to add to the alerts
-  # labels:
+  ## Any labels to add to the alert rules
+  # alertLabels:
   #   key: value
+
+  ## Any labels to add to the recording rules
+  # recordLabels:
+  #   key: value
+
   rules:
-    opensearch: true
     alertmanager: false
     blackbox: true
     certManagerCertificateAlerts: true
     falcoAlerts: true
+    general: true
+    k8s: true
+    kubeApiserverAvailability: true
+    kubePrometheusGeneral: true
+    kubePrometheusNodeRecording: true
+    kubeStateMetrics: true
+    kubelet: true
+    kubernetesApps: true
+    kubernetesResources: true
+    kubernetesStorage: true
+    kubernetesSystem: true
+    network: true
+    node: true
+    prometheus: true
+    prometheusOperator: true
+    opensearch: true
     rookMonitor: true
     predictLinear: true
     thanosMonitor: false
+    thanosRulerMonitor: false # Note thanos-ruler alerts does not add the defaultRules.alertLabels, instead use defaultRules.thanosRuler.alertLabels.
     backupStatus: false
     dailyChecks: false
     bucketdailyChecks: false
     fluentd: true
 
+  appNamespacesTarget: ".*"
+
+  thanos: {}
+    ## Any labels to add to the thanos ruler alert rules
+    # alertLabels:
+    #   key: value
+
 buckets:
   harbor: set-me
   velero: set-me
   opensearch: set-me
-  influxDB: set-me
   scFluentd: set-me
   thanos: set-me

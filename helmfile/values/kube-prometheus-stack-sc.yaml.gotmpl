@@ -1,15 +1,6 @@
 defaultRules:
-  create: true
-  rules:
-    # disabled rules from kube-prometheus-stack, but installed using charts/prometheus-alerts
-    alertmanager: false
-    # disabled rules from kube-prometheus-stack and not installed using another chart
-    etcd: false
-    kubeScheduler: false
-  # we want the chart default rules to be read by both sc cluster prometheus and wc reader prometheus
-  labels:
-    service_cluster: "1"
-    workload_cluster: "1"
+  # Provided by prometheus-alerts instead
+  create: false
 
 global:
   rbac:
@@ -333,7 +324,7 @@ prometheus:
     # for the sc prometheus we want to select only the relevant rules for sc
     ruleSelector:
       matchLabels:
-        service_cluster: "1"
+        evaluate_prometheus: "1"
 
     ## How long to retain metrics
     ##

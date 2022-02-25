@@ -15,7 +15,6 @@ helm fetch falcosecurity/falco --version 1.5.2 --untar
    Keep it until we don't use PSP admission controller anymore.
 
 ### kube-prometheus-stack
-1. Some alerts rules (e.g alert manager) are kept and maintained separately in [prometheus-alerts chart](helmfile/charts/prometheus-alerts/)
-1. The Prometheus wc reader needs to be updated separately in [prometheus-instance chart](helmfile/charts/prometheus-instance/)
+1. All rules are split between alerts and records, modified to preserve the cluster label in aggregations, and maintained separately in [prometheus-alerts chart](helmfile/charts/prometheus-alerts/)
 1. The user Grafana needs to be updated separately in [grafana chart](helmfile/upstream/grafana)
 1. The user AlertManager needs to be updated separately in [user-alertmanager chart](helmfile/charts/examples/user-alertmanager)

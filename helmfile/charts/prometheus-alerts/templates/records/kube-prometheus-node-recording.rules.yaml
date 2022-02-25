@@ -1,0 +1,32 @@
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.kubePrometheusNodeRecording }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "kube-prometheus-node-recording.rules" | trunc 63 | trimSuffix "-" }}
+  labels:
+    app: {{ template "prometheus-alerts.name" . }}
+{{ include "prometheus-alerts.labels" . | indent 4 }}
+{{- if .Values.defaultRules.recordLabels }}
+{{ toYaml .Values.defaultRules.recordLabels | indent 4 }}
+{{- end }}
+{{- if .Values.defaultRules.annotations }}
+  annotations:
+{{ toYaml .Values.defaultRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  groups:
+  - name: kube-prometheus-node-recording.rules
+    rules:
+    - expr: sum(rate(node_cpu_seconds_total{mode!="idle",mode!="iowait",mode!="steal"}[3m])) BY (cluster,instance)
+      record: instance:node_cpu:rate:sum
+    - expr: sum(rate(node_network_receive_bytes_total[3m])) BY (cluster,instance)
+      record: instance:node_network_receive_bytes:rate:sum
+    - expr: sum(rate(node_network_transmit_bytes_total[3m])) BY (cluster,instance)
+      record: instance:node_network_transmit_bytes:rate:sum
+    - expr: sum(rate(node_cpu_seconds_total{mode!="idle",mode!="iowait",mode!="steal"}[5m])) WITHOUT (cpu, mode) / ON(cluster, instance) GROUP_LEFT() count(sum(node_cpu_seconds_total) BY (cluster, instance, cpu)) BY (cluster, instance)
+      record: instance:node_cpu:ratio
+    - expr: sum(rate(node_cpu_seconds_total{mode!="idle",mode!="iowait",mode!="steal"}[5m])) by (cluster)
+      record: cluster:node_cpu:sum_rate5m
+    - expr: cluster:node_cpu:sum_rate5m / count(sum(node_cpu_seconds_total) by (cluster, instance, cpu)) by (cluster)
+      record: cluster:node_cpu:ratio
+{{- end }}

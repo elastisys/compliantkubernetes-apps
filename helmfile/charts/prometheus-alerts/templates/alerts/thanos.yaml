@@ -1,0 +1,19 @@
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.thanosMonitor }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "thanos" | trunc 63 | trimSuffix "-" }}
+  namespace: "thanos"
+  labels:
+    app: {{ template "prometheus-alerts.name" . }}
+{{ include "prometheus-alerts.labels" . | indent 4 }}
+{{- if .Values.defaultRules.thanos.alertLabels }}
+{{ toYaml .Values.defaultRules.thanos.alertLabels | indent 4 }}
+{{- end }}
+{{- if .Values.defaultRules.annotations }}
+  annotations:
+{{ toYaml .Values.defaultRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  {{- .Files.Get "files/thanos.yaml" | nindent 2}}
+{{- end }}

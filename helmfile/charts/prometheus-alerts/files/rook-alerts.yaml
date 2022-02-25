@@ -1,30 +1,5 @@
-# Taken from https://github.com/rook/rook/blob/master/cluster/examples/kubernetes/ceph/monitoring/prometheus-ceph-v14-rules.yaml
-- name: ceph.rules
-  rules:
-  - expr: |
-      kube_node_status_condition{condition="Ready",job="kube-state-metrics",status="true"} * on (node) group_right() max(label_replace(ceph_disk_occupation{job="rook-ceph-mgr"},"node","$1","exported_instance","(.*)")) by (node)
-    record: cluster:ceph_node_down:join_kube
-  - expr: |
-      avg(topk by (ceph_daemon) (1, label_replace(label_replace(ceph_disk_occupation{job="rook-ceph-mgr"}, "instance", "$1", "exported_instance", "(.*)"), "device", "$1", "device", "/dev/(.*)")) * on(instance, device) group_right(ceph_daemon) topk by (instance,device) (1,(irate(node_disk_read_time_seconds_total[1m]) + irate(node_disk_write_time_seconds_total[1m]) / (clamp_min(irate(node_disk_reads_completed_total[1m]), 1) + irate(node_disk_writes_completed_total[1m])))))
-    record: cluster:ceph_disk_latency:join_ceph_node_disk_irate1m
-- name: telemeter.rules
-  rules:
-  - expr: |
-      count(ceph_osd_metadata{job="rook-ceph-mgr"})
-    record: job:ceph_osd_metadata:count
-  - expr: |
-      count(kube_persistentvolume_info * on (storageclass)  group_left(provisioner) kube_storageclass_info {provisioner=~"(.*rbd.csi.ceph.com)|(.*cephfs.csi.ceph.com)"})
-    record: job:kube_pv:count
-  - expr: |
-      sum(ceph_pool_rd{job="rook-ceph-mgr"}+ ceph_pool_wr{job="rook-ceph-mgr"})
-    record: job:ceph_pools_iops:total
-  - expr: |
-      sum(ceph_pool_rd_bytes{job="rook-ceph-mgr"}+ ceph_pool_wr_bytes{job="rook-ceph-mgr"})
-    record: job:ceph_pools_iops_bytes:total
-  - expr: |
-      count(count(ceph_mon_metadata{job="rook-ceph-mgr"} or ceph_osd_metadata{job="rook-ceph-mgr"} or ceph_rgw_metadata{job="rook-ceph-mgr"} or ceph_mds_metadata{job="rook-ceph-mgr"} or ceph_mgr_metadata{job="rook-ceph-mgr"}) by(ceph_version))
-    record: job:ceph_versions_running:count
-- name: ceph-mgr-status
+groups:
+- name: rook-ceph-mgr-status
   rules:
   - alert: CephMgrIsAbsent
     annotations:
@@ -48,7 +23,7 @@
     for: 5m
     labels:
       severity: warning
-- name: ceph-mds-status
+- name: rook-ceph-mds-status
   rules:
   - alert: CephMdsMissingReplicas
     annotations:
@@ -62,7 +37,7 @@
     for: 5m
     labels:
       severity: warning
-- name: quorum-alert.rules
+- name: rook-quorum-alert.rules
   rules:
   - alert: CephMonQuorumAtRisk
     annotations:
@@ -71,7 +46,7 @@
       severity_level: error
       storage_type: ceph
     expr: |
-      count(ceph_mon_quorum_status{job="rook-ceph-mgr"} == 1) <= ((count(ceph_mon_metadata{job="rook-ceph-mgr"}) % 2) + 1)
+      (count by(cluster) (ceph_mon_quorum_status{job="rook-ceph-mgr"} == 1)) <= ((count by (cluster) (ceph_mon_metadata{job="rook-ceph-mgr"}) % 2) + 1)
     for: 15m
     labels:
       severity: critical
@@ -83,11 +58,11 @@
       severity_level: warning
       storage_type: ceph
     expr: |
-      (ceph_mon_metadata{job="rook-ceph-mgr"} * on (ceph_daemon) group_left() (rate(ceph_mon_num_elections{job="rook-ceph-mgr"}[5m]) * 60)) > 0.95
+      (ceph_mon_metadata{job="rook-ceph-mgr"} * on (cluster, ceph_daemon) group_left() (rate(ceph_mon_num_elections{job="rook-ceph-mgr"}[5m]) * 60)) > 0.95
     for: 5m
     labels:
       severity: warning
-- name: ceph-node-alert.rules
+- name: rook-ceph-node-alert.rules
   rules:
   - alert: CephNodeDown
     annotations:
@@ -101,7 +76,7 @@
     for: 30s
     labels:
       severity: critical
-- name: osd-alert.rules
+- name: rook-osd-alert.rules
   rules:
   - alert: CephOSDCriticallyFull
     annotations:
@@ -112,7 +87,7 @@
       severity_level: error
       storage_type: ceph
     expr: |
-      (ceph_osd_metadata * on (ceph_daemon) group_right(device_class) (ceph_osd_stat_bytes_used / ceph_osd_stat_bytes)) >= 0.80
+      (ceph_osd_metadata * on (cluster,ceph_daemon) group_right(device_class) (ceph_osd_stat_bytes_used / ceph_osd_stat_bytes)) >= 0.80
     for: 40s
     labels:
       severity: critical
@@ -138,7 +113,7 @@
       severity_level: warning
       storage_type: ceph
     expr: |
-      (ceph_osd_metadata * on (ceph_daemon) group_right(device_class) (ceph_osd_stat_bytes_used / ceph_osd_stat_bytes)) >= 0.75
+      (ceph_osd_metadata * on (cluster,ceph_daemon) group_right(device_class) (ceph_osd_stat_bytes_used / ceph_osd_stat_bytes)) >= 0.75
     for: 40s
     labels:
       severity: warning
@@ -150,7 +125,7 @@
       severity_level: error
       storage_type: ceph
     expr: |
-      label_replace((ceph_osd_in == 1 and ceph_osd_up == 0),"disk","$1","ceph_daemon","osd.(.*)") + on(ceph_daemon) group_left(host, device) label_replace(ceph_disk_occupation,"host","$1","exported_instance","(.*)")
+      label_replace((ceph_osd_in == 1 and ceph_osd_up == 0),"disk","$1","ceph_daemon","osd.(.*)") + on(cluster,ceph_daemon) group_left(host, device) label_replace(ceph_disk_occupation,"host","$1","exported_instance","(.*)")
     for: 1m
     labels:
       severity: critical
@@ -162,7 +137,7 @@
       severity_level: error
       storage_type: ceph
     expr: |
-      label_replace((ceph_osd_in == 0 and ceph_osd_up == 0),"disk","$1","ceph_daemon","osd.(.*)") + on(ceph_daemon) group_left(host, device) label_replace(ceph_disk_occupation,"host","$1","exported_instance","(.*)")
+      label_replace((ceph_osd_in == 0 and ceph_osd_up == 0),"disk","$1","ceph_daemon","osd.(.*)") + on(cluster,ceph_daemon) group_left(host, device) label_replace(ceph_disk_occupation,"host","$1","exported_instance","(.*)")
     for: 1m
     labels:
       severity: critical
@@ -200,7 +175,7 @@
     for: 1h
     labels:
       severity: warning
-- name: persistent-volume-alert.rules
+- name: rook-persistent-volume-alert.rules
   rules:
   - alert: PersistentVolumeUsageNearFull
     annotations:
@@ -211,7 +186,7 @@
       severity_level: warning
       storage_type: ceph
     expr: |
-      (kubelet_volume_stats_used_bytes * on (namespace,persistentvolumeclaim) group_left(storageclass, provisioner) (kube_persistentvolumeclaim_info * on (storageclass)  group_left(provisioner) kube_storageclass_info {provisioner=~"(.*rbd.csi.ceph.com)|(.*cephfs.csi.ceph.com)"})) / (kubelet_volume_stats_capacity_bytes * on (namespace,persistentvolumeclaim) group_left(storageclass, provisioner) (kube_persistentvolumeclaim_info * on (storageclass)  group_left(provisioner) kube_storageclass_info {provisioner=~"(.*rbd.csi.ceph.com)|(.*cephfs.csi.ceph.com)"})) > 0.75
+      (kubelet_volume_stats_used_bytes * on (cluster, namespace, persistentvolumeclaim) group_left(storageclass, provisioner) (kube_persistentvolumeclaim_info * on (cluster, storageclass) group_left(provisioner) kube_storageclass_info {provisioner=~"(.*rbd.csi.ceph.com)|(.*cephfs.csi.ceph.com)"})) / (kubelet_volume_stats_capacity_bytes * on (cluster, namespace, persistentvolumeclaim) group_left(storageclass, provisioner) (kube_persistentvolumeclaim_info * on (cluster, storageclass) group_left(provisioner) kube_storageclass_info {provisioner=~"(.*rbd.csi.ceph.com)|(.*cephfs.csi.ceph.com)"})) > 0.75
     for: 5s
     labels:
       severity: warning
@@ -224,11 +199,11 @@
       severity_level: error
       storage_type: ceph
     expr: |
-      (kubelet_volume_stats_used_bytes * on (namespace,persistentvolumeclaim) group_left(storageclass, provisioner) (kube_persistentvolumeclaim_info * on (storageclass)  group_left(provisioner) kube_storageclass_info {provisioner=~"(.*rbd.csi.ceph.com)|(.*cephfs.csi.ceph.com)"})) / (kubelet_volume_stats_capacity_bytes * on (namespace,persistentvolumeclaim) group_left(storageclass, provisioner) (kube_persistentvolumeclaim_info * on (storageclass)  group_left(provisioner) kube_storageclass_info {provisioner=~"(.*rbd.csi.ceph.com)|(.*cephfs.csi.ceph.com)"})) > 0.85
+      (kubelet_volume_stats_used_bytes * on (cluster, namespace, persistentvolumeclaim) group_left(storageclass, provisioner) (kube_persistentvolumeclaim_info * on (cluster, storageclass) group_left(provisioner) kube_storageclass_info {provisioner=~"(.*rbd.csi.ceph.com)|(.*cephfs.csi.ceph.com)"})) / (kubelet_volume_stats_capacity_bytes * on (cluster, namespace, persistentvolumeclaim) group_left(storageclass, provisioner) (kube_persistentvolumeclaim_info * on (cluster, storageclass)  group_left(provisioner) kube_storageclass_info {provisioner=~"(.*rbd.csi.ceph.com)|(.*cephfs.csi.ceph.com)"})) > 0.85
     for: 5s
     labels:
       severity: critical
-- name: cluster-state-alert.rules
+- name: rook-cluster-state-alert.rules
   rules:
   - alert: CephClusterErrorState
     annotations:
@@ -260,7 +235,7 @@
       severity_level: warning
       storage_type: ceph
     expr: |
-      count(count(ceph_osd_metadata{job="rook-ceph-mgr"}) by (ceph_version)) > 1
+      count by (cluster) (count(ceph_osd_metadata{job="rook-ceph-mgr"}) by (cluster,ceph_version)) > 1
     for: 10m
     labels:
       severity: warning
@@ -272,11 +247,11 @@
       severity_level: warning
       storage_type: ceph
     expr: |
-      count(count(ceph_mon_metadata{job="rook-ceph-mgr"}) by (ceph_version)) > 1
+      count by (cluster) (count(ceph_mon_metadata{job="rook-ceph-mgr"}) by (cluster,ceph_version)) > 1
     for: 10m
     labels:
       severity: warning
-- name: cluster-utilization-alert.rules
+- name: rook-cluster-utilization-alert.rules
   rules:
   - alert: CephClusterNearFull
     annotations:
@@ -317,7 +292,7 @@
     for: 0s
     labels:
       severity: critical
-- name: pool-quota.rules
+- name: rook-pool-quota.rules
   rules:
   - alert: CephPoolQuotaBytesNearExhaustion
     annotations:
@@ -326,7 +301,7 @@
       severity_level: warning
       storage_type: ceph
     expr: |
-      (ceph_pool_stored_raw * on (pool_id) group_left(name)ceph_pool_metadata) / ((ceph_pool_quota_bytes * on (pool_id) group_left(name)ceph_pool_metadata) > 0) > 0.70
+      (ceph_pool_stored_raw * on (cluster, pool_id) group_left(name)ceph_pool_metadata) / ((ceph_pool_quota_bytes * on (cluster, pool_id) group_left(name)ceph_pool_metadata) > 0) > 0.70
     for: 1m
     labels:
       severity: warning
@@ -337,7 +312,7 @@
       severity_level: critical
       storage_type: ceph
     expr: |
-      (ceph_pool_stored_raw * on (pool_id) group_left(name)ceph_pool_metadata) / ((ceph_pool_quota_bytes * on (pool_id) group_left(name)ceph_pool_metadata) > 0) > 0.90
+      (ceph_pool_stored_raw * on (cluster, pool_id) group_left(name)ceph_pool_metadata) / ((ceph_pool_quota_bytes * on (cluster, pool_id) group_left(name)ceph_pool_metadata) > 0) > 0.90
     for: 1m
     labels:
       severity: critical

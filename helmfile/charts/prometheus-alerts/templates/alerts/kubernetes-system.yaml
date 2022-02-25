@@ -1,0 +1,48 @@
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.kubernetesSystem }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "kubernetes-system" | trunc 63 | trimSuffix "-" }}
+  labels:
+    app: {{ template "prometheus-alerts.name" . }}
+{{ include "prometheus-alerts.labels" . | indent 4 }}
+{{- if .Values.defaultRules.alertLabels }}
+{{ toYaml .Values.defaultRules.alertLabels | indent 4 }}
+{{- end }}
+{{- if .Values.defaultRules.annotations }}
+  annotations:
+{{ toYaml .Values.defaultRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  groups:
+  - name: kubernetes-system
+    rules:
+    - alert: KubeVersionMismatch
+      annotations:
+        description: There are {{`{{`}} $value {{`}}`}} different semantic versions of Kubernetes components running.
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-kubeversionmismatch
+        summary: Different semantic versions of Kubernetes components running.
+      expr: count(count by (cluster, git_version) (label_replace(kubernetes_build_info{job!~"kube-dns|coredns"},"git_version","$1","git_version","(v[0-9]*.[0-9]*).*"))) by (cluster) > 1
+      for: 15m
+      labels:
+        severity: warning
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: KubeClientErrors
+      annotations:
+        description: Kubernetes API server client '{{`{{`}} $labels.job {{`}}`}}/{{`{{`}} $labels.instance {{`}}`}}' is experiencing {{`{{`}} $value | humanizePercentage {{`}}`}} errors.'
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-kubeclienterrors
+        summary: Kubernetes API server client is experiencing errors.
+      expr: |-
+        (sum(rate(rest_client_requests_total{code=~"5.."}[5m])) by (cluster, instance, job)
+          /
+        sum(rate(rest_client_requests_total[5m])) by (cluster, instance, job))
+        > 0.01
+      for: 15m
+      labels:
+        severity: warning
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+{{- end }}
