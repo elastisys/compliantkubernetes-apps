@@ -65,12 +65,12 @@ user:
     tolerations: []
     affinity: {}
     nodeSelector: {}
-    userGroups:
-      grafanaAdmin: grafana_admin   # maps to grafana role admin
-      grafanaEditor: grafana_editor # maps to grafana role editor
-      grafanaViewer: grafana_viewer # maps to grafana role viewer
     oidc:
       scopes: profile email openid
+      userGroups:
+        grafanaAdmin: grafana_admin   # maps to grafana role admin
+        grafanaEditor: grafana_editor # maps to grafana role editor
+        grafanaViewer: grafana_viewer # maps to grafana role viewer
       allowedDomains:
         - set-me
         - example.com
