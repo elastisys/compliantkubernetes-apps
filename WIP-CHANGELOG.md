@@ -40,6 +40,8 @@
 
 ### Added
 - Added Prometheus alerts for the 'backup status' and 'daily checks' dashboards. Also, 's3BucketPercentLimit' and 's3BucketSizeQuotaGB' parameters to set what limits the s3 rule including will alert off.
+- RBAC for admin user so that they now can list pods cluster wide and run the `kubectl top`.
 
 ### Removed
 - Removed disabled helm releases from the application helmfile
+- The no longer needed rolebinding and clusterrole `metrics` has been removed.
