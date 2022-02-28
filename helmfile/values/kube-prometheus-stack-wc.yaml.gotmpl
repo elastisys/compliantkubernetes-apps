@@ -6,6 +6,9 @@ defaultRules:
     # disabled rules from kube-prometheus-stack and not installed using another chart
     etcd: false
     kubeScheduler: false
+    # disabled rules since we don't collect the required metrics
+    kubeApiserver: false
+    kubeApiserverSlos: false
 
 global:
   rbac:

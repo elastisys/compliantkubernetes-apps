@@ -6,6 +6,9 @@ defaultRules:
     # disabled rules from kube-prometheus-stack and not installed using another chart
     etcd: false
     kubeScheduler: false
+    # disabled rules since we don't collect the required metrics
+    kubeApiserver: false
+    kubeApiserverSlos: false
   # we want the chart default rules to be read by both sc cluster prometheus and wc reader prometheus
   labels:
     service_cluster: "1"
