@@ -91,7 +91,7 @@ echo "--- Waiting for ODFE snapshots in progress ---
 Elasticsearch > GET /_snapshot/_status"
 while true; do
     res=$("${here}/../../bin/ck8s" ops kubectl sc -n elastic-system exec opendistro-es-master-0 -c elasticsearch -- \
-        curl -XGET "'http://localhost:9200/_snapshot/_status'" -u "'admin:${ES_PASSWORD}'" --no-progress-meter | \
+        curl -XGET "'http://localhost:9200/_snapshot/_status'" -u "'admin:${ES_PASSWORD}'" -sS | \
         yq r - 'snapshots')
     if [[ "$res" == "[]" ]]; then
         break
@@ -106,7 +106,7 @@ Elasticsearch > PUT /_snapshot/${ES_REPOSITORY}/final
 -"
 "${here}/../../bin/ck8s" ops kubectl sc -n elastic-system exec opendistro-es-master-0 -c elasticsearch -- \
 curl -XPUT "'http://localhost:9200/_snapshot/${ES_REPOSITORY}/final?wait_for_completion=true&pretty=true'" \
--u "'admin:${ES_PASSWORD}'" --no-progress-meter
+-u "'admin:${ES_PASSWORD}'" -sS
 echo "---
 "
 
@@ -219,7 +219,7 @@ OpenSearch > PUT /_snapshot/${ES_REPOSITORY}
 -"
 "${here}/../../bin/ck8s" ops kubectl sc -n opensearch-system exec "${OS_CLUSTERNAME}-master-0" -c opensearch -- \
 curl -XPUT "'http://localhost:9200/_snapshot/${ES_REPOSITORY}?pretty=true'" \
--u "'admin:${OS_PASSWORD}'" -H "'Content-Type: application/json'" --no-progress-meter -d \
+-u "'admin:${OS_PASSWORD}'" -H "'Content-Type: application/json'" -sS -d \
 "'{
     \"type\":\"s3\",
     \"settings\":{
@@ -242,7 +242,7 @@ OpenSearch > POST /_snapshot/${ES_REPOSITORY}/final/_restore
 -"
 "${here}/../../bin/ck8s" ops kubectl sc -n opensearch-system exec "${OS_CLUSTERNAME}-master-0" -c opensearch -- \
 curl -XPOST "'http://localhost:9200/_snapshot/${ES_REPOSITORY}/final/_restore?wait_for_completion=true&pretty=true'" \
--u "'admin:${OS_PASSWORD}'" -H "'Content-Type: application/json'" --no-progress-meter -d \
+-u "'admin:${OS_PASSWORD}'" -H "'Content-Type: application/json'" -sS -d \
 "'{
     \"indices\": \".kibana*\",
     \"include_aliases\": false,
@@ -265,7 +265,7 @@ OpenSearch > POST /_aliases
 }'"
 "${here}/../../bin/ck8s" ops kubectl sc -n opensearch-system exec "${OS_CLUSTERNAME}-master-0" -c opensearch -- \
 curl -XPOST "'http://localhost:9200/_aliases?pretty=true'" \
--u "'admin:${OS_PASSWORD}'" -H "'Content-Type: application/json'" --no-progress-meter -d \
+-u "'admin:${OS_PASSWORD}'" -H "'Content-Type: application/json'" -sS -d \
 "'{
     \"actions\": [
       {
@@ -301,7 +301,7 @@ OpenSearch > POST /_snapshot/${ES_REPOSITORY}/final/_restore
 -"
 "${here}/../../bin/ck8s" ops kubectl sc -n opensearch-system exec "${OS_CLUSTERNAME}-master-0" -c opensearch -- \
 curl -XPOST "'http://localhost:9200/_snapshot/${ES_REPOSITORY}/final/_restore?wait_for_completion=true&pretty=true'" \
--u "'admin:${OS_PASSWORD}'" -H "'Content-Type: application/json'" --no-progress-meter -d \
+-u "'admin:${OS_PASSWORD}'" -H "'Content-Type: application/json'" -sS -d \
 "'{
     \"indices\": \"${index}*\",
     \"include_aliases\": false,
@@ -329,7 +329,7 @@ OpenSearch > POST /_aliases
 }'"
 "${here}/../../bin/ck8s" ops kubectl sc -n opensearch-system exec "${OS_CLUSTERNAME}-master-0" -c opensearch -- \
 curl -XPOST "'http://localhost:9200/_aliases?pretty=true'" \
--u "'admin:${OS_PASSWORD}'" -H "'Content-Type: application/json'" --no-progress-meter -d \
+-u "'admin:${OS_PASSWORD}'" -H "'Content-Type: application/json'" -sS -d \
 "'{
     \"actions\": [
       {
@@ -357,7 +357,7 @@ if [[ "${reply}" != "y" ]]; then
 fi
 "${here}/../../bin/ck8s" ops kubectl sc -n opensearch-system exec "${OS_CLUSTERNAME}-master-0" -c opensearch -- \
 curl -XDELETE "'http://localhost:9200/_snapshot/${ES_REPOSITORY}?pretty=true'" \
--u "'admin:${OS_PASSWORD}'" --no-progress-meter
+-u "'admin:${OS_PASSWORD}'" -sS
 echo "---
 "
 
