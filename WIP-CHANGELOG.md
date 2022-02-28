@@ -33,6 +33,7 @@
  - Exposed options for starboard-operator to control the number of jobs it generates and to allow for it to be disabled.
  - Added the new OPA policy - disallowed the latest image tag.
  - Moved `user.alertmanager.group_by` to `prometheus.alertmanagerSpec.groupBy` in `sc-config.yaml`
+ - Moved `user.grafana.userGroups` to `user.grafana.oidc.userGroups` in `sc-config.yaml`
 
 ### Fixed
 
