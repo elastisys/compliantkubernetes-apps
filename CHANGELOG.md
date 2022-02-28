@@ -1,5 +1,6 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.19.1](#v0191---2022-02-28)
 - [v0.19.0](#v0190---2022-01-25)
 - [v0.18.0](#v0180---2021-10-28)
 - [v0.17.0](#v0170---2021-06-29)
@@ -16,6 +17,15 @@
 - [v0.6.0](#v060---2020-10-16)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.19.1 - 2022-02-28
+
+
+### Fixed
+
+- Disabled prometheus rules for the kube-apiserver that lacked metrics and caused the wc-reader to go out of memory when trying to evaluate them
+- Fixed opensearch migration script that used an uncompatible argument for curl
 
 -------------------------------------------------
 ## v0.19.0 - 2022-01-25
