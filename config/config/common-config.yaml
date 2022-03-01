@@ -166,8 +166,6 @@ prometheus:
   tolerations: []
   affinity: {}
   nodeSelector: {}
-  s3BucketPercentLimit: 80
-  s3BucketSizeQuotaGB: 1000
 
 thanos:
   # Enables Thanos components.
