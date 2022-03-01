@@ -28,16 +28,12 @@
  - Fluentd can now properly handle and write orphaned documents to Opensearch when using the index per namespace feature.
   The orphaned documents will be written to `.orphaned-...` indices, which a user does not have access to read from.
  - Add `ingressClassName` in ingresses where that configuration option is available.
-<<<<<<< HEAD
  - Upgrade velero helm chart to `v2.27.3`, which also upgrades velero to `v1.7.1`.
  - Upgrade prometheus-elasticsearch-exporter helm chart to v4.11.0 and prometheus-elasticsearch-exporter itself to v1.3.0
  - Exposed options for starboard-operator to control the number of jobs it generates and to allow for it to be disabled.
  - Added the new OPA policy - disallowed the latest image tag.
  - Moved `user.alertmanager.group_by` to `prometheus.alertmanagerSpec.groupBy` in `sc-config.yaml`
  - Moved `user.grafana.userGroups` to `user.grafana.oidc.userGroups` in `sc-config.yaml`
-=======
- - kubeconfig.bash have been edited to work with the new 'secret' structure.
->>>>>>> secret structure for kubeconfig.bash
 
 ### Fixed
 
