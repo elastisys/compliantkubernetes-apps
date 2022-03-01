@@ -7,6 +7,8 @@
 
 **Special notes for reviewer**:
 
+**Add a screenshot or an example to illustrate the proposed solution:**
+
 **Checklist:**
 
 - [ ] Added relevant notes to [WIP-CHANGELOG.md](https://github.com/elastisys/compliantkubernetes-apps/blob/main/WIP-CHANGELOG.md)
