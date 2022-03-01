@@ -275,6 +275,8 @@ prometheus:
   ## Predictive alert if the resource usage will hit the set percentage in 3 days
   ## Set to '0', 'false', or 'null' to disable
   predictLinearLimit: 66
+  s3BucketPercentLimit: 80
+  s3BucketSizeQuotaGB: 1000
 
 dex:
   subdomain: dex
