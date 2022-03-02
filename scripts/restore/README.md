@@ -23,7 +23,7 @@ The job will restore the latest backup.
 `$SPECIFIC_BACKUP` can be used to specify which backup.
 To get a list of available backups use:
 ```
-aws s3 ls ${S3_BUCKET}"/backups" --recursive --endpoint-url=${S3_REGION_ENDPOINT}
+s3cmd --config <(sops -d ${CK8S_CONFIG_PATH}/.state/s3cfg.ini) ls s3://${S3_BUCKET}/backups/
 ```
 Then set:
 ```bash
