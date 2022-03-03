@@ -334,7 +334,7 @@ thanos:
         memory: 200Mi
       limits:
         cpu: 500m
-        memory: 200Mi
+        memory: 300Mi
 
   ruler:
     # Enables the ruler component
@@ -352,7 +352,7 @@ thanos:
   receiver:
     persistence:
       enabled: true
-      size: 8Gi
+      size: 50Gi
 
     # Sets the mode of operation for the receiver component
     # dual-mode: Multiple instances of the receiver. For redundancy
