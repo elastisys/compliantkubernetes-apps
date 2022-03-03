@@ -14,7 +14,7 @@ here="$(dirname "$(readlink -f "$0")")"
 "${here}/.././bin/ck8s" ops helmfile sc -l app!=cert-manager destroy
 
 # Clean up namespaces and any other resources left behind by the apps
-"${here}/.././bin/ck8s" ops kubectl sc delete ns dex elastic-system harbor fluentd influxdb-prometheus ingress-nginx monitoring velero
+"${here}/.././bin/ck8s" ops kubectl sc delete ns dex opensearch-system harbor fluentd thanos influxdb-prometheus ingress-nginx monitoring velero
 
 # Destroy cert-manager helm release
 "${here}/.././bin/ck8s" ops helmfile sc -l app=cert-manager destroy
