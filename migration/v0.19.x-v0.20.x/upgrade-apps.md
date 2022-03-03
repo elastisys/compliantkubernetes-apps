@@ -18,6 +18,10 @@
     bin/ck8s init
     ```
 
+1. If your cluster are using docker as container runtime, set `global.containerRuntime` in `common-config.yaml` to `docker`
+
+    > To see which container runtime your nodes are running you can run `kubectl get container -owide` and check the `CONTAINER-RUNTIME` column.
+
 1. Remove conflicting starboard secret:
 
    This was managed by starboard-operator and from now on it is managed by helm.

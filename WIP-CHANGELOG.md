@@ -4,6 +4,8 @@
         By default, an ingressClass called `nginx` will be available in the cluster.
         Ingress-nginx will still handle ingresses that do not specify an `ingressClassName`, however users are strongly encouraged to update their Ingress Objects and specify `spec.ingressClassName: nginx`.
     - The entire changelog can be found [here](https://github.com/kubernetes/ingress-nginx/blob/main/Changelog.md).
+- Added a new config `global.containerRuntime` (default set to `containerd`).
+  - Supported runtimes are `containerd` and `docker`
 
 ### Updated
  - Upgraded nginx-ingress helm chart to `v4.0.17`, which upgrade nginx-ingress to `v1.1.1`.
@@ -42,6 +44,7 @@
 ### Added
 - Added Prometheus alerts for the 'backup status' and 'daily checks' dashboards. Also, 's3BucketPercentLimit' and 's3BucketSizeQuotaGB' parameters to set what limits the s3 rule including will alert off.
 - RBAC for admin user so that they now can list pods cluster wide and run the `kubectl top`.
+- Added containerd support for fluentd.
 
 - fluentd alerts for sc [#812](https://github.com/elastisys/compliantkubernetes-apps/pull/812)
 - fluentd grafana dashboard [#812](https://github.com/elastisys/compliantkubernetes-apps/pull/812)

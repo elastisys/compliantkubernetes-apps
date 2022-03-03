@@ -102,7 +102,7 @@ extraConfigMaps:
           time_format %Y-%m-%dT%H:%M:%S.%NZ
         </pattern>
         <pattern>
-          format /^(?<time>.+) (?<stream>stdout|stderr) [^ ]* (?<log>.*)$/
+          format /^(?<time>.+) (?<stream>stdout|stderr) (?<logtag>[^ ]*) (?<log>.*)$/
           time_format %Y-%m-%dT%H:%M:%S.%N%:z
         </pattern>
       </parse>
@@ -122,7 +122,6 @@ extraConfigMaps:
       </parse>
     </source>
 
-
     # Detect exceptions in the log output and forward them as one log entry.
     <match raw.kubernetes.**>
       @id raw.kubernetes
@@ -135,6 +134,7 @@ extraConfigMaps:
       max_lines 1000
     </match>
 
+    {{- if eq .Values.global.containerRuntime "docker" }}
     # Concatenate multi-line logs
     <filter **>
       @id filter_concat
@@ -143,6 +143,27 @@ extraConfigMaps:
       multiline_end_regexp /\n$/
       separator ""
     </filter>
+    {{- else if eq .Values.global.containerRuntime "containerd" }}
+    # Concatenate multi-line logs
+    <filter **>
+      @id filter_concat
+      @type concat
+      key message
+      use_first_timestamp true
+      partial_key logtag
+      partial_value P
+      separator ""
+      # TODO: When we have updated this plugin to v2.5.0 change to this instead
+      # @id filter_concat
+      # @type concat
+      # key message
+      # use_partial_cri_logtag true
+      # partial_cri_logtag_key logtag
+      # partial_cri_stream_key stream
+    </filter>
+    {{- else }}
+      {{ fail "Misconfigured `global.containerRuntime`. Supported container runtimes are 'containerd' and 'docker'" }}
+    {{- end }}
 
     # Enriches records with Kubernetes metadata
     <filter kubernetes.**>
