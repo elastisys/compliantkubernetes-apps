@@ -1,0 +1,20 @@
+- name: metrics-from-cluster-is-missing
+  rules:
+  - alert: MetricsFromWcClusterIsMissing
+    annotations:
+      description: Metrics from the worker cluster is missing
+      summary: Metrics from the worker cluster is not being received.
+    expr: |
+      absent(prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus",tenant_id!~".*-sc"}) > 0 or prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus",tenant_id!~".*-sc"} == 0
+    for: 5m
+    labels:
+      severity: critical
+  - alert: MetricsFromScClusterIsMissing
+    annotations:
+      description: Metrics from the service cluster is missing
+      summary: Metrics from the service cluster is not being received.
+    expr: |
+      absent(prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus",tenant_id!~".*-wc"}) > 0 or prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus",tenant_id!~".*-wc"} == 0
+    for: 5m
+    labels:
+      severity: critical

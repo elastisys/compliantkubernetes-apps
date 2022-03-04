@@ -1,0 +1,21 @@
+
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.missingMetrics }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app: {{ template "prometheus-alerts.name" . }}
+{{ include "prometheus-alerts.labels" . | indent 4 }}
+{{- if .Values.defaultRules.alertLabels }}
+{{ toYaml .Values.defaultRules.alertLabels | indent 4 }}
+{{- end }}
+{{- if .Values.defaultRules.annotations }}
+  annotations:
+{{ toYaml .Values.defaultRules.annotations | indent 4 }}
+{{- end }}
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "missing-metrics" | trunc 63 | trimSuffix "-" }}
+  namespace: "monitoring"
+spec:
+  groups:
+    {{- .Files.Get "files/missing-metrics-alerts.yaml" | nindent 4}}
+{{- end }}
