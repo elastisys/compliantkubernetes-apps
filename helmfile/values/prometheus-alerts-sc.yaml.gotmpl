@@ -9,16 +9,12 @@ defaultRules:
     {{- if and .Values.thanos.enabled .Values.thanos.metrics.enabled }}
     thanosMonitor: {{ .Values.thanos.metrics.enabled }}
     {{- end }}
-    {{- if not .Values.prometheus.predictLinearLimit }}
-    predictLinear: false
-    {{- end }}
-    thanosMonitor: {{ .Values.thanos.metrics.enabled }}
-
+    predictLinear: {{ .Values.prometheus.predictLinear.enabled }}
     backupStatus: true
     dailyChecks: true
     bucketdailyChecks: true
 
-predictLinearLimit: {{ .Values.prometheus.predictLinearLimit }}
+predictLinearLimit: {{ .Values.prometheus.predictLinear.limit }}
 
 s3BucketPercentLimit: {{ .Values.prometheus.s3BucketPercentLimit }}
 s3BucketSizeQuotaGB: {{ .Values.prometheus.s3BucketSizeQuotaGB }}

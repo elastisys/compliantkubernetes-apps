@@ -47,7 +47,7 @@ spec:
       for: 5m
       labels:
         severity: warning
-    - alert: CPU{{.Values.predictLinearLimit}}PercentOnAverige
+    - alert: CPU{{.Values.predictLinearLimit}}PercentOnAverage
       annotations:
         message: CPU usage has been over {{.Values.predictLinearLimit}} percent on average over the span of 24h in a Instance {{`{{ $labels.instance }}`}} of a Cluster {{`{{ $labels.cluster }}`}}.
       expr: 1 - (avg by (instance, cluster) (rate(node_cpu_seconds_total{job="node-exporter",mode="idle"}[24h]))) >= {{ .Values.predictLinearLimit }}/100
