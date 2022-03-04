@@ -71,6 +71,7 @@
 - fluentd grafana dashboard [#812](https://github.com/elastisys/compliantkubernetes-apps/pull/812)
 - `kured` - Kubernetes Reboot Daemon. Added helm chart version `2.11.2` which defaults to `v1.9.1` of the application.
 - Added dummy thanos-ruler instance to make prometheus-operator collect rules to be evaluated by thanos
+- Added alerts when no metrics are received from sc and wc cluster.
 
 ### Removed
 - Removed disabled helm releases from the application helmfile
