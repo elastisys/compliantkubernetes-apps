@@ -15,8 +15,6 @@ defaultRules:
     alertmanager: {{ .Values.user.alertmanager.enabled }}
     # These are already created for monitoring SC, no need to double them for WC
     rookMonitor: {{ .Values.monitoring.rook.enabled }}
-    {{- if not .Values.prometheus.predictLinearLimit }}
-    predictLinear: false
-    {{- end }}
+    predictLinear: {{ .Values.prometheus.predictLinear.enabled }}
 
-predictLinearLimit: {{ .Values.prometheus.predictLinearLimit }}
+predictLinearLimit: {{ .Values.prometheus.predictLinear.limit }}

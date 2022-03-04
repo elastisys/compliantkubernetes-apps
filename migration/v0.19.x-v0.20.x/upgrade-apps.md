@@ -10,6 +10,8 @@
 
 1. Run the migration script: `move-usergroups-user-grafana.sh`
 
+1. Run the migration script: `move-predict-linear.sh`
+
 1. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.

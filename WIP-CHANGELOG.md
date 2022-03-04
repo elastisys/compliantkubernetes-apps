@@ -48,6 +48,7 @@
 - Added Prometheus alerts for the 'backup status' and 'daily checks' dashboards. Also, 's3BucketPercentLimit' and 's3BucketSizeQuotaGB' parameters to set what limits the s3 rule including will alert off.
 - RBAC for admin user so that they now can list pods cluster wide and run the `kubectl top`.
 - Added containerd support for fluentd.
+- added the option to disable predict linear alerts
 - fluentd alerts for sc [#812](https://github.com/elastisys/compliantkubernetes-apps/pull/812)
 - fluentd grafana dashboard [#812](https://github.com/elastisys/compliantkubernetes-apps/pull/812)
 - `kured` - Kubernetes Reboot Daemon. Added helm chart version `2.11.2` which defaults to `v1.9.1` of the application.
