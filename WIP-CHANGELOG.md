@@ -6,6 +6,9 @@
     - The entire changelog can be found [here](https://github.com/kubernetes/ingress-nginx/blob/main/Changelog.md).
 - Added a new config `global.containerRuntime` (default set to `containerd`).
   - Supported runtimes are `containerd` and `docker`
+- The option to enable and configure [kured](https://github.com/weaveworks/kured) to keep nodes up to date with security patches.
+  Kured is disabled by default.
+
 
 ### Updated
  - Upgraded nginx-ingress helm chart to `v4.0.17`, which upgrade nginx-ingress to `v1.1.1`.
@@ -45,9 +48,9 @@
 - Added Prometheus alerts for the 'backup status' and 'daily checks' dashboards. Also, 's3BucketPercentLimit' and 's3BucketSizeQuotaGB' parameters to set what limits the s3 rule including will alert off.
 - RBAC for admin user so that they now can list pods cluster wide and run the `kubectl top`.
 - Added containerd support for fluentd.
-
 - fluentd alerts for sc [#812](https://github.com/elastisys/compliantkubernetes-apps/pull/812)
 - fluentd grafana dashboard [#812](https://github.com/elastisys/compliantkubernetes-apps/pull/812)
+- `kured` - Kubernetes Reboot Daemon. Added helm chart version `2.11.2` which defaults to `v1.9.1` of the application.
 
 ### Removed
 - Removed disabled helm releases from the application helmfile

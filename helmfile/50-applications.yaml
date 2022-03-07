@@ -25,6 +25,19 @@ environments:
 
 # The desired state of Helm releases.
 releases:
+# Kured
+- name: kured
+  namespace: kured
+  labels:
+    app: kured
+  chart: ./upstream/kured
+  version: 2.11.2
+  missingFileHandler: Error
+  installed: {{ .Values.kured.enabled }}
+  values:
+  - values/kured.yaml.gotmpl
+
+
 # Cert-manager issuers
 - name: issuers
   namespace: cert-manager

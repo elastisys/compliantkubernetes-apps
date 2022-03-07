@@ -20,5 +20,8 @@ namespaces:
 {{ if .Values.user.alertmanager.enabled }}
 - name: alertmanager
 {{ end }}
+{{ if .Values.kured.enabled }}
+- name: kured
+{{ end }}
 commonLabels:
   owner: operator

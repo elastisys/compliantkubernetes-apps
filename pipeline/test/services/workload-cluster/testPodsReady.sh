@@ -11,6 +11,7 @@ enable_user_alertmanager=$(yq r -e "${CONFIG_FILE}" 'user.alertmanager.enabled')
 enable_velero=$(yq r -e "${CONFIG_FILE}" 'velero.enabled')
 enable_local_pv_provisioner=$(yq r -e "${CONFIG_FILE}" 'storageClasses.local.enabled')
 enable_nfs_provisioner=$(yq r -e "${CONFIG_FILE}" 'storageClasses.nfs.enabled')
+enable_kured=$(yq r -e "${CONFIG_FILE}" 'kured.enabled')
 
 echo
 echo
@@ -72,6 +73,9 @@ if "${enable_velero}"; then
 fi
 if "${enable_local_pv_provisioner}"; then
   daemonsets+=("kube-system local-volume-provisioner")
+fi
+if "${enable_kured}"; then
+  daemonsets+=("kured kured")
 fi
 
 resourceKind="DaemonSet"
