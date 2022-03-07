@@ -18,14 +18,7 @@ kubeApiServer:
         sourceLabels: [__name__]
         regex: '(process_cpu_seconds_total|process_resident_memory_bytes|go_goroutines|workqueue_queue_duration_seconds_bucket|workqueue_adds_total|workqueue_depth|apiserver_request_total|apiserver_request_count|apiserver_request_latencies_bucket|apiserver_client_certificate_expiration_seconds_count|apiserver_request_duration_seconds_sum|apiserver_request_duration_seconds_count|APIServiceRegistrationController_depth)'
 
-  relabelings:
-  - targetLabel: cluster
-    replacement: service_cluster
-
 kubeEtcd:
-  relabelings:
-  - targetLabel: cluster
-    replacement: service_cluster
   service:
     port: 4001
     targetPort: 4001
@@ -129,11 +122,6 @@ alertmanager:
           source: {{ .Values.user.grafana.subdomain }}.{{ .Values.global.opsDomain }}
           priority: {{`'{{ if eq .GroupLabels.severity "critical"}}P1{{else if eq .GroupLabels.severity "warning"}}P2{{else if eq .GroupLabels.severity "medium"}}P3{{else if eq .GroupLabels.severity "low"}}P4{{else}}P5{{end}}'`}}
       {{ end }}
-
-  serviceMonitor:
-    relabelings:
-    - targetLabel: cluster
-      replacement: service_cluster
 
   alertmanagerSpec:
     ## Time duration Alertmanager shall retain data for. Default is '120h', and must match the regular expression
@@ -275,10 +263,6 @@ grafana:
     users:
       viewers_can_edit: {{ .Values.prometheus.grafana.viewersCanEdit }}
 
-  serviceMonitor:
-    relabelings:
-    - targetLabel: cluster
-      replacement: service_cluster
   resources: {{- toYaml .Values.prometheus.grafana.resources | nindent 4  }}
   tolerations: {{- toYaml .Values.prometheus.grafana.tolerations | nindent 4  }}
   affinity: {{- toYaml .Values.prometheus.grafana.affinity | nindent 4  }}
@@ -287,10 +271,6 @@ grafana:
 prometheusOperator:
   createCustomResource: false
   resources: {{- toYaml .Values.prometheusOperator.resources | nindent 4  }}
-  serviceMonitor:
-    relabelings:
-    - targetLabel: cluster
-      replacement: service_cluster
 
 prometheus:
   prometheusSpec:
@@ -299,12 +279,12 @@ prometheus:
     affinity: {{- toYaml .Values.prometheus.affinity | nindent 8 }}
     tolerations: {{- toYaml .Values.prometheus.tolerations | nindent 8 }}
 
+    externalLabels:
+      cluster: {{ .Values.global.clusterName }}
+
     {{- if and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
     remoteWrite:
     - url: http://thanos-receiver-receive.thanos.svc.cluster.local:19291/api/v1/receive
-      writeRelabelConfigs:
-      - targetLabel: cluster
-        replacement: {{ .Values.global.clusterName }}
       headers:
         THANOS-TENANT: {{ .Values.global.clusterName }}
     {{- end }}
@@ -348,11 +328,6 @@ prometheus:
               storage: {{ .Values.prometheus.storage.size }}
     {{- end }}
 
-  serviceMonitor:
-    relabelings:
-    - targetLabel: cluster
-      replacement: service_cluster
-
 kubelet:
   enabled: true
   namespace: kube-system
@@ -361,38 +336,10 @@ kubelet:
     cAdvisorRelabelings:
     - sourceLabels: [__metrics_path__]
       targetLabel: metrics_path
-    - targetLabel: cluster
-      replacement: service_cluster
 
     relabelings:
     - sourceLabels: [__metrics_path__]
       targetLabel: metrics_path
-    - targetLabel: cluster
-      replacement: service_cluster
-
-nodeExporter:
-  serviceMonitor:
-    relabelings:
-    - targetLabel: cluster
-      replacement: service_cluster
 
 prometheus-node-exporter:
   resources: {{- toYaml .Values.prometheusNodeExporter.resources | nindent 4 }}
-
-kubeStateMetrics:
-  serviceMonitor:
-    relabelings:
-    - targetLabel: cluster
-      replacement: service_cluster
-
-coreDns:
-  serviceMonitor:
-    relabelings:
-    - targetLabel: cluster
-      replacement: service_cluster
-
-kubeProxy:
-  serviceMonitor:
-    relabelings:
-    - targetLabel: cluster
-      replacement: service_cluster
