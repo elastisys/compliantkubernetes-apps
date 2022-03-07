@@ -190,6 +190,14 @@ extraConfigMaps:
       </parse>
     </filter>
 
+    <filter kubernetes.var.log.containers.gatekeeper-controller-manager-**>
+      @type grep
+      <exclude>
+        key $.source
+        pattern {}
+      </exclude>
+    </filter>
+
     <filter **>
       @type record_transformer
       <record>
