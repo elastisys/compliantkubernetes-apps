@@ -21,6 +21,7 @@ enable_thanos_query=$(yq r -e "${CONFIG_FILE}" 'thanos.query.enabled')
 enable_thanos_receiver=$(yq r -e "${CONFIG_FILE}" 'thanos.receiver.enabled')
 enable_thanos_ruler=$(yq r -e "${CONFIG_FILE}" 'thanos.ruler.enabled')
 enable_influxdb=$(yq r -e "${CONFIG_FILE}" 'influxDB.enabled')
+enable_kured=$(yq r -e "${CONFIG_FILE}" 'kured.enabled')
 
 echo
 echo
@@ -106,6 +107,9 @@ if "${enable_fluentd}"; then
 fi
 if "$enable_velero"; then
     daemonsets+=("velero restic")
+fi
+if "${enable_kured}"; then
+  daemonsets+=("kured kured")
 fi
 
 resourceKind="DaemonSet"

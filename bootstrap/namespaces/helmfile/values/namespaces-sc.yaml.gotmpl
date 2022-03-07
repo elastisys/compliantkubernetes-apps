@@ -16,5 +16,8 @@ namespaces:
 {{ if .Values.thanos.enabled }}
 - name: thanos
 {{ end }}
+{{ if .Values.kured.enabled }}
+- name: kured
+{{ end }}
 commonLabels:
   owner: operator

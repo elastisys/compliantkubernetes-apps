@@ -1,0 +1,18 @@
+podSecurityPolicy:
+  create: true
+
+metrics:
+  create: {{ .Values.kured.metrics.enabled }}
+  interval: {{ .Values.kured.metrics.interval }}
+  labels: {{- toYaml .Values.kured.metrics.labels | nindent 4 }}
+
+resources:    {{- toYaml .Values.kured.resources | nindent 2 }}
+nodeSelector: {{- toYaml .Values.kured.nodeSelector | nindent 2 }}
+affinity:     {{- toYaml .Values.kured.affinity | nindent 2 }}
+tolerations:  {{- toYaml .Values.kured.tolerations | nindent 2 }}
+
+configuration: {{- toYaml .Values.kured.configuration | nindent 2 }}
+
+extraArgs: {{- toYaml .Values.kured.extraArgs | nindent 2 }}
+
+dsAnnotations: {{- toYaml .Values.kured.dsAnnotations | nindent 2 }}
