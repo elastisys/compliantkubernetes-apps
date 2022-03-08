@@ -132,34 +132,13 @@ set_storage_class() {
     case ${CK8S_CLOUD_PROVIDER} in
         safespring | citycloud)
             storage_class=cinder-csi
-            replace_set_me "${file}" "storageClasses.nfs.enabled" false
-            replace_set_me "${file}" "storageClasses.cinder.enabled" false
-            replace_set_me "${file}" "storageClasses.local.enabled" false
-            replace_set_me "${file}" "storageClasses.ebs.enabled" false
             ;;
 
-        exoscale)
+        exoscale|baremetal)
             storage_class=rook-ceph-block
-            replace_set_me "${file}" "storageClasses.nfs.enabled" false
-            replace_set_me "${file}" "storageClasses.cinder.enabled" false
-            replace_set_me "${file}" "storageClasses.local.enabled" false
-            replace_set_me "${file}" "storageClasses.ebs.enabled" false
             ;;
-
         aws)
             storage_class=ebs-gp2
-            replace_set_me "${file}" "storageClasses.nfs.enabled" false
-            replace_set_me "${file}" "storageClasses.cinder.enabled" false
-            replace_set_me "${file}" "storageClasses.local.enabled" false
-            replace_set_me "${file}" "storageClasses.ebs.enabled" true
-            ;;
-
-        baremetal)
-            storage_class=node-local
-            replace_set_me "${file}" "storageClasses.nfs.enabled" false
-            replace_set_me "${file}" "storageClasses.cinder.enabled" false
-            replace_set_me "${file}" "storageClasses.local.enabled" true
-            replace_set_me "${file}" "storageClasses.ebs.enabled" false
             ;;
     esac
 
@@ -374,7 +353,7 @@ update_config() {
         preamble="# Changes made here will override the default values as well as the common config for this cluster."
     fi
     preamble="${preamble}
-# See the default configuration under \"defaults/\" to see available and suggested options."
+    # See the default configuration under \"defaults/\" to see available and suggested options."
     echo "${preamble}" | cat - "${new_config}" > "${override_config}"
 }
 

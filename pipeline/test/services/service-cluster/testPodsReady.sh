@@ -12,8 +12,6 @@ enable_opensearch_snapshot=$(yq r -e "${CONFIG_FILE}" 'opensearch.snapshot.enabl
 enable_influxdb_backup=$(yq r -e "${CONFIG_FILE}" 'influxDB.backup.enabled')
 enable_influxdb_backup_retention=$(yq r -e "${CONFIG_FILE}" 'influxDB.backupRetention.enabled')
 enable_velero=$(yq r -e "${CONFIG_FILE}" 'velero.enabled')
-enable_local_pv_provisioner=$(yq r -e "${CONFIG_FILE}" 'storageClasses.local.enabled')
-enable_nfs_provisioner=$(yq r -e "${CONFIG_FILE}" 'storageClasses.nfs.enabled')
 enable_os_data_sts=$(yq r -e "${CONFIG_FILE}" 'opensearch.dataNode.dedicatedPods')
 enable_os_client_sts=$(yq r -e "${CONFIG_FILE}" 'opensearch.clientNode.dedicatedPods')
 enable_thanos=$(yq r -e "${CONFIG_FILE}" 'thanos.enabled')
@@ -44,9 +42,6 @@ deployments=(
     "opensearch-system prometheus-elasticsearch-exporter"
     "opensearch-system opensearch-dashboards"
 )
-if "${enable_nfs_provisioner}"; then
-    deployments+=("kube-system nfs-subdir-external-provisioner")
-fi
 if "${enable_harbor}"; then
     deployments+=(
         "harbor harbor-harbor-chartmuseum"
@@ -99,9 +94,6 @@ daemonsets=(
     "ingress-nginx ingress-nginx-controller"
     "monitoring kube-prometheus-stack-prometheus-node-exporter"
 )
-if "${enable_local_pv_provisioner}"; then
-  daemonsets+=("kube-system local-volume-provisioner")
-fi
 if "${enable_fluentd}"; then
     daemonsets+=("fluentd fluentd")
 fi

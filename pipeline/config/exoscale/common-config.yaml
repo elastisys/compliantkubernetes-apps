@@ -15,8 +15,6 @@ ingressNginx:
     service:
       type: not-used
       annotations: not-used
-nfsProvisioner:
-  server: not-used
 velero:
   enabled: true
 issuers:

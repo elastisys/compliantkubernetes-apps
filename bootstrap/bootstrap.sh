@@ -8,5 +8,4 @@ here="$(dirname "$(readlink -f "$0")")"
 
 environment="${1}"
 
-"${here}/storageclass/bootstrap.sh" "${environment}"
 "${here}/namespaces/bootstrap.sh" "${environment}"

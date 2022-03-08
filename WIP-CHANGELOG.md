@@ -8,6 +8,9 @@
   - Supported runtimes are `containerd` and `docker`
 - The option to enable and configure [kured](https://github.com/weaveworks/kured) to keep nodes up to date with security patches.
   Kured is disabled by default.
+- Storageclass installation is not longer part of the bootstrap step.
+  If you have the nfs-provisioner or the local-pv-provisioner installed, they will be left untouched when upgrading.
+  You are responsible for managing them and/or removing them, and any unsused storageClasses.
 
 
 ### Updated
@@ -57,3 +60,5 @@
 ### Removed
 - Removed disabled helm releases from the application helmfile
 - The no longer needed rolebinding and clusterrole `metrics` has been removed.
+- Storageclass installation from bootstrap step.
+- Removed helm charts for nfs-provisioner and local-pv-provisioner.
