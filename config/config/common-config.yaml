@@ -56,25 +56,8 @@ global:
 ## Configuration of storageclasses.
 storageClasses:
   # Name of the default storageclass.
-  # Normally one of 'nfs-client', 'cinder-csi', 'local-storage', 'ebs-gp2', "rook-ceph-block".
+  # Normally one of 'cinder-csi' or "rook-ceph-block".
   default: set-me
-
-  ## Enable deployment of nfsClientProvisioner
-  ## Note, 'nfs-client' is installed as a deafult storageclass only if 'storageClasses.default: nfs-client'.
-  nfs:
-    enabled: set-me
-
-  ## Enableds installation of 'cinder-storage' storageclass.
-  cinder:
-    enabled: set-me
-
-  ## Enables deployment of local-volume-provisioner and installation of 'local-storage' storageclass.
-  local:
-    enabled: set-me
-
-  ## Enables installation of 'ebs-gp2' storageclass.
-  ebs:
-    enabled: set-me
 
 ## Object storage configuration for backups.
 objectStorage:

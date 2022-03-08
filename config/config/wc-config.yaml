@@ -5,22 +5,6 @@ global:
   ## Used in logs and metrics as to separate these from other clusters.
   clusterName: ${CK8S_ENVIRONMENT_NAME}-wc
 
-## Nfs-client-provisioner configuration.
-## Deployment is controlled via 'storageClasses.nfs.enabled'.
-nfsProvisioner:
-  server: ""
-  path: /nfs
-  resources:
-    limits:
-      cpu: 100m
-      memory: 128Mi
-    requests:
-      cpu: 100m
-      memory: 128Mi
-  tolerations: []
-  nodeSelector: {}
-  affinity: {}
-
 ## User configuration.
 user:
   ## This only controls if the namespaces should be created, user RBAC is always created.

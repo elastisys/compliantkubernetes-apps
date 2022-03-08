@@ -42,6 +42,3 @@ helmfile -e workload_cluster -f "${here}/../helmfile/" -l "$(IFS=',' ; echo "${c
 
 helmfile -e service_cluster -f "${here}/../bootstrap/namespaces/helmfile/" -l "$(IFS=',' ; echo "${charts_ignore_list[*]}")" lint
 helmfile -e workload_cluster -f "${here}/../bootstrap/namespaces/helmfile/" -l "$(IFS=',' ; echo "${charts_ignore_list[*]}")" lint
-
-helmfile -e service_cluster -f "${here}/../bootstrap/storageclass/helmfile/" -l "$(IFS=',' ; echo "${charts_ignore_list[*]}")" lint
-helmfile -e workload_cluster -f "${here}/../bootstrap/storageclass/helmfile/" -l "$(IFS=',' ; echo "${charts_ignore_list[*]}")" lint

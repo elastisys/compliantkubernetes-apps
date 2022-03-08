@@ -816,20 +816,6 @@ externalTrafficPolicy:
     opsGrafana: false
     prometheusWc: false
 
-nfsProvisioner:
-  server: ""
-  path: /nfs
-  resources:
-    limits:
-      cpu: 100m
-      memory: 128Mi
-    requests:
-      cpu: 100m
-      memory: 128Mi
-  tolerations: []
-  affinity: {}
-  nodeSelector: {}
-
 s3Exporter:
   # Also requries objectStorage.type=s3
   enabled: true
