@@ -142,10 +142,10 @@ prometheusNodeExporter:
 kubeStateMetrics:
   resources:
     requests:
-      cpu: 5m
+      cpu: 15m
       memory: 50Mi
     limits:
-      cpu: 10m
+      cpu: 30m
       memory: 100Mi
 
 prometheus:

@@ -41,6 +41,7 @@
  - Moved `user.grafana.userGroups` to `user.grafana.oidc.userGroups` in `sc-config.yaml`
  - kubeconfig.bash have been edited to work with the new 'secret' structure.
  - memory limit for thanos receiveDistributor and pvc size for thanos receiver
+ - Increased cpu requests and limits for kube-state-metrics
 
 ### Fixed
 
