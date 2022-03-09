@@ -126,15 +126,6 @@ prometheus:
     {{- end }}
 
     additionalScrapeConfigs:
-    {{ if .Values.storageClasses.nfs.enabled }}
-    - job_name: 'node-exporter'
-      scrape_interval: 30s
-      metrics_path: /metrics
-      scheme: http
-      static_configs:
-      - targets:
-        - '{{ .Values.nfsProvisioner.server }}:9100'
-    {{ end }}
 
     {{ if .Values.user.alertmanager.enabled }}
     - job_name: 'alertmanager/alertmanager-operated'

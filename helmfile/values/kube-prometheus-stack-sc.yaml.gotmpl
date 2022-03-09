@@ -357,17 +357,6 @@ prometheus:
               storage: {{ .Values.prometheus.storage.size }}
     {{- end }}
 
-    {{ if .Values.storageClasses.nfs.enabled  }}
-    additionalScrapeConfigs:
-    - job_name: 'node-exporter'
-      scrape_interval: 30s
-      metrics_path: /metrics
-      scheme: http
-      static_configs:
-      - targets:
-        - '{{ .Values.nfsProvisioner.server }}:9100'
-    {{ end }}
-
   serviceMonitor:
     relabelings:
     - targetLabel: cluster
