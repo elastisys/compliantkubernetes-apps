@@ -175,3 +175,6 @@ fluentd:
     tolerations: []
     affinity: {}
     nodeSelector: {}
+velero:
+  includedNamespaces:
+    - alertmanager
