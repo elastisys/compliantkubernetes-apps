@@ -4,13 +4,13 @@
 
 ## Steps
 
-1. Run the migration script: `move_log_retention_days.sh`
+1. Run the migration script: `migration/v0.19.x-v0.20.x/move_log_retention_days.sh`
 
-1. Run the migration script: `move-alertmanager-groupby.sh`
+1. Run the migration script: `migration/v0.19.x-v0.20.x/move-alertmanager-groupby.sh`
 
-1. Run the migration script: `move-usergroups-user-grafana.sh`
+1. Run the migration script: `migration/v0.19.x-v0.20.x/move-usergroups-user-grafana.sh`
 
-1. Run the migration script: `move-predict-linear.sh`
+1. Run the migration script: `migration/v0.19.x-v0.20.x/move-predict-linear.sh`
 
 1. Update apps configuration:
 
@@ -25,7 +25,7 @@
 
 1. If your cluster are using docker as container runtime, set `global.containerRuntime` in `common-config.yaml` to `docker`
 
-    > To see which container runtime your nodes are running you can run `kubectl get container -owide` and check the `CONTAINER-RUNTIME` column.
+    > To see which container runtime your nodes are running you can run `kubectl get nodes -owide` and check the `CONTAINER-RUNTIME` column.
 
 1. Remove conflicting starboard secret:
 
