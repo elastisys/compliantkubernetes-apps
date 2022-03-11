@@ -42,9 +42,14 @@
    ```bash
    bin/ck8s ops kubectl {sc|wc} apply -f helmfile/upstream/starboard-operator/crds
    ```
+1. Update the thanos receiver pvc size: `migration/v0.19.x-v0.20.x/upgrade-thanos-receiver-pvc.sh`
+   > **_NOTE:_** You will need to manually delete `thanos.receiver.persistence` lines from sc-config.yaml.
+   `vim $CK8S_CONFIG_PATH/sc-config.yaml`
 
 1. Upgrade applications:
 
     ```bash
     bin/ck8s apply {sc|wc}
     ```
+
+1. Check if thanos receiver sts was recreated: `bin/ck8s ops kubectl sc get sts thanos-receiver-receive -n thanos`, if not run a sync `bin/ck8s ops helmfile sc -l app=thanos sync`
