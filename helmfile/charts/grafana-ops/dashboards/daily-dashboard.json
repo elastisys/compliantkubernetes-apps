@@ -8,18 +8,30 @@
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
         "type": "dashboard"
       }
     ]
   },
   "editable": true,
+  "fiscalYearStartMonth": 0,
   "gnetId": null,
   "graphTooltip": 0,
   "links": [],
+  "liveNow": false,
   "panels": [
     {
       "collapsed": false,
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -36,7 +48,6 @@
       "description": "The age of the oldest snapshot currently available. This can help you determine if the retention policy is working. Is the age always increasing or does it regularly decrease when the oldest snapshot is removed?",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "decimals": 0,
           "mappings": [],
           "min": 0,
@@ -71,9 +82,11 @@
           ],
           "fields": "",
           "values": false
-        }
+        },
+        "text": {},
+        "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "8.2.7",
       "targets": [
         {
           "expr": "time() - elasticsearch_snapshot_stats_oldest_snapshot_timestamp",
@@ -92,7 +105,6 @@
       "description": "Shows the number of snapshots stored. This is for keeping track of retention. If the count just keeps increasing, something is wrong with the SLM retention.",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
           "min": 0,
           "thresholds": {
@@ -126,9 +138,11 @@
           ],
           "fields": "",
           "values": false
-        }
+        },
+        "text": {},
+        "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "8.2.7",
       "targets": [
         {
           "expr": "elasticsearch_snapshot_stats_number_of_snapshots",
@@ -145,6 +159,10 @@
     {
       "collapsed": false,
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -161,7 +179,6 @@
       "description": "This shows the time since an object was last modified for each bucket. If the backups are working objects should be added at least every 24 hours.",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
           "mappings": [],
           "min": 0,
           "thresholds": {
@@ -196,9 +213,11 @@
           ],
           "fields": "",
           "values": false
-        }
+        },
+        "text": {},
+        "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "8.2.7",
       "targets": [
         {
           "expr": "max by (bucket) (time() - max_over_time(s3_last_modified_object_date[1h]))",
@@ -221,18 +240,7 @@
       "description": "Show the total size of the *selected* buckets. This is for keeping track of the usage and avoid hitting quota limits.",
       "fieldConfig": {
         "defaults": {
-          "custom": {},
-          "mappings": [],
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
+          "links": [],
           "unit": "decbytes"
         },
         "overrides": []
@@ -261,10 +269,10 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "8.2.7",
       "pointradius": 2,
       "points": true,
       "renderer": "flot",
@@ -332,7 +340,7 @@
       "description": "Shows the size of all buckets used by Compliant Kubernetes. Note that this does *not* show *all* buckets, only those configured for the environment.",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "links": []
         },
         "overrides": []
       },
@@ -360,9 +368,10 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
+      "pluginVersion": "8.2.7",
       "pointradius": 2,
       "points": true,
       "renderer": "flot",
@@ -424,6 +433,10 @@
     {
       "collapsed": false,
       "datasource": null,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -436,84 +449,20 @@
       "type": "row"
     },
     {
-      "datasource": "prometheus-sc",
-      "description": "The size of the individual databases (service_cluster and workload_cluster). Note that you should not rely on this to calculate the total size of the volume. This is just for checking the size of these specific databases.",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {},
-          "mappings": [],
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "blue",
-                "value": null
-              }
-            ]
-          },
-          "unit": "deckbytes"
-        },
-        "overrides": []
-      },
+      "datasource": null,
+      "description": "",
       "gridPos": {
-        "h": 9,
+        "h": 8,
         "w": 12,
         "x": 0,
         "y": 27
       },
-      "id": 2,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "last"
-          ],
-          "fields": "",
-          "values": false
-        }
-      },
-      "pluginVersion": "7.0.3",
-      "targets": [
-        {
-          "expr": "influxdb_service_cluster_size",
-          "interval": "",
-          "legendFormat": "Service cluster",
-          "refId": "A"
-        },
-        {
-          "expr": "influxdb_workload_cluster_size",
-          "interval": "",
-          "legendFormat": "Workload cluster",
-          "refId": "B"
-        }
-      ],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "InfluxDB database size",
-      "type": "stat"
-    },
-    {
-      "content": "In addition to these panels, you should also check the Persistent Volumes and Backups dashboards.\n\n\n\n\n",
-      "datasource": null,
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 27
-      },
       "id": 21,
-      "mode": "markdown",
+      "options": {
+        "content": "In addition to these panels, you should also check the Persistent Volumes and Backups dashboards.\n\n\n\n\n",
+        "mode": "markdown"
+      },
+      "pluginVersion": "8.2.7",
       "timeFrom": null,
       "timeShift": null,
       "title": "Additional checks",
@@ -521,7 +470,7 @@
     }
   ],
   "refresh": "5m",
-  "schemaVersion": 25,
+  "schemaVersion": 32,
   "style": "dark",
   "tags": [
     "daily"
@@ -548,5 +497,6 @@
   },
   "timezone": "",
   "title": "Daily-checks",
-  "version": 3
+  "uid": "auCci6Lnk",
+  "version": 1
 }
