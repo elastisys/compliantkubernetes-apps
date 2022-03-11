@@ -8,15 +8,23 @@
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
         "type": "dashboard"
       }
     ]
   },
   "editable": true,
+  "fiscalYearStartMonth": 0,
   "gnetId": null,
   "graphTooltip": 0,
-  "iteration": 1627998047938,
+  "iteration": 1647000984348,
   "links": [],
+  "liveNow": false,
   "panels": [
     {
       "collapsed": false,
@@ -80,7 +88,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.0.0",
+      "pluginVersion": "8.2.7",
       "targets": [
         {
           "exemplar": true,
@@ -143,7 +151,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.0.0",
+      "pluginVersion": "8.2.7",
       "targets": [
         {
           "expr": "sum(kube_pod_status_phase{phase=\"Pending\", cluster=~\"$cluster\", namespace=~\"$namespace\"} == 1)",
@@ -205,7 +213,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.0.0",
+      "pluginVersion": "8.2.7",
       "targets": [
         {
           "expr": "sum(kube_pod_status_phase{phase=\"Failed\", cluster=~\"$cluster\", namespace=~\"$namespace\"} == 1)",
@@ -267,7 +275,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.0.0",
+      "pluginVersion": "8.2.7",
       "targets": [
         {
           "exemplar": true,
@@ -330,7 +338,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.0.0",
+      "pluginVersion": "8.2.7",
       "targets": [
         {
           "exemplar": true,
@@ -393,7 +401,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.0.0",
+      "pluginVersion": "8.2.7",
       "targets": [
         {
           "exemplar": true,
@@ -720,7 +728,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.0.0",
+      "pluginVersion": "8.2.7",
       "targets": [
         {
           "expr": "sum by (cluster) (kube_node_info{cluster=~\"$cluster\"})",
@@ -779,7 +787,7 @@
         "showThresholdMarkers": true,
         "text": {}
       },
-      "pluginVersion": "8.0.0",
+      "pluginVersion": "8.2.7",
       "targets": [
         {
           "expr": "sum(kube_node_status_condition{condition=\"Ready\", status=\"true\", cluster=~\"$cluster\"}) / sum(kube_node_info{cluster=~\"$cluster\"})",
@@ -866,7 +874,7 @@
         "showThresholdMarkers": true,
         "text": {}
       },
-      "pluginVersion": "8.0.0",
+      "pluginVersion": "8.2.7",
       "targets": [
         {
           "exemplar": true,
@@ -940,7 +948,7 @@
         "showThresholdMarkers": true,
         "text": {}
       },
-      "pluginVersion": "8.0.0",
+      "pluginVersion": "8.2.7",
       "targets": [
         {
           "exemplar": true,
@@ -1003,7 +1011,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.0.0",
+      "pluginVersion": "8.2.7",
       "targets": [
         {
           "exemplar": true,
@@ -1066,7 +1074,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.0.0",
+      "pluginVersion": "8.2.7",
       "targets": [
         {
           "exemplar": true,
@@ -1154,7 +1162,7 @@
           }
         ]
       },
-      "pluginVersion": "8.0.0",
+      "pluginVersion": "8.2.7",
       "targets": [
         {
           "exemplar": true,
@@ -1259,7 +1267,7 @@
           }
         ]
       },
-      "pluginVersion": "8.0.0",
+      "pluginVersion": "8.2.7",
       "targets": [
         {
           "exemplar": true,
@@ -1531,7 +1539,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "topk(10,sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{cluster=~\"$cluster\", namespace=~\"$namespace\"}) by (pod, cluster) /  sum(kube_pod_container_resource_requests{cluster=~\"$cluster\", namespace=~\"$namespace\", resource=\"cpu\"} and on (pod, namespace, cluster) kube_pod_status_phase{phase=\"Running\", cluster=~\"$cluster\", namespace=~\"$namespace\"} == 1 ) by (pod, cluster))",
+          "expr": "topk(10,sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{cluster=~\"$cluster\", namespace=~\"$namespace\"}) by (pod, cluster) /  sum(kube_pod_container_resource_requests{cluster=~\"$cluster\", namespace=~\"$namespace\", resource=\"cpu\"} and on (pod, namespace, cluster) kube_pod_status_phase{phase=\"Running\", cluster=~\"$cluster\", namespace=~\"$namespace\"} == 1 ) by (pod, cluster))",
           "interval": "",
           "legendFormat": "{{pod}} -  {{cluster}}",
           "refId": "A"
@@ -1697,7 +1705,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "bottomk(10,sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{cluster=~\"$cluster\", namespace=~\"$namespace\"}) by (pod, cluster) /  sum(kube_pod_container_resource_requests{cluster=~\"$cluster\", namespace=~\"$namespace\", resource=\"cpu\"} and on (pod, namespace, cluster) kube_pod_status_phase{phase=\"Running\", cluster=~\"$cluster\", namespace=~\"$namespace\"} == 1 ) by (pod, cluster))",
+          "expr": "bottomk(10,sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{cluster=~\"$cluster\", namespace=~\"$namespace\"}) by (pod, cluster) /  sum(kube_pod_container_resource_requests{cluster=~\"$cluster\", namespace=~\"$namespace\", resource=\"cpu\"} and on (pod, namespace, cluster) kube_pod_status_phase{phase=\"Running\", cluster=~\"$cluster\", namespace=~\"$namespace\"} == 1 ) by (pod, cluster))",
           "interval": "",
           "legendFormat": "{{pod}} -  {{cluster}}",
           "refId": "A"
@@ -1793,16 +1801,16 @@
     }
   ],
   "refresh": "30s",
-  "schemaVersion": 30,
+  "schemaVersion": 32,
   "style": "dark",
   "tags": [],
   "templating": {
     "list": [
       {
         "current": {
-          "selected": false,
-          "text": "Thanos All",
-          "value": "Thanos All"
+          "selected": true,
+          "text": "default",
+          "value": "default"
         },
         "description": null,
         "error": null,
@@ -1822,13 +1830,9 @@
       {
         "allValue": ".*",
         "current": {
-          "selected": true,
-          "text": [
-            "All"
-          ],
-          "value": [
-            "$__all"
-          ]
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
         },
         "datasource": "$datasource",
         "definition": "label_values(kube_node_info, cluster)",
@@ -1908,5 +1912,6 @@
   },
   "timezone": "utc",
   "title": "Kubernetes cluster status",
+  "uid": "iJiti6Lnk",
   "version": 1
 }
