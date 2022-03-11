@@ -22,7 +22,7 @@
   "fiscalYearStartMonth": 0,
   "gnetId": null,
   "graphTooltip": 0,
-  "iteration": 1643286437876,
+  "iteration": 1647000076457,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -134,70 +134,6 @@
         "h": 7,
         "w": 8,
         "x": 8,
-        "y": 1
-      },
-      "id": 5,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "last"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "text": {},
-        "textMode": "auto"
-      },
-      "pluginVersion": "8.2.7",
-      "targets": [
-        {
-          "expr": "min((time()-kube_job_status_completion_time{job_name=~\"influxdb-backup-[0-9]*\", cluster=~\"$cluster\"})/3600)",
-          "instant": false,
-          "interval": "",
-          "legendFormat": "{{job_name}}",
-          "refId": "A"
-        }
-      ],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Time since last successful InfluxDB backup",
-      "transformations": [],
-      "type": "stat"
-    },
-    {
-      "datasource": "$datasource",
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "#EAB839",
-                "value": 24
-              },
-              {
-                "color": "red",
-                "value": 48
-              }
-            ]
-          },
-          "unit": "h"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 8,
-        "x": 16,
         "y": 1
       },
       "id": 2,
@@ -519,7 +455,7 @@
       },
       "id": 16,
       "options": {
-        "content": "# Off-site backup replication is <<rclone-sync-state>>",
+        "content": "# Off-site backup replication is **disabled**",
         "mode": "markdown"
       },
       "pluginVersion": "8.2.7",
@@ -809,5 +745,6 @@
   },
   "timezone": "",
   "title": "Backup status",
-  "version": 21
+  "uid": "twztm6Y7k",
+  "version": 1
 }
