@@ -21,3 +21,7 @@ defaultRules:
     rookMonitor: {{ .Values.monitoring.rook.enabled }}
 
 predictLinearLimit: {{ .Values.prometheus.predictLinearLimit }}
+
+{{- if not .Values.prometheus.predictLinearLimit }}
+predictLinear: false
+{{- end }}
