@@ -104,6 +104,8 @@ opa:
     URL:
       - set-me
       - harbor.example.com
+      ## cert-manager-acmesolver resolves the ACME (LetsEncrypt) challenge for provisioning TLS certificates.
+      ## It runs in the same namespace as the Ingress, hence, this needs to be added as an exception.
       - quay.io/jetstack/cert-manager-acmesolver
 
   ## Enable rule that requires pods to be targeted
