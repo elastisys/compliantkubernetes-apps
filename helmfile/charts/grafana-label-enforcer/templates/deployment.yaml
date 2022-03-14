@@ -17,7 +17,7 @@ spec:
         runAsUser: 1000
       containers:
       - name: prom-label-enforcer
-        image: quay.io/prometheuscommunity/prom-label-proxy@sha256:574bc3be1e514767530d555097e2ff01a774b2c9a04b9327810619cb9cbee721
+        image: quay.io/prometheuscommunity/prom-label-proxy:master
         imagePullPolicy: IfNotPresent
         resources: {{- toYaml .Values.resources | nindent 10 }}
         args:
