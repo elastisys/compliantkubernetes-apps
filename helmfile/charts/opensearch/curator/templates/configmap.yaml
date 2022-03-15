@@ -17,6 +17,7 @@ data:
           continue_if_exception: False
           ignore_empty_list: True
           allow_ilm_indices: True
+          continue_if_exception: True
         filters:
         - filtertype: pattern
           kind: regex
@@ -38,6 +39,7 @@ data:
           continue_if_exception: False
           ignore_empty_list: True
           allow_ilm_indices: True
+          continue_if_exception: True
         filters:
         - filtertype: pattern
           kind: regex
