@@ -1,6 +1,6 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
-- [v0.19.2](#v0192---2022-03-16)
+- [v0.19.2](#v0192---2022-03-17)
 - [v0.19.1](#v0191---2022-02-28)
 - [v0.19.0](#v0190---2022-01-25)
 - [v0.18.0](#v0180---2021-10-28)
@@ -20,22 +20,16 @@
 <!-- END TOC -->
 
 -------------------------------------------------
-## v0.19.2 - 2022-03-16
+## v0.19.2 - 2022-03-17
 
-### Release notes
-
-### Updated
 
 ### Changed
 - Added the repo - "quay.io/jetstack/cert-manager-acmesolver" in allowrepo safeguard by default.
-- Backup operator namespaces can for example be added as veloro parameters to be able to back them up. 'alertmanager' is added as default in the workload cluster.
 
 ### Fixed
 - Use `master` tag for the grafana-label-enforcer as the previous sha used no longer exist.
+- predictLinear can now be disabled in workload cluster if needed.
 
-### Added
-
-### Removed
 
 -------------------------------------------------
 ## v0.19.1 - 2022-02-28

@@ -19,9 +19,8 @@ defaultRules:
     # Rook is handeled by the cluster operators. Users would normally not care
     # about these alerts, but we have no other way of gathering them currently.
     rookMonitor: {{ .Values.monitoring.rook.enabled }}
+    {{- if not .Values.prometheus.predictLinearLimit }}
+    predictLinear: false
+    {{- end }}
 
 predictLinearLimit: {{ .Values.prometheus.predictLinearLimit }}
-
-{{- if not .Values.prometheus.predictLinearLimit }}
-predictLinear: false
-{{- end }}
