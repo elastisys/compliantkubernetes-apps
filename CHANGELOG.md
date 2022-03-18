@@ -79,6 +79,7 @@
  - Configured thanos-ruler so it is enabled by default, runs as an HA pair without persistence, and dynamically reloads its rules on changes
  - Changed dashboards previously defaulting to wc-reader to default to "Thanos All"
  - Changed service cluster prometheus to use an external label instead of service monitor relabeling and write relabeling
+ - Increased resources for thanos receiveDistributor, compactor and storegateway components
 
 ### Fixed
 - Opensearch unable to parse `"source":{}` when gatekeeper starts up. The log including `"source":{}` from gatekeeper is excluded for now.
