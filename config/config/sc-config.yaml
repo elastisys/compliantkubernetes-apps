@@ -90,6 +90,7 @@ harbor:
   affinity: {}
   nodeSelector: {}
   chartmuseum:
+    replicas: 1
     persistentVolumeClaim:
       size: 5Gi
     resources:
@@ -100,6 +101,7 @@ harbor:
         cpu: 250m
         memory: 250Mi
   core:
+    replicas: 1
     resources:
       requests:
         cpu: 125m
@@ -125,6 +127,7 @@ harbor:
         cpu: 250m
         memory: 250Mi
   registry:
+    replicas: 1
     persistentVolumeClaim:
       size: 5Gi
     resources:
@@ -150,6 +153,7 @@ harbor:
         memory: 32Mi
         cpu: 10m
   notary:
+    replicas: 1
     subdomain: notary.harbor
     resources:
       requests:
@@ -167,6 +171,7 @@ harbor:
         cpu: 250m
         memory: 250Mi
   portal:
+    replicas: 1
     resources:
       requests:
         cpu: 125m
@@ -175,6 +180,7 @@ harbor:
         cpu: 250m
         memory: 250Mi
   trivy:
+    replicas: 1
     persistentVolumeClaim:
       size: 5Gi
     resources:
