@@ -330,7 +330,7 @@ thanos:
   receiveDistributor:
     resources:
       requests:
-        cpu: 100m
+        cpu: 150m
         memory: 200Mi
       limits:
         cpu: 500m
@@ -399,7 +399,7 @@ thanos:
 
     resources:
       requests:
-        cpu: 30m
+        cpu: 50m
         memory: 50Mi
       limits:
         cpu: 500m
@@ -409,10 +409,10 @@ thanos:
     resources:
       requests:
         cpu: 100m
-        memory: 60Mi
+        memory: 300Mi
       limits:
         cpu: 300m
-        memory: 300Mi
+        memory: 500Mi
 
   bucketweb:
     resources:
