@@ -86,6 +86,8 @@
 - Opensearch unable to parse `"source":{}` when gatekeeper starts up. The log including `"source":{}` from gatekeeper is excluded for now.
 - Fixed some grafana dashboards so they can retrieve the cluster label properly
 - Fixed opensearch naming on falco and gatekeeper dashboard
+- Fixed the missing tag on the grafana-label-enforcer.
+- Fixed the gatekeeper templates by adding the legacySchema: true and correcting the apiVersion.
 
 ### Added
 - Added Prometheus alerts for the 'backup status' and 'daily checks' dashboards. Also, 's3BucketPercentLimit' and 's3BucketSizeQuotaGB' parameters to set what limits the s3 rule including will alert off.
