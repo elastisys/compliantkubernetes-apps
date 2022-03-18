@@ -53,3 +53,5 @@
     ```
 
 1. Check if thanos receiver sts was recreated: `bin/ck8s ops kubectl sc get sts thanos-receiver-receive -n thanos`, if not run a sync `bin/ck8s ops helmfile sc -l app=thanos sync`
+
+1. If everything looks ok you can remove the influxdb pvc and namespace: `migration/v0.19.x-v0.20.x/remove-influxdb-pvc-ns.sh`
