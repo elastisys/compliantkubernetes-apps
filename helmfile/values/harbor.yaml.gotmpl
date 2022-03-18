@@ -79,6 +79,7 @@ clair:
   enabled: false
 
 core:
+  replicas: {{ .Values.harbor.core.replicas }}
   secret: {{ .Values.harbor.coreSecret }}
   secretName: harbor-core-cert
   xsrfKey: {{ .Values.harbor.xsrf }}
@@ -95,6 +96,7 @@ jobservice:
   tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
 
 registry:
+  replicas: {{ .Values.harbor.registry.replicas }}
   secret: {{ .Values.harbor.registrySecret }}
   registry:
     resources:  {{- toYaml .Values.harbor.registry.resources | nindent 6 }}
@@ -113,25 +115,28 @@ notary:
 
 database:
   internal:
-    password: {{ .Values.harbor.databasePassword }}
+    password:     {{ .Values.harbor.databasePassword }}
     resources:    {{- toYaml .Values.harbor.database.resources | nindent 6 }}
     nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 6 }}
     affinity:     {{- toYaml .Values.harbor.affinity | nindent 6 }}
     tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 6 }}
 
 trivy:
+  replicas: {{ .Values.harbor.trivy.replicas }}
   resources:    {{- toYaml .Values.harbor.trivy.resources | nindent 4 }}
   nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
   affinity:     {{- toYaml .Values.harbor.affinity | nindent 4 }}
   tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
 
 portal:
+  replicas: {{ .Values.harbor.portal.replicas }}
   resources:    {{- toYaml .Values.harbor.portal.resources | nindent 4 }}
   nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
   affinity:     {{- toYaml .Values.harbor.affinity | nindent 4 }}
   tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
 
 chartmuseum:
+  replicas: {{ .Values.harbor.chartmuseum.replicas }}
   resources:    {{- toYaml .Values.harbor.chartmuseum.resources | nindent 4 }}
   nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
   affinity:     {{- toYaml .Values.harbor.affinity | nindent 4 }}
@@ -139,8 +144,10 @@ chartmuseum:
 
 notary:
   server:
+    replicas: {{ .Values.harbor.notary.replicas }}
     resources:  {{- toYaml .Values.harbor.notary.resources | nindent 6 }}
   signer:
+    replicas: {{ .Values.harbor.notary.replicas }}
     resources:  {{- toYaml .Values.harbor.notarySigner.resources | nindent 6 }}
   nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
   affinity:     {{- toYaml .Values.harbor.affinity | nindent 4 }}
