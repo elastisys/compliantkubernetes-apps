@@ -12,9 +12,8 @@
 
 ### Fixed
 - Use `master` tag for the grafana-label-enforcer as the previous sha used no longer exist.
-
-### Fixed
 - The opensearch SLM job now uses `/_cat/snapshots` to make it work better when there are a large amount of snapshots available.
+- Calico-accountant is now being scheduled on master nodes.
 
 ### Added
 

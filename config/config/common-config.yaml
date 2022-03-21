@@ -342,6 +342,17 @@ metricsServer:
 
 calicoAccountant:
   enabled: true
+  tolerations:
+    - key: node-role.kubernetes.io/master
+      effect: NoSchedule
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
 
 calicoFelixMetrics:
   enabled: true
