@@ -9,6 +9,7 @@
 - Vulnerability scanner reports ttl is now set to 720 hours, i.e., 30 days.
   - Reports will now be deleted every 30 days by the operator and newer reports are generated.
   - Older reports that are not created with ttl parameter set, should be deleted manually.
+- Users are now allowed to get ClusterIssuers.
 
 ### Fixed
 - Use `master` tag for the grafana-label-enforcer as the previous sha used no longer exist.
