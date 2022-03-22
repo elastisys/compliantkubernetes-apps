@@ -2,5 +2,65 @@ resources: {{- toYaml .Values.prometheusBlackboxExporter.resources | nindent 4 }
 
 config:
   modules:
+    http_400:
+      prober: http
+      timeout: 5s
+      http:
+        # We are not logged in, just checking that it can be reached
+        valid_status_codes: [400]
+        valid_http_versions: ["HTTP/1.0","HTTP/1.1", "HTTP/2.0"]
+        follow_redirects: true
+        preferred_ip_protocol: "ip4"
+        tls_config:
+          insecure_skip_verify: true
+    http_401:
+      prober: http
+      timeout: 5s
+      http:
+        # We are not logged in, just checking that it can be reached
+        valid_status_codes: [401]
+        valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+        follow_redirects: true
+        preferred_ip_protocol: "ip4"
+        tls_config:
+          insecure_skip_verify: true
     tcp_connect:
       prober: tcp
+serviceMonitor:
+  enabled: true
+  targets:
+    {{- if .Values.prometheusBlackboxExporter.targets.prometheus }}
+    - name: prometheus
+      url: kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090/-/ready
+      interval: 60s
+      scrapeTimeout: 30s
+      module: http_2xx
+    {{- end }}
+    {{- if .Values.prometheusBlackboxExporter.targets.rook }}
+    - name: rook
+      url: rook-ceph-mgr.rook-ceph.svc.cluster.local:9283/health
+      interval: 60s
+      scrapeTimeout: 30s
+      module: http_2xx
+    {{- end }}
+    {{- if .Values.prometheusBlackboxExporter.targets.nginx }}
+    - name: nginx
+      url: ingress-nginx-controller-admission.ingress-nginx.svc.cluster.local:443
+      interval: 60s
+      scrapeTimeout: 30s
+      module: http_400
+    {{- end }}
+    {{- if .Values.prometheusBlackboxExporter.targets.gatekeeper }}
+    - name: gatekeeper
+      url: gatekeeper-webhook-service.gatekeeper-system.svc.cluster.local:443
+      interval: 60s
+      scrapeTimeout: 30s
+      module: http_400
+    {{- end }}
+    {{- if .Values.prometheusBlackboxExporter.targets.falco}}
+    - name: falco
+      url: falco-falcosidekick.falco.svc.cluster.local:2801/ping
+      interval: 60s
+      scrapeTimeout: 30s
+      module: http_2xx
+    {{- end }}

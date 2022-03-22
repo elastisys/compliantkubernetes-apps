@@ -103,7 +103,10 @@ prometheusBlackboxExporter:
     limits:
       cpu: 10m
       memory: 50Mi
-
+  targets:
+    rook: false
+    nginx: true
+    prometheus: true
 prometheusOperator:
   resources:
     requests:

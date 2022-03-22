@@ -788,3 +788,8 @@ s3Exporter:
   tolerations: []
   affinity: {}
   nodeSelector: {}
+prometheusBlackboxExporter:
+  targets:
+    fluentd: true
+    thanosQuery: true
+    thanosReceiver: true
