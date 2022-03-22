@@ -183,3 +183,7 @@ fluentd:
 velero:
   includedNamespaces:
     - alertmanager
+prometheusBlackboxExporter:
+  targets:
+    gatekeeper: true
+    falco: true
