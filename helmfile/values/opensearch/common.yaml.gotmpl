@@ -83,7 +83,8 @@ config:
       client:
         default:
           endpoint: {{ .Values.objectStorage.s3.regionEndpoint }}
-          path_style_access: true
+          path_style_access: {{ .Values.objectStorage.s3.forcePathStyle }}
+          region: {{ .Values.objectStorage.s3.region }}
     {{ else if eq .Values.objectStorage.type "gcs" -}}
     # TODO: Add config for GCS if any.
     {{- end }}
