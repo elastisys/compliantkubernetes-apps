@@ -12,7 +12,7 @@
 
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v3.2.0
+  rev: v4.1.0
   hooks:
   - id: check-json
     exclude: helmfile/upstream/|helmfile/elastisys/
@@ -24,6 +24,7 @@ repos:
   - id: trailing-whitespace
     exclude: helmfile/upstream/|helmfile/elastisys/
   - id: check-merge-conflict
+  - id: no-commit-to-branch
 - repo: https://github.com/jumanjihouse/pre-commit-hooks
   rev: 2.1.4
   hooks:
