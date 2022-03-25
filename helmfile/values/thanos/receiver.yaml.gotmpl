@@ -17,6 +17,8 @@ compactor:
 
 storegateway:
   enabled: true
+  persistence:
+    size: {{ .Values.thanos.storegateway.persistence.size }}
   resources: {{- toYaml .Values.thanos.storegateway.resources | nindent 4 }}
 
 bucketweb:
