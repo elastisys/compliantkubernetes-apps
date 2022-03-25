@@ -428,6 +428,8 @@ thanos:
         memory: 600Mi
 
   storegateway:
+    persistence:
+      size: 8Gi
     resources:
       requests:
         cpu: 100m
