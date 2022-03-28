@@ -12,6 +12,7 @@
 - Users are now allowed to get ClusterIssuers.
 - Changed the container names of the vulnerability exporter to a bit more meaningful ones.
 - Added persistence to alertmanager.
+- made the [CISO grafana dashboards](https://elastisys.io/compliantkubernetes/ciso-guide/) visible to the end-users
 
 ### Fixed
 - Use `master` tag for the grafana-label-enforcer as the previous sha used no longer exist.
