@@ -8,6 +8,7 @@
 - Exposed opensearch-slm-job max request seconds for curl.
 - Made opensearch-slm-job more verbose when using curl.
 - Added persistence to alertmanager.
+- made the [CISO grafana dashboards](https://elastisys.io/compliantkubernetes/ciso-guide/) visible to the end-users
 
 
 ### Fixed

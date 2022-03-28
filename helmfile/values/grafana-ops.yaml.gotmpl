@@ -10,7 +10,7 @@
 dashboards:
   backup:
     enabled: true
-    user_visible: false
+    user_visible: true
     {{- if .Values.objectStorage.sync.enabled }}
     sync:
       {{- range .Values.objectStorage.sync.buckets }}
@@ -22,9 +22,11 @@ dashboards:
     user_visible: true
   falco:
     enabled: true
+    user_visible: true
     logEndpoint: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
   gatekeeper:
     enabled: true
+    user_visible: true
     logEndpoint: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
   kubernetesstatus:
     enabled: true
@@ -40,13 +42,13 @@ dashboards:
     user_visible: false
   networkpolicy:
     enabled: true
-    user_visible: false
+    user_visible: true
   daily:
     enabled: true
     user_visible: false
   vulnerability:
     enabled: true
-    user_visible: false
+    user_visible: true
   cephcluster:
     enabled: {{ .Values.monitoring.rook.enabled }}
     user_visible: false
