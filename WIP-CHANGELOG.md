@@ -19,6 +19,7 @@
 - The opensearch SLM job now uses `/_cat/snapshots` to make it work better when there are a large amount of snapshots available.
 - predictlinear alerts
 - Calico-accountant is now being scheduled on master nodes.
+- it is now possible to set tolerations and affinity for vulnerability-exporter
 
 ### Added
 
