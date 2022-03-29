@@ -289,11 +289,13 @@ prometheus:
     limit: 66
   s3BucketPercentLimit: 80
   s3BucketSizeQuotaGB: 1000
-
 dex:
+  replicaCount: 2
   subdomain: dex
   additionalKubeloginRedirects: []
   enableStaticLogin: true
+  serviceMonitor:
+    enabled: true
   resources:
     limits:
       cpu: 100m
@@ -302,6 +304,13 @@ dex:
       cpu: 5m
       memory: 25Mi
   tolerations: []
+  topologySpreadConstraints:
+    - labelSelector:
+        matchLabels:
+          app: dex
+      maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: DoNotSchedule
   affinity: {}
   nodeSelector: {}
   google:

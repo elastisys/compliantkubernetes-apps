@@ -1,3 +1,4 @@
+replicaCount: {{ .Values.dex.replicaCount }}
 ingress:
   enabled: true
   className: nginx
@@ -86,11 +87,17 @@ config:
       userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
 {{ end }}
 
+serviceMonitor:
+  enabled: {{ .Values.dex.serviceMonitor.enabled }}
+
 resources:
 {{- toYaml .Values.dex.resources | nindent 2 }}
 
 nodeSelector:
 {{- toYaml .Values.dex.nodeSelector | nindent 2  }}
+
+topologySpreadConstraints:
+{{- toYaml .Values.dex.topologySpreadConstraints | nindent 2  }}
 
 affinity:
 {{- toYaml .Values.dex.affinity | nindent 2  }}
