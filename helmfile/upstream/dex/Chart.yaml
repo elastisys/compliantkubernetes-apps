@@ -1,29 +1,28 @@
-annotations:
-  artifacthub.io/changes: |
-    - kind: added
-      description: "`clusterIP` value to control the IP when using ClusterIP service type"
-  artifacthub.io/images: |
-    - name: dex
-      image: ghcr.io/dexidp/dex:v2.30.0
 apiVersion: v2
-appVersion: 2.30.0
-description: OpenID Connect (OIDC) identity and OAuth 2.0 provider with pluggable
-  connectors.
-home: https://dexidp.io/
+type: application
+name: dex
+version: 0.8.1
+appVersion: "2.31.1"
+kubeVersion: ">=1.14.0-0"
+description: OpenID Connect (OIDC) identity and OAuth 2.0 provider with pluggable connectors.
 icon: https://dexidp.io/favicon.png
 keywords:
-- oidc
-- oauth
-- identity-provider
-- saml
-kubeVersion: '>=1.14.0-0'
-maintainers:
-- email: mark.sagikazar@gmail.com
-  name: sagikazarmark
-  url: https://sagikazarmark.hu
-name: dex
+  - oidc
+  - oauth
+  - identity-provider
+  - saml
+home: https://dexidp.io/
 sources:
-- https://github.com/dexidp/dex
-- https://github.com/dexidp/helm-charts/tree/master/charts/dex
-type: application
-version: 0.6.3
+  - https://github.com/dexidp/dex
+  - https://github.com/dexidp/helm-charts/tree/master/charts/dex
+maintainers:
+  - name: sagikazarmark
+    email: mark.sagikazar@gmail.com
+    url: https://sagikazarmark.hu
+annotations:
+  artifacthub.io/changes: |
+    - kind: changed
+      description: "`ClusterRole` and `ClusterRoleBilding` to `Role` and `RoleBinding` to allow Deployments without ClusterPermissions"
+  artifacthub.io/images: |
+    - name: dex
+      image: ghcr.io/dexidp/dex:v2.31.1
