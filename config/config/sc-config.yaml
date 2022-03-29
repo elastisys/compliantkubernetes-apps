@@ -243,6 +243,13 @@ prometheus:
       requests:
         cpu: 10m
         memory: 50Mi
+    storage:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 1Gi
 
   grafana:
     subdomain: grafana
