@@ -129,6 +129,7 @@ alertmanager:
     ##
     retention: {{ .Values.prometheus.retention.alertmanager }}
     resources: {{- toYaml .Values.prometheus.alertmanagerSpec.resources | nindent 6 }}
+    storage: {{- toYaml .Values.prometheus.alertmanagerSpec.storage | nindent 6 }}
 
 kubeControllerManager:
   enabled: false
