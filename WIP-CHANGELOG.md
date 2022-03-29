@@ -11,6 +11,7 @@
   - Older reports that are not created with ttl parameter set, should be deleted manually.
 - Users are now allowed to get ClusterIssuers.
 - Changed the container names of the vulnerability exporter to a bit more meaningful ones.
+- Added persistence to alertmanager.
 
 ### Fixed
 - Use `master` tag for the grafana-label-enforcer as the previous sha used no longer exist.
