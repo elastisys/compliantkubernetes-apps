@@ -22,5 +22,6 @@
 - it is now possible to set tolerations and affinity for vulnerability-exporter
 
 ### Added
+- the possibility to add falco custom rules for each environment
 
 ### Removed
