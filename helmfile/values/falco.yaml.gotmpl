@@ -22,6 +22,9 @@ podSecurityPolicy:
   create: true
 
 customRules:
+  {{- if .Values.falco.customRules }}
+    {{ toYaml .Values.falco.customRules | nindent 2}}
+  {{- end }}
   ssh-trafic.yaml: |-
     - rule: Inbound SSH Connection
       desc: Detect Inbound SSH Connection

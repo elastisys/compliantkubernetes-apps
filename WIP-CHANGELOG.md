@@ -19,5 +19,6 @@
 - Calico-accountant is now being scheduled on master nodes.
 
 ### Added
+- the possibility to add falco custom rules for each environment
 
 ### Removed
