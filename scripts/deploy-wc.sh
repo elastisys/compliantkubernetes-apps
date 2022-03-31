@@ -31,6 +31,8 @@ kubectl create -f "${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-c
     2>/dev/null || echo "fluentd-extra-config configmap already in place. Ignoring."
 kubectl create -f "${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-plugins.yaml" \
     2>/dev/null || echo "fluentd-extra-plugins configmap already in place. Ignoring." >&2
+kubectl create -f "${SCRIPTS_PATH}/../helmfile/charts/manifests/user-rbac/clusterrolebindings/extra-user-view.yaml" \
+    2>/dev/null || echo "extra-user-view ClusterRoleBinding already in place. Ignoring." >&2
 
 echo "Installing helm charts" >&2
 cd "${SCRIPTS_PATH}/../helmfile"
