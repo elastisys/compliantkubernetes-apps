@@ -1,0 +1,18 @@
+# Managed by compliantkubernetes-apps
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: user-admin-cluster-wide-delegation
+rules:
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterrolebindings
+  resourceNames:
+  - extra-user-view
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - patch
