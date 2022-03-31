@@ -446,6 +446,9 @@ opensearch:
 
   clusterName: opensearch
 
+  # Change this value before applying opensearch to adjust indices.query.bool.max_clause_count
+  maxClauseCount: 1024
+
   # Create initial indices upon first startup
   createIndices: true
 

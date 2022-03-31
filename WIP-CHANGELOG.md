@@ -13,6 +13,7 @@
 - Changed the container names of the vulnerability exporter to a bit more meaningful ones.
 - Added persistence to alertmanager.
 - made the [CISO grafana dashboards](https://elastisys.io/compliantkubernetes/ciso-guide/) visible to the end-users
+- indices.query.bool.max_clause_count is now configurable.
 
 ### Fixed
 - Use `master` tag for the grafana-label-enforcer as the previous sha used no longer exist.

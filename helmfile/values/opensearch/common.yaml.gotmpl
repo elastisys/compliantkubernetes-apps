@@ -10,6 +10,11 @@ config:
     network:
       host: 0.0.0.0
 
+    indices:
+      query:
+        bool:
+          max_clause_count: {{ .Values.opensearch.maxClauseCount }}
+
     compatibility:
       override_main_response_version: true
 
