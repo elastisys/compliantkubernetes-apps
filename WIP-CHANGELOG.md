@@ -23,4 +23,6 @@
 
 ### Added
 
+- New Grafana dashboard that shows how many timeseries there are in Prometheus.
+
 ### Removed
