@@ -24,7 +24,7 @@
 
 ### Added
 - the possibility to add falco custom rules for each environment
-
 - New Grafana dashboard that shows how many timeseries there are in Prometheus.
+- Added the alternative port for kubelogin (18000) to be an allowed redirect url by default.
 
 ### Removed
