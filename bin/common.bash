@@ -13,6 +13,7 @@ ck8s_cloud_providers=(
     "citycloud"
     "exoscale"
     "safespring"
+    "upcloud"
 )
 
 # shellcheck disable=SC2034
