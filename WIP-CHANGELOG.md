@@ -2,6 +2,7 @@
 
 ### Updated
 - Helm upgraded to `v3.8.0`.
+- Helmfile upgraded to `v0.144.0`.
 
 ### Changed
 
