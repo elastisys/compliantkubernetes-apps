@@ -14,6 +14,7 @@
 - Added persistence to alertmanager.
 - made the [CISO grafana dashboards](https://elastisys.io/compliantkubernetes/ciso-guide/) visible to the end-users
 - indices.query.bool.max_clause_count is now configurable.
+- Patched Falco rules for  `k8s_containers` , `postgres_running_wal_e` & `user_known_contact_k8s_api_server_activities`. Will be removed if upstream Falco Chart accepts these.
 
 ### Fixed
 - Use `master` tag for the grafana-label-enforcer as the previous sha used no longer exist.

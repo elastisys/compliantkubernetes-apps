@@ -49,7 +49,12 @@ customRules:
       condition: >
         (container.image.repository in (gcr.io/google_containers/hyperkube-amd64,
         gcr.io/google_containers/kube2sky, sysdig/agent, sysdig/falco,
-        sysdig/sysdig, falcosecurity/falco, quay.io/fluentd_elasticsearch/fluentd) or (k8s.ns.name = "kube-system"))
+        sysdig/sysdig, falcosecurity/falco, quay.io/fluentd_elasticsearch/fluentd,
+        velero/velero, quay.io/jetstack/cert-manager-cainjector, weaveworks/kured,
+        ingress-controller/controller, quay.io/prometheus-operator/prometheus-operator,
+        k8s.gcr.io/ingress-nginx/kube-webhook-certgen, quay.io/spotahome/redis-operator,
+        registry.opensource.zalan.do/acid/postgres-operator, registry.opensource.zalan.do/acid/postgres-operator-ui,
+        rabbitmqoperator/cluster-operator) or (k8s.ns.name = "kube-system"))
     - list: falco_privileged_images
       items: [
         docker.io/sysdig/agent, docker.io/sysdig/falco, docker.io/sysdig/sysdig,
@@ -57,6 +62,11 @@ customRules:
         docker.io/rook/toolbox, docker.io/cloudnativelabs/kube-router, docker.io/mesosphere/mesos-slave,
         docker.io/docker/ucp-agent, sematext_images, k8s.gcr.io/kube-proxy, calico/node,falcosecurity/falco, k8s.gcr.io/k8s-dns-node-cache
     ]
+    - macro: postgres_running_wal_e
+      condition: (proc.pname=postgres and proc.cmdline startswith "sh -c envdir \"/run/etc/wal-e.d/env\" wal-g wal-push")
+    - macro: user_known_contact_k8s_api_server_activities
+      condition: >
+        (container.image.repository in (elastisys/curl-jq))
     - list: falco_sensitive_mount_images
       items: [
         docker.io/sysdig/agent, docker.io/sysdig/falco, docker.io/sysdig/sysdig,falcosecurity/falco,
