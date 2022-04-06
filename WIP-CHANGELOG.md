@@ -1,6 +1,7 @@
 ### Release notes
 
 ### Updated
+- Helm upgraded to `v3.8.0`.
 
 ### Changed
 
