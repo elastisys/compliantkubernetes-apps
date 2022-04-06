@@ -56,7 +56,7 @@ The apps are installed using a combination of helm charts and manifests with the
 * [helm](https://github.com/helm/helm/releases) (tested with 3.8.0)
 * [helmfile](https://github.com/roboll/helmfile) (tested with v0.144.0)
 * [helm-diff](https://github.com/databus23/helm-diff) (tested with 3.1.2)
-* [helm-secrets](https://github.com/futuresimple/helm-secrets) (tested with 2.0.2)
+* [helm-secrets](https://github.com/futuresimple/helm-secrets) (tested with 3.12.0)
 * [jq](https://github.com/stedolan/jq) (tested with jq-1.6)
 * [sops](https://github.com/mozilla/sops) (tested with 3.6.1)
 * [s3cmd](https://s3tools.org/s3cmd) available directly in ubuntus repositories (tested with 2.0.1)

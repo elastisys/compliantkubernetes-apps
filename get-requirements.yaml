@@ -7,7 +7,7 @@
       helm_version: 3.8.0
       helmfile_version: 0.144.0
       helmdiff_version: 3.1.2
-      helmsecrets_version: 2.0.2
+      helmsecrets_version: 3.12.0
       jq_version: 1.6
       s3cmd_version: 2.*
       sops_version: 3.6.1
@@ -58,7 +58,7 @@
       register: helm_secrets_exists
     - name: Get helm-secrets
       become_user: "{{ install_user }}"
-      command: "helm plugin install https://github.com/zendesk/helm-secrets --version v{{ helmsecrets_version }}"
+      command: "helm plugin install https://github.com/jkroepke/helm-secrets --version v{{ helmsecrets_version }}"
       register: "output"
       when: not helm_secrets_exists.stat.exists
     - name: Get jq
