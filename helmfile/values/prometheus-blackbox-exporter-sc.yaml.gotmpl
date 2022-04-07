@@ -87,7 +87,6 @@ serviceMonitor:
       interval: 60s
       scrapeTimeout: 30s
       module: http_2xx
-    {{- end }}
     - name: opensearch-dashboards
       url: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}/api/status
       interval: 60s
@@ -107,7 +106,7 @@ serviceMonitor:
       interval: 60s
       scrapeTimeout: 30s
       module: http_401
-    {{ end }}
+    {{- end }}
     {{- if and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
     - name: thanos-receiver
       url: https://{{ .Values.thanos.receiver.subdomain }}.{{ .Values.global.opsDomain }}
