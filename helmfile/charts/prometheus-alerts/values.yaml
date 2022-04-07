@@ -59,7 +59,7 @@ defaultRules:
     backupStatus: false
     dailyChecks: false
     fluentd: true
-    missingMetrics: true
+    missingMetrics: false
     kubeSchedulerAlerting: true
     kubeSchedulerRecording: true
     kubeProxy: true
@@ -75,8 +75,8 @@ defaultRules:
     #   key: value
 
 buckets:
-  harbor: set-me
+  # harbor: set-me
   velero: set-me
-  opensearch: set-me
-  scFluentd: set-me
+  # opensearch: set-me
+  # scFluentd: set-me
   thanos: set-me
