@@ -303,7 +303,7 @@ releases:
     group: opensearch
   chart: ./charts/opensearch/secrets
   version: 0.1.0
-  installed: true
+  installed: false
   values:
   - values/opensearch/secrets.yaml.gotmpl
 
@@ -314,7 +314,7 @@ releases:
     group: opensearch
   chart: ./upstream/opensearch
   version: 1.7.1
-  installed: true
+  installed: false
   needs:
   {{- if .Values.opensearch.sso.enabled }}
   - dex/dex
@@ -331,7 +331,7 @@ releases:
     group: opensearch
   chart: ./upstream/opensearch
   version: 1.7.1
-  installed: {{ .Values.opensearch.dataNode.dedicatedPods }}
+  installed: false
   needs:
   - opensearch-system/opensearch-master
   values:
@@ -345,7 +345,7 @@ releases:
     group: opensearch
   chart: ./upstream/opensearch
   version: 1.7.1
-  installed: {{ .Values.opensearch.clientNode.dedicatedPods }}
+  installed: false
   needs:
   - opensearch-system/opensearch-master
   values:
@@ -359,7 +359,7 @@ releases:
     group: opensearch
   chart: ./upstream/opensearch-dashboards
   version: 1.1.2
-  installed: true
+  installed: false
   needs:
   - opensearch-system/opensearch-master
   values:
@@ -372,7 +372,7 @@ releases:
     group: opensearch
   chart: ./charts/opensearch/backup
   version: 0.1.0
-  installed: {{ .Values.opensearch.snapshot.enabled }}
+  installed: false
   missingFileHandler: Error
   needs:
   - opensearch-system/opensearch-master
@@ -386,7 +386,7 @@ releases:
     group: opensearch
   chart: ./charts/opensearch/slm
   version: 0.1.0
-  installed: {{ .Values.opensearch.snapshot.enabled }}
+  installed: false
   missingFileHandler: Error
   needs:
   - opensearch-system/opensearch-master
@@ -400,7 +400,7 @@ releases:
     group: opensearch
   chart: ./charts/opensearch/curator
   version: 0.1.0
-  installed: {{ .Values.opensearch.curator.enabled }}
+  installed: false
   missingFileHandler: Error
   needs:
   - opensearch-system/opensearch-master
@@ -414,7 +414,7 @@ releases:
     group: opensearch
   chart: ./charts/opensearch/configurer
   version: 0.1.0
-  installed: true
+  installed: false
   needs:
   - opensearch-system/opensearch-master
   - opensearch-system/opensearch-dashboards
@@ -429,7 +429,7 @@ releases:
     group: opensearch
   chart: ./upstream/prometheus-elasticsearch-exporter
   version: 4.11.0
-  installed: true
+  installed: false
   missingFileHandler: Error
   needs:
   - opensearch-system/opensearch-master
