@@ -57,11 +57,11 @@ defaultRules:
     backupStatus: false
     dailyChecks: false
     fluentd: true
-    missingMetrics: true
     kubeScheduler: true
     kubeProxy: true
     kubeControllerManager: true
     configReloaders: true
+    missingMetrics: false
 
   appNamespacesTarget: ".*"
 
@@ -71,8 +71,8 @@ defaultRules:
     #   key: value
 
 buckets:
-  harbor: set-me
+  # harbor: set-me
   velero: set-me
-  opensearch: set-me
-  scFluentd: set-me
+  # opensearch: set-me
+  # scFluentd: set-me
   thanos: set-me
