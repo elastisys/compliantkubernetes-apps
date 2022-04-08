@@ -11,9 +11,21 @@ source "${here}/common.bash"
 
 usage() {
     echo "Usage: kubectl <wc|sc> ..." >&2
+    echo "       kubecolor <wc|sc> ..." >&2
     echo "       helm <wc|sc> ..." >&2
     echo "       helmfile <wc|sc> ..." >&2
     exit 1
+}
+
+# Run arbitrary kubecolor commands as cluster admin.
+ops_kubecolor() {
+    case "${1}" in
+        sc) kubeconfig="${secrets[kube_config_sc]}" ;;
+        wc) kubeconfig="${secrets[kube_config_wc]}" ;;
+        *) usage ;;
+    esac
+    shift
+    with_kubeconfig "${kubeconfig}" kubecolor "${@}"
 }
 
 # Run arbitrary kubectl commands as cluster admin.
@@ -66,6 +78,10 @@ case "${1}" in
     kubectl)
         shift
         ops_kubectl "${@}"
+    ;;
+    kubecolor)
+        shift
+        ops_kubecolor "${@}"
     ;;
     helm)
         shift
