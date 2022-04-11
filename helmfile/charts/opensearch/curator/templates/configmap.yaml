@@ -14,7 +14,6 @@ data:
         action: delete_indices
         description: "Delete oldest {{ $v.pattern }} indices that exceeds total disk size {{ $v.sizeGB }}GB"
         options:
-          continue_if_exception: False
           ignore_empty_list: True
           allow_ilm_indices: True
           continue_if_exception: True
@@ -36,7 +35,6 @@ data:
         action: delete_indices
         description: "Delete {{ $v.pattern }} indices that are older than {{ $v.ageDays }} days"
         options:
-          continue_if_exception: False
           ignore_empty_list: True
           allow_ilm_indices: True
           continue_if_exception: True
