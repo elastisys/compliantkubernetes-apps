@@ -502,6 +502,18 @@ opensearch:
       definition:
         users:
           - set-me # dashboards_admin
+    - mapping_name: alerting_ack_alerts #Grants permissions to view and acknowledge alerts, but not modify destinations or monitors.
+      definition:
+        users:
+          - set-me # alerting_dev
+    - mapping_name: alerting_read_access #Grants permissions to view alerts, destinations, and monitors, but not acknowledge alerts or modify destinations or monitors.
+      definition:
+        users:
+          - set-me # alerting_dev
+    - mapping_name: alerting_full_access #Grants full permissions to all alerting actions.
+      definition:
+        users:
+          - set-me # alerting_admin
 
   # Overwrite index templates
   overwriteTemplates: true
