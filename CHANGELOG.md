@@ -1,5 +1,6 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.19.3](#v0193---2022-04-12)
 - [v0.19.2](#v0192---2022-03-17)
 - [v0.19.1](#v0191---2022-02-28)
 - [v0.19.0](#v0190---2022-01-25)
@@ -18,6 +19,29 @@
 - [v0.6.0](#v060---2020-10-16)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.19.3 - 2022-04-12
+
+### Release notes
+
+### Updated
+
+### Changed
+
+- Set 'continue_if_exception' in curator as to not fail when a snapshot is in progress and it is trying to remove some indices.
+- Exposed opensearch-slm-job max request seconds for curl.
+- Made opensearch-slm-job more verbose when using curl.
+- Added persistence to alertmanager.
+- made the [CISO grafana dashboards](https://elastisys.io/compliantkubernetes/ciso-guide/) visible to the end-users
+
+
+### Fixed
+
+### Added
+- Added Prometheus alerts for the 'backup status' and 'daily checks' dashboards. Also, 's3BucketPercentLimit' and 's3BucketSizeQuotaGB' parameters to set what limits the s3 rule including will alert off.
+
+### Removed
 
 -------------------------------------------------
 ## v0.19.2 - 2022-03-17
