@@ -57,7 +57,8 @@ else
         aws s3 rm --recursive "${BACKUP_URI}" --endpoint-url="${S3_REGION_ENDPOINT}"
         # Wait 5 seconds to see if new files have been created while the deletion was done
         sleep 5
-        NR_OF_FILES=$(aws s3 ls "${BACKUP_URI}" --endpoint-url="${S3_REGION_ENDPOINT}" | wc -l)
+        # "aws s3 ls" will return an error if the path is empty, so the echo is needed to not exit the script
+        NR_OF_FILES=$(aws s3 ls "${BACKUP_URI}" --endpoint-url="${S3_REGION_ENDPOINT}" | wc -l) || echo "No more files in ${BACKUP_URI}"
       done
 
     elif [[ ${GCS_BACKUP} == "true" ]]; then

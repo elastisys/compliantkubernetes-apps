@@ -23,6 +23,7 @@
 - predictlinear alerts
 - Calico-accountant is now being scheduled on master nodes.
 - it is now possible to set tolerations and affinity for vulnerability-exporter
+- SC log retention no longer fails silently after removing one day of logs.
 
 ### Added
 - the possibility to add falco custom rules for each environment
