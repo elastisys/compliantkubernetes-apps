@@ -1,4 +1,4 @@
-# Upgrade v0.18.x to v0.19.0
+# Upgrade v0.18.x to v0.19.x
 
 ## Prerequisites
 
@@ -84,6 +84,8 @@
     The default value for InfluxDBs PVC has changed, and if you have not previously defined a size for it then it will try and fail to patch the StatefulSet.
     Either pin the current size by adding it into the override `sc-config.yaml` or remove the StatefulSet using `--cascade=false` to let the change apply.
     You might have to manually edit the PVC to set the new size after the apply.
+
+1. Remove grafana-ops chart with all the dashboards: `migration/v0.18.x-v0.19.x/remove-grafana-ops.sh`
 
 1. Upgrade applications:
 
