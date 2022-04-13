@@ -1,4 +1,4 @@
-# Upgrade v0.19.x to v0.20.0
+# Upgrade v0.19.x to v0.20.x
 
 ## Prerequisites
 
@@ -45,6 +45,8 @@
 1. Update the thanos receiver pvc size: `migration/v0.19.x-v0.20.x/upgrade-thanos-receiver-pvc.sh`
    > **_NOTE:_** You will need to manually delete `thanos.receiver.persistence` lines from sc-config.yaml.
    `vim $CK8S_CONFIG_PATH/sc-config.yaml`
+
+1. Remove grafana-ops chart with all the dashboards: `migration/v0.19.x-v0.20.x/remove-grafana-ops.sh`
 
 1. Upgrade applications:
 
