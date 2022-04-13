@@ -1,4 +1,4 @@
-# Upgrade v0.20.x to v0.21.x
+# Upgrade v0.20.0 to v0.21.1
 
 ## Prerequisites
 
