@@ -1,20 +1,18 @@
-
-{{- $striped_version := (split "-" .Capabilities.KubeVersion.GitVersion)._0 -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "fluentd-elasticsearch.fullname" . }}
   labels:
-{{ include "fluentd-elasticsearch.labels" . | indent 4 }}
-    {{- if semverCompare "< 1.6" $striped_version }}
-    kubernetes.io/cluster-service: "true"
-    {{- end }}
+    {{- include "fluentd-elasticsearch.labels" . | nindent 4 }}
     addonmanager.kubernetes.io/mode: Reconcile
 data:
 {{- if .Values.configMaps.useDefaults.systemConf }}
   system.conf: |-
     <system>
       root_dir /tmp/fluentd-buffers/
+      <log>
+        format {{ .Values.fluentdLogFormat }}
+      </log>
     </system>
 {{- end }}
 
@@ -130,10 +128,16 @@ data:
           format json
           time_key time
           time_format %Y-%m-%dT%H:%M:%S.%NZ
+{{- if .Values.configMaps.useDefaults.containersKeepTimeKey }}
+          keep_time_key true
+{{- end }}
         </pattern>
         <pattern>
           format /^(?<time>.+) (?<stream>stdout|stderr) [^ ]* (?<log>.*)$/
           time_format %Y-%m-%dT%H:%M:%S.%N%:z
+{{- if .Values.configMaps.useDefaults.containersKeepTimeKey }}
+          keep_time_key true
+{{- end }}
         </pattern>
       </parse>
     </source>
@@ -165,6 +169,9 @@ data:
     <filter kubernetes.**>
       @id filter_kubernetes_metadata
       @type kubernetes_metadata
+{{- range $key, $value := .Values.configMaps.useDefaults.kubernetesMetadataFilterConfig }}
+      {{ $key }} {{ $value }}
+{{- end }}
     </filter>
 
     # Fixes json fields in Elasticsearch
@@ -505,7 +512,7 @@ data:
       ssl_verify "#{ENV['OUTPUT_SSL_VERIFY']}"
       ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
 {{- if (ne .Values.elasticsearch.typeName "") }}
-      type_name "#{ENV['OUTPUT_TYPE_NAME']}"
+ 
 {{- end }}
 {{- if .Values.elasticsearch.auth.enabled }}
       user "#{ENV['OUTPUT_USER']}"
@@ -519,6 +526,7 @@ data:
 {{- else }}
       logstash_format "#{ENV['LOGSTASH_FORMAT']}"
       index_name "#{ENV['INDEX_NAME']}"
+      include_timestamp "#{ENV['INCLUDE_TIMESTAMP']}"
 {{- end }}
 {{- if .Values.elasticsearch.ilm.enabled }}
       enable_ilm "#{ENV['ENABLE_ILM']}"
@@ -527,16 +535,23 @@ data:
       ilm_policies "#{ENV['ILM_POLICIES']}"
       ilm_policy_overwrite "#{ENV['ILM_POLICY_OVERWRITE']}"
 {{- end }}
-      log_es_400_reason "#{ENV['OUTPUT_LOG_400_REASON']}"
+{{- if or .Values.elasticsearch.template.enabled .Values.elasticsearch.ilm.enabled }}
+      template_name "#{ENV['TEMPLATE_NAME']}"
+      template_file "#{ENV['TEMPLATE_FILE']}"
+      template_overwrite "#{ENV['TEMPLATE_OVERWRITE']}"
+      use_legacy_template "#{ENV['USE_LEGACY_TEMPLATE']}"
+{{- end }}
+      log_os_400_reason "#{ENV['OUTPUT_LOG_400_REASON']}"
       reconnect_on_error "#{ENV['OUTPUT_RECONNECT_ON_ERROR']}"
       reload_on_failure "#{ENV['OUTPUT_RELOAD_ON_FAILURE']}"
       reload_connections "#{ENV['OUTPUT_RELOAD_CONNECTIONS']}"
       request_timeout "#{ENV['OUTPUT_REQUEST_TIMEOUT']}"
-{{- if .Values.elasticsearch.suppressTypeName }}
-      suppress_type_name "#{ENV['OUTPUT_SUPPRESS_TYPE_NAME']}"
-{{- end }}
 {{- if .Values.elasticsearch.buffer.enabled }}
+{{- if .Values.elasticsearch.buffer.chunkKeys }}
+      <buffer "#{ENV['OUTPUT_BUFFER_CHUNK_KEYS']}">
+{{- else }}
       <buffer>
+{{- end }}
         @type "#{ENV['OUTPUT_BUFFER_TYPE']}"
         path "#{ENV['OUTPUT_BUFFER_PATH']}"
         flush_mode "#{ENV['OUTPUT_BUFFER_FLUSH_MODE']}"
@@ -546,12 +561,17 @@ data:
         retry_forever "#{ENV['OUTPUT_BUFFER_RETRY_FOREVER']}"
         retry_max_interval "#{ENV['OUTPUT_BUFFER_RETRY_MAX_INTERVAL']}"
         chunk_limit_size "#{ENV['OUTPUT_BUFFER_CHUNK_LIMIT']}"
-        queue_limit_length "#{ENV['OUTPUT_BUFFER_QUEUE_LIMIT']}"
+        total_limit_size "#{ENV['OUTPUT_BUFFER_TOTAL_LIMIT_SIZE']}"
         overflow_action "#{ENV['OUTPUT_BUFFER_OVERFLOW_ACTION']}"
       </buffer>
 {{- end }}
     </match>
     </label>
+{{- end }}
+
+{{- if or .Values.elasticsearch.template.enabled .Values.elasticsearch.ilm.enabled }}
+  {{ .Values.elasticsearch.template.file }}: |-
+{{ .Values.elasticsearch.template.content | indent 4 }}
 {{- end }}
 
 {{- range $key, $value := .Values.extraConfigMaps }}

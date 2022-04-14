@@ -2,64 +2,18 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "fluentd.fullname" . }}-aggregator-cm
-  labels: {{- include "fluentd.labels" . | nindent 4 }}
+  name: {{ include "common.names.fullname" . }}-aggregator-cm
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
     app.kubernetes.io/component: aggregator
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
 data:
-  fluentd.conf: |
-    {{- if .Values.metrics.enabled -}}
-    # Prometheus Exporter Plugin
-    # input plugin that exports metrics
-    <source>
-      @type prometheus
-      port {{ .Values.metrics.service.port }}
-    </source>
-
-    # input plugin that collects metrics from MonitorAgent
-    <source>
-      @type prometheus_monitor
-      <labels>
-        host ${hostname}
-      </labels>
-    </source>
-
-    # input plugin that collects metrics for output plugin
-    <source>
-      @type prometheus_output_monitor
-      <labels>
-        host ${hostname}
-      </labels>
-    </source>
-    {{- end }}
-
-    # Ignore fluentd own events
-    <match fluent.**>
-      @type null
-    </match>
-
-    # TCP input to receive logs from
-    {{- if and .Values.aggregator.port }}
-    <source>
-      @type forward
-      bind 0.0.0.0
-      port {{ .Values.aggregator.port }}
-    </source>
-    {{- end }}
-
-    # HTTP input for the liveness and readiness probes
-    <source>
-      @type http
-      bind 0.0.0.0
-      port 9880
-    </source>
-
-    # Throw the healthcheck to the standard output instead of forwarding it
-    <match fluentd.healthcheck>
-      @type stdout
-    </match>
-
-    # Send the logs to the standard output
-    <match **>
-      @type stdout
-    </match>
+  {{- range $key, $value := .Values.aggregator.configMapFiles }}
+  {{ $key }}: |
+    {{- include "common.tplvalues.render" (dict "value" $value "context" $) | nindent 4 }}
+  {{- end }}
 {{- end -}}
