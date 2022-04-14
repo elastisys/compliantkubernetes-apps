@@ -1,17 +1,12 @@
 {{- if .Values.service }}
 {{- range $port := .Values.service.ports  }}
 {{- $service_type := $port.type | default "ClusterIP" }}
-{{- $striped_version := (split "-" $.Capabilities.KubeVersion.GitVersion)._0 -}}
----
 apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "fluentd-elasticsearch.fullname" $ | trunc 50 }}-{{ $port.name | trunc 12 }}
   labels:
-{{ include "fluentd-elasticsearch.labels" $ | indent 4 }}
-    {{- if semverCompare "< 1.6" $striped_version }}
-    kubernetes.io/cluster-service: "true"
-    {{- end }}
+    {{- include "fluentd-elasticsearch.labels" $ | nindent 4 }}
     addonmanager.kubernetes.io/mode: Reconcile
 spec:
   type: {{ $service_type }}
@@ -26,7 +21,6 @@ spec:
       protocol: {{ $port.protocol }}
       {{- end }}
   selector:
-    app.kubernetes.io/name: {{ include "fluentd-elasticsearch.name" $ }}
-    app.kubernetes.io/instance: {{ $.Release.Name }}
+    {{- include "fluentd-elasticsearch.selectorLabels" $ | nindent 4 }}
 {{- end }}
 {{- end }}

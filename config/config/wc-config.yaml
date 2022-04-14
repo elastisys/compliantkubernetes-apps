@@ -141,6 +141,7 @@ opa:
 ## Consists of two different deployments, one for running on master nodes
 ## and and one for running on "user nodes".
 fluentd:
+
   ## Tolerate master nodes.
   tolerations:
     - effect: NoSchedule

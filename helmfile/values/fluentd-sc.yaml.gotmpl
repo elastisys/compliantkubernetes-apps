@@ -16,7 +16,7 @@ aggregator:
     size: 10Gi
 
   {{ if eq .Values.objectStorage.type "s3" -}}
-  extraEnv:
+  extraEnvVars:
    - name: AWS_ACCESS_KEY_ID
      valueFrom:
        secretKeyRef:
@@ -47,7 +47,7 @@ forwarder:
     failureThreshold: {{ .Values.fluentd.forwarder.readinessProbe.failureThreshold  }}
   rbac:
     pspEnabled: true
-  extraEnv:
+  extraEnvVars:
     - name: OUTPUT_BUFFER_CHUNK_LIMIT
       value: "{{ .Values.fluentd.forwarder.chunkLimitSize }}"
     - name: OUTPUT_BUFFER_TOTAL_LIMIT_SIZE

@@ -562,7 +562,7 @@ releases:
   labels:
     app: fluentd
   chart: ./upstream/fluentd
-  version: 2.4.0
+  version: 5.0.15
   installed: {{ .Values.fluentd.enabled }}
   missingFileHandler: Error
   needs:
@@ -666,7 +666,7 @@ releases:
   labels:
     app: fluentd
   chart: ./upstream/fluentd-elasticsearch
-  version: 10.2.1
+  version: 13.3.0
   missingFileHandler: Error
   values:
   - values/fluentd-wc.yaml.gotmpl
@@ -677,7 +677,7 @@ releases:
   labels:
     app: fluentd
   chart: ./upstream/fluentd-elasticsearch
-  version: 10.2.1
+  version: 13.3.0
   missingFileHandler: Error
   values:
   - values/fluentd-user.yaml.gotmpl
