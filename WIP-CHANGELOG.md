@@ -15,6 +15,7 @@
 - made the [CISO grafana dashboards](https://elastisys.io/compliantkubernetes/ciso-guide/) visible to the end-users
 - indices.query.bool.max_clause_count is now configurable.
 - Patched Falco rules for  `k8s_containers` , `postgres_running_wal_e` & `user_known_contact_k8s_api_server_activities`. Will be removed if upstream Falco Chart accepts these.
+- Curator can now delete all but for system indices.
 - Added the user-permissions available pre-defined alerting roles for opensearch.
 - PrometheusBlackboxExporter targets with customized propes added for internal service health-checking.
 - The dex chart has been upgraded from version 0.6.3 to 0.8.1. Dex has changed to have two replicas to increase the stability of OpenSearch's authentication. A dex ServiceMonitor has also been enabled

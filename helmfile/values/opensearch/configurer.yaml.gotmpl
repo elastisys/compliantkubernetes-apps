@@ -109,15 +109,8 @@ config:
           allowed_actions:
           - "indices_monitor"
         - index_patterns:
-          {{- if .Values.opensearch.indexPerNamespace }}
           - '/^[^.].*/'
           - ".orphaned-*"
-          {{- else }}
-          - "kubernetes-*"
-          - "other-*"
-          - "kubeaudit-*"
-          - "authlog-*"
-          {{- end }}
           allowed_actions:
           - "indices:admin/delete"
     - role_name: kubernetes_log_reader
