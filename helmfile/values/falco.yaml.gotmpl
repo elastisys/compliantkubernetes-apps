@@ -60,10 +60,12 @@ customRules:
         docker.io/sysdig/agent, docker.io/sysdig/falco, docker.io/sysdig/sysdig,
         gcr.io/google_containers/kube-proxy, docker.io/calico/node, quay.io/calico/node,
         docker.io/rook/toolbox, docker.io/cloudnativelabs/kube-router, docker.io/mesosphere/mesos-slave,
-        docker.io/docker/ucp-agent, sematext_images, k8s.gcr.io/kube-proxy, calico/node,falcosecurity/falco, k8s.gcr.io/k8s-dns-node-cache
+        docker.io/docker/ucp-agent, sematext_images, k8s.gcr.io/kube-proxy, calico/node, falcosecurity/falco,
+        k8s.gcr.io/k8s-dns-node-cache, k8s.gcr.io/dns/k8s-dns-node-cache
     ]
     - macro: postgres_running_wal_e
-      condition: (proc.pname=postgres and proc.cmdline startswith "sh -c envdir \"/run/etc/wal-e.d/env\" wal-g wal-push")
+      condition: ((proc.pname=postgres and proc.cmdline startswith "sh -c envdir /etc/wal-e.d/env /usr/local/bin/wal-e") or
+                  (proc.pname=postgres and proc.cmdline startswith "sh -c envdir \"/run/etc/wal-e.d/env\" wal-g wal-push"))
     - macro: user_known_contact_k8s_api_server_activities
       condition: >
         (container.image.repository in (elastisys/curl-jq))
@@ -77,6 +79,137 @@ customRules:
         docker.io/netdata/netdata, docker.io/google/cadvisor, docker.io/prom/node-exporter,
         amazon/amazon-ecs-agent, quay.io/prometheus/node-exporter
         ]
+    - macro: write_etc_common
+      condition: >
+        etc_dir and evt.dir = < and open_write
+        and proc_name_exists
+        and not proc.name in (passwd_binaries, shadowutils_binaries, sysdigcloud_binaries,
+                          package_mgmt_binaries, ssl_mgmt_binaries, dhcp_binaries,
+                          dev_creation_binaries, shell_mgmt_binaries,
+                          mail_config_binaries,
+                          sshkit_script_binaries,
+                          ldconfig.real, ldconfig, confd, gpg, insserv,
+                          apparmor_parser, update-mime, tzdata.config, tzdata.postinst,
+                          systemd, systemd-machine, systemd-sysuser,
+                          debconf-show, rollerd, bind9.postinst, sv,
+                          gen_resolvconf., update-ca-certi, certbot, runsv,
+                          qualys-cloud-ag, locales.postins, nomachine_binaries,
+                          adclient, certutil, crlutil, pam-auth-update, parallels_insta,
+                          openshift-launc, update-rc.d, puppet)
+        and not (container and proc.cmdline in ("cp /run/secrets/kubernetes.io/serviceaccount/ca.crt /etc/pki/ca-trust/source/anchors/openshift-ca.crt"))
+        and not proc.pname in (sysdigcloud_binaries, mail_config_binaries, hddtemp.postins, sshkit_script_binaries, locales.postins, deb_binaries, dhcp_binaries)
+        and not fd.name pmatch (safe_etc_dirs)
+        and not fd.name in (/etc/container_environment.sh, /etc/container_environment.json, /etc/motd, /etc/motd.svc)
+        and not sed_temporary_file
+        and not exe_running_docker_save
+        and not ansible_running_python
+        and not python_running_denyhosts
+        and not fluentd_writing_conf_files
+        and not user_known_write_etc_conditions
+        and not run_by_centrify
+        and not run_by_adclient
+        and not qualys_writing_conf_files
+        and not git_writing_nssdb
+        and not plesk_writing_keys
+        and not plesk_install_writing_apache_conf
+        and not plesk_running_mktemp
+        and not networkmanager_writing_resolv_conf
+        and not run_by_chef
+        and not add_shell_writing_shells_tmp
+        and not duply_writing_exclude_files
+        and not xmlcatalog_writing_files
+        and not parent_supervise_running_multilog
+        and not supervise_writing_status
+        and not pki_realm_writing_realms
+        and not htpasswd_writing_passwd
+        and not lvprogs_writing_conf
+        and not ovsdb_writing_openvswitch
+        and not datadog_writing_conf
+        and not curl_writing_pki_db
+        and not haproxy_writing_conf
+        and not java_writing_conf
+        and not dpkg_scripting
+        and not rabbitmq_writing_conf
+        and not rook_writing_conf
+        and not php_handlers_writing_conf
+        and not sed_writing_temp_file
+        and not cron_start_writing_pam_env
+        and not httpd_writing_conf_logs
+        and not mysql_writing_conf
+        and not openvpn_writing_conf
+        and not consul_template_writing_conf
+        and not countly_writing_nginx_conf
+        and not ms_oms_writing_conf
+        and not ms_scx_writing_conf
+        and not azure_scripts_writing_conf
+        and not azure_networkwatcher_writing_conf
+        and not couchdb_writing_conf
+        and not update_texmf_writing_conf
+        and not slapadd_writing_conf
+        and not symantec_writing_conf
+        and not liveupdate_writing_conf
+        and not sosreport_writing_files
+        and not selinux_writing_conf
+        and not veritas_writing_config
+        and not nginx_writing_conf
+        and not nginx_writing_certs
+        and not chef_client_writing_conf
+        and not centrify_writing_krb
+        and not cockpit_writing_conf
+        and not ipsec_writing_conf
+        and not httpd_writing_ssl_conf
+        and not userhelper_writing_etc_security
+        and not pkgmgmt_progs_writing_pki
+        and not update_ca_trust_writing_pki
+        and not brandbot_writing_os_release
+        and not redis_writing_conf
+        and not openldap_writing_conf
+        and not ucpagent_writing_conf
+        and not iscsi_writing_conf
+        and not istio_writing_conf
+        and not ufw_writing_conf
+        and not calico_writing_conf
+        and not calico_writing_envvars
+        and not prometheus_conf_writing_conf
+        and not openshift_writing_conf
+        and not keepalived_writing_conf
+        and not rancher_writing_conf
+        and not checkpoint_writing_state
+        and not jboss_in_container_writing_passwd
+        and not etcd_manager_updating_dns
+        and not user_known_write_below_etc_activities
+        and not automount_using_mtab
+        and not mcafee_writing_cma_d
+        and not avinetworks_supervisor_writing_ssh
+        and not multipath_writing_conf
+        and not calico_node
+    - macro: falco_sensitive_mount_containers
+      condition: (user_trusted_containers or
+              aws_eks_image_sensitive_mount or
+              container.image.repository in (trusted_images) or
+              container.image.repository in (falco_sensitive_mount_images) or
+              container.image.repository startswith quay.io/sysdig/ or
+              container.image.repository startswith k8scloudprovider/cinder-csi-plugin)
+    - rule: Launch Package Management Process in Container
+      desc: Package management process ran inside container
+      condition: >
+        spawned_process
+        and container
+        and user.name != "_apt"
+        and package_mgmt_procs
+        and not package_mgmt_ancestor_procs
+        and not user_known_package_manager_in_container
+      exceptions:
+       - name: kube-proxy
+         fields: [proc.cmdline, container.image.repository]
+         comps: [startswith, =]
+         values:
+           - [update-alternat, k8s.gcr.io/kube-proxy]
+      output: >
+        Package management process launched in container (user=%user.name user_loginuid=%user.loginuid
+        command=%proc.cmdline container_id=%container.id container_name=%container.name image=%container.image.repository:%container.image.tag)
+      priority: ERROR
+      tags: [process, mitre_persistence]
 
 falcosidekick:
   enabled: {{ .Values.falco.alerts.enabled }}
