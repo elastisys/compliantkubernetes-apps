@@ -51,7 +51,7 @@ falco:
     ## supported: 'alertmanager', 'slack'.
     type: alertmanager
     priority: notice
-    hostPort: http://kube-prometheus-stack-alertmanager.monitoring:9093
+    hostPort: http://alertmanager-operated.alertmanager:9093
 
   falcoSidekick:
     resources:

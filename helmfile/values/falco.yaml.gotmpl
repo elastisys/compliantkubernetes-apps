@@ -93,7 +93,7 @@ falcosidekick:
       minimumpriority: {{ .Values.falco.alerts.priority }}
       messageformat: "Falco Alert : rule *{{`{{ .Rule }}`}}*"
     {{ end }}
-    {{ if eq .Values.falco.alerts.type "alertmanager" }}
+    {{ if and (eq .Values.falco.alerts.type "alertmanager") .Values.user.alertmanager.enabled }}
     alertmanager:
       hostport: {{ .Values.falco.alerts.hostPort }}
       minimumpriority: {{ .Values.falco.alerts.priority }}
