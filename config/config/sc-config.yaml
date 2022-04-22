@@ -347,16 +347,16 @@ thanos:
         memory: 40Mi
       limits:
         cpu: 300m
-        memory: 100Mi
+        memory: 500Mi
 
   receiveDistributor:
     resources:
       requests:
         cpu: 150m
-        memory: 200Mi
+        memory: 50Mi
       limits:
         cpu: 500m
-        memory: 300Mi
+        memory: 100Mi
 
   ruler:
     # Enables the ruler component
@@ -404,8 +404,8 @@ thanos:
         cpu: 200m
         memory: 2Gi
       limits:
-        cpu: 500m
-        memory: 2Gi
+        cpu: "1"
+        memory: 4Gi
 
   compactor:
     # Set to 0s to disable retention
@@ -422,10 +422,10 @@ thanos:
     resources:
       requests:
         cpu: 50m
-        memory: 50Mi
+        memory: 80Mi
       limits:
-        cpu: 500m
-        memory: 200Mi
+        cpu: "2"
+        memory: 600Mi
 
   storegateway:
     resources:
@@ -434,7 +434,7 @@ thanos:
         memory: 300Mi
       limits:
         cpu: 300m
-        memory: 500Mi
+        memory: 700Mi
 
   bucketweb:
     resources:
