@@ -18,7 +18,7 @@
 - Curator can now delete all but for system indices.
 - Added the user-permissions available pre-defined alerting roles for opensearch.
 - PrometheusBlackboxExporter targets with customized propes added for internal service health-checking.
-- The dex chart has been upgraded from version 0.6.3 to 0.8.1. Dex has changed to have two replicas to increase the stability of OpenSearch's authentication. A dex ServiceMonitor has also been enabled
+- The dex chart has been upgraded from version 0.6.3 to 0.8.2. Dex has changed to have two replicas to increase the stability of OpenSearch's authentication. A dex ServiceMonitor has also been enabled
 - Self service: User admins are now allowed to add new users to the clusterrole user-view. Clusterrole and Clusterrolebinding has been added accordingly.
 - Enabled falcosidekick alertmanager if user alertmanager is also enabled
 
