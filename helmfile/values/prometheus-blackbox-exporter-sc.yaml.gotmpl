@@ -56,7 +56,7 @@ serviceMonitor:
       module: http_2xx
     {{- end }}
     {{- if .Values.prometheusBlackboxExporter.targets.thanosReceiver }}
-    - name: thanos-receiver
+    - name: thanos-internal-receiver
       url: thanos-receiver-receive.thanos.svc.cluster.local:10902/-/ready
       interval: 60s
       scrapeTimeout: 30s
