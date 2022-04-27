@@ -315,7 +315,7 @@ dex:
   topologySpreadConstraints:
     - labelSelector:
         matchLabels:
-          app: dex
+          app.kubernetes.io/name: dex
       maxSkew: 1
       topologyKey: kubernetes.io/hostname
       whenUnsatisfiable: DoNotSchedule
