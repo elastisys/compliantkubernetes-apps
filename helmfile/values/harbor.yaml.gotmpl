@@ -141,6 +141,8 @@ chartmuseum:
   nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
   affinity:     {{- toYaml .Values.harbor.affinity | nindent 4 }}
   tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
+  image:
+    tag: v2.4.2
 
 notary:
   server:
