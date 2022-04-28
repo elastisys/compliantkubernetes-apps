@@ -13,7 +13,7 @@ stringData:
   configurer.sh: |-
 {{ tpl (.Files.Get "files/configurer.sh") . | indent 4 }}
 
-  dashboards.ndjson: {{ .Files.Get "files/dashboards-resources/dashboards-resources.ndjson" | quote }}
+  dashboards.ndjson: {{ tpl (.Files.Get "files/dashboards-resources/dashboards-resources.ndjson") . | quote }}
 
 {{- if .Values.config.defaultTemplates }}
 {{ (.Files.Glob "files/index-templates/*.json").AsConfig | indent 2 }}
