@@ -37,10 +37,10 @@ fi
 echo "###############################"
 echo -e "Listing helm releases\n"
 
-"${bin_path}"/ck8s ops helmfile "${cluster_abbr}" status || true
+"${bin_path}"/ck8s ops helmfile "${cluster_abbr}" status
 
-failed_releases=$("${bin_path}"/ck8s ops helmfile "${cluster_abbr}" status --args="--output=json" 2>/dev/null \
-    | jq 'select(.info.status=="failed")' || true)
+failed_releases=$("${bin_path}"/ck8s ops helmfile "${cluster_abbr}" status --args="--output=json" \
+    | jq 'select(.info.status=="failed")')
 
 echo -e "###############################\n"
 
