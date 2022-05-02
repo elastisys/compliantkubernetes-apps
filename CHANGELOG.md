@@ -44,6 +44,7 @@
 - fluentd are upgraded from 2.4.0 to 5.0.15 and fluentd-elasticsearch are upgraded from 10.2.1 to 13.3.0. Elastisys also made their own fluentd-elasticsearch container image using fluentd-plugin-opensearch 1.0.4 to work with opensearch.
 - Changed the grafana image tag from 8.2.7 to 8.4.7 in both user-grafana and kube-prometheus-stack, as the latter has less vulnerabilities.
 - Changed the harbor chartmuseum image tag from 2.2.1 to 2.4.2 as the latter has less vulnerabilities.
+- Exposed fluentd-elasticsearch buffer settings in the wc-config.yaml
 
 ### Fixed
 - Use `master` tag for the grafana-label-enforcer as the previous sha used no longer exist.
