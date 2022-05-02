@@ -21,6 +21,7 @@ elasticsearch:
   reloadOnFailure: true
   log400Reason: true
   outputType: "opensearch"
+  buffer: {{- toYaml .Values.fluentd.elasticsearch.buffer | nindent 4 }}
 
 configMaps:
   useDefaults:
