@@ -15,6 +15,7 @@ elasticsearch:
   logLevel: "info"
   reloadOnFailure: true
   log400Reason: true
+  buffer: {{- toYaml .Values.fluentd.elasticsearch.buffer | nindent 4 }}
 
 secret:
 - name: OUTPUT_PASSWORD
