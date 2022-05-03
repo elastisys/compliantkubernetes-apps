@@ -28,6 +28,7 @@
 ### Updated
 
 ### Changed
+- Increased fluentd `FOR` alerts to 30m, should decrease number of false-positive alerts.
 
 ### Fixed
 

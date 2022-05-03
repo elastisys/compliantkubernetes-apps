@@ -258,7 +258,73 @@ prometheusRule:
   enabled: false
   prometheusNamespace: monitoring
   labels: {}
-  #  role: alert-rules
+  rules:
+  - alert: FluentdNodeDown
+    expr: up{job="{{ include "fluentd-elasticsearch.metricsServiceName" . }}"} == 0
+    for: 10m
+    labels:
+      service: fluentd
+      severity: warning
+    annotations:
+      summary: fluentd cannot be scraped
+      description: Prometheus could not scrape {{ "{{ $labels.job }}" }} for more than 10 minutes
+  - alert: FluentdNodeDown
+    expr: up{job="{{ include "fluentd-elasticsearch.metricsServiceName" . }}"} == 0
+    for: 30m
+    labels:
+      service: fluentd
+      severity: critical
+    annotations:
+      summary: fluentd cannot be scraped
+      description: Prometheus could not scrape {{ "{{ $labels.job }}" }} for more than 30 minutes
+  - alert: FluentdQueueLength
+    expr: rate(fluentd_status_buffer_queue_length[5m]) > 0.3
+    for: 1m
+    labels:
+      service: fluentd
+      severity: warning
+    annotations:
+      summary: fluentd node are failing
+      description: In the last 5 minutes, fluentd queues increased 30%. Current value is {{ "{{ $value }}" }}
+  - alert: FluentdQueueLength
+    expr: rate(fluentd_status_buffer_queue_length[5m]) > 0.5
+    for: 1m
+    labels:
+      service: fluentd
+      severity: critical
+    annotations:
+      summary: fluentd node are critical
+      description: In the last 5 minutes, fluentd queues increased 50%. Current value is {{ "{{ $value }}" }}
+  - alert: FluentdRecordsCountsHigh
+    expr: >
+      sum(rate(fluentd_output_status_emit_records{job="{{ include "fluentd-elasticsearch.metricsServiceName" . }}"}[5m]))
+      BY (instance) >  (3 * sum(rate(fluentd_output_status_emit_records{job="{{ include "fluentd-elasticsearch.metricsServiceName" . }}"}[15m]))
+      BY (instance))
+    for: 1m
+    labels:
+      service: fluentd
+      severity: critical
+    annotations:
+      summary: fluentd records count are critical
+      description: In the last 5m, records counts increased 3 times, comparing to the latest 15 min.
+  - alert: FluentdRetry
+    expr: increase(fluentd_status_retry_count[10m]) > 0
+    for: 30m
+    labels:
+      service: fluentd
+      severity: warning
+    annotations:
+      description: Fluentd retry count has been  {{ "{{ $value }}" }} for the last 10 minutes
+      summary: Fluentd retry count has been  {{ "{{ $value }}" }} for the last 10 minutes
+  - alert: FluentdOutputError
+    expr: increase(fluentd_output_status_num_errors[10m]) > 0
+    for: 30m
+    labels:
+      service: fluentd
+      severity: warning
+    annotations:
+      description: Fluentd output error count is {{ "{{ $value }}" }} for the last 10 minutes
+      summary: There have been Fluentd output error(s) for the last 10 minutes
 
 configMaps:
   useDefaults:
