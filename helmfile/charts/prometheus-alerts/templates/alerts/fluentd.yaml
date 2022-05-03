@@ -67,7 +67,7 @@ spec:
         description: In the last 5m, records counts increased 3 times, comparing to the latest 15 min.
     - alert: FluentdRetry
       expr: increase(fluentd_status_retry_count[10m]) > 0
-      for: 20m
+      for: 30m
       labels:
         service: fluentd
         severity: warning
@@ -76,7 +76,7 @@ spec:
         summary: Fluentd retry count has been  {{ "{{ $value }}" }} for the last 10 minutes
     - alert: FluentdOutputError
       expr: increase(fluentd_output_status_num_errors[10m]) > 0
-      for: 1s
+      for: 30m
       labels:
         service: fluentd
         severity: warning
