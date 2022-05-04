@@ -11,6 +11,11 @@ labelKey: grafana_dashboard
 # We will create one ConfigMap per dashboard in the .Release.Namespace. The namespace is defined in 50-applications.yaml
 # The dashboard name defined here should be the prefix for the `-dashboard.json` file name located in ./dashboards
 
+dashboard:
+  ck8sVersion: ""
+
+baseDomain: ""
+
 # Dashboards to include + settings if needed
 dashboards:
   backup:
@@ -91,3 +96,6 @@ dashboards:
   prometheus-timeseries:
     enabled: true
     user_visible: false
+  welcome:
+    enabled: true
+    user_visible: true
