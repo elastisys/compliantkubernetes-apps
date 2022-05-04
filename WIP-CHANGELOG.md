@@ -10,6 +10,8 @@
 
 ### Fixed
 
+- Issue where users couldn't do `POST` or `DELETE` requests to alertmanager via service proxy
+
 ### Added
 
 - Added support for UpCloud
