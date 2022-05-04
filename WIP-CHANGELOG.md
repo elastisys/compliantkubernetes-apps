@@ -15,5 +15,6 @@
 - Added support for UpCloud
 - Made thanos storegateway persistence size configurable
 - New 'Welcoming' Opensearch dashboard / home page.
+- New 'Welcoming' Grafana dashboard / home page.
 
 ### Removed

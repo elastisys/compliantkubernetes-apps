@@ -118,6 +118,8 @@ grafana.ini:
     role_attribute_path: contains(groups[*], '{{ .Values.user.grafana.oidc.userGroups.grafanaAdmin }}') && 'Admin' || contains(groups[*], '{{ .Values.user.grafana.oidc.userGroups.grafanaEditor }}') && 'Editor' || contains(groups[*], '{{ .Values.user.grafana.oidc.userGroups.grafanaViewer }}') && 'Viewer'
   users:
     viewers_can_edit: {{ .Values.user.grafana.viewersCanEdit }}
+  dashboards:
+    default_home_dashboard_path: /tmp/dashboards/welcome.json
 
 # Velero backup
 

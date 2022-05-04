@@ -2,6 +2,8 @@ apiVersion: v1
 kind: ConfigMapList
 items:
 {{- range $key, $value := .Values.dashboards }}
+{{- $_ := set $ "key" $key }}
+{{- $_ := set $ "value" $value }}
 {{- if $value.enabled }}
 - apiVersion: v1
   kind: ConfigMap
@@ -19,6 +21,10 @@ items:
     {{- $sync := (empty $value.sync) | ternary "**disabled**" (printf "**enabled** for bucket(s) %s" (join ", " (sortAlpha $value.sync))) }}
     {{ $key }}.json: |-
       {{- regexReplaceAll "<<rclone-sync-state>>" ($.Files.Get (printf "dashboards/%s-dashboard.json" $key)) $sync | nindent 6 }}
+    {{- else if eq $key "welcome" }}
+    {{- $markdown := (regexReplaceAll "\n" (tpl ($.Files.Get "files/welcome.md") $) "\\n") }}
+    {{ $key }}.json: |-
+      {{- regexReplaceAll "<<markdownstring>>" ($.Files.Get (printf "dashboards/%s-dashboard.json" $key)) $markdown | nindent 6 }}
     {{- else }}
     {{ $key }}.json: |-
       {{- regexReplaceAll "<<opensearchdashboardsURL>>" ($.Files.Get (printf "dashboards/%s-dashboard.json" $key)) ($value.logEndpoint | toString) | nindent 6 }}
