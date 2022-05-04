@@ -32,6 +32,8 @@ rules:
   - services/proxy
   verbs:
   - get
+  - create
+  - delete
 # Allow editing the user-alertmanager-auth secret
 - apiGroups:
   - ""

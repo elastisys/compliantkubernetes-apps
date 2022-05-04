@@ -9,6 +9,7 @@
 ### Fixed
 
 - Fixed deploy script with correct path to `extra-user-view` manifest.
+- Issue where users couldn't do `POST` or `DELETE` requests to alertmanager via service proxy
 
 ### Added
 
