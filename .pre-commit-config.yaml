@@ -24,8 +24,8 @@ repos:
   - id: trailing-whitespace
     exclude: helmfile/upstream/|helmfile/elastisys/
   - id: check-merge-conflict
-- repo: https://github.com/jumanjihouse/pre-commit-hooks
-  rev: 2.1.4
+- repo: https://github.com/robonaut/pre-commit-hooks
+  rev: feature/ruby-3-compat
   hooks:
   - id: shellcheck
     additional_dependencies: []
