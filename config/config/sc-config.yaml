@@ -238,6 +238,7 @@ prometheus:
 
   # Todo remove dependencie on alertmanager from service cluster
   alertmanagerSpec:
+    replicas: 2
     groupBy:
       - '...'
     resources:
@@ -251,6 +252,13 @@ prometheus:
           resources:
             requests:
               storage: 1Gi
+    topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app: alertmanager
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
 
   grafana:
     subdomain: grafana
