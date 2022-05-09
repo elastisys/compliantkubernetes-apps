@@ -91,7 +91,7 @@ yq_read_block() {
     value=$2
 
     yq read "${source}" --tojson --printMode p "**(.==${value})" | \
-             sed -r 's/\.\[.*\].*//' | sed -r 's/\\"//g' | uniq
+             sed -r 's/\.\[.*\].*//' | sed -r 's/\\//g' | uniq
 }
 
 # Copies a block from one file to another
@@ -108,11 +108,20 @@ yq_copy_commons() {
     source2=$2
     target=$3
 
-    keys=$(yq_merge "${source1}" "${source2}" --tojson | yq read - --tojson --printMode pv '**' | \
-           sed -rn 's/\{"(.+)":.*\}/\1/p' | sed -r 's/\.\[.+\].*//' | sed -r 's/\\"//g' | uniq)
+    keys=$(yq_merge "${source1}" "${source2}" --tojson | \
+           yq read - --tojson --printMode pv '**' | \
+           sed -rn 's/\{"(.+)":.*\}/\1/p' | \
+           sed -r 's/\.\[.+\].*//' | \
+           sed -r 's/\\//g' | \
+           uniq)
     for key in ${keys}; do
         compare=$(yq compare "${source1}" "${source2}" --tojson --printMode pv "${key}" || true)
         if [[ -z "${compare}" ]]; then
+            value=$(yq read "${source1}" --tojson --printMode v "${key}")
+            if [[ -z "${value}" ]]; then
+                log_error "Unknown key to copy from: ${key}"
+                exit 1
+            fi
             yq_copy_block "${source1}" "${target}" "${key}"
         fi
     done
@@ -125,7 +134,7 @@ yq_copy_changes() {
     target=$3
 
     keys=$(yq read "${source2}" --tojson --printMode pv '**' | \
-           sed -rn 's/\{"(.+)":.*\}/\1/p' | sed -r 's/\.\[.+\].*//' | sed -r 's/\\"//g' | uniq)
+           sed -rn 's/\{"(.+)":.*\}/\1/p' | sed -r 's/\.\[.+\].*//' | sed -r 's/\\//g' | uniq)
     for key in ${keys}; do
         compare=$(yq compare "${source1}" "${source2}" --tojson --printMode pv "${key}" | \
                   sed -rn 's/^\+(.*)/\1/p' || true)
