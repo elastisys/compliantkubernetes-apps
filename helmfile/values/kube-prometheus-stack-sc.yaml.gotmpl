@@ -48,15 +48,17 @@ alertmanager:
           # TODO: it would be nice to do this some other way.
           # The workload_cluster does not have an alertmanager, send to null.
           alertname: AlertmanagerDown
-          cluster: workload_cluster
+          {{- range .Values.global.clustersMonitoring }}
+          cluster: {{ . }}
         receiver: 'null'
-      {{ end }}
       - match:
           # TODO: it would be nice to do this some other way.
           # The workload_cluster does not have an alertmanager, send to null.
           alertname: PrometheusNotConnectedToAlertmanagers
-          cluster: workload_cluster
+          cluster: {{ . }}
         receiver: 'null'
+        {{- end }}
+      {{ end }}
       - match:
           # This alert is a bit over sensitive at the moment
           # See this: https://github.com/kubernetes-monitoring/kubernetes-mixin/issues/108
