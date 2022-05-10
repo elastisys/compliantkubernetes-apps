@@ -2,6 +2,7 @@
 <!-- BEGIN TOC -->
 - [v0.21.1](#v0211---2022-05-09)
 - [v0.21.0](#v0210---2022-04-28)
+- [v0.20.2](#v0202---2022-05-10)
 - [v0.20.1](#v0201---2022-04-13)
 - [v0.20.0](#v0200---2022-03-10)
 - [v0.19.0](#v0190---2022-01-25)
@@ -73,6 +74,17 @@
 - the possibility to add falco custom rules for each environment
 - New Grafana dashboard that shows how many timeseries there are in Prometheus.
 - Added the alternative port for kubelogin (18000) to be an allowed redirect url by default.
+
+-------------------------------------------------
+## v0.20.2 - 2022-05-10
+
+### Changed
+- Increased fluentd `FOR` alerts to 30m, should decrease number of false-positive alerts.
+
+### Fixed
+
+- Issue where users couldn't do `POST` or `DELETE` requests to alertmanager via service proxy
+-------------------------------------------------
 ## v0.20.1 - 2022-04-13
 
 ### Changed
