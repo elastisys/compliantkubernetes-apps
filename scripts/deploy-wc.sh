@@ -27,26 +27,10 @@ kubectl -n fluentd create secret generic opensearch \
 # Add example resources.
 # We use `create` here instead of `apply` to avoid overwriting any changes the
 # user may have done.
-if [ "$(kubectl get configmap fluentd-extra-config -n fluentd)" ] ; then
-  echo "fluentd-extra-config ConfigMap already in place. Ignoring."
-else
-  echo "Creating fluentd-extra-config ConfigMap"
-  kubectl create -f "${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-config.yaml"
-fi
-
-if [ "$(kubectl get configmap fluentd-extra-plugins -n fluentd)" ] ; then
-  echo "fluentd-extra-plugins ConfigMap already in place. Ignoring."
-else
-  echo "Creating fluentd-extra-plugins ConfigMap"
-  kubectl create -f "${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-plugins.yaml"
-fi
-
-if [ "$(kubectl get clusterrolebinding extra-user-view)" ] ; then
-  echo "extra-user-view ClusterRoleBinding already in place. Ignoring."
-else
-  echo "Creating extra-user-view ClusterRoleBinding"
-  kubectl create -f "${SCRIPTS_PATH}/../manifests/user-rbac/clusterrolebindings/extra-user-view.yaml"
-fi
+kubectl create -f "${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-config.yaml" \
+    2>/dev/null || echo "fluentd-extra-config configmap already in place. Ignoring."
+kubectl create -f "${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-plugins.yaml" \
+    2>/dev/null || echo "fluentd-extra-plugins configmap already in place. Ignoring." >&2
 
 echo "Installing helm charts" >&2
 cd "${SCRIPTS_PATH}/../helmfile"
