@@ -1,5 +1,6 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.20.2](#v0202---2022-05-10)
 - [v0.20.1](#v0201---2022-04-13)
 - [v0.20.0](#v0200---2022-03-10)
 - [v0.19.0](#v0190---2022-01-25)
@@ -18,6 +19,26 @@
 - [v0.6.0](#v060---2020-10-16)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.20.2 - 2022-05-10
+
+### Release notes
+
+### Updated
+
+### Changed
+
+- Improved error handling for applying manifests in wc deploy script
+
+### Fixed
+
+- Fixed deploy script with correct path to `extra-user-view` manifest.
+- Issue where users couldn't do `POST` or `DELETE` requests to alertmanager via service proxy
+
+### Added
+
+### Removed
 
 -------------------------------------------------
 ## v0.20.1 - 2022-04-13
