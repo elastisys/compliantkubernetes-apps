@@ -672,6 +672,9 @@ opensearch:
       - pattern: authlog-*
         sizeGB: 1
         ageDays: 30
+      - pattern: security-auditlog-*
+        sizeGB: 1
+        ageDays: 30
     startingDeadlineSeconds: 600
     activeDeadlineSeconds: 2700
     resources:
