@@ -18,6 +18,7 @@
 
 ### Added
 
+- Added support for Elastx
 - Added support for UpCloud
 - Made thanos storegateway persistence size configurable
 - New 'Welcoming' Opensearch dashboard / home page.

@@ -43,7 +43,7 @@ See [Quickstart](#Quickstart) for instructions on how to initialize the repo
 
 ### Cloud providers
 
-Currently we support four cloud providers: Exoscale, Safespring, Citycloud and AWS (beta). In addition to this we support running Compliant Kubernetes on bare metal (beta).
+Currently we support four cloud providers: Exoscale, Safespring, Citycloud, Elastx and AWS (beta). In addition to this we support running Compliant Kubernetes on bare metal (beta).
 
 ## Setup
 
@@ -117,7 +117,7 @@ Assuming you already have everything needed to install the apps, this is what yo
 
    ```bash
    export CK8S_ENVIRONMENT_NAME=my-ck8s-cluster
-   export CK8S_CLOUD_PROVIDER=[exoscale|safespring|citycloud|aws|baremetal]
+   export CK8S_CLOUD_PROVIDER=[exoscale|safespring|citycloud|elastx|aws|baremetal]
    export CK8S_FLAVOR=[dev|prod] # defaults to dev
    ```
 
