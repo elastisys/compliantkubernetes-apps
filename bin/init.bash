@@ -130,7 +130,7 @@ set_storage_class() {
         exit 1
     fi
     case ${CK8S_CLOUD_PROVIDER} in
-        safespring | citycloud)
+        safespring | citycloud | elastx)
             storage_class=cinder-csi
             ;;
 
@@ -165,7 +165,7 @@ set_object_storage() {
             yq write --inplace "${file}" "objectStorage.s3.forcePathStyle" false
             ;;
 
-        citycloud | safespring | upcloud)
+        citycloud | safespring | upcloud | elastx)
             object_storage_type="s3"
             yq write --inplace "${file}" "objectStorage.s3.region" "set-me"
             yq write --inplace "${file}" "objectStorage.s3.regionEndpoint" "set-me"
@@ -195,7 +195,7 @@ set_nginx_config() {
             service_enabled=false
             ;;
 
-        citycloud)
+        citycloud | elastx)
             use_proxy_protocol=false
             use_host_port=false
             service_enabled=true
@@ -240,7 +240,7 @@ set_fluentd_config() {
         exit 1
     fi
     case ${CK8S_CLOUD_PROVIDER} in
-        safespring | citycloud | exoscale | upcloud)
+        safespring | citycloud | exoscale | upcloud | elastx)
             use_region_endpoint=true
             ;;
 
@@ -270,7 +270,7 @@ set_harbor_config() {
             disable_redirect=false
             ;;
 
-        safespring | upcloud)
+        safespring | upcloud | elastx)
             persistence_type=objectStorage
             disable_redirect=true
             ;;

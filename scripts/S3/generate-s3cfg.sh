@@ -7,7 +7,7 @@ set -eu -o pipefail
 
 function usage() {
     echo "Usage:" 1>&2
-    echo "  $0 {aws|exoscale|safespring|citycloud} {access_key} {secret_key} {host_base} [region]" 1>&2
+    echo "  $0 {aws|exoscale|safespring|citycloud|elastx} {access_key} {secret_key} {host_base} [region]" 1>&2
     echo "  host_base - the host (and port if other than default) of the service" 1>&2
     echo "  region - the location where the buckets should be stored. This is ignored for exoscale, safespring and citycloud." 1>&2
     echo "Examples:" 1>&2
@@ -33,7 +33,7 @@ cat <<EOF
 host_base = $4
 host_bucket = %(bucket)s.$4
 EOF
-elif [ "$1" = "safespring" ] || [ "$1" = "citycloud" ]; then
+elif [ "$1" = "safespring" ] || [ "$1" = "citycloud" ] || [ "$1" = "elastx" ]; then
 cat <<EOF
 host_base = $4
 host_bucket = $4
