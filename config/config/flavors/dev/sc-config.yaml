@@ -43,6 +43,9 @@ opensearch:
       - pattern: authlog-*
         sizeGB: 1
         ageDays: 30
+      - pattern: security-auditlog-*
+        sizeGB: 1
+        ageDays: 7
   snapshot:
     enabled: false
     backupSchedule: 0 */12 * * * # run twice/day

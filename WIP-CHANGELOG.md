@@ -9,6 +9,7 @@
 - Patched Falco rules for  `write_etc_common` , `Launch Package Management Process in Container` , `falco_privileged_images` & `falco_sensitive_mount_containers`. Will be removed if upstream Falco Chart accepts these.
 - Improved error handling for applying manifests in wc deploy script
 - `kube-prometheus-stack-alertmanager` is configured to have 2 replicas to increase stability and make it highly available.
+- Add pattern `security-auditlog-*` to default retention for Curator
 
 ### Fixed
 

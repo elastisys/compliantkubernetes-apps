@@ -60,6 +60,9 @@ opensearch:
       - pattern: authlog-*
         sizeGB: 5
         ageDays: 30
+      - pattern: security-auditlog-*
+        sizeGB: 1
+        ageDays: 14
     resources:
       requests:
         cpu: 10m
