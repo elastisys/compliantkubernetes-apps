@@ -785,14 +785,19 @@ alerts:
     apiUrl: https://api.eu.opsgenie.com
 
 externalTrafficPolicy:
+  # Whitelisting requires externalTrafficPolicy.local to be true
+  # local: true
+
+  # Comma separated list of CIDRs, e.g. 172.16.0.0/24,172.24.0.0/24
   whitelistRange:
+    # global: 0.0.0.0/0
     dex: false
     harbor: false
     opensearch: false
     opensearchDashboards: false
     userGrafana: false
     opsGrafana: false
-    prometheusWc: false
+    thanosReceiver: false
 
 s3Exporter:
   # Also requries objectStorage.type=s3

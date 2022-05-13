@@ -3,6 +3,7 @@ ingress:
   clusterDomain: "{{ .Values.global.baseDomain }}"
   username: "kubeapiuser"
   password: "{{ .Values.kubeapiMetricsPassword }}"
-  ## TODO: ingress whitelist
-  #extraAnnotations:
-  #  nginx.ingress.kubernetes.io/whitelist-source-range: ...
+  {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.kubeapiMetrics }}
+  extraAnnotations:
+    nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.kubeapiMetrics }}
+  {{ end }}

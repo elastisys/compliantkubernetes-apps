@@ -182,9 +182,20 @@ fluentd:
     tolerations: []
     affinity: {}
     nodeSelector: {}
+
+externalTrafficPolicy:
+  # Whitelisting requires externalTrafficPolicy.local to be true
+  # local: true
+
+  # Comma separated list of CIDRs, e.g. 172.16.0.0/24,172.24.0.0/24
+  whitelistRange:
+    # global: 0.0.0.0/0
+    kubeapiMetrics: false
+
 velero:
   includedNamespaces:
     - alertmanager
+
 prometheusBlackboxExporter:
   targets:
     gatekeeper: true

@@ -57,6 +57,9 @@ receive:
       nginx.ingress.kubernetes.io/auth-secret: thanos-ingress-secret-basic-auth
       nginx.ingress.kubernetes.io/auth-type: basic
       nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
+      {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.thanosReceiver }}
+      nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.thanosReceiver }}
+      {{ end }}
 
 receiveDistributor:
   resources: {{- toYaml .Values.thanos.receiveDistributor.resources | nindent 4 }}

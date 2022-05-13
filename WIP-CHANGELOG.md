@@ -22,5 +22,6 @@
 - Made thanos storegateway persistence size configurable
 - New 'Welcoming' Opensearch dashboard / home page.
 - New 'Welcoming' Grafana dashboard / home page.
+- Add allowlisting for kubeapi-metrics (wc) and thanos-receiver (sc) endpoints
 
 ### Removed
