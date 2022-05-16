@@ -7,6 +7,16 @@
       "index.refresh_interval": "10s",
       "plugins.index_state_management.rollover_alias": "kubernetes",
       "mapping.total_fields.limit": "1000"
+    },
+    "mappings" : {
+      "properties" : {
+        "@timestamp" : {
+          "type" : "date"
+        },
+        "ts" : {
+          "type" : "text"
+        }
+      }
     }
   }
 }
