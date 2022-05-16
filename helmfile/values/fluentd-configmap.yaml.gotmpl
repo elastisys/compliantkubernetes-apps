@@ -183,6 +183,7 @@ forwarder:
         @id fluentd-containers.log
         @type tail
         path /var/log/containers/*.log
+        exclude_path ["/var/log/containers/fluentd*"]
         pos_file /var/log/containers.log.pos
         pos_file_compaction_interval 72h
         tag raw.kubernetes.*
