@@ -312,11 +312,7 @@ extraConfigMaps:
     </match>
     <match kubernetes.**>
       @id opensearch_kubernetes
-      {{- if .Values.opensearch.indexPerNamespace }}
-      @type elasticsearch_dynamic
-      {{- else }}
       @type "#{ENV['OUTPUT_TYPE']}"
-      {{- end }}
       @log_level "#{ENV['OUTPUT_LOG_LEVEL']}"
       include_tag_key "#{ENV['OUTPUT_INCLUDE_TAG_KEY']}"
       hosts "#{ENV['OUTPUT_HOSTS']}"
@@ -337,13 +333,17 @@ extraConfigMaps:
       include_timestamp true # defaults to false
       {{- if .Values.opensearch.indexPerNamespace }}
       logstash_format true
-      logstash_prefix ${record['kubernetes']['namespace_name']}
+      logstash_prefix ${$.kubernetes.namespace_name}
       {{- else }}
       index_name kubernetes
       {{- end }}
       default_opensearch_version 1
 
+      {{- if .Values.opensearch.indexPerNamespace }}
+      <buffer tag, $.kubernetes.namespace_name>
+      {{- else }}
       <buffer>
+      {{- end }}
         @type "#{ENV['OUTPUT_BUFFER_TYPE']}"
         path /var/log/fluentd-buffers/kubernetes.kubernetes.system.buffer
         flush_mode "#{ENV['OUTPUT_BUFFER_FLUSH_MODE']}"
