@@ -15,6 +15,7 @@
 - Issue where users couldn't do `POST` or `DELETE` requests to alertmanager via service proxy
 - Fixed deploy script with correct path to `extra-user-view` manifest.
 - Fixed issue when `keys` in config had `'.'` in its name and was being moved from `sc/wc` to `common` configs.
+- Fixed broken index per namespace feature for logging. The version of `elasticsearch_dynamic` plugin in Fluentd no longer supports OpenSearch. Now the OpenSearch output plugin is used for the feature thanks to the usage of placeholders.
 
 ### Added
 
