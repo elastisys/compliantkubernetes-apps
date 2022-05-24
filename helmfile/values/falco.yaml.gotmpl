@@ -182,7 +182,6 @@ customRules:
         and not mcafee_writing_cma_d
         and not avinetworks_supervisor_writing_ssh
         and not multipath_writing_conf
-        and not calico_node
     - macro: falco_sensitive_mount_containers
       condition: (user_trusted_containers or
               aws_eks_image_sensitive_mount or
