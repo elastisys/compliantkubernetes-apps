@@ -3,6 +3,7 @@ existingObjstoreSecret: thanos-objectstorage-secret-objstore-secret
 query:
   enabled: true
   replicaCount: {{ .Values.thanos.query.replicaCount }}
+
   dnsDiscovery:
     enabled: false
   stores:
@@ -10,6 +11,11 @@ query:
     {{- range $i := until .Values.thanos.receiver.replicaCount }}
     - "thanos-receiver-receive-{{ $i }}.thanos-receiver-receive-headless.thanos.svc.cluster.local:10901"
     {{- end }}
+
+  replicaLabel:
+    - replica
+    - prometheus_replica
+
   resources: {{- toYaml .Values.thanos.query.resources | nindent 4 }}
 
 queryFrontend:

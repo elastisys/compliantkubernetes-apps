@@ -421,6 +421,11 @@ thanos:
     retentionResolution5m: 90d
     retentionResolution1h: 0s
 
+    # Deduplication of metrics in long term storage
+    # receiverReplicas: Deduplicate results from multple receivers, simpler dedup
+    # prometheusReplicas: Deduplicate results from multple receivers and multiple prometheis, heavier dedup
+    deduplication: none
+
     # Persistence is recommended for caching.
     # https://thanos.io/v0.24/components/compact.md/#disk
     persistence:

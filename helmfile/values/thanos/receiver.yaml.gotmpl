@@ -8,10 +8,24 @@ queryFrontend:
 
 compactor:
   enabled: true
+
   retentionResolutionRaw: {{ .Values.thanos.compactor.retentionResolutionRaw }}
   retentionResolution5m: {{ .Values.thanos.compactor.retentionResolution5m }}
   retentionResolution1h: {{ .Values.thanos.compactor.retentionResolution1h }}
+
+  {{- if eq .Values.thanos.compactor.deduplication "receiverReplicas" }}
+  extraFlags:
+    - --deduplication.func=
+    - --deduplication.replica-label=replica
+  {{- else if eq .Values.thanos.compactor.deduplication "prometheusReplicas" }}
+  extraFlags:
+    - --deduplication.func=penalty
+    - --deduplication.replica-label=replica
+    - --deduplication.replica-label=prometheus_replica
+  {{- end }}
+
   resources: {{- toYaml .Values.thanos.compactor.resources | nindent 4 }}
+
   persistence:
     size: {{ .Values.thanos.compactor.persistence.size }}
 

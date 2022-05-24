@@ -31,6 +31,8 @@
 - New 'Welcoming' Opensearch dashboard / home page.
 - New 'Welcoming' Grafana dashboard / home page.
 - Add allowlisting for kubeapi-metrics (wc) and thanos-receiver (sc) endpoints
+- Add support for running prometheus in HA mode
+- Add option for deduplication/vertical compaction with thanos-compactor
 
 ### Removed
 

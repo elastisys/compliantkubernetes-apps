@@ -279,13 +279,21 @@ prometheusOperator:
 
 prometheus:
   prometheusSpec:
+    replicas: {{ .Values.prometheus.replicas }}
+
+    externalLabels:
+      cluster: {{ .Values.global.clusterName }}
+
+    # Don't add prometheus labels.
+    prometheusExternalLabelNameClear: true
+    {{- if le .Values.prometheus.replicas 1 }}
+    replicaExternalLabelNameClear: true
+    {{- end }}
+
     resources: {{- toYaml .Values.prometheus.resources | nindent 8  }}
     nodeSelector: {{- toYaml .Values.prometheus.nodeSelector | nindent 8 }}
     affinity: {{- toYaml .Values.prometheus.affinity | nindent 8 }}
     tolerations: {{- toYaml .Values.prometheus.tolerations | nindent 8 }}
-
-    externalLabels:
-      cluster: {{ .Values.global.clusterName }}
 
     {{- if and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
     remoteWrite:
@@ -293,10 +301,6 @@ prometheus:
       headers:
         THANOS-TENANT: {{ .Values.global.clusterName }}
     {{- end }}
-
-    # Don't add prometheus info.
-    prometheusExternalLabelNameClear: true
-    replicaExternalLabelNameClear: true
 
     # Empty selector to select all namespaces
     podMonitorNamespaceSelector: {}

@@ -47,8 +47,16 @@ prometheus:
     enabled: false
 
   prometheusSpec:
+    replicas: {{ .Values.prometheus.replicas }}
+
     externalLabels:
       cluster: {{ .Values.global.clusterName }}
+
+    # Dont add prometheus labels.
+    prometheusExternalLabelNameClear: true
+    {{- if le .Values.prometheus.replicas 1 }}
+    replicaExternalLabelNameClear: true
+    {{- end }}
 
     {{- if and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
     remoteWrite:
@@ -66,9 +74,6 @@ prometheus:
           name: thanos-ingress-secret-basic-auth
     {{- end }}
 
-    # Dont add prometheus labels.
-    prometheusExternalLabelNameClear: true
-    replicaExternalLabelNameClear: true
 
     # Select everything
     serviceMonitorNamespaceSelector:
