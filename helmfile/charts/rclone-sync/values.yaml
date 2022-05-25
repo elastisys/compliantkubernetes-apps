@@ -27,6 +27,16 @@ config:
       forcePathStyle: true
       v2Auth: false
 
+  encrypt:
+    enabled: false
+    name: encrypt
+    # rclone obscure of "somelongsecret"
+    password: OYAvXLS7N7LYYqgvmQejHIepyHwdt2q852PRTxpb
+    # rclone obscure of "somelongsecret"
+    salt: wc2BQGqZ4lD4I_Vtwyncv47QZ6Okrc7hY5ONzWQC
+    directoryNames: false
+    fileNames: false
+
 defaultSchedule: 0 5 * * *
 
 buckets:

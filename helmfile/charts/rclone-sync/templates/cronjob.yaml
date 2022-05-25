@@ -27,10 +27,10 @@ spec:
               args:
                 - sync
                 - {{ $.Values.config.source.name }}:{{ .source }}
-                {{- if hasKey . "destination" }}
-                - {{ $.Values.config.destination.name }}:{{ .destination }}
+                {{- if $.Values.config.encrypt.enabled }}
+                - "{{ $.Values.config.encrypt.name }}-{{ .destination }}:"
                 {{- else }}
-                - {{ $.Values.config.destination.name }}:{{ .source }}
+                - {{ $.Values.config.destination.name }}:{{ .destination }}
                 {{- end }}
                 - --log-level
                 - DEBUG

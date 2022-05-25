@@ -41,16 +41,39 @@ config:
     {{- end }}
   {{- end }}
 
+  encrypt:
+  {{- if .Values.objectStorage.sync.encrypt.enabled }}
+    enabled: true
+    name: encrypt
+    password: {{ .Values.objectStorage.sync.encrypt.passwordObscured }}
+    salt: {{ .Values.objectStorage.sync.encrypt.saltObscured }}
+    directoryNames: {{ .Values.objectStorage.sync.encrypt.directoryNames }}
+    fileNames: {{ .Values.objectStorage.sync.encrypt.fileNames }}
+  {{- else }}
+    enabled: false
+  {{- end }}
+
 defaultSchedule: {{ .Values.objectStorage.sync.defaultSchedule }}
 
 buckets:
 {{- if .Values.objectStorage.sync.syncDefaultBuckets }}
-{{- range (values .Values.objectStorage.buckets | sortAlpha) }}
+  {{- range (values .Values.objectStorage.buckets | sortAlpha) }}
   - source: {{ . }}
-{{- end }}
+    destination: {{ . }}
+  {{- end }}
 {{- end }}
 {{- if .Values.objectStorage.sync.buckets }}
-{{- toYaml .Values.objectStorage.sync.buckets | nindent 2 }}
+  {{- range .Values.objectStorage.sync.buckets }}
+  - source: {{ .source }}
+    {{- if hasKey . "destination" }}
+    destination: {{ .destination }}
+    {{- else }}
+    destination: {{ .source }}
+    {{- end }}
+    {{- if hasKey . "schedule" }}
+    schedule: {{ .schedule }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 
 resources: {{- toYaml .Values.objectStorage.sync.resources | nindent 2 }}

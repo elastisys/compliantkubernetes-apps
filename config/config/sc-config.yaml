@@ -41,6 +41,14 @@ objectStorage:
       #   # destination: destination-bucket # if unset it will be the same as 'source'
       #   # schedule: 0 5 * * *             # if unset it will be the same as 'defaultSchedule'
 
+    # Encrypt (symmetric) before syncing
+    encrypt:
+      enabled: false
+
+      # Enable to encrypt directory or file names
+      directoryName: false
+      fileName: false
+
     ## Sync job resources
     resources:
       requests:
