@@ -19,6 +19,7 @@
 - Fixed conflicting type `ts` in opensearch, where multiple services log `ts` as different types.
 - Fixed conflicting type `@timestamp`, should always be `date` in opensearch.
 - Fluentd no longer tails its own container log. Fixes the issue when Fluentd failed to push to OpenSearch and started filling up its logs with `\`. Because recursive logging of its own errors to OpenSearch which kept failing and for each fail adding more `\`.
+- Split the grafana-ops configmaplist into separate configmaps, which in some instances caused errors in helm due to the size of the resulting resource
 
 ### Added
 
