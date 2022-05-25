@@ -122,26 +122,6 @@ releases:
   installed: {{ .Values.calicoFelixMetrics.enabled }}
   missingFileHandler: Error
 
-#
-# OLD - to be removed
-#
-# Blackbox-sc-wc
-- name: blackbox
-  namespace: monitoring
-  labels:
-    app: blackbox
-  chart: ./upstream/prometheus-blackbox-exporter
-  version: 5.3.1
-  installed: false
-  missingFileHandler: Error
-  values:
-{{ if eq .Environment.Name "service_cluster" }}
-  - values/blackbox-sc.yaml.gotmpl
-{{ end }}
-{{ if eq .Environment.Name "workload_cluster" }}
-  - values/blackbox-wc.yaml.gotmpl
-{{ end }}
-
 # Prometheus blackboc exporter
 - name: prometheus-blackbox-exporter
   namespace: monitoring
@@ -206,33 +186,6 @@ releases:
   wait: true
   values:
   - values/dex.yaml.gotmpl
-
-# Prometheus-instance for reader workload cluster metrics from InfluxDB
-- name: wc-reader
-  namespace: monitoring
-  labels:
-    app: prometheus-wc-reader
-  chart: ./charts/prometheus-instance
-  version: 0.1.0
-  installed: false
-  missingFileHandler: Error
-  values:
-  - values/prometheus-wc-reader.yaml.gotmpl
-
-# prometheus wc-reader alerts
-- name: wc-reader-alerts
-  namespace: monitoring
-  labels:
-    app: prometheus-alerts
-    prometheus: wc-reader
-  chart: ./charts/prometheus-alerts
-  version: 0.1.1
-  installed: false
-  missingFileHandler: Error
-  values:
-  # Note: we want to have alerts for WC since this is wc-reader, even if it is
-  # running in SC.
-  - values/prometheus-alerts-wc.yaml.gotmpl
 
 - name: sc-servicemonitor
   namespace: monitoring
@@ -532,18 +485,6 @@ releases:
   missingFileHandler: Error
   values:
   - values/thanos/ruler.yaml.gotmpl
-
-# InfluxDB with disk usage monitoring and metrics retention
-- name: influxdb
-  namespace: influxdb-prometheus
-  labels:
-    app: influxdb
-  chart: ./elastisys/influxdb
-  version: 4.8.15
-  installed: false
-  missingFileHandler: Error
-  values:
-  - values/influxdb.yaml.gotmpl
 
 - name: s3-exporter
   namespace: monitoring

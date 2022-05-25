@@ -32,3 +32,5 @@
 - Add allowlisting for kubeapi-metrics (wc) and thanos-receiver (sc) endpoints
 
 ### Removed
+
+- Removed disabled releases from helmfile
