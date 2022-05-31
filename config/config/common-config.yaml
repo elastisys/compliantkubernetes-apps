@@ -135,6 +135,8 @@ kubeStateMetrics:
       memory: 100Mi
 
 prometheus:
+  replicas: 1
+
   ## Persistence for prometheus to store metrics and wal.
   storage:
     enabled: false

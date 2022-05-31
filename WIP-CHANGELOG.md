@@ -23,6 +23,7 @@
 - Split the grafana-ops configmaplist into separate configmaps, which in some instances caused errors in helm due to the size of the resulting resource
 - PrometheusNotConnectedToAlertmanagers alert will be sent to `null` if Alertmanger is disabled in wc
 - Removed undefined macro preventing falco rules to be compiled
+- Add missing default config option for prometheus replicas
 
 ### Added
 
