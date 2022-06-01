@@ -584,7 +584,7 @@ releases:
   labels:
     app: falco-exporter
   chart: ./upstream/falco-exporter
-  version: 0.3.8
+  version: 0.8.0
   installed: {{ .Values.falco.enabled }}
   missingFileHandler: Error
   values:

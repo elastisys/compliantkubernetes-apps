@@ -12,10 +12,17 @@ service:
   annotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "9376"
+  # Enable Mutual TLS for HTTP metrics server
+  mTLS:
+    enabled: false
+
+# /readiness and /liveness probes port
+probesPort: 19376
 
 image:
+  registry: docker.io
   repository: falcosecurity/falco-exporter
-  tag: 0.3.0
+  tag: 0.7.0
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -47,10 +54,17 @@ podSecurityPolicy:
   # If not set and create is true, a name is generated using the fullname template
   name:
 
-podSecurityContext: {}
+podSecurityContext:
+  {}
   # fsGroup: 2000
 
-securityContext: {}
+daemonset:
+  # Annotations to add to the DaemonSet pods
+  annotations: {}
+  podLabels: {}
+
+securityContext:
+  {}
   # capabilities:
   #   drop:
   #   - ALL
@@ -58,7 +72,8 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
-resources: {}
+resources:
+  {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -92,7 +107,33 @@ serviceMonitor:
 grafanaDashboard:
   enabled: false
   namespace: default
-
+  prometheusDatasourceName: Prometheus
 scc:
   # true here enabled creation of Security Context Constraints in Openshift
   create: true
+
+# Create PrometheusRules for alerting on priority events
+prometheusRules:
+  enabled: false
+  alerts:
+    warning:
+      enabled: true
+      rate_interval: "5m"
+      threshold: 0
+    error:
+      enabled: true
+      rate_interval: "5m"
+      threshold: 0
+    critical:
+      enabled: true
+      rate_interval: "5m"
+      threshold: 0
+    alert:
+      enabled: true
+      rate_interval: "5m"
+      threshold: 0
+    emergency:
+      enabled: true
+      rate_interval: "1m"
+      threshold: 0
+    additionalAlerts: {}

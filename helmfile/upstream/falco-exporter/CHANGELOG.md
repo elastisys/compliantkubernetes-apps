@@ -3,6 +3,86 @@
 This file documents all notable changes to `falco-exporter` Helm Chart. The release
 numbering uses [semantic versioning](http://semver.org).
 
+## v0.8.0
+
+* Upgrade falco-exporter version to v0.7.0 (see the [falco-exporter changelog](https://github.com/falcosecurity/falco-exporter/releases/tag/v0.7.0)) 
+
+### Major Changes
+
+* Add option to add labels to the Daemonset pods
+
+## v0.7.2
+
+### Minor Changes
+
+* Add option to add labels to the Daemonset pods
+
+## v0.7.1
+
+### Minor Changes
+
+* Fix `FalcoExporterAbsent` expression
+
+## v0.7.0
+
+### Major Changes
+
+* Adds ability to create custom PrometheusRules for alerting
+
+## v0.6.2
+
+## Minor Changes
+
+* Add Check availability of 'monitoring.coreos.com/v1' api version
+
+## v0.6.1
+
+### Minor Changes
+
+* Add option the add annotations to the Daemonset
+
+## v0.6.0
+
+### Minor Changes
+
+* Upgrade falco-exporter version to v0.6.0 (see the [falco-exporter changelog](https://github.com/falcosecurity/falco-exporter/releases/tag/v0.6.0))
+
+## v0.5.2
+
+### Minor changes
+
+* Make image registry configurable
+
+## v0.5.1
+
+* Display only non-zero rates in Grafana dashboard template
+
+## v0.5.0
+
+### Minor Changes
+
+* Upgrade falco-exporter version to v0.5.0
+* Add metrics about Falco drops
+* Make `unix://` prefix optional
+
+## v0.4.2
+
+### Minor Changes
+
+* Fix Prometheus datasource name reference in grafana dashboard template
+
+## v0.4.1
+
+### Minor Changes
+
+* Support release namespace configuration
+
+## v0.4.0
+
+### Mayor Changes
+
+* Add Mutual TLS for falco-exporter enable/disabled feature
+
 ## v0.3.8
 
 ### Minor Changes

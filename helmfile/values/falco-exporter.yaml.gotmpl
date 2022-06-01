@@ -1,7 +1,3 @@
-image:
-  tag: 0.3.0
-  pullPolicy: IfNotPresent
-
 resources: {{- toYaml .Values.falco.falcoExporter.resources | nindent 2  }}
 nodeSelector: {{- toYaml .Values.falco.falcoExporter.nodeSelector | nindent 2  }}
 affinity: {{- toYaml .Values.falco.falcoExporter.affinity | nindent 2  }}

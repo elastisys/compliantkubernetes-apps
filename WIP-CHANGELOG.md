@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Bump falco-exporter chart to v0.8.0.
+
 ### Fixed
 
 - `prometheus-blackbox-exporter's` internal thanos servicemonitor changed name to avoid name collisions.
