@@ -2,6 +2,8 @@
 
 ### Updated
 
+- Update the Velero plugin for AWS to v1.3.1
+
 ### Changed
 
 ### Fixed

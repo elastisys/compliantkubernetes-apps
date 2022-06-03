@@ -8,7 +8,7 @@ nodeSelector: {{- toYaml .Values.velero.nodeSelector | nindent 2  }}
 initContainers:
   {{- if eq .Values.objectStorage.type "s3" }}
   - name: velero-plugin-for-aws
-    image: velero/velero-plugin-for-aws:v1.0.0
+    image: velero/velero-plugin-for-aws:v1.3.1
     imagePullPolicy: IfNotPresent
     volumeMounts:
       - mountPath: /target
