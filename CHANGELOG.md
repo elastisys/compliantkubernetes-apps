@@ -77,6 +77,7 @@
 - Fixed conflicting type `@timestamp`, should always be `date` in opensearch.
 - Fluentd no longer tails its own container log. Fixes the issue when Fluentd failed to push to OpenSearch and started filling up its logs with `\`. Because recursive logging of its own errors to OpenSearch which kept failing and for each fail adding more `\`.
 
+-------------------------------------------------
 ## v0.21.1 - 2022-05-09
 
 ### Changed
