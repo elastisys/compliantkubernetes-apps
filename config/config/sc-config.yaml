@@ -651,6 +651,19 @@ opensearch:
     nodeSelector: {}
     tolerations: []
 
+  # Initializes and reconfigures the OpenSearch security plugin
+  # Disable after the cluster is initialized to prevent it from removing manually created user, roles, role mappings, etc.
+  securityadmin:
+    enabled: true
+    activeDeadlineSeconds: 1200
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 250m
+        memory: 256Mi
+
   # Config for https://www.elastic.co/guide/en/elasticsearch/client/curator/5.8/about.html
   curator:
     enabled: true

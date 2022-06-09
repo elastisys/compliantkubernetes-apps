@@ -15,6 +15,7 @@
 
 - Bump falco-exporter chart to v0.8.0.
 - Users are now not forced to use proxy for connecting to alertmanager but can use port-forward as well.
+- The OpenSearch security config will now be managed completely by securityadmin
 
 ### Fixed
 
@@ -26,6 +27,10 @@
 
 - Add option to encrypt off-site buckets replicated with rclone sync
 - Added metrics for field mappings and an alert that will throw an error if the fields get close to the max limit.
+- Add support for automatic reloading of the security config for OpenSearch
+  - **Warning**: When this runs the security plugin settings will be reset. All users, roles, and role mappings created via the API will be removed, so create a backup or be prepared to recreate the resources.
+  - The securityadmin can be disabled to protect manually created resources, but it will prevent the OpenSearch cluster to initialize the security plugin when the cluster is forming.
+- Add missing roles for alerting in OpenSearch
 
 ### Removed
 - wcReader mentions from all configs files

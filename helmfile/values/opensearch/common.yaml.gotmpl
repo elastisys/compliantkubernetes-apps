@@ -42,7 +42,7 @@ config:
           http:
             enabled: false
         allow_unsafe_democertificates: false
-        allow_default_init_securityindex: true
+        allow_default_init_securityindex: false
         authcz:
           admin_dn:
             - "CN=admin.opensearch-system.cluster.local,O=compliantkubernetes"
@@ -110,10 +110,6 @@ extraInitContainers:
       runAsUser: 0
 
 secretMounts:
-  - secretName: opensearch-admin-cert
-    name: opensearch-admin-cert
-    path: /usr/share/opensearch/config/admin
-    defaultMode: 0400
   - secretName: opensearch-transport-cert
     name: opensearch-transport-cert
     path: /usr/share/opensearch/config/transport
@@ -128,133 +124,6 @@ podSecurityPolicy:
 
 networkPolicy:
   create: true
-
-securityConfig:
-  config:
-    data:
-      config.yml: |-
-        _meta:
-          type: "config"
-          config_version: 2
-
-        config:
-          dynamic:
-            authc:
-              basic_internal_auth_domain:
-                description: "Authenticate via HTTP Basic against internal users database"
-                http_enabled: true
-                transport_enabled: true
-                order: 0
-                http_authenticator:
-                  type: basic
-                  challenge: false
-                authentication_backend:
-                  type: internal
-              {{ if .Values.opensearch.sso.enabled }}
-              openid_auth_domain:
-                description: "OpenID Connect"
-                http_enabled: true
-                transport_enabled: true
-                order: 1
-                http_authenticator:
-                  type: openid
-                  challenge: false
-                  config:
-                    openid_connect_url: http://dex.dex.svc.cluster.local:5556/.well-known/openid-configuration
-                    openid_connect_idp:
-                      enable_ssl: false
-                      verify_hostnames: false
-                    subject_key: {{ .Values.opensearch.sso.subjectKey }}
-                    roles_key: {{ .Values.opensearch.sso.rolesKey }}
-                authentication_backend:
-                  type: noop
-              {{ end }}
-
-      internal_users.yml: |-
-        _meta:
-          type: "internalusers"
-          config_version: 2
-
-        admin:
-          hash: {{ .Values.opensearch.adminHash }}
-          reserved: true
-          opendistro_security_roles:
-          - "all_access"
-          - "manage_snapshots"
-          description: "Admin user"
-
-        dashboards:
-          hash: {{ .Values.opensearch.dashboardsHash }}
-          reserved: true
-          opendistro_security_roles:
-          - "kibana_server"
-          description: "OpenSearch Dashboards user"
-
-        configurer:
-          hash: {{ .Values.opensearch.configurerHash }}
-          reserved: true
-          opendistro_security_roles:
-          - "kibana_user"
-          - "configurer"
-          description: "Configurer user"
-
-      roles.yml: |-
-        _meta:
-          type: "roles"
-          config_version: 2
-
-        # Can probably be locked down further
-        configurer:
-          static: false
-          hidden: false
-          reserved: false
-          cluster_permissions:
-          - "cluster:admin/repository/put"
-          - "cluster_manage_index_templates"
-          - "cluster:admin/opendistro/ism/policy/*"
-          index_permissions:
-          - index_patterns:
-            - "*"
-            allowed_actions:
-            - "create_index"
-            - "crud"
-            - "manage_aliases"
-            - "indices:admin/index_template/*"
-            - "indices:admin/opensearch/ism/managedindex"
-            - "indices:admin/rollover"
-            - "indices:monitor/stats"
-
-      # Needed
-      roles_mapping.yml: |-
-        _meta:
-          type: "rolesmapping"
-          config_version: 2
-
-      # Needed
-      tenants.yml: |-
-        _meta:
-          type: "tenants"
-          config_version: 2
-
-      # Needed
-      action_groups.yml: |-
-        _meta:
-          type: "actiongroups"
-          config_version: 2
-
-      # Optional
-      nodes_dn.yml: |-
-        _meta:
-          type: "nodesdn"
-          config_version: 2
-
-      # Optional
-      whitelist.yml: |-
-        _meta:
-          type: "whitelist"
-          config_version: 2
-        config:
-          enabled: false
 
 {{- if .Values.opensearch.snapshot.enabled }}
 keystore:

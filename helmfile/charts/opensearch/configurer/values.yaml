@@ -9,6 +9,9 @@ baseDomain: ""
 nameOverride: ""
 fullnameOverride: ""
 
+# Only used to template a checksum, the config is loaded via secret.
+securityConfig: {}
+
 opensearch:
   userSecret: opensearch-configurer-user
   clusterEndpoint: opensearch-cluster-master:9200

@@ -31,6 +31,7 @@ charts_ignore_list=(
   "app!=opensearch-client"
   "app!=opensearch-dashboards"
   "app!=opensearch-secrets"
+  "app!=opensearch-securityadmin"
   "app!=opensearch-configurer"
   "app!=falco"
   "app!=falco-exporter"

@@ -268,6 +268,7 @@ releases:
   chart: ./upstream/opensearch
   version: 1.7.1
   installed: true
+  wait: true
   needs:
   {{- if .Values.opensearch.sso.enabled }}
   - dex/dex
@@ -313,6 +314,7 @@ releases:
   chart: ./upstream/opensearch-dashboards
   version: 1.1.2
   installed: true
+  wait: true
   needs:
   - opensearch-system/opensearch-master
   values:
@@ -328,7 +330,7 @@ releases:
   installed: {{ .Values.opensearch.snapshot.enabled }}
   missingFileHandler: Error
   needs:
-  - opensearch-system/opensearch-master
+  - opensearch-system/opensearch-configurer
   values:
   - values/opensearch/backup.yaml.gotmpl
 
@@ -342,7 +344,7 @@ releases:
   installed: {{ .Values.opensearch.snapshot.enabled }}
   missingFileHandler: Error
   needs:
-  - opensearch-system/opensearch-master
+  - opensearch-system/opensearch-configurer
   values:
   - values/opensearch/slm.yaml.gotmpl
 
@@ -356,9 +358,22 @@ releases:
   installed: {{ .Values.opensearch.curator.enabled }}
   missingFileHandler: Error
   needs:
-  - opensearch-system/opensearch-master
+  - opensearch-system/opensearch-configurer
   values:
   - values/opensearch/curator.yaml.gotmpl
+
+- name: opensearch-securityadmin
+  namespace: opensearch-system
+  labels:
+    app: opensearch-securityadmin
+    group: opensearch
+  chart: ./charts/opensearch/securityadmin
+  version: 0.1.0
+  installed: {{ .Values.opensearch.securityadmin.enabled }}
+  needs:
+  - opensearch-system/opensearch-master
+  values:
+  - values/opensearch/securityadmin.yaml.gotmpl
 
 - name: opensearch-configurer
   namespace: opensearch-system
@@ -369,9 +384,14 @@ releases:
   version: 0.1.0
   installed: true
   needs:
+  {{- if .Values.opensearch.securityadmin.enabled }}
+  - opensearch-system/opensearch-securityadmin
+  {{- else }}
   - opensearch-system/opensearch-master
+  {{- end }}
   - opensearch-system/opensearch-dashboards
   values:
+  - values/opensearch/securityadmin.yaml.gotmpl
   - values/opensearch/configurer.yaml.gotmpl
 
 # prometheus-elasticsearch-exporter
@@ -385,7 +405,7 @@ releases:
   installed: true
   missingFileHandler: Error
   needs:
-  - opensearch-system/opensearch-master
+  - opensearch-system/opensearch-configurer
   values:
   - values/prometheus-elasticsearch-exporter.yaml.gotmpl
 

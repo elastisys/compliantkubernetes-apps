@@ -1,0 +1,39 @@
+fullnameOverride: ""
+nameOverride: ""
+
+imagePullSecrets: []
+image:
+  repository: opensearchproject/opensearch
+  pullPolicy: IfNotPresent
+  tag: 1.2.4
+
+helm:
+  hook: post-install,post-upgrade
+  deletePolicy: before-hook-creation,hook-failed
+
+# Only used to template a checksum, the config is loaded via secret.
+securityConfig: {}
+
+opensearch:
+  clusterService: opensearch-master
+  clusterPort: 9300
+
+  adminCertSecret: opensearch-admin-cert
+  securityConfigSecret: opensearch-securityconfig
+
+activeDeadlineSeconds: 600
+backoffLimit: 10
+
+podSecurityContext:
+  fsGroup: 1000
+  runAsUser: 1000
+
+securityContext: {}
+
+tolerations: []
+nodeSelector: {}
+affinity: {}
+
+resources:
+  requests: {}
+  limits: {}

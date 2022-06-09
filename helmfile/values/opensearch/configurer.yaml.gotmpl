@@ -13,9 +13,6 @@ resources:
    cpu: 10m
    memory: 32Mi
 
-helm:
-  deletePolicy: before-hook-creation
-
 dashboard:
   ck8sVersion: {{ .Values.global.ck8sVersion }}
 
