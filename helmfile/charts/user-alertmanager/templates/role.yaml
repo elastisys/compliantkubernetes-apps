@@ -69,3 +69,11 @@ rules:
   - roles
   verbs:
   - bind
+- apiGroups:
+  - ""
+  resources:
+  - pods/portforward
+  verbs:
+  - create
+  resourceNames:
+  - alertmanager-alertmanager-0

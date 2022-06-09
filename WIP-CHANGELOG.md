@@ -7,6 +7,7 @@
 ### Changed
 
 - Bump falco-exporter chart to v0.8.0.
+- Users are now not forced to use proxy for connecting to alertmanager but can use port-forward as well.
 
 ### Fixed
 
