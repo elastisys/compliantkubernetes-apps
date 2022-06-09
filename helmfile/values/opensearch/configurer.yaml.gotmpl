@@ -163,6 +163,7 @@ config:
           allowed_actions:
           - "indices:monitor/stats"
           - "indices:monitor/settings/get"
+          - "indices:admin/mappings/get"
     {{- with .Values.opensearch.extraRoles }}
     {{- toYaml . | nindent 4 }}
     {{- end }}

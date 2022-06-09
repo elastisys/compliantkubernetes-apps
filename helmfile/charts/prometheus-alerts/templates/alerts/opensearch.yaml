@@ -42,4 +42,20 @@ spec:
       annotations:
         description: OpenSearch disk full Warning
         summary: OpenSearch disk full Warning
+    - alert: OpenSearchFieldLimit
+      expr: (sum(elasticsearch_indices_mappings_stats_fields) by (index) / sum(elasticsearch_indices_settings_total_fields) by (index)) * 100 > 80
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        description: Index {{`{{ $labels.index }}`}} is using {{`{{ $value }}`}} percent of max field limit
+        summary: Index {{`{{ $labels.index }}`}} is using {{`{{ $value }}`}} percent of max field limit
+    - alert: OpenSearchFieldLimit
+      expr: (sum(elasticsearch_indices_mappings_stats_fields) by (index) / sum(elasticsearch_indices_settings_total_fields) by (index)) * 100 > 95
+      for: 15m
+      labels:
+        severity: critical
+      annotations:
+        description: Index {{`{{ $labels.index }}`}} is using {{`{{ $value }}`}} percent of max field limit
+        summary: Index {{`{{ $labels.index }}`}} is using {{`{{ $value }}`}} percent of max field limit
 {{- end }}

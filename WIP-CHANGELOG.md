@@ -18,5 +18,6 @@
 ### Added
 
 - Add option to encrypt off-site buckets replicated with rclone sync
+- Added metrics for field mappings and an alert that will throw an error if the fields get close to the max limit.
 
 ### Removed

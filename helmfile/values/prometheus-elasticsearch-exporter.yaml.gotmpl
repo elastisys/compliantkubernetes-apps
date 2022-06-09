@@ -8,7 +8,7 @@ es:
   shards: true
   snapshots: true
   cluster_settings: false
-  indices_mappings: false
+  indices_mappings: true
   {{- if or (contains "m" .Values.opensearch.exporter.serviceMonitor.scrapeTimeout) (contains "h" .Values.opensearch.exporter.serviceMonitor.scrapeTimeout) }}
   {{- fail "scrapeTimeout must only be given in seconds" }}
   {{ else }}
