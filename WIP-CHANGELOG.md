@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ### Release notes
 
 ### Updated
@@ -19,5 +18,3 @@
 - Add option to encrypt off-site buckets replicated with rclone sync
 
 ### Removed
-=======
->>>>>>> 6b55c5a (Reset changelog for release v0.21.2)
