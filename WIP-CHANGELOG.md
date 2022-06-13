@@ -28,3 +28,4 @@
 - Added metrics for field mappings and an alert that will throw an error if the fields get close to the max limit.
 
 ### Removed
+- wcReader mentions from all configs files

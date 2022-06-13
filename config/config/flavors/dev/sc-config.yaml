@@ -7,13 +7,6 @@ harbor:
   persistence:
     type: filesystem
 
-prometheus:
-  wcReader:
-    storage:
-      size: 2Gi
-    retention:
-      size: 1GiB
-
 opensearch:
   masterNode:
     storageSize: 20Gi
