@@ -3,6 +3,13 @@
 ### Updated
 
 - Update the Velero plugin for AWS to v1.3.1
+- Updated ingress-nginx helm chart to v4.1.3 and ingress-nginx controller image to v1.2.1
+   > **Breaking changes**
+      - deprecated http2_recv_timeout in favor of client_header_timeout (client-header-timeout);
+      - deprecated http2_max_field_size (http2-max-field-size) and http2_max_header_size (http2-max-header-size) in favor of large_client_header_buffers (large-client-header-buffers);
+      - deprecated http2_idle_timeout and http2_max_requests (http2-max-requests) in favor of keepalive_timeout (upstream-keepalive-timeout?) and keepalive_requests (upstream-keepalive-requests?) respectively;
+      - added an option to jail/chroot the nginx process, inside the controller container, is being introduced;
+      - implemented an object deep inspector. The inspection is a walk through of all the spec, checking for possible attempts to escape configs.
 
 ### Changed
 
