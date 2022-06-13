@@ -14,7 +14,7 @@ route:
   group_interval: 5m
   repeat_interval: 12h
   # Default receiver
-  receiver: slack
+  receiver: 'null'
   # Specify other receivers depending on match
   routes:
   - match:
@@ -23,29 +23,29 @@ route:
     receiver: 'null'
 receivers:
 - name: 'null'
-- name: slack
-  slack_configs:
-  # Note: the channel here does not apply if the webhook URL is for a specific channel
-  - channel: notifications
-    # Webhook URL for slack, see https://api.slack.com/apps
-    api_url: https://alertmanagerwebhook.example.com
-    # Do you want only alerts firing or also alerts resolved?
-    send_resolved: true
-    # Alertmanager templating: https://prometheus.io/docs/alerting/notifications/
-    text: |-
-      <!channel>
-      Attention! You have an alert!
-
-      *Common summary:* {{ .CommonAnnotations.summary }}
-      *Common description:* {{ .CommonAnnotations.description }}
-      {{ range .CommonLabels.SortedPairs }}
-      *{{ .Name }}:* {{ .Value }}
-      {{ end }}
-
-      *Individual alerts below*
-      {{ range .Alerts }}
-      *Status:* {{ .Status }}
-      {{ range .Annotations.SortedPairs }}
-      *{{ .Name }}:* {{ .Value }}
-      {{ end }}
-      {{ end }}
+#- name: slack
+#  slack_configs:
+#  # Note: the channel here does not apply if the webhook URL is for a specific channel
+#  - channel: notifications
+#    # Webhook URL for slack, see https://api.slack.com/apps
+#    api_url: https://alertmanagerwebhook.example.com
+#    # Do you want only alerts firing or also alerts resolved?
+#    send_resolved: true
+#    # Alertmanager templating: https://prometheus.io/docs/alerting/notifications/
+#    text: |-
+#      <!channel>
+#      Attention! You have an alert!
+#
+#      *Common summary:* {{ .CommonAnnotations.summary }}
+#      *Common description:* {{ .CommonAnnotations.description }}
+#      {{ range .CommonLabels.SortedPairs }}
+#      *{{ .Name }}:* {{ .Value }}
+#      {{ end }}
+#
+#      *Individual alerts below*
+#      {{ range .Alerts }}
+#      *Status:* {{ .Status }}
+#      {{ range .Annotations.SortedPairs }}
+#      *{{ .Name }}:* {{ .Value }}
+#      {{ end }}
+#      {{ end }}
