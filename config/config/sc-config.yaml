@@ -226,24 +226,6 @@ prometheus:
   retention:
     alertmanager: 72h
 
-  wcReader:
-    resources:
-      requests:
-        memory: 1Gi
-        cpu: 300m
-      limits:
-        memory: 2Gi
-        cpu: "1"
-    storage:
-      enabled: false
-      size: 5Gi
-    retention:
-      size: 4GiB
-      age: 3d
-    tolerations: []
-    affinity: {}
-    nodeSelector: {}
-
   # Todo remove dependencie on alertmanager from service cluster
   alertmanagerSpec:
     replicas: 2
