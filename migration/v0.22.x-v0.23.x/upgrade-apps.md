@@ -34,3 +34,4 @@
     ```bash
     bin/ck8s apply {sc|wc}
     ```
+1. Change user-alertmanager receiver to `null` if the default slack receiver is being used: `migration/v0.22.x-v0.23.x/user-alertmanager-reconfig.sh`
