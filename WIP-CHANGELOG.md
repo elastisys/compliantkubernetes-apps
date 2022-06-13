@@ -35,6 +35,10 @@
   - The securityadmin can be disabled to protect manually created resources, but it will prevent the OpenSearch cluster to initialize the security plugin when the cluster is forming.
 - Add missing roles for alerting in OpenSearch
 - Make the clean script more verbose what cluster will be cleaned.
+- Added possibility to use either encrypted or unencrypted kubeconfigs. The scripts will automatically detect if the file is encrypted or not.
+- Added the possibility to override what kubeconfig to use. If the env variable `KUBECONFIG` is set, then the scripts will use that kubeconfig path as the kubeconfig for both workload and service clusters. So if you are using that variable and want to switch between working on wc and sc you need to reset `KUBECONFIG`.
 
 ### Removed
+
 - wcReader mentions from all configs files
+- removed the command `ck8s kubeconfig admin <wc|sc>`. Creation of admin OIDC kubeconfigs have moved to the compliantkubernetes-kubespray github repo.

@@ -7,40 +7,14 @@ here="$(dirname "$(readlink -f "$0")")"
 source "${here}/common.bash"
 
 usage() {
-    echo "Usage: kubeconfig <user|admin <wc|sc> [cluster_name]>" >&2
+    echo "Usage: kubeconfig" >&2
     exit 1
 }
 
-case "${1}" in
-    user)
-        config_load wc
-        cluster_config="${config[config_file_wc]}"
-        kubeconfig="${secrets[kube_config_wc]}"
-        user_kubeconfig=${CK8S_CONFIG_PATH}/user/secret/kubeconfig.yaml
-    ;;
-    admin)
-        case "${2}" in
-            sc)
-                config_load sc
-                cluster_config="${config[config_file_sc]}"
-                kubeconfig="${secrets[kube_config_sc]}"
-            ;;
-            wc)
-                config_load wc
-                cluster_config="${config[config_file_wc]}"
-                kubeconfig="${secrets[kube_config_wc]}"
-            ;;
-            *) usage ;;
-        esac
-        cluster="$2"
-        if [[ $# -gt 2 ]]; then
-            kubeconfig="${state_path}/kube_config_$3.yaml"
-            cluster="$3"
-        fi
-        user_kubeconfig=${CK8S_CONFIG_PATH}/.state/admin-kubeconfig-${cluster}.yaml
-    ;;
-    *) usage ;;
-esac
+config_load wc
+cluster_config="${config[config_file_wc]}"
+kubeconfig="${config[kube_config_wc]}"
+user_kubeconfig=${CK8S_CONFIG_PATH}/user/kubeconfig.yaml
 
 if [[ ! -f "${kubeconfig}" ]]; then
     log_error "${kubeconfig} not found"
@@ -70,11 +44,6 @@ append_trap "rm ${user_certificate_authority}" EXIT
             | base64 --decode > ${user_certificate_authority}
 )
 
-append_trap "sops_encrypt ${user_kubeconfig}" EXIT
-if [ -f "${user_kubeconfig}" ]; then
-    sops_decrypt "${user_kubeconfig}"
-fi
-
 kubectl --kubeconfig="${user_kubeconfig}" config set-cluster "${cluster_name}" \
     --server="${user_server}" \
     --certificate-authority="${user_certificate_authority}" --embed-certs=true
@@ -92,11 +61,7 @@ kubectl --kubeconfig="${user_kubeconfig}" config set-credentials "${1}@${cluster
 # Create context with relavant namespace
 # Pick the first namespace
 
-if [[ ${1} == "user" ]]; then
-    context_namespace=$(yq r "${config[config_file_wc]}" 'user.namespaces[0]')
-else
-    context_namespace="default"
-fi
+context_namespace=$(yq r "${config[config_file_wc]}" 'user.namespaces[0]')
 
 kubectl --kubeconfig="${user_kubeconfig}" config set-context \
     "${cluster_name}" \
