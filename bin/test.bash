@@ -12,14 +12,14 @@ source "${here}/common.bash"
 test_apps_sc() {
     log_info "Testing service cluster"
 
-    with_kubeconfig "${secrets[kube_config_sc]}" \
+    with_kubeconfig "${config[kube_config_sc]}" \
         "${pipeline_path}/test/services/test-sc.sh" "${config[config_file_sc]}"
 }
 
 test_apps_wc() {
     log_info "Testing workload cluster"
 
-    with_kubeconfig "${secrets[kube_config_wc]}" \
+    with_kubeconfig "${config[kube_config_wc]}" \
         "${pipeline_path}/test/services/test-wc.sh" "${config[config_file_wc]}"
 }
 

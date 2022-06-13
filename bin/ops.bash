@@ -20,8 +20,8 @@ usage() {
 # Run arbitrary kubecolor commands as cluster admin.
 ops_kubecolor() {
     case "${1}" in
-        sc) kubeconfig="${secrets[kube_config_sc]}" ;;
-        wc) kubeconfig="${secrets[kube_config_wc]}" ;;
+        sc) kubeconfig="${config[kube_config_sc]}" ;;
+        wc) kubeconfig="${config[kube_config_wc]}" ;;
         *) usage ;;
     esac
     shift
@@ -31,8 +31,8 @@ ops_kubecolor() {
 # Run arbitrary kubectl commands as cluster admin.
 ops_kubectl() {
     case "${1}" in
-        sc) kubeconfig="${secrets[kube_config_sc]}" ;;
-        wc) kubeconfig="${secrets[kube_config_wc]}" ;;
+        sc) kubeconfig="${config[kube_config_sc]}" ;;
+        wc) kubeconfig="${config[kube_config_wc]}" ;;
         *) usage ;;
     esac
     shift
@@ -42,8 +42,8 @@ ops_kubectl() {
 # Run arbitrary helm commands as cluster admin.
 ops_helm() {
     case "${1}" in
-        sc) kubeconfig="${secrets[kube_config_sc]}" ;;
-        wc) kubeconfig="${secrets[kube_config_wc]}" ;;
+        sc) kubeconfig="${config[kube_config_sc]}" ;;
+        wc) kubeconfig="${config[kube_config_wc]}" ;;
         *) usage ;;
     esac
     shift
@@ -57,11 +57,11 @@ ops_helmfile() {
     case "${1}" in
         sc)
             cluster="service_cluster"
-            kubeconfig="${secrets[kube_config_sc]}"
+            kubeconfig="${config[kube_config_sc]}"
         ;;
         wc)
             cluster="workload_cluster"
-            kubeconfig="${secrets[kube_config_wc]}"
+            kubeconfig="${config[kube_config_wc]}"
         ;;
         *) usage ;;
     esac

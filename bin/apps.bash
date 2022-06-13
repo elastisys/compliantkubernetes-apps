@@ -23,7 +23,7 @@ apps_init() {
 apps_run_sc() {
     log_info "Applying applications in service cluster"
     (
-        with_kubeconfig "${secrets[kube_config_sc]}" \
+        with_kubeconfig "${config[kube_config_sc]}" \
             CONFIG_PATH="${CK8S_CONFIG_PATH}" "${scripts_path}/deploy-sc.sh" "${1:-""}"
     )
 }
@@ -31,7 +31,7 @@ apps_run_sc() {
 apps_run_wc() {
     log_info "Applying applications in workload cluster"
     (
-        with_kubeconfig "${secrets[kube_config_wc]}" \
+        with_kubeconfig "${config[kube_config_wc]}" \
             CONFIG_PATH="${CK8S_CONFIG_PATH}" "${scripts_path}/deploy-wc.sh" "${1:-""}"
     )
 }
@@ -39,7 +39,7 @@ apps_run_wc() {
 template_validate_sc() {
     log_info "Validating helm releases in service cluster"
 
-    kubeconfig="${secrets[kube_config_sc]}"
+    kubeconfig="${config[kube_config_sc]}"
 
     with_kubeconfig "${kubeconfig}" \
         helmfile -f "${here}/../helmfile/" -e service_cluster template --validate >/dev/null
@@ -50,7 +50,7 @@ template_validate_sc() {
 template_validate_wc() {
     log_info "Validating helm releases in workload cluster"
 
-    kubeconfig="${secrets[kube_config_wc]}"
+    kubeconfig="${config[kube_config_wc]}"
 
     with_kubeconfig "${kubeconfig}" \
         helmfile -f "${here}/../helmfile/" -e workload_cluster template --validate >/dev/null

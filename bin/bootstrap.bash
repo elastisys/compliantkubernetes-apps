@@ -15,7 +15,7 @@ export scripts_path
 bootstrap_run_sc() {
     log_info "Bootstrapping service cluster"
     (
-        with_kubeconfig "${secrets[kube_config_sc]}" \
+        with_kubeconfig "${config[kube_config_sc]}" \
             "${bootstrap_path}/bootstrap.sh" service_cluster
     )
 }
@@ -23,7 +23,7 @@ bootstrap_run_sc() {
 bootstrap_run_wc() {
     log_info "Bootstrapping workload cluster"
     (
-        with_kubeconfig "${secrets[kube_config_wc]}" \
+        with_kubeconfig "${config[kube_config_wc]}" \
             "${bootstrap_path}/bootstrap.sh" workload_cluster
     )
 }

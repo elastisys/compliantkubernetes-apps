@@ -25,11 +25,11 @@ cluster_abbr=""
 
 if [ "${cluster}" = "service_cluster" ]; then
     config_load sc
-    kubeconfig="${secrets[kube_config_sc]}"
+    kubeconfig="${config[kube_config_sc]}"
     cluster_abbr="sc"
 elif [ "${cluster}" = "workload_cluster" ]; then
     config_load wc
-    kubeconfig="${secrets[kube_config_wc]}"
+    kubeconfig="${config[kube_config_wc]}"
     cluster_abbr="wc"
 fi
 

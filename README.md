@@ -204,17 +204,6 @@ Assuming you already have everything needed to install the apps, this is what yo
 If you followed the steps in the quickstart above, you should now have deployed the applications and have a fully functioning environment.
 However, there are a few steps remaining to make all applications ready for the user.
 
-#### Authentication-based cluster admin access
-
-An admin kubeconfig that requires authentication via dex can be created using:
-
-`./bin/ck8s kubeconfig admin <sc|wc> [cluster_name]`
-
-Which email addresses should be allowed can be configured by setting `clusterAdmin.admins` in `common-config.yaml` or `sc-config.yaml` and `wc-config.yaml`.
-Also make sure to set `dex.allowedDomains` in `sc-config.yaml`, and `kube_oidc_url` in your `group_vars`.
-
-This admin kubeconfig can access everything in the cluster.
-
 #### User access
 
 After the cluster setup has completed RBAC resources and namespaces will have been created for the user.
