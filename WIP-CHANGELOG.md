@@ -16,6 +16,7 @@
 - Bump falco-exporter chart to v0.8.0.
 - Users are now not forced to use proxy for connecting to alertmanager but can use port-forward as well.
 - The OpenSearch security config will now be managed completely by securityadmin
+- Patched Falco rules and added the rules `Change thread namespace` & `System procs network activity`.
 
 ### Fixed
 
