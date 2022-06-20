@@ -209,6 +209,58 @@ customRules:
         command=%proc.cmdline container_id=%container.id container_name=%container.name image=%container.image.repository:%container.image.tag)
       priority: ERROR
       tags: [process, mitre_persistence]
+    - rule: Change thread namespace
+      desc: >
+        an attempt to change a program/thread\'s namespace (commonly done
+        as a part of creating a container) by calling setns.
+      condition: >
+        evt.type=setns and evt.dir=<
+        and proc_name_exists
+        and not (container.id=host and proc.name in (docker_binaries, k8s_binaries, lxd_binaries, nsenter))
+        and not proc.name in (sysdigcloud_binaries, sysdig, calico, oci-umount, cilium-cni, network_plugin_binaries)
+        and not proc.name in (user_known_change_thread_namespace_binaries)
+        and not proc.name startswith "runc"
+        and not proc.cmdline startswith "containerd"
+        and not proc.pname in (sysdigcloud_binaries, hyperkube, kubelet, protokube, dockerd, tini, aws)
+        and not java_running_sdjagent
+        and not kubelet_running_loopback
+        and not rancher_agent
+        and not rancher_network_manager
+        and not calico_node
+        and not weaveworks_scope
+        and not user_known_change_thread_namespace_activities
+      exceptions:
+       # snapd is part of the Ubuntu cloud image. Checked 2022-06-23 on the long-running-cluster.
+       - name: snapd
+         fields: [container.id, proc.pname, proc.cmdline]
+         comps: [=, =, startswith]
+         values:
+          - [host, snapd, snap-update-ns]
+      enabled: true
+      output: >
+        Namespace change (setns) by unexpected program (user=%user.name user_loginuid=%user.loginuid command=%proc.cmdline
+        parent=%proc.pname %container.info container_id=%container.id image=%container.image.repository:%container.image.tag)
+      priority: NOTICE
+      tags: [process, mitre_privilege_escalation, mitre_lateral_movement]
+    - rule: System procs network activity
+      desc: any network activity performed by system binaries that are not expected to send or receive any network traffic
+      condition: >
+        (fd.sockfamily = ip and (system_procs or proc.name in (shell_binaries)))
+        and (inbound_outbound)
+        and not proc.name in (known_system_procs_network_activity_binaries)
+        and not login_doing_dns_lookup
+        and not user_expected_system_procs_network_activity_conditions
+      exceptions:
+      - name: sidekick-system-procs
+        fields: [container.image.repository, k8s.ns.name, proc.cmdline]
+        comps: [=, =, =]
+        values:
+          - [falcosecurity/falco, falco, "sh -c curl -d @- falcosidekick:2801/\n"]
+      output: >
+        Known system binary sent/received network traffic
+        (user=%user.name user_loginuid=%user.loginuid command=%proc.cmdline connection=%fd.name container_id=%container.id image=%container.image.repository)
+      priority: NOTICE
+      tags: [network, mitre_exfiltration]
 
 falcosidekick:
   enabled: {{ .Values.falco.alerts.enabled }}
