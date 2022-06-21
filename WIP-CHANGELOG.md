@@ -31,6 +31,7 @@
   - **Warning**: When this runs the security plugin settings will be reset. All users, roles, and role mappings created via the API will be removed, so create a backup or be prepared to recreate the resources.
   - The securityadmin can be disabled to protect manually created resources, but it will prevent the OpenSearch cluster to initialize the security plugin when the cluster is forming.
 - Add missing roles for alerting in OpenSearch
+- Make the clean script more verbose what cluster will be cleaned.
 
 ### Removed
 - wcReader mentions from all configs files

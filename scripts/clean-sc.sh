@@ -1,7 +1,10 @@
 #!/bin/bash
 
+: "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
+
 echo "WARNING:"
 echo "This script will remove compliant kubernetes apps from your service cluster."
+echo -e "Your current \u1b[33mCK8S_CONFIG_PATH\033[m is set to: \u1b[33;4m${CK8S_CONFIG_PATH}\033[m"
 echo -n "Do you want to continue (y/N): "
 read -r reply
 if [[ ${reply} != "y" ]]; then
