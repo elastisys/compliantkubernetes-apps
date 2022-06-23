@@ -39,7 +39,7 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
-    - alert: AggregatedAPIErrors
+    - alert: KubeAggregatedAPIErrors
       annotations:
         description: An aggregated API {{`{{`}} $labels.name {{`}}`}}/{{`{{`}} $labels.namespace {{`}}`}} has reported errors. It has appeared unavailable {{`{{`}} $value | humanize {{`}}`}} times averaged over the past 10m.
         runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-aggregatedapierrors
@@ -50,7 +50,7 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
-    - alert: AggregatedAPIDown
+    - alert: KubeAggregatedAPIDown
       annotations:
         description: An aggregated API {{`{{`}} $labels.name {{`}}`}}/{{`{{`}} $labels.namespace {{`}}`}} has been only {{`{{`}} $value | humanize {{`}}`}}% available over the last 10m.
         runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-aggregatedapidown

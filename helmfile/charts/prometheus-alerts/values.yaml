@@ -52,6 +52,10 @@ defaultRules:
     bucketdailyChecks: false
     fluentd: true
     missingMetrics: true
+    kubeScheduler: true
+    kubeProxy: true
+    kubeControllerManager: true
+    configReloaders: true
 
   appNamespacesTarget: ".*"
 

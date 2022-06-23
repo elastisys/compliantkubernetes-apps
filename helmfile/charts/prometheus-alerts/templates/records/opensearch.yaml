@@ -20,6 +20,4 @@ spec:
     - record: elasticsearch_filesystem_data_used_percent
       expr: 100 * (elasticsearch_filesystem_data_size_bytes - elasticsearch_filesystem_data_free_bytes)
         / elasticsearch_filesystem_data_size_bytes
-    - record: elasticsearch_filesystem_data_free_percent
-      expr: 100 - elasticsearch_filesystem_data_used_percent
 {{- end }}
