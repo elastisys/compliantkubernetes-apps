@@ -49,6 +49,17 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+    - alert: KubeContainerOOMKilled
+      annotations:
+        description: Container {{`{{`}} $labels.container {{`}}`}} in pod {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod {{`}}`}} from {{`{{`}} $labels.cluster {{`}}`}} has been OOMKilled {{`{{`}} $value {{`}}`}} times in the last 10 minutes.
+        summary: Kubernetes container OOMKilled.
+      expr: (kube_pod_container_status_restarts_total - kube_pod_container_status_restarts_total offset 10m >= 1) and ignoring (reason) min_over_time(kube_pod_container_status_last_terminated_reason{reason="OOMKilled"}[10m]) == 1
+      for: 0m
+      labels:
+        severity: warning
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
     - alert: KubeDeploymentGenerationMismatch
       annotations:
         description: Deployment generation for {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.deployment {{`}}`}} does not match, this indicates that the Deployment has failed but has not been rolled back.
@@ -224,13 +235,15 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
-    - alert: KubeJobCompletion
+    - alert: KubeJobNotCompleted
       annotations:
-        description: Job {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.job_name {{`}}`}} is taking more than 12 hours to complete.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-kubejobcompletion
+        description: Job {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.job_name {{`}}`}} is taking more than {{`{{`}} "43200" | humanizeDuration {{`}}`}} to complete.
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}/kubernetes/kubejobnotcompleted
         summary: Job did not complete in time
-      expr: kube_job_spec_completions{job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"} - kube_job_status_succeeded{job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"}  > 0
-      for: 12h
+      expr: |-
+        time() - max by(cluster, namespace, job_name) (kube_job_status_start_time{job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"}
+          and
+        kube_job_status_active{job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"} > 0) > 43200
       labels:
         severity: warning
 {{- if .Values.defaultRules.additionalRuleLabels }}
@@ -242,46 +255,6 @@ spec:
         runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-kubejobfailed
         summary: Job failed to complete.
       expr: kube_job_failed{job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"}  > 0
-      for: 15m
-      labels:
-        severity: warning
-{{- if .Values.defaultRules.additionalRuleLabels }}
-{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
-{{- end }}
-    - alert: KubeHpaReplicasMismatch
-      annotations:
-        description: HPA {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.horizontalpodautoscaler  {{`}}`}} has not matched the desired number of replicas for longer than 15 minutes.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-kubehpareplicasmismatch
-        summary: HPA has not matched descired number of replicas.
-      expr: |-
-        (kube_horizontalpodautoscaler_status_desired_replicas{job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"}
-          !=
-        kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"})
-          and
-        (kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"}
-          >
-        kube_horizontalpodautoscaler_spec_min_replicas{job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"})
-          and
-        (kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"}
-          <
-        kube_horizontalpodautoscaler_spec_max_replicas{job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"})
-          and
-        changes(kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"}[15m]) == 0
-      for: 15m
-      labels:
-        severity: warning
-{{- if .Values.defaultRules.additionalRuleLabels }}
-{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
-{{- end }}
-    - alert: KubeHpaMaxedOut
-      annotations:
-        description: HPA {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.horizontalpodautoscaler  {{`}}`}} has been running at max replicas for longer than 15 minutes.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-kubehpamaxedout
-        summary: HPA is running at max replicas
-      expr: |-
-        kube_horizontalpodautoscaler_status_current_replicas{job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"}
-          ==
-        kube_horizontalpodautoscaler_spec_max_replicas{job="kube-state-metrics", namespace=~"{{ $targetNamespace }}"}
       for: 15m
       labels:
         severity: warning

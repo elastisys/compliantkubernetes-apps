@@ -10,6 +10,7 @@
       - deprecated http2_idle_timeout and http2_max_requests (http2-max-requests) in favor of keepalive_timeout (upstream-keepalive-timeout?) and keepalive_requests (upstream-keepalive-requests?) respectively;
       - added an option to jail/chroot the nginx process, inside the controller container, is being introduced;
       - implemented an object deep inspector. The inspection is a walk through of all the spec, checking for possible attempts to escape configs.
+- Updated the prometheus-alerts chart alerts and rules
 
 ### Changed
 

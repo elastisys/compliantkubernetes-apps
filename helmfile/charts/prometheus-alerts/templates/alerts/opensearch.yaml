@@ -34,14 +34,6 @@ spec:
       annotations:
         description: The heap usage is over 90% for 15m
         summary: OpenSearch node {{`{{ $labels.node}}`}} heap usage is high
-    - alert: OpenSearchDiskWarning
-      expr: 100 - es_fs_total_free_bytes{pod=~".*data.*"} / es_fs_total_total_bytes{pod=~".*data.*"}  * 100 > 80
-      for: 15m
-      labels:
-        severity: warning
-      annotations:
-        description: OpenSearch disk full Warning
-        summary: OpenSearch disk full Warning
     - alert: OpenSearchFieldLimit
       expr: (sum(elasticsearch_indices_mappings_stats_fields) by (index) / sum(elasticsearch_indices_settings_total_fields) by (index)) * 100 > 80
       for: 15m
