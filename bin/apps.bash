@@ -24,7 +24,7 @@ apps_run_sc() {
     log_info "Applying applications in service cluster"
     (
         with_kubeconfig "${config[kube_config_sc]}" \
-            CONFIG_PATH="${CK8S_CONFIG_PATH}" "${scripts_path}/deploy-sc.sh" "${1:-""}"
+            "${scripts_path}/deploy-sc.sh" "${1:-""}"
     )
 }
 
@@ -32,7 +32,7 @@ apps_run_wc() {
     log_info "Applying applications in workload cluster"
     (
         with_kubeconfig "${config[kube_config_wc]}" \
-            CONFIG_PATH="${CK8S_CONFIG_PATH}" "${scripts_path}/deploy-wc.sh" "${1:-""}"
+             "${scripts_path}/deploy-wc.sh" "${1:-""}"
     )
 }
 

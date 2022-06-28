@@ -66,7 +66,6 @@
 - Add missing roles for alerting in OpenSearch
 - Make the clean script more verbose what cluster will be cleaned.
 - Added possibility to use either encrypted or unencrypted kubeconfigs. The scripts will automatically detect if the file is encrypted or not.
-- Added the possibility to override what kubeconfig to use. If the env variable `KUBECONFIG` is set, then the scripts will use that kubeconfig path as the kubeconfig for both workload and service clusters. So if you are using that variable and want to switch between working on wc and sc you need to reset `KUBECONFIG`.
 
 ### Removed
 
