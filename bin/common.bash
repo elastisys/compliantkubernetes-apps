@@ -61,8 +61,8 @@ config["override_common"]="${CK8S_CONFIG_PATH}/common-config.yaml"
 config["override_wc"]="${CK8S_CONFIG_PATH}/wc-config.yaml"
 config["override_sc"]="${CK8S_CONFIG_PATH}/sc-config.yaml"
 
-config["kube_config_sc"]=${KUBECONFIG:-"${state_path}/kube_config_sc.yaml"}
-config["kube_config_wc"]=${KUBECONFIG:-"${state_path}/kube_config_wc.yaml"}
+config["kube_config_sc"]="${state_path}/kube_config_sc.yaml"
+config["kube_config_wc"]="${state_path}/kube_config_wc.yaml"
 
 secrets["secrets_file"]="${CK8S_CONFIG_PATH}/secrets.yaml"
 secrets["s3cfg_file"]="${state_path}/s3cfg.ini"
@@ -473,18 +473,6 @@ with_config_secrets() {
 with_kubeconfig() {
     kubeconfig="${1}"
     shift
-
-    if [ -n "${KUBECONFIG+x}" ] && [[ "${CK8S_USE_KUBECONFIG:-x}" != "true" ]]; then
-      log_info "You have set the env variable KUBECONFIG to ${KUBECONFIG}."
-      log_info "That will override the default kubeconfig path."
-      log_info "You can either proceed or stop and run 'unset KUBECONFIG'"
-      log_info "You can skip this prompt in the future by setting env variable 'CK8S_USE_KUBECONFIG=true'"
-      log_info_no_newline "Proceed with the current KUBECONFIG [y/N]: "
-      read -r reply
-      if [[ "${reply}" != "y" ]]; then
-          exit 1
-      fi
-    fi
 
     if [ ! -f "${kubeconfig}" ]; then
       log_error "ERROR: Kubeconfig not found: ${kubeconfig}"

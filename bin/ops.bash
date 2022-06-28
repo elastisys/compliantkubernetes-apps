@@ -68,8 +68,6 @@ ops_helmfile() {
 
     shift
 
-    export CONFIG_PATH="${CK8S_CONFIG_PATH}"
-
     with_kubeconfig "${kubeconfig}" \
         helmfile -f "${here}/../helmfile/" -e ${cluster} "${@}"
 }
