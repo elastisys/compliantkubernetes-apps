@@ -7,14 +7,40 @@ here="$(dirname "$(readlink -f "$0")")"
 source "${here}/common.bash"
 
 usage() {
-    echo "Usage: kubeconfig" >&2
+    echo "Usage: kubeconfig <user|admin <wc|sc> [cluster_name]>" >&2
     exit 1
 }
 
-config_load wc
-cluster_config="${config[config_file_wc]}"
-kubeconfig="${config[kube_config_wc]}"
-user_kubeconfig=${CK8S_CONFIG_PATH}/user/kubeconfig.yaml
+case "${1}" in
+    user)
+        config_load wc
+        cluster_config="${config[config_file_wc]}"
+        kubeconfig="${config[kube_config_wc]}"
+        user_kubeconfig=${CK8S_CONFIG_PATH}/user/secret/kubeconfig.yaml
+    ;;
+    admin)
+        case "${2}" in
+            sc)
+                config_load sc
+                cluster_config="${config[config_file_sc]}"
+                kubeconfig="${config[kube_config_sc]}"
+            ;;
+            wc)
+                config_load wc
+                cluster_config="${config[config_file_wc]}"
+                kubeconfig="${config[kube_config_wc]}"
+            ;;
+            *) usage ;;
+        esac
+        cluster="$2"
+        if [[ $# -gt 2 ]]; then
+            kubeconfig="${state_path}/kube_config_$3.yaml"
+            cluster="$3"
+        fi
+        user_kubeconfig=${CK8S_CONFIG_PATH}/.state/admin-kubeconfig-${cluster}.yaml
+    ;;
+    *) usage ;;
+esac
 
 if [[ ! -f "${kubeconfig}" ]]; then
     log_error "${kubeconfig} not found"
@@ -60,8 +86,11 @@ kubectl --kubeconfig="${user_kubeconfig}" config set-credentials "${1}@${cluster
 
 # Create context with relavant namespace
 # Pick the first namespace
-
-context_namespace=$(yq r "${config[config_file_wc]}" 'user.namespaces[0]')
+if [[ ${1} == "user" ]]; then
+    context_namespace=$(yq r "${config[config_file_wc]}" 'user.namespaces[0]')
+else
+    context_namespace="default"
+fi
 
 kubectl --kubeconfig="${user_kubeconfig}" config set-context \
     "${cluster_name}" \
