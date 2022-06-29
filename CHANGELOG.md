@@ -70,7 +70,6 @@
 ### Removed
 
 - wcReader mentions from all configs files
-- removed the command `ck8s kubeconfig admin <wc|sc>`. Creation of admin OIDC kubeconfigs have moved to the compliantkubernetes-kubespray github repo.
 
 -------------------------------------------------
 ## v0.22.0 - 2022-06-01
