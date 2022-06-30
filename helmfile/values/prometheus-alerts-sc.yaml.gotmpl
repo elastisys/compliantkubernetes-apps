@@ -25,7 +25,7 @@ defaultRules:
     thanosRulerMonitor: {{ .Values.thanos.ruler.enabled }}
     {{- end }}
 
-    predictLinear: {{ .Values.prometheus.predictLinear.enabled }}
+    capacityManagementAlerts: {{ .Values.prometheus.capacityManagementAlerts.enabled }}
 
     backupStatus: true
     dailyChecks: true
@@ -37,7 +37,10 @@ defaultRules:
       evaluate_prometheus: "1"
   {{- end }}
 
-predictLinearLimit: {{ .Values.prometheus.predictLinear.limit }}
+capacityManagementAlertsDiskLimit: {{ .Values.prometheus.capacityManagementAlerts.disklimit }}
+capacityManagementAlertsUsageLimit: {{ .Values.prometheus.capacityManagementAlerts.usagelimit }}
+capacityManagementAlertsRequestLimit:
+{{ toYaml .Values.prometheus.capacityManagementAlerts.requestlimit | indent 2}}
 
 s3BucketPercentLimit: {{ .Values.prometheus.s3BucketPercentLimit }}
 s3BucketSizeQuotaGB: {{ .Values.prometheus.s3BucketSizeQuotaGB }}

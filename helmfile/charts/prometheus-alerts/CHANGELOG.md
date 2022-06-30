@@ -1,3 +1,7 @@
+## 2022.07.07
+1. predict-linear.yaml
+   - ADDED - the custom CPURequest and MemoryRequest alerts for the node patterns from common-config.yaml
+
 ## 2022.06.23
 
 1. alertmanager.rules.yaml

@@ -281,10 +281,6 @@ prometheus:
         limits:
           cpu: 10m
           memory: 100Mi
-  ## Predictive alert if the resource usage will hit the set percentage in 3 days
-  predictLinear:
-    enabled: true
-    limit: 66
   s3BucketPercentLimit: 80
   s3BucketSizeQuotaGB: 1000
 dex:

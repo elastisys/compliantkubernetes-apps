@@ -158,6 +158,27 @@ prometheus:
   tolerations: []
   affinity: {}
   nodeSelector: {}
+  ## Predictive alert if the resource usage will hit the set percentage in 3 days
+  capacityManagementAlerts:
+    enabled: true
+    disklimit: 66
+    usagelimit: 95
+    ## for each cpu and memory add the node pattern for which you want to create an alert
+    requestlimit:
+      cpu:
+        - name: worker
+          pattern: ".*-worker-.*"
+          limit: 80
+        - name: elastisys
+          pattern: ".*-elastisys-.*"
+          limit: 80
+      memory:
+        - name: worker
+          pattern: ".*-worker-.*"
+          limit: 80
+        - name: elastisys
+          pattern: ".*-elastisys-.*"
+          limit: 80
 
 thanos:
   # Enables Thanos components.
