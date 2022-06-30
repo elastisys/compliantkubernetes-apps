@@ -7,7 +7,6 @@ alertmanagerNamespace: monitoring
 prometheusJob: kube-prometheus-stack-prometheus
 operatorJob: kube-prometheus-stack-operator
 prometheusNamespace: monitoring
-predictLinearLimit: 80
 
 s3BucketPercentLimit: 80
 s3BucketSizeQuotaGB: 80
@@ -44,7 +43,7 @@ defaultRules:
     prometheusOperator: true
     opensearch: true
     rookMonitor: true
-    predictLinear: true
+    capacityManagementAlerts: true
     thanosMonitor: false
     thanosRulerMonitor: false # Note thanos-ruler alerts does not add the defaultRules.alertLabels, instead use defaultRules.thanosRuler.alertLabels.
     backupStatus: false
