@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 RUN  apt-get update && \
      apt-get install -y software-properties-common && \
@@ -12,7 +12,7 @@ RUN  apt-get update && \
      rm -rf /var/lib/apt/lists/*
 
 # Kubectl
-ENV KUBECTL_VERSION "v1.20.7"
+ENV KUBECTL_VERSION "v1.22.6"
 RUN wget "https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/kubectl
@@ -25,7 +25,7 @@ RUN wget https://github.com/mozilla/sops/releases/download/v${SOPS_VERSION}/sops
     chmod +x /usr/local/bin/sops
 
 # Helm
-ENV HELM_VERSION "v3.5.2"
+ENV HELM_VERSION "v3.8.1"
 RUN wget "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz" && \
     tar -zxvf "helm-${HELM_VERSION}-linux-amd64.tar.gz" && \
     mv linux-amd64/helm /usr/local/bin/helm && \
@@ -35,10 +35,10 @@ RUN wget "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz" && \
 # Should come with v3.3.0, see https://github.com/helm/helm/pull/7983
 ENV XDG_DATA_HOME=/root/.config
 RUN helm plugin install https://github.com/databus23/helm-diff --version v3.1.2
-RUN helm plugin install https://github.com/futuresimple/helm-secrets --version v2.0.2
+RUN helm plugin install https://github.com/jkroepke/helm-secrets --version v3.12
 
 # Helmfile
-ENV HELMFILE_VERSION "v0.138.4"
+ENV HELMFILE_VERSION "v0.144.0"
 RUN wget "https://github.com/roboll/helmfile/releases/download/${HELMFILE_VERSION}/helmfile_linux_amd64" && \
     chmod +x helmfile_linux_amd64 && \
     mv helmfile_linux_amd64 /usr/local/bin/helmfile

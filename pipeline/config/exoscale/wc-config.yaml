@@ -5,9 +5,6 @@ opa:
   imageRegistry:
     URL:
       - harbor.pipeline-exoscale.elastisys.se
-issuers:
-  letsencrypt:
-    enabled: true
 user:
   namespaces:
     - demo1
@@ -16,5 +13,3 @@ user:
   adminUsers:
     - user-admin@example.com
   adminGroups: []
-prometheus:
-  predictLinearLimit: 66

@@ -10,6 +10,8 @@ source "$INNER_SCRIPTS_PATH/../prometheus-common.sh"
 totalNodes=$(kubectl get nodes --no-headers | wc -l)
 masterNodes=$(kubectl get nodes -l node-role.kubernetes.io/master --no-headers | wc -l)
 
+totalPrometheus=$(yq r -e "${CONFIG_FILE}" 'prometheus.replicas')
+
 enable_thanos=$(yq r -e "${CONFIG_FILE}" 'thanos.enabled')
 enable_thanos_receiver=$(yq r -e "${CONFIG_FILE}" 'thanos.receiver.enabled')
 enable_thanos_query=$(yq r -e "${CONFIG_FILE}" 'thanos.query.enabled')
@@ -31,7 +33,7 @@ scTargets=(
     "serviceMonitor/monitoring/prometheus-blackbox-exporter-dex/0 1"
     "serviceMonitor/monitoring/prometheus-blackbox-exporter-grafana/0 1"
     "serviceMonitor/monitoring/prometheus-blackbox-exporter-opensearch-dashboards/0 1"
-    "serviceMonitor/monitoring/kube-prometheus-stack-alertmanager/0 1"
+    "serviceMonitor/monitoring/kube-prometheus-stack-alertmanager/0 2"
     "serviceMonitor/monitoring/kube-prometheus-stack-apiserver/0 ${masterNodes}"
     "serviceMonitor/monitoring/kube-prometheus-stack-coredns/0 2"
     "serviceMonitor/monitoring/kube-prometheus-stack-grafana/0 1"
@@ -40,7 +42,7 @@ scTargets=(
     "serviceMonitor/monitoring/kube-prometheus-stack-kubelet/1 ${totalNodes}"
     "serviceMonitor/monitoring/kube-prometheus-stack-node-exporter/0 ${totalNodes}"
     "serviceMonitor/monitoring/kube-prometheus-stack-operator/0 1"
-    "serviceMonitor/monitoring/kube-prometheus-stack-prometheus/0 1"
+    "serviceMonitor/monitoring/kube-prometheus-stack-prometheus/0 ${totalPrometheus}"
 )
 if [[ "${enable_thanos}" == "true" ]] && [[ "${enable_thanos_service_monitor}" == "true" ]] && [[ "${enable_thanos_receiver}" == "true" ]]; then
     scTargets+=(

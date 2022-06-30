@@ -2,10 +2,9 @@
 
 set -eu -o pipefail
 
-here="$(dirname "$(readlink -f "$0")")"
+here="$(dirname "$(readlink -f "${0}")")"
 
 #We should only lint our "own" charts, not the upstream ones
-# TODO: enable linting of kubeapi-metrics, opensearch-secrets and opensearch-configurer after the PGP issues in the pipeline have been solved (https://github.com/elastisys/compliantkubernetes-apps/issues/184)
 
 charts_ignore_list=(
   "app!=sc-logs-retention"
@@ -15,7 +14,6 @@ charts_ignore_list=(
   "app!=kube-prometheus-stack"
   "app!=velero"
   "app!=metrics-server"
-  "app!=dex"
   "app!=wc-scraper"
   "app!=prometheus-auth"
   "app!=wc-reader"
@@ -26,17 +24,11 @@ charts_ignore_list=(
   "app!=thanos"
   "app!=fluentd"
   "app!=fluentd-aggregator"
-  "app!=opensearch-master"
   "app!=opensearch-data"
   "app!=opensearch-client"
-  "app!=opensearch-dashboards"
-  "app!=opensearch-secrets"
-  "app!=opensearch-securityadmin"
-  "app!=opensearch-configurer"
   "app!=falco"
   "app!=falco-exporter"
-  "app!=user-alertmanager"
-  "app!=kubeapi-metrics")
+  "app!=user-alertmanager")
 
 helmfile -e service_cluster -f "${here}/../helmfile/" -l "$(IFS=',' ; echo "${charts_ignore_list[*]}")" lint
 helmfile -e workload_cluster -f "${here}/../helmfile/" -l "$(IFS=',' ; echo "${charts_ignore_list[*]}")" lint

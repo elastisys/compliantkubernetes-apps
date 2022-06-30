@@ -2,6 +2,7 @@ kube_oidc_auth: true
 kube_oidc_url: "https://dex.pipeline-exoscale.elastisys.se"
 kube_oidc_client_id: "kubelogin"
 kube_oidc_username_claim: "email"
+kube_oidc_groups_claim: "groups"
 
 kube_apiserver_enable_admission_plugins:
   - "PodSecurityPolicy"
@@ -92,3 +93,10 @@ audit_policy_custom_rules: |-
       - "RequestReceived"
 podsecuritypolicy_enabled: true
 kubeconfig_localhost: true
+calico_felix_prometheusmetricsenabled: true
+
+resolvconf_mode: host_resolvconf
+container_manager: containerd
+kubelet_config_extra_args:
+  imageGCHighThresholdPercent: 75
+  imageGCLowThresholdPercent: 70
