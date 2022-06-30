@@ -4,7 +4,7 @@ set -eu -o pipefail
 
 here="$(dirname "$(readlink -f "$0")")"
 ck8s="${here}/../bin/ck8s"
-# shellcheck source=bin/common.bash
+# shellcheck source=pipeline/common.bash
 source "${here}/common.bash"
 
 export CK8S_FLAVOR="${CI_CK8S_FLAVOR:-dev}"

@@ -5,11 +5,9 @@ global:
   baseDomain: pipeline-exoscale.elastisys.se
   opsDomain: ops.pipeline-exoscale.elastisys.se
 objectStorage:
-  type: s3
   s3:
     region: ch-gva-2
     regionEndpoint: https://sos-ch-gva-2.exo.io
-    forcePathStyle: true
 ingressNginx:
   controller:
     service:
@@ -29,6 +27,3 @@ clusterAdmin:
 monitoring:
   rook:
     enabled: true
-prometheus:
-  s3BucketPercentLimit: 80
-  s3BucketSizeQuotaGB: 1000

@@ -18,21 +18,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cloud: ["safespring", "exoscale", "citycloud", "aws"]
+        cloud: ["safespring", "exoscale", "citycloud", "elastx", "upcloud"]
         flavor: ["prod", "dev"]
     steps:
     - name: Checkout compliantkubernetes-apps
       uses: actions/checkout@v2
       with:
         fetch-depth: 0 # Fetches all tags
-    - name: Setup pgp key for sops
-      uses: ./pipeline
-      with:
-        args: ./pipeline/sops-pgp-setup.bash
     - name: Init and configure config for compliantkubernetes-apps
       uses: ./pipeline
       with:
-        args: ./pipeline/init-unit-tests.bash
+        args: bash -c "./pipeline/sops-pgp-setup.bash && ./pipeline/init-unit-tests.bash"
       env:
         CK8S_CLOUD_PROVIDER: ${{ matrix.cloud }}
         CI_CK8S_FLAVOR: ${{ matrix.flavor }}
@@ -40,7 +36,7 @@ jobs:
     - name: Run linters
       uses: ./pipeline
       with:
-        args: ./pipeline/lint.bash
+        args: bash -c "./pipeline/sops-pgp-setup.bash && ./pipeline/lint.bash"
 
   opa:
     runs-on: ubuntu-latest
@@ -54,6 +50,8 @@ jobs:
 
   bats:
     runs-on: ubuntu-latest
+    env:
+      CK8S_PGP_FP: 529D964DE0BBD900C4A395DA09986C297F8B7757
     steps:
       - name: Checkout compliantkubernetes-apps
         uses: actions/checkout@v2

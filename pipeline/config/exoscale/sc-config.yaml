@@ -13,7 +13,6 @@ harbor:
     adminGroupName: not-used
   backup:
     enabled: true
-    retentionDays: 7
 opensearch:
   masterNode:
     storageSize: 1Gi
@@ -25,26 +24,11 @@ opensearch:
       limits:
         memory: 1024Mi
         cpu: 1
-  dataNode:
-    dedicatedPods: true
-    storageSize: 18Gi
-  clientNode:
-    dedicatedPods: true
-  curator:
-    retention:
-      authLogAgeDays: 7
   snapshot:
     enabled: true
   extraRoleMappings: []
 fluentd:
   enabled: true
-alerts:
-  opsGenieHeartbeat:
-    name: not-used
-  slack:
-    channel: not-used
 s3Exporter:
   interval: 120s
   scrapeTimeout: 30s
-prometheus:
-  predictLinearLimit: 66

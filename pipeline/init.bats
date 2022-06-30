@@ -13,7 +13,6 @@ setup() {
     export CK8S_CONFIG_PATH="${ck8s_config_path_tmp}"
     export CK8S_ENVIRONMENT_NAME=test
     export CK8S_FLAVOR=dev
-    export CK8S_PGP_FP=529D964DE0BBD900C4A395DA09986C297F8B7757
     export CK8S_CLOUD_PROVIDER=aws
 }
 
