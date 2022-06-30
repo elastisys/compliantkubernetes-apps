@@ -49,6 +49,7 @@
 - The OpenSearch security config will now be managed completely by securityadmin
 - Patched Falco rules and added the rules `Change thread namespace` & `System procs network activity`.
 - set the user-alertmanager default receiver to null
+- Increased limits for thanos receiveDistributor
 
 ### Fixed
 

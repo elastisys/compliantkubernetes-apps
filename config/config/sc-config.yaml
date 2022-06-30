@@ -351,10 +351,10 @@ thanos:
     resources:
       requests:
         cpu: 150m
-        memory: 50Mi
-      limits:
-        cpu: 500m
         memory: 100Mi
+      limits:
+        cpu: 1000m
+        memory: 400Mi
 
   ruler:
     # Enables the ruler component
