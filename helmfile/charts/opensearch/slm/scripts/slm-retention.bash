@@ -43,7 +43,7 @@ function get_snapshot_age {
     local now_seconds
     local age_seconds
 
-    snapshot_start_date_seconds=$(echo "${snapshots}" | sed "${idx}q;d" | awk '{ print $3 }')
+    snapshot_start_date_seconds=$(sed "${idx}q;d" <(echo "${snapshots}") | awk '{ print $3 }')
     now_seconds=$(date +%s)
     age_seconds=$((now_seconds - snapshot_start_date_seconds))
     echo "${age_seconds}"
@@ -97,7 +97,7 @@ function remove_old_snapshots {
         age_seconds=$(get_snapshot_age "${snapshots}" "${idx}")
         if [ "${age_seconds}" -gt "${MAX_AGE_SECONDS}" ]; then
             local snapshot_name
-            snapshot_name=$(echo "${snapshots}" | sed "${idx}q;d" | awk '{ print $1 }')
+            snapshot_name=$(sed "${idx}q;d" <(echo "${snapshots}") | awk '{ print $1 }')
             echo "Snapshot ${snapshot_name} is ${age_seconds} s old, max ${MAX_AGE_SECONDS} s"
             snapshots_to_delete="${snapshots_to_delete}${snapshot_name},"
         fi
@@ -128,7 +128,7 @@ function remove_excess_snapshots {
 
     while [ $((snapshot_count - idx )) -ge "${MAX_SNAPSHOTS}" ]; do
         local snapshot_name
-        snapshot_name=$(echo "${snapshots}" | sed "${idx}q;d" | awk '{ print $1 }')
+        snapshot_name=$(sed "${idx}q;d" <(echo "${snapshots}") | awk '{ print $1 }')
         echo "Too many snapshots: $snapshot_count, max ${MAX_SNAPSHOTS}"
         snapshots_to_delete="${snapshots_to_delete}${snapshot_name},"
         idx=$((idx + 1))
