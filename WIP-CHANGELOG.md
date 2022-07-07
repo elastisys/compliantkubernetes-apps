@@ -12,6 +12,8 @@
 - Increased blackbox exporter default resources to reduce cpu throttling.
 - Add the alertmanager namespace to wc velero, only if `user.alertmanager` is enabled
 
+- Kured now have 5m 'lockReleaseDelay' by default to make sure the pods have enough time to be rescheduled on the previous node
+
 ### Fixed
 
 - Pass snapshot list by tempfile in opensearch-slm to prevent piped commands to fail due to short circuiting
