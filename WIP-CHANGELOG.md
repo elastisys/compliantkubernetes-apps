@@ -8,6 +8,7 @@
 ### Changed
 - Renamed `predictLinear` alerts to `capacityManagementAlerts`
 - The `capacitymanagementAlerts` for CPU and Memory request alerts are now per cluster and you can add a `pattern` in the configs, `.prometheus.capacityManagementAlerts.requestlimit`, to create an alert for a certain group of nodes
+- Increased blackbox exporter default resources to reduce cpu throttling.
 
 ### Fixed
 

@@ -98,10 +98,10 @@ user:
 prometheusBlackboxExporter:
   resources:
     requests:
-      cpu: 5m
+      cpu: 10m
       memory: 25Mi
     limits:
-      cpu: 10m
+      cpu: 20m
       memory: 50Mi
   targets:
     rook: false
