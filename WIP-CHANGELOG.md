@@ -15,5 +15,6 @@
 - Pass snapshot list by tempfile in opensearch-slm to prevent piped commands to fail due to short circuiting
 
 ### Added
+- The option to enable `publishService` from configs
 
 ### Removed

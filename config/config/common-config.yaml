@@ -224,7 +224,7 @@ ingressNginx:
     tolerations: []
     affinity: {}
     nodeSelector: {}
-
+    enablepublishService: false
     config:
       ## If 'true', use PROXY protocol
       ## ref: https://docs.nginx.com/nginx/admin-guide/load-balancer/using-proxy-protocol/
