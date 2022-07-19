@@ -95,7 +95,9 @@ schedules:
       storageLocation: default
       includedNamespaces:
       {{ .Values.user.namespaces | toYaml | nindent 8 }}
-      {{ .Values.velero.includedNamespaces | toYaml | nindent 8 }}
+      {{- if .Values.user.alertmanager.enabled }}
+        - alertmanager
+      {{- end }}
       ttl: {{ .Values.velero.retentionPeriod }}
       labelSelector:
         matchExpressions:
