@@ -49,7 +49,7 @@ controller:
   ## by the service. If disable, the status field reports the IP address of the
   ## node or nodes where an ingress controller pod is running.
   publishService:
-    enabled: false
+    enabled:  {{ .Values.ingressNginx.controller.enablepublishService }}
 
   ## DaemonSet or Deployment
   ##
