@@ -188,10 +188,6 @@ externalTrafficPolicy:
     # global: 0.0.0.0/0
     kubeapiMetrics: false
 
-velero:
-  includedNamespaces:
-    - alertmanager
-
 prometheusBlackboxExporter:
   targets:
     gatekeeper: true
