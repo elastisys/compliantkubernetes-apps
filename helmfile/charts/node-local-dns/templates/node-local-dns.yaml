@@ -115,11 +115,8 @@ spec:
       k8s-app: node-local-dns
   template:
     metadata:
-       labels:
-          k8s-app: node-local-dns
-       annotations:
-        prometheus.io/port: "9253"
-        prometheus.io/scrape: "true"
+      labels:
+        k8s-app: node-local-dns
     spec:
       priorityClassName: system-node-critical
       serviceAccountName: node-local-dns
@@ -134,7 +131,7 @@ spec:
         operator: "Exists"
       containers:
       - name: node-cache
-        image: k8s.gcr.io/dns/k8s-dns-node-cache:1.17.0
+        image: registry.k8s.io/dns/k8s-dns-node-cache:1.21.1
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
         args: [ "-localip", "{{ .Values.localIP }},{{ .Values.clusterDNS }}", "-conf", "/etc/Corefile", "-upstreamsvc", "kube-dns-upstream"]

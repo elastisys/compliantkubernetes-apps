@@ -4,6 +4,7 @@
 - Helm upgraded to `v3.8.0`.
 - Helmfile upgraded to `v0.144.0`.
 - Helm-secrets upgraded to `v3.12.0`.
+- Node-local-dns to use image `registry.k8s.io/dns/k8s-dns-node-cache:1.21.1`
 
 ### Changed
 - Renamed `predictLinear` alerts to `capacityManagementAlerts`
