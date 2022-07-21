@@ -83,7 +83,7 @@ releases:
   labels:
     app: node-local-dns
   chart: ./charts/node-local-dns
-  version: 0.1.0
+  version: 0.1.1
   missingFileHandler: Error
   values:
   - values/node-local-dns.yaml.gotmpl
