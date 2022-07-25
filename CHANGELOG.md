@@ -1,5 +1,6 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.24.0](#v0240---2022-07-25)
 - [v0.23.0](#v0230---2022-06-28)
 - [v0.22.0](#v0220---2022-06-01)
 - [v0.21.2](#v0212---2022-06-08)
@@ -24,6 +25,34 @@
 - [v0.6.0](#v060---2020-10-16)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.24.0 - 2022-07-25
+
+### Release notes
+
+### Updated
+
+- Helm upgraded to `v3.8.0`.
+- Helmfile upgraded to `v0.144.0`.
+- Helm-secrets upgraded to `v3.12.0`.
+- Node-local-dns to use image `registry.k8s.io/dns/k8s-dns-node-cache:1.21.1`
+
+### Changed
+
+- Renamed `predictLinear` alerts to `capacityManagementAlerts`
+- The `capacitymanagementAlerts` for CPU and Memory request alerts are now per cluster and you can add a `pattern` in the configs, `.prometheus.capacityManagementAlerts.requestlimit`, to create an alert for a certain group of nodes
+- Increased blackbox exporter default resources to reduce cpu throttling.
+- Add the alertmanager namespace to wc velero, only if `user.alertmanager` is enabled
+- Kured now have 5m 'lockReleaseDelay' by default to make sure the pods have enough time to be rescheduled on the previous node
+
+### Fixed
+
+- Pass snapshot list by tempfile in opensearch-slm to prevent piped commands to fail due to short circuiting
+
+### Added
+
+- The option to enable `publishService` from configs
 
 -------------------------------------------------
 ## v0.23.0 - 2022-06-28
