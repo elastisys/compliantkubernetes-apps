@@ -4,12 +4,12 @@ INNER_SCRIPTS_PATH="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 # shellcheck source=pipeline/test/services/funcs.sh
 source "${INNER_SCRIPTS_PATH}/../funcs.sh"
 
-enable_falco_alerts=$(yq r -e "${CONFIG_FILE}" 'falco.alerts.enabled')
-enable_falco=$(yq r -e "${CONFIG_FILE}" 'falco.enabled')
-enable_opa=$(yq r -e "${CONFIG_FILE}" 'opa.enabled')
-enable_user_alertmanager=$(yq r -e "${CONFIG_FILE}" 'user.alertmanager.enabled')
-enable_velero=$(yq r -e "${CONFIG_FILE}" 'velero.enabled')
-enable_kured=$(yq r -e "${CONFIG_FILE}" 'kured.enabled')
+enable_falco_alerts=$(yq4 -e '.falco.alerts.enabled' "${CONFIG_FILE}")
+enable_falco=$(yq4 -e '.falco.enabled' "${CONFIG_FILE}")
+enable_opa=$(yq4 -e '.opa.enabled' "${CONFIG_FILE}")
+enable_user_alertmanager=$(yq4 -e '.user.alertmanager.enabled' "${CONFIG_FILE}")
+enable_velero=$(yq4 -e '.velero.enabled' "${CONFIG_FILE}")
+enable_kured=$(yq4 -e '.kured.enabled' "${CONFIG_FILE}")
 
 echo
 echo

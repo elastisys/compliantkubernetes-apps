@@ -56,8 +56,8 @@ get_user_server() {
 
 log_info "Creating kubeconfig for the ${1}"
 
-cluster_name=$(yq r "${cluster_config}" 'global.clusterName')
-base_domain=$(yq r "${cluster_config}" 'global.baseDomain')
+cluster_name=$(yq4 '.global.clusterName' "${cluster_config}")
+base_domain=$(yq4 '.global.baseDomain' "${cluster_config}")
 
 # Get server and certificate from the admin kubeconfig
 user_server=$(get_user_server)
@@ -87,7 +87,7 @@ kubectl --kubeconfig="${user_kubeconfig}" config set-credentials "${1}@${cluster
 # Create context with relavant namespace
 # Pick the first namespace
 if [[ ${1} == "user" ]]; then
-    context_namespace=$(yq r "${config[config_file_wc]}" 'user.namespaces[0]')
+    context_namespace=$(yq4 '.user.namespaces[0]' "${config[config_file_wc]}")
 else
     context_namespace="default"
 fi

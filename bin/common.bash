@@ -94,7 +94,8 @@ log_error() {
 # Merges all yaml files in order
 # Usage: yq_merge <files...>
 yq_merge() {
-    yq merge --overwrite --arrays overwrite --prettyPrint "${@}"
+    # shellcheck disable=SC2016
+    yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' "${@}"
 }
 
 # Reads the path to a block from one file containing the value
@@ -102,17 +103,20 @@ yq_merge() {
 yq_read_block() {
     source=$1
     value=$2
-
-    yq read "${source}" --tojson --printMode p "**(.==${value})" | \
-             sed -r 's/\.\[.*\].*//' | sed -r 's/\\//g' | uniq
+    # shellcheck disable=SC2140
+    yq4 ".. | select(tag != \"!!map\" and . == \"${value}\") | path |
+    with(.[]; . = (\"\\\"\" + .) + \"\\\"\" ) |
+    \".\" + join \".\"" "${source}" | \
+             sed -r 's/\."[0-9]+".*//' | sed -r 's/\\//g' | uniq
 }
 
 # Copies a block from one file to another
 # Usage: yq_copy_block <source> <target> <key>
 yq_copy_block() {
-    yq read "${1}" "${3}" --tojson | \
-    yq prefix - "${3}" --tojson | \
-    yq merge "${2}" - --inplace --overwrite --arrays overwrite --prettyPrint
+    prefix=$(yq4 -n ".$3 | path | reverse | .[] as \$i ireduce(\".\"; \"{\\\"\" + \$i + \"\\\":\" + . + \"}\")")
+    yq4 ".${3}" "${1}" -o json | \
+    yq4 "${prefix}" | \
+    yq4 eval-all 'select(fi == 0) * select(fi == 1)' -i "${2}" - --prettyPrint
 }
 
 # Usage: yq_copy_commons <source1> <source2> <target>
@@ -121,16 +125,17 @@ yq_copy_commons() {
     source2=$2
     target=$3
 
-    keys=$(yq_merge "${source1}" "${source2}" --tojson | \
-           yq read - --tojson --printMode pv '**' | \
-           sed -rn 's/\{"(.+)":.*\}/\1/p' | \
-           sed -r 's/\.\[.+\].*//' | \
+    keys=$(yq_merge "${source1}" "${source2}" | \
+           yq4 '.. | select(tag != "!!map") | path |
+           with(.[]; . = ("\"" + .) + "\"" ) |
+           join "."' | \
+           sed -r 's/\."[0-9]+".*//' | \
            sed -r 's/\\//g' | \
            uniq)
     for key in ${keys}; do
-        compare=$(yq compare "${source1}" "${source2}" --tojson --printMode pv "${key}" || true)
+        compare=$(diff <(yq4 -oj ".${key}" "${source1}" ) <(yq4 -oj ".${key}" "${source2}" ) || true)
         if [[ -z "${compare}" ]]; then
-            value=$(yq read "${source1}" --tojson --printMode v "${key}")
+            value=$(yq4 ".${key}" "${source1}" )
             if [[ -z "${value}" ]]; then
                 log_error "Unknown key to copy from: ${key}"
                 exit 1
@@ -146,11 +151,12 @@ yq_copy_changes() {
     source2=$2
     target=$3
 
-    keys=$(yq read "${source2}" --tojson --printMode pv '**' | \
-           sed -rn 's/\{"(.+)":.*\}/\1/p' | sed -r 's/\.\[.+\].*//' | sed -r 's/\\//g' | uniq)
+    keys=$(yq4 '.. | select(tag != "!!map") | path |
+           with(.[]; . = ("\"" + .) + "\"" ) |
+           join "."' "$source2" | \
+           sed -r 's/\."[0-9]+".*//' | uniq)
     for key in ${keys}; do
-        compare=$(yq compare "${source1}" "${source2}" --tojson --printMode pv "${key}" | \
-                  sed -rn 's/^\+(.*)/\1/p' || true)
+        compare=$(diff <(yq4 -oj ".${key}" "${source1}" ) <(yq4 -oj ".${key}" "${source2}" ) || true)
         if [[ -n "${compare}" ]]; then
             yq_copy_block "${source2}" "${target}" "${key}"
         fi
@@ -166,9 +172,9 @@ yq_copy_values() {
 
     keys=$(yq_read_block "${source1}" "${value}")
     for key in ${keys}; do
-        compare=$(yq read "${source2}" "${key}" --tojson --printMode p)
-        if [[ -z "${compare}" ]]; then
-            yq_copy_block "${source1}" "${target}" "${key}"
+        compare=$(yq4 "${key}" "${source2}")
+        if [[ "${compare}" == "null" ]]; then
+            yq_copy_block "${source1}" "${target}" "${key:1}"
         fi
     done
 }
@@ -242,7 +248,7 @@ validate_version() {
         echo log_error "Error: usage validate_version <wc|sc>"
         exit 1
     fi
-    ck8s_version=$(yq read "${merged_config}" 'global.ck8sVersion')
+    ck8s_version=$(yq4 '.global.ck8sVersion' "${merged_config}")
     if [[ -z "$ck8s_version" ]]; then
         log_error "ERROR: No version set. Run init to generate config."
         exit 1
@@ -269,7 +275,7 @@ validate_config() {
         options=$(yq_read_block "${template_config}" "set-me")
         maybe_exit="false"
         for opt in ${options}; do
-            compare=$(yq compare "${template_config}" "${merged_config}" "${opt}" -j -ppv | sed -rn 's/\+(.*)/\1/p' || true)
+            compare=$(diff <(yq4 -oj "${opt}" "${template_config}") <(yq4 -oj "${opt}" "${merged_config}") || true)
             if [[ -z "${compare}" ]]; then
                 log_warning "WARN: ${opt} is not set in config"
                 maybe_exit="true"
@@ -318,13 +324,13 @@ validate_sops_config() {
         exit 1
     fi
 
-    rule_count=$(yq r - --length creation_rules < "${sops_config}")
+    rule_count=$(yq4 '.creation_rules | length' "${sops_config}")
     if [ "${rule_count:-0}" -gt 1 ]; then
         log_error "ERROR: SOPS config has more than one creation rule."
         exit 1
     fi
 
-    fingerprints=$(yq r - 'creation_rules[0].pgp' < "${sops_config}")
+    fingerprints=$(yq4 '.creation_rules[0].pgp' "${sops_config}")
     if ! [[ "${fingerprints}" =~ ^[A-Z0-9,' ']+$ ]]; then
         log_error "ERROR: SOPS config contains no or invalid PGP keys."
         log_error "fingerprints=${fingerprints}"
@@ -372,7 +378,7 @@ append_trap() {
 
 # Write PGP fingerprints to SOPS config
 sops_config_write_fingerprints() {
-    yq n 'creation_rules[0].pgp' "${1}" > "${sops_config}" || \
+    yq4 -n ".creation_rules[0].pgp = \"${1}\"" > "${sops_config}" || \
       (log_error "ERROR: Failed to write fingerprints" && rm "${sops_config}" && exit 1)
 }
 

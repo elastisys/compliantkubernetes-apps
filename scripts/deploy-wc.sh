@@ -17,7 +17,7 @@ config_load wc --skip-validation
 INTERACTIVE=${1:-""}
 
 echo "Creating OpenSearch and Fluentd secrets" >&2
-opensearch_password=$(sops_exec_file "${secrets[secrets_file]}" 'yq r -e {} opensearch.fluentdPassword')
+opensearch_password=$(sops_exec_file "${secrets[secrets_file]}" 'yq4 .opensearch.fluentdPassword {}')
 
 kubectl -n kube-system create secret generic opensearch \
     --from-literal=password="${opensearch_password}" --dry-run=client -o yaml | kubectl apply -f -
