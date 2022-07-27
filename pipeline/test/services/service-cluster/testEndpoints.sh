@@ -9,18 +9,18 @@ echo
 echo "Testing endpoints"
 echo "=================="
 
-ops_domain=$(yq r -e "${CONFIG_FILE}" 'global.opsDomain')
-base_domain=$(yq r -e "${CONFIG_FILE}" 'global.baseDomain')
-enable_harbor=$(yq r -e "${CONFIG_FILE}" 'harbor.enabled')
-enable_user_grafana=$(yq r -e "${CONFIG_FILE}" 'user.grafana.enabled')
-grafana_subdomain=$(yq r -e "${CONFIG_FILE}" 'user.grafana.subdomain')
-grafana_ops_subdomain=$(yq r -e "${CONFIG_FILE}" 'prometheus.grafana.subdomain')
-harbor_subdomain=$(yq r -e "${CONFIG_FILE}" 'harbor.subdomain')
-opensearch_subdomain=$(yq r -e "${CONFIG_FILE}" 'opensearch.subdomain')
-opensearch_dashboards_subdomain=$(yq r -e "${CONFIG_FILE}" 'opensearch.dashboards.subdomain')
-thanos_subdomain=$(yq r -e "${CONFIG_FILE}" 'thanos.receiver.subdomain')
-enable_thanos=$(yq r -e "${CONFIG_FILE}" 'thanos.enabled')
-enable_thanos_receiver=$(yq r -e "${CONFIG_FILE}" 'thanos.receiver.enabled')
+ops_domain=$(yq4 -e '.global.opsDomain' "${CONFIG_FILE}")
+base_domain=$(yq4 -e '.global.baseDomain' "${CONFIG_FILE}")
+enable_harbor=$(yq4 -e '.harbor.enabled' "${CONFIG_FILE}")
+enable_user_grafana=$(yq4 -e '.user.grafana.enabled' "${CONFIG_FILE}")
+grafana_subdomain=$(yq4 -e '.user.grafana.subdomain' "${CONFIG_FILE}")
+grafana_ops_subdomain=$(yq4 -e '.prometheus.grafana.subdomain' "${CONFIG_FILE}")
+harbor_subdomain=$(yq4 -e '.harbor.subdomain' "${CONFIG_FILE}")
+opensearch_subdomain=$(yq4 -e '.opensearch.subdomain' "${CONFIG_FILE}")
+opensearch_dashboards_subdomain=$(yq4 -e '.opensearch.dashboards.subdomain' "${CONFIG_FILE}")
+thanos_subdomain=$(yq4 -e '.thanos.receiver.subdomain' "${CONFIG_FILE}")
+enable_thanos=$(yq4 -e '.thanos.enabled' "${CONFIG_FILE}")
+enable_thanos_receiver=$(yq4 -e '.thanos.receiver.enabled' "${CONFIG_FILE}")
 
 testEndpoint OpenSearch "https://${opensearch_subdomain}.${ops_domain}/"
 

@@ -13,9 +13,9 @@ source "${here}/common.bash"
 
 # Load cloud provider, environment name, and flavor from config if available.
 if [ -f "${config[default_common]}" ]; then
-    cloud_provider=$(yq read "${config[default_common]}" 'global.ck8sCloudProvider')
-    environment_name=$(yq read "${config[default_common]}" 'global.ck8sEnvironmentName')
-    flavor=$(yq read "${config[default_common]}" 'global.ck8sFlavor')
+    cloud_provider=$(yq4 '.global.ck8sCloudProvider' "${config[default_common]}")
+    environment_name=$(yq4 '.global.ck8sEnvironmentName' "${config[default_common]}")
+    flavor=$(yq4 '.global.ck8sFlavor' "${config[default_common]}")
 fi
 if [ -z "${cloud_provider:-}" ]; then
     : "${CK8S_CLOUD_PROVIDER:?Missing CK8S_CLOUD_PROVIDER}"
@@ -90,8 +90,8 @@ replace_set_me(){
         log_error "ERROR: number of args in replace_set_me must be 3. #=[$#]"
         exit 1
     fi
-    if [[ $(yq read "$1" "$2") == "set-me" ]]; then
-       yq write --inplace "$1" "$2" "$3"
+    if [[ $(yq4 "${2}" "${1}") == "set-me" ]]; then
+        yq4 --inplace "${2} = ${3}" "${1}"
     fi
 }
 
@@ -146,7 +146,7 @@ set_storage_class() {
             ;;
     esac
 
-    replace_set_me "${file}" "storageClasses.default" "${storage_class}"
+    replace_set_me "${file}" ".storageClasses.default" "\"${storage_class}\""
 }
 
 # Usage: set_object_storage <config-file>
@@ -160,16 +160,16 @@ set_object_storage() {
     case ${CK8S_CLOUD_PROVIDER} in
         aws | exoscale)
             object_storage_type="s3"
-            yq write --inplace "${file}" "objectStorage.s3.region" "set-me"
-            yq write --inplace "${file}" "objectStorage.s3.regionEndpoint" "set-me"
-            yq write --inplace "${file}" "objectStorage.s3.forcePathStyle" false
+            yq4 --inplace '.objectStorage.s3.region = "set-me"' "${file}"
+            yq4 --inplace '.objectStorage.s3.regionEndpoint = "set-me"' "${file}"
+            yq4 --inplace '.objectStorage.s3.forcePathStyle = false' "${file}"
             ;;
 
         citycloud | safespring | upcloud | elastx)
             object_storage_type="s3"
-            yq write --inplace "${file}" "objectStorage.s3.region" "set-me"
-            yq write --inplace "${file}" "objectStorage.s3.regionEndpoint" "set-me"
-            yq write --inplace "${file}" "objectStorage.s3.forcePathStyle" true
+            yq4 --inplace '.objectStorage.s3.region = "set-me"' "${file}"
+            yq4 --inplace '.objectStorage.s3.regionEndpoint = "set-me"' "${file}"
+            yq4 --inplace '.objectStorage.s3.forcePathStyle = true' "${file}"
             ;;
 
         baremetal)
@@ -177,7 +177,7 @@ set_object_storage() {
             ;;
     esac
 
-    replace_set_me "${file}" "objectStorage.type" "${object_storage_type}"
+    replace_set_me "${file}" ".objectStorage.type" "\"${object_storage_type}\""
 }
 
 # Usage: set_nginx_config <config-file>
@@ -218,16 +218,16 @@ set_nginx_config() {
             ;;
     esac
 
-    replace_set_me "$1" 'ingressNginx.controller.config.useProxyProtocol' "${use_proxy_protocol}"
-    replace_set_me "$1" 'ingressNginx.controller.useHostPort' "${use_host_port}"
-    replace_set_me "$1" 'ingressNginx.controller.service.enabled' "${service_enabled}"
+    replace_set_me "$1" '.ingressNginx.controller.config.useProxyProtocol' "${use_proxy_protocol}"
+    replace_set_me "$1" '.ingressNginx.controller.useHostPort' "${use_host_port}"
+    replace_set_me "$1" '.ingressNginx.controller.service.enabled' "${service_enabled}"
 
     if [ "${service_enabled}" = 'false' ]; then
-        replace_set_me "${file}" 'ingressNginx.controller.service.type' 'set-me-if-ingressNginx.controller.service.enabled'
-        replace_set_me "${file}" 'ingressNginx.controller.service.annotations' 'set-me-if-ingressNginx.controller.service.enabled'
+        replace_set_me "${file}" '.ingressNginx.controller.service.type' '"set-me-if-ingressNginx.controller.service.enabled"'
+        replace_set_me "${file}" '.ingressNginx.controller.service.annotations' '"set-me-if-ingressNginx.controller.service.enabled"'
     else
-        replace_set_me "$1" 'ingressNginx.controller.service.type' "${service_type}"
-        replace_set_me "$1" 'ingressNginx.controller.service.annotations' "${service_annotations}"
+        replace_set_me "$1" '.ingressNginx.controller.service.type' "\"${service_type}\""
+        replace_set_me "$1" '.ingressNginx.controller.service.annotations' "\"${service_annotations}\""
     fi
 }
 
@@ -253,7 +253,7 @@ set_fluentd_config() {
             ;;
     esac
 
-    replace_set_me "${file}" 'fluentd.forwarder.useRegionEndpoint' "${use_region_endpoint}"
+    replace_set_me "${file}" '.fluentd.forwarder.useRegionEndpoint' "${use_region_endpoint}"
 }
 
 # Usage: set_harbor_config <config-file>
@@ -279,15 +279,15 @@ set_harbor_config() {
             persistence_type=swift
             disable_redirect=true
 
-            yq write --inplace "${file}" "harbor.persistence.swift.identityApiVersion" 3
-            yq write --inplace "${file}" "harbor.persistence.swift.authURL" "set-me"
-            yq write --inplace "${file}" "harbor.persistence.swift.regionName" "set-me"
-            yq write --inplace "${file}" "harbor.persistence.swift.projectDomainName" "set-me"
-            yq write --inplace "${file}" "harbor.persistence.swift.userDomainName" "set-me"
-            yq write --inplace "${file}" "harbor.persistence.swift.projectName" "set-me"
-            yq write --inplace "${file}" "harbor.persistence.swift.projectID" "set-me"
-            yq write --inplace "${file}" "harbor.persistence.swift.tenantName" "set-me"
-            yq write --inplace "${file}" "harbor.persistence.swift.authVersion" 3
+            yq4 --inplace '.harbor.persistence.swift.identityApiVersion = 3' "${file}"
+            yq4 --inplace '.harbor.persistence.swift.authURL = "set-me"' "${file}"
+            yq4 --inplace '.harbor.persistence.swift.regionName = "set-me"' "${file}"
+            yq4 --inplace '.harbor.persistence.swift.projectDomainName = "set-me"' "${file}"
+            yq4 --inplace '.harbor.persistence.swift.userDomainName = "set-me"' "${file}"
+            yq4 --inplace '.harbor.persistence.swift.projectName = "set-me"' "${file}"
+            yq4 --inplace '.harbor.persistence.swift.projectID = "set-me"' "${file}"
+            yq4 --inplace '.harbor.persistence.swift.tenantName = "set-me"' "${file}"
+            yq4 --inplace '.harbor.persistence.swift.authVersion = 3' "${file}"
             ;;
 
         baremetal)
@@ -296,8 +296,8 @@ set_harbor_config() {
             ;;
     esac
 
-    replace_set_me "${file}" "harbor.persistence.type" "${persistence_type}"
-    replace_set_me "${file}" "harbor.persistence.disableRedirect" "${disable_redirect}"
+    replace_set_me "${file}" ".harbor.persistence.type" "\"${persistence_type}\""
+    replace_set_me "${file}" ".harbor.persistence.disableRedirect" "${disable_redirect}"
 }
 
 # Usage: update_config <override_config_file>
@@ -338,6 +338,7 @@ update_config() {
 
     new_config=$(mktemp)
     append_trap "rm ${new_config}" EXIT
+    echo "{}" > "${new_config}"
 
     yq_copy_changes "${base_config}" "${override_config}" "${new_config}"
 
@@ -373,13 +374,14 @@ update_secrets() {
     tmpfile=$(mktemp)
     append_trap "rm ${tmpfile}" EXIT
 
-    yq merge "${config_template_path}/secrets/sc-secrets.yaml" "${config_template_path}/secrets/wc-secrets.yaml" > "${tmpfile}"
+    yq4 eval-all 'select(fi == 0) * select(fi == 1)' "${config_template_path}/secrets/sc-secrets.yaml" "${config_template_path}/secrets/wc-secrets.yaml" > "${tmpfile}"
 
     generate_secrets "${tmpfile}"
 
     if [[ -f $file ]]; then
         sops_decrypt "${file}"
-        yq merge "${tmpfile}" "${file}" --inplace --prettyPrint --overwrite --arrays overwrite
+        yq4 --inplace '... comments=""' "${tmpfile}"
+        yq4 eval-all --inplace --prettyPrint 'select(fi == 0) * select(fi == 1)' "${tmpfile}" "${file}"
     fi
 
     if [ "${generate_new_secrets}" = "true" ]; then
@@ -416,36 +418,36 @@ generate_secrets() {
     THANOS_INGRESS_PASS=$(pwgen -cns 20 1)
     THANOS_INGRESS_PASS_HASH=$(htpasswd -bn "" "${THANOS_INGRESS_PASS}" | tr -d ':\n')
 
-    yq write --inplace "${tmpfile}" 'grafana.password' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'grafana.clientSecret' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'grafana.opsClientSecret' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'harbor.password' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'harbor.databasePassword' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'harbor.clientSecret' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'harbor.xsrf' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'harbor.coreSecret' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'harbor.jobserviceSecret' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'harbor.registrySecret' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'opensearch.adminPassword' "${OS_ADMIN_PASS}"
-    yq write --inplace "${tmpfile}" 'opensearch.adminHash' "${OS_ADMIN_PASS_HASH}"
-    yq write --inplace "${tmpfile}" 'opensearch.clientSecret' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'opensearch.configurerPassword' "${OS_CONF_PASS}"
-    yq write --inplace "${tmpfile}" 'opensearch.configurerHash' "${OS_CONF_PASS_HASH}"
-    yq write --inplace "${tmpfile}" 'opensearch.dashboardsPassword' "${OSD_PASS}"
-    yq write --inplace "${tmpfile}" 'opensearch.dashboardsHash' "${OSD_PASS_HASH}"
-    yq write --inplace "${tmpfile}" 'opensearch.dashboardsCookieEncKey' "$(pwgen -cns 32 1)"
-    yq write --inplace "${tmpfile}" 'opensearch.fluentdPassword' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'opensearch.curatorPassword' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'opensearch.snapshotterPassword' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'opensearch.metricsExporterPassword' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'kubeapiMetricsPassword' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'dex.staticPasswordNotHashed' "${DEX_STATIC_PASS}"
-    yq write --inplace "${tmpfile}" 'dex.staticPassword' "${DEX_STATIC_PASS_HASH}"
-    yq write --inplace "${tmpfile}" 'dex.kubeloginClientSecret' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'user.grafanaPassword' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'user.alertmanagerPassword' "$(pwgen -cns 20 1)"
-    yq write --inplace "${tmpfile}" 'thanos.receiver.basic_auth.password' "${THANOS_INGRESS_PASS}"
-    yq write --inplace "${tmpfile}" 'thanos.receiver.basic_auth.passwordHash' "${THANOS_INGRESS_PASS_HASH}"
+    yq4 --inplace ".grafana.password= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+    yq4 --inplace ".grafana.clientSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+    yq4 --inplace ".grafana.opsClientSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+    yq4 --inplace ".harbor.password= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+    yq4 --inplace ".harbor.databasePassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+    yq4 --inplace ".harbor.clientSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+    yq4 --inplace ".harbor.xsrf= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+    yq4 --inplace ".harbor.coreSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+    yq4 --inplace ".harbor.jobserviceSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+    yq4 --inplace ".harbor.registrySecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+    yq4 --inplace ".opensearch.adminPassword= \"${OS_ADMIN_PASS}\"" "${tmpfile}"
+    yq4 --inplace ".opensearch.adminHash= \"${OS_ADMIN_PASS_HASH}\"" "${tmpfile}"
+    yq4 --inplace ".opensearch.clientSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+    yq4 --inplace ".opensearch.configurerPassword= \"${OS_CONF_PASS}\"" "${tmpfile}"
+    yq4 --inplace ".opensearch.configurerHash= \"${OS_CONF_PASS_HASH}\"" "${tmpfile}"
+    yq4 --inplace ".opensearch.dashboardsPassword= \"${OSD_PASS}\"" "${tmpfile}"
+    yq4 --inplace ".opensearch.dashboardsHash= \"${OSD_PASS_HASH}\"" "${tmpfile}"
+    yq4 --inplace ".opensearch.dashboardsCookieEncKey= \"$(pwgen -cns 32 1)\"" "${tmpfile}"
+    yq4 --inplace ".opensearch.fluentdPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+    yq4 --inplace ".opensearch.curatorPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+    yq4 --inplace ".opensearch.snapshotterPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+    yq4 --inplace ".opensearch.metricsExporterPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+    yq4 --inplace ".kubeapiMetricsPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+    yq4 --inplace ".dex.staticPasswordNotHashed= \"${DEX_STATIC_PASS}\"" "${tmpfile}"
+    yq4 --inplace ".dex.staticPassword= \"${DEX_STATIC_PASS_HASH}\"" "${tmpfile}"
+    yq4 --inplace ".dex.kubeloginClientSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+    yq4 --inplace ".user.grafanaPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+    yq4 --inplace ".user.alertmanagerPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+    yq4 --inplace ".thanos.receiver.basic_auth.password= \"${THANOS_INGRESS_PASS}\"" "${tmpfile}"
+    yq4 --inplace ".thanos.receiver.basic_auth.passwordHash= \"${THANOS_INGRESS_PASS_HASH}\"" "${tmpfile}"
 }
 
 # Usage: backup_file <file> [sufix]

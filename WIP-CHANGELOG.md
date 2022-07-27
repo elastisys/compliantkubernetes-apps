@@ -1,6 +1,8 @@
 ### Release notes
 - In 1.7 the cert-manager API versions v1alpha2, v1alpha3, and v1beta1, have been removed from the custom resource definitions (CRDs).
 - In 1.8 the cert-manager will validate the spec.privateKey.rotationPolicy on Certificate resources. Valid options are Never and Always.
+- bash scripts are now migrated to yq-v4.26.1
+  - Requires `yq4` as an alias to yq v4. Installed via `get-requirements.yaml`.
 
 ### Updated
 - cert-manager from v1.6.1 to v1.8.2. [Full changelog](https://github.com/cert-manager/cert-manager/releases?page=1)
@@ -11,6 +13,7 @@
 
 ### Changed
 - The Kubernetes status Grafana dashboard (new node filter, new graphs for CPU/Memory requests and limits per node, updated graphs for CPU/Memory usage/requests)
+- bash scripts are now migrated to yq-v4.26.1
 
 ### Fixed
 

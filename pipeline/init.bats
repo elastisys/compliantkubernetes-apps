@@ -107,8 +107,7 @@ teardown() {
             run diff "${config_1}/wc-config.yaml" "${config_2}/wc-config.yaml"
             assert_success
 
-            run diff <(sops -d "${config_1}/secrets.yaml") \
-                <(sops -d "${config_2}/secrets.yaml")
+            run diff <(sops -d "${config_1}/secrets.yaml") <(sops -d "${config_2}/secrets.yaml")
             assert_success
 
             rm -r "${config_1}" "${config_2}"

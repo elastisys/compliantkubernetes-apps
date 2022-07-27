@@ -14,8 +14,8 @@ This will guide you through restoring a bucket from an off-site backup.
 - Else have sync configured, template the `rclone-sync-config` secret, and apply:
   ```bash
   ./bin/ck8s ops helmfile sc -l app=rclone-sync template | \
-    yq r -c -d '*' -D '[]' - | yq r - 'kind==Secret' | \
-    yq w - 'metadata.name' 'rclone-sync-restore-config' | \
+    yq4 '[.] // []' - | yq4 '.[] | select(.kind == "Secret")' - | \
+    yq4 '.metadata.name = "rclone-sync-restore-config"' - | \
     ./bin/ck8s ops kubectl sc -n kube-system apply -f -
 
   export RCLONE_CONFIG="rclone-sync-restore-config"
