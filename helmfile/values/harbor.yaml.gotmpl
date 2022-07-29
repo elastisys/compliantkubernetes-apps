@@ -63,6 +63,7 @@ persistence:
       bucket: {{ .Values.objectStorage.buckets.harbor }}
       secretkey: {{ .Values.objectStorage.s3.secretKey }}
       accesskey: {{ .Values.objectStorage.s3.accessKey }}
+      multipartcopythresholdsize: {{ .Values.harbor.s3.multipartcopythresholdsize }}
     {{ else if eq .Values.objectStorage.type "gcs" }}
     type: gcs
     gcs:

@@ -212,6 +212,8 @@ harbor:
   backup:
     enabled: true
     retentionDays: 7
+  s3:
+    multipartcopythresholdsize: "536870912"
 
 grafanaLabelEnforcer:
   resources:
