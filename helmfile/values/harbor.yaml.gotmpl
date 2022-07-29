@@ -34,7 +34,7 @@ persistence:
     database:
       size: {{ .Values.harbor.database.persistentVolumeClaim.size }}
     redis:
-      size: {{ .Values.harbor.redis.persistentVolumeClaim.size }}
+      size: {{ .Values.harbor.redis.internal.persistentVolumeClaim.size }}
     trivy:
       size: {{ .Values.harbor.trivy.persistentVolumeClaim.size }}
   imageChartStorage:
@@ -157,11 +157,15 @@ notary:
   tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
 
 redis:
+  type: {{ .Values.harbor.redis.type }}
   internal:
-    resources:    {{- toYaml .Values.harbor.redis.resources | nindent 6 }}
+    resources:    {{- toYaml .Values.harbor.redis.internal.resources | nindent 6 }}
     nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 6 }}
     affinity:     {{- toYaml .Values.harbor.affinity | nindent 6 }}
     tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 6 }}
-
+  {{- if and (eq .Values.harbor.redis.type "external") (.Values.harbor.redis.external) }}
+  external:
+    {{ toYaml .Values.harbor.redis.external | nindent 4 }}
+  {{- end }}
 updateStrategy:
   type: Recreate
