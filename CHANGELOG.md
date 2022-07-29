@@ -45,6 +45,7 @@
 - Increased blackbox exporter default resources to reduce cpu throttling.
 - Add the alertmanager namespace to wc velero, only if `user.alertmanager` is enabled
 - Kured now have 5m 'lockReleaseDelay' by default to make sure the pods have enough time to be rescheduled on the previous node
+- Made `multipartcopythresholdsize` for harbor s3 configurable and increased default value.
 
 ### Fixed
 
