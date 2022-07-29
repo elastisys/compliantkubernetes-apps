@@ -154,12 +154,19 @@ harbor:
           cpu: 250m
           memory: 250Mi
   redis:
-    persistentVolumeClaim:
-      size: 1Gi
-    resources:
-      requests:
-        memory: 32Mi
-        cpu: 10m
+    type: internal
+    internal:
+      persistentVolumeClaim:
+        size: 1Gi
+      resources:
+        requests:
+          memory: 32Mi
+          cpu: 10m
+    # if external redis database is used, please uncomment and update the below lines
+    external: {}
+    #  addr: "rfs-redis-harbor.redis-system.svc.cluster.local:26379"
+    #  sentinelMasterSet: "mymaster"
+
   notary:
     replicas: 1
     subdomain: notary.harbor

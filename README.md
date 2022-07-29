@@ -253,6 +253,22 @@ The user will first need to add pull secrets that gives some ServiceAccount acce
 
 For more details and a list of available services see the [user guide](https://compliantkubernetes.io/user-guide/).
 
+#### Redis
+
+**Config**
+In `$CK8S_CONFIG_PATH/sc-config.yaml` set the following configs
+```
+harbor:
+  ...
+  redis:
+    type: internal
+    external:
+      addr: "rfs-redis-harbor.redis-system.svc.cluster.local:26379"
+      sentinelMasterSet: "mymaster"
+```
+
+
+
 ### Management of the clusters
 
 The [`bin/ck8s`](bin/ck8s) script provides an entrypoint to the clusters.
