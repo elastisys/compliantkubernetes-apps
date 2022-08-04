@@ -49,29 +49,29 @@ customRules:
       condition: >
         (container.image.repository in (gcr.io/google_containers/hyperkube-amd64,
         gcr.io/google_containers/kube2sky, sysdig/agent, sysdig/falco,
-        sysdig/sysdig, falcosecurity/falco, quay.io/fluentd_elasticsearch/fluentd,
+        sysdig/sysdig, falcosecurity/falco, docker.io/falcosecurity/falco, docker.io/bitnami/fluentd,
         velero/velero, quay.io/jetstack/cert-manager-cainjector, weaveworks/kured,
         ingress-controller/controller, quay.io/prometheus-operator/prometheus-operator,
         k8s.gcr.io/ingress-nginx/kube-webhook-certgen, quay.io/spotahome/redis-operator,
         registry.opensource.zalan.do/acid/postgres-operator, registry.opensource.zalan.do/acid/postgres-operator-ui,
         rabbitmqoperator/cluster-operator) or (k8s.ns.name = "kube-system"))
     - list: falco_privileged_images
+      append: true
       items: [
         docker.io/sysdig/agent, docker.io/sysdig/falco, docker.io/sysdig/sysdig,
         gcr.io/google_containers/kube-proxy, docker.io/calico/node, quay.io/calico/node,
         docker.io/rook/toolbox, docker.io/cloudnativelabs/kube-router, docker.io/mesosphere/mesos-slave,
         docker.io/docker/ucp-agent, sematext_images, k8s.gcr.io/kube-proxy, calico/node, falcosecurity/falco,
-        k8s.gcr.io/k8s-dns-node-cache, k8s.gcr.io/dns/k8s-dns-node-cache
+        k8s.gcr.io/k8s-dns-node-cache, k8s.gcr.io/dns/k8s-dns-node-cache, registry.k8s.io/dns/k8s-dns-node-cache,
+        docker.io/falcosecurity/falco, docker.io/k8scloudprovider/cinder-csi-plugin
     ]
     - macro: postgres_running_wal_e
       condition: ((proc.pname=postgres and proc.cmdline startswith "sh -c envdir /etc/wal-e.d/env /usr/local/bin/wal-e") or
                   (proc.pname=postgres and proc.cmdline startswith "sh -c envdir \"/run/etc/wal-e.d/env\" wal-g wal-push"))
-    - macro: user_known_contact_k8s_api_server_activities
-      condition: >
-        (container.image.repository in (elastisys/curl-jq))
     - list: falco_sensitive_mount_images
       items: [
-        docker.io/sysdig/agent, docker.io/sysdig/falco, docker.io/sysdig/sysdig,falcosecurity/falco,
+        docker.io/sysdig/agent, docker.io/sysdig/falco, docker.io/sysdig/sysdig,
+        docker.io/falcosecurity/falco, falcosecurity/falco, public.ecr.aws/falcosecurity/falco,
         gcr.io/google_containers/hyperkube,
         gcr.io/google_containers/kube-proxy, docker.io/calico/node,
         docker.io/rook/toolbox, docker.io/cloudnativelabs/kube-router, docker.io/consul,
@@ -188,7 +188,7 @@ customRules:
               container.image.repository in (trusted_images) or
               container.image.repository in (falco_sensitive_mount_images) or
               container.image.repository startswith quay.io/sysdig/ or
-              container.image.repository startswith k8scloudprovider/cinder-csi-plugin)
+              container.image.repository=docker.io/k8scloudprovider/cinder-csi-plugin)
     - rule: Launch Package Management Process in Container
       desc: Package management process ran inside container
       condition: >

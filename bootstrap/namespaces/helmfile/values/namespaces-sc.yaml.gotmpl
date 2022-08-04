@@ -9,6 +9,9 @@ namespaces:
 - name: monitoring
 - name: ingress-nginx
 - name: influxdb-prometheus
+{{ if .Values.falco.enabled }}
+- name: falco
+{{ end }}
 - name: velero
 {{ if .Values.harbor.enabled }}
 - name: harbor

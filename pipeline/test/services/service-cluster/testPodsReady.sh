@@ -17,6 +17,8 @@ enable_thanos_query=$(yq r -e "${CONFIG_FILE}" 'thanos.query.enabled')
 enable_thanos_receiver=$(yq r -e "${CONFIG_FILE}" 'thanos.receiver.enabled')
 enable_thanos_ruler=$(yq r -e "${CONFIG_FILE}" 'thanos.ruler.enabled')
 enable_kured=$(yq r -e "${CONFIG_FILE}" 'kured.enabled')
+enable_falco_alerts=$(yq r -e "${CONFIG_FILE}" 'falco.alerts.enabled')
+enable_falco=$(yq r -e "${CONFIG_FILE}" 'falco.enabled')
 
 echo
 echo
@@ -55,6 +57,9 @@ if "${enable_user_grafana}"; then
 fi
 if "${enable_velero}"; then
     deployments+=("velero velero")
+fi
+if "${enable_falco_alerts}"; then
+    deployments+=("falco falco-falcosidekick")
 fi
 if [[ "${enable_thanos}" == "true" ]] && [[ "${enable_thanos_receiver}" == "true" ]]; then
     deployments+=(
@@ -100,7 +105,9 @@ fi
 if "${enable_kured}"; then
   daemonsets+=("kured kured")
 fi
-
+if "${enable_falco}"; then
+    daemonsets+=("falco falco")
+fi
 resourceKind="DaemonSet"
 # Get json data in a smaller dataset
 simpleData="$(getStatus $resourceKind)"
