@@ -173,6 +173,30 @@ releases:
   values:
   - values/vulnerability-exporter.yaml.gotmpl
 
+# Falco
+- name: falco
+  namespace: falco
+  labels:
+    app: falco
+  chart: ./upstream/falco
+  version: 1.16.0
+  installed: {{ .Values.falco.enabled }}
+  missingFileHandler: Error
+  values:
+  - values/falco.yaml.gotmpl
+
+# Falco-exporter
+- name: falco-exporter
+  namespace: falco
+  labels:
+    app: falco-exporter
+  chart: ./upstream/falco-exporter
+  version: 0.8.0
+  installed: {{ .Values.falco.enabled }}
+  missingFileHandler: Error
+  values:
+    - values/falco-exporter.yaml.gotmpl
+
 # Service cluster releases
 {{ if eq .Environment.Name "service_cluster" }}
 # Dex
@@ -585,30 +609,6 @@ releases:
   missingFileHandler: Error
   values:
   - values/wc-servicemonitor.yaml.gotmpl
-
-# Falco
-- name: falco
-  namespace: falco
-  labels:
-    app: falco
-  chart: ./upstream/falco
-  version: 1.16.0
-  installed: {{ .Values.falco.enabled }}
-  missingFileHandler: Error
-  values:
-  - values/falco.yaml.gotmpl
-
-# Falco-exporter
-- name: falco-exporter
-  namespace: falco
-  labels:
-    app: falco-exporter
-  chart: ./upstream/falco-exporter
-  version: 0.8.0
-  installed: {{ .Values.falco.enabled }}
-  missingFileHandler: Error
-  values:
-    - values/falco-exporter.yaml.gotmpl
 
 - name: user-alertmanager
   namespace: alertmanager
