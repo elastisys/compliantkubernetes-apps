@@ -12,6 +12,169 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 ### Fixed
 ### Security
+---
+## [1.7.4]
+### Added
+- Add lifecycle hooks for opensearch-dashboards charts
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.7.3]
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Opensearch dashboards ingress template to use values from provided config
+### Security
+---
+## [1.7.2]
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Opensearch dashboard fix issue #295.
+- Opensearch dashboard config map support both string and map format.
+### Security
+---
+## [1.7.1]
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Opensearch dashboard config map format is restored with backward support of string format
+### Security
+---
+## [1.7.0]
+### Added
+### Changed
+- Updated OpenSearch Dashboard appVersion to 1.3.4.
+### Deprecated
+### Removed
+### Fixed
+### Security
+
+---
+## [1.6.1]
+### Added
+### Changed
+- Updated OpenSearch Dashboard appVersion to 1.3.3.
+### Deprecated
+### Removed
+### Fixed
+### Security
+
+---
+## [1.6.0]
+### Added
+### Changed
+- Changed version to 1.12.0 to use 1.x branch for all 1.x releases.
+### Deprecated
+### Removed
+### Fixed
+### Security
+
+---
+## [1.5.1]
+### Added
+### Changed
+- Change app version to use OpenSearch-Dashboards 1.3.2
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.4.1]
+### Added
+- Update `values.yaml` example to use the correct format for configs
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.4.0]
+### Added
+- Change app version to use OpenSearch-Dashboards 1.3.1
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.3.3]
+### Added
+### Changed
+- Updated maintainer list
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.3.2]
+### Added
+- Added pod autoscaling capability.
+- Added autoscaling configuration parameters in readme.
+- Added autoscaling.yaml under templates.
+### Changed
+- Updated the chart version to 1.3.2
+- Changed values.yaml to reflect autoscaling changes.
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.3.1]
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Fixed Ingress empty annotations of the opensearch-dashboards
+### Security
+---
+## [1.3.0]
+### Added
+- Change app version to use OpenSearch-Dashboards 1.3.0
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.2.2]
+### Added
+- Add support for extra K8s manifests
+- Added Configuration parameters in readme
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.2.1]
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Fixed rendering of `opensearch-dashboard.yml` in `configmap.yaml`.
+### Security
+
+---
+## [1.2.0]
+### Added
+### Changed
+- Changed structure of `image` keys in `values.yaml` file to use helm's default (`image.repository`, `image.tag`, `image.pullPolicy`)
+### Deprecated
+### Removed
+### Fixed
+### Security
 
 ---
 ## [1.1.2]
@@ -107,7 +270,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 ### Security
 
-[Unreleased]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-1.1.2...HEAD
+[Unreleased]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-1.7.4...HEAD
+[1.7.4]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.7.3...opensearch-1.7.4
+[1.7.3]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.7.2...opensearch-1.7.3
+[1.7.2]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.7.1...opensearch-1.7.2
+[1.7.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.7.0...opensearch-1.7.1
+[1.7.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.6.1...opensearch-1.7.0
+[1.6.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.6.0...opensearch-1.6.1
+[1.6.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.5.1...opensearch-1.6.0
+[1.5.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.4.1...opensearch-1.5.1
+[1.4.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.4.0...opensearch-1.4.1
+[1.4.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.3.3...opensearch-1.4.0
+[1.3.3]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.3.2...opensearch-1.3.3
+[1.3.2]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.3.1...opensearch-1.3.2
+[1.3.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.3.0...opensearch-1.3.1
+[1.3.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.2.2...opensearch-1.3.0
+[1.2.2]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.2.1...opensearch-1.2.2
+[1.2.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.2.0...opensearch-1.2.1
+[1.2.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.1.2...opensearch-1.2.0
 [1.1.2]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.1.1...opensearch-1.1.2
 [1.1.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.1.0...opensearch-1.1.1
 [1.1.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.0.8...opensearch-1.1.0
