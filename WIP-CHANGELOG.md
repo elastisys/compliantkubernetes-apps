@@ -9,6 +9,9 @@
 
 ### Updated
 
+- Upgraded Opensearch helm chart to `1.13.1`, this upgrades Opensearch to `1.3.4`. For more information about the upgrade, check out their [1.3 Launch Announcement](https://opensearch.org/blog/releases/2022/03/launch-announcement-1-3-0/).
+- Upgraded Opensearch-Dashboards helm chart to `1.7.4`, this upgrades Opensearch-Dashboards to `1.3.4`
+
 ### Changed
 - The Kubernetes status Grafana dashboard (new node filter, new graphs for CPU/Memory requests and limits per node, updated graphs for CPU/Memory usage/requests)
 
