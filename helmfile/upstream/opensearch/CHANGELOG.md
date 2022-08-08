@@ -3,7 +3,6 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
 ---
 ## [Unreleased]
 ### Added
@@ -11,6 +10,152 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 ### Removed
 ### Fixed
+### Security
+
+---
+## [1.13.1]
+### Added
+- Update OpenSearch appVersion to 1.3.4.
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.13.0]
+### Added
+- Add feature for readinessProbe and startupProbe
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.12.1]
+### Added
+### Changed
+- Update OpenSearch appVersion to 1.3.3.
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.12.0]
+### Added
+### Changed
+- Changed version to 1.12.0 to use 1.x branch for all 1.x releases.
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.11.1]
+### Added
+### Changed
+- Update app version to OpenSearch 1.3.2
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.10.2]
+### Added
+### Changed
+- Removed deprecated zen.discovery from documentation and values.yaml
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.10.1]
+### Added
+### Changed
+- Fixed initResources field mapping
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.10.0]
+### Added
+### Changed
+- Update app version to OpenSearch 1.3.1
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.9.0]
+### Added
+### Changed
+- Update app version to OpenSearch 1.3.0
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.8.3]
+### Added
+- Add support for pod topology spread constraints
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.8.2]
+### Added
+- Add support for extra K8s manifests
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.8.1]
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Fixed small syntax bug in `StatefulSet` when `masterTerminationFix` is set.
+### Security
+---
+## [1.8.0]
+### Added
+### Changed
+- Accurate securityConfig files mount: mount of separate files will not hide other files from securityConfig folder.
+- Pods will be recreated on securityConfig files change
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.7.4]
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Fixed `securityConfig` mount. The `security-config-complete` was not mounting when an external secret was passed using `securityConfig.config.securityConfigSecret`
+### Security
+---
+## [1.7.3]
+### Added
+- Add annotations on headless service
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [1.7.2]
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Use correct serviceAccountName in statefulset template
 ### Security
 ---
 ## [1.7.1]
@@ -39,7 +184,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 ### Fixed
 ### Security
-
 ---
 ## [1.5.8]
 ### Added
@@ -313,7 +457,23 @@ config:
 ### Fixed
 ### Security
 
-[Unreleased]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.7.1...HEAD
+[Unreleased]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.13.1...HEAD
+[1.13.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.13.0...opensearch-1.13.1
+[1.13.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.12.1...opensearch-1.13.0
+[1.12.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.12.0...opensearch-1.12.1
+[1.12.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.11.1...opensearch-1.12.0
+[1.11.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.10.2...opensearch-1.11.1
+[1.10.2]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.10.1...opensearch-1.10.2
+[1.10.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.10.0...opensearch-1.10.1
+[1.10.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.9.0...opensearch-1.10.0
+[1.9.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.8.3...opensearch-1.9.0
+[1.8.3]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.8.2...opensearch-1.8.3
+[1.8.2]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.8.1...opensearch-1.8.2
+[1.8.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.8.0...opensearch-1.8.1
+[1.8.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.7.4...opensearch-1.8.0
+[1.7.4]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.7.3...opensearch-1.7.4
+[1.7.3]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.7.2...opensearch-1.7.3
+[1.7.2]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.7.1...opensearch-1.7.2
 [1.7.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.7.0...opensearch-1.7.1
 [1.7.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.6.0...opensearch-1.7.0
 [1.6.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-1.5.8...opensearch-1.6.0
