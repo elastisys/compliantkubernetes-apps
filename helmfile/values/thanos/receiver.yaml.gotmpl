@@ -56,6 +56,7 @@ receive:
   resources: {{- toYaml .Values.thanos.receiver.resources | nindent 4 }}
 
   replicaCount: {{ .Values.thanos.receiver.replicaCount }}
+  topologySpreadConstraints: {{- toYaml .Values.thanos.receiver.topologySpreadConstraints | nindent 4 }}
   replicationFactor: {{  .Values.thanos.receiver.replicationFactor }}
 
   service:
@@ -88,6 +89,7 @@ ruler:
     size: {{ .Values.thanos.ruler.persistence.size }}
 
   replicaCount: {{ .Values.thanos.ruler.replicaCount }}
+  topologySpreadConstraints: {{- toYaml .Values.thanos.ruler.topologySpreadConstraints | nindent 4 }}
 
   alertmanagers:
     - http://kube-prometheus-stack-alertmanager.monitoring:9093

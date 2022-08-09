@@ -1,4 +1,5 @@
 ### Release notes
+
 - In 1.7 the cert-manager API versions v1alpha2, v1alpha3, and v1beta1, have been removed from the custom resource definitions (CRDs).
 - In 1.8 the cert-manager will validate the spec.privateKey.rotationPolicy on Certificate resources. Valid options are Never and Always.
 - Automated CIS tests are preformed on each node using kube-bench
@@ -19,5 +20,6 @@
 - the possibility to enable falco in the service cluster
 - Kube-bench runs on every node
 - Added a CIS kube-bench Grafana dashboard
+- Added `topologySpreadConstraints` rule to thanos and kube-prometheus-stack.
 
 ### Removed

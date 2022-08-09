@@ -3,6 +3,7 @@ existingObjstoreSecret: thanos-objectstorage-secret-objstore-secret
 query:
   enabled: true
   replicaCount: {{ .Values.thanos.query.replicaCount }}
+  topologySpreadConstraints: {{- toYaml .Values.thanos.query.topologySpreadConstraints | nindent 4 }}
 
   extraFlags:
     - "--query.auto-downsampling"

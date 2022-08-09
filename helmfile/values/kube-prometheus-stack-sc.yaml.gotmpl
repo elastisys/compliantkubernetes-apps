@@ -280,6 +280,7 @@ prometheusOperator:
 prometheus:
   prometheusSpec:
     replicas: {{ .Values.prometheus.replicas }}
+    topologySpreadConstraints: {{- toYaml .Values.prometheus.topologySpreadConstraints | nindent 6 }}
 
     externalLabels:
       cluster: {{ .Values.global.clusterName }}

@@ -507,6 +507,15 @@ thanos:
     # They are infinitly scalable
     replicaCount: 1
 
+    topologySpreadConstraints:
+    - labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: thanos
+          app.kubernetes.io/component: query
+      maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: DoNotSchedule
+
     resources:
       requests:
         cpu: 50m
@@ -540,6 +549,15 @@ thanos:
 
     replicaCount: 2
 
+    topologySpreadConstraints:
+    - labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: thanos
+          app.kubernetes.io/component: ruler
+      maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: DoNotSchedule
+
     resources:
       requests:
         cpu: 50m
@@ -568,6 +586,15 @@ thanos:
 
     # Number of receiver instances
     replicaCount: 2
+
+    topologySpreadConstraints:
+    - labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: thanos
+          app.kubernetes.io/component: receive
+      maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: DoNotSchedule
 
     # How many nodes that a time-series needs to be written to for a write to be considered successful.
     # It needs to write to (REPLICATION_FACTOR + 1)/2 nodes for success.
