@@ -25,5 +25,6 @@
 - the possibility to enable falco in the service cluster
 - Kube-bench runs on every node
 - Added a CIS kube-bench Grafana dashboard
+- Added `topologySpreadConstraints` rule to thanos and kube-prometheus-stack.
 
 ### Removed

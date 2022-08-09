@@ -216,6 +216,14 @@ kubeStateMetrics:
 prometheus:
   replicas: 1
 
+  topologySpreadConstraints:
+  - labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: prometheus
+    maxSkew: 1
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: DoNotSchedule
+
   ## Persistence for prometheus to store metrics and wal.
   storage:
     enabled: false
