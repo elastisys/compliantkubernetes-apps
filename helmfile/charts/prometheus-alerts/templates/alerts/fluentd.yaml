@@ -53,6 +53,24 @@ spec:
       annotations:
         summary: fluentd node are critical
         description: In the last 5 minutes, fluentd queues increased 50%. Current value is {{ "{{ $value }}" }}
+    - alert: FluentdAvailableSpaceBuffer
+      expr: sum(fluentd_output_status_buffer_available_space_ratio) by (pod, cluster, plugin_id) < 50
+      for: 5m
+      labels:
+        service: fluentd
+        severity: warning
+      annotations:
+        summary: fluentd available space in buffer is less than 50%
+        description: For the last 5 minutes, the available buffer space for pod {{ "{{ $labels.pod }}" }}, plugin-id {{  "{{ $labels.plugin_id }}" }} in cluster {{ "{{ $labels.cluster }}" }} is below 50%. Current value is {{ "{{ $value }}" }}
+    - alert: FluentdAvailableSpaceBuffer
+      expr: sum(fluentd_output_status_buffer_available_space_ratio) by (pod, cluster, plugin_id) < 10
+      for: 5m
+      labels:
+        service: fluentd
+        severity: critical
+      annotations:
+        summary: fluentd available space in buffer is less than 90%
+        description: For the last 5 minutes, the available buffer space for pod {{ "{{ $labels.pod }}" }}, plugin-id {{  "{{ $labels.plugin_id }}" }} in cluster {{ "{{ $labels.cluster }}" }} is below 10%. Current value is {{ "{{ $value }}" }}
     - alert: FluentdRecordsCountsHigh
       expr: >
         sum(rate(fluentd_output_status_emit_records{job="fluentd-metrics"}[5m]))
