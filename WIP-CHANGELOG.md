@@ -17,5 +17,6 @@
 ### Added
 - Option to create custom solvers for letsencrypt issuers, including a simple way to add secrets.
 - Add external redis database as option for harbor
+- a new alert `FluentdAvailableSpaceBuffer`, notifies when the fluentd buffer is filling up
 
 ### Removed

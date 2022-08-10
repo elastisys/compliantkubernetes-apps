@@ -1,3 +1,7 @@
+## 2022.08.10
+1. fluentd.yaml
+   - ADDED - new FluentdAvailableSpaceBuffer alerts
+
 ## 2022.07.07
 1. predict-linear.yaml
    - ADDED - the custom CPURequest and MemoryRequest alerts for the node patterns from common-config.yaml
