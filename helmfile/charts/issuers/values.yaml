@@ -3,7 +3,10 @@ letsencrypt:
   namespaces: []
   prod:
     email: ""
+    solvers: []
   staging:
     email: ""
+    solvers: []
 
 extraIssuers: []
+secrets: {}

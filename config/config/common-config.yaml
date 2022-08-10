@@ -300,9 +300,24 @@ issuers:
     prod:
       ## Mail through which letsencrypt can contact you.
       email: set-me
+      ## Solvers, sets a default http01 when empty.
+      solvers: []
+      # - selector:
+      #     dnsZones:
+      #     - example.org
+      #   dns01:
+      #     route53:
+      #       region: eu-north-1
+      #       hostedZoneID: set-me
+      #       accessKeyID: set-me
+      #       secretAccessKeySecretRef:
+      #         name: route53-credentials-secret # Can be created in secrets.yaml
+      #         key: secretKey
     staging:
       ## Mail through which letsencrypt can contact you.
       email: set-me
+      ## Solvers, sets a default http01 when empty.
+      solvers: []
 
   ## Additional issuers to create.
   ## ref: https://cert-manager.io/docs/configuration/

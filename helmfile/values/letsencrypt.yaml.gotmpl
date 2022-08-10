@@ -3,8 +3,12 @@ letsencrypt:
   {{ if .Values.issuers.letsencrypt.enabled }}
   prod:
     email: {{ .Values.issuers.letsencrypt.prod.email }}
+    solvers: {{ toYaml .Values.issuers.letsencrypt.prod.solvers | nindent 6 }}
   staging:
     email: {{ .Values.issuers.letsencrypt.staging.email }}
+    solvers: {{ toYaml .Values.issuers.letsencrypt.staging.solvers | nindent 6 }}
   {{ end }}
 
 extraIssuers: {{- toYaml .Values.issuers.extraIssuers | nindent 2 }}
+
+secrets: {{- toYaml .Values.issuers.secrets | nindent 2 }}

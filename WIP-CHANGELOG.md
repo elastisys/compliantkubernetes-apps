@@ -15,5 +15,6 @@
 ### Fixed
 
 ### Added
+- Option to create custom solvers for letsencrypt issuers, including a simple way to add secrets.
 
 ### Removed

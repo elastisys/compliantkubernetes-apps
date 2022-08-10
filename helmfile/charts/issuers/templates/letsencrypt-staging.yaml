@@ -11,10 +11,14 @@ spec:
       name: letsencrypt-staging
     server: https://acme-staging-v02.api.letsencrypt.org/directory
     solvers:
+    {{- if .Values.letsencrypt.staging.solvers }}
+    {{- toYaml .Values.letsencrypt.staging.solvers | nindent 4 }}
+    {{- else }}
     # An empty selector will 'match' all Certificate resources that
     # reference this Issuer.
     - selector: {}
       http01:
         ingress:
           class: nginx
+    {{- end }}
 {{- end }}

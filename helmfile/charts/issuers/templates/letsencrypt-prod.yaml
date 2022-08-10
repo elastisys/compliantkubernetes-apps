@@ -11,10 +11,14 @@ spec:
       name: letsencrypt-prod
     server: https://acme-v02.api.letsencrypt.org/directory
     solvers:
+    {{- if .Values.letsencrypt.prod.solvers }}
+    {{- toYaml .Values.letsencrypt.prod.solvers | nindent 4 }}
+    {{- else }}
     # An empty selector will 'match' all Certificate resources that
     # reference this Issuer.
     - selector: {}
       http01:
         ingress:
           class: nginx
+    {{- end }}
 {{- end }}
