@@ -24,10 +24,9 @@ In case you get lost, don't forget to check out the [public docs](https://elasti
 
 As a user of Compliant Kubernetes you can request to see your Cluster configuration (without secrets) by asking your administrator.
 
-## Support
-
-Did not find the answers you were looking for in the docs? Please contact us via [Jira Service Desk](https://elastisys.atlassian.net/servicedesk/customer/portals)!
-
-Phone: 010-405 42 12
+{{ if .Values.dashboard.extraTextGrafana }}
+## {{ .Values.dashboard.extraTextGrafana }}
+{{ else }}
+{{ end }}
 
 [//]: # (If you update this file, remember to also edit compliantkubernetes-apps/helmfile/charts/opensearch/configurer/files/dashboards-resources/welcome.md)

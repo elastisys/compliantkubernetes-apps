@@ -1005,3 +1005,13 @@ prometheusBlackboxExporter:
     fluentd: true
     thanosQuery: true
     thanosReceiver: true
+
+welcomingDashboard:
+  # If you want to add extra text to the grafana/opensearch "welcoming dashboards"
+  # then write the text in these values as a one-line string.
+  # Example: 'extraTextGrafana: "Hello\\n\\n[This is an example link](https:/elastisys.io)"'
+  # Note, first line of the string is a header, not all characters are supported.
+  # For newline in Grafana dashboard use format "\\n"
+  extraTextGrafana: ""
+  # For newline in Opensearch dashboard use format "\\\\n"
+  extraTextOpensearch: ""
