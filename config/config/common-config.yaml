@@ -214,6 +214,7 @@ externalTrafficPolicy:
 ## Nginx ingress controller configuration
 ingressNginx:
   controller:
+    allowSnippetAnnotations: false
     resources:
       requests:
         cpu: 100m
