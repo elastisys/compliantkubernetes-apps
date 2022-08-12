@@ -22,6 +22,12 @@
     migration/v0.24.x-v0.25.x/migrate-harbor-database-variables.sh
     ```
 
+1. Add the new control-plane toleration:
+
+    ```console
+    migration/v0.24.x-v0.25.x/add-control-plane-toleration.sh
+    ```
+
 1. Upgrade applications:
 
     ```bash

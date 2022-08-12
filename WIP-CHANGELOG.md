@@ -24,5 +24,6 @@
 - Option to enable `allowSnippetAnnotations` from the configs
 - Add external database as option for harbor
 - the possibility to enable falco in the service cluster and added some rules or alert exceptions
+- Added the `node-role.kubernetes.io/control-plane:NoSchedule` toleration
 
 ### Removed

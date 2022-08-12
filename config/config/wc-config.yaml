@@ -89,10 +89,19 @@ fluentd:
     - effect: NoSchedule
       key: node-role.kubernetes.io/master
       value: ""
+    - key: node-role.kubernetes.io/control-plane
+      effect: NoSchedule
+      value: ""
 
   ## Only run on master nodes.
-  nodeSelector:
-    node-role.kubernetes.io/master: ""
+  nodeSelector: ""
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: Exists
 
   resources:
     limits:
@@ -101,8 +110,6 @@ fluentd:
     requests:
       cpu: 200m
       memory: 300Mi
-
-  affinity: {}
 
   ## Extra fluentd config to mount.
   extraConfigMaps: {}

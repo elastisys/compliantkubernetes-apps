@@ -8,7 +8,7 @@ source "$INNER_SCRIPTS_PATH/../prometheus-common.sh"
 
 # Get amount of nodes in cluster
 totalNodes=$(kubectl get nodes --no-headers | wc -l)
-masterNodes=$(kubectl get nodes -l node-role.kubernetes.io/master --no-headers | wc -l)
+masterNodes=$(kubectl get nodes -l node-role.kubernetes.io/control-plane --no-headers | wc -l)
 
 echo
 echo
