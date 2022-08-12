@@ -121,6 +121,10 @@ falco:
   ## Run on master nodes.
   tolerations:
     - key: node-role.kubernetes.io/master
+      operator: Exists
+      effect: NoSchedule
+    - key: node-role.kubernetes.io/control-plane
+      operator: Exists
       effect: NoSchedule
   affinity: {}
   nodeSelector: {}
@@ -154,8 +158,12 @@ falco:
         cpu: 30m
         memory: 20Mi
     tolerations:
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/master
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
     affinity: {}
     nodeSelector: {}
 
@@ -452,6 +460,10 @@ calicoAccountant:
   enabled: true
   tolerations:
     - key: node-role.kubernetes.io/master
+      operator: Exists
+      effect: NoSchedule
+    - key: node-role.kubernetes.io/control-plane
+      operator: Exists
       effect: NoSchedule
   resources:
     limits:
@@ -530,6 +542,10 @@ kured:
   extraArgs: {}
   tolerations:
     - key: node-role.kubernetes.io/master
+      operator: Exists
+      effect: NoSchedule
+    - key: node-role.kubernetes.io/control-plane
+      operator: Exists
       effect: NoSchedule
   resources:
     requests:
