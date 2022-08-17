@@ -15,6 +15,6 @@
       summary: Metrics from the service cluster is not being received.
     expr: |
       absent(prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus",tenant_id!~".*-wc"}) > 0 or prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus",tenant_id!~".*-wc"} == 0
-    for: 5m
+    for: 20m
     labels:
       severity: critical

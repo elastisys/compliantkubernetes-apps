@@ -19,7 +19,7 @@ spec:
     rules:
     - alert: OpenSearchTooFewNodesRunning
       expr: elasticsearch_cluster_health_number_of_nodes < {{ .Values.osNodeCount }}
-      for: 5m
+      for: 20m
       labels:
         severity: critical
       annotations:
