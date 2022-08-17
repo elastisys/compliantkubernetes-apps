@@ -186,7 +186,7 @@ groups:
       /
         sum by (cluster, job) (rate(http_requests_total{job=~".*thanos-receiver-receive.*", handler="receive"}[5m]))
       ) * 100 > 5
-    for: 5m
+    for: 20m
     labels:
       severity: critical
   - alert: ThanosReceiveHttpRequestLatencyHigh
