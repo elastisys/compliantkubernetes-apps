@@ -1,3 +1,11 @@
+## 2022.08.17
+1. helmfile/charts/prometheus-alerts/files/missing-metrics-alerts.yaml
+   - MODIFIED - MetricsFromScClusterIsMissing 'for' from 5m to 15m
+2. helmfile/charts/prometheus-alerts/files/thanos.yaml
+   - MODIFIED - ThanosReceiveHttpRequestErrorRateHigh 'for' from 5m to 20m
+3. helmfile/charts/prometheus-alerts/templates/alerts/opensearch.yaml
+   - MODIFIED - OpenSearchTooFewNodesRunning 'for' from 5m to 15m
+
 ## 2022.08.10
 1. fluentd.yaml
    - ADDED - new FluentdAvailableSpaceBuffer alerts

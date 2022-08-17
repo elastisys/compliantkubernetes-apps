@@ -6,6 +6,7 @@
 ### Updated
 
 ### Changed
+- The ThanosReceiveHttpRequestErrorRateHigh, OpenSearchTooFewNodesRunning, and MetricsFromScClusterIsMissing prometheus-alerts were optimized to not be triggered by kured and to reduce other unwanted behaviors.
 
 ### Fixed
 - Fixed so grafana can show data from thanos that's older than 30 days (downsampled data)
