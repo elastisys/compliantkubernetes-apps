@@ -22,7 +22,7 @@
 - Add external redis database as option for harbor
 - a new alert `FluentdAvailableSpaceBuffer`, notifies when the fluentd buffer is filling up
 - Option to enable `allowSnippetAnnotations` from the configs
-- the possibility to enable falco in the service cluster
 - Add external database as option for harbor
+- the possibility to enable falco in the service cluster and added some rules or alert exceptions
 
 ### Removed
