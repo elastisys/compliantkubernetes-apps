@@ -100,6 +100,9 @@ falco:
       - macro: user_known_contact_k8s_api_server_activities
         append: true
         condition: or (container.image.repository in (ghcr.io/dexidp/dex))
+    opensearch.yaml: |-
+      - macro: user_privileged_containers
+        condition: container.image.repository=docker.io/elastisys/curl-jq and k8s.pod.name startswith opensearch-
 
 harbor:
   enabled: true
