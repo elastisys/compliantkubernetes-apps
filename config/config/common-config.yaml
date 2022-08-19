@@ -530,6 +530,27 @@ vulnerabilityExporter:
         cpu: 40m
         memory: 128Mi
 
+ciskubebenchExporter:
+  # Will be disabled if starboard is disabled
+  resources:
+    requests:
+      cpu: 20m
+      memory: 15Mi
+    limits:
+      cpu: 40m
+      memory: 30Mi
+  tolerations: []
+  affinity: {}
+
+  curlcronjob:
+    resources:
+      requests:
+        cpu: 20m
+        memory: 64Mi
+      limits:
+        cpu: 40m
+        memory: 128Mi
+
 monitoring:
   rook:
     enabled: false

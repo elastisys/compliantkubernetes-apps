@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ciskubebench-exporter
+  name: ciskubebench-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ciskubebench-exporter
+  template:
+    metadata:
+      labels:
+        app: ciskubebench-exporter
+    spec:
+      serviceAccountName: ciskubebench-exporter
+      containers:
+      - name: metrics-collector
+        image: elastisys/curl-jq:cronjob
+        volumeMounts:
+          - name: textfile-collector-dir
+            mountPath: /textfile-collector
+          - name: scripts
+            mountPath: /scripts
+          - name: cronfiles
+            mountPath: /etc/cron.d/
+        resources: {{- .Values.curlcronjob.resources | toYaml | nindent 10 }}
+      - name: node-exporter
+        image: prom/node-exporter:v1.0.1
+        args: ["--collector.textfile.directory=/textfile-collector", "--no-collector.arp", "--no-collector.bcache", "--no-collector.bonding", "--no-collector.conntrack", "--no-collector.cpu", "--no-collector.cpufreq", "--no-collector.diskstats", "--no-collector.edac", "--no-collector.entropy", "--no-collector.filefd", "--no-collector.filesystem", "--no-collector.hwmon", "--no-collector.infiniband", "--no-collector.ipvs", "--no-collector.loadavg", "--no-collector.mdadm", "--no-collector.meminfo", "--no-collector.netclass", "--no-collector.netdev", "--no-collector.nfs", "--no-collector.nfsd", "--no-collector.netstat", "--no-collector.pressure", "--no-collector.stat", "--no-collector.sockstat", "--no-collector.timex", "--no-collector.vmstat", "--no-collector.xfs", "--no-collector.zfs"]
+          # enabled collectors: textfile, time, uname
+        ports:
+        - containerPort: 9100
+          name: metrics
+        volumeMounts:
+          - name: textfile-collector-dir
+            mountPath: /textfile-collector
+        resources: {{- .Values.resources | toYaml | nindent 10 }}
+      volumes:
+      - name: textfile-collector-dir
+        emptyDir: {}
+      - name: scripts
+        configMap:
+          name: ciskubebench-exporter-script
+      - name: cronfiles
+        configMap:
+          name: ciskubebench-exporter-cronjob
+      {{- if .Values.tolerations }}
+      tolerations:
+{{ toYaml .Values.tolerations | indent 8 }}
+      {{- end }}
+      {{- if .Values.affinity }}
+      affinity:
+{{ toYaml .Values.affinity | indent 8 }}
+      {{- end }}

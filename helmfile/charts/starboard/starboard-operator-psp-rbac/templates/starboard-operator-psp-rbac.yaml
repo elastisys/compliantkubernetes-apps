@@ -1,0 +1,73 @@
+# PSP for starboard operator and scan jobs
+# The PSP has the name 00- because starboard operator does not set a proper security context on its scanners.
+# By default they will have the restricted PSP (ordering by name), but naming this 00 ensure it receives this by default.
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: 00-starboard-operator
+  annotations:
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: "*"
+spec:
+  allowPrivilegeEscalation: false
+  fsGroup:
+    rule: RunAsAny
+  hostPID: true
+  hostPorts:
+    - max: 65535
+      min: 0
+  runAsGroup:
+    rule: RunAsAny
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  volumes:
+    - hostPath
+    - configMap
+    - emptyDir
+    - projected
+    - secret
+    - downwardAPI
+    - persistentVolumeClaim
+  allowedHostPaths:
+    - pathPrefix: /var/lib/etcd
+      readOnly: true
+    - pathPrefix: /var/lib/kubelet
+      readOnly: true
+    - pathPrefix: /etc/systemd
+      readOnly: true
+    - pathPrefix: /etc/kubernetes
+      readOnly: true
+    - pathPrefix: /usr/bin
+      readOnly: true
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: starboard-operator-psp
+  namespace: monitoring
+rules:
+  - apiGroups:
+      - policy
+    resourceNames:
+      - 00-starboard-operator
+    resources:
+      - podsecuritypolicies
+    verbs:
+      - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: starboard-operator-psp
+  namespace: monitoring
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: starboard-operator-psp
+subjects:
+  - kind: ServiceAccount
+    name: starboard-operator
+    namespace: monitoring

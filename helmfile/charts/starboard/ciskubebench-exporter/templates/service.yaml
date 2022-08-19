@@ -1,0 +1,30 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: ciskubebench-exporter
+  name: ciskubebench-exporter
+spec:
+  endpoints:
+  - port: metrics
+  selector:
+    matchLabels:
+      app: ciskubebench-exporter
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+      app: ciskubebench-exporter
+  name: ciskubebench-exporter-metrics
+spec:
+  ports:
+  - port: 9100
+    name: metrics
+    protocol: TCP
+    targetPort: 9100
+  selector:
+    app: ciskubebench-exporter
+  sessionAffinity: None
+  type: ClusterIP
