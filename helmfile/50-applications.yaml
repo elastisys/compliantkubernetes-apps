@@ -665,6 +665,18 @@ releases:
   values:
   - values/gatekeeper-constraints.yaml.gotmpl
 
+# hierarchical namespace controller
+- name: hnc
+  namespace: hnc-system
+  labels:
+    app: hnc
+  chart: ./charts/hnc
+  version: 0.1.0
+  installed: {{ .Values.hnc.enabled }}
+  missingFileHandler: Error
+  values:
+  - values/hnc.yaml.gotmpl
+
 # TODO: Make this optional! Users may not want any alerts by default.
 # It should also be separate from the alerts we use. Users should not need
 # to care about system components that they cannot touch anyway.

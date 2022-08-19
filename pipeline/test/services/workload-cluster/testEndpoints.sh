@@ -10,7 +10,7 @@ echo "Testing endpoints"
 echo "=================="
 
 base_domain=$(yq4 -e '.global.baseDomain' "${CONFIG_FILE}")
-enable_user_alertmanager_ingress=$(yq4 -e 'user.alertmanager.ingress.enabled' "${CONFIG_FILE}")
+enable_user_alertmanager_ingress=$(yq4 -e '.user.alertmanager.ingress.enabled' "${CONFIG_FILE}")
 enable_user_alertmanager=$(yq4 -e '.user.alertmanager.enabled' "${CONFIG_FILE}")
 
 if [[ "${enable_user_alertmanager_ingress}" == "true" && "${enable_user_alertmanager}" == "true" ]]

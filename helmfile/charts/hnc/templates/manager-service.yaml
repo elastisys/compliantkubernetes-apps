@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  {{- with .Values.managerService.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "hnc.labels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ .Chart.Name }}-controller-manager
+  name: {{ include "hnc.fullname" . }}-controller-manager-metrics-service
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "hnc.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ .Chart.Name }}-controller-manager
+  ports:
+    - name: metrics
+      port: {{ .Values.managerService.port }}
+      targetPort: 8080
+      protocol: TCP

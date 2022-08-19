@@ -14,6 +14,10 @@ fi
 
 here="$(dirname "$(readlink -f "$0")")"
 
+# Destroy user subnamespaces before their parent namespaces,
+# this might fail if there are multiple levels.
+"${here}/.././bin/ck8s" ops kubectl wc delete subns -A --all
+
 # Destroy user namespaces before everything else,
 # to avoid race conditions where CRs are not deleted before controllers in other namespaces
 "${here}/.././bin/ck8s" ops helmfile wc -l app=user-rbac destroy
@@ -22,7 +26,7 @@ here="$(dirname "$(readlink -f "$0")")"
 "${here}/.././bin/ck8s" ops helmfile wc -l app!=cert-manager destroy
 
 # Clean up namespaces and any other resources left behind by the apps
-"${here}/.././bin/ck8s" ops kubectl wc delete ns falco fluentd gatekeeper-system ingress-nginx monitoring velero kured
+"${here}/.././bin/ck8s" ops kubectl wc delete ns falco fluentd gatekeeper-system hnc-system ingress-nginx monitoring velero kured
 
 # Destroy cert-manager helm release
 "${here}/.././bin/ck8s" ops helmfile wc -l app=cert-manager destroy

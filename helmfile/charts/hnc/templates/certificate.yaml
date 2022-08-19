@@ -1,0 +1,18 @@
+{{- if .Values.certificate.create -}}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  labels:
+    {{- include "hnc.labels" . | nindent 4 }}
+  name: {{ include "hnc.fullname" . }}-webhook-server-cert
+spec:
+  commonName: {{ include "hnc.fullname" . }}-webhook-service.{{ .Release.Namespace }}.svc
+  dnsNames:
+  - {{ include "hnc.fullname" . }}-webhook-service.{{ .Release.Namespace }}.svc.cluster.local
+  - {{ include "hnc.fullname" . }}-webhook-service.{{ .Release.Namespace }}.svc
+  issuerRef:
+    kind: Issuer
+    name: {{ include "hnc.fullname" . }}-selfsigned-issuer
+  secretName: {{ include "hnc.fullname" . }}-webhook-server-cert
+{{- end -}}

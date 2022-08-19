@@ -17,6 +17,7 @@ defaultRules:
     evaluate_prometheus: "1"
   rules:
     alertmanager: true
+    hnc: {{ .Values.hnc.enabled }}
     rookMonitor: {{ .Values.monitoring.rook.enabled }}
     {{- if and .Values.thanos.enabled .Values.thanos.metrics.enabled }}
     thanosMonitor: {{ .Values.thanos.metrics.enabled }}

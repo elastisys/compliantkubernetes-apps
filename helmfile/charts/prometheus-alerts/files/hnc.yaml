@@ -1,0 +1,14 @@
+- name: hnc-alert
+  rules:
+    - alert: HierarchicalNamespaceControllerNamespaceCondition
+      annotations:
+        description: |
+          The Hierarchical Namespace Controller is reporting `{{ $value }}` Namespace condition(s) `{{ $labels.Condition }}` due to `{{ $labels.Reason }}` for longer than one minute.
+        summary: |
+          The Hierarchical Namespace Controller is reporting `{{ $value }}` Namespace condition(s) `{{ $labels.Condition }}` due to `{{ $labels.Reason }}` for longer than one minute.
+      labels:
+        rulesgroup: hnc
+        severity: warning
+      expr: |
+        hnc_namespace_conditions > 0
+      for: 1m

@@ -4,21 +4,21 @@ INNER_SCRIPTS_PATH="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 # shellcheck source=pipeline/test/services/funcs.sh
 source "${INNER_SCRIPTS_PATH}/../funcs.sh"
 
-enable_harbor=$(yq4 -e '.harbor.enabled' "${CONFIG_FILE}")
-enable_harbor_backup=$(yq4 -e '.harbor.backup.enabled' "${CONFIG_FILE}")
-enable_user_grafana=$(yq4 -e '.user.grafana.enabled' "${CONFIG_FILE}")
-enable_fluentd=$(yq4 -e '.fluentd.enabled' "${CONFIG_FILE}")
-enable_opensearch_snapshot=$(yq4 -e '.opensearch.snapshot.enabled' "${CONFIG_FILE}")
-enable_velero=$(yq4 -e '.velero.enabled' "${CONFIG_FILE}")
-enable_os_data_sts=$(yq4 -e '.opensearch.dataNode.dedicatedPods' "${CONFIG_FILE}")
-enable_os_client_sts=$(yq4 -e '.opensearch.clientNode.dedicatedPods' "${CONFIG_FILE}")
-enable_thanos=$(yq4 -e '.thanos.enabled' "${CONFIG_FILE}")
-enable_thanos_query=$(yq4 -e '.thanos.query.enabled' "${CONFIG_FILE}")
-enable_thanos_receiver=$(yq4 -e '.thanos.receiver.enabled' "${CONFIG_FILE}")
-enable_thanos_ruler=$(yq4 -e '.thanos.ruler.enabled' "${CONFIG_FILE}")
-enable_kured=$(yq4 -e '.kured.enabled' "${CONFIG_FILE}")
-enable_falco_alerts=$(yq -e '.falco.alerts.enabled' "${CONFIG_FILE}")
-enable_falco=$(yq -e '.falco.enabled' "${CONFIG_FILE}")
+enable_harbor=$(yq4 -e '.harbor.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_harbor_backup=$(yq4 -e '.harbor.backup.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_user_grafana=$(yq4 -e '.user.grafana.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_fluentd=$(yq4 -e '.fluentd.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_opensearch_snapshot=$(yq4 -e '.opensearch.snapshot.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_velero=$(yq4 -e '.velero.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_os_data_sts=$(yq4 -e '.opensearch.dataNode.dedicatedPods' "${CONFIG_FILE}" 2>/dev/null)
+enable_os_client_sts=$(yq4 -e '.opensearch.clientNode.dedicatedPods' "${CONFIG_FILE}" 2>/dev/null)
+enable_thanos=$(yq4 -e '.thanos.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_thanos_query=$(yq4 -e '.thanos.query.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_thanos_receiver=$(yq4 -e '.thanos.receiver.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_thanos_ruler=$(yq4 -e '.thanos.ruler.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_kured=$(yq4 -e '.kured.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_falco_alerts=$(yq4 -e '.falco.alerts.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_falco=$(yq4 -e '.falco.enabled' "${CONFIG_FILE}" 2>/dev/null)
 
 echo
 echo
@@ -58,7 +58,7 @@ fi
 if "${enable_velero}"; then
     deployments+=("velero velero")
 fi
-if "${enable_falco_alerts}"; then
+if "${enable_falco}" && "${enable_falco_alerts}"; then
     deployments+=("falco falco-falcosidekick")
 fi
 if [[ "${enable_thanos}" == "true" ]] && [[ "${enable_thanos_receiver}" == "true" ]]; then

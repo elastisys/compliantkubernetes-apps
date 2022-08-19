@@ -4,12 +4,14 @@ INNER_SCRIPTS_PATH="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 # shellcheck source=pipeline/test/services/funcs.sh
 source "${INNER_SCRIPTS_PATH}/../funcs.sh"
 
-enable_falco_alerts=$(yq4 -e '.falco.alerts.enabled' "${CONFIG_FILE}")
-enable_falco=$(yq4 -e '.falco.enabled' "${CONFIG_FILE}")
-enable_opa=$(yq4 -e '.opa.enabled' "${CONFIG_FILE}")
-enable_user_alertmanager=$(yq4 -e '.user.alertmanager.enabled' "${CONFIG_FILE}")
-enable_velero=$(yq4 -e '.velero.enabled' "${CONFIG_FILE}")
-enable_kured=$(yq4 -e '.kured.enabled' "${CONFIG_FILE}")
+enable_falco_alerts=$(yq4 -e '.falco.alerts.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_falco=$(yq4 -e '.falco.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_opa=$(yq4 -e '.opa.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_hnc=$(yq4 -e '.hnc.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_hnc_ha=$(yq4 -e '.hnc.ha' "${CONFIG_FILE}" 2>/dev/null)
+enable_user_alertmanager=$(yq4 -e '.user.alertmanager.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_velero=$(yq4 -e '.velero.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_kured=$(yq4 -e '.kured.enabled' "${CONFIG_FILE}" 2>/dev/null)
 
 echo
 echo
@@ -30,7 +32,14 @@ deployments=(
 if "${enable_opa}"; then
     deployments+=("gatekeeper-system gatekeeper-controller-manager")
 fi
-if "${enable_falco_alerts}"; then
+if "${enable_hnc}"; then
+    deployments+=("hnc-system hnc-controller-manager")
+
+    if "${enable_hnc_ha}"; then
+        deployments+=("hnc-system hnc-webhook")
+    fi
+fi
+if "${enable_falco}" && "${enable_falco_alerts}"; then
     deployments+=("falco falco-falcosidekick")
 fi
 if "${enable_velero}"; then

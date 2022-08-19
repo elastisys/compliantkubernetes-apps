@@ -167,6 +167,10 @@ falco:
     affinity: {}
     nodeSelector: {}
 
+## Hierarchical namespace controller configuration.
+hnc:
+  enabled: true
+
 ## Prometheus configuration.
 ## Prometheus collects metrics and pushes it to InfluxDB.
 prometheusBlackboxExporter:

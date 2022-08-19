@@ -1,0 +1,11 @@
+{{- if .Values.certificate.create -}}
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  labels:
+    {{- include "hnc.labels" . | nindent 4 }}
+  name: {{ include "hnc.fullname" . }}-selfsigned-issuer
+spec:
+  selfSigned: {}
+{{- end -}}

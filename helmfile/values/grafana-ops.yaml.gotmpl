@@ -33,6 +33,9 @@ dashboards:
     enabled: true
     user_visible: true
     logEndpoint: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
+  hnc:
+    enabled: {{ .Values.hnc.enabled }}
+    user_visible: false
   kubernetesstatus:
     enabled: true
     user_visible: true

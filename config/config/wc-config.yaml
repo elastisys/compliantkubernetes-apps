@@ -70,6 +70,70 @@ opa:
     tags:
      - latest
 
+## Hierarchical namespace controller configuration, enable in common-config.yaml
+hnc:
+  ## Included namespaces, empty string will include all
+  includedNamespacesRegex: ""
+
+  ## Excluded namespaces, system namespaces are excluded by default in addition to this list
+  excludedNamespaces: []
+
+  ## Annotations that will be stripped from propagated objects
+  unpropagatedAnnotations: []
+
+  ## Annotations that will be propagated to subnamespaces (allows regex)
+  managedNamespaceAnnotations: []
+  ## Labels that will be propagated to subnamespaces (allows regex)
+  ## Labels in particular must also be configured in the HierarchyConfiguration object to be propagated
+  managedNamespaceLabels: []
+
+  ## Set to allow users to edit the HierarchyConfiguration in each (sub)namespace
+  allowConfigEdit: false
+
+  ## Manager deployment configuration
+  manager:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 150Mi
+      limits:
+        cpu: 100m
+        memory: 300Mi
+
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+
+  ## Enables HA mode for hnc webhooks
+  ha: true
+
+  ## Webhook deployment configuration, only used if hnc.ha is true
+  webhook:
+    replicaCount: 3
+    resources:
+      requests:
+        cpu: 100m
+        memory: 150Mi
+      limits:
+        cpu: 100m
+        memory: 300Mi
+
+    topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/component: hnc-webhook
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+
+  ## Service monitor configuration
+  serviceMonitor:
+    relabelings: []
+
 ## certmanager:
   ## when using cert-manager with HTTP01 challenge and a custom image registry the below parameter should be added in the extraArgs
   ## !! this works only with public repositories !! see https://github.com/jetstack/cert-manager/issues/2429

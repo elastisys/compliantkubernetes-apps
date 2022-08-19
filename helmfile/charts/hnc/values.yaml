@@ -1,0 +1,108 @@
+fullnameOverride: ""
+nameOverride: ""
+
+imagePullSecrets: []
+image:
+  repository: gcr.io/k8s-staging-multitenancy/hnc-manager
+  pullPolicy: IfNotPresent
+  tag: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+rbac:
+  create: true
+
+  user:
+    allowConfigEdit: false
+
+    namespaces:
+    - default
+
+    groups: []
+    users:
+    - admin@example.com
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 2000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+includedNamespacesRegex: ""
+
+excludedNamespaces:
+- hnc-system
+- kube-node-lease
+- kube-public
+- kube-system
+
+unpropagatedAnnotations: []
+
+managedNamespaceAnnotations: []
+managedNamespaceLabels: []
+
+managerDeployment:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 150Mi
+    limits:
+      cpu: 100m
+      memory: 300Mi
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+managerService:
+  annotations: {}
+  port: 8080
+
+webhook:
+  annotations: {}
+
+webhookDeployment:
+  create: false
+  replicaCount: 3
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 150Mi
+    limits:
+      cpu: 100m
+      memory: 300Mi
+
+  topologySpreadConstraints: []
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+webhookService:
+  port: 443
+
+certificate:
+  create: true
+
+serviceMonitor:
+  create: true
+  relabelings: []

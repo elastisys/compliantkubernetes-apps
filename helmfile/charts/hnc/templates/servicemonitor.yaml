@@ -1,0 +1,22 @@
+{{- if .Values.serviceMonitor.create -}}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  {{- with .Values.managerService.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "hnc.labels" . | nindent 4 }}
+  name: {{ include "hnc.fullname" . }}-service-monitor
+spec:
+  selector:
+    matchLabels:
+      {{- include "hnc.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: {{ .Chart.Name }}-controller-manager
+  endpoints:
+  - relabelings:
+      {{- toYaml .Values.serviceMonitor.relabelings | nindent 6 }}
+    targetPort: {{ .Values.managerService.port }}
+{{- end -}}

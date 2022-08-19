@@ -1,0 +1,118 @@
+{{- if .Values.webhookDeployment.create -}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    {{- include "hnc.labels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ .Chart.Name }}-webhook
+  name: {{ include "hnc.fullname" . }}-webhook
+spec:
+  replicas: {{ .Values.webhookDeployment.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "hnc.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: {{ .Chart.Name }}-webhook
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "hnc.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: {{ .Chart.Name }}-webhook
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "hnc.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}-webhook
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          {{- with .Values.image.pullPolicy }}
+          imagePullPolicy: {{ . }}
+          {{- end }}
+          command:
+            - /manager
+          args:
+            - --webhooks-only
+            - --webhook-server-port=9443
+            - --max-reconciles=10
+            - --apiserver-qps-throttle=50
+            {{- if .Values.includedNamespacesRegex }}
+            - --included-namespace-regex={{ .Values.includedNamespacesRegex }}
+            {{- end }}
+            {{- range .Values.excludedNamespaces }}
+            - --excluded-namespace={{ . }}
+            {{- end }}
+            {{- range .Values.unpropagatedAnnotations }}
+            - --unpropagated-annotation={{ . }}
+            {{- end }}
+            {{- range .Values.managedNamespaceAnnotations }}
+            - --managed-namespace-annotation={{ . }}
+            {{- end }}
+            {{- range .Values.managedNamespaceLabels }}
+            - --managed-namespace-label={{ . }}
+            {{- end }}
+          ports:
+            - name: webhook-server
+              containerPort: 9443
+              protocol: TCP
+          startupProbe:
+            failureThreshold: 100
+            httpGet:
+              path: /readyz
+              port: 8081
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8081
+            periodSeconds: 5
+          livenessProbe:
+            failureThreshold: 1
+            httpGet:
+              path: /healthz
+              port: 8081
+            periodSeconds: 10
+          {{- with .Values.webhookDeployment.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - mountPath: /tmp/k8s-webhook-server/serving-certs
+              name: cert
+              readOnly: true
+      terminationGracePeriodSeconds: 10
+      {{- with .Values.webhookDeployment.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.webhookDeployment.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.webhookDeployment.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.webhookDeployment.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      - name: cert
+        secret:
+          defaultMode: 420
+          secretName: {{ include "hnc.fullname" . }}-webhook-server-cert
+{{- end -}}

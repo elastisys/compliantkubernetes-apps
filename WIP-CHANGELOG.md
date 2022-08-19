@@ -25,5 +25,6 @@
 - Add external database as option for harbor
 - the possibility to enable falco in the service cluster and added some rules or alert exceptions
 - Added the `node-role.kubernetes.io/control-plane:NoSchedule` toleration
+- Add hierarchical namespace controller, allowing self-serve namespaces within namespaces
 
 ### Removed

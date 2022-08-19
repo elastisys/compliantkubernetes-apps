@@ -17,6 +17,9 @@ namespaces:
   labels:
     admission.gatekeeper.sh/ignore: "true"
 {{ end }}
+{{ if .Values.hnc.enabled }}
+- name: hnc-system
+{{ end }}
 {{ if .Values.user.alertmanager.enabled }}
 - name: alertmanager
 {{ end }}

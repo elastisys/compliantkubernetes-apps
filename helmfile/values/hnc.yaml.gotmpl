@@ -1,0 +1,50 @@
+includedNamespacesRegex: {{ .Values.hnc.includedNamespacesRegex }}
+
+excludedNamespaces:
+  - alertmanager
+  - cert-manager
+  - falco
+  - fluentd
+  - hnc-system
+  - ingress-nginx
+  - kube-node-lease
+  - kube-public
+  - kube-system
+  - kured
+  - monitoring
+  - postgres-system
+  - rabbitmq-system
+  - redis-system
+  - rook-ceph
+  - velero
+  {{- with .Values.hnc.excludedNamespaces }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+
+unpropagatedAnnotations: {{ .Values.hnc.unpropagatedAnnotations }}
+
+managedNamespaceAnnotations: {{ .Values.hnc.managedNamespaceAnnotations }}
+managedNamespaceLabels: {{ .Values.hnc.managedNamespaceLabels }}
+
+rbac:
+  user:
+    allowConfigEdit: {{ .Values.hnc.allowConfigEdit }}
+    namespaces: {{- toYaml .Values.user.namespaces | nindent 6 }}
+    groups: {{- toYaml .Values.user.adminGroups | nindent 6 }}
+    users: {{- toYaml .Values.user.adminUsers | nindent 6 }}
+
+managerDeployment:
+  {{- with .Values.hnc.manager -}}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+
+webhookDeployment:
+  {{- with .Values.hnc.webhook -}}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+
+  create: {{ .Values.hnc.ha }}
+
+serviceMonitor:
+  relabelings:
+    {{- toYaml .Values.hnc.serviceMonitor.relabelings | nindent 4 }}
