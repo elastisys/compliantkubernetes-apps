@@ -1,7 +1,11 @@
 {{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") ) }}
 {{ fail "\nERROR: Harbor backup requires s3 or gcs object storage, see Values.objectStorage.type" }}
 {{ end }}
-dbPassword: {{ .Values.harbor.databasePassword }}
+{{ if and .Values.harbor.backup.enabled (eq .Values.harbor.database.type "external") }}
+{{ fail "\nERROR: Harbor backup is not available for external database" }}
+{{ end }}
+
+dbPassword: {{ .Values.harbor.internal.databasePassword }}
 retentionDays: {{ .Values.harbor.backup.retentionDays }}
 {{ if eq .Values.objectStorage.type "s3" -}}
 s3:

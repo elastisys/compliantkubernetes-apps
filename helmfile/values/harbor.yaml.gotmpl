@@ -31,8 +31,10 @@ persistence:
       size: {{ .Values.harbor.registry.persistentVolumeClaim.size }}
     jobservice:
       size: {{ .Values.harbor.jobservice.persistentVolumeClaim.size }}
+    {{ if eq .Values.harbor.database.type "internal" }}
     database:
-      size: {{ .Values.harbor.database.persistentVolumeClaim.size }}
+      size: {{ .Values.harbor.database.internal.persistentVolumeClaim.size }}
+    {{ end }}
     redis:
       size: {{ .Values.harbor.redis.internal.persistentVolumeClaim.size }}
     trivy:
@@ -115,13 +117,25 @@ notary:
   tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
 
 database:
+  type: {{ .Values.harbor.database.type }}
+  {{ if eq .Values.harbor.database.type "internal" }}
   internal:
-    password:     {{ .Values.harbor.databasePassword }}
-    resources:    {{- toYaml .Values.harbor.database.resources | nindent 6 }}
+    password:     {{ .Values.harbor.internal.databasePassword }}
+    resources:    {{- toYaml .Values.harbor.database.internal.resources | nindent 6 }}
     nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 6 }}
     affinity:     {{- toYaml .Values.harbor.affinity | nindent 6 }}
     tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 6 }}
-
+  {{ else if eq .Values.harbor.database.type "external" }}
+  external:
+    host: {{ .Values.harbor.database.external.host }}
+    port: {{ .Values.harbor.database.external.port }}
+    username: {{ .Values.harbor.database.external.username }}
+    password: {{ .Values.harbor.external.databasePassword }}
+    coreDatabase: {{ .Values.harbor.database.external.coreDatabase }}
+    notaryServerDatabase: {{ .Values.harbor.database.external.notaryServerDatabase }}
+    notarySignerDatabase: {{ .Values.harbor.database.external.notarySignerDatabase }}
+    sslmode: {{ .Values.harbor.database.external.sslmode }}
+  {{ end }}
 trivy:
   replicas: {{ .Values.harbor.trivy.replicas }}
   resources:    {{- toYaml .Values.harbor.trivy.resources | nindent 4 }}

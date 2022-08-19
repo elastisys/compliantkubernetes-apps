@@ -16,6 +16,12 @@
     migration/v0.24.x-v0.25.x/migrate-harbor-redis-variables.sh
     ```
 
+1. Migrate harbor database variables
+
+    ```console
+    migration/v0.24.x-v0.25.x/migrate-harbor-database-variables.sh
+    ```
+
 1. Upgrade applications:
 
     ```bash

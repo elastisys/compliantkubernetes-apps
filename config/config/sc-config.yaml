@@ -129,12 +129,29 @@ harbor:
         cpu: 250m
         memory: 500Mi
   database:
-    persistentVolumeClaim:
-      size: 1Gi
-    resources:
-      requests:
-        memory: 512Mi
-        cpu: 250m
+    type: internal
+    internal:
+      persistentVolumeClaim:
+        size: 1Gi
+      resources:
+        requests:
+          memory: 512Mi
+          cpu: 250m
+    external:
+      # host: "set-me"
+      port: "5432"
+      # username: "set-me"
+      coreDatabase: "registry"
+      notaryServerDatabase: "notaryserver"
+      notarySignerDatabase: "notarysigner"
+      # "disable" - No SSL
+      # "require" - Always SSL (skip verification)
+      # "verify-ca" - Always SSL (verify that the certificate presented by the
+      # server was signed by a trusted CA)
+      # "verify-full" - Always SSL (verify that the certification presented by the
+      # server was signed by a trusted CA and the server host name matches the one
+      # in the certificate)
+      # sslmode: "set-me"
   jobservice:
     persistentVolumeClaim:
       size: 1Gi

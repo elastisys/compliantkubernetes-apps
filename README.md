@@ -253,21 +253,72 @@ The user will first need to add pull secrets that gives some ServiceAccount acce
 
 For more details and a list of available services see the [user guide](https://compliantkubernetes.io/user-guide/).
 
-#### Redis
+### Harbor HA - work in progress
+
+It is possible to run harbor in HA mode.
+This section describes the necessary configuration needed to setup harbor in HA mode.
+More information about harbor ha can be found [here](https://goharbor.io/docs/2.2.0/install-config/harbor-ha-helm/).
+
+Both Postgres and Redis needs to be external, as harbor does not handle HA deployment of postgres and redis.
+It is up to the operator to set these up in a HA mode.
+
+#### Postgres requirements
+
+The following list is requirements on the external postgres
+
+- Password encryption: none or md5
+  - [scram-sha-256 is not supported](https://github.com/goharbor/harbor/issues/15731#issuecomment-1100666831).
+- Initial empty databases must be created before harbor starts
+  - registry
+  - notaryserver
+  - notarysigner
 
 **Config**
+
+Harbor backup is not designed to work with a external database.
+You will have to provide your own backup solution.
+
 In `$CK8S_CONFIG_PATH/sc-config.yaml` set the following configs
 ```
 harbor:
   ...
-  redis:
-    type: internal
+  backup:
+    enabled: false
+  database:
+    type: external
     external:
-      addr: "rfs-redis-harbor.redis-system.svc.cluster.local:26379"
-      sentinelMasterSet: "mymaster"
+      host: "set-me"
+      port: "5432"
+      username: "set-me"
+      # "disable" - No SSL
+      # "require" - Always SSL (skip verification)
+      # "verify-ca" - Always SSL (verify that the certificate presented by the
+      # server was signed by a trusted CA)
+      # "verify-full" - Always SSL (verify that the certification presented by the
+      # server was signed by a trusted CA and the server host name matches the one
+      # in the certificate)
+      sslmode: "disable"
 ```
 
+In `$CK8S_CONFIG_PATH/secrets.yaml` add the postgres user password
+```
+harbor:
+  external:
+    databasePassword: set-me
+```
 
+#### Redis
+
+**Config**
+In `$CK8S_CONFIG_PATH/sc-config.yaml` set the following configs
+
+```
+  redis:
+    type: external
+    external:
+      addr: "rfs-redis-harbor.redis-system:26379"
+      sentinelMasterSet: "mymaster"
+```
 
 ### Management of the clusters
 
