@@ -424,7 +424,7 @@ generate_secrets() {
     yq4 --inplace ".harbor.password= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
     yq4 --inplace ".harbor.internal.databasePassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
     yq4 --inplace ".harbor.clientSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
-    yq4 --inplace ".harbor.xsrf= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+    yq4 --inplace ".harbor.xsrf= \"$(pwgen -cns 32 1)\"" "${tmpfile}"
     yq4 --inplace ".harbor.coreSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
     yq4 --inplace ".harbor.jobserviceSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
     yq4 --inplace ".harbor.registrySecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"

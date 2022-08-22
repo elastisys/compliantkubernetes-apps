@@ -15,8 +15,11 @@
 - The Kubernetes status Grafana dashboard (new node filter, new graphs for CPU/Memory requests and limits per node, updated graphs for CPU/Memory usage/requests)
 - bash scripts are now migrated to yq-v4.26.1
 - Changed Velero WC namespace selectors from including user namespaces to include all and exclude system namespaces in order to support HNC
+- Split harbor affinity to apply for each component and added default podantiaffinity
 
 ### Fixed
+- Fixed a bug where you could set the XSRF key to an invalid length without any notifications
+- Fixed a bug where config for notary wasn't propagated to the chart
 
 ### Added
 - Option to create custom solvers for letsencrypt issuers, including a simple way to add secrets.
@@ -27,5 +30,6 @@
 - the possibility to enable falco in the service cluster and added some rules or alert exceptions
 - Added the `node-role.kubernetes.io/control-plane:NoSchedule` toleration
 - Add hierarchical namespace controller, allowing self-serve namespaces within namespaces
+- Configuration options for setting up harbor in HA
 
 ### Removed

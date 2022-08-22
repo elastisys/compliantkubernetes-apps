@@ -22,6 +22,12 @@
     migration/v0.24.x-v0.25.x/migrate-harbor-database-variables.sh
     ```
 
+1. Migrate harbor affinity variables
+
+    ```console
+    migration/v0.24.x-v0.25.x/migrate-harbor-affinity-variables.sh
+    ```
+
 1. Add the new control-plane toleration:
 
     ```console

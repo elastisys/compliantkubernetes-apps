@@ -38,4 +38,11 @@ sops --config "${sops_config}" -d -i "${secret_config}"
 move_value_to '.harbor.databasePassword' '{"harbor":{"internal": {"databasePassword": . }}}' "${secret_config}"
 delete_value '.harbor.databasePassword' "${secret_config}"
 
+XSRF_KEY_LENGTH=$(yq4 '.harbor.xsrf | length' "${secret_config}")
+if [ "${XSRF_KEY_LENGTH}" -ne 32 ]; then
+    echo "Old xsrf key was not the correct length, updating to a valid one."
+    NEW_XSRF_KEY=$(pwgen -cns 32 1)
+    yq4 -i '.harbor.xsrf = "'"${NEW_XSRF_KEY}"'"' "${secret_config}"
+fi
+
 sops --config "${sops_config}" -e -i "${secret_config}"

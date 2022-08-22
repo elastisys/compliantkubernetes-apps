@@ -109,7 +109,6 @@ harbor:
   subdomain: harbor
   # The tolerations, affinity, and nodeSelector are applied to all harbor pods.
   tolerations: []
-  affinity: {}
   nodeSelector: {}
   chartmuseum:
     replicas: 1
@@ -122,6 +121,20 @@ harbor:
       limits:
         cpu: 250m
         memory: 250Mi
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - harbor
+                - key: component
+                  operator: In
+                  values:
+                    - chartmuseum
+            topologyKey: "kubernetes.io/hostname"
   core:
     replicas: 1
     resources:
@@ -131,6 +144,20 @@ harbor:
       limits:
         cpu: 250m
         memory: 500Mi
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - harbor
+                - key: component
+                  operator: In
+                  values:
+                    - core
+            topologyKey: "kubernetes.io/hostname"
   database:
     type: internal
     internal:
@@ -140,6 +167,20 @@ harbor:
         requests:
           memory: 512Mi
           cpu: 250m
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - harbor
+                  - key: component
+                    operator: In
+                    values:
+                      - database
+              topologyKey: "kubernetes.io/hostname"
     external:
       # host: "set-me"
       port: "5432"
@@ -165,6 +206,22 @@ harbor:
       limits:
         cpu: 250m
         memory: 250Mi
+    jobLoggers:
+      - file
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - harbor
+                - key: component
+                  operator: In
+                  values:
+                    - jobservice
+            topologyKey: "kubernetes.io/hostname"
   registry:
     replicas: 1
     persistentVolumeClaim:
@@ -184,6 +241,20 @@ harbor:
         limits:
           cpu: 250m
           memory: 250Mi
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - harbor
+                - key: component
+                  operator: In
+                  values:
+                    - registry
+            topologyKey: "kubernetes.io/hostname"
   redis:
     type: internal
     internal:
@@ -193,6 +264,20 @@ harbor:
         requests:
           memory: 32Mi
           cpu: 10m
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - harbor
+                  - key: component
+                    operator: In
+                    values:
+                      - redis
+              topologyKey: "kubernetes.io/hostname"
     # if external redis database is used, please uncomment and update the below lines
     external: {}
     #  addr: "rfs-redis-harbor.redis-system.svc.cluster.local:26379"
@@ -208,6 +293,20 @@ harbor:
       limits:
         cpu: 250m
         memory: 250Mi
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - harbor
+                - key: component
+                  operator: In
+                  values:
+                    - notary-server
+            topologyKey: "kubernetes.io/hostname"
   notarySigner:
     resources:
       requests:
@@ -216,6 +315,20 @@ harbor:
       limits:
         cpu: 250m
         memory: 250Mi
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - harbor
+                - key: component
+                  operator: In
+                  values:
+                    - notary-signer
+            topologyKey: "kubernetes.io/hostname"
   portal:
     replicas: 1
     resources:
@@ -225,6 +338,20 @@ harbor:
       limits:
         cpu: 250m
         memory: 250Mi
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - harbor
+                - key: component
+                  operator: In
+                  values:
+                    - portal
+            topologyKey: "kubernetes.io/hostname"
   trivy:
     replicas: 1
     persistentVolumeClaim:
@@ -236,6 +363,20 @@ harbor:
       limits:
         cpu: 250m
         memory: 512Mi
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - harbor
+                - key: component
+                  operator: In
+                  values:
+                    - trivy
+            topologyKey: "kubernetes.io/hostname"
   persistence:
     # Valid options are "filesystem" (persistent volume), "swift", or "objectStorage" (matching global config)
     type: set-me
