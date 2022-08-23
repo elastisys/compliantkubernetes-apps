@@ -14,6 +14,7 @@
 ### Changed
 - The Kubernetes status Grafana dashboard (new node filter, new graphs for CPU/Memory requests and limits per node, updated graphs for CPU/Memory usage/requests)
 - bash scripts are now migrated to yq-v4.26.1
+- Changed Velero WC namespace selectors from including user namespaces to include all and exclude system namespaces in order to support HNC
 
 ### Fixed
 

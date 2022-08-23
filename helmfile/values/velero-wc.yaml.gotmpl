@@ -93,11 +93,22 @@ schedules:
     schedule: {{ .Values.velero.schedule }}
     template:
       storageLocation: default
-      includedNamespaces:
-      {{ .Values.user.namespaces | toYaml | nindent 8 }}
-      {{- if .Values.user.alertmanager.enabled }}
-        - alertmanager
-      {{- end }}
+      excludedNamespaces:
+        - cert-manager
+        - falco
+        - fluentd
+        - hnc-system
+        - ingress-nginx
+        - kube-node-lease
+        - kube-public
+        - kube-system
+        - kured
+        - monitoring
+        - postgres-system
+        - rabbitmq-system
+        - redis-system
+        - rook-ceph
+        - velero
       ttl: {{ .Values.velero.retentionPeriod }}
       labelSelector:
         matchExpressions:
