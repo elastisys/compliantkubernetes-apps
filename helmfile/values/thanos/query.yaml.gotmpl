@@ -4,6 +4,9 @@ query:
   enabled: true
   replicaCount: {{ .Values.thanos.query.replicaCount }}
 
+  extraFlags:
+    - "--query.auto-downsampling"
+
   dnsDiscovery:
     enabled: false
   stores:
