@@ -72,7 +72,7 @@ objectStorage:
   #   project: set-me
   # s3:
   #   region: set-me
-  #   for non-AWS implementation of s3 please prepend the protocol (i.e., https:// or http://) with the url, e.g., https://s3.sto1.safedc.net
+  #   # S3 endpoint for non-AWS implementation of S3. Make sure to prepend the protocol (i.e., https:// or http://) with the URL, e.g., https://s3.sto1.safedc.net
   #   regionEndpoint: set-me
   #   # Generally false when using AWS and Exoscale and true for other providers.
   #   forcePathStyle: set-me
