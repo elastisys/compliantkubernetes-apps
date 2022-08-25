@@ -18,17 +18,17 @@ log_error() {
     echo -e "[\e[31mck8s\e[0m] ${*}" 1>&2
 }
 
-common_default=$(yq4 -o j '.objectStorage' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
+common_default=$(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
 
 # shellcheck disable=SC2016
-sc_default=$(echo "${common_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage' "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml"))
+sc_default=$(echo "${common_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml"))
 # shellcheck disable=SC2016
-sc_config=$(echo "${sc_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage' "${CK8S_CONFIG_PATH}/common-config.yaml") <(yq4 -o j '.objectStorage' "${CK8S_CONFIG_PATH}/sc-config.yaml") | yq4 '{"objectStorage":.}' -)
+sc_config=$(echo "${sc_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/common-config.yaml") <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/sc-config.yaml") | yq4 '{"objectStorage":.}' -)
 
 # shellcheck disable=SC2016
-wc_default=$(echo "${common_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage' "${CK8S_CONFIG_PATH}/defaults/wc-config.yaml" -j 'objectStorage'))
+wc_default=$(echo "${common_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/defaults/wc-config.yaml"))
 # shellcheck disable=SC2016
-wc_config=$(echo "${wc_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage' "${CK8S_CONFIG_PATH}/common-config.yaml" -j 'objectStorage') <(yq4 -o j '.objectStorage' "${CK8S_CONFIG_PATH}/wc-config.yaml" -j 'objectStorage') |  yq4 '{"objectStorage":.}' -)
+wc_config=$(echo "${wc_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/common-config.yaml") <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/wc-config.yaml") |  yq4 '{"objectStorage":.}' -)
 
 objectstorage_type_sc=$(echo "${sc_config}" | yq4 '.objectStorage.type' -)
 objectstorage_type_wc=$(echo "${wc_config}" | yq4 '.objectStorage.type' -)
