@@ -69,5 +69,6 @@ opensearch:
 
 harbor:
   database:
-    persistentVolumeClaim:
-      size: 5Gi
+    internal:
+      persistentVolumeClaim:
+        size: 5Gi
