@@ -73,7 +73,7 @@ user:
     affinity: {}
     nodeSelector: {}
     oidc:
-      scopes: profile email openid
+      scopes: profile email openid groups
       userGroups:
         grafanaAdmin: grafana_admin   # maps to grafana role admin
         grafanaEditor: grafana_editor # maps to grafana role editor
@@ -383,7 +383,7 @@ harbor:
     disableRedirect: set-me
   oidc:
     # group claim name used by OIDC Provider
-    groupClaimName: set-me
+    groupClaimName: groups
     # Name of the group that autmatically will get admin
     # Set to "" to disable
     adminGroupName: set-me
@@ -444,14 +444,14 @@ prometheus:
     affinity: {}
     nodeSelector: {}
     oidc:
-      enabled: false
-      # Only used if the above is true
-      # userGroups:
-      #   grafanaAdmin: grafana_admin   # maps to grafana role admin
-      #   grafanaEditor: grafana_editor # maps to grafana role editor
-      #   grafanaViewer: grafana_viewer # maps to grafana role viewer
-      # scopes: "openid profile email groups"
-      # allowedDomains: []
+      enabled: true
+      userGroups:
+        grafanaAdmin: grafana_admin   # maps to grafana role admin
+        grafanaEditor: grafana_editor # maps to grafana role editor
+        grafanaViewer: grafana_viewer # maps to grafana role viewer
+      scopes: openid profile email groups
+      allowedDomains:
+        - set-me
     viewersCanEdit: true
 
     sidecar:
@@ -664,8 +664,7 @@ opensearch:
     subjectKey: email
     # Where to find roles
     rolesKey: groups
-    # Scope - add 'groups' if groups claim is supported
-    scope: openid profile email
+    scope: openid profile email groups
 
   extraRoles: []
     # - role_name: log_reader

@@ -6,6 +6,8 @@
 ### Updated
 
 ### Changed
+- OIDC scope to include groups for all services
+- OIDC enabled by default for ops grafana
 
 ### Fixed
 - Fixed so grafana can show data from thanos that's older than 30 days (downsampled data)
