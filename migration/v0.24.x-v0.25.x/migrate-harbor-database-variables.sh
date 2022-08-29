@@ -11,7 +11,7 @@ sops_config="${CK8S_CONFIG_PATH}/.sops.yaml"
 move_value_to() {
     value=$(yq4 "${1}" "${3}")
 
-    if [[ -z "${value}" ]]; then
+    if [[ "${value}" == "null" ]]; then
         echo "${1} missing from ${3}, skipping."
     else
         yq4 "${1}" "${3}" | yq4 "${2}" - | yq4 eval-all -i 'select(fi == 0) * select(fi == 1)' "${3}" -
@@ -21,7 +21,7 @@ move_value_to() {
 delete_value() {
     value=$(yq4 "${1}" "${2}")
 
-    if [[ -z "${value}" ]]; then
+    if [[ "${value}" == "null" ]]; then
         echo "$1 missing from $2, skipping."
     else
         yq4 "del(${1})" -i "$2"
