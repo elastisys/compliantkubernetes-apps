@@ -1,0 +1,52 @@
+additional: {}
+# |-
+#   kind: NetworkPolicy
+#   apiVersion: networking.k8s.io/v1
+#   metadata:
+#     name: example-np
+#     namespace: default
+#   spec:
+#     policyTypes:
+#       - Ingress
+#       - Egress
+#     podSelector:
+#       matchLabels:
+#         foo: bar
+#     ingress: {}
+#     egress: {}
+harbor:
+  enable: true
+  chartmuseum:
+    egressIPs:
+      - "0.0.0.0/0" # S3
+  core:
+    egressIPs:
+      - "0.0.0.0/0" # S3, openid
+  database:
+    type: internal
+    internal: []
+      # - ingressNSMatchLabels: {}
+      #   ingressPodMatchLabels: {}
+    external: []
+      # - egressNSMatchLabels:
+      #     kubernetes.io/metadata.name: <postgres namespace>
+      #   egressPodMatchLabels: {}
+      #   ports:
+      #    - 5432
+  jobservice:
+    egressIPs:
+      - "0.0.0.0/0" # image pull
+  redis:
+    type: external
+    external: []
+      # - egressNSMatchLabels:
+      #     kubernetes.io/metadata.name: <redis namespace>
+      #   egressPodMatchLabels: {}
+      #   ports:
+      #    - 6379
+  registry:
+    egressIPs:
+      - "0.0.0.0/0" # S3
+  trivy:
+    egressIPs:
+      - "0.0.0.0/0" # trivy vulnerability database

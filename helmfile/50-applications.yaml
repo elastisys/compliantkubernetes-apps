@@ -464,7 +464,7 @@ releases:
   namespace: harbor
   labels:
     app: harbor
-  chart: ./charts/harbor-certs
+  chart: ./charts/harbor/harbor-certs
   version: 0.1.0
   installed: {{ .Values.harbor.enabled }}
   missingFileHandler: Error
@@ -488,7 +488,7 @@ releases:
   namespace: harbor
   labels:
     app: harbor
-  chart: ./charts/init-harbor
+  chart: ./charts/harbor/init-harbor
   version: 0.1.0
   installed: {{ .Values.harbor.enabled }}
   missingFileHandler: Error
@@ -502,7 +502,7 @@ releases:
   labels:
     app: harbor
     component: backup
-  chart: ./charts/harbor-backup
+  chart: ./charts/harbor/harbor-backup
   version: 0.1.0
   installed: {{ and .Values.harbor.enabled .Values.harbor.backup.enabled }}
   missingFileHandler: Error
@@ -617,6 +617,17 @@ releases:
   missingFileHandler: Error
   values:
   - values/rclone-sync.yaml.gotmpl
+
+  # Service cluster NetworkPolicy
+- name: service-cluster-np
+  namespace: kube-system
+  labels:
+    app: service-cluster-np
+  chart: ./charts/networkpolicy-service
+  version: 0.1.0
+  missingFileHandler: Error
+  values:
+  - values/service-cluster-networkpolicy.yaml.gotmpl
 
 # End of system services releases
 {{ end }}
@@ -746,7 +757,7 @@ releases:
   namespace: kube-system
   labels:
     app: workload-cluster-np
-  chart: ./charts/networkpolicy
+  chart: ./charts/networkpolicy-workload
   version: 0.1.0
   missingFileHandler: Error
   needs:

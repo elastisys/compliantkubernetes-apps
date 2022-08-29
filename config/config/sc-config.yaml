@@ -1041,3 +1041,54 @@ welcomingDashboard:
   extraTextGrafana: ""
   # For newline in Opensearch dashboard use format "\\\\n"
   extraTextOpensearch: ""
+
+# Network policies for service cluster
+networkPolicies:
+  additional: {}
+# |-
+#   kind: NetworkPolicy
+#   apiVersion: networking.k8s.io/v1
+#   metadata:
+#     name: example-np
+#     namespace: default
+#   spec:
+#     policyTypes:
+#       - Ingress
+#       - Egress
+#     podSelector:
+#       matchLabels:
+#         foo: bar
+#     ingress: {}
+#     egress: {}
+# ---
+  harbor:
+    enable: true
+    chartmuseum:
+      # IP to S3
+      egressIPs:
+        - "0.0.0.0/0"
+    core:
+      # IP to S3, dex
+      egressIPs:
+        - "0.0.0.0/0"
+    jobservice:
+      # IP to pull images, docker hub etc
+      egressIPs:
+        - "0.0.0.0/0"
+    database:
+      internal:
+        - ingressNSMatchLabels:
+            kubernetes.io/metadata.name: harbor
+          ingressPodMatchLabels:
+            release: harbor-backup
+      external: []
+    redis:
+      external: []
+    registry:
+       # IP to S3
+      egressIPs:
+        - "0.0.0.0/0"
+    trivy:
+      # IP to trivy vulnerability database
+      egressIPs:
+        - "0.0.0.0/0"

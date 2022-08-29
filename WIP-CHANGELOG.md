@@ -26,5 +26,6 @@
 - Kube-bench runs on every node
 - Added a CIS kube-bench Grafana dashboard
 - Added `topologySpreadConstraints` rule to thanos and kube-prometheus-stack.
+- Network policies for harbor
 
 ### Removed
