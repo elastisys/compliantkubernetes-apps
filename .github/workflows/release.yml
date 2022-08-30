@@ -1,30 +1,19 @@
 name: Release
 
 on:
-  pull_request:
-    types: [closed]
-    branches:
-      - 'release-[0-9]+.[0-9]+'
+  push:
+    tags:
+      - v[0-9]+.[0-9]+.[0-9]+
 
 jobs:
   release:
-    if: github.event.pull_request.merged == true
-    name: Create Release
+    name: Create release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Release
+        uses: softprops/action-gh-release@v1
         with:
-          fetch-depth: 0 # Fetches all tags
-      - name: Get the version
-        id: get_version
-        run: echo ::set-output name=VERSION::$(git describe --tags --abbrev=0 HEAD)
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.get_version.outputs.VERSION }}
-          release_name: ${{ steps.get_version.outputs.VERSION }}
           body: |
-            See [CHANGELOG.md](https://github.com/elastisys/compliantkubernetes-apps/blob/${{ steps.get_version.outputs.VERSION }}/CHANGELOG.md) for details.
+            See [CHANGELOG.md](https://github.com/elastisys/compliantkubernetes-apps/blob/${{ github.ref_name }}/CHANGELOG.md) for details.
