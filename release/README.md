@@ -29,6 +29,12 @@ https://semver.org/
 1. If there were any changes in the QA branch the script should've prompted you with some cherry-pick commands that you should run.
     When you've run those commands you should create a PR from this branch to main so all QA fixes is merged back to main.
 
+1. Update public release notes.
+
+    When a released is published the public [user-facing release notes](https://github.com/elastisys/compliantkubernetes/blob/main/docs/compliantkubernetes/release-notes/ck8s.md) needs to be updated. The new release needs to be added and the list can be trimmed down to only include the supported versions.
+
+    Add bullet points of major changes within the cluster that affects the user as defined [here](https://compliantkubernetes.io/user-guide/). This includes any change within the cluster that may impact the user experience, for example new or updated feature, or the deprecation of features.
+
 ## Patch releases
 
 1. Check out the release branch you want to create a release for:
@@ -62,3 +68,5 @@ https://semver.org/
     ```
 
     *When the script is done a [GitHub actions workflow pipeline](/.github/workflows/release.yml) should've created a GitHub release from that tag.*
+
+1. Follow the major/minor release from step 6 to update the public release notes.
