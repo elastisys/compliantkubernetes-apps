@@ -31,7 +31,8 @@ config_yml: |-
   client:
     hosts:
     - ${OPENSEARCH_ENDPOINT}
-    use_ssl: false
+    use_ssl: true
+    ssl_no_validate: true
     username: ${OPENSEARCH_USERNAME}
     password: ${OPENSEARCH_PASSWORD}
     timeout: 30

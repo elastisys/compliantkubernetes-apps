@@ -1,4 +1,4 @@
-opensearchHosts: http://{{ .Values.opensearch.clusterName }}-master:9200
+opensearchHosts: https://{{ .Values.opensearch.clusterName }}-master:9200
 
 config:
   opensearch_dashboards.yml:
@@ -49,11 +49,14 @@ ingress:
     {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.opensearchDashboards }}
     nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.opensearchDashboards }}
     {{ end }}
-
+  # Due to template structure, variables need to be set to empty or "" to satisfy skeleton requirements
   hosts:
     - host: {{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
       paths:
         - path: /
+          backend:
+            serviceName: ""
+            servicePort: ""
   tls:
     - secretName: opensearch-dashboards-ingress-cert
       hosts:

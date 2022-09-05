@@ -12,7 +12,7 @@ wait_until_ready=600
 poll_interval=5
 
 auth="${OPENSEARCH_USERNAME}:${OPENSEARCH_PASSWORD}"
-os_url="http://{{ .Values.opensearch.clusterEndpoint }}"
+os_url="https://{{ .Values.opensearch.clusterEndpoint }}"
 osd_url="http://{{ .Values.opensearch.dashboardsEndpoint }}"
 
 snapshot_repository="{{ .Values.config.snapshotRepository }}"
@@ -37,7 +37,7 @@ log_error_exit() {
 wait_for_dashboards() {
   starttime_s=$(date +%s)
   while [ $(($(date +%s) - starttime_s)) -le ${wait_until_ready} ]; do
-    status=$(curl --insecure --silent "${osd_url}/api/status" | grep "^{" | jq -r .'status.overall.state')
+    status=$(curl --insecure -u "${auth}" --silent "${osd_url}/api/status" | grep "^{" | jq -r .'status.overall.state')
     if [ "${status}" = "green" ]; then
       echo "OpenSearch Dashboards is ready"
       break
@@ -62,7 +62,7 @@ setup_dashboards() {
 register_s3_repository() {
   echo
   echo "Registering S3 snapshot repository"
-  resp=$(curl -X PUT "${os_url}/_snapshot/${snapshot_repository}" \
+  resp=$(curl --insecure -X PUT "${os_url}/_snapshot/${snapshot_repository}" \
     -H 'Content-Type: application/json' \
     -d' {"type": "s3", "settings":{ "bucket": "{{ .Values.config.s3.bucketName }}", "client": "default"}}' \
     -s -k -u "${auth}")
@@ -75,7 +75,7 @@ register_s3_repository() {
 register_gcs_repository() {
   echo
   echo "Registering GCS snapshot repository"
-  resp=$(curl -X PUT "${os_url}/_snapshot/${snapshot_repository}" \
+  resp=$(curl --insecure -X PUT "${os_url}/_snapshot/${snapshot_repository}" \
     -H 'Content-Type: application/json' \
     -d' {"type": "gcs", "settings":{ "bucket": "{{ .Values.config.gcs.bucketName }}", "client": "default"}}' \
     -s -k -u "${auth}")
@@ -97,7 +97,7 @@ create_index_template() {
   esac
   filename="${name}.template.json"
   echo "Creating index template from file '${filename}'"
-  resp=$(curl -X PUT "${os_url}/_index_template/${name}?create=${strict}" \
+  resp=$(curl --insecure -X PUT "${os_url}/_index_template/${name}?create=${strict}" \
     -H "Content-Type: application/json" -s \
     -d@/files/${filename} -k -u "${auth}")
   acknowledged=$(echo "${resp}" | grep "^{" | jq -r '.acknowledged')
@@ -117,12 +117,12 @@ setup_policy() {
 
     update_policy() {
       policy=$1
-      policy_json=$(curl -X GET "${os_url}/_plugins/_ism/policies/${policy}" \
+      policy_json=$(curl --insecure -X GET "${os_url}/_plugins/_ism/policies/${policy}" \
         -H "Content-Type: application/json" -k -s \
         -u "${auth}")
       seq_no=$(echo "${policy_json}" | jq -r '._seq_no')
       primary_term=$(echo "${policy_json}" | jq -r '._primary_term')
-      resp=$(curl -X PUT "${os_url}/_plugins/_ism/policies/${policy}?if_seq_no=${seq_no}&if_primary_term=${primary_term}" \
+      resp=$(curl --insecure -X PUT "${os_url}/_plugins/_ism/policies/${policy}?if_seq_no=${seq_no}&if_primary_term=${primary_term}" \
         -H "Content-Type: application/json" -k -s \
         -d@"/files/${policy}.policy.json" \
         -u "${auth}")
@@ -135,7 +135,7 @@ setup_policy() {
 
     policy="${1}"
     echo "Creating policy '${policy}'"
-    resp=$(curl -X PUT "${os_url}/_plugins/_ism/policies/${policy}" \
+    resp=$(curl --insecure -X PUT "${os_url}/_plugins/_ism/policies/${policy}" \
       -H "Content-Type: application/json" \
       -d@"/files/${policy}.policy.json" -k -s \
       -u "${auth}")
@@ -159,12 +159,12 @@ init_indices() {
   echo "Creating initial indices"
 
   for idx in other kubernetes kubeaudit authlog; do
-    indices=$(curl -X GET "${os_url}/_cat/aliases/${idx}" \
+    indices=$(curl --insecure -X GET "${os_url}/_cat/aliases/${idx}" \
       -k -s -u "${auth}")
     if echo "${indices}" | grep "true" > /dev/null; then # idx exists
       echo "Index '${idx}' already exists"
     else # create idx
-      resp=$(curl -X PUT "${os_url}/%3C${idx}-default-%7Bnow%2Fd%7D-000001%3E" \
+      resp=$(curl --insecure -X PUT "${os_url}/%3C${idx}-default-%7Bnow%2Fd%7D-000001%3E" \
         -H 'Content-Type: application/json' \
         -k -s -u "${auth}" \
         -d '{"aliases": {"'"${idx}"'": {"is_write_index": true }}}')
@@ -180,7 +180,7 @@ init_indices() {
 
 create_role() {
   role_name="$1"; role_definition="$2"
-  response=$(curl -X PUT "${os_url}/_plugins/_security/api/roles/${role_name}" \
+  response=$(curl --insecure -X PUT "${os_url}/_plugins/_security/api/roles/${role_name}" \
     -H 'Content-Type: application/json' \
     -k -s -u "${auth}" \
     -d "${role_definition}")
@@ -199,7 +199,7 @@ create_role() {
 
 create_rolemapping() {
   rolemapping_name="$1"; role_definition="$2"
-  response=$(curl -X PUT "${os_url}/_plugins/_security/api/rolesmapping/${rolemapping_name}" \
+  response=$(curl --insecure -X PUT "${os_url}/_plugins/_security/api/rolesmapping/${rolemapping_name}" \
     -H 'Content-Type: application/json' \
     -k -s -u "${auth}" \
     -d "${role_definition}")
@@ -218,7 +218,7 @@ create_rolemapping() {
 
 create_user() {
   user_name="$1"; user_info="$2"
-  response=$(curl -X PUT "${os_url}/_plugins/_security/api/internalusers/${user_name}" \
+  response=$(curl --insecure -X PUT "${os_url}/_plugins/_security/api/internalusers/${user_name}" \
     -H 'Content-Type: application/json' \
     -k -s -u "${auth}" \
     -d "${user_info}")

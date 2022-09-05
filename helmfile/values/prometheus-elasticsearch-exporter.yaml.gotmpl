@@ -20,7 +20,7 @@ es:
 envFromSecret: opensearch-metrics-exporter-user
 
 env:
-  ES_URI: http://$(username):$(password)@{{ .Values.opensearch.clusterName }}-master:9200
+  ES_URI: https://$(username):$(password)@{{ .Values.opensearch.clusterName }}-master:9200
 
 serviceMonitor:
   enabled: true

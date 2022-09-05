@@ -12,6 +12,7 @@
 
 - The ThanosReceiveHttpRequestErrorRateHigh, OpenSearchTooFewNodesRunning, and MetricsFromScClusterIsMissing prometheus-alerts were optimized to not be triggered by kured and to reduce other unwanted behaviors.
 - Support section of the grafana/opensearch welcome dashboards is removed by default, you can now add custom text at the end of the dashboards via the sc-config.
+- OpenSearch has been upgraded from version `v1.3.4` to `v2.6.0`. Our fluentd-plugins was also changed from using "fluent-plugin-opensearch: 1.0.2" to "fluent-plugin-opensearch: 1.0.8".
 
 ### Fixed
 - Fixed so grafana can show data from thanos that's older than 30 days (downsampled data)

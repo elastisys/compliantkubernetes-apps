@@ -6,7 +6,7 @@ tolerations:  {{- toYaml .Values.fluentd.user.tolerations | nindent 2  }}
 image:
   # This is our own fork-image(https://github.com/elastisys/fluentd-elasticsearch). This can later be replaces with the original image(https://github.com/monotek/fluentd-elasticsearch) when our changes is merged.
   repository: elastisys/fluentd
-  tag: v3.4.0-ck8s2
+  tag: v3.4.0-ck8s3
 
 elasticsearch:
   scheme: https
@@ -239,7 +239,7 @@ extraConfigMaps:
       # Custom parameters --START--
       include_timestamp true # defaults to false
       index_name authlog
-      default_opensearch_version 1
+      default_opensearch_version 2
 
       <buffer>
         @type "#{ENV['OUTPUT_BUFFER_TYPE']}"
@@ -277,7 +277,7 @@ extraConfigMaps:
       # Custom parameters --START--
       include_timestamp true # defaults to false
       index_name kubeaudit
-      default_opensearch_version 1
+      default_opensearch_version 2
 
       <buffer>
         @type "#{ENV['OUTPUT_BUFFER_TYPE']}"
@@ -320,7 +320,7 @@ extraConfigMaps:
       {{- else }}
       index_name kubernetes
       {{- end }}
-      default_opensearch_version 1
+      default_opensearch_version 2
 
       {{- if .Values.opensearch.indexPerNamespace }}
       <buffer tag, $.kubernetes.namespace_name>
@@ -362,7 +362,7 @@ extraConfigMaps:
         # Custom parameters --START--
         include_timestamp true # defaults to false
         index_name other
-        default_opensearch_version 1
+        default_opensearch_version 2
 
         <buffer>
           @type "#{ENV['OUTPUT_BUFFER_TYPE']}"

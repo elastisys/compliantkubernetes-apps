@@ -8,8 +8,8 @@ set -euo pipefail
 : "${SNAPSHOT_REPOSITORY:?Missing SNAPSHOT_REPOSITORY}"
 : "${INDICES:?Missing INDICES}"
 
-curl -s -i -u "${OPENSEARCH_USERNAME}:${OPENSEARCH_PASSWORD}" \
-    -XPUT "http://${OPENSEARCH_ENDPOINT}/_snapshot/${SNAPSHOT_REPOSITORY}/snapshot-$(date --utc +%Y%m%d_%H%M%Sz)" \
+curl --insecure -s -i -u "${OPENSEARCH_USERNAME}:${OPENSEARCH_PASSWORD}" \
+    -XPUT "https://${OPENSEARCH_ENDPOINT}/_snapshot/${SNAPSHOT_REPOSITORY}/snapshot-$(date --utc +%Y%m%d_%H%M%Sz)" \
     -H "Content-Type: application/json" -d'
     {
         "indices": "'"${INDICES}"'",

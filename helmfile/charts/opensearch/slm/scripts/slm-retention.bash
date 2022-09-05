@@ -26,13 +26,13 @@ MAX_SNAPSHOTS=$(LC_ALL=C printf '%.0f\n' "${MAX_SNAPSHOTS}")
 MIN_SNAPSHOTS=$(LC_ALL=C printf '%.0f\n' "${MIN_SNAPSHOTS}")
 REQUEST_TIMEOUT_SECONDS=$(LC_ALL=C printf '%.0f\n' "${REQUEST_TIMEOUT_SECONDS}")
 
-OPENSEARCH_URL="http://${OPENSEARCH_ENDPOINT}"
+OPENSEARCH_URL="https://${OPENSEARCH_ENDPOINT}"
 
 # Snapshots returned from this function should be succeeded, or depending on how it was created, partial.
 # https://opensearch.org/docs/latest/opensearch/snapshot-restore
 function get_snapshots {
     local url="${OPENSEARCH_URL}/_cat/snapshots/${SNAPSHOT_REPOSITORY}"
-    curl "${url}" -f -X GET --max-time "${REQUEST_TIMEOUT_SECONDS}" --no-progress-meter \
+    curl --insecure "${url}" -f -X GET --max-time "${REQUEST_TIMEOUT_SECONDS}" --no-progress-meter \
         --basic --user "${OPENSEARCH_USERNAME}:${OPENSEARCH_PASSWORD}"
 }
 
@@ -53,7 +53,7 @@ function remove_snapshots {
     local snapshots_to_delete=$1
     local url="${OPENSEARCH_URL}/_snapshot/${SNAPSHOT_REPOSITORY}/${snapshots_to_delete}"
     echo "Deleting snapshots: ${snapshots_to_delete}"
-    curl "${url}" -f -X DELETE --max-time "${REQUEST_TIMEOUT_SECONDS}" --no-progress-meter \
+    curl --insecure "${url}" -f -X DELETE --max-time "${REQUEST_TIMEOUT_SECONDS}" --no-progress-meter \
         --basic --user "${OPENSEARCH_USERNAME}:${OPENSEARCH_PASSWORD}"
     echo ""
 }
