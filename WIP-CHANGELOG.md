@@ -9,4 +9,6 @@
 
 ### Added
 
+- Option to deny network traffic by default
+
 ### Removed
