@@ -40,7 +40,10 @@ config:
             pemtrustedcas_filepath: transport/ca.crt
             enforce_hostname_verification: false
           http:
-            enabled: false
+            enabled: true
+            pemcert_filepath: http/tls.crt
+            pemkey_filepath: http/tls.key
+            pemtrustedcas_filepath: http/ca.crt
         allow_unsafe_democertificates: false
         allow_default_init_securityindex: false
         authcz:
@@ -113,6 +116,10 @@ secretMounts:
   - secretName: opensearch-transport-cert
     name: opensearch-transport-cert
     path: /usr/share/opensearch/config/transport
+    defaultMode: 0400
+  - secretName: opensearch-http-cert
+    name: opensearch-http-cert
+    path: /usr/share/opensearch/config/http
     defaultMode: 0400
 
 rbac:

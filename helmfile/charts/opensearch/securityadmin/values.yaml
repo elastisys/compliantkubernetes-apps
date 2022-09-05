@@ -5,7 +5,7 @@ imagePullSecrets: []
 image:
   repository: opensearchproject/opensearch
   pullPolicy: IfNotPresent
-  tag: 1.2.4
+  tag: 2.2.1
 
 helm:
   hook: post-install,post-upgrade
@@ -16,7 +16,7 @@ securityConfig: {}
 
 opensearch:
   clusterService: opensearch-master
-  clusterPort: 9300
+  clusterPort: 9200
 
   adminCertSecret: opensearch-admin-cert
   securityConfigSecret: opensearch-securityconfig

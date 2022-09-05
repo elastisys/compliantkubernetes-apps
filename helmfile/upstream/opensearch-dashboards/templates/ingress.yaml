@@ -44,9 +44,13 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ $fullName }}
+                name: {{ .backend.serviceName | default $fullName }}
                 port:
-                  number: {{ $svcPort }}
+                  {{- if and .backend.servicePort (kindIs "string" .backend.servicePort) }}
+                  name: {{ .backend.servicePort }}
+                  {{- else }}
+                  number: {{ .backend.servicePort | default $svcPort }}
+                  {{- end }}
           {{- end }}
     {{- end }}
   {{- else -}}
@@ -57,8 +61,8 @@ spec:
           {{- range .paths }}
           - path: {{ .path }}
             backend:
-              serviceName: {{ $fullName }}
-              servicePort: {{ $svcPort }}
+              serviceName: {{ .backend.serviceName | default $fullName }}
+              servicePort: {{ .backend.servicePort | default $svcPort }}
           {{- end }}
     {{- end }}
   {{- end }}
