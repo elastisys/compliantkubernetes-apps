@@ -1,0 +1,13 @@
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkPolicy
+metadata:
+  name: deny-app-policy
+spec:
+  namespaceSelector: {{ .Values.namespaceSelector }}
+  types:
+  - Ingress
+  - Egress
+  egress:
+{{ toYaml .Values.egressPolicies | indent 4 }}
+  ingress:
+{{ toYaml .Values.ingressPolicies | indent 4 }}

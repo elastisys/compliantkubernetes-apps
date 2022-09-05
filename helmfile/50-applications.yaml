@@ -234,6 +234,17 @@ releases:
   values:
     - values/falco-exporter.yaml.gotmpl
 
+# Calico default deny
+- name: calico-default-deny
+  labels:
+    app: calico-default-deny
+  chart: ./charts/calico-default-deny
+  version: 0.1.0
+  installed: {{ .Values.networkPolicies.defaultDeny }}
+  missingFileHandler: Error
+  values:
+    - values/calico-default-deny.yaml.gotmpl
+
 # Service cluster releases
 {{ if eq .Environment.Name "service_cluster" }}
 # Dex

@@ -1,0 +1,10 @@
+namespaceSelector:
+{{- if .Values.networkPolicies.allowedNameSpaces }}
+  has(projectcalico.org/name) && projectcalico.org/name not in {"{{- join "\", \"" .Values.networkPolicies.allowedNameSpaces }}"}
+{{- else }}
+  has(projectcalico.org/name)
+{{- end }}
+
+egressPolicies: {{- toYaml .Values.networkPolicies.additionalEgressPolicies | nindent 2 }}
+
+ingressPolicies: {{- toYaml .Values.networkPolicies.additionalIngressPolicies | nindent 2 }}

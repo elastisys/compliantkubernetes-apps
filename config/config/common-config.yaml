@@ -596,3 +596,10 @@ kured:
   affinity: {}
   nodeSelector: {}
   dsAnnotations: {}
+
+networkPolicies:
+  # Default deny requires Calico as network plugin
+  defaultDeny: false
+  allowedNameSpaces: []
+  additionalEgressPolicies: []
+  additionalIngressPolicies: []
