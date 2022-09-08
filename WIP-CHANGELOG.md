@@ -27,5 +27,6 @@
 - Added a CIS kube-bench Grafana dashboard
 - Added `topologySpreadConstraints` rule to thanos and kube-prometheus-stack.
 - Network policies for harbor
+- Added option for kured to notify to slack when draning and rebooting nodes.
 
 ### Removed

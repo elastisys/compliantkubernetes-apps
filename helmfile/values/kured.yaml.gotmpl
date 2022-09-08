@@ -15,4 +15,21 @@ configuration: {{- toYaml .Values.kured.configuration | nindent 2 }}
 
 extraArgs: {{- toYaml .Values.kured.extraArgs | nindent 2 }}
 
+extraEnvVars:
+{{- if .Values.kured.extraEnvVars }}
+{{- toYaml .Values.kured.extraEnvVars | nindent 2 }}
+{{- end }}
+{{- if .Values.kured.notification.slack.enabled }}
+  - name: KURED_NOTIFY_URL
+    valueFrom:
+      secretKeyRef:
+        name: kured-secret
+        key: notifyUrl
+{{ end }}
+
 dsAnnotations: {{- toYaml .Values.kured.dsAnnotations | nindent 2 }}
+
+slack:
+  enabled: {{ .Values.kured.notification.slack.enabled }}
+  channel: {{ .Values.kured.notification.slack.channel }}
+  botToken: {{ .Values.kured.slack.botToken }}
