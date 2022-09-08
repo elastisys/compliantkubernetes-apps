@@ -574,6 +574,11 @@ kured:
     interval: 60s
     labels: {}
   extraArgs: {}
+  extraEnvVars: {}
+  notification:
+    slack:
+      enabled: false
+      channel: ""
   tolerations:
     - key: node-role.kubernetes.io/master
       operator: Exists

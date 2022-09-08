@@ -37,6 +37,17 @@ releases:
   values:
   - values/kured.yaml.gotmpl
 
+# Kured-secret
+- name: kured-secret
+  namespace: kured
+  labels:
+    app: kured
+  chart: ./charts/kured-secret
+  version: 0.1.0
+  missingFileHandler: Error
+  installed: {{ .Values.kured.enabled }}
+  values:
+  - values/kured.yaml.gotmpl
 
 # Cert-manager issuers
 - name: issuers
