@@ -28,5 +28,6 @@
 - Added `topologySpreadConstraints` rule to thanos and kube-prometheus-stack.
 - Network policies for harbor
 - Added option for kured to notify to slack when draning and rebooting nodes.
+- Added group subjects to `falco-viewer` and `fluentd-configurer` rolebindings.
 
 ### Removed
