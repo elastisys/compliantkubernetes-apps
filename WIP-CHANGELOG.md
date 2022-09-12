@@ -31,3 +31,5 @@
 - Added group subjects to `falco-viewer` and `fluentd-configurer` rolebindings.
 
 ### Removed
+
+- `readall_and_monitor` from `extraRoleMappings` in opensearch configuration

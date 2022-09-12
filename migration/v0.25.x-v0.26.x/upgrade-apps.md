@@ -17,6 +17,8 @@
     ./migration/v0.25.x-v0.26.x/add-support-message.sh
     ```
 
+1. *Optional:* You can remove the Opensearch role mapping `readall_and_monitor` from `${CK8S_CONFIG_PATH}/sc.config.yaml` if you aren't using it in any meaningful way
+
 1. Upgrade applications:
 
     ```bash
