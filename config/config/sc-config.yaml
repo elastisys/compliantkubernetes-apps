@@ -703,10 +703,6 @@ opensearch:
     #           - read
 
   extraRoleMappings:
-    - mapping_name: readall_and_monitor
-      definition:
-        users:
-          - set-me # Developer Name
     - mapping_name: kibana_user
       definition:
         users:
