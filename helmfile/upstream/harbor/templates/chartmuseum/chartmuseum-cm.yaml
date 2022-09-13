@@ -36,7 +36,7 @@ data:
   ALLOW_OVERWRITE: "true"
   AUTH_ANONYMOUS_GET: "false"
   CONTEXT_PATH: ""
-  INDEX_LIMIT: "0"
+  INDEX_LIMIT: {{ .Values.chartmuseum.indexLimit | quote}}
   MAX_STORAGE_OBJECTS: "0"
   MAX_UPLOAD_SIZE: "20971520"
   CHART_POST_FORM_FIELD_NAME: "chart"
@@ -55,7 +55,9 @@ data:
 {{- else if eq $storageType "gcs" }}
   STORAGE: "google"
   STORAGE_GOOGLE_BUCKET: {{ $storage.gcs.bucket }}
+  {{- if not .Values.persistence.imageChartStorage.gcs.useWorkloadIdentity }}
   GOOGLE_APPLICATION_CREDENTIALS: /etc/chartmuseum/gcs-key.json
+  {{- end }}
   {{- if $storage.gcs.rootdirectory }}
   STORAGE_GOOGLE_PREFIX: {{ $storage.gcs.rootdirectory }}
   {{- end }}
@@ -69,7 +71,10 @@ data:
   {{- if $storage.s3.regionendpoint }}
   STORAGE_AMAZON_ENDPOINT: {{ $storage.s3.regionendpoint }}
   {{- end }}
-  {{- if $storage.s3.accesskey }}
+  {{- if $storage.s3.skipverify }}
+  AWS_INSECURE_SKIP_VERIFY: "true"
+  {{- end }}
+  {{- if and (not $storage.s3.existingSecret) ($storage.s3.accesskey) }}
   AWS_ACCESS_KEY_ID: {{ $storage.s3.accesskey }}
   {{- end }}
   {{- if $storage.s3.keyid }}

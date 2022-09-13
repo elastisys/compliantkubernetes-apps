@@ -6,7 +6,7 @@ metadata:
 spec:
   secretName: harbor-notary-cert
   dnsNames:
-    - harbor-harbor-notary-signer
+    - harbor-notary-signer
     - {{ .Values.notary.domain }}
   commonName: {{ .Values.notary.domain }}
   isCA: false

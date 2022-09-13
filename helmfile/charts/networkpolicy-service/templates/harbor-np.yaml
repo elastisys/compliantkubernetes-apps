@@ -339,6 +339,12 @@ spec:
         - port: 4443
           protocol: TCP
   egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              component: notary-signer
+      ports:
+        - port: 7899
 {{- if eq .Values.harbor.database.type "internal" }}
     - to:
         - podSelector:
@@ -382,6 +388,13 @@ spec:
   podSelector:
     matchLabels:
       component: notary-signer
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              component: notary-server
+      ports:
+        - port: 7899
   egress:
 {{- if eq .Values.harbor.database.type "internal" }}
     - to:

@@ -2,7 +2,7 @@
 # Check https://compliantkubernetes.io/operator-manual/disaster-recovery/ for instructions
 set -e
 
-HOSTNAME=harbor-harbor-database
+HOSTNAME=harbor-database
 backup_dir=backups
 
 s3_download() {

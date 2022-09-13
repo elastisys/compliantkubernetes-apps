@@ -197,8 +197,12 @@ harbor:
       # in the certificate)
       # sslmode: "set-me"
   jobservice:
-    persistentVolumeClaim:
-      size: 1Gi
+    jobLog:
+      persistentVolumeClaim:
+        size: 1Gi
+    scanDataExports:
+      persistentVolumeClaim:
+        size: 1Gi
     resources:
       requests:
         cpu: 125m
