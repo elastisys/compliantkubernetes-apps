@@ -21,6 +21,14 @@ expose:
       core: {{ .Values.harbor.subdomain }}.{{ .Values.global.baseDomain }}
       notary: {{ .Values.harbor.notary.subdomain }}.{{ .Values.global.baseDomain }}
 
+ipFamily:
+  # ipv6Enabled set to true if ipv6 is enabled in cluster, currently it affected the nginx related component
+  ipv6:
+    enabled: false
+  # ipv4Enabled set to true if ipv4 is enabled in cluster, currently it affected the nginx related component
+  ipv4:
+    enabled: true
+
 persistence:
   enabled: true
   resourcePolicy: "keep"
@@ -30,7 +38,10 @@ persistence:
     registry:
       size: {{ .Values.harbor.registry.persistentVolumeClaim.size }}
     jobservice:
-      size: {{ .Values.harbor.jobservice.persistentVolumeClaim.size }}
+      jobLog:
+        size: {{ .Values.harbor.jobservice.jobLog.persistentVolumeClaim.size }}
+      scanDataExports:
+        size: {{ .Values.harbor.jobservice.scanDataExports.persistentVolumeClaim.size }}
     {{ if eq .Values.harbor.database.type "internal" }}
     database:
       size: {{ .Values.harbor.database.internal.persistentVolumeClaim.size }}

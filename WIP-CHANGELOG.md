@@ -3,10 +3,12 @@
 - In 1.7 the cert-manager API versions v1alpha2, v1alpha3, and v1beta1, have been removed from the custom resource definitions (CRDs).
 - In 1.8 the cert-manager will validate the spec.privateKey.rotationPolicy on Certificate resources. Valid options are Never and Always.
 - Automated CIS tests are preformed on each node using kube-bench
+- Harbor upgraded to v2.6.0. Requires a harbor restore.
 
 ### Updated
 
 - Updated `kubectl` requirement to version `1.24.4`
+- Harbor upgraded to v2.6.0.
 
 ### Changed
 - OIDC scope to include groups for all services

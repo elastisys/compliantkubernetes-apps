@@ -7,6 +7,7 @@ metadata:
     component: core
 spec:
   replicas: {{ .Values.core.replicas }}
+  revisionHistoryLimit: {{ .Values.core.revisionHistoryLimit }}
   selector:
     matchLabels:
 {{ include "harbor.matchLabels" . | indent 6 }}
@@ -39,7 +40,8 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      automountServiceAccountToken: false
+      automountServiceAccountToken: {{ .Values.core.automountServiceAccountToken | default false }}
+      terminationGracePeriodSeconds: 120
       containers:
       - name: core
         image: {{ .Values.core.image.repository }}:{{ .Values.core.image.tag }}
@@ -94,6 +96,20 @@ spec:
           - name: INTERNAL_TLS_TRUST_CA_PATH
             value: /etc/harbor/ssl/core/ca.crt
          {{- end }}
+         {{- if .Values.database.external.existingSecret }}
+          - name: POSTGRESQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.database.external.existingSecret }}
+                key: password
+         {{- end }}
+         {{- if .Values.registry.credentials.existingSecret }}
+          - name: REGISTRY_CREDENTIAL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.registry.credentials.existingSecret }}
+                key: REGISTRY_PASSWD
+         {{- end }}
         ports:
         - containerPort: {{ template "harbor.core.containerPort" . }}
         volumeMounts:
@@ -137,7 +153,11 @@ spec:
               path: app.conf
       - name: secret-key
         secret:
+          {{- if .Values.existingSecretSecretKey }}
+          secretName: {{ .Values.existingSecretSecretKey }}
+          {{- else }}
           secretName: {{ template "harbor.core" . }}
+          {{- end }}
           items:
             - key: secretKey
               path: key
@@ -188,4 +208,7 @@ spec:
     {{- with .Values.core.tolerations }}
       tolerations:
 {{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- if .Values.core.priorityClassName }}
+      priorityClassName: {{ .Values.core.priorityClassName }}
     {{- end }}
