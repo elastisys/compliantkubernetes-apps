@@ -25,5 +25,5 @@ elif [ -f "${CK8S_CONFIG_PATH}"/../"${sc_template}" ]; then
   export OPENSEARCH_VALUE
   yq4 -i '.welcomingDashboard.extraTextOpensearch = strenv(OPENSEARCH_VALUE) | .welcomingDashboard.extraTextOpensearch style="double"' "${sc_config}"
 else
-  printf "dashboard-support-string.yaml file not found"
+  printf "%s/%s or %s/../%s: file not found" "${CK8S_CONFIG_PATH}" "${sc_template}" "${CK8S_CONFIG_PATH}" "${sc_template}"
 fi
