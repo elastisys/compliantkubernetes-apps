@@ -29,5 +29,6 @@
 - Network policies for harbor
 - Added option for kured to notify to slack when draning and rebooting nodes.
 - Added group subjects to `falco-viewer` and `fluentd-configurer` rolebindings.
+- Allow users to proxy and port-forward to prometheus running in the workload cluster
 
 ### Removed
