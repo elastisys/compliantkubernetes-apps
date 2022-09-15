@@ -23,19 +23,40 @@ environments:
     secrets:
       - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
 
+templates:
+  upstream: &upstream
+    chart: ./upstream/{{`{{ .Release.Name }}`}}
+    labels:
+      app: "{{`{{ .Release.Name }}`}}"
+    values:
+    - values/{{`{{ .Release.Name }}`}}.yaml.gotmpl
+
+  local: &local
+    chart: ./charts/{{`{{ .Release.Name }}`}}
+    labels:
+      app: "{{`{{ .Release.Name }}`}}"
+    namespace: cert-manager
+    values:
+    - values/{{`{{ .Release.Name }}`}}.yaml.gotmpl
+
+  upstreamCustomValues: &upstreamCustomValues
+    chart: ./upstream/{{`{{ .Release.Name }}`}}
+    labels:
+      app: "{{`{{ .Release.Name }}`}}"
+
+  localCustomValues: &localCustomValues
+    chart: ./charts/{{`{{ .Release.Name }}`}}
+    labels:
+      app: "{{`{{ .Release.Name }}`}}"
+
 # The desired state of Helm releases.
 releases:
 # Kured
 - name: kured
+  <<: *upstream
   namespace: kured
-  labels:
-    app: kured
-  chart: ./upstream/kured
   version: 2.11.2
-  missingFileHandler: Error
   installed: {{ .Values.kured.enabled }}
-  values:
-  - values/kured.yaml.gotmpl
 
 # Kured-secret
 - name: kured-secret
@@ -62,77 +83,51 @@ releases:
 
 # Ingress-nginx
 - name: ingress-nginx
+  <<: *upstream
   namespace: ingress-nginx
-  labels:
-    app: ingress-nginx
-  chart: ./upstream/ingress-nginx
   version: 4.1.3
-  missingFileHandler: Error
   wait: true
-  values:
-  - values/ingress-nginx.yaml.gotmpl
 
 # Velero
 - name: velero
+  <<: *upstreamCustomValues
   namespace: velero
-  labels:
-    app: velero
-  chart: ./upstream/velero
   version: 2.27.3
   installed: {{ .Values.velero.enabled }}
-  missingFileHandler: Error
   values:
-{{ if eq .Environment.Name "service_cluster" }}
+  {{ if eq .Environment.Name "service_cluster" }}
   - values/velero-sc.yaml.gotmpl
-{{ end }}
-{{ if eq .Environment.Name "workload_cluster" }}
+  {{ end }}
+  {{ if eq .Environment.Name "workload_cluster" }}
   - values/velero-wc.yaml.gotmpl
-{{ end }}
+  {{ end }}
 
 - name: node-local-dns
+  <<: *local
   namespace: kube-system
-  labels:
-    app: node-local-dns
-  chart: ./charts/node-local-dns
   version: 0.1.1
-  missingFileHandler: Error
-  values:
-  - values/node-local-dns.yaml.gotmpl
 
 # metrics-server
 - name: metrics-server
+  <<: *upstream
   namespace: kube-system
-  labels:
-    app: metrics-server
-  chart: ./upstream/metrics-server
   version: 3.7.0
   installed: {{ .Values.metricsServer.enabled }}
-  missingFileHandler: Error
-  values:
-  - values/metrics-server.yaml.gotmpl
-
+  
 # calico-accountant
 - name: calico-accountant
+  <<: *local
   namespace: kube-system
-  labels:
-    app: calico-accountant
-  chart: ./charts/calico-accountant
   version: 0.1.0
   installed: {{ .Values.calicoAccountant.enabled }}
-  missingFileHandler: Error
-  values:
-  - values/calico-accountant.yaml.gotmpl
 
 # calico-felix-metrics
 - name: calico-felix-metrics
+  <<: *localCustomValues
   namespace: kube-system
-  labels:
-    app: calico-felix-metrics
-  chart: ./charts/calico-felix-metrics
   version: 0.1.0
   installed: {{ .Values.calicoFelixMetrics.enabled }}
-  missingFileHandler: Error
-
+  
 # Prometheus blackboc exporter
 - name: prometheus-blackbox-exporter
   namespace: monitoring
@@ -151,14 +146,9 @@ releases:
 
 # cluster-admin-rbac
 - name: cluster-admin-rbac
+  <<: *local
   namespace: kube-system
-  labels:
-    app: cluster-admin-rbac
-  chart: ./charts/cluster-admin-rbac
   version: 0.1.0
-  missingFileHandler: Error
-  values:
-  - values/cluster-admin-rbac.yaml.gotmpl
 
 # starboard-operator-psp-rbac
 - name: starboard-operator-psp-rbac
@@ -212,41 +202,26 @@ releases:
 
 # Falco
 - name: falco
+  <<: *upstream
   namespace: falco
-  labels:
-    app: falco
-  chart: ./upstream/falco
   version: 1.16.0
   installed: {{ .Values.falco.enabled }}
-  missingFileHandler: Error
-  values:
-  - values/falco.yaml.gotmpl
 
 # Falco-exporter
 - name: falco-exporter
+  <<: *upstream
   namespace: falco
-  labels:
-    app: falco-exporter
-  chart: ./upstream/falco-exporter
   version: 0.8.0
   installed: {{ .Values.falco.enabled }}
-  missingFileHandler: Error
-  values:
-    - values/falco-exporter.yaml.gotmpl
 
 # Service cluster releases
 {{ if eq .Environment.Name "service_cluster" }}
 # Dex
 - name: dex
+  <<: *upstream
   namespace: dex
-  labels:
-    app: dex
-  chart: ./upstream/dex
   version: 0.8.2
-  missingFileHandler: Error
   wait: true
-  values:
-  - values/dex.yaml.gotmpl
 
 - name: sc-servicemonitor
   namespace: monitoring
@@ -273,15 +248,11 @@ releases:
 
 # grafana-ops dashboard
 - name: grafana-ops
+  <<: *local
   namespace: monitoring
   labels:
-    app: grafana-ops
     prometheus: sc
-  chart: ./charts/grafana-ops
   version: 0.2.1
-  missingFileHandler: Error
-  values:
-  - values/grafana-ops.yaml.gotmpl
 
 # Grafana instance for user
 - name: user-grafana
@@ -299,15 +270,10 @@ releases:
 
 # Grafana label enforcer for thanos
 - name: grafana-label-enforcer
+  <<: *local
   namespace: monitoring
-  labels:
-    app: grafana-label-enforcer
-  chart: ./charts/grafana-label-enforcer
   version: 0.1.0
   installed: {{ and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
-  missingFileHandler: Error
-  values:
-  - values/grafana-label-enforcer.yaml.gotmpl
 
 # OpenSearch
 - name: opensearch-secrets
@@ -483,17 +449,12 @@ releases:
   - values/harbor-certs.yaml.gotmpl
 
 - name: harbor
+  <<: *upstream
   namespace: harbor
-  labels:
-    app: harbor
-  chart: ./upstream/harbor
   version: 1.6.1
   installed: {{ .Values.harbor.enabled }}
-  missingFileHandler: Error
   wait: true
   timeout: 600
-  values:
-  - values/harbor.yaml.gotmpl
 
 - name: init-harbor
   namespace: harbor
@@ -568,22 +529,15 @@ releases:
   - values/thanos/ruler.yaml.gotmpl
 
 - name: s3-exporter
+  <<: *local
   namespace: monitoring
-  labels:
-    app: s3-exporter
-  chart: ./charts/s3-exporter
   version: 0.1.0
   installed: {{ and (eq .Values.objectStorage.type "s3") .Values.s3Exporter.enabled }}
-  missingFileHandler: Error
-  values:
-  - values/s3-exporter.yaml.gotmpl
 
 # Fluentd
 - name: fluentd
+  <<: *upstreamCustomValues
   namespace: fluentd
-  labels:
-    app: fluentd
-  chart: ./upstream/fluentd
   version: 5.0.15
   installed: {{ .Values.fluentd.enabled }}
   missingFileHandler: Error
@@ -594,41 +548,26 @@ releases:
 
 # configmap for fluentd (for both aggregator and forwarder)
 - name: fluentd-configmap
+  <<: *local
   namespace: fluentd
-  labels:
-    app: fluentd-configmap
-  chart: ./charts/fluentd-configmap
   version: 0.1.0
   installed: {{ .Values.fluentd.enabled }}
-  missingFileHandler: Error
-  values:
-  - values/fluentd-configmap.yaml.gotmpl
-
+  
 # Logs backup retention
 - name: sc-logs-retention
+  <<: *local
   namespace: fluentd
-  labels:
-    app: sc-logs-retention
-  chart: ./charts/sc-logs-retention
   version: 0.1.0
   installed: {{ .Values.fluentd.enabled }}
-  missingFileHandler: Error
   needs:
   - fluentd/fluentd
-  values:
-  - values/sc-logs-retention.yaml.gotmpl
 
 - name: rclone-sync
+  <<: *local
   namespace: kube-system
-  labels:
-    app: rclone-sync
-  chart: ./charts/rclone-sync
   version: 0.1.0
   installed: {{ .Values.objectStorage.sync.enabled }}
-  missingFileHandler: Error
-  values:
-  - values/rclone-sync.yaml.gotmpl
-
+  
   # Service cluster NetworkPolicy
 - name: service-cluster-np
   namespace: kube-system
@@ -659,16 +598,11 @@ releases:
   - values/wc-servicemonitor.yaml.gotmpl
 
 - name: user-alertmanager
+  <<: *local
   namespace: alertmanager
-  labels:
-    app: user-alertmanager
-  chart: ./charts/user-alertmanager
   version: 0.1.0
   installed: {{ .Values.user.alertmanager.enabled }}
-  missingFileHandler: Error
-  values:
-  - values/user-alertmanager.yaml.gotmpl
-
+  
 # Fluentd
 - name: fluentd-system
   namespace: kube-system
@@ -691,39 +625,23 @@ releases:
   values:
   - values/fluentd-user.yaml.gotmpl
 
-# gatekeeper-metrics
 - name: gatekeeper-metrics
+  <<: *local
   namespace: gatekeeper-system
-  labels:
-    app: gatekeeper-metrics
-  chart: ./charts/gatekeeper-metrics
   version: 0.1.0
   installed: {{ .Values.opa.enabled }}
-  missingFileHandler: Error
 
-# gatekeeper-constraints
 - name: gatekeeper-constraints
+  <<: *local
   namespace: gatekeeper-system
-  labels:
-    app: gatekeeper-constraints
-  chart: ./charts/gatekeeper-constraints
   version: 1.6.0
   installed: {{ .Values.opa.enabled }}
-  missingFileHandler: Error
-  values:
-  - values/gatekeeper-constraints.yaml.gotmpl
 
-# hierarchical namespace controller
 - name: hnc
+  <<: *local
   namespace: hnc-system
-  labels:
-    app: hnc
-  chart: ./charts/hnc
   version: 0.1.0
   installed: {{ .Values.hnc.enabled }}
-  missingFileHandler: Error
-  values:
-  - values/hnc.yaml.gotmpl
 
 # TODO: Make this optional! Users may not want any alerts by default.
 # It should also be separate from the alerts we use. Users should not need
@@ -741,36 +659,20 @@ releases:
   values:
   - values/prometheus-user-alerts-wc.yaml.gotmpl
 
-# User RBAC
 - name: user-rbac
+  <<: *local
   namespace: kube-system
-  labels:
-    app: user-rbac
-  chart: ./charts/user-rbac
   version: 0.1.0
-  missingFileHandler: Error
-  values:
-  - values/user-rbac.yaml.gotmpl
 
-# kube apiserver metrics ingress
 - name: kubeapi-metrics
+  <<: *local
   namespace: kube-system
-  labels:
-    app: kubeapi-metrics
-  chart: ./charts/kubeapi-metrics
   version: 0.1.0
-  missingFileHandler: Error
-  values:
-  - values/kubeapi-metrics.yaml.gotmpl
 
-# Workload cluster NetworkPolicy
 - name: workload-cluster-np
+  <<: *localCustomValues
   namespace: kube-system
-  labels:
-    app: workload-cluster-np
-  chart: ./charts/networkpolicy-workload
   version: 0.1.0
-  missingFileHandler: Error
   needs:
   - kube-system/user-rbac
   values:
