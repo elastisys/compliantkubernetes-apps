@@ -32,7 +32,6 @@ releases:
     app: kube-prometheus-stack
   chart: ./upstream/kube-prometheus-stack
   version: 19.2.2
-  missingFileHandler: Error
   # https://helm.sh/docs/chart_best_practices/custom_resource_definitions/#some-caveats-and-explanations
   # The --dry-run flag of helm install and helm upgrade is not currently supported for CRDs.
   disableValidationOnInstall: true
@@ -55,6 +54,5 @@ releases:
   chart: ./charts/thanos/ingress-secret
   version: 0.1.0
   installed: {{ .Values.thanos.enabled }}
-  missingFileHandler: Error
   values:
   - values/thanos/ingress-secret.yaml.gotmpl

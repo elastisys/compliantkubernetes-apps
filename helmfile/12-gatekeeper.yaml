@@ -38,7 +38,6 @@ releases:
   disableValidationOnInstall: true
   version: 3.7.0
   installed: {{ .Values.opa.enabled }}
-  missingFileHandler: Error
   wait: true
   values:
   - values/gatekeeper.yaml.gotmpl

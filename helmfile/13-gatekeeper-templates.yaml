@@ -35,7 +35,6 @@ releases:
   chart: ./charts/gatekeeper-templates
   version: 1.6.0
   installed: {{ .Values.opa.enabled }}
-  missingFileHandler: Error
   # https://helm.sh/docs/chart_best_practices/custom_resource_definitions/#some-caveats-and-explanations
   # The --dry-run flag of helm install and helm upgrade is not currently supported for CRDs.
   disableValidationOnInstall: true
