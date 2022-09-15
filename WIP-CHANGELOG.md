@@ -19,6 +19,7 @@
 ### Fixed
 - Fixed so grafana can show data from thanos that's older than 30 days (downsampled data)
 - Fixed so opensearch field limit alert handles metrics drop better
+- Fixed spelling error so now the grafana test framework in sc will be uninstalled
 
 ### Added
 
