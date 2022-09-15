@@ -19,6 +19,12 @@
 
 1. *Optional:* You can remove the Opensearch role mapping `readall_and_monitor` from `${CK8S_CONFIG_PATH}/sc.config.yaml` if you aren't using it in any meaningful way
 
+1. Apply `starboard-operator` to temporarly remove the starboard psp
+
+    ```bash
+    bin/ck8s ops helmfile {sc|wc} -l app=starboard-operator apply
+    ```
+
 1. Upgrade applications:
 
     ```bash
