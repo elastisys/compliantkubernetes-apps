@@ -55,6 +55,7 @@
 - Fixed so opensearch field limit alert handles metrics drop better
 - Fixed spelling error so now the grafana test framework in sc will be uninstalled
 - Fixed issue where security admin would fail if separate nodes for data and/or client was used
+- Fixed the welcome dashboard template for OpenSearch Dashboards
 
 ### Added
 
