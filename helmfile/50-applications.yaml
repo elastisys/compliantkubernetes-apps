@@ -347,6 +347,7 @@ releases:
   chart: ./upstream/opensearch
   version: 2.6.0
   installed: {{ .Values.opensearch.dataNode.dedicatedPods }}
+  wait: true
   needs:
   - opensearch-system/opensearch-master
   values:
@@ -361,6 +362,7 @@ releases:
   chart: ./upstream/opensearch
   version: 2.6.0
   installed: {{ .Values.opensearch.clientNode.dedicatedPods }}
+  wait: true
   needs:
   - opensearch-system/opensearch-master
   values:
@@ -433,6 +435,12 @@ releases:
   installed: {{ .Values.opensearch.securityadmin.enabled }}
   needs:
   - opensearch-system/opensearch-master
+{{- if .Values.opensearch.dataNode.dedicatedPods }}
+  - opensearch-system/opensearch-data
+{{- end }}
+{{- if .Values.opensearch.clientNode.dedicatedPods }}
+  - opensearch-system/opensearch-client
+{{- end }}
   values:
   - values/opensearch/securityadmin.yaml.gotmpl
 
