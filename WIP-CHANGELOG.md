@@ -6,6 +6,8 @@
 
 ### Updated
 
+- Updated `kubectl` requirement to version `1.24.4`
+
 ### Changed
 - OIDC scope to include groups for all services
 - OIDC enabled by default for ops grafana
