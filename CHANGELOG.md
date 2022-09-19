@@ -1,5 +1,6 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.26.0](#v0260---2022-09-19)
 - [v0.25.0](#v0250---2022-08-25)
 - [v0.24.1](#v0241---2022-08-01)
 - [v0.24.0](#v0240---2022-07-25)
@@ -27,6 +28,54 @@
 - [v0.6.0](#v060---2020-10-16)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.26.0 - 2022-09-19
+
+### Release notes
+
+- In 1.7 the cert-manager API versions v1alpha2, v1alpha3, and v1beta1, have been removed from the custom resource definitions (CRDs).
+- In 1.8 the cert-manager will validate the spec.privateKey.rotationPolicy on Certificate resources. Valid options are Never and Always.
+- Automated CIS tests are preformed on each node using kube-bench
+- Harbor upgraded to v2.6.0. Requires a harbor restore.
+
+### Updated
+
+- Updated `kubectl` requirement to version `1.24.4`
+- Harbor upgraded to v2.6.0.
+
+### Changed
+- OIDC scope to include groups for all services
+- OIDC enabled by default for ops grafana
+
+- The ThanosReceiveHttpRequestErrorRateHigh, OpenSearchTooFewNodesRunning, and MetricsFromScClusterIsMissing prometheus-alerts were optimized to not be triggered by kured and to reduce other unwanted behaviors.
+- Support section of the grafana/opensearch welcome dashboards is removed by default, you can now add custom text at the end of the dashboards via the sc-config.
+- OpenSearch has been upgraded from version `v1.3.4` to `v2.6.0`. Our fluentd-plugins was also changed from using "fluent-plugin-opensearch: 1.0.2" to "fluent-plugin-opensearch: 1.0.8".
+
+### Fixed
+- Fixed so grafana can show data from thanos that's older than 30 days (downsampled data)
+- Fixed so opensearch field limit alert handles metrics drop better
+- Fixed spelling error so now the grafana test framework in sc will be uninstalled
+- Fixed issue where security admin would fail if separate nodes for data and/or client was used
+
+### Added
+
+- Option to create custom solvers for letsencrypt issuers, including a simple way to add secrets.
+- Add external redis database as option for harbor
+- a new alert `FluentdAvailableSpaceBuffer`, notifies when the fluentd buffer is filling up
+- Option to enable `allowSnippetAnnotations` from the configs
+- the possibility to enable falco in the service cluster
+- Kube-bench runs on every node
+- Added a CIS kube-bench Grafana dashboard
+- Added `topologySpreadConstraints` rule to thanos and kube-prometheus-stack.
+- Network policies for harbor
+- Added option for kured to notify to slack when draning and rebooting nodes.
+- Added group subjects to `falco-viewer` and `fluentd-configurer` rolebindings.
+- Allow users to proxy and port-forward to prometheus running in the workload cluster
+
+### Removed
+
+- `readall_and_monitor` from `extraRoleMappings` in opensearch configuration
 
 -------------------------------------------------
 ## v0.25.0 - 2022-08-25
