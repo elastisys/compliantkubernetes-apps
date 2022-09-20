@@ -20,13 +20,10 @@ global:
   ingressUsingHostNetwork: {{ .Values.ingressNginx.controller.useHostPort }}
 
 harbor:
-  enable: {{ .Values.networkPolicies.harbor.enable }}
-  chartmuseum:
-    egressIPs: {{- toYaml .Values.networkPolicies.harbor.chartmuseum.egressIPs | nindent 6 }}
-  core:
-    egressIPs: {{- toYaml .Values.networkPolicies.harbor.core.egressIPs | nindent 6 }}
+  enabled: {{ and .Values.harbor.enabled .Values.networkPolicies.harbor.enabled }}
   jobservice:
-    egressIPs: {{- toYaml .Values.networkPolicies.harbor.jobservice.egressIPs | nindent 6 }}
+    ips: {{- toYaml .Values.networkPolicies.harbor.jobservice.ips | nindent 6 }}
+    port: {{ .Values.networkPolicies.harbor.jobservice.port }}
   database:
     type: {{ .Values.harbor.database.type }}
     internal: {{- toYaml .Values.networkPolicies.harbor.database.internal | nindent 6 }}
@@ -34,10 +31,9 @@ harbor:
   redis:
     type: {{ .Values.harbor.redis.type }}
     external: {{- toYaml .Values.networkPolicies.harbor.redis.external | nindent 6 }}
-  registry:
-    egressIPs: {{- toYaml .Values.networkPolicies.harbor.registry.egressIPs | nindent 6 }}
   trivy:
-    egressIPs: {{- toYaml .Values.networkPolicies.harbor.trivy.egressIPs | nindent 6 }}
+    ips: {{- toYaml .Values.networkPolicies.harbor.trivy.ips | nindent 6 }}
+    port: {{ .Values.networkPolicies.harbor.trivy.port }}
 
 monitoring:
   enabled: {{ .Values.networkPolicies.monitoring.enabled }}
@@ -52,3 +48,16 @@ monitoring:
 
 thanos:
   enabled: {{ .Values.networkPolicies.thanos.enabled }}
+
+opensearch:
+  enabled: {{ .Values.networkPolicies.opensearch.enabled }}
+  data:
+    enabled: {{ .Values.opensearch.dataNode.dedicatedPods }}
+  client:
+    enabled: {{ .Values.opensearch.clientNode.dedicatedPods }}
+  plugins:
+    ips: {{- toYaml .Values.networkPolicies.opensearch.plugins.ips | nindent 8 }}
+    ports: {{- toYaml .Values.networkPolicies.opensearch.plugins.ports | nindent 8 }}
+
+fluentd:
+  enabled: {{ and .Values.fluentd.enabled .Values.networkPolicies.fluentd.enabled }}

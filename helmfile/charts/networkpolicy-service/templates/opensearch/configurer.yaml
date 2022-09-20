@@ -1,0 +1,29 @@
+{{ if .Values.opensearch.enabled }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-opensearch-configurer
+  namespace: opensearch-system
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      app: configurer
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-master
+      ports:
+        - port: 9200
+    - to:
+        - podSelector:
+            matchLabels:
+              app: opensearch-dashboards
+      ports:
+        - port: 5601
+    - ports:
+        - port: 53
+          protocol: UDP
+{{ end }}

@@ -32,3 +32,14 @@ fluentd:
 s3Exporter:
   interval: 120s
   scrapeTimeout: 30s
+networkPolicies:
+  global:
+    scApiserver:
+      ips:
+        - "0.0.0.0/0"
+    scNodes:
+      ips:
+        - "0.0.0.0/0"
+    wcIngress:
+      ips:
+        - "0.0.0.0/0"

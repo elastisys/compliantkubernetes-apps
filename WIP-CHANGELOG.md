@@ -37,6 +37,7 @@
 - An alert for failed evicted pods (KubeFailedEvictedPods)
 - Resource config for user-alertmanager, config-reloader, gatekeeper
 - Config option for gatekeeper audit interval
+- Network policies for logging stack (fluentd and opensearch)
 
 ### Removed
 

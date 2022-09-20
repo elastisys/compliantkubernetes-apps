@@ -91,9 +91,31 @@ apps_wc() {
 # ENTRYPOINT
 #
 if [[ $1 == "wc" ]]; then
+    if ! "${here}/update-ips.bash" "wc" "dry-run"; then
+        log_warning "Diff in wc config for network policy IPs, run 'ck8s update-ips wc update' to fix this issue."
+
+        if ! ${CK8S_AUTO_APPROVE}; then
+            log_warning_no_newline "Do you want to continue anyway? (y/N): "
+            read -r reply
+            if [[ ! "${reply}" =~ ^[yY]$ ]]; then
+                exit 1
+            fi
+        fi
+    fi
     config_load "$1"
     apps_wc "$2" "$3"
 elif [[ $1 == "sc" ]]; then
+    if ! "${here}/update-ips.bash" "sc" "dry-run"; then
+        log_warning "Diff in sc config for network policy IPs, run 'ck8s update-ips sc update' to fix this issue."
+
+        if ! ${CK8S_AUTO_APPROVE}; then
+            log_warning_no_newline "Do you want to continue anyway? (y/N): "
+            read -r reply
+            if [[ ! "${reply}" =~ ^[yY]$ ]]; then
+                exit 1
+            fi
+        fi
+    fi
     config_load "$1"
     apps_sc "$2" "$3"
 else

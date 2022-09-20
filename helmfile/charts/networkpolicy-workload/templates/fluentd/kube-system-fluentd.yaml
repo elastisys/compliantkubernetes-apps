@@ -1,0 +1,44 @@
+{{ if .Values.fluentd.enabled }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-kube-system-fluentd
+  namespace: kube-system
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: fluentd-elasticsearch
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+              app.kubernetes.io/instance: kube-prometheus-stack-prometheus
+          namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 24231
+  egress:
+    - to:
+        {{- range $ip := .Values.global.scIngress.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: 443
+    - ports:
+        - port: 53
+          protocol: UDP
+    - to:
+        {{- range $ip := .Values.global.wcApiserver.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        - port: {{ .Values.global.wcApiserver.port }}
+{{ end }}

@@ -13,3 +13,12 @@ user:
   adminUsers:
     - user-admin@example.com
   adminGroups: []
+
+networkPolicies:
+  global:
+    wcApiserver:
+      ips:
+        - "0.0.0.0/0"
+    wcNodes:
+      ips:
+        - "0.0.0.0/0"

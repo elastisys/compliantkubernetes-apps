@@ -1,4 +1,15 @@
-{{ if .Values.harbor.enable }}
+{{ if .Values.harbor.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: harbor-default-deny-all
+  namespace: harbor
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
@@ -19,15 +30,15 @@ spec:
       ports:
         - port: 9999
   egress:
-{{- if eq .Values.harbor.redis.type "internal" }}
+  {{- if eq .Values.harbor.redis.type "internal" }}
     - to:
         - podSelector:
             matchLabels:
               component: redis
       ports:
         - port: 6379
-{{- else if eq .Values.harbor.redis.type "external" }}
-  {{- range .Values.harbor.redis.external }}
+  {{- else if eq .Values.harbor.redis.type "external" }}
+    {{- range .Values.harbor.redis.external }}
     - to:
       {{- if .egressNSMatchLabels }}
         - namespaceSelector:
@@ -44,19 +55,21 @@ spec:
           {{- end }}
       {{- end }}
       ports:
-    {{- range $port := .ports }}
+      {{- range $port := .ports }}
         - port: {{ $port }}
+      {{- end }}
     {{- end }}
   {{- end }}
-{{- end }}
     - to:
-{{- range $IP := .Values.harbor.chartmuseum.egressIPs }}
+        {{- range $IP := .Values.global.objectStorage.ips }}
         - ipBlock:
             cidr: {{ $IP }}
-{{- end }}
+        {{- end }}
       ports:
+        {{- range $port := .Values.global.objectStorage.ports }}
         - protocol: TCP
-          port: 443
+          port: {{ $port }}
+        {{- end }}
 ---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
@@ -76,13 +89,38 @@ spec:
           protocol: TCP
   egress:
     - to:
-{{- range $IP := .Values.harbor.core.egressIPs }}
+      {{- if .Values.global.externalLoadBalancer }}
+        {{- range $ip := .Values.global.scIngress.ips }}
         - ipBlock:
-            cidr: {{ $IP }}
-{{- end }}
+            cidr: {{ $ip }}
+        {{- end }}
+      {{- else if .Values.global.ingressUsingHostNetwork }}
+        {{- range $ip := .Values.global.scNodes.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      {{- else }}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/component: controller
+              app.kubernetes.io/instance: ingress-nginx
+      {{- end }}
       ports:
         - protocol: TCP
           port: 443
+    - to:
+        {{- range $IP := .Values.global.objectStorage.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      ports:
+        {{- range $port := .Values.global.objectStorage.ports }}
+        - protocol: TCP
+          port: {{ $port }}
+        {{- end }}
     - to:
         - podSelector:
             matchLabels:
@@ -96,15 +134,15 @@ spec:
       ports:
         - port: 5000
         - port: 8080
-{{- if eq .Values.harbor.redis.type "internal" }}
+    {{- if eq .Values.harbor.redis.type "internal" }}
     - to:
         - podSelector:
             matchLabels:
               component: redis
       ports:
         - port: 6379
-{{- else if eq .Values.harbor.redis.type "external" }}
-  {{- range .Values.harbor.redis.external }}
+    {{- else if eq .Values.harbor.redis.type "external" }}
+    {{- range .Values.harbor.redis.external }}
     - to:
       {{- if .egressNSMatchLabels }}
         - namespaceSelector:
@@ -121,20 +159,20 @@ spec:
           {{- end }}
       {{- end }}
       ports:
-    {{- range $port := .ports }}
+        {{- range $port := .ports }}
         - port: {{ $port }}
+        {{- end }}
     {{- end }}
-  {{- end }}
-{{- end }}
-{{- if eq .Values.harbor.database.type "internal" }}
+    {{- end }}
+    {{- if eq .Values.harbor.database.type "internal" }}
     - to:
         - podSelector:
             matchLabels:
               component: database
       ports:
         - port: 5432
-{{- else if eq .Values.harbor.database.type "external" }}
-  {{- range .Values.harbor.database.external }}
+    {{- else if eq .Values.harbor.database.type "external" }}
+    {{- range .Values.harbor.database.external }}
     - to:
       {{- if .egressNSMatchLabels }}
         - namespaceSelector:
@@ -151,11 +189,11 @@ spec:
           {{- end }}
       {{- end }}
       ports:
-    {{- range $port := .ports }}
+        {{- range $port := .ports }}
         - port: {{ $port }}
+        {{- end }}
     {{- end }}
-  {{- end }}
-{{- end }}
+    {{- end }}
     - to:
         - podSelector:
             matchLabels:
@@ -208,7 +246,7 @@ spec:
         - podSelector:
             matchLabels:
               component: jobservice
-      {{- range .Values.harbor.database.internal }}
+        {{- range .Values.harbor.database.internal }}
         {{- if .ingressNSMatchLabels }}
         - namespaceSelector:
             matchLabels:
@@ -223,7 +261,7 @@ spec:
                 {{- end }}
           {{- end }}
         {{- end }}
-      {{- end }}
+        {{- end }}
       ports:
         - port: 5432
 {{- end }}
@@ -249,22 +287,22 @@ spec:
         - port: 8080
   egress:
     - to:
-{{- range $IP := .Values.harbor.jobservice.egressIPs }}
+        {{- range $IP := .Values.harbor.jobservice.ips }}
         - ipBlock:
             cidr: {{ $IP }}
-{{- end }}
+        {{- end }}
       ports:
         - protocol: TCP
           port: 443
-{{- if eq .Values.harbor.redis.type "internal" }}
+    {{- if eq .Values.harbor.redis.type "internal" }}
     - to:
         - podSelector:
             matchLabels:
               component: redis
       ports:
         - port: 6379
-{{- else if eq .Values.harbor.redis.type "external" }}
-  {{- range .Values.harbor.redis.external }}
+    {{- else if eq .Values.harbor.redis.type "external" }}
+    {{- range .Values.harbor.redis.external }}
     - to:
       {{- if .egressNSMatchLabels }}
         - namespaceSelector:
@@ -281,20 +319,20 @@ spec:
           {{- end }}
       {{- end }}
       ports:
-    {{- range $port := .ports }}
+        {{- range $port := .ports }}
         - port: {{ $port }}
+        {{- end }}
     {{- end }}
-  {{- end }}
-{{- end }}
-{{- if eq .Values.harbor.database.type "internal" }}
+    {{- end }}
+    {{- if eq .Values.harbor.database.type "internal" }}
     - to:
         - podSelector:
             matchLabels:
               component: database
       ports:
         - port: 5432
-{{- else if eq .Values.harbor.database.type "external" }}
-  {{- range .Values.harbor.database.external }}
+    {{- else if eq .Values.harbor.database.type "external" }}
+    {{- range .Values.harbor.database.external }}
     - to:
       {{- if .egressNSMatchLabels }}
         - namespaceSelector:
@@ -311,11 +349,11 @@ spec:
           {{- end }}
       {{- end }}
       ports:
-    {{- range $port := .ports }}
+        {{- range $port := .ports }}
         - port: {{ $port }}
+        {{- end }}
     {{- end }}
-  {{- end }}
-{{- end }}
+    {{- end }}
     - to:
         - podSelector:
             matchLabels:
@@ -352,15 +390,15 @@ spec:
               component: notary-signer
       ports:
         - port: 7899
-{{- if eq .Values.harbor.database.type "internal" }}
+    {{- if eq .Values.harbor.database.type "internal" }}
     - to:
         - podSelector:
             matchLabels:
               component: database
       ports:
         - port: 5432
-{{- else if eq .Values.harbor.database.type "external" }}
-  {{- range .Values.harbor.database.external }}
+    {{- else if eq .Values.harbor.database.type "external" }}
+    {{- range .Values.harbor.database.external }}
     - to:
       {{- if .egressNSMatchLabels }}
         - namespaceSelector:
@@ -377,11 +415,11 @@ spec:
           {{- end }}
       {{- end }}
       ports:
-    {{- range $port := .ports }}
+        {{- range $port := .ports }}
         - port: {{ $port }}
+        {{- end }}
     {{- end }}
-  {{- end }}
-{{- end }}
+    {{- end }}
 ---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
@@ -403,15 +441,15 @@ spec:
       ports:
         - port: 7899
   egress:
-{{- if eq .Values.harbor.database.type "internal" }}
+    {{- if eq .Values.harbor.database.type "internal" }}
     - to:
         - podSelector:
             matchLabels:
               component: database
       ports:
         - port: 5432
-{{- else if eq .Values.harbor.database.type "external" }}
-  {{- range .Values.harbor.database.external }}
+    {{- else if eq .Values.harbor.database.type "external" }}
+    {{- range .Values.harbor.database.external }}
     - to:
       {{- if .egressNSMatchLabels }}
         - namespaceSelector:
@@ -428,11 +466,11 @@ spec:
           {{- end }}
       {{- end }}
       ports:
-    {{- range $port := .ports }}
+        {{- range $port := .ports }}
         - port: {{ $port }}
+        {{- end }}
     {{- end }}
-  {{- end }}
-{{- end }}
+    {{- end }}
 ---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
@@ -513,22 +551,24 @@ spec:
         - port: 8080
   egress:
     - to:
-{{- range $IP := .Values.harbor.registry.egressIPs }}
+        {{- range $IP := .Values.global.objectStorage.ips }}
         - ipBlock:
             cidr: {{ $IP }}
-{{- end }}
+        {{- end }}
       ports:
+        {{- range $port := .Values.global.objectStorage.ports }}
         - protocol: TCP
-          port: 443
-{{- if eq .Values.harbor.redis.type "internal" }}
+          port: {{ $port }}
+        {{- end }}
+    {{- if eq .Values.harbor.redis.type "internal" }}
     - to:
         - podSelector:
             matchLabels:
               component: redis
       ports:
         - port: 6379
-{{- else if eq .Values.harbor.redis.type "external" }}
-  {{- range .Values.harbor.redis.external }}
+    {{- else if eq .Values.harbor.redis.type "external" }}
+    {{- range .Values.harbor.redis.external }}
     - to:
       {{- if .egressNSMatchLabels }}
         - namespaceSelector:
@@ -545,11 +585,11 @@ spec:
           {{- end }}
       {{- end }}
       ports:
-    {{- range $port := .ports }}
+        {{- range $port := .ports }}
         - port: {{ $port }}
+        {{- end }}
     {{- end }}
-  {{- end }}
-{{- end }}
+    {{- end }}
 ---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
@@ -574,15 +614,15 @@ spec:
       ports:
         - port: 8080
   egress:
-{{- if eq .Values.harbor.redis.type "internal" }}
+    {{- if eq .Values.harbor.redis.type "internal" }}
     - to:
         - podSelector:
             matchLabels:
               component: redis
       ports:
         - port: 6379
-{{- else if eq .Values.harbor.redis.type "external" }}
-  {{- range .Values.harbor.redis.external }}
+    {{- else if eq .Values.harbor.redis.type "external" }}
+    {{- range .Values.harbor.redis.external }}
     - to:
       {{- if .egressNSMatchLabels }}
         - namespaceSelector:
@@ -599,11 +639,11 @@ spec:
           {{- end }}
       {{- end }}
       ports:
-    {{- range $port := .ports }}
+        {{- range $port := .ports }}
         - port: {{ $port }}
+        {{- end }}
     {{- end }}
-  {{- end }}
-{{- end }}
+    {{- end }}
     - to:
         - podSelector:
             matchLabels:
@@ -611,13 +651,13 @@ spec:
       ports:
         - port: 8080
     - to:
-{{- range $IP := .Values.harbor.trivy.egressIPs }}
+        {{- range $IP := .Values.harbor.trivy.ips }}
         - ipBlock:
             cidr: {{ $IP }}
-{{- end }}
+        {{- end }}
       ports:
         - protocol: TCP
-          port: 443
+          port: {{ .Values.harbor.trivy.port }}
 ---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
@@ -636,4 +676,64 @@ spec:
     - ports:
         - port: 53
           protocol: UDP
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-init-harbor-job
+  namespace: harbor
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      job-name: init-harbor-job
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              component: core
+      ports:
+        - port: 8080
+          protocol: TCP
+    - ports:
+        - port: 53
+          protocol: UDP
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-harbor-acme-pods
+  namespace: harbor
+spec:
+  policyTypes:
+    - Ingress
+  podSelector:
+    matchLabels:
+      acme.cert-manager.io/http01-solver: "true"
+  ingress:
+    - from:
+      {{- if .Values.global.externalLoadBalancer }}
+        {{- range $ip := .Values.global.scIngress.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      {{- else if .Values.global.ingressUsingHostNetwork }}
+        {{- range $ip := .Values.global.scNodes.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      {{- else }}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/component: controller
+              app.kubernetes.io/instance: ingress-nginx
+      {{- end }}
+      ports:
+      - port: 8089
+        protocol: TCP
+---
 {{- end }}

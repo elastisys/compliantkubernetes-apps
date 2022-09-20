@@ -1,0 +1,46 @@
+{{ if .Values.fluentd.enabled }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-fluentd-aggregator
+  namespace: fluentd
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: aggregator
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: forwarder
+              app.kubernetes.io/name: fluentd
+      ports:
+        - port: 24224
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+              app.kubernetes.io/instance: kube-prometheus-stack-prometheus
+          namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 24231
+  egress:
+    - to:
+        {{- range $ip := .Values.global.objectStorage.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        {{- range $port := .Values.global.objectStorage.ports }}
+        - protocol: TCP
+          port: {{ $port }}
+        {{- end }}
+    - ports:
+        - port: 53
+          protocol: UDP
+{{- end }}

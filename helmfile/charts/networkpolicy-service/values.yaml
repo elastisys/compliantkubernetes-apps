@@ -37,13 +37,7 @@ global:
   externalLoadBalancer: false # not true if loadbalancer is controlled by a kubernetes cloud controller
 
 harbor:
-  enable: true
-  chartmuseum:
-    egressIPs:
-      - "0.0.0.0/0" # S3
-  core:
-    egressIPs:
-      - "0.0.0.0/0" # S3, openid
+  enabled: true
   database:
     type: internal
     internal: []
@@ -56,22 +50,24 @@ harbor:
       #   ports:
       #    - 5432
   jobservice:
-    egressIPs:
-      - "0.0.0.0/0" # image pull
+    # IP to pull images, docker hub etc
+    ips:
+      - "0.0.0.0/0"
+    ports:
+      - 443
   redis:
-    type: external
+    type: internal
     external: []
       # - egressNSMatchLabels:
       #     kubernetes.io/metadata.name: <redis namespace>
       #   egressPodMatchLabels: {}
       #   ports:
       #    - 6379
-  registry:
-    egressIPs:
-      - "0.0.0.0/0" # S3
   trivy:
-    egressIPs:
-      - "0.0.0.0/0" # trivy vulnerability database
+    # IP to trivy vulnerability database
+    ips:
+      - "0.0.0.0/0"
+    port: 443
 
 monitoring:
   enabled: true
@@ -87,3 +83,12 @@ monitoring:
         - "0.0.0.0/0"
       ports:
         - 443
+opensearch:
+  enabled: true
+  plugins:
+    ips:
+      - "0.0.0.0/0"
+    port: 443
+
+fluentd:
+  enabled: true

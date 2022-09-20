@@ -1,0 +1,137 @@
+{{ if .Values.opensearch.enabled }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-opensearch-master
+  namespace: opensearch-system
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: opensearch-master
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: opensearch-curator
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: opensearch-backup
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: opensearch-slm
+        - podSelector:
+            matchLabels:
+              app: opensearch-dashboards
+        - podSelector:
+            matchLabels:
+              app: prometheus-elasticsearch-exporter
+        - podSelector:
+            matchLabels:
+              app: configurer
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: opensearch-securityadmin
+      {{- if not .Values.opensearch.client.enabled }}
+      # Allow api port from ingress-ngix
+      {{- if .Values.global.ingressUsingHostNetwork }}
+        {{- range $ip := .Values.global.scNodes.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      {{- else }}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/component: controller
+              app.kubernetes.io/instance: ingress-nginx
+      {{- end }}
+      {{- end }}
+      ports:
+        - port: 9200
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-master
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-data
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-client
+      ports:
+        - port: 9300
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-master
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-data
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-client
+      ports:
+        - port: 9300
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: dex
+              app.kubernetes.io/instance: dex
+          namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: dex
+      ports:
+        - port: 5556
+    - to:
+        {{- range $ip := .Values.global.objectStorage.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        {{- range $port := .Values.global.objectStorage.ports }}
+        - protocol: TCP
+          port: {{ $port }}
+        {{- end }}
+    - to:
+        {{- range $ip := .Values.opensearch.plugins.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        {{- range $port := .Values.opensearch.plugins.ports }}
+        - protocol: TCP
+          port: {{ $port }}
+        {{- end }}
+    - to:
+      {{- if .Values.global.externalLoadBalancer }}
+        {{- range $ip := .Values.global.scIngress.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      {{- else if .Values.global.ingressUsingHostNetwork }}
+        {{- range $ip := .Values.global.scNodes.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      {{- else }}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/component: controller
+              app.kubernetes.io/instance: ingress-nginx
+      {{- end }}
+      ports:
+        - protocol: TCP
+          port: 443
+    - ports:
+        - port: 53
+          protocol: UDP
+{{ end }}

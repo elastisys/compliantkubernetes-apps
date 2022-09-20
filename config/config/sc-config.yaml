@@ -1077,19 +1077,12 @@ networkPolicies:
         - set-me
     externalLoadBalancer: false # only true if loadbalancer is not controlled by a kubernetes cloud controller
   harbor:
-    enable: true
-    chartmuseum:
-      # IP to S3
-      egressIPs:
-        - "0.0.0.0/0"
-    core:
-      # IP to S3, dex
-      egressIPs:
-        - "0.0.0.0/0"
+    enabled: true
     jobservice:
       # IP to pull images, docker hub etc
-      egressIPs:
-        - "0.0.0.0/0"
+      ips:
+        - "set-me"
+      port: 443
     database:
       internal:
         - ingressNSMatchLabels:
@@ -1099,14 +1092,11 @@ networkPolicies:
       external: []
     redis:
       external: []
-    registry:
-       # IP to S3
-      egressIPs:
-        - "0.0.0.0/0"
     trivy:
       # IP to trivy vulnerability database
-      egressIPs:
-        - "0.0.0.0/0"
+      ips:
+        - "set-me"
+      port: 443
   monitoring:
     enabled: true
     grafana:
@@ -1122,4 +1112,15 @@ networkPolicies:
         ports:
           - 443
   thanos:
+    enabled: true
+
+  opensearch:
+    enabled: true
+    plugins:
+      ips:
+        - "set-me"
+      ports:
+        - 443
+
+  fluentd:
     enabled: true

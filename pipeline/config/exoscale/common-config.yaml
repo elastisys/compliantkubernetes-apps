@@ -27,3 +27,11 @@ clusterAdmin:
 monitoring:
   rook:
     enabled: true
+networkPolicies:
+  global:
+    scIngress:
+      ips:
+        - "0.0.0.0/0"
+    objectStorage:
+      ips:
+        - "0.0.0.0/0"

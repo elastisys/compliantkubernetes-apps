@@ -1,0 +1,27 @@
+{{ if .Values.fluentd.enabled }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-fluentd-retention
+  namespace: fluentd
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: sc-logs-retention
+  egress:
+    - to:
+        {{- range $ip := .Values.global.objectStorage.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        {{- range $port := .Values.global.objectStorage.ports }}
+        - protocol: TCP
+          port: {{ $port }}
+        {{- end }}
+    - ports:
+        - port: 53
+          protocol: UDP
+{{- end }}

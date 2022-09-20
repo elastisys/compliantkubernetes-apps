@@ -1,0 +1,55 @@
+{{ if .Values.opensearch.enabled }}
+{{- if .Values.opensearch.data.enabled }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-opensearch-data
+  namespace: opensearch-system
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: opensearch-data
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-master
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-data
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-client
+      ports:
+        - port: 9300
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-master
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-data
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-client
+      ports:
+        - port: 9300
+    - to:
+        {{- range $ip := .Values.opensearch.plugins.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        {{- range $port := .Values.opensearch.plugins.ports }}
+        - protocol: TCP
+          port: {{ $port }}
+        {{- end }}
+    - ports:
+        - port: 53
+          protocol: UDP
+{{- end }}
+{{ end }}
