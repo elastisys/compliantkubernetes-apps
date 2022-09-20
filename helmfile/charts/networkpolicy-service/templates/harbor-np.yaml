@@ -1,4 +1,15 @@
-{{ if .Values.harbor.enable }}
+{{ if .Values.harbor.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: harbor-default-deny-all
+  namespace: harbor
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:

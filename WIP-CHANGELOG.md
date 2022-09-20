@@ -9,4 +9,6 @@
 
 ### Added
 
+- Network policies for logging stack (fluentd and opensearch)
+
 ### Removed

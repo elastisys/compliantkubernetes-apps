@@ -335,6 +335,7 @@ releases:
   - dex/dex
   {{- end }}
   - opensearch-system/opensearch-secrets
+  - kube-system/service-cluster-np
   values:
   - values/opensearch/common.yaml.gotmpl
   - values/opensearch/master.yaml.gotmpl
@@ -597,6 +598,7 @@ releases:
   missingFileHandler: Error
   needs:
   - fluentd/fluentd-configmap
+  - kube-system/service-cluster-np
   values:
   - values/fluentd-sc.yaml.gotmpl
 

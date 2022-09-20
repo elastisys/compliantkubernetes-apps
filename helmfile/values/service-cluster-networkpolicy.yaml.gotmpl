@@ -3,7 +3,7 @@ additional:
   {{ toYaml .Values.networkPolicies.additional | nindent 2 }}
 {{- end }}
 harbor:
-  enable: {{ .Values.networkPolicies.harbor.enable }}
+  enabled: {{ .Values.networkPolicies.harbor.enabled }}
   chartmuseum:
     egressIPs: {{- toYaml .Values.networkPolicies.harbor.chartmuseum.egressIPs | nindent 6 }}
   core:
@@ -21,3 +21,24 @@ harbor:
     egressIPs: {{- toYaml .Values.networkPolicies.harbor.registry.egressIPs | nindent 6 }}
   trivy:
     egressIPs: {{- toYaml .Values.networkPolicies.harbor.trivy.egressIPs | nindent 6 }}
+
+opensearch:
+  enabled: {{ .Values.networkPolicies.opensearch.enabled }}
+  data:
+    enabled: {{ .Values.opensearch.dataNode.dedicatedPods }}
+  client:
+    enabled: {{ .Values.opensearch.clientNode.dedicatedPods }}
+  global:
+    objectStorage:
+      ips: {{- toYaml .Values.networkPolicies.opensearch.global.objectStorage.ips | nindent 8 }}
+      port: {{ .Values.networkPolicies.opensearch.global.objectStorage.port }}
+    plugins:
+      ips: {{- toYaml .Values.networkPolicies.opensearch.global.plugins.ips | nindent 8 }}
+      port: {{ .Values.networkPolicies.opensearch.global.plugins.port }}
+
+fluentd:
+  enabled: {{ .Values.networkPolicies.fluentd.enabled }}
+  global:
+    objectStorage:
+      ips: {{- toYaml .Values.networkPolicies.fluentd.global.objectStorage.ips | nindent 8 }}
+      port: {{ .Values.networkPolicies.fluentd.global.objectStorage.port }}

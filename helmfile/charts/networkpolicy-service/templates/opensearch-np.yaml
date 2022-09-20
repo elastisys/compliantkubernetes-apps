@@ -1,0 +1,382 @@
+{{ if .Values.opensearch.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-opensearch
+  namespace: opensearch-system
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-opensearch-master
+  namespace: opensearch-system
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: opensearch-master
+  ingress:
+    # Allow api port from anywhere
+    - ports:
+        - port: 9200
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-master
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-data
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-client
+      ports:
+        - port: 9300
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-master
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-data
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-client
+      ports:
+        - port: 9300
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: dex
+              app.kubernetes.io/instance: dex
+          namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: dex
+      ports:
+        - port: 5556
+    - to:
+{{- range $ip := .Values.opensearch.global.objectStorage.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+{{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.opensearch.global.objectStorage.port }}
+    - to:
+{{- range $ip := .Values.opensearch.global.plugins.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+{{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.opensearch.global.plugins.port }}
+---
+{{- if .Values.opensearch.data.enabled }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-opensearch-data
+  namespace: opensearch-system
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: opensearch-data
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-master
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-data
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-client
+      ports:
+        - port: 9300
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-master
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-data
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-client
+      ports:
+        - port: 9300
+    - to:
+{{- range $ip := .Values.opensearch.global.plugins.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+{{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.opensearch.global.plugins.port }}
+---
+{{- end }}
+{{- if .Values.opensearch.client.enabled }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-opensearch-client
+  namespace: opensearch-system
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: opensearch-client
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-master
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-data
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-client
+      ports:
+        - port: 9300
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-master
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-data
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-client
+      ports:
+        - port: 9300
+    - to:
+{{- range $ip := .Values.opensearch.global.plugins.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+{{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.opensearch.global.plugins.port }}
+---
+{{- end }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-opensearch-dashboard
+  namespace: opensearch-system
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      app: opensearch-dashboards
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: ingress-nginx
+              app.kubernetes.io/component: controller
+          namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+        - podSelector:
+            matchLabels:
+              app: configurer
+      ports:
+        - port: 5601
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-master
+      ports:
+        - port: 9200
+    - ports:
+        - port: 53
+          protocol: UDP
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-opensearch-curator
+  namespace: opensearch-system
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: opensearch-curator
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-master
+      ports:
+        - port: 9200
+    - ports:
+        - port: 53
+          protocol: UDP
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-opensearch-securityadmin
+  namespace: opensearch-system
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: opensearch-securityadmin
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-master
+      ports:
+        - port: 9200
+    - ports:
+        - port: 53
+          protocol: UDP
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-opensearch-dns
+  namespace: opensearch-system
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: opensearch
+  egress:
+    - ports:
+        - port: 53
+          protocol: UDP
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-opensearch-backup
+  namespace: opensearch-system
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: opensearch-backup
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-master
+      ports:
+        - port: 9200
+    - ports:
+        - port: 53
+          protocol: UDP
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-opensearch-slm
+  namespace: opensearch-system
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: opensearch-slm
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-master
+      ports:
+        - port: 9200
+    - ports:
+        - port: 53
+          protocol: UDP
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-opensearch-configurer
+  namespace: opensearch-system
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      app: configurer
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-master
+      ports:
+        - port: 9200
+    - to:
+        - podSelector:
+            matchLabels:
+              app: opensearch-dashboards
+      ports:
+        - port: 5601
+    - ports:
+        - port: 53
+          protocol: UDP
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-opensearch-prometheus-exporter
+  namespace: opensearch-system
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      app: prometheus-elasticsearch-exporter
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: kube-prometheus-stack-prometheus
+              app.kubernetes.io/name: prometheus
+          namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 9108
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-master
+      ports:
+        - port: 9200
+    - ports:
+        - port: 53
+          protocol: UDP
+---
+{{- end }}
