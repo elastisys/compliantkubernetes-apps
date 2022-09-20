@@ -59,3 +59,10 @@
     ```
     ./bin/ck8s ops kubectl sc delete pvc -n harbor data-harbor-harbor-redis-0 data-harbor-harbor-trivy-0 database-data-harbor-harbor-database-0 harbor-harbor-jobservice
     ```
+
+1. Remove any old stuck jobs in the monitoring namespace. Other wise starboard operator will not create any new jobs.
+
+    ```
+    ./bin/ck8s ops kubectl sc delete jobs -n monitoring --all
+    ./bin/ck8s ops kubectl wc delete jobs -n monitoring --all
+    ```
