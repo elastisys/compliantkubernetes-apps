@@ -902,6 +902,19 @@ opensearch:
     nodeSelector: {}
     tolerations: []
 
+  # Config for https://github.com/elastisys/compliantkubernetes-apps/blob/main/helmfile/charts/prometheus-alerts/templates/alerts/opensearch.yaml#L70:L77
+  promIndexAlerts:
+    - prefix: kubernetes-default
+      alertSizeMB: 5500
+    - prefix: kubeaudit-default
+      alertSizeMB: 5500
+    - prefix: other-default
+      alertSizeMB: 400
+    - prefix: security-auditlog
+      alertSizeMB: 16
+    - prefix: authlog-default
+      alertSizeMB: 0.2
+
   # Snapshot and snapshot lifecycle configuration
   # Requires S3 or GCS to be enabled
   snapshot:
