@@ -5,6 +5,7 @@
 # TODO: We should update the rules for things with set namespace and job name to be able to monitor instances in the workload cluster.
 
 osNodeCount: {{ add .Values.opensearch.dataNode.count .Values.opensearch.clientNode.count .Values.opensearch.masterNode.count }}
+osIndexAlerts: {{ toYaml .Values.opensearch.promIndexAlerts | nindent 2 }}
 
 defaultRules:
   alertLabels:
@@ -40,8 +41,7 @@ defaultRules:
 
 capacityManagementAlertsDiskLimit: {{ .Values.prometheus.capacityManagementAlerts.disklimit }}
 capacityManagementAlertsUsageLimit: {{ .Values.prometheus.capacityManagementAlerts.usagelimit }}
-capacityManagementAlertsRequestLimit:
-{{ toYaml .Values.prometheus.capacityManagementAlerts.requestlimit | indent 2}}
+capacityManagementAlertsRequestLimit: {{ toYaml .Values.prometheus.capacityManagementAlerts.requestlimit | nindent 2 }}
 
 s3BucketPercentLimit: {{ .Values.prometheus.s3BucketPercentLimit }}
 s3BucketSizeQuotaGB: {{ .Values.prometheus.s3BucketSizeQuotaGB }}

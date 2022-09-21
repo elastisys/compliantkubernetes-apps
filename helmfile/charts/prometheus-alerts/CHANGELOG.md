@@ -1,6 +1,11 @@
 ## 2022.10.04
 1. helmfile/charts/prometheus-alerts/templates/alerts/kubernetes-apps.yaml
    - ADDED - KubeFailedEvictedPods alert
+
+## 2022.09.28
+1. helmfile/charts/prometheus-alerts/templates/alerts/opensearch.yaml
+   - ADDED - OpensearchClusterYellow, OpensearchClusterRed and $indexSizeIncreasedOverLimit
+
 ## 2022.08.17
 1. helmfile/charts/prometheus-alerts/files/missing-metrics-alerts.yaml
    - MODIFIED - MetricsFromScClusterIsMissing 'for' from 5m to 15m

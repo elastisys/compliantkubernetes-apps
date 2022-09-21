@@ -1,6 +1,7 @@
 ### Release notes
 
 - Several default resource requests and limits have changed. When upgrading these might need to be adjusted.
+- The settings for the new Opensearch index size alerts might need to be tweaked to better suit the environment.
 
 ### Updated
 
@@ -35,7 +36,7 @@
 - Fixed harbor network policies
 
 ### Added
-
+- Option to configure alerts for growing indices in OpenSearch
 - Option to deny network traffic by default
 - Network policies for monitoring stack (prometheus, thanos, grafana, some exporters)
 - An alert for failed evicted pods (KubeFailedEvictedPods)

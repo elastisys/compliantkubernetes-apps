@@ -50,4 +50,30 @@ spec:
       annotations:
         description: Index {{`{{ $labels.index }}`}} is using {{`{{ $value }}`}} percent of max field limit
         summary: Index {{`{{ $labels.index }}`}} is using {{`{{ $value }}`}} percent of max field limit
+    - alert: OpensearchClusterYellow
+      expr: elasticsearch_cluster_health_status{color="yellow"} == 1
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: Opensearch Cluster Yellow (instance {{`{{ $labels.instance }}`}})
+        description: Opensearch Cluster is in a Yellow status VALUE = {{`{{ $value }}`}}  LABELS = {{`{{ $labels }}`}}
+    - alert: OpensearchClusterRed
+      expr: elasticsearch_cluster_health_status{color="red"} == 1
+      for: 15m
+      labels:
+        severity: critical
+      annotations:
+        summary: Opensearch Cluster Red (instance {{`{{ $labels.instance }}`}})
+        description: Opensearch Cluster is in a Red status VALUE = {{`{{ $value }}`}}  LABELS = {{`{{ $labels }}`}}
+    {{- range $prefixes := .Values.osIndexAlerts }}
+    - alert: {{ $prefixes.prefix | title }}SizeIncreasedOverLimit
+      expr: elasticsearch_indices_store_size_bytes_primary{index=~"{{ $prefixes.prefix }}.+"} / (1024^2) > {{ $prefixes.alertSizeMB }}
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        message: Primary shard size for index {{`{{ $labels.index }}`}} has increased over the limit of {{ $prefixes.alertSizeMB }}MB current size is {{`{{ $value | printf "%.0f" }}`}}MB
+        description: If the size keeps increasing, that might indicate a problem with ISM
+    {{- end }}
 {{- end }}
