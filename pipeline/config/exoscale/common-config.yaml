@@ -40,3 +40,12 @@ networkPolicies:
       - "0.0.0.0/0"
       ports: # ports to s3 service
       - 443
+  certManager:
+    enabled: true
+    letsencrypt:
+      ips:
+        - "0.0.0.0/0"
+  ingressNginx:
+    enabled: true
+    ingressOverride:
+      enabled: true

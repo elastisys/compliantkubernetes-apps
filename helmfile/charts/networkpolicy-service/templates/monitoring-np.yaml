@@ -400,33 +400,4 @@ spec:
       ports:
         - protocol: TCP
           port: {{ .Values.global.scApiserver.port }}
----
-kind: NetworkPolicy
-apiVersion: networking.k8s.io/v1
-metadata:
-  name: allow-cert-manager-resolver
-  namespace: monitoring
-spec:
-  podSelector:
-    matchLabels:
-      acme.cert-manager.io/http01-solver: "true"
-  ingress:
-    - from:
-      {{- if .Values.global.ingressUsingHostNetwork }}
-        {{- range $ip := .Values.global.scNodes.ips }}
-        - ipBlock:
-            cidr: {{ $ip }}
-        {{- end }}
-      {{- else }}
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: ingress-nginx
-          podSelector:
-            matchLabels:
-              app.kubernetes.io/component: controller
-              app.kubernetes.io/instance: ingress-nginx
-      {{- end }}
-      ports:
-      - port: 8089
-        protocol: TCP
 {{- end }}

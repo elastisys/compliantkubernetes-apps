@@ -70,3 +70,9 @@ rcloneSync:
 
 s3Exporter:
   enabled: {{ and (eq .Values.objectStorage.type "s3") (and .Values.s3Exporter.enabled .Values.networkPolicies.s3Exporter.enabled) }}
+
+ingressNginx:
+  enabled: {{ .Values.networkPolicies.ingressNginx.enabled }}
+  ingressOverride:
+    enabled : {{ .Values.networkPolicies.ingressNginx.ingressOverride.enabled }}
+    ips: {{- toYaml .Values.networkPolicies.ingressNginx.ingressOverride.ips | nindent 4 }}

@@ -1082,7 +1082,6 @@ networkPolicies:
       # ip of all nodes in the cluster for internal communication
       ips:
         - set-me
-    externalLoadBalancer: false # only true if loadbalancer is not controlled by a kubernetes cloud controller
   harbor:
     enabled: true
     jobservice:
@@ -1142,3 +1141,16 @@ networkPolicies:
 
   s3Exporter:
     enabled: true
+
+  certManager:
+    namespaces:
+      - dex
+      - harbor
+      - monitoring
+      - opensearch-system
+      - thanos
+
+  ingressNginx:
+    ingressOverride:
+      ips:
+      - set-me-if-enabled

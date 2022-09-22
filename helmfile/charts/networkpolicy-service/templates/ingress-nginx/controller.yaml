@@ -1,0 +1,160 @@
+{{ if .Values.ingressNginx.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: controller
+  namespace: ingress-nginx
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: controller
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+      {{- if .Values.ingressNginx.ingressOverride.enabled }}
+        {{- range $IP := .Values.ingressNginx.ingressOverride.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      {{- else }}
+        {{- range $IP := .Values.global.scIngress.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      {{- end }}
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: kube-prometheus-stack-prometheus
+      ports:
+        - port: 10254
+    - from:
+        {{- range $IP := .Values.global.scApiserver.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: 8443 ## admission
+  egress:
+    - ports:
+      - port: 53
+        protocol: UDP
+    - to:
+      {{- if .Values.ingressNginx.ingressOverride.enabled }}
+        {{- range $IP := .Values.ingressNginx.ingressOverride.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      {{- else }}
+        {{- range $IP := .Values.global.scIngress.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      {{- end }}
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80
+    - to:
+        {{- range $IP := .Values.global.scApiserver.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.global.scApiserver.port }}
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: grafana
+      ports:
+        - port: 3000
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: opensearch-system
+          podSelector:
+            matchLabels:
+              app: opensearch-dashboards
+      ports:
+        - port: 5601
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: opensearch-system
+          podSelector:
+            matchLabels:
+              {{- if .Values.opensearch.client.enabled }}
+              app.kubernetes.io/component: opensearch-client
+              {{- else }}
+              app.kubernetes.io/component: opensearch-master
+              {{- end }}
+      ports:
+        - port: 9200
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: harbor
+          podSelector:
+            matchLabels:
+              component: core
+      ports:
+        - port: 8080
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: harbor
+          podSelector:
+            matchLabels:
+              component: portal
+      ports:
+        - port: 8080
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: dex
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: dex
+      ports:
+        - port: 5556
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: harbor
+          podSelector:
+            matchLabels:
+              component: notary-server
+      ports:
+        - port: 4443
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: thanos
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/component: receive-distributor
+      ports:
+        - port: 10902
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: default-backend
+      ports:
+        - port: 8080
+{{- end }}

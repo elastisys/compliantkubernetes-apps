@@ -625,6 +625,9 @@ networkPolicies:
       # ip(s) to wc loadbalancer if available, otherwise wc worker nodes
       ips:
         - set-me
+    # only true if loadbalancer is not controlled by a kubernetes cloud controller
+    externalLoadBalancer: false
+    ingressUsingHostNetwork: false
 
   kured:
     enabled: true
@@ -636,3 +639,15 @@ networkPolicies:
 
   velero:
     enabled: true
+
+  certManager:
+    enabled: true
+    # letsencrypt ip addresses
+    letsencrypt:
+      ips:
+        - set-me
+
+  ingressNginx:
+    enabled: true
+    ingressOverride:
+      enabled : false
