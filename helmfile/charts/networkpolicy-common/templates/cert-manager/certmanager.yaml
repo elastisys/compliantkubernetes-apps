@@ -1,0 +1,69 @@
+{{ if .Values.certManager.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cert-manager
+  namespace: cert-manager
+spec:
+  podSelector:
+    matchLabels:
+      app: cert-manager
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: kube-prometheus-stack-prometheus
+      ports:
+        - port: 9402 # promtheus metrics
+  egress:
+    - ports:
+      - port: 53
+        protocol: UDP
+    - to:
+        {{- range $IP := .Values.certManager.letsencrypt.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.certManager.letsencrypt.port }}
+    - to:
+        {{- range $IP := .Values.global.apiserver.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.global.apiserver.port }}
+    - to:
+      {{- if .Values.global.externalLoadBalancer }}
+        {{- range $IP := .Values.global.ingress.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      {{- else if .Values.global.ingressUsingHostNetwork }}
+        {{- range $IP := .Values.global.nodes.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      {{ else }}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/component: controller
+              app.kubernetes.io/instance: ingress-nginx
+      {{- end }}
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80
+{{- end }}

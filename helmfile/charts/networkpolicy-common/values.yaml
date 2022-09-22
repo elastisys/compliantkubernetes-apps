@@ -17,6 +17,8 @@ global:
       - 0.0.0.0/0
     ports:
       - 443
+  ingressUsingHostNetwork: false
+  externalLoadBalancer: false # not true if loadbalancer is controlled by a kubernetes cloud controller
 
   prometheusSelector:
     - namespaceSelector:
@@ -38,3 +40,12 @@ kured:
 
 velero:
   enabled: true
+
+certManager:
+  enabled: true
+  # letsencrypt ip addresses
+  namespaces: []
+  letsencrypt:
+    ips:
+    - "0.0.0.0/0"
+    port: 443

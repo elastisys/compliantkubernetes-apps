@@ -1,0 +1,95 @@
+{{ if .Values.ingressNginx.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: controller
+  namespace: ingress-nginx
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: controller
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+      {{- if .Values.ingressNginx.ingressOverride.enabled }}
+        {{- range $IP := .Values.ingressNginx.ingressOverride.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      {{- else }}
+        {{- range $IP := .Values.global.wcIngress.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      {{- end }}
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: kube-prometheus-stack-prometheus
+      ports:
+        - port: 10254
+    - from:
+        {{- range $IP := .Values.global.wcApiserver.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: 8443
+  egress:
+    - ports:
+        - port: 53
+          protocol: UDP
+    - to:
+      {{- if .Values.ingressNginx.ingressOverride.enabled }}
+        {{- range $IP := .Values.ingressNginx.ingressOverride.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      {{- else }}
+        {{- range $IP := .Values.global.wcIngress.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      {{- end }}
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80
+    - to:
+        {{- range $IP := .Values.global.wcApiserver.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.global.wcApiserver.port }}
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              component: kube-apiserver
+      ports:
+        - port: 3000
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: default-backend
+      ports:
+        - port: 8080
+    - to:
+        - namespaceSelector: {}
+{{- end }}

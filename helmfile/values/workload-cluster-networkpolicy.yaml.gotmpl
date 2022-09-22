@@ -4,16 +4,21 @@ global:
     port: {{- toYaml .Values.networkPolicies.global.wcApiserver.port | nindent 6 }}
   wcNodes:
     ips: {{- toYaml .Values.networkPolicies.global.wcNodes.ips | nindent 6 }}
+  wcIngress:
+    ips: {{- toYaml .Values.networkPolicies.global.wcIngress.ips | nindent 6 }}
   scIngress:
     ips: {{- toYaml .Values.networkPolicies.global.scIngress.ips | nindent 6 }}
   ingressUsingHostNetwork: {{ .Values.ingressNginx.controller.useHostPort }}
-
-certManager:
-  enabled: {{ .Values.networkPolicies.certManager.enabled }}
-  namespaces: {{ toYaml .Values.user.namespaces | nindent 2 }}
+  externalLoadBalancer: {{ .Values.networkPolicies.global.externalLoadBalancer }}
 
 monitoring:
   enabled: {{ .Values.networkPolicies.monitoring.enabled }}
 
 fluentd:
   enabled: {{ .Values.networkPolicies.fluentd.enabled }}
+
+ingressNginx:
+  enabled: {{ .Values.networkPolicies.ingressNginx.enabled }}
+  ingressOverride:
+    enabled : {{ .Values.networkPolicies.ingressNginx.ingressOverride.enabled }}
+    ips: {{- toYaml .Values.networkPolicies.ingressNginx.ingressOverride.ips | nindent 4 }}

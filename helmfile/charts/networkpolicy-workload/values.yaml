@@ -10,13 +10,20 @@ global:
     ips:
       - "0.0.0.0/0"
   ingressUsingHostNetwork: false
-
-certManager:
-  enabled: true
-  namespaces: []
+  wcIngress:
+    ips:
+      - "0.0.0.0/0" # ips of wc nodes or loadbalancer
+  externalLoadBalancer: false
 
 monitoring:
   enabled: true
 
 fluentd:
   enabled: true
+
+ingressNginx:
+  enabled: true
+  ingressOverride:
+    enabled : false
+    ips:
+     - set-me-if-enabled

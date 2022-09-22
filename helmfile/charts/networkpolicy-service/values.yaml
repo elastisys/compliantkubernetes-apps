@@ -94,6 +94,10 @@ monitoring:
         - 443
 opensearch:
   enabled: true
+  client:
+    enabled: false
+  data:
+    enabled: false
   plugins:
     ips:
       - "0.0.0.0/0"
@@ -112,3 +116,10 @@ rcloneSync:
 
 s3Exporter:
   enabled: true
+
+ingressNginx:
+  enabled: true
+  ingressOverride:
+    enabled : false
+    ips:
+     - set-me-if-enabled

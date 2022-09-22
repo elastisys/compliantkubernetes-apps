@@ -22,6 +22,8 @@ global:
   objectStorage:
     ips: {{- toYaml .Values.networkPolicies.global.objectStorage.ips | nindent 6 }}
     ports: {{- toYaml .Values.networkPolicies.global.objectStorage.ports | nindent 6 }}
+  externalLoadBalancer: {{ .Values.networkPolicies.global.externalLoadBalancer }}
+  ingressUsingHostNetwork: {{ .Values.ingressNginx.controller.useHostPort }}
 
 kured:
   enabled: {{ and .Values.kured.enabled .Values.networkPolicies.kured.enabled }}
@@ -32,3 +34,14 @@ kured:
 
 velero:
   enabled: {{ and .Values.velero.enabled .Values.networkPolicies.velero.enabled }}
+
+certManager:
+  enabled: {{ .Values.networkPolicies.certManager.enabled }}
+  namespaces:
+    {{- if eq .Environment.Name "workload_cluster" }}
+    {{- concat .Values.user.namespaces .Values.networkPolicies.certManager.namespaces | toYaml | nindent 4 }}
+    {{- else }}
+    {{- toYaml .Values.networkPolicies.certManager.namespaces | nindent 4 }}
+    {{- end }}
+  letsencrypt:
+    ips: {{- toYaml .Values.networkPolicies.certManager.letsencrypt.ips | nindent 6 }}
