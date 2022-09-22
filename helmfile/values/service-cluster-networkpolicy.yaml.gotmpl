@@ -2,6 +2,23 @@ additional:
 {{- if .Values.networkPolicies.additional }}
   {{ toYaml .Values.networkPolicies.additional | nindent 2 }}
 {{- end }}
+
+global:
+  scApiserver:
+    ips: {{- toYaml .Values.networkPolicies.global.scApiserver.ips | nindent 6 }}
+    port: {{ .Values.networkPolicies.global.scApiserver.port }}
+  scNodes:
+    ips: {{- toYaml .Values.networkPolicies.global.scNodes.ips | nindent 6 }}
+  scIngress:
+    ips: {{- toYaml .Values.networkPolicies.global.scIngress.ips | nindent 6 }}
+  wcIngress:
+    ips: {{- toYaml .Values.networkPolicies.global.wcIngress.ips | nindent 6 }}
+  objectStorage:
+    ips: {{- toYaml .Values.networkPolicies.global.objectStorage.ips | nindent 6 }}
+    ports: {{- toYaml .Values.networkPolicies.global.objectStorage.ports | nindent 6 }}
+  externalLoadBalancer: {{ .Values.networkPolicies.global.externalLoadBalancer }}
+  ingressUsingHostNetwork: {{ .Values.ingressNginx.controller.useHostPort }}
+
 harbor:
   enable: {{ .Values.networkPolicies.harbor.enable }}
   chartmuseum:
@@ -21,3 +38,17 @@ harbor:
     egressIPs: {{- toYaml .Values.networkPolicies.harbor.registry.egressIPs | nindent 6 }}
   trivy:
     egressIPs: {{- toYaml .Values.networkPolicies.harbor.trivy.egressIPs | nindent 6 }}
+
+monitoring:
+  enabled: {{ .Values.networkPolicies.monitoring.enabled }}
+  grafana:
+    externalDashboardProvider:
+      ips: {{- toYaml .Values.networkPolicies.monitoring.grafana.externalDashboardProvider.ips | nindent 8 }}
+      ports: {{- toYaml .Values.networkPolicies.monitoring.grafana.externalDashboardProvider.ports | nindent 8 }}
+  alertmanager:
+    alertReceivers:
+      ips: {{- toYaml .Values.networkPolicies.monitoring.alertmanager.alertReceivers.ips | nindent 8 }}
+      ports: {{- toYaml .Values.networkPolicies.monitoring.alertmanager.alertReceivers.ports | nindent 8 }}
+
+thanos:
+  enabled: {{ .Values.networkPolicies.thanos.enabled }}

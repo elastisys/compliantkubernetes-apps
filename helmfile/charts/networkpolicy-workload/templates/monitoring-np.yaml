@@ -1,0 +1,235 @@
+{{ if .Values.monitoring.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: node-exporter
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app: prometheus-node-exporter
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - port: 9100
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: blackbox-exporter
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: prometheus-blackbox-exporter
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - port: 9115
+  egress:
+    # probes in wc
+    - to:
+        - namespaceSelector: {}
+    # probes to pods with hostnetwork
+    - to:
+        {{- range $ip := .Values.global.wcNodes.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+    - ports:
+      - protocol: UDP
+        port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: kube-state-metrics
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: kube-state-metrics
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - port: 8080
+  egress:
+    - to:
+        {{- range $ip := .Values.global.wcApiserver.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.global.wcApiserver.port }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: prometheus-operator
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app: kube-prometheus-stack-operator
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - port: 10250
+  egress:
+    - to:
+        {{- range $ip := .Values.global.wcApiserver.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.global.wcApiserver.port }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: prometheus
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app: prometheus
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: prometheus-blackbox-exporter
+      ports:
+        - port: 9090
+  egress:
+    # metrics from pods in the cluster
+    - to:
+        - namespaceSelector: {}
+    - to:
+        {{- range $ip := .Values.global.wcApiserver.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.global.wcApiserver.port }}
+    # metrics from kubelet, calico and other host-network exporters
+    - to:
+        {{- range $ip := .Values.global.wcNodes.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+    # thanos
+    - to:
+        {{- range $ip := .Values.global.scIngress.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+      - protocol: TCP
+        port: 443
+    - ports:
+      - protocol: UDP
+        port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: prometheus-admission-create
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app: kube-prometheus-stack-admission-create
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - to:
+        {{- range $ip := .Values.global.wcApiserver.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.global.wcApiserver.port }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: prometheus-admission-patch
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app: kube-prometheus-stack-admission-patch
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - to:
+        {{- range $ip := .Values.global.wcApiserver.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.global.wcApiserver.port }}
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-cert-manager-resolver
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      acme.cert-manager.io/http01-solver: "true"
+  ingress:
+    - from:
+      {{- if .Values.global.ingressUsingHostNetwork }}
+        {{- range $ip := .Values.global.wcNodes.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      {{- else }}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/component: controller
+              app.kubernetes.io/instance: ingress-nginx
+      {{- end }}
+      ports:
+      - port: 8089
+        protocol: TCP
+{{- end }}

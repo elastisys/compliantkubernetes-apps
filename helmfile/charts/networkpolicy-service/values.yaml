@@ -14,6 +14,28 @@ additional: {}
 #         foo: bar
 #     ingress: {}
 #     egress: {}
+global:
+  scApiserver:
+    ips:
+      - "0.0.0.0/0"
+    port: 6443
+  scNodes:
+    ips:
+      - "0.0.0.0/0"
+  scIngress:
+    ips:
+      - "0.0.0.0/0"
+  wcIngress:
+    ips:
+      - "0.0.0.0/0"
+  objectStorage:
+    ips:
+      - "0.0.0.0/0"
+    ports:
+      - 443
+  ingressUsingHostNetwork: false
+  externalLoadBalancer: false # not true if loadbalancer is controlled by a kubernetes cloud controller
+
 harbor:
   enable: true
   chartmuseum:
@@ -50,3 +72,18 @@ harbor:
   trivy:
     egressIPs:
       - "0.0.0.0/0" # trivy vulnerability database
+
+monitoring:
+  enabled: true
+  grafana:
+    externalDashboardProvider: # loading dashboards from grafana website
+      ips:
+        - "0.0.0.0/0"
+      ports:
+        - 443
+  alertmanager:
+    alertReceivers: # alert receiver, e.g. slack or opsgenie
+      ips:
+        - "0.0.0.0/0"
+      ports:
+        - 443

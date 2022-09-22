@@ -1,3 +1,19 @@
-cert-manager:
-  enabled: false
-namespaces: []
+global:
+  wcApiserver:
+    ips:
+      - "0.0.0.0/0"
+    port: 6443
+  wcNodes:
+    ips:
+      - "0.0.0.0/0"
+  scIngress:
+    ips:
+      - "0.0.0.0/0"
+  ingressUsingHostNetwork: false
+
+certManager:
+  enabled: true
+  namespaces: []
+
+monitoring:
+  enabled: true

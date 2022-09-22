@@ -258,8 +258,8 @@ grafana:
       client_secret: {{ .Values.grafana.opsClientSecret }}
       scopes: {{ .Values.prometheus.grafana.oidc.scopes }}
       auth_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}/auth
-      token_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}/token
-      api_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}/api
+      token_url: http://dex.dex.svc.cluster.local:5556/token
+      api_url: http://dex.dex.svc.cluster.local:5556/api
       allowed_domains: {{ join " " .Values.prometheus.grafana.oidc.allowedDomains }}
       allow_sign_up: true
       tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}
@@ -267,6 +267,9 @@ grafana:
       {{- end }}
     users:
       viewers_can_edit: {{ .Values.prometheus.grafana.viewersCanEdit }}
+    analytics:
+      reporting_enabled: false
+      check_for_updates: false
 
   resources: {{- toYaml .Values.prometheus.grafana.resources | nindent 4  }}
   tolerations: {{- toYaml .Values.prometheus.grafana.tolerations | nindent 4  }}

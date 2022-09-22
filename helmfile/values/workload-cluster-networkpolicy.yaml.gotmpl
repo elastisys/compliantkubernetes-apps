@@ -1,1 +1,16 @@
-namespaces: {{ toYaml .Values.user.namespaces | nindent 2 }}
+global:
+  wcApiserver:
+    ips: {{- toYaml .Values.networkPolicies.global.wcApiserver.ips | nindent 6 }}
+    port: {{- toYaml .Values.networkPolicies.global.wcApiserver.port | nindent 6 }}
+  wcNodes:
+    ips: {{- toYaml .Values.networkPolicies.global.wcNodes.ips | nindent 6 }}
+  scIngress:
+    ips: {{- toYaml .Values.networkPolicies.global.scIngress.ips | nindent 6 }}
+  ingressUsingHostNetwork: {{ .Values.ingressNginx.controller.useHostPort }}
+
+certManager:
+  enabled: {{ .Values.networkPolicies.certManager.enabled }}
+  namespaces: {{ toYaml .Values.user.namespaces | nindent 2 }}
+
+monitoring:
+  enabled: {{ .Values.networkPolicies.monitoring.enabled }}
