@@ -43,13 +43,13 @@ deployments=(
 )
 if "${enable_harbor}"; then
     deployments+=(
-        "harbor harbor-harbor-chartmuseum"
-        "harbor harbor-harbor-core"
-        "harbor harbor-harbor-jobservice"
-        "harbor harbor-harbor-notary-server"
-        "harbor harbor-harbor-notary-signer"
-        "harbor harbor-harbor-portal"
-        "harbor harbor-harbor-registry"
+        "harbor harbor-chartmuseum"
+        "harbor harbor-core"
+        "harbor harbor-jobservice"
+        "harbor harbor-notary-server"
+        "harbor harbor-notary-signer"
+        "harbor harbor-portal"
+        "harbor harbor-registry"
     )
 fi
 if "${enable_user_grafana}"; then
@@ -136,9 +136,9 @@ if "${enable_os_client_sts}"; then
 fi
 if "${enable_harbor}"; then
     statefulsets+=(
-        "harbor harbor-harbor-database"
-        "harbor harbor-harbor-redis"
-        "harbor harbor-harbor-trivy"
+        "harbor harbor-database"
+        "harbor harbor-redis"
+        "harbor harbor-trivy"
     )
 fi
 if "${enable_fluentd}"; then
