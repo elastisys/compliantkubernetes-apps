@@ -1061,6 +1061,18 @@ networkPolicies:
 #     ingress: {}
 #     egress: {}
 # ---
+  global:
+    scApiserver:
+      ips: # usualy private ip of control-plane nodes
+        - set-me
+      port: 6443
+    scNodes:
+      ips: # ip of all nodes in the cluster for internal communication
+        - set-me
+    wcIngress:
+      ips: # ip(s) to wc loadbalancer if available, otherwise wc worker nodes
+        - set-me
+    externalLoadBalancer: false # only true if loadbalancer is not controlled by a kubernetes cloud controller
   harbor:
     enable: true
     chartmuseum:
@@ -1092,3 +1104,19 @@ networkPolicies:
       # IP to trivy vulnerability database
       egressIPs:
         - "0.0.0.0/0"
+  monitoring:
+    enabled: true
+    grafana:
+      externalDashboardProvider: # loading dashboards from grafana website
+        ips:
+          - set-me
+        ports:
+          - 443
+    alertmanager:
+      alertReceivers: # alert receiver, e.g. slack or opsgenie
+        ips:
+          - set-me
+        ports:
+          - 443
+  thanos:
+    enabled: true

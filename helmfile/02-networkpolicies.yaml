@@ -1,0 +1,58 @@
+# Defult settings to use with helm.
+helmDefaults:
+  timeout: 600
+  createNamespace: false
+  skipDeps: true
+
+# Environments
+environments:
+  workload_cluster:
+    values:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/wc-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/wc-config.yaml"
+    secrets:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
+  service_cluster:
+    values:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/sc-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/sc-config.yaml"
+    secrets:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
+
+# The desired state of Helm releases.
+releases:
+
+# Service cluster releases
+{{ if eq .Environment.Name "service_cluster" }}
+
+  # Service cluster NetworkPolicy
+- name: service-cluster-np
+  namespace: kube-system
+  labels:
+    app: service-cluster-np
+  chart: ./charts/networkpolicy-service
+  version: 0.1.0
+  values:
+  - values/service-cluster-networkpolicy.yaml.gotmpl
+
+# End of system services releases
+{{ end }}
+
+# Workload cluster releases
+{{ if eq .Environment.Name "workload_cluster" }}
+
+# Workload cluster NetworkPolicy
+- name: workload-cluster-np
+  namespace: kube-system
+  labels:
+    app: workload-cluster-np
+  chart: ./charts/networkpolicy-workload
+  version: 0.1.0
+  values:
+  - values/workload-cluster-networkpolicy.yaml.gotmpl
+
+{{ end }}

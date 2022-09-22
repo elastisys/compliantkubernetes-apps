@@ -603,3 +603,13 @@ networkPolicies:
   allowedNameSpaces: []
   additionalEgressPolicies: []
   additionalIngressPolicies: []
+
+  global:
+    objectStorage:
+      ips: # ips to s3 service
+      - set-me
+      ports: # ports to s3 service
+      - set-me
+    scIngress:
+      ips: # ip(s) to sc loadbalancer if available, otherwise sc worker nodes
+        - set-me

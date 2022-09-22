@@ -648,17 +648,6 @@ releases:
   values:
   - values/rclone-sync.yaml.gotmpl
 
-  # Service cluster NetworkPolicy
-- name: service-cluster-np
-  namespace: kube-system
-  labels:
-    app: service-cluster-np
-  chart: ./charts/networkpolicy-service
-  version: 0.1.0
-  missingFileHandler: Error
-  values:
-  - values/service-cluster-networkpolicy.yaml.gotmpl
-
 # End of system services releases
 {{ end }}
 
@@ -760,17 +749,6 @@ releases:
   values:
   - values/prometheus-user-alerts-wc.yaml.gotmpl
 
-# User RBAC
-- name: user-rbac
-  namespace: kube-system
-  labels:
-    app: user-rbac
-  chart: ./charts/user-rbac
-  version: 0.1.0
-  missingFileHandler: Error
-  values:
-  - values/user-rbac.yaml.gotmpl
-
 # kube apiserver metrics ingress
 - name: kubeapi-metrics
   namespace: kube-system
@@ -781,18 +759,5 @@ releases:
   missingFileHandler: Error
   values:
   - values/kubeapi-metrics.yaml.gotmpl
-
-# Workload cluster NetworkPolicy
-- name: workload-cluster-np
-  namespace: kube-system
-  labels:
-    app: workload-cluster-np
-  chart: ./charts/networkpolicy-workload
-  version: 0.1.0
-  missingFileHandler: Error
-  needs:
-  - kube-system/user-rbac
-  values:
-  - values/workload-cluster-networkpolicy.yaml.gotmpl
 
 {{ end }}

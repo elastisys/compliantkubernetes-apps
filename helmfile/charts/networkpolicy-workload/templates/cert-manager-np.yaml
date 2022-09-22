@@ -1,4 +1,5 @@
-{{- range $namespace := .Values.namespaces }}
+{{ if .Values.certManager.enabled }}
+{{- range $namespace := .Values.certManager.namespaces }}
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
@@ -13,4 +14,5 @@ spec:
       - port: 8089
         protocol: TCP
 ---
+{{- end }}
 {{- end }}
