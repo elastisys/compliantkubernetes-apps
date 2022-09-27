@@ -14,6 +14,11 @@ global:
     ips:
       - "0.0.0.0/0" # ips of wc nodes or loadbalancer
   externalLoadBalancer: false
+  objectStorage:
+    ips:
+      - "0.0.0.0/0"
+    ports:
+      - 443
 
 monitoring:
   enabled: true
@@ -27,3 +32,17 @@ ingressNginx:
     enabled : false
     ips:
      - set-me-if-enabled
+gatekeeper:
+  enabled: true
+
+falco:
+  enabled: true
+
+alertmanager:
+  enabled: true
+  # alert receiver, e.g. slack or opsgenie
+  alertReceivers:
+    ips:
+      - "0.0.0.0/0"
+    ports:
+      - 443

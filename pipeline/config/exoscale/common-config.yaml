@@ -42,7 +42,15 @@ networkPolicies:
         - 0.0.0.0/0
     externalLoadBalancer: true
     ingressUsingHostNetwork: true
+    trivy:
+      ips:
+        - 0.0.0.0/0
+      port: 443
   certManager:
     letsencrypt:
+      ips:
+        - 0.0.0.0/0
+  alertmanager:
+    alertReceivers:
       ips:
         - 0.0.0.0/0

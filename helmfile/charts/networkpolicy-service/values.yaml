@@ -81,17 +81,20 @@ harbor:
 monitoring:
   enabled: true
   grafana:
-    externalDashboardProvider: # loading dashboards from grafana website
+    # loading dashboards from grafana website
+    externalDashboardProvider:
       ips:
         - "0.0.0.0/0"
       ports:
         - 443
   alertmanager:
-    alertReceivers: # alert receiver, e.g. slack or opsgenie
+    # alert receiver, e.g. slack or opsgenie
+    alertReceivers:
       ips:
         - "0.0.0.0/0"
       ports:
         - 443
+
 opensearch:
   enabled: true
   client:
@@ -123,3 +126,11 @@ ingressNginx:
     enabled : false
     ips:
      - set-me-if-enabled
+
+dex:
+  enabled: true
+  ips:
+    - "0.0.0.0/0"
+
+falco:
+  enabled: true

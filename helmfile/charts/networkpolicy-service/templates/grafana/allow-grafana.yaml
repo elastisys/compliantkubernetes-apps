@@ -1,0 +1,88 @@
+{{ if .Values.monitoring.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: grafana
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+      {{- if .Values.global.ingressUsingHostNetwork }}
+        {{- range $ip := .Values.global.scNodes.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      {{- else }}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/component: controller
+              app.kubernetes.io/instance: ingress-nginx
+      {{- end }}
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - port: 3000
+          protocol: TCP
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+        - podSelector:
+            matchLabels:
+              app: grafana-label-enforcer
+      ports:
+        - port: 9090
+          protocol: TCP
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: thanos
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/component: query-frontend
+      ports:
+        - port: 10902
+          protocol: TCP
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: dex
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: dex
+      ports:
+        - port: 5556
+          protocol: TCP
+    - to:
+        {{- range $ip := .Values.global.scApiserver.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.global.scApiserver.port }}
+    # loading dashboards from grafana website
+    - to:
+        {{- range $ip := .Values.monitoring.grafana.externalDashboardProvider.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        {{- range $port := .Values.monitoring.grafana.externalDashboardProvider.ports }}
+        - port: {{ $port }}
+        {{- end }}
+    - ports:
+      - protocol: UDP
+        port: 53
+{{- end }}

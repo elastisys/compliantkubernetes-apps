@@ -57,11 +57,11 @@ networkPolicies:
       externalDashboardProvider:
         ips:
           - 0.0.0.0/0
-    alertmanager:
-      alertReceivers:
-        ips:
-          - 0.0.0.0/0
   opensearch:
     plugins:
+      ips:
+        - 0.0.0.0/0
+  dex:
+    connectors:
       ips:
         - 0.0.0.0/0

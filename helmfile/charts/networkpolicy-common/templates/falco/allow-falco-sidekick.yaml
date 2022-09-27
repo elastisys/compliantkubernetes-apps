@@ -1,0 +1,21 @@
+{{ if .Values.falco.enabled }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-falco-sidekick
+  namespace: falco
+spec:
+  policyTypes:
+    - Ingress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: falco
+      app.kubernetes.io/name: falcosidekick
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            app: falco
+      ports:
+        - port: 2801
+{{- end }}

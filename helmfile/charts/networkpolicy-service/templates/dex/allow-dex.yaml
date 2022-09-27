@@ -1,0 +1,80 @@
+{{ if .Values.dex.enabled }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-dex
+  namespace: dex
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: dex
+  ingress:
+    - from:
+      {{- if .Values.global.ingressUsingHostNetwork }}
+        {{- range $ip := .Values.global.scNodes.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      {{- else }}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: controller
+              app.kubernetes.io/instance: ingress-nginx
+      {{- end }}
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: user-grafana
+          namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: grafana
+          namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: opensearch-master
+          namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: opensearch-system
+      ports:
+        - port: 5556
+    - from:
+      - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: kube-prometheus-stack-prometheus
+              app.kubernetes.io/name: prometheus
+        namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 5558
+  egress:
+    - to:
+      {{- range $ip := .Values.dex.connectors.ips }}
+      - ipBlock:
+          cidr: {{ $ip }}
+      {{- end }}
+      ports:
+        {{- range $port := .Values.dex.connectors.ports }}
+        - port: {{ $port }}
+        {{- end }}
+    - to:
+        {{- range $IP := .Values.global.scApiserver.ips }}
+      - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      ports:
+        - port: {{ .Values.global.scApiserver.port }}
+    - ports:
+      - protocol: UDP
+        port: 53
+{{- end }}

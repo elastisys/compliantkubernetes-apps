@@ -1,0 +1,31 @@
+{{ if .Values.falco.enabled }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-falco
+  namespace: falco
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      app: falco
+  egress:
+    - to:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/instance: falco
+            app.kubernetes.io/name: falcosidekick
+      ports:
+        - port: 2801
+    - to:
+        {{- range $IP := .Values.global.apiserver.ips }}
+      - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      ports:
+        - port: {{ .Values.global.apiserver.port }}
+    - ports:
+        - port: 53
+          protocol: UDP
+{{- end }}

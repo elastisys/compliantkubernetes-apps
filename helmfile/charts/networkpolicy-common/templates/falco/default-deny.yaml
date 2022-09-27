@@ -1,0 +1,12 @@
+{{ if .Values.falco.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: falco-default-deny-all
+  namespace: falco
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+{{- end }}

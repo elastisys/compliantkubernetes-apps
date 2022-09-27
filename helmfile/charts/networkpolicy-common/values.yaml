@@ -19,6 +19,10 @@ global:
       - 443
   ingressUsingHostNetwork: false
   externalLoadBalancer: false # not true if loadbalancer is controlled by a kubernetes cloud controller
+  trivy:
+    # trivy vulnerability database
+    ips:
+      - "0.0.0.0/0"
 
   prometheusSelector:
     - namespaceSelector:
@@ -41,6 +45,9 @@ kured:
 velero:
   enabled: true
 
+falco:
+  enabled: true
+
 certManager:
   enabled: true
   # letsencrypt ip addresses
@@ -49,3 +56,6 @@ certManager:
     ips:
     - "0.0.0.0/0"
     port: 443
+
+monitoring:
+  enabled: true
