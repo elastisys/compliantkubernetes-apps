@@ -1,0 +1,21 @@
+{{ if .Values.monitoring.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: node-exporter
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app: prometheus-node-exporter
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - port: 9100
+{{- end }}

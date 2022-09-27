@@ -51,8 +51,8 @@ monitoring:
       ports: {{- toYaml .Values.networkPolicies.monitoring.grafana.externalDashboardProvider.ports | nindent 8 }}
   alertmanager:
     alertReceivers:
-      ips: {{- toYaml .Values.networkPolicies.monitoring.alertmanager.alertReceivers.ips | nindent 8 }}
-      ports: {{- toYaml .Values.networkPolicies.monitoring.alertmanager.alertReceivers.ports | nindent 8 }}
+      ips: {{- toYaml .Values.networkPolicies.alertmanager.alertReceivers.ips | nindent 8 }}
+      ports: {{- toYaml .Values.networkPolicies.alertmanager.alertReceivers.ports | nindent 8 }}
 
 thanos:
   enabled: {{ .Values.networkPolicies.thanos.enabled }}
@@ -84,3 +84,11 @@ ingressNginx:
   ingressOverride:
     enabled : {{ .Values.networkPolicies.ingressNginx.ingressOverride.enabled }}
     ips: {{- toYaml .Values.networkPolicies.ingressNginx.ingressOverride.ips | nindent 4 }}
+dex:
+  enabled: {{ .Values.networkPolicies.dex.enabled }}
+  connectors:
+    ips: {{- toYaml .Values.networkPolicies.dex.connectors.ips | nindent 6 }}
+    ports: {{- toYaml .Values.networkPolicies.dex.connectors.ports | nindent 6 }}
+
+falco:
+  enabled: {{ and .Values.falco.enabled .Values.networkPolicies.falco.enabled }}

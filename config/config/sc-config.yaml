@@ -1129,13 +1129,8 @@ networkPolicies:
   monitoring:
     enabled: true
     grafana:
-      externalDashboardProvider: # loading dashboards from grafana website
-        ips:
-          - set-me
-        ports:
-          - 443
-    alertmanager:
-      alertReceivers: # alert receiver, e.g. slack or opsgenie
+      # loading dashboards from grafana website
+      externalDashboardProvider:
         ips:
           - set-me
         ports:
@@ -1177,3 +1172,11 @@ networkPolicies:
     ingressOverride:
       ips:
       - set-me-if-enabled
+  dex:
+    enabled: true
+    # Ip to connector, e.g. Google, LDAP, ...
+    connectors:
+      ips:
+        - "set-me"
+      ports:
+        - 443

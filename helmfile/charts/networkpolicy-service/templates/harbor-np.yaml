@@ -130,6 +130,12 @@ spec:
     - to:
         - podSelector:
             matchLabels:
+              component: portal
+      ports:
+        - port: 8080
+    - to:
+        - podSelector:
+            matchLabels:
               component: registry
       ports:
         - port: 5000
@@ -212,6 +218,12 @@ spec:
               component: notary-server
       ports:
         - port: 4443
+    - to:
+        - podSelector:
+            matchLabels:
+              component: chartmuseum
+      ports:
+        - port: 9999
     - to:
       - podSelector:
           matchLabels:
@@ -510,6 +522,9 @@ spec:
       component: redis
   ingress:
     - from:
+        - podSelector:
+            matchLabels:
+              component: chartmuseum
         - podSelector:
             matchLabels:
               component: core

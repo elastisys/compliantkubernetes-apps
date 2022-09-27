@@ -1,0 +1,48 @@
+{{ if .Values.thanos.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: thanos-query
+  namespace: thanos
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: query
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: query-frontend
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app: prometheus
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: prometheus-blackbox-exporter
+      ports:
+        - port: 10902
+          protocol: TCP
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: receive
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: storegateway
+      ports:
+        - port: 10901
+          protocol: TCP
+    - ports:
+      - protocol: UDP
+        port: 53
+{{- end }}

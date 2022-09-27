@@ -69,6 +69,11 @@
 - Added support for running Thanos on Swift
 - Added RBAC for admin users to view Gatekeeper constraints
 - A helm chart `hnc/config-and-crds` for deploying HNC CRDs and HNC config
+- Network policies for user alertmanager
+- Network policies for falco
+- Network policies for dex
+- Network policies for starboard
+- Network policies for gatekeeper
 
 ### Removed
 

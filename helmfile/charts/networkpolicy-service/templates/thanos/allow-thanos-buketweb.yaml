@@ -1,0 +1,38 @@
+{{ if .Values.thanos.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: thanos-bucketweb
+  namespace: thanos
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: bucketweb
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - port: 8080
+          protocol: TCP
+  egress:
+    - to:
+        {{- range $ip := .Values.global.objectStorage.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        {{- range $port := .Values.global.objectStorage.ports }}
+        - port: {{ $port }}
+        {{- end }}
+    - ports:
+      - protocol: UDP
+        port: 53
+{{- end }}

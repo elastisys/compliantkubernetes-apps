@@ -616,6 +616,10 @@ networkPolicies:
     # only true if loadbalancer is not controlled by a kubernetes cloud controller
     externalLoadBalancer: false
     ingressUsingHostNetwork: false
+    trivy:
+      ips:
+        - set-me
+      port: 443
 
   kured:
     enabled: true
@@ -639,3 +643,13 @@ networkPolicies:
     enabled: true
     ingressOverride:
       enabled : false
+  falco:
+    enabled: true
+
+  alertmanager:
+    # alert receiver, e.g. slack or opsgenie
+    alertReceivers:
+      ips:
+        - set-me
+      ports:
+        - 443

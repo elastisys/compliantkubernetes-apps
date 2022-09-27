@@ -22,3 +22,14 @@ ingressNginx:
   ingressOverride:
     enabled : {{ .Values.networkPolicies.ingressNginx.ingressOverride.enabled }}
     ips: {{- toYaml .Values.networkPolicies.ingressNginx.ingressOverride.ips | nindent 4 }}
+gatekeeper:
+  enabled: {{ and .Values.opa.enabled .Values.networkPolicies.gatekeeper.enabled }}
+
+falco:
+  enabled: {{ and .Values.falco.enabled .Values.networkPolicies.falco.enabled }}
+
+alertmanager:
+  enabled: {{ and .Values.user.alertmanager.enabled .Values.networkPolicies.alertmanager.enabled }}
+  alertReceivers:
+    ips: {{- toYaml .Values.networkPolicies.alertmanager.alertReceivers.ips | nindent 6 }}
+    ports: {{- toYaml .Values.networkPolicies.alertmanager.alertReceivers.ports | nindent 6 }}
