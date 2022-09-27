@@ -1,0 +1,64 @@
+{{ if .Values.dex.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dex-default-deny-all
+  namespace: dex
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-dex
+  namespace: dex
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: dex
+  ingress:
+    - from:
+    {{- if .Values.global.ingressUsingHostNetwork }}
+      {{- range $ip := .Values.global.scNodes.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+      {{- end }}
+    {{- else }}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: controller
+              app.kubernetes.io/instance: ingress-nginx
+    {{- end }}
+      ports:
+        - port: 5556
+    - from:
+      - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: kube-prometheus-stack-prometheus
+              app.kubernetes.io/name: prometheus
+        namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 5558
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+    - to:
+        {{- range $IP := .Values.global.apiserver.ips }}
+      - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      ports:
+        - port: {{ .Values.global.apiserver.port }}
+{{- end }}

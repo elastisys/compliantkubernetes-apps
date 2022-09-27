@@ -258,6 +258,8 @@ releases:
   wait: true
   values:
   - values/dex.yaml.gotmpl
+  needs:
+	- kube-system/service-cluster-np
 
 - name: sc-servicemonitor
   namespace: monitoring
