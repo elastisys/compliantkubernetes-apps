@@ -15,7 +15,16 @@ additional: {}
 #     ingress: {}
 #     egress: {}
 global:
+<<<<<<< HEAD
   scApiserver:
+=======
+  externalLoadBalancer:
+    enabled: false
+    ips:
+      - "0.0.0.0/0"
+  ingressUsingHostNetwork: false
+  apiserver:
+>>>>>>> 2a7f892 (apps sc: fix dex)
     ips:
       - "0.0.0.0/0"
     port: 6443

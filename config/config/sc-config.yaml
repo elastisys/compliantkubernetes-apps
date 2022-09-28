@@ -1061,15 +1061,15 @@ networkPolicies:
 #     ingress: {}
 #     egress: {}
 # ---
-<<<<<<< HEAD
   global:
     scApiserver:
-=======
-<<<<<<< HEAD
-=======
   global:
+    externalLoadBalancer:
+      enabled: false
+      ips:
+        - set-me
+    ingressUsingHostNetwork: false
     apiserver:
->>>>>>> f09041f (apps sc: starboard and exporters network policies)
       ips: # usualy private ip of control-plane nodes
         - set-me
       port: 6443
@@ -1079,9 +1079,7 @@ networkPolicies:
     wcIngress:
       ips: # ip(s) to wc loadbalancer if available, otherwise wc worker nodes
         - set-me
-<<<<<<< HEAD
     externalLoadBalancer: false # only true if loadbalancer is not controlled by a kubernetes cloud controller
-=======
     objectStorage:
       ips: # ips to s3 service
       - set-me
@@ -1090,8 +1088,6 @@ networkPolicies:
     trivy:
       ips:
         - set-me
->>>>>>> 15a0a82 (apps sc: starboard and exporters network policies)
->>>>>>> f09041f (apps sc: starboard and exporters network policies)
   harbor:
     enable: true
     chartmuseum:
