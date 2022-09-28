@@ -35,6 +35,9 @@ global:
       - 443
   ingressUsingHostNetwork: false
   externalLoadBalancer: false # not true if loadbalancer is controlled by a kubernetes cloud controller
+  trivy:
+    ips:
+      - "0.0.0.0/0" # trivy vulnerability database
 
 harbor:
   enable: true

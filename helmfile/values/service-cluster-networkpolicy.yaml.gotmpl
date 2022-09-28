@@ -18,6 +18,8 @@ global:
     ports: {{- toYaml .Values.networkPolicies.global.objectStorage.ports | nindent 6 }}
   externalLoadBalancer: {{ .Values.networkPolicies.global.externalLoadBalancer }}
   ingressUsingHostNetwork: {{ .Values.ingressNginx.controller.useHostPort }}
+  trivy:
+    ips: {{- toYaml .Values.networkPolicies.global.trivy.ips | nindent 6 }}
 
 harbor:
   enable: {{ .Values.networkPolicies.harbor.enable }}
