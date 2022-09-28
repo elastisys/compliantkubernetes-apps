@@ -6,6 +6,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "velero.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   {{- with .Values.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -108,8 +109,14 @@ spec:
             {{- with .clientBurst }}
             - --client-burst={{ . }}
             {{- end }}
+            {{- with .clientPageSize }}
+            - --client-page-size={{ . }}
+            {{- end }}
             {{- with .disableControllers }}
             - --disable-controllers={{ . }}
+            {{- end }}
+            {{- with .storeValidationFrequency }}
+            - --store-validation-frequency={{ . }}
             {{- end }}
           {{- end }}
           {{- with .Values.resources }}
@@ -169,7 +176,7 @@ spec:
           {{- with .Values.configuration.extraEnvVars }}
           {{- range $key, $value := . }}
             - name: {{ default "none" $key }}
-              value: {{ default "none" $value }}
+              value: {{ default "none" $value | quote }}
           {{- end }}
           {{- end }}
           {{- with .Values.credentials.extraEnvVars }}
@@ -180,6 +187,9 @@ spec:
                   name: {{ include "velero.secretName" $ }}
                   key: {{ default "none" $key }}
           {{- end }}
+          {{- end }}
+          {{- if .Values.lifecycle }}
+          lifecycle: {{ toYaml .Values.lifecycle | nindent 12 }}
           {{- end }}
       dnsPolicy: {{ .Values.dnsPolicy }}
 {{- if .Values.initContainers }}
@@ -213,6 +223,10 @@ spec:
     {{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.dnsConfig }}
+      dnsConfig:
         {{- toYaml . | nindent 8 }}
     {{- end }}
     {{- with .Values.tolerations }}
