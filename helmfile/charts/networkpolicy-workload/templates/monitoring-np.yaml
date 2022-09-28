@@ -2,6 +2,17 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
+  name: monitoring-default-deny-all
+  namespace: monitoring
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
   name: node-exporter
   namespace: monitoring
 spec:
@@ -232,4 +243,152 @@ spec:
       ports:
       - port: 8089
         protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: starboard-operator
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: starboard-operator
+      app.kubernetes.io/name: starboard-operator
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress: []
+  egress:
+    - to:
+        {{- range $IP := .Values.global.apiserver.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.global.apiserver.port }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: vulnerability-exporter-metrics
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app: vulnerability-exporter
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - port: 9100
+  egress:
+    - to:
+        {{- range $IP := .Values.global.apiserver.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.global.apiserver.port }}
+    - ports:
+      - protocol: UDP
+        port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ciskubebench-exporter-metrics
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app: ciskubebench-exporter
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - port: 9100
+  egress:
+    - to:
+        {{- range $IP := .Values.global.apiserver.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.global.apiserver.port }}
+    - ports:
+      - protocol: UDP
+        port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: vulnerability-report-scanner
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      vulnerabilityReport.scanner: Trivy
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress: []
+  egress:
+    - to:
+{{- range $IP := .Values.global.trivy.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+{{- end }}
+      ports:
+        - protocol: TCP
+          port: 443
+    - ports:
+      - protocol: UDP
+        port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: s3-exporter
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: s3-exporter
+      app.kubernetes.io/name: s3-exporter
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - port: 9340
+  egress:
+    - to:
+        {{- range $IP := .Values.global.objectStorage.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      ports:
+        {{- range $PORT := .Values.global.objectStorage.ports }}
+        - port: {{ $PORT }}
+        {{- end }}
+    - ports:
+      - protocol: UDP
+        port: 53
 {{- end }}

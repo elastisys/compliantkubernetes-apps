@@ -10,6 +10,14 @@ global:
     ips:
       - "0.0.0.0/0"
   ingressUsingHostNetwork: false
+  objectStorage:
+    ips:
+      - "0.0.0.0/0"
+    ports:
+      - 443
+  trivy:
+    ips:
+      - "0.0.0.0/0" # trivy vulnerability database
 
 certManager:
   enabled: true
