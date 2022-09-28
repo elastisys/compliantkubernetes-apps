@@ -74,7 +74,7 @@ releases:
   labels:
     app: velero
   chart: ./upstream/velero
-  version: 2.27.3
+  version: 2.31.8
   installed: {{ .Values.velero.enabled }}
   values:
 {{ if eq .Environment.Name "service_cluster" }}
