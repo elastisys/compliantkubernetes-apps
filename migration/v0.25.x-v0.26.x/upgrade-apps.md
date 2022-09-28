@@ -1,4 +1,4 @@
-# Upgrade v0.24.x to v0.25.x
+# Upgrade v0.25.x to v0.26.x
 
 ## Steps
 
@@ -34,12 +34,28 @@
     ./migration/v0.25.x-v0.26.x/add-support-message.sh
     ```
 
-1. *Optional:* You can remove the Opensearch role mapping `readall_and_monitor` from `${CK8S_CONFIG_PATH}/sc.config.yaml` if you aren't using it in any meaningful way
+1. *Optional:* You can remove the Opensearch role mapping `readall_and_monitor` from `${CK8S_CONFIG_PATH}/sc-config.yaml` if you aren't using it in any meaningful way
 
 1. Apply `starboard-operator` to temporarly remove the starboard psp
 
     ```bash
     bin/ck8s ops helmfile {sc|wc} -l app=starboard-operator apply
+    ```
+
+1. *Optional:* You can enable kured reboot slack notifications:
+
+    a. Go to [Manage Slack Apps](https://api.slack.com/apps), `Install App` tab and copy the `Bot User OAuth Token` to `${CK8S_CONFIG_PATH}/secrets.yaml` file. You may need to ask your Administrator to add you as a collaborator:
+    ```
+    kured:
+      slack:
+        botToken: abcxyz-...
+    ```
+    b. Enable the slack notification and add the channel in `${CK8S_CONFIG_PATH}/common-config.yaml`:
+    ```
+    notification:
+      slack:
+        enabled: true
+        channel: kured-notification
     ```
 
 1. Upgrade applications:

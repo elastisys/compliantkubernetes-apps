@@ -44,8 +44,7 @@ releases:
     app: kured
   chart: ./charts/kured-secret
   version: 0.1.0
-  missingFileHandler: Error
-  installed: {{ .Values.kured.enabled }}
+  installed: {{ and .Values.kured.enabled .Values.kured.notification.slack.enabled }}
   values:
   - values/kured.yaml.gotmpl
 
