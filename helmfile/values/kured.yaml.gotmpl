@@ -29,7 +29,9 @@ extraEnvVars:
 
 dsAnnotations: {{- toYaml .Values.kured.dsAnnotations | nindent 2 }}
 
+{{- if .Values.kured.notification.slack.enabled }}
 slack:
   enabled: {{ .Values.kured.notification.slack.enabled }}
   channel: {{ .Values.kured.notification.slack.channel }}
   botToken: {{ .Values.kured.slack.botToken }}
+{{- end }}
