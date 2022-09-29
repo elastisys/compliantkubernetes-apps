@@ -18,6 +18,7 @@
 - Harbor backup is now pointed to the correct internal service to make backups from
 - Bumped backup-postgres image to use tag `1.2.0`, which includes newer versions of the postgresql client
 - Fixed Test User RBAC
+- Fixed the shifted comment after running init
 
 ### Added
 

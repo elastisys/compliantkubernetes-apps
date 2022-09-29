@@ -357,9 +357,8 @@ update_config() {
     else
         preamble="# Changes made here will override the default values as well as the common config for this cluster."
     fi
-    preamble="${preamble}
-    # See the default configuration under \"defaults/\" to see available and suggested options."
-    echo "${preamble}" | cat - "${new_config}" > "${override_config}"
+    preamble="${preamble}\n# See the default configuration under \"defaults/\" to see available and suggested options."
+    echo -e "${preamble}" | cat - "${new_config}" > "${override_config}"
 }
 
 # Usage: update_secrets <config-file> <false|true>
