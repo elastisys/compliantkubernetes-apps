@@ -95,7 +95,7 @@ log_error() {
 # Usage: yq_merge <files...>
 yq_merge() {
     # shellcheck disable=SC2016
-    yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' "${@}"
+    yq4 eval-all --prettyPrint 'explode(.) as $item ireduce ({}; . * $item )' "${@}"
 }
 
 # Reads the path to a block from one file containing the value
@@ -158,8 +158,30 @@ yq_copy_changes() {
     for key in ${keys}; do
         compare=$(diff <(yq4 -oj ".${key}" "${source1}" ) <(yq4 -oj ".${key}" "${source2}" ) || true)
         if [[ -n "${compare}" ]]; then
-            yq_copy_block "${source2}" "${target}" "${key}"
+            if [[ -n "$(yq4 ".${key} | select(tag == \"\") | alias" "${source2}")" ]]; then
+                # Creating placeholder for alias
+                yq4 -i ".${key} = {}" "${target}"
+            else
+                yq_copy_block "${source2}" "${target}" "${key}"
+            fi
         fi
+    done
+
+    anchors="$(yq4 '.. | select(anchor != "") | path | with(.[]; . = ("\"" + .) + "\"" ) | join "."' "${source2}")"
+    for anchor in ${anchors}; do
+        name="$(yq4 ".$anchor | anchor" "${source2}")"
+        # Protecting anchor from unwanted change
+        yq4 -i ".$anchor = (load(\"$source2\") | .$anchor)" "${target}"
+        # Putting anchor in place
+        yq4 -i ".$anchor anchor = \"$name\"" "${target}"
+    done
+
+    # The alias function will return leaf values, but they don't have a tag so filter on those
+    aliases="$(yq4 '.. | select(tag == "") | alias | path | with(.[]; . = ("\"" + .) + "\"" ) | join "."' "${source2}")"
+    for alias in ${aliases}; do
+        name="$(yq4 ".$alias | alias" "${source2}")"
+        # Putting alias in place
+        yq4 -i ".$alias alias = \"$name\"" "${target}"
     done
 }
 
