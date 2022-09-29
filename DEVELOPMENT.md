@@ -58,6 +58,7 @@ Some recommended plugins:
 * `davidanson.vscode-markdownlint`
 * `redhat.vscode-yaml`
 * `editorconfig.editorconfig`
+* `signageos.vscode-sops`
 
 #### Other editors
 
