@@ -92,9 +92,16 @@ spec:
     - to:
         - podSelector:
             matchLabels:
+              component: portal
+      ports:
+        - port: 8080
+    - to:
+        - podSelector:
+            matchLabels:
               component: registry
       ports:
         - port: 5000
+        - port: 8080
 {{- if eq .Values.harbor.redis.type "internal" }}
     - to:
         - podSelector:
@@ -167,6 +174,12 @@ spec:
               component: notary-server
       ports:
         - port: 4443
+    - to:
+        - podSelector:
+            matchLabels:
+              component: chartmuseum
+      ports:
+        - port: 9999
     - to:
       - podSelector:
           matchLabels:
@@ -440,6 +453,12 @@ spec:
     matchLabels:
       component: portal
   ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              component: core
+      ports:
+        - port: 8080
     - ports:
         - port: 8080
           protocol: TCP
@@ -459,6 +478,9 @@ spec:
       component: redis
   ingress:
     - from:
+        - podSelector:
+            matchLabels:
+              component: chartmuseum
         - podSelector:
             matchLabels:
               component: core
@@ -494,6 +516,7 @@ spec:
               component: core
       ports:
         - port: 5000
+        - port: 8080
   egress:
     - to:
 {{- range $IP := .Values.harbor.registry.egressIPs }}
