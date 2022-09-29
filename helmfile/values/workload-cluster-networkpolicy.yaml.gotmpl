@@ -7,6 +7,8 @@ global:
   scIngress:
     ips: {{- toYaml .Values.networkPolicies.global.scIngress.ips | nindent 6 }}
   ingressUsingHostNetwork: {{ .Values.ingressNginx.controller.useHostPort }}
+  trivy:
+    ips: {{- toYaml .Values.networkPolicies.global.trivy.ips | nindent 6 }}
 
 certManager:
   enabled: {{ .Values.networkPolicies.certManager.enabled }}
@@ -14,3 +16,6 @@ certManager:
 
 monitoring:
   enabled: {{ .Values.networkPolicies.monitoring.enabled }}
+
+gatekeeper:
+  enabled: {{ .Values.networkPolicies.gatekeeper.enabled }}
