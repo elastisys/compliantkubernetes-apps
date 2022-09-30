@@ -1,0 +1,16 @@
+### Release notes
+
+### Updated
+
+### Changed
+- Lowered the default retention age for kubernetes logs in the prod flavor down to 30 days
+
+### Fixed
+
+- Blackbox exporter now looks at the correct error code for the opensearch-dashboards target
+
+### Added
+
+- Option to deny network traffic by default
+
+### Removed
