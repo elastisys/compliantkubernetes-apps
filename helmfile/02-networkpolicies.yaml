@@ -26,6 +26,16 @@ environments:
 # The desired state of Helm releases.
 releases:
 
+# Common NetworkPolicies
+- name: common-np
+  namespace: kube-system
+  labels:
+    app: common-np
+  chart: ./charts/networkpolicy-common
+  version: 0.1.0
+  values:
+  - values/networkpolicy-common.yaml.gotmpl
+
 # Service cluster releases
 {{ if eq .Environment.Name "service_cluster" }}
 

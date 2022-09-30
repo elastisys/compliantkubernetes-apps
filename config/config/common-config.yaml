@@ -611,10 +611,25 @@ networkPolicies:
 
   global:
     objectStorage:
-      ips: # ips to s3 service
+      # ips to s3 service
+      ips:
       - set-me
-      ports: # ports to s3 service
+      # ports to s3 service
+      ports:
       - set-me
     scIngress:
-      ips: # ip(s) to sc loadbalancer if available, otherwise sc worker nodes
+      # ip(s) to sc loadbalancer if available, otherwise sc worker nodes
+      ips:
         - set-me
+    wcIngress:
+      # ip(s) to wc loadbalancer if available, otherwise wc worker nodes
+      ips:
+        - set-me
+
+  kured:
+    enabled: true
+    notificationSlack:
+      ips:
+        - set-me-if-kured.notification.slack.enabled
+      ports:
+        - 443

@@ -1,0 +1,14 @@
+{{- if .Values.kured.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    {{- include "np.labels" . | nindent 4 }}
+  name: default-deny-kured
+  namespace: kured
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector: {}
+{{- end }}

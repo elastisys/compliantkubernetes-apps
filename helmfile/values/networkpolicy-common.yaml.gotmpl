@@ -1,0 +1,31 @@
+global:
+  apiserver:
+  {{- if eq .Environment.Name "service_cluster" }}
+    ips: {{- toYaml .Values.networkPolicies.global.scApiserver.ips | nindent 6 }}
+    port: {{ .Values.networkPolicies.global.scApiserver.port }}
+  {{- else }}
+    ips: {{- toYaml .Values.networkPolicies.global.wcApiserver.ips | nindent 6 }}
+    port: {{ .Values.networkPolicies.global.wcApiserver.port }}
+  {{- end }}
+  ingress:
+  {{- if eq .Environment.Name "service_cluster" }}
+    ips: {{- toYaml .Values.networkPolicies.global.scIngress.ips | nindent 6 }}
+  {{- else }}
+    ips: {{- toYaml .Values.networkPolicies.global.wcIngress.ips | nindent 6 }}
+  {{- end }}
+  nodes:
+  {{- if eq .Environment.Name "service_cluster" }}
+    ips: {{- toYaml .Values.networkPolicies.global.scNodes.ips | nindent 6 }}
+  {{- else }}
+    ips: {{- toYaml .Values.networkPolicies.global.wcNodes.ips | nindent 6 }}
+  {{- end }}
+  objectStorage:
+    ips: {{- toYaml .Values.networkPolicies.global.objectStorage.ips | nindent 6 }}
+    ports: {{- toYaml .Values.networkPolicies.global.objectStorage.ports | nindent 6 }}
+
+kured:
+  enabled: {{ and .Values.kured.enabled .Values.networkPolicies.kured.enabled }}
+  notificationSlack:
+    enabled: {{ .Values.kured.notification.slack.enabled }}
+    ips: {{- toYaml .Values.networkPolicies.kured.notificationSlack.ips | nindent 6 }}
+    ports: {{- toYaml .Values.networkPolicies.kured.notificationSlack.ports | nindent 6 }}

@@ -38,6 +38,7 @@
 - Resource config for user-alertmanager, config-reloader, gatekeeper
 - Config option for gatekeeper audit interval
 - Network policies for logging stack (fluentd and opensearch)
+- Network policies for Kured
 
 ### Removed
 

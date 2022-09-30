@@ -1,0 +1,37 @@
+fullnameOverride: ""
+nameOverride: ""
+
+global:
+  apiserver:
+    ips:
+      - 0.0.0.0/0
+    port: 6443
+  ingress:
+    ips:
+      - 0.0.0.0/0
+  nodes:
+    ips:
+      - 0.0.0.0/0
+  objectStorage:
+    ips:
+      - 0.0.0.0/0
+    ports:
+      - 443
+
+  prometheusSelector:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: monitoring
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: prometheus
+          app.kubernetes.io/instance: kube-prometheus-stack-prometheus
+
+kured:
+  enabled: true
+  notificationSlack:
+    enabled: false
+    ips:
+      - 0.0.0.0/0
+    ports:
+      - 443

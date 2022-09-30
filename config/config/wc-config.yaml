@@ -261,11 +261,13 @@ networkPolicies:
 # ---
   global:
     wcApiserver:
-      ips: # usualy private ip of control-plane nodes
+      # usualy private ip of control-plane nodes
+      ips:
         - set-me
       port: 6443
     wcNodes:
-      ips: # ip of all nodes in the cluster for internal communication
+      # ip of all nodes in the cluster for internal communication
+      ips:
         - set-me
   certManager:
     enabled: true
