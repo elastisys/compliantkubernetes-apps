@@ -19,7 +19,7 @@ spec:
            fsGroup: 1000
           containers:
             - name: run
-              image: elastisys/backup-postgres:1.1.0
+              image: elastisys/backup-postgres:1.2.0
               command: ['/bin/bash', '/scripts/harbor-backup.sh']
               env:
               {{- if .Values.s3.enabled }}

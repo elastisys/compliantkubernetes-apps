@@ -20,7 +20,7 @@ spec:
      restartPolicy: Never
      containers:
      - name: run
-       image: elastisys/backup-postgres:1.1.0
+       image: elastisys/backup-postgres:1.2.0
        command: ['/bin/bash', '/scripts/restore-harbor.sh']
        env:
          - name: AWS_ACCESS_KEY_ID
