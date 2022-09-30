@@ -7,6 +7,8 @@
 
 ### Fixed
 
+- Blackbox exporter now looks at the correct error code for the opensearch-dashboards target
+
 ### Added
 
 - Option to deny network traffic by default

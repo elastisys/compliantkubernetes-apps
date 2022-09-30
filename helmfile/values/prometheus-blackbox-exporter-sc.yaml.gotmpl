@@ -90,7 +90,7 @@ serviceMonitor:
       url: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}/api/status
       interval: 60s
       scrapeTimeout: 30s
-      module: http_2xx
+      module: http_401
     - name: user-api-server
       url: https://kube-apiserver.{{ .Values.global.baseDomain }}:/healthz
       interval: 60s
