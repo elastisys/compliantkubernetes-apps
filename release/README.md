@@ -42,6 +42,8 @@ https://semver.org/
 
     When a released is published the public [user-facing release notes](https://github.com/elastisys/compliantkubernetes/blob/main/docs/release-notes/ck8s.md) needs to be updated. The new release needs to be added and the list can be trimmed down to only include the supported versions.
 
+    Create two new branches `release-vX.Y` and `<personal-tag>/release-vX.Y`. Add the release notes to `<personal-tag>/release-vX.Y` and then create two PRs. One to `release-vX.Y` and one to `main`.
+
     Add bullet points of major changes within the cluster that affects the user as defined [here](https://compliantkubernetes.io/user-guide/). This includes any change within the cluster that may impact the user experience, for example new or updated feature, or the deprecation of features.
 
 ## Patch releases
