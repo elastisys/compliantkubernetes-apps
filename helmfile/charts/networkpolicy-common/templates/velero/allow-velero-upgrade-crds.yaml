@@ -1,0 +1,27 @@
+{{- if .Values.velero.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    {{- include "np.labels" . | nindent 4 }}
+  name: allow-velero-upgrade-crds
+  namespace: velero
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      job-name: velero-upgrade-crds
+  egress:
+    - ports:
+        - port: 53
+          protocol: UDP
+    - to:
+        {{- range .Values.global.apiserver.ips }}
+        - ipBlock:
+            cidr: {{ . }}
+        {{- end }}
+      ports:
+        - port: {{ .Values.global.apiserver.port }}
+{{- end }}

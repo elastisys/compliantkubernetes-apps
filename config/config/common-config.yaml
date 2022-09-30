@@ -633,3 +633,6 @@ networkPolicies:
         - set-me-if-kured.notification.slack.enabled
       ports:
         - 443
+
+  velero:
+    enabled: true

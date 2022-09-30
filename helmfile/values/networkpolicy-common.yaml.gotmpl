@@ -29,3 +29,6 @@ kured:
     enabled: {{ .Values.kured.notification.slack.enabled }}
     ips: {{- toYaml .Values.networkPolicies.kured.notificationSlack.ips | nindent 6 }}
     ports: {{- toYaml .Values.networkPolicies.kured.notificationSlack.ports | nindent 6 }}
+
+velero:
+  enabled: {{ and .Values.velero.enabled .Values.networkPolicies.velero.enabled }}
