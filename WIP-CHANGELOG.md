@@ -8,6 +8,7 @@
 ### Fixed
 
 - Blackbox exporter now looks at the correct error code for the opensearch-dashboards target
+- Harbor backup is now pointed to the correct service to make backups from
 
 ### Added
 
