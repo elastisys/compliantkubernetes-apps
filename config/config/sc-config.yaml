@@ -1061,9 +1061,7 @@ networkPolicies:
 #     ingress: {}
 #     egress: {}
 # ---
-
   global:
-    ingressUsingHostNetwork: false
     scApiserver:
       ips: # usualy private ip of control-plane nodes
         - set-me
