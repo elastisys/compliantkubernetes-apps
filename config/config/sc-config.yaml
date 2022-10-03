@@ -1061,15 +1061,10 @@ networkPolicies:
 #     ingress: {}
 #     egress: {}
 # ---
+
   global:
-    scApiserver:
-  global:
-    externalLoadBalancer:
-      enabled: false
-      ips:
-        - set-me
     ingressUsingHostNetwork: false
-    apiserver:
+    scApiserver:
       ips: # usualy private ip of control-plane nodes
         - set-me
       port: 6443

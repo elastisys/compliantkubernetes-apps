@@ -30,12 +30,12 @@ spec:
       ports:
         - port: 2801
     - to:
-        {{- range $IP := .Values.global.apiserver.ips }}
+        {{- range $IP := .Values.global.scApiserver.ips }}
       - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
       ports:
-        - port: {{ .Values.global.apiserver.port }}
+        - port: {{ .Values.global.scApiserver.port }}
     - ports:
         - port: 53
           protocol: UDP

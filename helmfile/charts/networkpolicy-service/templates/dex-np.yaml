@@ -55,10 +55,10 @@ spec:
         - ipBlock:
             cidr: 0.0.0.0/0
     - to:
-        {{- range $IP := .Values.global.apiserver.ips }}
+        {{- range $IP := .Values.global.scApiserver.ips }}
       - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
       ports:
-        - port: {{ .Values.global.apiserver.port }}
+        - port: {{ .Values.global.scApiserver.port }}
 {{- end }}

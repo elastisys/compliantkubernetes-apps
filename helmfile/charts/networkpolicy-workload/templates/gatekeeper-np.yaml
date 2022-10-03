@@ -34,13 +34,13 @@ spec:
         - port: 8888
   egress:
     - to:
-        {{- range $IP := .Values.global.apiserver.ips }}
+        {{- range $IP := .Values.global.wcApiserver.ips }}
         - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
       ports:
         - protocol: TCP
-          port: {{ .Values.global.apiserver.port }}
+          port: {{ .Values.global.wcApiserver.port }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -65,7 +65,7 @@ spec:
       ports:
         - port: 8888
     - from:
-        {{- range $IP := .Values.global.apiserver.ips }}
+        {{- range $IP := .Values.global.wcApiserver.ips }}
         - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
@@ -74,13 +74,13 @@ spec:
           port: 8443
   egress:
     - to:
-        {{- range $IP := .Values.global.apiserver.ips }}
+        {{- range $IP := .Values.global.wcApiserver.ips }}
         - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
       ports:
         - protocol: TCP
-          port: {{ .Values.global.apiserver.port }}
+          port: {{ .Values.global.wcApiserver.port }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -97,13 +97,13 @@ spec:
   ingress: []
   egress:
     - to:
-        {{- range $IP := .Values.global.apiserver.ips }}
+        {{- range $IP := .Values.global.wcApiserver.ips }}
         - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
       ports:
         - protocol: TCP
-          port: {{ .Values.global.apiserver.port }}
+          port: {{ .Values.global.wcApiserver.port }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -120,11 +120,11 @@ spec:
   ingress: []
   egress:
     - to:
-        {{- range $IP := .Values.global.apiserver.ips }}
+        {{- range $IP := .Values.global.wcApiserver.ips }}
         - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
       ports:
         - protocol: TCP
-          port: {{ .Values.global.apiserver.port }}
+          port: {{ .Values.global.wcApiserver.port }}
 {{- end }}
