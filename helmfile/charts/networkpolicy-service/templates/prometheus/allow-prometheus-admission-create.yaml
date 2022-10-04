@@ -1,0 +1,23 @@
+{{ if .Values.monitoring.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: prometheus-admission-create
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app: kube-prometheus-stack-admission-create
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - to:
+        {{- range $ip := .Values.global.scApiserver.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.global.scApiserver.port }}
+{{- end }}

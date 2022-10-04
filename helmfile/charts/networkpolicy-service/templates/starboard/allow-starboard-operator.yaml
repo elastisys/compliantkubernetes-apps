@@ -1,0 +1,25 @@
+{{ if .Values.monitoring.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-starboard-operator
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: starboard-operator
+      app.kubernetes.io/name: starboard-operator
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress: []
+  egress:
+    - to:
+        {{- range $IP := .Values.global.scApiserver.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.global.scApiserver.port }}
+{{- end }}

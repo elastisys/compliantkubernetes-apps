@@ -1,0 +1,33 @@
+{{ if .Values.monitoring.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ciskubebench-exporter-metrics
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app: ciskubebench-exporter
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - port: 9100
+  egress:
+    - to:
+        {{- range $IP := .Values.global.scApiserver.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.global.scApiserver.port }}
+    - ports:
+      - protocol: UDP
+        port: 53
+{{- end }}

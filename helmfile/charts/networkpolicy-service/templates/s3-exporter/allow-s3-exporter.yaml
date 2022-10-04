@@ -1,0 +1,35 @@
+{{ if .Values.monitoring.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-s3-exporter
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: s3-exporter
+      app.kubernetes.io/name: s3-exporter
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - port: 9340
+  egress:
+    - to:
+        {{- range $IP := .Values.global.objectStorage.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      ports:
+        {{- range $PORT := .Values.global.objectStorage.ports }}
+        - port: {{ $PORT }}
+        {{- end }}
+    - ports:
+      - protocol: UDP
+        port: 53
+{{- end }}
