@@ -13,12 +13,12 @@ spec:
     - Egress
   ingress:
     - from:
-    {{- if .Values.global.ingressUsingHostNetwork }}
-      {{- range $ip := .Values.global.scNodes.ips }}
+      {{- if .Values.global.ingressUsingHostNetwork }}
+        {{- range $ip := .Values.global.scNodes.ips }}
         - ipBlock:
             cidr: {{ $ip }}
-      {{- end }}
-    {{- else }}
+        {{- end }}
+      {{- else }}
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: ingress-nginx
@@ -26,7 +26,7 @@ spec:
             matchLabels:
               app.kubernetes.io/component: controller
               app.kubernetes.io/instance: ingress-nginx
-    {{- end }}
+      {{- end }}
         - podSelector:
             matchLabels:
               app: prometheus
