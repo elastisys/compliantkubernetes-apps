@@ -5,7 +5,8 @@ kind: CronJob
 metadata:
   name: {{ $.Chart.Name }}-{{ .source }}
   labels:
-    app: {{ $.Chart.Name }}-{{ .source }}
+    app: {{ $.Chart.Name }}
+    component: {{ $.Chart.Name }}-{{ .source }}
 spec:
   {{- if hasKey . "schedule" }}
   schedule: {{ .schedule }}
@@ -18,7 +19,8 @@ spec:
       template:
         metadata:
           labels:
-            app: {{ $.Chart.Name }}-{{ .source }}
+            app: {{ $.Chart.Name }}
+            component: {{ $.Chart.Name }}-{{ .source }}
         spec:
           restartPolicy: Never
           containers:

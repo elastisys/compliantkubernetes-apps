@@ -1123,3 +1123,11 @@ networkPolicies:
 
   fluentd:
     enabled: true
+
+  rcloneSync:
+    enabled: true
+    destinationObjectStorage:
+      ips:
+        - "set-me-if-objectStorage.sync.enabled"
+      ports:
+        - 443

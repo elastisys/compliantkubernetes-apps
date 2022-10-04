@@ -61,3 +61,9 @@ opensearch:
 
 fluentd:
   enabled: {{ and .Values.fluentd.enabled .Values.networkPolicies.fluentd.enabled }}
+
+rcloneSync:
+  enabled: {{ and .Values.objectStorage.sync.enabled .Values.networkPolicies.rcloneSync.enabled }}
+  destinationObjectStorage:
+    ips: {{- toYaml .Values.networkPolicies.rcloneSync.destinationObjectStorage.ips | nindent 6 }}
+    ports: {{- toYaml .Values.networkPolicies.rcloneSync.destinationObjectStorage.ports | nindent 6 }}

@@ -92,3 +92,11 @@ opensearch:
 
 fluentd:
   enabled: true
+
+rcloneSync:
+  enabled: true
+  destinationObjectStorage:
+    ips:
+      - "0.0.0.0/0"
+    ports:
+      - 443

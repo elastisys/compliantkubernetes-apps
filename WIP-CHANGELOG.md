@@ -40,6 +40,7 @@
 - Network policies for logging stack (fluentd and opensearch)
 - Network policies for Kured
 - Network policies for Velero
+- Network policies for rclone-sync
 
 ### Removed
 

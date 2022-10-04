@@ -139,21 +139,41 @@ checkIfDiffAndUpdateKubectlIPs() {
     fi
 }
 
-S3_ENDPOINT="$(yq4 '.objectStorage.s3.regionEndpoint' "${config["override_common"]}" | sed 's/https\?:\/\///')"
+# yq_dig <cluster> <node> <default>
+yq_dig() {
+  for conf in "${config["override_$1"]}" "${config["override_common"]}" "${config["default_$1"]}" "${config["default_common"]}"; do
+      ret=$(yq4 "$2" "$conf")
+
+      if [[ "$ret" != "null" ]]; then
+          echo "$ret"
+          return
+      fi
+  done
+
+  echo "$3"
+}
+
+if [ "${CHECK_CLUSTER}" == "both" ]; then
+  DIG_CLUSTER="sc"
+else
+  DIG_CLUSTER="wc"
+fi
+
+S3_ENDPOINT="$(yq_dig "${DIG_CLUSTER}" '.objectStorage.s3.regionEndpoint' '""' | sed 's/https\?:\/\///')"
 if [[ "${S3_ENDPOINT}" == "" ]]; then
-    log_error "No S3 endpoint found, check your common-config.yaml"
+    log_error "No S3 endpoint found, check your common-config.yaml (or ${DIG_CLUSTER}-config.yaml)"
     exit 1
 fi
 
-OPS_DOMAIN="$(yq4 '.global.opsDomain' "${CK8S_CONFIG_PATH}/common-config.yaml")"
+OPS_DOMAIN="$(yq_dig "${DIG_CLUSTER}" '.global.opsDomain' '""')"
 if [[ "${OPS_DOMAIN}" == "" ]]; then
-    log_error "No ops domain found, check your common-config.yaml"
+    log_error "No ops domain found, check your common-config.yaml (or ${DIG_CLUSTER}-config.yaml)"
     exit 1
 fi
 
-BASE_DOMAIN="$(yq4 '.global.baseDomain' "${CK8S_CONFIG_PATH}/common-config.yaml")"
+BASE_DOMAIN="$(yq_dig "${DIG_CLUSTER}" '.global.baseDomain' '""')"
 if [[ "${BASE_DOMAIN}" == "" ]]; then
-    log_error "No base domain found, check your common-config.yaml"
+    log_error "No base domain found, check your common-config.yaml (or ${DIG_CLUSTER}-config.yaml)"
     exit 1
 fi
 
@@ -163,10 +183,8 @@ checkIfDiffAndUpdateDNSIPs "${S3_ENDPOINT}" ".networkPolicies.global.objectStora
 ## Add sc ingress ips to common config
 checkIfDiffAndUpdateDNSIPs "grafana.${OPS_DOMAIN}" ".networkPolicies.global.scIngress.ips" "${config["override_common"]}"
 
-## Add wc ingress ips to sc config
-if [[ "${CHECK_CLUSTER}" =~ ^(sc|both)$ ]]; then
-    checkIfDiffAndUpdateDNSIPs "non-existing-subdomain.${BASE_DOMAIN}" ".networkPolicies.global.wcIngress.ips" "${config["override_sc"]}"
-fi
+## Add wc ingress ips to common config
+checkIfDiffAndUpdateDNSIPs "non-existing-subdomain.${BASE_DOMAIN}" ".networkPolicies.global.wcIngress.ips" "${config["override_common"]}"
 
 ## Add sc apiserver ips
 if [[ "${CHECK_CLUSTER}" =~ ^(sc|both)$ ]]; then
@@ -186,6 +204,20 @@ fi
 ## Add wc nodes ips to wc config
 if [[ "${CHECK_CLUSTER}" =~ ^(wc|both)$ ]]; then
     checkIfDiffAndUpdateKubectlIPs "wc" "" ".networkPolicies.global.wcNodes.ips" "${config["override_wc"]}"
+fi
+
+## Add destination object storage ips for rclone sync to sc config
+if [ "$(yq_dig 'sc' '.objectStorage.sync.enabled' 'false')" == "true" ]; then
+    if [ "$(yq_dig 'sc' '.networkPolicies.rcloneSync.enabled' 'false')" == "true" ]; then
+
+        S3_ENDPOINT_DST="$(yq_dig 'sc' '.objectStorage.sync.s3.regionEndpoint' '""' | sed 's/https\?:\/\///')"
+        if [[ "${S3_ENDPOINT_DST}" == "" ]]; then
+            log_error "No destination S3 endpoint for rclone sync found, check your sc-config.yaml"
+            exit 1
+        fi
+
+        checkIfDiffAndUpdateDNSIPs "${S3_ENDPOINT_DST}" ".networkPolicies.rcloneSync.destinationObjectStorage.ips" "${config["override_sc"]}"
+    fi
 fi
 
 exit ${has_diff}
