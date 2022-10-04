@@ -1078,9 +1078,6 @@ networkPolicies:
       - set-me
       ports: # ports to s3 service
       - set-me
-    trivy:
-      ips:
-        - set-me
   harbor:
     enable: true
     chartmuseum:

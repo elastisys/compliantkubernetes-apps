@@ -613,3 +613,6 @@ networkPolicies:
     scIngress:
       ips: # ip(s) to sc loadbalancer if available, otherwise sc worker nodes
         - set-me
+    trivy:
+      ips:
+        - set-me
