@@ -26,6 +26,7 @@
 
 - Option to deny network traffic by default
 - Network policies for monitoring stack (prometheus, thanos, grafana, some exporters)
+- An alert for failed evicted pods (KubeFailedEvictedPods)
 
 ### Removed
 
