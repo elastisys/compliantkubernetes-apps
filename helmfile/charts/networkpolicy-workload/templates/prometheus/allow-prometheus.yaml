@@ -1,0 +1,51 @@
+{{ if .Values.monitoring.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: prometheus
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app: prometheus
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: prometheus-blackbox-exporter
+      ports:
+        - port: 9090
+  egress:
+    # metrics from pods in the cluster
+    - to:
+        - namespaceSelector: {}
+    - to:
+        {{- range $ip := .Values.global.wcApiserver.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.global.wcApiserver.port }}
+    # metrics from kubelet, calico and other host-network exporters
+    - to:
+        {{- range $ip := .Values.global.wcNodes.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+    # thanos
+    - to:
+        {{- range $ip := .Values.global.scIngress.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+      - protocol: TCP
+        port: 443
+    - ports:
+      - protocol: UDP
+        port: 53
+{{- end }}
