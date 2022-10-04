@@ -59,8 +59,8 @@ echo
 echo "Testing user RBAC"
 echo "====================="
 
-user_namespaces=$(yq4 '.user.namespaces[*]' "$CONFIG_FILE")
-user_admin_users=$(yq4 '.user.adminUsers[*]' "$CONFIG_FILE")
+user_namespaces=$(yq4 '.user.namespaces.[]' "$CONFIG_FILE")
+user_admin_users=$(yq4 '.user.adminUsers.[]' "$CONFIG_FILE")
 
 for user in ${user_admin_users}; do
     testCanUserDo "get" "node" "$user"
