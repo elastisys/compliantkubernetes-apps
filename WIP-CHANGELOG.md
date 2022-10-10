@@ -41,6 +41,7 @@
 - Network policies for Kured
 - Network policies for Velero
 - Network policies for rclone-sync
+- Network policies for s3-exporter
 
 ### Removed
 

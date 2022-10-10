@@ -67,3 +67,6 @@ rcloneSync:
   destinationObjectStorage:
     ips: {{- toYaml .Values.networkPolicies.rcloneSync.destinationObjectStorage.ips | nindent 6 }}
     ports: {{- toYaml .Values.networkPolicies.rcloneSync.destinationObjectStorage.ports | nindent 6 }}
+
+s3Exporter:
+  enabled: {{ and (eq .Values.objectStorage.type "s3") (and .Values.s3Exporter.enabled .Values.networkPolicies.s3Exporter.enabled) }}

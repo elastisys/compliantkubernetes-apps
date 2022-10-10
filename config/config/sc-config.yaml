@@ -1131,3 +1131,6 @@ networkPolicies:
         - "set-me-if-objectStorage.sync.enabled"
       ports:
         - 443
+
+  s3Exporter:
+    enabled: true

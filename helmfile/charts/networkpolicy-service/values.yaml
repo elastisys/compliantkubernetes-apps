@@ -36,6 +36,15 @@ global:
   ingressUsingHostNetwork: false
   externalLoadBalancer: false # not true if loadbalancer is controlled by a kubernetes cloud controller
 
+  prometheusSelector:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: monitoring
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: prometheus
+          app.kubernetes.io/instance: kube-prometheus-stack-prometheus
+
 harbor:
   enabled: true
   database:
@@ -100,3 +109,6 @@ rcloneSync:
       - "0.0.0.0/0"
     ports:
       - 443
+
+s3Exporter:
+  enabled: true
