@@ -248,7 +248,7 @@ prometheus:
   ## Predictive alert if the resource usage will hit the set percentage in 3 days
   capacityManagementAlerts:
     enabled: true
-    disklimit: 66
+    disklimit: 75
     usagelimit: 95
     ## for each cpu and memory add the node pattern for which you want to create an alert
     requestlimit:
