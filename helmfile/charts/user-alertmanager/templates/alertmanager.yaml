@@ -11,3 +11,4 @@ spec:
     fsGroup: 2000
     runAsNonRoot: true
     runAsUser: 1000
+  resources: {{- toYaml .Values.resources | nindent 4 }}

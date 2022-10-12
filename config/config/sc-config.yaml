@@ -420,6 +420,9 @@ prometheus:
       requests:
         cpu: 10m
         memory: 50Mi
+      limits:
+        cpu: 50m
+        memory: 100Mi
     storage:
       volumeClaimTemplate:
         spec:
@@ -973,7 +976,7 @@ fluentd:
         memory: 1000Mi
       requests:
         cpu: 300m
-        memory: 300Mi
+        memory: 500Mi
     tolerations: []
     affinity: {}
     nodeSelector: {}

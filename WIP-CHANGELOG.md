@@ -1,5 +1,7 @@
 ### Release notes
 
+- Several default resource requests and limits have changed. When upgrading these might need to be adjusted.
+
 ### Updated
 
 - Updated dex chart to `v0.12.0` which upgraded dex to `v2.35.1`
@@ -12,6 +14,9 @@
 - Update the provider plugins to a supported version for the new Velero release
 - Added support for anchors and aliases in override configs, not tested with merge aliases/tags
 - Changed the default limit for diskLimit alert, from 66 to 75
+- Changed some default resource requests and limits for multiple components
+- Gatekeeper audits every 10 min instead of 1 min
+- Gatekeeper audit only looks at the resource types mentioned in constraints, instead of all resource types
 
 ### Fixed
 
@@ -30,6 +35,8 @@
 - Option to deny network traffic by default
 - Network policies for monitoring stack (prometheus, thanos, grafana, some exporters)
 - An alert for failed evicted pods (KubeFailedEvictedPods)
+- Resource config for user-alertmanager, config-reloader, gatekeeper
+- Config option for gatekeeper audit interval
 
 ### Removed
 

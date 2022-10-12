@@ -114,10 +114,10 @@ falco:
   resources:
     limits:
       cpu: 200m
-      memory: 1024Mi
+      memory: 250Mi
     requests:
       cpu: 100m
-      memory: 512Mi
+      memory: 150Mi
 
   ## Run on master nodes.
   tolerations:
@@ -194,6 +194,11 @@ prometheusOperator:
     limits:
       cpu: 100m
       memory: 200Mi
+
+  ## Set the prometheus/alertmanager config reloader sidecar CPU request and limit
+  configReloaderCpu: 50m
+  ## Set the prometheus/alertmanager config reloader sidecar memory request and limit
+  configReloaderMemory: 50Mi
 
 prometheusNodeExporter:
   resources:
@@ -305,10 +310,10 @@ ingressNginx:
     resources:
       requests:
         cpu: 100m
-        memory: 263Mi
+        memory: 150Mi
       limits:
         cpu: 200m
-        memory: 512Mi
+        memory: 250Mi
     tolerations: []
     affinity: {}
     nodeSelector: {}
@@ -441,7 +446,7 @@ certmanager:
         memory: 25Mi
       limits:
         cpu: 250m
-        memory: 250Mi
+        memory: 100Mi
     nodeSelector: {}
     tolerations: {}
     affinity: {}
