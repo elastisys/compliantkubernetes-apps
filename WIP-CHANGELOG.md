@@ -29,3 +29,4 @@
 ### Removed
 
 - Grafana reporting and update checks
+- Pipeline check for `calico-kube-controllers` deployment as it is no longer created in Kubespray `v2.20.0`
