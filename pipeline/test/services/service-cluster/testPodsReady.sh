@@ -30,7 +30,6 @@ deployments=(
     "cert-manager cert-manager"
     "cert-manager cert-manager-cainjector"
     "cert-manager cert-manager-webhook"
-    "kube-system calico-kube-controllers"
     "kube-system coredns"
     "kube-system metrics-server"
     "ingress-nginx ingress-nginx-default-backend"
