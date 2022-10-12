@@ -24,6 +24,16 @@ user:
   adminGroups:
     - set-me
 
+  ## User controlled alertmanager configuration.
+  alertmanager:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 50Mi
+      limits:
+        cpu: 50m
+        memory: 100Mi
+
 ## Prometheus configuration.
 ## Prometheus collects metrics and pushes it to InfluxDB.
 prometheus:
@@ -38,6 +48,27 @@ prometheus:
 ## Open policy agent configuration
 opa:
   enabled: true
+
+  controllerManager:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 80Mi
+      limits:
+        cpu: 200m
+        memory: 100Mi
+
+  audit:
+    resources:
+      requests:
+        cpu: 200m
+        memory: 100Mi
+      limits:
+        cpu: 500m
+        memory: 200Mi
+
+  # how often gatekeeper audits kubernetes resources, in seconds
+  auditIntervalSeconds: 600
 
   ## Enable rule that requires pods to come from
   ## the image registry defined by "URL".
@@ -172,7 +203,7 @@ fluentd:
       cpu: 500m
       memory: 572Mi
     requests:
-      cpu: 200m
+      cpu: 100m
       memory: 300Mi
 
   ## Extra fluentd config to mount.
@@ -188,7 +219,7 @@ fluentd:
         cpu: 500m
         memory: 572Mi
       requests:
-        cpu: 200m
+        cpu: 100m
         memory: 300Mi
 
     tolerations: []

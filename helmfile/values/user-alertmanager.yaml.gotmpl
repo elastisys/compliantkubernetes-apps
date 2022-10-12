@@ -7,3 +7,5 @@ basic_auth:
   password: {{ .Values.user.alertmanagerPassword }}
 users: {{ toYaml .Values.user.adminUsers | nindent 2 }}
 groups: {{ toYaml .Values.user.adminGroups | nindent 2 }}
+
+resources: {{- toYaml .Values.user.alertmanager.resources | nindent 2  }}

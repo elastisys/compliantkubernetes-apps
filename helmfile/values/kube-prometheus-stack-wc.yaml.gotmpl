@@ -22,6 +22,9 @@ prometheusOperator:
   createCustomResource: false
   resources: {{- toYaml .Values.prometheusOperator.resources | nindent 4 }}
 
+  configReloaderCpu: {{ .Values.prometheusOperator.configReloaderCpu }}
+  configReloaderMemory: {{ .Values.prometheusOperator.configReloaderMemory }}
+
 kube-state-metrics:
   podSecurityPolicy:
     enabled: true

@@ -124,6 +124,10 @@ spec:
         - podSelector:
             matchLabels:
               app: prometheus
+        {{- range $ip := .Values.global.scApiserver.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
       ports:
         - port: 10250
   egress:

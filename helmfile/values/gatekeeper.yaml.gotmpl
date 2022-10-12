@@ -1,0 +1,7 @@
+auditInterval: {{ .Values.opa.auditIntervalSeconds }}
+auditMatchKindOnly: true
+
+controllerManager:
+  resources: {{- toYaml .Values.opa.controllerManager.resources | nindent 4  }}
+audit:
+  resources: {{- toYaml .Values.opa.audit.resources | nindent 4  }}

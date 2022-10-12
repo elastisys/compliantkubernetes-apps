@@ -37,3 +37,7 @@
     ```bash
     bin/ck8s apply {sc|wc}
     ```
+
+1. Check resource requests and limits
+
+    Several default resource requests and limits have changed. When upgrading these might need to be changed in your environment. Check for pods that have high memory usage (or even goes OOM) or have heavily throttled CPU.
