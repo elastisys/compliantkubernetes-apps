@@ -1,0 +1,49 @@
+{{ if .Values.coredns.enabled }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-coredns
+spec:
+  podSelector:
+    matchLabels:
+      k8s-app: kube-dns
+  policyTypes:
+    - Egress
+    - Ingress
+  ingress:
+    - ports:
+      - port: 53
+        protocol: UDP
+      - port: 53
+        protocol: TCP
+    - from:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+          namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 9153
+  egress:
+    - to:
+      {{- range $IP := .Values.global.wcApiserver.ips }}
+      - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      ports:
+        - port: {{ .Values.global.wcApiserver.port }}
+    - to:
+      {{- range $IP := .Values.coredns.externalDns.ips }}
+      - ipBlock:
+          cidr: {{ $IP }}
+      {{- end }}
+      - ipBlock:
+          cidr: 10.233.0.3/32
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+
+{{- end }}
