@@ -134,13 +134,3 @@ dex:
 
 falco:
   enabled: true
-
-coredns:
-  enabled: true
-  externalDns:
-    ips:
-      - "172.16.0.2/32"
-      - "172.16.0.3/32"
-
-dnsAutoscaler:
-  enabled: true

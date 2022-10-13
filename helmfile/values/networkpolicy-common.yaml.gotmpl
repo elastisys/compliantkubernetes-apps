@@ -84,3 +84,13 @@ kubeSystem:
     ports:
       {{- toYaml $upcloud.ports | nindent 6 }}
   {{- end }}
+
+coredns:
+  enabled: {{ .Values.networkPolicies.coredns.enabled }}
+  externalDns:
+    ips: {{- toYaml .Values.networkPolicies.coredns.externalDns.ips | nindent 6 }}
+  serviceIp:
+    ips: {{- toYaml .Values.networkPolicies.coredns.serviceIp.ips | nindent 6 }}
+
+dnsAutoscaler:
+  enabled: {{ .Values.networkPolicies.dnsAutoscaler.enabled }}

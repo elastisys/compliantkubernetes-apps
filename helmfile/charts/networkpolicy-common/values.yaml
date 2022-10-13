@@ -83,3 +83,15 @@ kubeSystem:
       - 0.0.0.0/0
     ports:
       - 443
+
+coredns:
+  enabled: true
+  externalDns:
+    ips:
+      - "0.0.0.0/0"
+  serviceIp:
+    ips:
+      - "10.233.0.3/32"
+
+dnsAutoscaler:
+  enabled: true
