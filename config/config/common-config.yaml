@@ -664,3 +664,15 @@ networkPolicies:
 
   kubeSystem:
     enabled: true
+
+  coredns:
+    enabled: true
+    externalDns:
+      ips:
+        - set-me
+    serviceIp:
+      ips:
+        - "10.233.0.3/32"
+
+  dnsAutoscaler:
+    enabled: true

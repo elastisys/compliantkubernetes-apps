@@ -54,3 +54,10 @@ networkPolicies:
     alertReceivers:
       ips:
         - 0.0.0.0/0
+  coredns:
+    externalDns:
+      ips:
+        - 0.0.0.0/0
+    serviceIp:
+      ips:
+        - 0.0.0.0/0

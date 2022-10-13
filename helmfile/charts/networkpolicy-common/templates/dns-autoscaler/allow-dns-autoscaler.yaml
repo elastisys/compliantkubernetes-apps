@@ -1,0 +1,34 @@
+{{ if .Values.dnsAutoscaler.enabled }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-dns-autoscaler
+spec:
+  podSelector:
+    matchLabels:
+      k8s-app: dns-autoscaler
+  policyTypes:
+    - Egress
+    - Ingress
+  ingress:
+    - from:
+      {{- range $ip := .Values.global.nodes.ips }}
+      - ipBlock:
+          cidr: {{ $ip }}
+      {{- end }}
+      {{- range $IP := .Values.global.apiserver.ips }}
+      - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      ports:
+        - port: 8080
+          protocol: TCP
+  egress:
+    - to:
+      {{- range $IP := .Values.global.apiserver.ips }}
+      - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
+      ports:
+        - port: {{ .Values.global.apiserver.port }}
+{{- end }}

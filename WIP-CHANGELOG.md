@@ -18,6 +18,7 @@
 
 ### Added
 
+-  Network policies for `coredns` and `dnsAutoscaler`.
 - Starboard resources will now be removed when running the cleanup scripts - `scripts/clean-{sc,wc}.sh`.
 - Enabled the `rook-ceph` network policy in both `sc` and `wc` cluster.
 - Added templating for wc Velero bucket prefix.
