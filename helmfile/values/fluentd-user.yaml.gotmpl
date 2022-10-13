@@ -6,7 +6,7 @@ tolerations:  {{- toYaml .Values.fluentd.user.tolerations | nindent 2  }}
 image:
   # This is our own fork-image(https://github.com/elastisys/fluentd-elasticsearch). This can later be replaces with the original image(https://github.com/monotek/fluentd-elasticsearch) when our changes is merged.
   repository: elastisys/fluentd
-  tag: v3.4.0-ck8s3
+  tag: v3.4.0-ck8s4
 
 elasticsearch:
   scheme: https
