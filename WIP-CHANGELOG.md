@@ -45,6 +45,7 @@
 - Network policies for Velero
 - Network policies for rclone-sync
 - Network policies for s3-exporter
+- New section in the welcoming dashboards, displaying the most relevant features and changes for the user added in the last two releases.
 
 ### Removed
 

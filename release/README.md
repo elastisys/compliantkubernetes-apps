@@ -16,6 +16,15 @@ https://semver.org/
 
     **NOTE**: All changes made in QA should be added to `CHANGELOG.md` and **NOT** `WIP-CHANGELOG.md`.
 
+1. Update the Welcoming Dashboards "What's New" section
+
+    Write about some new feature or change that is relevant for the user, e.g. for `v0.25` "- As an admin user, you can now create namespaces yourself using HNC ..."
+
+    Also remove the items in this section from two+ older minor versions, meaning if you release apps `v0.28` you can keep previous items that were added to the list in `v0.27` but remove the stuff that are from `v0.26`.
+
+    - Edit the [Grafana dashboard](../helmfile/charts/grafana-ops/files/welcome.md)
+    - Edit the [Opensearch dashboard](../helmfile/charts/opensearch/configurer/files/dashboards-resources/welcome.md)
+
 1. When you're done with QA, create a PR to the release branch and merge it.
 
 1. When the PR is merged switch to that branch and run:

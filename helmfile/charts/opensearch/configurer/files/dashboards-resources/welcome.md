@@ -1,5 +1,12 @@
 # Welcome to Compliant Kubernetes!
 
+## What's new
+
+Here you can find the most relevant features and changes for the last couple of releases of Compliant Kubernetes
+
+- You are now allowed to proxy and port-forward to prometheus in the Workload Cluster, more about that [here](https://elastisys.io/compliantkubernetes/user-guide/metrics/#accessing-prometheus). **[v0.26]**
+- As a User admin, you can now create namespaces yourself using [HNC](https://kubernetes.io/blog/2020/08/14/introducing-hierarchical-namespaces/), we have written a guide [here](https://elastisys.io/compliantkubernetes/user-guide/faq/#how-do-i-add-a-new-namespace) on how you do this in Compliant Kubernetes. **[v0.25]**
+
 ## Public docs
 
 In case you get lost, don't forget to check out the [public docs](https://elastisys.io/compliantkubernetes/). Here are the most common topics:
