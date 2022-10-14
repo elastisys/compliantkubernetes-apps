@@ -20,6 +20,7 @@
 - Bumped backup-postgres image to use tag `1.2.0`, which includes newer versions of the postgresql client
 - Fixed Test User RBAC
 - Fixed the shifted comment after running init
+- Kubernetes cluster status Grafana dashboard not loading data for some panels
 
 ### Added
 

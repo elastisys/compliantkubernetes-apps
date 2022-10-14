@@ -1314,7 +1314,6 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
         "uid": "$datasource"
       },
       "fieldConfig": {
@@ -1388,10 +1387,6 @@
       "pluginVersion": "8.0.5",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PE090269EBE049DA8"
-          },
           "exemplar": false,
           "expr": "sum by (node, cluster) (kube_pod_container_resource_requests{cluster=~\"$cluster\", node=~\"$node\", namespace=~\"$namespace\", resource=\"cpu\"} and on (pod, namespace, cluster) kube_pod_status_phase{phase=\"Running\", cluster=~\"$cluster\", namespace=~\"$namespace\"} == 1 ) / sum by (node, cluster) (kube_node_status_allocatable{cluster=~\"$cluster\", node=~\"$node\", resource=\"cpu\"})",
           "interval": "",
@@ -1404,7 +1399,6 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
         "uid": "$datasource"
       },
       "fieldConfig": {
@@ -1478,10 +1472,6 @@
       "pluginVersion": "8.0.5",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PE090269EBE049DA8"
-          },
           "exemplar": true,
           "expr": "sum by (node, cluster) (kube_pod_container_resource_requests{cluster=~\"$cluster\", namespace=~\"$namespace\", node=~\"$node\", resource=\"memory\"} and on (pod, namespace, cluster) kube_pod_status_phase{phase=\"Running\", cluster=~\"$cluster\", namespace=~\"$namespace\"} == 1) / sum by (node, cluster) (kube_node_status_allocatable{cluster=~\"$cluster\", node=~\"$node\", resource=\"memory\"})",
           "interval": "",
@@ -1494,7 +1484,6 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
         "uid": "$datasource"
       },
       "fieldConfig": {
@@ -1567,10 +1556,6 @@
       "pluginVersion": "8.0.5",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PE090269EBE049DA8"
-          },
           "exemplar": true,
           "expr": "sum by (node, cluster) (kube_pod_container_resource_limits{cluster=~\"$cluster\", namespace=~\"$namespace\", node=~\"$node\", resource=\"cpu\"} and on (pod, namespace, cluster) kube_pod_status_phase{phase=\"Running\", cluster=~\"$cluster\", namespace=~\"$namespace\"} == 1 ) / sum by (node, cluster) (kube_node_status_allocatable{cluster=~\"$cluster\", node=~\"$node\", resource=\"cpu\"})",
           "interval": "",
@@ -1583,7 +1568,6 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
         "uid": "$datasource"
       },
       "fieldConfig": {
@@ -1656,10 +1640,6 @@
       "pluginVersion": "8.0.5",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PE090269EBE049DA8"
-          },
           "exemplar": true,
           "expr": "sum by (node, cluster) (kube_pod_container_resource_limits{cluster=~\"$cluster\", namespace=~\"$namespace\", node=~\"$node\", resource=\"memory\"} and on (pod, namespace, cluster) kube_pod_status_phase{phase=\"Running\", cluster=~\"$cluster\", namespace=~\"$namespace\"} == 1) / sum by (node, cluster) (kube_node_status_allocatable{cluster=~\"$cluster\", node=~\"$node\", resource=\"memory\"})",
           "interval": "",
@@ -1672,7 +1652,6 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
         "uid": "$datasource"
       },
       "fieldConfig": {
@@ -1751,10 +1730,6 @@
       "pluginVersion": "8.0.5",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "$datasource"
-          },
           "exemplar": true,
           "expr": "sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{cluster=~\"$cluster\", node=~\"$node\", namespace=~\"$namespace\"}) by (pod, cluster) / sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests{cluster=~\"$cluster\", node=~\"$node\", namespace=~\"$namespace\"}) by (pod, cluster)",
           "hide": false,
@@ -1769,7 +1744,6 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
         "uid": "$datasource"
       },
       "fieldConfig": {
@@ -1848,10 +1822,6 @@
       "pluginVersion": "8.0.5",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "$datasource"
-          },
           "exemplar": false,
           "expr": "sum(node_namespace_pod_container:container_memory_working_set_bytes{cluster=~\"$cluster\", node=~\"$node\", namespace=~\"$namespace\", container!=\"\"}) by (pod, cluster) / sum(cluster:namespace:pod_memory:active:kube_pod_container_resource_requests{cluster=~\"$cluster\", node=~\"$node\", namespace=~\"$namespace\"}) by (pod, cluster)",
           "hide": false,
