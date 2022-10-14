@@ -60,11 +60,6 @@
 
 ### Added
 
-- Option to create custom solvers for letsencrypt issuers, including a simple way to add secrets.
-- Add external redis database as option for harbor
-- a new alert `FluentdAvailableSpaceBuffer`, notifies when the fluentd buffer is filling up
-- Option to enable `allowSnippetAnnotations` from the configs
-- the possibility to enable falco in the service cluster
 - Kube-bench runs on every node
 - Added a CIS kube-bench Grafana dashboard
 - Added `topologySpreadConstraints` rule to thanos and kube-prometheus-stack.
