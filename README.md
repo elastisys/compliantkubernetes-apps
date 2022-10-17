@@ -403,10 +403,6 @@ See <https://compliantkubernetes.io/operator-manual/>.
 
 ## Known issues
 
-- When using local volumes, OpenSearch might not start properly unless all worker nodes in the cluster has a local volume attatched to it.
-- Users must explicitly be given privileges in Grafana, OpenSearch and Kubernetes instead of automatically getting assigned roles based on group membership when logging in using OIDC.
-- The OPA policies are not enforced by default.
-  Unfortunately the policies breaks cert-manager so they have been set to "dry-run" by default.
 - OpenSearch Dashboards Single Sign On (SSO) via OpenID/Dex requires LetsEncrypt Production.
 
 For more, please the the public GitHub issues: <https://github.com/elastisys/compliantkubernetes-apps/issues>.
