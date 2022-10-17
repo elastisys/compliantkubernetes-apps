@@ -495,6 +495,14 @@ dex:
       whenUnsatisfiable: DoNotSchedule
   affinity: {}
   nodeSelector: {}
+  expiry:
+    deviceRequests: "5m"
+    signingKeys: "6h"
+    idToken: "24h"
+    refreshTokens:
+      reuseInterval: "3s"
+      validIfNotUsedFor: "2160h" # 90 days
+      absoluteLifetime: "3960h" # 165 days
   google:
     # Enables extra config needed to enable google connector to fetch group info.
     # When this is enabled the SASecretName needs to be set.
