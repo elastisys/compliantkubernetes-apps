@@ -1,9 +1,9 @@
 name: End-to-end
 
-#on:
-#  schedule:
-#  # Run at 4 and 10 GMT, basically "early morning" and "lunch"
-#  - cron: "0 4,10 * * *"
+on:
+  schedule:
+  # Run at 4 and 10 GMT, basically "early morning" and "lunch"
+  - cron: "0 4,10 * * *"
 
 jobs:
 
@@ -91,7 +91,7 @@ jobs:
         args: route53 change-resource-record-sets --hosted-zone-id Z2STJRQSJO5PZ0 --change-batch file://apps/pipeline/config/exoscale/dns-${{ matrix.cluster }}.json
 
     - name: Run kubespray
-      uses: docker://quay.io/kubespray/kubespray:v2.19.0
+      uses: docker://quay.io/kubespray/kubespray:v2.20.0
       env:
         ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
       with:
