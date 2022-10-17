@@ -28,6 +28,14 @@ volumes:
 {{- end }}
 
 config:
+  expiry:
+    deviceRequests: {{ .Values.dex.expiry.deviceRequests }}
+    signingKeys: {{ .Values.dex.expiry.signingKeys }}
+    idTokens: {{ .Values.dex.expiry.idToken }}
+    refreshTokens:
+      reuseInterval: {{ .Values.dex.expiry.refreshTokens.reuseInterval }}
+      validIfNotUsedFor: {{ .Values.dex.expiry.refreshTokens.validIfNotUsedFor }}
+      absoluteLifetime: {{ .Values.dex.expiry.refreshTokens.absoluteLifetime }}
   storage:
     type: kubernetes
     config:
