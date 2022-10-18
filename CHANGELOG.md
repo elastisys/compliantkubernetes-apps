@@ -1,5 +1,6 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.26.2](#v0262---2022-10-18)
 - [v0.26.1](#v0261---2022-10-05)
 - [v0.26.0](#v0260---2022-09-19)
 - [v0.25.0](#v0250---2022-08-25)
@@ -29,6 +30,22 @@
 - [v0.6.0](#v060---2020-10-16)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.26.2 - 2022-10-18
+
+### Changed
+- Changed the default limit for diskLimit alert, from 66 to 75
+
+### Fixed
+
+- Blackbox exporter now looks at the correct error code for the opensearch-dashboards target
+- Harbor backup is now pointed to the correct internal service to make backups from
+- Bumped backup-postgres image to use tag `1.2.0`, which includes newer versions of the postgresql client
+- Fixed inevitable mapping conflicts in Opensearch by updating `elastisys/fluentd` to use image tag `v3.4.0-ck8s4`.
+  In this image `fluent-plugin-kubernetes_metadata_filter` has been downgraded to version `2.13.0`, which still includes the de_dot functionality that was removed in the prior tag of the image.
+- Kubernetes cluster status Grafana dashboard not loading data for some panels
+- Fixed harbor network policies
 
 -------------------------------------------------
 ## v0.26.1 - 2022-10-05
