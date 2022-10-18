@@ -32,6 +32,11 @@ networkPolicies:
     scIngress:
       ips:
         - "0.0.0.0/0"
-    objectStorage:
+    wcIngress:
       ips:
         - "0.0.0.0/0"
+    objectStorage:
+      ips: # ips to s3 service
+      - "0.0.0.0/0"
+      ports: # ports to s3 service
+      - 443
