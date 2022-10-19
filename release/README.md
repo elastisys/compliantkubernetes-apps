@@ -70,3 +70,5 @@ https://semver.org/
     *When the script is done a [GitHub actions workflow pipeline](/.github/workflows/release.yml) should've created a GitHub release from that tag.*
 
 1. Follow the major/minor release from step 6 to update the public release notes.
+
+> **_WARNING:_** At the end in the github main page you will see a message like `release-X.Y had recent pushes * minutes ago` and the option to `Compare & pull request` --> Ignore this! Do not create a PR to push back to main!
