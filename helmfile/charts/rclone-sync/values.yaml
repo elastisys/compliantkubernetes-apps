@@ -38,6 +38,7 @@ config:
     fileNames: false
 
 defaultSchedule: 0 5 * * *
+backoffLimit: 0
 
 buckets:
   - source: bucket
