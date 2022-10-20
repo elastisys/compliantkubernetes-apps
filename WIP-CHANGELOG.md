@@ -17,6 +17,7 @@
 - Changed some default resource requests and limits for multiple components
 - Gatekeeper audits every 10 min instead of 1 min
 - Gatekeeper audit only looks at the resource types mentioned in constraints, instead of all resource types
+- Set backoffLimit for rclone-jobs to 0.
 
 ### Fixed
 
