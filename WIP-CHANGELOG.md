@@ -20,6 +20,7 @@
 - Set backoffLimit for rclone-jobs to 0.
 - Made dex ID Token expiration time configurable
 - Made dex tokens expiry times configurable
+- Excluded the `gatekeeper-system` namespace from velero backups in the workload cluster.
 
 ### Fixed
 
