@@ -14,8 +14,16 @@ global:
   wcIngress:
     ips: {{- toYaml .Values.networkPolicies.global.wcIngress.ips | nindent 6 }}
   objectStorage:
-    ips: {{- toYaml .Values.networkPolicies.global.objectStorage.ips | nindent 6 }}
-    ports: {{- toYaml .Values.networkPolicies.global.objectStorage.ports | nindent 6 }}
+    ips:
+      {{- toYaml .Values.networkPolicies.global.objectStorage.ips | nindent 6 }}
+      {{- if or (eq .Values.harbor.persistence.type "swift") (eq .Values.harbor.persistence.type "swift") }}
+      {{- toYaml .Values.networkPolicies.global.objectStorageSwift.ips | nindent 6 }}
+      {{- end }}
+    ports:
+      {{- toYaml .Values.networkPolicies.global.objectStorage.ports | nindent 6 }}
+      {{- if or (eq .Values.harbor.persistence.type "swift") (eq .Values.harbor.persistence.type "swift") }}
+      {{- toYaml .Values.networkPolicies.global.objectStorageSwift.ports | nindent 6 }}
+      {{- end }}
   externalLoadBalancer: {{ .Values.networkPolicies.global.externalLoadBalancer }}
   ingressUsingHostNetwork: {{ .Values.ingressNginx.controller.useHostPort }}
 

@@ -22,6 +22,7 @@
 - Made dex ID Token expiration time configurable
 - Made dex tokens expiry times configurable
 - Excluded the `gatekeeper-system` namespace from velero backups in the workload cluster.
+- Moved Harbor Swift configuration to `objectStorage.swift` to use the same as for Thanos.
 
 ### Fixed
 
@@ -34,6 +35,7 @@
 - Fixed inevitable mapping conflicts in Opensearch by updating `elastisys/fluentd` to use image tag `v3.4.0-ck8s4`.
   In this image `fluent-plugin-kubernetes_metadata_filter` has been downgraded to version `2.13.0`, which still includes the de_dot functionality that was removed in the prior tag of the image.
 - Fixed harbor network policies
+- Fixed update-ips script to handle ports for S3 endpoints
 
 ### Added
 - Option to configure alerts for growing indices in OpenSearch
@@ -49,6 +51,7 @@
 - Network policies for s3-exporter
 - New section in the welcoming dashboards, displaying the most relevant features and changes for the user added in the last two releases.
 - Network policies for ingress-nginx and cert-manager
+- Added support for running Thanos on Swift
 
 ### Removed
 

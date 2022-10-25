@@ -279,15 +279,15 @@ set_harbor_config() {
             persistence_type=swift
             disable_redirect=true
 
-            yq4 --inplace '.harbor.persistence.swift.identityApiVersion = 3' "${file}"
-            yq4 --inplace '.harbor.persistence.swift.authURL = "set-me"' "${file}"
-            yq4 --inplace '.harbor.persistence.swift.regionName = "set-me"' "${file}"
-            yq4 --inplace '.harbor.persistence.swift.projectDomainName = "set-me"' "${file}"
-            yq4 --inplace '.harbor.persistence.swift.userDomainName = "set-me"' "${file}"
-            yq4 --inplace '.harbor.persistence.swift.projectName = "set-me"' "${file}"
-            yq4 --inplace '.harbor.persistence.swift.projectID = "set-me"' "${file}"
-            yq4 --inplace '.harbor.persistence.swift.tenantName = "set-me"' "${file}"
-            yq4 --inplace '.harbor.persistence.swift.authVersion = 3' "${file}"
+            yq4 --inplace '.objectStorage.swift.authVersion = 0' "${file}"
+            yq4 --inplace '.objectStorage.swift.authUrl = "set-me"' "${file}"
+            yq4 --inplace '.objectStorage.swift.region = "set-me"' "${file}"
+            yq4 --inplace '.objectStorage.swift.domainId = "set-me"' "${file}"
+            yq4 --inplace '.objectStorage.swift.domainName = "set-me-or-domainId"' "${file}"
+            yq4 --inplace '.objectStorage.swift.projectDomainId = "set-me"' "${file}"
+            yq4 --inplace '.objectStorage.swift.projectDomainName = "set-me-or-projectDomainId"' "${file}"
+            yq4 --inplace '.objectStorage.swift.projectId = "set-me"' "${file}"
+            yq4 --inplace '.objectStorage.swift.projectName = "set-me"' "${file}"
             ;;
 
         baremetal)

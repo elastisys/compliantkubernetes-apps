@@ -10,6 +10,12 @@
     bin/ck8s init
     ```
 
+1. *When using Harbor on Swift:* Migrate Swift configuration.
+
+    ```bash
+    ./migration/v0.26.x-v0.27.x/migrate-swift.sh
+    ```
+
 1. *IMPORTANT* If you are using any Dex connector of type `google` and you haven't added a service account then you'll need to change it to a type `oidc`
 
     This can be done by adding the following line to the `config` part in the connector

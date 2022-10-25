@@ -62,11 +62,11 @@ storageClasses:
 ## Object storage configuration for backups.
 objectStorage:
   ## Options are 's3', 'gcs', or 'none'
-  ## If 'none', remember to disable backups (velero)
-  # If "none", remember to disable features that depend on object storage:
-  #   all backups (velero, harbor, opensearch), sc logs (fluentd)
-  #   Also set harbor persistence to "filesystem" or "swift"
-  # Otherwise configure the features to match this type.
+  ## If "none", remember to disable features that depend on object storage:
+  ##   All backups (Velero, Harbor, OpenSearch), SC logs (Fluentd)
+  ##   Long term metrics with Thanos.
+  ##   Also set Harbor persistence to "filesystem" or "swift"
+  ## Otherwise configure the features to match this type.
   type: set-me
   # gcs:
   #   project: set-me

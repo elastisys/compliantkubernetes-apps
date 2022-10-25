@@ -9,6 +9,19 @@ global:
     - ${CK8S_ENVIRONMENT_NAME}-wc
 
 objectStorage:
+  ## Swift can be enabled seperately for Harbor and Thanos only.
+  # swift:
+  #   authVersion: 0 # auto detect
+  #   authUrl: set-me
+  #   region: set-me
+  #   domainId: set-me
+  #   domainName: set-me
+  #   projectDomainId: set-me
+  #   projectDomainName: set-me
+  #   projectId: set-me
+  #   projectName: set-me
+  #   segmentsContainerSuffix: "+segments" # same as s3api
+
   buckets:
     harbor: ${CK8S_ENVIRONMENT_NAME}-harbor
     opensearch: ${CK8S_ENVIRONMENT_NAME}-opensearch
@@ -674,6 +687,11 @@ thanos:
     serviceMonitor:
       enabled: true
 
+  objectStorage:
+    # Available options "s3" or "swift", defaults to "objectStorage.type" when empty
+    # Configure the storage credentials in the global "objectStorage"
+    type: ""
+
 opensearch:
   # 'subdomain' and 'indexPerNamespace' is set in common-config.yaml
 
@@ -1086,6 +1104,11 @@ networkPolicies:
 #     egress: {}
 # ---
   global:
+    objectStorageSwift:
+      ips:
+        - set-me-if-enabled
+      ports:
+        - set-me-if-enabled
     scApiserver:
       # usualy private ip of control-plane nodes
       ips:

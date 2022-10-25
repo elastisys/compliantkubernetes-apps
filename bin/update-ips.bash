@@ -139,6 +139,36 @@ checkIfDiffAndUpdateKubectlIPs() {
     fi
 }
 
+# checkIfDiffAndUpdatePorts <filepath> <yamlpath> <ports>...
+checkIfDiffAndUpdatePorts() {
+    filepath="$1"
+    yamlpath="$2"
+    shift 2
+
+    ports="$(echo "[$(for port in "$@"; do echo "$port,"; done)]" | yq4 -oj)"
+
+    if $DRY_RUN; then
+        out=/dev/stdout
+    else
+        out=/dev/null
+    fi
+
+    portDiff() {
+      diff -U3 --color=always \
+          --label "${filepath//${CK8S_CONFIG_PATH}\//}" <(yq4 -P "$yamlpath"' // [] | sort_by(.)' "$filepath") \
+          --label expected <(echo "$ports" | yq4 -P '. | sort_by(.)') > "$out"
+    }
+
+    if ! portDiff ; then
+        if ! $DRY_RUN; then
+            yq4 -i "$yamlpath = $ports" "$filepath"
+        else
+            log_warning "Diff found for $yamlpath in ${filepath//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
+        fi
+        has_diff=$(( has_diff + 1 ))
+    fi
+}
+
 # yq_dig <cluster> <node> <default>
 yq_dig() {
   for conf in "${config["override_$1"]}" "${config["override_common"]}" "${config["default_$1"]}" "${config["default_common"]}"; do
@@ -159,10 +189,14 @@ else
   DIG_CLUSTER="wc"
 fi
 
-S3_ENDPOINT="$(yq_dig "${DIG_CLUSTER}" '.objectStorage.s3.regionEndpoint' '""' | sed 's/https\?:\/\///')"
+S3_ENDPOINT="$(yq_dig "${DIG_CLUSTER}" '.objectStorage.s3.regionEndpoint' '""' | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
 if [[ "${S3_ENDPOINT}" == "" ]]; then
     log_error "No S3 endpoint found, check your common-config.yaml (or ${DIG_CLUSTER}-config.yaml)"
     exit 1
+fi
+S3_PORT="$(yq_dig 'sc' '.objectStorage.s3.regionEndpoint' '""' | sed 's/https\?:\/\///' | sed 's/[A-Za-z.:]*//' | sed 's/\/.*//')"
+if [ -z "$S3_PORT" ]; then
+    S3_PORT="443"
 fi
 
 OPS_DOMAIN="$(yq_dig "${DIG_CLUSTER}" '.global.opsDomain' '""')"
@@ -179,6 +213,8 @@ fi
 
 ## Add object storage ips to common config
 checkIfDiffAndUpdateDNSIPs "${S3_ENDPOINT}" ".networkPolicies.global.objectStorage.ips" "${config["override_common"]}"
+## Add object storage port to common config
+checkIfDiffAndUpdatePorts "${config["override_common"]}" ".networkPolicies.global.objectStorage.ports" "$S3_PORT"
 
 ## Add sc ingress ips to common config
 checkIfDiffAndUpdateDNSIPs "grafana.${OPS_DOMAIN}" ".networkPolicies.global.scIngress.ips" "${config["override_common"]}"
@@ -204,6 +240,26 @@ fi
 ## Add wc nodes ips to wc config
 if [[ "${CHECK_CLUSTER}" =~ ^(wc|both)$ ]]; then
     checkIfDiffAndUpdateKubectlIPs "wc" "" ".networkPolicies.global.wcNodes.ips" "${config["override_wc"]}"
+fi
+
+## Add Swift to sc config
+if [[ "${CHECK_CLUSTER}" =~ ^(sc|both)$ ]]; then
+    CHECK="$(yq_dig 'sc' '.harbor.persistence.type == "swift" or .thanos.objectStorage.type == "swift"' 'false')"
+    if [ "$CHECK" == "true" ]; then
+        SWIFT_ENDPOINT="$(yq_dig 'sc' '.objectStorage.swift.authUrl' '""' | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
+        if [ -z "$SWIFT_ENDPOINT" ]; then
+            log_error "No Swift endpoint found, check your sc-config.yaml"
+            exit 1
+        fi
+        SWIFT_PORT="$(yq_dig 'sc' '.objectStorage.swift.authUrl' '""' | sed 's/https\?:\/\///' | sed 's/[A-Za-z.:]*//' | sed 's/\/.*//')"
+        if [ -z "$SWIFT_PORT" ]; then
+            SWIFT_PORT="443"
+        fi
+
+        checkIfDiffAndUpdateDNSIPs "${SWIFT_ENDPOINT}" ".networkPolicies.global.objectStorageSwift.ips" "${config["override_sc"]}"
+
+        checkIfDiffAndUpdatePorts "${config["override_sc"]}" ".networkPolicies.global.objectStorageSwift.ports" "$SWIFT_PORT"
+    fi
 fi
 
 ## Add destination object storage ips for rclone sync to sc config

@@ -59,16 +59,22 @@ persistence:
     filesystem:
       rootdirectory: /storage
     {{ else if eq .Values.harbor.persistence.type "swift" }}
+    {{- $swift := .Values.objectStorage | getOrNil "swift" | required "Swift enabled for Harbor but not configured!" }}
     type: swift
     swift:
-      authurl: {{ .Values.harbor.persistence.swift.authURL }}/v3
-      username: {{ .Values.harbor.persistence.swift.username }}
-      password: {{ .Values.harbor.persistence.swift.password }}
+      authversion: {{ $swift.authVersion }}
+      authurl: {{ $swift.authUrl }}
+      region: {{ $swift.region }}
       container: {{ .Values.objectStorage.buckets.harbor }}
-      region: {{ .Values.harbor.persistence.swift.regionName }}
-      authversion: {{ .Values.harbor.persistence.swift.authVersion }}
-      tenant: {{ .Values.harbor.persistence.swift.tenantName }}
-      domain: {{ .Values.harbor.persistence.swift.projectDomainName }}
+      {{- if hasKey $swift "domainId" }}
+      domainid: {{ $swift.domainId }}
+      {{- else if hasKey $swift "domainName" }}
+      domain: {{ $swift.domainName }}
+      {{- end }}
+      username: {{ $swift.username | quote }}
+      password: {{ $swift.password | quote }}
+      tenantid: {{ $swift.projectId }}
+      tenant: {{ $swift.projectName }}
     {{ else if eq .Values.harbor.persistence.type "objectStorage" }}
     {{ if eq .Values.objectStorage.type "s3" }}
     type: s3
