@@ -109,6 +109,7 @@ schedules:
         - redis-system
         - rook-ceph
         - velero
+        - gatekeeper-system
       ttl: {{ .Values.velero.retentionPeriod }}
       labelSelector:
         matchExpressions:
