@@ -39,6 +39,7 @@
   In this image `fluent-plugin-kubernetes_metadata_filter` has been downgraded to version `2.13.0`, which still includes the de_dot functionality that was removed in the prior tag of the image.
 - Fixed harbor network policies
 - Fixed update-ips script to handle ports for S3 endpoints
+- Rclone can now be configured to run every x minutes/hours/days/week/month/year.
 
 ### Added
 - Option to configure alerts for growing indices in OpenSearch

@@ -71,7 +71,7 @@ buckets:
     destination: {{ .source }}
     {{- end }}
     {{- if hasKey . "schedule" }}
-    schedule: {{ .schedule }}
+    schedule: {{ .schedule | quote }}
     {{- end }}
   {{- end }}
 {{- end }}
