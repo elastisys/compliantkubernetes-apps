@@ -9,7 +9,7 @@ metadata:
     component: {{ $.Chart.Name }}-{{ .source }}
 spec:
   {{- if hasKey . "schedule" }}
-  schedule: {{ .schedule }}
+  schedule: {{ .schedule | quote }}
   {{- else }}
   schedule: {{ $.Values.defaultSchedule }}
   {{- end }}
