@@ -98,19 +98,7 @@ falco:
   enabled: true
   ## additional falco rules
   ## ref: https://falco.org/docs/rules/
-  customRules:
-    elastisys-images.yaml: |-
-      - macro: user_known_contact_k8s_api_server_activities
-        condition: (container.image.repository in (docker.io/elastisys/curl-jq, docker.io/elastisys/calico-accountant, docker.io/elastisys/fluentd, quay.io/kiwigrid/k8s-sidecar))
-      - macro: user_known_package_manager_in_container
-        condition: (container.image.repository in (docker.io/elastisys/curl-jq))
-      - list: falco_privileged_images
-        append: true
-        items: [docker.io/elastisys/calico-accountant]
-    velero.yaml: |-
-      - macro: user_known_contact_k8s_api_server_activities
-        append: true
-        condition: or (container.image.repository in (docker.io/velero/velero))
+  customRules: []
   resources:
     limits:
       cpu: 200m

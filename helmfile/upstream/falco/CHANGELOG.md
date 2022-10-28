@@ -3,6 +3,218 @@
 This file documents all notable changes to Falco Helm Chart. The release
 numbering uses [semantic versioning](http://semver.org).
 
+## v2.2.0
+
+* Change the grpc socket path from `unix:///var/run/falco/falco.soc` to `unix:///run/falco/falco.sock`. Please note that this change is potentially a breaking change if upgrading falco from a previous version and you have external consumers of the grpc socket.
+
+## v2.1.0
+
+* Bump Falco to 0.33.0
+* Implicitly disable `syscall` source when not required
+* Update `values.yaml` to reflect the new configuration options in Falco 0.33.0
+* Mount `/sys/module/falco` when deployed using the `kernel module`
+* Update rulesets for falco and plugins
+
+## v2.0.18
+
+* Bump `falcosidekick` dependency to 0.5.9
+
+## v2.0.17
+
+* Fix: remove `namespace` from `clusterrole` and `clusterrolebinding` metadata
+
+## v2.0.16
+
+* Allow setting `resources` and `securityContext` on the `falco-driver-loader` init container
+
+## v2.0.15
+
+* Allow passing args to the `falco-driver-loader` init container
+
+## v2.0.14
+
+* Fix debugfs mount when `falco-no-driver` image and ebpf driver is used
+
+## v2.0.13
+
+* Upgrade Falco to 0.32.2
+
+## v2.0.12
+
+* Fully disable the driver when running in CI
+
+## v2.0.11
+
+* Correct CI values.
+
+## v2.0.10
+
+* Fix name of the falco certs secret.
+
+## v2.0.9
+
+* Fix the `certs-secret.yaml` template by correctly pointing to the root context when using the helpers.
+
+## v2.0.8
+
+* When using ebpf probe Falco is deployed in `privileged` mode instead of `least privileged`.
+
+## v2.0.7
+
+* Fix templating for priorityClassName in pod-template.tpl
+
+## v2.0.6
+
+* Add ability to enable `tty` for the falco container. Needed to force falco logs to be immediately displayed as they are emitted. Useful in test/debug scenarios.
+
+## v2.0.5
+
+* Mount `/proc` only when syscall data source is enabled (default). This behaviour can be overridden via `mounts.enforceProcMount` for edge cases where the `/proc` `hostPath` mount is required without having the syscall data source enabled at the same time.
+
+## v2.0.4
+
+* Fix templating for init containers in pod-template.tpl
+
+## v2.0.3
+
+* Add ability to specify extra environment variables to driver loader initContainer
+
+## v2.0.2
+
+update(falco/OWNERS): move inactive approvers to emeritus_approvers
+
+## v2.0.1
+
+* Add description for configuration variable in values.yaml
+* Add linting target in Makefile
+* Remove configuration values table from README.md
+* Fix section titles in README.md
+
+## v2.0.0
+
+**Note**
+*This release is a complete refactor of the Falco Helm Chart. Thus, it introduces some breaking changes.*
+*Please, do not reuse values from previous chart installations.*
+
+* Upgrade Falco to 0.32.1
+* Massive refactoring of the chart implementation
+* Add ability to use either a daemonset or a deployment (depending on the installation scenario)
+* Add ability to specify custom network services
+* New settings for the drivers configuration
+* New Makefile to generate helm documentation
+* Add values-k8saudit.yaml preset for the k8saudit plugin
+* Fix use `load_plugins` instead of `loadPlugins` in Falco configuration
+* Update `containerSecurityContext` (former `securityContext`) now takes precedence over auto configs
+* Move `leastPriviledged` mode under eBPF and add missing `SYS_PTRACE` cap
+* Update group values for metadata collection under "collectors"
+* Remove several settings in favour of `extra.env`
+* Use chart `appVersion` as default image tag
+* Move setting from `image.pullSecrets` to `imagePullSecrets`
+* Add an option to set desidered replicas
+* Improve selector labels
+* Modernize labels and improve internal helpers
+* Deprecate PSP (template removed)
+* Fake event generator removed from this chart
+
+## v1.19.4
+
+* Bump Falco Sidekick dependency.
+
+## v1.19.3
+
+* Add `watchConfigFiles` value to falco README
+
+## v1.19.2
+
+* Bump Falco Sidekick dependency.
+* Add support for DaemonSet podSecurityContext and securityContext.
+
+## v1.19.1
+
+* Fix the changelog for 1.19.0
+
+## v1.19.0
+
+* Upgrade to Falco 0.32.0 (see the [Falco changelog](https://github.com/falcosecurity/falco/blob/0.32.0/CHANGELOG.md))
+* Various Falco config settings were updated for Falco 0.32.0
+
+### Breaking Changes
+
+* Audit Log is now supported via k8saudit plugin (when enabled, syscall instrumentation will be disabled)
+* dynamicBackend support for Audit Log is now deprecated
+
+## v1.18.6
+
+* Bump falcosidekick chart dependency (fix issue with the UI)
+
+## v1.18.5
+
+* Bump falcosidekick chart dependency
+  
+## v1.18.4
+
+* Now the url to falcosidekick on NOTES.txt on falco helm chart points to the right place.
+
+## v1.18.3
+
+* Fix for [issue 318](https://github.com/falcosecurity/charts/issues/318) - Missing comma in k8s_audit_rules.yaml.
+
+## v1.18.2
+
+* Further fix for `--reuse-values` option after the introduction of `crio.enabled`.
+
+## v1.18.1
+
+* Workaround to make this chart work with Helm `--reuse-values` option after the introduction of `crio.enabled`.
+
+## v1.18.0
+
+* Added support for cri-o
+
+## v1.17.6
+
+Remove whitespace around `falco.httpOutput.url` to fix the error `libcurl error: URL using bad/illegal format or missing URL`.
+
+## v1.17.5
+
+* Changed `falco.httpOutput.url` so that it always overrides the default URL, even when falcosidekick is enabled. (NOTE: don't use this version, see v1.17.6)
+
+## v1.17.4
+
+* Upgrade to Falco 0.31.1 (see the [Falco changelog](https://github.com/falcosecurity/falco/blob/0.31.1/CHANGELOG.md))
+* Update rulesets from Falco 0.31.1
+
+## v1.17.3
+
+* Fix quoting around `--k8s-node`
+
+## v1.17.2
+
+* Add `leastPrivileged.enabled` configuration
+
+## v1.17.1
+
+* Fixed `priority` level `info` change to `informational`
+
+## v1.17.0
+
+* Upgrade to Falco 0.31.0 (see the [Falco changelog](https://github.com/falcosecurity/falco/blob/0.31.0/CHANGELOG.md))
+* Update rulesets from Falco 0.31.0
+* Update several configuration options under the `falco` node to reflect the new Falco version
+* Initial plugins support
+
+## v1.16.4
+
+* Bump falcosidekick chart dependency
+
+## v1.16.2
+
+* Add `serviceAccount.annotations` configuration
+
+## v1.16.1
+
+* Fixed string escaping for `--k8s-node`
+
 ## v1.16.0
 
 * Upgrade to Falco 0.30.0 (see the [Falco changelog](https://github.com/falcosecurity/falco/blob/0.30.0/CHANGELOG.md))
@@ -205,7 +417,7 @@ numbering uses [semantic versioning](http://semver.org).
 ### Minor Changes
 
 * Allow adding InitContainers to Falco pod with `extraInitContainers` configuration
-   
+
 ## v1.3.0
 
 ### Minor Changes
@@ -223,7 +435,7 @@ numbering uses [semantic versioning](http://semver.org).
 
 ### Minor Changes
 
-* Allow configuration using values for `imagePullSecrets` setting 
+* Allow configuration using values for `imagePullSecrets` setting
 * Add `docker.io/falcosecurity/falco` image to `falco_privileged_images` macro
 
 ## v1.2.1
@@ -262,7 +474,7 @@ numbering uses [semantic versioning](http://semver.org).
 ### Minor Changes
 
 * Upgrade to Falco 0.23.0
-* Correct socket path for `--cri` flag 
+* Correct socket path for `--cri` flag
 * Always mount `/etc` (required by `falco-driver-loader`)
 
 ## v1.1.7

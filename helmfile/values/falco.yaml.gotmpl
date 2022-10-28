@@ -1,25 +1,21 @@
 falco:
-  jsonOutput: true
-  syscallEventDrops:
+  json_output: true
+  syscall_event_drops:
     # Should be removed when fixed. Probably in 1.0.0 https://github.com/falcosecurity/falco/milestone/3
     actions:
       - ignore
   grpc:
     enabled: true
-    unixSocketPath: "unix:///var/run/falco/falco.sock"
+    bind_address: "unix:///var/run/falco/falco.sock"
     threadiness: 8
 
-  grpcOutput:
+  grpc_output:
     enabled: true
-
 
 resources: {{- toYaml .Values.falco.resources | nindent 2  }}
 nodeSelector: {{- toYaml .Values.falco.nodeSelector | nindent 2  }}
 affinity: {{- toYaml .Values.falco.affinity | nindent 2  }}
 tolerations: {{- toYaml .Values.falco.tolerations | nindent 2  }}
-
-podSecurityPolicy:
-  create: true
 
 customRules:
   {{- if .Values.falco.customRules }}
@@ -46,221 +42,73 @@ customRules:
       tags: [network]
   overwrites.yaml: |-
     - macro: k8s_containers
-      condition: >
-        (container.image.repository in (gcr.io/google_containers/hyperkube-amd64,
-        gcr.io/google_containers/kube2sky, sysdig/agent, sysdig/falco,
-        sysdig/sysdig, falcosecurity/falco, docker.io/falcosecurity/falco, docker.io/bitnami/fluentd,
-        velero/velero, quay.io/jetstack/cert-manager-cainjector, weaveworks/kured,
-        ingress-controller/controller, quay.io/prometheus-operator/prometheus-operator,
-        k8s.gcr.io/ingress-nginx/kube-webhook-certgen, quay.io/spotahome/redis-operator,
-        registry.opensource.zalan.do/acid/postgres-operator, registry.opensource.zalan.do/acid/postgres-operator-ui,
-        rabbitmqoperator/cluster-operator) or (k8s.ns.name = "kube-system"))
-    - list: falco_privileged_images
-      append: true
-      items: [
-        docker.io/sysdig/agent, docker.io/sysdig/falco, docker.io/sysdig/sysdig,
-        gcr.io/google_containers/kube-proxy, docker.io/calico/node, quay.io/calico/node,
-        docker.io/rook/toolbox, docker.io/cloudnativelabs/kube-router, docker.io/mesosphere/mesos-slave,
-        docker.io/docker/ucp-agent, sematext_images, k8s.gcr.io/kube-proxy, calico/node, falcosecurity/falco,
-        k8s.gcr.io/k8s-dns-node-cache, k8s.gcr.io/dns/k8s-dns-node-cache, registry.k8s.io/dns/k8s-dns-node-cache,
-        docker.io/falcosecurity/falco, docker.io/k8scloudprovider/cinder-csi-plugin
-    ]
-    - macro: postgres_running_wal_e
-      condition: ((proc.pname=postgres and proc.cmdline startswith "sh -c envdir /etc/wal-e.d/env /usr/local/bin/wal-e") or
-                  (proc.pname=postgres and proc.cmdline startswith "sh -c envdir \"/run/etc/wal-e.d/env\" wal-g wal-push"))
-    - list: falco_sensitive_mount_images
-      items: [
-        docker.io/sysdig/agent, docker.io/sysdig/falco, docker.io/sysdig/sysdig,
-        docker.io/falcosecurity/falco, falcosecurity/falco, public.ecr.aws/falcosecurity/falco,
-        gcr.io/google_containers/hyperkube,
-        gcr.io/google_containers/kube-proxy, docker.io/calico/node,
-        docker.io/rook/toolbox, docker.io/cloudnativelabs/kube-router, docker.io/consul,
-        docker.io/datadog/docker-dd-agent, docker.io/datadog/agent, docker.io/docker/ucp-agent, docker.io/gliderlabs/logspout,
-        docker.io/netdata/netdata, docker.io/google/cadvisor, docker.io/prom/node-exporter,
-        amazon/amazon-ecs-agent, quay.io/prometheus/node-exporter
-        ]
-    - macro: write_etc_common
-      condition: >
-        etc_dir and evt.dir = < and open_write
-        and proc_name_exists
-        and not proc.name in (passwd_binaries, shadowutils_binaries, sysdigcloud_binaries,
-                          package_mgmt_binaries, ssl_mgmt_binaries, dhcp_binaries,
-                          dev_creation_binaries, shell_mgmt_binaries,
-                          mail_config_binaries,
-                          sshkit_script_binaries,
-                          ldconfig.real, ldconfig, confd, gpg, insserv,
-                          apparmor_parser, update-mime, tzdata.config, tzdata.postinst,
-                          systemd, systemd-machine, systemd-sysuser,
-                          debconf-show, rollerd, bind9.postinst, sv,
-                          gen_resolvconf., update-ca-certi, certbot, runsv,
-                          qualys-cloud-ag, locales.postins, nomachine_binaries,
-                          adclient, certutil, crlutil, pam-auth-update, parallels_insta,
-                          openshift-launc, update-rc.d, puppet)
-        and not (container and proc.cmdline in ("cp /run/secrets/kubernetes.io/serviceaccount/ca.crt /etc/pki/ca-trust/source/anchors/openshift-ca.crt"))
-        and not proc.pname in (sysdigcloud_binaries, mail_config_binaries, hddtemp.postins, sshkit_script_binaries, locales.postins, deb_binaries, dhcp_binaries)
-        and not fd.name pmatch (safe_etc_dirs)
-        and not fd.name in (/etc/container_environment.sh, /etc/container_environment.json, /etc/motd, /etc/motd.svc)
-        and not sed_temporary_file
-        and not exe_running_docker_save
-        and not ansible_running_python
-        and not python_running_denyhosts
-        and not fluentd_writing_conf_files
-        and not user_known_write_etc_conditions
-        and not run_by_centrify
-        and not run_by_adclient
-        and not qualys_writing_conf_files
-        and not git_writing_nssdb
-        and not plesk_writing_keys
-        and not plesk_install_writing_apache_conf
-        and not plesk_running_mktemp
-        and not networkmanager_writing_resolv_conf
-        and not run_by_chef
-        and not add_shell_writing_shells_tmp
-        and not duply_writing_exclude_files
-        and not xmlcatalog_writing_files
-        and not parent_supervise_running_multilog
-        and not supervise_writing_status
-        and not pki_realm_writing_realms
-        and not htpasswd_writing_passwd
-        and not lvprogs_writing_conf
-        and not ovsdb_writing_openvswitch
-        and not datadog_writing_conf
-        and not curl_writing_pki_db
-        and not haproxy_writing_conf
-        and not java_writing_conf
-        and not dpkg_scripting
-        and not rabbitmq_writing_conf
-        and not rook_writing_conf
-        and not php_handlers_writing_conf
-        and not sed_writing_temp_file
-        and not cron_start_writing_pam_env
-        and not httpd_writing_conf_logs
-        and not mysql_writing_conf
-        and not openvpn_writing_conf
-        and not consul_template_writing_conf
-        and not countly_writing_nginx_conf
-        and not ms_oms_writing_conf
-        and not ms_scx_writing_conf
-        and not azure_scripts_writing_conf
-        and not azure_networkwatcher_writing_conf
-        and not couchdb_writing_conf
-        and not update_texmf_writing_conf
-        and not slapadd_writing_conf
-        and not symantec_writing_conf
-        and not liveupdate_writing_conf
-        and not sosreport_writing_files
-        and not selinux_writing_conf
-        and not veritas_writing_config
-        and not nginx_writing_conf
-        and not nginx_writing_certs
-        and not chef_client_writing_conf
-        and not centrify_writing_krb
-        and not cockpit_writing_conf
-        and not ipsec_writing_conf
-        and not httpd_writing_ssl_conf
-        and not userhelper_writing_etc_security
-        and not pkgmgmt_progs_writing_pki
-        and not update_ca_trust_writing_pki
-        and not brandbot_writing_os_release
-        and not redis_writing_conf
-        and not openldap_writing_conf
-        and not ucpagent_writing_conf
-        and not iscsi_writing_conf
-        and not istio_writing_conf
-        and not ufw_writing_conf
-        and not calico_writing_conf
-        and not calico_writing_envvars
-        and not prometheus_conf_writing_conf
-        and not openshift_writing_conf
-        and not keepalived_writing_conf
-        and not rancher_writing_conf
-        and not checkpoint_writing_state
-        and not jboss_in_container_writing_passwd
-        and not etcd_manager_updating_dns
-        and not user_known_write_below_etc_activities
-        and not automount_using_mtab
-        and not mcafee_writing_cma_d
-        and not avinetworks_supervisor_writing_ssh
-        and not multipath_writing_conf
-    - macro: falco_sensitive_mount_containers
-      condition: (user_trusted_containers or
-              aws_eks_image_sensitive_mount or
-              container.image.repository in (trusted_images) or
-              container.image.repository in (falco_sensitive_mount_images) or
-              container.image.repository startswith quay.io/sysdig/ or
-              container.image.repository=docker.io/k8scloudprovider/cinder-csi-plugin)
-    - rule: Launch Package Management Process in Container
-      desc: Package management process ran inside container
-      condition: >
-        spawned_process
-        and container
-        and user.name != "_apt"
-        and package_mgmt_procs
-        and not package_mgmt_ancestor_procs
-        and not user_known_package_manager_in_container
-      exceptions:
-       - name: kube-proxy
-         fields: [proc.cmdline, container.image.repository]
-         comps: [startswith, =]
-         values:
-           - [update-alternat, k8s.gcr.io/kube-proxy]
-      output: >
-        Package management process launched in container (user=%user.name user_loginuid=%user.loginuid
-        command=%proc.cmdline container_id=%container.id container_name=%container.name image=%container.image.repository:%container.image.tag)
-      priority: ERROR
-      tags: [process, mitre_persistence]
-    - rule: Change thread namespace
-      desc: >
-        an attempt to change a program/thread\'s namespace (commonly done
-        as a part of creating a container) by calling setns.
-      condition: >
-        evt.type=setns and evt.dir=<
-        and proc_name_exists
-        and not (container.id=host and proc.name in (docker_binaries, k8s_binaries, lxd_binaries, nsenter))
-        and not proc.name in (sysdigcloud_binaries, sysdig, calico, oci-umount, cilium-cni, network_plugin_binaries)
-        and not proc.name in (user_known_change_thread_namespace_binaries)
-        and not proc.name startswith "runc"
-        and not proc.cmdline startswith "containerd"
-        and not proc.pname in (sysdigcloud_binaries, hyperkube, kubelet, protokube, dockerd, tini, aws)
-        and not java_running_sdjagent
-        and not kubelet_running_loopback
-        and not rancher_agent
-        and not rancher_network_manager
-        and not calico_node
-        and not weaveworks_scope
-        and not user_known_change_thread_namespace_activities
-      exceptions:
-       # snapd is part of the Ubuntu cloud image. Checked 2022-06-23 on the long-running-cluster.
-       - name: snapd
-         fields: [container.id, proc.pname, proc.cmdline]
-         comps: [=, =, startswith]
-         values:
-          - [host, snapd, snap-update-ns]
-      enabled: true
-      output: >
-        Namespace change (setns) by unexpected program (user=%user.name user_loginuid=%user.loginuid command=%proc.cmdline
-        parent=%proc.pname %container.info container_id=%container.id image=%container.image.repository:%container.image.tag)
-      priority: NOTICE
-      tags: [process, mitre_privilege_escalation, mitre_lateral_movement]
-    - rule: System procs network activity
-      desc: any network activity performed by system binaries that are not expected to send or receive any network traffic
-      condition: >
-        (fd.sockfamily = ip and (system_procs or proc.name in (shell_binaries)))
-        and (inbound_outbound)
-        and not proc.name in (known_system_procs_network_activity_binaries)
-        and not login_doing_dns_lookup
-        and not user_expected_system_procs_network_activity_conditions
-      exceptions:
-      - name: sidekick-system-procs
-        fields: [container.image.repository, k8s.ns.name, proc.cmdline]
-        comps: [=, =, =]
-        values:
-          - [falcosecurity/falco, falco, "sh -c curl -d @- falcosidekick:2801/\n"]
-      output: >
-        Known system binary sent/received network traffic
-        (user=%user.name user_loginuid=%user.loginuid command=%proc.cmdline connection=%fd.name container_id=%container.id image=%container.image.repository)
-      priority: NOTICE
-      tags: [network, mitre_exfiltration]
+      condition: (
+          container.image.repository in (
+            docker.io/aquasec/starboard-operator,
+            docker.io/bitnami/fluentd,
+            docker.io/elastisys/calico-accountant,
+            docker.io/elastisys/curl-jq,
+            docker.io/elastisys/fluentd,
+            docker.io/openpolicyagent/gatekeeper,
+            docker.io/velero/velero,
+            docker.io/weaveworks/kured,
+            ghcr.io/dexidp/dex,
+            gcr.io/k8s-staging-multitenancy/hnc-manager,
+            k8s.gcr.io/kube-state-metrics/kube-state-metrics,
+            quay.io/jetstack/cert-manager-cainjector,
+            quay.io/jetstack/cert-manager-controller,
+            quay.io/jetstack/cert-manager-webhook,
+            quay.io/kiwigrid/k8s-sidecar,
+            quay.io/prometheus-operator/prometheus-operator,
+            quay.io/prometheus/prometheus,
+            quay.io/spotahome/redis-operator,
+            rabbitmqoperator/cluster-operator,
+            registry.opensource.zalan.do/acid/postgres-operator
+          ) or (k8s.ns.name = "kube-system")
+        )
+    - macro: user_known_mount_in_privileged_containers
+      condition: (
+          container.image.repository in (
+            docker.io/k8scloudprovider/cinder-csi-plugin
+          )
+        )
+    - macro: user_known_package_manager_in_container
+      condition: (
+          container.image.repository in (
+            docker.io/elastisys/curl-jq,
+            docker.io/elastisys/fluentd,
+            registry.k8s.io/dns/k8s-dns-node-cache
+          )
+        )
+    - macro: user_known_write_below_etc_activities
+      condition: (
+          (container.image.repository = docker.io/goharbor/harbor-core and proc.name = cp) or
+          (container.image.repository = docker.io/goharbor/harbor-registryctl and proc.name = cp) or
+          (container.image.repository = docker.io/goharbor/registry-photon and proc.name = cp) or
+          (container.image.repository = docker.io/goharbor/trivy-adapter-photon and proc.name = cp) or
+          (container.image.repository = quay.io/calico/node and proc.name = cp) or
+          (container.image.repository = registry.k8s.io/dns/k8s-dns-node-cache and proc.name = node-cache)
+        )
+    - macro: user_sensitive_mount_containers
+      condition: (
+          container.image.repository in (
+            quay.io/prometheus/node-exporter
+          )
+        )
+    - macro: user_trusted_containers
+      condition: (
+          container.image.repository in (
+            docker.io/elastisys/calico-accountant,
+            docker.io/k8scloudprovider/cinder-csi-plugin,
+            docker.io/weaveworks/kured,
+            quay.io/calico/cni,
+            quay.io/calico/pod2daemon-flexvol,
+            registry.k8s.io/dns/k8s-dns-node-cache,
+            registry.k8s.io/kube-proxy
+          ) or (
+            container.image.repository=docker.io/elastisys/curl-jq and k8s.pod.name startswith opensearch-
+          )
+        )
 
 falcosidekick:
   enabled: {{ .Values.falco.alerts.enabled }}

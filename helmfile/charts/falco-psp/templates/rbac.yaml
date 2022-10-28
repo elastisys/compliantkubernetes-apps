@@ -1,0 +1,28 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    {{- include "falco-psp.labels" . | nindent 4 }}
+  name: {{ include "falco-psp.fullname" . }}
+rules:
+  - apiGroups:
+      - policy
+    resourceNames:
+      - privileged
+    resources:
+      - podsecuritypolicies
+    verbs:
+      - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "falco-psp.fullname" . }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "falco-psp.fullname" . }}
+subjects:
+  - kind: ServiceAccount
+    name: falco

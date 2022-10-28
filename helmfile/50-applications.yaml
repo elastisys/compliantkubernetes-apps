@@ -201,8 +201,12 @@ releases:
   labels:
     app: falco
   chart: ./upstream/falco
-  version: 1.16.0
+  version: 2.2.0
   installed: {{ .Values.falco.enabled }}
+  # Inject use of privileged PSP
+  dependencies:
+  - chart: ./charts/falco-psp
+    version: 0.1.0
   values:
   - values/falco.yaml.gotmpl
 
@@ -212,7 +216,7 @@ releases:
   labels:
     app: falco-exporter
   chart: ./upstream/falco-exporter
-  version: 0.8.0
+  version: 0.9.0
   installed: {{ .Values.falco.enabled }}
   values:
     - values/falco-exporter.yaml.gotmpl

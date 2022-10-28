@@ -7,6 +7,9 @@ podSecurityPolicy:
   # Specifies whether a PSP, Role and RoleBinding should be created
   create: true
 
+falco:
+  grpcUnixSocketPath: "unix:///var/run/falco/falco.sock"
+
 serviceMonitor:
   # Enable the deployment of a Service Monitor for the Prometheus Operator.
   enabled: true

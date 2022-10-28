@@ -5,6 +5,116 @@ numbering uses [semantic versioning](http://semver.org).
 
 Before release 0.1.20, the helm chart can be found in `falcosidekick` [repository](https://github.com/falcosecurity/falcosidekick/tree/master/deploy/helm/falcosidekick).
 
+## 0.5.9
+
+* Fix: remove `namespace` from `clusterrole` and `clusterrolebinding` metadata
+
+## 0.5.8
+
+* Support `storageEnabled` for `redis` to allow ephemeral installs
+
+## 0.5.7
+
+* Removing unused Kafka config values
+
+## 0.5.6
+
+* Fixing Syslog's port import in `secrets.yaml`
+
+## 0.5.5
+
+* Add `webui.externalRedis` with `enabled`, `url` and `port` to values to set an external Redis database with RediSearch > v2 for the WebUI
+* Add `webui.redis.enabled` option to disable the deployment of the database.
+* `webui.redis.enabled ` and `webui.externalRedis.enabled` are mutually exclusive
+
+## 0.5.4
+
+* Upgrade image to fix Panic of `Prometheus` output when `customfields` is set
+* Add `extralabels` for `Loki` and `Prometheus` outputs to set fields to use as labels
+* Add `expiresafter` for `AlertManager` output
+
+## 0.5.3
+
+* Support full configuration of `securityContext` blocks in falcosidekick and falcosidekick-ui deployments, and redis statefulset.
+
+## 0.5.2
+
+* Update Falcosidekick-UI image (fix wrong redirect to localhost when an ingress is used)
+
+## 0.5.1
+
+* Support `ingressClassName` field in falcosidekick ingresses.
+
+## 0.5.0
+
+### Major Changes
+
+* Add `Policy Report` output
+* Add `Syslog` output
+* Add `AWS Kinesis` output
+* Add `Zoho Cliq` output
+* Support IRSA for AWS authentication
+* Upgrade Falcosidekick-UI to v2.0.1
+
+### Minor changes
+
+* Allow to set custom Labels for pods
+
+## 0.4.5
+
+* Allow additional service-ui annotations
+
+## 0.4.4
+
+* Fix output after chart installation when ingress is enable
+
+## 0.4.3
+
+* Support `annotation` block in service
+
+## 0.4.2
+
+* Fix: Added the rule to use the podsecuritypolicy
+* Fix: Added `ServiceAccountName` to the UI deployment
+
+## 0.4.1
+
+* Removes duplicate `Fission` keys from secret
+
+## 0.4.0
+
+### Major Changes
+
+* Support Ingress API version `networking.k8s.io/v1`, see `ingress.hosts` and `webui.ingress.hosts` in [values.yaml](values.yaml) for a breaking change in the `path` parameter
+
+## 0.3.17
+
+* Fix: Remove the value for bucket of `Yandex S3`, it enabled the output by default
+
+## 0.3.16
+
+### Major Changes
+
+* Fix: set correct new image 2.24.0
+
+## 0.3.15
+
+### Major Changes
+
+* Add `Fission` output
+
+## 0.3.14
+
+### Major Changes
+
+* Add `Grafana` output
+* Add `Yandex Cloud S3` output
+* Add `Kafka REST` output
+
+### Minor changes
+
+* Docker image is now available on AWS ECR Public Gallery (`--set image.registry=public.ecr.aws`)
+
 ## 0.3.13
 
 ### Minor changes

@@ -6,6 +6,8 @@
 ### Updated
 
 - Updated dex chart to `v0.12.0` which upgraded dex to `v2.35.1`
+- Updated Falco chart to `2.2.0` upgrading Falco itself to `0.33.0` and Falco Sidekick to `2.26.0`
+- Updated Falco Exporter chart to `0.9.0` upgrading Falco Exporter itself to `0.8.0`
 
 ### Changed
 
@@ -23,6 +25,7 @@
 - Made dex tokens expiry times configurable
 - Excluded the `gatekeeper-system` namespace from velero backups in the workload cluster.
 - Moved Harbor Swift configuration to `objectStorage.swift` to use the same as for Thanos.
+- Rewritten Falco overrides to use user editable macros with is used by upstream configuration.
 
 ### Fixed
 

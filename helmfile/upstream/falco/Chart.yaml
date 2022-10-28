@@ -1,10 +1,10 @@
 apiVersion: v2
-appVersion: 0.30.0
+appVersion: 0.33.0
 dependencies:
 - condition: falcosidekick.enabled
   name: falcosidekick
   repository: https://falcosecurity.github.io/charts
-  version: 0.3.13
+  version: 0.5.9
 description: Falco
 home: https://falco.org
 icon: https://raw.githubusercontent.com/cncf/artwork/master/projects/falco/horizontal/color/falco-horizontal-color.svg
@@ -21,4 +21,4 @@ maintainers:
 name: falco
 sources:
 - https://github.com/falcosecurity/falco
-version: 1.16.0
+version: 2.2.0

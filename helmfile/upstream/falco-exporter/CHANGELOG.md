@@ -3,6 +3,22 @@
 This file documents all notable changes to `falco-exporter` Helm Chart. The release
 numbering uses [semantic versioning](http://semver.org).
 
+## v0.8.3
+
+### Major Changes
+
+* Changing the grpc socket path from `unix:///var/run/falco/falco.soc` to `unix:///run/falco/falco.sock`.
+
+### Minor Changes
+
+* Bump falco-exporter to v0.8.0
+
+## v0.8.2
+
+### Minor Changes
+
+* Support configuration of updateStrategy of the Daemonset
+
 ## v0.8.0
 
 * Upgrade falco-exporter version to v0.7.0 (see the [falco-exporter changelog](https://github.com/falcosecurity/falco-exporter/releases/tag/v0.7.0)) 
