@@ -32,6 +32,12 @@
             clientSecret: examplesecret
     ```
 
+1. Upgrade the `workload-cluster-np` with the new changes, before applying the common-np chart:
+
+    ```bash
+    ./bin/ck8s ops helmfile wc -f helmfile -l app=workload-cluster-np -i apply
+    ```
+
 1. Upgrade applications:
 
     ```bash
