@@ -5,14 +5,14 @@ RUN  apt-get update && \
      add-apt-repository ppa:git-core/ppa && \
      apt-get update && \
      apt-get install -y \
-         python3-pip make git wget \
+         python3-pip make git wget dnsutils \
          unzip ssh gettext-base \
          jq pwgen curl apache2-utils \
          net-tools iputils-ping && \
      rm -rf /var/lib/apt/lists/*
 
 # Kubectl
-ENV KUBECTL_VERSION "v1.22.6"
+ENV KUBECTL_VERSION "v1.24.4"
 RUN wget "https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/kubectl
