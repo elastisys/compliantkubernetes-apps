@@ -40,33 +40,28 @@ prometheus:
 networkPolicies:
   global:
     scApiserver:
-      ips: # usualy private ip of control-plane nodes
-        - "0.0.0.0/0"
+      ips:
+        - 0.0.0.0/0
     scNodes:
-      ips: # ip of all nodes in the cluster for internal communication
-        - "0.0.0.0/0"
-    externalLoadBalancer: true
+      ips:
+        - 0.0.0.0/0
   harbor:
     jobservice:
       ips:
-        - "0.0.0.0/0"
+        - 0.0.0.0/0
     trivy:
       ips:
-        - "0.0.0.0/0"
+        - 0.0.0.0/0
   monitoring:
     grafana:
-      externalDashboardProvider: # loading dashboards from grafana website
+      externalDashboardProvider:
         ips:
-          - "0.0.0.0/0"
+          - 0.0.0.0/0
     alertmanager:
-      alertReceivers: # alert receiver, e.g. slack or opsgenie
+      alertReceivers:
         ips:
-          - "0.0.0.0/0"
+          - 0.0.0.0/0
   opensearch:
     plugins:
       ips:
-        - "0.0.0.0/0"
-  ingressNginx:
-    ingressOverride:
-      ips:
-      - "0.0.0.0/0"
+        - 0.0.0.0/0

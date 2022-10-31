@@ -29,23 +29,20 @@ monitoring:
     enabled: true
 networkPolicies:
   global:
+    objectStorage:
+      ips:
+        - 0.0.0.0/0
+      ports:
+        - 443
     scIngress:
       ips:
-        - "0.0.0.0/0"
+        - 0.0.0.0/0
     wcIngress:
       ips:
-        - "0.0.0.0/0"
-    objectStorage:
-      ips: # ips to s3 service
-      - "0.0.0.0/0"
-      ports: # ports to s3 service
-      - 443
+        - 0.0.0.0/0
+    externalLoadBalancer: true
+    ingressUsingHostNetwork: true
   certManager:
-    enabled: true
     letsencrypt:
       ips:
-        - "0.0.0.0/0"
-  ingressNginx:
-    enabled: true
-    ingressOverride:
-      enabled: true
+        - 0.0.0.0/0
