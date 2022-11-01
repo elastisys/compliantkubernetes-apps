@@ -58,6 +58,45 @@
         channel: kured-notification
     ```
 
+1. *Note:* About OpenSearch certificates
+
+    > Applicable if OpenSearch Securityadmin fails when running apply with something similar to this:
+    > ```console
+    > ERR: An unexpected SSLHandshakeException occured: PKIX path building failed
+    > ```
+
+    This might happen if the environment has changed domain since OpenSearch first was set up since the new internal HTTP certificate won't match the other internal certificates.
+    The fix is to remove the old certificates and issuers, and then rebuild the chain of trust.
+
+    Remove old certificates and issuers:
+    ```bash
+    ./bin/ck8s ops kubectl sc -n opensearch-system delete certificates opensearch-admin opensearch-ca opensearch-http opensearch-transport
+    ./bin/ck8s ops kubectl sc -n opensearch-system delete issuers opensearch-ca opensearch-selfsigned
+    ```
+
+    Check that the corresponding secrets for these certificates get deleted and delete them if they are left!
+
+    Then rebuild the chain of trust:
+    ```bash
+    ./bin/ck8s ops helmfile sc -l app=opensearch-secrets sync
+    ```
+
+    Restart any OpenSearch pods:
+    ```bash
+    ./bin/ck8s ops kubectl sc -n opensearch rollout restart sts opensearch-master
+    # With separate data or client pods:
+    # ./bin/ck8s ops kubectl sc -n opensearch rollout restart sts opensearch-data
+    # ./bin/ck8s ops kubectl sc -n opensearch rollout restart sts opensearch-client
+    ```
+
+    Re-run securityadmin:
+    ```bash
+    ./bin/ck8s ops helmfile sc -l app=opensearch-securityadmin destory
+    ./bin/ck8s ops helmfile sc -l app=opensearch-securityadmin apply
+    ```
+
+    Then continue to run apply and make sure to check so OpenSearch Dashboards works afterwards else you need to restart it.
+
 1. Upgrade applications:
 
     ```bash
