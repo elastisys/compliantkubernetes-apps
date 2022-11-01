@@ -26,6 +26,7 @@ user:
 
   ## User controlled alertmanager configuration.
   alertmanager:
+    enabled: true
     resources:
       requests:
         cpu: 10m

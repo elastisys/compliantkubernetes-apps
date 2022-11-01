@@ -26,6 +26,7 @@
 - Excluded the `gatekeeper-system` namespace from velero backups in the workload cluster.
 - Moved Harbor Swift configuration to `objectStorage.swift` to use the same as for Thanos.
 - Rewritten Falco overrides to use user editable macros with is used by upstream configuration.
+- User alertmanager is now enabled by default.
 
 ### Fixed
 
