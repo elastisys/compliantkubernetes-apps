@@ -18,6 +18,11 @@ spec:
         - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
+      {{- else if not (or .Values.global.externalLoadBalancer .Values.global.ingressUsingHostNetwork) }}
+        {{- range $IP := .Values.global.scNodes.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
       {{- else }}
         {{- range $IP := .Values.global.scIngress.ips }}
         - ipBlock:
@@ -33,7 +38,7 @@ spec:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: monitoring
-        - podSelector:
+          podSelector:
             matchLabels:
               app.kubernetes.io/instance: kube-prometheus-stack-prometheus
       ports:
@@ -43,6 +48,13 @@ spec:
         - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus-blackbox-exporter
+              app.kubernetes.io/instance: prometheus-blackbox-exporter
       ports:
         - protocol: TCP
           port: 8443 ## admission
@@ -150,7 +162,8 @@ spec:
             matchLabels:
               app.kubernetes.io/component: receive-distributor
       ports:
-        - port: 10902
+        - port: 10902 # HTTP API
+        - port: 19291 # Remote Write
     - to:
         - podSelector:
             matchLabels:

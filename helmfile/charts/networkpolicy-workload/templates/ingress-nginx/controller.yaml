@@ -18,6 +18,11 @@ spec:
         - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
+      {{- else if not (or .Values.global.externalLoadBalancer .Values.global.ingressUsingHostNetwork) }}
+        {{- range $IP := .Values.global.wcNodes.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
       {{- else }}
         {{- range $IP := .Values.global.wcIngress.ips }}
         - ipBlock:
@@ -43,6 +48,13 @@ spec:
         - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus-blackbox-exporter
+              app.kubernetes.io/instance: prometheus-blackbox-exporter
       ports:
         - protocol: TCP
           port: 8443
