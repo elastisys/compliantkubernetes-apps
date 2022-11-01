@@ -41,6 +41,7 @@
 - Fixed harbor network policies
 - Fixed update-ips script to handle ports for S3 endpoints
 - Rclone can now be configured to run every x minutes/hours/days/week/month/year.
+- Cleanup scripts now delete PVCs instead of PVs to let the cloud controller manager handle the volume lifecycle
 
 ### Added
 - Option to configure alerts for growing indices in OpenSearch

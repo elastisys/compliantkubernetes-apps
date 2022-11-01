@@ -25,8 +25,8 @@ here="$(dirname "$(readlink -f "$0")")"
 # Clean up cert-manager namespace
 "${here}/.././bin/ck8s" ops kubectl sc delete ns cert-manager
 
-# Remove any lingering persistent volumes
-"${here}/.././bin/ck8s" ops kubectl sc delete pv --all
+# Remove any lingering persistent volume claims
+"${here}/.././bin/ck8s" ops kubectl sc delete pvc -A --all
 
 # Velero-specific removal: https://velero.io/docs/v1.5/uninstalling/
 "${here}/.././bin/ck8s" ops kubectl sc delete namespace/velero clusterrolebinding/velero
