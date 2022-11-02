@@ -102,13 +102,50 @@ opa:
     tags:
      - latest
 
+velero:
+  ## Excluded namespaces
+  excludedNamespaces:
+    - cert-manager
+    - falco
+    - fluentd
+    - hnc-system
+    - ingress-nginx
+    - kube-node-lease
+    - kube-public
+    - kube-system
+    - kured
+    - monitoring
+    - rook-ceph
+    - velero
+    - gatekeeper-system
+
+  ## Extra excluded namespace, here we should add the namespaces that are more likely to change
+  excludedExtraNamespaces: []
+
 ## Hierarchical namespace controller configuration, enable in common-config.yaml
 hnc:
   ## Included namespaces, empty string will include all
   includedNamespacesRegex: ""
 
-  ## Excluded namespaces, system namespaces are excluded by default in addition to this list
-  excludedNamespaces: []
+  ## Excluded namespaces
+  excludedNamespaces:
+    - alertmanager
+    - cert-manager
+    - falco
+    - fluentd
+    - hnc-system
+    - ingress-nginx
+    - kube-node-lease
+    - kube-public
+    - kube-system
+    - kured
+    - monitoring
+    - rook-ceph
+    - velero
+    - gatekeeper-system
+
+  ## Extra excluded namespace, here we should add the namespaces that are more likely to change
+  excludedExtraNamespaces: []
 
   ## Annotations that will be stripped from propagated objects
   unpropagatedAnnotations: []

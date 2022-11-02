@@ -8,13 +8,13 @@
 - Updated dex chart to `v0.12.0` which upgraded dex to `v2.35.1`
 - Updated Falco chart to `2.2.0` upgrading Falco itself to `0.33.0` and Falco Sidekick to `2.26.0`
 - Updated Falco Exporter chart to `0.9.0` upgrading Falco Exporter itself to `0.8.0`
+- Upgrade Velero helm chart to `v2.31.8`, which also upgrades Velero to `v1.9.2`.
+- Update the provider plugins to a supported version for the new Velero release
 
 ### Changed
 
 - Lowered the default retention age for kubernetes logs in the prod flavor down to 30 days
 - Changed grafana's communication with dex to use internal service
-- Upgrade Velero helm chart to `v2.31.8`, which also upgrades Velero to `v1.9.2`.
-- Update the provider plugins to a supported version for the new Velero release
 - Added support for anchors and aliases in override configs, not tested with merge aliases/tags
 - Changed the default limit for diskLimit alert, from 66 to 75
 - Changed some default resource requests and limits for multiple components
@@ -27,6 +27,7 @@
 - Moved Harbor Swift configuration to `objectStorage.swift` to use the same as for Thanos.
 - Rewritten Falco overrides to use user editable macros with is used by upstream configuration.
 - User alertmanager is now enabled by default.
+- Moved the excluded namespace for velero and hnc from templates to configs.
 
 ### Fixed
 

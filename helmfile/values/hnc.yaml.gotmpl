@@ -1,23 +1,10 @@
 includedNamespacesRegex: {{ .Values.hnc.includedNamespacesRegex }}
 
 excludedNamespaces:
-  - alertmanager
-  - cert-manager
-  - falco
-  - fluentd
-  - hnc-system
-  - ingress-nginx
-  - kube-node-lease
-  - kube-public
-  - kube-system
-  - kured
-  - monitoring
-  - postgres-system
-  - rabbitmq-system
-  - redis-system
-  - rook-ceph
-  - velero
   {{- with .Values.hnc.excludedNamespaces }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+  {{- with .Values.hnc.excludedExtraNamespaces }}
   {{- toYaml . | nindent 2 }}
   {{- end }}
 

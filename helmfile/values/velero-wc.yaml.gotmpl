@@ -94,22 +94,12 @@ schedules:
     template:
       storageLocation: default
       excludedNamespaces:
-        - cert-manager
-        - falco
-        - fluentd
-        - hnc-system
-        - ingress-nginx
-        - kube-node-lease
-        - kube-public
-        - kube-system
-        - kured
-        - monitoring
-        - postgres-system
-        - rabbitmq-system
-        - redis-system
-        - rook-ceph
-        - velero
-        - gatekeeper-system
+        {{- with .Values.velero.excludedNamespaces }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- with .Values.velero.excludedExtraNamespaces }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       ttl: {{ .Values.velero.retentionPeriod }}
       labelSelector:
         matchExpressions:
