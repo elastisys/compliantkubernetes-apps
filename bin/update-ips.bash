@@ -194,7 +194,7 @@ if [[ "${S3_ENDPOINT}" == "" ]]; then
     log_error "No S3 endpoint found, check your common-config.yaml (or ${DIG_CLUSTER}-config.yaml)"
     exit 1
 fi
-S3_PORT="$(yq_dig 'sc' '.objectStorage.s3.regionEndpoint' '""' | sed 's/https\?:\/\///' | sed 's/[A-Za-z.:]*//' | sed 's/\/.*//')"
+S3_PORT="$(yq_dig 'sc' '.objectStorage.s3.regionEndpoint' '""' | sed 's/https\?:\/\///' | sed 's/.*://' | sed 's/\/.*//')"
 if [ -z "$S3_PORT" ]; then
     S3_PORT="443"
 fi
@@ -251,7 +251,7 @@ if [[ "${CHECK_CLUSTER}" =~ ^(sc|both)$ ]]; then
             log_error "No Swift endpoint found, check your sc-config.yaml"
             exit 1
         fi
-        SWIFT_PORT="$(yq_dig 'sc' '.objectStorage.swift.authUrl' '""' | sed 's/https\?:\/\///' | sed 's/[A-Za-z.:]*//' | sed 's/\/.*//')"
+        SWIFT_PORT="$(yq_dig 'sc' '.objectStorage.swift.authUrl' '""' | sed 's/https\?:\/\///' | sed 's/.*://' | sed 's/\/.*//')"
         if [ -z "$SWIFT_PORT" ]; then
             SWIFT_PORT="443"
         fi
