@@ -195,6 +195,15 @@ releases:
   values:
   - values/starboard/ciskubebench-exporter.yaml.gotmpl
 
+# Falco PSP RBAC
+- name: falco-psp-rbac
+  namespace: falco
+  labels:
+    app: falco
+  chart: ./charts/falco-psp-rbac
+  version: 0.1.0
+  installed: {{ .Values.falco.enabled }}
+
 # Falco
 - name: falco
   namespace: falco
@@ -203,10 +212,8 @@ releases:
   chart: ./upstream/falco
   version: 2.2.0
   installed: {{ .Values.falco.enabled }}
-  # Inject use of privileged PSP
-  dependencies:
-  - chart: ./charts/falco-psp
-    version: 0.1.0
+  needs:
+  - falco/falco-psp-rbac
   values:
   - values/falco.yaml.gotmpl
 
