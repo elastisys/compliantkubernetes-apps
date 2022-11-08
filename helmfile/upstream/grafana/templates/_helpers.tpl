@@ -142,6 +142,17 @@ Return the appropriate apiVersion for ingress.
 {{- end -}}
 
 {{/*
+Return the appropriate apiVersion for podDisruptionBudget.
+*/}}
+{{- define "grafana.podDisruptionBudget.apiVersion" -}}
+  {{- if $.Capabilities.APIVersions.Has "policy/v1/PodDisruptionBudget" -}}
+    {{- print "policy/v1" -}}
+  {{- else -}}
+    {{- print "policy/v1beta1" -}}
+  {{- end -}}
+{{- end -}}
+
+{{/*
 Return if ingress is stable.
 */}}
 {{- define "grafana.ingress.isStable" -}}
