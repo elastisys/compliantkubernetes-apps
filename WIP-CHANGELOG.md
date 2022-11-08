@@ -28,6 +28,7 @@
 - Rewritten Falco overrides to use user editable macros with is used by upstream configuration.
 - User alertmanager is now enabled by default.
 - Moved the excluded namespace for velero and hnc from templates to configs.
+- Changed so the instance label for node-exporter metrics now uses the node name instead of the IP
 
 ### Fixed
 

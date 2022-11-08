@@ -173,3 +173,11 @@ prometheus:
     {{- with .Values.prometheus.additionalScrapeConfigs }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
+
+nodeExporter:
+  serviceMonitor:
+    relabelings:
+      - action: replace
+        sourceLabels:
+        - __meta_kubernetes_pod_node_name
+        targetLabel: instance

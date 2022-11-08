@@ -359,3 +359,11 @@ kubelet:
 
 prometheus-node-exporter:
   resources: {{- toYaml .Values.prometheusNodeExporter.resources | nindent 4 }}
+
+nodeExporter:
+  serviceMonitor:
+    relabelings:
+      - action: replace
+        sourceLabels:
+        - __meta_kubernetes_pod_node_name
+        targetLabel: instance
