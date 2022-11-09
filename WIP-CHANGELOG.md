@@ -10,8 +10,8 @@
 - Updated Falco Exporter chart to `0.9.0` upgrading Falco Exporter itself to `0.8.0`
 - Upgrade Velero helm chart to `v2.31.8`, which also upgrades Velero to `v1.9.2`.
 - Update the provider plugins to a supported version for the new Velero release
-- Upgraded Grafana helm chart to `v6.43.4`, which also upgrades the user-facing Grafana to `v9.2.3`.
-- Use Grafana tag `9.2.3` in kube-prometheus-stack.
+- Upgraded Grafana helm chart to `v6.43.4`.
+- Upgraded Grafana to version `9.2.4`.
 
 ### Changed
 
