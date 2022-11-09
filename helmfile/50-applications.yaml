@@ -292,7 +292,7 @@ releases:
     app.kubernetes.io/instance: user-grafana
     app.kubernetes.io/name: grafana
   chart: ./upstream/grafana
-  version: 6.1.11
+  version: 6.43.4
   installed: {{ .Values.user.grafana.enabled }}
   values:
   - values/grafana-user.yaml.gotmpl
