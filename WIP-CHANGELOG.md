@@ -2,6 +2,7 @@
 
 - Several default resource requests and limits have changed. When upgrading these might need to be adjusted.
 - The settings for the new Opensearch index size alerts might need to be tweaked to better suit the environment.
+- NetworkPolicies are now automatically propagated from a parent namespace to its child namespaces.
 
 ### Updated
 
@@ -31,6 +32,7 @@
 - User alertmanager is now enabled by default.
 - Moved the excluded namespace for velero and hnc from templates to configs.
 - Changed so the instance label for node-exporter metrics now uses the node name instead of the IP
+- Renamed and moved chart `hnc` to `hnc/controller`
 
 ### Fixed
 
@@ -66,6 +68,7 @@
 - Network policies for ingress-nginx and cert-manager
 - Added support for running Thanos on Swift
 - Added RBAC for admin users to view Gatekeeper constraints
+- A helm chart `hnc/config-and-crds` for deploying HNC CRDs and HNC config
 
 ### Removed
 
