@@ -65,6 +65,7 @@
 - New section in the welcoming dashboards, displaying the most relevant features and changes for the user added in the last two releases.
 - Network policies for ingress-nginx and cert-manager
 - Added support for running Thanos on Swift
+- Added RBAC for admin users to view Gatekeeper constraints
 
 ### Removed
 
