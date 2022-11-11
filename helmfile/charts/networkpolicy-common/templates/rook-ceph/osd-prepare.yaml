@@ -1,0 +1,41 @@
+{{ if .Values.rookCeph.enabled }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-rook-ceph-osd-prepare
+  namespace: rook-ceph
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      app: rook-ceph-osd-prepare
+  egress:
+    - to:
+        {{- range $ip := .Values.global.apiserver.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        - port: {{ .Values.global.apiserver.port }}
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-osd
+      ports:
+        - port: 6800
+          protocol: TCP
+          endPort: 7300
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mon
+      ports:
+        - port: 6789
+          protocol: TCP
+        - port: 3300
+          protocol: TCP
+        - port: 7000
+          protocol: TCP
+{{- end }}
