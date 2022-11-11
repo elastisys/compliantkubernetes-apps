@@ -1,0 +1,40 @@
+{{ if .Values.rookCeph.enabled }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-rook-ceph-csi-rbdplugin-provisioner
+  namespace: rook-ceph
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      app: csi-rbdplugin-provisioner
+  egress:
+    - to:
+        {{- range $ip := .Values.global.apiserver.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        - port: {{ .Values.global.apiserver.port }}
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-osd
+      ports:
+        - port: 6800
+          protocol: TCP
+          endPort: 7300
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mgr
+      ports:
+        - port: 6800
+          protocol: TCP
+          endPort: 7300
+        - port: 9283
+          protocol: TCP
+{{- end }}

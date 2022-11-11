@@ -16,6 +16,7 @@
 ### Added
 
 - Starboard resources will now be removed when running the cleanup scripts - `scripts/clean-{sc,wc}.sh`.
+- Enabled the `rook-ceph` network policy in both `sc` and `wc` cluster.
 
 ### Removed
 
