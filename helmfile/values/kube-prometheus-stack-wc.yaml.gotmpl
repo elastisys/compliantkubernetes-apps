@@ -4,7 +4,7 @@ defaultRules:
 
 global:
   rbac:
-    pspEnabled: true
+    pspEnabled: false
 
 alertmanager:
   enabled: false
@@ -27,11 +27,18 @@ prometheusOperator:
 
 kube-state-metrics:
   podSecurityPolicy:
-    enabled: true
+    enabled: false
   resources: {{- toYaml .Values.kubeStateMetrics.resources | nindent 4 }}
 
 prometheus-node-exporter:
   resources: {{- toYaml .Values.prometheusNodeExporter.resources | nindent 4 }}
+  rbac:
+    ## If true, create & use RBAC resources
+    ##
+    create: true
+    ## If true, create & use Pod Security Policy resources
+    ## https://kubernetes.io/docs/concepts/policy/pod-security-policy/
+    pspEnabled: false
 
 kubeApiServer:
   serviceMonitor:

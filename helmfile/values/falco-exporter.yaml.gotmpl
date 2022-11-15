@@ -5,7 +5,7 @@ tolerations: {{- toYaml .Values.falco.falcoExporter.tolerations | nindent 2  }}
 
 podSecurityPolicy:
   # Specifies whether a PSP, Role and RoleBinding should be created
-  create: true
+  create: false
 
 falco:
   grpcUnixSocketPath: "unix:///var/run/falco/falco.sock"

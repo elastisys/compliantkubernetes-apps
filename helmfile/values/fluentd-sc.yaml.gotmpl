@@ -46,7 +46,7 @@ forwarder:
     timeoutSeconds: {{ .Values.fluentd.forwarder.readinessProbe.timeoutSeconds  }}
     failureThreshold: {{ .Values.fluentd.forwarder.readinessProbe.failureThreshold  }}
   rbac:
-    pspEnabled: true
+    pspEnabled: false
   extraEnvVars:
     - name: OUTPUT_BUFFER_CHUNK_LIMIT
       value: "{{ .Values.fluentd.forwarder.chunkLimitSize }}"
