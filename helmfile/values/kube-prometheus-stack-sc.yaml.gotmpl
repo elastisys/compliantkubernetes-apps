@@ -4,11 +4,11 @@ defaultRules:
 
 global:
   rbac:
-    pspEnabled: true
+    pspEnabled: false
 
 kube-state-metrics:
   podSecurityPolicy:
-    enabled: true
+    enabled: false
   resources: {{- toYaml .Values.kubeStateMetrics.resources | nindent 4 }}
 
 kubeApiServer:
@@ -175,7 +175,7 @@ grafana:
       - {{ .Values.prometheus.grafana.subdomain }}.{{ .Values.global.opsDomain }}
   rbac:
     pspUseAppArmor: false
-    pspEnabled: true
+    pspEnabled: false
 
   persistence:
     type: pvc
@@ -272,7 +272,6 @@ grafana:
       check_for_updates: false
 
   resources: {{- toYaml .Values.prometheus.grafana.resources | nindent 4  }}
-  tolerations: {{- toYaml .Values.prometheus.grafana.tolerations | nindent 4  }}
   affinity: {{- toYaml .Values.prometheus.grafana.affinity | nindent 4  }}
   nodeSelector: {{- toYaml .Values.prometheus.grafana.nodeSelector | nindent 4  }}
 
@@ -359,6 +358,13 @@ kubelet:
 
 prometheus-node-exporter:
   resources: {{- toYaml .Values.prometheusNodeExporter.resources | nindent 4 }}
+  rbac:
+    ## If true, create & use RBAC resources
+    ##
+    create: true
+    ## If true, create & use Pod Security Policy resources
+    ## https://kubernetes.io/docs/concepts/policy/pod-security-policy/
+    pspEnabled: false
 
 nodeExporter:
   serviceMonitor:
@@ -367,3 +373,4 @@ nodeExporter:
         sourceLabels:
         - __meta_kubernetes_pod_node_name
         targetLabel: instance
+

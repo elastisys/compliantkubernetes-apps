@@ -29,7 +29,7 @@ ingress:
     - {{ .Values.user.grafana.subdomain }}.{{ .Values.global.baseDomain }}
 rbac:
   pspUseAppArmor: false
-  pspEnabled: true
+  pspEnabled: false
   namespaced: true
 
 persistence:

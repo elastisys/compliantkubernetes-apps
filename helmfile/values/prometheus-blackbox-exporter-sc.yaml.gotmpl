@@ -1,5 +1,8 @@
 resources: {{- toYaml .Values.prometheusBlackboxExporter.resources | nindent 4 }}
 
+## Enable pod security policy
+pspEnabled: false
+
 config:
   modules:
     http_400:
