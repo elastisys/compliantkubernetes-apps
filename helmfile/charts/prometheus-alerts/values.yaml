@@ -8,9 +8,16 @@ prometheusJob: kube-prometheus-stack-prometheus
 operatorJob: kube-prometheus-stack-operator
 prometheusNamespace: monitoring
 
-s3BucketPercentLimit: 80
-s3BucketSizeQuotaGB: 80
-
+s3BucketAlerts:
+  size:
+    enabled: false
+    percent: 80
+    sizeQuotaGB: 1000
+  objects:
+    enabled: false
+    percent: 80
+    count: 1638400
+  exclude: []
 defaultRules:
   create: true
   ## Any labels to add to the alert rules
@@ -49,7 +56,6 @@ defaultRules:
     thanosRulerMonitor: false # Note thanos-ruler alerts does not add the defaultRules.alertLabels, instead use defaultRules.thanosRuler.alertLabels.
     backupStatus: false
     dailyChecks: false
-    bucketdailyChecks: false
     fluentd: true
     missingMetrics: true
     kubeScheduler: true

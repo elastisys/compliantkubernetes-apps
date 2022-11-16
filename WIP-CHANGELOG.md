@@ -25,6 +25,9 @@
 - Network policies for `rook-ceph` (disabled by default).
 - Network policies for `csi-cinder`, `csi-upcloud`, `metrics-server` and `snapshot-controller`.
 - Added alert for less kubelets than nodes in the cluster.
+- Added alert for object limits in bucket
+	- Limits: size and object count.
+	- Consult with your cloud provider for specific s3 limits.
 
 ### Removed
 

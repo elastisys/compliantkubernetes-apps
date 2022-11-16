@@ -31,7 +31,6 @@ defaultRules:
 
     backupStatus: true
     dailyChecks: true
-    bucketdailyChecks: true
 
   {{- if and .Values.thanos.enabled .Values.thanos.ruler.enabled }}
   thanos:
@@ -43,8 +42,16 @@ capacityManagementAlertsDiskLimit: {{ .Values.prometheus.capacityManagementAlert
 capacityManagementAlertsUsageLimit: {{ .Values.prometheus.capacityManagementAlerts.usagelimit }}
 capacityManagementAlertsRequestLimit: {{ toYaml .Values.prometheus.capacityManagementAlerts.requestlimit | nindent 2 }}
 
-s3BucketPercentLimit: {{ .Values.prometheus.s3BucketPercentLimit }}
-s3BucketSizeQuotaGB: {{ .Values.prometheus.s3BucketSizeQuotaGB }}
+s3BucketAlerts:
+  size:
+    enabled: {{ .Values.prometheus.s3BucketAlerts.size.enabled }}
+    percent: {{ .Values.prometheus.s3BucketAlerts.size.percent }}
+    sizeQuotaGB: {{ .Values.prometheus.s3BucketAlerts.size.sizeQuotaGB }}
+  objects:
+    enabled: {{ .Values.prometheus.s3BucketAlerts.objects.enabled }}
+    percent: {{ .Values.prometheus.s3BucketAlerts.objects.percent }}
+    count: {{ .Values.prometheus.s3BucketAlerts.objects.count }}
+  exclude: {{ toYaml .Values.prometheus.s3BucketAlerts.exclude | nindent 4 }}
 
 buckets:
   harbor: {{ .Values.objectStorage.buckets.harbor }}

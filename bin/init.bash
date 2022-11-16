@@ -264,6 +264,28 @@ set_fluentd_config() {
     replace_set_me "${file}" '.fluentd.forwarder.useRegionEndpoint' "${use_region_endpoint}"
 }
 
+# Usage: set_s3bucketalertscount_config <config-file>
+set_s3bucketalertscount_config() {
+    file=$1
+    if [[ ! -f "${file}" ]]; then
+        log_error "ERROR: invalid file - $file"
+        exit 1
+    fi
+    case ${CK8S_CLOUD_PROVIDER} in
+        citycloud)
+            yq4 --inplace '.prometheus.s3BucketAlerts.objects.count = 1638400' "${file}"
+
+            yq4 --inplace '.prometheus.s3BucketAlerts.objects.enabled = true' "${file}"
+            ;;
+        safespring)
+            yq4 --inplace '.prometheus.s3BucketAlerts.objects.count = 1000000' "${file}"
+
+            yq4 --inplace '.prometheus.s3BucketAlerts.objects.enabled = true' "${file}"
+            ;;
+    esac
+}
+
+
 # Usage: set_harbor_config <config-file>
 # baremetal support is experimental, keep as separate case until stable
 set_harbor_config() {
@@ -508,10 +530,11 @@ set_object_storage      "${config[default_common]}"
 set_nginx_config        "${config[default_common]}"
 update_config           "${config[override_common]}"
 
-generate_default_config "${config[default_sc]}"
-set_fluentd_config      "${config[default_sc]}"
-set_harbor_config       "${config[default_sc]}"
-update_config           "${config[override_sc]}"
+generate_default_config        "${config[default_sc]}"
+set_fluentd_config             "${config[default_sc]}"
+set_harbor_config              "${config[default_sc]}"
+set_s3bucketalertscount_config "${config[default_sc]}"
+update_config                  "${config[override_sc]}"
 
 generate_default_config "${config[default_wc]}"
 update_config           "${config[override_wc]}"
