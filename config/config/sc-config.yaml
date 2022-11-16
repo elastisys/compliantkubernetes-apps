@@ -410,7 +410,16 @@ grafanaLabelEnforcer:
 prometheus:
   retention:
     alertmanager: 72h
-
+  s3BucketAlerts:
+    size:
+      enabled: false
+      percent: 80
+      sizeQuotaGB: 1000
+    objects:
+      enabled: false
+      percent: 80
+      count: 1638400
+    exclude: []
   # Todo remove dependencie on alertmanager from service cluster
   alertmanagerSpec:
     replicas: 2
@@ -469,8 +478,6 @@ prometheus:
         limits:
           cpu: 10m
           memory: 100Mi
-  s3BucketPercentLimit: 80
-  s3BucketSizeQuotaGB: 1000
 dex:
   replicaCount: 2
   subdomain: dex
