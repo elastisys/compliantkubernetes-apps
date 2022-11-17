@@ -61,3 +61,23 @@ if [ -n "$PROM_CRDS" ]; then
     # We definitely want word splitting here.
     "${here}/.././bin/ck8s" ops kubectl sc delete crds $PROM_CRDS
 fi
+
+# Starboard specific removal
+STAR_CRDS=$(
+    "${here}/.././bin/ck8s" ops \
+        kubectl sc api-resources \
+        --api-group=aquasecurity.github.io \
+        -o name
+    )
+
+# Delete CRs
+for cr in $STAR_CRDS; do
+    "${here}/.././bin/ck8s" ops kubectl sc delete "$cr" --all --all-namespaces
+done
+
+# Delete CRDs
+if [ -n "$STAR_CRDS" ]; then
+    # shellcheck disable=SC2086
+    # We definitely want word splitting here.
+    "${here}/.././bin/ck8s" ops kubectl sc delete crds $STAR_CRDS
+fi
