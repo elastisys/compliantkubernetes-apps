@@ -14,6 +14,8 @@
 
 ### Added
 
+- Starboard resources will now be removed when running the cleanup scripts - `scripts/clean-{sc,wc}.sh`.
+
 ### Removed
 
 - Prometheus recording rules for Rook.
