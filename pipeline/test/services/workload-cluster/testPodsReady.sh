@@ -32,10 +32,10 @@ if "${enable_opa}"; then
     deployments+=("gatekeeper-system gatekeeper-controller-manager")
 fi
 if "${enable_hnc}"; then
-    deployments+=("hnc-system hnc-controller-manager")
+    deployments+=("hnc-system hnc-controller-controller-manager")
 
     if "${enable_hnc_ha}"; then
-        deployments+=("hnc-system hnc-webhook")
+        deployments+=("hnc-system hnc-controller-webhook")
     fi
 fi
 if "${enable_falco}" && "${enable_falco_alerts}"; then
