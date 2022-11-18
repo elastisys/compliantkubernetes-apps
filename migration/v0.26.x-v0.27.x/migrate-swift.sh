@@ -61,6 +61,11 @@ if [ -n "${authUrl##*/v3}" ]; then
   yq4 -i '.objectStorage.swift.authUrl = .objectStorage.swift.authUrl + "/v3"' "$config_sc"
 fi
 
+if [ "$(echo "$config_sc" | yq4 '.objectStorage.swift.domainId // "unset"')" == "unset" ]; then
+  echo "- info: setting objectStorage.swift.domainId to empty string"
+  yq4 -i '.objectStorage.swift.domainId = ""' "$config_sc"
+fi
+
 echo "info: moving secrets harbor.persistence.swift to objectStorage.swift"
 if [ "$(sops --config "$CK8S_CONFIG_PATH/.sops.yaml" -d "$secrets" | yq4 '.harbor.persistence.swift // "unset"')" = "unset" ]; then
   echo "- skip: move secrets harbor.persistence.swift to objectStorage.swift"
