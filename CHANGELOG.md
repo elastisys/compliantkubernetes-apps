@@ -86,6 +86,7 @@
 - Fixed issue with the update-ips script to fail to parse port
 - Fixed ingress-nginx controller network policy for loadbalancer service and thanos remote write
 - falco-psp-rbac chart is now it's own release as it interfered with the falco charts dependency on falco-sidekick
+- Fixed an issue with the prometheus operator network policy so that the apiservers can communicate to it
 
 ### Added
 - Option to configure alerts for growing indices in OpenSearch
