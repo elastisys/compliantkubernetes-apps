@@ -18,6 +18,13 @@ spec:
               app: prometheus
       ports:
         - port: 10250
+    - from:
+        {{- range $ip := .Values.global.apiserver.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        - port: 10250
   egress:
     - to:
         {{- range $ip := .Values.global.apiserver.ips }}
