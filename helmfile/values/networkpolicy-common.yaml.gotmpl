@@ -53,6 +53,9 @@ certManager:
     ips: {{- toYaml .Values.networkPolicies.certManager.letsencrypt.ips | nindent 6 }}
 falco:
   enabled: {{ and .Values.falco.enabled .Values.networkPolicies.falco.enabled }}
+  plugins:
+    ips: {{- toYaml .Values.networkPolicies.falco.plugins.ips | nindent 6 }}
+    ports: {{- toYaml .Values.networkPolicies.falco.plugins.ports | nindent 6 }}
 
 rookCeph:
   enabled: {{ .Values.networkPolicies.rookCeph.enabled }}

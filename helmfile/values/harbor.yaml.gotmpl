@@ -66,9 +66,9 @@ persistence:
       authurl: {{ $swift.authUrl }}
       region: {{ $swift.region }}
       container: {{ .Values.objectStorage.buckets.harbor }}
-      {{- if hasKey $swift "domainId" }}
+      {{- if getOrNil "domainId" $swift }}
       domainid: {{ $swift.domainId }}
-      {{- else if hasKey $swift "domainName" }}
+      {{- else if getOrNil "domainName" $swift }}
       domain: {{ $swift.domainName }}
       {{- end }}
       username: {{ $swift.username | quote }}
