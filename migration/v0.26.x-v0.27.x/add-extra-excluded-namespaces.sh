@@ -14,6 +14,6 @@ add_values_to() {
 if [[ ! -f "$wc_config" ]]; then
     echo "$wc_config does not exist, skipping."
 else
-   add_values_to '.velero.excludedExtraNamespaces' '["postgres-system","rabbitmq-system","redis-system","argocd-system","jaeger-system"]' "$wc_config"
-   add_values_to '.hnc.excludedExtraNamespaces' '["postgres-system","rabbitmq-system","redis-system","argocd-system","jaeger-system"]' "$wc_config"
+   add_values_to '.velero.excludedExtraNamespaces' '["postgres-system","rabbitmq-system","redis-system","jaeger-system"]' "$wc_config"
+   add_values_to '.hnc.excludedExtraNamespaces' '["postgres-system","rabbitmq-system","redis-system","jaeger-system"]' "$wc_config"
 fi
