@@ -51,8 +51,13 @@ move_value "harbor.persistence.swift.projectID" "objectStorage.swift.projectId"
 move_value "harbor.persistence.swift.tenantName" "objectStorage.swift.projectName"
 
 if [ "$(echo "$merge" | yq4 '.harbor.persistence.swift // "unset"')" != "unset" ]; then
-  echo "- info: clear harbor.persistence.swift"
-  yq4 -i 'del(.harbor.persistence.swift)' "$config_sc"
+  if [ "$(yq4 '.harbor.persistence | length' "$config_sc")" == "1" ]; then
+    echo "- info: clear harbor.persistence"
+    yq4 -i 'del(.harbor.persistence)' "$config_sc"
+  else
+    echo "- info: clear harbor.persistence.swift"
+    yq4 -i 'del(.harbor.persistence.swift)' "$config_sc"
+  fi
 fi
 
 authUrl="$(echo "$merge" | yq4 '.objectStorage.swift.authUrl // "unset"')"
