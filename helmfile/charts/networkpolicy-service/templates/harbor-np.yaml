@@ -276,6 +276,37 @@ spec:
         {{- end }}
       ports:
         - port: 5432
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-harbor-backup
+  namespace: harbor
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      component: backup
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              component: database
+      ports:
+        - port: 5432
+    - ports:
+        - port: 53
+          protocol: UDP
+    - to:
+        {{- range .Values.global.objectStorage.ips }}
+        - ipBlock:
+            cidr: {{ . }}
+        {{- end }}
+      ports:
+        {{- range .Values.global.objectStorage.ports }}
+        - port: {{ . }}
+        {{- end }}
 {{- end }}
 ---
 kind: NetworkPolicy

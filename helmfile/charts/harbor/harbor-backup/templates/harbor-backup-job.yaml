@@ -11,6 +11,7 @@ spec:
         metadata:
           labels:
             release: {{ .Release.Name }}
+            component: backup
         spec:
           restartPolicy: OnFailure
           securityContext:

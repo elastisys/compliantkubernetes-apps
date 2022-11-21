@@ -1117,7 +1117,7 @@ networkPolicies:
         - ingressNSMatchLabels:
             kubernetes.io/metadata.name: harbor
           ingressPodMatchLabels:
-            release: harbor-backup
+            component: backup
       external: []
     redis:
       external: []
