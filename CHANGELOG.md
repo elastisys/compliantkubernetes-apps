@@ -111,6 +111,7 @@
 - Network policies for dex
 - Network policies for starboard
 - Network policies for gatekeeper
+- Network policies for harbor-backup
 
 ### Removed
 
