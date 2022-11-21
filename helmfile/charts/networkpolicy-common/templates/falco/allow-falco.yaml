@@ -9,7 +9,7 @@ spec:
     - Egress
   podSelector:
     matchLabels:
-      app: falco
+      app.kubernetes.io/name: falco
   egress:
     - to:
       - podSelector:
@@ -25,6 +25,9 @@ spec:
         {{- end }}
       ports:
         - port: {{ .Values.global.apiserver.port }}
+    - ports:
+        - port: 443
+          protocol: TCP
     - ports:
         - port: 53
           protocol: UDP
