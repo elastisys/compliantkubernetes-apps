@@ -7,6 +7,7 @@ metadata:
 spec:
   policyTypes:
     - Ingress
+    - Egress
   podSelector:
     matchLabels:
       app.kubernetes.io/instance: falco
@@ -15,7 +16,11 @@ spec:
     - from:
       - podSelector:
           matchLabels:
-            app: falco
+            app.kubernetes.io/name: falco
       ports:
         - port: 2801
+  egress:
+    - ports:
+        - port: 53
+          protocol: UDP
 {{- end }}
