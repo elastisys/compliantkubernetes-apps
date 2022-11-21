@@ -70,6 +70,9 @@
     - name: Get s3cmd
       apt:
         name: s3cmd={{ s3cmd_version }}
+    - name: Get dig
+      apt:
+        name: dnsutils
     - name: Get sops
       get_url:
         url: https://github.com/mozilla/sops/releases/download/v{{ sops_version }}/sops-v{{ sops_version }}.linux
