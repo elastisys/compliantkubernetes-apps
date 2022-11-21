@@ -51,6 +51,7 @@ certManager:
     {{- end }}
   letsencrypt:
     ips: {{- toYaml .Values.networkPolicies.certManager.letsencrypt.ips | nindent 6 }}
+
 falco:
   enabled: {{ and .Values.falco.enabled .Values.networkPolicies.falco.enabled }}
   plugins:
@@ -59,3 +60,27 @@ falco:
 
 rookCeph:
   enabled: {{ .Values.networkPolicies.rookCeph.enabled }}
+
+kubeSystem:
+  enabled: {{ .Values.networkPolicies.kubeSystem.enabled }}
+
+  {{- if hasKey .Values.networkPolicies.kubeSystem "openstack" }}
+  {{- $openstack := .Values.networkPolicies.kubeSystem.openstack }}
+  openstack:
+    enabled: {{ $openstack.enabled }}
+
+    ips:
+      {{- toYaml $openstack.ips | nindent 6 }}
+    ports:
+      {{- toYaml $openstack.ports | nindent 6 }}
+
+  {{- else if hasKey .Values.networkPolicies.kubeSystem "upcloud" }}
+  {{- $upcloud := .Values.networkPolicies.kubeSystem.upcloud }}
+  upcloud:
+    enabled: {{ $upcloud.enabled }}
+
+    ips:
+      {{- toYaml $upcloud.ips | nindent 6 }}
+    ports:
+      {{- toYaml $upcloud.ports | nindent 6 }}
+  {{- end }}

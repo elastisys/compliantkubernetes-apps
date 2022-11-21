@@ -132,10 +132,18 @@ set_storage_class() {
     case ${CK8S_CLOUD_PROVIDER} in
         safespring | citycloud | elastx)
             storage_class=cinder-csi
+
+            yq4 -i '.networkPolicies.kubeSystem.openstack.enabled = true' "${file}"
+            yq4 -i '.networkPolicies.kubeSystem.openstack.ips = ["set-me"]' "${file}"
+            yq4 -i '.networkPolicies.kubeSystem.openstack.ports = [5000,8774,8776]' "${file}" # Keystone, Nova, Cinder
             ;;
 
         upcloud)
             storage_class=upcloud-block-storage
+
+            yq4 -i '.networkPolicies.kubeSystem.upcloud.enabled = true' "${file}"
+            yq4 -i '.networkPolicies.kubeSystem.upcloud.ips = ["94.237.0.0/23"]' "${file}" # api.upcloud.com
+            yq4 -i '.networkPolicies.kubeSystem.upcloud.ports = [443]' "${file}"
             ;;
 
         exoscale|baremetal)

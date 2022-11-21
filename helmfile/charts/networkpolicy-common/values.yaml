@@ -64,3 +64,22 @@ certManager:
 
 monitoring:
   enabled: true
+
+kubeSystem:
+  enabled: true
+
+  openstack:
+    enabled: false
+
+    ips:
+      - 0.0.0.0/0
+    ports:
+      - 443
+
+  upcloud:
+    enabled: false
+
+    ips:
+      - 0.0.0.0/0
+    ports:
+      - 443
