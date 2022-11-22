@@ -10,6 +10,7 @@ spec:
       app: prometheus
   policyTypes:
     - Egress
+    - Ingress
   egress:
     # thanos
     - to:
@@ -23,4 +24,13 @@ spec:
     - ports:
       - protocol: UDP
         port: 53
+  ingress:
+    - from:
+        {{- range $ip := .Values.global.wcApiserver.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        - port: 9090
+          protocol: TCP
 {{- end }}
