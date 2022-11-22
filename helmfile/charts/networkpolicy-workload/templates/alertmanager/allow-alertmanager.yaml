@@ -32,6 +32,14 @@ spec:
         - podSelector:
             matchLabels:
               app: alertmanager
+    - from:
+        {{- range $ip := .Values.global.wcApiserver.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        - port: 9093
+          protocol: TCP
   egress:
     - to:
         - podSelector:
