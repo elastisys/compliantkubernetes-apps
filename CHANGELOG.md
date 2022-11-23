@@ -68,6 +68,8 @@
 - Moved the excluded namespace for velero and hnc from templates to configs.
 - Changed so the instance label for node-exporter metrics now uses the node name instead of the IP
 - Renamed and moved chart `hnc` to `hnc/controller`
+- Disabled all collectors for node-exporter in ciskubebench- and vulnerability-exporter except textcollector
+- Increased the default CPU limit for node-exporter in ciskubebench- and vulnerability-exporter
 
 ### Fixed
 
