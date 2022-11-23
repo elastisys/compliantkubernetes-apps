@@ -4,8 +4,11 @@
 
 Here you can find the most relevant features and changes for the last couple of releases of Compliant Kubernetes
 
+- NetworkPolicies are now automatically propagated from a parent namespace to its child namespaces. **[v0.27]**
+- Made Dex tokens expiry times configurable. **[v0.27]**
+- Alertmanager for the user is enabled by default. **[v0.27]**
+- Admin users can now view Gatekeeper constraints. **[v0.27]**
 - You are now allowed to proxy and port-forward to prometheus in the Workload Cluster, more about that [here](https://elastisys.io/compliantkubernetes/user-guide/metrics/#accessing-prometheus). **[v0.26]**
-- As a User admin, you can now create namespaces yourself using [HNC](https://kubernetes.io/blog/2020/08/14/introducing-hierarchical-namespaces/), we have written a guide [here](https://elastisys.io/compliantkubernetes/user-guide/faq/#how-do-i-add-a-new-namespace) on how you do this in Compliant Kubernetes. **[v0.25]**
 
 ## Public docs
 
