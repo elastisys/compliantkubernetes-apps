@@ -645,6 +645,11 @@ networkPolicies:
       enabled : false
   falco:
     enabled: true
+    plugins:
+      ips:
+        - set-me
+      ports:
+        - 443
 
   alertmanager:
     # alert receiver, e.g. slack or opsgenie
