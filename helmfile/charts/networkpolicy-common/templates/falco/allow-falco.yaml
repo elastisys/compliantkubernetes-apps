@@ -25,9 +25,16 @@ spec:
         {{- end }}
       ports:
         - port: {{ .Values.global.apiserver.port }}
-    - ports:
-        - port: 443
-          protocol: TCP
+    - to:
+        {{- range $ip := .Values.falco.plugins.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        {{- range $port := .Values.falco.plugins.ports }}
+        - protocol: TCP
+          port: {{ $port }}
+        {{- end }}
     - ports:
         - port: 53
           protocol: UDP
