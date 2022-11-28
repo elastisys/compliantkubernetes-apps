@@ -61,7 +61,7 @@ prometheus:
 
     {{- if and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
     remoteWrite:
-    - url: https://{{ .Values.thanos.receiver.subdomain }}.{{ .Values.global.opsDomain }}/api/v1/receive
+    - url: https://{{ .Values.thanos.receiver.subdomain }}.{{ .Values.global.opsDomain }}./api/v1/receive
       tlsConfig:
         insecureSkipVerify: {{ not .Values.global.verifyTls }}
       headers:

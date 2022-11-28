@@ -9,6 +9,8 @@
 
 ### Fixed
 
+- Used FQDN for services connecting from the workload cluster to the service cluster to prevent resolve timeouts
+
 ### Added
 
 ### Removed
