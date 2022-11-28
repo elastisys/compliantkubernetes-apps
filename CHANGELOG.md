@@ -91,6 +91,7 @@
 - Fixed an issue with the prometheus operator network policy so that the apiservers can communicate to it
 - Updated the allow-falco & allow-falco-sidekick network policies to work with the new falco version
 - Fixed an issue with alertmanager and prometheus network policies in wc that prevented users from accessing the services via proxy.
+- Used FQDN for services connecting from the workload cluster to the service cluster to prevent resolve timeouts
 
 ### Added
 - Option to configure alerts for growing indices in OpenSearch
