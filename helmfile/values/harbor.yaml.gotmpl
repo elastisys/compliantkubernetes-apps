@@ -132,6 +132,8 @@ registry:
   nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
   affinity:     {{- toYaml .Values.harbor.registry.affinity | nindent 4 }}
   tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
+  credentials:
+    htpasswdString: {{ .Values.harbor.registryPasswordHtpasswd }}
 
 notary:
   server:
