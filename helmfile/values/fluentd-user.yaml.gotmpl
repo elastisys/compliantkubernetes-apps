@@ -15,7 +15,7 @@ elasticsearch:
     enabled: true
     user: fluentd
     password: null
-  hosts: ["{{ .Values.opensearch.subdomain }}.{{ .Values.global.opsDomain  }}"]
+  hosts: ["{{ .Values.opensearch.subdomain }}.{{ .Values.global.opsDomain  }}."]
   sslVerify: {{ .Values.global.verifyTls }}
   logLevel: "info"
   reloadOnFailure: true
