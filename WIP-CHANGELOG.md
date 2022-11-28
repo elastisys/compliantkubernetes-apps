@@ -12,6 +12,7 @@
 ### Fixed
 
 - Used FQDN for services connecting from the workload cluster to the service cluster to prevent resolve timeouts
+- Added generation of registry password so that there's not a diff each time we run apply
 
 ### Added
 

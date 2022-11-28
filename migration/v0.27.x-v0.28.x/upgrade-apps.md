@@ -16,6 +16,12 @@
     ./migration/v0.27.x-v0.28.x/move-nginx-controller-service-annotation-to-map
     ```
 
+1. Add new harbor credentials
+
+    ```bash
+    ./migration/v0.27.x-v0.28.x/add-registry-credentials.sh
+    ```
+
 1. Upgrade applications:
 
     ```bash
