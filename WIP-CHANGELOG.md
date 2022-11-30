@@ -14,6 +14,7 @@
 - Used FQDN for services connecting from the workload cluster to the service cluster to prevent resolve timeouts
 - Added generation of registry password so that there's not a diff each time we run apply
 - Fixed a templating error which occurs when more than one workload cluster is specified under the `global.clustersMonitoring` in the `sc-config.yaml`
+- Fix `KubeletDown` alert rule, did previously not alert if a kubelet was missing.
 
 ### Added
 
@@ -21,6 +22,7 @@
 - Enabled the `rook-ceph` network policy in both `sc` and `wc` cluster.
 - Added templating for wc Velero bucket prefix.
 - Network policies for `csi-cinder`, `csi-upcloud`, `metrics-server` and `snapshot-controller`.
+- Added alert for less kubelets than nodes in the cluster.
 
 ### Removed
 
