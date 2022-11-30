@@ -1,3 +1,7 @@
+## 2022.12.01
+1. helmfile/charts/prometheus-alerts/templates/alerts/kubernetes-system-kubelet.yaml
+   - ADDED - LessKubeletsThenNodes alert
+
 ## 2022.10.04
 1. helmfile/charts/prometheus-alerts/templates/alerts/kubernetes-apps.yaml
    - ADDED - KubeFailedEvictedPods alert

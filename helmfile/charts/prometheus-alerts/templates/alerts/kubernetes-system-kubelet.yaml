@@ -176,4 +176,28 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
+    - alert: LessKubeletsThanNodes
+      annotations:
+        description: There are less kubelets than nodes for the last 5m.
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-LessKubeletsThanNodes
+        summary: There are less kubelets than nodes for the last 5m.
+      expr: up{job="kubelet", metrics_path="/metrics"} == 0
+      for: 5m
+      labels:
+        severity: warning
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: LessKubeletsThanNodes
+      annotations:
+        description: There are less kubelets than nodes for the last 15m.
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-LessKubeletsThanNodes
+        summary: There are less kubelets than nodes for the last 15m.
+      expr: up{job="kubelet", metrics_path="/metrics"} == 0
+      for: 15m
+      labels:
+        severity: critical
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
 {{- end }}
