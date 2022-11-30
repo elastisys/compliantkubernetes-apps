@@ -1,5 +1,6 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.26.4](#v0264---2022-11-30)
 - [v0.26.3](#v0263---2022-10-31)
 - [v0.26.2](#v0262---2022-10-18)
 - [v0.26.1](#v0261---2022-10-05)
@@ -31,6 +32,18 @@
 - [v0.6.0](#v060---2020-10-16)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.26.4 - 2022-11-30
+
+### Changed
+
+- Disabled all collectors for node-exporter in ciskubebench- and vulnerability-exporter except textcollector
+- Increased the default CPU limit for node-exporter in ciskubebench- and vulnerability-exporter
+
+### Fixed
+
+- Used FQDN for services connecting from the workload cluster to the service cluster to prevent resolve timeouts
 
 -------------------------------------------------
 ## v0.26.3 - 2022-10-31
