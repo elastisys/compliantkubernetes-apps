@@ -18,17 +18,16 @@ spec:
         {{- end }}
     # probes to sc ingress
     - to:
-      {{- if .Values.global.externalLoadBalancer }}
-        {{- range $ip := .Values.global.scIngress.ips }}
-        - ipBlock:
-            cidr: {{ $ip }}
-        {{- end }}
-      {{- else if .Values.global.ingressUsingHostNetwork }}
+      {{- if .Values.global.ingressUsingHostNetwork }}
         {{- range $ip := .Values.global.scNodes.ips }}
         - ipBlock:
             cidr: {{ $ip }}
         {{- end }}
       {{- else }}
+        {{- range $ip := .Values.global.scIngress.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: ingress-nginx
