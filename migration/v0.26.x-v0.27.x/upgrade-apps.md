@@ -24,7 +24,7 @@
     ./migration/v0.26.x-v0.27.x/set-external-netpol-ips.sh
     ```
 
-    > **_Note_**: With Octavia load balancers add the IP of the Amphorae instances to SC and WC ingress respectively in `common-config.yaml`.
+    > **_Note_**: With Octavia load balancers add the IP of the Amphorae instances to SC and WC nodes respectively in `common-config.yaml`.
 
     First list networks using `openstack network list` to find the network IDs, then using `openstack port list --network <network-id>` find the IPs used by the load balancer instances prefixed with `octavia` and add those.
 
