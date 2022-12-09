@@ -44,11 +44,11 @@ alertmanager:
         receiver: 'null'
         {{ end }}
       {{ if not .Values.user.alertmanager.enabled }}
+      {{- range .Values.global.clustersMonitoring }}
       - match:
           # TODO: it would be nice to do this some other way.
           # The workload_cluster does not have an alertmanager, send to null.
           alertname: AlertmanagerDown
-          {{- range .Values.global.clustersMonitoring }}
           cluster: {{ . }}
         receiver: 'null'
       - match:
