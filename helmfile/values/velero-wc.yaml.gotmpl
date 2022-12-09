@@ -41,7 +41,7 @@ configuration:
     # Bucket to store backups in. Required.
     bucket: {{ .Values.objectStorage.buckets.velero }}
     # Prefix within bucket under which to store backups. Optional.
-    prefix: workload-cluster
+    prefix: {{ .Values.velero.storagePrefix }}
     # Additional provider-specific configuration. See link above
     # for details of required/optional fields for your provider.
     config:
@@ -55,7 +55,7 @@ configuration:
     # Bucket to store backups in. Required.
     bucket: {{ .Values.objectStorage.buckets.velero }}
     # Prefix within bucket under which to store backups. Optional.
-    prefix: workload-cluster
+    prefix: {{ .Values.velero.storagePrefix }}
     # Additional provider-specific configuration. See link above
     # for details of required/optional fields for your provider.
     {{- end }}
