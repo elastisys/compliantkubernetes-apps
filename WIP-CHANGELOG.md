@@ -13,6 +13,7 @@
 
 - Used FQDN for services connecting from the workload cluster to the service cluster to prevent resolve timeouts
 - Added generation of registry password so that there's not a diff each time we run apply
+- Fixed a templating error which occurs when more than one workload cluster is specified under the `global.clustersMonitoring` in the `sc-config.yaml`
 
 ### Added
 
