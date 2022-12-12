@@ -103,6 +103,8 @@ opa:
      - latest
 
 velero:
+  storagePrefix: workload-cluster
+
   ## Excluded namespaces
   excludedNamespaces:
     - cert-manager
