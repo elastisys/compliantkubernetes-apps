@@ -48,10 +48,10 @@ networkPolicies:
   harbor:
     jobservice:
       ips:
-        - 0.0.0.0/0
+        - "0.0.0.0/0"
     trivy:
       ips:
-        - 0.0.0.0/0
+        - "0.0.0.0/0"
   monitoring:
     grafana:
       externalDashboardProvider:
@@ -60,8 +60,8 @@ networkPolicies:
   opensearch:
     plugins:
       ips:
-        - 0.0.0.0/0
+        - "0.0.0.0/0"
   dex:
     connectors:
       ips:
-        - 0.0.0.0/0
+        - "0.0.0.0/0"

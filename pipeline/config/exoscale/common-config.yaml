@@ -31,9 +31,9 @@ networkPolicies:
   global:
     objectStorage:
       ips:
-        - 0.0.0.0/0
+      - 0.0.0.0/0
       ports:
-        - 443
+      - 443
     scIngress:
       ips:
         - 0.0.0.0/0
@@ -50,6 +50,10 @@ networkPolicies:
     letsencrypt:
       ips:
         - 0.0.0.0/0
+  falco:
+    plugins:
+      ips:
+        - 0.0.0.0/0
   alertmanager:
     alertReceivers:
       ips:
@@ -61,3 +65,5 @@ networkPolicies:
     serviceIp:
       ips:
         - 0.0.0.0/0
+  rookCeph:
+    enabled: false
