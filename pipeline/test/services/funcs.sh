@@ -1,5 +1,6 @@
 #!/bin/bash
 
+PIPELINE=${PIPELINE:-false}
 if [ -z "$PIPELINE" ]
 then
     RETRY_COUNT=6
