@@ -19,8 +19,8 @@
 ### Added
 
 - Starboard resources will now be removed when running the cleanup scripts - `scripts/clean-{sc,wc}.sh`.
-- Enabled the `rook-ceph` network policy in both `sc` and `wc` cluster.
 - Added templating for wc Velero bucket prefix.
+- Network policies for `rook-ceph` (disabled by default).
 - Network policies for `csi-cinder`, `csi-upcloud`, `metrics-server` and `snapshot-controller`.
 - Added alert for less kubelets than nodes in the cluster.
 
