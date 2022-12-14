@@ -139,6 +139,10 @@ check_opensearch_snapshots_status(){
     debug_msg=$(echo -e "$repo_exists_status" | jq)
   fi
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 661f291 (tests: Add troubleshooting script for opensearch checks)
   if $no_error; then
     echo "success ✔"
     echo "[DEBUG] All snapshots are either completed or in progress"
