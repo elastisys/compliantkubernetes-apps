@@ -6,9 +6,8 @@ on:
   - cron: "0 4,10 * * *"
 
 jobs:
-
   build-apps-image:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout compliantkubernetes-apps
       uses: actions/checkout@v3
@@ -41,7 +40,7 @@ jobs:
 
   apps:
     needs: [build-apps-image]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     container: ghcr.io/elastisys/compliantkubernetes-apps-pipeline:${{ github.sha }}
     strategy:
       fail-fast: false
@@ -272,7 +271,7 @@ jobs:
   clean-apps-image:
     needs: apps
     if: always()
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout compliantkubernetes-apps
       uses: actions/checkout@v3
@@ -286,7 +285,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   alert:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: [clean-apps-image]
     if: always() && github.ref == 'refs/heads/main'  # Make sure this runs even if some jobs fail, and only on main
     steps:

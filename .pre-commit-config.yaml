@@ -15,23 +15,23 @@ repos:
   rev: v4.1.0
   hooks:
   - id: check-json
-    exclude: helmfile/upstream/|helmfile/elastisys/
+    exclude: helmfile/upstream/
   - id: check-yaml
     exclude: helmfile/|bootstrap/
     args: [--allow-multiple-documents]
   - id: end-of-file-fixer
-    exclude: helmfile/upstream/|helmfile/elastisys/
+    exclude: helmfile/upstream/
   - id: trailing-whitespace
-    exclude: helmfile/upstream/|helmfile/elastisys/
+    exclude: helmfile/upstream/
   - id: check-merge-conflict
   - id: no-commit-to-branch
-- repo: https://github.com/robonaut/pre-commit-hooks
-  rev: feature/ruby-3-compat
+- repo: https://github.com/jumanjihouse/pre-commit-hooks
+  rev: 3.0.0
   hooks:
   - id: shellcheck
     additional_dependencies: []
     args:
     - "--external-sources"
-    exclude: helmfile/upstream/|helmfile/elastisys/|helmfile/charts/opensearch/configurer/
+    exclude: helmfile/upstream/|helmfile/charts/opensearch/configurer/
   - id: markdownlint
-    exclude: helmfile/upstream/|helmfile/elastisys/
+    exclude: helmfile/upstream/
