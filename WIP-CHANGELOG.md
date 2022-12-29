@@ -34,3 +34,5 @@
 
 - Prometheus recording rules for Rook.
 - Falco alerts in wc from prometheus. Users will get falco alerts via falco sidekick.
+- Legacy datasources from user-grafana: `prometheus-sc` and `prometheus-sc-reader`
+- Legacy datasources from grafana-ops: `prometheus-wc-reader`

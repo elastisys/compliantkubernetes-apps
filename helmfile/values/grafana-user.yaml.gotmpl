@@ -53,6 +53,11 @@ sidecar:
 datasources:
   datasources.yaml:
     apiVersion: 1
+    deleteDatasources:
+    - name: ck8s-metrics
+      orgId: 1
+    - name: prometheus-sc
+      orgId: 1
     datasources:
     {{- if and .Values.thanos.enabled .Values.thanos.query.enabled }}
     - name: "Service Cluster"

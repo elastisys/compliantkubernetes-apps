@@ -27,3 +27,13 @@
     ```bash
     bin/ck8s apply {sc|wc}
     ```
+
+1. Removing the legacy datasources requires a pod restart.
+
+    a. check if the grafana pods have restarted (restart them if not):
+
+    ```bash
+    bin/ck8s ops kubectl sc get po -n monitoring -l app.kubernetes.io/name=grafana
+    ```
+
+    b. check in the UI if the legacy datasources were removed
