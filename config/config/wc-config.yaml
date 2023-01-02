@@ -252,6 +252,7 @@ fluentd:
   ## Users can specify additional plugins and config in the respective configmaps:
   ## 'fluentd-extra-plugins', and 'fluentd-extra-config'.
   user:
+
     resources:
       limits:
         cpu: 500m
