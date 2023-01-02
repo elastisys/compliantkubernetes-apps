@@ -5,8 +5,8 @@ tolerations:  {{- toYaml .Values.fluentd.user.tolerations | nindent 2  }}
 
 image:
   # This is our own fork-image(https://github.com/elastisys/fluentd-elasticsearch). This can later be replaces with the original image(https://github.com/monotek/fluentd-elasticsearch) when our changes is merged.
-  repository: elastisys/fluentd
-  tag: v3.4.0-ck8s4
+  repository: ghcr.io/elastisys/fluentd
+  tag: v3.4.0-ck8s5
 
 elasticsearch:
   scheme: https
@@ -129,6 +129,11 @@ extraConfigMaps:
         expression /^(?<time>[^ ]* {1,2}[^ ]* [^ ]*) (?<host>[^ ]*) (?<ident>[a-zA-Z0-9_\/\.\-]*)(?:\[(?<pid>[0-9]+)\])?(?:[^\:]*\:)? *(?<message>.*)$/
       </parse>
     </source>
+
+    <filter **>
+       @type record_modifier
+       char_encoding utf-8:utf-8
+    </filter>
 
     # Detect exceptions in the log output and forward them as one log entry.
     <match raw.kubernetes.**>
