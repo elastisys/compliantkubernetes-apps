@@ -9,6 +9,7 @@
 - Fixed harbor restore network policy to allow all egress for the restore job.
 - `fluent-plugin-record-modifier` was added to our image `ghcr.io/elastisys/fluentd:v3.4.0-ck8s5` to prevent mapping errors from happening
 - Added generation of registry password so that there's not a diff each time we run apply
+- Fixed network policies for when internal traffic to the ingress is not short circuted by kube-proxy
 
 ### Added
 

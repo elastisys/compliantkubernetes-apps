@@ -53,6 +53,10 @@ spec:
             cidr: {{ $IP }}
         {{- end }}
       {{ else }}
+        {{- range $IP := .Values.global.ingress.ips }}
+        - ipBlock:
+            cidr: {{ $IP }}
+        {{- end }}
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: ingress-nginx
