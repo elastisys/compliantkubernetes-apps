@@ -33,3 +33,4 @@
 ### Removed
 
 - Prometheus recording rules for Rook.
+- Falco alerts in wc from prometheus. Users will get falco alerts via falco sidekick.
