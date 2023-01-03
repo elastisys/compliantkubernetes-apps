@@ -150,6 +150,8 @@ grafana:
   # admin username is "admin"
   adminPassword: {{ .Values.grafana.password }}
 
+  defaultDashboardsTimezone: ""
+
   initChownData:
     enabled: false
 
