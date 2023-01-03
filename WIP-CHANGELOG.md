@@ -12,3 +12,5 @@
 ### Added
 
 ### Removed
+
+- Falco alerts in wc from prometheus. Users will get falco alerts via falco sidekick.
