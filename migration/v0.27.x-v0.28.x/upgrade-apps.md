@@ -13,7 +13,13 @@
 1. Migrate nginx service annotations from a string to a map
 
     ```
-    ./migration/v0.27.x-v0.28.x/move-nginx-controller-service-annotation-to-map
+    ./migration/v0.27.x-v0.28.x/move-nginx-controller-service-annotation-to-map.sh
+    ```
+
+1. Migrate harbor jobservice port to ports (array)
+
+    ```
+    ./migration/v0.27.x-v0.28.x/move-harbor-jobservice-port-to-ports.sh
     ```
 
 1. Add new harbor credentials
