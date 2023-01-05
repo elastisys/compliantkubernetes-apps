@@ -1,0 +1,48 @@
+{{ if .Values.harbor.enabled }}
+{{- if eq .Values.harbor.database.type "internal" }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-harbor-database
+  namespace: harbor
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      component: database
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              component: core
+        - podSelector:
+            matchLabels:
+              component: notary-server
+        - podSelector:
+            matchLabels:
+              component: notary-signer
+        - podSelector:
+            matchLabels:
+              component: jobservice
+        {{- range .Values.harbor.database.internal }}
+        {{- if .ingressNSMatchLabels }}
+        - namespaceSelector:
+            matchLabels:
+              {{- range $key, $value := .ingressNSMatchLabels }}
+              {{ $key | quote }}: {{ $value | quote }}
+              {{- end }}
+          {{- if .ingressPodMatchLabels }}
+          podSelector:
+              matchLabels:
+                {{- range $key, $value := .ingressPodMatchLabels }}
+                {{ $key | quote }}: {{ $value | quote }}
+                {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
+      ports:
+        - port: 5432
+{{- end }}
+{{ end }}
