@@ -307,6 +307,8 @@ grafana:
   {{- end }}
 
   grafana.ini:
+    dataproxy:
+      timeout: 600
     server:
       root_url: https://{{ .Values.prometheus.grafana.subdomain }}.{{ .Values.global.opsDomain }}
     {{ if .Values.prometheus.grafana.oidc.enabled -}}
