@@ -29,9 +29,12 @@ global:
 
 harbor:
   enabled: {{ and .Values.harbor.enabled .Values.networkPolicies.harbor.enabled }}
+  registries:
+    ips: {{- toYaml .Values.networkPolicies.harbor.registries.ips | nindent 6 }}
+    ports: {{- toYaml .Values.networkPolicies.harbor.registries.ports | nindent 6 }}
   jobservice:
     ips: {{- toYaml .Values.networkPolicies.harbor.jobservice.ips | nindent 6 }}
-    port: {{ .Values.networkPolicies.harbor.jobservice.port }}
+    ports: {{- toYaml .Values.networkPolicies.harbor.jobservice.ports | nindent 6 }}
   database:
     type: {{ .Values.harbor.database.type }}
     internal: {{- toYaml .Values.networkPolicies.harbor.database.internal | nindent 6 }}
