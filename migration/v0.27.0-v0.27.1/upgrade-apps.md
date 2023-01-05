@@ -16,6 +16,12 @@
     ./migration/v0.27.0-v0.27.1/add-registry-credentials.sh
     ```
 
+1. Migrate harbor jobservice port to ports (array)
+
+    ```
+    ./migration/v0.27.x-v0.28.x/move-harbor-jobservice-port-to-ports.sh
+    ```
+
 1. Upgrade applications:
 
     ```bash

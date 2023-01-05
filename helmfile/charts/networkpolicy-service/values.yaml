@@ -58,8 +58,14 @@ harbor:
       #   egressPodMatchLabels: {}
       #   ports:
       #    - 5432
+  registries:
+    # For replication, added to core and jobservice
+    ips:
+      - 0.0.0.0/0
+    ports:
+      - 443
   jobservice:
-    # IP to pull images, docker hub etc
+    # IP for jobs, not needed for replication
     ips:
       - "0.0.0.0/0"
     ports:

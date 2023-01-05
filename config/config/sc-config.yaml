@@ -1107,11 +1107,17 @@ networkPolicies:
         - set-me
   harbor:
     enabled: true
-    jobservice:
-      # IP to pull images, docker hub etc
+    # For replication, added to core and jobservice
+    registries:
       ips:
         - "set-me"
-      port: 443
+      ports:
+        - 443
+    jobservice:
+      ips:
+        - "set-me"
+      ports:
+        - 443
     database:
       internal:
         - ingressNSMatchLabels:
