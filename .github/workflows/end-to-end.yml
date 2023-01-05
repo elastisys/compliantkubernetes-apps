@@ -11,23 +11,38 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - name: Checkout compliantkubernetes-apps
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: elastisys/compliantkubernetes-apps
         ref: main
-    - name: Build docker image
-      uses: whoan/docker-build-with-cache-action@v3
+    - name: Log in to the Container registry
+      uses: docker/login-action@v2
       with:
-        username: "${{ secrets.DOCKERHUB_USERNAME }}"
-        password: "${{ secrets.DOCKERHUB_PASSWORD }}"
-        image_name: elastisys/compliantkubernetes-apps-pipeline
-        image_tag: ${{ github.sha }}
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ghcr.io/elastisys/compliantkubernetes-apps-pipeline
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v3
+      with:
         context: pipeline
+        push: true
+        tags: ghcr.io/elastisys/compliantkubernetes-apps-pipeline:${{ github.sha }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-to: type=gha,mode=max
+        cache-from: type=gha
+
 
   apps:
     needs: [build-apps-image]
     runs-on: ubuntu-20.04
-    container: elastisys/compliantkubernetes-apps-pipeline:${{ github.sha }}
+    container: ghcr.io/elastisys/compliantkubernetes-apps-pipeline:${{ github.sha }}
     strategy:
       fail-fast: false
       matrix:
@@ -43,7 +58,7 @@ jobs:
     ## TODO: We cannot currently use ck8s-kubespray since the terraform code
     ## for exoscale is not in the version we have in the submodule
     - name: Checkout ck8s-kubespray
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: elastisys/compliantkubernetes-kubespray
         # TODO: Should we use a specific commit here?
@@ -51,7 +66,7 @@ jobs:
         submodules: recursive
         path: compliantkubernetes-kubespray
     - name: Checkout compliantkubernetes-apps
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: elastisys/compliantkubernetes-apps
         ref: main
@@ -159,7 +174,7 @@ jobs:
 
     - name: Upload configs
       if: always() && steps.gather-configs.outcome == 'success'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: compliantkubernetes-apps-pipeline-config
         path: ./apps/pipeline/config/exoscale/configs.tar.gz
@@ -184,13 +199,13 @@ jobs:
 
     - name: Upload logs
       if: always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: compliantkubernetes-apps-logs
         path: ./logs
     - name: Upload events
       if: always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: compliantkubernetes-apps-events
         path: ./events
@@ -230,16 +245,15 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - name: Checkout compliantkubernetes-apps
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: elastisys/compliantkubernetes-apps
         ref: main
     - name: Cleanup docker image
       run: ./pipeline/cleanup-docker-image.bash
       env:
-        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-        DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-        DOCKERHUB_REPOSITORY: elastisys/compliantkubernetes-apps-pipeline
+        GITHUB_ACTOR: ${{ github.actor }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   alert:
     runs-on: ubuntu-20.04
@@ -248,10 +262,10 @@ jobs:
     steps:
     - id: get-sha
       run: |
-          echo ::set-output name=sha::$( curl https://api.github.com/repos/elastisys/compliantkubernetes-apps/git/ref/heads/main | jq .object.sha | tr -d '"')
+          echo "sha=$( curl https://api.github.com/repos/elastisys/compliantkubernetes-apps/git/ref/heads/main | jq .object.sha | tr -d '"')" >> $GITHUB_OUTPUT
     - id: get-sha-short
       run: |
-          echo ::set-output name=sha::$( echo ${{ steps.get-sha.outputs.sha }} | cut -c -8)
+          echo "sha=$( echo ${{ steps.get-sha.outputs.sha }} | cut -c -8)" >> $GITHUB_OUTPUT
     - id: result
       run: |
         curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs \
@@ -272,7 +286,7 @@ jobs:
         RESULT="${RESULT//'%'/'%25'}"
         RESULT="${RESULT//$'\n'/'%0A'}"
         RESULT="${RESULT//$'\r'/'%0D'}"
-        echo "::set-output name=result::$(echo "$RESULT")"
+        echo "result=$(echo "$RESULT")" >> $GITHUB_OUTPUT
     - uses: technote-space/workflow-conclusion-action@v1
     - name: Send Slack alert
       uses: elastisys/action-slack@v3

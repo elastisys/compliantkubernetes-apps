@@ -1,4 +1,5 @@
 FROM ubuntu:20.04
+LABEL org.opencontainers.image.source https://github.com/elastisys/compliantkubernetes-apps
 
 RUN  apt-get update && \
      apt-get install -y software-properties-common && \
