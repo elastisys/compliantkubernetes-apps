@@ -9,6 +9,7 @@
 - Increased the default CPU limit for node-exporter in ciskubebench- and vulnerability-exporter
 - Nginx controller service annotations are now defined as a map, previously just a single string.
 - Synced all grafana dashboards so that they use the same timezone, they all now use the default organization timezone.
+- Changed init script to enable proxy-protocol for elastx and cleura clouds
 
 ### Fixed
 

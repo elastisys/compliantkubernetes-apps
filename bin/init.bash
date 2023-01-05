@@ -204,11 +204,11 @@ set_nginx_config() {
             ;;
 
         citycloud | elastx)
-            use_proxy_protocol=false
+            use_proxy_protocol=true
             use_host_port=false
             service_enabled=true
             service_type=LoadBalancer
-            service_annotations=''
+            service_annotations='loadbalancer.openstack.org/proxy-protocol: true'
             ;;
 
         aws)
