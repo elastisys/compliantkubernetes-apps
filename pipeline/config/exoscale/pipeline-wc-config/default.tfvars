@@ -1,7 +1,7 @@
 prefix = "pipeline-wc"
 zone   = "ch-gva-2"
 
-inventory_file = "apps/pipeline/config/exoscale/pipeline-wc-config/inventory.ini"
+inventory_file = "/github/workspace/apps/pipeline/config/exoscale/pipeline-wc-config/inventory.ini"
 
 ssh_public_keys = [
   # Put your public SSH key here

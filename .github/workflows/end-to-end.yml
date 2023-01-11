@@ -78,14 +78,23 @@ jobs:
         ssh-keygen -q -t rsa -N "" -f apps/pipeline/config/exoscale/id_rsa
         sed -i "s!PUBLIC_SSH_KEY_HERE!$(cat apps/pipeline/config/exoscale/id_rsa.pub)!g" apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/default.tfvars
     - name: Init terraform
-      uses: docker://hashicorp/terraform:0.14.7
+      uses: docker://hashicorp/terraform:1.2.9
       with:
-        args: init compliantkubernetes-kubespray/kubespray/contrib/terraform/exoscale
+        args: -chdir="/github/workspace/compliantkubernetes-kubespray/kubespray/contrib/terraform/exoscale" init
     # Note: This container doesn't run bash, so we cannot use env vars in the arguments
     - name: Run terraform
-      uses: docker://hashicorp/terraform:0.14.7
+      continue-on-error: true
+      id: runterraform0
+      uses: docker://hashicorp/terraform:1.2.9
       with:
-        args: apply -auto-approve -var-file apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/default.tfvars -state apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/terraform.tfstate compliantkubernetes-kubespray/kubespray/contrib/terraform/exoscale
+        args: -chdir="/github/workspace/compliantkubernetes-kubespray/kubespray/contrib/terraform/exoscale" apply -auto-approve -var-file /github/workspace/apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/default.tfvars -state /github/workspace/apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/terraform.tfstate
+
+    - name: Run terraform - retry 1
+      id: runterraform1
+      if: steps.runterraform0.outcome=='failure'
+      uses: docker://hashicorp/terraform:1.2.9
+      with:
+        args: -chdir="/github/workspace/compliantkubernetes-kubespray/kubespray/contrib/terraform/exoscale" apply -auto-approve -var-file /github/workspace/apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/default.tfvars -state /github/workspace/apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/terraform.tfstate
 
     - name: Prepare DNS
       if: matrix.cluster == 'sc'
@@ -106,6 +115,17 @@ jobs:
         args: route53 change-resource-record-sets --hosted-zone-id Z2STJRQSJO5PZ0 --change-batch file://apps/pipeline/config/exoscale/dns-${{ matrix.cluster }}.json
 
     - name: Run kubespray
+      continue-on-error: true
+      id: runkubespray0
+      uses: docker://quay.io/kubespray/kubespray:v2.20.0
+      env:
+        ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
+      with:
+        args: /bin/bash -c "cd compliantkubernetes-kubespray/kubespray && ansible-playbook -i ../../$CK8S_CONFIG_PATH/pipeline-${{ matrix.cluster }}-config/inventory.ini --private-key ../../$CK8S_CONFIG_PATH/id_rsa --become --become-user=root cluster.yml"
+
+    - name: Run kubespray - retry 1
+      id: runkubespray1
+      if: steps.runkubespray0.outcome=='failure'
       uses: docker://quay.io/kubespray/kubespray:v2.20.0
       env:
         ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
@@ -211,10 +231,20 @@ jobs:
         path: ./events
 
     - name: Destroy terraform
+      continue-on-error: true
+      id: destroyterraform0
       if: always()
-      uses: docker://hashicorp/terraform:0.14.7
+      uses: docker://hashicorp/terraform:1.2.9
       with:
-        args: destroy -auto-approve -var-file apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/default.tfvars -state apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/terraform.tfstate compliantkubernetes-kubespray/kubespray/contrib/terraform/exoscale
+        args: -chdir="/github/workspace/compliantkubernetes-kubespray/kubespray/contrib/terraform/exoscale" destroy -auto-approve -var-file /github/workspace/apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/default.tfvars -state /github/workspace/apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/terraform.tfstate
+
+    - name: Destroy terraform - retry 1
+      id: destroyterraform1
+      if: always() && steps.destroyterraform0.outcome=='failure'
+      uses: docker://hashicorp/terraform:1.2.9
+      with:
+        args: -chdir="/github/workspace/compliantkubernetes-kubespray/kubespray/contrib/terraform/exoscale" destroy -auto-approve -var-file /github/workspace/apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/default.tfvars -state /github/workspace/apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/terraform.tfstate
+
 
     - name: Prepare DNS cleanup
       if: always() && (matrix.cluster == 'sc')
