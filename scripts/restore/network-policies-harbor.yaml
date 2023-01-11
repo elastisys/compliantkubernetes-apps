@@ -17,3 +17,17 @@ spec:
               job-name: restore-harbor-job
       ports:
         - port: 5432
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-restore-job-egress
+  namespace: harbor
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      job-name: restore-harbor-job
+  egress:
+  - {}
