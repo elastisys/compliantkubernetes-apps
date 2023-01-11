@@ -100,3 +100,24 @@ container_manager: containerd
 kubelet_config_extra_args:
   imageGCHighThresholdPercent: 75
   imageGCLowThresholdPercent: 70
+
+calico_ipip_mode: 'Always'
+calico_vxlan_mode: 'Never'
+calico_network_backend: 'bird'
+
+kube_profiling: false
+kube_scheduler_bind_address: 127.0.0.1
+kube_kubeadm_scheduler_extra_args:
+  profiling: false
+
+kube_controller_manager_bind_address: 127.0.0.1
+
+kubelet_secure_addresses: >-
+  {%- for host in groups['kube_control_plane'] -%}
+    {{ hostvars[host]['ip'] | default(fallback_ips[host]) }}{{ ' ' if not loop.last else '' }}
+  {%- endfor -%}
+
+containerd_version: 1.6.12
+containerd_archive_checksums:
+  amd64:
+    1.6.12: a56c39795fd0d0ee356b4099a4dfa34689779f61afc858ef84c765c63e983a7d
