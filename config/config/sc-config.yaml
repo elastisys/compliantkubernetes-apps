@@ -98,10 +98,10 @@ user:
     sidecar:
       resources:
         requests:
-          cpu: 5m
+          cpu: 10m
           memory: 80Mi
         limits:
-          cpu: 10m
+          cpu: 50m
           memory: 100Mi
 
 harbor:
@@ -473,10 +473,10 @@ prometheus:
     sidecar:
       resources:
         requests:
-          cpu: 5m
+          cpu: 10m
           memory: 80Mi
         limits:
-          cpu: 10m
+          cpu: 50m
           memory: 100Mi
 dex:
   replicaCount: 2
