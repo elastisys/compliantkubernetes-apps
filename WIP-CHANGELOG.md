@@ -19,6 +19,7 @@
 - Add permissions to the `alerting_full_access` role in Opensearch to be able to view notification channels.
 - Fixed network policies for when internal traffic to the ingress is not short circuted by kube-proxy
 - `fluent-plugin-record-modifier` was added to our image `ghcr.io/elastisys/fluentd:v3.4.0-ck8s5` to prevent mapping errors from happening
+- Fixed harbor restore network policy to allow all egress for the restore job.
 
 ### Added
 
