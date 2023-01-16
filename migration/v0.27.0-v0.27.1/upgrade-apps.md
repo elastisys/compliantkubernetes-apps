@@ -18,9 +18,19 @@
 
 1. Migrate harbor jobservice port to ports (array)
 
-    ```
+    ```bash
     ./migration/v0.27.x-v0.28.x/move-harbor-jobservice-port-to-ports.sh
     ```
+
+1. Up date the IPs for harbor replication in $CK8S_CONFIG_PATH/sc-config.yaml
+
+    ```yaml
+      harbor:
+        registries:
+          ips:
+            - "set-me"
+    ```
+
 
 1. Upgrade applications:
 
