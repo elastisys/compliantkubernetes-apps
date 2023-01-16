@@ -1,5 +1,6 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.27.1](#v0271---2023-01-16)
 - [v0.27.0](#v0270---2022-11-17)
 - [v0.26.0](#v0260---2022-09-19)
 - [v0.25.0](#v0250---2022-08-25)
@@ -29,6 +30,32 @@
 - [v0.6.0](#v060---2020-10-16)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.27.1 - 2023-01-16
+
+### Release notes
+
+### Updated
+
+### Changed
+
+### Fixed
+
+- Fixed harbor restore network policy to allow all egress for the restore job.
+- `fluent-plugin-record-modifier` was added to our image `ghcr.io/elastisys/fluentd:v3.4.0-ck8s5` to prevent mapping errors from happening
+- Added generation of registry password so that there's not a diff each time we run apply
+- Fixed network policies for when internal traffic to the ingress is not short circuted by kube-proxy
+- Fixed Harbor network policies
+  - Cleaned up `core` egress rule
+  - Separate network policies
+  - Fixed replication egress rules, `core` and `jobservice`
+
+### Added
+
+### Removed
+
+- Falco alerts in wc from prometheus. Users will get falco alerts via falco sidekick.
 
 -------------------------------------------------
 ## v0.27.0 - 2022-11-17
