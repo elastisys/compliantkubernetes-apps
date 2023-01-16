@@ -448,7 +448,7 @@ generate_secrets() {
     THANOS_INGRESS_PASS_HASH=$(htpasswd -bn "" "${THANOS_INGRESS_PASS}" | tr -d ':\n')
 
     HARBOR_REGISTRY_PASS=$(pwgen -cns 20 1)
-    HARBOR_REGISTRY_PASS_HTPASSWD=$(htpasswd -bn "harbor_registry_user" "${HARBOR_REGISTRY_PASS}" | tr -d '\n')
+    HARBOR_REGISTRY_PASS_HTPASSWD=$(htpasswd -bnB "harbor_registry_user" "${HARBOR_REGISTRY_PASS}" | tr -d '\n')
 
     yq4 --inplace ".grafana.password= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
     yq4 --inplace ".grafana.clientSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"

@@ -24,6 +24,7 @@
   - Cleaned up `core` egress rule
   - Separate network policies
   - Fixed replication egress rules, `core` and `jobservice`
+- Fixed harbor registry credentials template and htpasswd generation
 
 ### Added
 

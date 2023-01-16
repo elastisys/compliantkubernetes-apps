@@ -133,6 +133,7 @@ registry:
   affinity:     {{- toYaml .Values.harbor.registry.affinity | nindent 4 }}
   tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
   credentials:
+    password: {{ .Values.harbor.registryPassword }}
     htpasswdString: {{ .Values.harbor.registryPasswordHtpasswd }}
 
 notary:
