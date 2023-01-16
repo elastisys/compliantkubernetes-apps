@@ -1,3 +1,4 @@
+### Release notes
 
 ### Fixed
 
@@ -7,3 +8,6 @@
 ### Updated
 
 - The NetworkPolicy Dashboard have been updated to be more clear
+### Changed
+
+- Updated metrics-server chart to 0.6.2 which upgrades metrics-server to 3.8.3

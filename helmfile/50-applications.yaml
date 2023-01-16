@@ -99,7 +99,7 @@ releases:
   labels:
     app: metrics-server
   chart: ./upstream/metrics-server
-  version: 3.7.0
+  version: 3.8.3
   installed: {{ .Values.metricsServer.enabled }}
   values:
   - values/metrics-server.yaml.gotmpl
