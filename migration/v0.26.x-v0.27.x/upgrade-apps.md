@@ -109,6 +109,28 @@
     ./bin/ck8s ops helmfile wc -l app=falco -l app=falco-exporter destroy
     ./bin/ck8s ops helmfile sc -l app=falco -l app=falco-exporter destroy
     ```
+1. If you are upgrading from v0.26.x to v0.27.1 apply this steps:
+
+   1. Add new harbor credentials
+
+       ```bash
+       ./migration/v0.27.x-v0.28.x/add-registry-credentials.sh
+       ```
+
+   1. Migrate harbor jobservice port to ports (array)
+
+       ```bash
+       ./migration/v0.27.x-v0.28.x/move-harbor-jobservice-port-to-ports.sh
+       ```
+
+   1. Up date the IPs for harbor replication in `$CK8S_CONFIG_PATH/sc-config.yaml`
+
+       ```yaml
+         harbor:
+           registries:
+             ips:
+               - "set-me"
+       ```
 
 1. Upgrade applications:
 
