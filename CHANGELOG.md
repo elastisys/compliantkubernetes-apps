@@ -1,5 +1,6 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.27.2](#v0272---2023-01-17)
 - [v0.27.1](#v0271---2023-01-16)
 - [v0.27.0](#v0270---2022-11-17)
 - [v0.26.0](#v0260---2022-09-19)
@@ -30,6 +31,14 @@
 - [v0.6.0](#v060---2020-10-16)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.27.2 - 2023-01-17
+
+### Fixed
+
+- Fixed harbor registry credentials template and htpasswd generation
+- Fixed checks in update-ips script to update Swift endpoints
 
 -------------------------------------------------
 ## v0.27.1 - 2023-01-16
