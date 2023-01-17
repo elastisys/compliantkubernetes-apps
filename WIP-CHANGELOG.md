@@ -3,7 +3,8 @@
 ### Added
 
 - Enable rook-ceph network polices by default for exoscale
-
+- Troubleshooting scripts for HNC
+- Tests for Groups RBAC
 ### Fixed
 
 - The update-ips script can now fetch Calico Wireguard IPs

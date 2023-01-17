@@ -10,7 +10,6 @@ here="$(dirname "$(readlink -f "$0")")"
 source "${here}/common.bash"
 # shellcheck source=pipeline/test/services/service-cluster/testOpensearch.sh
 source "${pipeline_path}/test/services/service-cluster/testOpensearch.sh"
-
 # shellcheck source=pipeline/test/services/service-cluster/testCertManager.sh
 source "${pipeline_path}/test/services/service-cluster/testCertManager.sh"
 # shellcheck source=pipeline/test/services/workload-cluster/testCertManager.sh
@@ -19,6 +18,8 @@ source "${pipeline_path}/test/services/workload-cluster/testCertManager.sh"
 source "${pipeline_path}/test/services/service-cluster/testIngress.sh"
 # shellcheck source=pipeline/test/services/workload-cluster/testIngress.sh
 source "${pipeline_path}/test/services/workload-cluster/testIngress.sh"
+# shellcheck source=pipeline/test/services/workload-cluster/testHNC.sh
+source "${pipeline_path}/test/services/workload-cluster/testHNC.sh"
 
 test_apps_sc() {
     log_info "Testing service cluster"
@@ -47,6 +48,7 @@ function wc_help() {
     printf "%s\n" "List of targets:"
     printf "\t%-23s %s\n" "cert-manager" "Cert Manager checks"
     printf "\t%-23s %s\n" "ingress" "Ingress checks"
+    printf "\t%-23s %s\n" "hnc" "HNC checks"
     printf "%s\n" "[NOTE] If no target is specified, the default wc apps tests will be executed."
     exit 0
 }
@@ -65,7 +67,7 @@ function sc() {
         ingress)
             sc_ingress_checks "${@:2}"
             ;;
-        --help)
+        --help | -h)
             sc_help
             ;;
         *)
@@ -89,7 +91,10 @@ function wc() {
         ingress)
             wc_ingress_checks "${@:2}"
             ;;
-        --help)
+        hnc)
+            wc_hnc_checks "${@:2}"
+            ;;
+        --help | -h)
             wc_help
             ;;
         *)
