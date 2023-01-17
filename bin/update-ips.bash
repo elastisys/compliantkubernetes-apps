@@ -244,8 +244,10 @@ fi
 
 ## Add Swift to sc config
 if [[ "${CHECK_CLUSTER}" =~ ^(sc|both)$ ]]; then
-    CHECK="$(yq_dig 'sc' '.harbor.persistence.type == "swift" or .thanos.objectStorage.type == "swift"' 'false')"
-    if [ "$CHECK" == "true" ]; then
+    CHECK_HARBOR="$(yq_dig 'sc' '.harbor.persistence.type' 'false')"
+    CHECK_THANOS="$(yq_dig 'sc' '.thanos.objectStorage.type' 'false')"
+
+    if [ "$CHECK_HARBOR" == "swift" ] || [ "$CHECK_THANOS" == "swift" ]; then
         SWIFT_ENDPOINT="$(yq_dig 'sc' '.objectStorage.swift.authUrl' '""' | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
         if [ -z "$SWIFT_ENDPOINT" ]; then
             log_error "No Swift endpoint found, check your sc-config.yaml"
