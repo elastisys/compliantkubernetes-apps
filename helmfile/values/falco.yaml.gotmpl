@@ -109,6 +109,43 @@ customRules:
             container.image.repository=docker.io/elastisys/curl-jq and k8s.pod.name startswith opensearch-
           )
         )
+    - macro: user_known_non_sudo_setuid_conditions
+      condition: (
+          user.name=root or
+          (k8s.pod.name startswith 'rfr-' and container.image.repository=docker.io/library/redis and (
+              proc.cmdline='sh -c redis-cli -h $(hostname) ping' or
+              proc.cmdline='xargs -0 sh -c' or
+              proc.cmdline='hostname' or
+              (proc.cmdline='hostname -i' and proc.pname='sh') or
+              (proc.cmdline='sh -c redis-cli info replication | grep role | tr -d "\\r" | tr -d "\\n"\n' and (proc.pname='xargs' or proc.pname='sh')) or
+              (proc.cmdline='sh -c redis-cli info replication | grep master_sync_in_progress:1 | tr -d "\\r" | tr -d "\\n"\n' and (proc.pname='xargs' or proc.pname='sh')) or
+              (proc.cmdline='sh -c redis-cli info replication | grep master_host:127.0.0.1 | tr -d "\\r" | tr -d "\\n"\n' and (proc.pname='xargs' or proc.pname='sh')) or
+              (proc.cmdline='grep role' and (proc.pname='xargs' or proc.pname='sh')) or
+              (proc.cmdline='grep master_sync_in_progress:1' and (proc.pname='xargs' or proc.pname='sh')) or
+              (proc.cmdline='grep master_host:127.0.0.1' and (proc.pname='xargs' or proc.pname='sh')) or
+              (proc.cmdline='tr -d \\n' and (proc.pname='xargs' or proc.pname='sh')) or
+              (proc.cmdline='tr -d \\r' and (proc.pname='xargs' or proc.pname='sh')) or
+              (proc.cmdline='tr -d \\"' and (proc.pname='xargs' or proc.pname='sh')) or
+              proc.cmdline='tr ,  ' or
+              proc.cmdline='cut -d  -f1' or
+              (proc.cmdline='sleep 5' and proc.pname='sh') or
+              proc.cmdline='sh -c sleep 5 && redis-server /redis/redis.conf' or
+              proc.cmdline='sh /redis-readiness/ready.sh' or
+              proc.cmdline='sh /redis-shutdown/shutdown.sh'
+            )
+          ) or (
+            k8s.pod.name startswith 'rfs-' and (
+              (container.image.repository=docker.io/library/redis and (
+                  proc.cmdline='sh -c redis-cli -h $(hostname) -p 26379 ping' or
+                  proc.cmdline='hostname' or
+                  proc.cmdline='cp /redis/sentinel.conf /redis-writable/sentinel.conf'
+                )
+              ) or (
+                container.image.repository=quay.io/oliver006/redis_exporter and proc.cmdline='redis_exporter -redis.addr redis://localhost:26379'
+              )
+            )
+          )
+        )
 
 falcosidekick:
   enabled: {{ .Values.falco.alerts.enabled }}

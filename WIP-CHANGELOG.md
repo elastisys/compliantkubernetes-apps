@@ -11,6 +11,7 @@
 - Support for extracting and storing audit logs with Fluentd
 - Compaction for logs stored directly in object store by Fluentd
 - New 'Log review overview' Opensearch dashboard
+- Added falco rules to ignore redis operator related alerts.
 
 ### Fixed
 
