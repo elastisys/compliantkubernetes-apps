@@ -92,7 +92,7 @@ jobs:
         #yq write --inplace "$CK8S_CONFIG_PATH/pipeline-${{ matrix.cluster }}-config/artifacts/admin.conf" clusters[0].cluster.server https://${control_plane_lb_ip_address}:6443
         # Copy to correct location and encrypt
         mkdir "$CK8S_CONFIG_PATH/.state"
-        cp "$CK8S_CONFIG_PATH/pipeline-${{ matrix.cluster }}-config/artifacts/admin.conf" "$CK8S_CONFIG_PATH/.state/kube_config_${{ matrix.cluster }}.yaml"
+        #cp "$CK8S_CONFIG_PATH/pipeline-${{ matrix.cluster }}-config/artifacts/admin.conf" "$CK8S_CONFIG_PATH/.state/kube_config_${{ matrix.cluster }}.yaml"
         sops --config "$CK8S_CONFIG_PATH/.sops.yaml" -e -i "$CK8S_CONFIG_PATH/.state/kube_config_${{ matrix.cluster }}.yaml"
         # Encrypt and set necessary secrets
         sops --config "$CK8S_CONFIG_PATH/.sops.yaml" -e -i "$CK8S_CONFIG_PATH/secrets.yaml"
