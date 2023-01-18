@@ -76,7 +76,31 @@ jobs:
         path: apps
         fetch-depth: 0 # Fetches all tags
 
+    - name: Import PGP key and configure GPG agent
+      run: ./apps/pipeline/setup-pgp.bash
+      env:
+        PGP_KEY: ${{ secrets.PGP_KEY }}
+        PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+
+    - name: Prepare for apps
+      env:
+        S3_ACCESS_KEY: ${{ secrets.EXOSCALE_API_KEY }}
+        S3_SECRET_KEY: ${{ secrets.EXOSCALE_API_SECRET }}
+      run: |
+        # Set public LB IP in the kubeconfig
+        #control_plane_lb_ip_address="$(jq -r .outputs.control_plane_lb_ip_address.value $CK8S_CONFIG_PATH/pipeline-${{ matrix.cluster }}-config/terraform.tfstate)"
+        #yq write --inplace "$CK8S_CONFIG_PATH/pipeline-${{ matrix.cluster }}-config/artifacts/admin.conf" clusters[0].cluster.server https://${control_plane_lb_ip_address}:6443
+        # Copy to correct location and encrypt
+        mkdir "$CK8S_CONFIG_PATH/.state"
+        cp "$CK8S_CONFIG_PATH/pipeline-${{ matrix.cluster }}-config/artifacts/admin.conf" "$CK8S_CONFIG_PATH/.state/kube_config_${{ matrix.cluster }}.yaml"
+        sops --config "$CK8S_CONFIG_PATH/.sops.yaml" -e -i "$CK8S_CONFIG_PATH/.state/kube_config_${{ matrix.cluster }}.yaml"
+        # Encrypt and set necessary secrets
+        sops --config "$CK8S_CONFIG_PATH/.sops.yaml" -e -i "$CK8S_CONFIG_PATH/secrets.yaml"
+        sops --config "$CK8S_CONFIG_PATH/.sops.yaml" --set "[\"objectStorage\"] {\"s3\": {\"accessKey\": \"${S3_ACCESS_KEY}\", \"secretKey\": \"${S3_SECRET_KEY}\"}}" "$CK8S_CONFIG_PATH/secrets.yaml"
+
+
     - name: Test apps
+      if: always() && (steps.install-apps.outcome != 'cancelled' && steps.install-apps.outcome != 'skipped' && steps.install-apps.outcome != 'failure')
       run: ./apps/bin/ck8s test ${{ matrix.cluster }}
       env:
         PIPELINE: "true"
