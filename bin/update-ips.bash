@@ -91,7 +91,8 @@ getKubectlIPs() {
     fi
     mapfile -t IPS_internal < <("${here}/ops.bash" kubectl "${1}" get node "${label_argument}" -ojsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')
     mapfile -t IPS_calico < <("${here}/ops.bash" kubectl "${1}" get node "${label_argument}" -ojsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4IPIPTunnelAddr}')
-    read -r -a IPS <<< "${IPS_internal[*]} ${IPS_calico[*]}"
+    mapfile -t IPS_wireguard < <("${here}/ops.bash" kubectl "${1}" get node "${label_argument}" -ojsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4WireguardInterfaceAddr}')
+    read -r -a IPS <<< "${IPS_internal[*]} ${IPS_calico[*]} ${IPS_wireguard[*]}"
     if [ ${#IPS[@]} -eq 0 ]; then
         log_error "No ips for ${1} nodes with labels ${2} was found"
         exit 1
