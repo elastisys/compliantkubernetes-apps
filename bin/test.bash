@@ -23,15 +23,13 @@ source "${pipeline_path}/test/services/workload-cluster/testIngress.sh"
 test_apps_sc() {
     log_info "Testing service cluster"
 
-    with_kubeconfig "${config[kube_config_sc]}" \
-        "${pipeline_path}/test/services/test-sc.sh" "${config[config_file_sc]}"
+    "${pipeline_path}/test/services/test-sc.sh" "${config[config_file_sc]}"
 }
 
 test_apps_wc() {
     log_info "Testing workload cluster"
 
-    with_kubeconfig "${config[kube_config_wc]}" \
-        "${pipeline_path}/test/services/test-wc.sh" "${config[config_file_wc]}"
+    "${pipeline_path}/test/services/test-wc.sh" "${config[config_file_wc]}"
 }
 
 function sc_help() {
@@ -121,13 +119,11 @@ function main() {
     case ${1} in
     sc)
         config_load "$1"
-        with_kubeconfig "${config[kube_config_sc]}" \
-            "$1" "${@:2}"
+        "$1" "${@:2}"
         ;;
     wc)
         config_load "$1"
-        with_kubeconfig "${config[kube_config_wc]}" \
-            "$1" "${@:2}"
+        "$1" "${@:2}"
         ;;
     esac
 }

@@ -70,7 +70,7 @@ case "${1}" in
         ;;
     test)
         [[ "${2}" =~ ^(wc|sc)$ ]] || usage
-        "${here}/test.bash" "${@:2}"
+        with_kubeconfig "${config["kube_config_${2}"]}" "${here}/test.bash" "${@:2}"
         ;;
     dry-run)
         [[ "${2}" =~ ^(wc|sc)$ ]] || usage
