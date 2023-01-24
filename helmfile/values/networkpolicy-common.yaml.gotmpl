@@ -1,3 +1,8 @@
+{{- if .Values.networkPolicies.additional }}
+additional:
+  {{ toYaml .Values.networkPolicies.additional | nindent 2 }}
+{{- end }}
+
 global:
   apiserver:
   {{- if eq .Environment.Name "service_cluster" }}

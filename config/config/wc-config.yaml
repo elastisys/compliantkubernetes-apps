@@ -283,23 +283,6 @@ prometheusBlackboxExporter:
 
 # Network policies for workload cluster
 networkPolicies:
-  additional: {}
-# |-
-#   kind: NetworkPolicy
-#   apiVersion: networking.k8s.io/v1
-#   metadata:
-#     name: example-np
-#     namespace: default
-#   spec:
-#     policyTypes:
-#       - Ingress
-#       - Egress
-#     podSelector:
-#       matchLabels:
-#         foo: bar
-#     ingress: {}
-#     egress: {}
-# ---
   global:
     wcApiserver:
       # usualy private ip of control-plane nodes

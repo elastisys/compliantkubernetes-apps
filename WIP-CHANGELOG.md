@@ -11,3 +11,4 @@
 ### Changed
 
 - Updated metrics-server chart to 0.6.2 which upgrades metrics-server to 3.8.3
+- Allow the creation of arbitrary network-policy in wc
