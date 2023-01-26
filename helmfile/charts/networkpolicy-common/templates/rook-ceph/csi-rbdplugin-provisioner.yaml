@@ -37,4 +37,13 @@ spec:
           endPort: 7300
         - port: 9283
           protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mon
+      ports:
+        - port: 3300
+          protocol: TCP
+        - port: 6789
+          protocol: TCP
 {{- end }}

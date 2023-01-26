@@ -42,6 +42,15 @@ spec:
           protocol: TCP
         - port: 7000
           protocol: TCP
+    - from:
+        - podSelector:
+            matchLabels:
+              app: csi-rbdplugin-provisioner
+      ports:
+        - port: 3300
+          protocol: TCP
+        - port: 6789
+          protocol: TCP
   egress:
     - to:
         - podSelector:
