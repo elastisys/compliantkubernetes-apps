@@ -1,0 +1,22 @@
+{{ if .Values.rookCeph.enabled }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-rook-ceph-csi-detect-version
+  namespace: rook-ceph
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      app: rook-ceph-csi-detect-version
+  egress:
+    - to:
+        {{- range $ip := .Values.global.apiserver.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        - port: {{ .Values.global.apiserver.port }}
+          protocol: TCP
+{{- end }}
