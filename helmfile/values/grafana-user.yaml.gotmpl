@@ -45,6 +45,13 @@ sidecar:
     labelValue: "1"
   resources: {{- toYaml .Values.prometheus.grafana.sidecar.resources | nindent 6 }}
 
+envFromSecret: {{ .Values.user.grafana.additionalDatasources.secret }}
+
+plugins:
+  {{- if .Values.user.grafana.additionalDatasources.enabled }}
+    {{ toYaml .Values.user.grafana.additionalDatasources.plugins | nindent 2 }}
+  {{- end }}
+
 datasources:
   datasources.yaml:
     apiVersion: 1
@@ -54,12 +61,23 @@ datasources:
     - name: prometheus-sc
       orgId: 1
     datasources:
+    {{- if .Values.user.grafana.additionalDatasources.enabled }}
+      {{ toYaml .Values.user.grafana.additionalDatasources.datasources | nindent 4 }}
+    {{- end }}
     {{- if and .Values.thanos.enabled .Values.thanos.query.enabled }}
+    - name: "Thanos All"
+      access: proxy
+      basicAuth: false
+      editable: false
+      isDefault: true
+      orgId: 1
+      type: prometheus
+      url: http://thanos-query-query-frontend.thanos:9090
+      version: 1
     - name: "Service Cluster"
       access: proxy
       basicAuth: false
       editable: false
-      isDefault: false
       orgId: 1
       type: prometheus
       url: http://grafana-label-enforcer:9090
@@ -77,7 +95,6 @@ datasources:
       access: proxy
       basicAuth: false
       editable: false
-      isDefault: true
       orgId: 1
       type: prometheus
       url: http://grafana-label-enforcer:9090
@@ -91,7 +108,6 @@ datasources:
       access: proxy
       basicAuth: false
       editable: false
-      isDefault: false
       orgId: 1
       type: prometheus
       url: http://grafana-label-enforcer:9090
@@ -105,6 +121,8 @@ datasources:
 
 
 grafana.ini:
+  dataproxy:
+    timeout: 600
   server:
     root_url: https://{{ .Values.user.grafana.subdomain }}.{{ .Values.global.baseDomain }}
   auth.generic_oauth:
