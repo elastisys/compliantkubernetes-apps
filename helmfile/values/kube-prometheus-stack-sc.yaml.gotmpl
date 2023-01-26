@@ -202,8 +202,20 @@ grafana:
       enabled: true
       defaultDatasourceEnabled: false
     resources: {{- toYaml .Values.prometheus.grafana.sidecar.resources | nindent 6 }}
+    plugins:
+      enabled: true
+
+  envFromSecret: {{ .Values.user.grafana.additionalDatasources.secret }}
+
+  plugins:
+    {{- if .Values.user.grafana.additionalDatasources.enabled }}
+      {{ toYaml .Values.user.grafana.additionalDatasources.plugins | nindent 2 }}
+    {{- end }}
 
   additionalDataSources:
+  {{- if .Values.user.grafana.additionalDatasources.enabled }}
+    {{ toYaml .Values.user.grafana.additionalDatasources.datasources | nindent 2 }}
+  {{- end }}
   - name: prometheus-sc
     access: proxy
     basicAuth: false
