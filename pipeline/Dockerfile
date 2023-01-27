@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:rolling
 LABEL org.opencontainers.image.source https://github.com/elastisys/compliantkubernetes-apps
 
 ARG DEBIAN_FRONTEND=noninteractive
