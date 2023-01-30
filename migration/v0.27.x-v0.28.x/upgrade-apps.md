@@ -28,6 +28,18 @@
     ./migration/v0.27.x-v0.28.x/add-registry-credentials.sh
     ```
 
+1. Update network policies:
+
+    - Set `networkPolicies.coredns.extarnalDns.ips` to your upstream DNS servers.
+
+      > *If you are unsure of which your upstream DNS servers are set this to `0.0.0.0/0`.*
+
+    - *With OpenStack Cinder blockstorage:* Set `networkPolicies.kubeSystem.openstack.ips` to your OpenStack endpoints for Keystone, Nova, and Cinder.
+
+      > *Usually these are the same endpoint and you can discover them by issuing `openstack catalog list`, then resolve the hostname of the public endpoint to find all IP addresses. If they do not use the standard ports `5000`, `8774`, and `8776` then be sure to configure them as well.*
+
+    - *With OpenStack Octavia load balancer:* Reconfigure `networkPolicies.global.scNodes` and `networkPolicies.global.wcNodes` to use the full subnet of your private network.
+
 1. Upgrade applications:
 
     ```bash
