@@ -222,6 +222,8 @@ grafana:
     orgId: 1
     type: prometheus
     url: http://thanos-query-query-frontend.thanos:9090
+    jsonData:
+      prometheusType: Thanos
     version: 1
   - name: "Thanos SC Only"
     access: proxy
@@ -233,6 +235,7 @@ grafana:
     url: http://grafana-label-enforcer:9090
     jsonData:
       customQueryParameters: "tenant_id={{ .Values.global.clusterName }}"
+      manageAlerts: false
     version: 1
   {{- range .Values.global.clustersMonitoring }}
   - name: "Thanos {{ . }} only"
@@ -246,6 +249,7 @@ grafana:
     version: 1
     jsonData:
       customQueryParameters: "tenant_id={{ . }}"
+      manageAlerts: false
   {{- end }}
   {{- end }}
 

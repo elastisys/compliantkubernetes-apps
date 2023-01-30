@@ -13,6 +13,13 @@ spec:
     - Egress
   ingress:
     - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: query
+      ports:
+        - port: 10901
+          protocol: TCP
+    - from:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: monitoring
@@ -26,7 +33,7 @@ spec:
     - to:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/component: query-frontend
+              app.kubernetes.io/component: query
       ports:
         - port: 10902
           protocol: TCP
@@ -50,6 +57,8 @@ spec:
         - port: {{ $port }}
         {{- end }}
     - ports:
+      - protocol: TCP
+        port: 53
       - protocol: UDP
         port: 53
 {{- end }}

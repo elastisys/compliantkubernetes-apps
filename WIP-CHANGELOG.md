@@ -1,5 +1,11 @@
 ### Release notes
 
+### Changed
+
+- Thanos Rulers now sends alerts to all Alertmanagers in an HA setup, sends requests directly to Queries, and are now accessible by Queries
+- Thanos components now use DNS SD to automatically find healthy replicas
+- Alerts can now be inspected in ops Grafana
+
 ### Fixed
 
 - The update-ips script can now fetch Calico Wireguard IPs

@@ -70,6 +70,7 @@ datasources:
       url: http://grafana-label-enforcer:9090
       jsonData:
         customQueryParameters: "tenant_id={{ .Values.global.clusterName }}"
+        manageAlerts: false
       version: 1
 
     {{- /*
@@ -88,6 +89,7 @@ datasources:
       version: 1
       jsonData:
         customQueryParameters: "tenant_id={{ first .Values.global.clustersMonitoring }}"
+        manageAlerts: false
     {{- else }}
     {{- range .Values.global.clustersMonitoring }}
     - name: "{{ . }}"
@@ -101,6 +103,7 @@ datasources:
       version: 1
       jsonData:
         customQueryParameters: "tenant_id={{ . }}"
+        manageAlerts: false
     {{- end }}
     {{- end }}
     {{- end }}

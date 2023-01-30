@@ -84,6 +84,9 @@ ruler:
 
   resources: {{- toYaml .Values.thanos.ruler.resources | nindent 4 }}
 
+  service:
+    additionalHeadless: true
+
   persistence:
     enabled: {{ .Values.thanos.ruler.persistence.enabled }}
     size: {{ .Values.thanos.ruler.persistence.size }}
@@ -92,10 +95,10 @@ ruler:
   topologySpreadConstraints: {{- toYaml .Values.thanos.ruler.topologySpreadConstraints | nindent 4 }}
 
   alertmanagers:
-    - http://kube-prometheus-stack-alertmanager.monitoring:9093
+    - dnssrv+http://_web._tcp.alertmanager-operated.monitoring.svc.cluster.local
 
   queries:
-    - thanos-query-query-frontend:9090
+    - dnssrv+_http._tcp.thanos-query-query-headless.thanos.svc
 
   clusterName: {{ .Values.global.ck8sEnvironmentName }}
 

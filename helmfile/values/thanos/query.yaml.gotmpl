@@ -5,16 +5,19 @@ query:
   replicaCount: {{ .Values.thanos.query.replicaCount }}
   topologySpreadConstraints: {{- toYaml .Values.thanos.query.topologySpreadConstraints | nindent 4 }}
 
+  service:
+    additionalHeadless: true
+
   extraFlags:
     - "--query.auto-downsampling"
 
   dnsDiscovery:
     enabled: false
+
   stores:
     - "thanos-receiver-storegateway:10901"
-    {{- range $i := until .Values.thanos.receiver.replicaCount }}
-    - "thanos-receiver-receive-{{ $i }}.thanos-receiver-receive-headless.thanos.svc.cluster.local:10901"
-    {{- end }}
+    - dnssrv+_grpc._tcp.thanos-receiver-receive-headless.thanos.svc
+    - dnssrv+_grpc._tcp.thanos-receiver-ruler-headless.thanos.svc
 
   replicaLabel:
     - replica

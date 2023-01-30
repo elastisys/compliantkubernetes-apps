@@ -16,6 +16,9 @@ spec:
         - podSelector:
             matchLabels:
               app.kubernetes.io/component: query-frontend
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: ruler
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: monitoring
@@ -38,11 +41,16 @@ spec:
               app.kubernetes.io/component: receive
         - podSelector:
             matchLabels:
+              app.kubernetes.io/component: ruler
+        - podSelector:
+            matchLabels:
               app.kubernetes.io/component: storegateway
       ports:
         - port: 10901
           protocol: TCP
     - ports:
+      - protocol: TCP
+        port: 53
       - protocol: UDP
         port: 53
 {{- end }}
