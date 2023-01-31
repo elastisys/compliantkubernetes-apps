@@ -33,7 +33,36 @@
     ./bin/ck8s init
     ```
 
+1. Reconfigure fluentd:
+
+    ```bash
+    ./migration/v0.28.x-v0.29.x/reconfigure-fluentd.sh
+    ```
+
+    *Optional:*
+    Fluentd can now collect audit logs, enable it by setting `fluentd.audit.enable: true`.
+    Make sure to create the bucket as set by `objectStore.buckets.audit` to store those logs.
+
+    ```bash
+    ./scripts/S3/entry.sh --s3cfg "$CK8S_CONFIG_PATH/.state/s3cfg.ini" create
+    ```
+
 ## Upgrade steps
+
+1. Run bootstrap to create `fluentd-system` namespaces:
+
+    ```bash
+    ./bin/ck8s bootstrap sc
+    ./bin/ck8s bootstrap wc
+    ```
+
+1. Redeploy fluentd:
+
+    This will remove the old fluentd releases in both SC and WC, install the new releases and update the rest.
+
+    ```bash
+    ./migration/v0.28.x-v0.29.x/redeploy-fluentd.sh
+    ```
 
 1. Remove the old metrics-server components from the clusters:
 

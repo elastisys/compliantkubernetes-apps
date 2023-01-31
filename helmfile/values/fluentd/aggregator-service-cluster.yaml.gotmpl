@@ -1,0 +1,107 @@
+{{ if not (or .Values.fluentd.audit.enabled .Values.fluentd.scLogs.enabled) -}}
+{{ fail "\nERROR: Fluentd enabled but audit and scLogs are both disabled!" }}
+{{ end -}}
+
+aggregator:
+  resources:    {{- toYaml .Values.fluentd.aggregator.resources | nindent 4  }}
+  nodeSelector: {{- toYaml .Values.fluentd.aggregator.nodeSelector | nindent 4  }}
+  affinity:     {{- toYaml .Values.fluentd.aggregator.affinity | nindent 4  }}
+  tolerations:  {{- toYaml .Values.fluentd.aggregator.tolerations | nindent 4  }}
+
+  configMapFiles:
+    {{- if .Values.fluentd.scLogs.enabled }}
+    fluentd-labels.conf: |
+      # Conditional labels
+      {{- if .Values.fluentd.audit.enabled }}
+      # Relabel authlog
+      <match authlog.**>
+        @type relabel
+        @label @AUDIT
+      </match>
+
+      # Split kubeaudit
+      <match kubeaudit.**>
+        @type copy
+        <store>
+          @type relabel
+          @label @AUDIT
+        </store>
+        <store>
+          @type relabel
+          @label @STORE
+        </store>
+      </match>
+
+      # Split kubernetes
+      <match kubernetes.**>
+        @type copy
+        <store>
+          @type relabel
+          @label @AUDIT
+        </store>
+        <store>
+          @type relabel
+          @label @STORE
+        </store>
+      </match>
+      {{- end }}
+
+      # Relabel others
+      <match **>
+        @type relabel
+        @label @STORE
+      </match>
+    {{- end }}
+
+    {{- if .Values.fluentd.audit.enabled }}
+    fluentd-filters.conf: |
+      # Set aside Harbor Audit events
+      <match kubernetes.var.log.containers.harbor-**>
+        @type rewrite_tag_filter
+        <rule>
+          key message
+          pattern /AuditLog/
+          tag harbor
+        </rule>
+      </match>
+
+      # Set aside OpenSearch Audit events
+      <match kubernetes.var.log.containers.opensearch-**>
+        @type rewrite_tag_filter
+        <rule>
+          key message
+          pattern /\[audit *\]/
+          tag opensearch
+        </rule>
+      </match>
+
+      {{ .Values.fluentd.audit.filters | nindent 6 }}
+    {{- end }}
+
+    {{- if .Values.fluentd.scLogs.enabled }}
+    store.output.conf: |
+      # Regular logs
+      <label @STORE>
+        <match **>
+          @id output-store
+          @include store.prop
+
+          s3_bucket {{ .Values.objectStorage.buckets.scFluentd }}
+
+          path logs/%Y%m%d/${tag}/
+
+          <buffer tag,time>
+            @include buffer.prop
+            path /opt/bitnami/fluentd/logs/buffers/store
+          </buffer>
+        </match>
+      </label>
+    {{- end }}
+
+    fluentd-output.conf: |
+      {{- if .Values.fluentd.audit.enabled }}
+      @include audit.output.conf
+      {{- end }}
+      {{- if .Values.fluentd.scLogs.enabled }}
+      @include store.output.conf
+      {{- end }}

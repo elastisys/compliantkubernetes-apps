@@ -50,7 +50,11 @@ config:
           admin_dn:
             - "CN=admin.opensearch-system.cluster.local,O=compliantkubernetes"
         audit:
-          type: internal_opensearch
+          type: log4j
+          config:
+            log4j:
+              logger_name: audit
+              level: INFO
           # In example config, but not supported
           # ignore_users:
           #   - kibanaserver

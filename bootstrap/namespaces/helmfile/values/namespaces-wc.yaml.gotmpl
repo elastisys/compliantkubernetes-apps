@@ -1,6 +1,9 @@
 namespaces:
 - name: cert-manager
+{{- if .Values.fluentd.enabled }}
 - name: fluentd
+- name: fluentd-system
+{{- end }}
 - name: kube-node-lease
 - name: kube-public
 - name: kube-system

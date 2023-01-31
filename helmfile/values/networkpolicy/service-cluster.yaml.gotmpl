@@ -1,0 +1,106 @@
+global:
+  scApiserver:
+    ips: {{- toYaml .Values.networkPolicies.global.scApiserver.ips | nindent 6 }}
+    port: {{ .Values.networkPolicies.global.scApiserver.port }}
+  scNodes:
+    ips: {{- toYaml .Values.networkPolicies.global.scNodes.ips | nindent 6 }}
+  scIngress:
+    ips: {{- toYaml .Values.networkPolicies.global.scIngress.ips | nindent 6 }}
+  wcIngress:
+    ips: {{- toYaml .Values.networkPolicies.global.wcIngress.ips | nindent 6 }}
+  objectStorage:
+    ips:
+      {{- toYaml .Values.networkPolicies.global.objectStorage.ips | nindent 6 }}
+      {{- if or (eq .Values.harbor.persistence.type "swift") (eq .Values.thanos.objectStorage.type "swift") }}
+      {{- toYaml .Values.networkPolicies.global.objectStorageSwift.ips | nindent 6 }}
+      {{- end }}
+    ports:
+      {{- toYaml .Values.networkPolicies.global.objectStorage.ports | nindent 6 }}
+      {{- if or (eq .Values.harbor.persistence.type "swift") (eq .Values.thanos.objectStorage.type "swift") }}
+      {{- toYaml .Values.networkPolicies.global.objectStorageSwift.ports | nindent 6 }}
+      {{- end }}
+  externalLoadBalancer: {{ .Values.networkPolicies.global.externalLoadBalancer }}
+  ingressUsingHostNetwork: {{ .Values.ingressNginx.controller.useHostPort }}
+
+  # TODO: Add Swift
+  objectStoreEgress:
+    - to:
+        {{- range .Values.networkPolicies.global.objectStorage.ips }}
+        - ipBlock:
+            cidr: {{ . }}
+        {{- end }}
+      ports:
+        {{- range .Values.networkPolicies.global.objectStorage.ports }}
+        - protocol: TCP
+          port: {{ . }}
+        {{- end }}
+
+harbor:
+  enabled: {{ and .Values.harbor.enabled .Values.networkPolicies.harbor.enabled }}
+  registries:
+    ips: {{- toYaml .Values.networkPolicies.harbor.registries.ips | nindent 6 }}
+    ports: {{- toYaml .Values.networkPolicies.harbor.registries.ports | nindent 6 }}
+  jobservice:
+    ips: {{- toYaml .Values.networkPolicies.harbor.jobservice.ips | nindent 6 }}
+    ports: {{- toYaml .Values.networkPolicies.harbor.jobservice.ports | nindent 6 }}
+  database:
+    type: {{ .Values.harbor.database.type }}
+    internal: {{- toYaml .Values.networkPolicies.harbor.database.internal | nindent 6 }}
+    external: {{- toYaml .Values.networkPolicies.harbor.database.external | nindent 6 }}
+  redis:
+    type: {{ .Values.harbor.redis.type }}
+    external: {{- toYaml .Values.networkPolicies.harbor.redis.external | nindent 6 }}
+  trivy:
+    ips: {{- toYaml .Values.networkPolicies.harbor.trivy.ips | nindent 6 }}
+    port: {{ .Values.networkPolicies.harbor.trivy.port }}
+
+monitoring:
+  enabled: {{ .Values.networkPolicies.monitoring.enabled }}
+  grafana:
+    externalDashboardProvider:
+      ips: {{- toYaml .Values.networkPolicies.monitoring.grafana.externalDashboardProvider.ips | nindent 8 }}
+      ports: {{- toYaml .Values.networkPolicies.monitoring.grafana.externalDashboardProvider.ports | nindent 8 }}
+  alertmanager:
+    alertReceivers:
+      ips: {{- toYaml .Values.networkPolicies.alertmanager.alertReceivers.ips | nindent 8 }}
+      ports: {{- toYaml .Values.networkPolicies.alertmanager.alertReceivers.ports | nindent 8 }}
+
+thanos:
+  enabled: {{ .Values.networkPolicies.thanos.enabled }}
+
+opensearch:
+  enabled: {{ .Values.networkPolicies.opensearch.enabled }}
+  data:
+    enabled: {{ .Values.opensearch.dataNode.dedicatedPods }}
+  client:
+    enabled: {{ .Values.opensearch.clientNode.dedicatedPods }}
+  plugins:
+    ips: {{- toYaml .Values.networkPolicies.opensearch.plugins.ips | nindent 8 }}
+    ports: {{- toYaml .Values.networkPolicies.opensearch.plugins.ports | nindent 8 }}
+
+fluentd:
+  enabled: {{ and .Values.fluentd.enabled .Values.networkPolicies.fluentd.enabled }}
+
+rcloneSync:
+  enabled: {{ and .Values.objectStorage.sync.enabled .Values.networkPolicies.rcloneSync.enabled }}
+  destinationObjectStorage:
+    ips: {{- toYaml .Values.networkPolicies.rcloneSync.destinationObjectStorage.ips | nindent 6 }}
+    ports: {{- toYaml .Values.networkPolicies.rcloneSync.destinationObjectStorage.ports | nindent 6 }}
+
+s3Exporter:
+  enabled: {{ and (eq .Values.objectStorage.type "s3") (and .Values.s3Exporter.enabled .Values.networkPolicies.s3Exporter.enabled) }}
+
+ingressNginx:
+  enabled: {{ .Values.networkPolicies.ingressNginx.enabled }}
+  ingressOverride:
+    enabled : {{ .Values.networkPolicies.ingressNginx.ingressOverride.enabled }}
+    ips: {{- toYaml .Values.networkPolicies.ingressNginx.ingressOverride.ips | nindent 4 }}
+
+dex:
+  enabled: {{ .Values.networkPolicies.dex.enabled }}
+  connectors:
+    ips: {{- toYaml .Values.networkPolicies.dex.connectors.ips | nindent 6 }}
+    ports: {{- toYaml .Values.networkPolicies.dex.connectors.ports | nindent 6 }}
+
+falco:
+  enabled: {{ and .Values.falco.enabled .Values.networkPolicies.falco.enabled }}

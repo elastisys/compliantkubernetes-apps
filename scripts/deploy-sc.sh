@@ -19,17 +19,6 @@ fi
 
 INTERACTIVE=${1:-""}
 
-objectStoreProvider=$(yq4 .objectStorage.type "${config[config_file_sc]}")
-if [[ ${objectStoreProvider} == "s3" ]]; then
-    echo "Creating fluentd secrets" >&2
-    s3_access_key=$(sops_exec_file "${secrets[secrets_file]}" 'yq4 .objectStorage.s3.accessKey {}')
-    s3_secret_key=$(sops_exec_file "${secrets[secrets_file]}" 'yq4 .objectStorage.s3.secretKey {}')
-    kubectl create secret generic s3-credentials -n fluentd \
-        --from-literal=s3_access_key="${s3_access_key}" \
-        --from-literal=s3_secret_key="${s3_secret_key}" \
-        --dry-run=client -o yaml | kubectl apply -f -
-fi
-
 echo "Installing helm charts" >&2
 cd "${SCRIPTS_PATH}/../helmfile"
 declare -a helmfile_opt_flags

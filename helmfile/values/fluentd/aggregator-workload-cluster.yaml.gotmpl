@@ -1,0 +1,5 @@
+aggregator:
+  configMapFiles:
+    fluentd-filters.conf: |
+      # Set aside logs you want to keep using rewrite_tag_filter with a different prefix than kubernetes.*
+      {{ .Values.fluentd.audit.filters | nindent 6 }}

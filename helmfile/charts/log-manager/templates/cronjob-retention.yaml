@@ -1,0 +1,78 @@
+{{- range .Values.instances }}
+{{- if .retention.enabled }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .bucket }}-{{ .prefix }}-retention
+  labels:
+    {{- include "log-manager.labels" $ | nindent 4 }}
+spec:
+  schedule: {{ .retention.schedule | quote }}
+  concurrencyPolicy: {{ $.Values.concurrencyPolicy }}
+  startingDeadlineSeconds: {{ $.Values.startingDeadlineSeconds }}
+  successfulJobsHistoryLimit: {{ $.Values.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ $.Values.failedJobsHistoryLimit }}
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: {{ $.Values.activeDeadlineSeconds }}
+      backoffLimit: {{ $.Values.backoffLimit }}
+      template:
+        metadata:
+          labels:
+            {{- include "log-manager.labels" $ | nindent 12 }}
+        spec:
+          automountServiceAccountToken: false
+          restartPolicy: {{ $.Values.restartPolicy }}
+          containers:
+            - name: retention
+              imagePullPolicy: {{ $.Values.image.pullPolicy }}
+              image: {{ $.Values.image.repository }}:{{ default $.Chart.AppVersion $.Values.image.tag }}
+              command: [/scripts/retention.sh]
+              env:
+                - name: S3_CONFIG
+                  value: /configs/s3cfg.ini
+                - name: S3_BUCKET
+                  value: {{ .bucket }}
+                - name: S3_PREFIX
+                  value: {{ .prefix }}
+                - name: RETAIN_DAYS
+                  value: {{ .retention.days | quote }}
+              {{- with $.Values.securityContext }}
+              securityContext: {{- toYaml . | nindent 16 }}
+              {{- end }}
+              {{- with $.Values.retention.resources }}
+              resources: {{- toYaml . | nindent 16 }}
+              {{- end }}
+              volumeMounts:
+                - name: s3cfg
+                  mountPath: /configs
+                  readOnly: true
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+          volumes:
+            - name: s3cfg
+              secret:
+                secretName: {{ include "log-manager.fullname" $ }}-s3-credentials
+            - name: scripts
+              configMap:
+                name: {{ include "log-manager.fullname" $ }}-scripts
+                defaultMode: 0777
+          {{- with $.Values.imagePullSecrets }}
+          imagePullSecrets: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $.Values.podSecurityContext }}
+          securityContext: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $.Values.tolerations }}
+          tolerations: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $.Values.nodeSelector }}
+          nodeSelector: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $.Values.affinity }}
+          affinity: {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}
+{{- end }}

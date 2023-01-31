@@ -12,6 +12,8 @@ enable_hnc_ha=$(yq4 -e '.hnc.ha' "${CONFIG_FILE}" 2>/dev/null)
 enable_user_alertmanager=$(yq4 -e '.user.alertmanager.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_velero=$(yq4 -e '.velero.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_kured=$(yq4 -e '.kured.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_fluentd=$(yq4 '.fluentd.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_fluentd_audit=$(yq4 '.fluentd.audit.enabled' "${CONFIG_FILE}" 2>/dev/null)
 
 echo
 echo
@@ -61,15 +63,19 @@ echo "Testing daemonsets"
 echo "=================="
 
 daemonsets=(
-    "fluentd fluentd-fluentd-elasticsearch"
     "kube-system calico-node"
-    "kube-system fluentd-system-fluentd-elasticsearch"
     "kube-system node-local-dns"
     "ingress-nginx ingress-nginx-controller"
     "monitoring kube-prometheus-stack-prometheus-node-exporter"
 )
 if "${enable_falco}"; then
     daemonsets+=("falco falco")
+fi
+if "${enable_fluentd}"; then
+    daemonsets+=(
+        "fluentd fluentd-fluentd-elasticsearch"
+        "fluentd-system fluentd-forwarder"
+    )
 fi
 if "${enable_velero}"; then
     daemonsets+=("velero restic")
@@ -99,6 +105,9 @@ statefulsets=(
 
 if "${enable_user_alertmanager}"; then
     statefulsets+=("alertmanager alertmanager-alertmanager")
+fi
+if "${enable_fluentd}" && "${enable_fluentd_audit}"; then
+    statefulsets+=("fluentd-system fluentd-aggregator")
 fi
 
 resourceKind="StatefulSet"

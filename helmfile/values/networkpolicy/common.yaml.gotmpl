@@ -1,0 +1,134 @@
+{{- if .Values.networkPolicies.additional }}
+additional:
+  {{ toYaml .Values.networkPolicies.additional | nindent 2 }}
+{{- end }}
+
+global:
+  apiserver:
+  {{- if eq .Environment.Name "service_cluster" }}
+    ips: {{- toYaml .Values.networkPolicies.global.scApiserver.ips | nindent 6 }}
+    port: {{ .Values.networkPolicies.global.scApiserver.port }}
+  {{- else }}
+    ips: {{- toYaml .Values.networkPolicies.global.wcApiserver.ips | nindent 6 }}
+    port: {{ .Values.networkPolicies.global.wcApiserver.port }}
+  {{- end }}
+  ingress:
+  {{- if eq .Environment.Name "service_cluster" }}
+    ips: {{- toYaml .Values.networkPolicies.global.scIngress.ips | nindent 6 }}
+  {{- else }}
+    ips: {{- toYaml .Values.networkPolicies.global.wcIngress.ips | nindent 6 }}
+  {{- end }}
+  nodes:
+  {{- if eq .Environment.Name "service_cluster" }}
+    ips: {{- toYaml .Values.networkPolicies.global.scNodes.ips | nindent 6 }}
+  {{- else }}
+    ips: {{- toYaml .Values.networkPolicies.global.wcNodes.ips | nindent 6 }}
+  {{- end }}
+  objectStorage:
+    ips: {{- toYaml .Values.networkPolicies.global.objectStorage.ips | nindent 6 }}
+    ports: {{- toYaml .Values.networkPolicies.global.objectStorage.ports | nindent 6 }}
+  externalLoadBalancer: {{ .Values.networkPolicies.global.externalLoadBalancer }}
+  ingressUsingHostNetwork: {{ .Values.ingressNginx.controller.useHostPort }}
+  trivy:
+    ips: {{- toYaml .Values.networkPolicies.global.trivy.ips | nindent 6 }}
+    port: {{ .Values.networkPolicies.global.trivy.port }}
+
+  apiServerEgress:
+    {{- if eq .Environment.Name "service_cluster" }}
+    - to:
+        {{- range .Values.networkPolicies.global.scApiserver.ips }}
+        - ipBlock:
+            cidr: {{ . }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.networkPolicies.global.scApiserver.port }}
+    {{- else }}
+    - to:
+        {{- range .Values.networkPolicies.global.wcApiserver.ips }}
+        - ipBlock:
+            cidr: {{ . }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.networkPolicies.global.wcApiserver.port }}
+    {{- end }}
+
+  objectStoreEgress:
+    - to:
+        {{- range .Values.networkPolicies.global.objectStorage.ips }}
+        - ipBlock:
+            cidr: {{ . }}
+        {{- end }}
+      ports:
+        {{- range .Values.networkPolicies.global.objectStorage.ports }}
+        - protocol: TCP
+          port: {{ . }}
+        {{- end }}
+
+monitoring:
+  enabled: {{ .Values.networkPolicies.monitoring.enabled }}
+
+kured:
+  enabled: {{ and .Values.kured.enabled .Values.networkPolicies.kured.enabled }}
+  notificationSlack:
+    enabled: {{ .Values.kured.notification.slack.enabled }}
+    ips: {{- toYaml .Values.networkPolicies.kured.notificationSlack.ips | nindent 6 }}
+    ports: {{- toYaml .Values.networkPolicies.kured.notificationSlack.ports | nindent 6 }}
+
+velero:
+  enabled: {{ and .Values.velero.enabled .Values.networkPolicies.velero.enabled }}
+
+certManager:
+  enabled: {{ .Values.networkPolicies.certManager.enabled }}
+  namespaces:
+    {{- if eq .Environment.Name "workload_cluster" }}
+    {{- concat .Values.user.namespaces .Values.networkPolicies.certManager.namespaces | toYaml | nindent 4 }}
+    {{- else }}
+    {{- toYaml .Values.networkPolicies.certManager.namespaces | nindent 4 }}
+    {{- end }}
+  letsencrypt:
+    ips: {{- toYaml .Values.networkPolicies.certManager.letsencrypt.ips | nindent 6 }}
+
+falco:
+  enabled: {{ and .Values.falco.enabled .Values.networkPolicies.falco.enabled }}
+  plugins:
+    ips: {{- toYaml .Values.networkPolicies.falco.plugins.ips | nindent 6 }}
+    ports: {{- toYaml .Values.networkPolicies.falco.plugins.ports | nindent 6 }}
+
+rookCeph:
+  enabled: {{ .Values.networkPolicies.rookCeph.enabled }}
+
+kubeSystem:
+  enabled: {{ .Values.networkPolicies.kubeSystem.enabled }}
+
+  {{- if hasKey .Values.networkPolicies.kubeSystem "openstack" }}
+  {{- $openstack := .Values.networkPolicies.kubeSystem.openstack }}
+  openstack:
+    enabled: {{ $openstack.enabled }}
+
+    ips:
+      {{- toYaml $openstack.ips | nindent 6 }}
+    ports:
+      {{- toYaml $openstack.ports | nindent 6 }}
+
+  {{- else if hasKey .Values.networkPolicies.kubeSystem "upcloud" }}
+  {{- $upcloud := .Values.networkPolicies.kubeSystem.upcloud }}
+  upcloud:
+    enabled: {{ $upcloud.enabled }}
+
+    ips:
+      {{- toYaml $upcloud.ips | nindent 6 }}
+    ports:
+      {{- toYaml $upcloud.ports | nindent 6 }}
+  {{- end }}
+
+coredns:
+  enabled: {{ .Values.networkPolicies.coredns.enabled }}
+  externalDns:
+    ips: {{- toYaml .Values.networkPolicies.coredns.externalDns.ips | nindent 6 }}
+  serviceIp:
+    ips: {{- toYaml .Values.networkPolicies.coredns.serviceIp.ips | nindent 6 }}
+
+dnsAutoscaler:
+  enabled: {{ .Values.networkPolicies.dnsAutoscaler.enabled }}

@@ -158,6 +158,7 @@ CK8S_NAMESPACES=(
     default
     falco
     fluentd
+    fluentd-system
     kube-system
     monitoring
     ingress-nginx

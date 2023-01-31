@@ -574,11 +574,7 @@ releases:
     app: fluentd
   chart: ./upstream/fluentd
   version: 5.0.15
-  installed: {{ .Values.fluentd.enabled }}
-  needs:
-  - fluentd/fluentd-configmap
-  values:
-  - values/fluentd-sc.yaml.gotmpl
+  installed: false
 
 # configmap for fluentd (for both aggregator and forwarder)
 - name: fluentd-configmap
@@ -587,9 +583,31 @@ releases:
     app: fluentd-configmap
   chart: ./charts/fluentd-configmap
   version: 0.1.0
+  installed: false
+
+- name: fluentd-aggregator
+  namespace: fluentd-system
+  labels:
+    app: fluentd
+    component: fluentd-aggregator
+  chart: ./upstream/fluentd
+  version: 5.0.15
   installed: {{ .Values.fluentd.enabled }}
   values:
-  - values/fluentd-configmap.yaml.gotmpl
+  - values/fluentd/aggregator-common.yaml.gotmpl
+  - values/fluentd/aggregator-service-cluster.yaml.gotmpl
+
+- name: fluentd-forwarder
+  namespace: fluentd-system
+  labels:
+    app: fluentd
+    component: fluentd-forwarder
+  chart: ./upstream/fluentd-elasticsearch
+  version: 13.3.0
+  installed: {{ .Values.fluentd.enabled }}
+  values:
+  - values/fluentd/forwarder-common.yaml.gotmpl
+  - values/fluentd/forwarder-service-cluster.yaml.gotmpl
 
 # Logs backup retention
 - name: sc-logs-retention
@@ -598,11 +616,23 @@ releases:
     app: sc-logs-retention
   chart: ./charts/sc-logs-retention
   version: 0.1.0
-  installed: {{ .Values.fluentd.enabled }}
+  installed: false
   needs:
   - fluentd/fluentd
   values:
   - values/sc-logs-retention.yaml.gotmpl
+
+# Logs backup retention
+- name: log-manager
+  namespace: fluentd-system
+  labels:
+    app: fluentd
+    component: log-manager
+  chart: ./charts/log-manager
+  version: 0.1.0
+  installed: {{ or .Values.fluentd.enabled .Values.fluentd.audit.enabled }}
+  values:
+  - values/fluentd/log-manager.yaml.gotmpl
 
 - name: rclone-sync
   namespace: kube-system
@@ -641,25 +671,56 @@ releases:
   values:
   - values/user-alertmanager.yaml.gotmpl
 
-# Fluentd
+- name: fluentd-aggregator
+  namespace: fluentd-system
+  labels:
+    app: fluentd
+    component: fluentd-aggregator
+  chart: ./upstream/fluentd
+  version: 5.0.15
+  installed: {{ and .Values.fluentd.enabled .Values.fluentd.audit.enabled }}
+  values:
+  - values/fluentd/aggregator-common.yaml.gotmpl
+  - values/fluentd/aggregator-workload-cluster.yaml.gotmpl
+
+- name: fluentd-forwarder
+  namespace: fluentd-system
+  labels:
+    app: fluentd
+    component: fluentd-forwarder
+  chart: ./upstream/fluentd-elasticsearch
+  version: 13.3.0
+  installed: {{ .Values.fluentd.enabled }}
+  values:
+  - values/fluentd/forwarder-common.yaml.gotmpl
+  - values/fluentd/forwarder-workload-cluster.yaml.gotmpl
+  - values/fluentd/forwarder-workload-cluster-system.yaml.gotmpl
+
 - name: fluentd-system
   namespace: kube-system
   labels:
     app: fluentd
   chart: ./upstream/fluentd-elasticsearch
   version: 13.3.0
+  installed: false
   values:
-  - values/fluentd-wc.yaml.gotmpl
+  - values/fluentd/forwarder-common.yaml.gotmpl
+  - values/fluentd/forwarder-workload-cluster.yaml.gotmpl
+  - values/fluentd/forwarder-workload-cluster-system.yaml.gotmpl
 
 # Fluentd configurable by the user
 - name: fluentd
   namespace: fluentd
   labels:
     app: fluentd
+    component: fluentd-user
   chart: ./upstream/fluentd-elasticsearch
   version: 13.3.0
+  installed: {{ .Values.fluentd.enabled }}
   values:
-  - values/fluentd-user.yaml.gotmpl
+  - values/fluentd/forwarder-common.yaml.gotmpl
+  - values/fluentd/forwarder-workload-cluster.yaml.gotmpl
+  - values/fluentd/forwarder-workload-cluster-user.yaml.gotmpl
 
 # gatekeeper-metrics
 - name: gatekeeper-metrics

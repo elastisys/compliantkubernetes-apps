@@ -31,10 +31,10 @@ releases:
   namespace: kube-system
   labels:
     app: common-np
-  chart: ./charts/networkpolicy-common
+  chart: ./charts/networkpolicy/common
   version: 0.1.0
   values:
-  - values/networkpolicy-common.yaml.gotmpl
+  - values/networkpolicy/common.yaml.gotmpl
 
 # Service cluster releases
 {{ if eq .Environment.Name "service_cluster" }}
@@ -44,10 +44,10 @@ releases:
   namespace: kube-system
   labels:
     app: service-cluster-np
-  chart: ./charts/networkpolicy-service
+  chart: ./charts/networkpolicy/service-cluster
   version: 0.1.0
   values:
-  - values/service-cluster-networkpolicy.yaml.gotmpl
+  - values/networkpolicy/service-cluster.yaml.gotmpl
 
 # End of system services releases
 {{ end }}
@@ -60,9 +60,9 @@ releases:
   namespace: kube-system
   labels:
     app: workload-cluster-np
-  chart: ./charts/networkpolicy-workload
+  chart: ./charts/networkpolicy/workload-cluster
   version: 0.1.0
   values:
-  - values/workload-cluster-networkpolicy.yaml.gotmpl
+  - values/networkpolicy/workload-cluster.yaml.gotmpl
 
 {{ end }}

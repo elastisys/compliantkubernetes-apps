@@ -1,0 +1,33 @@
+nameOverride: ""
+
+resources: {{- toYaml .Values.fluentd.user.resources | nindent 2  }}
+tolerations: {{- toYaml .Values.fluentd.user.tolerations | nindent 2  }}
+nodeSelector: {{- toYaml .Values.fluentd.user.nodeSelector | nindent 2  }}
+affinity: {{- toYaml .Values.fluentd.user.affinity | nindent 2  }}
+
+extraConfigMaps:
+  21-filters.conf: |-
+    <filter kubernetes.var.log.containers.gatekeeper-controller-manager-**>
+      @type grep
+      <exclude>
+        key $.source
+        pattern {}
+      </exclude>
+    </filter>
+
+extraVolumes:
+  - name: extra-config
+    configMap:
+      name: fluentd-extra-config
+  - name: fluentd-extra-plugins
+    configMap:
+      defaultMode: 420
+      name: fluentd-extra-plugins
+
+extraVolumeMounts:
+  - name: extra-config
+    mountPath: /etc/fluent/extra-config.d
+    readOnly: true
+  - name: fluentd-extra-plugins
+    mountPath: /etc/fluent/plugin
+    readOnly: true

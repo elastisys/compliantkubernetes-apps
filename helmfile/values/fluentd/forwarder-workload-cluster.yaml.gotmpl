@@ -1,0 +1,193 @@
+elasticsearch:
+  outputType: "opensearch"
+  logLevel: "info"
+
+  scheme: https
+  hosts: ["{{ .Values.opensearch.subdomain }}.{{ .Values.global.opsDomain  }}."]
+
+  sslVerify: {{ .Values.global.verifyTls }}
+  auth:
+    enabled: true
+    user: fluentd
+    password: null
+
+  reloadOnFailure: true
+  log400Reason: true
+
+extraObjects:
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: {{ .Release.Name }}-opensearch-credentials
+    type: Opaque
+    stringData:
+      password: {{ .Values.opensearch.fluentdPassword }}
+
+secret:
+- name: OUTPUT_PASSWORD
+  secret_name: {{ .Release.Name }}-opensearch-credentials
+  secret_key: password
+
+extraConfigMaps:
+  opensearch-store.prop: |-
+    @type "#{ENV['OUTPUT_TYPE']}"
+    @log_level "#{ENV['OUTPUT_LOG_LEVEL']}"
+    include_tag_key "#{ENV['OUTPUT_INCLUDE_TAG_KEY']}"
+    hosts "#{ENV['OUTPUT_HOSTS']}"
+    port "#{ENV['OUTPUT_PORT']}"
+    path "#{ENV['OUTPUT_PATH']}"
+    scheme "#{ENV['OUTPUT_SCHEME']}"
+    ssl_verify "#{ENV['OUTPUT_SSL_VERIFY']}"
+    ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
+    user "#{ENV['OUTPUT_USER']}"
+    password "#{ENV['OUTPUT_PASSWORD']}"
+    log_os_400_reason "#{ENV['OUTPUT_LOG_400_REASON']}"
+    reconnect_on_error "#{ENV['OUTPUT_RECONNECT_ON_ERROR']}"
+    reload_on_failure "#{ENV['OUTPUT_RELOAD_ON_FAILURE']}"
+    reload_connections "#{ENV['OUTPUT_RELOAD_CONNECTIONS']}"
+    request_timeout "#{ENV['OUTPUT_REQUEST_TIMEOUT']}"
+
+    # custom
+    include_timestamp true # defaults to false
+    default_opensearch_version 2
+
+  22-labels.conf: |-
+    # Conditional labels
+
+    {{- if .Values.fluentd.audit.enabled }}
+    # Split authlog
+    <match authlog.**>
+      @type copy
+      <store>
+        @type relabel
+        @label @AUDIT
+      </store>
+      <store>
+        @type relabel
+        @label @STORE
+      </store>
+    </match>
+
+    # Split kubeaudit
+    <match kubeaudit.**>
+      @type copy
+      <store>
+        @type relabel
+        @label @AUDIT
+      </store>
+      <store>
+        @type relabel
+        @label @STORE
+      </store>
+    </match>
+
+    # Split kubernetes
+    <match kubernetes.**>
+      @type copy
+      <store>
+        @type relabel
+        @label @AUDIT
+      </store>
+      <store>
+        @type relabel
+        @label @STORE
+      </store>
+    </match>
+    {{- end }}
+
+    # Relabel others
+    <match **>
+      @type relabel
+      @label @STORE
+    </match>
+
+
+  30-output.conf: |-
+    # Conditional output
+
+    {{- if .Values.fluentd.audit.enabled }}
+    <label @AUDIT>
+      <match **>
+        @id output-forwarding
+        @type forward
+        send_timeout 60s
+        recover_wait 10s
+        hard_timeout 60s
+
+        <server>
+          name aggregator
+          host fluentd-aggregator-aggregator.fluentd-system.svc
+          port 24224
+          weight 60
+        </server>
+
+        <buffer>
+          @include buffer.prop
+          path /var/log/fluentd-buffers/audit
+        </buffer>
+      </match>
+    </label>
+    {{- end }}
+
+    <label @STORE>
+      <match authlog.**>
+        @id opensearch_authlog
+        @include opensearch-store.prop
+
+        index_name authlog
+
+        <buffer>
+          @include buffer.prop
+
+          path /var/log/fluentd-buffers/kubernetes.authlog.system.buffer
+        </buffer>
+      </match>
+
+      <match kubeaudit.**>
+        @id opensearch_kubeaudit
+        @include opensearch-store.prop
+
+        index_name kubeaudit
+
+        <buffer>
+          @include buffer.prop
+
+          path /var/log/fluentd-buffers/kubernetes.kubeaudit.system.buffer
+        </buffer>
+      </match>
+
+      <match kubernetes.**>
+        @id opensearch_kubernetes
+        @include opensearch-store.prop
+
+        {{- if .Values.opensearch.indexPerNamespace }}
+        logstash_format true
+        logstash_prefix ${$.kubernetes.namespace_name}
+        {{- else }}
+        index_name kubernetes
+        {{- end }}
+
+        {{- if .Values.opensearch.indexPerNamespace }}
+        <buffer tag, $.kubernetes.namespace_name>
+        {{- else }}
+        <buffer>
+        {{- end }}
+          @include buffer.prop
+
+          path /var/log/fluentd-buffers/kubernetes.kubernetes.system.buffer
+        </buffer>
+      </match>
+
+      <match **>
+        @id opensearch
+        @include opensearch-store.prop
+
+        index_name other
+
+        <buffer>
+          @include buffer.prop
+
+          path /var/log/fluentd-buffers/kubernetes.system.buffer
+        </buffer>
+      </match>
+    </label>

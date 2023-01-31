@@ -1,0 +1,12 @@
+resources: {{- toYaml .Values.fluentd.forwarder.resources | nindent 2  }}
+tolerations: {{- toYaml .Values.fluentd.forwarder.tolerations | nindent 2 }}
+nodeSelector: {{- toYaml .Values.fluentd.forwarder.nodeSelector | nindent 2 }}
+affinity: {{- toYaml .Values.fluentd.forwarder.affinity | nindent 2 }}
+
+{{- with .Values.fluentd.extraConfigMaps }}
+extraConfigMaps:
+  {{- range $key, $value := . }}
+  {{ $key | indent 2 }}: |-
+    {{ $value | indent 4 }}
+  {{- end }}
+{{- end }}

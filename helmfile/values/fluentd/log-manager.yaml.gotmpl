@@ -1,0 +1,56 @@
+s3:
+  forcePathStyle: {{ .Values.objectStorage.s3.forcePathStyle }}
+  regionEndpoint: {{ .Values.objectStorage.s3.regionEndpoint }}
+  accessKey: {{ .Values.objectStorage.s3.accessKey }}
+  secretKey: {{ .Values.objectStorage.s3.secretKey }}
+
+instances:
+  {{- if .Values.fluentd.audit.enabled }}
+  {{- range .Values.global.clustersMonitoring }}
+  - bucket: {{ $.Values.objectStorage.buckets.audit }}
+    prefix: {{ . }}
+    compaction:
+      enabled: {{ $.Values.fluentd.audit.compaction.enabled }}
+      schedule: {{ $.Values.fluentd.audit.compaction.schedule }}
+      days: {{ $.Values.fluentd.audit.compaction.days }}
+    retention:
+      enabled: {{ $.Values.fluentd.audit.retention.enabled }}
+      schedule: {{ $.Values.fluentd.audit.retention.schedule }}
+      days: {{ $.Values.fluentd.audit.retention.days }}
+  {{- end }}
+  {{- end }}
+  {{- if .Values.fluentd.enabled }}
+  {{- if .Values.fluentd.audit.enabled }}
+  - bucket: {{ .Values.objectStorage.buckets.audit }}
+    prefix: {{ .Values.global.clusterName }}
+    compaction:
+      enabled: {{ .Values.fluentd.audit.compaction.enabled }}
+      schedule: {{ .Values.fluentd.audit.compaction.schedule }}
+      days: {{ .Values.fluentd.audit.compaction.days }}
+    retention:
+      enabled: {{ .Values.fluentd.audit.retention.enabled }}
+      schedule: {{ .Values.fluentd.audit.retention.schedule }}
+      days: {{ .Values.fluentd.audit.retention.days }}
+  {{- end }}
+  {{- if .Values.fluentd.scLogs.enabled }}
+  - bucket: {{ .Values.objectStorage.buckets.scFluentd }}
+    prefix: logs
+    compaction:
+      enabled: {{ .Values.fluentd.scLogs.compaction.enabled }}
+      schedule: {{ .Values.fluentd.scLogs.compaction.schedule }}
+      days: {{ .Values.fluentd.scLogs.compaction.days }}
+    retention:
+      enabled: {{ .Values.fluentd.scLogs.retention.enabled }}
+      schedule: {{ .Values.fluentd.scLogs.retention.schedule }}
+      days: {{ .Values.fluentd.scLogs.retention.days }}
+  {{- end }}
+  {{- end }}
+
+compaction:
+  resources: {{- toYaml .Values.fluentd.logManager.compaction.resources | nindent 4 }}
+retention:
+  resources: {{- toYaml .Values.fluentd.logManager.retention.resources | nindent 4 }}
+
+tolerations: {{- toYaml .Values.fluentd.logManager.tolerations | nindent 2 }}
+nodeSelector: {{- toYaml .Values.fluentd.logManager.nodeSelector | nindent 2 }}
+affinity: {{- toYaml .Values.fluentd.logManager.affinity | nindent 2 }}

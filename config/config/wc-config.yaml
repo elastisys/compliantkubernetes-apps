@@ -217,34 +217,16 @@ hnc:
 ## Consists of two different deployments, one for running on master nodes
 ## and and one for running on "user nodes".
 fluentd:
-  elasticsearch:
-    buffer: {}
-  ## Tolerate master nodes.
-  tolerations:
-    - effect: NoSchedule
-      key: node-role.kubernetes.io/master
-      value: ""
-    - key: node-role.kubernetes.io/control-plane
-      effect: NoSchedule
-      value: ""
-
+  enabled: true
   ## Only run on master nodes.
-  nodeSelector: ""
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-          - matchExpressions:
-              - key: node-role.kubernetes.io/control-plane
-                operator: Exists
-
-  resources:
-    limits:
-      cpu: 500m
-      memory: 572Mi
-    requests:
-      cpu: 100m
-      memory: 300Mi
+  forwarder:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: node-role.kubernetes.io/control-plane
+                  operator: Exists
 
   ## Extra fluentd config to mount.
   extraConfigMaps: {}
@@ -254,18 +236,17 @@ fluentd:
   ## Users can specify additional plugins and config in the respective configmaps:
   ## 'fluentd-extra-plugins', and 'fluentd-extra-config'.
   user:
-
     resources:
-      limits:
-        cpu: 500m
-        memory: 572Mi
       requests:
         cpu: 100m
         memory: 300Mi
+      limits:
+        cpu: 500m
+        memory: 572Mi
 
     tolerations: []
-    affinity: {}
     nodeSelector: {}
+    affinity: {}
 
 externalTrafficPolicy:
   # Whitelisting requires externalTrafficPolicy.local to be true

@@ -1,11 +1,15 @@
 ### Release notes
 
+- The Fluentd deplyoment has changed considerably and users must ensure that their custom filters continues to work as expected.
+
 ### Added
 
 - Enable rook-ceph network polices by default for exoscale
 - Troubleshooting scripts for HNC
 - Tests for Groups RBAC
 - the possibility to add static users for opensearch
+- Support for extracting and storing audit logs with Fluentd
+- Compaction for logs stored directly in object store by Fluentd
 
 ### Fixed
 
@@ -32,3 +36,10 @@
 - Network polices
   - Added missing network policy for rook-ceph-csi-detect-version for rook-ceph v1.10
 - Upgraded the kured helm chart to `4.4.1` which upgrades the app version to `1.12.1`
+- Fluentd in both SC and WC now use the `fluentd-elasticsearch` chart for forwarding, and the `fluentd` chart for aggregating
+  - This have changed the deployment for Fluentd considerably and users must ensure that their custom filter continues to work as expected
+- Retention for logs stored directly in object store have been reworked
+
+### Removed
+
+- GCS support for Fluentd

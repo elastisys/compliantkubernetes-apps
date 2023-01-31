@@ -1,0 +1,141 @@
+global:
+  scApiserver:
+    ips:
+      - "0.0.0.0/0"
+    port: 6443
+  scNodes:
+    ips:
+      - "0.0.0.0/0"
+  scIngress:
+    ips:
+      - "0.0.0.0/0"
+  wcIngress:
+    ips:
+      - "0.0.0.0/0"
+  objectStorage:
+    ips:
+      - "0.0.0.0/0"
+    ports:
+      - 443
+  ingressUsingHostNetwork: false
+  externalLoadBalancer: false # not true if loadbalancer is controlled by a kubernetes cloud controller
+
+  dnsServerEgress:
+    - ports:
+        - port: 53
+          protocol: TCP
+        - port: 53
+          protocol: UDP
+
+  objectStoreEgress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+
+  prometheusSelector:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: monitoring
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: prometheus
+          app.kubernetes.io/instance: kube-prometheus-stack-prometheus
+
+harbor:
+  enabled: true
+  database:
+    type: internal
+    internal: []
+      # - ingressNSMatchLabels: {}
+      #   ingressPodMatchLabels: {}
+    external: []
+      # - egressNSMatchLabels:
+      #     kubernetes.io/metadata.name: <postgres namespace>
+      #   egressPodMatchLabels: {}
+      #   ports:
+      #    - 5432
+  registries:
+    # For replication, added to core and jobservice
+    ips:
+      - 0.0.0.0/0
+    ports:
+      - 443
+  jobservice:
+    # IP for jobs, not needed for replication
+    ips:
+      - "0.0.0.0/0"
+    ports:
+      - 443
+  redis:
+    type: internal
+    external: []
+      # - egressNSMatchLabels:
+      #     kubernetes.io/metadata.name: <redis namespace>
+      #   egressPodMatchLabels: {}
+      #   ports:
+      #    - 6379
+  trivy:
+    # IP to trivy vulnerability database
+    ips:
+      - "0.0.0.0/0"
+    port: 443
+
+monitoring:
+  enabled: true
+  grafana:
+    # loading dashboards from grafana website
+    externalDashboardProvider:
+      ips:
+        - "0.0.0.0/0"
+      ports:
+        - 443
+  alertmanager:
+    # alert receiver, e.g. slack or opsgenie
+    alertReceivers:
+      ips:
+        - "0.0.0.0/0"
+      ports:
+        - 443
+
+opensearch:
+  enabled: true
+  client:
+    enabled: false
+  data:
+    enabled: false
+  plugins:
+    ips:
+      - "0.0.0.0/0"
+    port: 443
+
+fluentd:
+  enabled: true
+
+rcloneSync:
+  enabled: true
+  destinationObjectStorage:
+    ips:
+      - "0.0.0.0/0"
+    ports:
+      - 443
+
+s3Exporter:
+  enabled: true
+
+ingressNginx:
+  enabled: true
+  ingressOverride:
+    enabled : false
+    ips:
+     - set-me-if-enabled
+
+dex:
+  enabled: true
+  ips:
+    - "0.0.0.0/0"
+
+falco:
+  enabled: true

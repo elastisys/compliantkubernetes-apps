@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "sc-logs-retention.fullname" . }}-script
-  labels:
-    {{- include "sc-logs-retention.labels" . | nindent 4 }}
-data:
-  {{- (.Files.Glob "scripts/logs-retention.sh").AsConfig | nindent 2 }}

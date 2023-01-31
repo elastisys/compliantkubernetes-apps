@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "log-manager.fullname" . }}-scripts
+  labels:
+    {{- include "log-manager.labels" . | nindent 4 }}
+data:
+  compaction.sh: |-
+    {{- .Files.Get "files/compaction.sh" | nindent 4 }}
+  retention.sh: |-
+    {{- .Files.Get "files/retention.sh" | nindent 4 }}

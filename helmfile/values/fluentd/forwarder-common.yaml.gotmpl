@@ -1,0 +1,281 @@
+nameOverride: fluentd
+
+image:
+  # This is our own fork-image (https://github.com/elastisys/fluentd-elasticsearch).
+  # This can later be replaced with the original image (https://github.com/monotek/fluentd-elasticsearch) when our changes is merged.
+  # This image is included in falco k8s_containers and user_known_package_manager_in_container macros
+  repository: ghcr.io/elastisys/fluentd
+  tag: v3.4.0-ck8s5
+
+podSecurityPolicy:
+  enabled: true
+
+serviceMonitor:
+  enabled: true
+
+prometheusRule:
+  enabled: true
+
+fluentdArgs: "--no-supervisor -q"
+
+{{ with .Values.fluentd.forwarder.buffer -}}
+elasticsearch:
+  buffer: {{- toYaml . | nindent 4 }}
+{{- end }}
+
+env:
+  LIVENESS_THRESHOLD_SECONDS: {{ .Values.fluentd.forwarder.livenessThresholdSeconds }}
+  STUCK_THRESHOLD_SECONDS: {{ .Values.fluentd.forwarder.stuckThresholdSeconds }}
+  OUTPUT_PORT: 443
+  OUTPUT_BUFFER_TOTAL_LIMIT: 20G
+
+configMaps:
+  useDefaults:
+    containersInputConf: false
+    forwardInputConf: false
+    monitoringConf: false
+    outputConf: false
+    systemConf: false
+    systemInputConf: true
+
+extraConfigMaps:
+  buffer.prop: |-
+    @type "#{ENV['OUTPUT_BUFFER_TYPE']}"
+    flush_mode "#{ENV['OUTPUT_BUFFER_FLUSH_MODE']}"
+    retry_type "#{ENV['OUTPUT_BUFFER_RETRY_TYPE']}"
+    flush_thread_count "#{ENV['OUTPUT_BUFFER_FLUSH_THREAD_TYPE']}"
+    flush_interval "#{ENV['OUTPUT_BUFFER_FLUSH_INTERVAL']}"
+    retry_forever "#{ENV['OUTPUT_BUFFER_RETRY_FOREVER']}"
+    retry_max_interval "#{ENV['OUTPUT_BUFFER_RETRY_MAX_INTERVAL']}"
+    chunk_limit_size "#{ENV['OUTPUT_BUFFER_CHUNK_LIMIT']}"
+    total_limit_size "#{ENV['OUTPUT_BUFFER_TOTAL_LIMIT_SIZE']}"
+    overflow_action "#{ENV['OUTPUT_BUFFER_OVERFLOW_ACTION']}"
+
+  00-system.conf: |-
+    <system>
+      root_dir /tmp/fluentd-buffers/
+      <log>
+        format json
+      </log>
+    </system>
+
+  01-monitoring.conf: |-
+    # Prometheus Exporter Plugin
+    # input plugin that exports metrics
+    <source>
+      @id prometheus
+      @type prometheus
+    </source>
+
+    # input plugin that collects metrics from MonitorAgent
+    <source>
+      @id prometheus_monitor
+      @type prometheus_monitor
+      <labels>
+        host ${hostname}
+      </labels>
+    </source>
+
+    # input plugin that collects metrics for output plugin
+    <source>
+      @id prometheus_output_monitor
+      @type prometheus_output_monitor
+      <labels>
+        host ${hostname}
+      </labels>
+    </source>
+
+    # Don't include prometheus_tail_monitor since this will cause number of metrics to increase indefinitely
+    # https://github.com/fluent/fluent-plugin-prometheus/issues/20
+
+  10-authlog.conf: |-
+    # Tail the authlog
+    <source>
+      @id authlog
+      @type tail
+      path /var/log/auth.log
+      pos_file /var/log/auth.pos
+      pos_file_compaction_interval 72h
+      tag authlog.*
+      skip_refresh_on_startup true
+      <parse>
+        @type regexp
+        expression /^(?<time>[^ ]* {1,2}[^ ]* [^ ]*) (?<host>[^ ]*) (?<ident>[a-zA-Z0-9_\/\.\-]*)(?:\[(?<pid>[0-9]+)\])?(?:[^\:]*\:)? *(?<message>.*)$/
+      </parse>
+    </source>
+
+  11-kubeaudit.conf: |-
+    # Tail the kubeaudit
+    <source>
+      @id kubeaudit
+      @type tail
+      path /var/log/kube-audit/kube-apiserver.log,/var/log/kubernetes/audit/kube-apiserver-audit.log
+      pos_file /var/log/kube-audit/fluentd-kube-apiserver.pos
+      pos_file_compaction_interval 72h
+      tag kubeaudit.*
+      read_from_head true
+      skip_refresh_on_startup true
+      <parse>
+        @type multi_format
+        <pattern>
+          format json
+          time_key requestReceivedTimestamp
+          time_format %Y-%m-%dT%H:%M:%S.%NZ
+        </pattern>
+      </parse>
+    </source>
+
+    # Remove keys that include raw data causing errors
+    # See: https://github.com/uken/fluent-plugin-elasticsearch/issues/452
+    <filter kubeaudit.**>
+      @id kube_api_audit_normalize
+      @type record_transformer
+      remove_keys responseObject,requestObject
+    </filter>
+
+  12-kubernetes.conf: |-
+    # Tail the kubernetes container logs
+
+    # This config is taken from a default config that we have disabled
+    # See the value "configMaps.useDefaults.containersInputConf: false" above
+    # But we added "reserve_time true" in order to allow falco logs to use json
+    <source>
+      @id kubernetes
+      @type tail
+      path /var/log/containers/*.log
+      exclude_path ["/var/log/containers/fluentd*"]
+      pos_file /var/log/containers.log.pos
+      pos_file_compaction_interval 72h
+      tag raw.kubernetes.*
+      read_from_head true
+      skip_refresh_on_startup true
+      <parse>
+        @type multi_format
+        <pattern>
+          format json
+          time_key time
+          time_format %Y-%m-%dT%H:%M:%S.%NZ
+        </pattern>
+        <pattern>
+          format /^(?<time>.+) (?<stream>stdout|stderr) (?<logtag>[^ ]*) (?<log>.*)$/
+          time_format %Y-%m-%dT%H:%M:%S.%N%:z
+        </pattern>
+      </parse>
+    </source>
+
+    # Detect exceptions in the log output and forward them as one log entry.
+    <match raw.kubernetes.**>
+      @id raw.kubernetes
+      @type detect_exceptions
+      remove_tag_prefix raw
+      message log
+      stream stream
+      multiline_flush_interval 5
+      max_bytes 500000
+      max_lines 1000
+    </match>
+
+    # Concatenate multi-line logs
+    {{- if eq .Values.global.containerRuntime "docker" }}
+    <filter **>
+      @id filter_concat
+      @type concat
+      key log
+      multiline_end_regexp /\n$/
+      separator ""
+    </filter>
+    {{- else if eq .Values.global.containerRuntime "containerd" }}
+    <filter **>
+      @id filter_concat
+      @type concat
+      key message
+      use_first_timestamp true
+      partial_key logtag
+      partial_value P
+      separator ""
+      # TODO: When we have updated this plugin to v2.5.0 change to this instead
+      # @id filter_concat
+      # @type concat
+      # key message
+      # use_partial_cri_logtag true
+      # partial_cri_logtag_key logtag
+      # partial_cri_stream_key stream
+    </filter>
+    {{- else }}
+      {{ fail "Misconfigured `global.containerRuntime`. Supported container runtimes are 'containerd' and 'docker'" }}
+    {{- end }}
+
+    # Fixes json fields in Elasticsearch
+    <filter kubernetes.**>
+      @id filter_parser
+      @type parser
+      key_name log
+      reserve_data true
+      reserve_time true # This is the line that is changed from the default config
+      remove_key_name_field true
+      <parse>
+        @type multi_format
+        <pattern>
+          format json
+        </pattern>
+        <pattern>
+          format none
+        </pattern>
+      </parse>
+    </filter>
+
+    # Enriches records with Kubernetes metadata
+    <filter kubernetes.**>
+      @id filter_kubernetes_metadata
+      @type kubernetes_metadata
+    </filter>
+
+  20-filters.conf: |-
+    <filter **>
+       @type record_modifier
+       char_encoding utf-8:utf-8
+    </filter>
+
+    <filter **>
+      @type record_transformer
+      <record>
+        cluster.name "{{ .Values.global.clusterName }}"
+      </record>
+    </filter>
+
+# Liveliness probe reverted from upstream changes to prevent that it fails if just one buffer is inactive.
+# E.g. the authlog buffer will often be inactive, so it would make the probe fail.
+livenessProbe:
+  kind:
+    exec:
+      command:
+      # Liveness probe is aimed to help in situations where fluentd
+      # silently hangs for no apparent reasons until manual restart.
+      # The idea of this probe is that if fluentd is not queueing or
+      # flushing chunks for 5 minutes, something is not right. If
+      # you want to change the fluentd configuration, reducing amount of
+      # logs fluentd collects, consider changing the threshold or turning
+      # liveness probe off completely.
+      - '/bin/sh'
+      - '-c'
+      - >
+        LIVENESS_THRESHOLD_SECONDS=${LIVENESS_THRESHOLD_SECONDS:-300};
+        STUCK_THRESHOLD_SECONDS=${STUCK_THRESHOLD_SECONDS:-900};
+        if [ ! -e /var/log/fluentd-buffers ];
+        then
+          echo "Expected directory /var/log/fluentd-buffers does not exist. This is likely a configuration issue.";
+          exit 1;
+        fi;
+        touch -d "${STUCK_THRESHOLD_SECONDS} seconds ago" /tmp/marker-stuck;
+        if [ -z "$(find /var/log/fluentd-buffers -type d -newer /tmp/marker-stuck -print -quit)" ];
+        then
+          echo "Elasticsearch buffers found stuck longer than $STUCK_THRESHOLD_SECONDS seconds. Clearing buffers."
+          rm -rf /var/log/fluentd-buffers;
+          exit 1;
+        fi;
+        touch -d "${LIVENESS_THRESHOLD_SECONDS} seconds ago" /tmp/marker-liveness;
+        if [ -z "$(find /var/log/fluentd-buffers -type d -newer /tmp/marker-liveness -print -quit)" ];
+        then
+          echo "Elasticsearch buffers found stuck longer than $LIVENESS_THRESHOLD_SECONDS seconds."
+          exit 1;
+        fi;

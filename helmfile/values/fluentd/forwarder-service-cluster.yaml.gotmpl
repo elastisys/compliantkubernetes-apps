@@ -1,0 +1,27 @@
+resources: {{- toYaml .Values.fluentd.forwarder.resources | nindent 2  }}
+tolerations: {{- toYaml .Values.fluentd.forwarder.tolerations | nindent 2 }}
+nodeSelector: {{- toYaml .Values.fluentd.forwarder.nodeSelector | nindent 2 }}
+affinity: {{- toYaml .Values.fluentd.forwarder.affinity | nindent 2 }}
+
+extraConfigMaps:
+  30-output.conf: |-
+    # Forward
+    <match **>
+      @id output-forwarding
+      @type forward
+      send_timeout 60s
+      recover_wait 10s
+      hard_timeout 60s
+
+      <server>
+        name aggregator
+        host fluentd-aggregator-aggregator
+        port 24224
+        weight 60
+      </server>
+
+      <buffer>
+        @include buffer.prop
+        path /var/log/fluentd-buffers/audit
+      </buffer>
+    </match>

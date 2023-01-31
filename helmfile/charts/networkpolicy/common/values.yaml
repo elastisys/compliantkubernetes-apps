@@ -1,0 +1,140 @@
+fullnameOverride: ""
+nameOverride: ""
+
+additional: {}
+# |-
+#   kind: NetworkPolicy
+#   apiVersion: networking.k8s.io/v1
+#   metadata:
+#     name: example-np
+#     namespace: default
+#   spec:
+#     policyTypes:
+#       - Ingress
+#       - Egress
+#     podSelector:
+#       matchLabels:
+#         foo: bar
+#     ingress: {}
+#     egress: {}
+
+global:
+  apiserver:
+    ips:
+      - 0.0.0.0/0
+    port: 6443
+  ingress:
+    ips:
+      - 0.0.0.0/0
+  nodes:
+    ips:
+      - 0.0.0.0/0
+  objectStorage:
+    ips:
+      - 0.0.0.0/0
+    ports:
+      - 443
+  ingressUsingHostNetwork: false
+  externalLoadBalancer: false # not true if loadbalancer is controlled by a kubernetes cloud controller
+  trivy:
+    # trivy vulnerability database
+    ips:
+      - "0.0.0.0/0"
+
+  dnsServerEgress:
+    - ports:
+        - port: 53
+          protocol: TCP
+        - port: 53
+          protocol: UDP
+
+  objectStoreEgress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+
+  blackboxSelector:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: monitoring
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/instance: prometheus-blackbox-exporter
+
+  prometheusSelector:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: monitoring
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: prometheus
+          app.kubernetes.io/instance: kube-prometheus-stack-prometheus
+
+kured:
+  enabled: true
+  notificationSlack:
+    enabled: false
+    ips:
+      - 0.0.0.0/0
+    ports:
+      - 443
+
+velero:
+  enabled: true
+
+falco:
+  enabled: true
+  plugins:
+    ips:
+      - "0.0.0.0/0"
+    ports:
+      - 443
+
+fluentd:
+  enabled: true
+
+certManager:
+  enabled: true
+  # letsencrypt ip addresses
+  namespaces: []
+  letsencrypt:
+    ips:
+    - "0.0.0.0/0"
+    port: 443
+
+monitoring:
+  enabled: true
+
+kubeSystem:
+  enabled: true
+
+  openstack:
+    enabled: false
+
+    ips:
+      - 0.0.0.0/0
+    ports:
+      - 443
+
+  upcloud:
+    enabled: false
+
+    ips:
+      - 0.0.0.0/0
+    ports:
+      - 443
+
+coredns:
+  enabled: true
+  externalDns:
+    ips:
+      - "0.0.0.0/0"
+  serviceIp:
+    ips:
+      - "10.233.0.3/32"
+
+dnsAutoscaler:
+  enabled: true

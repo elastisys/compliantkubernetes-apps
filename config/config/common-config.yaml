@@ -79,6 +79,7 @@ objectStorage:
 
   ## Buckets where each respctive application will store its backups.
   buckets:
+    audit: ${CK8S_ENVIRONMENT_NAME}-audit
     velero: ${CK8S_ENVIRONMENT_NAME}-velero
     thanos: ${CK8S_ENVIRONMENT_NAME}-thanos
 
@@ -155,6 +156,69 @@ falco:
         effect: NoSchedule
     affinity: {}
     nodeSelector: {}
+
+fluentd:
+  audit:
+    enabled: false
+    # Add filter stages to capture audit logs, add the audit tag prefix
+    filters: ""
+      ## Example:
+      # filters: |
+      # # Set aside OpenSearch Master Audit events
+      #   <match kubernetes.var.log.containers.opensearch-master-**>
+      #     @type rewrite_tag_filter
+      #     <rule>
+      #       key message
+      #       pattern /\[audit *\]/
+      #       tag audit.${tag}
+      #     </rule>
+      #   </match>
+
+  aggregator:
+    buffer: {}
+
+    persistence:
+      storage: 10Gi
+
+    resources:
+      requests:
+        cpu: 300m
+        memory: 500Mi
+      limits:
+        cpu: 500m
+        memory: 1000Mi
+
+    tolerations: []
+
+    nodeSelector: ""
+    affinity: {}
+
+  forwarder:
+    buffer:
+      totalLimitSize: 20GB
+
+    resources:
+      requests:
+        cpu: 200m
+        memory: 300Mi
+      limits:
+        cpu: 500m
+        memory: 572Mi
+
+    tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        effect: NoSchedule
+        value: ""
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        value: ""
+
+    nodeSelector: ""
+    affinity: {}
+
+    livenessThresholdSeconds: 900
+    stuckThresholdSeconds: 1200
+
 
 ## Hierarchical namespace controller configuration.
 hnc:

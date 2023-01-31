@@ -1,0 +1,57 @@
+fullnameOverride: ""
+nameOverride: ""
+
+imagePullSecrets: []
+image:
+  pullPolicy: IfNotPresent
+  repository: ghcr.io/elastisys/compliantkubernetes-apps-log-manager
+  tag: ""
+
+s3:
+  forcePathStyle: false
+  regionEndpoint: set-me
+  accessKey: set-me
+  secretKey: set-me
+
+instances:
+  - bucket: set-me
+    prefix: set-me
+    compaction:
+      enabled: true
+      schedule: 0 0 * * *
+      days: 10 # Included in compaction
+    retention:
+      enabled: true
+      schedule: 0 0 * * *
+      days: 30 # Included in retention
+
+concurrencyPolicy: Forbid
+restartPolicy: Never
+
+startingDeadlineSeconds: 7200
+activeDeadlineSeconds: 7200
+successfulJobsHistoryLimit: 3
+failedJobsHistoryLimit: 1
+backoffLimit: 0
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext:
+  runAsNonRoot: true
+  runAsGroup: 1000
+  runAsUser: 1000
+  capabilities:
+    drop:
+    - ALL
+
+compaction:
+  resources: {}
+retention:
+  resources: {}
+
+tolerations: []
+nodeSelector: {}
+affinity: {}

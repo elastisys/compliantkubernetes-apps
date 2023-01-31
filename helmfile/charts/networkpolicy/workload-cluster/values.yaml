@@ -1,0 +1,96 @@
+global:
+  wcApiserver:
+    ips:
+      - "0.0.0.0/0"
+    port: 6443
+  wcNodes:
+    ips:
+      - "0.0.0.0/0"
+  scIngress:
+    ips:
+      - "0.0.0.0/0"
+  ingressUsingHostNetwork: false
+  wcIngress:
+    ips:
+      - "0.0.0.0/0" # ips of wc nodes or loadbalancer
+  externalLoadBalancer: false
+  objectStorage:
+    ips:
+      - "0.0.0.0/0"
+    ports:
+      - 443
+
+  apiServerEgress:
+    - to:
+        - ipBlock:
+            cidr: 10.0.0.1/32
+      ports:
+        - protocol: TCP
+          port: 80
+
+  dnsServerEgress:
+    - ports:
+        - port: 53
+          protocol: TCP
+        - port: 53
+          protocol: UDP
+
+  objectStoreEgress:
+    - to:
+        - ipBlock:
+            cidr: 10.0.0.1/32
+      ports:
+        - protocol: TCP
+          port: 80
+
+  scIngressEgress:
+    - to:
+        - ipBlock:
+            cidr: 10.0.0.1/32
+      ports:
+        - protocol: TCP
+          ports: 80
+
+  blackboxSelector:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: monitoring
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/instance: prometheus-blackbox-exporter
+
+  prometheusSelector:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: monitoring
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: prometheus
+          app.kubernetes.io/instance: kube-prometheus-stack-prometheus
+
+monitoring:
+  enabled: true
+
+fluentd:
+  enabled: true
+
+ingressNginx:
+  enabled: true
+  ingressOverride:
+    enabled : false
+    ips:
+     - set-me-if-enabled
+gatekeeper:
+  enabled: true
+
+falco:
+  enabled: true
+
+alertmanager:
+  enabled: true
+  # alert receiver, e.g. slack or opsgenie
+  alertReceivers:
+    ips:
+      - "0.0.0.0/0"
+    ports:
+      - 443

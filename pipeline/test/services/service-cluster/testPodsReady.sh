@@ -8,6 +8,8 @@ enable_harbor=$(yq4 -e '.harbor.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_harbor_backup=$(yq4 -e '.harbor.backup.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_user_grafana=$(yq4 -e '.user.grafana.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_fluentd=$(yq4 -e '.fluentd.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_fluentd_audit=$(yq4 -e '.fluentd.audit.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_fluentd_logs=$(yq4 -e '.fluentd.scLogs.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_opensearch_snapshot=$(yq4 -e '.opensearch.snapshot.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_velero=$(yq4 -e '.velero.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_os_data_sts=$(yq4 -e '.opensearch.dataNode.dedicatedPods' "${CONFIG_FILE}" 2>/dev/null)
@@ -96,7 +98,7 @@ daemonsets=(
     "monitoring kube-prometheus-stack-prometheus-node-exporter"
 )
 if "${enable_fluentd}"; then
-    daemonsets+=("fluentd fluentd")
+    daemonsets+=("fluentd-system fluentd-forwarder")
 fi
 if "$enable_velero"; then
     daemonsets+=("velero restic")
@@ -141,7 +143,7 @@ if "${enable_harbor}"; then
     )
 fi
 if "${enable_fluentd}"; then
-    statefulsets+=("fluentd fluentd")
+    statefulsets+=("fluentd-system fluentd-aggregator")
 fi
 if [[ "${enable_thanos}" == "true" ]] && [[ "${enable_thanos_receiver}" == "true" ]]; then
     statefulsets+=(
@@ -203,8 +205,25 @@ if "${enable_opensearch_snapshot}"; then
         "opensearch-system opensearch-slm"
     )
 fi
-if "${enable_fluentd}"; then
-    cronjobs+=("fluentd sc-logs-retention")
+if "${enable_fluentd_audit}"; then
+    audit_bucket="$(yq4 '.objectStorage.buckets.audit' "${CONFIG_FILE}" 2>/dev/null)"
+    env_name="$(yq4 '.global.ck8sEnvironmentName' "${CONFIG_FILE}" 2>/dev/null)"
+
+    cronjobs+=(
+        "fluentd-system $audit_bucket-$env_name-sc-compaction"
+        "fluentd-system $audit_bucket-$env_name-sc-retention"
+        "fluentd-system $audit_bucket-$env_name-wc-compaction"
+        "fluentd-system $audit_bucket-$env_name-wc-retention"
+    )
+fi
+if "${enable_fluentd_logs}"; then
+    logs_bucket="$(yq4 '.objectStorage.buckets.scFluentd' "${CONFIG_FILE}" 2>/dev/null)"
+    env_name="$(yq4 '.global.ck8sEnvironmentName' "${CONFIG_FILE}" 2>/dev/null)"
+
+    cronjobs+=(
+        "fluentd-system $logs_bucket-logs-compaction"
+        "fluentd-system $logs_bucket-logs-retention"
+    )
 fi
 
 echo

@@ -906,9 +906,6 @@ opensearch:
       - pattern: authlog-*
         sizeGB: 1
         ageDays: 30
-      - pattern: security-auditlog-*
-        sizeGB: 1
-        ageDays: 30
     startingDeadlineSeconds: 600
     activeDeadlineSeconds: 2700
     resources:
@@ -930,8 +927,6 @@ opensearch:
       alertSizeMB: 5500
     - prefix: other-default
       alertSizeMB: 400
-    - prefix: security-auditlog
-      alertSizeMB: 16
     - prefix: authlog-default
       alertSizeMB: 0.2
 
@@ -976,52 +971,53 @@ opensearch:
 
 fluentd:
   enabled: true
+
+  audit:
+    compaction:
+      enabled: true
+      schedule: 0 22 * * *
+      days: 10
+    retention:
+      enabled: true
+      schedule: 0 23 * * *
+      days: 30 # For HIPAA/PDL 1825
+
+  scLogs:
+    enabled: true
+    compaction:
+      enabled: true
+      schedule: 30 22 * * *
+      days: 7
+    retention:
+      enabled: true
+      schedule: 30 23 * * *
+      days: 7
+
   forwarder:
-    resources:
-      limits:
-        cpu: 500m
-        memory: 572Mi
-      requests:
-        cpu: 200m
-        memory: 300Mi
+    buffer:
+      chunkLimitSize: 256MB
+
+  logManager:
+    compaction:
+      resources:
+        requests:
+          cpu: 200m
+          memory: 100Mi
+        limits:
+          cpu: 1000m
+          memory: 400Mi
+    retention:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 50Mi
+        limits:
+          cpu: 200m
+          memory: 200Mi
+
     tolerations: []
-    affinity: {}
     nodeSelector: {}
-    livenessProbe:
-      initialDelaySeconds: 60
-      periodSeconds: 10
-      timeoutSeconds: 5
-      failureThreshold: 6
-    readinessProbe:
-      initialDelaySeconds: 5
-      periodSeconds: 10
-      timeoutSeconds: 5
-      failureThreshold: 6
-    # Set to 'false' when using AWS S3,
-    # and 'true' when using any other S3 provider.
-    useRegionEndpoint: set-me
-    chunkLimitSize: 256MB
-    totalLimitSize: 20GB
-  aggregator:
-    resources:
-      limits:
-        cpu: 500m
-        memory: 1000Mi
-      requests:
-        cpu: 300m
-        memory: 500Mi
-    tolerations: []
     affinity: {}
-    nodeSelector: {}
-  scLogsRetention:
-    days: 7
-    resources:
-      requests:
-        cpu: 200m
-        memory: 50Mi
-      limits:
-        cpu: 300m
-        memory: 100Mi
 
 alerts:
   alertTo: "null"

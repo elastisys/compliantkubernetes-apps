@@ -2,7 +2,9 @@ namespaces:
 - name: cert-manager
 - name: dex
 - name: opensearch-system
-- name: fluentd
+{{- if .Values.fluentd.enabled }}
+- name: fluentd-system
+{{- end }}
 - name: kube-node-lease
 - name: kube-public
 - name: kube-system

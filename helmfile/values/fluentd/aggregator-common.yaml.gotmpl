@@ -1,0 +1,175 @@
+{{ if not (eq .Values.objectStorage.type "s3") }}
+{{ fail "\nERROR: Fluentd requires S3 object storage, see Values.objectStorage.type" }}
+{{ end }}
+
+nameOverride: fluentd
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+
+forwarder:
+  enabled: false
+
+extraDeploy:
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: {{ .Release.Name }}-s3-credentials
+    type: Opaque
+    stringData:
+      AWS_ACCESS_KEY_ID: {{ .Values.objectStorage.s3.accessKey }}
+      AWS_ACCESS_SECRET_KEY: {{ .Values.objectStorage.s3.secretKey }}
+
+aggregator:
+  replicaCount: 1
+
+  # Persist buffer so that the last chunks of logs can be retrieved in case of a disaster.
+  persistence:
+    enabled: true
+    size: {{ .Values.fluentd.aggregator.persistence.storage }}
+
+  extraEnvVarsSecret: {{ .Release.Name }}-s3-credentials
+
+  configMapFiles:
+    fluentd.conf: |
+      # This is the root config file, which only includes components of the actual configuration
+
+      # Do not collect fluentd's own logs to avoid infinite loops.
+      <label @FLUENT_LOG>
+        <match fluent.*>
+          @type stdout
+        </match>
+      </label>
+
+      @include metrics.conf
+      @include fluentd-inputs.conf
+      @include fluentd-labels.conf
+      @include fluentd-output.conf
+
+    metrics.conf: |
+      # Prometheus Exporter Plugin
+      # input plugin that exports metrics
+      <source>
+        @id prometheus
+        @type prometheus
+      </source>
+
+      # input plugin that collects metrics from MonitorAgent
+      <source>
+        @id prometheus_monitor
+        @type prometheus_monitor
+        <labels>
+          host ${hostname}
+        </labels>
+      </source>
+
+      # input plugin that collects metrics for output plugin
+      <source>
+        @id prometheus_output_monitor
+        @type prometheus_output_monitor
+        <labels>
+          host ${hostname}
+        </labels>
+      </source>
+
+      # Don't include prometheus_tail_monitor since this will cause number of metrics to increase indefinitely
+      # https://github.com/fluent/fluent-plugin-prometheus/issues/20
+
+    fluentd-inputs.conf: |
+      # HTTP input for the liveness and readiness probes
+      <source>
+        @type http
+        bind 0.0.0.0
+        port 9880
+      </source>
+
+      # TCP input to receive logs from the forwarders
+      <source>
+        @type forward
+        bind 0.0.0.0
+        port 24224
+      </source>
+
+      # Drop fluentd logs
+      <match kubernetes.var.log.containers.fluentd-**>
+        @type null
+      </match>
+
+    fluentd-labels.conf: |
+      # Relabel authlog
+      <match authlog.**>
+        @type relabel
+        @label @AUDIT
+      </match>
+
+      # Relabel kubeaudit
+      <match kubeaudit.**>
+        @type relabel
+        @label @AUDIT
+      </match>
+
+      # Relabel kubernetes
+      <match kubernetes.**>
+        @type relabel
+        @label @AUDIT
+      </match>
+
+      # Discard all not relabeled
+      <match **>
+        @type null
+      </match>
+
+    fluentd-filters.conf: |
+      # Set aside logs you want to keep using rewrite_tag_filter with a different prefix than kubernetes.*
+
+    buffer.prop: |
+      @type file
+
+      overflow_action {{ .Values.fluentd.aggregator.buffer | get "overflowAction" "block" }}
+      chunk_limit_size {{ .Values.fluentd.aggregator.buffer | get "chunkLimitSize" "50MB" }}
+      chunk_limit_size {{ .Values.fluentd.aggregator.buffer | get "totalLimitSize" "9GB" }}
+
+      timekey {{ .Values.fluentd.aggregator.buffer | get "timekey" "10m" }}
+      timekey_wait {{ .Values.fluentd.aggregator.buffer | get "timekeyWait" "1m" }}
+      timekey_use_utc true
+
+    store.prop: |
+      @type s3
+
+      aws_key_id "#{ENV['AWS_ACCESS_KEY_ID']}"
+      aws_sec_key "#{ENV['AWS_ACCESS_SECRET_KEY']}"
+
+      s3_endpoint {{ .Values.objectStorage.s3.regionEndpoint }}
+      s3_region {{ .Values.objectStorage.s3.region }}
+
+      force_path_style {{ .Values.objectStorage.s3.forcePathStyle }}
+
+    audit.output.conf: |
+      # Audit logs
+      <label @AUDIT>
+        @include fluentd-filters.conf
+
+        # Discard all not set aside
+        <match kubernetes.**>
+          @type null
+        </match>
+
+        <match **>
+          @id output-audit
+          @include store.prop
+
+          s3_bucket {{ .Values.objectStorage.buckets.audit }}
+
+          path {{ .Values.global.clusterName }}/%Y%m%d/${tag}/
+
+          <buffer tag,time>
+            @include buffer.prop
+            path /opt/bitnami/fluentd/logs/buffers/audit
+          </buffer>
+        </match>
+      </label>
+
+    fluentd-output.conf: |
+      @include audit.output.conf
