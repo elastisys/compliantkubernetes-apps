@@ -28,10 +28,6 @@
     ./migration/v0.27.x-v0.28.x/add-registry-credentials.sh
     ```
 
-1. Run migration script `remove_old_metrics_server.sh`
-
-    This will remove the old metrics-server components from the clusters.
-
 1. Update network policies:
 
     - Set `networkPolicies.coredns.extarnalDns.ips` to your upstream DNS servers.
