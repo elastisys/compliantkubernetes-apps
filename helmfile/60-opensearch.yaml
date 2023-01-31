@@ -1,0 +1,120 @@
+helmDefaults:
+  timeout: 120
+  createNamespace: false
+  skipDeps: true
+
+environments:
+  workload_cluster:
+    values:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/wc-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/wc-config.yaml"
+    secrets:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
+  service_cluster:
+    values:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/sc-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/sc-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/opensearches.yaml"
+    secrets:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
+
+releases:
+{{ range $k, $v := .Values.osClusters }}
+  - name: {{ $k }}-opensearch-secrets
+    namespace: {{ $k }}
+    labels:
+      app: {{ $k }}-opensearch-secrets
+      group: {{ $k }}-opensearch
+    chart: ./charts/opensearch/secrets
+    version: 0.1.0
+    installed: true
+    values:
+    - values/opensearch/secrets.yaml.gotmpl
+
+  - name: {{ $k }}-opensearch-master
+    namespace: {{ $k }}
+    labels:
+      app: {{ $k }}-opensearch-master
+      group: {{ $k }}-opensearch
+    chart: ./upstream/opensearch
+    version: 2.6.0
+    installed: true
+    wait: true
+    needs:
+    - {{ $k }}/{{ $k }}-opensearch-secrets
+    values:
+    - values/opensearch/common.yaml.gotmpl
+    - values/opensearch/master.yaml.gotmpl
+    - {{- toYaml $v.master | nindent 6 }}
+
+  - name: {{ $k }}-opensearch-dashboards
+    namespace: {{ $k }}
+    labels:
+      app: {{ $k }}-opensearch-dashboards
+      group: {{ $k }}-opensearch
+    chart: ./upstream/opensearch-dashboards
+    version: 2.5.1
+    installed: true
+    wait: true
+    needs:
+    - {{ $k }}/{{ $k }}-opensearch-master
+    values:
+    - values/opensearch/dashboards.yaml.gotmpl
+    - {{- toYaml $v.dashboards | nindent 6 }}
+
+  - name: {{ $k }}-opensearch-securityadmin
+    namespace: {{ $k }}
+    labels:
+      app: {{ $k }}-opensearch-securityadmin
+      group: {{ $k }}-opensearch
+    chart: ./charts/opensearch/securityadmin
+    version: 0.1.0
+    installed: {{ $.Values.opensearch.securityadmin.enabled }}
+    needs:
+    - {{ $k }}/{{ $k }}-opensearch-master
+    values:
+    - values/opensearch/securityadmin.yaml.gotmpl
+    - {{- toYaml $v.securityAdmin | nindent 6 }}
+
+  - name: {{ $k }}-opensearch-configurer
+    namespace: {{ $k }}
+    labels:
+      app: {{ $k }}-opensearch-configurer
+      group: {{ $k }}-opensearch
+    chart: ./charts/opensearch/configurer
+    version: 0.1.0
+    installed: true
+    needs:
+    {{- if $.Values.opensearch.securityadmin.enabled }}
+    - {{ $k }}/{{ $k }}-opensearch-securityadmin
+    {{- else }}
+    - {{ $k }}/{{ $k }}-opensearch-master
+    {{- end }}
+    - {{ $k }}/{{ $k }}-opensearch-dashboards
+    values:
+    - values/opensearch/securityadmin.yaml.gotmpl
+    - values/opensearch/configurer.yaml.gotmpl
+    - {{- toYaml $v.configurer | nindent 6 }}
+
+  # prometheus-elasticsearch-exporter
+  - name: {{ $k }}-prometheus-elasticsearch-exporter
+    namespace: {{ $k }}
+    labels:
+      app: {{ $k }}-prometheus-elasticsearch-exporter
+      group: {{ $k }}-opensearch
+    chart: ./upstream/prometheus-elasticsearch-exporter
+    version: 4.11.0
+    installed: true
+    missingFileHandler: Error
+    needs:
+    - {{ $k }}/{{ $k }}-opensearch-configurer
+    values:
+    - values/prometheus-elasticsearch-exporter.yaml.gotmpl
+    - serviceMonitor:
+        namespace: {{ $k }}
+    - {{- toYaml $v.exporter | nindent 6 }}
+{{-  end }}

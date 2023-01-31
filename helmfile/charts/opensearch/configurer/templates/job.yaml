@@ -52,4 +52,4 @@ spec:
       volumes:
       - name: files
         secret:
-          secretName: opensearch-configurer-config
+          secretName: {{ include "opensearch-configurer.fullname" . }}-config
