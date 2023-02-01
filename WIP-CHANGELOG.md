@@ -5,6 +5,8 @@
 - Enable rook-ceph network polices by default for exoscale
 - Troubleshooting scripts for HNC
 - Tests for Groups RBAC
+- the possibility to add static users for opensearch
+
 ### Fixed
 
 - The update-ips script can now fetch Calico Wireguard IPs
