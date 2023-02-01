@@ -76,6 +76,9 @@ config:
         password: {{ .Values.opensearch.metricsExporterPassword }}
         opendistro_security_roles:
         - metrics_exporter
+  {{- if .Values.opensearch.extraUsers }}
+    {{- toYaml .Values.opensearch.extraUsers | nindent 4 }}
+  {{- end }}
 
     roles:
     - role_name: log_forwarder
