@@ -17,6 +17,16 @@ export old_version="${1}"
 export new_version="${2}"
 folder_name="${here}/${old_version}.x-${new_version}.x"
 
+echo "You are about to create the migration documentation for versions"
+echo "  from: ${old_version}"
+echo "  to:   ${new_version}"
+echo -n "Are you sure you want to continue [y/N]: "
+read -r reply
+if [[ ! "${reply}" =~ ^[yY]$ ]]; then
+  echo "Aborting..."
+  exit 0
+fi
+
 if [ -d "${folder_name}" ]; then
     echo "- ${folder_name} directory exists"
 else
