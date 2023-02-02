@@ -10,6 +10,7 @@ environments:
       - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/wc-config.yaml"
       - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml"
       - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/wc-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/opensearches.yaml"
     secrets:
       - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
   service_cluster:
@@ -23,6 +24,7 @@ environments:
       - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
 
 releases:
+{{- if eq .Environment.Name "service_cluster" }}
 {{ range $k, $v := .Values.osClusters }}
   - name: {{ $k }}-opensearch-secrets
     namespace: {{ $k }}
@@ -117,4 +119,17 @@ releases:
     - serviceMonitor:
         namespace: {{ $k }}
     - {{- toYaml $v.exporter | nindent 6 }}
-{{-  end }}
+{{- end }}
+{{- end }}
+
+{{- if eq .Environment.Name "workload_cluster" }}
+- name: fluentd-troubleshooting
+  namespace: fluentd
+  labels:
+    app: fluentd-troubleshooting
+  chart: ./upstream/fluentd-elasticsearch
+  version: 13.3.0
+  missingFileHandler: Error
+  values:
+  - values/fluentd-troubleshooting.yaml.gotmpl
+{{- end }}

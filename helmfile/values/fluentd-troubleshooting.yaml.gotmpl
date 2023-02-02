@@ -1,0 +1,191 @@
+resources:    {{- toYaml .Values.fluentd.user.resources | nindent 2  }}
+nodeSelector: {{- toYaml .Values.fluentd.user.nodeSelector | nindent 2  }}
+affinity:     {{- toYaml .Values.fluentd.user.affinity | nindent 2  }}
+tolerations:  {{- toYaml .Values.fluentd.user.tolerations | nindent 2  }}
+
+image:
+  repository: elastisys/fluentd
+  tag: v3.4.0-ck8s4
+
+elasticsearch:
+  scheme: https
+  port: 443
+  auth:
+    enabled: true
+    user: fluentd
+    password: null
+  hosts: ["{{ .Values.opensearch.subdomain }}.{{ .Values.global.opsDomain  }}."]
+  sslVerify: {{ .Values.global.verifyTls }}
+  logLevel: "info"
+  reloadOnFailure: true
+  log400Reason: true
+  outputType: "opensearch"
+  buffer: {{- toYaml .Values.fluentd.elasticsearch.buffer | nindent 4 }}
+
+configMaps:
+  useDefaults:
+    systemConf: false
+    containersInputConf: false
+    outputConf: false
+    monitoringConf: false
+    systemInputConf: false
+    forwardInputConf: false
+
+
+secret:
+- name: OUTPUT_PASSWORD
+  secret_name: opensearch
+  secret_key: password
+
+podSecurityPolicy:
+  enabled: true
+
+env:
+  LIVENESS_THRESHOLD_SECONDS: 900
+  STUCK_THRESHOLD_SECONDS: 1200
+  OUTPUT_PORT: 443
+  OUTPUT_BUFFER_TOTAL_LIMIT: 20G
+
+serviceMonitor:
+  enabled: false
+
+prometheusRule:
+  enabled: false
+
+extraConfigMaps:
+  system.conf: |-
+    <system>
+      root_dir /tmp/fluentd-troubleshooting-buffers/
+      <log>
+        format json
+      </log>
+    </system>
+
+  containers.input.conf: |-
+    <source>
+      @id fluentd-containers.log
+      @type tail
+      path /var/log/containers/troubleshooting*.log
+      exclude_path ["/var/log/containers/fluentd*"]
+      pos_file /var/log/containers-troubleshooting.log.pos
+      pos_file_compaction_interval 72h
+      tag raw.kubernetes.*
+      read_from_head true
+      skip_refresh_on_startup true
+      <parse>
+        @type multi_format
+        <pattern>
+          format json
+          time_key time
+          time_format %Y-%m-%dT%H:%M:%S.%NZ
+        </pattern>
+        <pattern>
+          format /^(?<time>.+) (?<stream>stdout|stderr) (?<logtag>[^ ]*) (?<log>.*)$/
+          time_format %Y-%m-%dT%H:%M:%S.%N%:z
+        </pattern>
+      </parse>
+    </source>
+
+    # Detect exceptions in the log output and forward them as one log entry.
+    <match raw.kubernetes.**>
+      @id raw.kubernetes
+      @type detect_exceptions
+      remove_tag_prefix raw
+      message log
+      stream stream
+      multiline_flush_interval 5
+      max_bytes 500000
+      max_lines 1000
+    </match>
+
+    # Concatenate multi-line logs
+    <filter **>
+      @id filter_concat
+      @type concat
+      key message
+      use_first_timestamp true
+      partial_key logtag
+      partial_value P
+      separator ""
+    </filter>
+
+    # Enriches records with Kubernetes metadata
+    <filter kubernetes.**>
+      @id filter_kubernetes_metadata
+      @type kubernetes_metadata
+    </filter>
+
+    # Fixes json fields in Elasticsearch
+    <filter kubernetes.**>
+      @id filter_parser
+      @type parser
+      key_name log
+      reserve_data true
+      reserve_time true #This is the line that is changed from the default config
+      remove_key_name_field true
+      <parse>
+        @type multi_format
+        <pattern>
+          format json
+        </pattern>
+        <pattern>
+          format none
+        </pattern>
+      </parse>
+    </filter>
+
+    <filter **>
+      @type record_transformer
+      <record>
+        cluster.name "{{ .Values.global.clusterName }}"
+      </record>
+    </filter>
+
+    # Include extra configuration files
+    @include /etc/fluent/extra-config.d/*.conf
+
+  output.conf: |-
+    <match kubernetes.**>
+      @type copy
+      {{ range $k, $v := .Values.osClusters }}
+      <store>
+        @id {{ $k }}-opensearch
+        @type "#{ENV['OUTPUT_TYPE']}"
+        @log_level "#{ENV['OUTPUT_LOG_LEVEL']}"
+        include_tag_key "#{ENV['OUTPUT_INCLUDE_TAG_KEY']}"
+        hosts "{{ $k }}.{{ $.Values.global.opsDomain  }}."
+        port "#{ENV['OUTPUT_PORT']}"
+        path "#{ENV['OUTPUT_PATH']}"
+        scheme "#{ENV['OUTPUT_SCHEME']}"
+        ssl_verify "#{ENV['OUTPUT_SSL_VERIFY']}"
+        ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
+        user "#{ENV['OUTPUT_USER']}"
+        password "#{ENV['OUTPUT_PASSWORD']}"
+        log_os_400_reason "#{ENV['OUTPUT_LOG_400_REASON']}"
+        reconnect_on_error "#{ENV['OUTPUT_RECONNECT_ON_ERROR']}"
+        reload_on_failure "#{ENV['OUTPUT_RELOAD_ON_FAILURE']}"
+        reload_connections "#{ENV['OUTPUT_RELOAD_CONNECTIONS']}"
+        request_timeout "#{ENV['OUTPUT_REQUEST_TIMEOUT']}"
+
+        include_timestamp true
+        index_name kubernetes
+        default_opensearch_version 2
+
+        <buffer>
+          @type "#{ENV['OUTPUT_BUFFER_TYPE']}"
+
+          flush_mode "#{ENV['OUTPUT_BUFFER_FLUSH_MODE']}"
+          retry_type "#{ENV['OUTPUT_BUFFER_RETRY_TYPE']}"
+          flush_thread_count "#{ENV['OUTPUT_BUFFER_FLUSH_THREAD_TYPE']}"
+          flush_interval "#{ENV['OUTPUT_BUFFER_FLUSH_INTERVAL']}"
+          retry_forever "#{ENV['OUTPUT_BUFFER_RETRY_FOREVER']}"
+          retry_max_interval "#{ENV['OUTPUT_BUFFER_RETRY_MAX_INTERVAL']}"
+          chunk_limit_size "#{ENV['OUTPUT_BUFFER_CHUNK_LIMIT']}"
+          total_limit_size "#{ENV['OUTPUT_BUFFER_TOTAL_LIMIT']}"
+          overflow_action "#{ENV['OUTPUT_BUFFER_OVERFLOW_ACTION']}"
+
+          path /var/log/fluentd-troubleshooting-buffers/kubernetes.{{ $k }}.kubernetes.system.buffer
+        </buffer>
+      </store>
+      {{- end }}
+    </match>
