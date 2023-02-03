@@ -269,13 +269,19 @@ fi
 if [ "$(yq_dig 'sc' '.objectStorage.sync.enabled' 'false')" == "true" ]; then
     if [ "$(yq_dig 'sc' '.networkPolicies.rcloneSync.enabled' 'false')" == "true" ]; then
 
-        S3_ENDPOINT_DST="$(yq_dig 'sc' '.objectStorage.sync.s3.regionEndpoint' '""' | sed 's/https\?:\/\///')"
+        S3_ENDPOINT_DST="$(yq_dig 'sc' '.objectStorage.sync.s3.regionEndpoint' '""' | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
         if [[ "${S3_ENDPOINT_DST}" == "" ]]; then
             log_error "No destination S3 endpoint for rclone sync found, check your sc-config.yaml"
             exit 1
         fi
+        S3_PORT_DST="$(yq_dig 'sc' '.objectStorage.sync.s3.regionEndpoint' '""' | sed 's/https\?:\/\///' | sed 's/[A-Za-z.0-9-]*:\?//' | sed 's/\/.*//')"
+        if [ -z "$S3_PORT_DST" ]; then
+            S3_PORT_DST="443"
+        fi
 
         checkIfDiffAndUpdateDNSIPs "${S3_ENDPOINT_DST}" ".networkPolicies.rcloneSync.destinationObjectStorage.ips" "${config["override_sc"]}"
+
+        checkIfDiffAndUpdatePorts "${config["override_sc"]}" ".networkPolicies.rcloneSync.destinationObjectStorage.ports" "$S3_PORT_DST"
     fi
 fi
 
