@@ -14,8 +14,10 @@
 ### Fixed
 
 - The update-ips script can now fetch Calico Wireguard IPs
+- The update-ips script can now fetch object storage sync destination IPs
 - The test scripts can now always access the kubeconfig
 - The OpenSearch network policies now properly work with dedicated nodes and shapshots enabled
+- The `clean-sc` script now patches any pending challenges which would prevent the removal of certain namespaces
 
 ### Updated
 
