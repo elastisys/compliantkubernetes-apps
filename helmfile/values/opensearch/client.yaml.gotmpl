@@ -10,6 +10,9 @@ opensearchJavaOpts: {{ .Values.opensearch.clientNode.javaOpts }}
 
 resources: {{- toYaml .Values.opensearch.clientNode.resources | nindent 2 }}
 
+persistence:
+  size: {{ .Values.opensearch.clientNode.storageSize }}
+
 {{ if (hasKey .Values.opensearch.clientNode.affinity.podAntiAffinity "requiredDuringSchedulingIgnoredDuringExecution") -}}
 antiAffinityTopologyKey: {{ (first .Values.opensearch.clientNode.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution).podAffinityTerm.topologyKey | quote }}
 antiAffinity: hard
