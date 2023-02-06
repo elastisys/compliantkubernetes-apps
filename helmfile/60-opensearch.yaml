@@ -1,5 +1,5 @@
 helmDefaults:
-  timeout: 120
+  timeout: 300
   createNamespace: false
   skipDeps: true
 
@@ -52,6 +52,38 @@ releases:
     - values/opensearch/common.yaml.gotmpl
     - values/opensearch/master.yaml.gotmpl
     - {{- toYaml $v.master | nindent 6 }}
+
+  - name: {{ $k }}-opensearch-data
+    namespace: {{ $k }}
+    labels:
+      app: {{ $k }}-opensearch-data
+      group: {{ $k }}-opensearch
+    chart: ./upstream/opensearch
+    version: 2.6.0
+    installed: {{ $.Values.opensearch.dataNode.dedicatedPods }}
+    wait: true
+    needs:
+    - {{ $k }}/{{ $k }}-opensearch-master
+    values:
+    - values/opensearch/common.yaml.gotmpl
+    - values/opensearch/data.yaml.gotmpl
+    - {{- toYaml $v.data | nindent 6 }}
+
+  - name: {{ $k }}-opensearch-client
+    namespace: {{ $k }}
+    labels:
+      app: {{ $k }}-opensearch-client
+      group: {{ $k }}-opensearch
+    chart: ./upstream/opensearch
+    version: 2.6.0
+    installed: {{ $.Values.opensearch.clientNode.dedicatedPods }}
+    wait: true
+    needs:
+    - {{ $k }}/{{ $k }}-opensearch-master
+    values:
+    - values/opensearch/common.yaml.gotmpl
+    - values/opensearch/client.yaml.gotmpl
+    - {{- toYaml $v.client | nindent 6 }}
 
   - name: {{ $k }}-opensearch-dashboards
     namespace: {{ $k }}
