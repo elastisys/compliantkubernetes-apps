@@ -15,6 +15,7 @@
 ### Updated
 
 - The NetworkPolicy Dashboard have been updated to be more clear
+- Upgraded the Starboard-operator helm chart to `0.10.11` which upgrades the app version to `0.15.11`
 
 ### Changed
 

@@ -9,6 +9,8 @@ operator:
 
   # configAuditScannerEnabled the flag to enable configuration audit scanner
   configAuditScannerEnabled: false
+  configAuditScannerBuiltIn: false
+  clusterComplianceEnabled: false
 
   # kubernetesBenchmarkEnabled the flag to enable CIS Kubernetes Benchmark scanner
   kubernetesBenchmarkEnabled: true
@@ -19,6 +21,7 @@ operator:
   vulnerabilityScannerReportTTL:  {{ .Values.starboard.vulnerabilityScanner.reportTTL }}
   # vulnerabilityScannerScanOnlyCurrentRevisions the flag to only create vulnerability scans on the current revision of a deployment.
   vulnerabilityScannerScanOnlyCurrentRevisions: {{ .Values.starboard.vulnerabilityScanner.scanOnlyCurrentRevisions }}
+  configAuditScannerScanOnlyCurrentRevisions: false
 
   # scanJobsConcurrentLimit the maximum number of scan jobs create by the operator
   scanJobsConcurrentLimit: {{ .Values.starboard.scanJobs.concurrentLimit }}
