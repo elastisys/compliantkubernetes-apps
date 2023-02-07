@@ -28,7 +28,7 @@ echo "=================================="
 # "monitoring/kube-prometheus-stack-kube-etcd/0 1"
 # "monitoring/kube-prometheus-stack-kube-proxy/0 1"
 scTargets=(
-    "serviceMonitor/opensearch-system/prometheus-elasticsearch-exporter/0 1"
+    "serviceMonitor/opensearch-system/prometheus-opensearch-exporter/0 1"
     "serviceMonitor/monitoring/prometheus-blackbox-exporter-user-api-server/0 1"
     "serviceMonitor/monitoring/prometheus-blackbox-exporter-dex/0 1"
     "serviceMonitor/monitoring/prometheus-blackbox-exporter-grafana/0 1"
