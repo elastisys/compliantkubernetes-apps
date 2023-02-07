@@ -41,6 +41,13 @@
    ./migration/v0.28.x-v0.29.x/remove_old_metrics_server.sh
    ```
 
+1. Upgrade starboard-operator CRDs
+
+    ```bash
+    ./bin/ck8s ops kubectl wc apply -f ./helmfile/upstream/starboard-operator/crds/
+    ./bin/ck8s ops kubectl sc apply -f ./helmfile/upstream/starboard-operator/crds/
+    ```
+
 1. Upgrade applications:
 
     ```bash
@@ -54,7 +61,7 @@
     ```bash
     ./bin/ck8s test sc|wc
     ./bin/ck8s ops kubectl sc|wc get pods -A -o custom-columns=NAMESPACE:metadata.namespace,POD:metadata.name,READY-false:status.containerStatuses[*].ready,REASON:status.containerStatuses[*].state.terminated.reason | grep false | grep -v Completed
-    kubectl get nodes
+    ./bin/ck8s ops kubectl sc|wc get nodes
     ```
 
 - [ ] Enable the notifications for the alerts;

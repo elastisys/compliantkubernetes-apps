@@ -52,7 +52,9 @@ spec:
             - name: OPERATOR_NAMESPACE
               value: {{ .Release.Namespace | quote }}
             - name: OPERATOR_TARGET_NAMESPACES
-              value: {{ tpl .Values.targetNamespaces . | quote }}
+              value: {{ .Values.targetNamespaces | quote }}
+            - name: OPERATOR_EXCLUDE_NAMESPACES
+              value: {{ tpl .Values.excludeNamespaces . | quote }}
             - name: OPERATOR_SERVICE_ACCOUNT
               value: {{ include "starboard-operator.serviceAccountName" . | quote }}
             - name: OPERATOR_LOG_DEV_MODE
@@ -81,6 +83,12 @@ spec:
               value: {{ .Values.operator.vulnerabilityScannerReportTTL | quote }}
             - name: OPERATOR_CONFIG_AUDIT_SCANNER_ENABLED
               value: {{ .Values.operator.configAuditScannerEnabled | quote }}
+            - name: OPERATOR_CONFIG_AUDIT_SCANNER_SCAN_ONLY_CURRENT_REVISIONS
+              value: {{ .Values.operator.configAuditScannerScanOnlyCurrentRevisions | quote }}
+            - name: OPERATOR_CONFIG_AUDIT_SCANNER_BUILTIN
+              value: {{ .Values.operator.configAuditScannerBuiltIn | quote }}
+            - name: OPERATOR_CLUSTER_COMPLIANCE_ENABLED
+              value: {{ .Values.operator.clusterComplianceEnabled | quote }}
             {{- if gt (int .Values.operator.replicas) 1 }}
             - name: OPERATOR_LEADER_ELECTION_ENABLED
               value: "true"
