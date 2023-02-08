@@ -23,3 +23,4 @@
 - Allow the creation of arbitrary network-policy in wc
 - Network polices
   - Added missing network policy for rook-ceph-csi-detect-version for rook-ceph v1.10
+- Upgraded the kured helm chart to `4.4.1` which upgrades the app version to `1.12.1`
