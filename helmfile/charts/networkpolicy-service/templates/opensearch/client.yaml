@@ -57,6 +57,16 @@ spec:
       ports:
         - port: 9300
     - to:
+        {{- range $ip := .Values.global.objectStorage.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        {{- range $port := .Values.global.objectStorage.ports }}
+        - protocol: TCP
+          port: {{ $port }}
+        {{- end }}
+    - to:
         {{- range $ip := .Values.opensearch.plugins.ips }}
         - ipBlock:
             cidr: {{ $ip }}
