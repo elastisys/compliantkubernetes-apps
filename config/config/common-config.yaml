@@ -573,7 +573,14 @@ starboard:
       memory: 172Mi
   tolerations: []
   affinity: {}
-
+trivy:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100M
+    limits:
+      cpu: 500m
+      memory: null
 vulnerabilityExporter:
   # Will be disabled if starboard is disabled
   resources:

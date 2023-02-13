@@ -48,3 +48,7 @@ tolerations:
 
 affinity:
 {{- toYaml .Values.starboard.affinity | nindent 2 }}
+
+trivy:
+  resources:
+{{- toYaml .Values.trivy.resources | nindent 4 }}
