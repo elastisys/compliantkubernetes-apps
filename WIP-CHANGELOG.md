@@ -11,6 +11,7 @@
 
 - The update-ips script can now fetch Calico Wireguard IPs
 - The test scripts can now always access the kubeconfig
+- The `clean-sc` script now patches any pending challenges which would prevent the removal of certain namespaces
 
 ### Updated
 

@@ -19,6 +19,23 @@ here="$(dirname "$(readlink -f "$0")")"
 # Clean up namespaces and any other resources left behind by the apps
 "${here}/.././bin/ck8s" ops kubectl sc delete ns dex opensearch-system harbor fluentd thanos ingress-nginx monitoring kured falco
 
+# Clean up any leftover challenges
+CHALLENGES=$(
+    "${here}/.././bin/ck8s" ops \
+      kubectl sc get challenge -A \
+      "-o=jsonpath='{range .items[*]}{.metadata.name}{\",\"}{.metadata.namespace}{\"\n\"}{end}'"
+	)
+if [ -n "$CHALLENGES" ]; then
+  for challenge in "${CHALLENGES[@]}"; do
+      IFS=, read -r name namespace <<< "$challenge"
+      "${here}/.././bin/ck8s" ops \
+          kubectl sc patch challenge \
+          "$name" -n "$namespace" \
+          "-p '{\"metadata\":{\"finalizers\":null}}'" \
+          --type=merge
+  done
+fi
+
 # Destroy cert-manager helm release
 "${here}/.././bin/ck8s" ops helmfile sc -l app=cert-manager destroy
 
