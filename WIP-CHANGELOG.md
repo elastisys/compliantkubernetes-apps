@@ -19,6 +19,8 @@
 
 - The NetworkPolicy Dashboard have been updated to be more clear
 - Upgraded the Starboard-operator helm chart to `0.10.11` which upgrades the app version to `0.15.11`
+- Upgrade Gatekeeper helm chart to `v3.11.0`, which also upgrades Gatekeeper to `v3.11.0`
+- Updated Gatekeeper Dashboard to new one from upstream
 
 ### Changed
 

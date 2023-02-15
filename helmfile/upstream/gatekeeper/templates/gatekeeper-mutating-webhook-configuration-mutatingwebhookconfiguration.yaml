@@ -2,6 +2,7 @@
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
+  annotations: {{- toYaml .Values.mutatingWebhookAnnotations | trim | nindent 4 }}
   labels:
     app: '{{ template "gatekeeper.name" . }}'
     chart: '{{ template "gatekeeper.name" . }}'
@@ -25,7 +26,25 @@ webhooks:
     matchExpressions:
     - key: admission.gatekeeper.sh/ignore
       operator: DoesNotExist
+    - key: kubernetes.io/metadata.name
+      operator: NotIn
+      values:
+      - {{ .Release.Namespace }}
+    
+    {{- range $key, $value := .Values.mutatingWebhookExemptNamespacesLabels}}
+    - key: {{ $key }}
+      operator: NotIn
+      values:
+      {{- range $value }}
+      - {{ . }}
+      {{- end }}
+    {{- end }}
+  objectSelector: {{ toYaml .Values.mutatingWebhookObjectSelector }}
+  reinvocationPolicy: {{ .Values.mutatingWebhookReinvocationPolicy }}
   rules:
+  {{- if .Values.mutatingWebhookCustomRules }}
+  {{- toYaml .Values.mutatingWebhookCustomRules | nindent 2 }}
+  {{- else }}
   - apiGroups:
     - '*'
     apiVersions:
@@ -35,6 +54,7 @@ webhooks:
     - UPDATE
     resources:
     - '*'
+  {{- end }}
   sideEffects: None
   timeoutSeconds: {{ .Values.mutatingWebhookTimeoutSeconds }}
 {{- end }}
