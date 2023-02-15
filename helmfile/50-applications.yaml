@@ -230,6 +230,7 @@ releases:
 
 # Calico default deny
 - name: calico-default-deny
+  namespace: kube-system
   labels:
     app: calico-default-deny
   chart: ./charts/calico-default-deny
@@ -455,20 +456,6 @@ releases:
   - values/opensearch/securityadmin.yaml.gotmpl
   - values/opensearch/configurer.yaml.gotmpl
 
-# prometheus-elasticsearch-exporter
-- name: prometheus-elasticsearch-exporter
-  namespace: opensearch-system
-  installed: false
-  labels:
-    app: prometheus-elasticsearch-exporter
-    group: opensearch
-  chart: ./upstream/prometheus-elasticsearch-exporter
-  version: 4.11.0
-  needs:
-  - opensearch-system/opensearch-configurer
-  values:
-  - values/prometheus-elasticsearch-exporter.yaml.gotmpl
-
 # prometheus-opensearch-exporter
 - name: prometheus-opensearch-exporter
   namespace: opensearch-system
@@ -582,24 +569,6 @@ releases:
   values:
   - values/s3-exporter.yaml.gotmpl
 
-# Fluentd
-- name: fluentd
-  namespace: fluentd
-  labels:
-    app: fluentd
-  chart: ./upstream/fluentd
-  version: 5.0.15
-  installed: false
-
-# configmap for fluentd (for both aggregator and forwarder)
-- name: fluentd-configmap
-  namespace: fluentd
-  labels:
-    app: fluentd-configmap
-  chart: ./charts/fluentd-configmap
-  version: 0.1.0
-  installed: false
-
 - name: fluentd-aggregator
   namespace: fluentd-system
   labels:
@@ -623,19 +592,6 @@ releases:
   values:
   - values/fluentd/forwarder-common.yaml.gotmpl
   - values/fluentd/forwarder-service-cluster.yaml.gotmpl
-
-# Logs backup retention
-- name: sc-logs-retention
-  namespace: fluentd
-  labels:
-    app: sc-logs-retention
-  chart: ./charts/sc-logs-retention
-  version: 0.1.0
-  installed: false
-  needs:
-  - fluentd/fluentd
-  values:
-  - values/sc-logs-retention.yaml.gotmpl
 
 # Logs backup retention
 - name: log-manager
@@ -706,18 +662,6 @@ releases:
   chart: ./upstream/fluentd-elasticsearch
   version: 13.3.0
   installed: {{ .Values.fluentd.enabled }}
-  values:
-  - values/fluentd/forwarder-common.yaml.gotmpl
-  - values/fluentd/forwarder-workload-cluster.yaml.gotmpl
-  - values/fluentd/forwarder-workload-cluster-system.yaml.gotmpl
-
-- name: fluentd-system
-  namespace: kube-system
-  labels:
-    app: fluentd
-  chart: ./upstream/fluentd-elasticsearch
-  version: 13.3.0
-  installed: false
   values:
   - values/fluentd/forwarder-common.yaml.gotmpl
   - values/fluentd/forwarder-workload-cluster.yaml.gotmpl

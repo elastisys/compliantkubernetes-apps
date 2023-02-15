@@ -15,7 +15,7 @@ fi
 here="$(dirname "$(readlink -f "$0")")"
 export old_version="${1}"
 export new_version="${2}"
-folder_name="${here}/${old_version}.x-${new_version}.x"
+folder_name="${here}/${new_version}"
 
 echo "You are about to create the migration documentation for versions"
 echo "  from: ${old_version}"
@@ -34,14 +34,17 @@ else
     echo "- ${folder_name} directory created"
 fi
 
-if [ -f "${folder_name}/upgrade-apps.md" ]; then
-    echo -n "- ${folder_name}/upgrade-apps.md exists. Do you want to replace it? (y/N): "
+if [ -f "${folder_name}/README.md" ]; then
+    echo -n "- ${folder_name}/README.md exists. Do you want to replace it? (y/N): "
     read -r reply
     if [[ ${reply} =~ ^[yY]$ ]]; then
-        envsubst < "${here}/template/upgrade-apps.md" > "${folder_name}/upgrade-apps.md"
-        echo "- ${folder_name}/upgrade-apps.md replaced"
+        envsubst < "${here}/template/README.md" > "${folder_name}/README.md"
+        echo "- ${folder_name}/README.md replaced"
     fi
 else
-    envsubst < "${here}/template/upgrade-apps.md" > "${folder_name}/upgrade-apps.md"
-    echo "- ${folder_name}/upgrade-apps.md created"
+    envsubst < "${here}/template/README.md" > "${folder_name}/README.md"
+    echo "- ${folder_name}/README.md created"
 fi
+
+cp -r "${here}/template/apply" "${folder_name}/"
+cp -r "${here}/template/prepare" "${folder_name}/"

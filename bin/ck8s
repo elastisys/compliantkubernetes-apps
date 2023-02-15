@@ -16,6 +16,8 @@ usage() {
     echo "  apply <wc|sc> [--sync] [--skip-template-validate] bootstrap and apps" 1>&2
     echo "  test <wc|sc>                                      test the applications" 1>&2
     echo "  dry-run <wc|sc> [--kubectl]                       runs helmfile diff" 1>&2
+    echo "  upgrade <version-matching-migration> prepare      runs all prepare steps upgrading the configuration" 1>&2
+    echo "  upgrade <version-matching-migration> apply        runs all apply steps upgrading the environment" 1>&2
     echo "  team add-pgp <fp>                                 add a new PGP key to secrets" 1>&2
     echo "  team remove-pgp <fp>                              remove a PGP key from secrets and rotate the data encryption key" 1>&2
     # TODO: We might want to make this command less visible once we have proper
@@ -75,6 +77,11 @@ case "${1}" in
     dry-run)
         [[ "${2}" =~ ^(wc|sc)$ ]] || usage
         "${here}/dry-run.bash" "${2}" "${KUBECTL}"
+        ;;
+    upgrade)
+        [[ "${2}" =~ ^(v[0-9]+\.[0-9]+)$ ]] || usage
+        [[ "${3}" =~ ^(prepare|apply)$ ]] || usage
+        "${here}/upgrade.bash" "${2}" "${3}"
         ;;
     team)
         case "${2}" in

@@ -367,6 +367,21 @@ CK8S_APPS_PATH= # fill this in
 source <($CK8S_APPS_PATH/bin/ck8s completion bash)
 ```
 
+### Upgrading compliantkubernetes-apps
+
+The [`bin/ck8s`](bin/ck8s) script also provides commands to upgrade an environment in two steps `prepare` and `apply`.
+The former runs scripted configuration steps that do not change the state of the environment, while the latter runs scripted upgrade steps that modifies the state of the environment.
+On unexpected failures the command will try to perform a rollback when possible to ensure that the environment continues to function.
+
+```bash
+./bin/ck8s upgrade vX.Y prepare
+./bin/ck8s upgrade vX.Y apply
+```
+
+It is possible to upgrade from one minor version to the next regardless of patch versions (`vX.Y -> vX.Y+1`), and from one patch version to any later patch versions (`vX.Y.Z -> vX.Y.Z+N`).
+Version validation will require that you are on a release tag matching version specified in the command, and that your environment is at most one minor version behind.
+When on a specific commit add the commit hash under `global.ck8sVersion` to pass validation, and for development set `any` to circumvent version validation completely.
+
 ### Removing compliantkubernetes-apps from your cluster
 There are two simple scripts that can be used to clean up you clusters.
 
