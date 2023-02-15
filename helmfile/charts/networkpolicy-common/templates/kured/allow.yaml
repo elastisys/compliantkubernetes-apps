@@ -12,7 +12,7 @@ spec:
     - Egress
   podSelector:
     matchLabels:
-      app: kured
+      app.kubernetes.io/name: kured
   ingress:
     - from: {{ toYaml .Values.global.prometheusSelector | nindent 8 }}
       ports:

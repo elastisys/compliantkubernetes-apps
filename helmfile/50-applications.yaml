@@ -31,7 +31,7 @@ releases:
   labels:
     app: kured
   chart: ./upstream/kured
-  version: 2.11.2
+  version: 4.4.1
   installed: {{ .Values.kured.enabled }}
   values:
   - values/kured.yaml.gotmpl
