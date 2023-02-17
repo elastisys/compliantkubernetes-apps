@@ -70,6 +70,12 @@
    ./migration/v0.28.x-v0.29.x/remove_old_metrics_server.sh
    ```
 
+1. Before upgrading, destroy `kured` in sc & wc
+    ```bash
+    ./bin/ck8s ops helmfile sc -l app=kured destroy
+    ./bin/ck8s ops helmfile wc -l app=kured destroy
+    ```
+
 1. Upgrade starboard-operator CRDs
 
     ```bash
