@@ -39,7 +39,7 @@ deployments=(
     "monitoring kube-prometheus-stack-grafana"
     "monitoring kube-prometheus-stack-kube-state-metrics"
     "monitoring prometheus-blackbox-exporter"
-    "opensearch-system prometheus-elasticsearch-exporter"
+    "opensearch-system prometheus-opensearch-exporter"
     "opensearch-system opensearch-dashboards"
 )
 if "${enable_harbor}"; then

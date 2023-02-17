@@ -25,6 +25,8 @@
 - Upgraded the Starboard-operator helm chart to `0.10.11` which upgrades the app version to `0.15.11`
 - Upgrade Gatekeeper helm chart to `v3.11.0`, which also upgrades Gatekeeper to `v3.11.0`
 - Updated Gatekeeper Dashboard to new one from upstream
+- Renamed the ElasticSearch Dashboard to Opensearch in Grafana
+- Changed release name for `prometheus-elasticsearch-exporter` to `prometheus-opensearch-exporter`
 
 ### Changed
 

@@ -35,3 +35,5 @@ tolerations: {{- toYaml .Values.opensearch.exporter.tolerations | nindent 2 }}
 
 podSecurityPolicies:
   enabled: true
+
+fullnameOverride: "prometheus-opensearch-exporter"

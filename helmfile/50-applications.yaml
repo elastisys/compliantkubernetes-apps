@@ -458,6 +458,7 @@ releases:
 # prometheus-elasticsearch-exporter
 - name: prometheus-elasticsearch-exporter
   namespace: opensearch-system
+  installed: false
   labels:
     app: prometheus-elasticsearch-exporter
     group: opensearch
@@ -467,6 +468,20 @@ releases:
   - opensearch-system/opensearch-configurer
   values:
   - values/prometheus-elasticsearch-exporter.yaml.gotmpl
+
+# prometheus-opensearch-exporter
+- name: prometheus-opensearch-exporter
+  namespace: opensearch-system
+  installed: true
+  labels:
+    app: prometheus-opensearch-exporter
+    group: opensearch
+  chart: ./upstream/prometheus-elasticsearch-exporter
+  version: 4.11.0
+  needs:
+  - opensearch-system/opensearch-configurer
+  values:
+  - values/prometheus-opensearch-exporter.yaml.gotmpl
 
 # Harbor
 - name: harbor-certs
