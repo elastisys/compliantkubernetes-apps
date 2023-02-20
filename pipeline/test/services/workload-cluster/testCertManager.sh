@@ -98,7 +98,7 @@ function check_wc_certmanager_apps_certificates() {
 
     if "${enable_hnc}"; then
         certificates+=(
-            "hnc-system hnc-webhook-server-cert"
+            "hnc-system hnc-controller-webhook-server-cert"
         )
     fi
 
