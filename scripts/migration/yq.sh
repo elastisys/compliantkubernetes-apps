@@ -8,6 +8,14 @@ yq_null() {
   test "$(yq4 "${2}" "${CK8S_CONFIG_PATH}/${1}-config.yaml")" = "null"
 }
 
+yq_check() {
+  if [[ "${#}" -lt 2 ]] || [[ ! "${1}" =~ ^(common|sc|wc)$ ]]; then
+    log_fatal "usage: yq_check <common|sc|wc> <target> <value>"
+  fi
+
+  test "$(yq4 "$2" "$CK8S_CONFIG_PATH/$1-config.yaml")" = "$3"
+}
+
 yq_copy() {
   if [[ "${#}" -lt 3 ]] || [[ ! "${1}" =~ ^(common|sc|wc)$ ]]; then
     log_fatal "usage: yq_copy <common|sc|wc> <source> <destination>"
@@ -28,6 +36,15 @@ yq_move() {
     log_info "  - move: ${2} to ${3}"
     yq4 -i "${3} = ${2} | del(${2})" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
   fi
+}
+
+yq_add() {
+  if [[ "${#}" -lt 3 ]] || [[ ! "${1}" =~ ^(common|sc|wc)$ ]]; then
+    log_fatal "usage: yq_add <common|sc|wc> <destination> <value>"
+  fi
+
+  log_info "  - add: ${3} to ${2}"
+  yq4 -i "$2 = $3" "$CK8S_CONFIG_PATH/$1-config.yaml"
 }
 
 yq_remove() {

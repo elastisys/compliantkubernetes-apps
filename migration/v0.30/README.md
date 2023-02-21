@@ -8,10 +8,10 @@ Notice to developers on writing migration steps:
 - Migration steps:
   - are written per minor version and placed in a subdirectory of the migration directory with the name `vX.Y/`,
   - are written to be idempotent and usable no matter which patch version you are upgrading from and to,
-  - are documented in this docuemnt to be able to run them manually,
+  - are documented in this document to be able to run them manually,
   - are divided into prepare and apply steps:
     - Prepare steps:
-      - are placed in the `prepare/` directoy,
+      - are placed in the `prepare/` directory,
       - may **only** modify the configuration of the environment,
       - may **not** modify the state of the environment,
       - steps are run in order of their names use two digit prefixes.
@@ -20,13 +20,13 @@ Notice to developers on writing migration steps:
       - may **only** modify the state of the environment,
       - may **not** modify the configuration of the environment,
       - are run in order of their names use two digit prefixes,
-      - are run with the argument `execute` on upgrade and should return 1 on failure and 2 on succesful internal rollback,
+      - are run with the argument `execute` on upgrade and should return 1 on failure and 2 on successful internal rollback,
       - are rerun with the argument `rollback` on execute failure and should return 1 on failure.
 
 For prepare the init step is given.
 For apply the bootstrap and the apply steps are given, it is expected that releases upgraded in custom steps are excluded from the apply step.
 
-Upgrades of components that are dependant on each other should be done within the same snippet to easily manage the upgrade to a working state and to be able to rollback to a working state.
+Upgrades of components that are dependent on each other should be done within the same snippet to easily manage the upgrade to a working state and to be able to rollback to a working state.
 
 Steps should use the `scripts/migration/lib.sh` which will provide helper functions, see the file for available helper functions.
 This script expects the `ROOT` environment variable to be set pointing to the root of the repository.
@@ -86,7 +86,6 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s upgrade prepare v0.30
     ```
 
-
 1. Apply upgrade - *disruptive*
 
     > *Done during maintenance window.*
@@ -134,6 +133,17 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
         http: 30080
         https: 30443
     ```
+1. Check if user-alertmanager is disabled and disable it in the overwrite `common-config`:
+
+   ```bash
+   ./migration/v0.30/prepare/20-user-alertmanager.sh
+   ```
+
+1. Migrate the prometheusConfigReloader resources requests and limits to the new format:
+
+   ```bash
+   ./migration/v0.30/prepare/30-prometheus-config-reloader.sh
+   ```
 
 ### Apply upgrade - *disruptive*
 
@@ -145,6 +155,18 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s bootstrap {sc|wc}
     # or
     ./migration/v0.30/apply/10-bootstrap.sh
+    ```
+
+1. Apply the new kube-prometheus-stack CRDs:
+
+    ```bash
+    ./migration/v0.30/apply/11-prometheus-operator-crds.sh
+    ```
+
+1. Remove node-exporter and kube-state-metrics:
+
+    ```bash
+    ./migration/v0.30/apply/20-remove-kube-prometheus-components.sh
     ```
 
 1. Upgrade applications:
