@@ -76,7 +76,7 @@ opa:
   ## "enforcement" can assume either "dryrun" or "deny".
   imageRegistry:
     enabled: true
-    enforcement: deny
+    enforcement: warn
     URL:
       - set-me
       - harbor.example.com
@@ -88,7 +88,7 @@ opa:
   ## by at least one network policy.
   networkPolicies:
     enabled: true
-    enforcement: deny
+    enforcement: warn
 
   ## Enable rule that requires pods to have resource requests.
   resourceRequests:
@@ -98,7 +98,7 @@ opa:
   ## It will not allow any image with the latest tag
   disallowedTags:
     enabled: true
-    enforcement: dryrun
+    enforcement: deny
     tags:
      - latest
 
