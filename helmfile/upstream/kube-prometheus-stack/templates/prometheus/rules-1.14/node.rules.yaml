@@ -1,5 +1,5 @@
 {{- /*
-Generated from 'node.rules' group from https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubernetes-prometheusRule.yaml
+Generated from 'node.rules' group from https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/kubernetesControlPlane-prometheusRule.yaml
 Do not change in-place! In order to change this file first read following link:
 https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack/hack
 */ -}}
@@ -25,17 +25,17 @@ spec:
   - name: node.rules
     rules:
     - expr: |-
-        topk by(namespace, pod) (1,
-          max by (node, namespace, pod) (
+        topk by(cluster, namespace, pod) (1,
+          max by (cluster, node, namespace, pod) (
             label_replace(kube_pod_info{job="kube-state-metrics",node!=""}, "pod", "$1", "pod", "(.*)")
         ))
       record: 'node_namespace_pod:kube_pod_info:'
     - expr: |-
-        count by (cluster, node) (sum by (node, cpu) (
-          node_cpu_seconds_total{job="node-exporter"}
-        * on (namespace, pod) group_left(node)
+        count by (cluster, node) (
+          node_cpu_seconds_total{mode="idle",job="node-exporter"}
+          * on (namespace, pod) group_left(node)
           topk by(namespace, pod) (1, node_namespace_pod:kube_pod_info:)
-        ))
+        )
       record: node:node_num_cpu:sum
     - expr: |-
         sum(
@@ -48,4 +48,16 @@ spec:
           )
         ) by (cluster)
       record: :node_memory_MemAvailable_bytes:sum
+    - expr: |-
+        avg by (cluster, node) (
+          sum without (mode) (
+            rate(node_cpu_seconds_total{mode!="idle",mode!="iowait",mode!="steal",job="node-exporter"}[5m])
+          )
+        )
+      record: node:node_cpu_utilization:ratio_rate5m
+    - expr: |-
+        avg by (cluster) (
+          node:node_cpu_utilization:ratio_rate5m
+        )
+      record: cluster:node_cpu:ratio_rate5m
 {{- end }}

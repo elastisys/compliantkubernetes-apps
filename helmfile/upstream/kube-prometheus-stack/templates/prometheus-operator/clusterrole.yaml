@@ -11,9 +11,11 @@ rules:
   - monitoring.coreos.com
   resources:
   - alertmanagers
+  - alertmanagers/status
   - alertmanagers/finalizers
   - alertmanagerconfigs
   - prometheuses
+  - prometheuses/status
   - prometheuses/finalizers
   - thanosrulers
   - thanosrulers/finalizers
