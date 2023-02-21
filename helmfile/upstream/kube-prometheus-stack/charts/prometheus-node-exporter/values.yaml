@@ -3,24 +3,39 @@
 # Declare variables to be passed into your templates.
 image:
   repository: quay.io/prometheus/node-exporter
-  tag: v1.2.2
+  # Overrides the image tag whose default is {{ printf "v%s" .Chart.AppVersion }}
+  tag: ""
   pullPolicy: IfNotPresent
+  sha: ""
+
+imagePullSecrets: []
+# - name: "image-pull-secret"
 
 service:
   type: ClusterIP
   port: 9100
   targetPort: 9100
   nodePort:
+  portName: metrics
   listenOnAllInterfaces: true
   annotations:
     prometheus.io/scrape: "true"
+
+# Additional environment variables that will be passed to the daemonset
+env: {}
+##  env:
+##    VARIABLE: value
 
 prometheus:
   monitor:
     enabled: false
     additionalLabels: {}
     namespace: ""
+
+    jobLabel: ""
+
     scheme: http
+    basicAuth: {}
     bearerTokenFile:
     tlsConfig: {}
 
@@ -28,8 +43,36 @@ prometheus:
     ##
     proxyUrl: ""
 
+    ## Override serviceMonitor selector
+    ##
+    selectorOverride: {}
+
     relabelings: []
+    metricRelabelings: []
+    interval: ""
     scrapeTimeout: 10s
+    ## prometheus.monitor.apiVersion ApiVersion for the serviceMonitor Resource(defaults to "monitoring.coreos.com/v1")
+    apiVersion: ""
+
+    ## SampleLimit defines per-scrape limit on number of scraped samples that will be accepted.
+    ##
+    sampleLimit: 0
+
+    ## TargetLimit defines a limit on the number of scraped targets that will be accepted.
+    ##
+    targetLimit: 0
+
+    ## Per-scrape limit on number of labels that will be accepted for a sample. Only valid in Prometheus versions 2.27.0 and newer.
+    ##
+    labelLimit: 0
+
+    ## Per-scrape limit on length of labels name that will be accepted for a sample. Only valid in Prometheus versions 2.27.0 and newer.
+    ##
+    labelNameLengthLimit: 0
+
+    ## Per-scrape limit on length of labels value that will be accepted for a sample. Only valid in Prometheus versions 2.27.0 and newer.
+    ##
+    labelValueLengthLimit: 0
 
 ## Customize the updateStrategy if set
 updateStrategy:
@@ -57,6 +100,7 @@ serviceAccount:
   name:
   annotations: {}
   imagePullSecrets: []
+  automountServiceAccountToken: false
 
 securityContext:
   fsGroup: 65534
@@ -88,9 +132,15 @@ hostNetwork: true
 # Share the host process ID namespace
 hostPID: true
 
-## If true, node-exporter pods mounts host / at /host/root
-##
-hostRootFsMount: true
+# Mount the node's root file system (/) at /host/root in the container
+hostRootFsMount:
+  enabled: true
+  # Defines how new mounts in existing mounts on the node or in the container
+  # are propagated to the container or node, respectively. Possible values are
+  # None, HostToContainer, and Bidirectional. If this field is omitted, then
+  # None is used. More information on:
+  # https://kubernetes.io/docs/concepts/storage/volumes/#mount-propagation
+  mountPropagation: HostToContainer
 
 ## Assign a group of affinity scheduling rules
 ##
@@ -111,6 +161,12 @@ podAnnotations:
 
 # Extra labels to be added to node exporter pods
 podLabels: {}
+
+# Annotations to be added to node exporter daemonset
+daemonsetAnnotations: {}
+
+## set to true to add the release label so scraping of the servicemonitor with kube-prometheus-stack works out of the box
+releaseLabel: false
 
 # Custom DNS configuration to be added to prometheus-node-exporter pods
 dnsConfig: {}
@@ -143,7 +199,7 @@ extraArgs: []
 #   - --collector.diskstats.ignored-devices=^(ram|loop|fd|(h|s|v)d[a-z]|nvme\\d+n\\d+p)\\d+$
 #   - --collector.textfile.directory=/run/prometheus
 
-## Additional mounts from the host
+## Additional mounts from the host to node-exporter container
 ##
 extraHostVolumeMounts: []
 #  - name: <mountName>
@@ -177,6 +233,59 @@ sidecarVolumeMount: []
 ##    mountPath: /run/prometheus
 ##    readOnly: false
 
+## Additional mounts from the host to sidecar containers
+##
+sidecarHostVolumeMounts: []
+#  - name: <mountName>
+#    hostPath: <hostPath>
+#    mountPath: <mountPath>
+#    readOnly: true|false
+#    mountPropagation: None|HostToContainer|Bidirectional
+
 ## Additional InitContainers to initialize the pod
 ##
 extraInitContainers: []
+
+## Liveness probe
+##
+livenessProbe:
+  failureThreshold: 3
+  httpGet:
+    httpHeaders: []
+    scheme: http
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 1
+
+## Readiness probe
+##
+readinessProbe:
+  failureThreshold: 3
+  httpGet:
+    httpHeaders: []
+    scheme: http
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 1
+
+# Enable vertical pod autoscaler support for prometheus-node-exporter
+verticalPodAutoscaler:
+  enabled: false
+  # List of resources that the vertical pod autoscaler can control. Defaults to cpu and memory
+  controlledResources: []
+
+  # Define the max allowed resources for the pod
+  maxAllowed: {}
+  # cpu: 200m
+  # memory: 100Mi
+  # Define the min allowed resources for the pod
+  minAllowed: {}
+  # cpu: 200m
+  # memory: 100Mi
+
+  # updatePolicy:
+    # Specifies whether recommended updates are applied when a Pod is started and whether recommended updates
+    # are applied during the life of a Pod. Possible values are "Off", "Initial", "Recreate", and "Auto".
+    # updateMode: Auto
