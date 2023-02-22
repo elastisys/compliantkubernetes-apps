@@ -14,6 +14,20 @@ spec:
   ingress:
     - from:
         - namespaceSelector:
+            matchExpressions:
+            - key: hnc.x-k8s.io/included-namespace
+              operator: In
+              values:
+                - "true"
+            - key: kubernetes.io/metadata.name
+              operator: NotIn
+              values:
+                - default
+      ports:
+        - port: 9093
+          protocol: TCP
+    - from:
+        - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: monitoring
           podSelector:

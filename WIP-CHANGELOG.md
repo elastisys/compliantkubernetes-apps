@@ -43,6 +43,7 @@
 - Fluentd in both SC and WC now use the `fluentd-elasticsearch` chart for forwarding, and the `fluentd` chart for aggregating
   - This have changed the deployment for Fluentd considerably and users must ensure that their custom filter continues to work as expected
 - Retention for logs stored directly in object store have been reworked
+- Updated alertmanager network policy to allow ingress traffic from user pods.
 
 ### Removed
 
