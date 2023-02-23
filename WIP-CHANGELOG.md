@@ -44,6 +44,10 @@
   - This have changed the deployment for Fluentd considerably and users must ensure that their custom filter continues to work as expected
 - Retention for logs stored directly in object store have been reworked
 - Updated alertmanager network policy to allow ingress traffic from user pods.
+- Gatekeeper default enforcements have been changed for certain policies
+  - Disallow latest tag default is now `deny`, was `dryrun`
+  - Require trusted image registry default is now `warn`, was `deny`
+  - Require network policies default is now `warn`, was `deny`
 
 ### Removed
 

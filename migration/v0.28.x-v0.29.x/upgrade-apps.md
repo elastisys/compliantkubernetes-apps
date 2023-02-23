@@ -47,6 +47,19 @@
     ./scripts/S3/entry.sh --s3cfg "$CK8S_CONFIG_PATH/.state/s3cfg.ini" create
     ```
 
+1. **Warning** The default Gatekeeper enforcements have been updated:
+
+    - Disallow latest tag `disallowedTags.enforcement` default is now `deny` - was `dryrun`
+    - Require trusted image registry `imageRegistry.enforcement` default is now `warn` - was `deny`
+    - Require network policies `networkPolicies.enforcement` default is now `warn` - was `deny`
+    - Require resource requests `resourceRequests.enforcement` default is unchanged as `deny`
+
+    As changing these enforcements can be disruptive, especially when going from `dryrun` to `deny`, here are some recommendations:
+
+    - If the new default is `deny` and the environment does not already have `deny` on that specific policy, then override with `warn` and inform the user that they should work toward being able to have `deny` in the future.
+    - If the new default is `warn` and the environment has `deny`, then leave it at `deny` (possibly requiring an override config).
+    - If the new default is `warn` and the environment has `dryrun`, then use `warn` (possibly requiring removal of override config) and inform the user that they will start seeing warnings from that policy.
+
 ## Upgrade steps
 
 1. Run bootstrap to create `fluentd-system` namespaces:
