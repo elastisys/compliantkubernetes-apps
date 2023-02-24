@@ -157,7 +157,7 @@ releases:
     group: starboard
   chart: ./charts/starboard/starboard-operator-psp-rbac
   version: 0.1.0
-  installed: {{ .Values.starboard.enabled }}
+  installed: false
 
 # starboard-operator
 - name: starboard-operator

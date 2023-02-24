@@ -113,7 +113,7 @@ customRules:
 falcosidekick:
   enabled: {{ .Values.falco.alerts.enabled }}
   podSecurityPolicy:
-    create: true
+    create: false
   config:
     debug: false
     {{ if eq .Values.falco.alerts.type "slack" }}
