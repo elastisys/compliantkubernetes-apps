@@ -107,6 +107,9 @@ controller:
     {{ else }}
     enabled: false
     {{ end }}
+    {{ if eq .Values.ingressNginx.controller.service.type "NodePort" }}
+    nodePorts: {{- toYaml .Values.ingressNginx.controller.service.nodePorts | nindent 6 }}
+    {{ end }}
 
   metrics:
     enabled: true

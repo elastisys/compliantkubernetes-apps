@@ -394,6 +394,11 @@ ingressNginx:
       ## ref: https://github.com/kubernetes/cloud-provider-openstack/blob/master/docs/openstack-cloud-controller-manager/expose-applications-using-loadbalancer-type-service.md#restrict-access-for-loadbalancer-service
       loadBalancerSourceRanges: []
 
+      ## type: NodePort
+      nodePorts:
+        http: "30080"
+        https: "30443"
+
     ## Additional configuration options for Nginx
     ## ref: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
     additionalConfig: {}
