@@ -33,6 +33,7 @@
 - Changed release name for `prometheus-elasticsearch-exporter` to `prometheus-opensearch-exporter`
 - Upgraded the cert-manager helm chart to `v1.11.0` which upgrades the app version to `v1.11.0`
 - Update deploy-wc.sh to create `extra-workload-admins` rolebinding on all user namespaces.
+- Update harbor backup job api version
 
 ### Changed
 
