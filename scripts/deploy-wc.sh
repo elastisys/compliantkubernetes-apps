@@ -40,6 +40,17 @@ else
   kubectl create -f "${SCRIPTS_PATH}/../manifests/user-rbac/clusterrolebindings/extra-user-view.yaml"
 fi
 
+user_namespaces=$(yq4 '.user.namespaces[]' "${config['config_file_wc']}")
+
+for namespace in ${user_namespaces}; do
+    if [ "$(kubectl get rolebinding -n "${namespace}" extra-workload-admins)" ] ; then
+        echo "extra-workload-admins RoleBinding already exists in ${namespace} namespace. Ignoring."
+    else
+        echo "Creating extra-workload-admins RoleBinding in ${namespace} namespace"
+        kubectl create rolebinding extra-workload-admins -n "${namespace}" --clusterrole=admin
+    fi
+done
+
 echo "Installing helm charts" >&2
 cd "${SCRIPTS_PATH}/../helmfile"
 declare -a helmfile_opt_flags
