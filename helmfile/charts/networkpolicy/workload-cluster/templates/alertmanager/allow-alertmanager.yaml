@@ -7,7 +7,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app: alertmanager
+      app.kubernetes.io/name: alertmanager
   policyTypes:
     - Ingress
     - Egress
@@ -32,7 +32,7 @@ spec:
               kubernetes.io/metadata.name: monitoring
           podSelector:
             matchLabels:
-              app: prometheus
+              app.kubernetes.io/name: prometheus
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: falco
@@ -45,7 +45,7 @@ spec:
     - from:
         - podSelector:
             matchLabels:
-              app: alertmanager
+              app.kubernetes.io/name: alertmanager
     {{- if .Values.global.wcApiserver.ips }}
     - from:
         {{- range $ip := .Values.global.wcApiserver.ips }}
@@ -60,7 +60,7 @@ spec:
     - to:
         - podSelector:
             matchLabels:
-              app: alertmanager
+              app.kubernetes.io/name: alertmanager
     {{- if and .Values.alertmanager.alertReceivers.ips .Values.alertmanager.alertReceivers.ports }}
     - to:
         {{- range $ip := .Values.alertmanager.alertReceivers.ips }}

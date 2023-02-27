@@ -29,7 +29,7 @@ spec:
       {{- end }}
         - podSelector:
             matchLabels:
-              app: prometheus
+              app.kubernetes.io/name: prometheus
       ports:
         - port: 3000
           protocol: TCP
@@ -37,7 +37,7 @@ spec:
     - to:
         - podSelector:
             matchLabels:
-              app: prometheus
+              app.kubernetes.io/name: prometheus
         - podSelector:
             matchLabels:
               app: grafana-label-enforcer

@@ -95,7 +95,7 @@ ruler:
   topologySpreadConstraints: {{- toYaml .Values.thanos.ruler.topologySpreadConstraints | nindent 4 }}
 
   alertmanagers:
-    - dnssrv+http://_web._tcp.alertmanager-operated.monitoring.svc.cluster.local
+    - dnssrv+http://_http-web._tcp.alertmanager-operated.monitoring.svc.cluster.local
 
   queries:
     - dnssrv+_http._tcp.thanos-query-query-headless.thanos.svc

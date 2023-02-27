@@ -19,11 +19,10 @@ kubeScheduler:
   enabled: false
 
 prometheusOperator:
-  createCustomResource: false
   resources: {{- toYaml .Values.prometheusOperator.resources | nindent 4 }}
 
-  configReloaderCpu: {{ .Values.prometheusOperator.configReloaderCpu }}
-  configReloaderMemory: {{ .Values.prometheusOperator.configReloaderMemory }}
+  prometheusConfigReloader:
+    resources: {{- toYaml .Values.prometheusOperator.prometheusConfigReloader.resources | nindent 6 }}
 
 kube-state-metrics:
   podSecurityPolicy:
@@ -32,6 +31,15 @@ kube-state-metrics:
 
 prometheus-node-exporter:
   resources: {{- toYaml .Values.prometheusNodeExporter.resources | nindent 4 }}
+  rbac:
+    pspEnabled: true
+  prometheus:
+    monitor:
+      relabelings:
+        - action: replace
+          sourceLabels:
+          - __meta_kubernetes_pod_node_name
+          targetLabel: instance
 
 kubeApiServer:
   serviceMonitor:
@@ -98,7 +106,7 @@ prometheus:
     alertingEndpoints:
       - name: alertmanager-operated
         namespace: alertmanager
-        port: web
+        port: http-web
         pathPrefix: /
     {{ end }}
 
@@ -147,7 +155,7 @@ prometheus:
       relabel_configs:
         - source_labels: [__meta_kubernetes_endpoint_port_name]
           action: keep
-          regex: web # keep only the web port (9093 by default) and drop the remaining (for example 9094)
+          regex: http-web # keep only the web port (9093 by default) and drop the remaining (for example 9094)
         - source_labels: [__meta_kubernetes_endpoints_name]
           action: replace
           target_label: job # needed to make Prometheus realize that it is the alertmanager
@@ -173,11 +181,3 @@ prometheus:
     {{- with .Values.prometheus.additionalScrapeConfigs }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-
-nodeExporter:
-  serviceMonitor:
-    relabelings:
-      - action: replace
-        sourceLabels:
-        - __meta_kubernetes_pod_node_name
-        targetLabel: instance

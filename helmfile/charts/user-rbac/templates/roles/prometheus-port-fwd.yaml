@@ -9,7 +9,7 @@ rules:
 - apiGroups:
   - ""
   resourceNames:
-  - kube-prometheus-stack-prometheus:web
+  - kube-prometheus-stack-prometheus:9090
   resources:
   - services/proxy
   verbs:

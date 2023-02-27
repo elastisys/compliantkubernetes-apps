@@ -17,10 +17,10 @@ route:
   receiver: 'null'
   # Specify other receivers depending on match
   routes:
-  - match:
-      # The watchdog alert is always active, send it to null.
-      alertname: Watchdog
-    receiver: 'null'
+    - receiver: 'null'
+      matchers:
+        # The watchdog alert is always active, send it to null.
+        - alertname = Watchdog
 receivers:
 - name: 'null'
 #- name: slack

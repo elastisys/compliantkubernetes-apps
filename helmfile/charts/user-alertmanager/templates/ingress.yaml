@@ -21,7 +21,7 @@ spec:
       - backend:
           # This service is created automatically by the operator
           serviceName: alertmanager-operated
-          servicePort: web
+          servicePort: http-web
         path: /
   tls:
   - hosts:

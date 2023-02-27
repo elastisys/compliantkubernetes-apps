@@ -1,8 +1,7 @@
 adminPassword: {{ .Values.user.grafanaPassword }}
 
 image:
-  repository: grafana/grafana
-  tag: 9.2.4
+  tag: 9.3.8
 
 testFramework:
   enabled: false
@@ -45,9 +44,6 @@ sidecar:
     # This will pick up the prometheus-operator dashboards
     label: grafana_dashboard
     labelValue: "1"
-  datasources:
-    enabled: false
-    defaultDatasourceEnabled: false
   resources: {{- toYaml .Values.prometheus.grafana.sidecar.resources | nindent 6 }}
 
 datasources:

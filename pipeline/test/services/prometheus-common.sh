@@ -8,7 +8,7 @@ function getData() {
     # Simplify the data by filtering out parts we do not need
     echo "${jsonData}" |
         jq '.data.activeTargets[] |
-            {job: .discoveredLabels.job , health: .health, instance: .labels.instance}'
+            {job: .scrapePool , health: .health, instance: .labels.instance}'
 }
 
 # Get the current count of healthy instances.

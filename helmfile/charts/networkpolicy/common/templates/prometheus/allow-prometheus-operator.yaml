@@ -15,7 +15,7 @@ spec:
     - from:
         - podSelector:
             matchLabels:
-              app: prometheus
+              app.kubernetes.io/name: prometheus
       ports:
         - port: 10250
     {{- if .Values.global.apiserver.ips }}
