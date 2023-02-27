@@ -87,7 +87,7 @@ objectStorage:
 user:
   ## User controlled alertmanager configuration.
   alertmanager:
-    enabled: false
+    enabled: true
 
     ## Todo remove dependencies on alertmanager from service cluster
     ## Create basic-auth protected ingress to alertmanager
@@ -247,10 +247,14 @@ prometheusOperator:
       cpu: 100m
       memory: 200Mi
 
-  ## Set the prometheus/alertmanager config reloader sidecar CPU request and limit
-  configReloaderCpu: 50m
-  ## Set the prometheus/alertmanager config reloader sidecar memory request and limit
-  configReloaderMemory: 50Mi
+  prometheusConfigReloader:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 50Mi
+      limits:
+        cpu: 50m
+        memory: 50Mi
 
 prometheusNodeExporter:
   resources:

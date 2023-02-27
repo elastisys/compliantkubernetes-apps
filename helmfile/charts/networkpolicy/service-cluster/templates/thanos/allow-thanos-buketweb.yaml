@@ -18,7 +18,7 @@ spec:
               kubernetes.io/metadata.name: monitoring
           podSelector:
             matchLabels:
-              app: prometheus
+              app.kubernetes.io/name: prometheus
       ports:
         - port: 8080
           protocol: TCP

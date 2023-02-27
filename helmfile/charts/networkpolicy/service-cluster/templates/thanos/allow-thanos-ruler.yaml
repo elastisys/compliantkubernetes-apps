@@ -25,7 +25,7 @@ spec:
               kubernetes.io/metadata.name: monitoring
           podSelector:
             matchLabels:
-              app: prometheus
+              app.kubernetes.io/name: prometheus
       ports:
         - port: 10902
           protocol: TCP
@@ -43,7 +43,7 @@ spec:
               kubernetes.io/metadata.name: monitoring
           podSelector:
             matchLabels:
-              app: alertmanager
+              app.kubernetes.io/name: alertmanager
       ports:
         - port: 9093
           protocol: TCP

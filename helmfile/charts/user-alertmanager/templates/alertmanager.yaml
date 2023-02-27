@@ -12,3 +12,4 @@ spec:
     runAsNonRoot: true
     runAsUser: 1000
   resources: {{- toYaml .Values.resources | nindent 4 }}
+  portName: http-web

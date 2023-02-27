@@ -26,52 +26,35 @@ kubeEtcd:
 alertmanager:
   config:
     # See https://prometheus.io/docs/alerting/configuration/
+    inhibit_rules: []
     route:
       group_by: {{ toYaml .Values.prometheus.alertmanagerSpec.groupBy | nindent 8 }}
       # default receiver
       receiver: '{{ .Values.alerts.alertTo }}'
       routes:
-      - match:
-          # The watchdog alert is always active to show that things are working
-          alertname: Watchdog
-        # Repeat often to integreate with opsgenies heartbeat feture.
-        # If this goes silent, opsgenie will send out alerts.
-        repeat_interval: 1m
-        group_interval: 1m
         {{ if .Values.alerts.opsGenieHeartbeat.enabled }}
-        receiver: heartbeat
+        - receiver: heartbeat
         {{ else }}
-        receiver: 'null'
+        - receiver: 'null'
         {{ end }}
-      {{ if not .Values.user.alertmanager.enabled }}
-      {{- range .Values.global.clustersMonitoring }}
-      - match:
-          # TODO: it would be nice to do this some other way.
-          # The workload_cluster does not have an alertmanager, send to null.
-          alertname: AlertmanagerDown
-          cluster: {{ . }}
-        receiver: 'null'
-      - match:
-          # TODO: it would be nice to do this some other way.
-          # The workload_cluster does not have an alertmanager, send to null.
-          alertname: PrometheusNotConnectedToAlertmanagers
-          cluster: {{ . }}
-        receiver: 'null'
+          # Repeat often to integreate with opsgenies heartbeat feture.
+          # If this goes silent, opsgenie will send out alerts.
+          repeat_interval: 1m
+          group_interval: 1m
+          matchers:
+            # The watchdog alert is always active to show that things are working
+            - alertname = Watchdog
+        {{ if not .Values.user.alertmanager.enabled }}
+        {{- range .Values.global.clustersMonitoring }}
+        - receiver: 'null'
+          matchers:
+            - alertname =~ "AlertmanagerDown|PrometheusNotConnectedToAlertmanagers"
+            - cluster = {{ . }}
         {{- end }}
-      {{ end }}
-      - match:
-          # This alert is a bit over sensitive at the moment
-          # See this: https://github.com/kubernetes-monitoring/kubernetes-mixin/issues/108
-          alertname: CPUThrottlingHigh
-        receiver: 'null'
-      - match:
-          # This alert is a bit over sensitive at the moment (always active for a cluster with one worker node), send to null.
-          alertname: KubeCPUOvercommit
-        receiver: 'null'
-      - match:
-          # This alert is a bit over sensitive at the moment (always active for a cluster with one worker node), send to null.
-          alertname: KubeMemOvercommit
-        receiver: 'null'
+        {{ end }}
+        - receiver: 'null'
+          matchers:
+            - alertname =~ "CPUThrottlingHigh|KubeCPUOvercommit|KubeMemOvercommit"
     receivers:
     - name: 'null'
     - name: heartbeat
@@ -126,9 +109,6 @@ alertmanager:
       {{ end }}
 
   alertmanagerSpec:
-    ## Time duration Alertmanager shall retain data for. Default is '120h', and must match the regular expression
-    ## [0-9]+(ms|s|m|h) (milliseconds seconds minutes hours).
-    ##
     replicas: {{ .Values.prometheus.alertmanagerSpec.replicas }}
     retention: {{ .Values.prometheus.retention.alertmanager }}
     resources: {{- toYaml .Values.prometheus.alertmanagerSpec.resources | nindent 6 }}
@@ -142,7 +122,7 @@ kubeScheduler:
 
 grafana:
   image:
-    tag: 9.2.4
+    tag: 9.3.8
 
   testFramework:
     enabled: false
@@ -193,13 +173,11 @@ grafana:
 
   sidecar:
     dashboards:
-      enabled: true
-      label: grafana_dashboard
+      labelValue: "" # should be set to "" to load all dashboards, regardless of the label value
       multicluster:
         global:
           enabled: true
     datasources:
-      enabled: true
       defaultDatasourceEnabled: false
     resources: {{- toYaml .Values.prometheus.grafana.sidecar.resources | nindent 6 }}
 
@@ -277,17 +255,16 @@ grafana:
       reporting_enabled: false
       check_for_updates: false
 
-  resources: {{- toYaml .Values.prometheus.grafana.resources | nindent 4  }}
-  tolerations: {{- toYaml .Values.prometheus.grafana.tolerations | nindent 4  }}
-  affinity: {{- toYaml .Values.prometheus.grafana.affinity | nindent 4  }}
-  nodeSelector: {{- toYaml .Values.prometheus.grafana.nodeSelector | nindent 4  }}
+  resources: {{- toYaml .Values.prometheus.grafana.resources | nindent 4 }}
+  tolerations: {{- toYaml .Values.prometheus.grafana.tolerations | nindent 4 }}
+  affinity: {{- toYaml .Values.prometheus.grafana.affinity | nindent 4 }}
+  nodeSelector: {{- toYaml .Values.prometheus.grafana.nodeSelector | nindent 4 }}
 
 prometheusOperator:
-  createCustomResource: false
-  resources: {{- toYaml .Values.prometheusOperator.resources | nindent 4  }}
+  resources: {{- toYaml .Values.prometheusOperator.resources | nindent 4 }}
 
-  configReloaderCpu: {{ .Values.prometheusOperator.configReloaderCpu }}
-  configReloaderMemory: {{ .Values.prometheusOperator.configReloaderMemory }}
+  prometheusConfigReloader:
+    resources: {{- toYaml .Values.prometheusOperator.prometheusConfigReloader.resources | nindent 6 }}
 
 prometheus:
   prometheusSpec:
@@ -350,26 +327,14 @@ prometheus:
               storage: {{ .Values.prometheus.storage.size }}
     {{- end }}
 
-kubelet:
-  enabled: true
-  namespace: kube-system
-
-  serviceMonitor:
-    cAdvisorRelabelings:
-    - sourceLabels: [__metrics_path__]
-      targetLabel: metrics_path
-
-    relabelings:
-    - sourceLabels: [__metrics_path__]
-      targetLabel: metrics_path
-
 prometheus-node-exporter:
   resources: {{- toYaml .Values.prometheusNodeExporter.resources | nindent 4 }}
-
-nodeExporter:
-  serviceMonitor:
-    relabelings:
-      - action: replace
-        sourceLabels:
-        - __meta_kubernetes_pod_node_name
-        targetLabel: instance
+  rbac:
+    pspEnabled: true
+  prometheus:
+    monitor:
+      relabelings:
+        - action: replace
+          sourceLabels:
+          - __meta_kubernetes_pod_node_name
+          targetLabel: instance

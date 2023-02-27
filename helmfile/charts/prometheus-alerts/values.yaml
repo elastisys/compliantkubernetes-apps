@@ -46,7 +46,8 @@ defaultRules:
     kubernetesStorage: true
     kubernetesSystem: true
     network: true
-    node: true
+    nodeExporterAlerting: true
+    nodeExporterRecording: true
     prometheus: true
     prometheusOperator: true
     opensearch: true
@@ -58,7 +59,8 @@ defaultRules:
     dailyChecks: false
     fluentd: true
     missingMetrics: true
-    kubeScheduler: true
+    kubeSchedulerAlerting: true
+    kubeSchedulerRecording: true
     kubeProxy: true
     kubeControllerManager: true
     configReloaders: true

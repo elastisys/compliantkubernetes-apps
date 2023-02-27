@@ -25,7 +25,7 @@ wcTargets=(
     "serviceMonitor/monitoring/kube-prometheus-stack-kube-state-metrics/0 1"
     "serviceMonitor/monitoring/kube-prometheus-stack-kubelet/0 ${totalNodes}"
     "serviceMonitor/monitoring/kube-prometheus-stack-kubelet/1 ${totalNodes}"
-    "serviceMonitor/monitoring/kube-prometheus-stack-node-exporter/0 ${totalNodes}"
+    "serviceMonitor/monitoring/kube-prometheus-stack-prometheus-node-exporter/0 ${totalNodes}"
     "serviceMonitor/monitoring/kube-prometheus-stack-operator/0 1"
     "serviceMonitor/monitoring/kube-prometheus-stack-prometheus/0 1"
 )

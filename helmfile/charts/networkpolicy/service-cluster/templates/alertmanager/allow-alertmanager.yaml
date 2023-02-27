@@ -7,7 +7,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app: alertmanager
+      app.kubernetes.io/name: alertmanager
   policyTypes:
     - Ingress
     - Egress
@@ -15,7 +15,7 @@ spec:
     - from:
         - podSelector:
             matchLabels:
-              app: prometheus
+              app.kubernetes.io/name: prometheus
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: thanos
@@ -34,12 +34,12 @@ spec:
     - from:
         - podSelector:
             matchLabels:
-              app: alertmanager
+              app.kubernetes.io/name: alertmanager
   egress:
     - to:
         - podSelector:
             matchLabels:
-              app: alertmanager
+              app.kubernetes.io/name: alertmanager
     {{- if and .Values.monitoring.alertmanager.alertReceivers.ips .Values.monitoring.alertmanager.alertReceivers.ports }}
     - to:
         {{- range $ip := .Values.monitoring.alertmanager.alertReceivers.ips }}

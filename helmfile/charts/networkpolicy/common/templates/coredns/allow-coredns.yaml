@@ -23,7 +23,7 @@ spec:
     - from:
         - podSelector:
             matchLabels:
-              app: prometheus
+              app.kubernetes.io/name: prometheus
           namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: monitoring

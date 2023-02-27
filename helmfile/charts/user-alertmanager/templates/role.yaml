@@ -27,7 +27,7 @@ rules:
 - apiGroups:
   - ""
   resourceNames:
-  - alertmanager-operated:web
+  - alertmanager-operated:9093
   resources:
   - services/proxy
   verbs:
