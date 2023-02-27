@@ -12,18 +12,21 @@ spec:
     - Ingress
     - Egress
   ingress:
+    {{- if or .Values.ingressNginx.ingressOverride.ips .Values.global.scNodes.ips .Values.global.scIngress.ips }}
     - from:
-      {{- if .Values.ingressNginx.ingressOverride.enabled }}
+      {{- if and .Values.ingressNginx.ingressOverride.enabled .Values.ingressNginx.ingressOverride.ips }}
         {{- range $IP := .Values.ingressNginx.ingressOverride.ips }}
         - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
       {{- else if not (or .Values.global.externalLoadBalancer .Values.global.ingressUsingHostNetwork) }}
+        {{- if .Values.global.scNodes.ips }}
         {{- range $IP := .Values.global.scNodes.ips }}
         - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
-      {{- else }}
+        {{- end }}
+      {{- else if .Values.global.scIngress.ips }}
         {{- range $IP := .Values.global.scIngress.ips }}
         - ipBlock:
             cidr: {{ $IP }}
@@ -34,6 +37,7 @@ spec:
           port: 443
         - protocol: TCP
           port: 80
+    {{- end }}
     - from:
         - namespaceSelector:
             matchLabels:
@@ -44,9 +48,11 @@ spec:
       ports:
         - port: 10254
     - from:
+        {{- if .Values.global.scApiserver.ips }}
         {{- range $IP := .Values.global.scApiserver.ips }}
         - ipBlock:
             cidr: {{ $IP }}
+        {{- end }}
         {{- end }}
         - namespaceSelector:
             matchLabels:
@@ -62,13 +68,14 @@ spec:
     - ports:
       - port: 53
         protocol: UDP
+    {{- if or .Values.ingressNginx.ingressOverride.ips .Values.global.scIngress.ips }}
     - to:
-      {{- if .Values.ingressNginx.ingressOverride.enabled }}
+      {{- if and .Values.ingressNginx.ingressOverride.enabled .Values.ingressNginx.ingressOverride.ips }}
         {{- range $IP := .Values.ingressNginx.ingressOverride.ips }}
         - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
-      {{- else }}
+      {{- else if .Values.global.scIngress.ips }}
         {{- range $IP := .Values.global.scIngress.ips }}
         - ipBlock:
             cidr: {{ $IP }}
@@ -79,6 +86,8 @@ spec:
           port: 443
         - protocol: TCP
           port: 80
+    {{- end }}
+    {{- if and .Values.global.scApiserver.ips .Values.global.scApiserver.port }}
     - to:
         {{- range $IP := .Values.global.scApiserver.ips }}
         - ipBlock:
@@ -87,6 +96,7 @@ spec:
       ports:
         - protocol: TCP
           port: {{ .Values.global.scApiserver.port }}
+    {{- end }}
     - to:
         - namespaceSelector:
             matchLabels:

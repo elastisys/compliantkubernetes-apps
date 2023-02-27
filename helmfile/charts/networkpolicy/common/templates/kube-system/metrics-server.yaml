@@ -14,6 +14,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: metrics-server
   ingress:
+    {{- if .Values.global.apiserver.ips }}
     - from:
         {{- range .Values.global.apiserver.ips }}
         - ipBlock:
@@ -21,10 +22,12 @@ spec:
         {{- end }}
       ports:
         - port: 8443
+    {{- end }}
   egress:
     - ports:
         - port: 53
           protocol: UDP
+    {{- if and .Values.global.apiserver.ips .Values.global.apiserver.port }}
     - to:
         {{- range .Values.global.apiserver.ips }}
         - ipBlock:
@@ -32,6 +35,8 @@ spec:
         {{- end }}
       ports:
         - port: {{ .Values.global.apiserver.port }}
+    {{- end }}
+    {{- if .Values.global.nodes.ips }}
     - to:
         {{- range .Values.global.nodes.ips }}
         - ipBlock:
@@ -39,4 +44,5 @@ spec:
         {{- end }}
       ports:
         - port: 10250
+    {{- end }}
 {{- end }}

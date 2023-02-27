@@ -25,9 +25,11 @@ spec:
         - podSelector:
             matchLabels:
               app: csi-rbdplugin-provisioner
+        {{- if .Values.global.nodes.ips }}
         {{- range $ip := .Values.global.nodes.ips }}
         - ipBlock:
             cidr: {{ $ip }}
+        {{- end }}
         {{- end }}
       ports:
         - port: 6800
@@ -44,6 +46,7 @@ spec:
           endPort: 7300
         - port: 9283
           protocol: TCP
+    {{- if and .Values.global.apiserver.ips .Values.global.apiserver.port }}
     - to:
         {{- range $ip := .Values.global.apiserver.ips }}
         - ipBlock:
@@ -52,6 +55,7 @@ spec:
       ports:
         - port: {{ .Values.global.apiserver.port }}
           protocol: TCP
+    {{- end }}
     - to:
         - podSelector:
             matchLabels:

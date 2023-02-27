@@ -16,6 +16,7 @@ spec:
     - ports:
         - port: 53
           protocol: UDP
+    {{- if and .Values.global.objectStorage.ips .Values.global.objectStorage.ports }}
     - to:
         {{- range .Values.global.objectStorage.ips }}
         - ipBlock:
@@ -25,6 +26,8 @@ spec:
         {{- range .Values.global.objectStorage.ports }}
         - port: {{ . }}
         {{- end }}
+    {{- end }}
+    {{- if and .Values.rcloneSync.destinationObjectStorage.ips .Values.rcloneSync.destinationObjectStorage.ports }}
     - to:
         {{- range .Values.rcloneSync.destinationObjectStorage.ips }}
         - ipBlock:
@@ -34,4 +37,5 @@ spec:
         {{- range .Values.rcloneSync.destinationObjectStorage.ports }}
         - port: {{ . }}
         {{- end }}
+    {{- end }}
 {{- end }}

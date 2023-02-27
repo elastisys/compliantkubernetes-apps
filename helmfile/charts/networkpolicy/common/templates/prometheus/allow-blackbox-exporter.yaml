@@ -23,11 +23,13 @@ spec:
     - to:
         - namespaceSelector: {}
     # probes to pods with hostnetwork
+    {{- if .Values.global.nodes.ips }}
     - to:
         {{- range $ip := .Values.global.nodes.ips }}
         - ipBlock:
             cidr: {{ $ip }}
         {{- end }}
+    {{- end }}
     - ports:
       - protocol: UDP
         port: 53

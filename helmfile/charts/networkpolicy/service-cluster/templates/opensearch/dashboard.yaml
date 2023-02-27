@@ -13,7 +13,7 @@ spec:
       app: opensearch-dashboards
   ingress:
     - from:
-      {{- if .Values.global.ingressUsingHostNetwork }}
+      {{- if and .Values.global.ingressUsingHostNetwork .Values.global.scNodes.ips }}
         {{- range $ip := .Values.global.scNodes.ips }}
         - ipBlock:
             cidr: {{ $ip }}
@@ -43,20 +43,22 @@ spec:
         - port: 53
           protocol: UDP
     - to:
-      {{- if .Values.global.externalLoadBalancer }}
+      {{- if and .Values.global.externalLoadBalancer .Values.global.scIngress.ips }}
         {{- range $ip := .Values.global.scIngress.ips }}
         - ipBlock:
             cidr: {{ $ip }}
         {{- end }}
-      {{- else if .Values.global.ingressUsingHostNetwork }}
+      {{- else if and .Values.global.ingressUsingHostNetwork .Values.global.scNodes.ips }}
         {{- range $ip := .Values.global.scNodes.ips }}
         - ipBlock:
             cidr: {{ $ip }}
         {{- end }}
       {{- else }}
+        {{- if .Values.global.scIngress.ips }}
         {{- range $ip := .Values.global.scIngress.ips }}
         - ipBlock:
             cidr: {{ $ip }}
+        {{- end }}
         {{- end }}
         - namespaceSelector:
             matchLabels:
