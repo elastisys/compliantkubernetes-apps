@@ -1,7 +1,54 @@
 # Release process
 
-The releases will follow semantic versioning and be handled with git tags.
-https://semver.org/
+The releases will follow [semantic versioning](https://semver.org/) and be handled with git tags.
+
+## Constraints
+
+The following constraints apply on releases:
+
+1. Major releases (v**X**.Y.Z and v0.**Y**.Z):
+
+    > *Updates that bring new features and improvements that require coordination with the user.*
+
+    - May perform major additions, modifications, or deletions to the configuration structure.
+
+        Example of major change would be to change the way configuration is processed.
+
+    - May perform major upgrades and updates to the deployed services.
+
+        Example of major change would be to upgrade or replace major services or stacks.
+
+1. Minor releases (vX.**Y**.Z):
+
+    > *Updates that bring new features and improvements that does not require coordination with the user.*
+
+    - May **only** perform minor additions, modifications, or deletions to the configuration structure.
+
+        The configuration *should* keep similar management and structure between different minor releases to ensure that they work with similar sets of features and tools on the same major version.
+
+        Example of minor change would be to change parts of the configuration for services and components.
+
+    - May **only** perform minor upgrades or updates to the deployed services.
+
+        The deployed services *should* be the same between different minor releases to ensure that they work with similar sets of features and tools on the same major version.
+
+        Example of minor change would be to upgrade or change minor services or components.
+
+1. Patch releases (vX.Y.**Z**):
+
+    > *Patches to fix known vulnerabilities threatening user data assessed as an immediate risk.*
+
+    - May **only** perform patch additions or modifications to the configuration structure.
+
+        The configuration **must** keep similar management and structure between different patch releases to ensure that they work with the same sets of features and tools, and can be applied over any patch version on the same minor version.
+
+        Example of allowed patches would be for missing or invalid configurations.
+
+    - May **only** perform patch or security updates to the deployed services.
+
+        The deployed services **must** be the same between different patch releases to ensure that they work with the same sets of features and tools, and can be applied over any patch version on the same minor version.
+
+        Example of allowed patches would be for upgrading patch versions of services due to security vulnerabilities.
 
 ## Major and minor releases
 
