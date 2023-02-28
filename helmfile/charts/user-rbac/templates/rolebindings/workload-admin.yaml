@@ -20,4 +20,19 @@ subjects:
   kind: Group
   name: {{ $group }}
 {{- end }}
+{{- $value := lookup "rbac.authorization.k8s.io/v1" "RoleBinding" $namespace "extra-workload-admins" }}
+{{- if and (or $.Release.IsInstall $.Release.IsUpgrade) (not $value) }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    "helm.sh/resource-policy": keep
+  name: extra-workload-admins
+  namespace: {{ $namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: admin
+{{- end }}
 {{- end }}

@@ -56,6 +56,7 @@
   - Disallow latest tag default is now `deny`, was `dryrun`
   - Require trusted image registry default is now `warn`, was `deny`
   - Require network policies default is now `warn`, was `deny`
+- Moved creation of `extra-workload-admins` to the `user-rbac` chart
 
 ### Removed
 
