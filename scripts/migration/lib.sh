@@ -179,8 +179,6 @@ check_config() {
     log_fatal "error: \"THIS\" is unset"
   elif [ -z "${ROOT:-}" ]; then
     log_fatal "error: \"ROOT\" is unset"
-  elif [ -z "${CK8S_TARGET_VERSION:-}" ]; then
-    log_fatal "error: \"CK8S_TARGET_VERSION\" is unset"
   elif [ -z "${CK8S_CONFIG_PATH:-}" ]; then
     log_fatal "error: \"CK8S_CONFIG_PATH\" is unset"
   elif [ ! -d "${CK8S_CONFIG_PATH}" ]; then
@@ -221,6 +219,8 @@ check_config() {
 check_version() {
   if [[ ! "${1:-}" =~ ^(sc|wc)$ ]] || [[ ! "${2:-}" =~ ^(prepare|apply)$ ]]; then
     log_fatal "usage: check_version <sc|wc> <prepare|apply>"
+  elif [ -z "${CK8S_TARGET_VERSION:-}" ]; then
+    log_fatal "error: \"CK8S_TARGET_VERSION\" is unset"
   fi
 
   if [ "${VERSION["${1}-config"]}" = "any" ]; then
@@ -280,7 +280,12 @@ check_version() {
 
 # Root scripts need to manage this themselves
 if [ -z "${CK8S_ROOT_SCRIPT:-}" ]; then
-  export CK8S_STACK="${CK8S_STACK}/${THIS}"
+  if [ -z "${CK8S_STACK:-}" ]; then
+    export CK8S_STACK="${THIS}"
+  else
+    export CK8S_STACK="${CK8S_STACK:-}/${THIS}"
+  fi
+
   check_config
 fi
 

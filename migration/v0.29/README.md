@@ -131,7 +131,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ```bash
     ./scripts/S3/entry.sh --s3cfg "$CK8S_CONFIG_PATH/.state/s3cfg.ini" create
     # or
-    ./migration/v0.29/apply/01-create-buckets.sh
+    ./migration/v0.29/apply/01-create-buckets.sh execute
     ```
 
 1. **Warning** The default Gatekeeper enforcements have been updated:
@@ -156,25 +156,37 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ```bash
     ./bin/ck8s bootstrap {sc|wc}
     # or
-    ./migration/v0.29/apply/10-bootstrap.sh
+    ./migration/v0.29/apply/10-bootstrap.sh execute
+    ```
+
+1. Upgrade Starboard CRDs:
+
+    ```bash
+    ./migration/v0.29/apply/11-crds.sh execute
     ```
 
 1. Upgrade kured:
 
     ```bash
-    ./migration/v0.29/apply/20-kured.sh
+    ./migration/v0.29/apply/20-kured.sh execute
     ```
 
 1. Upgrade metrics-server:
 
     ```bash
-    ./migration/v0.29/apply/20-metrics-server.sh
+    ./migration/v0.29/apply/20-metrics-server.sh execute
     ```
 
 1. Upgrade fluentd:
 
     ```bash
-    ./migration/v0.29/apply/21-fluentd.sh
+    ./migration/v0.29/apply/21-fluentd.sh execute
+    ```
+
+1. Sync user-rbac to add extra-workload-admins rolebinding:
+
+    ```bash
+    ./migration/v0.29/apply/50-user-rbac.sh execute
     ```
 
 1. Upgrade applications:
@@ -182,7 +194,13 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ```bash
     ./bin/ck8s apply {sc|wc}
     # or
-    ./migration/v0.29/apply/99-apply.sh
+    ./migration/v0.29/apply/80-apply.sh execute
+    ```
+
+1. Uninstall prometheus-elasticsearch-exporter:
+
+    ```bash
+    ./migration/v0.29/apply/90-uninstalls.sh execute
     ```
 
 ## Postrequisite:
