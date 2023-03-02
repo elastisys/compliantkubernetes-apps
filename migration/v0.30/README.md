@@ -54,6 +54,27 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
 - [ ] Silence the notifications for the alerts. e.g you can use [alertmanager silences](https://prometheus.io/docs/alerting/latest/alertmanager/#silences);
 
+### Important - PodSecurityPolicies
+
+This release of apps includes PodSecurityAdmission labels and OPA Gatekeepers PodSecurityPolicies.
+
+After doing the upgrade it is possible to disable kubernetes PodSecurityPolicy admission.
+
+After doing the `disruptive` step for either the automatic or manual method, you should follow these steps to disable Kubernetes PSP:
+
+1. Disable PSP admission for the clusters
+
+    For compliantkubernetes-kubespray you can follow [5. Disable Pod Security Policies](https://github.com/elastisys/compliantkubernetes-kubespray/blob/main/migration/v2.20.0-ck8sx-v2.21.0-ck8s1/upgrade-cluster.md) to disable PodSecurityPolicies.
+
+1. Set `kubernetesPSP: false` in your `common-config.yaml` to disable kubernetes PSPs.
+
+1. Apply to remove kubernetes PSPs:
+
+   ```bash
+   ./bin/ck8s apply sc
+   ./bin/ck8s apply wc
+   ```
+
 ## Automatic method
 
 1. Pull the latest changes and switch to the correct branch:

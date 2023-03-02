@@ -158,7 +158,7 @@ releases:
     group: starboard
   chart: ./charts/starboard/starboard-operator-psp-rbac
   version: 0.1.0
-  installed: {{ .Values.starboard.enabled }}
+  installed: {{ and .Values.starboard.enabled .Values.kubernetesPSP }}
 
 # starboard-operator
 - name: starboard-operator
@@ -203,7 +203,7 @@ releases:
     app: falco
   chart: ./charts/falco-psp-rbac
   version: 0.1.0
-  installed: {{ .Values.falco.enabled }}
+  installed: {{ and .Values.falco.enabled .Values.kubernetesPSP }}
 
 # Falco
 - name: falco

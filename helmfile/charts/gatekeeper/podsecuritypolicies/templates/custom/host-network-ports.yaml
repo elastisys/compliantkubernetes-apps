@@ -1,0 +1,25 @@
+{{- range $namespace, $services := .Values.constraints }}
+  {{- range $name, $value := $services }}
+    {{- if hasKey $value.allow "hostNetworkPorts" }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostNetworkingPorts
+metadata:
+  name: host-network-ports-{{ $name }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - {{ $namespace }}
+    labelSelector:
+      matchLabels:
+        {{- toYaml $value.podSelectorLabels | nindent 8 }}
+  parameters:
+    hostNetwork: {{ $value.allow.hostNetworkPorts }}
+    min: 1
+    max: 65535
+---
+    {{- end }}
+  {{- end }}
+{{- end }}

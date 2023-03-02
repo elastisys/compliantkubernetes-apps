@@ -10,6 +10,7 @@
 ### Added
 
 - Add PrometheusRule to alert for dropped packets to/from workloads.
+- Add Gatekeeper PSPs for ingress-nginx and monitoring namespaces.
 
 ### Fixed
 
@@ -30,4 +31,8 @@
 ### Changed
 - Changed timekey to `stageTimestamp` for Kubernetes audit logs. Use `auditID` to correlate stages of the same request.
 
+- vulnerability and kube-bench reporter runs as non root.
+
 ### Removed
+
+- Kubernetes PSP for ingress-nginx and monitoring namespace.

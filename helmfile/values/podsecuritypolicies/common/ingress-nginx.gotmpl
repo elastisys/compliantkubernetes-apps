@@ -1,0 +1,15 @@
+constraints:
+  ingress-nginx:
+    nginx:
+      podSelectorLabels:
+        app.kubernetes.io/component: controller
+      allow:
+        allowedCapabilities:
+          - NET_BIND_SERVICE
+        {{- if .Values.ingressNginx.controller.useHostPort }}
+        hostNetworkPorts: true
+        {{- end }}
+        hostNamespace: true
+        allowPrivilegeEscalation: true
+
+mutation: []

@@ -1,0 +1,24 @@
+{{- range $namespace, $services := .Values.constraints }}
+  {{- range $name, $value := $services }}
+    {{- if hasKey $value.allow "allowedHostPaths" }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostFilesystem
+metadata:
+  name: host-filesystem-{{ $name }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - {{ $namespace }}
+    labelSelector:
+      matchLabels:
+        {{- toYaml $value.podSelectorLabels | nindent 8 }}
+  parameters:
+    allowedHostPaths:
+    {{- toYaml $value.allow.allowedHostPaths | nindent 6 }}
+---
+    {{- end }}
+  {{- end }}
+{{- end }}

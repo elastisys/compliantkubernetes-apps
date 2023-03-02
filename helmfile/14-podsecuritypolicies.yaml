@@ -22,21 +22,18 @@ environments:
       - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/sc-config.yaml"
     secrets:
       - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
----
 
 # The desired state of Helm releases.
 releases:
-# gatekeeper
-- name: gatekeeper
-  namespace: gatekeeper-system
+
+# Gatekeeper PodSecurityPolices
+- name: podsecuritypolicies
+  namespace: kube-system
   labels:
-    app: gatekeeper
-  chart: ./upstream/gatekeeper
-  # https://helm.sh/docs/chart_best_practices/custom_resource_definitions/#some-caveats-and-explanations
-  # The --dry-run flag of helm install and helm upgrade is not currently supported for CRDs.
-  disableValidationOnInstall: true
-  version: 3.11.0
-  installed: {{ .Values.opa.enabled }}
-  wait: true
+    app: psp
+    group: gatekeeper
+  chart: ./charts/gatekeeper/podsecuritypolicies
+  version: 0.1.0
   values:
-  - values/gatekeeper.yaml.gotmpl
+  - values/podsecuritypolicies/common/ingress-nginx.gotmpl
+  - values/podsecuritypolicies/common/monitoring.gotmpl

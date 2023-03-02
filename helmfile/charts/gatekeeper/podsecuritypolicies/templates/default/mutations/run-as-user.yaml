@@ -1,0 +1,75 @@
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: mutation-run-as-user
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: ["*"]
+        kinds: ["Pod"]
+    namespaces:
+    {{- range $namespace, $services := .Values.constraints }}
+      - {{ $namespace }}
+    {{- end}}
+    {{- if .Values.mutationExceptions }}
+    labelSelector:
+      matchExpressions:
+        {{- range $value := .Values.mutationExceptions }}
+        {{- range $labelkey, $labelvalue := $value }}
+        - key: {{ $labelkey }}
+          operator: NotIn
+          values:
+            - {{ $labelvalue | quote }}
+        {{- end }}
+        {{- end }}
+    {{- end }}
+  location: "spec.containers[name: *].securityContext.runAsUser"
+  parameters:
+    assign:
+      value: 1000
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.runAsUser"
+        condition: MustNotExist
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: mutation-init-run-as-user
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: ["*"]
+        kinds: ["Pod"]
+    namespaces:
+    {{- range $namespace, $services := .Values.constraints }}
+      - {{ $namespace }}
+    {{- end}}
+    {{- if .Values.mutationExceptions }}
+    labelSelector:
+      matchExpressions:
+        {{- range $value := .Values.mutationExceptions }}
+        {{- range $labelkey, $labelvalue := $value }}
+        - key: {{ $labelkey }}
+          operator: NotIn
+          values:
+            - {{ $labelvalue | quote }}
+        {{- end }}
+        {{- end }}
+    {{- end }}
+  location: "spec.initContainers[name: *].securityContext.runAsUser"
+  parameters:
+    assign:
+      value: 1000
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.runAsUser"
+        condition: MustNotExist

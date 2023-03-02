@@ -1,0 +1,46 @@
+# Add pods that should override the default constraints
+# <namespace>:
+#   <service-name>:
+#     podSelectorLabels:
+#       foo: bar
+#     # Every "allow" is an override, and is optional.
+#     # If a override is NOT part of "allow", the default constraint is applied
+#     allow:
+#       allowedCapabilities:
+#         - NET_BIND_SERVICE
+#         - ...
+#       # Also allows for ports 1-65535, limit with network policies
+#       hostNetworkPorts: <true/false>
+#       hostNamespace: true
+#       allowPrivilegeEscalation: true
+#       privileged: true
+#       allowedHostPaths:
+#         - pathPrefix: /proc
+#           readOnly: true
+#         - ...
+#       volumes:
+#         - emptyDir
+#         - ...
+#       runAsUser:
+#         rule: MustRunAsNonRoot
+#       runAsGroup:
+#         rule: MustRunAs
+#         ranges:
+#           - max: 65535
+#             min: 1
+#       supplementalGroups:
+#         rule: MustRunAs
+#         ranges:
+#           - min: 1
+#             max: 65535
+#       fsGroup:
+#         rule: MustRunAs
+#         ranges:
+#           - min: 1
+#             max: 65535
+#       allowedUnsafeSysctls:
+#         - ...
+constraints: {}
+
+# List of pod labels that mutation should be exempted from
+mutationExceptions: []
