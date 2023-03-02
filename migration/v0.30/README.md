@@ -207,7 +207,13 @@ After doing the `disruptive` step for either the automatic or manual method, you
     ```bash
     ./bin/ck8s apply {sc|wc}
     # or
-    ./migration/v0.30/apply/99-apply.sh
+    ./migration/v0.30/apply/80-apply.sh
+    ```
+
+1. Uninstall the old starboard stack including starboard-operator and its exporter:
+
+    ```bash
+    ./migration/v0.29/apply/90-uninstalls.sh execute
     ```
 
 ## Postrequisite:
