@@ -10,7 +10,21 @@ namespaces:
   labels:
     admission.gatekeeper.sh/ignore: "true"
 - name: monitoring
+  labels:
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/warn: privileged
 - name: ingress-nginx
+  labels:
+    {{ if .Values.ingressNginx.controller.useHostPort }}
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/warn: privileged
+    {{ else }}
+    pod-security.kubernetes.io/audit: baseline
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/warn: baseline
+    {{ end }}
 - name: velero
 {{ if .Values.falco.enabled }}
 - name: falco
@@ -18,7 +32,9 @@ namespaces:
 {{ if .Values.opa.enabled }}
 - name: gatekeeper-system
   labels:
-    admission.gatekeeper.sh/ignore: "true"
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
 {{ end }}
 {{ if .Values.hnc.enabled }}
 - name: hnc-system

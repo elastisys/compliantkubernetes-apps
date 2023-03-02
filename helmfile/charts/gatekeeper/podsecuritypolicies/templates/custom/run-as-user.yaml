@@ -1,0 +1,55 @@
+{{- range $namespace, $services := .Values.constraints }}
+  {{- range $name, $value := $services }}
+    {{- if or (hasKey $value.allow "runAsUser") (hasKey $value.allow "runAsGroup") (hasKey $value.allow "supplementalGroups") (hasKey $value.allow "fsGroup") }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: run-as-user-{{ $name }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - {{ $namespace }}
+    labelSelector:
+      matchLabels:
+        {{- toYaml $value.podSelectorLabels | nindent 8 }}
+  parameters:
+    runAsUser:
+      {{- if $value.allow.runAsUser }}
+      {{- toYaml $value.allow.runAsUser | nindent 6 }}
+      {{- else }}
+      rule: MustRunAsNonRoot
+      {{- end }}
+    runAsGroup:
+      {{- if $value.allow.runAsGroup }}
+      {{- toYaml $value.allow.runAsGroup | nindent 6 }}
+      {{- else }}
+      rule: MustRunAs
+      ranges:
+      - max: 65535
+        min: 1
+      {{- end }}
+    supplementalGroups:
+      {{- if $value.allow.supplementalGroups }}
+      {{- toYaml $value.allow.supplementalGroups | nindent 6 }}
+      {{- else }}
+      rule: MustRunAs
+      ranges:
+      - max: 65535
+        min: 1
+      {{- end }}
+    fsGroup:
+      {{- if $value.allow.fsGroup }}
+      {{- toYaml $value.allow.fsGroup | nindent 6 }}
+      {{- else }}
+      rule: MustRunAs
+      ranges:
+      - max: 65535
+        min: 1
+      {{- end }}
+---
+    {{- end }}
+  {{- end }}
+{{- end }}

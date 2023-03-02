@@ -1,0 +1,31 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostNetworkingPorts
+metadata:
+  name: psp-host-network-ports
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+    {{- range $namespace, $services := .Values.constraints }}
+      - {{ $namespace }}
+    {{- end}}
+    labelSelector:
+      matchExpressions:
+        {{- range $namespace,$services := .Values.constraints }}
+          {{- range $name, $value := $services }}
+            {{- if hasKey $value.allow "hostNetworkPorts" }}
+              {{- range $labelkey, $labelvalue := $value.podSelectorLabels }}
+        - key: {{ $labelkey }}
+          operator: NotIn
+          values:
+            - {{ $labelvalue | quote }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+  parameters:
+    hostNetwork: false
+    min: 0
+    max: 0

@@ -1,0 +1,24 @@
+{{- range $namespace, $services := .Values.constraints }}
+  {{- range $name, $value := $services }}
+    {{- if hasKey $value.allow "allowedCapabilities" }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPCapabilities
+metadata:
+  name: capabilities-{{ $name }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - {{ $namespace }}
+    labelSelector:
+      matchLabels:
+        {{- toYaml $value.podSelectorLabels | nindent 8 }}
+  parameters:
+    allowedCapabilities:
+    {{- toYaml $value.allow.allowedCapabilities | nindent 6 }}
+---
+    {{- end }}
+  {{- end }}
+{{- end }}

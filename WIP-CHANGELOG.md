@@ -10,6 +10,7 @@
 ### Added
 
 - Add PrometheusRule to alert for dropped packets to/from workloads.
+- Add Gatekeeper PSPs for ingress-nginx and monitoring namespaces.
 
 ### Fixed
 
@@ -27,4 +28,8 @@
 
 ### Changed
 
+- vulnerability and kube-bench reporter runs as non root.
+
 ### Removed
+
+- Kubernetes PSP for ingress-nginx and monitoring namespace.

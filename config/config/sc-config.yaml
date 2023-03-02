@@ -969,6 +969,27 @@ opensearch:
   ingress:
     maxbodysize: 8m
 
+opa:
+  ## Enable rule that requires pods to come from
+  ## the image registry defined by "URL".
+  ## "enforcement" can assume either "dryrun" or "deny".
+  imageRegistry:
+    enabled: false
+    URL: []
+
+  ## Enable rule that requires pods to be targeted
+  ## by at least one network policy.
+  networkPolicies:
+    enabled: false
+
+  ## Enable rule that requires pods to have resource requests.
+  resourceRequests:
+    enabled: false
+
+  ## It will not allow any image with the latest tag
+  disallowedTags:
+    enabled: false
+
 fluentd:
   enabled: true
 

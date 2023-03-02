@@ -1,0 +1,67 @@
+constraints:
+  monitoring:
+    prometheus-node-exporter:
+      podSelectorLabels:
+        app.kubernetes.io/name: prometheus-node-exporter
+      allow:
+        allowedHostPaths:
+          - pathPrefix: /proc
+            readOnly: true
+          - pathPrefix: /sys
+            readOnly: true
+          - pathPrefix: /
+            readOnly: true
+        hostNetworkPorts: true
+        hostNamespace: true
+        volumes:
+          - configMap
+          - emptyDir
+          - projected
+          - secret
+          - downwardAPI
+          - persistentVolumeClaim
+          - hostPath
+
+    kube-bench-report:
+      podSelectorLabels:
+        kubeBenchReport.scanner: "true"
+      allow:
+        allowedHostPaths:
+          - pathPrefix: /var/lib/etcd
+            readOnly: true
+          - pathPrefix: /var/lib/kubelet
+            readOnly: true
+          - pathPrefix: /etc/systemd
+            readOnly: true
+          - pathPrefix: /etc/kubernetes
+            readOnly: true
+          - pathPrefix: /usr/bin
+            readOnly: true
+        volumes:
+          - configMap
+          - emptyDir
+          - projected
+          - secret
+          - downwardAPI
+          - persistentVolumeClaim
+          - hostPath
+
+    starboard-jobs:
+      podSelectorLabels:
+        app.kubernetes.io/managed-by: starboard
+      allow:
+        hostNamespace: true
+
+    ciskubebench-exporter:
+      podSelectorLabels:
+        app: ciskubebench-exporter
+      allow:
+        allowPrivilegeEscalation: true
+
+    vulnerability-exporter:
+      podSelectorLabels:
+        app: vulnerability-exporter
+      allow:
+        allowPrivilegeEscalation: true
+
+mutation: []

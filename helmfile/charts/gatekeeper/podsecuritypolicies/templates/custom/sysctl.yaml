@@ -1,0 +1,24 @@
+{{- range $namespace, $services := .Values.constraints }}
+  {{- range $name, $value := $services }}
+    {{- if hasKey $value.allow "allowedUnsafeSysctls" }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPForbiddenSysctls
+metadata:
+  name: sysctl-{{ $name }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - {{ $namespace }}
+    labelSelector:
+      matchLabels:
+        {{- toYaml $value.podSelectorLabels | nindent 8 }}
+  parameters:
+    allowedSysctls:
+      {{- toYaml $value.allow.allowedUnsafeSysctls | nindent 6 }}
+---
+    {{- end }}
+  {{- end }}
+{{- end }}

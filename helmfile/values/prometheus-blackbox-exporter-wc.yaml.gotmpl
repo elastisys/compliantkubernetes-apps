@@ -1,5 +1,7 @@
 resources: {{- toYaml .Values.prometheusBlackboxExporter.resources | nindent 4 }}
 
+pspEnabled: {{ .Values.kubernetesPSP }}
+
 config:
   modules:
     http_400:
