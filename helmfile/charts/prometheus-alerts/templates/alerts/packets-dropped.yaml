@@ -1,0 +1,42 @@
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.networkpolicies }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "packets-dropped" | trunc 63 | trimSuffix "-" }}
+  labels:
+    app: {{ template "prometheus-alerts.name" . }}
+{{ include "prometheus-alerts.labels" . | indent 4 }}
+{{- if .Values.defaultRules.alertLabels }}
+{{ toYaml .Values.defaultRules.alertLabels | indent 4 }}
+{{- end }}
+{{- if .Values.defaultRules.annotations }}
+  annotations:
+{{ toYaml .Values.defaultRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  groups:
+  - name: packets-dropped
+    rules:
+    - alert: PacketsDroppedToWorkload
+      annotations:
+        description: Number of packets dropped to a workload because no policies matched them
+        summary: Number of packets dropped to a workload
+      expr: |
+        rate(no_policy_drop_counter{type="tw", cluster=~".*", pod_namespace=~".*", exported_pod=~".*"}[1m]) > 0
+      for: 5m
+      labels:
+        severity: info
+    - alert: PacketsDroppedFromWorkload
+      annotations:
+        description: Number of packets dropped from a workload because no policies matched them
+        summary: Number of packets dropped from a workload
+      expr: |
+        rate(no_policy_drop_counter{type="fw", cluster=~".*", pod_namespace=~".*", exported_pod=~".*"}[1m]) > 0
+      for: 5m
+      labels:
+        severity: info
+
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+{{- end }}
