@@ -30,6 +30,7 @@ spec:
       ports:
         - port: 9153
   egress:
+    {{- if and .Values.global.apiserver.ips .Values.global.apiserver.port }}
     - to:
       {{- range $IP := .Values.global.apiserver.ips }}
       - ipBlock:
@@ -37,22 +38,31 @@ spec:
         {{- end }}
       ports:
         - port: {{ .Values.global.apiserver.port }}
+    {{- end }}
+    {{- if or .Values.global.nodes.ips .Values.coredns.serviceIp.ips .Values.coredns.externalDns.ips }}
     - to:
+      {{- if .Values.global.nodes.ips }}
       {{- range $IP := .Values.global.nodes.ips }}
       - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
+      {{- end }}
+      {{- if .Values.coredns.serviceIp.ips }}
       {{- range $IP := .Values.coredns.serviceIp.ips }}
       - ipBlock:
           cidr: {{ $IP }}
         {{- end }}
+      {{- end }}
+      {{- if .Values.coredns.externalDns.ips }}
       {{- range $IP := .Values.coredns.externalDns.ips }}
       - ipBlock:
           cidr: {{ $IP }}
+      {{- end }}
       {{- end }}
       ports:
         - port: 53
           protocol: UDP
         - port: 53
           protocol: TCP
+    {{- end }}
 {{- end }}

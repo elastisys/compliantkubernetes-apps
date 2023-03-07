@@ -13,7 +13,7 @@ spec:
     - Egress
   ingress:
     - from:
-      {{- if .Values.global.ingressUsingHostNetwork }}
+      {{- if and .Values.global.ingressUsingHostNetwork .Values.global.scNodes.ips }}
         {{- range $ip := .Values.global.scNodes.ips }}
         - ipBlock:
             cidr: {{ $ip }}
@@ -64,6 +64,7 @@ spec:
       ports:
         - port: 5556
           protocol: TCP
+    {{- if and .Values.global.scApiserver.ips .Values.global.scApiserver.port }}
     - to:
         {{- range $ip := .Values.global.scApiserver.ips }}
         - ipBlock:
@@ -72,7 +73,9 @@ spec:
       ports:
         - protocol: TCP
           port: {{ .Values.global.scApiserver.port }}
+    {{- end }}
     # loading dashboards from grafana website
+    {{- if and .Values.monitoring.grafana.externalDashboardProvider.ips .Values.monitoring.grafana.externalDashboardProvider.ports }}
     - to:
         {{- range $ip := .Values.monitoring.grafana.externalDashboardProvider.ips }}
         - ipBlock:
@@ -82,6 +85,7 @@ spec:
         {{- range $port := .Values.monitoring.grafana.externalDashboardProvider.ports }}
         - port: {{ $port }}
         {{- end }}
+    {{- end }}
     - ports:
       - protocol: TCP
         port: 53
