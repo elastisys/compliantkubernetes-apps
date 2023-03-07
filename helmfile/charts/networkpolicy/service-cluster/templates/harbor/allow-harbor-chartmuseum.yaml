@@ -49,6 +49,7 @@ spec:
       {{- end }}
     {{- end }}
   {{- end }}
+    {{- if and .Values.global.objectStorage.ips .Values.global.objectStorage.ports }}
     - to:
         {{- range $IP := .Values.global.objectStorage.ips }}
         - ipBlock:
@@ -59,4 +60,5 @@ spec:
         - protocol: TCP
           port: {{ $port }}
         {{- end }}
+    {{- end }}
 {{ end }}

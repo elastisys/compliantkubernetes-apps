@@ -14,6 +14,7 @@ spec:
     - ports:
         - port: 53
           protocol: UDP
+    {{- if and .Values.global.scApiserver.ips .Values.global.scApiserver.port }}
     - to:
         {{- range $IP := .Values.global.scApiserver.ips }}
         - ipBlock:
@@ -22,4 +23,5 @@ spec:
       ports:
         - protocol: TCP
           port: {{ .Values.global.scApiserver.port }}
+    {{- end }}
 {{- end }}

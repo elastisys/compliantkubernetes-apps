@@ -40,6 +40,7 @@ spec:
         - podSelector:
             matchLabels:
               app: alertmanager
+    {{- if and .Values.monitoring.alertmanager.alertReceivers.ips .Values.monitoring.alertmanager.alertReceivers.ports }}
     - to:
         {{- range $ip := .Values.monitoring.alertmanager.alertReceivers.ips }}
         - ipBlock:
@@ -49,6 +50,7 @@ spec:
         {{- range $port := .Values.monitoring.alertmanager.alertReceivers.ports }}
         - port: {{ $port }}
         {{- end }}
+    {{- end }}
     - ports:
       - protocol: UDP
         port: 53

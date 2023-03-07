@@ -58,6 +58,7 @@ spec:
               component: core
       ports:
         - port: 8080
+    {{- if and .Values.harbor.trivy.ips .Values.harbor.trivy.port }}
     - to:
         {{- range $IP := .Values.harbor.trivy.ips }}
         - ipBlock:
@@ -66,4 +67,5 @@ spec:
       ports:
         - protocol: TCP
           port: {{ .Values.harbor.trivy.port }}
+    {{- end }}
 {{ end }}

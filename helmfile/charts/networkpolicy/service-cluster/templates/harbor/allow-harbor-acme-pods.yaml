@@ -12,12 +12,12 @@ spec:
       acme.cert-manager.io/http01-solver: "true"
   ingress:
     - from:
-      {{- if .Values.global.externalLoadBalancer }}
+      {{- if and .Values.global.externalLoadBalancer .Values.global.scIngress.ips }}
         {{- range $ip := .Values.global.scIngress.ips }}
         - ipBlock:
             cidr: {{ $ip }}
         {{- end }}
-      {{- else if .Values.global.ingressUsingHostNetwork }}
+      {{- else if and .Values.global.ingressUsingHostNetwork .Values.global.scNodes.ips }}
         {{- range $ip := .Values.global.scNodes.ips }}
         - ipBlock:
             cidr: {{ $ip }}

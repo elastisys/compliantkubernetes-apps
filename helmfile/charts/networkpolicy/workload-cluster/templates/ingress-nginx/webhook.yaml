@@ -14,6 +14,7 @@ spec:
     - ports:
         - port: 53
           protocol: UDP
+    {{- if and .Values.global.wcApiserver.ips .Values.global.wcApiserver.port }}
     - to:
         {{- range $IP := .Values.global.wcApiserver.ips }}
         - ipBlock:
@@ -22,4 +23,5 @@ spec:
       ports:
         - protocol: TCP
           port: {{ .Values.global.wcApiserver.port }}
+    {{- end }}
 {{- end }}

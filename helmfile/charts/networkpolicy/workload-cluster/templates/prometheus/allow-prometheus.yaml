@@ -13,6 +13,7 @@ spec:
     - Ingress
   egress:
     # thanos
+    {{- if .Values.global.scIngress.ips }}
     - to:
         {{- range $ip := .Values.global.scIngress.ips }}
         - ipBlock:
@@ -21,10 +22,12 @@ spec:
       ports:
       - protocol: TCP
         port: 443
+    {{- end }}
     - ports:
       - protocol: UDP
         port: 53
   ingress:
+    {{- if .Values.global.wcApiserver.ips }}
     - from:
         {{- range $ip := .Values.global.wcApiserver.ips }}
         - ipBlock:
@@ -33,4 +36,5 @@ spec:
       ports:
         - port: 9090
           protocol: TCP
+    {{- end }}
 {{- end }}

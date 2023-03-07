@@ -13,7 +13,7 @@ spec:
       app.kubernetes.io/name: dex
   ingress:
     - from:
-      {{- if .Values.global.ingressUsingHostNetwork }}
+      {{- if and .Values.global.ingressUsingHostNetwork .Values.global.scNodes.ips }}
         {{- range $ip := .Values.global.scNodes.ips }}
         - ipBlock:
             cidr: {{ $ip }}
@@ -58,6 +58,7 @@ spec:
       ports:
         - port: 5558
   egress:
+    {{- if and .Values.dex.connectors.ips .Values.dex.connectors.ports }}
     - to:
       {{- range $ip := .Values.dex.connectors.ips }}
       - ipBlock:
@@ -67,6 +68,8 @@ spec:
         {{- range $port := .Values.dex.connectors.ports }}
         - port: {{ $port }}
         {{- end }}
+    {{- end }}
+    {{- if and .Values.global.scApiserver.ips .Values.global.scApiserver.port }}
     - to:
         {{- range $IP := .Values.global.scApiserver.ips }}
       - ipBlock:
@@ -74,6 +77,7 @@ spec:
         {{- end }}
       ports:
         - port: {{ .Values.global.scApiserver.port }}
+    {{- end }}
     - ports:
       - protocol: UDP
         port: 53

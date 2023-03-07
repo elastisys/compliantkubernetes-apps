@@ -12,18 +12,21 @@ spec:
     - Ingress
     - Egress
   ingress:
+    {{- if or .Values.ingressNginx.ingressOverride.ips .Values.global.wcNodes.ips .Values.global.wcIngress.ips }}
     - from:
-      {{- if .Values.ingressNginx.ingressOverride.enabled }}
+      {{- if and .Values.ingressNginx.ingressOverride.enabled .Values.ingressNginx.ingressOverride.ips }}
         {{- range $IP := .Values.ingressNginx.ingressOverride.ips }}
         - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
       {{- else if not (or .Values.global.externalLoadBalancer .Values.global.ingressUsingHostNetwork) }}
+        {{- if .Values.global.wcNodes.ips }}
         {{- range $IP := .Values.global.wcNodes.ips }}
         - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
-      {{- else }}
+        {{- end }}
+      {{- else if .Values.global.wcIngress.ips }}
         {{- range $IP := .Values.global.wcIngress.ips }}
         - ipBlock:
             cidr: {{ $IP }}
@@ -34,6 +37,7 @@ spec:
           port: 443
         - protocol: TCP
           port: 80
+    {{- end }}
     - from:
         - namespaceSelector:
             matchLabels:
@@ -44,9 +48,11 @@ spec:
       ports:
         - port: 10254
     - from:
+        {{- if .Values.global.wcApiserver.ips }}
         {{- range $IP := .Values.global.wcApiserver.ips }}
         - ipBlock:
             cidr: {{ $IP }}
+        {{- end }}
         {{- end }}
         - namespaceSelector:
             matchLabels:
@@ -62,13 +68,14 @@ spec:
     - ports:
         - port: 53
           protocol: UDP
+    {{- if or .Values.ingressNginx.ingressOverride.ips .Values.global.wcIngress.ips }}
     - to:
-      {{- if .Values.ingressNginx.ingressOverride.enabled }}
+      {{- if and .Values.ingressNginx.ingressOverride.enabled .Values.ingressNginx.ingressOverride.ips }}
         {{- range $IP := .Values.ingressNginx.ingressOverride.ips }}
         - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
-      {{- else }}
+      {{- else if .Values.global.wcIngress.ips }}
         {{- range $IP := .Values.global.wcIngress.ips }}
         - ipBlock:
             cidr: {{ $IP }}
@@ -79,6 +86,8 @@ spec:
           port: 443
         - protocol: TCP
           port: 80
+    {{- end }}
+    {{- if and .Values.global.wcApiserver.ips .Values.global.wcApiserver.port }}
     - to:
         {{- range $IP := .Values.global.wcApiserver.ips }}
         - ipBlock:
@@ -87,6 +96,7 @@ spec:
       ports:
         - protocol: TCP
           port: {{ .Values.global.wcApiserver.port }}
+    {{- end }}
     - to:
         - namespaceSelector:
             matchLabels:

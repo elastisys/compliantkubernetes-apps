@@ -25,6 +25,7 @@ spec:
     - ports:
       - port: 53
         protocol: UDP
+    {{- if and .Values.certManager.letsencrypt.ips .Values.certManager.letsencrypt.port }}
     - to:
         {{- range $IP := .Values.certManager.letsencrypt.ips }}
         - ipBlock:
@@ -33,6 +34,8 @@ spec:
       ports:
         - protocol: TCP
           port: {{ .Values.certManager.letsencrypt.port }}
+    {{- end }}
+    {{- if and .Values.global.apiserver.ips .Values.global.apiserver.port }}
     - to:
         {{- range $IP := .Values.global.apiserver.ips }}
         - ipBlock:
@@ -41,13 +44,15 @@ spec:
       ports:
         - protocol: TCP
           port: {{ .Values.global.apiserver.port }}
+    {{- end }}
+    {{- if or .Values.global.ingress.ips (and .Values.global.nodes.ips .Values.global.ingressUsingHostNetwork) }}
     - to:
-      {{- if .Values.global.externalLoadBalancer }}
+      {{- if and .Values.global.ingress.ips .Values.global.externalLoadBalancer }}
         {{- range $IP := .Values.global.ingress.ips }}
         - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
-      {{- else if .Values.global.ingressUsingHostNetwork }}
+      {{- else if and .Values.global.nodes.ips .Values.global.ingressUsingHostNetwork }}
         {{- range $IP := .Values.global.nodes.ips }}
         - ipBlock:
             cidr: {{ $IP }}
@@ -70,4 +75,5 @@ spec:
           port: 443
         - protocol: TCP
           port: 80
+    {{- end }}
 {{- end }}

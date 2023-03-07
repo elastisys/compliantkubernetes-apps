@@ -27,7 +27,7 @@ spec:
         - port: 9300
     # Allow api port from ingress-ngix
     - from:
-      {{- if .Values.global.ingressUsingHostNetwork }}
+      {{- if and .Values.global.ingressUsingHostNetwork .Values.global.scNodes.ips }}
         {{- range $ip := .Values.global.scNodes.ips }}
         - ipBlock:
             cidr: {{ $ip }}
@@ -56,6 +56,7 @@ spec:
               app.kubernetes.io/component: opensearch-client
       ports:
         - port: 9300
+    {{- if and .Values.global.objectStorage.ips .Values.global.objectStorage.ports }}
     - to:
         {{- range $ip := .Values.global.objectStorage.ips }}
         - ipBlock:
@@ -66,6 +67,8 @@ spec:
         - protocol: TCP
           port: {{ $port }}
         {{- end }}
+    {{- end }}
+    {{- if and .Values.opensearch.plugins.ips .Values.opensearch.plugins.ports }}
     - to:
         {{- range $ip := .Values.opensearch.plugins.ips }}
         - ipBlock:
@@ -76,6 +79,7 @@ spec:
         - protocol: TCP
           port: {{ $port }}
         {{- end }}
+    {{- end }}
     - ports:
         - port: 53
           protocol: UDP

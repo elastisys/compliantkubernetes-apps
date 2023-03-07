@@ -46,6 +46,7 @@ spec:
         - podSelector:
             matchLabels:
               app: alertmanager
+    {{- if .Values.global.wcApiserver.ips }}
     - from:
         {{- range $ip := .Values.global.wcApiserver.ips }}
         - ipBlock:
@@ -54,11 +55,13 @@ spec:
       ports:
         - port: 9093
           protocol: TCP
+    {{- end }}
   egress:
     - to:
         - podSelector:
             matchLabels:
               app: alertmanager
+    {{- if and .Values.alertmanager.alertReceivers.ips .Values.alertmanager.alertReceivers.ports }}
     - to:
         {{- range $ip := .Values.alertmanager.alertReceivers.ips }}
         - ipBlock:
@@ -68,6 +71,7 @@ spec:
         {{- range $port := .Values.alertmanager.alertReceivers.ports }}
         - port: {{ $port }}
         {{- end }}
+    {{- end }}
     - ports:
       - protocol: UDP
         port: 53

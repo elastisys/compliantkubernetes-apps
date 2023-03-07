@@ -12,6 +12,7 @@ spec:
     - Ingress
     - Egress
   egress:
+    {{- if and .Values.global.apiserver.ips .Values.global.apiserver.port }}
     - to:
         {{- range $ip := .Values.global.apiserver.ips }}
         - ipBlock:
@@ -20,4 +21,5 @@ spec:
       ports:
         - protocol: TCP
           port: {{ .Values.global.apiserver.port }}
+    {{- end }}
 {{- end }}

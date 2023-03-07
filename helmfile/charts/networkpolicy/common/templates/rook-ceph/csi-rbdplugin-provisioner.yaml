@@ -11,6 +11,7 @@ spec:
     matchLabels:
       app: csi-rbdplugin-provisioner
   egress:
+    {{- if and .Values.global.apiserver.ips .Values.global.apiserver.port }}
     - to:
         {{- range $ip := .Values.global.apiserver.ips }}
         - ipBlock:
@@ -19,6 +20,7 @@ spec:
       ports:
         - port: {{ .Values.global.apiserver.port }}
           protocol: TCP
+    {{- end }}
     - to:
         - podSelector:
             matchLabels:
