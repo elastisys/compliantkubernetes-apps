@@ -28,6 +28,7 @@ spec:
     # metrics from pods in the cluster
     - to:
         - namespaceSelector: {}
+    {{- if and .Values.global.apiserver.ips .Values.global.apiserver.port }}
     - to:
         {{- range $ip := .Values.global.apiserver.ips }}
         - ipBlock:
@@ -36,12 +37,15 @@ spec:
       ports:
         - protocol: TCP
           port: {{ .Values.global.apiserver.port }}
+    {{- end }}
     # metrics from kubelet, calico and other host-network exporters
+    {{- if .Values.global.nodes.ips }}
     - to:
         {{- range $ip := .Values.global.nodes.ips }}
         - ipBlock:
             cidr: {{ $ip }}
         {{- end }}
+    {{- end }}
     - ports:
       - protocol: UDP
         port: 53

@@ -11,7 +11,7 @@ spec:
       acme.cert-manager.io/http01-solver: "true"
   ingress:
     - from:
-      {{- if $.Values.global.ingressUsingHostNetwork }}
+      {{- if and $.Values.global.nodes.ips $.Values.global.ingressUsingHostNetwork }}
         {{- range $ip := $.Values.global.nodes.ips }}
         - ipBlock:
             cidr: {{ $ip }}

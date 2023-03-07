@@ -36,7 +36,7 @@ spec:
               app.kubernetes.io/instance: opensearch-securityadmin
       {{- if not .Values.opensearch.client.enabled }}
       # Allow api port from ingress-ngix
-      {{- if .Values.global.ingressUsingHostNetwork }}
+      {{- if and .Values.global.ingressUsingHostNetwork .Values.global.scNodes.ips }}
         {{- range $ip := .Values.global.scNodes.ips }}
         - ipBlock:
             cidr: {{ $ip }}
@@ -88,6 +88,7 @@ spec:
               kubernetes.io/metadata.name: dex
       ports:
         - port: 5556
+    {{- if and .Values.global.objectStorage.ips .Values.global.objectStorage.ports }}
     - to:
         {{- range $ip := .Values.global.objectStorage.ips }}
         - ipBlock:
@@ -98,6 +99,8 @@ spec:
         - protocol: TCP
           port: {{ $port }}
         {{- end }}
+    {{- end }}
+    {{- if and .Values.opensearch.plugins.ips .Values.opensearch.plugins.ports }}
     - to:
         {{- range $ip := .Values.opensearch.plugins.ips }}
         - ipBlock:
@@ -108,21 +111,24 @@ spec:
         - protocol: TCP
           port: {{ $port }}
         {{- end }}
+    {{- end }}
     - to:
-      {{- if .Values.global.externalLoadBalancer }}
+      {{- if and .Values.global.externalLoadBalancer .Values.global.scIngress.ips }}
         {{- range $ip := .Values.global.scIngress.ips }}
         - ipBlock:
             cidr: {{ $ip }}
         {{- end }}
-      {{- else if .Values.global.ingressUsingHostNetwork }}
+      {{- else if and .Values.global.ingressUsingHostNetwork .Values.global.scNodes.ips }}
         {{- range $ip := .Values.global.scNodes.ips }}
         - ipBlock:
             cidr: {{ $ip }}
         {{- end }}
       {{- else }}
+        {{- if .Values.global.scIngress.ips }}
         {{- range $ip := .Values.global.scIngress.ips }}
         - ipBlock:
             cidr: {{ $ip }}
+        {{- end }}
         {{- end }}
         - namespaceSelector:
             matchLabels:

@@ -20,6 +20,7 @@ spec:
         - port: 5000
         - port: 8080
   egress:
+    {{- if and .Values.global.objectStorage.ips .Values.global.objectStorage.ports }}
     - to:
         {{- range $IP := .Values.global.objectStorage.ips }}
         - ipBlock:
@@ -30,6 +31,7 @@ spec:
         - protocol: TCP
           port: {{ $port }}
         {{- end }}
+    {{- end }}
     {{- if eq .Values.harbor.redis.type "internal" }}
     - to:
         - podSelector:

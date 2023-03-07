@@ -12,7 +12,7 @@ spec:
     - Ingress
   ingress:
     - from:
-      {{- if .Values.global.ingressUsingHostNetwork }}
+      {{- if and .Values.global.ingressUsingHostNetwork .Values.global.wcNodes.ips }}
       {{- range $ip := .Values.global.wcNodes.ips }}
       - ipBlock:
           cidr: {{ $ip }}

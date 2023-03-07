@@ -21,6 +21,7 @@ spec:
     - ports:
         - port: 53
           protocol: UDP
+    {{- if and .Values.global.apiserver.ips .Values.global.apiserver.port }}
     - to:
         {{- range .Values.global.apiserver.ips }}
         - ipBlock:
@@ -28,7 +29,8 @@ spec:
         {{- end }}
       ports:
         - port: {{ .Values.global.apiserver.port }}
-    {{- if .Values.kured.notificationSlack.enabled }}
+    {{- end }}
+    {{- if and .Values.kured.notificationSlack.enabled .Values.kured.notificationSlack.ips .Values.kured.notificationSlack.ports }}
     - to:
         {{- range .Values.kured.notificationSlack.ips }}
         - ipBlock:

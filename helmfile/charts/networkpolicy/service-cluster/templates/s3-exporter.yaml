@@ -19,6 +19,7 @@ spec:
     - ports:
         - port: 53
           protocol: UDP
+    {{- if and .Values.global.objectStorage.ips .Values.global.objectStorage.ports }}
     - to:
         {{- range .Values.global.objectStorage.ips }}
         - ipBlock:
@@ -28,4 +29,5 @@ spec:
         {{- range .Values.global.objectStorage.ports }}
         - port: {{ . }}
         {{- end }}
+    {{- end }}
 {{- end }}

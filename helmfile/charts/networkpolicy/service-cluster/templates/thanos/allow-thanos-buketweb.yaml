@@ -23,6 +23,7 @@ spec:
         - port: 8080
           protocol: TCP
   egress:
+    {{- if and .Values.global.objectStorage.ips .Values.global.objectStorage.ports }}
     - to:
         {{- range $ip := .Values.global.objectStorage.ips }}
         - ipBlock:
@@ -32,6 +33,7 @@ spec:
         {{- range $port := .Values.global.objectStorage.ports }}
         - port: {{ $port }}
         {{- end }}
+    {{- end }}
     - ports:
       - protocol: UDP
         port: 53

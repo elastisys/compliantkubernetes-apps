@@ -11,19 +11,26 @@ spec:
     - Egress
     - Ingress
   ingress:
+    {{- if or .Values.global.nodes.ips .Values.global.apiserver.ips }}
     - from:
+      {{- if .Values.global.nodes.ips }}
       {{- range $ip := .Values.global.nodes.ips }}
       - ipBlock:
           cidr: {{ $ip }}
       {{- end }}
+      {{- end }}
+      {{- if .Values.global.apiserver.ips }}
       {{- range $IP := .Values.global.apiserver.ips }}
       - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
+      {{- end }}
       ports:
         - port: 8080
           protocol: TCP
+    {{- end }}
   egress:
+    {{- if and .Values.global.apiserver.ips .Values.global.apiserver.port }}
     - to:
       {{- range $IP := .Values.global.apiserver.ips }}
       - ipBlock:
@@ -31,4 +38,5 @@ spec:
         {{- end }}
       ports:
         - port: {{ .Values.global.apiserver.port }}
+    {{- end }}
 {{- end }}
