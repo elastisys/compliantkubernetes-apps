@@ -31,6 +31,7 @@ defaultRules:
 
     backupStatus: true
     dailyChecks: true
+    networkpolicies: {{ .Values.networkPolicies.enableAlerting }}
 
   {{- if and .Values.thanos.enabled .Values.thanos.ruler.enabled }}
   thanos:

@@ -655,6 +655,7 @@ kured:
   dsAnnotations: {}
 
 networkPolicies:
+  enableAlerting: true
   # Default deny requires Calico as network plugin
   defaultDeny: false
   allowedNameSpaces: []

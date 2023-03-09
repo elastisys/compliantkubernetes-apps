@@ -21,6 +21,7 @@ defaultRules:
     # about these alerts, but we have no other way of gathering them currently.
     rookMonitor: {{ .Values.monitoring.rook.enabled }}
     capacityManagementAlerts: {{ .Values.prometheus.capacityManagementAlerts.enabled }}
+    networkpolicies: {{ .Values.networkPolicies.enableAlerting }}
 
 capacityManagementAlertsDiskLimit: {{ .Values.prometheus.capacityManagementAlerts.disklimit }}
 capacityManagementAlertsUsageLimit: {{ .Values.prometheus.capacityManagementAlerts.usagelimit }}

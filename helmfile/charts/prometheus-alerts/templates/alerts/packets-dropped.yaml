@@ -1,0 +1,68 @@
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.networkpolicies }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "packets-dropped" | trunc 63 | trimSuffix "-" }}
+  labels:
+    app: {{ template "prometheus-alerts.name" . }}
+    {{- include "prometheus-alerts.labels" . | nindent 4 }}
+    {{- if .Values.defaultRules.alertLabels }}
+    {{- toYaml .Values.defaultRules.alertLabels | nindent 4 }}
+    {{- end }}
+  {{- if .Values.defaultRules.annotations }}
+  annotations:
+    {{- toYaml .Values.defaultRules.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  groups:
+  - name: packets-dropped
+    rules:
+    - alert: FrequentPacketsDroppedToWorkload
+      annotations:
+        description: Number of packets dropped to workload {{ "{{ $labels.exported_pod }}" }} in namespace {{ "{{ $labels.pod_namespace }}" }}, because no policies matched them
+        summary: Number of packets dropped to workload in {{ "{{ $labels.cluster }}" }} cluster
+      expr: |
+        increase(no_policy_drop_counter{type="tw"}[1m]) > 0
+      for: 5m
+      labels:
+        severity: warning
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: ScarcePacketsDroppedToWorkload
+      annotations:
+        description: Number of packets dropped to workload {{ "{{ $labels.exported_pod }}" }} in namespace {{ "{{ $labels.pod_namespace }}" }}, because no policies matched them
+        summary: Number of packets dropped to workload in {{ "{{ $labels.cluster }}" }} cluster
+      expr: |
+        increase(no_policy_drop_counter{type="tw"}[3h]) > 20
+      for: 6h
+      labels:
+        severity: info
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: FrequentPacketsDroppedFromWorkload
+      annotations:
+        description: Number of packets dropped from workload {{ "{{ $labels.exported_pod }}" }} in namespace {{ "{{ $labels.pod_namespace }}" }}, because no policies matched them
+        summary: Number of packets dropped from workload in {{ "{{ $labels.cluster }}" }} cluster
+      expr: |
+        increase(no_policy_drop_counter{type="fw"}[1m]) > 0
+      for: 5m
+      labels:
+        severity: warning
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: ScarcePacketsDroppedFromWorkload
+      annotations:
+        description: Number of packets dropped from workload {{ "{{ $labels.exported_pod }}" }} in namespace {{ "{{ $labels.pod_namespace }}" }}, because no policies matched them
+        summary: Number of packets dropped from workload in {{ "{{ $labels.cluster }}" }} cluster
+      expr: |
+        increase(no_policy_drop_counter{type="fw"}[3h]) > 20
+      for: 6h
+      labels:
+        severity: info
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+{{- end }}
