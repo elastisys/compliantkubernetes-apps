@@ -8,7 +8,7 @@ source "${ROOT}/scripts/migration/lib.sh"
 run() {
   case "${1:-}" in
   execute)
-    helmfile_do wc sync -lapp=user-rbac
+    helmfile_do wc -l app=user-rbac sync
     ;;
   rollback)
     log_warn "rollback not implemented"
