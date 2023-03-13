@@ -15,6 +15,13 @@ RUN wget --progress=dot:giga "https://storage.googleapis.com/kubernetes-release/
     install -Tm 755 kubectl /usr/local/bin/kubectl && \
     rm kubectl
 
+# Kubeconform
+ENV KUBECONFORM_VERSION "v0.6.1"
+RUN wget --progress=dot:giga "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" && \
+    tar -zxvf kubeconform-linux-amd64.tar.gz kubeconform && \
+    install -Tm 755 kubeconform /usr/local/bin/kubeconform && \
+    rm kubeconform
+
 # sops
 # NOTE: This needs to be installed before the helm-secrets plugin.
 ENV SOPS_VERSION="3.6.1"

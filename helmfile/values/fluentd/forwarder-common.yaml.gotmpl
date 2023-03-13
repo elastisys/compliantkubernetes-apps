@@ -12,6 +12,8 @@ podSecurityPolicy:
 
 serviceMonitor:
   enabled: true
+  # Seems like it is double templated so the end result yields an empty string ""
+  jobLabel: '""'
 
 prometheusRule:
   enabled: true
