@@ -22,7 +22,7 @@ spec:
   endpoints:
   - port: http-metrics
     path: /metrics
-    interval: 5s
+    interval: 15s
     # Add the correct cluster labels so we know what cluster this comes from.
     relabelings:
     {{- toYaml .Values.rookMonitor.relabelings | nindent 6 }}
