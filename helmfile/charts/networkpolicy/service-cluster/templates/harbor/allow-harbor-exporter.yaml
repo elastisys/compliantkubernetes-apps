@@ -2,7 +2,7 @@
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: allow-harbor-registry
+  name: allow-harbor-exporter
   namespace: harbor
 spec:
   policyTypes:
@@ -10,7 +10,7 @@ spec:
     - Egress
   podSelector:
     matchLabels:
-      component: registry
+      component: exporter
   ingress:
     - from:
         - namespaceSelector:
@@ -22,26 +22,13 @@ spec:
       ports:
         - port: 8001
           protocol: TCP
-    - from:
+  egress:
+    - to:
         - podSelector:
             matchLabels:
               component: core
       ports:
-        - port: 5000
         - port: 8080
-  egress:
-    {{- if and .Values.global.objectStorage.ips .Values.global.objectStorage.ports }}
-    - to:
-        {{- range $IP := .Values.global.objectStorage.ips }}
-        - ipBlock:
-            cidr: {{ $IP }}
-        {{- end }}
-      ports:
-        {{- range $port := .Values.global.objectStorage.ports }}
-        - protocol: TCP
-          port: {{ $port }}
-        {{- end }}
-    {{- end }}
     {{- if eq .Values.harbor.redis.type "internal" }}
     - to:
         - podSelector:
@@ -51,6 +38,36 @@ spec:
         - port: 6379
     {{- else if eq .Values.harbor.redis.type "external" }}
     {{- range .Values.harbor.redis.external }}
+    - to:
+      {{- if .egressNSMatchLabels }}
+        - namespaceSelector:
+            matchLabels:
+              {{- range $key, $value := .egressNSMatchLabels }}
+              {{ $key | quote }}: {{ $value | quote }}
+              {{- end }}
+          {{- if .egressPodMatchLabels }}
+          podSelector:
+            matchLabels:
+              {{- range $key, $value := .egressPodMatchLabels }}
+              {{ $key | quote }}: {{ $value | quote }}
+              {{- end }}
+          {{- end }}
+      {{- end }}
+      ports:
+        {{- range $port := .ports }}
+        - port: {{ $port }}
+        {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- if eq .Values.harbor.database.type "internal" }}
+    - to:
+        - podSelector:
+            matchLabels:
+              component: database
+      ports:
+        - port: 5432
+    {{- else if eq .Values.harbor.database.type "external" }}
+    {{- range .Values.harbor.database.external }}
     - to:
       {{- if .egressNSMatchLabels }}
         - namespaceSelector:

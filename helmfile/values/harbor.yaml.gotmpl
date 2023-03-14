@@ -212,3 +212,8 @@ redis:
   {{- end }}
 updateStrategy:
   type: Recreate
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true

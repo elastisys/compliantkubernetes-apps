@@ -13,6 +13,16 @@ spec:
       component: jobservice
   ingress:
     - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: kube-prometheus-stack-prometheus
+      ports:
+        - port: 8001
+          protocol: TCP
+    - from:
         - podSelector:
             matchLabels:
               component: core
