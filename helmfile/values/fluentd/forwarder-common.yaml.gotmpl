@@ -125,12 +125,18 @@ extraConfigMaps:
       </parse>
     </source>
 
-    # Remove keys that include raw data causing errors
-    # See: https://github.com/uken/fluent-plugin-elasticsearch/issues/452
+    # Jsonify responseObject and requestObject keys so that their
+    # contents won't be dynamically mapped in Opensearch and instead be indexed
+    # as json text.
     <filter kubeaudit.**>
       @id kube_api_audit_normalize
       @type record_transformer
-      remove_keys responseObject,requestObject
+      auto_typecast false
+      enable_ruby true
+      <record>
+        responseObject ${record["responseObject"].nil? ? "none": record["responseObject"].to_json}
+        requestObject ${record["requestObject"].nil? ? "none": record["requestObject"].to_json}
+      </record>
     </filter>
 
   12-kubernetes.conf: |-

@@ -10,6 +10,7 @@
 - Add document splits to helmfiles to prepare support for helmfile v0.150+
 
 ### Updated
+- `responseObject` and `requestObject` are no longer dropped in Fluentd from Kubernetes audit events.
 
 ### Changed
 
