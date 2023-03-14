@@ -26,6 +26,9 @@ spec:
         - podSelector:
             matchLabels:
               component: jobservice
+        - podSelector:
+            matchLabels:
+              component: exporter
         {{- range .Values.harbor.database.internal }}
         {{- if .ingressNSMatchLabels }}
         - namespaceSelector:

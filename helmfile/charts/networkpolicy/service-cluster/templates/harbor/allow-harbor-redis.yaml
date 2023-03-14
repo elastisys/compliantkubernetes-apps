@@ -31,7 +31,7 @@ spec:
               component: registry
         - podSelector:
             matchLabels:
-              component: chartmuseum
+              component: exporter
       ports:
         - port: 6379
 {{- end }}
