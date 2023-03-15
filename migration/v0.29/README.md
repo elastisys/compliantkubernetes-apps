@@ -35,6 +35,15 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
 ## Prerequisites
 
+- [ ] Upgrade your version of helmfile and helm diff by following these steps:
+    - Uninstall `helm-diff` so that the new version can be installed:
+        ```console
+        $ helm plugin uninstall diff
+        ```
+    - From the root of your `compliantkubernetes-apps` directory, run ansible to get the updated requirements:
+        ```console
+        $ ansible-playbook -e 'ansible_python_interpreter=/usr/bin/python3' --ask-become-pass --connection local --inventory 127.0.0.1, get-requirements.yaml
+        ```
 - [ ] Notify the users (if any) before the upgrade starts;
 - [ ] Check if there are any pending changes to the environment;
 - [ ] Check the state of the environment, pods, nodes and backup jobs:
@@ -44,7 +53,6 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s test sc|wc cert-manager
     ./bin/ck8s test sc|wc ingress
     ./bin/ck8s test sc opensearch
-    ./bin/ck8s test wc hnc
     ./bin/ck8s ops kubectl sc|wc get pods -A -o custom-columns=NAMESPACE:metadata.namespace,POD:metadata.name,READY-false:status.containerStatuses[*].ready,REASON:status.containerStatuses[*].state.terminated.reason | grep false | grep -v Completed
     ./bin/ck8s ops kubectl sc|wc get nodes
     ./bin/ck8s ops kubectl sc|wc get jobs -A
@@ -84,7 +92,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > *Done before maintenance window.*
 
     ```bash
-    ./bin/ck8s upgrade prepare v0.29
+    ./bin/ck8s upgrade v0.29 prepare
     ```
 
 1. Apply upgrade - *disruptive*
@@ -92,7 +100,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > *Done during maintenance window.*
 
     ```bash
-    ./bin/ck8s upgrade apply v0.29
+    ./bin/ck8s upgrade v0.29 apply
     ```
 
 ## Manual method
