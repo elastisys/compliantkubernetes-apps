@@ -4,12 +4,10 @@
 
 Here you can find the most relevant features and changes for the last couple of releases of Compliant Kubernetes
 
+- The Fluentd deplyoment has changed considerably and users must ensure that their custom filters continues to work as expected. **[v0.29]**
+- Static users can now be added in OpenSearch. **[v0.29]**
 - Nginx ingress controller service now allows multiple annotations. **[v0.28]**
 - All grafana dashboards now use the default organization timezone. **[v0.28]**
-- NetworkPolicies are now automatically propagated from a parent namespace to its child namespaces. **[v0.27]**
-- Made Dex tokens expiry times configurable. **[v0.27]**
-- Alertmanager for the user is enabled by default. **[v0.27]**
-- Admin users can now view Gatekeeper constraints. **[v0.27]**
 
 ## Public docs
 
