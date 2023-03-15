@@ -5,8 +5,8 @@
       install_user: "{{ lookup('env','USER') }}"
       kubectl_version: 1.24.4
       helm_version: 3.8.0
-      helmfile_version: 0.144.0
-      helmdiff_version: 3.1.2
+      helmfile_version: 0.146.0
+      helmdiff_version: 3.5.0
       helmsecrets_version: 3.12.0
       jq_version: 1.6
       s3cmd_version: 2.*
@@ -40,10 +40,13 @@
         - "--no-anchored"
         - "helm"
     - name: Get Helmfile
-      get_url:
-        url: https://github.com/roboll/helmfile/releases/download/v{{ helmfile_version }}/helmfile_linux_amd64
-        dest: "{{ install_path }}/helmfile"
+      unarchive:
+        src: https://github.com/helmfile/helmfile/releases/download/v{{ helmfile_version }}/helmfile_{{ helmfile_version }}_linux_amd64.tar.gz
+        dest: "{{ install_path }}"
         mode: 0775
+        remote_src: yes
+        extra_opts:
+        - "helmfile"
     - name: Check if helm-diff plugin exists
       stat:
         path: "/home/{{ install_user }}/.local/share/helm/plugins/helm-diff"
