@@ -5,3 +5,7 @@ controllerManager:
   resources: {{- toYaml .Values.opa.controllerManager.resources | nindent 4  }}
 audit:
   resources: {{- toYaml .Values.opa.audit.resources | nindent 4  }}
+
+postInstall:
+  probeWebhook:
+    enabled: false
