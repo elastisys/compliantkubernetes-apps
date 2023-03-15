@@ -22,25 +22,57 @@ environments:
       - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
 ---
 
+commonLabels:
+  app: netpol
+
 releases:
 
 - name: common-np
   namespace: kube-system
   labels:
-    app: common-np
+    netpol: common
   chart: ./charts/networkpolicy/common
-  version: 0.1.0
+  version: 0.2.0
   values:
   - values/networkpolicy/common.yaml.gotmpl
 
+- name: networkpolicy
+  namespace: monitoring
+  labels:
+    netpol: monitoring
+  installed: {{ .Values.networkPolicies.monitoring.enabled }}
+  chart: ./charts/networkpolicy/generator
+  version: 0.1.0
+  values:
+  - values/networkpolicies/common/common.yaml.gotmpl
+  - values/networkpolicies/common/prometheus.yaml.gotmpl
+  - values/networkpolicies/common/trivy.yaml.gotmpl
+  {{- if eq .Environment.Name "service_cluster" }}
+  - values/networkpolicies/service/alertmanager.yaml.gotmpl
+  - values/networkpolicies/service/grafana.yaml.gotmpl
+  {{- else if eq .Environment.Name "workload_cluster" }}
+  - values/networkpolicies/workload/alertmanager.yaml.gotmpl
+  {{- end }}
+
 {{ if eq .Environment.Name "service_cluster" }}
+
+- name: networkpolicy
+  namespace: thanos
+  labels:
+    netpol: thanos
+  installed: {{ .Values.networkPolicies.thanos.enabled }}
+  chart: ./charts/networkpolicy/generator
+  version: 0.1.0
+  values:
+  - values/networkpolicies/common/common.yaml.gotmpl
+  - values/networkpolicies/service/thanos.yaml.gotmpl
 
 - name: service-cluster-np
   namespace: kube-system
   labels:
-    app: service-cluster-np
+    netpol: service
   chart: ./charts/networkpolicy/service-cluster
-  version: 0.1.0
+  version: 0.2.0
   values:
   - values/networkpolicy/service-cluster.yaml.gotmpl
 
@@ -51,9 +83,9 @@ releases:
 - name: workload-cluster-np
   namespace: kube-system
   labels:
-    app: workload-cluster-np
+    netpol: workload
   chart: ./charts/networkpolicy/workload-cluster
-  version: 0.1.0
+  version: 0.2.0
   values:
   - values/networkpolicy/workload-cluster.yaml.gotmpl
 

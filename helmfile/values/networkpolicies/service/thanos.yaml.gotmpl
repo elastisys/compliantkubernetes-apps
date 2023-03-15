@@ -1,0 +1,176 @@
+rules:
+  egress-rule-query:
+    peers:
+      - podSelectorLabels:
+          app.kubernetes.io/component: query
+    ports:
+      - tcp: 10902
+
+  ingress-rule-query:
+    peers:
+      - podSelectorLabels:
+          app.kubernetes.io/component: query
+    ports:
+      - tcp: 10901
+
+  ingress-rule-prometheus:
+    peers:
+      - namespaceSelectorLabels:
+          kubernetes.io/metadata.name: monitoring
+        podSelectorLabels:
+          app.kubernetes.io/name: prometheus
+    ports:
+      - tcp: 10902
+
+policies:
+  thanos:
+    all-deny:
+      podSelectorLabels: {}
+      egress: {}
+      ingress: {}
+
+    cert-manager-http01-solver:
+      podSelectorLabels:
+        acme.cert-manager.io/http01-solver: "true"
+      ingress:
+        - rule: ingress-rule-ingress
+          ports:
+            - tcp: 8089
+
+    thanos-bucketweb:
+      podSelectorLabels:
+        app.kubernetes.io/component: bucketweb
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-object-storage
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 8080
+
+    thanos-compactor:
+      podSelectorLabels:
+        app.kubernetes.io/component: compactor
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-object-storage
+      ingress:
+        - rule: ingress-rule-prometheus
+
+    thanos-query-frontend:
+      podSelectorLabels:
+        app.kubernetes.io/component: query-frontend
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-query
+      ingress:
+        - rule: ingress-rule-prometheus
+        - name: ingress-rule-grafana-datasource
+          peers:
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: monitoring
+              podSelectorLabels:
+                app.kubernetes.io/name: grafana
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: monitoring
+              podSelectorLabels:
+                app: grafana-label-enforcer
+          ports:
+            - tcp: 10902
+
+    thanos-query:
+      podSelectorLabels:
+        app.kubernetes.io/component: query
+      egress:
+        - rule: egress-rule-dns
+        - name: egress-rule-store-api
+          peers:
+            - podSelectorLabels:
+                app.kubernetes.io/component: storegateway
+            - podSelectorLabels:
+                app.kubernetes.io/component: receive
+            - podSelectorLabels:
+                app.kubernetes.io/component: ruler
+          ports:
+            - tcp: 10901
+      ingress:
+        - rule: ingress-rule-blackbox
+          ports:
+            - tcp: 10902
+        - rule: ingress-rule-prometheus
+        - name: ingress-rule-query-api
+          peers:
+            - podSelectorLabels:
+                app.kubernetes.io/component: query-frontend
+            - podSelectorLabels:
+                app.kubernetes.io/component: ruler
+          ports:
+            - tcp: 10902
+
+    thanos-storegateway:
+      podSelectorLabels:
+        app.kubernetes.io/component: storegateway
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-object-storage
+      ingress:
+        - rule: ingress-rule-prometheus
+        - rule: ingress-rule-query
+
+    thanos-receive-distributor:
+      podSelectorLabels:
+        app.kubernetes.io/component: receive-distributor
+      egress:
+        - rule: egress-rule-dns
+        - name: egress-rule-receive
+          peers:
+            - podSelectorLabels:
+                app.kubernetes.io/component: receive
+          ports:
+            - tcp: 10901
+      ingress:
+        - rule: ingress-rule-blackbox
+          ports:
+            - tcp: 10902
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 10902
+            - tcp: 19291
+        - rule: ingress-rule-ingress
+          ports:
+            - tcp: 19291
+
+    thanos-receive:
+      podSelectorLabels:
+        app.kubernetes.io/component: receive
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-object-storage
+      ingress:
+        - rule: ingress-rule-prometheus
+        - rule: ingress-rule-query
+        - name: ingress-rule-receive-distributor
+          peers:
+            - podSelectorLabels:
+                app.kubernetes.io/component: receive-distributor
+          ports:
+            - tcp: 10901
+
+    thanos-ruler:
+      podSelectorLabels:
+        app.kubernetes.io/component: ruler
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-object-storage
+        - rule: egress-rule-query
+        - name: egress-rule-alertmanager
+          peers:
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: monitoring
+              podSelectorLabels:
+                app.kubernetes.io/name: alertmanager
+          ports:
+            - tcp: 9093
+      ingress:
+        - rule: ingress-rule-prometheus
+        - rule: ingress-rule-query

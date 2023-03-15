@@ -1,0 +1,124 @@
+fullnameOverride: ""
+nameOverride: ""
+
+# This helm chart allows for network policies to be generated with a much simpler definition and with the option for reuse of rules
+
+# The rules can be imported into polices by specifying the name under the "rule" key within the policy
+rules:
+  # Rule format
+  # <rule-name>:
+  #   peers:
+  #     # with IPs:
+  #     - cidr: 0.0.0.0/0
+  #     # with labels
+  #     - namespaceSelectorLabels:
+  #         <key>: <value>
+  #       podSelectorLabels:
+  #         <key>: <value>
+  #     # with regular networkpolicy expressions:
+  #     - raw:
+  #         <expression>
+  #   ports:
+  #     - <protocol>: <port>
+
+  # egressRuleDNS:
+  #   ports:
+  #     - tcp: 53
+  #     - udp: 53
+
+  # egressRuleApiServer:
+  #   peers:
+  #     - cidr: 0.0.0.0/0
+  #   ports:
+  #     - tcp: 6443
+
+  # egressRuleIngressSC:
+  #   peers:
+  #     - cidr: 0.0.0.0/0
+  #   ports:
+  #     - tcp: 443
+
+  # egressRuleIngressWC:
+  #   peers:
+  #     - cidr: 0.0.0.0/0
+  #   ports:
+  #     - tcp: 443
+
+  # egressRuleObjectStore:
+  #   peers:
+  #     - cidr: 0.0.0.0/0
+  #   ports:
+  #     - tcp: 443
+
+  # ingressRuleApiServer:
+  #   peers:
+  #     - cidr: 0.0.0.0/0
+
+  # ingressRuleBlackbox:
+  #   peers:
+  #     - namespaceSelectorLabels:
+  #         kubernetes.io/metadata.name: monitoring
+  #       podSelectorLabels:
+  #         app.kubernetes.io/name: blackbox
+
+  # ingressRulePrometheus:
+  #   peers:
+  #     - namespaceSelectorLabels:
+  #         kubernetes.io/metadata.name: monitoring
+  #       podSelectorLabels:
+  #         app.kubernetes.io/name: prometheus
+
+# The policies are organised under namespaces: "policies.<policy-namespace>.<policy-name>"
+policies:
+  # Policy format
+  # <policy-namespace>:
+  #   <policy-name>:
+  #     podSelectorLabels:
+  #       <key>: <value>
+  #     egress:
+  #       - rule: <rule-name> # optional to import predefined rule
+  #         name: <rule-name> # optional to name the rule
+  #         peers: ... # following the rules format
+  #         ports: ... # following the rules format
+  #     ingress:
+  #       - rule: <rule-name> # optional to import predefined rule
+  #         name: <rule-name> # optional to name the rule
+  #         peers: ... # following the rules format
+  #         ports: ... # following the rules format
+
+  # monitoring:
+  #   deny:
+  #     podSelectorLabels: {}
+  #     egress: []
+  #     ingress: []
+  #   allow-prometheus:
+  #     podSelectorLabels:
+  #       app.kubernetes.io/name: prometheus
+  #     egress:
+  #       - rule: egressRuleDNS
+  #       - rule: egressRuleApiServer
+  #       - rule: egressRuleIngressSC
+  #       - rule: egressRuleIngressWC
+  #       - peers:
+  #           - namespaceSelectorLabels:
+  #               kubernetes.io/metadata.name: kube-system
+  #             podSelectorLabels:
+  #               k8s-app: coredns
+  #           - cidr: 1.1.1.1/32
+  #           - cidr: 1.0.0.1/32
+  #         ports:
+  #           - tcp: 53
+  #           - udp: 53
+  #     ingress:
+  #       - rule: ingressRuleApiServer
+  #         ports:
+  #           - tcp: 9090
+  #       - rule: ingressRuleBlackbox
+  #         ports:
+  #           - tcp: 9090
+  #       - rule: ingressRulePrometheus
+  #         ports:
+  #           - tcp: 9090
+  #       - ports:
+  #           - tcp: 53
+  #           - udp: 53

@@ -1,0 +1,19 @@
+policies:
+  monitoring:
+    trivy-operator:
+      podSelectorLabels:
+        app.kubernetes.io/instance: trivy-operator
+        app.kubernetes.io/name: trivy-operator
+      egress:
+        - rule: egress-rule-apiserver
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 8080
+
+    trivy-vulnerability-report-scanner:
+      podSelectorLabels:
+        vulnerabilityReport.scanner: Trivy
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-trivy

@@ -1,0 +1,42 @@
+{{- define "old-style.rule.gen" }}{{ if and .ips .ports }}
+{{- $peers := list }}{{ range .ips }}{{ $peers = dict "cidr" . | append $peers }}{{ end }}
+{{- $ports := list }}{{ range .ports }}{{ $ports = dict "tcp" . | append $ports }}{{ end }}
+{{- dict "peers" $peers "ports" $ports | toYaml | nindent 10 | trim -}}
+{{- end }}{{ end -}}
+
+policies:
+  monitoring:
+    alertmanager:
+      podSelectorLabels:
+        app.kubernetes.io/name: alertmanager
+      egress:
+        - rule: egress-rule-dns
+        - name: egress-rule-alertmanager
+          peers:
+            - podSelectorLabels:
+                app.kubernetes.io/name: alertmanager
+        {{- with .Values.networkPolicies.alertmanager.alertReceivers }}
+        - name: egress-rule-alert-receivers
+          {{ template "old-style.rule.gen" . }}
+        {{- end }}
+      ingress:
+        - name: ingress-rule-alertmanager
+          peers:
+            - podSelectorLabels:
+                app.kubernetes.io/name: alertmanager
+        - name: ingress-rule-alert-generators
+          peers:
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: falco
+              podSelectorLabels:
+                app.kubernetes.io/name: falco-sidekick
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: monitoring
+              podSelectorLabels:
+                app.kubernetes.io/name: prometheus
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: thanos
+              podSelectorLabels:
+                app.kubernetes.io/component: ruler
+          ports:
+            - tcp: 9093

@@ -12,12 +12,39 @@ helm_do() {
   fi
 }
 
+helm_chart_name() {
+  if [[ "${#}" -lt 3 ]] || [[ ! "${1}" =~ ^(sc|wc)$ ]]; then
+    log_fatal "usage: helm_chart_name <sc|wc> <namespace> <release>"
+  fi
+
+  helm_do "${1}" list -n "${2}" -oyaml 2> /dev/null | yq4 ".[] | select(.name == \"${3}\") | .chart | sub(\"-\d+\.\d+\.\d+$\", \"\")"
+}
+
+helm_chart_version() {
+  if [[ "${#}" -lt 3 ]] || [[ ! "${1}" =~ ^(sc|wc)$ ]]; then
+    log_fatal "usage: helm_chart_version <sc|wc> <namespace> <release>"
+  fi
+
+  helm_do "${1}" list -n "${2}" -oyaml 2> /dev/null | yq4 ".[] | select(.name == \"${3}\") | .chart | match(\"\d+\.\d+\.\d+\") | .string"
+}
+
 helm_installed() {
   if [[ "${#}" -lt 3 ]] || [[ ! "${1}" =~ ^(sc|wc)$ ]]; then
     log_fatal "usage: helm_installed <sc|wc> <namespace> <release>"
   fi
 
   helm_do "${1}" status -n "${2}" "${3}" > /dev/null 2>&1
+}
+
+helm_rollback() {
+  if [[ "${#}" -lt 3 ]] || [[ ! "${1}" =~ ^(sc|wc)$ ]]; then
+    log_fatal "usage: helm_rollback <sc|wc> <namespace> <release>"
+  fi
+
+  if helm_installed "${@}"; then
+    log_info "  - rolling back ${1} ${2}/${3}"
+    helm_do "${1}" rollback -n "${2}" "${3}"
+  fi
 }
 
 helm_uninstall() {

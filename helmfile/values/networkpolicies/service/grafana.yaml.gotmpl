@@ -1,0 +1,74 @@
+{{- define "old-style.rule.gen" }}{{ if and .ips .ports }}
+{{- $peers := list }}{{ range .ips }}{{ $peers = dict "cidr" . | append $peers }}{{ end }}
+{{- $ports := list }}{{ range .ports }}{{ $ports = dict "tcp" . | append $ports }}{{ end }}
+{{- dict "peers" $peers "ports" $ports | toYaml | nindent 10 | trim -}}
+{{- end }}{{ end -}}
+
+policies:
+  monitoring:
+    grafana:
+      podSelectorLabels:
+        app.kubernetes.io/name: grafana
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
+        - name: egress-rule-prometheus
+          peers:
+            - podSelectorLabels:
+                app.kubernetes.io/name: prometheus
+            - podSelectorLabels:
+                app: grafana-label-enforcer
+          ports:
+            - tcp: 9090
+        - name: egress-rule-thanos
+          peers:
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: thanos
+              podSelectorLabels:
+                app.kubernetes.io/component: query-frontend
+          ports:
+            - tcp: 10902
+        - name: egress-rule-dex
+          peers:
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: dex
+              podSelectorLabels:
+                app.kubernetes.io/name: dex
+          ports:
+            - tcp: 5556
+        {{- with .Values.networkPolicies.monitoring.grafana.externalDataSources }}{{ if .enabled }}
+        - name: egress-rule-external-datasources
+          {{ template "old-style.rule.gen" . }}
+        {{- end }}{{ end }}
+        {{- with .Values.networkPolicies.monitoring.grafana.externalDashboardProvider }}
+        - name: egress-rule-external-dashboards
+          {{ template "old-style.rule.gen" . }}
+        {{- end }}
+      ingress:
+        - rule: ingress-rule-ingress
+          ports:
+            - tcp: 3000
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 3000
+
+    grafana-label-enforcer:
+      podSelectorLabels:
+        app: grafana-label-enforcer
+      egress:
+        - rule: egress-rule-dns
+        - name: egress-rule-thanos-query-frontend
+          peers:
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: thanos
+              podSelectorLabels:
+                app.kubernetes.io/component: query-frontend
+          ports:
+            - tcp: 10902
+      ingress:
+        - name: ingress-rule-grafana-datasource
+          peers:
+            - podSelectorLabels:
+                app.kubernetes.io/name: grafana
+          ports:
+            - tcp: 9090

@@ -1,0 +1,46 @@
+{{- range $namespace, $policies := .Values.policies }}
+{{- range $name, $policy := $policies }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    {{- include "networkpolicy-generator.labels" $ | nindent 4 }}
+  name: {{ $name }}
+  namespace: {{ $namespace }}
+spec:
+  podSelector:
+    {{- with $policy.podSelectorLabels }}
+    matchLabels: {{- toYaml . | nindent 6 }}
+    {{- else }} {} {{- end }}
+  policyTypes:
+    {{- if hasKey $policy "egress" }}
+    - Egress
+    {{- end }}
+    {{- if hasKey $policy "ingress" }}
+    - Ingress
+    {{- end }}
+
+  {{- with $policy.egress }}
+  egress:
+    {{- range . }}
+    {{ $rule := merge . (get $.Values.rules (.rule | default "") | default dict) -}}
+    {{ include "networkpolicy-generator.generateRuleComment" $rule -}}
+    {{ if unset $rule "name" -}}
+    - {{ include "networkpolicy-generator.generateEgressRule" $rule | nindent 6 | trim }}
+    {{- end }}
+    {{- end }}
+  {{- end }}
+
+  {{- with $policy.ingress }}
+  ingress:
+    {{- range . }}
+    {{ $rule := merge . (get $.Values.rules (.rule | default "") | default dict) -}}
+    {{ include "networkpolicy-generator.generateRuleComment" $rule -}}
+    {{ if unset $rule "name" -}}
+    - {{ include "networkpolicy-generator.generateIngressRule" $rule | nindent 6 | trim }}
+    {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,128 @@
+{{- $netpol := .Values.networkPolicies }}
+
+{{- $apiserver := dict }}
+{{- $ingress := dict }}
+{{- $nodes := dict }}
+
+{{- if eq .Environment.Name "service_cluster" }}
+
+{{- $apiserver = .Values.networkPolicies.global.scApiserver }}
+{{- $ingress = .Values.networkPolicies.global.scIngress }}
+{{- $nodes = .Values.networkPolicies.global.scNodes }}
+
+{{- else if eq .Environment.Name "workload_cluster" }}
+
+{{- $apiserver = .Values.networkPolicies.global.wcApiserver }}
+{{- $ingress = .Values.networkPolicies.global.wcIngress }}
+{{- $nodes = .Values.networkPolicies.global.wcNodes }}
+
+{{- end -}}
+
+{{- if not $netpol.global.externalLoadBalancer | and $netpol.global.ingressUsingHostNetwork }}
+{{- $ingress = $nodes }}
+{{- end -}}
+
+rules:
+  egress-rule-dns:
+    peers:
+      - cidr: 10.233.0.3/32
+    ports:
+      - tcp: 53
+      - udp: 53
+
+  egress-rule-apiserver:
+    peers:
+      {{- range $apiserver.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+    ports:
+      - tcp: {{ $apiserver.port }}
+
+  egress-rule-ingress:
+    peers:
+      {{- if or $netpol.global.externalLoadBalancer $netpol.global.ingressUsingHostNetwork | not }}
+      - namespaceSelectorLabels:
+          kubernetes.io/metadata.name: ingress-nginx
+        podSelectorLabels:
+          app.kubernetes.io/component: controller
+          app.kubernetes.io/name: ingress-nginx
+      {{- end }}
+      {{- range $ingress.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+    ports:
+      - tcp: 443
+
+  egress-rule-sc-ingress:
+    peers:
+      {{- range $netpol.global.scIngress.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+    ports:
+      - tcp: 443
+
+  egress-rule-wc-ingress:
+    peers:
+      {{- range $netpol.global.wcIngress.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+    ports:
+      - tcp: 443
+
+  egress-rule-nodes:
+    peers:
+      {{- range $nodes.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+
+  egress-rule-object-storage:
+    peers:
+      {{- range $netpol.global.objectStorage.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+    ports:
+      {{- range $netpol.global.objectStorage.ports }}
+      - tcp: {{ . }}
+      {{- end }}
+
+  egress-rule-trivy:
+    peers:
+      {{- range $netpol.global.trivy.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+    ports:
+      - tcp: 443
+
+  ingress-rule-apiserver:
+    peers:
+      {{- range $apiserver.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+
+  ingress-rule-ingress:
+    peers:
+      {{- if and $netpol.global.ingressUsingHostNetwork $nodes.ips }}
+      {{- range $nodes.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+      {{- else }}
+      - namespaceSelectorLabels:
+          kubernetes.io/metadata.name: ingress-nginx
+        podSelectorLabels:
+          app.kubernetes.io/component: controller
+          app.kubernetes.io/name: ingress-nginx
+      {{- end }}
+
+  ingress-rule-blackbox:
+    peers:
+      - namespaceSelectorLabels:
+          kubernetes.io/metadata.name: monitoring
+        podSelectorLabels:
+          app.kubernetes.io/name: prometheus-blackbox-exporter
+
+  ingress-rule-prometheus:
+    peers:
+      - namespaceSelectorLabels:
+          kubernetes.io/metadata.name: monitoring
+        podSelectorLabels:
+          app.kubernetes.io/name: prometheus
