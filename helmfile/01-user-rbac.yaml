@@ -14,6 +14,7 @@ environments:
       - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/wc-config.yaml"
     secrets:
       - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
+---
 
 # The desired state of Helm releases.
 releases:
