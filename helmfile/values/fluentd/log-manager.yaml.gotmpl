@@ -8,6 +8,7 @@ instances:
   {{- if .Values.fluentd.audit.enabled }}
   {{- range .Values.global.clustersMonitoring }}
   - bucket: {{ $.Values.objectStorage.buckets.audit }}
+    name: audit
     prefix: {{ . }}
     compaction:
       enabled: {{ $.Values.fluentd.audit.compaction.enabled }}
@@ -22,6 +23,7 @@ instances:
   {{- if .Values.fluentd.enabled }}
   {{- if .Values.fluentd.audit.enabled }}
   - bucket: {{ .Values.objectStorage.buckets.audit }}
+    name: audit
     prefix: {{ .Values.global.clusterName }}
     compaction:
       enabled: {{ .Values.fluentd.audit.compaction.enabled }}
@@ -34,6 +36,7 @@ instances:
   {{- end }}
   {{- if .Values.fluentd.scLogs.enabled }}
   - bucket: {{ .Values.objectStorage.buckets.scFluentd }}
+    name: sc-logs
     prefix: logs
     compaction:
       enabled: {{ .Values.fluentd.scLogs.compaction.enabled }}
