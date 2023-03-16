@@ -4,7 +4,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ .bucket }}-{{ .prefix }}-retention
+  name: {{ .name }}-{{ .prefix }}-retention
   labels:
     {{- include "log-manager.labels" $ | nindent 4 }}
 spec:
