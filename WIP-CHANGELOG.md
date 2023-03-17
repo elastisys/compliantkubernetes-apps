@@ -26,6 +26,7 @@
 - Add node-local-dns Grafana dashboard
 - Add gatekeeper mutation for setting seccomp profile
 - Allow drop all capabilites mutation to be disabled per service
+- Added annotation for the grafana dashboard "Compute Resources / Pod" to show container restarts
 
 ### Fixed
 

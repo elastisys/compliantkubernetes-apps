@@ -23,7 +23,19 @@ data:
     {
         "annotations": {
             "list": [
-
+              {
+                "datasource": {
+                  "type": "prometheus",
+                  "uid": "${datasource}"
+                },
+                "enable": true,
+                "expr": "changes(kube_pod_container_status_restarts_total{pod=\"$pod\"}[$__interval]) > 0",
+                "iconColor": "red",
+                "name": "Container restart",
+                "step": "",
+                "textFormat": "Container \"{{ container }}\" restarted",
+                "titleFormat": "Container restarted"
+              }
             ]
         },
         "editable": true,
