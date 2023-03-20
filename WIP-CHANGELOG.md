@@ -16,6 +16,7 @@
 - Increased interval for rook-ceph service monitor which fixes the grafana dashboard
 - Add document splits to helmfiles to prepare support for helmfile v0.150+
 - Added option to use nodePort for ingress-nginx.
+- Correct version checks in migration script library
 
 ### Updated
 

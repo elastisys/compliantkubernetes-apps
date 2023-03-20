@@ -226,7 +226,7 @@ check_version() {
   if [ "${VERSION["${1}-config"]}" = "any" ]; then
     log_warn "skipping version validation of ${1}-config for version \"${VERSION["${1}-config"]}\""
     return
-  elif [[ ! "${version}" =~ v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+  elif [[ ! "${VERSION["${1}-config"]}" =~ v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
     log_warn "reducing version validation of ${1}-config for version \"${VERSION["${1}-config"]}\""
   else
     log_info "version validation of ${1}-config for version \"${VERSION["${1}-config"]}\""
@@ -268,8 +268,7 @@ check_version() {
 
   local repo_version
   repo_version="$(git_version)"
-
-  if [[ "${repo_version%%.*}" == "${CK8S_TARGET_VERSION}" ]]; then
+  if [[ "${repo_version%.*}" == "${CK8S_TARGET_VERSION}" ]]; then
     log_info "valid repository version \"${repo_version}\""
   elif [[ "${repo_version}" == "${VERSION["${1}-config"]}" ]]; then
     log_warn "valid repository version \"${repo_version}\""
