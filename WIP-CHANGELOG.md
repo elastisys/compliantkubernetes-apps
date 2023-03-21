@@ -27,5 +27,6 @@
 - grafana to v9.3.8
 
 ### Changed
+- Changed timekey to `stageTimestamp` for Kubernetes audit logs. Use `auditID` to correlate stages of the same request.
 
 ### Removed
