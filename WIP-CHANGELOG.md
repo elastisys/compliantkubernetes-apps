@@ -14,8 +14,8 @@
 - Add Gatekeeper PSPs for Fluentd and OpenSearch
 - Add Gatekeeper PSPs for Kured.
 - Add Gatekeeper PSPs for Harbor
-- Add Gatekeeper mutation for setting job TTL if not already set.
-  By default, a TTL of 7 days will be set.
+- Add Gatekeeper mutation for setting job TTL if not already set. By default, a TTL of 7 days will be set.
+- Enabled Pod Security Admission for `dex` and `cert-manager`
 
 ### Fixed
 
@@ -34,8 +34,8 @@
 - grafana to v9.3.8
 
 ### Changed
-- Changed timekey to `stageTimestamp` for Kubernetes audit logs. Use `auditID` to correlate stages of the same request.
 
+- Changed timekey to `stageTimestamp` for Kubernetes audit logs. Use `auditID` to correlate stages of the same request.
 - vulnerability and kube-bench reporter runs as non root.
 - Replace chown init container with fsGroup in OpenSearch
 - Restructure Gatekeeper charts and values

@@ -1,6 +1,14 @@
 namespaces:
 - name: cert-manager
+  labels:
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
 - name: dex
+  labels:
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
 - name: opensearch-system
 {{- if .Values.fluentd.enabled }}
 - name: fluentd-system
