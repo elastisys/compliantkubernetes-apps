@@ -125,7 +125,7 @@ helmfile_replace() {
 # will rollback on failure if CK8S_ROLLBACK is not false
 helmfile_upgrade() {
   if [[ "${#}" -lt 2 ]] || [[ ! "${1}" =~ ^(sc|wc)$ ]]; then
-    log_fatal "usage: helmfile_replace <sc|wc> <selectors>..."
+    log_fatal "usage: helmfile_upgrade <sc|wc> <selectors>..."
   fi
 
   log_info "upgrading ${1} ${*:2}"

@@ -24,16 +24,17 @@ run() {
     local selector
 
     filters=("${skipped[@]}" "${skipped_sc[@]}")
-    selector="${filters[*]}"
+    selector="${filters[*]:-"app!=null"}"
     helmfile_upgrade sc "${selector// /,}"
-
     filters=("${skipped[@]}" "${skipped_wc[@]}")
-    selector="${filters[*]}"
+    selector="${filters[*]:-"app!=null"}"
     helmfile_upgrade wc "${selector// /,}"
     ;;
+
   rollback)
     log_warn "rollback not implemented"
     ;;
+
   *)
     log_fatal "usage: \"${0}\" <execute|rollback>"
     ;;

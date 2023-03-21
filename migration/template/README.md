@@ -68,7 +68,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > *Done before maintenance window.*
 
     ```bash
-    ./bin/ck8s upgrade prepare ${new_version}
+    ./bin/ck8s upgrade ${new_version} prepare
     ```
 
 1. Apply upgrade - *disruptive*
@@ -76,7 +76,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > *Done during maintenance window.*
 
     ```bash
-    ./bin/ck8s upgrade apply ${new_version}
+    ./bin/ck8s upgrade ${new_version} apply
     ```
 
 ## Manual method
@@ -119,7 +119,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ```bash
     ./bin/ck8s apply {sc|wc}
     # or
-    ./migration/${new_version}/apply/99-apply.sh
+    ./migration/${new_version}/apply/80-apply.sh
     ```
 
 ## Postrequisite:
