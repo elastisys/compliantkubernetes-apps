@@ -1,0 +1,21 @@
+{{- $namespaces := keys .Values.constraints | sortAlpha }}
+{{- $exceptions := list }}
+{{- range $namespace, $services := .Values.constraints }}
+{{- range $services }}
+{{- if hasKey .allow "allowedUnsafeSysctls" }}
+{{- $exceptions = append $exceptions .podSelectorLabels }}
+{{- end }}
+{{- end }}
+{{- end }}
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPForbiddenSysctls
+metadata:
+  name: sysctls-restricted
+spec:
+  match:
+    {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
+  parameters:
+    allowedSysctls: []
+    forbiddenSysctls:
+      - "*"

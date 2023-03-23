@@ -1,0 +1,49 @@
+fullnameOverride: ""
+nameOverride: ""
+
+imagePullSecrets: []
+image:
+  pullPolicy: IfNotPresent
+  # TODO: Provide own image
+  repository: docker.io/bitnami/kubectl
+  tag: "1.25"
+
+wait: true
+waitFor:
+  - k8sallowedrepos
+  - k8sdisallowedtags
+  - k8spspallowedusers
+  - k8spspallowprivilegeescalationcontainer
+  - k8spspapparmor
+  - k8spspcapabilities
+  - k8spspflexvolumes
+  - k8spspforbiddensysctls
+  - k8spspfsgroup
+  - k8spsphostfilesystem
+  - k8spsphostnamespace
+  - k8spsphostnetworkingports
+  - k8spspprivilegedcontainer
+  - k8spspprocmount
+  - k8spspreadonlyrootfilesystem
+  - k8spspseccomp
+  - k8spspselinuxv2
+  - k8spspvolumetypes
+  - k8srequirenetworkpolicy
+  - k8sresourcerequests
+
+serviceAccount:
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  capabilities:
+    drop:
+      - ALL

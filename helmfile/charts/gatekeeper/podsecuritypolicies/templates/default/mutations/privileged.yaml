@@ -1,33 +1,17 @@
+{{- $namespaces := keys .Values.constraints | sortAlpha }}
+{{- $exceptions := .Values.mutationExceptions }}
+---
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: mutation-privileged
+  name: privileged-restricted-container
 spec:
   applyTo:
     - groups: [""]
       kinds: ["Pod"]
       versions: ["v1"]
   match:
-    scope: Namespaced
-    kinds:
-      - apiGroups: ["*"]
-        kinds: ["Pod"]
-    namespaces:
-    {{- range $namespace, $services := .Values.constraints }}
-      - {{ $namespace }}
-    {{- end}}
-    {{- if .Values.mutationExceptions }}
-    labelSelector:
-      matchExpressions:
-        {{- range $value := .Values.mutationExceptions }}
-        {{- range $labelkey, $labelvalue := $value }}
-        - key: {{ $labelkey }}
-          operator: NotIn
-          values:
-            - {{ $labelvalue | quote }}
-        {{- end }}
-        {{- end }}
-    {{- end }}
+    {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
   location: "spec.containers[name: *].securityContext.privileged"
   parameters:
     assign:
@@ -39,33 +23,33 @@ spec:
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: mutation-init-privileged
+  name: privileged-restricted-ephemeral
 spec:
   applyTo:
     - groups: [""]
       kinds: ["Pod"]
       versions: ["v1"]
   match:
-    scope: Namespaced
-    kinds:
-      - apiGroups: ["*"]
-        kinds: ["Pod"]
-    namespaces:
-    {{- range $namespace, $services := .Values.constraints }}
-      - {{ $namespace }}
-    {{- end}}
-    {{- if .Values.mutationExceptions }}
-    labelSelector:
-      matchExpressions:
-        {{- range $value := .Values.mutationExceptions }}
-        {{- range $labelkey, $labelvalue := $value }}
-        - key: {{ $labelkey }}
-          operator: NotIn
-          values:
-            - {{ $labelvalue | quote }}
-        {{- end }}
-        {{- end }}
-    {{- end }}
+    {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
+  location: "spec.ephemeralContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
   location: "spec.initContainers[name: *].securityContext.privileged"
   parameters:
     assign:

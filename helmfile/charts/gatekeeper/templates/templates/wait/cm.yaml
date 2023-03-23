@@ -1,0 +1,15 @@
+{{- if .Values.wait -}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "gatekeeper-templates.fullname" . }}-wait
+  labels:
+    {{- include "gatekeeper-templates.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: hook-succeeded
+data:
+  wait.sh: |-
+    {{- .Files.Get "files/wait.sh" | nindent 4 }}
+{{- end }}

@@ -113,7 +113,9 @@ extraInitContainers:
       - -w
       - vm.max_map_count=262144
     securityContext:
+      allowPrivilegeEscalation: true
       privileged: true
+      runAsNonRoot: false
       runAsUser: 0
 
 secretMounts:
@@ -129,9 +131,22 @@ secretMounts:
 rbac:
   create: true
 
-# TODO: Shave, currently created with `privileged: true`..., which we might need for sysctl...
+persistence:
+  enableInitChown: false
+
 podSecurityPolicy:
-  create: true
+  create: {{ .Values.kubernetesPSP }}
+
+podSecurityContext:
+  fsGroup: 1000
+
+securityContext:
+  runAsNonRoot: true
+  runAsGroup: 1000
+  runAsUser: 1000
+  capabilities:
+    drop:
+      - ALL
 
 networkPolicy:
   create: true

@@ -1,33 +1,25 @@
+{{- $namespaces := keys .Values.constraints | sortAlpha }}
+{{- $exceptions := .Values.mutationExceptions }}
+
+{{- range $namespace, $services := .Values.constraints }}
+{{- range $name, $value := $services }}
+{{- if get (default dict $value.allow.runAsUser) "rule" | eq "RunAsAny" }}
+{{- $exceptions = append $exceptions $value.podSelectorLabels }}
+{{- end }}
+{{- end }}
+{{- end }}
+---
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: mutation-run-as-non-root
+  name: run-as-non-root-restricted
 spec:
   applyTo:
     - groups: [""]
       kinds: ["Pod"]
       versions: ["v1"]
   match:
-    scope: Namespaced
-    kinds:
-      - apiGroups: ["*"]
-        kinds: ["Pod"]
-    namespaces:
-    {{- range $namespace, $services := .Values.constraints }}
-      - {{ $namespace }}
-    {{- end}}
-    {{- if .Values.mutationExceptions }}
-    labelSelector:
-      matchExpressions:
-        {{- range $value := .Values.mutationExceptions }}
-        {{- range $labelkey, $labelvalue := $value }}
-        - key: {{ $labelkey }}
-          operator: NotIn
-          values:
-            - {{ $labelvalue | quote }}
-        {{- end }}
-        {{- end }}
-    {{- end }}
+    {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
   location: "spec.containers[name: *].securityContext.runAsNonRoot"
   parameters:
     assign:
@@ -39,33 +31,33 @@ spec:
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: mutation-init-run-as-non-root
+  name: run-as-non-root-restricted-ephemeral
 spec:
   applyTo:
     - groups: [""]
       kinds: ["Pod"]
       versions: ["v1"]
   match:
-    scope: Namespaced
-    kinds:
-      - apiGroups: ["*"]
-        kinds: ["Pod"]
-    namespaces:
-    {{- range $namespace, $services := .Values.constraints }}
-      - {{ $namespace }}
-    {{- end}}
-    {{- if .Values.mutationExceptions }}
-    labelSelector:
-      matchExpressions:
-        {{- range $value := .Values.mutationExceptions }}
-        {{- range $labelkey, $labelvalue := $value }}
-        - key: {{ $labelkey }}
-          operator: NotIn
-          values:
-            - {{ $labelvalue | quote }}
-        {{- end }}
-        {{- end }}
-    {{- end }}
+    {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
+  location: "spec.ephemeralContainers[name: *].securityContext.runAsNonRoot"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.runAsNonRoot"
+        condition: MustNotExist
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-non-root-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
   location: "spec.initContainers[name: *].securityContext.runAsNonRoot"
   parameters:
     assign:

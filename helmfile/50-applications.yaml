@@ -687,7 +687,7 @@ releases:
   namespace: gatekeeper-system
   labels:
     app: gatekeeper-metrics
-  chart: ./charts/gatekeeper-metrics
+  chart: ./charts/gatekeeper/metrics
   version: 0.1.0
   installed: {{ .Values.opa.enabled }}
 
@@ -696,11 +696,11 @@ releases:
   namespace: gatekeeper-system
   labels:
     app: gatekeeper-constraints
-  chart: ./charts/gatekeeper-constraints
+  chart: ./charts/gatekeeper/constraints
   version: 1.6.0
   installed: {{ .Values.opa.enabled }}
   values:
-  - values/gatekeeper-constraints.yaml.gotmpl
+  - values/gatekeeper/constraints.yaml.gotmpl
 
 # hierarchical namespace controller config and CRDs
 - name: hnc-config-and-crds

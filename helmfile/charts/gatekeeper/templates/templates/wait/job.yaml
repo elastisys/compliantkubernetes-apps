@@ -1,0 +1,60 @@
+{{- if .Values.wait -}}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "gatekeeper-templates.fullname" . }}-wait
+  labels:
+    {{- include "gatekeeper-templates.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: hook-succeeded
+spec:
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "gatekeeper-templates.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "gatekeeper-templates.serviceAccountName" . }}
+      restartPolicy: Never
+      containers:
+        - name: wait
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          command:
+            - /bin/bash
+          args:
+            - /scripts/wait.sh
+            {{- range .Values.waitFor }}
+            - {{ . }}.constraints.gatekeeper.sh
+            {{- end }}
+          securityContext: {{- toYaml .Values.securityContext | nindent 12 }}
+          resources: {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+      {{- with .Values.podSecurityContext }}
+      securityContext: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      - name: scripts
+        configMap:
+          name: {{ include "gatekeeper-templates.fullname" . }}-wait
+{{- end }}

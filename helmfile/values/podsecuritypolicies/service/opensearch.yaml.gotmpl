@@ -1,0 +1,38 @@
+constraints:
+  opensearch-system:
+    opensearch-nodes:
+      podSelectorLabels:
+        app.kubernetes.io/name: opensearch
+      allow:
+        allowPrivilegeEscalation: true
+        # allowedUnsafeSysctls:
+        #   - vm.max_map_count
+        privileged: true
+        runAsUser:
+          rule: RunAsAny
+        volumes:
+          - configMap
+          - emptyDir
+          - persistentVolumeClaim
+          - projected
+          - secret
+
+    opensearch-dashboards:
+      podSelectorLabels:
+        app: opensearch-dashboards
+      allow:
+        volumes:
+          - configMap
+          - projected
+          - secret
+
+    # TODO: Constrain jobs
+
+    prometheus-opensearch-exporter:
+      podSelectorLabels:
+        app: prometheus-elasticsearch-exporter
+      allow:
+        readOnlyRootFilesystem: true
+        volumes:
+          - projected
+          - secret

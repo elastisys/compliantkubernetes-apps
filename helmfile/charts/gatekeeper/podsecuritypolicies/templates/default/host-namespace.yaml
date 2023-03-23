@@ -1,27 +1,17 @@
+{{- $namespaces := keys .Values.constraints | sortAlpha }}
+{{- $exceptions := list }}
+{{- range $namespace, $services := .Values.constraints }}
+{{- range $services }}
+{{- if get .allow "hostNamespace" }}
+{{- $exceptions = append $exceptions .podSelectorLabels }}
+{{- end }}
+{{- end }}
+{{- end }}
+---
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sPSPHostNamespace
 metadata:
-  name: psp-host-namespace
+  name: host-namespace-restricted
 spec:
   match:
-    kinds:
-      - apiGroups: [""]
-        kinds: ["Pod"]
-    namespaces:
-    {{- range $namespace, $services := .Values.constraints }}
-      - {{ $namespace }}
-    {{- end}}
-    labelSelector:
-      matchExpressions:
-        {{- range $namespace,$services := .Values.constraints }}
-          {{- range $name, $value := $services }}
-            {{- if hasKey $value.allow "hostNamespace" }}
-              {{- range $labelkey, $labelvalue := $value.podSelectorLabels }}
-        - key: {{ $labelkey }}
-          operator: NotIn
-          values:
-            - {{ $labelvalue | quote }}
-              {{- end }}
-            {{- end }}
-          {{- end }}
-        {{- end }}
+    {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}

@@ -11,6 +11,7 @@
 
 - Add PrometheusRule to alert for dropped packets to/from workloads.
 - Add Gatekeeper PSPs for ingress-nginx and monitoring namespaces.
+- Add Gatekeeper PSPs for Fluentd and OpenSearch
 
 ### Fixed
 
@@ -32,7 +33,10 @@
 - Changed timekey to `stageTimestamp` for Kubernetes audit logs. Use `auditID` to correlate stages of the same request.
 
 - vulnerability and kube-bench reporter runs as non root.
+- Replace chown init container with fsGroup in OpenSearch
+- Restructure Gatekeeper charts and values
 
 ### Removed
 
 - Kubernetes PSP for ingress-nginx and monitoring namespace.
+- Remove Kubernetes PSPs for Fluentd and OpenSearch

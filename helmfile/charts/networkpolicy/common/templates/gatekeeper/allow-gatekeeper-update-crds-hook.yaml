@@ -2,24 +2,24 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-gatekeeper-update-namespace-label
+  name: allow-gatekeeper-update-crds-hook
   namespace: gatekeeper-system
 spec:
   podSelector:
     matchLabels:
-      job-name: gatekeeper-update-namespace-label
+      job-name: gatekeeper-update-crds-hook
   policyTypes:
     - Ingress
     - Egress
   egress:
-    {{- if and .Values.global.wcApiserver.ips .Values.global.wcApiserver.port }}
+    {{- if and .Values.global.apiserver.ips .Values.global.apiserver.port }}
     - to:
-        {{- range $IP := .Values.global.wcApiserver.ips }}
+        {{- range $IP := .Values.global.apiserver.ips }}
         - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
       ports:
         - protocol: TCP
-          port: {{ .Values.global.wcApiserver.port }}
+          port: {{ .Values.global.apiserver.port }}
     {{- end }}
 {{- end }}

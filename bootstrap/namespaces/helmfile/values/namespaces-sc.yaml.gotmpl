@@ -4,6 +4,10 @@ namespaces:
 - name: opensearch-system
 {{- if .Values.fluentd.enabled }}
 - name: fluentd-system
+  labels:
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/warn: privileged
 {{- end }}
 - name: kube-node-lease
 - name: kube-public

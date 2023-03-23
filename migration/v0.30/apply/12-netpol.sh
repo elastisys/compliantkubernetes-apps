@@ -8,11 +8,11 @@ source "${ROOT}/scripts/migration/lib.sh"
 run() {
   case "${1:-}" in
   execute)
-    for CLUSTER in sc wc; do
-      log_info "  - applying gatekeeper PodSecurityPolicies for $CLUSTER"
-      helmfile_apply sc app=psp
-      helmfile_apply wc app=psp
-    done
+    helmfile_upgrade sc "app=service-cluster-np"
+    helmfile_upgrade sc "app=common-np"
+
+    helmfile_upgrade wc "app=workload-cluster-np"
+    helmfile_upgrade wc "app=common-np"
     ;;
   rollback)
     log_warn "rollback not implemented"

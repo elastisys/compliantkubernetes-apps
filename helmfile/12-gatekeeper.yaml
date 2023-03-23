@@ -1,10 +1,8 @@
-# Defult settings to use with helm.
 helmDefaults:
   timeout: 600
   createNamespace: false
   skipDeps: true
 
-# Environments
 environments:
   workload_cluster:
     values:
@@ -24,19 +22,16 @@ environments:
       - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
 ---
 
-# The desired state of Helm releases.
 releases:
-# gatekeeper
 - name: gatekeeper
   namespace: gatekeeper-system
   labels:
     app: gatekeeper
+    component: gatekeeper
   chart: ./upstream/gatekeeper
-  # https://helm.sh/docs/chart_best_practices/custom_resource_definitions/#some-caveats-and-explanations
-  # The --dry-run flag of helm install and helm upgrade is not currently supported for CRDs.
-  disableValidationOnInstall: true
   version: 3.11.0
   installed: {{ .Values.opa.enabled }}
+  disableValidationOnInstall: true
   wait: true
   values:
-  - values/gatekeeper.yaml.gotmpl
+  - values/gatekeeper/gatekeeper.yaml.gotmpl

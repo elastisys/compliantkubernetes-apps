@@ -1,0 +1,35 @@
+{{- $namespaces := keys .Values.constraints | sortAlpha }}
+{{- $exceptions := list }}
+{{- range $namespace, $services := .Values.constraints }}
+{{- range $services }}
+{{- if pick .allow "runAsUser" "runAsGroup" "supplementalGroups" "fsGroup" }}
+{{- $exceptions = append $exceptions .podSelectorLabels }}
+{{- end }}
+{{- end }}
+{{- end }}
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-restricted
+spec:
+  match:
+    {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
+  parameters:
+    runAsUser:
+      rule: MustRunAsNonRoot
+    runAsGroup:
+      rule: MustRunAs
+      ranges:
+        - max: 65535
+          min: 1
+    supplementalGroups:
+      rule: MustRunAs
+      ranges:
+        - max: 65535
+          min: 1
+    fsGroup:
+      rule: MustRunAs
+      ranges:
+        - max: 65535
+          min: 1

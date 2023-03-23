@@ -1,27 +1,17 @@
+{{- $namespaces := keys .Values.constraints | sortAlpha }}
+{{- $exceptions := list }}
+{{- range $namespace, $services := .Values.constraints }}
+{{- range $services }}
+{{- if get .allow "privileged" }}
+{{- $exceptions = append $exceptions .podSelectorLabels }}
+{{- end }}
+{{- end }}
+{{- end }}
+---
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sPSPPrivilegedContainer
 metadata:
-  name: privileged
+  name: privileged-restricted
 spec:
   match:
-    kinds:
-      - apiGroups: [""]
-        kinds: ["Pod"]
-    namespaces:
-    {{- range $namespace, $services := .Values.constraints }}
-      - {{ $namespace }}
-    {{- end}}
-    labelSelector:
-      matchExpressions:
-        {{- range $namespace,$services := .Values.constraints }}
-          {{- range $name, $value := $services }}
-            {{- if hasKey $value.allow "privileged" }}
-              {{- range $labelkey, $labelvalue := $value.podSelectorLabels }}
-        - key: {{ $labelkey }}
-          operator: NotIn
-          values:
-            - {{ $labelvalue | quote }}
-              {{- end }}
-            {{- end }}
-          {{- end }}
-        {{- end }}
+    {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}

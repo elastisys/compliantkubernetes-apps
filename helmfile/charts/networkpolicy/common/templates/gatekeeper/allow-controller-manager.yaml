@@ -28,8 +28,8 @@ spec:
           podSelector:
             matchLabels:
               app.kubernetes.io/name: prometheus-blackbox-exporter
-        {{- if .Values.global.wcApiserver.ips }}
-        {{- range $IP := .Values.global.wcApiserver.ips }}
+        {{- if .Values.global.apiserver.ips }}
+        {{- range $IP := .Values.global.apiserver.ips }}
         - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
@@ -38,14 +38,14 @@ spec:
         - protocol: TCP
           port: 8443
   egress:
-    {{- if and .Values.global.wcApiserver.ips .Values.global.wcApiserver.port }}
+    {{- if and .Values.global.apiserver.ips .Values.global.apiserver.port }}
     - to:
-        {{- range $IP := .Values.global.wcApiserver.ips }}
+        {{- range $IP := .Values.global.apiserver.ips }}
         - ipBlock:
             cidr: {{ $IP }}
         {{- end }}
       ports:
         - protocol: TCP
-          port: {{ .Values.global.wcApiserver.port }}
+          port: {{ .Values.global.apiserver.port }}
     {{- end }}
 {{- end }}

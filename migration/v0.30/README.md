@@ -184,6 +184,18 @@ After doing the `disruptive` step for either the automatic or manual method, you
     ./migration/v0.30/apply/11-prometheus-operator-crds.sh
     ```
 
+1. Update network policies:
+
+    ```bash
+    ./migration/v0.30/apply/12-netpol.sh
+    ```
+
+1. Apply the new Gatekeeper pod security policies:
+
+    ```bash
+    ./migration/v0.30/apply/13-gatekeeper-psp.sh
+    ```
+
 1. Remove node-exporter and kube-state-metrics:
 
     ```bash

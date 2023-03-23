@@ -1,0 +1,63 @@
+{{- range $namespace, $services := .Values.constraints }}
+{{- range $name, $value := $services }}
+{{- if get (default dict $value.mutation) "runAsUser" }}
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: {{ printf "run-as-user-%s-container" $name | trunc 63 }}
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    {{- dict "namespace" $namespace "labels" $value.podSelectorLabels | include "podsecuritypolicies.renderMatchInclusion" | nindent 4 }}
+  location: "spec.containers[name: *].securityContext.runAsUser"
+  parameters:
+    assign:
+      value: {{ $value.mutation.runAsUser }}
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.runAsUser"
+        condition: MustNotExist
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: {{ printf "run-as-user-%s-ephemeral" $name | trunc 63 }}
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    {{- dict "namespace" $namespace "labels" $value.podSelectorLabels | include "podsecuritypolicies.renderMatchInclusion" | nindent 4 }}
+  location: "spec.ephemeralContainers[name: *].securityContext.runAsUser"
+  parameters:
+    assign:
+      value: {{ $value.mutation.runAsUser }}
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.runAsUser"
+        condition: MustNotExist
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: {{ printf "run-as-user-%s-init" $name | trunc 63 }}
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    {{- dict "namespace" $namespace "labels" $value.podSelectorLabels | include "podsecuritypolicies.renderMatchInclusion" | nindent 4 }}
+  location: "spec.initContainers[name: *].securityContext.runAsUser"
+  parameters:
+    assign:
+      value: {{ $value.mutation.runAsUser }}
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.runAsUser"
+        condition: MustNotExist
+{{- end }}
+{{- end }}
+{{- end }}

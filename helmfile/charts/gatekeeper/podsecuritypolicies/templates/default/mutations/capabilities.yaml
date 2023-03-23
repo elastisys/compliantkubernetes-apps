@@ -1,33 +1,17 @@
+{{- $namespaces := keys .Values.constraints | sortAlpha }}
+{{- $exceptions := .Values.mutationExceptions }}
+---
 apiVersion: mutations.gatekeeper.sh/v1
 kind: ModifySet
 metadata:
-  name: mutation-capabilities
+  name: capabilities-restricted-container
 spec:
   applyTo:
     - groups: [""]
       kinds: ["Pod"]
       versions: ["v1"]
   match:
-    scope: Namespaced
-    kinds:
-      - apiGroups: ["*"]
-        kinds: ["Pod"]
-    namespaces:
-    {{- range $namespace, $services := .Values.constraints }}
-      - {{ $namespace }}
-    {{- end}}
-    {{- if .Values.mutationExceptions }}
-    labelSelector:
-      matchExpressions:
-        {{- range $value := .Values.mutationExceptions }}
-        {{- range $labelkey, $labelvalue := $value }}
-        - key: {{ $labelkey }}
-          operator: NotIn
-          values:
-            - {{ $labelvalue | quote }}
-        {{- end }}
-        {{- end }}
-    {{- end }}
+    {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
   location: "spec.containers[name: *].securityContext.capabilities.drop"
   parameters:
     values:
@@ -40,33 +24,34 @@ spec:
 apiVersion: mutations.gatekeeper.sh/v1
 kind: ModifySet
 metadata:
-  name: mutation-init-capabilities
+  name: capabilities-restricted-ephemeral
 spec:
   applyTo:
     - groups: [""]
       kinds: ["Pod"]
       versions: ["v1"]
   match:
-    scope: Namespaced
-    kinds:
-      - apiGroups: ["*"]
-        kinds: ["Pod"]
-    namespaces:
-    {{- range $namespace, $services := .Values.constraints }}
-      - {{ $namespace }}
-    {{- end}}
-    {{- if .Values.mutationExceptions }}
-    labelSelector:
-      matchExpressions:
-        {{- range $value := .Values.mutationExceptions }}
-        {{- range $labelkey, $labelvalue := $value }}
-        - key: {{ $labelkey }}
-          operator: NotIn
-          values:
-            - {{ $labelvalue | quote }}
-        {{- end }}
-        {{- end }}
-    {{- end }}
+    {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
+  location: "spec.ephemeralContainers[name: *].securityContext.capabilities.drop"
+  parameters:
+    values:
+      fromList:
+        - ALL
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.capabilities.drop"
+        condition: MustNotExist
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: capabilities-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
   location: "spec.initContainers[name: *].securityContext.capabilities.drop"
   parameters:
     values:

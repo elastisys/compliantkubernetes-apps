@@ -40,6 +40,11 @@
 #             max: 65535
 #       allowedUnsafeSysctls:
 #         - ...
+#     # Custom values for user and group mutations
+#     mutation:
+#       runAsGroup: 999
+#       runAsUser: 999
+#       fsGroup: 999
 constraints: {}
 
 # List of pod labels that mutation should be exempted from

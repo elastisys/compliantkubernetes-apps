@@ -9,12 +9,17 @@ source "${ROOT}/scripts/migration/lib.sh"
 # Example: "app!=something"
 declare -a skipped
 skipped=(
+  "app!=common-np"
+  "app!=gatekeeper"
+  "app!=psp"
 )
 declare -a skipped_sc
 skipped_sc=(
+  "app!=service-cluster-np"
 )
 declare -a skipped_wc
 skipped_wc=(
+  "app!=workload-cluster-np"
 )
 
 run() {

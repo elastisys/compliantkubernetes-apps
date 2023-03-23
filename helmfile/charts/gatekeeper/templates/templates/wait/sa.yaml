@@ -1,0 +1,15 @@
+{{- if .Values.wait -}}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "gatekeeper-templates.serviceAccountName" . }}
+  labels:
+    {{- include "gatekeeper-templates.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: hook-succeeded
+    {{- with .Values.serviceAccount.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- end }}

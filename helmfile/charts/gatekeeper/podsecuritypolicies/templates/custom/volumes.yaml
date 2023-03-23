@@ -1,24 +1,17 @@
 {{- range $namespace, $services := .Values.constraints }}
-  {{- range $name, $value := $services }}
-    {{- if hasKey $value.allow "volumes" }}
+{{- range $name, $value := $services }}
+{{- if hasKey $value.allow "volumes" }}
+---
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sPSPVolumeTypes
 metadata:
-  name: volumes-{{ $name }}
+  name: {{ printf "volumes-%s" $name | trunc 63 }}
 spec:
   match:
-    kinds:
-      - apiGroups: [""]
-        kinds: ["Pod"]
-    namespaces:
-      - {{ $namespace }}
-    labelSelector:
-      matchLabels:
-        {{- toYaml $value.podSelectorLabels | nindent 8 }}
+    {{- dict "namespace" $namespace "labels" $value.podSelectorLabels | include "podsecuritypolicies.renderMatchInclusion" | nindent 4 }}
   parameters:
     volumes:
       {{- toYaml $value.allow.volumes | nindent 6 }}
----
-    {{- end }}
-  {{- end }}
+{{- end }}
+{{- end }}
 {{- end }}

@@ -43,8 +43,6 @@ ingressNginx:
   ingressOverride:
     enabled : {{ .Values.networkPolicies.ingressNginx.ingressOverride.enabled }}
     ips: {{- toYaml .Values.networkPolicies.ingressNginx.ingressOverride.ips | nindent 4 }}
-gatekeeper:
-  enabled: {{ and .Values.opa.enabled .Values.networkPolicies.gatekeeper.enabled }}
 
 falco:
   enabled: {{ and .Values.falco.enabled .Values.networkPolicies.falco.enabled }}
