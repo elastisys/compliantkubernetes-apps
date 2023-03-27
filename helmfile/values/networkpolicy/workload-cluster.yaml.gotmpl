@@ -36,7 +36,7 @@ monitoring:
   enabled: {{ .Values.networkPolicies.monitoring.enabled }}
 
 fluentd:
-  enabled: {{ .Values.networkPolicies.fluentd.enabled }}
+  enabled: {{ and .Values.fluentd.enabled .Values.networkPolicies.fluentd.enabled }}
 
 ingressNginx:
   enabled: {{ .Values.networkPolicies.ingressNginx.enabled }}
