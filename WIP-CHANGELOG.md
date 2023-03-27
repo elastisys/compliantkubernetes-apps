@@ -18,6 +18,7 @@
 - Added option to use nodePort for ingress-nginx.
 - Correct version checks in migration script library
 - Run migration apply snippet without filters
+- Add enabled checks for Fluentd network policies
 
 ### Updated
 
