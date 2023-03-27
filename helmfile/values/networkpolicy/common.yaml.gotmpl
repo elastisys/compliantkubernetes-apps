@@ -96,6 +96,9 @@ falco:
     ips: {{- toYaml .Values.networkPolicies.falco.plugins.ips | nindent 6 }}
     ports: {{- toYaml .Values.networkPolicies.falco.plugins.ports | nindent 6 }}
 
+fluentd:
+  enabled: {{ and .Values.fluentd.enabled .Values.networkPolicies.fluentd.enabled }}
+
 rookCeph:
   enabled: {{ .Values.networkPolicies.rookCeph.enabled }}
 
