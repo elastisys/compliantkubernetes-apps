@@ -151,6 +151,20 @@ After doing the `disruptive` step for either the automatic or manual method, you
         http: 30080
         https: 30443
     ```
+1. **Optional** Enable opensearch-securityadmin if disabled.
+
+    ```diff
+    # sc-config.yaml
+    opensearch:
+    - securityadmin:
+    -   enabled: false
+    ```
+
+    This is necessary to update the permissions for opensearch-configurer.
+    If opensearch-securityadmin is left disabled, opensearch-configurer will continue to always register the snapshot repository when run.
+    Note, that any manual edits done to the security config will be wiped once opensearch-securityadmin has run.
+    The need to manually have to edit the security config should be less significant now as it is possible to create static users by configuring `opensearch.extraUsers` in `secrets.yaml`.
+
 1. Check if user-alertmanager is disabled and disable it in the overwrite `common-config`:
 
    ```bash
