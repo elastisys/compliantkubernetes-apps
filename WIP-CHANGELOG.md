@@ -79,6 +79,7 @@
 - Install Gatekeeper PSPs per stack to improve targeting and modularity
 - Limit resource types checked by Gatekeeper
 - Allow for target discovery of all probes in workload cluster
+- Opensearch-configurer will only re-register the snapshot repository if the bucket name has changed
 
 ### Removed
 

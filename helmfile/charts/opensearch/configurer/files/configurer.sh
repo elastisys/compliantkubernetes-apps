@@ -59,6 +59,17 @@ setup_dashboards() {
   fi
 }
 
+# Returns true if:
+# - Snapshot repository is registered, and
+# - registered repositories' bucket name is the same as the one given
+check_s3_repository_bucket() {
+  resp=$(curl -u "${auth}" --insecure --silent "${os_url}/_snapshot/${snapshot_repository}")
+  if [ "$(echo $resp | jq -r '."'${snapshot_repository}'".settings.bucket')" = "{{ .Values.config.s3.bucketName }}" ]; then
+    return 0
+  fi
+  return 1
+}
+
 register_s3_repository() {
   echo
   echo "Registering S3 snapshot repository"
@@ -239,7 +250,12 @@ wait_for_dashboards
 setup_dashboards
 
 {{ if .Values.config.s3.enabled -}}
-register_s3_repository
+if ! check_s3_repository_bucket; then
+  register_s3_repository
+else
+  echo
+  echo "Skip registering S3 snapshot repository"
+fi
 {{ else if .Values.config.gcs.enabled -}}
 register_gcs_repository
 {{- end }}
