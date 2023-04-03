@@ -13,6 +13,7 @@
 - Add Gatekeeper PSPs for ingress-nginx and monitoring namespaces.
 - Add Gatekeeper PSPs for Fluentd and OpenSearch
 - Add Gatekeeper PSPs for Kured.
+- Add Gatekeeper PSPs for Harbor
 
 ### Fixed
 
