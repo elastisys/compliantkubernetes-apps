@@ -104,7 +104,7 @@ After doing the `disruptive` step for either the automatic or manual method, you
     > *Done before maintenance window.*
 
     ```bash
-    ./bin/ck8s upgrade prepare v0.30
+    ./bin/ck8s upgrade v0.30 prepare
     ```
 
 1. Apply upgrade - *disruptive*
@@ -112,7 +112,7 @@ After doing the `disruptive` step for either the automatic or manual method, you
     > *Done during maintenance window.*
 
     ```bash
-    ./bin/ck8s upgrade apply v0.30
+    ./bin/ck8s upgrade v0.30 apply
     ```
 
 ## Manual method
