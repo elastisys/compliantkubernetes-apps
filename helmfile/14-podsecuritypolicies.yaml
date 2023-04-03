@@ -37,5 +37,6 @@ releases:
   - values/podsecuritypolicies/common/kured.yaml.gotmpl
   - values/podsecuritypolicies/common/monitoring.yaml.gotmpl
   {{- if eq .Environment.Name "service_cluster" }}
+  - values/podsecuritypolicies/service/harbor.yaml.gotmpl
   - values/podsecuritypolicies/service/opensearch.yaml.gotmpl
   {{- end }}
