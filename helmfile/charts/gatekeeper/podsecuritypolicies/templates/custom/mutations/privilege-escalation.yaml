@@ -1,0 +1,63 @@
+{{- range $namespace, $services := .Values.constraints }}
+{{- range $name, $value := $services }}
+{{- if get $value.allow "allowPrivilegeEscalation" }}
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: {{ printf "privilege-escalation-%s-container" $name | trunc 63 }}
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    {{- dict "namespace" $namespace "labels" $value.podSelectorLabels | include "podsecuritypolicies.renderMatchInclusion" | nindent 4 }}
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: {{ printf "privilege-escalation-%s-ephemeral" $name | trunc 63 }}
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    {{- dict "namespace" $namespace "labels" $value.podSelectorLabels | include "podsecuritypolicies.renderMatchInclusion" | nindent 4 }}
+  location: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: {{ printf "privilege-escalation-%s-init" $name | trunc 63 }}
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    {{- dict "namespace" $namespace "labels" $value.podSelectorLabels | include "podsecuritypolicies.renderMatchInclusion" | nindent 4 }}
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+{{- end }}
+{{- end }}
+{{- end }}

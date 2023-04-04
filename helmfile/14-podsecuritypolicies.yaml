@@ -33,8 +33,9 @@ releases:
   version: 0.1.0
   values:
   - values/podsecuritypolicies/common/fluentd.yaml.gotmpl
-  - values/podsecuritypolicies/common/ingress-nginx.gotmpl
-  - values/podsecuritypolicies/common/monitoring.gotmpl
+  - values/podsecuritypolicies/common/ingress-nginx.yaml.gotmpl
+  - values/podsecuritypolicies/common/kured.yaml.gotmpl
+  - values/podsecuritypolicies/common/monitoring.yaml.gotmpl
   {{- if eq .Environment.Name "service_cluster" }}
   - values/podsecuritypolicies/service/opensearch.yaml.gotmpl
   {{- end }}
