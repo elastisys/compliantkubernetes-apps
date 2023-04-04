@@ -1,5 +1,5 @@
 podSecurityPolicy:
-  create: true
+  create: {{ .Values.kubernetesPSP }}
 
 metrics:
   create: {{ .Values.kured.metrics.enabled }}
@@ -37,3 +37,6 @@ slack:
 {{- end }}
 
 hostNetwork: false
+
+containerSecurityContext:
+  runAsUser: 0

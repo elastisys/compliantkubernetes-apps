@@ -1,0 +1,13 @@
+{{- if .Values.kured.enabled }}
+constraints:
+  kured:
+    kured:
+      podSelectorLabels:
+        app.kubernetes.io/instance: kured
+      allow:
+        hostNamespace: true
+        allowPrivilegeEscalation: true
+        privileged: true
+        runAsUser:
+          rule: RunAsAny
+{{- end }}
