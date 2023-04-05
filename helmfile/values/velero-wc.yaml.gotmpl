@@ -88,6 +88,12 @@ restic:
   resources:   {{- toYaml .Values.velero.restic.resources | nindent 4  }}
   tolerations: {{- toYaml .Values.velero.restic.tolerations | nindent 4  }}
 
+  privileged: true
+
+  containerSecurityContext:
+    runAsUser: 0
+    allowPrivilegeEscalation: true
+
 schedules:
   daily-backup:
     schedule: {{ .Values.velero.schedule }}
