@@ -14,6 +14,8 @@
 - Add Gatekeeper PSPs for Fluentd and OpenSearch
 - Add Gatekeeper PSPs for Kured.
 - Add Gatekeeper PSPs for Harbor
+- Add Gatekeeper mutation for setting job TTL if not already set.
+  By default, a TTL of 7 days will be set.
 
 ### Fixed
 

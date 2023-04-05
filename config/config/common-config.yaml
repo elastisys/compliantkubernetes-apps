@@ -566,6 +566,13 @@ clusterAdmin:
 opa:
   enabled: true
 
+  mutations:
+    enabled: true
+
+    jobTTL:
+      enabled: true
+      ttlSeconds: 604800
+
   controllerManager:
     resources:
       requests:

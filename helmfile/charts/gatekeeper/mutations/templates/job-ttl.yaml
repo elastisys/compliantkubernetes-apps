@@ -1,0 +1,23 @@
+{{- if .Values.jobTTL.enabled }}
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: job-ttl
+spec:
+  applyTo:
+    - groups: ["batch"]
+      kinds: ["Job"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: ["batch"]
+        kinds: ["Job"]
+  location: "spec.ttlSecondsAfterFinished"
+  parameters:
+    assign:
+      value: {{ .Values.jobTTL.ttlSeconds }}
+    pathTests:
+      - subPath: "spec.ttlSecondsAfterFinished"
+        condition: MustNotExist
+{{- end }}

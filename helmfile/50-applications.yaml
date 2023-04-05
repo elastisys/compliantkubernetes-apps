@@ -241,6 +241,17 @@ releases:
   values:
     - values/calico-default-deny.yaml.gotmpl
 
+# gatekeeper-mutations
+- name: gatekeeper-mutations
+  namespace: gatekeeper-system
+  labels:
+    app: gatekeeper-mutations
+  chart: ./charts/gatekeeper/mutations
+  version: 0.1.0
+  installed: {{ and .Values.opa.enabled .Values.opa.mutations.enabled }}
+  values:
+  - values/gatekeeper/mutations.yaml.gotmpl
+
 # Service cluster releases
 {{ if eq .Environment.Name "service_cluster" }}
 # Dex
