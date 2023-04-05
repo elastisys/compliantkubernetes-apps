@@ -28,6 +28,7 @@ defaultRules:
     {{- end }}
 
     capacityManagementAlerts: {{ .Values.prometheus.capacityManagementAlerts.enabled }}
+    tektonPipelines: {{ .Values.tekton.enabled }}
 
     backupStatus: true
     dailyChecks: true

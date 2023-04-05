@@ -14,6 +14,7 @@
 - Add Gatekeeper PSPs for Fluentd and OpenSearch
 - Add Gatekeeper PSPs for Kured.
 - Add Gatekeeper PSPs for Harbor
+- Add PrometheusRule a to alert on failed pipelines.
 
 ### Fixed
 

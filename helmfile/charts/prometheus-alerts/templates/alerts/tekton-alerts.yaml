@@ -1,0 +1,31 @@
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.tektonPipelines }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "tekton-pipelines-failed" | trunc 63 | trimSuffix "-" }}
+  labels:
+    app: {{ template "prometheus-alerts.name" . }}
+    {{- include "prometheus-alerts.labels" . | nindent 4 }}
+    {{- if .Values.defaultRules.alertLabels }}
+    {{- toYaml .Values.defaultRules.alertLabels | nindent 4 }}
+    {{- end }}
+  {{- if .Values.defaultRules.annotations }}
+  annotations:
+    {{- toYaml .Values.defaultRules.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  groups:
+  - name: tekton-pipelines-failed
+    rules:
+    - alert: FailedTektonPipelines
+      annotations:
+        description: Number of failed pipeline runs in the last minute
+        summary: Number of failed pipeline runs
+      expr: |
+        increase(tekton_pipelines_controller_pipelinerun_count{status="failed"}[1m]) > 0
+      labels:
+        severity: critical
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+{{- end }}
