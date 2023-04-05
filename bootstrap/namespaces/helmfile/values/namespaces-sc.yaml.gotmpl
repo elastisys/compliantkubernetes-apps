@@ -40,6 +40,10 @@ namespaces:
 - name: falco
 {{ end }}
 - name: velero
+  labels:
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/warn: privileged
 {{ if .Values.harbor.enabled }}
 - name: harbor
   labels:

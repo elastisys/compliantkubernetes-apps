@@ -1,0 +1,20 @@
+{{- if .Values.velero.enabled }}
+constraints:
+  velero:
+    restic:
+      podSelectorLabels:
+        name: restic
+      allow:
+        volumes:
+          - hostPath
+          - emptyDir
+          - projected
+          - secret
+        allowedHostPaths:
+          - pathPrefix: /var/lib/kubelet/pods
+            readOnly: false
+        runAsUser:
+          rule: RunAsAny
+        privileged: true
+        allowPrivilegeEscalation: true
+{{- end }}

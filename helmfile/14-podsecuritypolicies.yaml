@@ -36,6 +36,7 @@ releases:
   - values/podsecuritypolicies/common/ingress-nginx.yaml.gotmpl
   - values/podsecuritypolicies/common/kured.yaml.gotmpl
   - values/podsecuritypolicies/common/monitoring.yaml.gotmpl
+  - values/podsecuritypolicies/common/velero.yaml.gotmpl
   {{- if eq .Environment.Name "service_cluster" }}
   - values/podsecuritypolicies/service/harbor.yaml.gotmpl
   - values/podsecuritypolicies/service/opensearch.yaml.gotmpl
