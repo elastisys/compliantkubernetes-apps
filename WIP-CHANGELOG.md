@@ -27,6 +27,7 @@
 - Run migration apply snippet without filters
 - Add enabled checks for Fluentd network policies
 - Add missing PSPs for user Fluentd
+- Make `user-rbac` chart `extra-workload-admins` rolebinding idempotent
 
 ### Updated
 
