@@ -12,6 +12,19 @@ falco:
   grpc_output:
     enabled: true
 
+containerSecurityContext:
+  runAsUser: 0
+  privileged: true
+  allowPrivilegeEscalation: true
+
+driver:
+  loader:
+    initContainer:
+      securityContext:
+        runAsUser: 0
+        privileged: true
+        allowPrivilegeEscalation: true
+
 resources: {{- toYaml .Values.falco.resources | nindent 2  }}
 nodeSelector: {{- toYaml .Values.falco.nodeSelector | nindent 2  }}
 affinity: {{- toYaml .Values.falco.affinity | nindent 2  }}
@@ -150,7 +163,7 @@ customRules:
 falcosidekick:
   enabled: {{ .Values.falco.alerts.enabled }}
   podSecurityPolicy:
-    create: true
+    create: {{ .Values.kubernetesPSP }}
   config:
     debug: false
     {{ if eq .Values.falco.alerts.type "slack" }}

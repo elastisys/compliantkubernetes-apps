@@ -32,6 +32,7 @@ releases:
   chart: ./charts/gatekeeper/podsecuritypolicies
   version: 0.1.0
   values:
+  - values/podsecuritypolicies/common/falco.yaml.gotmpl
   - values/podsecuritypolicies/common/fluentd.yaml.gotmpl
   - values/podsecuritypolicies/common/ingress-nginx.yaml.gotmpl
   - values/podsecuritypolicies/common/kured.yaml.gotmpl

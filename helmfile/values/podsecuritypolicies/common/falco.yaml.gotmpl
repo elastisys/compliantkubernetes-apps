@@ -1,0 +1,41 @@
+{{- if .Values.falco.enabled }}
+constraints:
+  falco:
+    falco:
+      podSelectorLabels:
+        app.kubernetes.io/name: falco
+      allow:
+        privileged: true
+        allowPrivilegeEscalation: true
+        allowedHostPaths:
+        - pathPrefix: /boot
+        - pathPrefix: /lib/modules
+        - pathPrefix: /usr
+        - pathPrefix: /etc
+        - pathPrefix: /dev
+        - pathPrefix: /sys/module/falco
+        - pathPrefix: /var/run/docker.sock
+        - pathPrefix: /run/containerd/containerd.sock
+        - pathPrefix: /run/crio/crio.sock
+        - pathPrefix: /proc
+        - pathPrefix: /var/run/falco
+        volumes:
+        - configMap
+        - hostPath
+        - projected
+        - emptyDir
+        runAsUser:
+          rule: RunAsAny
+    falco-exporter:
+      podSelectorLabels:
+        app.kubernetes.io/name: falco-exporter
+      allow:
+        allowedHostPaths:
+        - pathPrefix: /var/run/falco
+        volumes:
+        - configMap
+        - hostPath
+        - projected
+        runAsUser:
+          rule: RunAsAny
+{{- end }}

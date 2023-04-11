@@ -5,7 +5,7 @@ tolerations: {{- toYaml .Values.falco.falcoExporter.tolerations | nindent 2  }}
 
 podSecurityPolicy:
   # Specifies whether a PSP, Role and RoleBinding should be created
-  create: true
+  create: {{ .Values.kubernetesPSP }}
 
 falco:
   grpcUnixSocketPath: "unix:///var/run/falco/falco.sock"
@@ -13,3 +13,6 @@ falco:
 serviceMonitor:
   # Enable the deployment of a Service Monitor for the Prometheus Operator.
   enabled: true
+
+securityContext:
+  runAsUser: 0
