@@ -928,7 +928,7 @@ opensearch:
     - prefix: other-default
       alertSizeMB: 400
     - prefix: authlog-default
-      alertSizeMB: 0.2
+      alertSizeMB: 2
 
   # Snapshot and snapshot lifecycle configuration
   # Requires S3 or GCS to be enabled

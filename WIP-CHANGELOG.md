@@ -47,6 +47,7 @@
 - vulnerability and kube-bench reporter runs as non root.
 - Replace chown init container with fsGroup in OpenSearch
 - Restructure Gatekeeper charts and values
+- Changed the default promIndexAlerts alertsize for authlog from 0.2 to 2.
 
 ### Removed
 
