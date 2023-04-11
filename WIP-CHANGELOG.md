@@ -19,6 +19,7 @@
 - Add Gatekeeper PSPs for Velero.
 - Metrics and Grafana dashboard for Harbor.
 - Added so the user admins can read hierarchyconfigurations.
+- Add Gatekeeper PSPs for falco.
 
 ### Fixed
 
@@ -56,3 +57,4 @@
 
 - Kubernetes PSP for ingress-nginx and monitoring namespace.
 - Remove Kubernetes PSPs for Fluentd and OpenSearch
+- Remove Kubernetes PSPs for falco
