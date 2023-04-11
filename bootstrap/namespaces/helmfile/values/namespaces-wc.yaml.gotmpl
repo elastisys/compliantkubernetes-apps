@@ -58,6 +58,10 @@ namespaces:
 {{ end }}
 {{ if .Values.hnc.enabled }}
 - name: hnc-system
+  labels:
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
 {{ end }}
 {{ if .Values.user.alertmanager.enabled }}
 - name: alertmanager

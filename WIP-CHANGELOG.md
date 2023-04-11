@@ -19,6 +19,7 @@
 - Add Gatekeeper PSPs for Velero.
 - Metrics and Grafana dashboard for Harbor.
 - Added so the user admins can read hierarchyconfigurations.
+- Add Gatekeeper PSPs for HNC.
 - Add Gatekeeper PSPs for falco.
 
 ### Fixed
