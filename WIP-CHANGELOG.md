@@ -29,6 +29,7 @@
 - Add enabled checks for Fluentd network policies
 - Add missing PSPs for user Fluentd
 - Make `user-rbac` chart `extra-workload-admins` rolebinding idempotent
+- Indentation issue in the `fluentd-forwarder-workload-cluster-system` values file.
 
 ### Updated
 

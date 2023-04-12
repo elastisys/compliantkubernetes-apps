@@ -6,7 +6,7 @@ affinity: {{- toYaml .Values.fluentd.forwarder.affinity | nindent 2 }}
 {{- with .Values.fluentd.extraConfigMaps }}
 extraConfigMaps:
   {{- range $key, $value := . }}
-  {{ $key | indent 2 }}: |-
-    {{ $value | indent 4 }}
+  {{ $key | nindent 2 }}: |-
+    {{- $value | nindent 4 }}
   {{- end }}
 {{- end }}
