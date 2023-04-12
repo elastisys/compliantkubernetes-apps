@@ -193,7 +193,7 @@ grafana:
     version: 1
     jsonData:
       prometheusType: Prometheus
-      timeInterval: "30s"
+      timeInterval: "30s" # this value should be equal with .prometheus.prometheusSpec.scrapeInterval
   {{- if and .Values.thanos.enabled .Values.thanos.query.enabled }}
   - name: "Thanos All"
     access: proxy
@@ -205,7 +205,7 @@ grafana:
     url: http://thanos-query-query-frontend.thanos:9090
     jsonData:
       prometheusType: Thanos
-      timeInterval: "30s"
+      timeInterval: "30s" # this value should be equal with .prometheus.prometheusSpec.scrapeInterval
     version: 1
   - name: "Thanos SC Only"
     access: proxy
