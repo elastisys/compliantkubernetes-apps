@@ -200,25 +200,25 @@ After doing the `disruptive` step for either the automatic or manual method, you
     ```bash
     ./bin/ck8s bootstrap {sc|wc}
     # or
-    ./migration/v0.30/apply/10-bootstrap.sh
+    ./migration/v0.30/apply/10-bootstrap.sh execute
     ```
 
 1. Apply the new kube-prometheus-stack CRDs:
 
     ```bash
-    ./migration/v0.30/apply/11-prometheus-operator-crds.sh
+    ./migration/v0.30/apply/11-prometheus-operator-crds.sh execute
     ```
 
 1. Update network policies:
 
     ```bash
-    ./migration/v0.30/apply/12-netpol.sh
+    ./migration/v0.30/apply/12-netpol.sh execute
     ```
 
 1. Apply the new Gatekeeper pod security policies:
 
     ```bash
-    ./migration/v0.30/apply/13-gatekeeper-psp.sh
+    ./migration/v0.30/apply/13-gatekeeper-psp.sh execute
     ```
 
 1. Apply bypass for Kubernetes pod security policy admission:
@@ -230,7 +230,7 @@ After doing the `disruptive` step for either the automatic or manual method, you
 1. Remove node-exporter and kube-state-metrics:
 
     ```bash
-    ./migration/v0.30/apply/20-remove-kube-prometheus-components.sh
+    ./migration/v0.30/apply/20-remove-kube-prometheus-components.sh execute
     ```
 
 1. Upgrade applications:
@@ -238,13 +238,19 @@ After doing the `disruptive` step for either the automatic or manual method, you
     ```bash
     ./bin/ck8s apply {sc|wc}
     # or
-    ./migration/v0.30/apply/80-apply.sh
+    ./migration/v0.30/apply/80-apply.sh execute
     ```
 
 1. Uninstall the old starboard stack including starboard-operator and its exporters:
 
     ```bash
     ./migration/v0.29/apply/90-uninstalls.sh execute
+    ```
+
+1. Restart pods violating the new Gatekeeper PSPs
+
+    ```bash
+    ./migration/v0.30/apply/99-psp-violations.sh execute
     ```
 
 ## Postrequisite:
