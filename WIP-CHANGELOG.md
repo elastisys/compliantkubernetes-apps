@@ -4,8 +4,8 @@
   - using`regex` field from the `Matcher` type is deprecated and it will be removed in a future version. See [CHANGELOG](https://github.com/prometheus-operator/prometheus-operator/blob/main/CHANGELOG.md#0570--2022-06-02)
   - added support for new matching syntax in the routes configuration of the AlertmanagerConfig CRD. See [CHANGELOG](https://github.com/prometheus-operator/prometheus-operator/blob/main/CHANGELOG.md#0530--2021-12-16)
 - kube-prometheus-stack:
-  - the portName for alertmanager and prometheus have been renamed from `web` to `http-web`. If this port names are used by you apllication or to port-forward to prometheus/alertmanager, you will need to update them to `http-web` or use the port numbers instead (e.g 9090 for prometheus and 9093 for alertmanager)
-  - added default metric relabelings for cAdvisor and apiserver metrics to reduce cardinality. See [CHANGELOG](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#from-36x-to-37x)
+  - the portName for alertmanager and prometheus have been renamed from `web` to `http-web`. If this port names are used by you application or to port-forward to prometheus/alertmanager, you will need to update them to `http-web` or use the port numbers instead (e.g 9090 for prometheus and 9093 for alertmanager)
+  - added default metric relabeling for cAdvisor and apiserver metrics to reduce cardinality. See [CHANGELOG](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#from-36x-to-37x)
 
 ### Added
 
@@ -37,6 +37,7 @@
 - Correct `fluentd-aggregator` buffer settings
 - Source `extra-fluentd-config` user supplied settings
 - Change config option `falco.customRules` to a map
+- Synced the default prometheus interval with the grafana dashboards and datasources
 
 ### Updated
 

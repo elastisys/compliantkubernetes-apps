@@ -191,6 +191,9 @@ grafana:
     type: prometheus
     url: http://kube-prometheus-stack-prometheus:9090
     version: 1
+    jsonData:
+      prometheusType: Prometheus
+      timeInterval: "30s"
   {{- if and .Values.thanos.enabled .Values.thanos.query.enabled }}
   - name: "Thanos All"
     access: proxy
@@ -202,6 +205,7 @@ grafana:
     url: http://thanos-query-query-frontend.thanos:9090
     jsonData:
       prometheusType: Thanos
+      timeInterval: "30s"
     version: 1
   - name: "Thanos SC Only"
     access: proxy
