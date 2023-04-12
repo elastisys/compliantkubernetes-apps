@@ -12,14 +12,17 @@ skipped=(
   "app!=common-np"
   "app!=gatekeeper"
   "app!=psp"
+  "app!=kube-prometheus-stack"
 )
 declare -a skipped_sc
 skipped_sc=(
   "app!=service-cluster-np"
+  "app!=thanos"
 )
 declare -a skipped_wc
 skipped_wc=(
   "app!=workload-cluster-np"
+  "app!=user-alertmanager"
 )
 
 run() {
