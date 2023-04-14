@@ -5,11 +5,11 @@ metadata:
   labels:
     {{- include "opensearch-configurer.labels" . | nindent 4 }}
   annotations:
-    "helm.sh/hook": {{ .Values.helm.hook }}
-    # Use higher value so that the secret is created before this job
-    "helm.sh/hook-weight": "-5"
-    "helm.sh/hook-delete-policy": {{ .Values.helm.deletePolicy }}
+    helm.sh/hook: {{ .Values.helm.hook }}
+    helm.sh/hook-weight: "-5"
+    helm.sh/hook-delete-policy: {{ .Values.helm.deletePolicy }}
     checksum/securityconfig: {{ print .Values.securityConfig | sha256sum }}
+    checksum/config: {{ print .Values.config | sha256sum }}
 spec:
   activeDeadlineSeconds: {{ .Values.activeDeadlineSeconds }}
   backoffLimit: {{ .Values.backoffLimit }}

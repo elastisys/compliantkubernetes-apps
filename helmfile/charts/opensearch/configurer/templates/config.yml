@@ -5,9 +5,10 @@ metadata:
   labels:
     {{- include "opensearch-configurer.labels" . | nindent 4 }}
   annotations:
-    "helm.sh/hook": {{ .Values.helm.hook }}
-    "helm.sh/hook-weight": "-10"
-    "helm.sh/hook-delete-policy": {{ .Values.helm.deletePolicy }}
+    helm.sh/hook: {{ .Values.helm.hook }}
+    helm.sh/hook-weight: "-10"
+    helm.sh/hook-delete-policy: {{ .Values.helm.deletePolicy }}
+    checksum/config: {{ print .Values.config | sha256sum }}
 type: Opaque
 stringData:
   configurer.sh: |-
