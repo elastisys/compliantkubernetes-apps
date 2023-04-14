@@ -31,6 +31,7 @@
 - Make `user-rbac` chart `extra-workload-admins` rolebinding idempotent
 - Indentation issue in the `fluentd-forwarder-workload-cluster-system` values file.
 - Ensure `opensearch-configurer` runs on changes
+- Correct `fluentd-aggregator` buffer settings
 
 ### Updated
 
