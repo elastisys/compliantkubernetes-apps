@@ -15,6 +15,9 @@ extraConfigMaps:
       </exclude>
     </filter>
 
+    # Include extra configuration files
+    @include /etc/fluent/extra-config.d/*.conf
+
 extraVolumes:
   - name: extra-config
     configMap:
