@@ -44,6 +44,16 @@ releases:
   - values/kube-prometheus-stack-wc.yaml.gotmpl
 {{ end }}
 
+- name: kube-state-metrics-extra-resource-metrics
+  namespace: monitoring
+  labels:
+    app: kube-prometheus-stack
+  chart: ./charts/kube-state-metrics-extra-resource-metrics
+  version: 0.1.0
+  installed: {{ .Values.kubeStateMetrics.clusterAPIMetrics.enabled }}
+  values:
+  - values/kube-state-metrics-extra-resource-metrics.yaml.gotmpl
+
 - name: thanos-ingress-secret
 {{- if eq .Environment.Name "service_cluster" }}
   namespace: thanos

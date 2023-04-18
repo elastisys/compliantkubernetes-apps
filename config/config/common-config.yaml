@@ -289,6 +289,9 @@ kubeStateMetrics:
     limits:
       cpu: 30m
       memory: 100Mi
+  # Enable this if your cluster is managed by Cluster API to get Cluster API metrics.
+  clusterAPIMetrics:
+    enabled: false
 
 prometheus:
   replicas: 1

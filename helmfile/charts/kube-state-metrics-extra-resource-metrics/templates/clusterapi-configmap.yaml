@@ -1,0 +1,9 @@
+{{- if .Values.clusterAPIMetrics.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kube-state-metrics-clusterapi
+data:
+  clusterapi-metrics.yaml: |-
+    {{ .Files.Get "files/clusterapi-metrics.yaml" | nindent 4 }}
+{{- end }}
