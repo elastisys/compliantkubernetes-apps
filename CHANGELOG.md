@@ -1,5 +1,6 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.29.1](#v0291---2023-04-18)
 - [v0.29.0](#v0290---2023-03-03)
 - [v0.28.0](#v0280---2023-01-20)
 - [v0.27.1](#v0271---2023-01-16)
@@ -32,6 +33,19 @@
 - [v0.6.0](#v060---2020-10-16)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.29.1 - 2023-04-18
+
+### Fixed
+
+- Correct version checks in migration script library
+- Add enabled checks for Fluentd network policies
+- Make `user-rbac` chart `extra-workload-admins` rolebinding idempotent
+- Ensure `opensearch-configurer` runs on changes
+- Correct `fluentd-aggregator` buffer settings
+- Source `extra-fluentd-config` user supplied settings
+- Indentation issue in the `fluentd-forwarder-workload-cluster-system` values file.
 
 -------------------------------------------------
 ## v0.29.0 - 2023-03-03
