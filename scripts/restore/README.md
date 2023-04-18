@@ -68,3 +68,17 @@ Clean up:
 ./bin/ck8s ops kubectl sc delete configmap -n harbor restore-harbor
 rm -v tmp-job.yaml
 ```
+
+If you are restoring harbor to a new environment with a different domain, you need to re-run the init job. First, make sure the harbor admin password is the same as in the old environment:
+
+```console
+# Edit harbor.password
+sops ${CK8S_CONFIG_PATH}/secrets.yaml
+```
+
+Then, re-run the init job:
+
+```console
+./bin/ck8s ops kubectl sc delete job -n harbor init-harbor-job
+./bin/ck8s ops helmfile sc -l app=harbor sync
+```
