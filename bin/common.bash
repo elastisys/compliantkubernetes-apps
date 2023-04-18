@@ -347,18 +347,19 @@ validate_sops_config() {
     fi
 
     rule_count=$(yq4 '.creation_rules | length' "${sops_config}")
-    if [ "${rule_count:-0}" -gt 1 ]; then
-        log_error "ERROR: SOPS config has more than one creation rule."
+    if [ "${rule_count}" -eq 0 ]; then
+        log_error "ERROR: SOPS config contains no creation rules."
         exit 1
     fi
 
-    fingerprints=$(yq4 '.creation_rules[0].pgp' "${sops_config}")
+    # Force all pgp entries to be a string and to contain "null" if unset in a creation rule
+    fingerprints=$(yq4 'with(.creation_rules[]; .pgp = (.pgp // "null" | to_yaml style="")) | [.creation_rules[].pgp] | join(",")' "${sops_config}")
     if ! [[ "${fingerprints}" =~ ^[A-Z0-9,' ']+$ ]]; then
         log_error "ERROR: SOPS config contains no or invalid PGP keys."
-        log_error "fingerprints=${fingerprints}"
+        log_error "SOPS config: ${sops_config}:"
+        yq4 'split(",") | {"fingerprints": .}' <<< "${fingerprints}" | cat
         log_error "Fingerprints must be uppercase and separated by colon."
         log_error "Delete or edit the SOPS config to fix the issue"
-        log_error "SOPS config: ${sops_config}"
         exit 1
     fi
 }
@@ -398,6 +399,10 @@ append_trap() {
     trap "$(new_trap)" "${signal}"
 }
 
+sops_check() {
+  grep -qs 'sops:\|"sops":\|\[sops\]\|sops_version=' "${1:-/dev/null}"
+}
+
 # Write PGP fingerprints to SOPS config
 sops_config_write_fingerprints() {
     yq4 -n ".creation_rules[0].pgp = \"${1}\"" > "${sops_config}" || \
@@ -413,10 +418,7 @@ sops_encrypt_stdin() {
 # Encrypt a file in place.
 sops_encrypt() {
     # https://github.com/mozilla/sops/issues/460
-    if grep -F -q 'sops:' "${1}" || \
-        grep -F -q '"sops":' "${1}" || \
-        grep -F -q '[sops]' "${1}" || \
-        grep -F -q 'sops_version=' "${1}"; then
+    if sops_check "${1}"; then
         log_info "Already encrypted ${1}"
         return
     fi
@@ -434,10 +436,7 @@ sops_decrypt_verify() {
     fi
 
     # https://github.com/mozilla/sops/issues/460
-    if ! grep -F -q 'sops:' "${1}" && \
-       ! grep -F -q '"sops":' "${1}" && \
-       ! grep -F -q '[sops]' "${1}" && \
-       ! grep -F -q 'sops_version=' "${1}"; then
+    if ! sops_check "${1}"; then
         log_error "NOT ENCRYPTED: ${1}"
         exit 1
     fi
@@ -507,10 +506,7 @@ with_kubeconfig() {
       exit 1
     fi
 
-    if grep -F -q 'sops:' "${kubeconfig}" || \
-        grep -F -q '"sops":' "${kubeconfig}" || \
-        grep -F -q '[sops]' "${kubeconfig}" || \
-        grep -F -q 'sops_version=' "${kubeconfig}"; then
+    if sops_check "${kubeconfig}"; then
         log_info "Using encrypted kubeconfig ${kubeconfig}"
 
         # TODO: Can't use a FIFO since we can't know that the kubeconfig is not

@@ -49,6 +49,7 @@
 - Replace chown init container with fsGroup in OpenSearch
 - Restructure Gatekeeper charts and values
 - Changed the default promIndexAlerts alertsize for authlog from 0.2 to 2.
+- Allow SOPS config to contain multiple creation rules
 
 ### Removed
 
