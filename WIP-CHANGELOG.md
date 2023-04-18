@@ -22,6 +22,7 @@
 - Add Gatekeeper PSPs for HNC.
 - Add Gatekeeper PSPs for falco.
 - Add cache-image workflow
+- Possibility to enable metrics for Cluster API in `kube-state-metrics`.
 
 ### Fixed
 

@@ -10,6 +10,74 @@ kube-state-metrics:
   podSecurityPolicy:
     enabled: {{ .Values.kubernetesPSP }}
   resources: {{- toYaml .Values.kubeStateMetrics.resources | nindent 4 }}
+  {{- if .Values.kubeStateMetrics.clusterAPIMetrics.enabled }}
+  rbac:
+    extraRules:
+      - apiGroups:
+          - cluster.x-k8s.io
+        resources:
+          - clusters
+          - machinedeployments
+          - machinesets
+          - machines
+          - machinehealthchecks
+          - machinepools
+        verbs:
+          - get
+          - list
+          - watch
+      - apiGroups:
+          - controlplane.cluster.x-k8s.io
+        resources:
+          - kubeadmcontrolplanes
+        verbs:
+          - get
+          - list
+          - watch
+  collectors:
+    - certificatesigningrequests
+    - configmaps
+    - cronjobs
+    - daemonsets
+    - deployments
+    - endpoints
+    - horizontalpodautoscalers
+    - ingresses
+    - jobs
+    - limitranges
+    - mutatingwebhookconfigurations
+    - namespaces
+    - networkpolicies
+    - nodes
+    - persistentvolumeclaims
+    - persistentvolumes
+    - poddisruptionbudgets
+    - pods
+    - replicasets
+    - replicationcontrollers
+    - resourcequotas
+    - secrets
+    - services
+    - statefulsets
+    - storageclasses
+    - validatingwebhookconfigurations
+    - volumeattachments
+    - clusters
+    - machinedeployments
+    - machinesets
+    - machines
+    - machinehealthchecks
+    - kubeadmcontrolplanes
+  volumeMounts:
+    - mountPath: /etc/config
+      name: kube-state-metrics-clusterapi-volume
+  volumes:
+    - configMap:
+        name: kube-state-metrics-clusterapi
+      name: kube-state-metrics-clusterapi-volume
+  extraArgs:
+    - "--custom-resource-state-config-file=/etc/config/clusterapi-metrics.yaml"
+  {{- end }}
 
 kubeApiServer:
   serviceMonitor:
