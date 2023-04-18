@@ -18,6 +18,7 @@
 - Enabled Pod Security Admission for `dex` and `cert-manager`
 - Add Gatekeeper PSPs for Velero.
 - Metrics and Grafana dashboard for Harbor.
+- Added so the user admins can read hierarchyconfigurations.
 
 ### Fixed
 
