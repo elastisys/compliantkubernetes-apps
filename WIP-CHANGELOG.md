@@ -32,6 +32,7 @@
 - Indentation issue in the `fluentd-forwarder-workload-cluster-system` values file.
 - Ensure `opensearch-configurer` runs on changes
 - Correct `fluentd-aggregator` buffer settings
+- Source `extra-fluentd-config` user supplied settings
 
 ### Updated
 
