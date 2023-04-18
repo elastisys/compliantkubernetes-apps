@@ -99,7 +99,7 @@ falco:
   enabled: true
   ## additional falco rules
   ## ref: https://falco.org/docs/rules/
-  customRules: []
+  customRules: {}
   resources:
     limits:
       cpu: 200m

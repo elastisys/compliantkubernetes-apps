@@ -34,6 +34,7 @@
 - Ensure `opensearch-configurer` runs on changes
 - Correct `fluentd-aggregator` buffer settings
 - Source `extra-fluentd-config` user supplied settings
+- Change config option `falco.customRules` to a map
 
 ### Updated
 
