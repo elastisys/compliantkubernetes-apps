@@ -260,7 +260,7 @@ releases:
   labels:
     app: dex
   chart: ./upstream/dex
-  version: 0.8.2
+  version: 0.14.1
   wait: true
   values:
   - values/dex.yaml.gotmpl

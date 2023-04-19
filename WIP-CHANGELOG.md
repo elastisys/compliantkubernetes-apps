@@ -41,6 +41,7 @@
 - kube-prometheus-stack chart to v45.2.0. Full [CHANGELOG](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#from-44x-to-45x)
 - prometheus-operator to v0.63.0
 - grafana to v9.3.8
+- Upgraded Dex to v2.36.0, chart v0.14.1
 
 ### Changed
 
