@@ -85,6 +85,16 @@ releases:
     values:
       - values/podsecuritypolicies/common/velero.yaml.gotmpl
 
+  - name: podsecuritypolicy
+    namespace: rook-ceph
+    labels:
+      psp: rook-ceph
+    chart: ./charts/gatekeeper/podsecuritypolicies
+    version: 0.1.0
+    installed: {{ .Values.rookCeph.enabled }}
+    values:
+      - values/podsecuritypolicies/common/rook-ceph.yaml.gotmpl
+
 {{- if eq .Environment.Name "service_cluster" }}
   - name: podsecuritypolicy
     namespace: harbor

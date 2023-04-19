@@ -150,6 +150,7 @@ set_storage_class() {
             storage_class=rook-ceph-block
 
             yq4 -i '.networkPolicies.rookCeph.enabled = true' "${file}"
+            yq4 -i '.rookCeph.enabled = true' "${file}"
             ;;
         aws)
             storage_class=ebs-gp2

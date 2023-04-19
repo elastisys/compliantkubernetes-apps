@@ -2,7 +2,7 @@
 {{- $exceptions := list }}
 {{- range $namespace, $services := .Values.constraints }}
 {{- range $services }}
-{{- if hasKey .allow "allowedCapabilities" }}
+{{- if or ( hasKey .allow "allowedCapabilities" ) ( get .allow "privileged" ) ( . | dig "mutation" "dropAllCapabilities" true | not ) }}
 {{- $exceptions = append $exceptions .podSelectorLabels }}
 {{- end }}
 {{- end }}

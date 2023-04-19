@@ -2,7 +2,7 @@
 {{- $exceptions := list }}
 {{- range $namespace, $services := .Values.constraints }}
 {{- range $services }}
-{{- if get .allow "allowPrivilegeEscalation" }}
+{{- if or (get .allow "allowPrivilegeEscalation") (get .allow "privileged") }}
 {{- $exceptions = append $exceptions .podSelectorLabels }}
 {{- end }}
 {{- end }}

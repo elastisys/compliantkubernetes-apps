@@ -72,6 +72,8 @@ After doing the `disruptive` step for either the automatic or manual method, you
    ./migration/v0.30/apply/14-kubernetes-psp.sh clean
    ```
 
+1. If you want to enable Gatekeeper PSP for rook-ceph, set `rookCeph.enabled` to `true` in your `common-config.yaml`.
+
 ## Automatic method
 
 1. Pull the latest changes and switch to the correct branch:

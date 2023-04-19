@@ -810,3 +810,7 @@ networkPolicies:
 
   dnsAutoscaler:
     enabled: true
+
+# Gatekeeper PSP for rook-ceph enabled/disabled
+rookCeph:
+  enabled: false
