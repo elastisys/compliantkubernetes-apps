@@ -21,6 +21,7 @@
 - Added so the user admins can read hierarchyconfigurations.
 - Add Gatekeeper PSPs for HNC.
 - Add Gatekeeper PSPs for falco.
+- Add cache-image workflow
 
 ### Fixed
 
@@ -46,6 +47,7 @@
 - prometheus-operator to v0.63.0
 - grafana to v9.3.8
 - Upgraded Dex to v2.36.0, chart v0.14.1
+- Update pre-commit hooks
 
 ### Changed
 

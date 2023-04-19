@@ -11,27 +11,47 @@
 # at .git/hooks/pre-commit
 
 repos:
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.1.0
-  hooks:
-  - id: check-json
-    exclude: helmfile/upstream/
-  - id: check-yaml
-    exclude: helmfile/|bootstrap/
-    args: [--allow-multiple-documents]
-  - id: end-of-file-fixer
-    exclude: helmfile/upstream/
-  - id: trailing-whitespace
-    exclude: helmfile/upstream/
-  - id: check-merge-conflict
-  - id: no-commit-to-branch
-- repo: https://github.com/jumanjihouse/pre-commit-hooks
-  rev: 3.0.0
-  hooks:
-  - id: shellcheck
-    additional_dependencies: []
-    args:
-    - "--external-sources"
-    exclude: helmfile/upstream/|helmfile/charts/opensearch/configurer/
-  - id: markdownlint
-    exclude: helmfile/upstream/
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-merge-conflict
+      - id: check-json
+        exclude: ^helmfile/upstream/|charts/.*/templates/
+      - id: check-yaml
+        exclude: ^helmfile/upstream/|charts/.*/templates/|helmfile.yaml|^helmfile/[0-9]+-[a-z-]+.yaml
+        args:
+          - --allow-multiple-documents
+      - id: detect-private-key
+        exclude: ^helmfile/upstream/|^pipeline/sops-pgp-setup.bash$
+      - id: end-of-file-fixer
+        exclude: ^helmfile/upstream/
+      - id: check-merge-conflict
+      - id: no-commit-to-branch
+      - id: trailing-whitespace
+        exclude: ^helmfile/upstream/
+
+  # - repo: https://github.com/codespell-project/codespell
+  #   rev: v2.2.4
+  #   hooks:
+  #     - id: codespell
+  #       exclude: ^helmfile/upstream/
+
+  # - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
+  #   rev: 2.7.1
+  #   hooks:
+  #     - id: editorconfig-checker
+  #       exclude: ^helmfile/upstream/|^helmfile/charts/grafana-ops/dashboards/|^LICENSE$
+
+  - repo: https://github.com/jumanjihouse/pre-commit-hooks
+    rev: 3.0.0
+    hooks:
+      - id: markdownlint
+        exclude: ^helmfile/upstream/
+
+  # - repo: https://github.com/koalaman/shellcheck-precommit
+  #   rev: v0.9.0
+  #   hooks:
+  #     - id: shellcheck
+  #       exclude: ^helmfile/upstream/|^helmfile/charts/opensearch/configurer/files/configurer.sh$
+  #       args:
+  #       - --external-sources

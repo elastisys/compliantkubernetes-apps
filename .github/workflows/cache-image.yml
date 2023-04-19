@@ -1,0 +1,22 @@
+name: cache-image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  cache-image:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: docker/setup-buildx-action@v2
+    - uses: docker/build-push-action@v3
+      with:
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        context: ./pipeline
+        load: false
+        pull: false
+        push: false
+        tags: elastisys-ck8s-apps/app:latest
