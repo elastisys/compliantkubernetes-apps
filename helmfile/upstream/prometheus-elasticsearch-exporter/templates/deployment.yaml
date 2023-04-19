@@ -7,9 +7,12 @@ metadata:
     app: {{ template "elasticsearch-exporter.name" . }}
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
-  {{- if .Values.deployment.annotations }}
+  {{- with .Values.deployment.labels }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.deployment.annotations }}
   annotations:
-{{- toYaml .Values.deployment.annotations | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
@@ -27,12 +30,12 @@ spec:
       labels:
         app: {{ template "elasticsearch-exporter.name" . }}
         release: "{{ .Release.Name }}"
-        {{- if .Values.podLabels }}
-{{ toYaml .Values.podLabels | indent 8 }}
-        {{- end }}
-      {{- if .Values.podAnnotations }}
+      {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podAnnotations }}
       annotations:
-{{ toYaml .Values.podAnnotations | indent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
     spec:
       {{- if .Values.serviceAccount.create  }}
@@ -43,20 +46,16 @@ spec:
 {{- if .Values.priorityClassName }}
       priorityClassName: "{{ .Values.priorityClassName }}"
 {{- end }}
-{{- if .Values.image.pullSecret }}
-      imagePullSecrets:
-        - name: {{ .Values.image.pullSecret }}
-{{- end }}
+      {{- include "elasticsearch-exporter.image.pullSecret.name" (dict "images" (list .Values.image) "context" $) | nindent 6 }}
       restartPolicy: {{ .Values.restartPolicy }}
-      {{- if .Values.securityContext.enabled }}
+      {{- with .Values.podSecurityContext }}
       securityContext:
-        runAsNonRoot: true
-        runAsUser: {{ .Values.securityContext.runAsUser }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
-{{- with .Values.dnsConfig }}
+      {{- with .Values.dnsConfig }}
       dnsConfig:
-{{ toYaml . | indent 8 }}
-{{- end }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: exporter
           env:
@@ -64,7 +63,7 @@ spec:
             - name: {{ $key }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ required "Must specify secret!" $value.secret }}
+                  name: {{ required "Must specify secret!" (tpl $value.secret $) }}
                   key: {{ required "Must specify key!" $value.key }}
             {{- end }}
             {{- range $key, $value := .Values.env }}
@@ -100,6 +99,9 @@ spec:
                     {{- if .Values.es.indices_mappings }}
                     "--es.indices_mappings",
                     {{- end }}
+                    {{- if .Values.es.aliases }}
+                    "--es.aliases",
+                    {{- end }}
                     {{- if .Values.es.shards }}
                     "--es.shards",
                     {{- end }}
@@ -108,6 +110,12 @@ spec:
                     {{- end }}
                     {{- if .Values.es.cluster_settings }}
                     "--es.cluster_settings",
+                    {{- end }}
+                    {{- if .Values.es.slm }}
+                    "--es.slm",
+                    {{- end }}
+                    {{- if .Values.es.data_stream }}
+                    "--es.data_stream",
                     {{- end }}
                     "--es.timeout={{ .Values.es.timeout }}",
                     {{- if .Values.es.sslSkipVerify }}
@@ -125,47 +133,35 @@ spec:
                     {{- end }}
                     "--web.listen-address=:{{ .Values.service.httpPort }}",
                     "--web.telemetry-path={{ .Values.web.path }}"]
+          {{- with .Values.securityContext }}
           securityContext:
-            capabilities:
-              drop:
-                - SETPCAP
-                - MKNOD
-                - AUDIT_WRITE
-                - CHOWN
-                - NET_RAW
-                - DAC_OVERRIDE
-                - FOWNER
-                - FSETID
-                - KILL
-                - SETGID
-                - SETUID
-                - NET_BIND_SERVICE
-                - SYS_CHROOT
-                - SETFCAP
-            readOnlyRootFilesystem: true
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
           resources:
-{{ toYaml .Values.resources | indent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           ports:
             - containerPort: {{ .Values.service.httpPort }}
-              name: http
+              name: {{ .Values.service.metricsPort.name }}
           livenessProbe:
             httpGet:
               path: /healthz
-              port: http
+              port: {{ .Values.service.metricsPort.name }}
             initialDelaySeconds: 5
             timeoutSeconds: 5
             periodSeconds: 5
           readinessProbe:
             httpGet:
               path: /healthz
-              port: http
+              port: {{ .Values.service.metricsPort.name }}
             initialDelaySeconds: 1
             timeoutSeconds: 5
             periodSeconds: 5
           lifecycle:
             preStop:
               exec:
-                command: ["/bin/bash", "-c", "sleep 20"]
+                command: ["/bin/ash", "-c", "sleep 20"]
           volumeMounts:
             {{- if and .Values.es.ssl.enabled (eq .Values.es.ssl.useExistingSecrets false) }}
             - mountPath: /ssl
@@ -178,21 +174,21 @@ spec:
               subPath: {{ .subPath }}
               {{- end }}
             {{- end }}
-            {{- if .Values.extraVolumeMounts }}
-            {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
+            {{- with .Values.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
             {{- end }}
-{{- if .Values.nodeSelector }}
+      {{- with .Values.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.nodeSelector | indent 8 }}
-{{- end }}
-{{- if .Values.tolerations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
       tolerations:
-{{ toYaml .Values.tolerations | indent 8 }}
-{{- end }}
-{{- if .Values.affinity }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
       affinity:
-{{ toYaml .Values.affinity | indent 8 }}
-{{- end }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
         {{- if and .Values.es.ssl.enabled (eq .Values.es.ssl.useExistingSecrets false) }}
         - name: ssl
@@ -204,6 +200,6 @@ spec:
           secret:
             secretName: {{ .secretName }}
         {{- end }}
-        {{- if .Values.extraVolumes }}
-        {{- toYaml .Values.extraVolumes | nindent 8 }}
+        {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
