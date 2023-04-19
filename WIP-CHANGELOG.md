@@ -14,6 +14,7 @@
 - Add Gatekeeper PSPs for Fluentd and OpenSearch
 - Add Gatekeeper PSPs for Kured.
 - Add Gatekeeper PSPs for Harbor
+- Add Gatekeeper PSPs for rook-ceph
 - Add Gatekeeper mutation for setting job TTL if not already set. By default, a TTL of 7 days will be set.
 - Enabled Pod Security Admission for `dex` and `cert-manager`
 - Add Gatekeeper PSPs for Velero.

@@ -1,0 +1,237 @@
+{{- if .Values.rookCeph.enabled }}
+constraints:
+  rook-ceph:
+
+    operator:
+      podSelectorLabels:
+        app: rook-ceph-operator
+      allow:
+        privileged: true
+        allowPrivilegeEscalation: true
+        volumes:
+          - emptyDir
+          - projected
+
+    csi-rbdplugin-provisioner:
+      podSelectorLabels:
+        app: csi-rbdplugin-provisioner
+      allow:
+        privileged: true
+        allowPrivilegeEscalation: true
+        volumes:
+          - emptyDir
+          - projected
+          - hostPath
+        allowedHostPaths:
+          - pathPrefix: "/dev"
+          - pathPrefix: "/sys"
+          - pathPrefix: "/lib/modules"
+        runAsUser:
+          rule: RunAsAny
+        runAsGroup:
+          rule: RunAsAny
+        supplementalGroups:
+          rule: RunAsAny
+        fsGroup:
+          rule: RunAsAny
+      mutation:
+        dropAllCapabilities: false
+
+    csi-rbdplugin:
+      podSelectorLabels:
+        app: csi-rbdplugin
+      allow:
+        privileged: true
+        allowPrivilegeEscalation: true
+        hostNetworkPorts: true
+        hostNamespace: true
+        volumes:
+          - emptyDir
+          - projected
+          - hostPath
+        allowedHostPaths:
+          - pathPrefix: "/run/udev"
+          - pathPrefix: "/dev"
+          - pathPrefix: "/var/lib/rook"
+          - pathPrefix: "/var/lib/kubelet/plugins_registry"
+          - pathPrefix: "/var/lib/kubelet/plugins"
+          - pathPrefix: "/var/lib/kubelet/pods"
+          - pathPrefix: "/sys"
+          - pathPrefix: "/run/mount"
+          - pathPrefix: "/lib/modules"
+        runAsUser:
+          rule: RunAsAny
+        runAsGroup:
+          rule: RunAsAny
+        supplementalGroups:
+          rule: RunAsAny
+        fsGroup:
+          rule: RunAsAny
+      mutation:
+        dropAllCapabilities: false
+
+    crashcollector:
+      podSelectorLabels:
+        app: rook-ceph-crashcollector
+      allow:
+        allowPrivilegeEscalation: true
+        volumes:
+          - secret
+          - projected
+          - hostPath
+        allowedHostPaths:
+          - pathPrefix: "/var/lib/rook"
+        supplementalGroups:
+          rule: RunAsAny
+      mutation:
+        runAsGroup: 167
+        runAsUser: 167
+        fsGroup: 167
+
+    osd:
+      podSelectorLabels:
+        app: rook-ceph-osd
+      allow:
+        privileged: true
+        allowPrivilegeEscalation: true
+        volumes:
+          - secret
+          - projected
+          - hostPath
+        allowedHostPaths:
+          - pathPrefix: "/run/udev"
+          - pathPrefix: "/dev"
+          - pathPrefix: "/var/lib/rook"
+        runAsUser:
+          rule: RunAsAny
+        runAsGroup:
+          rule: RunAsAny
+        supplementalGroups:
+          rule: RunAsAny
+        fsGroup:
+          rule: RunAsAny
+      mutation:
+        dropAllCapabilities: false
+
+    mgr:
+      podSelectorLabels:
+        app: rook-ceph-mgr
+      allow:
+        allowPrivilegeEscalation: true
+        volumes:
+          - emptyDir
+          - secret
+          - projected
+          - hostPath
+        allowedHostPaths:
+          - pathPrefix: "/var/lib/rook"
+        runAsUser:
+          rule: RunAsAny
+        runAsGroup:
+          rule: RunAsAny
+        supplementalGroups:
+          rule: RunAsAny
+        fsGroup:
+          rule: RunAsAny
+      mutation:
+        dropAllCapabilities: false
+
+    mon:
+      podSelectorLabels:
+        app: rook-ceph-mon
+      allow:
+        allowPrivilegeEscalation: true
+        volumes:
+          - secret
+          - projected
+          - hostPath
+        allowedHostPaths:
+          - pathPrefix: "/var/lib/rook"
+        runAsUser:
+          rule: RunAsAny
+        runAsGroup:
+          rule: RunAsAny
+        fsGroup:
+          rule: RunAsAny
+        supplementalGroups:
+          rule: RunAsAny
+      mutation:
+        dropAllCapabilities: false
+
+    tools:
+      podSelectorLabels:
+        app: rook-ceph-tools
+      allow:
+        volumes:
+          - configMap
+          - emptyDir
+          - projected
+        runAsUser:
+          rule: MustRunAsNonRoot
+        allowPrivilegeEscalation: true
+      mutation:
+        fsGroup: 2016
+
+    detect-version:
+      podSelectorLabels:
+        app: rook-ceph-detect-version
+      allow:
+        privileged: true
+        allowPrivilegeEscalation: true
+        volumes:
+          - emptyDir
+          - projected
+        runAsUser:
+          rule: RunAsAny
+        runAsGroup:
+          rule: RunAsAny
+        supplementalGroups:
+          rule: RunAsAny
+        fsGroup:
+          rule: RunAsAny
+      mutation:
+        dropAllCapabilities: false
+
+    csi-detect-version:
+      podSelectorLabels:
+        app: rook-ceph-csi-detect-version
+      allow:
+        privileged: true
+        allowPrivilegeEscalation: true
+        volumes:
+          - emptyDir
+          - projected
+        runAsUser:
+          rule: RunAsAny
+        runAsGroup:
+          rule: RunAsAny
+        supplementalGroups:
+          rule: RunAsAny
+        fsGroup:
+          rule: RunAsAny
+      mutation:
+        dropAllCapabilities: false
+
+    osd-prepare:
+      podSelectorLabels:
+        app: rook-ceph-osd-prepare
+      allow:
+        privileged: true
+        allowPrivilegeEscalation: true
+        volumes:
+          - emptyDir
+          - projected
+          - hostPath
+        allowedHostPaths:
+          - pathPrefix: "/"
+        runAsUser:
+          rule: RunAsAny
+        runAsGroup:
+          rule: RunAsAny
+        supplementalGroups:
+          rule: RunAsAny
+        fsGroup:
+          rule: RunAsAny
+      mutation:
+        dropAllCapabilities: false
+{{- end }}
