@@ -150,18 +150,11 @@ prometheus:
 
 
     # Select everything
-    serviceMonitorNamespaceSelector:
-      matchLabels: {}
-    serviceMonitorSelector:
-      matchLabels: {}
-    podMonitorNamespaceSelector:
-      matchLabels: {}
-    podMonitorSelector:
-      matchLabels: {}
-    ruleNamespaceSelector:
-      matchLabels: {}
-    ruleSelector:
-      matchLabels: {}
+    ruleSelectorNilUsesHelmValues: false
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    probeSelectorNilUsesHelmValues: false
+
 
     {{ if .Values.user.alertmanager.enabled }}
     # Connect to separately managed alertmanager
