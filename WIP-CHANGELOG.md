@@ -23,6 +23,7 @@
 - Add Gatekeeper PSPs for falco.
 - Add cache-image workflow
 - Possibility to enable metrics for Cluster API in `kube-state-metrics`.
+- Add node-local-dns Grafana dashboard
 
 ### Fixed
 
