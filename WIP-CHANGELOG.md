@@ -49,6 +49,7 @@
 - grafana to v9.3.8
 - Upgraded Dex to v2.36.0, chart v0.14.1
 - Update pre-commit hooks
+- node-local-dns to use image `registry.k8s.io/dns/k8s-dns-node-cache:1.22.20`
 
 ### Changed
 
