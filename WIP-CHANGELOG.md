@@ -59,6 +59,7 @@
 - Restructure Gatekeeper charts and values
 - Changed the default promIndexAlerts alertsize for authlog from 0.2 to 2.
 - Allow SOPS config to contain multiple creation rules
+- Expose all `fluentd-aggregator` buffer settings
 
 ### Removed
 

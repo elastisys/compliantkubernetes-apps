@@ -132,13 +132,9 @@ aggregator:
     buffer.prop: |
       @type file
 
-      overflow_action {{ .Values.fluentd.aggregator.buffer | get "overflowAction" "block" }}
-      chunk_limit_size {{ .Values.fluentd.aggregator.buffer | get "chunkLimitSize" "50MB" }}
-      total_limit_size {{ .Values.fluentd.aggregator.buffer | get "totalLimitSize" "9GB" }}
-
-      timekey {{ .Values.fluentd.aggregator.buffer | get "timekey" "10m" }}
-      timekey_wait {{ .Values.fluentd.aggregator.buffer | get "timekeyWait" "1m" }}
-      timekey_use_utc true
+      {{- range $key, $value := .Values.fluentd.aggregator.buffer }}
+      {{ $key | snakecase }} {{ $value }}
+      {{- end }}
 
     store.prop: |
       @type s3

@@ -175,7 +175,23 @@ fluentd:
       #   </match>
 
   aggregator:
-    buffer: {}
+    # All buffer settings are available, keys are transformed to snake_case as required by fluentd config
+    buffer:
+      chunkLimitSize: 50MB
+      totalLimitSize: 9GB
+
+      flushMode: interval
+      flushInterval: 15m
+      flushThreadCount: 4
+      flushThreadBurstInterval: 0.2
+
+      retryType: exponential_backoff
+      retryForever: true
+      retryMaxInterval: 30
+
+      timekey: 10m
+      timekeyWait: 1m
+      timekeyUseUtc: true
 
     persistence:
       storage: 10Gi
@@ -185,7 +201,7 @@ fluentd:
         cpu: 300m
         memory: 500Mi
       limits:
-        cpu: 500m
+        cpu: 750m
         memory: 1000Mi
 
     tolerations: []
