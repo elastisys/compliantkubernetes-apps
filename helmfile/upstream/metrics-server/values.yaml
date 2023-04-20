@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 image:
-  repository: k8s.gcr.io/metrics-server/metrics-server
+  repository: registry.k8s.io/metrics-server/metrics-server
   # Overrides the image tag whose default is v{{ .Chart.AppVersion }}
   tag: ""
   pullPolicy: IfNotPresent
@@ -56,10 +56,15 @@ securityContext:
   readOnlyRootFilesystem: true
   runAsNonRoot: true
   runAsUser: 1000
+  seccompProfile:
+    type: RuntimeDefault
+  capabilities:
+    drop:
+      - ALL
 
 priorityClassName: system-cluster-critical
 
-containerPort: 4443
+containerPort: 10250
 
 hostNetwork:
   # Specifies if metrics-server should be started in hostNetwork mode.
@@ -117,6 +122,27 @@ service:
   #  Add these labels to have metrics-server show up in `kubectl cluster-info`
   #  kubernetes.io/cluster-service: "true"
   #  kubernetes.io/name: "Metrics-server"
+
+addonResizer:
+  enabled: false
+  image:
+    repository: registry.k8s.io/autoscaling/addon-resizer
+    tag: 1.8.14
+  resources:
+    limits:
+      cpu: 40m
+      memory: 25Mi
+    requests:
+      cpu: 40m
+      memory: 25Mi
+  nanny:
+    cpu: 20m
+    extraCpu: 1m
+    extraMemory: 2Mi
+    memory: 15Mi
+    minClusterSize: 10
+    pollPeriod: 300000
+    threshold: 5
 
 metrics:
   enabled: false
