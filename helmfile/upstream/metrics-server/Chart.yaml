@@ -1,37 +1,32 @@
-apiVersion: v2
-name: metrics-server
-description: Metrics Server is a scalable, efficient source of container resource metrics for Kubernetes built-in autoscaling pipelines.
-type: application
-version: 3.8.3
-appVersion: 0.6.2
-keywords:
-  - kubernetes
-  - metrics-server
-  - metrics
-home: https://github.com/kubernetes-sigs/metrics-server
-icon: https://avatars.githubusercontent.com/u/36015203?s=400&v=4
-sources:
-  - https://github.com/kubernetes-sigs/metrics-server
-maintainers:
-  - name: stevehipwell
-    url: https://github.com/stevehipwell
-  - name: krmichel
-    url: https://github.com/krmichel
-  - name: endrec
-    url: https://github.com/endrec
 annotations:
   artifacthub.io/changes: |
+    - kind: fixed
+      description: "Fixed auth-reader role binding namespace to always use kube-system."
+    - kind: fixed
+      description: "Fixed addon resizer configuration."
     - kind: added
-      description: "Added support for topologySpreadConstraints."
-    - kind: added
-      description: "Set resource namespaces explicitly."
-    - kind: added
-      description: "Allow configuring TLS on the APIService."
-    - kind: added
-      description: "Enabled service monitor relabelling."
-    - kind: added
-      description: "Added ability to set the scheduler name."
-    - kind: added
-      description: "Added support for common labels."
-    - kind: changed
-      description: "Updated Metrics Server image to v0.6.2."
+      description: "Added support for running under PodSecurity restricted."
+    - kind: fixed
+      description: "Fixed container port default not having been updated to 10250."
+apiVersion: v2
+appVersion: 0.6.3
+description: Metrics Server is a scalable, efficient source of container resource
+  metrics for Kubernetes built-in autoscaling pipelines.
+home: https://github.com/kubernetes-sigs/metrics-server
+icon: https://avatars.githubusercontent.com/u/36015203?s=400&v=4
+keywords:
+- kubernetes
+- metrics-server
+- metrics
+maintainers:
+- name: stevehipwell
+  url: https://github.com/stevehipwell
+- name: krmichel
+  url: https://github.com/krmichel
+- name: endrec
+  url: https://github.com/endrec
+name: metrics-server
+sources:
+- https://github.com/kubernetes-sigs/metrics-server
+type: application
+version: 3.10.0
