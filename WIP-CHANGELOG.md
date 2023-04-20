@@ -78,6 +78,7 @@
 - Increase Gatekeeper controller resources to handle new constraints and mutations
 - Install Gatekeeper PSPs per stack to improve targeting and modularity
 - Limit resource types checked by Gatekeeper
+- Allow for target discovery of all probes in workload cluster
 
 ### Removed
 
