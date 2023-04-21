@@ -206,23 +206,25 @@ if "${enable_opensearch_snapshot}"; then
     )
 fi
 if "${enable_fluentd_audit}"; then
-    audit_bucket="$(yq4 '.objectStorage.buckets.audit' "${CONFIG_FILE}" 2>/dev/null)"
-    env_name="$(yq4 '.global.ck8sEnvironmentName' "${CONFIG_FILE}" 2>/dev/null)"
+    cluster_name="$(yq4 '.global.clusterName' "${CONFIG_FILE}" 2>/dev/null)"
+    mapfile -t clusters_monitoring < <(yq4 '.global.clustersMonitoring[]' "${CONFIG_FILE}" 2>/dev/null)
 
     cronjobs+=(
-        "fluentd-system $audit_bucket-$env_name-sc-compaction"
-        "fluentd-system $audit_bucket-$env_name-sc-retention"
-        "fluentd-system $audit_bucket-$env_name-wc-compaction"
-        "fluentd-system $audit_bucket-$env_name-wc-retention"
+        "fluentd-system audit-$cluster_name-compaction"
+        "fluentd-system audit-$cluster_name-retention"
     )
+    for cluster in "${clusters_monitoring[@]}"; do
+      cronjobs+=(
+        "fluentd-system audit-$cluster-compaction"
+        "fluentd-system audit-$cluster-retention"
+      )
+    done
 fi
 if "${enable_fluentd_logs}"; then
-    logs_bucket="$(yq4 '.objectStorage.buckets.scFluentd' "${CONFIG_FILE}" 2>/dev/null)"
-    env_name="$(yq4 '.global.ck8sEnvironmentName' "${CONFIG_FILE}" 2>/dev/null)"
 
     cronjobs+=(
-        "fluentd-system $logs_bucket-logs-compaction"
-        "fluentd-system $logs_bucket-logs-retention"
+        "fluentd-system sc-logs-logs-compaction"
+        "fluentd-system sc-logs-logs-retention"
     )
 fi
 

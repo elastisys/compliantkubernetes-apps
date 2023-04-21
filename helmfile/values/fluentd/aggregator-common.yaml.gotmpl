@@ -25,6 +25,11 @@ extraDeploy:
 aggregator:
   replicaCount: 1
 
+  resources:    {{- toYaml .Values.fluentd.aggregator.resources | nindent 4  }}
+  nodeSelector: {{- toYaml .Values.fluentd.aggregator.nodeSelector | nindent 4  }}
+  affinity:     {{- toYaml .Values.fluentd.aggregator.affinity | nindent 4  }}
+  tolerations:  {{- toYaml .Values.fluentd.aggregator.tolerations | nindent 4  }}
+
   # Persist buffer so that the last chunks of logs can be retrieved in case of a disaster.
   persistence:
     enabled: true

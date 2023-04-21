@@ -36,6 +36,7 @@
 - Indentation issue in the `fluentd-forwarder-workload-cluster-system` values file.
 - Ensure `opensearch-configurer` runs on changes
 - Correct `fluentd-aggregator` buffer settings
+- Moved tolerations, affinity and resources for `fluentd-aggregator` in `aggregator-common.yaml.gotmpl`
 - Source `extra-fluentd-config` user supplied settings
 - Change config option `falco.customRules` to a map
 - Synced the default prometheus interval with the grafana dashboards and datasources

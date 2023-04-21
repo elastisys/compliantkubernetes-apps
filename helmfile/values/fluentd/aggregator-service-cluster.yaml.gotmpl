@@ -3,11 +3,6 @@
 {{ end -}}
 
 aggregator:
-  resources:    {{- toYaml .Values.fluentd.aggregator.resources | nindent 4  }}
-  nodeSelector: {{- toYaml .Values.fluentd.aggregator.nodeSelector | nindent 4  }}
-  affinity:     {{- toYaml .Values.fluentd.aggregator.affinity | nindent 4  }}
-  tolerations:  {{- toYaml .Values.fluentd.aggregator.tolerations | nindent 4  }}
-
   configMapFiles:
     {{- if .Values.fluentd.scLogs.enabled }}
     fluentd-labels.conf: |

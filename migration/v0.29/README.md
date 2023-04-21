@@ -86,6 +86,8 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > **Note**:
     > Fluentd can now collect audit logs, enable it by setting `fluentd.audit.enabled: true`.
     > The apply upgrade will create the bucket as set by `objectStorage.buckets.audit` to store those logs.
+    > If the environment has rclone-sync enabled you will need to create the audit in the destination S3
+    > To set the elastisys nodes tolerations and affinity for fluentd aggregator in wc edit `vim "$CK8S_CONFIG_PATH/wc-config.yaml"` and add them under `fluentd.aggregator`
 
 1. Prepare upgrade - *non-disruptive*
 
@@ -94,6 +96,8 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ```bash
     ./bin/ck8s upgrade v0.29 prepare
     ```
+    > **Note**:
+    > To set the elastisys nodes tolerations and affinity for fluentd aggregator in wc edit `vim "$CK8S_CONFIG_PATH/wc-config.yaml"` and add them under `fluentd.aggregator`
 
 1. Apply upgrade - *disruptive*
 
@@ -135,11 +139,14 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > **Note**:
     > Fluentd can now collect audit logs, enable it by setting `fluentd.audit.enable: true`.
     > Make sure to create the bucket as set by `objectStorage.buckets.audit` to store those logs.
+    > To set the elastisys nodes tolerations and affinity for fluentd aggregator in wc edit `vim "$CK8S_CONFIG_PATH/wc-config.yaml"` and add them under `fluentd.aggregator`
 
     ```bash
-    ./scripts/S3/entry.sh --s3cfg "$CK8S_CONFIG_PATH/.state/s3cfg.ini" create
+    sops exec-file --no-fifo "$CK8S_CONFIG_PATH/.state/s3cfg.ini" './scripts/S3/entry.sh --s3cfg {} create'
     # or
     ./migration/v0.29/apply/01-create-buckets.sh execute
+    # if rclone-sync is enabled
+    sops exec-file --no-fifo "$CK8S_CONFIG_PATH/.state/destination-s3cfg.ini" './scripts/S3/entry.sh --s3cfg {} create'
     ```
 
 1. **Warning** The default Gatekeeper enforcements have been updated:
