@@ -207,8 +207,7 @@ if "${enable_opensearch_snapshot}"; then
 fi
 if "${enable_fluentd_audit}"; then
     cluster_name="$(yq4 '.global.clusterName' "${CONFIG_FILE}" 2>/dev/null)"
-    #clusters_monitoring=($(yq4 -r '.global.clustersMonitoring[]' "${CONFIG_FILE}" 2>/dev/null))
-    mapfile -t clusters_monitoring < <(yq4 -r '.global.clustersMonitoring[]' "${CONFIG_FILE}" 2>/dev/null)
+    mapfile -t clusters_monitoring < <(yq4 '.global.clustersMonitoring[]' "${CONFIG_FILE}" 2>/dev/null)
 
     cronjobs+=(
         "fluentd-system audit-$cluster_name-compaction"
