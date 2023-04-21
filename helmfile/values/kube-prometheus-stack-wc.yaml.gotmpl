@@ -40,6 +40,11 @@ prometheus-node-exporter:
           sourceLabels:
           - __meta_kubernetes_pod_node_name
           targetLabel: instance
+  securityContext:
+    fsGroup: 3000
+    runAsNonRoot: true
+    runAsUser: 1000
+    supplementalGroups: [2000]
 
 kubeApiServer:
   serviceMonitor:
