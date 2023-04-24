@@ -27,6 +27,7 @@
 - Add gatekeeper mutation for setting seccomp profile
 - Allow drop all capabilites mutation to be disabled per service
 - Added annotation for the grafana dashboard "Compute Resources / Pod" to show container restarts
+- Add falco filter to not warn when containerd removes images that contain static log files or shell files
 
 ### Fixed
 

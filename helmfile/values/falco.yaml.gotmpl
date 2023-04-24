@@ -159,6 +159,14 @@ customRules:
             )
           )
         )
+    - macro: allowed_clear_log_files
+      condition: (
+          fd.name startswith "/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/" and proc.cmdline = containerd
+        )
+    - macro: user_known_shell_config_modifiers
+      condition: (
+          fd.name startswith "/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/" and proc.cmdline = containerd
+        )
 
 falcosidekick:
   enabled: {{ .Values.falco.alerts.enabled }}
