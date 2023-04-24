@@ -33,6 +33,7 @@
 - Alerts for CoreDNS and Node-local-dns
 - Added RBAC for admin users to view events and logs
 - Possibility to add custom config for node-local-dns
+- Added Prometheus Blackbox Exporter dashboard to Grafana
 
 ### Changed
 
