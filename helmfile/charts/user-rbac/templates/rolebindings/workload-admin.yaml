@@ -4,7 +4,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: workload-admin
-  namespace: {{ $namespace }}
+  namespace: {{ $namespace.name }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -21,7 +21,7 @@ subjects:
   name: {{ $group }}
 {{- end }}
 {{- $known := lookup "v1" "Service" "default" "kubernetes" }}
-{{- $value := lookup "rbac.authorization.k8s.io/v1" "RoleBinding" $namespace "extra-workload-admins" }}
+{{- $value := lookup "rbac.authorization.k8s.io/v1" "RoleBinding" $namespace.name "extra-workload-admins" }}
 {{- if and $known (not $value) (or $.Release.IsInstall $.Release.IsUpgrade) }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -30,7 +30,7 @@ metadata:
   annotations:
     "helm.sh/resource-policy": keep
   name: extra-workload-admins
-  namespace: {{ $namespace }}
+  namespace: {{ $namespace.name }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

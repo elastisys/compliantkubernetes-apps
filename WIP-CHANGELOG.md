@@ -31,6 +31,10 @@
 - Added fluentd-system on the excluded list for hnc
 - Added so log-manager compaction can use ephemeral volumes.
 - Add default securitycontext mutations for restricted user namespaces
+- Add PSA labels propagate for user hnc owned namespaces
+- Add option to override usernamespace `restricted` PSA level
+  - Namespaces overridden will not be managed by HNC.
+- Add usernamespace gatekeeper constraints, for overridden usernamespaces.
 
 ### Fixed
 
@@ -89,3 +93,7 @@
 ### Removed
 
 - Remove all Kubernetes PSPs
+- Remove HNC admin-rbac from admin (attached to user admins)
+  - User admins will now only have the HNC user-rbac instead.
+- Removed the ability to edit HierarchyConfiguration for users
+  - HierarchyConfiguration controls the Pod Security Standard level, and as such should not be allowed to be changed by a user.

@@ -5,7 +5,6 @@ kind: ClusterRole
 metadata:
   labels:
     {{- include "hnc.labels" . | nindent 4 }}
-    rbac.authorization.k8s.io/aggregate-to-admin: "true"
   name: {{ include "hnc.fullname" . }}-admin-role
 rules:
 - apiGroups:
