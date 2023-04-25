@@ -1,4 +1,14 @@
-namespaces: {{ toYaml .Values.user.namespaces | nindent 2 }}
+namespaces:
+{{- range $namespace := .Values.user.namespaces }}
+  - name: {{ $namespace -}}
+    {{ if (hasKey $.Values.user.constraints $namespace ) }}
+    {{- $psa := (index $.Values.user.constraints $namespace) }}
+    psa: {{ $psa.psaLevel }}
+    {{ else }}
+    psa: restricted
+    {{- end }}
+{{- end }}
+
 users: {{ toYaml .Values.user.adminUsers | nindent 2 }}
 groups: {{ toYaml .Values.user.adminGroups | nindent 2 }}
 createNamespaces: {{ .Values.user.createNamespaces }}

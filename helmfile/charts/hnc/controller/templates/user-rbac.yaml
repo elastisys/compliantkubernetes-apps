@@ -10,6 +10,14 @@ rules:
 - apiGroups:
   - hnc.x-k8s.io
   resources:
+  - hierarchyconfigurations
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - hnc.x-k8s.io
+  resources:
   - hncconfigurations
   verbs:
   - get
@@ -47,18 +55,6 @@ metadata:
   name: {{ include "hnc.fullname" $ }}-user-role
   namespace: {{ . }}
 rules:
-- apiGroups:
-  - hnc.x-k8s.io
-  resources:
-  - hierarchyconfigurations
-  verbs:
-  - get
-  - list
-  - watch
-{{- if $.Values.rbac.user.allowConfigEdit }}
-  - patch
-  - update
-{{- end }}
 - apiGroups:
   - hnc.x-k8s.io
   resources:

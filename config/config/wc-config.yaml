@@ -15,6 +15,16 @@ user:
     - set-me
     - demo
 
+  ## Any namespace listed in constraints are exempted from HNC managed namespaces
+  ## This to override the Pod Security Admission level
+  ## Example of constraint can be found here: helmfile/charts/gatekeeper/podsecuritypolicies/values.yaml
+  ## The only extra label "psaLevel: <baseline/privileged>" is shown in the following example:
+  ## <namespace>:
+  ##  psaLevel: <baseline/privileged>
+  ##  <service-name>:
+  ##    ...
+  constraints: {}
+
   ## List of users to create RBAC rules for.
   adminUsers:
     - set-me
@@ -101,10 +111,10 @@ hnc:
   managedNamespaceAnnotations: []
   ## Labels that will be propagated to subnamespaces (allows regex)
   ## Labels in particular must also be configured in the HierarchyConfiguration object to be propagated
-  managedNamespaceLabels: []
-
-  ## Set to allow users to edit the HierarchyConfiguration in each (sub)namespace
-  allowConfigEdit: false
+  managedNamespaceLabels:
+    - pod-security.kubernetes.io/enforce
+    - pod-security.kubernetes.io/audit
+    - pod-security.kubernetes.io/warn
 
   ## Manager deployment configuration
   manager:

@@ -1,5 +1,9 @@
+{{- if .Values.user.constraints }}
 constraints:
-  default: {}
+{{- range $key, $value := .Values.user.constraints}}
+  {{ $key }}:{{- unset $value "psaLevel" | toYaml | nindent 4 }}
+{{- end }}
+{{- end }}
 
 mutations:
   # Select user restricted namespaces

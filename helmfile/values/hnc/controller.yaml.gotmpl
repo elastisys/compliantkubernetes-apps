@@ -7,16 +7,18 @@ excludedNamespaces:
   {{- with .Values.hnc.excludedExtraNamespaces }}
   {{- toYaml . | nindent 2 }}
   {{- end }}
+  {{- with (keys .Values.user.constraints) }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
 
 unpropagatedAnnotations: {{ .Values.hnc.unpropagatedAnnotations }}
 
 managedNamespaceAnnotations: {{ .Values.hnc.managedNamespaceAnnotations }}
-managedNamespaceLabels: {{ .Values.hnc.managedNamespaceLabels }}
+managedNamespaceLabels: {{- toYaml .Values.hnc.managedNamespaceLabels | nindent 4 }}
 
 rbac:
   user:
-    allowConfigEdit: {{ .Values.hnc.allowConfigEdit }}
-    namespaces: {{- toYaml .Values.user.namespaces | nindent 6 }}
+    namespaces: {{- toYaml (without .Values.user.namespaces (keys .Values.user.constraints | join " ")) | nindent 6 }}
     groups: {{- toYaml .Values.user.adminGroups | nindent 6 }}
     users: {{- toYaml .Values.user.adminUsers | nindent 6 }}
 

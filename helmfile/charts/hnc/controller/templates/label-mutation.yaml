@@ -1,0 +1,29 @@
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: namespace-restricted-label
+spec:
+  applyTo:
+  - groups: ["hnc.x-k8s.io"]
+    kinds: ["HierarchyConfiguration"]
+    versions: ["v1alpha2"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: ["hnc.x-k8s.io"]
+        kinds: ["HierarchyConfiguration"]
+    namespaces:
+    {{- range .Values.rbac.user.namespaces }}
+      - {{ . }}
+    {{- end }}
+  location: "spec.labels"
+  parameters:
+    operation: merge
+    values:
+      fromList:
+        - key: pod-security.kubernetes.io/enforce
+          value: restricted
+        - key: pod-security.kubernetes.io/audit
+          value: restricted
+        - key: pod-security.kubernetes.io/warn
+          value: restricted
