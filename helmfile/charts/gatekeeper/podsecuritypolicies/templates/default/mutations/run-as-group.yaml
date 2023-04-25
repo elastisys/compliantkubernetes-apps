@@ -23,7 +23,7 @@ spec:
   location: "spec.containers[name: *].securityContext.runAsGroup"
   parameters:
     assign:
-      value: 1000
+      value: 1
     pathTests:
       - subPath: "spec.containers[name: *].securityContext.runAsGroup"
         condition: MustNotExist
@@ -42,7 +42,7 @@ spec:
   location: "spec.ephemeralContainers[name: *].securityContext.runAsGroup"
   parameters:
     assign:
-      value: 1000
+      value: 1
     pathTests:
       - subPath: "spec.ephemeralContainers[name: *].securityContext.runAsGroup"
         condition: MustNotExist
@@ -61,7 +61,7 @@ spec:
   location: "spec.initContainers[name: *].securityContext.runAsGroup"
   parameters:
     assign:
-      value: 1000
+      value: 1
     pathTests:
       - subPath: "spec.initContainers[name: *].securityContext.runAsGroup"
         condition: MustNotExist

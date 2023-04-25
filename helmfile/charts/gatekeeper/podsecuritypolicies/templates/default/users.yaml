@@ -19,17 +19,8 @@ spec:
     runAsUser:
       rule: MustRunAsNonRoot
     runAsGroup:
-      rule: MustRunAs
-      ranges:
-        - max: 65535
-          min: 1
+      rule: RunAsAny
     supplementalGroups:
-      rule: MustRunAs
-      ranges:
-        - max: 65535
-          min: 1
+      rule: RunAsAny
     fsGroup:
-      rule: MustRunAs
-      ranges:
-        - max: 65535
-          min: 1
+      rule: RunAsAny

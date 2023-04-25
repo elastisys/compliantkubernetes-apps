@@ -16,7 +16,7 @@ spec:
   parameters:
     values:
       fromList:
-        - 65535
+        - 1
     pathTests:
       - subPath: "spec.securityContext.supplementalGroups"
         condition: MustNotExist
