@@ -1,5 +1,6 @@
+{{- $namespaceSelectorLabels := .Values.mutations.namespaceSelectorLabels }}
 {{- $namespaces := keys .Values.constraints | sortAlpha }}
-{{- $exceptions := .Values.mutationExceptions }}
+{{- $exceptions := .Values.mutations.exceptions }}
 
 {{- range $namespace, $services := .Values.constraints }}
 {{- range $name, $value := $services }}
@@ -19,7 +20,7 @@ spec:
       kinds: ["Pod"]
       versions: ["v1"]
   match:
-    {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
+    {{- dict "namespaceSelectorLabels" $namespaceSelectorLabels "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
   location: "spec.containers[name: *].securityContext.runAsNonRoot"
   parameters:
     assign:
@@ -38,7 +39,7 @@ spec:
       kinds: ["Pod"]
       versions: ["v1"]
   match:
-    {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
+    {{- dict "namespaceSelectorLabels" $namespaceSelectorLabels "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
   location: "spec.ephemeralContainers[name: *].securityContext.runAsNonRoot"
   parameters:
     assign:
@@ -57,7 +58,7 @@ spec:
       kinds: ["Pod"]
       versions: ["v1"]
   match:
-    {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
+    {{- dict "namespaceSelectorLabels" $namespaceSelectorLabels "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
   location: "spec.initContainers[name: *].securityContext.runAsNonRoot"
   parameters:
     assign:

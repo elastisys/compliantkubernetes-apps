@@ -47,5 +47,9 @@
 #       fsGroup: 999
 constraints: {}
 
-# List of pod labels that mutation should be exempted from
-mutationExceptions: []
+mutations:
+  # List of pod labels that should be excluded from mutation
+  exceptions: []
+
+  # List of selector terms that should be used instead of generated namespace selectors
+  namespaceSelectorLabels: []

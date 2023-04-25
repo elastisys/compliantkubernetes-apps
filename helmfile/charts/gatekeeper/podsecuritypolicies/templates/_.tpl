@@ -16,8 +16,15 @@ scope: Namespaced
 kinds:
   - apiGroups: [""]
     kinds: ["Pod"]
-namespaces:
-  {{- toYaml .namespaces | nindent 2 }}
+namespaceSelector:
+  matchExpressions:
+    {{- with .namespaceSelectorLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- else }}
+    - key: kubernetes.io/metadata.name
+      operator: In
+      values: {{- toYaml .namespaces | nindent 8 }}
+    {{- end }}
 {{- with .exceptions }}
 labelSelector:
   matchExpressions:

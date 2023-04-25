@@ -1,5 +1,6 @@
+{{- $namespaceSelectorLabels := .Values.mutations.namespaceSelectorLabels }}
 {{- $namespaces := keys .Values.constraints | sortAlpha }}
-{{- $exceptions := .Values.mutationExceptions }}
+{{- $exceptions := .Values.mutations.exceptions }}
 ---
 apiVersion: mutations.gatekeeper.sh/v1
 kind: ModifySet
@@ -11,7 +12,7 @@ spec:
       kinds: ["Pod"]
       versions: ["v1"]
   match:
-    {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
+    {{- dict "namespaceSelectorLabels" $namespaceSelectorLabels "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
   location: "spec.containers[name: *].securityContext.capabilities.drop"
   parameters:
     values:
@@ -31,7 +32,7 @@ spec:
       kinds: ["Pod"]
       versions: ["v1"]
   match:
-    {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
+    {{- dict "namespaceSelectorLabels" $namespaceSelectorLabels "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
   location: "spec.ephemeralContainers[name: *].securityContext.capabilities.drop"
   parameters:
     values:
@@ -51,7 +52,7 @@ spec:
       kinds: ["Pod"]
       versions: ["v1"]
   match:
-    {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
+    {{- dict "namespaceSelectorLabels" $namespaceSelectorLabels "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
   location: "spec.initContainers[name: *].securityContext.capabilities.drop"
   parameters:
     values:
