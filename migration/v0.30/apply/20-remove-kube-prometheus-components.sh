@@ -9,8 +9,8 @@ run() {
   case "${1:-}" in
   execute)
     for CLUSTER in sc wc; do
-      old_state_metrics=$(kubectl get deployments.apps -n monitoring -l app.kubernetes.io/instance=kube-prometheus-stack,app.kubernetes.io/name=kube-state-metrics,app.kubernetes.io/version!=2.8.0 --output=jsonpath={.items..metadata.name})
-      old_node_exporter=$(kubectl get daemonset -n monitoring -l app=prometheus-node-exporter --output=jsonpath={.items..metadata.name})
+      old_state_metrics=$(kubectl_do $CLUSTER get deployments.apps -n monitoring -l app.kubernetes.io/instance=kube-prometheus-stack,app.kubernetes.io/name=kube-state-metrics,app.kubernetes.io/version!=2.8.0 --output=jsonpath={.items..metadata.name})
+      old_node_exporter=$(kubectl_do $CLUSTER get daemonset -n monitoring -l app=prometheus-node-exporter --output=jsonpath={.items..metadata.name})
 
       if [[ -n "${old_state_metrics}" ]]; then
         log_info "- removing kube-state-metrics from $CLUSTER"
