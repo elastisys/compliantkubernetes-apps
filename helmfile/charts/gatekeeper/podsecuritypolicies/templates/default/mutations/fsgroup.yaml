@@ -13,7 +13,7 @@
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: fsgroup-restricted
+  name: {{ printf "fsgroup-%s-restricted" .Release.Namespace | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]

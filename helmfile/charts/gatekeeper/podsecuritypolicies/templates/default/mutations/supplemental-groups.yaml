@@ -5,7 +5,7 @@
 apiVersion: mutations.gatekeeper.sh/v1
 kind: ModifySet
 metadata:
-  name: supplemental-groups-restricted
+  name: {{ printf "supplemental-groups-%s-restricted" .Release.Namespace | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]

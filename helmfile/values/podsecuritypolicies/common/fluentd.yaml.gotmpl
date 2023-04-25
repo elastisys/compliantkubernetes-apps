@@ -1,7 +1,7 @@
 {{- if .Values.fluentd.enabled }}
 constraints:
   fluentd-system:
-    fluentd-forwarder:
+    forwarder:
       podSelectorLabels:
         app.kubernetes.io/instance: fluentd-forwarder
       allow:
@@ -26,7 +26,7 @@ constraints:
           - projected
   {{- if eq .Environment.Name "workload_cluster" }}
   fluentd:
-    fluentd-forwarder-user:
+    forwarder-user:
       podSelectorLabels:
         app.kubernetes.io/instance: fluentd-forwarder
       allow:

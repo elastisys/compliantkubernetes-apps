@@ -5,7 +5,7 @@
 apiVersion: mutations.gatekeeper.sh/v1
 kind: ModifySet
 metadata:
-  name: capabilities-restricted-container
+  name: {{ printf "capabilities-%s-restricted-container" .Release.Namespace | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]
@@ -25,7 +25,7 @@ spec:
 apiVersion: mutations.gatekeeper.sh/v1
 kind: ModifySet
 metadata:
-  name: capabilities-restricted-ephemeral
+  name: {{ printf "capabilities-%s-restricted-ephemeral" .Release.Namespace | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]
@@ -45,7 +45,7 @@ spec:
 apiVersion: mutations.gatekeeper.sh/v1
 kind: ModifySet
 metadata:
-  name: capabilities-restricted-init
+  name: {{ printf "capabilities-%s-restricted-init" .Release.Namespace | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]

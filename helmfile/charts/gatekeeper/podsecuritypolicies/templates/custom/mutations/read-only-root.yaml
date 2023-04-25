@@ -5,7 +5,7 @@
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: {{ printf "read-only-root-%s-container" $name | trunc 63 }}
+  name: {{ printf "read-only-root-%s-%s-container" $.Release.Namespace $name | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]
@@ -32,7 +32,7 @@ spec:
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: {{ printf "read-only-root-%s-ephemeral" $name | trunc 63 }}
+  name: {{ printf "read-only-root-%s-%s-ephemeral" $.Release.Namespace $name | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]
@@ -59,7 +59,7 @@ spec:
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: {{ printf "read-only-root-%s-init" $name | trunc 63 }}
+  name: {{ printf "read-only-root-%s-%s-init" $.Release.Namespace $name | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]

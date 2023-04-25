@@ -5,7 +5,7 @@
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: privileged-restricted-container
+  name: {{ printf "privileged-%s-restricted-container" .Release.Namespace | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]
@@ -24,7 +24,7 @@ spec:
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: privileged-restricted-ephemeral
+  name: {{ printf "privileged-%s-restricted-ephemeral" .Release.Namespace | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]
@@ -43,7 +43,7 @@ spec:
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: privileged-restricted-init
+  name: {{ printf "privileged-%s-restricted-init" .Release.Namespace | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]

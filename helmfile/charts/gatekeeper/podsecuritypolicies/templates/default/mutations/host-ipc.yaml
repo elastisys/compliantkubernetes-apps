@@ -5,7 +5,7 @@
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: host-ipc-restricted
+  name: {{ printf "host-ipc-%s-restricted" .Release.Namespace | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]

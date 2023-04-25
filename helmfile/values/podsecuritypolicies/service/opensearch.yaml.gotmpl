@@ -1,6 +1,6 @@
 constraints:
   opensearch-system:
-    opensearch-nodes:
+    nodes:
       podSelectorLabels:
         app.kubernetes.io/name: opensearch
       allow:
@@ -17,7 +17,7 @@ constraints:
           - projected
           - secret
 
-    opensearch-dashboards:
+    dashboards:
       podSelectorLabels:
         app: opensearch-dashboards
       allow:
@@ -26,9 +26,7 @@ constraints:
           - projected
           - secret
 
-    # TODO: Constrain jobs
-
-    prometheus-opensearch-exporter:
+    exporter:
       podSelectorLabels:
         app: prometheus-elasticsearch-exporter
       allow:

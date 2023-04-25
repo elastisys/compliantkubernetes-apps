@@ -5,7 +5,7 @@
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: {{ printf "fsgroup-%s" $name | trunc 63 }}
+  name: {{ printf "fsgroup-%s-%s" $.Release.Namespace $name | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]

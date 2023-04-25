@@ -68,6 +68,7 @@
 - Rework Gatekeeper PSP constraints and mutation to follow PSS in regards to groups
 - Allow restricted Gatekeeper PSP mutations to use custom namespace selector
 - Increase Gatekeeper controller resources to handle new constraints and mutations
+- Install Gatekeeper PSPs per stack to improve targeting and modularity
 
 ### Removed
 

@@ -5,7 +5,7 @@
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: {{ printf "run-as-user-%s-container" $name | trunc 63 }}
+  name: {{ printf "run-as-user-%s-%s-container" $.Release.Namespace $name | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]
@@ -24,7 +24,7 @@ spec:
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: {{ printf "run-as-user-%s-ephemeral" $name | trunc 63 }}
+  name: {{ printf "run-as-user-%s-%s-ephemeral" $.Release.Namespace $name | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]
@@ -43,7 +43,7 @@ spec:
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: {{ printf "run-as-user-%s-init" $name | trunc 63 }}
+  name: {{ printf "run-as-user-%s-%s-init" $.Release.Namespace $name | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]

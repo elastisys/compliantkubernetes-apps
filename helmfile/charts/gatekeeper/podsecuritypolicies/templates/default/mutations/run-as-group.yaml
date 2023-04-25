@@ -13,7 +13,7 @@
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: run-as-group-restricted-container
+  name: {{ printf "run-as-group-%s-restricted-container" .Release.Namespace | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]
@@ -32,7 +32,7 @@ spec:
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: run-as-group-restricted-ephemeral
+  name: {{ printf "run-as-group-%s-restricted-ephemeral" .Release.Namespace | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]
@@ -51,7 +51,7 @@ spec:
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: run-as-group-restricted-init
+  name: {{ printf "run-as-group-%s-restricted-init" .Release.Namespace | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]

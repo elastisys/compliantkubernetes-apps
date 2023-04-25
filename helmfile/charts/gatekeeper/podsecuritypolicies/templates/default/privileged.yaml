@@ -11,7 +11,7 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sPSPPrivilegedContainer
 metadata:
-  name: privileged-restricted
+  name: {{ printf "privileged-%s-restricted" .Release.Namespace | trunc 63 }}
 spec:
   match:
     {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}

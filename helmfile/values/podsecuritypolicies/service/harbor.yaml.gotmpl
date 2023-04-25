@@ -1,7 +1,6 @@
-{{- if .Values.harbor.enabled }}
 constraints:
   harbor:
-    harbor-database:
+    database:
       podSelectorLabels:
         app: harbor
         component: database
@@ -9,7 +8,7 @@ constraints:
       mutation:
         runAsUser: 999
         fsGroup: 999
-    harbor-core:
+    core:
       podSelectorLabels:
         app: harbor
         component: core
@@ -17,7 +16,7 @@ constraints:
       mutation:
         runAsUser: 10000
         fsGroup: 10000
-    harbor-chartmuseum:
+    chartmuseum:
       podSelectorLabels:
         app: harbor
         component: chartmuseum
@@ -25,7 +24,7 @@ constraints:
       mutation:
         runAsUser: 10000
         fsGroup: 10000
-    harbor-jobservice:
+    jobservice:
       podSelectorLabels:
         app: harbor
         component: jobservice
@@ -33,7 +32,7 @@ constraints:
       mutation:
         runAsUser: 10000
         fsGroup: 10000
-    harbor-registry:
+    registry:
       podSelectorLabels:
         app: harbor
         component: registry
@@ -41,7 +40,7 @@ constraints:
       mutation:
         runAsUser: 10000
         fsGroup: 10000
-    harbor-trivy:
+    trivy:
       podSelectorLabels:
         app: harbor
         component: trivy
@@ -49,4 +48,3 @@ constraints:
       mutation:
         runAsUser: 10000
         fsGroup: 10000
-{{- end }}

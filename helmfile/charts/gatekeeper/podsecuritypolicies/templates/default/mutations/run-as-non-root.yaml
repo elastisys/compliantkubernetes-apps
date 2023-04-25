@@ -13,7 +13,7 @@
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: run-as-non-root-restricted
+  name: {{ printf "run-as-non-root-%s-restricted-container" .Release.Namespace | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]
@@ -32,7 +32,7 @@ spec:
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: run-as-non-root-restricted-ephemeral
+  name: {{ printf "run-as-non-root-%s-restricted-ephemeral" .Release.Namespace | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]
@@ -51,7 +51,7 @@ spec:
 apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
-  name: run-as-non-root-restricted-init
+  name: {{ printf "run-as-non-root-%s-restricted-init" .Release.Namespace | trunc 63 }}
 spec:
   applyTo:
     - groups: [""]

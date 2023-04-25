@@ -5,7 +5,7 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sPSPReadOnlyRootFilesystem
 metadata:
-  name: {{ printf "read-only-root-%s" $name | trunc 63 }}
+  name: {{ printf "read-only-root-%s-%s" $.Release.Namespace $name | trunc 63 }}
 spec:
   match:
     {{- dict "namespace" $namespace "labels" $value.podSelectorLabels | include "podsecuritypolicies.renderMatchInclusion" | nindent 4 }}
