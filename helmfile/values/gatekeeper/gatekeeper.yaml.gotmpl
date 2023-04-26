@@ -1,3 +1,8 @@
+validatingWebhookFailurePolicy: Fail
+validatingWebhookTimeoutSeconds: 5
+mutatingWebhookFailurePolicy: Fail
+mutatingWebhookTimeoutSeconds: 5
+
 auditInterval: {{ .Values.opa.auditIntervalSeconds }}
 auditMatchKindOnly: true
 

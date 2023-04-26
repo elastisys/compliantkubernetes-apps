@@ -41,6 +41,7 @@
 - Change config option `falco.customRules` to a map
 - Synced the default prometheus interval with the grafana dashboards and datasources
 - Use FQDN for Grafana to Dex communication
+- Ensure Gatekeeper constraints cannot be circumvented by unavailability
 
 ### Updated
 
