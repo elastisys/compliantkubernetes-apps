@@ -57,6 +57,8 @@ networkPolicies:
         - "0.0.0.0/0"
   monitoring:
     grafana:
+      externalDataSources:
+        enabled: false
       externalDashboardProvider:
         ips:
           - 0.0.0.0/0
