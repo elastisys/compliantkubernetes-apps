@@ -60,12 +60,8 @@
 - Restructure Gatekeeper charts and values
 - Changed the default promIndexAlerts alertsize for authlog from 0.2 to 2.
 - Allow SOPS config to contain multiple creation rules
-<<<<<<< HEAD
 - Expose all `fluentd-aggregator` buffer settings
 - Replace starboard-operator v0.9.1 with trivy-operator v0.13.0. This also includes a grafana dashboard for trivy-operator.
-=======
-- Replace starboard-operator v0.9.1 with trivy-operator v0.13.0. This also includes a grafana dashboard for trivy-operator and another dashboard for ClusterComplianceReport: CIS,NSA and PSS.
->>>>>>> apps sc & wc: update of WIP-CHANGELOG.md
 
 ### Removed
 
