@@ -245,9 +245,9 @@ grafana:
       client_id: grafana-ops
       client_secret: {{ .Values.grafana.opsClientSecret }}
       scopes: {{ .Values.prometheus.grafana.oidc.scopes }}
-      auth_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}/auth
-      token_url: http://dex.dex.svc.cluster.local:5556/token
-      api_url: http://dex.dex.svc.cluster.local:5556/api
+      auth_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}./auth
+      token_url: http://dex.dex.svc.cluster.local.:5556/token
+      api_url: http://dex.dex.svc.cluster.local.:5556/api
       allowed_domains: {{ join " " .Values.prometheus.grafana.oidc.allowedDomains }}
       allow_sign_up: true
       tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}

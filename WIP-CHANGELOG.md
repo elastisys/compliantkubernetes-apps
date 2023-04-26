@@ -40,6 +40,7 @@
 - Source `extra-fluentd-config` user supplied settings
 - Change config option `falco.customRules` to a map
 - Synced the default prometheus interval with the grafana dashboards and datasources
+- Use FQDN for Grafana to Dex communication
 
 ### Updated
 
