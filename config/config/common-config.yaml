@@ -652,13 +652,6 @@ trivy:
     concurrentLimit: 1
     retryDelay: 1m
     timeout: 5m
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      cpu: 200m
-      memory: 172Mi
   serviceMonitor:
   # enabled determines whether a serviceMonitor should be deployed
     enabled: true

@@ -210,7 +210,7 @@ After doing the `disruptive` step for either the automatic or manual method, you
     ./migration/v0.30/apply/80-apply.sh
     ```
 
-1. Uninstall the old starboard stack including starboard-operator and its exporters:
+1. Uninstall the old starboard stack including starboard-operator and its exporter:
 
     ```bash
     ./migration/v0.29/apply/90-uninstalls.sh execute
