@@ -1,0 +1,27 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ciskubebench-exporter-script
+data:
+  cronjob: |
+    ### cron file for running the export script
+    #{{ .Values.ciskubebenchExporter.schedule }} sh /scripts/convert-ciskubebenchreports.sh
+    # An empty line is required at the end of this file for a valid cron file.
+  convert-ciskubebenchreports.sh: |
+    #!/bin/sh
+
+    APISERVER=https://kubernetes.default.svc
+    SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount
+    NAMESPACE=$(cat ${SERVICEACCOUNT}/namespace)
+    TOKEN=$(cat ${SERVICEACCOUNT}/token)
+    CACERT=${SERVICEACCOUNT}/ca.crt
+    curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" --silent -X GET ${APISERVER}/apis/aquasecurity.github.io/v1alpha1/ciskubebenchreports > /textfile-collector/tmp-reports.json
+    cat /textfile-collector/tmp-reports.json
+    cat /textfile-collector/tmp-reports.json | jq '.items[] | {node: .metadata.name, score: "pass", result: .report.summary.passCount}' -c | sed 's/,"result":\([0-9]\+\)}/} \1/' | sed 's/^/ciskubebench_scan/' | sed 's/"\([a-z]\+\)":/\1=/g' > /textfile-collector/tmp-metrics
+    cat /textfile-collector/tmp-reports.json | jq '.items[] | {node: .metadata.name, score: "info", result: .report.summary.infoCount}' -c | sed 's/,"result":\([0-9]\+\)}/} \1/' | sed 's/^/ciskubebench_scan/' | sed 's/"\([a-z]\+\)":/\1=/g' >> /textfile-collector/tmp-metrics
+    cat /textfile-collector/tmp-reports.json | jq '.items[] | {node: .metadata.name, score: "warn", result: .report.summary.warnCount}' -c | sed 's/,"result":\([0-9]\+\)}/} \1/' | sed 's/^/ciskubebench_scan/' | sed 's/"\([a-z]\+\)":/\1=/g' >> /textfile-collector/tmp-metrics
+    cat /textfile-collector/tmp-reports.json | jq '.items[] | {node: .metadata.name, score: "fail", result: .report.summary.failCount}' -c | sed 's/,"result":\([0-9]\+\)}/} \1/' | sed 's/^/ciskubebench_scan/' | sed 's/"\([a-z]\+\)":/\1=/g' >> /textfile-collector/tmp-metrics
+    cat /textfile-collector/tmp-reports.json | jq '.items[] | .metadata.name as $node_name | .report.sections[] as $sections | $sections.node_type as $type | $sections.tests[].results[] as $test | {node: $node_name, type: $type, test_number: $test.test_number, test_desc: $test.test_desc, status: $test.status, scored: $test.scored | tostring, remediation: $test.remediation }' -c | sed 's/^/ciskubebench_scan_tests/' | sed 's/"\([a-z_]\+\)":/\1=/g' | sed 's/$/ NaN/' >> /textfile-collector/tmp-metrics
+    cat /textfile-collector/tmp-metrics > /textfile-collector/csikubebench.prom
+    cat /textfile-collector/tmp-metrics

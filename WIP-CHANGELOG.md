@@ -61,7 +61,6 @@
 - Changed the default promIndexAlerts alertsize for authlog from 0.2 to 2.
 - Allow SOPS config to contain multiple creation rules
 - Expose all `fluentd-aggregator` buffer settings
-- Replace starboard-operator v0.9.1 with trivy-operator v0.13.0. This also includes a grafana dashboard for trivy-operator.
 
 ### Removed
 

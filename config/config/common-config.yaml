@@ -641,25 +641,74 @@ opa:
     tags:
      - latest
 
-trivy:
+starboard:
   enabled: true
   # All durations must be specified in seconds, minutes or hours
   # Example 40s / 30m / 20h
   vulnerabilityScanner:
-    scannerReportTTL: "720h"
+    reportTTL: "720h"
     scanOnlyCurrentRevisions: true
   scanJobs:
     concurrentLimit: 1
     retryDelay: 1m
     timeout: 5m
-  serviceMonitor:
-  # enabled determines whether a serviceMonitor should be deployed
-    enabled: true
+  resources:
+    requests:
+      cpu: 10m
+      memory: 128Mi
+    limits:
+      cpu: 20m
+      memory: 172Mi
   tolerations: []
   affinity: {}
+
+vulnerabilityExporter:
+  # Will be disabled if starboard is disabled
+  resources:
+    requests:
+      cpu: 20m
+      memory: 15Mi
+    limits:
+      cpu: 40m
+      memory: 30Mi
+  tolerations: []
+  affinity: {}
+
+  curlcronjob:
+    resources:
+      requests:
+        cpu: 20m
+        memory: 64Mi
+      limits:
+        cpu: 40m
+        memory: 128Mi
+
+ciskubebenchExporter:
+  # Will be disabled if starboard is disabled
+  resources:
+    requests:
+      cpu: 20m
+      memory: 15Mi
+    limits:
+      cpu: 100m
+      memory: 30Mi
+  tolerations: []
+  affinity: {}
+
+  curlcronjob:
+    resources:
+      requests:
+        cpu: 20m
+        memory: 64Mi
+      limits:
+        cpu: 40m
+        memory: 128Mi
+
 monitoring:
   rook:
     enabled: false
+
+
 kured:
   enabled: false
   # See options at https://github.com/weaveworks/kured/blob/1.9.1/charts/kured/values.yaml#L24

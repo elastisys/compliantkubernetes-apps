@@ -69,18 +69,6 @@ releases:
   values:
   - values/ingress-nginx.yaml.gotmpl
 
-# trivy-operator
-- name: trivy-operator
-  namespace: monitoring
-  labels:
-    app: trivy-operator
-    group: trivy
-  chart: ./upstream/trivy-operator
-  version: 0.13.0
-  installed: {{ .Values.trivy.enabled }}
-  values:
-  - values/trivy/trivy-operator.yaml.gotmpl
-
 # Velero
 - name: velero
   namespace: velero
@@ -161,6 +149,52 @@ releases:
   version: 0.1.0
   values:
   - values/cluster-admin-rbac.yaml.gotmpl
+
+# starboard-operator-psp-rbac
+- name: starboard-operator-psp-rbac
+  namespace: monitoring
+  labels:
+    app: starboard-operator-psp-rbac
+    group: starboard
+  chart: ./charts/starboard/starboard-operator-psp-rbac
+  version: 0.1.0
+  installed: {{ and .Values.starboard.enabled .Values.kubernetesPSP }}
+
+# starboard-operator
+- name: starboard-operator
+  namespace: monitoring
+  labels:
+    app: starboard-operator
+    group: starboard
+  chart: ./upstream/starboard-operator
+  version: 0.9.1
+  installed: {{ .Values.starboard.enabled }}
+  values:
+  - values/starboard/starboard-operator.yaml.gotmpl
+
+# vulnerability-exporter (for starboard -> prometheus)
+- name: vulnerability-exporter
+  namespace: monitoring
+  labels:
+    app: vulnerability-exporter
+    group: starboard
+  chart: ./charts/starboard/vulnerability-exporter
+  version: 0.1.0
+  installed: {{ .Values.starboard.enabled }}
+  values:
+  - values/starboard/vulnerability-exporter.yaml.gotmpl
+
+# ciskubebench-exporter (for starboard -> prometheus)
+- name: ciskubebench-exporter
+  namespace: monitoring
+  labels:
+    app: ciskubebench-exporter
+    group: starboard
+  chart: ./charts/starboard/ciskubebench-exporter
+  version: 0.1.0
+  installed: {{ .Values.starboard.enabled }}
+  values:
+  - values/starboard/ciskubebench-exporter.yaml.gotmpl
 
 # Falco PSP RBAC
 - name: falco-psp-rbac
