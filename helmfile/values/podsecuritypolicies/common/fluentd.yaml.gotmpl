@@ -28,7 +28,7 @@ constraints:
   fluentd:
     fluentd-forwarder-user:
       podSelectorLabels:
-        app.kubernetes.io/instance: fluentd-forwarder
+        app.kubernetes.io/instance: fluentd
       allow:
         allowPrivilegeEscalation: true
         allowedCapabilities:
@@ -50,4 +50,8 @@ constraints:
           - hostPath
           - projected
   {{- end }}
+mutations:
+  exceptions:
+    - app.kubernetes.io/instance: fluentd
+    - app.kubernetes.io/instance: fluentd-forwarder
 {{- end }}
