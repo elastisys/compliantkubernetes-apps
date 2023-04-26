@@ -16,4 +16,4 @@ yq_remove sc .ciskubebenchExporter
 yq_move wc '.starboard.vulnerabilityScanner.reportTTL' '.starboard.vulnerabilityScanner.scannerReportTTL'
 yq_move wc .starboard .trivy
 yq_remove wc .vulnerabilityExporter
-yq_remove wc .ciskubebenchExporter
+yq_remove sc .ciskubebenchExporter
