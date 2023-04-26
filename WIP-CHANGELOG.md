@@ -42,6 +42,7 @@
 - Synced the default prometheus interval with the grafana dashboards and datasources
 - Use FQDN for Grafana to Dex communication
 - Ensure Gatekeeper constraints cannot be circumvented by unavailability
+- Install Gatekeeper metrics in the service cluster
 
 ### Updated
 

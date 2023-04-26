@@ -207,11 +207,20 @@ releases:
   values:
     - values/calico-default-deny.yaml.gotmpl
 
-# gatekeeper-mutations
+- name: gatekeeper-metrics
+  namespace: gatekeeper-system
+  labels:
+    app: gatekeeper
+    component: gatekeeper-metrics
+  chart: ./charts/gatekeeper/metrics
+  version: 0.1.0
+  installed: {{ .Values.opa.enabled }}
+
 - name: gatekeeper-mutations
   namespace: gatekeeper-system
   labels:
-    app: gatekeeper-mutations
+    app: gatekeeper
+    component: gatekeeper-mutations
   chart: ./charts/gatekeeper/mutations
   version: 0.1.0
   installed: {{ and .Values.opa.enabled .Values.opa.mutations.enabled }}
@@ -659,20 +668,11 @@ releases:
   - values/fluentd/forwarder-workload-cluster.yaml.gotmpl
   - values/fluentd/forwarder-workload-cluster-user.yaml.gotmpl
 
-# gatekeeper-metrics
-- name: gatekeeper-metrics
-  namespace: gatekeeper-system
-  labels:
-    app: gatekeeper-metrics
-  chart: ./charts/gatekeeper/metrics
-  version: 0.1.0
-  installed: {{ .Values.opa.enabled }}
-
-# gatekeeper-constraints
 - name: gatekeeper-constraints
   namespace: gatekeeper-system
   labels:
-    app: gatekeeper-constraints
+    app: gatekeeper
+    component: gatekeeper-constraints
   chart: ./charts/gatekeeper/constraints
   version: 1.6.0
   installed: {{ .Values.opa.enabled }}
