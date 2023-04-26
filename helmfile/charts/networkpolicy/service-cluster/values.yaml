@@ -86,6 +86,13 @@ harbor:
 monitoring:
   enabled: true
   grafana:
+  # allows sc-config to add ip and ports to access user Grafana
+    externalDataSources:
+      enabled: false
+      ips:
+        - "0.0.0.0/0"
+      ports:
+        - 9090
     # loading dashboards from grafana website
     externalDashboardProvider:
       ips:

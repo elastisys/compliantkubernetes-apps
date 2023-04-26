@@ -57,6 +57,10 @@ harbor:
 monitoring:
   enabled: {{ .Values.networkPolicies.monitoring.enabled }}
   grafana:
+    externalDataSources:
+      enabled: {{ .Values.networkPolicies.monitoring.grafana.externalDataSources.enabled }}
+      ips: {{- toYaml .Values.networkPolicies.monitoring.grafana.externalDataSources.ips | nindent 8 }}
+      ports: {{- toYaml .Values.networkPolicies.monitoring.grafana.externalDataSources.ports | nindent 8 }}
     externalDashboardProvider:
       ips: {{- toYaml .Values.networkPolicies.monitoring.grafana.externalDashboardProvider.ips | nindent 8 }}
       ports: {{- toYaml .Values.networkPolicies.monitoring.grafana.externalDashboardProvider.ports | nindent 8 }}

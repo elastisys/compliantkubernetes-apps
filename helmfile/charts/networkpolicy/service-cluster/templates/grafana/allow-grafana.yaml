@@ -86,6 +86,18 @@ spec:
         - port: {{ $port }}
         {{- end }}
     {{- end }}
+    # allows sc-config to add ip and ports to access user Grafana
+    {{- if .Values.monitoring.grafana.externalDataSources.enabled }}
+    - to:
+        {{- range $ip := .Values.monitoring.grafana.externalDataSources.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        {{- range $port := .Values.monitoring.grafana.externalDataSources.ports }}
+        - port: {{ $port }}
+        {{- end }}
+    {{- end }}
     - ports:
       - protocol: TCP
         port: 53

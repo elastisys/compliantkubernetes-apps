@@ -1148,6 +1148,13 @@ networkPolicies:
   monitoring:
     enabled: true
     grafana:
+     # allows sc-config to add ip and ports to access user Grafana
+      externalDataSources:
+        enabled: false
+        ips:
+          - "set-me-if-externalDataSources.enabled"
+        ports:
+          - "set-me-if-externalDataSources.enabled"
       # loading dashboards from grafana website
       externalDashboardProvider:
         ips:
