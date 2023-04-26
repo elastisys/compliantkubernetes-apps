@@ -64,6 +64,7 @@
 - Replace starboard-operator v0.9.1 with trivy-operator v0.13.0. This also includes a grafana dashboard for trivy-operator and another dashboard for ClusterComplianceReport: CIS,NSA and PSS.
 - Rework Gatekeeper PSP constraints and mutation to follow PSS in regards to groups
 - Allow restricted Gatekeeper PSP mutations to use custom namespace selector
+- Increase Gatekeeper controller resources to handle new constraints and mutations
 
 ### Removed
 
