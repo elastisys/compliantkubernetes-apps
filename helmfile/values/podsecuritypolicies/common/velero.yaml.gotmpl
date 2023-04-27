@@ -17,4 +17,12 @@ constraints:
           rule: RunAsAny
         privileged: true
         allowPrivilegeEscalation: true
+    velero:
+      podSelectorLabels:
+        name: velero
+      allow:
+        runAsUser:
+          rule: MustRunAsNonRoot
+      mutation:
+        runAsUser: 1000
 {{- end }}
