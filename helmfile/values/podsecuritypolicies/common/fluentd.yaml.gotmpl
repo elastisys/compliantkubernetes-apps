@@ -6,9 +6,7 @@ constraints:
         app.kubernetes.io/instance: fluentd-forwarder
       allow:
         allowPrivilegeEscalation: true
-        allowedCapabilities:
-          - AUDIT_READ
-          - SYSLOG
+        allowedCapabilities: []
         allowedHostPaths:
           - pathPrefix: /var/log
           - pathPrefix: /var/lib/docker/containers
@@ -24,16 +22,16 @@ constraints:
           - emptyDir
           - hostPath
           - projected
+      mutation:
+        dropAllCapabilities: false
   {{- if eq .Environment.Name "workload_cluster" }}
   fluentd:
     forwarder-user:
       podSelectorLabels:
-        app.kubernetes.io/instance: fluentd-forwarder
+        app.kubernetes.io/instance: fluentd
       allow:
         allowPrivilegeEscalation: true
-        allowedCapabilities:
-          - AUDIT_READ
-          - SYSLOG
+        allowedCapabilities: []
         allowedHostPaths:
           - pathPrefix: /var/log
           - pathPrefix: /var/lib/docker/containers
@@ -49,5 +47,7 @@ constraints:
           - emptyDir
           - hostPath
           - projected
+      mutation:
+        dropAllCapabilities: false
   {{- end }}
 {{- end }}

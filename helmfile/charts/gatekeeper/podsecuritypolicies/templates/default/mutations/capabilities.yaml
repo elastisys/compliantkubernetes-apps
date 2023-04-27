@@ -1,6 +1,14 @@
 {{- $namespaceSelectorLabels := .Values.mutations.namespaceSelectorLabels }}
 {{- $namespaces := keys .Values.constraints | sortAlpha }}
 {{- $exceptions := .Values.mutations.exceptions }}
+
+{{- range $namespace, $services := .Values.constraints }}
+{{- range $name, $value := $services }}
+{{- if $value | dig "mutation" "dropAllCapabilities" "true" | not }}
+{{- $exceptions = append $exceptions $value.podSelectorLabels }}
+{{- end }}
+{{- end }}
+{{- end }}
 ---
 apiVersion: mutations.gatekeeper.sh/v1
 kind: ModifySet
