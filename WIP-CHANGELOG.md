@@ -47,6 +47,7 @@
 - Ensure Gatekeeper constraints cannot be circumvented by unavailability
 - Install Gatekeeper metrics in the service cluster
 - Rook-ceph netpol to allow prometheus scrape
+- Define Velero security contexts
 
 ### Updated
 

@@ -10,6 +10,11 @@ initContainers:
   - name: velero-plugin-for-aws
     image: velero/velero-plugin-for-aws:v1.5.1
     imagePullPolicy: IfNotPresent
+    securityContext:
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsGroup: 10000
+      runAsUser: 10000
     volumeMounts:
       - mountPath: /target
         name: plugins
@@ -17,6 +22,11 @@ initContainers:
   - name: velero-plugin-for-gcs
     image: velero/velero-plugin-for-gcp:v1.5.1
     imagePullPolicy: IfNotPresent
+    securityContext:
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsGroup: 10000
+      runAsUser: 10000
     volumeMounts:
       - mountPath: /target
         name: plugins
@@ -118,3 +128,18 @@ metrics:
 
   serviceMonitor:
     enabled: true
+
+# For velero containers
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsGroup: 10000
+  runAsUser: 10000
+
+# For kubectl containers
+kubectl:
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+    runAsGroup: 10000
+    runAsUser: 10000
