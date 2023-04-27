@@ -3,6 +3,71 @@ validatingWebhookTimeoutSeconds: 5
 mutatingWebhookFailurePolicy: Fail
 mutatingWebhookTimeoutSeconds: 5
 
+validatingWebhookCustomRules:
+  - apiGroups:
+      - '*'
+    apiVersions:
+      - '*'
+    operations:
+      - CREATE
+      - UPDATE
+    resources:
+      - cronjobs
+      - jobs
+      - pods
+      - pods/attach
+      - pods/binding
+      - pods/ephemeralcontainers
+      - pods/eviction
+      - pods/exec
+      - pods/log
+      - pods/portforward
+      - pods/proxy
+      - daemonsets
+      - deployments
+      - deployments/scale
+      - replicasets
+      - replicasets/scale
+      - replicationcontrollers
+      - replicationcontrollers/scale
+      - statefulsets
+      - statefulsets/scale
+      - services/proxy
+      - nodes/proxy
+      - hierarchyconfiguration
+mutatingWebhookCustomRules:
+  - apiGroups:
+      - '*'
+    apiVersions:
+      - '*'
+    operations:
+      - CREATE
+      - UPDATE
+    resources:
+      - cronjobs
+      - jobs
+      - pods
+      - pods/attach
+      - pods/binding
+      - pods/ephemeralcontainers
+      - pods/eviction
+      - pods/exec
+      - pods/log
+      - pods/portforward
+      - pods/proxy
+      - daemonsets
+      - deployments
+      - deployments/scale
+      - replicasets
+      - replicasets/scale
+      - replicationcontrollers
+      - replicationcontrollers/scale
+      - statefulsets
+      - statefulsets/scale
+      - services/proxy
+      - nodes/proxy
+      - hierarchyconfiguration
+
 auditInterval: {{ .Values.opa.auditIntervalSeconds }}
 auditMatchKindOnly: true
 

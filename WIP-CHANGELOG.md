@@ -73,6 +73,7 @@
 - Allow restricted Gatekeeper PSP mutations to use custom namespace selector
 - Increase Gatekeeper controller resources to handle new constraints and mutations
 - Install Gatekeeper PSPs per stack to improve targeting and modularity
+- Limit resource types checked by Gatekeeper
 
 ### Removed
 
