@@ -45,6 +45,7 @@
 - Use FQDN for Grafana to Dex communication
 - Ensure Gatekeeper constraints cannot be circumvented by unavailability
 - Install Gatekeeper metrics in the service cluster
+- Rook-ceph netpol to allow prometheus scrape
 
 ### Updated
 
