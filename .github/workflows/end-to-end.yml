@@ -64,7 +64,7 @@ jobs:
       with:
         repository: elastisys/compliantkubernetes-kubespray
         # TODO: Should we use a specific commit here?
-        ref: v2.20.0-ck8s3
+        ref: simonl/rook-ceph-psp
         submodules: recursive
         path: compliantkubernetes-kubespray
     - name: Checkout compliantkubernetes-apps
