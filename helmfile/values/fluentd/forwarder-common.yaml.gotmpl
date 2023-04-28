@@ -7,9 +7,6 @@ image:
   repository: ghcr.io/elastisys/fluentd
   tag: v3.4.0-ck8s5
 
-podSecurityPolicy:
-  enabled: {{ .Values.kubernetesPSP }}
-
 serviceMonitor:
   enabled: true
   # Seems like it is double templated so the end result yields an empty string ""

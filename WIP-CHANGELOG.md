@@ -79,6 +79,4 @@
 
 ### Removed
 
-- Kubernetes PSP for ingress-nginx and monitoring namespace.
-- Remove Kubernetes PSPs for Fluentd and OpenSearch
-- Remove Kubernetes PSPs for falco
+- Remove all Kubernetes PSPs

@@ -24,6 +24,22 @@ constraints:
           - projected
       mutation:
         dropAllCapabilities: false
+
+    {{- if eq .Environment.Name "service_cluster" }}
+    log-manager:
+      podSelectorLabels:
+        key: value
+      allow:
+        volumes:
+          - configMap
+          - emptyDir
+          - hostPath
+          - projected
+          - ephemeral
+    {{- end }}
+
+
+
   {{- if eq .Environment.Name "workload_cluster" }}
   fluentd:
     forwarder-user:

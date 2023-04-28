@@ -1,6 +1,3 @@
-podSecurityPolicy:
-  create: {{ .Values.kubernetesPSP }}
-
 metrics:
   create: {{ .Values.kured.metrics.enabled }}
   interval: {{ .Values.kured.metrics.interval }}

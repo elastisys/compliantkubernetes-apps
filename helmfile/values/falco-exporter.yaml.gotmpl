@@ -3,10 +3,6 @@ nodeSelector: {{- toYaml .Values.falco.falcoExporter.nodeSelector | nindent 2  }
 affinity: {{- toYaml .Values.falco.falcoExporter.affinity | nindent 2  }}
 tolerations: {{- toYaml .Values.falco.falcoExporter.tolerations | nindent 2  }}
 
-podSecurityPolicy:
-  # Specifies whether a PSP, Role and RoleBinding should be created
-  create: {{ .Values.kubernetesPSP }}
-
 falco:
   grpcUnixSocketPath: "unix:///var/run/falco/falco.sock"
 

@@ -162,8 +162,6 @@ customRules:
 
 falcosidekick:
   enabled: {{ .Values.falco.alerts.enabled }}
-  podSecurityPolicy:
-    create: {{ .Values.kubernetesPSP }}
   config:
     debug: false
     {{ if eq .Values.falco.alerts.type "slack" }}

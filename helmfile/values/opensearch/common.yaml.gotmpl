@@ -134,9 +134,6 @@ rbac:
 persistence:
   enableInitChown: false
 
-podSecurityPolicy:
-  create: {{ .Values.kubernetesPSP }}
-
 podSecurityContext:
   fsGroup: 1000
 

@@ -2,13 +2,7 @@ defaultRules:
   # Provided by prometheus-alerts instead
   create: false
 
-global:
-  rbac:
-    pspEnabled: {{ .Values.kubernetesPSP }}
-
 kube-state-metrics:
-  podSecurityPolicy:
-    enabled: {{ .Values.kubernetesPSP }}
   resources: {{- toYaml .Values.kubeStateMetrics.resources | nindent 4 }}
   {{- if .Values.kubeStateMetrics.clusterAPIMetrics.enabled }}
   rbac:
@@ -223,9 +217,6 @@ grafana:
     - secretName: grafana-ops-general-tls
       hosts:
       - {{ .Values.prometheus.grafana.subdomain }}.{{ .Values.global.opsDomain }}
-  rbac:
-    pspUseAppArmor: false
-    pspEnabled: {{ .Values.kubernetesPSP }}
 
   persistence:
     type: pvc
@@ -401,8 +392,6 @@ prometheus:
 
 prometheus-node-exporter:
   resources: {{- toYaml .Values.prometheusNodeExporter.resources | nindent 4 }}
-  rbac:
-    pspEnabled: {{ .Values.kubernetesPSP }}
   prometheus:
     monitor:
       relabelings:

@@ -2,10 +2,6 @@ defaultRules:
   # Provided by prometheus-alerts instead
   create: false
 
-global:
-  rbac:
-    pspEnabled: {{ .Values.kubernetesPSP }}
-
 alertmanager:
   enabled: false
 
@@ -99,8 +95,6 @@ kube-state-metrics:
 
 prometheus-node-exporter:
   resources: {{- toYaml .Values.prometheusNodeExporter.resources | nindent 4 }}
-  rbac:
-    pspEnabled: {{ .Values.kubernetesPSP }}
   prometheus:
     monitor:
       relabelings:

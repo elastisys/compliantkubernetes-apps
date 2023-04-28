@@ -33,7 +33,4 @@ resources: {{- toYaml .Values.opensearch.exporter.resources | nindent 2 }}
 
 tolerations: {{- toYaml .Values.opensearch.exporter.tolerations | nindent 2 }}
 
-podSecurityPolicies:
-  enabled: true
-
 fullnameOverride: "prometheus-opensearch-exporter"

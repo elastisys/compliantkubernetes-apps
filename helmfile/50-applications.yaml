@@ -162,15 +162,6 @@ releases:
   values:
   - values/cluster-admin-rbac.yaml.gotmpl
 
-# Falco PSP RBAC
-- name: falco-psp-rbac
-  namespace: falco
-  labels:
-    app: falco
-  chart: ./charts/falco-psp-rbac
-  version: 0.1.0
-  installed: {{ and .Values.falco.enabled .Values.kubernetesPSP }}
-
 # Falco
 - name: falco
   namespace: falco
@@ -179,8 +170,6 @@ releases:
   chart: ./upstream/falco
   version: 2.2.0
   installed: {{ .Values.falco.enabled }}
-  needs:
-  - falco/falco-psp-rbac
   values:
   - values/falco.yaml.gotmpl
 

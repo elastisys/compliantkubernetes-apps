@@ -1,6 +1,6 @@
 resources: {{- toYaml .Values.prometheusBlackboxExporter.resources | nindent 4 }}
 
-pspEnabled: {{ .Values.kubernetesPSP }}
+pspEnabled: false
 
 config:
   modules:

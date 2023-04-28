@@ -56,9 +56,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
 ### Important - PodSecurityPolicies
 
-This release of apps includes PodSecurityAdmission labels and OPA Gatekeepers PodSecurityPolicies.
+> **Warning**: This release of apps migrates from Kubernetes PodSecurityPolicies to Kubernetes PodSecurityStandards using namespace labels and Gatekeeper PodSecurityPolicies using constraints and mutations.
 
-After doing the upgrade it is possible to disable kubernetes PodSecurityPolicy admission.
+After performing the upgrade it is possible to disable Kubernetes PodSecurityPolicy admission.
 
 After doing the `disruptive` step for either the automatic or manual method, you should follow these steps to disable Kubernetes PSP:
 
@@ -66,13 +66,10 @@ After doing the `disruptive` step for either the automatic or manual method, you
 
     For compliantkubernetes-kubespray you can follow [5. Disable Pod Security Policies](https://github.com/elastisys/compliantkubernetes-kubespray/blob/main/migration/v2.20.0-ck8sx-v2.21.0-ck8s1/upgrade-cluster.md) to disable PodSecurityPolicies.
 
-1. Set `kubernetesPSP: false` in your `common-config.yaml` to disable kubernetes PSPs.
-
-1. Apply to remove kubernetes PSPs:
+1. Clean up leftover rolebindings bypassing PSP admission:
 
    ```bash
-   ./bin/ck8s apply sc
-   ./bin/ck8s apply wc
+   ./migration/v0.30/apply/14-kubernetes-psp.sh clean
    ```
 
 ## Automatic method
@@ -200,6 +197,12 @@ After doing the `disruptive` step for either the automatic or manual method, you
 
     ```bash
     ./migration/v0.30/apply/13-gatekeeper-psp.sh
+    ```
+
+1. Apply bypass for Kubernetes pod security policy admission:
+
+    ```bash
+    ./migration/v0.30/apply/14-kubernetes-psp.sh execute
     ```
 
 1. Remove node-exporter and kube-state-metrics:

@@ -27,8 +27,6 @@ ingress:
     hosts:
     - {{ .Values.user.grafana.subdomain }}.{{ .Values.global.baseDomain }}
 rbac:
-  pspUseAppArmor: false
-  pspEnabled: {{ .Values.kubernetesPSP }}
   namespaced: true
 
 persistence:
