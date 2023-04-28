@@ -1,0 +1,68 @@
+{{- $namespaceSelectorLabels := .Values.mutations.namespaceSelectorLabels }}
+{{- $namespaces := keys .Values.constraints | sortAlpha }}
+{{- $exceptions := .Values.mutations.exceptions }}
+
+{{- range $namespace, $services := .Values.constraints }}
+{{- range $name, $value := $services }}
+{{- if $value | dig "mutation" "setDefaultSeccompProfile" "true" | not }}
+{{- $exceptions = append $exceptions $value.podSelectorLabels }}
+{{- end }}
+{{- end }}
+{{- end }}
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: {{ printf "seccomp-profile-%s-restricted-container" .Release.Namespace | trunc 63 }}
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    {{- dict "namespaceSelectorLabels" $namespaceSelectorLabels "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
+  location: "spec.securityContext.seccompProfile.type"
+  parameters:
+    assign:
+      value: RuntimeDefault
+    pathTests:
+      - subPath: "spec.securityContext.seccompProfile.type"
+        condition: MustNotExist
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: {{ printf "seccomp-profile-%s-restricted-ephemeral" .Release.Namespace | trunc 63 }}
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    {{- dict "namespaceSelectorLabels" $namespaceSelectorLabels "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
+  location: "spec.ephemeralContainers[name: *].securityContext.seccompProfile.type"
+  parameters:
+    assign:
+      value: RuntimeDefault
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.seccompProfile.type"
+        condition: MustNotExist
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: {{ printf "seccomp-profile-%s-restricted-init" .Release.Namespace | trunc 63 }}
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    {{- dict "namespaceSelectorLabels" $namespaceSelectorLabels "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
+  location: "spec.initContainers[name: *].securityContext.seccompProfile.type"
+  parameters:
+    assign:
+      value: RuntimeDefault
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.seccompProfile.type"
+        condition: MustNotExist
