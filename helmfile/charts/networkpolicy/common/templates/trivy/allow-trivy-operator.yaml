@@ -24,10 +24,7 @@ spec:
           port: {{ .Values.global.apiserver.port }}
     {{- end }}
   ingress:
-    - from:
-        - podSelector:
-            matchLabels:
-              app: prometheus
+    - from: {{ toYaml .Values.global.prometheusSelector | nindent 8 }}
       ports:
         - port: 8080
           protocol: TCP

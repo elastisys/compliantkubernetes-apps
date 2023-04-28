@@ -50,6 +50,7 @@
 - Install Gatekeeper metrics in the service cluster
 - Rook-ceph netpol to allow prometheus scrape
 - Define Velero security contexts
+- Correct NetworkPolicies and PodSecurityPolicies for Trivy Operator
 
 ### Updated
 

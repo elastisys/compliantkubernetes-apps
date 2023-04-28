@@ -22,44 +22,44 @@ constraints:
           - persistentVolumeClaim
           - hostPath
 
-    kube-bench-report:
+    trivy-vulnerability-report-scanner:
       podSelectorLabels:
-        kubeBenchReport.scanner: "true"
+        vulnerabilityReport.scanner: Trivy
+      allow:
+        runAsUser:
+          rule: RunAsAny
+
+    trivy-node-info-collector:
+      podSelectorLabels:
+        app: node-collector
       allow:
         allowedHostPaths:
+          - pathPrefix: /etc/cni/net.d
+            readOnly: true
+          - pathPrefix: /etc/kubernetes
+            readOnly: true
+          - pathPrefix: /etc/systemd
+            readOnly: true
+          - pathPrefix: /lib/systemd
+            readOnly: true
           - pathPrefix: /var/lib/etcd
             readOnly: true
           - pathPrefix: /var/lib/kubelet
             readOnly: true
-          - pathPrefix: /etc/systemd
+          - pathPrefix: /var/lib/kube-controller-manager
+            readOnly: true
+          - pathPrefix: /var/lib/kube-scheduler
             readOnly: true
           - pathPrefix: /etc/kubernetes
             readOnly: true
-          - pathPrefix: /usr/bin
-            readOnly: true
+        hostNamespace: true
+        runAsUser:
+          rule: RunAsAny
         volumes:
           - configMap
+          - downwardAPI
           - emptyDir
+          - hostPath
+          - persistentVolumeClaim
           - projected
           - secret
-          - downwardAPI
-          - persistentVolumeClaim
-          - hostPath
-
-    starboard-jobs:
-      podSelectorLabels:
-        app.kubernetes.io/managed-by: starboard
-      allow:
-        hostNamespace: true
-
-    ciskubebench-exporter:
-      podSelectorLabels:
-        app: ciskubebench-exporter
-      allow:
-        allowPrivilegeEscalation: true
-
-    vulnerability-exporter:
-      podSelectorLabels:
-        app: vulnerability-exporter
-      allow:
-        allowPrivilegeEscalation: true
