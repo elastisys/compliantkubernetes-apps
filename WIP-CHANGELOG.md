@@ -29,6 +29,7 @@
 - Added annotation for the grafana dashboard "Compute Resources / Pod" to show container restarts
 - Add falco filter to not warn when containerd removes images that contain static log files or shell files
 - Added fluentd-system on the excluded list for hnc
+- Added so log-manager compaction can use ephemeral volumes.
 
 ### Fixed
 

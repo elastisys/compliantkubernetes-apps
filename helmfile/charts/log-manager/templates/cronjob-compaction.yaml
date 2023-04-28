@@ -28,6 +28,9 @@ spec:
             - name: compaction
               imagePullPolicy: {{ $.Values.image.pullPolicy }}
               image: {{ $.Values.image.repository }}:{{ default $.Chart.AppVersion $.Values.image.tag }}
+              {{- if .compaction.ephemeralVolumes.enabled }}
+              workingDir: /scratch
+              {{- end }}
               command: [/scripts/compaction.sh]
               env:
                 - name: S3_CONFIG
@@ -51,6 +54,10 @@ spec:
                 - name: scripts
                   mountPath: /scripts
                   readOnly: true
+                {{- if .compaction.ephemeralVolumes.enabled }}
+                - name: ephemeral-scratch
+                  mountPath: /scratch
+                {{- end }}
           volumes:
             - name: s3cfg
               secret:
@@ -59,6 +66,21 @@ spec:
               configMap:
                 name: {{ include "log-manager.fullname" $ }}-scripts
                 defaultMode: 0777
+            {{- if .compaction.ephemeralVolumes.enabled }}
+            - name: ephemeral-scratch
+              ephemeral:
+                volumeClaimTemplate:
+                  metadata:
+                    labels:
+                      {{- include "log-manager.labels" $ | nindent 22 }}
+                  spec:
+                    accessModes: [ "ReadWriteOnce" ]
+                    storageClassName: "cinder-csi"
+                    resources:
+                      {{- with $.Values.compaction.volume }}
+                      requests: {{- toYaml . | nindent 24 }}
+                      {{- end }}
+            {{- end }}
           {{- with $.Values.imagePullSecrets }}
           imagePullSecrets: {{- toYaml . | nindent 12 }}
           {{- end }}
