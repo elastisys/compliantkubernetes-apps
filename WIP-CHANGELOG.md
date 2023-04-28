@@ -30,6 +30,7 @@
 - Add falco filter to not warn when containerd removes images that contain static log files or shell files
 - Added fluentd-system on the excluded list for hnc
 - Added so log-manager compaction can use ephemeral volumes.
+- Add default securitycontext mutations for restricted user namespaces
 
 ### Fixed
 
