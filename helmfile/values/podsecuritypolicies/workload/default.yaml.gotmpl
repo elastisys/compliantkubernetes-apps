@@ -1,0 +1,14 @@
+constraints:
+  default: {}
+
+mutations:
+  # Select user restricted namespaces
+  namespaceSelectorLabels:
+    - key: owner
+      operator: NotIn
+      values:
+        - operator
+    - key: pod-security.kubernetes.io/enforce
+      operator: In
+      values:
+        - restricted

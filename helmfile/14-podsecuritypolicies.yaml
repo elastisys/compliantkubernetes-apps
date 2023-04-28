@@ -105,3 +105,14 @@ releases:
     values:
       - values/podsecuritypolicies/service/opensearch.yaml.gotmpl
 {{- end }}
+
+{{- if eq .Environment.Name "workload_cluster" }}
+  - name: podsecuritypolicy
+    namespace: default
+    labels:
+      psp: default
+    chart: ./charts/gatekeeper/podsecuritypolicies
+    version: 0.1.0
+    values:
+      - values/podsecuritypolicies/workload/default.yaml.gotmpl
+{{- end }}
