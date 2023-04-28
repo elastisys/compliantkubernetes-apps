@@ -28,13 +28,11 @@ constraints:
     {{- if eq .Environment.Name "service_cluster" }}
     log-manager:
       podSelectorLabels:
-        key: value
+        app.kubernetes.io/instance: log-manager
       allow:
         volumes:
           - configMap
-          - emptyDir
-          - hostPath
-          - projected
+          - secret
           - ephemeral
     {{- end }}
 

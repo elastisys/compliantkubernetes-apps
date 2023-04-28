@@ -996,6 +996,8 @@ fluentd:
   audit:
     compaction:
       enabled: true
+      ephemeralVolumes:
+        enabled: false
       schedule: 0 22 * * *
       days: 10
     retention:
@@ -1007,6 +1009,8 @@ fluentd:
     enabled: true
     compaction:
       enabled: true
+      ephemeralVolumes:
+        enabled: false
       schedule: 30 22 * * *
       days: 7
     retention:
@@ -1020,6 +1024,8 @@ fluentd:
 
   logManager:
     compaction:
+      volume:
+        storage: 5Gi
       resources:
         requests:
           cpu: 200m

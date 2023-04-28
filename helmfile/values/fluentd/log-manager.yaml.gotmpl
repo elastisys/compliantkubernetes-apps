@@ -12,6 +12,8 @@ instances:
     prefix: {{ . }}
     compaction:
       enabled: {{ $.Values.fluentd.audit.compaction.enabled }}
+      ephemeralVolumes:
+        enabled: {{ $.Values.fluentd.audit.compaction.ephemeralVolumes.enabled }}
       schedule: {{ $.Values.fluentd.audit.compaction.schedule }}
       days: {{ $.Values.fluentd.audit.compaction.days }}
     retention:
@@ -27,6 +29,8 @@ instances:
     prefix: {{ .Values.global.clusterName }}
     compaction:
       enabled: {{ .Values.fluentd.audit.compaction.enabled }}
+      ephemeralVolumes:
+        enabled: {{ .Values.fluentd.audit.compaction.ephemeralVolumes.enabled }}
       schedule: {{ .Values.fluentd.audit.compaction.schedule }}
       days: {{ .Values.fluentd.audit.compaction.days }}
     retention:
@@ -40,6 +44,8 @@ instances:
     prefix: logs
     compaction:
       enabled: {{ .Values.fluentd.scLogs.compaction.enabled }}
+      ephemeralVolumes:
+        enabled: {{ .Values.fluentd.scLogs.compaction.ephemeralVolumes.enabled }}
       schedule: {{ .Values.fluentd.scLogs.compaction.schedule }}
       days: {{ .Values.fluentd.scLogs.compaction.days }}
     retention:
@@ -51,6 +57,8 @@ instances:
 
 compaction:
   resources: {{- toYaml .Values.fluentd.logManager.compaction.resources | nindent 4 }}
+  volume: {{- toYaml .Values.fluentd.logManager.compaction.volume | nindent 4 }}
+
 retention:
   resources: {{- toYaml .Values.fluentd.logManager.retention.resources | nindent 4 }}
 
