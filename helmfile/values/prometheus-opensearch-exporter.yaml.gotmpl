@@ -20,7 +20,8 @@ es:
 envFromSecret: opensearch-metrics-exporter-user
 
 env:
-  ES_URI: https://$(username):$(password)@{{ .Values.opensearch.clusterName }}-master:9200
+  ES_USERNAME: $(username)
+  ES_PASSWORD: $(password)
 
 serviceMonitor:
   enabled: true
@@ -34,6 +35,6 @@ resources: {{- toYaml .Values.opensearch.exporter.resources | nindent 2 }}
 tolerations: {{- toYaml .Values.opensearch.exporter.tolerations | nindent 2 }}
 
 podSecurityPolicies:
-  enabled: {{ .Values.kubernetesPSP }}
+  enabled: false
 
 fullnameOverride: "prometheus-opensearch-exporter"
