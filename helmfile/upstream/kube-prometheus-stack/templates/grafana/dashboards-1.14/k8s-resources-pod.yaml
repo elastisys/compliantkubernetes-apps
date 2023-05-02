@@ -33,7 +33,7 @@ data:
                 "iconColor": "red",
                 "name": "Container restart",
                 "step": "",
-                "textFormat": "Container \"{{ container }}\" restarted",
+                "textFormat": "Container \"{{`{{ container }}`}}\" restarted",
                 "titleFormat": "Container restarted"
               }
             ]
