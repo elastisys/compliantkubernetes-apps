@@ -78,6 +78,7 @@ releases:
   chart: ./upstream/trivy-operator
   version: 0.13.0
   installed: {{ .Values.trivy.enabled }}
+  disableValidationOnInstall: true
   values:
   - values/trivy/trivy-operator.yaml.gotmpl
 
