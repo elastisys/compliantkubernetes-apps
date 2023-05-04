@@ -38,6 +38,7 @@
 - Add option to override usernamespace `restricted` PSA level
   - Namespaces overridden will not be managed by HNC.
 - Add usernamespace gatekeeper constraints, for overridden usernamespaces.
+- Added `--logging-enabled` flag for test scripts and disabled logging by default
 
 ### Fixed
 
