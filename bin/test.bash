@@ -24,13 +24,15 @@ source "${pipeline_path}/test/services/workload-cluster/testHNC.sh"
 test_apps_sc() {
     log_info "Testing service cluster"
 
-    "${pipeline_path}/test/services/test-sc.sh" "${config[config_file_sc]}"
+    "${pipeline_path}/test/services/test-sc.sh" "${config[config_file_sc]}" "${@}"
+
 }
 
 test_apps_wc() {
     log_info "Testing workload cluster"
 
-    "${pipeline_path}/test/services/test-wc.sh" "${config[config_file_wc]}"
+    "${pipeline_path}/test/services/test-wc.sh" "${config[config_file_wc]}" "${@}"
+
 }
 
 function sc_help() {
@@ -40,6 +42,7 @@ function sc_help() {
     printf "\t%-23s %s\n" "cert-manager" "Cert Manager checks"
     printf "\t%-23s %s\n" "ingress" "Ingress checks"
     printf "%s\n" "[NOTE] If no target is specified, the default sc apps tests will be executed."
+    printf "%s\n" "[NOTE] Logging can be enabled for the sc apps tests by using the --logging-enabled flag."
     exit 0
 }
 
@@ -50,12 +53,13 @@ function wc_help() {
     printf "\t%-23s %s\n" "ingress" "Ingress checks"
     printf "\t%-23s %s\n" "hnc" "HNC checks"
     printf "%s\n" "[NOTE] If no target is specified, the default wc apps tests will be executed."
+    printf "%s\n" "[NOTE] Logging can be enabled for wc apps tests by using the --logging-enabled flag."
     exit 0
 }
 
 function sc() {
-    if [[ ${#} == 0 ]]; then
-        test_apps_sc
+    if [[ ${#} == 0 ]] || [[ ${#} == 1 && ${1} == "--logging-enabled" ]]; then
+        test_apps_sc "${@}"
     else
         case ${1} in
         opensearch)
@@ -81,8 +85,8 @@ function sc() {
 }
 
 function wc() {
-    if [[ ${#} == 0 ]]; then
-        test_apps_wc
+    if [[ ${#} == 0 ]] || [[ ${#} == 1 && ${1} == "--logging-enabled" ]]; then
+        test_apps_wc "${@}"
     else
         case ${1} in
         cert-manager)

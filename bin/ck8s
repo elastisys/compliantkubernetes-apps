@@ -14,7 +14,7 @@ usage() {
     echo "  bootstrap <wc|sc>                                 bootstrap the cluster" 1>&2
     echo "  apps <wc|sc> [--sync] [--skip-template-validate]  deploy the applications" 1>&2
     echo "  apply <wc|sc> [--sync] [--skip-template-validate] bootstrap and apps" 1>&2
-    echo "  test <wc|sc>                                      test the applications" 1>&2
+    echo "  test <wc|sc> [--logging-enabled]                  test the applications" 1>&2
     echo "  dry-run <wc|sc> [--kubectl]                       runs helmfile diff" 1>&2
     echo "  upgrade <version-matching-migration> prepare      runs all prepare steps upgrading the configuration" 1>&2
     echo "  upgrade <version-matching-migration> apply        runs all apply steps upgrading the environment" 1>&2
@@ -43,6 +43,7 @@ SYNC=""
 SKIP=""
 KUBECTL=""
 GEN_NEW_SECRETS=""
+LOGGING=""
 
 for arg in "$@"; do
   case "$arg" in
@@ -50,6 +51,7 @@ for arg in "$@"; do
     "--sync") SYNC="sync" ;;
     "--kubectl") KUBECTL="kubectl" ;;
     "--generate-new-secrets") GEN_NEW_SECRETS="--generate-new-secrets" ;;
+    "--logging-enabled") LOGGING="--logging-enabled" ;;
   esac
 done
 
