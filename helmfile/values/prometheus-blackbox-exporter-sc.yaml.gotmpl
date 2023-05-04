@@ -45,7 +45,7 @@ serviceMonitor:
     {{- end }}
     {{- if .Values.prometheusBlackboxExporter.targets.fluentd }}
     - name: fluentd
-      url: fluentd-aggregator-aggregator.fluentd-system.svc.cluster.local:9880/fluentd.healthcheck?json={"ping","pong"}
+      url: http://fluentd-aggregator-aggregator.fluentd-system.svc.cluster.local:9880/fluentd.healthcheck?json=%7B%22ping%22%3A+%22pong%22%7D
       interval: 60s
       scrapeTimeout: 30s
       module: http_2xx
