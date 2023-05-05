@@ -158,13 +158,14 @@ config:
         - "cluster_monitor"
         - "cluster:admin/repository/get"
         - "cluster:admin/snapshot/get"
+        - "cluster:admin/snapshot/status"
         index_permissions:
         - index_patterns:
           - "*"
           allowed_actions:
-          - "indices:monitor/stats"
-          - "indices:monitor/settings/get"
+          - "indices_monitor"
           - "indices:admin/mappings/get"
+          - "indices:admin/aliases/get"
     {{- with .Values.opensearch.extraRoles }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
