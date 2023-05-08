@@ -57,17 +57,20 @@ customRules:
     - macro: k8s_containers
       condition: (
           container.image.repository in (
-            docker.io/aquasec/starboard-operator,
             docker.io/bitnami/fluentd,
+            docker.io/bitnami/kubectl,
             docker.io/elastisys/calico-accountant,
             docker.io/elastisys/curl-jq,
+            docker.io/library/rabbitmq,
             docker.io/openpolicyagent/gatekeeper,
+            docker.io/openpolicyagent/gatekeeper-crds,
+            docker.io/rabbitmqoperator/cluster-operator,
             docker.io/velero/velero,
-            docker.io/weaveworks/kured,
+            gcr.io/k8s-staging-multitenancy/hnc-manager,
+            ghcr.io/aquasecurity/trivy-operator,
             ghcr.io/dexidp/dex,
             ghcr.io/elastisys/fluentd,
-            gcr.io/k8s-staging-multitenancy/hnc-manager,
-            k8s.gcr.io/kube-state-metrics/kube-state-metrics,
+            ghcr.io/kubereboot/kured,
             quay.io/jetstack/cert-manager-cainjector,
             quay.io/jetstack/cert-manager-controller,
             quay.io/jetstack/cert-manager-webhook,
@@ -75,9 +78,53 @@ customRules:
             quay.io/prometheus-operator/prometheus-operator,
             quay.io/prometheus/prometheus,
             quay.io/spotahome/redis-operator,
-            rabbitmqoperator/cluster-operator,
+            registry.k8s.io/ingress-nginx/kube-webhook-certgen,
+            registry.k8s.io/kube-state-metrics/kube-state-metrics,
             registry.opensource.zalan.do/acid/postgres-operator
-          ) or (k8s.ns.name = "kube-system")
+          ) or (
+            k8s.ns.name = "kube-system"
+          ) or (
+            k8s.ns.name = 'ingress-nginx' and
+            k8s.pod.name startswith 'ingress-nginx-controller-' and
+            proc.cmdline startswith 'nginx-ingress-c'
+          ) or (
+            k8s.ns.name = 'velero' and
+            k8s.pod.name startswith 'node-agent-' and
+            proc.cmdline = 'velero node-agent server'
+          )
+        )
+    - macro: user_expected_system_procs_network_activity_conditions
+      condition: (
+          container.image.repository = quay.io/calico/cni and proc.cmdline = 'install'
+        )
+    - macro: user_known_create_files_below_dev_activities
+      condition: (
+          (
+            container.image.repository = registry.k8s.io/sig-storage/csi-attacher and
+            proc.cmdline startswith csi-attacher
+          ) or (
+            container.image.repository = registry.k8s.io/sig-storage/csi-provisioner and
+            proc.cmdline startswith csi-provisioner
+          ) or (
+            container.image.repository = registry.k8s.io/sig-storage/csi-resizer and
+            proc.cmdline startswith csi-resizer
+          ) or (
+            container.image.repository = registry.k8s.io/sig-storage/csi-snapshotter and
+            proc.cmdline startswith csi-snapshotter
+          )
+        )
+    - macro: user_known_k8s_client_container_parens
+      condition: (
+          container.image.repository in (
+            docker.io/bitnami/kubectl,
+            docker.io/openpolicyagent/gatekeeper-crds
+          )
+        )
+    - macro: user_known_modify_bin_dir_activities
+      condition: (
+          container.image.repository = registry.k8s.io/dns/k8s-dns-node-cache and
+          proc.pcmdline = 'iptables /usr/sbin/iptables --version' and
+          proc.cmdline startswith 'rm -f /usr/sbin/ip'
         )
     - macro: user_known_mount_in_privileged_containers
       condition: (
@@ -91,20 +138,34 @@ customRules:
             docker.io/elastisys/curl-jq,
             ghcr.io/elastisys/fluentd,
             registry.k8s.io/dns/k8s-dns-node-cache
+          ) or (
+            container.image.repository = registry.k8s.io/kube-proxy and
+            proc.cmdline startswith update-alternat
           )
+        )
+    - macro: user_known_stand_streams_redirect_activities
+      condition: (
+          (container.image.repository = quay.io/calico/node and proc.name = calico-node) or
+          (container.image.repository = registry.k8s.io/dns/k8s-dns-node-cache and proc.name = node-cache)
         )
     - macro: user_known_write_below_etc_activities
       condition: (
           (container.image.repository = docker.io/goharbor/harbor-core and proc.name = cp) or
+          (container.image.repository = docker.io/goharbor/harbor-exporter and proc.name = cp) or
+          (container.image.repository = docker.io/goharbor/harbor-jobservice and proc.name = cp) or
           (container.image.repository = docker.io/goharbor/harbor-registryctl and proc.name = cp) or
+          (container.image.repository = docker.io/goharbor/chartmuseum-photon and proc.name = cp) or
           (container.image.repository = docker.io/goharbor/registry-photon and proc.name = cp) or
           (container.image.repository = docker.io/goharbor/trivy-adapter-photon and proc.name = cp) or
           (container.image.repository = quay.io/calico/node and proc.name = cp) or
+          (container.image.repository = quay.io/kiwigrid/k8s-sidecar and proc.cmdline = 'python -u /app/sidecar.py') or
+          (container.image.repository = quay.io/prometheus-operator/prometheus-config-reloader and proc.name = prometheus-conf) or
           (container.image.repository = registry.k8s.io/dns/k8s-dns-node-cache and proc.name = node-cache)
         )
     - macro: user_sensitive_mount_containers
       condition: (
           container.image.repository in (
+            ghcr.io/aquasecurity/node-collector,
             quay.io/prometheus/node-exporter
           )
         )
@@ -113,50 +174,15 @@ customRules:
           container.image.repository in (
             docker.io/elastisys/calico-accountant,
             docker.io/k8scloudprovider/cinder-csi-plugin,
-            docker.io/weaveworks/kured,
+            docker.io/opensearchproject/opensearch,
+            docker.io/velero/velero,
+            ghcr.io/kubereboot/kured,
             quay.io/calico/cni,
             quay.io/calico/pod2daemon-flexvol,
             registry.k8s.io/dns/k8s-dns-node-cache,
             registry.k8s.io/kube-proxy
           ) or (
             container.image.repository=docker.io/elastisys/curl-jq and k8s.pod.name startswith opensearch-
-          )
-        )
-    - macro: user_known_non_sudo_setuid_conditions
-      condition: (
-          user.name=root or
-          (k8s.pod.name startswith 'rfr-' and container.image.repository=docker.io/library/redis and (
-              proc.cmdline='sh -c redis-cli -h $(hostname) ping' or
-              proc.cmdline='xargs -0 sh -c' or
-              proc.cmdline='hostname' or
-              (proc.cmdline='hostname -i' and proc.pname='sh') or
-              (proc.cmdline='sh -c redis-cli info replication | grep role | tr -d "\\r" | tr -d "\\n"\n' and (proc.pname='xargs' or proc.pname='sh')) or
-              (proc.cmdline='sh -c redis-cli info replication | grep master_sync_in_progress:1 | tr -d "\\r" | tr -d "\\n"\n' and (proc.pname='xargs' or proc.pname='sh')) or
-              (proc.cmdline='sh -c redis-cli info replication | grep master_host:127.0.0.1 | tr -d "\\r" | tr -d "\\n"\n' and (proc.pname='xargs' or proc.pname='sh')) or
-              (proc.cmdline='grep role' and (proc.pname='xargs' or proc.pname='sh')) or
-              (proc.cmdline='grep master_sync_in_progress:1' and (proc.pname='xargs' or proc.pname='sh')) or
-              (proc.cmdline='grep master_host:127.0.0.1' and (proc.pname='xargs' or proc.pname='sh')) or
-              (proc.cmdline='tr -d \\n' and (proc.pname='xargs' or proc.pname='sh')) or
-              (proc.cmdline='tr -d \\r' and (proc.pname='xargs' or proc.pname='sh')) or
-              (proc.cmdline='tr -d \\"' and (proc.pname='xargs' or proc.pname='sh')) or
-              proc.cmdline='tr ,  ' or
-              proc.cmdline='cut -d  -f1' or
-              (proc.cmdline='sleep 5' and proc.pname='sh') or
-              proc.cmdline='sh -c sleep 5 && redis-server /redis/redis.conf' or
-              proc.cmdline='sh /redis-readiness/ready.sh' or
-              proc.cmdline='sh /redis-shutdown/shutdown.sh'
-            )
-          ) or (
-            k8s.pod.name startswith 'rfs-' and (
-              (container.image.repository=docker.io/library/redis and (
-                  proc.cmdline='sh -c redis-cli -h $(hostname) -p 26379 ping' or
-                  proc.cmdline='hostname' or
-                  proc.cmdline='cp /redis/sentinel.conf /redis-writable/sentinel.conf'
-                )
-              ) or (
-                container.image.repository=quay.io/oliver006/redis_exporter and proc.cmdline='redis_exporter -redis.addr redis://localhost:26379'
-              )
-            )
           )
         )
     - macro: allowed_clear_log_files
@@ -167,6 +193,8 @@ customRules:
       condition: (
           fd.name startswith "/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/" and proc.cmdline = containerd
         )
+    - rule: Non sudo setuid
+      enabled: false
 
 falcosidekick:
   enabled: {{ .Values.falco.alerts.enabled }}

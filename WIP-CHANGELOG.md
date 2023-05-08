@@ -74,6 +74,7 @@
 - metrics-server to v0.6.3, chart v3.10.0
 - prometheus-elasticsearch-exporter to v5.1.1
 - velero to v1.10.2, chart v3.1.6
+- Update falco exceptions to reduce false positives
 
 ### Changed
 
@@ -101,3 +102,4 @@
   - User admins will now only have the HNC user-rbac instead.
 - Removed the ability to edit HierarchyConfiguration for users
   - HierarchyConfiguration controls the Pod Security Standard level, and as such should not be allowed to be changed by a user.
+- Disable `Non sudo setuid` falco rule
