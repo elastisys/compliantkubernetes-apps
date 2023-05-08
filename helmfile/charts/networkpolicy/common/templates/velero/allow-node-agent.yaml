@@ -4,7 +4,7 @@ kind: NetworkPolicy
 metadata:
   labels:
     {{- include "np.labels" . | nindent 4 }}
-  name: allow-restic
+  name: allow-node-agent
   namespace: velero
 spec:
   policyTypes:
@@ -13,7 +13,7 @@ spec:
   podSelector:
     matchLabels:
       app.kubernetes.io/name: velero
-      name: restic
+      name: node-agent
   egress:
     - ports:
         - port: 53

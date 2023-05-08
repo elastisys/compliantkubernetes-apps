@@ -40,7 +40,7 @@ configuration:
   provider: gcp
   {{- end }}
 
-  defaultVolumesToRestic: true
+  defaultVolumesToFsBackup: true
 
   # https://velero.io/docs/v1.0.0/api-types/backupstoragelocation/
   backupStorageLocation:
@@ -92,11 +92,11 @@ credentials:
       {{ .Values.objectStorage.gcs.keyfileData | nindent 6 }}
     {{- end }}
 
-deployRestic: true
+deployNodeAgent: true
 
-restic:
-  resources:   {{- toYaml .Values.velero.restic.resources | nindent 4  }}
-  tolerations: {{- toYaml .Values.velero.restic.tolerations | nindent 4  }}
+nodeAgent:
+  resources:   {{- toYaml .Values.velero.nodeAgent.resources | nindent 4  }}
+  tolerations: {{- toYaml .Values.velero.nodeAgent.tolerations | nindent 4  }}
 
   privileged: true
 

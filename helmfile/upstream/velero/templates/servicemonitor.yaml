@@ -1,10 +1,14 @@
-{{- if and .Values.metrics.enabled .Values.metrics.serviceMonitor.enabled (.Capabilities.APIVersions.Has "monitoring.coreos.com/v1") }}
+{{ if and (and .Values.metrics.enabled .Values.metrics.serviceMonitor.enabled) (or (not .Values.metrics.serviceMonitor.autodetect) (.Capabilities.APIVersions.Has "monitoring.coreos.com/v1")) }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: {{ include "velero.fullname" . }}
   {{- if .Values.metrics.serviceMonitor.namespace }}
   namespace: {{ .Values.metrics.serviceMonitor.namespace }}
+  {{- end }}
+  {{- with .Values.metrics.serviceMonitor.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
     app.kubernetes.io/name: {{ include "velero.name" . }}

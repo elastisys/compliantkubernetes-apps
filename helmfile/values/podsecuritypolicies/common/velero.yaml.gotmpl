@@ -1,8 +1,8 @@
 constraints:
   velero:
-    restic:
+    nodeAgent:
       podSelectorLabels:
-        name: restic
+        name: node-agent
       allow:
         volumes:
           - hostPath

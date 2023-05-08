@@ -438,7 +438,7 @@ ingressNginx:
     affinity: {}
     nodeSelector: {}
 
-## Configration for Velero and Restic.
+## Configuration for Velero and node-agent.
 ## Check out https://compliantkubernetes.io/user-guide/backup/ to see what's included in backups.
 velero:
   enabled: true
@@ -454,7 +454,7 @@ velero:
       cpu: 50m
       memory: 100Mi
 
-  restic:
+  nodeAgent:
     tolerations: []
     resources:
       limits:

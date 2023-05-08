@@ -71,6 +71,7 @@
 - node-local-dns to use image `registry.k8s.io/dns/k8s-dns-node-cache:1.22.20`
 - metrics-server to v0.6.3, chart v3.10.0
 - prometheus-elasticsearch-exporter to v5.1.1
+- velero to v1.10.2, chart v3.1.6
 
 ### Changed
 

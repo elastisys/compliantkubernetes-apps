@@ -183,6 +183,12 @@ After doing the `disruptive` step for either the automatic or manual method, you
    ./migration/v0.30/prepare/40-starboard-to-trivy.sh
    ```
 
+1. Migrate velero restic to nodeAgent configurations:
+
+   ```bash
+   ./migration/v0.30/prepare/50-velero-restic-to-nodeagent.sh
+   ```
+
 ### Apply upgrade - *disruptive*
 
 > *Done during maintenance window.*

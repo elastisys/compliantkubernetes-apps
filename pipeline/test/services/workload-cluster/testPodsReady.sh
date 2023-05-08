@@ -78,7 +78,7 @@ if "${enable_fluentd}"; then
     )
 fi
 if "${enable_velero}"; then
-    daemonsets+=("velero restic")
+    daemonsets+=("velero node-agent")
 fi
 if "${enable_kured}"; then
   daemonsets+=("kured kured")
