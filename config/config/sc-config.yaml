@@ -998,11 +998,11 @@ fluentd:
       enabled: true
       ephemeralVolumes:
         enabled: false
-      schedule: 0 22 * * *
+      schedule: 0 1/6 * * *
       days: 10
     retention:
       enabled: true
-      schedule: 0 23 * * *
+      schedule: 0 20 * * *
       days: 30 # For HIPAA/PDL 1825
 
   scLogs:
@@ -1011,11 +1011,11 @@ fluentd:
       enabled: true
       ephemeralVolumes:
         enabled: false
-      schedule: 30 22 * * *
+      schedule: 0 2/6 * * *
       days: 7
     retention:
       enabled: true
-      schedule: 30 23 * * *
+      schedule: 0 21 * * *
       days: 7
 
   forwarder:
