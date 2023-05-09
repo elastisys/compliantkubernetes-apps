@@ -6,7 +6,7 @@ config:
   dryrun: false
 
   source:
-    name: provider-region-a
+  - name: provider-region-a
     type: s3
     s3:
       region: region
@@ -15,9 +15,16 @@ config:
       secretKey: secret-key
       forcePathStyle: true
       v2Auth: false
+  - name: provider-region-a
+    type: swift
+    swift:
+      applicationCredentialID: access-key
+      applicationCredentialSecret: secret-key
+      authUrl: swift.region.provider.net
+      region: region
 
   destination:
-    name: provider-region-b
+  - name: provider-region-b
     type: s3
     s3:
       region: region
@@ -26,6 +33,13 @@ config:
       secretKey: secret-key
       forcePathStyle: true
       v2Auth: false
+  - name: provider-region-b
+    type: swift
+    swift:
+      applicationCredentialID: access-key
+      applicationCredentialSecret: secret-key
+      authUrl: swift.region.provider.net
+      region: region
 
   encrypt:
     enabled: false
@@ -44,6 +58,8 @@ buckets:
   - source: bucket
     destination: other-bucket
     schedule: 0 5 * * *
+    sourceType: # Optional but if included types are s3 or swift.
+    destinationType: # Optional but if included types are s3 or swift.
 
 resources:
   requests:

@@ -9,7 +9,7 @@ global:
     - ${CK8S_ENVIRONMENT_NAME}-wc
 
 objectStorage:
-  ## Swift can be enabled separately for Harbor and Thanos only.
+  ## Swift can be enabled separately for Harbor, Thanos and rclone-sync only.
   # swift:
   #   authVersion: 0 # auto detect
   #   authUrl: set-me
@@ -32,15 +32,21 @@ objectStorage:
     enabled: false
     # dryrun: false
 
-    ## Options are 's3'
-    type: none
+    ## Options are 's3 and swift'. If Harbor or Thanos are using swift then we will automatically use swift for the sync, regardless of the value set for type.
+    #
+    type: s3
+    # secondaryUrl: set-me if regionEndpoint and or authUrl does not have all the relevant ips and or ports used for rclone-sync networkpolicy.
     # s3:
     #   region: set-me
     #   regionEndpoint: set-me
     #   # Generally false when using AWS and Exoscale and true for other providers.
     #   forcePathStyle: set-me
     #   # v2Auth: false
-
+    ## rclone-sync needs authUrl with a /v3 suffix for swift.
+    # swift:
+    #   authUrl: set-me
+    #   region: set-me
+    #   projectName: set-me
     ## Sync all buckets under 'objectStorage.buckets'
     ## These will be appended to 'buckets' using the same name from source as destination, and the default schedule.
     syncDefaultBuckets: false
@@ -53,7 +59,8 @@ objectStorage:
       # - source: source-bucket
       #   # destination: destination-bucket # if unset it will be the same as 'source'
       #   # schedule: 0 5 * * *             # if unset it will be the same as 'defaultSchedule'
-
+      #   # sourceType: Optional but if included it uses s3 or swift
+      #   # destinationType: Optional but if included it uses s3 or swift.
     # Encrypt (symmetric) before syncing
     encrypt:
       enabled: false
@@ -1117,18 +1124,18 @@ networkPolicies:
   global:
     objectStorageSwift:
       ips:
-        - set-me-if-enabled
+        - "set-me-if-enabled"
       ports:
-        - set-me-if-enabled
+        - 5000
     scApiserver:
       # usually private ip of control-plane nodes
       ips:
-        - set-me
+        - "set-me"
       port: 6443
     scNodes:
       # ip of all nodes in the cluster for internal communication
       ips:
-        - set-me
+        - "set-me"
   harbor:
     enabled: true
     # For replication, added to core and jobservice
@@ -1214,12 +1221,21 @@ networkPolicies:
 
   rcloneSync:
     enabled: true
-    destinationObjectStorage:
+    destinationObjectStorageS3:
       ips:
-        - "set-me-if-objectStorage.sync.enabled"
+        - "set-me-if-objectStorage.sync.enabled-and-type-is-s3"
       ports:
         - 443
-
+    destinationObjectStorageSwift:
+      ips:
+        - "set-me-if-objectStorage.sync.enabled-type-is-swift-or-habor-thanos-use-swift"
+      ports:
+        - 5000
+    secondaryUrl:
+      ips:
+        - "set-me-if-secondaryUrl-has-an-url"
+      ports:
+        - 443
   s3Exporter:
     enabled: true
 
@@ -1234,7 +1250,7 @@ networkPolicies:
   ingressNginx:
     ingressOverride:
       ips:
-      - set-me-if-enabled
+        - "set-me-if-enabled"
   dex:
     enabled: true
     # Ip to connector, e.g. Google, LDAP, ...
