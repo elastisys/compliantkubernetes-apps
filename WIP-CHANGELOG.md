@@ -59,6 +59,7 @@
 - Rook-ceph netpol to allow prometheus scrape
 - Define Velero security contexts
 - Correct NetworkPolicies and PodSecurityPolicies for Trivy Operator
+- Fixed inconsistencies in config for rclone-sync encryption
 
 ### Updated
 
