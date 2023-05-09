@@ -3,24 +3,38 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": "-- Grafana --",
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
         "type": "dashboard"
       }
     ]
   },
   "description": "Grafana dashboard for Falco output events",
   "editable": true,
+  "fiscalYearStartMonth": 0,
   "gnetId": 11914,
-  "graphTooltip": 0,
-  "iteration": 1635158680533,
+  "graphTooltip": 1,
+  "id": 363,
   "links": [],
+  "liveNow": false,
   "panels": [
     {
-      "datasource": null,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
       "gridPos": {
         "h": 4,
         "w": 24,
@@ -29,17 +43,671 @@
       },
       "id": 7,
       "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
         "content": "# Detailed falco logs can be found in OpenSearch Dashboards:\n\n\n<<opensearchdashboardsURL>>",
         "mode": "markdown"
       },
-      "pluginVersion": "8.0.0",
-      "timeFrom": null,
-      "timeShift": null,
+      "pluginVersion": "9.3.8",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "refId": "A"
+        }
+      ],
       "title": "Falco logs",
       "type": "text"
     },
     {
-      "datasource": "$datasource",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "links": [
+            {
+              "targetBlank": false,
+              "title": "",
+              "url": "d/-alRycO7z?${datasource:queryparam}&var-cluster=${__field.labels.cluster}&${priority:queryparam}&${namespace:queryparam}&${pod:queryparam}"
+            }
+          ],
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 4,
+        "x": 0,
+        "y": 4
+      },
+      "id": 9,
+      "options": {
+        "displayLabels": [],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "sortBy": "Value",
+          "sortDesc": false,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(falco_events{cluster=~\"$cluster\", priority=~\"$priority\", k8s_ns_name=~\"$namespace\", k8s_pod_name=~\"$pod\"}) by (cluster)",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Violations per Cluster",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "links": [
+            {
+              "title": "",
+              "url": "d/-alRycO7z?${datasource:queryparam}&${cluster:queryparam}&var-priority=${__field.labels.priority}&${namespace:queryparam}&${pod:queryparam}"
+            }
+          ],
+          "mappings": [],
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "0"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Emergency"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "text",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "1"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Alert (1)"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "2"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Critical (2)"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "3"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Error (3)"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "4"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Warning (4)"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "5"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Notice (5)"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "6"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Informational (6)"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "7"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Debug (7)"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "transparent",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 4,
+        "x": 4,
+        "y": 4
+      },
+      "id": 16,
+      "options": {
+        "displayLabels": [],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(falco_events{cluster=~\"$cluster\", priority=~\"$priority\", k8s_ns_name=~\"$namespace\", k8s_pod_name=~\"$pod\"}) by (priority)",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Violations per Priority",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 4,
+        "x": 8,
+        "y": 4
+      },
+      "id": 15,
+      "options": {
+        "displayLabels": [],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(falco_events{cluster=~\"$cluster\", priority=~\"$priority\", k8s_ns_name=~\"$namespace\", k8s_pod_name=~\"$pod\"}) by (rule)",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Violations per Rule",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "links": [
+            {
+              "title": "",
+              "url": "d/-alRycO7z?${datasource:queryparam}&${cluster:queryparam}&${priority:queryparam}&var-namespace=${__field.labels.k8s_ns_name}&${pod:queryparam}"
+            }
+          ],
+          "mappings": []
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "<NA>"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "host"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 4,
+        "x": 12,
+        "y": 4
+      },
+      "id": 11,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(falco_events{cluster=~\"$cluster\", priority=~\"$priority\", k8s_ns_name=~\"$namespace\", k8s_pod_name=~\"$pod\"}) by (k8s_ns_name)",
+          "format": "time_series",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Violations per Namespace",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "links": [],
+          "mappings": []
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "<NA>/"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "host"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 4,
+        "x": 16,
+        "y": 4
+      },
+      "id": 17,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(label_replace(falco_events{cluster=~\"$cluster\", priority=~\"$priority\", k8s_ns_name=~\"$namespace\", k8s_pod_name=~\"$pod\"}, \"k8s_set_name\", \"$1\", \"k8s_pod_name\", \"(.+)-.+\" )) by (k8s_ns_name, k8s_set_name)",
+          "instant": true,
+          "legendFormat": "{{k8s_ns_name}}/{{k8s_set_name}}",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Violations per Set",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "links": [
+            {
+              "title": "",
+              "url": "d/-alRycO7z?${datasource:queryparam}&${cluster:queryparam}&${priority:queryparam}&${namespace:queryparam}&var-pod=${__field.labels.k8s_pod_name}"
+            }
+          ],
+          "mappings": []
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "<NA>/<NA>"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "host"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 4,
+        "x": 20,
+        "y": 4
+      },
+      "id": 13,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(falco_events{cluster=~\"$cluster\", priority=~\"$priority\", k8s_ns_name=~\"$namespace\", k8s_pod_name=~\"$pod\"}) by (k8s_ns_name, k8s_pod_name)",
+          "instant": true,
+          "legendFormat": "{{k8s_ns_name}}/{{k8s_pod_name}}",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Violations per Pod",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "description": "This shows all Falco events that take place according to type and time.",
       "fieldConfig": {
         "defaults": {
@@ -47,19 +715,21 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
             "fillOpacity": 10,
-            "gradientMode": "none",
+            "gradientMode": "opacity",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
             },
             "lineInterpolation": "linear",
-            "lineWidth": 1,
+            "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
@@ -92,33 +762,40 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 3
+        "y": 16
       },
       "id": 2,
       "options": {
         "legend": {
           "calcs": [],
           "displayMode": "table",
-          "placement": "right"
+          "placement": "right",
+          "showLegend": true,
+          "width": 600
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "exemplar": true,
-          "expr": "rate(falco_events{cluster=~\"$cluster\"}[5m])",
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(increase(falco_events{cluster=~\"$cluster\", priority=~\"$priority\", k8s_ns_name=~\"$namespace\", k8s_pod_name=~\"$pod\"}[5m])) by (rule, k8s_pod_name, k8s_ns_name, cluster)",
+          "instant": false,
           "interval": "",
           "intervalFactor": 1,
-          "legendFormat": "{{rule}} - {{k8s_pod_name}},{{instance}} - {{cluster}}",
+          "legendFormat": "{{rule}} - {{k8s_ns_name}}/{{k8s_pod_name}} - {{cluster}}",
+          "range": true,
           "refId": "A"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Events rate (average/5m)",
+      "title": "Event Rate (average/5m)",
       "transformations": [
         {
           "id": "renameByRegex",
@@ -131,7 +808,10 @@
       "type": "timeseries"
     },
     {
-      "datasource": "$datasource",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "description": "This shows the rate at which Falco events takes place.",
       "fieldConfig": {
         "defaults": {
@@ -139,19 +819,21 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
             "fillOpacity": 10,
-            "gradientMode": "none",
+            "gradientMode": "opacity",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
             },
             "lineInterpolation": "linear",
-            "lineWidth": 1,
+            "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
@@ -184,32 +866,38 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 14
+        "y": 27
       },
       "id": 5,
       "options": {
         "legend": {
           "calcs": [],
           "displayMode": "table",
-          "placement": "right"
+          "placement": "right",
+          "showLegend": true,
+          "width": 600
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "sum by (priority, cluster) (rate(falco_events{cluster=~\"$cluster\"}[5m]))",
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(falco_events{cluster=~\"$cluster\", priority=~\"$priority\", k8s_ns_name=~\"$namespace\", k8s_pod_name=~\"$pod\"}[5m])) by (priority, cluster) ",
           "interval": "",
           "intervalFactor": 1,
           "legendFormat": "Priority: {{priority}} -  {{cluster}}",
+          "range": true,
           "refId": "A"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Events rate by priority (average/5m)",
+      "title": "Event Rate by Priority (average/5m)",
       "transformations": [
         {
           "id": "renameByRegex",
@@ -271,7 +959,10 @@
       "type": "timeseries"
     },
     {
-      "datasource": "$datasource",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
       "description": "This shows all Falco events with details in sequential order.",
       "fieldConfig": {
         "defaults": {
@@ -280,7 +971,8 @@
           },
           "custom": {
             "align": "left",
-            "displayMode": "auto"
+            "displayMode": "auto",
+            "inspect": false
           },
           "decimals": 2,
           "displayName": "",
@@ -312,8 +1004,7 @@
                 "value": "time: YYYY-MM-DD HH:mm:ss"
               },
               {
-                "id": "custom.align",
-                "value": null
+                "id": "custom.align"
               }
             ]
           },
@@ -332,8 +1023,7 @@
                 "value": 2
               },
               {
-                "id": "custom.align",
-                "value": null
+                "id": "custom.align"
               }
             ]
           },
@@ -352,8 +1042,7 @@
                 "value": "short"
               },
               {
-                "id": "custom.align",
-                "value": null
+                "id": "custom.align"
               }
             ]
           },
@@ -370,22 +1059,128 @@
               {
                 "id": "custom.align",
                 "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cluster"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Cluster"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "k8s_ns_name"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Namespace"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "k8s_pod_name"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Pod"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "priority"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Priority"
               },
               {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "rgba(245, 54, 54, 0.9)",
-                      "value": null
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0": {
+                        "color": "text",
+                        "index": 0,
+                        "text": "Emergency (0)"
+                      },
+                      "1": {
+                        "color": "red",
+                        "index": 1,
+                        "text": "Alert (1)"
+                      },
+                      "2": {
+                        "color": "orange",
+                        "index": 2,
+                        "text": "Critical (2)"
+                      },
+                      "3": {
+                        "color": "yellow",
+                        "index": 3,
+                        "text": "Error (3)"
+                      },
+                      "4": {
+                        "color": "green",
+                        "index": 4,
+                        "text": "Warning (4)"
+                      },
+                      "5": {
+                        "color": "blue",
+                        "index": 5,
+                        "text": "Notice (5)"
+                      },
+                      "6": {
+                        "color": "purple",
+                        "index": 6,
+                        "text": "Informational (6)"
+                      },
+                      "7": {
+                        "color": "transparent",
+                        "index": 7,
+                        "text": "Debug (7)"
+                      }
                     },
-                    {
-                      "color": "rgba(237, 129, 40, 0.89)",
-                      "value": null
-                    }
-                  ]
-                }
+                    "type": "value"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "rule"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Rule"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "tags"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Tags"
               }
             ]
           }
@@ -395,17 +1190,28 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 25
+        "y": 38
       },
       "id": 4,
       "links": [],
       "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
         "showHeader": true
       },
-      "pluginVersion": "8.0.0",
+      "pluginVersion": "9.3.8",
       "targets": [
         {
-          "expr": "falco_events{cluster=~\"$cluster\"}",
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "editorMode": "code",
+          "expr": "sum(falco_events{cluster=~\"$cluster\", priority=~\"$priority\", k8s_ns_name=~\"$namespace\", k8s_pod_name=~\"$pod\"}) by (cluster, rule, priority, k8s_ns_name, k8s_pod_name, tags)",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -413,9 +1219,7 @@
           "refId": "A"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Totals",
+      "title": "Event List",
       "transformations": [
         {
           "id": "merge",
@@ -428,10 +1232,12 @@
       "type": "table"
     }
   ],
-  "refresh": "30s",
-  "schemaVersion": 30,
+  "refresh": "1m",
+  "schemaVersion": 37,
   "style": "dark",
-  "tags": [],
+  "tags": [
+    "Falco"
+  ],
   "templating": {
     "list": [
       {
@@ -440,11 +1246,8 @@
           "text": "default",
           "value": "default"
         },
-        "description": null,
-        "error": null,
         "hide": 0,
         "includeAll": false,
-        "label": null,
         "multi": false,
         "name": "datasource",
         "options": [],
@@ -456,7 +1259,7 @@
         "type": "datasource"
       },
       {
-        "allValue": ".*",
+        "allValue": "",
         "current": {
           "selected": true,
           "text": [
@@ -466,13 +1269,13 @@
             "$__all"
           ]
         },
-        "datasource": "$datasource",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
         "definition": "label_values(falco_events, cluster)",
-        "description": null,
-        "error": null,
         "hide": 0,
         "includeAll": true,
-        "label": null,
         "multi": true,
         "name": "cluster",
         "options": [],
@@ -483,16 +1286,108 @@
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
-        "sort": 0,
+        "sort": 1,
         "tagValuesQuery": "",
         "tagsQuery": "",
         "type": "query",
         "useTags": false
+      },
+      {
+        "allValue": "",
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values(falco_events{cluster=~\"$cluster\"}, priority)",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "priority",
+        "options": [],
+        "query": {
+          "query": "label_values(falco_events{cluster=~\"$cluster\"}, priority)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 2,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values(falco_events{cluster=~\"$cluster\", priority=~\"$priority\"}, k8s_ns_name)",
+        "description": "The `<NA>` means host namespace.",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "namespace",
+        "options": [],
+        "query": {
+          "query": "label_values(falco_events{cluster=~\"$cluster\", priority=~\"$priority\"}, k8s_ns_name)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values(falco_events{cluster=~\"$cluster\", priority=~\"$priority\", k8s_ns_name=~\"$namespace\"}, k8s_pod_name)",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "pod",
+        "options": [],
+        "query": {
+          "query": "label_values(falco_events{cluster=~\"$cluster\", priority=~\"$priority\", k8s_ns_name=~\"$namespace\"}, k8s_pod_name)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
       }
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {
@@ -511,5 +1406,6 @@
   "timezone": "",
   "title": "Falco",
   "uid": "-alRycO7z",
-  "version": 15
+  "version": 38,
+  "weekStart": ""
 }

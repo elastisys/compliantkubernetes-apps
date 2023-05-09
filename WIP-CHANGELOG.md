@@ -76,6 +76,7 @@
 - velero to v1.10.2, chart v3.1.6
 - Update falco exceptions to reduce false positives
 - grafana to v9.3.13 to fix some security issues
+- Update Falco Grafana dashboard with breakdowns of events
 
 ### Changed
 
