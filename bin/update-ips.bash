@@ -289,7 +289,6 @@ if [ "${CHECK_CLUSTER}" == "both" ]; then
 else
   DIG_CLUSTER="wc"
 fi
-
 S3_ENDPOINT="$(yq_dig "${DIG_CLUSTER}" '.objectStorage.s3.regionEndpoint' '""' | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
 if [[ "${S3_ENDPOINT}" == "" ]]; then
     log_error "No S3 endpoint found, check your common-config.yaml (or ${DIG_CLUSTER}-config.yaml)"
@@ -347,8 +346,14 @@ fi
 if [[ "${CHECK_CLUSTER}" =~ ^(sc|both)$ ]]; then
     check_harbor="$(yq_dig 'sc' '.harbor.persistence.type' 'false')"
     check_thanos="$(yq_dig 'sc' '.thanos.objectStorage.type' 'false')"
-
-    if [ "$check_harbor" == "swift" ] || [ "$check_thanos" == "swift" ]; then
+    sourceType=$(yq4 '.objectStorage.sync.buckets.[].sourceType'  "${config["override_sc"]}")
+    sourceSwift=false
+    for type in $sourceType; do
+      if [ "$type" == "swift" ]; then
+        sourceSwift=true
+      fi
+    done
+    if [ "$check_harbor" == "swift" ] || [ "$check_thanos" == "swift" ] || [ "${sourceSwift}" == "true" ]; then
         os_auth_endpoint="$(yq_dig 'sc' '.objectStorage.swift.authUrl' '""' | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
 
         if [ -z "$os_auth_endpoint" ]; then
@@ -389,20 +394,115 @@ fi
 ## Add destination object storage ips for rclone sync to sc config
 if [ "$(yq_dig 'sc' '.objectStorage.sync.enabled' 'false')" == "true" ]; then
     if [ "$(yq_dig 'sc' '.networkPolicies.rcloneSync.enabled' 'false')" == "true" ]; then
+        destination=$(yq4 '.objectStorage.sync.buckets.[].destinationType' "${config["override_sc"]}")
+        destinationSwift=false
+        destinationS3=false
+        for type in $destination; do
+          if [ "$type" == "swift" ]; then
+            destinationSwift=true
+          elif [ "$type" == "s3" ]; then
+            destinationS3=true
+          fi
+        done
+        ifNull=""
+        S3_ENDPOINT_DST="$(yq_dig 'sc' '.objectStorage.sync.s3.regionEndpoint' "" | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
+        S3_PORT_DST="$(yq_dig 'sc' '.objectStorage.sync.s3.regionEndpoint' "" | sed 's/https\?:\/\///' | sed 's/[A-Za-z.0-9-]*:\?//' | sed 's/\/.*//')"
 
-        S3_ENDPOINT_DST="$(yq_dig 'sc' '.objectStorage.sync.s3.regionEndpoint' '""' | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
-        if [[ "${S3_ENDPOINT_DST}" == "" ]]; then
-            log_error "No destination S3 endpoint for rclone sync found, check your sc-config.yaml"
-            exit 1
+        SWIFT_ENDPOINT_DST="$(yq_dig 'sc' '.objectStorage.sync.swift.authUrl' "" | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
+        SWIFT_PORT_DST="$(yq_dig 'sc' '.objectStorage.sync.swift.authUrl' "" | sed 's/https\?:\/\///' | sed 's/[A-Za-z.0-9-]*:\?//' | sed 's/\/.*//')"
+
+        if { [ "$destinationS3" == "true" ] && [ "$destinationSwift" != "true" ]; } || { [ "$destinationS3" != "true" ] && [ "$destinationSwift" != "true" ] && [ "$(yq_dig 'sc' '.objectStorage.sync.type' 's3')" == "s3" ]; }; then
+            if [ -z "${S3_ENDPOINT_DST}" ]; then
+                log_error "No destination S3 endpoint for rclone sync found, check your sc-config.yaml"
+                exit 1
+            fi
+            if [ -z "${S3_PORT_DST}" ]; then
+                S3_PORT_DST="443"
+            fi
+            checkIfDiffAndUpdateDNSIPs "${S3_ENDPOINT_DST}" ".networkPolicies.rcloneSync.destinationObjectStorageS3.ips" "${config["override_sc"]}"
+            checkIfDiffAndUpdatePorts ".networkPolicies.rcloneSync.destinationObjectStorageS3.ports" "${config["override_sc"]}" "$S3_PORT_DST"
+            if [ -z "${SWIFT_ENDPOINT_DST}" ] && [ -z "${SWIFT_PORT_DST}" ] && [ $DRY_RUN == "true" ]; then
+                results_diff=$(diff -U0 --color=always <(yq4 -P 'sort_keys(.networkPolicies.rcloneSync.destinationObjectStorageSwift)' "${config["override_sc"]}") <(yq4 -P 'del(.networkPolicies.rcloneSync.destinationObjectStorageSwift)' "${config["override_sc"]}") --label "${config["override_sc"]//${CK8S_CONFIG_PATH}\//}" --label expected) || true
+                if [ "${results_diff}" != "" ]; then
+                    printf "${results_diff}"'%s\n'
+                    log_warning "Diff found for .networkPolicies.rcloneSync.destinationObjectStorageSwift in ${config[override_sc]//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
+                fi
+            elif [ -z "${SWIFT_ENDPOINT_DST}" ] && [ -z "${SWIFT_PORT_DST}" ] && [ $DRY_RUN != "true" ]; then
+                yq4 -i 'del(.networkPolicies.rcloneSync.destinationObjectStorageSwift)' "${config["override_sc"]}"
+            else
+                checkIfDiffAndUpdateDNSIPs "${SWIFT_ENDPOINT_DST}" ".networkPolicies.rcloneSync.destinationObjectStorageSwift.ips" "${config["override_sc"]}"
+                checkIfDiffAndUpdatePorts ".networkPolicies.rcloneSync.destinationObjectStorageSwift.ports" "${config["override_sc"]}" "$SWIFT_PORT_DST"
+            fi
+            ifNull=true
         fi
-        S3_PORT_DST="$(yq_dig 'sc' '.objectStorage.sync.s3.regionEndpoint' '""' | sed 's/https\?:\/\///' | sed 's/[A-Za-z.0-9-]*:\?//' | sed 's/\/.*//')"
-        if [ -z "$S3_PORT_DST" ]; then
-            S3_PORT_DST="443"
+        if { [ "$destinationSwift" == "true" ] && [ "$destinationS3" != "true" ]; } || { [ "$destinationS3" != "true" ] && [ "$destinationSwift" != "true" ] && [ "$(yq_dig 'sc' '.objectStorage.sync.type' 'swift')" == "swift" ]; }; then
+            if [ -z "${SWIFT_ENDPOINT_DST}" ]; then
+                log_error "No destination Swift endpoint for rclone sync found, check your sc-config.yaml"
+                exit 1
+            fi
+            if [ -z "${SWIFT_PORT_DST}" ]; then
+                SWIFT_PORT_DST="443"
+            fi
+
+            if [ -z "${S3_ENDPOINT_DST}" ] && [ -z "${S3_PORT_DST}" ] && [ $DRY_RUN == "true" ]; then
+                results_diff=$(diff -U0 --color=always <(yq4 -P 'sort_keys(.networkPolicies.rcloneSync.destinationObjectStorageS3)' "${config["override_sc"]}") <(yq4 -P 'del(.networkPolicies.rcloneSync.destinationObjectStorageS3)' "${config["override_sc"]}") --label "${config["override_sc"]//${CK8S_CONFIG_PATH}\//}" --label expected) || true
+                if [ "${results_diff}" != "" ]; then
+                    printf "${results_diff}"'%s\n'
+                    log_warning "Diff found for .networkPolicies.rcloneSync.destinationObjectStorageS3 in ${config[override_sc]//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
+                fi
+            elif [ -z "${S3_ENDPOINT_DST}" ] && [ -z "${S3_PORT_DST}" ] && [ $DRY_RUN != "true" ]; then
+                yq4 -i 'del(.networkPolicies.rcloneSync.destinationObjectStorageS3)' "${config["override_sc"]}"
+            else
+                checkIfDiffAndUpdateDNSIPs "${S3_ENDPOINT_DST}" ".networkPolicies.rcloneSync.destinationObjectStorageS3.ips" "${config["override_sc"]}"
+                checkIfDiffAndUpdatePorts ".networkPolicies.rcloneSync.destinationObjectStorageS3.ports" "${config["override_sc"]}" "$S3_PORT_DST"
+            fi
+
+            checkIfDiffAndUpdateDNSIPs "${SWIFT_ENDPOINT_DST}" ".networkPolicies.rcloneSync.destinationObjectStorageSwift.ips" "${config["override_sc"]}"
+            checkIfDiffAndUpdatePorts ".networkPolicies.rcloneSync.destinationObjectStorageSwift.ports" "${config["override_sc"]}" "$SWIFT_PORT_DST"
+            ifNull=true
+
+        fi
+        if { [ "$destinationSwift" == "true" ] && [ "$destinationS3" == "true" ]; } || [ -z "$ifNull" ] && { [ "$(yq_dig 'sc' '.objectStorage.sync.type' 'swift')" == "swift" ] || [ "$(yq_dig 'sc' '.objectStorage.sync.type' 's3')" == "s3" ]; }; then
+            if [ -z "${S3_ENDPOINT_DST}" ]; then
+                log_error "No destination S3 endpoint for rclone sync found, check your sc-config.yaml"
+                exit 1
+            fi
+            if [ -z "${SWIFT_ENDPOINT_DST}" ]; then
+                log_error "No destination Swift endpoint for rclone sync found, check your sc-config.yaml"
+                exit 1
+            fi
+            if [ -z "${S3_PORT_DST}" ]; then
+                S3_PORT_DST="443"
+            fi
+            if [ -z "${SWIFT_PORT_DST}" ]; then
+                SWIFT_PORT_DST="443"
+            fi
+
+            checkIfDiffAndUpdateDNSIPs "${S3_ENDPOINT_DST}" ".networkPolicies.rcloneSync.destinationObjectStorageS3.ips" "${config["override_sc"]}"
+            checkIfDiffAndUpdatePorts ".networkPolicies.rcloneSync.destinationObjectStorageS3.ports" "${config["override_sc"]}" "$S3_PORT_DST"
+
+            checkIfDiffAndUpdateDNSIPs "${SWIFT_ENDPOINT_DST}" ".networkPolicies.rcloneSync.destinationObjectStorageSwift.ips" "${config["override_sc"]}"
+            checkIfDiffAndUpdatePorts ".networkPolicies.rcloneSync.destinationObjectStorageSwift.ports" "${config["override_sc"]}" "$SWIFT_PORT_DST"
         fi
 
-        checkIfDiffAndUpdateDNSIPs "${S3_ENDPOINT_DST}" ".networkPolicies.rcloneSync.destinationObjectStorage.ips" "${config["override_sc"]}"
+        SECONDARY_ENDPOINT="$(yq_dig 'sc' '.objectStorage.sync.secondaryUrl' "" | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
+        if [ -n "${SECONDARY_ENDPOINT}" ]; then
+            SECONDARY_PORT="$(yq_dig 'sc' '.objectStorage.sync.secondaryUrl' "" | sed 's/https\?:\/\///' | sed 's/[A-Za-z.0-9-]*:\?//' | sed 's/\/.*//')"
+            if [ -z "${SECONDARY_PORT}" ]; then
+                SECONDARY_PORT="443"
+            fi
+            checkIfDiffAndUpdateDNSIPs "${SECONDARY_ENDPOINT}" ".networkPolicies.rcloneSync.secondaryUrl.ips" "${config["override_sc"]}"
+            checkIfDiffAndUpdatePorts ".networkPolicies.rcloneSync.secondaryUrl.ports" "${config["override_sc"]}" "$SECONDARY_PORT"
 
-        checkIfDiffAndUpdatePorts ".networkPolicies.rcloneSync.destinationObjectStorage.ports" "${config["override_sc"]}" "$S3_PORT_DST"
+        elif  [ -z "${SECONDARY_ENDPOINT}" ] && [ $DRY_RUN == "true" ]; then
+            results_diff=$(diff -U0 --color=always <(yq4 -P 'sort_keys(.networkPolicies.rcloneSync.secondaryUrl)' "${config["override_sc"]}") <(yq4 -P 'del(.networkPolicies.rcloneSync.secondaryUrl)' "${config["override_sc"]}") --label "${config["override_sc"]//${CK8S_CONFIG_PATH}\//}" --label expected) || true
+            if [ "${results_diff}" != "" ]; then
+                printf "${results_diff}"'%s\n'
+                log_warning "Diff found for .networkPolicies.rcloneSync.secondaryUrl in ${config[override_sc]//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
+            fi
+        elif [ -z "${SECONDARY_ENDPOINT}" ] && [ $DRY_RUN != "true" ]; then
+            yq4 -i 'del(.networkPolicies.rcloneSync.secondaryUrl)' "${config["override_sc"]}"
+        fi
     fi
 fi
 

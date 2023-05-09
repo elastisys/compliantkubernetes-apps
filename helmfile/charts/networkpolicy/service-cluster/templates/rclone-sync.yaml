@@ -18,23 +18,23 @@ spec:
           protocol: TCP
     {{- if and .Values.global.objectStorage.ips .Values.global.objectStorage.ports }}
     - to:
-        {{- range .Values.global.objectStorage.ips }}
+        {{- range .Values.global.objectStorage.ips | uniq }}
         - ipBlock:
             cidr: {{ . }}
         {{- end }}
       ports:
-        {{- range .Values.global.objectStorage.ports }}
+        {{- range .Values.global.objectStorage.ports | uniq }}
         - port: {{ . }}
         {{- end }}
     {{- end }}
     {{- if and .Values.rcloneSync.destinationObjectStorage.ips .Values.rcloneSync.destinationObjectStorage.ports }}
     - to:
-        {{- range .Values.rcloneSync.destinationObjectStorage.ips }}
+        {{- range .Values.rcloneSync.destinationObjectStorage.ips | uniq }}
         - ipBlock:
             cidr: {{ . }}
         {{- end }}
       ports:
-        {{- range .Values.rcloneSync.destinationObjectStorage.ports }}
+        {{- range .Values.rcloneSync.destinationObjectStorage.ports | uniq }}
         - port: {{ . }}
         {{- end }}
     {{- end }}
