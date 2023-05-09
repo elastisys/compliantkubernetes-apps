@@ -2,6 +2,9 @@
 
 ### Added
 
+- Added support for Swift in rclone-sync.
+  - It is now possible to specify type (S3/Swift) per bucket.
+
 ### Changed
 
 - Increased window for `FrequentPacketsDroppedFromWorkload` and `FrequentPacketsDroppedToWorkload` alerts

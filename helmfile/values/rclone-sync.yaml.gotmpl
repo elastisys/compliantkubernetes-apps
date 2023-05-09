@@ -1,5 +1,10 @@
-{{- if or (ne .Values.objectStorage.type "s3") (ne .Values.objectStorage.sync.type "s3") }}
-{{- fail "rclone-sync is (for now) only supported using s3 on both ends" }}
+{{- range .Values.objectStorage.sync.buckets }}
+{{- if or (and (ne (get "sourceType" "s3" .) "s3") (ne (get "sourceType" "swift" .) "swift") ) (and (ne $.Values.objectStorage.type "s3") (ne $.Values.objectStorage.type "swift") ) }}
+{{- fail "rclone-sync only supports using s3 and swift on source ends" }}
+{{- end }}
+{{- if or (and (ne (get "destinationType" "s3" .) "s3") (ne (get "destinationType" "swift" .) "swift") ) (and (ne $.Values.objectStorage.sync.type "s3") (ne $.Values.objectStorage.sync.type "swift") ) }}
+{{- fail "rclone-sync only supports using s3 and swift on destination ends" }}
+{{- end }}
 {{- end }}
 
 {{- if not (or .Values.objectStorage.sync.syncDefaultBuckets .Values.objectStorage.sync.buckets) }}
@@ -11,10 +16,29 @@ config:
   dryrun: {{ .Values.objectStorage.sync.dryrun }}
 {{- end }}
 
+{{ $sourceS3 := "" }}
+{{ $sourceSwift := "" }}
+{{ $destinationS3 := "" }}
+{{ $destinationSwift := "" }}
+
+{{- range .Values.objectStorage.sync.buckets }}
+{{- if or (eq (get "sourceType" "" .) "s3") (and (ne (get "sourceType" "" .) "swift") (eq $.Values.objectStorage.type "s3") ) }}
+{{ $sourceS3 = "true" }}
+{{- else if or (eq (get "sourceType" "" .) "swift") (and (ne (get "sourceType" "" .) "s3") (eq $.Values.objectStorage.type "swift") ) }}
+{{ $sourceSwift = "true" }}
+{{- end }}
+
+{{- if or (eq (get "destinationType" "" .) "s3") (and (ne (get "destinationType" "" .) "swift") (eq $.Values.objectStorage.sync.type "s3") ) }}
+{{ $destinationS3 = "true" }}
+{{- else if or (eq (get "destinationType" "" .) "swift") (and (ne (get "destinationType" "" .) "s3") (eq $.Values.objectStorage.sync.type "swift") ) }}
+{{ $destinationSwift = "true" }}
+{{- end }}
+{{- end }}
+
   source:
-    name: default
-    type: {{ .Values.objectStorage.type }}
-  {{- if eq .Values.objectStorage.type "s3" }}
+  {{- if $sourceS3 }}
+  - name: src-s3
+    type: s3
     s3:
       accessKey: {{ .Values.objectStorage.s3.accessKey }}
       secretKey: {{ .Values.objectStorage.s3.secretKey }}
@@ -26,10 +50,20 @@ config:
     {{- end }}
   {{- end }}
 
+  {{- if $sourceSwift }}
+  - name: src-swift
+    type: swift
+    swift:
+      applicationCredentialID: {{ .Values.objectStorage.swift.applicationCredentialID }}
+      applicationCredentialSecret: {{ .Values.objectStorage.swift.applicationCredentialSecret }}
+      authUrl: {{ .Values.objectStorage.swift.authUrl }}
+      region: {{ .Values.objectStorage.swift.region }}
+  {{- end }}
+
   destination:
-    name: backup
-    type: {{ .Values.objectStorage.sync.type }}
-  {{- if eq .Values.objectStorage.sync.type "s3" }}
+  {{- if $destinationS3 }}
+  - name: dest-s3
+    type: s3
     s3:
       accessKey: {{ .Values.objectStorage.sync.s3.accessKey }}
       secretKey: {{ .Values.objectStorage.sync.s3.secretKey }}
@@ -39,6 +73,15 @@ config:
     {{- if hasKey .Values.objectStorage.sync.s3 "v2Auth" }}
       v2Auth: {{ .Values.objectStorage.sync.s3.v2Auth }}
     {{- end }}
+  {{- end }}
+  {{- if $destinationSwift }}
+  - name: dest-swift
+    type: swift
+    swift:
+      applicationCredentialID: {{ .Values.objectStorage.sync.swift.applicationCredentialID }}
+      applicationCredentialSecret: {{ .Values.objectStorage.sync.swift.applicationCredentialSecret }}
+      authUrl: {{ .Values.objectStorage.sync.swift.authUrl }}
+      region: {{ .Values.objectStorage.sync.swift.region }}
   {{- end }}
 
   encrypt:
@@ -73,6 +116,8 @@ buckets:
     {{- if hasKey . "schedule" }}
     schedule: {{ .schedule | quote }}
     {{- end }}
+    sourceType: {{ . | dig "sourceType" $.Values.objectStorage.type }}
+    destinationType: {{ . | dig "destinationType" $.Values.objectStorage.sync.type }}
   {{- end }}
 {{- end }}
 
