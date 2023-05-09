@@ -6,7 +6,6 @@ source "${INNER_SCRIPTS_PATH}/../funcs.sh"
 
 enable_falco_alerts=$(yq4 -e '.falco.alerts.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_falco=$(yq4 -e '.falco.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_opa=$(yq4 -e '.opa.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_hnc=$(yq4 -e '.hnc.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_hnc_ha=$(yq4 -e '.hnc.ha' "${CONFIG_FILE}" 2>/dev/null)
 enable_user_alertmanager=$(yq4 -e '.user.alertmanager.enabled' "${CONFIG_FILE}" 2>/dev/null)
@@ -24,15 +23,13 @@ deployments=(
     "cert-manager cert-manager"
     "cert-manager cert-manager-cainjector"
     "cert-manager cert-manager-webhook"
+    "gatekeeper-system gatekeeper-controller-manager"
+    "ingress-nginx ingress-nginx-default-backend"
     "kube-system coredns"
     "kube-system metrics-server"
-    "ingress-nginx ingress-nginx-default-backend"
     "monitoring kube-prometheus-stack-operator"
     "monitoring kube-prometheus-stack-kube-state-metrics"
 )
-if "${enable_opa}"; then
-    deployments+=("gatekeeper-system gatekeeper-controller-manager")
-fi
 if "${enable_hnc}"; then
     deployments+=("hnc-system hnc-controller-controller-manager")
 

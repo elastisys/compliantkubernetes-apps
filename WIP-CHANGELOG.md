@@ -6,6 +6,8 @@
 - kube-prometheus-stack:
   - the portName for alertmanager and prometheus have been renamed from `web` to `http-web`. If this port names are used by you application or to port-forward to prometheus/alertmanager, you will need to update them to `http-web` or use the port numbers instead (e.g 9090 for prometheus and 9093 for alertmanager)
   - added default metric relabeling for cAdvisor and apiserver metrics to reduce cardinality. See [CHANGELOG](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#from-36x-to-37x)
+- Gatekeeper:
+  - OPA / Gatekeeper will now be mandatory as it will be used to enforce PodSecurityPolicies with constraints instead of vanilla Kubernetes PodSecurityPolicies as they are unavailable from Kubernetes v1.25.
 
 ### Added
 

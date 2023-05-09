@@ -30,7 +30,6 @@ releases:
     component: gatekeeper
   chart: ./upstream/gatekeeper
   version: 3.11.0
-  installed: {{ .Values.opa.enabled }}
   disableValidationOnInstall: true
   wait: true
   values:

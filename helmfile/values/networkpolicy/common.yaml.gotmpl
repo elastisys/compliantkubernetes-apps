@@ -100,7 +100,7 @@ fluentd:
   enabled: {{ and .Values.fluentd.enabled .Values.networkPolicies.fluentd.enabled }}
 
 gatekeeper:
-  enabled: {{ and .Values.opa.enabled .Values.networkPolicies.gatekeeper.enabled }}
+  enabled: true
 
 rookCeph:
   enabled: {{ .Values.networkPolicies.rookCeph.enabled }}

@@ -204,7 +204,6 @@ releases:
     component: gatekeeper-metrics
   chart: ./charts/gatekeeper/metrics
   version: 0.1.0
-  installed: {{ .Values.opa.enabled }}
 
 - name: gatekeeper-mutations
   namespace: gatekeeper-system
@@ -213,7 +212,7 @@ releases:
     component: gatekeeper-mutations
   chart: ./charts/gatekeeper/mutations
   version: 0.1.0
-  installed: {{ and .Values.opa.enabled .Values.opa.mutations.enabled }}
+  installed: {{ .Values.opa.mutations.enabled }}
   values:
   - values/gatekeeper/mutations.yaml.gotmpl
 
@@ -665,7 +664,6 @@ releases:
     component: gatekeeper-constraints
   chart: ./charts/gatekeeper/constraints
   version: 1.6.0
-  installed: {{ .Values.opa.enabled }}
   values:
   - values/gatekeeper/constraints.yaml.gotmpl
 

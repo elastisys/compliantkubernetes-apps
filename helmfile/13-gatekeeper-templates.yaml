@@ -30,7 +30,6 @@ releases:
     component: gatekeeper-templates
   chart: ./charts/gatekeeper/templates
   version: 1.6.0
-  installed: {{ .Values.opa.enabled }}
   wait: true
   values:
   - values/gatekeeper/templates.yaml.gotmpl
