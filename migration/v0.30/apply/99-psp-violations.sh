@@ -27,13 +27,16 @@ function set_violating_resources() {
     namespace=$(echo "$resource" | yq4 e '.namespace')
     pod_name=$(echo "$resource" | yq4 e '.name')
 
-    owner_reference=$(kubectl_do "$cluster" -n "$namespace" get pod "$pod_name" -oyaml | yq4 '.metadata.ownerReferences.[0]')
+    owner_reference=$(kubectl_do "$cluster" -n "$namespace" get pod "$pod_name" --ignore-not-found=true -oyaml | yq4 '.metadata.ownerReferences.[0]')
 
-    # Skip standalone pods
-    if [ "$owner_reference" = "null" ]; then continue; fi
+    # Skip standalone Pods and stale references
+    if [ "$owner_reference" = "null" ] || [ -z "$owner_reference" ]; then continue; fi
 
     owner_kind=$(echo "$owner_reference" | yq4 .kind)
     owner_name=$(echo "$owner_reference" | yq4 .name)
+
+    # Skip jobs
+    if [ "$owner_kind" == "Job" ]; then continue; fi
 
     # Get owner of ReplicaSets
     if [ "$owner_kind" == "ReplicaSet" ]; then
