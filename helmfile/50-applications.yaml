@@ -686,6 +686,7 @@ releases:
     group: hnc
   chart: ./charts/hnc/controller
   version: 0.1.0
+  wait: true
   installed: {{ .Values.hnc.enabled }}
   needs:
   - hnc-system/hnc-config-and-crds
