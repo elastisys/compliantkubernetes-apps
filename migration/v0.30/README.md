@@ -127,6 +127,18 @@ After doing the `disruptive` step for either the automatic or manual method, you
     git switch -d v0.30.x
     ```
 
+1. Update override `promIndexAlerts` limit for `authlog`:
+
+    ```bash
+    ./migration/v0.30/prepare/05-increase-promIndexAlerts-authlog.sh
+    ```
+
+1. Update Gatekeeper configuration:
+
+    ```bash
+    ./migration/v0.30/prepare/09-gatekeeper.sh
+    ```
+
 1. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.
