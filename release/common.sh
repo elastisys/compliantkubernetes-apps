@@ -15,7 +15,7 @@ make_sure_branch_is_up_to_date() {
 }
 
 reset_commit_found() {
-  if git log "-${commit_lookback}" --format=%s | grep -P "^Reset changelog for release v${1}.${2}.0$" > /dev/null; then
+  if git log "-${commit_lookback}" --format=%s | grep -P "^Reset changelog for release v${1}.${2}.0" > /dev/null; then
     return 0
   else
     return 1
