@@ -26,6 +26,9 @@ spec:
         - podSelector:
             matchLabels:
               component: core
+        - podSelector:
+            matchLabels:
+              component: jobservice
       ports:
         - port: 5000
         - port: 8080
