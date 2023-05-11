@@ -21,8 +21,6 @@ prometheusOperator:
     resources: {{- toYaml .Values.prometheusOperator.prometheusConfigReloader.resources | nindent 6 }}
 
 kube-state-metrics:
-  podSecurityPolicy:
-    enabled: true
   resources: {{- toYaml .Values.kubeStateMetrics.resources | nindent 4 }}
   {{- if .Values.kubeStateMetrics.clusterAPIMetrics.enabled }}
   rbac:
