@@ -125,4 +125,10 @@ spec:
               component: trivy
       ports:
         - port: 8080
+    - to:
+        - podSelector:
+            matchLabels:
+              component: registry
+      ports:
+        - port: 8080
 {{ end }}

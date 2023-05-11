@@ -103,6 +103,7 @@
 - Define Velero security contexts
 - Correct NetworkPolicies and PodSecurityPolicies for Trivy Operator
 - Fixed inconsistencies in config for rclone-sync encryption
+- Network policies for Harbor to allow garbage collection
 
 ### Updated
 
