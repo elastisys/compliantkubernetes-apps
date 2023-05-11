@@ -15,6 +15,16 @@ extraConfigMaps:
       </exclude>
     </filter>
 
+    <filter kubernetes.var.log.containers.gatekeeper-audit**>
+      @id gatekeeper-audit-normalize
+      @type record_transformer
+      auto_typecast false
+      enable_ruby true
+      <record>
+        resource_labels ${record["resource_labels"].nil? ? "none": record["resource_labels"].to_json}
+      </record>
+    </filter>
+
     # Include extra configuration files
     @include /etc/fluent/extra-config.d/*.conf
 
