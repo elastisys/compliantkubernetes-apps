@@ -11,14 +11,6 @@ metadata:
   namespace: kube-system
 rules:
 - apiGroups:
-  - extensions
-  resourceNames:
-  - privileged
-  resources:
-  - podsecuritypolicies
-  verbs:
-  - use
-- apiGroups:
   - ""
   resources:
   - pods
