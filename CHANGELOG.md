@@ -39,7 +39,7 @@
 
 ### Release notes
 
-- alertmanager:
+- Alertmanager:
   - using`regex` field from the `Matcher` type is deprecated and it will be removed in a future version. See [CHANGELOG](https://github.com/prometheus-operator/prometheus-operator/blob/main/CHANGELOG.md#0570--2022-06-02)
   - added support for new matching syntax in the routes configuration of the AlertmanagerConfig CRD. See [CHANGELOG](https://github.com/prometheus-operator/prometheus-operator/blob/main/CHANGELOG.md#0530--2021-12-16)
 - kube-prometheus-stack:
@@ -47,6 +47,8 @@
   - added default metric relabeling for cAdvisor and apiserver metrics to reduce cardinality. See [CHANGELOG](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#from-36x-to-37x)
 - Gatekeeper:
   - OPA / Gatekeeper will now be mandatory as it will be used to enforce PodSecurityPolicies with constraints instead of vanilla Kubernetes PodSecurityPolicies as they are unavailable from Kubernetes v1.25.
+- Vulnerability dashboard:
+  - the `Image vulnerabilities` dashboard was replace by `Trivy Operator` dashboard
 
 ### Added
 
