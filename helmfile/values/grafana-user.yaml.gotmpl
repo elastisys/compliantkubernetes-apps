@@ -28,6 +28,7 @@ ingress:
     - {{ .Values.user.grafana.subdomain }}.{{ .Values.global.baseDomain }}
 rbac:
   namespaced: true
+  pspEnabled: false
 
 persistence:
   type: pvc
