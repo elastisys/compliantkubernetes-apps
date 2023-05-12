@@ -7,6 +7,8 @@
 {{- end }}
 {{- end }}
 {{- end }}
+
+{{- if $namespaces }}
 ---
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sPSPHostNamespace
@@ -15,3 +17,4 @@ metadata:
 spec:
   match:
     {{- dict "namespaces" $namespaces "exceptions" $exceptions | include "podsecuritypolicies.renderMatchExceptions" | nindent 4 }}
+{{- end }}
