@@ -14,9 +14,12 @@ NOW="$(date --utc '+%Y%m%d%H%M%S')"
 
 SEQ=0
 
-TMP="/tmp/lm"
+TMP_DIR="${TMP_DIR:-"/tmp"}"
+LM_TMP="${TMP_DIR}/lm"
+SORT_TMP="${TMP_DIR}/sort"
 
-mkdir -p "$TMP"
+mkdir -p "$LM_TMP"
+mkdir -p "$SORT_TMP"
 
 s3_list_days() {
   s3cmd --config "$S3_CONFIG" ls "s3://$S3_BUCKET/$S3_PREFIX/" | grep 'DIR' | awk '{print $2}' | sed "s#s3://$S3_BUCKET/$S3_PREFIX/##" | sed 's#/$##'
@@ -68,25 +71,25 @@ merge_chunks() {
     echo "--- merging chunks in $DAY/$INDEX"
 
     echo "----- fetching chunks"
-    s3_get_chunks "$DAY/$INDEX" "$TMP"
+    s3_get_chunks "$DAY/$INDEX" "$LM_TMP"
 
-    TMPFILE="$(printf "%s/%s/%s-%05d" "$TMP" "$INDEX" "$NOW" "$SEQ")"
+    TMPFILE="$(printf "%s/%s/%s-%05d" "$LM_TMP" "$INDEX" "$NOW" "$SEQ")"
     touch "$TMPFILE.idx"
     touch "$TMPFILE.log"
 
     echo "----- expanding chunks"
-    for FILE in "$TMP/$INDEX"/*; do
+    for FILE in "$LM_TMP/$INDEX"/*; do
       if [[ "$FILE" =~ "$TMPFILE"* ]]; then
         continue
       fi
 
-      echo "s3://$S3_BUCKET/$S3_PREFIX/$DAY/${FILE/$TMP\//}" >> "$TMPFILE.idx"
+      echo "s3://$S3_BUCKET/$S3_PREFIX/$DAY/${FILE/$LM_TMP\//}" >> "$TMPFILE.idx"
 
       zstd -c -d --rm "$FILE" >> "$TMPFILE.log"
     done
 
     echo "----- sorting chunk"
-    sort -u -S 100M -o "$TMPFILE.log" "$TMPFILE.log"
+    sort --temporary-directory="$SORT_TMP" -u -S 100M -o "$TMPFILE.log" "$TMPFILE.log"
 
     echo "----- compressing chunk"
     zstd --rm -o "$TMPFILE.zst" "$TMPFILE.log"
