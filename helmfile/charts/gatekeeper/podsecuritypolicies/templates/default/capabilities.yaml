@@ -7,6 +7,8 @@
 {{- end }}
 {{- end }}
 {{- end }}
+
+{{- if $namespaces }}
 ---
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sPSPCapabilities
@@ -18,3 +20,4 @@ spec:
   parameters:
     requiredDropCapabilities:
       - ALL
+{{- end }}

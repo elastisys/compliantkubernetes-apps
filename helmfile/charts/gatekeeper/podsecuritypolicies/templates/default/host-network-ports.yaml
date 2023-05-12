@@ -7,6 +7,8 @@
 {{- end }}
 {{- end }}
 {{- end }}
+
+{{- if $namespaces }}
 ---
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sPSPHostNetworkingPorts
@@ -19,3 +21,4 @@ spec:
     hostNetwork: false
     min: 0
     max: 0
+{{- end }}
