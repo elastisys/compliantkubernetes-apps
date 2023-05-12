@@ -99,7 +99,10 @@ falco:
   enabled: true
   ## additional falco rules
   ## ref: https://falco.org/docs/rules/
-  customRules: {}
+  customRules:
+    non-sudo-setuid.yaml: |-
+      - rule: Non sudo setuid
+        enabled: false
   resources:
     limits:
       cpu: 200m
