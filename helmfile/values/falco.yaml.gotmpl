@@ -206,8 +206,6 @@ customRules:
       condition: (
           fd.name startswith "/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/" and proc.cmdline = containerd
         )
-    - rule: Non sudo setuid
-      enabled: false
 
 falcosidekick:
   enabled: {{ .Values.falco.alerts.enabled }}
