@@ -8,6 +8,8 @@ constraints:
       allow:
         privileged: true
         allowPrivilegeEscalation: true
+        runAsUser:
+          rule: RunAsAny
         volumes:
           - emptyDir
           - projected
@@ -22,6 +24,7 @@ constraints:
           - emptyDir
           - projected
           - hostPath
+          - configMap
         allowedHostPaths:
           - pathPrefix: "/dev"
           - pathPrefix: "/sys"
@@ -49,6 +52,7 @@ constraints:
           - emptyDir
           - projected
           - hostPath
+          - configMap
         allowedHostPaths:
           - pathPrefix: "/run/udev"
           - pathPrefix: "/dev"
@@ -98,6 +102,7 @@ constraints:
           - secret
           - projected
           - hostPath
+          - emptyDir
         allowedHostPaths:
           - pathPrefix: "/run/udev"
           - pathPrefix: "/dev"
