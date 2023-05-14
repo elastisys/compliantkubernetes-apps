@@ -118,8 +118,21 @@ customRules:
           container.image.repository in (
             docker.io/bitnami/kubectl,
             docker.io/openpolicyagent/gatekeeper-crds
+          ) or (
+            k8s.ns.name = "tekton-pipelines" and k8s.pod.name startswith upgrade
           )
         )
+
+    - macro: user_known_contact_k8s_api_server_activities
+      condition: (
+            k8s.ns.name = "tekton-pipelines" and k8s.pod.name startswith upgrade
+        )
+
+    - macro: user_known_write_monitored_dir_conditions
+      condition: (
+            k8s.ns.name = "tekton-pipelines" and k8s.pod.name startswith upgrade
+        )
+
     - macro: user_known_modify_bin_dir_activities
       condition: (
           container.image.repository = registry.k8s.io/dns/k8s-dns-node-cache and
