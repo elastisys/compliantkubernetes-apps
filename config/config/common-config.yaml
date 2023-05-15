@@ -169,6 +169,12 @@ falco:
     affinity: {}
     nodeSelector: {}
 
+grafana:
+  ops:
+    subdomain: grafana
+  user:
+    subdomain: grafana
+
 fluentd:
   audit:
     enabled: false
@@ -247,6 +253,11 @@ fluentd:
     livenessThresholdSeconds: 900
     stuckThresholdSeconds: 1200
 
+harbor:
+  enabled: true
+  subdomain: harbor
+  notary:
+    subdomain: notary.harbor
 
 ## Hierarchical namespace controller configuration.
 hnc:
@@ -450,6 +461,9 @@ prometheus:
               node: ""
               disk: ""
 
+dex:
+  subdomain: dex
+
 thanos:
   # Enables Thanos components.
   # If this isn't set, no components will be deployed
@@ -470,6 +484,9 @@ opensearch:
   subdomain: opensearch
 
   indexPerNamespace: false
+
+  dashboards:
+    subdomain: opensearch
 
 ## Set external traffic policy to: "Local" to preserve source IP on
 ## providers supporting it

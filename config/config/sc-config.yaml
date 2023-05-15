@@ -87,7 +87,7 @@ falco:
 
 grafana:
   ops:
-    subdomain: grafana
+    # subdomain moved to common-config
     resources:
       requests:
         cpu: 50m
@@ -119,7 +119,7 @@ grafana:
           memory: 100Mi
   user:
     enabled: true
-    subdomain: grafana
+    # subdomain moved to common-config
     resources:
       limits:
         cpu: 100m
@@ -151,8 +151,8 @@ grafana:
           memory: 100Mi
 
 harbor:
-  enabled: true
-  subdomain: harbor
+  # the enabled property moved to common-config
+  # subdomain moved to common-config
   # The tolerations, affinity, and nodeSelector are applied to all harbor pods.
   tolerations: []
   nodeSelector: {}
@@ -315,7 +315,7 @@ harbor:
 
   notary:
     replicas: 1
-    subdomain: notary.harbor
+    # subdomain moved to common-config
     resources:
       requests:
         cpu: 20m
@@ -479,7 +479,7 @@ prometheus:
 
 dex:
   replicaCount: 2
-  subdomain: dex
+  # subdomain moved to common-config
   additionalKubeloginRedirects: []
   enableStaticLogin: true
   serviceMonitor:
@@ -708,7 +708,7 @@ opensearch:
   createIndices: true
 
   dashboards:
-    subdomain: opensearch
+    # subdomain moved to common-config
     # Note SSO is enabled via `opensearch.sso.enabled`
     resources:
       requests:

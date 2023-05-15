@@ -38,6 +38,19 @@ yq_move() {
   fi
 }
 
+yq_move_to_file() {
+  if [[ "${#}" -lt 4 ]] || [[ ! "${1}" =~ ^(common|sc|wc)$ ]] || [[ ! "${3}" =~ ^(common|sc|wc)$ ]]; then
+    log_fatal "usage: yq_move_to_file <common|sc|wc> <source> <common|sc|wc> <destination>"
+  fi
+
+  if ! yq_null "${1}" "${2}"; then
+    log_info "  - move: ${1} ${2} to ${4} ${3}"
+    yq4 -oj -I0 "${2}" "${CK8S_CONFIG_PATH}/${1}-config.yaml" |
+    yq4 -i "${4} = load(\"/dev/stdin\")" "${CK8S_CONFIG_PATH}/${3}-config.yaml"
+    yq4 -i "del(${2})" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
+  fi
+}
+
 yq_add() {
   if [[ "${#}" -lt 3 ]] || [[ ! "${1}" =~ ^(common|sc|wc)$ ]]; then
     log_fatal "usage: yq_add <common|sc|wc> <destination> <value>"
