@@ -40,10 +40,10 @@ function set_violating_resources() {
 
     # Get owner of ReplicaSets
     if [ "$owner_kind" == "ReplicaSet" ]; then
-      owner_reference=$(kubectl_do "$cluster" -n "$namespace" get rs "$owner_name" -oyaml | yq4 '.metadata.ownerReferences.[0]')
+      owner_reference=$(kubectl_do "$cluster" -n "$namespace" get rs "$owner_name" --ignore-not-found=true -oyaml | yq4 '.metadata.ownerReferences.[0]')
 
-      # Skip standalone ReplicaSets
-      if [ "$owner_reference" = "null" ]; then continue; fi
+      # Skip standalone ReplicaSets and stale references
+      if [ "$owner_reference" = "null" ] || [ -z "$owner_reference" ]; then continue; fi
 
       owner_kind=$(echo "$owner_reference" | yq4 .kind)
       owner_name=$(echo "$owner_reference" | yq4 .name)
@@ -77,8 +77,10 @@ function restart_violating_resources() {
     if [[ "${exempt_namepsaces[*]}" =~ "${namespace}" ]] || is_customer_namespace "$namespace" "$cluster"; then
       log_warn "$kind/$name in $namespace for cluster $cluster requires manual restart"
     else
-      log_info "Will trigger a rollout restart of $kind/$name in $namespace for cluster $cluster"
-      kubectl_do "$cluster" rollout restart "$kind" "$name" -n "$namespace"
+      if [[ -n "$(kubectl_do "$cluster" get "$kind" "$name" -n "$namespace" --ignore-not-found=true -oname)" ]]; then
+        log_info "Will trigger a rollout restart of $kind/$name in $namespace for cluster $cluster"
+        kubectl_do "$cluster" rollout restart "$kind" "$name" -n "$namespace"
+      fi
     fi
 
   done
