@@ -132,6 +132,27 @@ customRules:
             docker.io/k8scloudprovider/cinder-csi-plugin
           )
         )
+    - macro: user_privileged_containers
+      condition: (
+          (container.image.repository = docker.io/rook/ceph and proc.cmdline = 'tini -- /usr/local/bin/rook copy-binaries --copy-to-dir /rook') or
+          (container.image.repository = docker.io/ceph/ceph and proc.cmdline startswith container) or
+          (container.image.repository = quay.io/cephcsi/cephcsi and proc.cmdline startswith container) or
+          (container.image.repository = quay.io/cephcsi/cephcsi and proc.cmdline startswith cephcsi) or
+          (container.image.repository = quay.io/ceph/ceph and proc.cmdline startswith container) or
+          (container.image.repository = quay.io/ceph/ceph and proc.cmdline startswith 'rook cmd-reporter') or
+          (container.image.repository = k8s.gcr.io/sig-storage/csi-provisioner and proc.cmdline startswith container) or
+          (container.image.repository = registry.k8s.io/sig-storage/csi-snapshotter and proc.cmdline startswith 'csi-snapshotter --csi-address=unix:///csi/csi-provisioner.sock')
+        )
+    - macro: user_known_contact_k8s_api_server_activities
+      condition: (
+          (container.image.repository = docker.io/ceph/ceph and proc.cmdline = 'rook ceph osd provision') or
+          (container.image.repository = quay.io/ceph/ceph and proc.cmdline = 'rook ceph osd provision') or
+          (container.image.repository = docker.io/rook/ceph and proc.cmdline = 'rook ceph operator') or
+          (container.image.repository = docker.io/ceph/ceph and proc.cmdline startswith 'rook cmd-reporter') or
+          (container.image.repository = quay.io/ceph/ceph and proc.cmdline startswith 'rook cmd-reporter') or
+          (container.image.repository = k8s.gcr.io/sig-storage/csi-attacher and proc.cmdline startswith 'csi-attacher') or
+          (container.image.repository = k8s.gcr.io/sig-storage/csi-provisioner and proc.cmdline startswith 'csi-provisioner')
+        )
     - macro: user_known_package_manager_in_container
       condition: (
           container.image.repository in (
@@ -160,7 +181,12 @@ customRules:
           (container.image.repository = quay.io/calico/node and proc.name = cp) or
           (container.image.repository = quay.io/kiwigrid/k8s-sidecar and proc.cmdline = 'python -u /app/sidecar.py') or
           (container.image.repository = quay.io/prometheus-operator/prometheus-config-reloader and proc.name = prometheus-conf) or
-          (container.image.repository = registry.k8s.io/dns/k8s-dns-node-cache and proc.name = node-cache)
+          (container.image.repository = registry.k8s.io/dns/k8s-dns-node-cache and proc.name = node-cache) or
+          (container.image.repository = quay.io/ceph/ceph and proc.cmdline = 'rook ceph osd provision') or
+          (container.image.repository = docker.io/ceph/ceph and proc.cmdline = 'rook ceph osd provision') or
+          (container.image.repository = docker.io/rook/ceph and proc.cmdline = 'toolbox.sh -e /usr/local/bin/toolbox.sh') or
+          (container.image.repository = docker.io/ceph/ceph and proc.cmdline = 'tini -- /rook/rook ceph osd provision') or
+          (container.image.repository = quay.io/cephcsi/cephcsi and proc.cmdline startswith cephcsi)
         )
     - macro: user_sensitive_mount_containers
       condition: (
@@ -192,6 +218,12 @@ customRules:
     - macro: user_known_shell_config_modifiers
       condition: (
           fd.name startswith "/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/" and proc.cmdline = containerd
+        )
+    - list: known_binaries_to_read_environment_variables_from_proc_files
+      items: [systemd-run, rook, udevadm]
+    - macro: user_known_mount_in_privileged_containers
+      condition: (
+          (container.image.repository=quay.io/cephcsi/cephcsi and proc.cmdline startswith 'mount -t ext4 -o bind,_netdev')
         )
 
 falcosidekick:
