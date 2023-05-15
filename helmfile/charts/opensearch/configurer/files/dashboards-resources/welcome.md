@@ -4,10 +4,13 @@
 
 Here you can find the most relevant features and changes for the last couple of releases of Compliant Kubernetes
 
+- Kubernetes PodSecurityPolcies have been replaced with Kubernetes Pod Security Standards and additional Gatekeeper Constraints and Mutations. **[v0.30]**
+  - This should not affect user applications as the default behaviour is kept, and the new default restricted Pod Security Standard is slighly less restricted than the previous restricted PodSecurityPolicy following the upstream changes.
+- Trivy Operator have replaced Starboard Operator as the online security scanning tool. **[v0.30]**
+  - This includes a new Trivy Operator dashboard and the deprecation of the old Image vulnerabilites dashboard.
+- Kubernetes Jobs will now have a default TTL of 7 days if unset to ensure resources are cleaned up. **[v0.30]**
 - The Fluentd deplyoment has changed considerably and users must ensure that their custom filters continues to work as expected. **[v0.29]**
 - Static users can now be added in OpenSearch. **[v0.29]**
-- Nginx ingress controller service now allows multiple annotations. **[v0.28]**
-- All grafana dashboards now use the default organization timezone. **[v0.28]**
 
 ## Public docs
 
