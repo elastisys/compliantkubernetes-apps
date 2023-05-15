@@ -91,6 +91,9 @@ kube-state-metrics:
     - "--custom-resource-state-config-file=/etc/config/clusterapi-metrics.yaml"
   {{- end }}
 
+  metricLabelsAllowlist:
+  - nodes=[topology.kubernetes.io/zone]
+
 prometheus-node-exporter:
   resources: {{- toYaml .Values.prometheusNodeExporter.resources | nindent 4 }}
   prometheus:

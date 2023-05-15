@@ -1,0 +1,741 @@
+{
+  "description": "Visualize how spread-out pods are across zones or nodes",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 12688,
+      "panels": [],
+      "title": "Info",
+      "type": "row"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 9,
+        "x": 0,
+        "y": 1
+      },
+      "id": 19775,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "This dashboard shows how well Pods are spread out across Nodes or Zones.\n\n1. Select a cluster.\n2. Select granularity, by node or by zone\n3. Select the worker nodes that should be serving workloads.\n4. Select the Namespace to inspect.\n5. Apply further filtering on ReplicaSet or StatefulSet to\n   drill down to those of interest.\n\n<!--\nvim: filetype=markdown\n-->\n",
+        "mode": "markdown"
+      },
+      "pluginVersion": "9.3.13",
+      "title": "How To",
+      "type": "text"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 9,
+        "x": 9,
+        "y": 1
+      },
+      "id": 26130,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "# Skew\n\nDifference between Nodes or Zones with most and least amount of Pods.\n\nFor example, if one Node has 3 Pods and another Node has 1 then the skew\nis 2. A skew of 0 or 1 is normal, as means the Pods are evenly\ndistributed across the selected Nodes.\n\n<!--\nvim: filetype=markdown\n-->",
+        "mode": "markdown"
+      },
+      "pluginVersion": "9.3.13",
+      "title": "Terms",
+      "type": "text"
+    },
+    {
+      "description": "Number of pods running on each Node or in each Zone",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 5,
+        "x": 18,
+        "y": 1
+      },
+      "id": 21500,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "count by ($granularity) (\n\tkube_pod_info{cluster=~\"$cluster\", node=~\"$node\", created_by_kind=~\"ReplicaSet|StatefulSet\", namespace=\"$namespace\", created_by_name=~\"($replicaset-.*|$statefulset)\"}\n\t* on (node)\n\tgroup_left(label_topology_kubernetes_io_zone)\n\tkube_node_labels{cluster=~\"$cluster\", node=~\"$node\"}\n)\n",
+          "instant": true,
+          "legendFormat": "{{$granularity}}",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Overall Pods Each",
+      "type": "piechart"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "id": 15369,
+      "panels": [],
+      "repeat": "replicaset",
+      "repeatDirection": "h",
+      "title": "ReplicaSet $replicaset",
+      "type": "row"
+    },
+    {
+      "description": "Difference in number of pods across zones. E.g. if one zone has 3 pods and another pod has 1 then the skew is 2. A skew of 0 or 1 is normal.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "index": 0,
+                  "text": "Balanced"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "min": -1,
+          "noValue": "🤷",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-green",
+                "value": null
+              },
+              {
+                "color": "dark-green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "dark-red",
+                "value": 2
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 10
+      },
+      "id": 31945,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "9.3.13",
+      "targets": [
+        {
+          "exemplar": false,
+          "expr": "# largest amount of pods in the zone/node\nmax by (owner_name) (\n  sum by ($granularity, owner_name) (\n    # matching pods\n    kube_pod_info{cluster=~\"$cluster\", node=~\"$node\", created_by_kind=\"ReplicaSet\", namespace=\"$namespace\"}\n    # with the name of the deployment merged in\n    * on (created_by_name)\n    group_left (owner_name)\n    label_replace(kube_replicaset_owner{cluster=~\"$cluster\", namespace=\"$namespace\", owner_name=~\"$replicaset\"}, \"created_by_name\", \"$1\", \"replicaset\", \"(.*)\")\n    # and zones merged in, if available\n    * on (node)\n    group_left(label_topology_kubernetes_io_zone)\n    kube_node_labels{cluster=~\"$cluster\", node=~\"$node\"}\n  )\n)\n-\n# smallest amount of pods in the zone/node\nmin by (owner_name) (\n  sum by ($granularity, owner_name) (\n    kube_pod_info{cluster=~\"$cluster\", node=~\"$node\", created_by_kind=~\"ReplicaSet\", namespace=\"$namespace\"}\n    * on (created_by_name)\n    group_left (owner_name)\n    label_replace(kube_replicaset_owner{cluster=~\"$cluster\", namespace=\"$namespace\", owner_name=~\"$replicaset\"}, \"created_by_name\", \"$1\", \"replicaset\", \"(.*)\")\n    * on (node)\n    group_left(label_topology_kubernetes_io_zone)\n    kube_node_labels{cluster=~\"$cluster\", node=~\"$node\"}\n    or on (node)\n    label_replace(\n      kube_node_labels{cluster=~\"$cluster\", node=~\"$node\"}*0\n    , \"owner_name\", \"$replicaset\", \"\", \"\")\n  )\n)",
+          "format": "time_series",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "{{created_by_name}}",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Skew",
+      "type": "gauge",
+      "unit": "skew"
+    },
+    {
+      "description": "Share of pods between each node or zone",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 6,
+        "y": 10
+      },
+      "id": 31436,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "count by ($granularity) (\n\tkube_pod_info{cluster=~\"$cluster\", node=~\"$node\", created_by_kind=\"ReplicaSet\", namespace=\"$namespace\"}\n  * on (created_by_name)\n  group_left (owner_name)\n  label_replace(kube_replicaset_owner{cluster=~\"$cluster\", namespace=\"$namespace\", owner_name=~\"$replicaset\"}, \"created_by_name\", \"$1\", \"replicaset\", \"(.*)\")\n\t* on (node)\n\tgroup_left(label_topology_kubernetes_io_zone)\n\tkube_node_labels{cluster=~\"$cluster\", node=~\"$node\"}\n)\n",
+          "instant": true,
+          "legendFormat": "{{$granularity}}",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Pods Each",
+      "type": "piechart"
+    },
+    {
+      "description": "Number of pods deployed on each Zone",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 40,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 10
+      },
+      "id": 2306,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "count by ($granularity, namespace, created_by_kind, owner_name) (\n  kube_pod_info{cluster=~\"$cluster\", node=~\"$node\", namespace=\"$namespace\", created_by_kind=\"ReplicaSet\"}\n  * on (created_by_name)\n  group_left(owner_name)\n  label_replace(kube_replicaset_owner{cluster=~\"$cluster\", namespace=\"$namespace\", owner_name=~\"$replicaset\"}, \"created_by_name\", \"$1\", \"replicaset\", \"(.*)\")\n  * on (node)\n  group_left(label_topology_kubernetes_io_zone)\n  kube_node_labels{cluster=~\"$cluster\", node=~\"$node\"}\n)",
+          "legendFormat": "{{created_by_kind}} {{owner_name}} in {{$granularity}}",
+          "range": true,
+          "refId": "ReplicaSet"
+        }
+      ],
+      "title": "Pods each over time",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 459
+      },
+      "id": 930,
+      "panels": [],
+      "repeat": "statefulset",
+      "repeatDirection": "h",
+      "title": "StatefulSet $statefulset",
+      "type": "row"
+    },
+    {
+      "description": "Difference in number of pods across zones. E.g. if one zone has 3 pods and another pod has 1 then the skew is 2. A skew of 0 or 1 is normal.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "index": 0,
+                  "text": "Balanced"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "min": -1,
+          "noValue": "🤷",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-green",
+                "value": null
+              },
+              {
+                "color": "dark-green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "dark-red",
+                "value": 2
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 460
+      },
+      "id": 3493,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "9.3.13",
+      "targets": [
+        {
+          "exemplar": false,
+          "expr": "max by (created_by_name) (\n  sum by ($granularity, created_by_name) (\n    kube_pod_info{cluster=~\"$cluster\", node=~\"$node\", created_by_kind=\"StatefulSet\", created_by_name=~\"$statefulset\", namespace=\"$namespace\"}\n    # join to get zone label\n    * on (node)\n    group_left(label_topology_kubernetes_io_zone)\n    kube_node_labels{cluster=~\"$cluster\", node=~\"$node\"}\n  )\n)\n-\n# same as above but with an extra join to include empty zones/nodes\nmin by (created_by_name) (\n  sum by ($granularity, created_by_name) (\n    kube_pod_info{cluster=~\"$cluster\", node=~\"$node\", created_by_kind=\"StatefulSet\", created_by_name=~\"$statefulset\", namespace=\"$namespace\"}\n    * on (node)\n    group_left(label_topology_kubernetes_io_zone)\n    kube_node_labels{cluster=~\"$cluster\", node=~\"$node\"}\n    or on ($granularity)\n    label_replace(\n      kube_node_labels{cluster=~\"$cluster\", node=~\"$node\"}*0\n    ,\"created_by_name\", \"$statefulset\", \"\", \"\")\n  )\n)\n",
+          "format": "time_series",
+          "hide": false,
+          "instant": true,
+          "interval": "",
+          "legendFormat": "{{created_by_name}}",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Skew",
+      "type": "gauge",
+      "unit": "skew"
+    },
+    {
+      "description": "Share of pods between each node or zone",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 6,
+        "y": 460
+      },
+      "id": 20264,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "count by ($granularity) (\n\tkube_pod_info{cluster=~\"$cluster\", node=~\"$node\", created_by_kind=~\"StatefulSet\", namespace=\"$namespace\", created_by_name=~\"$statefulset\"}\n\t* on (node)\n\tgroup_left(label_topology_kubernetes_io_zone)\n\tkube_node_labels{cluster=~\"$cluster\", node=~\"$node\"}\n)\n",
+          "instant": true,
+          "legendFormat": "{{$granularity}}",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Pods Each",
+      "type": "piechart"
+    },
+    {
+      "description": "Number of pods deployed on each Zone",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 40,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 460
+      },
+      "id": 8178,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "count by ($granularity, namespace, created_by_kind, created_by_name) (\nkube_pod_info{cluster=~\"$cluster\", node=~\"$node\", namespace=\"$namespace\", created_by_kind=~\"StatefulSet\", created_by_name=~\"$statefulset\"}\n* on (node)\ngroup_left(label_topology_kubernetes_io_zone)\nkube_node_labels{cluster=~\"$cluster\", node=~\"$node\"}\n)",
+          "hide": false,
+          "legendFormat": "{{created_by_kind}} {{created_by_name}} in {{$granularity}}",
+          "range": true,
+          "refId": "StatefulSet"
+        }
+      ],
+      "title": "Pods each over time",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "1m",
+  "schemaVersion": 37,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "definition": "label_values(kube_node_info,cluster)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Cluster",
+        "multi": false,
+        "name": "cluster",
+        "options": [],
+        "query": {
+          "query": "label_values(kube_node_info,cluster)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "Nodes",
+          "value": "node"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Granularity",
+        "multi": false,
+        "name": "granularity",
+        "options": [
+          {
+            "selected": true,
+            "text": "Nodes",
+            "value": "node"
+          },
+          {
+            "selected": false,
+            "text": "Zones",
+            "value": "label_topology_kubernetes_io_zone"
+          }
+        ],
+        "query": "label_topology_kubernetes_io_zone,node",
+        "queryValue": "",
+        "skipUrlSync": false,
+        "type": "custom"
+      },
+      {
+        "definition": "label_values(kube_node_labels{cluster=\"$cluster\"},node)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Node",
+        "multi": true,
+        "name": "node",
+        "options": [],
+        "query": {
+          "query": "label_values(kube_node_labels{cluster=\"$cluster\"},node)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "definition": "label_values(kube_pod_info{cluster=\"$cluster\",node=~\"$node\",created_by_kind=~\"(ReplicaSet|StatefulSet)\"}, namespace)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Namespaces",
+        "multi": false,
+        "name": "namespace",
+        "options": [],
+        "query": {
+          "query": "label_values(kube_pod_info{cluster=\"$cluster\",node=~\"$node\",created_by_kind=~\"(ReplicaSet|StatefulSet)\"}, namespace)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "definition": "label_values(kube_replicaset_owner{cluster=\"$cluster\",namespace=~\"$namespace\"}, owner_name)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "ReplicaSets",
+        "multi": true,
+        "name": "replicaset",
+        "options": [],
+        "query": {
+          "query": "label_values(kube_replicaset_owner{cluster=\"$cluster\",namespace=~\"$namespace\"}, owner_name)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "definition": "label_values(kube_pod_info{cluster=\"$cluster\",node=~\"$node\",namespace=~\"$namespace\",created_by_kind=\"StatefulSet\"}, created_by_name)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "StatefulSets",
+        "multi": true,
+        "name": "statefulset",
+        "options": [],
+        "query": {
+          "query": "label_values(kube_pod_info{cluster=\"$cluster\",node=~\"$node\",namespace=~\"$namespace\",created_by_kind=\"StatefulSet\"}, created_by_name)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query",
+        "useTags": false
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {
+    "hidden": false
+  },
+  "timezone": "",
+  "title": "Pod Skew",
+  "uid": "X873T__4k",
+  "version": 27,
+  "weekStart": ""
+}
