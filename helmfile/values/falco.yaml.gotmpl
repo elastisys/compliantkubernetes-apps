@@ -95,7 +95,11 @@ customRules:
         )
     - macro: user_expected_system_procs_network_activity_conditions
       condition: (
-          container.image.repository = quay.io/calico/cni and proc.cmdline = 'install'
+          (
+            container.image.repository = ghcr.io/elastisys/compliantkubernetes-apps-log-manager
+          ) or (
+            container.image.repository = quay.io/calico/cni and proc.cmdline = 'install'
+          )
         )
     - macro: user_known_create_files_below_dev_activities
       condition: (
@@ -143,6 +147,8 @@ customRules:
       condition: (
           container.image.repository in (
             docker.io/k8scloudprovider/cinder-csi-plugin
+          ) or (
+            container.image.repository=quay.io/cephcsi/cephcsi and proc.cmdline startswith 'mount -t ext4 -o bind,_netdev'
           )
         )
     - macro: user_privileged_containers
@@ -234,10 +240,6 @@ customRules:
         )
     - list: known_binaries_to_read_environment_variables_from_proc_files
       items: [systemd-run, rook, udevadm]
-    - macro: user_known_mount_in_privileged_containers
-      condition: (
-          (container.image.repository=quay.io/cephcsi/cephcsi and proc.cmdline startswith 'mount -t ext4 -o bind,_netdev')
-        )
 
 falcosidekick:
   enabled: {{ .Values.falco.alerts.enabled }}
