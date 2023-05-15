@@ -166,7 +166,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "elasticsearch_cluster_health_status{instance=\"$instance\",cluster=\"$cluster\",color=\"red\"}==1 or (elasticsearch_cluster_health_status{instance=\"$instance\",cluster=\"$cluster\",color=\"green\"}==1)+4 or (elasticsearch_cluster_health_status{instance=\"$instance\",cluster=\"$cluster\",color=\"yellow\"}==1)+2",
+          "expr": "elasticsearch_cluster_health_status{instance=~\"$instance\",cluster=\"$cluster\",color=\"red\"}==1 or (elasticsearch_cluster_health_status{instance=~\"$instance\",cluster=\"$cluster\",color=\"green\"}==1)+4 or (elasticsearch_cluster_health_status{instance=~\"$instance\",cluster=\"$cluster\",color=\"yellow\"}==1)+2",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -259,7 +259,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "count(elasticsearch_breakers_tripped{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}>0)",
+          "expr": "count(elasticsearch_breakers_tripped{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}>0)",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -329,7 +329,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "sum (elasticsearch_process_cpu_percent{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"} ) / count (elasticsearch_process_cpu_percent{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"} )",
+          "expr": "sum (elasticsearch_process_cpu_percent{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"} ) / count (elasticsearch_process_cpu_percent{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"} )",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -401,7 +401,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "sum (elasticsearch_jvm_memory_used_bytes{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}) / sum (elasticsearch_jvm_memory_max_bytes{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}) * 100",
+          "expr": "sum (elasticsearch_jvm_memory_used_bytes{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}) / sum (elasticsearch_jvm_memory_max_bytes{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}) * 100",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -466,7 +466,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "elasticsearch_cluster_health_number_of_nodes{instance=\"$instance\",cluster=\"$cluster\"}",
+          "expr": "elasticsearch_cluster_health_number_of_nodes{instance=~\"$instance\",cluster=\"$cluster\"}",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -531,7 +531,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "elasticsearch_cluster_health_number_of_data_nodes{instance=\"$instance\",cluster=\"$cluster\"}",
+          "expr": "elasticsearch_cluster_health_number_of_data_nodes{instance=~\"$instance\",cluster=\"$cluster\"}",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -605,7 +605,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "elasticsearch_cluster_health_number_of_pending_tasks{instance=\"$instance\",cluster=\"$cluster\"}",
+          "expr": "elasticsearch_cluster_health_number_of_pending_tasks{instance=~\"$instance\",cluster=\"$cluster\"}",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -670,7 +670,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "sum (elasticsearch_process_open_files_count{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"})",
+          "expr": "sum (elasticsearch_process_open_files_count{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"})",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -755,7 +755,7 @@
       "repeat": "shard_type",
       "targets": [
         {
-          "expr": "elasticsearch_cluster_health_active_primary_shards{instance=\"$instance\",cluster=\"$cluster\"}",
+          "expr": "elasticsearch_cluster_health_active_primary_shards{instance=~\"$instance\",cluster=\"$cluster\"}",
           "format": "time_series",
           "instant": true,
           "intervalFactor": 2,
@@ -818,7 +818,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "elasticsearch_cluster_health_active_shards{instance=\"$instance\",cluster=\"$cluster\"}",
+          "expr": "elasticsearch_cluster_health_active_shards{instance=~\"$instance\",cluster=\"$cluster\"}",
           "format": "time_series",
           "instant": true,
           "intervalFactor": 2,
@@ -881,7 +881,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "elasticsearch_cluster_health_initializing_shards{instance=\"$instance\",cluster=\"$cluster\"}",
+          "expr": "elasticsearch_cluster_health_initializing_shards{instance=~\"$instance\",cluster=\"$cluster\"}",
           "format": "time_series",
           "instant": true,
           "intervalFactor": 2,
@@ -944,7 +944,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "elasticsearch_cluster_health_relocating_shards{instance=\"$instance\",cluster=\"$cluster\"}",
+          "expr": "elasticsearch_cluster_health_relocating_shards{instance=~\"$instance\",cluster=\"$cluster\"}",
           "format": "time_series",
           "instant": true,
           "intervalFactor": 2,
@@ -1007,7 +1007,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "elasticsearch_cluster_health_delayed_unassigned_shards{instance=\"$instance\",cluster=\"$cluster\"} ",
+          "expr": "elasticsearch_cluster_health_delayed_unassigned_shards{instance=~\"$instance\",cluster=\"$cluster\"} ",
           "format": "time_series",
           "instant": true,
           "intervalFactor": 2,
@@ -1070,7 +1070,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "elasticsearch_cluster_health_unassigned_shards{instance=\"$instance\",cluster=\"$cluster\"} ",
+          "expr": "elasticsearch_cluster_health_unassigned_shards{instance=~\"$instance\",cluster=\"$cluster\"} ",
           "format": "time_series",
           "instant": true,
           "intervalFactor": 2,
@@ -1176,7 +1176,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "irate(elasticsearch_jvm_gc_collection_seconds_count{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+          "expr": "irate(elasticsearch_jvm_gc_collection_seconds_count{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -1266,7 +1266,7 @@
       "pluginVersion": "8.0.0",
       "targets": [
         {
-          "expr": "irate(elasticsearch_jvm_gc_collection_seconds_sum{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+          "expr": "irate(elasticsearch_jvm_gc_collection_seconds_sum{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -1371,7 +1371,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "irate(elasticsearch_indices_translog_operations{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_indices_translog_operations{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}",
@@ -1458,7 +1458,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "irate(elasticsearch_indices_translog_size_in_bytes{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_indices_translog_size_in_bytes{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}",
@@ -1564,7 +1564,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "elasticsearch_breakers_tripped{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
+              "expr": "elasticsearch_breakers_tripped{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: {{breaker}}",
@@ -1650,14 +1650,14 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "elasticsearch_breakers_estimated_size_bytes{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
+              "expr": "elasticsearch_breakers_estimated_size_bytes{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: {{breaker}}",
               "refId": "A"
             },
             {
-              "expr": "elasticsearch_breakers_limit_size_bytes{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
+              "expr": "elasticsearch_breakers_limit_size_bytes{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: limit for {{breaker}}",
@@ -1766,7 +1766,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "elasticsearch_os_load1{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
+              "expr": "elasticsearch_os_load1{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -1777,7 +1777,7 @@
               "step": 20
             },
             {
-              "expr": "elasticsearch_os_load5{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
+              "expr": "elasticsearch_os_load5{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -1788,7 +1788,7 @@
               "step": 20
             },
             {
-              "expr": "elasticsearch_os_load15{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
+              "expr": "elasticsearch_os_load15{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -1881,7 +1881,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "elasticsearch_process_cpu_percent{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
+              "expr": "elasticsearch_process_cpu_percent{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -1973,7 +1973,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "elasticsearch_jvm_memory_used_bytes{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
+              "expr": "elasticsearch_jvm_memory_used_bytes{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -1983,7 +1983,7 @@
               "step": 20
             },
             {
-              "expr": "elasticsearch_jvm_memory_max_bytes{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
+              "expr": "elasticsearch_jvm_memory_max_bytes{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}} max: {{area}}",
@@ -1991,7 +1991,7 @@
               "step": 20
             },
             {
-              "expr": "elasticsearch_jvm_memory_pool_peak_used_bytes{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
+              "expr": "elasticsearch_jvm_memory_pool_peak_used_bytes{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}} peak used pool: {{pool}}",
@@ -2080,7 +2080,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "elasticsearch_jvm_memory_committed_bytes{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
+              "expr": "elasticsearch_jvm_memory_committed_bytes{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}} committed: {{area}}",
@@ -2088,7 +2088,7 @@
               "step": 20
             },
             {
-              "expr": "elasticsearch_jvm_memory_max_bytes{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
+              "expr": "elasticsearch_jvm_memory_max_bytes{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}} max: {{area}}",
@@ -2206,7 +2206,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "1-(elasticsearch_filesystem_data_available_bytes{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}/elasticsearch_filesystem_data_size_bytes{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"})",
+              "expr": "1-(elasticsearch_filesystem_data_available_bytes{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}/elasticsearch_filesystem_data_size_bytes{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"})",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -2296,7 +2296,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "irate(elasticsearch_transport_tx_size_bytes_total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_transport_tx_size_bytes_total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: sent ",
@@ -2304,7 +2304,7 @@
               "step": 20
             },
             {
-              "expr": "-irate(elasticsearch_transport_rx_size_bytes_total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "-irate(elasticsearch_transport_rx_size_bytes_total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: received",
@@ -2413,7 +2413,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "elasticsearch_indices_docs{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
+              "expr": "elasticsearch_indices_docs{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -2503,7 +2503,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "irate(elasticsearch_indices_indexing_index_total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_indices_indexing_index_total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -2594,7 +2594,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "irate(elasticsearch_indices_docs_deleted{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_indices_docs_deleted{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -2685,7 +2685,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "rate(elasticsearch_indices_merges_docs_total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "rate(elasticsearch_indices_merges_docs_total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -2775,7 +2775,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "irate(elasticsearch_indices_merges_total_size_bytes_total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_indices_merges_total_size_bytes_total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -2885,7 +2885,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "irate(elasticsearch_indices_search_query_time_seconds{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval]) ",
+              "expr": "irate(elasticsearch_indices_search_query_time_seconds{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval]) ",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -2975,7 +2975,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "irate(elasticsearch_indices_indexing_index_time_seconds_total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_indices_indexing_index_time_seconds_total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -3065,7 +3065,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "irate(elasticsearch_indices_merges_total_time_seconds_total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_indices_merges_total_time_seconds_total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -3149,7 +3149,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "irate(elasticsearch_indices_store_throttle_time_seconds_total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_indices_store_throttle_time_seconds_total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -3259,7 +3259,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "rate(elasticsearch_indices_indexing_index_total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "rate(elasticsearch_indices_indexing_index_total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -3269,7 +3269,7 @@
               "step": 10
             },
             {
-              "expr": "rate(elasticsearch_indices_search_query_total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "rate(elasticsearch_indices_search_query_total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: query",
@@ -3277,7 +3277,7 @@
               "step": 10
             },
             {
-              "expr": "rate(elasticsearch_indices_search_fetch_total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "rate(elasticsearch_indices_search_fetch_total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: fetch",
@@ -3285,7 +3285,7 @@
               "step": 10
             },
             {
-              "expr": "rate(elasticsearch_indices_merges_total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "rate(elasticsearch_indices_merges_total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: merges",
@@ -3293,7 +3293,7 @@
               "step": 10
             },
             {
-              "expr": "rate(elasticsearch_indices__total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "rate(elasticsearch_indices__total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: refresh",
@@ -3301,7 +3301,7 @@
               "step": 10
             },
             {
-              "expr": "rate(elasticsearch_indices_flush_total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "rate(elasticsearch_indices_flush_total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: flush",
@@ -3309,7 +3309,7 @@
               "step": 10
             },
             {
-              "expr": "rate(elasticsearch_indices_get_exists_total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "rate(elasticsearch_indices_get_exists_total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: get_exists",
@@ -3317,7 +3317,7 @@
               "step": 10
             },
             {
-              "expr": "rate(elasticsearch_indices_get_missing_total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "rate(elasticsearch_indices_get_missing_total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: get_missing",
@@ -3325,7 +3325,7 @@
               "step": 10
             },
             {
-              "expr": "rate(elasticsearch_indices_get_tota{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "rate(elasticsearch_indices_get_tota{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: get",
@@ -3333,7 +3333,7 @@
               "step": 10
             },
             {
-              "expr": "rate(elasticsearch_indices_indexing_delete_total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "rate(elasticsearch_indices_indexing_delete_total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: indexing_delete",
@@ -3421,7 +3421,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "irate(elasticsearch_indices_indexing_index_time_seconds_total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_indices_indexing_index_time_seconds_total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -3431,7 +3431,7 @@
               "step": 10
             },
             {
-              "expr": "irate(elasticsearch_indices_search_query_time_seconds{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_indices_search_query_time_seconds{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: query",
@@ -3439,7 +3439,7 @@
               "step": 10
             },
             {
-              "expr": "irate(elasticsearch_indices_search_fetch_time_seconds{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_indices_search_fetch_time_seconds{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: fetch",
@@ -3447,7 +3447,7 @@
               "step": 10
             },
             {
-              "expr": "irate(elasticsearch_indices_merges_total_time_seconds_total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_indices_merges_total_time_seconds_total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: merges",
@@ -3455,7 +3455,7 @@
               "step": 10
             },
             {
-              "expr": "irate(elasticsearch_indices_refresh_time_seconds_total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_indices_refresh_time_seconds_total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: refresh",
@@ -3463,7 +3463,7 @@
               "step": 10
             },
             {
-              "expr": "irate(elasticsearch_indices_flush_time_seconds{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_indices_flush_time_seconds{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: flush",
@@ -3471,7 +3471,7 @@
               "step": 10
             },
             {
-              "expr": "irate(elasticsearch_indices_get_exists_time_seconds{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_indices_get_exists_time_seconds{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: get_exists",
@@ -3479,7 +3479,7 @@
               "step": 10
             },
             {
-              "expr": "irate(elasticsearch_indices_get_time_seconds{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_indices_get_time_seconds{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: get_time",
@@ -3487,7 +3487,7 @@
               "step": 10
             },
             {
-              "expr": "irate(elasticsearch_indices_get_missing_time_seconds{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_indices_get_missing_time_seconds{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: get_missing",
@@ -3495,7 +3495,7 @@
               "step": 10
             },
             {
-              "expr": "irate(elasticsearch_indices_indexing_delete_time_seconds_total{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_indices_indexing_delete_time_seconds_total{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: indexing_delete",
@@ -3503,7 +3503,7 @@
               "step": 10
             },
             {
-              "expr": "irate(elasticsearch_indices_get_time_seconds{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_indices_get_time_seconds{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: get",
@@ -3610,7 +3610,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "irate(elasticsearch_thread_pool_rejected_count{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_thread_pool_rejected_count{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: {{ type }}",
@@ -3697,7 +3697,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "elasticsearch_thread_pool_active_count{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
+              "expr": "elasticsearch_thread_pool_active_count{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: {{ type }}",
@@ -3784,7 +3784,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "elasticsearch_thread_pool_active_count{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
+              "expr": "elasticsearch_thread_pool_active_count{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: {{ type }}",
@@ -3871,7 +3871,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "irate(elasticsearch_thread_pool_completed_count{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "irate(elasticsearch_thread_pool_completed_count{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}: {{ type }}",
@@ -3979,7 +3979,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "elasticsearch_indices_fielddata_memory_size_bytes{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
+              "expr": "elasticsearch_indices_fielddata_memory_size_bytes{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -4069,7 +4069,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "rate(elasticsearch_indices_fielddata_evictions{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "rate(elasticsearch_indices_fielddata_evictions{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -4159,7 +4159,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "elasticsearch_indices_query_cache_memory_size_bytes{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
+              "expr": "elasticsearch_indices_query_cache_memory_size_bytes{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -4249,7 +4249,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "rate(elasticsearch_indices_query_cache_evictions{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "rate(elasticsearch_indices_query_cache_evictions{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -4339,7 +4339,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "rate(elasticsearch_indices_filter_cache_evictions{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
+              "expr": "rate(elasticsearch_indices_filter_cache_evictions{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}[$interval])",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -4448,7 +4448,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "elasticsearch_indices_segments_count{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
+              "expr": "elasticsearch_indices_segments_count{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}",
@@ -4534,7 +4534,7 @@
           "pluginVersion": "8.0.0",
           "targets": [
             {
-              "expr": "elasticsearch_indices_segments_memory_bytes{instance=\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
+              "expr": "elasticsearch_indices_segments_memory_bytes{instance=~\"$instance\",cluster=\"$cluster\",name=~\"$name\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{name}}",
@@ -6890,7 +6890,7 @@
         "name": "name",
         "options": [],
         "query": {
-          "query": "label_values(elasticsearch_indices_docs{instance=\"$instance\",cluster=\"$cluster\", name!=\"\"},name)",
+          "query": "label_values(elasticsearch_indices_docs{instance=~\"$instance\",cluster=\"$cluster\", name!=\"\"},name)",
           "refId": "prometheus-sc-name-Variable-Query"
         },
         "refresh": 1,
@@ -6914,9 +6914,9 @@
         "description": null,
         "error": null,
         "hide": 0,
-        "includeAll": false,
+        "includeAll": true,
         "label": "Source of metrics",
-        "multi": false,
+        "multi": true,
         "name": "instance",
         "options": [],
         "query": {
