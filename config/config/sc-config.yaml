@@ -1054,6 +1054,17 @@ alerts:
     name: set-me-if-enabled
   slack:
     channel: set-me-if-enabled
+    # Alertmanager templating: https://prometheus.io/docs/alerting/notifications/ 
+    customTemplate: {}
+    ## Example:
+    # customTemplate: |-
+    #   *Common summary:* {{ .CommonAnnotations.summary }}
+    #   *Common description:* {{ .CommonAnnotations.description }}
+
+    #   *Individual alerts below*
+    #   {{ range .Alerts }}
+    #   *Status:* {{ .Status }}
+    #   {{ end }}
   opsGenie:
     apiUrl: https://api.eu.opsgenie.com
 
