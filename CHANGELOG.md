@@ -82,6 +82,7 @@
 - Added `--logging-enabled` flag for test scripts and disabled logging by default
 - Add document splits to helmfiles to prepare support for helmfile v0.150+
 - Added option to use nodePort for ingress-nginx.
+- Added falco filters for rook-ceph
 
 ### Fixed
 
