@@ -3,6 +3,7 @@
 ### Added
 
 - Extra component versions can be added in the Welcome dashboard via config
+- Probes from WC to SC to monitor how well clusters reach each other
 
 ### Changed
 
