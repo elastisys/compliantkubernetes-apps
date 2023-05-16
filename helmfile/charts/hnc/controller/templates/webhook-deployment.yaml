@@ -13,6 +13,11 @@ spec:
     matchLabels:
       {{- include "hnc.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: {{ .Chart.Name }}-webhook
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 0%
   template:
     metadata:
       {{- with .Values.podAnnotations }}
