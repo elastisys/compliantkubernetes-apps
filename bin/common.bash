@@ -104,10 +104,7 @@ yq_read_block() {
     source=$1
     value=$2
     # shellcheck disable=SC2140
-    yq4 ".. | select(tag != \"!!map\" and . == \"${value}\") | path |
-    with(.[]; . = (\"\\\"\" + .) + \"\\\"\" ) |
-    \".\" + join \".\"" "${source}" | \
-             sed -r 's/\."[0-9]+".*//' | sed -r 's/\\//g' | uniq
+    yq4 ".. | select(tag != \"!!map\" and . == \"${value}\") | path | with(.[]; . = (\"\\\"\" + .) + \"\\\"\" ) | \".\" + join \".\"" "${source}" | sed -r 's/\."[0-9]+".*//' | sed -r 's/\\//g' | uniq
 }
 
 # Copies a block from one file to another
@@ -125,13 +122,7 @@ yq_copy_commons() {
     source2=$2
     target=$3
 
-    keys=$(yq_merge "${source1}" "${source2}" | \
-           yq4 '.. | select(tag != "!!map") | path |
-           with(.[]; . = ("\"" + .) + "\"" ) |
-           join "."' | \
-           sed -r 's/\."[0-9]+".*//' | \
-           sed -r 's/\\//g' | \
-           uniq)
+    keys=$(yq_merge "${source1}" "${source2}" | yq4 '.. | select(tag != "!!map") | path | with(.[]; . = ("\"" + .) + "\"" ) | join "."' | sed -r 's/\."[0-9]+".*//' | sed -r 's/\\//g' | uniq)
     for key in ${keys}; do
         compare=$(diff <(yq4 -oj ".${key}" "${source1}" ) <(yq4 -oj ".${key}" "${source2}" ) || true)
         if [[ -z "${compare}" ]]; then
@@ -151,10 +142,7 @@ yq_copy_changes() {
     source2=$2
     target=$3
 
-    keys=$(yq4 '.. | select(tag != "!!map") | path |
-           with(.[]; . = ("\"" + .) + "\"" ) |
-           join "."' "$source2" | \
-           sed -r 's/\."[0-9]+".*//' | uniq)
+    keys=$(yq4 '.. | select(tag != "!!map") | path | with(.[]; . = ("\"" + .) + "\"" ) | join "."' "$source2" | sed -r 's/\."[0-9]+".*//' | uniq)
     for key in ${keys}; do
         compare=$(diff <(yq4 -oj ".${key}" "${source1}" ) <(yq4 -oj ".${key}" "${source2}" ) || true)
         if [[ -n "${compare}" ]]; then
@@ -318,20 +306,20 @@ validate_config() {
 
     if [[ $1 == "sc" ]]; then
         check_config "${config_template_path}/config/common-config.yaml" \
-                     "${config_template_path}/config/sc-config.yaml" \
-                     "${config_template_path}/secrets/sc-secrets.yaml"
+            "${config_template_path}/config/sc-config.yaml" \
+            "${config_template_path}/secrets/sc-secrets.yaml"
         yq_merge "${config_template_path}/config/common-config.yaml" \
-                 "${config_template_path}/config/sc-config.yaml" \
-                  > "${template_file}"
+            "${config_template_path}/config/sc-config.yaml" \
+            > "${template_file}"
         validate "${config[config_file_sc]}" "${template_file}"
         validate "${secrets[secrets_file]}" "${config_template_path}/secrets/sc-secrets.yaml"
     elif [[ $1 == "wc" ]]; then
         check_config "${config_template_path}/config/common-config.yaml" \
-                     "${config_template_path}/config/wc-config.yaml" \
-                     "${config_template_path}/secrets/wc-secrets.yaml"
+            "${config_template_path}/config/wc-config.yaml" \
+            "${config_template_path}/secrets/wc-secrets.yaml"
         yq_merge "${config_template_path}/config/common-config.yaml" \
-                 "${config_template_path}/config/wc-config.yaml" \
-                  > "${template_file}"
+            "${config_template_path}/config/wc-config.yaml" \
+            > "${template_file}"
         validate "${config[config_file_wc]}" "${template_file}"
         validate "${secrets[secrets_file]}" "${config_template_path}/secrets/wc-secrets.yaml"
     else
@@ -388,6 +376,7 @@ append_trap() {
         return
     fi
 
+    # shellcheck disable=SC2317
     previous_trap_cmd() { printf '%s\n' "$3"; }
 
     new_trap() {
@@ -411,8 +400,7 @@ sops_config_write_fingerprints() {
 
 # Encrypt stdin to file. If the file already exists it's overwritten.
 sops_encrypt_stdin() {
-    sops --config "${sops_config}" -e --input-type "${1}" \
-         --output-type "${1}" /dev/stdin > "${2}"
+    sops --config "${sops_config}" -e --input-type "${1}" --output-type "${1}" /dev/stdin > "${2}"
 }
 
 # Encrypt a file in place.
@@ -525,7 +513,7 @@ with_kubeconfig() {
 with_s3cfg() {
     s3cfg="${1}"
     shift
-    # TODO: Can't use a FIFO since the s3cfg is read mulitiple times when a
+    # TODO: Can't use a FIFO since the s3cfg is read multiple times when a
     #       bucket needs to be created.
     sops_exec_file_no_fifo "${s3cfg}" 'S3COMMAND_CONFIG_FILE="{}" '"${*}"
 }

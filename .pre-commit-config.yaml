@@ -1,15 +1,3 @@
-# Docs: https://pre-commit.com/
-#
-# Quickstart:
-# $ pip3 install pre-commit
-# $ pre-commit install
-# < edit json, yaml, (ba)sh, add trailing whitespace etc >
-# $ git add .
-# $ git commit
-#
-# If the pre-commit hook is broken, it can be removed by deleting the file
-# at .git/hooks/pre-commit
-
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
@@ -30,17 +18,20 @@ repos:
       - id: trailing-whitespace
         exclude: ^helmfile/upstream/
 
-  # - repo: https://github.com/codespell-project/codespell
-  #   rev: v2.2.4
-  #   hooks:
-  #     - id: codespell
-  #       exclude: ^helmfile/upstream/
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.4
+    hooks:
+      - id: codespell
+        exclude: ^helmfile/upstream/|^helmfile/charts/hnc/config-and-crds/crds/
+        args:
+          - -L
+          - fpr
 
-  # - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
-  #   rev: 2.7.1
-  #   hooks:
-  #     - id: editorconfig-checker
-  #       exclude: ^helmfile/upstream/|^helmfile/charts/grafana-ops/dashboards/|^LICENSE$
+  - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
+    rev: 2.7.1
+    hooks:
+      - id: editorconfig-checker
+        exclude: ^.gitmodules$|^helmfile/upstream/|^helmfile/charts/grafana-ops/dashboards/|^LICENSE$
 
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
     rev: 3.0.0
@@ -48,10 +39,11 @@ repos:
       - id: markdownlint
         exclude: ^helmfile/upstream/
 
-  # - repo: https://github.com/koalaman/shellcheck-precommit
-  #   rev: v0.9.0
-  #   hooks:
-  #     - id: shellcheck
-  #       exclude: ^helmfile/upstream/|^helmfile/charts/opensearch/configurer/files/configurer.sh$
-  #       args:
-  #       - --external-sources
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: v0.9.0
+    hooks:
+      - id: shellcheck
+        exclude: ^helmfile/upstream/|^helmfile/charts/opensearch/configurer/files/configurer.sh$
+        args:
+        - --color=always
+        - --external-sources

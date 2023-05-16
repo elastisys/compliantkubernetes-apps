@@ -19,11 +19,11 @@ add_affinity() {
 }
 
 for i in ${sc_config} ${wc_config} ${common_config}; do
-    if [[ ! -f "$i" ]]; then
-        echo "$i does not exist, skipping."
-        exit 1
-    else
-       add_toleration 'node-role.kubernetes.io/master' 'node-role.kubernetes.io/control-plane' "$i"
-       add_affinity 'node-role.kubernetes.io/master' 'node-role.kubernetes.io/control-plane' "$i"
-    fi
+  if [[ ! -f "$i" ]]; then
+    echo "$i does not exist, skipping."
+    exit 1
+  else
+    add_toleration 'node-role.kubernetes.io/master' 'node-role.kubernetes.io/control-plane' "$i"
+    add_affinity 'node-role.kubernetes.io/master' 'node-role.kubernetes.io/control-plane' "$i"
+  fi
 done

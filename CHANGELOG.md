@@ -175,7 +175,7 @@
 - The update-ips script can now fetch Calico Wireguard IPs
 - The update-ips script can now fetch object storage sync destination IPs
 - The test scripts can now always access the kubeconfig
-- The OpenSearch network policies now properly work with dedicated nodes and shapshots enabled
+- The OpenSearch network policies now properly work with dedicated nodes and snapshots enabled
 - The `clean-sc` script now patches any pending challenges which would prevent the removal of certain namespaces
 - Networkpolicies now contain checks to prevent allowing all traffic when ips/ports are empty.
 
@@ -247,15 +247,15 @@
 
 ### Added
 
--  Network policies for `coredns` and `dnsAutoscaler`.
+- Network policies for `coredns` and `dnsAutoscaler`.
 - Starboard resources will now be removed when running the cleanup scripts - `scripts/clean-{sc,wc}.sh`.
 - Added templating for wc Velero bucket prefix.
 - Network policies for `rook-ceph` (disabled by default).
 - Network policies for `csi-cinder`, `csi-upcloud`, `metrics-server` and `snapshot-controller`.
 - Added alert for less kubelets than nodes in the cluster.
 - Added alert for object limits in bucket
-	- Limits: size and object count.
-	- Consult with your cloud provider for specific s3 limits.
+  - Limits: size and object count.
+  - Consult with your cloud provider for specific s3 limits.
 
 ### Removed
 
@@ -377,7 +377,7 @@
 
 ### Release notes
 
-- Automated CIS tests are preformed on each node using kube-bench
+- Automated CIS tests are performed on each node using kube-bench
 - Harbor upgraded to v2.6.0. Requires a harbor restore.
 
 ### Updated
@@ -497,12 +497,12 @@
 
 - Update the Velero plugin for AWS to v1.3.1
 - Updated ingress-nginx helm chart to v4.1.3 and ingress-nginx controller image to v1.2.1
-   > **Breaking changes**
-      - deprecated http2_recv_timeout in favor of client_header_timeout (client-header-timeout);
-      - deprecated http2_max_field_size (http2-max-field-size) and http2_max_header_size (http2-max-header-size) in favor of large_client_header_buffers (large-client-header-buffers);
-      - deprecated http2_idle_timeout and http2_max_requests (http2-max-requests) in favor of keepalive_timeout (upstream-keepalive-timeout?) and keepalive_requests (upstream-keepalive-requests?) respectively;
-      - added an option to jail/chroot the nginx process, inside the controller container, is being introduced;
-      - implemented an object deep inspector. The inspection is a walk through of all the spec, checking for possible attempts to escape configs.
+  > **Breaking changes**
+  > - deprecated http2_recv_timeout in favor of client_header_timeout (client-header-timeout);
+  > - deprecated http2_max_field_size (http2-max-field-size) and http2_max_header_size (http2-max-header-size) in favor of large_client_header_buffers (large-client-header-buffers);
+  > - deprecated http2_idle_timeout and http2_max_requests (http2-max-requests) in favor of keepalive_timeout (upstream-keepalive-timeout?) and keepalive_requests (upstream-keepalive-requests?) respectively;
+  > - added an option to jail/chroot the nginx process, inside the controller container, is being introduced;
+  > - implemented an object deep inspector. The inspection is a walk through of all the spec, checking for possible attempts to escape configs.
 - Updated the prometheus-alerts chart alerts and rules
 
 ### Changed
@@ -674,54 +674,54 @@
   Kured is disabled by default.
 - Storageclass installation is not longer part of the bootstrap step.
   If you have the nfs-provisioner or the local-pv-provisioner installed, they will be left untouched when upgrading.
-  You are responsible for managing them and/or removing them, and any unsused storageClasses.
+  You are responsible for managing them and/or removing them, and any unused storageClasses.
 - InfluxDB is deprecated and Thanos is now enabled by default.
-   - With the removal of InfluxDB, the backups and buckets can eventually be removed.
+  - With the removal of InfluxDB, the backups and buckets can eventually be removed.
 - Running without object storage is no longer supported since it is required for Thanos.
-   - The dev flavor is now updated to use s3 by default
+  - The dev flavor is now updated to use s3 by default
 
 ### Updated
- - Upgraded nginx-ingress helm chart to `v4.0.17`, which upgrade nginx-ingress to `v1.1.1`.
-    When upgrading an ingressClass object called `nginx` will be installed, this class has been set as the default class in Kubernetes.
-    Ingress-nginx has been configured to still handle existing ingress objects that do not specify any `ingressClassName`.
-    Read more on the ingressClassName changes [here](https://kubernetes.github.io/ingress-nginx/#what-is-ingressclassname-field).
- - Upgraded starboard-operator helm chart to `v0.9.1`, upgrading starboard-operator to `v0.14.1`
+- Upgraded nginx-ingress helm chart to `v4.0.17`, which upgrade nginx-ingress to `v1.1.1`.
+  When upgrading an ingressClass object called `nginx` will be installed, this class has been set as the default class in Kubernetes.
+  Ingress-nginx has been configured to still handle existing ingress objects that do not specify any `ingressClassName`.
+  Read more on the ingressClassName changes [here](https://kubernetes.github.io/ingress-nginx/#what-is-ingressclassname-field).
+- Upgraded starboard-operator helm chart to `v0.9.1`, upgrading starboard-operator to `v0.14.1`
 
 ### Changed
 
- - Exposed sc-log-retention's resource requests.
- - Persist Dex state in Kubernetes.
- - Upgrade gatekeeper helm chart to `v3.7.0`, which also upgrades gatekeeper to `v3.7.0`.
- - Updated opensearch helm chart to version `1.7.1`, which upgrades opensearch  to `v1.2.4`.
- - Renamed release `blackbox` to `prometheus-blackbox-exporter`.
- - Added new panel to backup dashboard to reflect partial, failed and successful velero backups
- - Alertmanager group-by parameters was removed and replaced by the special value `...`
-     See https://github.com/prometheus/alertmanager/blob/ec83f71/docs/configuration.md#route for more information
- - Exposed opensearch-slm-job max request seconds for curl.
- - Made opensearch-slm-job more verbose when using curl.
- - Update kubeapi-metrics ingress api version to `networking.k8s.io/v1`.
- - Fluentd can now properly handle and write orphaned documents to Opensearch when using the index per namespace feature.
-  The orphaned documents will be written to `.orphaned-...` indices, which a user does not have access to read from.
- - Add `ingressClassName` in ingresses where that configuration option is available.
- - Upgrade velero helm chart to `v2.27.3`, which also upgrades velero to `v1.7.1`.
- - Upgrade prometheus-elasticsearch-exporter helm chart to v4.11.0 and prometheus-elasticsearch-exporter itself to v1.3.0
- - Exposed options for starboard-operator to control the number of jobs it generates and to allow for it to be disabled.
- - Added the new OPA policy - disallowed the latest image tag.
- - Moved `user.alertmanager.group_by` to `prometheus.alertmanagerSpec.groupBy` in `sc-config.yaml`
- - Moved `user.grafana.userGroups` to `user.grafana.oidc.userGroups` in `sc-config.yaml`
- - kubeconfig.bash have been edited to work with the new 'secret' structure.
- - memory limit for thanos receiveDistributor and pvc size for thanos receiver
- - Increased cpu requests and limits for kube-state-metrics
- - Thanos is now enabled by default.
- - Disabled default kube-prometheus-stack rules and copied them over to prometheus alerts
-   - Modified rules to allow for different labels for alert and record rules, and to pass the cluster label through aggregations
-   - Unused rules have been dropped
- - Grouped thanos charts
- - Configured thanos-ruler so it is enabled by default, runs as an HA pair without persistence, and dynamically reloads its rules on changes
- - Changed dashboards previously defaulting to wc-reader to default to "Thanos All"
- - Changed service cluster prometheus to use an external label instead of service monitor relabeling and write relabeling
- - Increased resources for thanos receiveDistributor, compactor and storegateway components
- - Exposed harbor components replicas in config
+- Exposed sc-log-retention's resource requests.
+- Persist Dex state in Kubernetes.
+- Upgrade gatekeeper helm chart to `v3.7.0`, which also upgrades gatekeeper to `v3.7.0`.
+- Updated opensearch helm chart to version `1.7.1`, which upgrades opensearch  to `v1.2.4`.
+- Renamed release `blackbox` to `prometheus-blackbox-exporter`.
+- Added new panel to backup dashboard to reflect partial, failed and successful velero backups
+- Alertmanager group-by parameters was removed and replaced by the special value `...`
+  See https://github.com/prometheus/alertmanager/blob/ec83f71/docs/configuration.md#route for more information
+- Exposed opensearch-slm-job max request seconds for curl.
+- Made opensearch-slm-job more verbose when using curl.
+- Update kubeapi-metrics ingress api version to `networking.k8s.io/v1`.
+- Fluentd can now properly handle and write orphaned documents to Opensearch when using the index per namespace feature.
+The orphaned documents will be written to `.orphaned-...` indices, which a user does not have access to read from.
+- Add `ingressClassName` in ingresses where that configuration option is available.
+- Upgrade velero helm chart to `v2.27.3`, which also upgrades velero to `v1.7.1`.
+- Upgrade prometheus-elasticsearch-exporter helm chart to v4.11.0 and prometheus-elasticsearch-exporter itself to v1.3.0
+- Exposed options for starboard-operator to control the number of jobs it generates and to allow for it to be disabled.
+- Added the new OPA policy - disallowed the latest image tag.
+- Moved `user.alertmanager.group_by` to `prometheus.alertmanagerSpec.groupBy` in `sc-config.yaml`
+- Moved `user.grafana.userGroups` to `user.grafana.oidc.userGroups` in `sc-config.yaml`
+- kubeconfig.bash have been edited to work with the new 'secret' structure.
+- memory limit for thanos receiveDistributor and pvc size for thanos receiver
+- Increased cpu requests and limits for kube-state-metrics
+- Thanos is now enabled by default.
+- Disabled default kube-prometheus-stack rules and copied them over to prometheus alerts
+  - Modified rules to allow for different labels for alert and record rules, and to pass the cluster label through aggregations
+  - Unused rules have been dropped
+- Grouped thanos charts
+- Configured thanos-ruler so it is enabled by default, runs as an HA pair without persistence, and dynamically reloads its rules on changes
+- Changed dashboards previously defaulting to wc-reader to default to "Thanos All"
+- Changed service cluster prometheus to use an external label instead of service monitor relabeling and write relabeling
+- Increased resources for thanos receiveDistributor, compactor and storegateway components
+- Exposed harbor components replicas in config
 
 ### Fixed
 - Opensearch unable to parse `"source":{}` when gatekeeper starts up. The log including `"source":{}` from gatekeeper is excluded for now.
@@ -796,7 +796,7 @@
 
 - The falco grafana dashboard now shows the misbehaving pod and instance for traceability
 - Reworked configuration handling to use a common config in addition to the service and workload configs. This is handled in the same way as the sc and wc configs, meaning it is split between a default and an override config. Running `init` will update this configuration structure, update and regenerate any missing configs, as well as merge common options from sc and wc overrides into the common override.
-- Updated fluentd config to adhere better with upsream configuration
+- Updated fluentd config to adhere better with upstream configuration
 - Fluentd now logs reasons for 400 errors from elasticsearch
 - Enabled the default rules from kube-prometheus-stack and deleted them from `prometheus-alerts` chart [#681](https://github.com/elastisys/compliantkubernetes-apps/pull/681)
 - Enabled extra api server metrics [#681](https://github.com/elastisys/compliantkubernetes-apps/pull/681)
@@ -812,7 +812,7 @@
     The impact will be minimal as the function of the API will stay mostly the same, and the configuration will basically works as is, although renamed.
     The user experience will change slightly as this will replace Kibana with OpenSearch Dashboards, however the functionality remains the same.
   - OpenSearch is compatible with existing tools supporting ODFE using a compatibility setting, however this will only last for version 1.x.
-    Newer versions of offical Elasticsearch tools and libraries already contain checks against unofficial Elasticsearch and will therefore not work for either ODFE or OpenSearch.
+    Newer versions of official Elasticsearch tools and libraries already contain checks against unofficial Elasticsearch and will therefore not work for either ODFE or OpenSearch.
     Older versions exists that will still work, and the OpenSearch project is working on providing their own set of tools and libraries.
   - This will cause downtime for Elasticsearch and Kibana during the migration, and OpenSearch and OpenSearch Dashboards will replace them.
     Data will be kept by the migration steps, except security settings, any manually created user or roles must be manually handled.
@@ -869,14 +869,14 @@
 - Check out the [upgrade guide](migration/v0.17.x-v0.18.x/upgrade-apps.md) for a complete set of instructions needed to upgrade.
 - ingress-nginx chart was upgraded from 2.10.0 to 3.39.0 and ingress-nginx-controller was upgraded from v0.28.0 to v.0.49.3. During the upgrade the services may be unavailable for short period of time.
   With this version:
-     - set allow-snippet-annotations: “false” to mitigate [CVE-2021-25742](https://github.com/kubernetes/ingress-nginx/issues/7837)
-     - only ValidatingWebhookConfiguration AdmissionReviewVersions v1 is supported
-     - the nginx-ingress-controller repository was deprecated
-     - access-log-path setting is deprecated
-     - server-tokens, ssl-session-tickets, use-gzip, upstream-keepalive-requests, upstream-keepalive-connections have new defaults
-     - TLSv1.3 is enabled by default
-     - Add linux node selector as default
-     - Update versions of components for base image, including nginx-http-auth-digest, ngx_http_substitutions_filter_module, nginx-opentracing, opentracing-cpp, ModSecurity-nginx, yaml-cpp, msgpack-c, lua-nginx-module, stream-lua-nginx-module, lua-upstream-nginx-module, luajit2, dd-opentracing-cpp, ngx_http_geoip2_module, nginx_ajp_module, lua-resty-string, lua-resty-balancer, lua-resty-core, lua-cjson, lua-resty-cookie, lua-resty-lrucache, lua-resty-dns, lua-resty-http, lua-resty-memcached, lua-resty-ipmatcher
+  - set allow-snippet-annotations: “false” to mitigate [CVE-2021-25742](https://github.com/kubernetes/ingress-nginx/issues/7837)
+  - only ValidatingWebhookConfiguration AdmissionReviewVersions v1 is supported
+  - the nginx-ingress-controller repository was deprecated
+  - access-log-path setting is deprecated
+  - server-tokens, ssl-session-tickets, use-gzip, upstream-keepalive-requests, upstream-keepalive-connections have new defaults
+  - TLSv1.3 is enabled by default
+  - Add linux node selector as default
+  - Update versions of components for base image, including nginx-http-auth-digest, ngx_http_substitutions_filter_module, nginx-opentracing, opentracing-cpp, ModSecurity-nginx, yaml-cpp, msgpack-c, lua-nginx-module, stream-lua-nginx-module, lua-upstream-nginx-module, luajit2, dd-opentracing-cpp, ngx_http_geoip2_module, nginx_ajp_module, lua-resty-string, lua-resty-balancer, lua-resty-core, lua-cjson, lua-resty-cookie, lua-resty-lrucache, lua-resty-dns, lua-resty-http, lua-resty-memcached, lua-resty-ipmatcher
 
 ### Updated
 
@@ -897,7 +897,7 @@
   2. add differenet values for "labelKey" so we can separate the user and ops dashboards in Grafana
   3. the chart template to automatically load the dashboards enabled in the values.yaml file
 - grafana-user.yaml.gotmpl:
-  1. grafana-user.yaml.gotmpl to load only the ConfiMaps that have the value of "1" fron "labelKey" [#587](https://github.com/elastisys/compliantkubernetes-apps/pull/587)
+  1. grafana-user.yaml.gotmpl to load only the ConfiMaps that have the value of "1" from "labelKey" [#587](https://github.com/elastisys/compliantkubernetes-apps/pull/587)
   2. added prometheus-sc as a datasource to user-grafana
 - enabled podSecurityPolicy in falco, fluentd, cert-manager, prometheus-elasticsearch-exporter helm charts
 - ingress-nginx chart was upgraded from 2.10.0 to 3.39.0. [#640](https://github.com/elastisys/compliantkubernetes-apps/pull/640)
@@ -916,7 +916,7 @@
   > **_Note:_** The upgrade will fail while disabling the hostNetwork when LoadBalancer type service is used, this is due removing some privileges from the PSP. See the migration steps for more details.
 - Prometheus alert and servicemonitor was separated
 - Default user alertmanager namespace changed from monitoring to alertmanager.
-- Reworked configuration handling to keep a read-only default with specifics for the environment and a seperate editable override config for main configuration.
+- Reworked configuration handling to keep a read-only default with specifics for the environment and a separate editable override config for main configuration.
 - Integrated secrets generation script into `ck8s init` which will by default generate password and hashes when creating a new `secrets.yaml`, and can be forced to generate new ones with the flag `--generate-new-secrets`.
 - Increased metricsserver resource limits.
 - Increased cert-managers resource limits.
@@ -967,7 +967,7 @@
 ### Release notes
 
 - Check out the [upgrade guide](migration/v0.16.x-v0.17.x/upgrade-apps.md) for a complete set of instructions needed to upgrade.
-- Changed from depricated nfs provisioner to the new one. Migration is automatic (no manual intervention)
+- Changed from deprecated nfs provisioner to the new one. Migration is automatic (no manual intervention)
 
 ### Changed
 
@@ -1026,7 +1026,7 @@ Grafana 8.0.1 and Prometheus 2.27.1.
 - Changed the way connectors are provided to dex
 - Default retention values for other* and authlog* are changed to fit the needs better
 - CK8S version validation accepts version number if exactly at the release tag, otherwise commit hash of current commit. "any" can still be used to disable validation.
-- The node-local-dns chart have been updated to match the upstream manifest. force_tcp have been removed to improve performence and the container image have beve been updated from 1.15.10 to 1.17.0.
+- The node-local-dns chart have been updated to match the upstream manifest. force_tcp have been removed to improve performance and the container image have beve been updated from 1.15.10 to 1.17.0.
 
 ### Fixed
 
@@ -1125,7 +1125,7 @@ Grafana 8.0.1 and Prometheus 2.27.1.
 
 - Removed label `certmanager.k8s.io/disable-validation` from cert-manager namespace
 - Removed leftover default tolerations config for `ingress-nginx`.
-- Removed unsed config option `objectStorage.s3.regionAddress`.
+- Removed unused config option `objectStorage.s3.regionAddress`.
 
 -------------------------------------------------
 ## v0.11.0 - 2021-03-03
@@ -1246,7 +1246,7 @@ Grafana 8.0.1 and Prometheus 2.27.1.
 - Retention setting for wc scraper always overriding the user config and being set to 10 days.
 - Blackbox exporter checks kibana correctly
 - Removed duplicate enforcement config for OPA from wc-config
-- Inavlid apiKey field being used in opsgenie config.
+- Invalid apiKey field being used in opsgenie config.
 
 ### Removed
 - The following helm release has been deprecated and will be uninstalled when upgrading:
@@ -1358,7 +1358,7 @@ One can now for example configure:
 - Configuration value `global.certType` has been replaced with `global.issuer` and `global.verifyTls`.
 - Certificate issuer configuration has been changed from `letsencrypt` to `issuers.letsencrypt` and extended to support more issuers.
 - Explicitly disabled multitenancy in Kibana.
-- Cloud provider dependencies are removed from the templates, instead, keys are added to the sc|wc-config.yaml by the init script so no more "hidden" config. This requires a re-run of ck8s init or manully adding the missing keys.
+- Cloud provider dependencies are removed from the templates, instead, keys are added to the sc|wc-config.yaml by the init script so no more "hidden" config. This requires a re-run of ck8s init or manually adding the missing keys.
 - Version of `yq` have been updated to `3.4.1`.
 
 ### Fixed
@@ -1435,7 +1435,7 @@ One can now for example configure:
 - New ServiceMonitor scrapes data from cert-manager.
 - Cronjob for service cluster log backup retention.
 - InfluxDB volume size is now configurable
-- In the pipeline the helm relese statuses are listed and k8s objects are printed in the apps install steps.
+- In the pipeline the helm release statuses are listed and k8s objects are printed in the apps install steps.
 - Alertmanager now generates alerts when certificates are about to expire (< 20 days) or if they are invalid.
 - Letsencrypt email addresses are now configurable.
 

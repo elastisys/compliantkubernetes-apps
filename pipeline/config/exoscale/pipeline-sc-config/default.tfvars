@@ -9,46 +9,46 @@ ssh_public_keys = [
 ]
 
 machines = {
- "master-0": {
-   "node_type": "master",
-   "size": "Medium",
-   "boot_disk": {
-     "image_name": "Linux Ubuntu 20.04 LTS 64-bit",
-     "root_partition_size": 50,
-     "node_local_partition_size": 0,
-     "ceph_partition_size": 0
-   }
- },
- "worker-0": {
-   "node_type": "worker",
-   "size": "Extra-large",
-   "boot_disk": {
-     "image_name": "Linux Ubuntu 20.04 LTS 64-bit",
-     "root_partition_size": 50,
-     "node_local_partition_size": 0,
-     "ceph_partition_size": 50
-   }
- },
- "worker-1": {
-   "node_type": "worker",
-   "size": "Extra-large",
-   "boot_disk": {
-     "image_name": "Linux Ubuntu 20.04 LTS 64-bit",
-     "root_partition_size": 50,
-     "node_local_partition_size": 0,
-     "ceph_partition_size": 50
-   }
- },
- "worker-2": {
-   "node_type": "worker",
-   "size": "Large",
-   "boot_disk": {
-     "image_name": "Linux Ubuntu 20.04 LTS 64-bit",
-     "root_partition_size": 50,
-     "node_local_partition_size": 0,
-     "ceph_partition_size": 50
-   }
- }
+  "master-0": {
+    "node_type": "master",
+    "size": "Medium",
+    "boot_disk": {
+      "image_name": "Linux Ubuntu 20.04 LTS 64-bit",
+      "root_partition_size": 50,
+      "node_local_partition_size": 0,
+      "ceph_partition_size": 0
+    }
+  },
+  "worker-0": {
+    "node_type": "worker",
+    "size": "Extra-large",
+    "boot_disk": {
+      "image_name": "Linux Ubuntu 20.04 LTS 64-bit",
+      "root_partition_size": 50,
+      "node_local_partition_size": 0,
+      "ceph_partition_size": 50
+    }
+  },
+  "worker-1": {
+    "node_type": "worker",
+    "size": "Extra-large",
+    "boot_disk": {
+      "image_name": "Linux Ubuntu 20.04 LTS 64-bit",
+      "root_partition_size": 50,
+      "node_local_partition_size": 0,
+      "ceph_partition_size": 50
+    }
+  },
+  "worker-2": {
+    "node_type": "worker",
+    "size": "Large",
+    "boot_disk": {
+      "image_name": "Linux Ubuntu 20.04 LTS 64-bit",
+      "root_partition_size": 50,
+      "node_local_partition_size": 0,
+      "ceph_partition_size": 50
+    }
+  }
 }
 
 nodeport_whitelist = [

@@ -38,8 +38,7 @@ migrate_swift_secret_option() {
     sops -d "${secrets}" |
         yq write - "${new_option}" "${value}" | \
         yq delete - "${old_option}" | \
-        sops --config "${sops_conf}" --input-type=yaml --output-type=yaml \
-             -e /dev/stdin > "${secrets}.tmp" && \
+        sops --config "${sops_conf}" --input-type=yaml --output-type=yaml -e /dev/stdin > "${secrets}.tmp" && \
         mv "${secrets}.tmp" "${secrets}"
 }
 
@@ -61,6 +60,5 @@ yq delete --inplace "${config}" citycloud
 migrate_swift_secret_option username
 migrate_swift_secret_option password
 sops -d "${secrets}" | yq delete - citycloud | \
-    sops --config "${sops_conf}" --input-type=yaml --output-type=yaml \
-         -e /dev/stdin > "${secrets}.tmp" && \
+    sops --config "${sops_conf}" --input-type=yaml --output-type=yaml -e /dev/stdin > "${secrets}.tmp" && \
     mv "${secrets}.tmp" "${secrets}"

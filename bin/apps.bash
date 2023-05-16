@@ -32,7 +32,7 @@ apps_run_wc() {
     log_info "Applying applications in workload cluster"
     (
         with_kubeconfig "${config[kube_config_wc]}" \
-             "${scripts_path}/deploy-wc.sh" "${1:-""}"
+            "${scripts_path}/deploy-wc.sh" "${1:-""}"
     )
 }
 

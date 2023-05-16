@@ -71,4 +71,4 @@ then
     exit 1
 fi
 
-echo "All tests succeded"
+echo "All tests succedeed"

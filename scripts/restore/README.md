@@ -1,7 +1,7 @@
 ### Restore Harbor
 With the k8s job you can restore the database in Harbor from a backup in S3.
 *Note this restore is only designed for internal harbor database and not for an external database*
-The steps should be preformed from the `compliantkubernetes-apps` root directory.
+The steps should be performed from the `compliantkubernetes-apps` root directory.
 *Note this k8s job does not include restore from gcs.*
 
 Before restoring the database, make sure that Harbor is installed.

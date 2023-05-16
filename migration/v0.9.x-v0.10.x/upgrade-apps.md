@@ -35,7 +35,7 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
   # Upgrade Elasticsearch
   ./bin/ck8s ops helmfile sc -l app=opendistro apply
 
-  # Open another teminal so that you can run kubectl while helmfile is running
+  # Open another terminal so that you can run kubectl while helmfile is running
 
   # Wait for master pod 0 to be up and for elasticsearch to have started
 
@@ -55,7 +55,7 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
   ```
 
 10. Remove ck8sdash's grafana api keys
-    Only needed if you acutally had ck8sdash running in either or both of the clusters.
+    Only needed if you actually had ck8sdash running in either or both of the clusters.
     If Grafana has been restarted/reinstalled the api key will no longer be there.
 
   ```bash

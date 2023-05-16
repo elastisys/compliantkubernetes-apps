@@ -4,7 +4,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   labels:
-     {{- include "hnc.labels" . | nindent 4 }}
+    {{- include "hnc.labels" . | nindent 4 }}
   name: {{ include "hnc.fullname" . }}-manager-role
 rules:
 - apiGroups:
@@ -80,7 +80,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   labels:
-     {{- include "hnc.labels" . | nindent 4 }}
+    {{- include "hnc.labels" . | nindent 4 }}
   name: {{ include "hnc.fullname" . }}-manager-rolebinding
 roleRef:
   apiGroup: rbac.authorization.k8s.io

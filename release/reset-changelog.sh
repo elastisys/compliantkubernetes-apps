@@ -46,7 +46,7 @@ DATE=$(date +'%Y-%m-%d')
 ### Generating new changelog by combining CHANGELOG.md and WIP-CHANGELOG.md ###
 echo "generating new changelog"
 
-# Split Changelog and Table of contents(TOC) into seperate files
+# Split Changelog and Table of contents(TOC) into separate files
 sed -n '/<!-- BEGIN TOC -->/,/<!-- END TOC -->/{ /<!--/d; p }' "${changelog}" > temp-toc.md
 sed '1,/^<!-- END TOC -->$/d' "${changelog}" > temp-cl.md
 

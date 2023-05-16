@@ -43,7 +43,7 @@ spec:
 {{- end }}
     - alert: Bucket36hActivityCheck
       annotations:
-        message: The bucket {{`{{ $labels.bucket }}`}} havent had any activity in 36h hours.
+        message: The bucket {{`{{ $labels.bucket }}`}} haven't had any activity in 36h hours.
       expr: |-
         (
           sum(time() - s3_last_modified_object_date{bucket!~"{{- join "|" .Values.s3BucketAlerts.exclude }}"}) by (bucket) / 3600 > 36

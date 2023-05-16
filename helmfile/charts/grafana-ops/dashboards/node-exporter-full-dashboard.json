@@ -1291,7 +1291,7 @@
           "color": "#7EB26D"
         },
         {
-          "alias": "Avaliable",
+          "alias": "Available",
           "color": "#DEDAF7",
           "fill": 0,
           "stack": false
@@ -2951,7 +2951,7 @@
           "timeFrom": null,
           "timeRegions": [],
           "timeShift": null,
-          "title": "Memory Commited",
+          "title": "Memory Committed",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -3341,7 +3341,7 @@
               "expr": "node_memory_Mapped_bytes{instance=\"$node\",job=\"$job\"}",
               "format": "time_series",
               "intervalFactor": 1,
-              "legendFormat": "Mapped - Used memory in mapped pages files which have been mmaped, such as libraries",
+              "legendFormat": "Mapped - Used memory in mapped pages files which have been mmapped, such as libraries",
               "refId": "A",
               "step": 240
             },
@@ -3367,7 +3367,7 @@
               "format": "time_series",
               "interval": "",
               "intervalFactor": 1,
-              "legendFormat": "ShmemPmdMapped - Ammount of shared (shmem/tmpfs) memory backed by huge pages",
+              "legendFormat": "ShmemPmdMapped - Amount of shared (shmem/tmpfs) memory backed by huge pages",
               "refId": "D",
               "step": 240
             }
@@ -3609,7 +3609,7 @@
               "format": "time_series",
               "hide": false,
               "intervalFactor": 1,
-              "legendFormat": "VmallocChunk - Largest contigious block of vmalloc area which is free",
+              "legendFormat": "VmallocChunk - Largest contiguous block of vmalloc area which is free",
               "refId": "A",
               "step": 240
             },
@@ -4619,7 +4619,7 @@
               "expr": "node_memory_NFS_Unstable_bytes{instance=\"$node\",job=\"$job\"}",
               "format": "time_series",
               "intervalFactor": 1,
-              "legendFormat": "NFS Unstable - Memory in NFS pages sent to the server, but not yet commited to the storage",
+              "legendFormat": "NFS Unstable - Memory in NFS pages sent to the server, but not yet committed to the storage",
               "refId": "A",
               "step": 240
             }
@@ -5252,7 +5252,7 @@
           "timeFrom": null,
           "timeRegions": [],
           "timeShift": null,
-          "title": "Time Syncronized Drift",
+          "title": "Time Synchronized Drift",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -5454,7 +5454,7 @@
           "timeFrom": null,
           "timeRegions": [],
           "timeShift": null,
-          "title": "Time Syncronized Status",
+          "title": "Time Synchronized Status",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -11833,7 +11833,7 @@
               "format": "time_series",
               "interval": "",
               "intervalFactor": 1,
-              "legendFormat": "TCP_tw - Sockets wating close",
+              "legendFormat": "TCP_tw - Sockets waiting close",
               "refId": "E",
               "step": 240
             }
@@ -12464,7 +12464,7 @@
             {
               "$$hashKey": "object:1889",
               "format": "short",
-              "label": "octects out (-) / in (+)",
+              "label": "octets out (-) / in (+)",
               "logBase": 1,
               "max": null,
               "min": null,
@@ -13450,7 +13450,7 @@
               "hide": false,
               "interval": "",
               "intervalFactor": 1,
-              "legendFormat": "MaxConn - Limit on the total number of TCP connections the entity can support (Dinamic is \"-1\")",
+              "legendFormat": "MaxConn - Limit on the total number of TCP connections the entity can support (Dynamic is \"-1\")",
               "refId": "B",
               "step": 240
             }

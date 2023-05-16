@@ -19,7 +19,7 @@
     bin/ck8s init
     ```
 
-1. Migrate harbor jobservice persistance storage size variable and prepare harbor for upgrade.
+1. Migrate harbor jobservice persistence storage size variable and prepare harbor for upgrade.
 
     ```
     ./migration/v0.25.x-v0.26.x/migrate-harbor-database-variables.sh
@@ -36,7 +36,7 @@
 
 1. *Optional:* You can remove the Opensearch role mapping `readall_and_monitor` from `${CK8S_CONFIG_PATH}/sc-config.yaml` if you aren't using it in any meaningful way
 
-1. Apply `starboard-operator` to temporarly remove the starboard psp
+1. Apply `starboard-operator` to temporarily remove the starboard psp
 
     ```bash
     bin/ck8s ops helmfile {sc|wc} -l app=starboard-operator apply
@@ -62,7 +62,7 @@
 
     > Applicable if OpenSearch Securityadmin fails when running apply with something similar to this:
     > ```console
-    > ERR: An unexpected SSLHandshakeException occured: PKIX path building failed
+    > ERR: An unexpected SSLHandshakeException occurred: PKIX path building failed
     > ```
 
     This might happen if the environment has changed domain since OpenSearch first was set up since the new internal HTTP certificate won't match the other internal certificates.
@@ -91,7 +91,7 @@
 
     Re-run securityadmin:
     ```bash
-    ./bin/ck8s ops helmfile sc -l app=opensearch-securityadmin destory
+    ./bin/ck8s ops helmfile sc -l app=opensearch-securityadmin destroy
     ./bin/ck8s ops helmfile sc -l app=opensearch-securityadmin apply
     ```
 
@@ -104,8 +104,8 @@
     ```
 
 1. Restore harbor by following the documentation for restoring harbor.
-   Ensure that it is the new config map that is added to the cluster.
-   [Restore documentation](../../scripts/restore/README.md)
+    Ensure that it is the new config map that is added to the cluster.
+    [Restore documentation](../../scripts/restore/README.md)
 
 1. Login into harbor and check that projects, images, users, robot accounts, etc exists after the restore is completed.
 

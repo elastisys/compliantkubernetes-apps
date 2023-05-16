@@ -80,7 +80,7 @@ if ! reset_commit_found "${major_version}" "${minor_version}"; then
 
   for file in $(git diff "${current_commit_hash}" --name-only); do
     if [[ ! "${file}" =~ ^(CHANGELOG.md|WIP-CHANGELOG.md)$ ]]; then
-      log_error "ERROR: Didn't expect file ${file} to have been commited, aborting"
+      log_error "ERROR: Didn't expect file ${file} to have been committed, aborting"
       exit 1
     fi
   done

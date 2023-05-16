@@ -8,8 +8,9 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
 2. Update helm to v3.5.0.
 
 3. Optional
- The default resource requests for Harbor pods have been updated.
- To get these new values you must remove the current values in your config (`resources:` yaml blocks under `harbor:`) from `sc-config.yaml` before running `./bin/ck8s init` in the next step.
+
+    The default resource requests for Harbor pods have been updated.
+    To get these new values you must remove the current values in your config (`resources:` yaml blocks under `harbor:`) from `sc-config.yaml` before running `./bin/ck8s init` in the next step.
 
 4. Replace the config option `global.environmentName` with `global.clusterName` run `./migration/v0.8.x-v0.9.x/migrate-config.sh`.
 
@@ -51,7 +52,7 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
   # Optional, only if you have alertmanager installed and you want to update the basic auth password.
   ./bin/ck8s ops helmfile wc -l app=user-alertmanager destroy
 
-  # Remove all letsencrypt relases
+  # Remove all letsencrypt releases
   for namespace in $(./bin/ck8s ops helm wc list --all-namespaces | grep -F letsencrypt | awk '{ print $2 }'); do
       ./bin/ck8s ops helm wc uninstall letsencrypt -n ${namespace}
   done
@@ -70,7 +71,7 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
   ./bin/ck8s ops helmfile sc -l app=fluentd destroy
   ./bin/ck8s ops helmfile sc -l app=fluentd-aggregator destroy
 
-  # Remove all letsencrypt relases
+  # Remove all letsencrypt releases
   for namespace in $(./bin/ck8s ops helm sc list --all-namespaces | grep -F letsencrypt | awk '{ print $2 }'); do
       ./bin/ck8s ops helm sc uninstall letsencrypt -n ${namespace}
   done

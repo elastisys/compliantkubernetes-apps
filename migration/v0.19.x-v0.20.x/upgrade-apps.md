@@ -31,20 +31,23 @@
 
 1. Remove conflicting starboard secret:
 
-   This was managed by starboard-operator and from now on it is managed by helm.
+    This was managed by starboard-operator and from now on it is managed by helm.
 
-   ```bash
-   bin/ck8s ops kubectl {sc|wc} -n monitoring delete secret starboard
-   ```
+    ```bash
+    bin/ck8s ops kubectl {sc|wc} -n monitoring delete secret starboard
+    ```
 
 1. Update starboard-operator custom resource definitions:
 
-   ```bash
-   bin/ck8s ops kubectl {sc|wc} apply -f helmfile/upstream/starboard-operator/crds
-   ```
+    ```bash
+    bin/ck8s ops kubectl {sc|wc} apply -f helmfile/upstream/starboard-operator/crds
+    ```
+
 1. Update the thanos receiver pvc size: `migration/v0.19.x-v0.20.x/upgrade-thanos-receiver-pvc.sh`
-   > **_NOTE:_** You will need to manually delete `thanos.receiver.persistence` lines from sc-config.yaml.
-   `vim $CK8S_CONFIG_PATH/sc-config.yaml`
+
+    > **_NOTE:_** You will need to manually delete `thanos.receiver.persistence` lines from sc-config.yaml.
+    >
+    > `vim $CK8S_CONFIG_PATH/sc-config.yaml`
 
 1. Upgrade applications:
 

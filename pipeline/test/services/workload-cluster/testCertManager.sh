@@ -160,7 +160,7 @@ function check_wc_certmanager_challenges() {
                 challenge_name=$(echo "$pending_challenge" | jq -r ".metadata.name")
                 challenge_namespace=$(echo "$pending_challenge" | jq -r ".metadata.namespace")
                 pending_reason=$(echo "$pending_challenge" | jq -r ".status.reason")
-                debug_msg+="Challenge $challenge_name in the $challenge_namespace namepsace is pending because : $pending_reason\n"
+                debug_msg+="Challenge $challenge_name in the $challenge_namespace namespace is pending because : $pending_reason\n"
             done
         fi
     fi
@@ -177,7 +177,7 @@ function check_wc_certmanager_challenges() {
                 order_name=$(echo "$errored_order" | jq -r ".metadata.name")
                 order_namespace=$(echo "$errored_order" | jq -r ".metadata.namespace")
                 errored_reason=$(echo "$errored_order" | jq -r ".status.reason")
-                debug_msg+="Order $order_name in the $order_namespace namepsace is errored because : $errored_reason\n"
+                debug_msg+="Order $order_name in the $order_namespace namespace is errored because : $errored_reason\n"
             done
         fi
     fi

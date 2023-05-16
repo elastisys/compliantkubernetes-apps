@@ -43,7 +43,6 @@ function sc_help() {
     printf "\t%-23s %s\n" "ingress" "Ingress checks"
     printf "%s\n" "[NOTE] If no target is specified, the default sc apps tests will be executed."
     printf "%s\n" "[NOTE] Logging can be enabled for the sc apps tests by using the --logging-enabled flag."
-    exit 0
 }
 
 function wc_help() {
@@ -54,7 +53,6 @@ function wc_help() {
     printf "\t%-23s %s\n" "hnc" "HNC checks"
     printf "%s\n" "[NOTE] If no target is specified, the default wc apps tests will be executed."
     printf "%s\n" "[NOTE] Logging can be enabled for wc apps tests by using the --logging-enabled flag."
-    exit 0
 }
 
 function sc() {

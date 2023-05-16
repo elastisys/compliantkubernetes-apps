@@ -46,7 +46,8 @@
     This script is only relevant if you have overridden the defaults.
 
 1. Run the migration script `remove_deleted_rules_prometheus_alerts.sh` to remove the old Prometheus rules and alerts from both clusters
-> **_WARNING:_** this will "hide" all the alerts until you run the `bin/ck8s apply` and recreate the rules and alerts
+
+    > **_WARNING:_** this will "hide" all the alerts until you run the `bin/ck8s apply` and recreate the rules and alerts
 
 1. Run migration script `remove_old_metrics_server.sh`
 
@@ -102,6 +103,6 @@
 
 1. You will need to restart the influxdb pod in order for it to load the new configmap:
 
-   ```bash
-   bin/ck8s ops kubectl sc delete po influxdb-0 -n influxdb-prometheus
-   ```
+    ```bash
+    bin/ck8s ops kubectl sc delete po influxdb-0 -n influxdb-prometheus
+    ```

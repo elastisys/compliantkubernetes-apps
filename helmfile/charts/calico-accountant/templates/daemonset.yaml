@@ -15,9 +15,9 @@ spec:
     spec:
       containers:
         - command:
-           - "/calico-accountant"
-           - "-logtostderr=true"
-           - "-v=2"
+          - "/calico-accountant"
+          - "-logtostderr=true"
+          - "-v=2"
           env:
           - name: METRICS_SERVER_PORT
             value: "9009"

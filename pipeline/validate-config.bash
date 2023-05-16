@@ -7,7 +7,7 @@ here="$(dirname "$(readlink -f "${0}")")"
 ret=0
 
 if [[ "${CI:-}" == "true" ]]; then
- 	git config --global --add safe.directory /github/workspace
+  git config --global --add safe.directory /github/workspace
 fi
 
 echo "--- service cluster ---"

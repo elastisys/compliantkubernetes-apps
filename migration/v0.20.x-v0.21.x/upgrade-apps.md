@@ -25,7 +25,9 @@ ansible-playbook -e 'ansible_python_interpreter=/usr/bin/python3' --ask-become-p
     ```
 
 4. After the upgrade, if you see errors that log
-```log
-Rejected by OpenSearch [error type]: mapper_parsing_exception
-```
- Rollover all streams to make fluentd have all logging fields/mappings: `migration/v0.20.x-v0.21.x/data-stream-rollovers.sh`
+
+    ```log
+    Rejected by OpenSearch [error type]: mapper_parsing_exception
+    ```
+
+    Rollover all streams to make fluentd have all logging fields/mappings: `migration/v0.20.x-v0.21.x/data-stream-rollovers.sh`

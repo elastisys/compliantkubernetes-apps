@@ -37,7 +37,7 @@ If any of the required environment variable is not set, `helmfile` will throw an
 ## Helmfile environments
 
 There is one environment for each cluster type: `service_cluster` and `workload_cluster`.
-Environments are specififed by using the flag `-e <environment_name>`.
+Environments are specified by using the flag `-e <environment_name>`.
 
 ## Usage
 

@@ -42,7 +42,7 @@ wait_for_db_ready() {
 }
 
 clean_database_data() {
-  echo "Droping existing databases">&2
+  echo "Dropping existing databases">&2
   psql -U postgres -d template1 -h $HOSTNAME -c "drop database registry;"
   psql -U postgres -d template1 -h $HOSTNAME -c "drop database postgres;"
   psql -U postgres -d template1 -h $HOSTNAME -c "drop database notarysigner;"

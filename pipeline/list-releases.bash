@@ -16,7 +16,7 @@ source "${here}/common.bash"
 source "${bin_path}/common.bash"
 
 if [ "${#}" -ne 1 ]; then
-    echo "Missing cluster paramter"
+    echo "Missing cluster parameter"
     exit 1
 fi
 

@@ -1,6 +1,6 @@
 {{- if not (or (eq .Values.harbor.persistence.type "filesystem") (eq .Values.harbor.persistence.type "swift") ) }}
 {{- if not (and (eq .Values.harbor.persistence.type "objectStorage") (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") ) ) }}
-{{ fail "\nERROR: Harbor persistence type should be set to \"filesystem\" (persistent volume), \"swift\", or \"objectStorage\" (matcing global object storage, see Values.objectStorage.type)" }}
+{{ fail "\nERROR: Harbor persistence type should be set to \"filesystem\" (persistent volume), \"swift\", or \"objectStorage\" (matching global object storage, see Values.objectStorage.type)" }}
 {{- end }}
 {{- end }}
 expose:

@@ -320,7 +320,7 @@ prometheus:
       cpu: 300m
     limits:
       memory: 2Gi
-      cpu: "1" ## Must be a string (integers might be suported in newer versions)
+      cpu: "1" ## Must be a string (integers might be supported in newer versions)
 
   tolerations: []
   affinity: {}
@@ -503,7 +503,7 @@ issuers:
   #   spec:
   #     selfSigned: {}
 
-## Configration for cert-manager and it's components.
+## Configuration for cert-manager and it's components.
 certmanager:
   resources:
     requests:
@@ -640,7 +640,7 @@ opa:
     enabled: true
     enforcement: deny
     tags:
-     - latest
+      - latest
 
 trivy:
   enabled: true

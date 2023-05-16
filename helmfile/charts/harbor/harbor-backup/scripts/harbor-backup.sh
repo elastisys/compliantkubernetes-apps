@@ -94,9 +94,9 @@ gcs_get_records() {
   gsutil -o "Credentials:gs_service_key_file=${GCS_KEYFILE}" ls -L "${PATH_TO_BACKUPS}" | \
     yq r - -j | \
     jq '[to_entries | .[] | ' \
-       'select(( .key | test("^gs:\/\/[^\/]+\/backups\/.+")) and ' \
-       '(.value."Update time" | strptime("%a, %d %b %Y %H:%M:%S %Z") | mktime <= '"${before_date}"') ) | ' \
-       '{Key: (.key | match("^gs:\/\/[^\/]+\/(.+)").captures[0].string)}]'
+        'select(( .key | test("^gs:\/\/[^\/]+\/backups\/.+")) and ' \
+        '(.value."Update time" | strptime("%a, %d %b %Y %H:%M:%S %Z") | mktime <= '"${before_date}"') ) | ' \
+        '{Key: (.key | match("^gs:\/\/[^\/]+\/(.+)").captures[0].string)}]'
 }
 
 gcs_remove_path() {

@@ -101,7 +101,7 @@ elif [[ "$ACTION" == "$DELETE_ACTION" ]]; then
         delete_bucket "$bucket"
     done
 elif [[ "$ACTION" == "$ABORT_UPLOAD_ACTION" ]]; then
-    echo 'Abort mutlipart uploads to buckets' >&2
+    echo 'Abort multipart uploads to buckets' >&2
     # shellcheck disable=SC2068
     for bucket in ${buckets[@]}; do
         abort_multipart_uploads "$bucket"

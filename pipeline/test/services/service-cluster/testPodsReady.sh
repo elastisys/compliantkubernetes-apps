@@ -192,7 +192,7 @@ done
 
 # Format:
 # namespace cronjob-name timeout
-# If the template name changes this has to be changed aswell.
+# If the template name changes this has to be changed as well.
 cronjobs=(
   "opensearch-system opensearch-curator"
 )

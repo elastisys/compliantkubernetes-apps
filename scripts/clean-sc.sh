@@ -8,7 +8,7 @@ echo -e "Your current \u1b[33mCK8S_CONFIG_PATH\033[m is set to: \u1b[33;4m${CK8S
 echo -n "Do you want to continue (y/N): "
 read -r reply
 if [[ ${reply} != "y" ]]; then
-    exit 1
+  exit 1
 fi
 
 here="$(dirname "$(readlink -f "$0")")"
@@ -24,7 +24,7 @@ CHALLENGES=$(
     "${here}/.././bin/ck8s" ops \
       kubectl sc get challenge -A \
       "-o=jsonpath='{range .items[*]}{.metadata.name}{\",\"}{.metadata.namespace}{\"\n\"}{end}'"
-	)
+  )
 if [ -n "$CHALLENGES" ]; then
   for challenge in "${CHALLENGES[@]}"; do
       IFS=, read -r name namespace <<< "$challenge"

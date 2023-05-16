@@ -9,16 +9,16 @@ update_hnc_namespaces_label() {
   log_info "--- Waiting for hnc-controller-manager"
   kubectl_do wc wait pods -n hnc-system -l app.kubernetes.io/component=hnc-controller-manager --for condition=Ready --timeout=90s
 
-  readarray userNamespaces < <(yq4 '.user.namespaces[]' $CK8S_CONFIG_PATH/wc-config.yaml)
-  readarray userNamespacesWithHigherPSALevel < <(yq4 '.user.constraints | keys | .[]' $CK8S_CONFIG_PATH/wc-config.yaml)
+  readarray userNamespaces < <(yq4 '.user.namespaces[]' "$CK8S_CONFIG_PATH/wc-config.yaml")
+  readarray userNamespacesWithHigherPSALevel < <(yq4 '.user.constraints | keys | .[]' "$CK8S_CONFIG_PATH/wc-config.yaml")
 
   for i in "${userNamespacesWithHigherPSALevel[@]}"; do
-    userNamespaces=(${userNamespaces[@]//*$i*/})
+    userNamespaces=("${userNamespaces[@]//*$i*/}")
   done
 
   for i in "${userNamespaces[@]}"; do
     ## Trigger the new mutation on already existing hnc namespaces
-    kubectl_do wc get hierarchyconfigurations -n ${i} hierarchy -o yaml |
+    kubectl_do wc get hierarchyconfigurations -n "${i}" hierarchy -o yaml |
       yq4 '.metadata.generation += 1' |
       kubectl_do wc apply -f -
   done

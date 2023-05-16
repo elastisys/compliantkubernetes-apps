@@ -1,10 +1,8 @@
-# Defult settings to use with helm.
 helmDefaults:
   timeout: 600
   createNamespace: false
   skipDeps: true
 
-# Environments
 environments:
   workload_cluster:
     values:
@@ -24,9 +22,8 @@ environments:
       - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
 ---
 
-# The desired state of Helm releases.
 releases:
-# Kube-prometheus-stack
+
 - name: kube-prometheus-stack
   namespace: monitoring
   labels:

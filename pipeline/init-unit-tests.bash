@@ -13,7 +13,7 @@ export CK8S_ENVIRONMENT_NAME="${CK8S_ENVIRONMENT_NAME:-apps-${CK8S_CLOUD_PROVIDE
 # Initialize ck8s repository
 
 if [[ "${CI:-}" == "true" ]]; then
- 	git config --global --add safe.directory /github/workspace
+  git config --global --add safe.directory /github/workspace
 
   if [[ -f "${CK8S_CONFIG_PATH}/secrets.yaml" ]]; then
     yq4 -i ".creation_rules = [{\"pgp\": \"${CK8S_PGP_FP}\"}]" "${CK8S_CONFIG_PATH}/.sops.yaml"

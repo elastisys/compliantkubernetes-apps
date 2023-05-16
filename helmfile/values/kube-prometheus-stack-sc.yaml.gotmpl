@@ -99,7 +99,7 @@ alertmanager:
         {{ else }}
         - receiver: 'null'
         {{ end }}
-          # Repeat often to integreate with opsgenies heartbeat feture.
+          # Repeat often to integreate with opsgenies heartbeat feature.
           # If this goes silent, opsgenie will send out alerts.
           repeat_interval: 1m
           group_interval: 1m

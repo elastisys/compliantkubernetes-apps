@@ -32,21 +32,21 @@
 
 1. If the loadbalancer, fronting the ingress controller, is not controlled by a kubernetes cloud controller, set the following to true in `$CK8S_CONFIG_PATH/common-config.yaml`
 
-   ```console
-   networkPolicies:
-     global:
-       externalLoadBalancer: true
-       ingressUsingHostNetwork: true
-   ```
+    ```console
+    networkPolicies:
+    global:
+      externalLoadBalancer: true
+      ingressUsingHostNetwork: true
+    ```
 
 1. If kured notification are enabled, set the ips in `$CK8S_CONFIG_PATH/common-config.yaml`
 
-   ```console
-   networkPolicies:
-     kured:
-       notificationSlack:
-         ips:
-           - 0.0.0.0/0
+    ```console
+    networkPolicies:
+      kured:
+        notificationSlack:
+          ips:
+            - 0.0.0.0/0
     ```
 
 1. *When using Harbor on Swift:* Migrate Swift configuration.
@@ -111,26 +111,26 @@
     ```
 1. If you are upgrading from v0.26.x to v0.27.1 apply this steps:
 
-   1. Add new harbor credentials
+  1. Add new harbor credentials
 
-       ```bash
-       ./migration/v0.27.x-v0.28.x/add-registry-credentials.sh
-       ```
+      ```bash
+      ./migration/v0.27.x-v0.28.x/add-registry-credentials.sh
+      ```
 
-   1. Migrate harbor jobservice port to ports (array)
+  1. Migrate harbor jobservice port to ports (array)
 
-       ```bash
-       ./migration/v0.27.x-v0.28.x/move-harbor-jobservice-port-to-ports.sh
-       ```
+      ```bash
+      ./migration/v0.27.x-v0.28.x/move-harbor-jobservice-port-to-ports.sh
+      ```
 
-   1. Up date the IPs for harbor replication in `$CK8S_CONFIG_PATH/sc-config.yaml`
+  1. Up date the IPs for harbor replication in `$CK8S_CONFIG_PATH/sc-config.yaml`
 
-       ```yaml
-         harbor:
-           registries:
-             ips:
-               - "set-me"
-       ```
+      ```yaml
+      harbor:
+        registries:
+          ips:
+            - "set-me"
+      ```
 
 1. Upgrade applications:
 

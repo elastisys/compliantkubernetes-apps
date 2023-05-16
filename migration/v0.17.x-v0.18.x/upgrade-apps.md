@@ -39,39 +39,40 @@
 
 1. Run migration script: `./migration/v0.17.x-v0.18.x/remove-velero-backupstoragelocation.sh`
 
-    This script removes the unused `backupstoragelocation` "aws/gcs". It has been switched to "defualt"
+    This script removes the unused `backupstoragelocation` "aws/gcs". It has been switched to "default"
 
 1. When upgrading the chart and setting `useHostPort: false` we noticed that the daemonset doesn't get the hostPort removed from the metrics and webhook ports.
-   Run the following script to check and remove them manually on each cluster:
 
-   ```bash
-   bin/ck8s ops kubectl sc get ds -n ingress-nginx ingress-nginx-controller -o json  | jq -r '.spec.template.spec.containers[].ports[].hostPort | select( . != null )' > ports.txt
-   while read i
-   do
-     echo "Removing the hostPort for: $i"
-     INDEX=$(bin/ck8s ops kubectl sc get ds -n ingress-nginx ingress-nginx-controller -o json | jq --arg i $i '.spec.template.spec.containers[].ports | map(.hostPort == '$i') | index(true)')
-     bin/ck8s ops kubectl sc patch ds -n ingress-nginx ingress-nginx-controller --type='json' -p="\"[{'op': 'remove', 'path': '/spec/template/spec/containers/0/ports/$INDEX/hostPort'}]\""
-   done < ports.txt
-   ```
+    Run the following script to check and remove them manually on each cluster:
+
+    ```bash
+    bin/ck8s ops kubectl sc get ds -n ingress-nginx ingress-nginx-controller -o json  | jq -r '.spec.template.spec.containers[].ports[].hostPort | select( . != null )' > ports.txt
+    while read i
+    do
+      echo "Removing the hostPort for: $i"
+      INDEX=$(bin/ck8s ops kubectl sc get ds -n ingress-nginx ingress-nginx-controller -o json | jq --arg i $i '.spec.template.spec.containers[].ports | map(.hostPort == '$i') | index(true)')
+      bin/ck8s ops kubectl sc patch ds -n ingress-nginx ingress-nginx-controller --type='json' -p="\"[{'op': 'remove', 'path': '/spec/template/spec/containers/0/ports/$INDEX/hostPort'}]\""
+    done < ports.txt
+    ```
 
 1. Remove the `existingPsp: ingress-nginx-tmp` from the ingress-nginx.yaml.gotmpl and re-run the ingress-nginx chart:
 
-   ```bash
-   vim ./helmfile/values/ingress-nginx.yaml.gotmpl
+    ```bash
+    vim ./helmfile/values/ingress-nginx.yaml.gotmpl
 
-   # remove existingPsp: ingress-nginx-tmp
-   ```
+    # remove existingPsp: ingress-nginx-tmp
+    ```
 
-   ```bash
-   bin/ck8s ops helmfile sc -f helmfile -l app=ingress-nginx -i sync
+    ```bash
+    bin/ck8s ops helmfile sc -f helmfile -l app=ingress-nginx -i sync
 
-   bin/ck8s ops helmfile wc -f helmfile -l app=ingress-nginx -i sync
-   ```
+    bin/ck8s ops helmfile wc -f helmfile -l app=ingress-nginx -i sync
+    ```
 
 1. Remove the temporary psp:
 
-   ```bash
-   bin/ck8s ops kubectl sc delete psp ingress-nginx-tmp
+    ```bash
+    bin/ck8s ops kubectl sc delete psp ingress-nginx-tmp
 
-   bin/ck8s ops kubectl wc delete psp ingress-nginx-tmp
-   ```
+    bin/ck8s ops kubectl wc delete psp ingress-nginx-tmp
+    ```

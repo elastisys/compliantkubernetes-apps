@@ -49,7 +49,7 @@ get_containers = res {
 }
 
 
-# Field missing if it does not exsist in the object
+# Field missing if it does not exist in the object
 missing(obj, field) {
     not obj[field]
 }

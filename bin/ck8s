@@ -43,7 +43,6 @@ SYNC=""
 SKIP=""
 KUBECTL=""
 GEN_NEW_SECRETS=""
-LOGGING=""
 
 for arg in "$@"; do
   case "$arg" in
@@ -51,7 +50,6 @@ for arg in "$@"; do
     "--sync") SYNC="sync" ;;
     "--kubectl") KUBECTL="kubectl" ;;
     "--generate-new-secrets") GEN_NEW_SECRETS="--generate-new-secrets" ;;
-    "--logging-enabled") LOGGING="--logging-enabled" ;;
   esac
 done
 

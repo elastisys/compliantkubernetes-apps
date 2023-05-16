@@ -17,7 +17,7 @@ function opensearch_check_help() {
     printf "\t%-25s %s\n" "--snapshot-status" "Check snapshot status"
     printf "\t%-25s %s\n" "--breakers" "Check if circuit breakers have been triggered"
     printf "\t%-25s %s\n" "--indices" "Check if there are any missing indices"
-    printf "\t%-25s %s\n" "--aliases" "Check if each aliase has a write index"
+    printf "\t%-25s %s\n" "--aliases" "Check if each aliases has a write index"
     printf "\t%-25s %s\n" "--mappings" "Check mappings/fields count & limit"
     printf "\t%-25s %s\n" "--user-roles" "Check configured user roles"
     printf "\t%-25s %s\n" "--ism" "Check ISM"

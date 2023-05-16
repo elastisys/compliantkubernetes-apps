@@ -15,7 +15,7 @@ data:
     }
     if [ -z "$exists" ]
     then
-      echo "ERROR - Harbor url {{ .Values.endpoint }}/projects/1 did not return any code (probably canot be reached)"
+      echo "ERROR - Harbor url {{ .Values.endpoint }}/projects/1 did not return any code (probably cannot be reached)"
       exit 1
     fi
     echo "Setting up initial harbor state"
@@ -27,7 +27,7 @@ data:
         then
             # Deletes the default project "library"
             echo Removing project library from harbor
-            # Curl will retrun status 500 even though it successfully removed the project.
+            # Curl will return status 500 even though it successfully removed the project.
             curl -k -X DELETE -u admin:${HARBOR_PASSWORD} {{ .Values.endpoint }}/projects/1 > /dev/null
 
             # Creates new private project "default"

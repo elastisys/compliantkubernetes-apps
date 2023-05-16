@@ -112,60 +112,60 @@ In addition to this, you will need to set up the following DNS entries (replace 
 Assuming you already have everything needed to install the apps, this is what you need to do.
 
 1. Decide on a name for this environment, the cloud provider to use as well as the flavor and set them as environment variables:
-   Note that these will be later kept as global values in the common defaults config to prevent them from being inadvertently changed, as they will affect the default options of the configuration when generated or updated.
-   To change them remove the common defaults config, set the new environment variables, and then generate a new configuration.
+    Note that these will be later kept as global values in the common defaults config to prevent them from being inadvertently changed, as they will affect the default options of the configuration when generated or updated.
+    To change them remove the common defaults config, set the new environment variables, and then generate a new configuration.
 
-   ```bash
-   export CK8S_ENVIRONMENT_NAME=my-ck8s-cluster
-   export CK8S_CLOUD_PROVIDER=[exoscale|safespring|citycloud|elastx|aws|baremetal]
-   export CK8S_FLAVOR=[dev|prod] # defaults to dev
-   ```
+    ```bash
+    export CK8S_ENVIRONMENT_NAME=my-ck8s-cluster
+    export CK8S_CLOUD_PROVIDER=[exoscale|safespring|citycloud|elastx|aws|baremetal]
+    export CK8S_FLAVOR=[dev|prod] # defaults to dev
+    ```
 
 1. Then set the path to where the ck8s configuration should be stored and the PGP fingerprint of the key(s) to use for encryption:
 
-   ```bash
-   export CK8S_CONFIG_PATH=${HOME}/.ck8s/my-ck8s-cluster
-   export CK8S_PGP_FP=<PGP-fingerprint1,PGP-fingerprint2,...>
-   ```
+    ```bash
+    export CK8S_CONFIG_PATH=${HOME}/.ck8s/my-ck8s-cluster
+    export CK8S_PGP_FP=<PGP-fingerprint1,PGP-fingerprint2,...>
+    ```
 
 1. Initialize your environment and configuration:
-   Note that the configuration is split between read-only default configs found in the `defaults/` directory, and the override configs `common-config.yaml`, `sc-config.yaml` and `wc-config.yaml` which are editable and will override any default value.
-   The `common-config.yaml` will be applied to both the service and workload cluster, although it will be overriden by the any value set in the `sc-config.yaml` or `wc-config.yaml` respectively.
-   When new configs are created this will generate new random passwords for all services.
-   When configs are updated this will *not* overwrite existing values in the override configs.
-   It will create a backup of the old override configs placed in `backups/`, generate new default configs in `defaults/`, merge common values into `common-config.yaml`, and clear out redundant values set in the override configs that matches the default values.
-   See [compliantkubernetes.io](https://compliantkubernetes.io/) if you are uncertain about what order you should do things in.
+    Note that the configuration is split between read-only default configs found in the `defaults/` directory, and the override configs `common-config.yaml`, `sc-config.yaml` and `wc-config.yaml` which are editable and will override any default value.
+    The `common-config.yaml` will be applied to both the service and workload cluster, although it will be overridden by the any value set in the `sc-config.yaml` or `wc-config.yaml` respectively.
+    When new configs are created this will generate new random passwords for all services.
+    When configs are updated this will *not* overwrite existing values in the override configs.
+    It will create a backup of the old override configs placed in `backups/`, generate new default configs in `defaults/`, merge common values into `common-config.yaml`, and clear out redundant values set in the override configs that matches the default values.
+    See [compliantkubernetes.io](https://compliantkubernetes.io/) if you are uncertain about what order you should do things in.
 
-   ```bash
-   ./bin/ck8s init
-   ```
+    ```bash
+    ./bin/ck8s init
+    ```
 
 1. Edit the configuration files that have been initialized in the configuration path.
-   Make sure that the `objectStorage` values are set in `common-config.yaml` or `sc-config.yaml` and `wc-config.yaml`, as well as required credentials in `secrets.yaml` according to your `objectStorage.type`.
-   The type may already be set in the default configuration found in the `defaults/` directory depending on your selected cloud provider.
-   Set `objectStorage.s3.*` if you are using S3 or `objectStorage.gcs.*` if you are using GCS.
+    Make sure that the `objectStorage` values are set in `common-config.yaml` or `sc-config.yaml` and `wc-config.yaml`, as well as required credentials in `secrets.yaml` according to your `objectStorage.type`.
+    The type may already be set in the default configuration found in the `defaults/` directory depending on your selected cloud provider.
+    Set `objectStorage.s3.*` if you are using S3 or `objectStorage.gcs.*` if you are using GCS.
 
 1. Create S3 buckets - optional
-   If you have set `objectStorage.type: s3`, then you need to create the buckets specified under `objectStorage.buckets` in your configuration files.
-   You can run the script `scripts/S3/entry.sh create` to create the buckets required.
-   The script uses `s3cmd` in the background and it uses the `${HOME}/.s3cfg` file for configuration and authentication for your S3 provider.
-   There's also a helper script `scripts/S3/generate-s3cfg.sh` that will allow you to generate an appropriate `s3cfg` config file for a few providers.
+    If you have set `objectStorage.type: s3`, then you need to create the buckets specified under `objectStorage.buckets` in your configuration files.
+    You can run the script `scripts/S3/entry.sh create` to create the buckets required.
+    The script uses `s3cmd` in the background and it uses the `${HOME}/.s3cfg` file for configuration and authentication for your S3 provider.
+    There's also a helper script `scripts/S3/generate-s3cfg.sh` that will allow you to generate an appropriate `s3cfg` config file for a few providers.
 
-   ```bash
-   # Use your s3cmd config file.
-   scripts/S3/entry.sh create
+    ```bash
+    # Use your s3cmd config file.
+    scripts/S3/entry.sh create
 
-   # Use custom config file for s3cmd.
-   scripts/S3/generate-s3cfg.sh aws ${AWS_ACCESS_KEY} ${AWS_ACCESS_SECRET_KEY} s3.eu-north-1.amazonaws.com eu-north-1 > s3cfg-aws
-   scripts/S3/entry.sh --s3cfg s3cfg-aws create
-   ```
+    # Use custom config file for s3cmd.
+    scripts/S3/generate-s3cfg.sh aws ${AWS_ACCESS_KEY} ${AWS_ACCESS_SECRET_KEY} s3.eu-north-1.amazonaws.com eu-north-1 > s3cfg-aws
+    scripts/S3/entry.sh --s3cfg s3cfg-aws create
+    ```
 
 1. Test S3 configuration - optional
-   If you enable object storage you also need to make sure that the buckets specified in `objecStorage.buckets` exist.
-   You can run the following snippet to ensure that you've configured S3 correctly:
+    If you enable object storage you also need to make sure that the buckets specified in `objecStorage.buckets` exist.
+    You can run the following snippet to ensure that you've configured S3 correctly:
 
-   ```bash
-   (
+    ```bash
+    (
       access_key=$(sops exec-file ${CK8S_CONFIG_PATH}/secrets.yaml 'yq r {} "objectStorage.s3.accessKey"')
       secret_key=$(sops exec-file ${CK8S_CONFIG_PATH}/secrets.yaml 'yq r {} "objectStorage.s3.secretKey"')
       sc_config=$(yq m ${CK8S_CONFIG_PATH}/defaults/common-config.yaml ${CK8S_CONFIG_PATH}/defaults/sc-config.yaml ${CK8S_CONFIG_PATH}/common-config.yaml ${CK8S_CONFIG_PATH}/sc-config.yaml -a overwrite -x)
@@ -178,26 +178,26 @@ Assuming you already have everything needed to install the apps, this is what yo
               ls s3://${bucket} > /dev/null
           [ ${?} = 0 ] && echo "Bucket ${bucket} exists!"
       done
-   )
-   ```
+    )
+    ```
 
 1. **Note**, for this step each cluster need to be up and running already.
-   Deploy the apps:
+    Deploy the apps:
 
-   ```bash
-   ./bin/ck8s apply sc
-   ./bin/ck8s apply wc
-   ```
+    ```bash
+    ./bin/ck8s apply sc
+    ./bin/ck8s apply wc
+    ```
 
 1. Test that the cluster is running correctly with:
 
-   ```bash
-   ./bin/ck8s test sc
-   ./bin/ck8s test wc
-   ```
+    ```bash
+    ./bin/ck8s test sc
+    ./bin/ck8s test wc
+    ```
 
 1. You should now have a fully working environment.
-   Check the next section for some additional steps to finalize it and set up user access.
+    Check the next section for some additional steps to finalize it and set up user access.
 
 ### On-boarding and final touches
 
@@ -405,16 +405,16 @@ See <https://compliantkubernetes.io/operator-manual/>.
 2. Go to the [Oauth consent screen](https://console.cloud.google.com/apis/credentials/consent) and name the application with the same name as the project of your google cloud project add the top level domain e.g. `elastisys.se` to Authorized domains.
 
 3. Go to [Credentials](https://console.cloud.google.com/apis/credentials) and press `Create credentials` and select `OAuth client ID`.
-   Select `web application` and give it a name and add the URL to dex in the `Authorized Javascript origins` field, e.g. `dex.demo.elastisys.se`.
-   Add `<dex url>/callback` to Authorized redirect URIs field, e.g. `dex.demo.elastisys.se/callback`.
+    Select `web application` and give it a name and add the URL to dex in the `Authorized Javascript origins` field, e.g. `dex.demo.elastisys.se`.
+    Add `<dex url>/callback` to Authorized redirect URIs field, e.g. `dex.demo.elastisys.se/callback`.
 
 4. Configure the following options in `CK8S_CONFIG_PATH/secrets.yaml`
 
-   ```yaml
-     dex:
-       googleClientID:
-       googleClientSecret:
-   ```
+    ```yaml
+      dex:
+        googleClientID:
+        googleClientSecret:
+    ```
 
 ## Known issues
 

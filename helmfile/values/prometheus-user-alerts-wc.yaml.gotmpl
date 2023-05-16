@@ -17,7 +17,7 @@ defaultRules:
     opensearch: false
     falcoAlerts: false # falco alerts will come from falco sidekick
     alertmanager: {{ .Values.user.alertmanager.enabled }}
-    # Rook is handeled by the cluster operators. Users would normally not care
+    # Rook is handled by the cluster operators. Users would normally not care
     # about these alerts, but we have no other way of gathering them currently.
     rookMonitor: {{ .Values.monitoring.rook.enabled }}
     capacityManagementAlerts: {{ .Values.prometheus.capacityManagementAlerts.enabled }}

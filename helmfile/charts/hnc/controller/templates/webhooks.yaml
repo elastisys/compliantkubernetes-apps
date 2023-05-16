@@ -8,7 +8,7 @@ metadata:
     {{ toYaml . | nindent 4 }}
     {{- end }}
   labels:
-     {{- include "hnc.labels" . | nindent 4 }}
+    {{- include "hnc.labels" . | nindent 4 }}
   name: {{ include "hnc.fullname" . }}-mutating-webhook-configuration
 webhooks:
 - admissionReviewVersions:
@@ -41,7 +41,7 @@ metadata:
     {{ toYaml . | nindent 4 }}
     {{- end }}
   labels:
-     {{- include "hnc.labels" . | nindent 4 }}
+    {{- include "hnc.labels" . | nindent 4 }}
   name: {{ include "hnc.fullname" . }}-validating-webhook-configuration
 webhooks:
 - admissionReviewVersions:

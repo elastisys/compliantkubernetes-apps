@@ -9,7 +9,7 @@ global:
     - ${CK8S_ENVIRONMENT_NAME}-wc
 
 objectStorage:
-  ## Swift can be enabled seperately for Harbor and Thanos only.
+  ## Swift can be enabled separately for Harbor and Thanos only.
   # swift:
   #   authVersion: 0 # auto detect
   #   authUrl: set-me
@@ -388,7 +388,7 @@ harbor:
   oidc:
     # group claim name used by OIDC Provider
     groupClaimName: groups
-    # Name of the group that autmatically will get admin
+    # Name of the group that automatically will get admin
     # Set to "" to disable
     adminGroupName: set-me
     scope: openid,email,profile,offline_access,groups
@@ -420,7 +420,7 @@ prometheus:
       percent: 80
       count: 1638400
     exclude: []
-  # Todo remove dependencie on alertmanager from service cluster
+  # Todo remove dependency on alertmanager from service cluster
   alertmanagerSpec:
     replicas: 2
     groupBy:
@@ -526,7 +526,7 @@ thanos:
     enabled: true
 
     # Number of query pods
-    # They are infinitly scalable
+    # They are infinitely scalable
     replicaCount: 1
 
     topologySpreadConstraints:
@@ -638,8 +638,8 @@ thanos:
     retentionResolution1h: 0s
 
     # Deduplication of metrics in long term storage
-    # receiverReplicas: Deduplicate results from multple receivers, simpler dedup
-    # prometheusReplicas: Deduplicate results from multple receivers and multiple prometheis, heavier dedup
+    # receiverReplicas: Deduplicate results from multiple receivers, simpler dedup
+    # prometheusReplicas: Deduplicate results from multiple receivers and multiple prometheis, heavier dedup
     deduplication: none
 
     # Persistence is recommended for caching.
@@ -1084,7 +1084,7 @@ externalTrafficPolicy:
     thanosReceiver: false
 
 s3Exporter:
-  # Also requries objectStorage.type=s3
+  # Also requires objectStorage.type=s3
   enabled: true
   interval: 60m
   scrapeTimeout: 10m
@@ -1121,7 +1121,7 @@ networkPolicies:
       ports:
         - set-me-if-enabled
     scApiserver:
-      # usualy private ip of control-plane nodes
+      # usually private ip of control-plane nodes
       ips:
         - set-me
       port: 6443
@@ -1159,7 +1159,7 @@ networkPolicies:
   monitoring:
     enabled: true
     grafana:
-     # allows sc-config to add ip and ports to access user Grafana
+      # allows sc-config to add ip and ports to access user Grafana
       externalDataSources:
         enabled: false
         ips:

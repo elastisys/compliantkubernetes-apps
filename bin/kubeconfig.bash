@@ -84,7 +84,7 @@ kubectl --kubeconfig="${user_kubeconfig}" config set-credentials "${1}@${cluster
     --exec-arg=--oidc-extra-scope=email \
     --exec-arg=--oidc-extra-scope=groups
 
-# Create context with relavant namespace
+# Create context with relevant namespace
 # Pick the first namespace
 if [[ ${1} == "user" ]]; then
     context_namespace=$(yq4 '.user.namespaces[0]' "${config[config_file_wc]}")

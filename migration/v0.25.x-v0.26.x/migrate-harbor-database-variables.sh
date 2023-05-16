@@ -32,9 +32,9 @@ delete_value() {
 }
 
 if [[ ! -f "$sc_config" ]]; then
-    echo "$sc_config does not exist, skipping."
+  echo "$sc_config does not exist, skipping."
 else
-   move_value_to '.harbor.jobservice.persistentVolumeClaim.size' '.harbor.jobservice.jobLog.persistentVolumeClaim.size' "$sc_config"
-   move_value_to '.harbor.jobservice.persistentVolumeClaim.size' '.harbor.jobservice.scanDataExports.persistentVolumeClaim.size' "$sc_config"
-   delete_value '.harbor.jobservice.persistentVolumeClaim' "$sc_config"
+  move_value_to '.harbor.jobservice.persistentVolumeClaim.size' '.harbor.jobservice.jobLog.persistentVolumeClaim.size' "$sc_config"
+  move_value_to '.harbor.jobservice.persistentVolumeClaim.size' '.harbor.jobservice.scanDataExports.persistentVolumeClaim.size' "$sc_config"
+  delete_value '.harbor.jobservice.persistentVolumeClaim' "$sc_config"
 fi

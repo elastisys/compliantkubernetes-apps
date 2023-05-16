@@ -4,11 +4,11 @@
 
 1. Run migration script: `./migration/v0.15.x-v0.16.x/migrate-apps.sh`
 
-   This script will rewrite the dex connector configuration to the secret file.
+    This script will rewrite the dex connector configuration to the secret file.
 
 1. Run migration script: `./migration/v0.15.x-v0.16.x/migrate-crd.sh`
 
-   This script will migrate all CRDs in the cluster to be managed by helm.
+    This script will migrate all CRDs in the cluster to be managed by helm.
 
 1. Run init to get new defaults:
 

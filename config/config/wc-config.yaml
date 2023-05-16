@@ -221,7 +221,7 @@ prometheusBlackboxExporter:
 networkPolicies:
   global:
     wcApiserver:
-      # usualy private ip of control-plane nodes
+      # usually private ip of control-plane nodes
       ips:
         - set-me
       port: 6443

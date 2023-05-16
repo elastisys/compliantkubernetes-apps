@@ -4,16 +4,17 @@
 
 1. Run migration script: `./migration/v0.16.x-v0.17.x/migrate-harbor-swift-config.sh`
 
-   This script will move config values from `citycloud.*` to `harbor.persistence.swift` if they exist.
+    This script will move config values from `citycloud.*` to `harbor.persistence.swift` if they exist.
 
 1. Rename `clusterAdmin.admins` to `clusterAdmin.users` for both `wc-config.yaml` and `sc-config.yaml`
 
 1. Check that `global.clusterDns` in both `wc-config.yaml` and `sc-config.yaml` matches the IP for the `coredns` service in `kube-system` namespace.
-   Old default values did not match defaults in Kubespray.
+
+    Old default values did not match defaults in Kubespray.
 
 1. Run migration script: `./migration/v0.16.x-v0.17.x/migrate-dex-additional-static-clients.sh`
 
-   This script introduces `dex.additionalStaticClients` and create entries for each additional static client already defined on the CK8S cluster.
+    This script introduces `dex.additionalStaticClients` and create entries for each additional static client already defined on the CK8S cluster.
 
 1. Verify if the script added all your custom static clients under `dex.additionalStaticClients`. If so, delete the backup at `${CK8S_CONFIG_PATH}/secrets.yaml.bak`.
 
@@ -26,7 +27,7 @@
     bin/ck8s ops kubectl wc apply -f 'helmfile/upstream/kube-prometheus-stack/crds'
     ```
 
-   and then apply the new changes.
+    and then apply the new changes.
 
 1. Run init to get new defaults:
 
@@ -54,4 +55,4 @@
 
 1. Run migration script: `./migration/v0.16.x-v0.17.x/migrate-openid.sh`
 
-   This script will reload the security config config.yml to make openid run by the new port
+    This script will reload the security config config.yml to make openid run by the new port

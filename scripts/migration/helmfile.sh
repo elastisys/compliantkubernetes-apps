@@ -103,6 +103,8 @@ helmfile_replace() {
 
   log_info "replacing ${1} ${*:2}"
 
+  # shellcheck disable=SC2317
+
   # prefix namespace name
   internal_helmfile_replace() {
     log_info "  - replacing ${1} ${2}/${3}"
@@ -129,6 +131,8 @@ helmfile_upgrade() {
   fi
 
   log_info "upgrading ${1} ${*:2}"
+
+  # shellcheck disable=SC2317
 
   # prefix namespace name
   internal_helmfile_upgrade() {

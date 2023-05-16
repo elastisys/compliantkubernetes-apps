@@ -17,7 +17,7 @@
       * set `prometheus.storage.enabled`: `true`
 
 1. If you had disabled OPA/gatekeeper because it could not be run on kubernetes v1.19+, then you can now enable it again in your config.
-  Otherwise, if you have enabled OPA/gatekeeper, then delete the old gatekeeper chart (note this will temporarilly disable any gatekeeper policy and create a possible security issue):
+  Otherwise, if you have enabled OPA/gatekeeper, then delete the old gatekeeper chart (note this will temporarily disable any gatekeeper policy and create a possible security issue):
     ```bash
     ./bin/ck8s ops helmfile wc -l app=gatekeeper-operator destroy
     ```

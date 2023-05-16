@@ -68,9 +68,9 @@ After doing the `disruptive` step for either the automatic or manual method, you
 
 1. Clean up leftover rolebindings bypassing PSP admission:
 
-   ```bash
-   ./migration/v0.30/apply/14-kubernetes-psp.sh clean
-   ```
+    ```bash
+    ./migration/v0.30/apply/14-kubernetes-psp.sh clean
+    ```
 
 1. If you want to enable Gatekeeper PSP for rook-ceph, set `rookCeph.enabled` to `true` in your `common-config.yaml`.
 
@@ -169,27 +169,27 @@ After doing the `disruptive` step for either the automatic or manual method, you
 
 1. Check if user-alertmanager is disabled and disable it in the overwrite `common-config`:
 
-   ```bash
-   ./migration/v0.30/prepare/20-user-alertmanager.sh
-   ```
+    ```bash
+    ./migration/v0.30/prepare/20-user-alertmanager.sh
+    ```
 
 1. Migrate the prometheusConfigReloader resources requests and limits to the new format:
 
-   ```bash
-   ./migration/v0.30/prepare/30-prometheus-config-reloader.sh
-   ```
+    ```bash
+    ./migration/v0.30/prepare/30-prometheus-config-reloader.sh
+    ```
 
 1. Migrate starboard to trivy configurations:
 
-   ```bash
-   ./migration/v0.30/prepare/40-starboard-to-trivy.sh
-   ```
+    ```bash
+    ./migration/v0.30/prepare/40-starboard-to-trivy.sh
+    ```
 
 1. Migrate velero restic to nodeAgent configurations:
 
-   ```bash
-   ./migration/v0.30/prepare/50-velero-restic-to-nodeagent.sh
-   ```
+    ```bash
+    ./migration/v0.30/prepare/50-velero-restic-to-nodeagent.sh
+    ```
 
 ### Apply upgrade - *disruptive*
 
