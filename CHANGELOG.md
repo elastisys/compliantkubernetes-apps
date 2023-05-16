@@ -142,6 +142,7 @@
 - Allow for target discovery of all probes in workload cluster
 - Opensearch-configurer will only re-register the snapshot repository if the bucket name has changed
 - Run `log-manager` compaction more frequently
+- Rollout HNC Webhooks without surge
 
 ### Removed
 
