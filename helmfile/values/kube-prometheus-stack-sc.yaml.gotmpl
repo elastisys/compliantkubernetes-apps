@@ -145,6 +145,9 @@ alertmanager:
         text: |-
           <!channel>
           *Cluster:* {{ .Values.prometheus.grafana.subdomain }}.{{ .Values.global.opsDomain }}
+          {{- if .Values.alerts.slack.customTemplate }}
+          {{ .Values.alerts.slack.customTemplate | nindent 10 }}
+          {{- else }}
           {{`
           *Common summary:* {{ .CommonAnnotations.summary }}
           *Common description:* {{ .CommonAnnotations.description }}
@@ -159,6 +162,7 @@ alertmanager:
           *{{ .Name }}:* {{ .Value }}
           {{ end }}
           {{ end }}`}}
+          {{- end }}
       {{ end }}
     - name: opsgenie
       {{ if eq .Values.alerts.alertTo "opsgenie" }}

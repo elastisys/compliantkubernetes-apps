@@ -28,6 +28,7 @@
 - Allow drop all capabilites mutation to be disabled per service
 - Added annotation for the grafana dashboard "Compute Resources / Pod" to show container restarts
 - Added so Grafana egress can be configured from sc-config.
+- Added possibility to change Alertmanager template for slack alerts.
 
 ### Fixed
 
