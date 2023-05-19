@@ -127,11 +127,6 @@ customRules:
           )
         )
 
-    - macro: user_known_contact_k8s_api_server_activities
-      condition: (
-            k8s.ns.name = "tekton-pipelines" and k8s.pod.name startswith upgrade
-        )
-
     - macro: user_known_write_monitored_dir_conditions
       condition: (
             k8s.ns.name = "tekton-pipelines" and k8s.pod.name startswith upgrade
@@ -170,7 +165,9 @@ customRules:
           (container.image.repository = docker.io/ceph/ceph and proc.cmdline startswith 'rook cmd-reporter') or
           (container.image.repository = quay.io/ceph/ceph and proc.cmdline startswith 'rook cmd-reporter') or
           (container.image.repository = k8s.gcr.io/sig-storage/csi-attacher and proc.cmdline startswith 'csi-attacher') or
-          (container.image.repository = k8s.gcr.io/sig-storage/csi-provisioner and proc.cmdline startswith 'csi-provisioner')
+          (container.image.repository = k8s.gcr.io/sig-storage/csi-provisioner and proc.cmdline startswith 'csi-provisioner') or
+          (k8s.ns.name = "tekton-pipelines" and k8s.pod.name startswith upgrade) or
+          (proc.cmdline = 'kube-webhook-ce create --host=ingress-nginx-controller-admission,ingress-nginx-controller-admission.ingress-nginx.svc --namespace=ingress-nginx --secret-name=ingress-nginx-admission')
         )
     - macro: user_known_package_manager_in_container
       condition: (
@@ -237,6 +234,10 @@ customRules:
     - macro: user_known_shell_config_modifiers
       condition: (
           fd.name startswith "/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/" and proc.cmdline = containerd
+        )
+    - macro: user_known_ingress_remote_file_copy_activities
+      condition: (
+          proc.cmdline = 'curl --retry 3 -w %{http_code} -o /dev/null -sk https://localhost/healthz'
         )
     - list: known_binaries_to_read_environment_variables_from_proc_files
       items: [systemd-run, rook, udevadm]
