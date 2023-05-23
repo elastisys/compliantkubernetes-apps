@@ -13,7 +13,9 @@ metadata:
   annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
   {{- end }}
 spec:
+  {{- if not .Values.bucketweb.autoscaling.enabled }}
   replicas: {{ .Values.bucketweb.replicaCount }}
+  {{- end }}
   {{- if .Values.bucketweb.updateStrategy }}
   strategy: {{- toYaml .Values.bucketweb.updateStrategy | nindent 4 }}
   {{- end }}
@@ -31,13 +33,14 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" .Values.bucketweb.podLabels "context" $) | nindent 8 }}
         {{- end }}
       annotations:
-        checksum/ojbstore-configuration: {{ include (print $.Template.BasePath "/objstore-secret.yaml") . | sha256sum }}
+        checksum/objstore-configuration: {{ include (print $.Template.BasePath "/objstore-secret.yaml") . | sha256sum }}
         {{- if .Values.bucketweb.podAnnotations }}
         {{- include "common.tplvalues.render" (dict "value" .Values.bucketweb.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
     spec:
       {{- include "thanos.imagePullSecrets" . | nindent 6 }}
-      serviceAccount: {{ include "thanos.serviceAccount.name" (dict "component" "bucketweb" "context" $) }}
+      serviceAccountName: {{ include "thanos.serviceAccountName" (dict "component" "bucketweb" "context" $) }}
+      automountServiceAccountToken: {{ .Values.bucketweb.automountServiceAccountToken }}
       {{- if .Values.bucketweb.hostAliases }}
       hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.bucketweb.hostAliases "context" $) | nindent 8 }}
       {{- end }}
@@ -48,6 +51,9 @@ spec:
         podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.bucketweb.podAffinityPreset "component" "bucketweb" "context" $) | nindent 10 }}
         podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.bucketweb.podAntiAffinityPreset "component" "bucketweb" "context" $) | nindent 10 }}
         nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.bucketweb.nodeAffinityPreset.type "key" .Values.bucketweb.nodeAffinityPreset.key "values" .Values.bucketweb.nodeAffinityPreset.values) | nindent 10 }}
+      {{- end }}
+      {{- if .Values.bucketweb.dnsConfig }}
+      dnsConfig: {{- include "common.tplvalues.render" (dict "value" .Values.bucketweb.dnsConfig "context" $) | nindent 8 }}
       {{- end }}
       {{- if .Values.bucketweb.nodeSelector }}
       nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.bucketweb.nodeSelector "context" $) | nindent 8 }}
@@ -100,6 +106,9 @@ spec:
             {{- if .Values.bucketweb.timeout }}
             - --timeout={{ .Values.bucketweb.timeout }}
             {{- end }}
+            {{- if (include "thanos.httpConfigEnabled" .) }}
+            - --http.config=/conf/http/http-config.yml
+            {{- end }}
             {{- if .Values.bucketweb.extraFlags }}
             {{- .Values.bucketweb.extraFlags | toYaml | nindent 12 }}
             {{- end }}
@@ -122,29 +131,47 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
-          {{- if .Values.bucketweb.livenessProbe.enabled }}
+          {{- if .Values.bucketweb.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.bucketweb.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.bucketweb.livenessProbe.enabled }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.bucketweb.livenessProbe "enabled") "context" $) | nindent 12 }}
+            {{- if not .Values.auth.basicAuthUsers }}
             httpGet:
               path: /-/healthy
               port: http
-          {{- else if .Values.bucketweb.customLivenessProbe }}
-          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.bucketweb.customLivenessProbe "context" $) | nindent 12 }}
-          {{- end }}
-          {{- if .Values.bucketweb.readinessProbe.enabled }}
-          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.bucketweb.readinessProbe "enabled") "context" $) | nindent 12 }}
-            httpGet:
-              path: /-/ready
+              scheme: {{ ternary "HTTPS" "HTTP" .Values.https.enabled }}
+            {{- else }}
+            tcpSocket:
               port: http
-          {{- else if .Values.bucketweb.customReadinessProbe }}
+            {{- end }}
+          {{- end }}
+          {{- if .Values.bucketweb.customReadinessProbe }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.bucketweb.customReadinessProbe "context" $) | nindent 12 }}
-          {{- end }}
-          {{- if .Values.bucketweb.startupProbe.enabled }}
-          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.bucketweb.startupProbe "enabled") "context" $) | nindent 12 }}
+          {{- else if .Values.bucketweb.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.bucketweb.readinessProbe "enabled") "context" $) | nindent 12 }}
+            {{- if not .Values.auth.basicAuthUsers }}
             httpGet:
               path: /-/ready
               port: http
-          {{- else if .Values.bucketweb.customReadinessProbe }}
+              scheme: {{ ternary "HTTPS" "HTTP" .Values.https.enabled }}
+            {{- else }}
+            tcpSocket:
+              port: http
+            {{- end }}
+          {{- end }}
+          {{- if .Values.bucketweb.customStartupProbe }}
           startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.bucketweb.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.bucketweb.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.bucketweb.startupProbe "enabled") "context" $) | nindent 12 }}
+            {{- if not .Values.auth.basicAuthUsers }}
+            httpGet:
+              path: /-/ready
+              port: http
+              scheme: {{ ternary "HTTPS" "HTTP" .Values.https.enabled }}
+            {{- else }}
+            tcpSocket:
+              port: http
+            {{- end }}
           {{- end }}
           {{- if .Values.bucketweb.lifecycleHooks }}
           lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.bucketweb.lifecycleHooks "context" $) | nindent 12 }}
@@ -155,6 +182,14 @@ spec:
           volumeMounts:
             - name: objstore-config
               mountPath: /conf
+            {{- if (include "thanos.httpConfigEnabled" .) }}
+            - name: http-config
+              mountPath: /conf/http
+            {{- if .Values.https.enabled }}
+            - name: http-certs
+              mountPath: /certs
+            {{- end }}
+            {{- end }}
             {{- if .Values.bucketweb.extraVolumeMounts }}
             {{- include "common.tplvalues.render" (dict "value" .Values.bucketweb.extraVolumeMounts "context" $) | nindent 12 }}
             {{- end }}
@@ -165,6 +200,16 @@ spec:
             {{- if .Values.existingObjstoreSecretItems }}
             items: {{- toYaml .Values.existingObjstoreSecretItems | nindent 14 }}
             {{- end }}
+        {{- if (include "thanos.httpConfigEnabled" .) }}
+        - name: http-config
+          secret:
+            secretName: {{ include "thanos.httpConfigSecretName" . }}
+        {{- if .Values.https.enabled }}
+        - name: http-certs
+          secret:
+            secretName: {{ include "thanos.httpCertsSecretName" . }}
+        {{- end }}
+        {{- end }}
         {{- if .Values.bucketweb.extraVolumes }}
         {{- include "common.tplvalues.render" (dict "value" .Values.bucketweb.extraVolumes "context" $) | nindent 8 }}
         {{- end }}

@@ -41,6 +41,11 @@
 - Rework monitoring networkpolicies with generator chart
 - New fluentd-elasticsearch custom image tag `v4.3.9-ck8s1` which includes a plugin for dot replacement, as this functionality has been removed from the `kubernetes_metadata_filter` plugin.
 
+## Updated
+
+- Upgraded Thanos helm chart to version `12.6.2` which bumps the application version to `0.31.0`
+    - Now supports authentication via Openstack application credentials when using Swift as the object storage backend
+
 ### Fixed
 
 - Fixed issue with compaction job on ephemeral volumes

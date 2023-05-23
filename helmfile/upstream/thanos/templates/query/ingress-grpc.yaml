@@ -29,7 +29,7 @@ spec:
             {{- if eq "true" (include "common.ingress.supportsPathType" .) }}
             pathType: {{ .Values.query.ingress.grpc.pathType }}
             {{- end }}
-            backend: {{- include "common.ingress.backend" (dict "serviceName" (printf "%s-%s"  (include "common.names.fullname" .) "query") "servicePort" "grpc" "context" $)  | nindent 14 }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (printf "%s-%s"  (include "common.names.fullname" .) "query-grpc") "servicePort" "grpc" "context" $)  | nindent 14 }}
     {{- end }}
     {{- range .Values.query.ingress.grpc.extraHosts }}
     - host: {{ .name }}
@@ -39,11 +39,14 @@ spec:
             {{- if eq "true" (include "common.ingress.supportsPathType" $) }}
             pathType: {{ default "ImplementationSpecific" .pathType }}
             {{- end }}
-            backend: {{- include "common.ingress.backend" (dict "serviceName" (printf "%s-%s"  (include "common.names.fullname" $) "query") "servicePort" "grpc" "context" $) | nindent 14 }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (printf "%s-%s"  (include "common.names.fullname" $) "query-grpc") "servicePort" "grpc" "context" $) | nindent 14 }}
     {{- end }}
-  {{- if or (and .Values.query.ingress.grpc.tls (or (include "thanos.ingress.certManagerRequest" .Values.query.ingress.grpc.annotations) .Values.query.ingress.grpc.selfSigned)) .Values.query.ingress.grpc.extraTls }}
+    {{- if .Values.query.ingress.grpc.extraRules }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.query.ingress.grpc.extraRules "context" $) | nindent 4 }}
+    {{- end }}
+  {{- if or (and .Values.query.ingress.grpc.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.query.ingress.grpc.annotations )) .Values.query.ingress.grpc.selfSigned)) .Values.query.ingress.grpc.extraTls }}
   tls:
-    {{- if and .Values.query.ingress.grpc.tls (or (include "thanos.ingress.certManagerRequest" .Values.query.ingress.grpc.annotations) .Values.query.ingress.grpc.selfSigned) }}
+    {{- if and .Values.query.ingress.grpc.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.query.ingress.grpc.annotations )) .Values.query.ingress.grpc.selfSigned) }}
     - hosts:
         - {{ .Values.query.ingress.grpc.hostname }}
       secretName: {{ printf "%s-tls" .Values.query.ingress.grpc.hostname }}

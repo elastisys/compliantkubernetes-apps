@@ -108,6 +108,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.31/prepare/50-init.sh
     ```
 
+1. Move thanos replication factor
+
+    ```bash
+    ./migration/v0.31/prepare/20-thanos-replication.sh
+    ```
+
 ### Apply upgrade - *disruptive*
 
 > *Done during maintenance window.*
