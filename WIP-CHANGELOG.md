@@ -17,6 +17,11 @@
 - Moved `.monitoring.rook` and `.rookCeph.enabled` keys under `rookCeph.monitoring` and `rookCeph.gatekeeperPsp`
 - The value for `networkPolicies.global.externalLoadBalancer` and `networkPolicies.global.ingressUsingHostNetwork` is now set by the init script, based on the `.global.ck8sCloudProvider` value
 
+## Updated
+
+- Upgraded Thanos helm chart to version `12.6.2` which bumps the application version to `0.31.0`
+    - Now supports authentication via Openstack application credentials when using Swift as the object storage backend
+
 ### Fixed
 
 - Fixed issue with compaction job on ephemeral volumes

@@ -1,3 +1,4 @@
+{{- $netpol := .Values.networkPolicies }}
 rules:
   egress-rule-query:
     peers:
@@ -21,6 +22,18 @@ rules:
           app.kubernetes.io/name: prometheus
     ports:
       - tcp: 10902
+
+  {{- if eq .Values.thanos.objectStorage.type "swift" }}
+  egress-rule-object-storage:
+    peers:
+      {{- range $netpol.global.objectStorageSwift.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+    ports:
+      {{- range $netpol.global.objectStorageSwift.ports }}
+      - tcp: {{ . }}
+      {{- end }}
+  {{- end }}
 
 policies:
   thanos:
