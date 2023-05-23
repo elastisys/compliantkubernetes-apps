@@ -498,7 +498,7 @@ releases:
   labels:
     app: thanos
   chart: ./upstream/thanos
-  version: 9.0.1
+  version: 12.6.2
   installed: {{ .Values.thanos.enabled }}
   values:
   - values/thanos/objectstorage-secret.yaml.gotmpl
@@ -508,8 +508,10 @@ releases:
   labels:
     app: thanos
   chart: ./upstream/thanos
-  version: 9.0.1
+  version: 12.6.2
   installed: {{ and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
+  needs:
+  - thanos/thanos-objectstorage-secret
   values:
   - values/thanos/receiver.yaml.gotmpl
 
@@ -519,7 +521,7 @@ releases:
   labels:
     app: thanos
   chart: ./upstream/thanos
-  version: 9.0.1
+  version: 12.6.2
   installed: {{ and .Values.thanos.enabled .Values.thanos.query.enabled }}
   values:
   - values/thanos/query.yaml.gotmpl

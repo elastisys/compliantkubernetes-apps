@@ -57,7 +57,6 @@ receive:
 
   replicaCount: {{ .Values.thanos.receiver.replicaCount }}
   topologySpreadConstraints: {{- toYaml .Values.thanos.receiver.topologySpreadConstraints | nindent 4 }}
-  replicationFactor: {{  .Values.thanos.receiver.replicationFactor }}
 
   service:
     additionalHeadless: true
@@ -78,6 +77,7 @@ receive:
 
 receiveDistributor:
   resources: {{- toYaml .Values.thanos.receiveDistributor.resources | nindent 4 }}
+  replicationFactor: {{  .Values.thanos.receiveDistributor.replicationFactor }}
 
 ruler:
   enabled: {{ .Values.thanos.ruler.enabled }}
