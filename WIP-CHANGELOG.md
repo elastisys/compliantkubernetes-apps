@@ -13,3 +13,11 @@
 - Fixed issue with compaction job on ephemeral volumes
 - Fixed duplicate exception for falco alerts
 - Another network policy fix for Harbor to allow garbage collection
+
+### Changed
+
+- Change Trivy Operator Dashboard to only count image states once per image instead for each namespace and resource
+
+### Updated
+
+- Update Trivy Operator Dashboard to improve the user experience
