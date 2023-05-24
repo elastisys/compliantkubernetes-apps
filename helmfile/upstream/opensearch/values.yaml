@@ -132,6 +132,9 @@ image:
 podAnnotations: {}
   # iam.amazonaws.com/role: es-cluster
 
+# OpenSearch Statefulset annotations
+openSearchAnnotations: {}
+
 # additionals labels
 labels: {}
 
@@ -164,6 +167,8 @@ rbac:
   create: false
   serviceAccountAnnotations: {}
   serviceAccountName: ""
+  # Controls whether or not the Service Account token is automatically mounted to /var/run/secrets/kubernetes.io/serviceaccount
+  automountServiceAccountToken: false
 
 podSecurityPolicy:
   create: false
@@ -259,6 +264,10 @@ enableServiceLinks: true
 protocol: https
 httpPort: 9200
 transportPort: 9300
+metricsPort: 9600
+httpHostPort: ""
+transportHostPort: ""
+
 
 service:
   labels: {}
@@ -266,10 +275,18 @@ service:
   headless:
     annotations: {}
   type: ClusterIP
+  # The IP family and IP families options are to set the behaviour in a dual-stack environment
+  # Omitting these values will let the service fall back to whatever the CNI dictates the defaults
+  # should be
+  #
+  # ipFamilyPolicy: SingleStack
+  # ipFamilies:
+  # - IPv4
   nodePort: ""
   annotations: {}
   httpPortName: http
   transportPortName: transport
+  metricsPortName: metrics
   loadBalancerIP: ""
   loadBalancerSourceRanges: []
   externalTrafficPolicy: ""
@@ -295,7 +312,7 @@ securityContext:
 
 securityConfig:
   enabled: true
-  path: "/usr/share/opensearch/plugins/opensearch-security/securityconfig"
+  path: "/usr/share/opensearch/config/opensearch-security"
   actionGroupsSecret:
   configSecret:
   internalUsersSecret:
@@ -310,9 +327,11 @@ securityConfig:
   config:
     # There are multiple ways to define the configuration here:
     # * If you define anything under data, the chart will automatically create
-    #   a secret and mount it.
+    #   a secret and mount it. This is best option to choose if you want to override all the
+    #   existing yml files at once.
     # * If you define securityConfigSecret, the chart will assume this secret is
-    #   created externally and mount it.
+    #   created externally and mount it. This is best option to choose if your intention is to
+    #   only update a single yml file.
     # * It is an error to define both data and securityConfigSecret.
     securityConfigSecret: ""
     dataComplete: true
@@ -336,6 +355,16 @@ startupProbe:
   periodSeconds: 10
   timeoutSeconds: 3
   failureThreshold: 30
+
+livenessProbe: {}
+  # periodSeconds: 20
+  # timeoutSeconds: 5
+  # failureThreshold: 10
+  # successThreshold: 1
+  # initialDelaySeconds: 10
+  # tcpSocket:
+  #   port: 9200
+
 readinessProbe:
   tcpSocket:
     port: 9200
@@ -375,6 +404,14 @@ nameOverride: ""
 fullnameOverride: ""
 
 masterTerminationFix: false
+
+opensearchLifecycle: {}
+  # preStop:
+  #   exec:
+  #     command: ["/bin/sh", "-c", "echo Hello from the preStart handler > /usr/share/message"]
+  # postStart:
+  #   exec:
+  #     command: ["/bin/sh", "-c", "echo Hello from the postStart handler > /usr/share/message"]
 
 lifecycle: {}
   # preStop:
@@ -417,11 +454,19 @@ networkPolicy:
 # please use the above podSecurityContext.fsGroup instead
 fsGroup: ""
 
-## Set optimal sysctl's. This requires privilege. Can be disabled if
+## Set optimal sysctl's through securityContext. This requires privilege. Can be disabled if
 ## the system has already been preconfigured. (Ex: https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html)
 ## Also see: https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
 sysctl:
   enabled: false
+
+## Set optimal sysctl's through privileged initContainer.
+sysctlInit:
+  enabled: false
+  # override image, which is busybox by default
+  # image: busybox
+  # override image tag, which is latest by default
+  # imageTag:
 
 ## Enable to add 3rd Party / Custom plugins not offered in the default OpenSearch image.
 plugins:

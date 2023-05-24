@@ -1,4 +1,18 @@
 ### Release notes
+- Opensearch
+  - New functionality to perform common administrative operations on your Opensearch indices, such as CRUD (Create, Read, Update, and Delete) functions, through the UI.
+  - New feature, searchable snapshots, which allows searching indices that are stored as snapshots within remote repositories without needing to download all of the index data ahead of time.
+  - New UI functionality to manage and restore from snapshots.
+  - More support for analyzing trace data collected by Jaeger in the Observability feature.
+  - New Security Analytics plugin includes tools to help you analyze security event logs, identify attack signatures, visualize threat patterns, and create security alerts.
+  - Support for multiple authentication options.
+  - Full release notes:
+    - [v2.4.0](https://github.com/opensearch-project/opensearch-build/blob/main/release-notes/opensearch-release-notes-2.4.0.md)
+    - [v2.5.0](https://github.com/opensearch-project/opensearch-build/blob/main/release-notes/opensearch-release-notes-2.5.0.md)
+    - [v2.6.0](https://github.com/opensearch-project/opensearch-build/blob/main/release-notes/opensearch-release-notes-2.6.0.md)
+    - [v2.7.0](https://github.com/opensearch-project/opensearch-build/blob/main/release-notes/opensearch-release-notes-2.7.0.md)
+    - [v2.8.0](https://github.com/opensearch-project/opensearch-build/blob/main/release-notes/opensearch-release-notes-2.8.0.md)
+
 
 ### Added
 
@@ -19,6 +33,9 @@
 - Updated ingress-nginx chart to `v4.7.0` with upgrade ingess-nginx to `v1.8.0`
   - Dropped support for kubernetes `v1.23.0`
   - Added, removed and deprecated prometheus metric names [#8728](https://github.com/kubernetes/ingress-nginx/pull/8728)
+- Change Trivy Operator Dashboard to only count image states once per image instead for each namespace and resource
+- Rework thanos networkpolicies with generator chart
+- Rework monitoring networkpolicies with generator chart
 
 ### Fixed
 
@@ -27,14 +44,9 @@
 - Another network policy fix for Harbor to allow garbage collection
 - Fix migration and race condition for HNC and HierarchyConfigurations
 
-### Changed
-
-- Change Trivy Operator Dashboard to only count image states once per image instead for each namespace and resource
-- Rework thanos networkpolicies with generator chart
-- Rework monitoring networkpolicies with generator chart
-
 ### Updated
 
 - Update Trivy Operator Dashboard to improve the user experience
 - Bump sops to version `3.7.3`.
 - Update Falco rules
+- Opensearch to v2.8.0, chart v2.13.0 and Opensearch Dashboard to v2.8.0, chart v2.11.0

@@ -4,7 +4,7 @@
 
 Here you can find the most relevant features and changes for the last couple of releases of Compliant Kubernetes
 
-- Kubernetes PodSecurityPolcies have been replaced with Kubernetes Pod Security Standards and additional Gatekeeper Constraints and Mutations. **[v0.30]**
+- Kubernetes PodSecurityPolicies have been replaced with Kubernetes Pod Security Standards and additional Gatekeeper Constraints and Mutations. **[v0.30]**
   - This should not affect user applications as the default behaviour is kept, and the new default restricted Pod Security Standard is slightly less restricted than the previous restricted PodSecurityPolicy following the upstream changes.
 - Trivy Operator have replaced Starboard Operator as the online security scanning tool. **[v0.30]**
   - This includes a new Trivy Operator dashboard and the deprecation of the old Image vulnerability dashboard.
