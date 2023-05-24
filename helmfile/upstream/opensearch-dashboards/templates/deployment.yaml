@@ -3,6 +3,10 @@ kind: Deployment
 metadata:
   name: {{ template "opensearch-dashboards.fullname" . }}
   labels: {{- include "opensearch-dashboards.labels" . | nindent 4 }}
+  {{- with .Values.dashboardAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
   strategy:
@@ -47,6 +51,9 @@ spec:
         - name: config
           configMap:
             name: {{ template "opensearch-dashboards.fullname" . }}-config
+            {{- if .Values.opensearchDashboardsYml.defaultMode }}
+            defaultMode: {{ .Values.opensearchDashboardsYml.defaultMode }}
+            {{- end }}
         {{- end }}
         {{- if .Values.extraVolumes }}
         # Currently some extra blocks accept strings
@@ -91,6 +98,20 @@ spec:
 {{ toYaml .Values.securityContext | indent 10 }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+        {{- if .Values.readinessProbe }}
+        readinessProbe:
+{{ toYaml .Values.readinessProbe | indent 10 }}
+        {{- end }}
+        {{- if .Values.livenessProbe }}
+        livenessProbe:
+{{ toYaml .Values.livenessProbe | indent 10 }}
+        {{- end }}
+        {{- if semverCompare ">=1.16-0" .Capabilities.KubeVersion.Version }}
+        {{- if .Values.readinessProbe }}
+        startupProbe:
+{{ toYaml .Values.startupProbe | indent 10 }}
+        {{- end }}
+        {{- end }}
         env:
         {{- if .Values.opensearchURL }}
         - name: OPENSEARCH_URL
@@ -137,6 +158,18 @@ spec:
         - containerPort: {{ .Values.service.port }}
           name: {{ .Values.service.httpPortName | default "http" }}
           protocol: TCP
+{{- if .Values.plugins.enabled }}
+        command:
+          - sh
+          - -c
+          - |
+            #!/usr/bin/bash
+            set -e
+            {{- range $plugin := .Values.plugins.installList }}
+            ./bin/opensearch-dashboards-plugin install {{ $plugin }}
+            {{- end }}
+            bash opensearch-dashboards-docker-entrypoint.sh opensearch-dashboards
+{{- end }}
 {{- if .Values.lifecycle }}
         lifecycle:
 {{ toYaml .Values.lifecycle | indent 10 }}

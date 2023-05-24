@@ -132,6 +132,14 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.31/apply/30-netpol.sh execute
     ```
 
+1. Remove opensearch-configurer so that it runs again after upgrading Opensearch:
+
+    ```bash
+    ./bin/ck8s helmfile sc -l app=opensearch-configurer destroy
+    # or
+    ./migration/v0.31/apply/11-remove-opensearch-configurer.sh execute
+    ```
+
 1. Upgrade applications:
 
     ```bash

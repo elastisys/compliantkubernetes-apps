@@ -299,7 +299,7 @@ releases:
     app: opensearch-master
     group: opensearch
   chart: ./upstream/opensearch
-  version: 2.6.0
+  version: 2.13.0
   wait: true
   needs:
   {{- if .Values.opensearch.sso.enabled }}
@@ -316,7 +316,7 @@ releases:
     app: opensearch-data
     group: opensearch
   chart: ./upstream/opensearch
-  version: 2.6.0
+  version: 2.13.0
   installed: {{ .Values.opensearch.dataNode.dedicatedPods }}
   wait: true
   needs:
@@ -331,7 +331,7 @@ releases:
     app: opensearch-client
     group: opensearch
   chart: ./upstream/opensearch
-  version: 2.6.0
+  version: 2.13.0
   installed: {{ .Values.opensearch.clientNode.dedicatedPods }}
   wait: true
   needs:
@@ -346,7 +346,7 @@ releases:
     app: opensearch-dashboards
     group: opensearch
   chart: ./upstream/opensearch-dashboards
-  version: 2.5.1
+  version: 2.11.0
   wait: true
   needs:
   - opensearch-system/opensearch-master
