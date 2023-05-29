@@ -148,10 +148,8 @@ set_storage_class() {
 
         exoscale|baremetal)
             storage_class=rook-ceph-block
-
-            yq4 -i '.networkPolicies.rookCeph.enabled = true' "${file}"
-            yq4 -i '.rookCeph.enabled = true' "${file}"
             ;;
+
         aws)
             storage_class=ebs-gp2
             ;;
@@ -204,6 +202,8 @@ set_nginx_config() {
             use_proxy_protocol=false
             use_host_port=true
             service_enabled=false
+            yq4 --inplace '.networkPolicies.global.externalLoadBalancer = true' "${file}"
+            yq4 --inplace '.networkPolicies.global.ingressUsingHostNetwork = true' "${file}"
             ;;
 
         citycloud | elastx)
@@ -333,6 +333,32 @@ set_harbor_config() {
     replace_set_me "${file}" ".harbor.persistence.disableRedirect" "${disable_redirect}"
 }
 
+update_monitoring() {
+    file=$1
+    if [[ ! -f "${file}" ]]; then
+        log_error "ERROR: invalid file - ${file}"
+        exit 1
+    fi
+    case ${CK8S_CLOUD_PROVIDER} in
+        exoscale | baremetal)
+          yq4 --inplace '.prometheusBlackboxExporter.targets.rook = true' "${file}"
+          yq4 --inplace '.rookCeph.monitoring.enabled = true' "${file}"
+          ;;
+    esac
+}
+update_psp_netpol() {
+    file=$1
+    if [[ ! -f "${file}" ]]; then
+        log_error "ERROR: invalid file - ${file}"
+        exit 1
+    fi
+    case ${CK8S_CLOUD_PROVIDER} in
+        exoscale | baremetal)
+          yq4 -i '.rookCeph.gatekeeperPsp.enabled = true' "${file}"
+          yq4 -i '.networkPolicies.rookCeph.enabled = true' "${file}"
+          ;;
+    esac
+}
 # Usage: update_config <override_config_file>
 # Updates configs to only contain custom values.
 update_config() {
@@ -531,6 +557,8 @@ generate_default_config "${config[default_common]}"
 set_storage_class       "${config[default_common]}"
 set_object_storage      "${config[default_common]}"
 set_nginx_config        "${config[default_common]}"
+update_monitoring        "${config[default_common]}"
+update_psp_netpol        "${config[default_common]}"
 update_config           "${config[override_common]}"
 
 generate_default_config        "${config[default_sc]}"

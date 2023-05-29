@@ -10,6 +10,10 @@
 - Added All instances option to OpenSearch dashboard
 - Add networkpolicy generator chart with common rules
 
+### Changed
+
+- Moved `.monitoring.rook` and `.rookCeph. enabled` keys under `rookCeph.monitoring` and `rookCeph.gatekeeperPsp`
+
 ### Fixed
 
 - Fixed issue with compaction job on ephemeral volumes

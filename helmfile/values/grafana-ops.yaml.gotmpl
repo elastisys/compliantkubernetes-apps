@@ -59,13 +59,13 @@ dashboards:
     enabled: true
     user_visible: true
   cephcluster:
-    enabled: {{ .Values.monitoring.rook.enabled }}
+    enabled: {{ .Values.rookCeph.monitoring.enabled }}
     user_visible: false
   cephosdsingle:
-    enabled: {{ .Values.monitoring.rook.enabled }}
+    enabled: {{ .Values.rookCeph.monitoring.enabled }}
     user_visible: false
   cephpools:
-    enabled: {{ .Values.monitoring.rook.enabled }}
+    enabled: {{ .Values.rookCeph.monitoring.enabled }}
     user_visible: false
   calicofelix:
     enabled: true

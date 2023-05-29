@@ -3,7 +3,7 @@ defaultRules:
     cluster: service
 
 rookMonitor:
-  enabled: {{ .Values.monitoring.rook.enabled }}
+  enabled: {{ .Values.rookCeph.monitoring.enabled }}
 
 certMonitor:
   enabled: true
