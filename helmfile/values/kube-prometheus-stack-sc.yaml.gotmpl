@@ -82,8 +82,13 @@ kubeApiServer:
 
 kubeEtcd:
   service:
+    {{- if .Values.global.clusterApi }}
+    port: 2381
+    targetPort: 2381
+    {{- else }}
     port: 4001
     targetPort: 4001
+    {{- end }}
 
 alertmanager:
   config:
