@@ -28,6 +28,7 @@
 - Add networkpolicy generator chart with common rules
 - Added option to enable harbor GC via config
 - Added openstack api metrics.
+- Added config option to support [Cluster API](https://cluster-api.sigs.k8s.io/) managed Kubernetes clusters
 
 ### Changed
 

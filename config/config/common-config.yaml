@@ -53,6 +53,9 @@ global:
   ## Supported values are 'docker', 'containerd'
   containerRuntime: containerd
 
+  ## Set to true if kubernetes is installed with cluster-api
+  clusterApi: false
+
 ## Configuration of storageclasses.
 storageClasses:
   # Name of the default storageclass.
