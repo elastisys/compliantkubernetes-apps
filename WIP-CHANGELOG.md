@@ -65,3 +65,7 @@
 - Updated harbor chart to `v1.12.2` which upgraded harbor to `v2.8.2`
   - Dropped support for chartmuseum
   - Default login page is now OIDC, for local login refer to path `<url>/account/sign-in`
+
+### Removed
+
+- Removed calico-node from test script

@@ -91,7 +91,6 @@ echo "Testing daemonsets"
 echo "=================="
 
 daemonsets=(
-    "kube-system calico-node"
     "kube-system node-local-dns"
     "ingress-nginx ingress-nginx-controller"
     "monitoring kube-prometheus-stack-prometheus-node-exporter"
