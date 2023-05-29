@@ -88,3 +88,6 @@ dashboards:
   harbor:
     enabled: {{ .Values.harbor.enabled }}
     user_visible: true
+  cluster-api:
+    enabled: {{ .Values.global.clusterApi }}
+    user_visible: false
