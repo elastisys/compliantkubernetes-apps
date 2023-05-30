@@ -31,8 +31,8 @@
             - "set-me"
     ```
 
-
 1. Upgrade applications:
 
     ```bash
     bin/ck8s apply {sc|wc}
+    ```

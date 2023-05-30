@@ -5,8 +5,8 @@ Project site: https://github.com/roboll/helmfile
 * Helm 3 is used to deploy all charts so helm 3 needs to be installed
 
 * We use multiple helm state files, located in `/helmfile` directory, containing the states for the helm releases for both the workload and service clusters.
-`Environments` are used to differentiate between these two clusters.
-**Note:** It should be investigated what the best practices are, like use sub-helmfiles etc.
+  `Environments` are used to differentiate between these two clusters.
+  **Note:** It should be investigated what the best practices are, like use sub-helmfiles etc.
 
 * The values that the charts are using are found in the `values` directory.
 
@@ -19,7 +19,7 @@ Project site: https://github.com/roboll/helmfile
     chmod +x helmfile
     ```
 
-2. Get `helm-diff` plugin if not already installed.
+1. Get `helm-diff` plugin if not already installed.
 
     ``` bash
     helm plugin install https://github.com/databus23/helm-diff --version 3.1.1

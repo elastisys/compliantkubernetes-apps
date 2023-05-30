@@ -165,6 +165,7 @@ After doing the `disruptive` step for either the automatic or manual method, you
         http: 30080
         https: 30443
     ```
+
 1. **Optional** Enable opensearch-securityadmin if disabled.
 
     ```diff

@@ -9,25 +9,25 @@
 This repository is part of the [Compliant Kubernetes][compliantkubernetes] (compliantkubernetes) platform.
 The platform consists of the following repositories:
 
-* [compliantkubernetes-kubespray][compliantkubernetes-kubespray] - Code for managing Kubernetes clusters and the infrastructure around them.
-* [compliantkubernetes-apps][compliantkubernetes-apps] - Code, configuration and tools for running various services and applications on top of Kubernetes clusters.
+- [compliantkubernetes-kubespray][compliantkubernetes-kubespray] - Code for managing Kubernetes clusters and the infrastructure around them.
+- [compliantkubernetes-apps][compliantkubernetes-apps] - Code, configuration and tools for running various services and applications on top of Kubernetes clusters.
 
 The Elastisys Compliant Kubernetes (compliantkubernetes) platform runs two Kubernetes clusters.
 One called "service" and one called "workload".
 
 The _service cluster_ provides observability, log aggregation, private container registry with vulnerability scanning and authentication using the following services:
 
-* Prometheus and Grafana
-* OpenSearch and OpenSearch Dashboards
-* Harbor
-* Dex
+- Prometheus and Grafana
+- OpenSearch and OpenSearch Dashboards
+- Harbor
+- Dex
 
 The _workload cluster_ manages the user applications as well as providing intrusion detection, security policies, log forwarding and monitoring using the following services:
 
-* Falco
-* Open Policy Agent
-* Fluentd
-* Prometheus
+- Falco
+- Open Policy Agent
+- Fluentd
+- Prometheus
 
 [compliantkubernetes]: https://compliantkubernetes.com/
 [compliantkubernetes-kubespray]: https://github.com/elastisys/compliantkubernetes-kubespray
@@ -51,18 +51,18 @@ The apps are installed using a combination of helm charts and manifests with the
 
 ### Requirements
 
-* A running cluster based on [compliantkubernetes-kubespray][compliantkubernetes-kubespray]
-* [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.24.4)
-* [helm](https://github.com/helm/helm/releases) (tested with 3.8.0)
-* [helmfile](https://github.com/roboll/helmfile) (tested with v0.144.0)
-* [helm-diff](https://github.com/databus23/helm-diff) (tested with 3.5.0)
-* [helm-secrets](https://github.com/futuresimple/helm-secrets) (tested with 3.12.0)
-* [jq](https://github.com/stedolan/jq) (tested with jq-1.6)
-* [sops](https://github.com/mozilla/sops) (tested with 3.7.3)
-* [s3cmd](https://s3tools.org/s3cmd) available directly in Ubuntus repositories (tested with 2.0.1)
-* [yq4](https://github.com/mikefarah/yq) (tested with 4.26.1)
-* [pwgen](https://sourceforge.net/projects/pwgen/) available directly in Ubuntus repositories (tested with 2.08)
-* [htpasswd](https://httpd.apache.org/docs/2.4/programs/htpasswd.html) available directly in Ubuntus repositories (tested with 2.4.41)
+- A running cluster based on [compliantkubernetes-kubespray][compliantkubernetes-kubespray]
+- [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.24.4)
+- [helm](https://github.com/helm/helm/releases) (tested with 3.8.0)
+- [helmfile](https://github.com/roboll/helmfile) (tested with v0.144.0)
+- [helm-diff](https://github.com/databus23/helm-diff) (tested with 3.5.0)
+- [helm-secrets](https://github.com/futuresimple/helm-secrets) (tested with 3.12.0)
+- [jq](https://github.com/stedolan/jq) (tested with jq-1.6)
+- [sops](https://github.com/mozilla/sops) (tested with 3.7.3)
+- [s3cmd](https://s3tools.org/s3cmd) available directly in Ubuntus repositories (tested with 2.0.1)
+- [yq4](https://github.com/mikefarah/yq) (tested with 4.26.1)
+- [pwgen](https://sourceforge.net/projects/pwgen/) available directly in Ubuntus repositories (tested with 2.08)
+- [htpasswd](https://httpd.apache.org/docs/2.4/programs/htpasswd.html) available directly in Ubuntus repositories (tested with 2.4.41)
 
 Installs requirements using the ansible playbook get-requirements.yaml
 
@@ -99,9 +99,13 @@ If this is all new to you, here's a [link](https://riseup.net/en/security/messag
 
 **You probably want to check the [compliantkubernetes-kubespray][compliantkubernetes-kubespray] repository first, since compliantkubernetes-apps depends on having two clusters already set up.**
 In addition to this, you will need to set up the following DNS entries (replace `example.com` with your domain).
+
 - Point these domains to the workload cluster ingress controller:
+
   - `*.example.com`
+
 - Point these domains to the service cluster ingress controller:
+
   - `*.ops.example.com`
   - `dex.example.com`
   - `grafana.example.com`
@@ -223,9 +227,11 @@ A **kubeconfig file for the user** (`${CK8S_CONFIG_PATH}/user/kubeconfig.yaml`) 
 The user kubeconfig will be configured to use the first namespace by default.
 
 **OpenSearch Dashboards** access for the user can be provided either by setting up OIDC or using the internal user database in OpenSearch:
+
 - OIDC:
   - Set `opensearch.sso.enabled=true` in `sc-config.yaml`.
   - Configure extra role mappings under `opensearch.extraRoleMappings` to give the users the necessary roles.
+
     ```yaml
     extraRoleMappings:
       - mapping_name: kibana_user
@@ -238,6 +244,7 @@ The user kubeconfig will be configured to use the first namespace by default.
           users:
             - "User Name"
     ```
+
 - Internal user database:
   - Log in to OpenSearch Dashboards using the admin account.
   - Create an account for the user.
@@ -273,12 +280,13 @@ The following list is requirements on the external postgres
   - notaryserver
   - notarysigner
 
-**Config**
+**Config**:
 
 Harbor backup is not designed to work with a external database.
 You will have to provide your own backup solution.
 
 In `$CK8S_CONFIG_PATH/sc-config.yaml` set the following configs
+
 ```
 harbor:
   ...
@@ -301,6 +309,7 @@ harbor:
 ```
 
 In `$CK8S_CONFIG_PATH/secrets.yaml` add the postgres user password
+
 ```
 harbor:
   external:
@@ -309,7 +318,8 @@ harbor:
 
 #### Redis
 
-**Config**
+**Config**:
+
 In `$CK8S_CONFIG_PATH/sc-config.yaml` set the following configs
 
 ```
@@ -334,25 +344,25 @@ Run the script to see what options are available.
 
 #### Examples
 
-* Bootstrap and deploy apps to the workload cluster:
+- Bootstrap and deploy apps to the workload cluster:
 
   ```bash
   ./bin/ck8s apply wc
   ```
 
-* Run tests on the service cluster:
+- Run tests on the service cluster:
 
   ```bash
   ./bin/ck8s test sc
   ```
 
-* Port-forward to a Service in the workload cluster:
+- Port-forward to a Service in the workload cluster:
 
   ```bash
   ./bin/ck8s ops kubectl wc port-forward svc/<service> --namespace <namespace> <port>
   ```
 
-* Run `helmfile diff` on a helm release:
+- Run `helmfile diff` on a helm release:
 
   ```bash
   ./bin/ck8s ops helmfile sc -l <label=selector> diff
@@ -383,13 +393,17 @@ Version validation will require that you are on a release tag matching version s
 When on a specific commit add the commit hash under `global.ck8sVersion` to pass validation, and for development set `any` to circumvent version validation completely.
 
 ### Removing compliantkubernetes-apps from your cluster
+
 There are two simple scripts that can be used to clean up you clusters.
 
 To clean up the service cluster run:
+
 ```bash
 ./scripts/clean-sc.sh
 ```
+
 To clean up the workload cluster run:
+
 ```bash
 ./scripts/clean-wc.sh
 ```
@@ -402,13 +416,13 @@ See <https://compliantkubernetes.io/operator-manual/>.
 
 1. Go to the [Google console](https://console.cloud.google.com/) and create a project.
 
-2. Go to the [Oauth consent screen](https://console.cloud.google.com/apis/credentials/consent) and name the application with the same name as the project of your google cloud project add the top level domain e.g. `elastisys.se` to Authorized domains.
+1. Go to the [Oauth consent screen](https://console.cloud.google.com/apis/credentials/consent) and name the application with the same name as the project of your google cloud project add the top level domain e.g. `elastisys.se` to Authorized domains.
 
-3. Go to [Credentials](https://console.cloud.google.com/apis/credentials) and press `Create credentials` and select `OAuth client ID`.
+1. Go to [Credentials](https://console.cloud.google.com/apis/credentials) and press `Create credentials` and select `OAuth client ID`.
     Select `web application` and give it a name and add the URL to dex in the `Authorized Javascript origins` field, e.g. `dex.demo.elastisys.se`.
     Add `<dex url>/callback` to Authorized redirect URIs field, e.g. `dex.demo.elastisys.se/callback`.
 
-4. Configure the following options in `CK8S_CONFIG_PATH/secrets.yaml`
+1. Configure the following options in `CK8S_CONFIG_PATH/secrets.yaml`
 
     ```yaml
       dex:

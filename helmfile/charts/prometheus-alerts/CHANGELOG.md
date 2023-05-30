@@ -1,28 +1,36 @@
+# Changelog
+
 ## 2022.12.01
+
 1. helmfile/charts/prometheus-alerts/templates/alerts/kubernetes-system-kubelet.yaml
     - ADDED - LessKubeletsThenNodes alert
 
 ## 2022.10.04
+
 1. helmfile/charts/prometheus-alerts/templates/alerts/kubernetes-apps.yaml
     - ADDED - KubeFailedEvictedPods alert
 
 ## 2022.09.28
+
 1. helmfile/charts/prometheus-alerts/templates/alerts/opensearch.yaml
     - ADDED - OpensearchClusterYellow, OpensearchClusterRed and $indexSizeIncreasedOverLimit
 
 ## 2022.08.17
+
 1. helmfile/charts/prometheus-alerts/files/missing-metrics-alerts.yaml
     - MODIFIED - MetricsFromScClusterIsMissing 'for' from 5m to 15m
-2. helmfile/charts/prometheus-alerts/files/thanos.yaml
+1. helmfile/charts/prometheus-alerts/files/thanos.yaml
     - MODIFIED - ThanosReceiveHttpRequestErrorRateHigh 'for' from 5m to 20m
-3. helmfile/charts/prometheus-alerts/templates/alerts/opensearch.yaml
+1. helmfile/charts/prometheus-alerts/templates/alerts/opensearch.yaml
     - MODIFIED - OpenSearchTooFewNodesRunning 'for' from 5m to 15m
 
 ## 2022.08.10
+
 1. fluentd.yaml
     - ADDED - new FluentdAvailableSpaceBuffer alerts
 
 ## 2022.07.07
+
 1. predict-linear.yaml
     - ADDED - the custom CPURequest and MemoryRequest alerts for the node patterns from common-config.yaml
 

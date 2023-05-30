@@ -12,7 +12,6 @@
 
     This will copy over the variables set for the environment regarding cloud provider, environment name, and flavor to the new location: the common default config.
 
-
 1. If using User Alertmanager: Run migration script `user-alertmanager-config.sh`
 
     This will save configuration and user role bindings for User Alertmanager.

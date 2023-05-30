@@ -19,6 +19,7 @@
     ```bash
     bin/ck8s init
     ```
+
 1. Remove grafana-ops chart: `migration/v0.19.x-v0.20.x/remove-grafana-ops.sh`
 
 1. Remove any potential nfs-provisioner config: `migration/v0.19.x-v0.20.x/remove-nfs-provisioner-config.sh`

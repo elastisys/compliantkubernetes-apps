@@ -1,4 +1,5 @@
-### Restore Harbor
+# Restore Harbor
+
 With the k8s job you can restore the database in Harbor from a backup in S3.
 *Note this restore is only designed for internal harbor database and not for an external database*
 The steps should be performed from the `compliantkubernetes-apps` root directory.
@@ -7,8 +8,10 @@ The steps should be performed from the `compliantkubernetes-apps` root directory
 Before restoring the database, make sure that Harbor is installed.
 It can be installed normally.
 
-#### Env variables
+## Env variables
+
 Set these variables for the restore job:
+
 ```bash
 export CK8S_CONFIG_PATH=<your config path>
 export S3_BUCKET=$(yq4 '.objectStorage.buckets.harbor' "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml" )
@@ -18,20 +21,23 @@ echo $S3_BUCKET
 echo $S3_REGION_ENDPOINT
 ```
 
-##### Optional env variables
+### Optional env variables
 
 The job will restore the latest backup.
 `$SPECIFIC_BACKUP` can be used to specify which backup.
 To get a list of available backups use:
+
 ```
 s3cmd --config <(sops -d ${CK8S_CONFIG_PATH}/.state/s3cfg.ini) ls s3://${S3_BUCKET}/backups/
 ```
+
 Then set:
+
 ```bash
 export SPECIFIC_BACKUP=<backups/xxxxxxxxxx.sql.gz> # Optional
 ```
 
-#### Restore
+## Restore
 
 Setup the necessary job.yaml and configmap:
 

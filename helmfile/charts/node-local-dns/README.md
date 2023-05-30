@@ -1,4 +1,4 @@
-## Node local DNS cache
+# Node local DNS cache
 
 This chart adds a daemonset running CoreDNS as the local DNS cache.
 

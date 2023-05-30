@@ -9,6 +9,7 @@
     ```bash
     bin/ck8s init
     ```
+
 1. Check if any of the [deprecated configurations](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.1.3/Changelog.md#113) are present in the wc-config.yaml
 
 1. **Warning** regarding OpenSearch securityadmin:
@@ -34,4 +35,5 @@
     ```bash
     bin/ck8s apply {sc|wc}
     ```
+
 1. Change user-alertmanager receiver to `null` if the default slack receiver is being used: `migration/v0.22.x-v0.23.x/user-alertmanager-reconfig.sh`

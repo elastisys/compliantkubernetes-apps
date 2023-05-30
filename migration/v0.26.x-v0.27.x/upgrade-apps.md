@@ -32,7 +32,7 @@
 
 1. If the loadbalancer, fronting the ingress controller, is not controlled by a kubernetes cloud controller, set the following to true in `$CK8S_CONFIG_PATH/common-config.yaml`
 
-    ```console
+    ```yaml
     networkPolicies:
     global:
       externalLoadBalancer: true
@@ -41,7 +41,7 @@
 
 1. If kured notification are enabled, set the ips in `$CK8S_CONFIG_PATH/common-config.yaml`
 
-    ```console
+    ```yaml
     networkPolicies:
       kured:
         notificationSlack:
@@ -60,6 +60,7 @@
     ```bash
     ./migration/v0.26.x-v0.27.x/add-extra-excluded-namespaces.sh
     ```
+
     > **_NOTE:_** remove the namespaces that are not managed from `$CK8S_CONFIG_PATH/wc-config.yaml`
 
 1. Reinstall HNC
@@ -71,6 +72,7 @@
 1. *IMPORTANT* If you are using any Dex connector of type `google` and you haven't added a service account then you'll need to change it to a type `oidc`
 
     This can be done by adding the following line to the `config` part in the connector
+
     ```
     issuer: https://accounts.google.com
     ```
@@ -109,28 +111,29 @@
     ./bin/ck8s ops helmfile wc -l app=falco -l app=falco-exporter destroy
     ./bin/ck8s ops helmfile sc -l app=falco -l app=falco-exporter destroy
     ```
+
 1. If you are upgrading from v0.26.x to v0.27.1 apply this steps:
 
-  1. Add new harbor credentials
+    1. Add new harbor credentials
 
-      ```bash
-      ./migration/v0.27.x-v0.28.x/add-registry-credentials.sh
-      ```
+        ```bash
+        ./migration/v0.27.x-v0.28.x/add-registry-credentials.sh
+        ```
 
-  1. Migrate harbor jobservice port to ports (array)
+    1. Migrate harbor jobservice port to ports (array)
 
-      ```bash
-      ./migration/v0.27.x-v0.28.x/move-harbor-jobservice-port-to-ports.sh
-      ```
+        ```bash
+        ./migration/v0.27.x-v0.28.x/move-harbor-jobservice-port-to-ports.sh
+        ```
 
-  1. Up date the IPs for harbor replication in `$CK8S_CONFIG_PATH/sc-config.yaml`
+    1. Up date the IPs for harbor replication in `$CK8S_CONFIG_PATH/sc-config.yaml`
 
-      ```yaml
-      harbor:
-        registries:
-          ips:
-            - "set-me"
-      ```
+        ```yaml
+        harbor:
+          registries:
+            ips:
+              - "set-me"
+        ```
 
 1. Upgrade applications:
 

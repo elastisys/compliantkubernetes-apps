@@ -9,7 +9,8 @@
     ```bash
     bin/ck8s init
     ```
-2. Upgrade applications:
+
+1. Upgrade applications:
 
     ```bash
     bin/ck8s apply {sc|wc}

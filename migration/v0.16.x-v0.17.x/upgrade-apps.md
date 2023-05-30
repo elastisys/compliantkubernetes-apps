@@ -23,6 +23,7 @@
     ```bash
     bin/ck8s ops kubectl sc apply -f 'helmfile/upstream/kube-prometheus-stack/crds'
     ```
+
     ```bash
     bin/ck8s ops kubectl wc apply -f 'helmfile/upstream/kube-prometheus-stack/crds'
     ```

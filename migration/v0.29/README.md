@@ -36,14 +36,19 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 ## Prerequisites
 
 - [ ] Upgrade your version of helmfile and helm diff by following these steps:
-    - Uninstall `helm-diff` so that the new version can be installed:
-        ```console
-        $ helm plugin uninstall diff
-        ```
-    - From the root of your `compliantkubernetes-apps` directory, run ansible to get the updated requirements:
-        ```console
-        $ ansible-playbook -e 'ansible_python_interpreter=/usr/bin/python3' --ask-become-pass --connection local --inventory 127.0.0.1, get-requirements.yaml
-        ```
+
+  - Uninstall `helm-diff` so that the new version can be installed:
+
+      ```bash
+      helm plugin uninstall diff
+      ```
+
+  - From the root of your `compliantkubernetes-apps` directory, run ansible to get the updated requirements:
+
+      ```bash
+      ansible-playbook -e 'ansible_python_interpreter=/usr/bin/python3' --ask-become-pass --connection local --inventory 127.0.0.1, get-requirements.yaml
+      ```
+
 - [ ] Notify the users (if any) before the upgrade starts;
 - [ ] Check if there are any pending changes to the environment;
 - [ ] Check the state of the environment, pods, nodes and backup jobs:
@@ -96,6 +101,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ```bash
     ./bin/ck8s upgrade v0.29 prepare
     ```
+
     > **Note**:
     > To set the elastisys nodes tolerations and affinity for fluentd aggregator in wc edit `vim "$CK8S_CONFIG_PATH/wc-config.yaml"` and add them under `fluentd.aggregator`
 
@@ -151,13 +157,15 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
 1. **Warning** The default Gatekeeper enforcements have been updated:
 
-    - Disallow latest tag `disallowedTags.enforcement` default is now `deny` - was `dryrun`
-    - Require trusted image registry `imageRegistry.enforcement` default is now `warn` - was `deny`
-    - Require network policies `networkPolicies.enforcement` default is now `warn` - was `deny`
-    - Require resource requests `resourceRequests.enforcement` default is unchanged as `deny`
+    Disallow latest tag `disallowedTags.enforcement` default is now `deny` - was `dryrun`
+
+    Require trusted image registry `imageRegistry.enforcement` default is now `warn` - was `deny`
+
+    Require network policies `networkPolicies.enforcement` default is now `warn` - was `deny`
+
+    Require resource requests `resourceRequests.enforcement` default is unchanged as `deny`
 
     As changing these enforcements can be disruptive, especially when going from `dryrun` to `deny`, here are some recommendations:
-
     - If the new default is `deny` and the environment does not already have `deny` on that specific policy, then override with `warn` and inform the user that they should work toward being able to have `deny` in the future.
     - If the new default is `warn` and the environment has `deny`, then leave it at `deny` (possibly requiring an override config).
     - If the new default is `warn` and the environment has `dryrun`, then use `warn` (possibly requiring removal of override config) and inform the user that they will start seeing warnings from that policy.

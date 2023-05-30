@@ -15,20 +15,20 @@
 - [ ] Proper commit message prefix on all commits
 - [ ] Updated the [public facing documentation](https://github.com/elastisys/compliantkubernetes)
 - Is this changeset backwards compatible for existing clusters? Applying:
-    - [ ] is completely transparent, will not impact the workload in any way.
-    - [ ] requires running a migration script.
-    - [ ] will create noticeable cluster degradation.
-          E.g. logs or metrics are not being collected or Kubernetes API server
-          will not be responding while upgrading.
-    - [ ] requires draining and/or replacing nodes.
-    - [ ] will change any APIs.
-          E.g. removes or changes any CK8S config options or Kubernetes APIs.
-    - [ ] will break the cluster.
-          I.e. full cluster migration is required.
+  - [ ] is completely transparent, will not impact the workload in any way.
+  - [ ] requires running a migration script.
+  - [ ] will create noticeable cluster degradation.
+        E.g. logs or metrics are not being collected or Kubernetes API server
+        will not be responding while upgrading.
+  - [ ] requires draining and/or replacing nodes.
+  - [ ] will change any APIs.
+        E.g. removes or changes any CK8S config options or Kubernetes APIs.
+  - [ ] will break the cluster.
+        I.e. full cluster migration is required.
 - Chart checklist (pick exactly one):
-    - [ ] I upgraded no Chart.
-    - [ ] I upgraded a Chart and determined that no migration steps are needed.
-    - [ ] I upgraded a Chart and added [migration steps](https://github.com/elastisys/compliantkubernetes-apps/blob/main/migration).
+  - [ ] I upgraded no Chart.
+  - [ ] I upgraded a Chart and determined that no migration steps are needed.
+  - [ ] I upgraded a Chart and added [migration steps](https://github.com/elastisys/compliantkubernetes-apps/blob/main/migration).
 
 **Pipeline config** *(if applicable)*
 If you change some config options (e.g. add/rename variable or change the default value) you may need to update the config used by the pipeline in `pipeline/config`.

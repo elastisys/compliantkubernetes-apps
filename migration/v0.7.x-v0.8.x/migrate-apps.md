@@ -4,43 +4,53 @@ You will need to follow these steps in order to upgrade each Compliant Kubernete
 The instructions assume that you work from the root of the `compliantkubernetes-apps` repository, has the latest changes already pulled and configured `CK8S_CONFIG_PATH` correctly.
 
 1. Checkout the new release: `git checkout v0.8.0`.
-2. Update helm to v3.4.1.
-3. The Helm repository `stable` has changed URL and has to be changed manually:
+
+1. Update helm to v3.4.1.
+
+1. The Helm repository `stable` has changed URL and has to be changed manually:
     `helm repo add "stable" "https://charts.helm.sh/stable" --force-update`
-4. The blackbox chart has a changed dependency URL and has to be updated manually:
+
+1. The blackbox chart has a changed dependency URL and has to be updated manually:
     `cd helmfile/charts/blackbox && helm dependency update && cd -`
-5. Run init to get new defaults: `./bin/ck8s init`.
-6. Run the migration script to update the object storage configuration: `./migration/v0.7.x-v0.8.x/migrate-object-storage.sh`
-7. The following configuration options must be manually updated (in both `sc-config.yaml` and `wc-config.yaml` if applicable unless otherwise mentioned):
-  - Move `nginxIngress.controller.daemonset.useHostPort` to `ingressNginx.controller.useHostPort`.
-  - Move `useRegionEndpoint` from `elasticsearch` to `fluentd` in `sc-config.yaml`.
-  - Remove `prometheus.retention.alertManager` from `wc-config.yaml`.
-  - Update `falco.alerts.hostPort` to `"http://kube-prometheus-stack-alertmanager.monitoring:9093"` in `wc-config.yaml`
-  - Please update the InfluxDB values, and make sure any new values match your old values when applicable.
-    - `influxDB.address` removed
-    - `influxDB.metrics.sizeWc` replaced by `influxDB.retention.sizeWC`
-    - `influxDB.metrics.sizeSc` replaced by `influxDB.retention.sizeSC`
-    - `influxDB.retention.ageWc` replaced by `influxDB.retention.durationWC`
-    - `influxDB.retention.ageSc` replaced by `influxDB.retention.durationSC`
-  - The config for opendistro has been changed.
-    Please update the new defaults to match your old values.
-    - `elasticsearch.tolerations` removed
-    - `elasticsearch.nodeSelector` removed
-    - `elasticsearch.affinity` removed
-    - `elasticsearch.storageClass` replaced by `elasticsearch.dataNode.storageClass`
-    - `elasticsearch.retention.kubeAuditSize` replaced by `elasticsearch.curator.retention.kubeAuditSizeGB`
-    - `elasticsearch.retention.kubeAuditAge` replaced by `elasticsearch.curator.retention.kubeAuditAgeDays`
-    - `elasticsearch.retention.kubernetesSize` replaced by `elasticsearch.curator.retention.kubernetesSizeGB`
-    - `elasticsearch.retention.kubernetesAge` replaced by `elasticsearch.curator.retention.kubernetesAgeDays`
-    - `elasticsearch.retention.otherSize` replaced by `elasticsearch.curator.retention.otherSizeGB`
-    - `elasticsearch.retention.otherAge` replaced by `elasticsearch.curator.retention.otherAgeDays`
-  - Make sure fluentd has a toleration to run on control plane nodes in `wc-config.yaml` under `fluentd.tolerations`:
-    ```yaml
-    - effect: NoSchedule
-      key: "node-role.kubernetes.io/master"
-      value: ""
-    ```
-8. Upgrade Workload cluster applications
+
+1. Run init to get new defaults: `./bin/ck8s init`.
+
+1. Run the migration script to update the object storage configuration: `./migration/v0.7.x-v0.8.x/migrate-object-storage.sh`
+
+1. The following configuration options must be manually updated (in both `sc-config.yaml` and `wc-config.yaml` if applicable unless otherwise mentioned):
+
+    - Move `nginxIngress.controller.daemonset.useHostPort` to `ingressNginx.controller.useHostPort`.
+    - Move `useRegionEndpoint` from `elasticsearch` to `fluentd` in `sc-config.yaml`.
+    - Remove `prometheus.retention.alertManager` from `wc-config.yaml`.
+    - Update `falco.alerts.hostPort` to `"http://kube-prometheus-stack-alertmanager.monitoring:9093"` in `wc-config.yaml`
+    - Please update the InfluxDB values, and make sure any new values match your old values when applicable.
+      - `influxDB.address` removed
+      - `influxDB.metrics.sizeWc` replaced by `influxDB.retention.sizeWC`
+      - `influxDB.metrics.sizeSc` replaced by `influxDB.retention.sizeSC`
+      - `influxDB.retention.ageWc` replaced by `influxDB.retention.durationWC`
+      - `influxDB.retention.ageSc` replaced by `influxDB.retention.durationSC`
+    - The config for opendistro has been changed.
+      Please update the new defaults to match your old values.
+      - `elasticsearch.tolerations` removed
+      - `elasticsearch.nodeSelector` removed
+      - `elasticsearch.affinity` removed
+      - `elasticsearch.storageClass` replaced by `elasticsearch.dataNode.storageClass`
+      - `elasticsearch.retention.kubeAuditSize` replaced by `elasticsearch.curator.retention.kubeAuditSizeGB`
+      - `elasticsearch.retention.kubeAuditAge` replaced by `elasticsearch.curator.retention.kubeAuditAgeDays`
+      - `elasticsearch.retention.kubernetesSize` replaced by `elasticsearch.curator.retention.kubernetesSizeGB`
+      - `elasticsearch.retention.kubernetesAge` replaced by `elasticsearch.curator.retention.kubernetesAgeDays`
+      - `elasticsearch.retention.otherSize` replaced by `elasticsearch.curator.retention.otherSizeGB`
+      - `elasticsearch.retention.otherAge` replaced by `elasticsearch.curator.retention.otherAgeDays`
+    - Make sure fluentd has a toleration to run on control plane nodes in `wc-config.yaml` under `fluentd.tolerations`:
+
+      ```yaml
+      - effect: NoSchedule
+        key: "node-role.kubernetes.io/master"
+        value: ""
+      ```
+
+1. Upgrade Workload cluster applications
+
     ```bash
     # Delete old prometheus-operator release and related resources
     ./bin/ck8s ops helm wc uninstall prometheus-operator -n monitoring
@@ -62,7 +72,9 @@ The instructions assume that you work from the root of the `compliantkubernetes-
     # Update everything else
     ./bin/ck8s apply wc
     ```
-9. Upgrade Service cluster applications
+
+1. Upgrade Service cluster applications
+
     ```bash
     # Delete old prometheus-operator release and related resources
     ./bin/ck8s ops helm sc uninstall prometheus-operator -n monitoring

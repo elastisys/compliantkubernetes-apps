@@ -1,4 +1,4 @@
-### Running Bats tests locally
+# Running Bats tests locally
 
 If you want to run Bats tests locally (instead of in the CI pipeline), execute the following from the project root directory:
 
