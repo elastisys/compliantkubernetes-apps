@@ -56,11 +56,12 @@ getConfigIPS() {
     local config_file="$2"
 
     local configIPS=()
-    while IFS= read -r line; do
-        if [[ $line != */32 ]]; then
-            configIPS+=("${line//[- ]/}")
+
+    for ip in $(yq4 e "$source_file | .[]" "$config_file"); do
+        if [[ $ip != */32 ]]; then
+            configIPS+=("${ip}")
         fi
-    done < <(yq4 e "$source_file" "$config_file")
+    done
 
     echo "${configIPS[@]}"
 }
@@ -80,14 +81,9 @@ updateConfigFile() {
 performIPCheck() {
     local kubectlIP="$1"
     local configIP="$2"
-    local output
 
-    output=$(performTheIPCheck "$kubectlIP" "$configIP")
-
-    if [[ $output == "True" ]]; then
-        if [[ " ${inside_subnet[*]} " != *" $kubectlIP "* ]]; then
-            inside_subnet+=("$kubectlIP")
-
+    if python3 -c "import ipaddress; exit(0) if ipaddress.ip_address('${kubectlIP}') in ipaddress.ip_network('${configIP}') else exit(1)"
+    then
             # Create a new array without the matching string.
             filtered_array=()
             for kubectl_ip in "${IPS[@]}"; do
@@ -98,35 +94,11 @@ performIPCheck() {
 
             # Create and set a clean kubeIP list without copies.
             IPS=("${filtered_array[@]}")
-        fi
 
         if [[ " ${working_subnet[*]} " != *" $configIP "* ]]; then
             working_subnet+=("$configIP")
         fi
-    elif [[ $output == "False" ]]; then
-        :
-    else
-        echo "$output". This string is disregarded.
     fi
-}
-
-performTheIPCheck() {
-    local kubectlIP="$1"
-    local configIP="$2"
-
-    local output
-    output=$(python3 -c "
-import ipaddress
-try:
-    result = ipaddress.ip_address('${kubectlIP}') in ipaddress.ip_network('${configIP}')
-    print('True' if result else 'False')
-except ipaddress.AddressValueError:
-    print('Invalid IP address')
-except Exception as e:
-    print('Error:', e)
-")
-
-    echo "$output"
 }
 
 # Fetches the IPs from a specified address
@@ -158,13 +130,10 @@ updateDNSIPs() {
 
     read -r -a IPS <<<"$(getDNSIPs "${endpoint}")"
 
-    IPS_copy=("${IPS[@]}")
-
     multiIPRanges=()
 
     read -r -a multiIPRanges <<<"$(getConfigIPS "$inputSource" "$inputConfig")"
 
-    inside_subnet=()
     working_subnet=()
 
     # Clear config-values
@@ -174,8 +143,8 @@ updateDNSIPs() {
     # 1. Check if any got kubectlIPs fits inside of the IPs existing in the config-files.
     # 2. IF True = Put the working subnet-address and kube-address in assigned arrays for comparison and remove copies.
     # 3. Merge the working subnet-adresses and kube-addresses into a finalized list.
-    if [ "${multiIPRanges[*]}" != '[]' ]; then
-        for upstreamDNSIP in "${IPS_copy[@]}"; do
+    if [ "${#multiIPRanges[@]}" -gt 0 ]; then
+        for upstreamDNSIP in "${IPS[@]}"; do
 
             for configIP in "${multiIPRanges[@]}"; do
                 performIPCheck "$upstreamDNSIP" "$configIP"
@@ -184,6 +153,7 @@ updateDNSIPs() {
 
         done
 
+        # Add the working subnet-adresses and working kubeIPs together.
         working_subnet+=("${IPS[@]}")
 
         for ip in "${working_subnet[@]}"; do
@@ -249,14 +219,10 @@ updateKubectlIPs() {
     local IPS
     read -r -a IPS <<<"$(getKubectlIPs "$cloud" "$label")"
 
-    # Create copy of the kube-addresses array for for-loop purposes only
-    IPS_copy=("${IPS[@]}")
-
     multiIPRanges=()
 
     read -r -a multiIPRanges <<<"$(getConfigIPS "$inputSource" "$inputConfig")"
 
-    inside_subnet=()
     working_subnet=()
 
     # Clear config-values
@@ -266,8 +232,8 @@ updateKubectlIPs() {
     # 1. Check if any got kubectlIPs fits inside of the IPs existing in the config-files.
     # 2. IF True = Put the working subnet-address and kube-address in assigned arrays for comparison and remove copies.
     # 3. Merge the working subnet-adresses and kube-addresses into a finalized list.
-    if [ "${multiIPRanges[*]}" != '[]' ]; then
-        for upstreamDNSIP in "${IPS_copy[@]}"; do
+    if [ "${#multiIPRanges[@]}" -gt 0 ]; then
+        for upstreamDNSIP in "${IPS[@]}"; do
 
             for configIP in "${multiIPRanges[@]}"; do
                 performIPCheck "$upstreamDNSIP" "$configIP"
