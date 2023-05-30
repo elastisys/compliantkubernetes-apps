@@ -92,6 +92,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     git switch -d v0.31.x
     ```
 
+1. Move some rookCeph keys if they exist:
+
+    ```bash
+    ./01-move-rook-values.sh
+    ```
+
 1. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.
