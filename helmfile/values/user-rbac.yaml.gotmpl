@@ -9,7 +9,18 @@ namespaces:
     {{- end }}
 {{- end }}
 
-users: {{ toYaml .Values.user.adminUsers | nindent 2 }}
+users:
+{{- range $user := .Values.user.adminUsers }}
+{{ if not (contains "serviceAccount:" $user) }}
+  - {{ $user }}
+{{- end }}
+{{- end }}
 groups: {{ toYaml .Values.user.adminGroups | nindent 2 }}
+serviceAccounts:
+{{- range $user := .Values.user.adminUsers }}
+{{ if contains "serviceAccount:" $user }}
+  - {{ $user | trimPrefix "serviceAccount:" }}
+{{- end }}
+{{- end }}
 createNamespaces: {{ .Values.user.createNamespaces }}
 enableFalcoViewer: {{ toYaml .Values.falco.enabled | nindent 2 }}

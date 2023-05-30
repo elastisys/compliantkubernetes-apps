@@ -122,7 +122,7 @@ case "${1}" in
         sops_exec_file "${secrets[s3cfg_file]}" 's3cmd --config="{}" '"${*}"
     ;;
     kubeconfig)
-        [[ "${2}" =~ ^(user|admin)$ ]] || usage
+        [[ "${2}" =~ ^(user|dev|admin)$ ]] || usage
         shift
         "${here}/kubeconfig.bash" "${@}"
         ;;
