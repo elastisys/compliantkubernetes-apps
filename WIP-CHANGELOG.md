@@ -22,3 +22,4 @@
 ### Updated
 
 - Update Trivy Operator Dashboard to improve the user experience
+- Bump sops to version `3.7.3`.
