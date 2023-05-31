@@ -24,7 +24,7 @@ RUN wget --progress=dot:giga "https://github.com/yannh/kubeconform/releases/down
 
 # sops
 # NOTE: This needs to be installed before the helm-secrets plugin.
-ENV SOPS_VERSION="3.6.1"
+ENV SOPS_VERSION="3.7.3"
 RUN wget --progress=dot:giga "https://github.com/mozilla/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux" && \
     install -Tm 755 "sops-v${SOPS_VERSION}.linux" /usr/local/bin/sops && \
     rm "sops-v${SOPS_VERSION}.linux"
@@ -43,10 +43,11 @@ RUN helm plugin install https://github.com/databus23/helm-diff --version v3.1.2
 RUN helm plugin install https://github.com/jkroepke/helm-secrets --version v3.12.0
 
 # Helmfile
-ENV HELMFILE_VERSION "v0.144.0"
-RUN wget --progress=dot:giga "https://github.com/roboll/helmfile/releases/download/${HELMFILE_VERSION}/helmfile_linux_amd64" && \
-    install -Tm 755 helmfile_linux_amd64 /usr/local/bin/helmfile && \
-    rm helmfile_linux_amd64
+ENV HELMFILE_VERSION "0.146.0"
+RUN wget --progress=dot:giga "https://github.com/helmfile/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz" && \
+    tar -zxvf "helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz" helmfile && \
+    install -Tm 755 helmfile /usr/local/bin/helmfile && \
+    rm helmfile "helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz"
 
 # yq
 ENV YQ_VERSION "3.4.1"
