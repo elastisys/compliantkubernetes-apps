@@ -2,6 +2,8 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: {{ .Release.Name }}-job
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
 spec:
   activeDeadlineSeconds: 600
   template:
@@ -15,15 +17,33 @@ spec:
           image: elastisys/curl-jq:latest
           command: ['/bin/sh', '/scripts/init-harbor.sh']
           env:
+            - name: ENDPOINT
+              value: {{ .Values.endpoint }}
+            - name: OIDC_VERIFY_CERT
+              value: {{ .Values.oidc.verifyCert | quote }}
+            - name: OIDC_SCOPE
+              value: {{ .Values.oidc.scope }}
+            - name: OIDC_ADMIN_GROUP_NAME
+              value: {{ .Values.oidc.adminGroupName }}
+            - name: OIDC_GROUP_CLAIM_NAME
+              value: {{ .Values.oidc.groupClaimName }}
+            - name: OIDC_ENDPOINT
+              value: {{ .Values.oidc.endpoint }}
+            - name: GC_ENABLED
+              value: {{ .Values.gc.enabled | quote }}
+            - name: GC_SCHEDULE
+              value: {{ .Values.gc.schedule | quote }}
+            - name: GC_FORCE_CONFIGURE
+              value: {{ .Values.gc.forceConfigure | quote }}
             - name: HARBOR_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name:  harbor-init-secret
+                  name: harbor-init-secret
                   key: harbor-password
             - name: OIDC_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name:  harbor-init-secret
+                  name: harbor-init-secret
                   key: oidc-client-secret
           volumeMounts:
             - name: scripts

@@ -9,3 +9,8 @@ oidc:
   verifyCert: true
   groupClaimName: groups
   adminGroupName: ""
+
+gc:
+  enabled: false
+  forceConfigure: false
+  schedule: "0 0 0 * * SUN"

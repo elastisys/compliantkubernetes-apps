@@ -448,46 +448,57 @@ releases:
   namespace: harbor
   labels:
     app: harbor
+    harbor: certs
+    component: harbor-certs
+    group: harbor
   chart: ./charts/harbor/harbor-certs
   version: 0.1.0
   installed: {{ .Values.harbor.enabled }}
   values:
-  - values/harbor-certs.yaml.gotmpl
+  - values/harbor/harbor-certs.yaml.gotmpl
 
 - name: harbor
   namespace: harbor
   labels:
     app: harbor
+    harbor: harbor
+    component: harbor
+    group: harbor
   chart: ./upstream/harbor
   version: 1.6.1
   installed: {{ .Values.harbor.enabled }}
   wait: true
   timeout: 600
   values:
-  - values/harbor.yaml.gotmpl
+  - values/harbor/harbor.yaml.gotmpl
 
 - name: init-harbor
   namespace: harbor
   labels:
     app: harbor
+    harbor: init
+    component: harbor-init
+    group: harbor
   chart: ./charts/harbor/init-harbor
-  version: 0.1.0
+  version: 0.2.0
   installed: {{ .Values.harbor.enabled }}
   needs:
   - harbor/harbor
   values:
-  - values/init-harbor.yaml.gotmpl
+  - values/harbor/init-harbor.yaml.gotmpl
 
 - name: harbor-backup
   namespace: harbor
   labels:
     app: harbor
-    component: backup
+    group: harbor
+    harbor: backup
+    component: harbor-backup
   chart: ./charts/harbor/harbor-backup
   version: 0.1.0
   installed: {{ and .Values.harbor.enabled .Values.harbor.backup.enabled }}
   values:
-  - values/harbor-backup.yaml.gotmpl
+  - values/harbor/harbor-backup.yaml.gotmpl
 
 # Objectstorage secret for thanos receiver
 - name: thanos-objectstorage-secret

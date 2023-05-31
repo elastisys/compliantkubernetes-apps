@@ -6,3 +6,8 @@ oidc:
   groupClaimName: {{ .Values.harbor.oidc.groupClaimName }}
   adminGroupName: {{ .Values.harbor.oidc.adminGroupName }}
   scope: {{ .Values.harbor.oidc.scope }}
+
+gc:
+  enabled: {{ .Values.harbor.gc.enabled }}
+  forceConfigure: {{ .Values.harbor.gc.forceConfigure }}
+  schedule: {{ .Values.harbor.gc.schedule }}
