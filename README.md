@@ -52,17 +52,17 @@ The apps are installed using a combination of helm charts and manifests with the
 ### Requirements
 
 * A running cluster based on [compliantkubernetes-kubespray][compliantkubernetes-kubespray]
-* [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.20.7)
+* [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.24.4)
 * [helm](https://github.com/helm/helm/releases) (tested with 3.8.0)
 * [helmfile](https://github.com/roboll/helmfile) (tested with v0.144.0)
-* [helm-diff](https://github.com/databus23/helm-diff) (tested with 3.1.2)
+* [helm-diff](https://github.com/databus23/helm-diff) (tested with 3.5.0)
 * [helm-secrets](https://github.com/futuresimple/helm-secrets) (tested with 3.12.0)
 * [jq](https://github.com/stedolan/jq) (tested with jq-1.6)
-* [sops](https://github.com/mozilla/sops) (tested with 3.6.1)
-* [s3cmd](https://s3tools.org/s3cmd) available directly in ubuntus repositories (tested with 2.0.1)
+* [sops](https://github.com/mozilla/sops) (tested with 3.7.3)
+* [s3cmd](https://s3tools.org/s3cmd) available directly in Ubuntus repositories (tested with 2.0.1)
 * [yq4](https://github.com/mikefarah/yq) (tested with 4.26.1)
-* [pwgen](https://sourceforge.net/projects/pwgen/) available directly in ubuntus repostitories (tested with 2.08)
-* [htpasswd](https://httpd.apache.org/docs/2.4/programs/htpasswd.html) available directly in ubuntus repostitories (tested with 2.4.41)
+* [pwgen](https://sourceforge.net/projects/pwgen/) available directly in Ubuntus repositories (tested with 2.08)
+* [htpasswd](https://httpd.apache.org/docs/2.4/programs/htpasswd.html) available directly in Ubuntus repositories (tested with 2.4.41)
 
 Installs requirements using the ansible playbook get-requirements.yaml
 
@@ -322,7 +322,7 @@ In `$CK8S_CONFIG_PATH/sc-config.yaml` set the following configs
 
 ### Management of the clusters
 
-The [`bin/ck8s`](bin/ck8s) script provides an entrypoint to the clusters.
+The [`bin/ck8s`](bin/ck8s) script provides an entry point to the clusters.
 It should be used instead of using for example `kubectl`or `helmfile` directly as an operator.
 To use the script, set the `CK8S_CONFIG_PATH` to the environment you want to access:
 
@@ -420,4 +420,4 @@ See <https://compliantkubernetes.io/operator-manual/>.
 
 - OpenSearch Dashboards Single Sign On (SSO) via OpenID/Dex requires LetsEncrypt Production.
 
-For more, please the the public GitHub issues: <https://github.com/elastisys/compliantkubernetes-apps/issues>.
+For more, please check the public GitHub issues: <https://github.com/elastisys/compliantkubernetes-apps/issues>.
