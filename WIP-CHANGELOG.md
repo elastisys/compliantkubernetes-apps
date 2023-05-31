@@ -29,6 +29,7 @@
 ### Updated
 
 - Upgraded falco-exporter chart version to `v0.9.6` and app version to `v0.8.3`
+- Added "IPs in Subnet mask" logic in checkIfDiffAndUpdateDNSIPs, checkIfDiffAndUpdateKubectlIPs and checkIfDiffAndUpdateIPs of update-ips.bash
 
 ### Removed
 
