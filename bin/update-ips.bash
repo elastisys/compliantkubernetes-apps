@@ -51,13 +51,14 @@ diffIPs() {
     return ${DIFF_RETURN}
 }
 
+# Get IPs in given field and config file
 getConfigIPS() {
-    local source_file="$1"
+    local source_field="$1"
     local config_file="$2"
 
     local configIPS=()
 
-    for ip in $(yq4 e "$source_file | .[]" "$config_file"); do
+    for ip in $(yq4 e "$source_field | .[]" "$config_file"); do
         if [[ $ip != */32 ]]; then
             configIPS+=("${ip}")
         fi
@@ -66,25 +67,28 @@ getConfigIPS() {
     echo "${configIPS[@]}"
 }
 
+# Insert processes IPs
 updateConfigFile() {
-    local source_file="$1"
+    local source_field="$1"
     local config_file="$2"
     local ip="$3"
 
     if [[ $ip =~ "/" ]]; then
-        yq4 -i "${source_file}"' |= . + ["'"${ip}"'"]' "${config_file}"
+        yq4 -i "${source_field}"' |= . + ["'"${ip}"'"]' "${config_file}"
     else
-        yq4 -i "${source_file}"' |= . + ["'"${ip}"'/32"]' "${config_file}"
+        yq4 -i "${source_field}"' |= . + ["'"${ip}"'/32"]' "${config_file}"
     fi
 }
 
+# Check if IPs fits into subnets
 performIPCheck() {
     local kubectlIP="$1"
     local configIP="$2"
 
+    # Try to see if ip belongs to subnet - if not, exit(1)
     if python3 -c "import ipaddress; exit(0) if ipaddress.ip_address('${kubectlIP}') in ipaddress.ip_network('${configIP}') else exit(1)"
     then
-            # Create a new array without the matching string.
+            # Filter out the matching string for IPS.
             filtered_array=()
             for kubectl_ip in "${IPS[@]}"; do
                 if [[ "$kubectl_ip" != "$kubectlIP" ]]; then
@@ -92,9 +96,10 @@ performIPCheck() {
                 fi
             done
 
-            # Create and set a clean kubeIP list without copies.
+
             IPS=("${filtered_array[@]}")
 
+        # Add working configIP to the list of working subnets
         if [[ " ${working_subnet[*]} " != *" $configIP "* ]]; then
             working_subnet+=("$configIP")
         fi
@@ -187,6 +192,7 @@ updateKubectlIPs() {
     processIPRanges "$inputSource" "$inputConfig"
 }
 
+# Process ip ranges with subnet masks in consideration.
 processIPRanges(){
     local inputSource="$1"
     local inputConfig="$2"
@@ -196,10 +202,10 @@ processIPRanges(){
 
     local working_subnet=()
 
-    # Clear config-values
+    # Clear config values
     yq4 -i "$inputSource"' = []' "$inputConfig"
 
-    # IF config-value is not empty, go ahead with the following:
+    # IF config value is not empty, go ahead with the following:
     # 1. Check if any got kubectlIPs fit inside of the IPs existing in the config-files.
     # 2. IF True = Put the working subnet-address and kube-address in assigned arrays for comparison and remove copies.
     # 3. Merge the working subnet-addresses and kube-addresses into a finalized list.
@@ -210,7 +216,7 @@ processIPRanges(){
             done
         done
 
-        # Add the working subnet-addresses and working kubeIPs together.
+        # Add the working subnet-addresses and working IPs together.
         working_subnet+=("${IPS[@]}")
 
         for ip in "${working_subnet[@]}"; do
