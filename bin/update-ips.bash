@@ -206,7 +206,7 @@ processIPRanges(){
     yq4 -i "$inputSource"' = []' "$inputConfig"
 
     # IF config value is not empty, go ahead with the following:
-    # 1. Check if any got kubectlIPs fit inside of the IPs existing in the config-files.
+    # 1. Check if any got IPS fit inside of the IPs existing in the config-files.
     # 2. IF True = Put the working subnet-address and kube-address in assigned arrays for comparison and remove copies.
     # 3. Merge the working subnet-addresses and kube-addresses into a finalized list.
     if [ "${#multiIPRanges[@]}" -gt 0 ]; then
