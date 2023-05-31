@@ -130,42 +130,7 @@ updateDNSIPs() {
 
     read -r -a IPS <<<"$(getDNSIPs "${endpoint}")"
 
-    multiIPRanges=()
-
-    read -r -a multiIPRanges <<<"$(getConfigIPS "$inputSource" "$inputConfig")"
-
-    working_subnet=()
-
-    # Clear config-values
-    yq4 -i "$inputSource"' = []' "$inputConfig"
-
-    # IF config-value is not empty, go ahread with the following:
-    # 1. Check if any got kubectlIPs fits inside of the IPs existing in the config-files.
-    # 2. IF True = Put the working subnet-address and kube-address in assigned arrays for comparison and remove copies.
-    # 3. Merge the working subnet-adresses and kube-addresses into a finalized list.
-    if [ "${#multiIPRanges[@]}" -gt 0 ]; then
-        for upstreamDNSIP in "${IPS[@]}"; do
-
-            for configIP in "${multiIPRanges[@]}"; do
-                performIPCheck "$upstreamDNSIP" "$configIP"
-
-            done
-
-        done
-
-        # Add the working subnet-adresses and working kubeIPs together.
-        working_subnet+=("${IPS[@]}")
-
-        for ip in "${working_subnet[@]}"; do
-            updateConfigFile "$inputSource" "$inputConfig" "$ip"
-        done
-    else
-        yq4 -i "${inputSource}"' = []' "${inputConfig}"
-        for ip in "${IPS[@]}"; do
-            updateConfigFile "$inputSource" "$inputConfig" "$ip/32"
-        done
-
-    fi
+    processIPRanges "$inputSource" "$inputConfig"
 }
 
 # Usage: updateIPs <yaml_path> <file> <IP 1> <IP ..>
@@ -219,29 +184,33 @@ updateKubectlIPs() {
     local IPS
     read -r -a IPS <<<"$(getKubectlIPs "$cloud" "$label")"
 
-    multiIPRanges=()
+    processIPRanges "$inputSource" "$inputConfig"
+}
 
+processIPRanges(){
+    local inputSource="$1"
+    local inputConfig="$2"
+
+    local multiIPRanges=()
     read -r -a multiIPRanges <<<"$(getConfigIPS "$inputSource" "$inputConfig")"
 
-    working_subnet=()
+    local working_subnet=()
 
     # Clear config-values
     yq4 -i "$inputSource"' = []' "$inputConfig"
 
-    # IF config-value is not empty, go ahread with the following:
-    # 1. Check if any got kubectlIPs fits inside of the IPs existing in the config-files.
+    # IF config-value is not empty, go ahead with the following:
+    # 1. Check if any got kubectlIPs fit inside of the IPs existing in the config-files.
     # 2. IF True = Put the working subnet-address and kube-address in assigned arrays for comparison and remove copies.
-    # 3. Merge the working subnet-adresses and kube-addresses into a finalized list.
+    # 3. Merge the working subnet-addresses and kube-addresses into a finalized list.
     if [ "${#multiIPRanges[@]}" -gt 0 ]; then
         for upstreamDNSIP in "${IPS[@]}"; do
-
             for configIP in "${multiIPRanges[@]}"; do
                 performIPCheck "$upstreamDNSIP" "$configIP"
             done
-
         done
 
-        # Add the working subnet-adresses and working kubeIPs together.
+        # Add the working subnet-addresses and working kubeIPs together.
         working_subnet+=("${IPS[@]}")
 
         for ip in "${working_subnet[@]}"; do
@@ -252,7 +221,6 @@ updateKubectlIPs() {
         for ip in "${IPS[@]}"; do
             updateConfigFile "$inputSource" "$inputConfig" "$ip/32"
         done
-
     fi
 }
 
