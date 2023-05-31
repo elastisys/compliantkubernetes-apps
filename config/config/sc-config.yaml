@@ -397,6 +397,10 @@ harbor:
     retentionDays: 7
   s3:
     multipartcopythresholdsize: "536870912"
+  gc:
+    enabled: true
+    forceConfigure: false
+    schedule: "0 0 0 * * SUN"
 
 grafanaLabelEnforcer:
   resources:
