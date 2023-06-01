@@ -58,7 +58,8 @@ configure_OIDC() {
         -u admin:"${HARBOR_PASSWORD}" \
         -H "accept: application/json" \
         -H "Content-Type: application/json" \
-        -d "{ \"oidc_verify_cert\": ${OIDC_VERIFY_CERT},
+        -d "{ \"primary_auth_mode\": true,
+              \"oidc_verify_cert\": ${OIDC_VERIFY_CERT},
               \"auth_mode\": \"oidc_auth\",
               \"self_registration\": false,
               \"oidc_scope\": \"${OIDC_SCOPE}\",

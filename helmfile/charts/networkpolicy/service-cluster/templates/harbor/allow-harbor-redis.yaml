@@ -16,9 +16,6 @@ spec:
     - from:
         - podSelector:
             matchLabels:
-              component: chartmuseum
-        - podSelector:
-            matchLabels:
               component: core
         - podSelector:
             matchLabels:

@@ -168,16 +168,16 @@ postgres://{{ template "harbor.database.username" . }}:{{ template "harbor.datab
   {{- end }}
 {{- end -}}
 
-/*scheme://[redis:password@]host:port[/master_set]*/
+/*scheme://[:password@]host:port[/master_set]*/
 {{- define "harbor.redis.url" -}}
   {{- with .Values.redis }}
     {{- $path := ternary "" (printf "/%s" (include "harbor.redis.masterSet" $)) (not (include "harbor.redis.masterSet" $)) }}
-    {{- $cred := ternary (printf "redis:%s@" (.external.password | urlquery)) "" (and (eq .type "external" ) (not (not .external.password))) }}
+    {{- $cred := ternary (printf "%s:%s@" (.external.username | urlquery) (.external.password | urlquery)) "" (and (eq .type "external" ) (not (not .external.password))) }}
     {{- printf "%s://%s%s%s" (include "harbor.redis.scheme" $) $cred (include "harbor.redis.addr" $) $path -}}
   {{- end }}
 {{- end -}}
 
-/*scheme://[redis:password@]addr/db_index?idle_timeout_seconds=30*/
+/*scheme://[:password@]addr/db_index?idle_timeout_seconds=30*/
 {{- define "harbor.redis.urlForCore" -}}
   {{- with .Values.redis }}
     {{- $index := ternary "0" .external.coreDatabaseIndex (eq .type "internal") }}
@@ -185,7 +185,7 @@ postgres://{{ template "harbor.database.username" . }}:{{ template "harbor.datab
   {{- end }}
 {{- end -}}
 
-/*scheme://[redis:password@]addr/db_index*/
+/*scheme://[:password@]addr/db_index*/
 {{- define "harbor.redis.urlForJobservice" -}}
   {{- with .Values.redis }}
     {{- $index := ternary "1" .external.jobserviceDatabaseIndex (eq .type "internal") }}
@@ -193,7 +193,7 @@ postgres://{{ template "harbor.database.username" . }}:{{ template "harbor.datab
   {{- end }}
 {{- end -}}
 
-/*scheme://[redis:password@]addr/db_index?idle_timeout_seconds=30*/
+/*scheme://[:password@]addr/db_index?idle_timeout_seconds=30*/
 {{- define "harbor.redis.urlForRegistry" -}}
   {{- with .Values.redis }}
     {{- $index := ternary "2" .external.registryDatabaseIndex (eq .type "internal") }}
@@ -201,7 +201,7 @@ postgres://{{ template "harbor.database.username" . }}:{{ template "harbor.datab
   {{- end }}
 {{- end -}}
 
-/*scheme://[redis:password@]addr/db_index?idle_timeout_seconds=30*/
+/*scheme://[:password@]addr/db_index?idle_timeout_seconds=30*/
 {{- define "harbor.redis.urlForTrivy" -}}
   {{- with .Values.redis }}
     {{- $index := ternary "5" .external.trivyAdapterIndex (eq .type "internal") }}
@@ -212,12 +212,6 @@ postgres://{{ template "harbor.database.username" . }}:{{ template "harbor.datab
 {{- define "harbor.redis.dbForRegistry" -}}
   {{- with .Values.redis }}
     {{- ternary "2" .external.registryDatabaseIndex (eq .type "internal") }}
-  {{- end }}
-{{- end -}}
-
-{{- define "harbor.redis.dbForChartmuseum" -}}
-  {{- with .Values.redis }}
-    {{- ternary "3" .external.chartmuseumDatabaseIndex (eq .type "internal") }}
   {{- end }}
 {{- end -}}
 
@@ -237,20 +231,12 @@ postgres://{{ template "harbor.database.username" . }}:{{ template "harbor.datab
   {{- printf "%s-jobservice" (include "harbor.fullname" .) -}}
 {{- end -}}
 
-{{- define "harbor.jobserviceScandata" -}}
-  {{- printf "%s-jobservice-scandata" (include "harbor.fullname" .) -}}
-{{- end -}}
-
 {{- define "harbor.registry" -}}
   {{- printf "%s-registry" (include "harbor.fullname" .) -}}
 {{- end -}}
 
 {{- define "harbor.registryCtl" -}}
   {{- printf "%s-registryctl" (include "harbor.fullname" .) -}}
-{{- end -}}
-
-{{- define "harbor.chartmuseum" -}}
-  {{- printf "%s-chartmuseum" (include "harbor.fullname" .) -}}
 {{- end -}}
 
 {{- define "harbor.database" -}}
@@ -286,7 +272,7 @@ postgres://{{ template "harbor.database.username" . }}:{{ template "harbor.datab
 {{- end -}}
 
 {{- define "harbor.noProxy" -}}
-  {{- printf "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s" (include "harbor.core" .) (include "harbor.jobservice" .) (include "harbor.database" .) (include "harbor.chartmuseum" .) (include "harbor.notary-server" .) (include "harbor.notary-signer" .) (include "harbor.registry" .) (include "harbor.portal" .) (include "harbor.trivy" .) (include "harbor.exporter" .) .Values.proxy.noProxy -}}
+  {{- printf "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s" (include "harbor.core" .) (include "harbor.jobservice" .) (include "harbor.database" .) (include "harbor.notary-server" .) (include "harbor.notary-signer" .) (include "harbor.registry" .) (include "harbor.portal" .) (include "harbor.trivy" .) (include "harbor.exporter" .) .Values.proxy.noProxy -}}
 {{- end -}}
 
 {{- define "harbor.caBundleVolume" -}}
@@ -307,24 +293,6 @@ postgres://{{ template "harbor.database.username" . }}:{{ template "harbor.datab
     {{- printf "https" -}}
   {{- else -}}
     {{- printf "http" -}}
-  {{- end -}}
-{{- end -}}
-
-{{/* chartmuseum component container port */}}
-{{- define "harbor.chartmuseum.containerPort" -}}
-  {{- if .Values.internalTLS.enabled -}}
-    {{- printf "9443" -}}
-  {{- else -}}
-    {{- printf "9999" -}}
-  {{- end -}}
-{{- end -}}
-
-{{/* chartmuseum component service port */}}
-{{- define "harbor.chartmuseum.servicePort" -}}
-  {{- if .Values.internalTLS.enabled -}}
-    {{- printf "443" -}}
-  {{- else -}}
-    {{- printf "80" -}}
   {{- end -}}
 {{- end -}}
 
@@ -470,14 +438,6 @@ postgres://{{ template "harbor.database.username" . }}:{{ template "harbor.datab
 {{/* TRIVY_ADAPTER_URL */}}
 {{- define "harbor.trivyAdapterURL" -}}
   {{- printf "%s://%s:%s" (include "harbor.component.scheme" .) (include "harbor.trivy" .) (include "harbor.trivy.servicePort" .) -}}
-{{- end -}}
-
-{{- define "harbor.internalTLS.chartmuseum.secretName" -}}
-  {{- if eq .Values.internalTLS.certSource "secret" -}}
-    {{- .Values.internalTLS.chartmuseum.secretName -}}
-  {{- else -}}
-    {{- printf "%s-chartmuseum-internal-tls" (include "harbor.fullname" .) -}}
-  {{- end -}}
 {{- end -}}
 
 {{- define "harbor.internalTLS.core.secretName" -}}

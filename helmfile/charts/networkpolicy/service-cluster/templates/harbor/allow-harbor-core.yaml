@@ -68,12 +68,6 @@ spec:
     - to:
         - podSelector:
             matchLabels:
-              component: chartmuseum
-      ports:
-        - port: 9999
-    - to:
-        - podSelector:
-            matchLabels:
               component: portal
       ports:
         - port: 8080
@@ -162,12 +156,6 @@ spec:
               component: notary-server
       ports:
         - port: 4443
-    - to:
-        - podSelector:
-            matchLabels:
-              component: chartmuseum
-      ports:
-        - port: 9999
     - to:
       - podSelector:
           matchLabels:

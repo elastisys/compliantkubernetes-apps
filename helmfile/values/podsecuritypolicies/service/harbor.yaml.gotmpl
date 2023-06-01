@@ -16,14 +16,6 @@ constraints:
       mutation:
         runAsUser: 10000
         fsGroup: 10000
-    chartmuseum:
-      podSelectorLabels:
-        app: harbor
-        component: chartmuseum
-      allow: {}
-      mutation:
-        runAsUser: 10000
-        fsGroup: 10000
     jobservice:
       podSelectorLabels:
         app: harbor

@@ -14,6 +14,9 @@
     - [v2.8.0](https://github.com/opensearch-project/opensearch-build/blob/main/release-notes/opensearch-release-notes-2.8.0.md)
 
 
+- Harbor is upgraded to v2.8.2, which drops support for chartmuseum. If you are using chartmuseum you will need to migrate your [charts](https://github.com/goharbor/harbor/wiki/Migrate-helm-chart-to-oci-registry-in-Harbor).
+
+
 ### Added
 
 - Added so Grafana egress can be configured from sc-config.
@@ -53,3 +56,6 @@
 - Opensearch to v2.8.0, chart v2.13.0 and Opensearch Dashboard to v2.8.0, chart v2.11.0
 - Upgrade chart `fluentd` to version `5.8.2`, app version `1.16.1`.
 - Upgrade chart `fluentd-elasticsearch` to version `13.10.0`, app version `4.3.9`.
+- Updated harbor chart to `v1.12.2` which upgraded harbor to `v2.8.2`
+  - Dropped support for chartmuseum
+  - Default login page is now OIDC, for local login refer to path `<url>/account/sign-in`
