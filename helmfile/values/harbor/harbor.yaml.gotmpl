@@ -33,15 +33,11 @@ persistence:
   enabled: true
   resourcePolicy: "keep"
   persistentVolumeClaim:
-    chartmuseum:
-      size: {{ .Values.harbor.chartmuseum.persistentVolumeClaim.size }}
     registry:
       size: {{ .Values.harbor.registry.persistentVolumeClaim.size }}
     jobservice:
       jobLog:
         size: {{ .Values.harbor.jobservice.jobLog.persistentVolumeClaim.size }}
-      scanDataExports:
-        size: {{ .Values.harbor.jobservice.scanDataExports.persistentVolumeClaim.size }}
     {{ if eq .Values.harbor.database.type "internal" }}
     database:
       size: {{ .Values.harbor.database.internal.persistentVolumeClaim.size }}
@@ -187,15 +183,6 @@ portal:
   nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
   affinity:     {{- toYaml .Values.harbor.portal.affinity | nindent 4 }}
   tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
-
-chartmuseum:
-  replicas:     {{ .Values.harbor.chartmuseum.replicas }}
-  resources:    {{- toYaml .Values.harbor.chartmuseum.resources | nindent 4 }}
-  nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
-  affinity:     {{- toYaml .Values.harbor.chartmuseum.affinity | nindent 4 }}
-  tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
-  image:
-    tag: v2.4.2
 
 redis:
   type: {{ .Values.harbor.redis.type }}

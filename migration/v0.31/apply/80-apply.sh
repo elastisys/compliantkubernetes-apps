@@ -13,6 +13,7 @@ skipped=(
 )
 declare -a skipped_sc
 skipped_sc=(
+  "app!=harbor"
 )
 declare -a skipped_wc
 skipped_wc=(

@@ -110,31 +110,6 @@ harbor:
   # The tolerations, affinity, and nodeSelector are applied to all harbor pods.
   tolerations: []
   nodeSelector: {}
-  chartmuseum:
-    replicas: 1
-    persistentVolumeClaim:
-      size: 5Gi
-    resources:
-      requests:
-        cpu: 125m
-        memory: 125Mi
-      limits:
-        cpu: 250m
-        memory: 250Mi
-    affinity:
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                    - harbor
-                - key: component
-                  operator: In
-                  values:
-                    - chartmuseum
-            topologyKey: "kubernetes.io/hostname"
   core:
     replicas: 1
     resources:
@@ -365,7 +340,7 @@ harbor:
         cpu: 125m
         memory: 263Mi
       limits:
-        cpu: 250m
+        cpu: 400m
         memory: 512Mi
     affinity:
       podAntiAffinity:

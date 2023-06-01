@@ -465,7 +465,7 @@ releases:
     component: harbor
     group: harbor
   chart: ./upstream/harbor
-  version: 1.6.1
+  version: 1.12.2
   installed: {{ .Values.harbor.enabled }}
   wait: true
   timeout: 600

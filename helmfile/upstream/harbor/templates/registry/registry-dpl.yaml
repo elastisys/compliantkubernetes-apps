@@ -100,6 +100,13 @@ spec:
         - name: INTERNAL_TLS_TRUST_CA_PATH
           value: /etc/harbor/ssl/registry/ca.crt
         {{- end }}
+        {{- if .Values.persistence.imageChartStorage.azure.existingSecret }}
+        - name: REGISTRY_STORAGE_AZURE_ACCOUNTKEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.persistence.imageChartStorage.azure.existingSecret }}
+              key: AZURE_STORAGE_ACCESS_KEY
+        {{- end }}
         ports:
         - containerPort: {{ template "harbor.registry.containerPort" . }}
         - containerPort: 5001
@@ -243,7 +250,7 @@ spec:
           {{- if not .Values.registry.credentials.existingSecret }}
           secretName: {{ template "harbor.registry" . }}-htpasswd
           {{ else }}
-          secretName: .Values.registry.credentials.existingSecret
+          secretName: {{ .Values.registry.credentials.existingSecret }}
           {{- end }}
           items:
             - key: REGISTRY_HTPASSWD

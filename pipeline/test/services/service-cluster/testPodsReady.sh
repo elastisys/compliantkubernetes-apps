@@ -44,7 +44,6 @@ deployments=(
 )
 if "${enable_harbor}"; then
     deployments+=(
-        "harbor harbor-chartmuseum"
         "harbor harbor-core"
         "harbor harbor-jobservice"
         "harbor harbor-notary-server"
