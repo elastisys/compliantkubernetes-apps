@@ -16,6 +16,9 @@
 
 - Moved `.monitoring.rook` and `.rookCeph.enabled` keys under `rookCeph.monitoring` and `rookCeph.gatekeeperPsp`
 - The value for `networkPolicies.global.externalLoadBalancer` and `networkPolicies.global.ingressUsingHostNetwork` is now set by the init script, based on the `.global.ck8sCloudProvider` value
+- Updated ingress-nginx chart to `v4.7.0` with upgrade ingess-nginx to `v1.8.0`
+  - Dropped support for kubernetes `v1.23.0`
+  - Added, removed and deprecated prometheus metric names [#8728](https://github.com/kubernetes/ingress-nginx/pull/8728)
 
 ### Fixed
 

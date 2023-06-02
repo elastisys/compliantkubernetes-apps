@@ -1,16 +1,11 @@
 annotations:
   artifacthub.io/changes: |
-    - "[8459](https://github.com/kubernetes/ingress-nginx/pull/8459) Update default allowed CORS headers"
-    - "[8202](https://github.com/kubernetes/ingress-nginx/pull/8202) disable modsecurity on error page"
-    - "[8178](https://github.com/kubernetes/ingress-nginx/pull/8178) Add header Host into mirror annotations"
-    - "[8213](https://github.com/kubernetes/ingress-nginx/pull/8213) feat: always set auth cookie"
-    - "[8548](https://github.com/kubernetes/ingress-nginx/pull/8548) Implement reporting status classes in metrics"
-    - "[8612](https://github.com/kubernetes/ingress-nginx/pull/8612) move so files under /etc/nginx/modules"
-    - "[8624](https://github.com/kubernetes/ingress-nginx/pull/8624) Add patch to remove root and alias directives"
-    - "[8623](https://github.com/kubernetes/ingress-nginx/pull/8623) Improve path rule"
+    - "helm: Fix opentelemetry module installation for daemonset (#9792)"
+    - "Update charts/* to keep project name display aligned (#9931)"
+    - "Update Ingress-Nginx version controller-v1.8.0"
   artifacthub.io/prerelease: "false"
 apiVersion: v2
-appVersion: 1.2.1
+appVersion: 1.8.0
 description: Ingress controller for Kubernetes using NGINX as a reverse proxy and
   load balancer
 home: https://github.com/kubernetes/ingress-nginx
@@ -18,7 +13,7 @@ icon: https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Nginx_logo.svg/5
 keywords:
 - ingress
 - nginx
-kubeVersion: '>=1.19.0-0'
+kubeVersion: '>=1.20.0-0'
 maintainers:
 - name: rikatz
 - name: strongjz
@@ -26,5 +21,4 @@ maintainers:
 name: ingress-nginx
 sources:
 - https://github.com/kubernetes/ingress-nginx
-type: application
-version: 4.1.3
+version: 4.7.0
