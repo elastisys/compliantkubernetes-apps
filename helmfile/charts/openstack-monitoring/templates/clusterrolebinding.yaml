@@ -1,0 +1,14 @@
+{{- if .Values.openstackMonitoring.enabled }}
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: system:cloud-controller-manager:auth-delegate
+subjects:
+- kind: User
+  name: system:serviceaccount:kube-system:cloud-controller-manager
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: system:auth-delegator
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

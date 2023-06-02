@@ -1106,6 +1106,10 @@ prometheusBlackboxExporter:
     thanosQuery: true
     thanosReceiver: true
 
+openstackMonitoring:
+  ## Enables openstack api metrics.
+  enabled: false
+
 welcomingDashboard:
   # If you want to add extra text to the grafana/opensearch "welcoming dashboards"
   # then write the text in these values as a one-line string.

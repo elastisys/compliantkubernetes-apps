@@ -1,0 +1,23 @@
+{{- if .Values.openstackMonitoring.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    {{- include "openstack-monitoring.labels" . | nindent 4}}
+  name: {{ include "openstack-monitoring.fullname" . }}
+spec:
+  endpoints:
+  - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+    interval: 30s
+    port: http
+    scheme: https
+    tlsConfig:
+      insecureSkipVerify: true
+  jobLabel: component
+  namespaceSelector:
+    matchNames:
+    - kube-system
+  selector:
+    matchLabels:
+      k8s-app: openstack-cloud-controller-manager
+{{- end }}

@@ -1,0 +1,15 @@
+{{- if .Values.openstackMonitoring.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{- include "openstack-monitoring.labels" . | nindent 4}}
+  name: {{ include "openstack-monitoring.fullname" . }}
+spec:
+  ports:
+  - name: http
+    port: 10258
+    protocol: TCP
+  selector:
+    k8s-app: openstack-cloud-controller-manager
+{{- end }}

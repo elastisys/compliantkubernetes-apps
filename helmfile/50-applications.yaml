@@ -599,6 +599,17 @@ releases:
   values:
   - values/rclone-sync.yaml.gotmpl
 
+# openstack api metrics
+- name: openstack-monitoring
+  namespace: kube-system
+  labels:
+    app: openstack-monitoring
+  chart: ./charts/openstack-monitoring
+  version: 0.1.0
+  values:
+  - values/openstack-monitoring.yaml.gotmpl
+  - values/prometheus-alerts-sc.yaml.gotmpl
+
 # End of system services releases
 {{ end }}
 

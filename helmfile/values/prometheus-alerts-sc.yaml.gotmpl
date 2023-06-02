@@ -8,6 +8,7 @@ osNodeCount: {{ add .Values.opensearch.dataNode.count .Values.opensearch.clientN
 osIndexAlerts: {{ toYaml .Values.opensearch.promIndexAlerts | nindent 2 }}
 
 defaultRules:
+  create: true
   alertLabels:
     {{- if and .Values.thanos.enabled .Values.thanos.ruler.enabled }}
     evaluate_thanos: "1"
