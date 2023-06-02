@@ -18,3 +18,4 @@
 - Update Trivy Operator Dashboard to improve the user experience
 - Another network policy fix for Harbor to allow garbage collection
 - Fixed duplicate exception for falco alerts
+- Update Falco rules
