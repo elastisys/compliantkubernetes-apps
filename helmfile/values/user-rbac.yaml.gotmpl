@@ -13,3 +13,6 @@ users: {{ toYaml .Values.user.adminUsers | nindent 2 }}
 groups: {{ toYaml .Values.user.adminGroups | nindent 2 }}
 createNamespaces: {{ .Values.user.createNamespaces }}
 enableFalcoViewer: {{ toYaml .Values.falco.enabled | nindent 2 }}
+
+hnc:
+  enabled: {{ .Values.hnc.enabled }}
