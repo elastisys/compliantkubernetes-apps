@@ -10,6 +10,7 @@
 - Added All instances option to OpenSearch dashboard
 - Add networkpolicy generator chart with common rules
 - Added option to enable harbor GC via config
+- Added openstack api metrics.
 
 ### Changed
 

@@ -1,0 +1,55 @@
+{{- if and .Values.defaultRules.create .Values.openstackMonitoring.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" "sc-alerts" (include "openstack-monitoring.fullname" .)  | trunc 63 | trimSuffix "-" }}
+  labels:
+    app: {{ template "openstack-monitoring.name" . }}
+    {{- include "openstack-monitoring.labels" . | nindent 4 }}
+    {{- if .Values.defaultRules.alertLabels }}
+    {{- toYaml .Values.defaultRules.alertLabels | nindent 4 }}
+    {{- end }}
+  {{- if .Values.defaultRules.annotations }}
+  annotations:
+    {{- toYaml .Values.defaultRules.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  groups:
+  - name: openstack
+    rules:
+    - alert: OpenStackApiRequestFailed
+      annotations:
+        summary: Failed openstack api call.
+      expr: rate(openstack_api_request_errors_total[5m]) > 0.01
+      for: 5m
+      labels:
+        severity: high
+    - alert: OpenStackApiRequestDuration
+      annotations:
+        summary: Openstack api has taken longer then 15 seconds.
+      expr: rate(openstack_api_request_duration_seconds_sum[5m]) / rate(openstack_api_request_duration_seconds_count[5m]) > 15
+      for: 5m
+      labels:
+        severity: high
+    - alert: OpenStackApiRequestTotal
+      annotations:
+        summary: Too high amount of openstack api calls.
+      expr: (delta(openstack_api_requests_total[5m]))/5 > 20
+      for: 5m
+      labels:
+        severity: high
+    - alert: OpenStackReconcileFailed
+      annotations:
+        summary: Increased reconciliation errors.
+      expr: rate(cloudprovider_openstack_reconcile_errors_total[5m]) > 0
+      for: 10m
+      labels:
+        severity: high
+    - alert: OpenStackReconcileDuration
+      annotations:
+        summary: Reconciliation has taken longer then 10 minute.
+      expr: rate(cloudprovider_openstack_reconcile_duration_seconds_sum[5m]) / rate(cloudprovider_openstack_reconcile_duration_seconds_count[5m]) > 600
+      for: 10m
+      labels:
+        severity: high
+{{- end }}
