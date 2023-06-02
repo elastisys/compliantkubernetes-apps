@@ -114,10 +114,16 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.31/apply/20-bootstrap.sh execute
     ```
 
+1. Update HNC namespace labels:
+
+    ```bash
+    ./migration/v0.31/apply/14-hnc-labels.sh execute
+    ```
+
 1. Upgrade networkpolicies:
 
     ```bash
-    ./migration/v0.31/apply/30-apply.sh execute
+    ./migration/v0.31/apply/30-netpol.sh execute
     ```
 
 1. Upgrade applications:

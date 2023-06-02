@@ -664,17 +664,6 @@ releases:
   values:
   - values/gatekeeper/constraints.yaml.gotmpl
 
-# hierarchical namespace controller config and CRDs
-- name: hnc-config-and-crds
-  namespace: hnc-system
-  labels:
-    app: hnc-config-and-crds
-    group: hnc
-  chart: ./charts/hnc/config-and-crds
-  disableValidationOnInstall: true
-  version: 0.1.0
-  installed: {{ .Values.hnc.enabled }}
-
 # hierarchical namespace controller
 - name: hnc-controller
   namespace: hnc-system
@@ -685,8 +674,6 @@ releases:
   version: 0.1.0
   wait: true
   installed: {{ .Values.hnc.enabled }}
-  needs:
-  - hnc-system/hnc-config-and-crds
   values:
   - values/hnc/controller.yaml.gotmpl
 
