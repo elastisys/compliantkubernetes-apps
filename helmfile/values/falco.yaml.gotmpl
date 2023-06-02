@@ -69,7 +69,9 @@ customRules:
             gcr.io/k8s-staging-multitenancy/hnc-manager,
             ghcr.io/aquasecurity/trivy-operator,
             ghcr.io/dexidp/dex,
+            ghcr.io/elastisys/argocd-managed-namespaces-manager,
             ghcr.io/elastisys/fluentd,
+            ghcr.io/elastisys/logical-backup,
             ghcr.io/kubereboot/kured,
             quay.io/jetstack/cert-manager-cainjector,
             quay.io/jetstack/cert-manager-controller,
@@ -80,7 +82,8 @@ customRules:
             quay.io/spotahome/redis-operator,
             registry.k8s.io/ingress-nginx/kube-webhook-certgen,
             registry.k8s.io/kube-state-metrics/kube-state-metrics,
-            registry.opensource.zalan.do/acid/postgres-operator
+            registry.opensource.zalan.do/acid/postgres-operator,
+            registry.opensource.zalan.do/acid/spilo-14
           ) or (
             k8s.ns.name = "kube-system"
           ) or (
@@ -95,8 +98,11 @@ customRules:
         )
     - macro: user_expected_system_procs_network_activity_conditions
       condition: (
-          (
-            container.image.repository = ghcr.io/elastisys/compliantkubernetes-apps-log-manager
+          container.image.repository in (
+            ghcr.io/elastisys/compliantkubernetes-apps-log-manager,
+            registry.opensource.zalan.do/acid/spilo-14
+          ) or (
+            container.image.repository = docker.io/library/redis and proc.cmdline = 'sh -c sleep 5 && redis-server /redis/redis.conf'
           ) or (
             container.image.repository = quay.io/calico/cni and proc.cmdline = 'install'
           )
@@ -117,21 +123,24 @@ customRules:
             proc.cmdline startswith csi-snapshotter
           )
         )
+    - macro: user_known_db_spawned_processes
+      condition: (
+          container.image.repository = registry.opensource.zalan.do/acid/spilo-14 and proc.cmdline glob 'sh -c envdir "/run/etc/wal-e.d/env" /scripts/restore_command.sh *'
+        )
     - macro: user_known_k8s_client_container_parens
       condition: (
           container.image.repository in (
             docker.io/bitnami/kubectl,
-            docker.io/openpolicyagent/gatekeeper-crds
+            docker.io/openpolicyagent/gatekeeper-crds,
+            ghcr.io/elastisys/argocd-managed-namespaces-manager
           ) or (
             k8s.ns.name = "tekton-pipelines" and k8s.pod.name startswith upgrade
           )
         )
-
     - macro: user_known_write_monitored_dir_conditions
       condition: (
             k8s.ns.name = "tekton-pipelines" and k8s.pod.name startswith upgrade
         )
-
     - macro: user_known_modify_bin_dir_activities
       condition: (
           container.image.repository = registry.k8s.io/dns/k8s-dns-node-cache and
@@ -202,7 +211,12 @@ customRules:
           (container.image.repository = docker.io/ceph/ceph and proc.cmdline = 'rook ceph osd provision') or
           (container.image.repository = docker.io/rook/ceph and proc.cmdline = 'toolbox.sh -e /usr/local/bin/toolbox.sh') or
           (container.image.repository = docker.io/ceph/ceph and proc.cmdline = 'tini -- /rook/rook ceph osd provision') or
-          (container.image.repository = quay.io/cephcsi/cephcsi and proc.cmdline startswith cephcsi)
+          (container.image.repository = quay.io/cephcsi/cephcsi and proc.cmdline startswith cephcsi) or
+          (container.image.repository = registry.opensource.zalan.do/acid/spilo-14)
+        )
+    - macro: user_known_write_below_root_activities
+      condition: (
+          container.image.repository = ghcr.io/elastisys/logical-backup and proc.name = aws
         )
     - macro: user_sensitive_mount_containers
       condition: (
@@ -222,7 +236,8 @@ customRules:
             quay.io/calico/cni,
             quay.io/calico/pod2daemon-flexvol,
             registry.k8s.io/dns/k8s-dns-node-cache,
-            registry.k8s.io/kube-proxy
+            registry.k8s.io/kube-proxy,
+            registry.opensource.zalan.do/acid/spilo-14
           ) or (
             container.image.repository=docker.io/elastisys/curl-jq and k8s.pod.name startswith opensearch-
           )
@@ -230,6 +245,11 @@ customRules:
     - macro: allowed_clear_log_files
       condition: (
           fd.name startswith "/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/" and proc.cmdline = containerd
+        )
+    - macro: user_shell_container_exclusions
+      condition: (
+          container.image.repository = registry.opensource.zalan.do/acid/spilo-14 and
+          proc.cmdline glob 'sh -c envdir "/run/etc/wal-e.d/env" /scripts/restore_command.sh *'
         )
     - macro: user_known_shell_config_modifiers
       condition: (
