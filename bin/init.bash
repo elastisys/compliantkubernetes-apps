@@ -202,8 +202,8 @@ set_nginx_config() {
             use_proxy_protocol=false
             use_host_port=true
             service_enabled=false
-            yq4 --inplace '.networkPolicies.global.externalLoadBalancer = true' "${file}"
-            yq4 --inplace '.networkPolicies.global.ingressUsingHostNetwork = true' "${file}"
+            external_load_balancer=true
+            ingress_using_host_network=true
             ;;
 
         citycloud | elastx)
@@ -212,6 +212,8 @@ set_nginx_config() {
             service_enabled=true
             service_type=LoadBalancer
             service_annotations=''
+            external_load_balancer=false
+            ingress_using_host_network=false
             ;;
 
         aws)
@@ -220,18 +222,24 @@ set_nginx_config() {
             service_enabled=true
             service_type=LoadBalancer
             service_annotations='service.beta.kubernetes.io/aws-load-balancer-type: nlb'
+            external_load_balancer=false
+            ingress_using_host_network=false
             ;;
 
         baremetal)
             use_proxy_protocol=false
             use_host_port=true
             service_enabled=false
+            external_load_balancer=true
+            ingress_using_host_network=true
             ;;
     esac
 
     replace_set_me "$1" '.ingressNginx.controller.config.useProxyProtocol' "${use_proxy_protocol}"
     replace_set_me "$1" '.ingressNginx.controller.useHostPort' "${use_host_port}"
     replace_set_me "$1" '.ingressNginx.controller.service.enabled' "${service_enabled}"
+    replace_set_me "$1" '.networkPolicies.global.externalLoadBalancer' "${external_load_balancer}"
+    replace_set_me "$1" '.networkPolicies.global.ingressUsingHostNetwork' "${ingress_using_host_network}"
 
     if [ "${service_enabled}" = 'false' ]; then
         replace_set_me "${file}" '.ingressNginx.controller.service.type' '"set-me-if-ingressNginx.controller.service.enabled"'
@@ -557,8 +565,8 @@ generate_default_config "${config[default_common]}"
 set_storage_class       "${config[default_common]}"
 set_object_storage      "${config[default_common]}"
 set_nginx_config        "${config[default_common]}"
-update_monitoring        "${config[default_common]}"
-update_psp_netpol        "${config[default_common]}"
+update_monitoring       "${config[default_common]}"
+update_psp_netpol       "${config[default_common]}"
 update_config           "${config[override_common]}"
 
 generate_default_config        "${config[default_sc]}"

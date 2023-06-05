@@ -12,7 +12,8 @@
 
 ### Changed
 
-- Moved `.monitoring.rook` and `.rookCeph. enabled` keys under `rookCeph.monitoring` and `rookCeph.gatekeeperPsp`
+- Moved `.monitoring.rook` and `.rookCeph.enabled` keys under `rookCeph.monitoring` and `rookCeph.gatekeeperPsp`
+- The value for `networkPolicies.global.externalLoadBalancer` and `networkPolicies.global.ingressUsingHostNetwork` is now set by the init script, based on the `.global.ck8sCloudProvider` value
 
 ### Fixed
 
