@@ -1,0 +1,20 @@
+{{- if and .Values.createNamespaces .Values.hnc.enabled }}
+{{- range $namespace := .Values.namespaces }}
+{{- if eq $namespace.psa "restricted" }}
+---
+apiVersion: hnc.x-k8s.io/v1alpha2
+kind: HierarchyConfiguration
+metadata:
+  name: hierarchy
+  namespace: {{ $namespace.name }}
+spec:
+  labels:
+    - key: pod-security.kubernetes.io/enforce
+      value: restricted
+    - key: pod-security.kubernetes.io/audit
+      value: restricted
+    - key: pod-security.kubernetes.io/warn
+      value: restricted
+{{- end }}
+{{- end }}
+{{- end }}

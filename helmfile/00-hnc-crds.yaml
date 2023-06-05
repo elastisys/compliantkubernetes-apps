@@ -1,0 +1,25 @@
+helmDefaults:
+  createNamespace: false
+  skipDeps: true
+  timeout: 600
+
+environments:
+  workload_cluster:
+    values:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/wc-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/wc-config.yaml"
+    secrets:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
+---
+releases:
+- name: hnc-config-and-crds
+  namespace: hnc-system
+  labels:
+    app: hnc-config-and-crds
+    group: hnc
+  installed: {{ .Values.hnc.enabled }}
+  disableValidationOnInstall: true
+  chart: ./charts/hnc/config-and-crds
+  version: 0.1.0
