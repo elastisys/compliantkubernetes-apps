@@ -50,6 +50,8 @@ run() {
     log_info "--- applying HNC for workload cluster"
     helmfile_upgrade wc group=hnc
 
+    sleep 10
+
     log_info "--- waiting for hnc-controller-manager"
     kubectl_do wc wait pods -n hnc-system -l app.kubernetes.io/component=hnc-controller-manager --for condition=Ready --timeout=300s
 
