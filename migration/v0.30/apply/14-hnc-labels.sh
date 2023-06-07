@@ -18,8 +18,8 @@ update_hierarchyconfigurations() {
       continue
     fi
 
-    kubectl_do wc annotate hierarchyconfigurations.hnc.x-k8s.io -n "${i}" hierarchy helm.sh/hook- helm.sh/resource-policy- meta.helm.sh/release-name=user-rbac meta.helm.sh/release-namespace=kube-system
-    kubectl_do wc label hierarchyconfigurations.hnc.x-k8s.io -n "${i}" hierarchy app.kubernetes.io/managed-by=Helm
+    kubectl_do wc annotate hierarchyconfigurations.hnc.x-k8s.io -n "${i}" hierarchy helm.sh/hook- helm.sh/resource-policy- meta.helm.sh/release-name=user-rbac meta.helm.sh/release-namespace=kube-system --overwrite
+    kubectl_do wc label hierarchyconfigurations.hnc.x-k8s.io -n "${i}" hierarchy app.kubernetes.io/managed-by=Helm --overwrite
 
     config="$(kubectl_do wc get hierarchyconfigurations.hnc.x-k8s.io -n "${i}" hierarchy -oyaml)"
 
