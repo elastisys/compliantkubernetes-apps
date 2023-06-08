@@ -77,7 +77,7 @@ serviceMonitor:
       scrapeTimeout: 30s
       module: http_2xx
     - name: grafana
-      url: https://{{ .Values.user.grafana.subdomain }}.{{ .Values.global.baseDomain }}/api/health
+      url: https://{{ .Values.grafana.user.subdomain }}.{{ .Values.global.baseDomain }}/api/health
       interval: 60s
       scrapeTimeout: 30s
       module: http_2xx

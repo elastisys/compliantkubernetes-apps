@@ -1,0 +1,30 @@
+testFramework:
+    enabled: false
+
+initChownData:
+  enabled: false
+
+deploymentStrategy:
+  type: Recreate
+
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
+
+persistence:
+  type: pvc
+  enabled: true
+  size: 10Gi
+  accessModes:
+    - ReadWriteOnce
+
+sidecar:
+  dashboards:
+    enabled: true
+
+grafana.ini:
+  analytics:
+    reporting_enabled: false
+    check_for_updates: false

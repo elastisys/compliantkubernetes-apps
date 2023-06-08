@@ -1,0 +1,104 @@
+# admin username is "admin"
+adminPassword: {{ .Values.grafana.password }}
+serviceMonitor:
+  enabled: true
+ingress:
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+  {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.opsGrafana }}
+    nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.opsGrafana }}
+  {{ end }}
+  hosts:
+  - {{ .Values.grafana.ops.subdomain }}.{{ .Values.global.opsDomain }}
+  tls:
+  - secretName: ops-grafana-tls
+    hosts:
+    - {{ .Values.grafana.ops.subdomain }}.{{ .Values.global.opsDomain }}
+
+sidecar:
+  dashboards:
+    labelValue: "" # should be set to "" to load all dashboards, regardless of the label value
+  resources: {{- toYaml .Values.grafana.ops.sidecar.resources | nindent 6 }}
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - name: prometheus-sc
+      access: proxy
+      basicAuth: false
+      editable: false
+      isDefault: false
+      orgId: 1
+      type: prometheus
+      url: http://kube-prometheus-stack-prometheus:9090
+      version: 1
+      jsonData:
+        prometheusType: Prometheus
+        timeInterval: "30s" # this value should be equal with .prometheus.prometheusSpec.scrapeInterval
+    {{- if and .Values.thanos.enabled .Values.thanos.query.enabled }}
+    - name: "Thanos All"
+      access: proxy
+      basicAuth: false
+      editable: false
+      isDefault: true
+      orgId: 1
+      type: prometheus
+      url: http://thanos-query-query-frontend.thanos:9090
+      jsonData:
+        prometheusType: Thanos
+        timeInterval: "30s" # this value should be equal with .prometheus.prometheusSpec.scrapeInterval
+      version: 1
+    - name: "Thanos SC Only"
+      access: proxy
+      basicAuth: false
+      editable: false
+      isDefault: false
+      orgId: 1
+      type: prometheus
+      url: http://grafana-label-enforcer:9090
+      jsonData:
+        customQueryParameters: "tenant_id={{ .Values.global.clusterName }}"
+        manageAlerts: false
+      version: 1
+    {{- range .Values.global.clustersMonitoring }}
+    - name: "Thanos {{ . }} only"
+      access: proxy
+      basicAuth: false
+      editable: false
+      isDefault: false
+      orgId: 1
+      type: prometheus
+      url: http://grafana-label-enforcer:9090
+      version: 1
+      jsonData:
+        customQueryParameters: "tenant_id={{ . }}"
+        manageAlerts: false
+    {{- end }}
+    {{- end }}
+
+grafana.ini:
+  server:
+    root_url: https://{{ .Values.grafana.ops.subdomain }}.{{ .Values.global.opsDomain }}
+  {{ if .Values.grafana.ops.oidc.enabled -}}
+  auth.generic_oauth:
+    name: dex
+    enabled: {{ .Values.grafana.ops.oidc.enabled }}
+    client_id: grafana-ops
+    client_secret: {{ .Values.grafana.opsClientSecret }}
+    scopes: {{ .Values.grafana.ops.oidc.scopes }}
+    auth_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}./auth
+    token_url: http://dex.dex.svc.cluster.local.:5556/token
+    api_url: http://dex.dex.svc.cluster.local.:5556/api
+    allowed_domains: {{ join " " .Values.grafana.ops.oidc.allowedDomains }}
+    allow_sign_up: true
+    tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}
+    role_attribute_path: contains(groups[*], '{{ .Values.grafana.ops.oidc.userGroups.grafanaAdmin }}') && 'Admin' || contains(groups[*], '{{ .Values.grafana.ops.oidc.userGroups.grafanaEditor }}') && 'Editor' || contains(groups[*], '{{ .Values.grafana.ops.oidc.userGroups.grafanaViewer }}') && 'Viewer'
+    {{- end }}
+  users:
+    viewers_can_edit: {{ .Values.grafana.ops.viewersCanEdit }}
+
+resources: {{- toYaml .Values.grafana.ops.resources | nindent 4 }}
+tolerations: {{- toYaml .Values.grafana.ops.tolerations | nindent 4 }}
+affinity: {{- toYaml .Values.grafana.ops.affinity | nindent 4 }}
+nodeSelector: {{- toYaml .Values.grafana.ops.nodeSelector | nindent 4 }}

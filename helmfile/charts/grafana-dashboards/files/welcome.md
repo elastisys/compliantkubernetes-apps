@@ -37,7 +37,9 @@ In case you get lost, don't forget to check out the [public docs](https://elasti
 As a user of Compliant Kubernetes you can request to see your Cluster configuration (without secrets) by asking your administrator.
 
 {{ if .Values.dashboard.extraTextGrafana }}
+
 ## {{ .Values.dashboard.extraTextGrafana }}
+
 {{ else }}
 {{ end }}
 

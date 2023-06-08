@@ -251,16 +251,29 @@ releases:
   values:
   - values/prometheus-alerts-sc.yaml.gotmpl
 
-# grafana-ops dashboard
-- name: grafana-ops
+# grafana dashboards
+- name: grafana-dashboards
   namespace: monitoring
   labels:
-    app: grafana-ops
+    app: grafana-dashboards
     prometheus: sc
-  chart: ./charts/grafana-ops
+  chart: ./charts/grafana-dashboards
   version: 0.2.1
   values:
-  - values/grafana-ops.yaml.gotmpl
+  - values/grafana/grafana-dashboards.yaml.gotmpl
+
+# Grafana instance for operators
+- name: ops-grafana
+  namespace: monitoring
+  labels:
+    app: ops-grafana
+    app.kubernetes.io/instance: ops-grafana
+    app.kubernetes.io/name: grafana
+  chart: ./upstream/grafana
+  version: 6.57.1
+  values:
+  - values/grafana/grafana-common.yaml.gotmpl
+  - values/grafana/grafana-ops.yaml.gotmpl
 
 # Grafana instance for user
 - name: user-grafana
@@ -270,10 +283,11 @@ releases:
     app.kubernetes.io/instance: user-grafana
     app.kubernetes.io/name: grafana
   chart: ./upstream/grafana
-  version: 6.43.4
-  installed: {{ .Values.user.grafana.enabled }}
+  version: 6.57.1
+  installed: {{ .Values.grafana.user.enabled }}
   values:
-  - values/grafana-user.yaml.gotmpl
+  - values/grafana/grafana-common.yaml.gotmpl
+  - values/grafana/grafana-user.yaml.gotmpl
 
 # Grafana label enforcer for thanos
 - name: grafana-label-enforcer
@@ -284,7 +298,7 @@ releases:
   version: 0.1.0
   installed: {{ and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
   values:
-  - values/grafana-label-enforcer.yaml.gotmpl
+  - values/grafana/grafana-label-enforcer.yaml.gotmpl
 
 # OpenSearch
 - name: opensearch-secrets

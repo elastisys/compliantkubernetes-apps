@@ -46,6 +46,11 @@
 - Rework monitoring networkpolicies with generator chart
 - New fluentd-elasticsearch custom image tag `v4.3.9-ck8s1` which includes a plugin for dot replacement, as this functionality has been removed from the `kubernetes_metadata_filter` plugin.
 - Changed location for opensearch-curator image.
+- Reworked Ops-Grafana
+  - Moved to a separate release instead of deploying it through `kube-prometheus-stack`
+  - Renamed `grafana-ops` to `grafana-dashboards`
+  - Moved all grafana value templates to a separate folder
+  - Moved grafana config from `prometheus.grafana` and `user.grafana` to `grafana.ops` and `grafana.user`
 
 ## Updated
 
@@ -72,6 +77,7 @@
 - Updated harbor chart to `v1.12.2` which upgraded harbor to `v2.8.2`
   - Dropped support for chartmuseum
   - Default login page is now OIDC, for local login refer to path `<url>/account/sign-in`
+- Upgraded Grafana chart version to `6.57.1` and app version to `9.5.3`
 
 ### Removed
 

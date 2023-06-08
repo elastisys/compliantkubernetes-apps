@@ -14,6 +14,10 @@ skipped=(
 declare -a skipped_sc
 skipped_sc=(
   "app!=harbor"
+  "app!=kube-prometheus-stack"
+  "app!=ops-grafana"
+  "app!=user-grafana"
+  "app!=grafana-dashboards"
 )
 declare -a skipped_wc
 skipped_wc=(

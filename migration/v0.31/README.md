@@ -98,6 +98,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.31/prepare/01-move-rook-values.sh
     ```
 
+1. Move grafana keys if they exist:
+
+    ```bash
+    ./migration/v0.31/prepare/02-move-grafana-values.sh
+    ```
+
 1. Move thanos replication factor
 
     ```bash
@@ -150,6 +156,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     ./migration/v0.31/apply/40-harbor.sh execute
+    ```
+
+1. Upgrade grafana:
+
+    ```bash
+    ./migration/v0.31/apply/50-grafana.sh execute
     ```
 
 1. Upgrade applications:
