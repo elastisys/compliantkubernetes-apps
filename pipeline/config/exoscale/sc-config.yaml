@@ -1,7 +1,11 @@
 # Changes made here will override the default values as well as the common config for this cluster.
 # See the default configuration under "defaults/" to see available and suggested options.
-user:
-  grafana:
+grafana:
+  user:
+    oidc:
+      allowedDomains:
+        - example.com
+  ops:
     oidc:
       allowedDomains:
         - example.com
@@ -32,11 +36,6 @@ fluentd:
 s3Exporter:
   interval: 120s
   scrapeTimeout: 30s
-prometheus:
-  grafana:
-    oidc:
-      allowedDomains:
-        - example.com
 networkPolicies:
   global:
     scApiserver:

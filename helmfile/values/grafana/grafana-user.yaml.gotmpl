@@ -1,49 +1,24 @@
 adminPassword: {{ .Values.user.grafanaPassword }}
 
-image:
-  tag: 9.3.13
-
-testFramework:
-  enabled: false
-
-initChownData:
-  enabled: false
-
-deploymentStrategy:
-  type: Recreate
-
 ingress:
-  enabled: true
-  ingressClassName: nginx
-  annotations:
-    cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
   {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.userGrafana }}
     nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.userGrafana }}
   {{ end }}
   hosts:
-  - {{ .Values.user.grafana.subdomain }}.{{ .Values.global.baseDomain }}
+  - {{ .Values.grafana.user.subdomain }}.{{ .Values.global.baseDomain }}
   tls:
   - secretName: user-grafana-tls
     hosts:
-    - {{ .Values.user.grafana.subdomain }}.{{ .Values.global.baseDomain }}
+    - {{ .Values.grafana.user.subdomain }}.{{ .Values.global.baseDomain }}
 rbac:
   namespaced: true
-  pspEnabled: false
-
-persistence:
-  type: pvc
-  enabled: true
-  size: 10Gi
-  accessModes:
-    - ReadWriteOnce
 
 sidecar:
   dashboards:
-    enabled: true
     # This will pick up the prometheus-operator dashboards
     label: grafana_dashboard
     labelValue: "1"
-  resources: {{- toYaml .Values.prometheus.grafana.sidecar.resources | nindent 6 }}
+  resources: {{- toYaml .Values.grafana.user.sidecar.resources | nindent 6 }}
 
 datasources:
   datasources.yaml:
@@ -67,7 +42,6 @@ datasources:
         customQueryParameters: "tenant_id={{ .Values.global.clusterName }}"
         manageAlerts: false
       version: 1
-
     {{- /*
       If only one workload cluster, don't bother naming the datasource and set to default.
       Otherwise set the name of the clusters so users know what they are looking at.
@@ -106,27 +80,24 @@ datasources:
 
 grafana.ini:
   server:
-    root_url: https://{{ .Values.user.grafana.subdomain }}.{{ .Values.global.baseDomain }}
+    root_url: https://{{ .Values.grafana.user.subdomain }}.{{ .Values.global.baseDomain }}
   auth.generic_oauth:
     name: dex
     enabled: true
     client_id: grafana
     client_secret: {{ .Values.grafana.clientSecret }}
-    scopes: {{ .Values.user.grafana.oidc.scopes }}
+    scopes: {{ .Values.grafana.user.oidc.scopes }}
     auth_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}./auth
     token_url: http://dex.dex.svc.cluster.local.:5556/token
     api_url: http://dex.dex.svc.cluster.local.:5556/api
-    allowed_domains: {{ join " " .Values.user.grafana.oidc.allowedDomains }}
+    allowed_domains: {{ join " " .Values.grafana.user.oidc.allowedDomains }}
     allow_sign_up: true
     tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}
-    role_attribute_path: contains(groups[*], '{{ .Values.user.grafana.oidc.userGroups.grafanaAdmin }}') && 'Admin' || contains(groups[*], '{{ .Values.user.grafana.oidc.userGroups.grafanaEditor }}') && 'Editor' || contains(groups[*], '{{ .Values.user.grafana.oidc.userGroups.grafanaViewer }}') && 'Viewer'
+    role_attribute_path: contains(groups[*], '{{ .Values.grafana.user.oidc.userGroups.grafanaAdmin }}') && 'Admin' || contains(groups[*], '{{ .Values.grafana.user.oidc.userGroups.grafanaEditor }}') && 'Editor' || contains(groups[*], '{{ .Values.grafana.user.oidc.userGroups.grafanaViewer }}') && 'Viewer'
   users:
-    viewers_can_edit: {{ .Values.user.grafana.viewersCanEdit }}
+    viewers_can_edit: {{ .Values.grafana.user.viewersCanEdit }}
   dashboards:
     default_home_dashboard_path: /tmp/dashboards/welcome.json
-  analytics:
-    reporting_enabled: false
-    check_for_updates: false
 
 # Velero backup
 
@@ -136,7 +107,7 @@ labels:
 podLabels:
   velero: backup
 
-resources: {{- toYaml .Values.user.grafana.resources | nindent 2 }}
-nodeSelector: {{- toYaml .Values.user.grafana.nodeSelector | nindent 2 }}
-affinity: {{- toYaml .Values.user.grafana.affinity | nindent 2  }}
-tolerations: {{- toYaml .Values.user.grafana.tolerations | nindent 2  }}
+resources: {{- toYaml .Values.grafana.user.resources | nindent 2 }}
+nodeSelector: {{- toYaml .Values.grafana.user.nodeSelector | nindent 2 }}
+affinity: {{- toYaml .Values.grafana.user.affinity | nindent 2  }}
+tolerations: {{- toYaml .Values.grafana.user.tolerations | nindent 2  }}

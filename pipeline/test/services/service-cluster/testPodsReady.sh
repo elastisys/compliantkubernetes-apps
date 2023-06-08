@@ -6,7 +6,7 @@ source "${INNER_SCRIPTS_PATH}/../funcs.sh"
 
 enable_harbor=$(yq4 -e '.harbor.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_harbor_backup=$(yq4 -e '.harbor.backup.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_user_grafana=$(yq4 -e '.user.grafana.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_user_grafana=$(yq4 -e '.grafana.user.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_fluentd=$(yq4 -e '.fluentd.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_fluentd_audit=$(yq4 -e '.fluentd.audit.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_fluentd_logs=$(yq4 -e '.fluentd.scLogs.enabled' "${CONFIG_FILE}" 2>/dev/null)
@@ -36,7 +36,7 @@ deployments=(
     "kube-system metrics-server"
     "ingress-nginx ingress-nginx-default-backend"
     "monitoring kube-prometheus-stack-operator"
-    "monitoring kube-prometheus-stack-grafana"
+    "monitoring ops-grafana"
     "monitoring kube-prometheus-stack-kube-state-metrics"
     "monitoring prometheus-blackbox-exporter"
     "opensearch-system prometheus-opensearch-exporter"

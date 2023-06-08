@@ -36,7 +36,7 @@ scTargets=(
     "serviceMonitor/monitoring/kube-prometheus-stack-alertmanager/0 2"
     "serviceMonitor/monitoring/kube-prometheus-stack-apiserver/0 ${masterNodes}"
     "serviceMonitor/monitoring/kube-prometheus-stack-coredns/0 2"
-    "serviceMonitor/monitoring/kube-prometheus-stack-grafana/0 1"
+    "serviceMonitor/monitoring/ops-grafana/0 1"
     "serviceMonitor/monitoring/kube-prometheus-stack-kube-state-metrics/0 1"
     "serviceMonitor/monitoring/kube-prometheus-stack-kubelet/0 ${totalNodes}"
     "serviceMonitor/monitoring/kube-prometheus-stack-kubelet/1 ${totalNodes}"

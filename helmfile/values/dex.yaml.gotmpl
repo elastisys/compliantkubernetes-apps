@@ -58,13 +58,13 @@ config:
       secret: {{ .Values.grafana.clientSecret }}
       name: 'Grafana'
       redirectURIs:
-        - https://{{ .Values.user.grafana.subdomain }}.{{ .Values.global.baseDomain }}/login/generic_oauth
-{{- if .Values.prometheus.grafana.oidc.enabled }}
+        - https://{{ .Values.grafana.user.subdomain }}.{{ .Values.global.baseDomain }}/login/generic_oauth
+{{- if .Values.grafana.ops.oidc.enabled }}
     - id: grafana-ops
       secret: {{ .Values.grafana.opsClientSecret }}
       name: 'Grafana ops'
       redirectURIs:
-        - https://{{ .Values.prometheus.grafana.subdomain }}.{{ .Values.global.opsDomain }}/login/generic_oauth
+        - https://{{ .Values.grafana.ops.subdomain }}.{{ .Values.global.opsDomain }}/login/generic_oauth
 {{- end }}
 {{- if .Values.harbor.enabled }}
     - id: harbor

@@ -104,7 +104,7 @@ function check_sc_certmanager_apps_certificates() {
 
     enable_harbor=$(yq4 -e '.harbor.enabled' "${config['config_file_sc']}" 2>/dev/null)
     enable_thanos=$(yq4 -e '.thanos.enabled' "${config['config_file_sc']}" 2>/dev/null)
-    enable_user_grafana=$(yq4 -e '.user.grafana.enabled' "${config['config_file_sc']}" 2>/dev/null)
+    enable_user_grafana=$(yq4 -e '.grafana.user.enabled' "${config['config_file_sc']}" 2>/dev/null)
 
     if "${enable_harbor}"; then
         certificates+=(

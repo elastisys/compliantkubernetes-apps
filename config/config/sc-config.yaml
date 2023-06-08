@@ -71,8 +71,38 @@ objectStorage:
         cpu: 300m
         memory: 300Mi
 
-user:
-  grafana:
+grafana:
+  ops:
+    subdomain: grafana
+    resources:
+      requests:
+        cpu: 50m
+        memory: 60Mi
+      limits:
+        cpu: 100m
+        memory: 160Mi
+    tolerations: []
+    affinity: {}
+    nodeSelector: {}
+    oidc:
+      enabled: true
+      userGroups:
+        grafanaAdmin: grafana_admin   # maps to grafana role admin
+        grafanaEditor: grafana_editor # maps to grafana role editor
+        grafanaViewer: grafana_viewer # maps to grafana role viewer
+      scopes: openid profile email groups
+      allowedDomains:
+        - set-me
+    viewersCanEdit: true
+    sidecar:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 80Mi
+        limits:
+          cpu: 50m
+          memory: 100Mi
+  user:
     enabled: true
     subdomain: grafana
     resources:
@@ -426,37 +456,6 @@ prometheus:
         topologyKey: kubernetes.io/hostname
         whenUnsatisfiable: DoNotSchedule
 
-  grafana:
-    subdomain: grafana
-    resources:
-      requests:
-        cpu: 50m
-        memory: 60Mi
-      limits:
-        cpu: 100m
-        memory: 160Mi
-    tolerations: []
-    affinity: {}
-    nodeSelector: {}
-    oidc:
-      enabled: true
-      userGroups:
-        grafanaAdmin: grafana_admin   # maps to grafana role admin
-        grafanaEditor: grafana_editor # maps to grafana role editor
-        grafanaViewer: grafana_viewer # maps to grafana role viewer
-      scopes: openid profile email groups
-      allowedDomains:
-        - set-me
-    viewersCanEdit: true
-
-    sidecar:
-      resources:
-        requests:
-          cpu: 10m
-          memory: 80Mi
-        limits:
-          cpu: 50m
-          memory: 100Mi
 dex:
   replicaCount: 2
   subdomain: dex

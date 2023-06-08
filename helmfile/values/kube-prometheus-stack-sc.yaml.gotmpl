@@ -149,7 +149,7 @@ alertmanager:
         # See: https://github.com/helm/helm/issues/2798#issuecomment-467319526
         text: |-
           <!channel>
-          *Cluster:* {{ .Values.prometheus.grafana.subdomain }}.{{ .Values.global.opsDomain }}
+          *Cluster:* {{ .Values.grafana.ops.subdomain }}.{{ .Values.global.opsDomain }}
           {{- if .Values.alerts.slack.customTemplate }}
           {{ .Values.alerts.slack.customTemplate | nindent 10 }}
           {{- else }}
@@ -175,7 +175,7 @@ alertmanager:
         # See https://prometheus.io/docs/alerting/configuration/#opsgenie_config
         - api_key: {{ .Values.alerts.opsGenie.apiKey }}
           api_url: {{ .Values.alerts.opsGenie.apiUrl }}
-          source: {{ .Values.user.grafana.subdomain }}.{{ .Values.global.opsDomain }}
+          source: {{ .Values.grafana.user.subdomain }}.{{ .Values.global.opsDomain }}
           priority: {{`'{{ if eq .GroupLabels.severity "critical"}}P1{{else if eq .GroupLabels.severity "warning"}}P2{{else if eq .GroupLabels.severity "medium"}}P3{{else if eq .GroupLabels.severity "low"}}P4{{else}}P5{{end}}'`}}
       {{ end }}
 
@@ -192,145 +192,14 @@ kubeScheduler:
   enabled: false
 
 grafana:
-  image:
-    tag: 9.3.13
-
-  testFramework:
-    enabled: false
-
-  # admin username is "admin"
-  adminPassword: {{ .Values.grafana.password }}
-
+  enabled: false
+  forceDeployDashboards: true
   defaultDashboardsTimezone: ""
-
-  initChownData:
-    enabled: false
-
-  deploymentStrategy:
-    type: Recreate
-
-  ingress:
-    enabled: true
-    ingressClassName: nginx
-    annotations:
-      ingress.kubernetes.io/rewrite-target: /
-      cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
-    {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.opsGrafana }}
-      nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.opsGrafana }}
-    {{ end }}
-    hosts:
-    - {{ .Values.prometheus.grafana.subdomain }}.{{ .Values.global.opsDomain }}
-    ## TLS configuration for grafana Ingress
-    ## Secret must be manually created in the namespace
-    tls:
-    - secretName: grafana-ops-general-tls
-      hosts:
-      - {{ .Values.prometheus.grafana.subdomain }}.{{ .Values.global.opsDomain }}
-
-  persistence:
-    type: pvc
-    enabled: true
-    size: 10Gi
-    accessModes:
-      - ReadWriteOnce
-
-  serviceAccount:
-    create: true
-    name:
-    nameTest:
-
   sidecar:
     dashboards:
-      labelValue: "" # should be set to "" to load all dashboards, regardless of the label value
       multicluster:
         global:
           enabled: true
-    datasources:
-      defaultDatasourceEnabled: false
-    resources: {{- toYaml .Values.prometheus.grafana.sidecar.resources | nindent 6 }}
-
-  additionalDataSources:
-  - name: prometheus-sc
-    access: proxy
-    basicAuth: false
-    editable: false
-    isDefault: false
-    orgId: 1
-    type: prometheus
-    url: http://kube-prometheus-stack-prometheus:9090
-    version: 1
-    jsonData:
-      prometheusType: Prometheus
-      timeInterval: "30s" # this value should be equal with .prometheus.prometheusSpec.scrapeInterval
-  {{- if and .Values.thanos.enabled .Values.thanos.query.enabled }}
-  - name: "Thanos All"
-    access: proxy
-    basicAuth: false
-    editable: false
-    isDefault: true
-    orgId: 1
-    type: prometheus
-    url: http://thanos-query-query-frontend.thanos:9090
-    jsonData:
-      prometheusType: Thanos
-      timeInterval: "30s" # this value should be equal with .prometheus.prometheusSpec.scrapeInterval
-    version: 1
-  - name: "Thanos SC Only"
-    access: proxy
-    basicAuth: false
-    editable: false
-    isDefault: false
-    orgId: 1
-    type: prometheus
-    url: http://grafana-label-enforcer:9090
-    jsonData:
-      customQueryParameters: "tenant_id={{ .Values.global.clusterName }}"
-      manageAlerts: false
-    version: 1
-  {{- range .Values.global.clustersMonitoring }}
-  - name: "Thanos {{ . }} only"
-    access: proxy
-    basicAuth: false
-    editable: false
-    isDefault: false
-    orgId: 1
-    type: prometheus
-    url: http://grafana-label-enforcer:9090
-    version: 1
-    jsonData:
-      customQueryParameters: "tenant_id={{ . }}"
-      manageAlerts: false
-  {{- end }}
-  {{- end }}
-
-  grafana.ini:
-    server:
-      root_url: https://{{ .Values.prometheus.grafana.subdomain }}.{{ .Values.global.opsDomain }}
-    {{ if .Values.prometheus.grafana.oidc.enabled -}}
-    auth.generic_oauth:
-      name: dex
-      enabled: {{ .Values.prometheus.grafana.oidc.enabled }}
-      client_id: grafana-ops
-      client_secret: {{ .Values.grafana.opsClientSecret }}
-      scopes: {{ .Values.prometheus.grafana.oidc.scopes }}
-      auth_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}./auth
-      token_url: http://dex.dex.svc.cluster.local.:5556/token
-      api_url: http://dex.dex.svc.cluster.local.:5556/api
-      allowed_domains: {{ join " " .Values.prometheus.grafana.oidc.allowedDomains }}
-      allow_sign_up: true
-      tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}
-      role_attribute_path: contains(groups[*], '{{ .Values.prometheus.grafana.oidc.userGroups.grafanaAdmin }}') && 'Admin' || contains(groups[*], '{{ .Values.prometheus.grafana.oidc.userGroups.grafanaEditor }}') && 'Editor' || contains(groups[*], '{{ .Values.prometheus.grafana.oidc.userGroups.grafanaViewer }}') && 'Viewer'
-      {{- end }}
-    users:
-      viewers_can_edit: {{ .Values.prometheus.grafana.viewersCanEdit }}
-    analytics:
-      reporting_enabled: false
-      check_for_updates: false
-
-  resources: {{- toYaml .Values.prometheus.grafana.resources | nindent 4 }}
-  tolerations: {{- toYaml .Values.prometheus.grafana.tolerations | nindent 4 }}
-  affinity: {{- toYaml .Values.prometheus.grafana.affinity | nindent 4 }}
-  nodeSelector: {{- toYaml .Values.prometheus.grafana.nodeSelector | nindent 4 }}
 
 prometheusOperator:
   resources: {{- toYaml .Values.prometheusOperator.resources | nindent 4 }}
