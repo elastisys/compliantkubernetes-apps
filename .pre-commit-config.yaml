@@ -5,7 +5,7 @@ repos:
       - id: no-commit-to-branch
       - id: check-merge-conflict
       - id: check-yaml
-        exclude: ^helmfile/upstream/|charts/.*/templates/|helmfile.yaml|^helmfile/[0-9]+-[a-z-]+.yaml
+        exclude: ^helmfile/upstream/|charts/.*/templates/|helmfile.yaml|^helmfile/[0-9]+-[a-z-]+.yaml|^helmfile/bases
         args:
           - --allow-multiple-documents
       - id: check-json

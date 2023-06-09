@@ -43,7 +43,7 @@ RUN helm plugin install https://github.com/databus23/helm-diff --version v3.1.2
 RUN helm plugin install https://github.com/jkroepke/helm-secrets --version v3.12.0
 
 # Helmfile
-ENV HELMFILE_VERSION "0.146.0"
+ENV HELMFILE_VERSION "0.154.0"
 RUN wget --progress=dot:giga "https://github.com/helmfile/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz" && \
     tar -zxvf "helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz" helmfile && \
     install -Tm 755 helmfile /usr/local/bin/helmfile && \

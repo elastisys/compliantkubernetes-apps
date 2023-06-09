@@ -1,8 +1,8 @@
 helmDefaults:
-  timeout: 600
   createNamespace: false
+  skipDeps: true
+  timeout: 600
 
-# Environments
 environments:
   workload_cluster:
     values:
@@ -20,24 +20,3 @@ environments:
       - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/sc-config.yaml"
     secrets:
       - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
-
----
-
-# The desired state of Helm releases.
-releases:
-
-# Create Service cluster Namespaces
-- name: ck8s-namespaces
-  namespace: kube-system
-  labels:
-    app: ck8s-namespaces
-  chart: ./charts/namespaces
-  version: 0.1.1
-  missingFileHandler: Error
-  values:
-  {{ if eq .Environment.Name "service_cluster"  }}
-  - values/namespaces-sc.yaml.gotmpl
-  {{ end }}
-  {{ if eq .Environment.Name "workload_cluster"  }}
-  - values/namespaces-wc.yaml.gotmpl
-  {{ end }}

@@ -1,25 +1,6 @@
-helmDefaults:
-  timeout: 600
-  createNamespace: false
-  skipDeps: true
-
-environments:
-  workload_cluster:
-    values:
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml"
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/wc-config.yaml"
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml"
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/wc-config.yaml"
-    secrets:
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
-  service_cluster:
-    values:
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml"
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/sc-config.yaml"
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml"
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/sc-config.yaml"
-    secrets:
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
+bases:
+  - ./bases/environment.yaml
+  - ./bases/upstream.yaml
 ---
 
 releases:
@@ -28,8 +9,7 @@ releases:
   namespace: kured
   labels:
     app: kured
-  chart: ./upstream/kured
-  version: 4.5.1
+  inherit: [ template: kured ]
   installed: {{ .Values.kured.enabled }}
   values:
   - values/kured.yaml.gotmpl
@@ -60,8 +40,7 @@ releases:
   namespace: ingress-nginx
   labels:
     app: ingress-nginx
-  chart: ./upstream/ingress-nginx
-  version: 4.7.0
+  inherit: [ template: ingress-nginx ]
   wait: true
   values:
   - values/ingress-nginx.yaml.gotmpl
@@ -72,8 +51,7 @@ releases:
   labels:
     app: trivy-operator
     group: trivy
-  chart: ./upstream/trivy-operator
-  version: 0.13.0
+  inherit: [ template: trivy-operator ]
   installed: {{ .Values.trivy.enabled }}
   disableValidationOnInstall: true
   values:
@@ -84,8 +62,7 @@ releases:
   namespace: velero
   labels:
     app: velero
-  chart: ./upstream/velero
-  version: 2.31.8
+  inherit: [ template: velero ]
   installed: {{ .Values.velero.enabled }}
   values:
 {{ if eq .Environment.Name "service_cluster" }}
@@ -109,8 +86,7 @@ releases:
   namespace: kube-system
   labels:
     app: metrics-server
-  chart: ./upstream/metrics-server
-  version: 3.8.3
+  inherit: [ template: metrics-server ]
   installed: {{ .Values.metricsServer.enabled }}
   values:
   - values/metrics-server.yaml.gotmpl
@@ -144,8 +120,7 @@ releases:
   namespace: monitoring
   labels:
     app: blackbox
-  chart: ./upstream/prometheus-blackbox-exporter
-  version: 8.2.0
+  inherit: [ template: prometheus-blackbox-exporter ]
   values:
 {{ if eq .Environment.Name "service_cluster" }}
   - values/prometheus-blackbox-exporter-sc.yaml.gotmpl
@@ -169,8 +144,7 @@ releases:
   namespace: falco
   labels:
     app: falco
-  chart: ./upstream/falco
-  version: 3.3.0
+  inherit: [ template: falco ]
   installed: {{ .Values.falco.enabled }}
   values:
   - values/falco/falco-common.yaml.gotmpl
@@ -186,8 +160,7 @@ releases:
   namespace: falco
   labels:
     app: falco-exporter
-  chart: ./upstream/falco-exporter
-  version: 0.9.6
+  inherit: [ template: falco-exporter ]
   installed: {{ .Values.falco.enabled }}
   values:
     - values/falco/falco-exporter.yaml.gotmpl
@@ -230,8 +203,7 @@ releases:
   namespace: dex
   labels:
     app: dex
-  chart: ./upstream/dex
-  version: 0.14.1
+  inherit: [ template: dex ]
   wait: true
   values:
   - values/dex.yaml.gotmpl
@@ -275,8 +247,7 @@ releases:
     app: ops-grafana
     app.kubernetes.io/instance: ops-grafana
     app.kubernetes.io/name: grafana
-  chart: ./upstream/grafana
-  version: 6.57.4
+  inherit: [ template: grafana ]
   values:
   - values/grafana/grafana-common.yaml.gotmpl
   - values/grafana/grafana-ops.yaml.gotmpl
@@ -288,8 +259,7 @@ releases:
     app: user-grafana
     app.kubernetes.io/instance: user-grafana
     app.kubernetes.io/name: grafana
-  chart: ./upstream/grafana
-  version: 6.57.4
+  inherit: [ template: grafana ]
   installed: {{ .Values.grafana.user.enabled }}
   values:
   - values/grafana/grafana-common.yaml.gotmpl
@@ -322,8 +292,7 @@ releases:
   labels:
     app: opensearch-master
     group: opensearch
-  chart: ./upstream/opensearch
-  version: 2.13.0
+  inherit: [ template: opensearch ]
   wait: true
   needs:
   {{- if .Values.opensearch.sso.enabled }}
@@ -339,8 +308,7 @@ releases:
   labels:
     app: opensearch-data
     group: opensearch
-  chart: ./upstream/opensearch
-  version: 2.13.0
+  inherit: [ template: opensearch ]
   installed: {{ .Values.opensearch.dataNode.dedicatedPods }}
   wait: true
   needs:
@@ -354,8 +322,7 @@ releases:
   labels:
     app: opensearch-client
     group: opensearch
-  chart: ./upstream/opensearch
-  version: 2.13.0
+  inherit: [ template: opensearch ]
   installed: {{ .Values.opensearch.clientNode.dedicatedPods }}
   wait: true
   needs:
@@ -369,8 +336,7 @@ releases:
   labels:
     app: opensearch-dashboards
     group: opensearch
-  chart: ./upstream/opensearch-dashboards
-  version: 2.11.0
+  inherit: [ template: opensearch-dashboards ]
   wait: true
   needs:
   - opensearch-system/opensearch-master
@@ -460,8 +426,7 @@ releases:
   labels:
     app: prometheus-opensearch-exporter
     group: opensearch
-  chart: ./upstream/prometheus-elasticsearch-exporter
-  version: 4.11.0
+  inherit: [ template: prometheus-elasticsearch-exporter ]
   needs:
   - opensearch-system/opensearch-configurer
   values:
@@ -488,8 +453,7 @@ releases:
     harbor: harbor
     component: harbor
     group: harbor
-  chart: ./upstream/harbor
-  version: 1.12.2
+  inherit: [ template: harbor ]
   installed: {{ .Values.harbor.enabled }}
   wait: true
   timeout: 600
@@ -529,8 +493,7 @@ releases:
   namespace: thanos
   labels:
     app: thanos
-  chart: ./upstream/thanos
-  version: 12.6.2
+  inherit: [ template: thanos ]
   installed: {{ .Values.thanos.enabled }}
   values:
   - values/thanos/objectstorage-secret.yaml.gotmpl
@@ -539,8 +502,7 @@ releases:
   namespace: thanos
   labels:
     app: thanos
-  chart: ./upstream/thanos
-  version: 12.6.2
+  inherit: [ template: thanos ]
   installed: {{ and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
   needs:
   - thanos/thanos-objectstorage-secret
@@ -552,8 +514,7 @@ releases:
   namespace: thanos
   labels:
     app: thanos
-  chart: ./upstream/thanos
-  version: 12.6.2
+  inherit: [ template: thanos ]
   installed: {{ and .Values.thanos.enabled .Values.thanos.query.enabled }}
   values:
   - values/thanos/query.yaml.gotmpl
@@ -584,8 +545,7 @@ releases:
   labels:
     app: fluentd
     component: fluentd-aggregator
-  chart: ./upstream/fluentd
-  version: 5.8.2
+  inherit: [ template: fluentd ]
   installed: {{ .Values.fluentd.enabled }}
   values:
   - values/fluentd/aggregator-common.yaml.gotmpl
@@ -596,8 +556,7 @@ releases:
   labels:
     app: fluentd
     component: fluentd-forwarder
-  chart: ./upstream/fluentd-elasticsearch
-  version: 13.10.0
+  inherit: [ template: fluentd-elasticsearch ]
   installed: {{ .Values.fluentd.enabled }}
   values:
   - values/fluentd/forwarder-common.yaml.gotmpl
@@ -668,8 +627,7 @@ releases:
   labels:
     app: fluentd
     component: fluentd-aggregator
-  chart: ./upstream/fluentd
-  version: 5.8.2
+  inherit: [ template: fluentd ]
   installed: {{ and .Values.fluentd.enabled .Values.fluentd.audit.enabled }}
   values:
   - values/fluentd/aggregator-common.yaml.gotmpl
@@ -680,8 +638,7 @@ releases:
   labels:
     app: fluentd
     component: fluentd-forwarder
-  chart: ./upstream/fluentd-elasticsearch
-  version: 13.10.0
+  inherit: [ template: fluentd-elasticsearch ]
   installed: {{ .Values.fluentd.enabled }}
   values:
   - values/fluentd/forwarder-common.yaml.gotmpl
@@ -694,8 +651,7 @@ releases:
   labels:
     app: fluentd
     component: fluentd-user
-  chart: ./upstream/fluentd-elasticsearch
-  version: 13.10.0
+  inherit: [ template: fluentd-elasticsearch ]
   installed: {{ .Values.fluentd.enabled }}
   values:
   - values/fluentd/forwarder-common.yaml.gotmpl

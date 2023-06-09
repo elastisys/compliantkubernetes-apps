@@ -1,0 +1,64 @@
+repositories:
+  aquasecurity: https://aquasecurity.github.io/helm-charts
+
+  bitnami: https://charts.bitnami.com/bitnami
+
+  dexidp: https://charts.dexidp.io
+
+  falcosecurity: https://falcosecurity.github.io/charts
+
+  goharbor: https://helm.goharbor.io
+
+  grafana: https://grafana.github.io/helm-charts
+
+  jetstack: https://charts.jetstack.io
+
+  kokuwa: https://kokuwaio.github.io/helm-charts
+
+  kubereboot: https://kubereboot.github.io/charts
+
+  kubernetes-ingress-nginx: https://kubernetes.github.io/ingress-nginx
+  kubernetes-metrics-server: https://kubernetes-sigs.github.io/metrics-server
+
+  open-policy-agent-gatekeeper: https://open-policy-agent.github.io/gatekeeper/charts
+
+  opensearch-project: https://opensearch-project.github.io/helm-charts
+
+  prometheus-community: https://prometheus-community.github.io/helm-charts
+
+  vmware-tanzu: https://vmware-tanzu.github.io/helm-charts
+
+charts:
+  aquasecurity/trivy-operator: 0.13.0
+
+  bitnami/fluentd: 5.8.2
+  bitnami/thanos: 12.6.2
+
+  dexidp/dex: 0.14.1
+
+  falcosecurity/falco: 3.3.0
+  falcosecurity/falco-exporter: 0.9.6
+
+  goharbor/harbor: 1.12.2
+
+  grafana/grafana: 6.57.4
+
+  jetstack/cert-manager: v1.11.0
+
+  kokuwa/fluentd-elasticsearch: 13.10.0
+
+  kubereboot/kured: 4.5.1
+
+  kubernetes-ingress-nginx/ingress-nginx: 4.7.0
+  kubernetes-metrics-server/metrics-server: 3.10.0
+
+  open-policy-agent-gatekeeper/gatekeeper: 3.11.0
+
+  opensearch-project/opensearch: 2.13.0
+  opensearch-project/opensearch-dashboards: 2.11.0
+
+  prometheus-community/kube-prometheus-stack: 45.2.0
+  prometheus-community/prometheus-blackbox-exporter: 8.2.0
+  prometheus-community/prometheus-elasticsearch-exporter: 5.1.1
+
+  vmware-tanzu/velero: 3.1.6

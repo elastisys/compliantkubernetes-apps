@@ -1,18 +1,81 @@
-# Upstream maintained Charts
+# Upstream Charts
 
-## Example on how to add or update a Chart:
+Charts are managed with the file `index.yaml` and the script `charts.sh`.
 
+> **Note**: Most functions relies on the repositories being added and updated in helm:
+>
+> ```bash
+> ./scripts/charts.sh repo add
+> ./scripts/charts.sh repo update
+> ```
+
+## Adding charts
+
+Add the repository in the index:
+
+```diff
+  repositories:
+
++   <repository-name>: <repository-url>
 ```
-helm repo add falcosecurity https://falcosecurity.github.io/charts
-helm repo up
-helm fetch falcosecurity/falco --version 1.5.2 --untar
+
+Add the chart in the index:
+
+```diff
+  charts:
+
++   <repository-name>/<chart-name>: <chart-version>
+```
+
+Pull the chart:
+
+```bash
+./scripts/charts.sh pull <chart-name>
+```
+
+> **Note**: To use an upstream chart ensure that:
+>
+> 1. the state file contains `./bases/upstream.yaml` as a base to include the upstream index, and
+> 2. the release spec contains `inherit: [ template: <chart-name> ]` to include the chart template.
+
+## Updating charts
+
+Update the chart in the index:
+
+```diff
+  charts:
+
+-   <repository-name>/<chart-name>: <old-chart-version>
++   <repository-name>/<chart-name>: <new-chart-version>
+```
+
+Pull the chart:
+
+```bash
+./scripts/charts.sh pull <chart-name>
+```
+
+## Other functions
+
+Check for chart changes:
+
+```bash
+./scripts/charts.sh diff all|<chart> all|chart|crds|readme|values <version>
+```
+
+Check for chart updates:
+
+```bash
+./scripts/charts.sh list all|<chart>
+```
+
+Check for chart verification:
+
+```bash
+./scripts/charts.sh verify all|<chart>
 ```
 
 ## To consider when upgrading a chart
-
-### starboard-operator
-1. The Starboard Operator currently contains a subchart containing a PSP to allow the Trivy scanners to run and the RBAC to use it.
-   Keep it until we don't use PSP admission controller anymore.
 
 ### kube-prometheus-stack
 1. All rules are split between alerts and records, modified to preserve the cluster label in aggregations, and maintained separately in [prometheus-alerts chart](helmfile/charts/prometheus-alerts/)

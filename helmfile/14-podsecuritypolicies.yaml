@@ -1,25 +1,5 @@
-helmDefaults:
-  timeout: 600
-  createNamespace: false
-  skipDeps: true
-
-environments:
-  workload_cluster:
-    values:
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml"
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/wc-config.yaml"
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml"
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/wc-config.yaml"
-    secrets:
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
-  service_cluster:
-    values:
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml"
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/sc-config.yaml"
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml"
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/sc-config.yaml"
-    secrets:
-      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
+bases:
+  - ./bases/environment.yaml
 ---
 
 commonLabels:
