@@ -95,7 +95,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 1. Move some rookCeph keys if they exist:
 
     ```bash
-    ./01-move-rook-values.sh
+    ./migration/v0.31/prepare/01-move-rook-values.sh
     ```
 
 1. Update apps configuration:
