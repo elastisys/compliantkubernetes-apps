@@ -51,7 +51,7 @@ diffIPs() {
     return ${DIFF_RETURN}
 }
 
-# Get IPs in given field and config file
+# Get all non /32 IPs in given field and config file
 getConfigIPS() {
     local source_field="$1"
     local config_file="$2"
@@ -81,27 +81,25 @@ updateConfigFile() {
 }
 
 # Check if IPs fits into subnets
-performIPCheck() {
-    local kubectlIP="$1"
-    local configIP="$2"
+performIPCheckAndRemoveFromIPSList() {
+    local IPToCheck="$1"
+    local networkToCompareTo="$2"
 
     # Try to see if ip belongs to subnet - if not, exit(1)
-    if python3 -c "import ipaddress; exit(0) if ipaddress.ip_address('${kubectlIP}') in ipaddress.ip_network('${configIP}') else exit(1)"
-    then
+    if python3 -c "import ipaddress; exit(0) if ipaddress.ip_address('${IPToCheck}') in ipaddress.ip_network('${networkToCompareTo}') else exit(1)"; then
             # Filter out the matching string for IPS.
             filtered_array=()
-            for kubectl_ip in "${IPS[@]}"; do
-                if [[ "$kubectl_ip" != "$kubectlIP" ]]; then
-                    filtered_array+=("$kubectl_ip")
+            for ip in "${IPS[@]}"; do
+                if [[ "$ip" != "$IPToCheck" ]]; then
+                    filtered_array+=("$ip")
                 fi
             done
 
-
             IPS=("${filtered_array[@]}")
 
-        # Add working configIP to the list of working subnets
-        if [[ " ${working_subnet[*]} " != *" $configIP "* ]]; then
-            working_subnet+=("$configIP")
+        # Add working networkToCompareTo to the list of working subnets
+        if [[ " ${working_subnet[*]} " != *" $networkToCompareTo "* ]]; then
+            working_subnet+=("$networkToCompareTo")
         fi
     fi
 }
@@ -130,12 +128,12 @@ diffDNSIPs() {
 # Usage: updateDNSIPs <dns_record> <yaml_path> <file>
 updateDNSIPs() {
     endpoint="${1}"
-    inputSource="${2}"
-    inputConfig="$3"
+    configKey="${2}"
+    configFile="$3"
 
     read -r -a IPS <<<"$(getDNSIPs "${endpoint}")"
 
-    processIPRanges "$inputSource" "$inputConfig"
+    processIPRanges "$configKey" "$configFile"
 }
 
 # Usage: updateIPs <yaml_path> <file> <IP 1> <IP ..>
@@ -183,27 +181,27 @@ diffKubectlIPs() {
 updateKubectlIPs() {
     cloud="${1}"
     label="${2}"
-    inputSource="${3}"
-    inputConfig="${4}"
+    configKey="${3}"
+    configFile="${4}"
 
     local IPS
     read -r -a IPS <<<"$(getKubectlIPs "$cloud" "$label")"
 
-    processIPRanges "$inputSource" "$inputConfig"
+    processIPRanges "$configKey" "$configFile"
 }
 
 # Process ip ranges with subnet masks in consideration.
 processIPRanges(){
-    local inputSource="$1"
-    local inputConfig="$2"
+    local configKey="$1"
+    local configFile="$2"
 
     local multiIPRanges=()
-    read -r -a multiIPRanges <<<"$(getConfigIPS "$inputSource" "$inputConfig")"
+    read -r -a multiIPRanges <<<"$(getConfigIPS "$configKey" "$configFile")"
 
     local working_subnet=()
 
     # Clear config values
-    yq4 -i "$inputSource"' = []' "$inputConfig"
+    yq4 -i "$configKey"' = []' "$configFile"
 
     # IF config value is not empty, go ahead with the following:
     # 1. Check if any got IPS fit inside of the IPs existing in the config-files.
@@ -212,7 +210,7 @@ processIPRanges(){
     if [ "${#multiIPRanges[@]}" -gt 0 ]; then
         for upstreamDNSIP in "${IPS[@]}"; do
             for configIP in "${multiIPRanges[@]}"; do
-                performIPCheck "$upstreamDNSIP" "$configIP"
+                performIPCheckAndRemoveFromIPSList "$upstreamDNSIP" "$configIP"
             done
         done
 
@@ -220,12 +218,12 @@ processIPRanges(){
         working_subnet+=("${IPS[@]}")
 
         for ip in "${working_subnet[@]}"; do
-            updateConfigFile "$inputSource" "$inputConfig" "$ip"
+            updateConfigFile "$configKey" "$configFile" "$ip"
         done
     else
-        yq4 -i "${inputSource}"' = []' "${inputConfig}"
+        yq4 -i "${configKey}"' = []' "${configFile}"
         for ip in "${IPS[@]}"; do
-            updateConfigFile "$inputSource" "$inputConfig" "$ip/32"
+            updateConfigFile "$configKey" "$configFile" "$ip/32"
         done
     fi
 }
