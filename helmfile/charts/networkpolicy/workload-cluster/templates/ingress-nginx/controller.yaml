@@ -68,6 +68,8 @@ spec:
     - ports:
         - port: 53
           protocol: UDP
+        - port: 53
+          protocol: TCP
     {{- if or .Values.ingressNginx.ingressOverride.ips .Values.global.wcIngress.ips }}
     - to:
       {{- if and .Values.ingressNginx.ingressOverride.enabled .Values.ingressNginx.ingressOverride.ips }}
