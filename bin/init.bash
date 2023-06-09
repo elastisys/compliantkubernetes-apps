@@ -148,10 +148,8 @@ set_storage_class() {
 
         exoscale|baremetal)
             storage_class=rook-ceph-block
-
-            yq4 -i '.networkPolicies.rookCeph.enabled = true' "${file}"
-            yq4 -i '.rookCeph.enabled = true' "${file}"
             ;;
+
         aws)
             storage_class=ebs-gp2
             ;;
@@ -204,6 +202,8 @@ set_nginx_config() {
             use_proxy_protocol=false
             use_host_port=true
             service_enabled=false
+            external_load_balancer=true
+            ingress_using_host_network=true
             ;;
 
         citycloud | elastx)
@@ -212,6 +212,8 @@ set_nginx_config() {
             service_enabled=true
             service_type=LoadBalancer
             service_annotations=''
+            external_load_balancer=false
+            ingress_using_host_network=false
             ;;
 
         aws)
@@ -220,18 +222,24 @@ set_nginx_config() {
             service_enabled=true
             service_type=LoadBalancer
             service_annotations='service.beta.kubernetes.io/aws-load-balancer-type: nlb'
+            external_load_balancer=false
+            ingress_using_host_network=false
             ;;
 
         baremetal)
             use_proxy_protocol=false
             use_host_port=true
             service_enabled=false
+            external_load_balancer=true
+            ingress_using_host_network=true
             ;;
     esac
 
     replace_set_me "$1" '.ingressNginx.controller.config.useProxyProtocol' "${use_proxy_protocol}"
     replace_set_me "$1" '.ingressNginx.controller.useHostPort' "${use_host_port}"
     replace_set_me "$1" '.ingressNginx.controller.service.enabled' "${service_enabled}"
+    replace_set_me "$1" '.networkPolicies.global.externalLoadBalancer' "${external_load_balancer}"
+    replace_set_me "$1" '.networkPolicies.global.ingressUsingHostNetwork' "${ingress_using_host_network}"
 
     if [ "${service_enabled}" = 'false' ]; then
         replace_set_me "${file}" '.ingressNginx.controller.service.type' '"set-me-if-ingressNginx.controller.service.enabled"'
@@ -333,6 +341,32 @@ set_harbor_config() {
     replace_set_me "${file}" ".harbor.persistence.disableRedirect" "${disable_redirect}"
 }
 
+update_monitoring() {
+    file=$1
+    if [[ ! -f "${file}" ]]; then
+        log_error "ERROR: invalid file - ${file}"
+        exit 1
+    fi
+    case ${CK8S_CLOUD_PROVIDER} in
+        exoscale | baremetal)
+          yq4 --inplace '.prometheusBlackboxExporter.targets.rook = true' "${file}"
+          yq4 --inplace '.rookCeph.monitoring.enabled = true' "${file}"
+          ;;
+    esac
+}
+update_psp_netpol() {
+    file=$1
+    if [[ ! -f "${file}" ]]; then
+        log_error "ERROR: invalid file - ${file}"
+        exit 1
+    fi
+    case ${CK8S_CLOUD_PROVIDER} in
+        exoscale | baremetal)
+          yq4 -i '.rookCeph.gatekeeperPsp.enabled = true' "${file}"
+          yq4 -i '.networkPolicies.rookCeph.enabled = true' "${file}"
+          ;;
+    esac
+}
 # Usage: update_config <override_config_file>
 # Updates configs to only contain custom values.
 update_config() {
@@ -531,6 +565,8 @@ generate_default_config "${config[default_common]}"
 set_storage_class       "${config[default_common]}"
 set_object_storage      "${config[default_common]}"
 set_nginx_config        "${config[default_common]}"
+update_monitoring       "${config[default_common]}"
+update_psp_netpol       "${config[default_common]}"
 update_config           "${config[override_common]}"
 
 generate_default_config        "${config[default_sc]}"

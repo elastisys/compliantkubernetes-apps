@@ -91,7 +91,7 @@ releases:
       psp: rook-ceph
     chart: ./charts/gatekeeper/podsecuritypolicies
     version: 0.1.0
-    installed: {{ .Values.rookCeph.enabled }}
+    installed: {{ .Values.rookCeph.gatekeeperPsp.enabled }}
     values:
       - values/podsecuritypolicies/common/rook-ceph.yaml.gotmpl
 

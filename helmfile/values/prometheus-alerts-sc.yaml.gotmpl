@@ -19,7 +19,7 @@ defaultRules:
   rules:
     alertmanager: true
     hnc: {{ .Values.hnc.enabled }}
-    rookMonitor: {{ .Values.monitoring.rook.enabled }}
+    rookMonitor: {{ .Values.rookCeph.monitoring.enabled }}
     {{- if and .Values.thanos.enabled .Values.thanos.metrics.enabled }}
     thanosMonitor: {{ .Values.thanos.metrics.enabled }}
     {{- end }}

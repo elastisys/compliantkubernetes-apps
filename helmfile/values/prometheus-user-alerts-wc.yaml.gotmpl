@@ -19,7 +19,7 @@ defaultRules:
     alertmanager: {{ .Values.user.alertmanager.enabled }}
     # Rook is handled by the cluster operators. Users would normally not care
     # about these alerts, but we have no other way of gathering them currently.
-    rookMonitor: {{ .Values.monitoring.rook.enabled }}
+    rookMonitor: {{ .Values.rookCeph.monitoring.enabled }}
     capacityManagementAlerts: {{ .Values.prometheus.capacityManagementAlerts.enabled }}
     networkpolicies: {{ .Values.networkPolicies.enableAlerting }}
 

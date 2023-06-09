@@ -24,9 +24,6 @@ issuers:
 clusterAdmin:
   users:
     - admin@example.com
-monitoring:
-  rook:
-    enabled: true
 networkPolicies:
   global:
     objectStorage:
@@ -40,8 +37,6 @@ networkPolicies:
     wcIngress:
       ips:
         - 0.0.0.0/0
-    externalLoadBalancer: true
-    ingressUsingHostNetwork: true
     trivy:
       ips:
         - 0.0.0.0/0
@@ -65,5 +60,3 @@ networkPolicies:
     serviceIp:
       ips:
         - 0.0.0.0/0
-  rookCeph:
-    enabled: false
