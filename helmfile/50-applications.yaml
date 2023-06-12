@@ -559,7 +559,7 @@ releases:
     app: fluentd
     component: fluentd-aggregator
   chart: ./upstream/fluentd
-  version: 5.0.15
+  version: 5.8.2
   installed: {{ .Values.fluentd.enabled }}
   values:
   - values/fluentd/aggregator-common.yaml.gotmpl
@@ -571,7 +571,7 @@ releases:
     app: fluentd
     component: fluentd-forwarder
   chart: ./upstream/fluentd-elasticsearch
-  version: 13.3.0
+  version: 13.10.0
   installed: {{ .Values.fluentd.enabled }}
   values:
   - values/fluentd/forwarder-common.yaml.gotmpl
@@ -643,7 +643,7 @@ releases:
     app: fluentd
     component: fluentd-aggregator
   chart: ./upstream/fluentd
-  version: 5.0.15
+  version: 5.8.2
   installed: {{ and .Values.fluentd.enabled .Values.fluentd.audit.enabled }}
   values:
   - values/fluentd/aggregator-common.yaml.gotmpl
@@ -655,7 +655,7 @@ releases:
     app: fluentd
     component: fluentd-forwarder
   chart: ./upstream/fluentd-elasticsearch
-  version: 13.3.0
+  version: 13.10.0
   installed: {{ .Values.fluentd.enabled }}
   values:
   - values/fluentd/forwarder-common.yaml.gotmpl
@@ -669,7 +669,7 @@ releases:
     app: fluentd
     component: fluentd-user
   chart: ./upstream/fluentd-elasticsearch
-  version: 13.3.0
+  version: 13.10.0
   installed: {{ .Values.fluentd.enabled }}
   values:
   - values/fluentd/forwarder-common.yaml.gotmpl

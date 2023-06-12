@@ -36,6 +36,7 @@
 - Change Trivy Operator Dashboard to only count image states once per image instead for each namespace and resource
 - Rework thanos networkpolicies with generator chart
 - Rework monitoring networkpolicies with generator chart
+- New fluentd-elasticsearch custom image tag `v4.3.9-ck8s1` which includes a plugin for dot replacement, as this functionality has been removed from the `kubernetes_metadata_filter` plugin.
 
 ### Fixed
 
@@ -50,3 +51,5 @@
 - Bump sops to version `3.7.3`.
 - Update Falco rules
 - Opensearch to v2.8.0, chart v2.13.0 and Opensearch Dashboard to v2.8.0, chart v2.11.0
+- Upgrade chart `fluentd` to version `5.8.2`, app version `1.16.1`.
+- Upgrade chart `fluentd-elasticsearch` to version `13.10.0`, app version `4.3.9`.

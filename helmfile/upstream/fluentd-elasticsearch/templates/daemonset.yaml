@@ -19,6 +19,9 @@ spec:
     metadata:
       labels:
         {{- include "fluentd-elasticsearch.selectorLabels" . | nindent 8 }}
+        {{- with .Values.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmaps.yaml") . | sha256sum }}
 {{- if .Values.podAnnotations }}
@@ -35,9 +38,13 @@ spec:
         - name: {{ . }}
       {{- end }}
       {{- end }}
+{{- if .Values.securityContext }}
+      securityContext:
+{{ toYaml .Values.securityContext | indent 8 }}
+{{- end }}
       containers:
       - name: {{ include "fluentd-elasticsearch.fullname" . }}
-        image:  "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image:  "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
         env:
         - name: FLUENTD_ARGS
@@ -146,6 +153,10 @@ spec:
           value: {{ .Values.elasticsearch.reloadConnections | quote }}
         - name: OUTPUT_REQUEST_TIMEOUT
           value: {{ .Values.elasticsearch.requestTimeout | quote }}
+{{- if .Values.elasticsearch.suppressTypeName }}
+        - name: OUTPUT_SUPPRESS_TYPE_NAME
+          value: {{ .Values.elasticsearch.suppressTypeName | quote }}
+{{- end }}
         - name: INCLUDE_TIMESTAMP
           value: {{ .Values.elasticsearch.includeTimestamp | quote }}
         {{- if .Values.env }}

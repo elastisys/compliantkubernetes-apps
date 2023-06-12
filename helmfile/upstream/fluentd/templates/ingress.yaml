@@ -1,9 +1,10 @@
 {{- if and .Values.aggregator.enabled .Values.aggregator.ingress.enabled }}
-{{- $serviceName := printf "%s-aggregator" (include "common.names.fullname" .) -}}
+{{- $serviceName := printf "%s-aggregator" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" -}}
 apiVersion: {{ include "common.capabilities.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
-  name: {{ include "common.names.fullname" . }}-aggregator
+  name: {{ printf "%s-aggregator" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace | quote }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
     app.kubernetes.io/component: aggregator
     app: aggregator
@@ -48,6 +49,9 @@ spec:
             {{- end }}
             backend: {{- include "common.ingress.backend" (dict "serviceName" $serviceName "servicePort" "http" "context" $) | nindent 14 }}
     {{- end }}
+    {{- if .Values.aggregator.ingress.extraRules }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.aggregator.ingress.extraRules "context" $) | nindent 4 }}
+    {{- end }}
   {{- if or .Values.aggregator.ingress.tls .Values.aggregator.ingress.extraTls }}
   tls:
     {{- if .Values.aggregator.ingress.tls }}
@@ -56,7 +60,7 @@ spec:
         {{- range .Values.aggregator.ingress.extraHosts }}
         - {{ .name }}
         {{- end }}
-      secretName: {{ printf "%s-tls" .Values.aggregator.ingress.hostname }}
+      secretName: {{ printf "%s-tls" .Values.aggregator.ingress.hostname | trunc 63 | trimSuffix "-" }}
     {{- end }}
     {{- if .Values.aggregator.ingress.extraTls }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.aggregator.ingress.extraTls "context" $ ) | nindent 4 }}

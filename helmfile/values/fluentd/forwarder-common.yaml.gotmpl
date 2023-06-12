@@ -5,7 +5,7 @@ image:
   # This can later be replaced with the original image (https://github.com/monotek/fluentd-elasticsearch) when our changes is merged.
   # This image is included in falco k8s_containers and user_known_package_manager_in_container macros
   repository: ghcr.io/elastisys/fluentd
-  tag: v3.4.0-ck8s5
+  tag: v4.3.9-ck8s1
 
 serviceMonitor:
   enabled: true
@@ -246,6 +246,13 @@ extraConfigMaps:
       <record>
         cluster.name "{{ .Values.global.clusterName }}"
       </record>
+    </filter>
+
+    <filter kubernetes.**>
+      @type dedot
+      de_dot true
+      de_dot_separator _
+      de_dot_nested true
     </filter>
 
 # Liveliness probe reverted from upstream changes to prevent that it fails if just one buffer is inactive.

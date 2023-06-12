@@ -1,9 +1,10 @@
 image:
   repository: quay.io/fluentd_elasticsearch/fluentd
-## Specify an imagePullPolicy (Required)
-## It's recommended to change this to 'Always' if the image tag is 'latest'
-## ref: http://kubernetes.io/docs/user-guide/images/#updating-images
-  tag: v3.1.0
+  # if empty uses appVersion from Chart.yaml as default image tag
+  tag: ""
+  ## Specify an imagePullPolicy (Required)
+  ## It's recommended to change this to 'Always' if the image tag is 'latest'
+  ## ref: http://kubernetes.io/docs/user-guide/images/#updating-images
   pullPolicy: IfNotPresent
   ## Optionally specify an array of imagePullSecrets.
   ## Secrets must be manually created in the namespace.
@@ -52,7 +53,6 @@ elasticsearch:
   # address of the sidecar, like "localhost:8080"
   hosts: ["elasticsearch-client:9200"]
   indexName: "fluentd"
-  outputType: "elasticsearch"
   logstash:
     enabled: true
     prefix: "logstash"
@@ -104,6 +104,7 @@ elasticsearch:
   scheme: "http"
   sslVerify: true
   sslVersion: "TLSv1_2"
+  outputType: "elasticsearch"
   typeName: "_doc"
   logLevel: "info"
   log400Reason: false
@@ -145,6 +146,7 @@ env: {}
   # OUTPUT_USER: my_user
   # LIVENESS_THRESHOLD_SECONDS: 300
   # STUCK_THRESHOLD_SECONDS: 900
+  # BUFFER_PATH: /var/log/fluentd-buffers/kubernetes.system.buffer
 
 # If you want to add custom environment variables from secrets, use the secret list
 secret: []
@@ -194,33 +196,41 @@ livenessProbe:
       # liveness probe off completely.
       - '/bin/sh'
       - '-c'
-      - >
+      - |
         LIVENESS_THRESHOLD_SECONDS=${LIVENESS_THRESHOLD_SECONDS:-300};
         STUCK_THRESHOLD_SECONDS=${STUCK_THRESHOLD_SECONDS:-900};
-        if [ ! -e /var/log/fluentd-buffers ];
+        BUFFER_PATH=${BUFFER_PATH:-/var/log/fluentd-buffers/kubernetes.system.buffer}
+        if [ ! -e ${BUFFER_PATH} ];
         then
-          echo "Expected directory /var/log/fluentd-buffers does not exist. This is likely a configuration issue.";
+          echo "Expected file ${BUFFER_PATH} does not exist. This is likely a configuration issue.";
           exit 1;
         fi;
         touch -d "${STUCK_THRESHOLD_SECONDS} seconds ago" /tmp/marker-stuck;
-        if [ -n "$(find /var/log/fluentd-buffers -mindepth 1 -type d ! -newer /tmp/marker-stuck -print -quit)" ];
+        if [ -n "$(find ${BUFFER_PATH} -mindepth 1 -type d ! -newer /tmp/marker-stuck -print -quit)" ];
         then
-          echo "Elasticsearch buffers found stuck longer than $STUCK_THRESHOLD_SECONDS seconds. Clearing buffers."
-          rm -rf /var/log/fluentd-buffers;
+          echo "Elasticsearch buffer found stuck longer than $STUCK_THRESHOLD_SECONDS seconds. Clearing buffer."
+          rm -rf ${BUFFER_PATH};
           exit 1;
         fi;
         touch -d "${LIVENESS_THRESHOLD_SECONDS} seconds ago" /tmp/marker-liveness;
-        if [ -n "$(find /var/log/fluentd-buffers -mindepth 1 -type d ! -newer /tmp/marker-liveness -print -quit)" ];
+        if [ -n "$(find ${BUFFER_PATH} -mindepth 1 -type d ! -newer /tmp/marker-liveness -print -quit)" ];
         then
-          echo "Elasticsearch buffers found stuck longer than $LIVENESS_THRESHOLD_SECONDS seconds."
+          echo "Elasticsearch buffer found stuck longer than $LIVENESS_THRESHOLD_SECONDS seconds."
           exit 1;
         fi;
+
+## Extra labels to be added to created resources
+labels: {}
 
 annotations: {}
 
 podAnnotations: {}
   # prometheus.io/scrape: "true"
   # prometheus.io/port: "24231"
+
+securityContext: {}
+  # seLinuxOptions:
+  #   type: spc_t
 
 ## DaemonSet update strategy
 ## Ref: https://kubernetes.io/docs/tasks/manage-daemon/update-daemon-set/
@@ -325,7 +335,7 @@ prometheusRule:
       description: In the last 5m, records counts increased 3 times, comparing to the latest 15 min.
   - alert: FluentdRetry
     expr: increase(fluentd_status_retry_count[10m]) > 0
-    for: 30m
+    for: 20m
     labels:
       service: fluentd
       severity: warning
@@ -334,7 +344,7 @@ prometheusRule:
       summary: Fluentd retry count has been  {{ "{{ $value }}" }} for the last 10 minutes
   - alert: FluentdOutputError
     expr: increase(fluentd_output_status_num_errors[10m]) > 0
-    for: 30m
+    for: 1s
     labels:
       service: fluentd
       severity: warning
