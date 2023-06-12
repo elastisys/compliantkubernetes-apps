@@ -512,7 +512,7 @@ data:
       ssl_verify "#{ENV['OUTPUT_SSL_VERIFY']}"
       ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
 {{- if (ne .Values.elasticsearch.typeName "") }}
- 
+      type_name "#{ENV['OUTPUT_TYPE_NAME']}"
 {{- end }}
 {{- if .Values.elasticsearch.auth.enabled }}
       user "#{ENV['OUTPUT_USER']}"
@@ -541,11 +541,14 @@ data:
       template_overwrite "#{ENV['TEMPLATE_OVERWRITE']}"
       use_legacy_template "#{ENV['USE_LEGACY_TEMPLATE']}"
 {{- end }}
-      log_os_400_reason "#{ENV['OUTPUT_LOG_400_REASON']}"
+      log_es_400_reason "#{ENV['OUTPUT_LOG_400_REASON']}"
       reconnect_on_error "#{ENV['OUTPUT_RECONNECT_ON_ERROR']}"
       reload_on_failure "#{ENV['OUTPUT_RELOAD_ON_FAILURE']}"
       reload_connections "#{ENV['OUTPUT_RELOAD_CONNECTIONS']}"
       request_timeout "#{ENV['OUTPUT_REQUEST_TIMEOUT']}"
+{{- if .Values.elasticsearch.suppressTypeName }}
+      suppress_type_name "#{ENV['OUTPUT_SUPPRESS_TYPE_NAME']}"
+{{- end }}
 {{- if .Values.elasticsearch.buffer.enabled }}
 {{- if .Values.elasticsearch.buffer.chunkKeys }}
       <buffer "#{ENV['OUTPUT_BUFFER_CHUNK_KEYS']}">
