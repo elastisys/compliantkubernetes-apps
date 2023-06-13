@@ -18,6 +18,56 @@ s3BucketAlerts:
     percent: 80
     count: 1638400
   exclude: []
+
+diskAlerts:
+  storage:
+    #  - hours: 24 # How many hours to predict over
+    #    freeSpacePercentage: 30 # At what percentage to alert at
+    #    severity: warning
+    #    for: 1h
+    #    pattern:
+    #      include:
+    #        node: ".*" # Node to pattern match on
+    #        disk: ".*" # Disk to pattern match on
+    #      exclude:
+    #        node: "" # Node to filter out from pattern matching
+    #        disk: "" # Disk to filter out from pattern matching
+    predictLinear: []
+    #  - freeSpacePercentage: 5 # At what percentage to alert at
+    #    severity: warning
+    #    for: 30m
+    #    pattern:
+    #      include:
+    #        node: ".*" # Node to pattern match on
+    #        disk: ".*" # Disk to pattern match on
+    #      exclude:
+    #        node: "" # Node to filter out from pattern matching
+    #        disk: "" # Disk to filter out from pattern matching
+    space: []
+  inode:
+    #  - freeSpacePercentage: 5 # At what percentage to alert at
+    #    severity: warning
+    #    for: 30m
+    #    pattern:
+    #      include:
+    #        node: ".*" # Node to pattern match on
+    #        disk: ".*" # Disk to pattern match on
+    #      exclude:
+    #        node: "" # Node to filter out from pattern matching
+    #        disk: "" # Disk to filter out from pattern matching
+    predictLinear: []
+    #  - freeSpacePercentage: 5 # At what percentage to alert at
+    #    severity: warning
+    #    for: 30m
+    #    pattern:
+    #      include:
+    #        node: ".*" # Node to pattern match on
+    #        disk: ".*" # Disk to pattern match on
+    #      exclude:
+    #        node: "" # Node to filter out from pattern matching
+    #        disk: "" # Disk to filter out from pattern matching
+    space: []
+
 defaultRules:
   create: true
   ## Any labels to add to the alert rules
