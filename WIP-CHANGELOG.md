@@ -23,6 +23,7 @@
 - Fixed duplicate exception for falco alerts
 - Another network policy fix for Harbor to allow garbage collection
 - Fix migration and race condition for HNC and HierarchyConfigurations
+- Rook-Ceph mgr netpol to allow blackbox exporter probes
 
 ### Changed
 

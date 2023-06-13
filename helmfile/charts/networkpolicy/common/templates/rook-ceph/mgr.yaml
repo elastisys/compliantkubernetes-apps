@@ -15,6 +15,9 @@ spec:
     - from: {{ toYaml .Values.global.prometheusSelector | nindent 8 }}
       ports:
         - port: 9283
+    - from: {{ toYaml .Values.global.blackboxSelector | nindent 8 }}
+      ports:
+        - port: 9283
     - from:
         - podSelector:
             matchLabels:
