@@ -352,6 +352,97 @@ prometheus:
         - name: elastisys
           pattern: ".*-elastisys-.*"
           limit: 80
+  diskAlerts:
+    storage:
+      predictLinear:
+        - hours: 24
+          freeSpacePercentage: 30
+          severity: warning
+          for: 1h
+          pattern:
+            include:
+              node: ".*"
+              disk: ".*"
+            exclude:
+              node: ""
+              disk: ""
+        - hours: 4
+          freeSpacePercentage: 15
+          severity: critical
+          for: 1h
+          pattern:
+            include:
+              node: ".*"
+              disk: ".*"
+            exclude:
+              node: ""
+              disk: ""
+      space:
+        - freeSpacePercentage: 5
+          severity: warning
+          for: 30m
+          pattern:
+            include:
+              node: ".*"
+              disk: ".*"
+            exclude:
+              node: ""
+              disk: ""
+        - freeSpacePercentage: 3
+          severity: critical
+          for: 30m
+          pattern:
+            include:
+              node: ".*"
+              disk: ".*"
+            exclude:
+              node: ""
+              disk: ""
+    inode:
+      predictLinear:
+        - hours: 24
+          freeSpacePercentage: 40
+          severity: warning
+          for: 1h
+          pattern:
+            include:
+              node: ".*"
+              disk: ".*"
+            exclude:
+              node: ""
+              disk: ""
+        - hours: 4
+          freeSpacePercentage: 20
+          severity: critical
+          for: 1h
+          pattern:
+            include:
+              node: ".*"
+              disk: ".*"
+            exclude:
+              node: ""
+              disk: ""
+      space:
+        - freeSpacePercentage: 5
+          severity: warning
+          for: 1h
+          pattern:
+            include:
+              node: ".*"
+              disk: ".*"
+            exclude:
+              node: ""
+              disk: ""
+        - freeSpacePercentage: 3
+          severity: critical
+          for: 1h
+          pattern:
+            include:
+              node: ".*"
+              disk: ".*"
+            exclude:
+              node: ""
+              disk: ""
 
 thanos:
   # Enables Thanos components.

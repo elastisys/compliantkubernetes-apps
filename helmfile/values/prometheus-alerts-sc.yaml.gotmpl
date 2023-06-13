@@ -61,3 +61,5 @@ buckets:
   opensearch: {{ .Values.objectStorage.buckets.opensearch }}
   scFluentd: {{ .Values.objectStorage.buckets.scFluentd }}
   thanos: {{ .Values.objectStorage.buckets.thanos }}
+
+diskAlerts: {{ toYaml .Values.prometheus.diskAlerts | nindent 2 }}
