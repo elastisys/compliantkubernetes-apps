@@ -30,6 +30,7 @@
 - Added openstack api metrics.
 - Added config option to support [Cluster API](https://cluster-api.sigs.k8s.io/) managed Kubernetes clusters
 - Added grafana dashboard for cluster-api management
+- Alerts for CoreDNS and Node-local-dns
 
 ### Changed
 

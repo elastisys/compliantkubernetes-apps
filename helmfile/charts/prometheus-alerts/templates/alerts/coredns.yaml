@@ -1,0 +1,130 @@
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.dns }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "dns" | trunc 63 | trimSuffix "-" }}
+  labels:
+    app: {{ template "prometheus-alerts.name" . }}
+{{ include "prometheus-alerts.labels" . | indent 4 }}
+{{- if .Values.defaultRules.alertLabels }}
+{{ toYaml .Values.defaultRules.alertLabels | indent 4 }}
+{{- end }}
+{{- if .Values.defaultRules.annotations }}
+  annotations:
+{{ toYaml .Values.defaultRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  groups:
+  - name: dns
+    rules:
+    {{- range list "coredns" "node-local-dns" }}
+    - alert: {{ . | title }}Down
+      annotations:
+        description: {{ . | title }} has disappeared from Prometheus target discovery.
+        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednsdown
+        summary: {{ . | title }} has disappeared from Prometheus target discovery.
+      expr: absent(up{job="{{ . }}"} == 1)
+      for: 15m
+      labels:
+        severity: critical
+    - alert: {{ . | title }}LatencyHigh
+      annotations:
+        description: {{ . | title }} has 99th percentile latency of {{`{{`}} $value {{`}}`}} seconds for server  {{`{{`}} $labels.server {{`}}`}} zone  {{`{{`}} $labels.zone {{`}}`}}.
+        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednslatencyhigh
+        summary: {{ . | title }} is experiencing high 99th percentile latency.
+      expr: |
+        histogram_quantile(0.99, sum(rate(coredns_dns_request_duration_seconds_bucket{job="{{ . }}"}[5m])) without (instance,pod)) > 4
+      for: 10m
+      labels:
+        severity: medium
+    - alert: {{ . | title }}ErrorsHigh
+      annotations:
+        description: {{ . | title }} is returning SERVFAIL for {{`{{`}} $value | humanizePercentage {{`}}`}} of requests.
+        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednserrorshigh
+        summary: {{ . | title }} is returning SERVFAIL.
+      expr: |
+        sum without (pod, instance, server, zone, view, rcode, plugin) (rate(coredns_dns_responses_total{job="{{ . }}",rcode="SERVFAIL"}[5m]))
+          /
+        sum without (pod, instance, server, zone, view, rcode, plugin) (rate(coredns_dns_responses_total{job="{{ . }}"}[5m])) > 0.03
+      for: 10m
+      labels:
+        severity: medium
+    - alert: {{ . | title }}ErrorsHigh
+      annotations:
+        description: {{ . | title }} is returning SERVFAIL for {{`{{`}} $value | humanizePercentage {{`}}`}} of requests.
+        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednserrorshigh
+        summary: {{ . | title }} is returning SERVFAIL.
+      expr: |
+        sum without (pod, instance, server, zone, view, rcode, plugin) (rate(coredns_dns_responses_total{job="{{ . }}",rcode="SERVFAIL"}[5m]))
+          /
+        sum without (pod, instance, server, zone, view, rcode, plugin) (rate(coredns_dns_responses_total{job="{{ . }}"}[5m])) > 0.01
+      for: 10m
+      labels:
+        severity: low
+    - alert: {{ . | title }}ForwardLatencyHigh
+      annotations:
+        description: {{ . | title }} has 99th percentile latency of {{`{{`}} $value {{`}}`}} seconds forwarding requests to  {{`{{`}} $labels.to {{`}}`}}.
+        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednsforwardlatencyhigh
+        summary: {{ . | title }} is experiencing high latency forwarding requests.
+      expr: |
+        histogram_quantile(0.99, sum(rate(coredns_forward_request_duration_seconds_bucket{job="{{ . }}"}[5m])) without (pod, instance, rcode)) > 4
+      for: 10m
+      labels:
+        severity: medium
+    - alert: {{ . | title }}ForwardErrorsHigh
+      annotations:
+        description: {{ . | title }} is returning SERVFAIL for {{`{{`}} $value | humanizePercentage {{`}}`}} of forward requests to  {{`{{`}} $labels.to {{`}}`}}.
+        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednsforwarderrorshigh
+        summary: {{ . | title }} is returning SERVFAIL for forward requests.
+      expr: |
+        sum without (pod, instance, rcode) (rate(coredns_forward_responses_total{job="{{ . }}",rcode="SERVFAIL"}[5m]))
+          /
+        sum without (pod, instance, rcode) (rate(coredns_forward_responses_total{job="{{ . }}"}[5m])) > 0.03
+      for: 10m
+      labels:
+        severity: medium
+    - alert: {{ . | title }}ForwardErrorsHigh
+      annotations:
+        description: {{ . | title }} is returning SERVFAIL for {{`{{`}} $value | humanizePercentage {{`}}`}} of forward requests to  {{`{{`}} $labels.to {{`}}`}}.
+        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednsforwarderrorshigh
+        summary: {{ . | title }} is returning SERVFAIL for forward requests.
+      expr: |
+        sum without (pod, instance, rcode) (rate(coredns_forward_responses_total{job="{{ . }}",rcode="SERVFAIL"}[5m]))
+          /
+        sum without (pod, instance, rcode) (rate(coredns_forward_responses_total{job="{{ . }}"}[5m])) > 0.01
+      for: 10m
+      labels:
+        severity: low
+    - alert: {{ . | title }}ForwardHealthcheckFailureCount
+      annotations:
+        description: {{ . | title }} health checks have failed to upstream server  {{`{{`}} $labels.to {{`}}`}}.
+        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednsforwardhealthcheckfailurecount
+        summary: {{ . | title }} health checks have failed to upstream server.
+      expr: |
+        sum without (pod, instance) (rate(coredns_forward_healthcheck_failures_total{job="{{ . }}"}[5m])) > 0
+      for: 10m
+      labels:
+        severity: low
+    - alert: {{ . | title }}ForwardHealthcheckBrokenCount
+      annotations:
+        description: {{ . | title }} health checks have failed for all upstream servers.
+        runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednsforwardhealthcheckbrokencount
+        summary: {{ . | title }} health checks have failed for all upstream servers.
+      expr: |
+        sum without (pod, instance) (rate(coredns_forward_healthcheck_broken_total{job="{{ . }}"}[5m])) > 0
+      for: 10m
+      labels:
+        severity: low
+    - alert: {{ . | title }}PanicCount
+      annotations:
+        description: "Number of {{ . | title }} panics encountered VALUE = {{`{{`}} $value {{`}}`}}  LABELS = {{`{{`}} $labels {{`}}`}}"
+        summary: {{ . | title }} Panic Count (instance {{`{{`}} $labels.pod {{`}}`}})
+      expr: increase(coredns_panics_total{job="{{ . }}"}[1m]) > 0
+      for: 1m
+      labels:
+        severity: low
+    {{- end }}
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+{{- end }}
