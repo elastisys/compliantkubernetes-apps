@@ -23,14 +23,24 @@ rules:
     ports:
       - tcp: 10902
 
+  #
+  # TODO: remove object storage IPs once update-ips properly adds
+  #       the IPs for the Swift endpoint.
+  #
   {{- if eq .Values.thanos.objectStorage.type "swift" }}
   egress-rule-object-storage:
     peers:
       {{- range $netpol.global.objectStorageSwift.ips }}
       - cidr: {{ . }}
       {{- end }}
+      {{- range $netpol.global.objectStorage.ips }}
+      - cidr: {{ . }}
+      {{- end }}
     ports:
       {{- range $netpol.global.objectStorageSwift.ports }}
+      - tcp: {{ . }}
+      {{- end }}
+      {{- range $netpol.global.objectStorage.ports }}
       - tcp: {{ . }}
       {{- end }}
   {{- end }}
