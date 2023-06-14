@@ -57,6 +57,17 @@ releases:
 {{ if eq .Environment.Name "service_cluster" }}
 
 - name: networkpolicy
+  namespace: harbor
+  labels:
+    netpol: harbor
+  installed: {{ .Values.networkPolicies.harbor.enabled }}
+  chart: ./charts/networkpolicy/generator
+  version: 0.1.0
+  values:
+  - values/networkpolicies/common/common.yaml.gotmpl
+  - values/networkpolicies/service/harbor.yaml.gotmpl
+
+- name: networkpolicy
   namespace: thanos
   labels:
     netpol: thanos

@@ -1,0 +1,328 @@
+{{- define "old-style.rule.gen" }}{{ if and .ips .ports }}
+{{- $peers := list }}{{ range .ips }}{{ $peers = dict "cidr" . | append $peers }}{{ end }}
+{{- $ports := list }}{{ range .ports }}{{ $ports = dict "tcp" . | append $ports }}{{ end }}
+{{- dict "peers" $peers "ports" $ports | toYaml | nindent 4 | trim -}}
+{{- end }}{{ end -}}
+
+rules:
+
+  egress-rule-harbor-core:
+    peers:
+      - podSelectorLabels:
+          component: core
+    ports:
+      - tcp: 8080
+
+  egress-rule-harbor-database:
+    {{- if eq .Values.harbor.database.type "internal" }}
+    peers:
+      - podSelectorLabels:
+          component: database
+    ports:
+      - tcp: 5432
+    {{- else if eq .Values.harbor.database.type "external" }}
+    {{- with .Values.networkPolicies.harbor.database.externalEgress.peers }}
+    peers:
+      {{ toYaml . | nindent 8 }}
+    ports:
+    {{- range .ports }}
+      - tcp: {{ . }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+
+  egress-rule-harbor-redis:
+    peers:
+    {{- if eq .Values.harbor.redis.type "internal" }}
+      - podSelectorLabels:
+          component: redis
+    ports:
+      - tcp: 6379
+    {{- else if eq .Values.harbor.redis.type "external" }}
+    {{- with .Values.networkPolicies.harbor.redis.externalEgress.peers }}
+    peers:
+      {{ toYaml . | nindent 8 }}
+    ports:
+    {{- range .ports }}
+      - tcp: {{ . }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+
+  egress-rule-harbor-registry:
+    peers:
+      - podSelectorLabels:
+          component: registry
+    ports:
+      - tcp: 5000
+      - tcp: 8080
+
+  egress-rule-harbor-trivy:
+    peers:
+      - podSelectorLabels:
+          component: trivy
+    ports:
+      - tcp: 8080
+
+  egress-rule-harbor-portal:
+    peers:
+      - podSelectorLabels:
+          component: portal
+    ports:
+      - tcp: 8080
+
+  egress-rule-harbor-notary-server:
+    peers:
+      - podSelectorLabels:
+          component: notary-server
+    ports:
+      - tcp: 4443
+
+  egress-rule-harbor-jobservice:
+    peers:
+      - podSelectorLabels:
+          component: jobservice
+    ports:
+      - tcp: 8080
+
+  {{- with .Values.networkPolicies.harbor.registries }}
+  egress-rule-harbor-external-registries:
+    {{ template "old-style.rule.gen" . }}
+  {{ end }}
+
+  {{- with .Values.networkPolicies.harbor.jobservice }}
+  egress-rule-harbor-external-jobservice:
+    {{ template "old-style.rule.gen" . }}
+  {{ end }}
+
+  {{- with .Values.networkPolicies.harbor.trivy }}
+  egress-rule-harbor-external-trivy:
+    {{ template "old-style.rule.gen" . }}
+  {{ end }}
+
+policies:
+  harbor:
+    all-deny:
+      podSelectorLabels: {}
+      egress: {}
+      ingress: {}
+
+    cert-manager-http01-solver:
+      podSelectorLabels:
+        acme.cert-manager.io/http01-solver: "true"
+      ingress:
+        - rule: ingress-rule-ingress
+          ports:
+            - tcp: 8089
+
+    core:
+      podSelectorLabels:
+        component: core
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 8001
+        - rule: ingress-rule-ingress
+          ports:
+            - tcp: 8080
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-ingress
+        - rule: egress-rule-object-storage
+        - rule: egress-rule-harbor-portal
+        - rule: egress-rule-harbor-registry
+        - rule: egress-rule-harbor-redis
+        - rule: egress-rule-harbor-database
+        - rule: egress-rule-harbor-trivy
+        - rule: egress-rule-harbor-notary-server
+        - rule: egress-rule-harbor-jobservice
+        - rule: egress-rule-harbor-external-registries
+
+    exporter:
+      podSelectorLabels:
+        component: exporter
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 8001
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-harbor-core
+        - rule: egress-rule-harbor-redis
+        - rule: egress-rule-harbor-database
+
+    {{- if eq .Values.harbor.database.type "internal" }}
+    database:
+      podSelectorLabels:
+        component: database
+      ingress:
+        - peers:
+          - podSelectorLabels:
+              component: core
+          - podSelectorLabels:
+              component: jobservice
+          - podSelectorLabels:
+              component: notary-server
+          - podSelectorLabels:
+              component: notary-signer
+          - podSelectorLabels:
+              component: registry
+          - podSelectorLabels:
+              component: exporter
+          - podSelectorLabels:
+              component: backup
+          {{- with .Values.networkPolicies.harbor.database.internalIngress.peers }}
+          {{- if . }}
+          {{ toYaml . | nindent 10 }}
+          {{- end }}
+          {{- end }}
+          ports:
+            - tcp: 5432
+      egress:
+        - rule: egress-rule-dns
+    {{- end }}
+
+    {{- if eq .Values.harbor.redis.type "internal" }}
+    redis:
+      podSelectorLabels:
+        component: redis
+      ingress:
+        - peers:
+          - podSelectorLabels:
+              component: core
+          - podSelectorLabels:
+              component: jobservice
+          - podSelectorLabels:
+              component: trivy
+          - podSelectorLabels:
+              component: registry
+          - podSelectorLabels:
+              component: exporter
+          ports:
+            - tcp: 6379
+      egress:
+        - rule: egress-rule-dns
+    {{- end }}
+
+    registry:
+      podSelectorLabels:
+        component: registry
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 8001
+        - peers:
+          - podSelectorLabels:
+              component: core
+          - podSelectorLabels:
+              component: jobservice
+          ports:
+            - tcp: 5000
+            - tcp: 8080
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-object-storage
+        - rule: egress-rule-harbor-redis
+
+    portal:
+      podSelectorLabels:
+        component: portal
+      ingress:
+        - peers:
+          - podSelectorLabels:
+              component: core
+            ports:
+              - tcp: 8080
+        - rule: ingress-rule-ingress
+          ports:
+            - tcp: 8080
+      egress:
+        - rule: egress-rule-dns
+
+    notary-server:
+      podSelectorLabels:
+        component: notary-server
+      ingress:
+        - peers:
+          - podSelectorLabels:
+              component: core
+            ports:
+              - tcp: 4443
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-harbor-database
+        - name: egress-rule-harbor-notary-signer
+          peers:
+          - podSelectorLabels:
+              component: notary-signer
+          ports:
+            - tcp: 7899
+
+    notary-signer:
+      podSelectorLabels:
+        component: notary-signer
+      ingress:
+        - peers:
+          - podSelectorLabels:
+              component: notary-server
+          ports:
+            - tcp: 7899
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-harbor-database
+
+    jobservice:
+      podSelectorLabels:
+        component: jobservice
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 8001
+        - name: ingress-rule-harbor-core
+          peers:
+          - podSelectorLabels:
+              component: core
+            ports:
+              - tcp: 8080
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-harbor-core
+        - rule: egress-rule-harbor-redis
+        - rule: egress-rule-harbor-database
+        - rule: egress-rule-harbor-trivy
+        - rule: egress-rule-harbor-registry
+        - rule: egress-rule-harbor-external-registries
+        - rule: egress-rule-harbor-jobservice
+        - rule: egress-rule-harbor-external-jobservice
+
+    trivy:
+      podSelectorLabels:
+        component: trivy
+      ingress:
+        - peers:
+          - podSelectorLabels:
+              component: core
+          - podSelectorLabels:
+              component: jobservice
+          ports:
+            - tcp: 8080
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-harbor-core
+        - rule: egress-rule-harbor-redis
+        - rule: egress-rule-harbor-external-trivy
+
+    backup:
+      podSelectorLabels:
+        component: backup
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-harbor-database
+        - rule: egress-rule-object-storage
+
+    init:
+      podSelectorLabels:
+        job-name: init-harbor-job
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-harbor-core

@@ -287,7 +287,7 @@ You will have to provide your own backup solution.
 
 In `$CK8S_CONFIG_PATH/sc-config.yaml` set the following configs
 
-```
+```yaml
 harbor:
   ...
   backup:
@@ -310,10 +310,28 @@ harbor:
 
 In `$CK8S_CONFIG_PATH/secrets.yaml` add the postgres user password
 
-```
+```yaml
 harbor:
   external:
     databasePassword: set-me
+```
+
+Also configure network policies to access database
+
+```yaml
+networkPolicies:
+    database:
+      internal:
+        ingress:
+          peers: []
+      externalEgress:
+        peers:
+          - namespaceSelectorLabels:
+              kubernetes.io/metadata.name: postgres-system
+            podSelectorLabels:
+              cluster-name: harbor-cluster
+        ports:
+          - 5432
 ```
 
 #### Redis
@@ -322,12 +340,29 @@ harbor:
 
 In `$CK8S_CONFIG_PATH/sc-config.yaml` set the following configs
 
-```
+```yaml
+harbor:
   redis:
     type: external
     external:
       addr: "rfs-redis-harbor.redis-system:26379"
       sentinelMasterSet: "mymaster"
+```
+
+Also configure network policies to access redis
+
+```yaml
+networkPolicies:
+    redis:
+      internalIngress:
+        peers:
+          - namespaceSelectorLabels:
+              kubernetes.io/metadata.name: redis-system
+            podSelectorLabels:
+              app.kubernetes.io/name: redis-harbor
+        ports:
+          - 26379
+          - 6379
 ```
 
 ### Management of the clusters
