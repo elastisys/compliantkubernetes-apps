@@ -1128,19 +1128,45 @@ networkPolicies:
       ports:
         - 443
     database:
-      internal:
-        - ingressNSMatchLabels:
-            kubernetes.io/metadata.name: harbor
-          ingressPodMatchLabels:
-            component: backup
-      external: []
+      # internalIngress:
+      #    peers:
+      #      - namespaceSelectorLabels:
+      #          kubernetes.io/metadata.name: harbor
+      #        podSelectorLabels:
+      #          component: backup
+      internalIngress:
+        peers: []
+        ports: []
+      # externalEgress:
+      #    peers:
+      #      - namespaceSelectorLabels:
+      #          kubernetes.io/metadata.name: postgres-system
+      #        podSelectorLabels:
+      #          cluster-name: harbor-cluster
+      #    ports:
+      #      - 5432
+      externalEgress:
+        peers: []
+        ports: []
     redis:
-      external: []
+      # externalEgress:
+      #    peers:
+      #      - namespaceSelectorLabels:
+      #          kubernetes.io/metadata.name: redis-system
+      #        podSelectorLabels:
+      #          app.kubernetes.io/name: redis-harbor
+      #    ports:
+      #      - 26379
+      #      - 6379
+      externalEgress:
+        peers: []
+        ports: []
     trivy:
       # IP to trivy vulnerability database
       ips:
         - "set-me"
-      port: 443
+      ports:
+        - 443
   monitoring:
     enabled: true
     grafana:
