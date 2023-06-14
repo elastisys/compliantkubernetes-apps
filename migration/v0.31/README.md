@@ -98,6 +98,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.31/prepare/01-move-rook-values.sh
     ```
 
+1. Move thanos replication factor
+
+    ```bash
+    ./migration/v0.31/prepare/20-thanos-replication.sh
+    ```
+
 1. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.
@@ -106,12 +112,6 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s init
     # or
     ./migration/v0.31/prepare/50-init.sh
-    ```
-
-1. Move thanos replication factor
-
-    ```bash
-    ./migration/v0.31/prepare/20-thanos-replication.sh
     ```
 
 ### Apply upgrade - *disruptive*
