@@ -93,11 +93,21 @@ serviceMonitor:
       interval: 60s
       scrapeTimeout: 30s
       module: http_401
+    {{ if .Values.kubeapiServers }}
+    {{ range $kubeapiServer := .Values.kubeapiServers }}
+    - name: {{ $kubeapiServer.name }}
+      url: https://kube-apiserver.{{ $kubeapiServer.domain }}:/healthz
+      interval: 60s
+      scrapeTimeout: 30s
+      module: http_401
+    {{ end }}
+    {{ else }}
     - name: user-api-server
       url: https://kube-apiserver.{{ .Values.global.baseDomain }}:/healthz
       interval: 60s
       scrapeTimeout: 30s
       module: http_401
+    {{ end }}
     {{- if and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
     - name: thanos-receiver
       url: https://{{ .Values.thanos.receiver.subdomain }}.{{ .Values.global.opsDomain }}

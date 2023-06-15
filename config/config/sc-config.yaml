@@ -1083,6 +1083,8 @@ prometheusBlackboxExporter:
     thanosQuery: true
     thanosReceiver: true
 
+kubeApiservers: []
+
 openstackMonitoring:
   ## Enables openstack api metrics.
   enabled: false
