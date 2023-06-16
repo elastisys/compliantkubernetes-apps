@@ -17,6 +17,8 @@ spec:
     - ports:
         - port: 53
           protocol: UDP
+        - port: 53
+          protocol: TCP
     {{- if and .Values.global.apiserver.ips .Values.global.apiserver.port }}
     - to:
         {{- range .Values.global.apiserver.ips }}

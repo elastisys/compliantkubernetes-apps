@@ -21,6 +21,8 @@ spec:
     - ports:
         - port: 53
           protocol: UDP
+        - port: 53
+          protocol: TCP
     {{- if and .Values.global.objectStorage.ips .Values.global.objectStorage.ports }}
     - to:
         {{- range .Values.global.objectStorage.ips }}

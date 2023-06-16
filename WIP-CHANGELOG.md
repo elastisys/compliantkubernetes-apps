@@ -47,6 +47,7 @@
 
 - Upgraded Thanos helm chart to version `12.6.2` which bumps the application version to `0.31.0`
     - Now supports authentication via Openstack application credentials when using Swift as the object storage backend
+- Allow egress to port 53 TCP for all network policies
 
 ### Fixed
 

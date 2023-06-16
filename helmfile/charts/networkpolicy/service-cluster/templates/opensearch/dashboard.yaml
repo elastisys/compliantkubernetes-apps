@@ -42,6 +42,8 @@ spec:
     - ports:
         - port: 53
           protocol: UDP
+        - port: 53
+          protocol: TCP
     - to:
       {{- if and .Values.global.externalLoadBalancer .Values.global.scIngress.ips }}
         {{- range $ip := .Values.global.scIngress.ips }}
