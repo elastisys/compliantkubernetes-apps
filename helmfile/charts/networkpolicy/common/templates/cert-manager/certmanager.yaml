@@ -25,6 +25,8 @@ spec:
     - ports:
       - port: 53
         protocol: UDP
+      - port: 53
+        protocol: TCP
     {{- if and .Values.certManager.letsencrypt.ips .Values.certManager.letsencrypt.port }}
     - to:
         {{- range $IP := .Values.certManager.letsencrypt.ips }}
