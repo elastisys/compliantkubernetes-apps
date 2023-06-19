@@ -91,6 +91,63 @@ log_error() {
     log_error_no_newline "${*}\n"
 }
 
+# Checks that all dependencies are available and critical ones for matching minor version.
+check_tools() {
+  local req
+
+  req="${root_path}/get-requirements.yaml"
+
+  local warn
+  local err
+
+  warn=0
+  err=0
+
+  for executable in jq yq4 s3cmd sops kubectl helm helmfile dig pwgen htpasswd; do
+    if ! command -v "${executable}" > /dev/null; then
+      log_error "Required dependency ${executable} missing"
+      err=1
+    fi
+  done
+
+  if [[ "${err}" != 0 ]]; then
+    log_error "Install required dependencies before running this command!"
+    exit 1
+  fi
+
+  check_minor() {
+    local v1
+    local v2
+
+    v1="$(sed -r -e 's/^v//' -e 's/\.[0-9]$/\.\*/' -e 's/\./\\\./g' -e 's/\*/\.*/g' <<< "${1}")"
+    v2="$(sed -nr 's/.*([0-9]+\.[0-9]+\.[0-9]+).*/\1/p' <<< "${2}")"
+
+    if ! [[ "${v2}" =~ ${v1} ]]; then
+      log_warning "Required dependency ${3} not using recommended version: (expected ${1##v} - actual ${v2})"
+      warn=1
+    fi
+  }
+
+  check_minor "$(yq4 '.[0].vars.yq4_version' "${req}")" "$(yq4 --version)" yq4
+  check_minor "$(yq4 '.[0].vars.kubectl_version' "${req}")" "$(kubectl version -oyaml 2> /dev/null | yq4 '.clientVersion.gitVersion')" kubectl
+  check_minor "$(yq4 '.[0].vars.helm_version' "${req}")" "$(helm version --template='{{.Version}}')" helm
+  check_minor "$(yq4 '.[0].vars.helmfile_version' "${req}")" "$(helmfile --version)" helmfile
+  check_minor "$(yq4 '.[0].vars.helmdiff_version' "${req}")" "$(helm plugin list | grep diff)" "helm diff plugin"
+  check_minor "$(yq4 '.[0].vars.helmsecrets_version' "${req}")" "$(helm plugin list | grep secrets)" "helm secrets plugin"
+  check_minor "$(yq4 '.[0].vars.sops_version' "${req}")" "$(sops --version)" "sops"
+  check_minor "$(yq4 '.[0].vars.s3cmd_version' "${req}")" "$(s3cmd --version)" "s3cmd"
+
+  if [[ "${warn}" != 0 ]]; then
+    if [[ -t 1 ]]; then
+      log_warning_no_newline "Do you want to abort? (y/N): "
+      read -r reply
+      if [[ "${reply}" == "y" ]]; then
+        exit 1
+      fi
+    fi
+  fi
+}
+
 # Merges all yaml files in order
 # Usage: yq_merge <files...>
 yq_merge() {
