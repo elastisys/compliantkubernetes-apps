@@ -1,5 +1,6 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.30.2](#v0302---2023-06-19)
 - [v0.30.1](#v0301---2023-06-05)
 - [v0.30.0](#v0300---2023-05-10)
 - [v0.29.0](#v0290---2023-03-03)
@@ -34,6 +35,18 @@
 - [v0.6.0](#v060---2020-10-16)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.30.2 - 2023-06-19
+
+## Updated
+
+- Allow egress to port 53 TCP for all network policies
+- Update Falco rules
+
+### Fixed
+
+- Rook-Ceph mgr netpol to allow blackbox exporter probes
 
 -------------------------------------------------
 ## v0.30.1 - 2023-06-05
