@@ -10,7 +10,7 @@ rules:
   resources: ["pods","nodes"]
   verbs: ["get", "watch", "list"]
 - apiGroups: [""]
-  resources: ["pods"]
+  resources: ["pods", "pods/log", events]
   verbs: ["get", "watch", "list"]
 - apiGroups: ["cert-manager.io"]
   resources: ["clusterissuers"]
