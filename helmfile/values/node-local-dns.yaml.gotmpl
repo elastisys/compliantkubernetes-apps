@@ -1,2 +1,6 @@
 # IP of the cluster DNS in kubernetes
 clusterDNS: {{ .Values.global.clusterDns }}
+
+{{- if dig "nodeLocalDns" "customConfig" false .Values }}
+customConfig: {{ toYaml .Values.nodeLocalDns.customConfig }}
+{{- end }}
