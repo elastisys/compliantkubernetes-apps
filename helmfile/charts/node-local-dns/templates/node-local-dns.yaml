@@ -97,6 +97,9 @@ data:
         forward . __PILLAR__UPSTREAM__SERVERS__
         prometheus :9253
         }
+    {{- if .Values.customConfig }}
+    {{- .Values.customConfig | nindent 4 }}
+    {{- end }}
 ---
 apiVersion: apps/v1
 kind: DaemonSet

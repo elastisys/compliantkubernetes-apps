@@ -8,3 +8,15 @@ resources:
   requests:
     cpu: 25m
     memory: 40Mi
+
+
+# See docs for details about the config format and options:
+# https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/#coredns-configmap-options
+customConfig: #|-
+#  example.com:53 {
+#      errors
+#      cache 30
+#      reload
+#      loop
+#      forward . 127.0.0.1:9005
+#      }
