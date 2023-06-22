@@ -44,6 +44,7 @@
 - Rework thanos networkpolicies with generator chart
 - Rework monitoring networkpolicies with generator chart
 - New fluentd-elasticsearch custom image tag `v4.3.9-ck8s1` which includes a plugin for dot replacement, as this functionality has been removed from the `kubernetes_metadata_filter` plugin.
+- Changed location for opensearch-curator image.
 
 ## Updated
 
