@@ -6,6 +6,7 @@ config:
   opensearch.yml: |
     cluster:
       name: {{ .Values.opensearch.clusterName }}
+      max_shards_per_node: {{ .Values.opensearch.maxShardsPerNode }}
 
     network:
       host: 0.0.0.0
