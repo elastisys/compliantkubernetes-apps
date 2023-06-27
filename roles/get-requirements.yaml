@@ -1,0 +1,177 @@
+- name: Download compliantkubernetes-apps requirements
+  hosts: localhost
+  vars:
+    install_path: /usr/local/bin
+    install_user: "{{ lookup('env','USER') }}"
+    kubectl_version: 1.24.4
+    helm_version: 3.8.0
+    helmfile_version: 0.146.0
+    helmdiff_version: 3.5.0
+    helmsecrets_version: 3.12.0
+    jq_version: 1.6
+    s3cmd_version: 2.*
+    sops_version: 3.7.3
+    yq_version: 3.4.1
+    yq4_version: 4.26.1
+    pwgen_version: 2.08*
+    apache2_utils_version: 2.4.*
+    apt_list:
+      - curl
+      - s3cmd={{ s3cmd_version }}
+      - dnsutils
+      - apache2-utils={{ apache2_utils_version }}
+      - pwgen={{ pwgen_version }}
+    get_url_list:
+      - command: jq
+        version: "{{ jq_version }}"
+        url: https://github.com/stedolan/jq/releases/download/jq-{{ jq_version }}/jq-linux64
+        dest: "{{ install_path }}/jq"
+      - command: sops
+        version: "{{ sops_version }}"
+        url: https://github.com/mozilla/sops/releases/download/v{{ sops_version }}/sops-v{{ sops_version }}.linux
+        dest: "{{ install_path }}/sops"
+      - command: yq
+        version: "{{ yq_version }}"
+        url: https://github.com/mikefarah/yq/releases/download/{{ yq_version }}/yq_linux_amd64
+        dest: "{{ install_path }}/yq"
+      - command: yq4
+        version: "{{ yq4_version }}"
+        url: https://github.com/mikefarah/yq/releases/download/v{{ yq4_version }}/yq_linux_amd64
+        dest: "{{ install_path }}/yq4"
+
+  connection: local
+  become: yes
+  become_user: root
+  tasks:
+    - name: Install apt-packages
+      apt:
+        pkg: "{{ apt_list }}"
+
+    - name: Kubectl
+      block:
+        - name: Check if Kubectl exists
+          stat:
+            path: "{{ install_path }}/kubectl"
+          register: kubectl_exists
+
+        - name: Check Kubectl
+          command: "kubectl version --client=true -ojson"
+          register: current_kubectl_version
+          when: kubectl_exists.stat.exists
+
+        - name: Get Kubectl
+          unarchive:
+            src: https://dl.k8s.io/v{{ kubectl_version }}/kubernetes-client-linux-amd64.tar.gz
+            dest: "{{ install_path }}"
+            remote_src: yes
+            extra_opts: [--strip-components=3]
+          when: (not kubectl_exists.stat.exists) or
+            (current_kubectl_version.stdout == "") or
+            (kubectl_version | string not in current_kubectl_version.stdout | from_json | json_query('clientVersion.gitVersion'))
+
+    - name: Helm
+      block:
+        - name: Check if Helm exists
+          stat:
+            path: "{{ install_path }}/helm"
+          register: helm_exists
+
+        - name: Check Helm
+          command: "helm version --short"
+          register: current_helm_version
+          when: helm_exists.stat.exists
+
+        - name: Get Helm
+          unarchive:
+            src: https://get.helm.sh/helm-v{{ helm_version }}-linux-amd64.tar.gz
+            dest: "{{ install_path }}"
+            mode: 0775
+            remote_src: yes
+            extra_opts:
+              - "--strip-components=1"
+              - "--no-wildcards"
+              - "--no-anchored"
+              - "helm"
+          when: (not helm_exists.stat.exists) or
+            (current_helm_version.stdout == "") or
+            (helm_version | string not in current_helm_version.stdout)
+
+    - name: Helmfile
+      block:
+        - name: Check if Helmfile exists
+          stat:
+            path: "{{ install_path }}/helmfile"
+          register: helmfile_exists
+
+        - name: Check Helmfile
+          command: "helmfile -v"
+          register: current_helmfile_version
+          when: helmfile_exists.stat.exists
+
+        - name: Get Helm
+          unarchive:
+            src: https://github.com/helmfile/helmfile/releases/download/v{{ helmfile_version }}/helmfile_{{ helmfile_version }}_linux_amd64.tar.gz
+            dest: "{{ install_path }}"
+            mode: 0775
+            remote_src: yes
+            extra_opts:
+              - "helmfile"
+          when: (not helmfile_exists.stat.exists) or
+            (current_helmfile_version.stdout == "") or
+            (helmfile_version | string not in current_helmfile_version.stdout)
+
+    - name: Helm-diff
+      block:
+        - name: Check if helm-diff plugin exists
+          stat:
+            path: "/home/{{ install_user }}/.local/share/helm/plugins/helm-diff"
+          register: helm_diff_exists
+
+        - name: Check Helm-diff
+          become_user: "{{ install_user }}"
+          shell: helm plugin list | grep diff
+          register: current_helm_diff_version
+          when: helm_diff_exists.stat.exists
+
+        - name: Remove Helm-diff
+          become_user: "{{ install_user }}"
+          command: "helm plugin uninstall diff"
+          register: "helm_diff_removed"
+          when: (helm_diff_exists.stat.exists) and
+            (helmdiff_version | string not in current_helm_diff_version.stdout)
+
+        - name: Get Helm-diff
+          become_user: "{{ install_user }}"
+          command: "helm plugin install https://github.com/databus23/helm-diff --version v{{ helmdiff_version }}"
+          register: "output"
+          when: (not helm_diff_exists.stat.exists) or (helm_diff_removed.changed)
+
+    - name: Helm-secrets
+      block:
+        - name: Check if helm-secrets plugin exists
+          stat:
+            path: "/home/{{ install_user }}/.local/share/helm/plugins/helm-secrets"
+          register: helm_secrets_exists
+
+        - name: Check Helm-secrets
+          become_user: "{{ install_user }}"
+          shell: helm plugin list | grep secrets
+          register: current_helm_secrets_version
+          when: helm_secrets_exists.stat.exists
+
+        - name: Remove Helm-secrets
+          become_user: "{{ install_user }}"
+          command: "helm plugin uninstall secrets"
+          register: "helm_secrets_removed"
+          when: (helm_secrets_exists.stat.exists) and
+            (helmsecrets_version | string not in current_helm_secrets_version.stdout)
+
+        - name: Get Helm-secrets
+          become_user: "{{ install_user }}"
+          command: "helm plugin install https://github.com/jkroepke/helm-secrets --version v{{ helmsecrets_version }}"
+          register: "output"
+          when: not helm_secrets_exists.stat.exists or (helm_secrets_removed.changed)
+
+    - name: Get URL
+      include_tasks: get-url.yaml
+      loop: "{{ get_url_list }}"
