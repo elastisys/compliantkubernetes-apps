@@ -95,7 +95,7 @@ log_error() {
 check_tools() {
   local req
 
-  req="${root_path}/get-requirements.yaml"
+  req="${root_path}/roles/get-requirements.yaml"
 
   local warn
   local err
@@ -124,6 +124,7 @@ check_tools() {
 
     if ! [[ "${v2}" =~ ${v1} ]]; then
       log_warning "Required dependency ${3} not using recommended version: (expected ${1##v} - actual ${v2})"
+      log_warning "Run the following command to update/install: ./bin/ck8s install-requirements"
       warn=1
     fi
   }

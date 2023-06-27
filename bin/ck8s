@@ -32,6 +32,7 @@ usage() {
     echo "  s3cmd [cmd]                                       run s3cmd" 1>&2
     echo "  kubeconfig                                        generate user kubeconfig, stored at CK8S_CONFIG_PATH/user"
     echo "  completion bash                                   output shell completion code for bash" 1>&2
+    echo "  install-requirements                              installs or updates required tools to run compliantkubernetes-apps" 1>&2
     echo "  validate <wc|sc>                                  validates config files" 1>&2
     echo "  providers                                         lists supported cloud providers" 1>&2
     echo "  flavors                                           lists supported configuration flavors" 1>&2
@@ -136,6 +137,10 @@ case "${1}" in
     completion)
         [ -f "${here}/../completion/${2}" ] || usage
         cat "${here}/../completion/${2}"
+        ;;
+    install-requirements)
+        [ -f "${here}/install-requirements.bash" ] || usage
+        "${here}/install-requirements.bash"
         ;;
     validate)
         [[ "${2}" =~ ^(wc|sc)$ ]] || usage

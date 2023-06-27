@@ -41,20 +41,27 @@ All config files will be located under `CK8S_CONFIG_PATH`.
 There will be four config files: `common-config.yaml`, `wc-config.yaml`, `sc-config.yaml` and `secrets.yaml`.
 See [Quickstart](#Quickstart) for instructions on how to initialize the repo
 
-### Cloud providers
+### :cloud: Cloud providers :cloud:
 
-Currently we support four cloud providers: Exoscale, Safespring, Citycloud, Elastx and AWS (beta). In addition to this we support running Compliant Kubernetes on bare metal (beta).
+Currently we support four cloud providers:
+
+- Exoscale
+- Safespring
+- Citycloud/Cleura
+- Elastx
+- UpCloud
+- In addition to this we support running Compliant Kubernetes on bare metal (beta).
 
 ## Setup
 
 The apps are installed using a combination of helm charts and manifests with the help of helmfile and some bash scripts.
 
-### Requirements
+### :wrench: Requirements :wrench:
 
-- A running cluster based on [compliantkubernetes-kubespray][compliantkubernetes-kubespray]
+- [compliantkubernetes-kubespray][compliantkubernetes-kubespray] environment
 - [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.24.4)
 - [helm](https://github.com/helm/helm/releases) (tested with 3.8.0)
-- [helmfile](https://github.com/roboll/helmfile) (tested with v0.144.0)
+- [helmfile](https://github.com/roboll/helmfile) (tested with v0.146.0)
 - [helm-diff](https://github.com/databus23/helm-diff) (tested with 3.5.0)
 - [helm-secrets](https://github.com/futuresimple/helm-secrets) (tested with 3.12.0)
 - [jq](https://github.com/stedolan/jq) (tested with jq-1.6)
@@ -64,10 +71,10 @@ The apps are installed using a combination of helm charts and manifests with the
 - [pwgen](https://sourceforge.net/projects/pwgen/) available directly in Ubuntus repositories (tested with 2.08)
 - [htpasswd](https://httpd.apache.org/docs/2.4/programs/htpasswd.html) available directly in Ubuntus repositories (tested with 2.4.41)
 
-Installs requirements using the ansible playbook get-requirements.yaml
+Install the requirements to use compliantkubernetes-apps:
 
 ```bash
-ansible-playbook -e 'ansible_python_interpreter=/usr/bin/python3' --ask-become-pass --connection local --inventory 127.0.0.1, get-requirements.yaml
+./bin/ck8s install-requirements
 ```
 
 Note that you will need a service and workload cluster.
@@ -76,7 +83,7 @@ Note that you will need a service and workload cluster.
 
 See [DEVELOPMENT.md](DEVELOPMENT.md).
 
-### PGP
+### :closed_lock_with_key: PGP :closed_lock_with_key:
 
 Configuration secrets in ck8s are encrypted using [SOPS](https://github.com/mozilla/sops).
 We currently only support using PGP when encrypting secrets.

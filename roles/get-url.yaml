@@ -1,0 +1,20 @@
+- name: Check if {{ item.dest }} exists
+  stat:
+    path: "{{ item.dest }}"
+  register: command_exists
+
+- name: Check {{ item.dest }}
+  command: "{{ item.command }} --version"
+  register: current_command_version
+  ignore_errors: yes
+  when: command_exists.stat.exists
+
+- name: Get {{ item.url }}
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+    mode: 0775
+    force: true
+  when: (not command_exists.stat.exists) or
+    (current_command_version.stdout == "") or
+    (item.version | string not in current_command_version.stdout)

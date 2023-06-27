@@ -57,6 +57,8 @@
   - Renamed `grafana-ops` to `grafana-dashboards`
   - Moved all grafana value templates to a separate folder
   - Moved grafana config from `prometheus.grafana` and `user.grafana` to `grafana.ops` and `grafana.user`
+- Requirements installer will now update binaries if they are of the wrong version or missing
+  - It will also not try to install already correct installed requirements
 
 ## Updated
 
