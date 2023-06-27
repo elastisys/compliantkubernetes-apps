@@ -93,10 +93,10 @@ serviceMonitor:
       interval: 60s
       scrapeTimeout: 30s
       module: http_401
-    {{ if .Values.kubeapiServers }}
-    {{ range $kubeapiServer := .Values.kubeapiServers }}
-    - name: {{ $kubeapiServer.name }}
-      url: https://kube-apiserver.{{ $kubeapiServer.domain }}:/healthz
+    {{ if .Values.prometheusBlackboxExporter.customKubeapiTargets }}
+    {{ range $kubeapiTarget := .Values.prometheusBlackboxExporter.customKubeapiTargets }}
+    - name: {{ $kubeapiTarget.name }}
+      url: https://kube-apiserver.{{ $kubeapiTarget.domain }}:/healthz
       interval: 60s
       scrapeTimeout: 30s
       module: http_401
