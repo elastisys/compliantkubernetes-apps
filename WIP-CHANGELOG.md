@@ -13,6 +13,7 @@
 - Changed location for some dockerfiles to `/images`
 - Changed image location for some images from `elastisys/` to `ghcr.io/elastisys/`
 - Added secret as a volumetype for osdprepare jobs
+- The `score.sh` script now presents results in either structured yaml or machine readable csv
 
 ### Fixed
 
