@@ -18,17 +18,38 @@ containerSecurityContext:
   allowPrivilegeEscalation: true
 
 driver:
+  kind: {{ .Values.falco.driver.kind }}
+  {{- if eq .Values.falco.driver.kind "ebpf" }}
+  ebpf:
+    hostNetwork: {{ .Values.falco.driver.ebpf.hostNetwork }}
+    leastPrivileged: true
+  {{- end }}
   loader:
     initContainer:
       securityContext:
         runAsUser: 0
         privileged: true
         allowPrivilegeEscalation: true
+      {{- if eq .Values.falco.driver.kind "ebpf" }}
+        capabilities:
+          add:
+          - BPF
+          - SYS_RESOURCE
+          - PERFMON
+          - SYS_PTRACE
+      {{- end }}
 
 resources: {{- toYaml .Values.falco.resources | nindent 2  }}
 nodeSelector: {{- toYaml .Values.falco.nodeSelector | nindent 2  }}
 affinity: {{- toYaml .Values.falco.affinity | nindent 2  }}
 tolerations: {{- toYaml .Values.falco.tolerations | nindent 2  }}
+
+falcoctl:
+  artifact:
+    install:
+      enabled: false
+    follow:
+      enabled: false
 
 customRules:
   {{- if .Values.falco.customRules }}

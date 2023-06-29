@@ -100,6 +100,17 @@ user:
 ## Falco configuration.
 falco:
   enabled: true
+
+  ## configure syscall source
+  ## ref: https://falco.org/docs/event-sources/kernel/
+  driver:
+    kind: module
+
+    ebpf:
+      # -- Needed to enable eBPF JIT at runtime for performance reasons.
+      # Can be skipped if eBPF JIT is enabled from outside the container
+      hostNetwork: false
+
   ## additional falco rules
   ## ref: https://falco.org/docs/rules/
   customRules:

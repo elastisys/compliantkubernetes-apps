@@ -3,9 +3,13 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: {{ include "falco.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "falco.namespace" . }}
   labels:
     {{- include "falco.labels" . | nindent 4 }}
+  {{- if .Values.controller.annotations }}
+  annotations:
+  {{ toYaml .Values.controller.annotations | nindent 4 }}
+  {{- end }}
 spec:
   selector:
     matchLabels:
