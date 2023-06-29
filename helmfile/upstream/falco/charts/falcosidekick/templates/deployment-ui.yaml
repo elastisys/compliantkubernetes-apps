@@ -59,6 +59,21 @@ spec:
             {{- else if .Values.webui.externalRedis.enabled }}
             - "{{ required "External Redis is enabled. Please set the URL to the database." .Values.webui.externalRedis.url }}:{{ .Values.webui.externalRedis.port | default "6379" }}"
             {{- end}}
+            {{- if .Values.webui.ttl }}
+            - "-t"
+            - {{ .Values.webui.ttl | quote }}
+            {{- end}}
+            {{- if .Values.webui.loglevel }}
+            - "-l"
+            - {{ .Values.webui.loglevel }}
+            {{- end}}
+            {{- if .Values.webui.user }}
+            - "-u"
+            - {{ .Values.webui.user }}
+            {{- end}}
+            {{- if .Values.webui.allowcors }}
+            - "-x"
+            {{- end}}
           ports:
             - name: http
               containerPort: 2802
@@ -148,21 +163,21 @@ spec:
             - name: redis
               containerPort: 6379
               protocol: TCP
-          livenessProbe: 
+          livenessProbe:
             tcpSocket:
               port: 6379
-            initialDelaySeconds: 5 
-            periodSeconds: 5 
-            timeoutSeconds: 2 
-            successThreshold: 1 
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 2
+            successThreshold: 1
             failureThreshold: 3
           readinessProbe:
             tcpSocket:
               port: 6379
-            initialDelaySeconds: 5 
-            periodSeconds: 5 
-            timeoutSeconds: 2 
-            successThreshold: 1 
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 2
+            successThreshold: 1
             failureThreshold: 3
           {{- if .Values.webui.redis.securityContext }}
           securityContext:
