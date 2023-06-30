@@ -28,9 +28,6 @@ spec:
             - name: compaction
               imagePullPolicy: {{ $.Values.image.pullPolicy }}
               image: {{ $.Values.image.repository }}:{{ default $.Chart.AppVersion $.Values.image.tag }}
-              {{- if .compaction.ephemeralVolumes.enabled }}
-              workingDir: /scratch
-              {{- end }}
               command: [/scripts/compaction.sh]
               env:
                 - name: S3_CONFIG
@@ -41,10 +38,8 @@ spec:
                   value: {{ .prefix }}
                 - name: COMPACT_DAYS
                   value: {{ .compaction.days | quote }}
-                {{- if .compaction.ephemeralVolumes.enabled }}
                 - name: TMP_DIR
                   value: /scratch
-                {{- end }}
               {{- with $.Values.securityContext }}
               securityContext: {{- toYaml . | nindent 16 }}
               {{- end }}
@@ -58,10 +53,8 @@ spec:
                 - name: scripts
                   mountPath: /scripts
                   readOnly: true
-                {{- if .compaction.ephemeralVolumes.enabled }}
-                - name: ephemeral-scratch
+                - name: scratch
                   mountPath: /scratch
-                {{- end }}
           volumes:
             - name: s3cfg
               secret:
@@ -70,8 +63,8 @@ spec:
               configMap:
                 name: {{ include "log-manager.fullname" $ }}-scripts
                 defaultMode: 0777
-            {{- if .compaction.ephemeralVolumes.enabled }}
-            - name: ephemeral-scratch
+            - name: scratch
+              {{- if .compaction.ephemeralVolumes.enabled }}
               ephemeral:
                 volumeClaimTemplate:
                   metadata:
@@ -79,12 +72,16 @@ spec:
                       {{- include "log-manager.labels" $ | nindent 22 }}
                   spec:
                     accessModes: [ "ReadWriteOnce" ]
-                    storageClassName: "cinder-csi"
+                    {{- with $.Values.storageClassName }}
+                    storageClassName: {{ . }}
+                    {{- end }}
                     resources:
                       {{- with $.Values.compaction.volume }}
                       requests: {{- toYaml . | nindent 24 }}
                       {{- end }}
-            {{- end }}
+              {{- else }}
+              emptyDir: {}
+              {{- end }}
           {{- with $.Values.imagePullSecrets }}
           imagePullSecrets: {{- toYaml . | nindent 12 }}
           {{- end }}

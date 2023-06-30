@@ -47,6 +47,8 @@ securityContext:
     drop:
     - ALL
 
+storageClassName: ""
+
 compaction:
   resources: {}
 retention:
