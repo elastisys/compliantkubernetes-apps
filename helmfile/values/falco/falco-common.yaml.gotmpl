@@ -30,14 +30,6 @@ driver:
         runAsUser: 0
         privileged: true
         allowPrivilegeEscalation: true
-      {{- if eq .Values.falco.driver.kind "ebpf" }}
-        capabilities:
-          add:
-          - BPF
-          - SYS_RESOURCE
-          - PERFMON
-          - SYS_PTRACE
-      {{- end }}
 
 resources: {{- toYaml .Values.falco.resources | nindent 2  }}
 nodeSelector: {{- toYaml .Values.falco.nodeSelector | nindent 2  }}

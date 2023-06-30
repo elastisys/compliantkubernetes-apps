@@ -12,7 +12,11 @@ constraints:
         - pathPrefix: /usr
         - pathPrefix: /etc
         - pathPrefix: /dev
+        {{- if eq .Values.falco.driver.kind "ebpf" }}
+        - pathPrefix: /sys/kernel/debug
+        {{- else if eq .Values.falco.driver.kind "module" }}
         - pathPrefix: /sys/module/falco
+        {{- end }}
         - pathPrefix: /var/run/docker.sock
         - pathPrefix: /run/containerd/containerd.sock
         - pathPrefix: /run/crio/crio.sock
