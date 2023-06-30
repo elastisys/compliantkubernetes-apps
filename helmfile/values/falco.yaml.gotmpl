@@ -23,6 +23,9 @@ driver:
   ebpf:
     hostNetwork: {{ .Values.falco.driver.ebpf.hostNetwork }}
     leastPrivileged: true
+  {{- else if eq .Values.falco.driver.kind "modern-bpf" }}
+  modern_bpf:
+    leastPrivileged: true
   {{- end }}
   loader:
     initContainer:
