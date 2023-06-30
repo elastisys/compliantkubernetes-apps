@@ -104,6 +104,9 @@ falco:
     kind: module
 
     ebpf:
+      # -- Path where the eBPF probe is located. It comes handy when the probe have been installed in the nodes using tools other than the init
+      # container deployed with the chart.
+      path:
       # -- Needed to enable eBPF JIT at runtime for performance reasons.
       # Can be skipped if eBPF JIT is enabled from outside the container
       hostNetwork: false
