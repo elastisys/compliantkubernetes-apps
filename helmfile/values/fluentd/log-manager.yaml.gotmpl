@@ -55,6 +55,8 @@ instances:
   {{- end }}
   {{- end }}
 
+storageClassName: {{ .Values.storageClasses.default }}
+
 compaction:
   resources: {{- toYaml .Values.fluentd.logManager.compaction.resources | nindent 4 }}
   volume: {{- toYaml .Values.fluentd.logManager.compaction.volume | nindent 4 }}
