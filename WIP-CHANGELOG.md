@@ -38,6 +38,7 @@
 - Dependency check to main bin scripts
 - Add possibility to add and tune disk usage alerts
   - Add pattern matching for node and disk
+- Added support for configuring multiple kube-apiservers for blackbox exporter in sc
 
 ### Changed
 
