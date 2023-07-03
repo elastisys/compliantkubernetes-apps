@@ -25,7 +25,7 @@
 rules:
   egress-rule-dns:
     peers:
-      - cidr: 10.233.0.3/32
+      - cidr: {{ .Values.global.clusterDns }}/32
     ports:
       - tcp: 53
       - udp: 53

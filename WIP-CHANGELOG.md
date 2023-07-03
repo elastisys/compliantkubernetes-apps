@@ -72,6 +72,7 @@
 - Fix migration and race condition for HNC and HierarchyConfigurations
 - Rook-Ceph mgr netpol to allow blackbox exporter probes
 - Run log-manager compaction with emptyDir volume
+- Use set cluster DNS for egress rule
 
 ### Updated
 
