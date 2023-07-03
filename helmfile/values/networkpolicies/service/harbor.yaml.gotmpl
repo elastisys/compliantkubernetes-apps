@@ -125,6 +125,18 @@ policies:
         - rule: ingress-rule-ingress
           ports:
             - tcp: 8080
+        - name: ingress-http
+          peers:
+            - podSelectorLabels:
+                component: exporter
+            - podSelectorLabels:
+                component: jobservice
+            - podSelectorLabels:
+                component: trivy
+            - podSelectorLabels:
+                job-name: init-harbor-job
+          ports:
+            - tcp: 8080
       egress:
         - rule: egress-rule-dns
         - rule: egress-rule-ingress

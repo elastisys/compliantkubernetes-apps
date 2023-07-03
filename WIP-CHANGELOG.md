@@ -73,6 +73,7 @@
 - Rook-Ceph mgr netpol to allow blackbox exporter probes
 - Run log-manager compaction with emptyDir volume
 - Use set cluster DNS for egress rule
+- Add missing ingress rules for harbor core
 
 ### Updated
 
