@@ -911,17 +911,17 @@
         "current": {
           "selected": true,
           "text": [
-            "user-api-server"
+            "All"
           ],
           "value": [
-            "user-api-server"
+            "All"
           ]
         },
         "cacheTimeout": null,
         "datasource": "prometheus-sc",
         "definition": "label_values(probe_success{instance=~\".*kube-apiserver.*\"}, target)",
         "hide": 0,
-        "includeAll": false,
+        "includeAll": true,
         "label": "apiserver",
         "multi": true,
         "name": "apiserver",
