@@ -66,3 +66,10 @@ buckets:
   thanos: {{ .Values.objectStorage.buckets.thanos }}
 
 diskAlerts: {{ toYaml .Values.prometheus.diskAlerts | nindent 2 }}
+
+harbor:
+  database:
+    type: {{ .Values.harbor.database.type }}
+  redis:
+    type: {{ .Values.harbor.redis.type }}
+  alerts: {{ toYaml .Values.harbor.alerts | nindent 4 }}
