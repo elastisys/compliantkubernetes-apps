@@ -25,6 +25,7 @@ driver:
   kind: {{ .Values.falco.driver.kind }}
   {{- if eq .Values.falco.driver.kind "ebpf" }}
   ebpf:
+    path: {{ .Values.falco.driver.ebpf.path }}
     hostNetwork: {{ .Values.falco.driver.ebpf.hostNetwork }}
     leastPrivileged: true
   {{- else if eq .Values.falco.driver.kind "modern-bpf" }}
