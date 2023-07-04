@@ -6,6 +6,7 @@
   - It is now possible to specify type (S3/Swift) per bucket.
 - Support for nftables backend in calico-accountant via config option `calicoAccountant.backend: nftables`
 - Added basic alerts for Cluster-API
+- Added templating to configure Falco with different syscall sources (default is still `module`)
 
 ### Changed
 
@@ -39,5 +40,6 @@
 - Upgraded s3-exporter image app version from `0.4.0` to `0.5.0` chart version from `v0.4.0` to `0.5.0`
 - Upgraded kured image app version from `v1.12.1` to `v1.13.1` chart version from `4.4.1` to `4.5.1`
 - Upgraded blackbox exporter image app version from `v0.19.0` to `v0.24.0` chart version from `5.3.1` to `8.2.0`
+- Upgraded Falco chart version to `3.3.0` and app version to `0.35.1`
 
 ### Removed
