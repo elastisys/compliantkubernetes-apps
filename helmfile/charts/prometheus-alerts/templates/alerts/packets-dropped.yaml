@@ -22,7 +22,7 @@ spec:
         description: Number of packets dropped to workload {{ "{{ $labels.exported_pod }}" }} in namespace {{ "{{ $labels.pod_namespace }}" }}, because no policies matched them
         summary: Number of packets dropped to workload in {{ "{{ $labels.cluster }}" }} cluster
       expr: |
-        increase(no_policy_drop_counter{type="tw"}[1m]) > 0
+        increase(no_policy_drop_counter{type="tw"}[15m]) > 0
       for: 5m
       labels:
         severity: warning
@@ -46,7 +46,7 @@ spec:
         description: Number of packets dropped from workload {{ "{{ $labels.exported_pod }}" }} in namespace {{ "{{ $labels.pod_namespace }}" }}, because no policies matched them
         summary: Number of packets dropped from workload in {{ "{{ $labels.cluster }}" }} cluster
       expr: |
-        increase(no_policy_drop_counter{type="fw"}[1m]) > 0
+        increase(no_policy_drop_counter{type="fw"}[15m]) > 0
       for: 5m
       labels:
         severity: warning
