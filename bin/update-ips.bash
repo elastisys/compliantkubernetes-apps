@@ -22,6 +22,7 @@ has_diff=0
 
 # Compares a list IPs with the list of IPs in the yaml path and file specified and returns the diff return code.
 # If DRY_RUN is set, it will output to stdout, otherwise it will just return the diff return code silently.
+# Usage: diffIPs <yaml_path> <file> <IP 1> <IP ..>
 diffIPs() {
     local yaml_path
     local file
@@ -42,7 +43,6 @@ diffIPs() {
     else
         out_file=/dev/null
     fi
-
     diff -U3 --color=always \
         --label "${file//${CK8S_CONFIG_PATH}\//}" <(yq4 -P "${yaml_path}"' // [] | sort_by(.)' "${file}") \
         --label expected <(yq4 -P '. | sort_by(.)' "${tmp_file}") > "${out_file}"
@@ -52,6 +52,7 @@ diffIPs() {
 }
 
 # Fetches the IPs from a specified address
+# Usage: getDNSIPs <dns_record>
 getDNSIPs() {
     local IPS
     mapfile -t IPS < <(dig +short "${1}" | grep '^[.0-9]*$')
@@ -62,6 +63,7 @@ getDNSIPs() {
     echo "${IPS[@]}"
 }
 
+# Usage: diffDNSIPs <dns_record> <yaml_path> <file>
 diffDNSIPs() {
     local IPS
     read -r -a IPS <<< "$(getDNSIPs "${1}")"
@@ -70,12 +72,26 @@ diffDNSIPs() {
 }
 
 # Updates the list from the file and yaml path specified with IPs fetched from the domain
+# Usage: updateDNSIPs <dns_record> <yaml_path> <file>
 updateDNSIPs() {
     read -r -a IPS <<< "$(getDNSIPs "${1}")"
 
     yq4 -i "${2}"' = []' "${3}"
     for ip in "${IPS[@]}"; do
         yq4 -i "${2}"' |= . + ["'"${ip}"'/32"]' "${3}"
+    done
+}
+
+# Usage: updateIPs <yaml_path> <file> <IP 1> <IP ..>
+updateIPs() {
+    local yaml_path="${1}"
+    local file="${2}"
+    shift 2
+    local IPS=("$@")
+
+    yq4 -i "${yaml_path}"' = []' "${file}"
+    for ip in "${IPS[@]}"; do
+        yq4 -i "${yaml_path}"' |= . + ["'"${ip}"'/32"]' "${file}"
     done
 }
 
@@ -118,6 +134,7 @@ updateKubectlIPs() {
     done
 }
 
+# Usage: checkIfDiffAndUpdateDNSIPs <dns_record> <yaml_path> <file>
 checkIfDiffAndUpdateDNSIPs() {
     if ! diffDNSIPs "${1}" "${2}" "${3}"; then
         if ! $DRY_RUN; then
@@ -140,10 +157,27 @@ checkIfDiffAndUpdateKubectlIPs() {
     fi
 }
 
-# checkIfDiffAndUpdatePorts <filepath> <yamlpath> <ports>...
+# checkIfDiffAndUpdateIPs <yaml_path> <file> <IP 1> <IP ..>
+checkIfDiffAndUpdateIPs() {
+    local yaml_path="${1}"
+    local file="${2}"
+    shift 2
+    local IPS=("$@")
+
+    if ! diffIPs "${yaml_path}" "${file}" "${IPS[@]}"; then
+        if ! $DRY_RUN; then
+            updateIPs "${yaml_path}" "${file}" "${IPS[@]}"
+        else
+            log_warning "Diff found for ${yaml_path} in ${file//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
+        fi
+        has_diff=$(( has_diff + 1 ))
+    fi
+}
+
+# checkIfDiffAndUpdatePorts <yaml_path> <file_path> <port 1> <port ..>
 checkIfDiffAndUpdatePorts() {
-    filepath="$1"
-    yamlpath="$2"
+    yaml_path="${1}"
+    file="${2}"
     shift 2
 
     ports="$(echo "[$(for port in "$@"; do echo "$port,"; done)]" | yq4 -oj)"
@@ -156,21 +190,21 @@ checkIfDiffAndUpdatePorts() {
 
     portDiff() {
       diff -U3 --color=always \
-          --label "${filepath//${CK8S_CONFIG_PATH}\//}" <(yq4 -P "$yamlpath"' // [] | sort_by(.)' "$filepath") \
+          --label "${file//${CK8S_CONFIG_PATH}\//}" <(yq4 -P "$yaml_path"' // [] | sort_by(.)' "$file") \
           --label expected <(echo "$ports" | yq4 -P '. | sort_by(.)') > "$out"
     }
 
     if ! portDiff ; then
         if ! $DRY_RUN; then
-            yq4 -i "$yamlpath = $ports" "$filepath"
+            yq4 -i "$yaml_path = $ports" "$file"
         else
-            log_warning "Diff found for $yamlpath in ${filepath//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
+            log_warning "Diff found for $yaml_path in ${file//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
         fi
         has_diff=$(( has_diff + 1 ))
     fi
 }
 
-# yq_dig <cluster> <node> <default>
+# yq_dig <cluster> <yaml_path> <default>
 yq_dig() {
   for conf in "${config["override_$1"]}" "${config["override_common"]}" "${config["default_$1"]}" "${config["default_common"]}"; do
       ret=$(yq4 "$2" "$conf")
@@ -182,6 +216,72 @@ yq_dig() {
   done
 
   echo "$3"
+}
+
+# yq_dig_secrets <yaml_path> <default>
+yq_dig_secrets() {
+    ret=$(sops -d "${secrets["secrets_file"]}" | yq4 "$1")
+
+    if [[ "$ret" != "null" ]]; then
+        echo "$ret"
+        return
+    fi
+
+  echo "$2"
+}
+
+get_swift_url() {
+    local auth_url
+    local os_token
+    local swift_url
+    local swift_region
+
+    auth_url="$(yq_dig 'sc' '.objectStorage.swift.authUrl' '""')"
+
+    if [ -n "$(yq_dig_secrets '.objectStorage.swift.username' "")" ]; then
+        response=$(curl -i -s -H "Content-Type: application/json" -d '
+        {
+          "auth": {
+            "identity": {
+              "methods": ["password"],
+              "password": {
+                "user": {
+                  "name": "'"$(yq_dig_secrets '.objectStorage.swift.username' '""')"'",
+                  "domain": { "name": "'"$(yq_dig "sc" '.objectStorage.swift.domainName' '""')"'" },
+                  "password": "'"$(yq_dig_secrets '.objectStorage.swift.password' '""')"'"
+                }
+              }
+            },
+            "scope": {
+              "project": {
+                "name": "'"$(yq_dig "sc" '.objectStorage.swift.projectName' '""')"'",
+                "domain": { "name": "'"$(yq_dig "sc" '.objectStorage.swift.projectDomainName' '""')"'" }
+              }
+            }
+          }
+        }' "${auth_url}/auth/tokens")
+    elif [ -n "$(yq_dig_secrets '.objectStorage.swift.applicationCredentialID' "")" ]; then
+        response=$(curl -i -s -H "Content-Type: application/json" -d '
+        {
+          "auth": {
+            "identity": {
+              "methods": ["application_credential"],
+              "application_credential": {
+                "id": "'"$(yq_dig_secrets '.objectStorage.swift.applicationCredentialID' '""')"'",
+                "secret": "'"$(yq_dig_secrets '.objectStorage.swift.applicationCredentialSecret' '""')"'"
+              }
+            }
+          }
+        }' "${auth_url}/auth/tokens")
+    fi
+
+    swift_region=$(yq_dig "sc" '.objectStorage.swift.region' '""')
+    os_token=$(echo "$response" | grep -oP "x-subject-token:\s+\K\S+")
+    swift_url=$(echo "$response" | tail -n +15 | jq -r '.[].catalog[] | select( .type == "object-store" and .name == "swift") | .endpoints[] | select(.interface == "public" and .region == "'"$swift_region"'") | .url')
+
+    curl -i -s -X DELETE -H "X-Auth-Token: $os_token" -H "X-Subject-Token: $os_token" "${auth_url}/auth/tokens" > /dev/null
+
+    echo "$swift_url"
 }
 
 if [ "${CHECK_CLUSTER}" == "both" ]; then
@@ -215,7 +315,7 @@ fi
 ## Add object storage ips to common config
 checkIfDiffAndUpdateDNSIPs "${S3_ENDPOINT}" ".networkPolicies.global.objectStorage.ips" "${config["override_common"]}"
 ## Add object storage port to common config
-checkIfDiffAndUpdatePorts "${config["override_common"]}" ".networkPolicies.global.objectStorage.ports" "$S3_PORT"
+checkIfDiffAndUpdatePorts ".networkPolicies.global.objectStorage.ports" "${config["override_common"]}" "$S3_PORT"
 
 ## Add sc ingress ips to common config
 checkIfDiffAndUpdateDNSIPs "grafana.${OPS_DOMAIN}" ".networkPolicies.global.scIngress.ips" "${config["override_common"]}"
@@ -245,23 +345,44 @@ fi
 
 ## Add Swift to sc config
 if [[ "${CHECK_CLUSTER}" =~ ^(sc|both)$ ]]; then
-    CHECK_HARBOR="$(yq_dig 'sc' '.harbor.persistence.type' 'false')"
-    CHECK_THANOS="$(yq_dig 'sc' '.thanos.objectStorage.type' 'false')"
+    check_harbor="$(yq_dig 'sc' '.harbor.persistence.type' 'false')"
+    check_thanos="$(yq_dig 'sc' '.thanos.objectStorage.type' 'false')"
 
-    if [ "$CHECK_HARBOR" == "swift" ] || [ "$CHECK_THANOS" == "swift" ]; then
-        SWIFT_ENDPOINT="$(yq_dig 'sc' '.objectStorage.swift.authUrl' '""' | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
-        if [ -z "$SWIFT_ENDPOINT" ]; then
-            log_error "No Swift endpoint found, check your sc-config.yaml"
+    if [ "$check_harbor" == "swift" ] || [ "$check_thanos" == "swift" ]; then
+        os_auth_endpoint="$(yq_dig 'sc' '.objectStorage.swift.authUrl' '""' | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
+
+        if [ -z "$os_auth_endpoint" ]; then
+            log_error "No openstack auth endpoint found, check your sc-config.yaml"
             exit 1
         fi
-        SWIFT_PORT="$(yq_dig 'sc' '.objectStorage.swift.authUrl' '""' | sed 's/https\?:\/\///' | sed 's/[A-Za-z.0-9-]*:\?//' | sed 's/\/.*//')"
-        if [ -z "$SWIFT_PORT" ]; then
-            SWIFT_PORT="443"
+
+        os_auth_port="$(yq_dig 'sc' '.objectStorage.swift.authUrl' '""' | sed 's/https\?:\/\///' | sed 's/[A-Za-z.0-9-]*:\?//' | sed 's/\/.*//')"
+
+        if [ -z "$os_auth_port" ]; then
+            os_auth_port="5000"
         fi
 
-        checkIfDiffAndUpdateDNSIPs "${SWIFT_ENDPOINT}" ".networkPolicies.global.objectStorageSwift.ips" "${config["override_sc"]}"
+        object_storage_swift_ips=()
+        object_storage_swift_ports=()
 
-        checkIfDiffAndUpdatePorts "${config["override_sc"]}" ".networkPolicies.global.objectStorageSwift.ports" "$SWIFT_PORT"
+        # shellcheck disable=SC2207
+        object_storage_swift_ips+=($(getDNSIPs "$os_auth_endpoint"))
+        object_storage_swift_ports+=("$os_auth_port")
+
+        swift_url=$(get_swift_url)
+        swift_endpoint="$(echo "$swift_url" | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
+        swift_port="$(echo "$swift_url" | sed 's/https\?:\/\///' | sed 's/[A-Za-z.0-9-]*:\?//' | sed 's/\/.*//')"
+
+        if [ -z "$swift_port" ]; then
+            swift_port="443"
+        fi
+
+        # shellcheck disable=SC2207
+        object_storage_swift_ips+=($(getDNSIPs "$swift_endpoint"))
+        object_storage_swift_ports+=("$swift_port")
+
+        checkIfDiffAndUpdateIPs ".networkPolicies.global.objectStorageSwift.ips" "${config["override_sc"]}" "${object_storage_swift_ips[@]}"
+        checkIfDiffAndUpdatePorts ".networkPolicies.global.objectStorageSwift.ports" "${config["override_sc"]}" "${object_storage_swift_ports[@]}"
     fi
 fi
 
@@ -281,7 +402,7 @@ if [ "$(yq_dig 'sc' '.objectStorage.sync.enabled' 'false')" == "true" ]; then
 
         checkIfDiffAndUpdateDNSIPs "${S3_ENDPOINT_DST}" ".networkPolicies.rcloneSync.destinationObjectStorage.ips" "${config["override_sc"]}"
 
-        checkIfDiffAndUpdatePorts "${config["override_sc"]}" ".networkPolicies.rcloneSync.destinationObjectStorage.ports" "$S3_PORT_DST"
+        checkIfDiffAndUpdatePorts ".networkPolicies.rcloneSync.destinationObjectStorage.ports" "${config["override_sc"]}" "$S3_PORT_DST"
     fi
 fi
 

@@ -39,6 +39,7 @@
 - Add possibility to add and tune disk usage alerts
   - Add pattern matching for node and disk
 - Added support for configuring multiple kube-apiservers for blackbox exporter in sc
+- `./bin/ck8s update-ips` now adds the IPs and port for swift endpoint
 
 ### Changed
 
@@ -58,12 +59,6 @@
   - Moved all grafana value templates to a separate folder
   - Moved grafana config from `prometheus.grafana` and `user.grafana` to `grafana.ops` and `grafana.user`
 
-## Updated
-
-- Upgraded Thanos helm chart to version `12.6.2` which bumps the application version to `0.31.0`
-    - Now supports authentication via Openstack application credentials when using Swift as the object storage backend
-- Allow egress to port 53 TCP for all network policies
-
 ### Fixed
 
 - Fixed issue with compaction job on ephemeral volumes
@@ -77,6 +72,9 @@
 
 ### Updated
 
+- Upgraded Thanos helm chart to version `12.6.2` which bumps the application version to `0.31.0`
+    - Now supports authentication via Openstack application credentials when using Swift as the object storage backend
+- Allow egress to port 53 TCP for all network policies
 - Update Trivy Operator Dashboard to improve the user experience
 - Bump sops to version `3.7.3`.
 - Update Falco rules
