@@ -95,3 +95,4 @@
 ### Removed
 
 - Removed calico-node from test script
+- Leftover InfluxDB config
