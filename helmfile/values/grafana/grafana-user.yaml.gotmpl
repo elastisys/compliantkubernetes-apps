@@ -81,6 +81,9 @@ datasources:
 grafana.ini:
   server:
     root_url: https://{{ .Values.grafana.user.subdomain }}.{{ .Values.global.baseDomain }}
+  # Enable user lookup based on email in addition to using unique ID provided by IdPs.
+  auth:
+    oauth_allow_insecure_email_lookup: true
   auth.generic_oauth:
     name: dex
     enabled: true
