@@ -4,6 +4,9 @@
 
 ### Changed
 
+- Increased window for `FrequentPacketsDroppedFromWorkload` and `FrequentPacketsDroppedToWorkload` alerts
+  - To make it less sensitive to semi-consistent blocked network traffic.
+
 ### Fixed
 
 ### Updated
