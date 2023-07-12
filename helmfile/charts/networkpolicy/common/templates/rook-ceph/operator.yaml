@@ -7,9 +7,21 @@ metadata:
 spec:
   policyTypes:
     - Egress
+    - Ingress
   podSelector:
     matchLabels:
       app: rook-ceph-operator
+  ingress:
+    {{- if and .Values.global.apiserver.ips .Values.global.apiserver.port }}
+    - from:
+        {{- range $ip := .Values.global.apiserver.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      ports:
+        - port: 9443
+          protocol: TCP
+    {{- end }}
   egress:
     - to:
         - podSelector:
