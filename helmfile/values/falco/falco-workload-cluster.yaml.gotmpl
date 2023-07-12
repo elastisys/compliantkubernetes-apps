@@ -1,0 +1,23 @@
+falcosidekick:
+  enabled: {{ .Values.falco.alerts.enabled }}
+  config:
+    debug: false
+    {{ if eq .Values.falco.alerts.type "slack" }}
+    slack:
+      webhookurl: {{ .Values.falco.alerts.slackWebhook }}
+      outputformat: "all"
+      footer: ""
+      icon: ""
+      minimumpriority: {{ .Values.falco.alerts.priority }}
+      messageformat: "Falco Alert : rule *{{`{{ .Rule }}`}}*"
+    {{ end }}
+    {{ if and (eq .Values.falco.alerts.type "alertmanager") .Values.user.alertmanager.enabled }}
+    alertmanager:
+      hostport: {{ .Values.falco.alerts.hostPort }}
+      minimumpriority: {{ .Values.falco.alerts.priority }}
+    {{ end }}
+
+  resources:    {{- toYaml .Values.falco.falcoSidekick.resources | nindent 4  }}
+  nodeSelector: {{- toYaml .Values.falco.falcoSidekick.nodeSelector | nindent 4  }}
+  affinity:     {{- toYaml .Values.falco.falcoSidekick.affinity | nindent 4  }}
+  tolerations:  {{- toYaml .Values.falco.falcoSidekick.tolerations | nindent 4  }}
