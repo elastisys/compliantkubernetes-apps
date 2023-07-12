@@ -381,9 +381,9 @@ groups:
         expr: |
           abs(
             (
-              (ceph_osd_numpg > 0) - on (job) group_left avg(ceph_osd_numpg > 0) by (job)
-            ) / on (job) group_left avg(ceph_osd_numpg > 0) by (job)
-          ) * on (ceph_daemon) group_left(hostname) ceph_osd_metadata > 0.30
+              (ceph_osd_numpg > 0) - on (cluster,job) group_left avg(ceph_osd_numpg > 0) by (cluster,job)
+            ) / on (cluster,job) group_left avg(ceph_osd_numpg > 0) by (cluster,job)
+          ) * on (cluster,ceph_daemon) group_left(hostname) ceph_osd_metadata > 0.30
         for: 5m
         labels:
           severity: warning
