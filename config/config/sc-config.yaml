@@ -76,6 +76,15 @@ objectStorage:
         cpu: 300m
         memory: 300Mi
 
+falco:
+  ## Falco alerting configuration.
+  alerts:
+    enabled: false # falco alerts will come from prometheus metrics
+    ## supported: 'alertmanager', 'slack'.
+    type: alertmanager
+    priority: notice
+    hostPort: http://alertmanager-operated.monitoring:9093
+
 grafana:
   ops:
     subdomain: grafana
