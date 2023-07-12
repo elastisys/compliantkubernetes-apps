@@ -117,7 +117,7 @@ function check_sc_certmanager_apps_certificates() {
 
     if "${enable_user_grafana}"; then
         certificates+=(
-            "monitoring grafana-ops-general-tls"
+            "monitoring ops-grafana-tls"
             "monitoring user-grafana-tls"
         )
     fi
