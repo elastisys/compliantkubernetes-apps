@@ -173,7 +173,13 @@ releases:
   version: 2.2.0
   installed: {{ .Values.falco.enabled }}
   values:
-  - values/falco.yaml.gotmpl
+  - values/falco/falco-common.yaml.gotmpl
+{{ if eq .Environment.Name "service_cluster" }}
+  - values/falco/falco-service-cluster.yaml.gotmpl
+{{ end }}
+{{ if eq .Environment.Name "workload_cluster" }}
+  - values/falco/falco-workload-cluster.yaml.gotmpl
+{{ end }}
 
 # Falco-exporter
 - name: falco-exporter
@@ -184,7 +190,7 @@ releases:
   version: 0.9.0
   installed: {{ .Values.falco.enabled }}
   values:
-    - values/falco-exporter.yaml.gotmpl
+    - values/falco/falco-exporter.yaml.gotmpl
 
 # Calico default deny
 - name: calico-default-deny
