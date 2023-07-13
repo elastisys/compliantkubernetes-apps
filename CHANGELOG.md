@@ -102,6 +102,8 @@
   - It will also not try to install already correct installed requirements
 - Increased window for `FrequentPacketsDroppedFromWorkload` and `FrequentPacketsDroppedToWorkload` alerts
   - To make it less sensitive to semi-consistent blocked network traffic.
+- Moved `falco.yaml.gotmpl` and `falco-exporter.yaml.gotmpl` to `/values/falco` folder
+  - Split the `falco.yaml.gotmpl` into three files, `falco-common`, `falco-service-cluster` and `falco-workload-cluster`
 
 ### Fixed
 
@@ -114,6 +116,9 @@
 - Use set cluster DNS for egress rule
 - Add missing ingress rules for harbor core
 - Network policy fix for harbor that is using swift for persistence
+- Network policy to allow `alermanager` ingress from `falcosidekick`
+- The `CephPGImbalance` rook-ceph alert for multi-cluster configuration
+- Network policy to allow `rook-ceph operator` ingress from `apiserver`
 
 ### Updated
 
