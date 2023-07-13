@@ -36,7 +36,7 @@ spec:
                 - dest-{{ .destinationType }}:{{ .destination }}
                 {{- end }}
                 - --log-level
-                - DEBUG
+                - INFO
                 {{- if $.Values.config.dryrun }}
                 - --dry-run
                 {{- end }}

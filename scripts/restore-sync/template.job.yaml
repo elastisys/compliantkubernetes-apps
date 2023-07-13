@@ -10,13 +10,13 @@ spec:
       restartPolicy: Never
       containers:
         - name: rclone
-          image: elastisys/rclone-sync:1.3.0
+          image: ghcr.io/elastisys/rclone-sync:1.63.0
           args:
             - sync
             - "${SOURCE}"
             - "${DESTINATION}"
             - --log-level
-            - DEBUG
+            - INFO
           volumeMounts:
             - name: rclone-config
               mountPath: /home/rclone/.config/rclone/

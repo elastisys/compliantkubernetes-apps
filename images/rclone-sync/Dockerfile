@@ -1,16 +1,16 @@
-FROM ubuntu:latest as download
+FROM ubuntu:rolling as download
 
 # Install dependencies
 RUN apt-get update && apt-get install -y curl unzip
 
 # Install rclone
-RUN curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip && \
-    unzip rclone-current-linux-amd64.zip && \
+ENV RCLONE_VERSION="v1.63.0"
+RUN curl -O https://downloads.rclone.org/${RCLONE_VERSION}/rclone-${RCLONE_VERSION}-linux-amd64.zip && \
+    unzip rclone-${RCLONE_VERSION}-linux-amd64.zip && \
     cd rclone-*-linux-amd64 && \
     install rclone /usr/bin/rclone
 
-FROM ubuntu:latest as final
-
+FROM ubuntu:rolling as final
 
 # Install root certificates
 RUN apt-get update && \
@@ -22,7 +22,8 @@ RUN apt-get update && \
 COPY --from=download /usr/bin/rclone /usr/bin/rclone
 
 # Create rclone user
-RUN adduser --system --uid 10000 rclone
+RUN apt-get install adduser && \
+    adduser --system --home /home/rclone --uid 10000 rclone
 
 # Run as rclone user
 USER 10000
