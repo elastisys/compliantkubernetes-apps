@@ -113,6 +113,7 @@
 - Run log-manager compaction with emptyDir volume
 - Use set cluster DNS for egress rule
 - Add missing ingress rules for harbor core
+- Network policy fix for harbor that is using swift for persistence
 
 ### Updated
 
