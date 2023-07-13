@@ -100,6 +100,24 @@ rules:
     {{ template "old-style.rule.gen" . }}
   {{ end }}
 
+  {{- if eq .Values.harbor.persistence.type "swift" }}
+  egress-rule-swift-object-storage:
+    peers:
+      {{- range .Values.networkPolicies.global.objectStorageSwift.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+      {{- range .Values.networkPolicies.global.objectStorage.ips }}
+      - cidr: {{ . }}
+      {{- end }}
+    ports:
+      {{- range .Values.networkPolicies.global.objectStorageSwift.ports }}
+      - tcp: {{ . }}
+      {{- end }}
+      {{- range .Values.networkPolicies.global.objectStorage.ports }}
+      - tcp: {{ . }}
+      {{- end }}
+  {{- end }}
+
 policies:
   harbor:
     all-deny:
@@ -140,7 +158,11 @@ policies:
       egress:
         - rule: egress-rule-dns
         - rule: egress-rule-ingress
+        {{- if eq .Values.harbor.persistence.type "s3" }}
         - rule: egress-rule-object-storage
+        {{- else if eq .Values.harbor.persistence.type "swift" }}
+        - rule: egress-rule-swift-object-storage
+        {{- end }}
         - rule: egress-rule-harbor-portal
         - rule: egress-rule-harbor-registry
         - rule: egress-rule-harbor-redis
@@ -233,7 +255,11 @@ policies:
             - tcp: 8080
       egress:
         - rule: egress-rule-dns
+        {{- if eq .Values.harbor.persistence.type "s3" }}
         - rule: egress-rule-object-storage
+        {{- else if eq .Values.harbor.persistence.type "swift" }}
+        - rule: egress-rule-swift-object-storage
+        {{- end }}
         - rule: egress-rule-harbor-redis
 
     portal:
