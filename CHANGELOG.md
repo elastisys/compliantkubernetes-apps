@@ -104,6 +104,8 @@
   - To make it less sensitive to semi-consistent blocked network traffic.
 - Moved `falco.yaml.gotmpl` and `falco-exporter.yaml.gotmpl` to `/values/falco` folder
   - Split the `falco.yaml.gotmpl` into three files, `falco-common`, `falco-service-cluster` and `falco-workload-cluster`
+- Fluentd forwarder buffer chunk limit in wc updated to 8MB
+- Opensearch ingress max body size updated to 32MB
 
 ### Fixed
 

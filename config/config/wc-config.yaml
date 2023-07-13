@@ -179,6 +179,8 @@ fluentd:
   enabled: true
   ## Only run on master nodes.
   forwarder:
+    buffer:
+      chunkLimitSize: 8MB
     affinity:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
