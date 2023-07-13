@@ -957,7 +957,7 @@ opensearch:
     tolerations: []
 
   ingress:
-    maxbodysize: 8m
+    maxbodysize: 32m
 
 opa:
   ## Enable rule that requires pods to come from
