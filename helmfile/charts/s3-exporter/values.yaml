@@ -19,7 +19,7 @@ serviceMonitor:
 replicaCount: 1
 
 image:
-  repository: elastisys/s3_exporter
+  repository: ghcr.io/elastisys/s3-exporter
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
