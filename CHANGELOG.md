@@ -52,10 +52,8 @@
     - [v2.6.0](https://github.com/opensearch-project/opensearch-build/blob/main/release-notes/opensearch-release-notes-2.6.0.md)
     - [v2.7.0](https://github.com/opensearch-project/opensearch-build/blob/main/release-notes/opensearch-release-notes-2.7.0.md)
     - [v2.8.0](https://github.com/opensearch-project/opensearch-build/blob/main/release-notes/opensearch-release-notes-2.8.0.md)
-
-
 - Harbor is upgraded to v2.8.2, which drops support for chartmuseum. If you are using chartmuseum you will need to migrate your [charts](https://github.com/goharbor/harbor/wiki/Migrate-helm-chart-to-oci-registry-in-Harbor).
-
+- Known bug: Network policy metrics from calico accountant does not work on nodes running Ubuntu 22.04. It is verified to work on nodes running Ubuntu 20.04. This will be fixed in a later release.
 
 ### Added
 
