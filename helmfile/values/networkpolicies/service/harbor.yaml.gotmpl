@@ -102,20 +102,7 @@ rules:
 
   {{- if eq .Values.harbor.persistence.type "swift" }}
   egress-rule-object-storage:
-    peers:
-      {{- range .Values.networkPolicies.global.objectStorageSwift.ips }}
-      - cidr: {{ . }}
-      {{- end }}
-      {{- range .Values.networkPolicies.global.objectStorage.ips }}
-      - cidr: {{ . }}
-      {{- end }}
-    ports:
-      {{- range .Values.networkPolicies.global.objectStorageSwift.ports }}
-      - tcp: {{ . }}
-      {{- end }}
-      {{- range .Values.networkPolicies.global.objectStorage.ports }}
-      - tcp: {{ . }}
-      {{- end }}
+    {{ template "old-style.rule.gen" .Values.networkPolicies.global.objectStorageSwift }}
   {{- end }}
 
 policies:
