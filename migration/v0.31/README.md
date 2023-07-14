@@ -104,6 +104,18 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.31/prepare/02-move-grafana-values.sh
     ```
 
+1. Move Harbor trivy:
+
+    ```bash
+    ./migration/v0.31/prepare/03-move-harbor-trivy-port.sh
+    ```
+
+1. Remove `opensearch.ingress.maxbodysize` and `fluentd.forwarder.buffer.chunkLimitSize` if they are lower then the new defaults:
+
+    ```bash
+    ./migration/v0.31/prepare/05-increase-maxbodysize-chunklimitsize.sh
+    ```
+
 1. Move thanos replication factor
 
     ```bash
@@ -124,12 +136,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
 > *Done during maintenance window.*
 
-1. Rerun bootstrap:
+1. Remove opensearch-configurer so that it runs again after upgrading Opensearch:
 
     ```bash
-    ./bin/ck8s bootstrap {sc|wc}
+    ./bin/ck8s helmfile sc -l app=opensearch-configurer destroy
     # or
-    ./migration/v0.31/apply/20-bootstrap.sh execute
+    ./migration/v0.31/apply/11-remove-opensearch-configurer.sh execute
     ```
 
 1. Update HNC namespace labels:
@@ -138,18 +150,18 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.31/apply/14-hnc-labels.sh execute
     ```
 
+1. Rerun bootstrap:
+
+    ```bash
+    ./bin/ck8s bootstrap {sc|wc}
+    # or
+    ./migration/v0.31/apply/20-bootstrap.sh execute
+    ```
+
 1. Upgrade networkpolicies:
 
     ```bash
     ./migration/v0.31/apply/30-netpol.sh execute
-    ```
-
-1. Remove opensearch-configurer so that it runs again after upgrading Opensearch:
-
-    ```bash
-    ./bin/ck8s helmfile sc -l app=opensearch-configurer destroy
-    # or
-    ./migration/v0.31/apply/11-remove-opensearch-configurer.sh execute
     ```
 
 1. Upgrade harbor:
