@@ -21,6 +21,7 @@
 
 - The Ingress test script to work with proxy-protocol, when used
 - Fixed the sops_validate_config function in `bin/common.bash` to better handle invalid pgp keys.
+- `scripts/migration/lib.sh` check_version function now asks if you want to use the specified nonstandard ck8sVersion.
 
 ### Updated
 

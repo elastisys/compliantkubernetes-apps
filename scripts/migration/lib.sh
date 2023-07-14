@@ -226,7 +226,25 @@ check_version() {
   if [ "${VERSION["${1}-config"]}" = "any" ]; then
     log_warn "skipping version validation of ${1}-config for version \"${VERSION["${1}-config"]}\""
     return
-  elif [[ ! "${VERSION["${1}-config"]}" =~ v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+  fi
+
+  common_override=$(yq4 '.global.ck8sVersion' "${CK8S_CONFIG_PATH}/common-config.yaml")
+  sc_wc_override=$(yq4 '.global.ck8sVersion' "${CK8S_CONFIG_PATH}/${1}-config.yaml")
+  if [ "$common_override" != "null" ] || [ "$sc_wc_override" != "null" ]; then
+    log_warn "You have set the ck8sVersion in an override config"
+    log_warn "If this override version does not match the current repository version then:"
+    log_warn "- upgrade ${version} prepare will not remove it, and"
+    log_warn "- upgrade ${version} apply will fail"
+    if [[ -t 1 ]]; then
+      log_warn_no_newline "Do you want to continue [y/N]: "
+      read -r reply
+      if [[ "${reply}" != "y" ]]; then
+        exit 1
+      fi
+    fi
+  fi
+
+  if [[ ! "${VERSION["${1}-config"]}" =~ v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
     log_warn "reducing version validation of ${1}-config for version \"${VERSION["${1}-config"]}\""
   else
     log_info "version validation of ${1}-config for version \"${VERSION["${1}-config"]}\""
