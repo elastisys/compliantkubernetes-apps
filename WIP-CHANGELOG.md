@@ -15,6 +15,8 @@
 
 ### Fixed
 
+- The Ingress test script to work with proxy-protocol, when used
+
 ### Updated
 
 - Upgraded Grafana chart version to `6.57.4` and app version to `9.5.5`
