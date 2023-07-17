@@ -253,7 +253,10 @@ customRules:
     - macro: allowed_clear_log_files
       condition: (
           (fd.name startswith "/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/" and proc.cmdline = container) or
-          (fd.name glob "/var/lib/containerd/tmpmounts/containerd-mount*/var/log/dpkg.log" and proc.cmdline = containerd)
+          (fd.name glob "/var/lib/containerd/tmpmounts/containerd-mount*/var/log/dpkg.log" and proc.cmdline = containerd) or
+          (fd.name glob "/var/lib/containerd/tmpmounts/containerd-mount*/var/log/yum.log" and proc.cmdline = containerd) or
+          (fd.name glob "/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/*/fs/var/log/yum.log" and proc.cmdline = containerd) or
+          (fd.name glob "/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/*/fs/var/log/dpkg.log" and proc.cmdline = containerd)
         )
     - macro: user_shell_container_exclusions
       condition: (
