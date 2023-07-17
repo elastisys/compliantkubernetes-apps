@@ -11,6 +11,7 @@
   - To make it less sensitive to semi-consistent blocked network traffic.
 - Changed location for some dockerfiles to `/images`
 - Changed image location for some images from `elastisys/` to `ghcr.io/elastisys/`
+- Added secret as a volumetype for osdprepare jobs
 
 ### Fixed
 

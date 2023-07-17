@@ -224,6 +224,7 @@ constraints:
         privileged: true
         allowPrivilegeEscalation: true
         volumes:
+          - secret
           - emptyDir
           - projected
           - hostPath
