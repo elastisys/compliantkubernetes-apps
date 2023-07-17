@@ -112,6 +112,7 @@ check_tools() {
 
   if [[ "${err}" != 0 ]]; then
     log_error "Install required dependencies before running this command!"
+    log_warning "Run the following command to install: ./bin/ck8s install-requirements"
     exit 1
   fi
 
@@ -124,7 +125,6 @@ check_tools() {
 
     if ! [[ "${v2}" =~ ${v1} ]]; then
       log_warning "Required dependency ${3} not using recommended version: (expected ${1##v} - actual ${v2})"
-      log_warning "Run the following command to update/install: ./bin/ck8s install-requirements"
       warn=1
     fi
   }
@@ -140,6 +140,7 @@ check_tools() {
 
   if [[ "${warn}" != 0 ]]; then
     if [[ -t 1 ]]; then
+      log_warning "Run the following command to update: ./bin/ck8s install-requirements"
       log_warning_no_newline "Do you want to abort? (y/N): "
       read -r reply
       if [[ "${reply}" == "y" ]]; then
