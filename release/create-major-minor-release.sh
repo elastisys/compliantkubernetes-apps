@@ -3,7 +3,6 @@
 set -eu -o pipefail
 
 here="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
-
 # shellcheck source=release/common.sh
 source "${here}/common.sh"
 
@@ -33,9 +32,9 @@ fi
 git tag "${tag}"
 git push --tags
 
-if ! git log -1 --format=%s | grep -P "^Reset changelog for release ${tag}$" > /dev/null; then
+if ! git log -1 --format=%s | grep -P "^Reset changelog for release ${tag}" > /dev/null; then
   release_head_commit=$(git rev-parse --short HEAD)
-  reset_commit=$(git log "-${commit_lookback}" --oneline | grep -P "Reset changelog for release ${tag}$" | awk '{print $1}')
+  reset_commit=$(git log "-${commit_lookback}" --oneline | grep -P "Reset changelog for release ${tag}" | awk '{print $1}')
 
   git switch main
   git pull

@@ -2,7 +2,7 @@
 
 set -eu -o pipefail
 
-commit_lookback=10
+commit_lookback=30
 # shellcheck disable=SC2034
 this_repo="elastisys/compliantkubernetes-apps"
 
