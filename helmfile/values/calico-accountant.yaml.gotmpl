@@ -1,2 +1,3 @@
-resources:    {{- toYaml .Values.calicoAccountant.resources | nindent 2 }}
-tolerations:  {{- toYaml .Values.calicoAccountant.tolerations | nindent 2 }}
+backend: {{ .Values.calicoAccountant.backend }}
+resources: {{- toYaml .Values.calicoAccountant.resources | nindent 2 }}
+tolerations: {{- toYaml .Values.calicoAccountant.tolerations | nindent 2 }}

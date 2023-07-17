@@ -4,6 +4,7 @@
 
 - Added support for Swift in rclone-sync.
   - It is now possible to specify type (S3/Swift) per bucket.
+- Support for nftables backend in calico-accountant via config option `calicoAccountant.backend: nftables`
 
 ### Changed
 

@@ -14,9 +14,19 @@ spec:
     spec:
       containers:
         - command:
-          - "/calico-accountant"
-          - "-logtostderr=true"
-          - "-v=2"
+          - sh
+          args:
+          - -c
+          - |
+              #!/bin/sh
+              {{- if eq .Values.backend "nftables" }}
+              cp /sbin/iptables-nft /sbin/iptables
+              cp /sbin/iptables-nft-restore /sbin/iptables-restore
+              cp /sbin/iptables-nft-save /sbin/iptables-save
+              {{- else if ne .Values.backend "iptables" }}
+              {{- printf "\n- Unsupported backend \"%s\" for calico-accountant! Only \"iptables\" and \"nftables\" are supported!" .Values.backend | fail }}
+              {{- end }}
+              /calico-accountant -logtostderr=true -v=2
           env:
           - name: METRICS_SERVER_PORT
             value: "9009"
