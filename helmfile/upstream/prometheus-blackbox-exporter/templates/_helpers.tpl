@@ -40,6 +40,12 @@ helm.sh/chart: {{ include "prometheus-blackbox-exporter.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- if .Values.releaseLabel }}
+release: {{ .Release.Name }}
+{{- end }}
+{{- if .Values.commonLabels }}
+{{ toYaml .Values.commonLabels }}
+{{- end }}
 {{- end }}
 
 {{/*
@@ -70,4 +76,28 @@ Return the appropriate apiVersion for rbac.
 {{- else -}}
 {{- print "rbac.authorization.k8s.io/v1beta1" -}}
 {{- end -}}
+{{- end -}}
+
+
+{{- define "prometheus-blackbox-exporter.namespace" -}}
+  {{- if .Values.namespaceOverride -}}
+    {{- .Values.namespaceOverride -}}
+  {{- else -}}
+    {{- .Release.Namespace -}}
+  {{- end -}}
+{{- end -}}
+
+{{/* Enable overriding Kubernetes version for some use cases */}}
+{{- define "prometheus-blackbox-exporter.kubeVersion" -}}
+  {{- default .Capabilities.KubeVersion.Version .Values.kubeVersionOverride -}}
+{{- end -}}
+
+
+{{/*
+The image to use
+*/}}
+{{- define "prometheus-blackbox-exporter.image" -}}
+{{- with (.Values.global.imageRegistry | default .Values.image.registry) -}}{{ . }}/{{- end }}
+{{- .Values.image.repository -}}:{{- .Values.image.tag | default .Chart.AppVersion -}}
+{{- with .Values.image.digest -}}@{{ .}}{{- end -}}
 {{- end -}}
