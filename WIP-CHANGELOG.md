@@ -19,6 +19,7 @@
 ### Fixed
 
 - The Ingress test script to work with proxy-protocol, when used
+- Fixed the sops_validate_config function in `bin/common.bash` to better handle invalid pgp keys.
 
 ### Updated
 
