@@ -399,14 +399,19 @@ validate_sops_config() {
         exit 1
     fi
 
-    # Force all pgp entries to be a string and to contain "null" if unset in a creation rule
-    fingerprints=$(yq4 'with(.creation_rules[]; .pgp = (.pgp // "null" | to_yaml style="")) | [.creation_rules[].pgp] | join(",")' "${sops_config}")
-    if ! [[ "${fingerprints}" =~ ^[A-Z0-9,' ']+$ ]]; then
+    # Compares the keyring with pgp fingerprints to see if pgp has anything keyring does not have.
+    keyring=$(gpg --list-keys  | grep pub -A 1 | grep -v pub | sed -n 'n;p' | xargs)
+    creation_pgp=$(yq4 '[.creation_rules[].pgp // null | split(",") | .[]] | unique | join(" ")' "${sops_config}")
+    comma_search=$(yq4 '.creation_rules[] | select(.pgp == "*,")' "${sops_config}")
+    combined="${keyring} ${creation_pgp}"
+    fingerprints=$(echo "${keyring}" "${combined}" | tr ' ' '\n' | sort | uniq -u)
+
+    if [ -n "${fingerprints// }" ] || [ "${comma_search: -1}" == "," ]; then
         log_error "ERROR: SOPS config contains no or invalid PGP keys."
         log_error "SOPS config: ${sops_config}:"
-        yq4 'split(",") | {"fingerprints": .}' <<< "${fingerprints}" | cat
-        log_error "Fingerprints must be uppercase and separated by colon."
-        log_error "Delete or edit the SOPS config to fix the issue"
+        yq4 'split(" ") | {"missing or invalid fingerprints": .}' <<< "${fingerprints}" | cat
+        log_error "Fingerprints must be uppercase and separated by commas."
+        log_error "Recreate or edit the SOPS config to fix the issue"
         exit 1
     fi
 }
