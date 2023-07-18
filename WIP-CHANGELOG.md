@@ -25,5 +25,6 @@
 - Upgraded compliantkubernetes-apps-log-manager image to a later `ubuntu:rolling` and chart version to `0.2.0`
 - Upgraded rclone-sync image app version from `v1.57.0` to `v1.63.0` chart version from `1.3.0` to `1.63.0`
 - Upgraded s3-exporter image app version from `0.4.0` to `0.5.0` chart version from `v0.4.0` to `0.5.0`
+- Upgraded kured image app version from `v1.12.1` to `v1.13.1` chart version from `4.4.1` to `4.5.1`
 
 ### Removed

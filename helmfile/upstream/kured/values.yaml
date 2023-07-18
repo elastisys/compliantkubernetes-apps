@@ -97,7 +97,8 @@ tolerations: []
 
 affinity: {}
 
-nodeSelector: {}
+nodeSelector:
+  kubernetes.io/os: linux
 
 volumeMounts: []
 

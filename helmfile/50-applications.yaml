@@ -29,7 +29,7 @@ releases:
   labels:
     app: kured
   chart: ./upstream/kured
-  version: 4.4.1
+  version: 4.5.1
   installed: {{ .Values.kured.enabled }}
   values:
   - values/kured.yaml.gotmpl
