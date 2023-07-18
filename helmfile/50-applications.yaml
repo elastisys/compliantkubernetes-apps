@@ -139,13 +139,13 @@ releases:
   version: 0.1.0
   installed: {{ .Values.calicoFelixMetrics.enabled }}
 
-# Prometheus blackboc exporter
+# Prometheus blackbox exporter
 - name: prometheus-blackbox-exporter
   namespace: monitoring
   labels:
     app: blackbox
   chart: ./upstream/prometheus-blackbox-exporter
-  version: 5.3.1
+  version: 8.2.0
   values:
 {{ if eq .Environment.Name "service_cluster" }}
   - values/prometheus-blackbox-exporter-sc.yaml.gotmpl
