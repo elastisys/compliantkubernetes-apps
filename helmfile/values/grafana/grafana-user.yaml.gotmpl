@@ -24,11 +24,6 @@ sidecar:
 datasources:
   datasources.yaml:
     apiVersion: 1
-    deleteDatasources:
-    - name: ck8s-metrics
-      orgId: 1
-    - name: prometheus-sc
-      orgId: 1
     datasources:
     {{- if and .Values.thanos.enabled .Values.thanos.query.enabled }}
     - name: "Service Cluster"
@@ -105,7 +100,7 @@ grafana.ini:
   users:
     viewers_can_edit: {{ .Values.grafana.user.viewersCanEdit }}
   dashboards:
-    default_home_dashboard_path: /tmp/dashboards/welcome.json
+    default_home_dashboard_path: /tmp/dashboards/welcome-dashboard.json
 
 # Velero backup
 

@@ -1,11 +1,3 @@
-
-# We use the value for the "labelkey" to separate the ops and user dashboards in Grafana.
-# ops Grafana will load all ConfigMaps regardless of the "labelkey" value
-# user Grafana will load only the ConfigMaps that have the value for "labelkey" set to 1. Set "user_visible" to "true" for this.
-
-# We will create one ConfigMap per dashboard in the .Release.Namespace. The namespace is defined in 50-applications.yaml
-# The dashboard name defined here should be the prefix for the `-dashboard.json` file name located in ./dashboards
-
 dashboard:
   ck8sVersion: {{ .Values.global.ck8sVersion }}
   extraTextGrafana: {{ .Values.welcomingDashboard.extraTextGrafana }}
@@ -15,83 +7,41 @@ dashboard:
 {{ end }}
 
 baseDomain: {{ .Values.global.baseDomain }}
+logEndpoint: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
 
-# Dashboards to include + settings if needed
-dashboards:
-  backup:
-    enabled: true
-    user_visible: true
-    {{- if .Values.objectStorage.sync.enabled }}
-    sync:
-      {{- range .Values.objectStorage.sync.buckets }}
-      - {{ .source }}
-      {{- end }}
-    {{- end }}
-  opensearch:
-    enabled: true
-    user_visible: true
-  falco:
-    enabled: true
-    user_visible: true
-    logEndpoint: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
-  gatekeeper:
-    enabled: true
-    user_visible: true
-    logEndpoint: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
-  hnc:
-    enabled: {{ .Values.hnc.enabled }}
-    user_visible: false
-  kubernetesstatus:
-    enabled: true
-    user_visible: true
-  nginx:
-    enabled: true
-    user_visible: true
-  uptime:
-    enabled: true
-    user_visible: false
-  velero:
-    enabled: true
-    user_visible: false
-  networkpolicy:
-    enabled: true
-    user_visible: true
-  daily:
-    enabled: true
-    user_visible: false
-  vulnerability:
-    enabled: true
-    user_visible: true
-  cephcluster:
-    enabled: {{ .Values.rookCeph.monitoring.enabled }}
-    user_visible: false
-  cephosdsingle:
-    enabled: {{ .Values.rookCeph.monitoring.enabled }}
-    user_visible: false
-  cephpools:
-    enabled: {{ .Values.rookCeph.monitoring.enabled }}
-    user_visible: false
-  calicofelix:
-    enabled: true
-    user_visible: false
-  fluentd:
-    enabled: true
-    user_visible: true
-  prometheus-timeseries:
-    enabled: true
-    user_visible: false
-  welcome:
-    enabled: true
-    user_visible: true
-  trivy-operator:
-    enabled: true
-    user_visible: true
-  clustercompliancereport:
-    enabled: true
-    user_visible: true
-  harbor:
-    enabled: {{ .Values.harbor.enabled }}
-    user_visible: true
-  cluster-api:
-    enabled: {{ .Values.global.clusterApi }}
-    user_visible: false
+disabledDashboards:
+  {{- if not .Values.hnc.enabled }}
+  - hnc-dashboard
+  {{- end }}
+  {{- if not .Values.rookCeph.monitoring.enabled }}
+  - cephcluster-dashboard
+  - cephosdsingle-dashboard
+  - cephpools-dashboard
+  {{- end }}
+  {{- if not .Values.harbor.enabled }}
+  - harbor-dashboard
+  {{- end }}
+  {{- if not .Values.global.clusterApi }}
+  - cluster-api-dashboard
+  {{- end }}
+  - vulnerability-dashboard
+  - thanos-sidecar-dashboard
+  - thanos-bucket-replicate-dashboard
+notDeveloperVisible:
+  - hnc-dashboard
+  - uptime-dashbord
+  - velero-dashboard
+  - daily-dashboard
+  - cephcluster-dashboard
+  - cephosdsingle-dashboard
+  - cephpools-dashboard
+  - calicofelix-dashboard
+  - prometheus-timeseries-dashboard
+  - cluster-api-dashboard
+
+{{- if .Values.objectStorage.sync.enabled }}
+sync:
+  {{- range .Values.objectStorage.sync.buckets }}
+  - {{ .source }}
+  {{- end }}
+{{- end }}

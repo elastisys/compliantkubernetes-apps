@@ -193,13 +193,6 @@ kubeScheduler:
 
 grafana:
   enabled: false
-  forceDeployDashboards: true
-  defaultDashboardsTimezone: ""
-  sidecar:
-    dashboards:
-      multicluster:
-        global:
-          enabled: true
 
 prometheusOperator:
   resources: {{- toYaml .Values.prometheusOperator.resources | nindent 4 }}

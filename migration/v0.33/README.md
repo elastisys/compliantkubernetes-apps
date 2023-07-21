@@ -127,6 +127,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.33/apply/20-bootstrap.sh execute
     ```
 
+1. Migrate Grafana dashboards:
+
+    ```bash
+    ./migration/v0.33/apply/30-grafana-dashboards.sh
+    ```
+
 1. Move `rclone-sync` from `kube-system`:
 
     ```bash

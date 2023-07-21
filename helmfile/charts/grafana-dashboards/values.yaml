@@ -4,12 +4,12 @@
 #   {{ .Values.labelKey }}: nameOfDashboard
 labelKey: grafana_dashboard
 
-# We use the value for the "labelkey" to separate the ops and user dashboards in Grafana.
-# ops Grafana will load all ConfigMaps regardless of the "labelkey" value
-# user Grafana will load only the ConfigMaps that have the value for "labelkey" set to 1. Set "user_visible" to "true" for this.
+# We use the value for the "lablekey" to separate the ops and user dashboards in Grafana.
+# Grafana-ops will load all ConfigMaps regardless of the "labelkey" value
+# Grafana-user will load only the ConfigMaps that have the value for "labelkey" set to 1. All dashboard will be visible to the developer, unless they are added into the notDeveloperVisible list.
 
 # We will create one ConfigMap per dashboard in the .Release.Namespace. The namespace is defined in 50-applications.yaml
-# The dashboard name defined here should be the prefix for the `-dashboard.json` file name located in ./dashboards
+# The name of the file containing the JSON for the dashboard should follow this naming convention: `[dashboardName]-dashboard.json`
 
 dashboard:
   ck8sVersion: ""
@@ -24,108 +24,11 @@ dashboard:
   #   releasenotes: https://https://elastisys.io/compliantkubernetes/release-notes/#example
 
 baseDomain: ""
+logEndpoint: https://opensearch.your.endpoint
 
-# Dashboards to include + settings if needed
-dashboards:
-  backup:
-    enabled: true
-    user_visible: false
-    sync: []
-  opensearch:
-    enabled: true
-    user_visible: false
-  falco:
-    enabled: true
-    user_visible: false
-    logEndpoint: https://kibana.your.endpoint
-  gatekeeper:
-    enabled: true
-    user_visible: false
-    logEndpoint: https://kibana.your.endpoint
-  hnc:
-    enabled: false
-    user_visible: false
-  kubernetesstatus:
-    enabled: true
-    user_visible: false
-  nginx:
-    enabled: true
-    user_visible: false
-  uptime:
-    enabled: true
-    user_visible: false
-  velero:
-    enabled: true
-    user_visible: false
-  networkpolicy:
-    enabled: true
-    user_visible: false
-  daily:
-    enabled: true
-    user_visible: false
-  vulnerability:
-    enabled: false
-    user_visible: false
-  cephcluster:
-    enabled: true
-    user_visible: false
-  cephosdsingle:
-    enabled: true
-    user_visible: false
-  cephpools:
-    enabled: true
-    user_visible: false
-  calicofelix:
-    enabled: true
-    user_visible: false
-  thanos-compact:
-    enabled: true
-    user_visible: false
-  thanos-overview:
-    enabled: true
-    user_visible: false
-  thanos-query-frontend:
-    enabled: true
-    user_visible: false
-  thanos-query:
-    enabled: true
-    user_visible: false
-  thanos-receive:
-    enabled: true
-    user_visible: false
-  thanos-rule:
-    enabled: true
-    user_visible: false
-  thanos-store:
-    enabled: true
-    user_visible: false
-  node-exporter-full:
-    enabled: true
-    user_visible: false
-  fluentd:
-    enabled: true
-    user_visible: false
-  prometheus-timeseries:
-    enabled: true
-    user_visible: false
-  welcome:
-    enabled: true
-    user_visible: true
-  trivy-operator:
-    enabled: true
-    user_visible: true
-  clustercompliancereport:
-    enabled: true
-    user_visible: true
-  harbor:
-    enabled: true
-    user_visible: true
-  node-local-dns:
-    enabled: false
-    user_visible: true
-  cluster-api:
-    enabled: true
-    user_visible: false
-  prometheus-blackbox-exporter:
-    enabled: true
-    user_visible: true
+# List of dashboards that will not be installed
+disabledDashboards: []
+# List of dashboards that will not be visible to the developers
+notDeveloperVisible: []
+# If objectStorage sync in enabled this will contain the bucket names
+sync: []

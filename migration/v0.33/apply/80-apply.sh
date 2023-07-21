@@ -13,6 +13,8 @@ skipped=(
 declare -a skipped_sc
 skipped_sc=(
   "app!=rclone-sync"
+  "app!=kube-prometheus-stack"
+  "app!=grafana-dashboards"
 )
 declare -a skipped_wc
 skipped_wc=(
