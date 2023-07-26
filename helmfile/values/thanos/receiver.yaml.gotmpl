@@ -123,13 +123,7 @@ ruler:
           fieldRef:
             apiVersion: v1
             fieldPath: metadata.name
-      resources:
-        limits:
-          cpu: 100m
-          memory: 50Mi
-        requests:
-          cpu: 100m
-          memory: 50Mi
+      resources: {{- toYaml .Values.thanos.ruler.configReloader.resources | nindent 8 }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: 65534

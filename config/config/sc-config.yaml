@@ -158,7 +158,7 @@ harbor:
     replicas: 1
     resources:
       requests:
-        cpu: 125m
+        cpu: 100m
         memory: 250Mi
       limits:
         cpu: 250m
@@ -185,7 +185,7 @@ harbor:
       resources:
         requests:
           memory: 512Mi
-          cpu: 250m
+          cpu: 100m
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -224,7 +224,7 @@ harbor:
         size: 1Gi
     resources:
       requests:
-        cpu: 125m
+        cpu: 50m
         memory: 125Mi
       limits:
         cpu: 250m
@@ -259,7 +259,7 @@ harbor:
     controller:
       resources:
         requests:
-          cpu: 125m
+          cpu: 10m
           memory: 125Mi
         limits:
           cpu: 250m
@@ -311,7 +311,7 @@ harbor:
     subdomain: notary.harbor
     resources:
       requests:
-        cpu: 125m
+        cpu: 20m
         memory: 125Mi
       limits:
         cpu: 250m
@@ -333,7 +333,7 @@ harbor:
   notarySigner:
     resources:
       requests:
-        cpu: 125m
+        cpu: 20m
         memory: 125Mi
       limits:
         cpu: 250m
@@ -356,7 +356,7 @@ harbor:
     replicas: 1
     resources:
       requests:
-        cpu: 125m
+        cpu: 50m
         memory: 125Mi
       limits:
         cpu: 250m
@@ -381,7 +381,7 @@ harbor:
       size: 5Gi
     resources:
       requests:
-        cpu: 125m
+        cpu: 50m
         memory: 263Mi
       limits:
         cpu: 400m
@@ -584,6 +584,14 @@ thanos:
       limits:
         cpu: 300m
         memory: 100Mi
+    configReloader:
+      resources:
+        limits:
+          cpu: 100m
+          memory: 50Mi
+        requests:
+          cpu: 10m
+          memory: 50Mi
 
     # With our configuration of rules, thanos ruler has no recording rules so it should be fine without persistence.
     persistence:
@@ -985,6 +993,11 @@ opa:
   disallowedTags:
     enabled: false
 
+  controllerManager:
+    resources:
+      requests:
+        cpu: 30m
+
 fluentd:
   enabled: true
 
@@ -1012,6 +1025,11 @@ fluentd:
       enabled: true
       schedule: 0 21 * * *
       days: 7
+
+  aggregator:
+    resources:
+      requests:
+        cpu: 150m
 
   forwarder:
     buffer:
