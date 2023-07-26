@@ -116,6 +116,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.31/prepare/05-increase-maxbodysize-chunklimitsize.sh
     ```
 
+1. Increase the memory limit for Thanos receiveDistributor
+
+    ```bash
+    ./migration/v0.31/prepare/10-thanos-distrib-memory-limit.sh
+    ```
+
 1. Move thanos replication factor
 
     ```bash
