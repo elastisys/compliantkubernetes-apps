@@ -5,8 +5,6 @@ ROOT="$(readlink -f "$(dirname "${0}")/../../../")"
 # shellcheck source=scripts/migration/lib.sh
 source "${ROOT}/scripts/migration/lib.sh"
 
-HERE="$(dirname "$(readlink -f "${0}")")"
-
 wait_velero_backup() {
   TIMEOUT=15
   while [ $TIMEOUT -gt 0 ]; do
@@ -28,8 +26,21 @@ run() {
   execute)
     # Note: 00-template.sh will be skipped by the upgrade command
     log_info "- backing-up wc alertmanager namespace using velero"
-    kubectl_do wc apply -f "${HERE}"/alertmanager_velero_backup.yaml
-
+    kubectl_do wc apply -f - <<EOF
+apiVersion: velero.io/v1
+kind: Backup
+metadata:
+  creationTimestamp: null
+  name: alertmanager-config-backup
+  namespace: velero
+spec:
+  hooks: {}
+  includedNamespaces:
+  - alertmanager
+  metadata: {}
+  ttl: 720h0m0s
+status: {}
+EOF
     log_info "- waiting for the backup to be complete"
     wait_velero_backup
 
