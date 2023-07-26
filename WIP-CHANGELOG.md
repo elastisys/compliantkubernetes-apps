@@ -15,6 +15,7 @@
 - Added secret as a volumetype for osdprepare jobs
 - The `score.sh` script now presents results in either structured yaml or machine readable csv
 - User alertmanager will re-use the secret if exists, instead of using the `"helm.sh/hook": pre-install` annotation
+- Memory limit for Thanos distributor increased to 700Mi
 
 ### Fixed
 

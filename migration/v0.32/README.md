@@ -92,6 +92,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     git switch -d v0.32.x
     ```
 
+1. Increase the memory limit for Thanos receiveDistributor
+
+    ```bash
+    ./migration/v0.32/prepare/10-thanos-distrib-memory-limit.sh
+    ```
+
 1. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.
