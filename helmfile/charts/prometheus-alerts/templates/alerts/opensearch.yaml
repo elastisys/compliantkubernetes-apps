@@ -18,7 +18,7 @@ spec:
   - name: opensearch-alerts
     rules:
     - alert: OpenSearchTooFewNodesRunning
-      expr: elasticsearch_cluster_health_number_of_nodes < {{ .Values.osNodeCount }}
+      expr: elasticsearch_cluster_health_number_of_nodes{namespace="opensearch-system"} < {{ .Values.osNodeCount }}
       for: 15m
       labels:
         severity: critical
@@ -26,7 +26,7 @@ spec:
         description: There are only {{`{{ $value }}`}}  OpenSearch nodes running
         summary: OpenSearch running on less than {{ .Values.osNodeCount }} nodes
     - alert: OpenSearchHeapTooHigh
-      expr: elasticsearch_jvm_memory_used_bytes{area="heap"} / elasticsearch_jvm_memory_max_bytes{area="heap"}
+      expr: elasticsearch_jvm_memory_used_bytes{namespace="opensearch-system",area="heap"} / elasticsearch_jvm_memory_max_bytes{namespace="opensearch-system",area="heap"}
         > 0.9
       for: 15m
       labels:
@@ -35,7 +35,7 @@ spec:
         description: The heap usage is over 90% for 15m
         summary: OpenSearch node {{`{{ $labels.node}}`}} heap usage is high
     - alert: OpenSearchFieldLimit
-      expr: (sum(max_over_time(elasticsearch_indices_mappings_stats_fields[5m])) by (index) / sum(max_over_time(elasticsearch_indices_settings_total_fields[5m])) by (index)) * 100 > 80
+      expr: (sum(max_over_time(elasticsearch_indices_mappings_stats_fields{namespace="opensearch-system"}[5m])) by (index) / sum(max_over_time(elasticsearch_indices_settings_total_fields{namespace="opensearch-system"}[5m])) by (index)) * 100 > 80
       for: 15m
       labels:
         severity: warning
@@ -43,7 +43,7 @@ spec:
         description: Index {{`{{ $labels.index }}`}} is using {{`{{ $value }}`}} percent of max field limit
         summary: Index {{`{{ $labels.index }}`}} is using {{`{{ $value }}`}} percent of max field limit
     - alert: OpenSearchFieldLimit
-      expr: (sum(max_over_time(elasticsearch_indices_mappings_stats_fields[5m])) by (index) / sum(max_over_time(elasticsearch_indices_settings_total_fields[5m])) by (index)) * 100 > 95
+      expr: (sum(max_over_time(elasticsearch_indices_mappings_stats_fields{namespace="opensearch-system"}[5m])) by (index) / sum(max_over_time(elasticsearch_indices_settings_total_fields{namespace="opensearch-system"}[5m])) by (index)) * 100 > 95
       for: 15m
       labels:
         severity: critical
@@ -51,7 +51,7 @@ spec:
         description: Index {{`{{ $labels.index }}`}} is using {{`{{ $value }}`}} percent of max field limit
         summary: Index {{`{{ $labels.index }}`}} is using {{`{{ $value }}`}} percent of max field limit
     - alert: OpensearchClusterYellow
-      expr: elasticsearch_cluster_health_status{color="yellow"} == 1
+      expr: elasticsearch_cluster_health_status{namespace="opensearch-system",color="yellow"} == 1
       for: 15m
       labels:
         severity: warning
@@ -59,7 +59,7 @@ spec:
         summary: Opensearch Cluster Yellow (instance {{`{{ $labels.instance }}`}})
         description: Opensearch Cluster is in a Yellow status VALUE = {{`{{ $value }}`}}  LABELS = {{`{{ $labels }}`}}
     - alert: OpensearchClusterRed
-      expr: elasticsearch_cluster_health_status{color="red"} == 1
+      expr: elasticsearch_cluster_health_status{namespace="opensearch-system",color="red"} == 1
       for: 15m
       labels:
         severity: critical
@@ -68,7 +68,7 @@ spec:
         description: Opensearch Cluster is in a Red status VALUE = {{`{{ $value }}`}}  LABELS = {{`{{ $labels }}`}}
     {{- range $prefixes := .Values.osIndexAlerts }}
     - alert: {{ $prefixes.prefix | title }}SizeIncreasedOverLimit
-      expr: elasticsearch_indices_store_size_bytes_primary{index=~"{{ $prefixes.prefix }}.+"} / (1024^2) > {{ $prefixes.alertSizeMB }}
+      expr: elasticsearch_indices_store_size_bytes_primary{namespace="opensearch-system",index=~"{{ $prefixes.prefix }}.+"} / (1024^2) > {{ $prefixes.alertSizeMB }}
       for: 15m
       labels:
         severity: warning
