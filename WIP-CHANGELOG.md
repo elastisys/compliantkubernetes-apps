@@ -17,6 +17,7 @@
 - User alertmanager will re-use the secret if exists, instead of using the `"helm.sh/hook": pre-install` annotation
 - Memory limit for Thanos distributor increased to 700Mi
 - Reduced CPU requests for some components in the service cluster.
+- Reduced the information on the dashboard for Cluster-API at a glance, but added some hidden more detailed graphs
 
 ### Fixed
 

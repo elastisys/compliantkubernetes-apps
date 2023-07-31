@@ -23,8 +23,8 @@
   },
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "graphTooltip": 0,
-  "id": 104,
+  "graphTooltip": 1,
+  "id": 106,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -103,8 +103,8 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 4,
+        "h": 4,
+        "w": 5,
         "x": 0,
         "y": 1
       },
@@ -123,7 +123,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.3.13",
+      "pluginVersion": "9.5.5",
       "targets": [
         {
           "datasource": {
@@ -131,7 +131,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "capi_cluster_status_phase{name=~\"$cluster\", phase=\"Provisioned\"} == 1 or\n(capi_cluster_status_phase{name=~\"$cluster\", phase=\"Provisioning\"} == 1) + 1 or\n(capi_cluster_status_phase{name=~\"$cluster\", phase=\"Pending\"} == 1) + 1 or\n(capi_cluster_status_phase{name=~\"$cluster\", phase=\"Unknown\"} == 1) + 1 or\n(capi_cluster_status_phase{name=~\"$cluster\", phase=\"Deleting\"} == 1) + 1 or\n(capi_cluster_status_phase{name=~\"$cluster\", phase=\"Failed\"} == 1) + 1",
+          "expr": "max(capi_cluster_status_phase{name=~\"$cluster\", phase=\"Provisioned\"} == 1 or\n(capi_cluster_status_phase{name=~\"$cluster\", phase=\"Provisioning\"} == 1) + 1 or\n(capi_cluster_status_phase{name=~\"$cluster\", phase=\"Pending\"} == 1) + 2 or\n(capi_cluster_status_phase{name=~\"$cluster\", phase=\"Unknown\"} == 1) + 3 or\n(capi_cluster_status_phase{name=~\"$cluster\", phase=\"Deleting\"} == 1) + 4 or\n(capi_cluster_status_phase{name=~\"$cluster\", phase=\"Failed\"} == 1) + 5) without (instance, pod)",
           "legendFormat": "{{status}}",
           "range": true,
           "refId": "A"
@@ -180,9 +180,9 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 4,
-        "x": 4,
+        "h": 4,
+        "w": 3,
+        "x": 5,
         "y": 1
       },
       "id": 15,
@@ -200,7 +200,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.3.13",
+      "pluginVersion": "9.5.5",
       "targets": [
         {
           "datasource": {
@@ -208,7 +208,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "capi_cluster_spec_paused{name=~\"$cluster\"}",
+          "expr": "max(capi_cluster_spec_paused{name=~\"$cluster\"}) without (instance, pod)",
           "legendFormat": "{{status}}",
           "range": true,
           "refId": "A"
@@ -262,8 +262,8 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 4,
+        "h": 4,
+        "w": 3,
         "x": 8,
         "y": 1
       },
@@ -282,7 +282,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.3.13",
+      "pluginVersion": "9.5.5",
       "targets": [
         {
           "datasource": {
@@ -290,7 +290,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "capi_cluster_status_condition{name=~\"$cluster\", type=\"Ready\", status=\"True\"} == 1 or (capi_cluster_status_condition{name=~\"$cluster\", type=\"Ready\", status=\"Unknown\"} == 1) + 1 or (capi_cluster_status_condition{name=~\"$cluster\", type=\"Ready\", status=\"False\"} == 1) + 2",
+          "expr": "max(capi_cluster_status_condition{name=~\"$cluster\", type=\"Ready\", status=\"True\"} == 1 or (capi_cluster_status_condition{name=~\"$cluster\", type=\"Ready\", status=\"Unknown\"} == 1) + 1 or (capi_cluster_status_condition{name=~\"$cluster\", type=\"Ready\", status=\"False\"} == 1) + 2) without (instance, pod)",
           "legendFormat": "{{status}}",
           "range": true,
           "refId": "A"
@@ -344,9 +344,9 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 4,
-        "x": 12,
+        "h": 4,
+        "w": 3,
+        "x": 11,
         "y": 1
       },
       "id": 11,
@@ -364,7 +364,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.3.13",
+      "pluginVersion": "9.5.5",
       "targets": [
         {
           "datasource": {
@@ -372,7 +372,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "capi_cluster_status_condition{name=~\"$cluster\", type=\"ControlPlaneInitialized\", status=\"True\"} == 1 or (capi_cluster_status_condition{name=~\"$cluster\", type=\"ControlPlaneInitialized\", status=\"Unknown\"} == 1) + 1 or (capi_cluster_status_condition{name=~\"$cluster\", type=\"ControlPlaneInitialized\", status=\"False\"} == 1) + 2",
+          "expr": "max(capi_cluster_status_condition{name=~\"$cluster\", type=\"ControlPlaneInitialized\", status=\"True\"} == 1 or (capi_cluster_status_condition{name=~\"$cluster\", type=\"ControlPlaneInitialized\", status=\"Unknown\"} == 1) + 1 or (capi_cluster_status_condition{name=~\"$cluster\", type=\"ControlPlaneInitialized\", status=\"False\"} == 1) + 2) without (instance, pod)",
           "legendFormat": "{{status}}",
           "range": true,
           "refId": "A"
@@ -426,9 +426,9 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 4,
-        "x": 16,
+        "h": 4,
+        "w": 3,
+        "x": 14,
         "y": 1
       },
       "id": 12,
@@ -446,7 +446,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.3.13",
+      "pluginVersion": "9.5.5",
       "targets": [
         {
           "datasource": {
@@ -454,7 +454,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "capi_cluster_status_condition{name=~\"$cluster\", type=\"ControlPlaneReady\", status=\"True\"} == 1 or (capi_cluster_status_condition{name=~\"$cluster\", type=\"ControlPlaneReady\", status=\"Unknown\"} == 1) + 1 or (capi_cluster_status_condition{name=~\"$cluster\", type=\"ControlPlaneReady\", status=\"False\"} == 1) + 2",
+          "expr": "max(capi_cluster_status_condition{name=~\"$cluster\", type=\"ControlPlaneReady\", status=\"True\"} == 1 or (capi_cluster_status_condition{name=~\"$cluster\", type=\"ControlPlaneReady\", status=\"Unknown\"} == 1) + 1 or (capi_cluster_status_condition{name=~\"$cluster\", type=\"ControlPlaneReady\", status=\"False\"} == 1) + 2) without (instance, pod)",
           "legendFormat": "{{status}}",
           "range": true,
           "refId": "A"
@@ -508,9 +508,9 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 4,
-        "x": 20,
+        "h": 4,
+        "w": 3,
+        "x": 17,
         "y": 1
       },
       "id": 13,
@@ -528,7 +528,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.3.13",
+      "pluginVersion": "9.5.5",
       "targets": [
         {
           "datasource": {
@@ -536,7 +536,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "capi_cluster_status_condition{name=~\"$cluster\", type=\"InfrastructureReady\", status=\"True\"} == 1 or (capi_cluster_status_condition{name=~\"$cluster\", type=\"InfrastructureReady\", status=\"Unknown\"} == 1) + 1 or (capi_cluster_status_condition{name=~\"$cluster\", type=\"InfrastructureReady\", status=\"False\"} == 1) + 2",
+          "expr": "max(capi_cluster_status_condition{name=~\"$cluster\", type=\"InfrastructureReady\", status=\"True\"} == 1 or (capi_cluster_status_condition{name=~\"$cluster\", type=\"InfrastructureReady\", status=\"Unknown\"} == 1) + 1 or (capi_cluster_status_condition{name=~\"$cluster\", type=\"InfrastructureReady\", status=\"False\"} == 1) + 2) without (instance, pod)",
           "legendFormat": "{{status}}",
           "range": true,
           "refId": "A"
@@ -569,10 +569,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 6,
+        "h": 5,
+        "w": 3,
         "x": 0,
-        "y": 7
+        "y": 5
       },
       "id": 16,
       "options": {
@@ -589,7 +589,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.3.13",
+      "pluginVersion": "9.5.5",
       "targets": [
         {
           "datasource": {
@@ -597,7 +597,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "capi_kubeadmcontrolplane_status_replicas{name=~\"${cluster}-control-plane\"}",
+          "expr": "avg(capi_kubeadmcontrolplane_status_replicas{name=~\"${cluster}-control-plane\"}) without (instance, pod)",
           "legendFormat": "{{cluster}}",
           "range": true,
           "refId": "A"
@@ -634,10 +634,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 6,
-        "y": 7
+        "h": 5,
+        "w": 3,
+        "x": 3,
+        "y": 5
       },
       "id": 17,
       "options": {
@@ -654,7 +654,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.3.13",
+      "pluginVersion": "9.5.5",
       "targets": [
         {
           "datasource": {
@@ -662,7 +662,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "capi_kubeadmcontrolplane_status_replicas_unavailable{name=~\"${cluster}-control-plane\"}",
+          "expr": "avg(capi_kubeadmcontrolplane_status_replicas_unavailable{name=~\"${cluster}-control-plane\"}) without (instance, pod)",
           "legendFormat": "{{cluster}}",
           "range": true,
           "refId": "A"
@@ -683,31 +683,73 @@
           },
           "custom": {
             "align": "auto",
-            "displayMode": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
             "inspect": false
           },
-          "mappings": [],
+          "mappings": [
+            {
+              "options": {
+                "Failed": {
+                  "color": "red",
+                  "index": 2
+                },
+                "Running": {
+                  "color": "green",
+                  "index": 0
+                },
+                "Unknown": {
+                  "color": "orange",
+                  "index": 1
+                }
+              },
+              "type": "value"
+            }
+          ],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "yellow",
                 "value": null
               }
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "phase"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "gradient",
+                  "type": "color-background"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 6,
-        "w": 12,
-        "x": 12,
-        "y": 7
+        "h": 7,
+        "w": 9,
+        "x": 6,
+        "y": 5
       },
       "id": 22,
       "options": {
+        "cellHeight": "sm",
         "footer": {
+          "countRows": false,
           "fields": "",
           "reducer": [
             "sum"
@@ -717,7 +759,7 @@
         "frameIndex": 5,
         "showHeader": true
       },
-      "pluginVersion": "9.3.13",
+      "pluginVersion": "9.5.5",
       "targets": [
         {
           "datasource": {
@@ -726,15 +768,15 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "capi_machine_status_condition{name=~\"${cluster}-control-plane.*\", type=\"Ready\"} == 1",
+          "expr": "capi_machinedeployment_status_phase{cluster_name=~\"$cluster\"} == 1",
           "format": "table",
           "instant": true,
-          "legendFormat": "{{name}}",
+          "legendFormat": "{{node_name}}",
           "range": false,
           "refId": "A"
         }
       ],
-      "title": "Control plane replicas",
+      "title": "Machine Deployment phase",
       "transformations": [
         {
           "id": "organize",
@@ -752,6 +794,442 @@
               "endpoint": true,
               "instance": true,
               "job": true,
+              "name": false,
+              "namespace": true,
+              "pod": true,
+              "receive": true,
+              "service": true,
+              "status": false,
+              "tenant_id": true,
+              "uid": true
+            },
+            "indexByName": {
+              "Time": 2,
+              "Value": 18,
+              "__name__": 19,
+              "cluster": 3,
+              "cluster_name": 4,
+              "container": 5,
+              "customresource_group": 6,
+              "customresource_kind": 7,
+              "customresource_version": 8,
+              "endpoint": 9,
+              "instance": 10,
+              "job": 11,
+              "name": 0,
+              "namespace": 12,
+              "phase": 1,
+              "pod": 13,
+              "receive": 14,
+              "service": 15,
+              "tenant_id": 16,
+              "uid": 17
+            },
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "Failed": {
+                  "color": "red",
+                  "index": 2
+                },
+                "Running": {
+                  "color": "green",
+                  "index": 0
+                },
+                "Unknown": {
+                  "color": "orange",
+                  "index": 1
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "yellow",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "phase"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "gradient",
+                  "type": "color-background"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 9,
+        "x": 15,
+        "y": 5
+      },
+      "id": 71,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 5,
+        "showHeader": true
+      },
+      "pluginVersion": "9.5.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "capi_machine_status_phase{cluster_name=~\"$cluster\", phase!=\"Running\"} == 1",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{node_name}}",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Non running machine phase",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true,
+              "__name__": true,
+              "cluster": true,
+              "cluster_name": true,
+              "container": true,
+              "customresource_group": true,
+              "customresource_kind": true,
+              "customresource_version": true,
+              "endpoint": true,
+              "instance": true,
+              "job": true,
+              "name": false,
+              "namespace": true,
+              "pod": true,
+              "receive": true,
+              "service": true,
+              "status": false,
+              "tenant_id": true,
+              "uid": true
+            },
+            "indexByName": {
+              "Time": 2,
+              "Value": 18,
+              "__name__": 19,
+              "cluster": 3,
+              "cluster_name": 4,
+              "container": 5,
+              "customresource_group": 6,
+              "customresource_kind": 7,
+              "customresource_version": 8,
+              "endpoint": 9,
+              "instance": 10,
+              "job": 11,
+              "name": 0,
+              "namespace": 12,
+              "phase": 1,
+              "pod": 13,
+              "receive": 14,
+              "service": 15,
+              "tenant_id": 16,
+              "uid": 17
+            },
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 70
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 10
+      },
+      "id": 108,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "9.5.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "avg(capi_machinedeployment_status_replicas{cluster_name=~\"$cluster\"}) by (name)",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "B"
+        }
+      ],
+      "title": "Total control plane replicas",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "cluster": true,
+              "cluster_name": true,
+              "container": true,
+              "customresource_group": true,
+              "customresource_kind": true,
+              "customresource_version": true,
+              "endpoint": true,
+              "job": true
+            },
+            "indexByName": {},
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "False": {
+                  "color": "red",
+                  "index": 2
+                },
+                "True": {
+                  "color": "green",
+                  "index": 0
+                },
+                "Unknown": {
+                  "color": "orange",
+                  "index": 1
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "yellow",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "status"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "gradient",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "type"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 300
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 9,
+        "x": 6,
+        "y": 12
+      },
+      "id": 38,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 5,
+        "showHeader": true
+      },
+      "pluginVersion": "9.5.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "(capi_machine_status_condition{cluster_name=~\"$cluster\", name!~\".*control-plane.*\", status!=\"True\"} == 1) * on (name) group_left(node_name) capi_machine_status_noderef",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{node_name}}",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "MachineDeployment replicas with non True conditions",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true,
+              "__name__": true,
+              "cluster": true,
+              "cluster_name": true,
+              "container": true,
+              "customresource_group": true,
+              "customresource_kind": true,
+              "customresource_version": true,
+              "endpoint": true,
+              "instance": true,
+              "job": true,
+              "name": true,
               "namespace": true,
               "pod": true,
               "receive": true,
@@ -762,8 +1240,167 @@
             },
             "indexByName": {
               "Time": 3,
+              "Value": 4,
+              "node_name": 0,
+              "status": 2,
+              "type": 1
+            },
+            "renameByName": {
+              "node_name": "",
+              "type": ""
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "False": {
+                  "color": "red",
+                  "index": 2
+                },
+                "True": {
+                  "color": "green",
+                  "index": 0
+                },
+                "Unknown": {
+                  "color": "orange",
+                  "index": 1
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "yellow",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "status"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "gradient",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "type"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 300
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 9,
+        "x": 15,
+        "y": 12
+      },
+      "id": 39,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 5,
+        "showHeader": true
+      },
+      "pluginVersion": "9.5.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "(capi_machine_status_condition{name=~\"${cluster}-control-plane.*\", status!=\"True\"} == 1) * on (name) group_left(node_name) capi_machine_status_noderef",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{node_name}}",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Control plane replicas with non True conditions",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true,
+              "__name__": true,
+              "cluster": true,
+              "cluster_name": true,
+              "container": true,
+              "customresource_group": true,
+              "customresource_kind": true,
+              "customresource_version": true,
+              "endpoint": true,
+              "instance": true,
+              "job": true,
+              "name": true,
+              "namespace": true,
+              "pod": true,
+              "receive": true,
+              "service": true,
+              "status": false,
+              "tenant_id": true,
+              "uid": true
+            },
+            "indexByName": {
+              "Time": 4,
               "Value": 20,
-              "__name__": 4,
               "cluster": 5,
               "cluster_name": 6,
               "container": 7,
@@ -773,8 +1410,9 @@
               "endpoint": 11,
               "instance": 12,
               "job": 13,
-              "name": 0,
+              "name": 3,
               "namespace": 14,
+              "node_name": 0,
               "pod": 15,
               "receive": 16,
               "service": 17,
@@ -788,6 +1426,338 @@
         }
       ],
       "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "orange",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "#EAB839",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 2
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Unavailable"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "auto"
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "gradient",
+                  "type": "color-background"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 0,
+        "y": 15
+      },
+      "id": 54,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "9.5.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "avg(capi_machinedeployment_status_replicas_unavailable{cluster_name=~\"$cluster\"}) without (instance, pod)",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{cluster}}",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Unavailable MachineDeployment replicas",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "cluster": true,
+              "cluster_name": true,
+              "container": true,
+              "customresource_group": true,
+              "customresource_kind": true,
+              "customresource_version": true,
+              "endpoint": true,
+              "job": true,
+              "namespace": true,
+              "receive": true,
+              "service": true,
+              "tenant_id": true,
+              "uid": true
+            },
+            "indexByName": {},
+            "renameByName": {
+              "Value": "Unavailable"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 42
+      },
+      "id": 128,
+      "panels": [],
+      "title": "Detailed graphs",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 12,
+        "x": 0,
+        "y": 43
+      },
+      "id": 89,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.5.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "avg(capi_kubeadmcontrolplane_status_replicas_unavailable{name=~\"${cluster}-control-plane\"}) without (instance, pod)",
+          "legendFormat": "{{cluster}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Unavailable control plane replicas",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 12,
+        "x": 12,
+        "y": 43
+      },
+      "id": 70,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.3.13",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "avg((capi_machine_status_condition{cluster_name=~\"$cluster\", type=\"NodeHealthy\", status!=\"True\"} == 1)  * on (name) group_left(node_name) capi_machine_status_noderef) by (cluster_name, node_name, status)",
+          "hide": false,
+          "legendFormat": "{{cluster_name}}: {{node_name}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Non healthy machines",
+      "type": "timeseries"
     },
     {
       "datasource": {
@@ -843,10 +1813,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
-        "w": 7,
+        "h": 11,
+        "w": 12,
         "x": 0,
-        "y": 13
+        "y": 54
       },
       "id": 21,
       "options": {
@@ -869,9 +1839,9 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "capi_machinedeployment_status_replicas{cluster_name=~\"$cluster\"}",
+          "expr": "avg(capi_machinedeployment_status_replicas{cluster_name=~\"$cluster\"}) without (instance, pod)",
           "hide": false,
-          "legendFormat": "{{name}}",
+          "legendFormat": "{{cluster_name}}: {{name}}",
           "range": true,
           "refId": "A"
         }
@@ -933,10 +1903,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
-        "w": 7,
-        "x": 7,
-        "y": 13
+        "h": 11,
+        "w": 12,
+        "x": 12,
+        "y": 54
       },
       "id": 23,
       "options": {
@@ -959,136 +1929,19 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "capi_machinedeployment_status_replicas_unavailable{cluster_name=~\"$cluster\"}",
+          "expr": "avg(capi_machinedeployment_status_replicas_unavailable{cluster_name=~\"$cluster\"}) without (instance, pod)",
           "hide": false,
-          "legendFormat": "{{name}}",
+          "legendFormat": "{{cluster_name}}: {{name}}",
           "range": true,
           "refId": "A"
         }
       ],
       "title": "Unavailable MachineDeployment replicas",
       "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "align": "auto",
-            "displayMode": "auto",
-            "inspect": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 10,
-        "x": 14,
-        "y": 13
-      },
-      "id": 24,
-      "options": {
-        "footer": {
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
-        "frameIndex": 5,
-        "showHeader": true
-      },
-      "pluginVersion": "9.3.13",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "exemplar": false,
-          "expr": "capi_machine_status_condition{cluster_name=~\"$cluster\", name!~\".*control-plane.*\", type=\"Ready\"} == 1",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "{{name}}",
-          "range": false,
-          "refId": "A"
-        }
-      ],
-      "title": "MachineDeployment replicas",
-      "transformations": [
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true,
-              "Value": true,
-              "__name__": true,
-              "cluster": true,
-              "cluster_name": true,
-              "container": true,
-              "customresource_group": true,
-              "customresource_kind": true,
-              "customresource_version": true,
-              "endpoint": true,
-              "instance": true,
-              "job": true,
-              "namespace": true,
-              "pod": true,
-              "receive": true,
-              "service": true,
-              "status": false,
-              "tenant_id": true,
-              "uid": true
-            },
-            "indexByName": {
-              "Time": 3,
-              "Value": 20,
-              "__name__": 4,
-              "cluster": 5,
-              "cluster_name": 6,
-              "container": 7,
-              "customresource_group": 8,
-              "customresource_kind": 9,
-              "customresource_version": 10,
-              "endpoint": 11,
-              "instance": 12,
-              "job": 13,
-              "name": 0,
-              "namespace": 14,
-              "pod": 15,
-              "receive": 16,
-              "service": 17,
-              "status": 2,
-              "tenant_id": 18,
-              "type": 1,
-              "uid": 19
-            },
-            "renameByName": {}
-          }
-        }
-      ],
-      "type": "table"
     }
   ],
-  "schemaVersion": 37,
+  "refresh": "10s",
+  "schemaVersion": 38,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -1138,7 +1991,7 @@
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
-        "sort": 0,
+        "sort": 1,
         "type": "query"
       }
     ]
@@ -1151,6 +2004,6 @@
   "timezone": "",
   "title": "Cluster api",
   "uid": "xgfBZCUVk",
-  "version": 5,
+  "version": 6,
   "weekStart": ""
 }
