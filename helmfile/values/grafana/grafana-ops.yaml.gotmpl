@@ -24,6 +24,9 @@ datasources:
   datasources.yaml:
     apiVersion: 1
     datasources:
+    {{- if .Values.user.grafana.additionalDatasources.enabled }}
+      {{ toYaml .Values.user.grafana.additionalDatasources.datasources | nindent 2 }}
+    {{- end }}
     - name: prometheus-sc
       access: proxy
       basicAuth: false

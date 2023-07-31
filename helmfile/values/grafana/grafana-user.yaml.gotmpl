@@ -29,12 +29,23 @@ datasources:
     - name: prometheus-sc
       orgId: 1
     datasources:
+    {{- if .Values.user.grafana.additionalDatasources.enabled }}
+      {{ toYaml .Values.user.grafana.additionalDatasources.datasources | nindent 4 }}
+    {{- end }}
     {{- if and .Values.thanos.enabled .Values.thanos.query.enabled }}
+    - name: "Thanos All"
+      access: proxy
+      basicAuth: false
+      editable: false
+      isDefault: true
+      orgId: 1
+      type: prometheus
+      url: http://thanos-query-query-frontend.thanos:9090
+      version: 1
     - name: "Service Cluster"
       access: proxy
       basicAuth: false
       editable: false
-      isDefault: false
       orgId: 1
       type: prometheus
       url: http://grafana-label-enforcer:9090
@@ -51,7 +62,6 @@ datasources:
       access: proxy
       basicAuth: false
       editable: false
-      isDefault: true
       orgId: 1
       type: prometheus
       url: http://grafana-label-enforcer:9090
@@ -65,7 +75,6 @@ datasources:
       access: proxy
       basicAuth: false
       editable: false
-      isDefault: false
       orgId: 1
       type: prometheus
       url: http://grafana-label-enforcer:9090
@@ -79,6 +88,8 @@ datasources:
 
 
 grafana.ini:
+  dataproxy:
+    timeout: 600
   server:
     root_url: https://{{ .Values.grafana.user.subdomain }}.{{ .Values.global.baseDomain }}
   # Enable user lookup based on email in addition to using unique ID provided by IdPs.

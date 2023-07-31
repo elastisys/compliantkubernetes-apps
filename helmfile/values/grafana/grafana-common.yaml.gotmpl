@@ -28,3 +28,10 @@ grafana.ini:
   analytics:
     reporting_enabled: false
     check_for_updates: false
+
+envFromSecret: {{ .Values.user.grafana.additionalDatasources.secret }}
+
+plugins:
+  {{- if .Values.user.grafana.additionalDatasources.enabled }}
+    {{ toYaml .Values.user.grafana.additionalDatasources.plugins | nindent 2 }}
+  {{- end }}
