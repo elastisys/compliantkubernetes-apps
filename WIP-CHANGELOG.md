@@ -6,6 +6,8 @@
   - It is now possible to specify type (S3/Swift) per bucket.
 - Support for nftables backend in calico-accountant via config option `calicoAccountant.backend: nftables`
 - Added basic alerts for Cluster-API
+- Added support to turn off trailing dots for grafana.
+- Added gatekeeper mutation to enable changing ndots for any specified pod/podgroup or clusterwide.
 
 ### Changed
 

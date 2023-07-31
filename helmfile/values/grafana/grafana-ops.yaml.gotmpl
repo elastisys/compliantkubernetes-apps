@@ -77,6 +77,11 @@ datasources:
     {{- end }}
     {{- end }}
 
+{{ $trailingDot := "" }}
+{{- if .Values.grafana.ops.trailingDots }}
+{{ $trailingDot = "." }}
+{{- end }}
+
 grafana.ini:
   server:
     root_url: https://{{ .Values.grafana.ops.subdomain }}.{{ .Values.global.opsDomain }}
@@ -90,9 +95,9 @@ grafana.ini:
     client_id: grafana-ops
     client_secret: {{ .Values.grafana.opsClientSecret }}
     scopes: {{ .Values.grafana.ops.oidc.scopes }}
-    auth_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}./auth
-    token_url: http://dex.dex.svc.cluster.local.:5556/token
-    api_url: http://dex.dex.svc.cluster.local.:5556/api
+    auth_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}{{ $trailingDot }}/auth
+    token_url: http://dex.dex.svc.cluster.local{{ $trailingDot }}:5556/token
+    api_url: http://dex.dex.svc.cluster.local{{ $trailingDot }}:5556/api
     allowed_domains: {{ join " " .Values.grafana.ops.oidc.allowedDomains }}
     allow_sign_up: true
     tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}

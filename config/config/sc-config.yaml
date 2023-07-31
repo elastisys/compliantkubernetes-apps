@@ -108,6 +108,7 @@ grafana:
       allowedDomains:
         - set-me
     viewersCanEdit: true
+    trailingDots: true
     sidecar:
       resources:
         requests:
@@ -139,6 +140,7 @@ grafana:
         - set-me
         - example.com
     viewersCanEdit: true
+    trailingDots: true
     sidecar:
       resources:
         requests:

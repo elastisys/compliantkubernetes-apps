@@ -1,3 +1,11 @@
 jobTTL:
   enabled: {{ .Values.opa.mutations.jobTTL.enabled }}
   ttlSeconds: {{ .Values.opa.mutations.jobTTL.ttlSeconds }}
+
+ndots:
+  enabled: {{ .Values.opa.mutations.ndots.enabled }}
+  ndotAmount: {{ .Values.opa.mutations.ndots.ndotAmount }}
+  labelSelector:
+    matchLabels: {{ range $key, $val := .Values.opa.mutations.ndots.labelSelector.matchLabels }}
+      {{ $key }}: {{ $val }}
+      {{- end }}
