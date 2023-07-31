@@ -1,0 +1,42 @@
+{{- define "ndots-mutation" }}
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  {{- if .mutationLabelValue }}
+  name: ndot-amount-dns-policy-{{ .mutationLabelValue }}
+  {{- else }}
+  name: ndot-amount-dns-policy
+  {{- end }}
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: ["*"]
+        kinds: ["Pod"]
+    {{- if .mutationLabelValue }}
+    labelSelector:
+      matchLabels:
+        {{ .mutationLabelKey }}: {{ .mutationLabelValue }}
+    {{- end }}
+  location: "spec.dnsConfig"
+  parameters:
+    assign:
+      value:
+        options:
+        - name: ndots
+          value: "{{ .Values.ndots.ndotAmount }}"
+{{- end }}
+{{- if $.Values.ndots.enabled }}
+{{- if gt (len ($.Values.ndots | dig "labelSelector" "matchLabels" dict)) 0 }}
+{{- range $key, $val := .Values.ndots.labelSelector.matchLabels }}
+{{- include "ndots-mutation" (mustMergeOverwrite (dict "mutationLabelKey" $key "mutationLabelValue" $val) $) }}
+{{- end }}
+{{- else }}
+{{- include "ndots-mutation" $ }}
+{{- end }}
+{{- end }}
