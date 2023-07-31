@@ -265,6 +265,9 @@ policies:
               component: core
             ports:
               - tcp: 4443
+        - rule: ingress-rule-ingress
+          ports:
+            - tcp: 4443
       egress:
         - rule: egress-rule-dns
         - rule: egress-rule-harbor-database
