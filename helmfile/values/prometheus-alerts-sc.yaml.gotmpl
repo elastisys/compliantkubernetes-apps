@@ -33,6 +33,7 @@ defaultRules:
     backupStatus: true
     dailyChecks: true
     networkpolicies: {{ .Values.networkPolicies.enableAlerting }}
+    clusterApi: {{ .Values.global.clusterApi }}
 
   {{- if and .Values.thanos.enabled .Values.thanos.ruler.enabled }}
   thanos:

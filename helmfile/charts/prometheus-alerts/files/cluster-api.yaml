@@ -1,0 +1,152 @@
+- name: cluster-api-cluster
+  rules:
+    - alert: ClusterApiClusterIsPaused
+      annotations:
+        description: |
+          The cluster `{{ $labels.name }}` has been paused for 15 minutes
+        summary: |
+          The cluster `{{ $labels.name }}` has been paused for 15 minutes
+      labels:
+        rulesgroup: cluster-api
+        severity: warning
+      expr: |
+        sum(capi_cluster_spec_paused) by (name) != 0
+      for: 15m
+    - alert: ClusterApiClusterControlPlaneNotInitialized
+      annotations:
+        description: |
+          The cluster `{{ $labels.name }}` has an uninitialized control plane
+        summary: |
+          The cluster `{{ $labels.name }}` has an uninitialized control plane
+      labels:
+        rulesgroup: cluster-api
+        severity: warning
+      expr: |
+        sum(capi_cluster_status_condition{type="ControlPlaneInitialized", status="True"}) by (name) != 1
+      for: 15m
+    - alert: ClusterApiClusterNotReady
+      annotations:
+        description: |
+          The cluster `{{ $labels.name }}` is not ready
+        summary: |
+          The cluster `{{ $labels.name }}` is not ready
+      labels:
+        rulesgroup: cluster-api
+        severity: high
+      expr: |
+        sum(capi_cluster_status_condition{type="ControlPlaneReady", status="True"}) by (name) != 1
+      for: 5m
+    - alert: ClusterApiClusterInfrastructureNotReady
+      annotations:
+        description: |
+          The cluster `{{ $labels.name }}` infrastructur is not ready
+        summary: |
+          The cluster `{{ $labels.name }}` infrastructur is not ready
+      labels:
+        rulesgroup: cluster-api
+        severity: high
+      expr: |
+        sum(capi_cluster_status_condition{type="InfrastructureReady", status="True"}) by (name) != 1
+      for: 15m
+    - alert: ClusterApiClusterNotProvisionedState
+      annotations:
+        description: |
+          The cluster `{{ $labels.name }}` is not in a Provisioned state for more than 15 minutes, this can happen if the cluster is currently provisioning new nodes or replacing nodes.
+        summary: |
+          The cluster `{{ $labels.name }}` is not in a Provisioned state for more than 15 minutes
+      labels:
+        rulesgroup: cluster-api
+        severity: warning
+      expr: |
+        capi_cluster_status_phase{phase!="Provisioned"} == 1
+      for: 15m
+    - alert: ClusterApiClusterNotProvisionedState
+      annotations:
+        description: |
+          The cluster `{{ $labels.name }}` is not in a Provisioned state for more than 1 hour, this can happen if the cluster is currently provisioning new nodes or replacing nodes.
+        summary: |
+          The cluster `{{ $labels.name }}` is not in a Provisioned state for more than 1 hour
+      labels:
+        rulesgroup: cluster-api
+        severity: high
+      expr: |
+        capi_cluster_status_phase{phase!="Provisioned"} == 1
+      for: 60m
+- name: cluster-api-kubeadm-control-plane
+  rules:
+    - alert: ClusterApiKubeadmControlPlaneNotFullyReady
+      annotations:
+        description: |
+          The cluster `{{ $labels.cluster_name }}` has a control plane `{{ $labels.name }}` that has some not ready nodes.
+        summary: |
+          The cluster `{{ $labels.cluster_name }}` has a control plane `{{ $labels.name }}` that has some not ready nodes.
+      labels:
+        rulesgroup: cluster-api
+        severity: warning
+      expr: |
+        sum(capi_kubeadmcontrolplane_status_replicas_ready / capi_kubeadmcontrolplane_status_replicas) by (cluster_name, name) != 1
+      for: 10m
+    - alert: ClusterApiKubeadmControlPlaneCloseToMajorityNotReady
+      annotations:
+        description: |
+          The cluster `{{ $labels.cluster_name }}` has a control plane `{{ $labels.name }}` with one node from having majority of its nodes not ready.
+        summary: |
+          The cluster `{{ $labels.cluster_name }}` has a control plane `{{ $labels.name }}` with one node from having majority of its nodes not ready.
+      labels:
+        rulesgroup: cluster-api
+        severity: warning
+      expr: |
+        sum(capi_kubeadmcontrolplane_status_replicas_ready / capi_kubeadmcontrolplane_status_replicas) by (cluster_name, name) < 0.5
+      for: 10m
+    - alert: ClusterApiKubeadmControlPlaneMajorityNotReady
+      annotations:
+        description: |
+          The cluster `{{ $labels.cluster_name }}` has a control plane `{{ $labels.name }}` that have majority of its nodes not ready.
+        summary: |
+          The cluster `{{ $labels.cluster_name }}` has a control plane `{{ $labels.name }}` that have majority of its nodes not ready.
+      labels:
+        rulesgroup: cluster-api
+        severity: high
+      expr: |
+        sum(capi_kubeadmcontrolplane_status_replicas_ready / capi_kubeadmcontrolplane_status_replicas) by (cluster_name, name) < 0.5
+      for: 2m
+- name: cluster-api-machine-deployment
+  rules:
+    - alert: ClusterApiMachineDeploymentNotFullyReady
+      annotations:
+        description: |
+          The cluster `{{ $labels.cluster_name }}` has a machine deployment `{{ $labels.name }}` that has some not ready nodes.
+        summary: |
+          The cluster `{{ $labels.cluster_name }}` has a machine deployment `{{ $labels.name }}` that has some not ready nodes.
+      labels:
+        rulesgroup: cluster-api
+        severity: warning
+      expr: |
+        sum(capi_machinedeployment_status_replicas_ready / capi_machinedeployment_status_replicas) by (cluster_name, name) != 1
+      for: 15m
+    - alert: ClusterApiMachineDeploymentMajorityNotReady
+      annotations:
+        description: |
+          The cluster `{{ $labels.cluster_name }}` has a machine deployment `{{ $labels.name }}` that have majority of its nodes not ready.
+        summary: |
+          The cluster `{{ $labels.cluster_name }}` has a machine deployment `{{ $labels.name }}` that have majority of its nodes not ready.
+      labels:
+        rulesgroup: cluster-api
+        severity: high
+      expr: |
+        sum(capi_machinedeployment_status_replicas_ready / capi_machinedeployment_status_replicas) by (cluster_name, name) < 0.5
+      for: 2m
+- name: cluster-api-machine
+  rules:
+    - alert: ClusterApiMachineConditionNotTrue
+      annotations:
+        description: |
+          The cluster `{{ $labels.cluster_name }}` has a machine `{{ $labels.node_name }}` that has the condition `{{ $labels.type }}` set to `{{ $labels.status }}`
+        summary: |
+          The cluster `{{ $labels.cluster_name }}` has a machine `{{ $labels.node_name }}` that has the condition `{{ $labels.type }}` set to `{{ $labels.status }}`
+      labels:
+        rulesgroup: cluster-api
+        severity: warning
+      expr: |
+        sum((capi_machine_status_condition{status!="True"}) * on (name) group_left(node_name) sum(capi_machine_status_noderef) by (name, node_name)) by (cluster_name, node_name, type, status) > 0
+      for: 15m
