@@ -69,6 +69,11 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     ./bin/ck8s upgrade v0.32 prepare
+
+    # check if the netpol IPs need to be updated
+    ./bin/ck8s update-ips both dry-run
+    # if you agree with the changes apply
+    ./bin/ck8s update-ips both update
     ```
 
 1. Apply upgrade - *disruptive*
@@ -106,6 +111,11 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s init
     # or
     ./migration/v0.32/prepare/50-init.sh
+
+    # check if the netpol IPs need to be updated
+    ./bin/ck8s update-ips both dry-run
+    # if you agree with the changes apply
+    ./bin/ck8s update-ips both update
     ```
 
 > **Note**: Calico Accountant now supports nftables as a backend for network policy rules which is used by default in Ubuntu 22.04 and newer.
