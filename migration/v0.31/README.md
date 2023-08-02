@@ -69,6 +69,11 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     ./bin/ck8s upgrade v0.31 prepare
+
+    # check if the netpol IPs need to be updated
+    ./bin/ck8s update-ips both dry-run
+    # if you agree with the changes apply
+    ./bin/ck8s update-ips both update
     ```
 
 1. Apply upgrade - *disruptive*
@@ -148,6 +153,11 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s helmfile sc -l app=opensearch-configurer destroy
     # or
     ./migration/v0.31/apply/11-remove-opensearch-configurer.sh execute
+
+    # check if the netpol IPs need to be updated
+    ./bin/ck8s update-ips both dry-run
+    # if you agree with the changes apply
+    ./bin/ck8s update-ips both update
     ```
 
 1. Update HNC namespace labels:
