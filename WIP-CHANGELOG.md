@@ -26,6 +26,7 @@
 - Fixed the sops_validate_config function in `bin/common.bash` to better handle invalid pgp keys.
 - `scripts/migration/lib.sh` check_version function now asks if you want to use the specified nonstandard ck8sVersion.
 - Network policy for harbor notary server
+- Added some default annotations for harbor that will fix issues with not being able to upload larger images
 
 ### Updated
 

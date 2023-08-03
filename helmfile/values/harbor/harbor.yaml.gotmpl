@@ -14,9 +14,15 @@ expose:
   ingress:
     annotations:
       cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
-      {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.harbor }}
+      {{- if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.harbor }}
       nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.harbor }}
-      {{ end }}
+      {{- end }}
+      {{- range $key, $value := .Values.harbor.ingress.defaultAnnotations }}
+      {{ $key }}: {{ $value | quote }}
+      {{- end }}
+      {{- range $key, $value := .Values.harbor.ingress.additionalAnnotations }}
+      {{ $key }}: {{ $value | quote }}
+      {{- end }}
     hosts:
       core: {{ .Values.harbor.subdomain }}.{{ .Values.global.baseDomain }}
       notary: {{ .Values.harbor.notary.subdomain }}.{{ .Values.global.baseDomain }}

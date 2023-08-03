@@ -154,6 +154,11 @@ harbor:
   # The tolerations, affinity, and nodeSelector are applied to all harbor pods.
   tolerations: []
   nodeSelector: {}
+  ingress:
+    defaultAnnotations:
+      nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+      nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    additionalAnnotations: {}
   core:
     replicas: 1
     resources:
