@@ -26,6 +26,13 @@ In case you get lost, don't forget to check out the [public docs](https://elasti
 
 - Apps: **{{ .Values.dashboard.ck8sVersion }}** - [Release Notes](https://elastisys.io/compliantkubernetes/release-notes/)
 
+{{ $baseDomain := .Values.baseDomain }}
+{{ range .Values.dashboard.extraVersions }}
+
+- {{ if .url }}[{{ .name }}]({{ .url }}){{ else if .subdomain }}[{{ .name }}](https://{{ .subdomain }}.{{ $baseDomain }}/){{ else }}{{ .name }}{{ end }}{{ if .version }}: **{{ .version }}**{{ end }}{{ if .releasenotes }} - [Release Notes]({{ .releasenotes }}){{ end }}
+
+{{ end }}
+
 ## Web Portals
 
 - [grafana.{{ .Values.baseDomain }}](https://grafana.{{ .Values.baseDomain }})

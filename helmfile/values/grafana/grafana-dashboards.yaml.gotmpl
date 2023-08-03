@@ -9,6 +9,10 @@
 dashboard:
   ck8sVersion: {{ .Values.global.ck8sVersion }}
   extraTextGrafana: {{ .Values.welcomingDashboard.extraTextGrafana }}
+{{ if .Values.welcomingDashboard.extraVersions }}
+  extraVersions:
+{{- toYaml .Values.welcomingDashboard.extraVersions | nindent 2 }}
+{{ end }}
 
 baseDomain: {{ .Values.global.baseDomain }}
 

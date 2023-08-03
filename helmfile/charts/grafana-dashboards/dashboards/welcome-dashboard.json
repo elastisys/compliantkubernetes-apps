@@ -1,65 +1,65 @@
 {
-    "annotations": {
-      "list": [
-        {
-          "builtIn": 1,
-          "datasource": "-- Grafana --",
-          "enable": true,
-          "hide": true,
-          "iconColor": "rgba(0, 211, 255, 1)",
-          "name": "Annotations & Alerts",
-          "target": {
-            "limit": 100,
-            "matchAny": false,
-            "tags": [],
-            "type": "dashboard"
-          },
-          "type": "dashboard"
-        }
-      ]
-    },
-    "description": "Welcoming Dashboard",
-    "editable": true,
-    "fiscalYearStartMonth": 0,
-    "graphTooltip": 0,
-    "id": 46,
-    "links": [],
-    "liveNow": false,
-    "panels": [
+  "annotations": {
+    "list": [
       {
-        "description": "Home dashboard",
-        "gridPos": {
-          "h": 25,
-          "w": 24,
-          "x": 0,
-          "y": 0
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
         },
-        "id": 2,
-        "options": {
-          "content": "<<markdownstring>>",
-          "mode": "markdown"
-        },
-        "pluginVersion": "8.4.7",
-        "title": "Welcome",
-        "type": "text"
+        "type": "dashboard"
       }
-    ],
-    "schemaVersion": 35,
-    "style": "dark",
-    "tags": [],
-    "templating": {
-      "list": []
-    },
-    "time": {
-      "from": "now-6h",
-      "to": "now"
-    },
-    "timepicker": {
-      "hidden": true
-    },
-    "timezone": "",
-    "title": "Welcome to Compliant Kubernetes",
-    "uid": "xI0OiXQnk",
-    "version": 3,
-    "weekStart": ""
-  }
+    ]
+  },
+  "description": "Welcoming Dashboard",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 46,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "description": "Home dashboard",
+      "gridPos": {
+        "h": 32,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "content": "<<markdownstring>>",
+        "mode": "markdown"
+      },
+      "pluginVersion": "8.4.7",
+      "title": "Welcome",
+      "type": "text"
+    }
+  ],
+  "schemaVersion": 35,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {
+    "hidden": true
+  },
+  "timezone": "",
+  "title": "Welcome to Compliant Kubernetes",
+  "uid": "xI0OiXQnk",
+  "version": 3,
+  "weekStart": ""
+}

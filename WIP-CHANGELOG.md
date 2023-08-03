@@ -2,6 +2,8 @@
 
 ### Added
 
+- Extra component versions can be added in the Welcome dashboard via config
+
 ### Changed
 
 - Moved `rclone-sync` from `kube-system` to its own namespace.
