@@ -14,6 +14,14 @@ labelKey: grafana_dashboard
 dashboard:
   ck8sVersion: ""
   extraTextGrafana: ""
+  extraVersions: []
+  # - name: The Example Software
+  #   version: "1.7.3"
+  #   url: https://the-software.example/
+  #   # OR
+  #   subdomain: subdomain
+  #   # becomes https://subdomain.{{ baseDomain }}/
+  #   releasenotes: https://https://elastisys.io/compliantkubernetes/release-notes/#example
 
 baseDomain: ""
 

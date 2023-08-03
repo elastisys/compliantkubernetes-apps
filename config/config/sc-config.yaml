@@ -1141,6 +1141,17 @@ welcomingDashboard:
   extraTextGrafana: ""
   # For newline in Opensearch dashboard use format "\\\\n"
   extraTextOpensearch: ""
+  extraVersions: []
+  #- name: Stuffs
+  #  version: v0.30.4
+  #  releasenotes: https://elastisys.io/compliantkubernetes/release-notes/
+  #- name: Dex
+  #  version: "v2.37"
+  #  subdomain: dex
+  #- name: Postgres
+  #  version: "11"
+  #  url: https://www.postgresql.org/
+  #  releasenotes: https://elastisys.io/compliantkubernetes/release-notes/#postgres
 
 # Network policies for service cluster
 networkPolicies:
