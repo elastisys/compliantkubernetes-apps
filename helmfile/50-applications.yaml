@@ -616,7 +616,7 @@ releases:
   - values/fluentd/log-manager.yaml.gotmpl
 
 - name: rclone-sync
-  namespace: kube-system
+  namespace: rclone
   labels:
     app: rclone-sync
   chart: ./charts/rclone-sync

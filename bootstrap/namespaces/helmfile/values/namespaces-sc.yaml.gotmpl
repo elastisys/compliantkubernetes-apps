@@ -66,5 +66,12 @@ namespaces:
     pod-security.kubernetes.io/audit: restricted
     pod-security.kubernetes.io/enforce: restricted
     pod-security.kubernetes.io/warn: restricted
+{{ if .Values.objectStorage.sync.enabled }}
+- name: rclone
+  labels:
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
+{{ end }}
 commonLabels:
   owner: operator
