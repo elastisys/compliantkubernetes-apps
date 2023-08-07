@@ -22,6 +22,7 @@
 - Reduced CPU requests for some components in the service cluster.
 - Reduced the information on the dashboard for Cluster-API at a glance, but added some hidden more detailed graphs
 - Scrape interval for fluentd-forwarder is increased from 10s to 30s
+- Limited the Opensearch alerts only to the opensearch-system namespace
 
 ### Fixed
 
