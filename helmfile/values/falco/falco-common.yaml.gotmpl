@@ -12,12 +12,26 @@ falco:
   grpc_output:
     enabled: true
 
+{{- if eq .Values.falco.driver.kind "module" }}
 containerSecurityContext:
-  runAsUser: 0
   privileged: true
   allowPrivilegeEscalation: true
+{{- end }}
+
+podSecurityContext:
+  runAsUser: 0
 
 driver:
+  kind: {{ .Values.falco.driver.kind }}
+  {{- if eq .Values.falco.driver.kind "ebpf" }}
+  ebpf:
+    path: {{ .Values.falco.driver.ebpf.path }}
+    hostNetwork: {{ .Values.falco.driver.ebpf.hostNetwork }}
+    leastPrivileged: true
+  {{- else if eq .Values.falco.driver.kind "modern-bpf" }}
+  modern_bpf:
+    leastPrivileged: true
+  {{- end }}
   loader:
     initContainer:
       securityContext:
@@ -29,6 +43,13 @@ resources: {{- toYaml .Values.falco.resources | nindent 2  }}
 nodeSelector: {{- toYaml .Values.falco.nodeSelector | nindent 2  }}
 affinity: {{- toYaml .Values.falco.affinity | nindent 2  }}
 tolerations: {{- toYaml .Values.falco.tolerations | nindent 2  }}
+
+falcoctl:
+  artifact:
+    install:
+      enabled: false
+    follow:
+      enabled: false
 
 customRules:
   {{- if .Values.falco.customRules }}
