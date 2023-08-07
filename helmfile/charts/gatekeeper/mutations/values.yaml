@@ -1,3 +1,10 @@
 jobTTL:
   enabled: true
   ttlSeconds: 604800
+
+ndots:
+  enabled: true
+  ndotAmount: 3
+  labelSelector:
+    matchLabels:
+      # labelkey: labelvalue

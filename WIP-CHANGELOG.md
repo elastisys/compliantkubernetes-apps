@@ -6,6 +6,8 @@
   - It is now possible to specify type (S3/Swift) per bucket.
 - Support for nftables backend in calico-accountant via config option `calicoAccountant.backend: nftables`
 - Added basic alerts for Cluster-API
+- Added support to turn off trailing dots for grafana.
+- Added gatekeeper mutation to enable changing ndots for any specified pod/podgroup or clusterwide.
 - Added templating to configure Falco with different syscall sources (default is still `module`)
 
 ### Changed
@@ -20,6 +22,8 @@
 - Memory limit for Thanos distributor increased to 700Mi
 - Reduced CPU requests for some components in the service cluster.
 - Reduced the information on the dashboard for Cluster-API at a glance, but added some hidden more detailed graphs
+- Scrape interval for fluentd-forwarder is increased from 10s to 30s
+- Limited the Opensearch alerts only to the opensearch-system namespace
 
 ### Fixed
 

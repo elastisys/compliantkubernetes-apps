@@ -694,6 +694,14 @@ opa:
       enabled: true
       ttlSeconds: 604800
 
+    ndots:
+      enabled: false
+      ndotAmount: 3
+      labelSelector:
+        # None for clusterwide effect or one for each pod or podgroup to be effected by this mutation.
+        matchLabels:
+          # labelkey: labelvalue
+
   controllerManager:
     resources:
       requests:
