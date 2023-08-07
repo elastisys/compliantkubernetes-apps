@@ -4,6 +4,8 @@
 
 ### Changed
 
+- Moved `rclone-sync` from `kube-system` to its own namespace.
+
 ### Fixed
 
 ### Updated
