@@ -125,6 +125,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
 > *Done during maintenance window.*
 
+1. Delete the jobs with no TTL set
+
+    ```bash
+    ./migration/v0.31/apply/12-remove-no-ttl-jobs.sh execute
+    ```
+
 1. Rerun bootstrap:
 
     ```bash
