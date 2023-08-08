@@ -103,6 +103,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.32/prepare/10-thanos-distrib-memory-limit.sh
     ```
 
+1. Update rclone sync networkPolicy name:
+
+    ```bash
+    ./migration/v0.32/prepare/30-rclone-sync-name-change.sh
+    ```
+
 1. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.
