@@ -33,7 +33,7 @@ diffIPs() {
     IPS=("$@")
     tmp_file=$(mktemp --suffix=.yaml)
 
-    yq4 -n '. = []' > "${tmp_file}"
+    yq4 -n '. = []' >"${tmp_file}"
     for ip in "${IPS[@]}"; do
         yq4 -i '. |= . + ["'"${ip}"'/32"]' "${tmp_file}"
     done
@@ -45,63 +45,11 @@ diffIPs() {
     fi
     diff -U3 --color=always \
         --label "${file//${CK8S_CONFIG_PATH}\//}" <(yq4 -P "${yaml_path}"' // [] | sort_by(.)' "${file}") \
-        --label expected <(yq4 -P '. | sort_by(.)' "${tmp_file}") > "${out_file}"
+        --label expected <(yq4 -P '. | sort_by(.)' "${tmp_file}") >"${out_file}"
     DIFF_RETURN=$?
     rm "${tmp_file}"
+
     return ${DIFF_RETURN}
-}
-
-# Get all non /32 IPs in given field and config file
-getConfigIPS() {
-    local source_field="$1"
-    local config_file="$2"
-
-    local configIPS=()
-
-    for ip in $(yq4 e "$source_field | .[]" "$config_file"); do
-        if [[ $ip != */32 ]]; then
-            configIPS+=("${ip}")
-        fi
-    done
-
-    echo "${configIPS[@]}"
-}
-
-# Insert processes IPs
-updateConfigFile() {
-    local source_field="$1"
-    local config_file="$2"
-    local ip="$3"
-
-    if [[ $ip =~ "/" ]]; then
-        yq4 -i "${source_field}"' |= . + ["'"${ip}"'"]' "${config_file}"
-    else
-        yq4 -i "${source_field}"' |= . + ["'"${ip}"'/32"]' "${config_file}"
-    fi
-}
-
-# Check if IPs fits into subnets
-performIPCheckAndRemoveFromIPSList() {
-    local IPToCheck="$1"
-    local networkToCompareTo="$2"
-
-    # Try to see if ip belongs to subnet - if not, exit(1)
-    if python3 -c "import ipaddress; exit(0) if ipaddress.ip_address('${IPToCheck}') in ipaddress.ip_network('${networkToCompareTo}') else exit(1)"; then
-            # Filter out the matching string for IPS.
-            filtered_array=()
-            for ip in "${IPS[@]}"; do
-                if [[ "$ip" != "$IPToCheck" ]]; then
-                    filtered_array+=("$ip")
-                fi
-            done
-
-            IPS=("${filtered_array[@]}")
-
-        # Add working networkToCompareTo to the list of working subnets
-        if [[ " ${working_subnet[*]} " != *" $networkToCompareTo "* ]]; then
-            working_subnet+=("$networkToCompareTo")
-        fi
-    fi
 }
 
 # Fetches the IPs from a specified address
@@ -118,22 +66,41 @@ getDNSIPs() {
 
 # Usage: diffDNSIPs <dns_record> <yaml_path> <file>
 diffDNSIPs() {
-    local IPS
-    read -r -a IPS <<< "$(getDNSIPs "${1}")"
-    diffIPs "${2}" "${3}" "${IPS[@]}"
+    diffIPs "${2}" "${3}" "${@:4}"
     return $?
 }
 
 # Updates the list from the file and yaml path specified with IPs fetched from the domain
 # Usage: updateDNSIPs <dns_record> <yaml_path> <file>
 updateDNSIPs() {
-    endpoint="${1}"
-    configKey="${2}"
-    configFile="$3"
+    local yaml_path="${2}"
+    local file="${3}"
 
-    read -r -a IPS <<<"$(getDNSIPs "${endpoint}")"
+    yq4 -i "${yaml_path}"' = []' "${file}"
 
-    processIPRanges "$configKey" "$configFile"
+    IFS=' ' read -ra ip_array <<<"${@:4}"
+
+    for ip in "${ip_array[@]}"; do
+        yq4 -i "${yaml_path}"' |= . + ["'"${ip}"'"]' "${file}"
+    done
+}
+
+# Usage: updateIPs <yaml_path> <file> <IP 1> <IP ..>
+updateIPs() {
+    local yaml_path="${1}"
+    local file="${2}"
+    shift 2
+    local IPS=("$@")
+
+    yq4 -i "${yaml_path}"' = []' "${file}"
+
+
+
+    IFS=' ' read -ra ip_array <<<"${@:2}"
+
+    for ip in "${ip_array[@]}"; do
+        yq4 -i "${yaml_path}"' |= . + ["'"${ip}"'"]' "${file}"
+    done
 }
 
 # Usage: updateIPs <yaml_path> <file> <IP 1> <IP ..>
@@ -162,7 +129,7 @@ getKubectlIPs() {
     mapfile -t IPS_internal < <("${here}/ops.bash" kubectl "${1}" get node "${label_argument}" -ojsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')
     mapfile -t IPS_calico < <("${here}/ops.bash" kubectl "${1}" get node "${label_argument}" -ojsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4IPIPTunnelAddr}')
     mapfile -t IPS_wireguard < <("${here}/ops.bash" kubectl "${1}" get node "${label_argument}" -ojsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4WireguardInterfaceAddr}')
-    read -r -a IPS <<< "${IPS_internal[*]} ${IPS_calico[*]} ${IPS_wireguard[*]}"
+    read -r -a IPS <<<"${IPS_internal[*]} ${IPS_calico[*]} ${IPS_wireguard[*]}"
     if [ ${#IPS[@]} -eq 0 ]; then
         log_error "No ips for ${1} nodes with labels ${2} was found"
         exit 1
@@ -171,27 +138,96 @@ getKubectlIPs() {
 }
 
 diffKubectlIPs() {
-    local IPS
-    read -r -a IPS <<< "$(getKubectlIPs "${1}" "${2}")"
-    diffIPs "${3}" "${4}" "${IPS[@]}"
+    #local IPS
+    #read -r -a IPS <<< "$(getKubectlIPs "${1}" "${2}")"
+    diffIPs "${3}" "${4}" "${@:5}"
     return $?
 }
 
 # Updates the list from the file and yaml path specified with IPs fetched from the nodes
 updateKubectlIPs() {
-    cloud="${1}"
-    label="${2}"
-    configKey="${3}"
-    configFile="${4}"
+    yq4 -i "${3}"' = []' "${4}"
+    IFS=' ' read -ra ip_array <<<"${@:5}"
 
-    local IPS
-    read -r -a IPS <<<"$(getKubectlIPs "$cloud" "$label")"
-
-    processIPRanges "$configKey" "$configFile"
+    for ip in "${ip_array[@]}"; do
+        yq4 -i "${3}"' |= . + ["'"${ip}"'"]' "${4}"
+    done
 }
 
-# Process ip ranges with subnet masks in consideration.
-processIPRanges(){
+# Usage: checkIfDiffAndUpdateDNSIPs <dns_record> <yaml_path> <file>
+checkIfDiffAndUpdateDNSIPs() {
+    local IPS
+    read -r -a IPS <<<"$(getDNSIPs "${1}")"
+
+    processedIPRANGE=$(processIPRanges "$2" "$3")
+
+    if ! diffDNSIPs "${1}" "${2}" "${3}" "$processedIPRANGE"; then
+        if ! $DRY_RUN; then
+            updateDNSIPs "${1}" "${2}" "${3}" "$processedIPRANGE"
+        else
+            log_warning "Diff found for ${2} in ${3//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
+        fi
+        has_diff=$((has_diff + 1))
+    fi
+}
+
+checkIfDiffAndUpdateKubectlIPs() {
+    local IPS
+    read -r -a IPS <<<"$(getKubectlIPs "${1}" "${2}")"
+
+    processedIPRANGE=$(processIPRanges "$3" "$4")
+
+    if ! diffKubectlIPs "${1}" "${2}" "${3}" "${4}" "$processedIPRANGE"; then
+        if ! $DRY_RUN; then
+            updateKubectlIPs "${1}" "${2}" "${3}" "${4}" "$processedIPRANGE"
+        else
+            log_warning "Diff found for ${3} in ${4//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
+        fi
+        has_diff=$((has_diff + 1))
+    fi
+}
+
+# Get all non /32 IPs in given field and config file
+getConfigIPS() {
+    local source_field="$1"
+    local config_file="$2"
+
+    local configIPS=()
+
+    for ip in $(yq4 e "$source_field | .[]" "$config_file"); do
+        if [[ $ip != */32 ]]; then
+            configIPS+=("${ip}")
+        fi
+    done
+
+    echo "${configIPS[@]}"
+}
+
+# Check if IPs fits into subnets
+performIPCheckAndRemoveFromIPSList() {
+    local IPToCheck="$1"
+    local networkToCompareTo="$2"
+
+    # Try to see if ip belongs to subnet - if not, exit(1)
+    if python3 -c "import ipaddress; exit(0) if ipaddress.ip_address('${IPToCheck}') in ipaddress.ip_network('${networkToCompareTo}') else exit(1)"; then
+        # Filter out the matching string for IPS.
+        filtered_array=()
+        for ip in "${IPS[@]}"; do
+            if [[ "$ip" != "$IPToCheck" ]]; then
+                filtered_array+=("$ip")
+            fi
+        done
+
+        IPS=("${filtered_array[@]}")
+
+        # Add working networkToCompareTo to the list of working subnets
+        if [[ " ${working_subnet[*]} " != *" $networkToCompareTo "* ]]; then
+            working_subnet+=("$networkToCompareTo")
+        fi
+    fi
+}
+
+processIPRanges() {
     local configKey="$1"
     local configFile="$2"
 
@@ -217,37 +253,26 @@ processIPRanges(){
         # Add the working subnet-addresses and working IPs together.
         working_subnet+=("${IPS[@]}")
 
+        ready_IPS=()
+
         for ip in "${working_subnet[@]}"; do
-            updateConfigFile "$configKey" "$configFile" "$ip"
+
+            if [[ $ip =~ "/" ]]; then
+                ready_IPS+=("$ip")
+            else
+                ready_IPS+=("$ip"/32)
+            fi
         done
+
+        echo "${ready_IPS[@]}"
     else
-        yq4 -i "${configKey}"' = []' "${configFile}"
+
+        ready_IPS=()
+
         for ip in "${IPS[@]}"; do
-            updateConfigFile "$configKey" "$configFile" "$ip/32"
+            ready_IPS+=("$ip/32")
         done
-    fi
-}
-
-# Usage: checkIfDiffAndUpdateDNSIPs <dns_record> <yaml_path> <file>
-checkIfDiffAndUpdateDNSIPs() {
-    if ! diffDNSIPs "${1}" "${2}" "${3}"; then
-        if ! $DRY_RUN; then
-            updateDNSIPs "${1}" "${2}" "${3}"
-        else
-            log_warning "Diff found for ${2} in ${3//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
-        fi
-        has_diff=$(( has_diff + 1 ))
-    fi
-}
-
-checkIfDiffAndUpdateKubectlIPs() {
-    if ! diffKubectlIPs "${1}" "${2}" "${3}" "${4}"; then
-        if ! $DRY_RUN; then
-            updateKubectlIPs "${1}" "${2}" "${3}" "${4}"
-        else
-            log_warning "Diff found for ${3} in ${4//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
-        fi
-        has_diff=$(( has_diff + 1 ))
+        echo "${ready_IPS[@]}"
     fi
 }
 
@@ -258,13 +283,15 @@ checkIfDiffAndUpdateIPs() {
     shift 2
     local IPS=("$@")
 
-    if ! diffIPs "${yaml_path}" "${file}" "${IPS[@]}"; then
+    processedIPRANGE=$(processIPRanges "${yaml_path}" "${file}")
+
+    if ! diffIPs "${yaml_path}" "${file}" "$processedIPRANGE"; then
         if ! $DRY_RUN; then
-            updateIPs "${yaml_path}" "${file}" "${IPS[@]}"
+            updateIPs "${yaml_path}" "${file}" "$processedIPRANGE"
         else
             log_warning "Diff found for ${yaml_path} in ${file//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
         fi
-        has_diff=$(( has_diff + 1 ))
+        has_diff=$((has_diff + 1))
     fi
 }
 
@@ -283,33 +310,99 @@ checkIfDiffAndUpdatePorts() {
     fi
 
     portDiff() {
-      diff -U3 --color=always \
-          --label "${file//${CK8S_CONFIG_PATH}\//}" <(yq4 -P "$yaml_path"' // [] | sort_by(.)' "$file") \
-          --label expected <(echo "$ports" | yq4 -P '. | sort_by(.)') > "$out"
+        diff -U3 --color=always \
+            --label "${file//${CK8S_CONFIG_PATH}\//}" <(yq4 -P "$yaml_path"' // [] | sort_by(.)' "$file") \
+            --label expected <(echo "$ports" | yq4 -P '. | sort_by(.)') >"$out"
     }
 
-    if ! portDiff ; then
+    if ! portDiff; then
         if ! $DRY_RUN; then
             yq4 -i "$yaml_path = $ports" "$file"
         else
             log_warning "Diff found for $yaml_path in ${file//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
         fi
-        has_diff=$(( has_diff + 1 ))
+        has_diff=$((has_diff + 1))
     fi
 }
 
 # yq_dig <cluster> <yaml_path> <default>
 yq_dig() {
-  for conf in "${config["override_$1"]}" "${config["override_common"]}" "${config["default_$1"]}" "${config["default_common"]}"; do
-      ret=$(yq4 "$2" "$conf")
+    for conf in "${config["override_$1"]}" "${config["override_common"]}" "${config["default_$1"]}" "${config["default_common"]}"; do
+        ret=$(yq4 "$2" "$conf")
 
-      if [[ "$ret" != "null" ]]; then
-          echo "$ret"
-          return
-      fi
-  done
+        if [[ "$ret" != "null" ]]; then
+            echo "$ret"
+            return
+        fi
+    done
 
-  echo "$3"
+    echo "$3"
+}
+
+# yq_dig_secrets <yaml_path> <default>
+yq_dig_secrets() {
+    ret=$(sops -d "${secrets["secrets_file"]}" | yq4 "$1")
+
+    if [[ "$ret" != "null" ]]; then
+        echo "$ret"
+        return
+    fi
+
+    echo "$2"
+}
+
+get_swift_url() {
+    local auth_url
+    local os_token
+    local swift_url
+    local swift_region
+
+    auth_url="$(yq_dig 'sc' '.objectStorage.swift.authUrl' '""')"
+
+    if [ -n "$(yq_dig_secrets '.objectStorage.swift.username' "")" ]; then
+        response=$(curl -i -s -H "Content-Type: application/json" -d '
+        {
+          "auth": {
+            "identity": {
+              "methods": ["password"],
+              "password": {
+                "user": {
+                  "name": "'"$(yq_dig_secrets '.objectStorage.swift.username' '""')"'",
+                  "domain": { "name": "'"$(yq_dig "sc" '.objectStorage.swift.domainName' '""')"'" },
+                  "password": "'"$(yq_dig_secrets '.objectStorage.swift.password' '""')"'"
+                }
+              }
+            },
+            "scope": {
+              "project": {
+                "name": "'"$(yq_dig "sc" '.objectStorage.swift.projectName' '""')"'",
+                "domain": { "name": "'"$(yq_dig "sc" '.objectStorage.swift.projectDomainName' '""')"'" }
+              }
+            }
+          }
+        }' "${auth_url}/auth/tokens")
+    elif [ -n "$(yq_dig_secrets '.objectStorage.swift.applicationCredentialID' "")" ]; then
+        response=$(curl -i -s -H "Content-Type: application/json" -d '
+        {
+          "auth": {
+            "identity": {
+              "methods": ["application_credential"],
+              "application_credential": {
+                "id": "'"$(yq_dig_secrets '.objectStorage.swift.applicationCredentialID' '""')"'",
+                "secret": "'"$(yq_dig_secrets '.objectStorage.swift.applicationCredentialSecret' '""')"'"
+              }
+            }
+          }
+        }' "${auth_url}/auth/tokens")
+    fi
+
+    swift_region=$(yq_dig "sc" '.objectStorage.swift.region' '""')
+    os_token=$(echo "$response" | grep -oP "x-subject-token:\s+\K\S+")
+    swift_url=$(echo "$response" | tail -n +15 | jq -r '.[].catalog[] | select( .type == "object-store" and .name == "swift") | .endpoints[] | select(.interface == "public" and .region == "'"$swift_region"'") | .url')
+
+    curl -i -s -X DELETE -H "X-Auth-Token: $os_token" -H "X-Subject-Token: $os_token" "${auth_url}/auth/tokens" >/dev/null
+
+    echo "$swift_url"
 }
 
 # yq_dig_secrets <yaml_path> <default>
@@ -379,9 +472,9 @@ get_swift_url() {
 }
 
 if [ "${CHECK_CLUSTER}" == "both" ]; then
-  DIG_CLUSTER="sc"
+    DIG_CLUSTER="sc"
 else
-  DIG_CLUSTER="wc"
+    DIG_CLUSTER="wc"
 fi
 S3_ENDPOINT="$(yq_dig "${DIG_CLUSTER}" '.objectStorage.s3.regionEndpoint' '""' | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
 if [[ "${S3_ENDPOINT}" == "" ]]; then
@@ -440,12 +533,12 @@ fi
 if [[ "${CHECK_CLUSTER}" =~ ^(sc|both)$ ]]; then
     check_harbor="$(yq_dig 'sc' '.harbor.persistence.type' 'false')"
     check_thanos="$(yq_dig 'sc' '.thanos.objectStorage.type' 'false')"
-    sourceType=$(yq4 '.objectStorage.sync.buckets.[].sourceType'  "${config["override_sc"]}")
+    sourceType=$(yq4 '.objectStorage.sync.buckets.[].sourceType' "${config["override_sc"]}")
     sourceSwift=false
     for type in $sourceType; do
-      if [ "$type" == "swift" ]; then
-        sourceSwift=true
-      fi
+        if [ "$type" == "swift" ]; then
+            sourceSwift=true
+        fi
     done
     if [ "$check_harbor" == "swift" ] || [ "$check_thanos" == "swift" ] || [ "${sourceSwift}" == "true" ]; then
         os_auth_endpoint="$(yq_dig 'sc' '.objectStorage.swift.authUrl' '""' | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
@@ -494,11 +587,11 @@ if [ "$(yq_dig 'sc' '.objectStorage.sync.enabled' 'false')" == "true" ]; then
         destinationSwift=false
         destinationS3=false
         for type in $destination; do
-          if [ "$type" == "swift" ]; then
-            destinationSwift=true
-          elif [ "$type" == "s3" ]; then
-            destinationS3=true
-          fi
+            if [ "$type" == "swift" ]; then
+                destinationSwift=true
+            elif [ "$type" == "s3" ]; then
+                destinationS3=true
+            fi
         done
         if [ "$check_harbor" == "swift" ] || [ "$check_thanos" == "swift" ]; then
             destinationSwift=true
@@ -593,7 +686,7 @@ if [ "$(yq_dig 'sc' '.objectStorage.sync.enabled' 'false')" == "true" ]; then
             checkIfDiffAndUpdateDNSIPs "${SECONDARY_ENDPOINT}" ".networkPolicies.rcloneSync.secondaryUrl.ips" "${config["override_sc"]}"
             checkIfDiffAndUpdatePorts ".networkPolicies.rcloneSync.secondaryUrl.ports" "${config["override_sc"]}" "$SECONDARY_PORT"
 
-        elif  [ -z "${SECONDARY_ENDPOINT}" ] && [ $DRY_RUN == "true" ]; then
+        elif [ -z "${SECONDARY_ENDPOINT}" ] && [ $DRY_RUN == "true" ]; then
             results_diff=$(diff -U0 --color=always <(yq4 -P 'sort_keys(.networkPolicies.rcloneSync.secondaryUrl)' "${config["override_sc"]}") <(yq4 -P 'del(.networkPolicies.rcloneSync.secondaryUrl)' "${config["override_sc"]}") --label "${config["override_sc"]//${CK8S_CONFIG_PATH}\//}" --label expected) || true
             if [ "${results_diff}" != "" ]; then
                 printf "${results_diff}"'%s\n'
