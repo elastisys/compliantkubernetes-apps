@@ -15,7 +15,7 @@ source "${here}/common.bash"
 
 CHECK_CLUSTER="${1}" # sc, wc or both
 DRY_RUN=true
-if [[ "${2}" == "update" ]]; then
+if [[ "${2}" == "apply" ]]; then
   DRY_RUN=false
 fi
 has_diff=0
@@ -24,11 +24,9 @@ has_diff=0
 # If DRY_RUN is set, it will output to stdout, otherwise it will just return the diff return code silently.
 # Usage: diffIPs <yaml_path> <file> <IP 1> <IP ..>
 diffIPs() {
-  local yaml_path
-  local file
+  local yaml_path="${1}"
+  local file="${2}"
   local IPS
-  yaml_path="${1}"
-  file="${2}"
   shift 2
   IPS=("$@")
   tmp_file=$(mktemp --suffix=.yaml)
@@ -94,7 +92,6 @@ updateIPs() {
   local file="${2}"
   shift 2
   local IPS=("$@")
-
   yq4 -i "${yaml_path}"' = []' "${file}"
 
   IFS=' ' read -ra ip_array <<<"${@:2}"
@@ -102,19 +99,6 @@ updateIPs() {
   for ip in "${ip_array[@]}"; do
     yq4 -i "${yaml_path}"' |= . + ["'"${ip}"'"]' "${file}"
   done
-}
-
-# Usage: updateIPs <yaml_path> <file> <IP 1> <IP ..>
-updateIPs() {
-    local yaml_path="${1}"
-    local file="${2}"
-    shift 2
-    local IPS=("$@")
-
-    yq4 -i "${yaml_path}"' = []' "${file}"
-    for ip in "${IPS[@]}"; do
-        yq4 -i "${yaml_path}"' |= . + ["'"${ip}"'/32"]' "${file}"
-    done
 }
 
 # Fetches the Internal IP and calico tunnel ip of kubernetes nodes using the label selector.
@@ -418,72 +402,6 @@ get_swift_url() {
   curl -i -s -X DELETE -H "X-Auth-Token: $os_token" -H "X-Subject-Token: $os_token" "${auth_url}/auth/tokens" >/dev/null
 
   echo "$swift_url"
-}
-
-# yq_dig_secrets <yaml_path> <default>
-yq_dig_secrets() {
-    ret=$(sops -d "${secrets["secrets_file"]}" | yq4 "$1")
-
-    if [[ "$ret" != "null" ]]; then
-        echo "$ret"
-        return
-    fi
-
-  echo "$2"
-}
-
-get_swift_url() {
-    local auth_url
-    local os_token
-    local swift_url
-    local swift_region
-
-    auth_url="$(yq_dig 'sc' '.objectStorage.swift.authUrl' '""')"
-
-    if [ -n "$(yq_dig_secrets '.objectStorage.swift.username' "")" ]; then
-        response=$(curl -i -s -H "Content-Type: application/json" -d '
-        {
-          "auth": {
-            "identity": {
-              "methods": ["password"],
-              "password": {
-                "user": {
-                  "name": "'"$(yq_dig_secrets '.objectStorage.swift.username' '""')"'",
-                  "domain": { "name": "'"$(yq_dig "sc" '.objectStorage.swift.domainName' '""')"'" },
-                  "password": "'"$(yq_dig_secrets '.objectStorage.swift.password' '""')"'"
-                }
-              }
-            },
-            "scope": {
-              "project": {
-                "name": "'"$(yq_dig "sc" '.objectStorage.swift.projectName' '""')"'",
-                "domain": { "name": "'"$(yq_dig "sc" '.objectStorage.swift.projectDomainName' '""')"'" }
-              }
-            }
-          }
-        }' "${auth_url}/auth/tokens")
-    elif [ -n "$(yq_dig_secrets '.objectStorage.swift.applicationCredentialID' "")" ]; then
-        response=$(curl -i -s -H "Content-Type: application/json" -d '
-        {
-          "auth": {
-            "identity": {
-              "methods": ["application_credential"],
-              "application_credential": {
-                "id": "'"$(yq_dig_secrets '.objectStorage.swift.applicationCredentialID' '""')"'",
-                "secret": "'"$(yq_dig_secrets '.objectStorage.swift.applicationCredentialSecret' '""')"'"
-              }
-            }
-          }
-        }' "${auth_url}/auth/tokens")
-    fi
-
-    swift_region=$(yq_dig "sc" '.objectStorage.swift.region' '""')
-    os_token=$(echo "$response" | grep -oP "x-subject-token:\s+\K\S+")
-    swift_url=$(echo "$response" | tail -n +15 | jq -r '.[].catalog[] | select( .type == "object-store" and .name == "swift") | .endpoints[] | select(.interface == "public" and .region == "'"$swift_region"'") | .url')
-
-    curl -i -s -X DELETE -H "X-Auth-Token: $os_token" -H "X-Subject-Token: $os_token" "${auth_url}/auth/tokens" > /dev/null
-
-    echo "$swift_url"
 }
 
 if [ "${CHECK_CLUSTER}" == "both" ]; then
