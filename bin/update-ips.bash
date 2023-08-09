@@ -66,7 +66,10 @@ getDNSIPs() {
 
 # Usage: diffDNSIPs <dns_record> <yaml_path> <file>
 diffDNSIPs() {
-  diffIPs "${2}" "${3}" "${@:4}"
+  local yaml_path="${2}"
+  local file="${3}"
+
+  diffIPs "${yaml_path}" "${file}" "${@:4}"
   return $?
 }
 
@@ -136,50 +139,63 @@ getKubectlIPs() {
 }
 
 diffKubectlIPs() {
-  #local IPS
-  #read -r -a IPS <<< "$(getKubectlIPs "${1}" "${2}")"
-  diffIPs "${3}" "${4}" "${@:5}"
+  local yaml_path="${3}"
+  local file="${4}"
+
+  diffIPs "${yaml_path}" "${file}" "${@:5}"
   return $?
 }
 
 # Updates the list from the file and yaml path specified with IPs fetched from the nodes
 updateKubectlIPs() {
-  yq4 -i "${3}"' = []' "${4}"
+  local yaml_path="${3}"
+  local file="${4}"
+
+  yq4 -i "${yaml_path}"' = []' "${file}"
   IFS=' ' read -ra ip_array <<<"${@:5}"
 
   for ip in "${ip_array[@]}"; do
-    yq4 -i "${3}"' |= . + ["'"${ip}"'"]' "${4}"
+    yq4 -i "${yaml_path}"' |= . + ["'"${ip}"'"]' "${file}"
   done
 }
 
 # Usage: checkIfDiffAndUpdateDNSIPs <dns_record> <yaml_path> <file>
 checkIfDiffAndUpdateDNSIPs() {
+  local dns_record="${1}"
+  local yaml_path="${2}"
+  local file="${3}"
+
   local IPS
-  read -r -a IPS <<<"$(getDNSIPs "${1}")"
+  read -r -a IPS <<<"$(getDNSIPs "${dns_record}")"
 
-  processedIPRANGE=$(processIPRanges "$2" "$3")
+  processedIPRANGE=$(processIPRanges "$yaml_path" "$file")
 
-  if ! diffDNSIPs "${1}" "${2}" "${3}" "$processedIPRANGE"; then
+  if ! diffDNSIPs "${dns_record}" "${yaml_path}" "${file}" "$processedIPRANGE"; then
     if ! $DRY_RUN; then
-      updateDNSIPs "${1}" "${2}" "${3}" "$processedIPRANGE"
+      updateDNSIPs "${dns_record}" "${yaml_path}" "${file}" "$processedIPRANGE"
     else
-      log_warning "Diff found for ${2} in ${3//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
+      log_warning "Diff found for ${yaml_path} in ${file//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
     fi
     has_diff=$((has_diff + 1))
   fi
 }
 
 checkIfDiffAndUpdateKubectlIPs() {
+  local cluster="${1}"
+  local label="${2}"
+  local yaml_path="${3}"
+  local file="${4}"
+
   local IPS
-  read -r -a IPS <<<"$(getKubectlIPs "${1}" "${2}")"
+  read -r -a IPS <<<"$(getKubectlIPs "${cluster}" "${label}")"
 
-  processedIPRANGE=$(processIPRanges "$3" "$4")
+  processedIPRANGE=$(processIPRanges "$yaml_path" "$file")
 
-  if ! diffKubectlIPs "${1}" "${2}" "${3}" "${4}" "$processedIPRANGE"; then
+  if ! diffKubectlIPs "${cluster}" "${label}" "${yaml_path}" "${file}" "$processedIPRANGE"; then
     if ! $DRY_RUN; then
-      updateKubectlIPs "${1}" "${2}" "${3}" "${4}" "$processedIPRANGE"
+      updateKubectlIPs "${cluster}" "${label}" "${yaml_path}" "${file}" "$processedIPRANGE"
     else
-      log_warning "Diff found for ${3} in ${4//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
+      log_warning "Diff found for ${yaml_path} in ${file//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
     fi
     has_diff=$((has_diff + 1))
   fi
@@ -251,27 +267,27 @@ processIPRanges() {
     # Add the working subnet-addresses and working IPs together.
     working_subnet+=("${IPS[@]}")
 
-    ready_IPS=()
+    filtered_working_subnet=()
 
     for ip in "${working_subnet[@]}"; do
 
       if [[ $ip =~ "/" ]]; then
-        ready_IPS+=("$ip")
+        filtered_working_subnet+=("$ip")
       else
-        ready_IPS+=("$ip"/32)
+        filtered_working_subnet+=("$ip"/32)
       fi
     done
 
-    echo "${ready_IPS[@]}"
+    echo "${filtered_working_subnet[@]}"
   else
 
-    ready_IPS=()
+    processed_IPS=()
 
     for ip in "${IPS[@]}"; do
-      ready_IPS+=("$ip/32")
+      processed_IPS+=("$ip/32")
     done
 
-    echo "${ready_IPS[@]}"
+    echo "${processed_IPS[@]}"
   fi
 }
 
