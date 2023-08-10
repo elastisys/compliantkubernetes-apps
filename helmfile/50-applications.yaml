@@ -170,7 +170,7 @@ releases:
   labels:
     app: falco
   chart: ./upstream/falco
-  version: 2.2.0
+  version: 3.3.0
   installed: {{ .Values.falco.enabled }}
   values:
   - values/falco/falco-common.yaml.gotmpl
@@ -276,7 +276,7 @@ releases:
     app.kubernetes.io/instance: ops-grafana
     app.kubernetes.io/name: grafana
   chart: ./upstream/grafana
-  version: 6.57.1
+  version: 6.57.4
   values:
   - values/grafana/grafana-common.yaml.gotmpl
   - values/grafana/grafana-ops.yaml.gotmpl
@@ -289,7 +289,7 @@ releases:
     app.kubernetes.io/instance: user-grafana
     app.kubernetes.io/name: grafana
   chart: ./upstream/grafana
-  version: 6.57.1
+  version: 6.57.4
   installed: {{ .Values.grafana.user.enabled }}
   values:
   - values/grafana/grafana-common.yaml.gotmpl
