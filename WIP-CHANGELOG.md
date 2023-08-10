@@ -16,6 +16,7 @@
 ### Fixed
 
 - Broken link in v0.30 migration instructions
+- Fixed thanos ingesting out-of-order error.
 
 ### Updated
 

@@ -601,6 +601,9 @@ thanos:
     # standalone: Single instance of receiver.
     mode: dual-mode
 
+    # Can only be used if thanos.compactor.verticalCompaction is set to true
+    outOfOrderTimeWindow: 600s
+
     # Retention for the metrics in the receiver
     tsdbRetention: 15d
 
@@ -629,6 +632,8 @@ thanos:
     retentionResolutionRaw: 30d
     retentionResolution5m: 90d
     retentionResolution1h: 0s
+
+    verticalCompaction: false
 
     # Deduplication of metrics in long term storage
     # receiverReplicas: Deduplicate results from multiple receivers, simpler dedup
