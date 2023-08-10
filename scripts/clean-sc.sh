@@ -17,7 +17,7 @@ here="$(dirname "$(readlink -f "$0")")"
 "${here}/.././bin/ck8s" ops helmfile sc -l app!=cert-manager destroy
 
 # Clean up namespaces and any other resources left behind by the apps
-"${here}/.././bin/ck8s" ops kubectl sc delete ns dex opensearch-system harbor fluentd thanos ingress-nginx monitoring kured falco
+"${here}/.././bin/ck8s" ops kubectl sc delete ns dex opensearch-system harbor fluentd-system gatekeeper-system thanos ingress-nginx monitoring kured falco velero
 
 # Clean up any leftover challenges
 CHALLENGES=$(
@@ -39,16 +39,11 @@ fi
 # Destroy cert-manager helm release
 "${here}/.././bin/ck8s" ops helmfile sc -l app=cert-manager destroy
 
-# Clean up cert-manager namespace
-"${here}/.././bin/ck8s" ops kubectl sc delete ns cert-manager
-
 # Remove any lingering persistent volume claims
 "${here}/.././bin/ck8s" ops kubectl sc delete pvc -A --all
 
-# Velero-specific removal: https://velero.io/docs/v1.5/uninstalling/
-"${here}/.././bin/ck8s" ops kubectl sc delete namespace/velero clusterrolebinding/velero
+# Velero-specific removal: https://velero.io/docs/v1.10/uninstalling/
 "${here}/.././bin/ck8s" ops kubectl sc delete crds -l component=velero
-"${here}/.././bin/ck8s" ops kubectl sc delete crds -l app.kubernetes.io/name=velero
 
 # Cert-manager specific removal
 "${here}/.././bin/ck8s" ops kubectl sc delete namespace cert-manager
@@ -64,7 +59,9 @@ fi
     offlinesessionses.dex.coreos.com \
     passwords.dex.coreos.com \
     refreshtokens.dex.coreos.com \
-    signingkeies.dex.coreos.com
+    signingkeies.dex.coreos.com \
+    devicerequests.dex.coreos.com \
+    devicetokens.dex.coreos.com
 
 # Prometheus specific removal
 PROM_CRDS=$(
@@ -87,14 +84,22 @@ TRIVY_CRDS=$(
         -o name
     )
 
-# Delete CRs
-for cr in $TRIVY_CRDS; do
-    "${here}/.././bin/ck8s" ops kubectl sc delete "$cr" --all --all-namespaces
-done
-
 # Delete CRDs
 if [ -n "$TRIVY_CRDS" ]; then
     # shellcheck disable=SC2086
     # We definitely want word splitting here.
     "${here}/.././bin/ck8s" ops kubectl sc delete crds $TRIVY_CRDS
+fi
+
+# Delete Gatekeeper CRDs
+GATE_CRDS=$("${here}/.././bin/ck8s" ops kubectl sc get crds -l gatekeeper.sh/system=yes -oname)
+if [ -n "$GATE_CRDS" ]; then
+    # shellcheck disable=SC2086
+    "${here}/.././bin/ck8s" ops kubectl sc delete --ignore-not-found=true $GATE_CRDS
+fi
+
+GATE_CONS=$("${here}/.././bin/ck8s" ops kubectl sc get crds -l gatekeeper.sh/constraint=yes -oname)
+if [ -n "$GATE_CONS" ]; then
+    # shellcheck disable=SC2086
+    "${here}/.././bin/ck8s" ops kubectl sc delete --ignore-not-found=true $GATE_CONS
 fi
