@@ -4,17 +4,13 @@
 
 Here you can find the most relevant features and changes for the last couple of releases of Compliant Kubernetes
 
+- Added some default annotations for Harbor that will fix issues with not being able to upload larger images **[v0.32]**
 - Updated Harbor to v2.8.2 **[v0.31]**
   - Dropped support for chartmuseum
   - The default login page will redirect you directly to Dex
 - Other application updates:
   - Ingress-nginx to v1.8.0 **[v0.31]**
-  - Grafana to v9.5.3 **[v0.31]**
-- Kubernetes PodSecurityPolicies have been replaced with Kubernetes Pod Security Standards and additional Gatekeeper Constraints and Mutations. **[v0.30]**
-  - This should not affect user applications as the default behaviour is kept, and the new default restricted Pod Security Standard is slightly less restricted than the previous restricted PodSecurityPolicy following the upstream changes.
-- Trivy Operator have replaced Starboard Operator as the online security scanning tool. **[v0.30]**
-  - This includes a new Trivy Operator dashboard and the deprecation of the old Image vulnerabilities dashboard.
-- Kubernetes Jobs will now have a default TTL of 7 days if unset to ensure resources are cleaned up. **[v0.30]**
+  - Grafana to v9.5.5 **[v0.31]**
 
 ## Public docs
 
