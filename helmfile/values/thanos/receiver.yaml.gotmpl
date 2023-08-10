@@ -13,12 +13,14 @@ compactor:
   retentionResolution5m: {{ .Values.thanos.compactor.retentionResolution5m }}
   retentionResolution1h: {{ .Values.thanos.compactor.retentionResolution1h }}
 
-  {{- if eq .Values.thanos.compactor.deduplication "receiverReplicas" }}
   extraFlags:
+  {{- if eq .Values.thanos.compactor.verticalCompaction true }}
+    - --compact.enable-vertical-compaction
+  {{- end }}
+  {{- if eq .Values.thanos.compactor.deduplication "receiverReplicas" }}
     - --deduplication.func=
     - --deduplication.replica-label=replica
   {{- else if eq .Values.thanos.compactor.deduplication "prometheusReplicas" }}
-  extraFlags:
     - --deduplication.func=penalty
     - --deduplication.replica-label=replica
     - --deduplication.replica-label=prometheus_replica
@@ -44,6 +46,10 @@ receive:
 
   mode: {{ .Values.thanos.receiver.mode }}
 
+  {{- if eq .Values.thanos.compactor.verticalCompaction true }}
+  extraFlags:
+    - --tsdb.out-of-order.time-window={{ .Values.thanos.receiver.outOfOrderTimeWindow }}
+  {{- end }}
   # extraFlags:
   #   - "--receive.tenant-label-name=\"cluster\""
 
