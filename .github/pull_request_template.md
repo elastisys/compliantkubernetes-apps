@@ -33,11 +33,8 @@
   - [ ] Will create noticeable cluster degradation.
         E.g. logs or metrics are not being collected or Kubernetes API server
         will not be responding while upgrading.
-  - [ ] Requires draining and/or replacing nodes.
   - [ ] Will change any APIs.
         E.g. removes or changes any CK8S config options or Kubernetes APIs.
-  - [ ] Will break the cluster.
-        I.e. full cluster migration is required.
 - Chart checklist (pick exactly one):
   - [ ] I upgraded no Chart.
   - [ ] I upgraded a Chart and determined that no migration steps are needed.
