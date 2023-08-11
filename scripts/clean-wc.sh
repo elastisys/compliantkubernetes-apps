@@ -26,37 +26,20 @@ here="$(dirname "$(readlink -f "$0")")"
 "${here}/.././bin/ck8s" ops helmfile wc -l app!=cert-manager destroy
 
 # Clean up namespaces and any other resources left behind by the apps
-"${here}/.././bin/ck8s" ops kubectl wc delete ns falco fluentd gatekeeper-system hnc-system ingress-nginx monitoring velero kured
+"${here}/.././bin/ck8s" ops kubectl wc delete ns falco fluentd-system fluentd gatekeeper-system hnc-system ingress-nginx monitoring velero kured
 
 # Destroy cert-manager helm release
 "${here}/.././bin/ck8s" ops helmfile wc -l app=cert-manager destroy
 
-# Clean up cert-manager namespace
-"${here}/.././bin/ck8s" ops kubectl wc delete ns cert-manager
-
 # Remove any lingering persistent volume claims
 "${here}/.././bin/ck8s" ops kubectl wc delete pvc -A --all
 
-# Velero-specific removal: https://velero.io/docs/v1.5/uninstalling/
-"${here}/.././bin/ck8s" ops kubectl wc delete namespace/velero clusterrolebinding/velero
+# Velero-specific removal: https://velero.io/docs/v1.10/uninstalling/
 "${here}/.././bin/ck8s" ops kubectl wc delete crds -l component=velero
-"${here}/.././bin/ck8s" ops kubectl wc delete crds -l app.kubernetes.io/name=velero
 
 # Cert-manager specific removal
 "${here}/.././bin/ck8s" ops kubectl wc delete namespace cert-manager
-"${here}/.././bin/ck8s" ops kubectl wc delete crds -l app.kubernetes.io/name=cert-manager
-
-# Dex specific removal
-# Keep for now, we won't use Dex CRDs in the future
-"${here}/.././bin/ck8s" ops kubectl wc delete crds \
-    authcodes.dex.coreos.com \
-    authrequests.dex.coreos.com \
-    connectors.dex.coreos.com \
-    oauth2clients.dex.coreos.com \
-    offlinesessionses.dex.coreos.com \
-    passwords.dex.coreos.com \
-    refreshtokens.dex.coreos.com \
-    signingkeies.dex.coreos.com
+#"${here}/.././bin/ck8s" ops kubectl wc delete crds -l app.kubernetes.io/name=cert-manager
 
 # Prometheus specific removal
 PROM_CRDS=$(
@@ -71,22 +54,37 @@ if [ -n "$PROM_CRDS" ]; then
     "${here}/.././bin/ck8s" ops kubectl wc delete crds $PROM_CRDS
 fi
 
-# Starboard specific removal
-STAR_CRDS=$(
+# Trivy specific removal
+TRIVY_CRDS=$(
     "${here}/.././bin/ck8s" ops \
         kubectl wc api-resources \
         --api-group=aquasecurity.github.io \
         -o name
     )
 
-# Delete CRs
-for cr in $STAR_CRDS; do
-    "${here}/.././bin/ck8s" ops kubectl wc delete "$cr" --all --all-namespaces
-done
-
 # Delete CRDs
-if [ -n "$STAR_CRDS" ]; then
+if [ -n "$TRIVY_CRDS" ]; then
     # shellcheck disable=SC2086
     # We definitely want word splitting here.
-    "${here}/.././bin/ck8s" ops kubectl wc delete crds $STAR_CRDS
+    "${here}/.././bin/ck8s" ops kubectl wc delete crds $TRIVY_CRDS
 fi
+
+# Delete Gatekeeper CRDs
+GATE_CRDS=$("${here}/.././bin/ck8s" ops kubectl wc get crds -l gatekeeper.sh/system=yes -oname)
+if [ -n "$GATE_CRDS" ]; then
+    # shellcheck disable=SC2086
+    "${here}/.././bin/ck8s" ops kubectl wc delete --ignore-not-found=true $GATE_CRDS
+fi
+
+GATE_CONS=$("${here}/.././bin/ck8s" ops kubectl wc get crds -l gatekeeper.sh/constraint=yes -oname)
+if [ -n "$GATE_CONS" ]; then
+    # shellcheck disable=SC2086
+    "${here}/.././bin/ck8s" ops kubectl wc delete --ignore-not-found=true $GATE_CONS
+fi
+
+# Delete hnc crds
+"${here}/.././bin/ck8s" ops kubectl wc delete crds \
+    hierarchicalresourcequotas.hnc.x-k8s.io \
+    hierarchyconfigurations.hnc.x-k8s.io \
+    hncconfigurations.hnc.x-k8s.io \
+    subnamespaceanchors.hnc.x-k8s.io
