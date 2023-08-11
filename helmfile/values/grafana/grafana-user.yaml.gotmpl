@@ -2,6 +2,7 @@ adminPassword: {{ .Values.user.grafanaPassword }}
 
 ingress:
   {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.userGrafana }}
+  annotations:
     nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.userGrafana }}
   {{ end }}
   hosts:
