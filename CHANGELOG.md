@@ -73,6 +73,10 @@
 - `scripts/migration/lib.sh` check_version function now asks if you want to use the specified nonstandard ck8sVersion.
 - Network policy for harbor notary server
 - Added some default annotations for harbor that will fix issues with not being able to upload larger images
+- Fixed the Gatekeeper Grafana dashboard
+  - Updated queries to produce correct numbers
+  - Removed broken/duplicate panels
+- Grafana user values rendering was failing when whitelistRange was enabled, because of the missing of `annotations` key
 
 ### Updated
 
