@@ -76,6 +76,7 @@
 - Fixed the Gatekeeper Grafana dashboard
   - Updated queries to produce correct numbers
   - Removed broken/duplicate panels
+- Grafana user values rendering was failing when whitelistRange was enabled, because of the missing of `annotations` key
 
 ### Updated
 
