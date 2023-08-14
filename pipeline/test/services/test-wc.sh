@@ -7,7 +7,7 @@ if [[ ! -f $1 ]];then
 fi
 
 export CONFIG_FILE=$1
-LOGGING="${2:-}"
+LOGGING="${3:-$2}"
 SUCCESSES=0
 FAILURES=0
 DEBUG_OUTPUT=("")
@@ -28,7 +28,7 @@ source "${SCRIPTS_PATH}"/workload-cluster/testUserRbac.sh
 echo -e "\nSuccesses: $SUCCESSES"
 echo "Failures: $FAILURES"
 
-if [ $FAILURES -gt 0 ] && [ -n "$LOGGING" ]
+if [ $FAILURES -gt 0 ] && [ "$LOGGING" == "--logging-enabled" ]
 then
     echo "Something failed"
     echo

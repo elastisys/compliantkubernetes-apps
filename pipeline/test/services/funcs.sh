@@ -102,7 +102,7 @@ function resourceReplicaCompare() {
 
         if [[ "${activeResourceStatus}" == "${desiredResourceStatus}" ]]; then
             echo -e "\tready ✔"; SUCCESSES=$((SUCCESSES+1))
-            if [ -n "$LOGGING" ]; then
+            if [ "$LOGGING" == "--logging-enabled" ]; then
               writeLog "${namespace}" "${resourceName}" "Pod"
               writeLog "${namespace}" "${resourceName}" "${kind}"
               writeEvent "${namespace}" "${resourceName}" "Pod"
@@ -118,7 +118,7 @@ function resourceReplicaCompare() {
 
     echo -e "\tready ❌"; FAILURES=$((FAILURES+1))
     DEBUG_OUTPUT+=$(kubectl get "${kind}" -n "${namespace}" "${resourceName}" -o json)
-    if [ -n "$LOGGING" ]; then
+    if [  "$LOGGING" == "--logging-enabled" ]; then
       writeLog "${namespace}" "${resourceName}" "Pod"
       writeLog "${namespace}" "${resourceName}" "${kind}"
       writeEvent "${namespace}" "${resourceName}" "Pod"
@@ -138,7 +138,7 @@ function testStatefulsetStatusByPods {
         if ! kubectl wait -n "$1" --for=condition=ready pod "$POD_NAME" --timeout=60s > /dev/null; then
             echo -n -e "\tnot ready ❌"; FAILURES=$((FAILURES+1))
             DEBUG_OUTPUT+="$(kubectl get statefulset -n "$1" "$2" -o json)"
-            if [ -n "$LOGGING" ]; then
+            if [ "$LOGGING" == "--logging-enabled" ]; then
               writeLog "${1}" "${2}" "Pod"
               writeLog "${1}" "${2}" "${kind}"
               writeEvent "${1}" "${2}" "Pod"
@@ -160,7 +160,7 @@ function testJobStatus {
       echo -n -e "\tnot completed ❌"; FAILURES=$((FAILURES+1))
       DEBUG_OUTPUT+=$(kubectl get -n "$1" job "$2" -o json)
     fi
-    if [ -n "$LOGGING" ]; then
+    if [ "$LOGGING" == "--logging-enabled" ]; then
       logJob "${1}" "${2}"
     fi
 }

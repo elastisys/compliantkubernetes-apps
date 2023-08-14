@@ -40,7 +40,7 @@ function sc_opensearch_checks() {
         check_opensearch_ism
         check_object_store_access
         check_fluentd_connection
-        exit 0
+        return
     fi
     while [[ ${#} -gt 0 ]]; do
         case ${1} in

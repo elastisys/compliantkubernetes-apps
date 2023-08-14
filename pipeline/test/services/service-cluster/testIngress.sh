@@ -17,7 +17,7 @@ function sc_ingress_checks() {
     if [[ ${#} == 0 ]]; then
         echo "Running all checks ..."
         check_sc_ingress_health
-        exit 0
+        return
     fi
     while [[ ${#} -gt 0 ]]; do
         case ${1} in
