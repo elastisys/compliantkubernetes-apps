@@ -20,7 +20,15 @@ spec:
           image: ghcr.io/elastisys/curl-jq:1.0.0
           command: ['/bin/bash', '/scripts/init-harbor.sh']
           securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
             runAsUser: 10000
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop:
+                - ALL
           env:
             - name: ENDPOINT
               value: {{ .Values.endpoint }}
