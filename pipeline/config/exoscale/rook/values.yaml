@@ -1,0 +1,105 @@
+# Values shared with all clusters
+commons:
+  podSecurityPolicies:
+    enabled: false
+  networkPolicies:
+    enabled: true
+    dnsPeers:
+      - cidr: 0.0.0.0/0
+  cluster:
+    preset: "none"
+    mon:
+      resources:
+        requests:
+          cpu: 400m
+          memory: 500Mi
+    osd:
+      resources:
+        requests:
+          cpu: 500m
+          memory: 500Mi
+    cephVersion:
+      image: quay.io/ceph/ceph:v17.2.6
+    cephBlockPool:
+      name: replicapool
+    storageClass:
+      name: rook-ceph-block
+      default: true
+      reclaimPolicy: Delete
+    all: {}
+  toolbox:
+    enabled: true
+    tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+  operator:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 100Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+    nodeSelector: {}
+    tolerations: &ctltol null
+  provisioner:
+    csi-attacher:
+      resources: &csires
+        requests:
+          cpu: 10m
+          memory: 16Mi
+        limits:
+          cpu: 100m
+          memory: 100Mi
+    csi-provisioner:
+      resources: *csires
+    csi-resizer:
+      resources: *csires
+    csi-snapshotter:
+      resources: *csires
+    csi-rbdplugin:
+      resources: &pluginres
+        requests:
+          cpu: 10m
+          memory: 50Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
+    liveness-prometheus:
+      resources: *csires
+    tolerations: *ctltol
+  plugin:
+    driver-registrar:
+      resources: *csires
+    csi-rbdplugin:
+      resources: *pluginres
+    liveness-prometheus:
+      resources: *csires
+    tolerations: []
+# Values specific to each cluster
+clusters:
+  service:
+    monitoring:
+      installGrafanaDashboards: false
+      installPrometheusRules: false
+      installServiceMonitors: false
+    networkPolicies:
+      apiserverPeers:
+        - cidr: 0.0.0.0/0
+      nodePeers:
+        - cidr: 0.0.0.0/0
+      dnsPeers:
+        - cidr: 0.0.0.0/0
+    podSecurityPolicies:
+      enabled: false
+  workload:
+    monitoring:
+      installServiceMonitors: false
+    networkPolicies:
+      apiserverPeers:
+        - cidr: 0.0.0.0/0
+      nodePeers:
+        - cidr: 0.0.0.0/0
+      dnsPeers:
+        - cidr: 0.0.0.0/0

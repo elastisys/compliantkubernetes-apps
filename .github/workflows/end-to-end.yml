@@ -54,8 +54,6 @@ jobs:
       CK8S_CONFIG_PATH: ./apps/pipeline/config/exoscale
       CK8S_AUTO_APPROVE: true
     steps:
-    ## TODO: We cannot currently use ck8s-kubespray since the terraform code
-    ## for exoscale is not in the version we have in the submodule
     - name: Checkout ck8s-kubespray
       uses: actions/checkout@v3
       with:
@@ -170,15 +168,27 @@ jobs:
         ./apps/scripts/S3/generate-s3cfg.sh exoscale "${EXOSCALE_API_KEY}" "${EXOSCALE_API_SECRET}" sos-ch-gva-2.exo.io ch-gva-2 > s3cfg.ini
         ./apps/scripts/S3/entry.sh --s3cfg s3cfg.ini create
 
-    - name: Install rook
+    - name: Bootstrap rook
       env:
         KUBECONFIG: /__w/compliantkubernetes-apps/compliantkubernetes-apps/apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/artifacts/admin.conf
+        CK8S_CONFIG_PATH: /__w/compliantkubernetes-apps/compliantkubernetes-apps/apps/pipeline/config/exoscale
+        CK8S_APPS_PIPELINE: "true"
+        CLUSTER: ${{ matrix.cluster }}
       run: |
-        ./deploy-rook.sh
+        ./scripts/pipeline/bootstrap-rook.sh
       working-directory: ./compliantkubernetes-kubespray/rook
+      id: bootstrap-rook
 
-    # TODO: Some kind of test of Rook before we waste time waiting for apps to fail if it is broken...
-    # We may also want to move Rook to the apps bootstrap instead.
+    - name: Test rook
+      env:
+        KUBECONFIG: /__w/compliantkubernetes-apps/compliantkubernetes-apps/apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/artifacts/admin.conf
+        CK8S_CONFIG_PATH: /__w/compliantkubernetes-apps/compliantkubernetes-apps/apps/pipeline/config/exoscale
+        CK8S_APPS_PIPELINE: "true"
+        CLUSTER: ${{ matrix.cluster }}
+      run: |
+        ./scripts/pipeline/wait-for-rook.sh ${{ matrix.cluster }}
+      working-directory: ./compliantkubernetes-kubespray/rook
+      id: test-rook
 
     - name: Gather configs
       if: always() && steps.initialize-apps.outcome == 'success' && matrix.cluster == 'sc'
@@ -199,6 +209,7 @@ jobs:
         path: ./apps/pipeline/config/exoscale/configs.tar.gz
 
     - name: Install apps
+      if: steps.bootstrap-rook.outcome == 'success' && steps.test-rook.outcome == 'success'
       run: ./apps/pipeline/apply-${{ matrix.cluster }}.bash
       shell: bash
       id: install-apps
@@ -211,23 +222,50 @@ jobs:
       id: opensearch
 
     - name: Test apps
-      if: always() && (steps.install-apps.outcome != 'cancelled' && steps.install-apps.outcome != 'skipped' && steps.install-apps.outcome != 'failure')
-      run: ./apps/bin/ck8s test ${{ matrix.cluster }}
+      if: always() && (steps.install-apps.outcome != 'cancelled' && steps.install-apps.outcome != 'skipped')
+      run: ./apps/bin/ck8s test ${{ matrix.cluster }} apps --logging-enabled
       env:
         PIPELINE: "true"
+      id: test-apps
+
+    - name: Finalise deploy rook
+      env:
+        KUBECONFIG: /__w/compliantkubernetes-apps/compliantkubernetes-apps/apps/pipeline/config/exoscale/pipeline-${{ matrix.cluster }}-config/artifacts/admin.conf
+        CK8S_CONFIG_PATH: /__w/compliantkubernetes-apps/compliantkubernetes-apps/apps/pipeline/config/exoscale
+        CK8S_APPS_PIPELINE: "true"
+        CLUSTER: ${{ matrix.cluster }}
+      run: |
+        ./scripts/pipeline/finalise-deploy-rook.sh
+      working-directory: ./compliantkubernetes-kubespray/rook
+      id: finalise-rook
 
     - name: Upload logs
-      if: always()
+      if: steps.install-apps.outcome == 'failure' || steps.test-apps.outcome == 'failure'
       uses: actions/upload-artifact@v3
       with:
         name: compliantkubernetes-apps-logs
         path: ./logs
+
     - name: Upload events
-      if: always()
+      if: steps.install-apps.outcome == 'failure' || steps.test-apps.outcome == 'failure'
       uses: actions/upload-artifact@v3
       with:
         name: compliantkubernetes-apps-events
         path: ./events
+
+    - name: Upload rook-ceph logs
+      if: steps.finalise-rook.outcome == 'failure' || steps.bootstrap-rook.outcome == 'failure' || steps.test-rook.outcome == 'failure' || steps.install-apps.outcome == 'failure'
+      uses: actions/upload-artifact@v3
+      with:
+        name: rook-ceph-logs
+        path: ./compliantkubernetes-kubespray/rook/logs
+
+    - name: Upload rook-ceph events
+      if: steps.finalise-rook.outcome == 'failure' || steps.bootstrap-rook.outcome == 'failure' || steps.test-rook.outcome == 'failure' || steps.install-apps.outcome == 'failure'
+      uses: actions/upload-artifact@v3
+      with:
+        name: rook-ceph-events
+        path: ./compliantkubernetes-kubespray/rook/events
 
     - name: Destroy terraform
       continue-on-error: true

@@ -591,6 +591,7 @@ releases:
     app: openstack-monitoring
   chart: ./charts/openstack-monitoring
   version: 0.1.0
+  installed: {{ .Values.openstackMonitoring.enabled }}
   values:
   - values/openstack-monitoring.yaml.gotmpl
   - values/prometheus-alerts-sc.yaml.gotmpl
