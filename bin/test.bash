@@ -38,28 +38,43 @@ test_apps_wc() {
 function sc_help() {
     printf "%s\n" "[Usage]: test sc [target] [ARGUMENTS]"
     printf "%s\n" "List of targets:"
+    printf "\t%-23s %s\n" "apps" "Apps checks"
     printf "\t%-23s %s\n" "opensearch" "Open search checks"
     printf "\t%-23s %s\n" "cert-manager" "Cert Manager checks"
     printf "\t%-23s %s\n" "ingress" "Ingress checks"
-    printf "%s\n" "[NOTE] If no target is specified, the default sc apps tests will be executed."
-    printf "%s\n" "[NOTE] Logging can be enabled for the sc apps tests by using the --logging-enabled flag."
+    printf "%s\n" "[NOTE] If no target is specified, all of them will be executed."
+    printf "%s\n" "[NOTE] Logging can be enabled for test sc and test sc apps by using the --logging-enabled flag."
 }
 
 function wc_help() {
     printf "%s\n" "[Usage]: test wc [target] [ARGUMENTS]"
     printf "%s\n" "List of targets:"
+    printf "\t%-23s %s\n" "apps" "Apps checks"
     printf "\t%-23s %s\n" "cert-manager" "Cert Manager checks"
     printf "\t%-23s %s\n" "ingress" "Ingress checks"
     printf "\t%-23s %s\n" "hnc" "HNC checks"
-    printf "%s\n" "[NOTE] If no target is specified, the default wc apps tests will be executed."
-    printf "%s\n" "[NOTE] Logging can be enabled for wc apps tests by using the --logging-enabled flag."
+    printf "%s\n" "[NOTE] If no target is specified, all of them will be executed."
+    printf "%s\n" "[NOTE] Logging can be enabled for test wc and test wc apps by using the --logging-enabled flag."
 }
 
 function sc() {
     if [[ ${#} == 0 ]] || [[ ${#} == 1 && ${1} == "--logging-enabled" ]]; then
-        test_apps_sc "${@}"
+        set +e
+        test_apps_sc "${@:1}"
+        set -e
+        log_info "Testing opensearch\n"
+        sc_opensearch_checks
+        echo
+        log_info "Testing cert-manager\n"
+        sc_cert_manager_checks
+        echo
+        log_info "Testing ingress\n"
+        sc_ingress_checks
     else
         case ${1} in
+        apps)
+            test_apps_sc "${@:2}"
+            ;;
         opensearch)
             sc_opensearch_checks "${@:2}"
             ;;
@@ -84,9 +99,23 @@ function sc() {
 
 function wc() {
     if [[ ${#} == 0 ]] || [[ ${#} == 1 && ${1} == "--logging-enabled" ]]; then
-        test_apps_wc "${@}"
+        set +e
+        test_apps_wc "${@:1}"
+        set -e
+        log_info "Testing cert-manager\n"
+        wc_cert_manager_checks
+        echo
+        log_info "Testing ingress\n"
+        wc_ingress_checks
+        echo
+        log_info "Testing hnc\n"
+        wc_hnc_checks
+
     else
         case ${1} in
+        apps)
+            test_apps_wc "${@:2}"
+            ;;
         cert-manager)
             wc_cert_manager_checks "${@:2}"
             ;;

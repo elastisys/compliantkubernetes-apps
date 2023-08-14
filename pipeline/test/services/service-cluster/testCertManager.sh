@@ -21,7 +21,7 @@ function sc_cert_manager_checks() {
         check_sc_certmanager_cluster_issuers
         check_sc_certmanager_apps_certificates
         check_sc_certmanager_challenges
-        exit 0
+        return
     fi
     while [[ ${#} -gt 0 ]]; do
         case ${1} in

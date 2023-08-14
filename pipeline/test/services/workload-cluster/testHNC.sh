@@ -19,7 +19,7 @@ function wc_hnc_checks() {
         echo "Running all checks ..."
         check_wc_hnc_creation_removal
         check_wc_hnc_system_namespaces
-        exit 0
+        return
     fi
     while [[ ${#} -gt 0 ]]; do
         case ${1} in

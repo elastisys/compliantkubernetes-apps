@@ -236,7 +236,7 @@ for cronjob in "${cronjobs[@]}"; do
     namespace="${arr[0]}"
     name="${arr[1]}"
     echo -n -e "\n${name}\t"
-    if testResourceExistence cronjob "${namespace}" "${name}" && [ -n "$LOGGING" ]; then
+    if testResourceExistence cronjob "${namespace}" "${name}" && [ "$LOGGING" == "--logging-enabled" ]; then
         logCronJob "${namespace}" "${name}"
     fi
 done

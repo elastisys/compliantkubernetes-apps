@@ -42,10 +42,6 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     ./bin/ck8s test sc|wc
-    ./bin/ck8s test sc|wc cert-manager
-    ./bin/ck8s test sc|wc ingress
-    ./bin/ck8s test sc opensearch
-    ./bin/ck8s test wc hnc
     ./bin/ck8s ops kubectl sc|wc get pods -A -o custom-columns=NAMESPACE:metadata.namespace,POD:metadata.name,READY-false:status.containerStatuses[*].ready,REASON:status.containerStatuses[*].state.terminated.reason | grep false | grep -v Completed
     ./bin/ck8s ops kubectl sc|wc get nodes
     ./bin/ck8s ops kubectl sc|wc get jobs -A
@@ -139,10 +135,6 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     ./bin/ck8s test sc|wc
-    ./bin/ck8s test sc|wc cert-manager
-    ./bin/ck8s test sc|wc ingress
-    ./bin/ck8s test sc opensearch
-    ./bin/ck8s test wc hnc
     ./bin/ck8s ops kubectl sc|wc get pods -A -o custom-columns=NAMESPACE:metadata.namespace,POD:metadata.name,READY-false:status.containerStatuses[*].ready,REASON:status.containerStatuses[*].state.terminated.reason | grep false | grep -v Completed
     ./bin/ck8s ops kubectl sc|wc get nodes
     ./bin/ck8s ops helm sc|wc list -A --all
