@@ -26,7 +26,7 @@ In case you get lost, don't forget to check out the [public docs](https://elasti
 
 - Apps: **{{ .Values.dashboard.ck8sVersion }}** - [Release Notes](https://elastisys.io/compliantkubernetes/release-notes/)
 
-## Additional services:
+## Web Portals
 
 - [grafana.{{ .Values.baseDomain }}](https://grafana.{{ .Values.baseDomain }})
 - [opensearch.{{ .Values.baseDomain }}](https://opensearch.{{ .Values.baseDomain }})
