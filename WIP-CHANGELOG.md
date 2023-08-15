@@ -9,6 +9,7 @@
 ### Fixed
 
 - Grafana user values rendering was failing when whitelistRange was enabled, because of the missing of `annotations` key
+- Refer to Grafana, OpenSearch and Harbor as Web Portals in Grafana and OpenSearch welcome dashboards
 
 ### Updated
 
