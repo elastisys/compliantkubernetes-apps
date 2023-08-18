@@ -41,6 +41,8 @@ defaultRules:
       evaluate_prometheus: "1"
   {{- end }}
 
+capacityManagementAlertsPersistentVolumeEnabled: {{ .Values.prometheus.capacityManagementAlerts.persistentVolume.enabled }}
+capacityManagementAlertsPersistentVolumeLimit: {{ .Values.prometheus.capacityManagementAlerts.persistentVolume.limit }}
 capacityManagementAlertsDiskLimit: {{ .Values.prometheus.capacityManagementAlerts.disklimit }}
 capacityManagementAlertsUsageLimit: {{ .Values.prometheus.capacityManagementAlerts.usagelimit }}
 capacityManagementAlertsRequestLimit: {{ toYaml .Values.prometheus.capacityManagementAlerts.requestlimit | nindent 2 }}

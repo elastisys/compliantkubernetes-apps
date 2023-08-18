@@ -108,6 +108,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
   ./migration/v0.33/prepare/07-move-to-common-for-cross-cluster-probe.sh
   ```
 
+1. Check if `.prometheus.capacityManagementAlerts.disklimit` needs to be copied:
+
+    ```bash
+    ./migration/v0.33/prepare/10-copy-capacity-alert-disklimit.sh
+    ```
+
 1. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.

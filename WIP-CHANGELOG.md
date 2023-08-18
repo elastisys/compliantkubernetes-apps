@@ -9,6 +9,7 @@
 
 - Moved `rclone-sync` from `kube-system` to its own namespace.
 - Moved all the kube-prometheus-stack Grafana dashboards to `grafana-dashboards` chart
+- Separated node and PV `capacityManagementAlerts` limit configuration
 
 ### Fixed
 

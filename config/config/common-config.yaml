@@ -352,6 +352,9 @@ prometheus:
   capacityManagementAlerts:
     enabled: true
     disklimit: 75
+    persistentVolume:
+      enabled: true
+      limit: 75
     usagelimit: 95
     ## for each cpu and memory add the node pattern for which you want to create an alert
     requestlimit:
