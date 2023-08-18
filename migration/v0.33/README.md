@@ -130,7 +130,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 1. Move `rclone-sync` from `kube-system`:
 
     ```bash
-    ./migration/v0.32/apply/40-rclone.sh execute
+    ./migration/v0.33/apply/40-rclone.sh execute
     ```
 
 1. Upgrade applications:
