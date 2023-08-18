@@ -13,6 +13,7 @@
 - Separated node and PV `capacityManagementAlerts` limit configuration
 - Replaced image `elastisys/curl-jq:latest` with `ghcr.io/elastisys/curl-jq:1.0.0`.
 - Only mutate pods on create to prevent them from getting stuck
+- Increased the default `proxy-buffer-size` setting in ingress-nginx to `8k`.
 
 ### Fixed
 
