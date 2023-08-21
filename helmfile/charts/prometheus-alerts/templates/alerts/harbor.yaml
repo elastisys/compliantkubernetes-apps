@@ -76,7 +76,7 @@ spec:
       labels:
         severity: medium
       annotations:
-        description: Total used storage is above the limit of
+        description: Total used storage is above the limit of {{ .Values.harbor.alerts.maxTotalStorageUsedGB }}GB
     - alert: 'Harbor p99 latency is higher than 10 seconds'
       expr: |
         histogram_quantile(0.99,  sum  (rate(registry_http_request_duration_seconds_bucket[30m]) )) > 10
@@ -100,5 +100,5 @@ spec:
       labels:
         severity: low
       annotations:
-        description: Total number of artifacts is above the limit of
+        description: Total number of artifacts is above the limit of {{ .Values.harbor.alerts.maxTotalArtifacts }}GB
 {{- end }}

@@ -24,7 +24,6 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 55,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -172,7 +171,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "max(harbor_system_info) by (auth_mode, harbor_version, pod)",
+          "expr": "max(harbor_system_info) by (auth_mode, harbor_version)",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -232,7 +231,32 @@
           },
           "unit": "none"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "false"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Private"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "true"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Public"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 6,
@@ -265,12 +289,13 @@
           "editorMode": "code",
           "expr": "harbor_project_total",
           "interval": "",
-          "legendFormat": "Public: {{public}}",
+          "legendFormat": "{{public}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Project total",
+      "title": "Total number of Projects (Public vs Private)",
+      "transformations": [],
       "type": "stat"
     },
     {
@@ -278,6 +303,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
+      "description": "Total number of artifacts type in a project",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -333,7 +359,7 @@
           "refId": "A"
         }
       ],
-      "title": "Project artifacts total",
+      "title": "Total number of artifacts",
       "type": "stat"
     },
     {
@@ -341,6 +367,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
+      "description": "Total used resources of a project",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -396,7 +423,7 @@
           "refId": "A"
         }
       ],
-      "title": "Project quota usage",
+      "title": "Quota usage",
       "type": "stat"
     },
     {
@@ -404,6 +431,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
+      "description": "Running status of Harbor components",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -500,6 +528,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
+      "description": "Total number of repositories in a project",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -591,7 +620,7 @@
           "refId": "A"
         }
       ],
-      "title": "Project repo total",
+      "title": "Total repositories in a project",
       "type": "timeseries"
     },
     {
@@ -599,6 +628,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
+      "description": "Total number of members in a project",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -687,7 +717,7 @@
           "refId": "A"
         }
       ],
-      "title": "Project members",
+      "title": "Total members in a project",
       "type": "timeseries"
     },
     {
@@ -695,7 +725,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "",
+      "description": "Total used resources of a project",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -822,7 +852,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "",
+      "description": "Total number of artifacts type in a project",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -949,6 +979,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
+      "description": "Number of images pulled in a project",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1036,7 +1067,7 @@
           "refId": "A"
         }
       ],
-      "title": "Artifact pulled",
+      "title": "Images pulled per project",
       "type": "timeseries"
     },
     {
@@ -4119,7 +4150,7 @@
     "list": [
       {
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "default",
           "value": "default"
         },
@@ -4146,5 +4177,7 @@
   },
   "timezone": "",
   "title": "Harbor",
-  "version": 1
+  "uid": "c51f4da2-e4a1-46cb-9856-46251a01e612",
+  "version": 2,
+  "weekStart": ""
 }
