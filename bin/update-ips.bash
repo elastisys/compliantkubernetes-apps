@@ -7,7 +7,7 @@
 #   cluster: What cluster config to check for (sc, wc or both)
 #   action: If the script should update the config or not (update or dry-run)
 
-set -eu -o pipefail
+set -euo pipefail
 
 here="$(dirname "$(readlink -f "$0")")"
 # shellcheck source=bin/common.bash
@@ -20,34 +20,37 @@ if [[ "${2}" == "apply" ]]; then
 fi
 has_diff=0
 
-# Compares a list IPs with the list of IPs in the yaml path and file specified and returns the diff return code.
-# If DRY_RUN is set, it will output to stdout, otherwise it will just return the diff return code silently.
-# Usage: diffIPs <yaml_path> <file> <IP 1> <IP ..>
-diffIPs() {
-  local yaml_path="${1}"
-  local file="${2}"
-  local IPS
-  shift 2
-  IPS=("$@")
-  tmp_file=$(mktemp --suffix=.yaml)
 
-  yq4 -n '. = []' >"${tmp_file}"
-  for ip in "${IPS[@]}"; do
-    yq4 -i '. |= . + ["'"${ip}"'/32"]' "${tmp_file}"
-  done
+# Usage: diff_cidrs <config_key> <config_file> <cidrs>...
+# Compares the given list of cidrs with the cidrs configured in the config (with implicit diff return code).
+# If DRY_RUN is set it will output to stdout, else to null
+diff_cidrs() {
+  local config_key="${1}"
+  local config_file="${2}"
+  local cidrs=("${@:3}")
 
   if $DRY_RUN; then
     out_file=/dev/stdout
   else
     out_file=/dev/null
   fi
-  diff -U3 --color=always \
-    --label "${file//${CK8S_CONFIG_PATH}\//}" <(yq4 -P "${yaml_path}"' // [] | sort_by(.)' "${file}") \
-    --label expected <(yq4 -P '. | sort_by(.)' "${tmp_file}") >"${out_file}"
-  DIFF_RETURN=$?
-  rm "${tmp_file}"
 
-  return ${DIFF_RETURN}
+  # use diff return implicitly
+  diff -U3 --color=always \
+    --label "${config_file//${CK8S_CONFIG_PATH}\//}" <(yq4 -P "${config_key}"' // [] | sort' "${config_file}") \
+    --label expected <(yq4 -P 'split(" ") | sort' <<< "${cidrs[*]}") > "${out_file}"
+}
+
+# Usage: update_cidrs <config key> <config file> <cidrs>
+update_cidrs() {
+  local config_key="${1}"
+  local config_file="${2}"
+  local cidrs=("${@:3}")
+
+  local ips
+  ips="$(yq4 -oj 'split(" ") | sort' <<< "${cidrs[*]}")"
+
+  yq4 -i "${config_key} = ${ips}" "${config_file}"
 }
 
 # Fetches the IPs from a specified address
@@ -60,45 +63,6 @@ getDNSIPs() {
     exit 1
   fi
   echo "${IPS[@]}"
-}
-
-# Usage: diffDNSIPs <dns_record> <yaml_path> <file>
-diffDNSIPs() {
-  local yaml_path="${2}"
-  local file="${3}"
-
-  diffIPs "${yaml_path}" "${file}" "${@:4}"
-  return $?
-}
-
-# Updates the list from the file and yaml path specified with IPs fetched from the domain
-# Usage: updateDNSIPs <dns_record> <yaml_path> <file>
-updateDNSIPs() {
-  local yaml_path="${2}"
-  local file="${3}"
-
-  yq4 -i "${yaml_path}"' = []' "${file}"
-
-  IFS=' ' read -ra ip_array <<<"${@:4}"
-
-  for ip in "${ip_array[@]}"; do
-    yq4 -i "${yaml_path}"' |= . + ["'"${ip}"'"]' "${file}"
-  done
-}
-
-# Usage: updateIPs <yaml_path> <file> <IP 1> <IP ..>
-updateIPs() {
-  local yaml_path="${1}"
-  local file="${2}"
-  shift 2
-  local IPS=("$@")
-  yq4 -i "${yaml_path}"' = []' "${file}"
-
-  IFS=' ' read -ra ip_array <<<"${@:2}"
-
-  for ip in "${ip_array[@]}"; do
-    yq4 -i "${yaml_path}"' |= . + ["'"${ip}"'"]' "${file}"
-  done
 }
 
 # Fetches the Internal IP and calico tunnel ip of kubernetes nodes using the label selector.
@@ -122,173 +86,81 @@ getKubectlIPs() {
   echo "${IPS[@]}"
 }
 
-diffKubectlIPs() {
-  local yaml_path="${3}"
-  local file="${4}"
-
-  diffIPs "${yaml_path}" "${file}" "${@:5}"
-  return $?
-}
-
-# Updates the list from the file and yaml path specified with IPs fetched from the nodes
-updateKubectlIPs() {
-  local yaml_path="${3}"
-  local file="${4}"
-
-  yq4 -i "${yaml_path}"' = []' "${file}"
-  IFS=' ' read -ra ip_array <<<"${@:5}"
-
-  for ip in "${ip_array[@]}"; do
-    yq4 -i "${yaml_path}"' |= . + ["'"${ip}"'"]' "${file}"
-  done
-}
-
-# Usage: checkIfDiffAndUpdateDNSIPs <dns_record> <yaml_path> <file>
+# Usage: checkIfDiffAndUpdateDNSIPs <dns_record> <config key> <config file>
 checkIfDiffAndUpdateDNSIPs() {
   local dns_record="${1}"
-  local yaml_path="${2}"
-  local file="${3}"
+  local config_key="${2}"
+  local config_file="${3}"
 
-  local IPS
-  read -r -a IPS <<<"$(getDNSIPs "${dns_record}")"
+  local -a ips
+  readarray -t ips <<<"$(getDNSIPs "${dns_record}" | tr ' ' '\n')"
 
-  processedIPRANGE=$(processIPRanges "$yaml_path" "$file")
-
-  if ! diffDNSIPs "${dns_record}" "${yaml_path}" "${file}" "$processedIPRANGE"; then
-    if ! $DRY_RUN; then
-      updateDNSIPs "${dns_record}" "${yaml_path}" "${file}" "$processedIPRANGE"
-    else
-      log_warning "Diff found for ${yaml_path} in ${file//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
-    fi
-    has_diff=$((has_diff + 1))
-  fi
+  checkIfDiffAndUpdateIPs "${config_key}" "${config_file}" "${ips[@]}"
 }
 
 checkIfDiffAndUpdateKubectlIPs() {
   local cluster="${1}"
   local label="${2}"
-  local yaml_path="${3}"
-  local file="${4}"
+  local config_key="${3}"
+  local config_file="${4}"
 
-  local IPS
-  read -r -a IPS <<<"$(getKubectlIPs "${cluster}" "${label}")"
+  local -a ips
+  readarray -t ips <<< "$(getKubectlIPs "${cluster}" "${label}" | tr ' ' '\n')"
 
-  processedIPRANGE=$(processIPRanges "$yaml_path" "$file")
-
-  if ! diffKubectlIPs "${cluster}" "${label}" "${yaml_path}" "${file}" "$processedIPRANGE"; then
-    if ! $DRY_RUN; then
-      updateKubectlIPs "${cluster}" "${label}" "${yaml_path}" "${file}" "$processedIPRANGE"
-    else
-      log_warning "Diff found for ${yaml_path} in ${file//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
-    fi
-    has_diff=$((has_diff + 1))
-  fi
+  checkIfDiffAndUpdateIPs "${config_key}" "${config_file}" "${ips[@]}"
 }
 
-# Get all non /32 IPs in given field and config file
-getConfigIPS() {
-  local source_field="$1"
-  local config_file="$2"
+# Usage: check_ip_in_cidr <ip> <cidr>
+check_ip_in_cidr() {
+  local ip="${1}"
+  local cidr="${2}"
 
-  local configIPS=()
+  python3 -c "import ipaddress; exit(0) if ipaddress.ip_address('${ip}') in ipaddress.ip_network('${cidr}') else exit(1)"
+}
 
-  for ip in $(yq4 e "$source_field | .[]" "$config_file"); do
-    if [[ $ip != */32 ]]; then
-      configIPS+=("${ip}")
-    fi
+# Usage: process_ips_to_cidrs <config key> <config file> <ips>...
+# return cidrs that are filtered so:
+# 1. old cidr entries are returned with existing suffix if it contains new ips
+# 2. new cidr entries are returned with a /32 suffix
+# 3. returned cidrs are sorted and unique
+process_ips_to_cidrs() {
+  local config_key="${1}"
+  local config_file="${2}"
+
+  local -a new_cidrs
+  local -a old_cidrs
+
+  readarray -t old_cidrs <<< "$(yq4 "${config_key} | .[]" "${config_file}")"
+
+  for ip in "${@:3}"; do
+    for cidr in "${old_cidrs[@]}"; do
+      if [[ "${cidr}" != "" ]] && ! [[ "${cidr}" =~ .*/32 ]] && check_ip_in_cidr "${ip}" "${cidr}"; then
+        new_cidrs+=("${cidr}")
+        continue 2
+      fi
+    done
+
+    new_cidrs+=("${ip}/32")
   done
 
-  echo "${configIPS[@]}"
+  yq4 'split(" ") | sort | unique | .[]' <<< "${new_cidrs[@]}"
 }
 
-# Check if IPs fits into subnets
-performIPCheckAndRemoveFromIPSList() {
-  local IPToCheck="$1"
-  local networkToCompareTo="$2"
-
-  # Try to see if ip belongs to subnet - if not, exit(1)
-  if python3 -c "import ipaddress; exit(0) if ipaddress.ip_address('${IPToCheck}') in ipaddress.ip_network('${networkToCompareTo}') else exit(1)"; then
-    # Filter out the matching string for IPS.
-    filtered_array=()
-    for ip in "${IPS[@]}"; do
-      if [[ "$ip" != "$IPToCheck" ]]; then
-        filtered_array+=("$ip")
-      fi
-    done
-
-    IPS=("${filtered_array[@]}")
-
-    # Add working networkToCompareTo to the list of working subnets
-    if [[ " ${working_subnet[*]} " != *" $networkToCompareTo "* ]]; then
-      working_subnet+=("$networkToCompareTo")
-    fi
-  fi
-}
-
-processIPRanges() {
-  local configKey="$1"
-  local configFile="$2"
-
-  local multiIPRanges=()
-  read -r -a multiIPRanges <<<"$(getConfigIPS "$configKey" "$configFile")"
-
-  local working_subnet=()
-
-  # Clear config values
-  yq4 -i "$configKey"' = []' "$configFile"
-
-  # IF config value is not empty, go ahead with the following:
-  # 1. Check if any got IPS fit inside of the IPs existing in the config-files.
-  # 2. IF True = Put the working subnet-address and kube-address in assigned arrays for comparison and remove copies.
-  # 3. Merge the working subnet-addresses and kube-addresses into a finalized list.
-  if [ "${#multiIPRanges[@]}" -gt 0 ]; then
-    for upstreamDNSIP in "${IPS[@]}"; do
-      for configIP in "${multiIPRanges[@]}"; do
-        performIPCheckAndRemoveFromIPSList "$upstreamDNSIP" "$configIP"
-      done
-    done
-
-    # Add the working subnet-addresses and working IPs together.
-    working_subnet+=("${IPS[@]}")
-
-    filtered_working_subnet=()
-
-    for ip in "${working_subnet[@]}"; do
-
-      if [[ $ip =~ "/" ]]; then
-        filtered_working_subnet+=("$ip")
-      else
-        filtered_working_subnet+=("$ip"/32)
-      fi
-    done
-
-    echo "${filtered_working_subnet[@]}"
-  else
-
-    processed_IPS=()
-
-    for ip in "${IPS[@]}"; do
-      processed_IPS+=("$ip/32")
-    done
-
-    echo "${processed_IPS[@]}"
-  fi
-}
-
-# checkIfDiffAndUpdateIPs <yaml_path> <file> <IP 1> <IP ..>
+# checkIfDiffAndUpdateIPs <config_key> <config_file> <ips>...
 checkIfDiffAndUpdateIPs() {
-  local yaml_path="${1}"
-  local file="${2}"
+  local config_key="${1}"
+  local config_file="${2}"
   shift 2
-  local IPS=("$@")
+  local -a ips=("$@")
 
-  processedIPRANGE=$(processIPRanges "${yaml_path}" "${file}")
+  local cidrs
+  cidrs="$(process_ips_to_cidrs "${config_key}" "${config_file}" "${ips[@]}")"
 
-  if ! diffIPs "${yaml_path}" "${file}" "$processedIPRANGE"; then
+  if ! diff_cidrs "${config_key}" "${config_file}" "${cidrs}"; then
     if ! $DRY_RUN; then
-      updateIPs "${yaml_path}" "${file}" "$processedIPRANGE"
+      update_cidrs "${config_key}" "${config_file}" "${cidrs}"
     else
-      log_warning "Diff found for ${yaml_path} in ${file//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
+      log_warning "Diff found for ${config_key} in ${config_file//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
     fi
     has_diff=$((has_diff + 1))
   fi
