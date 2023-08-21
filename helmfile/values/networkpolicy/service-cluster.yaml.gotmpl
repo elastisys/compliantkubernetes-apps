@@ -74,7 +74,6 @@ fluentd:
 
 rcloneSync:
   enabled: {{ and .Values.objectStorage.sync.enabled .Values.networkPolicies.rcloneSync.enabled }}
-  {{- if and .Values.objectStorage.sync.enabled .Values.networkPolicies.rcloneSync.enabled }}
   destinationObjectStorage:
     ips:
       {{- if eq .Values.objectStorage.sync.destinationType "s3" }}
