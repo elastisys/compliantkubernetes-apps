@@ -129,6 +129,19 @@ config_validate() {
           pass="false"
       fi
     done
+
+    sync_enabled=$(yq4 '.objectStorage.sync.enabled' <<< "${CONFIG["${1}"]}")
+    if [[ "${1}" = "sc" ]] && [[ "${sync_enabled}" = "true" ]]; then
+      log_info "checking sync swift"
+
+      check_harbor="$(yq4 '.harbor.persistence.type' <<< "${CONFIG["${1}"]}")"
+      check_thanos="$(yq4 '.thanos.objectStorage.type' <<< "${CONFIG["${1}"]}")"
+      check_sync_swift="$(yq4 '.objectStorage.sync.swift' <<< "${CONFIG["${1}"]}")"
+
+      if { [[ "${check_harbor}" = "swift" ]] || [[ "${check_thanos}" = "swift" ]]; } && [[ "${check_sync_swift}" = "null" ]]; then
+        log_error "error: swift is enabled for Harbor/Thanos, but .objectStorage.sync is missing swift configuration"
+      fi
+    fi
     ;;
 
   *)

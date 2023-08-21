@@ -36,6 +36,40 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
 ## Prerequisites
 
+- If `.objectStorage.sync.enabled: true` and `.thanos.objectStorage.type: swift` or `.harbor.persistence.type: swift` then the rclone jobs will automatically use swift for source and destination buckets. You will need to create the application credentials for swift and add them into the `secrets.yaml`:
+
+    <details><summary>Create source application credentials</summary>
+
+    ```bash
+    source ${CK8S_CONFIG_PATH}/openrc.sh
+    source <(sops -d ${CK8S_CONFIG_PATH}/secret/<source-env-openstack-user>.sh)
+
+    openstack application credential create <env-name>-swift
+
+    sops ${CK8S_CONFIG_PATH}/secrets.yaml
+
+    objectStorage.swift.applicationCredentialID
+    objectStorage.swift.applicationCredentialSecret
+    ```
+
+    </details>
+
+    <details><summary>Create destination application credentials</summary>
+
+    ```bash
+    source ${CK8S_CONFIG_PATH}/openrc.sh
+    source <(sops -d ${CK8S_CONFIG_PATH}/secret/<destination-env-openstack-user>.sh)
+
+    openstack application credential create <env-name>-swift
+
+    sops ${CK8S_CONFIG_PATH}/secrets.yaml
+
+    objectStorage.sync.swift.applicationCredentialID
+    objectStorage.sync.swift.applicationCredentialSecret
+    ```
+
+    </details>
+
 - [ ] Notify the users (if any) before the upgrade starts;
 - [ ] Check if there are any pending changes to the environment;
 - [ ] Check the state of the environment, pods, nodes and backup jobs:
@@ -102,6 +136,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     ./migration/v0.32/prepare/10-thanos-distrib-memory-limit.sh
+    ```
+
+1. Rename the key `.objectStorage.sync.type` to `objectStorage.sync.destinationType`
+
+    ```bash
+    ./migration/v0.32/prepare/20-sync-type-new-key-name.sh
     ```
 
 1. Update rclone sync networkPolicy name:
