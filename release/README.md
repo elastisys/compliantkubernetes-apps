@@ -129,4 +129,5 @@ The following constraints apply on releases:
 
 1. Follow the major/minor release from step 6 to update the public release notes.
 
-> [!WARNING] At the end in the github main page you will see a message like `release-X.Y had recent pushes * minutes ago` and the option to `Compare & pull request` --> Ignore this! Do not create a PR to push back to main!
+> [!WARNING]
+> At the end in the github main page you will see a message like `release-X.Y had recent pushes * minutes ago` and the option to `Compare & pull request` --> Ignore this! Do not create a PR to push back to main!

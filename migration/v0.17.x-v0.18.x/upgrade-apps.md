@@ -4,7 +4,8 @@
 
 - ingress-nginx: in v0.17.0 hostNetwork was enabled by default even for LoadBalancer type service. During this upgrade we will disable hostNetwork for this service type, but we noticed that the upgrade will fail due to the PSP being deleted before the new pods get scheduled. We mitigate this by creating a temporary PSP, using it for the upgrade, apply the chart PSP and at the end delete the temporary PSP.
 
-    > [!NOTE] This steps will apply only where LoadBalancer type service is available and `useHostPort: false` in the sc and wc configs
+    > [!NOTE]
+    > This steps will apply only where LoadBalancer type service is available and `useHostPort: false` in the sc and wc configs
 
     Apply the temporary psp:
 

@@ -46,7 +46,8 @@
 
 1. Update the thanos receiver pvc size: `migration/v0.19.x-v0.20.x/upgrade-thanos-receiver-pvc.sh`
 
-    > [!NOTE] You will need to manually delete `thanos.receiver.persistence` lines from sc-config.yaml.
+    > [!NOTE]
+    > You will need to manually delete `thanos.receiver.persistence` lines from sc-config.yaml.
     >
     > `vim $CK8S_CONFIG_PATH/sc-config.yaml`
 

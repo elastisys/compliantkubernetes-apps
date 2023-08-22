@@ -2,7 +2,8 @@
 
 Charts are managed with the file `index.yaml` and the script `charts.sh`.
 
-> [!NOTE] Most functions relies on the repositories being added and updated in helm:
+> [!NOTE]
+> Most functions relies on the repositories being added and updated in helm:
 >
 > ```bash
 > ./scripts/charts.sh repo add
@@ -33,7 +34,8 @@ Pull the chart:
 ./scripts/charts.sh pull <chart-name>
 ```
 
-> [!NOTE] To use an upstream chart ensure that:
+> [!NOTE]
+> To use an upstream chart ensure that:
 >
 > 1. the state file contains `./bases/upstream.yaml` as a base to include the upstream index, and
 > 2. the release spec contains `inherit: [ template: <chart-name> ]` to include the chart template.
