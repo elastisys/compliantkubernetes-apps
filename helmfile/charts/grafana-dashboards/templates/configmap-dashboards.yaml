@@ -1,31 +1,32 @@
-{{- range $key, $value := .Values.dashboards }}
-{{- $_ := set $ "key" $key }}
-{{- $_ := set $ "value" $value }}
-{{- if $value.enabled }}
+{{- $files := .Files.Glob "dashboards/**dashboard.json" }}
+{{- range $path, $fileContents := $files }}
+{{- $dashboardName := regexReplaceAll "(^.*/)(.*)\\.json$" $path "${2}" }}
+{{- if not (has $dashboardName $.Values.disabledDashboards) }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ printf "%s-%s" $.Release.Name $key }}
-  namespace: {{ $.Release.Namespace }}
+  name: {{ printf "%s-%s" (include "grafana-dashboards.fullname" $) $dashboardName | trunc 63 | trimSuffix "-" }}
+  namespace: {{ include "grafana-dashboards.namespace" $ }}
   labels:
-    {{- if $value.user_visible }}
-    {{ $.Values.labelKey }}: "1"
-    {{- else }}
+    {{- include "grafana-dashboards.labels" $ | nindent 4 }}
+    {{- if has $dashboardName $.Values.notDeveloperVisible }}
     {{ $.Values.labelKey }}: "ops"
+    {{- else }}
+    {{ $.Values.labelKey }}: "1"
     {{- end }}
 data:
-  {{- if eq $key "backup" }}
-  {{- $sync := (empty $value.sync) | ternary "**disabled**" (printf "**enabled** for bucket(s) %s" (join ", " (sortAlpha $value.sync))) }}
-  {{ $key }}.json: |-
-    {{- regexReplaceAll "<<rclone-sync-state>>" ($.Files.Get (printf "dashboards/%s-dashboard.json" $key)) $sync | nindent 6 }}
-  {{- else if eq $key "welcome" }}
+  {{ $dashboardName }}.json: |-
+  {{- if eq $dashboardName "backup-dashboard" }}
+  {{- $sync := (empty $.Values.sync) | ternary "**disabled**" (printf "**enabled** for bucket(s) %s" (join ", " (sortAlpha $.Values.sync))) }}
+    {{- regexReplaceAll "<<rclone-sync-state>>" ($.Files.Get (printf $path)) $sync | nindent 6 }}
+  {{- else if eq $dashboardName "welcome-dashboard" }}
   {{- $markdown := (regexReplaceAll "\n" (tpl ($.Files.Get "files/welcome.md") $) "\\n") }}
-  {{ $key }}.json: |-
-    {{- regexReplaceAll "<<markdownstring>>" ($.Files.Get (printf "dashboards/%s-dashboard.json" $key)) $markdown | nindent 6 }}
+    {{- regexReplaceAll "<<markdownstring>>" ($.Files.Get (printf $path)) $markdown | nindent 6 }}
+  {{- else if or (eq $dashboardName "falco-dashboard") (eq $dashboardName "gatekeeper-dashboard") }}
+    {{- regexReplaceAll "<<opensearchdashboardsURL>>" ($.Files.Get (printf $path)) ($.Values.logEndpoint | toString) | nindent 6 }}
   {{- else }}
-  {{ $key }}.json: |-
-    {{- regexReplaceAll "<<opensearchdashboardsURL>>" ($.Files.Get (printf "dashboards/%s-dashboard.json" $key)) ($value.logEndpoint | toString) | nindent 6 }}
+    {{ $.Files.Get $path | nindent 6 }}
   {{- end }}
 {{- end }}
 {{- end }}
