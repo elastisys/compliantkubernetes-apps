@@ -32,8 +32,8 @@ objectStorage:
     enabled: false
     # dryrun: false
 
-    ## Options are 's3 and swift'. If Harbor or Thanos are using swift then we will automatically use swift for the sync, regardless of the value set for type.
-    #
+    ## Only 's3' is currently supported for `.objectStorage.sync.destinationType` as not all default buckets applications have swift support.
+    ## If Harbor or Thanos are using swift then we will automatically use swift for the sync, regardless of the value set for type.
     destinationType: s3
     # secondaryUrl: set-me if regionEndpoint and or authUrl does not have all the relevant ips and or ports used for rclone-sync networkpolicy.
     # s3:

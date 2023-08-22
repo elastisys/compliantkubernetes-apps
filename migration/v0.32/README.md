@@ -36,12 +36,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
 ## Prerequisites
 
-- If `.objectStorage.sync.enabled: true` and `.thanos.objectStorage.type: swift` or `.harbor.persistence.type: swift` then the rclone jobs will automatically use swift for source and destination buckets. You will need to create the application credentials for swift and add them into the `secrets.yaml`:
+- If `.objectStorage.sync.enabled: true` and `.thanos.objectStorage.type: swift` or `.harbor.persistence.type: swift` then the rclone jobs will automatically use swift for Thanos and/or Harbor source and destination buckets. You will need to create the application credentials for swift and add them into the `secrets.yaml`:
 
     <details><summary>Create source application credentials</summary>
 
     ```bash
-    source ${CK8S_CONFIG_PATH}/openrc.sh
+    source ${CK8S_CONFIG_PATH}/<source-openrc>.sh
     source <(sops -d ${CK8S_CONFIG_PATH}/secret/<source-env-openstack-user>.sh)
 
     openstack application credential create <env-name>-swift
@@ -57,7 +57,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     <details><summary>Create destination application credentials</summary>
 
     ```bash
-    source ${CK8S_CONFIG_PATH}/openrc.sh
+    source ${CK8S_CONFIG_PATH}/<destination-openrc>.sh
     source <(sops -d ${CK8S_CONFIG_PATH}/secret/<destination-env-openstack-user>.sh)
 
     openstack application credential create <env-name>-swift

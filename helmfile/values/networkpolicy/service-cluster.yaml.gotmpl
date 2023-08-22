@@ -1,3 +1,20 @@
+{{ $sourceSwift := "" }}
+{{ $destinationSwift := "" }}
+
+{{- range .Values.objectStorage.sync.buckets }}
+  {{- if hasKey . "sourceType" }}
+  {{- if eq .sourceType "swift" }}
+  {{ $sourceSwift = "true" }}
+  {{- end }}
+  {{- end }}
+
+  {{- if hasKey . "destinationType" }}
+  {{- if eq .destinationType "swift" }}
+  {{ $destinationSwift = "true" }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+
 global:
   scApiserver:
     ips: {{- toYaml .Values.networkPolicies.global.scApiserver.ips | nindent 6 }}
@@ -9,12 +26,6 @@ global:
   wcIngress:
     ips: {{- toYaml .Values.networkPolicies.global.wcIngress.ips | nindent 6 }}
   objectStorage:
-  {{ $sourceSwift := "" }}
-  {{- range .Values.objectStorage.sync.buckets }}
-  {{- if or (eq (get "sourceType" "" .) "swift") (and (ne (get "sourceType" "" .) "s3") (eq $.Values.objectStorage.type "swift") ) }}
-  {{ $sourceSwift = "true" }}
-  {{- end }}
-  {{- end }}
     ips:
       {{- toYaml .Values.networkPolicies.global.objectStorage.ips | nindent 6 }}
       {{- if and (or (eq .Values.harbor.persistence.type "swift") (eq .Values.thanos.objectStorage.type "swift") ($sourceSwift)) (.Values.networkPolicies.global.objectStorageSwift.ips) }}
@@ -79,7 +90,7 @@ rcloneSync:
       {{- if eq .Values.objectStorage.sync.destinationType "s3" }}
       {{- toYaml .Values.networkPolicies.rcloneSync.destinationObjectStorageS3.ips | nindent 6 }}
       {{- end }}
-      {{- if or (eq .Values.objectStorage.sync.destinationType "swift") (eq .Values.harbor.persistence.type "swift") (eq .Values.thanos.objectStorage.type "swift") }}
+      {{- if or (eq .Values.objectStorage.sync.destinationType "swift") (eq .Values.harbor.persistence.type "swift") (eq .Values.thanos.objectStorage.type "swift") ($destinationSwift) }}
       {{- toYaml .Values.networkPolicies.rcloneSync.destinationObjectStorageSwift.ips | nindent 6 }}
       {{- end }}
       {{- if hasKey .Values.objectStorage.sync "secondaryUrl" }}
@@ -89,7 +100,7 @@ rcloneSync:
       {{- if eq .Values.objectStorage.sync.destinationType "s3" }}
       {{- toYaml .Values.networkPolicies.rcloneSync.destinationObjectStorageS3.ports | nindent 6 }}
       {{- end }}
-      {{- if or (eq .Values.objectStorage.sync.destinationType "swift") (eq .Values.harbor.persistence.type "swift") (eq .Values.thanos.objectStorage.type "swift") }}
+      {{- if or (eq .Values.objectStorage.sync.destinationType "swift") (eq .Values.harbor.persistence.type "swift") (eq .Values.thanos.objectStorage.type "swift") ($destinationSwift) }}
       {{- toYaml .Values.networkPolicies.rcloneSync.destinationObjectStorageSwift.ports | nindent 6 }}
       {{- end }}
       {{- if hasKey .Values.objectStorage.sync "secondaryUrl" }}
