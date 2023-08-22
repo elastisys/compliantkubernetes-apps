@@ -98,7 +98,7 @@ config:
       {{- end }}
   {{- end }}
 
-  {{- if or $destinationSwift ($.Values.objectStorage.sync.destinationType "swift") }}
+  {{- if or $destinationSwift (eq $.Values.objectStorage.sync.destinationType "swift") }}
   {{- $swift := .Values.objectStorage.sync | getOrNil "swift" | required "Swift destination enabled for rclone but not configured!" }}
   - name: dest-swift
     type: swift
