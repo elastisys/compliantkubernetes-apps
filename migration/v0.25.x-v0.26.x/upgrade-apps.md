@@ -29,7 +29,7 @@
 
 1. *Optional:* If you are upgrading an environment of an Elastisys customer then run this script to add a customer support message to the grafana/opensearch "welcoming dashboards":
 
-    > **_NOTE:_** This script requires yq4
+    > [!NOTE] This script requires yq4
 
     ```bash
     ./migration/v0.25.x-v0.26.x/add-support-message.sh

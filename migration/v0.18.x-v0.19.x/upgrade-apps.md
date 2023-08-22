@@ -46,7 +46,7 @@
 
 1. Run the migration script `remove_deleted_rules_prometheus_alerts.sh` to remove the old Prometheus rules and alerts from both clusters
 
-    > **_WARNING:_** this will "hide" all the alerts until you run the `bin/ck8s apply` and recreate the rules and alerts
+    > [!WARNING] this will "hide" all the alerts until you run the `bin/ck8s apply` and recreate the rules and alerts
 
 1. Run migration script `remove_old_metrics_server.sh`
 
