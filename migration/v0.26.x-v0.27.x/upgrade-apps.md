@@ -24,7 +24,8 @@
     ./migration/v0.26.x-v0.27.x/set-external-netpol-ips.sh
     ```
 
-    > **_Note_**: With Octavia load balancers add the IP of the Amphorae instances to SC and WC nodes respectively in `common-config.yaml`.
+    > [!NOTE]
+    > With Octavia load balancers add the IP of the Amphorae instances to SC and WC nodes respectively in `common-config.yaml`.
 
     First list networks using `openstack network list` to find the network IDs, then using `openstack port list --network <network-id>` find the IPs used by the load balancer instances prefixed with `octavia` and add those.
 
@@ -61,7 +62,8 @@
     ./migration/v0.26.x-v0.27.x/add-extra-excluded-namespaces.sh
     ```
 
-    > **_NOTE:_** remove the namespaces that are not managed from `$CK8S_CONFIG_PATH/wc-config.yaml`
+    > [!NOTE]
+    > Remove the namespaces that are not managed from `$CK8S_CONFIG_PATH/wc-config.yaml`
 
 1. Reinstall HNC
 
@@ -145,4 +147,5 @@
 
     Several default resource requests and limits have changed. When upgrading these might need to be changed in your environment. Check for pods that have high memory usage (or even goes OOM) or have heavily throttled CPU.
 
-> **_NOTE:_** after the upgrade check the `NetworkPolicy Dashboard` in Grafana to see if you have any dropped packets.
+> [!NOTE]
+> After the upgrade check the `NetworkPolicy Dashboard` in Grafana to see if you have any dropped packets.
