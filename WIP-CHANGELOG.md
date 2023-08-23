@@ -6,6 +6,7 @@
 - Probes from WC to SC to monitor how well clusters reach each other
 - Added so `bin/ck8s test` components can be used all at once in a cluster.
 - Alerts for Harbor
+- The possibility to configure plugins and additional datasources for Grafana
 
 ### Changed
 

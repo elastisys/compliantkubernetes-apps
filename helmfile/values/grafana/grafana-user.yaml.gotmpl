@@ -21,10 +21,21 @@ sidecar:
     labelValue: "1"
   resources: {{- toYaml .Values.grafana.user.sidecar.resources | nindent 6 }}
 
+{{- if .Values.grafana.user.envRenderSecret }}
+envRenderSecret: {{- toYaml .Values.grafana.user.envRenderSecret | nindent 2 }}
+{{- end }}
+
+{{- if .Values.grafana.user.plugins }}
+plugins: {{- toYaml .Values.grafana.user.plugins | nindent 2 }}
+{{- end }}
+
 datasources:
   datasources.yaml:
     apiVersion: 1
     datasources:
+    {{- if .Values.grafana.user.additionalDatasources }}
+    {{- toYaml .Values.grafana.user.additionalDatasources | nindent 4 }}
+    {{- end }}
     {{- if and .Values.thanos.enabled .Values.thanos.query.enabled }}
     - name: "Service Cluster"
       access: proxy
