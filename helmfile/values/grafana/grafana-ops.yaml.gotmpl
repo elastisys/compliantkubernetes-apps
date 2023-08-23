@@ -116,6 +116,9 @@ grafana.ini:
     {{- end }}
   users:
     viewers_can_edit: {{ .Values.grafana.ops.viewersCanEdit }}
+  {{- if .Values.grafana.ops.additionalConfigValues }}
+  {{ .Values.grafana.ops.additionalConfigValues | nindent 2 }}
+  {{- end }}
 
 resources: {{- toYaml .Values.grafana.ops.resources | nindent 4 }}
 tolerations: {{- toYaml .Values.grafana.ops.tolerations | nindent 4 }}

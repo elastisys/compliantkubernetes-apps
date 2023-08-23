@@ -7,6 +7,7 @@
 - Added so `bin/ck8s test` components can be used all at once in a cluster.
 - Alerts for Harbor
 - The possibility to configure plugins and additional datasources for Grafana
+- The possibility to add or overwrite `grafana.ini` configuration
 
 ### Changed
 
