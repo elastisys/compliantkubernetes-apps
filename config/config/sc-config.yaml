@@ -121,6 +121,10 @@ grafana:
           memory: 100Mi
     plugins: []
     additionalDatasources: {}  # if the datasource require a secrets, you can set that in secrets.yaml under .grafana.ops|user.envRenderSecret
+    additionalConfigValues: {}
+    # additionalConfigValues: |-
+    #   dataproxy:
+    #     timeout: 600
   user:
     enabled: true
     <<: *grafanadefaults
