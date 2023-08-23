@@ -131,7 +131,8 @@ config_validate() {
     done
 
     sync_enabled=$(yq4 '.objectStorage.sync.enabled' <<< "${CONFIG["${1}"]}")
-    if [[ "${1}" = "sc" ]] && [[ "${sync_enabled}" = "true" ]]; then
+    sync_default_enabled=$(yq4 '.objectStorage.sync.syncDefaultBuckets' <<< "${CONFIG["${1}"]}")
+    if [[ "${1}" = "sc" ]] && [[ "${sync_enabled}" = "true" ]] && [[ "${sync_default_enabled}" = "true" ]]; then
       log_info "checking sync swift"
 
       check_harbor="$(yq4 '.harbor.persistence.type' <<< "${CONFIG["${1}"]}")"

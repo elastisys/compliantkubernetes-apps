@@ -36,7 +36,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
 ## Prerequisites
 
-- If `.objectStorage.sync.enabled: true` and `.thanos.objectStorage.type: swift` or `.harbor.persistence.type: swift` then the rclone jobs will automatically use swift for Thanos and/or Harbor source and destination buckets. You will need to create the application credentials for swift and add them into the `secrets.yaml`:
+- If `.objectStorage.sync.enabled: true` and `.objectStorage.sync.syncDefaultBuckets: true` and `.thanos.objectStorage.type: swift` or `.harbor.persistence.type: swift` then the rclone jobs will automatically use swift for Thanos and/or Harbor source and destination buckets. You will need to create the application credentials for swift and add them into the `secrets.yaml`:
 
     <details><summary>Create source application credentials</summary>
 
