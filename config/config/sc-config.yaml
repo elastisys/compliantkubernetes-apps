@@ -86,12 +86,12 @@ falco:
     hostPort: http://alertmanager-operated.monitoring:9093
 
 grafana:
-  ops:
+  ops: &grafanadefaults
     # subdomain moved to common-config
     resources:
       requests:
         cpu: 50m
-        memory: 60Mi
+        memory: 80Mi
       limits:
         cpu: 100m
         memory: 160Mi
@@ -101,9 +101,9 @@ grafana:
     oidc:
       enabled: true
       userGroups:
-        grafanaAdmin: grafana_admin   # maps to grafana role admin
-        grafanaEditor: grafana_editor # maps to grafana role editor
-        grafanaViewer: grafana_viewer # maps to grafana role viewer
+        grafanaAdmin: grafana_admin    # maps to grafana role admin
+        grafanaEditor: grafana_editor  # maps to grafana role editor
+        grafanaViewer: grafana_viewer  # maps to grafana role viewer
       scopes: openid profile email groups
       allowedDomains:
         - set-me
@@ -117,38 +117,18 @@ grafana:
         limits:
           cpu: 50m
           memory: 100Mi
+    plugins: []  # this will require adding the correct IP/range and port to .networkPolicies.monitoring.grafana.externalDashboardProvider
+    # if the datasource require a secrets, you can set that in secrets.yaml under .grafana.{ops|user}.envRenderSecret
+    # the correct IP/range and port should be added to .networkPolicies.monitoring.grafana.externalDataSources
+    additionalDatasources: {}
+    additionalConfigValues: {}
+    # additionalConfigValues: |-
+    #   dataproxy:
+    #     timeout: 600
   user:
     enabled: true
     # subdomain moved to common-config
-    resources:
-      limits:
-        cpu: 100m
-        memory: 160Mi
-      requests:
-        cpu: 50m
-        memory: 80Mi
-    tolerations: []
-    affinity: {}
-    nodeSelector: {}
-    oidc:
-      scopes: profile email openid groups
-      userGroups:
-        grafanaAdmin: grafana_admin   # maps to grafana role admin
-        grafanaEditor: grafana_editor # maps to grafana role editor
-        grafanaViewer: grafana_viewer # maps to grafana role viewer
-      allowedDomains:
-        - set-me
-        - example.com
-    viewersCanEdit: true
-    trailingDots: true
-    sidecar:
-      resources:
-        requests:
-          cpu: 10m
-          memory: 80Mi
-        limits:
-          cpu: 50m
-          memory: 100Mi
+    <<: *grafanadefaults
 
 harbor:
   # the enabled property moved to common-config
