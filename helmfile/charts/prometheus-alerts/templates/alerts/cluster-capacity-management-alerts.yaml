@@ -33,13 +33,15 @@ spec:
       for: 1h
       labels:
         severity: warning
-    - alert: PersistentVolume{{.Values.capacityManagementAlertsDiskLimit}}PercentInThreeDays
+    {{- if .Values.capacityManagementAlertsPersistentVolumeEnabled }}
+    - alert: PersistentVolume{{.Values.capacityManagementAlertsPersistentVolumeLimit}}PercentInThreeDays
       annotations:
-        message: The PersistentVolume claimed by {{`{{ $labels.persistentvolumeclaim }}`}} in Namespace {{`{{ $labels.namespace }}`}} will go over {{.Values.capacityManagementAlertsDiskLimit}} in three days.
-      expr: predict_linear(kubelet_volume_stats_available_bytes[24h], 3*24*60*60) <= (kubelet_volume_stats_capacity_bytes*(1-{{ .Values.capacityManagementAlertsDiskLimit }}/100))
+        message: The PersistentVolume claimed by {{`{{ $labels.persistentvolumeclaim }}`}} in Namespace {{`{{ $labels.namespace }}`}} will go over {{.Values.capacityManagementAlertsPersistentVolumeLimit}} in three days.
+      expr: predict_linear(kubelet_volume_stats_available_bytes[24h], 3*24*60*60) <= (kubelet_volume_stats_capacity_bytes*(1-{{ .Values.capacityManagementAlertsPersistentVolumeLimit }}/100))
       for: 5m
       labels:
         severity: warning
+    {{- end }}
     - alert: Memory{{.Values.capacityManagementAlertsUsageLimit}}PercentInThreeDays
       annotations:
         message: Memory usage in Cluster {{`{{ $labels.cluster }}`}} Instance {{`{{ $labels.instance }}`}} is predicted to go over {{.Values.capacityManagementAlertsUsageLimit}}% within the next 3 days at current use rate.
