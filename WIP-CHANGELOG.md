@@ -12,6 +12,7 @@
 ### Fixed
 
 - Refer to Grafana, OpenSearch and Harbor as Web Portals in Grafana and OpenSearch welcome dashboards
+- Fixed the `csi-upcloud` Network Policy template.
 
 ### Updated
 
