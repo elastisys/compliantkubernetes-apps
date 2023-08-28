@@ -16,14 +16,14 @@ spec:
           protocol: UDP
         - port: 53
           protocol: TCP
-    {{- if and .Values.global.objectStorage.ips .Values.global.objectStorage.ports }}
+    {{- if and .Values.rcloneSync.sourceObjectStorage.ips .Values.rcloneSync.sourceObjectStorage.ports }}
     - to:
-        {{- range .Values.global.objectStorage.ips | uniq }}
+        {{- range .Values.rcloneSync.sourceObjectStorage.ips | uniq }}
         - ipBlock:
             cidr: {{ . }}
         {{- end }}
       ports:
-        {{- range .Values.global.objectStorage.ports | uniq }}
+        {{- range .Values.rcloneSync.sourceObjectStorage.ports | uniq }}
         - port: {{ . }}
         {{- end }}
     {{- end }}

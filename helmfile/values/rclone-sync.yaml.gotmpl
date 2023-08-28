@@ -114,15 +114,6 @@ config:
       region: {{ $swift.region }}
       tenant: {{ $swift.projectName }}
   {{- end }}
-  {{- if $destinationSwift }}
-  - name: dest-swift
-    type: swift
-    swift:
-      applicationCredentialID: {{ .Values.objectStorage.sync.swift.applicationCredentialID }}
-      applicationCredentialSecret: {{ .Values.objectStorage.sync.swift.applicationCredentialSecret }}
-      authUrl: {{ .Values.objectStorage.sync.swift.authUrl }}
-      region: {{ .Values.objectStorage.sync.swift.region }}
-  {{- end }}
 
   encrypt:
   {{- if .Values.objectStorage.sync.encrypt.enabled }}
