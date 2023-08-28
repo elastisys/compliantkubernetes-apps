@@ -1,0 +1,22 @@
+name: pull-request
+
+on:
+  pull_request:
+    branches:
+      - main
+      - release-*
+    types:
+      - edited
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  pull-requst:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: fetch pull request
+        run: jq -r '.pull_request.body' "${{ github.event_path }}"  > /tmp/pr-body.md
+      - name: validate pull request
+        run: ./scripts/validate-pr.sh /tmp/pr-body.md
