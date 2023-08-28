@@ -11,6 +11,7 @@
 - Moved `rclone-sync` from `kube-system` to its own namespace.
 - Moved all the kube-prometheus-stack Grafana dashboards to `grafana-dashboards` chart
 - Separated node and PV `capacityManagementAlerts` limit configuration
+- Replaced image `elastisys/curl-jq:latest` with `ghcr.io/elastisys/curl-jq:1.0.0`.
 
 ### Fixed
 

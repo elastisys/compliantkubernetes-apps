@@ -82,7 +82,7 @@ customRules:
             docker.io/bitnami/fluentd,
             docker.io/bitnami/kubectl,
             docker.io/elastisys/calico-accountant,
-            docker.io/elastisys/curl-jq,
+            ghcr.io/elastisys/curl-jq,
             docker.io/library/rabbitmq,
             docker.io/openpolicyagent/gatekeeper,
             docker.io/openpolicyagent/gatekeeper-crds,
@@ -210,7 +210,7 @@ customRules:
     - macro: user_known_package_manager_in_container
       condition: (
           container.image.repository in (
-            docker.io/elastisys/curl-jq,
+            ghcr.io/elastisys/curl-jq,
             ghcr.io/elastisys/fluentd,
             registry.k8s.io/dns/k8s-dns-node-cache
           ) or
@@ -268,7 +268,7 @@ customRules:
             registry.k8s.io/kube-proxy,
             registry.opensource.zalan.do/acid/spilo-14
           ) or (
-            container.image.repository=docker.io/elastisys/curl-jq and k8s.pod.name startswith opensearch-
+            container.image.repository=ghcr.io/elastisys/curl-jq and k8s.pod.name startswith opensearch-
           )
         )
     - macro: allowed_clear_log_files

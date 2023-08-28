@@ -108,7 +108,7 @@ extraEnvs:
 # However this relies on the unsafe sysctl to be allowed in kubelet, which it is not by default.
 extraInitContainers:
   - name: init-sysctl
-    image: elastisys/curl-jq:latest
+    image: ghcr.io/elastisys/curl-jq:1.0.0
     command:
       - sysctl
       - -w
