@@ -29,8 +29,21 @@ config:
   {{ $destinationSwift = "true" }}
 {{- end }}
 
+{{- if .Values.objectStorage.sync.syncDefaultBuckets }}
+  {{- if eq .Values.objectStorage.type "s3" }}
+  {{ $sourceS3 = "true" }}
+  {{- end }}
+  {{- if eq $.Values.objectStorage.sync.destinationType "s3" }}
+  {{ $destinationS3 = "true" }}
+  {{- else if eq $.Values.objectStorage.sync.destinationType "swift" }}
+  {{ $destinationSwift = "true" }}
+  {{- end }}
+{{- end }}
+
 {{- range .Values.objectStorage.sync.buckets }}
-  {{- if hasKey . "sourceType" }}
+  {{- if not (hasKey . "sourceType") }}
+  {{- $_ := set . "sourceType" $.Values.objectStorage.type }}
+  {{- end }}
   {{- if eq .sourceType "s3" }}
   {{ $sourceS3 = "true" }}
   {{- else if eq .sourceType "swift" }}
@@ -38,9 +51,10 @@ config:
   {{- else }}
   {{- fail "rclone-sync custom buckets only support s3 and swift for sourceType" }}
   {{- end }}
-  {{- end }}
 
-  {{- if hasKey . "destinationType" }}
+  {{- if not (hasKey . "destinationType") }}
+  {{- $_ := set . "destinationType" $.Values.objectStorage.sync.destinationType }}
+  {{- end }}
   {{- if eq .destinationType "s3" }}
   {{ $destinationS3 = "true" }}
   {{- else if eq .destinationType "swift" }}
@@ -48,11 +62,10 @@ config:
   {{- else }}
   {{- fail "rclone-sync custom buckets only support s3 and swift for destinationType" }}
   {{- end }}
-  {{- end }}
 {{- end }}
 
   source:
-  {{- if or $sourceS3 (eq $.Values.objectStorage.type "s3") }}
+  {{- if $sourceS3 }}
   - name: src-s3
     type: s3
     s3:
@@ -84,7 +97,7 @@ config:
   {{- end }}
 
   destination:
-  {{- if or $destinationS3 (eq $.Values.objectStorage.sync.destinationType "s3") }}
+  {{- if $destinationS3 }}
   - name: dest-s3
     type: s3
     s3:
@@ -98,7 +111,7 @@ config:
       {{- end }}
   {{- end }}
 
-  {{- if or $destinationSwift (eq $.Values.objectStorage.sync.destinationType "swift") }}
+  {{- if $destinationSwift }}
   {{- $swift := .Values.objectStorage.sync | getOrNil "swift" | required "Swift destination enabled for rclone but not configured!" }}
   - name: dest-swift
     type: swift
