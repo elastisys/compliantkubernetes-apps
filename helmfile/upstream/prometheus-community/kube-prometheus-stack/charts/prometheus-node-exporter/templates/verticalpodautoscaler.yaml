@@ -7,11 +7,19 @@ metadata:
   labels:
     {{- include "prometheus-node-exporter.labels" . | nindent 4 }}
 spec:
+  {{- with .Values.verticalPodAutoscaler.recommenders }}
+  recommenders:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   resourcePolicy:
     containerPolicies:
-    - containerName: {{ include "prometheus-node-exporter.name" . }}
+    - containerName: node-exporter
       {{- with .Values.verticalPodAutoscaler.controlledResources }}
-      controlledResources: {{ . }}
+      controlledResources:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.verticalPodAutoscaler.controlledValues }}
+      controlledValues: {{ . }}
       {{- end }}
       {{- with .Values.verticalPodAutoscaler.maxAllowed }}
       maxAllowed:
@@ -24,11 +32,9 @@ spec:
   targetRef:
     apiVersion: apps/v1
     kind: DaemonSet
-    name:  {{ include "prometheus-node-exporter.fullname" . }}
-  {{- if .Values.verticalPodAutoscaler.updatePolicy }}
+    name: {{ include "prometheus-node-exporter.fullname" . }}
+  {{- with .Values.verticalPodAutoscaler.updatePolicy }}
   updatePolicy:
-    {{- with .Values.verticalPodAutoscaler.updatePolicy.updateMode }}
-    updateMode: {{ . }}
-    {{- end }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 {{- end }}
