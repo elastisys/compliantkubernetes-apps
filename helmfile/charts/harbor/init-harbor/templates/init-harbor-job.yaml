@@ -14,7 +14,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: run
-          image: elastisys/curl-jq:latest
+          image: ghcr.io/elastisys/curl-jq:1.0.0
           command: ['/bin/sh', '/scripts/init-harbor.sh']
           env:
             - name: ENDPOINT
