@@ -42,11 +42,18 @@ mutatingWebhookCustomRules:
       - '*'
     operations:
       - CREATE
+    resources:
+      - pods
+  - apiGroups:
+      - '*'
+    apiVersions:
+      - '*'
+    operations:
+      - CREATE
       - UPDATE
     resources:
       - cronjobs
       - jobs
-      - pods
       - pods/attach
       - pods/binding
       - pods/ephemeralcontainers
