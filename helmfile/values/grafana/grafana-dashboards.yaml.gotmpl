@@ -5,9 +5,12 @@ dashboard:
   extraVersions:
 {{- toYaml .Values.welcomingDashboard.extraVersions | nindent 2 }}
 {{ end }}
+  opensearch: {{ .Values.opensearch.enabled }}
 
 baseDomain: {{ .Values.global.baseDomain }}
+{{- if .Values.opensearch.enabled }}
 logEndpoint: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
+{{- end }}
 
 disabledDashboards:
   {{- if not .Values.hnc.enabled }}
@@ -28,6 +31,9 @@ disabledDashboards:
   - vulnerability-dashboard
   - thanos-sidecar-dashboard
   - thanos-bucket-replicate-dashboard
+  {{- if not .Values.opensearch.enabled }}
+  - opensearch-dashboard
+  {{- end }}
 notDeveloperVisible:
   - hnc-dashboard
   - uptime-dashbord
