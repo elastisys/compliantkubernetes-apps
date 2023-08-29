@@ -115,6 +115,7 @@ spec:
               app.kubernetes.io/name: grafana
       ports:
         - port: 3000
+    {{- if .Values.opensearch.enabled }}
     - to:
         - namespaceSelector:
             matchLabels:
@@ -137,6 +138,7 @@ spec:
               {{- end }}
       ports:
         - port: 9200
+    {{- end }}
     - to:
         - namespaceSelector:
             matchLabels:

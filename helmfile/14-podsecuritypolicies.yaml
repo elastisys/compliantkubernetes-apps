@@ -92,6 +92,7 @@ releases:
       psp: opensearch
     chart: ./charts/gatekeeper/podsecuritypolicies
     version: 0.1.0
+    installed: {{ .Values.opensearch.enabled }}
     values:
       - values/podsecuritypolicies/service/opensearch.yaml.gotmpl
 {{- end }}

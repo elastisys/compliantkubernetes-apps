@@ -31,7 +31,9 @@ In case you get lost, don't forget to check out the [public docs](https://elasti
 ## Web Portals
 
 - [grafana.{{ .Values.baseDomain }}](https://grafana.{{ .Values.baseDomain }})
+{{ if .Values.dashboard.opensearch }}
 - [opensearch.{{ .Values.baseDomain }}](https://opensearch.{{ .Values.baseDomain }})
+{{ end }}
 - [harbor.{{ .Values.baseDomain }}](https://harbor.{{ .Values.baseDomain }})
 
 ## Did you know?

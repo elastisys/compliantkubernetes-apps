@@ -54,7 +54,7 @@ thanos:
   enabled: {{ .Values.networkPolicies.thanos.enabled }}
 
 opensearch:
-  enabled: {{ .Values.networkPolicies.opensearch.enabled }}
+  enabled: {{ and .Values.opensearch.enabled .Values.networkPolicies.opensearch.enabled }}
   data:
     enabled: {{ .Values.opensearch.dataNode.dedicatedPods }}
   client:

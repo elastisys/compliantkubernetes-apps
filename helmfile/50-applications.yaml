@@ -284,6 +284,7 @@ releases:
     group: opensearch
   chart: ./charts/opensearch/secrets
   version: 0.1.0
+  installed: {{ .Values.opensearch.enabled }}
   values:
   - values/opensearch/secrets.yaml.gotmpl
 
@@ -293,6 +294,7 @@ releases:
     app: opensearch-master
     group: opensearch
   inherit: [ template: opensearch ]
+  installed: {{ .Values.opensearch.enabled }}
   wait: true
   needs:
   {{- if .Values.opensearch.sso.enabled }}
@@ -309,7 +311,7 @@ releases:
     app: opensearch-data
     group: opensearch
   inherit: [ template: opensearch ]
-  installed: {{ .Values.opensearch.dataNode.dedicatedPods }}
+  installed: {{ and .Values.opensearch.enabled .Values.opensearch.dataNode.dedicatedPods }}
   wait: true
   needs:
   - opensearch-system/opensearch-master
@@ -323,7 +325,7 @@ releases:
     app: opensearch-client
     group: opensearch
   inherit: [ template: opensearch ]
-  installed: {{ .Values.opensearch.clientNode.dedicatedPods }}
+  installed: {{ and .Values.opensearch.enabled .Values.opensearch.clientNode.dedicatedPods }}
   wait: true
   needs:
   - opensearch-system/opensearch-master
@@ -337,6 +339,7 @@ releases:
     app: opensearch-dashboards
     group: opensearch
   inherit: [ template: opensearch-dashboards ]
+  installed: {{ .Values.opensearch.enabled }}
   wait: true
   needs:
   - opensearch-system/opensearch-master
@@ -350,7 +353,7 @@ releases:
     group: opensearch
   chart: ./charts/opensearch/backup
   version: 0.1.0
-  installed: {{ .Values.opensearch.snapshot.enabled }}
+  installed: {{ and .Values.opensearch.enabled .Values.opensearch.snapshot.enabled }}
   needs:
   - opensearch-system/opensearch-configurer
   values:
@@ -363,7 +366,7 @@ releases:
     group: opensearch
   chart: ./charts/opensearch/slm
   version: 0.1.0
-  installed: {{ .Values.opensearch.snapshot.enabled }}
+  installed: {{ and .Values.opensearch.enabled .Values.opensearch.snapshot.enabled }}
   needs:
   - opensearch-system/opensearch-configurer
   values:
@@ -376,7 +379,7 @@ releases:
     group: opensearch
   chart: ./charts/opensearch/curator
   version: 0.1.0
-  installed: {{ .Values.opensearch.curator.enabled }}
+  installed: {{ and .Values.opensearch.enabled .Values.opensearch.curator.enabled }}
   needs:
   - opensearch-system/opensearch-configurer
   values:
@@ -389,7 +392,7 @@ releases:
     group: opensearch
   chart: ./charts/opensearch/securityadmin
   version: 0.1.0
-  installed: {{ .Values.opensearch.securityadmin.enabled }}
+  installed: {{ and .Values.opensearch.enabled .Values.opensearch.securityadmin.enabled }}
   needs:
   - opensearch-system/opensearch-master
 {{- if .Values.opensearch.dataNode.dedicatedPods }}
@@ -408,6 +411,7 @@ releases:
     group: opensearch
   chart: ./charts/opensearch/configurer
   version: 0.1.0
+  installed: {{ .Values.opensearch.enabled }}
   needs:
   {{- if .Values.opensearch.securityadmin.enabled }}
   - opensearch-system/opensearch-securityadmin
@@ -557,7 +561,7 @@ releases:
     app: fluentd
     component: fluentd-forwarder
   inherit: [ template: fluentd-elasticsearch ]
-  installed: {{ .Values.fluentd.enabled }}
+  installed: {{ and .Values.opensearch.enabled .Values.fluentd.enabled }}
   values:
   - values/fluentd/forwarder-common.yaml.gotmpl
   - values/fluentd/forwarder-service-cluster.yaml.gotmpl
