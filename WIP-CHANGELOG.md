@@ -5,6 +5,7 @@
 - Extra component versions can be added in the Welcome dashboard via config
 - Probes from WC to SC to monitor how well clusters reach each other
 - Added so `bin/ck8s test` components can be used all at once in a cluster.
+- Alerts for Harbor
 
 ### Changed
 
@@ -14,6 +15,7 @@
 - Replaced image `elastisys/curl-jq:latest` with `ghcr.io/elastisys/curl-jq:1.0.0`.
 - Only mutate pods on create to prevent them from getting stuck
 - Increased the default `proxy-buffer-size` setting in ingress-nginx to `8k`.
+- The Grafana dashboard for Harbor to show the total number of artifacts and storage used per project
 
 ### Fixed
 

@@ -22,6 +22,7 @@ defaultRules:
     rookMonitor: {{ .Values.rookCeph.monitoring.enabled }}
     capacityManagementAlerts: {{ .Values.prometheus.capacityManagementAlerts.enabled }}
     networkpolicies: {{ .Values.networkPolicies.enableAlerting }}
+    harbor: false
 
 capacityManagementAlertsPersistentVolumeEnabled: {{ .Values.prometheus.capacityManagementAlerts.persistentVolume.enabled }}
 capacityManagementAlertsPersistentVolumeLimit: {{ .Values.prometheus.capacityManagementAlerts.persistentVolume.limit }}

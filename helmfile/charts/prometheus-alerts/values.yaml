@@ -77,7 +77,6 @@ defaultRules:
   ## Any labels to add to the recording rules
   # recordLabels:
   #   key: value
-
   rules:
     alertmanager: false
     blackbox: true
@@ -118,6 +117,7 @@ defaultRules:
     networkpolicies: true
     dns: true
     clusterApi: false
+    harbor: true
 
   appNamespacesTarget: ".*"
 
@@ -132,3 +132,12 @@ buckets:
   opensearch: set-me
   scFluentd: set-me
   thanos: set-me
+
+harbor:
+  database:
+    type: internal
+  redis:
+    type: internal
+  alerts:
+    maxTotalStorageUsedGB: 500
+    maxTotalArtifacts: 1000
