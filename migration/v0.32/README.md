@@ -48,8 +48,8 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     sops ${CK8S_CONFIG_PATH}/secrets.yaml
 
-    objectStorage.swift.applicationCredentialID
-    objectStorage.swift.applicationCredentialSecret
+    # set objectStorage.swift.applicationCredentialID in secrets.yaml
+    # set objectStorage.swift.applicationCredentialSecret in secrets.yaml
     ```
 
     </details>
@@ -64,8 +64,8 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     sops ${CK8S_CONFIG_PATH}/secrets.yaml
 
-    objectStorage.sync.swift.applicationCredentialID
-    objectStorage.sync.swift.applicationCredentialSecret
+    # set objectStorage.sync.swift.applicationCredentialID in secrets.yaml
+    # set objectStorage.sync.swift.applicationCredentialSecret in secrets.yaml
     ```
 
     </details>
