@@ -28,10 +28,15 @@ spec:
       {{- if .Values.affinity }}
       affinity: {{- toYaml .Values.affinity | nindent 8 }}
       {{- end }}
+      securityContext:
+        runAsUser: 10000
+        fsGroup: 10000
       containers:
       - name: opensearch-configurer
         image: {{ .Values.image }}
-        command: ['/bin/sh', '/files/configurer.sh']
+        command: ['/bin/bash', '/files/configurer.sh']
+        securityContext:
+          runAsUser: 10000
         volumeMounts:
         - name: files
           mountPath: /files

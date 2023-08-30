@@ -23,6 +23,7 @@
 
 - Refer to Grafana, OpenSearch and Harbor as Web Portals in Grafana and OpenSearch welcome dashboards
 - Fixed the `csi-upcloud` Network Policy template.
+- Pods that are using `curl-jq` image security context
 
 ### Updated
 
