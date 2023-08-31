@@ -1,0 +1,20 @@
+{{- if and .Values.userCRDs.enabled .Values.userCRDs.resourceNames }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: user-crds
+rules:
+- apiGroups: ["apiextensions.k8s.io"]
+  resources: ["customresourcedefinitions"]
+  verbs: ["get", "list", "watch", "create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: user-crds-resourcename-limit
+rules:
+- apiGroups: ["apiextensions.k8s.io"]
+  resources: ["customresourcedefinitions"]
+  resourceNames: {{- toYaml .Values.userCRDs.resourceNames | nindent 4 }}
+  verbs: ["update", "patch", "delete"]
+{{- end }}

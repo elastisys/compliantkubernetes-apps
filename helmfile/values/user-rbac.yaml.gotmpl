@@ -11,8 +11,22 @@ namespaces:
 
 users: {{ toYaml .Values.user.adminUsers | nindent 2 }}
 groups: {{ toYaml .Values.user.adminGroups | nindent 2 }}
+serviceAccounts: {{ toYaml .Values.user.serviceAccounts | nindent 2 }}
 createNamespaces: {{ .Values.user.createNamespaces }}
 enableFalcoViewer: {{ toYaml .Values.falco.enabled | nindent 2 }}
 
 hnc:
   enabled: {{ .Values.hnc.enabled }}
+
+userCRDs:
+  enabled: {{ .Values.gatekeeper.allowUserCRDs.enabled }}
+  resourceNames:
+  {{- if .Values.user.sealedSecrets.enabled }}
+    - sealedsecrets.bitnami.com
+  {{- end }}
+  {{- if .Values.user.mongodb.enabled }}
+    - mongodbcommunity.mongodbcommunity.mongodb.com
+  {{- end }}
+  {{- range .Values.gatekeeper.allowUserCRDs.extraCRDs }}
+  {{- toYaml .names | nindent 4 }}
+  {{- end }}

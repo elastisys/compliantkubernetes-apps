@@ -1,0 +1,17 @@
+{{- if .Values.userCRDs.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sUserCRDs
+metadata:
+  name: allowed-user-crds
+spec:
+  enforcementAction: {{ .Values.allowUserCRDs.enforcementAction }}
+  match:
+    kinds:
+      - apiGroups: ["apiextensions.k8s.io"]
+        kinds: ["CustomResourceDefinition"]
+  parameters:
+    users: {{- toYaml .Values.userCRDs.admin.users | nindent 6 }}
+    groups: {{- toYaml .Values.userCRDs.admin.groups | nindent 6 }}
+    serviceAccounts: {{- toYaml .Values.userCRDs.admin.serviceAccounts | nindent 6 }}
+    allowedCRDs: {{- toYaml .Values.userCRDs.allowedCRDs | nindent 6 }}
+{{- end }}

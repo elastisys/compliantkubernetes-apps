@@ -44,6 +44,15 @@ user:
       limits:
         cpu: 50m
         memory: 100Mi
+
+  # Installs required cluster resources needed to install sealedSecrets
+  # Requires that gatekeeper.allowUserCRDs.enabled is enabled.
+  sealedSecrets:
+    enabled: false
+  # Installs required cluster resources needed to install mongodb
+  # Requires that gatekeeper.allowUserCRDs.enabled is enabled.
+  mongodb:
+    enabled: false
 falco:
   ## Falco alerting configuration.
   alerts:
@@ -252,3 +261,18 @@ networkPolicies:
 
   alertmanager:
     enabled: true
+
+## Open Policy Agent Gatekeeper configuration
+gatekeeper:
+  allowUserCRDs:
+    enabled: false
+    enforcement: deny
+    extraCRDs: []
+    # Sealed secrets and MongoDB CRDs can be enabled via user.sealedsecrets/mongodb
+    # - names:
+    #     - sealedsecrets.bitnami.com
+    #   group: "bitnami.com"
+
+    extraServiceAccounts: []
+    #  - namespace: "gatekeeper-system"
+    #    name: "gatekeeper-admin-upgrade-crds"

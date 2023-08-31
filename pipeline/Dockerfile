@@ -62,7 +62,7 @@ RUN wget --progress=dot:giga "https://github.com/mikefarah/yq/releases/download/
     rm yq_linux_amd64
 
 # opa
-ENV OPA_VERSION "v0.17.2"
+ENV OPA_VERSION "v0.52.0"
 RUN wget --progress=dot:giga "https://github.com/open-policy-agent/opa/releases/download/${OPA_VERSION}/opa_linux_amd64" && \
     install -Tm 755 opa_linux_amd64 /usr/local/bin/opa && \
     rm opa_linux_amd64

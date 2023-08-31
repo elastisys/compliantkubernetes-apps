@@ -1,0 +1,29 @@
+waitFor:
+  - k8sallowedrepos
+  - k8sdisallowedtags
+  - k8spspallowedusers
+  - k8spspallowprivilegeescalationcontainer
+  - k8spspapparmor
+  - k8spspcapabilities
+  - k8spspflexvolumes
+  - k8spspforbiddensysctls
+  - k8spspfsgroup
+  - k8spsphostfilesystem
+  - k8spsphostnamespace
+  - k8spsphostnetworkingports
+  - k8spspprivilegedcontainer
+  - k8spspprocmount
+  - k8spspreadonlyrootfilesystem
+  - k8spspseccomp
+  - k8spspselinuxv2
+  - k8spspvolumetypes
+  - k8srequirenetworkpolicy
+  - k8sresourcerequests
+{{- if and (eq .Environment.Name "workload_cluster") (eq .Values.gatekeeper.allowUserCRDs.enabled true) }}
+  - k8susercrds
+{{- end }}
+
+{{- if eq .Environment.Name "workload_cluster" }}
+userCRDs:
+    enabled: {{ .Values.gatekeeper.allowUserCRDs.enabled }}
+{{- end }}
