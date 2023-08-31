@@ -10,8 +10,19 @@ requireResourceRequests:
 disallowedTags:
     enable: true
     enforcementAction: dryrun
+allowUserCRDs:
+    enable: true
+    enforcementAction: warn
 
 imageRegistryURL: registry.example.com
 
 imageDisallowedTags:
-  - latest
+    - latest
+
+userCRDs:
+    enabled: false
+    admin:
+        users: []
+        groups: []
+        serviceAccounts: []
+    allowedCRDs: []

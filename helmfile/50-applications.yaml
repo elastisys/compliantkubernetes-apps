@@ -663,10 +663,26 @@ releases:
   labels:
     app: gatekeeper
     component: gatekeeper-constraints
+    group: user-crds
   chart: ./charts/gatekeeper/constraints
   version: 1.6.0
   values:
   - values/gatekeeper/constraints.yaml.gotmpl
+  - values/userCRDs/userCRDs.yaml.gotmpl
+
+- name: user-crds
+  namespace: gatekeeper-system
+  installed: {{ .Values.gatekeeper.allowUserCRDs.enabled }}
+  labels:
+    app: user-crds
+    component: user-crds
+    group: user-crds
+  chart: ./charts/user-crds
+  version: 1.0.0
+  values:
+  - values/userCRDs/common.yaml.gotmpl
+  - values/userCRDs/bitnami/sealedsecrets.yaml.gotmpl
+  - values/userCRDs/mongodbcommunity/mongodb.yaml.gotmpl
 
 # hierarchical namespace controller
 - name: hnc-controller

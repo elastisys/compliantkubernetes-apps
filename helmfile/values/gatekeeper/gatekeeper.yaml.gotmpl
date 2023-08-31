@@ -35,6 +35,16 @@ validatingWebhookCustomRules:
       - services/proxy
       - nodes/proxy
       - hierarchyconfiguration
+  - apiGroups:
+      - '*'
+    apiVersions:
+      - '*'
+    operations:
+      - CREATE
+      - UPDATE
+      - DELETE
+    resources:
+      - customresourcedefinitions
 mutatingWebhookCustomRules:
   - apiGroups:
       - '*'
