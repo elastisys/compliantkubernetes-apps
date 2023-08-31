@@ -12,10 +12,15 @@ spec:
         release: {{ .Release.Name }}
     spec:
       restartPolicy: OnFailure
+      securityContext:
+        runAsUser: 10000
+        fsGroup: 10000
       containers:
         - name: run
           image: ghcr.io/elastisys/curl-jq:1.0.0
-          command: ['/bin/sh', '/scripts/init-harbor.sh']
+          command: ['/bin/bash', '/scripts/init-harbor.sh']
+          securityContext:
+            runAsUser: 10000
           env:
             - name: ENDPOINT
               value: {{ .Values.endpoint }}
