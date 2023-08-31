@@ -30,6 +30,9 @@ user:
     - set-me
     - admin@example.com
 
+  ## List of serviceAccounts to create RBAC rules for, used for dev situations.
+  serviceAccounts: []
+
   ## List of groups to create RBAC rules for.
   adminGroups:
     - set-me
