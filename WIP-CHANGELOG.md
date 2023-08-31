@@ -18,6 +18,7 @@
 - Only mutate pods on create to prevent them from getting stuck
 - Increased the default `proxy-buffer-size` setting in ingress-nginx to `8k`.
 - The Grafana dashboard for Harbor to show the total number of artifacts and storage used per project
+- If sync is enabled and swift is used for Harbor or Thanos then the sync job will automatically use swift
 
 ### Fixed
 
