@@ -1,0 +1,27 @@
+userCRDs:
+    enabled: {{ .Values.gatekeeper.allowUserCRDs.enabled }}
+    admin:
+        users: {{ .Values.clusterAdmin.users }}
+        groups: {{ .Values.clusterAdmin.groups }}
+        serviceAccounts:
+        - namespace: "gatekeeper-system"
+          name: "gatekeeper-admin-upgrade-crds"
+        - namespace: "velero"
+          name: "velero-server-upgrade-crds"
+        {{- if .Values.gatekeeper.allowUserCRDs.extraServiceAccounts }}
+        {{- toYaml .Values.gatekeeper.allowUserCRDs.extraServiceAccounts | nindent 8 }}
+        {{- end }}
+    allowedCRDs:
+    {{- if .Values.user.sealedSecrets.enabled }}
+    - names:
+        - sealedsecrets.bitnami.com
+      group: "bitnami.com"
+    {{- end }}
+    {{- if .Values.user.mongodb.enabled }}
+    - names:
+        - mongodbcommunity.mongodbcommunity.mongodb.com
+      group: mongodbcommunity.mongodb.com
+    {{- end }}
+    {{- if .Values.gatekeeper.allowUserCRDs.extraCRDs }}
+    {{- toYaml .Values.gatekeeper.allowUserCRDs.extraCRDs | nindent 4 }}
+    {{- end }}

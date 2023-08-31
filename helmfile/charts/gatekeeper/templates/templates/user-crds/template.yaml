@@ -1,0 +1,46 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8susercrds
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sUserCRDs
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          properties:
+            allowedCRDs:
+              type: array
+              items:
+                type: object
+                properties:
+                  names:
+                    type: array
+                    items:
+                      type: string
+                  group:
+                    type: string
+            users:
+              type: array
+              items:
+                type: string
+            groups:
+              type: array
+              items:
+                type: string
+            serviceAccounts:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  namespace:
+                    type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ .Files.Get "policies/user-crds.rego"  | indent 8 }}

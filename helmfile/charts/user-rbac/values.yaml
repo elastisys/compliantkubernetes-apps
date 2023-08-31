@@ -1,8 +1,13 @@
 namespaces: []
 users: []
 groups: []
+serviceAccounts: []
 createNamespaces: true
 enableFalcoViewer: false
 
 hnc:
   enabled: false
+
+userCRDs:
+  enabled: false
+  resourceNames: []

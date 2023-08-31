@@ -8,6 +8,7 @@ releases:
   namespace: kube-system
   labels:
     app: user-rbac
+    group: user-crds
   chart: ./charts/user-rbac
   version: 0.1.0
   values:
