@@ -29,14 +29,14 @@ spec:
               image: {{ $.Values.image.repository }}:{{ $.Values.image.tag }}
               args:
                 - sync
-                - {{ $.Values.config.source.name }}:{{ .source }}
+                - src-{{ .sourceType }}:{{ .source }}
                 {{- if $.Values.config.encrypt.enabled }}
                 - "{{ $.Values.config.encrypt.name }}-{{ .destination }}:"
                 {{- else }}
-                - {{ $.Values.config.destination.name }}:{{ .destination }}
+                - dest-{{ .destinationType }}:{{ .destination }}
                 {{- end }}
                 - --log-level
-                - DEBUG
+                - INFO
                 {{- if $.Values.config.dryrun }}
                 - --dry-run
                 {{- end }}
@@ -44,6 +44,13 @@ spec:
               volumeMounts:
                 - name: {{ $.Chart.Name }}-config
                   mountPath: /home/rclone/.config/rclone/
+              securityContext:
+                allowPrivilegeEscalation: false
+                runAsNonRoot: true
+                seccompProfile:
+                  type: "RuntimeDefault"
+                capabilities:
+                  drop: ["ALL"]
           volumes:
             - name: {{ $.Chart.Name }}-config
               secret:
