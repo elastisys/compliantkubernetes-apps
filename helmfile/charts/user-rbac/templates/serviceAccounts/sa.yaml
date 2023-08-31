@@ -1,0 +1,16 @@
+{{- range $serviceAccount := $.Values.serviceAccounts }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $serviceAccount }}
+  namespace: default
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: secret-{{ $serviceAccount }}
+  namespace: default
+  annotations:
+    kubernetes.io/service-account.name: "{{ $serviceAccount }}"
+type: kubernetes.io/service-account-token
+{{- end }}

@@ -1,16 +1,15 @@
-{{- range $namespace := .Values.namespaces }}
+{{- if .Values.userCRDs.enabled }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
-  name: workload-admin
-  namespace: {{ $namespace.name }}
+  name: user-crds
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: admin
+  name: user-crds
 subjects:
-{{- range $user := $.Values.users }}
+{{- range $user := .Values.users }}
 - apiGroup: rbac.authorization.k8s.io
   kind: User
   name: {{ $user }}
@@ -25,20 +24,29 @@ subjects:
   name: {{ $serviceAccount }}
   namespace: default
 {{- end }}
-{{- $known := lookup "v1" "Service" "default" "kubernetes" }}
-{{- $value := lookup "rbac.authorization.k8s.io/v1" "RoleBinding" $namespace.name "extra-workload-admins" }}
-{{- if and $known (not $value) (or $.Release.IsInstall $.Release.IsUpgrade) }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
-  annotations:
-    "helm.sh/resource-policy": keep
-  name: extra-workload-admins
-  namespace: {{ $namespace.name }}
+  name: user-crds-resourcename-limit
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: admin
+  name: user-crds-resourcename-limit
+subjects:
+{{- range $user := .Values.users }}
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: {{ $user }}
+{{- end }}
+{{- range $group := $.Values.groups }}
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: {{ $group }}
+{{- end }}
+{{- range $serviceAccount := $.Values.serviceAccounts }}
+- kind: ServiceAccount
+  name: {{ $serviceAccount }}
+  namespace: default
 {{- end }}
 {{- end }}
