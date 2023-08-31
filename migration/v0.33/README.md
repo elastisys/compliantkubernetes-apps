@@ -1,7 +1,7 @@
-# Upgrade to v0.32.x
+# Upgrade to v0.33.x
 
 > [!WARNING]
-> Upgrade only supported from v0.31.x.
+> Upgrade only supported from v0.32.x.
 
 <!--
 Notice to developers on writing migration steps:
@@ -70,6 +70,10 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     </details>
 
+> [!WARNING]
+> Any `rclone-sync` job running during the upgrade will be terminated
+
+- [ ] Suspend any `rclone-sync` jobs that are scheduled to run during the upgrade;
 - [ ] Notify the users (if any) before the upgrade starts;
 - [ ] Check if there are any pending changes to the environment;
 - [ ] Check the state of the environment, pods, nodes and backup jobs:
@@ -95,7 +99,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     git pull
-    git switch -d v0.32.x
+    git switch -d v0.33.x
     ```
 
 1. Prepare upgrade - *non-disruptive*
@@ -103,7 +107,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > *Done before maintenance window.*
 
     ```bash
-    ./bin/ck8s upgrade v0.32 prepare
+    ./bin/ck8s upgrade v0.33 prepare
 
     # check if the netpol IPs need to be updated
     ./bin/ck8s update-ips both dry-run
@@ -116,7 +120,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > *Done during maintenance window.*
 
     ```bash
-    ./bin/ck8s upgrade v0.32 apply
+    ./bin/ck8s upgrade v0.33 apply
     ```
 
 ## Manual method
@@ -129,25 +133,25 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     git pull
-    git switch -d v0.32.x
+    git switch -d v0.33.x
     ```
 
-1. Increase the memory limit for Thanos receiveDistributor
+1. Move subdomain and enabled settings to the common config file:
+
+  ```bash
+  ./migration/v0.33/prepare/07-move-to-common-for-cross-cluster-probe.sh
+  ```
+
+1. Check if `.prometheus.capacityManagementAlerts.disklimit` needs to be copied:
 
     ```bash
-    ./migration/v0.32/prepare/10-thanos-distrib-memory-limit.sh
+    ./migration/v0.33/prepare/10-copy-capacity-alert-disklimit.sh
     ```
 
 1. Rename the key `.objectStorage.sync.type` to `objectStorage.sync.destinationType`
 
     ```bash
-    ./migration/v0.32/prepare/20-sync-type-new-key-name.sh
-    ```
-
-1. Update rclone sync networkPolicy name:
-
-    ```bash
-    ./migration/v0.32/prepare/30-rclone-sync-name-change.sh
+    ./migration/v0.33/prepare/20-sync-type-new-key-name.sh
     ```
 
 1. Update apps configuration:
@@ -157,7 +161,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ```bash
     ./bin/ck8s init
     # or
-    ./migration/v0.32/prepare/50-init.sh
+    ./migration/v0.33/prepare/50-init.sh
 
     # check if the netpol IPs need to be updated
     ./bin/ck8s update-ips both dry-run
@@ -165,26 +169,28 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s update-ips both update
     ```
 
-> [!NOTE]
-> Calico Accountant now supports nftables as a backend for network policy rules which is used by default in Ubuntu 22.04 and newer.
-> Enable it by setting `calicoAccountant.backend: nftables`.
-
 ### Apply upgrade - *disruptive*
 
 > *Done during maintenance window.*
-
-1. Delete the jobs with no TTL set
-
-    ```bash
-    ./migration/v0.31/apply/12-remove-no-ttl-jobs.sh execute
-    ```
 
 1. Rerun bootstrap:
 
     ```bash
     ./bin/ck8s bootstrap {sc|wc}
     # or
-    ./migration/v0.32/apply/20-bootstrap.sh execute
+    ./migration/v0.33/apply/20-bootstrap.sh execute
+    ```
+
+1. Migrate Grafana dashboards:
+
+    ```bash
+    ./migration/v0.33/apply/30-grafana-dashboards.sh
+    ```
+
+1. Move `rclone-sync` from `kube-system`:
+
+    ```bash
+    ./migration/v0.33/apply/40-rclone.sh execute
     ```
 
 1. Upgrade applications:
@@ -192,11 +198,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ```bash
     ./bin/ck8s apply {sc|wc}
     # or
-    ./migration/v0.32/apply/80-apply.sh execute
+    ./migration/v0.33/apply/80-apply.sh execute
     ```
 
 ## Postrequisite:
 
+- [ ] Unsuspend any `rclone-sync` jobs that were suspended before the upgrade;
 - [ ] Check the state of the environment, pods and nodes:
 
     ```bash

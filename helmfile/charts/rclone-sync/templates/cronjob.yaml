@@ -44,6 +44,13 @@ spec:
               volumeMounts:
                 - name: {{ $.Chart.Name }}-config
                   mountPath: /home/rclone/.config/rclone/
+              securityContext:
+                allowPrivilegeEscalation: false
+                runAsNonRoot: true
+                seccompProfile:
+                  type: "RuntimeDefault"
+                capabilities:
+                  drop: ["ALL"]
           volumes:
             - name: {{ $.Chart.Name }}-config
               secret:
