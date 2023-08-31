@@ -32,7 +32,7 @@ repos:
         exclude: ^helmfile/upstream/|^CHANGELOG.md$|^WIP-CHANGELOG.md$|^helmfile/charts/grafana-ops/files/welcome.md$|^helmfile/charts/opensearch/configurer/files/dashboards-resources/welcome.md$|^images/elasticsearch-curator/README.md
         args:
           - -r
-          - ~MD013,~MD024,~MD026,~MD028,~MD034
+          - ~MD013,~MD024,~MD026,~MD028,~MD034,~MD033
 
   - repo: https://github.com/codespell-project/codespell
     rev: v2.2.4
