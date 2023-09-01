@@ -66,7 +66,7 @@ After doing the `disruptive` step for either the automatic or manual method, you
 
 1. Disable PSP admission for the clusters
 
-    For compliantkubernetes-kubespray you can follow [5. Disable Pod Security Policies](https://github.com/elastisys/compliantkubernetes-kubespray/blob/main/migration/v2.20.0-ck8sx-v2.21.0-ck8s1/upgrade-cluster.md) to disable PodSecurityPolicies.
+    For compliantkubernetes-kubespray you can follow [5. Disable Pod Security Policies](https://github.com/elastisys/compliantkubernetes-kubespray/blob/main/migration/v2.21/upgrade-cluster.md) to disable PodSecurityPolicies.
 
 1. Clean up leftover rolebindings bypassing PSP admission:
 

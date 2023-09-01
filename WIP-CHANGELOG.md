@@ -13,6 +13,8 @@
 
 ### Fixed
 
+- Broken link in v0.30 migration instructions
+
 ### Updated
 
 - Upgrade kube-prometheus-stack chart version from `v45.2.0` to `v49.2.0` and app version from `v0.63.0` to `v0.67.1`
