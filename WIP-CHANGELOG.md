@@ -17,6 +17,8 @@
 
 - Changed the alert `KubeContainerOOMKilled` threshold.
 - Changed Gatekeeper violation messages to be more informative.
+- Modified the `FluentdQueueLength` prometheus alert condition to calculate the rate of change of the `fluentd_status_buffer_queue_length` metric from `5m` to `15m` and sustain the condition from `1m` to `5m`.
+- Modified the `FluentdOutputError` & `FluentdRetry` prometheus alert condition to evaluate based on specific labels combination of `pod`, `cluster`, and `service`.
 
 ### Fixed
 
