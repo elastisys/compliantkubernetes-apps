@@ -102,3 +102,5 @@
 - Audit checks:
   - [ ] The change does not cause any unnecessary Kubernetes audit events
   - [ ] The change requires changes to Kubernetes audit policy
+- Bug checks:
+  - [ ] The bug fix is covered by regression tests

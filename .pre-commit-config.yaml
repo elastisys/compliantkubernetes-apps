@@ -39,7 +39,7 @@ repos:
     hooks:
       - id: codespell
         name: check spelling
-        exclude: ^helmfile/upstream/|^helmfile/charts/hnc/config-and-crds/crds/|^helmfile/charts/grafana-dashboards/dashboards/scripts/
+        exclude: ^helmfile/upstream/|^helmfile/charts/hnc/config-and-crds/crds/|^helmfile/charts/grafana-dashboards/dashboards/scripts/|^tests/package-lock.json$
         args:
           - -L
           - fpr
