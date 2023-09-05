@@ -1,5 +1,6 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.33.0](#v0330---2023-09-05)
 - [v0.32.0](#v0320---2023-08-07)
 - [v0.31.0](#v0310---2023-07-06)
 - [v0.30.0](#v0300---2023-05-10)
@@ -35,6 +36,46 @@
 - [v0.6.0](#v060---2020-10-16)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.33.0 - 2023-09-05
+
+### Release notes
+
+### Added
+
+- Extra component versions can be added in the Welcome dashboard via config
+- Probes from WC to SC to monitor how well clusters reach each other
+- Added so `bin/ck8s test` components can be used all at once in a cluster.
+- Alerts for Harbor
+- The possibility to configure plugins and additional datasources for Grafana
+- The possibility to add or overwrite `grafana.ini` configuration
+
+### Changed
+
+- Moved `rclone-sync` from `kube-system` to its own namespace.
+- Moved all the kube-prometheus-stack Grafana dashboards to `grafana-dashboards` chart
+- Separated node and PV `capacityManagementAlerts` limit configuration
+- Replaced image `elastisys/curl-jq:latest` with `ghcr.io/elastisys/curl-jq:1.0.0`.
+- Only mutate pods on create to prevent them from getting stuck
+- Increased the default `proxy-buffer-size` setting in ingress-nginx to `8k`.
+- The Grafana dashboard for Harbor to show the total number of artifacts and storage used per project
+- If sync is enabled and swift is used for Harbor or Thanos then the sync job will automatically use swift
+
+### Fixed
+
+- Refer to Grafana, OpenSearch and Harbor as Web Portals in Grafana and OpenSearch welcome dashboards
+- Fixed the `csi-upcloud` Network Policy template.
+- Pods that are using `curl-jq` image security context
+
+### Updated
+
+- Upgraded falco-exporter chart version to `v0.9.6` and app version to `v0.8.3`
+- Added "IPs in Subnet mask" logic in checkIfDiffAndUpdateDNSIPs, checkIfDiffAndUpdateKubectlIPs and checkIfDiffAndUpdateIPs of update-ips.bash
+
+### Removed
+
+- The deprecated `Image vulnerabilities` dashboard
 
 -------------------------------------------------
 ## v0.32.0 - 2023-08-07
