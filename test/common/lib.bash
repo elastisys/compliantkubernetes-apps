@@ -1,19 +1,68 @@
 #!/usr/bin/env bash
 
+ROOT="$(git rev-parse --show-toplevel)"
+export ROOT
+
 log_error() {
-  echo "${FUNCNAME[1]} - ${1:-}" >&2
+  echo "error: ${FUNCNAME[1]}: ${1:-}" >&2
 }
 log_fatal() {
-  echo "${FUNCNAME[1]} - ${1:-}" >&2
+  echo "fatal: ${FUNCNAME[1]}: ${1:-}" >&2
   exit 1
 }
 
 common_setup() {
-  load "${PWD}/bats/assert/load.bash"
-  load "${PWD}/bats/detik/lib/detik.bash"
-  load "${PWD}/bats/detik/lib/linter.bash"
-  load "${PWD}/bats/detik/lib/utils.bash"
-  load "${PWD}/bats/support/load.bash"
+  load "${ROOT}/test/common/bats/assert/load.bash"
+  load "${ROOT}/test/common/bats/detik/lib/detik.bash"
+  load "${ROOT}/test/common/bats/detik/lib/linter.bash"
+  load "${ROOT}/test/common/bats/detik/lib/utils.bash"
+  load "${ROOT}/test/common/bats/support/load.bash"
+}
+
+# note: not intended for direct use
+# usage: cypress_setup <path-to-cypress-spec>
+cypress_setup() {
+  if ! [[ -f "${1:-}" ]]; then
+    log_fatal "invalid or missing file argument"
+  fi
+
+  CYPRESS_REPORT="$(mktemp)"
+
+  pushd "${ROOT}/test/common/cypress" || exit 1
+
+  npx cypress run --project "$(dirname "$1")" --config-file "${ROOT}/test/common/cypress/cypress.config.js" --spec "$1" --reporter json --quiet > "${CYPRESS_REPORT}" || true
+
+  popd || exit 1
+
+  export CYPRESS_REPORT
+}
+
+# note: not intended for direct use
+# usage: cypress_test <group + test name>
+cypress_test() {
+  if ! [[ -f "${CYPRESS_REPORT:-}" ]]; then
+    fail "invalid or missing cypress report"
+  elif [[ -z "${1:-}" ]]; then
+    fail "invalid or missing file argument"
+  fi
+
+  if [[ "$(yq4 -Poj ".passes[] | select(.fullTitle == \"$1\") | . != null" "${CYPRESS_REPORT}")" == "true" ]]; then
+    assert true
+  elif [[ "$(yq4 -Poj ".pending[] | select(.fullTitle == \"$1\") | . != null" "${CYPRESS_REPORT}")" == "true" ]]; then
+    skip "pending according to cypress"
+  elif [[ "$(yq4 -Poj ".skipped[] | select(.fullTitle == \"$1\") | . != null" "${CYPRESS_REPORT}")" == "true" ]]; then
+    skip "skipped according to cypress"
+  else
+    fail "$(yq4 -Poy '.failures[] | select(.fullTitle == "grafana integration should fail") | .err.name + ": " + .err.message + " - " + .err.codeFrame.absoluteFile' "${CYPRESS_REPORT}")"
+  fi
+}
+
+# note: not intended for direct use
+# usage: cypress_teardown
+cypress_teardown() {
+  if [[ -f "${CYPRESS_REPORT:-}" ]]; then
+    rm "${CYPRESS_REPORT}"
+  fi
 }
 
 # note: not intended for direct use
