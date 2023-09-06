@@ -16,6 +16,7 @@ usage() {
     echo "  apply <wc|sc> [--sync] [--skip-template-validate] bootstrap and apps" 1>&2
     echo "  test <wc|sc> [--logging-enabled]                  test the applications" 1>&2
     echo "  dry-run <wc|sc> [--kubectl]                       runs helmfile diff" 1>&2
+    echo "  fix-psp-violations <wc|sc>                        Checks and restarts pods that violates Pod Security Polices, applicable for new environments" 1>&2
     echo "  upgrade <version-matching-migration> prepare      runs all prepare steps upgrading the configuration" 1>&2
     echo "  upgrade <version-matching-migration> apply        runs all apply steps upgrading the environment" 1>&2
     echo "  team add-pgp <fp>                                 add a new PGP key to secrets" 1>&2
@@ -37,6 +38,7 @@ usage() {
     echo "  providers                                         lists supported cloud providers" 1>&2
     echo "  flavors                                           lists supported configuration flavors" 1>&2
     echo "  update-ips <wc|sc|both> <apply|dry-run>           Automatically fetches and applies the IPs for network policies" 1>&2
+    echo "  clean <wc|sc>                                     Cleans the cluster of apps" 1>&2
     exit 1
 }
 
@@ -154,6 +156,12 @@ case "${1}" in
         [[ "${2}" =~ ^(wc|sc|both)$ ]] || usage
         [[ "${3}" =~ ^(apply|dry-run)$ ]] || usage
         "${here}/update-ips.bash" "${2}" "${3}"
+        ;;
+    fix-psp-violations)
+        "${here}/fix-psp-violations.bash" "${2}"
+        ;;
+    clean)
+        "${here}/clean.bash" "${2}"
         ;;
     *) usage ;;
 esac
