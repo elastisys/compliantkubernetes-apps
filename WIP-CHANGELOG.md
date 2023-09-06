@@ -8,6 +8,11 @@
   - Enabled developers to easily create a kube-config to act as an application developer
 - Dashboard showing how spread out pods are across nodes or zones
 - Add secrets to gatekeeper validatingWebhookCustomRules
+- Fix psp violations in clusters as a command for ck8s
+  - `bin/ck8s fix-psp-violations <sc/wc>` ensures that there are no pods violating psps, important for new environments.
+- Clean apps from clusters as a command for ck8s
+  - `bin/ck8s clean <sc/wc>` removes apps from cluster.
+
 ### Changed
 
 - Changed the alert `KubeContainerOOMKilled` threshold.
