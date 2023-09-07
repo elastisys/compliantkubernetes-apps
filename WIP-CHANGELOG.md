@@ -13,6 +13,8 @@
 
 ### Fixed
 
+- Removed the label `admission.gatekeeper.sh/ignore: "true"` from `kube-system` namespace.
+
 ### Updated
 
 ### Removed
