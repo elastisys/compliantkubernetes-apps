@@ -34,6 +34,11 @@ cypress_setup() {
 
   popd || exit 1
 
+  if ! yq4 "${CYPRESS_REPORT}" > /dev/null 2>&1; then
+    cat "${CYPRESS_REPORT}" >&2
+    exit 1
+  fi
+
   export CYPRESS_REPORT
 }
 
