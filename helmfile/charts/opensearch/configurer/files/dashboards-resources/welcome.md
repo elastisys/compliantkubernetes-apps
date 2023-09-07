@@ -4,13 +4,9 @@
 
 Here you can find the most relevant features and changes for the last couple of releases of Compliant Kubernetes
 
+- Added alerts for Harbor. **[v0.33]**
+- Removed the deprecated grafana dashboard "Image vulnerabilities". **[v0.33]**
 - Added some default annotations for Harbor that will fix issues with not being able to upload larger images **[v0.32]**
-- Updated Harbor to v2.8.2 **[v0.31]**
-  - Dropped support for chartmuseum
-  - The default login page will redirect you directly to Dex
-- Other application updates:
-  - Ingress-nginx to v1.8.0 **[v0.31]**
-  - Grafana to v9.5.5 **[v0.31]**
 
 ## Public docs
 
