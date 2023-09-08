@@ -1,0 +1,160 @@
+name: pods ready
+tests:
+  - clusters: [ sc, wc ]
+    function: test_deployment
+    tests:
+      - namespaces: [ cert-manager ]
+        tests:
+          - target: cert-manager
+          - target: cert-manager-cainjector
+          - target: cert-manager-webhook
+
+      - namespaces: [ falco ]
+        condition: .falco.enabled
+        tests:
+          - function: test_daemonset
+            target: falco
+          - function: test_daemonset
+            target: falco-exporter
+          - condition: .falco.alerts.enabled
+            target: falco-falcosidekick
+            args: [ 2 ]
+
+      - namespaces: [ ingress-nginx ]
+        tests:
+          - function: test_daemonset
+            target: ingress-nginx-controller
+          - target: ingress-nginx-default-backend
+
+      - namespaces: [ kube-system ]
+        tests:
+          - target: coredns
+            args: [ 2 ]
+          - target: metrics-server
+          - function: test_daemonset
+            tests:
+              - target: node-local-dns
+
+      - namespaces: [ kured ]
+        condition: .kured.enabled
+        tests:
+          - function: test_daemonset
+            target: kured
+
+      - namespaces: [ velero ]
+        condition: .velero.enabled
+        tests:
+          - function: test_daemonset
+            target: node-agent
+          - target: velero
+
+  - clusters: [ sc ]
+    function: test_deployment
+    tests:
+      - namespaces: [ dex ]
+        target: dex
+        args: [ 2 ]
+
+      - namespaces: [ fluentd-system ]
+        condition: .fluentd.enabled
+        tests:
+          - function: test_statefulset
+            target: fluentd-aggregator
+          - function: test_daemonset
+            target: fluentd-forwarder
+          - condition: .fluentd.scLogs.enabled
+            function: test_cronjob
+            tests:
+              # todo: generative test targets
+              # - targetExpression: .global.clusterName
+              #   targetTemplate: audit-${expression}-compaction
+              # - targetExpression: .global.clusterMonitoring[]
+              #   targetTemplate: audit-${expression}-compaction
+              # - targetExpression: .global.clusterName
+              #   targetTemplate: audit-${expression}-retention
+              # - targetExpression: .global.clusterMonitoring[]
+              #   targetTemplate: audit-${expression}-retention
+              - target: sc-logs-logs-compaction
+              - target: sc-logs-logs-retention
+
+      - namespaces: [ harbor ]
+        condition: .harbor.enabled
+        tests:
+          - function: test_cronjob
+            condition: .harbor.backup.enabled
+            target: harbor-backup-cronjob
+          - target: harbor-core
+          - target: harbor-jobservice
+          - target: harbor-notary-server
+          - target: harbor-notary-signer
+          - target: harbor-portal
+          - target: harbor-registry
+          - function: test_statefulset
+            tests:
+              - target: harbor-database
+              - target: harbor-redis
+              - target: harbor-trivy
+
+      - namespaces: [ monitoring ]
+        tests:
+          - target: kube-prometheus-stack-kube-state-metrics
+          - target: kube-prometheus-stack-operator
+          - target: prometheus-blackbox-exporter
+          - target: ops-grafana
+          - target: user-grafana
+            condition: .grafana.user.enabled
+          - function: test_daemonset
+            target: kube-prometheus-stack-prometheus-node-exporter
+          - function: test_statefulset
+            tests:
+              - target: alertmanager-kube-prometheus-stack-alertmanager
+                args: [ .prometheus.alertmanagerSpec.replicas ]
+              - target: prometheus-kube-prometheus-stack-prometheus
+                args: [ .prometheus.replicas ]
+
+      - namespaces: [ opensearch-system ]
+        tests:
+          - function: test_statefulset
+            tests:
+              - condition: .opensearch.clientNode.dedicatedPods
+                target: opensearch-client
+                args: [ .opensearch.clientNode.count ]
+              - condition: .opensearch.dataNode.dedicatedPods
+                target: opensearch-data
+                args: [ .opensearch.dataNode.count ]
+              - target: opensearch-master
+                args: [ .opensearch.masterNode.count ]
+          - target: opensearch-dashboards
+          - function: test_cronjob
+            tests:
+              - condition: .opensearch.snapshot.enabled
+                target: opensearch-backup
+              - condition: .opensearch.snapshot.enabled
+                target: opensearch-slm
+              - condition: .opensearch.curator.enabled
+                target: opensearch-curator
+          - target: prometheus-opensearch-exporter
+
+      - namespaces: [ thanos ]
+        condition: .thanos.enabled
+        tests:
+          - condition: .thanos.query.enabled
+            tests:
+              - target: thanos-query-query
+                args: [ .thanos.query.replicaCount ]
+              - target: thanos-query-query-frontend
+          - condition: .thanos.receiver.enabled
+            tests:
+              - tests:
+                  - target: thanos-receiver-bucketweb
+                  - target: thanos-receiver-compactor
+                  - target: thanos-receiver-receive-distributor
+              - function: test_statefulset
+                tests:
+                  - target: thanos-receiver-receive
+                    args: [ .thanos.receiver.replicaCount ]
+                  - target: thanos-receiver-storegateway
+          - condition: .thanos.ruler.enabled
+            function: test_statefulset
+            target: thanos-receiver-ruler
+            args: [ .thanos.ruler.replicaCount ]

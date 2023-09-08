@@ -1,24 +1,26 @@
 dirs := unit regression integration end-to-end
 
 bats_suites := $(foreach dir, $(dirs), $(wildcard $(dir)/*.bats))
+bats_templates := $(foreach dir, $(dirs), $(wildcard $(dir)/*.bats.yaml))
+bats_gen := $(bats_templates:.bats.yaml=.gen.bats)
 
 cypress_suites := $(foreach dir, $(dirs), $(wildcard $(dir)/*.cy.js))
 cypress_gen := $(cypress_suites:.cy.js=.gen.bats)
 
-run-all: $(bats_suites) $(cypress_gen) | dep
+run-all: $(bats_suites) $(bats_gen) $(cypress_gen) | dep
 	@echo --- bats all
 	@bats -r unit regression integration end-to-end
 
-run-unit: $(filter unit/%, $(bats_suites)) $(filter unit/%, $(cypress_gen)) | dep
+run-unit: $(filter unit/%, $(bats_suites)) $(filter unit/%, $(bats_gen)) $(filter unit/%, $(cypress_gen)) | dep
 	@echo --- bats unit
 	@bats -r unit
-run-regression: $(filter regression/%, $(bats_suites)) $(filter regression/%, $(cypress_gen)) | dep
+run-regression: $(filter regression/%, $(bats_suites)) $(filter regression/%, $(bats_gen)) $(filter regression/%, $(cypress_gen)) | dep
 	@echo --- bats regression
 	@bats -r regression
-run-integration: $(filter integration/%, $(bats_suites)) $(filter integration/%, $(cypress_gen)) | dep
+run-integration: $(filter integration/%, $(bats_suites)) $(filter integration/%, $(bats_gen)) $(filter integration/%, $(cypress_gen)) | dep
 	@echo --- bats integration
 	@bats -r integration
-run-end-to-end: $(filter end-to-end/%, $(bats_suites)) $(filter end-to-end/%, $(cypress_gen)) | dep
+run-end-to-end: $(filter end-to-end/%, $(bats_suites)) $(filter end-to-end/%, $(bats_gen)) $(filter end-to-end/%, $(cypress_gen)) | dep
 	@echo --- bats end-to-end
 	@bats -r end-to-end
 
@@ -44,9 +46,15 @@ common/cypress/node_modules:
 	@npm install --prefix common/cypress --save-dev
 	@echo
 
-gen: gen-cypress
+gen: gen-bats gen-cypress
+
+gen-bats: $(bats_gen)
 
 gen-cypress: $(cypress_gen)
+
+$(bats_gen): %.gen.bats: %.bats.yaml common/gen-bats.bash
+	@echo gen-bats $< to $@
+	@./common/gen-bats.bash $< > $@
 
 $(cypress_gen): %.gen.bats: %.cy.js common/gen-cypress.bash
 	@echo gen-cypress $< to $@
@@ -61,4 +69,5 @@ clean-dep:
 	@rm -rf common/cypress/node_modules
 
 clean-gen:
+	rm -f $(bats_gen)
 	rm -f $(cypress_gen)
