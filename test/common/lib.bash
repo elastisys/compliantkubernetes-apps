@@ -87,6 +87,22 @@ yq_dig() {
   echo "$3"
 }
 
+continue_on() {
+  if [[ "${1:-}" =~ ^(sc|wc)$ ]]; then
+    if [[ -n "${2:-}" ]]; then
+      if [[ "$(yq_dig "$1" "$2" "false")" != "true" ]]; then
+        skip "$1/$2 - disabled"
+      fi
+    else
+      fail "missing config key argument"
+    fi
+  elif [[ -n "${1:-}" ]]; then
+    fail "invalid cluster argument"
+  else
+    fail "missing cluster argument"
+  fi
+}
+
 # note: expects that the config key has an enabled field
 # usage: skip_on_disabled <cluster> <config-key>
 skip_on_disabled() {
@@ -144,32 +160,45 @@ with_namespace() {
 }
 
 # note: expects with_kubeconfig and with_namespace to be set
-# usage: check_deployment <name> <replicas>
-check_deployment() {
+# usage: test_cronjob <name>
+test_cronjob() {
   if [[ -n "${1:-}" ]]; then
-    if [[ -n "${2:-}" ]]; then
-      verify "there is 1 deployment named '^$1$'"
-      verify "there are $2 pods named '$1-[[:alnum:]]\+-[[:alnum:]]\+$'"
-      verify "'status' is 'running' for pods named '$1-[[:alnum:]]\+-[[:alnum:]]\+[[:space:]]'"
-    else
-      fail "missing deployment replicas argument"
-    fi
+    verify "there is 1 cronjob named '^$1$'"
+  else
+    fail "missing cronjob name argument"
+  fi
+}
+
+# note: expects with_kubeconfig and with_namespace to be set
+# usage: test_daemonset <name>
+test_daemonset() {
+  if [[ -n "${1:-}" ]]; then
+    verify "there is 1 daemonset named '^$1$'"
+    verify "'status' is 'running' for pods named '$1-[[:alnum:]]\+[[:space:]]'"
+  else
+    fail "missing daemonset name argument"
+  fi
+}
+
+# note: expects with_kubeconfig and with_namespace to be set
+# usage: test_deployment <name> <replicas>
+test_deployment() {
+  if [[ -n "${1:-}" ]]; then
+    verify "there is 1 deployment named '^$1$'"
+    verify "there are ${2:-1} pods named '$1-[[:alnum:]]\+-[[:alnum:]]\+$'"
+    verify "'status' is 'running' for pods named '$1-[[:alnum:]]\+-[[:alnum:]]\+[[:space:]]'"
   else
     fail "missing deployment name argument"
   fi
 }
 
 # note: expects with_kubeconfig and with_namespace to be set
-# usage: check_statefulset <name> <replicas>
-check_statefulset() {
+# usage: test_statefulset <name> <replicas>
+test_statefulset() {
   if [[ -n "${1:-}" ]]; then
-    if [[ -n "${2:-}" ]]; then
-      verify "there is 1 statefulset named '^$1$'"
-      verify "there are $2 pods named '$1-[[:digit:]]\+$'"
-      verify "'status' is 'running' for pods named '$1-[[:digit:]]\+[[:space:]]'"
-    else
-      fail "missing statefulset replicas argument"
-    fi
+    verify "there is 1 statefulset named '^$1$'"
+    verify "there are ${2-1} pods named '$1-[[:digit:]]\+$'"
+    verify "'status' is 'running' for pods named '$1-[[:digit:]]\+[[:space:]]'"
   else
     fail "missing statefulset name argument"
   fi
