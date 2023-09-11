@@ -33,3 +33,7 @@ metrics:
   enabled: {{ .Values.thanos.metrics.enabled }}
   serviceMonitor:
     enabled: {{ .Values.thanos.metrics.serviceMonitor.enabled }}
+    metricRelabelings:
+      - action: keep
+        sourceLabels: [__name__]
+        regex: '({{ concat (.Values.metrics.default.thanos) (dig "metrics" "override" "thanos" list .Values) | join "|" }})'

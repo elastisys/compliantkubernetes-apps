@@ -2,6 +2,10 @@
 adminPassword: {{ .Values.grafana.password }}
 serviceMonitor:
   enabled: true
+  relabelings:
+    - action: keep
+      sourceLabels: [__name__]
+      regex: '({{ concat (.Values.metrics.default.grafana) (dig "metrics" "override" "grafana" list .Values) | join "|" }})'
 ingress:
   annotations:
     ingress.kubernetes.io/rewrite-target: /

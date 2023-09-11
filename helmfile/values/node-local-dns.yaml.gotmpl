@@ -4,3 +4,9 @@ clusterDNS: {{ .Values.global.clusterDns }}
 {{- if dig "nodeLocalDns" "customConfig" false .Values }}
 customConfig: {{ toYaml .Values.nodeLocalDns.customConfig }}
 {{- end }}
+
+serviceMonitor:
+  metricRelabelings:
+    - action: keep
+      sourceLabels: [__name__]
+      regex: '({{ concat (.Values.metrics.default.nodeLocalDns) (dig "metrics" "override" "nodeLocalDns" list .Values) | join "|" }})'

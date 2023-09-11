@@ -9,6 +9,11 @@ metrics:
   serviceMonitor:
     enabled: true
 
+    metricRelabelings:
+      - action: keep
+        sourceLabels: [__name__]
+        regex: '({{ concat (.Values.metrics.default.fluentdAggregator) (dig "metrics" "override" "fluentdAggregator" list .Values) | join "|" }})'
+
 forwarder:
   enabled: false
 

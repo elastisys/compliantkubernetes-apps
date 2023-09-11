@@ -13,6 +13,12 @@ serviceMonitor:
   jobLabel: '""'
   interval: 30s
 
+  metricRelabelings:
+    - action: keep
+      sourceLabels: [__name__]
+      regex: '({{ concat (.Values.metrics.default.fluentdForwarder) (dig "metrics" "override" "fluentdForwarder" list .Values) | join "|" }})'
+
+
 prometheusRule:
   enabled: true
 

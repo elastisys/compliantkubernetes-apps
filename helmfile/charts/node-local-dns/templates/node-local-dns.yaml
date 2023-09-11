@@ -213,6 +213,10 @@ spec:
   - interval: 30s
     path: /metrics
     port: metrics
+{{- if .Values.serviceMonitor.metricRelabelings }}
+    metricRelabelings:
+{{ tpl (toYaml .Values.serviceMonitor.metricRelabelings | indent 4) . }}
+{{- end }}
   namespaceSelector:
     matchNames:
     - kube-system

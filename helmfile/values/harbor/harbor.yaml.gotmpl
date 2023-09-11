@@ -210,3 +210,7 @@ metrics:
   enabled: true
   serviceMonitor:
     enabled: true
+    metricRelabelings:
+      - action: keep
+        sourceLabels: [__name__]
+        regex: '({{ concat (.Values.metrics.default.harbor) (dig "metrics" "override" "harbor" list .Values) | join "|" }})'

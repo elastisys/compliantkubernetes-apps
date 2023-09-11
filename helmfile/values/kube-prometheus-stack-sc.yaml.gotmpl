@@ -45,13 +45,19 @@ kube-state-metrics:
   extraArgs:
     - "--custom-resource-state-config-file=/etc/config/clusterapi-metrics.yaml"
   {{- end }}
+  prometheus:
+    monitor:
+      metricRelabelings:
+        - action: keep
+          sourceLabels: [__name__]
+          regex: '({{ concat (.Values.metrics.default.kubeStateMetrics) (dig "metrics" "override" "kubeStateMetrics" list .Values) | join "|" }})'
 
 kubeApiServer:
   serviceMonitor:
     metricRelabelings:
       - action: keep
         sourceLabels: [__name__]
-        regex: '(process_cpu_seconds_total|process_resident_memory_bytes|go_goroutines|workqueue_queue_duration_seconds_bucket|workqueue_adds_total|workqueue_depth|apiserver_request_total|apiserver_request_count|apiserver_request_latencies_bucket|apiserver_client_certificate_expiration_seconds_count|apiserver_request_duration_seconds_sum|apiserver_request_duration_seconds_count|APIServiceRegistrationController_depth)'
+        regex: '({{ concat (.Values.metrics.default.kubeApiServer) (dig "metrics" "override" "kubeApiServer" list .Values) | join "|" }})'
 
 kubeEtcd:
   service:
@@ -62,6 +68,11 @@ kubeEtcd:
     port: 4001
     targetPort: 4001
     {{- end }}
+  serviceMonitor:
+    metricRelabelings:
+      - action: keep
+        sourceLabels: [__name__]
+        regex: '({{ concat (.Values.metrics.default.etcd) (dig "metrics" "override" "etcd" list .Values) | join "|" }})'
 
 alertmanager:
   config:
@@ -159,6 +170,13 @@ alertmanager:
     storage: {{- toYaml .Values.prometheus.alertmanagerSpec.storage | nindent 6 }}
     topologySpreadConstraints: {{- toYaml .Values.prometheus.alertmanagerSpec.topologySpreadConstraints | nindent 4 }}
 
+  serviceMonitor:
+    metricRelabelings:
+      - action: keep
+        sourceLabels: [__name__]
+        regex: '({{ concat (.Values.metrics.default.alertmanager) (dig "metrics" "override" "alertmanager" list .Values) | join "|" }})'
+
+
 kubeControllerManager:
   enabled: false
 kubeScheduler:
@@ -172,6 +190,12 @@ prometheusOperator:
 
   prometheusConfigReloader:
     resources: {{- toYaml .Values.prometheusOperator.prometheusConfigReloader.resources | nindent 6 }}
+
+  serviceMonitor:
+    metricRelabelings:
+      - action: keep
+        sourceLabels: [__name__]
+        regex: '({{ concat (.Values.metrics.default.prometheusOperator) (dig "metrics" "override" "prometheusOperator" list .Values) | join "|" }})'
 
 prometheus:
   prometheusSpec:
@@ -234,6 +258,13 @@ prometheus:
               storage: {{ .Values.prometheus.storage.size }}
     {{- end }}
 
+  serviceMonitor:
+    metricRelabelings:
+      - action: keep
+        sourceLabels: [__name__]
+        regex: '({{ concat (.Values.metrics.default.prometheus) (dig "metrics" "override" "prometheus" list .Values) | join "|" }})'
+
+
 prometheus-node-exporter:
   resources: {{- toYaml .Values.prometheusNodeExporter.resources | nindent 4 }}
   prometheus:
@@ -243,3 +274,31 @@ prometheus-node-exporter:
           sourceLabels:
           - __meta_kubernetes_pod_node_name
           targetLabel: instance
+      metricRelabelings:
+        - action: keep
+          sourceLabels: [__name__]
+          regex: '({{ concat (.Values.metrics.default.nodeExporter) (dig "metrics" "override" "nodeExporter" list .Values) | join "|" }})'
+
+kubeProxy:
+  serviceMonitor:
+    metricRelabelings:
+      - action: keep
+        sourceLabels: [__name__]
+        regex: '({{ concat (.Values.metrics.default.kubeProxy) (dig "metrics" "override" "kubeProxy" list .Values) | join "|" }})'
+
+coreDns:
+  serviceMonitor:
+    metricRelabelings:
+      - action: keep
+        sourceLabels: [__name__]
+        regex: '({{ concat (.Values.metrics.default.coreDns) (dig "metrics" "override" "coreDns" list .Values) | join "|" }})'
+
+kubelet:
+  serviceMonitor:
+    cAdvisorMetricRelabelings:
+      # - sourceLabels: [id, pod]
+      #   action: drop
+      #   regex: '.+;'
+      - action: keep
+        sourceLabels: [__name__]
+        regex: '({{ concat (.Values.metrics.default.kubelet) (dig "metrics" "override" "kubelet" list .Values) | join "|" }})'

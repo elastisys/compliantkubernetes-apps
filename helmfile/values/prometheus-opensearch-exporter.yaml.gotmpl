@@ -29,6 +29,10 @@ serviceMonitor:
   interval: {{ .Values.opensearch.exporter.serviceMonitor.interval }}
   scrapeTimeout: {{ .Values.opensearch.exporter.serviceMonitor.scrapeTimeout }}
   scheme: http
+  metricRelabelings:
+    - action: keep
+      sourceLabels: [__name__]
+      regex: '({{ concat (.Values.metrics.default.opensearch) (dig "metrics" "override" "opensearch" list .Values) | join "|" }})'
 
 resources: {{- toYaml .Values.opensearch.exporter.resources | nindent 2 }}
 
