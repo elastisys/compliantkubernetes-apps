@@ -4,7 +4,7 @@ set -euo pipefail
 
 HERE="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
-# shellcheck source=test/common/lib.bash
+# shellcheck source=tests/common/lib.bash
 source "${HERE}/lib.bash"
 
 render_test() {

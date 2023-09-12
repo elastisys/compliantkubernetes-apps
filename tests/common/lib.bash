@@ -14,11 +14,11 @@ log_fatal() {
 }
 
 common_setup() {
-  load "${ROOT}/test/common/bats/assert/load.bash"
-  load "${ROOT}/test/common/bats/detik/lib/detik.bash"
-  load "${ROOT}/test/common/bats/detik/lib/linter.bash"
-  load "${ROOT}/test/common/bats/detik/lib/utils.bash"
-  load "${ROOT}/test/common/bats/support/load.bash"
+  load "${ROOT}/tests/common/bats/assert/load.bash"
+  load "${ROOT}/tests/common/bats/detik/lib/detik.bash"
+  load "${ROOT}/tests/common/bats/detik/lib/linter.bash"
+  load "${ROOT}/tests/common/bats/detik/lib/utils.bash"
+  load "${ROOT}/tests/common/bats/support/load.bash"
 }
 
 # note: not intended for direct use
@@ -30,9 +30,9 @@ cypress_setup() {
 
   CYPRESS_REPORT="$(mktemp)"
 
-  pushd "${ROOT}/test/common/cypress" || exit 1
+  pushd "${ROOT}/tests/common/cypress" || exit 1
 
-  npx cypress run --project "$(dirname "$1")" --config-file "${ROOT}/test/common/cypress/cypress.config.js" --spec "$1" --reporter json-stream --quiet > "${CYPRESS_REPORT}" || true
+  npx cypress run --project "$(dirname "$1")" --config-file "${ROOT}/tests/common/cypress/cypress.config.js" --spec "$1" --reporter json-stream --quiet > "${CYPRESS_REPORT}" || true
 
   popd || exit 1
 
