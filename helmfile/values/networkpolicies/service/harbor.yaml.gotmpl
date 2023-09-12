@@ -21,9 +21,9 @@ rules:
     ports:
       - tcp: 5432
     {{- else if eq .Values.harbor.database.type "external" }}
-    {{- with .Values.networkPolicies.harbor.database.externalEgress.peers }}
+    {{- with .Values.networkPolicies.harbor.database.externalEgress }}
     peers:
-      {{ toYaml . | nindent 8 }}
+      {{ toYaml .peers | nindent 8 }}
     ports:
     {{- range .ports }}
       - tcp: {{ . }}
@@ -39,9 +39,9 @@ rules:
     ports:
       - tcp: 6379
     {{- else if eq .Values.harbor.redis.type "external" }}
-    {{- with .Values.networkPolicies.harbor.redis.externalEgress.peers }}
+    {{- with .Values.networkPolicies.harbor.redis.externalEgress }}
     peers:
-      {{ toYaml . | nindent 8 }}
+      {{ toYaml .peers | nindent 8 }}
     ports:
     {{- range .ports }}
       - tcp: {{ . }}
