@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-ROOT="$(git rev-parse --show-toplevel)"
+if [[ -z "${ROOT:-}" ]]; then
+  ROOT="$(git rev-parse --show-toplevel)"
+fi
 export ROOT
 
 log_error() {
@@ -30,12 +32,25 @@ cypress_setup() {
 
   pushd "${ROOT}/test/common/cypress" || exit 1
 
-  npx cypress run --project "$(dirname "$1")" --config-file "${ROOT}/test/common/cypress/cypress.config.js" --spec "$1" --reporter json --quiet > "${CYPRESS_REPORT}" || true
+  npx cypress run --project "$(dirname "$1")" --config-file "${ROOT}/test/common/cypress/cypress.config.js" --spec "$1" --reporter json-stream --quiet > "${CYPRESS_REPORT}" || true
 
   popd || exit 1
 
-  if ! yq4 "${CYPRESS_REPORT}" > /dev/null 2>&1; then
+
+  # Without json events we have some failure
+  if ! grep -q '^\[.*\]$' < "${CYPRESS_REPORT}"; then
     cat "${CYPRESS_REPORT}" >&2
+    exit 1
+  fi
+
+  # Filter json events
+  grep '^\[.*\]$' < "${CYPRESS_REPORT}" > "${CYPRESS_REPORT}.tmp"
+  mv "${CYPRESS_REPORT}.tmp" "${CYPRESS_REPORT}"
+
+  # Check for any auto-generated error
+  if [[ -n "$(jq -r 'select(.[1].title == "An uncaught error was detected outside of a test")' "${CYPRESS_REPORT}" 2>&1)" ]]; then
+    echo "An uncaught error was detected outside of a test" >&2
+    jq -r 'select(.[1].title == "An uncaught error was detected outside of a test") | .[1].stack' "${CYPRESS_REPORT}"
     exit 1
   fi
 
@@ -51,14 +66,12 @@ cypress_test() {
     fail "invalid or missing file argument"
   fi
 
-  if [[ "$(yq4 -Poj ".passes[] | select(.fullTitle == \"$1\") | . != null" "${CYPRESS_REPORT}")" == "true" ]]; then
+  if [[ "$(jq -r "select(.[1].fullTitle == \"$1\") | .[0]" "${CYPRESS_REPORT}")" == "fail" ]]; then
+    fail "$(jq -r "select(.[1].fullTitle == \"$1\") | .[1].stack" "${CYPRESS_REPORT}")"
+  elif [[ "$(jq -r "select(.[1].fullTitle == \"$1\") | .[0]" "${CYPRESS_REPORT}")" == "pass" ]]; then
     assert true
-  elif [[ "$(yq4 -Poj ".pending[] | select(.fullTitle == \"$1\") | . != null" "${CYPRESS_REPORT}")" == "true" ]]; then
-    skip "pending according to cypress"
-  elif [[ "$(yq4 -Poj ".skipped[] | select(.fullTitle == \"$1\") | . != null" "${CYPRESS_REPORT}")" == "true" ]]; then
-    skip "skipped according to cypress"
   else
-    fail "$(yq4 -Poy '.failures[] | select(.fullTitle == "grafana integration should fail") | .err.name + ": " + .err.message + " - " + .err.codeFrame.absoluteFile' "${CYPRESS_REPORT}")"
+    skip "cypress skipped this test"
   fi
 }
 

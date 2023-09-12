@@ -18,10 +18,8 @@ render_test() {
     log_fatal "missing target"
   fi
 
-
-  for cluster in $(yq -oy '.[]' <<< "$1"); do
-    for namespace in $(yq -oy '.[]' <<< "$2"); do
-
+  for cluster in $(yq4 -oy '.[]' <<< "$1"); do
+    for namespace in $(yq4 -oy '.[]' <<< "$2"); do
       local -a args
       if ! [[ "${6:-}" =~ ^([]|)$ ]]; then
         for arg in $(yq4 -oy '.[]' <<< "$6"); do
@@ -36,7 +34,7 @@ render_test() {
       echo ""
       echo "@test \"${name} - ${4/_/ } - ${cluster} / ${namespace} / $5\" {"
       if ! [[ "${3:-}" =~ ^([]|)$ ]]; then
-        for condition in $(yq -oy '.[]' <<< "$3"); do
+        for condition in $(yq4 -oy '.[]' <<< "$3"); do
           echo "  continue_on \"${cluster}\" \"${condition}\""
         done
         echo ""
