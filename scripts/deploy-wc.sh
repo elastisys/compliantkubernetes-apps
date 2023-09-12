@@ -19,21 +19,25 @@ INTERACTIVE=${1:-""}
 # Add example resources.
 # We use `create` here instead of `apply` to avoid overwriting any changes the
 # user may have done.
-if [ "$(kubectl get configmap fluentd-extra-config -n fluentd)" ] ; then
-  echo "fluentd-extra-config ConfigMap already in place. Ignoring."
+if ! kubectl get ns fluentd > /dev/null; then
+  echo "fluentd namespace missing, skipping installing fluentd example resources."
 else
-  echo "Creating fluentd-extra-config ConfigMap"
-  kubectl create -f "${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-config.yaml"
+  if kubectl get configmap fluentd-extra-config -n fluentd > /dev/null; then
+    echo "fluentd-extra-config ConfigMap already in place. Ignoring."
+  else
+    echo "Creating fluentd-extra-config ConfigMap"
+    kubectl create -f "${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-config.yaml"
+  fi
+
+  if kubectl get configmap fluentd-extra-plugins -n fluentd > /dev/null ; then
+    echo "fluentd-extra-plugins ConfigMap already in place. Ignoring."
+  else
+    echo "Creating fluentd-extra-plugins ConfigMap"
+    kubectl create -f "${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-plugins.yaml"
+  fi
 fi
 
-if [ "$(kubectl get configmap fluentd-extra-plugins -n fluentd)" ] ; then
-  echo "fluentd-extra-plugins ConfigMap already in place. Ignoring."
-else
-  echo "Creating fluentd-extra-plugins ConfigMap"
-  kubectl create -f "${SCRIPTS_PATH}/../manifests/examples/fluentd/fluentd-extra-plugins.yaml"
-fi
-
-if [ "$(kubectl get clusterrolebinding extra-user-view)" ] ; then
+if kubectl get clusterrolebinding extra-user-view > /dev/null; then
   echo "extra-user-view ClusterRoleBinding already in place. Ignoring."
 else
   echo "Creating extra-user-view ClusterRoleBinding"
