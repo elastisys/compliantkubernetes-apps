@@ -47,11 +47,11 @@ RUN wget --progress=dot:giga "https://github.com/mikefarah/yq/releases/download/
     install -Tm 755 yq_linux_amd64 /usr/local/bin/yq4 && \
     rm yq_linux_amd64
 
-COPY ./ /test
+COPY ./ /tests
 
-RUN chown -R ubuntu:ubuntu /test
+RUN chown -R ubuntu:ubuntu /tests
 
-WORKDIR /test
+WORKDIR /tests
 
 USER ubuntu
 
