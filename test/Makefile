@@ -1,3 +1,5 @@
+#!/usr/bin/make
+
 dirs := unit regression integration end-to-end
 
 bats_suites := $(foreach dir, $(dirs), $(wildcard $(dir)/*.bats))
@@ -6,6 +8,21 @@ bats_gen := $(bats_templates:.bats.yaml=.gen.bats)
 
 cypress_suites := $(foreach dir, $(dirs), $(wildcard $(dir)/*.cy.js))
 cypress_gen := $(cypress_suites:.cy.js=.gen.bats)
+
+config_path := ${CK8S_CONFIG_PATH}
+
+container_image := elastisys-ck8s-apps-tests:main
+
+container_arg := -it --rm
+container_arg := $(container_arg) --env=CK8S_CONFIG_PATH=${CK8S_CONFIG_PATH}
+container_arg := $(container_arg) --env=ROOT=/
+container_arg := $(container_arg) --mount type=bind,source=${CK8S_CONFIG_PATH},target=${CK8S_CONFIG_PATH}
+container_arg := $(container_arg) --mount type=bind,source=${HOME}/.kube/cache/oidc-login,target=/home/ubuntu/.kube/cache/oidc-login
+container_arg := $(container_arg) --mount type=bind,source=/run/user/$(shell id -u),target=/run/user/$(shell id -u),readonly
+container_arg := $(container_arg) --network=host
+container_arg := $(container_arg) --user $(shell id -u):$(shell id -g)
+
+found_podman := $(shell command -v podman 2>/dev/null)
 
 run-all: $(bats_suites) $(bats_gen) $(cypress_gen) | dep
 	@echo --- bats all
@@ -71,3 +88,17 @@ clean-dep:
 clean-gen:
 	rm -f $(bats_gen)
 	rm -f $(cypress_gen)
+
+build:
+ifdef found_podman
+	podman build -t $(container_image) .
+else
+	docker build -t $(container_image) .
+endif
+
+ctr-%:
+ifdef found_podman
+	podman run --userns=keep-id $(container_arg) $(container_image) make $*
+else
+	docker run $(container_arg) $(container_image) make $*
+endif

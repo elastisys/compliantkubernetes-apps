@@ -5,6 +5,9 @@ Tests implemented with `cypress` can and will be integrated into the `bats` test
 
 ## Usage with Makefile
 
+> [!note]
+> You can also use `make build` and then `make ctr-<command>` to run each command in a container, you can then skip `make ctr-dep` as they are integrated into the image.
+
 You must have `bats`, `make` and `npm` installed, supporting libraries including `cypress` are fetched automatically as a dependency or with:
 
 ```bash
