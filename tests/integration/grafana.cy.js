@@ -6,6 +6,13 @@ describe("grafana integration", function() {
       .then(cy.visit)
   })
 
+  it("should get password", function() {
+    cy.yqSecrets('.user.grafanaPassword')
+      .its("stdout")
+      .should("not.equal", "")
+      .should("not.equal", "null")
+  })
+
   it("should fail", function() {
     cy.contains("Welcome to Grafana")
       .should("not.exist")
