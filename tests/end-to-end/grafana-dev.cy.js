@@ -21,4 +21,27 @@ describe("grafana dev", function() {
     cy.contains("Home")
       .should("exist")
   })
+
+  it("has configured data sources", function() {
+    cy.contains("Sign in with dex")
+      .click()
+
+    cy.dexStaticLogin()
+
+    cy.get("button[aria-label=\"Toggle menu\"]")
+      .click()
+
+    cy.contains("Connections")
+      .click()
+    cy.contains("Data sources")
+      .click()
+
+    cy.contains("Service Cluster")
+      .should("exist")
+    cy.contains("Workload Cluster")
+      .should("exist")
+      .parent()
+      .contains("default")
+      .should("exist")
+  })
 })

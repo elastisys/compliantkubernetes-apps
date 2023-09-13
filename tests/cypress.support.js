@@ -56,6 +56,36 @@ Cypress.Commands.add("yqDig", function(cluster, expression) {
     })
 })
 
+// Available as cy.yqDigParse("sc|wc", "expression") expression first then merge
+// More efficient for simple data such as scalars that cannot be merged
+Cypress.Commands.add("yqDigParse", function(cluster, expression) {
+  if (typeof cluster === "undefined") {
+    cy.fail("yqDigParse: cluster argument is missing")
+
+  } else if (typeof expression === "undefined") {
+    cy.fail("yqDigParse: expression argument is missing")
+  }
+
+  const configPath = Cypress.env("CK8S_CONFIG_PATH")
+  if (typeof configPath === "undefined") {
+    cy.fail("yqDigParse: CK8S_CONFIG_PATH is unset")
+  }
+
+  if (cluster === "sc") {
+    cy.exec(`yq4 -oj ea 'explode(.) | ${expression} | select(. != null) | {"wrapper": .} as $item ireduce ({}; . *$item) | .wrapper | ... comments=""' ${configPath}/defaults/common-config.yaml ${configPath}/defaults/sc-config.yaml ${configPath}/common-config.yaml ${configPath}/sc-config.yaml`)
+      .its("stdout")
+      .then(JSON.parse)
+
+  } else if (cluster === "wc") {
+    cy.exec(`yq4 -oj ea 'explode(.) | ${expression} | select(. != null) | {"wrapper": .} as $item ireduce ({}; . *$item) | .wrapper | ... comments=""' ${configPath}/defaults/common-config.yaml ${configPath}/defaults/wc-config.yaml ${configPath}/common-config.yaml ${configPath}/wc-config.yaml`)
+      .its("stdout")
+      .then(JSON.parse)
+
+  } else {
+    cy.fail("yqDigParse: cluster argument is invalid")
+  }
+})
+
 // Available as cy.yqSecrets("expression") sops decrypt into yq expression
 Cypress.Commands.add("yqSecrets", function(expression) {
   const configPath = Cypress.env("CK8S_CONFIG_PATH")
