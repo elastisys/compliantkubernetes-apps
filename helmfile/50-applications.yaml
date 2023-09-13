@@ -570,7 +570,7 @@ releases:
     component: log-manager
   chart: ./charts/log-manager
   version: 0.1.0
-  installed: {{ or .Values.fluentd.enabled .Values.fluentd.audit.enabled }}
+  installed: {{ .Values.fluentd.enabled }}
   values:
   - values/fluentd/log-manager.yaml.gotmpl
 
