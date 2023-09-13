@@ -84,3 +84,11 @@ And for specific files:
 ```bash
 npx --prefix common/cypress cypress run --config-file "$PWD/common/cypress/cypress.config.js" --project <.|unit|regression|integration|end-to-end> --config supportFile=$PWD/common/cypress/support/lib.js --spec <path/to/file>
 ```
+
+During test development it can be useful to keep `cypress` open:
+
+```bash
+npx --prefix common/cypress cypress open --config-file "$PWD/common/cypress/cypress.config.js" --project <.|unit|regression|integration|end-to-end> --config supportFile=$PWD/common/cypress/support/lib.js
+```
+
+Then it will auto-reload and auto-execute as tests are updated, use `it.only` instead of `it` to run only selected tests.
