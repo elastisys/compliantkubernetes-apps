@@ -36,7 +36,6 @@ cypress_setup() {
 
   popd || exit 1
 
-
   # Without json events we have some failure
   if ! grep -q '^\[.*\]$' < "${CYPRESS_REPORT}"; then
     cat "${CYPRESS_REPORT}" >&2

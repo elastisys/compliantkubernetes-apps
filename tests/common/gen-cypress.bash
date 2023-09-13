@@ -28,9 +28,9 @@ main() {
 
   for line in "${input[@]}"; do
     if [[ "${line}" =~ [[:space:]]*describe\( ]]; then
-      group="$(sed -n "s/describe([\"\']\([[:alnum:] ]\+\)[\"\'],.\+/\1/p" <<< "${line}")"
+      group="$(sed -n "s/describe([\"\']\(.\+\)[\"\'],.\+/\1/p" <<< "${line}")"
     elif [[ "${line}" =~ [[:space:]]+it\( ]]; then
-      test="$(sed -n "s/[[:space:]]\+it([\"\']\([[:alnum:] ]\+\)[\"\'],.\+/\1/p" <<< "${line}")"
+      test="$(sed -n "s/[[:space:]]\+it([\"\']\(.\+\)[\"\'],.\+/\1/p" <<< "${line}")"
 
       tests+=("${group} ${test}")
     fi
