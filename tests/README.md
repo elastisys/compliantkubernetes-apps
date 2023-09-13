@@ -3,6 +3,9 @@
 The test suite is implemented using `bats` and `cypress`, with unit, regression, integration, and end-to-end tests under their own respective directory.
 Tests implemented with `cypress` can and will be integrated into the `bats` test suite using generators.
 
+> [!note]
+> All instructions assume that you are standing in the `tests/` directory.
+
 ## Usage with Makefile
 
 > [!note]
@@ -73,11 +76,11 @@ The plain `bats` test suite can be manually run by simply running `bats` and lis
 The plain `cypress` test suite can be manually run as follows for all:
 
 ```bash
-npx --prefix common/cypress cypress run --config-file "$PWD/common/cypress/cypress.config.js" --project <.|unit|regression|integration|end-to-end>
+npx --prefix common/cypress cypress run --config-file "$PWD/common/cypress/cypress.config.js" --project <.|unit|regression|integration|end-to-end> --config supportFile=$PWD/common/cypress/support/lib.js
 ```
 
 And for specific files:
 
 ```bash
-npx --prefix common/cypress cypress run --config-file "$PWD/common/cypress/cypress.config.js" --project <.|unit|regression|integration|end-to-end> --spec <path/to/file>
+npx --prefix common/cypress cypress run --config-file "$PWD/common/cypress/cypress.config.js" --project <.|unit|regression|integration|end-to-end> --config supportFile=$PWD/common/cypress/support/lib.js --spec <path/to/file>
 ```
