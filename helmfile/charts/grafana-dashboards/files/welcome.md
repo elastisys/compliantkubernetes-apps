@@ -4,7 +4,7 @@
 
 Here you can find the most relevant features and changes for the last couple of releases of Compliant Kubernetes
 
-- Removed the deprecated grafana dashboard "Image vulnerabilities". **[v0.33]**
+- Removed the deprecated grafana dashboard Image vulnerabilities. **[v0.33]**
 - Added some default annotations for Harbor that will fix issues with not being able to upload larger images **[v0.32]**
 
 ## Public docs
