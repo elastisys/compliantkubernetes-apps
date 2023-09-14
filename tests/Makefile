@@ -13,10 +13,15 @@ config_path := ${CK8S_CONFIG_PATH}
 
 container_image := elastisys-ck8s-apps-tests:main
 
+ifndef GNUPGHOME
+GNUPGHOME := ${HOME}/.gnupg
+endif
+
 container_arg := -it --rm
 container_arg := $(container_arg) --env=CK8S_CONFIG_PATH=${CK8S_CONFIG_PATH}
 container_arg := $(container_arg) --env=ROOT=/apps
 container_arg := $(container_arg) --mount type=bind,source=${CK8S_CONFIG_PATH},target=${CK8S_CONFIG_PATH}
+container_arg := $(container_arg) --mount type=bind,source=${GNUPGHOME},target=/home/ubuntu/.gnupg,readonly
 container_arg := $(container_arg) --mount type=bind,source=${HOME}/.kube/cache/oidc-login,target=/home/ubuntu/.kube/cache/oidc-login
 container_arg := $(container_arg) --mount type=bind,source=/run/user/$(shell id -u),target=/run/user/$(shell id -u),readonly
 container_arg := $(container_arg) --network=host
