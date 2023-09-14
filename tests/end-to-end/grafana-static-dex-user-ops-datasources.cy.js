@@ -1,32 +1,29 @@
-describe("grafana admin", function() {
+describe("grafana static dex user datasources test", function() {
+  before(function() {
+    cy.yq("sc", "\"https://\" + .grafana.ops.subdomain + \".\" + .global.opsDomain")
+      .should("not.contain.empty")
+      .as('baseUrl')
+  })
   beforeEach(function() {
     // Cypress does not like trailing dots
     cy.yqDig("sc", ".grafana.ops.trailingDots")
       .should("not.equal", "true")
-
-    cy.yq("sc", "\"https://\" + .grafana.ops.subdomain + \".\" + .global.opsDomain")
-      .should("not.be.empty")
-      .then(cy.visit)
+    cy.dexStaticUserLogin("admin@example.com", this.baseUrl, 'grafana_session_expiry')
+    cy.on('uncaught:exception', (err, runnable) => {
+      if (err.statusText.includes("Request was aborted")) {
+        return false
+      }
+    })
   })
 
-  it("can login via dex with static user", function() {
-    cy.url()
-      .should("include", "/login")
-
-    cy.contains("Sign in with dex")
-      .click()
-
-    cy.dexStaticLogin()
-
+  it('Home is visible', function () {
+    cy.visit(this.baseUrl)
     cy.contains("Home")
       .should("exist")
   })
 
   it("has configured data sources", function() {
-    cy.contains("Sign in with dex")
-      .click()
-
-    cy.dexStaticLogin()
+    cy.visit(this.baseUrl)
 
     cy.get("button[aria-label=\"Toggle menu\"]")
       .click()
@@ -39,6 +36,7 @@ describe("grafana admin", function() {
 
     cy.contains("Connections")
       .click()
+
     cy.contains("Data sources")
       .click()
 
@@ -58,5 +56,9 @@ describe("grafana admin", function() {
             .should("exist")
         }
       })
+  })
+
+  after(function() {
+    Cypress.session.clearAllSavedSessions()
   })
 })
