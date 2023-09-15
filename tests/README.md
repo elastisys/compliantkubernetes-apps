@@ -40,20 +40,20 @@ make
 Run selected tests:
 
 ```bash
-make <unit|regression|integration|end-to-end>
+make run-<unit|regression|integration|end-to-end>
 ```
 
 Run individual tests:
 
 ```bash
-make <file/path> # without trailing .bats, for cypress and templates use the .gen ending
+make <file/path> # without trailing .bats, for generated files use the .gen ending
 ```
 
 Clean up:
 
 ```bash
 # remove dependencies and generated files
-make clean-all
+make clean
 
 # remove dependencies
 make clean-dep
@@ -66,24 +66,32 @@ make clean-gen
 
 The plain `bats` test suite can be manually run by simply running `bats` and listing the target directories or files.
 
+```bash
+# all
+bats -r .
+# dirs
+bats -r <unit|regression|integration|end-to-end>
+# files
+bats <path/to/file.bats>
+```
+
 ## Usage with `cypress`
 
-The plain `cypress` test suite can be manually run as follows for all:
+The plain `cypress` test suite can be manually run as follows:
 
 ```bash
-npx --prefix common/cypress cypress run --config-file "$PWD/common/cypress/cypress.config.js" --project <.|unit|regression|integration|end-to-end> --config supportFile=$PWD/common/cypress/support/lib.js
+# all
+npx cypress run
+# dirs
+npx cypress run --spec <unit|regression|integration|end-to-end>
+# files
+npx cypress run --spec <path/to/file.cy.js>
 ```
 
-And for specific files:
+It can be useful to open `cypress` as it will give you a view of how the tests execute, helping in the development and review process:
 
 ```bash
-npx --prefix common/cypress cypress run --config-file "$PWD/common/cypress/cypress.config.js" --project <.|unit|regression|integration|end-to-end> --config supportFile=$PWD/common/cypress/support/lib.js --spec <path/to/file>
-```
-
-During test development it can be useful to keep `cypress` open:
-
-```bash
-npx --prefix common/cypress cypress open --config-file "$PWD/common/cypress/cypress.config.js" --project <.|unit|regression|integration|end-to-end> --config supportFile=$PWD/common/cypress/support/lib.js
+npx cypress open
 ```
 
 Then it will auto-reload and auto-execute as tests are updated, use `it.only` instead of `it` to run only selected tests.
