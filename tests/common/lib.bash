@@ -13,6 +13,7 @@ log_fatal() {
   exit 1
 }
 
+# important: all bats files should execute this during setup to have assert support
 common_setup() {
   load "${ROOT}/tests/common/bats/assert/load.bash"
   load "${ROOT}/tests/common/bats/detik/lib/detik.bash"
@@ -30,7 +31,7 @@ cypress_setup() {
 
   CYPRESS_REPORT="$(mktemp)"
 
-  pushd "${ROOT}/tests/common/cypress" || exit 1
+  pushd "${ROOT}/tests" || exit 1
 
   npx cypress run --spec "$1" --reporter json-stream --quiet > "${CYPRESS_REPORT}" || true
 
@@ -82,62 +83,59 @@ cypress_teardown() {
   fi
 }
 
-# note: not intended for direct use
+# note: more correct than yq_dig for complex data such as maps that can be merged
+# usage: yq <cluster> <config-key> <default>
+yq() {
+  local value
+
+  if [[ "${1:-}" =~ ^(sc|wc)$ ]]; then
+    if [[ -n "${2:-}" ]]; then
+      value="$(yq4 ea "explode(.) as \$item ireduce ({}; . * \$item) | ${2} | ...comments=\"\"" "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/$1-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" "${CK8S_CONFIG_PATH}/sc-config.yaml")"
+      if [[ -n "${value#null}" ]]; then
+        echo "${value}"
+      else
+        echo "${3:-}"
+      fi
+    else
+      fail "missing config key argument"
+    fi
+  elif [[ -n "${1:-}" ]]; then
+    fail "invalid cluster argument"
+  else
+    fail "missing cluster argument"
+  fi
+}
+
+# note: more efficient than yq for simple data such as scalars that cannot be merged
 # usage: yq_dig <cluster> <config-key> <default>
 yq_dig() {
   local value
 
-  for config in "${CK8S_CONFIG_PATH}/$1-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/$1-config.yaml" "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"; do
-    value=$(yq4 "$2" "${config}")
-
-    if [[ "${value}" != "null" ]]; then
-      echo "${value}"
-      return
+  if [[ "${1:-}" =~ ^(sc|wc)$ ]]; then
+    if [[ -n "${2:-}" ]]; then
+      value="$(yq4 ea "explode(.) | ${2} | select(. != null) | {\"wrapper\": .} as \$item ireduce ({}; . * \$item) | .wrapper | ... comments=\"\"" "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/$1-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" "${CK8S_CONFIG_PATH}/sc-config.yaml")"
+      if [[ -n "${value#null}" ]]; then
+        echo "${value}"
+      else
+        echo "${3:-}"
+      fi
+    else
+      fail "missing config key argument"
     fi
-  done
-
-  echo "$3"
+  elif [[ -n "${1:-}" ]]; then
+    fail "invalid cluster argument"
+  else
+    fail "missing cluster argument"
+  fi
 }
 
+# usage: continue_on <cluster> <config-key>
 continue_on() {
   if [[ "${1:-}" =~ ^(sc|wc)$ ]]; then
     if [[ -n "${2:-}" ]]; then
       if [[ "$(yq_dig "$1" "$2" "false")" != "true" ]]; then
         skip "$1/$2 - disabled"
       fi
-    else
-      fail "missing config key argument"
-    fi
-  elif [[ -n "${1:-}" ]]; then
-    fail "invalid cluster argument"
-  else
-    fail "missing cluster argument"
-  fi
-}
-
-# note: expects that the config key has an enabled field
-# usage: skip_on_disabled <cluster> <config-key>
-skip_on_disabled() {
-  if [[ "${1:-}" =~ ^(sc|wc)$ ]]; then
-    if [[ -n "${2:-}" ]]; then
-      if [[ "$(yq_dig "$1" ".$2.enabled" "false")" != "true" ]]; then
-        skip "$1/$2 - disabled"
-      fi
-    else
-      fail "missing config key argument"
-    fi
-  elif [[ -n "${1:-}" ]]; then
-    fail "invalid cluster argument"
-  else
-    fail "missing cluster argument"
-  fi
-}
-
-# usage: get <cluster> <config-key>
-get() {
-  if [[ "${1:-}" =~ ^(sc|wc)$ ]]; then
-    if [[ -n "${2:-}" ]]; then
-      yq_dig "$1" ".$2" "0"
     else
       fail "missing config key argument"
     fi
