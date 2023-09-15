@@ -2,7 +2,7 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sUserCRDs
 metadata:
-  name: allowed-user-crds
+  name: elastisys-allowed-user-crds
 spec:
   enforcementAction: {{ .Values.allowUserCRDs.enforcementAction }}
   match:

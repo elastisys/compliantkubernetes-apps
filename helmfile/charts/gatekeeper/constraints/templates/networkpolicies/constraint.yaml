@@ -2,7 +2,7 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sRequireNetworkPolicy
 metadata:
-  name: require-networkpolicy
+  name: elastisys-require-networkpolicy
 spec:
   enforcementAction: {{ .Values.requireNetworkpolicies.enforcementAction }}
   match:
