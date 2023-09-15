@@ -7,7 +7,7 @@ violation[{"msg": msg}] {
 
     satisfied := [good | repo = input.parameters.repos[_] ; good = startswith(container.image, repo)]
     not any(satisfied)
-    msg := sprintf("container %q has an invalid image repo %q, allowed repos are %v", [container.name, container.image, input.parameters.repos])
+    msg := sprintf("The container named <%v> does not have an allowed image registry <%v>, allowed registries are <%v>. Elastisys Compliant Kubernetes requires that all images come from trusted registries. Read more at https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-trusted-registries/", [container.name, container.image, input.parameters.repos])
 }
 
 # Get containers for "Pods"
@@ -44,7 +44,7 @@ violation[{"msg": msg}] {
 
     satisfied := [good | repo = input.parameters.repos[_] ; good = startswith(container.image, repo)]
     not any(satisfied)
-    msg := sprintf("initContainer %q has an invalid image repo %q, allowed repos are %v", [container.name, container.image, input.parameters.repos])
+    msg := sprintf("The initContainer named <%v> does not have an allowed image registry <%v>, allowed registries are <%v>. Elastisys Compliant Kubernetes requires that all images come from trusted registries. Read more at https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-trusted-registries/", [container.name, container.image, input.parameters.repos])
 }
 
 # Get init containers for "Pods"
