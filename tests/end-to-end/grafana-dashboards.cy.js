@@ -2,7 +2,6 @@
 describe("grafana-admin dashboards e2e", function() {
   before(function() {
     cy.yq("sc", "\"https://\" + .grafana.ops.subdomain + \".\" + .global.opsDomain")
-      .its("stdout")
       .should("not.contain", "null")
       .as('baseUrl')
   })
