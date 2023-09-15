@@ -74,22 +74,48 @@ Cypress.Commands.add("skipOnDisabled", function(cluster, expression) {
     })
 })
 
-// TBD
-Cypress.Commands.add('staticLogin', (username, password, url) => {
-  cy.session([username, password, url], () => {
-    cy.visit(url)
+// Available as cy.staticLogin("username", "password expression", "url for login", "path to test after login", "session cookie name")
+Cypress.Commands.add('staticLogin', (username, passwordExpression, loginUrl, landingPath, cookieName) => {
+  cy.session([username, passwordExpression, loginUrl, landingPath, cookieName], () => {
+    cy.visit(loginUrl)
+    // ToDo the username label should be configurable
     cy.get('input[name=user]').type(username)
 
-    // {enter} causes the form to submit
-    cy.get('input[name=password]').type(`${password}{enter}`, { log: false })
-
-    cy.url().should('include', '/?orgId')
+    cy.yqSecrets(passwordExpression)
+      .its("stdout")
+      .then(password => {
+        // {enter} causes the form to submit
+        // ToDo the password label should be configurable
+        cy.get('input[name=password]').type(`${password}{enter}`, { log: false })
+      })
+    // we get some network errors at this step, let's see if wait fixes them
+    cy.wait(5000)
+    cy.url().should('include', landingPath)
   },
   {
     validate() {
-      cy.getCookie('grafana_session').should('exist')
+      cy.getCookie(cookieName).should('exist')
     },
     cacheAcrossSpecs: true,
   }
   )
+})
+
+// Available as cy.testGrafanaDashboard("baseUrl", "the names of the Grafana dashboard", "the no of completed api req to wait")
+Cypress.Commands.add('testGrafanaDashboard', (baseUrl, dashboardName, requestsToWait) => {
+  cy.intercept("/api/**").as("api")
+
+  cy.visit(baseUrl + '/dashboards')
+  // used to view and load as much of the dashboard as possible
+  cy.viewport(2560, 2160)
+
+  cy.get('[data-testid="data-testid Folder header General"]').click()
+  cy.get(`[data-testid="data-testid Dashboard search item ${dashboardName}"]`).click()
+  // ToDo: expand all rows
+  cy.wait(Array(requestsToWait).fill('@api'))
+  // not really best practices to target objects by id
+  cy.get('[id="var-datasource"]').should('exist').and('contain', 'default')
+  cy.get('[id="var-cluster"]').should('exist')
+  // some dashboards will contain "No data" because an overwrite for NaN or Null doesn't exist
+  cy.contains('No data').should('not.exist')
 })
