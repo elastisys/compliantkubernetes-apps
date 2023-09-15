@@ -170,3 +170,7 @@ The format is recursive and keeps variables set for one test as it goes deeper i
 Any `clusters`, `namespaces` and `function` fields overwrites the previously set variable, while `condition` fields are accumulative.
 Any `target` field will case tests to be emitted for each cluster and namespace combo, skipping the `tests` fields in the same spec.
 Arguments starting with a `.` are treated as an expression and evaluated during runtime against the config.
+
+## Possible issues
+
+1. If, when executing `make build`, you get `404  Not Found` at the `apt update` step, you may need to remove the local `ubuntu:rolling` image
