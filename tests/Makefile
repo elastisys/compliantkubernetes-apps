@@ -2,7 +2,7 @@
 
 dirs := unit regression integration end-to-end
 
-bats_suites := $(foreach dir, $(dirs), $(wildcard $(dir)/*.bats))
+bats_suites = $(filter-out %.gen.bats,$(foreach dir, $(dirs), $(wildcard $(dir)/*.bats)))
 bats_templates := $(foreach dir, $(dirs), $(wildcard $(dir)/*.bats.yaml))
 bats_gen := $(bats_templates:.bats.yaml=.gen.bats)
 
@@ -27,28 +27,58 @@ container_arg := $(container_arg) --mount type=bind,source=/run/user/$(shell id 
 container_arg := $(container_arg) --network=host
 container_arg := $(container_arg) --user $(shell id -u):$(shell id -g)
 
+found_apt := $(shell command -v apt 2>/dev/null)
+
+found_bats := $(shell command -v bats 2>/dev/null)
+found_npm := $(shell command -v npm 2>/dev/null)
+
 found_podman := $(shell command -v podman 2>/dev/null)
 
-run-all: $(bats_suites) $(bats_gen) $(cypress_gen) | dep
+all := $(bats_suites) $(bats_gen) $(cypress_gen)
+
+all: $(all) | dep
 	@echo --- bats all
 	@bats -r unit regression integration end-to-end
 
-run-unit: $(filter unit/%, $(bats_suites)) $(filter unit/%, $(bats_gen)) $(filter unit/%, $(cypress_gen)) | dep
+unit: $(filter unit/%, $(bats_suites)) $(filter unit/%, $(bats_gen)) $(filter unit/%, $(cypress_gen)) | dep
 	@echo --- bats unit
 	@bats -r unit
-run-regression: $(filter regression/%, $(bats_suites)) $(filter regression/%, $(bats_gen)) $(filter regression/%, $(cypress_gen)) | dep
+regression: $(filter regression/%, $(bats_suites)) $(filter regression/%, $(bats_gen)) $(filter regression/%, $(cypress_gen)) | dep
 	@echo --- bats regression
 	@bats -r regression
-run-integration: $(filter integration/%, $(bats_suites)) $(filter integration/%, $(bats_gen)) $(filter integration/%, $(cypress_gen)) | dep
+integration: $(filter integration/%, $(bats_suites)) $(filter integration/%, $(bats_gen)) $(filter integration/%, $(cypress_gen)) | dep
 	@echo --- bats integration
 	@bats -r integration
-run-end-to-end: $(filter end-to-end/%, $(bats_suites)) $(filter end-to-end/%, $(bats_gen)) $(filter end-to-end/%, $(cypress_gen)) | dep
+end-to-end: $(filter end-to-end/%, $(bats_suites)) $(filter end-to-end/%, $(bats_gen)) $(filter end-to-end/%, $(cypress_gen)) | dep
 	@echo --- bats end-to-end
 	@bats -r end-to-end
 
+$(all:.bats=): %: %.bats
+	@echo --- bats $*.bats
+	@bats -r $*.bats
+
 @PHONY: clean-dep clean-gen
 
-dep: common/bats/assert common/bats/detik common/bats/support common/cypress/node_modules
+dep: dep-bats common/bats/assert common/bats/detik common/bats/support dep-npm common/cypress/node_modules
+
+dep-bats:
+ifndef found_bats
+ifdef found_apt
+	@echo "missing dependency: bats - install it using 'sudo apt install bats'"
+else
+	@echo "missing dependency: bats - install it using your method of choice"
+endif
+	@exit 1
+endif
+dep-npm:
+ifndef found_npm
+ifdef found_apt
+	@echo "missing dependency: npm - install it using 'sudo apt install npm'"
+else
+	@echo "missing dependency: npm - install it using your method of choice"
+endif
+	@exit 1
+endif
 
 common/bats/assert:
 	@echo --- git clone github.com/bats-core/bats-assert
@@ -107,3 +137,6 @@ ifdef found_podman
 else
 	docker run $(container_arg) $(container_image) make $*
 endif
+
+print-%:
+	@echo $($*)

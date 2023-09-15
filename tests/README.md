@@ -12,7 +12,14 @@ Tests implemented with `cypress` can and will be integrated into the `bats` test
 > You can also use `make build`, then `make ctr-<command>` to run each command in a container, skip `make ctr-dep` as they are integrated into the image.
 > You must rebuild the image for it to contain your changes.
 
-You must have `bats`, `make` and `npm` installed, supporting libraries including `cypress` are fetched automatically as a dependency or with:
+You must have `bats`, `make` and `npm` installed
+
+```bash
+# For deb based distributions
+sudo apt install bats make npm
+```
+
+Supporting libraries including `cypress` are fetched automatically as a dependency or with:
 
 ```bash
 make dep
@@ -30,28 +37,16 @@ Run all tests:
 make
 ```
 
-Run unit tests:
+Run selected tests:
 
 ```bash
-make run-unit
+make <unit|regression|integration|end-to-end>
 ```
 
-Run regression tests:
+Run individual tests:
 
 ```bash
-make run-regression
-```
-
-Run integration tests:
-
-```bash
-make run-integration
-```
-
-Run end-to-end tests:
-
-```bash
-make run-end-to-end
+make <file/path> # without trailing .bats, for cypress and templates use the .gen ending
 ```
 
 Clean up:
