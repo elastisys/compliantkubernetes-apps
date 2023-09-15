@@ -32,7 +32,7 @@ cypress_setup() {
 
   pushd "${ROOT}/tests/common/cypress" || exit 1
 
-  npx cypress run --project "$(dirname "$1")" --config-file "${ROOT}/tests/common/cypress/cypress.config.js" --spec "$1" --reporter json-stream --quiet > "${CYPRESS_REPORT}" || true
+  npx cypress run --spec "$1" --reporter json-stream --quiet > "${CYPRESS_REPORT}" || true
 
   popd || exit 1
 

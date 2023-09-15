@@ -2,12 +2,16 @@
 
 dirs := unit regression integration end-to-end
 
+# Pure bats tests
 bats_suites = $(filter-out %.gen.bats,$(foreach dir, $(dirs), $(wildcard $(dir)/*.bats)))
-bats_templates := $(foreach dir, $(dirs), $(wildcard $(dir)/*.bats.yaml))
-bats_gen := $(bats_templates:.bats.yaml=.gen.bats)
 
+# Cypress tests
 cypress_suites := $(foreach dir, $(dirs), $(wildcard $(dir)/*.cy.js))
 cypress_gen := $(cypress_suites:.cy.js=.gen.bats)
+
+# Template tests
+template_suites := $(foreach dir, $(dirs), $(wildcard $(dir)/*.bats.yaml))
+template_gen := $(template_suites:.bats.yaml=.gen.bats)
 
 config_path := ${CK8S_CONFIG_PATH}
 
@@ -34,22 +38,25 @@ found_npm := $(shell command -v npm 2>/dev/null)
 
 found_podman := $(shell command -v podman 2>/dev/null)
 
-all := $(bats_suites) $(bats_gen) $(cypress_gen)
+all := $(bats_suites) $(cypress_gen) $(template_gen)
 
 all: $(all) | dep
 	@echo --- bats all
 	@bats -r unit regression integration end-to-end
 
-unit: $(filter unit/%, $(bats_suites)) $(filter unit/%, $(bats_gen)) $(filter unit/%, $(cypress_gen)) | dep
+run-unit: $(filter unit/%, $(all)) | dep
 	@echo --- bats unit
 	@bats -r unit
-regression: $(filter regression/%, $(bats_suites)) $(filter regression/%, $(bats_gen)) $(filter regression/%, $(cypress_gen)) | dep
+
+run-regression: $(filter regression/%, $(all)) | dep
 	@echo --- bats regression
 	@bats -r regression
-integration: $(filter integration/%, $(bats_suites)) $(filter integration/%, $(bats_gen)) $(filter integration/%, $(cypress_gen)) | dep
+
+run-integration: $(filter integration/%, $(all)) | dep
 	@echo --- bats integration
 	@bats -r integration
-end-to-end: $(filter end-to-end/%, $(bats_suites)) $(filter end-to-end/%, $(bats_gen)) $(filter end-to-end/%, $(cypress_gen)) | dep
+
+run-end-to-end: $(filter end-to-end/%, $(all)) | dep
 	@echo --- bats end-to-end
 	@bats -r end-to-end
 
@@ -57,9 +64,7 @@ $(all:.bats=): %: %.bats
 	@echo --- bats $*.bats
 	@bats -r $*.bats
 
-@PHONY: clean-dep clean-gen
-
-dep: dep-bats common/bats/assert common/bats/detik common/bats/support dep-npm common/cypress/node_modules
+dep: dep-bats common/bats/assert common/bats/detik common/bats/support dep-npm node_modules
 
 dep-bats:
 ifndef found_bats
@@ -70,6 +75,7 @@ else
 endif
 	@exit 1
 endif
+
 dep-npm:
 ifndef found_npm
 ifdef found_apt
@@ -84,45 +90,47 @@ common/bats/assert:
 	@echo --- git clone github.com/bats-core/bats-assert
 	@git clone https://github.com/bats-core/bats-assert.git common/bats/assert
 	@echo
+
 common/bats/detik:
 	@echo --- git clone github.com/bats-core/bats-detik
 	@git clone https://github.com/bats-core/bats-detik.git common/bats/detik
 	@echo
+
 common/bats/support:
 	@echo --- git clone github.com/bats-core/bats-support
 	@git clone https://github.com/bats-core/bats-support.git common/bats/support
 	@echo
 
-common/cypress/node_modules:
-	@echo --- npm install cypress
-	@npm install --prefix common/cypress --save-dev
+node_modules:
+	@echo --- npm install
+	@npm install --save-dev
 	@echo
 
-gen: gen-bats gen-cypress
-
-gen-bats: $(bats_gen)
+gen: gen-template gen-cypress
 
 gen-cypress: $(cypress_gen)
 
-$(bats_gen): %.gen.bats: %.bats.yaml common/gen-bats.bash
-	@echo gen-bats $< to $@
-	@./common/gen-bats.bash $< > $@
+gen-template: $(template_gen)
 
 $(cypress_gen): %.gen.bats: %.cy.js common/gen-cypress.bash
 	@echo gen-cypress $< to $@
 	@./common/gen-cypress.bash $< > $@
 
-clean-all: clean-dep clean-gen
+$(template_gen): %.gen.bats: %.bats.yaml common/gen-bats.bash
+	@echo gen-bats $< to $@
+	@./common/gen-bats.bash $< > $@
+
+clean: clean-dep clean-gen
 
 clean-dep:
 	@echo rm common/bats
 	@rm -rf common/bats
-	@echo rm common/cypress/node_modules
-	@rm -rf common/cypress/node_modules
+	@echo rm node_modules
+	@rm -rf node_modules
 
 clean-gen:
-	rm -f $(bats_gen)
-	rm -f $(cypress_gen)
+	@echo rm $(foreach dir, $(dirs), $(wildcard $(dir)/*.gen.bats))
+	@rm -f $(foreach dir, $(dirs), $(wildcard $(dir)/*.gen.bats))
 
 build:
 ifdef found_podman

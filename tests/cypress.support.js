@@ -73,3 +73,47 @@ Cypress.Commands.add("skipOnDisabled", function(cluster, expression) {
       }
     })
 })
+
+// Available as cy.dexStaticLogin() requires dex static login to be enabled
+Cypress.Commands.add("dexStaticLogin", function() {
+  // Check if enabled
+  cy.yqDig("sc", ".dex.enableStaticLogin")
+    .its("stdout")
+    .then(staticLoginEnabled => {
+      if (staticLoginEnabled !== "true") {
+        cy.fail("dexStaticLogin: requires dex static login to be enabled")
+      }
+    })
+
+  // Conditionally skip connector selection
+  cy.yqSecrets(".dex.connectors | length")
+    .its("stdout")
+    .then(connectors => {
+      if (connectors !== "0") {
+        cy.contains("Log in with Email")
+          .click()
+      }
+    })
+
+  // Fetch and type in credentials
+  // The selection of the input is a bit weak but the field's label is in its own div
+  cy.yqSecrets(".dex.staticPasswordNotHashed")
+    .its("stdout")
+    .then(password => {
+      cy.contains("Email Address")
+        .parent()
+        .parent()
+        .find("input")
+        .type("admin@example.com", { log: false })
+
+      cy.contains("Password")
+        .parent()
+        .parent()
+        .find("input")
+        .type(password, { log: false })
+    })
+
+  // Finally login
+  cy.contains("Login")
+    .click()
+})

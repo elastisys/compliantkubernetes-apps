@@ -51,13 +51,12 @@ USER ubuntu
 
 ENV ROOT="/apps"
 
-COPY --chown=ubuntu:ubuntu ./Makefile /apps/tests/Makefile
-COPY --chown=ubuntu:ubuntu ./common /apps/tests/common
+COPY --chown=ubuntu:ubuntu Makefile package.json package-lock.json /apps/tests/
 
 WORKDIR /apps/tests
 
 RUN make dep
 
-COPY --chown=ubuntu:ubuntu  ./ /apps/tests
+COPY --chown=ubuntu:ubuntu  . /apps/tests
 
 RUN make gen
