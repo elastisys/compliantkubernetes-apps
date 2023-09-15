@@ -4,21 +4,21 @@ package k8sresourcerequests
 violation[{"msg": msg}] {
     container := get_containers[_]
     not container.resources.requests
-    msg := sprintf("Container %q has no resource requests", [container.name])
+    msg := sprintf("The container named <%v> has no resource requests. Elastisys Compliant Kubernetes requires resource requests to be set for all containers. Read more at https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-resources/", [container.name])
 }
 
 # violation if CPU REQUESTS is missing.
 violation[{"msg": msg}] {
     container := get_containers[_]
     missing(container.resources.requests, "cpu")
-    msg := sprintf("Container %q has no cpu request", [container.name])
+    msg := sprintf("The container <%v> has no cpu request. Elastisys Compliant Kubernetes requires resource requests to be set for all containers. Read more at https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-resources/", [container.name])
 }
 
 # violation if MEMORY REQUESTS is missing.
 violation[{"msg": msg}] {
     container := get_containers[_]
     missing(container.resources.requests, "memory")
-    msg := sprintf("Container %q has no memory request", [container.name])
+    msg := sprintf("The container <%v> has no memory request. Elastisys Compliant Kubernetes requires resource requests to be set for all containers. Read more at https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-resources/", [container.name])
 }
 
 # Get containers for "Pods"
