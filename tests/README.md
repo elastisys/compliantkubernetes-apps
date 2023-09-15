@@ -3,14 +3,18 @@
 The test suite is implemented using `bats` and `cypress`, with unit, regression, integration, and end-to-end tests under their own respective directory.
 Tests implemented with `cypress` can and will be integrated into the `bats` test suite using generators.
 
+## Usage
+
 > [!note]
 > All instructions assume that you are standing in the `tests/` directory.
 
-## Usage with Makefile
+### Usage with Makefile
 
 > [!note]
 > You can also use `make build`, then `make ctr-<command>` to run each command in a container, skip `make ctr-dep` as they are integrated into the image.
 > You must rebuild the image for it to contain your changes.
+>
+> The container might struggle to prompt for kube-login and gpg-agent, but if those are activated before by accessing the clusters and using gpg then the session can be reused.
 
 You must have `bats`, `make` and `npm` installed
 
@@ -62,7 +66,7 @@ make clean-dep
 make clean-gen
 ```
 
-## Usage with `bats`
+### Usage with `bats`
 
 The plain `bats` test suite can be manually run by simply running `bats` and listing the target directories or files.
 
@@ -75,7 +79,7 @@ bats -r <unit|regression|integration|end-to-end>
 bats <path/to/file.bats>
 ```
 
-## Usage with `cypress`
+### Usage with `cypress`
 
 The plain `cypress` test suite can be manually run as follows:
 

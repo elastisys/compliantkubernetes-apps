@@ -7,47 +7,81 @@ HERE="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 # shellcheck source=tests/common/lib.bash
 source "${HERE}/lib.bash"
 
-render_test() {
-  if [[ "${1:-}" =~ ^([]|)$ ]]; then
-    log_fatal "missing clusters"
-  elif [[ "${2:-}" =~ ^([]|)$ ]]; then
-    log_fatal "missing namespaces"
-  elif [[ -z "${4:-}" ]]; then
-    log_fatal "missing function"
-  elif [[ -z "${5:-}" ]]; then
-    log_fatal "missing target"
+# usage: render_args <cluster-name> <args-as-json-array>
+render_args() {
+  local cluster="${1:-}"
+  local args="${2:-}"
+
+  if [[ -z "${cluster}" ]]; then
+    log_fatal "render args: missing cluster"
+  elif [[ -z "${args#[]}" ]]; then
+    # no args to render
+    return
   fi
 
-  for cluster in $(yq4 -oy '.[]' <<< "$1"); do
-    for namespace in $(yq4 -oy '.[]' <<< "$2"); do
-      local -a args
-      if ! [[ "${6:-}" =~ ^([]|)$ ]]; then
-        for arg in $(yq4 -oy '.[]' <<< "$6"); do
-          if [[ "${arg}" =~ ^\. ]]; then
-            args+=("\"\$(yq_dig \"${cluster}\" \"${arg}\")\"")
-          else
-            args+=("\"${arg}\"")
-          fi
-        done
-      fi
+  for arg in $(yq4 -oy '.[]' <<< "${args}"); do
+    if [[ "${arg}" =~ ^\. ]]; then
+      # reference argument
+      echo -n "\"\$(yq_dig \"${cluster}\" \"${arg}\")\""
+    else
+      # plain argument
+      echo -n "\"${arg}\""
+    fi
+  done
+}
 
+# usage: render_conditions <cluster-name> <conditions-as-json-array>
+render_conditions() {
+  local cluster="${1:-}"
+  local conditions="${2:-}"
+
+  if [[ -z "${cluster}" ]]; then
+    log_fatal "render conditions: missing cluster"
+  elif [[ -z "${conditions#[]}" ]]; then
+    # no conditions to render
+    return
+  fi
+
+  for condition in $(yq4 -oy '.[]' <<< "${conditions}"); do
+    echo "  continue_on \"${cluster}\" \"${condition}\""
+  done
+  echo ""
+}
+
+# usage: render_test <cluster-as-json-array> <namespaces-as-json-array> <conditions-as-json-array> <function-name> <target-name> <args-as-json-array>
+render_test() {
+  local clusters="${1:-}"
+  local namespaces="${2:-}"
+  local conditions="${3:-}"
+  local function="${4:-}"
+  local target="${5:-}"
+  local args="${6:-}"
+
+  if [[ -z "${clusters#[]}" ]]; then
+    log_fatal "render test: missing clusters"
+  elif [[ -z "${namespaces#[]}" ]]; then
+    log_fatal "render test: missing namespaces"
+  elif [[ -z "${function}" ]]; then
+    log_fatal "render test: missing function"
+  elif [[ -z "${target}" ]]; then
+    log_fatal "render test: missing target"
+  fi
+
+  for cluster in $(yq4 -oy '.[]' <<< "${clusters}"); do
+    for namespace in $(yq4 -oy '.[]' <<< "${namespaces}"); do
       echo ""
-      echo "@test \"${name} - ${4/_/ } - ${cluster} / ${namespace} / $5\" {"
-      if ! [[ "${3:-}" =~ ^([]|)$ ]]; then
-        for condition in $(yq4 -oy '.[]' <<< "$3"); do
-          echo "  continue_on \"${cluster}\" \"${condition}\""
-        done
-        echo ""
-      fi
+      echo "@test \"${name} - ${function/_/ } - ${cluster} / ${namespace} / ${target}\" {"
+      render_conditions "${cluster}" "${conditions}"
       echo "  with_kubeconfig \"${cluster}\""
       echo "  with_namespace \"${namespace}\""
       echo ""
-      echo "  $4 \"$5\" ${args[*]}"
+      echo "  ${function} \"${target}\" $(render_args "${cluster}" "${args}")"
       echo "}"
     done
   done
 }
 
+# usage: render_tests <test-as-json-object>...
 render_tests() {
   local stage
 
@@ -92,15 +126,15 @@ render_tests() {
 
 # Generate bats test files from templates
 main() {
-  if [[ -z "${1:-}" ]]; then
+  local file="${1:-}"
+
+  if [[ -z "${file}" ]]; then
     log_fatal "missing file argument"
-  elif ! [[ -f "$1" ]]; then
+  elif ! [[ -f "${file}" ]]; then
     log_fatal "invalid file argument"
   fi
 
-  local template
-
-  template="$(readlink -f "$1")"
+  file="$(readlink -f "${file}")"
 
   echo '#!/usr/bin/env bats'
   echo ''
@@ -110,13 +144,13 @@ main() {
   echo '  common_setup'
   echo '}'
 
-  name="$(yq4 '.name' "${template}")"
+  name="$(yq4 '.name' "${file}")"
   if [[ -z "${name}" ]]; then
     log.fatal "missing name of template"
   fi
   export name
 
-  readarray -t tests <<< "$(yq4 -oj -I0 '.tests[]' "${template}")"
+  readarray -t tests <<< "$(yq4 -oj -I0 '.tests[]' "${file}")"
   render_tests "${tests[@]}"
 }
 
