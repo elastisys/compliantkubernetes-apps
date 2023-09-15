@@ -11,6 +11,7 @@
 ### Changed
 
 - Changed the alert `KubeContainerOOMKilled` threshold.
+- Changed Gatekeeper violation messages to be more informative.
 
 ### Fixed
 

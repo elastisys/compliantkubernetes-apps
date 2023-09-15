@@ -2,7 +2,7 @@
 apiVersion: constraints.gatekeeper.sh/v1alpha1
 kind: K8sResourceRequests
 metadata:
-  name: require-resource-requests
+  name: elastisys-require-resource-requests
 spec:
   enforcementAction: {{ .Values.requireResourceRequests.enforcementAction }}
   match:

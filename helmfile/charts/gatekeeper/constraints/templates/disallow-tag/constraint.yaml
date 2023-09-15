@@ -2,7 +2,7 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sDisallowedTags
 metadata:
-  name: container-image-must-not-have-disallowed-tags
+  name: elastisys-container-image-must-not-have-disallowed-tags
 spec:
   enforcementAction: {{ .Values.disallowedTags.enforcementAction }}
   match:

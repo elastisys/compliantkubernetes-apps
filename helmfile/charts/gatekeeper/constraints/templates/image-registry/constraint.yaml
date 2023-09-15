@@ -2,7 +2,7 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sAllowedRepos
 metadata:
-  name: require-harbor-repo
+  name: elastisys-require-harbor-registry
 spec:
   enforcementAction: {{ .Values.restrictImageRegistry.enforcementAction }}
   match:
