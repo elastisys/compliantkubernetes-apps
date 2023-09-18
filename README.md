@@ -426,9 +426,16 @@ The former runs scripted configuration steps that do not change the state of the
 On unexpected failures the command will try to perform a rollback when possible to ensure that the environment continues to function.
 
 ```bash
-./bin/ck8s upgrade vX.Y prepare
-./bin/ck8s upgrade vX.Y apply
+./bin/ck8s upgrade both vX.Y prepare
+./bin/ck8s upgrade both vX.Y apply
 ```
+
+> [!NOTE]
+> It is possible to upgrade `wc` and `sc` clusters separately by replacing `both` when running the `upgrade` command, e.g. the following will only upgrade the workload cluster:
+> ```bash
+> ./bin/ck8s upgrade wc vX.Y prepare
+> ./bin/ck8s upgrade wc vX.Y apply
+> ```
 
 It is possible to upgrade from one minor version to the next regardless of patch versions (`vX.Y -> vX.Y+1`), and from one patch version to any later patch versions (`vX.Y.Z -> vX.Y.Z+N`).
 Version validation will require that you are on a release tag matching version specified in the command, and that your environment is at most one minor version behind.

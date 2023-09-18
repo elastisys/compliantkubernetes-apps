@@ -17,8 +17,8 @@ usage() {
     echo "  test <wc|sc> [--logging-enabled]                  test the applications" 1>&2
     echo "  dry-run <wc|sc> [--kubectl]                       runs helmfile diff" 1>&2
     echo "  fix-psp-violations <wc|sc>                        Checks and restarts pods that violates Pod Security Polices, applicable for new environments" 1>&2
-    echo "  upgrade <version-matching-migration> prepare      runs all prepare steps upgrading the configuration" 1>&2
-    echo "  upgrade <version-matching-migration> apply        runs all apply steps upgrading the environment" 1>&2
+    echo "  upgrade <wc|sc|both> <vX.Y> prepare               runs all prepare steps upgrading the configuration" 1>&2
+    echo "  upgrade <wc|sc|both> <vX.Y> apply                 runs all apply steps upgrading the environment" 1>&2
     echo "  team add-pgp <fp>                                 add a new PGP key to secrets" 1>&2
     echo "  team remove-pgp <fp>                              remove a PGP key from secrets and rotate the data encryption key" 1>&2
     # TODO: We might want to make this command less visible once we have proper
@@ -88,10 +88,11 @@ case "${1}" in
         "${here}/dry-run.bash" "${2}" "${KUBECTL}"
         ;;
     upgrade)
-        [[ "${2}" =~ ^(v[0-9]+\.[0-9]+)$ ]] || usage
-        [[ "${3}" =~ ^(prepare|apply)$ ]] || usage
+        [[ "${2}" =~ ^(wc|sc|both)$ ]] || usage
+        [[ "${3}" =~ ^(v[0-9]+\.[0-9]+)$ ]] || usage
+        [[ "${4}" =~ ^(prepare|apply)$ ]] || usage
         check_tools
-        "${here}/upgrade.bash" "${2}" "${3}"
+        "${here}/upgrade.bash" "${2}" "${3}" "${4}"
         ;;
     team)
         case "${2}" in

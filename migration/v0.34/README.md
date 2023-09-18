@@ -65,7 +65,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > *Done before maintenance window.*
 
     ```bash
-    ./bin/ck8s upgrade v0.34 prepare
+    ./bin/ck8s upgrade both v0.34 prepare
 
     # check if the netpol IPs need to be updated
     ./bin/ck8s update-ips both dry-run
@@ -73,12 +73,19 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s update-ips both apply
     ```
 
+    > [!NOTE]
+    > It is possible to upgrade `wc` and `sc` clusters separately by replacing `both` when running the `upgrade` command, e.g. the following will only upgrade the workload cluster:
+    > ```bash
+    > ./bin/ck8s upgrade wc v0.34 prepare
+    > ./bin/ck8s upgrade wc v0.34 apply
+    > ```
+
 1. Apply upgrade - *disruptive*
 
     > *Done during maintenance window.*
 
     ```bash
-    ./bin/ck8s upgrade v0.34 apply
+    ./bin/ck8s upgrade both v0.34 apply
     ```
 
 ## Manual method
@@ -92,6 +99,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ```bash
     git pull
     git switch -d v0.34.x
+    ```
+
+1. Set whether or not upgrade should be prepared for `both` clusters or for one of `sc` or `wc`:
+
+    ```bash
+    export CK8S_CLUSTER=<wc|sc|both>
     ```
 
 1. Verify that no important resources are present in the `elastic-system` and `influxdb-prometheus` namespaces.
@@ -127,6 +140,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 ### Apply upgrade - *disruptive*
 
 > *Done during maintenance window.*
+
+1. Set whether or not upgrade should be applied for `both` clusters or for one of `sc` or `wc`:
+
+    ```bash
+    export CK8S_CLUSTER=<wc|sc|both>
+    ```
 
 1. Rerun bootstrap:
 

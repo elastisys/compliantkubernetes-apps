@@ -65,7 +65,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > *Done before maintenance window.*
 
     ```bash
-    ./bin/ck8s upgrade ${new_version} prepare
+    ./bin/ck8s upgrade both ${new_version} prepare
 
     # check if the netpol IPs need to be updated
     ./bin/ck8s update-ips both dry-run
@@ -73,12 +73,19 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s update-ips both apply
     ```
 
+    > [!NOTE]
+    > It is possible to upgrade `wc` and `sc` clusters separately by replacing `both` when running the `upgrade` command, e.g. the following will only upgrade the workload cluster:
+    > ```bash
+    > ./bin/ck8s upgrade wc ${new_version} prepare
+    > ./bin/ck8s upgrade wc ${new_version} apply
+    > ```
+
 1. Apply upgrade - *disruptive*
 
     > *Done during maintenance window.*
 
     ```bash
-    ./bin/ck8s upgrade ${new_version} apply
+    ./bin/ck8s upgrade both ${new_version} apply
     ```
 
 ## Manual method
@@ -92,6 +99,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ```bash
     git pull
     git switch -d ${new_version}.x
+    ```
+
+1. Set whether or not upgrade should be prepared for `both` clusters or for one of `sc` or `wc`:
+
+    ```bash
+    export CK8S_CLUSTER=<wc|sc|both>
     ```
 
 1. Update apps configuration:
@@ -112,6 +125,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 ### Apply upgrade - *disruptive*
 
 > *Done during maintenance window.*
+
+1. Set whether or not upgrade should be applied for `both` clusters or for one of `sc` or `wc`:
+
+    ```bash
+    export CK8S_CLUSTER=<wc|sc|both>
+    ```
 
 1. Rerun bootstrap:
 

@@ -8,8 +8,13 @@ source "${ROOT}/scripts/migration/lib.sh"
 run() {
   case "${1:-}" in
   execute)
-    "${ROOT}/bin/ck8s" bootstrap sc
-    "${ROOT}/bin/ck8s" bootstrap wc
+
+    if [[ "${CK8S_CLUSTER}" =~ ^(sc|both)$ ]]; then
+      "${ROOT}/bin/ck8s" bootstrap sc
+    fi
+    if [[ "${CK8S_CLUSTER}" =~ ^(wc|both)$ ]]; then
+      "${ROOT}/bin/ck8s" bootstrap wc
+    fi
     ;;
   rollback)
     log_warn "rollback not implemented"
