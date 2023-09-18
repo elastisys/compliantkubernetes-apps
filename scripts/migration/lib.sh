@@ -9,18 +9,8 @@ THIS="$(basename "$(readlink -f "${0}")")"
 declare -A CONFIG
 declare -A VERSION
 
-declare -a CONFIG_FILES
-CONFIG_FILES=(
-  "defaults/common-config.yaml"
-  "common-config.yaml"
-  "defaults/sc-config.yaml"
-  "sc-config.yaml"
-  "defaults/wc-config.yaml"
-  "wc-config.yaml"
-  "secrets.yaml"
-  ".state/kube_config_sc.yaml"
-  ".state/kube_config_wc.yaml"
-)
+SC_KUBECONFIG_FILE=".state/kube_config_sc.yaml"
+WC_KUBECONFIG_FILE=".state/kube_config_wc.yaml"
 
 declare -a SC_CONFIG_FILES
 SC_CONFIG_FILES=(
@@ -189,6 +179,12 @@ check_sops() {
 }
 
 check_config() {
+  if [ -z "${CK8S_CLUSTER:-}" ]; then
+    log_fatal "error: \"CK8S_CLUSTER\" is unset"
+  elif [[ ! "${CK8S_CLUSTER}" =~ ^(sc|wc|both)$ ]]; then
+    log_fatal "error: invalid value set for \"CK8S_CLUSTER\", valid values are <sc|wc|both>"
+  fi
+
   if [ -z "${THIS:-}" ]; then
     log_fatal "error: \"THIS\" is unset"
   elif [ -z "${ROOT:-}" ]; then
@@ -202,12 +198,23 @@ check_config() {
   log_info "using config path: \"${CK8S_CONFIG_PATH}\""
 
   local pass="true"
-  for FILE in "${CONFIG_FILES[@]}"; do
-    if [ ! -f "${CK8S_CONFIG_PATH}/${FILE}" ]; then
-      log_error "error: \"${FILE}\" is not a file"
-      pass="false"
-    fi
-  done
+
+  if [[ "${CK8S_CLUSTER}" =~ ^(sc|both)$ ]]; then
+    for FILE in "${SC_CONFIG_FILES[@]}" "$SC_KUBECONFIG_FILE"; do
+      if [ ! -f "${CK8S_CONFIG_PATH}/${FILE}" ]; then
+        log_error "error: \"${FILE}\" is not a file"
+        pass="false"
+      fi
+    done
+  fi
+  if [[ "${CK8S_CLUSTER}" =~ ^(wc|both)$ ]]; then
+    for FILE in "${WC_CONFIG_FILES[@]}" "$WC_KUBECONFIG_FILE"; do
+      if [ ! -f "${CK8S_CONFIG_PATH}/${FILE}" ]; then
+        log_error "error: \"${FILE}\" is not a file"
+        pass="false"
+      fi
+    done
+  fi
 
   if ! check_sops "${CK8S_CONFIG_PATH}/secrets.yaml"; then
       log_error "error: \"secrets.yaml\" is not encrypted"
@@ -218,14 +225,16 @@ check_config() {
     exit 1
   fi
 
-  for prefix in sc wc; do
-    if check_sops "${CK8S_CONFIG_PATH}/.state/kube_config_${prefix}.yaml"; then
-      CONFIG["${prefix}-kubeconfig"]="encrypted"
-    else
-      CONFIG["${prefix}-kubeconfig"]="unencrypted"
-    fi
+  for prefix in wc sc; do
+    if [[ "${CK8S_CLUSTER}" =~ ^($prefix|both)$ ]]; then
+      if check_sops "${CK8S_CONFIG_PATH}/.state/kube_config_${prefix}.yaml"; then
+        CONFIG["${prefix}-kubeconfig"]="encrypted"
+      else
+        CONFIG["${prefix}-kubeconfig"]="unencrypted"
+      fi
 
-    log_info "using ${prefix} kubeconfig ${CONFIG["${prefix}-kubeconfig"]}"
+      log_info "using ${prefix} kubeconfig ${CONFIG["${prefix}-kubeconfig"]}"
+    fi
   done
 }
 

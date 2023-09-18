@@ -6,6 +6,7 @@ ROOT="$(readlink -f "${here}/../")"
 
 CK8S_STACK="$(basename "$0")"
 export CK8S_STACK
+export CK8S_CLUSTER="${1}"
 
 # shellcheck source=scripts/migration/lib.sh
 CK8S_ROOT_SCRIPT="true" source "${ROOT}/scripts/migration/lib.sh"
@@ -63,15 +64,23 @@ prepare() {
     fi
   done
 
-  for prefix in secrets sc wc; do
-    config_validate "${prefix}"
-  done
+  config_validate secrets
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
+    config_validate sc
+  fi
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
+    config_validate wc
+  fi
 }
 
 apply() {
-  for prefix in secrets sc wc; do
-    config_validate "${prefix}"
-  done
+  config_validate secrets
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
+    config_validate sc
+  fi
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
+    config_validate wc
+  fi
 
   # TODO: Template validation
   # for prefix in sc wc; do
@@ -125,12 +134,8 @@ usage() {
 }
 
 main() {
-  if [[ "${#}" -lt 2 ]] || [[ ! "${2}" =~ ^(prepare|apply)$ ]]; then
-    usage "${2:-}"
-  fi
-
-  local version="${1}"
-  local action="${2}"
+  local version="${2}"
+  local action="${3}"
 
   local pass="true"
   for dir in "" "prepare" "apply"; do
@@ -148,12 +153,16 @@ main() {
 
   check_config
 
-  for prefix in sc wc; do
-    config_load "${prefix}"
-    check_version "${prefix}" "${action}"
-  done
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
+    config_load "sc"
+    check_version "sc" "${action}"
+  fi
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
+    config_load "wc"
+    check_version "wc" "${action}"
+  fi
 
-  "${action}" "${version}"
+  "${action}"
 
   log_info "${action} complete"
 }

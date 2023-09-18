@@ -23,16 +23,28 @@ run() {
     local -a filters
     local selector
 
-    filters=("${skipped[@]}" "${skipped_sc[@]}")
-    selector="${filters[*]:-"app!=null"}"
-    helmfile_upgrade sc "${selector// /,}"
-    filters=("${skipped[@]}" "${skipped_wc[@]}")
-    selector="${filters[*]:-"app!=null"}"
-    helmfile_upgrade wc "${selector// /,}"
+    if [[ "${CK8S_CLUSTER}" =~ ^(sc|both)$ ]]; then
+      filters=("${skipped[@]}" "${skipped_sc[@]}")
+      selector="${filters[*]:-"app!=null"}"
+      helmfile_upgrade sc "${selector// /,}"
+    fi
+
+    if [[ "${CK8S_CLUSTER}" =~ ^(wc|both)$ ]]; then
+      filters=("${skipped[@]}" "${skipped_wc[@]}")
+      selector="${filters[*]:-"app!=null"}"
+      helmfile_upgrade wc "${selector// /,}"
+    fi
     ;;
 
   rollback)
     log_warn "rollback not implemented"
+
+    # if [[ "${CK8S_CLUSTER}" =~ ^(sc|both)$ ]]; then
+    #   log_info "rollback operation on service cluster"
+    # fi
+    # if [[ "${CK8S_CLUSTER}" =~ ^(wc|both)$ ]]; then
+    #   log_info "rollback operation on workload cluster"
+    # fi
     ;;
 
   *)
