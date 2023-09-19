@@ -26,6 +26,13 @@ kube-state-metrics:
   rbac:
     extraRules:
       - apiGroups:
+          - apiextensions.k8s.io
+        resources:
+          - customresourcedefinitions
+        verbs:
+          - list
+          - watch
+      - apiGroups:
           - cluster.x-k8s.io
         resources:
           - clusters
@@ -46,40 +53,6 @@ kube-state-metrics:
           - get
           - list
           - watch
-  collectors:
-    - certificatesigningrequests
-    - configmaps
-    - cronjobs
-    - daemonsets
-    - deployments
-    - endpoints
-    - horizontalpodautoscalers
-    - ingresses
-    - jobs
-    - limitranges
-    - mutatingwebhookconfigurations
-    - namespaces
-    - networkpolicies
-    - nodes
-    - persistentvolumeclaims
-    - persistentvolumes
-    - poddisruptionbudgets
-    - pods
-    - replicasets
-    - replicationcontrollers
-    - resourcequotas
-    - secrets
-    - services
-    - statefulsets
-    - storageclasses
-    - validatingwebhookconfigurations
-    - volumeattachments
-    - clusters
-    - machinedeployments
-    - machinesets
-    - machines
-    - machinehealthchecks
-    - kubeadmcontrolplanes
   volumeMounts:
     - mountPath: /etc/config
       name: kube-state-metrics-clusterapi-volume
