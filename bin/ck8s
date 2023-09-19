@@ -10,7 +10,7 @@ source "${here}/common.bash"
 
 usage() {
     echo "COMMANDS:" 1>&2
-    echo "  init [--generate-new-secrets]                     initialize the config path" 1>&2
+    echo "  init <wc|sc|both> [--generate-new-secrets]        initialize the config path" 1>&2
     echo "  bootstrap <wc|sc>                                 bootstrap the cluster" 1>&2
     echo "  apps <wc|sc> [--sync] [--skip-template-validate]  deploy the applications" 1>&2
     echo "  apply <wc|sc> [--sync] [--skip-template-validate] bootstrap and apps" 1>&2
@@ -58,7 +58,9 @@ done
 
 case "${1}" in
     init)
+        [[ "${2}" =~ ^(wc|sc|both)$ ]] || usage
         check_tools
+        export CK8S_CLUSTER="${2}"
         "${here}/init.bash" "${GEN_NEW_SECRETS}"
         ;;
     bootstrap)
@@ -92,7 +94,8 @@ case "${1}" in
         [[ "${3}" =~ ^(v[0-9]+\.[0-9]+)$ ]] || usage
         [[ "${4}" =~ ^(prepare|apply)$ ]] || usage
         check_tools
-        "${here}/upgrade.bash" "${2}" "${3}" "${4}"
+        export CK8S_CLUSTER="${2}"
+        "${here}/upgrade.bash" "${3}" "${4}"
         ;;
     team)
         case "${2}" in
@@ -159,7 +162,10 @@ case "${1}" in
         "${here}/update-ips.bash" "${2}" "${3}"
         ;;
     fix-psp-violations)
-        "${here}/fix-psp-violations.bash" "${2}"
+        [[ "${2}" =~ ^(wc|sc)$ ]] || usage
+        check_tools
+        export CK8S_CLUSTER="${2}"
+        "${here}/fix-psp-violations.bash"
         ;;
     clean)
         "${here}/clean.bash" "${2}"
