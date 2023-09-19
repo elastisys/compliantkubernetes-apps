@@ -156,7 +156,7 @@ jobs:
         CK8S_ENVIRONMENT_NAME: pipeline-exoscale
         CK8S_CLOUD_PROVIDER: exoscale
         CK8S_FLAVOR: dev
-      run: ./apps/bin/ck8s init
+      run: ./apps/bin/ck8s init both
       id: initialize-apps
 
     - name: Create buckets

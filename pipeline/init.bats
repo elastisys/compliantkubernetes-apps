@@ -21,19 +21,19 @@ teardown() {
 }
 
 @test "ck8s init requires CK8S_CONFIG_PATH" {
-    CK8S_CONFIG_PATH="" run ck8s init
+    CK8S_CONFIG_PATH="" run ck8s init both
     assert_failure
     assert_output --partial "Missing CK8S_CONFIG_PATH"
 }
 
 @test "ck8s init requires CK8S_ENVIRONMENT_NAME" {
-    CK8S_ENVIRONMENT_NAME="" run ck8s init
+    CK8S_ENVIRONMENT_NAME="" run ck8s init both
     assert_failure
     assert_output --partial "Missing CK8S_ENVIRONMENT_NAME"
 }
 
 @test "ck8s init requires CK8S_FLAVOR" {
-    CK8S_FLAVOR="" run ck8s init
+    CK8S_FLAVOR="" run ck8s init both
     assert_failure
     assert_output --partial "Missing CK8S_FLAVOR"
 }
@@ -41,33 +41,33 @@ teardown() {
 @test "ck8s init requires valid CK8S_PGP_FP or valid CK8S_PGP_UID" {
     unset CK8S_PGP_FP
 
-    run ck8s init
+    run ck8s init both
     assert_failure
     assert_output --partial "CK8S_PGP_FP and CK8S_PGP_UID can't both be unset"
 
-    CK8S_PGP_FP="123" run ck8s init
+    CK8S_PGP_FP="123" run ck8s init both
     assert_failure
     assert_output --partial "Fingerprint does not exist in gpg keyring"
 
-    CK8S_PGP_UID="asd" run ck8s init
+    CK8S_PGP_UID="asd" run ck8s init both
     assert_failure
     assert_output --partial "Unable to get fingerprint from gpg keyring using UID"
 }
 
 @test "ck8s init requires CK8S_CLOUD_PROVIDER" {
-    CK8S_CLOUD_PROVIDER="" run ck8s init
+    CK8S_CLOUD_PROVIDER="" run ck8s init both
     assert_failure
     assert_output --partial "Missing CK8S_CLOUD_PROVIDER"
 }
 
 @test "ck8s init checks supported cloud providers" {
-    CK8S_CLOUD_PROVIDER=foo run ck8s init
+    CK8S_CLOUD_PROVIDER=foo run ck8s init both
     assert_failure
     assert_output --partial "Unsupported cloud provider: foo"
 }
 
 @test "ck8s init checks supported flavors" {
-    CK8S_CLOUD_PROVIDER=aws CK8S_FLAVOR=foo run ck8s init
+    CK8S_CLOUD_PROVIDER=aws CK8S_FLAVOR=foo run ck8s init both
     assert_failure
     assert_output --partial "Unsupported flavor: foo"
 }
@@ -84,12 +84,12 @@ teardown() {
             local config_1="${CK8S_CONFIG_PATH}/1"
             local config_2="${CK8S_CONFIG_PATH}/2"
 
-            CK8S_CONFIG_PATH="${config_1}" run ck8s init
+            CK8S_CONFIG_PATH="${config_1}" run ck8s init both
             assert_success
 
             cp -R "${config_1}/." "${config_2}/"
 
-            CK8S_CONFIG_PATH="${config_2}" run ck8s init
+            CK8S_CONFIG_PATH="${config_2}" run ck8s init both
             assert_success
 
             run diff "${config_1}/defaults/common-config.yaml" "${config_2}/defaults/common-config.yaml"

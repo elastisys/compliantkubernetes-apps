@@ -148,8 +148,15 @@ Assuming you already have everything needed to install the apps, this is what yo
     See [compliantkubernetes.io](https://compliantkubernetes.io/) if you are uncertain about what order you should do things in.
 
     ```bash
-    ./bin/ck8s init
+    ./bin/ck8s init both
     ```
+
+    > [!NOTE]
+    > It is possible to initialize `wc` and `sc` clusters separately by replacing `both` when running the `init` command:
+    > ```bash
+    > ./bin/ck8s init wc
+    > ./bin/ck8s init sc
+    > ```
 
 1. Edit the configuration files that have been initialized in the configuration path.
     Make sure that the `objectStorage` values are set in `common-config.yaml` or `sc-config.yaml` and `wc-config.yaml`, as well as required credentials in `secrets.yaml` according to your `objectStorage.type`.

@@ -18,6 +18,7 @@ SC_CONFIG_FILES=(
   "defaults/sc-config.yaml"
   "common-config.yaml"
   "sc-config.yaml"
+  "secrets.yaml"
 )
 
 declare -a WC_CONFIG_FILES
@@ -26,6 +27,7 @@ WC_CONFIG_FILES=(
   "defaults/wc-config.yaml"
   "common-config.yaml"
   "wc-config.yaml"
+  "secrets.yaml"
 )
 
 # --- logging functions ---
@@ -87,7 +89,7 @@ config_version() {
   VERSION["${prefix}-config-patch"]="${version}"
 }
 
-# Usage: config_validation <secrets|sc|wc>
+# Usage: config_validate <secrets|sc|wc>
 config_validate() {
   local defaults
   local setmes

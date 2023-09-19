@@ -112,14 +112,14 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     This will take a backup into `backups/` before modifying any files.
 
     ```bash
-    ./bin/ck8s init
+    ./bin/ck8s init ${CK8S_CLUSTER}
     # or
     ./migration/${new_version}/prepare/50-init.sh
 
     # check if the netpol IPs need to be updated
-    ./bin/ck8s update-ips both dry-run
+    ./bin/ck8s update-ips ${CK8S_CLUSTER} dry-run
     # if you agree with the changes apply
-    ./bin/ck8s update-ips both apply
+    ./bin/ck8s update-ips ${CK8S_CLUSTER} apply
     ```
 
 ### Apply upgrade - *disruptive*

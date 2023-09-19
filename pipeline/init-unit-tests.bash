@@ -24,7 +24,7 @@ if [[ "${CI:-}" == "true" ]]; then
   fi
 fi
 
-"${ck8s}" init
+"${ck8s}" init both
 
 # Add additional config changes here
 config_update "common" ".issuers.letsencrypt.staging.email" "me@example.com"

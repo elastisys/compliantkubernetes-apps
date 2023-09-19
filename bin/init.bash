@@ -5,9 +5,12 @@
 # some defaults where applicable.
 # It's not to be executed on its own but rather via `ck8s init`.
 
+: "${CK8S_CLUSTER:?Missing CK8S_CLUSTER}"
+
 set -eu -o pipefail
 
 here="$(dirname "$(readlink -f "$0")")"
+
 # shellcheck source=bin/common.bash
 source "${here}/common.bash"
 
@@ -102,7 +105,7 @@ generate_default_config() {
         exit 1
     fi
 
-    default_config=$1
+    default_config="${1}"
     if [ -f "${default_config}" ]; then
         backup_file "${default_config}" default
     else
@@ -124,9 +127,9 @@ generate_default_config() {
 # Usage: set_storage_class <config-file>
 # baremetal support is experimental, keep as separate case until stable
 set_storage_class() {
-    file=$1
+    file="${1}"
     if [[ ! -f "${file}" ]]; then
-        log_error "ERROR: invalid file - $file"
+        log_error "ERROR: invalid file - ${file}"
         exit 1
     fi
     case ${CK8S_CLOUD_PROVIDER} in
@@ -161,9 +164,9 @@ set_storage_class() {
 # Usage: set_object_storage <config-file>
 # baremetal support is experimental, keep as separate case until stable
 set_object_storage() {
-    file=$1
+    file="${1}"
     if [[ ! -f "${file}" ]]; then
-        log_error "ERROR: invalid file - $file"
+        log_error "ERROR: invalid file - ${file}"
         exit 1
     fi
     case ${CK8S_CLOUD_PROVIDER} in
@@ -192,9 +195,9 @@ set_object_storage() {
 # Usage: set_nginx_config <config-file>
 # baremetal support is experimental, keep as separate case until stable
 set_nginx_config() {
-    file=$1
+    file="${1}"
     if [[ ! -f "${file}" ]]; then
-        log_error "ERROR: invalid file - $file"
+        log_error "ERROR: invalid file - ${file}"
         exit 1
     fi
     case ${CK8S_CLOUD_PROVIDER} in
@@ -235,27 +238,27 @@ set_nginx_config() {
             ;;
     esac
 
-    replace_set_me "$1" '.ingressNginx.controller.config.useProxyProtocol' "${use_proxy_protocol}"
-    replace_set_me "$1" '.ingressNginx.controller.useHostPort' "${use_host_port}"
-    replace_set_me "$1" '.ingressNginx.controller.service.enabled' "${service_enabled}"
-    replace_set_me "$1" '.networkPolicies.global.externalLoadBalancer' "${external_load_balancer}"
-    replace_set_me "$1" '.networkPolicies.global.ingressUsingHostNetwork' "${ingress_using_host_network}"
+    replace_set_me "${file}" '.ingressNginx.controller.config.useProxyProtocol' "${use_proxy_protocol}"
+    replace_set_me "${file}" '.ingressNginx.controller.useHostPort' "${use_host_port}"
+    replace_set_me "${file}" '.ingressNginx.controller.service.enabled' "${service_enabled}"
+    replace_set_me "${file}" '.networkPolicies.global.externalLoadBalancer' "${external_load_balancer}"
+    replace_set_me "${file}" '.networkPolicies.global.ingressUsingHostNetwork' "${ingress_using_host_network}"
 
     if [ "${service_enabled}" = 'false' ]; then
         replace_set_me "${file}" '.ingressNginx.controller.service.type' '"set-me-if-ingressNginx.controller.service.enabled"'
         replace_set_me "${file}" '.ingressNginx.controller.service.annotations' '"set-me-if-ingressNginx.controller.service.enabled"'
     else
-        replace_set_me "$1" '.ingressNginx.controller.service.type' "\"${service_type}\""
-        replace_set_me "$1" '.ingressNginx.controller.service.annotations' "\"${service_annotations}\""
+        replace_set_me "${file}" '.ingressNginx.controller.service.type' "\"${service_type}\""
+        replace_set_me "${file}" '.ingressNginx.controller.service.annotations' "\"${service_annotations}\""
     fi
 }
 
 # Usage: set_fluentd_config <config-file>
 # baremetal support is experimental, keep as separate case until stable
 set_fluentd_config() {
-    file=$1
+    file="${1}"
     if [[ ! -f "${file}" ]]; then
-        log_error "ERROR: invalid file - $file"
+        log_error "ERROR: invalid file - ${file}"
         exit 1
     fi
     case ${CK8S_CLOUD_PROVIDER} in
@@ -277,9 +280,9 @@ set_fluentd_config() {
 
 # Usage: set_s3bucketalertscount_config <config-file>
 set_s3bucketalertscount_config() {
-    file=$1
+    file="${1}"
     if [[ ! -f "${file}" ]]; then
-        log_error "ERROR: invalid file - $file"
+        log_error "ERROR: invalid file - ${file}"
         exit 1
     fi
     case ${CK8S_CLOUD_PROVIDER} in
@@ -300,7 +303,7 @@ set_s3bucketalertscount_config() {
 # Usage: set_harbor_config <config-file>
 # baremetal support is experimental, keep as separate case until stable
 set_harbor_config() {
-    file=$1
+    file="${1}"
     if [[ ! -f "${file}" ]]; then
         log_error "ERROR: invalid file - ${file}"
         exit 1
@@ -342,7 +345,7 @@ set_harbor_config() {
 }
 
 update_monitoring() {
-    file=$1
+    file="${1}"
     if [[ ! -f "${file}" ]]; then
         log_error "ERROR: invalid file - ${file}"
         exit 1
@@ -355,7 +358,7 @@ update_monitoring() {
     esac
 }
 update_psp_netpol() {
-    file=$1
+    file="${1}"
     if [[ ! -f "${file}" ]]; then
         log_error "ERROR: invalid file - ${file}"
         exit 1
@@ -375,7 +378,7 @@ update_config() {
         exit 1
     fi
 
-    override_config=$1
+    override_config="${1}"
     config_name=$(echo "${override_config}" | sed -r 's/.*\///' | sed -r 's/-config.yaml//')
 
     if [ -f "${override_config}" ]; then
@@ -434,8 +437,8 @@ update_secrets() {
         log_error "ERROR: number of args in update_secrets must be 2. #=[$#]"
         exit 1
     fi
-    file=$1
-    generate_new_secrets=$2
+    file="${1}"
+    generate_new_secrets="${2}"
 
     tmpfile=$(mktemp)
     append_trap "rm ${tmpfile}" EXIT
@@ -444,7 +447,7 @@ update_secrets() {
 
     generate_secrets "${tmpfile}"
 
-    if [[ -f $file ]]; then
+    if [[ -f "${file}" ]]; then
         sops_decrypt "${file}"
         yq4 --inplace '... comments=""' "${tmpfile}"
         yq4 eval-all --inplace --prettyPrint 'select(fi == 0) * select(fi == 1)' "${tmpfile}" "${file}"
@@ -464,7 +467,7 @@ generate_secrets() {
         log_error "ERROR: number of args in generate_secrets must be 1. #=[$#]"
         exit 1
     fi
-    tmpfile=$1
+    tmpfile="${1}"
 
     # https://unix.stackexchange.com/questions/307994/compute-bcrypt-hash-from-command-line
 
@@ -523,8 +526,9 @@ generate_secrets() {
 
 # Usage: backup_file <file> [sufix]
 backup_file() {
-    if [ ! -f "$1" ]; then
-        log_error "ERROR: args in backup_file must be a file. [$1]"
+    file="${1}"
+    if [ ! -f "${file}" ]; then
+        log_error "ERROR: args in backup_file must be a file. [${file}]"
     fi
 
     if [ ! -d "${backup_config_path}" ]; then
@@ -532,14 +536,14 @@ backup_file() {
     fi
 
     if [ ${#} -gt 1 ]; then
-        backup_name=$(echo "$1" | sed "s/.*\///" | sed "s/-config.yaml/-$2-$(date +%y%m%d%H%M%S).yaml/")
+        backup_name=$(echo "${file}" | sed "s/.*\///" | sed "s/-config.yaml/-$2-$(date +%y%m%d%H%M%S).yaml/")
     else
-        backup_name=$(echo "$1" | sed "s/.*\///" | sed "s/.yaml/-$(date +%y%m%d%H%M%S).yaml/")
+        backup_name=$(echo "${file}" | sed "s/.*\///" | sed "s/.yaml/-$(date +%y%m%d%H%M%S).yaml/")
     fi
 
     log_info "Creating backup ${backup_config_path}/${backup_name}"
 
-    cp "$1" "${backup_config_path}/${backup_name}"
+    cp "${file}" "${backup_config_path}/${backup_name}"
 }
 
 log_info "Initializing CK8S configuration for $CK8S_ENVIRONMENT_NAME with $CK8S_CLOUD_PROVIDER:$CK8S_FLAVOR"
@@ -569,19 +573,23 @@ update_monitoring       "${config[default_common]}"
 update_psp_netpol       "${config[default_common]}"
 update_config           "${config[override_common]}"
 
-generate_default_config        "${config[default_sc]}"
-set_fluentd_config             "${config[default_sc]}"
-set_harbor_config              "${config[default_sc]}"
-set_s3bucketalertscount_config "${config[default_sc]}"
-update_config                  "${config[override_sc]}"
+if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
+  generate_default_config        "${config[default_sc]}"
+  set_fluentd_config             "${config[default_sc]}"
+  set_harbor_config              "${config[default_sc]}"
+  set_s3bucketalertscount_config "${config[default_sc]}"
+  update_config                  "${config[override_sc]}"
+fi
 
-generate_default_config "${config[default_wc]}"
-update_config           "${config[override_wc]}"
+if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
+  generate_default_config "${config[default_wc]}"
+  update_config           "${config[override_wc]}"
+fi
 
 gen_new_secrets=true
 if [ -f "${secrets[secrets_file]}" ]; then
     backup_file "${secrets[secrets_file]}"
-    if [ ${#} -gt 0 ] && [ "$1" = "--generate-new-secrets" ]; then
+    if [ ${#} -gt 0 ] && [ "${1}" = "--generate-new-secrets" ]; then
         log_info "Updating and generating new secrets"
     else
         log_info "Updating secrets"
@@ -597,6 +605,10 @@ log_info "Config initialized"
 
 log_info "Time to edit the following files:"
 log_info "${config[override_common]}"
-log_info "${config[override_sc]}"
-log_info "${config[override_wc]}"
+if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
+  log_info "${config[override_sc]}"
+fi
+if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
+  log_info "${config[override_wc]}"
+fi
 log_info "${secrets[secrets_file]}"

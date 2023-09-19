@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 
+: "${CK8S_CLUSTER:?Missing CK8S_CLUSTER}"
+
 here="$(readlink -f "$(dirname "${0}")")"
 
 ROOT="$(readlink -f "${here}/../")"
 
 CK8S_STACK="$(basename "$0")"
 export CK8S_STACK
-export CK8S_CLUSTER="${1}"
 
 # shellcheck source=scripts/migration/lib.sh
 CK8S_ROOT_SCRIPT="true" source "${ROOT}/scripts/migration/lib.sh"
@@ -134,8 +135,8 @@ usage() {
 }
 
 main() {
-  local version="${2}"
-  local action="${3}"
+  local version="${1}"
+  local action="${2}"
 
   local pass="true"
   for dir in "" "prepare" "apply"; do
