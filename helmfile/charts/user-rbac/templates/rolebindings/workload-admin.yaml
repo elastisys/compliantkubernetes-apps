@@ -29,6 +29,11 @@ subjects:
 {{- $value := lookup "rbac.authorization.k8s.io/v1" "RoleBinding" $namespace.name "extra-workload-admins" }}
 {{- if and $known (not $value) (or $.Release.IsInstall $.Release.IsUpgrade) }}
 ---
+# NOTE: This will always be deleted from the Helm release on the second apply
+# but the role binding won't be deleted due to the
+# helm.sh/resource-policy: keep annotation.
+# This is to create the initial resource and then hand over the control from
+# the operators to the application developers.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
