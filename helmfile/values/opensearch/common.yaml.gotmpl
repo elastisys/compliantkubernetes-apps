@@ -1,3 +1,10 @@
+{{ if and .Values.opensearch.dataNode.dedicatedPods (eq .Values.opensearch.dataNode.count 0) }}
+{{ fail "\nERROR: Using 0 replicas with dedicated data pods is not supported by OpenSearch" }}
+{{ end }}
+{{ if and .Values.opensearch.clientNode.dedicatedPods (eq .Values.opensearch.clientNode.count 0) }}
+{{ fail "\nERROR: Using 0 replicas with dedicated client pods is not supported by OpenSearch" }}
+{{ end }}
+
 clusterName: {{ .Values.opensearch.clusterName }}
 
 masterService: {{ .Values.opensearch.clusterName }}-master
