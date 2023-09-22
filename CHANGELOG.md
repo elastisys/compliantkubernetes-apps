@@ -46,6 +46,10 @@
 
 - If sync is enabled and swift is used for Harbor or Thanos then the sync job will automatically use swift
 - Changed the alert `KubeContainerOOMKilled` threshold.
+- Allow domains to be used for swift in rclone-sync
+
+### Fixed
+- Only check for swift if sync default buckets is enabled with harbor or thanos using swift
 
 -------------------------------------------------
 ## v0.32.0 - 2023-08-07

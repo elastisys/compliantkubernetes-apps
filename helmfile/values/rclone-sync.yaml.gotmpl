@@ -18,18 +18,17 @@ config:
 {{ $destinationSwift := "" }}
 {{ $swiftEnabled := list }}
 
-{{- if eq .Values.thanos.objectStorage.type "swift" }}
-  {{ $swiftEnabled = append $swiftEnabled .Values.objectStorage.buckets.thanos }}
-  {{ $sourceSwift = "true" }}
-  {{ $destinationSwift = "true" }}
-{{- end }}
-{{- if eq .Values.harbor.persistence.type "swift" }}
-  {{ $swiftEnabled = append $swiftEnabled .Values.objectStorage.buckets.harbor }}
-  {{ $sourceSwift = "true" }}
-  {{ $destinationSwift = "true" }}
-{{- end }}
-
 {{- if .Values.objectStorage.sync.syncDefaultBuckets }}
+  {{- if eq .Values.thanos.objectStorage.type "swift" }}
+    {{ $swiftEnabled = append $swiftEnabled .Values.objectStorage.buckets.thanos }}
+    {{ $sourceSwift = "true" }}
+    {{ $destinationSwift = "true" }}
+  {{- end }}
+  {{- if eq .Values.harbor.persistence.type "swift" }}
+    {{ $swiftEnabled = append $swiftEnabled .Values.objectStorage.buckets.harbor }}
+    {{ $sourceSwift = "true" }}
+    {{ $destinationSwift = "true" }}
+  {{- end }}
   {{- if eq .Values.objectStorage.type "s3" }}
   {{ $sourceS3 = "true" }}
   {{- end }}
