@@ -45,15 +45,6 @@ validatingWebhookCustomRules:
       - DELETE
     resources:
       - customresourcedefinitions
-  - apiGroups:
-      - '*'
-    apiVersions:
-      - '*'
-    operations:
-      - CREATE
-      - UPDATE
-      - DELETE
-    resources:
       - secrets
 mutatingWebhookCustomRules:
   - apiGroups:
