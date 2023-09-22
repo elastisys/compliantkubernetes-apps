@@ -94,6 +94,21 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     git switch -d v0.34.x
     ```
 
+1. Verify that no important resources are present in the `elastic-system` and `influxdb-prometheus` namespaces.
+
+    ``` bash
+    ./migration/v0.34/prepare/30-delete-obsolete-ns.sh
+    ```
+
+    Expected output:
+
+    ```
+    No resources found in elastic-system namespace.
+    No resources found in influxdb-prometheus namespace.
+    ```
+
+    If resources _are_ present, verify that they are not something important.
+
 1. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.
@@ -125,6 +140,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     ./migration/v0.30/apply/11-prometheus-operator-crds.sh execute
+    ```
+
+1. Delete obsolete namespaces:
+
+    ```bash
+    ./migration/v0.34/apply/30-delete-obsolete-ns.sh execute
     ```
 
 1. Upgrade applications:
