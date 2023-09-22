@@ -94,6 +94,12 @@ config:
       authUrl: {{ $swift.authUrl }}
       region: {{ $swift.region }}
       tenant: {{ $swift.projectName }}
+      {{- if getOrNil "domainName" $swift }}
+      domainName: {{ $swift.domainName }}
+      {{- end }}
+      {{- if getOrNil "projectDomainName" $swift }}
+      projectDomainName: {{ $swift.projectDomainName }}
+      {{- end }}
   {{- end }}
 
   destination:
@@ -126,6 +132,12 @@ config:
       authUrl: {{ $swift.authUrl }}
       region: {{ $swift.region }}
       tenant: {{ $swift.projectName }}
+      {{- if getOrNil "domainName" $swift }}
+      domainName: {{ $swift.domainName }}
+      {{- end }}
+      {{- if getOrNil "projectDomainName" $swift }}
+      projectDomainName: {{ $swift.projectDomainName }}
+      {{- end }}
   {{- end }}
 
   encrypt:
