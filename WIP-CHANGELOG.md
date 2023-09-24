@@ -7,7 +7,7 @@
 - Add application developer service account kube-config for devs
   - Enabled developers to easily create a kube-config to act as an application developer
 - Dashboard showing how spread out pods are across nodes or zones
-
+- Add secrets to gatekeeper validatingWebhookCustomRules
 ### Changed
 
 - Changed the alert `KubeContainerOOMKilled` threshold.
