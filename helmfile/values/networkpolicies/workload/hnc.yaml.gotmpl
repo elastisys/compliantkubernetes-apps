@@ -1,0 +1,26 @@
+policies:
+  hnc-system:
+    all-deny:
+      podSelectorLabels: {}
+      egress: {}
+      ingress: {}
+
+    webhook:
+      podSelectorLabels:
+        app.kubernetes.io/component: hnc-webhook
+      ingress:
+        - rule: ingress-rule-apiserver
+          ports:
+            - tcp: 9443
+      egress:
+        - rule: egress-rule-apiserver
+
+    controller-manager:
+      podSelectorLabels:
+        app.kubernetes.io/component: hnc-controller-manager
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 8080
+      egress:
+        - rule: egress-rule-apiserver
