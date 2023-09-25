@@ -80,4 +80,15 @@ releases:
   values:
   - values/networkpolicy/workload-cluster.yaml.gotmpl
 
+- name: networkpolicy
+  namespace: hnc-system
+  labels:
+    netpol: hnc
+  installed: {{ .Values.hnc.enabled }}
+  chart: ./charts/networkpolicy/generator
+  version: 0.1.0
+  values:
+  - values/networkpolicies/common/common.yaml.gotmpl
+  - values/networkpolicies/workload/hnc.yaml.gotmpl
+
 {{ end }}
