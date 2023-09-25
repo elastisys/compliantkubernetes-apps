@@ -1,5 +1,6 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.32.1](#v0321---2023-09-19)
 - [v0.32.0](#v0320---2023-08-07)
 - [v0.31.0](#v0310---2023-07-06)
 - [v0.30.0](#v0300---2023-05-10)
@@ -35,6 +36,20 @@
 - [v0.6.0](#v060---2020-10-16)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.32.1 - 2023-09-19
+
+### Release notes
+
+### Changed
+
+- If sync is enabled and swift is used for Harbor or Thanos then the sync job will automatically use swift
+- Changed the alert `KubeContainerOOMKilled` threshold.
+- Allow domains to be used for swift in rclone-sync
+
+### Fixed
+- Only check for swift if sync default buckets is enabled with harbor or thanos using swift
 
 -------------------------------------------------
 ## v0.32.0 - 2023-08-07

@@ -32,8 +32,9 @@ objectStorage:
     enabled: false
     # dryrun: false
 
-    ## Options are 's3 and swift'
-    type: none
+    ## Only 's3' is currently supported for `.objectStorage.sync.destinationType` as not all default buckets applications have swift support.
+    ## If Harbor or Thanos are using swift then we will automatically use swift for the sync, regardless of the value set for type.
+    destinationType: s3
     # secondaryUrl: set-me if regionEndpoint and or authUrl does not have all the relevant ips and or ports used for rclone-sync networkpolicy.
     # s3:
     #   region: set-me
@@ -45,6 +46,7 @@ objectStorage:
     # swift:
     #   authUrl: set-me
     #   region: set-me
+    #   projectName: set-me
     ## Sync all buckets under 'objectStorage.buckets'
     ## These will be appended to 'buckets' using the same name from source as destination, and the default schedule.
     syncDefaultBuckets: false
@@ -1146,17 +1148,19 @@ welcomingDashboard:
 networkPolicies:
   global:
     objectStorageSwift:
-      ips: [] # - set-me-if-enabled
-      ports: [] # - set-me-if-enabled
+      ips:
+        - "set-me-if-enabled"
+      ports:
+        - 5000
     scApiserver:
       # usually private ip of control-plane nodes
       ips:
-        - set-me
+        - "set-me"
       port: 6443
     scNodes:
       # ip of all nodes in the cluster for internal communication
       ips:
-        - set-me
+        - "set-me"
   harbor:
     enabled: true
     # For replication, added to core and jobservice
@@ -1243,14 +1247,20 @@ networkPolicies:
   rcloneSync:
     enabled: true
     destinationObjectStorageS3:
-      ips: [] # - "set-me-if-objectStorage.sync.enabled-and-type-is-s3"
-      ports: [] # - 443
+      ips:
+        - "set-me-if-objectStorage.sync.enabled-and-type-is-s3"
+      ports:
+        - 443
     destinationObjectStorageSwift:
-      ips: [] # - "set-me-if-objectStorage.sync.enabled-and-type-is-swift"
-      ports: [] # - 443
+      ips:
+        - "set-me-if-objectStorage.sync.enabled-type-is-swift-or-harbor-thanos-use-swift"
+      ports:
+        - 5000
     secondaryUrl:
-      ips: [] # - "set-me-if-secondaryUrl-has-a-url"
-      ports: [] # - 443
+      ips:
+        - "set-me-if-secondaryUrl-has-an-url"
+      ports:
+        - 443
   s3Exporter:
     enabled: true
 
@@ -1265,7 +1275,7 @@ networkPolicies:
   ingressNginx:
     ingressOverride:
       ips:
-      - set-me-if-enabled
+        - "set-me-if-enabled"
   dex:
     enabled: true
     # Ip to connector, e.g. Google, LDAP, ...
