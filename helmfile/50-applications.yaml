@@ -561,7 +561,7 @@ releases:
     app: fluentd
     component: fluentd-forwarder
   inherit: [ template: fluentd-elasticsearch ]
-  installed: {{ and .Values.opensearch.enabled .Values.fluentd.enabled }}
+  installed: {{ and (or .Values.opensearch.enabled .Values.fluentd.audit.enabled ) .Values.fluentd.enabled }}
   values:
   - values/fluentd/forwarder-common.yaml.gotmpl
   - values/fluentd/forwarder-service-cluster.yaml.gotmpl
