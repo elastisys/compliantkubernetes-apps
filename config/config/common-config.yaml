@@ -231,6 +231,8 @@ fluentd:
     buffer:
       totalLimitSize: 20GB
 
+    requestTimeout: 60s
+
     resources:
       requests:
         cpu: 200m
