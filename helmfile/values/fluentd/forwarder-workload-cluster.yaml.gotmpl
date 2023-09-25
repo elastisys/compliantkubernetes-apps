@@ -1,3 +1,4 @@
+{{- if .Values.opensearch.enabled }}
 elasticsearch:
   outputType: "opensearch"
   logLevel: "info"
@@ -29,8 +30,10 @@ secret:
 - name: OUTPUT_PASSWORD
   secret_name: {{ .Release.Name }}-opensearch-credentials
   secret_key: password
+{{- end }}
 
 extraConfigMaps:
+{{- if .Values.opensearch.enabled }}
   opensearch-store.prop: |-
     @type "#{ENV['OUTPUT_TYPE']}"
     @log_level "#{ENV['OUTPUT_LOG_LEVEL']}"
@@ -52,6 +55,7 @@ extraConfigMaps:
     # custom
     include_timestamp true # defaults to false
     default_opensearch_version 2
+{{- end }}
 
   22-labels.conf: |-
     # Conditional labels
@@ -64,10 +68,12 @@ extraConfigMaps:
         @type relabel
         @label @AUDIT
       </store>
+      {{- if .Values.opensearch.enabled }}
       <store>
         @type relabel
         @label @STORE
       </store>
+      {{- end }}
     </match>
 
     # Split kubeaudit
@@ -77,10 +83,12 @@ extraConfigMaps:
         @type relabel
         @label @AUDIT
       </store>
+      {{- if .Values.opensearch.enabled }}
       <store>
         @type relabel
         @label @STORE
       </store>
+      {{- end }}
     </match>
 
     # Split kubernetes
@@ -90,18 +98,27 @@ extraConfigMaps:
         @type relabel
         @label @AUDIT
       </store>
+      {{- if .Values.opensearch.enabled }}
       <store>
         @type relabel
         @label @STORE
       </store>
+      {{- end }}
     </match>
     {{- end }}
 
+    {{- if .Values.opensearch.enabled }}
     # Relabel others
     <match **>
       @type relabel
       @label @STORE
     </match>
+    {{- else }}
+    # Discard others
+    <match **>
+      @type null
+    </match>
+    {{- end }}
 
 
   30-output.conf: |-
@@ -131,6 +148,7 @@ extraConfigMaps:
     </label>
     {{- end }}
 
+    {{- if .Values.opensearch.enabled }}
     <label @STORE>
       <match authlog.**>
         @id opensearch_authlog
@@ -193,3 +211,4 @@ extraConfigMaps:
         </buffer>
       </match>
     </label>
+    {{- end }}
