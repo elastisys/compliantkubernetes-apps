@@ -143,3 +143,13 @@ kubectl:
     runAsNonRoot: true
     runAsGroup: 10000
     runAsUser: 10000
+
+# Run velero-restore-helper init container with numeric UID and GID.
+configMaps:
+  restore-helper-config:
+    labels:
+      velero.io/plugin-config: ""
+      velero.io/pod-volume-restore: RestoreItemAction
+    data:
+      secCtxRunAsUser: "1000"
+      secCtxRunAsGroup: "1000"
