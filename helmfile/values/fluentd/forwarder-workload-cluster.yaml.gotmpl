@@ -14,6 +14,8 @@ elasticsearch:
   reloadOnFailure: true
   log400Reason: true
 
+  requestTimeout: {{ .Values.fluentd.forwarder.requestTimeout }}
+
 extraObjects:
   - apiVersion: v1
     kind: Secret
