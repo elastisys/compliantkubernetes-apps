@@ -217,6 +217,7 @@
 - Network policy to allow `alermanager` ingress from `falcosidekick`
 - The `CephPGImbalance` rook-ceph alert for multi-cluster configuration
 - Network policy to allow `rook-ceph operator` ingress from `apiserver`
+- Network policy to allow `ingress-nginx` ingress from `blackbox-exporter` when it manages to skip a service load balancer
 
 ### Updated
 
