@@ -32,6 +32,13 @@ spec:
             cidr: {{ $IP }}
         {{- end }}
       {{- end }}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus-blackbox-exporter
+              app.kubernetes.io/instance: prometheus-blackbox-exporter
       ports:
         - protocol: TCP
           port: 443
