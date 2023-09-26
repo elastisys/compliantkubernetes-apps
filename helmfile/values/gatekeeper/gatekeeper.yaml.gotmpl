@@ -1,7 +1,7 @@
 validatingWebhookFailurePolicy: Fail
-validatingWebhookTimeoutSeconds: 5
+validatingWebhookTimeoutSeconds: {{ .Values.opa.validatingWebhookTimeoutSeconds }}
 mutatingWebhookFailurePolicy: Fail
-mutatingWebhookTimeoutSeconds: 5
+mutatingWebhookTimeoutSeconds: {{ .Values.opa.mutatingWebhookTimeoutSeconds }}
 
 validatingWebhookCustomRules:
   - apiGroups:
@@ -86,13 +86,26 @@ mutatingWebhookCustomRules:
       - nodes/proxy
       - hierarchyconfiguration
 
-auditInterval: {{ .Values.opa.auditIntervalSeconds }}
 auditMatchKindOnly: true
+
+auditChunkSize: {{ .Values.opa.auditChunkSize }}
+auditFromCache: {{ .Values.opa.auditFromCache }}
+auditInterval: {{ .Values.opa.auditIntervalSeconds }}
+constraintViolationsLimit: {{ .Values.opa.constraintViolationsLimit }}
 
 controllerManager:
   resources: {{- toYaml .Values.opa.controllerManager.resources | nindent 4  }}
+  affinity: {{- toYaml .Values.opa.controllerManager.affinity | nindent 4  }}
+  nodeSelector: {{- toYaml .Values.opa.controllerManager.nodeSelector | nindent 4  }}
+  tolerations: {{- toYaml .Values.opa.controllerManager.tolerations | nindent 4  }}
+  topologySpreadConstraints: {{- toYaml .Values.opa.controllerManager.topologySpreadConstraints | nindent 4  }}
+
 audit:
   resources: {{- toYaml .Values.opa.audit.resources | nindent 4  }}
+  affinity: {{- toYaml .Values.opa.audit.affinity | nindent 4  }}
+  nodeSelector: {{- toYaml .Values.opa.audit.nodeSelector | nindent 4  }}
+  tolerations: {{- toYaml .Values.opa.audit.tolerations | nindent 4  }}
+  writeToRAMDisk: {{- toYaml .Values.opa.audit.writeToRAMDisk  | nindent 4  }}
 
 postInstall:
   probeWebhook:

@@ -730,6 +730,10 @@ opa:
       limits:
         cpu: 300m
         memory: 300Mi
+    affinity: {}
+    tolerations: []
+    nodeSelector: {kubernetes.io/os: linux}
+    topologySpreadConstraints: []
 
   audit:
     resources:
@@ -739,9 +743,28 @@ opa:
       limits:
         cpu: 500m
         memory: 300Mi
+    affinity: {}
+    tolerations: []
+    nodeSelector: {kubernetes.io/os: linux}
 
-  # how often gatekeeper audits kubernetes resources, in seconds
+    # Enable for audit pod to use cache instead of disk
+    writeToRAMDisk: false
+
+  # How often gatekeeper audits kubernetes resources, in seconds
   auditIntervalSeconds: 600
+
+  # A lower chunk size can reduce memory consumption of the auditing Pod
+  # but can increase the number of requests to the Kubernetes API server
+  auditChunkSize: 500
+
+  # Enable audit informer cache instead of requesting resources from Kubernetes API
+  auditFromCache: false
+
+  # The maximum number of audit violations reported on a constraint
+  constraintViolationsLimit: 20
+
+  validatingWebhookTimeoutSeconds: 5
+  mutatingWebhookTimeoutSeconds: 5
 
   ## Enable rule that requires pods to come from
   ## the image registry defined by "URL".
