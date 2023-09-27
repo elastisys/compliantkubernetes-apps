@@ -84,7 +84,7 @@ rcloneSync:
     {{ $sourceS3 = "true" }}
     {{- end }}
     {{- if eq $.Values.objectStorage.sync.destinationType "s3" }}
-    {{ $destinationS3 := "true" }}
+    {{ $destinationS3 = "true" }}
     {{- else if eq $.Values.objectStorage.sync.destinationType "swift" }}
     {{ $sourceSwift = "true" }}
     {{- end }}
