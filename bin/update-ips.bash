@@ -386,6 +386,8 @@ fi
 ## Add destination object storage ips for rclone sync to sc config
 if [ "$(yq_dig 'sc' '.objectStorage.sync.enabled' 'false')" == "true" ]; then
   if [ "$(yq_dig 'sc' '.networkPolicies.rcloneSync.enabled' 'false')" == "true" ]; then
+    check_harbor="$(yq_dig 'sc' '.harbor.persistence.type' 'false')"
+    check_thanos="$(yq_dig 'sc' '.thanos.objectStorage.type' 'false')"
     destination=$(yq4 '.objectStorage.sync.buckets.[].destinationType' "${config["override_sc"]}")
     destinationSwift=false
     destinationS3=false
@@ -396,6 +398,10 @@ if [ "$(yq_dig 'sc' '.objectStorage.sync.enabled' 'false')" == "true" ]; then
         destinationS3=true
       fi
     done
+    if [ "$check_harbor" == "swift" ] || [ "$check_thanos" == "swift" ]; then
+        destinationSwift=true
+    fi
+
     ifNull=""
     S3_ENDPOINT_DST="$(yq_dig 'sc' '.objectStorage.sync.s3.regionEndpoint' "" | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
     S3_PORT_DST="$(yq_dig 'sc' '.objectStorage.sync.s3.regionEndpoint' "" | sed 's/https\?:\/\///' | sed 's/[A-Za-z.0-9-]*:\?//' | sed 's/\/.*//')"
@@ -403,7 +409,7 @@ if [ "$(yq_dig 'sc' '.objectStorage.sync.enabled' 'false')" == "true" ]; then
     SWIFT_ENDPOINT_DST="$(yq_dig 'sc' '.objectStorage.sync.swift.authUrl' "" | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
     SWIFT_PORT_DST="$(yq_dig 'sc' '.objectStorage.sync.swift.authUrl' "" | sed 's/https\?:\/\///' | sed 's/[A-Za-z.0-9-]*:\?//' | sed 's/\/.*//')"
 
-    if { [ "$destinationS3" == "true" ] && [ "$destinationSwift" != "true" ]; } || { [ "$destinationS3" != "true" ] && [ "$destinationSwift" != "true" ] && [ "$(yq_dig 'sc' '.objectStorage.sync.type' 's3')" == "s3" ]; }; then
+    if { [ "$destinationS3" == "true" ] && [ "$destinationSwift" != "true" ]; } || { [ "$destinationS3" != "true" ] && [ "$destinationSwift" != "true" ] && [ "$(yq_dig 'sc' '.objectStorage.sync.destinationType' 'false')" == "s3" ]; }; then
       if [ -z "${S3_ENDPOINT_DST}" ]; then
         log_error "No destination S3 endpoint for rclone sync found, check your sc-config.yaml"
         exit 1
@@ -427,7 +433,7 @@ if [ "$(yq_dig 'sc' '.objectStorage.sync.enabled' 'false')" == "true" ]; then
       fi
       ifNull=true
     fi
-    if { [ "$destinationSwift" == "true" ] && [ "$destinationS3" != "true" ]; } || { [ "$destinationS3" != "true" ] && [ "$destinationSwift" != "true" ] && [ "$(yq_dig 'sc' '.objectStorage.sync.type' 'swift')" == "swift" ]; }; then
+    if { [ "$destinationSwift" == "true" ] && [ "$destinationS3" != "true" ]; } || { [ "$destinationS3" != "true" ] && [ "$destinationSwift" != "true" ] && [ "$(yq_dig 'sc' '.objectStorage.sync.destinationType' 'false')" == "swift" ]; }; then
       if [ -z "${SWIFT_ENDPOINT_DST}" ]; then
         log_error "No destination Swift endpoint for rclone sync found, check your sc-config.yaml"
         exit 1
@@ -454,7 +460,7 @@ if [ "$(yq_dig 'sc' '.objectStorage.sync.enabled' 'false')" == "true" ]; then
       ifNull=true
 
     fi
-    if { [ "$destinationSwift" == "true" ] && [ "$destinationS3" == "true" ]; } || [ -z "$ifNull" ] && { [ "$(yq_dig 'sc' '.objectStorage.sync.type' 'swift')" == "swift" ] || [ "$(yq_dig 'sc' '.objectStorage.sync.type' 's3')" == "s3" ]; }; then
+    if { [ "$destinationSwift" == "true" ] && [ "$destinationS3" == "true" ]; } || [ -z "$ifNull" ] && { [ "$(yq_dig 'sc' '.objectStorage.sync.destinationType' 'false')" == "swift" ] || [ "$(yq_dig 'sc' '.objectStorage.sync.destinationType' 'false')" == "s3" ]; }; then
       if [ -z "${S3_ENDPOINT_DST}" ]; then
         log_error "No destination S3 endpoint for rclone sync found, check your sc-config.yaml"
         exit 1
