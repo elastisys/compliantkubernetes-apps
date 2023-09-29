@@ -1,0 +1,46 @@
+groups:
+  - name: disk-performance
+    rules:
+      - alert: DiskReadWaitTimeHigh
+        annotations:
+          description: Disk {{ $labels.device }} Wait Time on {{ $labels.instance }} is {{ $value }}, check the workload
+          summary: Disk {{ $labels.device }} Wait Time is high on {{ $labels.instance }}
+          severity_level: warning
+          storage_type: local
+        expr: |
+          (
+          rate(node_disk_read_time_seconds_total{job="node-exporter"}[1m])
+          /
+          rate(node_disk_reads_completed_total{job="node-exporter"}[1m])
+          ) > 0.01
+        for: 10m
+        labels:
+          severity: warning
+      - alert: DiskWriteWaitTimeHigh
+        annotations:
+          description: Disk {{ $labels.device }} Wait Time on {{ $labels.instance }} is {{ $value }}, check the workload
+          summary: Disk {{ $labels.device }} Wait Time is high on {{ $labels.instance }}
+          severity_level: warning
+          storage_type: local
+        expr: |
+          (
+          rate(node_disk_write_time_seconds_total{job="node-exporter"}[1m])
+          /
+          rate(node_disk_writes_completed_total{job="node-exporter"}[1m])
+          ) > 0.1
+        for: 10m
+        labels:
+          severity: warning
+      - alert: DiskQueueSizeHigh
+        annotations:
+          description: Disk {{ $labels.device }} Queue Size on {{ $labels.instance }} is {{ $value }}, check the workload
+          summary: Disk {{ $labels.device }} has very large Queue Size on {{ $labels.instance }}
+          severity_level: warning
+          storage_type: local
+        expr: |
+          (
+          rate(node_disk_io_time_weighted_seconds_total{job="node-exporter"}[1m])
+          ) > 0.5
+        for: 10m
+        labels:
+          severity: warning
