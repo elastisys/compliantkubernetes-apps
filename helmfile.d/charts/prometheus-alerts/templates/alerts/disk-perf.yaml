@@ -1,0 +1,23 @@
+# Based on https://github.com/rook/rook/blob/master/cluster/examples/kubernetes/ceph/monitoring/prometheus-ceph-v14-rules.yaml
+{{- if .Values.diskAlerts.perf }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "disk-perf" | trunc 63 | trimSuffix "-" }}
+  namespace: "monitoring"
+  labels:
+    app: {{ template "prometheus-alerts.name" . }}
+{{ include "prometheus-alerts.labels" . | indent 4 }}
+{{- if .Values.defaultRules.alertLabels }}
+{{ toYaml .Values.defaultRules.alertLabels | indent 4 }}
+{{- end }}
+{{- if .Values.defaultRules.annotations }}
+  annotations:
+{{ toYaml .Values.defaultRules.annotations | indent 4 }}
+{{- end }}
+spec:
+  # The rules contain templates for prometheus, which breaks helm if trying
+  # to render them. We have to either escape them or (as we do here) include
+  # them without going through the template rendering.
+  {{- .Files.Get "files/disk-perf.yaml" | nindent 2}}
+{{- end }}
