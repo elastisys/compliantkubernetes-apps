@@ -52,7 +52,9 @@ metadata:
 data:
   Corefile: |
     cluster.local:53 {
-        errors
+        errors {
+          {{ .Values.errorConfig }}
+        }
         cache {
                 success 9984 30
                 denial 9984 5
@@ -67,7 +69,9 @@ data:
         health {{ .Values.localIP }}:8080
         }
     in-addr.arpa:53 {
-        errors
+        errors {
+          {{ .Values.errorConfig }}
+        }
         cache 30
         reload
         loop
@@ -78,7 +82,9 @@ data:
         prometheus :9253
         }
     ip6.arpa:53 {
-        errors
+        errors {
+          {{ .Values.errorConfig }}
+        }
         cache 30
         reload
         loop
@@ -89,7 +95,9 @@ data:
         prometheus :9253
         }
     .:53 {
-        errors
+        errors {
+          {{ .Values.errorConfig }}
+        }
         cache 30
         reload
         loop
