@@ -114,7 +114,7 @@ jobs:
     - name: Run kubespray
       continue-on-error: true
       id: runkubespray0
-      uses: docker://quay.io/kubespray/kubespray:v2.20.0
+      uses: docker://quay.io/kubespray/kubespray:v2.23.0
       env:
         ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
       with:
@@ -123,7 +123,7 @@ jobs:
     - name: Run kubespray - retry 1
       id: runkubespray1
       if: steps.runkubespray0.outcome=='failure'
-      uses: docker://quay.io/kubespray/kubespray:v2.20.0
+      uses: docker://quay.io/kubespray/kubespray:v2.23.0
       env:
         ANSIBLE_CONFIG: ./compliantkubernetes-kubespray/kubespray/ansible.cfg
       with:
