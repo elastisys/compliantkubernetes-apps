@@ -5,6 +5,10 @@ global:
   ## Used in logs and metrics as to separate these from other clusters.
   clusterName: ${CK8S_ENVIRONMENT_NAME}-wc
 
+  ## If baseDomain for wc and sc are not the same, set the domain of the sc cluster.
+  scDomain: ""
+  scOpsDomain: ""
+
 ## User configuration.
 user:
   ## This only controls if the namespaces should be created, user RBAC is always created.
@@ -234,6 +238,7 @@ prometheusBlackboxExporter:
   targets:
     gatekeeper: true
     falco: true
+    sc: true
 
 # Network policies for workload cluster
 networkPolicies:
