@@ -115,18 +115,29 @@ Cypress.Commands.add("dexStaticUserLogin", function(username, loginUrl, cookieNa
         // {enter} causes the form to submit
         cy.get('input#password').type(`${password}{enter}`, { log: false })
       })
-
-    // Ensure Auth0 has redirected us back to the original URL
+    // ToDO: needed mostly for OpenSearch, check for alternatives or make if configurable
     cy.wait(10000)
+    // this is needed for Harbor first time login
+    cy.title().then(($title) => {
+      if ($title === 'Harbor') {
+        cy.get("body").then(($body) => {
+          const hasOidcBanner = $body[0].querySelectorAll("*[class='modal-title oidc-header-text']")
+          if (hasOidcBanner.length > 0) {
+            cy.get('input[name=oidcUsername]').clear().type('admin_static_user')
+            cy.get('[id="saveButton"]').click()
+          }
+        })
+      }
+    })
+    // Ensure Auth0 has redirected us back to the original URL
     cy.url().should('include', loginUrl)
   },
-    // ToDo: seems like validating the cookie name doesn't work as expected with dex
-//  {
-//    validate: () => {
-//      // Validate the session
-//      cy.getCookie(cookieName).should('exist')
-//    },
-//  }
+  {
+    validate: () => {
+      // Validate the session
+      cy.getCookie(cookieName).should('exist')
+    },
+  }
   )
 })
 
