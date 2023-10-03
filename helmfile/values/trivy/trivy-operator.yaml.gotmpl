@@ -13,7 +13,7 @@ operator:
   # vulnerabilityScannerEnabled the flag to enable vulnerability scanner
   vulnerabilityScannerEnabled: true
   # vulnerabilityScannerReportTTL the flag to set how long a vulnerability report should exist. "" means that the vulnerabilityScannerReportTTL feature is disabled
-  scannerReportTTL:  {{ .Values.trivy.vulnerabilityScanner.scannerReportTTL }}
+  scannerReportTTL: {{ .Values.trivy.vulnerabilityScanner.scannerReportTTL }}
   # vulnerabilityScannerScanOnlyCurrentRevisions the flag to only create vulnerability scans on the current revision of a deployment.
   vulnerabilityScannerScanOnlyCurrentRevisions: {{ .Values.trivy.vulnerabilityScanner.scanOnlyCurrentRevisions }}
   configAuditScannerScanOnlyCurrentRevisions: false
@@ -24,11 +24,11 @@ operator:
   # scanJobTimeout the length of time to wait before giving up on a scan job
   scanJobTimeout: {{ .Values.trivy.scanJobs.timeout }}
 
-tolerations:
-{{- toYaml .Values.trivy.tolerations | nindent 2 }}
+tolerations: {{- toYaml .Values.trivy.tolerations | nindent 2 }}
 
-affinity:
-{{- toYaml .Values.trivy.affinity | nindent 2 }}
+affinity: {{- toYaml .Values.trivy.affinity | nindent 2 }}
+
+resources: {{- toYaml .Values.trivy.resources | nindent 2 }}
 
 serviceMonitor:
   # enabled determines whether a serviceMonitor should be deployed
