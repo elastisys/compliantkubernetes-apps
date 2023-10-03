@@ -67,32 +67,36 @@ serviceMonitor:
       module: http_2xx
     {{- end }}
 
+    {{- if .Values.prometheusBlackboxExporter.targets.sc}}
+    {{- $scDomain := default .Values.global.baseDomain .Values.global.scDomain }}
+    {{- $scOpsDomain := default .Values.global.opsDomain .Values.global.scOpsDomain }}
     - name: sc-dex
-      url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}/healthz
+      url: https://{{ .Values.dex.subdomain }}.{{ $scDomain }}/healthz
       interval: 60s
       scrapeTimeout: 30s
       module: http_2xx
     {{- if .Values.harbor.enabled }}
     - name: sc-harbor
-      url: https://{{ .Values.harbor.subdomain }}.{{ .Values.global.baseDomain }}/api/v2.0/ping
+      url: https://{{ .Values.harbor.subdomain }}.{{ $scDomain }}/api/v2.0/ping
       interval: 60s
       scrapeTimeout: 30s
       module: http_2xx
     {{- end }}
     - name: sc-user-grafana
-      url: https://{{ .Values.grafana.user.subdomain }}.{{ .Values.global.baseDomain }}/api/health
+      url: https://{{ .Values.grafana.user.subdomain }}.{{ $scDomain }}/api/health
       interval: 60s
       scrapeTimeout: 30s
       module: http_2xx
     - name: sc-opensearch-ops
-      url: https://{{ .Values.opensearch.subdomain }}.{{ .Values.global.opsDomain }}
+      url: https://{{ .Values.opensearch.subdomain }}.{{ $scOpsDomain }}
       interval: 60s
       scrapeTimeout: 30s
       module: http_401
     {{- if and .Values.thanos.enabled .Values.thanos.receiver.enabled }}
     - name: sc-thanos-recv-ops
-      url: https://{{ .Values.thanos.receiver.subdomain }}.{{ .Values.global.opsDomain }}
+      url: https://{{ .Values.thanos.receiver.subdomain }}.{{ $scOpsDomain }}
       interval: 60s
       scrapeTimeout: 30s
       module: http_401
+    {{- end }}
     {{- end }}
