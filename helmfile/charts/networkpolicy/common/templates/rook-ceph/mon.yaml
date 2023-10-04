@@ -15,6 +15,9 @@ spec:
     - from:
         - podSelector:
             matchLabels:
+              app: rook-ceph-crashcollector
+        - podSelector:
+            matchLabels:
               app: rook-ceph-mon
         - podSelector:
             matchLabels:

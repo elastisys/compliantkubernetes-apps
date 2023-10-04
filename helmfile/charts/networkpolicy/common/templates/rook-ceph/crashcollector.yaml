@@ -1,0 +1,32 @@
+{{ if .Values.rookCeph.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-rook-ceph-crashcollector
+  namespace: rook-ceph
+spec:
+  egress:
+  - ports:
+    - port: 6800
+      protocol: TCP
+    - port: 7000
+      protocol: TCP
+    to:
+    - podSelector:
+        matchLabels:
+          app: rook-ceph-mgr
+  - ports:
+    - port: 6789
+      protocol: TCP
+    - port: 3300
+      protocol: TCP
+    to:
+    - podSelector:
+        matchLabels:
+          app: rook-ceph-mon
+  podSelector:
+    matchLabels:
+      app: rook-ceph-crashcollector
+  policyTypes:
+    - Egress
+{{- end }}
