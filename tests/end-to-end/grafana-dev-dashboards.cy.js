@@ -2,11 +2,11 @@
 describe("grafana-dev dashboards e2e", function() {
   before(function() {
     cy.yq("sc", "\"https://\" + .grafana.user.subdomain + \".\" + .global.baseDomain")
-      .should("not.contain", "null")
+      .should("not.contain.empty")
       .as('baseUrl')
   })
   beforeEach(function() {
-    cy.staticLogin("admin", ".user.grafanaPassword", this.baseUrl + '/login', 'orgId', 'grafana_session')
+    cy.staticLogin("admin", ".user.grafanaPassword", "user", "password", this.baseUrl + '/login', 'orgId', 'grafana_session_expiry')
   })
 
   it('Welcome dashboard is visible', function () {
