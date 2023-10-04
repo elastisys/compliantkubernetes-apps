@@ -14,5 +14,6 @@ module.exports = defineConfig({
     screenshotOnRunFailure: false,
     specPattern: "**.cy.js",
     supportFile: "cypress.support.js",
+    defaultCommandTimeout: 10000,
   },
 });
