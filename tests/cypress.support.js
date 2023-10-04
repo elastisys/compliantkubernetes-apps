@@ -141,18 +141,25 @@ Cypress.Commands.add("dexStaticUserLogin", function(username, loginUrl, cookieNa
   )
 })
 
-// Available as cy.staticLogin("username", "password expression", "url for login", "path to test after login", "session cookie name")
-Cypress.Commands.add('staticLogin', (username, passwordExpression, loginUrl, landingPath, cookieName) => {
-  cy.session([username, passwordExpression, loginUrl, landingPath, cookieName], () => {
+// Available as cy.staticLogin("username", "password expression", "url for login", "username field name", "password field name", "path to test after login", "session cookie name")
+Cypress.Commands.add('staticLogin', (username, passwordExpression, userField, passField, loginUrl, landingPath, cookieName) => {
+  cy.session([username, passwordExpression, userField, passField, loginUrl, landingPath, cookieName], () => {
     cy.visit(loginUrl)
+
+    // this is needed for Harbor login via local db
+    cy.title().then(($title) => {
+      if ($title === 'Harbor') {
+        cy.get('[id="login-db"]').should('exist').click()
+      }
+    })
     // ToDo the username label should be configurable
-    cy.get('input[name=user]').type(username)
+    cy.get(`input[name=${userField}]`).type(username)
 
     cy.yqSecrets(passwordExpression)
       .then(password => {
         // {enter} causes the form to submit
         // ToDo the password label should be configurable
-        cy.get('input[name=password]').type(`${password}{enter}`, { log: false })
+        cy.get(`input[name=${passField}]`).type(`${password}{enter}`, { log: false })
       })
     // we get some network errors at this step, let's see if wait fixes that
     cy.wait(5000)
