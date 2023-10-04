@@ -164,6 +164,7 @@ with_kubeconfig() {
 with_namespace() {
   if [[ -n "${1:-}" ]]; then
     export DETIK_CLIENT_NAMESPACE="$1"
+    export NAMESPACE="$1"
   else
     fail "missing namespace argument"
   fi
@@ -212,4 +213,14 @@ test_statefulset() {
   else
     fail "missing statefulset name argument"
   fi
+}
+
+# note: expects with_kubeconfig and with_namespace to be set
+# usage: test_logs_contains <resource-type/name> <container> <regex>...
+test_logs_contains() {
+  run kubectl -n "${NAMESPACE}" logs "${1}" grafana-sc-dashboard
+
+  for arg in "${@:2}"; do
+    assert_line --regexp "${arg}"
+  done
 }

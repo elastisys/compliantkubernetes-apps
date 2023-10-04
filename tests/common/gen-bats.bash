@@ -19,13 +19,14 @@ render_args() {
     return
   fi
 
-  for arg in $(yq4 -oy '.[]' <<< "${args}"); do
-    if [[ "${arg}" =~ ^\. ]]; then
+  readarray -t args_arr <<< "$(jq -c '.[]' <<< "${args}")"
+  for arg in "${args_arr[@]}"; do
+    if [[ "${arg}" =~ ^\"\. ]]; then
       # reference argument
-      echo -n "\"\$(yq_dig \"${cluster}\" \"${arg}\")\""
+      echo -n " \"\$(yq_dig \"${cluster}\" ${arg})\""
     else
       # plain argument
-      echo -n "\"${arg}\""
+      echo -n " ${arg}"
     fi
   done
 }
@@ -42,8 +43,9 @@ render_conditions() {
     return
   fi
 
-  for condition in $(yq4 -oy '.[]' <<< "${conditions}"); do
-    echo "  continue_on \"${cluster}\" \"${condition}\""
+  readarray -t conditions_arr <<< "$(jq -c '.[]' <<< "${conditions}")"
+  for condition in "${conditions_arr[@]}"; do
+    echo "  continue_on ${cluster} ${condition}"
   done
   echo ""
 }
@@ -67,15 +69,22 @@ render_test() {
     log_fatal "render test: missing target"
   fi
 
-  for cluster in $(yq4 -oy '.[]' <<< "${clusters}"); do
-    for namespace in $(yq4 -oy '.[]' <<< "${namespaces}"); do
+  readarray -t clusters_arr <<< "$(jq -c '.[]' <<< "${clusters}")"
+  for cluster in "${clusters_arr[@]}"; do
+    readarray -t namespaces_arr <<< "$(jq -c '.[]' <<< "${namespaces}")"
+    for namespace in "${namespaces_arr[@]}"; do
       echo ""
-      echo "@test \"${name} - ${function/_/ } - ${cluster} / ${namespace} / ${target}\" {"
+      # TODO: Set with flag
+      if [ "${foreach:-[]}" != "[]" ]; then
+        echo "@test \"${name} - ${function//_/ } - ${cluster//\"/} / ${namespace//\"/} / ${target} - $(jq -r .[0] <<< "${args}")\" {"
+      else
+        echo "@test \"${name} - ${function//_/ } - ${cluster//\"/} / ${namespace//\"/} / ${target}\" {"
+      fi
       render_conditions "${cluster}" "${conditions}"
-      echo "  with_kubeconfig \"${cluster}\""
-      echo "  with_namespace \"${namespace}\""
+      echo "  with_kubeconfig ${cluster}"
+      echo "  with_namespace ${namespace}"
       echo ""
-      echo "  ${function} \"${target}\" $(render_args "${cluster}" "${args}")"
+      echo "  ${function} \"${target}\"$(render_args "${cluster}" "${args}")"
       echo "}"
     done
   done
@@ -88,12 +97,12 @@ render_tests() {
   for test in "$@"; do
     # Intentionally creating subprocesses to ensure variables are reset after traversal
     (
-      stage="$(yq4 '.clusters // []' <<< "${test}")"
+      stage="$(jq -c '.clusters // []' <<< "${test}")"
       if [[ "${stage}" != "[]" ]]; then
         clusters="${stage}"
       fi
 
-      stage="$(yq4 '.namespaces // []' <<< "${test}")"
+      stage="$(jq -c '.namespaces // []' <<< "${test}")"
       if [[ "${stage}" != "[]" ]]; then
         namespaces="${stage}"
       fi
@@ -112,12 +121,25 @@ render_tests() {
         function="${stage}"
       fi
 
+      stage="$(jq -c '.foreach // []' <<< "${test}")"
+      if [[ "${stage}" != "[]" ]]; then
+        foreach="${stage}"
+      fi
+
       stage="$(yq4 '.target // ""' <<< "${test}")"
-      readarray -t tests <<< "$(yq4 -oj -I0 '.tests[] // []' <<< "${test}")"
+      readarray -t tests <<< "$(jq -c '(.tests // []) | .[]' <<< "${test}")"
 
       if [[ "${stage}" != "" ]]; then
-        render_test "${clusters:-[]}" "${namespaces:-[]}" "[${conditions:-}]" "${function:-}" "${stage}" "$(yq4 -oj -I0 '.args // []' <<< "${test}")"
-      elif [[ "${tests[*]}" != "[]" ]]; then
+        # With foreach set emit tests for each as first argument with regular args after
+        if [[ "${foreach:-[]}" != "[]" ]]; then
+          for args in $(jq .[] <<< "${foreach}"); do
+            render_test "${clusters:-[]}" "${namespaces:-[]}" "[${conditions:-}]" "${function:-}" "${stage}" "$(jq -c "[${args}] + (.args // [])" <<< "${test}")"
+          done
+        # Without foreach set emit test with regular args
+        else
+          render_test "${clusters:-[]}" "${namespaces:-[]}" "[${conditions:-}]" "${function:-}" "${stage}" "$(jq -c '.args // []' <<< "${test}")"
+        fi
+      elif [[ "${tests[*]}" != "" ]]; then
         render_tests "${tests[@]}"
       fi
     )
