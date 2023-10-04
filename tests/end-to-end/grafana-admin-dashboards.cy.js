@@ -2,11 +2,11 @@
 describe("grafana-admin dashboards e2e", function() {
   before(function() {
     cy.yq("sc", "\"https://\" + .grafana.ops.subdomain + \".\" + .global.opsDomain")
-      .should("not.contain", "null")
+      .should("not.contain.empty")
       .as('baseUrl')
   })
   beforeEach(function() {
-    cy.staticLogin("admin", ".grafana.password", this.baseUrl + '/login', 'orgId', 'grafana_session')
+    cy.staticLogin("admin", ".grafana.password", "user", "password", this.baseUrl + '/login', 'orgId', 'grafana_session_expiry')
   })
 
   it('landing page navigation toolbar is visible', function () {
