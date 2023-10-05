@@ -12,6 +12,8 @@ falco:
   grpc_output:
     enabled: true
 
+tty: {{ .Values.falco.tty }}
+
 {{- if eq .Values.falco.driver.kind "module" }}
 containerSecurityContext:
   privileged: true
