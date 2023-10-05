@@ -101,6 +101,9 @@ user:
 falco:
   enabled: true
 
+  # Setting tty to "true" will immediately display Falco logs by flushing them as they are emitted
+  tty: true
+
   ## configure syscall source
   ## ref: https://falco.org/docs/event-sources/kernel/
   driver:
