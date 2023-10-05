@@ -7,7 +7,7 @@ setup() {
 }
 
 grafana_sc_dashboard_logs() {
-  kubectl -n monitoring logs "deployment/${1}" grafana-sc-dashboard | sed -rn 's#\{"time": ".+", "msg": "Writing /tmp/dashboards/(.+) \(ascii\)", "level": "INFO"\}#- \1#p' | sort -u
+  kubectl -n monitoring logs "deployment/${1}" grafana-sc-dashboard | sed -rn 's#\{"time": ".+", "msg": "Writing /tmp/dashboards/(.+) \(ascii\)", "level": "INFO"\}#\1#p' | sort -u
 }
 
 grafana_logs() {
@@ -19,9 +19,11 @@ grafana_logs() {
 
   run grafana_sc_dashboard_logs ops-grafana
 
-  while read -r line; do
-    assert_line "${line}"
-  done < "${ROOT}/tests/end-to-end/grafana-dashboards-admin.yaml"
+  readarray -t dashboards < <(helmfile -e service_cluster -f "${ROOT}/helmfile" -l app=grafana-dashboards template | yq4 -N 'select(.kind == "ConfigMap") | .data | keys | .[]')
+
+  for dashboard in "${dashboards[@]}"; do
+    assert_line "${dashboard}"
+  done
 }
 
 @test "grafana dev dashboard discovery" {
@@ -29,9 +31,11 @@ grafana_logs() {
 
   run grafana_sc_dashboard_logs user-grafana
 
-  while read -r line; do
-    assert_line "${line}"
-  done < "${ROOT}/tests/end-to-end/grafana-dashboards-dev.yaml"
+  readarray -t dashboards < <(helmfile -e service_cluster -f "${ROOT}/helmfile" -l app=grafana-dashboards template | yq4 -N 'select(.kind == "ConfigMap" and .metadata.labels.grafana_dashboard == "1") | .data | keys | .[]')
+
+  for dashboard in "${dashboards[@]}"; do
+    assert_line "${dashboard}"
+  done
 }
 
 @test "grafana admin dashboard load without error" {
