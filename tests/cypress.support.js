@@ -121,7 +121,7 @@ Cypress.Commands.add("dexStaticUserLogin", function(username, loginUrl, cookieNa
           const hasOidcBanner = $body[0].querySelectorAll("*[class='modal-title oidc-header-text']")
           if (hasOidcBanner.length > 0) {
             cy.get('input[name=oidcUsername]').clear().type('admin_static_user')
-            cy.get('[id="saveButton"]').click()
+            cy.contains('button', 'SAVE').click()
           }
         })
       }
@@ -159,8 +159,6 @@ Cypress.Commands.add('staticLogin', (username, passwordExpression, userField, pa
         // ToDo the password label should be configurable
         cy.get(`input[name=${passField}]`).type(`${password}{enter}`, { log: false })
       })
-    // we get some network errors at this step, let's see if wait fixes that
-    cy.wait(5000)
     cy.url().should('include', landingPath)
   },
   {
@@ -169,23 +167,4 @@ Cypress.Commands.add('staticLogin', (username, passwordExpression, userField, pa
     },
   }
   )
-})
-
-// Available as cy.testGrafanaDashboard("baseUrl", "the names of the Grafana dashboard", "the no of completed api req to wait")
-Cypress.Commands.add('testGrafanaDashboard', (baseUrl, dashboardName, requestsToWait) => {
-  cy.intercept("/api/**").as("api")
-
-  cy.visit(baseUrl + '/dashboards')
-  // used to view and load as much of the dashboard as possible
-  cy.viewport(2560, 2160)
-
-  cy.get('[data-testid="data-testid Folder header General"]').click()
-  cy.get(`[data-testid="data-testid Dashboard search item ${dashboardName}"]`).click()
-  // ToDo: expand all rows
-  cy.wait(Array(requestsToWait).fill('@api'))
-  // not really best practices to target objects by id
-  cy.get('[id="var-datasource"]').should('exist').and('contain', 'default')
-  cy.get('[id="var-cluster"]').should('exist')
-  // some dashboards will contain "No data" because an overwrite for NaN or Null doesn't exist
-  cy.contains('No data').should('not.exist')
 })
