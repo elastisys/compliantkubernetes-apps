@@ -14,7 +14,7 @@ grafana_logs() {
     kubectl -n monitoring logs "deployment/${1}" grafana | grep 'level=error' | sed -rn 's#.*dashboards/(.+) error="(.+)"#error: \1: \2#p' | sort -u
 }
 
-@test "grafana admin - can discover dashboards" {
+@test "grafana admin can discover dashboards" {
   with_kubeconfig "sc"
 
   run grafana_sc_dashboard_logs ops-grafana
@@ -26,7 +26,7 @@ grafana_logs() {
   done
 }
 
-@test "grafana admin - can load dashboards without error" {
+@test "grafana admin can load dashboards without error" {
   with_kubeconfig "sc"
 
   run grafana_logs ops-grafana
@@ -34,7 +34,7 @@ grafana_logs() {
   refute_output
 }
 
-@test "grafana dev - can discover dashboards" {
+@test "grafana dev can discover dashboards" {
   with_kubeconfig "sc"
 
   run grafana_sc_dashboard_logs user-grafana
@@ -46,7 +46,7 @@ grafana_logs() {
   done
 }
 
-@test "grafana dev - can load dashboards without error" {
+@test "grafana dev can load dashboards without error" {
   with_kubeconfig "sc"
 
   run grafana_logs user-grafana
