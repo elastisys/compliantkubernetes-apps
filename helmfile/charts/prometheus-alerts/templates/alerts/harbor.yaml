@@ -100,5 +100,5 @@ spec:
       labels:
         severity: low
       annotations:
-        description: Total number of artifacts is above the limit of {{ .Values.harbor.alerts.maxTotalArtifacts }}GB
+        description: Total number of artifacts is above the limit of {{ .Values.harbor.alerts.maxTotalArtifacts }}
 {{- end }}
