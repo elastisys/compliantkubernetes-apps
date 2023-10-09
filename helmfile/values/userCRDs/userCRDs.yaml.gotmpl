@@ -22,6 +22,31 @@ userCRDs:
         - mongodbcommunity.mongodbcommunity.mongodb.com
       group: mongodbcommunity.mongodb.com
     {{- end }}
+    {{- if .Values.user.fluxv2.enabled }}
+    - names:
+        - helmreleases.helm.toolkit.fluxcd.io
+      group: helm.toolkit.fluxcd.io
+    - names:
+        - imageupdateautomations.image.toolkit.fluxcd.io
+        - imagepolicies.image.toolkit.fluxcd.io
+        - imagerepositories.image.toolkit.fluxcd.io
+      group: image.toolkit.fluxcd.io
+    - names:
+        - kustomizations.kustomize.toolkit.fluxcd.io
+      group: kustomize.toolkit.fluxcd.io
+    - names:
+        - alerts.notification.toolkit.fluxcd.io
+        - providers.notification.toolkit.fluxcd.io
+        - receivers.notification.toolkit.fluxcd.io
+      group: notification.toolkit.fluxcd.io
+    - names:
+        - buckets.source.toolkit.fluxcd.io
+        - gitrepositories.source.toolkit.fluxcd.io
+        - helmcharts.source.toolkit.fluxcd.io
+        - helmrepositories.source.toolkit.fluxcd.io
+        - ocirepositories.source.toolkit.fluxcd.io
+      group: source.toolkit.fluxcd.io
+    {{- end }}
     {{- if .Values.gatekeeper.allowUserCRDs.extraCRDs }}
     {{- toYaml .Values.gatekeeper.allowUserCRDs.extraCRDs | nindent 4 }}
     {{- end }}
