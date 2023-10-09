@@ -22,6 +22,8 @@ config:
       applicationCredentialSecret: secret-key
       authUrl: swift.region.provider.net
       region: region
+      # domainName: domain-name
+      # projectDomainName: project-domain-name
 
   destination:
   - name: provider-region-b
@@ -40,6 +42,8 @@ config:
       applicationCredentialSecret: secret-key
       authUrl: swift.region.provider.net
       region: region
+      # domainName: domain-name
+      # projectDomainName: project-domain-name
 
   encrypt:
     enabled: false
