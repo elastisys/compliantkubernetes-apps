@@ -56,6 +56,10 @@ user:
   # Requires that gatekeeper.allowUserCRDs.enabled is enabled.
   mongodb:
     enabled: false
+  # Installs required cluster resources needed to install fluxv2
+  # Requires that gatekeeper.allowUserCRDs.enabled is enabled.
+  fluxv2:
+    enabled: false
 falco:
   ## Falco alerting configuration.
   alerts:

@@ -4,6 +4,7 @@
 
 - Add support for self-managed CRDs (preview)
   - Add support for SealedSecrets and MongoDB
+  - Add support for Flux
 - Add application developer service account kube-config for devs
   - Enabled developers to easily create a kube-config to act as an application developer
 - Dashboard showing how spread out pods are across nodes or zones

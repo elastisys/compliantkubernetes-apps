@@ -1,0 +1,57 @@
+{{- if .Values.user.fluxv2.enabled }}
+clusterRoles:
+  crd-controller:
+    rules:
+    - apiGroups:
+        - source.toolkit.fluxcd.io
+        - kustomize.toolkit.fluxcd.io
+        - helm.toolkit.fluxcd.io
+        - notification.toolkit.fluxcd.io
+        - image.toolkit.fluxcd.io
+      resources:
+        - '*'
+      verbs:
+        - '*'
+clusterRoleBindings:
+  crd-controller:
+    roleRef:
+      name: crd-controller
+    subjects:
+    - kind: ServiceAccount
+      name: kustomize-controller
+      namespace: flux-system
+    - kind: ServiceAccount
+      name: helm-controller
+      namespace: flux-system
+    - kind: ServiceAccount
+      name: source-controller
+      namespace: flux-system
+    - kind: ServiceAccount
+      name: notification-controller
+      namespace: flux-system
+    - kind: ServiceAccount
+      name: image-reflector-controller
+      namespace: flux-system
+    - kind: ServiceAccount
+      name: image-automation-controller
+      namespace: flux-system
+  flux-admin:
+    roleRef:
+      name: crd-controller
+    subjects:
+    {{- range $user := .Values.user.adminUsers }}
+    - apiGroup: rbac.authorization.k8s.io
+      kind: User
+      name: {{ $user }}
+    {{- end }}
+    {{- range $group := $.Values.user.adminGroups }}
+    - apiGroup: rbac.authorization.k8s.io
+      kind: Group
+      name: {{ $group }}
+    {{- end }}
+    {{- range $serviceAccount := .Values.user.serviceAccounts }}
+    - kind: ServiceAccount
+      name: {{ $serviceAccount }}
+      namespace: default
+    {{- end }}
+{{- end }}
