@@ -65,7 +65,7 @@ The apps are installed using a combination of helm charts and manifests with the
 - [helm-diff](https://github.com/databus23/helm-diff) (tested with 3.5.0)
 - [helm-secrets](https://github.com/futuresimple/helm-secrets) (tested with 3.12.0)
 - [jq](https://github.com/stedolan/jq) (tested with jq-1.6)
-- [sops](https://github.com/mozilla/sops) (tested with 3.7.3)
+- [sops](https://github.com/getsops/sops) (tested with 3.7.3)
 - [s3cmd](https://s3tools.org/s3cmd) available directly in Ubuntus repositories (tested with 2.0.1)
 - [yq4](https://github.com/mikefarah/yq) (tested with 4.26.1)
 - [pwgen](https://sourceforge.net/projects/pwgen/) available directly in Ubuntus repositories (tested with 2.08)
@@ -85,7 +85,7 @@ See [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ### :closed_lock_with_key: PGP :closed_lock_with_key:
 
-Configuration secrets in ck8s are encrypted using [SOPS](https://github.com/mozilla/sops).
+Configuration secrets in ck8s are encrypted using [SOPS](https://github.com/getsops/sops).
 We currently only support using PGP when encrypting secrets.
 Because of this, before you can start using ck8s, you need to generate your own PGP key:
 

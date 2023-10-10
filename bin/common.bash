@@ -469,7 +469,7 @@ sops_encrypt_stdin() {
 
 # Encrypt a file in place.
 sops_encrypt() {
-    # https://github.com/mozilla/sops/issues/460
+    # https://github.com/getsops/sops/issues/460
     if sops_check "${1}"; then
         log_info "Already encrypted ${1}"
         return
@@ -487,7 +487,7 @@ sops_decrypt_verify() {
         exit 1
     fi
 
-    # https://github.com/mozilla/sops/issues/460
+    # https://github.com/getsops/sops/issues/460
     if ! sops_check "${1}"; then
         log_error "NOT ENCRYPTED: ${1}"
         exit 1
