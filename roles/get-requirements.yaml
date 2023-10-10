@@ -28,7 +28,7 @@
         dest: "{{ install_path }}/jq"
       - command: sops
         version: "{{ sops_version }}"
-        url: https://github.com/mozilla/sops/releases/download/v{{ sops_version }}/sops-v{{ sops_version }}.linux
+        url: https://github.com/getsops/sops/releases/download/v{{ sops_version }}/sops-v{{ sops_version }}.linux
         dest: "{{ install_path }}/sops"
       - command: yq
         version: "{{ yq_version }}"
