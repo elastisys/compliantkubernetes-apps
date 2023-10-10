@@ -11,6 +11,8 @@ describe("harbor admin static user", function() {
   it('Harbor landing page is visible', function () {
     cy.visit(this.baseUrl)
     cy.get('[class="header-title"]').should('exist').and('contain', 'Projects')
+    cy.contains('button', 'admin').click()
+    cy.contains('a', 'Log Out').click()
   })
 
 })
