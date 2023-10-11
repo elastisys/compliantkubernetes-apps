@@ -92,7 +92,7 @@ apps_wc() {
 #
 if [[ $1 == "wc" ]]; then
     if ! "${here}/update-ips.bash" "wc" "dry-run"; then
-        log_warning "Diff in wc config for network policy IPs, run 'ck8s update-ips wc update' to fix this issue."
+        log_warning "Diff in wc config for network policy IPs, run 'ck8s update-ips wc apply' to fix this issue."
 
         if ! ${CK8S_AUTO_APPROVE}; then
             log_warning_no_newline "Do you want to continue anyway? (y/N): "
@@ -106,7 +106,7 @@ if [[ $1 == "wc" ]]; then
     apps_wc "$2" "$3"
 elif [[ $1 == "sc" ]]; then
     if ! "${here}/update-ips.bash" "sc" "dry-run"; then
-        log_warning "Diff in sc config for network policy IPs, run 'ck8s update-ips sc update' to fix this issue."
+        log_warning "Diff in sc config for network policy IPs, run 'ck8s update-ips sc apply' to fix this issue."
 
         if ! ${CK8S_AUTO_APPROVE}; then
             log_warning_no_newline "Do you want to continue anyway? (y/N): "

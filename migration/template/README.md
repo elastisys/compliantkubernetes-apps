@@ -70,7 +70,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     # check if the netpol IPs need to be updated
     ./bin/ck8s update-ips both dry-run
     # if you agree with the changes apply
-    ./bin/ck8s update-ips both update
+    ./bin/ck8s update-ips both apply
     ```
 
 1. Apply upgrade - *disruptive*
@@ -106,7 +106,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     # check if the netpol IPs need to be updated
     ./bin/ck8s update-ips both dry-run
     # if you agree with the changes apply
-    ./bin/ck8s update-ips both update
+    ./bin/ck8s update-ips both apply
     ```
 
 ### Apply upgrade - *disruptive*
