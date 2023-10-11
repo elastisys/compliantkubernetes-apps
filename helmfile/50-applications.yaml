@@ -93,7 +93,7 @@ releases:
 
 # calico-accountant
 - name: calico-accountant
-  {{ if .Values.global.clusterApi }}
+  {{ if .Values.clusterApi.enabled }}
   namespace: calico-system
   {{ else }}
   namespace: kube-system
@@ -596,6 +596,21 @@ releases:
   - values/openstack-monitoring.yaml.gotmpl
   - values/prometheus-alerts-sc.yaml.gotmpl
 
+{{- range $name := .Values.clusterApi.clusters }}
+- name: autoscaling-monitoring-{{ $name }}
+  namespace: capi-cluster
+  labels:
+    app: autoscaling-monitoring-{{ $name }}
+    group: autoscaling-monitoring
+  chart: ./charts/autoscaling-monitoring
+  version: 0.1.0
+  installed: {{ $.Values.clusterApi.monitoring.enabled }}
+  set:
+  - name: clusterName
+    value: {{ $.Values.global.ck8sEnvironmentName}}-{{ $name }}
+  values:
+    - ./values/autoscaling-monitoring.yaml.gotmpl
+{{- end }}
 # End of system services releases
 {{ end }}
 

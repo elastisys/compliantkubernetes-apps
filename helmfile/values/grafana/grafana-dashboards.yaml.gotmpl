@@ -21,9 +21,10 @@ disabledDashboards:
   {{- if not .Values.harbor.enabled }}
   - harbor-dashboard
   {{- end }}
-  {{- if not .Values.global.clusterApi }}
+  {{- if not .Values.clusterApi.monitoring.enabled }}
   - cluster-api-dashboard
-  {{- end }}
+  - cluster-api-autoscaling-dashboard
+  {{- end }}}
   - vulnerability-dashboard
   - thanos-sidecar-dashboard
   - thanos-bucket-replicate-dashboard
@@ -38,6 +39,7 @@ notDeveloperVisible:
   - calicofelix-dashboard
   - prometheus-timeseries-dashboard
   - cluster-api-dashboard
+  - cluster-api-autoscaling-dashboard
 
 {{- if .Values.objectStorage.sync.enabled }}
 sync:
