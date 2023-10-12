@@ -307,6 +307,10 @@ customRules:
     - list: known_binaries_to_read_environment_variables_from_proc_files
       append: true
       items: [systemd-run, rook, udevadm]
+    - list: known_drop_and_execute_containers
+      append: true
+      items:
+        - ghcr.io/elastisys/calico-accountant # when .calicoAccountant.backend = nftables
 falcosidekick:
   enabled: {{ .Values.falco.alerts.enabled }}
   config:
