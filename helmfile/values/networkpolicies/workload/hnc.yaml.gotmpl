@@ -5,22 +5,29 @@ policies:
       egress: {}
       ingress: {}
 
+    controller-manager:
+      podSelectorLabels:
+        app.kubernetes.io/component: hnc-controller-manager
+      egress:
+        - rule: egress-rule-apiserver
+      ingress:
+        {{- if not .Values.hnc.ha }}
+        - rule: ingress-rule-apiserver
+          ports:
+            - tcp: 9443
+        {{- end }}
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 8080
+
+    {{- if .Values.hnc.ha }}
     webhook:
       podSelectorLabels:
         app.kubernetes.io/component: hnc-webhook
+      egress:
+        - rule: egress-rule-apiserver
       ingress:
         - rule: ingress-rule-apiserver
           ports:
             - tcp: 9443
-      egress:
-        - rule: egress-rule-apiserver
-
-    controller-manager:
-      podSelectorLabels:
-        app.kubernetes.io/component: hnc-controller-manager
-      ingress:
-        - rule: ingress-rule-prometheus
-          ports:
-            - tcp: 8080
-      egress:
-        - rule: egress-rule-apiserver
+    {{- end }}
