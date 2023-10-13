@@ -121,11 +121,11 @@ alertmanager:
         # {{``}} to prevent helm from parsing them.
         # See: https://github.com/helm/helm/issues/2798#issuecomment-467319526
         text: |-
-          <!channel>
-          *Cluster:* {{ .Values.grafana.ops.subdomain }}.{{ .Values.global.opsDomain }}
           {{- if .Values.alerts.slack.customTemplate }}
           {{ .Values.alerts.slack.customTemplate | nindent 10 }}
           {{- else }}
+          <!channel>
+          *Cluster:* {{ .Values.grafana.ops.subdomain }}.{{ .Values.global.opsDomain }}
           {{`
           *Common summary:* {{ .CommonAnnotations.summary }}
           *Common description:* {{ .CommonAnnotations.description }}
