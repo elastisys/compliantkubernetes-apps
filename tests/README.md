@@ -8,6 +8,9 @@ Tests implemented with `cypress` can and will be integrated into the `bats` test
 > [!note]
 > All instructions assume that you are standing in the `tests/` directory.
 
+> [!warning]
+> Known issue that tests requiring use of `docker` or `podman` cannot run within the test container.
+
 ### Usage with Makefile
 
 > [!note]

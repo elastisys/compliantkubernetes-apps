@@ -64,7 +64,7 @@ $(all:.bats=): %: %.bats
 	@echo --- bats $*.bats
 	@bats -r $*.bats
 
-dep: dep-bats common/bats/assert common/bats/detik common/bats/support dep-npm node_modules
+dep: dep-bats common/bats/assert common/bats/detik common/bats/support common/docs dep-npm node_modules
 
 dep-bats:
 ifndef found_bats
@@ -88,17 +88,22 @@ endif
 
 common/bats/assert:
 	@echo --- git clone github.com/bats-core/bats-assert
-	@git clone https://github.com/bats-core/bats-assert.git common/bats/assert
+	@git clone --depth 1 https://github.com/bats-core/bats-assert.git common/bats/assert
 	@echo
 
 common/bats/detik:
 	@echo --- git clone github.com/bats-core/bats-detik
-	@git clone https://github.com/bats-core/bats-detik.git common/bats/detik
+	@git clone --depth 1 https://github.com/bats-core/bats-detik.git common/bats/detik
 	@echo
 
 common/bats/support:
 	@echo --- git clone github.com/bats-core/bats-support
-	@git clone https://github.com/bats-core/bats-support.git common/bats/support
+	@git clone --depth 1 https://github.com/bats-core/bats-support.git common/bats/support
+	@echo
+
+common/docs:
+	@echo --- git clone github.com/elastisys/compliantkubernetes
+	@git clone --depth 1 https://github.com/elastisys/compliantkubernetes.git common/docs
 	@echo
 
 node_modules:
@@ -125,6 +130,8 @@ clean: clean-dep clean-gen
 clean-dep:
 	@echo rm common/bats
 	@rm -rf common/bats
+	@echo rm common/docs
+	@rm -rf common/docs
 	@echo rm node_modules
 	@rm -rf node_modules
 

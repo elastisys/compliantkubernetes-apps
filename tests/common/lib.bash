@@ -20,6 +20,10 @@ common_setup() {
   load "${ROOT}/tests/common/bats/detik/lib/linter.bash"
   load "${ROOT}/tests/common/bats/detik/lib/utils.bash"
   load "${ROOT}/tests/common/bats/support/load.bash"
+
+  if [[ -z "${CK8S_CONFIG_PATH:-}" ]]; then
+    fail "CK8S_CONFIG_PATH is unset!"
+  fi
 }
 
 # note: not intended for direct use
@@ -86,153 +90,141 @@ cypress_teardown() {
 # note: more correct than yq_dig for complex data such as maps that can be merged
 # usage: yq <cluster> <config-key> <default>
 yq() {
-  local value
+  if ! [[ "${1:-}" =~ ^(sc|wc)$ ]]; then
+    fail "invalid or missing cluster argument"
+  elif [[ -z "${2:-}" ]]; then
+    fail "missing config key argument"
+  fi
 
-  if [[ "${1:-}" =~ ^(sc|wc)$ ]]; then
-    if [[ -n "${2:-}" ]]; then
-      value="$(yq4 ea "explode(.) as \$item ireduce ({}; . * \$item) | ${2} | ...comments=\"\"" "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/$1-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" "${CK8S_CONFIG_PATH}/sc-config.yaml")"
-      if [[ -n "${value#null}" ]]; then
-        echo "${value}"
-      else
-        echo "${3:-}"
-      fi
-    else
-      fail "missing config key argument"
-    fi
-  elif [[ -n "${1:-}" ]]; then
-    fail "invalid cluster argument"
+  local value
+  value="$(yq4 ea "explode(.) as \$item ireduce ({}; . * \$item) | $2 | ...comments=\"\"" "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/$1-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" "${CK8S_CONFIG_PATH}/$1-config.yaml")"
+
+  if [[ -n "${value#null}" ]]; then
+    echo "${value}"
   else
-    fail "missing cluster argument"
+    echo "${3:-}"
   fi
 }
 
 # note: more efficient than yq for simple data such as scalars that cannot be merged
 # usage: yq_dig <cluster> <config-key> <default>
 yq_dig() {
-  local value
+  if ! [[ "${1:-}" =~ ^(sc|wc)$ ]]; then
+    fail "invalid or missing cluster argument"
+  elif [[ -z "${2:-}" ]]; then
+    fail "missing config key argument"
+  fi
 
-  if [[ "${1:-}" =~ ^(sc|wc)$ ]]; then
-    if [[ -n "${2:-}" ]]; then
-      value="$(yq4 ea "explode(.) | ${2} | select(. != null) | {\"wrapper\": .} as \$item ireduce ({}; . * \$item) | .wrapper | ... comments=\"\"" "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/$1-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" "${CK8S_CONFIG_PATH}/sc-config.yaml")"
-      if [[ -n "${value#null}" ]]; then
-        echo "${value}"
-      else
-        echo "${3:-}"
-      fi
-    else
-      fail "missing config key argument"
-    fi
-  elif [[ -n "${1:-}" ]]; then
-    fail "invalid cluster argument"
+  local value
+  value="$(yq4 ea "explode(.) | $2 | select(. != null) | {\"wrapper\": .} as \$item ireduce ({}; . * \$item) | .wrapper | ... comments=\"\"" "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/$1-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" "${CK8S_CONFIG_PATH}/$1-config.yaml")"
+
+  if [[ -n "${value#null}" ]]; then
+    echo "${value}"
   else
-    fail "missing cluster argument"
+    echo "${3:-}"
   fi
 }
 
 # usage: yq_secret <config-key> <default>
 yq_secret() {
-  if [[ -n "${1:-}" ]]; then
-    value="$(sops -d "${CK8S_CONFIG_PATH}/secrets.yaml" | yq4 "${1} | ... comments=\"\"")"
-    if [[ -n "${value#null}" ]]; then
-      echo "${value}"
-    else
-      echo "${2:-}"
-    fi
-  else
+  if [[ -z "${1:-}" ]]; then
     fail "missing config key argument"
+  fi
+
+  local value
+  value="$(sops -d "${CK8S_CONFIG_PATH}/secrets.yaml" | yq4 "$1 | ... comments=\"\"")"
+
+  if [[ -n "${value#null}" ]]; then
+    echo "${value}"
+  else
+    echo "${2:-}"
   fi
 }
 
 # usage: continue_on <cluster> <config-key>
 continue_on() {
-  if [[ "${1:-}" =~ ^(sc|wc)$ ]]; then
-    if [[ -n "${2:-}" ]]; then
-      if [[ "$(yq_dig "$1" "$2" "false")" != "true" ]]; then
-        skip "$1/$2 - disabled"
-      fi
-    else
-      fail "missing config key argument"
-    fi
-  elif [[ -n "${1:-}" ]]; then
-    fail "invalid cluster argument"
-  else
-    fail "missing cluster argument"
+  if ! [[ "${1:-}" =~ ^(sc|wc)$ ]]; then
+    fail "invalid or missing cluster argument"
+  elif [[ -z "${2:-}" ]]; then
+    fail "missing config key argument"
+  fi
+
+  if [[ "$(yq_dig "$1" "$2" "false")" != "true" ]]; then
+    skip "$1/$2 - disabled"
   fi
 }
 
 # sets the kubeconfig to use
 # usage: with_kubeconfig <cluster>
 with_kubeconfig() {
-  if [[ "${1:-}" =~ ^(sc|wc)$ ]]; then
-    export KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_$1.yaml"
-    export DETIK_CLIENT_NAME="kubectl"
-  elif [[ -n "${1:-}" ]]; then
-    fail "invalid cluster argument"
-  else
-    fail "missing cluster argument"
+  if ! [[ "${1:-}" =~ ^(sc|wc)$ ]]; then
+    fail "invalid or missing cluster argument"
   fi
+
+  export KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_$1.yaml"
+  export DETIK_CLIENT_NAME="kubectl"
 }
 
 # sets the namespace to use
 # usage: with_namespace <namespace>
 with_namespace() {
-  if [[ -n "${1:-}" ]]; then
-    export DETIK_CLIENT_NAMESPACE="$1"
-    export NAMESPACE="$1"
-  else
+  if [[ -z "${1:-}" ]]; then
     fail "missing namespace argument"
   fi
+
+  export DETIK_CLIENT_NAMESPACE="$1"
+  export NAMESPACE="$1"
 }
 
 # note: expects with_kubeconfig and with_namespace to be set
 # usage: test_cronjob <name>
 test_cronjob() {
-  if [[ -n "${1:-}" ]]; then
-    verify "there is 1 cronjob named '^$1$'"
-  else
+  if [[ -z "${1:-}" ]]; then
     fail "missing cronjob name argument"
   fi
+
+  verify "there is 1 cronjob named '^$1$'"
 }
 
 # note: expects with_kubeconfig and with_namespace to be set
 # usage: test_daemonset <name>
 test_daemonset() {
-  if [[ -n "${1:-}" ]]; then
-    verify "there is 1 daemonset named '^$1$'"
-    verify "'status' is 'running' for pods named '$1-[[:alnum:]]\+[[:space:]]'"
-  else
+  if [[ -z "${1:-}" ]]; then
     fail "missing daemonset name argument"
   fi
+
+  verify "there is 1 daemonset named '^$1$'"
+  verify "'status' is 'running' for pods named '$1-[[:alnum:]]\+[[:space:]]'"
 }
 
 # note: expects with_kubeconfig and with_namespace to be set
 # usage: test_deployment <name> <replicas>
 test_deployment() {
-  if [[ -n "${1:-}" ]]; then
-    verify "there is 1 deployment named '^$1$'"
-    verify "there are ${2:-1} pods named '$1-[[:alnum:]]\+-[[:alnum:]]\+$'"
-    verify "'status' is 'running' for pods named '$1-[[:alnum:]]\+-[[:alnum:]]\+[[:space:]]'"
-  else
+  if [[ -z "${1:-}" ]]; then
     fail "missing deployment name argument"
   fi
+
+  verify "there is 1 deployment named '^$1$'"
+  verify "there are ${2:-1} pods named '$1-[[:alnum:]]\+-[[:alnum:]]\+$'"
+  verify "'status' is 'running' for pods named '$1-[[:alnum:]]\+-[[:alnum:]]\+[[:space:]]'"
 }
 
 # note: expects with_kubeconfig and with_namespace to be set
 # usage: test_statefulset <name> <replicas>
 test_statefulset() {
-  if [[ -n "${1:-}" ]]; then
-    verify "there is 1 statefulset named '^$1$'"
-    verify "there are ${2-1} pods named '$1-[[:digit:]]\+$'"
-    verify "'status' is 'running' for pods named '$1-[[:digit:]]\+[[:space:]]'"
-  else
+  if [[ -z "${1:-}" ]]; then
     fail "missing statefulset name argument"
   fi
+
+  verify "there is 1 statefulset named '^$1$'"
+  verify "there are ${2-1} pods named '$1-[[:digit:]]\+$'"
+  verify "'status' is 'running' for pods named '$1-[[:digit:]]\+[[:space:]]'"
 }
 
 # note: expects with_kubeconfig and with_namespace to be set
 # usage: test_logs_contains <resource-type/name> <container> <regex>...
 test_logs_contains() {
-  run kubectl -n "${NAMESPACE}" logs "${1}" grafana-sc-dashboard
+  run kubectl -n "${NAMESPACE}" logs "$1" grafana-sc-dashboard
 
   for arg in "${@:2}"; do
     assert_line --regexp "${arg}"
