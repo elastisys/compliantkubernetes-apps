@@ -74,12 +74,11 @@ rcloneSync:
   {{ $destinationS3 := "" }}
   {{ $destinationSwift := "" }}
 
-  {{- if or (eq .Values.thanos.objectStorage.type "swift") (eq .Values.harbor.persistence.type "swift") }}
-    {{ $sourceSwift = "true" }}
-    {{ $destinationSwift = "true" }}
-  {{- end }}
-
   {{- if .Values.objectStorage.sync.syncDefaultBuckets }}
+    {{- if or (eq .Values.thanos.objectStorage.type "swift") (eq .Values.harbor.persistence.type "swift") }}
+      {{ $sourceSwift = "true" }}
+      {{ $destinationSwift = "true" }}
+    {{- end }}
     {{- if eq .Values.objectStorage.type "s3" }}
     {{ $sourceS3 = "true" }}
     {{- end }}
