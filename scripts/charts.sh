@@ -134,8 +134,8 @@ run_pull() {
 
   mkdir -p "${CHARTS}/tmp"
 
-  error="$(helm pull "${chart}" --version "${requested_version}" --untar --untardir "${CHARTS}/tmp/${chart%%/*}" 2>&1 || true)"
-
+  error="$(helm pull "${chart}" --version "${requested_version}" --untar --untardir "${CHARTS}/tmp/${chart%%/*}" 2>&1 > /dev/null || true)"
+  error="$(grep "Error" <<< "${error}" || true)"
   if [[ -z "${error}" ]]; then
     rm -rf "${CHARTS:?}/${chart:?}"
     mkdir -p "${CHARTS}/${chart%%/*}"
