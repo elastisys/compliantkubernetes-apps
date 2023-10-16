@@ -386,10 +386,16 @@ fi
 ## Add destination object storage ips for rclone sync to sc config
 if [ "$(yq_dig 'sc' '.objectStorage.sync.enabled' 'false')" == "true" ]; then
   if [ "$(yq_dig 'sc' '.networkPolicies.rcloneSync.enabled' 'false')" == "true" ]; then
-    check_harbor="$(yq_dig 'sc' '.harbor.persistence.type' 'false')"
-    check_thanos="$(yq_dig 'sc' '.thanos.objectStorage.type' 'false')"
-    destination=$(yq4 '.objectStorage.sync.buckets.[].destinationType' "${config["override_sc"]}")
     destinationSwift=false
+    check_sync_default_buckets="$(yq_dig 'sc' '.objectStorage.sync.syncDefaultBuckets' 'false')"
+    if [ "${check_sync_default_buckets}" == "true" ]; then
+      check_harbor="$(yq_dig 'sc' '.harbor.persistence.type' 'false')"
+      check_thanos="$(yq_dig 'sc' '.thanos.objectStorage.type' 'false')"
+      if [ "$check_harbor" == "swift" ] || [ "$check_thanos" == "swift" ]; then
+          destinationSwift=true
+      fi
+    fi
+    destination=$(yq4 '.objectStorage.sync.buckets.[].destinationType' "${config["override_sc"]}")
     destinationS3=false
     for type in $destination; do
       if [ "$type" == "swift" ]; then
@@ -398,9 +404,6 @@ if [ "$(yq_dig 'sc' '.objectStorage.sync.enabled' 'false')" == "true" ]; then
         destinationS3=true
       fi
     done
-    if [ "$check_harbor" == "swift" ] || [ "$check_thanos" == "swift" ]; then
-        destinationSwift=true
-    fi
 
     ifNull=""
     S3_ENDPOINT_DST="$(yq_dig 'sc' '.objectStorage.sync.s3.regionEndpoint' "" | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
