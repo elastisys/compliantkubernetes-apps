@@ -85,9 +85,6 @@ defaultRules:
     general: true
     hnc: false
     k8s: true
-    kubeApiserverAvailability: true
-    kubePrometheusGeneral: true
-    kubePrometheusNodeRecording: true
     kubeStateMetrics: true
     kubelet: true
     kubernetesApps: true
@@ -109,11 +106,7 @@ defaultRules:
     dailyChecks: false
     fluentd: true
     missingMetrics: true
-    kubeSchedulerAlerting: true
-    kubeSchedulerRecording: true
     kubeProxy: true
-    kubeControllerManager: true
-    configReloaders: true
     networkpolicies: true
     dns: true
     clusterApi: false

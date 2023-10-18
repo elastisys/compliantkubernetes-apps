@@ -14,15 +14,24 @@ defaultRules:
   # labels:
   #   cluster: workload
   rules:
-    opensearch: false
-    falcoAlerts: false # falco alerts will come from falco sidekick
     alertmanager: {{ .Values.user.alertmanager.enabled }}
     # Rook is handled by the cluster operators. Users would normally not care
     # about these alerts, but we have no other way of gathering them currently.
     rookMonitor: {{ .Values.rookCeph.monitoring.enabled }}
     capacityManagementAlerts: {{ .Values.prometheus.capacityManagementAlerts.enabled }}
     networkpolicies: {{ .Values.networkPolicies.enableAlerting }}
+    # handled by the platform administrator
+    opensearch: false
+    falcoAlerts: false # falco alerts will come from falco sidekick
     harbor: false
+    missingMetrics: false # not useful for wc
+    dns: false
+    kubeProxy: false
+    prometheusOperator: false
+    network: false
+    kubernetesSystem: false
+    kubeStateMetrics: false
+
 
 capacityManagementAlertsPersistentVolumeEnabled: {{ .Values.prometheus.capacityManagementAlerts.persistentVolume.enabled }}
 capacityManagementAlertsPersistentVolumeLimit: {{ .Values.prometheus.capacityManagementAlerts.persistentVolume.limit }}
