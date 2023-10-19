@@ -1,5 +1,6 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.33.1](#v0331---2023-10-19)
 - [v0.33.0](#v0330---2023-09-05)
 - [v0.32.0](#v0320---2023-08-07)
 - [v0.31.0](#v0310---2023-07-06)
@@ -36,6 +37,34 @@
 - [v0.6.0](#v060---2020-10-16)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.33.1 - 2023-10-19
+
+### Release notes
+
+### Added
+
+- Network policies from `rook-ceph-crashcollector`
+- The possibility to set a different domain from `baseDomain` for blackboxExporter probes
+- Exposed the option to set `tty` for falco
+
+### Changed
+
+- Log management jobs `successfulJobsHistoryLimit` was decreased to 1 from 3
+
+### Fixed
+
+- Rclone sync enable Thanos and Harbor destination swift only if `.objectStorage.sync.syncDefaultBuckets: true`
+- Rclone sync added `domainName` and `projectDomainName` fields for swift config
+- Harbor artifacts alert description
+- Alertmanager custom template
+
+### Updated
+
+- Ingress-nginx controller to 1.8.4 and chart to 4.7.3 (HTTP/2 fix for CVE-2023-44487)
+    - a limit of no more than 2 * max_concurrent_streams new streams per one event loop iteration was introduced
+    - refused streams are now limited to maximum of max_concurrent_streams and 100
 
 -------------------------------------------------
 ## v0.33.0 - 2023-09-05
