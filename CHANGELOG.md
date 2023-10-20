@@ -1,5 +1,6 @@
 # Compliant Kubernetes changelog
 <!-- BEGIN TOC -->
+- [v0.32.2](#v0322---2023-10-20)
 - [v0.32.1](#v0321---2023-09-19)
 - [v0.32.0](#v0320---2023-08-07)
 - [v0.31.0](#v0310---2023-07-06)
@@ -36,6 +37,21 @@
 - [v0.6.0](#v060---2020-10-16)
 - [v0.5.0](#v050---2020-08-06)
 <!-- END TOC -->
+
+-------------------------------------------------
+## v0.32.2 - 2023-10-20
+
+### Release notes
+
+### Fixed
+
+- Rclone sync enable Thanos and Harbor destination swift only if `.objectStorage.sync.syncDefaultBuckets: true`
+
+### Updated
+
+- Ingress-nginx controller to 1.8.4 and chart to 4.7.3 (HTTP/2 fix for CVE-2023-44487)
+    - a limit of no more than 2 * max_concurrent_streams new streams per one event loop iteration was introduced
+    - refused streams are now limited to maximum of max_concurrent_streams and 100
 
 -------------------------------------------------
 ## v0.32.1 - 2023-09-19
