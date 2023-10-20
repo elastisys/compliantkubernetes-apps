@@ -23,9 +23,9 @@ controller:
     ## for backwards compatibility consider setting the full image url via the repository value below
     ## use *either* current default registry/image or repository format or installing chart by providing the values.yaml will fail
     ## repository:
-    tag: "v1.8.0"
-    digest: sha256:744ae2afd433a395eeb13dc03d3313facba92e96ad71d9feaafc85925493fee3
-    digestChroot: sha256:a45e41cd2b7670adf829759878f512d4208d0aec1869dae593a0fecd09a5e49e
+    tag: "v1.8.4"
+    digest: sha256:8d8ddf32b83ca3e74bd5f66369fa60d85353e18ff55fa7691b321aa4716f5ba9
+    digestChroot: sha256:76100ab4c1b3cdc2697dd26492ba42c6519e99c5df1bc839ac5d6444a2c58d17
     pullPolicy: IfNotPresent
     # www-data -> uid 101
     runAsUser: 101
@@ -257,7 +257,7 @@ controller:
   ##
   terminationGracePeriodSeconds: 300
   # -- Node labels for controller pod assignment
-  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ## Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
   ##
   nodeSelector:
     kubernetes.io/os: linux
@@ -368,6 +368,9 @@ controller:
     maxReplicas: 11
     pollingInterval: 30
     cooldownPeriod: 300
+    # fallback:
+    #   failureThreshold: 3
+    #   replicas: 11
     restoreToOriginalReplicaCount: false
     scaledObject:
       annotations: {}
@@ -412,17 +415,20 @@ controller:
     # Will be ignored for Kubernetes versions older than 1.20
     ##
     appProtocol: true
+    # -- Annotations are mandatory for the load balancer to come up. Varies with the cloud service. Values passed through helm tpl engine.
     annotations: {}
     labels: {}
     # clusterIP: ""
 
     # -- List of IP addresses at which the controller services are available
-    ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
+    ## Ref: https://kubernetes.io/docs/concepts/services-networking/service/#external-ips
     ##
     externalIPs: []
     # -- Used by cloud providers to connect the resulting `LoadBalancer` to a pre-existing static IP according to https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
     loadBalancerIP: ""
     loadBalancerSourceRanges: []
+    # -- Used by cloud providers to select a load balancer implementation other than the cloud provider default. https://kubernetes.io/docs/concepts/services-networking/service/#load-balancer-class
+    loadBalancerClass: ""
     enableHttp: true
     enableHttps: true
     ## Set external traffic policy to: "Local" to preserve source IP on providers supporting it.
@@ -471,10 +477,10 @@ controller:
     internal:
       # -- Enables an additional internal load balancer (besides the external one).
       enabled: false
-      # -- Annotations are mandatory for the load balancer to come up. Varies with the cloud service.
+      # -- Annotations are mandatory for the load balancer to come up. Varies with the cloud service. Values passed through helm tpl engine.
       annotations: {}
-      # loadBalancerIP: ""
-
+      # -- Used by cloud providers to connect the resulting internal LoadBalancer to a pre-existing static IP. Make sure to add to the service the needed annotation to specify the subnet which the static IP belongs to. For instance, `networking.gke.io/internal-load-balancer-subnet` for GCP and `service.beta.kubernetes.io/aws-load-balancer-subnets` for AWS.
+      loadBalancerIP: ""
       # -- Restrict access For LoadBalancer service. Defaults to 0.0.0.0/0.
       loadBalancerSourceRanges: []
       ## Set external traffic policy to: "Local" to preserve source IP on
@@ -547,7 +553,7 @@ controller:
 
   opentelemetry:
     enabled: false
-    image: registry.k8s.io/ingress-nginx/opentelemetry:v20230527@sha256:fd7ec835f31b7b37187238eb4fdad4438806e69f413a203796263131f4f02ed0
+    image: registry.k8s.io/ingress-nginx/opentelemetry:v20230721-3e2062ee5@sha256:13bee3f5223883d3ca62fee7309ad02d22ec00ff0d7033e3e9aca7a9f60fd472
     containerSecurityContext:
       allowPrivilegeEscalation: false
   admissionWebhooks:
@@ -609,8 +615,8 @@ controller:
         ## for backwards compatibility consider setting the full image url via the repository value below
         ## use *either* current default registry/image or repository format or installing chart by providing the values.yaml will fail
         ## repository:
-        tag: v20230407
-        digest: sha256:543c40fd093964bc9ab509d3e791f9989963021f1e9e4c9c7b6700b02bfb227b
+        tag: v20231011-8b53cabe0
+        digest: sha256:a7943503b45d552785aa3b5e457f169a5661fb94d82b8a3373bcd9ebaf9aac80
         pullPolicy: IfNotPresent
       # -- Provide a priority class name to the webhook patching job
       ##
@@ -652,7 +658,7 @@ controller:
       # clusterIP: ""
 
       # -- List of IP addresses at which the stats-exporter service is available
-      ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
+      ## Ref: https://kubernetes.io/docs/concepts/services-networking/service/#external-ips
       ##
       externalIPs: []
       # loadBalancerIP: ""
@@ -810,7 +816,7 @@ defaultBackend:
   #  key: value
 
   # -- Node labels for default backend pod assignment
-  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ## Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
   ##
   nodeSelector:
     kubernetes.io/os: linux
@@ -849,7 +855,7 @@ defaultBackend:
     # clusterIP: ""
 
     # -- List of IP addresses at which the default backend service is available
-    ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
+    ## Ref: https://kubernetes.io/docs/concepts/services-networking/service/#external-ips
     ##
     externalIPs: []
     # loadBalancerIP: ""
