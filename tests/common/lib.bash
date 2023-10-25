@@ -97,7 +97,7 @@ yq() {
   fi
 
   local value
-  value="$(yq4 ea "explode(.) as \$item ireduce ({}; . * \$item) | $2 | ...comments=\"\"" "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/$1-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" "${CK8S_CONFIG_PATH}/$1-config.yaml")"
+  value="$(yq4 ea "explode(.) as \$item ireduce ({}; . * \$item) | $2 | ... comments=\"\"" "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/$1-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" "${CK8S_CONFIG_PATH}/$1-config.yaml")"
 
   if [[ -n "${value#null}" ]]; then
     echo "${value}"

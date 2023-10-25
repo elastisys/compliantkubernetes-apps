@@ -18,6 +18,8 @@
 # - harbor.delete repositories [project] [repository]                           - delete a repository within a project
 # - harbor.get_artefact_vulnerabilities [project] [repository] [artefact]       - get vulnerabilities for an artefact
 # - harbor.create_artefact_vulnerability_scan [project] [repository] [artefact] - create a vulnerability scan for an artefact
+# - harbor.create_pull_secret [cluster] [namespace]                             - create a pull secret for the robot set in the environment
+# - harbor.delete_pull_secret [cluster] [namespace]                             - delete a pull secret
 
 harbor.load_env() {
   if [[ -z "${1:-}" ]]; then
@@ -212,4 +214,33 @@ harbor.create_artefact_vulnerability_scan() {
   fi
 
   harbor.post "projects/${1}/repositories/${2}/artifacts/${3}/scan" ""
+}
+
+harbor.create_pull_secret() {
+  if [[ "${#}" -lt 2 ]]; then
+    log.fatal "usage: harbor.create_pull_secret [cluster] [namespace]"
+  fi
+
+  with_kubeconfig "${1}"
+  with_namespace "${2}"
+
+  kubectl -n "${NAMESPACE}" create secret docker-registry pull-secret \
+    "--docker-server=${harbor_endpoint}" \
+    "--docker-username=${harbor_robot_fullname}" \
+    "--docker-password=$(<"${harbor_robot_secret_path}")"
+
+  kubectl -n "${NAMESPACE}" patch serviceaccount default -p '{"imagePullSecrets": [{"name": "pull-secret"}]}'
+}
+
+harbor.delete_pull_secret() {
+  if [[ "${#}" -lt 2 ]]; then
+    log.fatal "usage: harbor.delete_pull_secret [cluster] [namespace]"
+  fi
+
+  with_kubeconfig "${1}"
+  with_namespace "${2}"
+
+  kubectl -n "${NAMESPACE}" delete secret pull-secret
+
+  kubectl -n "${NAMESPACE}" patch serviceaccount default -p '{"imagePullSecrets": []}'
 }
