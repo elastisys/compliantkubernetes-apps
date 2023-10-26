@@ -9,3 +9,12 @@ spec:
   - group: networking.k8s.io
     mode: Propagate
     resource: networkpolicies
+  {{- if .Values.additionalAllowPropagateResources }}
+  {{- range $VAL := .Values.additionalAllowPropagateResources }}
+  - mode: AllowPropagate
+    resource: {{ $VAL.resource }}
+  {{- if $VAL.group }}
+    group: {{ $VAL.group }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
