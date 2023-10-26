@@ -54,263 +54,45 @@ falcoctl:
       enabled: false
 
 customRules:
-  {{- if .Values.falco.customRules }}
-    {{ toYaml .Values.falco.customRules | nindent 2}}
-  {{- end }}
-  ssh-trafic.yaml: |-
-    - rule: Inbound SSH Connection
-      desc: Detect Inbound SSH Connection
-      condition: >
-        ((evt.type in (accept,listen) and evt.dir=<) or
-          (evt.type in (recvfrom,recvmsg))) and ssh_port
-      output: >
-        Inbound SSH connection (user=%user.name client_ip=%fd.cip client_port=%fd.cport server_ip=%fd.sip)
-      priority: WARNING
-      tags: [network]
-    - rule: Outbound SSH Connection
-      desc: Detect Outbound SSH Connection
-      condition: >
-        ((evt.type = connect and evt.dir=<) or
-          (evt.type in (sendto,sendmsg))) and ssh_port
-        and not (k8s.ns.name = argocd-system and k8s.pod.name startswith argocd-repo-server)
-      output: >
-        Outbound SSH connection (user=%user.name server_ip=%fd.sip server_port=%fd.sport client_ip=%fd.cip)
-      priority: WARNING
-      tags: [network]
   overwrites.yaml: |-
+    - list: trusted_image_repositories
+      items: [
+        docker.io/jaegertracing/jaeger-operator,
+        quay.io/argoproj/argocd,
+        docker.io/elastisys/curl-jq,
+        ghcr.io/elastisys/argocd-managed-namespaces-manager,
+        quay.io/kiwigrid/k8s-sidecar,
+        ghcr.io/zalando/spilo-15,
+        quay.io/calico/node,
+        ghcr.io/elastisys/fluentd,
+        docker.io/rabbitmqoperator/cluster-operator,
+        docker.io/velero/velero,
+        docker.io/library/rabbitmq,
+        quay.io/prometheus/prometheus,
+        ghcr.io/elastisys/logical-backup
+        ]
+
     - macro: k8s_containers
-      condition: (
-          container.image.repository in (
-            docker.io/bitnami/fluentd,
-            docker.io/bitnami/kubectl,
-            docker.io/elastisys/calico-accountant,
-            ghcr.io/elastisys/curl-jq,
-            docker.io/library/rabbitmq,
-            docker.io/openpolicyagent/gatekeeper,
-            docker.io/openpolicyagent/gatekeeper-crds,
-            docker.io/rabbitmqoperator/cluster-operator,
-            docker.io/velero/velero,
-            gcr.io/k8s-staging-multitenancy/hnc-manager,
-            ghcr.io/aquasecurity/trivy-operator,
-            ghcr.io/dexidp/dex,
-            ghcr.io/elastisys/argocd-managed-namespaces-manager,
-            ghcr.io/elastisys/fluentd,
-            ghcr.io/elastisys/logical-backup,
-            ghcr.io/kubereboot/kured,
-            quay.io/jetstack/cert-manager-cainjector,
-            quay.io/jetstack/cert-manager-controller,
-            quay.io/jetstack/cert-manager-webhook,
-            quay.io/kiwigrid/k8s-sidecar,
-            quay.io/prometheus-operator/prometheus-operator,
-            quay.io/prometheus/prometheus,
-            quay.io/spotahome/redis-operator,
-            registry.k8s.io/ingress-nginx/kube-webhook-certgen,
-            registry.k8s.io/kube-state-metrics/kube-state-metrics,
-            registry.opensource.zalan.do/acid/postgres-operator,
-            registry.opensource.zalan.do/acid/spilo-14
+      append: true
+      condition: or (
+            container.image.repository in (trusted_image_repositories)
           ) or (
-            k8s.ns.name = "kube-system"
+              proc.cmdline = "kubectl get rolebindings --all-namespaces -o json"
           ) or (
-            k8s.ns.name = 'ingress-nginx' and
-            k8s.pod.name startswith 'ingress-nginx-controller-' and
-            proc.cmdline startswith 'nginx-ingress-c'
-          ) or (
-            k8s.ns.name = 'velero' and
-            k8s.pod.name startswith 'node-agent-' and
-            proc.cmdline = 'velero node-agent server'
+            proc.cmdline startswith "kubectl patch secret -n argocd-system argocd-manager-config -p"
           )
-        )
-    - macro: user_expected_system_procs_network_activity_conditions
-      condition: (
-          container.image.repository in (
-            ghcr.io/elastisys/compliantkubernetes-apps-log-manager,
-            registry.opensource.zalan.do/acid/spilo-14
-          ) or
-          (container.image.repository = docker.io/library/redis and proc.cmdline = 'sh -c sleep 5 && redis-server /redis/redis.conf') or
-          (k8s.pod.name startswith 'rfs-' and ((container.image.repository=docker.io/library/redis and (proc.cmdline='sh -c redis-cli -h $(hostname) -p 26379 ping')))) or
-          (container.image.repository = quay.io/calico/cni and proc.cmdline = 'install')
-        )
-    - macro: user_known_create_files_below_dev_activities
-      condition: (
-          (
-            container.image.repository = registry.k8s.io/sig-storage/csi-attacher and
-            proc.cmdline startswith csi-attacher
-          ) or (
-            container.image.repository = registry.k8s.io/sig-storage/csi-provisioner and
-            proc.cmdline startswith csi-provisioner
-          ) or (
-            container.image.repository = registry.k8s.io/sig-storage/csi-resizer and
-            proc.cmdline startswith csi-resizer
-          ) or (
-            container.image.repository = registry.k8s.io/sig-storage/csi-snapshotter and
-            proc.cmdline startswith csi-snapshotter
-          )
-        )
-    - macro: user_known_db_spawned_processes
-      condition: (
-          (container.image.repository = registry.opensource.zalan.do/acid/spilo-14 and proc.cmdline glob 'sh -c envdir "/run/etc/wal-e.d/env" /scripts/restore_command.sh *') or
-          (container.image.repository = registry.opensource.zalan.do/acid/spilo-15 and (proc.cmdline glob 'sh -c envdir "/run/etc/wal-e.d/env" timeout "0" /scripts/restore_command.sh *'))
-        )
-    - macro: user_known_k8s_client_container_parens
-      condition: (
-          container.image.repository in (
-            docker.io/bitnami/kubectl,
-            docker.io/openpolicyagent/gatekeeper-crds
-          ) or
-          (k8s.ns.name = "tekton-pipelines" and k8s.pod.name startswith upgrade) or
-          (container.image.repository = ghcr.io/elastisys/argocd-managed-namespaces-manager and proc.cmdline startswith 'kubectl patch secret -n argocd-system argocd-manager-config') or
-          (k8s.ns.name = argocd-system and k8s.pod.name startswith argocd-managed-namespaces-manager- and proc.cmdline = 'kubectl get rolebindings --all-namespaces -o json')
-        )
-    - macro: user_known_write_monitored_dir_conditions
-      condition: (
-            k8s.ns.name = "tekton-pipelines" and k8s.pod.name startswith upgrade
-        )
-    - macro: user_known_modify_bin_dir_activities
-      condition: (
-          container.image.repository = registry.k8s.io/dns/k8s-dns-node-cache and
-          proc.pcmdline = 'iptables /usr/sbin/iptables --version' and
-          proc.cmdline startswith 'rm -f /usr/sbin/ip'
-        )
-    - macro: user_known_mount_in_privileged_containers
-      condition: (
-          container.image.repository in (
-            docker.io/k8scloudprovider/cinder-csi-plugin
-          ) or (
-            container.image.repository=quay.io/cephcsi/cephcsi and proc.cmdline startswith 'mount -t ext4 -o bind,_netdev'
-          )
-        )
-    - macro: user_privileged_containers
-      condition: (
-          (container.image.repository = docker.io/rook/ceph and proc.cmdline = 'tini -- /usr/local/bin/rook copy-binaries --copy-to-dir /rook') or
-          (container.image.repository = docker.io/ceph/ceph and proc.cmdline startswith container) or
-          (container.image.repository = quay.io/cephcsi/cephcsi and proc.cmdline startswith container) or
-          (container.image.repository = quay.io/cephcsi/cephcsi and proc.cmdline startswith cephcsi) or
-          (container.image.repository = quay.io/ceph/ceph and proc.cmdline startswith container) or
-          (container.image.repository = quay.io/ceph/ceph and proc.cmdline startswith 'rook cmd-reporter') or
-          (container.image.repository = k8s.gcr.io/sig-storage/csi-provisioner and proc.cmdline startswith container) or
-          (container.image.repository = registry.k8s.io/sig-storage/csi-snapshotter and proc.cmdline startswith 'csi-snapshotter --csi-address=unix:///csi/csi-provisioner.sock') or
-          (container.image.repository = ghcr.io/elastisys/logical-backup and proc.cmdline startswith container) or
-          (container.image.repository = ghcr.io/elastisys/logical-backup and proc.cmdline = 'dump.sh bash /dump.sh') or
-          (container.image.repository = ghcr.io/elastisys/logical-backup and proc.cmdline = 'bash /dump.sh')
-        )
-    - macro: user_known_contact_k8s_api_server_activities
-      condition: (
-          (container.image.repository = docker.io/ceph/ceph and proc.cmdline = 'rook ceph osd provision') or
-          (container.image.repository = quay.io/ceph/ceph and proc.cmdline = 'rook ceph osd provision') or
-          (container.image.repository = docker.io/rook/ceph and proc.cmdline = 'rook ceph operator') or
-          (container.image.repository = docker.io/ceph/ceph and proc.cmdline startswith 'rook cmd-reporter') or
-          (container.image.repository = quay.io/ceph/ceph and proc.cmdline startswith 'rook cmd-reporter') or
-          (container.image.repository = k8s.gcr.io/sig-storage/csi-attacher and proc.cmdline startswith 'csi-attacher') or
-          (container.image.repository = k8s.gcr.io/sig-storage/csi-provisioner and proc.cmdline startswith 'csi-provisioner') or
-          (k8s.ns.name = "tekton-pipelines" and k8s.pod.name startswith upgrade) or
-          (proc.cmdline = 'kube-webhook-ce create --host=ingress-nginx-controller-admission,ingress-nginx-controller-admission.ingress-nginx.svc --namespace=ingress-nginx --secret-name=ingress-nginx-admission') or
-          (container.image.repository = ghcr.io/zalando/spilo-15 and proc.cmdline = 'patroni /usr/local/bin/patroni /home/postgres/postgres.yml') or
-          (container.image.repository = ghcr.io/zalando/spilo-15 and proc.cmdline = 'patronictl /usr/local/bin/patronictl show-config') or
-          (container.image.repository = quay.io/argoproj/argocd and proc.cmdline = argocd-applicat) or
-          (k8s.ns.name = argocd-system and k8s.pod.name startswith argocd-managed-namespaces-manager- and proc.cmdline = 'kubectl get rolebindings --all-namespaces -o json')
-        )
-    - macro: user_known_package_manager_in_container
-      condition: (
-          container.image.repository in (
-            ghcr.io/elastisys/curl-jq,
-            ghcr.io/elastisys/fluentd,
-            registry.k8s.io/dns/k8s-dns-node-cache
-          ) or
-          (container.image.repository = registry.k8s.io/kube-proxy and proc.cmdline startswith update-alternat)
-        )
+
     - macro: user_known_stand_streams_redirect_activities
       condition: (
           (container.image.repository = quay.io/calico/node and proc.name = calico-node) or
           (container.image.repository = registry.k8s.io/dns/k8s-dns-node-cache and proc.name = node-cache)
         )
-    - macro: user_known_write_below_etc_activities
-      condition: (
-          (container.image.repository = docker.io/goharbor/harbor-core and proc.name = cp) or
-          (container.image.repository = docker.io/goharbor/harbor-exporter and proc.name = cp) or
-          (container.image.repository = docker.io/goharbor/harbor-jobservice and proc.name = cp) or
-          (container.image.repository = docker.io/goharbor/harbor-registryctl and proc.name = cp) or
-          (container.image.repository = docker.io/goharbor/registry-photon and proc.name = cp) or
-          (container.image.repository = docker.io/goharbor/trivy-adapter-photon and proc.name = cp) or
-          (container.image.repository = quay.io/calico/node and proc.name = cp) or
-          (container.image.repository = quay.io/kiwigrid/k8s-sidecar and proc.cmdline = 'python -u /app/sidecar.py') or
-          (container.image.repository = quay.io/prometheus-operator/prometheus-config-reloader and proc.name = prometheus-conf) or
-          (container.image.repository = registry.k8s.io/dns/k8s-dns-node-cache and proc.name = node-cache) or
-          (container.image.repository = quay.io/ceph/ceph and proc.cmdline = 'rook ceph osd provision') or
-          (container.image.repository = docker.io/ceph/ceph and proc.cmdline = 'rook ceph osd provision') or
-          (container.image.repository = docker.io/rook/ceph and proc.cmdline = 'toolbox.sh -e /usr/local/bin/toolbox.sh') or
-          (container.image.repository = docker.io/ceph/ceph and proc.cmdline = 'tini -- /rook/rook ceph osd provision') or
-          (container.image.repository = quay.io/cephcsi/cephcsi and proc.cmdline startswith cephcsi) or
-          (container.image.repository = registry.opensource.zalan.do/acid/spilo-14) or
-          (container.image.repository = ghcr.io/zalando/spilo-15 and proc.cmdline = 'python3 /scripts/configure_spilo.py all') or
-          (container.image.repository = ghcr.io/zalando/spilo-15 and proc.cmdline = 'sh /launch.sh')
-        )
-    - macro: user_known_write_below_root_activities
-      condition: (
-          (container.image.repository = ghcr.io/elastisys/logical-backup and proc.name = aws) or
-          (container.image.repository = ghcr.io/zalando/spilo-15 and proc.cmdline = 'sh /launch.sh')
-        )
-    - macro: user_sensitive_mount_containers
-      condition: (
-          container.image.repository in (
-            ghcr.io/aquasecurity/node-collector,
-            quay.io/prometheus/node-exporter
-          )
-        )
-    - macro: user_trusted_containers
-      condition: (
-          container.image.repository in (
-            docker.io/elastisys/calico-accountant,
-            docker.io/k8scloudprovider/cinder-csi-plugin,
-            docker.io/opensearchproject/opensearch,
-            docker.io/velero/velero,
-            ghcr.io/kubereboot/kured,
-            quay.io/calico/cni,
-            quay.io/calico/pod2daemon-flexvol,
-            registry.k8s.io/dns/k8s-dns-node-cache,
-            registry.k8s.io/kube-proxy,
-            registry.opensource.zalan.do/acid/spilo-14
-          ) or (
-            container.image.repository=ghcr.io/elastisys/curl-jq and k8s.pod.name startswith opensearch-
-          )
-        )
-    - macro: allowed_clear_log_files
-      condition: (
-          (fd.name startswith "/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/" and proc.cmdline = container) or
-          (fd.name glob "/var/lib/containerd/tmpmounts/containerd-mount*/var/log/dpkg.log" and proc.cmdline = containerd) or
-          (fd.name glob "/var/lib/containerd/tmpmounts/containerd-mount*/var/log/yum.log" and proc.cmdline = containerd) or
-          (fd.name glob "/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/*/fs/var/log/yum.log" and proc.cmdline = containerd) or
-          (fd.name glob "/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/*/fs/var/log/dpkg.log" and proc.cmdline = containerd)
-        )
+
+    - macro: user_known_read_sensitive_files_activities
+      condition: ( container.image.repository = ghcr.io/zalando/spilo-15 )
+
     - macro: user_shell_container_exclusions
-      condition: (
-          (container.image.repository = registry.opensource.zalan.do/acid/spilo-14 and proc.cmdline glob 'sh -c envdir "/run/etc/wal-e.d/env" /scripts/restore_command.sh *') or
-          (container.image.repository = docker.io/library/rabbitmq and proc.cmdline = 'sh -c "/usr/local/lib/erlang/erts-13.0.4/bin/epmd" -daemon')
-        )
-    - macro: user_known_shell_config_modifiers
-      condition: (
-          (fd.name startswith "/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/" and proc.cmdline = containerd) or
-          (fd.name glob "/var/lib/containerd/tmpmounts/containerd-mount*/root/.bashrc" and proc.cmdline = containerd) or
-          (fd.name glob "/var/lib/containerd/tmpmounts/containerd-mount*/root/.profile" and proc.cmdline = containerd) or
-          (fd.name glob "/var/lib/containerd/tmpmounts/containerd-mount*/etc/skel/.bash_logout" and proc.cmdline = containerd) or
-          (fd.name glob "/var/lib/containerd/tmpmounts/containerd-mount*/etc/skel/.bashrc" and proc.cmdline = containerd) or
-          (fd.name glob "/var/lib/containerd/tmpmounts/containerd-mount*/etc/skel/.profile" and proc.cmdline = containerd) or
-          (fd.name glob "/var/lib/containerd/tmpmounts/containerd-mount*/etc/skel/.bash_profile" and proc.cmdline = containerd)
-        )
-    - macro: user_expected_terminal_shell_in_container_conditions
-      condition: (
-        (container.image.repository = ghcr.io/zalando/spilo-15 and proc.cmdline = bash)
-        )
-    - macro: user_known_ingress_remote_file_copy_activities
-      condition: (
-          proc.cmdline = 'curl --retry 3 -w %{http_code} -o /dev/null -sk https://localhost/healthz'
-        )
-    - list: known_binaries_to_read_environment_variables_from_proc_files
-      append: true
-      items: [systemd-run, rook, udevadm]
-    - list: known_drop_and_execute_containers
-      append: true
-      items:
-        - ghcr.io/elastisys/calico-accountant # when .calicoAccountant.backend = nftables
+      condition: ( container.image.repository in (trusted_image_repositories) )
 falcosidekick:
   enabled: {{ .Values.falco.alerts.enabled }}
   config:
