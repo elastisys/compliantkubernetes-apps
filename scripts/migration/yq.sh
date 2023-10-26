@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+# warning: only shows consistent results on anything that is not a map
+yq_dig() {
+  if [[ "${#}" -lt 2 ]] || [[ ! "${1}" =~ ^(common|sc|wc)$ ]]; then
+    log_fatal "usage: yq_dig <sc|wc> <target>"
+  fi
+
+  yq4 ea "explode(.) | ${2} | select(. != null) | {\"wrapper\": .} as \$item ireduce ({}; . * \$item) | .wrapper | ... comments=\"\"" "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/${1}-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
+}
+
 yq_null() {
   if [[ "${#}" -lt 2 ]] || [[ ! "${1}" =~ ^(common|sc|wc)$ ]]; then
     log_fatal "usage: yq_null <common|sc|wc> <target>"
@@ -13,7 +22,7 @@ yq_check() {
     log_fatal "usage: yq_check <common|sc|wc> <target> <value>"
   fi
 
-  test "$(yq4 "$2" "$CK8S_CONFIG_PATH/$1-config.yaml")" = "$3"
+  test "$(yq4 "${2}" "$CK8S_CONFIG_PATH/${1}-config.yaml")" = "${3}"
 }
 
 yq_copy() {
@@ -57,7 +66,7 @@ yq_add() {
   fi
 
   log_info "  - add: ${3} to ${2}"
-  yq4 -i "$2 = $3" "$CK8S_CONFIG_PATH/$1-config.yaml"
+  yq4 -i "${2} = ${3}" "$CK8S_CONFIG_PATH/${1}-config.yaml"
 }
 
 yq_remove() {

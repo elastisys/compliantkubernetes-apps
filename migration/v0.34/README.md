@@ -167,6 +167,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.34/apply/30-delete-obsolete-ns.sh execute
     ```
 
+1. Unmanage the user-alertmanager secret:
+
+    ```bash
+    ./migration/v0.34/apply/70-unmanage-user-alertmanager-secret.sh execute
+    ```
+
 1. Upgrade applications:
 
     ```bash
