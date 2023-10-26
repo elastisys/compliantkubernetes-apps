@@ -128,6 +128,14 @@ hnc:
   ## Extra excluded namespace, here we should add the namespaces that are more likely to change
   excludedExtraNamespaces: []
 
+  ## Additional resources to enable opt-in propagation for.
+  ## Objects that should be propagated must have one of the annotations listed here https://github.com/kubernetes-sigs/hierarchical-namespaces/blob/master/docs/user-guide/how-to.md#limit-the-propagation-of-an-object-to-descendant-namespaces
+  additionalAllowPropagateResources: []
+    ## examples:
+    ## - resource: secrets
+    ## - resource: networkpolicies
+    ##   group: networking.k8s.io
+
   ## Annotations that will be stripped from propagated objects
   unpropagatedAnnotations: []
 

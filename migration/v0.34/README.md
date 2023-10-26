@@ -147,18 +147,24 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
+1. Apply the new kube-prometheus-stack CRDs:
+
+    ```bash
+    ./migration/v0.34/apply/11-prometheus-operator-crds.sh execute
+    ```
+
+1. Apply the new HNC CRDs:
+
+    ```bash
+    ./migration/v0.34/apply/12-hnc-crds.sh execute
+    ```
+
 1. Rerun bootstrap:
 
     ```bash
     ./bin/ck8s bootstrap {sc|wc}
     # or
     ./migration/v0.34/apply/20-bootstrap.sh execute
-    ```
-
-1. Apply the new kube-prometheus-stack CRDs:
-
-    ```bash
-    ./migration/v0.30/apply/11-prometheus-operator-crds.sh execute
     ```
 
 1. Delete obsolete namespaces:

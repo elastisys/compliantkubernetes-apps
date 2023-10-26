@@ -37,3 +37,8 @@ webhookDeployment:
 serviceMonitor:
   relabelings:
     {{- toYaml .Values.hnc.serviceMonitor.relabelings | nindent 4 }}
+
+additionalAllowPropagateResources:
+  {{- with .Values.hnc.additionalAllowPropagateResources }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}

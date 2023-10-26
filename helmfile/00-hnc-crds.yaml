@@ -13,4 +13,6 @@ releases:
   disableValidationOnInstall: true
   chart: ./charts/hnc/config-and-crds
   version: 0.1.0
+  values:
+  - values/hnc/controller.yaml.gotmpl
 {{- end }}
