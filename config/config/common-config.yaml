@@ -401,20 +401,9 @@ prometheus:
     storage:
       predictLinear:
         - hours: 24
-          freeSpacePercentage: 30
+          freeSpacePercentage: 5
           severity: warning
-          for: 1h
-          pattern:
-            include:
-              node: ".*"
-              disk: ".*"
-            exclude:
-              node: ""
-              disk: ""
-        - hours: 4
-          freeSpacePercentage: 15
-          severity: critical
-          for: 1h
+          for: 2h
           pattern:
             include:
               node: ".*"
@@ -423,7 +412,7 @@ prometheus:
               node: ""
               disk: ""
       space:
-        - freeSpacePercentage: 5
+        - freeSpacePercentage: 20
           severity: warning
           for: 30m
           pattern:
@@ -433,7 +422,7 @@ prometheus:
             exclude:
               node: ""
               disk: ""
-        - freeSpacePercentage: 3
+        - freeSpacePercentage: 10
           severity: critical
           for: 30m
           pattern:
@@ -448,17 +437,6 @@ prometheus:
         - hours: 24
           freeSpacePercentage: 40
           severity: warning
-          for: 1h
-          pattern:
-            include:
-              node: ".*"
-              disk: ".*"
-            exclude:
-              node: ""
-              disk: ""
-        - hours: 4
-          freeSpacePercentage: 20
-          severity: critical
           for: 1h
           pattern:
             include:
