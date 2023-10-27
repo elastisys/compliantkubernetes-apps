@@ -35,12 +35,26 @@ The destination bucket will be created automatically if it does not exists alrea
 With `<encrypted-bucket>` being the name of the encrypted bucket to restore, `<restored-bucket>` being the bucket to restore to, and `<prefix>` being the destination S3 service (`default` or `backup`):
 
 ```bash
-SOURCE="encrypt-<encrypted-bucket>:" DESTINATION="<prefix>:<restored-bucket>" envsubst < ./scripts/restore-sync-encrypt/template.job.yaml | ./bin/ck8s ops kubectl sc apply -f -
+SOURCE="encrypt-<encrypted-bucket>:" DESTINATION="<prefix>:<restored-bucket>" envsubst < ./scripts/restore-sync/template.job.yaml | ./bin/ck8s ops kubectl sc apply -f -
 ```
 
 > Important here that the value set for `SOURCE` is prefixed with `encrypt-` and ends with `:`!
 >
 > Make sure that the two buckets have separate names when restoring into the off-site S3 service!
+
+### Encrypted and Object lock enabled
+
+With `<encrypted-bucket>` being the name of the encrypted and object locked bucket to restore, `<restored-bucket>` being the bucket to restore to, and `<prefix>` being the destination S3 service (`default` or `backup`):
+
+```bash
+SOURCE="encrypt-<encrypted-bucket>,version_at="<version-timestamp>":" DESTINATION="<prefix>:<restored-bucket>" envsubst < ./scripts/restore-sync/template.job.yaml | ./bin/ck8s ops kubectl sc apply -f -
+```
+
+> Important here that the value set for `SOURCE` is prefixed with `encrypt-` and ends with `:`!
+>
+> Make sure that the two buckets have separate names when restoring into the off-site S3 service!
+>
+> You can find the `version-timestamp` using `aws --endpoint https://<s3-endpoint-url> s3api list-object-versions --bucket <encrypted-bucket>`
 
 ### Unencrypted
 
