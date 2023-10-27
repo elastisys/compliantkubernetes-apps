@@ -1,0 +1,18 @@
+{{- if .Values.autoscalingMonitoring.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "autoscaling-monitoring.fullname" . }}
+  labels:
+    {{- include "autoscaling-monitoring.labels" . | nindent 4 }}
+spec:
+  endpoints:
+  - interval: 30s
+    port: metrics
+  namespaceSelector:
+    matchNames:
+    - capi-cluster
+  selector:
+    matchLabels:
+      {{- include "autoscaling-monitoring.selectorLabels" . | nindent 6 }}
+{{- end }}
