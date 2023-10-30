@@ -10,12 +10,28 @@ Tests implemented with `cypress` can and will be integrated into the `bats` test
 
 > [!warning]
 > Known issue that tests requiring use of `docker` or `podman` cannot run within the test container.
+>
+> Additionally tests running in the test container might hang on interrupts, requiring the container to be killed.
+
+The tests differentiate between static and dynamic tests, all static tests can be run without setting up an environment, and all dynamic tests requires an environment to test.
+Static tests are tagged with `static`.
+
+The `tests / unit-static` workflow on GitHub is invoked with the following commands:
+
+```bash
+make build-unit
+make ctr-run-unit-static
+```
 
 ### Usage with Makefile
 
 > [!note]
 > You can also use `make build`, then `make ctr-<command>` to run each command in a container, skip `make ctr-dep` as they are integrated into the image.
 > You must rebuild the image for it to contain your changes.
+>
+> If you get errors from `bats` about tags then you `bats` version is to old, either update or run in the container.
+>
+> If you get warnings from `docker` about that the "legacy builder is deprecated" then you need to setup [`buildx`](https://docs.docker.com/go/buildx) on your system.
 >
 > The container might struggle to prompt for kube-login and gpg-agent, but if those are activated before by accessing the clusters and using gpg then the session can be reused.
 
@@ -50,6 +66,8 @@ Run selected tests:
 make run-<unit|regression|integration|end-to-end>
 ```
 
+Additionally tests can be filtered via tags using the `-<tags,...>` suffix to the `run-<target>` command.
+
 Run individual tests:
 
 ```bash
@@ -81,6 +99,8 @@ bats -r <unit|regression|integration|end-to-end>
 # files
 bats <path/to/file.bats>
 ```
+
+Additionally tests can be filtered via tags using the `--filter-tags <tags,...>` argument.
 
 ### Usage with `cypress`
 
@@ -151,6 +171,23 @@ The base for the format is as follows:
 ```yaml
 # required: name of the test suite
 name: test suite name
+# optional: tags to apply to all tests in the file
+tagsFile:
+  - static
+
+# optional: functions to render
+functions:
+  setup_file: |-
+    function body for setup_file
+  teardown_file: |-
+    function body for teardown_file
+  setup: |-
+    function body for setup
+  teardown: |-
+    function body for teardown
+  # <declaration>: |-
+  #   <definition>
+
 # required: list of the tests
 tests:
     # required: list of clusters the test applies to, renders down to use "with_kubeconfig <cluster>"

@@ -12,9 +12,7 @@ render_args() {
   local cluster="${1:-}"
   local args="${2:-}"
 
-  if [[ -z "${cluster}" ]]; then
-    log_fatal "render args: missing cluster"
-  elif [[ -z "${args#[]}" ]]; then
+  if [[ -z "${args#[]}" ]]; then
     # no args to render
     return
   fi
@@ -22,6 +20,9 @@ render_args() {
   readarray -t args_arr <<< "$(jq -c '.[]' <<< "${args}")"
   for arg in "${args_arr[@]}"; do
     if [[ "${arg}" =~ ^\"\. ]]; then
+      if [[ -z "${cluster}" ]]; then
+        log_fatal "render args: missing cluster"
+      fi
       # reference argument
       echo -n " \"\$(yq_dig \"${cluster}\" ${arg})\""
     else
@@ -36,11 +37,11 @@ render_conditions() {
   local cluster="${1:-}"
   local conditions="${2:-}"
 
-  if [[ -z "${cluster}" ]]; then
-    log_fatal "render conditions: missing cluster"
-  elif [[ -z "${conditions#[]}" ]]; then
+  if [[ -z "${conditions#[]}" ]]; then
     # no conditions to render
     return
+  elif [[ -z "${cluster}" ]]; then
+    log_fatal "render conditions: missing cluster"
   fi
 
   readarray -t conditions_arr <<< "$(jq -c '.[]' <<< "${conditions}")"
@@ -59,15 +60,15 @@ render_test() {
   local target="${5:-}"
   local args="${6:-}"
 
-  if [[ -z "${clusters#[]}" ]]; then
-    log_fatal "render test: missing clusters"
-  elif [[ -z "${namespaces#[]}" ]]; then
-    log_fatal "render test: missing namespaces"
-  elif [[ -z "${function}" ]]; then
+  if [[ -z "${function}" ]]; then
     log_fatal "render test: missing function"
   elif [[ -z "${target}" ]]; then
     log_fatal "render test: missing target"
   fi
+
+  local identifier
+
+  identifier="${name} - $(sed -e 's/_/ /g' -e 's/.*\.//' <<< "${function}")"
 
   readarray -t clusters_arr <<< "$(jq -c '.[]' <<< "${clusters}")"
   for cluster in "${clusters_arr[@]}"; do
@@ -76,13 +77,17 @@ render_test() {
       echo ""
       # TODO: Set with flag
       if [ "${foreach:-[]}" != "[]" ]; then
-        echo "@test \"${name} - ${function//_/ } - ${cluster//\"/} / ${namespace//\"/} / ${target} - $(jq -r .[0] <<< "${args}")\" {"
+        echo "@test \"${identifier} - ${cluster//\"/} / ${namespace//\"/} / ${target} - $(jq -r .[0] <<< "${args}")\" {"
       else
-        echo "@test \"${name} - ${function//_/ } - ${cluster//\"/} / ${namespace//\"/} / ${target}\" {"
+        echo "@test \"${identifier} - ${cluster//\"/} / ${namespace//\"/} / ${target}\" {"
       fi
       render_conditions "${cluster}" "${conditions}"
-      echo "  with_kubeconfig ${cluster}"
-      echo "  with_namespace ${namespace}"
+      if [[ -n "${cluster}" ]]; then
+        echo "  with_kubeconfig ${cluster}"
+      fi
+      if [[ -n "${namespace}" ]]; then
+        echo "  with_namespace ${namespace}"
+      fi
       echo ""
       echo "  ${function} \"${target}\"$(render_args "${cluster}" "${args}")"
       echo "}"
@@ -133,6 +138,7 @@ render_tests() {
         # With foreach set emit tests for each as first argument with regular args after
         if [[ "${foreach:-[]}" != "[]" ]]; then
           for args in $(jq .[] <<< "${foreach}"); do
+            echo -en "\n# bats test_tags=${args//\"/}"
             render_test "${clusters:-[]}" "${namespaces:-[]}" "[${conditions:-}]" "${function:-}" "${stage}" "$(jq -c "[${args}] + (.args // [])" <<< "${test}")"
           done
         # Without foreach set emit test with regular args
@@ -160,11 +166,25 @@ main() {
 
   echo '#!/usr/bin/env bats'
   echo ''
-  echo 'setup() {'
-  echo '  load "../common/lib"'
-  echo ''
-  echo '  common_setup'
-  echo '}'
+
+  read -r tags_file < <(yq4 '.tagsFile // [] | join(",")' "${file}")
+  if [[ -n "${tags_file}" ]]; then
+    echo "# bats file_tags=${tags_file}"
+    echo
+  fi
+
+  readarray -t functions < <(yq4 '.functions // [] | keys | .[] // ""' "${file}")
+  if [[ -n "${functions[*]}" ]]; then
+    for function in "${functions[@]}"; do
+      echo "${function}() {"
+      readarray -t lines < <(yq4 ".functions.${function} // \"\"" "${file}")
+      for line in "${lines[@]}"; do
+        echo "  ${line}"
+      done
+      echo '}'
+      echo
+    done
+  fi
 
   name="$(yq4 '.name' "${file}")"
   if [[ -z "${name}" ]]; then

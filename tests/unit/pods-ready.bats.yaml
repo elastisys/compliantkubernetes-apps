@@ -1,4 +1,10 @@
 name: pods ready
+functions:
+  setup: |-
+    load "../common/lib"
+
+    common_setup
+
 tests:
   - clusters: [ sc, wc ]
     function: test_deployment

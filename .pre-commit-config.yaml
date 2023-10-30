@@ -13,16 +13,16 @@ repos:
       - id: detect-private-key
         exclude: ^helmfile/upstream/|^pipeline/sops-pgp-setup.bash$
       - id: end-of-file-fixer
-        exclude: ^helmfile/upstream/
+        exclude: ^helmfile/upstream/|^tests/.*/resources/
       - id: trailing-whitespace
-        exclude: ^helmfile/upstream/|^pipeline/resources/
+        exclude: ^helmfile/upstream/|^tests/.*/resources/
 
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
     rev: 2.7.1
     hooks:
       - id: editorconfig-checker
         name: check indentation
-        exclude: ^.gitmodules$|^helmfile/upstream/|^helmfile/charts/grafana-dashboards/dashboards/|^LICENSE$|^pipeline/resources/
+        exclude: ^.gitmodules$|^helmfile/upstream/|^helmfile/charts/grafana-dashboards/dashboards/|^LICENSE$|^tests/.*/resources/
 
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
     rev: 3.0.0
@@ -50,6 +50,7 @@ repos:
       - id: shellcheck
         name: check scripts
         exclude: ^helmfile/upstream/|^helmfile/charts/opensearch/configurer/files/configurer.sh$
+        require_serial: true
         args:
         - --color=always
         - --external-sources

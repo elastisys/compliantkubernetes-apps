@@ -1,0 +1,48 @@
+name: tests
+
+on:
+  pull_request:
+    branches:
+      - main
+      - release-*
+
+jobs:
+  unit-static:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        tag:
+          - general
+          - baremetal
+          - citycloud
+          - elastx
+          - exoscale
+          - safespring
+          - upcloud
+    steps:
+      - name: checkout compliantkubernetes-apps
+        uses: actions/checkout@v4
+      - name: setup docker with buildx
+        uses: docker/setup-buildx-action@v3
+      - name: build tests container image
+        uses: docker/build-push-action@v5
+        with:
+          build-args: |
+            CK8S_TESTS_BUILD=true
+            UID=1001
+            GID=121
+          cache-from: type=gha
+          context: .
+          target: unit
+          file: ./tests/Dockerfile
+          load: true
+          pull: false
+          push: false
+          tags: compliantkubernetes-apps-tests:unit
+      - name: run static unit tests
+        working-directory: ./tests
+        env:
+          CI: true
+          CK8S_TESTS_STATIC: true
+        run: make ctr-run-unit-static,${{ matrix.tag }}

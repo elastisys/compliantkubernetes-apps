@@ -5,6 +5,8 @@ if [[ -z "${ROOT:-}" ]]; then
 fi
 export ROOT
 
+export PATH="${ROOT}/bin:${PATH}"
+
 log_error() {
   echo "error: ${FUNCNAME[1]}: ${1:-}" >&2
 }
@@ -19,6 +21,8 @@ common_setup() {
   load "${ROOT}/tests/common/bats/detik/lib/detik.bash"
   load "${ROOT}/tests/common/bats/detik/lib/linter.bash"
   load "${ROOT}/tests/common/bats/detik/lib/utils.bash"
+  load "${ROOT}/tests/common/bats/file/load.bash"
+  load "${ROOT}/tests/common/bats/mock/load.bash"
   load "${ROOT}/tests/common/bats/support/load.bash"
 
   if [[ -z "${CK8S_CONFIG_PATH:-}" ]]; then
@@ -123,6 +127,19 @@ yq_dig() {
   else
     echo "${3:-}"
   fi
+}
+
+# usage: yq_set <config-file> <config-key> <value>
+yq_set() {
+  if ! [[ "${1:-}" =~ ^(common|sc|wc)$ ]]; then
+    fail "invalid or missing config file argument"
+  elif [[ -z "${2:-}" ]]; then
+    fail "missing config key argument"
+  elif [[ -z "${3:-}" ]]; then
+    fail "missing value argument"
+  fi
+
+  yq4 -i "${2} = ${3}" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
 }
 
 # usage: yq_secret <config-key> <default>
