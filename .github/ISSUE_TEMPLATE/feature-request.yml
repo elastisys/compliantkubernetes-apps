@@ -1,0 +1,39 @@
+name: Feature Request
+description: Create a feature request to help us improve Compliant Kubernetes
+labels: feature
+body:
+  - type: textarea
+    attributes:
+      label: Proposed feature
+      description: The what and the why
+      placeholder: |
+        Clear and concise description of the feature you would like and the problem it will solve.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Proposed alternatives
+      placeholder: |
+        Clear and concise description of the alternatives you have considered.
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: |
+        Any additional information about the feature request here.
+
+        Include screenshots if applicable to help explain.
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Definition of done
+      description: Testable conditions for when this feature can be considered completed
+      placeholder: |
+        - [ ] Conditions...
+    validations:
+      required: true

@@ -1,0 +1,30 @@
+name: General Issue
+description: Create a general issue to help us improve Compliant Kubernetes
+body:
+  - type: textarea
+    attributes:
+      label: Description
+      description: The what and the why
+      placeholder: |
+        Clear and concise description of the goal for this issue and why it is needed.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: |
+        Any additional information about the feature request here.
+
+        Include screenshots if applicable to help explain.
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Definition of done
+      description: Testable conditions for when this issue can be considered completed
+      placeholder: |
+        - [ ] Conditions...
+    validations:
+      required: true
