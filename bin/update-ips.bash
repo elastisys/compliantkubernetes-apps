@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# This script checks the IPs that are setup for network policies and reports the diff
-# If set to update the config, it will also update the config files.
+# This script synchronizes the network policy configuration.
 
-# Usage: update-ips.bash <cluster> <action>
-#   cluster: What cluster config to check for (sc, wc or both)
-#   action: If the script should update the config or not (update or dry-run)
+# Usage: update-ips.bash <cluster> <apply|dry-run>
+#   cluster: What cluster config to check for (sc, wc or both).
+#   apply: Update the config.
+#   dry-run: Output the diff, don't update the config.
 
 set -euo pipefail
 
@@ -13,103 +13,218 @@ here="$(dirname "$(readlink -f "$0")")"
 # shellcheck source=bin/common.bash
 source "${here}/common.bash"
 
-CHECK_CLUSTER="${1}" # sc, wc or both
-DRY_RUN=true
+check_cluster="${1}" # sc, wc or both
+dry_run=true
 if [[ "${2}" == "apply" ]]; then
-  DRY_RUN=false
+  dry_run=false
 fi
 has_diff=0
 
+# Get the value of the config option or the provided default value if the
+# config option is unset.
+#
+# Usage: yq_read <cluster> <config_option> <default_value>
+yq_read() {
+  local cluster="${1}"
+  local config_option="${2}"
+  local default_value="${3}"
 
-# Usage: diff_cidrs <config_key> <config_file> <cidrs>...
-# Compares the given list of cidrs with the cidrs configured in the config (with implicit diff return code).
-# If DRY_RUN is set it will output to stdout, else to null
-diff_cidrs() {
-  local config_key="${1}"
-  local config_file="${2}"
-  local cidrs=("${@:3}")
+  local value
 
-  if $DRY_RUN; then
-    out_file=/dev/stdout
+  for config_file in "${config["override_${cluster}"]}" \
+                      "${config["override_common"]}" \
+                      "${config["default_${cluster}"]}" \
+                      "${config["default_common"]}"
+  do
+    value=$(yq4 "${config_option}" "${config_file}")
+
+    if [[ "${value}" != "null" ]]; then
+      echo "${value}"
+      return
+    fi
+  done
+
+  echo "${default_value}"
+}
+
+# Get the value of the secrets config option or the provided default value if
+# the secrets config option is unset.
+#
+# Usage: yq_read_secret <config_option> <default_value>
+yq_read_secret() {
+  local config_option="${1}"
+  local default_value="${2}"
+
+  local value
+  value=$(sops -d "${secrets["secrets_file"]}" | yq4 "${config_option}")
+
+  if [[ "${value}" != "null" ]]; then
+    echo "${value}"
+    return
+  fi
+
+  echo "${default_value}"
+}
+
+# Execute a yq expression on a config file.
+#
+# Usage: yq_eval <config_file> <config_option> <expression>
+yq_eval() {
+  local config_file="${1}"
+  local config_option="${2}"
+  local expression="${3}"
+
+  local config_filename="${config_file//${CK8S_CONFIG_PATH}\//}"
+
+  local out
+  if ${dry_run}; then
+    out=/dev/stdout
   else
-    out_file=/dev/null
+    out=/dev/null
   fi
 
-  # use diff return implicitly
   diff -U3 --color=always \
-    --label "${config_file//${CK8S_CONFIG_PATH}\//}" <(yq4 -P "${config_key}"' // [] | sort' "${config_file}") \
-    --label expected <(yq4 -P 'split(" ") | sort' <<< "${cidrs[*]}") > "${out_file}"
-}
+      --label "${config_filename}" <(yq4 -P "${config_file}") \
+      --label expected <(yq4 -P "${expression}" "${config_file}") > "${out}" && return
 
-# Usage: update_cidrs <config key> <config file> <cidrs>
-update_cidrs() {
-  local config_key="${1}"
-  local config_file="${2}"
-  local cidrs=("${@:3}")
-
-  local ips
-  ips="$(yq4 -oj 'split(" ") | sort' <<< "${cidrs[*]}")"
-
-  yq4 -i "${config_key} = ${ips}" "${config_file}"
-}
-
-# Fetches the IPs from a specified address
-# Usage: getDNSIPs <dns_record>
-getDNSIPs() {
-  local IPS
-  mapfile -t IPS < <(dig +short "${1}" | grep '^[.0-9]*$')
-  if [ ${#IPS[@]} -eq 0 ]; then
-    log_error "No ips for ${1} was found"
-    exit 1
+  if ${dry_run}; then
+    log_warning "Diff found for ${config_option} in ${config_filename} (diff shows actions needed to be up to date)"
+  else
+    yq4 -i "${expression}" "${config_file}"
   fi
-  echo "${IPS[@]}"
+
+  has_diff=$((has_diff + 1))
 }
 
-# Fetches the Internal IP and calico tunnel ip of kubernetes nodes using the label selector.
-# If label selector isn't specified, all nodes will be returned.
-getKubectlIPs() {
-  local IPS_internal
-  local IPS_calico
-  local IPS
-  local label_argument=""
-  if [[ "${2}" != "" ]]; then
-    label_argument="-l ${2}"
-  fi
-  mapfile -t IPS_internal < <("${here}/ops.bash" kubectl "${1}" get node "${label_argument}" -ojsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')
-  mapfile -t IPS_calico < <("${here}/ops.bash" kubectl "${1}" get node "${label_argument}" -ojsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4IPIPTunnelAddr}')
-  mapfile -t IPS_wireguard < <("${here}/ops.bash" kubectl "${1}" get node "${label_argument}" -ojsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4WireguardInterfaceAddr}')
-  read -r -a IPS <<<"${IPS_internal[*]} ${IPS_calico[*]} ${IPS_wireguard[*]}"
-  if [ ${#IPS[@]} -eq 0 ]; then
-    log_error "No ips for ${1} nodes with labels ${2} was found"
-    exit 1
-  fi
-  echo "${IPS[@]}"
+# Determine if Swift is enabled in the configuration.
+swift_enabled() {
+  [ "$(yq_read "sc" '.harbor.persistence.type' "false")" = "swift" ] && return 0
+  [ "$(yq_read "sc" '.thanos.objectStorage.type' "false")" = "swift" ] && return 0
+  for source_type in $(yq_read "sc" '.objectStorage.sync.buckets.[].sourceType' ""); do
+    [ "${source_type}" = "swift" ] && return 0
+  done
+  return 1
 }
 
-# Usage: checkIfDiffAndUpdateDNSIPs <dns_record> <config key> <config file>
-checkIfDiffAndUpdateDNSIPs() {
-  local dns_record="${1}"
-  local config_key="${2}"
-  local config_file="${3}"
-
-  local -a ips
-  readarray -t ips <<<"$(getDNSIPs "${dns_record}" | tr ' ' '\n')"
-
-  checkIfDiffAndUpdateIPs "${config_key}" "${config_file}" "${ips[@]}"
+# Determine if Rsync is enabled in the configuration.
+rsync_enabled() {
+  [ "$(yq_read "sc" '.objectStorage.sync.enabled' "false")" = "true" ] && \
+    [ "$(yq_read "sc" '.networkPolicies.rcloneSync.enabled' "false")" = "true" ]
 }
 
-checkIfDiffAndUpdateKubectlIPs() {
+# Fetch the InternalIP, Calico tunnel IP and Wireguard IP of Kubernetes
+# nodes using a label selector.
+#
+# If the label selector isn't specified, all nodes will be returned.
+#
+# Usage: get_kubectl_ips <cluster> <label>
+get_kubectl_ips() {
   local cluster="${1}"
   local label="${2}"
-  local config_key="${3}"
-  local config_file="${4}"
+
+  local label_argument=""
+  if [[ "${label}" != "" ]]; then
+    label_argument="-l ${label}"
+  fi
+
+  local -a ips_internal
+  local -a ips_calico
+  local -a ips_wireguard
+  mapfile -t ips_internal < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')
+  mapfile -t ips_calico < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4IPIPTunnelAddr}')
+  mapfile -t ips_wireguard < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4WireguardInterfaceAddr}')
 
   local -a ips
-  readarray -t ips <<< "$(getKubectlIPs "${cluster}" "${label}" | tr ' ' '\n')"
+  read -r -a ips <<< "${ips_internal[*]} ${ips_calico[*]} ${ips_wireguard[*]}"
 
-  checkIfDiffAndUpdateIPs "${config_key}" "${config_file}" "${ips[@]}"
+  if [ ${#ips[@]} -eq 0 ]; then
+    log_error "No IPs for ${cluster} nodes with label ${label} was found"
+    exit 1
+  fi
+
+  echo "${ips[@]}"
 }
 
+# Fetch the IPs from a domain.
+#
+# Usage: get_dns_ips <domain>
+get_dns_ips() {
+  local domain="${1}"
+
+  local -a ips
+  mapfile -t ips < <(dig +short "${domain}" | grep '^[.0-9]*$')
+  if [ ${#ips[@]} -eq 0 ]; then
+    log_error "No IPs for ${domain} was found"
+    exit 1
+  fi
+  echo "${ips[@]}"
+}
+
+# Fetch the Swift URL.
+get_swift_url() {
+  local auth_url
+  local os_token
+  local swift_url
+  local swift_region
+  local response
+
+  auth_url="$(yq_read "sc" '.objectStorage.swift.authUrl' "")"
+  swift_region="$(yq_read "sc" '.objectStorage.swift.region' "")"
+
+  if [ -n "$(yq_read_secret '.objectStorage.swift.username' "")" ]; then
+    response=$(curl -i -s -H "Content-Type: application/json" -d '
+        {
+          "auth": {
+            "identity": {
+              "methods": ["password"],
+              "password": {
+                "user": {
+                  "name": "'"$(yq_read_secret '.objectStorage.swift.username' '""')"'",
+                  "domain": { "name": "'"$(yq_read "sc" '.objectStorage.swift.domainName' '""')"'" },
+                  "password": "'"$(yq_read_secret '.objectStorage.swift.password' '""')"'"
+                }
+              }
+            },
+            "scope": {
+              "project": {
+                "name": "'"$(yq_read "sc" '.objectStorage.swift.projectName' '""')"'",
+                "domain": { "name": "'"$(yq_read "sc" '.objectStorage.swift.projectDomainName' '""')"'" }
+              }
+            }
+          }
+        }' "${auth_url}/auth/tokens")
+  elif [ -n "$(yq_read_secret '.objectStorage.swift.applicationCredentialID' "")" ]; then
+    response=$(curl -i -s -H "Content-Type: application/json" -d '
+        {
+          "auth": {
+            "identity": {
+              "methods": ["application_credential"],
+              "application_credential": {
+                "id": "'"$(yq_read_secret '.objectStorage.swift.applicationCredentialID' '""')"'",
+                "secret": "'"$(yq_read_secret '.objectStorage.swift.applicationCredentialSecret' '""')"'"
+              }
+            }
+          }
+        }' "${auth_url}/auth/tokens")
+  fi
+
+  os_token=$(echo "${response}" | grep -oP "x-subject-token:\s+\K\S+")
+  swift_url=$(echo "${response}" | tail -n +15 | jq -r '.[].catalog[] | select( .type == "object-store" and .name == "swift") | .endpoints[] | select(.interface == "public" and .region == "'"${swift_region}"'") | .url')
+
+  curl -i -s -X DELETE -H "X-Auth-Token: ${os_token}" -H "X-Subject-Token: ${os_token}" "${auth_url}/auth/tokens" >/dev/null
+
+  echo "${swift_url}"
+}
+
+# Sort IP addresses.
+#
+# For example, [1.0.0.10, 1.0.0.2] would be reordered to [1.0.0.2, 1.0.0.10].
+sort_ips() {
+  python3 -c "import ipaddress; import sys; ips = [ipaddress.ip_address(ip) for ip in sys.argv[1:]]; ips.sort(); [print(ip) for ip in ips]" "${@}"
+}
+
+# Check if an IP address is part of a CIDR address block.
+#
 # Usage: check_ip_in_cidr <ip> <cidr>
 check_ip_in_cidr() {
   local ip="${1}"
@@ -118,21 +233,23 @@ check_ip_in_cidr() {
   python3 -c "import ipaddress; exit(0) if ipaddress.ip_address('${ip}') in ipaddress.ip_network('${cidr}') else exit(1)"
 }
 
-# Usage: process_ips_to_cidrs <config key> <config file> <ips>...
-# return cidrs that are filtered so:
-# 1. old cidr entries are returned with existing suffix if it contains new ips
-# 2. new cidr entries are returned with a /32 suffix
-# 3. returned cidrs are sorted and unique
+# Returns CIDRs that are filtered so that:
+# 1. Old CIDR entries are returned with existing suffix if it contains new IPs.
+# 2. New CIDR entries are returned with a /32 suffix.
+# 3. Returned CIDRs are sorted and unique.
+#
+# Usage: process_ips_to_cidrs <config_file> <config_option> <ip> [<ip> ...]
 process_ips_to_cidrs() {
-  local config_key="${1}"
-  local config_file="${2}"
+  local config_file="${1}"
+  local config_option="${2}"
+  shift 2
 
   local -a new_cidrs
   local -a old_cidrs
 
-  readarray -t old_cidrs <<< "$(yq4 "${config_key} | .[]" "${config_file}")"
+  readarray -t old_cidrs <<< "$(yq4 "${config_option} | .[]" "${config_file}")"
 
-  for ip in "${@:3}"; do
+  for ip in "${@}"; do
     for cidr in "${old_cidrs[@]}"; do
       if [[ "${cidr}" != "" ]] && ! [[ "${cidr}" =~ .*/32 ]] && check_ip_in_cidr "${ip}" "${cidr}"; then
         new_cidrs+=("${cidr}")
@@ -143,368 +260,280 @@ process_ips_to_cidrs() {
     new_cidrs+=("${ip}/32")
   done
 
-  yq4 'split(" ") | sort | unique | .[]' <<< "${new_cidrs[@]}"
+  yq4 'split(" ") | unique | .[]' <<< "${new_cidrs[@]}"
 }
 
-# checkIfDiffAndUpdateIPs <config_key> <config_file> <ips>...
-checkIfDiffAndUpdateIPs() {
-  local config_key="${1}"
-  local config_file="${2}"
-  shift 2
-  local -a ips=("$@")
-
-  local cidrs
-  cidrs="$(process_ips_to_cidrs "${config_key}" "${config_file}" "${ips[@]}")"
-
-  if ! diff_cidrs "${config_key}" "${config_file}" "${cidrs}"; then
-    if ! $DRY_RUN; then
-      update_cidrs "${config_key}" "${config_file}" "${cidrs}"
-    else
-      log_warning "Diff found for ${config_key} in ${config_file//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
-    fi
-    has_diff=$((has_diff + 1))
-  fi
+# Parse the host from an URL.
+parse_url_host() {
+  echo "${1}" | sed 's/https\?:\/\///' | sed 's/[:\/].*//'
 }
 
-# checkIfDiffAndUpdatePorts <yaml_path> <file_path> <port 1> <port ..>
-checkIfDiffAndUpdatePorts() {
-  yaml_path="${1}"
-  file="${2}"
+# Parse the port from an URL.
+#
+# Usage: parse_url_port <url> <default_port>
+parse_url_port() {
+  port="$(echo "${1}" | sed 's/https\?:\/\///' | sed 's/[A-Za-z.0-9-]*:\?//' | sed 's/\/.*//')"
+  [ -z "${port}" ] && port="${2}"
+  echo "${port}"
+}
+
+# Updates the configuration to allow IPs.
+#
+# Usage: allow_ips <config_file> <config_option> <ip> [<ip> ...]
+allow_ips() {
+  local config_file="${1}"
+  local config_option="${2}"
   shift 2
 
-  ports="$(echo "[$(for port in "$@"; do echo "$port,"; done)]" | yq4 -oj)"
+  local -a ips
+  readarray -t ips <<< "$(sort_ips "${@}")"
 
-  if $DRY_RUN; then
-    out=/dev/stdout
-  else
-    out=/dev/null
-  fi
+  local -a cidrs
+  readarray -t cidrs <<< "$(process_ips_to_cidrs "${config_file}" "${config_option}" "${ips[@]}")"
 
-  portDiff() {
-    diff -U3 --color=always \
-      --label "${file//${CK8S_CONFIG_PATH}\//}" <(yq4 -P "$yaml_path"' // [] | sort_by(.)' "$file") \
-      --label expected <(echo "$ports" | yq4 -P '. | sort_by(.)') >"$out"
-  }
+  local list
+  list=$(echo "[$(for v in "${cidrs[@]}"; do echo "${v},"; done)]" | yq4 -oj)
 
-  if ! portDiff; then
-    if ! $DRY_RUN; then
-      yq4 -i "$yaml_path = $ports" "$file"
-    else
-      log_warning "Diff found for $yaml_path in ${file//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
-    fi
-    has_diff=$((has_diff + 1))
-  fi
+  yq_eval "${config_file}" "${config_option}" "${config_option} = ${list}"
 }
 
-# yq_dig <cluster> <yaml_path> <default>
-yq_dig() {
-  for conf in "${config["override_$1"]}" "${config["override_common"]}" "${config["default_$1"]}" "${config["default_common"]}"; do
-    ret=$(yq4 "$2" "$conf")
+# Updates the configuration to allow ports.
+#
+# Usage: allow_ports <config_file> <config_option> <port> [<port> ...]
+allow_ports() {
+  local config_file="${1}"
+  local config_option="${2}"
+  shift 2
 
-    if [[ "$ret" != "null" ]]; then
-      echo "$ret"
-      return
-    fi
-  done
+  local ports
+  ports=$(echo "[$(for v in "${@}"; do echo "${v},"; done)]" | yq4 -oj sort)
 
-  echo "$3"
+  yq_eval "${config_file}" "${config_option}" "${config_option} = ${ports}"
 }
 
-# yq_dig_secrets <yaml_path> <default>
-yq_dig_secrets() {
-  ret=$(sops -d "${secrets["secrets_file"]}" | yq4 "$1")
+# Updates the configuration to allow the IPs of the domain.
+#
+# Usage: allow_domain <config_file> <config_option> <dns_record>
+allow_domain() {
+  local config_file="${1}"
+  local config_option="${2}"
+  local dns_record="${3}"
 
-  if [[ "$ret" != "null" ]]; then
-    echo "$ret"
+  local -a ips dns_ips
+  dns_ips=$(get_dns_ips "${dns_record}")
+  readarray -t ips <<< "$(echo "${dns_ips}" | tr ' ' '\n')"
+
+  allow_ips "${config_file}" "${config_option}" "${ips[@]}"
+}
+
+# Updates the configuration to allow the IPs of Kubernetes nodes.
+#
+# If the node label is empty all nodes are allowed.
+#
+# Usage: allow_nodes <cluster> <config_option> <node_label>
+allow_nodes() {
+  local cluster="${1}"
+  local config_option="${2}"
+  local label="${3}"
+
+  local config_file="${config["override_${cluster}"]}"
+
+  local -a ips kubectl_ips
+  kubectl_ips=$(get_kubectl_ips "${cluster}" "${label}")
+  readarray -t ips <<< "$(echo "${kubectl_ips}" | tr ' ' '\n')"
+
+  allow_ips "${config_file}" "${config_option}" "${ips[@]}"
+}
+
+# Allow object storage in the common network policy configuration.
+allow_object_storage() {
+  local cluster="${check_cluster}"
+  if [ "${check_cluster}" == "both" ]; then
+    cluster="sc"
+  fi
+
+  local url
+  local host
+  local port
+  url=$(yq_read "${cluster}" '.objectStorage.s3.regionEndpoint' "")
+  host=$(parse_url_host "${url}")
+  port=$(parse_url_port "${url}" 443)
+
+  allow_domain "${config["override_common"]}" '.networkPolicies.global.objectStorage.ips' "${host}"
+  allow_ports "${config["override_common"]}" '.networkPolicies.global.objectStorage.ports' "${port}"
+}
+
+# Allow ingresses in the common network policy configuration.
+allow_ingress() {
+  local cluster="${check_cluster}"
+  if [ "${check_cluster}" == "both" ]; then
+    cluster="sc"
+  fi
+
+  local base_domain
+  local ops_domain
+  base_domain="$(yq_read "${cluster}" '.global.baseDomain' "")"
+  ops_domain="$(yq_read "${cluster}" '.global.opsDomain' "")"
+
+  allow_domain "${config["override_common"]}" '.networkPolicies.global.scIngress.ips' "grafana.${ops_domain}"
+  allow_domain "${config["override_common"]}" '.networkPolicies.global.wcIngress.ips' "non-existing-subdomain.${base_domain}"
+}
+
+# Allow Swift object storage in the sc network policy configuration.
+allow_swift() {
+  swift_enabled || return 0
+
+  local os_auth_url
+  local os_auth_host
+  local os_auth_port
+  os_auth_url="$(yq_read "sc" '.objectStorage.swift.authUrl' "")"
+  os_auth_host=$(parse_url_host "${os_auth_url}")
+  os_auth_port=$(parse_url_port "${os_auth_url}" 5000)
+
+  local -a object_storage_swift_ips
+  local -a object_storage_swift_ports
+
+  # shellcheck disable=SC2207
+  object_storage_swift_ips+=($(get_dns_ips "${os_auth_host}"))
+  object_storage_swift_ports+=("${os_auth_port}")
+
+  local swift_url
+  local swift_host
+  local swift_port
+  swift_url="$(get_swift_url)"
+  swift_host=$(parse_url_host "${swift_url}")
+  swift_port=$(parse_url_port "${swift_url}" 443)
+
+  # shellcheck disable=SC2207
+  object_storage_swift_ips+=($(get_dns_ips "${swift_host}"))
+  object_storage_swift_ports+=("${swift_port}")
+
+  allow_ips "${config["override_sc"]}" '.networkPolicies.global.objectStorageSwift.ips' "${object_storage_swift_ips[@]}"
+  allow_ports "${config["override_sc"]}" '.networkPolicies.global.objectStorageSwift.ports' "${object_storage_swift_ports[@]}"
+}
+
+# Synchronize the Rclone sync network policy configuration.
+#
+# If the endpoint config option is unset the existing network policy
+# configuration is removed.
+#
+# Usage: sync_rclone <endpoint_config_option> <netpol_config_option>
+sync_rclone() {
+  local endpoint_config_option="${1}"
+  local netpol_config_option="${2}"
+
+  local url
+  local host
+  local port
+  url=$(yq_read "sc" "${endpoint_config_option}" "")
+  host=$(parse_url_host "${url}")
+  port=$(parse_url_port "${url}" 443)
+
+  if [ -n "${host}" ]; then
+    allow_domain "${config["override_sc"]}" "${netpol_config_option}.ips" "${host}"
+    allow_ports "${config["override_sc"]}" "${netpol_config_option}.ports" "${port}"
     return
   fi
 
-  echo "$2"
+  yq_eval "${config["override_sc"]}" "${netpol_config_option}" 'del('"${netpol_config_option}"')'
 }
 
-get_swift_url() {
-  local auth_url
-  local os_token
-  local swift_url
-  local swift_region
+# TODO: Remove when config validation is in-place.
+# https://github.com/elastisys/compliantkubernetes-apps/issues/1427
+validate_config() {
+  yq_read_required() {
+    local cluster="${1}"
+    local config_option="${2}"
 
-  auth_url="$(yq_dig 'sc' '.objectStorage.swift.authUrl' '""')"
+    local value
 
-  if [ -n "$(yq_dig_secrets '.objectStorage.swift.username' "")" ]; then
-    response=$(curl -i -s -H "Content-Type: application/json" -d '
-        {
-          "auth": {
-            "identity": {
-              "methods": ["password"],
-              "password": {
-                "user": {
-                  "name": "'"$(yq_dig_secrets '.objectStorage.swift.username' '""')"'",
-                  "domain": { "name": "'"$(yq_dig "sc" '.objectStorage.swift.domainName' '""')"'" },
-                  "password": "'"$(yq_dig_secrets '.objectStorage.swift.password' '""')"'"
-                }
-              }
-            },
-            "scope": {
-              "project": {
-                "name": "'"$(yq_dig "sc" '.objectStorage.swift.projectName' '""')"'",
-                "domain": { "name": "'"$(yq_dig "sc" '.objectStorage.swift.projectDomainName' '""')"'" }
-              }
-            }
-          }
-        }' "${auth_url}/auth/tokens")
-  elif [ -n "$(yq_dig_secrets '.objectStorage.swift.applicationCredentialID' "")" ]; then
-    response=$(curl -i -s -H "Content-Type: application/json" -d '
-        {
-          "auth": {
-            "identity": {
-              "methods": ["application_credential"],
-              "application_credential": {
-                "id": "'"$(yq_dig_secrets '.objectStorage.swift.applicationCredentialID' '""')"'",
-                "secret": "'"$(yq_dig_secrets '.objectStorage.swift.applicationCredentialSecret' '""')"'"
-              }
-            }
-          }
-        }' "${auth_url}/auth/tokens")
-  fi
+    value=$(yq_read "${cluster}" "${config_option}" "")
 
-  swift_region=$(yq_dig "sc" '.objectStorage.swift.region' '""')
-  os_token=$(echo "$response" | grep -oP "x-subject-token:\s+\K\S+")
-  swift_url=$(echo "$response" | tail -n +15 | jq -r '.[].catalog[] | select( .type == "object-store" and .name == "swift") | .endpoints[] | select(.interface == "public" and .region == "'"$swift_region"'") | .url')
-
-  curl -i -s -X DELETE -H "X-Auth-Token: $os_token" -H "X-Subject-Token: $os_token" "${auth_url}/auth/tokens" >/dev/null
-
-  echo "$swift_url"
-}
-
-if [ "${CHECK_CLUSTER}" == "both" ]; then
-  DIG_CLUSTER="sc"
-else
-  DIG_CLUSTER="wc"
-fi
-S3_ENDPOINT="$(yq_dig "${DIG_CLUSTER}" '.objectStorage.s3.regionEndpoint' '""' | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
-if [[ "${S3_ENDPOINT}" == "" ]]; then
-  log_error "No S3 endpoint found, check your common-config.yaml (or ${DIG_CLUSTER}-config.yaml)"
-  exit 1
-fi
-S3_PORT="$(yq_dig 'sc' '.objectStorage.s3.regionEndpoint' '""' | sed 's/https\?:\/\///' | sed 's/[A-Za-z.0-9-]*:\?//' | sed 's/\/.*//')"
-if [ -z "$S3_PORT" ]; then
-  S3_PORT="443"
-fi
-
-OPS_DOMAIN="$(yq_dig "${DIG_CLUSTER}" '.global.opsDomain' '""')"
-if [[ "${OPS_DOMAIN}" == "" ]]; then
-  log_error "No ops domain found, check your common-config.yaml (or ${DIG_CLUSTER}-config.yaml)"
-  exit 1
-fi
-
-BASE_DOMAIN="$(yq_dig "${DIG_CLUSTER}" '.global.baseDomain' '""')"
-if [[ "${BASE_DOMAIN}" == "" ]]; then
-  log_error "No base domain found, check your common-config.yaml (or ${DIG_CLUSTER}-config.yaml)"
-  exit 1
-fi
-
-## Add object storage ips to common config
-checkIfDiffAndUpdateDNSIPs "${S3_ENDPOINT}" ".networkPolicies.global.objectStorage.ips" "${config["override_common"]}"
-## Add object storage port to common config
-checkIfDiffAndUpdatePorts ".networkPolicies.global.objectStorage.ports" "${config["override_common"]}" "$S3_PORT"
-
-## Add sc ingress ips to common config
-checkIfDiffAndUpdateDNSIPs "grafana.${OPS_DOMAIN}" ".networkPolicies.global.scIngress.ips" "${config["override_common"]}"
-
-## Add wc ingress ips to common config
-checkIfDiffAndUpdateDNSIPs "non-existing-subdomain.${BASE_DOMAIN}" ".networkPolicies.global.wcIngress.ips" "${config["override_common"]}"
-
-## Add sc apiserver ips
-if [[ "${CHECK_CLUSTER}" =~ ^(sc|both)$ ]]; then
-  checkIfDiffAndUpdateKubectlIPs "sc" "node-role.kubernetes.io/control-plane=" ".networkPolicies.global.scApiserver.ips" "${config["override_sc"]}"
-fi
-
-## Add wc apiserver ips
-if [[ "${CHECK_CLUSTER}" =~ ^(wc|both)$ ]]; then
-  checkIfDiffAndUpdateKubectlIPs "wc" "node-role.kubernetes.io/control-plane=" ".networkPolicies.global.wcApiserver.ips" "${config["override_wc"]}"
-fi
-
-## Add sc nodes ips to sc config
-if [[ "${CHECK_CLUSTER}" =~ ^(sc|both)$ ]]; then
-  checkIfDiffAndUpdateKubectlIPs "sc" "" ".networkPolicies.global.scNodes.ips" "${config["override_sc"]}"
-fi
-
-## Add wc nodes ips to wc config
-if [[ "${CHECK_CLUSTER}" =~ ^(wc|both)$ ]]; then
-  checkIfDiffAndUpdateKubectlIPs "wc" "" ".networkPolicies.global.wcNodes.ips" "${config["override_wc"]}"
-fi
-
-## Add Swift to sc config
-if [[ "${CHECK_CLUSTER}" =~ ^(sc|both)$ ]]; then
-  check_harbor="$(yq_dig 'sc' '.harbor.persistence.type' 'false')"
-  check_thanos="$(yq_dig 'sc' '.thanos.objectStorage.type' 'false')"
-  sourceType=$(yq4 '.objectStorage.sync.buckets.[].sourceType' "${config["override_sc"]}")
-  sourceSwift=false
-  for type in $sourceType; do
-    if [ "$type" == "swift" ]; then
-      sourceSwift=true
-    fi
-  done
-  if [ "$check_harbor" == "swift" ] || [ "$check_thanos" == "swift" ] || [ "${sourceSwift}" == "true" ]; then
-    os_auth_endpoint="$(yq_dig 'sc' '.objectStorage.swift.authUrl' '""' | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
-
-    if [ -z "$os_auth_endpoint" ]; then
-      log_error "No openstack auth endpoint found, check your sc-config.yaml"
+    if [ -z "${value}" ]; then
+      log_error "${config_option} is not configured, check your common-config.yaml (or ${cluster}-config.yaml)"
       exit 1
     fi
+  }
 
-    os_auth_port="$(yq_dig 'sc' '.objectStorage.swift.authUrl' '""' | sed 's/https\?:\/\///' | sed 's/[A-Za-z.0-9-]*:\?//' | sed 's/\/.*//')"
-
-    if [ -z "$os_auth_port" ]; then
-      os_auth_port="5000"
-    fi
-
-    object_storage_swift_ips=()
-    object_storage_swift_ports=()
-
-    # shellcheck disable=SC2207
-    object_storage_swift_ips+=($(getDNSIPs "$os_auth_endpoint"))
-    object_storage_swift_ports+=("$os_auth_port")
-
-    swift_url=$(get_swift_url)
-    swift_endpoint="$(echo "$swift_url" | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
-    swift_port="$(echo "$swift_url" | sed 's/https\?:\/\///' | sed 's/[A-Za-z.0-9-]*:\?//' | sed 's/\/.*//')"
-
-    if [ -z "$swift_port" ]; then
-      swift_port="443"
-    fi
-
-    # shellcheck disable=SC2207
-    object_storage_swift_ips+=($(getDNSIPs "$swift_endpoint"))
-    object_storage_swift_ports+=("$swift_port")
-
-    checkIfDiffAndUpdateIPs ".networkPolicies.global.objectStorageSwift.ips" "${config["override_sc"]}" "${object_storage_swift_ips[@]}"
-    checkIfDiffAndUpdatePorts ".networkPolicies.global.objectStorageSwift.ports" "${config["override_sc"]}" "${object_storage_swift_ports[@]}"
+  local cluster="${check_cluster}"
+  if [ "${check_cluster}" == "both" ]; then
+    cluster="sc"
   fi
+
+  yq_read_required "${cluster}" '.objectStorage.s3.regionEndpoint'
+  yq_read_required "${cluster}" '.global.opsDomain'
+  yq_read_required "${cluster}" '.global.baseDomain'
+
+  if swift_enabled; then
+    yq_read_required "sc" '.objectStorage.swift.authUrl'
+    yq_read_required "sc" '.objectStorage.swift.region'
+    if [ -z "$(yq_read_secret '.objectStorage.swift.username' "")" ] && [ -z "$(yq_read_secret '.objectStorage.swift.applicationCredentialID' "")" ]; then
+      log_error "No Swift username or application credential ID, check your secrets.yaml"
+      exit 1
+    fi
+  fi
+
+  rsync_enabled || return 0
+
+  local destination_s3=false
+  local destination_swift=false
+
+  local sync_default_buckets
+  local sync_destination_type
+  local harbor_persistence_type
+  local thanos_object_storage_type
+  local bucket_destination_types
+
+  sync_default_buckets="$(yq_read "sc" '.objectStorage.sync.syncDefaultBuckets' "false")"
+  sync_destination_type="$(yq_read "sc" '.objectStorage.sync.destinationType' "")"
+  harbor_persistence_type="$(yq_read "sc" '.harbor.persistence.type' "false")"
+  thanos_object_storage_type="$(yq_read "sc" '.thanos.objectStorage.type' "false")"
+  bucket_destination_types=$(yq_read "sc" '.objectStorage.sync.buckets.[].destinationType' "")
+
+  if [ "${sync_default_buckets}" == "true" ]; then
+    if [ "${harbor_persistence_type}" == "swift" ] || [ "${thanos_object_storage_type}" == "swift" ]; then
+        destination_swift=true
+    fi
+  fi
+  for bucket_type in ${bucket_destination_types}; do
+    if [ "${bucket_type}" == "swift" ]; then
+      destination_swift=true
+    elif [ "${bucket_type}" == "s3" ]; then
+      destination_s3=true
+    fi
+  done
+
+  if [ "${destination_s3}" == "true" ] || [ "${sync_destination_type}" == "s3" ]; then
+    yq_read_required "sc" ".objectStorage.sync.s3.regionEndpoint"
+  fi
+
+  if [ "${destination_swift}" == "true" ] || [ "${sync_destination_type}" == "swift" ]; then
+    yq_read_required "sc" ".objectStorage.sync.swift.authUrl"
+  fi
+}
+
+validate_config
+
+allow_object_storage
+
+allow_ingress
+
+if [[ "${check_cluster}" =~ ^(sc|both)$ ]]; then
+  allow_nodes "sc" '.networkPolicies.global.scApiserver.ips' "node-role.kubernetes.io/control-plane="
+  allow_nodes "sc" '.networkPolicies.global.scNodes.ips' ""
+
+  allow_swift
 fi
 
-## Add destination object storage ips for rclone sync to sc config
-if [ "$(yq_dig 'sc' '.objectStorage.sync.enabled' 'false')" == "true" ]; then
-  if [ "$(yq_dig 'sc' '.networkPolicies.rcloneSync.enabled' 'false')" == "true" ]; then
-    destinationSwift=false
-    check_sync_default_buckets="$(yq_dig 'sc' '.objectStorage.sync.syncDefaultBuckets' 'false')"
-    if [ "${check_sync_default_buckets}" == "true" ]; then
-      check_harbor="$(yq_dig 'sc' '.harbor.persistence.type' 'false')"
-      check_thanos="$(yq_dig 'sc' '.thanos.objectStorage.type' 'false')"
-      if [ "$check_harbor" == "swift" ] || [ "$check_thanos" == "swift" ]; then
-          destinationSwift=true
-      fi
-    fi
-    destination=$(yq4 '.objectStorage.sync.buckets.[].destinationType' "${config["override_sc"]}")
-    destinationS3=false
-    for type in $destination; do
-      if [ "$type" == "swift" ]; then
-        destinationSwift=true
-      elif [ "$type" == "s3" ]; then
-        destinationS3=true
-      fi
-    done
+if [[ "${check_cluster}" =~ ^(wc|both)$ ]]; then
+  allow_nodes "wc" '.networkPolicies.global.wcApiserver.ips' "node-role.kubernetes.io/control-plane="
+  allow_nodes "wc" '.networkPolicies.global.wcNodes.ips' ""
+fi
 
-    ifNull=""
-    S3_ENDPOINT_DST="$(yq_dig 'sc' '.objectStorage.sync.s3.regionEndpoint' "" | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
-    S3_PORT_DST="$(yq_dig 'sc' '.objectStorage.sync.s3.regionEndpoint' "" | sed 's/https\?:\/\///' | sed 's/[A-Za-z.0-9-]*:\?//' | sed 's/\/.*//')"
-
-    SWIFT_ENDPOINT_DST="$(yq_dig 'sc' '.objectStorage.sync.swift.authUrl' "" | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
-    SWIFT_PORT_DST="$(yq_dig 'sc' '.objectStorage.sync.swift.authUrl' "" | sed 's/https\?:\/\///' | sed 's/[A-Za-z.0-9-]*:\?//' | sed 's/\/.*//')"
-
-    if { [ "$destinationS3" == "true" ] && [ "$destinationSwift" != "true" ]; } || { [ "$destinationS3" != "true" ] && [ "$destinationSwift" != "true" ] && [ "$(yq_dig 'sc' '.objectStorage.sync.destinationType' 'false')" == "s3" ]; }; then
-      if [ -z "${S3_ENDPOINT_DST}" ]; then
-        log_error "No destination S3 endpoint for rclone sync found, check your sc-config.yaml"
-        exit 1
-      fi
-      if [ -z "${S3_PORT_DST}" ]; then
-        S3_PORT_DST="443"
-      fi
-      checkIfDiffAndUpdateDNSIPs "${S3_ENDPOINT_DST}" ".networkPolicies.rcloneSync.destinationObjectStorageS3.ips" "${config["override_sc"]}"
-      checkIfDiffAndUpdatePorts ".networkPolicies.rcloneSync.destinationObjectStorageS3.ports" "${config["override_sc"]}" "$S3_PORT_DST"
-      if [ -z "${SWIFT_ENDPOINT_DST}" ] && [ -z "${SWIFT_PORT_DST}" ] && [ $DRY_RUN == "true" ]; then
-        results_diff=$(diff -U0 --color=always <(yq4 -P 'sort_keys(.networkPolicies.rcloneSync.destinationObjectStorageSwift)' "${config["override_sc"]}") <(yq4 -P 'del(.networkPolicies.rcloneSync.destinationObjectStorageSwift)' "${config["override_sc"]}") --label "${config["override_sc"]//${CK8S_CONFIG_PATH}\//}" --label expected) || true
-        if [ "${results_diff}" != "" ]; then
-          printf "${results_diff}"'%s\n'
-          log_warning "Diff found for .networkPolicies.rcloneSync.destinationObjectStorageSwift in ${config[override_sc]//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
-        fi
-      elif [ -z "${SWIFT_ENDPOINT_DST}" ] && [ -z "${SWIFT_PORT_DST}" ] && [ $DRY_RUN != "true" ]; then
-        yq4 -i 'del(.networkPolicies.rcloneSync.destinationObjectStorageSwift)' "${config["override_sc"]}"
-      else
-        checkIfDiffAndUpdateDNSIPs "${SWIFT_ENDPOINT_DST}" ".networkPolicies.rcloneSync.destinationObjectStorageSwift.ips" "${config["override_sc"]}"
-        checkIfDiffAndUpdatePorts ".networkPolicies.rcloneSync.destinationObjectStorageSwift.ports" "${config["override_sc"]}" "$SWIFT_PORT_DST"
-      fi
-      ifNull=true
-    fi
-    if { [ "$destinationSwift" == "true" ] && [ "$destinationS3" != "true" ]; } || { [ "$destinationS3" != "true" ] && [ "$destinationSwift" != "true" ] && [ "$(yq_dig 'sc' '.objectStorage.sync.destinationType' 'false')" == "swift" ]; }; then
-      if [ -z "${SWIFT_ENDPOINT_DST}" ]; then
-        log_error "No destination Swift endpoint for rclone sync found, check your sc-config.yaml"
-        exit 1
-      fi
-      if [ -z "${SWIFT_PORT_DST}" ]; then
-        SWIFT_PORT_DST="443"
-      fi
-
-      if [ -z "${S3_ENDPOINT_DST}" ] && [ -z "${S3_PORT_DST}" ] && [ $DRY_RUN == "true" ]; then
-        results_diff=$(diff -U0 --color=always <(yq4 -P 'sort_keys(.networkPolicies.rcloneSync.destinationObjectStorageS3)' "${config["override_sc"]}") <(yq4 -P 'del(.networkPolicies.rcloneSync.destinationObjectStorageS3)' "${config["override_sc"]}") --label "${config["override_sc"]//${CK8S_CONFIG_PATH}\//}" --label expected) || true
-        if [ "${results_diff}" != "" ]; then
-          printf "${results_diff}"'%s\n'
-          log_warning "Diff found for .networkPolicies.rcloneSync.destinationObjectStorageS3 in ${config[override_sc]//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
-        fi
-      elif [ -z "${S3_ENDPOINT_DST}" ] && [ -z "${S3_PORT_DST}" ] && [ $DRY_RUN != "true" ]; then
-        yq4 -i 'del(.networkPolicies.rcloneSync.destinationObjectStorageS3)' "${config["override_sc"]}"
-      else
-        checkIfDiffAndUpdateDNSIPs "${S3_ENDPOINT_DST}" ".networkPolicies.rcloneSync.destinationObjectStorageS3.ips" "${config["override_sc"]}"
-        checkIfDiffAndUpdatePorts ".networkPolicies.rcloneSync.destinationObjectStorageS3.ports" "${config["override_sc"]}" "$S3_PORT_DST"
-      fi
-
-      checkIfDiffAndUpdateDNSIPs "${SWIFT_ENDPOINT_DST}" ".networkPolicies.rcloneSync.destinationObjectStorageSwift.ips" "${config["override_sc"]}"
-      checkIfDiffAndUpdatePorts ".networkPolicies.rcloneSync.destinationObjectStorageSwift.ports" "${config["override_sc"]}" "$SWIFT_PORT_DST"
-      ifNull=true
-
-    fi
-    if { [ "$destinationSwift" == "true" ] && [ "$destinationS3" == "true" ]; } || [ -z "$ifNull" ] && { [ "$(yq_dig 'sc' '.objectStorage.sync.destinationType' 'false')" == "swift" ] || [ "$(yq_dig 'sc' '.objectStorage.sync.destinationType' 'false')" == "s3" ]; }; then
-      if [ -z "${S3_ENDPOINT_DST}" ]; then
-        log_error "No destination S3 endpoint for rclone sync found, check your sc-config.yaml"
-        exit 1
-      fi
-      if [ -z "${SWIFT_ENDPOINT_DST}" ]; then
-        log_error "No destination Swift endpoint for rclone sync found, check your sc-config.yaml"
-        exit 1
-      fi
-      if [ -z "${S3_PORT_DST}" ]; then
-        S3_PORT_DST="443"
-      fi
-      if [ -z "${SWIFT_PORT_DST}" ]; then
-        SWIFT_PORT_DST="443"
-      fi
-
-      checkIfDiffAndUpdateDNSIPs "${S3_ENDPOINT_DST}" ".networkPolicies.rcloneSync.destinationObjectStorageS3.ips" "${config["override_sc"]}"
-      checkIfDiffAndUpdatePorts ".networkPolicies.rcloneSync.destinationObjectStorageS3.ports" "${config["override_sc"]}" "$S3_PORT_DST"
-
-      checkIfDiffAndUpdateDNSIPs "${SWIFT_ENDPOINT_DST}" ".networkPolicies.rcloneSync.destinationObjectStorageSwift.ips" "${config["override_sc"]}"
-      checkIfDiffAndUpdatePorts ".networkPolicies.rcloneSync.destinationObjectStorageSwift.ports" "${config["override_sc"]}" "$SWIFT_PORT_DST"
-    fi
-
-    SECONDARY_ENDPOINT="$(yq_dig 'sc' '.objectStorage.sync.secondaryUrl' "" | sed 's/https\?:\/\///' | sed 's/[:\/].*//')"
-    if [ -n "${SECONDARY_ENDPOINT}" ]; then
-      SECONDARY_PORT="$(yq_dig 'sc' '.objectStorage.sync.secondaryUrl' "" | sed 's/https\?:\/\///' | sed 's/[A-Za-z.0-9-]*:\?//' | sed 's/\/.*//')"
-      if [ -z "${SECONDARY_PORT}" ]; then
-        SECONDARY_PORT="443"
-      fi
-      checkIfDiffAndUpdateDNSIPs "${SECONDARY_ENDPOINT}" ".networkPolicies.rcloneSync.secondaryUrl.ips" "${config["override_sc"]}"
-      checkIfDiffAndUpdatePorts ".networkPolicies.rcloneSync.secondaryUrl.ports" "${config["override_sc"]}" "$SECONDARY_PORT"
-
-    elif [ -z "${SECONDARY_ENDPOINT}" ] && [ $DRY_RUN == "true" ]; then
-      results_diff=$(diff -U0 --color=always <(yq4 -P 'sort_keys(.networkPolicies.rcloneSync.secondaryUrl)' "${config["override_sc"]}") <(yq4 -P 'del(.networkPolicies.rcloneSync.secondaryUrl)' "${config["override_sc"]}") --label "${config["override_sc"]//${CK8S_CONFIG_PATH}\//}" --label expected) || true
-      if [ "${results_diff}" != "" ]; then
-        printf "${results_diff}"'%s\n'
-        log_warning "Diff found for .networkPolicies.rcloneSync.secondaryUrl in ${config[override_sc]//${CK8S_CONFIG_PATH}\//} (diff shows actions needed to be up to date)"
-      fi
-    elif [ -z "${SECONDARY_ENDPOINT}" ] && [ $DRY_RUN != "true" ]; then
-      yq4 -i 'del(.networkPolicies.rcloneSync.secondaryUrl)' "${config["override_sc"]}"
-    fi
-  fi
+if rsync_enabled; then
+  sync_rclone '.objectStorage.sync.s3.regionEndpoint' ".networkPolicies.rcloneSync.destinationObjectStorageS3"
+  sync_rclone '.objectStorage.sync.swift.authUrl' ".networkPolicies.rcloneSync.destinationObjectStorageSwift"
+  sync_rclone '.objectStorage.sync.secondaryUrl' ".networkPolicies.rcloneSync.secondaryUrl"
 fi
 
 exit ${has_diff}

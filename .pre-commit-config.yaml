@@ -22,7 +22,7 @@ repos:
     hooks:
       - id: editorconfig-checker
         name: check indentation
-        exclude: ^.gitmodules$|^helmfile/upstream/|^helmfile/charts/grafana-dashboards/dashboards/|^LICENSE$
+        exclude: ^.gitmodules$|^helmfile/upstream/|^helmfile/charts/grafana-dashboards/dashboards/|^LICENSE$|^pipeline/resources/
 
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
     rev: 3.0.0
