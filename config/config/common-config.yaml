@@ -100,6 +100,17 @@ user:
 ## Falco configuration.
 falco:
   enabled: true
+  # Available rule files and addons can be found at: https://falcosecurity.github.io/falcoctl/index.yaml
+  rulesFiles:
+    default:
+      enabled: true
+      version: 2.0.0
+    incubating:
+      enabled: false
+      version: 2.0.0
+    sandbox:
+      enabled: false
+      version: 2.0.0
 
   # Setting tty to "true" will immediately display Falco logs by flushing them as they are emitted
   tty: true
@@ -119,7 +130,7 @@ falco:
 
   ## additional falco rules
   ## ref: https://falco.org/docs/rules/
-#  customRules:
+  customRules:
 
   resources:
     limits:
