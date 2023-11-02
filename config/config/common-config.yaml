@@ -130,7 +130,12 @@ falco:
 
   ## additional falco rules
   ## ref: https://falco.org/docs/rules/
-  customRules:
+  customRules: {}
+  # my-rules-example.yaml : |-
+  # - macro: <name of macro to add/change> # possible to use rules and lists as well
+  #   append: <true/false> # if re-using an upstream macro/rule/list, append can be used to not overwrite.
+  #   condition: <add condition here>
+  #   ...
 
   resources:
     limits:
