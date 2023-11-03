@@ -57,7 +57,7 @@ spec:
                 key: etcd_cert
                 name: calico-config
           {{- end }}
-          - name: NODE_NAME
+          - name: NODENAME
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
