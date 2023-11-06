@@ -88,6 +88,7 @@ customRules:
     # Contact K8S API Server From Container
     - list: trusted_image_repositories
       items: [
+        ghcr.io/elastisys/logical-backup,
         docker.io/jaegertracing/jaeger-operator,
         quay.io/argoproj/argocd,
         docker.io/elastisys/curl-jq,
@@ -132,26 +133,45 @@ customRules:
     - macro: expected_udp_traffic
       append: true
       condition: or (
-          container.image.repository = docker.io/bitnami/fluentd
+          container.image.repository = docker.io/bitnami/fluentd or
+          container.image.repository = ghcr.io/elastisys/compliantkubernetes-apps-log-manager or
+          container.image.repository = ghcr.io/elastisys/logical-backup or
+          container.image.repository = docker.io/elastisys/rabbitmqadmin or
+          (proc.pname = systemd and proc.name = check-new-relea)
         )
     - macro: user_expected_system_procs_network_activity_conditions
       condition: (
           container.image.repository = docker.io/library/redis
+        )
+    - macro: user_privileged_containers
+      condition: (
+          container.image.repository = ghcr.io/elastisys/logical-backup
+        )
+    - macro: user_known_db_spawned_processes
+      condition: (
+          container.image.repository = ghcr.io/zalando/spilo-15
         )
     {{- end }}
     {{- if eq .Values.falco.rulesFiles.sandbox.enabled true }}
     - list: known_decode_payload_containers
       append: true
       items: [ghcr.io/aquasecurity/trivy]
+
     - macro: user_known_k8s_client_container
       append: true
       condition: or (
           container.image.repository = ghcr.io/elastisys/argocd-managed-namespaces-manager
+        ) or (
+            proc.cmdline = "kubectl get rolebindings --all-namespaces -o json"
         )
     - macro: user_known_write_etc_conditions
       append: true
       condition: or (
           container.image.repository = quay.io/prometheus-operator/prometheus-config-reloader
+        )
+    - macro: user_known_write_below_root_activities
+      condition: (
+          container.image.repository = ghcr.io/elastisys/logical-backup
         )
     {{- end }}
 
