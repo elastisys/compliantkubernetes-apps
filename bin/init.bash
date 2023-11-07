@@ -142,7 +142,7 @@ set_storage_class() {
             ;;
 
         upcloud)
-            storage_class=upcloud-block-storage
+            storage_class=standard
 
             yq4 -i '.networkPolicies.kubeSystem.upcloud.enabled = true' "${file}"
             yq4 -i '.networkPolicies.kubeSystem.upcloud.ips = ["94.237.0.0/23"]' "${file}" # api.upcloud.com
