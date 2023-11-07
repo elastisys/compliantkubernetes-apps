@@ -3,11 +3,68 @@
 This file documents all notable changes to Falco Helm Chart. The release
 numbering uses [semantic versioning](http://semver.org).
 
+## v3.8.3
+
+* Upgrade falcosidekick chart to `v0.7.7`.
+
+## v3.8.2
+
+* Upgrade falcosidekick chart to `v0.7.6`.
+
+## v3.8.1
+
+* noop change just to test the ci
+
+## v3.8.0
+
+* Upgrade Falco to 0.36.1: https://github.com/falcosecurity/falco/releases/tag/0.36.1
+* Sync values.yaml with 0.36.1 falco.yaml config file.
+
+## v3.7.1
+
+* Update readme
+
+## v3.7.0
+
+* Upgrade Falco to 0.36. https://github.com/falcosecurity/falco/releases/tag/0.36.0
+* Sync values.yaml with upstream falco.yaml config file.
+* Upgrade falcoctl to 0.6.2. For more info see the release notes: https://github.com/falcosecurity/falcoctl/releases/tag/v0.6.2
+
+## v3.6.2
+
+* Cleanup wrong files
+
+## v3.6.1
+
+* Upgrade falcosidekick chart to `v0.7.1`.
+
+## v3.6.0
+
+* Add `outputs` field to falco configuration
+
+## v3.5.0
+
+## Major Changes
+
+* Support configuration of revisionHistoryLimit of the deployment
+
+## v3.4.1
+
+* Upgrade falcosidekick chart to `v0.6.3`.
+
+## v3.4.0
+
+* Introduce an ability to use an additional volumeMounts for `falcoctl-artifact-install` and `falcoctl-artifact-follow` containers.
+
+## v3.3.1
+
+* No changes made to the falco chart, only some fixes in the makefile
+
 ## v3.3.0
 * Upgrade Falco to 0.35.1. For more info see the release notes: https://github.com/falcosecurity/falco/releases/tag/0.35.1
 * Upgrade falcoctl to 0.5.1. For more info see the release notes: https://github.com/falcosecurity/falcoctl/releases/tag/v0.5.1
 * Introduce least privileged mode in modern ebpf. For more info see: https://falco.org/docs/event-sources/kernel/#least-privileged-mode-2
- 
+
 ## v3.2.1
 * Set falco.http_output.url to empty string in values.yaml file
 

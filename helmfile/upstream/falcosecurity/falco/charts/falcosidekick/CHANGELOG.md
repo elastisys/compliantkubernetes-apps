@@ -5,6 +5,68 @@ numbering uses [semantic versioning](http://semver.org).
 
 Before release 0.1.20, the helm chart can be found in `falcosidekick` [repository](https://github.com/falcosecurity/falcosidekick/tree/master/deploy/helm/falcosidekick).
 
+## 0.7.7
+
+* Support extraArgs in the helm chart
+
+## 0.7.6
+
+* Fix the behavior with the `AWS IRSA` with a new value `aws.config.useirsa`
+* Add a section in the README to describe how to use a subpath for `Falcosidekick-ui` ingress
+* Add a `ServiceMonitor` for prometheus-operator
+* Add a `PrometheusRule` for prometheus-operator
+
+## 0.7.5
+
+* noop change just to test the ci
+
+## 0.7.4
+
+* Fix volume mount when `config.tlsserver.servercrt`, `config.tlsserver.serverkey` and `config.tlsserver.cacrt` variables are defined.
+
+## 0.7.3
+
+* Allow to set (m)TLS Server cryptographic material via `config.tlsserver.servercrt`, `config.tlsserver.serverkey` and `config.tlsserver.cacrt` variables or through `config.tlsserver.existingSecret` variables.
+
+## 0.7.2
+
+* Fix the wrong key of the secret for the user
+
+## 0.7.1
+
+* Allow to set a password `webui.redis.password` for Redis for `Falcosidekick-UI`
+* The user for `Falcosidekick-UI` is now set with an env var from a secret
+
+## 0.7.0
+
+* Support configuration of revisionHistoryLimit of the deployments
+
+## 0.6.3
+
+* Update Falcosidekick to 2.28.0
+* Add Mutual TLS Client config
+* Add TLS Server config
+* Add `bracketreplacer` config
+* Add `customseveritymap` to `alertmanager` output
+* Add Drop Event config to `alertmanager` output
+* Add `customheaders` to `elasticsearch` output
+* Add `customheaders` to `loki` output
+* Add `customheaders` to `grafana` output
+* Add `rolearn` and `externalid` for `aws` outputs
+* Add `method` to `webhook` output
+* Add `customattributes` to `gcp.pubsub` output
+* Add `region` to `pargerduty` output
+* Add `topiccreation` and `tls` to `kafka` output
+* Add `Grafana OnCall` output
+* Add `Redis` output
+* Add `Telegram` output
+* Add `N8N` output
+* Add `OpenObserver` output
+
+## 0.6.2
+
+* Fix interpolation of `SYSLOG_PORT`
+
 ## 0.6.1
 
 * Add `webui.allowcors` value for `Falcosidekick-UI`

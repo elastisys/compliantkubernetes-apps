@@ -150,6 +150,8 @@ controller:
     # -- Number of replicas when installing Falco using a deployment. Change it if you really know what you are doing.
     # For more info check the section on Plugins in the README.md file.
     replicas: 1
+    # -- Number of old history to retain to allow rollback (If not set, default Kubernetes value is set to 10)
+    # revisionHistoryLimit: 1
 
 # -- Network services configuration (scenario requirement)
 # Add here your services to be deployed together with Falco.
@@ -349,7 +351,7 @@ falcoctl:
     # -- The image repository to pull from.
     repository: falcosecurity/falcoctl
     # -- The image tag to pull.
-    tag: "0.5.1"
+    tag: "0.6.2"
   artifact:
     # -- Runs "falcoctl artifact install" command as an init container. It is used to install artfacts before
     # Falco starts. It provides them to Falco by using an emptyDir volume.
@@ -363,6 +365,9 @@ falcoctl:
       resources: {}
       # -- Security context for the falcoctl init container.
       securityContext: {}
+      # -- A list of volume mounts you want to add to the falcoctl-artifact-install init container.
+      mounts:
+        volumeMounts: []
     # -- Runs "falcoctl artifact follow" command as a sidecar container. It is used to automatically check for
     # updates given a list of artifacts. If an update is found it downloads and installs it in a shared folder (emptyDir)
     # that is accessible by Falco. Rulesfiles are automatically detected and loaded by Falco once they are installed in the
@@ -378,6 +383,9 @@ falcoctl:
       resources: {}
       # -- Security context for the falcoctl-artifact-follow sidecar container.
       securityContext: {}
+      # -- A list of volume mounts you want to add to the falcoctl-artifact-follow sidecar container.
+      mounts:
+        volumeMounts: []
   # -- Configuration file of the falcoctl tool. It is saved in a configmap and mounted on the falcotl containers.
   config:
     # -- List of indexes that falcoctl downloads and uses to locate and download artiafcts. For more info see:
@@ -395,15 +403,15 @@ falcoctl:
         # -- Do not resolve the depenencies for artifacts. By default is true, but for our use case we disable it.
         resolveDeps: false
         # -- List of artifacts to be installed by the falcoctl init container.
-        refs: [falco-rules:1]
+        refs: [falco-rules:2]
         # -- Directory where the rulesfiles are saved. The path is relative to the container, which in this case is an emptyDir
         # mounted also by the Falco pod.
         rulesfilesDir: /rulesfiles
         # -- Same as the one above but for the artifacts.
         pluginsDir: /plugins
       follow:
-      # -- List of artifacts to be followed by the falcoctl sidecar container.
-        refs: [falco-rules:1]
+        # -- List of artifacts to be followed by the falcoctl sidecar container.
+        refs: [falco-rules:2]
         # -- How often the tool checks for new versions of the followed artifacts.
         every: 6h
         # -- HTTP endpoint that serves the api versions of the Falco instance. It is used to check if the new versions are compatible
@@ -454,6 +462,47 @@ falco:
     - /etc/falco/falco_rules.yaml
     - /etc/falco/falco_rules.local.yaml
     - /etc/falco/rules.d
+
+  # [Experimental] `rule_matching`
+  #
+  # - Falco has to be performant when evaluating rules against events. To quickly
+  # understand which rules could trigger on a specific event, Falco maintains
+  # buckets of rules sharing the same event type in a map. Then, the lookup
+  # in each bucket is performed through linear search. The `rule_matching`
+  # configuration key's values are:
+  #  - "first": when evaluating conditions of rules in a bucket, Falco will stop
+  #    to evaluate rules if it finds a matching rules. Since rules are stored
+  #    in buckets in the order they are defined in the rules files, this option
+  #    could prevent other rules to trigger even if their condition is met, causing
+  #    a shadowing problem.
+  #  - "all": with this value Falco will continue evaluating all the rules
+  #    stored in the bucket, so that multiple rules could be triggered upon one
+  #    event.
+
+  rule_matching: first
+
+
+  # [Experimental] `outputs_queue`
+  #
+  # -- Falco utilizes tbb::concurrent_bounded_queue for handling outputs, and this parameter
+  # allows you to customize the queue capacity. Please refer to the official documentation:
+  # https://oneapi-src.github.io/oneTBB/main/tbb_userguide/Concurrent_Queue_Classes.html.
+  # On a healthy system with optimized Falco rules, the queue should not fill up.
+  # If it does, it is most likely happening due to the entire event flow being too slow,
+  # indicating that the server is under heavy load.
+  #
+  # `capacity`: the maximum number of items allowed in the queue is determined by this value.
+  # Setting the value to 0 (which is the default) is equivalent to keeping the queue unbounded.
+  # In other words, when this configuration is set to 0, the number of allowed items is
+  # effectively set to the largest possible long value, disabling this setting.
+  #
+  # In the case of an unbounded queue, if the available memory on the system is consumed,
+  # the Falco process would be OOM killed. When using this option and setting the capacity,
+  # the current event would be dropped, and the event loop would continue. This behavior mirrors
+  # kernel-side event drops when the buffer between kernel space and user space is full.
+  outputs_queue:
+    capacity: 0
+
 
   #################
   # Falco plugins #
@@ -584,6 +633,31 @@ falco:
   # output mechanism. By default, buffering is disabled (false).
   buffered_outputs: false
 
+  # [Stable] `outputs`
+  #
+  # -- A throttling mechanism, implemented as a token bucket, can be used to control
+  # the rate of Falco outputs. Each event source has its own rate limiter,
+  # ensuring that alerts from one source do not affect the throttling of others.
+  # The following options control the mechanism:
+  #  - rate: the number of tokens (i.e. right to send a notification) gained per
+  #    second. When 0, the throttling mechanism is disabled. Defaults to 0.
+  #  - max_burst: the maximum number of tokens outstanding. Defaults to 1000.
+  #
+  # For example, setting the rate to 1 allows Falco to send up to 1000
+  # notifications initially, followed by 1 notification per second. The burst
+  # capacity is fully restored after 1000 seconds of no activity.
+  #
+  # Throttling can be useful in various scenarios, such as preventing notification
+  # floods, managing system load, controlling event processing, or complying with
+  # rate limits imposed by external systems or APIs. It allows for better resource
+  # utilization, avoids overwhelming downstream systems, and helps maintain a
+  # balanced and controlled flow of notifications.
+  #
+  # With the default settings, the throttling mechanism is disabled.
+  outputs:
+    rate: 0
+    max_burst: 1000
+
   ##########################
   # Falco outputs channels #
   ##########################
@@ -635,6 +709,14 @@ falco:
     # -- Path to a folder that will be used as the CA certificate store. CA certificate need to be
     # stored as indivitual PEM files in this directory.
     ca_path: "/etc/ssl/certs"
+    # -- Tell Falco to use mTLS
+    mtls: false
+    # -- Path to the client cert.
+    client_cert: "/etc/ssl/certs/client.crt"
+    # -- Path to the client key.
+    client_key: "/etc/ssl/certs/client.key"
+    # -- Whether to echo server answers to stdout
+    echo: false
 
   # [Stable] `program_output`
   #

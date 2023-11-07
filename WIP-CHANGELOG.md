@@ -29,5 +29,7 @@
 ### Updated
 
 - Upgrade kube-prometheus-stack chart version from `v45.2.0` to `v49.2.0` and app version from `v0.63.0` to `v0.67.1`
+- Upgraded falco chart version from `3.3.0` to `3.8.3` and app version from `0.35.1` to `0.36.1`
+- Upgraded falco-exporter chart version from `0.9.6` to `0.9.7`
 
 ### Removed
