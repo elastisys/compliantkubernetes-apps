@@ -13,6 +13,7 @@
     sops_version: 3.8.1
     yq_version: 3.4.1
     yq4_version: 4.42.1
+    yajsv_version: 1.4.1
     pwgen_version: 2.08*
     apache2_utils_version: 2.4.*
     apt_list:
@@ -38,6 +39,10 @@
         version: "{{ yq4_version }}"
         url: https://github.com/mikefarah/yq/releases/download/v{{ yq4_version }}/yq_linux_amd64
         dest: "{{ install_path }}/yq4"
+      - command: yajsv
+        version: "{{ yajsv_version }}"
+        url: https://github.com/neilpa/yajsv/releases/download/v{{ yajsv_version }}/yajsv.linux.amd64
+        dest: "{{ install_path }}/yajsv"
 
   connection: local
   become: yes

@@ -1,0 +1,131 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+# TODO point to main branch before merge
+$id: https://github.com/elastisys/compliantkubernetes-apps/raw/ka/jsonschema/config/schemas/config.yaml
+title: Compliant Kubernetes Apps settings
+description: |
+  This describes the structure of the configuration for both the service
+  cluster and the workload cluster, but keep in mind that each configuration
+  file will contain different settings.
+$defs:
+  $comment: |
+    Location for common types of things for reuse with a reference like
+
+    ```yaml
+    thing:
+      $ref: "#/$defs/thing"
+    ```
+type: object
+required:
+  - global
+properties:
+  global:
+    title: Global options
+    description: Some common options used in various helm charts.
+    type: object
+    required:
+      - ck8sVersion
+      - ck8sCloudProvider
+      - ck8sEnvironmentName
+      - ck8sFlavor
+      - baseDomain
+      - opsDomain
+    properties:
+      ck8sVersion:
+        title: Compliant Kubernetes Apps version
+        description: |-
+          Use version number if you are exactly at a release tag.
+          Otherwise use full commit hash of current commit.
+          `any`, can be used to disable this validation.
+        type: string
+        examples:
+          - v0.42.1
+          - any
+          - 424442541a567646c232d949bad1af2b5b7cb885
+      ck8sCloudProvider:
+        type: string
+        enum:
+          - aws
+          - baremetal
+          - citycloud
+          - elastx
+          - exoscale
+          - none
+          - safespring
+          - upcloud
+      ck8sEnvironmentName:
+        title: Environment name
+        type: string
+        examples:
+          - my-ck8s-cluster
+      ck8sFlavor:
+        type: string
+        enum:
+          - prod
+          - dev
+          - air-gapped
+      baseDomain:
+        title: Base Domain
+        description: |-
+          Domain intended for ingress usage in the workload cluster
+          and to reach application developer facing services such as Grafana, Harbor and OpenSearch Dashboards.
+          E.g. with 'prod.domain.com', OpenSearch Dashboards is reached via 'opensearch.prod.domain.com'.
+        type: string
+        format: hostname
+      opsDomain:
+        description: |-
+          Domain intended for ingress usage in the service cluster and to reach
+          non-user facing services such as Thanos and OpenSearch.
+          E.g. with 'ops.prod.domain.com', OpenSearch is reached via 'opensearch.ops.prod.domain.com'.
+        type: string
+        format: hostname
+      scDomain:
+        description: If baseDomain for wc and sc are not the same, set the domain of the sc cluster.
+        type: string
+        oneOf: # Templates do not handle missing values so they must be empty strings to disable. Future FIXME?
+          - const: ""
+          - format: hostname
+      scOpsDomain:
+        description: If opsDomain for wc and sc are not the same, set the ops domain of the sc cluster.
+        type: string
+        oneOf:
+          - const: ""
+          - format: hostname
+      issuer:
+        description: |-
+          Default cert-manager issuer to use for issuing certificates for ingresses.
+          Normally one of `letsencrypt-staging` or `letsencrypt-prod`.
+        type: string
+        default: letsencrypt-staging
+        enum:
+          - letsencrypt-staging
+          - letsencrypt-prod
+      verifyTls:
+        description: Verify ingress certificates
+        type: boolean
+        default: true
+      clusterDns:
+        description: IP of the cluster DNS in kubernetes
+        type: string
+        default: 10.233.0.3
+        format: ip-address
+      clusterName:
+        type: string
+      clustersMonitoring:
+        description: |-
+          Names of the workload clusters that sends metrics to this cluster.
+          Mainly used for filtering of metrics.
+        type: array
+        items:
+          type: string
+          pattern: -[sw]c$
+      containerRuntime:
+        title: Container runtime
+        default: containerd
+        type: string
+        enum:
+          - containerd
+          - docker
+    additionalProperties: false
+additionalProperties:
+  type: object
+  properties: {}

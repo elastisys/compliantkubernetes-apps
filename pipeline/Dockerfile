@@ -61,6 +61,12 @@ RUN wget --progress=dot:giga "https://github.com/mikefarah/yq/releases/download/
     install -Tm 755 yq_linux_amd64 /usr/local/bin/yq4 && \
     rm yq_linux_amd64
 
+# yajsv
+ENV YAJSV_VERSION "v1.4.1"
+RUN wget --progress=dot:giga https://github.com/neilpa/yajsv/releases/download/${YAJSV_VERSION}/yajsv.linux.amd64 && \
+    install -Tm 755 yajsv.linux.amd64 /usr/local/bin/yajsv && \
+    rm yajsv.linux.amd64
+
 # opa
 ENV OPA_VERSION "v0.52.0"
 RUN wget --progress=dot:giga "https://github.com/open-policy-agent/opa/releases/download/${OPA_VERSION}/opa_linux_amd64" && \
