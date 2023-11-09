@@ -1,6 +1,7 @@
 name: validate
 tagsFile:
   - static
+  - validate
 functions:
   setup_file: |-
     load "../common/lib/gpg"
@@ -33,6 +34,21 @@ functions:
     run ck8s validate wc <<< $'y\n'
     assert_success
 
+  validate_schema: |-
+    env.init "${@}"
+
+    run ck8s validate wc <<< $'y\n'
+    assert_success
+
+    run yq_set 'wc' '.global.baseDomain' '"this is not a valid hostname"'
+    run ck8s validate wc <<< $'y\n'
+    assert_output --partial 'global.baseDomain'
+
+    run yq_set 'wc' '.global.baseDomain' '"this is not a valid hostname"'
+    run ck8s validate wc <<< $'y\n'
+    assert_output --partial '"this is not a valid hostname"'
+
+
   validate_template: |-
     env.init "${@}"
 
@@ -54,6 +70,12 @@ tests:
 
     tests:
       - function: validate_config # cloud flavor
+        tests:
+          - target: dev
+          - target: prod
+          - target: air-gapped
+
+      - function: validate_schema # cloud flavor
         tests:
           - target: dev
           - target: prod

@@ -113,7 +113,7 @@ check_tools() {
   warn=0
   err=0
 
-  for executable in jq yq4 s3cmd sops kubectl helm helmfile dig pwgen htpasswd; do
+  for executable in jq yq4 s3cmd sops kubectl helm helmfile dig pwgen htpasswd yajsv; do
     if ! command -v "${executable}" > /dev/null; then
       log_error "Required dependency ${executable} missing"
       err=1
@@ -288,13 +288,13 @@ load_config() {
 
     if [[ "${1}" == "sc" ]]; then
         check_config "${config[default_sc]}" "${config[override_sc]}"
-        config[config_file_sc]=$(mktemp)
+        config[config_file_sc]=$(mktemp --suffix="_sc-config.yaml")
         append_trap "rm ${config[config_file_sc]}" EXIT
         merge_config "${config[default_sc]}" "${config[override_sc]}" "${config[config_file_sc]}"
 
     elif [[ "${1}" == "wc" ]]; then
         check_config "${config[default_wc]}" "${config[override_wc]}"
-        config[config_file_wc]=$(mktemp)
+        config[config_file_wc]=$(mktemp --suffix="_wc-config.yaml")
         append_trap "rm ${config[config_file_wc]}" EXIT
         merge_config "${config[default_wc]}" "${config[override_wc]}" "${config[config_file_wc]}"
 
@@ -362,7 +362,30 @@ validate_config() {
         fi
     }
 
-    template_file=$(mktemp)
+    schema_validate() {
+        merged_config="${1}"
+        schema_file="${2}"
+
+        schema_validation_result="$(mktemp  --suffix='.txt')"
+        append_trap "rm ${schema_validation_result}" EXIT
+
+        if ! yajsv -s "${schema_file}" "${merged_config}" > "${schema_validation_result}"; then
+            log_warning "Failed schema validation:"
+            sed -r 's/^.*_(..-config\.yaml): fail: (.*)/\1: \2/; / failed validation$/q' < "${schema_validation_result}"
+            grep -oP '(?<=fail: )[^:]+' "${schema_validation_result}" | sort -u |
+            while read -r jpath; do
+              echo -n ".$jpath = "
+              yq4 -oj ".$jpath" "${merged_config}"
+            done
+            maybe_exit="true"
+        fi
+
+        if ${maybe_exit} && ! ${CK8S_AUTO_APPROVE}; then
+            ask_abort
+        fi
+    }
+
+    template_file=$(mktemp --suffix="-tpl.yaml")
     append_trap "rm ${template_file}" EXIT
 
     if [[ $1 == "sc" ]]; then
@@ -373,7 +396,9 @@ validate_config() {
             "${config_template_path}/config/sc-config.yaml" \
             > "${template_file}"
         validate "${config[config_file_sc]}" "${template_file}"
+        schema_validate "${config[config_file_sc]}" "${config_template_path}/schemas/config.yaml"
         validate "${secrets[secrets_file]}" "${config_template_path}/secrets/sc-secrets.yaml"
+        schema_validate "${secrets[secrets_file]}" "${config_template_path}/schemas/secrets.yaml"
     elif [[ $1 == "wc" ]]; then
         check_config "${config_template_path}/config/common-config.yaml" \
             "${config_template_path}/config/wc-config.yaml" \
@@ -382,7 +407,9 @@ validate_config() {
             "${config_template_path}/config/wc-config.yaml" \
             > "${template_file}"
         validate "${config[config_file_wc]}" "${template_file}"
+        schema_validate "${config[config_file_wc]}" "${config_template_path}/schemas/config.yaml"
         validate "${secrets[secrets_file]}" "${config_template_path}/secrets/wc-secrets.yaml"
+        schema_validate "${secrets[secrets_file]}" "${config_template_path}/schemas/secrets.yaml"
     else
         log_error "ERROR: usage validate_config <sc|wc>"
         exit 1

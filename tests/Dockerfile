@@ -54,6 +54,11 @@ RUN curl -LOs "https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/
     install -Tm 755 yq_linux_amd64 /usr/local/bin/yq4 && \
     rm yq_linux_amd64
 
+ENV YAJSV_VERSION "1.4.1"
+RUN curl -LOs "https://github.com/neilpa/yajsv/releases/download/v${YAJSV_VERSION}/yajsv.linux.amd64" && \
+    install -Tm 755 yajsv.linux.amd64 /usr/local/bin/yajsv && \
+    rm yajsv.linux.amd64
+
 # Match user between container and host
 
 ARG UID=1000

@@ -47,6 +47,7 @@ env.init() {
 
   yq_set 'common' '.clusterAdmin.users' '["admin@example.com"]'
 
+  yq_set 'common' '.global.issuer' '"letsencrypt-staging"'
   yq_set 'common' '.issuers.letsencrypt.prod.email' '"admin@.example.com"'
   yq_set 'common' '.issuers.letsencrypt.staging.email' '"admin@.example.com"'
 
