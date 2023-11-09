@@ -117,82 +117,32 @@ Cypress.Commands.add("continueOn", function(cluster, expression) {
     })
 })
 
-// Available as cy.dexStaticUserLogin() requires dex static login to be enabled
-Cypress.Commands.add("dexStaticUserLogin", function(username, loginUrl, cookieName) {
-  // Check if static login is enabled
+// Available as cy.dexStaticLogin()
+Cypress.Commands.add("dexStaticLogin", () => {
+  // Requires dex static login to be enabled
   cy.yqDig("sc", ".dex.enableStaticLogin")
-    .then(staticLoginEnabled => {
-      if (staticLoginEnabled !== "true") {
-        cy.fail("dexStaticLogin: requires dex static login to be enabled")
+    .should("equal", "true")
+
+  // Conditionally skip connector selection
+  cy.yqSecrets(".dex.connectors | length")
+    .then(connectors => {
+      if (connectors !== "0") {
+        cy.get("button")
+          .contains("Log in with Email")
+          .click()
       }
     })
 
-  cy.session([username, loginUrl, cookieName], () => {
-    cy.visit(loginUrl)
+  cy.yqSecrets(".dex.staticPasswordNotHashed")
+    .then(password => {
+      cy.get('input[placeholder*="email address"]')
+        .type("admin@example.com", { log: false })
 
-    // this is needed for Grafana
-    cy.title().then(($title) => {
-      if ($title === 'Grafana') {
-        cy.contains("Sign in with dex").click()
-      }
+      cy.get('input[placeholder*="password"]')
+        .type(password, { log: false })
+
+      cy.get("button")
+        .contains("Login")
+        .click()
     })
-
-    // Conditionally skip connector selection
-    cy.yqSecrets(".dex.connectors | length")
-      .then(connectors => {
-        if (connectors !== "0") {
-          cy.contains('button', 'Log in with Email').click()
-        }
-      })
-    cy.get('input#login').type(username)
-    cy.yqSecrets(".dex.staticPasswordNotHashed")
-      .then(password => {
-        // {enter} causes the form to submit
-        cy.get('input#password').type(`${password}{enter}`, { log: false })
-      })
-    // this is needed for Harbor first time login
-    cy.title().then(($title) => {
-      if ($title === 'Harbor') {
-        cy.wait(1000)
-        cy.get("body").then(($body) => {
-          const hasOidcBanner = $body[0].querySelectorAll("*[class='modal-title oidc-header-text']")
-          cy.log(hasOidcBanner)
-          if (hasOidcBanner.length > 0) {
-            cy.get('input[name=oidcUsername]').clear().type('cypress_static_user')
-            cy.contains('button', 'SAVE').click()
-          }
-        })
-      }
-    })
-    // Ensure Auth0 has redirected us back to the original URL
-    cy.url().should('include', loginUrl)
-    cy.getCookie(cookieName).should('exist')
-  },
-  )
-})
-
-// Available as cy.staticLogin("username", "password expression", "url for login", "username field name", "password field name", "path to test after login", "session cookie name")
-Cypress.Commands.add('staticLogin', (username, passwordExpression, userField, passField, loginUrl, landingPath, cookieName) => {
-  cy.session([username, passwordExpression, cookieName], () => {
-    cy.visit(loginUrl)
-
-    // this is needed for Harbor login via local db
-    cy.title().then(($title) => {
-      if ($title === 'Harbor') {
-        cy.get('[id="login-db"]').should('exist').click()
-      }
-    })
-    // ToDo the username label should be configurable
-    cy.get(`input[name=${userField}]`).type(username)
-
-    cy.yqSecrets(passwordExpression)
-      .then(password => {
-        // {enter} causes the form to submit
-        // ToDo the password label should be configurable
-        cy.get(`input[name=${passField}]`).type(`${password}{enter}`, { log: false })
-      })
-    cy.url().should('include', landingPath)
-    cy.getCookie(cookieName).should('exist')
-  },
-  )
 })
