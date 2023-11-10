@@ -85,14 +85,8 @@ merge_chunks() {
 
       echo "s3://$S3_BUCKET/$S3_PREFIX/$DAY/${FILE/$LM_TMP\//}" >> "$TMPFILE.idx"
 
-      zstd -c -d --rm "$FILE" >> "$TMPFILE.log"
-    done
-
-    echo "----- sorting chunk"
-    sort --temporary-directory="$SORT_TMP" -u -S 100M -o "$TMPFILE.log" "$TMPFILE.log"
-
-    echo "----- compressing chunk"
-    zstd --rm -o "$TMPFILE.zst" "$TMPFILE.log"
+      zstd --rm -c -d "$FILE"
+    done | sort --compress-program=zstd --temporary-directory="$SORT_TMP" -u -S 100M | zstd -o "$TMPFILE.zst"
 
     echo "----- uploading chunk"
     s3_put_chunk "$DAY/$INDEX" "$TMPFILE.zst"
@@ -103,6 +97,9 @@ merge_chunks() {
     s3_rm_chunks "$TMPFILE.idx"
 
     rm "$TMPFILE.idx"
+
+    echo "----- clearing temporary files"
+    rm -r "${LM_TMP:?}/$INDEX"
 
     SEQ=$((SEQ + 1))
   done
