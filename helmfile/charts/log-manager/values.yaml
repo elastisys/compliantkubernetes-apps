@@ -29,7 +29,7 @@ concurrencyPolicy: Forbid
 restartPolicy: Never
 
 startingDeadlineSeconds: 7200
-activeDeadlineSeconds: 7200
+activeDeadlineSeconds: 21600
 successfulJobsHistoryLimit: 1
 failedJobsHistoryLimit: 1
 backoffLimit: 0
