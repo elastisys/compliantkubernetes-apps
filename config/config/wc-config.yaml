@@ -51,6 +51,9 @@ user:
       limits:
         cpu: 50m
         memory: 100Mi
+    tolerations: []
+    affinity: {}
+    topologySpreadConstraints: []
 
   # Installs required cluster resources needed to install sealedSecrets
   # Requires that gatekeeper.allowUserCRDs.enabled is enabled.
