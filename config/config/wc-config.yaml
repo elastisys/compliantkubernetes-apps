@@ -48,6 +48,10 @@ user:
       limits:
         cpu: 50m
         memory: 100Mi
+    tolerations: []
+    affinity: {}
+    topologySpreadConstraints: []
+
 falco:
   ## Falco alerting configuration.
   alerts:
