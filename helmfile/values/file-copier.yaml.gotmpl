@@ -1,0 +1,5 @@
+# Use the same affinity as ingress-nginx controller so the files get placed on the same nodes as the controller pods run on.
+ingressNginxChroot:
+  enabled: {{ .Values.ingressNginx.controller.chroot }}
+  tolerations: {{ toYaml .Values.ingressNginx.controller.tolerations | nindent 4 }}
+  affinity: {{ toYaml .Values.ingressNginx.controller.affinity | nindent 4 }}

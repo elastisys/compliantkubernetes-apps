@@ -35,6 +35,17 @@ releases:
   values:
   - values/letsencrypt.yaml.gotmpl
 
+# file-copier
+- name: file-copier
+  namespace: kube-system
+  labels:
+    app: file-copier
+  chart: ./charts/file-copier
+  version: 0.1.0
+  installed: {{ .Values.ingressNginx.controller.chroot }}
+  values:
+  - values/file-copier.yaml.gotmpl
+
 # Ingress-nginx
 - name: ingress-nginx
   namespace: ingress-nginx
