@@ -36,6 +36,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
 ## Prerequisites
 
+- [ ] Read through the changelog to check if there are any changes you need to be aware of. Read through the release notes, Platform Administrator notices, Application Developer notices, and Security notice.
 - [ ] Notify the users (if any) before the upgrade starts;
 - [ ] Check if there are any pending changes to the environment;
 - [ ] Check the state of the environment, pods, nodes and backup jobs:
