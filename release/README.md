@@ -50,84 +50,101 @@ The following constraints apply on releases:
 
         Example of allowed patches would be for upgrading patch versions of services due to security vulnerabilities.
 
-## Major and minor releases
+## Feature freeze
 
-1. To release a major or minor version, switch to the branch you want to create the release from (probably main) and run:
+Create a release branch `release-X.Y` from the main branch.
 
-    ```bash
-    git switch main
-    release/feature-freeze-for-major-minor-release.sh vX.Y.0
-    ```
+```bash
+git switch main
+git switch -c release-X.Y
+git push -u origin release-X.Y
+```
 
-1. Now you should be on the QA branch, so now is the time to do QA and add all fixes on this branch.
+## Staging
 
-    **NOTE**: All changes made in QA should be added to `CHANGELOG.md` and **NOT** `WIP-CHANGELOG.md`.
+For patch releases, configure the list of commits that you want to backport.
 
-1. Update the Welcoming Dashboards "What's New" section
+```bash
+export CK8S_GIT_CHERRY_PICK="COMMIT-SHA [COMMIT-SHA ...]"
+```
 
-    Write about some new feature or change that is relevant for the user, e.g. for `v0.25` "- As an admin user, you can now create namespaces yourself using HNC ..."
+Stage the release.
 
-    Also remove the items in this section from two+ older minor versions, meaning if you release apps `v0.28` you can keep previous items that were added to the list in `v0.27` but remove the stuff that are from `v0.26`.
+```bash
+release/stage-release.sh X.Y.Z
+```
 
-    - Edit the [Grafana dashboard](../helmfile/charts/grafana-ops/files/welcome.md)
-    - Edit the [Opensearch dashboard](../helmfile/charts/opensearch/configurer/files/dashboards-resources/welcome.md)
+Running the script above will:
 
-1. When you're done with QA, create a PR to the release branch and merge it.
+- Create a staging branch from the release branch.
+- Cherry pick commits in `$CK8S_GIT_CHERRY_PICK`, if there are any.
+- Generate and commit the changelog.
 
-1. When the PR is merged switch to that branch and run:
+Push the staging branch and open a draft pull request to the release branch.
 
-    ```bash
-    release/create-major-minor-release.sh
-    ```
+```bash
+git push -u origin staging-X.Y.Z
+```
 
-    *When the script is done a [GitHub actions workflow pipeline](/.github/workflows/release.yml) should've created a GitHub release from that tag.*
+If there is no migration document, create one as described [here](../migration/README.md).
+If a migration document already exists, make sure that it follows [this template](../migration/template/README.md).
 
-1. If there were any changes in the QA branch the script should've prompted you with some cherry-pick commands that you should run.
-    When you've run those commands you should create a PR from this branch to main so all QA fixes is merged back to main.
+Perform QA on the staging branch.
+If any fixes are necessary, add a manual changelog entry and push them to the staging branch.
 
-1. Update public release notes.
+Update the Welcoming Dashboards "What's New" section.
 
-    When a released is published the public [user-facing release notes](https://github.com/elastisys/compliantkubernetes/blob/main/docs/release-notes/ck8s.md) needs to be updated. The new release needs to be added and the list can be trimmed down to only include the supported versions.
+Write about some new feature or change that is relevant for the user, e.g. for `v0.25` "- As an admin user, you can now create namespaces yourself using HNC ...".
 
-    Add bullet points of major changes within the cluster that affects the user. This includes any change within the cluster that may impact the user experience, for example new or updated feature, or the deprecation of features.
+Remove the items in this section from two+ older minor versions, meaning if you release apps `v0.28` you can keep previous items that were added to the list in `v0.27` but remove the stuff that are from `v0.26`.
 
-    Create two new branches `release-vX.Y` and `<personal-tag>/release-vX.Y`. Add the release notes to `<personal-tag>/release-vX.Y` and then create two PRs. One to `release-vX.Y` and one to `main`.
+- Edit the [Grafana dashboard](../helmfile/charts/grafana-ops/files/welcome.md)
+- Edit the [Opensearch dashboard](../helmfile/charts/opensearch/configurer/files/dashboards-resources/welcome.md)
 
-## Patch releases
+## Code freeze
 
-1. Check out the release branch you want to create a release for:
+When the QA process is finished the code should be in a state where it's ready to be released.
 
-    ```bash
-    git switch release-X.Y
-    ```
+Mark the staging pull request ready for review.
 
-1. Run the prepare patch command:
+## Release
 
-    ```bash
-    release/prepare-patch-release.sh vX.Y.Z
-    ```
+When the staging branch has been merged, finalize the release by tagging the HEAD of the release branch and push the tag.
 
-1. You should now be on the patch branch.
-    Cherry-pick or manually add all fixes that you want to include in the patch.
+```bash
+git switch release-X.Y
+git pull
+git tag vX.Y.Z
+git push --tags
+```
 
-1. Run reset-changelog:
+A [GitHub actions workflow pipeline](/.github/workflows/release.yml) will create a GitHub release from the tag.
 
-    ```bash
-    release/reset-changelog.sh vX.Y.Z
-    ```
+## Update public release notes
 
-1. Create a PR into the release branch and merge it.
+When a release is published the public [user-facing release notes](https://github.com/elastisys/compliantkubernetes/blob/main/docs/release-notes/ck8s.md) needs to be updated.
+The new release needs to be added and the list can be trimmed down to only include the supported versions.
 
-1. When the PR is merged, switch to that branch and run:
+```bash
+release/generate-release-notes.sh X.Y.Z
+```
 
-    ```bash
-    git switch release-X.Y
-    release/create-patch-release.sh vX.Y.Z
-    ```
+The public release notes are aimed towards application developers.
+Remove irrelevant entries and/or reword entries so that they are easy to understand for the application developers.
 
-    *When the script is done a [GitHub actions workflow pipeline](/.github/workflows/release.yml) should've created a GitHub release from that tag.*
+## Update the main branch
 
-1. Follow the major/minor release from step 6 to update the public release notes.
+Port the changelog and all applicable fixes done in the QA process to the main branch.
 
-> [!WARNING]
-> At the end in the github main page you will see a message like `release-X.Y had recent pushes * minutes ago` and the option to `Compare & pull request` --> Ignore this! Do not create a PR to push back to main!
+```bash
+git switch main
+git pull
+git switch -c port-X.Y.Z
+git cherry-pick [changelog commit SHA]
+git cherry-pick [fix1 commit SHA]
+git cherry-pick [fix2 commit SHA]
+git cherry-pick [fixN commit SHA]
+git push -u origin port-X.Y.Z
+```
+
+Open a pull request to the main branch.
