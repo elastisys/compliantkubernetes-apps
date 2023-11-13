@@ -6,6 +6,9 @@ constraints:
       allow:
         allowedCapabilities:
           - NET_BIND_SERVICE
+        {{- if .Values.ingressNginx.controller.chroot }}
+          - SYS_CHROOT
+        {{- end }}
         {{- if .Values.ingressNginx.controller.useHostPort }}
         hostNetworkPorts: true
         {{- end }}

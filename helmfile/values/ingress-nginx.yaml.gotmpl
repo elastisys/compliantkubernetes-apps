@@ -122,6 +122,23 @@ controller:
     serviceMonitor:
       enabled: true
 
+  {{- if .Values.ingressNginx.controller.chroot }}
+  image:
+    chroot: true
+  containerSecurityContext:
+    seccompProfile:
+      type: Localhost
+      localhostProfile: profiles/ingress-nginx-chroot.json
+    capabilities:
+      drop:
+      - ALL
+      add:
+      - NET_BIND_SERVICE
+      - SYS_CHROOT
+    runAsUser: 101
+    allowPrivilegeEscalation: true
+  {{- end }}
+
 ## Default 404 backend
 ##
 defaultBackend:

@@ -565,6 +565,11 @@ ingressNginx:
     ## ref: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
     additionalConfig: {}
 
+    # If 'true', nginx will run in a 'chroot' in the controller container.
+    # Note that this also allows the container to use the 'SYS_ADMIN' capability
+    # as well as changing the ingress-nginx namespace to privileged.
+    chroot: false
+
   defaultBackend:
     resources:
       requests:
