@@ -12,8 +12,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Only on release branch
+        run: for branch in $(git branch -r --contains tags/${GITHUB_REF_NAME}); do [[ "${branch}" =~ release-.* ]] && exit 0; done; exit 1
+      - name: Get minor version
+        id: minor_version
+        run: echo ::set-output name=VERSION::$(echo "${{ github.ref_name }}" | sed 's/v\(.*\)\.[0-9]*$/\1/')
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           body: |
-            See [CHANGELOG.md](https://github.com/elastisys/compliantkubernetes-apps/blob/${{ github.ref_name }}/CHANGELOG.md) for details.
+            See [CHANGELOG](https://github.com/elastisys/compliantkubernetes-apps/blob/${{ github.ref_name }}/changelog/${{ steps.minor_version.outputs.VERSION }}.md) for details.
