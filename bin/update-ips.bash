@@ -161,17 +161,21 @@ get_dns_ips() {
 }
 
 # Fetch the Swift URL.
+#
+# Usage: get_swift_url <swift_config_option>
 get_swift_url() {
+  local swift_config_option="${1}"
+
   local auth_url
   local os_token
   local swift_url
   local swift_region
   local response
 
-  auth_url="$(yq_read "sc" '.objectStorage.swift.authUrl' "")"
-  swift_region="$(yq_read "sc" '.objectStorage.swift.region' "")"
+  auth_url="$(yq_read "sc" "${swift_config_option}.authUrl" "")"
+  swift_region="$(yq_read "sc" "${swift_config_option}.region" "")"
 
-  if [ -n "$(yq_read_secret '.objectStorage.swift.username' "")" ]; then
+  if [ -n "$(yq_read_secret "${swift_config_option}.username" "")" ]; then
     response=$(curl -i -s -H "Content-Type: application/json" -d '
         {
           "auth": {
@@ -179,29 +183,29 @@ get_swift_url() {
               "methods": ["password"],
               "password": {
                 "user": {
-                  "name": "'"$(yq_read_secret '.objectStorage.swift.username' '""')"'",
-                  "domain": { "name": "'"$(yq_read "sc" '.objectStorage.swift.domainName' '""')"'" },
-                  "password": "'"$(yq_read_secret '.objectStorage.swift.password' '""')"'"
+                  "name": "'"$(yq_read_secret "${swift_config_option}.username" '""')"'",
+                  "domain": { "name": "'"$(yq_read "sc" "${swift_config_option}.domainName" '""')"'" },
+                  "password": "'"$(yq_read_secret "${swift_config_option}.password" '""')"'"
                 }
               }
             },
             "scope": {
               "project": {
-                "name": "'"$(yq_read "sc" '.objectStorage.swift.projectName' '""')"'",
-                "domain": { "name": "'"$(yq_read "sc" '.objectStorage.swift.projectDomainName' '""')"'" }
+                "name": "'"$(yq_read "sc" "${swift_config_option}.projectName" '""')"'",
+                "domain": { "name": "'"$(yq_read "sc" "${swift_config_option}.projectDomainName" '""')"'" }
               }
             }
           }
         }' "${auth_url}/auth/tokens")
-  elif [ -n "$(yq_read_secret '.objectStorage.swift.applicationCredentialID' "")" ]; then
+  elif [ -n "$(yq_read_secret "${swift_config_option}.applicationCredentialID" "")" ]; then
     response=$(curl -i -s -H "Content-Type: application/json" -d '
         {
           "auth": {
             "identity": {
               "methods": ["application_credential"],
               "application_credential": {
-                "id": "'"$(yq_read_secret '.objectStorage.swift.applicationCredentialID' '""')"'",
-                "secret": "'"$(yq_read_secret '.objectStorage.swift.applicationCredentialSecret' '""')"'"
+                "id": "'"$(yq_read_secret "${swift_config_option}.applicationCredentialID" '""')"'",
+                "secret": "'"$(yq_read_secret "${swift_config_option}.applicationCredentialSecret" '""')"'"
               }
             }
           }
@@ -384,15 +388,15 @@ allow_ingress() {
 # If the endpoint config option is unset the existing network policy
 # configuration is removed.
 #
-# Usage: sync_swift <endpoint_config_option> <netpol_config_option>
+# Usage: sync_swift <swift_config_option> <netpol_config_option>
 sync_swift() {
-  local endpoint_config_option="${1}"
+  local swift_config_option="${1}"
   local netpol_config_option="${2}"
 
   local os_auth_url
   local os_auth_host
   local os_auth_port
-  os_auth_url="$(yq_read "sc" "${endpoint_config_option}" "")"
+  os_auth_url="$(yq_read "sc" "${swift_config_option}.authUrl" "")"
 
   if [ -z "${os_auth_url}" ]; then
     yq_eval "${config["override_sc"]}" "${netpol_config_option}" 'del('"${netpol_config_option}"')'
@@ -412,7 +416,7 @@ sync_swift() {
   local swift_url
   local swift_host
   local swift_port
-  swift_url="$(get_swift_url)"
+  swift_url="$(get_swift_url "${swift_config_option}")"
   swift_host=$(parse_url_host "${swift_url}")
   swift_port=$(parse_url_port "${swift_url}" 443)
 
@@ -516,11 +520,15 @@ validate_config() {
   done
 
   if [ "${destination_s3}" == "true" ] || [ "${sync_destination_type}" == "s3" ]; then
-    yq_read_required "sc" ".objectStorage.sync.s3.regionEndpoint"
+    yq_read_required "sc" '.objectStorage.sync.s3.regionEndpoint'
   fi
 
   if [ "${destination_swift}" == "true" ] || [ "${sync_destination_type}" == "swift" ]; then
-    yq_read_required "sc" ".objectStorage.sync.swift.authUrl"
+    yq_read_required "sc" '.objectStorage.sync.swift.authUrl'
+    if [ -z "$(yq_read_secret '.objectStorage.sync.swift.username' "")" ] && [ -z "$(yq_read_secret '.objectStorage.sync.swift.applicationCredentialID' "")" ]; then
+      log_error "No RClone sync Swift username or application credential ID, check your secrets.yaml"
+      exit 1
+    fi
   fi
 }
 
@@ -535,7 +543,7 @@ if [[ "${check_cluster}" =~ ^(sc|both)$ ]]; then
   allow_nodes "sc" '.networkPolicies.global.scNodes.ips' ""
 
   if swift_enabled; then
-    sync_swift '.objectStorage.swift.authUrl' '.networkPolicies.global.objectStorageSwift'
+    sync_swift '.objectStorage.swift' '.networkPolicies.global.objectStorageSwift'
   fi
 fi
 
@@ -545,9 +553,9 @@ if [[ "${check_cluster}" =~ ^(wc|both)$ ]]; then
 fi
 
 if rsync_enabled; then
-  sync_rclone '.objectStorage.sync.s3.regionEndpoint' ".networkPolicies.rcloneSync.destinationObjectStorageS3"
-  sync_swift '.objectStorage.sync.swift.authUrl' ".networkPolicies.rcloneSync.destinationObjectStorageSwift"
-  sync_rclone '.objectStorage.sync.secondaryUrl' ".networkPolicies.rcloneSync.secondaryUrl"
+  sync_rclone '.objectStorage.sync.s3.regionEndpoint' '.networkPolicies.rcloneSync.destinationObjectStorageS3'
+  sync_swift '.objectStorage.sync.swift' '.networkPolicies.rcloneSync.destinationObjectStorageSwift'
+  sync_rclone '.objectStorage.sync.secondaryUrl' '.networkPolicies.rcloneSync.secondaryUrl'
 fi
 
 exit ${has_diff}
