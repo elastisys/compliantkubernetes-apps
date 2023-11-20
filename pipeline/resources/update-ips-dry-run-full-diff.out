@@ -178,22 +178,24 @@
 [[33mck8s[0m] Diff found for .networkPolicies.rcloneSync.destinationObjectStorageS3.ports in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -15,3 +15,6 @@[0m
+[36m@@ -15,3 +15,7 @@[0m
  networkPolicies:
    rcloneSync:
      enabled: "true"
 [32m+    destinationObjectStorageSwift:[0m
 [32m+      ips:[0m
 [32m+        - 127.1.0.7/32[0m
+[32m+        - 127.1.0.8/32[0m
 [[33mck8s[0m] Diff found for .networkPolicies.rcloneSync.destinationObjectStorageSwift.ips in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -15,3 +15,6 @@[0m
+[36m@@ -15,3 +15,7 @@[0m
  networkPolicies:
    rcloneSync:
      enabled: "true"
 [32m+    destinationObjectStorageSwift:[0m
 [32m+      ports:[0m
+[32m+        - 443[0m
 [32m+        - 5678[0m
 [[33mck8s[0m] Diff found for .networkPolicies.rcloneSync.destinationObjectStorageSwift.ports in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
@@ -204,7 +206,7 @@
      enabled: "true"
 [32m+    secondaryUrl:[0m
 [32m+      ips:[0m
-[32m+        - 127.1.0.8/32[0m
+[32m+        - 127.1.0.9/32[0m
 [[33mck8s[0m] Diff found for .networkPolicies.rcloneSync.secondaryUrl.ips in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
