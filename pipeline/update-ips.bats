@@ -412,6 +412,7 @@ _test_apply_rclone_sync_s3_add_swift() {
   _setup_rclone_sync_s3 "${1}"
 
   yq4 -i '.objectStorage.sync.swift.authUrl = "https://keystone.foo.dev-ck8s.com:5678"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  sops --set '["objectStorage"]["sync"]["swift"]["username"] "swift-sync-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
 
   mock_set_output "${mock_dig}" "127.0.0.5" 5 # $os_auth_host
   mock_set_output "${mock_dig}" "127.0.0.6" 6 # $swift_host
@@ -481,6 +482,7 @@ _setup_rclone_sync_swift() {
   _setup_rclone
 
   yq4 -i '.objectStorage.sync.swift.authUrl = "https://keystone.foo.dev-ck8s.com:1234"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  sops --set '["objectStorage"]["sync"]["swift"]["username"] "swift-sync-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
   yq4 -i "${1}"' = "swift"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
 
   mock_set_output "${mock_dig}" "127.0.0.4" 4 # $os_auth_host
@@ -546,6 +548,7 @@ _test_apply_rclone_sync_swift_add_s3() {
   _setup_rclone
 
   yq4 -i '.objectStorage.sync.swift.authUrl = "https://keystone.foo.dev-ck8s.com:1234"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  sops --set '["objectStorage"]["sync"]["swift"]["username"] "swift-sync-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
   yq4 -i "${1}"' = "swift"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   yq4 -i '.objectStorage.sync.s3.regionEndpoint = "https://s3.foo.dev-ck8s.com:5678"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
 
@@ -639,6 +642,7 @@ _test_apply_rclone_sync_s3_and_swift() {
 
   yq4 -i '.objectStorage.sync.s3.regionEndpoint = "https://s3.foo.dev-ck8s.com:1234"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   yq4 -i '.objectStorage.sync.swift.authUrl = "https://keystone.foo.dev-ck8s.com:5678"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  sops --set '["objectStorage"]["sync"]["swift"]["username"] "swift-sync-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
 
   mock_set_output "${mock_dig}" "127.0.0.4" 4 # $S3_ENDPOINT_DST
   mock_set_output "${mock_dig}" "127.0.0.5" 5 # $os_auth_host
@@ -782,6 +786,7 @@ _setup_full() {
   yq4 -i '.networkPolicies.rcloneSync.enabled = "true"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   yq4 -i '.objectStorage.sync.s3.regionEndpoint = "https://s3.foo.dev-ck8s.com:1234"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   yq4 -i '.objectStorage.sync.swift.authUrl = "https://keystone.foo.dev-ck8s.com:5678"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  sops --set '["objectStorage"]["sync"]["swift"]["username"] "swift-sync-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
   yq4 -i '.objectStorage.sync.secondaryUrl = "https://s3.foo.dev-ck8s.com:1234"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
 
   mock_set_output "${mock_dig}" "127.1.0.6" 6 # $S3_ENDPOINT_DST
@@ -806,4 +811,42 @@ _setup_full() {
   assert_success
 
   assert_output "$(cat "${BATS_TEST_DIRNAME}/resources/update-ips-dry-run-zero-diff.out")"
+}
+
+@test "get-swift-url" {
+  _setup_basic
+
+  yq4 -i '.harbor.persistence.type = "swift"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq4 -i '.objectStorage.swift.authUrl = "https://keystone.foo.dev-ck8s.com:5678"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq4 -i '.objectStorage.swift.region = "swift-region"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq4 -i '.objectStorage.swift.domainName = "swift-domain"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq4 -i '.objectStorage.swift.projectDomainName = "swift-project-domain"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq4 -i '.objectStorage.swift.projectName = "swift-project"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  sops --set '["objectStorage"]["swift"]["username"] "swift-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
+  sops --set '["objectStorage"]["swift"]["password"] "swift-password"' "${CK8S_CONFIG_PATH}/secrets.yaml"
+
+  mock_set_output "${mock_dig}" ""
+
+  run ck8s update-ips both apply
+
+  assert_equal "$(mock_get_call_args "${mock_curl}" 1)" "$(cat "${BATS_TEST_DIRNAME}/resources/get-swift-url.out")"
+}
+
+@test "get-swift-url sync" {
+  _setup_rclone
+
+  yq4 -i '.objectStorage.sync.destinationType = "swift"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq4 -i '.objectStorage.sync.swift.authUrl = "https://keystone.foo.dev-ck8s.com:5678"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq4 -i '.objectStorage.sync.swift.region = "swift-region"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq4 -i '.objectStorage.sync.swift.domainName = "swift-domain"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq4 -i '.objectStorage.sync.swift.projectDomainName = "swift-project-domain"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq4 -i '.objectStorage.sync.swift.projectName = "swift-project"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  sops --set '["objectStorage"]["sync"]["swift"]["username"] "swift-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
+  sops --set '["objectStorage"]["sync"]["swift"]["password"] "swift-password"' "${CK8S_CONFIG_PATH}/secrets.yaml"
+
+  mock_set_output "${mock_dig}" ""
+
+  run ck8s update-ips both apply
+
+  assert_equal "$(mock_get_call_args "${mock_curl}" 1)" "$(cat "${BATS_TEST_DIRNAME}/resources/get-swift-url.out")"
 }

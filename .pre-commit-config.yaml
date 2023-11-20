@@ -15,7 +15,7 @@ repos:
       - id: end-of-file-fixer
         exclude: ^helmfile/upstream/
       - id: trailing-whitespace
-        exclude: ^helmfile/upstream/
+        exclude: ^helmfile/upstream/|^pipeline/resources/
 
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
     rev: 2.7.1

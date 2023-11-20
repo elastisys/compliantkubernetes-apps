@@ -1,0 +1,21 @@
+-i -s -H Content-Type: application/json -d 
+        {
+          "auth": {
+            "identity": {
+              "methods": ["password"],
+              "password": {
+                "user": {
+                  "name": "swift-username",
+                  "domain": { "name": "swift-domain" },
+                  "password": "swift-password"
+                }
+              }
+            },
+            "scope": {
+              "project": {
+                "name": "swift-project",
+                "domain": { "name": "swift-project-domain" }
+              }
+            }
+          }
+        } https://keystone.foo.dev-ck8s.com:5678/auth/tokens
