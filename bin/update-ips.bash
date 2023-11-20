@@ -330,6 +330,28 @@ allow_domain() {
   allow_ips "${config_file}" "${config_option}" "${ips[@]}"
 }
 
+# Check if a string is a valid IP address.
+#
+# Usage: is_ip_address <string>
+is_ip_address() {
+  python3 -c "import ipaddress; import sys; ipaddress.ip_address(sys.argv[1])" "${1}" > /dev/null 2>&1
+}
+
+# Updates the configuration to allow the host domain or IP address.
+#
+# Usage: allow_host <config_file> <config_option> <host>
+allow_host() {
+  local config_file="${1}"
+  local config_option="${2}"
+  local host="${3}"
+
+  if is_ip_address "${host}"; then
+    allow_ips "${config_file}" "${config_option}" "${host}"
+  else
+    allow_domain "${config_file}" "${config_option}" "${host}"
+  fi
+}
+
 # Updates the configuration to allow the IPs of Kubernetes nodes.
 #
 # If the node label is empty all nodes are allowed.
@@ -363,7 +385,7 @@ allow_object_storage() {
   host=$(parse_url_host "${url}")
   port=$(parse_url_port "${url}" 443)
 
-  allow_domain "${config["override_common"]}" '.networkPolicies.global.objectStorage.ips' "${host}"
+  allow_host "${config["override_common"]}" '.networkPolicies.global.objectStorage.ips' "${host}"
   allow_ports "${config["override_common"]}" '.networkPolicies.global.objectStorage.ports' "${port}"
 }
 
