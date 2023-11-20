@@ -413,19 +413,20 @@ _test_apply_rclone_sync_s3_add_swift() {
 
   yq4 -i '.objectStorage.sync.swift.authUrl = "https://keystone.foo.dev-ck8s.com:5678"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
 
-  mock_set_output "${mock_dig}" "127.0.0.5" 5 # $SWIFT_ENDPOINT_DST
+  mock_set_output "${mock_dig}" "127.0.0.5" 5 # $os_auth_host
+  mock_set_output "${mock_dig}" "127.0.0.6" 6 # $swift_host
 
   run ck8s update-ips both apply
 
   assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageS3 | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.4/32]"
   assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageS3 | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[1234]"
 
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.5/32]"
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[5678]"
+  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.5/32, 127.0.0.6/32]"
+  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[443, 5678]"
 
-  assert_equal "$(mock_get_call_num "${mock_dig}")" 5
+  assert_equal "$(mock_get_call_num "${mock_dig}")" 6
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 12
-  assert_equal "$(mock_get_call_num "${mock_curl}")" 0
+  assert_equal "$(mock_get_call_num "${mock_curl}")" 1
 }
 
 @test "rclone sync - s3 and add swift - buckets destination type" {
@@ -479,10 +480,11 @@ _test_apply_rclone_sync_swift_requires_swift_endpoint() {
 _setup_rclone_sync_swift() {
   _setup_rclone
 
-  yq4 -i '.objectStorage.sync.swift.authUrl = "https://swift.foo.dev-ck8s.com:1234"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq4 -i '.objectStorage.sync.swift.authUrl = "https://keystone.foo.dev-ck8s.com:1234"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   yq4 -i "${1}"' = "swift"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
 
-  mock_set_output "${mock_dig}" "127.0.0.4" 4 # $SWIFT_ENDPOINT_DST
+  mock_set_output "${mock_dig}" "127.0.0.4" 4 # $os_auth_host
+  mock_set_output "${mock_dig}" "127.0.0.5" 5 # $swift_host
 }
 
 _test_apply_rclone_sync_swift() {
@@ -490,12 +492,12 @@ _test_apply_rclone_sync_swift() {
 
   run ck8s update-ips both apply
 
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.4/32]"
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[1234]"
+  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.4/32, 127.0.0.5/32]"
+  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[443, 1234]"
 
-  assert_equal "$(mock_get_call_num "${mock_dig}")" 4
+  assert_equal "$(mock_get_call_num "${mock_dig}")" 5
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 12
-  assert_equal "$(mock_get_call_num "${mock_curl}")" 0
+  assert_equal "$(mock_get_call_num "${mock_curl}")" 1
 }
 
 @test "rclone sync - swift - buckets destination type" {
@@ -518,14 +520,14 @@ _test_apply_rclone_sync_swift_remove_s3() {
 
   run ck8s update-ips both apply
 
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.4/32]"
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[1234]"
+  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.4/32, 127.0.0.5/32]"
+  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[443, 1234]"
 
   assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageS3' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
 
-  assert_equal "$(mock_get_call_num "${mock_dig}")" 4
+  assert_equal "$(mock_get_call_num "${mock_dig}")" 5
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 12
-  assert_equal "$(mock_get_call_num "${mock_curl}")" 0
+  assert_equal "$(mock_get_call_num "${mock_curl}")" 1
 }
 
 @test "rclone sync - swift and remove s3 - buckets destination type" {
@@ -543,24 +545,25 @@ _test_apply_rclone_sync_swift_remove_s3() {
 _test_apply_rclone_sync_swift_add_s3() {
   _setup_rclone
 
-  yq4 -i '.objectStorage.sync.swift.authUrl = "https://swift.foo.dev-ck8s.com:1234"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq4 -i '.objectStorage.sync.swift.authUrl = "https://keystone.foo.dev-ck8s.com:1234"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   yq4 -i "${1}"' = "swift"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   yq4 -i '.objectStorage.sync.s3.regionEndpoint = "https://s3.foo.dev-ck8s.com:5678"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
 
   mock_set_output "${mock_dig}" "127.0.0.5" 4 # $S3_ENDPOINT_DST
-  mock_set_output "${mock_dig}" "127.0.0.4" 5 # $SWIFT_ENDPOINT_DST
+  mock_set_output "${mock_dig}" "127.0.0.4" 5 # $os_auth_host
+  mock_set_output "${mock_dig}" "127.0.0.6" 6 # $swift_host
 
   run ck8s update-ips both apply
 
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.4/32]"
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[1234]"
+  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.4/32, 127.0.0.6/32]"
+  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[443, 1234]"
 
   assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageS3 | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.5/32]"
   assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageS3 | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[5678]"
 
-  assert_equal "$(mock_get_call_num "${mock_dig}")" 5
+  assert_equal "$(mock_get_call_num "${mock_dig}")" 6
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 12
-  assert_equal "$(mock_get_call_num "${mock_curl}")" 0
+  assert_equal "$(mock_get_call_num "${mock_curl}")" 1
 }
 
 @test "rclone sync - swift and add s3 - buckets destination type" {
@@ -638,7 +641,8 @@ _test_apply_rclone_sync_s3_and_swift() {
   yq4 -i '.objectStorage.sync.swift.authUrl = "https://keystone.foo.dev-ck8s.com:5678"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
 
   mock_set_output "${mock_dig}" "127.0.0.4" 4 # $S3_ENDPOINT_DST
-  mock_set_output "${mock_dig}" "127.0.0.5" 5 # $SWIFT_ENDPOINT_DST
+  mock_set_output "${mock_dig}" "127.0.0.5" 5 # $os_auth_host
+  mock_set_output "${mock_dig}" "127.0.0.6" 6 # $swift_host
 
   run ck8s update-ips both apply
 
@@ -647,12 +651,12 @@ _test_apply_rclone_sync_s3_and_swift() {
   assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageS3 | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.4/32]"
   assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageS3 | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[1234]"
 
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.5/32]"
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[5678]"
+  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.5/32, 127.0.0.6/32]"
+  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[443, 5678]"
 
-  assert_equal "$(mock_get_call_num "${mock_dig}")" 5
+  assert_equal "$(mock_get_call_num "${mock_dig}")" 6
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 12
-  assert_equal "$(mock_get_call_num "${mock_curl}")" 0
+  assert_equal "$(mock_get_call_num "${mock_curl}")" 1
 }
 
 @test "rclone sync - s3 and swift - s3" {
@@ -781,8 +785,9 @@ _setup_full() {
   yq4 -i '.objectStorage.sync.secondaryUrl = "https://s3.foo.dev-ck8s.com:1234"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
 
   mock_set_output "${mock_dig}" "127.1.0.6" 6 # $S3_ENDPOINT_DST
-  mock_set_output "${mock_dig}" "127.1.0.7" 7 # $SWIFT_ENDPOINT_DST
-  mock_set_output "${mock_dig}" "127.1.0.8" 8 # $SECONDARY_ENDPOINT
+  mock_set_output "${mock_dig}" "127.1.0.7" 7 # $os_auth_host
+  mock_set_output "${mock_dig}" "127.1.0.8" 8 # $swift_host
+  mock_set_output "${mock_dig}" "127.1.0.9" 9 # $SECONDARY_ENDPOINT
 }
 
 @test "dry-run full diff" {

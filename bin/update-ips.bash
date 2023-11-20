@@ -379,14 +379,26 @@ allow_ingress() {
   allow_domain "${config["override_common"]}" '.networkPolicies.global.wcIngress.ips' "non-existing-subdomain.${base_domain}"
 }
 
-# Allow Swift object storage in the sc network policy configuration.
-allow_swift() {
-  swift_enabled || return 0
+# Synchronize the Swift object storage network policy configuration.
+#
+# If the endpoint config option is unset the existing network policy
+# configuration is removed.
+#
+# Usage: sync_swift <endpoint_config_option> <netpol_config_option>
+sync_swift() {
+  local endpoint_config_option="${1}"
+  local netpol_config_option="${2}"
 
   local os_auth_url
   local os_auth_host
   local os_auth_port
-  os_auth_url="$(yq_read "sc" '.objectStorage.swift.authUrl' "")"
+  os_auth_url="$(yq_read "sc" "${endpoint_config_option}" "")"
+
+  if [ -z "${os_auth_url}" ]; then
+    yq_eval "${config["override_sc"]}" "${netpol_config_option}" 'del('"${netpol_config_option}"')'
+    return
+  fi
+
   os_auth_host=$(parse_url_host "${os_auth_url}")
   os_auth_port=$(parse_url_port "${os_auth_url}" 5000)
 
@@ -408,8 +420,8 @@ allow_swift() {
   object_storage_swift_ips+=($(get_dns_ips "${swift_host}"))
   object_storage_swift_ports+=("${swift_port}")
 
-  allow_ips "${config["override_sc"]}" '.networkPolicies.global.objectStorageSwift.ips' "${object_storage_swift_ips[@]}"
-  allow_ports "${config["override_sc"]}" '.networkPolicies.global.objectStorageSwift.ports' "${object_storage_swift_ports[@]}"
+  allow_ips "${config["override_sc"]}" "${netpol_config_option}.ips" "${object_storage_swift_ips[@]}"
+  allow_ports "${config["override_sc"]}" "${netpol_config_option}.ports" "${object_storage_swift_ports[@]}"
 }
 
 # Synchronize the Rclone sync network policy configuration.
@@ -522,7 +534,9 @@ if [[ "${check_cluster}" =~ ^(sc|both)$ ]]; then
   allow_nodes "sc" '.networkPolicies.global.scApiserver.ips' "node-role.kubernetes.io/control-plane="
   allow_nodes "sc" '.networkPolicies.global.scNodes.ips' ""
 
-  allow_swift
+  if swift_enabled; then
+    sync_swift '.objectStorage.swift.authUrl' '.networkPolicies.global.objectStorageSwift'
+  fi
 fi
 
 if [[ "${check_cluster}" =~ ^(wc|both)$ ]]; then
@@ -532,7 +546,7 @@ fi
 
 if rsync_enabled; then
   sync_rclone '.objectStorage.sync.s3.regionEndpoint' ".networkPolicies.rcloneSync.destinationObjectStorageS3"
-  sync_rclone '.objectStorage.sync.swift.authUrl' ".networkPolicies.rcloneSync.destinationObjectStorageSwift"
+  sync_swift '.objectStorage.sync.swift.authUrl' ".networkPolicies.rcloneSync.destinationObjectStorageSwift"
   sync_rclone '.objectStorage.sync.secondaryUrl' ".networkPolicies.rcloneSync.secondaryUrl"
 fi
 
