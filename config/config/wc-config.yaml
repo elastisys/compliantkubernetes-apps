@@ -290,6 +290,9 @@ gatekeeper:
   allowUserCRDs:
     enabled: false
     enforcement: deny
+    # The name of the user specified in /etc/kubernetes/admin.conf kubeconfig file of the control plane nodes
+    # Necessary if Kubespray is used for managing the k8s cluster.
+    adminConfUser: kubernetes-admin
     extraCRDs: []
     # Sealed secrets and MongoDB CRDs can be enabled via user.sealedsecrets/mongodb
     # - names:

@@ -1,50 +1,54 @@
 userCRDs:
-    enabled: {{ .Values.gatekeeper.allowUserCRDs.enabled }}
-    admin:
-        users: {{ .Values.clusterAdmin.users }}
-        groups: {{ .Values.clusterAdmin.groups }}
-        serviceAccounts:
-        - namespace: "gatekeeper-system"
-          name: "gatekeeper-admin-upgrade-crds"
-        - namespace: "velero"
-          name: "velero-server-upgrade-crds"
-        {{- if .Values.gatekeeper.allowUserCRDs.extraServiceAccounts }}
-        {{- toYaml .Values.gatekeeper.allowUserCRDs.extraServiceAccounts | nindent 8 }}
-        {{- end }}
-    allowedCRDs:
+  enabled: {{ .Values.gatekeeper.allowUserCRDs.enabled }}
+  admin:
+    users:
+      - {{ .Values.gatekeeper.allowUserCRDs.adminConfUser }}
+      {{- with .Values.clusterAdmin.users }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+    groups: {{- toYaml .Values.clusterAdmin.groups | nindent 6 }}
+    serviceAccounts:
+      - namespace: "gatekeeper-system"
+        name: "gatekeeper-admin-upgrade-crds"
+      - namespace: "velero"
+        name: "velero-server-upgrade-crds"
+      {{- if .Values.gatekeeper.allowUserCRDs.extraServiceAccounts }}
+      {{- toYaml .Values.gatekeeper.allowUserCRDs.extraServiceAccounts | nindent 6 }}
+      {{- end }}
+  allowedCRDs:
     {{- if .Values.user.sealedSecrets.enabled }}
     - names:
-        - sealedsecrets.bitnami.com
+      - sealedsecrets.bitnami.com
       group: "bitnami.com"
     {{- end }}
     {{- if .Values.user.mongodb.enabled }}
     - names:
-        - mongodbcommunity.mongodbcommunity.mongodb.com
+      - mongodbcommunity.mongodbcommunity.mongodb.com
       group: mongodbcommunity.mongodb.com
     {{- end }}
     {{- if .Values.user.fluxv2.enabled }}
     - names:
-        - helmreleases.helm.toolkit.fluxcd.io
+      - helmreleases.helm.toolkit.fluxcd.io
       group: helm.toolkit.fluxcd.io
     - names:
-        - imageupdateautomations.image.toolkit.fluxcd.io
-        - imagepolicies.image.toolkit.fluxcd.io
-        - imagerepositories.image.toolkit.fluxcd.io
+      - imageupdateautomations.image.toolkit.fluxcd.io
+      - imagepolicies.image.toolkit.fluxcd.io
+      - imagerepositories.image.toolkit.fluxcd.io
       group: image.toolkit.fluxcd.io
     - names:
-        - kustomizations.kustomize.toolkit.fluxcd.io
+      - kustomizations.kustomize.toolkit.fluxcd.io
       group: kustomize.toolkit.fluxcd.io
     - names:
-        - alerts.notification.toolkit.fluxcd.io
-        - providers.notification.toolkit.fluxcd.io
-        - receivers.notification.toolkit.fluxcd.io
+      - alerts.notification.toolkit.fluxcd.io
+      - providers.notification.toolkit.fluxcd.io
+      - receivers.notification.toolkit.fluxcd.io
       group: notification.toolkit.fluxcd.io
     - names:
-        - buckets.source.toolkit.fluxcd.io
-        - gitrepositories.source.toolkit.fluxcd.io
-        - helmcharts.source.toolkit.fluxcd.io
-        - helmrepositories.source.toolkit.fluxcd.io
-        - ocirepositories.source.toolkit.fluxcd.io
+      - buckets.source.toolkit.fluxcd.io
+      - gitrepositories.source.toolkit.fluxcd.io
+      - helmcharts.source.toolkit.fluxcd.io
+      - helmrepositories.source.toolkit.fluxcd.io
+      - ocirepositories.source.toolkit.fluxcd.io
       group: source.toolkit.fluxcd.io
     {{- end }}
     {{- if .Values.gatekeeper.allowUserCRDs.extraCRDs }}
