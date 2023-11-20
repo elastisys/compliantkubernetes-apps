@@ -850,3 +850,16 @@ _setup_full() {
 
   assert_equal "$(mock_get_call_args "${mock_curl}" 1)" "$(cat "${BATS_TEST_DIRNAME}/resources/get-swift-url.out")"
 }
+
+@test "s3 region endpoint can be ip" {
+  _setup_basic
+
+  yq4 -i '.objectStorage.s3.regionEndpoint = "http://192.168.1.1:8080"' "${CK8S_CONFIG_PATH}/common-config.yaml"
+
+  run ck8s update-ips both apply
+
+  assert_equal "$(yq4 '.networkPolicies.global.objectStorage | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/common-config.yaml")" "[192.168.1.1/32]"
+  assert_equal "$(yq4 '.networkPolicies.global.objectStorage | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/common-config.yaml")" "[8080]"
+
+  assert_equal "$(mock_get_call_num "${mock_dig}")" 2
+}
