@@ -427,7 +427,7 @@ _test_apply_rclone_sync_s3_add_swift() {
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 6
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 12
-  assert_equal "$(mock_get_call_num "${mock_curl}")" 1
+  assert_equal "$(mock_get_call_num "${mock_curl}")" 2
 }
 
 @test "rclone sync - s3 and add swift - buckets destination type" {
@@ -499,7 +499,7 @@ _test_apply_rclone_sync_swift() {
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 5
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 12
-  assert_equal "$(mock_get_call_num "${mock_curl}")" 1
+  assert_equal "$(mock_get_call_num "${mock_curl}")" 2
 }
 
 @test "rclone sync - swift - buckets destination type" {
@@ -529,7 +529,7 @@ _test_apply_rclone_sync_swift_remove_s3() {
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 5
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 12
-  assert_equal "$(mock_get_call_num "${mock_curl}")" 1
+  assert_equal "$(mock_get_call_num "${mock_curl}")" 2
 }
 
 @test "rclone sync - swift and remove s3 - buckets destination type" {
@@ -566,7 +566,7 @@ _test_apply_rclone_sync_swift_add_s3() {
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 6
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 12
-  assert_equal "$(mock_get_call_num "${mock_curl}")" 1
+  assert_equal "$(mock_get_call_num "${mock_curl}")" 2
 }
 
 @test "rclone sync - swift and add s3 - buckets destination type" {
@@ -660,7 +660,7 @@ _test_apply_rclone_sync_s3_and_swift() {
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 6
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 12
-  assert_equal "$(mock_get_call_num "${mock_curl}")" 1
+  assert_equal "$(mock_get_call_num "${mock_curl}")" 2
 }
 
 @test "rclone sync - s3 and swift - s3" {
