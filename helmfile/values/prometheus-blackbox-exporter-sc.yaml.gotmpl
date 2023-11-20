@@ -115,3 +115,14 @@ serviceMonitor:
       scrapeTimeout: 30s
       module: http_401
     {{- end }}
+
+{{- with .Values.prometheusBlackboxExporter.hostAliases }}
+hostAliases:
+  {{- range . }}
+  - ip: {{ .ip }}
+    hostNames:
+      {{- range .hostNames }}
+      - {{ . }}
+      {{- end }}
+  {{- end }}
+{{- end }}

@@ -100,3 +100,14 @@ serviceMonitor:
       module: http_401
     {{- end }}
     {{- end }}
+
+{{- with .Values.prometheusBlackboxExporter.hostAliases }}
+hostAliases:
+  {{- range . }}
+  - ip: {{ .ip }}
+    hostNames:
+      {{- range .hostNames }}
+      - {{ . }}
+      {{- end }}
+  {{- end }}
+{{- end }}
