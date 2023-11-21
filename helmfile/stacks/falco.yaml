@@ -1,0 +1,50 @@
+---
+templates:
+  falco:
+    installed: {{ .Values | get "falco.enabled" false }}
+    namespace: falco
+    labels:
+      app: falco
+
+  falco-podsecuritypolicy:
+    inherit:
+      - template: falco
+      - template: podsecuritypolicies
+    labels:
+      psp: falco
+    values:
+      - helmfile/values/podsecuritypolicies/common/falco.yaml.gotmpl
+
+  falco-main:
+    inherit:
+      - template: falco
+      - template: falco-chart
+    name: falco
+    needs:
+      - falco/podsecuritypolicy
+      - kube-system/common-np
+      {{- if .Values | get "ck8sManagementCluster.enabled" false }}
+      - kube-system/service-cluster-np
+      {{- else if .Values | get "ck8sWorkloadCluster.enabled" false }}
+      - kube-system/workload-cluster-np
+      {{- end }}
+    values:
+      - helmfile/values/falco/falco-common.yaml.gotmpl
+      {{- if .Values | get "ck8sManagementCluster.enabled" false }}
+      - helmfile/values/falco/falco-service-cluster.yaml.gotmpl
+      {{- else if .Values | get "ck8sWorkloadCluster.enabled" false }}
+      - helmfile/values/falco/falco-workload-cluster.yaml.gotmpl
+      {{ end }}
+
+  falco-exporter:
+    disableValidationOnInstall: true
+    inherit:
+      - template: falco
+      - template: falco-exporter-chart
+    name: falco-exporter
+    needs:
+      - falco/falco
+      - falco/podsecuritypolicy
+      - monitoring/kube-prometheus-stack # creates servicemonitors
+    values:
+      - helmfile/values/falco/falco-exporter.yaml.gotmpl

@@ -1,0 +1,42 @@
+---
+templates:
+  hnc:
+    condition: ck8sWorkloadCluster.enabled
+    installed: {{ .Values | get "hnc.enabled" false }}
+    namespace: hnc-system
+    labels:
+      app: hnc
+
+  hnc-networkpolicy:
+    inherit:
+      - template: hnc
+      - template: networkpolicies
+    labels:
+      netpol: hnc
+    values:
+      - helmfile/values/networkpolicies/common/common.yaml.gotmpl
+      - helmfile/values/networkpolicies/workload/hnc.yaml.gotmpl
+
+  hnc-resources:
+    disableValidationOnInstall: true # creates own resources
+    inherit: [ template: hnc ]
+    chart: helmfile/charts/hnc/config-and-crds
+    version: 0.1.0
+    name: hnc-config-and-crds
+    values:
+      - helmfile/values/hnc/controller.yaml.gotmpl
+
+  hnc-controller:
+    disableValidationOnInstall: true
+    inherit: [ template: hnc ]
+    chart: helmfile/charts/hnc/controller
+    version: 0.1.0
+    name: hnc-controller
+    needs:
+      - cert-manager/cert-manager # creates certificates
+      - gatekeeper-system/gatekeeper # creates mutations
+      - hnc-system/networkpolicy
+      - kube-system/user-rbac # creates resources in its namespaces
+      - monitoring/kube-prometheus-stack # creates servicemonitors
+    values:
+      - helmfile/values/hnc/controller.yaml.gotmpl
