@@ -412,8 +412,12 @@ _test_apply_rclone_sync_s3_add_swift() {
   _setup_rclone_sync_s3 "${1}"
 
   yq4 -i '.objectStorage.sync.swift.authUrl = "https://keystone.foo.dev-ck8s.com:5678"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq4 -i '.objectStorage.sync.swift.region = "swift-region"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   sops --set '["objectStorage"]["sync"]["swift"]["username"] "swift-sync-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
 
+  # GET /auth/tokens
+  mock_set_output "${mock_curl}" '\n\n\n\n\n\n\n\n\n\n\n\n\n\n[{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com"}]}]}]' 1
+  mock_set_output "${mock_curl}" "" 2 # DELETE /auth/tokens
   mock_set_output "${mock_dig}" "127.0.0.5" 5 # $os_auth_host
   mock_set_output "${mock_dig}" "127.0.0.6" 6 # $swift_host
 
@@ -482,9 +486,13 @@ _setup_rclone_sync_swift() {
   _setup_rclone
 
   yq4 -i '.objectStorage.sync.swift.authUrl = "https://keystone.foo.dev-ck8s.com:1234"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq4 -i '.objectStorage.sync.swift.region = "swift-region"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   sops --set '["objectStorage"]["sync"]["swift"]["username"] "swift-sync-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
   yq4 -i "${1}"' = "swift"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
 
+  # GET /auth/tokens
+  mock_set_output "${mock_curl}" '\n\n\n\n\n\n\n\n\n\n\n\n\n\n[{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com"}]}]}]' 1
+  mock_set_output "${mock_curl}" "" 2 # DELETE /auth/tokens
   mock_set_output "${mock_dig}" "127.0.0.4" 4 # $os_auth_host
   mock_set_output "${mock_dig}" "127.0.0.5" 5 # $swift_host
 }
@@ -548,10 +556,14 @@ _test_apply_rclone_sync_swift_add_s3() {
   _setup_rclone
 
   yq4 -i '.objectStorage.sync.swift.authUrl = "https://keystone.foo.dev-ck8s.com:1234"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq4 -i '.objectStorage.sync.swift.region = "swift-region"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   sops --set '["objectStorage"]["sync"]["swift"]["username"] "swift-sync-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
   yq4 -i "${1}"' = "swift"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   yq4 -i '.objectStorage.sync.s3.regionEndpoint = "https://s3.foo.dev-ck8s.com:5678"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
 
+  # GET /auth/tokens
+  mock_set_output "${mock_curl}" '\n\n\n\n\n\n\n\n\n\n\n\n\n\n[{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com"}]}]}]' 1
+  mock_set_output "${mock_curl}" "" 2 # DELETE /auth/tokens
   mock_set_output "${mock_dig}" "127.0.0.5" 4 # $S3_ENDPOINT_DST
   mock_set_output "${mock_dig}" "127.0.0.4" 5 # $os_auth_host
   mock_set_output "${mock_dig}" "127.0.0.6" 6 # $swift_host
@@ -642,8 +654,12 @@ _test_apply_rclone_sync_s3_and_swift() {
 
   yq4 -i '.objectStorage.sync.s3.regionEndpoint = "https://s3.foo.dev-ck8s.com:1234"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   yq4 -i '.objectStorage.sync.swift.authUrl = "https://keystone.foo.dev-ck8s.com:5678"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq4 -i '.objectStorage.sync.swift.region = "swift-region"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   sops --set '["objectStorage"]["sync"]["swift"]["username"] "swift-sync-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
 
+  # GET /auth/tokens
+  mock_set_output "${mock_curl}" '\n\n\n\n\n\n\n\n\n\n\n\n\n\n[{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com"}]}]}]' 1
+  mock_set_output "${mock_curl}" "" 2 # DELETE /auth/tokens
   mock_set_output "${mock_dig}" "127.0.0.4" 4 # $S3_ENDPOINT_DST
   mock_set_output "${mock_dig}" "127.0.0.5" 5 # $os_auth_host
   mock_set_output "${mock_dig}" "127.0.0.6" 6 # $swift_host
@@ -786,9 +802,13 @@ _setup_full() {
   yq4 -i '.networkPolicies.rcloneSync.enabled = "true"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   yq4 -i '.objectStorage.sync.s3.regionEndpoint = "https://s3.foo.dev-ck8s.com:1234"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   yq4 -i '.objectStorage.sync.swift.authUrl = "https://keystone.foo.dev-ck8s.com:5678"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq4 -i '.objectStorage.sync.swift.region = "swift-region"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   sops --set '["objectStorage"]["sync"]["swift"]["username"] "swift-sync-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
   yq4 -i '.objectStorage.sync.secondaryUrl = "https://s3.foo.dev-ck8s.com:1234"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
 
+  # GET /auth/tokens
+  mock_set_output "${mock_curl}" '\n\n\n\n\n\n\n\n\n\n\n\n\n\n[{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com"}]}]}]' 3
+  mock_set_output "${mock_curl}" "" 4 # DELETE /auth/tokens
   mock_set_output "${mock_dig}" "127.1.0.6" 6 # $S3_ENDPOINT_DST
   mock_set_output "${mock_dig}" "127.1.0.7" 7 # $os_auth_host
   mock_set_output "${mock_dig}" "127.1.0.8" 8 # $swift_host
