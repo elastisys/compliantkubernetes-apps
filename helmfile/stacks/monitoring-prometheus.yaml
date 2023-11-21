@@ -28,3 +28,11 @@ templates:
       - template: prometheus
       - template: prometheus-blackbox-exporter-chart
     name: prometheus-blackbox-exporter
+    needs:
+      - monitoring/kube-prometheus-stack
+    values:
+      {{- if .Values.ck8sManagementCluster.enabled }}
+      - helmfile/values/prometheus-blackbox-exporter-sc.yaml.gotmpl
+      {{- else if .Values.ck8sWorkloadCluster.enabled }}
+      - helmfile/values/prometheus-blackbox-exporter-wc.yaml.gotmpl
+      {{- end }}
