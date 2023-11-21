@@ -1,6 +1,7 @@
 ---
 templates:
   grafana:
+    condition: ck8sManagementCluster.enabled
     namespace: monitoring
     labels:
       app: grafana

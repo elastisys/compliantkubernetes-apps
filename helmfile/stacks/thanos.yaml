@@ -1,0 +1,84 @@
+---
+templates:
+  thanos:
+    condition: ck8sManagementCluster.enabled
+    installed: {{ .Values | get "thanos.enabled" false }}
+    namespace: thanos
+    labels:
+      app: thanos
+
+  thanos-networkpolicy:
+    inherit:
+      - template: thanos
+      - template: networkpolicies
+    installed: {{ and (.Values | get "thanos.enabled" false) (.Values | get "networkPolicies.thanos.enabled" false) }}
+    labels:
+      netpol: thanos
+    values:
+      - helmfile/values/networkpolicies/common/common.yaml.gotmpl
+      - helmfile/values/networkpolicies/service/thanos.yaml.gotmpl
+
+  thanos-ingress-secret:
+    installed: {{ .Values | get "thanos.enabled" false }}
+    chart: helmfile/charts/thanos/ingress-secret
+    version: 0.1.0
+    {{- if .Values.ck8sManagementCluster.enabled }}
+    namespace: thanos
+    labels:
+      app: thanos
+    {{- else if .Values.ck8sWorkloadCluster.enabled }}
+    namespace: monitoring
+    labels:
+      app: prometheus
+    {{- end }}
+    name: thanos-ingress-secret
+    values:
+      - helmfile/values/thanos/ingress-secret.yaml.gotmpl
+
+  thanos-objstore-secret:
+    inherit:
+      - template: thanos
+      - template: thanos-chart
+    installed: {{ .Values | get "thanos.enabled" false }}
+    name: thanos-objectstorage-secret
+    values:
+      - helmfile/values/thanos/objectstorage-secret.yaml.gotmpl
+
+  thanos-query:
+    disableValidationOnInstall: true # creates prometheus-operator/servicemonitors
+    inherit:
+      - template: thanos
+      - template: thanos-chart
+    installed: {{ and (.Values | get "thanos.enabled" false) (.Values | get "thanos.query.enabled" false) }}
+    name: thanos-query
+    needs:
+      - thanos/networkpolicy
+    values:
+      - helmfile/values/thanos/query.yaml.gotmpl
+
+  thanos-receiver:
+    disableValidationOnInstall: true # creates prometheus-operator/servicemonitors
+    inherit:
+      - template: thanos
+      - template: thanos-chart
+    installed: {{ and (.Values | get "thanos.enabled" false) (.Values | get "thanos.receiver.enabled" false) }}
+    name: thanos-receiver
+    needs:
+      - thanos/networkpolicy
+      - thanos/thanos-objectstorage-secret
+    values:
+      - helmfile/values/thanos/receiver.yaml.gotmpl
+
+  thanos-ruler:
+    disableValidationOnInstall: true # creates prometheus-operator/thanosrulers
+    inherit: [ template: thanos ]
+    installed: {{ and (.Values | get "thanos.enabled" false) (.Values | get "thanos.ruler.enabled" false) }}
+    chart: helmfile/charts/thanos/ruler
+    version: 0.1.0
+    name: thanos-ruler
+    needs:
+      - monitoring/kube-prometheus-stack
+      - thanos/networkpolicy
+      - thanos/thanos-objectstorage-secret
+    values:
+      - helmfile/values/thanos/ruler.yaml.gotmpl

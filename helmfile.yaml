@@ -13,6 +13,7 @@ bases:
   - helmfile/stacks/monitoring-prometheus.yaml
   - helmfile/stacks/opensearch.yaml
   - helmfile/stacks/system.yaml
+  - helmfile/stacks/thanos.yaml
 ---
 releases:
   - inherit: [ template: networkpolicies-common ]
@@ -33,8 +34,15 @@ releases:
 
   - inherit: [ template: monitoring-networkpolicy ]
   - inherit: [ template: monitoring-podsecuritypolicy ]
+
   - inherit: [ template: kube-prometheus-stack ]
   - inherit: [ template: prometheus-blackbox-exporter ]
+  - inherit: [ template: prometheus-sc-monitors ]
+  - inherit: [ template: prometheus-sc-rules ]
+  - inherit: [ template: kube-state-metrics-extra-resources ]
+
+  - inherit: [ template: trivy-operator ]
+  - inherit: [ template: s3-exporter ]
 
   - inherit: [ template: grafana-admin ]
   - inherit: [ template: grafana-dev ]
@@ -54,18 +62,19 @@ releases:
   - inherit: [ template: opensearch-curator ]
   - inherit: [ template: opensearch-exporter ]
 
+  - inherit: [ template: thanos-networkpolicy ]
+  - inherit: [ template: thanos-ingress-secret ]
+  - inherit: [ template: thanos-objstore-secret ]
+  - inherit: [ template: thanos-query ]
+  - inherit: [ template: thanos-receiver ]
+  - inherit: [ template: thanos-ruler ]
+
 # NAME                                     	NAMESPACE        	ENABLED	INSTALLED	LABELS                                                                                                  	CHART                                                            	VERSION
-# sc-servicemonitor                        	monitoring       	true   	true     	app:prometheus-servicemonitor,prometheus:sc                                                             	./charts/prometheus-servicemonitor                               	0.1.1
-# sc-alerts                                	monitoring       	true   	true     	app:prometheus-alerts,prometheus:sc                                                                     	./charts/prometheus-alerts                                       	0.1.1
-# s3-exporter                              	monitoring       	true   	true     	app:s3-exporter                                                                                         	./charts/s3-exporter                                             	0.1.0
-# trivy-operator                           	monitoring       	true   	true     	app:trivy-operator,group:trivy,upstream:aquasecurity                                                    	./upstream/aquasecurity/trivy-operator                           	0.13.0
-# kube-state-metrics-extra-resource-metrics	monitoring       	true   	true     	app:kube-prometheus-stack                                                                               	./charts/kube-state-metrics-extra-resource-metrics               	0.1.0
 # openstack-monitoring                     	kube-system      	true   	true     	app:openstack-monitoring                                                                                	./charts/openstack-monitoring                                    	0.1.0
 # autoscaling-monitoring-sc                	capi-cluster     	true   	false    	app:autoscaling-monitoring-sc,group:autoscaling-monitoring                                              	./charts/autoscaling-monitoring                                  	0.1.0
 # autoscaling-monitoring-wc                	capi-cluster     	true   	false    	app:autoscaling-monitoring-wc,group:autoscaling-monitoring                                              	./charts/autoscaling-monitoring                                  	0.1.0
 # networkpolicy                            	harbor           	true   	true     	app:netpol,netpol:harbor                                                                                	./charts/networkpolicy/generator                                 	0.1.0
 # networkpolicy                            	thanos           	true   	true     	app:netpol,netpol:thanos                                                                                	./charts/networkpolicy/generator                                 	0.1.0
-# thanos-ingress-secret                    	thanos           	true   	true     	app:thanos                                                                                              	./charts/thanos/ingress-secret                                   	0.1.0
 # podsecuritypolicy                        	falco            	true   	true     	app:psp,component:gatekeeper-psp,psp:falco                                                              	./charts/gatekeeper/podsecuritypolicies                          	0.1.0
 # podsecuritypolicy                        	fluentd-system   	true   	true     	app:psp,component:gatekeeper-psp,psp:fluentd                                                            	./charts/gatekeeper/podsecuritypolicies                          	0.1.0
 # podsecuritypolicy                        	kured            	true   	true     	app:psp,component:gatekeeper-psp,psp:kured                                                              	./charts/gatekeeper/podsecuritypolicies                          	0.1.0
@@ -88,10 +97,6 @@ releases:
 # harbor                                   	harbor           	true   	true     	app:harbor,component:harbor,group:harbor,harbor:harbor,upstream:goharbor                                	./upstream/goharbor/harbor                                       	1.12.2
 # init-harbor                              	harbor           	true   	true     	app:harbor,component:harbor-init,group:harbor,harbor:init                                               	./charts/harbor/init-harbor                                      	0.2.0
 # harbor-backup                            	harbor           	true   	true     	app:harbor,component:harbor-backup,group:harbor,harbor:backup                                           	./charts/harbor/harbor-backup                                    	0.1.0
-# thanos-objectstorage-secret              	thanos           	true   	true     	app:thanos,upstream:bitnami                                                                             	./upstream/bitnami/thanos                                        	12.6.2
-# thanos-receiver                          	thanos           	true   	true     	app:thanos,upstream:bitnami                                                                             	./upstream/bitnami/thanos                                        	12.6.2
-# thanos-query                             	thanos           	true   	true     	app:thanos,upstream:bitnami                                                                             	./upstream/bitnami/thanos                                        	12.6.2
-# thanos-ruler                             	thanos           	true   	true     	app:thanos-ruler                                                                                        	./charts/thanos/ruler                                            	0.1.0
 # fluentd-aggregator                       	fluentd-system   	true   	true     	app:fluentd,component:fluentd-aggregator,upstream:bitnami                                               	./upstream/bitnami/fluentd                                       	5.8.2
 # fluentd-forwarder                        	fluentd-system   	true   	true     	app:fluentd,component:fluentd-forwarder,upstream:kokuwa                                                 	./upstream/kokuwa/fluentd-elasticsearch                          	13.10.0
 # log-manager                              	fluentd-system   	true   	true     	app:fluentd,component:log-manager                                                                       	./charts/log-manager                                             	0.1.0

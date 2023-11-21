@@ -36,3 +36,36 @@ templates:
       {{- else if .Values.ck8sWorkloadCluster.enabled }}
       - helmfile/values/prometheus-blackbox-exporter-wc.yaml.gotmpl
       {{- end }}
+
+  prometheus-sc-monitors:
+    disableValidationOnInstall: true # creates prometheus-operator/servicemonitors
+    inherit: [ template: prometheus ]
+    condition: ck8sManagementCluster.enabled
+    chart: helmfile/charts/prometheus-servicemonitor
+    version: 0.1.1
+    name: sc-servicemonitor
+    needs:
+      - monitoring/kube-prometheus-stack
+    values:
+      - helmfile/values/sc-servicemonitor.yaml.gotmpl
+
+  prometheus-sc-rules:
+    disableValidationOnInstall: true # creates prometheus-operator/prometheusrules
+    inherit: [ template: prometheus ]
+    condition: ck8sManagementCluster.enabled
+    chart: helmfile/charts/prometheus-alerts
+    version: 0.1.1
+    name: sc-alerts
+    needs:
+      - monitoring/kube-prometheus-stack
+    values:
+      - helmfile/values/prometheus-alerts-sc.yaml.gotmpl
+
+  kube-state-metrics-extra-resources:
+    inherit: [ template: prometheus ]
+    installed: {{ .Values | get "kubeStateMetrics.clusterAPIMetrics.enabled" "false" }}
+    chart: helmfile/charts/kube-state-metrics-extra-resource-metrics
+    version: 0.1.0
+    name: kube-state-metrics-extra-resource-metrics
+    values:
+      - helmfile/values/kube-state-metrics-extra-resource-metrics.yaml.gotmpl

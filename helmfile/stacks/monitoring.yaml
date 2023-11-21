@@ -31,3 +31,31 @@ templates:
       psp: monitoring
     values:
       - helmfile/values/podsecuritypolicies/common/monitoring.yaml.gotmpl
+
+  trivy-operator:
+    disableValidationOnInstall: true # creates own custom resources
+    inherit:
+      - template: monitoring
+      - template: trivy-operator-chart
+    installed: {{ .Values | get "trivy.enabled" false }}
+    name: trivy-operator
+    needs:
+      - monitoring/networkpolicy
+      - monitoring/podsecuritypolicy
+      - monitoring/kube-prometheus-stack
+    values:
+      - helmfile/values/trivy/trivy-operator.yaml.gotmpl
+
+  s3-exporter:
+    inherit: [ template: monitoring ]
+    condition: ck8sManagementCluster.enabled
+    installed: {{ and (.Values | get "s3Exporter.enabled" false) (.Values | get "objectStorage.type" "" | eq "s3") }}
+    chart: helmfile/charts/s3-exporter
+    version: 0.1.0
+    name: s3-exporter
+    needs:
+      - monitoring/networkpolicy
+      - monitoring/podsecuritypolicy
+      - monitoring/kube-prometheus-stack
+    values:
+      - helmfile/values/s3-exporter.yaml.gotmpl
