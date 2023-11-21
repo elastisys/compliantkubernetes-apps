@@ -274,11 +274,18 @@ parse_url_host() {
 
 # Parse the port from an URL.
 #
-# Usage: parse_url_port <url> <default_port>
+# Usage: parse_url_port <url>
 parse_url_port() {
   port="$(echo "${1}" | sed 's/https\?:\/\///' | sed 's/[A-Za-z.0-9-]*:\?//' | sed 's/\/.*//')"
-  [ -z "${port}" ] && port="${2}"
-  echo "${port}"
+  [ -n "${port}" ] && echo "${port}" && return
+  case "${1}" in
+    http://*) echo 80 ;;
+    https://*) echo 443 ;;
+    *)
+      log_error "Could not determine default port for: ${1}"
+      exit 1
+    ;;
+  esac
 }
 
 # Updates the configuration to allow IPs.
@@ -383,7 +390,7 @@ allow_object_storage() {
   local port
   url=$(yq_read "${cluster}" '.objectStorage.s3.regionEndpoint' "")
   host=$(parse_url_host "${url}")
-  port=$(parse_url_port "${url}" 443)
+  port=$(parse_url_port "${url}")
 
   allow_host "${config["override_common"]}" '.networkPolicies.global.objectStorage.ips' "${host}"
   allow_ports "${config["override_common"]}" '.networkPolicies.global.objectStorage.ports' "${port}"
@@ -416,8 +423,6 @@ sync_swift() {
   local netpol_config_option="${2}"
 
   local os_auth_url
-  local os_auth_host
-  local os_auth_port
   os_auth_url="$(yq_read "sc" "${swift_config_option}.authUrl" "")"
 
   if [ -z "${os_auth_url}" ]; then
@@ -425,8 +430,10 @@ sync_swift() {
     return
   fi
 
+  local os_auth_host
+  local os_auth_port
   os_auth_host=$(parse_url_host "${os_auth_url}")
-  os_auth_port=$(parse_url_port "${os_auth_url}" 5000)
+  os_auth_port=$(parse_url_port "${os_auth_url}")
 
   local -a object_storage_swift_ips
   local -a object_storage_swift_ports
@@ -440,7 +447,7 @@ sync_swift() {
   local swift_port
   swift_url="$(get_swift_url "${swift_config_option}")"
   swift_host=$(parse_url_host "${swift_url}")
-  swift_port=$(parse_url_port "${swift_url}" 443)
+  swift_port=$(parse_url_port "${swift_url}")
 
   # shellcheck disable=SC2207
   object_storage_swift_ips+=($(get_dns_ips "${swift_host}"))
@@ -461,19 +468,20 @@ sync_rclone() {
   local netpol_config_option="${2}"
 
   local url
-  local host
-  local port
   url=$(yq_read "sc" "${endpoint_config_option}" "")
-  host=$(parse_url_host "${url}")
-  port=$(parse_url_port "${url}" 443)
 
-  if [ -n "${host}" ]; then
-    allow_domain "${config["override_sc"]}" "${netpol_config_option}.ips" "${host}"
-    allow_ports "${config["override_sc"]}" "${netpol_config_option}.ports" "${port}"
+  if [ -z "${url}" ]; then
+    yq_eval "${config["override_sc"]}" "${netpol_config_option}" 'del('"${netpol_config_option}"')'
     return
   fi
 
-  yq_eval "${config["override_sc"]}" "${netpol_config_option}" 'del('"${netpol_config_option}"')'
+  local host
+  local port
+  host=$(parse_url_host "${url}")
+  port=$(parse_url_port "${url}")
+
+  allow_domain "${config["override_sc"]}" "${netpol_config_option}.ips" "${host}"
+  allow_ports "${config["override_sc"]}" "${netpol_config_option}.ports" "${port}"
 }
 
 # TODO: Remove when config validation is in-place.
