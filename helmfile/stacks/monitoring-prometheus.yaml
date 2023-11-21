@@ -1,0 +1,30 @@
+---
+templates:
+  prometheus:
+    namespace: monitoring
+    labels:
+      app: prometheus
+
+  kube-prometheus-stack:
+    disableValidationOnInstall: true # creates own custom resources
+    inherit:
+      - template: prometheus
+      - template: kube-prometheus-stack-chart
+    name: kube-prometheus-stack
+    needs:
+      - monitoring/networkpolicy
+      - monitoring/podsecuritypolicy
+    values:
+      {{- if .Values.ck8sManagementCluster.enabled }}
+      - helmfile/values/kube-prometheus-stack-sc.yaml.gotmpl
+      {{- else if .Values.ck8sWorkloadCluster.enabled }}
+      - helmfile/values/kube-prometheus-stack-wc.yaml.gotmpl
+      {{- end }}
+    wait: true
+
+  prometheus-blackbox-exporter:
+    disableValidationOnInstall: true # creates prometheus-operator/servicemonitors
+    inherit:
+      - template: prometheus
+      - template: prometheus-blackbox-exporter-chart
+    name: prometheus-blackbox-exporter

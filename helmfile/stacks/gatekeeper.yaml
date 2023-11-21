@@ -1,0 +1,64 @@
+---
+templates:
+  gatekeeper:
+    disableValidationOnInstall: true
+    namespace: gatekeeper-system
+    labels:
+      app: gatekeeper
+
+  gatekeeper-controller:
+    inherit:
+      - template: gatekeeper
+      - template: gatekeeper-chart
+    name: gatekeeper
+    needs:
+      - kube-system/common-np
+    values:
+      - helmfile/values/gatekeeper/gatekeeper.yaml.gotmpl
+    wait: true
+
+  gatekeeper-templates:
+    inherit:
+      - template: gatekeeper
+    chart: helmfile/charts/gatekeeper/templates
+    version: 0.1.0
+    name: gatekeeper-templates
+    needs:
+      - gatekeeper-system/gatekeeper
+    values:
+      - helmfile/values/gatekeeper/templates.yaml.gotmpl
+    wait: true
+
+  gatekeeper-constraints:
+    inherit:
+      - template: gatekeeper
+    chart: helmfile/charts/gatekeeper/constraints
+    version: 0.1.0
+    name: gatekeeper-constraints
+    condition: ck8sWorkloadCluster.enabled
+    needs:
+      - gatekeeper-system/gatekeeper-templates
+    values:
+      - helmfile/values/gatekeeper/constraints.yaml.gotmpl
+      - helmfile/values/userCRDs/userCRDs.yaml.gotmpl
+
+  gatekeeper-mutations:
+    inherit:
+      - template: gatekeeper
+    installed: {{ .Values  | get "opa.mutations.enabled" false }}
+    chart: helmfile/charts/gatekeeper/mutations
+    version: 0.1.0
+    name: gatekeeper-mutations
+    needs:
+      - gatekeeper-system/gatekeeper-templates
+    values:
+      - helmfile/values/gatekeeper/mutations.yaml.gotmpl
+
+  gatekeeper-metrics:
+    inherit:
+      - template: gatekeeper
+    chart: helmfile/charts/gatekeeper/metrics
+    version: 0.1.0
+    name: gatekeeper-metrics
+    needs:
+      - gatekeeper-system/gatekeeper

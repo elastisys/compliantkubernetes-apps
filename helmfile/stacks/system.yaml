@@ -1,0 +1,39 @@
+---
+templates:
+  system:
+    namespace: kube-system
+
+  networkpolicies-common:
+    inherit: [ template: system ]
+    chart: helmfile/charts/networkpolicy/common
+    version: 0.2.0
+    name: common-np
+    labels:
+      policy: netpol
+      netpol: common
+    values:
+    - helmfile/values/networkpolicy/common.yaml.gotmpl
+
+  networkpolicies-service:
+    inherit: [ template: system ]
+    condition: ck8sManagementCluster.enabled
+    chart: helmfile/charts/networkpolicy/service-cluster
+    version: 0.2.0
+    name: service-cluster-np
+    labels:
+      policy: netpol
+      netpol: service
+    values:
+      - helmfile/values/networkpolicy/service-cluster.yaml.gotmpl
+
+  networkpolicies-workload:
+    inherit: [ template: system ]
+    condition: ck8sWorkloadCluster.enabled
+    chart: helmfile/charts/networkpolicy/workload-cluster
+    version: 0.2.0
+    name: workload-cluster-np
+    labels:
+      policy: netpol
+      netpol: workload
+    values:
+      - helmfile/values/networkpolicy/workload-cluster.yaml.gotmpl

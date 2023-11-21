@@ -1,0 +1,33 @@
+---
+templates:
+  monitoring:
+    namespace: monitoring
+    labels:
+      app: monitoring
+
+  monitoring-networkpolicy:
+    inherit:
+      - template: monitoring
+      - template: networkpolicies
+    installed: {{ .Values | get "networkPolicies.monitoring.enabled" false }}
+    labels:
+      netpol: monitoring
+    values:
+      - helmfile/values/networkpolicies/common/common.yaml.gotmpl
+      - helmfile/values/networkpolicies/common/prometheus.yaml.gotmpl
+      - helmfile/values/networkpolicies/common/trivy.yaml.gotmpl
+      {{- if .Values.ck8sManagementCluster.enabled }}
+      - helmfile/values/networkpolicies/service/alertmanager.yaml.gotmpl
+      - helmfile/values/networkpolicies/service/grafana.yaml.gotmpl
+      {{- else if .Values.ck8sWorkloadCluster.enabled }}
+      - helmfile/values/networkpolicies/workload/alertmanager.yaml.gotmpl
+      {{- end }}
+
+  monitoring-podsecuritypolicy:
+    inherit:
+      - template: monitoring
+      - template: podsecuritypolicies
+    labels:
+      psp: monitoring
+    values:
+      - helmfile/values/podsecuritypolicies/common/monitoring.yaml.gotmpl

@@ -1,0 +1,12 @@
+{{- with readFile "helmfile/upstream/index.yaml" | fromYaml | get "charts" dict }}
+templates:
+  {{- range $chart, $version := . }}
+  {{ regexSplit "/" $chart -1 | last | printf "%s-chart" }}:
+    labels:
+      upstream: {{ regexSplit "/" $chart -1 | first }}
+    chart: {{ printf "helmfile/upstream/%s" $chart }}
+    version: {{ $version }}
+  {{- end }}
+{{- else }}
+{{ fail "unable to load upstream index" }}
+{{- end }}

@@ -1,0 +1,29 @@
+---
+templates:
+  ingress-nginx:
+    namespace: ingress-nginx
+    labels:
+      app: ingress-nginx
+
+  ingress-nginx-podsecuritypolicy:
+    inherit:
+      - template: ingress-nginx
+      - template: podsecuritypolicies
+    labels:
+      psp: ingress-nginx
+    values:
+      - helmfile/values/podsecuritypolicies/common/ingress-nginx.yaml.gotmpl
+
+  ingress-nginx-controller:
+    disableValidationOnInstall: true # creates prometheus-operator/servicemonitors
+    inherit:
+      - template: ingress-nginx
+      - template: ingress-nginx-chart
+    name: ingress-nginx
+    needs:
+      - kube-system/common-np
+      - monitoring/kube-prometheus-stack
+      - ingress-nginx/podsecuritypolicy
+    values:
+      - helmfile/values/ingress-nginx.yaml.gotmpl
+    wait: true
