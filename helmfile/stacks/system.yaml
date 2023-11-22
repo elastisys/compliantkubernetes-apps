@@ -37,3 +37,26 @@ templates:
       netpol: workload
     values:
       - helmfile/values/networkpolicy/workload-cluster.yaml.gotmpl
+
+  node-local-dns:
+    disableValidationOnInstall: true # creates prometheus-operator/servicemonitors
+    inherit: [ template: system ]
+    chart: helmfile/charts/node-local-dns
+    version: 0.1.1
+    name: node-local-dns
+    labels:
+      app: node-local-dns
+    needs:
+      - monitoring/kube-prometheus-stack
+    values:
+      - helmfile/values/node-local-dns.yaml.gotmpl
+
+  rook-ceph-podsecuritypolicy:
+    inherit: [ template: podsecuritypolicies ]
+    installed: {{ .Values | get "rookCeph.gatekeeperPsp.enabled" false }}
+    namespace: rook-ceph
+    labels:
+      app: rook-ceph
+      psp: rook-ceph
+    values:
+      - helmfile/values/podsecuritypolicies/common/rook-ceph.yaml.gotmpl

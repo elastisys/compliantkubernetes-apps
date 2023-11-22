@@ -1,0 +1,15 @@
+---
+templates:
+  dex:
+    disableValidationOnInstall: true # creates prometheus-operator/servicemonitors
+    inherit: [ template: dex-chart ]
+    condition: ck8sManagementCluster.enabled
+    namespace: dex
+    name: dex
+    labels:
+      app: dex
+    needs:
+      - monitoring/kube-prometheus-stack
+    values:
+      - helmfile/values/dex.yaml.gotmpl
+    wait: true

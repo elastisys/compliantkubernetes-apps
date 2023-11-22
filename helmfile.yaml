@@ -5,19 +5,28 @@ bases:
   - helmfile/bases/v2upstream.yaml
 ---
 bases:
+  - helmfile/stacks/calico.yaml
   - helmfile/stacks/cert-manager.yaml
+  - helmfile/stacks/dex.yaml
   - helmfile/stacks/falco.yaml
   - helmfile/stacks/fluentd.yaml
   - helmfile/stacks/gatekeeper.yaml
+  - helmfile/stacks/harbor.yaml
   - helmfile/stacks/ingress-nginx.yaml
+  - helmfile/stacks/kured.yaml
   - helmfile/stacks/monitoring.yaml
   - helmfile/stacks/monitoring-grafana.yaml
   - helmfile/stacks/monitoring-prometheus.yaml
   - helmfile/stacks/opensearch.yaml
+  - helmfile/stacks/rbac.yaml
+  - helmfile/stacks/rclone.yaml
   - helmfile/stacks/system.yaml
   - helmfile/stacks/thanos.yaml
+  - helmfile/stacks/velero.yaml
 ---
 releases:
+  - inherit: [ template: admin-rbac ]
+
   - inherit: [ template: networkpolicies-common ]
   - inherit: [ template: networkpolicies-service ]
   - inherit: [ template: networkpolicies-workload ]
@@ -47,19 +56,64 @@ releases:
   - inherit: [ template: monitoring-networkpolicy ]
   - inherit: [ template: monitoring-podsecuritypolicy ]
 
+  - inherit: [ template: metrics-server ]
+
   - inherit: [ template: kube-prometheus-stack ]
+  - inherit: [ template: kube-state-metrics-extra-resources ]
   - inherit: [ template: prometheus-blackbox-exporter ]
   - inherit: [ template: prometheus-sc-monitors ]
   - inherit: [ template: prometheus-sc-rules ]
-  - inherit: [ template: kube-state-metrics-extra-resources ]
+
+  {{- range .Values | get "clusterApi.clusters" list }}
+  - inherit: [ template: autoscaling-monitoring ]
+    name: autoscaling-monitoring-{{ . }}
+    set:
+    - name: clusterName
+      value: {{ $.Values.global.ck8sEnvironmentName }}-{{ . }}
+  {{- end }}
+
+  - inherit: [ template: openstack-monitoring ]
 
   - inherit: [ template: trivy-operator ]
   - inherit: [ template: s3-exporter ]
+
+  - inherit: [ template: thanos-networkpolicy ]
+  - inherit: [ template: thanos-ingress-secret ]
+  - inherit: [ template: thanos-objstore-secret ]
+  - inherit: [ template: thanos-query ]
+  - inherit: [ template: thanos-receiver ]
+  - inherit: [ template: thanos-ruler ]
+
+  - inherit: [ template: calico-accountant ]
+  - inherit: [ template: calico-default-deny ]
+  - inherit: [ template: calico-felix-metrics ]
+
+  - inherit: [ template: node-local-dns ]
+
+  - inherit: [ template: rook-ceph-podsecuritypolicy ]
+
+  - inherit: [ template: kured-podsecuritypolicy ]
+  - inherit: [ template: kured-secret ]
+  - inherit: [ template: kured-main ]
+
+  - inherit: [ template: velero-podsecuritypolicy ]
+  - inherit: [ template: velero-main ]
+
+  - inherit: [ template: rclone-sync ]
+
+  - inherit: [ template: dex ]
 
   - inherit: [ template: grafana-admin ]
   - inherit: [ template: grafana-dev ]
   - inherit: [ template: grafana-label-enforcer ]
   - inherit: [ template: grafana-dashboards ]
+
+  - inherit: [ template: harbor-networkpolicy ]
+  - inherit: [ template: harbor-podsecuritypolicy ]
+  - inherit: [ template: harbor-certs ]
+  - inherit: [ template: harbor-main ]
+  - inherit: [ template: harbor-init ]
+  - inherit: [ template: harbor-backup ]
 
   - inherit: [ template: opensearch-podsecuritypolicy ]
   - inherit: [ template: opensearch-secrets ]
@@ -73,35 +127,3 @@ releases:
   - inherit: [ template: opensearch-slm ]
   - inherit: [ template: opensearch-curator ]
   - inherit: [ template: opensearch-exporter ]
-
-  - inherit: [ template: thanos-networkpolicy ]
-  - inherit: [ template: thanos-ingress-secret ]
-  - inherit: [ template: thanos-objstore-secret ]
-  - inherit: [ template: thanos-query ]
-  - inherit: [ template: thanos-receiver ]
-  - inherit: [ template: thanos-ruler ]
-
-# NAME                                     	NAMESPACE        	ENABLED	INSTALLED	LABELS                                                                                                  	CHART                                                            	VERSION
-# openstack-monitoring                     	kube-system      	true   	true     	app:openstack-monitoring                                                                                	./charts/openstack-monitoring                                    	0.1.0
-# autoscaling-monitoring-sc                	capi-cluster     	true   	false    	app:autoscaling-monitoring-sc,group:autoscaling-monitoring                                              	./charts/autoscaling-monitoring                                  	0.1.0
-# autoscaling-monitoring-wc                	capi-cluster     	true   	false    	app:autoscaling-monitoring-wc,group:autoscaling-monitoring                                              	./charts/autoscaling-monitoring                                  	0.1.0
-# networkpolicy                            	harbor           	true   	true     	app:netpol,netpol:harbor                                                                                	./charts/networkpolicy/generator                                 	0.1.0
-# podsecuritypolicy                        	kured            	true   	true     	app:psp,component:gatekeeper-psp,psp:kured                                                              	./charts/gatekeeper/podsecuritypolicies                          	0.1.0
-# podsecuritypolicy                        	velero           	true   	true     	app:psp,component:gatekeeper-psp,psp:velero                                                             	./charts/gatekeeper/podsecuritypolicies                          	0.1.0
-# podsecuritypolicy                        	rook-ceph        	true   	false    	app:psp,component:gatekeeper-psp,psp:rook-ceph                                                          	./charts/gatekeeper/podsecuritypolicies                          	0.1.0
-# podsecuritypolicy                        	harbor           	true   	true     	app:psp,component:gatekeeper-psp,psp:harbor                                                             	./charts/gatekeeper/podsecuritypolicies                          	0.1.0
-# kured                                    	kured            	true   	true     	app:kured,upstream:kubereboot                                                                           	./upstream/kubereboot/kured                                      	4.5.1
-# kured-secret                             	kured            	true   	false    	app:kured                                                                                               	./charts/kured-secret                                            	0.1.0
-# velero                                   	velero           	true   	true     	app:velero,upstream:vmware-tanzu                                                                        	./upstream/vmware-tanzu/velero                                   	3.1.6
-# node-local-dns                           	kube-system      	true   	true     	app:node-local-dns                                                                                      	./charts/node-local-dns                                          	0.1.1
-# metrics-server                           	kube-system      	true   	true     	app:metrics-server,upstream:kubernetes-metrics-server                                                   	./upstream/kubernetes-metrics-server/metrics-server              	3.10.0
-# calico-accountant                        	calico-system    	true   	true     	app:calico-accountant                                                                                   	./charts/calico-accountant                                       	0.1.0
-# calico-felix-metrics                     	kube-system      	true   	true     	app:calico-felix-metrics                                                                                	./charts/calico-felix-metrics                                    	0.1.0
-# cluster-admin-rbac                       	kube-system      	true   	true     	app:cluster-admin-rbac                                                                                  	./charts/cluster-admin-rbac                                      	0.1.0
-# calico-default-deny                      	kube-system      	true   	false    	app:calico-default-deny                                                                                 	./charts/calico-default-deny                                     	0.1.0
-# dex                                      	dex              	true   	true     	app:dex,upstream:dexidp                                                                                 	./upstream/dexidp/dex                                            	0.14.1
-# harbor-certs                             	harbor           	true   	true     	app:harbor,component:harbor-certs,group:harbor,harbor:certs                                             	./charts/harbor/harbor-certs                                     	0.1.0
-# harbor                                   	harbor           	true   	true     	app:harbor,component:harbor,group:harbor,harbor:harbor,upstream:goharbor                                	./upstream/goharbor/harbor                                       	1.12.2
-# init-harbor                              	harbor           	true   	true     	app:harbor,component:harbor-init,group:harbor,harbor:init                                               	./charts/harbor/init-harbor                                      	0.2.0
-# harbor-backup                            	harbor           	true   	true     	app:harbor,component:harbor-backup,group:harbor,harbor:backup                                           	./charts/harbor/harbor-backup                                    	0.1.0
-# rclone-sync                              	rclone           	true   	false    	app:rclone-sync                                                                                         	./charts/rclone-sync                                             	0.1.0

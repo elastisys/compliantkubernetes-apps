@@ -32,6 +32,46 @@ templates:
     values:
       - helmfile/values/podsecuritypolicies/common/monitoring.yaml.gotmpl
 
+  metrics-server:
+    inherit: [ template: metrics-server-chart ]
+    installed: {{ .Values | get "metricsServer.enabled" false }}
+    namespace: kube-system
+    name: metrics-server
+    labels:
+      app: metrics-server
+    values:
+      - helmfile/values/metrics-server.yaml.gotmpl
+
+  autoscaling-monitoring:
+    disableValidationOnInstall: true # creates prometheus-operator/servicemonitors
+    condition: ck8sManagementCluster.enabled
+    installed: {{ .Values | get "clusterApi.monitoring.enabled" false }}
+    chart: helmfile/charts/autoscaling-monitoring
+    version: 0.1.0
+    namespace: capi-cluster
+    labels:
+      app: autoscaling-monitoring
+    needs:
+      - monitoring/kube-prometheus-stack
+    values:
+      - helmfile/values/autoscaling-monitoring.yaml.gotmpl
+
+  openstack-monitoring:
+    disableValidationOnInstall: true # creates prometheus-operator/servicemonitors and prometheus-operator/prometheusrules
+    condition: ck8sManagementCluster.enabled
+    installed: {{ .Values | get "openstackMonitoring.enabled" false }}
+    chart: helmfile/charts/openstack-monitoring
+    version: 0.1.0
+    namespace: kube-system
+    name: openstack-monitoring
+    labels:
+      app: openstack-monitoring
+    needs:
+      - monitoring/kube-prometheus-stack
+    values:
+      - helmfile/values/openstack-monitoring.yaml.gotmpl
+      - helmfile/values/prometheus-alerts-sc.yaml.gotmpl
+
   trivy-operator:
     disableValidationOnInstall: true # creates own custom resources
     inherit:
@@ -39,6 +79,8 @@ templates:
       - template: trivy-operator-chart
     installed: {{ .Values | get "trivy.enabled" false }}
     name: trivy-operator
+    labels:
+      app: trivy-operator
     needs:
       - monitoring/networkpolicy
       - monitoring/podsecuritypolicy

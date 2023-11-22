@@ -153,7 +153,7 @@ templates:
       - template: prometheus-elasticsearch-exporter-chart
     name: prometheus-opensearch-exporter
     needs:
-      # - monitoring/kube-prometheus-stack
+      - monitoring/kube-prometheus-stack
       - opensearch-system/opensearch-configurer
     values:
       - helmfile/values/prometheus-opensearch-exporter.yaml.gotmpl

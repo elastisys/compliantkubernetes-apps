@@ -1,0 +1,16 @@
+---
+templates:
+  rbac:
+    namespace: kube-system
+    labels:
+      policy: rbac
+
+  admin-rbac:
+    inherit: [ template: rbac ]
+    chart: helmfile/charts/cluster-admin-rbac
+    version: 0.1.0
+    name: cluster-admin-rbac
+    labels:
+      app: admin-rbac
+    values:
+      - helmfile/values/cluster-admin-rbac.yaml.gotmpl

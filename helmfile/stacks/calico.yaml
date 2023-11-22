@@ -1,0 +1,43 @@
+---
+templates:
+  calico:
+    {{- if .Values | get "clusterApi.enabled" false }}
+    namespace: calico-system
+    {{- else }}
+    namespace: kube-system
+    {{- end }}
+    labels:
+      app: calico
+
+  calico-accountant:
+    disableValidationOnInstall: true # creates prometheus-operator/servicemonitors
+    inherit: [ template: calico ]
+    installed: {{ .Values | get "calicoAccountant.enabled" false }}
+    chart: helmfile/charts/calico-accountant
+    version: 0.1.0
+    name: calico-accountant
+    needs:
+      - monitoring/kube-prometheus-stack
+    values:
+      - helmfile/values/calico-accountant.yaml.gotmpl
+
+  calico-default-deny:
+    inherit: [ template: calico ]
+    installed: {{ .Values | get "networkPolicies.defaultDeny" false }}
+    chart: helmfile/charts/calico-default-deny
+    version: 0.1.0
+    namespace: kube-system
+    name: calico-default-deny
+    values:
+      - helmfile/values/calico-default-deny.yaml.gotmpl
+
+  calico-felix-metrics:
+    disableValidationOnInstall: true # creates prometheus-operator/servicemonitors
+    inherit: [ template: calico ]
+    installed: {{ .Values | get "calicoFelixMetrics.enabled" false }}
+    chart: helmfile/charts/calico-felix-metrics
+    version: 0.1.0
+    namespace: kube-system
+    name: calico-felix-metrics
+    needs:
+      - monitoring/kube-prometheus-stack

@@ -1,0 +1,33 @@
+---
+templates:
+  velero:
+    namespace: velero
+    labels:
+      app: velero
+
+  velero-podsecuritypolicy:
+    inherit:
+      - template: velero
+      - template: podsecuritypolicies
+    installed: {{ .Values | get "velero.enabled" false }}
+    labels:
+      psp: velero
+    values:
+      - helmfile/values/podsecuritypolicies/common/velero.yaml.gotmpl
+
+  velero-main:
+    disableValidationOnInstall: true # creates own custom resources
+    inherit:
+      - template: velero
+      - template: velero-chart
+    installed: {{ .Values | get "velero.enabled" false }}
+    name: velero
+    needs:
+      - monitoring/kube-prometheus-stack
+      - velero/podsecuritypolicy
+    values:
+      {{ if .Values.ck8sManagementCluster.enabled }}
+      - helmfile/values/velero-sc.yaml.gotmpl
+      {{ else if .Values.ck8sWorkloadCluster.enabled }}
+      - helmfile/values/velero-wc.yaml.gotmpl
+      {{ end }}
