@@ -6,6 +6,8 @@ bases:
 ---
 bases:
   - helmfile/stacks/cert-manager.yaml
+  - helmfile/stacks/falco.yaml
+  - helmfile/stacks/fluentd.yaml
   - helmfile/stacks/gatekeeper.yaml
   - helmfile/stacks/ingress-nginx.yaml
   - helmfile/stacks/monitoring.yaml
@@ -28,6 +30,16 @@ releases:
   - inherit: [ template: gatekeeper-constraints ]
   - inherit: [ template: gatekeeper-mutations ]
   - inherit: [ template: gatekeeper-metrics ]
+
+  - inherit: [ template: falco-podsecuritypolicy ]
+  - inherit: [ template: falco-daemonset ]
+  - inherit: [ template: falco-exporter ]
+
+  - inherit: [ template: fluentd-podsecuritypolicy ]
+  - inherit: [ template: fluentd-aggregator ]
+  - inherit: [ template: fluentd-forwarder ]
+  - inherit: [ template: fluentd-user ]
+  - inherit: [ template: log-manager ]
 
   - inherit: [ template: ingress-nginx-podsecuritypolicy ]
   - inherit: [ template: ingress-nginx-controller ]
@@ -74,9 +86,6 @@ releases:
 # autoscaling-monitoring-sc                	capi-cluster     	true   	false    	app:autoscaling-monitoring-sc,group:autoscaling-monitoring                                              	./charts/autoscaling-monitoring                                  	0.1.0
 # autoscaling-monitoring-wc                	capi-cluster     	true   	false    	app:autoscaling-monitoring-wc,group:autoscaling-monitoring                                              	./charts/autoscaling-monitoring                                  	0.1.0
 # networkpolicy                            	harbor           	true   	true     	app:netpol,netpol:harbor                                                                                	./charts/networkpolicy/generator                                 	0.1.0
-# networkpolicy                            	thanos           	true   	true     	app:netpol,netpol:thanos                                                                                	./charts/networkpolicy/generator                                 	0.1.0
-# podsecuritypolicy                        	falco            	true   	true     	app:psp,component:gatekeeper-psp,psp:falco                                                              	./charts/gatekeeper/podsecuritypolicies                          	0.1.0
-# podsecuritypolicy                        	fluentd-system   	true   	true     	app:psp,component:gatekeeper-psp,psp:fluentd                                                            	./charts/gatekeeper/podsecuritypolicies                          	0.1.0
 # podsecuritypolicy                        	kured            	true   	true     	app:psp,component:gatekeeper-psp,psp:kured                                                              	./charts/gatekeeper/podsecuritypolicies                          	0.1.0
 # podsecuritypolicy                        	velero           	true   	true     	app:psp,component:gatekeeper-psp,psp:velero                                                             	./charts/gatekeeper/podsecuritypolicies                          	0.1.0
 # podsecuritypolicy                        	rook-ceph        	true   	false    	app:psp,component:gatekeeper-psp,psp:rook-ceph                                                          	./charts/gatekeeper/podsecuritypolicies                          	0.1.0
@@ -89,15 +98,10 @@ releases:
 # calico-accountant                        	calico-system    	true   	true     	app:calico-accountant                                                                                   	./charts/calico-accountant                                       	0.1.0
 # calico-felix-metrics                     	kube-system      	true   	true     	app:calico-felix-metrics                                                                                	./charts/calico-felix-metrics                                    	0.1.0
 # cluster-admin-rbac                       	kube-system      	true   	true     	app:cluster-admin-rbac                                                                                  	./charts/cluster-admin-rbac                                      	0.1.0
-# falco                                    	falco            	true   	true     	app:falco,upstream:falcosecurity                                                                        	./upstream/falcosecurity/falco                                   	3.8.3
-# falco-exporter                           	falco            	true   	true     	app:falco-exporter,upstream:falcosecurity                                                               	./upstream/falcosecurity/falco-exporter                          	0.9.7
 # calico-default-deny                      	kube-system      	true   	false    	app:calico-default-deny                                                                                 	./charts/calico-default-deny                                     	0.1.0
 # dex                                      	dex              	true   	true     	app:dex,upstream:dexidp                                                                                 	./upstream/dexidp/dex                                            	0.14.1
 # harbor-certs                             	harbor           	true   	true     	app:harbor,component:harbor-certs,group:harbor,harbor:certs                                             	./charts/harbor/harbor-certs                                     	0.1.0
 # harbor                                   	harbor           	true   	true     	app:harbor,component:harbor,group:harbor,harbor:harbor,upstream:goharbor                                	./upstream/goharbor/harbor                                       	1.12.2
 # init-harbor                              	harbor           	true   	true     	app:harbor,component:harbor-init,group:harbor,harbor:init                                               	./charts/harbor/init-harbor                                      	0.2.0
 # harbor-backup                            	harbor           	true   	true     	app:harbor,component:harbor-backup,group:harbor,harbor:backup                                           	./charts/harbor/harbor-backup                                    	0.1.0
-# fluentd-aggregator                       	fluentd-system   	true   	true     	app:fluentd,component:fluentd-aggregator,upstream:bitnami                                               	./upstream/bitnami/fluentd                                       	5.8.2
-# fluentd-forwarder                        	fluentd-system   	true   	true     	app:fluentd,component:fluentd-forwarder,upstream:kokuwa                                                 	./upstream/kokuwa/fluentd-elasticsearch                          	13.10.0
-# log-manager                              	fluentd-system   	true   	true     	app:fluentd,component:log-manager                                                                       	./charts/log-manager                                             	0.1.0
 # rclone-sync                              	rclone           	true   	false    	app:rclone-sync                                                                                         	./charts/rclone-sync                                             	0.1.0

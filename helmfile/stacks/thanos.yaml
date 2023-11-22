@@ -2,7 +2,6 @@
 templates:
   thanos:
     condition: ck8sManagementCluster.enabled
-    installed: {{ .Values | get "thanos.enabled" false }}
     namespace: thanos
     labels:
       app: thanos
