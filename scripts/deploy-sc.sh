@@ -18,7 +18,7 @@ if [[ "$alertTo" != "slack" && "$alertTo" != "null" && "$alertTo" != "opsgenie" 
 fi
 
 echo "Installing helm charts" >&2
-cd "${SCRIPTS_PATH}/../helmfile"
+cd "${SCRIPTS_PATH}/../helmfile.d"
 
 if [ ${#} -eq 1 ] && [ "$1" = "sync" ]; then
     helmfile -f . -e service_cluster sync "$2"

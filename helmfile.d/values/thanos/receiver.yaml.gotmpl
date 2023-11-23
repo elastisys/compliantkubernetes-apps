@@ -31,15 +31,36 @@ compactor:
   persistence:
     size: {{ .Values.thanos.compactor.persistence.size }}
 
+  containerSecurityContext:
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+
 storegateway:
   enabled: true
   persistence:
     size: {{ .Values.thanos.storegateway.persistence.size }}
   resources: {{- toYaml .Values.thanos.storegateway.resources | nindent 4 }}
 
+  containerSecurityContext:
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+
 bucketweb:
   enabled: true
   resources: {{- toYaml .Values.thanos.bucketweb.resources | nindent 4 }}
+
+  containerSecurityContext:
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
 
 receive:
   enabled: true
@@ -81,9 +102,23 @@ receive:
       nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.thanosReceiver }}
       {{ end }}
 
+  containerSecurityContext:
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+
 receiveDistributor:
   resources: {{- toYaml .Values.thanos.receiveDistributor.resources | nindent 4 }}
   replicationFactor: {{  .Values.thanos.receiveDistributor.replicationFactor }}
+
+  containerSecurityContext:
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
 
 ruler:
   enabled: {{ .Values.thanos.ruler.enabled }}
@@ -113,6 +148,13 @@ ruler:
   extraFlags:
     - --rule-file=/conf/rules/*.yaml
 
+  containerSecurityContext:
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+
   # Taken from what a thanos-ruler would get from the prometheus operator.
   sidecars:
     - name: config-reloader
@@ -134,6 +176,12 @@ ruler:
         runAsNonRoot: true
         runAsGroup: 65534
         runAsUser: 65534
+        capabilities:
+          drop:
+            - ALL
+        seccompProfile:
+          type: RuntimeDefault
+        allowPrivilegeEscalation: false
       volumeMounts:
       - mountPath: /etc/thanos/rules/thanos-ruler-thanos-ruler-rulefiles-0
         name: ruler-config

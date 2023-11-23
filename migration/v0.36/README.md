@@ -1,7 +1,7 @@
-# Upgrade to ${new_version}.x
+# Upgrade to v0.36.x
 
 > [!WARNING]
-> Upgrade only supported from ${old_version}.x.
+> Upgrade only supported from v0.35.x.
 
 <!--
 Notice to developers on writing migration steps:
@@ -58,7 +58,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     git pull
-    git switch -d ${new_version}.x
+    git switch -d v0.36.x
     ```
 
 1. Prepare upgrade - *non-disruptive*
@@ -66,7 +66,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > *Done before maintenance window.*
 
     ```bash
-    ./bin/ck8s upgrade both ${new_version} prepare
+    ./bin/ck8s upgrade both v0.36 prepare
 
     # check if the netpol IPs need to be updated
     ./bin/ck8s update-ips both dry-run
@@ -77,8 +77,8 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > [!NOTE]
     > It is possible to upgrade `wc` and `sc` clusters separately by replacing `both` when running the `upgrade` command, e.g. the following will only upgrade the workload cluster:
     > ```bash
-    > ./bin/ck8s upgrade wc ${new_version} prepare
-    > ./bin/ck8s upgrade wc ${new_version} apply
+    > ./bin/ck8s upgrade wc v0.36 prepare
+    > ./bin/ck8s upgrade wc v0.36 apply
     > ```
 
 1. Apply upgrade - *disruptive*
@@ -86,7 +86,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > *Done during maintenance window.*
 
     ```bash
-    ./bin/ck8s upgrade both ${new_version} apply
+    ./bin/ck8s upgrade both v0.36 apply
     ```
 
 ## Manual method
@@ -99,7 +99,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     git pull
-    git switch -d ${new_version}.x
+    git switch -d v0.36.x
     ```
 
 1. Set whether or not upgrade should be prepared for `both` clusters or for one of `sc` or `wc`:
@@ -115,7 +115,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ```bash
     ./bin/ck8s init ${CK8S_CLUSTER}
     # or
-    ./migration/${new_version}/prepare/50-init.sh
+    ./migration/v0.36/prepare/50-init.sh
 
     # check if the netpol IPs need to be updated
     ./bin/ck8s update-ips ${CK8S_CLUSTER} dry-run
@@ -133,12 +133,18 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
+1. Configure namespaces in helm and update gatekeeper
+
+    ```bash
+    ./migration/v0.36/apply/40-namespaces.sh
+    ```
+
 1. Upgrade applications:
 
     ```bash
     ./bin/ck8s apply {sc|wc}
     # or
-    ./migration/${new_version}/apply/80-apply.sh execute
+    ./migration/v0.36/apply/80-apply.sh execute
     ```
 
 ## Postrequisite:

@@ -20,16 +20,22 @@ here="$(dirname "$(readlink -f "$0")")"
 
 # Destroy user namespaces before everything else,
 # to avoid race conditions where CRs are not deleted before controllers in other namespaces
-"${here}/.././bin/ck8s" ops helmfile wc -l app=user-rbac destroy
+"${here}/.././bin/ck8s" ops helmfile wc -l app=dev-rbac destroy
+
+# Might fail to be destroyed the first time, therefore run it once now
+"${here}/.././bin/ck8s" ops helmfile wc -l app=hnc destroy
 
 # Destroy all helm releases
 "${here}/.././bin/ck8s" ops helmfile wc -l app!=cert-manager destroy
 
 # Clean up namespaces and any other resources left behind by the apps
-"${here}/.././bin/ck8s" ops kubectl wc delete ns falco fluentd-system fluentd gatekeeper-system hnc-system ingress-nginx monitoring velero kured
+"${here}/.././bin/ck8s" ops kubectl wc delete ns alertmanager falco fluentd-system fluentd gatekeeper-system hnc-system ingress-nginx monitoring velero kured
 
 # Destroy cert-manager helm release
 "${here}/.././bin/ck8s" ops helmfile wc -l app=cert-manager destroy
+
+# Destroy local-cluster minio release, otherwise pvc cleanup will get stuck
+helmfile -e local_cluster -f "${here}/../helmfile.d" -l app=minio destroy
 
 # Remove any lingering persistent volume claims
 "${here}/.././bin/ck8s" ops kubectl wc delete pvc -A --all
