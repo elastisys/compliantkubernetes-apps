@@ -1,0 +1,10 @@
+nameOverride: ""
+
+service:
+  name: "ingress-nginx-controller-metrics"
+  port: 10254
+
+ingress:
+  className: nginx
+  host: ingress.example.com
+  annotations: {}

@@ -62,6 +62,7 @@ releases:
   - inherit: [ template: file-copier ]
   - inherit: [ template: ingress-nginx-podsecuritypolicy ]
   - inherit: [ template: ingress-nginx-controller ]
+  - inherit: [ template: ingress-nginx-probe-ingress ]
 
   - inherit: [ template: monitoring-networkpolicy ]
   - inherit: [ template: monitoring-podsecuritypolicy ]
