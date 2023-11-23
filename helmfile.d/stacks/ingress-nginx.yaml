@@ -44,3 +44,15 @@ templates:
     values:
       - values/ingress-nginx.yaml.gotmpl
     wait: true
+
+  ingress-nginx-probe-ingress:
+    name: ingress-nginx-probe-ingresss
+    condition: ck8sWorkloadCluster.enabled
+    namespace: ingress-nginx
+    labels:
+      app: ingress-nginx-probe-ingress
+    chart: charts/ingress-nginx-probe-ingress
+    installed: {{ .Values | get "wcProbeIngress.enabled" false }}
+    version: 0.1.0
+    values:
+      - values/ingress-nginx-probe-ingress.yaml.gotmpl

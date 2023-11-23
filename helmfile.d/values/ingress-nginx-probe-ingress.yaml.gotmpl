@@ -1,0 +1,7 @@
+ingress:
+  host: {{ .Values.ingressNginx.subDomain }}.{{ .Values.global.baseDomain }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
+  {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.global }}
+    nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.global }}
+  {{ end }}

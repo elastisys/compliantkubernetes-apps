@@ -253,12 +253,17 @@ externalTrafficPolicy:
   whitelistRange:
     # global: 0.0.0.0/0
     kubeapiMetrics: false
+wcProbeIngress:
+  enabled: true
 
 prometheusBlackboxExporter:
   targets:
     gatekeeper: true
     falco: true
     sc: true
+
+ingressNginx:
+  subDomain: ingress-nginx
 
 # Network policies for workload cluster
 networkPolicies:
