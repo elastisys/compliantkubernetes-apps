@@ -24,7 +24,7 @@ apps_run_sc() {
     log_info "Applying applications in service cluster"
     (
         with_kubeconfig "${config[kube_config_sc]}" \
-            "${scripts_path}/deploy-sc.sh" "${1:-""}"
+            "${scripts_path}/deploy-sc.sh" "${@}"
     )
 }
 
@@ -32,7 +32,7 @@ apps_run_wc() {
     log_info "Applying applications in workload cluster"
     (
         with_kubeconfig "${config[kube_config_wc]}" \
-            "${scripts_path}/deploy-wc.sh" "${1:-""}"
+            "${scripts_path}/deploy-wc.sh" "${@}"
     )
 }
 
@@ -71,8 +71,7 @@ apps_sc() {
     # but feels good enough until we figure out something smarter.
     #
     #[ "$1" != "--skip-template-validate" ] && template_validate_sc
-
-    apps_run_sc "${2:-""}"
+    apps_run_sc "${2:-""}" "$3"
 
     log_info "Applications applied successfully!"
 }
@@ -82,7 +81,7 @@ apps_wc() {
     # See rationale above
     #[ "$1" != "--skip-template-validate" ] && template_validate_wc
 
-    apps_run_wc "${2:-""}"
+    apps_run_wc "${2:-""}" "$3"
 
     log_info "Applications applied successfully!"
 }
@@ -103,7 +102,7 @@ if [[ $1 == "wc" ]]; then
         fi
     fi
     config_load "$1"
-    apps_wc "$2" "$3"
+    apps_wc "$2" "$3" "$4"
 elif [[ $1 == "sc" ]]; then
     if ! "${here}/update-ips.bash" "sc" "dry-run"; then
         log_warning "Diff in sc config for network policy IPs, run 'ck8s update-ips sc apply' to fix this issue."
@@ -117,7 +116,7 @@ elif [[ $1 == "sc" ]]; then
         fi
     fi
     config_load "$1"
-    apps_sc "$2" "$3"
+    apps_sc "$2" "$3" "$4"
 else
     echo "ERROR:  [$1] is an invalid argument:"
     echo "usage:   ck8s apps <wc|sc>. "

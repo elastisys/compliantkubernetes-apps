@@ -17,17 +17,13 @@ if [[ "$alertTo" != "slack" && "$alertTo" != "null" && "$alertTo" != "opsgenie" 
     exit 1
 fi
 
-INTERACTIVE=${1:-""}
-
 echo "Installing helm charts" >&2
 cd "${SCRIPTS_PATH}/../helmfile"
-declare -a helmfile_opt_flags
-[[ -n "$INTERACTIVE" ]] && helmfile_opt_flags+=("$INTERACTIVE")
 
 if [ ${#} -eq 1 ] && [ "$1" = "sync" ]; then
-    helmfile -f . -e service_cluster sync
+    helmfile -f . -e service_cluster sync "$2"
 else
-    helmfile -f . -e service_cluster apply --suppress-diff
+    helmfile -f . -e service_cluster apply "$2" --suppress-diff
 fi
 
 echo "Deploy sc completed!" >&2
