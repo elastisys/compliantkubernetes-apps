@@ -1,0 +1,10 @@
+namespaces:
+  {{ if .Values.user.alertmanager.enabled }}
+  - name: alertmanager
+  {{ end }}
+
+commonLabels:
+  owner: operator
+
+commonAnnotations:
+  helm.sh/resource-policy: keep

@@ -41,3 +41,4 @@ templates:
     name: calico-felix-metrics
     needs:
       - monitoring/kube-prometheus-stack # creates servicemonitors
+      - kube-system/system-namespaces

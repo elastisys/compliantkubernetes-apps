@@ -2,8 +2,6 @@
 
 _ck8s_command_ck8s() {
     opts+=("init")
-    opts+=("bootstrap")
-    opts+=("apps")
     opts+=("apply")
     opts+=("test")
     opts+=("dry-run")
@@ -16,20 +14,6 @@ _ck8s_command_ck8s() {
     opts+=("providers")
     opts+=("flavors")
     COMPREPLY=($(compgen -W "${opts[*]}" -- ${cur}))
-}
-
-_ck8s_command_ck8s_bootstrap() {
-    local opts=()
-    opts+=("sc")
-    opts+=("wc")
-    COMPREPLY=( $(compgen -W "${opts[*]}" -- ${cur}) )
-}
-
-_ck8s_command_ck8s_apps() {
-    local opts=()
-    opts+=("sc")
-    opts+=("wc")
-    COMPREPLY=( $(compgen -W "${opts[*]}" -- ${cur}) )
 }
 
 _ck8s_command_ck8s_apply() {

@@ -25,10 +25,14 @@ bases:
   - helmfile/stacks/system.yaml
   - helmfile/stacks/thanos.yaml
   - helmfile/stacks/velero.yaml
+  - helmfile/stacks/namespaces.yaml
 ---
 releases:
   - inherit: [ template: tigera ]
   - inherit: [ template: minio ]
+
+  - inherit: [ template: system-namespaces ]
+  - inherit: [ template: user-namespaces ]
 
   - inherit: [ template: admin-rbac ]
   - inherit: [ template: dev-rbac ]

@@ -13,6 +13,8 @@ templates:
       - template: networkpolicies
     labels:
       netpol: hnc
+    needs:
+      - kube-system/system-namespaces
     values:
       - helmfile/values/networkpolicies/common/common.yaml.gotmpl
       - helmfile/values/networkpolicies/workload/hnc.yaml.gotmpl
@@ -23,6 +25,8 @@ templates:
     chart: helmfile/charts/hnc/config-and-crds
     version: 0.1.0
     name: hnc-config-and-crds
+    needs:
+      - kube-system/system-namespaces
     values:
       - helmfile/values/hnc/controller.yaml.gotmpl
 

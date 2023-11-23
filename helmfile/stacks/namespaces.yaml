@@ -1,0 +1,27 @@
+---
+templates:
+  namespaces:
+    namespace: kube-system
+    chart: helmfile/charts/namespaces
+    version: 0.1.1
+
+  system-namespaces:
+    name: system-namespaces
+    inherit: [ template: namespaces ]
+    labels:
+      app: system-namespaces
+    values:
+      {{ if .Values.ck8sManagementCluster.enabled }}
+      - helmfile/values/system-namespaces-sc.yaml.gotmpl
+      {{ else if .Values.ck8sWorkloadCluster.enabled }}
+      - helmfile/values/system-namespaces-wc.yaml.gotmpl
+      {{ end }}
+
+  user-namespaces:
+    name: user-namespaces
+    inherit: [ template: namespaces ]
+    condition: ck8sWorkloadCluster.enabled
+    labels:
+      app: user-namespaces
+    values:
+      - helmfile/values/user-namespaces.yaml.gotmpl

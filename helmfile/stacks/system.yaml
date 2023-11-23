@@ -27,6 +27,8 @@ templates:
     labels:
       policy: netpol
       netpol: service
+    needs:
+      - kube-system/system-namespaces
     values:
       - helmfile/values/networkpolicy/service-cluster.yaml.gotmpl
 
@@ -39,6 +41,8 @@ templates:
     labels:
       policy: netpol
       netpol: workload
+    needs:
+      - kube-system/system-namespaces
     values:
       - helmfile/values/networkpolicy/workload-cluster.yaml.gotmpl
 

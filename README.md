@@ -394,7 +394,7 @@ Run the script to see what options are available.
 
 #### Examples
 
-- Bootstrap and deploy apps to the workload cluster:
+- Deploy apps to the workload cluster:
 
   ```bash
   ./bin/ck8s apply wc

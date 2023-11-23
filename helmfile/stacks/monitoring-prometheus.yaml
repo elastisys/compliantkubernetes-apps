@@ -105,6 +105,7 @@ templates:
     labels:
       app: dev-alertmanager
     needs:
+      - kube-system/user-namespaces
       - kube-system/user-rbac
       - monitoring/kube-prometheus-stack # creates prometheus-operator/alertmanagers
     values:

@@ -21,6 +21,8 @@ templates:
     chart: helmfile/charts/kured-secret
     version: 0.1.0
     name: kured-secret
+    needs:
+      - kube-system/system-namespaces
     values:
     - helmfile/values/kured.yaml.gotmpl
 

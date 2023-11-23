@@ -139,14 +139,6 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
-1. Rerun bootstrap:
-
-    ```bash
-    ./bin/ck8s bootstrap {sc|wc}
-    # or
-    ./migration/v0.35/apply/20-bootstrap.sh execute
-    ```
-
 1. Upgrade harbor:
 
     ```bash

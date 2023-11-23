@@ -160,14 +160,6 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.34/apply/12-hnc-crds.sh execute
     ```
 
-1. Rerun bootstrap:
-
-    ```bash
-    ./bin/ck8s bootstrap {sc|wc}
-    # or
-    ./migration/v0.34/apply/20-bootstrap.sh execute
-    ```
-
 1. Delete obsolete namespaces:
 
     ```bash
