@@ -11,7 +11,6 @@ source "${here}/common.bash"
 usage() {
     echo "COMMANDS:" 1>&2
     echo "  init <wc|sc|both> [--generate-new-secrets]        initialize the config path" 1>&2
-    echo "  bootstrap <wc|sc>                                 bootstrap the cluster" 1>&2
     echo "  apps <wc|sc> [--sync] [--skip-template-validate]  deploy the applications" 1>&2
     echo "  apply <wc|sc> [--sync] [--skip-template-validate] bootstrap and apps" 1>&2
     echo "  test <wc|sc> [--logging-enabled]                  test the applications" 1>&2
@@ -63,11 +62,6 @@ case "${1}" in
         export CK8S_CLUSTER="${2}"
         "${here}/init.bash" "${GEN_NEW_SECRETS}"
         ;;
-    bootstrap)
-        [[ "${2}" =~ ^(wc|sc)$ ]] || usage
-        check_tools
-        "${here}/bootstrap.bash" "${2}"
-        ;;
     apps)
         [[ "${2}" =~ ^(wc|sc)$ ]] || usage
         check_tools
@@ -76,7 +70,6 @@ case "${1}" in
     apply)
         [[ "${2}" =~ ^(wc|sc)$ ]] || usage
         check_tools
-        "${here}/bootstrap.bash" "${2}"
         "${here}/apps.bash" "${2}" "${SKIP}" "${SYNC}"
         ;;
     test)

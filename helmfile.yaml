@@ -23,8 +23,10 @@ bases:
   - helmfile/stacks/system.yaml
   - helmfile/stacks/thanos.yaml
   - helmfile/stacks/velero.yaml
+  - helmfile/stacks/namespaces.yaml
 ---
 releases:
+  - inherit: [ template: ck8s-namespaces ]
   - inherit: [ template: admin-rbac ]
 
   - inherit: [ template: networkpolicies-common ]

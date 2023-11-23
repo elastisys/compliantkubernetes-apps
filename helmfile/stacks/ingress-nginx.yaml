@@ -11,6 +11,8 @@ templates:
       - template: podsecuritypolicies
     labels:
       psp: ingress-nginx
+    needs:
+      - kube-system/ck8s-namespaces
     values:
       - helmfile/values/podsecuritypolicies/common/ingress-nginx.yaml.gotmpl
 

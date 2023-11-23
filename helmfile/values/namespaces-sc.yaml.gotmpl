@@ -4,12 +4,13 @@ namespaces:
     pod-security.kubernetes.io/audit: restricted
     pod-security.kubernetes.io/enforce: restricted
     pod-security.kubernetes.io/warn: restricted
-{{- if .Values.fluentd.enabled }}
-- name: fluentd
+- name: dex
   labels:
-    pod-security.kubernetes.io/audit: privileged
-    pod-security.kubernetes.io/enforce: privileged
-    pod-security.kubernetes.io/warn: privileged
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
+- name: opensearch-system
+{{- if .Values.fluentd.enabled }}
 - name: fluentd-system
   labels:
     pod-security.kubernetes.io/audit: privileged
@@ -17,8 +18,14 @@ namespaces:
     pod-security.kubernetes.io/warn: privileged
 {{- end }}
 - name: kube-node-lease
+  annotations:
+    helm.sh/resource-policy: keep
 - name: kube-public
+  annotations:
+    helm.sh/resource-policy: keep
 - name: kube-system
+  annotations:
+    helm.sh/resource-policy: keep
 - name: monitoring
   labels:
     pod-security.kubernetes.io/audit: privileged
@@ -35,13 +42,26 @@ namespaces:
     pod-security.kubernetes.io/enforce: baseline
     pod-security.kubernetes.io/warn: baseline
     {{ end }}
+{{ if .Values.falco.enabled }}
+- name: falco
+{{ end }}
 - name: velero
   labels:
     pod-security.kubernetes.io/audit: privileged
     pod-security.kubernetes.io/enforce: privileged
     pod-security.kubernetes.io/warn: privileged
-{{ if .Values.falco.enabled }}
-- name: falco
+{{ if .Values.harbor.enabled }}
+- name: harbor
+  labels:
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
+{{ end }}
+{{ if .Values.thanos.enabled }}
+- name: thanos
+{{ end }}
+{{ if .Values.kured.enabled }}
+- name: kured
   labels:
     pod-security.kubernetes.io/audit: privileged
     pod-security.kubernetes.io/enforce: privileged
@@ -52,22 +72,12 @@ namespaces:
     pod-security.kubernetes.io/audit: restricted
     pod-security.kubernetes.io/enforce: restricted
     pod-security.kubernetes.io/warn: restricted
-{{ if .Values.hnc.enabled }}
-- name: hnc-system
+{{ if .Values.objectStorage.sync.enabled }}
+- name: rclone
   labels:
     pod-security.kubernetes.io/audit: restricted
     pod-security.kubernetes.io/enforce: restricted
     pod-security.kubernetes.io/warn: restricted
-{{ end }}
-{{ if .Values.user.alertmanager.enabled }}
-- name: alertmanager
-{{ end }}
-{{ if .Values.kured.enabled }}
-- name: kured
-  labels:
-    pod-security.kubernetes.io/audit: privileged
-    pod-security.kubernetes.io/enforce: privileged
-    pod-security.kubernetes.io/warn: privileged
 {{ end }}
 commonLabels:
   owner: operator

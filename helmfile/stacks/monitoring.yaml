@@ -12,6 +12,8 @@ templates:
     installed: {{ .Values | get "networkPolicies.monitoring.enabled" false }}
     labels:
       netpol: monitoring
+    needs:
+      - kube-system/ck8s-namespaces
     values:
       - helmfile/values/networkpolicies/common/common.yaml.gotmpl
       - helmfile/values/networkpolicies/common/prometheus.yaml.gotmpl
@@ -29,6 +31,8 @@ templates:
       - template: podsecuritypolicies
     labels:
       psp: monitoring
+    needs:
+      - kube-system/ck8s-namespaces
     values:
       - helmfile/values/podsecuritypolicies/common/monitoring.yaml.gotmpl
 

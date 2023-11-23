@@ -1,0 +1,15 @@
+---
+templates:
+  ck8s-namespaces:
+    name: ck8s-namespaces
+    namespace: kube-system
+    labels:
+      app: ck8s-namespaces
+    chart: helmfile/charts/namespaces
+    version: 0.1.1
+    values:
+      {{ if .Values.ck8sManagementCluster.enabled }}
+      - helmfile/values/namespaces-sc.yaml.gotmpl
+      {{ else if .Values.ck8sWorkloadCluster.enabled }}
+      - helmfile/values/namespaces-wc.yaml.gotmpl
+      {{ end }}

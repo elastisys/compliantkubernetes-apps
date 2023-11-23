@@ -23,6 +23,7 @@ templates:
     installed: {{ .Values | get "velero.enabled" false }}
     name: velero
     needs:
+      - kube-system/ck8s-namespaces
       - monitoring/kube-prometheus-stack
       - velero/podsecuritypolicy
     values:
