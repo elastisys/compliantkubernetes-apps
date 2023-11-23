@@ -19,6 +19,7 @@ bases:
   - stacks/monitoring.yaml
   - stacks/monitoring-grafana.yaml
   - stacks/monitoring-prometheus.yaml
+  - stacks/namespaces.yaml
   - stacks/opensearch.yaml
   - stacks/rbac.yaml
   - stacks/rclone.yaml
@@ -29,6 +30,9 @@ bases:
 releases:
   - inherit: [ template: tigera ]
   - inherit: [ template: minio ]
+
+  - inherit: [ template: admin-namespaces ]
+  - inherit: [ template: dev-namespaces ]
 
   - inherit: [ template: admin-rbac ]
   - inherit: [ template: dev-rbac ]

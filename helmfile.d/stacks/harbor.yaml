@@ -13,6 +13,8 @@ templates:
     installed: {{ and (.Values | get "harbor.enabled" false) (.Values | get "networkPolicies.harbor.enabled" false) }}
     labels:
       netpol: harbor
+    needs:
+      - kube-system/admin-namespaces
     values:
       - values/networkpolicies/common/common.yaml.gotmpl
       - values/networkpolicies/service/harbor.yaml.gotmpl

@@ -13,6 +13,8 @@ templates:
     installed: {{ and (.Values | get "thanos.enabled" false) (.Values | get "networkPolicies.thanos.enabled" false) }}
     labels:
       netpol: thanos
+    needs:
+      - kube-system/admin-namespaces
     values:
       - values/networkpolicies/common/common.yaml.gotmpl
       - values/networkpolicies/service/thanos.yaml.gotmpl
@@ -31,6 +33,8 @@ templates:
       app: prometheus
     {{- end }}
     name: thanos-ingress-secret
+    needs:
+      - kube-system/admin-namespaces
     values:
       - values/thanos/ingress-secret.yaml.gotmpl
 
@@ -40,6 +44,8 @@ templates:
       - template: thanos-chart
     installed: {{ .Values | get "thanos.enabled" false }}
     name: thanos-objectstorage-secret
+    needs:
+      - kube-system/admin-namespaces
     values:
       - values/thanos/objectstorage-secret.yaml.gotmpl
 

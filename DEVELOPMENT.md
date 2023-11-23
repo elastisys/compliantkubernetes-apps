@@ -52,9 +52,6 @@ The configuration contains some `set-me`'s that must be configured manually.
 > [!important]
 > Setting up ingresses properly requires some additional steps documented later in this section.
 
-> [!important]
-> Namespaces are not yet managed by `helmfile` so you must first run `./bin/ck8s bootstrap sc|wc`.
-
 Manage apps by using `helmfile` directly and with needs it will pull in all required releases:
 
 ```sh

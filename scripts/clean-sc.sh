@@ -39,6 +39,9 @@ fi
 # Destroy cert-manager helm release
 "${here}/.././bin/ck8s" ops helmfile sc -l app=cert-manager destroy
 
+# Destroy local-cluster minio release, otherwise pvc cleanup will get stuck
+helmfile -e local_cluster -f "${here}/../helmfile.d" -l app=minio destroy
+
 # Remove any lingering persistent volume claims
 "${here}/.././bin/ck8s" ops kubectl sc delete pvc -A --all
 

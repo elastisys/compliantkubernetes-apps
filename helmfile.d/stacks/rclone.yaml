@@ -9,5 +9,7 @@ templates:
     name: rclone-sync
     labels:
       app: rclone-sync
+    needs:
+      - kube-system/admin-namespaces
     values:
       - values/rclone-sync.yaml.gotmpl

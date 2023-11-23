@@ -1,0 +1,28 @@
+---
+templates:
+  namespaces:
+    namespace: kube-system
+    chart: charts/namespaces
+    version: 0.1.1
+    wait: true
+
+  admin-namespaces:
+    name: admin-namespaces
+    inherit: [ template: namespaces ]
+    labels:
+      app: admin-namespaces
+    values:
+      {{- if .Values | get "ck8sManagementCluster.enabled" false }}
+      - values/admin-namespaces-sc.yaml.gotmpl
+      {{- else if .Values | get "ck8sWorkloadCluster.enabled" false }}
+      - values/admin-namespaces-wc.yaml.gotmpl
+      {{ end }}
+
+  dev-namespaces:
+    name: dev-namespaces
+    inherit: [ template: namespaces ]
+    condition: ck8sWorkloadCluster.enabled
+    labels:
+      app: dev-namespaces
+    values:
+      - values/dev-namespaces.yaml.gotmpl

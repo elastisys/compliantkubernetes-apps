@@ -39,15 +39,3 @@ setup() {
 
   assert_success
 }
-
-@test "chart lint - bootstrap sc" {
-  run helmfile -e service_cluster -f "${ROOT}/bootstrap/namespaces/helmfile/" lint
-
-  assert_success
-}
-
-@test "chart lint - bootstrap wc" {
-  run helmfile -e workload_cluster -f "${ROOT}/bootstrap/namespaces/helmfile/" lint
-
-  assert_success
-}

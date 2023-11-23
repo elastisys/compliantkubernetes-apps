@@ -12,6 +12,11 @@ templates:
     installed: {{ .Values | get "networkPolicies.monitoring.enabled" false }}
     labels:
       netpol: monitoring
+    needs:
+      - kube-system/admin-namespaces
+      {{- if .Values | get "ck8sWorkloadCluster.enabled" false }}
+      - kube-system/dev-namespaces
+      {{- end }}
     values:
       - values/networkpolicies/common/common.yaml.gotmpl
       - values/networkpolicies/common/prometheus.yaml.gotmpl
@@ -82,8 +87,6 @@ templates:
     labels:
       app: trivy-operator
     needs:
-      - monitoring/networkpolicy
-      - monitoring/podsecuritypolicy
       - monitoring/kube-prometheus-stack
     values:
       - values/trivy/trivy-operator.yaml.gotmpl
@@ -97,8 +100,6 @@ templates:
     version: 0.1.0
     name: s3-exporter
     needs:
-      - monitoring/networkpolicy
-      - monitoring/podsecuritypolicy
       - monitoring/kube-prometheus-stack # creates servicemonitors
     values:
       - values/s3-exporter.yaml.gotmpl

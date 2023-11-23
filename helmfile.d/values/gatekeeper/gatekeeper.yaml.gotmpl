@@ -1,7 +1,17 @@
 validatingWebhookFailurePolicy: Fail
 validatingWebhookTimeoutSeconds: {{ .Values.opa.validatingWebhookTimeoutSeconds }}
+validatingWebhookExemptNamespacesLabels:
+  kubernetes.io/metadata.name:
+  - kube-system
+  - kube-public
+  - kube-node-lease
 mutatingWebhookFailurePolicy: Fail
 mutatingWebhookTimeoutSeconds: {{ .Values.opa.mutatingWebhookTimeoutSeconds }}
+mutatingWebhookExemptNamespacesLabels:
+  kubernetes.io/metadata.name:
+  - kube-system
+  - kube-public
+  - kube-node-lease
 
 validatingWebhookCustomRules:
   - apiGroups:

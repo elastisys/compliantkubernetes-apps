@@ -25,9 +25,23 @@ query:
 
   resources: {{- toYaml .Values.thanos.query.resources | nindent 4 }}
 
+  containerSecurityContext:
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+
 queryFrontend:
   enabled: true
   resources: {{- toYaml .Values.thanos.queryFrontend.resources | nindent 4 }}
+
+  containerSecurityContext:
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
 
 metrics:
   enabled: {{ .Values.thanos.metrics.enabled }}

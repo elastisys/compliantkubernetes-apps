@@ -63,8 +63,7 @@ apps_sc() {
     #
     # The first few Charts install CRDs, which will make template validation
     # fail. CRDs are "changes" to the Kubernetes API, hence validation against
-    # the Kubernetes API cannot be done. OTOH, manually adding the CRDs during
-    # bootstrap is error-prone and adds maintenance burden.
+    # the Kubernetes API cannot be done.
     #
     # While it would be nice to have some template validation before `helmfile apply`,
     # at least Helmfile does "just in time" template validation. Not as nice,

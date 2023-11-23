@@ -11,8 +11,9 @@ templates:
     labels:
       policy: netpol
       netpol: common
-    {{- if .Values | get "ck8sWorkloadCluster.enabled" false }}
     needs:
+      - kube-system/admin-namespaces # Make this only for SC?
+    {{- if .Values | get "ck8sWorkloadCluster.enabled" false }}
       - kube-system/user-rbac # creates networkpolicies for its namespaces
     {{- end }}
     values:
@@ -27,6 +28,8 @@ templates:
     labels:
       policy: netpol
       netpol: service
+    needs:
+      - kube-system/admin-namespaces
     values:
       - values/networkpolicy/service-cluster.yaml.gotmpl
 
@@ -39,6 +42,8 @@ templates:
     labels:
       policy: netpol
       netpol: workload
+    needs:
+      - kube-system/admin-namespaces
     values:
       - values/networkpolicy/workload-cluster.yaml.gotmpl
 
