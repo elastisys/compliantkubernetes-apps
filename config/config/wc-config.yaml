@@ -67,6 +67,11 @@ user:
   # Requires that gatekeeper.allowUserCRDs.enabled is enabled.
   fluxv2:
     enabled: false
+  # Installs required cluster resources needed to install kafka-operator
+  # Requires that gatekeeper.allowUserCRDs.enabled is enabled.
+  kafka:
+    enabled: false
+
 falco:
   ## Falco alerting configuration.
   alerts:

@@ -1,0 +1,182 @@
+{{- if .Values.user.kafka.enabled }}
+clusterRoles:
+  strimzi-cluster-operator-global:
+    rules:
+    - apiGroups:
+        - "storage.k8s.io"
+      resources:
+        - storageclasses
+      verbs:
+        - get
+    - apiGroups:
+        - ""
+      resources:
+        - nodes
+      verbs:
+        - list
+        - get
+    - apiGroups:
+        - ""
+      resources:
+        - endpoints
+      verbs:
+        - get
+        - list
+        - watch
+        - create
+        - delete
+        - patch
+        - update
+    - apiGroups:
+        - "apps"
+      resources:
+        - deployments/status
+      verbs:
+        - get
+        - list
+        - watch
+        - create
+        - delete
+        - patch
+        - update
+    - apiGroups:
+        - "build.openshift.io"
+      resources:
+        - buildconfigs
+        - buildconfigs/instantiate
+        - builds
+      verbs:
+        - get
+        - list
+        - watch
+        - create
+        - delete
+        - patch
+        - update
+    - apiGroups:
+        - "core.strimzi.io"
+      resources:
+        - strimzipodsets/status
+      verbs:
+        - get
+        - list
+        - watch
+        - create
+        - delete
+        - patch
+        - update
+    - apiGroups:
+        - "events.k8s.io"
+      resources:
+        - events
+      verbs:
+        - create
+    - apiGroups:
+        - "image.openshift.io"
+      resources:
+        - imagestreams
+      verbs:
+        - get
+    - apiGroups:
+        - "route.openshift.io"
+      resources:
+        - routes
+        - routes/custom-host
+      verbs:
+        - get
+        - list
+        - watch
+        - create
+        - delete
+        - patch
+        - update
+    - apiGroups:
+        - "kafka.strimzi.io"
+      resources:
+        - kafkas/status
+        - kafkanodepools/status
+        - kafkaconnects/status
+        - kafkaconnectors/status
+        - kafkamirrormakers/status
+        - kafkabridges/status
+        - kafkamirrormaker2s/status
+        - kafkarebalances/status
+        - kafkatopics/status
+        - kafkausers/status
+      verbs:
+        - get
+        - list
+        - watch
+        - create
+        - delete
+        - patch
+        - update
+  strimzi-admin:
+    rules:
+    - apiGroups:
+        - "kafka.strimzi.io"
+      resources:
+        - kafkas
+        - kafkanodepools
+        - kafkanodepools/scale
+        - kafkaconnects
+        - kafkaconnects/scale
+        - kafkamirrormakers
+        - kafkamirrormakers/scale
+        - kafkausers
+        - kafkatopics
+        - kafkabridges
+        - kafkabridges/scale
+        - kafkaconnectors
+        - kafkaconnectors/scale
+        - kafkamirrormaker2s
+        - kafkamirrormaker2s/scale
+        - kafkarebalances
+      verbs:
+        - get
+        - list
+        - watch
+        - create
+        - delete
+        - patch
+        - update
+    - apiGroups:
+        - "core.strimzi.io"
+      resources:
+        - strimzipodsets
+      verbs:
+        - get
+        - list
+        - watch
+        - create
+        - delete
+        - patch
+        - update
+clusterRoleBindings:
+  strimzi-cluster-operator:
+    roleRef:
+      name: strimzi-cluster-operator-global
+    subjects:
+    - kind: ServiceAccount
+      name: strimzi-cluster-operator
+      namespace: kafka
+  strimzi-admin:
+    roleRef:
+      name: strimzi-admin
+    subjects:
+    {{- range $user := .Values.user.adminUsers }}
+    - apiGroup: rbac.authorization.k8s.io
+      kind: User
+      name: {{ $user }}
+    {{- end }}
+    {{- range $group := $.Values.user.adminGroups }}
+    - apiGroup: rbac.authorization.k8s.io
+      kind: Group
+      name: {{ $group }}
+    {{- end }}
+    {{- range $serviceAccount := .Values.user.serviceAccounts }}
+    - kind: ServiceAccount
+      name: {{ $serviceAccount }}
+      namespace: default
+    {{- end }}
+{{- end }}

@@ -42,6 +42,19 @@ userCRDs:
     - helmrepositories.source.toolkit.fluxcd.io
     - ocirepositories.source.toolkit.fluxcd.io
   {{- end }}
+  {{- if .Values.user.kafka.enabled }}
+    - kafkanodepools.kafka.strimzi.io
+    - kafkas.kafka.strimzi.io
+    - kafkaconnects.kafka.strimzi.io
+    - strimzipodsets.core.strimzi.io
+    - kafkatopics.kafka.strimzi.io
+    - kafkausers.kafka.strimzi.io
+    - kafkamirrormakers.kafka.strimzi.io
+    - kafkabridges.kafka.strimzi.io
+    - kafkaconnectors.kafka.strimzi.io
+    - kafkamirrormaker2s.kafka.strimzi.io
+    - kafkarebalances.kafka.strimzi.io
+  {{- end }}
   {{- range .Values.gatekeeper.allowUserCRDs.extraCRDs }}
   {{- toYaml .names | nindent 4 }}
   {{- end }}
