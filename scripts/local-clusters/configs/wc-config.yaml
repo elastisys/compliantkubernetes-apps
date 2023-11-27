@@ -1,0 +1,16 @@
+user:
+  namespaces:
+    - production
+    - staging
+  adminUsers:
+    - admin@example.com
+  adminGroups:
+    - admin
+networkPolicies:
+  global:
+    wcApiserver:
+      ips:
+        - 0.0.0.0/0
+    wcNodes:
+      ips:
+        - 0.0.0.0/0

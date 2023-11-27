@@ -15,6 +15,7 @@ bases:
   - helmfile/stacks/hnc.yaml
   - helmfile/stacks/ingress-nginx.yaml
   - helmfile/stacks/kured.yaml
+  - helmfile/stacks/local.yaml
   - helmfile/stacks/monitoring.yaml
   - helmfile/stacks/monitoring-grafana.yaml
   - helmfile/stacks/monitoring-prometheus.yaml
@@ -26,6 +27,9 @@ bases:
   - helmfile/stacks/velero.yaml
 ---
 releases:
+  - inherit: [ template: tigera ]
+  - inherit: [ template: minio ]
+
   - inherit: [ template: admin-rbac ]
   - inherit: [ template: dev-rbac ]
   - inherit: [ template: dev-rbac-crds ]

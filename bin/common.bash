@@ -15,6 +15,7 @@ ck8s_cloud_providers=(
     "safespring"
     "upcloud"
     "elastx"
+    "none"
 )
 
 # shellcheck disable=SC2034

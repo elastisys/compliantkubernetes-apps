@@ -1,0 +1,16 @@
+mode: standalone
+
+persistence:
+  size: 50Gi
+
+resources:
+  requests:
+    memory: 500Mi
+
+rootUser: {{ .Values.objectStorage.s3.accessKey }}
+rootPassword: {{ .Values.objectStorage.s3.secretKey }}
+
+buckets:
+  {{- range $key, $value := .Values.objectStorage.buckets }}
+  - name: {{ $value }}
+  {{- end }}

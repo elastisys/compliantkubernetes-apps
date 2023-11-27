@@ -127,8 +127,12 @@ Assuming you already have everything needed to install the apps, this is what yo
 
     ```bash
     export CK8S_ENVIRONMENT_NAME=my-ck8s-cluster
-    export CK8S_CLOUD_PROVIDER=[exoscale|safespring|citycloud|elastx|aws|baremetal]
     export CK8S_FLAVOR=[dev|prod] # defaults to dev
+
+    #
+    # If 'none', no infra provider tailored configuration will be performed!
+    #
+    export CK8S_CLOUD_PROVIDER=[exoscale|safespring|citycloud|elastx|aws|baremetal|none]
     ```
 
 1. Then set the path to where the ck8s configuration should be stored and the PGP fingerprint of the key(s) to use for encryption:
