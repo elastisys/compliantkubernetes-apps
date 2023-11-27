@@ -399,12 +399,14 @@ validate_sops_config() {
         exit 1
     fi
 
-    # Compares the keyring with pgp fingerprints to see if pgp has anything keyring does not have.
-    keyring=$(gpg --list-keys  | grep pub -A 1 | grep -v pub | sed -n 'n;p' | xargs)
-    creation_pgp=$(yq4 '[.creation_rules[].pgp // null | split(",") | .[]] | unique | join(" ")' "${sops_config}")
+    # Compares the keyring with the sops config to see if the config has anything the keyring does not have.
+    keyring=$(gpg --with-colons --list-keys | awk -F: '/^pub:.*/ { getline; print $10 }')
+    creation_pgp=$(yq4 '[.creation_rules[].pgp // "" | split(",") | .[]] | unique | .[]' "${sops_config}")
+    # Pass keyring fingerprints twice to ensure other keys will not be flagged
+    fingerprints=$(tr ' ' '\n' <<< "${keyring} ${keyring} ${creation_pgp}" | sort | uniq -u)
+
+    # Find rules ending with trailing comma
     comma_search=$(yq4 '.creation_rules[] | select(.pgp == "*,")' "${sops_config}")
-    combined="${keyring} ${creation_pgp}"
-    fingerprints=$(echo "${keyring}" "${combined}" | tr ' ' '\n' | sort | uniq -u)
 
     if [ -n "${fingerprints// }" ] || [ "${comma_search: -1}" == "," ]; then
         log_error "ERROR: SOPS config contains no or invalid PGP keys."
