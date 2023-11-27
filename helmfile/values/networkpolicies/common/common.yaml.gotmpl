@@ -25,6 +25,10 @@
 rules:
   egress-rule-dns:
     peers:
+      - namespaceSelectorLabels:
+          kubernetes.io/metadata.name: kube-system
+        podSelectorLabels:
+          k8s-app: kube-dns
       - cidr: {{ .Values.global.clusterDns }}/32
     ports:
       - tcp: 53
