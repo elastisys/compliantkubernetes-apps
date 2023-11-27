@@ -45,6 +45,12 @@ spec:
           namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: opensearch-system
+        - podSelector:
+            matchLabels:
+              app: opensearch-dashboards
+          namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: opensearch-system
       ports:
         - port: 5556
     - from:

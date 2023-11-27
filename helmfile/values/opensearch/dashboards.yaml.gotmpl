@@ -21,7 +21,7 @@ config:
         type: "openid"
       openid:
         scope: {{ .Values.opensearch.sso.scope }}
-        connect_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}/.well-known/openid-configuration
+        connect_url: http://dex.dex.svc.cluster.local:5556/.well-known/openid-configuration
         client_id: "opensearch"
         client_secret: {{ .Values.opensearch.clientSecret }}
         base_redirect_url: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
