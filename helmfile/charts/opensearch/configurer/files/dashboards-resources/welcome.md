@@ -4,8 +4,11 @@
 
 Here you can find the most relevant features and changes for the last couple of releases of Compliant Kubernetes
 
+- Dashboard for visualizing how spread-out pods are across nodes. **[v0.34]**
+- Application developers can now self manage CRDs for MongoDB, SealedSecrets and Flux **[v0.34]**
+- Upgrade Ingress-NGINX controller to 1.8.4 and chart to 4.7.3 **[v0.34]**
+- Upgrade HNC and expose opt-in propagation. **[v0.34]**
 - Removed the deprecated grafana dashboard Image vulnerabilities. **[v0.33]**
-- Added some default annotations for Harbor that will fix issues with not being able to upload larger images **[v0.32]**
 
 ## Public docs
 
