@@ -11,7 +11,7 @@ templates:
     labels:
       policy: netpol
       netpol: common
-    {{- if .Values | get "ck8sWorkloadCluster" false }}
+    {{- if .Values | get "ck8sWorkloadCluster.enabled" false }}
     needs:
       - kube-system/user-rbac # creates networkpolicies for its namespaces
     {{- end }}

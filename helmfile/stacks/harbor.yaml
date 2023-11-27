@@ -68,7 +68,7 @@ templates:
 
   harbor-backup:
     inherit: [ template: harbor ]
-    installed: {{ .Values | get "harbor.enabled" false }}
+    installed: {{ and (.Values | get "harbor.enabled" false) (.Values | get "harbor.backup.enabled" false) }}
     chart: helmfile/charts/harbor/harbor-backup
     version: 0.1.0
     name: harbor-backup
