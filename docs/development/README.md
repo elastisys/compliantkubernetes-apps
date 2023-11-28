@@ -8,7 +8,7 @@
 
 Containerd failed with something about mounting `/dev/input/event*` device, but it seem to work fine after recreating the kind cluster
 
-Labeling the namespaces seem to have done the trick
+Labelling the namespaces seem to have done the trick
 
 ## Setup
 
@@ -19,9 +19,9 @@ Labeling the namespaces seem to have done the trick
 > Ensure your `inotify` limits are high enough else [pods might fail with the "too many open files" or similar](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files)
 
 ```
-kind create cluster --config docs/development/cluster.yaml
+kind create cluster --name compliantkubernetes --config docs/development/cluster.yaml
 kind get kubeconfig --name compliantkubernetes > "${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml"
-kind get kubeconfig --name compliantkubernetes > "${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml"
+kind get kubeconfig --name compliantkubernetes > "${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml"
 
 kubectl create namespace tigera-operator
 helm -n tigera-operator install tigera ./docs/development/charts/projectcalico/tigera-operator-v3.26.4.tgz
