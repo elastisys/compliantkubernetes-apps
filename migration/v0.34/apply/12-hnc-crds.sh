@@ -8,8 +8,10 @@ source "${ROOT}/scripts/migration/lib.sh"
 run() {
   case "${1:-}" in
   execute)
-    log_info "  - applying the HNC CRDs on wc"
-    kubectl_do wc apply --server-side --force-conflicts -f "${ROOT}"/helmfile/charts/hnc/config-and-crds/crds/hncconfigurations.yaml
+    if [[ "${CK8S_CLUSTER}" =~ ^(wc|both)$ ]]; then
+      log_info "  - applying the HNC CRDs on wc"
+      kubectl_do wc apply --server-side --force-conflicts -f "${ROOT}"/helmfile/charts/hnc/config-and-crds/crds/hncconfigurations.yaml
+    fi
     ;;
   rollback)
     log_warn "rollback not implemented"
