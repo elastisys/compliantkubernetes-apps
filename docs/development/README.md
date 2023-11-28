@@ -6,9 +6,9 @@
 
 ~~Currently it seems like `gatekeeper` might break `local-path-provisioner`~~
 
-Containerd failed with something about mounting `/dev/input/event*` device, but it seem to work fine after recreating the kind cluster
+~~Labelling the namespaces seem to have done the trick~~
 
-Labelling the namespaces seem to have done the trick
+Containerd failed with something about mounting `/dev/input/event*` device, but it seem to work fine after recreating the kind cluster
 
 ## Setup
 
@@ -24,9 +24,16 @@ kind get kubeconfig --name compliantkubernetes > "${CK8S_CONFIG_PATH}/.state/kub
 kind get kubeconfig --name compliantkubernetes > "${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml"
 
 kubectl create namespace tigera-operator
-helm -n tigera-operator install tigera ./docs/development/charts/projectcalico/tigera-operator-v3.26.4.tgz
+kubectl create namespace seaweedfs-system
 
-kubectl label namespace calico-apiserver calico-system local-path-storage tigera-operator owner=operator
+kubectl label namespaces local-path-storage tigera-operator seaweedfs-system owner=operator --overwrite=true
+
+kubectl -n seaweedfs-system apply -f ./docs/development/seaweedfs-credentials.yaml
+
+helm --namespace tigera-operator install tigera ./docs/development/charts/projectcalico/tigera-operator-v3.26.4.tgz --wait
+helm --namespace seaweedfs-system install seaweedfs ./docs/development/charts/seaweedfs/seaweedfs-3.59.4.tgz --wait --values ./docs/development/seaweedfs.yaml
+
+kubectl label namespace calico-apiserver calico-system owner=operator --overwrite=true
 ```
 
 ## Teardown
@@ -46,6 +53,9 @@ Using the `baremetal` preset disable all reference to `rook-ceph` and set `stand
 
 ### Both Clusters
 
+- `calico` via `apply --include-transitive-needs --selector app=calico`
+  - Needs fix for felix metrics
+  - Requires `clusterApi.enabled: true`
 - `cert-manager` via `apply --include-transitive-needs --selector app=cert-manager`
 - `falco` via `apply --include-transitive-needs --selector app=falco`
   - Will remain in error state as the pods need to be able to either load bpf or kernel module
@@ -53,36 +63,36 @@ Using the `baremetal` preset disable all reference to `rook-ceph` and set `stand
 - `kured` via `apply --include-transitive-needs --selector app=kured`
 - `kube-prometheus-stack` via `apply --include-transitive-needs --selector app=prometheus`
 - `velero` via `apply --include-transitive-needs --selector app=velero`
-  - Will not template as it requires object storage
+  - Requires object storage
 
 ### Service Cluster
 
 - `dex` via `apply --include-transitive-needs --selector app=dex`
   - Will not pull in `ingress-nginx`
 - `fluentd` via `apply --include-transitive-needs --selector app=fluentd`
-  - Will not template as it requires object storage
+  - Requires object storage
+  - Requires a fix to check S3 protocol
 - `grafana` via `apply --include-transitive-needs --selector app=grafana`
-  - Will not template as it requires `thanos` which requires  object storage
+  - Will not pull in `ingress-nginx`
+  - Requires object storage due to `thanos`
 - `harbor` via `apply --include-transitive-needs --selector app=harbor`
   - Will not pull in `ingress-nginx`
-  - Not with `harbor.backup.enabled: true`
-  - Not with `harbor.persistence.type: objectStorage`
-  - Requires a fix for DNS networkpolicies
+  - Requires object storage
 - `opensearch` via `apply --include-transitive-needs --selector app=opensearch`
   - Will not pull in `ingress-nginx`
-  - Not with `opensearch.snapshot.enabled: true`
-  - Requires a fix for dex service endpoint and netpol
+  - Requires object storage
   - Uses significant amount of RAM
 - `rclone-sync` via `apply --include-transitive-needs --selector app=rclone-sync`
-  - Will not template as it requires object storage
+  - Requires object storage
 - `thanos` via `apply --include-transitive-needs --selector app=thanos`
-  - Will not template as it requires object storage
+  - Requires object storage
+  - Requires a fix to check S3 protocol
 
 ### Workload Cluster
 
 - `fluentd` via `apply --include-transitive-needs --selector app=fluentd`
-  - Not with `fluentd.audit.enabled: true`
   - Requires a fix for dev-editable extra configmaps
+  - Requires an edit for in-cluster opensearch endpoint (or potentially add that to sc fluentd)
 - `hnc` via `apply --include-transitive-needs --selector app=hnc`
   - Has a race condition on `destroy` but it works the second time
 
@@ -99,4 +109,10 @@ I'll see if I can include some glue to setup a proxy+resolver in some easy way.
 
 ### Object Storage
 
-To be tested as dev/test dependency.
+Works with either `minio` or `seaweedfs`, TBD which one will be included.
+
+Regardless we need to prepare for a better way to handle private S3 endpoints.
+
+### Pull-through Registry Cache
+
+Needs investigation as it is quite easy to hit pull limits.

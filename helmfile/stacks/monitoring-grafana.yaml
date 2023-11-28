@@ -15,7 +15,6 @@ templates:
     needs:
       - monitoring/networkpolicy
       - monitoring/podsecuritypolicy
-      - ingress-nginx/ingress-nginx
     values:
       - helmfile/values/grafana/grafana-common.yaml.gotmpl
       - helmfile/values/grafana/grafana-ops.yaml.gotmpl
@@ -29,7 +28,6 @@ templates:
     needs:
       - monitoring/networkpolicy
       - monitoring/podsecuritypolicy
-      - ingress-nginx/ingress-nginx
     values:
       - helmfile/values/grafana/grafana-common.yaml.gotmpl
       - helmfile/values/grafana/grafana-user.yaml.gotmpl

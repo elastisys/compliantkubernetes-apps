@@ -1,0 +1,59 @@
+global:
+  createClusterRole: false
+
+master:
+  enabled: true
+
+  config: |-
+    # Intentionally left empty
+
+
+  data:
+    type: persistentVolumeClaim
+    size: 10Gi
+
+  logs:
+    type: stderr
+
+volume:
+  enabled: true
+
+  extraVolumes: |
+    - name: dummy-volume
+      emptyDir: {}
+
+  idx:
+    type: persistentVolumeClaim
+    size: 10Gi
+
+  data:
+    type: persistentVolumeClaim
+    size: 10Gi
+
+  logs:
+    type: stderr
+
+filer:
+  enabled: true
+
+  data:
+    type: persistentVolumeClaim
+    size: 10Gi
+
+  logs:
+    type: stderr
+
+  s3:
+    enabled: true
+
+    skipAuthSecretCreation: true
+
+    existingConfigSecret: seaweedfs-s3-credentials
+
+    createBuckets:
+      - name: ck8s-audit
+      - name: ck8s-harbor
+      - name: ck8s-opensearch
+      - name: ck8s-sc-logs
+      - name: ck8s-thanos
+      - name: ck8s-velero
