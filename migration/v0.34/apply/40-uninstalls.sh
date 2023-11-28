@@ -10,6 +10,7 @@ run() {
   execute)
     if [[ "${CK8S_CLUSTER}" =~ ^(sc|both)$ ]]; then
       helm_uninstall sc monitoring trivy-operator
+      helm_uninstall sc monitoring grafana-dashboards
     fi
     if [[ "${CK8S_CLUSTER}" =~ ^(wc|both)$ ]]; then
       helm_uninstall wc monitoring trivy-operator
