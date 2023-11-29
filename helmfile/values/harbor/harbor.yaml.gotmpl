@@ -81,11 +81,13 @@ persistence:
     {{ if eq .Values.objectStorage.type "s3" }}
     type: s3
     s3:
+      bucket: {{ .Values.objectStorage.buckets.harbor }}
       region: {{ .Values.objectStorage.s3.region }}
       regionendpoint: {{ .Values.objectStorage.s3.regionEndpoint }}
-      bucket: {{ .Values.objectStorage.buckets.harbor }}
+      secure: {{ .Values.objectStorage.s3.regionEndpoint | hasPrefix "https://" }}
       secretkey: {{ .Values.objectStorage.s3.secretKey }}
       accesskey: {{ .Values.objectStorage.s3.accessKey }}
+      forcepathstyle: {{ .Values.objectStorage.s3.forcePathStyle }}
       multipartcopythresholdsize: {{ int64 .Values.harbor.s3.multipartcopythresholdsize | quote }}
     {{ else if eq .Values.objectStorage.type "gcs" }}
     type: gcs
