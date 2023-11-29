@@ -739,8 +739,8 @@ opa:
         cpu: 100m
         memory: 150Mi
       limits:
-        cpu: 300m
-        memory: 300Mi
+        cpu: 400m
+        memory: 400Mi
     affinity: {}
     tolerations: []
     nodeSelector: {kubernetes.io/os: linux}
@@ -774,7 +774,7 @@ opa:
   # The maximum number of audit violations reported on a constraint
   constraintViolationsLimit: 20
 
-  validatingWebhookTimeoutSeconds: 5
+  validatingWebhookTimeoutSeconds: 30
   mutatingWebhookTimeoutSeconds: 5
 
   ## Enable rule that requires pods to come from
