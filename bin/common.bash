@@ -570,7 +570,7 @@ with_kubeconfig() {
     else
         log_info "Using unencrypted kubeconfig ${kubeconfig}"
         # shellcheck disable=SC2048
-        KUBECONFIG=${kubeconfig} ${*}
+        KUBECONFIG=${kubeconfig} "$@"
     fi
 }
 

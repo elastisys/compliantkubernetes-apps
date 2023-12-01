@@ -11,11 +11,6 @@ config_load wc --skip-validation
 : "${config[config_file_wc]:?Missing config}"
 : "${secrets[secrets_file]:?Missing secrets}"
 
-# Arg for Helmfile to be interactive so that one can decide on which releases
-# to update if changes are found.
-# USE: --interactive, default is not interactive.
-INTERACTIVE=${1:-""}
-
 # Add example resources.
 # We use `create` here instead of `apply` to avoid overwriting any changes the
 # user may have done.
@@ -46,13 +41,11 @@ fi
 
 echo "Installing helm charts" >&2
 cd "${SCRIPTS_PATH}/../helmfile"
-declare -a helmfile_opt_flags
-[[ -n "$INTERACTIVE" ]] && helmfile_opt_flags+=("$INTERACTIVE")
 
 if [ ${#} -eq 1 ] && [ "$1" = "sync" ]; then
-    helmfile -f . -e workload_cluster sync
+    helmfile -f . -e workload_cluster sync "$2"
 else
-    helmfile -f . -e workload_cluster apply --suppress-diff
+    helmfile -f . -e workload_cluster apply "$2" --suppress-diff
 fi
 
 echo "Deploy wc completed!" >&2
