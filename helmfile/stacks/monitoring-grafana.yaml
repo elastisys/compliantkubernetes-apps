@@ -41,7 +41,6 @@ templates:
     needs:
       - monitoring/networkpolicy
       - monitoring/podsecuritypolicy
-      - thanos/thanos-receiver
     values:
       - helmfile/values/grafana/grafana-label-enforcer.yaml.gotmpl
 

@@ -8,7 +8,7 @@
 
 ~~Labelling the namespaces seem to have done the trick~~
 
-Containerd failed with something about mounting `/dev/input/event*` device, but it seem to work fine after recreating the kind cluster
+Containerd failed with something about mounting `/dev/input/event*` device, but it seem to work fine after restarting the worker node containers.
 
 ## Setup
 
@@ -17,6 +17,26 @@ Containerd failed with something about mounting `/dev/input/event*` device, but 
 
 > [!important]
 > Ensure your `inotify` limits are high enough else [pods might fail with the "too many open files" or similar](https://kind.sigs.k8s.io/docs/user/known-issues/#pod-errors-due-to-too-many-open-files)
+
+> [!important]
+> To use rootless `podman` or `docker` you must allow unprivileged user to bind to low port numbers:
+> ```sh
+> sudo sysctl net.ipv4.ip_unprivileged_port_start=53
+> ```
+
+> [!important]
+> To use `podman` with their `aardvark` DNS resolver you must edit the CoreDNS ConfigMap to prefer UDP:
+> ```diff
+> $ kubectl --namespace edit configmap coredns
+>
+>   forward . ./etc/resolv.conf {
+>     max_concurrent 1000
+> +   prefer_udp
+>   }
+>
+> $ kubectl --namespace rollout restart deployment coredns
+> ```
+>
 
 ```
 kind create cluster --name compliantkubernetes --config docs/development/cluster.yaml
@@ -47,9 +67,67 @@ kind delete cluster --name compliantkubernetes
 > [!note]
 > These have been tested with an initial bootstrap then using the new helmfile setup.
 >
-> All deployments have been able to be removed with a plain `destroy`.
+> All deployments have been able to be removed with a plain `destroy`, except `hnc` which requires a second `destroy`.
 
 Using the `baremetal` preset disable all reference to `rook-ceph` and set `standard` as the default storage class.
+
+### Resolve and Ingress
+
+> [!note]
+> To be have properly signed certificates you must configure a DNS-01 solver for `cert-manager`.
+
+To allow local access to service endpoints both `ingress-nginx` and `node-local-dns` will need to be setup with NodePorts.
+
+Configuration additions for `ingress-nginx`:
+
+```yaml
+# common-config.yaml
+ingressNginx:
+  controller:
+    service:
+      enabled: true
+      type: NodePort
+      nodePorts:
+        http: 30080
+        https: 30443
+```
+
+Configuration additions for `node-local-dns`:
+
+```yaml
+# Replace these in the snippet below, {{ .Name }} should remain as it is.
+DOMAIN: global.baseDomain
+KIND_CLUSTER_DNS_IP: global.clusterDns # matching the cluster IP of the coredns service
+KIND_WORKER_NODE_IP: # matching the internal IP of the first worker node
+
+# common-config.yaml
+nodeLocalDns:
+  customConfig: |-
+    {{ DOMAIN }}:53 {
+      errors
+      bind 169.254.20.10 {{ KIND_CLUSTER_DNS_IP }}
+      template ANY ANY {{ DOMAIN }} {
+        match "\.{{ DOMAIN | REPLACE "." WITH "\." }}\.$"
+        answer "{{ .Name }} 60 IN A {{ KIND_WORKER_NODE_IP }}"
+      }
+    }
+    .:30053 {
+      errors
+      log
+      template ANY ANY {{ DOMAIN }} {
+        match "\.{{ DOMAIN | REPLACE "." WITH "\." }}\.$"
+        answer "{{ .Name }} 60 IN A 127.0.64.43"
+        fallthrough
+      }
+      cache 30
+      reload
+      loop
+      forward . 1.1.1.1 1.0.0.1
+    }
+```
+
+Then when `node-local-dns` is deployed configure your network connection to use `127.0.64.43` as a resolver and you will be able to access the service endpoints using their domain names.
+Note that this will make local resolve dependent on `node-local-dns`.
 
 ### Both Clusters
 
@@ -60,8 +138,10 @@ Using the `baremetal` preset disable all reference to `rook-ceph` and set `stand
 - `falco` via `apply --include-transitive-needs --selector app=falco`
   - Will remain in error state as the pods need to be able to either load bpf or kernel module
 - `gatekeeper` via `apply --include-transitive-needs --selector app=gatekeeper`
+- `ingress-nginx` via `apply --include-transitive-needs --selector app=ingress-nginx`
 - `kured` via `apply --include-transitive-needs --selector app=kured`
 - `kube-prometheus-stack` via `apply --include-transitive-needs --selector app=prometheus`
+- `node-local-dns` via `apply --include-transitive-needs --selector app=node-local-dns`
 - `velero` via `apply --include-transitive-needs --selector app=velero`
   - Requires object storage
 
@@ -71,13 +151,12 @@ Using the `baremetal` preset disable all reference to `rook-ceph` and set `stand
   - Will not pull in `ingress-nginx`
 - `fluentd` via `apply --include-transitive-needs --selector app=fluentd`
   - Requires object storage
-  - Requires a fix to check S3 protocol
 - `grafana` via `apply --include-transitive-needs --selector app=grafana`
-  - Will not pull in `ingress-nginx`
-  - Requires object storage due to `thanos`
+  - Will not pull in `ingress-nginx` or `thanos`
 - `harbor` via `apply --include-transitive-needs --selector app=harbor`
   - Will not pull in `ingress-nginx`
   - Requires object storage
+  - Requires `persistence.disableRedirect: true` with internal S3
 - `opensearch` via `apply --include-transitive-needs --selector app=opensearch`
   - Will not pull in `ingress-nginx`
   - Requires object storage
@@ -86,7 +165,6 @@ Using the `baremetal` preset disable all reference to `rook-ceph` and set `stand
   - Requires object storage
 - `thanos` via `apply --include-transitive-needs --selector app=thanos`
   - Requires object storage
-  - Requires a fix to check S3 protocol
 
 ### Workload Cluster
 
@@ -94,18 +172,12 @@ Using the `baremetal` preset disable all reference to `rook-ceph` and set `stand
   - Requires a fix for dev-editable extra configmaps
   - Requires an edit for in-cluster opensearch endpoint (or potentially add that to sc fluentd)
 - `hnc` via `apply --include-transitive-needs --selector app=hnc`
-  - Has a race condition on `destroy` but it works the second time
 
 ## Missing
 
 ### Audit
 
 To be tested.
-
-### Ingress
-
-To be tested.
-I'll see if I can include some glue to setup a proxy+resolver in some easy way.
 
 ### Object Storage
 
