@@ -97,24 +97,29 @@ Configuration additions for `node-local-dns`:
 ```yaml
 # Replace these in the snippet below, {{ .Name }} should remain as it is.
 DOMAIN: global.baseDomain
-KIND_CLUSTER_DNS_IP: global.clusterDns # matching the cluster IP of the coredns service
-KIND_WORKER_NODE_IP: # matching the internal IP of the first worker node
+KIND_RESOLVE_IP: # matching the cluster IP of the kube-system/coredns service
+KIND_INGRESS_IP: # matching the cluster IP of the ingress-nginx/controller service
 
 # common-config.yaml
 nodeLocalDns:
   customConfig: |-
     {{ DOMAIN }}:53 {
       errors
-      bind 169.254.20.10 {{ KIND_CLUSTER_DNS_IP }}
-      template ANY ANY {{ DOMAIN }} {
+      bind 169.254.20.10 {{ KIND_RESOLVE_IP }}
+      template IN A {{ DOMAIN }} {
         match "\.{{ DOMAIN | REPLACE "." WITH "\." }}\.$"
-        answer "{{ .Name }} 60 IN A {{ KIND_WORKER_NODE_IP }}"
+        answer "{{ .Name }} 60 IN A {{ KIND_INGRESS_IP }}"
+        fallthrough
       }
+      cache 30
+      reload
+      loop
+      forward . 1.1.1.1 1.0.0.1
     }
     .:30053 {
       errors
       log
-      template ANY ANY {{ DOMAIN }} {
+      template IN A {{ DOMAIN }} {
         match "\.{{ DOMAIN | REPLACE "." WITH "\." }}\.$"
         answer "{{ .Name }} 60 IN A 127.0.64.43"
         fallthrough
