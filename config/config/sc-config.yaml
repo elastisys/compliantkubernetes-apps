@@ -544,7 +544,7 @@ thanos:
         memory: 40Mi
       limits:
         cpu: 300m
-        memory: 100Mi
+        memory: 300Mi
     configReloader:
       resources:
         limits:
@@ -631,7 +631,7 @@ thanos:
         memory: 300Mi
       limits:
         cpu: 300m
-        memory: 700Mi
+        memory: 2000Mi
 
   bucketweb:
     resources:
@@ -941,7 +941,7 @@ opensearch:
         memory: 30Mi
       limits:
         cpu: 30m
-        memory: 60Mi
+        memory: 300Mi
     tolerations: []
 
   ingress:
