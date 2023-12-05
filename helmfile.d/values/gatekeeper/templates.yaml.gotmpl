@@ -18,6 +18,7 @@ waitFor:
   - k8spspseccomp
   - k8spspselinuxv2
   - k8spspvolumetypes
+  - k8srejectloadbalancerservice
   - k8srequirenetworkpolicy
   - k8sresourcerequests
 {{- if and (eq .Environment.Name "workload_cluster") (eq .Values.gatekeeper.allowUserCRDs.enabled true) }}

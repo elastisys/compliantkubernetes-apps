@@ -833,6 +833,10 @@ opa:
     tags:
       - latest
 
+  ## Prevent the creation of load balancer services when unsupported
+  rejectLoadBalancerService:
+    enabled: set-me
+    enforcement: deny
 trivy:
   enabled: true
   # comma separated list of namespaces (or glob patterns) to be excluded from scanning

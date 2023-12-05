@@ -13,6 +13,9 @@ disallowedTags:
 allowUserCRDs:
     enable: true
     enforcementAction: warn
+rejectLoadBalancerService:
+    enable: true
+    enforcementAction: dryrun
 
 imageRegistryURL: registry.example.com
 

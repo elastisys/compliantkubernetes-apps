@@ -290,6 +290,27 @@ set_fluentd_config() {
     replace_set_me "${file}" '.fluentd.forwarder.useRegionEndpoint' "${use_region_endpoint}"
 }
 
+# Usage: set_lbsvc_safeguard <config-file>
+set_lbsvc_safeguard() {
+    file="${1}"
+    if [[ ! -f "${file}" ]]; then
+        log_error "ERROR: invalid file - ${file}"
+        exit 1
+    fi
+    case ${CK8S_CLOUD_PROVIDER} in
+        safespring | upcloud | exoscale | baremetal)
+            enable_loadbalancer_safeguard=true
+            ;;
+
+        *)
+            enable_loadbalancer_safeguard=false
+            ;;
+
+    esac
+
+    replace_set_me "${file}" '.opa.rejectLoadBalancerService.enabled' "${enable_loadbalancer_safeguard}"
+}
+
 # Usage: set_s3bucketalertscount_config <config-file>
 set_s3bucketalertscount_config() {
     file="${1}"
@@ -634,6 +655,7 @@ generate_default_config "${config[default_common]}"
 set_storage_class       "${config[default_common]}"
 set_object_storage      "${config[default_common]}"
 set_nginx_config        "${config[default_common]}"
+set_lbsvc_safeguard     "${config[default_common]}"
 update_monitoring       "${config[default_common]}"
 update_psp_netpol       "${config[default_common]}"
 update_config           "${config[override_common]}"
