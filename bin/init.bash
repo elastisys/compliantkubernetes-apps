@@ -156,6 +156,9 @@ set_storage_class() {
         aws)
             storage_class=ebs-gp2
             ;;
+        none)
+            return
+            ;;
     esac
 
     replace_set_me "${file}" ".storageClasses.default" "\"${storage_class}\""
@@ -186,6 +189,9 @@ set_object_storage() {
 
         baremetal)
             object_storage_type="none"
+            ;;
+        none)
+            return
             ;;
     esac
 
@@ -236,6 +242,9 @@ set_nginx_config() {
             external_load_balancer=true
             ingress_using_host_network=true
             ;;
+        none)
+            return
+            ;;
     esac
 
     replace_set_me "${file}" '.ingressNginx.controller.config.useProxyProtocol' "${use_proxy_protocol}"
@@ -272,6 +281,9 @@ set_fluentd_config() {
 
         baremetal)
             use_region_endpoint=true
+            ;;
+        none)
+            return
             ;;
     esac
 
@@ -337,6 +349,9 @@ set_harbor_config() {
         baremetal)
             persistence_type=objectStorage
             disable_redirect=false
+            ;;
+        none)
+            return
             ;;
     esac
 
