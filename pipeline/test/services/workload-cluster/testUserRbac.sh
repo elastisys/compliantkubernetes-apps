@@ -114,9 +114,9 @@ echo "Testing user RBAC"
 echo "====================="
 
 user_namespaces=$(yq4 '.user.namespaces[]' "$CONFIG_FILE")
-user_admin_users=$(yq4 '.user.adminUsers[]' "$CONFIG_FILE")
+mapfile -t user_admin_users < <(yq4 '.user.adminUsers[]' "$CONFIG_FILE")
 
-for user in ${user_admin_users}; do
+for user in "${user_admin_users[@]}"; do
     testCanUserDo "get" "node" "$user"
     testCanUserDo "get" "namespace" "$user"
     testCannotUserDo "drain" "node" "$user"
@@ -131,7 +131,7 @@ RESOURCES=(
     deployments
 )
 
-for user in ${user_admin_users}; do
+for user in "${user_admin_users[@]}"; do
     for namespace in ${user_namespaces}; do
         for resource in "${RESOURCES[@]}"; do
             for verb in "${VERBS[@]}"; do
@@ -165,7 +165,7 @@ CK8S_NAMESPACES=(
     velero
 )
 
-for user in ${user_admin_users}; do
+for user in "${user_admin_users[@]}"; do
     for namespace in "${CK8S_NAMESPACES[@]}"; do
         for resource in "${RESOURCES[@]}"; do
             for verb in "${VERBS[@]}"; do
@@ -183,7 +183,7 @@ FLUENTD_RESOURCES=(
     configmaps/fluentd-extra-plugins
 )
 
-for user in ${user_admin_users}; do
+for user in "${user_admin_users[@]}"; do
     for resource in "${FLUENTD_RESOURCES[@]}"; do
         for verb in "${FLUENTD_VERBS[@]}"; do
             testCanUserDoInNamespace "$verb" "$resource" "fluentd" "$user"
@@ -201,7 +201,7 @@ then
         secret/user-alertmanager-auth
     )
 
-    for user in ${user_admin_users}; do
+    for user in "${user_admin_users[@]}"; do
         for resource in "${ALERTMANAGER_SECRET_RESOURCES[@]}"; do
             for verb in "${ALERTMANAGER_SECRET_VERBS[@]}"; do
                 testCanUserDoInNamespace "$verb" "$resource" "monitoring" "$user"
@@ -218,7 +218,7 @@ then
         secret/user-alertmanager-auth
     )
 
-    for user in ${user_admin_users}; do
+    for user in "${user_admin_users[@]}"; do
         for resource in "${ALERTMANAGER_SECRET_RESOURCES[@]}"; do
             for verb in "${ALERTMANAGER_SECRET_VERBS[@]}"; do
                 testCannotUserDoInNamespace "$verb" "$resource" "monitoring" "$user"
@@ -233,7 +233,7 @@ then
         rolebinding/alertmanager-configurer
     )
 
-    for user in ${user_admin_users}; do
+    for user in "${user_admin_users[@]}"; do
         for resource in "${ALERTMANAGER_ROLEBINDING_RESOURCES[@]}"; do
             for verb in "${ALERTMANAGER_ROLEBINDING_VERBS[@]}"; do
                 testCanUserDoInNamespace "$verb" "$resource" "monitoring" "$user"
@@ -249,9 +249,9 @@ echo "====================="
 
 
 user_namespaces=$(yq4 '.user.namespaces[]' "$CONFIG_FILE")
-user_admin_groups=$(yq4 '.user.adminGroups[]' "$CONFIG_FILE")
+mapfile -t user_admin_groups < <(yq4 '.user.adminGroups[]' "$CONFIG_FILE")
 
-for group in ${user_admin_groups}; do
+for group in "${user_admin_groups[@]}"; do
     testCanGroupDo "get" "node" "$group"
     testCanGroupDo "get" "namespace" "$group"
     testCannotGroupDo "drain" "node" "$group"
@@ -266,7 +266,7 @@ RESOURCES=(
     deployments
 )
 
-for group in ${user_admin_groups}; do
+for group in "${user_admin_groups[@]}"; do
     for namespace in ${user_namespaces}; do
         for resource in "${RESOURCES[@]}"; do
             for verb in "${VERBS[@]}"; do
@@ -299,7 +299,7 @@ CK8S_NAMESPACES=(
     velero
 )
 
-for group in ${user_admin_groups}; do
+for group in "${user_admin_groups[@]}"; do
     for namespace in "${CK8S_NAMESPACES[@]}"; do
         for resource in "${RESOURCES[@]}"; do
             for verb in "${VERBS[@]}"; do
@@ -317,7 +317,7 @@ FLUENTD_RESOURCES=(
     configmaps/fluentd-extra-plugins
 )
 
-for group in ${user_admin_groups}; do
+for group in "${user_admin_groups[@]}"; do
     for resource in "${FLUENTD_RESOURCES[@]}"; do
         for verb in "${FLUENTD_VERBS[@]}"; do
             testCanGroupDoInNamespace "$verb" "$resource" "fluentd" "$group"
@@ -335,7 +335,7 @@ then
         secret/user-alertmanager-auth
     )
 
-    for group in ${user_admin_groups}; do
+    for group in "${user_admin_groups[@]}"; do
         for resource in "${ALERTMANAGER_SECRET_RESOURCES[@]}"; do
             for verb in "${ALERTMANAGER_SECRET_VERBS[@]}"; do
                 testCanGroupDoInNamespace "$verb" "$resource" "monitoring" "$group"
@@ -352,7 +352,7 @@ then
         secret/user-alertmanager-auth
     )
 
-    for group in ${user_admin_groups}; do
+    for group in "${user_admin_groups[@]}"; do
         for resource in "${ALERTMANAGER_SECRET_RESOURCES[@]}"; do
             for verb in "${ALERTMANAGER_SECRET_VERBS[@]}"; do
                 testCannotGroupDoInNamespace "$verb" "$resource" "monitoring" "$group"
@@ -367,7 +367,7 @@ then
         rolebinding/alertmanager-configurer
     )
 
-    for group in ${user_admin_groups}; do
+    for group in "${user_admin_groups[@]}"; do
         for resource in "${ALERTMANAGER_ROLEBINDING_RESOURCES[@]}"; do
             for verb in "${ALERTMANAGER_ROLEBINDING_VERBS[@]}"; do
                 testCanGroupDoInNamespace "$verb" "$resource" "monitoring" "$group"
