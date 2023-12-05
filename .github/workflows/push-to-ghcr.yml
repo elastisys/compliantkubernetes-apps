@@ -1,0 +1,47 @@
+name: Push package to GHCR
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish-chart:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        folder:
+          - './helmfile.d/charts/opensearch/curator'
+          - './helmfile.d/charts/opensearch/securityadmin'
+          - './helmfile.d/charts/opensearch/secrets'
+          - './helmfile.d/charts/opensearch/slm'
+          - './helmfile.d/charts/opensearch/configurer'
+          - './helmfile.d/charts/opensearch/backup'
+          - './helmfile.d/charts/gatekeeper/podsecuritypolicies'
+          - './helmfile.d/charts/networkpolicy/generator'
+
+    steps:
+      - name: Checkout GitHub Actions
+        uses: actions/checkout@v4
+
+      - name: Import GPG Private Key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.HELM_SIGN_PGP_PRIVATE_KEY }}
+          passphrase: ''
+
+      - name: Export GPG Private Key
+        run: |
+          gpg --export-secret-keys "Elastisys Compliant Kubernetes - Chart Signing Key" > ~/.gnupg/private.gpg
+
+      - name: Helm Registry Login
+        run: helm registry login ghcr.io -u ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Package, Sign And Push To Registry
+        run: |
+          folder="${{ matrix.folder }}"
+          if [ -d "$folder" ]; then
+            helm package --sign --key "Elastisys Compliant Kubernetes - Chart Signing Key" --keyring ~/.gnupg/private.gpg "$folder" -d "$folder" && helm push "$folder"/*.tgz oci://ghcr.io/${{ github.repository_owner }}
+          else
+            echo "Folder $folder does not exist. Skipping..."
+          fi
