@@ -1,0 +1,18 @@
+{{- if .Values.rejectLoadBalancerService.enable -}}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRejectLoadBalancerService
+metadata:
+  name: elastisys-reject-load-balancer-service
+spec:
+  enforcementAction: {{ .Values.rejectLoadBalancerService.enforcementAction }}
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Service"]
+    namespaceSelector:
+      matchExpressions:
+      - key: owner
+        operator: NotIn
+        values:
+        - operator
+{{- end }}

@@ -10,6 +10,9 @@ requireResourceRequests:
 disallowedTags:
     enable: {{ .Values.opa.disallowedTags.enabled }}
     enforcementAction: {{ .Values.opa.disallowedTags.enforcement }}
+rejectLoadBalancerService:
+    enable: {{ .Values.opa.rejectLoadBalancerService.enabled }}
+    enforcementAction: {{ .Values.opa.rejectLoadBalancerService.enforcement }}
 {{- if eq .Environment.Name "workload_cluster" }}
 allowUserCRDs:
     enable: {{ .Values.gatekeeper.allowUserCRDs.enabled }}
