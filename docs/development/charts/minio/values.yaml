@@ -1,0 +1,18 @@
+mode: standalone
+
+persistence:
+  size: 50Gi
+
+resources:
+  requests:
+    memory: 500Mi
+
+rootUser: "hodie8koujaeDaex"
+rootPassword: "Zoogae5uaBeequai1Iegahj3xahWuhup"
+
+buckets:
+  - name: olle-kind-opensearch
+  - name: olle-kind-audit
+  - name: olle-kind-sc-logs
+  - name: olle-kind-velero
+  - name: olle-kind-thanos

@@ -45,13 +45,19 @@ kind get kubeconfig --name compliantkubernetes > "${CK8S_CONFIG_PATH}/.state/kub
 
 kubectl create namespace tigera-operator
 kubectl create namespace seaweedfs-system
+kubectl create namespace minio
 
 kubectl label namespaces local-path-storage tigera-operator seaweedfs-system owner=operator --overwrite=true
+kubectl label namespace minio owner=operator --overwrite=true
 
-kubectl -n seaweedfs-system apply -f ./docs/development/seaweedfs-credentials.yaml
+# kubectl -n seaweedfs-system apply -f ./docs/development/seaweedfs-credentials.yaml
 
 helm --namespace tigera-operator install tigera ./docs/development/charts/projectcalico/tigera-operator-v3.26.4.tgz --wait
-helm --namespace seaweedfs-system install seaweedfs ./docs/development/charts/seaweedfs/seaweedfs-3.59.4.tgz --wait --values ./docs/development/seaweedfs.yaml
+#helm --namespace seaweedfs-system install seaweedfs ./docs/development/charts/seaweedfs/seaweedfs-3.59.4.tgz --wait --values ./docs/development/seaweedfs.yaml
+
+# Minio
+
+helm -n minio upgrade --install minio ./docs/development/charts/minio/minio-5.0.14.tgz -f ./docs/development/charts/minio/values.yaml
 
 kubectl label namespace calico-apiserver calico-system owner=operator --overwrite=true
 ```
