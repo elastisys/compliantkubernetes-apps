@@ -122,7 +122,7 @@ get_kubectl_ips() {
   local cluster="${1}"
   local label="${2}"
 
-  local label_argument=""
+  local label_argument="--ignore-not-found"
   if [[ "${label}" != "" ]]; then
     label_argument="-l ${label}"
   fi
