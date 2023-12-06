@@ -527,6 +527,11 @@ ingressNginx:
     affinity: {}
     nodeSelector: {}
     enablepublishService: false
+
+    #  Ref: https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/cli-arguments.md
+    extraArgs: {}
+    # metrics-per-host: false
+
     config:
       ## If 'true', use PROXY protocol
       ## ref: https://docs.nginx.com/nginx/admin-guide/load-balancer/using-proxy-protocol/
