@@ -883,3 +883,33 @@ _setup_full() {
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 2
 }
+
+@test "s3 region endpoint can be cluster local with kubeadm config" {
+  _setup_basic
+
+  yq4 -i '.objectStorage.s3.regionEndpoint = "http://minio.minio-system.svc.cluster.local"' "${CK8S_CONFIG_PATH}/common-config.yaml"
+
+  mock_set_output "${mock_kubectl}" 'data: { ClusterConfiguration: "networking: { podSubnet: 10.244.0.0/16 }" }' 1
+
+  run ck8s update-ips both apply
+
+  assert_equal "$(yq4 '.networkPolicies.global.objectStorage | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/common-config.yaml")" "[10.244.0.0/16]"
+
+  assert_equal "$(mock_get_call_num "${mock_dig}")" 2
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 13
+}
+
+@test "s3 region endpoint can be cluster local without kubeadm config" {
+  _setup_basic
+
+  yq4 -i '.objectStorage.s3.regionEndpoint = "http://minio.minio-system.svc.cluster.local"' "${CK8S_CONFIG_PATH}/common-config.yaml"
+
+  mock_set_output "${mock_kubectl}" "" 1
+
+  run ck8s update-ips both apply
+
+  assert_equal "$(yq4 '.networkPolicies.global.objectStorage | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/common-config.yaml")" "[0.0.0.0/0]"
+
+  assert_equal "$(mock_get_call_num "${mock_dig}")" 2
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 13
+}

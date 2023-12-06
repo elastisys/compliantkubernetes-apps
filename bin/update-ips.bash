@@ -346,13 +346,28 @@ is_ip_address() {
 
 # Updates the configuration to allow the host domain or IP address.
 #
+# Cluster local hosts will resolve to the pod subnet if kubeadm config is available.
+#
 # Usage: allow_host <config_file> <config_option> <host>
 allow_host() {
   local config_file="${1}"
   local config_option="${2}"
   local host="${3}"
 
-  if is_ip_address "${host}"; then
+  if [[ "${host}" =~ \.cluster\.local$ ]]; then
+    local cluster="${check_cluster}"
+    if [ "${check_cluster}" == "both" ]; then
+      cluster="sc"
+    fi
+
+    pod_subnet="$("${here}/ops.bash" kubectl "${cluster}" get configmap --namespace kube-system kubeadm-config --ignore-not-found --output yaml)"
+    pod_subnet="$(yq4 '.data.ClusterConfiguration | @yamld | .networking.podSubnet // "0.0.0.0/0"' <<< "${pod_subnet}")"
+
+    log_warning "Found cluster local endpoint ${host} for ${config_option} using ${pod_subnet}"
+
+    yq_eval "${config_file}" "${config_option}" "${config_option} = [ \"${pod_subnet}\" ]"
+
+  elif is_ip_address "${host}"; then
     allow_ips "${config_file}" "${config_option}" "${host}"
   else
     allow_domain "${config_file}" "${config_option}" "${host}"
