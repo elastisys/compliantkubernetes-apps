@@ -556,6 +556,8 @@ ingressNginx:
         http: "30080"
         https: "30443"
 
+      clusterIP: ""
+
     ## Additional configuration options for Nginx
     ## ref: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
     additionalConfig: {}
