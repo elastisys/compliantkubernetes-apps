@@ -255,7 +255,7 @@ process_ips_to_cidrs() {
 
   for ip in "${@}"; do
     for cidr in "${old_cidrs[@]}"; do
-      if [[ "${cidr}" != "" ]] && ! [[ "${cidr}" =~ .*/32 ]] && check_ip_in_cidr "${ip}" "${cidr}"; then
+      if [[ "${cidr}" != "" ]] && [[ "${cidr}" != "set-me" ]] && ! [[ "${cidr}" =~ .*/32 ]] && check_ip_in_cidr "${ip}" "${cidr}"; then
         new_cidrs+=("${cidr}")
         continue 2
       fi

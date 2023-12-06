@@ -763,7 +763,7 @@ _setup_basic_with_zero_diff() {
 @test "ips part of existing cidrs" {
   _setup_basic_with_zero_diff
 
-  yq4 -i '.networkPolicies.global.scApiserver.ips = ["127.0.0.0/16", "127.1.0.0/16"]' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq4 -i '.networkPolicies.global.scApiserver.ips = ["set-me", "127.0.0.0/16", "127.1.0.0/16"]' "${CK8S_CONFIG_PATH}/sc-config.yaml"
 
   mock_set_output "${mock_kubectl}" "127.0.1.1 127.0.2.1 127.0.3.1 127.1.0.0 127.1.0.1 127.2.0.1" 1 # .networkPolicies.global.scApiserver.ips IPS_internal
 
