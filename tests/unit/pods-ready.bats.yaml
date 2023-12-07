@@ -76,8 +76,6 @@ tests:
             target: harbor-backup-cronjob
           - target: harbor-core
           - target: harbor-jobservice
-          - target: harbor-notary-server
-          - target: harbor-notary-signer
           - target: harbor-portal
           - target: harbor-registry
           - function: test_statefulset

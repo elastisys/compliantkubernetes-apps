@@ -117,7 +117,6 @@ In addition to this, you will need to set up the following DNS entries (replace 
   - `dex.example.com`
   - `grafana.example.com`
   - `harbor.example.com`
-  - `notary.harbor.example.com`
   - `opensearch.example.com`
 
 Assuming you already have everything needed to install the apps, this is what you need to do.
@@ -291,8 +290,6 @@ The following list is requirements on the external postgres
   - [scram-sha-256 is not supported](https://github.com/goharbor/harbor/issues/15731#issuecomment-1100666831).
 - Initial empty databases must be created before harbor starts
   - registry
-  - notaryserver
-  - notarysigner
 
 **Config**:
 

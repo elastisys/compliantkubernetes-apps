@@ -45,22 +45,16 @@ clean_database_data() {
   echo "Dropping existing databases">&2
   psql -U postgres -d template1 -h $HOSTNAME -c "drop database registry;"
   psql -U postgres -d template1 -h $HOSTNAME -c "drop database postgres;"
-  psql -U postgres -d template1 -h $HOSTNAME -c "drop database notarysigner;"
-  psql -U postgres -d template1 -h $HOSTNAME -c "drop database notaryserver;"
 
   echo "Creating clean database">&2
   psql -U postgres -d template1 -h $HOSTNAME -c "create database registry;"
   psql -U postgres -d template1 -h $HOSTNAME -c "create database postgres;"
-  psql -U postgres -d template1 -h $HOSTNAME -c "create database notarysigner;"
-  psql -U postgres -d template1 -h $HOSTNAME -c "create database notaryserver;"
 }
 
 restore_database() {
   echo "Restoring database">&2
   psql -U postgres -h $HOSTNAME registry < ${backup_dir}/registry.back
   psql -U postgres -h $HOSTNAME postgres < ${backup_dir}/postgres.back
-  psql -U postgres -h $HOSTNAME notarysigner < ${backup_dir}/notarysigner.back
-  psql -U postgres -h $HOSTNAME notaryserver < ${backup_dir}/notaryserver.back
 }
 
 cleanup_local_files(){
@@ -68,8 +62,6 @@ cleanup_local_files(){
   rm harbor.tgz
   rm ${backup_dir}/registry.back
   rm ${backup_dir}/postgres.back
-  rm ${backup_dir}/notarysigner.back
-  rm ${backup_dir}/notaryserver.back
   rmdir ${backup_dir}
 }
 

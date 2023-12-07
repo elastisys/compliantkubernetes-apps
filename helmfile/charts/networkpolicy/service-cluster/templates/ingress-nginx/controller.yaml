@@ -169,15 +169,6 @@ spec:
     - to:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: harbor
-          podSelector:
-            matchLabels:
-              component: notary-server
-      ports:
-        - port: 4443
-    - to:
-        - namespaceSelector:
-            matchLabels:
               kubernetes.io/metadata.name: thanos
           podSelector:
             matchLabels:

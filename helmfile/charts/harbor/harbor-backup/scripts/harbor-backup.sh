@@ -27,8 +27,6 @@ dump_database() {
     echo "Dumping database"  >&2
     pg_dump -U postgres -h "$PG_HOSTNAME" registry > ${backup_dir}/registry.back
     pg_dump -U postgres -h "$PG_HOSTNAME" postgres > ${backup_dir}/postgres.back
-    pg_dump -U postgres -h "$PG_HOSTNAME" notarysigner > ${backup_dir}/notarysigner.back
-    pg_dump -U postgres -h "$PG_HOSTNAME" notaryserver > ${backup_dir}/notaryserver.back
 }
 
 create_tarball() {
