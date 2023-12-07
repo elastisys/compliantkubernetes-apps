@@ -46,8 +46,6 @@ if "${enable_harbor}"; then
     deployments+=(
         "harbor harbor-core"
         "harbor harbor-jobservice"
-        "harbor harbor-notary-server"
-        "harbor harbor-notary-signer"
         "harbor harbor-portal"
         "harbor harbor-registry"
     )

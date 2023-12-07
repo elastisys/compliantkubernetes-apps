@@ -109,9 +109,7 @@ function check_sc_certmanager_apps_certificates() {
     if "${enable_harbor}"; then
         certificates+=(
             "harbor harbor-core-cert"
-            "harbor harbor-notary-cert"
             "harbor harbor-core-ingress-cert"
-            "harbor harbor-notary-ingress-cert"
         )
     fi
 

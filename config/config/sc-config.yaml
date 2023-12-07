@@ -194,8 +194,6 @@ harbor:
       port: "5432"
       # username: "set-me"
       coreDatabase: "registry"
-      notaryServerDatabase: "notaryserver"
-      notarySignerDatabase: "notarysigner"
       # "disable" - No SSL
       # "require" - Always SSL (skip verification)
       # "verify-ca" - Always SSL (verify that the certificate presented by the
@@ -294,53 +292,6 @@ harbor:
     external: {}
     #  addr: "rfs-redis-harbor.redis-system.svc.cluster.local:26379"
     #  sentinelMasterSet: "mymaster"
-
-  notary:
-    replicas: 1
-    # subdomain moved to common-config
-    resources:
-      requests:
-        cpu: 20m
-        memory: 125Mi
-      limits:
-        cpu: 250m
-        memory: 250Mi
-    affinity:
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                    - harbor
-                - key: component
-                  operator: In
-                  values:
-                    - notary-server
-            topologyKey: "kubernetes.io/hostname"
-  notarySigner:
-    resources:
-      requests:
-        cpu: 20m
-        memory: 125Mi
-      limits:
-        cpu: 250m
-        memory: 250Mi
-    affinity:
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                    - harbor
-                - key: component
-                  operator: In
-                  values:
-                    - notary-signer
-            topologyKey: "kubernetes.io/hostname"
   portal:
     replicas: 1
     resources:

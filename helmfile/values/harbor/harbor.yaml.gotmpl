@@ -10,7 +10,6 @@ expose:
     certSource: secret
     secret:
       secretName: harbor-core-ingress-cert
-      notarySecretName: harbor-notary-ingress-cert
   ingress:
     annotations:
       cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
@@ -25,7 +24,6 @@ expose:
       {{- end }}
     hosts:
       core: {{ .Values.harbor.subdomain }}.{{ .Values.global.baseDomain }}
-      notary: {{ .Values.harbor.notary.subdomain }}.{{ .Values.global.baseDomain }}
 
 ipFamily:
   # ipv6Enabled set to true if ipv6 is enabled in cluster, currently it affected the nginx related component
@@ -140,23 +138,6 @@ registry:
     password: {{ .Values.harbor.registryPassword }}
     htpasswdString: {{ .Values.harbor.registryPasswordHtpasswd }}
 
-notary:
-  server:
-    replicas:     {{ .Values.harbor.notary.replicas }}
-    resources:    {{- toYaml .Values.harbor.notary.resources | nindent 6 }}
-    affinity:     {{- toYaml .Values.harbor.notary.affinity | nindent 6 }}
-    resources:    {{- toYaml .Values.harbor.notary.resources | nindent 6 }}
-    nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 6 }}
-    tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 6 }}
-  signer:
-    replicas:     {{ .Values.harbor.notary.replicas }}
-    resources:    {{- toYaml .Values.harbor.notarySigner.resources | nindent 6 }}
-    affinity:     {{- toYaml .Values.harbor.notarySigner.affinity | nindent 6 }}
-    resources:    {{- toYaml .Values.harbor.notary.resources | nindent 6 }}
-    nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 6 }}
-    tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 6 }}
-  secretName: harbor-notary-cert
-
 database:
   type: {{ .Values.harbor.database.type }}
   {{- if eq .Values.harbor.database.type "internal" }}
@@ -173,8 +154,6 @@ database:
     username:             {{ .Values.harbor.database.external.username }}
     password:             {{ .Values.harbor.external.databasePassword }}
     coreDatabase:         {{ .Values.harbor.database.external.coreDatabase }}
-    notaryServerDatabase: {{ .Values.harbor.database.external.notaryServerDatabase }}
-    notarySignerDatabase: {{ .Values.harbor.database.external.notarySignerDatabase }}
     sslmode:              {{ .Values.harbor.database.external.sslmode }}
   {{- end }}
 
