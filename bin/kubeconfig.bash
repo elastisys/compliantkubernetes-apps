@@ -54,6 +54,7 @@ set_dex_credentials() {
     --exec-arg=get-token \
     --exec-arg=--oidc-issuer-url="https://dex.${base_domain}" \
     --exec-arg=--oidc-client-id=kubelogin \
+    --exec-arg=--grant-type=device-code \
     --exec-arg=--oidc-client-secret="$(sops -d --extract '["dex"]["kubeloginClientSecret"]' "${secrets[secrets_file]}")" \
     --exec-arg=--oidc-extra-scope=email \
     --exec-arg=--oidc-extra-scope=groups
