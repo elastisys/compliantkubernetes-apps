@@ -31,7 +31,7 @@ usage() {
     #       that direct Helmfile access is not necessary.
     echo "  ops helmfile <wc|sc>                                                      run helmfile as cluster admin" 1>&2
     echo "  s3cmd [cmd]                                                               run s3cmd" 1>&2
-    echo "  kubeconfig                                                                generate user kubeconfig, stored at CK8S_CONFIG_PATH/user"
+    echo "  kubeconfig <user|dev|admin>                                               generate user kubeconfig, stored at CK8S_CONFIG_PATH/user"
     echo "  completion bash                                                           output shell completion code for bash" 1>&2
     echo "  install-requirements                                                      installs or updates required tools to run compliantkubernetes-apps" 1>&2
     echo "  validate <wc|sc>                                                          validates config files" 1>&2
@@ -138,7 +138,6 @@ case "${1}" in
         sops_exec_file "${secrets[s3cfg_file]}" 's3cmd --config="{}" '"${*}"
     ;;
     kubeconfig)
-        [[ "${2}" =~ ^(user|dev|admin)$ ]] || usage
         shift
         "${here}/kubeconfig.bash" "${@}"
         ;;

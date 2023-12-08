@@ -11,6 +11,8 @@ usage() {
     exit 1
 }
 
+[ -z "${1:-}" ] && usage
+
 get_user_server() {
     (
         with_kubeconfig "${kubeconfig}" \
@@ -85,7 +87,7 @@ case "${1}" in
         user_kubeconfig=${CK8S_CONFIG_PATH}/user/secret/kubeconfig.yaml
     ;;
     dev)
-        serviceAccount="${2}"
+        serviceAccount="${2:-}"
         if [ -z "${serviceAccount}" ]; then
           echo "Error: Service account name is needed" >&2
           usage
@@ -116,7 +118,7 @@ case "${1}" in
         exit
     ;;
     admin)
-        case "${2}" in
+        case "${2:-}" in
             sc)
                 config_load sc
                 cluster_config="${config[config_file_sc]}"
