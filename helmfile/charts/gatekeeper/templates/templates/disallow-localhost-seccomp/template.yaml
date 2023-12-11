@@ -1,0 +1,13 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sdisallowlocalhostseccomp
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDisallowLocalhostSeccomp
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ .Files.Get "policies/disallow-localhost-seccomp.rego"  | indent 8 }}
