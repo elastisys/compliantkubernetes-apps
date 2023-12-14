@@ -17,6 +17,7 @@ enable_thanos_receiver=$(yq4 -e '.thanos.receiver.enabled' "${CONFIG_FILE}")
 enable_thanos_query=$(yq4 -e '.thanos.query.enabled' "${CONFIG_FILE}")
 enable_thanos_ruler=$(yq4 -e '.thanos.ruler.enabled' "${CONFIG_FILE}")
 enable_thanos_service_monitor=$(yq4 -e '.thanos.metrics.serviceMonitor.enabled' "${CONFIG_FILE}")
+readarray -t custom_kubeapi_targets < <(yq4 -e '.prometheusBlackboxExporter.customKubeapiTargets[].name' "${CONFIG_FILE}")
 
 echo
 echo
@@ -29,7 +30,6 @@ echo "=================================="
 # "monitoring/kube-prometheus-stack-kube-proxy/0 1"
 scTargets=(
     "serviceMonitor/opensearch-system/prometheus-opensearch-exporter/0 1"
-    "serviceMonitor/monitoring/prometheus-blackbox-exporter-user-api-server/0 1"
     "serviceMonitor/monitoring/prometheus-blackbox-exporter-dex/0 1"
     "serviceMonitor/monitoring/prometheus-blackbox-exporter-grafana/0 1"
     "serviceMonitor/monitoring/prometheus-blackbox-exporter-opensearch-dashboards/0 1"
@@ -44,6 +44,13 @@ scTargets=(
     "serviceMonitor/monitoring/kube-prometheus-stack-operator/0 1"
     "serviceMonitor/monitoring/kube-prometheus-stack-prometheus/0 ${totalPrometheus}"
 )
+if [ ${#custom_kubeapi_targets[@]} -gt 0 ]; then
+    for target_name in "${custom_kubeapi_targets[@]}"; do
+        scTargets+=("serviceMonitor/monitoring/prometheus-blackbox-exporter-${target_name}/0 1")
+    done
+else
+    scTargets+=("serviceMonitor/monitoring/prometheus-blackbox-exporter-user-api-server/0 1")
+fi
 if [[ "${enable_thanos}" == "true" ]] && [[ "${enable_thanos_service_monitor}" == "true" ]] && [[ "${enable_thanos_receiver}" == "true" ]]; then
     scTargets+=(
         "serviceMonitor/thanos/thanos-receiver-bucketweb/0 1"
