@@ -1,7 +1,9 @@
-package k8susercrds
+package test.k8susercrds
+
+import data.k8susercrds
 
 test_allowed_CRD_as_Admin_user {
-    count(violation) == 0 with input as {
+    count(k8susercrds.violation) == 0 with input as {
         "review": {
             "object": {
                 "kind": "CustomResourceDefinition",
@@ -23,7 +25,7 @@ test_allowed_CRD_as_Admin_user {
 }
 
 test_allowed_CRD_as_Admin_group {
-    count(violation) == 0 with input as {
+    count(k8susercrds.violation) == 0 with input as {
         "review": {
             "object": {
                 "kind": "CustomResourceDefinition",
@@ -45,7 +47,7 @@ test_allowed_CRD_as_Admin_group {
 }
 
 test_not_allowed_CRD_no_users_no_groups_no_CRDS {
-    count(violation) == 1 with input as {
+    count(k8susercrds.violation) == 1 with input as {
         "review": {
             "object": {
                 "kind": "CustomResourceDefinition",
@@ -67,7 +69,7 @@ test_not_allowed_CRD_no_users_no_groups_no_CRDS {
 }
 
 test_allowed_CRD_no_users_no_groups {
-    count(violation) == 0 with input as {
+    count(k8susercrds.violation) == 0 with input as {
         "review": {
             "object": {
                 "kind": "CustomResourceDefinition",
@@ -92,7 +94,7 @@ test_allowed_CRD_no_users_no_groups {
 }
 
 test_allowed_two_CRD_no_users_no_groups {
-    count(violation) == 0 with input as {
+    count(k8susercrds.violation) == 0 with input as {
         "review": {
             "object": {
                 "kind": "CustomResourceDefinition",
@@ -123,7 +125,7 @@ test_allowed_two_CRD_no_users_no_groups {
 }
 
 test_not_allowed_two_CRD_no_users_no_groups {
-    count(violation) == 1 with input as {
+    count(k8susercrds.violation) == 1 with input as {
         "review": {
             "object": {
                 "kind": "CustomResourceDefinition",
@@ -154,7 +156,7 @@ test_not_allowed_two_CRD_no_users_no_groups {
 }
 
 test_not_allowed_CRD_no_users_no_groups_wrong_CRD_name {
-    count(violation) == 1 with input as {
+    count(k8susercrds.violation) == 1 with input as {
         "review": {
             "object": {
                 "kind": "CustomResourceDefinition",
@@ -179,7 +181,7 @@ test_not_allowed_CRD_no_users_no_groups_wrong_CRD_name {
 }
 
 test_not_allowed_CRD_no_users_no_groups_wrong_CRD_group {
-    count(violation) == 1 with input as {
+    count(k8susercrds.violation) == 1 with input as {
         "review": {
             "object": {
                 "kind": "CustomResourceDefinition",
@@ -204,7 +206,7 @@ test_not_allowed_CRD_no_users_no_groups_wrong_CRD_group {
 }
 
 test_allowed_namespace_serivceaccount {
-    count(violation) == 0 with input as {
+    count(k8susercrds.violation) == 0 with input as {
         "review": {
             "object": {
                 "kind": "CustomResourceDefinition",
@@ -230,7 +232,7 @@ test_allowed_namespace_serivceaccount {
 }
 
 test_not_allowed_namespace_serivceaccount {
-    count(violation) == 1 with input as {
+    count(k8susercrds.violation) == 1 with input as {
         "review": {
             "object": {
                 "kind": "CustomResourceDefinition",
@@ -255,7 +257,7 @@ test_not_allowed_namespace_serivceaccount {
     }
 }
 test_allowed_namespace_name_serivceaccount {
-    count(violation) == 0 with input as {
+    count(k8susercrds.violation) == 0 with input as {
         "review": {
             "object": {
                 "kind": "CustomResourceDefinition",
@@ -280,7 +282,7 @@ test_allowed_namespace_name_serivceaccount {
     }
 }
 test_not_allowed_namespace_name_serivceaccount {
-    count(violation) == 1 with input as {
+    count(k8susercrds.violation) == 1 with input as {
         "review": {
             "object": {
                 "kind": "CustomResourceDefinition",
@@ -305,7 +307,7 @@ test_not_allowed_namespace_name_serivceaccount {
     }
 }
 test_not_allowed_allowedCRDs_null {
-    count(violation) == 1 with input as {
+    count(k8susercrds.violation) == 1 with input as {
         "review": {
             "object": {
                 "kind": "CustomResourceDefinition",
