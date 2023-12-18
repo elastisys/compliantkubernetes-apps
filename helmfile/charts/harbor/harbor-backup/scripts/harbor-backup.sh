@@ -1,10 +1,13 @@
 #!/bin/bash
 set -e
 : "${PG_HOSTNAME:?Missing PG_HOSTNAME}"
-backup_dir=backups
+backup_dir="${BACKUP_DIR:-/backup}"
+dump_dir="${backup_dir}/dbdump"
+tarball_dir="${backup_dir}/tarball"
 create_dir(){
-    echo "creating backup directory" >&2
-    mkdir -p ${backup_dir}
+    echo "creating backup directories" >&2
+    mkdir -p "${dump_dir}"
+    mkdir -p "${tarball_dir}"
 }
 
 wait_for_db_ready() {
@@ -25,26 +28,23 @@ wait_for_db_ready() {
 
 dump_database() {
     echo "Dumping database"  >&2
-    pg_dump -U postgres -h "$PG_HOSTNAME" registry > ${backup_dir}/registry.back
-    pg_dump -U postgres -h "$PG_HOSTNAME" postgres > ${backup_dir}/postgres.back
-    pg_dump -U postgres -h "$PG_HOSTNAME" notarysigner > ${backup_dir}/notarysigner.back
-    pg_dump -U postgres -h "$PG_HOSTNAME" notaryserver > ${backup_dir}/notaryserver.back
+    pg_dump -U postgres -h "$PG_HOSTNAME" registry | gzip -c > "${dump_dir}/registry.back.gz"
+    pg_dump -U postgres -h "$PG_HOSTNAME" postgres | gzip -c > "${dump_dir}/postgres.back.gz"
 }
 
 create_tarball() {
     echo "Creating tarball" >&2
-    tar zcvf harbor.tgz $backup_dir
-    mv harbor.tgz /backup/harbor.tgz
+    tar zcvf "${tarball_dir}/harbor.tgz" "${dump_dir}"
 }
 
 s3_upload() {
     : "${BUCKET_NAME:?Missing BUCKET_NAME}"
     : "${S3_REGION_ENDPOINT:?Missing S3_REGION_ENDPOINT}"
-    echo "Uploading to s3 bucket s3://${BUCKET_NAME}/backups/$(date +%s).sql.gz" >&2
+    PATH_TO_BACKUP=s3://${BUCKET_NAME}"/backups/"$(date +%s).tgz
 
-    PATH_TO_BACKUP=s3://${BUCKET_NAME}"/backups/"$(date +%s).sql.gz
+    echo "Uploading to s3 bucket ${PATH_TO_BACKUP}" >&2
 
-    aws s3 cp /backup/harbor.tgz "$PATH_TO_BACKUP" --endpoint-url="$S3_REGION_ENDPOINT"
+    aws s3 cp "${tarball_dir}/harbor.tgz" "$PATH_TO_BACKUP" --endpoint-url="$S3_REGION_ENDPOINT"
 }
 
 s3_get_records() {
@@ -68,11 +68,11 @@ s3_remove_path() {
 gcs_upload() {
   : "${GCS_KEYFILE:?Missing GCS_KEYFILE}"
   : "${BUCKET_NAME:?Missing BUCKET_NAME}"
-  echo "Uploading to gcs bucket gs://${BUCKET_NAME}/backups/$(date +%s).sql.gz" >&2
+  PATH_TO_BACKUP="gs://${BUCKET_NAME}/backups/$(date +%s).tgz"
 
-  PATH_TO_BACKUP="gs://${BUCKET_NAME}/backups/$(date +%s).sql.gz"
+  echo "Uploading to gcs bucket ${PATH_TO_BACKUP}" >&2
 
-  gsutil -o "Credentials:gs_service_key_file=${GCS_KEYFILE}" cp /backup/harbor.tgz "${PATH_TO_BACKUP}"
+  gsutil -o "Credentials:gs_service_key_file=${GCS_KEYFILE}" cp "${tarball_dir}/harbor.tgz" "${PATH_TO_BACKUP}"
 }
 
 gcs_get_records() {
