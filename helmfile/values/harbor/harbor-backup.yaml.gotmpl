@@ -23,3 +23,7 @@ gcs:
   keyfileData: |
     {{ .Values.objectStorage.gcs.keyfileData | nindent 4 }}
 {{- end }}
+
+ephemeralBackupStore:
+  enabled: {{ .Values.harbor.backup.ephemeralBackupStore.enabled }}
+  storageSize: {{ .Values.harbor.backup.ephemeralBackupStore.storageSize }}
