@@ -10,6 +10,6 @@ The key is available from [keyserver.ubuntu.com](https://keyserver.ubuntu.com/pk
 
 **Important:** We ask you to not disclose the vulnerability before it has been fixed and announced, unless you received a response from the Elastisys security team that you can do so.
 
-## Security announcements
+## Security patches
 
-You can subscribe to our [mailing list](https://eepurl.com/ht4l5n) to receive updates via mail.
+To receive notification when we release security patches, watch the Releases of this GitHub repository.
