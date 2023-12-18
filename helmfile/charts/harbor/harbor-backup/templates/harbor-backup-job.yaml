@@ -71,7 +71,17 @@ spec:
             configMap:
               name: {{ .Release.Name }}-cm
           - name: backup
+          {{- if .Values.ephemeralBackupStore.enabled }}
+            ephemeral:
+              volumeClaimTemplate:
+                spec:
+                  accessModes: [ "ReadWriteOnce" ]
+                  resources:
+                    requests:
+                      storage: {{ .Values.ephemeralBackupStore.storageSize }}
+          {{- else }}
             emptyDir: {}
+          {{- end }}
           {{- if .Values.gcs.enabled }}
           - name: gcs-credentials
             secret:
