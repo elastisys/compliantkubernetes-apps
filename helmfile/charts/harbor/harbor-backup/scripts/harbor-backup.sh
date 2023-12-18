@@ -3,7 +3,7 @@ set -e
 : "${PG_HOSTNAME:?Missing PG_HOSTNAME}"
 backup_dir="${BACKUP_DIR:-/backup}"
 dump_dir="${backup_dir}/dbdump"
-tarball_dir="${BACKUP_DIR:-backup}/tarball"
+tarball_dir="${backup_dir}/tarball"
 create_dir(){
     echo "creating backup directories" >&2
     mkdir -p "${dump_dir}"
