@@ -40,7 +40,7 @@ create_tarball() {
 s3_upload() {
     : "${BUCKET_NAME:?Missing BUCKET_NAME}"
     : "${S3_REGION_ENDPOINT:?Missing S3_REGION_ENDPOINT}"
-    PATH_TO_BACKUP=s3://${BUCKET_NAME}"/backups/"$(date +%s).sql.gz
+    PATH_TO_BACKUP=s3://${BUCKET_NAME}"/backups/"$(date +%s).tgz
 
     echo "Uploading to s3 bucket ${PATH_TO_BACKUP}" >&2
 
@@ -68,7 +68,7 @@ s3_remove_path() {
 gcs_upload() {
   : "${GCS_KEYFILE:?Missing GCS_KEYFILE}"
   : "${BUCKET_NAME:?Missing BUCKET_NAME}"
-  PATH_TO_BACKUP="gs://${BUCKET_NAME}/backups/$(date +%s).sql.gz"
+  PATH_TO_BACKUP="gs://${BUCKET_NAME}/backups/$(date +%s).tgz"
 
   echo "Uploading to gcs bucket ${PATH_TO_BACKUP}" >&2
 
