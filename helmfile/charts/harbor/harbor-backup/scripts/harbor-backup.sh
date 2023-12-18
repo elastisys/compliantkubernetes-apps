@@ -28,8 +28,8 @@ wait_for_db_ready() {
 
 dump_database() {
     echo "Dumping database"  >&2
-    pg_dump -U postgres -h "$PG_HOSTNAME" registry | gzip -c > "${dump_dir}/registry.back.gzip"
-    pg_dump -U postgres -h "$PG_HOSTNAME" postgres | gzip -c > "${dump_dir}/postgres.back.gzip"
+    pg_dump -U postgres -h "$PG_HOSTNAME" registry | gzip -c > "${dump_dir}/registry.back.gz"
+    pg_dump -U postgres -h "$PG_HOSTNAME" postgres | gzip -c > "${dump_dir}/postgres.back.gz"
 }
 
 create_tarball() {
