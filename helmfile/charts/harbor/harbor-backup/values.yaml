@@ -13,3 +13,6 @@ gcs:
   keyfileData: ""
   bucket: ""
 startingDeadlineSeconds: 200
+ephemeralBackupStore:
+  enabled: false
+  storageSize: 10Gi
