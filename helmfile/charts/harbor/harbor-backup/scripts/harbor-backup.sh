@@ -1,10 +1,13 @@
 #!/bin/bash
 set -e
 : "${PG_HOSTNAME:?Missing PG_HOSTNAME}"
-backup_dir=backups
+backup_dir="${BACKUP_DIR:-/backup}"
+dump_dir="${backup_dir}/dbdump"
+tarball_dir="${BACKUP_DIR:-backup}/tarball"
 create_dir(){
-    echo "creating backup directory" >&2
-    mkdir -p ${backup_dir}
+    echo "creating backup directories" >&2
+    mkdir -p "${dump_dir}"
+    mkdir -p "${tarball_dir}"
 }
 
 wait_for_db_ready() {
@@ -25,14 +28,13 @@ wait_for_db_ready() {
 
 dump_database() {
     echo "Dumping database"  >&2
-    pg_dump -U postgres -h "$PG_HOSTNAME" registry > ${backup_dir}/registry.back
-    pg_dump -U postgres -h "$PG_HOSTNAME" postgres > ${backup_dir}/postgres.back
+    pg_dump -U postgres -h "$PG_HOSTNAME" registry | gzip -c > "${dump_dir}/registry.back.gzip"
+    pg_dump -U postgres -h "$PG_HOSTNAME" postgres | gzip -c > "${dump_dir}/postgres.back.gzip"
 }
 
 create_tarball() {
     echo "Creating tarball" >&2
-    tar zcvf harbor.tgz $backup_dir
-    mv harbor.tgz /backup/harbor.tgz
+    tar zcvf "${tarball_dir}/harbor.tgz" "${dump_dir}"
 }
 
 s3_upload() {
@@ -42,7 +44,7 @@ s3_upload() {
 
     PATH_TO_BACKUP=s3://${BUCKET_NAME}"/backups/"$(date +%s).sql.gz
 
-    aws s3 cp /backup/harbor.tgz "$PATH_TO_BACKUP" --endpoint-url="$S3_REGION_ENDPOINT"
+    aws s3 cp "${tarball_dir}/harbor.tgz" "$PATH_TO_BACKUP" --endpoint-url="$S3_REGION_ENDPOINT"
 }
 
 s3_get_records() {
@@ -70,7 +72,7 @@ gcs_upload() {
 
   PATH_TO_BACKUP="gs://${BUCKET_NAME}/backups/$(date +%s).sql.gz"
 
-  gsutil -o "Credentials:gs_service_key_file=${GCS_KEYFILE}" cp /backup/harbor.tgz "${PATH_TO_BACKUP}"
+  gsutil -o "Credentials:gs_service_key_file=${GCS_KEYFILE}" cp "${tarball_dir}/harbor.tgz" "${PATH_TO_BACKUP}"
 }
 
 gcs_get_records() {

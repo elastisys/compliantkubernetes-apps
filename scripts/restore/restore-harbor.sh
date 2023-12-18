@@ -23,6 +23,12 @@ s3_download() {
 extract_backup(){
     echo "Extracting backups">&2
     tar xvf harbor.tgz
+    for backup_file in "registry" "postgres"; do
+      if [[ ! -f "${backup_dir}/${backup_file}.back" && -f "${backup_dir}/${backup_file}.back.gzip" ]]; then
+        gzip -d < "${backup_dir}/${backup_file}.back.gzip" > "${backup_dir}/${backup_file}.back"
+        rm "${backup_dir}/${backup_file}.back.gzip"
+      fi
+    done
 }
 
 wait_for_db_ready() {
