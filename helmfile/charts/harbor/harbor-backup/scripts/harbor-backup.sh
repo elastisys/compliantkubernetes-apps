@@ -40,9 +40,9 @@ create_tarball() {
 s3_upload() {
     : "${BUCKET_NAME:?Missing BUCKET_NAME}"
     : "${S3_REGION_ENDPOINT:?Missing S3_REGION_ENDPOINT}"
-    echo "Uploading to s3 bucket s3://${BUCKET_NAME}/backups/$(date +%s).sql.gz" >&2
-
     PATH_TO_BACKUP=s3://${BUCKET_NAME}"/backups/"$(date +%s).sql.gz
+
+    echo "Uploading to s3 bucket ${PATH_TO_BACKUP}" >&2
 
     aws s3 cp "${tarball_dir}/harbor.tgz" "$PATH_TO_BACKUP" --endpoint-url="$S3_REGION_ENDPOINT"
 }
@@ -68,9 +68,9 @@ s3_remove_path() {
 gcs_upload() {
   : "${GCS_KEYFILE:?Missing GCS_KEYFILE}"
   : "${BUCKET_NAME:?Missing BUCKET_NAME}"
-  echo "Uploading to gcs bucket gs://${BUCKET_NAME}/backups/$(date +%s).sql.gz" >&2
-
   PATH_TO_BACKUP="gs://${BUCKET_NAME}/backups/$(date +%s).sql.gz"
+
+  echo "Uploading to gcs bucket ${PATH_TO_BACKUP}" >&2
 
   gsutil -o "Credentials:gs_service_key_file=${GCS_KEYFILE}" cp "${tarball_dir}/harbor.tgz" "${PATH_TO_BACKUP}"
 }
