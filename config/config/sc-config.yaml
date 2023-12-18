@@ -354,6 +354,9 @@ harbor:
   backup:
     enabled: true
     retentionDays: 7
+    ephemeralBackupStore:
+      enabled: false
+      storageSize: 10Gi
   s3:
     multipartcopythresholdsize: "536870912"
   gc:
