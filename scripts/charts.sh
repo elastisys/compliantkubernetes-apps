@@ -5,7 +5,7 @@ set -euo pipefail
 HERE="$(readlink -f "${0}")"
 ROOT="$(dirname "$(dirname "${HERE}")")"
 
-CHARTS="${ROOT}/helmfile/upstream"
+CHARTS="${ROOT}/helmfile.d/upstream"
 INDEX="${CHARTS}/index.yaml"
 
 RETURN="0"
