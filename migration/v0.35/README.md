@@ -139,6 +139,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
+1. Apply the trivy-operator CRDs
+
+    ```bash
+    ./migration/v0.35/apply/11-trivy-operator-crds.sh execute
+    ```
+
 1. Rerun bootstrap:
 
     ```bash
