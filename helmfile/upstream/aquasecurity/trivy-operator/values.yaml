@@ -1,6 +1,12 @@
 # Default values for the trivy-operator Helm chart, these are used to render
 # the templates into valid k8s Resources.
 
+# -- global values provide a centralized configuration for 'image.registry', reducing the potential for errors.
+# If left blank, the chart will default to the individually set 'image.registry' values
+global:
+  image:
+    registry: ""
+
 # -- managedBy is similar to .Release.Service but allows to overwrite the value
 managedBy: Helm
 
@@ -65,6 +71,8 @@ operator:
   sbomGenerationEnabled: true
   # -- scannerReportTTL the flag to set how long a report should exist. "" means that the ScannerReportTTL feature is disabled
   scannerReportTTL: "24h"
+  # -- cacheReportTTL the flag to set how long a cluster sbom report should exist. "" means that the cacheReportTTL feature is disabled
+  cacheReportTTL: "120h"
   # -- configAuditScannerEnabled the flag to enable configuration audit scanner
   configAuditScannerEnabled: true
   # -- rbacAssessmentScannerEnabled the flag to enable rbac assessment scanner
@@ -114,9 +122,18 @@ operator:
   # be aware of metrics cardinality is significantly increased with this feature enabled.
   metricsRbacAssessmentInfo: false
 
-    # -- MetricsInfraAssessmentInfo the flag to enable metrics about Infra Assessment
+  # -- MetricsInfraAssessmentInfo the flag to enable metrics about Infra Assessment
   # be aware of metrics cardinality is significantly increased with this feature enabled.
   metricsInfraAssessmentInfo: false
+
+  # -- MetricsImageInfo the flag to enable metrics about Image Information of scanned images
+  # This information has image os information including os family, name/version, and if end of service life has been reached
+  # be aware of metrics cardinality is significantly increased with this feature enabled.
+  metricsImageInfo: false
+
+  # -- MetricsClusterComplianceInfo the flag to enable metrics about Cluster Compliance
+  # be aware of metrics cardinality is significantly increased with this feature enabled.
+  metricsClusterComplianceInfo: false
 
   # -- webhookBroadcastURL the flag to set reports should be sent to a webhook endpoint. "" means that the webhookBroadcastURL feature is disabled
   webhookBroadcastURL: ""
@@ -147,6 +164,7 @@ image:
 # -- service only expose a metrics endpoint for prometheus to scrape,
 # trivy-operator does not have a user interface.
 service:
+  headless: true
   metricsPort: 80
   # -- annotations added to the operator's service
   annotations: {}
@@ -248,6 +266,10 @@ trivyOperator:
   # labeled with. Example: `foo=bar,env=stage` will labeled the reports with the labels `foo: bar` and `env: stage`
   additionalReportLabels: ""
 
+  # -- policiesConfig Custom Rego Policies to be used by the config audit scanner
+  # See https://github.com/aquasecurity/trivy-operator/blob/main/docs/tutorials/writing-custom-configuration-audit-policies.md for more details.
+  policiesConfig: ""
+
 trivy:
   # -- createConfig indicates whether to create config objects
   createConfig: true
@@ -257,10 +279,13 @@ trivy:
     # -- repository of the Trivy image
     repository: aquasecurity/trivy
     # -- tag version of the Trivy image
-    tag: 0.44.1
+    tag: 0.47.0
     # -- imagePullSecret is the secret name to be used when pulling trivy image from private registries example : reg-secret
     # It is the user responsibility to create the secret for the private registry in `trivy-operator` namespace
     imagePullSecret: ~
+
+    # -- pullPolicy is the imge pull policy used for trivy image , valid values are (Always, Never, IfNotPresent)
+    pullPolicy: IfNotPresent
 
   # -- mode is the Trivy client mode. Either Standalone or ClientServer. Depending
   # on the active mode other settings might be applicable or required.
@@ -321,6 +346,8 @@ trivy:
   # vulnerabilities reported by Trivy. Set to true to enable it.
   #
   ignoreUnfixed: false
+  # -- a comma separated list of file paths for Trivy to skip
+  skipFiles:
   # -- a comma separated list of directories for Trivy to skip
   skipDirs:
 
@@ -351,7 +378,7 @@ trivy:
   # -- vulnType can be used to tell Trivy to filter vulnerabilities by a pkg-type (library, os)
   vulnType: ~
 
-  # -- resources resource requests and limits
+  # -- resources resource requests and limits for scan job containers
   resources:
     requests:
       cpu: 100m
@@ -423,6 +450,12 @@ trivy:
   # For 'filesystem' and `rootfs` scanning, ensure that the `trivyOperator.scanJobPodTemplateContainerSecurityContext` is configured
   # to run as the root user (runAsUser = 0).
   command: image
+  # -- imageScanCacheDir the flag to set custom path for trivy image scan `cache-dir` parameter.
+  # Only applicable in image scan mode.
+  imageScanCacheDir: "/tmp/trivy/.cache"
+  # -- filesystemScanCacheDir the flag to set custom path for trivy filesystem scan `cache-dir` parameter.
+  # Only applicable in filesystem scan mode.
+  filesystemScanCacheDir: "/var/trivyoperator/trivy-db"
   # -- serverUser this param is the server user to be used to download db from private registry
   serverUser: ""
   # -- serverPassword this param is the server user to be used to download db from private registry
@@ -454,6 +487,9 @@ trivy:
     securityContext:
       privileged: false
       readOnlyRootFilesystem: true
+
+    # -- the number of replicas of the trivy-server
+    replicas: 1
 
 compliance:
   # -- failEntriesLimit the flag to limit the number of fail entries per control check in the cluster compliance detail report
@@ -531,13 +567,13 @@ nodeCollector:
   # -- repository of the node-collector image
   repository: aquasecurity/node-collector
   # -- tag version of the node-collector image
-  tag: 0.0.6
+  tag: 0.0.9
   # -- imagePullSecret is the secret name to be used when pulling node-collector image from private registries example : reg-secret
   # It is the user responsibility to create the secret for the private registry in `trivy-operator` namespace
   imagePullSecret: ~
   # -- excludeNodes comma-separated node labels that the node-collector job should exclude from scanning (example kubernetes.io/arch=arm64,team=dev)
   excludeNodes:
-  # -- node-collector pod volumeMounts definition for collecting config files information
+  # -- node-collector pod volume mounts definition for collecting config files information
   volumeMounts:
     - name: var-lib-etcd
       mountPath: /var/lib/etcd
