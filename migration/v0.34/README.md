@@ -180,6 +180,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.34/apply/40-uninstalls.sh execute
     ```
 
+1. Apply the trivy-operator CRDs
+
+    ```bash
+    ./migration/v0.35/apply/50-trivy-operator-crds.sh execute
+    ```
+
 1. Unmanage the user-alertmanager secret:
 
     ```bash
