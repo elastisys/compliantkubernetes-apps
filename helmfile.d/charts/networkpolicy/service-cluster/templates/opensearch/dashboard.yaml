@@ -48,6 +48,35 @@ spec:
               app.kubernetes.io/component: opensearch-master
       ports:
         - port: 9200
+    - to:
+      {{- if and .Values.global.externalLoadBalancer .Values.global.scIngress.ips }}
+        {{- range $ip := .Values.global.scIngress.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      {{- else if and .Values.global.ingressUsingHostNetwork .Values.global.scNodes.ips }}
+        {{- range $ip := .Values.global.scNodes.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+      {{- else }}
+        {{- if .Values.global.scIngress.ips }}
+        {{- range $ip := .Values.global.scIngress.ips }}
+        - ipBlock:
+            cidr: {{ $ip }}
+        {{- end }}
+        {{- end }}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/component: controller
+              app.kubernetes.io/instance: ingress-nginx
+      {{- end }}
+      ports:
+        - protocol: TCP
+          port: 443
     - ports:
         - port: 53
           protocol: UDP
