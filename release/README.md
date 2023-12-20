@@ -131,6 +131,7 @@ release/generate-release-notes.sh X.Y.Z
 
 The public release notes are aimed towards application developers.
 Remove irrelevant entries and/or reword entries so that they are easy to understand for the application developers.
+In the [compliantkubernetes repo](https://github.com/elastisys/compliantkubernetes), create two new branches `release-vX.Y` and `<personal-tag>/release-vX.Y`. Add the release notes to `<personal-tag>/release-vX.Y` and then create two PRs, one to `release-vX.Y` and one to `main`.
 
 ## Update the main branch
 
