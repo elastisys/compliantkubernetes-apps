@@ -206,7 +206,7 @@ create() {
 
     kubectl label namespaces calico-apiserver calico-system tigera-operator owner=operator
 
-    helmfile -e local_cluster -f "${ROOT}/helmfile.yaml" -lapp=tigera apply --output simple
+    helmfile -e local_cluster -f "${ROOT}/helmfile.d" -lapp=tigera apply --output simple
   fi
 
   # install s3
@@ -217,7 +217,7 @@ create() {
 
     kubectl label namespace minio-system owner=operator
 
-    helmfile -e local_cluster -f "${ROOT}/helmfile.yaml" -lapp=minio apply --output simple
+    helmfile -e local_cluster -f "${ROOT}/helmfile.d" -lapp=minio apply --output simple
   fi
 
   index.state "${cluster}" "ready"

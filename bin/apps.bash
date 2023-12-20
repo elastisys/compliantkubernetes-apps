@@ -42,7 +42,7 @@ template_validate_sc() {
     kubeconfig="${config[kube_config_sc]}"
 
     with_kubeconfig "${kubeconfig}" \
-        helmfile -f "${here}/../helmfile/" -e service_cluster template --validate >/dev/null
+        helmfile -f "${here}/../helmfile.d/" -e service_cluster template --validate >/dev/null
 
     log_info "Validation of helm releases completed successfully"
 }
@@ -53,7 +53,7 @@ template_validate_wc() {
     kubeconfig="${config[kube_config_wc]}"
 
     with_kubeconfig "${kubeconfig}" \
-        helmfile -f "${here}/../helmfile/" -e workload_cluster template --validate >/dev/null
+        helmfile -f "${here}/../helmfile.d/" -e workload_cluster template --validate >/dev/null
 
     log_info "Validation of helm releases completed successfully"
 }

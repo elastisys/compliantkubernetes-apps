@@ -1,0 +1,76 @@
+---
+templates:
+  system:
+    namespace: kube-system
+
+  networkpolicies-common:
+    inherit: [ template: system ]
+    chart: charts/networkpolicy/common
+    version: 0.2.0
+    name: common-np
+    labels:
+      policy: netpol
+      netpol: common
+    {{- if .Values | get "ck8sWorkloadCluster.enabled" false }}
+    needs:
+      - kube-system/user-rbac # creates networkpolicies for its namespaces
+    {{- end }}
+    values:
+    - values/networkpolicy/common.yaml.gotmpl
+
+  networkpolicies-service:
+    inherit: [ template: system ]
+    condition: ck8sManagementCluster.enabled
+    chart: charts/networkpolicy/service-cluster
+    version: 0.2.0
+    name: service-cluster-np
+    labels:
+      policy: netpol
+      netpol: service
+    values:
+      - values/networkpolicy/service-cluster.yaml.gotmpl
+
+  networkpolicies-workload:
+    inherit: [ template: system ]
+    condition: ck8sWorkloadCluster.enabled
+    chart: charts/networkpolicy/workload-cluster
+    version: 0.2.0
+    name: workload-cluster-np
+    labels:
+      policy: netpol
+      netpol: workload
+    values:
+      - values/networkpolicy/workload-cluster.yaml.gotmpl
+
+  node-local-dns:
+    disableValidationOnInstall: true
+    inherit: [ template: system ]
+    chart: charts/node-local-dns
+    version: 0.1.1
+    name: node-local-dns
+    labels:
+      app: node-local-dns
+    needs:
+      - monitoring/kube-prometheus-stack # creates prometheus-operator/servicemonitors
+    values:
+      - values/node-local-dns.yaml.gotmpl
+
+  default-podsecuritypolicy:
+    inherit: [ template: podsecuritypolicies ]
+    condition: ck8sWorkloadCluster.enabled
+    namespace: default
+    labels:
+      app: dev-rbac
+      psp: default
+    values:
+      - values/podsecuritypolicies/workload/default.yaml.gotmpl
+
+  rook-ceph-podsecuritypolicy:
+    inherit: [ template: podsecuritypolicies ]
+    installed: {{ .Values | get "rookCeph.gatekeeperPsp.enabled" false }}
+    namespace: rook-ceph
+    labels:
+      app: rook-ceph
+      psp: rook-ceph
+    values:
+      - values/podsecuritypolicies/common/rook-ceph.yaml.gotmpl

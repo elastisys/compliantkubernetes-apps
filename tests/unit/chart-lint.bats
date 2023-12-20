@@ -29,13 +29,13 @@ setup() {
 }
 
 @test "chart lint - apps sc" {
-  run helmfile -e service_cluster -f "${ROOT}/helmfile/" lint
+  run helmfile -e service_cluster -f "${ROOT}/helmfile.d/" lint
 
   assert_success
 }
 
 @test "chart lint - apps wc" {
-  run helmfile -e workload_cluster -f "${ROOT}/helmfile/" lint
+  run helmfile -e workload_cluster -f "${ROOT}/helmfile.d/" lint
 
   assert_success
 }

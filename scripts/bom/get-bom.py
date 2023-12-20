@@ -8,7 +8,7 @@ Usage:
     ./scripts/bom/get-bom.py
 
 Input:
-    Helm Charts in ./helmfile/upstream
+    Helm Charts in ./helmfile.d/upstream
 
 Output:
     CSV-like file
@@ -47,7 +47,7 @@ def parse_chart_yaml(file):
             logging.error(f'Cannot parse {file}: {e}')
 
 components = [ ]
-for root, dirs, filenames in os.walk('./helmfile/upstream'):
+for root, dirs, filenames in os.walk('./helmfile.d/upstream'):
     for filename in filenames:
         file = os.path.join(root, filename)
         if filename == 'Chart.yaml':

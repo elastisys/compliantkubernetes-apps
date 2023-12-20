@@ -19,7 +19,7 @@ grafana_logs() {
 
   run grafana_sc_dashboard_logs ops-grafana
 
-  readarray -t dashboards < <(helmfile -e service_cluster -f "${ROOT}/helmfile" -l app=grafana-dashboards template | yq4 -N 'select(.kind == "ConfigMap") | .data | keys | .[]')
+  readarray -t dashboards < <(helmfile -e service_cluster -f "${ROOT}/helmfile.d" -l app=grafana-dashboards template | yq4 -N 'select(.kind == "ConfigMap") | .data | keys | .[]')
 
   for dashboard in "${dashboards[@]}"; do
     assert_line "${dashboard}"
@@ -39,7 +39,7 @@ grafana_logs() {
 
   run grafana_sc_dashboard_logs user-grafana
 
-  readarray -t dashboards < <(helmfile -e service_cluster -f "${ROOT}/helmfile" -l app=grafana-dashboards template | yq4 -N 'select(.kind == "ConfigMap" and .metadata.labels.grafana_dashboard == "1") | .data | keys | .[]')
+  readarray -t dashboards < <(helmfile -e service_cluster -f "${ROOT}/helmfile.d" -l app=grafana-dashboards template | yq4 -N 'select(.kind == "ConfigMap" and .metadata.labels.grafana_dashboard == "1") | .data | keys | .[]')
 
   for dashboard in "${dashboards[@]}"; do
     assert_line "${dashboard}"

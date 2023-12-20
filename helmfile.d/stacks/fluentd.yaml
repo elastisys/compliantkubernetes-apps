@@ -1,0 +1,94 @@
+---
+templates:
+  fluentd:
+    namespace: fluentd-system
+    labels:
+      app: fluentd
+
+  fluentd-podsecuritypolicy:
+    inherit:
+      - template: fluentd
+      - template: podsecuritypolicies
+    installed: {{ .Values | get "fluentd.enabled" false }}
+    labels:
+      psp: fluentd
+    values:
+      - values/podsecuritypolicies/common/fluentd.yaml.gotmpl
+
+  fluentd-aggregator:
+    disableValidationOnInstall: true
+    inherit:
+      - template: fluentd
+      - template: fluentd-chart
+    {{- if .Values | get "ck8sManagementCluster.enabled" false }}
+    installed: {{ .Values | get "fluentd.enabled" false }}
+    {{- else if .Values | get "ck8sWorkloadCluster.enabled" false }}
+    installed: {{ and (.Values | get "fluentd.enabled" false) (.Values | get "fluentd.audit.enabled" false) }}
+    {{- end }}
+    name: fluentd-aggregator
+    needs:
+      - fluentd-system/podsecuritypolicy
+      - kube-system/common-np
+      - monitoring/kube-prometheus-stack # creates servicemonitors
+    values:
+      - values/fluentd/aggregator-common.yaml.gotmpl
+      {{- if .Values | get "ck8sManagementCluster.enabled" false }}
+      - values/fluentd/aggregator-service-cluster.yaml.gotmpl
+      {{- else if .Values | get "ck8sWorkloadCluster.enabled" false }}
+      - values/fluentd/aggregator-workload-cluster.yaml.gotmpl
+      {{ end }}
+
+  fluentd-forwarder:
+    disableValidationOnInstall: true
+    inherit:
+      - template: fluentd
+      - template: fluentd-elasticsearch-chart
+    {{- if .Values | get "ck8sManagementCluster.enabled" false }}
+    installed: {{ .Values | get "fluentd.enabled" false }}
+    {{- else if .Values | get "ck8sWorkloadCluster.enabled" false }}
+    installed: {{ and (.Values | get "fluentd.enabled" false) (or (.Values | get "fluentd.audit.enabled" false) (.Values | get "opensearch.enabled" false)) }}
+    {{- end }}
+    name: fluentd-forwarder
+    needs:
+      - fluentd-system/podsecuritypolicy
+      - kube-system/common-np
+      - monitoring/kube-prometheus-stack # creates servicemonitors and prometheusrules
+    values:
+      - values/fluentd/forwarder-common.yaml.gotmpl
+      {{- if .Values | get "ck8sManagementCluster.enabled" false }}
+      - values/fluentd/forwarder-service-cluster.yaml.gotmpl
+      {{- else if .Values | get "ck8sWorkloadCluster.enabled" false }}
+      - values/fluentd/forwarder-workload-cluster.yaml.gotmpl
+      - values/fluentd/forwarder-workload-cluster-system.yaml.gotmpl
+      {{ end }}
+
+  fluentd-user:
+    disableValidationOnInstall: true
+    inherit:
+      - template: fluentd
+      - template: fluentd-elasticsearch-chart
+    condition: ck8sWorkloadCluster.enabled
+    installed: {{ and (.Values | get "fluentd.enabled" false) (or (.Values | get "fluentd.audit.enabled" false) (.Values | get "opensearch.enabled" false)) }}
+    namespace: fluentd
+    name: fluentd
+    needs:
+      - fluentd-system/podsecuritypolicy
+      - kube-system/workload-cluster-np
+      - monitoring/kube-prometheus-stack # creates servicemonitors and prometheusrules
+    values:
+      - values/fluentd/forwarder-common.yaml.gotmpl
+      - values/fluentd/forwarder-workload-cluster.yaml.gotmpl
+      - values/fluentd/forwarder-workload-cluster-user.yaml.gotmpl
+
+  log-manager:
+    inherit: [ template: fluentd ]
+    condition: ck8sManagementCluster.enabled
+    installed: {{ .Values | get "fluentd.enabled" false }}
+    chart: charts/log-manager
+    version: 0.1.0
+    name: log-manager
+    needs:
+      - kube-system/service-cluster-np
+      - fluentd-system/podsecuritypolicy
+    values:
+      - values/fluentd/log-manager.yaml.gotmpl

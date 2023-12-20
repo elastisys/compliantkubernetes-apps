@@ -1,0 +1,13 @@
+---
+templates:
+  rclone-sync:
+    condition: ck8sManagementCluster.enabled
+    installed: {{ .Values | get "objectStorage.sync.enabled" false }}
+    chart: charts/rclone-sync
+    version: 0.1.0
+    namespace: rclone
+    name: rclone-sync
+    labels:
+      app: rclone-sync
+    values:
+      - values/rclone-sync.yaml.gotmpl

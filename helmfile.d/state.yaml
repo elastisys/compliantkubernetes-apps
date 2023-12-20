@@ -1,0 +1,149 @@
+---
+missingFileHandler: Error
+bases:
+  - bases/environments.yaml
+  - bases/upstream.yaml
+---
+bases:
+  - stacks/calico.yaml
+  - stacks/cert-manager.yaml
+  - stacks/dex.yaml
+  - stacks/falco.yaml
+  - stacks/fluentd.yaml
+  - stacks/gatekeeper.yaml
+  - stacks/harbor.yaml
+  - stacks/hnc.yaml
+  - stacks/ingress-nginx.yaml
+  - stacks/kured.yaml
+  - stacks/local.yaml
+  - stacks/monitoring.yaml
+  - stacks/monitoring-grafana.yaml
+  - stacks/monitoring-prometheus.yaml
+  - stacks/opensearch.yaml
+  - stacks/rbac.yaml
+  - stacks/rclone.yaml
+  - stacks/system.yaml
+  - stacks/thanos.yaml
+  - stacks/velero.yaml
+---
+releases:
+  - inherit: [ template: tigera ]
+  - inherit: [ template: minio ]
+
+  - inherit: [ template: admin-rbac ]
+  - inherit: [ template: dev-rbac ]
+  - inherit: [ template: dev-rbac-crds ]
+
+  - inherit: [ template: networkpolicies-common ]
+  - inherit: [ template: networkpolicies-service ]
+  - inherit: [ template: networkpolicies-workload ]
+
+  - inherit: [ template: cert-manager-controller ]
+  - inherit: [ template: cert-manager-issuers ]
+
+  - inherit: [ template: gatekeeper-controller ]
+  - inherit: [ template: gatekeeper-templates ]
+  - inherit: [ template: gatekeeper-constraints ]
+  - inherit: [ template: gatekeeper-mutations ]
+  - inherit: [ template: gatekeeper-metrics ]
+
+  - inherit: [ template: default-podsecuritypolicy ]
+
+  - inherit: [ template: falco-podsecuritypolicy ]
+  - inherit: [ template: falco-main ]
+  - inherit: [ template: falco-exporter ]
+
+  - inherit: [ template: fluentd-podsecuritypolicy ]
+  - inherit: [ template: fluentd-aggregator ]
+  - inherit: [ template: fluentd-forwarder ]
+  - inherit: [ template: fluentd-user ]
+  - inherit: [ template: log-manager ]
+
+  - inherit: [ template: file-copier ]
+  - inherit: [ template: ingress-nginx-podsecuritypolicy ]
+  - inherit: [ template: ingress-nginx-controller ]
+
+  - inherit: [ template: monitoring-networkpolicy ]
+  - inherit: [ template: monitoring-podsecuritypolicy ]
+
+  - inherit: [ template: metrics-server ]
+
+  - inherit: [ template: kube-prometheus-stack ]
+  - inherit: [ template: kube-state-metrics-extra-resources ]
+  - inherit: [ template: prometheus-blackbox-exporter ]
+  - inherit: [ template: prometheus-sc-monitors ]
+  - inherit: [ template: prometheus-sc-rules ]
+  - inherit: [ template: prometheus-wc-monitors ]
+  - inherit: [ template: prometheus-wc-rules ]
+
+  - inherit: [ template: dev-alertmanager ]
+
+  {{- range .Values | get "clusterApi.clusters" list }}
+  - inherit: [ template: autoscaling-monitoring ]
+    name: autoscaling-monitoring-{{ . }}
+    set:
+    - name: clusterName
+      value: {{ $.Values.global.ck8sEnvironmentName }}-{{ . }}
+  {{- end }}
+
+  - inherit: [ template: openstack-monitoring ]
+
+  - inherit: [ template: trivy-operator ]
+  - inherit: [ template: s3-exporter ]
+
+  - inherit: [ template: kubeapi-metrics ]
+
+  - inherit: [ template: thanos-networkpolicy ]
+  - inherit: [ template: thanos-ingress-secret ]
+  - inherit: [ template: thanos-objstore-secret ]
+  - inherit: [ template: thanos-query ]
+  - inherit: [ template: thanos-receiver ]
+  - inherit: [ template: thanos-ruler ]
+
+  - inherit: [ template: calico-accountant ]
+  - inherit: [ template: calico-default-deny ]
+  - inherit: [ template: calico-felix-metrics ]
+
+  - inherit: [ template: hnc-networkpolicy ]
+  - inherit: [ template: hnc-resources ]
+  - inherit: [ template: hnc-controller ]
+
+  - inherit: [ template: node-local-dns ]
+
+  - inherit: [ template: rook-ceph-podsecuritypolicy ]
+
+  - inherit: [ template: kured-podsecuritypolicy ]
+  - inherit: [ template: kured-secret ]
+  - inherit: [ template: kured-main ]
+
+  - inherit: [ template: velero-podsecuritypolicy ]
+  - inherit: [ template: velero-main ]
+
+  - inherit: [ template: rclone-sync ]
+
+  - inherit: [ template: dex ]
+
+  - inherit: [ template: grafana-admin ]
+  - inherit: [ template: grafana-dev ]
+  - inherit: [ template: grafana-label-enforcer ]
+  - inherit: [ template: grafana-dashboards ]
+
+  - inherit: [ template: harbor-networkpolicy ]
+  - inherit: [ template: harbor-podsecuritypolicy ]
+  - inherit: [ template: harbor-certs ]
+  - inherit: [ template: harbor-main ]
+  - inherit: [ template: harbor-init ]
+  - inherit: [ template: harbor-backup ]
+
+  - inherit: [ template: opensearch-podsecuritypolicy ]
+  - inherit: [ template: opensearch-secrets ]
+  - inherit: [ template: opensearch-master ]
+  - inherit: [ template: opensearch-client ]
+  - inherit: [ template: opensearch-data ]
+  - inherit: [ template: opensearch-dashboards ]
+  - inherit: [ template: opensearch-securityadmin ]
+  - inherit: [ template: opensearch-configurer ]
+  - inherit: [ template: opensearch-backup ]
+  - inherit: [ template: opensearch-slm ]
+  - inherit: [ template: opensearch-curator ]
+  - inherit: [ template: opensearch-exporter ]

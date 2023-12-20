@@ -1,0 +1,175 @@
+---
+templates:
+  opensearch:
+    condition: ck8sManagementCluster.enabled
+    namespace: opensearch-system
+    labels:
+      app: opensearch
+
+  opensearch-podsecuritypolicy:
+    inherit:
+      - template: opensearch
+      - template: podsecuritypolicies
+    installed: {{ .Values | get "opensearch.enabled" false }}
+    labels:
+      psp: opensearch
+    values:
+      - values/podsecuritypolicies/service/opensearch.yaml.gotmpl
+
+  opensearch-secrets:
+    disableValidationOnInstall: true # creates cert-manager/certificates
+    inherit: [ template: opensearch ]
+    installed: {{ .Values | get "opensearch.enabled" false }}
+    chart: charts/opensearch/secrets
+    version: 0.1.0
+    name: opensearch-secrets
+    needs:
+      - cert-manager/cert-manager
+    values:
+      - values/opensearch/secrets.yaml.gotmpl
+
+  opensearch-master:
+    disableValidationOnInstall: true
+    inherit:
+      - template: opensearch
+      - template: opensearch-chart
+    installed: {{ .Values | get "opensearch.enabled" false }}
+    name: opensearch-master
+    needs:
+      {{- if .Values | get "opensearch.sso.enabled" false }}
+      - dex/dex
+      {{- end }}
+      - kube-system/service-cluster-np
+      - opensearch-system/opensearch-secrets
+      - opensearch-system/podsecuritypolicy
+    values:
+      - values/opensearch/common.yaml.gotmpl
+      - values/opensearch/master.yaml.gotmpl
+    wait: true
+
+  opensearch-client:
+    inherit:
+      - template: opensearch
+      - template: opensearch-chart
+    installed: {{ and ( .Values | get "opensearch.enabled" false) (.Values | get "opensearch.clientNode.dedicatedPods" false) }}
+    name: opensearch-client
+    needs:
+      - kube-system/service-cluster-np
+      - opensearch-system/opensearch-master
+      - opensearch-system/podsecuritypolicy
+    values:
+      - values/opensearch/common.yaml.gotmpl
+      - values/opensearch/client.yaml.gotmpl
+    wait: true
+
+  opensearch-data:
+    inherit:
+      - template: opensearch
+      - template: opensearch-chart
+    installed: {{ and ( .Values | get "opensearch.enabled" false) (.Values | get "opensearch.dataNode.dedicatedPods" false) }}
+    name: opensearch-data
+    needs:
+      - kube-system/service-cluster-np
+      - opensearch-system/opensearch-master
+      - opensearch-system/podsecuritypolicy
+    values:
+      - values/opensearch/common.yaml.gotmpl
+      - values/opensearch/data.yaml.gotmpl
+    wait: true
+
+  opensearch-dashboards:
+    inherit:
+      - template: opensearch
+      - template: opensearch-dashboards-chart
+    installed: {{ .Values | get "opensearch.enabled" false }}
+    name: opensearch-dashboards
+    needs:
+      {{- if .Values | get "opensearch.sso.enabled" false }}
+      - dex/dex
+      {{- end }}
+      - kube-system/service-cluster-np
+      - opensearch-system/opensearch-master
+      - opensearch-system/podsecuritypolicy
+    values:
+      - values/opensearch/dashboards.yaml.gotmpl
+    wait: true
+
+  opensearch-securityadmin:
+    inherit: [ template: opensearch ]
+    installed: {{ and ( .Values | get "opensearch.enabled" false) (.Values | get "opensearch.securityadmin.enabled" false) }}
+    chart: charts/opensearch/securityadmin
+    version: 0.1.0
+    name: opensearch-securityadmin
+    needs:
+      - opensearch-system/opensearch-master
+      {{- if .Values | get "opensearch.clientNode.dedicatedPods" false }}
+      - opensearch-system/opensearch-client
+      {{- end }}
+      {{- if .Values | get "opensearch.dataNode.dedicatedPods" false }}
+      - opensearch-system/opensearch-data
+      {{- end }}
+    values:
+      - values/opensearch/securityadmin.yaml.gotmpl
+
+  opensearch-configurer:
+    inherit: [ template: opensearch ]
+    installed: {{ .Values | get "opensearch.enabled" false }}
+    chart: charts/opensearch/configurer
+    version: 0.1.0
+    name: opensearch-configurer
+    needs:
+      {{- if .Values | get "opensearch.securityadmin.enabled" false }}
+      - opensearch-system/opensearch-securityadmin
+      {{- else }}
+      - opensearch-system/opensearch-master
+      {{- end }}
+      - opensearch-system/opensearch-dashboards
+    values:
+      - values/opensearch/securityadmin.yaml.gotmpl
+      - values/opensearch/configurer.yaml.gotmpl
+
+  opensearch-backup:
+    inherit: [ template: opensearch ]
+    installed: {{ and ( .Values | get "opensearch.enabled" false) (.Values | get "opensearch.snapshot.enabled" false) }}
+    chart: charts/opensearch/backup
+    version: 0.1.0
+    name: opensearch-backup
+    needs:
+      - opensearch-system/opensearch-configurer
+    values:
+      - values/opensearch/backup.yaml.gotmpl
+
+  opensearch-slm:
+    inherit: [ template: opensearch ]
+    installed: {{ and ( .Values | get "opensearch.enabled" false) (.Values | get "opensearch.snapshot.enabled" false) }}
+    chart: charts/opensearch/slm
+    version: 0.1.0
+    name: opensearch-slm
+    needs:
+      - opensearch-system/opensearch-configurer
+    values:
+      - values/opensearch/slm.yaml.gotmpl
+
+  opensearch-curator:
+    inherit: [ template: opensearch ]
+    installed: {{ and ( .Values | get "opensearch.enabled" false) (.Values | get "opensearch.curator.enabled" false) }}
+    chart: charts/opensearch/curator
+    version: 0.1.0
+    name: opensearch-curator
+    needs:
+      - opensearch-system/opensearch-configurer
+    values:
+      - values/opensearch/curator.yaml.gotmpl
+
+  opensearch-exporter:
+    disableValidationOnInstall: true # creates prometheus-operator/servicemonitors
+    inherit:
+      - template: opensearch
+      - template: prometheus-elasticsearch-exporter-chart
+    installed: {{ .Values | get "opensearch.enabled" false }}
+    name: prometheus-opensearch-exporter
+    needs:
+      - monitoring/kube-prometheus-stack
+      - opensearch-system/opensearch-configurer
+    values:
+      - values/prometheus-opensearch-exporter.yaml.gotmpl

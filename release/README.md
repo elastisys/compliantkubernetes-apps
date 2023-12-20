@@ -98,8 +98,8 @@ Write about some new feature or change that is relevant for the user, e.g. for `
 
 Remove the items in this section from two+ older minor versions, meaning if you release apps `v0.28` you can keep previous items that were added to the list in `v0.27` but remove the stuff that are from `v0.26`.
 
-- Edit the [Grafana dashboard](../helmfile/charts/grafana-ops/files/welcome.md)
-- Edit the [Opensearch dashboard](../helmfile/charts/opensearch/configurer/files/dashboards-resources/welcome.md)
+- Edit the [Grafana dashboard](../helmfile.d/charts/grafana-dashboards/files/welcome.md)
+- Edit the [Opensearch dashboard](../helmfile.d/charts/opensearch/configurer/files/dashboards-resources/welcome.md)
 
 ## Code freeze
 

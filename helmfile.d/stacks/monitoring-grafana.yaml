@@ -1,0 +1,56 @@
+---
+templates:
+  grafana:
+    condition: ck8sManagementCluster.enabled
+    namespace: monitoring
+    labels:
+      app: grafana
+
+  grafana-admin:
+    disableValidationOnInstall: true
+    inherit:
+      - template: grafana
+      - template: grafana-chart
+    name: ops-grafana
+    needs:
+      - monitoring/networkpolicy
+      - monitoring/podsecuritypolicy
+      - monitoring/kube-prometheus-stack # creates servicemonitors
+    values:
+      - values/grafana/grafana-common.yaml.gotmpl
+      - values/grafana/grafana-ops.yaml.gotmpl
+
+  grafana-dev:
+    inherit:
+      - template: grafana
+      - template: grafana-chart
+    installed: {{ .Values | get "grafana.user.enabled" false }}
+    name: user-grafana
+    needs:
+      - monitoring/networkpolicy
+      - monitoring/podsecuritypolicy
+    values:
+      - values/grafana/grafana-common.yaml.gotmpl
+      - values/grafana/grafana-user.yaml.gotmpl
+
+  grafana-label-enforcer:
+    inherit: [ template: grafana ]
+    installed: {{ and (.Values | get "thanos.enabled" false) (.Values | get "thanos.receiver.enabled" false) }}
+    chart: charts/grafana-label-enforcer
+    version: 0.1.0
+    name: grafana-label-enforcer
+    needs:
+      - monitoring/networkpolicy
+      - monitoring/podsecuritypolicy
+    values:
+      - values/grafana/grafana-label-enforcer.yaml.gotmpl
+
+  grafana-dashboards:
+    inherit: [ template: grafana ]
+    chart: charts/grafana-dashboards
+    version: 0.3.0
+    name: grafana-dashboards
+    needs:
+      - monitoring/ops-grafana
+    values:
+      - values/grafana/grafana-dashboards.yaml.gotmpl

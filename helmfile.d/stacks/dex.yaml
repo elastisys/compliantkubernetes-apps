@@ -1,0 +1,16 @@
+---
+templates:
+  dex:
+    disableValidationOnInstall: true
+    inherit: [ template: dex-chart ]
+    condition: ck8sManagementCluster.enabled
+    namespace: dex
+    name: dex
+    labels:
+      app: dex
+    needs:
+      - kube-system/service-cluster-np
+      - monitoring/kube-prometheus-stack # creates servicemonitors
+    values:
+      - values/dex.yaml.gotmpl
+    wait: true

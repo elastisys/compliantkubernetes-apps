@@ -22,7 +22,7 @@ score() {
   shift
 
   local releases
-  releases="$(helmfile --allow-no-matching-release -e  "${target}_cluster" -f "${root}/helmfile/" list "${@/#/-l}" -q --output json)"
+  releases="$(helmfile --allow-no-matching-release -e  "${target}_cluster" -f "${root}/helmfile.d/" list "${@/#/-l}" -q --output json)"
   releases="$(yq4 -Poj '[.[] | select(.enabled and .installed) | {"namespace": .namespace, "name": .name}] | sort_by(.namespace, .name)' <<< "${releases}")"
 
   local length
@@ -33,7 +33,7 @@ score() {
     name="$(yq4 -Poy ".[${index}].name" <<< "${releases}")"
 
     echo "templating ${target}/${namespace}/${name}" >&2
-    helmfile -e "${target}_cluster" -f "${root}/helmfile/" template -q "-lnamespace=${namespace},name=${name}" | yq4 "with(select(.metadata.namespace == null); .metadata.namespace = \"${namespace}\")"
+    helmfile -e "${target}_cluster" -f "${root}/helmfile.d/" template -q "-lnamespace=${namespace},name=${name}" | yq4 "with(select(.metadata.namespace == null); .metadata.namespace = \"${namespace}\")"
     echo "---"
   done | $cmd score - --output-format=json --ignore-test container-image-pull-policy,container-ephemeral-storage-request-and-limit --kubernetes-version v1.24 || true
 }

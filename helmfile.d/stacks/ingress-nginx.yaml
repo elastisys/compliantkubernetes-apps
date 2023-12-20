@@ -1,0 +1,46 @@
+---
+templates:
+  ingress-nginx:
+    namespace: ingress-nginx
+    labels:
+      app: ingress-nginx
+
+  file-copier:
+    inherit: [ template: ingress-nginx ]
+    name: file-copier
+    namespace: kube-system
+    chart: charts/file-copier
+    version: 0.1.0
+    installed: {{ .Values | get "ingressNginx.controller.chroot" false }}
+    values:
+      - values/file-copier.yaml.gotmpl
+
+  ingress-nginx-podsecuritypolicy:
+    inherit:
+      - template: ingress-nginx
+      - template: podsecuritypolicies
+    labels:
+      psp: ingress-nginx
+    values:
+      - values/podsecuritypolicies/common/ingress-nginx.yaml.gotmpl
+
+  ingress-nginx-controller:
+    disableValidationOnInstall: true
+    inherit:
+      - template: ingress-nginx
+      - template: ingress-nginx-chart
+    name: ingress-nginx
+    needs:
+      - ingress-nginx/podsecuritypolicy
+      {{- if .Values | get "ck8sManagementCluster.enabled" false }}
+      - kube-system/service-cluster-np
+      {{- else if .Values | get "ck8sWorkloadCluster.enabled" false }}
+      - kube-system/workload-cluster-np
+      {{- end }}
+      {{- if .Values | get "ingressNginx.controller.chroot" false }}
+      - kube-system/file-copier
+      {{- end }}
+      - monitoring/kube-prometheus-stack # creates servicemonitors
+    values:
+      - values/ingress-nginx.yaml.gotmpl
+    wait: true

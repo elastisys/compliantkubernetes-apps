@@ -5,31 +5,31 @@ repos:
       - id: no-commit-to-branch
       - id: check-merge-conflict
       - id: check-yaml
-        exclude: ^helmfile/stacks/|^helmfile/upstream/|charts/.*/templates/|helmfile.yaml|^helmfile/[0-9]+-[a-z-]+.yaml|^helmfile/bases
+        exclude: ^helmfile\.d/(bases/.*|charts/.*/templates/.*|stacks/.*|upstream/.*|state.yaml)$|bootstrap/
         args:
           - --allow-multiple-documents
       - id: check-json
-        exclude: ^helmfile/upstream/|charts/.*/templates/
+        exclude: ^helmfile\.d/(charts/.*/templates/|upstream/)
       - id: detect-private-key
-        exclude: ^helmfile/upstream/|^pipeline/sops-pgp-setup.bash$
+        exclude: ^helmfile\.d/upstream/|^pipeline/sops-pgp-setup.bash$
       - id: end-of-file-fixer
-        exclude: ^helmfile/upstream/|^tests/.*/resources/
+        exclude: ^helmfile\.d/upstream/|^tests/.*/resources/
       - id: trailing-whitespace
-        exclude: ^helmfile/upstream/|^tests/.*/resources/
+        exclude: ^helmfile\.d/upstream/|^tests/.*/resources/
 
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
     rev: 2.7.1
     hooks:
       - id: editorconfig-checker
         name: check indentation
-        exclude: ^.gitmodules$|^helmfile/upstream/|^helmfile/charts/grafana-dashboards/dashboards/|^LICENSE$|^tests/.*/resources/
+        exclude: ^.gitmodules$|^helmfile\.d/upstream/|^helmfile\.d/charts/grafana-dashboards/dashboards/|^LICENSE$|^tests/.*/resources/
 
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
     rev: 3.0.0
     hooks:
       - id: markdownlint
         name: check markdown
-        exclude: ^.github/pull_request_template.md$|^helmfile/upstream/|^CHANGELOG.md$|^WIP-CHANGELOG.md$|^helmfile/charts/grafana-dashboards/files/welcome.md$|^helmfile/charts/opensearch/configurer/files/dashboards-resources/welcome.md$|^images/elasticsearch-curator/README.md
+        exclude: ^.github/pull_request_template.md$|^helmfile\.d/upstream/|^CHANGELOG.md$|^WIP-CHANGELOG.md$|^helmfile\.d/charts/grafana-dashboards/files/welcome.md$|^helmfile\.d/charts/opensearch/configurer/files/dashboards-resources/welcome.md$|^images/elasticsearch-curator/README.md
         args:
           - -r
           - ~MD013,~MD024,~MD026,~MD027,~MD028,~MD034,~MD033
@@ -39,7 +39,7 @@ repos:
     hooks:
       - id: codespell
         name: check spelling
-        exclude: ^helmfile/upstream/|^helmfile/charts/hnc/config-and-crds/crds/|^helmfile/charts/grafana-dashboards/dashboards/scripts/|^tests/package-lock.json$
+        exclude: ^helmfile\.d/upstream/|^helmfile\.d/charts/hnc/config-and-crds/crds/|^helmfile\.d/charts/grafana-dashboards/dashboards/scripts/|^tests/package-lock.json$
         args:
           - -L
           - fpr
@@ -49,7 +49,7 @@ repos:
     hooks:
       - id: shellcheck
         name: check scripts
-        exclude: ^helmfile/upstream/|^helmfile/charts/opensearch/configurer/files/configurer.sh$
+        exclude: ^helmfile\.d/upstream/|^helmfile\.d/charts/opensearch/configurer/files/configurer.sh$
         require_serial: true
         args:
         - --color=always

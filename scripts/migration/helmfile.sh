@@ -16,9 +16,9 @@ helmfile_do() {
   esac
 
   if [ "${CONFIG["${1}-kubeconfig"]}" = "encrypted" ]; then
-    sops exec-file --no-fifo "${CK8S_CONFIG_PATH}/.state/kube_config_${1}.yaml" "KUBECONFIG={} helmfile -e ${environment} -f ${ROOT}/helmfile ${*:2}"
+    sops exec-file --no-fifo "${CK8S_CONFIG_PATH}/.state/kube_config_${1}.yaml" "KUBECONFIG={} helmfile -e ${environment} -f ${ROOT}/helmfile.d/ ${*:2}"
   else
-    KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_${1}.yaml" helmfile -e "${environment}" -f "${ROOT}/helmfile" "${@:2}"
+    KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_${1}.yaml" helmfile -e "${environment}" -f "${ROOT}/helmfile.d/" "${@:2}"
   fi
 }
 

@@ -61,7 +61,7 @@ The apps are installed using a combination of helm charts and manifests with the
 - [compliantkubernetes-kubespray][compliantkubernetes-kubespray] environment
 - [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.24.4)
 - [helm](https://github.com/helm/helm/releases) (tested with 3.8.0)
-- [helmfile](https://github.com/roboll/helmfile) (tested with v0.146.0)
+- [helmfile](https://github.com/helmfile/helmfile) (tested with v0.154.0)
 - [helm-diff](https://github.com/databus23/helm-diff) (tested with 3.5.0)
 - [helm-secrets](https://github.com/futuresimple/helm-secrets) (tested with 3.12.0)
 - [jq](https://github.com/stedolan/jq) (tested with jq-1.6)

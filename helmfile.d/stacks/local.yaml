@@ -1,0 +1,21 @@
+---
+templates:
+  tigera:
+    disableValidationOnInstall: true
+    inherit: [ template: tigera-operator-chart ]
+    condition: ck8sLocalCluster.enabled
+    namespace: tigera-operator
+    name: tigera
+    labels:
+      app: tigera
+
+  minio:
+    inherit: [ template: minio-chart ]
+    condition: ck8sLocalCluster.enabled
+    namespace: minio-system
+    name: minio
+    labels:
+      app: minio
+    values:
+      - values/minio.yaml.gotmpl
+    wait: true

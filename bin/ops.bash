@@ -69,7 +69,7 @@ ops_helmfile() {
     shift
 
     with_kubeconfig "${kubeconfig}" \
-        helmfile -f "${here}/../helmfile/" -e ${cluster} "${@}"
+        helmfile -f "${here}/../helmfile.d/" -e ${cluster} "${@}"
 }
 
 case "${1}" in

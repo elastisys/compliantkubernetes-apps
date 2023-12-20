@@ -16,7 +16,7 @@ teardown() {
 }
 
 @test "opa gatekeeper policies - opa test" {
-  run opa test -v "${ROOT}/helmfile/charts/gatekeeper/templates/policies/"
+  run opa test -v "${ROOT}/helmfile.d/charts/gatekeeper/templates/policies/"
 
   assert_success
 }
