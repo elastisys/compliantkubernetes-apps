@@ -17,3 +17,8 @@ policies:
       egress:
         - rule: egress-rule-dns
         - rule: egress-rule-trivy
+    node-collector:
+      podSelectorLabels:
+        app: node-collector
+      egress:
+        - rule: egress-rule-apiserver
