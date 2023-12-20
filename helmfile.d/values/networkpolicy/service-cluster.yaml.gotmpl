@@ -158,6 +158,3 @@ dex:
   connectors:
     ips: {{- toYaml .Values.networkPolicies.dex.connectors.ips | nindent 6 }}
     ports: {{- toYaml .Values.networkPolicies.dex.connectors.ports | nindent 6 }}
-
-falco:
-  enabled: {{ and .Values.falco.enabled .Values.networkPolicies.falco.enabled }}

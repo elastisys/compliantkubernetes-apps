@@ -44,9 +44,6 @@ ingressNginx:
     enabled : {{ .Values.networkPolicies.ingressNginx.ingressOverride.enabled }}
     ips: {{- toYaml .Values.networkPolicies.ingressNginx.ingressOverride.ips | nindent 4 }}
 
-falco:
-  enabled: {{ and .Values.falco.enabled .Values.networkPolicies.falco.enabled }}
-
 alertmanager:
   enabled: {{ and .Values.user.alertmanager.enabled .Values.networkPolicies.alertmanager.enabled }}
   alertReceivers:

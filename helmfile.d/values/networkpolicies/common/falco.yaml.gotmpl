@@ -1,0 +1,76 @@
+policies:
+  falco:
+    all-deny:
+      podSelectorLabels: {}
+      egress: {}
+      ingress: {}
+
+    falco:
+      podSelectorLabels:
+        app.kubernetes.io/name: falco
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
+        - name: egress-rule-falco-sidekick
+          peers:
+            - podSelectorLabels:
+                app.kubernetes.io/name: falcosidekick
+          ports:
+            - tcp: 2801
+        - name: egress-rule-falco-plugins
+          {{- if and (.Values | get "networkPolicies.falco.plugins.ips" list) (.Values | get "networkPolicies.falco.plugins.ports" list) }}
+          peers:
+            {{- range .Values | get "networkPolicies.falco.plugins.ips" list }}
+            - cidr: {{ . }}
+            {{- end }}
+          ports:
+            {{- range .Values | get "networkPolicies.falco.plugins.ports" list }}
+            - tcp: {{ . }}
+            {{- end }}
+          {{- end }}
+
+    falco-exporter:
+      podSelectorLabels:
+        app.kubernetes.io/name: falco-exporter
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 9376
+
+    falco-sidekick:
+      podSelectorLabels:
+        app.kubernetes.io/name: falcosidekick
+      egress:
+        - rule: egress-rule-dns
+        {{- if .Values | get "ck8sManagementCluster.enabled" false }}
+        - name: egress-rule-alertmanager
+          peers:
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: monitoring
+              podSelectorLabels:
+                app.kubernetes.io/instance: kube-prometheus-stack-alertmanager
+          ports:
+            - tcp: 9093
+        {{- end }}
+        {{- if .Values | get "ck8sWorkloadCluster.enabled" false }}
+        - name: egress-rule-alertmanager
+          peers:
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: alertmanager
+              podSelectorLabels:
+                app.kubernetes.io/name: alertmanager
+          ports:
+            - tcp: 9093
+        {{- end }}
+      ingress:
+        {{- if .Values | get "ck8sWorkloadCluster.enabled" false }}
+        - rule: ingress-rule-blackbox
+          ports:
+            - tcp: 2801
+        {{- end }}
+        - name: ingress-rule-falco
+          peers:
+            - podSelectorLabels:
+                app.kubernetes.io/name: falco
+          ports:
+            - tcp: 2801

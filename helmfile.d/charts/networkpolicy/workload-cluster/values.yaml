@@ -81,9 +81,6 @@ ingressNginx:
     ips:
       - set-me-if-enabled
 
-falco:
-  enabled: true
-
 alertmanager:
   enabled: true
   # alert receiver, e.g. slack or opsgenie

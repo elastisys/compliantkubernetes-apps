@@ -49,6 +49,7 @@ releases:
 
   - inherit: [ template: default-podsecuritypolicy ]
 
+  - inherit: [ template: falco-networkpolicy ]
   - inherit: [ template: falco-podsecuritypolicy ]
   - inherit: [ template: falco-main ]
   - inherit: [ template: falco-exporter ]

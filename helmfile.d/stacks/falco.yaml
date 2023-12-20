@@ -6,6 +6,17 @@ templates:
     labels:
       app: falco
 
+  falco-networkpolicy:
+    inherit:
+      - template: falco
+      - template: networkpolicies
+    installed: {{ and (.Values | get "falco.enabled" false) (.Values | get "networkPolicies.falco.enabled" false) }}
+    labels:
+      netpol: falco
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/common/falco.yaml.gotmpl
+
   falco-podsecuritypolicy:
     inherit:
       - template: falco
@@ -21,8 +32,8 @@ templates:
       - template: falco-chart
     name: falco
     needs:
+      - falco/networkpolicy
       - falco/podsecuritypolicy
-      - kube-system/common-np
       {{- if .Values | get "ck8sManagementCluster.enabled" false }}
       - kube-system/service-cluster-np
       {{- else if .Values | get "ck8sWorkloadCluster.enabled" false }}
@@ -44,6 +55,7 @@ templates:
     name: falco-exporter
     needs:
       - falco/falco
+      - falco/networkpolicy
       - falco/podsecuritypolicy
       - monitoring/kube-prometheus-stack # creates servicemonitors
     values:

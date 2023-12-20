@@ -85,14 +85,6 @@ kured:
 velero:
   enabled: true
 
-falco:
-  enabled: true
-  plugins:
-    ips:
-      - "0.0.0.0/0"
-    ports:
-      - 443
-
 fluentd:
   enabled: true
 
