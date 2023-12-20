@@ -98,7 +98,7 @@ Write about some new feature or change that is relevant for the user, e.g. for `
 
 Remove the items in this section from two+ older minor versions, meaning if you release apps `v0.28` you can keep previous items that were added to the list in `v0.27` but remove the stuff that are from `v0.26`.
 
-- Edit the [Grafana dashboard](../helmfile/charts/grafana-ops/files/welcome.md)
+- Edit the [Grafana dashboard](../helmfile/charts/grafana-dashboards/files/welcome.md)
 - Edit the [Opensearch dashboard](../helmfile/charts/opensearch/configurer/files/dashboards-resources/welcome.md)
 
 ## Code freeze
@@ -131,6 +131,7 @@ release/generate-release-notes.sh X.Y.Z
 
 The public release notes are aimed towards application developers.
 Remove irrelevant entries and/or reword entries so that they are easy to understand for the application developers.
+In the [compliantkubernetes repo](https://github.com/elastisys/compliantkubernetes), create two new branches `release-vX.Y` and `<personal-tag>/release-vX.Y`. Add the release notes to `<personal-tag>/release-vX.Y` and then create two PRs, one to `release-vX.Y` and one to `main`.
 
 ## Update the main branch
 
