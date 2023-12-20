@@ -1,0 +1,54 @@
+policies:
+  cert-manager:
+    all-deny:
+      podSelectorLabels: {}
+      egress: {}
+      ingress: {}
+
+    cainjector:
+      podSelectorLabels:
+        app.kubernetes.io/component: cainjector
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
+
+    controller:
+      podSelectorLabels:
+        app: cert-manager
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
+        - rule: egress-rule-ingress
+          ports:
+            - tcp: 443
+            - tcp: 80
+        {{- with .Values | get "networkPolicies.certManager.letsencrypt.ips" list }}
+        - name: egress-rule-letsencrypt
+          peers:
+            {{- range . }}
+            - cidr: {{ . }}
+            {{- end }}
+          ports:
+            - tcp: 443
+        {{- end }}
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 9402
+
+    webhook:
+      podSelectorLabels:
+        app.kubernetes.io/component: webhook
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
+      ingress:
+        - rule: ingress-rule-apiserver
+          ports:
+            - tcp: 10250
+
+    startupapicheck:
+      podSelectorLabels:
+        app.kubernetes.io/component: startupapicheck
+      egress:
+        - rule: egress-rule-apiserver

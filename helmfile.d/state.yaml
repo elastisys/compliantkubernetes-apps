@@ -42,6 +42,7 @@ releases:
   - inherit: [ template: networkpolicies-service ]
   - inherit: [ template: networkpolicies-workload ]
 
+  - inherit: [ template: cert-manager-networkpolicy ]
   - inherit: [ template: cert-manager-controller ]
   - inherit: [ template: cert-manager-issuers ]
 

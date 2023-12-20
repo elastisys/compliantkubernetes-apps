@@ -5,13 +5,26 @@ templates:
     labels:
       app: cert-manager
 
+  cert-manager-networkpolicy:
+    inherit:
+      - template: cert-manager
+      - template: networkpolicies
+    installed: {{ .Values | get "networkPolicies.certManager.enabled" false }}
+    labels:
+      netpol: cert-manager
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/common/cert-manager.yaml.gotmpl
+
   cert-manager-controller:
     inherit:
       - template: cert-manager
       - template: cert-manager-chart
     name: cert-manager
     needs:
-      - kube-system/common-np
+      - cert-manager/networkpolicy
     values:
       - values/cert-manager.yaml.gotmpl
 
