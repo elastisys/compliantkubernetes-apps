@@ -4,11 +4,13 @@
 
 Here you can find the most relevant features and changes for the last couple of releases of Compliant Kubernetes
 
+- Harbor was upgraded to v2.9.1. As part of this upgrade, Notary V1 is removed. **[v0.35]**
+- Chroot for ingress-nginx is enabled by default. **[v0.35]**
+- Application developers can now self manage CRDs for Kafka **[v0.35]**
 - Dashboard for visualizing how spread-out pods are across nodes. **[v0.34]**
 - Application developers can now self manage CRDs for MongoDB, SealedSecrets and Flux **[v0.34]**
 - Upgrade Ingress-NGINX controller to 1.8.4 and chart to 4.7.3 **[v0.34]**
 - Upgrade HNC and expose opt-in propagation. **[v0.34]**
-- Removed the deprecated grafana dashboard Image vulnerabilities. **[v0.33]**
 
 ## Public docs
 
