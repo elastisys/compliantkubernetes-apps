@@ -69,14 +69,14 @@ spec:
         severity: critical
       annotations:
         description: Harbor JobService Is Down
-    - alert: 'Storage Usage Is Above the Limit'
+    - alert: 'Harbor storage Usage Is Above the Limit'
       expr: |
         sum(harbor_project_quota_usage_byte) / (1024^3) > {{ .Values.harbor.alerts.maxTotalStorageUsedGB }}
       for: 5m
       labels:
         severity: medium
       annotations:
-        description: Total used storage is above the limit of {{ .Values.harbor.alerts.maxTotalStorageUsedGB }}GB
+        description: Total used storage for Harbor is above the limit of {{ .Values.harbor.alerts.maxTotalStorageUsedGB }}GB
     - alert: 'Harbor p99 latency is higher than 10 seconds'
       expr: |
         histogram_quantile(0.99,  sum  (rate(registry_http_request_duration_seconds_bucket[30m]) )) > 10
