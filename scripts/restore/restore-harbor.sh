@@ -68,6 +68,13 @@ cleanup_local_files(){
   rm harbor.tgz
   rm ${backup_dir}/registry.back
   rm ${backup_dir}/postgres.back
+  # TODO: once v0.34 reaches EOL, these checks can be removed
+  if [[ -f "${backup_dir}/notarysigner.back" ]]; then
+    rm "${backup_dir}/notarysigner.back"
+  fi
+  if [[ -f "${backup_dir}/notaryserver.back" ]]; then
+    rm "${backup_dir}/notaryserver.back"
+  fi
   rmdir ${backup_dir}
 }
 
