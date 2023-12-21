@@ -5,6 +5,19 @@ templates:
     labels:
       app: velero
 
+  velero-networkpolicy:
+    inherit:
+      - template: velero
+      - template: networkpolicies
+    installed: {{ and (.Values | get "velero.enabled" false) (.Values | get "networkPolicies.velero.enabled" false) }}
+    labels:
+      netpol: velero
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/common/velero.yaml.gotmpl
+
   velero-podsecuritypolicy:
     inherit:
       - template: velero
@@ -23,8 +36,8 @@ templates:
     installed: {{ .Values | get "velero.enabled" false }}
     name: velero
     needs:
-      - kube-system/common-np
       - monitoring/kube-prometheus-stack # creates servicemonitors
+      - velero/networkpolicy
       - velero/podsecuritypolicy
     values:
       {{ if .Values | get "ck8sManagementCluster.enabled" false }}

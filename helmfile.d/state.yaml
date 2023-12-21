@@ -123,6 +123,7 @@ releases:
   - inherit: [ template: kured-secret ]
   - inherit: [ template: kured-main ]
 
+  - inherit: [ template: velero-networkpolicy ]
   - inherit: [ template: velero-podsecuritypolicy ]
   - inherit: [ template: velero-main ]
 

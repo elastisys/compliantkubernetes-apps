@@ -1,0 +1,31 @@
+policies:
+  velero:
+    all-deny:
+      podSelectorLabels: {}
+      egress: {}
+      ingress: {}
+
+    velero:
+      podSelectorLabels:
+        app.kubernetes.io/name: velero
+        name: velero
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
+        - rule: egress-rule-object-storage
+
+    velero-node-agent:
+      podSelectorLabels:
+        app.kubernetes.io/name: velero
+        name: node-agent
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
+        - rule: egress-rule-object-storage
+
+    velero-upgrade-crds:
+      podSelectorLabels:
+        job-name: velero-upgrade-crds
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
