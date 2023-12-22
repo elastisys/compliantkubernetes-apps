@@ -9,7 +9,7 @@ operator:
   replicas: 1
 
   # configAuditScannerEnabled the flag to enable configuration audit scanner
-  configAuditScannerEnabled: true
+  configAuditScannerEnabled: false
   # vulnerabilityScannerEnabled the flag to enable vulnerability scanner
   vulnerabilityScannerEnabled: true
   # vulnerabilityScannerReportTTL the flag to set how long a vulnerability report should exist. "" means that the vulnerabilityScannerReportTTL feature is disabled
@@ -23,6 +23,13 @@ operator:
   scanJobsRetryDelay: {{ .Values.trivy.scanJobs.retryDelay }}
   # scanJobTimeout the length of time to wait before giving up on a scan job
   scanJobTimeout: {{ .Values.trivy.scanJobs.timeout }}
+
+  sbomGenerationEnabled: false
+  rbacAssessmentScannerEnabled: false
+  infraAssessmentScannerEnabled: false
+  clusterComplianceEnabled: false
+  exposedSecretScannerEnabled: false
+
 
 tolerations: {{- toYaml .Values.trivy.tolerations | nindent 2 }}
 
