@@ -1,0 +1,228 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bundleresolver-config
+  labels:
+    app.kubernetes.io/component: resolvers
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+  {{- include "tektonPipelines.labels" . | nindent 4 }}
+data:
+  # the default service account name to use for bundle requests.
+  default-service-account: "default"
+  # The default layer kind in the bundle image.
+  default-kind: "task"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-resolver-config
+  labels:
+    app.kubernetes.io/component: resolvers
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+  {{- include "tektonPipelines.labels" . | nindent 4 }}
+data:
+  # The default kind to fetch.
+  default-kind: "task"
+  # The default namespace to look for resources in.
+  default-namespace: ""
+  # An optional comma-separated list of namespaces which the resolver is allowed to access. Defaults to empty, meaning all namespaces are allowed.
+  allowed-namespaces: ""
+  # An optional comma-separated list of namespaces which the resolver is blocked from accessing. Defaults to empty, meaning all namespaces are allowed.
+  blocked-namespaces: ""
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: resolvers-feature-flags
+  labels:
+    app.kubernetes.io/component: resolvers
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+data:
+  # Setting this flag to "true" enables remote resolution of Tekton OCI bundles.
+  enable-bundles-resolver: "true"
+  # Setting this flag to "true" enables remote resolution of tasks and pipelines via the Tekton Hub.
+  enable-hub-resolver: "true"
+  # Setting this flag to "true" enables remote resolution of tasks and pipelines from Git repositories.
+  enable-git-resolver: "true"
+  # Setting this flag to "true" enables remote resolution of tasks and pipelines from other namespaces within the cluster.
+  enable-cluster-resolver: "true"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: resolvers-config-leader-election
+  labels:
+    app.kubernetes.io/component: resolvers
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+data:
+  _example: |
+    ################################
+    #                              #
+    #    EXAMPLE CONFIGURATION     #
+    #                              #
+    ################################
+    # This block is not actually functional configuration,
+    # but serves to illustrate the available configuration
+    # options and document them in a way that is accessible
+    # to users that `kubectl edit` this config map.
+    #
+    # These sample configuration options may be copied out of
+    # this example block and unindented to be in the data block
+    # to actually change the configuration.
+    # lease-duration is how long non-leaders will wait to try to acquire the
+    # lock; 15 seconds is the value used by core kubernetes controllers.
+    lease-duration: "60s"
+    # renew-deadline is how long a leader will try to renew the lease before
+    # giving up; 10 seconds is the value used by core kubernetes controllers.
+    renew-deadline: "40s"
+    # retry-period is how long the leader election client waits between tries of
+    # actions; 2 seconds is the value used by core kubernetes controllers.
+    retry-period: "10s"
+    # buckets is the number of buckets used to partition key space of each
+    # Reconciler. If this number is M and the replica number of the controller
+    # is N, the N replicas will compete for the M buckets. The owner of a
+    # bucket will take care of the reconciling for the keys partitioned into
+    # that bucket.
+    buckets: "1"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: resolvers-config-logging
+  labels:
+    app.kubernetes.io/component: resolvers
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+data:
+  zap-logger-config: |
+    {
+      "level": "info",
+      "development": false,
+      "sampling": {
+        "initial": 100,
+        "thereafter": 100
+      },
+      "outputPaths": ["stdout"],
+      "errorOutputPaths": ["stderr"],
+      "encoding": "json",
+      "encoderConfig": {
+        "timeKey": "timestamp",
+        "levelKey": "severity",
+        "nameKey": "logger",
+        "callerKey": "caller",
+        "messageKey": "message",
+        "stacktraceKey": "stacktrace",
+        "lineEnding": "",
+        "levelEncoder": "",
+        "timeEncoder": "iso8601",
+        "durationEncoder": "",
+        "callerEncoder": ""
+      }
+    }
+  # Log level overrides
+  loglevel.controller: "info"
+  loglevel.webhook: "info"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: resolvers-config-observability
+  labels:
+    app.kubernetes.io/component: resolvers
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+data:
+  _example: |
+    ################################
+    #                              #
+    #    EXAMPLE CONFIGURATION     #
+    #                              #
+    ################################
+
+    # This block is not actually functional configuration,
+    # but serves to illustrate the available configuration
+    # options and document them in a way that is accessible
+    # to users that `kubectl edit` this config map.
+    #
+    # These sample configuration options may be copied out of
+    # this example block and unindented to be in the data block
+    # to actually change the configuration.
+
+    # metrics.backend-destination field specifies the system metrics destination.
+    # It supports either prometheus (the default) or stackdriver.
+    # Note: Using stackdriver will incur additional charges
+    metrics.backend-destination: prometheus
+
+    # metrics.request-metrics-backend-destination specifies the request metrics
+    # destination. If non-empty, it enables queue proxy to send request metrics.
+    # Currently supported values: prometheus, stackdriver.
+    metrics.request-metrics-backend-destination: prometheus
+
+    # metrics.stackdriver-project-id field specifies the stackdriver project ID. This
+    # field is optional. When running on GCE, application default credentials will be
+    # used if this field is not provided.
+    metrics.stackdriver-project-id: "<your stackdriver project id>"
+
+    # metrics.allow-stackdriver-custom-metrics indicates whether it is allowed to send metrics to
+    # Stackdriver using "global" resource type and custom metric type if the
+    # metrics are not supported by "knative_revision" resource type. Setting this
+    # flag to "true" could cause extra Stackdriver charge.
+    # If metrics.backend-destination is not Stackdriver, this is ignored.
+    metrics.allow-stackdriver-custom-metrics: "false"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: git-resolver-config
+  labels:
+    app.kubernetes.io/component: resolvers
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+data:
+  # The maximum amount of time a single anonymous cloning resolution may take.
+  fetch-timeout: "1m"
+  # The git url to fetch the remote resource from when using anonymous cloning.
+  default-url: "https://github.com/tektoncd/catalog.git"
+  # The git revision to fetch the remote resource from with either anonymous cloning or the authenticated API.
+  default-revision: "main"
+  # The SCM type to use with the authenticated API. Can be github, gitlab, gitea, bitbucketserver, bitbucketcloud
+  scm-type: "github"
+  # The SCM server URL to use with the authenticated API. Not needed when using github.com, gitlab.com, or BitBucket Cloud
+  server-url: ""
+  # The Kubernetes secret containing the API token for the SCM provider. Required when using the authenticated API.
+  api-token-secret-name: ""
+  # The key in the API token secret containing the actual token. Required when using the authenticated API.
+  api-token-secret-key: ""
+  # The namespace containing the API token secret. Defaults to "default".
+  api-token-secret-namespace: "default"
+  # The default organization to look for repositories under when using the authenticated API,
+  # if not specified in the resolver parameters. Optional.
+  default-org: ""
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hubresolver-config
+  labels:
+    app.kubernetes.io/component: resolvers
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+data:
+  # the default Tekton Hub catalog from where to pull the resource.
+  default-tekton-hub-catalog: "Tekton"
+  # the default Artifact Hub Task catalog from where to pull the resource.
+  default-artifact-hub-task-catalog: "tekton-catalog-tasks"
+  # the default Artifact Hub Pipeline catalog from where to pull the resource.
+  default-artifact-hub-pipeline-catalog: "tekton-catalog-pipelines"
+  # the default layer kind in the hub image.
+  default-kind: "task"
+  # the default hub source to pull the resource from.
+  default-type: "artifact"

@@ -1,0 +1,10 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chains-info
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- include "tektonChains.baseLabels" . | nindent 4 }}
+data:
+  version: {{ .Chart.Version | quote }}

@@ -1,0 +1,36 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "tektonPipelines.fullname" . }}-resolvers-namespace-rbac
+  labels:
+    app.kubernetes.io/component: resolvers
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+  {{- include "tektonPipelines.labels" . | nindent 4 }}
+rules:
+  # Needed to watch and load configuration and secret data.
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list", "update", "watch"]
+  # This is needed by leader election to run the controller in HA.
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "tektonPipelines.fullname" . }}-resolvers-namespace-rbac
+  labels:
+    app.kubernetes.io/component: resolvers
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+  {{- include "tektonPipelines.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: '{{ include "tektonPipelines.fullname" . }}-resolvers-namespace-rbac'
+subjects:
+- kind: ServiceAccount
+  name: '{{ include "tektonPipelines.fullname" . }}-resolvers'
+  namespace: '{{ .Release.Namespace }}'

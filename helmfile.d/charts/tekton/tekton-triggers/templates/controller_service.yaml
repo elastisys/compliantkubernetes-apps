@@ -1,0 +1,27 @@
+{{- if .Values.controller.metrics.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "triggers.fullname" . }}-controller
+  labels:
+    {{- include "triggers.baseLabels" . | nindent 4 }}
+    {{- include "triggers.helmLabels" . | nindent 4 }}
+    {{- include "triggers.versionLabels" . | nindent 4 }}
+    {{- include "triggers.componentLabels" "controller" | nindent 4 }}
+    {{- include "triggers.nameLabels" "controller" | nindent 4 }}
+  {{- with .Values.controller.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.controller.service.type }}
+  ports:
+    - name: {{ .Values.controller.metrics.portName }}
+      port: {{ .Values.controller.metrics.port }}
+      protocol: TCP
+      targetPort: 9090
+  selector:
+    {{- include "triggers.baseLabels" . | nindent 4 }}
+    {{- include "triggers.componentLabels" "controller" | nindent 4 }}
+    {{- include "triggers.nameLabels" "controller" | nindent 4 }}
+{{- end }}

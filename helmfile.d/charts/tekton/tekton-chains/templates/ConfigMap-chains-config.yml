@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chains-config #config is namespaced and the name is hard coded in chains https://github.com/tektoncd/chains/blob/4ebc18d05e8c6827e81569d294f716e9a5c7986f/pkg/config/config.go#L129
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- include "tektonChains.baseLabels" . | nindent 4 }}
+data:
+  {{- range $key, $val := .Values.tenantConfig }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}

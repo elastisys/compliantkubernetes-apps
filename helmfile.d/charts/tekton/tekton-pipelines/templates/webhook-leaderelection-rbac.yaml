@@ -1,0 +1,17 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "tektonPipelines.fullname" . }}-webhook-leaderelection
+  labels:
+    app.kubernetes.io/component: webhook
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+  {{- include "tektonPipelines.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: '{{ include "tektonPipelines.fullname" . }}-leader-election'
+subjects:
+- kind: ServiceAccount
+  name: '{{ include "tektonPipelines.fullname" . }}-webhook'
+  namespace: '{{ .Release.Namespace }}'

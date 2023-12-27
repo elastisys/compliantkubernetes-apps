@@ -1,0 +1,23 @@
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  # This is the access that the controller needs on a per-namespace basis.
+  name: {{ template "tektonChains.fullname". }}-tenant-access
+  labels:
+    {{- include "tektonChains.baseLabels" . | nindent 4 }}
+    {{- include "tektonChains.componentLabels" "controller" | nindent 4 }}
+    {{- include "tektonChains.helmLabels" . | nindent 4 }}
+rules:
+  # Read-write access to create Pods, K8s Events and PVCs (for Workspaces)
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "events", "persistentvolumeclaims"]
+    verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]
+  # Read-only access to these.
+  - apiGroups: [""]
+    resources: ["configmaps", "limitranges", "secrets", "serviceaccounts"]
+    verbs: ["get", "list", "watch"]
+  # Read-write access to StatefulSets for Affinity Assistant.
+  - apiGroups: ["apps"]
+    resources: ["statefulsets"]
+    verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]

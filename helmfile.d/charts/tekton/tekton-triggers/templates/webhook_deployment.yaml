@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "triggers.fullname" . }}-webhook
+  labels:
+    {{- include "triggers.baseLabels" . | nindent 4 }}
+    {{- include "triggers.helmLabels" . | nindent 4 }}
+    {{- include "triggers.versionLabels" . | nindent 4 }}
+    {{- include "triggers.componentLabels" "webhook" | nindent 4 }}
+    {{- include "triggers.nameLabels" "webhook" | nindent 4 }}
+spec:
+  replicas: {{ .Values.webhook.replicas }}
+  {{- with .Values.webhook.updateStrategy }}
+  strategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "triggers.baseLabels" . | nindent 6 }}
+      {{- include "triggers.componentLabels" "webhook" | nindent 6 }}
+      {{- include "triggers.nameLabels" "webhook" | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.webhook.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "triggers.baseLabels" . | nindent 8 }}
+        {{- include "triggers.helmLabels" . | nindent 8 }}
+        {{- include "triggers.versionLabels" . | nindent 8 }}
+        {{- include "triggers.componentLabels" "webhook" | nindent 8 }}
+        {{- include "triggers.nameLabels" "webhook" | nindent 8 }}
+        app: {{ template "triggers.fullname" . }}-webhook
+    spec:
+      serviceAccountName: {{ template "triggers.fullname" . }}-webhook
+      {{- with .Values.webhook.securityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.webhook.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.webhook.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.webhook.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: webhook
+          image: {{ printf "%s:%s" .Values.webhook.image.repository .Values.webhook.image.tag | quote }}
+          imagePullPolicy: {{ .Values.webhook.image.pullPolicy | quote }}
+          env:
+            - name: SYSTEM_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: CONFIG_LOGGING_NAME
+              value: config-logging-triggers
+            - name: WEBHOOK_SERVICE_NAME
+              value: {{ template "triggers.fullname" . }}-webhook
+            - name: WEBHOOK_SECRET_NAME
+              value: triggers-webhook-certs
+            - name: METRICS_DOMAIN
+              value: tekton.dev/triggers
+          securityContext:
+            allowPrivilegeEscalation: false
+            # User 65532 is the distroless nonroot user ID
+            runAsUser: 65532
+            runAsGroup: 65532
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - "ALL"
+            seccompProfile:
+              type: RuntimeDefault
+          {{- with .Values.webhook.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: metrics
+              containerPort: 9090
+            - name: profiling
+              containerPort: 8008
+            - name: https-webhook
+              containerPort: 8443

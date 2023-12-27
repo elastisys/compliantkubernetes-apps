@@ -1,0 +1,58 @@
+
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: ClusterInterceptor
+metadata:
+  name: cel
+  labels:
+    server/type: https
+spec:
+  clientConfig:
+    service:
+      name: {{ template "triggers.fullname" . }}-core-interceptors
+      namespace: {{ .Release.Namespace }}
+      path: "cel"
+      port: 8443
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: ClusterInterceptor
+metadata:
+  name: bitbucket
+  labels:
+    server/type: https
+spec:
+  clientConfig:
+    service:
+      name: {{ template "triggers.fullname" . }}-core-interceptors
+      namespace: {{ .Release.Namespace }}
+      path: "bitbucket"
+      port: 8443
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: ClusterInterceptor
+metadata:
+  name: github
+  labels:
+    server/type: https
+spec:
+  clientConfig:
+    service:
+      name: {{ template "triggers.fullname" . }}-core-interceptors
+      namespace: {{ .Release.Namespace }}
+      path: "github"
+      port: 8443
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: ClusterInterceptor
+metadata:
+  name: gitlab
+  labels:
+    server/type: https
+spec:
+  clientConfig:
+    service:
+      name: {{ template "triggers.fullname" . }}-core-interceptors
+      namespace: {{ .Release.Namespace }}
+      path: "gitlab"
+      port: 8443
+
+---

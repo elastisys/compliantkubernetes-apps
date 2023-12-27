@@ -1,0 +1,41 @@
+
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ template "triggers.fullname" . }}-admin-webhook
+  labels:
+    {{- include "triggers.baseLabels" . | nindent 4 }}
+    {{- include "triggers.helmLabels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ template "triggers.fullname" . }}-core-interceptors
+  labels:
+    {{- include "triggers.baseLabels" . | nindent 4 }}
+    {{- include "triggers.helmLabels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ template "triggers.fullname" . }}-info
+  labels:
+    {{- include "triggers.baseLabels" . | nindent 4 }}
+    {{- include "triggers.helmLabels" . | nindent 4 }}
+rules:
+  # All system:authenticated users needs to have access
+  # of the triggers-info ConfigMap even if they don't
+  # have access to the other resources present in the
+  # installed namespace.
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: ["triggers-info"]
+    verbs: ["get"]

@@ -1,0 +1,17 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+{{ include "tektonDashboard.labels" . | indent 4 }}
+  name: {{ template "tektonDashboard.fullname". }}-info
+  namespace: {{ .Release.Namespace }}
+rules:
+  - apiGroups:
+      - ""
+    resourceNames:
+      - {{ template "tektonDashboard.fullname". }}-info
+    resources:
+      - configmaps
+    verbs:
+      - get

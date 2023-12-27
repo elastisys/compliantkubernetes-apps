@@ -1,0 +1,19 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ template "tektonChains.fullname". }}-info
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "tektonChains.baseLabels" . | nindent 4 }}
+    {{- include "tektonChains.helmLabels" . | nindent 4 }}
+subjects:
+  # Giving all system:authenticated users the access to the
+  # ConfigMap which contains version information
+  - kind: Group
+    name: system:authenticated
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: {{ template "tektonChains.fullname". }}-info
+  apiGroup: rbac.authorization.k8s.io

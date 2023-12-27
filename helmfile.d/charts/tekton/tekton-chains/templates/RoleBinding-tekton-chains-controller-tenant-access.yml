@@ -1,0 +1,21 @@
+---
+# If this ClusterRoleBinding is replaced with a RoleBinding
+# then the ClusterRole would be namespaced. The access described by
+# the tekton-pipelines-controller-tenant-access ClusterRole would
+# be scoped to individual tenant namespaces.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ template "tektonChains.fullname". }}-tenant-access
+  labels:
+    {{- include "tektonChains.componentLabels" "controller" | nindent 4 }}
+    {{- include "tektonChains.baseLabels" . | nindent 4 }}
+    {{- include "tektonChains.helmLabels" . | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ template "tektonChains.fullname". }}-controller
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: Role
+  name: {{ template "tektonChains.fullname". }}-tenant-access
+  apiGroup: rbac.authorization.k8s.io

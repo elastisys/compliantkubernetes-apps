@@ -1240,3 +1240,35 @@ networkPolicies:
         - "set-me"
       ports:
         - 443
+
+# Tekton Configuration
+tekton:
+  bootstraped: false
+  components:
+    pipelines:
+      enabled: false
+    dashboard:
+      enabled: false
+    triggers:
+      enabled: false
+    chains:
+      enabled: false
+  serviceAccount:
+    name: tekton-service
+    clusterAdmin: false
+  imagePullSecrets:
+    - name: pull-secret
+  listener:
+    enabled: false
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        acme.cert-manager.io/http01-edit-in-place: "true"
+      host: listenerhost
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+      limits:
+        memory: "128Mi"
+        cpu: "500m"

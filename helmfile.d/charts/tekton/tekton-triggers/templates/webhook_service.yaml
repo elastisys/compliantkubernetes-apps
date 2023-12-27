@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "triggers.fullname" . }}-webhook
+  labels:
+    {{- include "triggers.baseLabels" . | nindent 4 }}
+    {{- include "triggers.helmLabels" . | nindent 4 }}
+    {{- include "triggers.versionLabels" . | nindent 4 }}
+    {{- include "triggers.componentLabels" "webhook" | nindent 4 }}
+    {{- include "triggers.nameLabels" "webhook" | nindent 4 }}
+    app: {{ template "triggers.fullname" . }}-webhook
+  {{- with .Values.webhook.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.webhook.service.type }}
+  ports:
+    - name: https-webhook
+      port: 443
+      protocol: TCP
+      targetPort: 8443
+  selector:
+    {{- include "triggers.baseLabels" . | nindent 4 }}
+    {{- include "triggers.componentLabels" "webhook" | nindent 4 }}
+    {{- include "triggers.nameLabels" "webhook" | nindent 4 }}
