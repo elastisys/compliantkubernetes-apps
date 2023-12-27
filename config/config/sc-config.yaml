@@ -1269,11 +1269,11 @@ tekton:
 
   pipeline:
     devbox:
-      repository: set-me
-      tag: set-me
+      repository: devbox-image-repo
+      tag: devbox-image-tag
 
     configChangeDays: 5
-    configRepoUrl: set-me
+    configRepoUrl: config-repo
 
     appsVersion: ""
     kubesprayVersion: ""

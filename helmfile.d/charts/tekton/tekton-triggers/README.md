@@ -1,14 +1,12 @@
-
-
 # Tekton Triggers Helm Chart
 
 [Triggers](https://github.com/tektoncd/triggers) is a Kubernetes Custom Resource Definition (CRD) controller that allows you to extract information from events payloads (a "trigger") to create Kubernetes resources.
+
 ## Version
 
 Current chart version is `0.1.0`
 
 ## Chart Values
-
 
 | Key | Type | Description | Default |
 |-----|------|-------------|---------|
@@ -57,7 +55,6 @@ Current chart version is `0.1.0`
 | `webhook.service.type` | string | Webhook service type | `"ClusterIP"` |
 | `webhook.tolerations` | list | Webhook tolerations | `[]` |
 | `webhook.updateStrategy` | object | Webhook pods update strategy | `{}` |
-
 
 You can look directly at the [values.yaml](./values.yaml) file to look at the options and their default values.
 
