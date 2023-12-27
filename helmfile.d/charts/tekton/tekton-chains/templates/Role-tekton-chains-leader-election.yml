@@ -1,0 +1,14 @@
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ template "tektonChains.fullname". }}-leader-election
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "tektonChains.baseLabels" . | nindent 4 }}
+    {{- include "tektonChains.helmLabels" . | nindent 4 }}
+rules:
+  # We uses leases for leaderelection
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]

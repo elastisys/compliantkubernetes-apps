@@ -1,0 +1,5 @@
+serviceAccount:
+  name: {{ .Values.tekton.service.serviceAccount.name }}
+  clusterAdmin: {{ .Values.tekton.service.serviceAccount.clusterAdmin }}
+  imagePullSecrets:
+  {{- toYaml .Values.tekton.service.imagePullSecrets | nindent 4 }}

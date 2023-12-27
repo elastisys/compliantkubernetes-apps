@@ -1,0 +1,17 @@
+icon: https://github.com/cdfoundation/artwork/blob/main/tekton/additional-artwork/tekton_dashboard/color/TektonDashboard_color.svg
+
+dashboardDeployment:
+  replicas: 1
+  container:
+    image:
+      repository: gcr.io/tekton-releases/github.com/tektoncd/dashboard/cmd/dashboard
+      digest: "sha256:02dd3b2f4aa17038991de5032b6da790080a7e663510da673464bba9c74ef900"
+      tag: "v0.33.0"
+    port: 9097
+  resources:
+    limits:
+      cpu: 200m
+      memory: 200Mi
+    requests:
+      cpu: 50m
+      memory: 50Mi

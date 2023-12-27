@@ -1,0 +1,64 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: validation.webhook.triggers.tekton.dev
+  labels:
+  labels:
+    {{- include "triggers.baseLabels" . | nindent 4 }}
+    {{- include "triggers.helmLabels" . | nindent 4 }}
+    {{- include "triggers.componentLabels" "webhook" | nindent 4 }}
+    {{- include "triggers.versionLabels" . | nindent 4 }}
+webhooks:
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: {{ template "triggers.fullname" . }}-webhook
+        namespace: {{ .Release.Namespace }}
+    failurePolicy: Fail
+    sideEffects: None
+    name: validation.webhook.triggers.tekton.dev
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: webhook.triggers.tekton.dev
+  labels:
+    {{- include "triggers.baseLabels" . | nindent 4 }}
+    {{- include "triggers.helmLabels" . | nindent 4 }}
+    {{- include "triggers.componentLabels" "webhook" | nindent 4 }}
+    {{- include "triggers.versionLabels" . | nindent 4 }}
+webhooks:
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: {{ template "triggers.fullname" . }}-webhook
+        namespace: {{ .Release.Namespace }}
+    failurePolicy: Fail
+    sideEffects: None
+    name: webhook.triggers.tekton.dev
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: config.webhook.triggers.tekton.dev
+  labels:
+    {{- include "triggers.baseLabels" . | nindent 4 }}
+    {{- include "triggers.helmLabels" . | nindent 4 }}
+    {{- include "triggers.componentLabels" "webhook" | nindent 4 }}
+    {{- include "triggers.versionLabels" . | nindent 4 }}
+webhooks:
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: {{ template "triggers.fullname" . }}-webhook
+        namespace: {{ .Release.Namespace }}
+    failurePolicy: Fail
+    sideEffects: None
+    name: config.webhook.triggers.tekton.dev
+    namespaceSelector:
+      matchExpressions:
+        - key: triggers.tekton.dev/release
+          operator: Exists

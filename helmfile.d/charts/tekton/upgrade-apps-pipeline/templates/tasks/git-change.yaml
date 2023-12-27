@@ -1,0 +1,33 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: git-change
+spec:
+  results:
+    - name: change-condition
+      description: The condition if the default/common-config.yaml file has changed
+  workspaces:
+  - name: source
+  steps:
+    - name: main
+      image: {{ .Values.tekton.pipeline.devbox.repository }}:{{ .Values.tekton.pipeline.devbox.tag }}
+      env:
+        - name: "CK8S_CONFIG_PATH"
+          value: $(workspaces.source.path)/config
+      script: |
+        #!/usr/bin/env bash
+
+        cd "${CK8S_CONFIG_PATH}"
+
+        if [[ -n "$(git log --since="{{ .Values.tekton.pipeline.configChangeDays }} days ago" -- defaults/common-config.yaml)" ]]; then
+          echo "git change condition pass"
+          echo -n "execute" | tee "$(results.change-condition.path)"
+        else
+          echo "git change condition fail"
+          echo -n "skip" | tee "$(results.change-condition.path)"
+        fi
+      securityContext:
+        runAsNonRoot: true
+        runAsGroup: 65532
+        runAsUser: 65532

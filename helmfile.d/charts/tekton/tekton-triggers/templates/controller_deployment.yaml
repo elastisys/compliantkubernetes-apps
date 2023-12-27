@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "triggers.fullname" . }}-controller
+  labels:
+    {{- include "triggers.baseLabels" . | nindent 4 }}
+    {{- include "triggers.helmLabels" . | nindent 4 }}
+    {{- include "triggers.versionLabels" . | nindent 4 }}
+    {{- include "triggers.componentLabels" "controller" | nindent 4 }}
+    {{- include "triggers.nameLabels" "controller" | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "triggers.baseLabels" . | nindent 6 }}
+      {{- include "triggers.componentLabels" "controller" | nindent 6 }}
+      {{- include "triggers.nameLabels" "controller" | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.controller.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "triggers.baseLabels" . | nindent 8 }}
+        {{- include "triggers.helmLabels" . | nindent 8 }}
+        {{- include "triggers.versionLabels" . | nindent 8 }}
+        {{- include "triggers.componentLabels" "controller" | nindent 8 }}
+        {{- include "triggers.nameLabels" "controller" | nindent 8 }}
+        app: {{ template "triggers.fullname" . }}-controller
+    spec:
+      serviceAccountName: {{ template "triggers.fullname" . }}-controller
+      {{- with .Values.controller.securityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.controller.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.controller.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.controller.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ template "triggers.fullname" . }}-controller
+          image: {{ printf "%s:%s" .Values.controller.image.repository .Values.controller.image.tag | quote }}
+          imagePullPolicy: {{ .Values.controller.image.pullPolicy | quote }}
+          args:
+          {{- range .Values.controller.args }}
+            - {{ . | quote }}
+          {{- end }}
+          env:
+            - name: SYSTEM_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: CONFIG_LOGGING_NAME
+              value: config-logging-triggers
+            - name: CONFIG_OBSERVABILITY_NAME
+              value: config-observability-triggers
+            - name: CONFIG_DEFAULTS_NAME
+              value: config-defaults-triggers
+            - name: METRICS_DOMAIN
+              value: tekton.dev/triggers
+            - name: METRICS_PROMETHEUS_PORT
+              value: "9000"
+          {{- with .Values.controller.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.controller.metrics.enabled }}
+          ports:
+            - containerPort: 9090
+              protocol: TCP
+          {{- end }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - "ALL"
+            # User 65532 is the distroless nonroot user ID
+            runAsUser: 65532
+            runAsGroup: 65532
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault

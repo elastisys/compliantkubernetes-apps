@@ -1,0 +1,57 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: expire-alert-silence
+spec:
+  results:
+    - name: silence-id
+      description: The ID of the silence created in alertmanager
+  workspaces:
+  - name: source
+  params:
+    - name: devbox-image-tag
+      description: The devbox image tag to use based on the README.md of the config repository
+      type: string
+      default: {{ .Values.tekton.pipeline.devbox.tag | quote }}
+    - name: silence-id
+      description: The ID of the alertmanager silence that was created earlier
+      type: string
+    - name: lingering-duration
+      description: Duration of how long the alertmanager silence will linger after apps upgrade is done, in minutes
+      type: string
+  steps:
+    - name: expire-alert-silence
+      image: {{ .Values.tekton.pipeline.devbox.repository }}:$(inputs.params.devbox-image-tag)
+      {{- with .Values.tekton.pipeline.resources }}
+      resources:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      env:
+        - name: "CK8S_CONFIG_PATH"
+          value: $(workspaces.source.path)/config
+        - name: "SILENCE_ID"
+          value: $(params.silence-id)
+        - name: "LINGERING_DURATION"
+          value: $(params.lingering-duration)
+      script: |
+        #!/usr/bin/env bash
+
+        echo "Expiring alert silence"
+
+        end_date=$(date --rfc-3339=seconds -u -d ''"${LINGERING_DURATION}"' min' | sed 's/ /T/')
+
+        kubectl --kubeconfig ${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml exec -n monitoring statefulset/alertmanager-kube-prometheus-stack-alertmanager -it -c alertmanager -- amtool --alertmanager.url=http://localhost:9093 silence update ${SILENCE_ID} --end=${end_date}
+
+      securityContext:
+        runAsNonRoot: true
+        runAsGroup: 65532
+        runAsUser: 65532
+      volumeMounts:
+        - name: kubeconfigs
+          mountPath: $(workspaces.source.path)/config/.state/kube_config_sc.yaml
+          subPath: kube_config_sc.yaml
+  volumes:
+    - name: kubeconfigs
+      secret:
+        secretName: kubeconfigs

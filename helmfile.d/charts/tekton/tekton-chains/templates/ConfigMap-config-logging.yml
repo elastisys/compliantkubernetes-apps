@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "tektonChains.fullname". }}-config-logging
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- include "tektonChains.baseLabels" . | nindent 4 }}
+data:
+  {{- range $key, $val := .Values.tenantLogging }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}

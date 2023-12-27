@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-logging-triggers
+  labels:
+    {{- include "triggers.baseLabels" . | nindent 4 }}
+    {{- include "triggers.helmLabels" . | nindent 4 }}
+data:
+{{ .Values.config.logging | toYaml | indent 2 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-observability-triggers
+  labels:
+    {{- include "triggers.baseLabels" . | nindent 4 }}
+    {{- include "triggers.helmLabels" . | nindent 4 }}
+data:
+{{ .Values.config.observability | toYaml | indent 2 }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-defaults-triggers
+  labels:
+    {{- include "triggers.baseLabels" . | nindent 4 }}
+    {{- include "triggers.helmLabels" . | nindent 4 }}
+data:
+{{ .Values.config.defaults | toYaml | indent 2 }}
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: feature-flags-triggers
+  labels:
+    {{- include "triggers.baseLabels" . | nindent 4 }}
+    {{- include "triggers.helmLabels" . | nindent 4 }}
+data:
+  # Setting this flag will determine which gated features are enabled.
+  # Acceptable values are "stable" or "alpha".
+  enable-api-fields: "stable"
+  # Setting this field with valid regex pattern matching the pattern will exclude labels from
+  # getting added to resources created by the EventListener such as the deployment
+  labels-exclusion-pattern: ""
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: triggers-info
+  labels:
+    {{- include "triggers.baseLabels" . | nindent 4 }}
+    {{- include "triggers.helmLabels" . | nindent 4 }}
+data:
+  # Contains triggers version which can be queried by external
+  # tools such as CLI. Elevated permissions are already given to
+  # this ConfigMap such that even if we don't have access to
+  # other resources in the namespace we still can have access to
+  # this ConfigMap.
+  version: "v0.23.0"

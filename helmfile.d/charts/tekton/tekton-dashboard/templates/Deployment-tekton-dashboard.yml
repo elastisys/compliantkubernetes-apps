@@ -1,0 +1,72 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tekton-dashboard
+{{ include "tektonDashboard.labels" . | indent 4 }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion}}
+    dashboard.tekton.dev/release: {{ .Chart.AppVersion}}
+    version: {{ .Chart.AppVersion}}
+  name: {{ template "tektonDashboard.fullname". }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.dashboardDeployment.replicas  }}
+  selector:
+    matchLabels:
+{{ include "tektonDashboard.labelselector" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+        app: tekton-dashboard
+{{ include "tektonDashboard.labelselector" . | indent 8 }}
+        app.kubernetes.io/version: {{ .Chart.AppVersion}}
+      name: tekton-dashboard
+    spec:
+      containers:
+        - args:
+            - --port={{ .Values.dashboardDeployment.container.port }}
+            - --logout-url=
+            - --pipelines-namespace={{.Release.Namespace }}
+            - --triggers-namespace={{.Release.Namespace }}
+            - --read-only=false
+            - --log-level=info
+            - --log-format=json
+            - --namespace={{.Release.Namespace }}
+            - --stream-logs=true
+            - --external-logs=
+          env:
+            - name: INSTALLED_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          image: {{ template "dashboard.image" .Values.dashboardDeployment.container.image }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.dashboardDeployment.container.port }}
+          name: tekton-dashboard
+          ports:
+            - containerPort: {{ .Values.dashboardDeployment.container.port }}
+          readinessProbe:
+            httpGet:
+              path: /readiness
+              port: {{ .Values.dashboardDeployment.container.port }}
+          {{- with .Values.dashboardDeployment.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsGroup: 65532
+            runAsNonRoot: true
+            runAsUser: 65532
+            seccompProfile:
+              type: RuntimeDefault
+      nodeSelector:
+        kubernetes.io/os: linux
+      serviceAccountName: {{ template "tektonDashboard.fullname". }}-dashboard
+      volumes: []

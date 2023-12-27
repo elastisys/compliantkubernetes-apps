@@ -1,0 +1,8 @@
+tekton:
+  cleanup:
+    enabled: {{ .Values.tekton.cleanup.enabled }}
+    schedule: {{ .Values.tekton.cleanup.schedule | quote }}
+    timeZone: {{ .Values.tekton.cleanup.timeZone | quote }}
+    resources:
+    {{ toYaml .Values.tekton.cleanup.resources | nindent 6 }}
+    keepLast: {{ .Values.tekton.cleanup.keepLast }}

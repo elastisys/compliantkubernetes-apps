@@ -1,0 +1,118 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: {{ include "upgrade-apps-pipeline.fullname" . }}
+spec:
+  description: |
+    upgrade apps
+  workspaces:
+  - name: shared-data
+    description: |
+      This workspace will receive the cloned git repo and be passed
+      to the next Task for the repo's README.md file to be read.
+  - name: ssh-creds
+  tasks:
+    - name: clone-config
+      taskRef:
+        name: git-clone
+      workspaces:
+      - name: output
+        workspace: shared-data
+      - name: ssh-directory
+        workspace: ssh-creds
+      params:
+      - name: url
+        value: {{ .Values.tekton.pipeline.configRepoUrl }}
+      - name: revision
+        value: main
+      - name: subdirectory
+        value: config
+      - name: depth
+        value: 0
+      - name: sparseCheckoutDirectories
+        value: /*,!/*/,/docs/,/cmd/,/.state/,/backups/,/defaults/
+
+    - name: git-change
+      runAfter: ["clone-config"]
+      taskRef:
+        name: git-change
+      workspaces:
+      - name: source
+        workspace: shared-data
+
+    - name: fetch-version
+      runAfter: ["git-change"]
+      when:
+        - input: "$(tasks.git-change.results.change-condition)"
+          operator: in
+          values: ["execute"]
+      taskRef:
+        name: fetch-version
+      workspaces:
+      - name: source
+        workspace: shared-data
+
+    - name: add-alert-silence
+      runAfter: ["fetch-version"]
+      when:
+        - input: "$(tasks.git-change.results.change-condition)"
+          operator: in
+          values: ["execute"]
+      taskRef:
+        name: add-alert-silence
+      workspaces:
+      - name: source
+        workspace: shared-data
+      params:
+      - name: devbox-image-tag
+        value: $(tasks.fetch-version.results.devbox-image-tag)
+
+    - name: upgrade-apps
+      runAfter: ["add-alert-silence"]
+      when:
+        - input: "$(tasks.git-change.results.change-condition)"
+          operator: in
+          values: ["execute"]
+      taskRef:
+        name: ck8s-apps-upgrade
+      workspaces:
+      - name: source
+        workspace: shared-data
+      params:
+      - name: devbox-image-tag
+        value: $(tasks.fetch-version.results.devbox-image-tag)
+      - name: kubespray-version
+        value: $(tasks.fetch-version.results.kubespray-version)
+      - name: apps-version
+        value: $(tasks.fetch-version.results.apps-version)
+
+    - name: expire-alert-silence
+      runAfter: ["upgrade-apps"]
+      when:
+        - input: "$(tasks.git-change.results.change-condition)"
+          operator: in
+          values: ["execute"]
+      taskRef:
+        name: expire-alert-silence
+      workspaces:
+      - name: source
+        workspace: shared-data
+      params:
+      - name: devbox-image-tag
+        value: $(tasks.fetch-version.results.devbox-image-tag)
+      - name: silence-id
+        value: $(tasks.add-alert-silence.results.silence-id)
+      - name: lingering-duration
+        value: {{ .Values.tekton.pipeline.silence.lingeringDuration }}
+
+    - name: remove-sa-rbac
+      params:
+      - name: devbox-image-tag
+        value: $(tasks.fetch-version.results.devbox-image-tag)
+      runAfter: ["expire-alert-silence"]
+      taskRef:
+        name: remove-sa-rbac
+      workspaces:
+      - name: source
+        workspace: shared-data

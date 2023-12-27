@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: feature-flags
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+  {{- include "tektonPipelines.labels" . | nindent 4 }}
+data:
+  disable-affinity-assistant: {{ .Values.featureFlags.disableAffinityAssistant | quote }}
+  disable-creds-init: {{ .Values.featureFlags.disableCredsInit | quote }}
+  await-sidecar-readiness: {{ .Values.featureFlags.awaitSidecarReadiness | quote }}
+  running-in-environment-with-injected-sidecars: {{ .Values.featureFlags.runningInEnvironmentWithInjectedSidecars | quote }}
+  require-git-ssh-secret-known-hosts: {{ .Values.featureFlags.requireGitSshSecretKnownHosts | quote }}
+  enable-tekton-oci-bundles: {{ .Values.featureFlags.enableTektonOciBundles | quote }}
+  enable-api-fields: {{ .Values.featureFlags.enableApiFields | quote }}
+  send-cloudevents-for-runs: {{ .Values.featureFlags.sendCloudeventsForRuns | quote }}
+  resource-verification-mode: {{ .Values.featureFlags.resourceVerificationMode | quote }}
+  enable-provenance-in-status: {{ .Values.featureFlags.enableProvenanceInStatus | quote }}
+  custom-task-version: {{ .Values.featureFlags.customTaskVersion | quote }}
+  enforce-nonfalsifiablity: {{ .Values.featureFlags.enforeNonFalsiablity | quote }}

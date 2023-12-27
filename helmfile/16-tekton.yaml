@@ -1,0 +1,96 @@
+helmDefaults:
+  timeout: 600
+  createNamespace: false
+  skipDeps: true
+
+environments:
+  workload_cluster:
+    values:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/wc-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/wc-config.yaml"
+    secrets:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
+  service_cluster:
+    values:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/sc-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/sc-config.yaml"
+    secrets:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
+---
+
+releases:
+  - name: tekton-rbac
+    namespace: kube-system
+    labels:
+      app: tekton-rbac
+      stage: bootstrap
+    chart: ./charts/tekton/tekton-rbac
+    version: 0.1.0
+    installed: {{ .Values.tekton.enabled }}
+    values:
+    {{- if eq .Environment.Name "service_cluster" }}
+      - values/tekton/bootstrap/service/tekton-rbac.yaml.gotmpl
+    {{- else if eq .Environment.Name "workload_cluster" }}
+      - values/tekton/bootstrap/workload/tekton-rbac.yaml.gotmpl
+    {{- end  }}
+
+  {{- if eq .Environment.Name "service_cluster" }}
+  - name: tekton-pipelines
+    namespace: tekton-pipelines
+    labels:
+      app: tekton-pipelines
+      stage: setup
+    chart: ./charts/tekton/tekton-pipelines
+    installed: {{ and .Values.tekton.enabled .Values.tekton.components.pipelines.enabled }}
+    version: 0.1.0
+
+  - name: tekton-dashboard
+    namespace: tekton-pipelines
+    labels:
+      app: tekton-dashboard
+      stage: setup
+    chart: ./charts/tekton/tekton-dashboard
+    version: 0.2.2
+    installed: {{ and .Values.tekton.enabled .Values.tekton.components.dashboard.enabled }}
+
+  - name: tekton-triggers
+    namespace: tekton-pipelines
+    labels:
+      app: tekton-triggers
+      stage: setup
+    chart: ./charts/tekton/tekton-triggers
+    version: 0.1.0
+    disableValidation: true
+    installed: {{ and .Values.tekton.enabled .Values.tekton.components.triggers.enabled }}
+
+  - name: tekton-chains
+    namespace: tekton-pipelines
+    labels:
+      app: tekton-chains
+      stage: setup
+    chart: ./charts/tekton/tekton-chains
+    version: 0.1.0
+    installed: {{ and .Values.tekton.enabled .Values.tekton.components.chains.enabled }}
+
+  - name: upgrade-apps-pipeline
+    namespace: tekton-pipelines
+    labels:
+      app: upgrade-apps-pipeline
+      stage: setup
+    chart: ./charts/tekton/upgrade-apps-pipeline
+    version: 0.1.0
+    disableValidation: true
+    installed: {{ and .Values.tekton.enabled .Values.tekton.components.upgradeApps.enabled }}
+    values:
+      - values/tekton/upgrade-apps.yaml.gotmpl
+      - values/tekton/cleanup.yaml.gotmpl
+    needs:
+      - tekton-pipelines/tekton-pipelines
+      {{- if .Values.tekton.listener.enabled }}
+      - tekton-pipelines/tekton-triggers
+      {{- end }}
+  {{- end }}

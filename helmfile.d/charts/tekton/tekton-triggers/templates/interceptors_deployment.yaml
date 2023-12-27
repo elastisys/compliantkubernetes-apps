@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "triggers.fullname" . }}-core-interceptors
+  labels:
+    {{- include "triggers.baseLabels" . | nindent 4 }}
+    {{- include "triggers.helmLabels" . | nindent 4 }}
+    {{- include "triggers.versionLabels" . | nindent 4 }}
+    {{- include "triggers.componentLabels" "interceptors" | nindent 4 }}
+    {{- include "triggers.nameLabels" "core-interceptors" | nindent 4 }}
+spec:
+  replicas: {{ .Values.interceptors.replicas }}
+  {{- with .Values.interceptors.updateStrategy }}
+  strategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "triggers.baseLabels" . | nindent 6 }}
+      {{- include "triggers.componentLabels" "interceptors" | nindent 6 }}
+      {{- include "triggers.nameLabels" "core-interceptors" | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.interceptors.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "triggers.baseLabels" . | nindent 8 }}
+        {{- include "triggers.helmLabels" . | nindent 8 }}
+        {{- include "triggers.versionLabels" . | nindent 8 }}
+        {{- include "triggers.componentLabels" "interceptors" | nindent 8 }}
+        {{- include "triggers.nameLabels" "core-interceptors" | nindent 8 }}
+        app: {{ template "triggers.fullname" . }}-core-interceptors
+    spec:
+      serviceAccountName: {{ template "triggers.fullname" . }}-core-interceptors
+      {{- with .Values.interceptors.securityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.interceptors.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.interceptors.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.interceptors.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: interceptors
+          image: {{ printf "%s:%s" .Values.interceptors.image.repository .Values.interceptors.image.tag | quote }}
+          imagePullPolicy: {{ .Values.interceptors.image.pullPolicy | quote }}
+          args: ["-logtostderr", "-stderrthreshold", "INFO"]
+          env:
+            - name: SYSTEM_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: CONFIG_LOGGING_NAME
+              value: config-logging-triggers
+            - name: CONFIG_OBSERVABILITY_NAME
+              value: config-observability-triggers
+            - name: METRICS_DOMAIN
+              value: tekton.dev/triggers
+            # assuming service and deployment names are same always for consistency
+            - name: INTERCEPTOR_TLS_SVC_NAME
+              value: {{ template "triggers.fullname" . }}-core-interceptors
+            - name: INTERCEPTOR_TLS_SECRET_NAME
+              value: {{ template "triggers.fullname" . }}-core-interceptors-certs
+          securityContext:
+            allowPrivilegeEscalation: false
+            # User 65532 is the distroless nonroot user ID
+            runAsUser: 65532
+            runAsGroup: 65532
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - "ALL"
+            seccompProfile:
+              type: RuntimeDefault
+          {{- with .Values.interceptors.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - containerPort: 8443

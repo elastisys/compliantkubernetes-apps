@@ -1,0 +1,69 @@
+{{- if .Values.cron.enabled }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "upgrade-apps-pipeline.fullname" . }}-cron
+  labels:
+    {{- include "upgrade-apps-pipeline.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.cron.scheduleCron | quote }}
+  timeZone: {{ .Values.cron.scheduleTimeZone | quote }}
+  concurrencyPolicy: {{ .Values.concurrencyPolicy }}
+  startingDeadlineSeconds: {{ .Values.cron.startingDeadlineSeconds }}
+  successfulJobsHistoryLimit: {{ .Values.cron.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.cron.failedJobsHistoryLimit }}
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: {{ .Values.cron.activeDeadlineSeconds }}
+      backoffLimit: {{ .Values.cron.backoffLimit }}
+      template:
+        metadata:
+          labels:
+            {{- include "upgrade-apps-pipeline.labels" . | nindent 12 }}
+        spec:
+          serviceAccountName: {{ include "upgrade-apps-pipeline.serviceAccountName" . }}-cron
+          restartPolicy: {{ .Values.cron.restartPolicy }}
+          containers:
+            - name: backup
+              image: {{ .Values.tekton.pipeline.devbox.repository }}:{{ .Values.tekton.pipeline.devbox.tag }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              command:
+                - /usr/bin/bash
+              args:
+                - /scripts/cron.sh
+              env:
+                - name: SCHEDULE_DAYS
+                  value: {{ .Values.cron.scheduleDays | quote }}
+                - name: SCHEDULE_START
+                  value: {{ .Values.cron.scheduleStart | quote }}
+              {{- with .Values.cron.securityContext }}
+              securityContext: {{- toYaml . | nindent 16 }}
+              {{- end }}
+              {{- with .Values.cron.resources }}
+              resources: {{- toYaml . | nindent 16 }}
+              {{- end }}
+              volumeMounts:
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+          volumes:
+            - name: scripts
+              configMap:
+                name: {{ include "upgrade-apps-pipeline.fullname" . }}-cron
+          {{- with .Values.cron.imagePullSecrets }}
+          imagePullSecrets: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.cron.podSecurityContext }}
+          securityContext: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.cron.nodeSelector }}
+          nodeSelector: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.cron.tolerations }}
+          tolerations: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.cron.affinity }}
+          affinity: {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}

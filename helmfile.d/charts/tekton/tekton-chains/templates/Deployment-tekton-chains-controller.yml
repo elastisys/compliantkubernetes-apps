@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tekton-chains-controller
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- include "tektonChains.nameLabels" "controller" | nindent 4 }}
+  {{- include "tektonChains.componentLabels" "controller" | nindent 4 }}
+  {{- include "tektonChains.baseLabels" . | nindent 4 }}
+  {{- include "tektonChains.versionLabels" . | nindent 4 }}
+  {{- include "tektonChains.helmLabels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "tektonChains.nameLabels" "controller" | nindent 6 }}
+      {{- include "tektonChains.componentLabels" "controller" | nindent 6 }}
+      {{- include "tektonChains.baseLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+      labels:
+        {{- include "tektonChains.nameLabels" "controller" | nindent 8 }}
+        {{- include "tektonChains.componentLabels" "controller" | nindent 8 }}
+        {{- include "tektonChains.baseLabels" . | nindent 8 }}
+        {{- include "tektonChains.helmLabels" . | nindent 8 }}
+        {{- include "tektonChains.versionLabels" . | nindent 8 }}
+        app: tekton-chains-controller
+    spec:
+      serviceAccountName: {{ template "tektonChains.fullname" . }}-controller
+      containers:
+        - name: tekton-chains-controller
+          image: {{ template "tektonChains.image" .Values.chainsDeployment.image }}
+          volumeMounts:
+            - name: signing-secrets
+              mountPath: /etc/signing-secrets
+            - name: oidc-info
+              mountPath: /var/run/sigstore/cosign
+            {{- if .Values.spire.enabled }}
+            - name: spiffe-workload-api
+              mountPath: {{ .Values.spire.mountPath }}
+            {{- end }}
+          env:
+            - name: SYSTEM_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: METRICS_DOMAIN
+              value: tekton.dev/chains
+            {{- if .Values.spire.enabled }}
+            - name: SPIFFE_ENDPOINT_SOCKET
+              value: {{ .Values.spire.mountPath }}
+            {{- end }}
+          {{- with .Values.chainsDeployment.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            # User 65532 is the distroless nonroot user ID
+            runAsUser: 65532
+            runAsGroup: 65532
+      volumes:
+        - name: signing-secrets
+          secret:
+            secretName: signing-secrets
+        - name: oidc-info
+          projected:
+            sources:
+              # The "public good" instance supports tokens from EKS and GKE by default.
+              # The fulcio URL can also be redirected to an instance that has been
+              # configured to accept other issuers as well.  Removing this volume
+              # completely will direct chains to use alternate ambient credentials
+              # (e.g. GKE workload identity, SPIFFE)
+              - serviceAccountToken:
+                  path: oidc-token
+                  expirationSeconds: 600 # Use as short-lived as possible.
+                  audience: sigstore
+        {{- if .Values.spire.enabled }}
+        - name: spiffe-workload-api
+          hostPath:
+            path: {{ .Values.spire.socketPath }}
+        {{- end }}

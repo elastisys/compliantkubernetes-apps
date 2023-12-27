@@ -1238,3 +1238,65 @@ networkPolicies:
         - "set-me"
       ports:
         - 443
+
+# Tekton Configuration
+tekton:
+  bootstraped: false
+  components:
+    pipelines:
+      enabled: false
+    dashboard:
+      enabled: false
+    triggers:
+      enabled: false
+    chains:
+      enabled: false
+    upgradeApps:
+      enabled: false
+
+  service:
+    serviceAccount:
+      name: tekton-service
+      clusterAdmin: false
+    imagePullSecrets:
+      - name: pull-secret
+
+  cron:
+    scheduleCron: 0 */1 * * fri
+    scheduleTimeZone: "Europe/Stockholm"
+    scheduleDays: 1
+    scheduleStart: 230412
+
+  pipeline:
+    devbox:
+      repository: set-me
+      tag: set-me
+
+    configChangeDays: 5
+    configRepoUrl: set-me
+
+    appsVersion: ""
+    kubesprayVersion: ""
+
+    workspace:
+      storageCapacity: 5Gi
+      storageClassName: "" # If not set, default storageClassName will be used
+
+    silence:
+      lingeringDuration: "10" # Amount of minutes the alermanager silence will linger after tekton upgrade is completed
+
+  listener:
+    enabled: false
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        acme.cert-manager.io/http01-edit-in-place: "true"
+      host: listenerhost
+
+  cleanup:
+    enabled: true
+    schedule: "0 0 * * *"
+    timeZone: "Europe/Stockholm"
+    resources:
+      - pipelineruns
+    keepLast: 1 # Keep n most recent number
