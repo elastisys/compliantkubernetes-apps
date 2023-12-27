@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: feature-flags
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+  {{- include "tekton-pipelines.labels" . | nindent 4 }}
+data:
+  disable-affinity-assistant: "false"
+  disable-creds-init: "false"
+  await-sidecar-readiness: "true"
+  running-in-environment-with-injected-sidecars: "false"
+  require-git-ssh-secret-known-hosts: "false"
+  enable-tekton-oci-bundles: "false"
+  enable-api-fields: "alpha"
+  send-cloudevents-for-runs: "false"
+  resource-verification-mode: "skip"
+  enable-provenance-in-status: "false"
+  custom-task-version: "v1beta1"
+  enforce-nonfalsifiablity: "none"

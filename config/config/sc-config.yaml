@@ -1299,3 +1299,42 @@ networkPolicies:
         - "set-me"
       ports:
         - 443
+
+# Tekton Configuration
+tektonPipelines:
+  enabled: false
+
+  controller:
+    replicas: 1
+
+    resources:
+      limits:
+        cpu: 20m
+        memory: 128Mi
+      requests:
+        cpu: 10m
+        memory: 64Mi
+
+  webhook:
+    replicas: 1
+
+    resources:
+      limits:
+        cpu: 20m
+        memory: 128Mi
+      requests:
+        cpu: 10m
+        memory: 64Mi
+
+  remoteResolvers:
+    replicas: 1
+
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: 20m
+        memory: 128Mi
+
+  customConfigDefaults: {}

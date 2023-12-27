@@ -1,0 +1,25 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" (include "tekton-pipelines.fullname" .) "failed-alerts" | trunc 63 | trimSuffix "-" }}
+  labels:
+    app: tekton-pipelines-controller
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: tekton-pipelines
+    app.kubernetes.io/name: tekton-pipelines
+    app.kubernetes.io/part-of: tekton-pipelines
+    {{- if .Values.alerts.evaluateThanos }}
+    evaluate_thanos: "1"
+    {{- end }}
+spec:
+  groups:
+  - name: tekton-pipelines-failed
+    rules:
+    - alert: FailedTektonPipelines
+      annotations:
+        description: Number of failed pipeline runs in the last 12 hours
+        summary: Number of failed pipeline runs
+      expr: |
+        increase(tekton_pipelines_controller_pipelinerun_count{status="failed"}[12h]) > 0
+      labels:
+        severity: critical
