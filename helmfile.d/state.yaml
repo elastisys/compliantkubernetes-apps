@@ -24,6 +24,7 @@ bases:
   - stacks/rbac.yaml
   - stacks/rclone.yaml
   - stacks/system.yaml
+  - stacks/tekton.yaml
   - stacks/thanos.yaml
   - stacks/velero.yaml
 ---
@@ -156,3 +157,6 @@ releases:
   - inherit: [ template: opensearch-slm ]
   - inherit: [ template: opensearch-curator ]
   - inherit: [ template: opensearch-exporter ]
+
+  - inherit: [ template: tekton-pipelines-podsecuritypolicy ]
+  - inherit: [ template: tekton-pipelines ]

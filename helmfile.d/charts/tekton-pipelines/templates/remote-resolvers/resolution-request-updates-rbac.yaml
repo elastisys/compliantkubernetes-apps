@@ -1,0 +1,40 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "tekton-pipelines.fullname" . }}-resolvers-resolution-request-updates
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/component: resolvers
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+  {{- include "tekton-pipelines.labels" . | nindent 4 }}
+rules:
+  - apiGroups: ["resolution.tekton.dev"]
+    resources: ["resolutionrequests", "resolutionrequests/status"]
+    verbs: ["get", "list", "watch", "update", "patch"]
+  - apiGroups: ["tekton.dev"]
+    resources: ["tasks", "pipelines"]
+    verbs: ["get", "list"]
+  # Read-only access to these.
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "tekton-pipelines.fullname" . }}-resolvers
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/component: resolvers
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-pipelines
+  {{- include "tekton-pipelines.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: '{{ include "tekton-pipelines.fullname" . }}-resolvers-resolution-request-updates'
+subjects:
+- kind: ServiceAccount
+  name: '{{ include "tekton-pipelines.fullname" . }}-resolvers'
+  namespace: '{{ .Release.Namespace }}'
