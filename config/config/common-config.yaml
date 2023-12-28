@@ -820,6 +820,15 @@ opa:
 
 trivy:
   enabled: true
+  # comma separated list of namespaces (or glob patterns) to be excluded from scanning
+  excludeNamespaces: ""
+  vulnerabilityScannerEnabled: true
+  sbomGenerationEnabled: false
+  configAuditScannerEnabled: true
+  rbacAssessmentScannerEnabled: true
+  infraAssessmentScannerEnabled: true
+  clusterComplianceEnabled: true
+  exposedSecretScannerEnabled: true
   # All durations must be specified in seconds, minutes or hours
   # Example 40s / 30m / 20h
   vulnerabilityScanner:
@@ -839,6 +848,7 @@ trivy:
   serviceMonitor:
   # enabled determines whether a serviceMonitor should be deployed
     enabled: true
+    interval: 5m
   tolerations: []
   affinity: {}
 kured:
