@@ -13,6 +13,19 @@ fi
 
 here="$(dirname "$(readlink -f "$0")")"
 
+GATE_VALWEBHOOK=$(
+    "${here}/.././bin/ck8s" ops \
+        kubectl sc get \
+        validatingwebhookconfigurations \
+        -l gatekeeper.sh/system=yes \
+        -oname
+    )
+
+if [ -n "${GATE_VALWEBHOOK}" ]; then
+    # Destroy gatekeeper validatingwebhook which could potentially prevent other resources from being deleted
+    "${here}/.././bin/ck8s" ops kubectl sc delete "${GATE_VALWEBHOOK}"
+fi
+
 # Destroy all helm releases
 "${here}/.././bin/ck8s" ops helmfile sc -l app!=cert-manager destroy
 
