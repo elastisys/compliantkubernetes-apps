@@ -309,8 +309,7 @@ gatekeeper:
     #    name: "gatekeeper-admin-upgrade-crds"
 # Tekton Configuration
 tekton:
-  workload:
-    serviceAccount:
-      name: tekton-workload
-      clusterAdmin: false
-    imagePullSecrets: []
+  serviceAccount:
+    name: tekton-workload
+    clusterAdmin: false
+  imagePullSecrets: []

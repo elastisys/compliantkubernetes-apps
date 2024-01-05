@@ -1,0 +1,33 @@
+tekton:
+  eventTriggerSecret: {{ .Values.tekton.eventTriggerSecret }}
+  ssh:
+    privateKey: {{ .Values.tekton.ssh.privateKey }}
+  gpg:
+    fingerprint: {{ .Values.tekton.gpg.fingerprint }}
+    privateKey: {{ .Values.tekton.gpg.privateKey }}
+
+  serviceAccount:
+    name: {{ .Values.tekton.serviceAccount.name }}
+
+  listener:
+    {{- if not .Values.tekton.components.triggers.enabled | and .Values.tekton.listener.enabled }}
+    {{- fail "\n\nEnabling the listener requires Tekton Triggers to be enabled!" }}
+    {{- end }}
+    enabled: {{ .Values.tekton.listener.enabled }}
+    ingress:
+      annotations:
+        {{- toYaml .Values.tekton.listener.ingress.annotations | nindent 8 }}
+      host: {{ .Values.tekton.listener.ingress.host }}
+    resources:
+      {{- toYaml .Values.tekton.listener.resources | nindent 6 }}
+
+{{- with .Values.tekton.imagePullSecrets }}
+image:
+  pullSecrets: {{- toYaml . | nindent 4 }}
+{{- end  }}
+
+serviceAccount:
+  name: {{ .Values.tekton.serviceAccount.name }}
+  clusterAdmin: {{ .Values.tekton.serviceAccount.clusterAdmin }}
+  imagePullSecrets:
+  {{- toYaml .Values.tekton.imagePullSecrets | nindent 4 }}

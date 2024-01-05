@@ -1251,40 +1251,11 @@ tekton:
       enabled: false
     chains:
       enabled: false
-    upgradeApps:
-      enabled: false
-
-  service:
-    serviceAccount:
-      name: tekton-service
-      clusterAdmin: false
-    imagePullSecrets:
-      - name: pull-secret
-
-  cron:
-    scheduleCron: 0 */1 * * fri
-    scheduleTimeZone: "Europe/Stockholm"
-    scheduleDays: 1
-    scheduleStart: 230412
-
-  pipeline:
-    devbox:
-      repository: devbox-image-repo
-      tag: devbox-image-tag
-
-    configChangeDays: 5
-    configRepoUrl: config-repo
-
-    appsVersion: ""
-    kubesprayVersion: ""
-
-    workspace:
-      storageCapacity: 5Gi
-      storageClassName: "" # If not set, default storageClassName will be used
-
-    silence:
-      lingeringDuration: "10" # Amount of minutes the alermanager silence will linger after tekton upgrade is completed
-
+  serviceAccount:
+    name: tekton-service
+    clusterAdmin: false
+  imagePullSecrets:
+    - name: pull-secret
   listener:
     enabled: false
     ingress:
@@ -1292,11 +1263,10 @@ tekton:
         cert-manager.io/cluster-issuer: letsencrypt-prod
         acme.cert-manager.io/http01-edit-in-place: "true"
       host: listenerhost
-
-  cleanup:
-    enabled: true
-    schedule: "0 0 * * *"
-    timeZone: "Europe/Stockholm"
     resources:
-      - pipelineruns
-    keepLast: 1 # Keep n most recent number
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
