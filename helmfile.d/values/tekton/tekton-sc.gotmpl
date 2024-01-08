@@ -15,11 +15,9 @@ tekton:
     {{- end }}
     enabled: {{ .Values.tekton.listener.enabled }}
     ingress:
-      annotations:
-        {{- toYaml .Values.tekton.listener.ingress.annotations | nindent 8 }}
+      annotations: {{- toYaml .Values.tekton.listener.ingress.annotations | nindent 8 }}
       host: {{ .Values.tekton.listener.ingress.host }}
-    resources:
-      {{- toYaml .Values.tekton.listener.resources | nindent 6 }}
+    resources: {{- toYaml .Values.tekton.listener.resources | nindent 6 }}
 
 {{- with .Values.tekton.imagePullSecrets }}
 image:
@@ -29,5 +27,4 @@ image:
 serviceAccount:
   name: {{ .Values.tekton.serviceAccount.name }}
   clusterAdmin: {{ .Values.tekton.serviceAccount.clusterAdmin }}
-  imagePullSecrets:
-  {{- toYaml .Values.tekton.imagePullSecrets | nindent 4 }}
+  imagePullSecrets: {{- toYaml .Values.tekton.imagePullSecrets | nindent 4 }}

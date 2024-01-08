@@ -1,6 +1,8 @@
 ---
 templates:
   tekton:
+    labels:
+      app: tekton
     condition: ck8sManagementCluster.enabled
     namespace: tekton-pipelines
 
@@ -9,75 +11,50 @@ templates:
     namespace: kube-system
     labels:
       app: tekton
-      component: tekton-rbac
     chart: charts/tekton/tekton-rbac
     version: 0.1.0
     installed: {{ .Values | get "tekton.enabled" false }}
     values:
-    {{- if .Values | get "ck8sManagementCluster.enabled" false }}
       - values/tekton/tekton-sc.gotmpl
-    {{- else if .Values | get "ck8sWorkloadCluster.enabled" false }}
       - values/tekton/tekton-wc.gotmpl
-    {{- end  }}
 
   tekton-pipelines:
     inherit:
       - template: tekton
     name: tekton-pipelines
-    labels:
-      app: tekton
-      component: tekton-pipelines
     chart: charts/tekton/tekton-pipelines
     installed: {{ and (.Values | get "tekton.enabled" false) (.Values | get "tekton.components.pipelines.enabled" false) }}
     version: 0.1.0
-    {{- if .Values | get "ck8sManagementCluster.enabled" false }}
     values:
       - values/tekton/tekton-sc.gotmpl
-    {{- end  }}
-
 
   tekton-dashboard:
     inherit:
       - template: tekton
     name: tekton-dashboard
-    labels:
-      app: tekton
-      component: tekton-dashboard
     chart: charts/tekton/tekton-dashboard
     version: 0.2.2
     installed: {{ and (.Values | get "tekton.enabled" false) (.Values | get "tekton.components.dashboard.enabled" false) }}
-    {{- if .Values | get "ck8sManagementCluster.enabled" false }}
     values:
       - values/tekton/tekton-sc.gotmpl
-    {{- end  }}
 
   tekton-triggers:
     inherit:
       - template: tekton
     name: tekton-triggers
-    labels:
-      app: tekton
-      component: tekton-triggers
     chart: charts/tekton/tekton-triggers
     version: 0.1.0
     disableValidation: true
     installed: {{ and (.Values | get "tekton.enabled" false) (.Values | get "tekton.components.triggers.enabled" false) }}
-    {{- if .Values | get "ck8sManagementCluster.enabled" false }}
     values:
       - values/tekton/tekton-sc.gotmpl
-    {{- end  }}
 
   tekton-chains:
     inherit:
       - template: tekton
     name: tekton-chains
-    labels:
-      app: tekton
-      component: tekton-chains
     chart: charts/tekton/tekton-chains
     version: 0.1.0
     installed: {{ and (.Values | get "tekton.enabled" false) (.Values | get "tekton.components.chains.enabled" false) }}
-    {{- if .Values | get "ck8sManagementCluster.enabled" false }}
     values:
       - values/tekton/tekton-sc.gotmpl
-    {{- end  }}
