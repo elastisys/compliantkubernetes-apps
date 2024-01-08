@@ -15,8 +15,11 @@ templates:
     version: 0.1.0
     installed: {{ .Values | get "tekton.enabled" false }}
     values:
+    {{- if .Values | get "ck8sManagementCluster.enabled" false }}
       - values/tekton/tekton-sc.gotmpl
+    {{- else if .Values | get "ck8sWorkloadCluster.enabled" false }}
       - values/tekton/tekton-wc.gotmpl
+    {{- end  }}
 
   tekton-pipelines:
     inherit:
