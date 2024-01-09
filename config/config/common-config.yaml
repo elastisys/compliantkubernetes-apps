@@ -378,6 +378,8 @@ prometheus:
   tolerations: []
   affinity: {}
   nodeSelector: {}
+  webhookAlerts:
+    enabled: false
   ## Predictive alert if the resource usage will hit the set percentage in 3 days
   capacityManagementAlerts:
     enabled: true
