@@ -5,7 +5,7 @@ set -euo pipefail
 HERE="$(readlink -f "${0}")"
 ROOT="$(dirname "$(dirname "${HERE}")")"
 
-CHARTS="${ROOT}/helmfile/upstream"
+CHARTS="${ROOT}/helmfile.d/upstream"
 INDEX="${CHARTS}/index.yaml"
 
 RETURN="0"
@@ -211,7 +211,7 @@ diff|list|pull|verify)
   *)
     charts="$(yq4 ".charts | keys | .[] | select(match(\"${2}\"))" "${INDEX}")"
     if [[ -z "${charts}" ]]; then
-      out "\e[31merror\e[0m: invalid chart identifier \"${chart}\""
+      out "\e[31merror\e[0m: invalid chart identifier \"${2}\""
       exit 1
     fi
 
