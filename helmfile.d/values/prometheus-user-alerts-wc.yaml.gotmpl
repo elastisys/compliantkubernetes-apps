@@ -23,6 +23,7 @@ defaultRules:
     capacityManagementAlerts: {{ .Values.prometheus.capacityManagementAlerts.enabled }}
     networkpolicies: {{ .Values.networkPolicies.enableAlerting }}
     harbor: false
+    webhooks: {{ .Values.prometheus.webhookAlerts.enabled }}
 
 capacityManagementAlertsPersistentVolumeEnabled: {{ .Values.prometheus.capacityManagementAlerts.persistentVolume.enabled }}
 capacityManagementAlertsPersistentVolumeLimit: {{ .Values.prometheus.capacityManagementAlerts.persistentVolume.limit }}

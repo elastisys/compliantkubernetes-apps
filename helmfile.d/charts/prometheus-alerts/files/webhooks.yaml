@@ -1,0 +1,10 @@
+- name: webhook-failures
+  rules:
+  - alert: WebhookFailing
+    annotations:
+      description: Webhooks have been failing during the last 10m
+      summary: Webhooks requests are failing
+    expr: rate(apiserver_admission_webhook_rejection_count{error_type!="no_error"}[5m]) > 0
+    for: 10m
+    labels:
+      severity: warning

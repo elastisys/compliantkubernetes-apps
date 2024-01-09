@@ -34,6 +34,7 @@ defaultRules:
     dailyChecks: true
     networkpolicies: {{ .Values.networkPolicies.enableAlerting }}
     clusterApi: {{ .Values.clusterApi.enabled }}
+    webhooks: {{ .Values.prometheus.webhookAlerts.enabled }}
 
   {{- if and .Values.thanos.enabled .Values.thanos.ruler.enabled }}
   thanos:

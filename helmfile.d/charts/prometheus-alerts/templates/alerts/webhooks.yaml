@@ -1,0 +1,19 @@
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.webhooks }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "webhooks" | trunc 63 | trimSuffix "-" }}
+  labels:
+    app: {{ template "prometheus-alerts.name" . }}
+    {{- include "prometheus-alerts.labels" . | nindent 4 }}
+    {{- with .Values.defaultRules.alertLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.defaultRules.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  groups:
+    {{- .Files.Get "files/webhooks.yaml" | nindent 4 }}
+{{- end }}
