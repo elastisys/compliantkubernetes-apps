@@ -26,7 +26,7 @@ RUN curl -LOs "https://github.com/yannh/kubeconform/releases/download/${KUBECONF
     install -Tm 755 kubeconform /usr/local/bin/kubeconform && \
     rm kubeconform-linux-amd64.tar.gz kubeconform
 
-ENV KUBELOGIN_VERSION="1.24.0"
+ENV KUBELOGIN_VERSION="1.26.0"
 RUN curl -LOs "https://github.com/int128/kubelogin/releases/download/v${KUBELOGIN_VERSION}/kubelogin_linux_amd64.zip" && \
     unzip kubelogin_linux_amd64.zip && \
     install -Tm 755 kubelogin /usr/local/bin/kubectl-oidc_login && \
