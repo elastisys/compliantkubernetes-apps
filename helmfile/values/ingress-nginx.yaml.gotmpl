@@ -99,6 +99,7 @@ controller:
     ## Ref: https://kubernetes.io/docs/tutorials/services/source-ip/#source-ip-for-services-with-typeloadbalancer
     ## Required for IP whitelisting
     externalTrafficPolicy: "Local"
+    allocateLoadBalancerNodePorts: false
     {{ end }}
     {{ if .Values.ingressNginx.controller.service.enabled }}
     enabled: true

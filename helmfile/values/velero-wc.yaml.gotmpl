@@ -65,7 +65,7 @@ configuration:
     # Bucket to store backups in. Required.
     bucket: {{ .Values.objectStorage.buckets.velero }}
     # Prefix within bucket under which to store backups. Optional.
-    prefix: workload-cluster
+    prefix: prefix: {{ .Values.velero.storagePrefix }}
     # Additional provider-specific configuration. See link above
     # for details of required/optional fields for your provider.
     config:
@@ -79,14 +79,14 @@ configuration:
     # Bucket to store backups in. Required.
     bucket: {{ .Values.objectStorage.buckets.velero }}
     # Prefix within bucket under which to store backups. Optional.
-    prefix: workload-cluster
+    prefix: {{ .Values.velero.storagePrefix }}
     # Additional provider-specific configuration. See link above
     # for details of required/optional fields for your provider.
     {{- else if eq .Values.objectStorage.type "azure" }}
     # Configuration for Azure
     name: default
     bucket: {{ .Values.objectStorage.buckets.velero }}
-    prefix: workload-cluster
+    prefix: prefix: {{ .Values.velero.storagePrefix }}
     config:
       resourceGroup: {{ .Values.objectStorage.azure.resourceGroup }}
       storageAccount: {{ .Values.objectStorage.azure.storageAccount }}
