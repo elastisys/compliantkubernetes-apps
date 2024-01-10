@@ -83,6 +83,14 @@ customRules:
   {{- end }}
   overwrites.yaml: |-
     {{- if eq  .Values.falco.rulesFiles.default.enabled true }}
+    # This will be added in a later falco rules version as well
+    # The fix was added upstream here (with a new condition): https://github.com/falcosecurity/rules/pull/177
+    - macro: allowed_clear_log_files
+      condition: (
+        proc.name=containerd and (
+          fd.name startswith "/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/" or
+          fd.name startswith "/var/lib/containerd/tmpmounts/"
+        ))
     # Adding a repository to this list will add an exception to the rules:
     # Run shell untrusted
     # Contact K8S API Server From Container
