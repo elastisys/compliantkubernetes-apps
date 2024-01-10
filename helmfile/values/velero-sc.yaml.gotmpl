@@ -1,5 +1,5 @@
-{{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") ) }}
-{{ fail "\nERROR: Velero requires s3 or gcs object storage, see Values.objectStorage.type" }}
+{{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") (eq .Values.objectStorage.type "azure") ) }}
+{{ fail "\nERROR: Velero requires s3 or gcs or azure object storage, see Values.objectStorage.type" }}
 {{ end }}
 resources:    {{- toYaml .Values.velero.resources | nindent 2  }}
 tolerations:  {{- toYaml .Values.velero.tolerations | nindent 2  }}
@@ -30,6 +30,18 @@ initContainers:
     volumeMounts:
       - mountPath: /target
         name: plugins
+  {{- else if eq .Values.objectStorage.type "azure" }}
+  - name: velero-plugin-for-gcs
+    image: velero/velero-plugin-for-microsoft-azure:v1.8.2
+    imagePullPolicy: IfNotPresent
+    securityContext:
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsGroup: 10000
+      runAsUser: 10000
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
   {{- end }}
 
 configuration:
@@ -38,6 +50,8 @@ configuration:
   provider: aws
   {{- else if eq .Values.objectStorage.type "gcs" }}
   provider: gcp
+  {{- else if eq .Values.objectStorage.type "azure" }}
+  provider: azure
   {{- end }}
 
   defaultVolumesToFsBackup: true
@@ -68,6 +82,15 @@ configuration:
     prefix: service-cluster
     # Additional provider-specific configuration. See link above
     # for details of required/optional fields for your provider.
+    {{- else if eq .Values.objectStorage.type "azure" }}
+    # Configuration for Azure
+    name: default
+    bucket: {{ .Values.objectStorage.buckets.velero }}
+    prefix: service-cluster
+    config:
+      resourceGroup: {{ .Values.objectStorage.azure.resourceGroup }}
+      storageAccount: {{ .Values.objectStorage.azure.storageAccount }}
+      subscriptionId: {{ .Values.objectStorage.azure.subscriptionId }}
     {{- end }}
 
   # Parameters for the `default` VolumeSnapshotLocation. See
@@ -78,6 +101,8 @@ configuration:
       region: {{ .Values.objectStorage.s3.region }}
       {{- else if eq .Values.objectStorage.type "gcs" }}
       project: {{ .Values.objectStorage.gcs.project }}
+      {{- else if eq .Values.objectStorage.type "azure" }}
+      resourceGroup: {{ .Values.objectStorage.azure.resourceGroup }}
       {{- end }}
 
 credentials:
@@ -90,6 +115,12 @@ credentials:
       aws_secret_access_key: {{ .Values.objectStorage.s3.secretKey }}
     {{- else if eq .Values.objectStorage.type "gcs" }}
       {{ .Values.objectStorage.gcs.keyfileData | nindent 6 }}
+    {{- else if eq .Values.objectStorage.type "azure" }}
+      AZURE_SUBSCRIPTION_ID={{ .Values.objectStorage.azure.subscriptionId }}
+      AZURE_TENANT_ID={{ .Values.objectStorage.azure.tenantId }}
+      AZURE_CLIENT_ID={{ .Values.objectStorage.azure.clientId }}
+      AZURE_CLIENT_SECRET={{ .Values.objectStorage.azure.clientSecret }}
+      AZURE_CLOUD_NAME=AzurePublicCloud
     {{- end }}
 
 deployNodeAgent: true

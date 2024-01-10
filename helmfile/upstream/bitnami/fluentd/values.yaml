@@ -69,7 +69,7 @@ diagnosticMode:
 image:
   registry: docker.io
   repository: bitnami/fluentd
-  tag: 1.16.1-debian-11-r12
+  tag: 1.16.3-debian-11-r3 
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -89,7 +89,8 @@ image:
 ##
 forwarder:
   ## @param forwarder.enabled Enable forwarder daemonset
-  ##
+  extraGems:
+    - fluent-plugin-azure-storage-append-blob
   enabled: true
   ## @param forwarder.image.registry Fluentd forwarder image registry override
   ## @param forwarder.image.repository Fluentd forwarder image repository override
@@ -636,7 +637,8 @@ forwarder:
 ##
 aggregator:
   ## @param aggregator.enabled Enable Fluentd aggregator statefulset
-  ##
+  extraGems:
+    - fluent-plugin-azure-storage-append-blob
   enabled: true
   ## @param aggregator.image.registry Fluentd aggregator image registry override
   ## @param aggregator.image.repository Fluentd aggregator image repository override

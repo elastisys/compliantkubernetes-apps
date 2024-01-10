@@ -102,6 +102,12 @@ config:
           region: {{ .Values.objectStorage.s3.region }}
     {{ else if eq .Values.objectStorage.type "gcs" -}}
     # TODO: Add config for GCS if any.
+    {{ else if eq .Values.objectStorage.type "azure" -}}
+    azure:
+      client:
+        default:
+          account: {{ .Values.objectStorage.azure.opensearchaccountName }}
+          key: {{ .Values.objectStorage.azure.opensearchaccountKey }}
     {{- end }}
     {{- end }}
 
@@ -162,6 +168,8 @@ keystore:
   - secretName: opensearch-s3-secret
   {{- else if (eq .Values.objectStorage.type "gcs") }}
   - secretName: opensearch-gcs-secret
+  {{- else if (eq .Values.objectStorage.type "azure") }}
+  - secretName: opensearch-azure-secret
   {{- end }}
 plugins:
   enabled: true
@@ -170,5 +178,7 @@ plugins:
     - repository-s3
     {{- else if (eq .Values.objectStorage.type "gcs") }}
     - repository-gcs
+    {{- else if (eq .Values.objectStorage.type "azure") }}
+    - repository-azure
     {{- end }}
 {{- end}}

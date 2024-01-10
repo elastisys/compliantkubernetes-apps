@@ -567,16 +567,16 @@ releases:
   - values/fluentd/forwarder-service-cluster.yaml.gotmpl
 
 # Logs backup retention
-- name: log-manager
-  namespace: fluentd-system
-  labels:
-    app: fluentd
-    component: log-manager
-  chart: ./charts/log-manager
-  version: 0.1.0
-  installed: {{ .Values.fluentd.enabled }}
-  values:
-  - values/fluentd/log-manager.yaml.gotmpl
+# - name: log-manager
+#   namespace: fluentd-system
+#   labels:
+#     app: fluentd
+#     component: log-manager
+#   chart: ./charts/log-manager
+#   version: 0.1.0
+#   installed: {{ .Values.fluentd.enabled }}
+#   values:
+#   - values/fluentd/log-manager.yaml.gotmpl
 
 - name: rclone-sync
   namespace: rclone
@@ -667,7 +667,7 @@ releases:
 
 # Fluentd configurable by the user
 - name: fluentd
-  namespace: fluentd
+  namespace: fluentd 
   labels:
     app: fluentd
     component: fluentd-user
