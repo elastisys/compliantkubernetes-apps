@@ -5,6 +5,8 @@ templates:
       app: tekton
     condition: ck8sManagementCluster.enabled
     namespace: tekton-pipelines
+    needs:
+      - kube-system/admin-namespaces
 
   tekton-rbac:
     name: tekton-rbac
