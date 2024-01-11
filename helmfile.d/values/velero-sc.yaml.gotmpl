@@ -33,52 +33,33 @@ initContainers:
   {{- end }}
 
 configuration:
-  # Cloud provider being used (e.g. aws, azure, gcp).
-  {{- if eq .Values.objectStorage.type "s3" }}
-  provider: aws
-  {{- else if eq .Values.objectStorage.type "gcs" }}
-  provider: gcp
-  {{- end }}
-
   defaultVolumesToFsBackup: true
 
-  # https://velero.io/docs/v1.0.0/api-types/backupstoragelocation/
+  # https://velero.io/docs/v1.11/api-types/backupstoragelocation/
   backupStorageLocation:
-    {{- if eq .Values.objectStorage.type "s3" }}
-    # Cloud provider where backups should be stored. Usually should
-    # match `configuration.provider`. Required.
-    name: default
-    # Bucket to store backups in. Required.
-    bucket: {{ .Values.objectStorage.buckets.velero }}
-    # Prefix within bucket under which to store backups. Optional.
-    prefix: service-cluster
-    # Additional provider-specific configuration. See link above
-    # for details of required/optional fields for your provider.
-    config:
-      region: {{ .Values.objectStorage.s3.region }}
-      s3ForcePathStyle: "true"
-      s3Url: {{ .Values.objectStorage.s3.regionEndpoint }}
-    {{- else if eq .Values.objectStorage.type "gcs" }}
-    # Cloud provider where backups should be stored. Usually should
-    # match `configuration.provider`. Required.
-    name: default
-    # Bucket to store backups in. Required.
-    bucket: {{ .Values.objectStorage.buckets.velero }}
-    # Prefix within bucket under which to store backups. Optional.
-    prefix: service-cluster
-    # Additional provider-specific configuration. See link above
-    # for details of required/optional fields for your provider.
-    {{- end }}
-
-  # Parameters for the `default` VolumeSnapshotLocation. See
-  # https://velero.io/docs/v1.0.0/api-types/volumesnapshotlocation/
-  volumeSnapshotLocation:
-    config:
+    - bucket: {{ .Values.objectStorage.buckets.velero }}
+      prefix: service-cluster
       {{- if eq .Values.objectStorage.type "s3" }}
-      region: {{ .Values.objectStorage.s3.region }}
+      provider: aws
+      config:
+        region: {{ .Values.objectStorage.s3.region }}
+        s3ForcePathStyle: "true"
+        s3Url: {{ .Values.objectStorage.s3.regionEndpoint }}
       {{- else if eq .Values.objectStorage.type "gcs" }}
-      project: {{ .Values.objectStorage.gcs.project }}
+      provider: gcp
       {{- end }}
+
+  # https://velero.io/docs/v1.11/api-types/volumesnapshotlocation/
+  volumeSnapshotLocation:
+    {{- if eq .Values.objectStorage.type "s3" }}
+    - provider: aws
+      config:
+        region: {{ .Values.objectStorage.s3.region }}
+    {{- else if eq .Values.objectStorage.type "gcs" }}
+    - provider: gcp
+      config:
+        project: {{ .Values.objectStorage.gcs.project }}
+    {{- end }}
 
 credentials:
   # Create secret with credentials
