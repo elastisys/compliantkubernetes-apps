@@ -23,7 +23,7 @@ s3_download() {
 extract_backup(){
     echo "Extracting backups">&2
     tar xvf harbor.tgz
-    for backup_file in "registry" "postgres" "notaryserver" "notarysigner"; do
+    for backup_file in "registry" "postgres"; do
       if [[ ! -f "${backup_dir}/${backup_file}.back" && -f "${backup_dir}/${backup_file}.back.gz" ]]; then
         gzip -d < "${backup_dir}/${backup_file}.back.gz" > "${backup_dir}/${backup_file}.back"
         rm "${backup_dir}/${backup_file}.back.gz"
