@@ -73,6 +73,7 @@
     - apps sc: changes to applications running in the service cluster
     - apps wc: changes to applications running in the workload cluster
     - bin: changes to management binaries or scripts
+    - scripts: changes to other scripts
     - config: changes to configuration
     - docs: changes to documentation
     - tests: changes to tests
