@@ -4,16 +4,31 @@
 # to a blank string to let it operate in all namespaces.
 targetNamespaces: ""
 
+# excludeNamespaces is a comma separated list of namespaces (or glob patterns)
+# to be excluded from scanning. Only applicable in the all namespaces install
+# mode, i.e. when the targetNamespaces values is a blank string.
+excludeNamespaces: {{ .Values.trivy.excludeNamespaces }}
+
 operator:
 
   replicas: 1
 
   # configAuditScannerEnabled the flag to enable configuration audit scanner
-  configAuditScannerEnabled: true
+  configAuditScannerEnabled: {{ .Values.trivy.configAuditScannerEnabled }}
   # vulnerabilityScannerEnabled the flag to enable vulnerability scanner
-  vulnerabilityScannerEnabled: true
+  vulnerabilityScannerEnabled: {{ .Values.trivy.vulnerabilityScannerEnabled }}
+  # the flag to enable sbom generation
+  sbomGenerationEnabled: {{ .Values.trivy.sbomGenerationEnabled }}
+  # rbacAssessmentScannerEnabled the flag to enable rbac assessment scanner
+  rbacAssessmentScannerEnabled: {{ .Values.trivy.rbacAssessmentScannerEnabled }}
+  # infraAssessmentScannerEnabled the flag to enable infra assessment scanner
+  infraAssessmentScannerEnabled: {{ .Values.trivy.infraAssessmentScannerEnabled }}
+  # clusterComplianceEnabled the flag to enable cluster compliance scanner
+  clusterComplianceEnabled: {{ .Values.trivy.clusterComplianceEnabled }}
   # vulnerabilityScannerReportTTL the flag to set how long a vulnerability report should exist. "" means that the vulnerabilityScannerReportTTL feature is disabled
   scannerReportTTL: {{ .Values.trivy.vulnerabilityScanner.scannerReportTTL }}
+  # exposedSecretScannerEnabled the flag to enable exposed secret scanner
+  exposedSecretScannerEnabled: {{ .Values.trivy.exposedSecretScannerEnabled }}
   # vulnerabilityScannerScanOnlyCurrentRevisions the flag to only create vulnerability scans on the current revision of a deployment.
   vulnerabilityScannerScanOnlyCurrentRevisions: {{ .Values.trivy.vulnerabilityScanner.scanOnlyCurrentRevisions }}
   configAuditScannerScanOnlyCurrentRevisions: false
@@ -33,3 +48,4 @@ resources: {{- toYaml .Values.trivy.resources | nindent 2 }}
 serviceMonitor:
   # enabled determines whether a serviceMonitor should be deployed
   enabled: {{ .Values.trivy.serviceMonitor.enabled }}
+  interval: {{ .Values.trivy.serviceMonitor.interval }}
