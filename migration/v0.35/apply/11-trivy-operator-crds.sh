@@ -13,7 +13,7 @@ run() {
         log_info "  - applying the trivy-operator CRDs on sc"
         kubectl_do sc apply --server-side --force-conflicts -f "${ROOT}"/helmfile/upstream/aquasecurity/trivy-operator/crds
         log_info "  - upgrade trivy-operator on sc"
-        kubectl_do sc app=trivy-operator
+        helmfile_upgrade sc app=trivy-operator
       fi
     fi
     if [[ "${CK8S_CLUSTER}" =~ ^(wc|both)$ ]]; then
@@ -21,7 +21,7 @@ run() {
         log_info "  - applying the trivy-operator CRDs on wc"
         kubectl_do wc apply --server-side --force-conflicts -f "${ROOT}"/helmfile/upstream/aquasecurity/trivy-operator/crds
         log_info "  - upgrade trivy-operator on wc"
-        kubectl_do wc app=trivy-operator
+        helmfile_upgrade wc app=trivy-operator
       fi
     fi
     ;;
