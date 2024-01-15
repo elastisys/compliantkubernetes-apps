@@ -30,8 +30,6 @@ dump_database() {
     echo "Dumping database"  >&2
     pg_dump -U postgres -h "$PG_HOSTNAME" registry | gzip -c > "${dump_dir}/registry.back.gz"
     pg_dump -U postgres -h "$PG_HOSTNAME" postgres | gzip -c > "${dump_dir}/postgres.back.gz"
-    pg_dump -U postgres -h "$PG_HOSTNAME" registry | gzip -c > "${dump_dir}/notarysigner.back.gz"
-    pg_dump -U postgres -h "$PG_HOSTNAME" postgres | gzip -c > "${dump_dir}/notaryserver.back.gz"
 }
 
 create_tarball() {
