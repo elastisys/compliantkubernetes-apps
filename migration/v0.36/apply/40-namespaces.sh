@@ -28,15 +28,15 @@ prepare_namespaces() {
 }
 
 sync_release() {
-  cluster_long="${1}"
+  cluster_short="${1}"
 
   # Needs to executed twice
-  helmfile -f "${ROOT}/helmfile.d/state.yaml" -e "${cluster_long}" -l app=admin-namespaces sync --args --force
-  helmfile -f "${ROOT}/helmfile.d/state.yaml" -e "${cluster_long}" -l app=admin-namespaces sync --args --force
+  helmfile_do "${cluster_short}" -l app=admin-namespaces sync --args --force
+  helmfile_do "${cluster_short}" -l app=admin-namespaces sync --args --force
 
-  if [[ "$cluster_long" = "workload_cluster" ]]; then
-    helmfile -f "${ROOT}/helmfile.d/state.yaml" -e "${cluster_long}" -l app=dev-namespaces sync --args --force
-    helmfile -f "${ROOT}/helmfile.d/state.yaml" -e "${cluster_long}" -l app=dev-namespaces sync --args --force
+  if [[ "$cluster_short" = "wc" ]]; then
+    helmfile_do "${cluster_short}" -l app=dev-namespaces sync --args --force
+    helmfile_do "${cluster_short}" -l app=dev-namespaces sync --args --force
   fi
 }
 
@@ -67,7 +67,7 @@ run() {
 
       for cluster in "${!clusters[@]}"; do
         prepare_namespaces "${clusters[${cluster}]}" "${cluster}"
-        sync_release "${clusters[${cluster}]}"
+        sync_release "${cluster}"
         apply_gatekeeper "${cluster}"
         remove_owner_label "${cluster}"
       done
