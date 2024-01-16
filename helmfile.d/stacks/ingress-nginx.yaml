@@ -45,6 +45,19 @@ templates:
       - values/ingress-nginx.yaml.gotmpl
     wait: true
 
+  ingress-nginx-networkpolicy:
+    condition: ck8sWorkloadCluster.enabled
+    inherit:
+      - template: networkpolicies
+    installed: {{ .Values | get "wcProbeIngress.enabled" false }}
+    labels:
+      netpol: ingress-nginx-probe
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/workload/ingress-nginx-probe.yaml.gotmpl
+
   ingress-nginx-probe-ingress:
     name: ingress-nginx-probe-ingresss
     condition: ck8sWorkloadCluster.enabled

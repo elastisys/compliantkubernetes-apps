@@ -1,0 +1,9 @@
+policies:
+  ingress-nginx:
+    cert-manager-http01-solver:
+      podSelectorLabels:
+        acme.cert-manager.io/http01-solver: "true"
+      ingress:
+        - rule: ingress-rule-ingress
+          ports:
+            - tcp: 8089
