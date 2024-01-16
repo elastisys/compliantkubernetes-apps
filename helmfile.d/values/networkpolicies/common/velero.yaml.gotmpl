@@ -13,6 +13,10 @@ policies:
         - rule: egress-rule-dns
         - rule: egress-rule-apiserver
         - rule: egress-rule-object-storage
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 8085
 
     velero-node-agent:
       podSelectorLabels:
