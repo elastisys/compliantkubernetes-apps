@@ -43,7 +43,7 @@ configuration:
       provider: aws
       config:
         region: {{ .Values.objectStorage.s3.region }}
-        s3ForcePathStyle: "true"
+        s3ForcePathStyle: {{ .Values.objectStorage.s3.forcePathStyle }}
         s3Url: {{ .Values.objectStorage.s3.regionEndpoint }}
       {{- else if eq .Values.objectStorage.type "gcs" }}
       provider: gcp
