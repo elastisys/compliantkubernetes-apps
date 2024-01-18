@@ -24,9 +24,9 @@ bases:
   - stacks/rbac.yaml
   - stacks/rclone.yaml
   - stacks/system.yaml
+  - stacks/tekton.yaml
   - stacks/thanos.yaml
   - stacks/velero.yaml
-  - stacks/tekton.yaml
 ---
 releases:
   - inherit: [ template: tigera ]

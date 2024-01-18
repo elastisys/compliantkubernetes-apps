@@ -1,7 +1,4 @@
 tekton:
-  eventTriggerSecret: {{ .Values.tekton.eventTriggerSecret }}
-  ssh:
-    privateKey: {{ .Values.tekton.ssh.privateKey }}
   gpg:
     fingerprint: {{ .Values.tekton.gpg.fingerprint }}
     privateKey: {{ .Values.tekton.gpg.privateKey }}
