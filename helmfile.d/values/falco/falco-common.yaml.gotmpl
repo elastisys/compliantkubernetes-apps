@@ -24,6 +24,7 @@ falco:
     {{end}}
     - /etc/falco/falco_rules.local.yaml
     - /etc/falco/rules.d
+
 tty: {{ .Values.falco.tty }}
 
 {{- if eq .Values.falco.driver.kind "module" }}
@@ -52,6 +53,11 @@ driver:
         runAsUser: 0
         privileged: true
         allowPrivilegeEscalation: true
+      {{- with .Values.falco.driver.module.repoURL }}
+      env:
+      - name: DRIVERS_REPO
+        value: {{ . }}
+      {{- end }}
 
 resources: {{- toYaml .Values.falco.resources | nindent 2  }}
 nodeSelector: {{- toYaml .Values.falco.nodeSelector | nindent 2  }}
@@ -61,7 +67,7 @@ tolerations: {{- toYaml .Values.falco.tolerations | nindent 2  }}
 falcoctl:
   artifact:
     install:
-      enabled: true
+      enabled: {{ .Values.falco.artifact.install.enabled }}
     follow:
       enabled: false
   config:
@@ -77,6 +83,10 @@ falcoctl:
           {{- if eq .Values.falco.rulesFiles.sandbox.enabled true }}
           - falco-sandbox-rules:{{.Values.falco.rulesFiles.sandbox.version}}
           {{end}}
+    {{- with .Values.falco.customIndexes }}
+    indexes:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
 customRules:
   {{- if .Values.falco.customRules }}
     {{ toYaml .Values.falco.customRules | nindent 2}}

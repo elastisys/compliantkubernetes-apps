@@ -57,8 +57,10 @@ tests:
         tests:
           - target: dev
           - target: prod
+          - target: air-gapped
 
       - function: validate_template # cloud flavor
         tests:
           - target: dev
           - target: prod
+          - target: air-gapped

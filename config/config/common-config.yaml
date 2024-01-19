@@ -118,6 +118,11 @@ falco:
       enabled: false
       version: 2.0.0
 
+  artifact:
+    install:
+      # set to false in an air-gapped environment, unless artifacts are self-hosted
+      enabled: true
+
   # Setting tty to "true" will immediately display Falco logs by flushing them as they are emitted
   tty: true
 
@@ -133,6 +138,14 @@ falco:
       # -- Needed to enable eBPF JIT at runtime for performance reasons.
       # Can be skipped if eBPF JIT is enabled from outside the container
       hostNetwork: false
+
+    module:
+      # override the URL used for downloading driver modules, e.g. to use a self hosted file server in an air-gapped environment
+      repoURL: ""
+
+  # use custom indexes for falcoctl downloads
+  # ref: https://github.com/falcosecurity/charts/blob/falco-3.8.3/charts/falco/values.yaml#L390-L395
+  customIndexes: []
 
   ## additional falco rules
   ## ref: https://falco.org/docs/rules/
@@ -853,6 +866,29 @@ trivy:
     interval: 5m
   tolerations: []
   affinity: {}
+
+  # configurations for an offline / air-gapped environment
+  # ref: https://github.com/aquasecurity/trivy-operator/tree/main/deploy/helm#values
+  scanner:
+    offlineScanEnabled: false
+    dbRegistry: ""
+    dbRepository: ""
+    dbRepositoryInsecure: false
+    javaDbRegistry: ""
+    javaDbRepository: ""
+    # if authorization is required for pulling from registry, create a pull
+    # secret in the monitoring namespace and configure the secret name
+    imagePullSecret:
+      name: ""
+    registry:
+      mirror: {}
+        # "docker.io": registry.example.org:5000
+        # "gcr.io": registry.example.org:5000
+        # "ghcr.io": registry.example.org:5000
+        # "index.docker.io": registry.example.org:5000
+        # "quay.io": registry.example.org:5000
+        # "registry.k8s.io": registry.example.org:5000
+
 kured:
   enabled: false
   # See options at https://github.com/weaveworks/kured/blob/1.9.1/charts/kured/values.yaml#L24

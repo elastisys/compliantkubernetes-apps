@@ -1,0 +1,32 @@
+global:
+  issuer: set-me
+
+prometheus:
+  storage:
+    size: 15Gi
+  retention:
+    size: 12GiB
+
+falco:
+  artifact:
+    install:
+      enabled: false
+
+trivy:
+  scanner:
+    offlineScanEnabled: true
+    dbRegistry: set-me
+    dbRepository: set-me
+    dbRepositoryInsecure: false # set to true if the private registry is not configured with HTTPS
+    javaDbRegistry: set-me
+    javaDbRepository: set-me
+
+    # add registries that should be mirrored to private registry
+    registry:
+      mirror:
+        "docker.io": set-me
+        "gcr.io": set-me
+        "ghcr.io": set-me
+        "index.docker.io": set-me
+        "quay.io": set-me
+        "registry.k8s.io": set-me

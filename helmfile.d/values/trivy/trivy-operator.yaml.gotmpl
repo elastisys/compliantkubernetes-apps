@@ -9,6 +9,30 @@ targetNamespaces: ""
 # mode, i.e. when the targetNamespaces values is a blank string.
 excludeNamespaces: {{ .Values.trivy.excludeNamespaces }}
 
+trivy:
+  offlineScan: {{ .Values.trivy.scanner.offlineScanEnabled }}
+
+  {{- with .Values.trivy.scanner.dbRegistry }}
+  dbRegistry: {{ . | quote }}
+  {{- end }}
+  {{- with .Values.trivy.scanner.dbRepository }}
+  dbRepository: {{ . | quote }}
+  {{- end }}
+  dbRepositoryInsecure: {{ .Values.trivy.scanner.dbRepositoryInsecure }}
+
+  {{- with .Values.trivy.scanner.javaDbRegistry }}
+  javaDbRegistry: {{ . | quote }}
+  {{- end }}
+  {{- with .Values.trivy.scanner.javaDbRepository }}
+  javaDbRepository: {{ . | quote }}
+  {{- end }}
+
+  {{- with .Values.trivy.scanner.registry }}
+  registry:
+    mirror:
+      {{ toYaml .mirror | nindent 6 }}
+  {{- end }}
+
 operator:
 
   replicas: 1
@@ -38,6 +62,10 @@ operator:
   scanJobsRetryDelay: {{ .Values.trivy.scanJobs.retryDelay }}
   # scanJobTimeout the length of time to wait before giving up on a scan job
   scanJobTimeout: {{ .Values.trivy.scanJobs.timeout }}
+
+  {{- with .Values.trivy.scanner.imagePullSecret.name }}
+  privateRegistryScanSecretsNames: {"monitoring": {{ . }}}
+  {{- end }}
 
 tolerations: {{- toYaml .Values.trivy.tolerations | nindent 2 }}
 
