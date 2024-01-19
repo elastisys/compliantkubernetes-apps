@@ -22,6 +22,7 @@ ck8s_cloud_providers=(
 ck8s_flavors=(
     "dev"
     "prod"
+    "air-gapped"
 )
 
 CK8S_AUTO_APPROVE=${CK8S_AUTO_APPROVE:-"false"}

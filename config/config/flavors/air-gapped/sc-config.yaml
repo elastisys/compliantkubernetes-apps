@@ -1,0 +1,77 @@
+dex:
+  enableStaticLogin: false
+
+alerts:
+  alertTo: set-me
+  customReceivers:
+  - set-me
+
+prometheus:
+  retention:
+    age: 7d
+
+opensearch:
+  sso:
+    enabled: true
+  plugins:
+    installExternalObjectStoragePlugin: false
+    additionalPlugins:
+    - set-me
+  masterNode:
+    javaOpts: -Xms1024m -Xmx1024m
+    resources:
+      requests:
+        memory: 2Gi
+        cpu: 100m
+      limits:
+        memory: 3Gi
+  dataNode:
+    storageSize: 130Gi
+    javaOpts: -Xms2048m -Xmx2048m
+    resources:
+      requests:
+        memory: 4Gi
+      limits:
+        memory: 5Gi
+  clientNode:
+    javaOpts: -Xms1024m -Xmx1024m
+    resources:
+      requests:
+        memory: 2Gi
+      limits:
+        memory: 2.5Gi
+  ism:
+    rolloverSizeGB: 5
+    rolloverAgeDays: 1
+  curator:
+    retention:
+      - pattern: other-*
+        sizeGB: 5
+        ageDays: 10
+      - pattern: kubeaudit-*
+        sizeGB: 50
+        ageDays: 30
+      - pattern: kubernetes-*
+        sizeGB: 50
+        ageDays: 30
+      - pattern: authlog-*
+        sizeGB: 5
+        ageDays: 30
+      - pattern: security-auditlog-*
+        sizeGB: 1
+        ageDays: 14
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+  snapshot:
+    min: 300 # 12 / day * 30 days = 360, subtract some to account for failures
+    max: 500
+    ageSeconds: 2592000 # 30 days
+    backupSchedule: 30 */2 * * * # 30 min past every 2nd hour to avoid collision with retention
+
+harbor:
+  database:
+    internal:
+      persistentVolumeClaim:
+        size: 5Gi

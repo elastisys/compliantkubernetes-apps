@@ -151,6 +151,9 @@ alertmanager:
           source: {{ .Values.grafana.user.subdomain }}.{{ .Values.global.opsDomain }}
           priority: {{`'{{ if eq .GroupLabels.severity "critical"}}P1{{else if eq .GroupLabels.severity "warning"}}P2{{else if eq .GroupLabels.severity "medium"}}P3{{else if eq .GroupLabels.severity "low"}}P4{{else}}P5{{end}}'`}}
       {{ end }}
+    {{- with .Values.alerts.customReceivers }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 
   alertmanagerSpec:
     replicas: {{ .Values.prometheus.alertmanagerSpec.replicas }}

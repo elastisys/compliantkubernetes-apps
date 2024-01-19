@@ -101,8 +101,10 @@ tests:
         tests:
           - target: dev
           - target: prod
+          - target: air-gapped
 
       - function: test_init_idempotent # cloud flavor
         tests:
           - target: dev
           - target: prod
+          - target: air-gapped

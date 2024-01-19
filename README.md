@@ -127,13 +127,16 @@ Assuming you already have everything needed to install the apps, this is what yo
 
     ```bash
     export CK8S_ENVIRONMENT_NAME=my-ck8s-cluster
-    export CK8S_FLAVOR=[dev|prod] # defaults to dev
+    export CK8S_FLAVOR=[dev|prod|air-gapped] # defaults to dev
 
     #
     # If 'none', no infra provider tailored configuration will be performed!
     #
     export CK8S_CLOUD_PROVIDER=[exoscale|safespring|citycloud|elastx|aws|baremetal|none]
     ```
+
+    > [!NOTE]
+    > The `air-gapped` flavor has a lot of the same settings as the `prod` flavor but with some additional variables that you need to configure yourself (these are set to `set-me`).
 
 1. Then set the path to where the ck8s configuration should be stored and the PGP fingerprint of the key(s) to use for encryption:
 

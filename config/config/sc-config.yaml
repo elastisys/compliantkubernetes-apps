@@ -718,6 +718,15 @@ opensearch:
   defaultTemplates: true
   additionalTemplates: {}
 
+  plugins:
+    # in an air-gapped environment where the nodes are not connected to the Internet, set
+    # following variable to false to prevent downloading external object storage plugin
+    installExternalObjectStoragePlugin: true
+
+    # in an air-gapped environment this can be used to install plugins from known sources
+    additionalPlugins: []
+    # - server.local:8080/repository-s3-2.8.0.zip
+
   # Index state management
   ism:
     rolloverSizeGB: 1
@@ -1034,6 +1043,8 @@ alerts:
     #   {{ end }}
   opsGenie:
     apiUrl: https://api.eu.opsgenie.com
+  # Configure custom alert receivers
+  customReceivers: []
 
 externalTrafficPolicy:
   # Whitelisting requires externalTrafficPolicy.local to be true
