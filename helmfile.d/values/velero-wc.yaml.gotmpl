@@ -97,6 +97,18 @@ schedules:
         {{- with .Values.velero.excludedExtraNamespaces }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+      excludedResources:
+        - clustercompliancereports.aquasecurity.github.io
+        - clusterconfigauditreports.aquasecurity.github.io
+        - clusterinfraassessmentreports.aquasecurity.github.io
+        - clusterrbacassessmentreports.aquasecurity.github.io
+        - clustersbomreports.aquasecurity.github.io
+        - configauditreports.aquasecurity.github.io
+        - exposedsecretreports.aquasecurity.github.io
+        - infraassessmentreports.aquasecurity.github.io
+        - rbacassessmentreports.aquasecurity.github.io
+        - sbomreports.aquasecurity.github.io
+        - vulnerabilityreports.aquasecurity.github.io
       ttl: {{ .Values.velero.retentionPeriod }}
       labelSelector:
         matchExpressions:
