@@ -344,6 +344,36 @@ validate_version() {
 #       future.
 validate_config() {
     log_info "Validating $1 config"
+
+    check_conditionals() {
+        merged_config="${1}"
+        template_config="${2}"
+
+        # Loop all lines in ${template_config} and checks if same option has conditional set-me in ${merged_config}
+        options=$(yq_read_block "${template_config}" "set-me-if-*")
+        maybe_exit="false"
+        for opt in ${options}; do
+            opt_value=$(yq4 "${opt}" "${merged_config}")
+            opt_value_no_list=$(echo "${opt_value}" | yq4 "[.] | flatten | .[0]")
+
+            if echo "${opt_value_no_list}" | grep -Pq "^set-me-if-.*$"; then
+                required_condition=$(echo "${opt_value_no_list}" | sed -rn 's/^set-me-if-(.*)/\1/p')
+                if [[ $(yq4 "${required_condition}" "${merged_config}") == "true" ]]; then
+                    # If the option is a list, set the first element in the list
+                    if [[ $(yq4 "${opt} | tag" "${merged_config}") == "!!seq" ]]; then
+                        yq4 "${opt}[0] = \"set-me\"" -i "${merged_config}"
+                        yq4 "${opt}[0] = \"set-me\"" -i "${template_config}"
+                        log_info "Set-me condition matched for ${opt}"
+                    else
+                        yq4 "${opt} = \"set-me\"" -i "${merged_config}"
+                        yq4 "${opt} = \"set-me\"" -i "${template_config}"
+                        log_info "Set-me condition matched for ${opt}"
+                    fi
+                fi
+            fi
+        done
+    }
+
     validate() {
         merged_config="${1}"
         template_config="${2}"
@@ -397,8 +427,10 @@ validate_config() {
         yq_merge "${config_template_path}/common-config.yaml" \
             "${config_template_path}/sc-config.yaml" \
             > "${template_file}"
+        check_conditionals "${config[config_file_sc]}" "${template_file}"
         validate "${config[config_file_sc]}" "${template_file}"
         schema_validate "${config[config_file_sc]}" "${config_template_path}/schemas/config.yaml"
+        check_conditionals "${secrets[secrets_file]}" "${config_template_path}/secrets.yaml"
         validate "${secrets[secrets_file]}" "${config_template_path}/secrets.yaml"
         schema_validate "${secrets[secrets_file]}" "${config_template_path}/schemas/secrets.yaml"
     elif [[ $1 == "wc" ]]; then
@@ -408,8 +440,10 @@ validate_config() {
         yq_merge "${config_template_path}/common-config.yaml" \
             "${config_template_path}/wc-config.yaml" \
             > "${template_file}"
+        check_conditionals "${config[config_file_wc]}" "${template_file}"
         validate "${config[config_file_wc]}" "${template_file}"
         schema_validate "${config[config_file_wc]}" "${config_template_path}/schemas/config.yaml"
+        check_conditionals "${secrets[secrets_file]}" "${config_template_path}/secrets.yaml"
         validate "${secrets[secrets_file]}" "${config_template_path}/secrets.yaml"
         schema_validate "${secrets[secrets_file]}" "${config_template_path}/schemas/secrets.yaml"
     else
