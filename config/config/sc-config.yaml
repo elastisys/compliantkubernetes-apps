@@ -1097,9 +1097,9 @@ alerts:
   opsGenieHeartbeat:
     enabled: false
     url: https://api.eu.opsgenie.com/v2/heartbeats
-    name: set-me-if-enabled
+    name: set-me-if-(.alerts.opsGenieHeartbeat.enabled)
   slack:
-    channel: set-me-if-enabled
+    channel: set-me-if-(.alerts.alertTo == "slack")
     # Alertmanager templating: https://prometheus.io/docs/alerting/notifications/
     customTemplate: {}
     ## Example:
@@ -1182,7 +1182,7 @@ networkPolicies:
   global:
     objectStorageSwift:
       ips:
-        - "set-me-if-enabled"
+        - set-me-if-(.harbor.persistence.type == "swift")
       ports:
         - 5000
     scApiserver:
@@ -1199,12 +1199,12 @@ networkPolicies:
     # For replication, added to core and jobservice
     registries:
       ips:
-        - "set-me"
+        - set-me-if-(.harbor.enabled and .networkPolicies.harbor.enabled)
       ports:
         - 443
     jobservice:
       ips:
-        - "set-me"
+        - set-me-if-(.harbor.enabled and .networkPolicies.harbor.enabled)
       ports:
         - 443
     database:
@@ -1244,7 +1244,7 @@ networkPolicies:
     trivy:
       # IP to trivy vulnerability database
       ips:
-        - "set-me"
+        - set-me-if-(.harbor.enabled and .networkPolicies.harbor.enabled)
       ports:
         - 443
   monitoring:
@@ -1254,9 +1254,9 @@ networkPolicies:
       externalDataSources:
         enabled: false
         ips:
-          - "set-me-if-externalDataSources.enabled"
+          - set-me-if-(.networkPolicies.monitoring.enabled and .networkPolicies.monitoring.externalDataSources.enabled)
         ports:
-          - "set-me-if-externalDataSources.enabled"
+          - set-me-if-(.networkPolicies.monitoring.enabled and .networkPolicies.monitoring.externalDataSources.enabled)
       # loading dashboards from grafana website
       externalDashboardProvider:
         ips:
@@ -1270,7 +1270,7 @@ networkPolicies:
     enabled: true
     plugins:
       ips:
-        - "set-me"
+        - set-me-if-(.networkPolicies.opensearch.enabled)
       ports:
         - 443
 
@@ -1283,20 +1283,19 @@ networkPolicies:
     sync:
       objectStorage:
         ips:
-          - set-me-if-objectStorage.sync.enabled
+          - set-me-if-(.objectStorage.sync.enabled and .objectStorage.type == "s3")
         ports:
           - 443
       objectStorageSwift:
         ips:
-          - set-me-if-objectStorage.sync.enabled-and-any-target-use-swift-as-destination
+          - set-me-if-(.objectStorage.sync.enabled and (.objectStorage.type == "swift" or .harbor.persistence.type == "swift" or .thanos.objectStorage.type == "swift"))
         ports:
           - 5000
       secondaryUrl:
         ips:
-          - set-me-if-objectStorage.sync.secondaryUrl-has-an-url
+          - set-me-if-(.objectStorage.sync.secondaryUrl != null and .objectStorage.sync.secondaryUrl != "")
         ports:
           - 443
-
   s3Exporter:
     enabled: true
 
@@ -1310,13 +1309,14 @@ networkPolicies:
 
   ingressNginx:
     ingressOverride:
-      ips: set-me-if-enabled
+      ips:
+        - set-me-if-(.networkPolicies.ingressNginx.ingressOverride.enabled)
   dex:
     enabled: true
     # Ip to connector, e.g. Google, LDAP, ...
     connectors:
       ips:
-        - "set-me"
+        - set-me-if-(.networkPolicies.dex.enabled)
       ports:
         - 443
 

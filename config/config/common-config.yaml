@@ -583,7 +583,7 @@ ingressNginx:
 
       ## Type of service.
       ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
-      type: set-me
+      type: set-me-if-(.ingressNginx.controller.service.enabled)
 
       ## Annotations to add to service
       ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
@@ -670,7 +670,7 @@ issuers:
     enabled: true
     prod:
       ## Mail through which letsencrypt can contact you.
-      email: set-me
+      email: set-me-if-(.issuers.letsencrypt.enabled)
       ## Solvers, sets a default http01 when empty.
       solvers: []
       # - selector:
@@ -687,7 +687,7 @@ issuers:
       #         key: secretKey
     staging:
       ## Mail through which letsencrypt can contact you.
-      email: set-me
+      email: set-me-if-(.issuers.letsencrypt.enabled)
       ## Solvers, sets a default http01 when empty.
       solvers: []
 
@@ -1024,14 +1024,14 @@ networkPolicies:
     ingressUsingHostNetwork: set-me
     trivy:
       ips:
-        - set-me
+        - set-me-if-(.trivy.enabled)
       port: 443
 
   kured:
     enabled: true
     notificationSlack:
       ips:
-        - set-me-if-kured.notification.slack.enabled
+        - set-me-if-(.kured.enabled and .kured.notification.slack.enabled)
       ports:
         - 443
 
@@ -1043,7 +1043,7 @@ networkPolicies:
     # letsencrypt ip addresses
     letsencrypt:
       ips:
-        - set-me
+        - set-me-if-(.networkPolicies.certManager.enabled)
     # Configure this if DNS-01 challenges are enabled in cert-manager
     dns01:
       ips: []
@@ -1057,7 +1057,7 @@ networkPolicies:
     enabled: true
     plugins:
       ips:
-        - set-me
+        - set-me-if-(.falco.enabled and .networkPolicies.falco.enabled)
       ports:
         - 443
 
@@ -1089,7 +1089,7 @@ networkPolicies:
     enabled: true
     externalDns:
       ips:
-        - set-me
+        - set-me-if-(.networkPolicies.coredns.enabled)
     serviceIp:
       ips: set-me
 
