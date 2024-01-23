@@ -133,7 +133,9 @@ helmfile -e service_cluster destroy
 helmfile -e workload_cluster destroy
 # might need two tries if the first fails due to webhooks
 
-kubectl delete pvc --all
+helmfile -e local_cluster destroy
+
+kubectl delete pvc --all -A
 
 ./scripts/local-cluster.sh delete <name>
 ```
