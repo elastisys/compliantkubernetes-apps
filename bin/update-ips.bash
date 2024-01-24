@@ -274,7 +274,7 @@ parse_url_host() {
 
 # Parse the port from an URL.
 #
-# Usage: parse_url_port <url>
+# Usage: parse_url_port <url> <config_option>
 parse_url_port() {
   port="$(echo "${1}" | sed 's/https\?:\/\///' | sed 's/[A-Za-z.0-9-]*:\?//' | sed 's/\/.*//')"
   [ -n "${port}" ] && echo "${port}" && return
@@ -282,7 +282,7 @@ parse_url_port() {
     http://*) echo 80 ;;
     https://*) echo 443 ;;
     *)
-      log_error "Could not determine default port for: ${1}"
+      log_error "Could not determine default port for ${2}, missing protocol: ${1}"
       exit 1
     ;;
   esac
@@ -405,7 +405,7 @@ allow_object_storage() {
   local port
   url=$(yq_read "${cluster}" '.objectStorage.s3.regionEndpoint' "")
   host=$(parse_url_host "${url}")
-  port=$(parse_url_port "${url}")
+  port=$(parse_url_port "${url}" '.objectStorage.s3.regionEndpoint')
 
   allow_host "${config["override_common"]}" '.networkPolicies.global.objectStorage.ips' "${host}"
   allow_ports "${config["override_common"]}" '.networkPolicies.global.objectStorage.ports' "${port}"
@@ -448,7 +448,7 @@ sync_swift() {
   local os_auth_host
   local os_auth_port
   os_auth_host=$(parse_url_host "${os_auth_url}")
-  os_auth_port=$(parse_url_port "${os_auth_url}")
+  os_auth_port=$(parse_url_port "${os_auth_url}" "${swift_config_option}.authUrl")
 
   local -a object_storage_swift_ips
   local -a object_storage_swift_ports
@@ -462,7 +462,7 @@ sync_swift() {
   local swift_port
   swift_url="$(get_swift_url "${swift_config_option}")"
   swift_host=$(parse_url_host "${swift_url}")
-  swift_port=$(parse_url_port "${swift_url}")
+  swift_port=$(parse_url_port "${swift_url}" "${swift_config_option}")
 
   # shellcheck disable=SC2207
   object_storage_swift_ips+=($(get_dns_ips "${swift_host}"))
@@ -493,7 +493,7 @@ sync_rclone() {
   local host
   local port
   host=$(parse_url_host "${url}")
-  port=$(parse_url_port "${url}")
+  port=$(parse_url_port "${url}" "${endpoint_config_option}")
 
   allow_domain "${config["override_sc"]}" "${netpol_config_option}.ips" "${host}"
   allow_ports "${config["override_sc"]}" "${netpol_config_option}.ports" "${port}"
