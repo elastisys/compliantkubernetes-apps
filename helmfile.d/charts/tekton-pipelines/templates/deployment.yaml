@@ -65,7 +65,7 @@ spec:
       serviceAccountName: {{ include "tektonPipelines.fullname" . }}-controller
       containers:
         - name: tekton-pipelines-controller
-          image: {{ .Values.controller.tektonPipelinesController.image.repository }}:{{ .Values.controller.tektonPipelinesController.image.tag| default .Chart.AppVersion }}
+          image: {{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag| default .Chart.AppVersion }}
           args: [
             # These images are built on-demand by `ko resolve` and are replaced
             # by image references by digest.
@@ -89,7 +89,7 @@ spec:
             - name: verification-secrets
               mountPath: /etc/verification-secrets
               readOnly: true
-          {{- with .Values.controller.tektonPipelinesController.resources }}
+          {{- with .Values.controller.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -243,10 +243,10 @@ spec:
         - name: webhook
           # This is the Go import path for the binary that is containerized
           # and substituted here.
-          image: {{ .Values.webhook.webhook.image.repository }}:{{ .Values.webhook.webhook.image.tag | default .Chart.AppVersion }}
+          image: {{ .Values.webhook.image.repository }}:{{ .Values.webhook.image.tag | default .Chart.AppVersion }}
 
           # Resource request required for autoscaler to take any action for a metric
-          {{- with .Values.webhook.webhook.resources }}
+          {{- with .Values.webhook.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}

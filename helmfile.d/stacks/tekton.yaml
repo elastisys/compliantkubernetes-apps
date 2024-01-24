@@ -1,65 +1,15 @@
 ---
 templates:
-  tekton:
+  tekton-pipelines:
+    condition: ck8sManagementCluster.enabled
+    name: tekton-pipelines
+    chart: charts/tekton-pipelines
+    installed: {{ .Values | get "tektonPipelines.enabled" false }}
+    version: 0.1.0
+    namespace: tekton-pipelines
     labels:
       app: tekton
-    condition: ck8sManagementCluster.enabled
-    namespace: tekton-pipelines
     needs:
       - kube-system/admin-namespaces
-
-  tekton-rbac:
-    name: tekton-rbac
-    namespace: kube-system
-    labels:
-      app: tekton
-    chart: charts/tekton/tekton-rbac
-    version: 0.1.0
-    installed: {{ .Values | get "tekton.enabled" false }}
     values:
-    {{- if .Values | get "ck8sManagementCluster.enabled" false }}
-      - values/tekton/tekton-sc.gotmpl
-    {{- else if .Values | get "ck8sWorkloadCluster.enabled" false }}
-      - values/tekton/tekton-wc.gotmpl
-    {{- end  }}
-
-  tekton-pipelines:
-    inherit:
-      - template: tekton
-    name: tekton-pipelines
-    chart: charts/tekton/tekton-pipelines
-    installed: {{ and (.Values | get "tekton.enabled" false) (.Values | get "tekton.components.pipelines.enabled" false) }}
-    version: 0.1.0
-    values:
-      - values/tekton/tekton-sc.gotmpl
-
-  tekton-dashboard:
-    inherit:
-      - template: tekton
-    name: tekton-dashboard
-    chart: charts/tekton/tekton-dashboard
-    version: 0.2.2
-    installed: {{ and (.Values | get "tekton.enabled" false) (.Values | get "tekton.components.dashboard.enabled" false) }}
-    values:
-      - values/tekton/tekton-sc.gotmpl
-
-  tekton-triggers:
-    inherit:
-      - template: tekton
-    name: tekton-triggers
-    chart: charts/tekton/tekton-triggers
-    version: 0.1.0
-    disableValidation: true
-    installed: {{ and (.Values | get "tekton.enabled" false) (.Values | get "tekton.components.triggers.enabled" false) }}
-    values:
-      - values/tekton/tekton-sc.gotmpl
-
-  tekton-chains:
-    inherit:
-      - template: tekton
-    name: tekton-chains
-    chart: charts/tekton/tekton-chains
-    version: 0.1.0
-    installed: {{ and (.Values | get "tekton.enabled" false) (.Values | get "tekton.components.chains.enabled" false) }}
-    values:
-      - values/tekton/tekton-sc.gotmpl
+      - values/tekton.gotmpl

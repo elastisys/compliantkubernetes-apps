@@ -1242,18 +1242,5 @@ networkPolicies:
         - 443
 
 # Tekton Configuration
-tekton:
-  components:
-    pipelines:
-      enabled: false
-    dashboard:
-      enabled: false
-    triggers:
-      enabled: false
-    chains:
-      enabled: false
-  serviceAccount:
-    name: tekton-service
-    clusterAdmin: false
-  imagePullSecrets:
-    - name: pull-secret
+tektonPipelines:
+  enabled: false

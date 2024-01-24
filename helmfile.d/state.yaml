@@ -155,8 +155,4 @@ releases:
   - inherit: [ template: opensearch-curator ]
   - inherit: [ template: opensearch-exporter ]
 
-  - inherit: [ template: tekton-rbac ]
   - inherit: [ template: tekton-pipelines ]
-  - inherit: [ template: tekton-dashboard ]
-  - inherit: [ template: tekton-triggers ]
-  - inherit: [ template: tekton-chains ]
