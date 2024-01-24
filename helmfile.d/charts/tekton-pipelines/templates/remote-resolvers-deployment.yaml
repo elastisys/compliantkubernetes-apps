@@ -13,7 +13,7 @@ metadata:
     # labels below are related to istio and should not be used for resource lookup
     version: "v0.45.0"
 spec:
-  replicas: 1
+  replicas: {{ .Values.remoteResolvers.replicas }}
   selector:
     matchLabels:
       app.kubernetes.io/name: resolvers
@@ -50,13 +50,10 @@ spec:
       containers:
         - name: controller
           image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/resolvers:v0.45.0@sha256:5bd5240ccd89e0b81796aa8b8bbb4feb2162e63dda1cb0a95e315c9fadeb7ec8
+          {{- with .Values.remoteResolvers.resources }}
           resources:
-            requests:
-              cpu: 100m
-              memory: 100Mi
-            limits:
-              cpu: 1000m
-              memory: 1Gi
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           ports:
             - name: metrics
               containerPort: 9090

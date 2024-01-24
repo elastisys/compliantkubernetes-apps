@@ -45,7 +45,7 @@ metadata:
     version: "v0.45.0"
   {{- include "tektonPipelines.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.webhook.type }}
+  type: ClusterIP
   selector:
     app.kubernetes.io/component: webhook
     app.kubernetes.io/instance: default
@@ -53,4 +53,15 @@ spec:
     app.kubernetes.io/part-of: tekton-pipelines
   {{- include "tektonPipelines.selectorLabels" . | nindent 4 }}
   ports:
-  {{- .Values.webhook.ports | toYaml | nindent 2 -}}
+  - name: http-metrics
+    port: 9090
+    targetPort: 9090
+  - name: http-profiling
+    port: 8008
+    targetPort: 8008
+  - name: https-webhook
+    port: 443
+    targetPort: 8443
+  - name: probes
+    port: 8080
+    targetPort: 8080

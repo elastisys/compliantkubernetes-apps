@@ -13,7 +13,7 @@ metadata:
     version: v0.45.0
   {{- include "tektonPipelines.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.controller.type }}
+  type: ClusterIP
   selector:
     app.kubernetes.io/component: controller
     app.kubernetes.io/instance: default
@@ -21,4 +21,13 @@ spec:
     app.kubernetes.io/part-of: tekton-pipelines
   {{- include "tektonPipelines.selectorLabels" . | nindent 4 }}
   ports:
-  {{- .Values.controller.ports | toYaml | nindent 2 -}}
+  - name: http-metrics
+    port: 9090
+    protocol: TCP
+    targetPort: 9090
+  - name: http-profiling
+    port: 8008
+    targetPort: 8008
+  - name: probes
+    port: 8080
+    targetPort: 8080
