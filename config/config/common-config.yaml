@@ -379,7 +379,7 @@ prometheus:
   affinity: {}
   nodeSelector: {}
   webhookAlerts:
-    enabled: false
+    enabled: true
   ## Predictive alert if the resource usage will hit the set percentage in 3 days
   capacityManagementAlerts:
     enabled: true
