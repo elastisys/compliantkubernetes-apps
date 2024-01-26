@@ -198,18 +198,3 @@ remoteResolvers:
 
 alerts:
   evaluateThanos: {{ .Values.thanos.enabled }}
-
-featureFlags:
-  disableAffinityAssistant: "false"
-  disableCredsInit: "false"
-  awaitSidecarReadiness: "true"
-  runningInEnvironmentWithInjectedSidecars: "true"
-  requireGitSshSecretKnownHosts: "false"
-  enableTektonOciBundles: "false"
-  enableApiFields: stable
-  sendCloudeventsForRuns: "false"
-  resourceVerificationMode: "skip"
-  enableProvenanceInStatus: "false"
-  customTaskVersion: "v1beta1"
-  enforeNonFalsiablity: "none"
-kubernetesClusterDomain: cluster.local
