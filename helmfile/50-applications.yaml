@@ -208,7 +208,7 @@ releases:
   values:
   - values/dex.yaml.gotmpl
 
-- name: sc-servicemonitor
+# - name: sc-servicemonitor
   namespace: monitoring
   labels:
     app: prometheus-servicemonitor
@@ -218,7 +218,7 @@ releases:
   values:
   - values/sc-servicemonitor.yaml.gotmpl
 
-# prometheus sc-alerts
+# # prometheus sc-alerts
 - name: sc-alerts
   namespace: monitoring
   labels:
@@ -229,7 +229,7 @@ releases:
   values:
   - values/prometheus-alerts-sc.yaml.gotmpl
 
-# grafana dashboards
+# # grafana dashboards
 - name: grafana-dashboards
   namespace: monitoring
   labels:
@@ -436,7 +436,7 @@ releases:
   values:
   - values/prometheus-opensearch-exporter.yaml.gotmpl
 
-# Harbor
+#Harbor
 - name: harbor-certs
   namespace: harbor
   labels:
@@ -534,7 +534,7 @@ releases:
   values:
   - values/thanos/ruler.yaml.gotmpl
 
-- name: s3-exporter
+# - name: s3-exporter
   namespace: monitoring
   labels:
     app: s3-exporter
@@ -567,16 +567,16 @@ releases:
   - values/fluentd/forwarder-service-cluster.yaml.gotmpl
 
 # Logs backup retention
-# - name: log-manager
-#   namespace: fluentd-system
-#   labels:
-#     app: fluentd
-#     component: log-manager
-#   chart: ./charts/log-manager
-#   version: 0.1.0
-#   installed: {{ .Values.fluentd.enabled }}
-#   values:
-#   - values/fluentd/log-manager.yaml.gotmpl
+- name: log-manager
+  namespace: fluentd-system
+  labels:
+    app: fluentd
+    component: log-manager
+  chart: ./charts/log-manager
+  version: 0.1.0
+  installed: {{ .Values.fluentd.enabled }}
+  values:
+  - values/fluentd/log-manager.yaml.gotmpl
 
 - name: rclone-sync
   namespace: rclone
@@ -724,14 +724,14 @@ releases:
 # prometheus user-alerts
 # We should split this into two releases one for the record rules and alert rules, we are dependent on the record rules
 # being evaluated on the workload cluster for our alerts.
-- name: ck8s-alerts
-  namespace: monitoring
-  labels:
-    app: prometheus-alerts
-  chart: ./charts/prometheus-alerts
-  version: 0.1.1
-  values:
-  - values/prometheus-user-alerts-wc.yaml.gotmpl
+# - name: ck8s-alerts
+#   namespace: monitoring
+#   labels:
+#     app: prometheus-alerts
+#   chart: ./charts/prometheus-alerts
+#   version: 0.1.1
+#   values:
+#   - values/prometheus-user-alerts-wc.yaml.gotmpl
 
 # kube apiserver metrics ingress
 - name: kubeapi-metrics

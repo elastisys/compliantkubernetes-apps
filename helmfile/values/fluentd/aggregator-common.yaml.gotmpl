@@ -11,8 +11,6 @@ metrics:
 
 forwarder:
   enabled: false
-  extraGems:
-    - fluent-plugin-azure-storage-append-blob
 
 extraDeploy:
   - apiVersion: v1
@@ -25,15 +23,22 @@ extraDeploy:
       AWS_ACCESS_KEY_ID: {{ .Values.objectStorage.s3.accessKey }}
       AWS_ACCESS_SECRET_KEY: {{ .Values.objectStorage.s3.secretKey }}
       {{- else if eq .Values.objectStorage.type "azure" }}
-      AZURE_STORAGE_ACCOUNT: {{ .Values.objectStorage.azure.sclogsaccountName }}
-      AZURE_STORAGE_ACCESS_KEY: {{ .Values.objectStorage.azure.sclogsaccountKey }}
+      STORAGE_ACCOUNT: {{ .Values.objectStorage.azure.sclogsaccountName }}
+      STORAGE_ACCESS_KEY: {{ .Values.objectStorage.azure.sclogsaccountKey }}
       {{- end }}
 
+image:
+  registry: harbor.long-running.dev-ck8s.com
+  repository: azfluentd/fluentd
+  tag: v2
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: Always
 
 aggregator:
   replicaCount: 1
-  extraGems:
-    - fluent-plugin-azure-storage-append-blob
 
   resources:    {{- toYaml .Values.fluentd.aggregator.resources | nindent 4  }}
   nodeSelector: {{- toYaml .Values.fluentd.aggregator.nodeSelector | nindent 4  }}
@@ -158,12 +163,13 @@ aggregator:
 
       force_path_style {{ .Values.objectStorage.s3.forcePathStyle }}
       {{- else if eq .Values.objectStorage.type "azure" }}
-      @type azure_storage_append_blob
+      @type azure-storage-append-blob
 
       azure_storage_account {{ .Values.objectStorage.azure.sclogsaccountName }}
       azure_storage_access_key {{ .Values.objectStorage.azure.sclogsaccountKey }}
       path logs/${tag}/%Y%m%d/
       azure_container_name {{ .Values.objectStorage.azure.sclogscontainerName }}
+      azure_container {{ .Values.objectStorage.azure.sclogscontainerName }}
       auto_create_container true
       buffer_type file
       buffer_path /var/log/fluent/azureblob/
@@ -187,7 +193,9 @@ aggregator:
           {{- if eq .Values.objectStorage.type "s3" }}
           s3_bucket {{ .Values.objectStorage.buckets.audit }}
           {{- else if eq .Values.objectStorage.type "azure" }}
-          azure_container {{ .Values.objectStorage.azure.sclogscontainerName }}
+          azure_storage_account {{ .Values.objectStorage.azure.sclogsaccountName }}
+          azure_storage_access_key {{ .Values.objectStorage.azure.sclogsaccountKey }}
+          azure_container {{ .Values.objectStorage.azure.auditcontainerName }}
           {{- end }}
           path {{ .Values.global.clusterName }}/%Y%m%d/${tag}/
 

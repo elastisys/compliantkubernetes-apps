@@ -1,8 +1,3 @@
-s3:
-  forcePathStyle: {{ .Values.objectStorage.s3.forcePathStyle }}
-  regionEndpoint: {{ .Values.objectStorage.s3.regionEndpoint }}
-  accessKey: {{ .Values.objectStorage.s3.accessKey }}
-  secretKey: {{ .Values.objectStorage.s3.secretKey }}
 
 instances:
   {{- if .Values.fluentd.audit.enabled }}

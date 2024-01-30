@@ -99,19 +99,23 @@ controller:
     ## Ref: https://kubernetes.io/docs/tutorials/services/source-ip/#source-ip-for-services-with-typeloadbalancer
     ## Required for IP whitelisting
     externalTrafficPolicy: "Local"
-    allocateLoadBalancerNodePorts: false
     {{ end }}
     {{ if .Values.ingressNginx.controller.service.enabled }}
     enabled: true
     type: {{ .Values.ingressNginx.controller.service.type }}
     annotations: {{- toYaml .Values.ingressNginx.controller.service.annotations | nindent 6 }}
     loadBalancerSourceRanges: {{- toYaml .Values.ingressNginx.controller.service.loadBalancerSourceRanges | nindent 6 }}
+    allocateLoadBalancerNodePorts: false
+    externalTrafficPolicy: Local
     {{ else }}
     enabled: false
     {{ end }}
     {{ if eq .Values.ingressNginx.controller.service.type "NodePort" }}
     nodePorts: {{- toYaml .Values.ingressNginx.controller.service.nodePorts | nindent 6 }}
     {{ end }}
+    {{- with .Values | get "ingressNginx.controller.service.clusterIP" "" }}
+    clusterIP: {{ . }}
+    {{- end }}
 
   metrics:
     enabled: true

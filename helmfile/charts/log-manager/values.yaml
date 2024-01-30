@@ -3,15 +3,15 @@ nameOverride: ""
 
 imagePullSecrets: []
 image:
-  pullPolicy: IfNotPresent
-  repository: ghcr.io/elastisys/compliantkubernetes-apps-log-manager
-  tag: ""
+  pullPolicy: Always
+  repository: harbor.long-running.dev-ck8s.com/azlogmanager/logmanager
+  tag: v1
 
-s3:
-  forcePathStyle: false
-  regionEndpoint: set-me
-  accessKey: set-me
-  secretKey: set-me
+# s3:
+#   forcePathStyle: false
+#   regionEndpoint: set-me
+#   accessKey: set-me
+#   secretKey: set-me
 
 instances:
   - bucket: set-me

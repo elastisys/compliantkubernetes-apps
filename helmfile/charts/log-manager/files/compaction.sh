@@ -2,9 +2,15 @@
 
 set -euo pipefail
 
-: "${S3_CONFIG:?Missing S3_CONFIG}"
-: "${S3_BUCKET:?Missing S3_BUCKET}"
-: "${S3_PREFIX:?Missing S3_PREFIX}"
+# S3 configuration
+# : "${S3_CONFIG:?Missing S3_CONFIG}"
+# : "${S3_BUCKET:?Missing S3_BUCKET}"
+# : "${S3_PREFIX:?Missing S3_PREFIX}"
+
+# Azure Blob configuration
+: "${AZURE_STORAGE_CONNECTION_STRING:?Missing AZURE_STORAGE_CONNECTION_STRING}"
+: "${AZURE_CONTAINER_NAME:?Missing AZURE_CONTAINER_NAME}"
+: "${AZURE_PREFIX:?Missing AZURE_PREFIX}"
 
 # Days to compact
 : "${COMPACT_DAYS:?Missing COMPACT_DAYS}"
@@ -21,6 +27,7 @@ SORT_TMP="${TMP_DIR}/sort"
 mkdir -p "$LM_TMP"
 mkdir -p "$SORT_TMP"
 
+# Definte functions for the S3 operations
 s3_list_days() {
   s3cmd --config "$S3_CONFIG" ls "s3://$S3_BUCKET/$S3_PREFIX/" | grep 'DIR' | awk '{print $2}' | sed "s#s3://$S3_BUCKET/$S3_PREFIX/##" | sed 's#/$##'
 }
@@ -57,11 +64,51 @@ s3_rm_chunks() {
   xargs -n1000 s3cmd --config "$S3_CONFIG" rm < "$CHUNK_LIST" > /dev/null
 }
 
+# Define functions for Azure operations
+azure_list_days() {
+    az storage blob directory list --container-name "$AZURE_CONTAINER_NAME" --directory-path "$AZURE_PREFIX" --prefix "$AZURE_PREFIX/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | awk '{print $1}'
+}
+
+azure_list_indices() {
+    AZURE_PATH="$1"
+    az storage blob directory list --container-name "$AZURE_CONTAINER_NAME"  --directory-path "$AZURE_PREFIX" --prefix "${AZURE_PREFIX}/${AZURE_PATH}/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | awk '{print $1}'
+}
+
+azure_list_chunks() {
+    AZURE_PATH="$1"
+    az storage blob list --container-name "$AZURE_CONTAINER_NAME" --prefix "${AZURE_PREFIX}/${AZURE_PATH}/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | grep '\.gz\|\.zst' | awk '{print $1}'
+}
+
+azure_get_chunks() {
+    AZURE_PATH="$1"
+    CHUNK_DIR="$2"
+    az storage blob download-batch -d "$CHUNK_DIR" --pattern '*.gz' --pattern '*.zst' --source "${AZURE_CONTAINER_NAME}/${AZURE_PREFIX}/${AZURE_PATH}" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" > /dev/null
+}
+
+azure_put_chunk() {
+    AZURE_PATH="$1"
+    CHUNK_FILE="$2"
+    az storage blob upload --file "$CHUNK_FILE" --container-name "$AZURE_CONTAINER_NAME" --name "${AZURE_PREFIX}/${AZURE_PATH}/$(basename "$CHUNK_FILE")" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" > /dev/null
+}
+
+azure_rm_chunks() {
+    CHUNK_LIST="$1"
+    while IFS= read -r line; do
+        az storage blob delete --container-name "$AZURE_CONTAINER_NAME" --name "${AZURE_PREFIX}/${line}" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" > /dev/null
+    done < "$CHUNK_LIST"
+}
+
+# Update merge_chunks function to support Azure Blob
 merge_chunks() {
   DAY="$1"
 
-  INDICES="$(s3_list_indices "$DAY")"
-  CHUNKS="$(s3_list_chunks "$DAY")"
+  if [ "$STORAGE_SERVICE" = "azure" ]; then
+    INDICES="$(azure_list_indices "$DAY")"
+    CHUNKS="$(azure_list_chunks "$DAY")"
+  else
+    INDICES="$(s3_list_indices "$DAY")"
+    CHUNKS="$(s3_list_chunks "$DAY")"
+  fi
 
   for INDEX in $INDICES; do
     if [ "$(echo "$CHUNKS" | grep -c "$INDEX")" -lt 2 ]; then
@@ -71,7 +118,11 @@ merge_chunks() {
     echo "--- merging chunks in $DAY/$INDEX"
 
     echo "----- fetching chunks"
-    s3_get_chunks "$DAY/$INDEX" "$LM_TMP"
+    if [ "$STORAGE_SERVICE" = "azure" ]; then
+      azure_get_chunks "$DAY/$INDEX" "$LM_TMP"
+    else
+      s3_get_chunks "$DAY/$INDEX" "$LM_TMP"
+    fi
 
     TMPFILE="$(printf "%s/%s/%s-%05d" "$LM_TMP" "$INDEX" "$NOW" "$SEQ")"
     touch "$TMPFILE.idx"
@@ -83,18 +134,30 @@ merge_chunks() {
         continue
       fi
 
-      echo "s3://$S3_BUCKET/$S3_PREFIX/$DAY/${FILE/$LM_TMP\//}" >> "$TMPFILE.idx"
+      if [ "$STORAGE_SERVICE" = "azure" ]; then
+        echo "azure://${AZURE_CONTAINER_NAME}/${AZURE_PREFIX}/${DAY}/${FILE/$LM_TMP\//}" >> "$TMPFILE.idx"
+      else
+        echo "s3://$S3_BUCKET/$S3_PREFIX/$DAY/${FILE/$LM_TMP\//}" >> "$TMPFILE.idx"
+      fi
 
       zstd --rm -c -d "$FILE"
     done | sort --compress-program=zstd --temporary-directory="$SORT_TMP" -u -S 100M | zstd -o "$TMPFILE.zst"
 
     echo "----- uploading chunk"
-    s3_put_chunk "$DAY/$INDEX" "$TMPFILE.zst"
+    if [ "$STORAGE_SERVICE" = "azure" ]; then
+      azure_put_chunk "$DAY/$INDEX" "$TMPFILE.zst"
+    else
+      s3_put_chunk "$DAY/$INDEX" "$TMPFILE.zst"
+    fi
 
     rm "$TMPFILE.zst"
 
     echo "----- clearing chunks"
-    s3_rm_chunks "$TMPFILE.idx"
+    if [ "$STORAGE_SERVICE" = "azure" ]; then
+      azure_rm_chunks "$TMPFILE.idx"
+    else
+      s3_rm_chunks "$TMPFILE.idx"
+    fi
 
     rm "$TMPFILE.idx"
 
@@ -105,12 +168,21 @@ merge_chunks() {
   done
 }
 
-for DAY in $(s3_list_days); do
-  if [[ "$DAY" > "$LIMIT" ]]; then
-    echo "- day: $DAY -----"
-    merge_chunks "$DAY"
-  fi
-done
+if [[ "$STORAGE_SERVICE" == "azure" ]]; then
+ for DAY in $(azure_list_days); do
+   if [[ "$DAY" > "$LIMIT" ]]; then
+     echo "- day: $DAY -----"
+     merge_chunks "$DAY"
+   fi
+ done
+else
+ for DAY in $(s3_list_days); do
+   if [[ "$DAY" > "$LIMIT" ]]; then
+     echo "- day: $DAY -----"
+     merge_chunks "$DAY"
+   fi
+ done
+fi 
 
 echo "---"
 echo "end"

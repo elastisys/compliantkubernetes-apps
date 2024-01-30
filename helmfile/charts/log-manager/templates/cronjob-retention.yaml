@@ -38,6 +38,14 @@ spec:
                   value: {{ .prefix }}
                 - name: RETAIN_DAYS
                   value: {{ .retention.days | quote }}
+                - name: AZURE_STORAGE_CONNECTION_STRING
+                  value: "DefaultEndpointsProtocol=https;AccountName=azureck8sclustersclogs;AccountKey=XXXXXXXXXXXXXXXXXXXXXXXXXXXX;EndpointSuffix=core.windows.net"
+                - name: AZURE_CONTAINER_NAME
+                  value: sclogscontainer
+                - name: AZURE_PREFIX
+                  value: logs
+                - name: STORAGE_SERVICE
+                  value: azure
               {{- with $.Values.securityContext }}
               securityContext: {{- toYaml . | nindent 16 }}
               {{- end }}
