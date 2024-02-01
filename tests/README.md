@@ -211,6 +211,14 @@ Any `clusters`, `namespaces` and `function` fields overwrites the previously set
 Any `target` field will case tests to be emitted for each cluster and namespace combo, skipping the `tests` fields in the same spec.
 Arguments starting with a `.` are treated as an expression and evaluated during runtime against the config.
 
+### Writing resource tests
+
+Some tests need pregenerated resources that are used as the assertion during tests.
+
+To regenerate these resources export `CK8S_TESTS_REGENERATE_RESOURCES="true"` and run tests with the `resources` tag.
+
+When writing tests that uses resources that may change ensure that the tests can regenerate their resources when this variable is set.
+
 ## Regression tests
 
 Whenever a bug is fixed there should be an associated regression test written to ensure that the bug will not resurface.

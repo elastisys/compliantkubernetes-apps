@@ -196,10 +196,16 @@ _configure_maximal() {
   yq_set sc .objectStorage.sync.secondaryUrl '"https://s3.foo.dev-ck8s.com:1234"'
 }
 
+# bats test_tags=resources
 @test "update-ips - maximal run full diff" {
   update_ips.mock_maximal
 
   _configure_maximal
+
+  if [[ "${CK8S_TESTS_REGENERATE_RESOURCES:-}" == "true" ]]; then
+    _apply_normalise > "${BATS_TEST_DIRNAME}/resources/maximal-run-full-diff.out"
+    return
+  fi
 
   run _apply_normalise
   # assert_failure # isn't passed through by _apply_normalise
