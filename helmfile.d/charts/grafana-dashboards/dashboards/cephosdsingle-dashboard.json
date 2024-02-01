@@ -494,7 +494,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum without (instance, ceph_daemon) (ceph_osd_stat_bytes{ceph_daemon=\"osd.0\"}-ceph_osd_stat_bytes_used{ceph_daemon=\"osd.0\"})",
+          "expr": "sum without (instance, ceph_daemon) (ceph_osd_stat_bytes{ceph_daemon=\"$osd\"}-ceph_osd_stat_bytes_used{ceph_daemon=\"$osd\"})",
           "format": "time_series",
           "hide": false,
           "interval": "$interval",
@@ -627,7 +627,7 @@
       "tableColumn": "{cluster=\"service_cluster\", container=\"mgr\", endpoint=\"http-metrics\", job=\"rook-ceph-mgr\", namespace=\"rook-ceph\", pod=\"rook-ceph-mgr-a-695f859d9f-k2qdg\", service=\"rook-ceph-mgr\"}",
       "targets": [
         {
-          "expr": "sum without (instance, ceph_daemon) (ceph_osd_stat_bytes_used{ceph_daemon=\"osd.0\"}/ceph_osd_stat_bytes{ceph_daemon=\"osd.0\"})",
+          "expr": "sum without (instance, ceph_daemon) (ceph_osd_stat_bytes_used{ceph_daemon=\"$osd\"}/ceph_osd_stat_bytes{ceph_daemon=\"$osd\"})",
           "format": "time_series",
           "interval": "$interval",
           "intervalFactor": 1,
