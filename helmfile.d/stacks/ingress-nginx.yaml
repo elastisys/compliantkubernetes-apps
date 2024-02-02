@@ -48,6 +48,7 @@ templates:
   ingress-nginx-networkpolicy:
     condition: ck8sWorkloadCluster.enabled
     inherit:
+      - template: ingress-nginx
       - template: networkpolicies
     installed: {{ .Values | get "wcProbeIngress.enabled" false }}
     labels:
