@@ -1,0 +1,219 @@
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-tekton-pipelines-restricted-init
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  match:
+    kinds:
+    - apiGroups:
+      - ""
+      kinds:
+      - Pod
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values:
+        - tekton-pipelines
+    labelSelector:
+      matchExpressions:
+      - key: tekton.dev/pipeline
+        operator: In
+        values:
+        - upgrade-apps-pipeline
+    scope: Namespaced
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+    - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+      condition: MustNotExist
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-tekton-pipelines-restricted-container
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  match:
+    kinds:
+    - apiGroups:
+      - ""
+      kinds:
+      - Pod
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values:
+        - tekton-pipelines
+    labelSelector:
+      matchExpressions:
+      - key: tekton.dev/pipeline
+        operator: In
+        values:
+        - upgrade-apps-pipeline
+    scope: Namespaced
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+    - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+      condition: MustNotExist
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: capabilities-place-tekton-pipelines-restricted-init
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  match:
+    kinds:
+    - apiGroups:
+      - ""
+      kinds:
+      - Pod
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values:
+        - tekton-pipelines
+    labelSelector:
+      matchExpressions:
+      - key: tekton.dev/pipeline
+        operator: In
+        values:
+        - upgrade-apps-pipeline
+    scope: Namespaced
+  location: "spec.initContainers[name: *].securityContext.capabilities.drop"
+  parameters:
+    operation: merge
+    values:
+      fromList:
+      - ALL
+    pathTests:
+    - subPath: "spec.initContainers[name: *].securityContext.capabilities.drop"
+      condition: MustNotExist
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: capabilities-place-tekton-pipelines-restricted-container
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  match:
+    kinds:
+    - apiGroups:
+      - ""
+      kinds:
+      - Pod
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values:
+        - tekton-pipelines
+    labelSelector:
+      matchExpressions:
+      - key: tekton.dev/pipeline
+        operator: In
+        values:
+        - upgrade-apps-pipeline
+    scope: Namespaced
+  location: "spec.containers[name: *].securityContext.capabilities.drop"
+  parameters:
+    operation: merge
+    values:
+      fromList:
+      - ALL
+    pathTests:
+    - subPath: "spec.containers[name: *].securityContext.capabilities.drop"
+      condition: MustNotExist
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-non-root-tekton-pipelines-restricted-container
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  match:
+    kinds:
+    - apiGroups:
+      - ""
+      kinds:
+      - Pod
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values:
+        - tekton-pipelines
+    labelSelector:
+      matchExpressions:
+      - key: tekton.dev/pipeline
+        operator: In
+        values:
+        - upgrade-apps-pipeline
+    scope: Namespaced
+  location: "spec.containers[name: *].securityContext.runAsNonRoot"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+    - subPath: "spec.containers[name: *].securityContext.runAsNonRoot"
+      condition: MustNotExist
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: seccomp-profile-tekton-pipelines-restricted-container
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  match:
+    kinds:
+    - apiGroups:
+      - ""
+      kinds:
+      - Pod
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values:
+        - tekton-pipelines
+    labelSelector:
+      matchExpressions:
+      - key: tekton.dev/pipeline
+        operator: In
+        values:
+        - upgrade-apps-pipeline
+    scope: Namespaced
+  location: "spec.containers[name: *].securityContext.seccompProfile.type"
+  parameters:
+    assign:
+      value: RuntimeDefault
+    pathTests:
+    - subPath: "spec.containers[name: *].securityContext.seccompProfile.type"
+      condition: MustNotExist
