@@ -400,7 +400,14 @@ prometheus:
     persistentVolume:
       enabled: true
       limit: 75
+    predictUsage: false
     usagelimit: 95
+    nodeGroupCpuLimit24h: 75
+    nodeGroupMemoryLimit24h: 75
+    nodeGroupCpuLimit1h: 95
+    nodeGroupMemoryLimit1h: 85
+    nodeCpuLimit1h: 95
+    nodeMemoryLimit1h: 85
     ## for each cpu and memory add the node pattern for which you want to create an alert
     requestlimit:
       cpu:
