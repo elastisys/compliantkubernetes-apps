@@ -561,6 +561,56 @@ backup_file() {
     cp "${file}" "${backup_config_path}/${backup_name}"
 }
 
+backup_retention() {
+  if ! "${CK8S_AUTO_APPROVE}" && ! [[ -t 1 ]]; then
+    return
+  fi
+
+  if ! [[ -d "${CK8S_CONFIG_PATH}/backups" ]]; then
+    return
+  fi
+
+  local -a backups
+
+  local file prefix reply time
+
+  time="$(date --utc --date "${CK8S_INIT_BACKUP_DAYS:-30} days ago" +%y%m%d%H%M%S)"
+
+  for prefix in common-default common-config sc-default sc-config wc-default wc-config secrets; do
+    for file in "${CK8S_CONFIG_PATH}/backups/${prefix}-"*; do
+      if [[ -f "${file}" ]] && [[ "${time}" > "${file##"${CK8S_CONFIG_PATH}/backups/${prefix}-"}" ]]; then
+        backups+=("${file}")
+      fi
+    done
+  done
+
+  if [[ -z "${backups[*]}" ]]; then
+    return
+  fi
+
+  if "${CK8S_AUTO_APPROVE}"; then
+    log_warning "Removing backups older than ${CK8S_INIT_BACKUP_DAYS:-30} days:"
+    yq4 -M 'split(" ") | sort' <<< "${backups[@]:-}"
+
+    # Needs to be with force else it'll stop on read-only files
+    rm -f "${backups[@]:-}"
+
+  elif [[ -t 1 ]]; then
+    log_warning "Backups older than ${CK8S_INIT_BACKUP_DAYS:-30} days:"
+    yq4 -M 'split(" ") | sort' <<< "${backups[@]:-}"
+
+    log_warning_no_newline "Do you want to remove them? (Y/n): " 1>&2
+    read -r reply
+
+    if [[ "${reply:-y}" =~ ^(Y|y)$ ]]; then
+      log_warning "Removing backups older than ${CK8S_INIT_BACKUP_DAYS:-30} days."
+
+      # Needs to be with force else it'll stop on read-only files
+      rm -f "${backups[@]:-}"
+    fi
+  fi
+}
+
 log_info "Initializing CK8S configuration for $CK8S_ENVIRONMENT_NAME with $CK8S_CLOUD_PROVIDER:$CK8S_FLAVOR"
 
 if [ -f "${sops_config}" ]; then
@@ -617,6 +667,8 @@ fi
 update_secrets "${secrets[secrets_file]}" "${gen_new_secrets}"
 
 log_info "Config initialized"
+
+backup_retention
 
 log_info "Time to edit the following files:"
 log_info "${config[override_common]}"
