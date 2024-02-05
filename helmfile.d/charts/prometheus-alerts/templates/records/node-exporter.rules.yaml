@@ -18,7 +18,7 @@ spec:
   - name: node-exporter.rules
     rules:
     - expr: |-
-        count without (cpu, mode) (
+        count without (cpu, mode, pod) (
           node_cpu_seconds_total{job="node-exporter",mode="idle"}
         )
       record: instance:node_num_cpu:sum
@@ -35,22 +35,24 @@ spec:
         )
       record: instance:node_load1_per_cpu:ratio
     - expr: |-
-        1 - (
-          (
-            node_memory_MemAvailable_bytes{job="node-exporter"}
-            or
+        sum by (instance) (
+          1 - (
             (
-              node_memory_Buffers_bytes{job="node-exporter"}
-              +
-              node_memory_Cached_bytes{job="node-exporter"}
-              +
-              node_memory_MemFree_bytes{job="node-exporter"}
-              +
-              node_memory_Slab_bytes{job="node-exporter"}
+              node_memory_MemAvailable_bytes{job="node-exporter"}
+              or
+              (
+                node_memory_Buffers_bytes{job="node-exporter"}
+                +
+                node_memory_Cached_bytes{job="node-exporter"}
+                +
+                node_memory_MemFree_bytes{job="node-exporter"}
+                +
+                node_memory_Slab_bytes{job="node-exporter"}
+              )
             )
+          /
+            node_memory_MemTotal_bytes{job="node-exporter"}
           )
-        /
-          node_memory_MemTotal_bytes{job="node-exporter"}
         )
       record: instance:node_memory_utilisation:ratio
     - expr: rate(node_vmstat_pgmajfault{job="node-exporter"}[5m])

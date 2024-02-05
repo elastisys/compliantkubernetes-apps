@@ -127,6 +127,14 @@ defaultRules:
     # alertLabels:
     #   key: value
 
+capacityManagementAlertsPredictUsage: false
+capacityManagementAlertsNodeGroupCpuLimit24h: 75
+capacityManagementAlertsNodeGroupMemoryLimit24h: 75
+capacityManagementAlertsNodeGroupCpuLimit1h: 95
+capacityManagementAlertsNodeGroupMemoryLimit1h: 85
+capacityManagementAlertsNodeCpuLimit1h: 95
+capacityManagementAlertsNodeMemoryLimit1h: 85
+
 buckets:
   harbor: set-me
   velero: set-me

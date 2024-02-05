@@ -27,7 +27,7 @@ disabledDashboards:
   {{- if not .Values.clusterApi.monitoring.enabled }}
   - cluster-api-dashboard
   - cluster-api-autoscaling-dashboard
-  {{- end }}}
+  {{- end }}
   - vulnerability-dashboard
   - thanos-sidecar-dashboard
   - thanos-bucket-replicate-dashboard
