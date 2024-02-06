@@ -7,6 +7,30 @@ metadata:
     app.kubernetes.io/part-of: tekton-pipelines
   {{- include "tektonPipelines.labels" . | nindent 4 }}
 data:
-  loglevel.controller: {{ .Values.configLogging.loglevelController | quote }}
-  loglevel.webhook: {{ .Values.configLogging.loglevelWebhook | quote }}
-  zap-logger-config: {{ .Values.configLogging.zapLoggerConfig | quote }}
+  loglevel.controller: "info"
+  loglevel.webhook: "info"
+  zap-logger-config: |
+    {
+      "level": "info",
+      "development": false,
+      "sampling": {
+        "initial": 100,
+        "thereafter": 100
+      },
+      "outputPaths": ["stdout"],
+      "errorOutputPaths": ["stderr"],
+      "encoding": "json",
+      "encoderConfig": {
+        "timeKey": "timestamp",
+        "levelKey": "severity",
+        "nameKey": "logger",
+        "callerKey": "caller",
+        "messageKey": "message",
+        "stacktraceKey": "stacktrace",
+        "lineEnding": "",
+        "levelEncoder": "",
+        "timeEncoder": "iso8601",
+        "durationEncoder": "",
+        "callerEncoder": ""
+      }
+    }
