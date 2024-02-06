@@ -1,11 +1,11 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: {{ include "tektonPipelines.fullname" . }}-info
+  name: {{ include "tekton-pipelines.fullname" . }}-info
   labels:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-pipelines
-  {{- include "tektonPipelines.labels" . | nindent 4 }}
+  {{- include "tekton-pipelines.labels" . | nindent 4 }}
 rules:
   # All system:authenticated users needs to have access
   # of the pipelines-info ConfigMap even if they don't
@@ -19,15 +19,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ include "tektonPipelines.fullname" . }}-info
+  name: {{ include "tekton-pipelines.fullname" . }}-info
   labels:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-pipelines
-  {{- include "tektonPipelines.labels" . | nindent 4 }}
+  {{- include "tekton-pipelines.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: '{{ include "tektonPipelines.fullname" . }}-info'
+  name: '{{ include "tekton-pipelines.fullname" . }}-info'
 subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group

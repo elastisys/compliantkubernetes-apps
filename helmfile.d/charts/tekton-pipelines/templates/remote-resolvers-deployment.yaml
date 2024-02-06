@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "tektonPipelines.fullname" . }}-remote-resolvers
+  name: {{ include "tekton-pipelines.fullname" . }}-remote-resolvers
   labels:
     app.kubernetes.io/name: resolvers
     app.kubernetes.io/component: resolvers
@@ -46,7 +46,7 @@ spec:
                     app.kubernetes.io/part-of: tekton-pipelines
                 topologyKey: kubernetes.io/hostname
               weight: 100
-      serviceAccountName: {{ include "tektonPipelines.fullname" . }}-resolvers
+      serviceAccountName: {{ include "tekton-pipelines.fullname" . }}-resolvers
       containers:
         - name: controller
           image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/resolvers:v0.45.0@sha256:5bd5240ccd89e0b81796aa8b8bbb4feb2162e63dda1cb0a95e315c9fadeb7ec8

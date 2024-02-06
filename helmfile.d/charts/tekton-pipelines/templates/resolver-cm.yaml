@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/component: resolvers
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-pipelines
-  {{- include "tektonPipelines.labels" . | nindent 4 }}
+  {{- include "tekton-pipelines.labels" . | nindent 4 }}
 data:
   # the default service account name to use for bundle requests.
   default-service-account: "default"
@@ -21,7 +21,7 @@ metadata:
     app.kubernetes.io/component: resolvers
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-pipelines
-  {{- include "tektonPipelines.labels" . | nindent 4 }}
+  {{- include "tekton-pipelines.labels" . | nindent 4 }}
 data:
   # The default kind to fetch.
   default-kind: "task"

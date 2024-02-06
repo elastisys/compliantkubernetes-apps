@@ -1,7 +1,7 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "tektonPipelines.fullname" . }}-webhook
+  name: {{ include "tekton-pipelines.fullname" . }}-webhook
   labels:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/component: webhook
@@ -12,14 +12,14 @@ metadata:
     pipeline.tekton.dev/release: "v0.45.0"
     # labels below are related to istio and should not be used for resource lookup
     version: "v0.45.0"
-  {{- include "tektonPipelines.labels" . | nindent 4 }}
+  {{- include "tekton-pipelines.labels" . | nindent 4 }}
 spec:
   minReplicas: 1
   maxReplicas: 5
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "tektonPipelines.fullname" . }}-webhook
+    name: {{ include "tekton-pipelines.fullname" . }}-webhook
   metrics:
     - type: Resource
       resource:
@@ -31,7 +31,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "tektonPipelines.fullname" . }}-webhook
+  name: {{ include "tekton-pipelines.fullname" . }}-webhook
   labels:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/component: webhook
@@ -43,7 +43,7 @@ metadata:
     # labels below are related to istio and should not be used for resource lookup
     app: tekton-pipelines-webhook
     version: "v0.45.0"
-  {{- include "tektonPipelines.labels" . | nindent 4 }}
+  {{- include "tekton-pipelines.labels" . | nindent 4 }}
 spec:
   type: ClusterIP
   selector:
@@ -51,7 +51,7 @@ spec:
     app.kubernetes.io/instance: default
     app.kubernetes.io/name: webhook
     app.kubernetes.io/part-of: tekton-pipelines
-  {{- include "tektonPipelines.selectorLabels" . | nindent 4 }}
+  {{- include "tekton-pipelines.selectorLabels" . | nindent 4 }}
   ports:
   - name: http-metrics
     port: 9090

@@ -5,6 +5,6 @@ metadata:
   labels:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-pipelines
-  {{- include "tektonPipelines.labels" . | nindent 4 }}
+  {{- include "tekton-pipelines.labels" . | nindent 4 }}
 data:
   version: {{ .Chart.AppVersion | quote }}

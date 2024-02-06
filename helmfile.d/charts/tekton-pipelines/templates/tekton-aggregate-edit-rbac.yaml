@@ -1,13 +1,13 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "tektonPipelines.fullname" . }}-tekton-aggregate-edit
+  name: {{ include "tekton-pipelines.fullname" . }}-tekton-aggregate-edit
   labels:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-pipelines
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
-  {{- include "tektonPipelines.labels" . | nindent 4 }}
+  {{- include "tekton-pipelines.labels" . | nindent 4 }}
 rules:
   - apiGroups:
       - tekton.dev

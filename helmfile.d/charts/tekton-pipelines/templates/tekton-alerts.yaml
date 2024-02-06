@@ -1,7 +1,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: {{ printf "%s-%s" (include "tektonPipelines.fullname" .) "failed-alerts" | trunc 63 | trimSuffix "-" }}
+  name: {{ printf "%s-%s" (include "tekton-pipelines.fullname" .) "failed-alerts" | trunc 63 | trimSuffix "-" }}
   labels:
     app: tekton-pipelines-controller
     app.kubernetes.io/component: controller

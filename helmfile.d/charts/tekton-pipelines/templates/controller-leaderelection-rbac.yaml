@@ -1,17 +1,17 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ include "tektonPipelines.fullname" . }}-controller-leaderelection
+  name: {{ include "tekton-pipelines.fullname" . }}-controller-leaderelection
   labels:
     app.kubernetes.io/component: controller
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-pipelines
-  {{- include "tektonPipelines.labels" . | nindent 4 }}
+  {{- include "tekton-pipelines.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: '{{ include "tektonPipelines.fullname" . }}-leader-election'
+  name: '{{ include "tekton-pipelines.fullname" . }}-leader-election'
 subjects:
 - kind: ServiceAccount
-  name: '{{ include "tektonPipelines.fullname" . }}-controller'
+  name: '{{ include "tekton-pipelines.fullname" . }}-controller'
   namespace: '{{ .Release.Namespace }}'
