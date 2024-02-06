@@ -10,7 +10,7 @@
     helmsecrets_version: 3.12.0
     jq_version: 1.6
     s3cmd_version: 2.*
-    sops_version: 3.7.3
+    sops_version: 3.8.1
     yq_version: 3.4.1
     yq4_version: 4.26.1
     pwgen_version: 2.08*
@@ -28,7 +28,7 @@
         dest: "{{ install_path }}/jq"
       - command: sops
         version: "{{ sops_version }}"
-        url: https://github.com/getsops/sops/releases/download/v{{ sops_version }}/sops-v{{ sops_version }}.linux
+        url: https://github.com/getsops/sops/releases/download/v{{ sops_version }}/sops-v{{ sops_version }}.linux.amd64
         dest: "{{ install_path }}/sops"
       - command: yq
         version: "{{ yq_version }}"
