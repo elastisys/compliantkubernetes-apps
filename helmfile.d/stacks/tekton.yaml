@@ -1,15 +1,17 @@
 ---
 templates:
   tekton-pipelines:
+    disableValidationOnInstall: true
     condition: ck8sManagementCluster.enabled
-    name: tekton-pipelines
-    chart: charts/tekton-pipelines
     installed: {{ .Values | get "tektonPipelines.enabled" false }}
-    version: 0.1.0
     namespace: tekton-pipelines
+    name: tekton-pipelines
     labels:
       app: tekton
+    chart: charts/tekton-pipelines
+    version: 0.1.0
     needs:
       - kube-system/admin-namespaces
+      - monitoring/kube-prometheus-stack # creates servicemonitors and prometheusrules
     values:
       - values/tekton.gotmpl
