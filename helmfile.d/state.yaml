@@ -117,6 +117,8 @@ releases:
 
   - inherit: [ template: node-local-dns ]
 
+  - inherit: [ template: tekton-pipelines-podsecuritypolicy ]
+
   - inherit: [ template: rook-ceph-podsecuritypolicy ]
 
   - inherit: [ template: kured-podsecuritypolicy ]
