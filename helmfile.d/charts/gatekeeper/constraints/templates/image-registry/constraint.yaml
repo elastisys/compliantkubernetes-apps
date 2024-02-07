@@ -15,7 +15,7 @@ spec:
         kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
       - apiGroups: ["batch"]
         kinds: ["Job", "CronJob"]
-    excludedNamespaces: ["kube-system", "kube-public", "kube-node-lease"]
+    excludedNamespaces: ["kube-system", "kube-public", "kube-node-lease", "calico-system"]
     namespaceSelector:
       matchExpressions:
       - key: owner
