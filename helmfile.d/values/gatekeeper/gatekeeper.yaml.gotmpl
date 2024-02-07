@@ -5,6 +5,7 @@ validatingWebhookExemptNamespacesLabels:
   - kube-system
   - kube-public
   - kube-node-lease
+  - calico-system
 mutatingWebhookFailurePolicy: Fail
 mutatingWebhookTimeoutSeconds: {{ .Values.opa.mutatingWebhookTimeoutSeconds }}
 mutatingWebhookExemptNamespacesLabels:
@@ -12,6 +13,7 @@ mutatingWebhookExemptNamespacesLabels:
   - kube-system
   - kube-public
   - kube-node-lease
+  - calico-system
 
 validatingWebhookCustomRules:
   - apiGroups:
