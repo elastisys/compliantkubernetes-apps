@@ -590,6 +590,16 @@ ingressNginx:
       ## ref: https://github.com/kubernetes/cloud-provider-openstack/blob/master/docs/openstack-cloud-controller-manager/expose-applications-using-loadbalancer-type-service.md#restrict-access-for-loadbalancer-service
       loadBalancerSourceRanges: []
 
+      # -- Represents the dual-stack-ness requested or required by this Service. Possible values are
+      # SingleStack (default), PreferDualStack or RequireDualStack. When utilizing an internal loadbalancer service (ie MetalLB),
+      # set this field to "RequireDualStack" if you want both IPv4 and IPv6 connectivity.
+      # The ipFamilies and clusterIPs fields depend on the value of this field.
+      ## Ref: https://kubernetes.io/docs/concepts/services-networking/dual-stack/
+      ipFamilyPolicy: ""
+      # -- List of IP families (e.g. IPv4, IPv6) assigned to the service. Default is IPv4 only. When utilizing an internal loadbalancer service (ie MetalLB),
+      # IPv6 would also need to be included in order for the ingress service to allocate an address in that family.
+      ipFamilies: []
+
       ## type: NodePort
       nodePorts:
         http: "30080"
