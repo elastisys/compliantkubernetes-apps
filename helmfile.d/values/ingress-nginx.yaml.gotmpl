@@ -109,6 +109,12 @@ controller:
     {{ else }}
     enabled: false
     {{ end }}
+    {{ if .Values.ingressNginx.controller.service.ipFamilyPolicy }}
+    ipFamilyPolicy: {{ .Values.ingressNginx.controller.service.ipFamilyPolicy }}
+    {{ end }}
+    {{ if .Values.ingressNginx.controller.service.ipFamilies }}
+    ipFamilies: {{- toYaml .Values.ingressNginx.controller.service.ipFamilies | nindent 6 }}
+    {{ end }}
     {{ if eq .Values.ingressNginx.controller.service.type "NodePort" }}
     nodePorts: {{- toYaml .Values.ingressNginx.controller.service.nodePorts | nindent 6 }}
     {{ end }}
