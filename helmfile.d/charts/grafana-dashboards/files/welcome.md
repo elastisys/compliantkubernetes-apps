@@ -4,6 +4,9 @@
 
 Here you can find the most relevant features and changes for the last couple of releases of Compliant Kubernetes
 
+- A probe ingress is added to monitor services that are not responding successfully. **[v0.36]**
+- Velero was upgraded to v1.11.1. **[v0.36]**
+- The CIS Kubernetes Benchmark is removed since we migrated to trivy operator. **[v0.36]**
 - Harbor was upgraded to v2.9.1. As part of this upgrade, Notary V1 is removed. **[v0.35]**
 - Chroot is enabled by default for ingress-nginx controller, to improve security and limit NGINX inside the controller container from having access to list cluster-wide secrets **[v0.35]**
 - Application developers can now self manage CRDs for Kafka **[v0.35]**
