@@ -142,6 +142,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
+1. Apply the kube-prometheus-stack CRDs
+
+    ```bash
+    ./migration/v0.37/apply/11-kube-prometheus-stack.sh execute
+    ```
+
 1. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.
@@ -179,6 +185,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
+1. Apply the kube-prometheus-stack CRDs
+
+    ```bash
+    ./migration/v0.37/apply/11-kube-prometheus-stack.sh execute
+    ```
+
 1. Upgrade applications:
 
     ```bash
@@ -187,7 +199,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.37/apply/80-apply.sh execute
     ```
 
-## Postrequisite:
+## Postrequisite
 
 - [ ] Check the state of the environment, pods and nodes:
 
