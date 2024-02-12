@@ -3,7 +3,7 @@
 set -e
 
 HOSTNAME=harbor-database
-backup_dir=backups
+backup_dir=backup/dbdump
 
 s3_download() {
     : "${S3_BUCKET:?Missing S3_BUCKET}"
