@@ -189,6 +189,14 @@ harbor:
                     values:
                       - database
               topologyKey: "kubernetes.io/hostname"
+  exporter:
+    resources:
+      requests:
+        memory: 20Mi
+        cpu: 10m
+      limits:
+        cpu: 50m
+        memory: 40Mi
     external:
       # host: "set-me"
       port: "5432"
