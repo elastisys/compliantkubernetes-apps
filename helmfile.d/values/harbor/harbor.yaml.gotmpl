@@ -184,6 +184,10 @@ redis:
   external:
     {{ toYaml .Values.harbor.redis.external | nindent 4 }}
   {{- end }}
+
+exporter:
+  resources: {{- toYaml .Values.harbor.exporter.resources | nindent 4 }}
+
 updateStrategy:
   type: Recreate
 
