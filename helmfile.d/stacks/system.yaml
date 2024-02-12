@@ -70,17 +70,6 @@ templates:
     values:
       - values/podsecuritypolicies/workload/default.yaml.gotmpl
 
-  tekton-pipelines-podsecuritypolicy:
-    inherit: [ template: podsecuritypolicies ]
-    installed: {{ .Values | get "tektonPipelines.enabled" false }}
-    condition: ck8sManagementCluster.enabled
-    namespace: tekton-pipelines
-    labels:
-      app: tekton
-      psp: tekton
-    values:
-      - values/podsecuritypolicies/service/tekton-pipelines.yaml.gotmpl
-
   rook-ceph-podsecuritypolicy:
     inherit: [ template: podsecuritypolicies ]
     installed: {{ .Values | get "rookCeph.gatekeeperPsp.enabled" false }}
