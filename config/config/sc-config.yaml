@@ -115,10 +115,10 @@ grafana:
       resources:
         requests:
           cpu: 10m
-          memory: 80Mi
+          memory: 150Mi
         limits:
-          cpu: 50m
-          memory: 100Mi
+          cpu: 250m
+          memory: 200Mi
     plugins: []  # this will require adding the correct IP/range and port to .networkPolicies.monitoring.grafana.externalDashboardProvider
     # if the datasource require a secrets, you can set that in secrets.yaml under .grafana.{ops|user}.envRenderSecret
     # the correct IP/range and port should be added to .networkPolicies.monitoring.grafana.externalDataSources
