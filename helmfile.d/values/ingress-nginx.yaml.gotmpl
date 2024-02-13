@@ -22,6 +22,7 @@ controller:
     {{- with .Values.ingressNginx.controller.additionalConfig }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
+    annotations-risk-level: {{ .Values.ingressNginx.controller.config.annotationsRiskLevel | quote }}
 
   # Optionally change this to ClusterFirstWithHostNet in case you have 'hostNetwork: true'.
   # By default, while using host network, name resolution uses the host's DNS. If you wish nginx-controller
@@ -32,6 +33,8 @@ controller:
 
   # Set allow-snippet-annotations to false in order to mitigate CVE-2021-25742
   allowSnippetAnnotations: {{ .Values.ingressNginx.controller.allowSnippetAnnotations }}
+
+  enableAnnotationValidations: {{ .Values.ingressNginx.controller.enableAnnotationValidations }}
 
   # Required for use with CNI based kubernetes installations (such as ones set up by kubeadm),
   # since CNI and hostport don't mix yet. Can be deprecated once https://github.com/kubernetes/kubernetes/issues/23920
@@ -94,6 +97,7 @@ controller:
   resources: {{- toYaml .Values.ingressNginx.controller.resources | nindent 4 }}
 
   service:
+    allocateLoadBalancerNodePorts: {{ .Values.ingressNginx.controller.service.allocateLoadBalancerNodePorts }}
     {{ if .Values.externalTrafficPolicy.local }}
     ## Set external traffic policy to: "Local" to preserve source IP on
     ## providers supporting it
