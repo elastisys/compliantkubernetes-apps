@@ -548,6 +548,12 @@ ingressNginx:
     nodeSelector: {}
     enablepublishService: false
 
+    ## Enable validation of Nginx annotations on Ingress resources.
+    ## This is kept false by default due to the maturity of the feature,
+    ## e.g. lack of documentation and disruptive bugs.
+    ## TODO: Revisit this feature in future upgrade
+    enableAnnotationValidations: false
+
     #  Ref: https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/cli-arguments.md
     extraArgs: {}
     # metrics-per-host: false
@@ -556,6 +562,10 @@ ingressNginx:
       ## If 'true', use PROXY protocol
       ## ref: https://docs.nginx.com/nginx/admin-guide/load-balancer/using-proxy-protocol/
       useProxyProtocol: set-me
+
+      ## Accepted values are 'Critical', 'High', 'Medium' and 'Low'
+      ## ref: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#annotations-risk-level
+      annotationsRiskLevel: Critical
 
     ## If 'true', nginx will use host ports 80 and 443
     useHostPort: set-me
@@ -571,6 +581,10 @@ ingressNginx:
       ## Annotations to add to service
       ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
       annotations: {}
+
+      ## Enable node port allocation
+      ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#load-balancer-nodeport-allocation
+      allocateLoadBalancerNodePorts: true
 
       ## Whitelist IP address for octavia loadbalancer
       ## ref: https://github.com/kubernetes/cloud-provider-openstack/blob/master/docs/openstack-cloud-controller-manager/expose-applications-using-loadbalancer-type-service.md#restrict-access-for-loadbalancer-service

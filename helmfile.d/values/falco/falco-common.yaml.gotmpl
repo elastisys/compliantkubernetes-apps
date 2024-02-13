@@ -106,26 +106,27 @@ customRules:
     # Contact K8S API Server From Container
     - list: trusted_image_repositories
       items: [
-        ghcr.io/elastisys/logical-backup,
-        docker.io/jaegertracing/jaeger-operator,
-        quay.io/argoproj/argocd,
         docker.io/elastisys/curl-jq,
-        ghcr.io/elastisys/argocd-managed-namespaces-manager,
-        quay.io/kiwigrid/k8s-sidecar,
-        ghcr.io/zalando/spilo-15,
-        quay.io/calico/node,
-        ghcr.io/elastisys/fluentd,
+        docker.io/jaegertracing/jaeger-operator,
+        docker.io/library/rabbitmq,
+        docker.io/openpolicyagent/gatekeeper,
         docker.io/rabbitmqoperator/cluster-operator,
         docker.io/velero/velero,
-        docker.io/library/rabbitmq,
-        quay.io/prometheus/prometheus,
-        registry.k8s.io/ingress-nginx/controller,
         gcr.io/k8s-staging-multitenancy/hnc-manager,
-        docker.io/openpolicyagent/gatekeeper,
+        ghcr.io/aquasecurity/trivy-operator,
+        ghcr.io/elastisys/argocd-managed-namespaces-manager,
+        ghcr.io/elastisys/fluentd,
+        ghcr.io/elastisys/logical-backup,
+        ghcr.io/zalando/spilo-15,
+        quay.io/argoproj/argocd,
+        quay.io/calico/node,
         quay.io/jetstack/cert-manager-controller,
         quay.io/jetstack/cert-manager-webhook,
-        registry.k8s.io/kube-state-metrics/kube-state-metrics,
-        ghcr.io/aquasecurity/trivy-operator
+        quay.io/kiwigrid/k8s-sidecar,
+        quay.io/prometheus/prometheus,
+        registry.k8s.io/ingress-nginx/controller-chroot,
+        registry.k8s.io/ingress-nginx/controller,
+        registry.k8s.io/kube-state-metrics/kube-state-metrics
         ]
     # Contact K8S API Server From Container
     - macro: k8s_containers
