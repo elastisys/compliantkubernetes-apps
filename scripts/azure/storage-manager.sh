@@ -21,12 +21,12 @@ delete)
 esac
 shift
 
-function create_resource_groupe() {
+function create_resource_group() {
 
-    echo "checking if resource groupe exists" >&2
-    GROUP_EXISTS=$(az group list --query '[].name' | awk "/${CK8S_ENVIRONMENT_NAME}-storage-resource-groupe/")
+    echo "checking if resource group exists" >&2
+    GROUP_EXISTS=$(az group list --query '[].name' | awk "/${CK8S_ENVIRONMENT_NAME}-storage-resource-group/")
     if [ "$GROUP_EXISTS" ]; then
-        echo "resource groupe [${CK8S_ENVIRONMENT_NAME}-storage-resource-groupe] already exists" >&2
+        echo "resource group [${CK8S_ENVIRONMENT_NAME}-storage-resource-group] already exists" >&2
         echo "contnue using this group ? (y/n)" >&2
         # shellcheck disable=SC2162
         read -n 1 cmdinput
@@ -35,9 +35,9 @@ function create_resource_groupe() {
         n) exit 0 ;;
         esac
     else
-        echo "resource groupe [${CK8S_ENVIRONMENT_NAME}-storage-resource-groupe] does not exist, creating it now" >&2
+        echo "resource group [${CK8S_ENVIRONMENT_NAME}-storage-resource-group] does not exist, creating it now" >&2
         az group create \
-            --name "$CK8S_ENVIRONMENT_NAME"-storage-resource-groupe \
+            --name "$CK8S_ENVIRONMENT_NAME"-storage-resource-group \
             --location swedencentral --only-show-errors
     fi
 
@@ -59,7 +59,7 @@ function create_storage_account() {
     else
         az storage account create \
             --name "$CK8S_ENVIRONMENT_NAME"storageaccount \
-            --resource-group "$CK8S_ENVIRONMENT_NAME"-storage-resource-groupe \
+            --resource-group "$CK8S_ENVIRONMENT_NAME"-storage-resource-group \
             --location swedencentral \
             --sku Standard_RAGRS \
             --kind StorageV2 \
@@ -89,12 +89,12 @@ function create_containers() {
 }
 
 function delete_all() {
-    az group delete --name "$CK8S_ENVIRONMENT_NAME"-storage-resource-groupe
+    az group delete --name "$CK8S_ENVIRONMENT_NAME"-storage-resource-group
 }
 
 if [[ "$ACTION" == "$CREATE_ACTION" ]]; then
     echo "Creating Resource Group" >&2
-    create_resource_groupe
+    create_resource_group
 
     echo "Creating Storage Account" >&2
     create_storage_account
