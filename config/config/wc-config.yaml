@@ -132,6 +132,7 @@ hnc:
     - rook-ceph
     - velero
     - gatekeeper-system
+    - metallb-system
 
   ## Extra excluded namespace, here we should add the namespaces that are more likely to change
   excludedExtraNamespaces: []
