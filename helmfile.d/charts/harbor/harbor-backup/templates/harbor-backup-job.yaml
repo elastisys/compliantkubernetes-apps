@@ -51,17 +51,17 @@ spec:
                 - name: AZURE_BACKUP
                   value: "true"
                 - name: AZURE_ACCOUNT_NAME
-                  valueFrom: 
+                  valueFrom:
                     secretKeyRef:
                       name: harbor-backup-secret
                       key: azure-account-name
                 - name: AZURE_ACCOUNT_KEY
-                  valueFrom: 
+                  valueFrom:
                     secretKeyRef:
                       name: harbor-backup-secret
                       key: azure-account-key
                 - name: AZURE_CONTAINER_NAME
-                  valueFrom: 
+                  valueFrom:
                     secretKeyRef:
                       name: harbor-backup-secret
                       key: azure-container-name
