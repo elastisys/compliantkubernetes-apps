@@ -148,7 +148,7 @@ azure_get_records() {
     --account-name "${AZURE_ACCOUNT_NAME}" \
     --account-key "${AZURE_ACCOUNT_KEY}" \
     --container-name "${AZURE_CONTAINER_NAME}" \
-    --query "[?properties.lastModified <= '${before_date}'].{Name: name}" 
+    --query "[?properties.lastModified <= '${before_date}'].{Name: name}"
 }
 
 azure_remove_path() {

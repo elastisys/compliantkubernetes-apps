@@ -39,7 +39,7 @@ spec:
                   value: {{ .prefix }}
               {{- else if .Values.azure.enabled }}
                 - name: AZURE_STORAGE_CONNECTION_STRING
-                  valueFrom: 
+                  valueFrom:
                     secretRef:
                       name: {{ include "log-manager.fullname" . }}-storage-credentials
                       value: azure-storage-connection-string

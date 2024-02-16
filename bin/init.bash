@@ -176,6 +176,7 @@ set_storage_class() {
         azure)
             storage_class=azure-csi
             ;;
+
         none)
             return
             ;;
@@ -326,12 +327,11 @@ set_fluentd_config() {
 
     replace_set_me "${file}" '.fluentd.forwarder.useRegionEndpoint' "${use_region_endpoint}"
 
-    set_to_true=true
     if [ "${CK8S_CLOUD_PROVIDER}" = "azure" ]; then
-        
-        replace_set_me "${file}" '.fluentd.azure.enabled' "${set_to_true}"
+
+        replace_set_me "${file}" '.fluentd.azure.enabled' "true"
     else
-        replace_set_me "${file}" '.fluentd.s3.enabled' "${set_to_true}"
+        replace_set_me "${file}" '.fluentd.s3.enabled' "true"
     fi
 }
 

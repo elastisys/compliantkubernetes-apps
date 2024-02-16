@@ -3,15 +3,16 @@
 set -euo pipefail
 if [ "$STORAGE_SERVICE" = "azure" ]; then
 # Azure Blob configuration
-: "${AZURE_STORAGE_CONNECTION_STRING:?Missing AZURE_STORAGE_CONNECTION_STRING}"
-: "${AZURE_CONTAINER_NAME:?Missing AZURE_CONTAINER_NAME}"
-: "${AZURE_PREFIX:?Missing AZURE_PREFIX}"
+  : "${AZURE_STORAGE_CONNECTION_STRING:?Missing AZURE_STORAGE_CONNECTION_STRING}"
+  : "${AZURE_CONTAINER_NAME:?Missing AZURE_CONTAINER_NAME}"
+  : "${AZURE_PREFIX:?Missing AZURE_PREFIX}"
 else
 # S3 configuration
-: "${S3_CONFIG:?Missing S3_CONFIG}"
-: "${S3_BUCKET:?Missing S3_BUCKET}"
-: "${S3_PREFIX:?Missing S3_PREFIX}"
+  : "${S3_CONFIG:?Missing S3_CONFIG}"
+  : "${S3_BUCKET:?Missing S3_BUCKET}"
+  : "${S3_PREFIX:?Missing S3_PREFIX}"
 fi
+
 # Days to compact
 : "${COMPACT_DAYS:?Missing COMPACT_DAYS}"
 
@@ -26,7 +27,8 @@ SORT_TMP="${TMP_DIR}/sort"
 
 mkdir -p "$LM_TMP"
 mkdir -p "$SORT_TMP"
-# Definte functions for the S3 operations
+
+# Define functions for the S3 operations
 s3_list_days() {
   s3cmd --config "$S3_CONFIG" ls "s3://$S3_BUCKET/$S3_PREFIX/" | grep 'DIR' | awk '{print $2}' | sed "s#s3://$S3_BUCKET/$S3_PREFIX/##" | sed 's#/$##'
 }
@@ -101,7 +103,7 @@ azure_rm_chunks() {
 merge_chunks() {
   DAY="$1"
 
-    if [ "$STORAGE_SERVICE" = "azure" ]; then
+  if [ "$STORAGE_SERVICE" = "azure" ]; then
     INDICES="$(azure_list_indices "$DAY")"
     CHUNKS="$(azure_list_chunks "$DAY")"
   else
@@ -167,21 +169,18 @@ merge_chunks() {
   done
 }
 
+
 if [[ "$STORAGE_SERVICE" == "azure" ]]; then
- for DAY in $(azure_list_days); do
-   if [[ "$DAY" > "$LIMIT" ]]; then
-     echo "- day: $DAY -----"
-     merge_chunks "$DAY"
-   fi
- done
+  days=$(azure_list_days)
 else
- for DAY in $(s3_list_days); do
-   if [[ "$DAY" > "$LIMIT" ]]; then
-     echo "- day: $DAY -----"
-     merge_chunks "$DAY"
-   fi
- done
+  days=$(s3_list_days)
 fi
+for DAY in ${days}; do
+  if [[ "$DAY" > "$LIMIT" ]]; then
+    echo "- day: $DAY -----"
+    merge_chunks "$DAY"
+  fi
+done
 
 echo "---"
 echo "end"

@@ -80,6 +80,7 @@ aggregator:
         <match **>
           @id output-store
           @include store.prop
+
           {{- if eq .Values.objectStorage.type "s3" }}
           s3_bucket {{ .Values.objectStorage.buckets.scFluentd }}
 
@@ -88,6 +89,7 @@ aggregator:
           azure_storage_access_key {{ .Values.objectStorage.azure.sclogsaccountKey }}
           azure_container {{ .Values.objectStorage.azure.sclogscontainerName }}
           {{- end }}
+          
           path logs/%Y%m%d/${tag}/
 
           <buffer tag,time>

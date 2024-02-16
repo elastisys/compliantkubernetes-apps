@@ -4,14 +4,14 @@ set -euo pipefail
 
 if [ "$STORAGE_SERVICE" = "azure" ]; then
 # Azure Blob configuration
-: "${AZURE_STORAGE_CONNECTION_STRING:?Missing AZURE_STORAGE_CONNECTION_STRING}"
-: "${AZURE_CONTAINER_NAME:?Missing AZURE_CONTAINER_NAME}"
-: "${AZURE_PREFIX:?Missing AZURE_PREFIX}"
+  : "${AZURE_STORAGE_CONNECTION_STRING:?Missing AZURE_STORAGE_CONNECTION_STRING}"
+  : "${AZURE_CONTAINER_NAME:?Missing AZURE_CONTAINER_NAME}"
+  : "${AZURE_PREFIX:?Missing AZURE_PREFIX}"
 else
 # S3 configuration
-: "${S3_CONFIG:?Missing S3_CONFIG}"
-: "${S3_BUCKET:?Missing S3_BUCKET}"
-: "${S3_PREFIX:?Missing S3_PREFIX}"
+  : "${S3_CONFIG:?Missing S3_CONFIG}"
+  : "${S3_BUCKET:?Missing S3_BUCKET}"
+  : "${S3_PREFIX:?Missing S3_PREFIX}"
 fi
 
 # Days to retain
@@ -37,6 +37,7 @@ s3_rm_chunks() {
 
   xargs -n1000 s3cmd --config "$S3_CONFIG" rm < "$CHUNK_LIST" > /dev/null
 }
+
 # Define Azure Blob functions
 azure_list_days() {
     az storage blob directory list --container-name "$AZURE_CONTAINER_NAME" --prefix "$AZURE_PREFIX/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | awk '{print $1}'
@@ -55,20 +56,19 @@ azure_rm_chunks() {
 }
 
 # Main loop
-  if [[ "$DAY" < "$LIMIT" ]]; then
-     echo "- day: $DAY -----"
-    if [[ "$STORAGE_SERVICE" == "azure" ]]; then
-        echo "----- listing Azure chunks"
-        azure_list_chunks "$DAY" > "$TMPFILE"
-
-        echo "----- clearing Azure chunks"
-        azure_rm_chunks "$TMPFILE"
-    else
-        echo "----- listing S3 chunks"
-        s3_list_chunks "$DAY" > "$TMPFILE"
-        echo "----- clearing S3 chunks"
-        s3_rm_chunks "$TMPFILE"
-    fi
+if [[ "$DAY" < "$LIMIT" ]]; then
+   echo "- day: $DAY -----"
+  if [[ "$STORAGE_SERVICE" == "azure" ]]; then
+      echo "----- listing Azure chunks"
+      azure_list_chunks "$DAY" > "$TMPFILE"
+      echo "----- clearing Azure chunks"
+      azure_rm_chunks "$TMPFILE"
+  else
+      echo "----- listing S3 chunks"
+      s3_list_chunks "$DAY" > "$TMPFILE"
+      echo "----- clearing S3 chunks"
+      s3_rm_chunks "$TMPFILE"
   fi
+fi
 echo "---"
 echo "end"
