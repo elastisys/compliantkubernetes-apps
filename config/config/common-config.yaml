@@ -590,7 +590,7 @@ ingressNginx:
 
       ## Enable node port allocation
       ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#load-balancer-nodeport-allocation
-      allocateLoadBalancerNodePorts: true
+      allocateLoadBalancerNodePorts: set-me
 
       ## Whitelist IP address for octavia loadbalancer
       ## ref: https://github.com/kubernetes/cloud-provider-openstack/blob/master/docs/openstack-cloud-controller-manager/expose-applications-using-loadbalancer-type-service.md#restrict-access-for-loadbalancer-service

@@ -94,6 +94,13 @@ persistence:
     gcs:
       bucket: {{ .Values.objectStorage.buckets.harbor }}
       encodedkey: {{ .Values.objectStorage.gcs.keyfileData | b64enc }}
+    {{ else if eq .Values.objectStorage.type "azure" }}
+    type: azure
+    azure:
+      accountname: {{ .Values.objectStorage.azure.accountname }}
+      accountkey: {{ .Values.objectStorage.azure.accountkey }}
+      container: {{ .Values.objectStorage.azure.container }}
+      realm: core.windows.net
     {{- end }}
     {{- end }}
 

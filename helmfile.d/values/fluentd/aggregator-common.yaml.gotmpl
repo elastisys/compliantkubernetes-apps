@@ -1,5 +1,5 @@
-{{ if not (eq .Values.objectStorage.type "s3") }}
-{{ fail "\nERROR: Fluentd requires S3 object storage, see Values.objectStorage.type" }}
+{{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "azure") ) }}
+{{ fail "\nERROR: Fluentd requires S3 or azure object storage, see Values.objectStorage.type" }}
 {{ end }}
 
 nameOverride: fluentd
@@ -11,19 +11,32 @@ metrics:
 
 forwarder:
   enabled: false
+  {{- if eq .Values.objectStorage.type "azure"}}
+  extraGems:
+    - fluent-plugin-azure-storage-append-blob
+  {{ end }}
 
 extraDeploy:
   - apiVersion: v1
     kind: Secret
     metadata:
-      name: {{ .Release.Name }}-s3-credentials
+      name: {{ .Release.Name }}-storage-credentials
     type: Opaque
     stringData:
+      {{- if eq .Values.objectStorage.type "s3" }}
       AWS_ACCESS_KEY_ID: {{ .Values.objectStorage.s3.accessKey }}
       AWS_ACCESS_SECRET_KEY: {{ .Values.objectStorage.s3.secretKey }}
+      {{- else if eq .Values.objectStorage.type "azure" }}
+      AZURE_STORAGE_ACCOUNT: {{ .Values.objectStorage.azure.sclogsaccountName }}
+      AZURE_STORAGE_ACCESS_KEY: {{ .Values.objectStorage.azure.sclogsaccountKey }}
+      {{- end }}
 
 aggregator:
   replicaCount: 1
+  {{- if eq .Values.objectStorage.type "azure"}}
+  extraGems:
+    - fluent-plugin-azure-storage-append-blob
+  {{ end }}
 
   resources:    {{- toYaml .Values.fluentd.aggregator.resources | nindent 4  }}
   nodeSelector: {{- toYaml .Values.fluentd.aggregator.nodeSelector | nindent 4  }}
@@ -35,7 +48,7 @@ aggregator:
     enabled: true
     size: {{ .Values.fluentd.aggregator.persistence.storage }}
 
-  extraEnvVarsSecret: {{ .Release.Name }}-s3-credentials
+  extraEnvVarsSecret: {{ .Release.Name }}-storage-credentials
 
   configMapFiles:
     fluentd.conf: |
@@ -137,6 +150,7 @@ aggregator:
       {{- end }}
 
     store.prop: |
+      {{- if eq .Values.objectStorage.type "s3" }}
       @type s3
 
       aws_key_id "#{ENV['AWS_ACCESS_KEY_ID']}"
@@ -146,7 +160,20 @@ aggregator:
       s3_region {{ .Values.objectStorage.s3.region }}
 
       force_path_style {{ .Values.objectStorage.s3.forcePathStyle }}
+      {{- else if eq .Values.objectStorage.type "azure" }}
+      @type azure_storage_append_blob
 
+      azure_storage_account {{ .Values.objectStorage.azure.sclogsaccountName }}
+      azure_storage_access_key {{ .Values.objectStorage.azure.sclogsaccountKey }}
+      path logs/${tag}/%Y%m%d/
+      azure_container_name {{ .Values.objectStorage.azure.sclogscontainerName }}
+      auto_create_container true
+      buffer_type file
+      buffer_path /var/log/fluent/azureblob/
+      flush_interval 60s
+      retry_wait 10s
+      max_retry 12
+      {{- end }}
     audit.output.conf: |
       # Audit logs
       <label @AUDIT>
@@ -160,9 +187,12 @@ aggregator:
         <match **>
           @id output-audit
           @include store.prop
-
+          {{- if eq .Values.objectStorage.type "s3" }}
           s3_bucket {{ .Values.objectStorage.buckets.audit }}
 
+          {{- else if eq .Values.objectStorage.type "azure" }}
+          azure_container {{ .Values.objectStorage.azure.sclogscontainerName }}
+          {{- end }}
           path {{ .Values.global.clusterName }}/%Y%m%d/${tag}/
 
           <buffer tag,time>
