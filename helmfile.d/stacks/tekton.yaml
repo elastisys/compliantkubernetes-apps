@@ -2,10 +2,9 @@
 templates:
   tekton-pipelines-podsecuritypolicy:
     inherit: [ template: podsecuritypolicies ]
-    installed: {{ .Values | get "tektonPipelines.enabled" false }}
     condition: ck8sManagementCluster.enabled
+    installed: {{ .Values | get "tektonPipelines.enabled" false }}
     namespace: tekton-pipelines
-    name: tekton-pipelines-podsecuritypolicy
     labels:
       app: tekton
       psp: tekton
@@ -25,6 +24,6 @@ templates:
     needs:
       - kube-system/admin-namespaces
       - monitoring/kube-prometheus-stack # creates servicemonitors and prometheusrules
-      - tekton-pipelines/tekton-pipelines-podsecuritypolicy
+      - tekton-pipelines/podsecuritypolicy
     values:
       - values/tekton.gotmpl
