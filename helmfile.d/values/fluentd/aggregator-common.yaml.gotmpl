@@ -188,7 +188,7 @@ aggregator:
         <match **>
           @id output-audit
           @include store.prop
-          
+
           {{- if eq .Values.objectStorage.type "s3" }}
           s3_bucket {{ .Values.objectStorage.buckets.audit }}
 
