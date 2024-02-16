@@ -93,6 +93,14 @@ log_error() {
     log_error_no_newline "${*}\n"
 }
 
+ask_abort() {
+  log_warning_no_newline "Do you want to abort? (y/N): "
+  read -r reply
+  if [[ "${reply}" == "y" ]]; then
+    exit 1
+  fi
+}
+
 # Checks that all dependencies are available and critical ones for matching minor version.
 check_tools() {
   local req
@@ -143,11 +151,7 @@ check_tools() {
   if [[ "${warn}" != 0 ]]; then
     if [[ -t 1 ]]; then
       log_warning "Run the following command to update: ./bin/ck8s install-requirements"
-      log_warning_no_newline "Do you want to abort? (y/N): "
-      read -r reply
-      if [[ "${reply}" == "y" ]]; then
-        exit 1
-      fi
+      ask_abort
     fi
   fi
 }
@@ -354,11 +358,7 @@ validate_config() {
         done
 
         if ${maybe_exit} && ! ${CK8S_AUTO_APPROVE}; then
-            echo -n -e "[\e[34mck8s\e[0m] Do you want to abort? (y/n): " 1>&2
-            read -r reply
-            if [[ "${reply}" == "y" ]]; then
-                exit 1
-            fi
+            ask_abort
         fi
     }
 
