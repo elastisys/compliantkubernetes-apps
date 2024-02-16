@@ -172,6 +172,10 @@ set_storage_class() {
         aws)
             storage_class=ebs-gp2
             ;;
+
+        azure)
+            storage_class=azure-csi
+            ;;
         none)
             return
             ;;
@@ -206,6 +210,10 @@ set_object_storage() {
         baremetal)
             object_storage_type="none"
             ;;
+
+        azure)
+            object_storage_type="azure"
+            ;;
         none)
             return
             ;;
@@ -231,7 +239,7 @@ set_nginx_config() {
             ingress_using_host_network=true
             ;;
 
-        citycloud | elastx)
+        citycloud | elastx | azure)
             use_proxy_protocol=false
             use_host_port=false
             service_enabled=true
@@ -269,6 +277,12 @@ set_nginx_config() {
     replace_set_me "${file}" '.networkPolicies.global.externalLoadBalancer' "${external_load_balancer}"
     replace_set_me "${file}" '.networkPolicies.global.ingressUsingHostNetwork' "${ingress_using_host_network}"
 
+    if [ "${CK8S_CLOUD_PROVIDER}" = "azure" ]; then
+        replace_set_me "${file}" '.ingressNginx.controller.service.allocateLoadBalancerNodePorts' 'false'
+    else
+        replace_set_me "${file}" '.ingressNginx.controller.service.allocateLoadBalancerNodePorts' 'true'
+    fi
+
     if [ "${service_enabled}" = 'false' ]; then
         replace_set_me "${file}" '.ingressNginx.controller.service.type' '"set-me-if-ingressNginx.controller.service.enabled"'
         replace_set_me "${file}" '.ingressNginx.controller.service.annotations' '"set-me-if-ingressNginx.controller.service.enabled"'
@@ -291,7 +305,7 @@ set_fluentd_config() {
             use_region_endpoint=true
             ;;
 
-        aws)
+        aws | azure)
             use_region_endpoint=false
             ;;
 
@@ -304,6 +318,14 @@ set_fluentd_config() {
     esac
 
     replace_set_me "${file}" '.fluentd.forwarder.useRegionEndpoint' "${use_region_endpoint}"
+
+    set_to_true=true
+    if [ "${CK8S_CLOUD_PROVIDER}" = "azure" ]; then
+        
+        replace_set_me "${file}" '.fluentd.azure.enabled' "${set_to_true}"
+    else
+        replace_set_me "${file}" '.fluentd.s3.enabled' "${set_to_true}"
+    fi
 }
 
 # Usage: set_lbsvc_safeguard <config-file>
@@ -358,7 +380,7 @@ set_harbor_config() {
         exit 1
     fi
     case ${CK8S_CLOUD_PROVIDER} in
-        aws | exoscale)
+        aws | exoscale | azure)
             persistence_type=objectStorage
             disable_redirect=false
             ;;

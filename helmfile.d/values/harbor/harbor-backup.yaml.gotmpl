@@ -1,4 +1,4 @@
-{{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") ) }}
+{{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") (eq .Values.objectStorage.type "azure") ) }}
 {{ fail "\nERROR: Harbor backup requires s3 or gcs object storage, see Values.objectStorage.type" }}
 {{ end }}
 {{ if and .Values.harbor.backup.enabled (eq .Values.harbor.database.type "external") }}
@@ -22,6 +22,15 @@ gcs:
   bucket: {{ .Values.objectStorage.buckets.harbor }}
   keyfileData: |
     {{ .Values.objectStorage.gcs.keyfileData | nindent 4 }}
+{{ else if eq .Values.objectStorage.type "azure" -}}
+# TODO
+# Fix harbor backup chart to support azure
+azure:
+  enabled: true
+  accountname: {{ .Values.objectStorage.azure.accountname }}
+  accountkey: {{ .Values.objectStorage.azure.accountkey }}
+  container: {{ .Values.objectStorage.azure.container }}
+  realm: core.windows.net
 {{- end }}
 
 ephemeralBackupStore:

@@ -47,6 +47,24 @@ spec:
                   value: /etc/gcs/gcs-credentials.json
                 - name: BUCKET_NAME
                   value: {{ .Values.gcs.bucket }}
+              {{- else if .Values.azure.enabled }}
+                - name: AZURE_BACKUP
+                  value: "true"
+                - name: AZURE_ACCOUNT_NAME
+                  valueFrom: 
+                    secretKeyRef:
+                      name: harbor-backup-secret
+                      key: azure-account-name
+                - name: AZURE_ACCOUNT_KEY
+                  valueFrom: 
+                    secretKeyRef:
+                      name: harbor-backup-secret
+                      key: azure-account-key
+                - name: AZURE_CONTAINER_NAME
+                  valueFrom: 
+                    secretKeyRef:
+                      name: harbor-backup-secret
+                      key: azure-container-name
               {{- end }}
                 - name: PGPASSWORD
                   valueFrom:
