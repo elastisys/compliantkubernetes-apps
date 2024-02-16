@@ -57,17 +57,17 @@ azure_rm_chunks() {
 
 # Main loop
 if [[ "$DAY" < "$LIMIT" ]]; then
-   echo "- day: $DAY -----"
+  echo "- day: $DAY -----"
   if [[ "$STORAGE_SERVICE" == "azure" ]]; then
-      echo "----- listing Azure chunks"
-      azure_list_chunks "$DAY" > "$TMPFILE"
-      echo "----- clearing Azure chunks"
-      azure_rm_chunks "$TMPFILE"
+    echo "----- listing Azure chunks"
+    azure_list_chunks "$DAY" > "$TMPFILE"
+    echo "----- clearing Azure chunks"
+    azure_rm_chunks "$TMPFILE"
   else
-      echo "----- listing S3 chunks"
-      s3_list_chunks "$DAY" > "$TMPFILE"
-      echo "----- clearing S3 chunks"
-      s3_rm_chunks "$TMPFILE"
+    echo "----- listing S3 chunks"
+    s3_list_chunks "$DAY" > "$TMPFILE"
+    echo "----- clearing S3 chunks"
+    s3_rm_chunks "$TMPFILE"
   fi
 fi
 echo "---"
