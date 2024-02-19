@@ -85,7 +85,7 @@ aggregator:
           s3_bucket {{ .Values.objectStorage.buckets.scFluentd }}
 
           {{- else if eq .Values.objectStorage.type "azure" }}
-          azure_container {{ .Values.objectStorage.azure.sclogscontainerName }}
+          azure_container {{ .Values.objectStorage.buckets.scFluentd }}
           {{- end }}
 
           path logs/%Y%m%d/${tag}/
