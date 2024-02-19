@@ -133,10 +133,16 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
+1. Remove hnc `tree.hnc.x-k8s.io/depth` label from system admin namespaces
+
+    ```bash
+    ./migration/v0.36/apply/10-hnc-excluded-ns.sh execute
+    ```
+
 1. Configure namespaces in helm and update gatekeeper
 
     ```bash
-    ./migration/v0.36/apply/40-namespaces.sh
+    ./migration/v0.36/apply/40-namespaces.sh execute
     ```
 
 1. Upgrade applications:
