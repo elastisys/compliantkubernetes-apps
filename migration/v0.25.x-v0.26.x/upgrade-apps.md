@@ -66,6 +66,7 @@
 1. *Note:* About OpenSearch certificates
 
     > Applicable if OpenSearch Securityadmin fails when running apply with something similar to this:
+    >
     > ```console
     > ERR: An unexpected SSLHandshakeException occurred: PKIX path building failed
     > ```

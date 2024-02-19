@@ -1,14 +1,23 @@
 name: Chart Upgrade Request
-description: Create a chart upgrade request to update update a component of Compliant Kubernetes
-labels: improvement
+description: Create a chart upgrade request to update a component of Compliant Kubernetes Apps
+labels: kind/improvement
 body:
+  - type: markdown
+    attributes:
+      value: |-
+        Thank you for taking the time to help improve Compliant Kubernetes!
+
+        > [!warning]
+        > **This is a public repository, ensure not to disclose:**
+        >
+        > - [x] personal data beyond what is necessary for interacting with this issue, nor
+        > - [x] business confidential information, such as customer names.
   - type: input
     attributes:
       label: Chart to upgrade
-      placeholder: e.g. dexidp/dex
+      placeholder: repository/chart
     validations:
       required: true
-
   - type: checkboxes
     attributes:
       label: Reason for upgrade
@@ -16,23 +25,23 @@ body:
         - label: Security patching
         - label: Upgrade to allow new features
         - label: Upgrade to prevent future issues
+        - label: Upgrade to maintain a supported version
         - label: Other - _Write the reason below_
-
   - type: textarea
     attributes:
       label: Additional context
-      placeholder: |
+      placeholder: |-
         Any additional information about the chart upgrade here.
 
-        Minimum version required, Other reason for upgrade,...
+        Deadline for supported version, minimum version required, other reason for upgrade,...
     validations:
       required: false
-
   - type: textarea
     attributes:
       label: Acceptance criteria
+      description: Testable conditions for when this chart upgrade can be considered completed
       placeholder: When can this chart upgrade be considered done
-      value: |
+      value: |-
         - I checked the migration of the new chart version:
           - [ ] The upgrade does not require migration steps
           - [ ] The upgrade requires migration steps

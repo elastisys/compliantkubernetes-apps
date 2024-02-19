@@ -149,7 +149,7 @@ Assuming you already have everything needed to install the apps, this is what yo
     Note that the configuration is split between read-only default configs found in the `defaults/` directory, and the override configs `common-config.yaml`, `sc-config.yaml` and `wc-config.yaml` which are editable and will override any default value.
     The `common-config.yaml` will be applied to both the service and workload cluster, although it will be overridden by the any value set in the `sc-config.yaml` or `wc-config.yaml` respectively.
     When new configs are created this will generate new random passwords for all services.
-    When configs are updated this will *not* overwrite existing values in the override configs.
+    When configs are updated this will _not_ overwrite existing values in the override configs.
     It will create a backup of the old override configs placed in `backups/`, generate new default configs in `defaults/`, merge common values into `common-config.yaml`, and clear out redundant values set in the override configs that matches the default values.
     See [compliantkubernetes.io](https://compliantkubernetes.io/) if you are uncertain about what order you should do things in.
 
@@ -159,6 +159,7 @@ Assuming you already have everything needed to install the apps, this is what yo
 
     > [!NOTE]
     > It is possible to initialize `wc` and `sc` clusters separately by replacing `both` when running the `init` command:
+    >
     > ```bash
     > ./bin/ck8s init wc
     > ./bin/ck8s init sc
@@ -451,6 +452,7 @@ On unexpected failures the command will try to perform a rollback when possible 
 
 > [!NOTE]
 > It is possible to upgrade `wc` and `sc` clusters separately by replacing `both` when running the `upgrade` command, e.g. the following will only upgrade the workload cluster:
+>
 > ```bash
 > ./bin/ck8s upgrade wc vX.Y prepare
 > ./bin/ck8s upgrade wc vX.Y apply

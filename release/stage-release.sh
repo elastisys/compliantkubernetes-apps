@@ -1,9 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -euo pipefail
 
 if ! command -v releaser >/dev/null; then
-    echo "releaser is not installed, install it by following the installation steps https://github.com/elastisys/releaser/#installation" >&2
+    echo "releaser is not installed, install it by running: go install github.com/elastisys/releaser/cmd/releaser@latest" >&2
+    echo "For more information see https://github.com/elastisys/releaser/#installation" >&2
     exit 1
 fi
 
@@ -15,14 +16,14 @@ function usage() {
 [ ${#} -eq 1 ] || usage
 
 full_version="${1}"
-minor_version="$(echo "${full_version}" | cut -d '.' -f 1,2)"
-patch_version="$(echo "${full_version}" | cut -d '.' -f 3)"
+series="$(echo "${full_version}" | cut -d '.' -f 1,2)"
+patch="$(echo "${full_version}" | cut -d '.' -f 3)"
 
 #
 # Create staging branch
 #
 
-git switch "release-${minor_version}"
+git switch "release-${series}"
 git pull
 git switch -c "staging-${full_version}"
 
@@ -40,7 +41,7 @@ done
 
 here="$(dirname "$(readlink -f "$0")")"
 changelog_dir="${here}/../changelog"
-changelog_path="${changelog_dir}/${minor_version}.md"
+changelog_path="${changelog_dir}/${series}.md"
 
 mkdir -p "${changelog_dir}"
 
@@ -48,7 +49,7 @@ mkdir -p "${changelog_dir}"
 # notes. Also add an extra hashtag to please the markdownlint rule:
 # MD025 Multiple top level headers in the same document
 # TODO: Find a nicer way to do this.
-[ "${patch_version}" != "0" ] && printf "\n#" >> "${changelog_path}"
+[ "${patch}" != "0" ] && printf "\n#" >> "${changelog_path}"
 
 releaser changelog compliantkubernetes-apps "${full_version}" >> "${changelog_path}"
 

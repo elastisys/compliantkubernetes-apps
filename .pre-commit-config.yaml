@@ -1,11 +1,11 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
       - id: no-commit-to-branch
       - id: check-merge-conflict
       - id: check-yaml
-        exclude: ^helmfile\.d/(bases/.*|charts/.*/templates/.*|stacks/.*|upstream/.*|state.yaml)$|bootstrap/
+        exclude: ^helmfile\.d/(bases/.*|charts/.*/templates/.*|stacks/.*|upstream/.*|state.yaml)$
         args:
           - --allow-multiple-documents
       - id: check-json
@@ -17,25 +17,37 @@ repos:
       - id: trailing-whitespace
         exclude: ^helmfile\.d/upstream/|^tests/.*/resources/
 
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.39.0
+    hooks:
+      - id: markdownlint
+        name: lint markdown
+        args:
+          - --disable
+          - MD013 # Line length
+          - MD024 # Multiple headings with the same content
+          - MD026 # Trailing punctuation in heading
+          - MD028 # Blank line inside blockquote
+          - MD029 # Ordered list item prefix
+          - MD033 # Inline HTML
+          - MD034 # Bare URL used
+          - MD036 # Emphasis used instead of a heading
+          - MD040 # Fenced code blocks should have a language specified
+          - MD041 # First line in a file should be a top-level heading
+          - MD042 # No empty links
+          - MD051 # Link fragments should be valid
+          - --
+        exclude: ^helmfile\.d/upstream/|^helmfile\.d/charts/grafana-dashboards/files/welcome.md$|^helmfile\.d/charts/opensearch/configurer/files/dashboards-resources/welcome.md$|^images/elasticsearch-curator/README.md
+
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
     rev: 2.7.3
     hooks:
       - id: editorconfig-checker
         name: check indentation
-        exclude: ^.gitmodules$|^helmfile\.d/upstream/|^helmfile\.d/charts/grafana-dashboards/dashboards/|^LICENSE$|^tests/.*/resources/
-
-  - repo: https://github.com/jumanjihouse/pre-commit-hooks
-    rev: 3.0.0
-    hooks:
-      - id: markdownlint
-        name: check markdown
-        exclude: ^.github/pull_request_template.md$|^helmfile\.d/upstream/|^CHANGELOG.md$|^WIP-CHANGELOG.md$|^helmfile\.d/charts/grafana-dashboards/files/welcome.md$|^helmfile\.d/charts/opensearch/configurer/files/dashboards-resources/welcome.md$|^images/elasticsearch-curator/README.md
-        args:
-          - -r
-          - ~MD013,~MD024,~MD026,~MD027,~MD028,~MD034,~MD033
+        exclude: ^helmfile\.d/upstream/|^helmfile\.d/charts/grafana-dashboards/dashboards/|^LICENSE$|^tests/.*/resources/
 
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.4
+    rev: v2.2.6
     hooks:
       - id: codespell
         name: check spelling

@@ -1,54 +1,58 @@
 name: Bug Report
-description: Create a bug report to help us improve Compliant Kubernetes
-labels: bug
+description: Create a bug report to help us improve Compliant Kubernetes Apps
+labels: kind/bug
 body:
+  - type: markdown
+    attributes:
+      value: |-
+        Thank you for taking the time to help improve Compliant Kubernetes!
+
+        > [!warning]
+        > **This is a public repository, ensure not to disclose:**
+        >
+        > - [x] personal data beyond what is necessary for interacting with this issue, nor
+        > - [x] business confidential information, such as customer names.
   - type: textarea
     attributes:
-      label: Current behaviour
+      label: Experienced behaviour
       description: Clear and concise description of what you experienced.
-      placeholder: Description of what the bug is.
     validations:
       required: true
-
   - type: textarea
     attributes:
       label: Expected behaviour
       description: Clear and concise description of what you expected.
     validations:
       required: true
-
   - type: textarea
     attributes:
       label: Steps to reproduce
-      description: Minimal example of that shows the behaviour you experienced.
-      placeholder: |
+      description: Minimal example that shows the behaviour you experienced.
+      placeholder: |-
         1. Go to '...'
         1. Click on '...'
         1. Scroll down to '...'
         1. See error
     validations:
       required: true
-
   - type: input
     attributes:
       label: Compliant Kubernetes Apps Version
       placeholder: vX.Y.Z
     validations:
       required: true
-
   - type: input
     attributes:
       label: Kubernetes Version
       placeholder: vX.Y.Z
     validations:
       required: false
-
   - type: textarea
     attributes:
       label: Additional context
-      description: |
-        Any additional information about the problem.
+      description: |-
+        Any additional information about the bug here.
 
-        Include screenshots if applicable to help explain the problem.
+        Include screenshots if applicable.
     validations:
       required: false

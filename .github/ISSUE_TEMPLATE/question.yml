@@ -1,0 +1,30 @@
+name: Question
+description: Ask a question regarding Compliant Kubernetes Apps
+labels: kind/question
+body:
+  - type: markdown
+    attributes:
+      value: |-
+        Got a question about Compliant Kubernetes? Ask away and we'll get back to you!
+
+        > [!warning]
+        > **This is a public repository, ensure not to disclose:**
+        >
+        > - [x] personal data beyond what is necessary for interacting with this issue, nor
+        > - [x] business confidential information, such as customer names.
+  - type: textarea
+    attributes:
+      label: Question
+      placeholder: |-
+        Write your question here.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: |-
+        Any additional information about the question here.
+
+        Include screenshots if applicable.
+    validations:
+      required: false

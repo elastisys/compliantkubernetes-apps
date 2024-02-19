@@ -50,7 +50,7 @@
             - 0.0.0.0/0
     ```
 
-1. *When using Harbor on Swift:* Migrate Swift configuration.
+1. _When using Harbor on Swift:_ Migrate Swift configuration.
 
     ```bash
     ./migration/v0.26.x-v0.27.x/migrate-swift.sh
@@ -71,7 +71,7 @@
     ./migration/v0.26.x-v0.27.x/reinstall-hnc.sh
     ```
 
-1. *IMPORTANT* If you are using any Dex connector of type `google` and you haven't added a service account then you'll need to change it to a type `oidc`
+1. _IMPORTANT_ If you are using any Dex connector of type `google` and you haven't added a service account then you'll need to change it to a type `oidc`
 
     This can be done by adding the following line to the `config` part in the connector
 
@@ -96,7 +96,7 @@
 
 1. Upgrade the `workload-cluster-np` with the new changes, before applying the common-np chart:
 
-    *If alertmanager was not enabled in wc before, you need to enable it before applying the network policies.*
+    _If alertmanager was not enabled in wc before, you need to enable it before applying the network policies._
 
     ```bash
     ./bin/ck8s bootstrap wc

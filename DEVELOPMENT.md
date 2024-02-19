@@ -33,6 +33,7 @@ This requires that `kind` is installed and that either `podman` or `docker` is a
 > [!note]
 > In its current state the local cluster is created to be either SC or WC, and currently the scripts does not support setting up both a SC and WC.
 > To setup two independent clusters the following must be changed manually:
+>
 > 1. the kind-config/local-cluster-profile must not bind the ingress controller to the same address, and
 > 1. the node-local-dns config must be updated to point towards the correct clusters.
 
@@ -86,6 +87,7 @@ helmfile -e <service|workload>_cluster -lapp=ingress-nginx -lapp=node-local-dns 
 
 > [!important]
 > To use `podman` with their `aardvark` DNS resolver you must edit the CoreDNS ConfigMap to prefer UDP:
+>
 > ```diff
 > $ kubectl --namespace edit configmap coredns
 >
@@ -102,25 +104,25 @@ helmfile -e <service|workload>_cluster -lapp=ingress-nginx -lapp=node-local-dns 
 
 Support matrix:
 
-App            | SC | WC | Notes
--------------- | -- | -- | -----
-calico         | 🟨️ | 🟨️ | Requires Cluster API settings to work.
-cert-manager   | 🟩️ | 🟩️ |
-dex            | 🟩️ | ⬜️ | Does not pull in cert-manager or ingress-nginx. For full functionality use: <br/> `-lapp=cert-manager -lapp=dex -lapp=ingress-nginx -lapp=node-local-dns`
-falco          | 🟥️ | 🟥️ | Installs but cannot start due to lack of permissions inside Kind.
-fluentd        | 🟩️ | 🟨️ | Installs but cannot start without creating initial resources on WC.
-gatekeeper     | 🟩️ | 🟩️ |
-grafana        | 🟩️ | ⬜️ | Does not pull in cert-manager, dex, ingress-nginx, monitors, rules, or thanos. For full functionality use: <br/> `-lapp=cert-manager -lapp=dex -lapp=ingress-nginx -lapp=node-local-dns -lapp=prometheus`
-harbor         | 🟩️ | ⬜️ | Does not pull in dex or ingress-nginx. For full functionality use: <br/> `-lapp=cert-manager -lapp=dex -lapp=harbor -lapp=ingress-nginx -lapp=node-local-dns`
-hnc            | ⬜️ | 🟩️ |
-ingress-nginx  | 🟩️ | 🟩️ |
-kured          | 🟩️ | 🟩️ |
-node-local-dns | 🟩️ | 🟩️ |
-opensearch     | 🟩️ | ⬜️ | Does not pull ingress-nginx. Prod flavour is heavy on resources. For full functionality use: <br/> `-lapp=cert-manager -lapp=dex -lapp=ingress-nginx -lapp=node-local-dns -lapp=opensearch`
-prometheus     | 🟩️ | 🟩️ |
-thanos         | 🟩️ | ⬜️ | Does not pull cert-manager, or ingress-nginx. For full functionality use: <br/> `-lapp=cert-manager -lapp=ingress-nginx-lapp=node-local-dns -lapp=opensearch -lapp=thanos`
-trivy-operator | 🟩️ | 🟩️ |
-velero         | 🟩️ | 🟩️ |
+| App            | SC | WC | Notes |
+| -------------- | -- | -- | ----- |
+| calico         | 🟨️ | 🟨️ | Requires Cluster API settings to work. |
+| cert-manager   | 🟩️ | 🟩️ | |
+| dex            | 🟩️ | ⬜️ | Does not pull in cert-manager or ingress-nginx. For full functionality use: <br/> `-lapp=cert-manager -lapp=dex -lapp=ingress-nginx -lapp=node-local-dns` |
+| falco          | 🟥️ | 🟥️ | Installs but cannot start due to lack of permissions inside Kind. |
+| fluentd        | 🟩️ | 🟨️ | Installs but cannot start without creating initial resources on WC. |
+| gatekeeper     | 🟩️ | 🟩️ | |
+| grafana        | 🟩️ | ⬜️ | Does not pull in cert-manager, dex, ingress-nginx, monitors, rules, or thanos. For full functionality use: <br/> `-lapp=cert-manager -lapp=dex -lapp=ingress-nginx -lapp=node-local-dns -lapp=prometheus` |
+| harbor         | 🟩️ | ⬜️ | Does not pull in dex or ingress-nginx. For full functionality use: <br/> `-lapp=cert-manager -lapp=dex -lapp=harbor -lapp=ingress-nginx -lapp=node-local-dns` |
+| hnc            | ⬜️ | 🟩️ | |
+| ingress-nginx  | 🟩️ | 🟩️ | |
+| kured          | 🟩️ | 🟩️ | |
+| node-local-dns | 🟩️ | 🟩️ | |
+| opensearch     | 🟩️ | ⬜️ | Does not pull ingress-nginx. Prod flavour is heavy on resources. For full functionality use: <br/> `-lapp=cert-manager -lapp=dex -lapp=ingress-nginx -lapp=node-local-dns -lapp=opensearch` |
+| prometheus     | 🟩️ | 🟩️ | |
+| thanos         | 🟩️ | ⬜️ | Does not pull cert-manager, or ingress-nginx. For full functionality use: <br/> `-lapp=cert-manager -lapp=ingress-nginx-lapp=node-local-dns -lapp=opensearch -lapp=thanos` |
+| trivy-operator | 🟩️ | 🟩️ | |
+| velero         | 🟩️ | 🟩️ | |
 
 Key: 🟩️ Runs without issues, 🟨️ Runs with some issues, 🟥️ Does not run, ⬜️ Does not install by design.
 
