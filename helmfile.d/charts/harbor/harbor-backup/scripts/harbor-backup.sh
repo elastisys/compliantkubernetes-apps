@@ -219,7 +219,7 @@ remove_old_backups () {
           s3_remove_path "${path}"
       elif [[ ${GCS_BACKUP} == "true" ]]; then
           gcs_remove_path "${path}"
-      elif [[ ${GCS_BACKUP} == "true" ]]; then
+      elif [[ ${AZURE_BACKUP} == "true" ]]; then
           azure_remove_path "${path}"
       fi
     done

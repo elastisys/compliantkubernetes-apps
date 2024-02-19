@@ -175,6 +175,7 @@ if [[ "$STORAGE_SERVICE" == "azure" ]]; then
 else
   days=$(s3_list_days)
 fi
+
 for DAY in ${days}; do
   if [[ "$DAY" > "$LIMIT" ]]; then
     echo "- day: $DAY -----"
