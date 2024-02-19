@@ -27,8 +27,8 @@ extraDeploy:
       AWS_ACCESS_KEY_ID: {{ .Values.objectStorage.s3.accessKey }}
       AWS_ACCESS_SECRET_KEY: {{ .Values.objectStorage.s3.secretKey }}
       {{- else if eq .Values.objectStorage.type "azure" }}
-      AZURE_STORAGE_ACCOUNT: {{ .Values.objectStorage.azure.sclogsaccountName }}
-      AZURE_STORAGE_ACCESS_KEY: {{ .Values.objectStorage.azure.sclogsaccountKey }}
+      AZURE_STORAGE_ACCOUNT: {{ .Values.objectStorage.azure.accountName }}
+      AZURE_STORAGE_ACCESS_KEY: {{ .Values.objectStorage.azure.accountKey }}
       {{- end }}
 
 aggregator:
