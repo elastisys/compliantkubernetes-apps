@@ -52,7 +52,7 @@ config:
   {{- else if eq .Values.objectStorage.type "azure" }}
   azure:
     enabled: true
-    containerName: {{ .Values.objectStorage.azure.containerName }}
+    containerName: {{ .Values.objectStorage.buckets.opensearch }}
   {{- end }}
 
   {{- end }}

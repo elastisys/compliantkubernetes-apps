@@ -163,10 +163,10 @@ aggregator:
       {{- else if eq .Values.objectStorage.type "azure" }}
       @type azure_storage_append_blob
 
-      azure_storage_account {{ .Values.objectStorage.azure.sclogsaccountName }}
-      azure_storage_access_key {{ .Values.objectStorage.azure.sclogsaccountKey }}
+      azure_storage_account {{ .Values.objectStorage.azure.accountName }}
+      azure_storage_access_key {{ .Values.objectStorage.azure.accountKey }}
       path logs/${tag}/%Y%m%d/
-      azure_container_name {{ .Values.objectStorage.azure.sclogscontainerName }}
+      azure_container_name {{ .Values.objectStorage.buckets.audit }}
       auto_create_container true
       buffer_type file
       buffer_path /var/log/fluent/azureblob/
@@ -193,7 +193,7 @@ aggregator:
           s3_bucket {{ .Values.objectStorage.buckets.audit }}
 
           {{- else if eq .Values.objectStorage.type "azure" }}
-          azure_container {{ .Values.objectStorage.azure.sclogscontainerName }}
+          azure_container {{ .Values.objectStorage.buckets.audit }}
           {{- end }}
           path {{ .Values.global.clusterName }}/%Y%m%d/${tag}/
 

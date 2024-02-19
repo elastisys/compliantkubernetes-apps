@@ -29,7 +29,7 @@ azure:
   enabled: true
   accountname: {{ .Values.objectStorage.azure.accountname }}
   accountkey: {{ .Values.objectStorage.azure.accountkey }}
-  container: {{ .Values.objectStorage.azure.container }}
+  container: {{ .Values.objectStorage.buckets.harbor }}
   realm: core.windows.net
 {{- end }}
 
