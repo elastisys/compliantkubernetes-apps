@@ -53,8 +53,7 @@ configuration:
       prefix: workload-cluster
       config:
         resourceGroup: {{ .Values.objectStorage.azure.resourceGroup }}
-        storageAccount: {{ .Values.objectStorage.azure.storageAccount }}
-        subscriptionId: {{ .Values.objectStorage.azure.subscriptionId }}
+        storageAccount: {{ .Values.objectStorage.azure.accountName }}
       {{- end }}
 
   # https://velero.io/docs/v1.11/api-types/volumesnapshotlocation/
@@ -71,6 +70,7 @@ configuration:
     - provider: azure
       config:
         resourceGroup: {{ .Values.objectStorage.azure.resourceGroup }}
+        subscriptionId: {{ .Values.objectStorage.azure.subscriptionId }}
     {{- end }}
 
 credentials:
@@ -84,10 +84,11 @@ credentials:
     {{- else if eq .Values.objectStorage.type "gcs" }}
       {{ .Values.objectStorage.gcs.keyfileData | nindent 6 }}
     {{- else if eq .Values.objectStorage.type "azure" }}
-      AZURE_SUBSCRIPTION_ID={{ .Values.objectStorage.azure.subscriptionId }}
-      AZURE_TENANT_ID={{ .Values.objectStorage.azure.tenantId }}
-      AZURE_CLIENT_ID={{ .Values.objectStorage.azure.clientId }}
-      AZURE_CLIENT_SECRET={{ .Values.objectStorage.azure.clientSecret }}
+      AZURE_SUBSCRIPTION_ID= {{ .Values.objectStorage.azure.subscriptionId }}
+      AZURE_TENANT_ID= {{ .Values.objectStorage.azure.tenantId }}
+      AZURE_CLIENT_ID= {{ .Values.objectStorage.azure.clientId }}
+      AZURE_CLIENT_SECRET= {{ .Values.objectStorage.azure.clientSecret }}
+      AZURE_RESOURCE_GROUP= {{ .Values.objectStorage.azure.resourceGroup }}
       AZURE_CLOUD_NAME=AzurePublicCloud
     {{- end }}
 
