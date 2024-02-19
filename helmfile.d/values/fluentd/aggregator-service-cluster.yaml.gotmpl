@@ -85,8 +85,6 @@ aggregator:
           s3_bucket {{ .Values.objectStorage.buckets.scFluentd }}
 
           {{- else if eq .Values.objectStorage.type "azure" }}
-          azure_storage_account {{ .Values.objectStorage.azure.sclogsaccountName }}
-          azure_storage_access_key {{ .Values.objectStorage.azure.sclogsaccountKey }}
           azure_container {{ .Values.objectStorage.azure.sclogscontainerName }}
           {{- end }}
 

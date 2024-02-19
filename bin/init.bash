@@ -326,13 +326,6 @@ set_fluentd_config() {
     esac
 
     replace_set_me "${file}" '.fluentd.forwarder.useRegionEndpoint' "${use_region_endpoint}"
-
-    if [ "${CK8S_CLOUD_PROVIDER}" = "azure" ]; then
-
-        replace_set_me "${file}" '.fluentd.azure.enabled' "true"
-    else
-        replace_set_me "${file}" '.fluentd.s3.enabled' "true"
-    fi
 }
 
 # Usage: set_lbsvc_safeguard <config-file>
