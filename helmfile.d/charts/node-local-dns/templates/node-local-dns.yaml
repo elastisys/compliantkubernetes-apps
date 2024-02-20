@@ -143,8 +143,7 @@ spec:
       containers:
       - name: node-cache
         image: registry.k8s.io/dns/k8s-dns-node-cache:1.22.20
-        resources:
-          {{- toYaml .Values.resources | nindent 12 }}
+        resources: {{- toYaml .Values.resources | nindent 10 }}
         args: [ "-localip", "{{ .Values.localIP }},{{ .Values.clusterDNS }}", "-conf", "/etc/Corefile", "-upstreamsvc", "kube-dns-upstream"]
         securityContext:
           privileged: true

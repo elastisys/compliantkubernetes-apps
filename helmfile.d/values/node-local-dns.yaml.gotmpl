@@ -8,3 +8,5 @@ errorConfig: |-
 {{- if dig "nodeLocalDns" "customConfig" false .Values }}
 customConfig: {{ toYaml .Values.nodeLocalDns.customConfig }}
 {{- end }}
+
+resources: {{- toYaml .Values.nodeLocalDns.resources | nindent 2 }}
