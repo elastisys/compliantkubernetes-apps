@@ -30,21 +30,21 @@ spec:
               image: {{ $.Values.image.repository }}:{{ default $.Chart.AppVersion $.Values.image.tag }}
               command: [/scripts/retention.sh]
               env:
-                {{- if .Values.s3.enabled }}
+                {{- if $.Values.s3.enabled }}
                 - name: S3_CONFIG
                   value: /configs/s3cfg.ini
                 - name: S3_BUCKET
                   value: {{ .bucket }}
                 - name: S3_PREFIX
                   value: {{ .prefix }}
-                {{- else if .Values.azure.enabled }}
+                {{- else if $.Values.azure.enabled }}
                 - name: AZURE_STORAGE_CONNECTION_STRING
                   valueFrom:
                     secretRef:
                       name: {{ include "log-manager.fullname" . }}-storage-credentials
                       value: azure-storage-connection-string
                 - name: AZURE_CONTAINER_NAME
-                  value: {{ .Values.azure.containerName }}
+                  value: {{ $.Values.azure.containerName }}
                 - name: AZURE_PREFIX
                   value: logs
                 - name: STORAGE_SERVICE
@@ -66,7 +66,7 @@ spec:
                   mountPath: /scripts
                   readOnly: true
           volumes:
-            {{- if .Values.s3.enabled }}
+            {{- if $.Values.s3.enabled }}
             - name: s3cfg
               secret:
                 secretName: {{ include "log-manager.fullname" $ }}-storage-credentials

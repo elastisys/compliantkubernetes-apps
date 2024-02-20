@@ -54,24 +54,8 @@ configuration:
       config:
         resourceGroup: {{ .Values.objectStorage.azure.resourceGroup }}
         storageAccount: {{ .Values.objectStorage.azure.accountName }}
+        storageAccountKeyEnvVar: AZURE_STORAGE_ACCOUNT_ACCESS_KEY
       {{- end }}
-
-  # https://velero.io/docs/v1.11/api-types/volumesnapshotlocation/
-  volumeSnapshotLocation:
-    {{- if eq .Values.objectStorage.type "s3" }}
-    - provider: aws
-      config:
-        region: {{ .Values.objectStorage.s3.region }}
-    {{- else if eq .Values.objectStorage.type "gcs" }}
-    - provider: gcp
-      config:
-        project: {{ .Values.objectStorage.gcs.project }}
-    {{- else if eq .Values.objectStorage.type "azure" }}
-    - provider: azure
-      config:
-        resourceGroup: {{ .Values.objectStorage.azure.resourceGroup }}
-        subscriptionId: {{ .Values.objectStorage.azure.subscriptionId }}
-    {{- end }}
 
 credentials:
   # Create secret with credentials
@@ -84,11 +68,7 @@ credentials:
     {{- else if eq .Values.objectStorage.type "gcs" }}
       {{ .Values.objectStorage.gcs.keyfileData | nindent 6 }}
     {{- else if eq .Values.objectStorage.type "azure" }}
-      AZURE_SUBSCRIPTION_ID= {{ .Values.objectStorage.azure.subscriptionId }}
-      AZURE_TENANT_ID= {{ .Values.objectStorage.azure.tenantId }}
-      AZURE_CLIENT_ID= {{ .Values.objectStorage.azure.clientId }}
-      AZURE_CLIENT_SECRET= {{ .Values.objectStorage.azure.clientSecret }}
-      AZURE_RESOURCE_GROUP= {{ .Values.objectStorage.azure.resourceGroup }}
+      AZURE_STORAGE_ACCOUNT_ACCESS_KEY={{ .Values.objectStorage.azure.accountKey }}
       AZURE_CLOUD_NAME=AzurePublicCloud
     {{- end }}
 
