@@ -59,9 +59,11 @@ spec:
               resources: {{- toYaml . | nindent 16 }}
               {{- end }}
               volumeMounts:
+                {{- if $.Values.s3.enabled }}
                 - name: s3cfg
                   mountPath: /configs
                   readOnly: true
+                {{- end }}
                 - name: scripts
                   mountPath: /scripts
                   readOnly: true
