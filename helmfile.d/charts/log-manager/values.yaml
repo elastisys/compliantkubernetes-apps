@@ -8,11 +8,13 @@ image:
   tag: ""
 
 s3:
+  enabled: false
   forcePathStyle: false
   regionEndpoint: set-me
   accessKey: set-me
   secretKey: set-me
 azure:
+  enabled: false
   accountName: set-me
   accountKey: set-me
   containerName: set-me
