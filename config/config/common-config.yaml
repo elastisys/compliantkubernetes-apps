@@ -1012,3 +1012,10 @@ nodeLocalDns:
   #      loop
   #      forward . 127.0.0.1:9005
   #      }
+  resources:
+    limits:
+      cpu: 100m
+      memory: 200Mi
+    requests:
+      cpu: 25m
+      memory: 40Mi
