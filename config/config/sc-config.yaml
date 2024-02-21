@@ -1267,6 +1267,8 @@ tektonPipelines:
         cpu: 10m
         memory: 64Mi
 
+    denyNamespaces: []
+
   remoteResolvers:
     replicas: 1
 
