@@ -17,13 +17,13 @@ webhooks:
       namespace: '{{ .Release.Namespace }}'
   failurePolicy: Fail
   name: validation.webhook.pipeline.tekton.dev
-  {{- if .Values.webhook.denyNamespaces }}
+  {{- if .Values.webhook.excludeNamespaces }}
   namespaceSelector:
     matchExpressions:
     - key: kubernetes.io/metadata.name
       operator: NotIn
       values:
-      {{- range $namespace := mustUniq .Values.webhook.denyNamespaces }}
+      {{- range $namespace := mustUniq .Values.webhook.excludeNamespaces }}
       - {{ $namespace }}
       {{- end }}
   {{- end }}
@@ -48,13 +48,13 @@ webhooks:
       namespace: '{{ .Release.Namespace }}'
   failurePolicy: Fail
   name: config.webhook.pipeline.tekton.dev
-  {{- if .Values.webhook.denyNamespaces }}
+  {{- if .Values.webhook.excludeNamespaces }}
   namespaceSelector:
     matchExpressions:
     - key: kubernetes.io/metadata.name
       operator: NotIn
       values:
-      {{- range $namespace := mustUniq .Values.webhook.denyNamespaces }}
+      {{- range $namespace := mustUniq .Values.webhook.excludeNamespaces }}
       - {{ $namespace }}
       {{- end }}
   {{- end }}

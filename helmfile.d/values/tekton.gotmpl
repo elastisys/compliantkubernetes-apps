@@ -5,8 +5,8 @@ controller:
 webhook:
   replicas: {{ .Values.tektonPipelines.webhook.replicas }}
   resources: {{- toYaml .Values.tektonPipelines.webhook.resources | nindent 4 }}
-  denyNamespaces:
-  {{- range .Values.tektonPipelines.webhook.denyNamespaces }}
+  excludeNamespaces:
+  {{- range .Values.tektonPipelines.webhook.excludeNamespaces }}
   - {{ . }}
   {{- end }}
 
