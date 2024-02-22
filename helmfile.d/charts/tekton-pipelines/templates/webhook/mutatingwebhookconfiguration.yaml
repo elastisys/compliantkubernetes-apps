@@ -17,14 +17,10 @@ webhooks:
       namespace: '{{ .Release.Namespace }}'
   failurePolicy: Fail
   name: webhook.pipeline.tekton.dev
-  {{- if .Values.webhook.excludeNamespaces }}
   namespaceSelector:
     matchExpressions:
     - key: kubernetes.io/metadata.name
-      operator: NotIn
+      operator: In
       values:
-      {{- range $namespace := mustUniq .Values.webhook.excludeNamespaces }}
-      - {{ $namespace }}
-      {{- end }}
-  {{- end }}
+      - tekton-pipelines
   sideEffects: None

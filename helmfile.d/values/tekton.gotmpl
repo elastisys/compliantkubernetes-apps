@@ -5,10 +5,6 @@ controller:
 webhook:
   replicas: {{ .Values.tektonPipelines.webhook.replicas }}
   resources: {{- toYaml .Values.tektonPipelines.webhook.resources | nindent 4 }}
-  excludeNamespaces:
-  {{- range .Values.tektonPipelines.webhook.excludeNamespaces }}
-  - {{ . }}
-  {{- end }}
 
 remoteResolvers:
   replicas: {{ .Values.tektonPipelines.remoteResolvers.replicas }}

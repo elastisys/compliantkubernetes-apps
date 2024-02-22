@@ -17,16 +17,12 @@ webhooks:
       namespace: '{{ .Release.Namespace }}'
   failurePolicy: Fail
   name: validation.webhook.pipeline.tekton.dev
-  {{- if .Values.webhook.excludeNamespaces }}
   namespaceSelector:
     matchExpressions:
     - key: kubernetes.io/metadata.name
-      operator: NotIn
+      operator: In
       values:
-      {{- range $namespace := mustUniq .Values.webhook.excludeNamespaces }}
-      - {{ $namespace }}
-      {{- end }}
-  {{- end }}
+      - tekton-pipelines
   sideEffects: None
 ---
 apiVersion: admissionregistration.k8s.io/v1
@@ -48,16 +44,12 @@ webhooks:
       namespace: '{{ .Release.Namespace }}'
   failurePolicy: Fail
   name: config.webhook.pipeline.tekton.dev
-  {{- if .Values.webhook.excludeNamespaces }}
   namespaceSelector:
     matchExpressions:
     - key: kubernetes.io/metadata.name
-      operator: NotIn
+      operator: In
       values:
-      {{- range $namespace := mustUniq .Values.webhook.excludeNamespaces }}
-      - {{ $namespace }}
-      {{- end }}
-  {{- end }}
+      - tekton-pipelines
   objectSelector:
     matchLabels:
       app.kubernetes.io/part-of: tekton-pipelines
