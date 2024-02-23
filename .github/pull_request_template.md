@@ -85,6 +85,7 @@
   - [ ] The change is disruptive
   - [ ] The change requires no migration steps
   - [ ] The change requires migration steps
+  - [ ] The CRDs were upgraded (if a chart with CRDs was upgraded)
 - Metrics checks:
   - [ ] The metrics are still exposed and present in Grafana after the change
   - [ ] The metrics names didn't change (Grafana dashboards and Prometheus alerts are not affected)
