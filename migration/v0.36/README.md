@@ -108,6 +108,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
+1. Set the memory limit for Thanos Distributor to 1Gi, if less
+
+    ```bash
+    ./migration/v0.36/prepare/10-thanos-distrib-memory-limit.sh
+    ```
+
 1. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.
