@@ -516,7 +516,7 @@ thanos:
         memory: 100Mi
       limits:
         cpu: 1000m
-        memory: 700Mi
+        memory: 1Gi
 
   ruler:
     # Enables the ruler component
