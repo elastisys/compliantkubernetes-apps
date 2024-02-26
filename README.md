@@ -383,6 +383,14 @@ networkPolicies:
           - 6379
 ```
 
+### Capacity Management
+
+For capacity management, `compliantkubernetes-apps` comes with some [Prometheus alerts](https://github.com/elastisys/compliantkubernetes-apps/blob/main/helmfile.d/charts/prometheus-alerts/templates/alerts/cluster-capacity-management-alerts.yaml) and a [Grafana dashboard](https://github.com/elastisys/compliantkubernetes-apps/blob/main/helmfile.d/charts/grafana-dashboards/dashboards/capacity-management-dashboard.json), which facilitate monitoring on a per Node as well as Node Group basis. The Node Group is meant to represent a logical grouping of Nodes, e.g., `worker` and `control-plane`. As such, in order to make use of these you first have to label your nodes with `elastisys.io/node-group=<node-group>`, for example:
+
+```bash
+kubectl label node <node-name> elastisys.io/node-group=<node-group>
+```
+
 ### Management of the clusters
 
 The [`bin/ck8s`](bin/ck8s) script provides an entry point to the clusters.
