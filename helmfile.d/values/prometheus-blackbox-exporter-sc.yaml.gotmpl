@@ -30,6 +30,10 @@ config:
         preferred_ip_protocol: "ip4"
         tls_config:
           insecure_skip_verify: true
+    {{- if or (eq .Values.harbor.database.type "external") (eq .Values.harbor.redis.type "external") }}
+    tcp_connect:
+      prober: tcp
+    {{- end }}
 serviceMonitor:
   enabled: true
   targets:
