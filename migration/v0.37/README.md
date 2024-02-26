@@ -61,6 +61,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     git switch -d v0.37.x
     ```
 
+1. Install updated local requirements:
+
+    ```bash
+    ./bin/ck8s install-requirements
+    ```
+
 1. If you are running on an Openstack environment and `openstackMonitoring.enabled = true` then you need to make sure that the `openstack-cloud-controller-manager` pod can expose the metrics port. On an environment running [compliantkubernetes-kubespray](https://github.com/elastisys/compliantkubernetes-kubespray) you can do that by running the following commands:
 
     1. Set `external_openstack_cloud_controller_bind_address` to `0.0.0.0`
@@ -97,11 +103,11 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     > **Note:**
     > It is possible to upgrade `wc` and `sc` clusters separately by replacing `both` when running the `upgrade` command, e.g. the following will only upgrade the workload cluster:
-
-    ```bash
-    ./bin/ck8s upgrade wc v0.37 prepare
-    ./bin/ck8s upgrade wc v0.37 apply
-    ```
+    >
+    > ```bash
+    > ./bin/ck8s upgrade wc v0.37 prepare
+    > ./bin/ck8s upgrade wc v0.37 apply
+    > ```
 
 1. Apply upgrade - *disruptive*
 
@@ -124,6 +130,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     git switch -d v0.37.x
     ```
 
+1. Install updated local requirements:
+
+    ```bash
+    ./bin/ck8s install-requirements
+    ```
+
 1. Set whether or not upgrade should be prepared for `both` clusters or for one of `sc` or `wc`:
 
     ```bash
@@ -135,14 +147,14 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     This will take a backup into `backups/` before modifying any files.
 
     ```bash
-    ./bin/ck8s init wc
+    ./bin/ck8s init ${CK8S_CLUSTER}
     # or
     ./migration/v0.37/prepare/50-init.sh
 
     # check if the netpol IPs need to be updated
-    ./bin/ck8s update-ips wc dry-run
+    ./bin/ck8s update-ips ${CK8S_CLUSTER} dry-run
     # if you agree with the changes apply
-    ./bin/ck8s update-ips wc apply
+    ./bin/ck8s update-ips ${CK8S_CLUSTER} apply
     ```
 
 1. Move issuer ingress class keys:

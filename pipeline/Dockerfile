@@ -10,7 +10,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Kubectl
-ENV KUBECTL_VERSION "v1.24.4"
+ENV KUBECTL_VERSION "v1.28.6"
 RUN wget --progress=dot:giga "https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
     install -Tm 755 kubectl /usr/local/bin/kubectl && \
     rm kubectl
@@ -30,7 +30,7 @@ RUN wget --progress=dot:giga "https://github.com/getsops/sops/releases/download/
     rm "sops-v${SOPS_VERSION}.linux.amd64"
 
 # Helm
-ENV HELM_VERSION "v3.8.0"
+ENV HELM_VERSION "v3.13.3"
 RUN wget --progress=dot:giga "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz" && \
     tar -zxvf "helm-${HELM_VERSION}-linux-amd64.tar.gz" && \
     install -Tm 755 linux-amd64/helm /usr/local/bin/helm && \
@@ -39,11 +39,11 @@ RUN wget --progress=dot:giga "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd
 # TODO Change when this is closed https://github.com/helm/helm/issues/7919
 # Should come with v3.3.0, see https://github.com/helm/helm/pull/7983
 ENV XDG_DATA_HOME=/root/.config
-RUN helm plugin install https://github.com/databus23/helm-diff --version v3.1.2
-RUN helm plugin install https://github.com/jkroepke/helm-secrets --version v3.12.0
+RUN helm plugin install https://github.com/databus23/helm-diff --version v3.9.4
+RUN helm plugin install https://github.com/jkroepke/helm-secrets --version v4.5.1
 
 # Helmfile
-ENV HELMFILE_VERSION "0.154.0"
+ENV HELMFILE_VERSION "0.162.0"
 RUN wget --progress=dot:giga "https://github.com/helmfile/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz" && \
     tar -zxvf "helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz" helmfile && \
     install -Tm 755 helmfile /usr/local/bin/helmfile && \
@@ -56,7 +56,7 @@ RUN wget --progress=dot:giga "https://github.com/mikefarah/yq/releases/download/
     rm yq_linux_amd64
 
 # yq4
-ENV YQ_VERSION "v4.26.1"
+ENV YQ_VERSION "v4.42.1"
 RUN wget --progress=dot:giga "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" && \
     install -Tm 755 yq_linux_amd64 /usr/local/bin/yq4 && \
     rm yq_linux_amd64
