@@ -424,6 +424,10 @@ prometheus:
         maxSkew: 1
         topologyKey: kubernetes.io/hostname
         whenUnsatisfiable: DoNotSchedule
+    #image:
+    # registry: registry.example.com
+    # repository: prometheus/alertmanager
+    # tag: vX.Y.Z
   diskAlerts:
     perf: true
 

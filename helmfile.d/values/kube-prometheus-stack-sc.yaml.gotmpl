@@ -162,6 +162,9 @@ alertmanager:
     resources: {{- toYaml .Values.prometheus.alertmanagerSpec.resources | nindent 6 }}
     storage: {{- toYaml .Values.prometheus.alertmanagerSpec.storage | nindent 6 }}
     topologySpreadConstraints: {{- toYaml .Values.prometheus.alertmanagerSpec.topologySpreadConstraints | nindent 4 }}
+{{- if .Values | get "prometheus.alertmanagerSpec.image" nil }}
+    image: {{- toYaml .Values.prometheus.alertmanagerSpec.image | nindent 6 }}
+{{- end }}
 
 kubeControllerManager:
   enabled: false
