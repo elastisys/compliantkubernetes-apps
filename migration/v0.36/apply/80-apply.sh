@@ -10,6 +10,7 @@ source "${ROOT}/scripts/migration/lib.sh"
 declare -a skipped
 skipped=(
   "app!=gatekeeper"
+  "app!=velero"
 )
 declare -a skipped_sc
 skipped_sc=(
