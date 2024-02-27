@@ -1,0 +1,70 @@
+{{- range .Values.targets }}
+{{- $ = merge (dict "component" .destinationName) $ }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  labels: {{- include "rclone.labels" $ | nindent 4 }}
+  name: {{ printf "%s-%s" (include "rclone.fullname" $) .destinationName | trunc 63 | trimSuffix "-" }}
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: {{ $.Values.failedJobsHistoryLimit }}
+  successfulJobsHistoryLimit: {{ $.Values.successfulJobsHistoryLimit }}
+  {{- if hasKey . "schedule" }}
+  schedule: {{ .schedule }}
+  {{- else }}
+  schedule: {{ $.Values.defaultSchedule }}
+  {{- end }}
+  {{- if hasKey . "suspend" }}
+  suspend: {{ .suspend }}
+  {{- else }}
+  suspend: {{ $.Values.defaultSuspend }}
+  {{- end }}
+  {{- with $.Values.timeZone }}
+  timeZone: {{ . }}
+  {{- end }}
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: {{ $.Values.activeDeadlineSeconds }}
+      backoffLimit: {{ $.Values.backoffLimit }}
+      template:
+        metadata:
+          labels: {{- include "rclone.selectorLabels" $ | nindent 12 }}
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: {{ $.Chart.Name }}
+              image: {{ $.Values.image.repository }}:{{ $.Values.image.tag | default $.Chart.AppVersion }}
+              args:
+                - sync
+                {{- if get . "sourceCrypt" | default false }}
+                - "decrypt-{{ .sourceName }}:"
+                {{- else }}
+                - "source-{{ .sourceType }}:{{ .sourceName }}"
+                {{- end }}
+                {{- if get . "destinationCrypt" | default false }}
+                - "encrypt-{{ .destinationName }}:"
+                {{- else }}
+                - "destination-{{ .destinationType }}:{{ .destinationName }}"
+                {{- end }}
+                - --log-level
+                - INFO
+                {{- if $.Values.dryrun }}
+                - --dry-run
+                {{- end }}
+              resources: {{ toYaml $.Values.resources | nindent 16 }}
+              securityContext:
+                allowPrivilegeEscalation: false
+                runAsNonRoot: true
+                seccompProfile:
+                  type: RuntimeDefault
+                capabilities:
+                  drop: [ALL]
+              volumeMounts:
+                - name: config
+                  mountPath: /home/rclone/.config/rclone/
+          volumes:
+            - name: config
+              secret:
+                secretName: {{ include "rclone.fullname" $ }}
+{{- end }}

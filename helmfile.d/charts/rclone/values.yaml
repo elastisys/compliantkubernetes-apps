@@ -1,0 +1,59 @@
+fullnameOverride: ""
+nameOverride: ""
+
+image:
+  repository: ghcr.io/elastisys/rclone-sync
+  tag: ""
+
+activeDeadlineSeconds: 600
+backoffLimit: 0
+
+failedJobsHistoryLimit: 1
+successfulJobsHistoryLimit: 1
+
+defaultSchedule: 0 0 31 2 *
+defaultSuspend: true
+timeZone: ""
+
+dryrun: false
+
+# Encrypt destinations or decrypt sources
+crypt:
+  enabled: false
+
+  # Enables file name encryption
+  fileNamesEnabled: false
+  # Enables directory name encryption
+  directoryNamesEnabled: false
+
+  # rclone obscure of "somelongsecret"
+  password: OYAvXLS7N7LYYqgvmQejHIepyHwdt2q852PRTxpb
+  # rclone obscure of "somelongsecret"
+  salt: wc2BQGqZ4lD4I_Vtwyncv47QZ6Okrc7hY5ONzWQC
+
+# Configure rclone targets
+# - Names translate into the container or bucket name
+# - Crypts translate into the condition if the provider should be wrapped with encrypt or decrypt
+# - Providers translate into the configured provider
+targets:
+  - destinationName: dn
+    destinationCrypt: false
+    destinationProvider: dp
+    sourceName: sn
+    sourceCrypt: false
+    sourceProvider: sp
+    schedule: ""
+
+# Configure rclone providers
+# Prefix destination providers with "destination-" and source providers with "source-"
+# Config keys are converted to snakecase and must be supported by rclone
+providers: {}
+  # destination-provider:
+  #   configKey: configValue
+  # source-provider:
+  #   configKey: configValue
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 100Mi

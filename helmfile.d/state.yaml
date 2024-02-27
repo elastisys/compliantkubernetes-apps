@@ -128,6 +128,7 @@ releases:
   - inherit: [ template: velero-podsecuritypolicy ]
   - inherit: [ template: velero-main ]
 
+  - inherit: [ template: rclone-restore ]
   - inherit: [ template: rclone-sync ]
 
   - inherit: [ template: dex ]
