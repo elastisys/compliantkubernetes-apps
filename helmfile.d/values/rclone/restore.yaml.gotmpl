@@ -1,0 +1,84 @@
+{{- $main := .Values.objectStorage -}}
+
+{{- $restore := $main.restore -}}
+{{- $sync := $main.sync -}}
+
+{{- $destinations := list -}}
+{{- $sources := list -}}
+
+dryrun: {{ $restore.dryrun }}
+
+{{ $crypt := merge dict $restore.decrypt $sync.encrypt -}}
+crypt: {{- include "crypt-provider" $crypt | nindent 2 }}
+
+targets:
+  {{- if $restore.addTargetsFromSync }}
+
+  {{- if $sync.syncDefaultBuckets }}
+  {{- range $key, $value := $main.buckets }}
+  - destinationName: {{ $value }}
+    {{- $destinationType := $main.type }}
+    {{- $sourceType := $sync.destinationType }}
+
+    {{- if eq $key "harbor" }}
+    {{- $destinationType = $.Values.harbor.persistence.type | replace "objectStorage" "" | default $destinationType }}
+    {{- $sourceType = $.Values.harbor.persistence.type | replace "objectStorage" "" | default $sourceType }}
+    {{- else if eq $key "thanos" }}
+    {{- $destinationType = $.Values.thanos.objectStorage.type | default $destinationType }}
+    {{- $sourceType = $.Values.thanos.objectStorage.type | default $sourceType }}
+    {{- end }}
+
+    {{- $destinations = append $destinations $destinationType }}
+    destinationType: {{ $destinationType }}
+    sourceName: {{ $value }}
+    sourceCrypt: {{ $crypt | get "enabled" false }}
+    {{- $sources = append $sources $sourceType }}
+    sourceType: {{ $sourceType }}
+  {{- end }}
+  {{- end }}
+
+  {{- range $sync.buckets }}
+  - destinationName: {{ .source }}
+    {{- $destinations = get "sourceType" $main.type . | append $destinations }}
+    destinationType: {{ get "sourceType" $main.type . }}
+    sourceName: {{ get "destination" .source . }}
+    sourceCrypt: {{ $crypt | get "enabled" false }}
+    {{- $sources = get "destinationType" $sync.destinationType . | append $sources }}
+    sourceType: {{ get "destinationType" $sync.destinationType . }}
+  {{- end }}
+
+  {{- end }}
+
+  {{- range $restore.targets }}
+  - destinationName: {{ .destinationName }}
+    {{- $destinations = get "destinationType" $main.type . | append $destinations }}
+    destinationType: {{ get "destinationType" $main.type . }}
+    sourceName: {{ get "sourceName" .destinationName . }}
+    sourceCrypt: {{ $crypt | get "enabled" false }}
+    {{- $sources = get "sourceType" $sync.destinationType . | append $sources }}
+    sourceType: {{ get "sourceType" $sync.destinationType . }}
+  {{- end }}
+
+providers:
+  {{- if not $destinations }}
+  {{ fail "rclone-restore configured without destinations" }}
+  {{- end }}
+
+  {{- $providers := merge dict $restore.destinations $main }}
+
+  {{- range $destinations | uniq | sortAlpha }}
+  {{ printf "destination-%s" . }}: {{- set $providers "type" . | include "provider" | nindent 4 }}
+  {{- end }}
+
+  {{- if not $sources }}
+  {{ fail "rclone-restore configured without sources" }}
+  {{- end }}
+
+  {{- $providers := merge dict $restore.sources $sync }}
+
+  {{- range $sources | uniq | sortAlpha }}
+  {{ printf "source-%s" . }}: {{- set $providers "type" . | include "provider" | nindent 4 }}
+    {{- if eq "s3" . | and $restore.timestamp }}
+    versionAt: {{ $restore.timestamp }}
+    {{- end }}
+  {{- end }}
