@@ -1,22 +1,29 @@
-{{- if and .Values.defaultRules.create .Values.openstackMonitoring.enabled }}
+{{- if and .Values.defaultRules.create .Values.defaultRules.rules.openstack }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: {{ printf "%s-%s" "sc-alerts" (include "openstack-monitoring.fullname" .)  | trunc 63 | trimSuffix "-" }}
+  name: {{ printf "%s-%s" (include "prometheus-alerts.fullname" .) "openstack" | trunc 63 | trimSuffix "-" }}
   labels:
-    app: {{ template "openstack-monitoring.name" . }}
-    {{- include "openstack-monitoring.labels" . | nindent 4 }}
-    {{- if .Values.defaultRules.alertLabels }}
-    {{- toYaml .Values.defaultRules.alertLabels | nindent 4 }}
-    {{- end }}
-  {{- if .Values.defaultRules.annotations }}
+    app: {{ template "prometheus-alerts.name" . }}
+{{ include "prometheus-alerts.labels" . | indent 4 }}
+{{- if .Values.defaultRules.alertLabels }}
+{{ toYaml .Values.defaultRules.alertLabels | indent 4 }}
+{{- end }}
+{{- if .Values.defaultRules.annotations }}
   annotations:
-    {{- toYaml .Values.defaultRules.annotations | nindent 4 }}
-  {{- end }}
+{{ toYaml .Values.defaultRules.annotations | indent 4 }}
+{{- end }}
 spec:
   groups:
   - name: openstack
     rules:
+    - alert: OpenStackCloudControllerDown
+      annotations:
+        summary: Openstack cloud controller manager has disappeared.
+      expr: (group(present_over_time(up{job="openstack-monitoring"}[6h])) by (cluster) unless group(up{job="openstack-monitoring"}) by (cluster)) or (absent(up{job="openstack-monitoring"} == 1))
+      for: 10m
+      labels:
+        severity: critical
     - alert: OpenStackApiRequestFailed
       annotations:
         summary: Failed openstack api call.

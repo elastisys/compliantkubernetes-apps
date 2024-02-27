@@ -61,6 +61,27 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     git switch -d v0.37.x
     ```
 
+1. If you are running on an Openstack environment and `openstackMonitoring.enabled = true` then you need to make sure that the `openstack-cloud-controller-manager` pod can expose the metrics port. On an environment running [compliantkubernetes-kubespray](https://github.com/elastisys/compliantkubernetes-kubespray) you can do that by running the following commands:
+
+    1. Set `external_openstack_cloud_controller_bind_address` to `0.0.0.0`
+
+    ```bash
+    vim {sc|wc}-config/group_vars/k8s_cluster/ck8s-k8s-cluster-openstack.yaml
+    ```
+
+    ```yaml
+    ## used to expose the openstack cloud controller metrics
+    external_openstack_cloud_controller_bind_address: 0.0.0.0
+    ```
+
+    1. Apply the changes
+
+    ```bash
+    ./bin/ck8s-kubespray run-playbook sc cluster.yml -b --tags=external-openstack
+
+    ./bin/ck8s-kubespray run-playbook wc cluster.yml -b --tags=external-openstack
+    ```
+
 1. Prepare upgrade - *non-disruptive*
 
     > *Done before maintenance window.*

@@ -16,7 +16,7 @@ spec:
   jobLabel: component
   namespaceSelector:
     matchNames:
-    - kube-system
+    - {{ .Release.Namespace }}
   selector:
     matchLabels:
       k8s-app: openstack-cloud-controller-manager

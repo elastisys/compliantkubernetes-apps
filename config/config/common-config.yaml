@@ -359,6 +359,10 @@ kubeStateMetrics:
   clusterAPIMetrics:
     enabled: false
 
+openstackMonitoring:
+  ## Enables openstack api metrics.
+  enabled: false
+
 prometheus:
   replicas: 1
 
