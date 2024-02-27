@@ -136,6 +136,9 @@ kubectl:
     runAsGroup: 10000
     runAsUser: 10000
 
+# This job upgrades the CRDs.
+upgradeCRDs: false
+
 # Run velero-restore-helper init container with numeric UID and GID.
 configMaps:
   restore-helper-config:

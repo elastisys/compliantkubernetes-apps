@@ -159,6 +159,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.35/apply/50-harbor.sh execute
     ```
 
+1. Upgrade Velero
+
+    ```bash
+    ./migration/v0.35/apply/60-velero-crds-upgrade.sh execute
+    ```
+
 1. Upgrade applications:
 
     ```bash
