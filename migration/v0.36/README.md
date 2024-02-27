@@ -151,6 +151,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.36/apply/40-namespaces.sh execute
     ```
 
+1. Upgrade Velero
+
+    ```bash
+    ./migration/v0.36/apply/50-velero-crds-upgrade.sh execute
+    ```
+
 1. Upgrade applications:
 
     ```bash
