@@ -54,6 +54,7 @@ user:
     tolerations: []
     affinity: {}
     topologySpreadConstraints: []
+    # image: quay.io/prometheus/alertmanager:vX.Y.Z
 
   # Installs required cluster resources needed to install sealedSecrets
   # Requires that gatekeeper.allowUserCRDs.enabled is enabled.
