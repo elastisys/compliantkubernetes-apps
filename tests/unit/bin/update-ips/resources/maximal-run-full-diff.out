@@ -1,6 +1,6 @@
 [1m--- common-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -22,7 +22,7 @@[0m
+[36m@@ -16,7 +16,7 @@[0m
    global:
      objectStorage:
        ips:
@@ -12,7 +12,7 @@
 [[33mck8s[0m] Diff found for .networkPolicies.global.objectStorage.ips in common-config.yaml (diff shows actions needed to be up to date)
 [1m--- common-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -24,7 +24,7 @@[0m
+[36m@@ -18,7 +18,7 @@[0m
        ips:
          - set-me
        ports:
@@ -24,7 +24,7 @@
 [[33mck8s[0m] Diff found for .networkPolicies.global.objectStorage.ports in common-config.yaml (diff shows actions needed to be up to date)
 [1m--- common-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -27,7 +27,7 @@[0m
+[36m@@ -21,7 +21,7 @@[0m
          - set-me
      scIngress:
        ips:
@@ -36,15 +36,15 @@
 [[33mck8s[0m] Diff found for .networkPolicies.global.scIngress.ips in common-config.yaml (diff shows actions needed to be up to date)
 [1m--- common-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -30,7 +30,7 @@[0m
+[36m@@ -24,7 +24,7 @@[0m
          - set-me
      wcIngress:
        ips:
 [31m-        - set-me[0m
 [32m+        - 127.0.0.3/32[0m
-     trivy:
+   alertmanager:
+     alertReceivers:
        ips:
-         - set-me
 [[33mck8s[0m] Diff found for .networkPolicies.global.wcIngress.ips in common-config.yaml (diff shows actions needed to be up to date)
 [[34mck8s[0m] Using unencrypted kubeconfig /tmp/ck8s-apps-config/.state/kube_config_sc.yaml
 [[34mck8s[0m] Using unencrypted kubeconfig /tmp/ck8s-apps-config/.state/kube_config_sc.yaml
@@ -88,9 +88,9 @@
 [32m+        - 127.0.3.7/32[0m
 [32m+        - 127.0.3.8/32[0m
 [32m+        - 127.0.3.9/32[0m
-   harbor:
-     registries:
-       ips:
+   monitoring:
+     grafana:
+       externalDashboardProvider:
 [[33mck8s[0m] Diff found for .networkPolicies.global.scNodes.ips in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
@@ -102,9 +102,9 @@
 [32m+      ips:[0m
 [32m+        - 127.1.0.4/32[0m
 [32m+        - 127.1.0.5/32[0m
-   harbor:
-     registries:
-       ips:
+   monitoring:
+     grafana:
+       externalDashboardProvider:
 [[33mck8s[0m] Diff found for .networkPolicies.global.objectStorageSwift.ips in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
@@ -116,9 +116,9 @@
 [32m+      ports:[0m
 [32m+        - 5678[0m
 [32m+        - 91011[0m
-   harbor:
-     registries:
-       ips:
+   monitoring:
+     grafana:
+       externalDashboardProvider:
 [[33mck8s[0m] Diff found for .networkPolicies.global.objectStorageSwift.ports in sc-config.yaml (diff shows actions needed to be up to date)
 [[34mck8s[0m] Using unencrypted kubeconfig /tmp/ck8s-apps-config/.state/kube_config_wc.yaml
 [[34mck8s[0m] Using unencrypted kubeconfig /tmp/ck8s-apps-config/.state/kube_config_wc.yaml
@@ -168,8 +168,8 @@
 [[33mck8s[0m] Diff found for .networkPolicies.global.wcNodes.ips in wc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -47,6 +47,9 @@[0m
-         - set-me
+[36m@@ -29,6 +29,9 @@[0m
+           - set-me
    rcloneSync:
      enabled: true
 [32m+    destinationObjectStorageS3:[0m
@@ -181,8 +181,8 @@
 [[33mck8s[0m] Diff found for .networkPolicies.rcloneSync.destinationObjectStorageS3.ips in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -47,6 +47,9 @@[0m
-         - set-me
+[36m@@ -29,6 +29,9 @@[0m
+           - set-me
    rcloneSync:
      enabled: true
 [32m+    destinationObjectStorageS3:[0m
@@ -194,8 +194,8 @@
 [[33mck8s[0m] Diff found for .networkPolicies.rcloneSync.destinationObjectStorageS3.ports in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -47,6 +47,10 @@[0m
-         - set-me
+[36m@@ -29,6 +29,10 @@[0m
+           - set-me
    rcloneSync:
      enabled: true
 [32m+    destinationObjectStorageSwift:[0m
@@ -208,8 +208,8 @@
 [[33mck8s[0m] Diff found for .networkPolicies.rcloneSync.destinationObjectStorageSwift.ips in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -47,6 +47,10 @@[0m
-         - set-me
+[36m@@ -29,6 +29,10 @@[0m
+           - set-me
    rcloneSync:
      enabled: true
 [32m+    destinationObjectStorageSwift:[0m
@@ -222,8 +222,8 @@
 [[33mck8s[0m] Diff found for .networkPolicies.rcloneSync.destinationObjectStorageSwift.ports in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -47,6 +47,9 @@[0m
-         - set-me
+[36m@@ -29,6 +29,9 @@[0m
+           - set-me
    rcloneSync:
      enabled: true
 [32m+    secondaryUrl:[0m
@@ -235,8 +235,8 @@
 [[33mck8s[0m] Diff found for .networkPolicies.rcloneSync.secondaryUrl.ips in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -47,6 +47,9 @@[0m
-         - set-me
+[36m@@ -29,6 +29,9 @@[0m
+           - set-me
    rcloneSync:
      enabled: true
 [32m+    secondaryUrl:[0m
