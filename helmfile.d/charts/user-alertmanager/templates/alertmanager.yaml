@@ -25,3 +25,6 @@ spec:
   topologySpreadConstraints:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+  {{- if .Values.image }}
+  image: {{ .Values.image | quote }}
+  {{- end }}

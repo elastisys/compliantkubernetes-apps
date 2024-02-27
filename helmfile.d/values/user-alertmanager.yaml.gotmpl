@@ -13,3 +13,4 @@ resources: {{- toYaml .Values.user.alertmanager.resources | nindent 2  }}
 tolerations: {{- toYaml .Values.user.alertmanager.tolerations | nindent 2 }}
 affinity: {{- toYaml .Values.user.alertmanager.affinity | nindent 2 }}
 topologySpreadConstraints: {{- toYaml .Values.user.alertmanager.topologySpreadConstraints | nindent 2 }}
+image: {{ .Values | get "user.alertmanager.image" "" | quote }}
