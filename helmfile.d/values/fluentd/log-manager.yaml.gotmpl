@@ -1,7 +1,7 @@
 {{- if eq .Values.objectStorage.type "azure"}}
 azure:
-  accountName: {{ .Values.objectStorage.azure.storageAccountName }}
-  accountKey: {{ .Values.objectStorage.azure.storageAccountKey }}
+  storageAccountName: {{ .Values.objectStorage.azure.storageAccountName }}
+  storageAccountKey: {{ .Values.objectStorage.azure.storageAccountKey }}
   containerName: {{ .Values.objectStorage.buckets.audit }}
   enabled: true
 {{- else if eq .Values.objectStorage.type "s3"}}
