@@ -150,7 +150,7 @@ set_storage_class() {
     fi
     case ${CK8S_CLOUD_PROVIDER} in
         safespring | citycloud | elastx)
-            storage_class=standard
+            storage_class=cinder-csi
 
             yq4 -i '.networkPolicies.kubeSystem.openstack.enabled = true' "${file}"
             yq4 -i '.networkPolicies.kubeSystem.openstack.ips = ["set-me"]' "${file}"
@@ -165,7 +165,15 @@ set_storage_class() {
             yq4 -i '.networkPolicies.kubeSystem.upcloud.ports = [443]' "${file}"
             ;;
 
-        exoscale | baremetal | aws | azure)
+        exoscale | baremetal)
+            storage_class=rook-ceph-block
+            ;;
+
+        aws)
+            storage_class=ebs-gp2
+            ;;
+
+        azure)
             storage_class=standard
             ;;
 
