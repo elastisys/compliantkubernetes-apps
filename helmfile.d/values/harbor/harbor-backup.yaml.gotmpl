@@ -27,8 +27,8 @@ gcs:
 # Fix harbor backup chart to support azure
 azure:
   enabled: true
-  accountname: {{ .Values.objectStorage.azure.accountname }}
-  accountkey: {{ .Values.objectStorage.azure.accountkey }}
+  accountname: {{ .Values.objectStorage.azure.accountName }}
+  accountkey: {{ .Values.objectStorage.azure.accountKey }}
   container: {{ .Values.objectStorage.buckets.harbor }}
   realm: core.windows.net
 {{- end }}

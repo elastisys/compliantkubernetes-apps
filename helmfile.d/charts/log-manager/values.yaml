@@ -2,10 +2,10 @@ fullnameOverride: ""
 nameOverride: ""
 
 imagePullSecrets: []
-image:
+image: #TODO restore to main image when it's updated
   pullPolicy: IfNotPresent
-  repository: ghcr.io/elastisys/compliantkubernetes-apps-log-manager
-  tag: ""
+  repository: harbor.hani-azure.dev-ck8s.com/logmanager/logmanager 
+  tag: "azure"
 
 s3:
   enabled: false

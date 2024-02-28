@@ -57,7 +57,7 @@ azure_rm_chunks() {
 
 # Main loop
 if [[ "$STORAGE_SERVICE" == "azure" ]]; then
-  for DAY in $(azure_list_chunks); do
+  for DAY in $(azure_list_days); do
     if [[ "$DAY" < "$LIMIT" ]]; then
       echo "- day: $DAY -----"
       echo "----- listing Azure chunks"
@@ -67,7 +67,7 @@ if [[ "$STORAGE_SERVICE" == "azure" ]]; then
     fi
   done
 else
-  for DAY in $(s3_list_chunks); do
+  for DAY in $(s3_list_days); do
     if [[ "$DAY" < "$LIMIT" ]]; then
       echo "- day: $DAY -----"
       echo "----- listing S3 chunks"

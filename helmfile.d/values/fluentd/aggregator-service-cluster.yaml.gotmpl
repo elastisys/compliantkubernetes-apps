@@ -86,6 +86,8 @@ aggregator:
 
           {{- else if eq .Values.objectStorage.type "azure" }}
           azure_container {{ .Values.objectStorage.buckets.scFluentd }}
+          azure_storage_account {{ .Values.objectStorage.azure.accountName }}
+          azure_storage_access_key {{ .Values.objectStorage.azure.accountKey }}
           {{- end }}
 
           path logs/%Y%m%d/${tag}/
