@@ -27,16 +27,23 @@ extraDeploy:
       AWS_ACCESS_KEY_ID: {{ .Values.objectStorage.s3.accessKey }}
       AWS_ACCESS_SECRET_KEY: {{ .Values.objectStorage.s3.secretKey }}
       {{- else if eq .Values.objectStorage.type "azure" }}
-      AZURE_STORAGE_ACCOUNT: {{ .Values.objectStorage.azure.accountName }}
-      AZURE_STORAGE_ACCESS_KEY: {{ .Values.objectStorage.azure.accountKey }}
+      STORAGE_ACCOUNT: {{ .Values.objectStorage.azure.accountName }}
+      STORAGE_ACCESS_KEY: {{ .Values.objectStorage.azure.accountKey }}
       {{- end }}
+
+
+image: 
+  registry: harbor.long-running.dev-ck8s.com
+  repository: azfluentd/fluentd
+  tag: v2
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ## TDOD: reset to main image when it's updated
+  pullPolicy: Always
 
 aggregator:
   replicaCount: 1
-  {{- if eq .Values.objectStorage.type "azure"}}
-  extraGems:
-    - fluent-plugin-azure-storage-append-blob
-  {{ end }}
 
   resources:    {{- toYaml .Values.fluentd.aggregator.resources | nindent 4  }}
   nodeSelector: {{- toYaml .Values.fluentd.aggregator.nodeSelector | nindent 4  }}
@@ -161,7 +168,7 @@ aggregator:
 
       force_path_style {{ .Values.objectStorage.s3.forcePathStyle }}
       {{- else if eq .Values.objectStorage.type "azure" }}
-      @type azure_storage_append_blob
+      @type azure-storage-append-blob
 
       azure_storage_account {{ .Values.objectStorage.azure.accountName }}
       azure_storage_access_key {{ .Values.objectStorage.azure.accountKey }}

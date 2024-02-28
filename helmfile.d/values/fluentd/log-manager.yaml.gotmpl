@@ -1,14 +1,16 @@
 {{- if eq .Values.objectStorage.type "azure"}}
 azure:
   accountName: {{ .Values.objectStorage.azure.accountName }}
-  accountKey: {{ .Values.objectStorage.azure.accessKey }}
+  accountKey: {{ .Values.objectStorage.azure.accountKey }}
   containerName: {{ .Values.objectStorage.buckets.audit }}
+  enabled: true
 {{- else if eq .Values.objectStorage.type "s3"}}
 s3:
   forcePathStyle: {{ .Values.objectStorage.s3.forcePathStyle }}
   regionEndpoint: {{ .Values.objectStorage.s3.regionEndpoint }}
   accessKey: {{ .Values.objectStorage.s3.accessKey }}
   secretKey: {{ .Values.objectStorage.s3.secretKey }}
+  enabled: true
 {{- end }}
 
 instances:
