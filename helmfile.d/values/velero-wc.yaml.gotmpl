@@ -80,7 +80,7 @@ credentials:
     {{- else if eq .Values.objectStorage.type "gcs" }}
       {{ .Values.objectStorage.gcs.keyfileData | nindent 6 }}
     {{- else if eq .Values.objectStorage.type "azure" }}
-      AZURE_STORAGE_ACCOUNT_ACCESS_KEY={{ .Values.objectStorage.azure.accountKey }}
+      AZURE_STORAGE_ACCOUNT_ACCESS_KEY={{ .Values.objectStorage.azure.storageAccountKey }}
       AZURE_CLOUD_NAME=AzurePublicCloud
     {{- end }}
 
