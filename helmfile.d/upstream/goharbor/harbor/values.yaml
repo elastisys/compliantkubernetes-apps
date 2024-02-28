@@ -251,8 +251,8 @@ persistence:
       rootdirectory: /storage
       #maxthreads: 100
     azure:
-      accountname: accountname
-      accountkey: base64encodedaccountkey
+      storageAccountname: accountname
+      storageAccountkey: base64encodedaccountkey
       container: containername
       #realm: core.windows.net
       # To use existing secret, the key must be AZURE_STORAGE_ACCESS_KEY
