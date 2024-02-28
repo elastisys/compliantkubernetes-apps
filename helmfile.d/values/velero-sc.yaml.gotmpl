@@ -53,7 +53,7 @@ configuration:
       prefix: workload-cluster
       config:
         resourceGroup: {{ .Values.objectStorage.azure.resourceGroup }}
-        storageAccount: {{ .Values.objectStorage.azure.accountName }}
+        storageAccount: {{ .Values.objectStorage.azure.storageAccountName }}
         storageAccountKeyEnvVar: AZURE_STORAGE_ACCOUNT_ACCESS_KEY
       {{- end }}
 

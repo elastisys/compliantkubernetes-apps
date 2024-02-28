@@ -106,7 +106,7 @@ config:
     azure:
       client:
         default:
-          account: {{ .Values.objectStorage.azure.accountName }}
+          account: {{ .Values.objectStorage.azure.storageAccountName }}
     {{- end }}
     {{- end }}
 

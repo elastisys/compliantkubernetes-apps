@@ -27,8 +27,8 @@ extraDeploy:
       AWS_ACCESS_KEY_ID: {{ .Values.objectStorage.s3.accessKey }}
       AWS_ACCESS_SECRET_KEY: {{ .Values.objectStorage.s3.secretKey }}
       {{- else if eq .Values.objectStorage.type "azure" }}
-      STORAGE_ACCOUNT: {{ .Values.objectStorage.azure.accountName }}
-      STORAGE_ACCESS_KEY: {{ .Values.objectStorage.azure.accountKey }}
+      STORAGE_ACCOUNT: {{ .Values.objectStorage.azure.storageAccountName }}
+      STORAGE_ACCESS_KEY: {{ .Values.objectStorage.azure.storageAccountKey }}
       {{- end }}
 
 
@@ -170,8 +170,8 @@ aggregator:
       {{- else if eq .Values.objectStorage.type "azure" }}
       @type azure-storage-append-blob
 
-      azure_storage_account {{ .Values.objectStorage.azure.accountName }}
-      azure_storage_access_key {{ .Values.objectStorage.azure.accountKey }}
+      azure_storage_account {{ .Values.objectStorage.azure.storageAccountName }}
+      azure_storage_access_key {{ .Values.objectStorage.azure.storageAccountKey }}
       path logs/${tag}/%Y%m%d/
       azure_container_name {{ .Values.objectStorage.buckets.audit }}
       auto_create_container true
