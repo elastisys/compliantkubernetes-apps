@@ -48,9 +48,7 @@ configuration:
       {{- else if eq .Values.objectStorage.type "gcs" }}
       provider: gcp
       {{- else if eq .Values.objectStorage.type "azure" }}
-      name: default
-      bucket: {{ .Values.objectStorage.buckets.velero }}
-      prefix: workload-cluster
+      provider: azure
       config:
         resourceGroup: {{ .Values.objectStorage.azure.resourceGroup }}
         storageAccount: {{ .Values.objectStorage.azure.storageAccountName }}

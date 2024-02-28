@@ -48,9 +48,7 @@ configuration:
       {{- else if eq .Values.objectStorage.type "gcs" }}
       provider: gcp
       {{- else if eq .Values.objectStorage.type "azure" }}
-      name: default
-      bucket: {{ .Values.objectStorage.buckets.velero }}
-      prefix: workload-cluster
+      provider: azure
       config:
         resourceGroup: {{ .Values.objectStorage.azure.resourceGroup }}
         storageAccount: {{ .Values.objectStorage.azure.storageAccountName }}
@@ -68,7 +66,7 @@ credentials:
     {{- else if eq .Values.objectStorage.type "gcs" }}
       {{ .Values.objectStorage.gcs.keyfileData | nindent 6 }}
     {{- else if eq .Values.objectStorage.type "azure" }}
-      AZURE_STORAGE_ACCOUNT_ACCESS_KEY={{ .Values.objectStorage.azure.accountKey }}
+      AZURE_STORAGE_ACCOUNT_ACCESS_KEY={{ .Values.objectStorage.azure.storageAccountKey }}
       AZURE_CLOUD_NAME=AzurePublicCloud
     {{- end }}
 
