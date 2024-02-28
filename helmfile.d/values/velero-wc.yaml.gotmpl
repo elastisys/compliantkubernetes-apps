@@ -30,7 +30,21 @@ initContainers:
     volumeMounts:
       - mountPath: /target
         name: plugins
+  {{- else if eq .Values.objectStorage.type "azure" }}
+  - name: velero-plugin-for-microsoft-azure
+    image: velero/velero-plugin-for-microsoft-azure:v1.9.0
+    imagePullPolicy: IfNotPresent
+    securityContext:
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsGroup: 10000
+      runAsUser: 10000
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
   {{- end }}
+
+snapshotsEnabled: false
 
 configuration:
   defaultVolumesToFsBackup: true
