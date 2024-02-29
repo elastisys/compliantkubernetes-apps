@@ -21,6 +21,35 @@ delete)
 esac
 shift
 
+
+common_default=$(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
+
+# shellcheck disable=SC2016
+sc_default=$(echo "${common_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml"))
+# shellcheck disable=SC2016
+sc_config=$(echo "${sc_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/common-config.yaml") <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/sc-config.yaml") | yq4 '{"objectStorage":.}' -)
+
+# shellcheck disable=SC2016
+wc_default=$(echo "${common_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/defaults/wc-config.yaml"))
+# shellcheck disable=SC2016
+wc_config=$(echo "${wc_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/common-config.yaml") <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/wc-config.yaml") |  yq4 '{"objectStorage":.}' -)
+
+objectstorage_type_sc=$(echo "${sc_config}" | yq4 '.objectStorage.type' -)
+objectstorage_type_wc=$(echo "${wc_config}" | yq4 '.objectStorage.type' -)
+
+[ "$objectstorage_type_sc" != "azure" ] && log_info "Azure Storage is not enabled in service cluster"
+[ "$objectstorage_type_wc" != "azure" ] && log_info "Azure Storage is not enabled in workload cluster"
+
+if [ "$objectstorage_type_sc" != "azure" ] && [ "$objectstorage_type_wc" != "azure" ]; then
+    log_error "Azure Storage is not enabled in either cluster, aborting!"
+    exit 1
+fi
+
+[ "$objectstorage_type_sc" = "azure" ] && buckets_sc=$(echo "${sc_config}" | yq4 '.objectStorage.buckets.*' -)
+[ "$objectstorage_type_wc" = "azure" ] && buckets_wc=$(echo "${wc_config}" | yq4 '.objectStorage.buckets.*' -)
+
+CONTAINERS=$( { echo "$buckets_sc"; echo "$buckets_wc"; } | sort | uniq | tr '\n' ' ' | sed s'/.$//')
+
 function create_resource_group() {
 
     echo "checking if resource group exists" >&2
@@ -65,24 +94,23 @@ function create_storage_account() {
     fi
 }
 
-CONTAINERS=('audit' 'harbor' 'opensearch' 'sclogs' 'velero' 'thanos')
-
 function create_containers() {
 
     CONTAINERS_LIST=$(az storage container list --account-name "$CK8S_ENVIRONMENT_NAME"storageaccount --query '[].name' --only-show-errors)
 
-    for container in "${CONTAINERS[@]}"; do
+    # shellcheck disable=SC2068
+    for container in ${CONTAINERS[@]}; do
 
-        echo "checking status of container [${CK8S_ENVIRONMENT_NAME}-${container}]" >&2
+        echo "checking status of container ${container}]" >&2
 
-        CONTAINER_EXISTS=$(echo "$CONTAINERS_LIST" | awk "/${CK8S_ENVIRONMENT_NAME}-${container}/")
+        CONTAINER_EXISTS=$(echo "$CONTAINERS_LIST" | awk "/${container}/")
 
         if [ "$CONTAINER_EXISTS" ]; then
-            echo "container [${CK8S_ENVIRONMENT_NAME}-${container}] already exists, do nothing" >&2
+            echo "container ${container}] already exists, do nothing" >&2
         else
-            echo "container [${CK8S_ENVIRONMENT_NAME}-${container}] does not exist, creating it now" >&2
+            echo "container ${container}] does not exist, creating it now" >&2
             az storage container create \
-                -n "$CK8S_ENVIRONMENT_NAME"-"$container" \
+                -n "$container" \
                 --account-name "$CK8S_ENVIRONMENT_NAME"storageaccount --only-show-errors
         fi
     done
@@ -100,7 +128,7 @@ if [[ "$ACTION" == "$CREATE_ACTION" ]]; then
     create_storage_account
 
     echo "Creating Storage Containers"
-    create_containers "${CONTAINERS[@]}"
+    create_containers "${CONTAINERS}"
 elif [[ "$ACTION" == "$DELETE_ACTION" ]]; then
     echo "deleting..." >&2
     delete_all
