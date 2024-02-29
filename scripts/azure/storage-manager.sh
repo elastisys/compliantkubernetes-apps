@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 readonly CREATE_ACTION="create"
 readonly DELETE_ACTION="delete"
@@ -27,18 +27,17 @@ function create_resource_group() {
     GROUP_EXISTS=$(az group list --query '[].name' | awk "/${CK8S_ENVIRONMENT_NAME}-storage-resource-group/")
     if [ "$GROUP_EXISTS" ]; then
         echo "resource group [${CK8S_ENVIRONMENT_NAME}-storage-resource-group] already exists" >&2
-        echo "contnue using this group ? (y/n)" >&2
-        # shellcheck disable=SC2162
-        read -n 1 cmdinput
+        echo "continue using this group ? (y/n)" >&2
+        read -r -n 1 cmdinput
         case "$cmdinput" in
-        y) return ;;
-        n) exit 0 ;;
+        y|Y) return ;;
+        *) exit 0 ;;
         esac
     else
         echo "resource group [${CK8S_ENVIRONMENT_NAME}-storage-resource-group] does not exist, creating it now" >&2
         az group create \
             --name "$CK8S_ENVIRONMENT_NAME"-storage-resource-group \
-            --location swedencentral --only-show-errors
+            --location "${AZURE_LOCATION}" --only-show-errors
     fi
 
 }
@@ -50,8 +49,7 @@ function create_storage_account() {
     if [ "$ACCOUNT_EXISTS" ]; then
         echo "storage account [${CK8S_ENVIRONMENT_NAME}storageaccount] already exists" >&2
         echo "contnue using this account ? (y/n)" >&2
-        # shellcheck disable=SC2162
-        read -n 1 cmdinput
+        read -r -n 1 cmdinput
         case "$cmdinput" in
         y) return ;;
         n) exit 0 ;;
@@ -70,6 +68,8 @@ function create_storage_account() {
 CONTAINERS=('audit' 'harbor' 'opensearch' 'sclogs' 'velero' 'thanos')
 
 function create_containers() {
+
+    CONTAINERS_LIST=$(az storage container list --account-name "$CK8S_ENVIRONMENT_NAME"storageaccount --query '[].name' --only-show-errors)
 
     for container in "${CONTAINERS[@]}"; do
 
@@ -99,7 +99,6 @@ if [[ "$ACTION" == "$CREATE_ACTION" ]]; then
     echo "Creating Storage Account" >&2
     create_storage_account
 
-    CONTAINERS_LIST=$(az storage container list --account-name "$CK8S_ENVIRONMENT_NAME"storageaccount --query '[].name' --only-show-errors)
     echo "Creating Storage Containers"
     create_containers "${CONTAINERS[@]}"
 elif [[ "$ACTION" == "$DELETE_ACTION" ]]; then
