@@ -3,7 +3,7 @@ nameOverride: ""
 
 imagePullSecrets: []
 image: #TODO restore to main image when it's updated
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   repository: harbor.hani-azure.dev-ck8s.com/logmanager/logmanager
   tag: "azure"
 
