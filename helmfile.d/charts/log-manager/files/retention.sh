@@ -40,7 +40,7 @@ s3_rm_chunks() {
 
 # Define Azure Blob functions
 azure_list_days() {
-    az storage blob directory list --container-name "$AZURE_CONTAINER_NAME" --prefix "$AZURE_PREFIX/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | awk '{print $1}'
+    az storage blob directory list --container-name "$AZURE_CONTAINER_NAME" --directory-path "$AZURE_PREFIX" --prefix "$AZURE_PREFIX/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | awk '{print $1}'
 }
 
 azure_list_chunks() {
