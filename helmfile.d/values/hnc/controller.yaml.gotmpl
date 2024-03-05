@@ -42,3 +42,5 @@ additionalAllowPropagateResources:
   {{- with .Values.hnc.additionalAllowPropagateResources }}
   {{- toYaml . | nindent 2 }}
   {{- end }}
+
+webhookMatchConditions: {{ .Values.hnc.webhookMatchConditions }}

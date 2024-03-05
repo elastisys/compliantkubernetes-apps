@@ -175,6 +175,10 @@ hnc:
   ## Enables HA mode for hnc webhooks
   ha: true
 
+  ## This feature is only available in Kubernetes v1.28+ (https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-matchconditions)
+  ## It will be changed to true by default when v1.27 is closer to EOL.
+  webhookMatchConditions: false
+
   ## Webhook deployment configuration, only used if hnc.ha is true
   webhook:
     replicaCount: 3

@@ -65,6 +65,11 @@ webhooks:
     resources:
     - subnamespaceanchors
   sideEffects: None
+  {{- if .Values.webhookMatchConditions }}
+  matchConditions:
+    - name: 'exclude-velero'
+      expression: '!(request.userInfo.username == "system:serviceaccount:velero:velero-server")'
+  {{- end }}
 - admissionReviewVersions:
   - v1
   clientConfig:
@@ -85,6 +90,11 @@ webhooks:
     resources:
     - hierarchyconfigurations
   sideEffects: None
+  {{- if .Values.webhookMatchConditions }}
+  matchConditions:
+    - name: 'exclude-velero'
+      expression: '!(request.userInfo.username == "system:serviceaccount:velero:velero-server")'
+  {{- end }}
 - admissionReviewVersions:
   - v1
   clientConfig:
@@ -111,6 +121,11 @@ webhooks:
     scope: Namespaced
   sideEffects: None
   timeoutSeconds: 2
+  {{- if .Values.webhookMatchConditions }}
+  matchConditions:
+    - name: 'exclude-velero'
+      expression: '!(request.userInfo.username == "system:serviceaccount:velero:velero-server")'
+  {{- end }}
 - admissionReviewVersions:
   - v1
   clientConfig:
@@ -132,6 +147,11 @@ webhooks:
     resources:
     - hncconfigurations
   sideEffects: None
+  {{- if .Values.webhookMatchConditions }}
+  matchConditions:
+    - name: 'exclude-velero'
+      expression: '!(request.userInfo.username == "system:serviceaccount:velero:velero-server")'
+  {{- end }}
 - admissionReviewVersions:
   - v1
   clientConfig:
@@ -153,3 +173,8 @@ webhooks:
     resources:
     - namespaces
   sideEffects: None
+  {{- if .Values.webhookMatchConditions }}
+  matchConditions:
+    - name: 'exclude-velero'
+      expression: '!(request.userInfo.username == "system:serviceaccount:velero:velero-server")'
+  {{- end }}
