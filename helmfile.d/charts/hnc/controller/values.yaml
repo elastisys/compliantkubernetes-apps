@@ -105,3 +105,7 @@ certificate:
 serviceMonitor:
   create: true
   relabelings: []
+
+## This feature is only available in Kubernetes v1.28+ (https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-matchconditions)
+## It will be changed to true by default when v1.27 is closer to EOL.
+webhookMatchConditions: false
