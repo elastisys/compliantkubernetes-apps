@@ -60,7 +60,7 @@ templates:
       - values/networkpolicies/workload/ingress-nginx-probe.yaml.gotmpl
 
   ingress-nginx-probe-ingress:
-    name: ingress-nginx-probe-ingresss
+    name: ingress-nginx-probe-ingress
     condition: ck8sWorkloadCluster.enabled
     namespace: ingress-nginx
     labels:
