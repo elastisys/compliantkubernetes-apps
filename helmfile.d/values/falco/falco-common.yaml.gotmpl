@@ -55,7 +55,7 @@ driver:
         allowPrivilegeEscalation: true
       {{- with .Values.falco.driver.module.repoURL }}
       env:
-      - name: DRIVERS_REPO
+      - name: FALCOCTL_DRIVER_NAME
         value: {{ . }}
       {{- end }}
 
