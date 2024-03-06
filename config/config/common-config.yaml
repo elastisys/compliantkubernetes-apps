@@ -733,6 +733,10 @@ certmanager:
     tolerations: {}
     affinity: {}
 
+    ## Extra args for cainjector, docs for available args: https://cert-manager.io/docs/cli/cainjector/
+    extraArgs: []
+    #- --enable-certificates-data-source=true
+
 ## Configuration for metric-server
 metricsServer:
   enabled: true
