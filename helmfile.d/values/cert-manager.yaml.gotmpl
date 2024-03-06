@@ -15,5 +15,6 @@ cainjector:
   nodeSelector: {{- toYaml .Values.certmanager.cainjector.nodeSelector | nindent 4 }}
   affinity:     {{- toYaml .Values.certmanager.cainjector.affinity | nindent 4 }}
   tolerations:  {{- toYaml .Values.certmanager.cainjector.tolerations | nindent 4 }}
+  extraArgs:    {{- toYaml .Values.certmanager.cainjector.extraArgs | nindent 4 }}
 
 installCRDs: true

@@ -19,6 +19,6 @@ spec:
     - selector: {}
       http01:
         ingress:
-          class: nginx
+          ingressClassName: nginx
     {{- end }}
 {{- end }}
