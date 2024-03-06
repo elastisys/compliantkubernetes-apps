@@ -5,10 +5,8 @@ metadata:
   name: {{ include "falcosidekick.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    app.kubernetes.io/name: {{ include "falcosidekick.name" . }}
-    helm.sh/chart: {{ include "falcosidekick.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "falcosidekick.labels" . | nindent 4 }}
+    app.kubernetes.io/component: core
   {{- with .Values.service.annotations }}
   annotations:
     prometheus.io/scrape: "true"
@@ -27,7 +25,6 @@ spec:
       protocol: TCP
       name: http-notls
     {{- end }}
-
   selector:
-    app.kubernetes.io/name: {{ include "falcosidekick.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    {{- include "falcosidekick.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: core

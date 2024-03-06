@@ -5,10 +5,8 @@ metadata:
   name: {{ include "falcosidekick.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    app.kubernetes.io/name: {{ include "falcosidekick.name" . }}
-    helm.sh/chart: {{ include "falcosidekick.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "falcosidekick.labels" . | nindent 4 }}
+    app.kubernetes.io/component: core
 spec:
   replicas: {{ .Values.replicaCount }}
   {{- if .Values.revisionHistoryLimit }}
@@ -16,13 +14,13 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "falcosidekick.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      {{- include "falcosidekick.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: core
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "falcosidekick.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
+        {{- include "falcosidekick.labels" . | nindent 8 }}
+        app.kubernetes.io/component: core
         {{- if and .Values.config.azure.podIdentityClientID .Values.config.azure.podIdentityName }}
         aadpodidbinding: {{ include "falcosidekick.fullname" . }}
         {{- end }}
@@ -114,6 +112,7 @@ spec:
               value: {{ .Values.config.mutualtlsclient.keyfile | quote }}
             - name: MUTUALTLSCLIENT_CACERTFILE
               value: {{ .Values.config.mutualtlsclient.cacertfile | quote }}
+            {{-  if .Values.config.tlsserver.deploy }}  
             - name: TLSSERVER_DEPLOY
               value: {{ .Values.config.tlsserver.deploy | quote }}
             - name: TLSSERVER_CERTFILE
@@ -128,6 +127,7 @@ spec:
               value: {{ .Values.config.tlsserver.notlsport | quote }}
             - name: TLSSERVER_NOTLSPATHS
               value: {{ .Values.config.tlsserver.notlspaths | quote }}
+            {{- end }}
 
             {{- if .Values.config.extraEnv }}
             {{ toYaml .Values.config.extraEnv | nindent 12 }}

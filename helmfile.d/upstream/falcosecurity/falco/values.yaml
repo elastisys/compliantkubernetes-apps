@@ -23,21 +23,17 @@ fullnameOverride: ""
 # -- Override the deployment namespace
 namespaceOverride: ""
 
-rbac:
-  # Create and use rbac resources when set to true. Needed to fetch k8s metadata from the api-server.
-  create: true
+# -- Add additional pod annotations
+podAnnotations: {}
 
 serviceAccount:
   # -- Specifies whether a service account should be created.
-  create: true
+  create: false
   # -- Annotations to add to the service account.
   annotations: {}
   # -- The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
-
-# -- Add additional pod annotations
-podAnnotations: {}
 
 # -- Add additional pod labels
 podLabels: {}
@@ -178,13 +174,20 @@ driver:
   # -- Set it to false if you want to deploy Falco without the drivers.
   # Always set it to false when using Falco with plugins.
   enabled: true
-  # -- Tell Falco which driver to use. Available options: module (kernel driver), ebpf (eBPF probe), modern-bpf (modern eBPF probe).
-  kind: module
+  # -- kind tells Falco which driver to use. Available options: kmod (kernel driver), ebpf (eBPF probe), modern_ebpf (modern eBPF probe).
+  kind: kmod
+  # -- kmod holds the configuration for the kernel module.
+  kmod:
+    # -- bufSizePreset determines the size of the shared space between Falco and its drivers.
+    # This shared space serves as a temporary storage for syscall events.
+    bufSizePreset: 4
+    # -- dropFailedExit if set true drops failed system call exit events before pushing them to userspace.
+    dropFailedExit: false
   # -- Configuration section for ebpf driver.
   ebpf:
-    # -- Path where the eBPF probe is located. It comes handy when the probe have been installed in the nodes using tools other than the init
+    # -- path where the eBPF probe is located. It comes handy when the probe have been installed in the nodes using tools other than the init
     # container deployed with the chart.
-    path:
+    path: "${HOME}/.falco/falco-bpf.o"
     # -- Needed to enable eBPF JIT at runtime for performance reasons.
     # Can be skipped if eBPF JIT is enabled from outside the container
     hostNetwork: false
@@ -195,13 +198,37 @@ driver:
     # Usually 'kernel.perf_event_paranoid>2' means that you cannot use 'CAP_PERFMON' and you should fallback to 'CAP_SYS_ADMIN', but the behavior changes across different distros.
     # Read more on that here: https://falco.org/docs/event-sources/kernel/#least-privileged-mode-1
     leastPrivileged: false
-  # -- Configuration section for modern bpf driver.
-  modern_bpf:
+    # -- bufSizePreset determines the size of the shared space between Falco and its drivers.
+    # This shared space serves as a temporary storage for syscall events.
+    bufSizePreset: 4
+    # -- dropFailedExit if set true drops failed system call exit events before pushing them to userspace.
+    dropFailedExit: false
+  modernEbpf:
     # -- Constrain Falco with capabilities instead of running a privileged container.
     # Ensure the modern bpf driver is enabled (i.e., setting the `driver.kind` option to `modern-bpf`).
     # Capabilities used: {CAP_SYS_RESOURCE, CAP_BPF, CAP_PERFMON, CAP_SYS_PTRACE}.
     # Read more on that here: https://falco.org/docs/event-sources/kernel/#least-privileged-mode-2
     leastPrivileged: false
+    # -- bufSizePreset determines the size of the shared space between Falco and its drivers.
+    # This shared space serves as a temporary storage for syscall events.
+    bufSizePreset: 4
+    # -- dropFailedExit if set true drops failed system call exit events before pushing them to userspace.
+    dropFailedExit: false
+    # -- cpusForEachBuffer is the index that controls how many CPUs to assign to a single syscall buffer.
+    cpusForEachBuffer: 2
+
+  # -- Gvisor configuration. Based on your system you need to set the appropriate values.
+  # Please, remember to add pod tolerations and affinities in order to schedule the Falco pods in the gVisor enabled nodes.
+  gvisor:
+    # -- Runsc container runtime configuration. Falco needs to interact with it in order to intercept the activity of the sandboxed pods.
+    runsc:
+      # -- Absolute path of the `runsc` binary in the k8s nodes.
+      path: /home/containerd/usr/local/sbin
+      # -- Absolute path of the root directory of the `runsc` container runtime. It is of vital importance for Falco since `runsc` stores there the information of the workloads handled by it;
+      root: /run/containerd/runsc
+      # -- Absolute path of the `runsc` configuration file, used by Falco to set its configuration and make aware `gVisor` of its presence.
+      config: /run/containerd/runsc/config.toml
+
   # -- Configuration for the Falco init container.
   loader:
     # -- Enable/disable the init container.
@@ -224,20 +251,6 @@ driver:
       resources: {}
       # -- Security context for the Falco driver loader init container. Overrides the default security context. If driver.kind == "module" you must at least set `privileged: true`.
       securityContext: {}
-
-# -- Gvisor configuration. Based on your system you need to set the appropriate values.
-# Please, rembember to add pod tolerations and affinities in order to schedule the Falco pods in the gVisor enabled nodes.
-gvisor:
-  # -- Set it to true if you want to deploy Falco with gVisor support.
-  enabled: false
-  # -- Runsc container runtime configuration. Falco needs to interact with it in order to intercept the activity of the sandboxed pods.
-  runsc:
-    # -- Absolute path of the `runsc` binary in the k8s nodes.
-    path: /home/containerd/usr/local/sbin
-    # -- Absolute path of the root directory of the `runsc` container runtime. It is of vital importance for Falco since `runsc` stores there the information of the workloads handled by it;
-    root: /run/containerd/runsc
-    # -- Absolute path of the `runsc` configuration file, used by Falco to set its configuration and make aware `gVisor` of its presence.
-    config: /run/containerd/runsc/config.toml
 
 # Collectors for data enrichment (scenario requirement)
 collectors:
@@ -262,30 +275,31 @@ collectors:
     # -- The path of the CRI-O socket.
     socket: /run/crio/crio.sock
 
+  # -- kubernetes holds the configuration for the kubernetes collector. Starting from version 0.37.0 of Falco, the legacy
+  # kubernetes client has been removed. A new standalone component named k8s-metacollector and a Falco plugin have been developed
+  # to solve the issues that were present in the old implementation. More info here: https://github.com/falcosecurity/falco/issues/2973
   kubernetes:
-    # -- Enable Kubernetes meta data collection via a connection to the Kubernetes API server.
-    # When this option is disabled, Falco falls back to the container annotations to grap the meta data.
+    # -- enabled specifies whether the Kubernetes metadata should be collected using the k8smeta plugin and the k8s-metacollector component.
+    # It will deploy the k8s-metacollector external component that fetches Kubernetes metadata and pushes them to Falco instances.
+    # For more info see:
+    # https://github.com/falcosecurity/k8s-metacollector
+    # https://github.com/falcosecurity/charts/tree/master/charts/k8s-metacollector
+    # When this option is disabled, Falco falls back to the container annotations to grab the metadata.
     # In such a case, only the ID, name, namespace, labels of the pod will be available.
-    enabled: true
-    # -- The apiAuth value is to provide the authentication method Falco should use to connect to the Kubernetes API.
-    # The argument's documentation from Falco is provided here for reference:
-    #
-    #  <bt_file> | <cert_file>:<key_file[#password]>[:<ca_cert_file>], --k8s-api-cert <bt_file> | <cert_file>:<key_file[#password]>[:<ca_cert_file>]
-    #     Use the provided files names to authenticate user and (optionally) verify the K8S API server identity.
-    #     Each entry must specify full (absolute, or relative to the current directory) path to the respective file.
-    #     Private key password is optional (needed only if key is password protected).
-    #     CA certificate is optional. For all files, only PEM file format is supported.
-    #     Specifying CA certificate only is obsoleted - when single entry is provided
-    #     for this option, it will be interpreted as the name of a file containing bearer token.
-    #     Note that the format of this command-line option prohibits use of files whose names contain
-    #     ':' or '#' characters in the file name.
-    # -- Provide the authentication method Falco should use to connect to the Kubernetes API.
-    apiAuth: /var/run/secrets/kubernetes.io/serviceaccount/token
-    ## -- Provide the URL Falco should use to connect to the Kubernetes API.
-    apiUrl: "https://$(KUBERNETES_SERVICE_HOST)"
-    # -- If true, only the current node (on which Falco is running) will be considered when requesting metadata of pods
-    # to the API server. Disabling this option may have a performance penalty on large clusters.
-    enableNodeFilter: true
+    enabled: false
+    # --pluginRef is the OCI reference for the k8smeta plugin. It could be a full reference such as:
+    # "ghcr.io/falcosecurity/plugins/plugin/k8smeta:0.1.0". Or just name + tag: k8smeta:0.1.0.
+    pluginRef: "ghcr.io/falcosecurity/plugins/plugin/k8smeta:0.1.0"
+    # -- collectorHostname is the address of the k8s-metacollector. When not specified it will be set to match
+    # k8s-metacollector service. e.x: falco-k8smetacollecto.falco.svc. If for any reason you need to override
+    # it, make sure to set here the address of the k8s-metacollector.
+    # It is used by the k8smeta plugin to connect to the k8s-metacollector.
+    collectorHostname: ""
+    # -- collectorPort designates the port on which the k8s-metacollector gRPC service listens. If not specified
+    # the value of the port named `broker-grpc` in k8s-metacollector.service.ports is used. The default values is 45000.
+    # It is used by the k8smeta plugin to connect to the k8s-metacollector.
+    collectorPort: ""
+
 
 ###########################
 # Extras and customization #
@@ -313,6 +327,13 @@ certs:
   ca:
     # -- CA certificate used by gRPC, webserver and AuditSink validation.
     crt: ""
+  existingClientSecret: ""
+  client:
+    # -- Key used by http mTLS client.
+    key: ""
+    # -- Certificate used by http mTLS client.
+    crt: ""
+
 # -- Third party rules enabled for Falco. More info on the dedicated section in README.md file.
 customRules:
   {}
@@ -330,7 +351,7 @@ customRules:
 # Falco integrations   #
 ########################
 
-# -- For configuration values, see https://github.com/falcosecurity/charts/blob/master/falcosidekick/values.yaml
+# -- For configuration values, see https://github.com/falcosecurity/charts/blob/master/charts/falcosidekick/values.yaml
 falcosidekick:
   # -- Enable falcosidekick deployment.
   enabled: false
@@ -351,7 +372,7 @@ falcoctl:
     # -- The image repository to pull from.
     repository: falcosecurity/falcoctl
     # -- The image tag to pull.
-    tag: "0.6.2"
+    tag: "0.7.2"
   artifact:
     # -- Runs "falcoctl artifact install" command as an init container. It is used to install artfacts before
     # Falco starts. It provides them to Falco by using an emptyDir volume.
@@ -360,7 +381,7 @@ falcoctl:
       # -- Extra environment variables that will be pass onto falcoctl-artifact-install init container.
       env: []
       # -- Arguments to pass to the falcoctl-artifact-install init container.
-      args: ["--verbose"]
+      args: ["--log-format=json"]
       # -- Resources requests and limits for the falcoctl-artifact-install init container.
       resources: {}
       # -- Security context for the falcoctl init container.
@@ -378,7 +399,7 @@ falcoctl:
       # -- Extra environment variables that will be pass onto falcoctl-artifact-follow sidecar container.
       env: []
       # -- Arguments to pass to the falcoctl-artifact-follow sidecar container.
-      args: ["--verbose"]
+      args: ["--log-format=json"]
       # -- Resources requests and limits for the falcoctl-artifact-follow sidecar container.
       resources: {}
       # -- Security context for the falcoctl-artifact-follow sidecar container.
@@ -399,11 +420,12 @@ falcoctl:
       # in the list it will refuse to downloade and install that artifact.
       allowedTypes:
         - rulesfile
+        - plugin
       install:
-        # -- Do not resolve the depenencies for artifacts. By default is true, but for our use case we disable it.
-        resolveDeps: false
+        # -- Resolve the dependencies for artifacts.
+        resolveDeps: true
         # -- List of artifacts to be installed by the falcoctl init container.
-        refs: [falco-rules:2]
+        refs: [falco-rules:3]
         # -- Directory where the rulesfiles are saved. The path is relative to the container, which in this case is an emptyDir
         # mounted also by the Falco pod.
         rulesfilesDir: /rulesfiles
@@ -411,7 +433,7 @@ falcoctl:
         pluginsDir: /plugins
       follow:
         # -- List of artifacts to be followed by the falcoctl sidecar container.
-        refs: [falco-rules:2]
+        refs: [falco-rules:3]
         # -- How often the tool checks for new versions of the followed artifacts.
         every: 6h
         # -- HTTP endpoint that serves the api versions of the Falco instance. It is used to check if the new versions are compatible
@@ -708,15 +730,19 @@ falco:
     ca_bundle: ""
     # -- Path to a folder that will be used as the CA certificate store. CA certificate need to be
     # stored as indivitual PEM files in this directory.
-    ca_path: "/etc/ssl/certs"
+    ca_path: "/etc/falco/certs/"
     # -- Tell Falco to use mTLS
     mtls: false
     # -- Path to the client cert.
-    client_cert: "/etc/ssl/certs/client.crt"
+    client_cert: "/etc/falco/certs/client/client.crt"
     # -- Path to the client key.
-    client_key: "/etc/ssl/certs/client.key"
+    client_key: "/etc/falco/certs/client/client.key"
     # -- Whether to echo server answers to stdout
     echo: false
+    # -- compress_uploads whether to compress data sent to http endpoint.
+    compress_uploads: false
+    # -- keep_alive whether to keep alive the connection.
+    keep_alive: false
 
   # [Stable] `program_output`
   #
@@ -1065,13 +1091,22 @@ falco:
   # number of CPUs to determine overall usage. Memory metrics are provided in raw
   # units (`kb` for `RSS`, `PSS` and `VSZ` or `bytes` for `container_memory_used`)
   # and can be uniformly converted to megabytes (MB) using the
-  # `convert_memory_to_mb` functionality. In environments such as Kubernetes, it
-  # is crucial to track Falco's container memory usage. To customize the path of
-  # the memory metric file, you can create an environment variable named
-  # `FALCO_CGROUP_MEM_PATH` and set it to the desired file path. By default, Falco
-  # uses the file `/sys/fs/cgroup/memory/memory.usage_in_bytes` to monitor
-  # container memory usage, which aligns with Kubernetes'
-  # `container_memory_working_set_bytes` metric.
+  # `convert_memory_to_mb` functionality. In environments such as Kubernetes when
+  # deployed as daemonset, it is crucial to track Falco's container memory usage.
+  # To customize the path of the memory metric file, you can create an environment
+  # variable named `FALCO_CGROUP_MEM_PATH` and set it to the desired file path. By
+  # default, Falco uses the file `/sys/fs/cgroup/memory/memory.usage_in_bytes` to
+  # monitor container memory usage, which aligns with Kubernetes'
+  # `container_memory_working_set_bytes` metric. Finally, we emit the overall host
+  # CPU and memory usages, along with the total number of processes and open file
+  # descriptors (fds) on the host, obtained from the proc file system unrelated to
+  # Falco's monitoring. These metrics help assess Falco's usage in relation to the
+  # server's workload intensity.
+  #
+  # `state_counters_enabled`: Emit counters related to Falco's state engine, including
+  # added, removed threads or file descriptors (fds), and failed lookup, store, or
+  # retrieve actions in relation to Falco's underlying process cache table (threadtable).
+  # We also log the number of currently cached containers if applicable.
   #
   # `kernel_event_counters_enabled`: Emit kernel side event and drop counters, as
   # an alternative to `syscall_event_drops`, but with some differences. These
@@ -1101,6 +1136,7 @@ falco:
     output_rule: true
     # output_file: /tmp/falco_stats.jsonl
     resource_utilization_enabled: true
+    state_counters_enabled: true
     kernel_event_counters_enabled: true
     libbpf_stats_enabled: true
     convert_memory_to_mb: true
@@ -1110,68 +1146,6 @@ falco:
   #######################################
   # Falco performance tuning (advanced) #
   #######################################
-
-  # [Stable] `syscall_buf_size_preset`
-  #
-  # --- [Description]
-  #
-  # -- The syscall buffer index determines the size of the shared space between Falco
-  # and its drivers. This shared space serves as a temporary storage for syscall
-  # events, allowing them to be transferred from the kernel to the userspace
-  # efficiently. The buffer size for each online CPU is determined by the buffer
-  # index, and each CPU has its own dedicated buffer. Adjusting this index allows
-  # you to control the overall size of the syscall buffers.
-  #
-  # --- [Usage]
-  #
-  # The index 0 is reserved, and each subsequent index corresponds to an
-  # increasing size in bytes. For example, index 1 corresponds to a size of 1 MB,
-  # index 2 corresponds to 2 MB, and so on:
-  #
-  # [(*), 1 MB, 2 MB, 4 MB, 8 MB, 16 MB, 32 MB, 64 MB, 128 MB, 256 MB, 512 MB]
-  #   ^    ^     ^     ^     ^     ^      ^      ^       ^       ^       ^
-  #   |    |     |     |     |     |      |      |       |       |       |
-  #   0    1     2     3     4     5      6      7       8       9       10
-  #
-  #
-  # The buffer dimensions in bytes are determined by the following requirements:
-  # (1) a power of 2.
-  # (2) a multiple of your system_page_dimension.
-  # (3) greater than `2 * (system_page_dimension).
-  #
-  # The buffer size constraints may limit the usability of certain indexes. Let's
-  # consider an example to illustrate this:
-  #
-  # If your system has a page size of 1 MB, the first available buffer size would
-  # be 4 MB because 2 MB is exactly equal to 2 * (system_page_size), which is not
-  # sufficient as we require more than 2 * (system_page_size). In this example, it
-  # is evident that if the page size is 1 MB, the first index that can be used is 3.
-  #
-  # However, in most cases, these constraints do not pose a limitation, and all
-  # indexes from 1 to 10 can be used. You can check your system's page size using
-  # the Falco `--page-size` command-line option.
-  #
-  # --- [Suggestions]
-  #
-  # The buffer size was previously fixed at 8 MB (index 4). You now have the
-  # option to adjust the size based on your needs. Increasing the size, such as to
-  # 16 MB (index 5), can reduce syscall drops in heavy production systems, but may
-  # impact performance. Decreasing the size can speed up the system but may
-  # increase syscall drops. It's important to note that the buffer size is mapped
-  # twice in the process' virtual memory, so a buffer of 8 MB will result in a 16
-  # MB area in virtual memory. Use this parameter with caution and only modify it
-  # if the default size is not suitable for your use case.
-  syscall_buf_size_preset: 4
-
-  # [Experimental] `syscall_drop_failed_exit`
-  #
-  # -- Enabling this option in Falco allows it to drop failed system call exit events
-  # in the kernel driver before pushing them onto the ring buffer. This
-  # optimization can result in lower CPU usage and more efficient utilization of
-  # the ring buffer, potentially reducing the number of event losses. However, it
-  # is important to note that enabling this option also means sacrificing some
-  # visibility into the system.
-  syscall_drop_failed_exit: false
 
   # [Experimental] `base_syscalls`, use with caution, read carefully
   #
@@ -1288,113 +1262,9 @@ falco:
     custom_set: []
     repair: false
 
-  # [Experimental] `modern_bpf.cpus_for_each_syscall_buffer`, modern_bpf only
-  #
-  # --- [Description]
-  #
-  # -- The modern_bpf driver in Falco utilizes the new BPF ring buffer, which has a
-  # different memory footprint compared to the current BPF driver that uses the
-  # perf buffer. The Falco core maintainers have discussed the differences and
-  # their implications, particularly in Kubernetes environments where limits need
-  # to be carefully set to avoid interference with the Falco daemonset deployment
-  # from the OOM killer. Based on guidance received from the kernel mailing list,
-  # it is recommended to assign multiple CPUs to one buffer instead of allocating
-  # a buffer for each CPU individually. This helps optimize resource allocation
-  # and prevent potential issues related to memory usage.
-  #
-  # This is an index that controls how many CPUs you want to assign to a single
-  # syscall buffer (ring buffer). By default, for modern_bpf every syscall buffer
-  # is associated to 2 CPUs, so the mapping is 1:2. The modern BPF probe allows
-  # you to choose different mappings, for example, changing the value to `1`
-  # results in a 1:1 mapping and would mean one syscall buffer for each CPU (this
-  # is the default for the `bpf` driver).
-  #
-  # --- [Usage]
-  #
-  # You can choose an index from 0 to MAX_NUMBER_ONLINE_CPUs to set the dimension
-  # of the syscall buffers. The value 0 represents a single buffer shared among
-  # all online CPUs. It serves as a flexible option when the exact number of
-  # online CPUs is unknown. Here's an example to illustrate this:
-  #
-  # Consider a system with 7 online CPUs:
-  #
-  #          CPUs     0  X  2  3  X  X  6  7  8  9   (X means offline CPU)
-  #
-  # - `1` means a syscall buffer for each CPU so 7 buffers
-  #
-  #          CPUs     0  X  2  3  X  X  6  7  8  9   (X means offline CPU)
-  #                   |     |  |        |  |  |  |
-  #       BUFFERs     0     1  2        3  4  5  6
-  #
-  # - `2` (Default value) means a syscall buffer for each CPU pair, so 4 buffers
-  #
-  #          CPUs     0  X  2  3  X  X  6  7  8  9   (X means offline CPU)
-  #                   |     |  |        |  |  |  |
-  #       BUFFERs     0     0  1        1  2  2  3
-  #
-  # Please note that in this example, there are 4 buffers in total. Three of the
-  # buffers are associated with pairs of CPUs, while the last buffer is mapped to
-  # a single CPU. This arrangement is necessary because we have an odd number of
-  # CPUs.
-  #
-  # - `0` or `MAX_NUMBER_ONLINE_CPUs` mean a syscall buffer shared between all
-  #   CPUs, so 1 buffer
-  #
-  #          CPUs     0  X  2  3  X  X  6  7  8  9   (X means offline CPU)
-  #                   |     |  |        |  |  |  |
-  #       BUFFERs     0     0  0        0  0  0  0
-  #
-  # Moreover, you have the option to combine this parameter with
-  # `syscall_buf_size_preset` index. For instance, you can create a large shared
-  # syscall buffer of 512 MB (using syscall_buf_size_preset=10) that is
-  # allocated among all the online CPUs.
-  #
-  # --- [Suggestions]
-  #
-  # The default choice of index 2 (one syscall buffer for each CPU pair) was made
-  # because the modern bpf probe utilizes a different memory allocation strategy
-  # compared to the other two drivers (bpf and kernel module). However, you have
-  # the flexibility to experiment and find the optimal configuration for your
-  # system.
-  #
-  # When considering a fixed syscall_buf_size_preset and a fixed buffer dimension:
-  # - Increasing this configs value results in lower number of buffers and you can
-  #   speed up your system and reduce memory usage
-  # - However, using too few buffers may increase contention in the kernel,
-  #   leading to a slowdown.
-  #
-  # If you have low event throughputs and minimal drops, reducing the number of
-  # buffers (higher `cpus_for_each_syscall_buffer`) can lower the memory footprint.
-  modern_bpf:
-    cpus_for_each_syscall_buffer: 2
-
   #################################################
   # Falco cloud orchestration systems integration #
   #################################################
-
-  # [Stable] `metadata_download`
-  #
-  # -- When connected to an orchestrator like Kubernetes, Falco has the capability to
-  # collect metadata and enrich system call events with contextual data. The
-  # parameters mentioned here control the downloading process of this metadata.
-  #
-  # Please note that support for Mesos is deprecated, so these parameters
-  # currently apply only to Kubernetes. When using Falco with Kubernetes, you can
-  # enable this functionality by using the `-k` or `-K` command-line flag.
-  #
-  # However, it's worth mentioning that for important Kubernetes metadata fields
-  # such as namespace or pod name, these fields are automatically extracted from
-  # the container runtime, providing the necessary enrichment for common use cases
-  # of syscall-based threat detection.
-  #
-  # In summary, the `-k` flag is typically not required for most scenarios involving
-  # Kubernetes workload owner enrichment. The `-k` flag is primarily used when
-  # additional metadata is required beyond the standard fields, catering to more
-  # specific use cases, see https://falco.org/docs/reference/rules/supported-fields/#field-class-k8s.
-  metadata_download:
-    max_mb: 100
-    chunk_wait_us: 1000
-    watch_freq_sec: 1
 
   # [Stable] Guidance for Kubernetes container engine command-line args settings
   #

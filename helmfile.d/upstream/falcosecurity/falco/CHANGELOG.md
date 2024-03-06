@@ -3,6 +3,55 @@
 This file documents all notable changes to Falco Helm Chart. The release
 numbering uses [semantic versioning](http://semver.org).
 
+## v4.2.2
+
+* fix(falco/README): dead link
+
+## v4.2.1
+* fix(falco/README): typos, formatting and broken links
+
+## v4.2.0
+
+* Bump falco to v0.37.1 and falcoctl to v0.7.2
+
+## v4.1.2
+* Fix links in output after falco install without sidekick
+
+## v4.1.1
+
+* Update README.md.
+
+## v4.1.0
+
+* Reintroduce the service account.
+
+## v4.0.0
+The new chart introduces some breaking changes. For folks upgrading Falco please see the BREAKING-CHANGES.md file.
+
+* Uniform driver names and configuration to the Falco one: https://github.com/falcosecurity/falco/pull/2413;
+* Fix usernames and groupnames resolution by mounting the `/etc` filesystem;
+* Drop old kubernetes collector related resources;
+* Introduce the new k8s-metacollector and k8smeta plugin (experimental);
+* Enable the dependency resolver for artifacts in falcoctl since the Falco image does not ship anymore the plugins;
+* Bump Falco to 0.37.0;
+* Bump falcoctl to 0.7.0.
+
+## v3.8.7
+
+*  Upgrade falcosidekick chart to `v0.7.11`.
+
+## v3.8.6
+
+* no changes to the chart itself. Updated README.md and makefile.
+
+## v3.8.5
+
+* Add mTLS cryptographic material load via Helm for Falco
+
+## v3.8.4
+
+* Upgrade Falco to 0.36.2: https://github.com/falcosecurity/falco/releases/tag/0.36.2
+
 ## v3.8.3
 
 * Upgrade falcosidekick chart to `v0.7.7`.
@@ -112,7 +161,7 @@ numbering uses [semantic versioning](http://semver.org).
 
 ## v2.5.4
 
-* Fix incorrect entry in v2.5.2 changelog 
+* Fix incorrect entry in v2.5.2 changelog
 
 ## v2.5.3
 
@@ -553,7 +602,7 @@ Remove whitespace around `falco.httpOutput.url` to fix the error `libcurl error:
 
 ### Minor Changes
 
-* Upgrade to Falco 0.26.2, `DRIVERS_REPO` now defaults to https://download.falco.org/driver (see the [Falco changelog](https://github.com/falcosecurity/falco/blob/0.26.2/CHANGELOG.md))
+* Upgrade to Falco 0.26.2, `DRIVERS_REPO` now defaults to https://download.falco.org/?prefix=driver/ (see the [Falco changelog](https://github.com/falcosecurity/falco/blob/0.26.2/CHANGELOG.md))
 
 ## v1.5.3
 

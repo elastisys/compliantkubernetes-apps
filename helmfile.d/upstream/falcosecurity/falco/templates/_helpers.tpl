@@ -185,7 +185,7 @@ we just disable the sycall source.
 */}}
 {{- define "falco.configSyscallSource" -}}
 {{- $userspaceDisabled := true -}}
-{{- $gvisorDisabled := (not .Values.gvisor.enabled) -}}
+{{- $gvisorDisabled := (ne .Values.driver.kind  "gvisor") -}}
 {{- $driverDisabled :=  (not .Values.driver.enabled) -}}
 {{- if or (has "-u" .Values.extra.args) (has "--userspace" .Values.extra.args) -}}
 {{- $userspaceDisabled = false -}}
@@ -214,8 +214,8 @@ be temporary and will stay here until we move this logic to the falcoctl tool.
       set -o nounset
       set -o pipefail
 
-      root={{ .Values.gvisor.runsc.root }}
-      config={{ .Values.gvisor.runsc.config }}
+      root={{ .Values.driver.gvisor.runsc.root }}
+      config={{ .Values.driver.gvisor.runsc.config }}
 
       echo "* Configuring Falco+gVisor integration...".
       # Check if gVisor is configured on the node.
@@ -240,12 +240,12 @@ be temporary and will stay here until we move this logic to the falcoctl tool.
       echo "* Falco+gVisor correctly configured."
       exit 0
   volumeMounts:
-    - mountPath: /host{{ .Values.gvisor.runsc.path }}
+    - mountPath: /host{{ .Values.driver.gvisor.runsc.path }}
       name: runsc-path
       readOnly: true
-    - mountPath: /host{{ .Values.gvisor.runsc.root }}
+    - mountPath: /host{{ .Values.driver.gvisor.runsc.root }}
       name: runsc-root
-    - mountPath: /host{{ .Values.gvisor.runsc.config }}
+    - mountPath: /host{{ .Values.driver.gvisor.runsc.config }}
       name: runsc-config
     - mountPath: /gvisor-config
       name: falco-gvisor-config
@@ -318,4 +318,100 @@ be temporary and will stay here until we move this logic to the falcoctl tool.
   {{- if .Values.falcoctl.artifact.follow.env }}
   {{- include "falco.renderTemplate" ( dict "value" .Values.falcoctl.artifact.follow.env "context" $) | nindent 4 }}
   {{- end }}
+{{- end -}}
+
+
+{{/*
+ Build configuration for k8smeta plugin and update the relevant variables.
+ * The configuration that needs to be built up is the initconfig section:
+    init_config:
+     collectorPort: 0
+     collectorHostname: ""
+     nodeName: ""
+    The falco chart exposes this configuriotino through two variable:
+       * collectors.kubenetetes.collectorHostname;
+       * collectors.kubernetes.collectorPort;
+    If those two variable are not set, then we take those values from the k8smetacollector subchart.
+    The hostname is built using the name of the service that exposes the collector endpoints and the
+    port is directly taken form the service's port that exposes the gRPC endpoint.
+    We reuse the helpers from the k8smetacollector subchart, by passing down the variables. There is a
+    hardcoded values that is the chart name for the k8s-metacollector chart.
+
+ * The falcoctl configuration is updated to allow  plugin artifacts to be installed. The refs in the install
+   section are updated by adding the reference for the k8s meta plugin that needs to be installed.
+ NOTE: It seems that the named templates run during the validation process. And then again during the
+ render fase. In our case we are setting global variable that persist during the various phases.
+ We need to make the helper idempotent.
+*/}}
+{{- define "k8smeta.configuration" -}}
+{{- if and .Values.collectors.kubernetes.enabled .Values.driver.enabled -}}
+{{- $hostname := "" -}}
+{{- if .Values.collectors.kubernetes.collectorHostname -}}
+{{- $hostname = .Values.collectors.kubernetes.collectorHostname -}}
+{{- else -}}
+{{- $collectorContext := (dict "Release" .Release "Values" (index .Values "k8s-metacollector") "Chart" (dict "Name" "k8s-metacollector")) -}}
+{{- $hostname = printf "%s.%s.svc" (include "k8s-metacollector.fullname" $collectorContext) (include "k8s-metacollector.namespace" $collectorContext) -}}
+{{- end -}}
+{{- $hasConfig := false -}}
+{{- range .Values.falco.plugins -}}
+{{- if eq (get . "name") "k8smeta" -}}
+{{ $hasConfig = true -}}
+{{- end -}}
+{{- end -}}
+{{- if not $hasConfig -}}
+{{- $listenPort := default (index .Values "k8s-metacollector" "service" "ports" "broker-grpc" "port") .Values.collectors.kubernetes.collectorPort -}}
+{{- $listenPort = int $listenPort -}}
+{{- $pluginConfig := dict "name" "k8smeta" "library_path" "libk8smeta.so" "init_config" (dict "collectorHostname" $hostname "collectorPort" $listenPort "nodeName" "${FALCO_K8S_NODE_NAME}") -}}
+{{- $newConfig := append .Values.falco.plugins $pluginConfig -}}
+{{- $_ := set .Values.falco "plugins" ($newConfig | uniq) -}}
+{{- $loadedPlugins := append .Values.falco.load_plugins "k8smeta" -}}
+{{- $_ = set .Values.falco "load_plugins" ($loadedPlugins | uniq) -}}
+{{- end -}}
+{{- $_ := set .Values.falcoctl.config.artifact.install "refs" ((append .Values.falcoctl.config.artifact.install.refs .Values.collectors.kubernetes.pluginRef) | uniq)}}
+{{- $_ = set .Values.falcoctl.config.artifact "allowedTypes" ((append .Values.falcoctl.config.artifact.allowedTypes "plugin") | uniq)}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Based on the user input it populates the driver configuration in the falco config map.
+*/}}
+{{- define "falco.engineConfiguration" -}}
+{{- if .Values.driver.enabled -}}
+{{- $supportedDrivers := list "kmod" "ebpf" "modern_ebpf" "gvisor" -}}
+{{- $aliasDrivers := list "module" "modern-bpf" -}}
+{{- if and (not (has .Values.driver.kind $supportedDrivers)) (not (has .Values.driver.kind $aliasDrivers)) -}}
+{{- fail (printf "unsupported driver kind: \"%s\". Supported drivers %s, alias %s" .Values.driver.kind $supportedDrivers $aliasDrivers) -}}
+{{- end -}}
+{{- if or (eq .Values.driver.kind "kmod") (eq .Values.driver.kind "module") -}}
+{{- $kmodConfig := dict "kind" "kmod" "kmod" (dict "buf_size_preset" .Values.driver.kmod.bufSizePreset "drop_failed_exit" .Values.driver.kmod.dropFailedExit) -}}
+{{- $_ := set .Values.falco "engine" $kmodConfig -}}
+{{- else if eq .Values.driver.kind "ebpf" -}}
+{{- $ebpfConfig := dict "kind" "ebpf" "ebpf" (dict "buf_size_preset" .Values.driver.ebpf.bufSizePreset "drop_failed_exit" .Values.driver.ebpf.dropFailedExit "probe" .Values.driver.ebpf.path) -}}
+{{- $_ := set .Values.falco "engine" $ebpfConfig -}}
+{{- else if or (eq .Values.driver.kind "modern_ebpf") (eq .Values.driver.kind "modern-bpf") -}}
+{{- $ebpfConfig := dict "kind" "modern_ebpf" "modern_ebpf" (dict "buf_size_preset" .Values.driver.modernEbpf.bufSizePreset "drop_failed_exit" .Values.driver.modernEbpf.dropFailedExit "cpus_for_each_buffer" .Values.driver.modernEbpf.cpusForEachBuffer) -}}
+{{- $_ := set .Values.falco "engine" $ebpfConfig -}}
+{{- else if eq .Values.driver.kind "gvisor" -}}
+{{- $root := printf "/host%s/k8s.io" .Values.driver.gvisor.runsc.root -}}
+{{- $gvisorConfig := dict "kind" "gvisor" "gvisor" (dict "config" "/gvisor-config/pod-init.json" "root" $root) -}}
+{{- $_ := set .Values.falco "engine" $gvisorConfig -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+It returns "true" if the driver loader has to be enabled, otherwise false.
+*/}}
+{{- define "driverLoader.enabled" -}}
+{{- if or
+        (eq .Values.driver.kind "modern_ebpf")
+        (eq .Values.driver.kind "modern-bpf")
+        (eq .Values.driver.kind "gvisor")
+        (not .Values.driver.enabled)
+        (not .Values.driver.loader.enabled)
+-}}
+false
+{{- else -}}
+true
+{{- end -}}
 {{- end -}}

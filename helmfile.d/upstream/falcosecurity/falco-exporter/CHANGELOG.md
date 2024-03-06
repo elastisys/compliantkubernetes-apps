@@ -3,6 +3,23 @@
 This file documents all notable changes to `falco-exporter` Helm Chart. The release
 numbering uses [semantic versioning](http://semver.org).
 
+## v0.9.11
+
+* fix dead links in README.md
+
+## v0.9.10
+
+* update configuration values in README.md
+* introduce helm docs for the chart
+
+## v0.9.9
+
+* update tolerations
+
+## v0.9.8
+
+* add annotation for set of folder's grafana-chart
+
 ## v0.9.7
 
 * noop change just to test the ci

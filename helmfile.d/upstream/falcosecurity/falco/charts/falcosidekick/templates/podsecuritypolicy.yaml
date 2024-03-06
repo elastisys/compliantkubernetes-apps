@@ -4,10 +4,8 @@ kind: PodSecurityPolicy
 metadata:
   name: {{ template "falcosidekick.fullname" . }}
   labels:
-    app: {{ template "falcosidekick.fullname" . }}
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    release: "{{ .Release.Name }}"
-    heritage: "{{ .Release.Service }}"
+    {{- include "falcosidekick.labels" . | nindent 4 }}
+    app.kubernetes.io/component: core
 spec:
   privileged: false
   allowPrivilegeEscalation: false

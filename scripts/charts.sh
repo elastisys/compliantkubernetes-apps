@@ -216,7 +216,7 @@ diff|list|pull|verify)
     fi
 
     for chart in ${charts}; do
-      "run_${1}" "${charts}" "${@:3}"
+      "run_${1}" "${chart}" "${@:3}"
     done
     ;;
   esac
