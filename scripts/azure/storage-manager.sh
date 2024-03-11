@@ -154,11 +154,7 @@ if [[ "$ACTION" == "$CREATE_ACTION" ]]; then
     log_info "Creating Storage Account" >&2
     create_storage_account
 
-<<<<<<< HEAD
     log_info "Creating Storage Containers" >&2
-=======
-    echo "Creating Storage Containers" >&2
->>>>>>> 83e21845 (fix log_info)
     create_containers "${CONTAINERS}"
 elif [[ "$ACTION" == "$DELETE_ACTION" ]]; then
     log_info "deleting..." >&2
