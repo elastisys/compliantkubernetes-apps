@@ -61,46 +61,55 @@ shift
 
 function create_resource_group() {
 
-    echo "checking if resource group exists" >&2
+    log_info "checking if resource group exists" >&2
     GROUP_EXISTS=$(az group list --query '[].name' | awk "/${CK8S_ENVIRONMENT_NAME}-storage-resource-group/")
     if [ "$GROUP_EXISTS" ]; then
-        echo "resource group [${CK8S_ENVIRONMENT_NAME}-storage-resource-group] already exists" >&2
-        echo "continue using this group ? (y/n)" >&2
+        log_info "resource group [${CK8S_ENVIRONMENT_NAME}-storage-resource-group] already exists" >&2
+        log_info "continue using this group ? (y/n)" >&2
         read -r -n 1 cmdinput
         case "$cmdinput" in
         y|Y) return ;;
         *) exit 0 ;;
         esac
     else
-        echo "resource group [${CK8S_ENVIRONMENT_NAME}-storage-resource-group] does not exist, creating it now" >&2
+        log_info "resource group [${CK8S_ENVIRONMENT_NAME}-storage-resource-group] does not exist, creating it now" >&2
         az group create \
             --name "$CK8S_ENVIRONMENT_NAME"-storage-resource-group \
             --location "${AZURE_LOCATION}" --only-show-errors
     fi
-
 }
 
 function create_storage_account() {
 
-    echo "checking if storage account exists" >&2
-    ACCOUNT_EXISTS=$(az storage account list --query '[].name' | awk "/${CK8S_ENVIRONMENT_NAME}storageaccount/")
-    if [ "$ACCOUNT_EXISTS" ]; then
-        echo "storage account [${CK8S_ENVIRONMENT_NAME}storageaccount] already exists" >&2
-        echo "contnue using this account ? (y/n)" >&2
-        read -r -n 1 cmdinput
-        case "$cmdinput" in
-        y) return ;;
-        n) exit 0 ;;
-        esac
-    else
-        az storage account create \
+    log_info "checking storage account availability" >&2
+    out=$(az storage account check-name --name "${CK8S_ENVIRONMENT_NAME}"storageaccount)
+    ACCOUNT_AVAILABLE=$(echo "$out" | jq -r .nameAvailable)
+    REASON=$(echo "$out" | jq -r .reason)
+    case $ACCOUNT_AVAILABLE in
+        false)
+            if [ "$REASON" == "AccountNameInvalid" ]; then
+                log_info "Account name invalid, must be only contain numbers and lowercase letters"
+                exit 0
+            elif [ "$REASON" == "AlreadyExists" ]; then
+                log_info "storage account [${CK8S_ENVIRONMENT_NAME}storageaccount] already exists" >&2
+                log_info "contnue using this account ? (y/n)" >&2
+                read -r -n 1 cmdinput
+                case "$cmdinput" in
+                y) return ;;
+                n) exit 0 ;;
+                esac
+            fi
+            ;;
+        true)
+            az storage account create \
             --name "$CK8S_ENVIRONMENT_NAME"storageaccount \
             --resource-group "$CK8S_ENVIRONMENT_NAME"-storage-resource-group \
             --location swedencentral \
             --sku Standard_RAGRS \
             --kind StorageV2 \
             --allow-blob-public-access false --only-show-errors
-    fi
+            ;;
+    esac
 }
 
 function create_containers() {
@@ -110,14 +119,14 @@ function create_containers() {
     # shellcheck disable=SC2068
     for container in ${CONTAINERS[@]}; do
 
-        echo "checking status of container ${container}]" >&2
+        log_info "checking status of container ${container}]" >&2
 
         CONTAINER_EXISTS=$(echo "$CONTAINERS_LIST" | awk "/${container}/")
 
         if [ "$CONTAINER_EXISTS" ]; then
-            echo "container ${container}] already exists, do nothing" >&2
+            log_info "container ${container}] already exists, do nothing" >&2
         else
-            echo "container ${container}] does not exist, creating it now" >&2
+            log_info "container ${container}] does not exist, creating it now" >&2
             az storage container create \
                 -n "$container" \
                 --account-name "$CK8S_ENVIRONMENT_NAME"storageaccount --only-show-errors
@@ -130,18 +139,18 @@ function delete_all() {
 }
 
 if [[ "$ACTION" == "$CREATE_ACTION" ]]; then
-    echo "Creating Resource Group" >&2
+    log_info "Creating Resource Group" >&2
     create_resource_group
 
-    echo "Creating Storage Account" >&2
+    log_info "Creating Storage Account" >&2
     create_storage_account
 
-    echo "Creating Storage Containers" >&2
+    log_info "Creating Storage Containers" >&2
     create_containers "${CONTAINERS}"
 elif [[ "$ACTION" == "$DELETE_ACTION" ]]; then
-    echo "deleting..." >&2
+    log_info "deleting..." >&2
     delete_all
 else
-    echo 'Unknown action - Aborting!' >&2 && usage
+    log_error 'Unknown action - Aborting!' >&2 && usage
     exit 1
 fi
