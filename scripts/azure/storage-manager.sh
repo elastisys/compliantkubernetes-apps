@@ -5,22 +5,13 @@ set -euo pipefail
 readonly CREATE_ACTION="create"
 readonly DELETE_ACTION="delete"
 
-function usage() {
-    echo "Usage:" 1>&2
-    echo " $0 create" 1>&2
-    echo " $0 delete" 1>&2
+log_info() {
+    echo -e "[\e[34mck8s\e[0m] ${*}" 1>&2
 }
 
-case "$1" in
-create)
-    ACTION=$CREATE_ACTION
-    ;;
-delete)
-    ACTION=$DELETE_ACTION
-    ;;
-esac
-shift
-
+log_error() {
+    echo -e "[\e[31mck8s\e[0m] ${*}" 1>&2
+}
 
 common_default=$(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
 
@@ -49,6 +40,24 @@ fi
 [ "$objectstorage_type_wc" = "azure" ] && buckets_wc=$(echo "${wc_config}" | yq4 '.objectStorage.buckets.*' -)
 
 CONTAINERS=$( { echo "$buckets_sc"; echo "$buckets_wc"; } | sort | uniq | tr '\n' ' ' | sed s'/.$//')
+
+log_info "Operating on containers: ${CONTAINERS// /', '}"
+
+function usage() {
+    echo "Usage:" 1>&2
+    echo " $0 create" 1>&2
+    echo " $0 delete" 1>&2
+}
+
+case "$1" in
+create)
+    ACTION=$CREATE_ACTION
+    ;;
+delete)
+    ACTION=$DELETE_ACTION
+    ;;
+esac
+shift
 
 function create_resource_group() {
 
@@ -127,7 +136,7 @@ if [[ "$ACTION" == "$CREATE_ACTION" ]]; then
     echo "Creating Storage Account" >&2
     create_storage_account
 
-    echo "Creating Storage Containers"
+    echo "Creating Storage Containers" >&2
     create_containers "${CONTAINERS}"
 elif [[ "$ACTION" == "$DELETE_ACTION" ]]; then
     echo "deleting..." >&2
