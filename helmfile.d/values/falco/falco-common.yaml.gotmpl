@@ -119,6 +119,7 @@ customRules:
         ghcr.io/elastisys/fluentd,
         ghcr.io/elastisys/logical-backup,
         ghcr.io/zalando/spilo-15,
+        ghcr.io/elastisys/spilo-15,
         quay.io/argoproj/argocd,
         quay.io/calico/node,
         quay.io/jetstack/cert-manager-controller,
@@ -127,12 +128,20 @@ customRules:
         quay.io/prometheus/prometheus,
         registry.k8s.io/ingress-nginx/controller-chroot,
         registry.k8s.io/ingress-nginx/controller,
-        registry.k8s.io/kube-state-metrics/kube-state-metrics
+        quay.io/metallb/controller,
+        registry.k8s.io/kube-state-metrics/kube-state-metrics,
+        gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/webhook,
+        gcr.io/tekton-releases/github.com/tektoncd/dashboard/cmd/dashboard,
+        gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/controller,
+        gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/resolvers,
+        ghcr.io/kubereboot/kured,
+        ghcr.io/dexidp/dex
         ]
 
     # Contact K8S API Server From Container
     - macro: user_known_contact_k8s_api_server_activities
-      condition: (
+      condition: >
+        (
           container.image.repository in (trusted_image_repositories)
         ) or (
           proc.cmdline = "kubectl get rolebindings --all-namespaces -o json"
