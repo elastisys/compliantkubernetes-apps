@@ -119,14 +119,14 @@ function create_containers() {
     # shellcheck disable=SC2068
     for container in ${CONTAINERS[@]}; do
 
-        log_info "checking status of container ${container}]" >&2
+        log_info "checking status of container ${container}" >&2
 
-        CONTAINER_EXISTS=$(echo "$CONTAINERS_LIST" | awk "/${container}/")
+        CONTAINER_EXISTS=$(echo "$CONTAINERS_LIST" | jq --arg container "${container}" '. | index($container)')
 
         if [ "$CONTAINER_EXISTS" ]; then
-            log_info "container ${container}] already exists, do nothing" >&2
+            log_info "container ${container} already exists, do nothing" >&2
         else
-            log_info "container ${container}] does not exist, creating it now" >&2
+            log_info "container ${container} does not exist, creating it now" >&2
             az storage container create \
                 -n "$container" \
                 --account-name "$CK8S_ENVIRONMENT_NAME"storageaccount --only-show-errors
