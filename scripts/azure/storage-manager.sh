@@ -62,7 +62,7 @@ shift
 function create_resource_group() {
 
     log_info "checking if resource group exists" >&2
-    GROUP_EXISTS=$(az group list --query '[].name' | awk "/${CK8S_ENVIRONMENT_NAME}-storage-resource-group/")
+    GROUP_EXISTS=$(az group list --query '[].name' | jq --arg group "${CK8S_ENVIRONMENT_NAME}"-storage-resource-group '. | index($group)')
     if [ "$GROUP_EXISTS" ]; then
         log_info "resource group [${CK8S_ENVIRONMENT_NAME}-storage-resource-group] already exists" >&2
         log_info "continue using this group ? (y/n)" >&2
@@ -82,7 +82,7 @@ function create_resource_group() {
 function create_storage_account() {
 
     log_info "checking storage account availability" >&2
-    out=$(az storage account check-name --name "${CK8S_ENVIRONMENT_NAME}"storageaccount)
+    out=$(az storage account check-name --only-show-errors --name "${CK8S_ENVIRONMENT_NAME}"storageaccount)
     ACCOUNT_AVAILABLE=$(echo "$out" | jq -r .nameAvailable)
     REASON=$(echo "$out" | jq -r .reason)
     case $ACCOUNT_AVAILABLE in
