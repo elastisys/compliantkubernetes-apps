@@ -10,13 +10,13 @@ run() {
   execute)
     if [[ "${CK8S_CLUSTER}" =~ ^(sc|both)$ ]]; then
       log_info "  - applying the Velero CRDs on sc"
-      kubectl_do sc apply --server-side --force-conflicts -f "${ROOT}"/helmfile.d/upstream/vmware-tanzu/velero/crds
+      kubectl_do sc apply --server-side --force-conflicts -f "${ROOT}"/helmfile/upstream/vmware-tanzu/velero/crds
 
       helmfile_upgrade sc app=velero
     fi
     if [[ "${CK8S_CLUSTER}" =~ ^(wc|both)$ ]]; then
       log_info "  - applying the Velero CRDs on wc"
-      kubectl_do wc apply --server-side --force-conflicts -f "${ROOT}"/helmfile.d/upstream/vmware-tanzu/velero/crds
+      kubectl_do wc apply --server-side --force-conflicts -f "${ROOT}"/helmfile/upstream/vmware-tanzu/velero/crds
 
       helmfile_upgrade wc app=velero
     fi
