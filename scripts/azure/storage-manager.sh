@@ -63,7 +63,7 @@ function create_resource_group() {
 
     log_info "checking if resource group exists" >&2
     GROUP_EXISTS=$(az group list --query '[].name' | jq --arg group "${CK8S_ENVIRONMENT_NAME}"-storage-resource-group '. | index($group)')
-    if [ "$GROUP_EXISTS" ]; then
+    if [ "$GROUP_EXISTS" != null ]; then
         log_info "resource group [${CK8S_ENVIRONMENT_NAME}-storage-resource-group] already exists" >&2
         log_info "continue using this group ? (y/n)" >&2
         read -r -n 1 cmdinput
@@ -101,6 +101,7 @@ function create_storage_account() {
             fi
             ;;
         true)
+            log_info "createing storage account ${CK8S_ENVIRONMENT_NAME}storageaccount"
             az storage account create \
             --name "$CK8S_ENVIRONMENT_NAME"storageaccount \
             --resource-group "$CK8S_ENVIRONMENT_NAME"-storage-resource-group \
@@ -123,7 +124,7 @@ function create_containers() {
 
         CONTAINER_EXISTS=$(echo "$CONTAINERS_LIST" | jq --arg container "${container}" '. | index($container)')
 
-        if [ "$CONTAINER_EXISTS" ]; then
+        if [ "$CONTAINER_EXISTS" != null ]; then
             log_info "container ${container} already exists, do nothing" >&2
         else
             log_info "container ${container} does not exist, creating it now" >&2
