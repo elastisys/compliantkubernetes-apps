@@ -99,7 +99,6 @@ azure_rm_chunks() {
     done < "$CHUNK_LIST"
 }
 
-# Update merge_chunks function to support Azure Blob
 merge_chunks() {
   DAY="$1"
 
