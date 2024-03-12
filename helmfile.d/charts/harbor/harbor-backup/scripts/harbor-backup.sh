@@ -140,9 +140,6 @@ azure_get_records() {
     exit 1
   fi
 
-  before_date="$1"
-  PATH_TO_BACKUPS="https://${AZURE_ACCOUNT_NAME}.blob.core.windows.net/${AZURE_CONTAINER_NAME}/backups/"
-
   # List all blobs in the specified container and filter by date
   az storage blob list \
     --account-name "${AZURE_ACCOUNT_NAME}" \
@@ -157,7 +154,7 @@ azure_remove_path() {
   : "${AZURE_CONTAINER_NAME:?Missing AZURE_CONTAINER_NAME}"
   path=$1
 
-  echo "deleting https://${AZURE_ACCOUNT_NAME}.blob.core.windows.net/${AZURE_CONTAINER_NAME}/${path}"
+  echo "deleting https://${AZURE_ACCOUNT_NAME}.blob.core.windows.net/${AZURE_CONTAINER_NAME}/${path}" >&2
   az storage blob delete \
     --account-name "${AZURE_ACCOUNT_NAME}" \
     --account-key "${AZURE_ACCOUNT_KEY}" \
