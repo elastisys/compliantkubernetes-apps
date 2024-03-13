@@ -11,10 +11,6 @@ metrics:
 
 forwarder:
   enabled: false
-  {{- if eq .Values.objectStorage.type "azure"}}
-  extraGems:
-    - fluent-plugin-azure-storage-append-blob
-  {{ end }}
 
 extraDeploy:
   - apiVersion: v1
