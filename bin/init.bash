@@ -284,12 +284,8 @@ set_nginx_config() {
     replace_set_me "${file}" '.ingressNginx.controller.service.enabled' "${service_enabled}"
     replace_set_me "${file}" '.networkPolicies.global.externalLoadBalancer' "${external_load_balancer}"
     replace_set_me "${file}" '.networkPolicies.global.ingressUsingHostNetwork' "${ingress_using_host_network}"
-
-    if [ "${CK8S_CLOUD_PROVIDER}" = "azure" ]; then
-        replace_set_me "${file}" '.ingressNginx.controller.service.allocateLoadBalancerNodePorts' 'false'
-    else
-        replace_set_me "${file}" '.ingressNginx.controller.service.allocateLoadBalancerNodePorts' 'true'
-    fi
+    replace_set_me "${file}" '.ingressNginx.controller.service.allocateLoadBalancerNodePorts' 'true'
+ 
 
     if [ "${service_enabled}" = 'false' ]; then
         replace_set_me "${file}" '.ingressNginx.controller.service.type' '"set-me-if-ingressNginx.controller.service.enabled"'
