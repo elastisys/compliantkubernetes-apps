@@ -25,9 +25,9 @@ gcs:
 {{ else if eq .Values.objectStorage.type "azure" -}}
 azure:
   enabled: true
-  accountname: {{ .Values.objectStorage.azure.storageAccountName }}
-  accountkey: {{ .Values.objectStorage.azure.storageAccountKey }}
-  container: {{ .Values.objectStorage.buckets.harbor }}
+  storageAccountName: {{ .Values.objectStorage.azure.storageAccountName }}
+  storageAccountKey: {{ .Values.objectStorage.azure.storageAccountKey }}
+  containerName: {{ .Values.objectStorage.buckets.harbor }}
   realm: core.windows.net
 {{- end }}
 
