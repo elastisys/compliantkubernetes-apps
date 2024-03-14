@@ -101,7 +101,7 @@ function create_storage_account() {
             fi
             ;;
         true)
-            log_info "createing storage account ${CK8S_ENVIRONMENT_NAME}storageaccount"
+            log_info "creating storage account ${CK8S_ENVIRONMENT_NAME}storageaccount"
             az storage account create \
             --name "$CK8S_ENVIRONMENT_NAME"storageaccount \
             --resource-group "$CK8S_ENVIRONMENT_NAME"-storage-resource-group \
