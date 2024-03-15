@@ -31,6 +31,15 @@ policies:
           ports:
             - tcp: 443
         {{- end }}
+        {{- with .Values | get "networkPolicies.certManager.dns01.ips" list }}
+        - name: dns01
+          peers:
+            {{- range . }}
+            - cidr: {{ . }}
+            {{- end }}
+          ports:
+            - tcp: 53
+        {{- end }}
       ingress:
         - rule: ingress-rule-prometheus
           ports:
