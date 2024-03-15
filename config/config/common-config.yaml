@@ -644,6 +644,7 @@ issuers:
       # - selector:
       #     dnsZones:
       #     - example.org
+      #   Set the required network policies
       #   dns01:
       #     route53:
       #       region: eu-north-1
@@ -999,6 +1000,9 @@ networkPolicies:
     letsencrypt:
       ips:
         - set-me
+    # Enable this if dns01 is used by certManager
+    dns01:
+      ips: []
 
   ingressNginx:
     enabled: true
