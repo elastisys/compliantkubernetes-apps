@@ -118,7 +118,6 @@ run_list() {
 run_pull() {
   chart="${1}"
   out "${chart}:"
-
   requested_version="$(yq4 ".charts.\"${chart}\"" "${INDEX}")"
   out "  requested-version: \e[34m${requested_version}\e[0m"
 
@@ -209,7 +208,7 @@ diff|list|pull|verify)
     done
     ;;
   *)
-    charts="$(yq4 ".charts | keys | .[] | select(match(\"${2}\"))" "${INDEX}")"
+    charts="$(yq4 ".charts | keys | .[] | select(match(\"${2}\$\"))" "${INDEX}")"
     if [[ -z "${charts}" ]]; then
       out "\e[31merror\e[0m: invalid chart identifier \"${2}\""
       exit 1
