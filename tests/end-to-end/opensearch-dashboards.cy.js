@@ -34,13 +34,10 @@ function opensearchTestIndexPattern(cy, indexPattern) {
     .click()
 
   // select index pattern
-  cy.contains("button", "kubeaudit")
+  cy.contains("div", "kubeaudit*")
     .click()
-  cy.contains("li", indexPattern)
+  cy.contains("button", indexPattern)
     .click()
-
-  cy.contains("searching", opt)
-    .should("not.be.visible")
 
   cy.contains("no results match your search criteria", opt)
     .should("not.exist")
