@@ -342,7 +342,7 @@ kubeStateMetrics:
     limits:
       cpu: 30m
       memory: 100Mi
-  # Enable this if your cluster is managed by Cluster API to get Cluster API metrics.
+  # Configure this if DNS-01 challenges are enabled in cert-manager
   clusterAPIMetrics:
     enabled: false
 
