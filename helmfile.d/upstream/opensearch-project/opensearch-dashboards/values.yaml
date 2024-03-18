@@ -114,16 +114,16 @@ config: {}
 
 
   # Dashboards TLS Config (Ensure the cert files are present before enabling SSL
-      # ssl:
-      #   enabled: true
-      #   key: /usr/share/opensearch-dashboards/certs/dashboards-key.pem
-      #   certificate: /usr/share/opensearch-dashboards/certs/dashboards-crt.pem
+  # ssl:
+  #   enabled: true
+  #   key: /usr/share/opensearch-dashboards/certs/dashboards-key.pem
+  #   certificate: /usr/share/opensearch-dashboards/certs/dashboards-crt.pem
 
-    # determines how dashboards will verify certificates (needs to be none for default opensearch certificates to work)
-    # opensearch:
-    #   ssl:
-    #     certificateAuthorities: /usr/share/opensearch-dashboards/certs/dashboards-root-ca.pem
-    #     if utilizing custom CA certs for connection to opensearch, provide the CA here
+  # determines how dashboards will verify certificates (needs to be none for default opensearch certificates to work)
+  # opensearch:
+  #   ssl:
+  #     certificateAuthorities: /usr/share/opensearch-dashboards/certs/dashboards-root-ca.pem
+  #     if utilizing custom CA certs for connection to opensearch, provide the CA here
 
 opensearchDashboardsYml:
   defaultMode:
@@ -210,6 +210,10 @@ tolerations: []
 
 affinity: {}
 
+# This is the pod topology spread constraints
+# https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+topologySpreadConstraints: []
+
 # -- Array of extra K8s manifests to deploy
 extraObjects: []
   # - apiVersion: secrets-store.csi.x-k8s.io/v1
@@ -237,6 +241,18 @@ extraObjects: []
   #       type: Opaque
   #       labels:
   #         app.kubernetes.io/part-of: argocd
+  # - |
+  #    apiVersion: policy/v1
+  #    kind: PodDisruptionBudget
+  #    metadata:
+  #      name: {{ template "opensearch-dashboards.fullname" . }}
+  #      labels:
+  #        {{- include "opensearch-dashboards.labels" . | nindent 4 }}
+  #    spec:
+  #      minAvailable: 1
+  #      selector:
+  #        matchLabels:
+#          {{- include "opensearch-dashboards.selectorLabels" . | nindent 6 }}
 
 # pod lifecycle policies as outlined here:
 # https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks

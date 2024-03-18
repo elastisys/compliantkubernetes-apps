@@ -167,6 +167,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
+1. Upgrade Opensearch:
+
+  ```
+  ./migration/v0.37/apply/20-upgrade-opensearch.sh execute
+  ```
+
 1. Upgrade applications:
 
     ```bash
