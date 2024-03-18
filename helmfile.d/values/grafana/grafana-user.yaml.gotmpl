@@ -21,9 +21,16 @@ sidecar:
     labelValue: "1"
   resources: {{- toYaml .Values.grafana.user.sidecar.resources | nindent 6 }}
 
-{{- if .Values.grafana.user.envRenderSecret }}
-envRenderSecret: {{- toYaml .Values.grafana.user.envRenderSecret | nindent 2 }}
-{{- end }}
+admin:
+  existingSecret: {{ .Release.Name }}-env ## Should match the secret name for envRenderSecret
+
+envRenderSecret:
+  admin-user: admin
+  admin-password: {{ .Values.user.grafanaPassword }}
+  clientSecret: {{ .Values.grafana.clientSecret }}
+  {{- if .Values.grafana.user.envRenderSecret }}
+  {{- toYaml .Values.grafana.user.envRenderSecret | nindent 2 }}
+  {{- end }}
 
 {{- if .Values.grafana.user.plugins }}
 plugins: {{- toYaml .Values.grafana.user.plugins | nindent 2 }}
@@ -99,7 +106,7 @@ grafana.ini:
     name: dex
     enabled: true
     client_id: grafana
-    client_secret: {{ .Values.grafana.clientSecret }}
+    client_secret: $__env{clientSecret}
     scopes: {{ .Values.grafana.user.oidc.scopes }}
     auth_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}{{ $trailingDot }}/auth
     token_url: http://dex.dex.svc.cluster.local{{ $trailingDot }}:5556/token
