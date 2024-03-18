@@ -99,8 +99,7 @@ helmfile -e <service|workload>_cluster -lapp=ingress-nginx -lapp=node-local-dns 
 
 > [!important]
 > To use certificates from Let's Encrypt you must enable [DNS-01 challenges in `cert-manager`](https://cert-manager.io/docs/configuration/acme/dns01/).
-> Remember to add the correct network policies.
-> For Amazon route53 the ip range is: `205.251.192.0/18`
+> Remember to add the correct network policies, for Amazon Route 53 the IP range is: `205.251.192.0/18`.
 
 Support matrix:
 
