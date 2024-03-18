@@ -61,6 +61,8 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     git switch -d v0.38.x
     ```
 
+1. If you have enabled `externalDns` and want to adopt already created dns records you can set `CK8S_HOSTED_ZONE_ID` to the hosted zone id.
+
 1. Prepare upgrade - *non-disruptive*
 
     > *Done before maintenance window.*
@@ -134,6 +136,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s update-ips  dry-run
     # if you agree with the changes apply
     ./bin/ck8s update-ips  apply
+    ```
+
+1. If you have enabled `externalDns` and you can adopt already configured records:
+
+    ```bash
+    ./migration/v0.37/prepare/60-adopt-dns-records.sh
     ```
 
 ### Apply upgrade - *disruptive*

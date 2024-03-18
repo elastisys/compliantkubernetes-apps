@@ -107,11 +107,13 @@ If this is all new to you, here's a [link](https://riseup.net/en/security/messag
 **You probably want to check the [compliantkubernetes-kubespray][compliantkubernetes-kubespray] repository first, since compliantkubernetes-apps depends on having two clusters already set up.**
 In addition to this, you will need to set up the following DNS entries (replace `example.com` with your domain).
 
-- Point these domains to the workload cluster ingress controller:
+There are two options when managing DNS records, manually or ExternalDNS.
+
+- Manually point these domains to the workload cluster ingress controller:
 
   - `*.example.com`
 
-- Point these domains to the service cluster ingress controller:
+- Manually point these domains to the service cluster ingress controller:
 
   - `*.ops.example.com`
   - `dex.example.com`
@@ -120,6 +122,9 @@ In addition to this, you will need to set up the following DNS entries (replace 
   - `opensearch.example.com`
 
 Assuming you already have everything needed to install the apps, this is what you need to do.
+
+The other option is to let ExternalDNS manage your DNS records, currently only AWS Route 53 is supported.
+You configure ExternalDNS later in the process.
 
 1. Decide on a name for this environment, the cloud provider to use as well as the flavor and set them as environment variables:
     Note that these will be later kept as global values in the common defaults config to prevent them from being inadvertently changed, as they will affect the default options of the configuration when generated or updated.
@@ -169,6 +174,8 @@ Assuming you already have everything needed to install the apps, this is what yo
     Make sure that the `objectStorage` values are set in `common-config.yaml` or `sc-config.yaml` and `wc-config.yaml`, as well as required credentials in `secrets.yaml` according to your `objectStorage.type`.
     The type may already be set in the default configuration found in the `defaults/` directory depending on your selected cloud provider.
     Set `objectStorage.s3.*` if you are using S3 or `objectStorage.gcs.*` if you are using GCS.
+    Enable ExternalDNS `externalDns.enabled` and set the required variables, if you want ExternalDNS to manage your records from inside your cluster.
+    It requires credentials to route53, `txtOwnerId`, `endpoints` if `externalDns.sources.crd` is enabled.
 
 1. Create S3 buckets - optional
     If you have set `objectStorage.type: s3`, then you need to create the buckets specified under `objectStorage.buckets` in your configuration files.

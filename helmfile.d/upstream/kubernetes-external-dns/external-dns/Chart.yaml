@@ -1,0 +1,27 @@
+annotations:
+  artifacthub.io/changes: |
+    - kind: added
+      description: "Added support for dnsConfig."
+    - kind: changed
+      description: "Updated _ExternalDNS_ OCI image version to [v0.14.1](https://github.com/kubernetes-sigs/external-dns/releases/tag/v0.14.1)."
+apiVersion: v2
+appVersion: 0.14.1
+description: ExternalDNS synchronizes exposed Kubernetes Services and Ingresses with
+  DNS providers.
+home: https://github.com/kubernetes-sigs/external-dns/
+icon: https://github.com/kubernetes-sigs/external-dns/raw/master/docs/img/external-dns.png
+keywords:
+- kubernetes
+- externaldns
+- external-dns
+- dns
+- service
+- ingress
+maintainers:
+- email: steve.hipwell@gmail.com
+  name: stevehipwell
+name: external-dns
+sources:
+- https://github.com/kubernetes-sigs/external-dns/
+type: application
+version: 1.14.4

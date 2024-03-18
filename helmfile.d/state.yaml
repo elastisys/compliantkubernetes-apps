@@ -8,6 +8,7 @@ bases:
   - stacks/calico.yaml
   - stacks/cert-manager.yaml
   - stacks/dex.yaml
+  - stacks/external-dns.yaml
   - stacks/falco.yaml
   - stacks/fluentd.yaml
   - stacks/gatekeeper.yaml
@@ -124,6 +125,11 @@ releases:
   - inherit: [ template: kured-podsecuritypolicy ]
   - inherit: [ template: kured-secret ]
   - inherit: [ template: kured-main ]
+
+  - inherit: [ template: external-dns-networkpolicy ]
+  - inherit: [ template: external-dns-secrets ]
+  - inherit: [ template: external-dns-main ]
+  - inherit: [ template: external-dns-endpoints ]
 
   - inherit: [ template: velero-networkpolicy ]
   - inherit: [ template: velero-podsecuritypolicy ]
