@@ -110,6 +110,7 @@ Support matrix:
 | calico         | 🟨️ | 🟨️ | Requires Cluster API settings to work. |
 | cert-manager   | 🟩️ | 🟩️ | |
 | dex            | 🟩️ | ⬜️ | Does not pull in cert-manager or ingress-nginx. For full functionality use: <br/> `-lapp=cert-manager -lapp=dex -lapp=ingress-nginx -lapp=node-local-dns` |
+| external-dns   | 🟩️ | 🟩️ | |
 | falco          | 🟥️ | 🟥️ | Installs but cannot start due to lack of permissions inside Kind. |
 | fluentd        | 🟩️ | 🟨️ | Installs but cannot start without creating initial resources on WC. |
 | gatekeeper     | 🟩️ | 🟩️ | |

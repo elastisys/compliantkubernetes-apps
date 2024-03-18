@@ -552,6 +552,7 @@ ingressNginx:
     tolerations: []
     affinity: {}
     nodeSelector: {}
+    # Enable this if service type is loadbalancer and externalDns is enabled together with ingress
     enablepublishService: false
 
     ## Enable validation of Nginx annotations on Ingress resources.
@@ -1050,6 +1051,13 @@ networkPolicies:
       ports:
         - 443
 
+  externalDns:
+    enabled: false
+    ips:
+      - set-me-if-externalDns.enabled
+    ports:
+      - 443
+
   gatekeeper:
     enabled: true
 
@@ -1103,3 +1111,50 @@ nodeLocalDns:
     requests:
       cpu: 25m
       memory: 40Mi
+
+externalDns:
+  # Enable ExternalDNS to manage dns records from kubernetes objects.
+  # Possible sources are CRD, Ingress and services.
+  # Currently only aws route53 is supported within ck8s-apps.
+  # Example: https://kubernetes-sigs.github.io/external-dns/v0.14.1/tutorials/aws/
+  enabled: false
+  provider: aws
+  txtOwnerId: set-me-if-externalDns.enabled
+  sources:
+    crd: false
+    ingress: true
+    service: true
+  domains: []
+  logLevel: info
+  # AWS route53 can not handle CNAME records and TXT with the same name.
+  # When --aws-prefer-cname is used, add a prefix to make it work.
+  # txtPrefix: <cluster-name>
+  txtPrefix: ""
+  extraArgs: []
+  # If loadbalancer as a service is used and it receives a hostname instead of a ip.
+  # You should add the following to extraArgs.
+  # This happens for openstack environments using proxy protocol (nip.io)
+  # - --aws-prefer-cname
+  resources:
+    limits:
+      cpu: 100m
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      memory: 50Mi
+  affinity: {}
+  topologySpreadConstraints: []
+  tolerations: []
+  namespaced: false
+  endpoints: []
+  # If externalDns.sources.crd is enabled add endpoints for your dns endpoints
+  #  - dnsName: kube
+  #    recordTTL: 180
+  #    recordType: A
+  #    targets:
+  #      - wc control-plane nodes
+  #  - dnsName: kube.ops
+  #    recordTTL: 180
+  #    recordType: A
+  #    targets:
+  #      - sc control-plane nodes

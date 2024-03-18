@@ -1,0 +1,54 @@
+---
+templates:
+  external-dns:
+    namespace: external-dns
+    labels:
+      app: external-dns
+
+  external-dns-networkpolicy:
+    inherit:
+      - template: external-dns
+      - template: networkpolicies
+    installed: {{ and (.Values | get "externalDns.enabled" false) (.Values | get "networkPolicies.externalDns.enabled" false) }}
+    labels:
+      netpol: external-dns
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/common/external-dns.yaml.gotmpl
+
+  external-dns-secrets:
+    inherit: [ template: external-dns ]
+    installed: {{ .Values | get "externalDns.enabled" false }}
+    chart: charts/external-dns-secrets
+    version: 0.1.0
+    name: external-dns-secrets
+    needs:
+      - kube-system/admin-namespaces
+    values:
+    - values/external-dns/external-dns.yaml.gotmpl
+
+  external-dns-main:
+    disableValidationOnInstall: true
+    inherit:
+      - template: external-dns
+      - template: external-dns-chart
+    installed: {{ .Values | get "externalDns.enabled" false }}
+    name: external-dns
+    needs:
+      - external-dns/networkpolicy
+      - monitoring/kube-prometheus-stack # creates servicemonitors
+    values:
+      - values/external-dns/external-dns.yaml.gotmpl
+
+  external-dns-endpoints:
+    inherit: [ template: external-dns ]
+    installed: {{ and (.Values | get "externalDns.enabled" false) (.Values | get "externalDns.sources.crd" false) }}
+    chart: charts/external-dns-endpoints
+    version: 0.1.0
+    name: external-dns-endpoints
+    needs:
+      - external-dns/external-dns
+    values:
+    - values/external-dns/external-dns.yaml.gotmpl

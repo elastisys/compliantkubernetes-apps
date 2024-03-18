@@ -1,0 +1,24 @@
+policies:
+  external-dns:
+    all-deny:
+      podSelectorLabels: {}
+      egress: {}
+      ingress: {}
+
+    external-dns:
+      podSelectorLabels:
+        app.kubernetes.io/name: external-dns
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-apiserver
+        - name: egress-rule-route53
+          {{- if and (.Values | get "networkPolicies.externalDns.ips" list) (.Values | get "networkPolicies.externalDns.ports" list) }}
+          peers:
+            {{- range .Values | get "networkPolicies.externalDns.ips" list }}
+            - cidr: {{ . }}
+            {{- end }}
+          ports:
+            {{- range .Values | get "networkPolicies.externalDns.ports" list }}
+            - tcp: {{ . }}
+            {{- end }}
+          {{- end }}

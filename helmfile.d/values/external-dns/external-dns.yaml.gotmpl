@@ -1,0 +1,76 @@
+{{- if not (eq .Values.externalDns.provider "aws") }}
+{{- fail "Currently we only support aws route53 when using external-dns" }}
+{{- end }}
+
+serviceMonitor:
+  enabled: true
+
+externalDns:
+  accessKey: {{ .Values.externalDns.awsRoute53.accessKey }}
+  secretKey: {{ .Values.externalDns.awsRoute53.secretKey }}
+
+resources: {{ .Values.externalDns.resources }}
+tolerations: {{ .Values.externalDns.tolerations }}
+affinity: {{ .Values.externalDns.affinity }}
+topologySpreadConstraints: {{ .Values.externalDns.topologySpreadConstraints }}
+
+namespaced: {{ .Values.externalDns.namespaced | default false }}
+
+crd: {{ .Values.externalDns.sources.crd }}
+
+sources:
+  {{- if .Values.externalDns.sources.service }}
+  - service
+  {{- end }}
+  {{- if .Values.externalDns.sources.ingress }}
+  - ingress
+  {{- end }}
+  {{- if .Values.externalDns.sources.crd }}
+  - crd
+  {{- end }}
+
+domainFilters:
+  {{- if .Values.externalDns.domains }}
+    {{- toYaml .Values.externalDns.domains | nindent 2 }}
+  {{- else }}
+  - {{ .Values.global.baseDomain }}
+  {{- end }}
+
+txtPrefix: {{ .Values.externalDns.txtPrefix }}
+
+provider:
+  name: {{ .Values.externalDns.provider }}
+
+env:
+  - name: AWS_SHARED_CREDENTIALS_FILE
+    value: /.aws/credentials
+
+extraVolumeMounts:
+  - name: aws-credentials
+    mountPath: /.aws
+    readOnly: true
+
+extraVolumes:
+  - name: aws-credentials
+    secret:
+      secretName: external-dns-secrets
+
+logLevel: {{ .Values.externalDns.logLevel | default "info" }}
+
+extraArgs:
+  - --txt-owner-id={{ .Values.externalDns.txtOwnerId }}
+  {{- if .Values.externalDns.extraArgs }}
+    {{- toYaml .Values.externalDns.extraArgs | nindent 2 }}
+  {{- end }}
+
+
+{{- if .Values.externalDns.endpoints }}
+endpoints:
+  {{- range .Values.externalDns.endpoints }}
+  - dnsName: {{ .dnsName }}.{{ $.Values.global.baseDomain }}
+    recordTTL: {{ .recordTTL }}
+    recordType: {{ .recordType }}
+    targets:
+      {{- toYaml .targets | nindent 4 }}
+  {{- end }}
+{{- end }}
