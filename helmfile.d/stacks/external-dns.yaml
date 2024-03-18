@@ -1,0 +1,30 @@
+---
+templates:
+  external-dns:
+    namespace: external-dns
+    labels:
+      app: external-dns
+
+  external-dns-secret-crds:
+    inherit: [ template: external-dns ]
+    installed: {{ .Values | get "externalDns.enabled" false }}
+    chart: charts/external-dns-secret-crds
+    version: 0.1.0
+    name: external-dns-secret-crds
+    needs:
+      - kube-system/admin-namespaces
+    values:
+    - values/external-dns/external-dns.yaml.gotmpl
+
+  external-dns-main:
+    disableValidationOnInstall: true
+    inherit:
+      - template: external-dns
+      - template: external-dns-chart
+    installed: {{ .Values | get "externalDns.enabled" false }}
+    name: external-dns
+    needs:
+      - kube-system/common-np
+      - monitoring/kube-prometheus-stack # creates servicemonitors
+    values:
+      - values/external-dns/external-dns.yaml.gotmpl

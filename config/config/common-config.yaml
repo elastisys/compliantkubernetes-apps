@@ -1102,3 +1102,23 @@ nodeLocalDns:
     requests:
       cpu: 25m
       memory: 40Mi
+
+externalDns:
+  enabled: false
+  txtOwnerId: set-me
+  sources:
+    services: true
+    ingress: true
+    crd: false
+  domains: []
+  logLevel: info
+  extraArgs: []
+  namespaced: false
+  endpoints: []
+  # If externalDns.sources.crd is enabled add endpoints for your dns endpoints
+  #  - dnsName: kube
+  #    targets:
+  #      - wc control-plane nodes
+  #  - dnsName: kube.ops
+  #    targets:
+  #    - sc control-plane nodes

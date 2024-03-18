@@ -1,0 +1,8 @@
+{{- if .Values.crd }}
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: dnsendpoints
+spec:
+  endpoints: {{- toYaml .Values.endpoints | nindent 2}}
+{{- end }}
