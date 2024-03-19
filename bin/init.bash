@@ -247,7 +247,7 @@ set_nginx_config() {
             ingress_using_host_network=true
             ;;
 
-        citycloud | elastx | azure)
+        citycloud | elastx)
             use_proxy_protocol=false
             use_host_port=false
             service_enabled=true
@@ -263,6 +263,16 @@ set_nginx_config() {
             service_enabled=true
             service_type=LoadBalancer
             service_annotations='service.beta.kubernetes.io/aws-load-balancer-type: nlb'
+            external_load_balancer=false
+            ingress_using_host_network=false
+            ;;
+
+        azure)
+            use_proxy_protocol=false
+            use_host_port=false
+            service_enabled=true
+            service_type=LoadBalancer
+            service_annotations='service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz'
             external_load_balancer=false
             ingress_using_host_network=false
             ;;
