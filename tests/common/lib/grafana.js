@@ -6,10 +6,10 @@ Cypress.Commands.add('testGrafanaDashboard', (ingress, dashboardName, expandRows
   cy.visit(`https://${ingress}/dashboards`)
 
   // View and load as much of the dashboard as possible
-  cy.viewport(2560, 2160)
+  cy.viewport(2560, 2260)
 
-  cy.contains('General')
-    .click()
+  // The dashboard view in Grafana need a scroll action to load all the dashboard names
+  cy.contains('Kubernetes').trigger("wheel", { deltaY: -66.666666, wheelDelta: 120, wheelDeltaX: 0, wheelDeltaY: 120, bubbles: true})
 
   cy.contains(dashboardName)
     .click()
