@@ -74,13 +74,13 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s update-ips both apply
     ```
 
-    > [!NOTE]
+    > **Note:**
     > It is possible to upgrade `wc` and `sc` clusters separately by replacing `both` when running the `upgrade` command, e.g. the following will only upgrade the workload cluster:
-    >
-    > ```bash
-    > ./bin/ck8s upgrade wc ${new_version} prepare
-    > ./bin/ck8s upgrade wc ${new_version} apply
-    > ```
+
+    ```bash
+    ./bin/ck8s upgrade wc ${new_version} prepare
+    ./bin/ck8s upgrade wc ${new_version} apply
+    ```
 
 1. Apply upgrade - *disruptive*
 
