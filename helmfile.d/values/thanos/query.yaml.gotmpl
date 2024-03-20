@@ -4,6 +4,7 @@ query:
   enabled: true
   replicaCount: {{ .Values.thanos.query.replicaCount }}
   topologySpreadConstraints: {{- toYaml .Values.thanos.query.topologySpreadConstraints | nindent 4 }}
+  affinity: {{- toYaml .Values.thanos.query.affinity | nindent 4 }}
 
   service:
     additionalHeadless: true

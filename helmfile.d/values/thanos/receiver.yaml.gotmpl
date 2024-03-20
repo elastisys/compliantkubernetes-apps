@@ -84,6 +84,7 @@ receive:
 
   replicaCount: {{ .Values.thanos.receiver.replicaCount }}
   topologySpreadConstraints: {{- toYaml .Values.thanos.receiver.topologySpreadConstraints | nindent 4 }}
+  affinity: {{- toYaml .Values.thanos.receiver.affinity | nindent 4 }}
 
   service:
     additionalHeadless: true
@@ -134,6 +135,7 @@ ruler:
 
   replicaCount: {{ .Values.thanos.ruler.replicaCount }}
   topologySpreadConstraints: {{- toYaml .Values.thanos.ruler.topologySpreadConstraints | nindent 4 }}
+  affinity: {{- toYaml .Values.thanos.ruler.affinity | nindent 4 }}
 
   alertmanagers:
     - dnssrv+http://_http-web._tcp.alertmanager-operated.monitoring.svc.cluster.local
