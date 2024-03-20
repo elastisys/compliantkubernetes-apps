@@ -3,3 +3,6 @@
 # Declare variables to be passed into your templates.
 openstackMonitoring:
   enabled: false
+serviceMonitor:
+  labels: {}
+  namespace: ""

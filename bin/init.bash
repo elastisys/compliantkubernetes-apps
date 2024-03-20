@@ -124,6 +124,22 @@ generate_default_config() {
     cat "${new_config}" > "${default_config}"
 }
 
+# Usage: set_openstack_monitoring <config-file>
+set_openstack_monitoring() {
+    file="${1}"
+    if [[ ! -f "${file}" ]]; then
+        log_error "ERROR: invalid file - ${file}"
+        exit 1
+    fi
+    case ${CK8S_CLOUD_PROVIDER} in
+        safespring | citycloud | elastx)
+            yq4 -i '.openstackMonitoring.enabled = true' "${file}"
+            ;;
+        none)
+            return
+            ;;
+    esac
+}
 # Usage: set_storage_class <config-file>
 # baremetal support is experimental, keep as separate case until stable
 set_storage_class() {
@@ -652,6 +668,7 @@ CK8S_VERSION=$(version_get)
 export CK8S_VERSION
 
 generate_default_config "${config[default_common]}"
+set_openstack_monitoring "${config[default_common]}"
 set_storage_class       "${config[default_common]}"
 set_object_storage      "${config[default_common]}"
 set_nginx_config        "${config[default_common]}"

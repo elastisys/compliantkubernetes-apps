@@ -63,11 +63,14 @@ templates:
 
   openstack-monitoring:
     disableValidationOnInstall: true
-    condition: ck8sManagementCluster.enabled
     installed: {{ .Values | get "openstackMonitoring.enabled" false }}
     chart: charts/openstack-monitoring
     version: 0.1.0
+    {{- if .Values | get "clusterApi.enabled" false }}
+    namespace: openstack-system
+    {{- else }}
     namespace: kube-system
+    {{- end }}
     name: openstack-monitoring
     labels:
       app: openstack-monitoring
@@ -75,7 +78,6 @@ templates:
       - monitoring/kube-prometheus-stack # creates servicemonitors and prometheusrules
     values:
       - values/openstack-monitoring.yaml.gotmpl
-      - values/prometheus-alerts-sc.yaml.gotmpl
 
   trivy-operator:
     disableValidationOnInstall: true # creates own custom resources

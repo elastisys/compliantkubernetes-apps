@@ -11,5 +11,5 @@ spec:
     port: 10258
     protocol: TCP
   selector:
-    k8s-app: openstack-cloud-controller-manager
+    {{- toYaml .Values.serviceMonitor.labels | nindent 4 }}
 {{- end }}

@@ -35,6 +35,7 @@ defaultRules:
     networkpolicies: {{ .Values.networkPolicies.enableAlerting }}
     clusterApi: {{ .Values.clusterApi.enabled }}
     webhooks: {{ .Values.prometheus.webhookAlerts.enabled }}
+    openstack: {{ .Values | get "openstackMonitoring.enabled" false }}
 
   {{- if and .Values.thanos.enabled .Values.thanos.ruler.enabled }}
   thanos:

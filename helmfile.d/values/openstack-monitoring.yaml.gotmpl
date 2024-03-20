@@ -1,2 +1,9 @@
 openstackMonitoring:
     enabled: {{ .Values.openstackMonitoring.enabled }}
+serviceMonitor:
+  labels:
+  {{- if .Values | get "clusterApi.enabled" false }}
+    app: openstack-cloud-controller-manager
+  {{- else }}
+    k8s-app: openstack-cloud-controller-manager
+  {{- end }}
