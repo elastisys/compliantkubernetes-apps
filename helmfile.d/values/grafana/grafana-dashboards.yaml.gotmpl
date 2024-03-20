@@ -34,6 +34,9 @@ disabledDashboards:
   {{- if not .Values.opensearch.enabled }}
   - opensearch-dashboard
   {{- end }}
+  - k8s-resources-multicluster-dashboard
+  - controller-manager-dashboard
+  - scheduler-dashboard
 notDeveloperVisible:
   - hnc-dashboard
   - uptime-dashbord
