@@ -1,0 +1,37 @@
+{
+    "Name": "$role_name",
+    "IsCustom": true,
+    "Description": "$role_description",
+    "Actions": [
+                    "Microsoft.Compute/disks/read",
+                    "Microsoft.Compute/disks/write",
+                    "Microsoft.Compute/disks/delete",
+                    "Microsoft.Compute/snapshots/read",
+                    "Microsoft.Compute/snapshots/write",
+                    "Microsoft.Compute/snapshots/delete",
+                    "Microsoft.Compute/virtualMachines/write",
+                    "Microsoft.Compute/virtualMachines/read",
+                    "Microsoft.Compute/virtualMachineScaleSets/virtualMachines/write",
+                    "Microsoft.Compute/virtualMachineScaleSets/virtualMachines/read",
+                    "Microsoft.Compute/virtualMachineScaleSets/read",
+                    "Microsoft.Compute/locations/operations/read",
+                    "Microsoft.Compute/locations/DiskOperations/read",
+                    "Microsoft.Network/loadBalancers/delete",
+                    "Microsoft.Network/loadBalancers/read",
+                    "Microsoft.Network/loadBalancers/write",
+                    "Microsoft.Network/loadBalancers/backendAddressPools/read",
+                    "Microsoft.Network/loadBalancers/backendAddressPools/write",
+                    "Microsoft.Network/loadBalancers/backendAddressPools/delete",
+                    "Microsoft.Network/loadBalancers/backendAddressPools/join/action",
+                    "Microsoft.Network/publicIPAddresses/delete",
+                    "Microsoft.Network/publicIPAddresses/read",
+                    "Microsoft.Network/publicIPAddresses/write",
+                    "Microsoft.Network/publicIPAddresses/join/action",
+                    "Microsoft.Network/networkSecurityGroups/read",
+                    "Microsoft.Network/networkSecurityGroups/write"
+    ],
+    "NotActions": [],
+    "AssignableScopes": [
+        "/subscriptions/${SUBSCRIPTIONS_ID}"
+    ]
+}
