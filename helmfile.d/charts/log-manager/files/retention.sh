@@ -3,12 +3,12 @@
 set -euo pipefail
 
 if [ "$STORAGE_SERVICE" = "azure" ]; then
-# Azure Blob configuration
+  # Azure Blob configuration
   : "${AZURE_STORAGE_CONNECTION_STRING:?Missing AZURE_STORAGE_CONNECTION_STRING}"
   : "${AZURE_CONTAINER_NAME:?Missing AZURE_CONTAINER_NAME}"
   : "${AZURE_PREFIX:?Missing AZURE_PREFIX}"
 else
-# S3 configuration
+  # S3 configuration
   : "${S3_CONFIG:?Missing S3_CONFIG}"
   : "${S3_BUCKET:?Missing S3_BUCKET}"
   : "${S3_PREFIX:?Missing S3_PREFIX}"
