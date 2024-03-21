@@ -42,16 +42,15 @@ function check_wc_ingress_health() {
     has_proxy_protocol=$(kubectl get configmap -n ingress-nginx ingress-nginx-controller -oyaml | yq4 '.data.use-proxy-protocol')
 
     diff=$((desired_replicas - ready_replicas))
-    if [[ $desired_replicas -eq $ready_replicas ]]; then
+    if "${has_proxy_protocol}"; then
+        no_error=false
+        debug_msg+="[ERROR] unable to test ingress with proxy protocol\n"
+    elif [[ $desired_replicas -eq $ready_replicas ]]; then
         read -r -a pods <<<"$(kubectl get pods -n ingress-nginx -ojson | jq -r '.items[].metadata.name' | tr '\n' ' ')"
         for pod in "${pods[@]}"; do
             if [[ "$pod" =~ ingress-nginx-controller* ]]; then
-                extra_flags=""
-                if "${has_proxy_protocol}"; then
-                  extra_flags="--haproxy-protocol"
-                fi
                 # shellcheck disable=SC2086
-                res=$(kubectl -n ingress-nginx exec -it "$pod" -- curl --retry 3 ${extra_flags} -w "%{http_code}" -o /dev/null -sk https://localhost/healthz)
+                res=$(kubectl -n ingress-nginx exec -it "$pod" -- wget --spider -S --tries=4 --no-check-certificate https://localhost/healthz 2>&1 | grep "HTTP/" | awk '{print $2}')
                 if [[ "$res" != "200" ]]; then
                     no_error=false
                     debug_msg+="[ERROR] The following nginx pod $pod is not healthy\n"
