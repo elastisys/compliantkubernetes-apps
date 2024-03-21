@@ -420,10 +420,12 @@ prometheus:
     topologySpreadConstraints:
       - labelSelector:
           matchLabels:
-            app: alertmanager
+            app.kubernetes.io/name: alertmanager
+            app.kubernetes.io/instance: kube-prometheus-stack-alertmanager
         maxSkew: 1
         topologyKey: kubernetes.io/hostname
         whenUnsatisfiable: DoNotSchedule
+    affinity: {}
     #image:
     # registry: registry.example.com
     # repository: prometheus/alertmanager
@@ -486,10 +488,12 @@ thanos:
     - labelSelector:
         matchLabels:
           app.kubernetes.io/name: thanos
+          app.kubernetes.io/instance: thanos-query
           app.kubernetes.io/component: query
       maxSkew: 1
       topologyKey: kubernetes.io/hostname
       whenUnsatisfiable: DoNotSchedule
+    affinity: {}
 
     resources:
       requests:
@@ -533,10 +537,12 @@ thanos:
     - labelSelector:
         matchLabels:
           app.kubernetes.io/name: thanos
+          app.kubernetes.io/instance: thanos-receiver
           app.kubernetes.io/component: ruler
       maxSkew: 1
       topologyKey: kubernetes.io/hostname
       whenUnsatisfiable: DoNotSchedule
+    affinity: {}
 
     resources:
       requests:
@@ -582,10 +588,12 @@ thanos:
     - labelSelector:
         matchLabels:
           app.kubernetes.io/name: thanos
+          app.kubernetes.io/instance: thanos-receiver
           app.kubernetes.io/component: receive
       maxSkew: 1
       topologyKey: kubernetes.io/hostname
       whenUnsatisfiable: DoNotSchedule
+    affinity: {}
 
     resources:
       requests:

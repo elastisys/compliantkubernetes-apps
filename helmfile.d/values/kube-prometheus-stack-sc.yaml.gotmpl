@@ -161,7 +161,8 @@ alertmanager:
     retention: {{ .Values.prometheus.retention.alertmanager }}
     resources: {{- toYaml .Values.prometheus.alertmanagerSpec.resources | nindent 6 }}
     storage: {{- toYaml .Values.prometheus.alertmanagerSpec.storage | nindent 6 }}
-    topologySpreadConstraints: {{- toYaml .Values.prometheus.alertmanagerSpec.topologySpreadConstraints | nindent 4 }}
+    topologySpreadConstraints: {{- toYaml .Values.prometheus.alertmanagerSpec.topologySpreadConstraints | nindent 6 }}
+    affinity: {{- toYaml .Values.prometheus.alertmanagerSpec.affinity | nindent 6 }}
 {{- if .Values | get "prometheus.alertmanagerSpec.image" nil }}
     image: {{- toYaml .Values.prometheus.alertmanagerSpec.image | nindent 6 }}
 {{- end }}
