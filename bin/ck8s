@@ -37,6 +37,7 @@ usage() {
     echo "  flavors                                                                   lists supported configuration flavors" 1>&2
     echo "  update-ips <wc|sc|both> <apply|dry-run>                                   Automatically fetches and applies the IPs for network policies" 1>&2
     echo "  clean <wc|sc>                                                             Cleans the cluster of apps" 1>&2
+    echo "  diagnostics <wc|sc>                                                       Runs diagnostics of apps" 1>&2
     exit 1
 }
 
@@ -157,6 +158,11 @@ case "${1}" in
         ;;
     clean)
         "${here}/clean.bash" "${2}"
+        ;;
+    diagnostics)
+        [[ "${2}" =~ ^(wc|sc)$ ]] || usage
+        shift
+        "${here}/diagnostics.bash" "${@}"
         ;;
     *) usage ;;
 esac
