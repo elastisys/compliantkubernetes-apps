@@ -355,7 +355,7 @@ kubeStateMetrics:
     limits:
       cpu: 30m
       memory: 100Mi
-  # Configure this if DNS-01 challenges are enabled in cert-manager
+  # Enable this if your cluster is managed by Cluster API to get Cluster API metrics.
   clusterAPIMetrics:
     enabled: false
 
@@ -1032,7 +1032,7 @@ networkPolicies:
     letsencrypt:
       ips:
         - set-me
-    # Enable this if dns01 is used by certManager
+    # Configure this if DNS-01 challenges are enabled in cert-manager
     dns01:
       ips: []
 
