@@ -23,21 +23,21 @@ describe("grafana admin dashboards", function() {
   })
 
   it('open the Backup status dashboard', function () {
-    cy.testGrafanaDashboard(this.ingress, 'Backup status', false, 20)
+    cy.testGrafanaDashboard(this.ingress, 'Backup status', false, 18)
 
     cy.get('[data-testid="data-testid dashboard-row-title-Time since last successful backup"]')
       .should('exist')
   })
 
   it('open the Trivy Operator Dashboard', function () {
-    cy.testGrafanaDashboard(this.ingress, 'Trivy Operator Dashboard', false, 20)
+    cy.testGrafanaDashboard(this.ingress, 'Trivy Operator Dashboard', false, 18)
 
     cy.get('[data-testid="data-testid Panel menu Security Overview"]')
       .should('exist')
   })
 
   it('open the NetworkPolicy Dashboard', function () {
-    cy.testGrafanaDashboard(this.ingress, 'NetworkPolicy Dashboard', false, 17)
+    cy.testGrafanaDashboard(this.ingress, 'NetworkPolicy Dashboard', false, 15)
 
     cy.get('[data-testid="data-testid Panel menu Packets allowed by NetworkPolicy going from pod"]')
       .should('exist')
@@ -51,7 +51,7 @@ describe("grafana admin dashboards", function() {
   })
 
   it('open the Gatekeeper dashboard', function () {
-    cy.testGrafanaDashboard(this.ingress, 'Gatekeeper', false, 20)
+    cy.testGrafanaDashboard(this.ingress, 'Gatekeeper', false, 16)
 
     cy.get('[data-testid="data-testid Panel header Gatekeeper logs"]')
       .should('exist')
@@ -65,7 +65,7 @@ describe("grafana admin dashboards", function() {
   })
 
   it('open the Falco dashboard', function () {
-    cy.testGrafanaDashboard(this.ingress, 'Falco', 24)
+    cy.testGrafanaDashboard(this.ingress, 'Falco', 21)
 
     cy.get('[data-testid="data-testid Panel header Falco logs"]')
       .should('exist')
@@ -110,21 +110,21 @@ describe("grafana dev dashboards", function() {
   })
 
   it('open the NetworkPolicy Dashboard', function () {
-    cy.testGrafanaDashboard(this.ingress, 'NetworkPolicy Dashboard', false, 17)
+    cy.testGrafanaDashboard(this.ingress, 'NetworkPolicy Dashboard', false, 14)
 
     cy.get('[data-testid="data-testid Panel menu Packets allowed by NetworkPolicy going from pod"]')
       .should('exist')
   })
 
   it('open the Kubernetes cluster status dashboard', function () {
-    cy.testGrafanaDashboard(this.ingress, 'Kubernetes cluster status', false, 32)
+    cy.testGrafanaDashboard(this.ingress, 'Kubernetes cluster status', false, 30)
 
     cy.get('[data-testid="data-testid Panel menu Running pods not ready"]')
       .should('exist')
   })
 
   it('open the Gatekeeper dashboard', function () {
-    cy.testGrafanaDashboard(this.ingress, 'Gatekeeper', 20)
+    cy.testGrafanaDashboard(this.ingress, 'Gatekeeper', 18)
 
     cy.get('[data-testid="data-testid Panel header Gatekeeper logs"]')
       .should('exist')
@@ -138,7 +138,7 @@ describe("grafana dev dashboards", function() {
   })
 
   it('open the Falco dashboard', function () {
-    cy.testGrafanaDashboard(this.ingress, 'Falco', false, 24)
+    cy.testGrafanaDashboard(this.ingress, 'Falco', false, 21)
 
     cy.get('[data-testid="data-testid Panel header Falco logs"]')
       .should('exist')

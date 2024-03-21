@@ -1,5 +1,4 @@
 # admin username is "admin"
-adminPassword: {{ .Values.grafana.password }}
 serviceMonitor:
   enabled: true
 ingress:
@@ -20,9 +19,19 @@ sidecar:
     labelValue: "" # should be set to "" to load all dashboards, regardless of the label value
   resources: {{- toYaml .Values.grafana.ops.sidecar.resources | nindent 6 }}
 
-{{- if .Values.grafana.ops.envRenderSecret }}
-envRenderSecret: {{- toYaml .Values.grafana.ops.envRenderSecret | nindent 2 }}
-{{- end }}
+admin:
+  existingSecret: {{ .Release.Name }}-env ## Should match the secret name for envRenderSecret
+
+envRenderSecret:
+  admin-user: admin
+  admin-password: {{ .Values.grafana.password }}
+  {{- if .Values.grafana.ops.oidc.enabled }}
+  opsClientSecret: {{ .Values.grafana.opsClientSecret }}
+  {{- end }}
+  {{- if .Values.grafana.ops.envRenderSecret }}
+  {{- toYaml .Values.grafana.ops.envRenderSecret | nindent 2 }}
+  {{- end }}
+
 
 {{- if .Values.grafana.ops.plugins }}
 plugins: {{- toYaml .Values.grafana.ops.plugins | nindent 2 }}
@@ -104,7 +113,7 @@ grafana.ini:
     name: dex
     enabled: {{ .Values.grafana.ops.oidc.enabled }}
     client_id: grafana-ops
-    client_secret: {{ .Values.grafana.opsClientSecret }}
+    client_secret: $__env{opsClientSecret}
     scopes: {{ .Values.grafana.ops.oidc.scopes }}
     auth_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}{{ $trailingDot }}/auth
     token_url: http://dex.dex.svc.cluster.local{{ $trailingDot }}:5556/token
