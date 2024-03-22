@@ -20,6 +20,9 @@ if [[ "${2}" == "apply" ]]; then
 fi
 has_diff=0
 
+#TODO: To be changed when decision made on networkpolicies for azure storage
+STORAGE_SERVICE=$(yq4 '.objectStorage.type' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
+
 # Get the value of the config option or the provided default value if the
 # config option is unset.
 #
@@ -405,16 +408,10 @@ allow_object_storage() {
   local url
   local host
   local port
-  STORAGE_SERVICE=$(yq4 '.objectStorage.type' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
 
-  if [ "$STORAGE_SERVICE" == "azure" ]; then
-    host="0.0.0.0/0"
-    port="443"
-  else
-    url=$(yq_read "${cluster}" '.objectStorage.s3.regionEndpoint' "")
-    host=$(parse_url_host "${url}")
-    port=$(parse_url_port "${url}" '.objectStorage.s3.regionEndpoint')
-  fi
+  url=$(yq_read "${cluster}" '.objectStorage.s3.regionEndpoint' "")
+  host=$(parse_url_host "${url}")
+  port=$(parse_url_port "${url}" '.objectStorage.s3.regionEndpoint')
 
   allow_host "${config["override_common"]}" '.networkPolicies.global.objectStorage.ips' "${host}"
   allow_ports "${config["override_common"]}" '.networkPolicies.global.objectStorage.ports' "${port}"
@@ -530,7 +527,12 @@ validate_config() {
     cluster="sc"
   fi
 
-  yq_read_required "${cluster}" '.objectStorage.s3.regionEndpoint'
+  #TODO: To be changed when decision made on networkpolicies for azure storage
+  if [ "$STORAGE_SERVICE" == "azure" ]; then
+    :
+  else
+    yq_read_required "${cluster}" '.objectStorage.s3.regionEndpoint'
+  fi
   yq_read_required "${cluster}" '.global.opsDomain'
   yq_read_required "${cluster}" '.global.baseDomain'
 
@@ -587,9 +589,12 @@ validate_config() {
 }
 
 validate_config
-
-allow_object_storage
-
+#TODO: To be changed when decision made on networkpolicies for azure storage
+if [ "$STORAGE_SERVICE" == "azure" ]; then
+  :
+else
+  allow_object_storage
+fi
 allow_ingress
 
 if [[ "${check_cluster}" =~ ^(sc|both)$ ]]; then
