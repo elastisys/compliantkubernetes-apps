@@ -41,7 +41,7 @@ spec:
                 - name: AZURE_STORAGE_CONNECTION_STRING
                   valueFrom:
                     secretKeyRef:
-                      name: {{ include "log-manager.fullname" . }}-storage-credentials
+                      name: {{ include "log-manager.fullname" $ }}-storage-credentials
                       key: azure-storage-connection-string
                 - name: AZURE_CONTAINER_NAME
                   value: {{ $.Values.azure.containerName }}
