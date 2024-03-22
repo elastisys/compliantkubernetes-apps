@@ -405,9 +405,16 @@ allow_object_storage() {
   local url
   local host
   local port
-  url=$(yq_read "${cluster}" '.objectStorage.s3.regionEndpoint' "")
-  host=$(parse_url_host "${url}")
-  port=$(parse_url_port "${url}" '.objectStorage.s3.regionEndpoint')
+  STORAGE_SERVICE=$(yq4 '.objectStorage.type' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
+
+  if [ "$STORAGE_SERVICE" == "azure" ]; then
+    host="0.0.0.0/0"
+    port="443"
+  else
+    url=$(yq_read "${cluster}" '.objectStorage.s3.regionEndpoint' "")
+    host=$(parse_url_host "${url}")
+    port=$(parse_url_port "${url}" '.objectStorage.s3.regionEndpoint')
+  fi
 
   allow_host "${config["override_common"]}" '.networkPolicies.global.objectStorage.ips' "${host}"
   allow_ports "${config["override_common"]}" '.networkPolicies.global.objectStorage.ports' "${port}"
