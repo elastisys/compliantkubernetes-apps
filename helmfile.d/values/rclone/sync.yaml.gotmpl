@@ -1,0 +1,74 @@
+{{- $main := .Values.objectStorage -}}
+
+{{- $sync := $main.sync -}}
+
+{{- $destinations := list -}}
+{{- $sources := list -}}
+
+defaultSchedule: {{ $sync.defaultSchedule }}
+defaultSuspend: false
+
+dryrun: {{ $sync.dryrun }}
+
+{{ $crypt := $sync.encrypt -}}
+crypt: {{- include "crypt-provider" $crypt | nindent 2 }}
+
+targets:
+  {{- if $sync.syncDefaultBuckets }}
+  {{- range $key, $value := $main.buckets }}
+  - destinationName: {{ $value }}
+    destinationCrypt: {{ $crypt | get "enabled" false }}
+    {{- $destinationType := $sync.type }}
+    {{- $sourceType := $main.type }}
+
+    {{- if eq $key "harbor" }}
+    {{- $destinationType = $.Values.harbor.persistence.type | replace "objectStorage" "" | default $destinationType }}
+    {{- $sourceType = $.Values.harbor.persistence.type | replace "objectStorage" "" | default $sourceType }}
+    {{- else if eq $key "thanos" }}
+    {{- $destinationType = $.Values.thanos.objectStorage.type | default $destinationType }}
+    {{- $sourceType = $.Values.thanos.objectStorage.type | default $sourceType }}
+    {{- end }}
+
+    {{- $destinations = append $destinations $destinationType }}
+    destinationType: {{ $destinationType }}
+    sourceName: {{ $value }}
+    {{- $sources = append $sources $sourceType }}
+    sourceType: {{ $sourceType }}
+  {{- end }}
+  {{- end }}
+
+  {{- range $sync.buckets }}
+  - destinationName: {{ get "destination" .source . }}
+    destinationCrypt: {{ $crypt | get "enabled" false }}
+    {{- $destinations = get "destinationType" $sync.type . | append $destinations }}
+    destinationType: {{ get "destinationType" $sync.type . }}
+    sourceName: {{ .source }}
+    {{- $sources = get "sourceType" $main.type . | append $sources }}
+    sourceType: {{ get "sourceType" $main.type . }}
+    {{- with get "schedule" "" . }}
+    schedule: {{ . }}
+    {{- end }}
+  {{- end }}
+
+providers:
+  {{- if not $destinations }}
+  {{ fail "rclone-restore configured without destinations" }}
+  {{- end }}
+
+  {{- $providers := merge dict $sync }}
+
+  {{- range $destinations | uniq | sortAlpha }}
+  {{ printf "destination-%s" . }}: {{- set $providers "type" . | include "provider" | nindent 4 }}
+  {{- end }}
+
+  {{- if not $sources }}
+  {{ fail "rclone-restore configured without sources" }}
+  {{- end }}
+
+  {{- $providers := merge dict $main }}
+
+  {{- range $sources | uniq | sortAlpha }}
+  {{ printf "source-%s" . }}: {{- set $providers "type" . | include "provider" | nindent 4 }}
+  {{- end }}
+
+resources: {{- toYaml $sync.resources | nindent 2 }}
