@@ -44,7 +44,7 @@ fi
 [ "$objectstorage_type_sc" = "azure" ] && buckets_sc=$(echo "${sc_config}" | yq4 '.objectStorage.buckets.*' -)
 [ "$objectstorage_type_wc" = "azure" ] && buckets_wc=$(echo "${wc_config}" | yq4 '.objectStorage.buckets.*' -)
 
-RESOURCE_GROUP=$(echo "${common_config}" | yq4 '.azure.resourceGroup')
+RESOURCE_GROUP=$(echo "${common_config}" | yq4 '.objectStorage.azure.resourceGroup')
 CONTAINERS=$( { echo "$buckets_sc"; echo "$buckets_wc"; } | sort | uniq | tr '\n' ' ' | sed s'/.$//')
 
 log_info "Operating on containers: ${CONTAINERS// /', '}"
