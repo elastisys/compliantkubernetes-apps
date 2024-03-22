@@ -70,6 +70,13 @@ namespaces:
       pod-security.kubernetes.io/enforce: restricted
       pod-security.kubernetes.io/warn: restricted
   {{ end }}
+  {{ if .Values.tektonPipelines.enabled }}
+  - name: tekton-pipelines
+    labels:
+      pod-security.kubernetes.io/audit: restricted
+      pod-security.kubernetes.io/enforce: restricted
+      pod-security.kubernetes.io/warn: restricted
+  {{ end }}
   {{ if .Values.thanos.enabled }}
   - name: thanos
     labels:

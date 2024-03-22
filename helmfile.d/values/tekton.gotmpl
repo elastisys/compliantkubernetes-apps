@@ -1,0 +1,16 @@
+controller:
+  replicas: {{ .Values.tektonPipelines.controller.replicas }}
+  resources: {{- toYaml .Values.tektonPipelines.controller.resources | nindent 4 }}
+
+webhook:
+  replicas: {{ .Values.tektonPipelines.webhook.replicas }}
+  resources: {{- toYaml .Values.tektonPipelines.webhook.resources | nindent 4 }}
+
+remoteResolvers:
+  replicas: {{ .Values.tektonPipelines.remoteResolvers.replicas }}
+  resources: {{- toYaml .Values.tektonPipelines.remoteResolvers.resources | nindent 4 }}
+
+alerts:
+  evaluateThanos: {{ .Values.thanos.enabled }}
+
+customConfigDefaults: {{- toYaml .Values.tektonPipelines.customConfigDefaults | nindent 2 }}
