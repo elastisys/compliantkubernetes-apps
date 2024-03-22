@@ -91,7 +91,7 @@ update_ips.mock_maximal() {
 update_ips.mock_rclone_s3() {
   update_ips.mock_minimal
 
-  mock_set_output "${mock_dig}" "127.0.0.4" 4 # .networkPolicies.rcloneSync.destinationObjectStorageS3.ips
+  mock_set_output "${mock_dig}" "127.0.0.4" 4 # .networkPolicies.rclone.sync.objectStorage.ips
 }
 
 update_ips.mock_rclone_s3_and_swift() {
@@ -101,8 +101,8 @@ update_ips.mock_rclone_s3_and_swift() {
   mock_set_output "${mock_curl}" '\n\n\n\n\n\n\n\n\n\n\n\n\n\n[{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com"}]}]}]' 1
   mock_set_output "${mock_curl}" "" 2 # DELETE /auth/tokens
 
-  mock_set_output "${mock_dig}" "127.0.0.5" 5 # networkPolicies.rcloneSync.destinationObjectStorageSwift.ips keystone endpoint
-  mock_set_output "${mock_dig}" "127.0.0.6" 6 # networkPolicies.rcloneSync.destinationObjectStorageSwift.ips swift endpoint
+  mock_set_output "${mock_dig}" "127.0.0.5" 5 # networkPolicies.rclone.sync.objectStorageSwift.ips keystone endpoint
+  mock_set_output "${mock_dig}" "127.0.0.6" 6 # networkPolicies.rclone.sync.objectStorageSwift.ips swift endpoint
 }
 
 update_ips.mock_rclone_swift() {
@@ -112,8 +112,8 @@ update_ips.mock_rclone_swift() {
   mock_set_output "${mock_curl}" '\n\n\n\n\n\n\n\n\n\n\n\n\n\n[{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com"}]}]}]' 1
   mock_set_output "${mock_curl}" "" 2 # DELETE /auth/tokens
 
-  mock_set_output "${mock_dig}" "127.0.0.5" 4 # networkPolicies.rcloneSync.destinationObjectStorageSwift.ips keystone endpoint
-  mock_set_output "${mock_dig}" "127.0.0.6" 5 # networkPolicies.rcloneSync.destinationObjectStorageSwift.ips swift endpoint
+  mock_set_output "${mock_dig}" "127.0.0.5" 4 # networkPolicies.rclone.sync.objectStorageSwift.ips keystone endpoint
+  mock_set_output "${mock_dig}" "127.0.0.6" 5 # networkPolicies.rclone.sync.objectStorageSwift.ips swift endpoint
 }
 
 update_ips.mock_swift() {
@@ -149,14 +149,14 @@ update_ips.populate_maximal() {
   yq_set sc .networkPolicies.global.objectStorageSwift.ips '["127.1.0.4/32", "127.1.0.5/32"]'
   yq_set sc .networkPolicies.global.objectStorageSwift.ports '[5678, 91011]'
 
-  yq_set sc .networkPolicies.rcloneSync.destinationObjectStorageS3.ips '["127.1.0.6/32"]'
-  yq_set sc .networkPolicies.rcloneSync.destinationObjectStorageS3.ports '[1234]'
+  yq_set sc .networkPolicies.rclone.sync.objectStorage.ips '["127.1.0.6/32"]'
+  yq_set sc .networkPolicies.rclone.sync.objectStorage.ports '[1234]'
 
-  yq_set sc .networkPolicies.rcloneSync.destinationObjectStorageSwift.ips '["127.1.0.7/32", "127.1.0.8/32"]'
-  yq_set sc .networkPolicies.rcloneSync.destinationObjectStorageSwift.ports '[443, 5678]'
+  yq_set sc .networkPolicies.rclone.sync.objectStorageSwift.ips '["127.1.0.7/32", "127.1.0.8/32"]'
+  yq_set sc .networkPolicies.rclone.sync.objectStorageSwift.ports '[443, 5678]'
 
-  yq_set sc .networkPolicies.rcloneSync.secondaryUrl.ips '["127.1.0.9/32"]'
-  yq_set sc .networkPolicies.rcloneSync.secondaryUrl.ports '[1234]'
+  yq_set sc .networkPolicies.rclone.sync.secondaryUrl.ips '["127.1.0.9/32"]'
+  yq_set sc .networkPolicies.rclone.sync.secondaryUrl.ports '[1234]'
 }
 
 # --- asserts ----------------------------------------------------------------------------------------------------------
@@ -195,10 +195,10 @@ update_ips.assert_swift() {
 }
 
 update_ips.assert_rclone_s3() {
-  assert_equal "$(yq_dig sc '.networkPolicies.rcloneSync.destinationObjectStorageS3.ips | . style="flow"')" "[127.0.0.4/32]"
-  assert_equal "$(yq_dig sc '.networkPolicies.rcloneSync.destinationObjectStorageS3.ports | . style="flow"')" "[1234]"
+  assert_equal "$(yq_dig sc '.networkPolicies.rclone.sync.objectStorage.ips | . style="flow"')" "[127.0.0.4/32]"
+  assert_equal "$(yq_dig sc '.networkPolicies.rclone.sync.objectStorage.ports | . style="flow"')" "[1234]"
 
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
+  assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorageSwift' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 4
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16
@@ -206,11 +206,11 @@ update_ips.assert_rclone_s3() {
 }
 
 update_ips.assert_rclone_s3_and_swift() {
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageS3 | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.4/32]"
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageS3 | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[1234]"
+  assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorage | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.4/32]"
+  assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorage | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[1234]"
 
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.5/32, 127.0.0.6/32]"
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[443, 5678]"
+  assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorageSwift | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.5/32, 127.0.0.6/32]"
+  assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorageSwift | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[443, 5678]"
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 6
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16
@@ -218,10 +218,10 @@ update_ips.assert_rclone_s3_and_swift() {
 }
 
 update_ips.assert_rclone_swift() {
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.5/32, 127.0.0.6/32]"
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[443, 5678]"
+  assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorageSwift | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.5/32, 127.0.0.6/32]"
+  assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorageSwift | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[443, 5678]"
 
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageS3' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
+  assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorage' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
 
   # GET /auth/tokens
   mock_set_output "${mock_curl}" '\n\n\n\n\n\n\n\n\n\n\n\n\n\n[{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com"}]}]}]' 1

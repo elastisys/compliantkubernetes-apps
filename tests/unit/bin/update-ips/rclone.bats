@@ -27,7 +27,7 @@ setup_file() {
   yq_set sc .objectStorage.sync.destinationType '"none"'
   yq_set sc .objectStorage.sync.syncDefaultBuckets 'false'
 
-  yq_set sc .networkPolicies.rcloneSync.enabled 'true'
+  yq_set sc .networkPolicies.rclone.enabled 'true'
 
   env.cache_create
 }
@@ -150,12 +150,12 @@ _test_apply_rclone_sync_s3() {
 _test_apply_rclone_sync_s3_remove_swift() {
   _setup_s3 "${1}"
 
-  yq_set sc .networkPolicies.rcloneSync.destinationObjectStorageSwift.ips '["127.0.0.5/32"]'
-  yq_set sc .networkPolicies.rcloneSync.destinationObjectStorageSwift.ports '[5678]'
+  yq_set sc .networkPolicies.rclone.sync.objectStorageSwift.ips '["127.0.0.5/32"]'
+  yq_set sc .networkPolicies.rclone.sync.objectStorageSwift.ports '[5678]'
 
   run ck8s update-ips both apply
 
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
+  assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorageSwift' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
 
   update_ips.assert_rclone_s3
 }
@@ -241,12 +241,12 @@ _test_apply_rclone_sync_swift() {
 _test_apply_rclone_sync_swift_remove_s3() {
   _setup_swift "${1}"
 
-  yq_set sc .networkPolicies.rcloneSync.destinationObjectStorageS3.ips '["127.0.0.5/32"]'
-  yq_set sc .networkPolicies.rcloneSync.destinationObjectStorageS3.ports '[5678]'
+  yq_set sc .networkPolicies.rclone.sync.objectStorage.ips '["127.0.0.5/32"]'
+  yq_set sc .networkPolicies.rclone.sync.objectStorage.ports '[5678]'
 
   run ck8s update-ips both apply
 
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageS3' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
+  assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorage' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
 
   update_ips.assert_rclone_swift
 }
@@ -364,8 +364,8 @@ _test_apply_rclone_sync_s3_and_swift() {
 
   run ck8s update-ips both apply
 
-  assert_equal "$(yq_dig sc '.networkPolicies.rcloneSync.secondaryUrl.ips | . style="flow"')" "[127.0.0.4/32]"
-  assert_equal "$(yq_dig sc '.networkPolicies.rcloneSync.secondaryUrl.ports | . style="flow"')" "[1234]"
+  assert_equal "$(yq_dig sc '.networkPolicies.rclone.sync.secondaryUrl.ips | . style="flow"')" "[127.0.0.4/32]"
+  assert_equal "$(yq_dig sc '.networkPolicies.rclone.sync.secondaryUrl.ports | . style="flow"')" "[1234]"
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 4
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16
@@ -373,13 +373,13 @@ _test_apply_rclone_sync_s3_and_swift() {
 }
 
 @test "rclone sync - secondary remove" {
-  yq_set sc .networkPolicies.rcloneSync.secondaryUrl.ips '["127.0.0.4"]'
-  yq_set sc .networkPolicies.rcloneSync.secondaryUrl.ports '[1234]'
+  yq_set sc .networkPolicies.rclone.sync.secondaryUrl.ips '["127.0.0.4"]'
+  yq_set sc .networkPolicies.rclone.sync.secondaryUrl.ports '[1234]'
 
   update_ips.mock_minimal
   run ck8s update-ips both apply
 
-  assert_equal "$(yq4 '.networkPolicies.rcloneSync.secondaryUrl' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
+  assert_equal "$(yq4 '.networkPolicies.rclone.sync.secondaryUrl' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 3
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16

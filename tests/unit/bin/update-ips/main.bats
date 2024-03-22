@@ -186,7 +186,7 @@ _configure_maximal() {
   sops --set '["objectStorage"]["swift"]["username"] "swift-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
 
   yq_set sc .objectStorage.sync.enabled 'true'
-  yq_set sc .networkPolicies.rcloneSync.enabled 'true'
+  yq_set sc .networkPolicies.rclone.enabled 'true'
   yq_set sc .objectStorage.sync.s3.regionEndpoint '"https://s3.foo.dev-ck8s.com:1234"'
   yq_set sc .objectStorage.sync.swift.authUrl '"https://keystone.foo.dev-ck8s.com:5678"'
   yq_set sc .objectStorage.sync.swift.region '"swift-region"'

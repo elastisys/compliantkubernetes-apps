@@ -1,0 +1,125 @@
+{{- define "old-style.rule.gen" -}}{{- if and .ips .ports -}}
+{{- $peers := list }}{{ range .ips }}{{ $peers = dict "cidr" . | append $peers }}{{ end -}}
+{{- $ports := list }}{{ range .ports }}{{ $ports = dict "tcp" . | append $ports }}{{ end -}}
+{{- dict "peers" $peers "ports" $ports | toYaml | trim -}}
+{{- end -}}{{- end -}}
+
+{{- $netpol := .Values.networkPolicies -}}
+
+rules:
+  egress-rule-object-storage-main-swift:
+    {{- include "old-style.rule.gen" $netpol.global.objectStorageSwift | nindent 4 }}
+  egress-rule-object-storage-sync:
+    {{- include "old-style.rule.gen" $netpol.rclone.sync.objectStorage | nindent 4 }}
+  egress-rule-object-storage-sync-swift:
+    {{- include "old-style.rule.gen" $netpol.rclone.sync.objectStorageSwift | nindent 4 }}
+  egress-rule-object-storage-sync-secondary:
+    {{- include "old-style.rule.gen" $netpol.rclone.sync.secondaryUrl | nindent 4 }}
+
+{{- $main := .Values.objectStorage }}
+
+{{- $restore := $main.restore }}
+{{- $sync := $main.sync }}
+
+policies:
+  rclone:
+    all-deny:
+      podSelectorLabels: {}
+      ingress: {}
+      egress: {}
+
+    {{- $destinations := list }}
+    {{- $sources := list }}
+
+    {{- if $sync.syncDefaultBuckets }}
+    {{- range $key, $value := $main.buckets }}
+
+    {{- $destinationType := $main.type }}
+    {{- $sourceType := $sync.destinationType }}
+
+    {{- if eq $key "harbor" }}
+    {{- $destinationType = $.Values.harbor.persistence.type | replace "objectStorage" "" | default $destinationType }}
+    {{- $sourceType = $.Values.harbor.persistence.type | replace "objectStorage" "" | default $sourceType }}
+    {{- else if eq $key "thanos" }}
+    {{- $destinationType = $.Values.thanos.objectStorage.type | default $destinationType }}
+    {{- $sourceType = $.Values.thanos.objectStorage.type | default $sourceType }}
+    {{- end }}
+
+    {{- $destinations = append $destinations $destinationType }}
+    {{- $sources = append $sources $sourceType }}
+
+    {{- end }}
+    {{- end }}
+
+    {{- range $sync.buckets }}
+    {{- $destinations = get "sourceType" $main.type . | append $destinations }}
+    {{- $sources = get "destinationType" $sync.destinationType . | append $sources }}
+    {{- end }}
+
+    {{- if .Values | get "objectStorage.sync.enabled" false }}
+    sync:
+      podSelectorLabels:
+        app.kubernetes.io/name: rclone
+        app.kubernetes.io/instance: rclone-sync
+      egress:
+        - rule: egress-rule-dns
+
+        {{- if has $main.type $sources }}
+        - rule: egress-rule-object-storage
+        {{- end }}
+        {{- if has "swift" $sources }}
+        - rule: egress-rule-object-storage-main-swift
+        {{- end }}
+
+        {{- if has $sync.type $destinations }}
+        - rule: egress-rule-object-storage-sync
+        {{- end }}
+        {{- if has "swift" $destinations }}
+        - rule: egress-rule-object-storage-sync-swift
+        {{- end }}
+
+        {{- if hasKey .Values.objectStorage.sync "secondaryUrl" }}
+        - rule: egress-rule-object-storage-sync-secondary
+        {{- end }}
+    {{- end }}
+
+    {{- /* reuse variables from sync */ -}}
+    {{- if $restore.addTargetsFromSync | not }}
+    {{- $destinations = list }}
+    {{- $sources = list }}
+    {{- end }}
+
+    {{- range $restore.targets }}
+    {{- /* reuse variables from sync requires reverse order */ -}}
+    {{- $destinations = get "sourceType" $sync.destinationType . | append $destinations }}
+    {{- $sources = get "destinationType" $main.type . | append $sources }}
+    {{- end }}
+
+    {{- if .Values | get "objectStorage.restore.enabled" false }}
+    restore:
+      podSelectorLabels:
+        app.kubernetes.io/name: rclone
+        app.kubernetes.io/instance: rclone-restore
+      egress:
+        - rule: egress-rule-dns
+
+        {{- /* reuse variables from sync requires reverse order */ -}}
+
+        {{- if has $main.type $sources }}
+        - rule: egress-rule-object-storage
+        {{- end }}
+        {{- if has "swift" $sources }}
+        - rule: egress-rule-object-storage-main-swift
+        {{- end }}
+
+        {{- if has $sync.type $destinations }}
+        - rule: egress-rule-object-storage-sync
+        {{- end }}
+        {{- if has "swift" $destinations }}
+        - rule: egress-rule-object-storage-sync-swift
+        {{- end }}
+
+        {{- if hasKey .Values.objectStorage.sync "secondaryUrl" }}
+        - rule: egress-rule-object-storage-sync-secondary
+        {{- end }}
+    {{- end }}

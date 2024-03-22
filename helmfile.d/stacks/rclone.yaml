@@ -7,13 +7,26 @@ templates:
     namespace: rclone
     labels:
       app: rclone
+
+  rclone-networkpolicy:
+    inherit:
+      - template: rclone
+      - template: networkpolicies
+    installed: {{ and (.Values | get "networkPolicies.rclone.enabled" false) (or (.Values | get "objectStorage.restore.enabled" false) (.Values | get "objectStorage.sync.enabled" false)) }}
+    labels:
+      netpol: rclone
     needs:
       - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/service/rclone.yaml.gotmpl
 
   rclone-restore:
     inherit: [ template: rclone ]
     installed: {{ .Values | get "objectStorage.restore.enabled" false }}
     name: rclone-restore
+    needs:
+      - rclone/networkpolicy
     values:
       - values/rclone/restore.yaml.gotmpl
 
@@ -21,5 +34,7 @@ templates:
     inherit: [ template: rclone ]
     installed: {{ and (.Values | get "objectStorage.restore.enabled" false | not) (.Values | get "objectStorage.sync.enabled" false) }}
     name: rclone-sync
+    needs:
+      - rclone/networkpolicy
     values:
       - values/rclone/sync.yaml.gotmpl

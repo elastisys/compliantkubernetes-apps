@@ -109,10 +109,12 @@ swift_enabled() {
   return 1
 }
 
-# Determine if Rsync is enabled in the configuration.
-rsync_enabled() {
-  [ "$(yq_read "sc" '.objectStorage.sync.enabled' "false")" = "true" ] && \
-    [ "$(yq_read "sc" '.networkPolicies.rcloneSync.enabled' "false")" = "true" ]
+# Determine if rclone is enabled in the configuration.
+rclone_enabled() {
+  [ "$(yq_read "sc" '.networkPolicies.rclone.enabled' "false")" = "true" ] || return 1
+  [ "$(yq_read "sc" '.objectStorage.restore.enabled' "false")" = "true" ] && return 0
+  [ "$(yq_read "sc" '.objectStorage.sync.enabled' "false")" = "true" ] && return 0
+  return 1
 }
 
 # Fetch the InternalIP, Calico tunnel IP and Wireguard IP of Kubernetes
@@ -215,6 +217,9 @@ get_swift_url() {
             }
           }
         }' "${auth_url}/auth/tokens")
+  else
+    log_error "Could not find Swift credentials in ${swift_config_option}"
+    exit 1
   fi
 
   os_token=$(echo "${response}" | grep -oP "x-subject-token:\s+\K\S+")
@@ -545,7 +550,7 @@ validate_config() {
     fi
   fi
 
-  rsync_enabled || return 0
+  rclone_enabled || return 0
 
   local destination_s3=false
   local destination_swift=false
@@ -611,10 +616,10 @@ if [[ "${check_cluster}" =~ ^(wc|both)$ ]]; then
   allow_nodes "wc" '.networkPolicies.global.wcNodes.ips' ""
 fi
 
-if rsync_enabled; then
-  sync_rclone '.objectStorage.sync.s3.regionEndpoint' '.networkPolicies.rcloneSync.destinationObjectStorageS3'
-  sync_swift '.objectStorage.sync.swift' '.networkPolicies.rcloneSync.destinationObjectStorageSwift'
-  sync_rclone '.objectStorage.sync.secondaryUrl' '.networkPolicies.rcloneSync.secondaryUrl'
+if rclone_enabled; then
+  sync_rclone '.objectStorage.sync.s3.regionEndpoint' '.networkPolicies.rclone.sync.objectStorage'
+  sync_swift '.objectStorage.sync.swift' '.networkPolicies.rclone.sync.objectStorageSwift'
+  sync_rclone '.objectStorage.sync.secondaryUrl' '.networkPolicies.rclone.sync.secondaryUrl'
 fi
 
 exit ${has_diff}
