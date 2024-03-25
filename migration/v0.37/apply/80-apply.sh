@@ -12,6 +12,8 @@ skipped=(
 )
 declare -a skipped_sc
 skipped_sc=(
+  "netpol!=service"
+  "netpol!=rclone"
 )
 declare -a skipped_wc
 skipped_wc=(
