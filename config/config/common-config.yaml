@@ -159,7 +159,7 @@ falco:
   resources:
     limits:
       cpu: 200m
-      memory: 250Mi
+      memory: 500Mi
     requests:
       cpu: 100m
       memory: 150Mi
@@ -179,7 +179,7 @@ falco:
     resources:
       limits:
         cpu: 20m
-        memory: 50Mi
+        memory: 250Mi
       requests:
         cpu: 10m
         memory: 25Mi
@@ -194,7 +194,7 @@ falco:
         memory: 20Mi
       limits:
         cpu: 30m
-        memory: 20Mi
+        memory: 50Mi
     tolerations:
       - key: node-role.kubernetes.io/master
         operator: Exists
@@ -354,7 +354,7 @@ kubeStateMetrics:
       memory: 50Mi
     limits:
       cpu: 30m
-      memory: 100Mi
+      memory: 300Mi
   # Enable this if your cluster is managed by Cluster API to get Cluster API metrics.
   clusterAPIMetrics:
     enabled: false
@@ -817,8 +817,8 @@ opa:
         cpu: 200m
         memory: 150Mi
       limits:
-        cpu: 500m
-        memory: 300Mi
+        cpu: 750m
+        memory: 500Mi
     affinity: {}
     tolerations: []
     nodeSelector: {kubernetes.io/os: linux}
