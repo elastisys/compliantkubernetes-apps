@@ -128,14 +128,16 @@ get_kubectl_ips() {
   fi
 
   local -a ips_internal
-  local -a ips_calico
+  local -a ips_calico_ipip
+  local -a ips_calico_vxlan
   local -a ips_wireguard
   mapfile -t ips_internal < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')
-  mapfile -t ips_calico < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4IPIPTunnelAddr}')
+  mapfile -t ips_calico_vxlan < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4VXLANTunnelAddr}')
+  mapfile -t ips_calico_ipip < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4IPIPTunnelAddr}')
   mapfile -t ips_wireguard < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4WireguardInterfaceAddr}')
 
   local -a ips
-  read -r -a ips <<< "${ips_internal[*]} ${ips_calico[*]} ${ips_wireguard[*]}"
+  read -r -a ips <<< "${ips_internal[*]} ${ips_calico_vxlan[*]} ${ips_calico_ipip[*]} ${ips_wireguard[*]}"
 
   if [ ${#ips[@]} -eq 0 ]; then
     log_error "No IPs for ${cluster} nodes with label ${label} was found"
