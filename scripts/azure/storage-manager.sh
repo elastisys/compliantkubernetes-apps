@@ -3,8 +3,9 @@
 set -euo pipefail
 
 : "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
-: "${CK8S_ENVIRONMENT_NAME:?Missing CK8S_ENVIRONMENT_NAME}"
 : "${AZURE_LOCATION:?Missing AZURE_LOCATION}"
+
+CK8S_ENVIRONMENT_NAME="$(yq4 .global.ck8sEnvironmentName <<< "${common_config}")"
 
 readonly CREATE_ACTION="create"
 readonly DELETE_ACTION="delete"
