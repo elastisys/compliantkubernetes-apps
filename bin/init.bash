@@ -6,6 +6,7 @@
 # It's not to be executed on its own but rather via `ck8s init`.
 
 : "${CK8S_CLUSTER:?Missing CK8S_CLUSTER}"
+: "${CLUSTER_PROVISIONER:?Missing CLUSTER_PROVISIONER}"
 
 set -eu -o pipefail
 
@@ -212,6 +213,11 @@ set_object_storage() {
         baremetal)
             object_storage_type="none"
             ;;
+
+        azure)
+            object_storage_type="azure"
+            ;;
+
         none)
             return
             ;;
@@ -404,6 +410,33 @@ set_harbor_config() {
 
     replace_set_me "${file}" ".harbor.persistence.type" "\"${persistence_type}\""
     replace_set_me "${file}" ".harbor.persistence.disableRedirect" "${disable_redirect}"
+}
+
+# Usage: set_cluster_dns <config-file>
+set_cluster_dns() {
+    file="${1}"
+    if [[ ! -f "${file}" ]]; then
+        log_error "ERROR: invalid file - ${file}"
+        exit 1
+    fi
+    case ${CLUSTER_PROVISIONER} in
+        CAPI)
+            clusterapi=true
+            clusterdns="10.233.0.10"
+            clusterdnscidr="10.233.0.10/32"
+        ;;
+        *)
+            clusterapi=false
+            clusterdns="10.233.0.3"
+            clusterdnscidr="10.233.0.3/32"
+        ;;
+    esac
+
+    replace_set_me "${file}" ".global.clusterDns" "\"${clusterdns}\""
+    replace_set_me "${file}" '.networkPolicies.coredns.serviceIp.ips' "[\"${clusterdnscidr}\"]"
+    replace_set_me "${file}" ".clusterApi.enabled" "${clusterapi}"
+    replace_set_me "${file}" ".clusterApi.monitoring.enabled" "${clusterapi}"
+    replace_set_me "${file}" ".kubeStateMetrics.clusterAPIMetrics.enabled" "${clusterapi}"
 }
 
 update_monitoring() {
@@ -683,6 +716,7 @@ set_storage_class       "${config[default_common]}"
 set_object_storage      "${config[default_common]}"
 set_nginx_config        "${config[default_common]}"
 set_lbsvc_safeguard     "${config[default_common]}"
+set_cluster_dns         "${config[default_common]}"
 update_monitoring       "${config[default_common]}"
 update_psp_netpol       "${config[default_common]}"
 update_config           "${config[override_common]}"
