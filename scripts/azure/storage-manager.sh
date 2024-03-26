@@ -5,8 +5,6 @@ set -euo pipefail
 : "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
 : "${AZURE_LOCATION:?Missing AZURE_LOCATION}"
 
-CK8S_ENVIRONMENT_NAME="$(yq4 .global.ck8sEnvironmentName <<< "${common_config}")"
-
 readonly CREATE_ACTION="create"
 readonly DELETE_ACTION="delete"
 
@@ -21,6 +19,7 @@ log_error() {
 common_default=$(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
 # shellcheck disable=SC2016
 common_config=$(echo "${common_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/common-config.yaml"))
+
 # shellcheck disable=SC2016
 sc_default=$(echo "${common_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml"))
 # shellcheck disable=SC2016
@@ -46,6 +45,7 @@ fi
 [ "$objectstorage_type_wc" = "azure" ] && buckets_wc=$(echo "${wc_config}" | yq4 '.objectStorage.buckets.*' -)
 
 RESOURCE_GROUP=$(echo "${common_config}" | yq4 '.objectStorage.azure.resourceGroup')
+STORAGE_ACCOUNT=$(echo "${common_config}" | yq4 '.objectStorage.azure.storageAccountName')
 CONTAINERS=$( { echo "${buckets_sc:-}"; echo "${buckets_wc:-}"; } | sort | uniq | tr '\n' ' ' | sed s'/.$//')
 
 log_info "Operating on containers: ${CONTAINERS// /', '}"
@@ -94,7 +94,7 @@ function create_resource_group() {
 function create_storage_account() {
 
     log_info "checking storage account availability" >&2
-    out=$(az storage account check-name --only-show-errors --name "${CK8S_ENVIRONMENT_NAME}")
+    out=$(az storage account check-name --only-show-errors --name "${STORAGE_ACCOUNT}")
     ACCOUNT_AVAILABLE=$(echo "$out" | jq -r .nameAvailable)
     REASON=$(echo "$out" | jq -r .reason)
     case $ACCOUNT_AVAILABLE in
@@ -103,7 +103,7 @@ function create_storage_account() {
                 log_info "Account name invalid, must be only contain numbers and lowercase letters"
                 exit 0
             elif [ "$REASON" == "AlreadyExists" ]; then
-                log_info "storage account [${CK8S_ENVIRONMENT_NAME}] already exists" >&2
+                log_info "storage account [${STORAGE_ACCOUNT}] already exists" >&2
                 log_info "contnue using this account ? (y/n)" >&2
                 read -r -n 1 cmdinput
                 case "$cmdinput" in
@@ -113,9 +113,9 @@ function create_storage_account() {
             fi
             ;;
         true)
-            log_info "creating storage account ${CK8S_ENVIRONMENT_NAME}"
+            log_info "creating storage account ${STORAGE_ACCOUNT}"
             az storage account create \
-            --name "$CK8S_ENVIRONMENT_NAME" \
+            --name "$STORAGE_ACCOUNT" \
             --resource-group "${RESOURCE_GROUP}" \
             --location swedencentral \
             --sku Standard_RAGRS \
@@ -127,7 +127,7 @@ function create_storage_account() {
 
 function create_containers() {
 
-    CONTAINERS_LIST=$(az storage container list --account-name "$CK8S_ENVIRONMENT_NAME" --query '[].name' --only-show-errors)
+    CONTAINERS_LIST=$(az storage container list --account-name "$STORAGE_ACCOUNT" --query '[].name' --only-show-errors)
 
     # shellcheck disable=SC2068
     for container in ${CONTAINERS[@]}; do
@@ -142,7 +142,7 @@ function create_containers() {
             log_info "container ${container} does not exist, creating it now" >&2
             az storage container create \
                 -n "$container" \
-                --account-name "$CK8S_ENVIRONMENT_NAME" --only-show-errors
+                --account-name "$STORAGE_ACCOUNT" --only-show-errors
         fi
     done
 }
