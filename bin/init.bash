@@ -219,7 +219,7 @@ set_object_storage() {
 
     replace_set_me "${file}" ".objectStorage.type" "\"${object_storage_type}\""
     if [ "$object_storage_type" == "azure" ]; then
-        replace_set_me "${file}" ".objectStorage.azure.resourceGroup" "${CK8S_ENVIRONMENT_NAME}"
+        replace_set_me "${file}" ".objectStorage.azure.resourceGroup" "${CK8S_ENVIRONMENT_NAME}-storage"
         replace_set_me "${file}" ".objectStorage.azure.storageAccountName" "${CK8S_ENVIRONMENT_NAME}"
     fi
 }
