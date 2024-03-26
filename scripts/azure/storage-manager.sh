@@ -128,14 +128,10 @@ function create_storage_account() {
 function create_containers() {
 
     CONTAINERS_LIST=$(az storage container list --account-name "$STORAGE_ACCOUNT" --query '[].name' --only-show-errors)
-
     # shellcheck disable=SC2068
     for container in ${CONTAINERS[@]}; do
-
         log_info "checking status of container ${container}" >&2
-
         CONTAINER_EXISTS=$(echo "$CONTAINERS_LIST" | jq --arg container "${container}" '. | index($container)')
-
         if [ "$CONTAINER_EXISTS" != null ]; then
             log_info "container ${container} already exists, do nothing" >&2
         else
