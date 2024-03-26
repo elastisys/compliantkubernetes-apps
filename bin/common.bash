@@ -9,6 +9,7 @@
 # shellcheck disable=SC2034
 ck8s_cloud_providers=(
     "aws"
+    "azure"
     "baremetal"
     "citycloud"
     "exoscale"
@@ -16,6 +17,13 @@ ck8s_cloud_providers=(
     "upcloud"
     "elastx"
     "none"
+)
+
+# shellcheck disable=SC2034
+ck8s_cluster_provisioner=(
+    "cluster-api"
+    "kubespray"
+    "other"
 )
 
 # shellcheck disable=SC2034
