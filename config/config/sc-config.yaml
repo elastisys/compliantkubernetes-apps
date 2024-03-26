@@ -1258,23 +1258,24 @@ networkPolicies:
   fluentd:
     enabled: true
 
-  rcloneSync:
+  rclone:
     enabled: true
-    destinationObjectStorageS3:
-      ips:
-        - "set-me-if-objectStorage.sync.enabled-and-type-is-s3"
-      ports:
-        - 443
-    destinationObjectStorageSwift:
-      ips:
-        - "set-me-if-objectStorage.sync.enabled-type-is-swift-or-harbor-thanos-use-swift"
-      ports:
-        - 5000
-    secondaryUrl:
-      ips:
-        - "set-me-if-secondaryUrl-has-an-url"
-      ports:
-        - 443
+    # Restore reuses network policy rules set for .global.objectStorage and .rclone.sync.objectStorage
+    sync:
+      objectStorage:
+        ips: set-me-if-objectStorage.sync.enabled
+        ports:
+          - 443
+      objectStorageSwift:
+        ips: set-me-if-objectStorage.sync.enabled-and-any-target-use-swift-as-destination
+        ports:
+          - 5000
+      secondaryUrl:
+        ips:
+          - set-me-if-objectStorage.sync.secondaryUrl-has-an-url
+        ports:
+          - 443
+
   s3Exporter:
     enabled: true
 
