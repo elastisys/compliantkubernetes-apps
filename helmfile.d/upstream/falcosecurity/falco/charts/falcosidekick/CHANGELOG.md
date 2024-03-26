@@ -5,6 +5,22 @@ numbering uses [semantic versioning](http://semver.org).
 
 Before release 0.1.20, the helm chart can be found in `falcosidekick` [repository](https://github.com/falcosecurity/falcosidekick/tree/master/deploy/helm/falcosidekick).
 
+## 0.7.11
+
+* Fix a link in the falcosidekick README to the policy report output documentation
+
+## 0.7.10
+
+* Set Helm recommended labels (`app.kubernetes.io/name`, `app.kubernetes.io/instance`, `app.kubernetes.io/version`, `helm.sh/chart`, `app.kubernetes.io/part-of`, `app.kubernetes.io/managed-by`) using helpers.tpl
+
+## 0.7.9
+
+* noop change to the chart itself. Updated makefile.
+
+## 0.7.8
+
+* Fix the condition for missing cert files
+
 ## 0.7.7
 
 * Support extraArgs in the helm chart

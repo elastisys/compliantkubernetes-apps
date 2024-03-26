@@ -110,13 +110,13 @@ falco:
   rulesFiles:
     default:
       enabled: true
-      version: 2.0.0
+      version: 3.0.1
     incubating:
       enabled: false
-      version: 2.0.0
+      version: 3.0.1
     sandbox:
       enabled: false
-      version: 2.0.0
+      version: 3.0.1
 
   artifact:
     install:
@@ -129,7 +129,7 @@ falco:
   ## configure syscall source
   ## ref: https://falco.org/docs/event-sources/kernel/
   driver:
-    kind: module
+    kind: kmod
 
     ebpf:
       # -- Path where the eBPF probe is located. It comes handy when the probe have been installed in the nodes using tools other than the init

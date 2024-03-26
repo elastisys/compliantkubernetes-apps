@@ -27,7 +27,7 @@ falco:
 
 tty: {{ .Values.falco.tty }}
 
-{{- if eq .Values.falco.driver.kind "module" }}
+{{- if eq .Values.falco.driver.kind "kmod" }}
 containerSecurityContext:
   privileged: true
   allowPrivilegeEscalation: true
@@ -55,7 +55,7 @@ driver:
         allowPrivilegeEscalation: true
       {{- with .Values.falco.driver.module.repoURL }}
       env:
-      - name: DRIVERS_REPO
+      - name: FALCOCTL_DRIVER_NAME
         value: {{ . }}
       {{- end }}
 
@@ -101,6 +101,7 @@ customRules:
           fd.name startswith "/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/" or
           fd.name startswith "/var/lib/containerd/tmpmounts/"
         ))
+
     # Adding a repository to this list will add an exception to the rules:
     # Run shell untrusted
     # Contact K8S API Server From Container
@@ -118,6 +119,7 @@ customRules:
         ghcr.io/elastisys/fluentd,
         ghcr.io/elastisys/logical-backup,
         ghcr.io/zalando/spilo-15,
+        ghcr.io/elastisys/spilo-15,
         quay.io/argoproj/argocd,
         quay.io/calico/node,
         quay.io/jetstack/cert-manager-controller,
@@ -126,18 +128,27 @@ customRules:
         quay.io/prometheus/prometheus,
         registry.k8s.io/ingress-nginx/controller-chroot,
         registry.k8s.io/ingress-nginx/controller,
-        registry.k8s.io/kube-state-metrics/kube-state-metrics
+        quay.io/metallb/controller,
+        registry.k8s.io/kube-state-metrics/kube-state-metrics,
+        gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/webhook,
+        gcr.io/tekton-releases/github.com/tektoncd/dashboard/cmd/dashboard,
+        gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/controller,
+        gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/resolvers,
+        ghcr.io/kubereboot/kured,
+        ghcr.io/dexidp/dex
         ]
+
     # Contact K8S API Server From Container
-    - macro: k8s_containers
-      append: true
-      condition: or (
+    - macro: user_known_contact_k8s_api_server_activities
+      condition: >
+        (
           container.image.repository in (trusted_image_repositories)
         ) or (
           proc.cmdline = "kubectl get rolebindings --all-namespaces -o json"
         ) or (
           proc.cmdline startswith "kubectl patch secret -n argocd-system argocd-manager-config -p"
         )
+
     # Run shell untrusted
     - macro: user_shell_container_exclusions
       condition: ( container.image.repository in (trusted_image_repositories) )
@@ -155,17 +166,24 @@ customRules:
     {{- end }}
 
     {{- if eq .Values.falco.rulesFiles.incubating.enabled true }}
+    # Change thread namespace
+    - macro: user_known_change_thread_namespace_activities
+      condition: (
+        container.image.repository = ghcr.io/kubereboot/kured
+        )
+
     - rule: Change namespace privileges via unshare
-      append: true
       condition: and not (
           (k8s.ns.name = kube-system and
           k8s.pod.name startswith calico-node) or
           (k8s.ns.name = monitoring and
           k8s.pod.name startswith prometheus-kube-prometheus-stack-prometheus)
         )
+      override:
+        condition: append
+
     # Non sudo setuid
     - macro: user_known_non_sudo_setuid_conditions
-      append: true
       condition: or container.image.repository in (
           quay.io/prometheuscommunity/elasticsearch-exporter,
           docker.io/jaegertracing/jaeger-query,
@@ -174,6 +192,9 @@ customRules:
         ) or (
           container.id = host
         )
+      override:
+        condition: append
+
     # Contact EC2 Instance Metadata Service From Container
     - macro: ec2_metadata_containers
       condition: (
@@ -181,11 +202,13 @@ customRules:
           container.image.repository = gcr.io/k8s-staging-multitenancy/hnc-manager or
           container.image.repository = docker.io/k8scloudprovider/cinder-csi-plugin
         )
+
     # Launch Package Management Process in Container
     - macro: user_known_package_manager_in_container
       condition: (
           container.image.repository = ghcr.io/elastisys/fluentd
         )
+
     # Set Setuid or Setgid bit
     - macro: user_known_set_setuid_or_setgid_bit_conditions
       condition: (
@@ -193,9 +216,9 @@ customRules:
           container.image.repository = quay.io/calico/cni or
           proc.name = containerd
         )
+
     # Unexpected UDP Traffic
     - macro: expected_udp_traffic
-      append: true
       condition: or container.image.repository in (
           docker.io/bitnami/fluentd,
           ghcr.io/elastisys/compliantkubernetes-apps-log-manager,
@@ -207,12 +230,16 @@ customRules:
         ) or (
           proc.name = iptables and user.name = root
         )
+      override:
+        condition: append
+
     # System procs network activity
     - macro: user_expected_system_procs_network_activity_conditions
       condition: (
           container.image.repository = docker.io/library/redis or
           container.image.repository = quay.io/calico/cni
         )
+
     # Launch Privileged Container
     - macro: user_privileged_containers
       condition: container.image.repository in (
@@ -223,74 +250,81 @@ customRules:
           quay.io/calico/cni,
           docker.io/velero/velero
         )
+
     # DB program spawned process
     - macro: user_known_db_spawned_processes
       condition: (
           container.image.repository = ghcr.io/zalando/spilo-15
         )
+
     # Schedule Cron Jobs
     - macro: user_known_cron_jobs
       condition: ( container.image.repository = ghcr.io/zalando/spilo-15 )
+
+    # Contact cloud metadata service from container
+    - macro: user_known_metadata_access
+      condition: or (
+          container.image.repository = gcr.io/k8s-staging-multitenancy/hnc-manager or
+          container.image.repository = ghcr.io/zalando/spilo-15
+        )
+      override:
+        condition: append
     {{- end }}
+
     {{- if eq .Values.falco.rulesFiles.sandbox.enabled true }}
     # Decoding Payload in Container
     - list: known_decode_payload_containers
-      append: true
       items: [ghcr.io/aquasecurity/trivy]
 
-    # Image repository exception for rule BPF Program Not Profiled
-    - list: bpf_profiled_binaries
-      append: true
-      items: [systemd]
     # Mkdir binary dirs
     - macro: user_known_mkdir_bin_dir_activities
       condition: (
           container.image.repository = registry.k8s.io/kube-proxy
         )
+
     # Modify binary dirs
-    - macro: user_known_modify_bin_dir_activitiess
+    - macro: user_known_modify_bin_dir_activities
       condition: (
           container.image.repository = registry.k8s.io/kube-proxy
         )
+
     # Kubernetes Client Tool Launched in Container
     - macro: user_known_k8s_client_container
-      append: true
       condition: or (
           container.image.repository = ghcr.io/elastisys/argocd-managed-namespaces-manager or
           container.image.repository = ghcr.io/zalando/spilo-15
         ) or (
           proc.cmdline = "kubectl get rolebindings --all-namespaces -o json"
         )
+      override:
+        condition: append
+
     # Write below etc
     - macro: user_known_write_etc_conditions
-      append: true
       condition: or (
           container.image.repository = quay.io/prometheus-operator/prometheus-config-reloader or
-          container.image.repository = quay.io/calico/node or
           container.image.repository = ghcr.io/zalando/spilo-15
         )
+      override:
+        condition: append
+
     # Write below root
     - macro: user_known_write_below_root_activities
       condition: (
           container.image.repository = ghcr.io/elastisys/logical-backup
         )
+
     # Launch Sensitive Mount Container
     - macro: user_sensitive_mount_containers
       condition: (
           container.image.repository = quay.io/prometheus/node-exporter or
           container.image.repository = docker.io/k8scloudprovider/cinder-csi-plugin
         )
+
     # Mount Launched in Privileged Container
     - macro: user_known_mount_in_privileged_containers
       condition: (
           container.image.repository = docker.io/k8scloudprovider/cinder-csi-plugin
-        )
-    # Contact cloud metadata service from container
-    - macro: user_known_metadata_access
-      append: true
-      condition: or (
-          container.image.repository = gcr.io/k8s-staging-multitenancy/hnc-manager or
-          container.image.repository = ghcr.io/zalando/spilo-15
         )
     {{- end }}
 
