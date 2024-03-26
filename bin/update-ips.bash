@@ -21,7 +21,7 @@ fi
 has_diff=0
 
 #TODO: To be changed when decision made on networkpolicies for azure storage
-STORAGE_SERVICE=$(yq4 '.objectStorage.type' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
+storage_service=$(yq4 '.objectStorage.type' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
 
 # Get the value of the config option or the provided default value if the
 # config option is unset.
@@ -528,7 +528,7 @@ validate_config() {
   fi
 
   #TODO: To be changed when decision made on networkpolicies for azure storage
-  if [ "$STORAGE_SERVICE" == "azure" ]; then
+  if [ "$storage_service" == "azure" ]; then
     :
   else
     yq_read_required "${cluster}" '.objectStorage.s3.regionEndpoint'
@@ -590,7 +590,7 @@ validate_config() {
 
 validate_config
 #TODO: To be changed when decision made on networkpolicies for azure storage
-if [ "$STORAGE_SERVICE" == "azure" ]; then
+if [ "$storage_service" == "azure" ]; then
   :
 else
   allow_object_storage
