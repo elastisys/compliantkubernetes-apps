@@ -130,6 +130,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
+1. Update service and rclone networkpolicies:
+
+    ```bash
+    ./migration/v0.37/prepare/40-service-rclone-netpol.sh
+    ```
+
 1. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.
