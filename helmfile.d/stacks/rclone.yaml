@@ -12,7 +12,7 @@ templates:
     inherit:
       - template: rclone
       - template: networkpolicies
-    installed: {{ and (.Values | get "networkPolicies.rcloneSync.enabled" false) (or (.Values | get "objectStorage.restore.enabled" false) (.Values | get "objectStorage.sync.enabled" false)) }}
+    installed: {{ and (.Values | get "networkPolicies.rclone.enabled" false) (or (.Values | get "objectStorage.restore.enabled" false) (.Values | get "objectStorage.sync.enabled" false)) }}
     labels:
       netpol: rclone
     needs:

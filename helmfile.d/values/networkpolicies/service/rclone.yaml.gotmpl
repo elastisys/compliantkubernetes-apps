@@ -10,11 +10,11 @@ rules:
   egress-rule-object-storage-main-swift:
     {{- include "old-style.rule.gen" $netpol.global.objectStorageSwift | nindent 4 }}
   egress-rule-object-storage-sync:
-    {{- include "old-style.rule.gen" $netpol.rcloneSync.destinationObjectStorageS3 | nindent 4 }}
+    {{- include "old-style.rule.gen" $netpol.rclone.sync.objectStorage | nindent 4 }}
   egress-rule-object-storage-sync-swift:
-    {{- include "old-style.rule.gen" $netpol.rcloneSync.destinationObjectStorageSwift | nindent 4 }}
+    {{- include "old-style.rule.gen" $netpol.rclone.sync.objectStorageSwift | nindent 4 }}
   egress-rule-object-storage-sync-secondary:
-    {{- include "old-style.rule.gen" $netpol.rcloneSync.secondaryUrl | nindent 4 }}
+    {{- include "old-style.rule.gen" $netpol.rclone.sync.secondaryUrl | nindent 4 }}
 
 {{- $main := .Values.objectStorage }}
 
