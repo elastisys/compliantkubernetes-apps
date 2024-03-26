@@ -8,10 +8,12 @@ source "${ROOT}/scripts/migration/lib.sh"
 run() {
   case "${1:-}" in
   execute)
-    log_info "- Removing opensearch-configurer"
-    helmfile_destroy sc name=opensearch-configurer
-    log_info "- Upgrading Opensearch"
-    helmfile_apply sc app=opensearch
+    if [[ "${CK8S_CLUSTER}" =~ ^(sc|both)$ ]]; then
+      log_info "- Removing opensearch-configurer"
+      helmfile_destroy sc name=opensearch-configurer
+      log_info "- Upgrading Opensearch"
+      helmfile_apply sc app=opensearch
+    fi
     ;;
   rollback)
     log_warn "rollback not implemented"
