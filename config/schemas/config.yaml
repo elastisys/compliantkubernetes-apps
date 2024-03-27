@@ -807,6 +807,73 @@ properties:
       default:
         type: string
     type: object
+  objectStorage:
+    additionalProperties: false
+    description: Swift can be enabled separately for Harbor, Thanos and rclone-sync only.
+    properties:
+      buckets:
+        additionalProperties:
+          type: string
+        description: Buckets where each respective application will store its backups.
+        type: object
+      s3:
+        additionalProperties: false
+        properties:
+          accessKey:
+            type: string
+          forcePathStyle:
+            description: Generally false when using AWS and Exoscale and true for other providers.
+            type: boolean
+          region:
+            type: string
+          regionEndpoint:
+            description: S3 endpoint for non-AWS implementation of S3. Make sure to prepend the protocol (i.e., https:// or http://) with the URL, e.g., https://s3.sto1.safedc.net
+            type: string
+          secretKey:
+            type: string
+        type: object
+      sync:
+        additionalProperties: false
+        properties:
+          buckets:
+            type: array
+          defaultSchedule:
+            default: 0 5 * * *
+            type: string
+          destinationType:
+            default: s3
+            type: string
+          enabled:
+            default: false
+            type: boolean
+          encrypt:
+            additionalProperties: false
+            properties:
+              directoryNames:
+                default: false
+                type: boolean
+              enabled:
+                default: false
+                type: boolean
+              fileNames:
+                default: false
+                type: boolean
+            type: object
+          resources:
+            $ref: '#/$defs/resources'
+          s3:
+            $ref: '#/properties/objectStorage/properties/s3'
+          syncDefaultBuckets:
+            default: false
+            type: boolean
+        type: object
+      type:
+        enum:
+          - s3
+          - gcs
+          - none
+        type: string
+    type: object
 additionalProperties:
   type: object
   properties: {}
