@@ -138,6 +138,93 @@ properties:
           type: string
         type: array
     type: object
+  dex:
+    additionalProperties: false
+    dependentRequred:
+      enableStaticLogin:
+        - staticPassword
+    properties:
+      additionalKubeloginRedirects:
+        items:
+          examples:
+            - http://localhost:8080/redirect
+          format: uri
+          type: string
+        type: array
+      affinity:
+        $ref: '#/$defs/affinity'
+      enableStaticLogin:
+        default: true
+        description: enable a static password login
+        type: boolean
+      expiry:
+        additionalProperties: false
+        properties:
+          deviceRequests:
+            $ref: '#/$defs/timeRange'
+            default: 5m
+          idToken:
+            $ref: '#/$defs/timeRange'
+            default: 24h
+          refreshTokens:
+            additionalProperties: false
+            properties:
+              absoluteLifetime:
+                $ref: '#/$defs/timeRange'
+                default: 3960h
+              reuseInterval:
+                $ref: '#/$defs/timeRange'
+                default: 3s
+              validIfNotUsedFor:
+                $ref: '#/$defs/timeRange'
+                default: 2160h
+            type: object
+          signingKeys:
+            default: 6h
+            type: string
+        type: object
+      google:
+        additionalProperties: false
+        if:
+          properties:
+            groupSupport:
+              const: true
+        properties:
+          SASecretName:
+            type: string
+          groupSupport:
+            default: false
+            type: boolean
+        then:
+          required:
+            - SASecretName
+        type: object
+      nodeSelector:
+        $ref: '#/$defs/nodeSelector'
+      replicaCount:
+        default: 2
+        type: number
+      resources:
+        $ref: '#/$defs/resources'
+      serviceMonitor:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+        type: object
+      staticPassword:
+        default: $2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W
+        description: bcrypt hash of a password
+        type: string
+      subdomain:
+        default: dex
+        type: string
+      tolerations:
+        $ref: '#/$defs/tolerations'
+      topologySpreadConstraints:
+        $ref: '#/$defs/topologySpreadConstraints'
+    type: object
 additionalProperties:
   type: object
   properties: {}
