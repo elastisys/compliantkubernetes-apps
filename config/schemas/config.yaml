@@ -1382,6 +1382,26 @@ properties:
         default: true
         type: boolean
     type: object
+  certmanager:
+    additionalProperties: false
+    properties:
+      affinity:
+        $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      cainjector:
+        $ref: '#/$defs/component'
+      extraArgs:
+        $ref: '#/$defs/extraArgs'
+      nodeSelector:
+        $ref: '#/$defs/kubernetesNodeSelector'
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+      tolerations:
+        $ref: '#/$defs/kubernetesTolerations'
+      topologySpreadConstraints:
+        $ref: '#/$defs/kubernetesTopologySpreadConstraints'
+      webhook:
+        $ref: '#/$defs/component'
+    type: object
 additionalProperties:
   type: object
   properties: {}
