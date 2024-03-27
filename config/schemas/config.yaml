@@ -622,6 +622,39 @@ properties:
       topologySpreadConstraints:
         $ref: '#/$defs/topologySpreadConstraints'
     type: object
+  prometheusBlackboxExporter:
+    additionalProperties: false
+    properties:
+      customKubeapiTargets:
+        items:
+          properties:
+            domain:
+              format: hostname
+              type: string
+            name:
+              type: string
+          type: object
+        type: array
+      hostAliases:
+        items:
+          properties:
+            hostNames:
+              items:
+                type: string
+              type: array
+            ip:
+              format: ipv4
+              type: string
+          type: object
+        type: array
+      resources:
+        $ref: '#/$defs/resources'
+      targets:
+        properties:
+          additionalProperties:
+            type: boolean
+        type: object
+    type: object
 additionalProperties:
   type: object
   properties: {}
