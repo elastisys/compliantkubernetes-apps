@@ -241,6 +241,12 @@ properties:
       user:
         $ref: '#/properties/grafana/properties/ops'
     type: object
+  grafanaLabelEnforcer:
+    additionalProperties: false
+    properties:
+      resources:
+        $ref: '#/$defs/resources'
+    type: object
 additionalProperties:
   type: object
   properties: {}
