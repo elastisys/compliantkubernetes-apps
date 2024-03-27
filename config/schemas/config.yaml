@@ -1105,6 +1105,328 @@ properties:
       user:
         $ref: '#/$defs/commonResource'
     type: object
+  opensearch:
+    additionalProperties: false
+    properties:
+      additionalTemplates:
+        type: object
+      clientNode:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/affinity'
+          count:
+            default: 1
+            type: number
+          dedicatedPods:
+            default: true
+            type: boolean
+          javaOpts:
+            default: -Xms512m -Xmx512m
+            type: string
+          nodeSelector:
+            $ref: '#/$defs/nodeSelector'
+          resources:
+            $ref: '#/$defs/resources'
+          tolerations:
+            $ref: '#/$defs/tolerations'
+        type: object
+      clusterName:
+        default: opensearch
+        type: string
+      createIndices:
+        default: true
+        description: Create initial indices upon first startup
+        type: boolean
+      curator:
+        additionalProperties: false
+        properties:
+          activeDeadlineSeconds:
+            default: 2700
+            type: number
+          affinity:
+            $ref: '#/$defs/affinity'
+          enabled:
+            default: true
+            type: boolean
+          nodeSelector:
+            $ref: '#/$defs/nodeSelector'
+          resources:
+            $ref: '#/$defs/resources'
+          retention:
+            items:
+              additionalProperties: false
+              properties:
+                ageDays:
+                  default: 7
+                  type: number
+                pattern:
+                  default: other-*
+                  type: string
+                sizeGB:
+                  default: 1
+                  type: number
+              type: object
+            type: array
+          startingDeadlineSeconds:
+            default: 600
+            type: number
+          tolerations:
+            $ref: '#/$defs/tolerations'
+        type: object
+      dashboards:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/affinity'
+          nodeSelector:
+            $ref: '#/$defs/nodeSelector'
+          resources:
+            $ref: '#/$defs/resources'
+          subdomain:
+            default: opensearch
+            type: string
+          tolerations:
+            $ref: '#/$defs/tolerations'
+          topologySpreadConstraints:
+            $ref: '#/$defs/topologySpreadConstraints'
+        type: object
+      dataNode:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/affinity'
+          count:
+            default: 2
+            type: number
+          dedicatedPods:
+            default: true
+            type: boolean
+          javaOpts:
+            default: -Xms512m -Xmx512m
+            type: string
+          nodeSelector:
+            $ref: '#/$defs/nodeSelector'
+          resources:
+            $ref: '#/$defs/resources'
+          storageClass:
+            examples:
+              - '-'
+            type: string
+          storageSize:
+            default: 25Gi
+            type: string
+          tolerations:
+            $ref: '#/$defs/tolerations'
+        type: object
+      defaultTemplates:
+        default: true
+        type: boolean
+      enabled:
+        default: true
+        type: boolean
+      exporter:
+        additionalProperties: false
+        properties:
+          resources:
+            $ref: '#/$defs/resources'
+          serviceMonitor:
+            additionalProperties: false
+            properties:
+              interval:
+                default: 30s
+                type: string
+              scrapeTimeout:
+                default: 30s
+                type: string
+            type: object
+          tolerations:
+            $ref: '#/$defs/tolerations'
+        type: object
+      extraRoleMappings:
+        items:
+          additionalProperties: false
+          properties:
+            definition:
+              additionalProperties: false
+              properties:
+                users:
+                  items:
+                    type: string
+                  type: array
+              type: object
+            mapping_name:
+              default: kibana_user
+              type: string
+          type: object
+        type: array
+      extraRoles:
+        type: array
+      indexPerNamespace:
+        default: false
+        type: boolean
+      ingress:
+        additionalProperties: false
+        properties:
+          maxbodysize:
+            default: 32m
+            type: string
+        type: object
+      ism:
+        additionalProperties: false
+        properties:
+          additionalPolicies:
+            type: object
+          defaultPolicies:
+            default: true
+            type: boolean
+          overwritePolicies:
+            default: true
+            type: boolean
+          rolloverAgeDays:
+            default: 1
+            type: number
+          rolloverSizeGB:
+            default: 1
+            type: number
+        type: object
+      masterNode:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/affinity'
+          count:
+            default: 1
+            type: number
+          javaOpts:
+            default: -Xms512m -Xmx512m
+            type: string
+          nodeSelector:
+            $ref: '#/$defs/nodeSelector'
+          resources:
+            $ref: '#/$defs/resources'
+          storageClass:
+            type: string
+          storageSize:
+            default: 8Gi
+            type: string
+          tolerations:
+            $ref: '#/$defs/tolerations'
+        type: object
+      maxClauseCount:
+        default: 1024
+        description: Change this value before applying opensearch to adjust indices.query.bool.max_clause_count
+        type: number
+      maxShardsPerNode:
+        default: 1000
+        type: number
+      overwriteTemplates:
+        default: true
+        type: boolean
+      plugins:
+        additionalProperties: false
+        properties:
+          additionalPlugins:
+            description: in an air-gapped environment this can be used to install plugins from known sources
+            type: array
+          installExternalObjectStoragePlugin:
+            description: |-
+              in an air-gapped environment where the nodes are not connected to the Internet, set
+              following variable to false to prevent downloading external object storage plugin
+            type: boolean
+        type: object
+      promIndexAlerts:
+        items:
+          additionalProperties: false
+          properties:
+            alertSizeMB:
+              default: 5500
+              type: number
+            prefix:
+              default: kubernetes-default
+              type: string
+          type: object
+        type: array
+      securityadmin:
+        additionalProperties: false
+        properties:
+          activeDeadlineSeconds:
+            default: 1200
+            type: number
+          enabled:
+            default: true
+            type: boolean
+          resources:
+            $ref: '#/$defs/resources'
+        type: object
+      snapshot:
+        additionalProperties: false
+        properties:
+          ageSeconds:
+            default: 864000
+            type: number
+          backupActiveDeadlineSeconds:
+            default: 600
+            type: number
+          backupSchedule:
+            default: 0 */2 * * *
+            type: string
+          backupStartingDeadlineSeconds:
+            default: 600
+            type: number
+          enabled:
+            default: true
+            type: boolean
+          max:
+            default: 14
+            type: number
+          maxRequestSeconds:
+            default: 1200
+            type: number
+          min:
+            default: 7
+            type: number
+          repository:
+            default: opensearch-snapshots
+            type: string
+          retentionActiveDeadlineSeconds:
+            default: 2700
+            type: number
+          retentionResources:
+            $ref: '#/$defs/resources'
+          retentionSchedule:
+            default: '@daily'
+            type: string
+          retentionStartingDeadlineSeconds:
+            default: 600
+            type: number
+        type: object
+      sso:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: false
+            type: boolean
+          rolesKey:
+            default: groups
+            type: string
+          scope:
+            default: openid profile email groups
+            type: string
+          subjectKey:
+            default: email
+            type: string
+        type: object
+      subdomain:
+        default: opensearch
+        format: hostname
+        type: string
+    required:
+      - enabled
+      - subdomain
+      - indexPerNamespace
+      - dashboards
+    type: object
 additionalProperties:
   type: object
   properties: {}
