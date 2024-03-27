@@ -177,6 +177,23 @@
           register: "output"
           when: not helm_secrets_exists.stat.exists or (helm_secrets_removed.changed)
 
+    - name: azure-cli
+      block:
+        - name: Check if azure-cli exists
+          stat:
+            path: "/usr/bin/az"
+          register: azure_cli_exists
+
+        - name: Check azure-cli
+          shell: az version --query '"azure-cli"'
+          register: current_azure_cli_version
+          when: azure_cli_exists.stat.exists
+
+        - name: Get azure-cli
+          command: "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash"
+          when: (not azure_cli_exists.stat.exists) or
+            (current_azure_cli_version.stdout == "")
+
     - name: Get URL
       include_tasks: get-url.yaml
       loop: "{{ get_url_list }}"
