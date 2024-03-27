@@ -244,6 +244,150 @@ properties:
         title: IP range allow-lists
         type: object
     type: object
+  falco:
+    additionalProperties: false
+    description: |
+      Falco alerting configuration.
+
+      Available rule files and addons can be found at: <https://falcosecurity.github.io/falcoctl/index.yaml>
+    properties:
+      affinity:
+        $ref: '#/$defs/affinity'
+      alerts:
+        additionalProperties: false
+        description: Falco alerts will come from prometheus metrics
+        properties:
+          enabled:
+            default: false
+            type: boolean
+          hostPort:
+            default: http://alertmanager-operated.monitoring:9093
+            format: uri
+            type: string
+          priority:
+            default: notice
+            type: string
+          type:
+            default: alertmanager
+            enum:
+              - alertmanager
+              - slack
+            type: string
+        type: object
+      artifact:
+        additionalProperties: false
+        properties:
+          install:
+            additionalProperties: false
+            description: set to false in an air-gapped environment, unless artifacts are self-hosted
+            properties:
+              enabled:
+                type: boolean
+            type: object
+        type: object
+      customIndexes:
+        type: array
+      customRules:
+        additionalProperties:
+          format: yaml
+          type: string
+        type: object
+      driver:
+        additionalProperties: false
+        properties:
+          ebpf:
+            additionalProperties: false
+            properties:
+              hostNetwork:
+                default: false
+                type: boolean
+              path:
+                description: Path where the eBPF probe is located. It comes handy when the probe have been installed in the nodes using tools other than the init
+                type: string
+            type: object
+          kind:
+            default: module
+            type: string
+          module:
+            additionalProperties: false
+            description: override the URL used for downloading driver modules, e.g. to use a self hosted file server in an air-gapped environment
+            properties:
+              repoURL:
+                format: uri
+                type: string
+            type: object
+        type: object
+      enabled:
+        default: true
+        type: boolean
+      falcoExporter:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/affinity'
+          nodeSelector:
+            $ref: '#/$defs/nodeSelector'
+          resources:
+            $ref: '#/$defs/resources'
+          tolerations:
+            $ref: '#/$defs/tolerations'
+        type: object
+      falcoSidekick:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/affinity'
+          nodeSelector:
+            $ref: '#/$defs/nodeSelector'
+          resources:
+            $ref: '#/$defs/resources'
+          tolerations:
+            $ref: '#/$defs/tolerations'
+        type: object
+      nodeSelector:
+        $ref: '#/$defs/nodeSelector'
+      resources:
+        $ref: '#/$defs/resources'
+      rulesFiles:
+        additionalProperties: false
+        properties:
+          default:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: true
+                type: boolean
+              version:
+                default: 2.0.0
+                type: string
+            type: object
+          incubating:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: false
+                type: boolean
+              version:
+                default: 2.0.0
+                type: string
+            type: object
+          sandbox:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: false
+                type: boolean
+              version:
+                default: 2.0.0
+                type: string
+            type: object
+        type: object
+      tolerations:
+        $ref: '#/$defs/tolerations'
+      tty:
+        default: true
+        type: boolean
+    type: object
 additionalProperties:
   type: object
   properties: {}
