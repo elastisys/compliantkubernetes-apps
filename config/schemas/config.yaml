@@ -449,6 +449,131 @@ properties:
       tolerations:
         $ref: '#/$defs/tolerations'
     type: object
+  opa:
+    additionalProperties: false
+    properties:
+      audit:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/affinity'
+          nodeSelector:
+            $ref: '#/$defs/nodeSelector'
+          resources:
+            $ref: '#/$defs/resources'
+          tolerations:
+            $ref: '#/$defs/tolerations'
+          topologySpreadConstraints:
+            $ref: '#/$defs/topologySpreadConstraints'
+          writeToRAMDisk:
+            default: false
+            type: boolean
+        type: object
+      auditChunkSize:
+        default: 500
+        type: number
+      auditFromCache:
+        default: false
+        type: boolean
+      auditIntervalSeconds:
+        default: 600
+        type: number
+      constraintViolationsLimit:
+        default: 20
+        type: number
+      controllerManager:
+        $ref: '#/$defs/commonResource'
+      disallowedTags:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          enforcement:
+            default: deny
+            type: string
+          tags:
+            items:
+              default: latest
+              type: string
+            type: array
+        type: object
+      imageRegistry:
+        additionalProperties: false
+        properties:
+          URL:
+            items:
+              examples:
+                - harbor.example.com
+                - quay.io/jetstack/cert-manager-acmesolver
+              type: string
+            type: array
+          enabled:
+            default: true
+            type: boolean
+          enforcement:
+            default: warn
+            type: string
+        type: object
+      mutatingWebhookTimeoutSeconds:
+        default: 5
+        type: number
+      mutations:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          jobTTL:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: true
+                type: boolean
+              ttlSeconds:
+                default: 604800
+                type: number
+            type: object
+          ndots:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: false
+                type: boolean
+              labelSelector:
+                additionalProperties: false
+                properties:
+                  matchLabels: {}
+                type: object
+              ndotAmount:
+                default: 3
+                type: integer
+            type: object
+        type: object
+      networkPolicies:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          enforcement:
+            default: warn
+            type: string
+        type: object
+      resourceRequests:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          enforcement:
+            default: deny
+            type: string
+        type: object
+      validatingWebhookTimeoutSeconds:
+        default: 5
+        type: number
+    type: object
 additionalProperties:
   type: object
   properties: {}
