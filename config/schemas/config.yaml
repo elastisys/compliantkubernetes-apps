@@ -260,6 +260,15 @@ properties:
       resources:
         $ref: '#/$defs/resources'
     type: object
+  metricsServer:
+    additionalProperties: false
+    properties:
+      enabled:
+        default: true
+        type: boolean
+      resources:
+        $ref: '#/$defs/resources'
+    type: object
 additionalProperties:
   type: object
   properties: {}
