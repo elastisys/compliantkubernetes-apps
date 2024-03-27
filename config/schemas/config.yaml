@@ -150,6 +150,26 @@ properties:
         default: true
         type: boolean
     type: object
+  certmanager:
+    additionalProperties: false
+    properties:
+      affinity:
+        $ref: '#/$defs/affinity'
+      cainjector:
+        $ref: '#/$defs/commonResource'
+      extraArgs:
+        $ref: '#/$defs/extraArgs'
+      nodeSelector:
+        $ref: '#/$defs/nodeSelector'
+      resources:
+        $ref: '#/$defs/resources'
+      tolerations:
+        $ref: '#/$defs/tolerations'
+      topologySpreadConstraints:
+        $ref: '#/$defs/topologySpreadConstraints'
+      webhook:
+        $ref: '#/$defs/commonResource'
+    type: object
 additionalProperties:
   type: object
   properties: {}
