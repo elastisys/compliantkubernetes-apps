@@ -609,8 +609,8 @@ ingressNginx:
 
       ## type: NodePort
       nodePorts:
-        http: "30080"
-        https: "30443"
+        http: 30080
+        https: 30443
 
       clusterIP: ""
 
@@ -712,7 +712,7 @@ certmanager:
       cpu: 250m
       memory: 250Mi
   nodeSelector: {}
-  tolerations: {}
+  tolerations: []
   affinity: {}
 
   ## if you need use cert-manager with HTTP01 challenge and a custom image registry in wc, please update the wc-config.yaml with the correct extraArgs
@@ -727,7 +727,7 @@ certmanager:
         cpu: 250m
         memory: 100Mi
     nodeSelector: {}
-    tolerations: {}
+    tolerations: []
     affinity: {}
 
   cainjector:
@@ -739,7 +739,7 @@ certmanager:
         cpu: 250m
         memory: 250Mi
     nodeSelector: {}
-    tolerations: {}
+    tolerations: []
     affinity: {}
 
     ## Extra args for cainjector, docs for available args: https://cert-manager.io/docs/cli/cainjector/
@@ -1106,7 +1106,7 @@ rookCeph:
 nodeLocalDns:
   # See docs for details about the config format and options:
   # https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/#coredns-configmap-options
-  customConfig: #|-
+  customConfig: "" #|-
   #  example.com:53 {
   #      errors
   #      cache 30
