@@ -892,6 +892,33 @@ properties:
             type: boolean
         type: object
     type: object
+  velero:
+    additionalProperties: false
+    properties:
+      enabled:
+        default: true
+        type: boolean
+      nodeAgent:
+        additionalProperties: false
+        properties:
+          resources:
+            $ref: '#/$defs/resources'
+          tolerations:
+            $ref: '#/$defs/tolerations'
+        type: object
+      nodeSelector:
+        $ref: '#/$defs/nodeSelector'
+      resources:
+        $ref: '#/$defs/resources'
+      retentionPeriod:
+        $ref: '#/$defs/goDuration'
+        default: 720h0m0s
+      schedule:
+        default: 0 0 * * *
+        type: string
+      tolerations:
+        $ref: '#/$defs/tolerations'
+    type: object
 additionalProperties:
   type: object
   properties: {}
