@@ -126,6 +126,52 @@ properties:
           - containerd
           - docker
     additionalProperties: false
+  alerts:
+    additionalProperties: false
+    properties:
+      alertTo:
+        type: string
+      customReceivers:
+        type: array
+      opsGenie:
+        additionalProperties: false
+        properties:
+          apiUrl:
+            default: https://api.eu.opsgenie.com
+            format: uri
+            type: string
+        type: object
+      opsGenieHeartbeat:
+        additionalProperties: false
+        if:
+          properties:
+            enabled:
+              const: true
+        properties:
+          enabled:
+            default: false
+            type: boolean
+          name:
+            type: string
+          url:
+            default: https://api.eu.opsgenie.com/v2/heartbeats
+            format: uri
+            type: string
+        required:
+          - enabled
+        then:
+          required:
+            - name
+        type: object
+      slack:
+        additionalProperties: false
+        properties:
+          channel:
+            type: string
+          customTemplate:
+            type: object
+        type: object
+    type: object
 additionalProperties:
   type: object
   properties: {}
