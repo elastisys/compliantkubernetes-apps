@@ -85,6 +85,18 @@ EOF
 
 The output can be tweaked and inserted into `config/schemas/config.yaml` under `.properties`.
 
+To limit duplication, common properties that are used in many places can be placed under `.$defs` and referenced via `$ref: '#/$defs/thing'`
+
+```yaml
+$defs:
+  common:
+    title: Some Common Thing
+service:
+  title: The Service
+  common:
+    $ref: '#/$defs/common'
+```
+
 ## VSCode
 
 The plugin `redhat.vscode-yaml` can provide auto completion, validation and help texts from the schema.

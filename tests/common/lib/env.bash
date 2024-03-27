@@ -35,7 +35,7 @@ env.init() {
 
     if [[ "${CK8S_CLOUD_PROVIDER}" = "citycloud" ]]; then
       yq_set 'sc' '.objectStorage.swift.authVersion' '0'
-      yq_set 'sc' '.objectStorage.swift.authUrl' '"example-auth-url"'
+      yq_set 'sc' '.objectStorage.swift.authUrl' '"https://auth.url.example"'
       yq_set 'sc' '.objectStorage.swift.region' '"example-region"'
       yq_set 'sc' '.objectStorage.swift.projectDomainId' '"example-project-domain-id"'
       yq_set 'sc' '.objectStorage.swift.projectId' '"example-project-id"'
