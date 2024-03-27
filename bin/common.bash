@@ -105,7 +105,7 @@ check_tools() {
   warn=0
   err=0
 
-  for executable in jq yq4 s3cmd sops kubectl helm helmfile dig pwgen htpasswd; do
+  for executable in jq yq4 s3cmd sops kubectl helm helmfile dig pwgen htpasswd az; do
     if ! command -v "${executable}" > /dev/null; then
       log_error "Required dependency ${executable} missing"
       err=1
