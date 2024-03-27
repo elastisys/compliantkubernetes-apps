@@ -170,6 +170,89 @@ properties:
       webhook:
         $ref: '#/$defs/commonResource'
     type: object
+  ingressNginx:
+    additionalProperties: false
+    properties:
+      controller:
+        additionalProperties: false
+        properties:
+          additionalConfig:
+            type: object
+          affinity:
+            $ref: '#/$defs/affinity'
+          allowSnippetAnnotations:
+            default: false
+            type: boolean
+          chroot:
+            type: boolean
+          config:
+            additionalProperties: false
+            properties:
+              useProxyProtocol:
+                type: boolean
+            type: object
+          enablepublishService:
+            default: false
+            type: boolean
+          extraArgs: true
+          nodeSelector:
+            $ref: '#/$defs/nodeSelector'
+          resources:
+            $ref: '#/$defs/resources'
+          service:
+            additionalProperties: false
+            properties:
+              annotations:
+                additionalProperties:
+                  type: string
+                type: object
+              clusterIP:
+                format: ipv4
+                type: string
+              enabled:
+                type: boolean
+              loadBalancerSourceRanges:
+                items:
+                  type: string
+                type: array
+              nodePorts:
+                additionalProperties: false
+                properties:
+                  http:
+                    default: 30080
+                    type: integer
+                  https:
+                    default: 30443
+                    type: integer
+                type: object
+              type:
+                enum:
+                  - ClusterIP
+                  - NodePort
+                  - LoadBalancer
+                  - ExternalName
+                type: string
+            type: object
+          tolerations:
+            $ref: '#/$defs/tolerations'
+          useHostPort:
+            type: boolean
+        type: object
+      defaultBackend:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/affinity'
+          nodeSelector:
+            $ref: '#/$defs/nodeSelector'
+          resources:
+            $ref: '#/$defs/resources'
+          tolerations:
+            $ref: '#/$defs/tolerations'
+        type: object
+      subDomain:
+        type: string
+    type: object
 additionalProperties:
   type: object
   properties: {}
