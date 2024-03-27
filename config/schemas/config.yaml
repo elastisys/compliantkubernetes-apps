@@ -655,6 +655,12 @@ properties:
             type: boolean
         type: object
     type: object
+  prometheusNodeExporter:
+    additionalProperties: false
+    properties:
+      resources:
+        $ref: '#/$defs/resources'
+    type: object
 additionalProperties:
   type: object
   properties: {}
