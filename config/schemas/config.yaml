@@ -412,6 +412,24 @@ properties:
           - containerd
           - docker
     additionalProperties: false
+  clusterApi:
+    additionalProperties: false
+    properties:
+      clusters:
+        items:
+          type: string
+        type: array
+      enabled:
+        default: false
+        type: boolean
+      monitoring:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: false
+            type: boolean
+        type: object
+    type: object
 additionalProperties:
   type: object
   properties: {}
