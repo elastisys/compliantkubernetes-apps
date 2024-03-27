@@ -14,6 +14,13 @@ fi
 
 here="$(dirname "$(readlink -f "$0")")"
 
+# shellcheck source=bin/common.bash
+source "${here}/../bin/common.bash"
+
+config_load wc
+
+clusterAPIEnabled=$(yq4 '.clusterApi.enabled' "${config[config_file_wc]}")
+
 GATE_VALWEBHOOK=$(
     "${here}/.././bin/ck8s" ops \
         kubectl wc get \
@@ -44,8 +51,12 @@ fi
 # Clean up namespaces and any other resources left behind by the apps
 "${here}/.././bin/ck8s" ops kubectl wc delete ns alertmanager falco fluentd-system fluentd gatekeeper-system hnc-system ingress-nginx monitoring velero kured
 
-# Destroy cert-manager helm release
-"${here}/.././bin/ck8s" ops helmfile wc -l app=cert-manager destroy
+if [ "${clusterAPIEnabled}" = "false" ]; then
+  # Destroy cert-manager helm release
+  "${here}/.././bin/ck8s" ops helmfile wc -l app=cert-manager destroy
+else
+  log_info "Cluster API provisioned cluster, skipping deletion of cert-manager Helm release"
+fi
 
 # Destroy local-cluster minio release, otherwise pvc cleanup will get stuck
 helmfile -e local_cluster -f "${here}/../helmfile.d" -l app=minio destroy
@@ -56,9 +67,13 @@ helmfile -e local_cluster -f "${here}/../helmfile.d" -l app=minio destroy
 # Velero-specific removal: https://velero.io/docs/v1.10/uninstalling/
 "${here}/.././bin/ck8s" ops kubectl wc delete crds -l component=velero
 
-# Cert-manager specific removal
-"${here}/.././bin/ck8s" ops kubectl wc delete namespace cert-manager
-#"${here}/.././bin/ck8s" ops kubectl wc delete crds -l app.kubernetes.io/name=cert-manager
+if [ "${clusterAPIEnabled}" = "false" ]; then
+  # Cert-manager specific removal
+  "${here}/.././bin/ck8s" ops kubectl wc delete namespace cert-manager
+  #"${here}/.././bin/ck8s" ops kubectl wc delete crds -l app.kubernetes.io/name=cert-manager
+else
+  log_info "Cluster API provisioned cluster, skipping deletion of cert-manager namespace"
+fi
 
 # Prometheus specific removal
 PROM_CRDS=$(
