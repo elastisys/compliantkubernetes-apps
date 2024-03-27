@@ -801,6 +801,12 @@ properties:
             $ref: '#/$defs/resources'
         type: object
     type: object
+  storageClasses:
+    additionalProperties: false
+    properties:
+      default:
+        type: string
+    type: object
 additionalProperties:
   type: object
   properties: {}
