@@ -497,6 +497,13 @@ properties:
           type: string
         type: array
     type: object
+  hnc:
+    additionalProperties: false
+    properties:
+      enabled:
+        default: true
+        type: boolean
+    type: object
 additionalProperties:
   type: object
   properties: {}
