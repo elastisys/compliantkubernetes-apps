@@ -874,6 +874,24 @@ properties:
           - none
         type: string
     type: object
+  rookCeph:
+    additionalProperties: false
+    properties:
+      gatekeeperPsp:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: false
+            type: boolean
+        type: object
+      monitoring:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: false
+            type: boolean
+        type: object
+    type: object
 additionalProperties:
   type: object
   properties: {}
