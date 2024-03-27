@@ -673,6 +673,27 @@ properties:
       resources:
         $ref: '#/$defs/resources'
     type: object
+  s3Exporter:
+    additionalProperties: false
+    properties:
+      affinity:
+        $ref: '#/$defs/affinity'
+      enabled:
+        default: true
+        type: boolean
+      interval:
+        default: 60m
+        type: string
+      nodeSelector:
+        $ref: '#/$defs/nodeSelector'
+      resources:
+        $ref: '#/$defs/resources'
+      scrapeTimeout:
+        default: 10m
+        type: string
+      tolerations:
+        $ref: '#/$defs/tolerations'
+    type: object
 additionalProperties:
   type: object
   properties: {}
