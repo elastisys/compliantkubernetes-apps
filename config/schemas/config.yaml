@@ -126,6 +126,18 @@ properties:
           - containerd
           - docker
     additionalProperties: false
+  clusterAdmin:
+    additionalProperties: false
+    properties:
+      groups:
+        items:
+          type: string
+        type: array
+      users:
+        items:
+          type: string
+        type: array
+    type: object
 additionalProperties:
   type: object
   properties: {}
