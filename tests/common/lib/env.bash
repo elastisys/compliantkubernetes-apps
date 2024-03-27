@@ -51,8 +51,8 @@ env.init() {
   yq_set 'common' '.issuers.letsencrypt.prod.email' '"admin@.example.com"'
   yq_set 'common' '.issuers.letsencrypt.staging.email' '"admin@.example.com"'
 
-  yq_set 'sc' '.grafana.ops.oidc.allowedDomains' '"example.com"'
-  yq_set 'sc' '.grafana.user.oidc.allowedDomains' '"example.com"'
+  yq_set 'sc' '.grafana.ops.oidc.allowedDomains' '["example.com"]'
+  yq_set 'sc' '.grafana.user.oidc.allowedDomains' '["example.com"]'
 
   yq_set 'sc' '.harbor.oidc.adminGroupName' '"admin"'
 
