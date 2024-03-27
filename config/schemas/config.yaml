@@ -661,6 +661,18 @@ properties:
       resources:
         $ref: '#/$defs/resources'
     type: object
+  prometheusOperator:
+    additionalProperties: false
+    properties:
+      prometheusConfigReloader:
+        additionalProperties: false
+        properties:
+          resources:
+            $ref: '#/$defs/resources'
+        type: object
+      resources:
+        $ref: '#/$defs/resources'
+    type: object
 additionalProperties:
   type: object
   properties: {}
