@@ -126,6 +126,23 @@ properties:
           - containerd
           - docker
     additionalProperties: false
+  calicoAccountant:
+    additionalProperties: false
+    properties:
+      backend:
+        default: iptables
+        enum:
+          - iptables
+          - nftables
+        type: string
+      enabled:
+        default: true
+        type: boolean
+      resources:
+        $ref: '#/$defs/resources'
+      tolerations:
+        $ref: '#/$defs/tolerations'
+    type: object
 additionalProperties:
   type: object
   properties: {}
