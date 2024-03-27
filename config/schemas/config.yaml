@@ -225,6 +225,25 @@ properties:
       topologySpreadConstraints:
         $ref: '#/$defs/topologySpreadConstraints'
     type: object
+  externalTrafficPolicy:
+    additionalProperties: false
+    properties:
+      local:
+        default: false
+        type: boolean
+      whitelistRange:
+        additionalProperties:
+          default: 0.0.0.0/0
+          type:
+            - string
+            - boolean
+        description: |-
+          CIDR IP ranges that enable various
+          `nginx.ingress.kubernetes.io/whitelist-source-range` annotations or a
+          boolean `false` to explicitly opt-out of the annotation.
+        title: IP range allow-lists
+        type: object
+    type: object
 additionalProperties:
   type: object
   properties: {}
