@@ -812,37 +812,11 @@ properties:
                 type: string
               port:
                 examples:
-                  - '5432'
+                  - "5432"
                 type: string
             type: object
           resources:
-            additionalProperties: false
-            properties:
-              limits:
-                additionalProperties: false
-                properties:
-                  cpu:
-                    examples:
-                      - 50m
-                    type: string
-                  memory:
-                    examples:
-                      - 40Mi
-                    type: string
-                type: object
-              requests:
-                additionalProperties: false
-                properties:
-                  cpu:
-                    examples:
-                      - 10m
-                    type: string
-                  memory:
-                    examples:
-                      - 20Mi
-                    type: string
-                type: object
-            type: object
+            $ref: '#/$defs/resources'
         type: object
     type: object
   storageClasses:
