@@ -1533,6 +1533,35 @@ properties:
       subDomain:
         type: string
     type: object
+  issuers:
+    additionalProperties: false
+    properties:
+      extraIssuers:
+        type: array
+      letsencrypt:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          prod:
+            additionalProperties: false
+            properties:
+              email:
+                type: string
+              solvers:
+                type: array
+            type: object
+          staging:
+            additionalProperties: false
+            properties:
+              email:
+                type: string
+              solvers:
+                type: array
+            type: object
+        type: object
+    type: object
 additionalProperties:
   type: object
   properties: {}
