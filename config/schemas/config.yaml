@@ -14,6 +14,292 @@ $defs:
     thing:
       $ref: "#/$defs/thing"
     ```
+  affinity:
+    $comment: Real k8s resources might have existing schemas that could be reused as-is
+    additionalProperties: false
+    default:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: node-role.kubernetes.io/control-plane
+                  operator: Exists
+    properties:
+      podAntiAffinity:
+        additionalProperties: false
+        properties:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            items:
+              additionalProperties: false
+              properties:
+                podAffinityTerm:
+                  additionalProperties: false
+                  properties:
+                    labelSelector:
+                      additionalProperties: false
+                      properties:
+                        matchExpressions:
+                          items:
+                            additionalProperties: false
+                            properties:
+                              key:
+                                default: app.kubernetes.io/instance
+                                type: string
+                              operator:
+                                default: In
+                                type: string
+                              values:
+                                items:
+                                  default: opensearch-master
+                                  type: string
+                                type: array
+                            type: object
+                          type: array
+                      type: object
+                    topologyKey:
+                      default: kubernetes.io/hostname
+                      type: string
+                  type: object
+                weight:
+                  default: 1
+                  type: number
+              type: object
+            type: array
+          requiredDuringSchedulingIgnoredDuringExecution:
+            items:
+              additionalProperties: false
+              properties:
+                labelSelector:
+                  additionalProperties: false
+                  properties:
+                    matchExpressions:
+                      items:
+                        additionalProperties: false
+                        properties:
+                          key:
+                            default: app
+                            type: string
+                          operator:
+                            default: In
+                            type: string
+                          values:
+                            items:
+                              default: harbor
+                              type: string
+                            type: array
+                        type: object
+                      type: array
+                  type: object
+                topologyKey:
+                  default: kubernetes.io/hostname
+                  type: string
+              type: object
+            type: array
+        type: object
+    title: Affinity
+    type: object
+  commonResource:
+    additionalProperties: false
+    description: This is meant to describe the base class if you will, for ck8s resources.
+    properties:
+      affinity:
+        $ref: '#/$defs/affinity'
+      enabled:
+        type: boolean
+      nodeSelector:
+        $ref: '#/$defs/nodeSelector'
+      resources:
+        $ref: '#/$defs/resources'
+      tolerations:
+        $ref: '#/$defs/tolerations'
+      topologySpreadConstraints:
+        $ref: '#/$defs/topologySpreadConstraints'
+    required:
+      - enabled
+    title: Common Resource
+    type: object
+  cpumem:
+    additionalProperties: false
+    properties:
+      cpu:
+        default: 100m
+        pattern: ^[1-9][0-9]*m?$
+        type:
+          - string
+          - integer
+      memory:
+        default: 128Mi
+        pattern: ^[0-9]+(\.[0-9]+)?([KMG]i)?$
+        type:
+          - string
+          - integer
+    title: CPU and Memory specifications
+    type: object
+  extraArgs:
+    description: Additional arguments for a thing???
+    items:
+      type: string
+    title: Extra arguments
+    type: array
+  fluentdBuffer:
+    additionalProperties:
+      $comment: Assuming that these are never structures, only scalars
+      not:
+        type:
+          - object
+          - array
+      type:
+        - string
+        - integer
+        - boolean
+    properties:
+      chunkLimitSize:
+        examples:
+          - 50MB
+        type: string
+      flushInterval:
+        examples:
+          - 15m
+        type: string
+      flushMode:
+        examples:
+          - interval
+        type: string
+      flushThreadBurstInterval:
+        type: number
+      flushThreadCount:
+        type: integer
+      retryForever:
+        type: boolean
+      retryMaxInterval:
+        type: integer
+      retryType:
+        examples:
+          - exponential_backoff
+        type: string
+      timekey:
+        examples:
+          - 10m
+        type: string
+      timekeyUseUtc:
+        type: boolean
+      timekeyWait:
+        examples:
+          - 1m
+        type: string
+      totalLimitSize:
+        examples:
+          - 9GB
+        type: string
+    type: object
+  goDuration:
+    examples:
+      - 2h45m0s
+    pattern: ^([-+]?[0-9]+(.[0-9]+)?(ns|us|µs|ms|s|m|h))+$
+    title: A more complexly expressed amount of time
+    type: string
+  iplist:
+    items:
+      oneOf:
+        - format: ipv4
+        - format: ipv6
+        - format: netmask
+      type: string
+    type: array
+  listen:
+    additionalProperties: false
+    properties:
+      ips:
+        $ref: '#/$defs/iplist'
+      ports:
+        $ref: '#/$defs/portlist'
+    type: object
+  nodeSelector:
+    additionalProperties:
+      type: string
+    examples:
+      - kubernetes.io/os: linux
+    type: object
+  pct:
+    description: Percentage, 0% - 100%
+    maximum: 100
+    minimum: 0
+    title: Percentage
+    type: number
+  portlist:
+    items:
+      maximum: 65535
+      minimum: 1
+      type: integer
+    type: array
+  resources:
+    additionalProperties: false
+    properties:
+      limits:
+        $ref: '#/$defs/cpumem'
+      requests:
+        $ref: '#/$defs/cpumem'
+    type: object
+  timeRange:
+    examples:
+      - 300s
+      - 72h
+      - 3dd
+    pattern: ^[0-9]+[hmsd]+$
+    title: An amount of time
+    type: string
+  tolerations:
+    items:
+      additionalProperties: false
+      properties:
+        effect:
+          examples:
+            - NoExecute
+            - NoSchedule
+            - PreferNoSchedule
+          type: string
+        key:
+          examples:
+            - node.kubernetes.io/memory-pressure
+            - node.kubernetes.io/not-ready
+            - node.kubernetes.io/unreachable
+            - node-role.kubernetes.io/control-plane
+            - node-role.kubernetes.io/master
+          type: string
+        operator:
+          examples:
+            - Exists
+          type: string
+        tolerationSeconds:
+          type: integer
+        value:
+          type: string
+      type: object
+    type: array
+  topologySpreadConstraints:
+    items:
+      additionalProperties: false
+      properties:
+        labelSelector:
+          additionalProperties: false
+          properties:
+            matchLabels:
+              additionalProperties:
+                type: string
+              properties: {}
+              type: object
+          type: object
+        maxSkew:
+          default: 1
+          type: number
+        topologyKey:
+          default: kubernetes.io/hostname
+          type: string
+        whenUnsatisfiable:
+          default: DoNotSchedule
+          type: string
+      type: object
+    type: array
 type: object
 required:
   - global
