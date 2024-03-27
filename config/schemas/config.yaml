@@ -1363,6 +1363,655 @@ properties:
         items:
           type: string
     type: object
+  clusterAdmin:
+    additionalProperties: false
+    properties:
+      groups:
+        items:
+          type: string
+        type: array
+      users:
+        items:
+          type: string
+        type: array
+    type: object
+  dex:
+    additionalProperties: false
+    dependentRequred:
+      enableStaticLogin:
+        - staticPassword
+    properties:
+      additionalKubeloginRedirects:
+        items:
+          examples:
+            - http://localhost:8080/redirect
+          format: uri
+          type: string
+        type: array
+      affinity:
+        $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      enableStaticLogin:
+        default: true
+        description: enable a static password login
+        type: boolean
+      expiry:
+        additionalProperties: false
+        properties:
+          deviceRequests:
+            $ref: '#/$defs/timeRange'
+            default: 5m
+          idToken:
+            $ref: '#/$defs/timeRange'
+            default: 24h
+          refreshTokens:
+            additionalProperties: false
+            properties:
+              absoluteLifetime:
+                $ref: '#/$defs/timeRange'
+                default: 3960h
+              reuseInterval:
+                $ref: '#/$defs/timeRange'
+                default: 3s
+              validIfNotUsedFor:
+                $ref: '#/$defs/timeRange'
+                default: 2160h
+            type: object
+          signingKeys:
+            default: 6h
+            type: string
+        type: object
+      google:
+        additionalProperties: false
+        if:
+          properties:
+            groupSupport:
+              const: true
+        properties:
+          SASecretName:
+            type: string
+          groupSupport:
+            default: false
+            type: boolean
+        then:
+          required:
+            - SASecretName
+        type: object
+      nodeSelector:
+        $ref: '#/$defs/kubernetesNodeSelector'
+      replicaCount:
+        default: 2
+        type: number
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+      serviceMonitor:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+        type: object
+      staticPassword:
+        default: $2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W
+        description: bcrypt hash of a password
+        type: string
+      subdomain:
+        default: dex
+        type: string
+      tolerations:
+        $ref: '#/$defs/kubernetesTolerations'
+      topologySpreadConstraints:
+        $ref: '#/$defs/kubernetesTopologySpreadConstraints'
+    type: object
+  externalTrafficPolicy:
+    additionalProperties: false
+    properties:
+      local:
+        default: false
+        type: boolean
+      whitelistRange:
+        additionalProperties:
+          default: 0.0.0.0/0
+          type:
+            - string
+            - boolean
+        description: |-
+          CIDR IP ranges that enable various
+          `nginx.ingress.kubernetes.io/whitelist-source-range` annotations or a
+          boolean `false` to explicitly opt-out of the annotation.
+        title: IP range allow-lists
+        type: object
+    type: object
+  falco:
+    additionalProperties: false
+    description: |
+      Falco alerting configuration.
+
+      Available rule files and addons can be found at: <https://falcosecurity.github.io/falcoctl/index.yaml>
+    properties:
+      affinity:
+        $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      alerts:
+        additionalProperties: false
+        description: Falco alerts will come from prometheus metrics
+        properties:
+          enabled:
+            default: false
+            type: boolean
+          hostPort:
+            default: http://alertmanager-operated.monitoring:9093
+            format: uri
+            type: string
+          priority:
+            default: notice
+            type: string
+          type:
+            default: alertmanager
+            enum:
+              - alertmanager
+              - slack
+            type: string
+        type: object
+      artifact:
+        additionalProperties: false
+        properties:
+          install:
+            additionalProperties: false
+            description: set to false in an air-gapped environment, unless artifacts are self-hosted
+            properties:
+              enabled:
+                type: boolean
+            type: object
+        type: object
+      customIndexes:
+        type: array
+      customRules:
+        additionalProperties:
+          format: yaml
+          type: string
+        type: object
+      driver:
+        properties:
+          kind:
+            default: kmod
+            type: string
+            enum:
+              - kmod
+              - ebpf
+              - modern-bpf
+        type: object
+        if:
+          properties:
+            kind:
+              const: kmod
+        then:
+          properties:
+            module:
+              additionalProperties: false
+              description: override the URL used for downloading driver modules, e.g. to use a self hosted file server in an air-gapped environment
+              properties:
+                repoURL:
+                  oneOf:
+                    - contst: ""
+                    - format: uri
+                  type: string
+              type: object
+        else:
+          properties:
+            kind:
+              type: string
+              enum:
+                - ebpf
+                - modern-bpf
+            ebpf:
+              additionalProperties: false
+              properties:
+                hostNetwork:
+                  description: Needed to enable eBPF JIT at runtime for performance reasons. Can be skipped if eBPF JIT is enabled from outside the container
+                  default: false
+                  type: boolean
+                path:
+                  description: Path where the eBPF probe is located. It comes in handy when the probe have been installed in the nodes using tools other than the init container deployed with the chart.
+                  type:
+                    - string
+                    - "null"
+                  $comment: Phase out the null default from the default config eventually
+              type: object
+      enabled:
+        default: true
+        type: boolean
+      falcoExporter:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+        type: object
+      falcoSidekick:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+        type: object
+      nodeSelector:
+        $ref: '#/$defs/kubernetesNodeSelector'
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+      rulesFiles:
+        additionalProperties: false
+        properties:
+          default:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: true
+                type: boolean
+              version:
+                default: 2.0.0
+                type: string
+            type: object
+          incubating:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: false
+                type: boolean
+              version:
+                default: 2.0.0
+                type: string
+            type: object
+          sandbox:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: false
+                type: boolean
+              version:
+                default: 2.0.0
+                type: string
+            type: object
+        type: object
+      tolerations:
+        $ref: '#/$defs/kubernetesTolerations'
+      tty:
+        default: true
+        type: boolean
+    type: object
+  gatekeeper:
+    title: Open Policy Agent Gatekeeper configuration
+    type: object
+    properties:
+      allowUserCRDs:
+        properties:
+          enabled:
+            type: boolean
+          enforcement:
+            type: string
+          adminConfUser:
+            description: |-
+              The name of the user specified in /etc/kubernetes/admin.conf kubeconfig file of the control plane nodes
+              Necessary if Kubespray is used for managing the k8s cluster.
+            type: string
+          extraCRDs:
+            type: array
+            items:
+              type: object
+              properties:
+                names:
+                  type: array
+                  items:
+                    type: string
+                group:
+                  type: string
+          extraServiceAccounts:
+            type: array
+            items:
+              type: object
+              properties:
+                namespace:
+                  type: string
+                name:
+                  type: string
+              additionalProperties: false
+      enabled:
+        type: boolean
+    additionalProperties: false
+  kured:
+    additionalProperties: false
+    properties:
+      affinity:
+        $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      configuration:
+        $comment: Would it be possible to extract schema from somewhere else in the future?
+        description: |-
+          Passed through as-is to Kured chart
+          See <helmfile.d/upstream/kubereboot/kured/README.md#Configuration>
+        properties: {}
+        type: object
+      drainTimeout: true
+      dsAnnotations:
+        type: object
+      enabled:
+        default: false
+        type: boolean
+      endTime: true
+      extraArgs:
+        type: object
+      extraEnvVars:
+        type: object
+      metrics:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          interval:
+            default: 60s
+            type: string
+          labels:
+            type: object
+        type: object
+      nodeSelector:
+        $ref: '#/$defs/kubernetesNodeSelector'
+      notification:
+        additionalProperties: false
+        properties:
+          slack:
+            additionalProperties: false
+            properties:
+              channel:
+                default: ""
+                type: string
+              enabled:
+                default: false
+                type: boolean
+            type: object
+        type: object
+      period: true
+      rebootDays: true
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+      startTime: true
+      timeZone: true
+      tolerations:
+        $ref: '#/$defs/kubernetesTolerations'
+    type: object
+  opa:
+    additionalProperties: false
+    properties:
+      audit:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+          topologySpreadConstraints:
+            $ref: '#/$defs/kubernetesTopologySpreadConstraints'
+          writeToRAMDisk:
+            default: false
+            type: boolean
+        type: object
+      auditChunkSize:
+        default: 500
+        type: number
+      auditFromCache:
+        default: false
+        type: boolean
+      auditIntervalSeconds:
+        default: 600
+        type: number
+      constraintViolationsLimit:
+        default: 20
+        type: number
+      controllerManager:
+        $ref: '#/$defs/component'
+      disallowedTags:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          enforcement:
+            default: deny
+            type: string
+          tags:
+            items:
+              default: latest
+              type: string
+            type: array
+        type: object
+      imageRegistry:
+        additionalProperties: false
+        properties:
+          URL:
+            items:
+              examples:
+                - harbor.example.com
+                - quay.io/jetstack/cert-manager-acmesolver
+              type: string
+            type: array
+          enabled:
+            default: true
+            type: boolean
+          enforcement:
+            default: warn
+            type: string
+        type: object
+      mutatingWebhookTimeoutSeconds:
+        default: 5
+        type: number
+      mutations:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          jobTTL:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: true
+                type: boolean
+              ttlSeconds:
+                default: 604800
+                type: number
+            type: object
+          ndots:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: false
+                type: boolean
+              labelSelector:
+                additionalProperties: false
+                properties:
+                  matchLabels: {}
+                type: object
+              ndotAmount:
+                default: 3
+                type: integer
+            type: object
+        type: object
+      networkPolicies:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          enforcement:
+            default: warn
+            type: string
+        type: object
+      rejectLoadBalancerService:
+        additionalProperties: false
+        description: Prevent the creation of load balancer services when unsupported
+        properties:
+          enabled:
+            type: boolean
+          enforcement:
+            default: deny
+            enum:
+              - dryrun
+              - warn
+              - deny
+            type: string
+        type: object
+      resourceRequests:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          enforcement:
+            default: deny
+            enum:
+              - dryrun
+              - warn
+              - deny
+            type: string
+        type: object
+      validatingWebhookTimeoutSeconds:
+        default: 5
+        type: number
+      minimumDeploymentReplicas:
+        type: object
+        properties:
+          enabled:
+            type: boolean
+            default: true
+          enforcemenct:
+            type: string
+            default: warn
+            enum:
+              - dryrun
+              - warn
+              - deny
+    type: object
+  trivy:
+    additionalProperties: false
+    patternProperties:
+      \w+Enabled$:
+        $comment: |-
+          This definition applies to any key that ends with 'Enabled', which are all
+          booleans. In the future it may be desirable to replace this with individual
+          entries under `properties` in order to provide documentation for each
+          scanner.
+        description: Enable or disable various security scanners
+        type: boolean
+    properties:
+      affinity:
+        $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      enabled:
+        default: true
+        type: boolean
+      excludeNamespaces:
+        description: comma separated list of namespaces (or glob patterns) to be excluded from scanning
+        type: string
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+      scanJobs:
+        additionalProperties: false
+        properties:
+          concurrentLimit:
+            default: 1
+            type: number
+          retryDelay:
+            default: 1m
+            type: string
+          timeout:
+            default: 5m
+            type: string
+        type: object
+      scanner:
+        additionalProperties: false
+        description: |
+          configurations for an offline / air-gapped environment
+          ref: <https://github.com/aquasecurity/trivy-operator/tree/main/deploy/helm#values>
+        properties:
+          additionalProperties: false
+          dbRegistry:
+            type: string
+          dbRepository:
+            type: string
+          dbRepositoryInsecure:
+            type: boolean
+          imagePullSecret:
+            additionalProperties: false
+            description: |
+              if authorization is required for pulling from registry, create a pull
+              secret in the monitoring namespace and configure the secret name
+            properties:
+              name:
+                type: string
+            type: object
+          javaDbRegistry:
+            type: string
+          javaDbRepository:
+            type: string
+          offlineScanEnabled:
+            type: boolean
+          registry:
+            examples:
+              - docker.io: registry.example.org:5000
+                gcr.io: registry.example.org:5000
+                ghcr.io: registry.example.org:5000
+                index.docker.io: registry.example.org:5000
+                quay.io: registry.example.org:5000
+                registry.k8s.io: registry.example.org:5000
+            properties:
+              mirror:
+                additionalProperties:
+                  description: a docker registry
+                  examples:
+                    - registry.example.org:5000
+                  type: string
+                type: object
+            type: object
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          timeout:
+            $ref: '#/$defs/goDuration'
+        type: object
+      serviceMonitor:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          interval:
+            $ref: '#/$defs/timeRange'
+        type: object
+      tolerations:
+        $ref: '#/$defs/kubernetesTolerations'
+      vulnerabilityScanner:
+        additionalProperties: false
+        properties:
+          scanOnlyCurrentRevisions:
+            default: true
+            type: boolean
+          scannerReportTTL:
+            $ref: '#/$defs/timeRange'
+            default: 720h
+        type: object
+    required:
+      - enabled
+    title: Trivy security scanner
+    type: object
 additionalProperties:
   type: object
   properties: {}

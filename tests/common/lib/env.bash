@@ -91,7 +91,7 @@ env.init() {
     yq_set 'sc' '.networkPolicies.opensearch.plugins.ips' '["0.0.0.0/0"]'
   fi
 
-  yq_set 'wc' '.opa.imageRegistry.URL' '"harbor.ck8s.example.com"'
+  yq_set 'wc' '.opa.imageRegistry.URL' '["harbor.ck8s.example.com"]'
 
   yq_set 'wc' '.user.adminUsers' '["user@example.com"]'
   yq_set 'wc' '.user.adminGroups' '["group@example.com"]'
