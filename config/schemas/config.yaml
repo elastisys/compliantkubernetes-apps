@@ -1,19 +1,503 @@
 $schema: https://json-schema.org/draft/2020-12/schema
-# TODO point to main branch before merge
-$id: https://github.com/elastisys/compliantkubernetes-apps/raw/ka/jsonschema/config/schemas/config.yaml
+$id: https://github.com/elastisys/compliantkubernetes-apps/raw/main/config/schemas/config.yaml
 title: Compliant Kubernetes Apps settings
 description: |
   This describes the structure of the configuration for both the service
   cluster and the workload cluster, but keep in mind that each configuration
   file will contain different settings.
 $defs:
-  $comment: |
-    Location for common types of things for reuse with a reference like
+  component:
+    deprecated: true
+    additionalProperties: false
+    description: This is meant to describe the base class if you will, for ck8s resources.
+    properties:
+      affinity:
+        $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      enabled:
+        type: boolean
+      nodeSelector:
+        $ref: '#/$defs/kubernetesNodeSelector'
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+      tolerations:
+        $ref: '#/$defs/kubernetesTolerations'
+      topologySpreadConstraints:
+        $ref: '#/$defs/kubernetesTopologySpreadConstraints'
+    required: [] # Shouldn't at least 'enabled' be required?
+    title: Common Resource
+    type: object
+  cpumem:
+    deprecated: true
+    description: |
+      Use `.$defs.kubernetesQuantity` instead.
+    additionalProperties: false
+    properties:
+      cpu:
+        default: 100m
+        pattern: ^[1-9][0-9]*m?$
+        type:
+          - string
+          - integer
+      memory:
+        default: 128Mi
+        pattern: ^[0-9]+(\.[0-9]+)?([KMG]i)?$
+        type:
+          - string
+          - integer
+    title: CPU and Memory specifications
+    type: object
+  extraArgs:
+    items:
+      type: string
+    title: Extra arguments
+    description: Extra arguments passed to a container
+    type: array
+  fluentdBuffer:
+    additionalProperties:
+      $comment: Assuming that these are never structures, only scalars
+      not:
+        type:
+          - object
+          - array
+      type:
+        - string
+        - integer
+        - boolean
+    properties:
+      chunkLimitSize:
+        examples:
+          - 50MB
+        type: string
+      flushInterval:
+        examples:
+          - 15m
+        type: string
+      flushMode:
+        examples:
+          - interval
+        type: string
+      flushThreadBurstInterval:
+        type: number
+      flushThreadCount:
+        type: integer
+      retryForever:
+        type: boolean
+      retryMaxInterval:
+        type: integer
+      retryType:
+        examples:
+          - exponential_backoff
+        type: string
+      timekey:
+        examples:
+          - 10m
+        type: string
+      timekeyUseUtc:
+        type: boolean
+      timekeyWait:
+        examples:
+          - 1m
+        type: string
+      totalLimitSize:
+        examples:
+          - 9GB
+        type: string
+    type: object
+  goDuration:
+    examples:
+      - 2h45m0s
+    pattern: ^([-+]?[0-9]+(.[0-9]+)?(ns|us|µs|ms|s|m|h))+$
+    title: Duration string
+    description: |
+      A duration string is a possibly signed sequence of decimal numbers, each with optional fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
+      Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+    type: string
+  iplist:
+    title: List of IP netmasks
+    items:
+      type: string
+      regex: ^[0-9a-f.:]{2,45}/[0-9]{1,3}$
+      description: A IP address with netmask
+      examples:
+        - 0.0.0.0/0
+        - 192.0.2.1/24
+        - 2001:db8:0:1234::/64
+    type: array
+  netpolRule:
+    title: IP and port list
+    additionalProperties: false
+    properties:
+      ips:
+        $ref: '#/$defs/iplist'
+      ports:
+        $ref: '#/$defs/portlist'
+    type: object
+  kubernetesNodeSelector:
+    additionalProperties:
+      type: string
+    examples:
+      - kubernetes.io/os: linux
+    type: object
+  percentage:
+    description: Percentage, 0% - 100%
+    maximum: 100
+    minimum: 0
+    title: Percentage
+    type: number
+  portlist:
+    title: Port number
+    description: A 16 bit unsigned integer
+    items:
+      maximum: 65535
+      minimum: 1
+      type: integer
+    type: array
+  kubernetesResourceRequirements:
+    title: Resource requirements
+    description: |-
+      Resource requests are used by the kube-scheduler to pick a node to schedule
+      pods on. Limits are enforced. Resources are commonly 'cpu' and 'memory'.
+    additionalProperties: false
+    properties:
+      requests:
+        $ref: '#/$defs/kubernetesQuantityMap'
+      limits:
+        $ref: '#/$defs/kubernetesQuantityMap'
+    type: object
+    examples:
+      - requests:
+          memory: 128Mi
+          cpu: 100m
+        limits:
+          memory: 256Mi
+          cpu: 250m
+  timeRange:
+    examples:
+      - 300s
+      - 72h
+      - 3d
+    pattern: ^[0-9]+[hmsd]+$
+    title: An amount of time
+    type: string
+  kubernetesTolerations:
+    items:
+      additionalProperties: false
+      properties:
+        effect:
+          examples:
+            - NoExecute
+            - NoSchedule
+            - PreferNoSchedule
+          type: string
+        key:
+          examples:
+            - node.kubernetes.io/memory-pressure
+            - node.kubernetes.io/not-ready
+            - node.kubernetes.io/unreachable
+            - node-role.kubernetes.io/control-plane
+            - node-role.kubernetes.io/master
+          type: string
+        operator:
+          examples:
+            - Exists
+          type: string
+        tolerationSeconds:
+          type: integer
+        value:
+          type: string
+      type: object
+    type: array
+  kubernetesTopologySpreadConstraints:
+    items:
+      additionalProperties: false
+      properties:
+        labelSelector:
+          additionalProperties: false
+          properties:
+            matchLabels:
+              additionalProperties:
+                type: string
+              properties: {}
+              type: object
+          type: object
+        maxSkew:
+          default: 1
+          type: number
+        topologyKey:
+          default: kubernetes.io/hostname
+          type: string
+        whenUnsatisfiable:
+          default: DoNotSchedule
+          type: string
+      type: object
+    type: array
+  kubernetesQuantityMap:
+    type: object
+    additionalProperties:
+      $ref: '#/$defs/kubernetesQuantity'
+  kubernetesQuantity:
+    title: Quantity
+    type:
+      - string
+      - number
+    regex: ^[-+]?[0-9]+([KMGTPE]i|[eE][0-9]+|[mkMGTPE])?$
+    description: |-
+      Used for CPU shares, memory and storage size etc.
 
-    ```yaml
-    thing:
-      $ref: "#/$defs/thing"
-    ```
+      See <https://github.com/kubernetes/apimachinery/blob/master/pkg/api/resource/quantity.go>
+  io.k8s.api.core.v1.Affinity:
+    description: Affinity is a group of affinity scheduling rules.
+    properties:
+      nodeAffinity:
+        allOf:
+          - $ref: '#/$defs/io.k8s.api.core.v1.NodeAffinity'
+        description: Describes node affinity scheduling rules for the pod.
+      podAffinity:
+        allOf:
+          - $ref: '#/$defs/io.k8s.api.core.v1.PodAffinity'
+        description: Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).
+      podAntiAffinity:
+        allOf:
+          - $ref: '#/$defs/io.k8s.api.core.v1.PodAntiAffinity'
+        description: Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).
+    type: object
+  io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement:
+    description: A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
+    properties:
+      key:
+        default: ""
+        description: key is the label key that the selector applies to.
+        type: string
+      operator:
+        default: ""
+        description: operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.
+        type: string
+      values:
+        description: values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
+        items:
+          default: ""
+          type: string
+        type: array
+        x-kubernetes-list-type: atomic
+    required:
+      - key
+      - operator
+    type: object
+  io.k8s.api.core.v1.NodeAffinity:
+    description: Node affinity is a group of node affinity scheduling rules.
+    properties:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        description: The scheduler will prefer to schedule pods to nodes that satisfy the affinity expressions specified by this field, but it may choose a node that violates one or more of the expressions. The node that is most preferred is the one with the greatest sum of weights, i.e. for each node that meets all of the scheduling requirements (resource request, requiredDuringScheduling affinity expressions, etc.), compute a sum by iterating through the elements of this field and adding "weight" to the sum if the node matches the corresponding matchExpressions; the node(s) with the highest sum are the most preferred.
+        items:
+          allOf:
+            - $ref: '#/$defs/io.k8s.api.core.v1.PreferredSchedulingTerm'
+          default: {}
+        type: array
+        x-kubernetes-list-type: atomic
+      requiredDuringSchedulingIgnoredDuringExecution:
+        allOf:
+          - $ref: '#/$defs/io.k8s.api.core.v1.NodeSelector'
+        description: If the affinity requirements specified by this field are not met at scheduling time, the pod will not be scheduled onto the node. If the affinity requirements specified by this field cease to be met at some point during pod execution (e.g. due to an update), the system may or may not try to eventually evict the pod from its node.
+    type: object
+    $comment: Imported from Kubernetes project
+  io.k8s.api.core.v1.PodAffinity:
+    description: Pod affinity is a group of inter pod affinity scheduling rules.
+    properties:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        description: The scheduler will prefer to schedule pods to nodes that satisfy the affinity expressions specified by this field, but it may choose a node that violates one or more of the expressions. The node that is most preferred is the one with the greatest sum of weights, i.e. for each node that meets all of the scheduling requirements (resource request, requiredDuringScheduling affinity expressions, etc.), compute a sum by iterating through the elements of this field and adding "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the node(s) with the highest sum are the most preferred.
+        items:
+          allOf:
+            - $ref: '#/$defs/io.k8s.api.core.v1.WeightedPodAffinityTerm'
+          default: {}
+        type: array
+        x-kubernetes-list-type: atomic
+      requiredDuringSchedulingIgnoredDuringExecution:
+        description: If the affinity requirements specified by this field are not met at scheduling time, the pod will not be scheduled onto the node. If the affinity requirements specified by this field cease to be met at some point during pod execution (e.g. due to a pod label update), the system may or may not try to eventually evict the pod from its node. When there are multiple elements, the lists of nodes corresponding to each podAffinityTerm are intersected, i.e. all terms must be satisfied.
+        items:
+          allOf:
+            - $ref: '#/$defs/io.k8s.api.core.v1.PodAffinityTerm'
+          default: {}
+        type: array
+        x-kubernetes-list-type: atomic
+    type: object
+    $comment: Imported from Kubernetes project
+  io.k8s.api.core.v1.PodAntiAffinity:
+    description: Pod anti affinity is a group of inter pod anti affinity scheduling rules.
+    properties:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        description: The scheduler will prefer to schedule pods to nodes that satisfy the anti-affinity expressions specified by this field, but it may choose a node that violates one or more of the expressions. The node that is most preferred is the one with the greatest sum of weights, i.e. for each node that meets all of the scheduling requirements (resource request, requiredDuringScheduling anti-affinity expressions, etc.), compute a sum by iterating through the elements of this field and adding "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the node(s) with the highest sum are the most preferred.
+        items:
+          allOf:
+            - $ref: '#/$defs/io.k8s.api.core.v1.WeightedPodAffinityTerm'
+          default: {}
+        type: array
+        x-kubernetes-list-type: atomic
+      requiredDuringSchedulingIgnoredDuringExecution:
+        description: If the anti-affinity requirements specified by this field are not met at scheduling time, the pod will not be scheduled onto the node. If the anti-affinity requirements specified by this field cease to be met at some point during pod execution (e.g. due to a pod label update), the system may or may not try to eventually evict the pod from its node. When there are multiple elements, the lists of nodes corresponding to each podAffinityTerm are intersected, i.e. all terms must be satisfied.
+        items:
+          allOf:
+            - $ref: '#/$defs/io.k8s.api.core.v1.PodAffinityTerm'
+          default: {}
+        type: array
+        x-kubernetes-list-type: atomic
+    type: object
+    $comment: Imported from Kubernetes project
+  io.k8s.api.core.v1.PreferredSchedulingTerm:
+    description: An empty preferred scheduling term matches all objects with implicit weight 0 (i.e. it's a no-op). A null preferred scheduling term matches no objects (i.e. is also a no-op).
+    properties:
+      preference:
+        allOf:
+          - $ref: '#/$defs/io.k8s.api.core.v1.NodeSelectorTerm'
+        default: {}
+        description: A node selector term, associated with the corresponding weight.
+      weight:
+        default: 0
+        description: Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.
+        format: int32
+        type: integer
+    required:
+      - weight
+      - preference
+    type: object
+    $comment: Imported from Kubernetes project
+  io.k8s.api.core.v1.NodeSelector:
+    description: A node selector represents the union of the results of one or more label queries over a set of nodes; that is, it represents the OR of the selectors represented by the node selector terms.
+    properties:
+      nodeSelectorTerms:
+        description: Required. A list of node selector terms. The terms are ORed.
+        items:
+          allOf:
+            - $ref: '#/$defs/io.k8s.api.core.v1.NodeSelectorTerm'
+          default: {}
+        type: array
+        x-kubernetes-list-type: atomic
+    required:
+      - nodeSelectorTerms
+    type: object
+    x-kubernetes-map-type: atomic
+    $comment: Imported from Kubernetes project
+  io.k8s.api.core.v1.WeightedPodAffinityTerm:
+    description: The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
+    properties:
+      podAffinityTerm:
+        allOf:
+          - $ref: '#/$defs/io.k8s.api.core.v1.PodAffinityTerm'
+        default: {}
+        description: Required. A pod affinity term, associated with the corresponding weight.
+      weight:
+        default: 0
+        description: weight associated with matching the corresponding podAffinityTerm, in the range 1-100.
+        format: int32
+        type: integer
+    required:
+      - weight
+      - podAffinityTerm
+    type: object
+    $comment: Imported from Kubernetes project
+  io.k8s.api.core.v1.PodAffinityTerm:
+    description: Defines a set of pods (namely those matching the labelSelector relative to the given namespace(s)) that this pod should be co-located (affinity) or not co-located (anti-affinity) with, where co-located is defined as running on a node whose value of the label with key <topologyKey> matches that of any node on which a pod of the set of pods is running
+    properties:
+      labelSelector:
+        allOf:
+          - $ref: '#/$defs/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector'
+        description: A label query over a set of resources, in this case pods. If it's null, this PodAffinityTerm matches with no Pods.
+      matchLabelKeys:
+        description: MatchLabelKeys is a set of pod label keys to select which pods will be taken into consideration. The keys are used to lookup values from the incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)` to select the group of existing pods which pods will be taken into consideration for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming pod labels will be ignored. The default value is empty. The same key is forbidden to exist in both matchLabelKeys and labelSelector. Also, matchLabelKeys cannot be set when labelSelector isn't set. This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+        items:
+          default: ""
+          type: string
+        type: array
+        x-kubernetes-list-type: atomic
+      mismatchLabelKeys:
+        description: MismatchLabelKeys is a set of pod label keys to select which pods will be taken into consideration. The keys are used to lookup values from the incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)` to select the group of existing pods which pods will be taken into consideration for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming pod labels will be ignored. The default value is empty. The same key is forbidden to exist in both mismatchLabelKeys and labelSelector. Also, mismatchLabelKeys cannot be set when labelSelector isn't set. This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+        items:
+          default: ""
+          type: string
+        type: array
+        x-kubernetes-list-type: atomic
+      namespaceSelector:
+        allOf:
+          - $ref: '#/$defs/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector'
+        description: A label query over the set of namespaces that the term applies to. The term is applied to the union of the namespaces selected by this field and the ones listed in the namespaces field. null selector and null or empty namespaces list means "this pod's namespace". An empty selector ({}) matches all namespaces.
+      namespaces:
+        description: namespaces specifies a static list of namespace names that the term applies to. The term is applied to the union of the namespaces listed in this field and the ones selected by namespaceSelector. null or empty namespaces list and null namespaceSelector means "this pod's namespace".
+        items:
+          default: ""
+          type: string
+        type: array
+        x-kubernetes-list-type: atomic
+      topologyKey:
+        default: ""
+        description: This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching the labelSelector in the specified namespaces, where co-located is defined as running on a node whose value of the label with key topologyKey matches that of any node on which any of the selected pods is running. Empty topologyKey is not allowed.
+        type: string
+    required:
+      - topologyKey
+    type: object
+    $comment: Imported from Kubernetes project
+  io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector:
+    description: A label selector is a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. An empty label selector matches all objects. A null label selector matches no objects.
+    properties:
+      matchExpressions:
+        description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
+        items:
+          allOf:
+            - $ref: '#/$defs/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement'
+          default: {}
+        type: array
+        x-kubernetes-list-type: atomic
+      matchLabels:
+        additionalProperties:
+          default: ""
+          type: string
+        description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
+        type: object
+    type: object
+    x-kubernetes-map-type: atomic
+    $comment: Imported from Kubernetes project
+  io.k8s.api.core.v1.NodeSelectorTerm:
+    description: A null or empty node selector term matches no objects. The requirements of them are ANDed. The TopologySelectorTerm type implements a subset of the NodeSelectorTerm.
+    properties:
+      matchExpressions:
+        description: A list of node selector requirements by node's labels.
+        items:
+          allOf:
+            - $ref: '#/$defs/io.k8s.api.core.v1.NodeSelectorRequirement'
+          default: {}
+        type: array
+        x-kubernetes-list-type: atomic
+      matchFields:
+        description: A list of node selector requirements by node's fields.
+        items:
+          allOf:
+            - $ref: '#/$defs/io.k8s.api.core.v1.NodeSelectorRequirement'
+          default: {}
+        type: array
+        x-kubernetes-list-type: atomic
+    type: object
+    x-kubernetes-map-type: atomic
+  io.k8s.api.core.v1.NodeSelectorRequirement:
+    description: A node selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
+    properties:
+      key:
+        default: ""
+        description: The label key that the selector applies to.
+        type: string
+      operator:
+        default: ""
+        description: Represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+        type: string
+      values:
+        description: An array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. If the operator is Gt or Lt, the values array must have a single element, which will be interpreted as an integer. This array is replaced during a strategic merge patch.
+        items:
+          default: ""
+          type: string
+        type: array
+        x-kubernetes-list-type: atomic
+    required:
+      - key
+      - operator
+    type: object
+    $comment: Imported from Kubernetes project
 type: object
 required:
   - global
@@ -127,6 +611,753 @@ properties:
           - containerd
           - docker
     additionalProperties: false
+  clusterApi:
+    additionalProperties: false
+    properties:
+      clusters:
+        items:
+          type: string
+        type: array
+      enabled:
+        default: false
+        type: boolean
+      monitoring:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: false
+            type: boolean
+        type: object
+    type: object
+  user:
+    additionalProperties: false
+    properties:
+      adminGroups:
+        items:
+          type: string
+        type: array
+      adminUsers:
+        items:
+          examples:
+            - admin@example.com
+          type: string
+        type: array
+      constraints:
+        additionalProperties:
+          additionalProperties:
+            properties: {}
+            type: object
+          properties: {}
+          propertyNames:
+            title: Service name
+            type: string
+          type: object
+        description: |-
+          Any namespace listed in constraints are exempted from HNC managed namespaces
+          This to override the Pod Security Admission level
+          Example of constraint can be found here: helmfile.d/charts/gatekeeper/podsecuritypolicies/values.yaml
+          The only extra label "psaLevel: <baseline/privileged>" is shown in the following example:
+          <namespace>:
+            psaLevel: <baseline/privileged>
+            <service-name>:
+              ...
+        properties: {}
+        propertyNames:
+          title: Namespace
+          type: string
+        type: object
+      createNamespaces:
+        type: boolean
+        description: This only controls if the namespaces should be created, user RBAC is always created.
+      grafanaPassword:
+        type: string
+      namespaces:
+        items:
+          examples:
+            - production
+            - staging
+          type: string
+        type: array
+      serviceAccounts:
+        items:
+          type: string
+        type: array
+      alertmanager:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          enabled:
+            type: boolean
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+          topologySpreadConstraints:
+            $ref: '#/$defs/kubernetesTopologySpreadConstraints'
+          ingress:
+            type: object
+            properties:
+              enabled:
+                type: boolean
+          image:
+            type: string
+            examples:
+              - quay.io/prometheus/alertmanager:vX.Y.Z
+            description: Set to override the alertmanager container image
+        type: object
+      sealedSecrets:
+        type: object
+        properties:
+          enabled:
+            type: boolean
+        additionalProperties: false
+        title: sealedSecrets
+        description: |-
+          Installs required cluster resources needed to install sealedSecrets
+          Requires that gatekeeper.allowUserCRDs.enabled is enabled.
+      mongodb:
+        description: |-
+          Installs required cluster resources needed to install fluxv2
+          Requires that gatekeeper.allowUserCRDs.enabled is enabled.
+        type: object
+        properties:
+          enabled:
+            type: boolean
+        additionalProperties: false
+        title: mongodb
+      fluxv2:
+        type: object
+        properties:
+          enabled:
+            type: boolean
+        additionalProperties: false
+        title: fluxv2
+        description: |-
+          Installs required cluster resources needed to install fluxv2
+          Requires that gatekeeper.allowUserCRDs.enabled is enabled.
+      kafka:
+        description: |-
+          Installs required cluster resources needed to install kafka-operator
+          Requires that gatekeeper.allowUserCRDs.enabled is enabled.
+        type: object
+        properties:
+          enabled:
+            type: boolean
+        additionalProperties: false
+        title: kafka
+    type: object
+    title: User configuration
+  hnc:
+    additionalProperties: false
+    properties:
+      additionalAllowPropagateResources:
+        items:
+          additionalProperties: false
+          properties:
+            group:
+              examples:
+                - networking.k8s.io
+              type: string
+            resource:
+              examples:
+                - networkpolicies
+                - secrets
+              type: string
+          type: object
+        type: array
+      excludedExtraNamespaces:
+        items:
+          type: string
+        type: array
+      excludedNamespaces:
+        items:
+          examples:
+            - alertmanager
+            - cert-manager
+            - falco
+            - fluentd
+            - fluentd-system
+            - gatekeeper-system
+            - hnc-system
+            - ingress-nginx
+            - kube-node-lease
+            - kube-public
+            - kube-system
+            - kured
+            - metallb-system
+            - monitoring
+            - rook-ceph
+            - velero
+          type: string
+        type: array
+      ha:
+        type: boolean
+      includedNamespacesRegex:
+        type: string
+      managedNamespaceAnnotations:
+        items:
+          type: string
+        type: array
+      managedNamespaceLabels:
+        items:
+          examples:
+            - pod-security.kubernetes.io/audit
+            - pod-security.kubernetes.io/enforce
+            - pod-security.kubernetes.io/warn
+          type: string
+        type: array
+      manager:
+        $ref: '#/$defs/component'
+      serviceMonitor:
+        additionalProperties: false
+        properties:
+          relabelings:
+            items: {}
+            type: array
+        type: object
+      unpropagatedAnnotations:
+        items: {}
+        type: array
+      webhook:
+        additionalProperties: false
+        properties:
+          affinity:
+            additionalProperties: false
+            properties: {}
+            type: object
+          nodeSelector:
+            additionalProperties: false
+            properties: {}
+            type: object
+          replicaCount:
+            type: integer
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          tolerations:
+            items: {}
+            type: array
+          topologySpreadConstraints:
+            items:
+              additionalProperties: false
+              properties:
+                labelSelector:
+                  additionalProperties: false
+                  properties:
+                    matchLabels:
+                      additionalProperties: false
+                      properties:
+                        app.kubernetes.io/component:
+                          examples:
+                            - hnc-webhook
+                          type: string
+                      type: object
+                  type: object
+                maxSkew:
+                  type: integer
+                topologyKey:
+                  examples:
+                    - kubernetes.io/hostname
+                  type: string
+                whenUnsatisfiable:
+                  examples:
+                    - DoNotSchedule
+                  type: string
+              type: object
+            type: array
+        type: object
+      webhookMatchConditions:
+        type: boolean
+      enabled:
+        type: boolean
+    type: object
+  harbor:
+    additionalProperties: false
+    properties:
+      alerts:
+        additionalProperties: false
+        properties:
+          maxTotalArtifacts:
+            default: 1000
+            type: number
+          maxTotalStorageUsedGB:
+            default: 500
+            type: number
+        type: object
+      backup:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          ephemeralBackupStore:
+            properties:
+              enabled:
+                type: boolean
+              storageSize:
+                type: string
+            type: object
+          retentionDays:
+            default: 7
+            type: number
+        type: object
+      core:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          replicas:
+            default: 1
+            type: number
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+        type: object
+      database:
+        additionalProperties: false
+        properties:
+          external:
+            additionalProperties: false
+            properties:
+              coreDatabase:
+                default: registry
+                type: string
+              notaryServerDatabase:
+                default: notaryserver
+                type: string
+              notarySignerDatabase:
+                default: notarysigner
+                type: string
+              port:
+                default: "5432"
+                type: string
+              sslmode:
+                default: disable
+                enum:
+                  - disable
+                  - require
+                  - verify-ca
+                  - verify-full
+                type: string
+            type: object
+          internal:
+            additionalProperties: false
+            properties:
+              affinity:
+                $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+              persistentVolumeClaim:
+                additionalProperties: false
+                properties:
+                  size:
+                    default: 1Gi
+                    type: string
+                type: object
+              resources:
+                $ref: '#/$defs/kubernetesResourceRequirements'
+            type: object
+          type:
+            default: internal
+            type: string
+        type: object
+      enabled:
+        default: true
+        type: boolean
+      gc:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          forceConfigure:
+            default: false
+            type: boolean
+          schedule:
+            default: 0 0 0 * * SUN
+            type: string
+        type: object
+      ingress:
+        additionalProperties: false
+        properties:
+          additionalAnnotations:
+            type: object
+          defaultAnnotations:
+            additionalProperties: false
+            properties:
+              nginx.ingress.kubernetes.io/proxy-buffering:
+                default: off
+                type: string
+              nginx.ingress.kubernetes.io/proxy-request-buffering:
+                default: off
+                type: string
+            type: object
+        type: object
+      jobservice:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          jobLog:
+            additionalProperties: false
+            properties:
+              persistentVolumeClaim:
+                additionalProperties: false
+                properties:
+                  size:
+                    default: 1Gi
+                    type: string
+                type: object
+            type: object
+          jobLoggers:
+            items:
+              default: file
+              type: string
+            type: array
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          scanDataExports:
+            additionalProperties: false
+            properties:
+              persistentVolumeClaim:
+                additionalProperties: false
+                properties:
+                  size:
+                    default: 1Gi
+                    type: string
+                type: object
+            type: object
+        type: object
+      nodeSelector:
+        $ref: '#/$defs/kubernetesNodeSelector'
+      notary:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          replicas:
+            default: 1
+            type: number
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          subdomain:
+            default: notary.harbor
+            type: string
+        type: object
+      notarySigner:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+        type: object
+      oidc:
+        additionalProperties: false
+        properties:
+          adminGroupName:
+            type: string
+          groupClaimName:
+            default: groups
+            type: string
+          scope:
+            default: openid,email,profile,offline_access,groups
+            type: string
+        type: object
+      persistence:
+        additionalProperties: false
+        properties:
+          disableRedirect:
+            type: boolean
+          type:
+            type: string
+        type: object
+      portal:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          replicas:
+            default: 1
+            type: number
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+        type: object
+      redis:
+        additionalProperties: false
+        properties:
+          external:
+            additionalProperties: false
+            properties:
+              addr:
+                examples:
+                  - rfs-redis-harbor.redis-system.svc.cluster.local:26379
+                type: string
+              sentinelMasterSet:
+                type: string
+            type: object
+          internal:
+            additionalProperties: false
+            properties:
+              affinity:
+                $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+              persistentVolumeClaim:
+                additionalProperties: false
+                properties:
+                  size:
+                    default: 1Gi
+                    type: string
+                type: object
+              resources:
+                $ref: '#/$defs/kubernetesResourceRequirements'
+            type: object
+          type:
+            default: internal
+            type: string
+        type: object
+      registry:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          controller:
+            additionalProperties: false
+            properties:
+              resources:
+                $ref: '#/$defs/kubernetesResourceRequirements'
+            type: object
+          persistentVolumeClaim:
+            additionalProperties: false
+            properties:
+              size:
+                default: 5Gi
+                type: string
+            type: object
+          replicas:
+            default: 1
+            type: number
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+        type: object
+      s3:
+        additionalProperties: false
+        properties:
+          multipartcopythresholdsize:
+            default: "536870912"
+            type: string
+            $comment: turn into number?
+          multipartcopychunksize:
+            type:
+              - integer
+              - string
+          multipartcopymaxconcurrency:
+            type:
+              - integer
+              - string
+        type: object
+      subdomain:
+        default: harbor
+        type: string
+      tolerations:
+        $ref: '#/$defs/kubernetesTolerations'
+      trivy:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          persistentVolumeClaim:
+            additionalProperties: false
+            properties:
+              size:
+                default: 5Gi
+                type: string
+            type: object
+          replicas:
+            default: 1
+            type: number
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+        type: object
+      exporter:
+        additionalProperties: false
+        properties:
+          external:
+            additionalProperties: false
+            properties:
+              coreDatabase:
+                examples:
+                  - registry
+                type: string
+              port:
+                examples:
+                  - "5432"
+                type: string
+            type: object
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+        type: object
+    type: object
+  storageClasses:
+    additionalProperties: false
+    properties:
+      default:
+        type: string
+    type: object
+  objectStorage:
+    additionalProperties: false
+    description: Swift can be enabled separately for Harbor, Thanos and rclone-sync only.
+    properties:
+      buckets:
+        additionalProperties:
+          type: string
+        description: Buckets where each respective application will store its backups.
+        type: object
+      s3:
+        additionalProperties: false
+        properties:
+          accessKey:
+            type: string
+          forcePathStyle:
+            description: Generally false when using AWS and Exoscale and true for other providers.
+            type: boolean
+          region:
+            type: string
+          regionEndpoint:
+            description: S3 endpoint for non-AWS implementation of S3. Make sure to prepend the protocol (i.e., https:// or http://) with the URL, e.g., https://s3.sto1.safedc.net
+            type: string
+          secretKey:
+            type: string
+        type: object
+      sync:
+        additionalProperties: false
+        properties:
+          buckets:
+            type: array
+          defaultSchedule:
+            default: 0 5 * * *
+            type: string
+          destinationType:
+            default: s3
+            type: string
+          enabled:
+            default: false
+            type: boolean
+          encrypt:
+            additionalProperties: false
+            properties:
+              directoryNames:
+                default: false
+                type: boolean
+              enabled:
+                default: false
+                type: boolean
+              fileNames:
+                default: false
+                type: boolean
+            type: object
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          s3:
+            $ref: '#/properties/objectStorage/properties/s3'
+          syncDefaultBuckets:
+            default: false
+            type: boolean
+        type: object
+      type:
+        enum:
+          - s3
+          - gcs
+          - none
+        type: string
+      swift:
+        type: object
+        properties:
+          authVersion:
+            type: number
+          authUrl:
+            type: string
+            format: uri
+          region:
+            type: string
+          domainId:
+            type: string
+          domainName:
+            type: string
+            format: hostname
+          projectDomainId:
+            type: string
+          projectDomainName:
+            type: string
+            format: hostname
+          projectId:
+            type: string
+          projectName:
+            type: string
+          segmentsContainerSuffix:
+            type: string
+      restore:
+        type: object
+        properties: {}
+        $comment: TODO
+    type: object
+  rookCeph:
+    additionalProperties: false
+    properties:
+      gatekeeperPsp:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: false
+            type: boolean
+        type: object
+      monitoring:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: false
+            type: boolean
+        type: object
+    type: object
+  velero:
+    additionalProperties: false
+    properties:
+      enabled:
+        default: true
+        type: boolean
+      nodeAgent:
+        additionalProperties: false
+        properties:
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+        type: object
+      nodeSelector:
+        $ref: '#/$defs/kubernetesNodeSelector'
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+      retentionPeriod:
+        $ref: '#/$defs/goDuration'
+        default: 720h0m0s
+      schedule:
+        default: 0 0 * * *
+        type: string
+      tolerations:
+        $ref: '#/$defs/kubernetesTolerations'
+      storagePrefix:
+        type: string
+        examples:
+          - workload-cluster
+      excludedNamespaces:
+        description: Excluded namespaces
+        type: array
+        items:
+          type: string
+      excludedExtraNamespaces:
+        description: Extra excluded namespace, here we should add the namespaces that are more likely to change
+        type: array
+        items:
+          type: string
+    type: object
 additionalProperties:
   type: object
   properties: {}
