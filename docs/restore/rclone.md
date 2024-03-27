@@ -106,15 +106,13 @@ objectStorage:
 ```
 
 > [!important]
-> With this configuration `rclone-sync` **_may not_ overwrite the data stored in main object storage**!
->
-> To use this restored data the main object storage configuration must be updated.
+> With this configuration `rclone-sync` **_may_ overwrite the data stored in main object storage** depending on your configuration!
 
 ## Apply and run
 
-Apply:
+Apply `app=rclone` with helmfile:
 
-```yaml
+```sh
 ./bin/ck8s ops helmfile sc apply -lapp=rclone --include-transitive-needs
 ```
 
@@ -135,4 +133,33 @@ $ ./bin/ck8s ops kubectl sc -n rclone get pods -lapp.kubernetes.io/instance=rclo
 <rclone restore pods>...
 ```
 
-Then wait for completion.
+Then wait for completion and verify the logs of the `rclone-restore` Pods to ensure that they managed to restore all data.
+
+## Continue restore
+
+After the restore following:
+
+- [the "Configure with existing main and sync" instructions](#configure-with-existing-main-and-sync) _no reconfiguration is required_ to restore other services.
+- [the "Configure without existing main or sync" instructions](#configure-without-existing-main-or-sync) **reconfiguration may be required** to restore other services depending on your configuration.
+
+## Continue sync
+
+> [!important]
+> Ensure you have restored required data from the off-site backup before re-enabling `rclone-sync`!
+
+To re-enable `rclone-sync` update your configuration to match if the object storage or targets have changed.
+
+Disable `rclone-restore` via the config:
+
+```yaml
+# file: sc-config.yaml
+objectStorage:
+  restore:
+    enabled: false
+```
+
+Apply `app=rclone` with helmfile:
+
+```sh
+./bin/ck8s ops helmfile sc apply -lapp=rclone --include-transitive-needs
+```
