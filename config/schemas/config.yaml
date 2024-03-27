@@ -758,6 +758,22 @@ properties:
             type: boolean
         type: object
     type: object
+  nodeLocalDns:
+    additionalProperties: false
+    properties:
+      customConfig:
+        description: https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/#coredns-configmap-options
+        examples:
+          - |-
+            example.com:53 {
+              errors
+              cache 30
+              reload
+              loop
+              forward . 127.0.0.1:9005
+            }
+        type: string
+    type: object
 additionalProperties:
   type: object
   properties: {}
