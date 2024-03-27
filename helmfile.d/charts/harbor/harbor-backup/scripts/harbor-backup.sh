@@ -114,6 +114,55 @@ gcs_remove_path() {
   gsutil -o "Credentials:gs_service_key_file=${GCS_KEYFILE}" rm "${BUCKET_NAME}/${path}"
 }
 
+azure_upload() {
+  : "${AZURE_ACCOUNT_NAME:?Missing AZURE_ACCOUNT_NAME}"
+  : "${AZURE_ACCOUNT_KEY:?Missing AZURE_ACCOUNT_KEY}"
+  : "${AZURE_CONTAINER_NAME:?Missing AZURE_CONTAINER_NAME}"
+  PATH_TO_BACKUP="https://${AZURE_ACCOUNT_NAME}.blob.core.windows.net/${AZURE_CONTAINER_NAME}/backups/$(date +%s).tgz"
+
+  echo "Uploading to Azure Blob Storage bucket ${PATH_TO_BACKUP}" >&2
+
+  az storage blob upload \
+    --account-name "${AZURE_ACCOUNT_NAME}" \
+    --account-key "${AZURE_ACCOUNT_KEY}" \
+    --container-name "${AZURE_CONTAINER_NAME}" \
+    --name "backups/$(date +%s).tgz" \
+    --file "${tarball_dir}/harbor.tgz"
+}
+
+azure_get_records() {
+  : "${AZURE_ACCOUNT_NAME:?Missing AZURE_ACCOUNT_NAME}"
+  : "${AZURE_ACCOUNT_KEY:?Missing AZURE_ACCOUNT_KEY}"
+  : "${AZURE_CONTAINER_NAME:?Missing AZURE_CONTAINER_NAME}"
+
+  if [ $# -lt 1 ]; then
+    echo "ERROR: Need to supply date to azure_get_records" >&2
+    exit 1
+  fi
+
+  # List all blobs in the specified container and filter by date
+  az storage blob list \
+    --account-name "${AZURE_ACCOUNT_NAME}" \
+    --account-key "${AZURE_ACCOUNT_KEY}" \
+    --container-name "${AZURE_CONTAINER_NAME}" \
+    --query "[?properties.lastModified <= '${before_date}'].{Name: name}"
+}
+
+azure_remove_path() {
+  : "${AZURE_ACCOUNT_NAME:?Missing AZURE_ACCOUNT_NAME}"
+  : "${AZURE_ACCOUNT_KEY:?Missing AZURE_ACCOUNT_KEY}"
+  : "${AZURE_CONTAINER_NAME:?Missing AZURE_CONTAINER_NAME}"
+  path=$1
+
+  echo "deleting https://${AZURE_ACCOUNT_NAME}.blob.core.windows.net/${AZURE_CONTAINER_NAME}/${path}" >&2
+  az storage blob delete \
+    --account-name "${AZURE_ACCOUNT_NAME}" \
+    --account-key "${AZURE_ACCOUNT_KEY}" \
+    --container-name "${AZURE_CONTAINER_NAME}" \
+    --name "${path}"
+}
+
+
 remove_old_backups () {
     : "${DAYS_TO_RETAIN:?Missing DAYS_TO_RETAIN}"
 
@@ -129,6 +178,12 @@ remove_old_backups () {
 
       del_records=$(gcs_get_records "${before_date}")
       all_records=$(gcs_get_records "${now}")
+    elif [[ ${AZURE_BACKUP} == "true" ]]; then
+      before_date=$(date -d "-${DAYS_TO_RETAIN} days" +%s)
+      now=$(date +%s)
+
+      del_records=$(azure_get_records "${before_date}")
+      all_records=$(azure_get_records "${now}")
     fi
 
     del_paths=()
@@ -161,6 +216,8 @@ remove_old_backups () {
           s3_remove_path "${path}"
       elif [[ ${GCS_BACKUP} == "true" ]]; then
           gcs_remove_path "${path}"
+      elif [[ ${AZURE_BACKUP} == "true" ]]; then
+          azure_remove_path "${path}"
       fi
     done
 }
@@ -174,5 +231,8 @@ if [[ ${S3_BACKUP} == "true" ]]; then
 fi
 if [[ ${GCS_BACKUP} == "true" ]]; then
   gcs_upload
+fi
+if [[ ${AZURE_BACKUP} == "true" ]]; then
+  azure_upload
 fi
 remove_old_backups

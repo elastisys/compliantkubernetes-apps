@@ -49,6 +49,10 @@ config:
     # secretName: opensearch-gcs-credentials
     # keyfileData: |
     #  {{ .Values.objectStorage.gcs.keyfileData | nindent 6 }}
+  {{- else if eq .Values.objectStorage.type "azure" }}
+  azure:
+    enabled: true
+    containerName: {{ .Values.objectStorage.buckets.opensearch }}
   {{- end }}
 
   {{- end }}

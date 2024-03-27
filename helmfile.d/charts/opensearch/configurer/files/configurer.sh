@@ -70,6 +70,14 @@ check_s3_repository_bucket() {
   return 1
 }
 
+check_azure_repository_container() {
+  resp=$(curl -u "${auth}" --insecure --silent "${os_url}/_snapshot/${snapshot_repository}")
+  if [ "$(echo $resp | jq -r '."'${snapshot_repository}'".settings.container')" = "{{ .Values.config.azure.containerName }}" ]; then
+    return 0
+  fi
+  return 1
+}
+
 register_s3_repository() {
   echo
   echo "Registering S3 snapshot repository"
@@ -93,6 +101,19 @@ register_gcs_repository() {
   acknowledged=$(echo "${resp}" | grep "^{" | jq -r '.acknowledged')
   if [ "${acknowledged}" != "true" ]; then
     log_error_exit "Failed to register GSC repository" "${resp}"
+  fi
+}
+
+register_azure_repository() {
+  echo
+  echo "Registering Azure Blob Storage snapshot repository"
+  resp=$(curl --insecure -X PUT "${os_url}/_snapshot/${snapshot_repository}" \
+    -H 'Content-Type: application/json' \
+    -d' {"type": "azure", "settings":{ "container": "{{ .Values.config.azure.containerName }}", "client": "default" }}' \
+    -s -k -u "${auth}")
+  acknowledged=$(echo "${resp}" | grep "^{" | jq -r '.acknowledged')
+  if [ "${acknowledged}" != "true" ]; then
+    log_error_exit "Failed to register Azure repository" "${resp}"
   fi
 }
 
@@ -258,6 +279,13 @@ else
 fi
 {{ else if .Values.config.gcs.enabled -}}
 register_gcs_repository
+{{ else if .Values.config.azure.enabled -}}
+if ! check_azure_repository_container; then
+  register_azure_repository
+else
+  echo
+  echo "Skip registering Azure Blob Storage snapshot repository"
+fi
 {{- end }}
 
 [ -n "${template_names}" ] && echo && echo "Creating index templates"

@@ -1,5 +1,5 @@
-{{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") ) }}
-{{ fail "\nERROR: Harbor backup requires s3 or gcs object storage, see Values.objectStorage.type" }}
+{{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") (eq .Values.objectStorage.type "azure") ) }}
+{{ fail "\nERROR: Harbor backup requires s3, gcs or azure object storage, see Values.objectStorage.type" }}
 {{ end }}
 {{ if and .Values.harbor.backup.enabled (eq .Values.harbor.database.type "external") }}
 {{ fail "\nERROR: Harbor backup is not available for external database" }}
@@ -22,6 +22,13 @@ gcs:
   bucket: {{ .Values.objectStorage.buckets.harbor }}
   keyfileData: |
     {{ .Values.objectStorage.gcs.keyfileData | nindent 4 }}
+{{ else if eq .Values.objectStorage.type "azure" -}}
+azure:
+  enabled: true
+  storageAccountName: {{ .Values.objectStorage.azure.storageAccountName }}
+  storageAccountKey: {{ .Values.objectStorage.azure.storageAccountKey }}
+  containerName: {{ .Values.objectStorage.buckets.harbor }}
+  realm: core.windows.net
 {{- end }}
 
 ephemeralBackupStore:

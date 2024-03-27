@@ -12,6 +12,11 @@ gcs:
   enabled: false
   keyfileData: ""
   bucket: ""
+azure:
+  enabled: false
+  storageAccountName: ""
+  storageAccountKey: ""
+  containerName: ""
 startingDeadlineSeconds: 200
 ephemeralBackupStore:
   enabled: false

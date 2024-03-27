@@ -1,5 +1,5 @@
-{{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") ) }}
-{{ fail "\nERROR: OpenSearch slm requires s3 or gcs object storage, see Values.objectStorage.type" }}
+{{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") (eq .Values.objectStorage.type "azure") ) }}
+{{ fail "\nERROR: OpenSearch slm requires s3 or gcs or azure object storage, see Values.objectStorage.type" }}
 {{ end }}
 
 opensearch:

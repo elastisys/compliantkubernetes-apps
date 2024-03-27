@@ -165,13 +165,18 @@ set_storage_class() {
             yq4 -i '.networkPolicies.kubeSystem.upcloud.ports = [443]' "${file}"
             ;;
 
-        exoscale|baremetal)
+        exoscale | baremetal)
             storage_class=rook-ceph-block
             ;;
 
         aws)
             storage_class=ebs-gp2
             ;;
+
+        azure)
+            storage_class=standard
+            ;;
+
         none)
             return
             ;;
@@ -212,6 +217,11 @@ set_object_storage() {
         baremetal)
             object_storage_type="none"
             ;;
+
+        azure)
+            object_storage_type="azure"
+            ;;
+
         none)
             return
             ;;
@@ -261,6 +271,16 @@ set_nginx_config() {
             ingress_using_host_network=false
             ;;
 
+        azure)
+            use_proxy_protocol=false
+            use_host_port=false
+            service_enabled=true
+            service_type=LoadBalancer
+            service_annotations='service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz'
+            external_load_balancer=false
+            ingress_using_host_network=false
+            ;;
+
         baremetal)
             use_proxy_protocol=false
             use_host_port=true
@@ -278,6 +298,8 @@ set_nginx_config() {
     replace_set_me "${file}" '.ingressNginx.controller.service.enabled' "${service_enabled}"
     replace_set_me "${file}" '.networkPolicies.global.externalLoadBalancer' "${external_load_balancer}"
     replace_set_me "${file}" '.networkPolicies.global.ingressUsingHostNetwork' "${ingress_using_host_network}"
+    replace_set_me "${file}" '.ingressNginx.controller.service.allocateLoadBalancerNodePorts' 'true'
+
 
     if [ "${service_enabled}" = 'false' ]; then
         replace_set_me "${file}" '.ingressNginx.controller.service.type' '"set-me-if-ingressNginx.controller.service.enabled"'
@@ -301,7 +323,7 @@ set_fluentd_config() {
             use_region_endpoint=true
             ;;
 
-        aws)
+        aws | azure)
             use_region_endpoint=false
             ;;
 
@@ -368,7 +390,7 @@ set_harbor_config() {
         exit 1
     fi
     case ${CK8S_CLOUD_PROVIDER} in
-        aws | exoscale)
+        aws | exoscale | azure)
             persistence_type=objectStorage
             disable_redirect=false
             ;;

@@ -3,15 +3,22 @@ nameOverride: ""
 
 imagePullSecrets: []
 image:
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   repository: ghcr.io/elastisys/compliantkubernetes-apps-log-manager
-  tag: ""
+  tag: "0.3.0"
 
 s3:
+  enabled: false
   forcePathStyle: false
   regionEndpoint: set-me
   accessKey: set-me
   secretKey: set-me
+azure:
+  enabled: false
+  storageAccountName: set-me
+  storageAccountKey: set-me
+  containerName: set-me
+
 
 instances:
   - bucket: set-me
