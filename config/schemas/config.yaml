@@ -143,6 +143,13 @@ properties:
       tolerations:
         $ref: '#/$defs/tolerations'
     type: object
+  calicoFelixMetrics:
+    additionalProperties: false
+    properties:
+      enabled:
+        default: true
+        type: boolean
+    type: object
 additionalProperties:
   type: object
   properties: {}
