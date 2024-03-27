@@ -20,13 +20,6 @@ ck8s_cloud_providers=(
 )
 
 # shellcheck disable=SC2034
-ck8s_cluster_provisioner=(
-    "cluster-api"
-    "kubespray"
-    "other"
-)
-
-# shellcheck disable=SC2034
 ck8s_flavors=(
     "dev"
     "prod"
