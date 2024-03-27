@@ -23,6 +23,8 @@ $defs:
         $ref: '#/$defs/kubernetesTolerations'
       topologySpreadConstraints:
         $ref: '#/$defs/kubernetesTopologySpreadConstraints'
+      extraArgs:
+        $ref: '#/$defs/extraArgs'
     required: [] # Shouldn't at least 'enabled' be required?
     title: Common Resource
     type: object
@@ -127,6 +129,8 @@ $defs:
     title: IP and port list
     additionalProperties: false
     properties:
+      enabled:
+        type: boolean
       ips:
         $ref: '#/$defs/iplist'
       ports:
@@ -144,13 +148,15 @@ $defs:
     minimum: 0
     title: Percentage
     type: number
+  port:
+    maximum: 65535
+    minimum: 1
+    type: integer
   portlist:
     title: Port number
     description: A 16 bit unsigned integer
     items:
-      maximum: 65535
-      minimum: 1
-      type: integer
+      $ref: '#/$defs/port'
     type: array
   kubernetesResourceRequirements:
     title: Resource requirements
@@ -3398,6 +3404,833 @@ properties:
       - dashboards
     type: object
   elasticsearch: true
+  calicoAccountant:
+    title: Calico Accountant
+    additionalProperties: false
+    properties:
+      backend:
+        title: Backend for networkpolicy rules
+        default: iptables
+        enum:
+          - iptables
+          - nftables
+        meta:enum:
+          iptables: The classical kernel netfilter interface. Use with Ubuntu 20.04 and older
+          nftables: More modern netfilter interface. Use with Ubuntu 22.04 and newer
+        type: string
+      enabled:
+        default: true
+        type: boolean
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+      tolerations:
+        $ref: '#/$defs/kubernetesTolerations'
+    type: object
+  calicoFelixMetrics:
+    title: Calico Felix Metrics
+    additionalProperties: false
+    properties:
+      enabled:
+        title: Enable Calico Felix Metrics
+        default: true
+        type: boolean
+    type: object
+  certmanager:
+    title: Configuration for cert-manager and its components
+    additionalProperties: false
+    properties:
+      affinity:
+        $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      cainjector:
+        $ref: '#/$defs/component'
+      extraArgs:
+        $ref: '#/$defs/extraArgs'
+      nodeSelector:
+        $ref: '#/$defs/kubernetesNodeSelector'
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+      tolerations:
+        $ref: '#/$defs/kubernetesTolerations'
+      topologySpreadConstraints:
+        $ref: '#/$defs/kubernetesTopologySpreadConstraints'
+      webhook:
+        $ref: '#/$defs/component'
+    type: object
+  ingressNginx:
+    title: Ingress-Nginx Controller Configuration
+    additionalProperties: false
+    properties:
+      controller:
+        additionalProperties: false
+        properties:
+          additionalConfig:
+            type: object
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          allowSnippetAnnotations:
+            default: false
+            type: boolean
+          chroot:
+            type: boolean
+          config:
+            additionalProperties: false
+            properties:
+              useProxyProtocol:
+                type: boolean
+              annotationsRiskLevel:
+                type: string
+                description: See [reference](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#annotations-risk-level)
+                enum:
+                  - Critical
+                  - High
+                  - Medium
+                  - Low
+            type: object
+          enablepublishService:
+            default: false
+            type: boolean
+          enableAnnotationValidations:
+            description: |-
+              Enable validation of Nginx annotations on Ingress resources.
+              This is kept false by default due to the maturity of the feature,
+              e.g. lack of documentation and disruptive bugs.
+            default: false
+            type: boolean
+          extraArgs: true
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          service:
+            type: object
+            properties:
+              enabled:
+                type: boolean
+            if:
+              properties:
+                enabled:
+                  type: boolean
+                  const: true
+            then:
+              additionalProperties: false
+              properties:
+                enabled:
+                  type: boolean
+                  const: true
+                  $comment: This is duplicated because of the if-then.
+                annotations:
+                  additionalProperties:
+                    type:
+                      - string
+                      - boolean
+                      - number
+                    description: Kubernetes annotations should be strings, but other scalars may be coereced during templating.
+                  type: object
+                clusterIP:
+                  type: string
+                  oneOf:
+                    - format: ipv4
+                    - const: ""
+                loadBalancerSourceRanges:
+                  items:
+                    type: string
+                  type: array
+                ipFamilyPolicy:
+                  type: string
+                  description: |-
+                    Represents the dual-stack-ness requested or required by this Service. When
+                    utilizing an internal loadbalancer service (ie MetalLB), set this field to
+                    "RequireDualStack" if you want both IPv4 and IPv6 connectivity. The
+                    ipFamilies and clusterIPs fields depend on the value of this field.
+
+                    See [reference](https://kubernetes.io/docs/concepts/services-networking/dual-stack/)
+                  enum:
+                    - ""
+                    - SingleStack
+                    - PreferDualStack
+                    - RequireDualStack
+                  default: SingleStack
+                ipFamilies:
+                  type: array
+                  description: |-
+                    List of IP families (e.g. IPv4, IPv6) assigned to the service. Default is IPv4 only. When utilizing an internal loadbalancer service (ie MetalLB),
+                    IPv6 would also need to be included in order for the ingress service to allocate an address in that family.
+                  uniqueItems: true
+                  items:
+                    type: string
+                    enum:
+                      - IPv4
+                      - IPv6
+                  default:
+                    - IPv4
+                nodePorts:
+                  additionalProperties: false
+                  properties:
+                    http:
+                      default: 30080
+                      $ref: '#/$defs/port'
+                    https:
+                      default: 30443
+                      $ref: '#/$defs/port'
+                  type: object
+                type:
+                  description: See [reference](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types)
+                  enum:
+                    - ClusterIP
+                    - NodePort
+                    - LoadBalancer
+                    - ExternalName
+                  type: string
+                allocateLoadBalancerNodePorts:
+                  type: boolean
+                  default: false
+                  title: Enable node port allocation
+                  description: See [reference](https://kubernetes.io/docs/concepts/services-networking/service/#load-balancer-nodeport-allocation)
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+          useHostPort:
+            type: boolean
+        type: object
+      defaultBackend:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+        type: object
+      subDomain:
+        type: string
+    type: object
+  issuers:
+    title: Configuration for cert-manager issuers.
+    additionalProperties: false
+    properties:
+      extraIssuers:
+        type: array
+      letsencrypt:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          prod:
+            additionalProperties: false
+            properties:
+              email:
+                type: string
+              solvers:
+                type: array
+            type: object
+          staging:
+            additionalProperties: false
+            properties:
+              email:
+                type: string
+              solvers:
+                type: array
+            type: object
+        type: object
+    type: object
+  networkPolicies:
+    title: Network policies for service cluster
+    description: Network policy configuration for various services in service cluster.
+    additionalProperties: false
+    properties:
+      additional:
+        type: object
+      additionalEgressPolicies:
+        type: array
+      additionalIngressPolicies:
+        type: array
+      alertmanager:
+        additionalProperties: false
+        properties:
+          alertReceivers:
+            $ref: '#/$defs/netpolRule'
+          enabled:
+            type: boolean
+        type: object
+      allowedNameSpaces:
+        type: array
+      certManager:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          letsencrypt:
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+            type: object
+          namespaces:
+            items:
+              default: dex
+              type: string
+            type: array
+          dns01:
+            type: object
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+        type: object
+      coredns:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          externalDns:
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+            type: object
+          serviceIp:
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+            type: object
+        type: object
+      defaultDeny:
+        default: false
+        type: boolean
+      dex:
+        additionalProperties: false
+        properties:
+          connectors:
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+              ports:
+                $ref: '#/$defs/portlist'
+                default:
+                  - 443
+            type: object
+          enabled:
+            default: true
+            type: boolean
+        type: object
+      dnsAutoscaler:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+        type: object
+      enableAlerting:
+        default: true
+        type: boolean
+      falco:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          plugins:
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+              ports:
+                $ref: '#/$defs/portlist'
+                default:
+                  - 443
+            type: object
+        type: object
+      fluentd:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+        type: object
+      gatekeeper:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+        type: object
+      global:
+        additionalProperties: false
+        properties:
+          externalLoadBalancer:
+            type: boolean
+          ingressUsingHostNetwork:
+            type: boolean
+          objectStorage:
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+              ports:
+                $ref: '#/$defs/portlist'
+            required:
+              - ips
+            type: object
+          objectStorageSwift:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  type: string
+                type: array
+              ports:
+                $ref: '#/$defs/portlist'
+                default:
+                  - 5000
+            required:
+              - ips
+            type: object
+          scApiserver:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  type: string
+                type: array
+              port:
+                default: 6443
+                $ref: '#/$defs/port'
+            required:
+              - ips
+            type: object
+          scIngress:
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+            required:
+              - ips
+            type: object
+          scNodes:
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+            required:
+              - ips
+            type: object
+          trivy:
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+              port:
+                default: 443
+                $ref: '#/$defs/port'
+            required:
+              - ips
+            type: object
+          wcIngress:
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+            required:
+              - ips
+            type: object
+          wcApiserver:
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+              port:
+                $ref: '#/$defs/port'
+          wcNodes:
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+        required:
+          - externalLoadBalancer
+          - ingressUsingHostNetwork
+        type: object
+      harbor:
+        additionalProperties: false
+        properties:
+          database:
+            additionalProperties: false
+            properties:
+              externalEgress:
+                additionalProperties: false
+                properties:
+                  peers:
+                    type: array
+                  ports:
+                    type: array
+                type: object
+              internalIngress:
+                additionalProperties: false
+                properties:
+                  peers:
+                    type: array
+                  ports:
+                    type: array
+                type: object
+            type: object
+          enabled:
+            default: true
+            type: boolean
+          jobservice:
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+              ports:
+                $ref: '#/$defs/portlist'
+                default:
+                  - 443
+            type: object
+          redis:
+            additionalProperties: false
+            properties:
+              externalEgress:
+                additionalProperties: false
+                properties:
+                  peers:
+                    type: array
+                  ports:
+                    type: array
+                type: object
+            type: object
+          registries:
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+              ports:
+                $ref: '#/$defs/portlist'
+                default:
+                  - 443
+            type: object
+          trivy:
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+              ports:
+                $ref: '#/$defs/portlist'
+                default:
+                  - 443
+            type: object
+        type: object
+      ingressNginx:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          ingressOverride:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: false
+                type: boolean
+              ips:
+                oneOf:
+                  - $ref: '#/$defs/iplist'
+                  - type: string
+                    const: set-me-if-enabled
+            type: object
+        type: object
+      kubeSystem:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          openstack:
+            type: object
+            properties:
+              enabled:
+                type: boolean
+              ips:
+                $ref: '#/$defs/iplist'
+              ports:
+                $ref: '#/$defs/portlist'
+          upcloud:
+            type: object
+            properties:
+              enabled:
+                type: boolean
+              ips:
+                $ref: '#/$defs/iplist'
+              ports:
+                $ref: '#/$defs/portlist'
+        type: object
+      kured:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          notificationSlack:
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+              ports:
+                $ref: '#/$defs/portlist'
+                default:
+                  - 443
+            type: object
+        type: object
+      monitoring:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          grafana:
+            additionalProperties: false
+            properties:
+              externalDashboardProvider:
+                additionalProperties: false
+                properties:
+                  ips:
+                    $ref: '#/$defs/iplist'
+                  ports:
+                    $ref: '#/$defs/portlist'
+                    default:
+                      - 443
+                type: object
+              externalDataSources:
+                if:
+                  properties:
+                    enabled:
+                      default: false
+                      type: boolean
+                      const: true
+                then:
+                  properties:
+                    enabled:
+                      default: false
+                      type: boolean
+                    ips:
+                      $ref: '#/$defs/iplist'
+                    ports:
+                      $ref: '#/$defs/portlist'
+                  type: object
+            type: object
+        type: object
+      opensearch:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          plugins:
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+              ports:
+                $ref: '#/$defs/portlist'
+                default:
+                  - 443
+            type: object
+        type: object
+      prometheus:
+        additionalProperties: false
+        properties:
+          internalAccess:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: false
+                type: boolean
+              namespaces:
+                items:
+                  type: string
+                type: array
+      rcloneSync:
+        additionalProperties: false
+        properties:
+          destinationObjectStorageS3:
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+              ports:
+                $ref: '#/$defs/portlist'
+                default:
+                  - 443
+            type: object
+          destinationObjectStorageSwift:
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+              ports:
+                $ref: '#/$defs/portlist'
+                default:
+                  - 5000
+            type: object
+          enabled:
+            default: true
+            type: boolean
+          secondaryUrl:
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+              ports:
+                $ref: '#/$defs/portlist'
+                default:
+                  - 443
+            type: object
+        type: object
+      rookCeph:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: false
+            type: boolean
+        type: object
+      s3Exporter:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+        type: object
+      thanos:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+        type: object
+      velero:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+        type: object
+      enabled:
+        type: boolean
+      enforcement:
+        type: string
+        $comment: TODO enforcement enum?
+      rclone:
+        type: object
+        properties:
+          enabled:
+            type: boolean
+      externalDns:
+        $ref: '#/$defs/netpolRule'
+    type: object
+  nodeLocalDns:
+    title: Cluster DNS Service
+    additionalProperties: false
+    properties:
+      customConfig:
+        title: CoreDNS config options
+        description: https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/#coredns-configmap-options
+        examples:
+          - |-
+            example.com:53 {
+              errors
+              cache 30
+              reload
+              loop
+              forward . 127.0.0.1:9005
+            }
+        type: string
+        default: null
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+    type: object
+  externalDns:
+    title: External DNS
+    description: |-
+      Enable ExternalDNS to manage dns records from kubernetes objects.
+      Possible sources are CRD, Ingress and services.
+      Currently only aws route53 is supported within ck8s-apps.
+      Example: https://kubernetes-sigs.github.io/external-dns/v0.14.1/tutorials/aws/
+    additionalProperties: false
+    properties:
+      affinity:
+        $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      domains:
+        items: {}
+        type: array
+      enabled:
+        type: boolean
+      endpoints:
+        description: If externalDns.sources.crd is enabled add endpoints for your dns endpoints
+        items:
+          additionalProperties: false
+          properties:
+            dnsName:
+              examples:
+                - kube
+              type: string
+            recordTTL:
+              type: integer
+            recordType:
+              examples:
+                - A
+              type: string
+            targets:
+              items:
+                type: string
+                examples:
+                  - wc control-plane nodes
+              type: array
+          type: object
+        type: array
+      extraArgs:
+        description: |-
+          If loadbalancer as a service is used and it receives a hostname instead of a ip.
+          You should add the following to extraArgs.
+          This happens for openstack environments using proxy protocol (nip.io)
+        $ref: '#/$defs/extraArgs'
+      logLevel:
+        examples:
+          - info
+        type: string
+      namespaced:
+        type: boolean
+      provider:
+        examples:
+          - aws
+        type: string
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+      sources:
+        additionalProperties: false
+        properties:
+          crd:
+            type: boolean
+          ingress:
+            type: boolean
+          service:
+            type: boolean
+        type: object
+      tolerations:
+        $ref: '#/$defs/kubernetesTolerations'
+      topologySpreadConstraints:
+        $ref: '#/$defs/kubernetesTopologySpreadConstraints'
+      txtOwnerId:
+        examples:
+          - set-me-if-externalDns.enabled
+        type: string
+      txtPrefix:
+        type: string
+        description: |-
+          AWS route53 can not handle CNAME records and TXT with the same name.
+          When --aws-prefer-cname is used, add a prefix to make it work.
+    type: object
 additionalProperties:
   type: object
   properties: {}

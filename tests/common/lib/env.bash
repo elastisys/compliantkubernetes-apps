@@ -60,7 +60,7 @@ env.init() {
 
   if ! [[ "$*" =~ --skip-network-policies ]]; then
     yq_set 'common' '.networkPolicies.global.objectStorage.ips' '["0.0.0.0/0"]'
-    yq_set 'common' '.networkPolicies.global.objectStorage.ports' '["443"]'
+    yq_set 'common' '.networkPolicies.global.objectStorage.ports' '[443]'
 
     yq_set 'common' '.networkPolicies.global.scIngress.ips' '["0.0.0.0/0"]'
     yq_set 'common' '.networkPolicies.global.wcIngress.ips' '["0.0.0.0/0"]'
