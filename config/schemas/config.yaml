@@ -389,6 +389,66 @@ properties:
         type: boolean
     type: object
   gatekeeper: true
+  kured:
+    additionalProperties: false
+    properties:
+      affinity:
+        $ref: '#/$defs/affinity'
+      configuration:
+        $comment: Would it be possible to extract schema from somewhere? Guess from the thing maybe?
+        description: |-
+          Passed through as-is to Kured chart
+          See <helmfile.d/upstream/kubereboot/kured/README.md#Configuration>
+        properties: {}
+        type: object
+      drainTimeout: true
+      dsAnnotations:
+        type: object
+      enabled:
+        default: false
+        type: boolean
+      endTime: true
+      extraArgs:
+        type: object
+      extraEnvVars:
+        type: object
+      metrics:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          interval:
+            default: 60s
+            type: string
+          labels:
+            type: object
+        type: object
+      nodeSelector:
+        $ref: '#/$defs/nodeSelector'
+      notification:
+        additionalProperties: false
+        properties:
+          slack:
+            additionalProperties: false
+            properties:
+              channel:
+                default: ""
+                type: string
+              enabled:
+                default: false
+                type: boolean
+            type: object
+        type: object
+      period: true
+      rebootDays: true
+      resources:
+        $ref: '#/$defs/resources'
+      startTime: true
+      timeZone: true
+      tolerations:
+        $ref: '#/$defs/tolerations'
+    type: object
 additionalProperties:
   type: object
   properties: {}
