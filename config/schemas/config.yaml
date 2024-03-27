@@ -247,6 +247,19 @@ properties:
       resources:
         $ref: '#/$defs/resources'
     type: object
+  kubeStateMetrics:
+    additionalProperties: false
+    properties:
+      clusterAPIMetrics:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: false
+            type: boolean
+        type: object
+      resources:
+        $ref: '#/$defs/resources'
+    type: object
 additionalProperties:
   type: object
   properties: {}
