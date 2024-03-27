@@ -2012,6 +2012,1392 @@ properties:
       - enabled
     title: Trivy security scanner
     type: object
+  alerts:
+    title: Alerting
+    additionalProperties: false
+    properties:
+      alertTo:
+        type: string
+      customReceivers:
+        type: array
+      opsGenie:
+        additionalProperties: false
+        properties:
+          apiUrl:
+            default: https://api.eu.opsgenie.com
+            format: uri
+            type: string
+        type: object
+      opsGenieHeartbeat:
+        additionalProperties: false
+        if:
+          properties:
+            enabled:
+              const: true
+        properties:
+          enabled:
+            default: false
+            type: boolean
+          name:
+            type: string
+          url:
+            default: https://api.eu.opsgenie.com/v2/heartbeats
+            format: uri
+            type: string
+        required:
+          - enabled
+        then:
+          required:
+            - name
+        type: object
+      slack:
+        additionalProperties: false
+        properties:
+          channel:
+            type: string
+          customTemplate:
+            type: object
+        type: object
+    type: object
+  grafana:
+    title: Grafana
+    additionalProperties: false
+    properties:
+      ops:
+        additionalProperties: false
+        properties:
+          additionalConfigValues:
+            type: object
+          additionalDatasources:
+            type: object
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          enabled:
+            default: true
+            type: boolean
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
+          oidc:
+            additionalProperties: false
+            properties:
+              allowedDomains:
+                items:
+                  type: string
+                type: array
+              enabled:
+                default: true
+                type: boolean
+              scopes:
+                default: openid profile email groups
+                type: string
+              userGroups:
+                additionalProperties: false
+                properties:
+                  grafanaAdmin:
+                    default: grafana_admin
+                    type: string
+                  grafanaEditor:
+                    default: grafana_editor
+                    type: string
+                  grafanaViewer:
+                    default: grafana_viewer
+                    type: string
+                type: object
+              skipRoleSync:
+                type: boolean
+            type: object
+          plugins:
+            type: array
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          sidecar:
+            additionalProperties: false
+            properties:
+              resources:
+                $ref: '#/$defs/kubernetesResourceRequirements'
+            type: object
+          subdomain:
+            default: grafana
+            type: string
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+          trailingDots:
+            default: true
+            type: boolean
+          viewersCanEdit:
+            default: true
+            type: boolean
+        type: object
+      user:
+        $ref: '#/properties/grafana/properties/ops'
+    type: object
+  grafanaLabelEnforcer:
+    title: Grafana Label Enforcer
+    additionalProperties: false
+    properties:
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+    type: object
+  kubeStateMetrics:
+    title: Kubernetes Metrics
+    additionalProperties: false
+    properties:
+      clusterAPIMetrics:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: false
+            type: boolean
+        type: object
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+    type: object
+  metricsServer:
+    additionalProperties: false
+    properties:
+      enabled:
+        default: true
+        type: boolean
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+    type: object
+  openstackMonitoring:
+    title: Openstack Monitoring
+    additionalProperties: false
+    properties:
+      enabled:
+        default: false
+        type: boolean
+    type: object
+  prometheus:
+    title: Prometheus
+    additionalProperties: false
+    properties:
+      affinity:
+        $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      alertmanagerSpec:
+        additionalProperties: false
+        properties:
+          groupBy:
+            items:
+              default: '...'
+              type: string
+            type: array
+          replicas:
+            default: 2
+            type: number
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          storage:
+            additionalProperties: false
+            properties:
+              volumeClaimTemplate:
+                additionalProperties: false
+                properties:
+                  spec:
+                    additionalProperties: false
+                    properties:
+                      accessModes:
+                        items:
+                          default: ReadWriteOnce
+                          type: string
+                        type: array
+                      resources:
+                        $ref: '#/$defs/kubernetesResourceRequirements'
+                    type: object
+                type: object
+            type: object
+          topologySpreadConstraints:
+            $ref: '#/$defs/kubernetesTopologySpreadConstraints'
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+        type: object
+      capacityManagementAlerts:
+        additionalProperties:
+          type: number
+        properties:
+          disklimit:
+            default: 75
+            type: number
+          enabled:
+            default: true
+            type: boolean
+          persistentVolume:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: true
+                type: boolean
+              limit:
+                default: 75
+                type: number
+            type: object
+          requestlimit:
+            additionalProperties: false
+            properties:
+              cpu:
+                items:
+                  additionalProperties: false
+                  properties:
+                    limit:
+                      examples:
+                        - 80
+                      type: number
+                    name:
+                      examples:
+                        - worker
+                        - elastisys
+                      type: string
+                    pattern:
+                      examples:
+                        - .*-worker-.*
+                        - .*-elastisys-.*
+                      type: string
+                  type: object
+                type: array
+              memory:
+                items:
+                  additionalProperties: false
+                  properties:
+                    limit:
+                      examples:
+                        - 80
+                      type: number
+                    name:
+                      default: worker
+                      type: string
+                    pattern:
+                      default: .*-worker-.*
+                      type: string
+                  type: object
+                type: array
+            type: object
+          usagelimit:
+            default: 95
+            type: number
+          predictUsage:
+            type: boolean
+        type: object
+      diskAlerts:
+        additionalProperties: false
+        properties:
+          inode:
+            additionalProperties: false
+            properties:
+              predictLinear:
+                items:
+                  additionalProperties: false
+                  properties:
+                    for:
+                      $ref: '#/$defs/timeRange'
+                      default: 1h
+                    freeSpacePercentage:
+                      $ref: '#/$defs/percentage'
+                      default: 40
+                    hours:
+                      default: 24
+                      type: number
+                    pattern:
+                      additionalProperties: false
+                      properties:
+                        exclude:
+                          additionalProperties: false
+                          properties:
+                            disk:
+                              default: ""
+                              type: string
+                            node:
+                              default: ""
+                              type: string
+                          type: object
+                        include:
+                          additionalProperties: false
+                          properties:
+                            disk:
+                              default: .*
+                              type: string
+                            node:
+                              default: .*
+                              type: string
+                          type: object
+                      type: object
+                    severity:
+                      default: warning
+                      type: string
+                  type: object
+                type: array
+              space:
+                items:
+                  additionalProperties: false
+                  properties:
+                    for:
+                      $ref: '#/$defs/timeRange'
+                      default: 1h
+                    freeSpacePercentage:
+                      $ref: '#/$defs/percentage'
+                      default: 5
+                    pattern:
+                      additionalProperties: false
+                      properties:
+                        exclude:
+                          additionalProperties: false
+                          properties:
+                            disk:
+                              default: ""
+                              type: string
+                            node:
+                              default: ""
+                              type: string
+                          type: object
+                        include:
+                          additionalProperties: false
+                          properties:
+                            disk:
+                              default: .*
+                              type: string
+                            node:
+                              default: .*
+                              type: string
+                          type: object
+                      type: object
+                    severity:
+                      default: warning
+                      type: string
+                  type: object
+                type: array
+            type: object
+          perf:
+            additionalProperties: false
+            properties:
+              enabled:
+                type: boolean
+              queueSizeThreshold:
+                type: number
+              readWaitTimeThreshold:
+                type: number
+              writeWaitTimeThreshold:
+                type: number
+            type: object
+          storage:
+            additionalProperties: false
+            properties:
+              predictLinear:
+                items:
+                  additionalProperties: false
+                  properties:
+                    for:
+                      $ref: '#/$defs/timeRange'
+                      default: 1h
+                    freeSpacePercentage:
+                      $ref: '#/$defs/percentage'
+                      default: 30
+                    hours:
+                      default: 24
+                      type: number
+                    pattern:
+                      additionalProperties: false
+                      properties:
+                        exclude:
+                          additionalProperties: false
+                          properties:
+                            disk:
+                              default: ""
+                              type: string
+                            node:
+                              default: ""
+                              type: string
+                          type: object
+                        include:
+                          additionalProperties: false
+                          properties:
+                            disk:
+                              default: .*
+                              type: string
+                            node:
+                              default: .*
+                              type: string
+                          type: object
+                      type: object
+                    severity:
+                      default: warning
+                      type: string
+                  type: object
+                type: array
+              space:
+                items:
+                  additionalProperties: false
+                  properties:
+                    for:
+                      default: 30m
+                      type: string
+                    freeSpacePercentage:
+                      $ref: '#/$defs/percentage'
+                      default: 5
+                    pattern:
+                      additionalProperties: false
+                      properties:
+                        exclude:
+                          additionalProperties: false
+                          properties:
+                            disk:
+                              default: ""
+                              type: string
+                            node:
+                              default: ""
+                              type: string
+                          type: object
+                        include:
+                          additionalProperties: false
+                          properties:
+                            disk:
+                              default: .*
+                              type: string
+                            node:
+                              default: .*
+                              type: string
+                          type: object
+                      type: object
+                    severity:
+                      default: warning
+                      type: string
+                  type: object
+                type: array
+            type: object
+        type: object
+      nodeSelector:
+        $ref: '#/$defs/kubernetesNodeSelector'
+      replicas:
+        default: 1
+        type: number
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+      retention:
+        additionalProperties: false
+        properties:
+          age:
+            default: 3d
+            type: string
+          alertmanager:
+            $ref: '#/$defs/timeRange'
+            default: 72h
+          size:
+            default: 4GiB
+            type: string
+        type: object
+      s3BucketAlerts:
+        additionalProperties: false
+        properties:
+          exclude:
+            type: array
+          objects:
+            additionalProperties: false
+            properties:
+              count:
+                default: 1638400
+                type: number
+              enabled:
+                default: false
+                type: boolean
+              percent:
+                $ref: '#/$defs/percentage'
+                default: 80
+            type: object
+          size:
+            type: object
+            additionalProperties: false
+            properties:
+              enabled:
+                default: false
+                type: boolean
+              percent:
+                $ref: '#/$defs/percentage'
+                default: 80
+              sizeQuotaGB:
+                default: 1000
+                type: number
+          totalSize:
+            type: object
+            additionalProperties: false
+            properties:
+              enabled:
+                default: false
+                type: boolean
+              percent:
+                $ref: '#/$defs/percentage'
+                default: 80
+              sizeQuotaGB:
+                default: 1000
+                type: number
+        type: object
+      storage:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: false
+            type: boolean
+          size:
+            default: 5Gi
+            type: string
+        type: object
+      tolerations:
+        $ref: '#/$defs/kubernetesTolerations'
+      topologySpreadConstraints:
+        $ref: '#/$defs/kubernetesTopologySpreadConstraints'
+      webhookAlerts:
+        type: object
+        properties:
+          enabled:
+            type: boolean
+      additionalScrapeConfigs:
+        type: array
+        title: Additional prometheus scrape config.
+        description: |
+          Ref: <https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config>
+    type: object
+  prometheusBlackboxExporter:
+    $title: Prometheus Blackbox Exporter
+    additionalProperties: false
+    properties:
+      customKubeapiTargets:
+        items:
+          properties:
+            domain:
+              format: hostname
+              type: string
+            name:
+              type: string
+          type: object
+        type: array
+      hostAliases:
+        items:
+          properties:
+            hostNames:
+              items:
+                type: string
+              type: array
+            ip:
+              format: ipv4
+              type: string
+          type: object
+        type: array
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+      targets:
+        properties:
+          additionalProperties:
+            type: boolean
+        type: object
+    type: object
+  prometheusNodeExporter:
+    title: Prometheus Node Exporter
+    additionalProperties: false
+    properties:
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+    type: object
+  prometheusOperator:
+    title: Prometheus Operator
+    additionalProperties: false
+    properties:
+      prometheusConfigReloader:
+        additionalProperties: false
+        properties:
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+        type: object
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+    type: object
+  s3Exporter:
+    title: S3 Exporter
+    additionalProperties: false
+    properties:
+      affinity:
+        $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      enabled:
+        default: true
+        type: boolean
+      interval:
+        default: 60m
+        type: string
+      nodeSelector:
+        $ref: '#/$defs/kubernetesNodeSelector'
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+      scrapeTimeout:
+        default: 10m
+        type: string
+      tolerations:
+        $ref: '#/$defs/kubernetesTolerations'
+    type: object
+  thanos:
+    title: Thanos
+    additionalProperties: false
+    properties:
+      bucketweb:
+        additionalProperties: false
+        properties:
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+        type: object
+      compactor:
+        additionalProperties: false
+        properties:
+          deduplication:
+            default: none
+            type: string
+          persistence:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: true
+                type: boolean
+              size:
+                default: 8Gi
+                type: string
+            type: object
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          retentionResolution1h:
+            $ref: '#/$defs/timeRange'
+            default: 0s
+          retentionResolution5m:
+            $ref: '#/$defs/timeRange'
+            default: 90d
+          retentionResolutionRaw:
+            $ref: '#/$defs/timeRange'
+            default: 30d
+          verticalCompaction:
+            default: false
+            type: boolean
+        type: object
+      enabled:
+        default: true
+        type: boolean
+      metrics:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          serviceMonitor:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: true
+                type: boolean
+            type: object
+        type: object
+      objectStorage:
+        additionalProperties: false
+        properties:
+          type:
+            default: ""
+            type: string
+        type: object
+      query:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          replicaCount:
+            default: 1
+            type: number
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          topologySpreadConstraints:
+            $ref: '#/$defs/kubernetesTopologySpreadConstraints'
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+        type: object
+      queryFrontend:
+        additionalProperties: false
+        properties:
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+        type: object
+      receiveDistributor:
+        additionalProperties: false
+        properties:
+          replicationFactor:
+            default: 1
+            type: number
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+        type: object
+      receiver:
+        additionalProperties: false
+        properties:
+          basic_auth:
+            additionalProperties: false
+            properties:
+              username:
+                default: thanos
+                type: string
+            type: object
+          enabled:
+            default: true
+            type: boolean
+          mode:
+            default: dual-mode
+            type: string
+          outOfOrderTimeWindow:
+            default: 600s
+            type: string
+          persistence:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: true
+                type: boolean
+              size:
+                default: 50Gi
+                type: string
+            type: object
+          replicaCount:
+            default: 2
+            type: number
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          subdomain:
+            default: thanos-receiver
+            type: string
+          topologySpreadConstraints:
+            $ref: '#/$defs/kubernetesTopologySpreadConstraints'
+          tsdbRetention:
+            default: 15d
+            type: string
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+        type: object
+      ruler:
+        additionalProperties: false
+        properties:
+          configReloader:
+            additionalProperties: false
+            properties:
+              resources:
+                $ref: '#/$defs/kubernetesResourceRequirements'
+            type: object
+          enabled:
+            default: true
+            type: boolean
+          persistence:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: false
+                type: boolean
+              size:
+                default: 8Gi
+                type: string
+            type: object
+          replicaCount:
+            default: 2
+            type: number
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          topologySpreadConstraints:
+            $ref: '#/$defs/kubernetesTopologySpreadConstraints'
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+        type: object
+      storegateway:
+        additionalProperties: false
+        properties:
+          persistence:
+            additionalProperties: false
+            properties:
+              size:
+                default: 8Gi
+                type: string
+            type: object
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+        type: object
+    type: object
+  wcProbeIngress:
+    title: Workcload Cluster Ingress Probe
+    additionalProperties: false
+    properties:
+      enabled:
+        type: boolean
+    type: object
+  welcomingDashboard:
+    title: Welcoming Dashboard
+    additionalProperties: false
+    description: |-
+      If you want to add extra text to the grafana/opensearch "welcoming dashboards"
+      then write the text in these values as a one-line string.
+      Note, first line of the string is a header, not all characters are supported.
+      For newline in Grafana dashboard use format `\\n`
+    properties:
+      extraTextGrafana:
+        description: Extra text added to the Grafana welcoming dashboard.
+        examples:
+          - Hello\n\n[This is an example link](https:/elastisys.io)
+        format: markdown
+        type: string
+      extraTextOpensearch:
+        description: Extra text added to the Opensearch welcoming dashboard.
+        format: markdown
+        type: string
+      extraVersions:
+        description: List of additional components to list on the welcoming dashboard.
+        items:
+          additionalProperties: false
+          properties:
+            name:
+              description: Name of the component.
+              examples:
+                - Dex
+                - Postgres
+              type: string
+            releasenotes:
+              description: Link to release notes for the component
+              examples:
+                - https://elastisys.io/compliantkubernetes/release-notes/
+              format: uri
+              type: string
+            subdomain:
+              description: Link to a subdomain of `.global.baseDomain`
+              format: hostname
+              type: string
+            url:
+              description: Link to a full URL, instead of `subdomain`
+              examples:
+                - https://www.postgresql.org/
+              format: uri
+              type: string
+            version:
+              description: Version number.
+              examples:
+                - v2.37
+                - "11"
+              type: string
+          required:
+            - name
+          type: object
+        type: array
+    type: object
+  fluentd:
+    title: Fluentd
+    additionalProperties: false
+    properties:
+      aggregator:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          buffer:
+            $ref: '#/$defs/fluentdBuffer'
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
+          persistence:
+            additionalProperties: false
+            properties:
+              storage:
+                default: 10Gi
+                type: string
+            type: object
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+        type: object
+      audit:
+        additionalProperties: false
+        properties:
+          compaction:
+            additionalProperties: false
+            properties:
+              days:
+                default: 10
+                type: number
+              enabled:
+                default: true
+                type: boolean
+              ephemeralVolumes:
+                additionalProperties: false
+                properties:
+                  enabled:
+                    default: false
+                    type: boolean
+                type: object
+              schedule:
+                default: 0 1/6 * * *
+                type: string
+            type: object
+          enabled:
+            default: false
+            type: boolean
+          filters:
+            default: ""
+            description: Add filter stages to capture audit logs, add the audit tag prefix
+            type: string
+          retention:
+            additionalProperties: false
+            properties:
+              days:
+                default: 30
+                type: number
+              enabled:
+                default: true
+                type: boolean
+              schedule:
+                default: 0 20 * * *
+                type: string
+            type: object
+        type: object
+      enabled:
+        default: true
+        type: boolean
+      forwarder:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          buffer:
+            type: object
+          livenessThresholdSeconds:
+            default: 900
+            type: number
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
+          requestTimeout:
+            default: 60s
+            type: string
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          stuckThresholdSeconds:
+            default: 1200
+            type: number
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+          topologySpreadConstraints:
+            $ref: '#/$defs/kubernetesTopologySpreadConstraints'
+        type: object
+      logManager:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          compaction:
+            additionalProperties: false
+            properties:
+              resources:
+                $ref: '#/$defs/kubernetesResourceRequirements'
+              volume:
+                additionalProperties: false
+                properties:
+                  storage:
+                    default: 5Gi
+                    type: string
+                type: object
+            type: object
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
+          retention:
+            additionalProperties: false
+            properties:
+              resources:
+                $ref: '#/$defs/kubernetesResourceRequirements'
+            type: object
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+        type: object
+      scLogs:
+        additionalProperties: false
+        properties:
+          compaction:
+            additionalProperties: false
+            properties:
+              days:
+                default: 7
+                type: number
+              enabled:
+                default: true
+                type: boolean
+              ephemeralVolumes:
+                additionalProperties: false
+                properties:
+                  enabled:
+                    default: false
+                    type: boolean
+                type: object
+              schedule:
+                default: 0 2/6 * * *
+                type: string
+            type: object
+          enabled:
+            default: true
+            type: boolean
+          retention:
+            additionalProperties: false
+            properties:
+              days:
+                default: 7
+                type: number
+              enabled:
+                default: true
+                type: boolean
+              schedule:
+                default: 0 21 * * *
+                type: string
+            type: object
+        type: object
+      user:
+        $ref: '#/$defs/component'
+      extraConfigMaps:
+        type: object
+        description: |
+          Extra fluentd config to mount.
+        properties: {}
+        additionalProperties:
+          type: string
+          description: configmap content
+    type: object
+  opensearch:
+    title: OpenSearch
+    additionalProperties: false
+    properties:
+      additionalTemplates:
+        type: object
+      clientNode:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          count:
+            default: 1
+            type: number
+          dedicatedPods:
+            default: true
+            type: boolean
+          javaOpts:
+            default: -Xms512m -Xmx512m
+            type: string
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+        type: object
+      clusterName:
+        default: opensearch
+        type: string
+      createIndices:
+        default: true
+        description: Create initial indices upon first startup
+        type: boolean
+      curator:
+        additionalProperties: false
+        properties:
+          activeDeadlineSeconds:
+            default: 2700
+            type: number
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          enabled:
+            default: true
+            type: boolean
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          retention:
+            items:
+              additionalProperties: false
+              properties:
+                ageDays:
+                  default: 7
+                  type: number
+                pattern:
+                  default: other-*
+                  type: string
+                sizeGB:
+                  default: 1
+                  type: number
+              type: object
+            type: array
+          startingDeadlineSeconds:
+            default: 600
+            type: number
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+        type: object
+      dashboards:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          subdomain:
+            default: opensearch
+            type: string
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+          topologySpreadConstraints:
+            $ref: '#/$defs/kubernetesTopologySpreadConstraints'
+        type: object
+      dataNode:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          count:
+            default: 2
+            type: number
+          dedicatedPods:
+            default: true
+            type: boolean
+          javaOpts:
+            default: -Xms512m -Xmx512m
+            type: string
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          storageClass:
+            examples:
+              - '-'
+            type:
+              - string
+              - "null"
+            description: |
+              If null, no storageclass is specified in pvc and default storageClass is used
+              if the DefaultStorageClass admission plugin is enabled.
+              If "-", "" will be used as storageClassName.
+          storageSize:
+            default: 25Gi
+            type: string
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+        type: object
+      defaultTemplates:
+        default: true
+        type: boolean
+      enabled:
+        default: true
+        type: boolean
+      exporter:
+        additionalProperties: false
+        properties:
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          serviceMonitor:
+            additionalProperties: false
+            properties:
+              interval:
+                default: 30s
+                type: string
+              scrapeTimeout:
+                default: 30s
+                type: string
+            type: object
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+        type: object
+      extraRoleMappings:
+        items:
+          additionalProperties: false
+          properties:
+            definition:
+              additionalProperties: false
+              properties:
+                backend_roles:
+                  items:
+                    type: string
+                  type: array
+                users:
+                  items:
+                    type: string
+                  type: array
+              type: object
+            mapping_name:
+              default: kibana_user
+              type: string
+          type: object
+        type: array
+      extraRoles:
+        type: array
+      indexPerNamespace:
+        default: false
+        type: boolean
+      ingress:
+        additionalProperties: false
+        properties:
+          maxbodysize:
+            default: 32m
+            type: string
+        type: object
+      ism:
+        additionalProperties: false
+        properties:
+          additionalPolicies:
+            type: object
+          defaultPolicies:
+            default: true
+            type: boolean
+          overwritePolicies:
+            default: true
+            type: boolean
+          rolloverAgeDays:
+            default: 1
+            type: number
+          rolloverSizeGB:
+            default: 1
+            type: number
+        type: object
+      masterNode:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          count:
+            default: 1
+            type: number
+          javaOpts:
+            default: -Xms512m -Xmx512m
+            type: string
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          storageClass:
+            type:
+              - string
+              - "null"
+            description: |-
+              If null, no storageclass is specified in pvc and default storageClass is used
+              if the DefaultStorageClass admission plugin is enabled.
+              If "-", "" will be used as storageClassName.
+          storageSize:
+            default: 8Gi
+            type: string
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+        type: object
+      maxClauseCount:
+        default: 1024
+        description: Change this value before applying opensearch to adjust indices.query.bool.max_clause_count
+        type: number
+      maxShardsPerNode:
+        default: 1000
+        type: number
+      overwriteTemplates:
+        default: true
+        type: boolean
+      plugins:
+        additionalProperties: false
+        properties:
+          additionalPlugins:
+            description: in an air-gapped environment this can be used to install plugins from known sources
+            type: array
+          installExternalObjectStoragePlugin:
+            description: |-
+              in an air-gapped environment where the nodes are not connected to the Internet, set
+              following variable to false to prevent downloading external object storage plugin
+            type: boolean
+        type: object
+      promIndexAlerts:
+        items:
+          additionalProperties: false
+          properties:
+            alertSizeMB:
+              default: 5500
+              type: number
+            prefix:
+              default: kubernetes-default
+              type: string
+          type: object
+        type: array
+      securityadmin:
+        additionalProperties: false
+        properties:
+          activeDeadlineSeconds:
+            default: 1200
+            type: number
+          enabled:
+            default: true
+            type: boolean
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+        type: object
+      snapshot:
+        additionalProperties: false
+        properties:
+          ageSeconds:
+            default: 864000
+            type: number
+          backupActiveDeadlineSeconds:
+            default: 600
+            type: number
+          backupSchedule:
+            default: 0 */2 * * *
+            type: string
+          backupStartingDeadlineSeconds:
+            default: 600
+            type: number
+          enabled:
+            default: true
+            type: boolean
+          max:
+            default: 14
+            type: number
+          maxRequestSeconds:
+            default: 1200
+            type: number
+          min:
+            default: 7
+            type: number
+          repository:
+            default: opensearch-snapshots
+            type: string
+          retentionActiveDeadlineSeconds:
+            default: 2700
+            type: number
+          retentionResources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          retentionSchedule:
+            default: '@daily'
+            type: string
+          retentionStartingDeadlineSeconds:
+            default: 600
+            type: number
+        type: object
+      sso:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: false
+            type: boolean
+          rolesKey:
+            default: groups
+            type: string
+          scope:
+            default: openid profile email groups
+            type: string
+          subjectKey:
+            default: email
+            type: string
+        type: object
+      subdomain:
+        default: opensearch
+        format: hostname
+        type: string
+    required:
+      - enabled
+      - subdomain
+      - indexPerNamespace
+      - dashboards
+    type: object
+  elasticsearch: true
 additionalProperties:
   type: object
   properties: {}
