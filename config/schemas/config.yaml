@@ -574,6 +574,122 @@ properties:
         default: 5
         type: number
     type: object
+  trivy:
+    additionalProperties: false
+    properties:
+      affinity:
+        $ref: '#/$defs/affinity'
+      clusterComplianceEnabled:
+        default: true
+        type: boolean
+      configAuditScannerEnabled:
+        default: true
+        type: boolean
+      enabled:
+        default: true
+        type: boolean
+      excludeNamespaces:
+        description: comma separated list of namespaces (or glob patterns) to be excluded from scanning
+        type: string
+      exposedSecretScannerEnabled:
+        default: true
+        type: boolean
+      infraAssessmentScannerEnabled:
+        default: true
+        type: boolean
+      rbacAssessmentScannerEnabled:
+        default: true
+        type: boolean
+      resources:
+        $ref: '#/$defs/resources'
+      sbomGenerationEnabled:
+        default: false
+        type: boolean
+      scanJobs:
+        additionalProperties: false
+        properties:
+          concurrentLimit:
+            default: 1
+            type: number
+          retryDelay:
+            default: 1m
+            type: string
+          timeout:
+            default: 5m
+            type: string
+        type: object
+      scanner:
+        additionalProperties: false
+        description: |
+          configurations for an offline / air-gapped environment
+          ref: <https://github.com/aquasecurity/trivy-operator/tree/main/deploy/helm#values>
+        properties:
+          additionalProperties: false
+          dbRegistry:
+            type: string
+          dbRepository:
+            type: string
+          dbRepositoryInsecure:
+            type: boolean
+          imagePullSecret:
+            additionalProperties: false
+            description: |
+              if authorization is required for pulling from registry, create a pull
+              secret in the monitoring namespace and configure the secret name
+            properties:
+              name:
+                type: string
+            type: object
+          javaDbRegistry:
+            type: string
+          javaDbRepository:
+            type: string
+          offlineScanEnabled:
+            type: boolean
+          registry:
+            examples:
+              - docker.io: registry.example.org:5000
+                gcr.io: registry.example.org:5000
+                ghcr.io: registry.example.org:5000
+                index.docker.io: registry.example.org:5000
+                quay.io: registry.example.org:5000
+                registry.k8s.io: registry.example.org:5000
+            properties:
+              mirror:
+                additionalProperties:
+                  description: a docker registry
+                  examples:
+                    - registry.example.org:5000
+                  type: string
+                type: object
+            type: object
+        type: object
+      serviceMonitor:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+        type: object
+      tolerations:
+        $ref: '#/$defs/tolerations'
+      vulnerabilityScanner:
+        additionalProperties: false
+        properties:
+          scanOnlyCurrentRevisions:
+            default: true
+            type: boolean
+          scannerReportTTL:
+            $ref: '#/$defs/timeRange'
+            default: 720h
+        type: object
+      vulnerabilityScannerEnabled:
+        default: true
+        type: boolean
+    required:
+      - enabled
+    title: Trivy security scanner
+    type: object
 additionalProperties:
   type: object
   properties: {}
