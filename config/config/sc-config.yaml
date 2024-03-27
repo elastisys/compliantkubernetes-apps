@@ -29,7 +29,7 @@ objectStorage:
 
   ## Restore object storage from off-site backups with rclone
   ## Decrypt, destinations, and sources are automatically configured based on main and sync object storage configuration.
-  ## See https://github.com/elastisys/compliantkubernetes-apps/blob/main/docs/restore/rclone.md for instructions.
+  ## See https://github.com/elastisys/compliantkubernetes-apps/blob/main/docs/restore/rclone.md for the instructions.
   restore:
     enabled: false
     dryrun: false
@@ -43,8 +43,8 @@ objectStorage:
     decrypt: {}
 
     ## Allows for point in time restoring using object versions
-    ## Only supported by S3 sources
-    ## Ref: https://rclone.org/docs/#time-option
+    ## Only supported by S3 sources.
+    ## See https://rclone.org/docs/#time-option for the format.
     timestamp: ""
 
     ## Autogenerate restore targets from sync configuration

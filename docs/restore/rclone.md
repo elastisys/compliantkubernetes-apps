@@ -1,6 +1,6 @@
 # Restore rclone
 
-This will guide you through restoring object storage.
+This will guide you through restoring object storage if you primary object storage is corrupted or unavailable, and allows for data to be restore with point in time if using versioning (currently only supported for S3) in your off-site backup.
 
 > [!important]
 > Ensure that all `rclone-sync` CronJobs are suspended or removed so they cannot corrupt the backup!
@@ -25,6 +25,8 @@ Follow the instruction that matches the scenario:
 
 > [!tip]
 > This is the only configuration needed if you want to do the reverse of an already configured `rclone-sync`.
+>
+> _Restoring all object storage data from the off-site backup._
 
 Enable `rclone-restore` via the config:
 
@@ -38,6 +40,16 @@ objectStorage:
     addTargetsFromSync: true
 ```
 
+If your off-site backup uses S3 and versioning you may restore from a set point in time by setting a timestamp:
+
+```yaml
+# file: sc-config.yaml
+objectStorage:
+  restore:
+    ## See https://rclone.org/docs/#time-option for the format
+    timestamp: ""
+```
+
 > [!important]
 > With this configuration `rclone-restore` **will overwrite the data stored in main object storage**!
 
@@ -45,6 +57,8 @@ objectStorage:
 
 > [!tip]
 > These can also be followed if you want to make overrides of already configured `rclone-sync`.
+>
+> _Restoring select object storage data from the off-site backup with possible overrides._
 
 Enable `rclone-restore` via the config:
 
@@ -103,6 +117,16 @@ objectStorage:
         destinationType: <object-storage-type> # azure | s3 | swift
         sourceName: <bucket-or-container-name> # optional - defaults to destination name
         sourceType: <object-storage-type> # azure | s3 | swift
+```
+
+If your off-site backup uses S3 and versioning you may restore from a set point in time by setting a timestamp:
+
+```yaml
+# file: sc-config.yaml
+objectStorage:
+  restore:
+    ## See https://rclone.org/docs/#time-option for the format
+    timestamp: ""
 ```
 
 > [!important]
