@@ -16,12 +16,14 @@
     yajsv_version: 1.4.1
     pwgen_version: 2.08*
     apache2_utils_version: 2.4.*
+    azure_cli_version: 2.58.*
     apt_list:
       - curl
       - s3cmd={{ s3cmd_version }}
       - dnsutils
       - apache2-utils={{ apache2_utils_version }}
       - pwgen={{ pwgen_version }}
+      - azure-cli={{ azure_cli_version }}
     get_url_list:
       - command: jq
         version: "{{ jq_version }}"
@@ -48,9 +50,13 @@
   become: yes
   become_user: root
   tasks:
+    - name: update repos list
+      include_tasks: add-microsoft-repo.yaml
+
     - name: Install apt-packages
       apt:
         pkg: "{{ apt_list }}"
+        update_cache: yes
 
     - name: Kubectl
       block:
@@ -176,23 +182,6 @@
           command: "helm plugin install https://github.com/jkroepke/helm-secrets --version v{{ helmsecrets_version }}"
           register: "output"
           when: not helm_secrets_exists.stat.exists or (helm_secrets_removed.changed)
-
-    - name: azure-cli
-      block:
-        - name: Check if azure-cli exists
-          stat:
-            path: "/usr/bin/az"
-          register: azure_cli_exists
-
-        - name: Check azure-cli
-          shell: az version --query '"azure-cli"'
-          register: current_azure_cli_version
-          when: azure_cli_exists.stat.exists
-
-        - name: Get azure-cli
-          command: "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash"
-          when: (not azure_cli_exists.stat.exists) or
-            (current_azure_cli_version.stdout == "")
 
     - name: Get URL
       include_tasks: get-url.yaml

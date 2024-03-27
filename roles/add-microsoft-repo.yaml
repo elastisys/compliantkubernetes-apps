@@ -1,0 +1,14 @@
+- name: Add the Microsoft software repository
+  block:
+    - name: Download the Microsoft signing key
+      ansible.builtin.get_url:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        dest: /usr/share/keyrings/microsoft.asc
+        mode: '0644'
+        force: true
+
+    - name: Add the Microsoft software repository to /etc/apt/sources.list.d
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.asc] https://packages.microsoft.com/repos/azure-cli {{ansible_distribution_release}} main"
+        filename: azure-cli
+        state: present
