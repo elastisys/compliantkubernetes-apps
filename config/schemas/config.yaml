@@ -874,6 +874,12 @@ properties:
             $ref: '#/$defs/resources'
         type: object
     type: object
+  wcProbeIngress:
+    additionalProperties: false
+    properties:
+      enabled:
+        type: boolean
+    type: object
 additionalProperties:
   type: object
   properties: {}
