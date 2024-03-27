@@ -172,6 +172,75 @@ properties:
             type: object
         type: object
     type: object
+  grafana:
+    additionalProperties: false
+    properties:
+      ops:
+        additionalProperties: false
+        properties:
+          additionalConfigValues:
+            type: object
+          additionalDatasources:
+            type: object
+          affinity:
+            $ref: '#/$defs/affinity'
+          enabled:
+            default: true
+            type: boolean
+          nodeSelector:
+            $ref: '#/$defs/nodeSelector'
+          oidc:
+            additionalProperties: false
+            properties:
+              allowedDomains:
+                items:
+                  type: string
+                type: array
+              enabled:
+                default: true
+                type: boolean
+              scopes:
+                default: openid profile email groups
+                type: string
+              userGroups:
+                additionalProperties: false
+                properties:
+                  grafanaAdmin:
+                    default: grafana_admin
+                    type: string
+                  grafanaEditor:
+                    default: grafana_editor
+                    type: string
+                  grafanaViewer:
+                    default: grafana_viewer
+                    type: string
+                type: object
+            type: object
+          plugins:
+            type: array
+          resources:
+            $ref: '#/$defs/resources'
+          sidecar:
+            additionalProperties: false
+            properties:
+              resources:
+                $ref: '#/$defs/resources'
+            type: object
+          subdomain:
+            default: grafana
+            type: string
+          tolerations:
+            $ref: '#/$defs/tolerations'
+          trailingDots:
+            default: true
+            type: boolean
+          viewersCanEdit:
+            default: true
+            type: boolean
+        type: object
+      user:
+        $ref: '#/properties/grafana/properties/ops'
+    type: object
 additionalProperties:
   type: object
   properties: {}
