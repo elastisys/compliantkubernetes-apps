@@ -1358,6 +1358,23 @@ properties:
         items:
           type: string
     type: object
+  calicoAccountant:
+    additionalProperties: false
+    properties:
+      backend:
+        default: iptables
+        enum:
+          - iptables
+          - nftables
+        type: string
+      enabled:
+        default: true
+        type: boolean
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+      tolerations:
+        $ref: '#/$defs/kubernetesTolerations'
+    type: object
 additionalProperties:
   type: object
   properties: {}
