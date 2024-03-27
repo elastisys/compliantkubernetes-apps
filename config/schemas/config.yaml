@@ -1375,6 +1375,13 @@ properties:
       tolerations:
         $ref: '#/$defs/kubernetesTolerations'
     type: object
+  calicoFelixMetrics:
+    additionalProperties: false
+    properties:
+      enabled:
+        default: true
+        type: boolean
+    type: object
 additionalProperties:
   type: object
   properties: {}
