@@ -15,6 +15,11 @@ here="$(dirname "$(readlink -f "$0")")"
 source "${here}/common.bash"
 
 # Load cloud provider, environment name, and flavor from config if available.
+if [ -f "${config[default_common]}" ]; then
+    cloud_provider=$(yq4 '.global.ck8sCloudProvider' "${config[default_common]}")
+    environment_name=$(yq4 '.global.ck8sEnvironmentName' "${config[default_common]}")
+    flavor=$(yq4 '.global.ck8sFlavor' "${config[default_common]}")
+fi
 if [ -z "${cloud_provider:-}" ]; then
     : "${CK8S_CLOUD_PROVIDER:?Missing CK8S_CLOUD_PROVIDER}"
 elif [ -v CK8S_CLOUD_PROVIDER ] && [ "${CK8S_CLOUD_PROVIDER}" != "${cloud_provider}" ]; then
