@@ -880,6 +880,62 @@ properties:
       enabled:
         type: boolean
     type: object
+  welcomingDashboard:
+    additionalProperties: false
+    description: |-
+      If you want to add extra text to the grafana/opensearch "welcoming dashboards"
+      then write the text in these values as a one-line string.
+      Note, first line of the string is a header, not all characters are supported.
+      For newline in Grafana dashboard use format `\\n`
+    properties:
+      extraTextGrafana:
+        description: Extra text added to the Grafana welcoming dashboard.
+        examples:
+          - Hello\n\n[This is an example link](https:/elastisys.io)
+        format: markdown
+        type: string
+      extraTextOpensearch:
+        description: Extra text added to the Opensearch welcoming dashboard.
+        format: markdown
+        type: string
+      extraVersions:
+        description: List of additional components to list on the welcoming dashboard.
+        items:
+          additionalProperties: false
+          properties:
+            name:
+              description: Name of the component.
+              examples:
+                - Dex
+                - Postgres
+              type: string
+            releasenotes:
+              description: Link to release notes for the component
+              examples:
+                - https://elastisys.io/compliantkubernetes/release-notes/
+              format: uri
+              type: string
+            subdomain:
+              description: Link to a subdomain of `.global.baseDomain`
+              format: hostname
+              type: string
+            url:
+              description: Link to a full URL, instead of `subdomain`
+              examples:
+                - https://www.postgresql.org/
+              format: uri
+              type: string
+            version:
+              description: Version number.
+              examples:
+                - v2.37
+                - "11"
+              type: string
+          required:
+            - name
+          type: object
+        type: array
+    type: object
 additionalProperties:
   type: object
   properties: {}
