@@ -136,7 +136,7 @@ falco:
     ebpf:
       # -- Path where the eBPF probe is located. It comes handy when the probe have been installed in the nodes using tools other than the init
       # container deployed with the chart.
-      path:
+      #path: ""
       # -- Needed to enable eBPF JIT at runtime for performance reasons.
       # Can be skipped if eBPF JIT is enabled from outside the container
       hostNetwork: false
@@ -925,7 +925,7 @@ trivy:
   # ref: https://github.com/aquasecurity/trivy-operator/tree/main/deploy/helm#values
   scanner:
     resources: {}
-    timeout: ""
+    timeout: 5m0s
     offlineScanEnabled: false
     dbRegistry: ""
     dbRepository: ""
