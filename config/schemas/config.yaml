@@ -269,6 +269,13 @@ properties:
       resources:
         $ref: '#/$defs/resources'
     type: object
+  openstackMonitoring:
+    additionalProperties: false
+    properties:
+      enabled:
+        default: false
+        type: boolean
+    type: object
 additionalProperties:
   type: object
   properties: {}
