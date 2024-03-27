@@ -504,6 +504,303 @@ properties:
         default: true
         type: boolean
     type: object
+  harbor:
+    additionalProperties: false
+    properties:
+      alerts:
+        additionalProperties: false
+        properties:
+          maxTotalArtifacts:
+            default: 1000
+            type: number
+          maxTotalStorageUsedGB:
+            default: 500
+            type: number
+        type: object
+      backup:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          ephemeralBackupStore:
+            properties:
+              enabled:
+                type: boolean
+              storageSize:
+                type: string
+            type: object
+          retentionDays:
+            default: 7
+            type: number
+        type: object
+      core:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/affinity'
+          replicas:
+            default: 1
+            type: number
+          resources:
+            $ref: '#/$defs/resources'
+        type: object
+      database:
+        additionalProperties: false
+        properties:
+          external:
+            additionalProperties: false
+            properties:
+              coreDatabase:
+                default: registry
+                type: string
+              notaryServerDatabase:
+                default: notaryserver
+                type: string
+              notarySignerDatabase:
+                default: notarysigner
+                type: string
+              port:
+                default: "5432"
+                type: string
+              sslmode:
+                default: disable
+                enum:
+                  - disable
+                  - require
+                  - verify-ca
+                  - verify-full
+                type: string
+            type: object
+          internal:
+            additionalProperties: false
+            properties:
+              affinity:
+                $ref: '#/$defs/affinity'
+              persistentVolumeClaim:
+                additionalProperties: false
+                properties:
+                  size:
+                    default: 1Gi
+                    type: string
+                type: object
+              resources:
+                $ref: '#/$defs/resources'
+            type: object
+          type:
+            default: internal
+            type: string
+        type: object
+      enabled:
+        default: true
+        type: boolean
+      gc:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          forceConfigure:
+            default: false
+            type: boolean
+          schedule:
+            default: 0 0 0 * * SUN
+            type: string
+        type: object
+      ingress:
+        additionalProperties: false
+        properties:
+          additionalAnnotations:
+            type: object
+          defaultAnnotations:
+            additionalProperties: false
+            properties:
+              nginx.ingress.kubernetes.io/proxy-buffering:
+                default: off
+                type: string
+              nginx.ingress.kubernetes.io/proxy-request-buffering:
+                default: off
+                type: string
+            type: object
+        type: object
+      jobservice:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/affinity'
+          jobLog:
+            additionalProperties: false
+            properties:
+              persistentVolumeClaim:
+                additionalProperties: false
+                properties:
+                  size:
+                    default: 1Gi
+                    type: string
+                type: object
+            type: object
+          jobLoggers:
+            items:
+              default: file
+              type: string
+            type: array
+          resources:
+            $ref: '#/$defs/resources'
+          scanDataExports:
+            additionalProperties: false
+            properties:
+              persistentVolumeClaim:
+                additionalProperties: false
+                properties:
+                  size:
+                    default: 1Gi
+                    type: string
+                type: object
+            type: object
+        type: object
+      nodeSelector:
+        $ref: '#/$defs/nodeSelector'
+      notary:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/affinity'
+          replicas:
+            default: 1
+            type: number
+          resources:
+            $ref: '#/$defs/resources'
+          subdomain:
+            default: notary.harbor
+            type: string
+        type: object
+      notarySigner:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/affinity'
+          resources:
+            $ref: '#/$defs/resources'
+        type: object
+      oidc:
+        additionalProperties: false
+        properties:
+          adminGroupName:
+            type: string
+          groupClaimName:
+            default: groups
+            type: string
+          scope:
+            default: openid,email,profile,offline_access,groups
+            type: string
+        type: object
+      persistence:
+        additionalProperties: false
+        properties:
+          disableRedirect:
+            type: boolean
+          type:
+            type: string
+        type: object
+      portal:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/affinity'
+          replicas:
+            default: 1
+            type: number
+          resources:
+            $ref: '#/$defs/resources'
+        type: object
+      redis:
+        additionalProperties: false
+        properties:
+          external:
+            additionalProperties: false
+            properties:
+              addr:
+                examples:
+                  - rfs-redis-harbor.redis-system.svc.cluster.local:26379
+                type: string
+              sentinelMasterSet:
+                type: string
+            type: object
+          internal:
+            additionalProperties: false
+            properties:
+              affinity:
+                $ref: '#/$defs/affinity'
+              persistentVolumeClaim:
+                additionalProperties: false
+                properties:
+                  size:
+                    default: 1Gi
+                    type: string
+                type: object
+              resources:
+                $ref: '#/$defs/resources'
+            type: object
+          type:
+            default: internal
+            type: string
+        type: object
+      registry:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/affinity'
+          controller:
+            additionalProperties: false
+            properties:
+              resources:
+                $ref: '#/$defs/resources'
+            type: object
+          persistentVolumeClaim:
+            additionalProperties: false
+            properties:
+              size:
+                default: 5Gi
+                type: string
+            type: object
+          replicas:
+            default: 1
+            type: number
+          resources:
+            $ref: '#/$defs/resources'
+        type: object
+      s3:
+        additionalProperties: false
+        properties:
+          multipartcopythresholdsize:
+            default: "536870912"
+            type: string
+            $comment: turn into number?
+        type: object
+      subdomain:
+        default: harbor
+        type: string
+      tolerations:
+        $ref: '#/$defs/tolerations'
+      trivy:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/affinity'
+          persistentVolumeClaim:
+            additionalProperties: false
+            properties:
+              size:
+                default: 5Gi
+                type: string
+            type: object
+          replicas:
+            default: 1
+            type: number
+          resources:
+            $ref: '#/$defs/resources'
+        type: object
+    type: object
 additionalProperties:
   type: object
   properties: {}
