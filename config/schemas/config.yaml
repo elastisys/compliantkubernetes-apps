@@ -276,6 +276,352 @@ properties:
         default: false
         type: boolean
     type: object
+  prometheus:
+    additionalProperties: false
+    properties:
+      affinity:
+        $ref: '#/$defs/affinity'
+      alertmanagerSpec:
+        additionalProperties: false
+        properties:
+          groupBy:
+            items:
+              default: '...'
+              type: string
+            type: array
+          replicas:
+            default: 2
+            type: number
+          resources:
+            $ref: '#/$defs/resources'
+          storage:
+            additionalProperties: false
+            properties:
+              volumeClaimTemplate:
+                additionalProperties: false
+                properties:
+                  spec:
+                    additionalProperties: false
+                    properties:
+                      accessModes:
+                        items:
+                          default: ReadWriteOnce
+                          type: string
+                        type: array
+                      resources:
+                        $ref: '#/$defs/resources'
+                    type: object
+                type: object
+            type: object
+          topologySpreadConstraints:
+            $ref: '#/$defs/topologySpreadConstraints'
+        type: object
+      capacityManagementAlerts:
+        additionalProperties: false
+        properties:
+          disklimit:
+            default: 75
+            type: number
+          enabled:
+            default: true
+            type: boolean
+          persistentVolume:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: true
+                type: boolean
+              limit:
+                default: 75
+                type: number
+            type: object
+          requestlimit:
+            additionalProperties: false
+            properties:
+              cpu:
+                items:
+                  additionalProperties: false
+                  properties:
+                    limit:
+                      examples:
+                        - 80
+                      type: number
+                    name:
+                      examples:
+                        - worker
+                        - elastisys
+                      type: string
+                    pattern:
+                      examples:
+                        - .*-worker-.*
+                        - .*-elastisys-.*
+                      type: string
+                  type: object
+                type: array
+              memory:
+                items:
+                  additionalProperties: false
+                  properties:
+                    limit:
+                      examples:
+                        - 80
+                      type: number
+                    name:
+                      default: worker
+                      type: string
+                    pattern:
+                      default: .*-worker-.*
+                      type: string
+                  type: object
+                type: array
+            type: object
+          usagelimit:
+            default: 95
+            type: number
+        type: object
+      diskAlerts:
+        additionalProperties: false
+        properties:
+          inode:
+            additionalProperties: false
+            properties:
+              predictLinear:
+                items:
+                  additionalProperties: false
+                  properties:
+                    for:
+                      $ref: '#/$defs/timeRange'
+                      default: 1h
+                    freeSpacePercentage:
+                      $ref: '#/$defs/pct'
+                      default: 40
+                    hours:
+                      default: 24
+                      type: number
+                    pattern:
+                      additionalProperties: false
+                      properties:
+                        exclude:
+                          additionalProperties: false
+                          properties:
+                            disk:
+                              default: ""
+                              type: string
+                            node:
+                              default: ""
+                              type: string
+                          type: object
+                        include:
+                          additionalProperties: false
+                          properties:
+                            disk:
+                              default: .*
+                              type: string
+                            node:
+                              default: .*
+                              type: string
+                          type: object
+                      type: object
+                    severity:
+                      default: warning
+                      type: string
+                  type: object
+                type: array
+              space:
+                items:
+                  additionalProperties: false
+                  properties:
+                    for:
+                      $ref: '#/$defs/timeRange'
+                      default: 1h
+                    freeSpacePercentage:
+                      $ref: '#/$defs/pct'
+                      default: 5
+                    pattern:
+                      additionalProperties: false
+                      properties:
+                        exclude:
+                          additionalProperties: false
+                          properties:
+                            disk:
+                              default: ""
+                              type: string
+                            node:
+                              default: ""
+                              type: string
+                          type: object
+                        include:
+                          additionalProperties: false
+                          properties:
+                            disk:
+                              default: .*
+                              type: string
+                            node:
+                              default: .*
+                              type: string
+                          type: object
+                      type: object
+                    severity:
+                      default: warning
+                      type: string
+                  type: object
+                type: array
+            type: object
+          perf:
+            type: boolean
+          storage:
+            additionalProperties: false
+            properties:
+              predictLinear:
+                items:
+                  additionalProperties: false
+                  properties:
+                    for:
+                      $ref: '#/$defs/timeRange'
+                      default: 1h
+                    freeSpacePercentage:
+                      $ref: '#/$defs/pct'
+                      default: 30
+                    hours:
+                      default: 24
+                      type: number
+                    pattern:
+                      additionalProperties: false
+                      properties:
+                        exclude:
+                          additionalProperties: false
+                          properties:
+                            disk:
+                              default: ""
+                              type: string
+                            node:
+                              default: ""
+                              type: string
+                          type: object
+                        include:
+                          additionalProperties: false
+                          properties:
+                            disk:
+                              default: .*
+                              type: string
+                            node:
+                              default: .*
+                              type: string
+                          type: object
+                      type: object
+                    severity:
+                      default: warning
+                      type: string
+                  type: object
+                type: array
+              space:
+                items:
+                  additionalProperties: false
+                  properties:
+                    for:
+                      default: 30m
+                      type: string
+                    freeSpacePercentage:
+                      $ref: '#/$defs/pct'
+                      default: 5
+                    pattern:
+                      additionalProperties: false
+                      properties:
+                        exclude:
+                          additionalProperties: false
+                          properties:
+                            disk:
+                              default: ""
+                              type: string
+                            node:
+                              default: ""
+                              type: string
+                          type: object
+                        include:
+                          additionalProperties: false
+                          properties:
+                            disk:
+                              default: .*
+                              type: string
+                            node:
+                              default: .*
+                              type: string
+                          type: object
+                      type: object
+                    severity:
+                      default: warning
+                      type: string
+                  type: object
+                type: array
+            type: object
+        type: object
+      nodeSelector:
+        $ref: '#/$defs/nodeSelector'
+      replicas:
+        default: 1
+        type: number
+      resources:
+        $ref: '#/$defs/resources'
+      retention:
+        additionalProperties: false
+        properties:
+          age:
+            default: 3d
+            type: string
+          alertmanager:
+            $ref: '#/$defs/timeRange'
+            default: 72h
+          size:
+            default: 4GiB
+            type: string
+        type: object
+      s3BucketAlerts:
+        additionalProperties: false
+        properties:
+          exclude:
+            type: array
+          objects:
+            additionalProperties: false
+            properties:
+              count:
+                default: 1638400
+                type: number
+              enabled:
+                default: false
+                type: boolean
+              percent:
+                $ref: '#/$defs/pct'
+                default: 80
+            type: object
+          size:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: false
+                type: boolean
+              percent:
+                $ref: '#/$defs/pct'
+                default: 80
+              sizeQuotaGB:
+                default: 1000
+                type: number
+            type: object
+        type: object
+      storage:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: false
+            type: boolean
+          size:
+            default: 5Gi
+            type: string
+        type: object
+      tolerations:
+        $ref: '#/$defs/tolerations'
+      topologySpreadConstraints:
+        $ref: '#/$defs/topologySpreadConstraints'
+    type: object
 additionalProperties:
   type: object
   properties: {}
