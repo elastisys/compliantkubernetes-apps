@@ -694,6 +694,186 @@ properties:
       tolerations:
         $ref: '#/$defs/tolerations'
     type: object
+  thanos:
+    additionalProperties: false
+    properties:
+      bucketweb:
+        additionalProperties: false
+        properties:
+          resources:
+            $ref: '#/$defs/resources'
+        type: object
+      compactor:
+        additionalProperties: false
+        properties:
+          deduplication:
+            default: none
+            type: string
+          persistence:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: true
+                type: boolean
+              size:
+                default: 8Gi
+                type: string
+            type: object
+          resources:
+            $ref: '#/$defs/resources'
+          retentionResolution1h:
+            $ref: '#/$defs/timeRange'
+            default: 0s
+          retentionResolution5m:
+            $ref: '#/$defs/timeRange'
+            default: 90d
+          retentionResolutionRaw:
+            $ref: '#/$defs/timeRange'
+            default: 30d
+          verticalCompaction:
+            default: false
+            type: boolean
+        type: object
+      enabled:
+        default: true
+        type: boolean
+      metrics:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          serviceMonitor:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: true
+                type: boolean
+            type: object
+        type: object
+      objectStorage:
+        additionalProperties: false
+        properties:
+          type:
+            default: ""
+            type: string
+        type: object
+      query:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          replicaCount:
+            default: 1
+            type: number
+          resources:
+            $ref: '#/$defs/resources'
+          topologySpreadConstraints:
+            $ref: '#/$defs/topologySpreadConstraints'
+        type: object
+      queryFrontend:
+        additionalProperties: false
+        properties:
+          resources:
+            $ref: '#/$defs/resources'
+        type: object
+      receiveDistributor:
+        additionalProperties: false
+        properties:
+          replicationFactor:
+            default: 1
+            type: number
+          resources:
+            $ref: '#/$defs/resources'
+        type: object
+      receiver:
+        additionalProperties: false
+        properties:
+          basic_auth:
+            additionalProperties: false
+            properties:
+              username:
+                default: thanos
+                type: string
+            type: object
+          enabled:
+            default: true
+            type: boolean
+          mode:
+            default: dual-mode
+            type: string
+          outOfOrderTimeWindow:
+            default: 600s
+            type: string
+          persistence:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: true
+                type: boolean
+              size:
+                default: 50Gi
+                type: string
+            type: object
+          replicaCount:
+            default: 2
+            type: number
+          resources:
+            $ref: '#/$defs/resources'
+          subdomain:
+            default: thanos-receiver
+            type: string
+          topologySpreadConstraints:
+            $ref: '#/$defs/topologySpreadConstraints'
+          tsdbRetention:
+            default: 15d
+            type: string
+        type: object
+      ruler:
+        additionalProperties: false
+        properties:
+          configReloader:
+            additionalProperties: false
+            properties:
+              resources:
+                $ref: '#/$defs/resources'
+            type: object
+          enabled:
+            default: true
+            type: boolean
+          persistence:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: false
+                type: boolean
+              size:
+                default: 8Gi
+                type: string
+            type: object
+          replicaCount:
+            default: 2
+            type: number
+          resources:
+            $ref: '#/$defs/resources'
+          topologySpreadConstraints:
+            $ref: '#/$defs/topologySpreadConstraints'
+        type: object
+      storegateway:
+        additionalProperties: false
+        properties:
+          persistence:
+            additionalProperties: false
+            properties:
+              size:
+                default: 8Gi
+                type: string
+            type: object
+          resources:
+            $ref: '#/$defs/resources'
+        type: object
+    type: object
 additionalProperties:
   type: object
   properties: {}
