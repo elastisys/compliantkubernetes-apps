@@ -6,7 +6,6 @@
 # It's not to be executed on its own but rather via `ck8s init`.
 
 : "${CK8S_CLUSTER:?Missing CK8S_CLUSTER}"
-: "${CLUSTER_PROVISIONER:?Missing CLUSTER_PROVISIONER}"
 
 set -eu -o pipefail
 
@@ -16,12 +15,6 @@ here="$(dirname "$(readlink -f "$0")")"
 source "${here}/common.bash"
 
 # Load cloud provider, environment name, and flavor from config if available.
-if [ -f "${config[default_common]}" ]; then
-    cloud_provider=$(yq4 '.global.ck8sCloudProvider' "${config[default_common]}")
-    cluster_provisioner=$(yq4 '.global.ck8sClusterProvisioner' "${config[default_common]}")
-    environment_name=$(yq4 '.global.ck8sEnvironmentName' "${config[default_common]}")
-    flavor=$(yq4 '.global.ck8sFlavor' "${config[default_common]}")
-fi
 if [ -z "${cloud_provider:-}" ]; then
     : "${CK8S_CLOUD_PROVIDER:?Missing CK8S_CLOUD_PROVIDER}"
 elif [ -v CK8S_CLOUD_PROVIDER ] && [ "${CK8S_CLOUD_PROVIDER}" != "${cloud_provider}" ]; then
@@ -29,14 +22,6 @@ elif [ -v CK8S_CLOUD_PROVIDER ] && [ "${CK8S_CLOUD_PROVIDER}" != "${cloud_provid
     exit 1
 else
     export CK8S_CLOUD_PROVIDER="${cloud_provider}"
-fi
-if [ -z "${cluster_provisioner:-}" ]; then
-    : "${CK8S_CLUSTER_PROVISIONER:?Missing CK8S_CLUSTER_PROVISIONER}"
-elif [ -v CK8S_CLUSTER_PROVISIONER ] && [ "${CK8S_CLUSTER_PROVISIONER}" != "${cluster_provisioner}" ]; then
-    log_error "ERROR: Cloud provider mismatch, '${cluster_provisioner}' in config and '${CK8S_CLUSTER_PROVISIONER}' in env"
-    exit 1
-else
-    export CK8S_CLUSTER_PROVISIONER="${cluster_provisioner}"
 fi
 if [ -z "${environment_name:-}" ]; then
     : "${CK8S_ENVIRONMENT_NAME:?Missing CK8S_ENVIRONMENT_NAME}"
@@ -429,12 +414,9 @@ set_cluster_api() {
         log_error "ERROR: invalid file - ${file}"
         exit 1
     fi
-    case ${CLUSTER_PROVISIONER} in
-        cluster-api)
+    case ${CK8S_CLOUD_PROVIDER} in
+        azure)
             clusterapi=true
-        ;;
-        kubespray)
-            clusterapi=false
         ;;
         *)
             clusterapi=false
@@ -452,18 +434,14 @@ set_cluster_dns() {
         log_error "ERROR: invalid file - ${file}"
         exit 1
     fi
-    case ${CLUSTER_PROVISIONER} in
-        cluster-api)
+    case ${CK8S_CLOUD_PROVIDER} in
+        azure)
             clusterdns="10.233.0.10"
             clusterdnscidr="10.233.0.10/32"
         ;;
-        kubespray)
+        *)
             clusterdns="10.233.0.3"
             clusterdnscidr="10.233.0.3/32"
-        ;;
-        *)
-            clusterdns="set-me"
-            clusterdnscidr="set-me"
         ;;
     esac
 
