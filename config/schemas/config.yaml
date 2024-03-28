@@ -500,8 +500,124 @@ properties:
   hnc:
     additionalProperties: false
     properties:
+      additionalAllowPropagateResources:
+        items:
+          additionalProperties: false
+          properties:
+            group:
+              examples:
+                - networking.k8s.io
+              type: string
+            resource:
+              examples:
+                - networkpolicies
+                - secrets
+              type: string
+          type: object
+        type: array
+      excludedExtraNamespaces:
+        items:
+          type: string
+        type: array
+      excludedNamespaces:
+        items:
+          examples:
+            - alertmanager
+            - cert-manager
+            - falco
+            - fluentd
+            - fluentd-system
+            - gatekeeper-system
+            - hnc-system
+            - ingress-nginx
+            - kube-node-lease
+            - kube-public
+            - kube-system
+            - kured
+            - metallb-system
+            - monitoring
+            - rook-ceph
+            - velero
+          type: string
+        type: array
+      ha:
+        type: boolean
+      includedNamespacesRegex:
+        type: string
+      managedNamespaceAnnotations:
+        items:
+          type: string
+        type: array
+      managedNamespaceLabels:
+        items:
+          examples:
+            - pod-security.kubernetes.io/audit
+            - pod-security.kubernetes.io/enforce
+            - pod-security.kubernetes.io/warn
+          type: string
+        type: array
+      manager:
+        $ref: '#/$defs/commonResource'
+      serviceMonitor:
+        additionalProperties: false
+        properties:
+          relabelings:
+            items: {}
+            type: array
+        type: object
+      unpropagatedAnnotations:
+        items: {}
+        type: array
+      webhook:
+        additionalProperties: false
+        properties:
+          affinity:
+            additionalProperties: false
+            properties: {}
+            type: object
+          nodeSelector:
+            additionalProperties: false
+            properties: {}
+            type: object
+          replicaCount:
+            type: integer
+          resources:
+            $ref: '#/$defs/resources'
+          tolerations:
+            items: {}
+            type: array
+          topologySpreadConstraints:
+            items:
+              additionalProperties: false
+              properties:
+                labelSelector:
+                  additionalProperties: false
+                  properties:
+                    matchLabels:
+                      additionalProperties: false
+                      properties:
+                        app.kubernetes.io/component:
+                          examples:
+                            - hnc-webhook
+                          type: string
+                      type: object
+                  type: object
+                maxSkew:
+                  type: integer
+                topologyKey:
+                  examples:
+                    - kubernetes.io/hostname
+                  type: string
+                whenUnsatisfiable:
+                  examples:
+                    - DoNotSchedule
+                  type: string
+              type: object
+            type: array
+        type: object
+      webhookMatchConditions:
+        type: boolean
       enabled:
-        default: true
         type: boolean
     type: object
   harbor:
