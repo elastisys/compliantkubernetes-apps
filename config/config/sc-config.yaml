@@ -27,6 +27,37 @@ objectStorage:
     opensearch: ${CK8S_ENVIRONMENT_NAME}-opensearch
     scFluentd: ${CK8S_ENVIRONMENT_NAME}-sc-logs
 
+  ## Restore object storage from off-site backups with rclone
+  ## Decrypt, destinations, and sources are automatically configured based on main and sync object storage configuration.
+  ## See https://github.com/elastisys/compliantkubernetes-apps/blob/main/docs/restore/rclone.md for the instructions.
+  restore:
+    enabled: false
+    dryrun: false
+
+    ## Allows for overrides of the main object storage configuration
+    destinations: {}
+    ## Allows for overrides of the sync object storage configuration
+    sources: {}
+
+    ## Allows for overrides of the sync encrypt configuration
+    decrypt: {}
+
+    ## Allows for point in time restoring using object versions
+    ## Only supported by S3 sources.
+    ## See https://rclone.org/docs/#time-option for the format.
+    timestamp: ""
+
+    ## Autogenerate restore targets from sync configuration
+    ## Note: Harbor and Thanos will be configured with both the destination and source type based on their individual configuration.
+    addTargetsFromSync: false
+
+    ## Restore targets
+    targets: []
+      # - destinationName: <bucket-or-container-name>
+      #   # destinationType: <object-storage-type> # optional - defaults to main object storage type
+      #   # sourceName: <bucket-or-container-name> # optional - defaults to destination name
+      #   # sourceType: <object-storage-type> # optional - defaults to sync object storage type
+
   ## Off-site backup replication between two providers or regions using rclone sync
   sync:
     enabled: false

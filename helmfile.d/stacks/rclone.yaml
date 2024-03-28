@@ -1,15 +1,27 @@
 ---
 templates:
-  rclone-sync:
+  rclone:
     condition: ck8sManagementCluster.enabled
-    installed: {{ .Values | get "objectStorage.sync.enabled" false }}
-    chart: charts/rclone-sync
-    version: 0.1.0
     namespace: rclone
-    name: rclone-sync
     labels:
-      app: rclone-sync
+      app: rclone
     needs:
       - kube-system/admin-namespaces
+
+  rclone-restore:
+    inherit: [ template: rclone ]
+    installed: {{ .Values | get "objectStorage.restore.enabled" false }}
+    chart: charts/rclone
+    version: 0.1.0
+    name: rclone-restore
+    values:
+      - values/rclone/restore.yaml.gotmpl
+
+  rclone-sync:
+    inherit: [ template: rclone ]
+    installed: {{ and (.Values | get "objectStorage.restore.enabled" false | not) (.Values | get "objectStorage.sync.enabled" false) }}
+    chart: charts/rclone-sync
+    version: 0.1.0
+    name: rclone-sync
     values:
       - values/rclone-sync.yaml.gotmpl
