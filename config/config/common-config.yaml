@@ -47,7 +47,7 @@ global:
   verifyTls: true
 
   ## IP of the cluster DNS in kubernetes
-  clusterDns: 10.233.0.3
+  clusterDns: set-me
 
   ## Container runtime.
   ## Supported values are 'docker', 'containerd'
@@ -55,9 +55,9 @@ global:
 
 clusterApi:
   ## Set to true if kubernetes is installed with cluster-api
-  enabled: false
+  enabled: set-me
   monitoring:
-    enabled: false
+    enabled: set-me
   clusters:
   - sc
   - wc
@@ -70,13 +70,15 @@ storageClasses:
 
 ## Object storage configuration for backups.
 objectStorage:
-  ## Options are 's3', 'gcs', or 'none'
+  ## Options are 's3', 'gcs', 'azure' or 'none'
   ## If "none", remember to disable features that depend on object storage:
   ##   All backups (Velero, Harbor, OpenSearch), SC logs (Fluentd)
   ##   Long term metrics with Thanos.
   ##   Also set Harbor persistence to "filesystem" or "swift"
   ## Otherwise configure the features to match this type.
   type: set-me
+  # azure:
+  #  resourceGroup: set-me
   # gcs:
   #   project: set-me
   # s3:
@@ -357,7 +359,7 @@ kubeStateMetrics:
       memory: 300Mi
   # Enable this if your cluster is managed by Cluster API to get Cluster API metrics.
   clusterAPIMetrics:
-    enabled: false
+    enabled: set-me
 
 openstackMonitoring:
   ## Enables openstack api metrics.
@@ -1071,8 +1073,7 @@ networkPolicies:
       ips:
         - set-me
     serviceIp:
-      ips:
-        - "10.233.0.3/32"
+      ips: set-me
 
   dnsAutoscaler:
     enabled: true
