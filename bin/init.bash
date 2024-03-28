@@ -213,10 +213,6 @@ set_object_storage() {
             object_storage_type="none"
             ;;
 
-        azure)
-            object_storage_type="azure"
-            ;;
-
         none)
             return
             ;;
