@@ -51,6 +51,7 @@
     - name: Install apt-packages
       apt:
         pkg: "{{ apt_list }}"
+        update_cache: yes
 
     - name: Kubectl
       block:
