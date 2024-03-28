@@ -16,14 +16,12 @@
     yajsv_version: 1.4.1
     pwgen_version: 2.08*
     apache2_utils_version: 2.4.*
-    azure_cli_version: 2.58.*
     apt_list:
       - curl
       - s3cmd={{ s3cmd_version }}
       - dnsutils
       - apache2-utils={{ apache2_utils_version }}
       - pwgen={{ pwgen_version }}
-      - azure-cli={{ azure_cli_version }}
     get_url_list:
       - command: jq
         version: "{{ jq_version }}"
@@ -50,9 +48,6 @@
   become: yes
   become_user: root
   tasks:
-    - name: update repos list
-      include_tasks: add-microsoft-repo.yaml
-
     - name: Install apt-packages
       apt:
         pkg: "{{ apt_list }}"
