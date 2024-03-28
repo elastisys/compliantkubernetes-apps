@@ -19,6 +19,7 @@ repositories:
 
   kubernetes-ingress-nginx: https://kubernetes.github.io/ingress-nginx
   kubernetes-metrics-server: https://kubernetes-sigs.github.io/metrics-server
+  kubernetes-external-dns: https://kubernetes-sigs.github.io/external-dns
 
   minio: https://charts.min.io/
 
@@ -55,6 +56,7 @@ charts:
 
   kubernetes-ingress-nginx/ingress-nginx: 4.9.1
   kubernetes-metrics-server/metrics-server: 3.10.0
+  kubernetes-external-dns/external-dns: 1.14.3
 
   minio/minio: 5.0.14
 

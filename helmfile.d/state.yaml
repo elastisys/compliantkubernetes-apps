@@ -26,6 +26,7 @@ bases:
   - stacks/system.yaml
   - stacks/thanos.yaml
   - stacks/velero.yaml
+  - stacks/external-dns.yaml
 ---
 releases:
   - inherit: [ template: tigera ]
@@ -123,6 +124,9 @@ releases:
   - inherit: [ template: kured-podsecuritypolicy ]
   - inherit: [ template: kured-secret ]
   - inherit: [ template: kured-main ]
+
+  - inherit: [ template: external-dns-secret-crds ]
+  - inherit: [ template: external-dns-main ]
 
   - inherit: [ template: velero-networkpolicy ]
   - inherit: [ template: velero-podsecuritypolicy ]
