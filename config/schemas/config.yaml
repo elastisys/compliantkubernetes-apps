@@ -126,6 +126,654 @@ properties:
           - containerd
           - docker
     additionalProperties: false
+  calicoAccountant:
+    additionalProperties: false
+    properties:
+      backend:
+        default: iptables
+        enum:
+          - iptables
+          - nftables
+        type: string
+      enabled:
+        default: true
+        type: boolean
+      resources:
+        $ref: '#/$defs/resources'
+      tolerations:
+        $ref: '#/$defs/tolerations'
+    type: object
+  calicoFelixMetrics:
+    additionalProperties: false
+    properties:
+      enabled:
+        default: true
+        type: boolean
+    type: object
+  certmanager:
+    additionalProperties: false
+    properties:
+      affinity:
+        $ref: '#/$defs/affinity'
+      cainjector:
+        $ref: '#/$defs/commonResource'
+      extraArgs:
+        $ref: '#/$defs/extraArgs'
+      nodeSelector:
+        $ref: '#/$defs/nodeSelector'
+      resources:
+        $ref: '#/$defs/resources'
+      tolerations:
+        $ref: '#/$defs/tolerations'
+      topologySpreadConstraints:
+        $ref: '#/$defs/topologySpreadConstraints'
+      webhook:
+        $ref: '#/$defs/commonResource'
+    type: object
+  ingressNginx:
+    additionalProperties: false
+    properties:
+      controller:
+        additionalProperties: false
+        properties:
+          additionalConfig:
+            type: object
+          affinity:
+            $ref: '#/$defs/affinity'
+          allowSnippetAnnotations:
+            default: false
+            type: boolean
+          chroot:
+            type: boolean
+          config:
+            additionalProperties: false
+            properties:
+              useProxyProtocol:
+                type: boolean
+            type: object
+          enablepublishService:
+            default: false
+            type: boolean
+          extraArgs: true
+          nodeSelector:
+            $ref: '#/$defs/nodeSelector'
+          resources:
+            $ref: '#/$defs/resources'
+          service:
+            additionalProperties: false
+            properties:
+              annotations:
+                additionalProperties:
+                  type: string
+                type: object
+              clusterIP:
+                format: ipv4
+                type: string
+              enabled:
+                type: boolean
+              loadBalancerSourceRanges:
+                items:
+                  type: string
+                type: array
+              nodePorts:
+                additionalProperties: false
+                properties:
+                  http:
+                    default: 30080
+                    type: integer
+                  https:
+                    default: 30443
+                    type: integer
+                type: object
+              type:
+                enum:
+                  - ClusterIP
+                  - NodePort
+                  - LoadBalancer
+                  - ExternalName
+                type: string
+            type: object
+          tolerations:
+            $ref: '#/$defs/tolerations'
+          useHostPort:
+            type: boolean
+        type: object
+      defaultBackend:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/affinity'
+          nodeSelector:
+            $ref: '#/$defs/nodeSelector'
+          resources:
+            $ref: '#/$defs/resources'
+          tolerations:
+            $ref: '#/$defs/tolerations'
+        type: object
+      subDomain:
+        type: string
+    type: object
+  issuers:
+    additionalProperties: false
+    properties:
+      extraIssuers:
+        type: array
+      letsencrypt:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          prod:
+            additionalProperties: false
+            properties:
+              email:
+                type: string
+              solvers:
+                type: array
+            type: object
+          staging:
+            additionalProperties: false
+            properties:
+              email:
+                type: string
+              solvers:
+                type: array
+            type: object
+        type: object
+    type: object
+  networkPolicies:
+    additionalProperties: false
+    properties:
+      additional:
+        type: object
+      additionalEgressPolicies:
+        type: array
+      additionalIngressPolicies:
+        type: array
+      alertmanager:
+        additionalProperties: false
+        properties:
+          alertReceivers:
+            $ref: '#/$defs/listen'
+        type: object
+      allowedNameSpaces:
+        type: array
+      certManager:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          letsencrypt:
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+            type: object
+          namespaces:
+            items:
+              default: dex
+              type: string
+            type: array
+        type: object
+      coredns:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          externalDns:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  type: string
+                type: array
+            type: object
+          serviceIp:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  default: 10.233.0.3/32
+                  type: string
+                type: array
+            type: object
+        type: object
+      defaultDeny:
+        default: false
+        type: boolean
+      dex:
+        additionalProperties: false
+        properties:
+          connectors:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  type: string
+                type: array
+              ports:
+                items:
+                  default: 443
+                  type: number
+                type: array
+            type: object
+          enabled:
+            default: true
+            type: boolean
+        type: object
+      dnsAutoscaler:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+        type: object
+      enableAlerting:
+        default: true
+        type: boolean
+      falco:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          plugins:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  type: string
+                type: array
+              ports:
+                items:
+                  default: 443
+                  type: number
+                type: array
+            type: object
+        type: object
+      fluentd:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+        type: object
+      gatekeeper:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+        type: object
+      global:
+        additionalProperties: false
+        properties:
+          externalLoadBalancer:
+            type: boolean
+          ingressUsingHostNetwork:
+            type: boolean
+          objectStorage:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  type: string
+                type: array
+              ports:
+                $ref: '#/$defs/portlist'
+            required:
+              - ips
+            type: object
+          objectStorageSwift:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  type: string
+                type: array
+              ports:
+                $ref: '#/$defs/portlist'
+                default:
+                  - 5000
+            required:
+              - ips
+            type: object
+          scApiserver:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  type: string
+                type: array
+              port:
+                default: 6443
+                type: number
+            required:
+              - ips
+            type: object
+          scIngress:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  type: string
+                type: array
+            required:
+              - ips
+            type: object
+          scNodes:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  type: string
+                type: array
+            required:
+              - ips
+            type: object
+          trivy:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  type: string
+                type: array
+              port:
+                default: 443
+                type: number
+            required:
+              - ips
+            type: object
+          wcIngress:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  type: string
+                type: array
+            required:
+              - ips
+            type: object
+        required:
+          - externalLoadBalancer
+          - ingressUsingHostNetwork
+        type: object
+      harbor:
+        additionalProperties: false
+        properties:
+          database:
+            additionalProperties: false
+            properties:
+              externalEgress:
+                additionalProperties: false
+                properties:
+                  peers:
+                    type: array
+                  ports:
+                    type: array
+                type: object
+              internalIngress:
+                additionalProperties: false
+                properties:
+                  peers:
+                    type: array
+                  ports:
+                    type: array
+                type: object
+            type: object
+          enabled:
+            default: true
+            type: boolean
+          jobservice:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  type: string
+                type: array
+              ports:
+                items:
+                  default: 443
+                  type: number
+                type: array
+            type: object
+          redis:
+            additionalProperties: false
+            properties:
+              externalEgress:
+                additionalProperties: false
+                properties:
+                  peers:
+                    type: array
+                  ports:
+                    type: array
+                type: object
+            type: object
+          registries:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  type: string
+                type: array
+              ports:
+                items:
+                  default: 443
+                  type: number
+                type: array
+            type: object
+          trivy:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  type: string
+                type: array
+              ports:
+                items:
+                  default: 443
+                  type: number
+                type: array
+            type: object
+        type: object
+      ingressNginx:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          ingressOverride:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: false
+                type: boolean
+              ips:
+                items:
+                  type: string
+                type: array
+            type: object
+        type: object
+      kubeSystem:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+        type: object
+      kured:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          notificationSlack:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  type: string
+                type: array
+              ports:
+                items:
+                  default: 443
+                  type: number
+                type: array
+            type: object
+        type: object
+      monitoring:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          grafana:
+            additionalProperties: false
+            properties:
+              externalDashboardProvider:
+                additionalProperties: false
+                properties:
+                  ips:
+                    items:
+                      type: string
+                    type: array
+                  ports:
+                    items:
+                      default: 443
+                      type: number
+                    type: array
+                type: object
+              externalDataSources:
+                additionalProperties: false
+                properties:
+                  enabled:
+                    default: false
+                    type: boolean
+                  ips:
+                    items:
+                      type: string
+                    type: array
+                  ports:
+                    items:
+                      type: string
+                    type: array
+                type: object
+            type: object
+        type: object
+      opensearch:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          plugins:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  type: string
+                type: array
+              ports:
+                items:
+                  default: 443
+                  type: number
+                type: array
+            type: object
+        type: object
+      rcloneSync:
+        additionalProperties: false
+        properties:
+          destinationObjectStorageS3:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  type: string
+                type: array
+              ports:
+                items:
+                  default: 443
+                  type: number
+                type: array
+            type: object
+          destinationObjectStorageSwift:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  type: string
+                type: array
+              ports:
+                items:
+                  default: 5000
+                  type: number
+                type: array
+            type: object
+          enabled:
+            default: true
+            type: boolean
+          secondaryUrl:
+            additionalProperties: false
+            properties:
+              ips:
+                items:
+                  type: string
+                type: array
+              ports:
+                items:
+                  default: 443
+                  type: number
+                type: array
+            type: object
+        type: object
+      rookCeph:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: false
+            type: boolean
+        type: object
+      s3Exporter:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+        type: object
+      thanos:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+        type: object
+      velero:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+        type: object
+    type: object
+  nodeLocalDns:
+    additionalProperties: false
+    properties:
+      customConfig:
+        description: https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/#coredns-configmap-options
+        examples:
+          - |-
+            example.com:53 {
+              errors
+              cache 30
+              reload
+              loop
+              forward . 127.0.0.1:9005
+            }
+        type: string
+    type: object
 additionalProperties:
   type: object
   properties: {}
