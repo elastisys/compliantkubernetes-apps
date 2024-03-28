@@ -126,6 +126,570 @@ properties:
           - containerd
           - docker
     additionalProperties: false
+  clusterAdmin:
+    additionalProperties: false
+    properties:
+      groups:
+        items:
+          type: string
+        type: array
+      users:
+        items:
+          type: string
+        type: array
+    type: object
+  dex:
+    additionalProperties: false
+    dependentRequred:
+      enableStaticLogin:
+        - staticPassword
+    properties:
+      additionalKubeloginRedirects:
+        items:
+          examples:
+            - http://localhost:8080/redirect
+          format: uri
+          type: string
+        type: array
+      affinity:
+        $ref: '#/$defs/affinity'
+      enableStaticLogin:
+        default: true
+        description: enable a static password login
+        type: boolean
+      expiry:
+        additionalProperties: false
+        properties:
+          deviceRequests:
+            $ref: '#/$defs/timeRange'
+            default: 5m
+          idToken:
+            $ref: '#/$defs/timeRange'
+            default: 24h
+          refreshTokens:
+            additionalProperties: false
+            properties:
+              absoluteLifetime:
+                $ref: '#/$defs/timeRange'
+                default: 3960h
+              reuseInterval:
+                $ref: '#/$defs/timeRange'
+                default: 3s
+              validIfNotUsedFor:
+                $ref: '#/$defs/timeRange'
+                default: 2160h
+            type: object
+          signingKeys:
+            default: 6h
+            type: string
+        type: object
+      google:
+        additionalProperties: false
+        if:
+          properties:
+            groupSupport:
+              const: true
+        properties:
+          SASecretName:
+            type: string
+          groupSupport:
+            default: false
+            type: boolean
+        then:
+          required:
+            - SASecretName
+        type: object
+      nodeSelector:
+        $ref: '#/$defs/nodeSelector'
+      replicaCount:
+        default: 2
+        type: number
+      resources:
+        $ref: '#/$defs/resources'
+      serviceMonitor:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+        type: object
+      staticPassword:
+        default: $2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W
+        description: bcrypt hash of a password
+        type: string
+      subdomain:
+        default: dex
+        type: string
+      tolerations:
+        $ref: '#/$defs/tolerations'
+      topologySpreadConstraints:
+        $ref: '#/$defs/topologySpreadConstraints'
+    type: object
+  externalTrafficPolicy:
+    additionalProperties: false
+    properties:
+      local:
+        default: false
+        type: boolean
+      whitelistRange:
+        additionalProperties:
+          default: 0.0.0.0/0
+          type:
+            - string
+            - boolean
+        description: |-
+          CIDR IP ranges that enable various
+          `nginx.ingress.kubernetes.io/whitelist-source-range` annotations or a
+          boolean `false` to explicitly opt-out of the annotation.
+        title: IP range allow-lists
+        type: object
+    type: object
+  falco:
+    additionalProperties: false
+    description: |
+      Falco alerting configuration.
+
+      Available rule files and addons can be found at: <https://falcosecurity.github.io/falcoctl/index.yaml>
+    properties:
+      affinity:
+        $ref: '#/$defs/affinity'
+      alerts:
+        additionalProperties: false
+        description: Falco alerts will come from prometheus metrics
+        properties:
+          enabled:
+            default: false
+            type: boolean
+          hostPort:
+            default: http://alertmanager-operated.monitoring:9093
+            format: uri
+            type: string
+          priority:
+            default: notice
+            type: string
+          type:
+            default: alertmanager
+            enum:
+              - alertmanager
+              - slack
+            type: string
+        type: object
+      artifact:
+        additionalProperties: false
+        properties:
+          install:
+            additionalProperties: false
+            description: set to false in an air-gapped environment, unless artifacts are self-hosted
+            properties:
+              enabled:
+                type: boolean
+            type: object
+        type: object
+      customIndexes:
+        type: array
+      customRules:
+        additionalProperties:
+          format: yaml
+          type: string
+        type: object
+      driver:
+        additionalProperties: false
+        properties:
+          ebpf:
+            additionalProperties: false
+            properties:
+              hostNetwork:
+                default: false
+                type: boolean
+              path:
+                description: Path where the eBPF probe is located. It comes handy when the probe have been installed in the nodes using tools other than the init
+                type: string
+            type: object
+          kind:
+            default: module
+            type: string
+          module:
+            additionalProperties: false
+            description: override the URL used for downloading driver modules, e.g. to use a self hosted file server in an air-gapped environment
+            properties:
+              repoURL:
+                format: uri
+                type: string
+            type: object
+        type: object
+      enabled:
+        default: true
+        type: boolean
+      falcoExporter:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/affinity'
+          nodeSelector:
+            $ref: '#/$defs/nodeSelector'
+          resources:
+            $ref: '#/$defs/resources'
+          tolerations:
+            $ref: '#/$defs/tolerations'
+        type: object
+      falcoSidekick:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/affinity'
+          nodeSelector:
+            $ref: '#/$defs/nodeSelector'
+          resources:
+            $ref: '#/$defs/resources'
+          tolerations:
+            $ref: '#/$defs/tolerations'
+        type: object
+      nodeSelector:
+        $ref: '#/$defs/nodeSelector'
+      resources:
+        $ref: '#/$defs/resources'
+      rulesFiles:
+        additionalProperties: false
+        properties:
+          default:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: true
+                type: boolean
+              version:
+                default: 2.0.0
+                type: string
+            type: object
+          incubating:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: false
+                type: boolean
+              version:
+                default: 2.0.0
+                type: string
+            type: object
+          sandbox:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: false
+                type: boolean
+              version:
+                default: 2.0.0
+                type: string
+            type: object
+        type: object
+      tolerations:
+        $ref: '#/$defs/tolerations'
+      tty:
+        default: true
+        type: boolean
+    type: object
+  gatekeeper: true
+  kured:
+    additionalProperties: false
+    properties:
+      affinity:
+        $ref: '#/$defs/affinity'
+      configuration:
+        $comment: Would it be possible to extract schema from somewhere? Guess from the thing maybe?
+        description: |-
+          Passed through as-is to Kured chart
+          See <helmfile.d/upstream/kubereboot/kured/README.md#Configuration>
+        properties: {}
+        type: object
+      drainTimeout: true
+      dsAnnotations:
+        type: object
+      enabled:
+        default: false
+        type: boolean
+      endTime: true
+      extraArgs:
+        type: object
+      extraEnvVars:
+        type: object
+      metrics:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          interval:
+            default: 60s
+            type: string
+          labels:
+            type: object
+        type: object
+      nodeSelector:
+        $ref: '#/$defs/nodeSelector'
+      notification:
+        additionalProperties: false
+        properties:
+          slack:
+            additionalProperties: false
+            properties:
+              channel:
+                default: ""
+                type: string
+              enabled:
+                default: false
+                type: boolean
+            type: object
+        type: object
+      period: true
+      rebootDays: true
+      resources:
+        $ref: '#/$defs/resources'
+      startTime: true
+      timeZone: true
+      tolerations:
+        $ref: '#/$defs/tolerations'
+    type: object
+  opa:
+    additionalProperties: false
+    properties:
+      audit:
+        additionalProperties: false
+        properties:
+          affinity:
+            $ref: '#/$defs/affinity'
+          nodeSelector:
+            $ref: '#/$defs/nodeSelector'
+          resources:
+            $ref: '#/$defs/resources'
+          tolerations:
+            $ref: '#/$defs/tolerations'
+          topologySpreadConstraints:
+            $ref: '#/$defs/topologySpreadConstraints'
+          writeToRAMDisk:
+            default: false
+            type: boolean
+        type: object
+      auditChunkSize:
+        default: 500
+        type: number
+      auditFromCache:
+        default: false
+        type: boolean
+      auditIntervalSeconds:
+        default: 600
+        type: number
+      constraintViolationsLimit:
+        default: 20
+        type: number
+      controllerManager:
+        $ref: '#/$defs/commonResource'
+      disallowedTags:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          enforcement:
+            default: deny
+            type: string
+          tags:
+            items:
+              default: latest
+              type: string
+            type: array
+        type: object
+      imageRegistry:
+        additionalProperties: false
+        properties:
+          URL:
+            items:
+              examples:
+                - harbor.example.com
+                - quay.io/jetstack/cert-manager-acmesolver
+              type: string
+            type: array
+          enabled:
+            default: true
+            type: boolean
+          enforcement:
+            default: warn
+            type: string
+        type: object
+      mutatingWebhookTimeoutSeconds:
+        default: 5
+        type: number
+      mutations:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          jobTTL:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: true
+                type: boolean
+              ttlSeconds:
+                default: 604800
+                type: number
+            type: object
+          ndots:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: false
+                type: boolean
+              labelSelector:
+                additionalProperties: false
+                properties:
+                  matchLabels: {}
+                type: object
+              ndotAmount:
+                default: 3
+                type: integer
+            type: object
+        type: object
+      networkPolicies:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          enforcement:
+            default: warn
+            type: string
+        type: object
+      resourceRequests:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+          enforcement:
+            default: deny
+            type: string
+        type: object
+      validatingWebhookTimeoutSeconds:
+        default: 5
+        type: number
+    type: object
+  trivy:
+    additionalProperties: false
+    properties:
+      affinity:
+        $ref: '#/$defs/affinity'
+      clusterComplianceEnabled:
+        default: true
+        type: boolean
+      configAuditScannerEnabled:
+        default: true
+        type: boolean
+      enabled:
+        default: true
+        type: boolean
+      excludeNamespaces:
+        description: comma separated list of namespaces (or glob patterns) to be excluded from scanning
+        type: string
+      exposedSecretScannerEnabled:
+        default: true
+        type: boolean
+      infraAssessmentScannerEnabled:
+        default: true
+        type: boolean
+      rbacAssessmentScannerEnabled:
+        default: true
+        type: boolean
+      resources:
+        $ref: '#/$defs/resources'
+      sbomGenerationEnabled:
+        default: false
+        type: boolean
+      scanJobs:
+        additionalProperties: false
+        properties:
+          concurrentLimit:
+            default: 1
+            type: number
+          retryDelay:
+            default: 1m
+            type: string
+          timeout:
+            default: 5m
+            type: string
+        type: object
+      scanner:
+        additionalProperties: false
+        description: |
+          configurations for an offline / air-gapped environment
+          ref: <https://github.com/aquasecurity/trivy-operator/tree/main/deploy/helm#values>
+        properties:
+          additionalProperties: false
+          dbRegistry:
+            type: string
+          dbRepository:
+            type: string
+          dbRepositoryInsecure:
+            type: boolean
+          imagePullSecret:
+            additionalProperties: false
+            description: |
+              if authorization is required for pulling from registry, create a pull
+              secret in the monitoring namespace and configure the secret name
+            properties:
+              name:
+                type: string
+            type: object
+          javaDbRegistry:
+            type: string
+          javaDbRepository:
+            type: string
+          offlineScanEnabled:
+            type: boolean
+          registry:
+            examples:
+              - docker.io: registry.example.org:5000
+                gcr.io: registry.example.org:5000
+                ghcr.io: registry.example.org:5000
+                index.docker.io: registry.example.org:5000
+                quay.io: registry.example.org:5000
+                registry.k8s.io: registry.example.org:5000
+            properties:
+              mirror:
+                additionalProperties:
+                  description: a docker registry
+                  examples:
+                    - registry.example.org:5000
+                  type: string
+                type: object
+            type: object
+        type: object
+      serviceMonitor:
+        additionalProperties: false
+        properties:
+          enabled:
+            default: true
+            type: boolean
+        type: object
+      tolerations:
+        $ref: '#/$defs/tolerations'
+      vulnerabilityScanner:
+        additionalProperties: false
+        properties:
+          scanOnlyCurrentRevisions:
+            default: true
+            type: boolean
+          scannerReportTTL:
+            $ref: '#/$defs/timeRange'
+            default: 720h
+        type: object
+      vulnerabilityScannerEnabled:
+        default: true
+        type: boolean
+    required:
+      - enabled
+    title: Trivy security scanner
+    type: object
 additionalProperties:
   type: object
   properties: {}
