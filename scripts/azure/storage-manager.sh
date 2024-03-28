@@ -18,7 +18,7 @@ log_error() {
 
 common_default=$(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
 # shellcheck disable=SC2016
-common_config=$(echo "${common_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/common-config.yaml"))
+common_config=$(echo "${common_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/common-config.yaml") | yq4 '{"objectStorage":.}' -)
 
 # shellcheck disable=SC2016
 sc_default=$(echo "${common_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml"))

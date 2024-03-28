@@ -205,8 +205,8 @@ set_object_storage() {
 
         azure)
             object_storage_type="azure"
-            yq4 --inplace '.objectStorage.azure.resourceGroup = "set-me' "${file}"
-            yq4 --inplace '.objectStorage.azure.storageAccountName = "set-me' "${file}"
+            yq4 --inplace '.objectStorage.azure.resourceGroup = "set-me"' "${file}"
+            yq4 --inplace '.objectStorage.azure.storageAccountName = "set-me"' "${file}"
             ;;
 
         baremetal)
@@ -219,8 +219,8 @@ set_object_storage() {
 
     replace_set_me "${file}" ".objectStorage.type" "\"${object_storage_type}\""
     if [ "$object_storage_type" == "azure" ]; then
-        replace_set_me "${file}" ".objectStorage.azure.resourceGroup" "${CK8S_ENVIRONMENT_NAME}-storage"
-        replace_set_me "${file}" ".objectStorage.azure.storageAccountName" "${CK8S_ENVIRONMENT_NAME}"
+        replace_set_me "${file}" ".objectStorage.azure.resourceGroup" "\"${CK8S_ENVIRONMENT_NAME}-storage\""
+        replace_set_me "${file}" ".objectStorage.azure.storageAccountName" "\"${CK8S_ENVIRONMENT_NAME}\""
     fi
 }
 
