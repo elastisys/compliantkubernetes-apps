@@ -41,16 +41,20 @@ update_ips.mock_minimal() {
 
   mock_set_output "${mock_kubectl}" "127.0.1.1 127.0.2.1 127.0.3.1" 1 # .networkPolicies.global.scApiserver.ips node internal
   mock_set_output "${mock_kubectl}" "127.0.1.2 127.0.2.2 127.0.3.2" 2 # .networkPolicies.global.scApiserver.ips calico ipip
-  mock_set_output "${mock_kubectl}" "127.0.1.3 127.0.2.3 127.0.3.3" 3 # .networkPolicies.global.scApiserver.ips calico wireguard
-  mock_set_output "${mock_kubectl}" "127.0.1.7 127.0.2.7 127.0.3.7" 4 # .networkPolicies.global.scNodes.ips node internal
-  mock_set_output "${mock_kubectl}" "127.0.1.8 127.0.2.8 127.0.3.8" 5 # .networkPolicies.global.scNodes.ips calico ipip
-  mock_set_output "${mock_kubectl}" "127.0.1.9 127.0.2.9 127.0.3.9" 6 # .networkPolicies.global.scNodes.ips calico wireguard
-  mock_set_output "${mock_kubectl}" "127.0.1.4 127.0.2.4 127.0.3.4" 7 # .networkPolicies.global.wcApiserver.ips node internal
-  mock_set_output "${mock_kubectl}" "127.0.1.5 127.0.2.5 127.0.3.5" 8 # .networkPolicies.global.wcApiserver.ips calico ipip
-  mock_set_output "${mock_kubectl}" "127.0.1.6 127.0.2.6 127.0.3.6" 9 # .networkPolicies.global.wcApiserver.ips calico wireguard
-  mock_set_output "${mock_kubectl}" "127.0.1.10 127.0.2.10 127.0.3.10" 10 # .networkPolicies.global.wcNodes.ips node internal
-  mock_set_output "${mock_kubectl}" "127.0.1.11 127.0.2.11 127.0.3.11" 11 # .networkPolicies.global.wcNodes.ips calico ipip
-  mock_set_output "${mock_kubectl}" "127.0.1.12 127.0.2.12 127.0.3.12" 12 # .networkPolicies.global.wcNodes.ips calico wireguard
+  mock_set_output "${mock_kubectl}" "127.0.1.2 127.0.2.2 127.0.3.2" 3 # .networkPolicies.global.scApiserver.ips calico vxlan
+  mock_set_output "${mock_kubectl}" "127.0.1.3 127.0.2.3 127.0.3.3" 4 # .networkPolicies.global.scApiserver.ips calico wireguard
+  mock_set_output "${mock_kubectl}" "127.0.1.7 127.0.2.7 127.0.3.7" 5 # .networkPolicies.global.scNodes.ips node internal
+  mock_set_output "${mock_kubectl}" "127.0.1.8 127.0.2.8 127.0.3.8" 6 # .networkPolicies.global.scNodes.ips calico ipip
+  mock_set_output "${mock_kubectl}" "127.0.1.8 127.0.2.8 127.0.3.8" 7 # .networkPolicies.global.scNodes.ips calico vxlan
+  mock_set_output "${mock_kubectl}" "127.0.1.9 127.0.2.9 127.0.3.9" 8 # .networkPolicies.global.scNodes.ips calico wireguard
+  mock_set_output "${mock_kubectl}" "127.0.1.4 127.0.2.4 127.0.3.4" 9 # .networkPolicies.global.wcApiserver.ips node internal
+  mock_set_output "${mock_kubectl}" "127.0.1.5 127.0.2.5 127.0.3.5" 10 # .networkPolicies.global.wcApiserver.ips calico ipip
+  mock_set_output "${mock_kubectl}" "127.0.1.5 127.0.2.5 127.0.3.5" 11 # .networkPolicies.global.wcApiserver.ips calico vxlan
+  mock_set_output "${mock_kubectl}" "127.0.1.6 127.0.2.6 127.0.3.6" 12 # .networkPolicies.global.wcApiserver.ips calico wireguard
+  mock_set_output "${mock_kubectl}" "127.0.1.10 127.0.2.10 127.0.3.10" 13 # .networkPolicies.global.wcNodes.ips node internal
+  mock_set_output "${mock_kubectl}" "127.0.1.11 127.0.2.11 127.0.3.11" 14 # .networkPolicies.global.wcNodes.ips calico ipip
+  mock_set_output "${mock_kubectl}" "127.0.1.11 127.0.2.11 127.0.3.11" 15 # .networkPolicies.global.wcNodes.ips calico vxlan
+  mock_set_output "${mock_kubectl}" "127.0.1.12 127.0.2.12 127.0.3.12" 16 # .networkPolicies.global.wcNodes.ips calico wireguard
 }
 
 update_ips.mock_maximal() {
@@ -178,7 +182,7 @@ update_ips.assert_minimal() {
 
   assert_equal "$(mock_get_call_num "${mock_curl}")" 0
   assert_equal "$(mock_get_call_num "${mock_dig}")" 3
-  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 12
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16
 }
 
 update_ips.assert_swift() {
@@ -187,7 +191,7 @@ update_ips.assert_swift() {
 
   assert_equal "$(mock_get_call_num "${mock_curl}")" 2
   assert_equal "$(mock_get_call_num "${mock_dig}")" 5
-  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 12
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16
 }
 
 update_ips.assert_rclone_s3() {
@@ -197,7 +201,7 @@ update_ips.assert_rclone_s3() {
   assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 4
-  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 12
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16
   assert_equal "$(mock_get_call_num "${mock_curl}")" 0
 }
 
@@ -209,7 +213,7 @@ update_ips.assert_rclone_s3_and_swift() {
   assert_equal "$(yq4 '.networkPolicies.rcloneSync.destinationObjectStorageSwift | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[443, 5678]"
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 6
-  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 12
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16
   assert_equal "$(mock_get_call_num "${mock_curl}")" 2
 }
 
