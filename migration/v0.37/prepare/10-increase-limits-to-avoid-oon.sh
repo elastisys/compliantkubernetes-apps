@@ -13,10 +13,10 @@ if [[ "${CK8S_CLUSTER}" =~ ^(sc|both)$ ]]; then
     log_info "- check if thanos ruler memory limit is less than 300Mi"
     bytelimit=$(yq4 '.thanos.ruler.resources.limits.memory' "${CK8S_CONFIG_PATH}/sc-config.yaml" | LC_ALL=C numfmt --from=auto)
     if [ -n "$bytelimit" ] && ((bytelimit < 314572800)); then
-        log_info "- increase the thanos ruler memory limit to 300Mi"
-        yq4 -i '.thanos.ruler.resources.limits.memory = "300Mi"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
-      else
-        log_info "- thanos ruler memory limit is greater or equal with 300Mi, will not update it"
+      log_info "- increase the thanos ruler memory limit to 300Mi"
+      yq4 -i '.thanos.ruler.resources.limits.memory = "300Mi"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+    else
+      log_info "- thanos ruler memory limit is greater or equal with 300Mi, will not update it"
     fi
   fi
   # Check thanos.storegateway.resources.limits.memory
@@ -24,10 +24,10 @@ if [[ "${CK8S_CLUSTER}" =~ ^(sc|both)$ ]]; then
     log_info "- check if thanos storegateway memory limit is less than 2000Mi"
     bytelimit=$(yq4 '.thanos.storegateway.resources.limits.memory' "${CK8S_CONFIG_PATH}/sc-config.yaml" | LC_ALL=C numfmt --from=auto)
     if [ -n "$bytelimit" ] && ((bytelimit < 2097152000)); then
-        log_info "- increase the thanos storegateway memory limit to 2000Mi"
-        yq4 -i '.thanos.storegateway.resources.limits.memory = "2000Mi"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
-      else
-        log_info "- thanos storegateway memory limit is greater or equal with 2000Mi, will not update it"
+      log_info "- increase the thanos storegateway memory limit to 2000Mi"
+      yq4 -i '.thanos.storegateway.resources.limits.memory = "2000Mi"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+    else
+      log_info "- thanos storegateway memory limit is greater or equal with 2000Mi, will not update it"
     fi
   fi
   # Check opensearch.exporter.resources.limits.memory:
@@ -35,10 +35,10 @@ if [[ "${CK8S_CLUSTER}" =~ ^(sc|both)$ ]]; then
     log_info "- check if opensearch exporter memory limit is less than 300Mi"
     bytelimit=$(yq4 '.opensearch.exporter.resources.limits.memory' "${CK8S_CONFIG_PATH}/sc-config.yaml" | LC_ALL=C numfmt --from=auto)
     if [ -n "$bytelimit" ] && ((bytelimit < 314572800)); then
-        log_info "- increase the opensearch exporter memory limit to 300Mi"
-        yq4 -i '.opensearch.exporter.resources.limits.memory = "300Mi"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
-      else
-        log_info "- opensearch exporter memory limit is greater or equal with 300Mi, will not update it"
+      log_info "- increase the opensearch exporter memory limit to 300Mi"
+      yq4 -i '.opensearch.exporter.resources.limits.memory = "300Mi"' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+    else
+      log_info "- opensearch exporter memory limit is greater or equal with 300Mi, will not update it"
     fi
   fi
   # Check falco.resources.limits.memory
