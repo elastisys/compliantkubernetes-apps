@@ -142,12 +142,6 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
-1. Apply the kube-prometheus-stack CRDs
-
-    ```bash
-    ./migration/v0.37/apply/11-kube-prometheus-stack.sh execute
-    ```
-
 1. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.
@@ -193,9 +187,21 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
 1. Upgrade Opensearch:
 
-  ```
-  ./migration/v0.37/apply/20-upgrade-opensearch.sh execute
-  ```
+    ```bash
+    ./migration/v0.37/apply/20-upgrade-opensearch.sh execute
+    ```
+
+1. Replace the ingress-nginx-probe-ingress chart:
+
+    ```bash
+    ./migration/v0.37/apply/30-reinstall-probe-ingress.sh execute
+    ```
+
+1. Upgrade Falco on WC
+
+    ```bash
+    ./migration/v0.37/apply/40-upgrade-falco-wc.sh execute
+    ```
 
 1. Upgrade applications:
 
