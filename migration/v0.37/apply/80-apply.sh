@@ -17,6 +17,7 @@ skipped_sc=(
 )
 declare -a skipped_wc
 skipped_wc=(
+  "app!=falco"
 )
 
 run() {
