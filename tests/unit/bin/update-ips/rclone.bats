@@ -368,7 +368,7 @@ _test_apply_rclone_sync_s3_and_swift() {
   assert_equal "$(yq_dig sc '.networkPolicies.rcloneSync.secondaryUrl.ports | . style="flow"')" "[1234]"
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 4
-  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 12
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16
   assert_equal "$(mock_get_call_num "${mock_curl}")" 0
 }
 
@@ -382,7 +382,7 @@ _test_apply_rclone_sync_s3_and_swift() {
   assert_equal "$(yq4 '.networkPolicies.rcloneSync.secondaryUrl' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 3
-  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 12
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16
   assert_equal "$(mock_get_call_num "${mock_curl}")" 0
 }
 

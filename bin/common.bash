@@ -9,6 +9,7 @@
 # shellcheck disable=SC2034
 ck8s_cloud_providers=(
     "aws"
+    "azure"
     "baremetal"
     "citycloud"
     "exoscale"
