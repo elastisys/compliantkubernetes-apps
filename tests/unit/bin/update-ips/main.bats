@@ -109,7 +109,7 @@ _apply_normalise() {
 
   run ck8s update-ips both apply
 
-  assert_equal "$(yq_dig sc '.networkPolicies.global.scApiserver.ips | . style="flow"')" "[126.0.0.3/32, 126.0.0.20/32, 127.0.1.1/32, 127.0.1.2/32, 127.0.1.3/32, 127.0.2.1/32, 127.0.2.2/32, 127.0.2.3/32, 127.0.3.1/32, 127.0.3.2/32, 127.0.3.3/32]"
+  assert_equal "$(yq_dig sc '.networkPolicies.global.scApiserver.ips | . style="flow"')" "[126.0.0.3/32, 126.0.0.20/32, 127.0.1.1/32, 127.0.1.2/32, 127.0.1.3/32, 127.0.1.21/32, 127.0.2.1/32, 127.0.2.2/32, 127.0.2.3/32, 127.0.2.21/32, 127.0.3.1/32, 127.0.3.2/32, 127.0.3.3/32, 127.0.3.21/32]"
 
   assert_equal "$(mock_get_call_num "${mock_curl}")" 0
   assert_equal "$(mock_get_call_num "${mock_dig}")" 3
