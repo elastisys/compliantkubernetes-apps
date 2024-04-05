@@ -3,9 +3,9 @@ nameOverride: ""
 
 imagePullSecrets: []
 image:
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
   repository: ghcr.io/elastisys/compliantkubernetes-apps-log-manager
-  tag: "0.3.0"
+  tag: ""
 
 s3:
   enabled: false
