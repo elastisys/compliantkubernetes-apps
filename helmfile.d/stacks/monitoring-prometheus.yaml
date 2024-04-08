@@ -91,6 +91,8 @@ templates:
     chart: charts/kube-state-metrics-extra-resource-metrics
     version: 0.1.0
     name: kube-state-metrics-extra-resource-metrics
+    needs:
+      - kube-system/admin-namespaces
     values:
       - values/kube-state-metrics-extra-resource-metrics.yaml.gotmpl
 
