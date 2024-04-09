@@ -462,7 +462,8 @@ prometheus:
     # repository: prometheus/alertmanager
     # tag: vX.Y.Z
   diskAlerts:
-    perf: true
+    perf:
+      enabled: true
 
 dex:
   replicaCount: 2

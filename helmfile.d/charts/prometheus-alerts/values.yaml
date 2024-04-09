@@ -67,7 +67,11 @@ diskAlerts:
     #        node: "" # Node to filter out from pattern matching
     #        disk: "" # Disk to filter out from pattern matching
     space: []
-  perf: false
+  perf:
+    enabled: false
+    queueSizeThreshold: 0.5
+    writeWaitTimeThreshold: 0.1
+    readWaitTimeThreshold: 0.01
 
 defaultRules:
   create: true

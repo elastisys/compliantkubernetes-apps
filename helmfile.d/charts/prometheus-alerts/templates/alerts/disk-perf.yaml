@@ -1,5 +1,5 @@
 # Based on https://github.com/rook/rook/blob/master/cluster/examples/kubernetes/ceph/monitoring/prometheus-ceph-v14-rules.yaml
-{{- if .Values.diskAlerts.perf }}
+{{- if .Values.diskAlerts.perf.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -19,5 +19,50 @@ spec:
   # The rules contain templates for prometheus, which breaks helm if trying
   # to render them. We have to either escape them or (as we do here) include
   # them without going through the template rendering.
-  {{- .Files.Get "files/disk-perf.yaml" | nindent 2}}
+  groups:
+    - name: disk-performance
+      rules:
+        - alert: DiskReadWaitTimeHigh
+          annotations:
+            description: Disk {{`{{`}} $labels.device {{`}}`}} Wait Time on {{`{{`}} $labels.instance {{`}}`}} is {{`{{`}} $value {{`}}`}}, check the workload
+            summary: Disk {{`{{`}} $labels.device {{`}}`}} Wait Time is high on {{`{{`}} $labels.instance {{`}}`}}
+            severity_level: warning
+            storage_type: local
+          expr: |
+            (
+            rate(node_disk_read_time_seconds_total{job="node-exporter"}[1m])
+            /
+            rate(node_disk_reads_completed_total{job="node-exporter"}[1m])
+            ) > {{ .Values.diskAlerts.perf.readWaitTimeThreshold }}
+          for: 10m
+          labels:
+            severity: warning
+        - alert: DiskWriteWaitTimeHigh
+          annotations:
+            description: Disk {{`{{`}} $labels.device {{`}}`}} Wait Time on {{`{{`}} $labels.instance {{`}}`}} is {{`{{`}} $value {{`}}`}}, check the workload
+            summary: Disk {{`{{`}} $labels.device {{`}}`}} Wait Time is high on {{`{{`}} $labels.instance {{`}}`}}
+            severity_level: warning
+            storage_type: local
+          expr: |
+            (
+            rate(node_disk_write_time_seconds_total{job="node-exporter"}[1m])
+            /
+            rate(node_disk_writes_completed_total{job="node-exporter"}[1m])
+            ) > {{ .Values.diskAlerts.perf.writeWaitTimeThreshold }}
+          for: 10m
+          labels:
+            severity: warning
+        - alert: DiskQueueSizeHigh
+          annotations:
+            description: Disk {{`{{`}} $labels.device {{`}}`}} Queue Size on {{`{{`}} $labels.instance {{`}}`}} is {{`{{`}} $value {{`}}`}}, check the workload
+            summary: Disk {{`{{`}} $labels.device {{`}}`}} has very large Queue Size on {{`{{`}} $labels.instance {{`}}`}}
+            severity_level: warning
+            storage_type: local
+          expr: |
+            (
+            rate(node_disk_io_time_weighted_seconds_total{job="node-exporter"}[1m])
+            ) > {{ .Values.diskAlerts.perf.queueSizeThreshold }}
+          for: 10m
+          labels:
+            severity: warning
 {{- end }}
