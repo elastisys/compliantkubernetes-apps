@@ -18,3 +18,6 @@ rules:
 - apiGroups: ["constraints.gatekeeper.sh"]
   resources: ["*"]
   verbs: ["get", "watch", "list"]
+- apiGroups: ["storage.k8s.io"]
+  resources: ["storageclasses"]
+  verbs: ["get", "watch", "list"]
