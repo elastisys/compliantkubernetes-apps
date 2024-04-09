@@ -586,7 +586,7 @@ ingressNginx:
 
       ## Annotations to add to service
       ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
-      annotations: {}
+      annotations: set-me
 
       ## Enable node port allocation
       ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#load-balancer-nodeport-allocation
