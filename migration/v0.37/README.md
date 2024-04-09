@@ -142,6 +142,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
+1. Check if application developer OIDC groups are used for Grafana user:
+
+    ```bash
+    ./migration/v0.37/prepare/20-check-grafana-oidc-groups.sh
+    ```
+
 1. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.
