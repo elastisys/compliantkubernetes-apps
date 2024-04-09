@@ -102,6 +102,7 @@ grafana:
     nodeSelector: {}
     oidc:
       enabled: true
+      skipRoleSync: false  # enable if you want to manage the roles of your users from within Grafana
       userGroups:
         grafanaAdmin: grafana_admin    # maps to grafana role admin
         grafanaEditor: grafana_editor  # maps to grafana role editor

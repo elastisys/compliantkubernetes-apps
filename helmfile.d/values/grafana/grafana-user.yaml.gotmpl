@@ -114,6 +114,7 @@ grafana.ini:
     allowed_domains: {{ join " " .Values.grafana.user.oidc.allowedDomains }}
     allow_sign_up: true
     tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}
+    skip_org_role_sync: {{ .Values.grafana.user.oidc.skipRoleSync }}
     role_attribute_path: contains(groups[*], '{{ .Values.grafana.user.oidc.userGroups.grafanaAdmin }}') && 'Admin' || contains(groups[*], '{{ .Values.grafana.user.oidc.userGroups.grafanaEditor }}') && 'Editor' || contains(groups[*], '{{ .Values.grafana.user.oidc.userGroups.grafanaViewer }}') && 'Viewer'
   users:
     viewers_can_edit: {{ .Values.grafana.user.viewersCanEdit }}
