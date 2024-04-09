@@ -5,9 +5,6 @@
 # bats file_tags=static,bin:init,citycloud
 
 setup_file() {
-  # Not supported right now, might be able to leverage env.cache with some adaptions
-  export BATS_NO_PARALLELIZE_WITHIN_FILE=true
-
   load "../../../common/lib"
   load "../../../common/lib/env"
   load "../../../common/lib/gpg"
@@ -16,7 +13,6 @@ setup_file() {
   env.setup
 
   env.init dev citycloud
-  env.cache_create
 }
 
 setup() {
@@ -25,11 +21,14 @@ setup() {
   load "script"
 
   common_setup
-  env.cache_restore
+  env.private
+}
+
+teardown() {
+  env.teardown
 }
 
 teardown_file() {
-  env.cache_delete
   env.teardown
   gpg.teardown
 }

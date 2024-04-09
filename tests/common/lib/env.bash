@@ -106,19 +106,16 @@ env.teardown() {
   rm -rf "${CK8S_CONFIG_PATH}"
 }
 
-env.cache_create() {
+# Create a private copy of the current config path
+env.private() {
   if [[ -z "${CK8S_CONFIG_PATH:-}" ]]; then
     fail "CK8S_CONFIG_PATH is unset!"
   fi
 
-  cp -r "${CK8S_CONFIG_PATH}" "${CK8S_CONFIG_PATH}-cache"
-}
+  local target
+  target="$(mktemp --directory)"
 
-env.cache_delete() {
-  rm -rf "${CK8S_CONFIG_PATH}" "${CK8S_CONFIG_PATH}-cache"
-}
+  cp -Tr "${CK8S_CONFIG_PATH}" "${target}"
 
-env.cache_restore() {
-  rm -rf "${CK8S_CONFIG_PATH}"
-  cp -r "${CK8S_CONFIG_PATH}-cache" "${CK8S_CONFIG_PATH}"
+  export CK8S_CONFIG_PATH="${target}"
 }

@@ -18,13 +18,9 @@ setup_file() {
 
   yq_set common .objectStorage.type '"s3"'
   yq_set common .objectStorage.s3.regionEndpoint '"https://s3.foo.dev-ck8s.com:1234"'
-
-  env.cache_create
 }
 
 teardown_file() {
-  env.cache_delete
-
   env.teardown
   gpg.teardown
 }
@@ -36,12 +32,17 @@ setup() {
 
   common_setup
 
-  env.cache_restore
+  env.private
+
   update_ips.setup_mocks
 
   export mock_curl
   export mock_dig
   export mock_kubectl
+}
+
+teardown() {
+  env.teardown
 }
 
 _apply_normalise() {

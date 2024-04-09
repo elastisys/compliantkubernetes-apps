@@ -24,13 +24,9 @@ setup_file() {
   yq_set sc .objectStorage.swift.domainName '"swift-domain"'
   yq_set sc .objectStorage.swift.projectDomainName '"swift-project-domain"'
   yq_set sc .objectStorage.swift.projectName '"swift-project"'
-
-  env.cache_create
 }
 
 teardown_file() {
-  env.cache_delete
-
   env.teardown
   gpg.teardown
 }
@@ -42,13 +38,17 @@ setup() {
 
   common_setup
 
-  env.cache_restore
+  env.private
 
   update_ips.setup_mocks
 
   export mock_curl
   export mock_dig
   export mock_kubectl
+}
+
+teardown() {
+  env.teardown
 }
 
 _test_requires_auth_endpoint() {

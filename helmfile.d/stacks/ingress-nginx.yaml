@@ -68,5 +68,7 @@ templates:
     chart: charts/ingress-nginx-probe-ingress
     installed: {{ .Values | get "wcProbeIngress.enabled" false }}
     version: 0.1.0
+    needs:
+      - ingress-nginx/networkpolicy
     values:
       - values/ingress-nginx-probe-ingress.yaml.gotmpl

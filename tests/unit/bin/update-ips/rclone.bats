@@ -30,13 +30,9 @@ setup_file() {
   yq_set sc .objectStorage.sync.syncDefaultBuckets 'false'
 
   yq_set sc .networkPolicies.rclone.enabled 'true'
-
-  env.cache_create
 }
 
 teardown_file() {
-  env.cache_delete
-
   env.teardown
   gpg.teardown
 }
@@ -48,13 +44,17 @@ setup() {
 
   common_setup
 
-  env.cache_restore
+  env.private
 
   update_ips.setup_mocks
 
   export mock_curl
   export mock_dig
   export mock_kubectl
+}
+
+teardown() {
+  env.teardown
 }
 
 # ---- setup -----------------------------------------------------------------------------------------------------------
