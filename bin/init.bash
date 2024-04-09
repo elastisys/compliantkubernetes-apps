@@ -247,7 +247,7 @@ set_nginx_config() {
             use_host_port=false
             service_enabled=true
             service_type=LoadBalancer
-            service_annotations=''
+            service_annotations='{}'
             external_load_balancer=false
             ingress_using_host_network=false
             ;;
@@ -257,7 +257,7 @@ set_nginx_config() {
             use_host_port=false
             service_enabled=true
             service_type=LoadBalancer
-            service_annotations='service.beta.kubernetes.io/aws-load-balancer-type: nlb'
+            service_annotations='{ "service.beta.kubernetes.io/aws-load-balancer-type": "nlb" }'
             external_load_balancer=false
             ingress_using_host_network=false
             ;;
@@ -285,7 +285,7 @@ set_nginx_config() {
         replace_set_me "${file}" '.ingressNginx.controller.service.annotations' '"set-me-if-ingressNginx.controller.service.enabled"'
     else
         replace_set_me "${file}" '.ingressNginx.controller.service.type' "\"${service_type}\""
-        replace_set_me "${file}" '.ingressNginx.controller.service.annotations' "\"${service_annotations}\""
+        replace_set_me "${file}" '.ingressNginx.controller.service.annotations' "${service_annotations}"
     fi
 }
 
