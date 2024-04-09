@@ -398,6 +398,8 @@ harbor:
       storageSize: 10Gi
   s3:
     multipartcopythresholdsize: "536870912"
+    multipartcopychunksize: "33554432"
+    multipartcopymaxconcurrency: "100"
   gc:
     enabled: true
     forceConfigure: false

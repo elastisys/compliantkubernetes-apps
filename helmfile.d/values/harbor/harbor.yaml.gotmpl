@@ -87,6 +87,8 @@ persistence:
       accesskey: {{ .Values.objectStorage.s3.accessKey }}
       forcepathstyle: {{ .Values.objectStorage.s3.forcePathStyle }}
       multipartcopythresholdsize: {{ int64 .Values.harbor.s3.multipartcopythresholdsize | quote }}
+      multipartcopychunksize: {{ int64 .Values.harbor.s3.multipartcopychunksize | quote }}
+      multipartcopymaxconcurrency: {{ int64 .Values.harbor.s3.multipartcopymaxconcurrency | quote }}
     {{ else if eq .Values.objectStorage.type "gcs" }}
     type: gcs
     gcs:
