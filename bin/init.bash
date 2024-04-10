@@ -445,6 +445,26 @@ set_cluster_api() {
     replace_set_me "${file}" ".kubeStateMetrics.clusterAPIMetrics.enabled" "${clusterapi}"
 }
 
+# Usage: set_calico_accountant_backend <config-file>
+set_calico_accountant_backend() {
+    file="${1}"
+    if [[ ! -f "${file}" ]]; then
+        log_error "ERROR: invalid file - ${file}"
+        exit 1
+    fi
+    case ${CK8S_CLOUD_PROVIDER} in
+        azure)
+        backend="nftables"
+        ;;
+        *)
+        backend="iptables"
+        ;;
+    esac
+
+    replace_set_me "${file}" ".calicoAccountant.backend" "\"${backend}\""
+    
+}
+
 # Usage: set_cluster_dns <config-file>
 set_cluster_dns() {
     file="${1}"
@@ -465,6 +485,7 @@ set_cluster_dns() {
 
     replace_set_me "${file}" ".global.clusterDns" "\"${clusterdns}\""
     replace_set_me "${file}" '.networkPolicies.coredns.serviceIp.ips' "[\"${clusterdnscidr}\"]"
+        
 }
 
 update_monitoring() {
@@ -746,6 +767,7 @@ set_nginx_config        "${config[default_common]}"
 set_lbsvc_safeguard     "${config[default_common]}"
 set_cluster_api         "${config[default_common]}"
 set_cluster_dns         "${config[default_common]}"
+set_calico_accountant_backend "${config[default_common]}"
 update_monitoring       "${config[default_common]}"
 update_psp_netpol       "${config[default_common]}"
 update_config           "${config[override_common]}"
