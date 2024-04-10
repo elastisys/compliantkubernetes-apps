@@ -378,24 +378,29 @@ check_object_store_access() {
     EX_CONFIG=78
     snapshot_bucket=$(yq4 -e '.objectStorage.buckets.opensearch' "${config['config_file_sc']}")
 
-    command=$(
-        s3cmd --config <(sops -d "${CK8S_CONFIG_PATH}"/.state/s3cfg.ini) ls s3://"${snapshot_bucket}" >/dev/null 2>&1
-        echo $?
-    )
-    if [[ ${command} -eq $EX_OK ]]; then
-        debug_msg="[DEBUG] Snapshot bucket ${snapshot_bucket} exist and can be accessed"
-    elif [[ ${command} -eq $EX_NOTFOUND ]]; then
+    if [ ! -f "${CK8S_CONFIG_PATH}/.state/s3cfg.ini" ]; then
         no_error=false
-        debug_msg="[ERROR] S3 error: 404 (NoSuchBucket): The specified bucket ${snapshot_bucket} does not exist."
-    elif [[ ${command} -eq $EX_ACCESSDENIED ]]; then
-        no_error=false
-        debug_msg="[ERROR] S3 error: Insufficient permissions to perform the operation on S3"
-    elif [[ ${command} -eq $EX_CONFIG ]]; then
-        no_error=false
-        debug_msg="[ERROR] S3 error: Configuration file error"
+        debug_msg="[SKIP] S3 configuration file missing"
     else
-        no_error=false
-        debug_msg="[ERROR] An error happened, please try again"
+        command=$(
+            s3cmd --config <(sops -d "${CK8S_CONFIG_PATH}"/.state/s3cfg.ini) ls s3://"${snapshot_bucket}" >/dev/null 2>&1
+            echo $?
+        )
+        if [[ ${command} -eq $EX_OK ]]; then
+            debug_msg="[DEBUG] Snapshot bucket ${snapshot_bucket} exist and can be accessed"
+        elif [[ ${command} -eq $EX_NOTFOUND ]]; then
+            no_error=false
+            debug_msg="[ERROR] S3 error: 404 (NoSuchBucket): The specified bucket ${snapshot_bucket} does not exist."
+        elif [[ ${command} -eq $EX_ACCESSDENIED ]]; then
+            no_error=false
+            debug_msg="[ERROR] S3 error: Insufficient permissions to perform the operation on S3"
+        elif [[ ${command} -eq $EX_CONFIG ]]; then
+            no_error=false
+            debug_msg="[ERROR] S3 error: Configuration file error"
+        else
+            no_error=false
+            debug_msg="[ERROR] An error happened, please try again"
+        fi
     fi
 
     if $no_error; then
