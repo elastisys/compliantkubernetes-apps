@@ -272,7 +272,7 @@ set_nginx_config() {
             use_host_port=false
             service_enabled=true
             service_type=LoadBalancer
-            service_annotations='service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz'
+            service_annotations='{ "service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path": "/healthz" }'
             external_load_balancer=false
             ingress_using_host_network=false
             ;;
