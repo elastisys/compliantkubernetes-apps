@@ -140,6 +140,7 @@ set_openstack_monitoring() {
             ;;
     esac
 }
+
 # Usage: set_storage_class <config-file>
 # baremetal support is experimental, keep as separate case until stable
 set_storage_class() {
@@ -376,7 +377,6 @@ set_s3bucketalertscount_config() {
     esac
 }
 
-
 # Usage: set_harbor_config <config-file>
 # baremetal support is experimental, keep as separate case until stable
 set_harbor_config() {
@@ -462,7 +462,6 @@ set_calico_accountant_backend() {
     esac
 
     replace_set_me "${file}" ".calicoAccountant.backend" "\"${backend}\""
-    
 }
 
 # Usage: set_cluster_dns <config-file>
@@ -485,7 +484,6 @@ set_cluster_dns() {
 
     replace_set_me "${file}" ".global.clusterDns" "\"${clusterdns}\""
     replace_set_me "${file}" '.networkPolicies.coredns.serviceIp.ips' "[\"${clusterdnscidr}\"]"
-        
 }
 
 update_monitoring() {
@@ -501,6 +499,7 @@ update_monitoring() {
           ;;
     esac
 }
+
 update_psp_netpol() {
     file="${1}"
     if [[ ! -f "${file}" ]]; then
@@ -514,6 +513,7 @@ update_psp_netpol() {
           ;;
     esac
 }
+
 # Usage: update_config <override_config_file>
 # Updates configs to only contain custom values.
 update_config() {
