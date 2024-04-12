@@ -20,6 +20,7 @@ RUN apt-get update     \
     && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - \
     && add-apt-repository ppa:rmescandon/yq \
     && apt-get update \
+    && curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
     && apt-get install --no-install-recommends -y  \
         postgresql-client-14  \
         postgresql-client-13  \

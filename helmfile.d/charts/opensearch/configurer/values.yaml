@@ -111,6 +111,9 @@ config:
   gcs:
     enabled: false
     bucketName: ""
+  azure:
+    enabled: false
+    containerName: ""
 
   ## Allow specification of security plugin users, roles, and role mappings.
   securityPlugin:

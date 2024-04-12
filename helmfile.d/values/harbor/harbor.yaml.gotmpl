@@ -1,5 +1,5 @@
 {{- if not (or (eq .Values.harbor.persistence.type "filesystem") (eq .Values.harbor.persistence.type "swift") ) }}
-{{- if not (and (eq .Values.harbor.persistence.type "objectStorage") (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") ) ) }}
+{{- if not (and (eq .Values.harbor.persistence.type "objectStorage") (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") (eq .Values.objectStorage.type "azure")) ) }}
 {{ fail "\nERROR: Harbor persistence type should be set to \"filesystem\" (persistent volume), \"swift\", or \"objectStorage\" (matching global object storage, see Values.objectStorage.type)" }}
 {{- end }}
 {{- end }}
@@ -94,6 +94,13 @@ persistence:
     gcs:
       bucket: {{ .Values.objectStorage.buckets.harbor }}
       encodedkey: {{ .Values.objectStorage.gcs.keyfileData | b64enc }}
+    {{ else if eq .Values.objectStorage.type "azure" }}
+    type: azure
+    azure:
+      accountname: {{ .Values.objectStorage.azure.storageAccountName }}
+      accountkey: {{ .Values.objectStorage.azure.storageAccountKey }}
+      container: {{ .Values.objectStorage.buckets.harbor }}
+      realm: core.windows.net
     {{- end }}
     {{- end }}
 

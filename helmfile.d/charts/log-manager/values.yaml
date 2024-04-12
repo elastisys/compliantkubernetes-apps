@@ -8,10 +8,17 @@ image:
   tag: ""
 
 s3:
+  enabled: false
   forcePathStyle: false
   regionEndpoint: set-me
   accessKey: set-me
   secretKey: set-me
+azure:
+  enabled: false
+  storageAccountName: set-me
+  storageAccountKey: set-me
+  containerName: set-me
+
 
 instances:
   - bucket: set-me

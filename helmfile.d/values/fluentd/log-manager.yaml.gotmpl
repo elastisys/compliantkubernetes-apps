@@ -1,8 +1,17 @@
+{{- if eq .Values.objectStorage.type "azure"}}
+azure:
+  storageAccountName: {{ .Values.objectStorage.azure.storageAccountName }}
+  storageAccountKey: {{ .Values.objectStorage.azure.storageAccountKey }}
+  containerName: {{ .Values.objectStorage.buckets.audit }}
+  enabled: true
+{{- else if eq .Values.objectStorage.type "s3"}}
 s3:
   forcePathStyle: {{ .Values.objectStorage.s3.forcePathStyle }}
   regionEndpoint: {{ .Values.objectStorage.s3.regionEndpoint }}
   accessKey: {{ .Values.objectStorage.s3.accessKey }}
   secretKey: {{ .Values.objectStorage.s3.secretKey }}
+  enabled: true
+{{- end }}
 
 instances:
   {{- if .Values.fluentd.audit.enabled }}

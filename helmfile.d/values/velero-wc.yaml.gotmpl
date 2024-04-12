@@ -1,5 +1,5 @@
-{{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") ) }}
-{{ fail "\nERROR: Velero requires s3 or gcs object storage, see Values.objectStorage.type" }}
+{{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") (eq .Values.objectStorage.type "azure") ) }}
+{{ fail "\nERROR: Velero requires s3 or gcs or azure object storage, see Values.objectStorage.type" }}
 {{ end }}
 resources:    {{- toYaml .Values.velero.resources | nindent 2  }}
 tolerations:  {{- toYaml .Values.velero.tolerations | nindent 2  }}
@@ -30,7 +30,21 @@ initContainers:
     volumeMounts:
       - mountPath: /target
         name: plugins
+  {{- else if eq .Values.objectStorage.type "azure" }}
+  - name: velero-plugin-for-microsoft-azure
+    image: velero/velero-plugin-for-microsoft-azure:v1.9.0
+    imagePullPolicy: IfNotPresent
+    securityContext:
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsGroup: 10000
+      runAsUser: 10000
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
   {{- end }}
+
+snapshotsEnabled: false
 
 configuration:
   defaultVolumesToFsBackup: true
@@ -47,19 +61,13 @@ configuration:
         s3Url: {{ .Values.objectStorage.s3.regionEndpoint }}
       {{- else if eq .Values.objectStorage.type "gcs" }}
       provider: gcp
+      {{- else if eq .Values.objectStorage.type "azure" }}
+      provider: azure
+      config:
+        resourceGroup: {{ .Values.objectStorage.azure.resourceGroup }}
+        storageAccount: {{ .Values.objectStorage.azure.storageAccountName }}
+        storageAccountKeyEnvVar: AZURE_STORAGE_ACCOUNT_ACCESS_KEY
       {{- end }}
-
-  # https://velero.io/docs/v1.11/api-types/volumesnapshotlocation/
-  volumeSnapshotLocation:
-    {{- if eq .Values.objectStorage.type "s3" }}
-    - provider: aws
-      config:
-        region: {{ .Values.objectStorage.s3.region }}
-    {{- else if eq .Values.objectStorage.type "gcs" }}
-    - provider: gcp
-      config:
-        project: {{ .Values.objectStorage.gcs.project }}
-    {{- end }}
 
 credentials:
   # Create secret with credentials
@@ -71,6 +79,9 @@ credentials:
       aws_secret_access_key: {{ .Values.objectStorage.s3.secretKey }}
     {{- else if eq .Values.objectStorage.type "gcs" }}
       {{ .Values.objectStorage.gcs.keyfileData | nindent 6 }}
+    {{- else if eq .Values.objectStorage.type "azure" }}
+      AZURE_STORAGE_ACCOUNT_ACCESS_KEY={{ .Values.objectStorage.azure.storageAccountKey }}
+      AZURE_CLOUD_NAME=AzurePublicCloud
     {{- end }}
 
 deployNodeAgent: true

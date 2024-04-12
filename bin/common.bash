@@ -16,6 +16,7 @@ ck8s_cloud_providers=(
     "safespring"
     "upcloud"
     "elastx"
+    "azure"
     "none"
 )
 

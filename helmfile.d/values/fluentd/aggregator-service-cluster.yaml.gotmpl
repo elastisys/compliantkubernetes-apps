@@ -81,7 +81,14 @@ aggregator:
           @id output-store
           @include store.prop
 
+          {{- if eq .Values.objectStorage.type "s3" }}
           s3_bucket {{ .Values.objectStorage.buckets.scFluentd }}
+
+          {{- else if eq .Values.objectStorage.type "azure" }}
+          azure_container {{ .Values.objectStorage.buckets.scFluentd }}
+          azure_storage_account {{ .Values.objectStorage.azure.storageAccountName }}
+          azure_storage_access_key {{ .Values.objectStorage.azure.storageAccountKey }}
+          {{- end }}
 
           path logs/%Y%m%d/${tag}/
 
