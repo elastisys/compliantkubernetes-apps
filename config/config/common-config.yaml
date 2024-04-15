@@ -532,7 +532,7 @@ opensearch:
 ## providers supporting it
 ## Ref: https://kubernetes.io/docs/tutorials/services/source-ip/#source-ip-for-services-with-typeloadbalancer
 externalTrafficPolicy:
-  local: false
+  local: set-me
 
   ## Source IP range to allow.
   whitelistRange:
@@ -1041,7 +1041,8 @@ networkPolicies:
   ingressNginx:
     enabled: true
     ingressOverride:
-      enabled : false
+      enabled : set-me
+
   falco:
     enabled: true
     plugins:
