@@ -44,7 +44,7 @@ RUN curl -LOs "https://github.com/helmfile/helmfile/releases/download/v${HELMFIL
     install -Tm 755 helmfile /usr/local/bin/helmfile && \
     rm helmfile "helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz"
 
-ENV OPA_VERSION "v0.58.0"
+ENV OPA_VERSION "v0.57.1"
 RUN curl -LOs "https://github.com/open-policy-agent/opa/releases/download/${OPA_VERSION}/opa_linux_amd64" && \
     install -Tm 755 opa_linux_amd64 /usr/local/bin/opa && \
     rm opa_linux_amd64

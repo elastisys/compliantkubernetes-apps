@@ -68,7 +68,7 @@ RUN wget --progress=dot:giga https://github.com/neilpa/yajsv/releases/download/$
     rm yajsv.linux.amd64
 
 # opa
-ENV OPA_VERSION "v0.52.0"
+ENV OPA_VERSION "v0.57.1"
 RUN wget --progress=dot:giga "https://github.com/open-policy-agent/opa/releases/download/${OPA_VERSION}/opa_linux_amd64" && \
     install -Tm 755 opa_linux_amd64 /usr/local/bin/opa && \
     rm opa_linux_amd64
