@@ -63,6 +63,10 @@ s3BucketAlerts:
     enabled: {{ .Values.prometheus.s3BucketAlerts.size.enabled }}
     percent: {{ .Values.prometheus.s3BucketAlerts.size.percent }}
     sizeQuotaGB: {{ .Values.prometheus.s3BucketAlerts.size.sizeQuotaGB }}
+  totalSize:
+    enabled: {{ .Values.prometheus.s3BucketAlerts.totalSize.enabled }}
+    percent: {{ .Values.prometheus.s3BucketAlerts.totalSize.percent }}
+    sizeQuotaGB: {{ .Values.prometheus.s3BucketAlerts.totalSize.sizeQuotaGB }}
   objects:
     enabled: {{ .Values.prometheus.s3BucketAlerts.objects.enabled }}
     percent: {{ .Values.prometheus.s3BucketAlerts.objects.percent }}

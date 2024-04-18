@@ -423,7 +423,13 @@ prometheus:
   retention:
     alertmanager: 72h
   s3BucketAlerts:
+    # alert on each individual bucket
     size:
+      enabled: false
+      percent: 80
+      sizeQuotaGB: 1000
+    # alert for the total size of all buckets combined
+    totalSize:
       enabled: false
       percent: 80
       sizeQuotaGB: 1000

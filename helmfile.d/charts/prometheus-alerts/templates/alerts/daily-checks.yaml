@@ -29,6 +29,18 @@ spec:
       labels:
         severity: warning
 {{- end }}
+{{- if .Values.s3BucketAlerts.totalSize.enabled }}
+    - alert: S3BucketsTotalSizeOver{{.Values.s3BucketAlerts.totalSize.percent}}Percent
+      annotations:
+        message: Over {{.Values.s3BucketAlerts.totalSize.percent}} percent for the total size of all s3 buckets.
+      expr: |-
+        (
+          sum(max_over_time(s3_objects_size_sum_bytes[1h])) >= ({{ .Values.s3BucketAlerts.totalSize.sizeQuotaGB }} * (1024^3)) * ({{ .Values.s3BucketAlerts.totalSize.percent }} / 100)
+        )
+      for: 1h
+      labels:
+        severity: warning
+{{- end }}
 {{- if .Values.s3BucketAlerts.objects.enabled }}
     - alert: S3BucketObjectsOver{{.Values.s3BucketAlerts.objects.percent}}Percent
       annotations:
