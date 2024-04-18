@@ -246,6 +246,7 @@ set_nginx_config() {
             service_enabled=false
             external_load_balancer=true
             ingress_using_host_network=true
+            allocate_loadbalancer_node_ports=true
             ;;
 
         citycloud | elastx)
@@ -256,6 +257,7 @@ set_nginx_config() {
             service_annotations='{}'
             external_load_balancer=false
             ingress_using_host_network=false
+            allocate_loadbalancer_node_ports=true
             ;;
 
         aws)
@@ -266,6 +268,7 @@ set_nginx_config() {
             service_annotations='{ "service.beta.kubernetes.io/aws-load-balancer-type": "nlb" }'
             external_load_balancer=false
             ingress_using_host_network=false
+            allocate_loadbalancer_node_ports=true
             ;;
 
         azure)
@@ -276,6 +279,7 @@ set_nginx_config() {
             service_annotations='{ "service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path": "/healthz" }'
             external_load_balancer=false
             ingress_using_host_network=false
+            allocate_loadbalancer_node_ports=false
             ;;
 
         baremetal)
@@ -284,6 +288,7 @@ set_nginx_config() {
             service_enabled=false
             external_load_balancer=true
             ingress_using_host_network=true
+            allocate_loadbalancer_node_ports=true
             ;;
         none)
             return
@@ -295,8 +300,16 @@ set_nginx_config() {
     replace_set_me "${file}" '.ingressNginx.controller.service.enabled' "${service_enabled}"
     replace_set_me "${file}" '.networkPolicies.global.externalLoadBalancer' "${external_load_balancer}"
     replace_set_me "${file}" '.networkPolicies.global.ingressUsingHostNetwork' "${ingress_using_host_network}"
-    replace_set_me "${file}" '.ingressNginx.controller.service.allocateLoadBalancerNodePorts' 'true'
+    replace_set_me "${file}" '.ingressNginx.controller.service.allocateLoadBalancerNodePorts' "${allocate_loadbalancer_node_ports}"
 
+    if [ "${CK8S_CLOUD_PROVIDER}" = "azure" ]; then
+        replace_set_me "${file}" '.externalTrafficPolicy.local' 'true'
+        replace_set_me "${file}" '.networkPolicies.ingressNginx.ingressOverride.enabled' 'true'
+        replace_set_me "${file}" '.networkPolicies.ingressNginx.ingressOverride.ips' "[ 0.0.0.0/0 ]"
+    else
+        replace_set_me "${file}" '.externalTrafficPolicy.local' 'false'
+        replace_set_me "${file}" '.networkPolicies.ingressNginx.ingressOverride.enabled' 'false'
+    fi
 
     if [ "${service_enabled}" = 'false' ]; then
         replace_set_me "${file}" '.ingressNginx.controller.service.type' '"set-me-if-ingressNginx.controller.service.enabled"'
