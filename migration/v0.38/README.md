@@ -109,10 +109,16 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
+1. Check if environment is running on Upcloud with S3 object storage V1, and if so enable total size of all S3 buckets alert:
+
+    ```bash
+    ./migration/v0.38/prepare/30-check-upcloud-s3-version.sh
+    ```
+
 1. Update service and rclone networkpolicies:
 
     ```bash
-    ./migration/v0.37/prepare/40-service-rclone-netpol.sh
+    ./migration/v0.38/prepare/40-service-rclone-netpol.sh
     ```
 
 1. Update apps configuration:
@@ -143,7 +149,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 1. Upgrade service and rclone networkpolicies:
 
     ```bash
-    ./migration/v0.37/apply/70-service-rclone-netpol.sh execute
+    ./migration/v0.38/apply/70-service-rclone-netpol.sh execute
     ```
 
 1. Upgrade applications:
