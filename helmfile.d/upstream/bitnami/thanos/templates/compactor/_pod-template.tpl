@@ -1,3 +1,8 @@
+{{/*
+Copyright VMware, Inc.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
 {{/* vim: set filetype=mustache: */}}
 
 {{/*
@@ -5,22 +10,19 @@ Compactor pod template. Shared between Cronjob and deployment
 */}}
 {{- define "thanos.compactor.podTemplate" -}}
 metadata:
-  labels: {{- include "common.labels.standard" . | nindent 4 }}
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.compactor.podLabels .Values.commonLabels ) "context" . ) }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" $podLabels "context" $ ) | nindent 4 }}
     app.kubernetes.io/component: compactor
-    {{- if .Values.commonLabels }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
-    {{- end }}
-    {{- if .Values.compactor.podLabels }}
-    {{- include "common.tplvalues.render" (dict "value" .Values.compactor.podLabels "context" $) | nindent 4 }}
-    {{- end }}
   annotations:
-    checksum/objstore-configuration: {{ include (print $.Template.BasePath "/objstore-secret.yaml") . | sha256sum }}
+    {{- if (include "thanos.objstoreConfig" $) }}
+    checksum/objstore-configuration: {{ include "thanos.objstoreConfig" . | sha256sum }}
+    {{- end }}
     {{- if .Values.compactor.podAnnotations }}
     {{- include "common.tplvalues.render" (dict "value" .Values.compactor.podAnnotations "context" $) | nindent 4 }}
     {{- end }}
 spec:
   {{- include "thanos.imagePullSecrets" . | nindent 2 }}
-  serviceAccountName: {{ include "thanos.serviceAccountName" (dict "component" "compactor" "context" $) }}
+  serviceAccountName: {{ include "thanos.compactor.serviceAccountName" . }}
   automountServiceAccountToken: {{ .Values.compactor.automountServiceAccountToken }}
   {{- if .Values.compactor.hostAliases }}
   hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.compactor.hostAliases "context" $) | nindent 4 }}
@@ -29,12 +31,15 @@ spec:
   affinity: {{- include "common.tplvalues.render" (dict "value" .Values.compactor.affinity "context" $) | nindent 4 }}
   {{- else }}
   affinity:
-    podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.compactor.podAffinityPreset "component" "compactor" "context" $) | nindent 6 }}
-    podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.compactor.podAntiAffinityPreset "component" "compactor" "context" $) | nindent 6 }}
+    podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.compactor.podAffinityPreset "component" "compactor" "customLabels" $podLabels "context" $) | nindent 6 }}
+    podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.compactor.podAntiAffinityPreset "component" "compactor" "customLabels" $podLabels "context" $) | nindent 6 }}
     nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.compactor.nodeAffinityPreset.type "key" .Values.compactor.nodeAffinityPreset.key "values" .Values.compactor.nodeAffinityPreset.values) | nindent 6 }}
   {{- end }}
   {{- if .Values.compactor.dnsConfig }}
   dnsConfig: {{- include "common.tplvalues.render" (dict "value" .Values.compactor.dnsConfig "context" $) | nindent 4 }}
+  {{- end }}
+  {{- if .Values.compactor.dnsPolicy }}
+  dnsPolicy: {{ .Values.compactor.dnsPolicy | quote }}
   {{- end }}
   {{- if .Values.compactor.nodeSelector }}
   nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.compactor.nodeSelector "context" $) | nindent 4 }}
@@ -49,7 +54,7 @@ spec:
   schedulerName: {{ .Values.compactor.schedulerName }}
   {{- end }}
   {{- if .Values.compactor.podSecurityContext.enabled }}
-  securityContext: {{- omit .Values.compactor.podSecurityContext "enabled" | toYaml | nindent 4 }}
+  securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.compactor.podSecurityContext "context" $) | nindent 4 }}
   {{- end }}
   {{- if .Values.compactor.topologySpreadConstraints }}
   topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.compactor.topologySpreadConstraints "context" $) | nindent 4 }}
@@ -89,7 +94,7 @@ spec:
       image: {{ include "thanos.image" . }}
       imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
       {{- if .Values.compactor.containerSecurityContext.enabled }}
-      securityContext: {{- omit .Values.compactor.containerSecurityContext "enabled" | toYaml | nindent 8 }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.compactor.containerSecurityContext "context" $) | nindent 8 }}
       {{- end }}
       {{- if .Values.compactor.command }}
       command: {{- include "common.tplvalues.render" (dict "value" .Values.compactor.command "context" $) | nindent 8 }}
@@ -101,7 +106,7 @@ spec:
         - compact
         - --log.level={{ .Values.compactor.logLevel }}
         - --log.format={{ .Values.compactor.logFormat }}
-        - --http-address=0.0.0.0:10902
+        - --http-address=0.0.0.0:{{ .Values.compactor.containerPorts.http }}
         - --data-dir=/data
         - --retention.resolution-raw={{ .Values.compactor.retentionResolutionRaw }}
         - --retention.resolution-5m={{ .Values.compactor.retentionResolution5m }}
@@ -134,7 +139,7 @@ spec:
       {{- end }}
       ports:
         - name: http
-          containerPort: 10902
+          containerPort: {{ .Values.compactor.containerPorts.http }}
           protocol: TCP
       {{- if .Values.compactor.customLivenessProbe }}
       livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.compactor.customLivenessProbe "context" $) | nindent 8 }}
@@ -183,6 +188,8 @@ spec:
       {{- end }}
       {{- if .Values.compactor.resources }}
       resources: {{- toYaml .Values.compactor.resources | nindent 8 }}
+      {{- else if ne .Values.compactor.resourcesPreset "none" }}
+      resources: {{- include "common.resources.preset" (dict "type" .Values.compactor.resourcesPreset) | nindent 8 }}
       {{- end }}
       volumeMounts:
         - name: objstore-config
@@ -217,13 +224,37 @@ spec:
         secretName: {{ include "thanos.httpCertsSecretName" . }}
     {{- end }}
     {{- end }}
+    {{- if or .Values.compactor.persistence.enabled .Values.compactor.persistence.defaultEmptyDir }}
     - name: data
       {{- if .Values.compactor.persistence.enabled }}
+      {{- if .Values.compactor.persistence.ephemeral }}
+      ephemeral:
+        volumeClaimTemplate:
+          metadata:
+            {{- $labels := include "common.tplvalues.merge" ( dict "values" ( list .Values.compactor.persistence.labels .Values.commonLabels ) "context" . ) }}
+            labels: {{- include "common.labels.standard" ( dict "customLabels" $labels "context" $ ) | nindent 14 }}
+              app.kubernetes.io/component: compactor
+            {{- if or .Values.compactor.persistence.annotations .Values.commonAnnotations }}
+            {{- $annotations := include "common.tplvalues.merge" ( dict "values" ( list .Values.compactor.persistence.annotations .Values.commonAnnotations ) "context" . ) }}
+            annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $) | nindent 14 }}
+            {{- end }}
+          spec:
+            accessModes:
+            {{- range .Values.compactor.persistence.accessModes }}
+              - {{ . | quote }}
+            {{- end }}
+            {{- include "common.storage.class" (dict "persistence" .Values.compactor.persistence "global" .Values.global) | nindent 12 }}
+            resources:
+              requests:
+                storage: {{ .Values.compactor.persistence.size | quote }}
+      {{- else }}
       persistentVolumeClaim:
         claimName: {{ include "thanos.compactor.pvcName" . }}
+      {{- end }}
       {{- else }}
       emptyDir: {}
       {{- end }}
+    {{- end }}
     {{- if .Values.compactor.extraVolumes }}
     {{- include "common.tplvalues.render" (dict "value" .Values.compactor.extraVolumes "context" $) | nindent 4 }}
     {{- end }}

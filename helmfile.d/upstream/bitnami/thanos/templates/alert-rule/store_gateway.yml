@@ -1,18 +1,20 @@
 {{- /*
+Copyright VMware, Inc.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- /*
 Generated from https://github.com/thanos-io/thanos/blob/main/examples/alerts/alerts.md
 */ -}}
 {{- if and .Values.metrics.enabled (or .Values.metrics.prometheusRule.default.create .Values.metrics.prometheusRule.default.store_gateway ) }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: {{ template "common.names.fullname" . }}-store-gateway
+  name: {{ include "thanos.storegateway.fullname" . }}
   namespace: {{ default .Release.Namespace .Values.metrics.prometheusRule.namespace | quote }}
-  labels: {{- include "common.labels.standard" . | nindent 4 }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
     {{- if .Values.metrics.prometheusRule.additionalLabels }}
     {{- include "common.tplvalues.render" (dict "value" .Values.metrics.prometheusRule.additionalLabels "context" $) | nindent 4 }}
-    {{- end }}
-    {{- if .Values.commonLabels }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
   {{- if .Values.commonAnnotations }}
   annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
@@ -28,7 +30,7 @@ spec:
         {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 8 }}
         {{- end }}
         description: Thanos Store {{`{{`}} $labels.job {{`}}`}} is failing to handle {{`{{`}} $value | humanize {{`}}`}}% of requests.
-        runbook_url: https://github.com/thanos-io/thanos/tree/main/mixin/runbook.md#alert-name-thanosstoregrpcerrorrate
+        runbook_url: {{ .Values.metrics.prometheusRule.runbookUrl }}thanosstoregrpcerrorrate
         summary: Thanos Store is failing to handle qrpcd requests.
       expr: |
         (
@@ -51,7 +53,7 @@ spec:
         {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 8 }}
         {{- end }}
         description: Thanos Store {{`{{`}} $labels.job {{`}}`}} has a 99th percentile latency of {{`{{`}} $value {{`}}`}} seconds for store series gate requests.
-        runbook_url: https://github.com/thanos-io/thanos/tree/main/mixin/runbook.md#alert-name-thanosstoreseriesgatelatencyhigh
+        runbook_url: {{ .Values.metrics.prometheusRule.runbookUrl }}thanosstoreseriesgatelatencyhigh
         summary: Thanos Store has high latency for store series gate requests.
       expr: |
         (
@@ -73,7 +75,7 @@ spec:
         {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 8 }}
         {{- end }}
         description: Thanos Store {{`{{`}} $labels.job {{`}}`}} Bucket is failing to execute {{`{{`}} $value | humanize {{`}}`}}% of operations.
-        runbook_url: https://github.com/thanos-io/thanos/tree/main/mixin/runbook.md#alert-name-thanosstorebuckethighoperationfailures
+        runbook_url: {{ .Values.metrics.prometheusRule.runbookUrl }}thanosstorebuckethighoperationfailures
         summary: Thanos Store Bucket is failing to execute operations.
       expr: |
         (
@@ -96,7 +98,7 @@ spec:
         {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 8 }}
         {{- end }}
         description: Thanos Store {{`{{`}} $labels.job {{`}}`}} Bucket has a 99th percentile latency of {{`{{`}} $value {{`}}`}} seconds for the bucket operations.
-        runbook_url: https://github.com/thanos-io/thanos/tree/main/mixin/runbook.md#alert-name-thanosstoreobjstoreoperationlatencyhigh
+        runbook_url: {{ .Values.metrics.prometheusRule.runbookUrl }}thanosstoreobjstoreoperationlatencyhigh
         summary: Thanos Store is having high latency for bucket operations.
       expr: |
         (

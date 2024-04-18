@@ -27,7 +27,7 @@ policies:
               podSelectorLabels:
                 app.kubernetes.io/component: query-frontend
           ports:
-            - tcp: 10902
+            - tcp: 9090
         - name: egress-rule-dex
           peers:
             - namespaceSelectorLabels:
@@ -64,7 +64,7 @@ policies:
               podSelectorLabels:
                 app.kubernetes.io/component: query-frontend
           ports:
-            - tcp: 10902
+            - tcp: 9090
       ingress:
         - name: ingress-rule-grafana-datasource
           peers:

@@ -1,3 +1,8 @@
+{{/*
+Copyright VMware, Inc.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
 {{/* vim: set filetype=mustache: */}}
 
 {{/*
@@ -164,6 +169,50 @@ Return the appropriate apiVersion for Vertical Pod Autoscaler.
 {{- end -}}
 {{- else -}}
 {{- print "autoscaling/v2" -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Returns true if PodSecurityPolicy is supported
+*/}}
+{{- define "common.capabilities.psp.supported" -}}
+{{- if semverCompare "<1.25-0" (include "common.capabilities.kubeVersion" .) -}}
+  {{- true -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Returns true if AdmissionConfiguration is supported
+*/}}
+{{- define "common.capabilities.admissionConfiguration.supported" -}}
+{{- if semverCompare ">=1.23-0" (include "common.capabilities.kubeVersion" .) -}}
+  {{- true -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return the appropriate apiVersion for AdmissionConfiguration.
+*/}}
+{{- define "common.capabilities.admissionConfiguration.apiVersion" -}}
+{{- if semverCompare "<1.23-0" (include "common.capabilities.kubeVersion" .) -}}
+{{- print "apiserver.config.k8s.io/v1alpha1" -}}
+{{- else if semverCompare "<1.25-0" (include "common.capabilities.kubeVersion" .) -}}
+{{- print "apiserver.config.k8s.io/v1beta1" -}}
+{{- else -}}
+{{- print "apiserver.config.k8s.io/v1" -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return the appropriate apiVersion for PodSecurityConfiguration.
+*/}}
+{{- define "common.capabilities.podSecurityConfiguration.apiVersion" -}}
+{{- if semverCompare "<1.23-0" (include "common.capabilities.kubeVersion" .) -}}
+{{- print "pod-security.admission.config.k8s.io/v1alpha1" -}}
+{{- else if semverCompare "<1.25-0" (include "common.capabilities.kubeVersion" .) -}}
+{{- print "pod-security.admission.config.k8s.io/v1beta1" -}}
+{{- else -}}
+{{- print "pod-security.admission.config.k8s.io/v1" -}}
 {{- end -}}
 {{- end -}}
 

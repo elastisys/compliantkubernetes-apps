@@ -1,4 +1,9 @@
 {{- /*
+Copyright VMware, Inc.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- /*
 Generated from https://github.com/thanos-io/thanos/blob/main/examples/alerts/alerts.md
 */ -}}
 {{- if and .Values.metrics.enabled (or .Values.metrics.prometheusRule.default.create .Values.metrics.prometheusRule.default.replicate ) }}
@@ -7,12 +12,9 @@ kind: PrometheusRule
 metadata:
   name: {{ template "common.names.fullname" . }}-replicate
   namespace: {{ default .Release.Namespace .Values.metrics.prometheusRule.namespace | quote }}
-  labels: {{- include "common.labels.standard" . | nindent 4 }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
     {{- if .Values.metrics.prometheusRule.additionalLabels }}
     {{- include "common.tplvalues.render" (dict "value" .Values.metrics.prometheusRule.additionalLabels "context" $) | nindent 4 }}
-    {{- end }}
-    {{- if .Values.commonLabels }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
   {{- if .Values.commonAnnotations }}
   annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
@@ -28,13 +30,13 @@ spec:
         {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 8 }}
         {{- end }}
         description: Thanos Replicate is failing to run, {{`{{`}} $value | humanize {{`}}`}}% of attempts failed.
-        runbook_url: https://github.com/thanos-io/thanos/tree/main/mixin/runbook.md#alert-name-thanosbucketreplicateerrorrate
+        runbook_url: {{ .Values.metrics.prometheusRule.runbookUrl }}thanosbucketreplicateerrorrate
         summary: Thanos Replicate is failing to run.
       expr: |
         (
-          sum by (job) (rate(thanos_replicate_replication_runs_total{result="error", job=~".*thanos-bucket-replicate.*"}[5m]))
+          sum by (job) (rate(thanos_replicate_replication_runs_total{result="error", job=~".*{{ template "common.names.fullname" . }}-bucket-replicate.*"}[5m]))
         / on (job) group_left
-          sum by (job) (rate(thanos_replicate_replication_runs_total{job=~".*thanos-bucket-replicate.*"}[5m]))
+          sum by (job) (rate(thanos_replicate_replication_runs_total{job=~".*{{ template "common.names.fullname" . }}-bucket-replicate.*"}[5m]))
         ) * 100 >= 10
       for: 5m
       labels:
@@ -50,13 +52,13 @@ spec:
         {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 8 }}
         {{- end }}
         description: Thanos Replicate {{`{{`}} $labels.job {{`}}`}} has a 99th percentile latency of {{`{{`}} $value {{`}}`}} seconds for the replicate operations.
-        runbook_url: https://github.com/thanos-io/thanos/tree/main/mixin/runbook.md#alert-name-thanosbucketreplicaterunlatency
+        runbook_url: {{ .Values.metrics.prometheusRule.runbookUrl }}thanosbucketreplicaterunlatency
         summary: Thanos Replicate has a high latency for replicate operations.
       expr: |
         (
-          histogram_quantile(0.99, sum by (job) (rate(thanos_replicate_replication_run_duration_seconds_bucket{job=~".*thanos-bucket-replicate.*"}[5m]))) > 20
+          histogram_quantile(0.99, sum by (job) (rate(thanos_replicate_replication_run_duration_seconds_bucket{job=~".*{{ template "common.names.fullname" . }}-bucket-replicate.*"}[5m]))) > 20
         and
-          sum by (job) (rate(thanos_replicate_replication_run_duration_seconds_bucket{job=~".*thanos-bucket-replicate.*"}[5m])) > 0
+          sum by (job) (rate(thanos_replicate_replication_run_duration_seconds_bucket{job=~".*{{ template "common.names.fullname" . }}-bucket-replicate.*"}[5m])) > 0
         )
       for: 5m
       labels:

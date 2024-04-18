@@ -1,14 +1,16 @@
+{{- /*
+Copyright VMware, Inc.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
 {{- if and .Values.compactor.enabled .Values.compactor.cronJob.enabled }}
 apiVersion: {{ include "common.capabilities.cronjob.apiVersion" . }}
 kind: CronJob
 metadata:
-  name: {{ include "common.names.fullname" . }}-compactor
-  namespace: {{ .Release.Namespace | quote }}
-  labels: {{- include "common.labels.standard" . | nindent 4 }}
+  name: {{ include "thanos.compactor.fullname" . }}
+  namespace: {{ include "common.names.namespace" . }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
     app.kubernetes.io/component: compactor
-    {{- if .Values.commonLabels }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
-    {{- end }}
   {{- if .Values.commonAnnotations }}
   annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
   {{- end }}
@@ -39,6 +41,9 @@ spec:
       {{- end }}
       {{- if .Values.compactor.cronJob.activeDeadlineSeconds }}
       activeDeadlineSeconds: {{ .Values.compactor.cronJob.activeDeadlineSeconds }}
+      {{- end }}
+      {{- if .Values.compactor.cronJob.ttlSecondsAfterFinished }}
+      ttlSecondsAfterFinished: {{ .Values.compactor.cronJob.ttlSecondsAfterFinished }}
       {{- end }}
       template:
         {{- include "thanos.compactor.podTemplate" . | nindent 8 }}

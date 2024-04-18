@@ -7,6 +7,8 @@ queryFrontend:
   enabled: false
 
 compactor:
+  networkPolicy:
+    enabled: false
   enabled: true
 
   retentionResolutionRaw: {{ .Values.thanos.compactor.retentionResolutionRaw }}
@@ -39,6 +41,8 @@ compactor:
       type: RuntimeDefault
 
 storegateway:
+  networkPolicy:
+    enabled: false
   enabled: true
   persistence:
     size: {{ .Values.thanos.storegateway.persistence.size }}
@@ -52,6 +56,8 @@ storegateway:
       type: RuntimeDefault
 
 bucketweb:
+  networkPolicy:
+    enabled: false
   enabled: true
   resources: {{- toYaml .Values.thanos.bucketweb.resources | nindent 4 }}
 
@@ -63,6 +69,8 @@ bucketweb:
       type: RuntimeDefault
 
 receive:
+  networkPolicy:
+    enabled: false
   enabled: true
 
   mode: {{ .Values.thanos.receiver.mode }}
@@ -111,6 +119,11 @@ receive:
       type: RuntimeDefault
 
 receiveDistributor:
+  serviceAccount:
+    create: false
+    name: "thanos-receiver-receive"
+    automountServiceAccountToken: true
+
   resources: {{- toYaml .Values.thanos.receiveDistributor.resources | nindent 4 }}
   replicationFactor: {{  .Values.thanos.receiveDistributor.replicationFactor }}
 
@@ -122,6 +135,8 @@ receiveDistributor:
       type: RuntimeDefault
 
 ruler:
+  networkPolicy:
+    enabled: false
   enabled: {{ .Values.thanos.ruler.enabled }}
 
   resources: {{- toYaml .Values.thanos.ruler.resources | nindent 4 }}
@@ -192,3 +207,12 @@ metrics:
   enabled: {{ .Values.thanos.metrics.enabled }}
   serviceMonitor:
     enabled: {{ .Values.thanos.metrics.serviceMonitor.enabled }}
+
+query:
+  enabled: false
+  networkPolicy:
+    enabled: false
+queryFrontend:
+  enabled: false
+  networkPolicy:
+    enabled: false

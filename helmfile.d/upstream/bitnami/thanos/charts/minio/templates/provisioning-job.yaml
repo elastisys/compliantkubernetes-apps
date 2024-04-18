@@ -1,3 +1,8 @@
+{{- /*
+Copyright VMware, Inc.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
 {{- if .Values.provisioning.enabled }}
 {{- $fullname := printf "%s-provisioning" (include "common.names.fullname" .) }}
 {{- $minioAlias := "provisioning" }}
@@ -5,12 +10,9 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: {{ $fullname }}
-  namespace: {{ .Release.Namespace | quote  }}
-  labels: {{- include "common.labels.standard" . | nindent 4 }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
     app.kubernetes.io/component: minio-provisioning
-    {{- if .Values.commonLabels }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
-    {{- end }}
   annotations:
     helm.sh/hook: post-install,post-upgrade
     helm.sh/hook-delete-policy: before-hook-creation
@@ -18,17 +20,16 @@ metadata:
     {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
     {{- end }}
 spec:
+  {{- if .Values.provisioning.cleanupAfterFinished.enabled }} 
+  ttlSecondsAfterFinished: {{ .Values.provisioning.cleanupAfterFinished.seconds }} 
+  {{- end }} 
   parallelism: 1
   template:
     metadata:
       labels: {{- include "minio.labels.provisioning" . | nindent 8 }}
         app.kubernetes.io/component: minio-provisioning
-        {{- if .Values.podLabels }}
-        {{- include "common.tplvalues.render" (dict "value" .Values.podLabels "context" $) | nindent 8 }}
-        {{- end }}
       {{- if .Values.provisioning.podAnnotations }}
-      annotations:
-        {{- include "common.tplvalues.render" ( dict "value" .Values.provisioning.podAnnotations "context" $) | nindent 8 }}
+      annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.provisioning.podAnnotations "context" $) | nindent 8 }}
       {{- end }}
     spec:
       {{- include "minio.imagePullSecrets" . | nindent 6 }}
@@ -38,7 +39,7 @@ spec:
       restartPolicy: OnFailure
       terminationGracePeriodSeconds: 0
       {{- if .Values.provisioning.podSecurityContext.enabled }}
-      securityContext: {{- omit .Values.provisioning.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.provisioning.podSecurityContext "context" $) | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ template "minio.serviceAccountName" . }}
       initContainers:
@@ -46,7 +47,7 @@ spec:
           image: {{ include "minio.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
           {{- if .Values.provisioning.containerSecurityContext.enabled }}
-          securityContext: {{- omit .Values.provisioning.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.provisioning.containerSecurityContext "context" $) | nindent 12 }}
           {{- end }}
           command:
             - /bin/bash
@@ -62,13 +63,15 @@ spec:
               echo "Minio is available";
           {{- if .Values.provisioning.resources }}
           resources: {{- toYaml .Values.provisioning.resources | nindent 12 }}
+          {{- else if ne .Values.provisioning.resourcesPreset "none" }}
+          resources: {{- include "common.resources.preset" (dict "type" .Values.provisioning.resourcesPreset) | nindent 12 }}
           {{- end }}
       containers:
         - name: minio
           image: {{ include "minio.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
           {{- if .Values.provisioning.containerSecurityContext.enabled }}
-          securityContext: {{- omit .Values.provisioning.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.provisioning.containerSecurityContext "context" $) | nindent 12 }}
           {{- end }}
           {{- if .Values.provisioning.command }}
           command: {{- include "common.tplvalues.render" (dict "value" .Values.provisioning.command "context" $) | nindent 12 }}
@@ -80,13 +83,24 @@ spec:
               set -e;
               echo "Start Minio provisioning";
 
-              function addPolicy() {
+              function attachPolicy() {
                 local tmp=$(mc admin $1 info {{ $minioAlias }} $2 | sed -n -e 's/^Policy.*: \(.*\)$/\1/p');
                 IFS=',' read -r -a CURRENT_POLICIES <<< "$tmp";
                 if [[ ! "${CURRENT_POLICIES[*]}" =~ "$3" ]]; then
                   mc admin policy attach {{ $minioAlias }} $3 --$1=$2;
                 fi;
               };
+
+              function detachDanglingPolicies() {
+                local tmp=$(mc admin $1 info {{ $minioAlias }} $2 | sed -n -e 's/^Policy.*: \(.*\)$/\1/p');
+                IFS=',' read -r -a CURRENT_POLICIES <<< "$tmp";
+                IFS=',' read -r -a DESIRED_POLICIES <<< "$3";
+                for current in "${CURRENT_POLICIES[@]}"; do
+                  if [[ ! "${DESIRED_POLICIES[*]}" =~ "${current}" ]]; then
+                    mc admin policy detach {{ $minioAlias }} $current --$1=$2;
+                  fi;
+                done;
+              }
 
               function addUsersFromFile() {
                 local username=$(grep -oP '^username=\K.+' $1);
@@ -97,13 +111,12 @@ spec:
 
                 mc admin user add {{ $minioAlias }} "${username}" "${password}";
 
+                IFS=',' read -r -a POLICIES <<< "${policies_list}";
+                for policy in "${POLICIES[@]}"; do
+                  attachPolicy user "${username}" "${policy}";
+                done;
                 if [ "${set_policies}" == "true" ]; then
-                  mc admin policy attach {{ $minioAlias }} "${policies_list}" --user="${username}";
-                else
-                  IFS=',' read -r -a POLICIES <<< "${policies_list}";
-                  for policy in "${POLICIES[@]}"; do
-                    addPolicy user "${username}" "${policy}";
-                  done
+                  detachDanglingPolicies user "${username}" "${policies_list}";
                 fi;
 
                 local user_status="enable";
@@ -136,12 +149,11 @@ spec:
 
               {{- range $user := .Values.provisioning.users }}
               mc admin user add {{ $minioAlias }} {{ $user.username }} {{ $user.password }};
-              {{- if $user.setPolicies }}
-              mc admin policy attach {{ $minioAlias }} "{{ join "," $user.policies }}" --user={{ $user.username }};
-              {{- else }}
               {{- range $policy := $user.policies }}
-              addPolicy user {{ $user.username }} {{ $policy }};
+              attachPolicy user {{ $user.username }} {{ $policy }};
               {{- end }}
+              {{- if $user.setPolicies }}
+              detachDanglingPolicies user {{ $user.username }} "{{ join "," $user.policies }}";
               {{- end }}
               {{- $userStatus := ternary ("disable") ("enable") (and (not (empty $user.disabled)) $user.disabled) }}
               mc admin user {{ $userStatus }} {{ $minioAlias }} {{ $user.username }};
@@ -154,12 +166,11 @@ spec:
 
               {{- range $group := .Values.provisioning.groups }}
               mc admin group add {{ $minioAlias }} {{ $group.name }} {{ join " " $group.members }};
-              {{- if $group.setPolicies }}
-              mc admin policy attach {{ $minioAlias }} "{{ join "," $group.policies }}" --group={{ $group.name }};
-              {{- else }}
               {{- range $policy := $group.policies }}
-              addPolicy group {{ $group.name }} {{ $policy }};
+              attachPolicy group {{ $group.name }} {{ $policy }};
               {{- end }}
+              {{- if $group.setPolicies }}
+              detachDanglingPolicies group {{ $group.name }} "{{ join "," $group.policies }}";
               {{- end }}
               {{- $groupStatus := ternary ("disable") ("enable") (and (not (empty $group.disabled)) $group.disabled) }}
               mc admin group {{ $groupStatus }} {{ $minioAlias }} {{ $group.name }};
@@ -186,8 +197,17 @@ spec:
 
               {{- if $isDistributedMode }}
               {{- if (or ((empty $bucket.withLock)) (not $bucket.withLock)) }}
-              {{- $versioning := ternary ("enable") ("suspend") (and (not (empty $bucket.versioning)) $bucket.versioning) }}
-              mc version {{ $versioning }} {{ $minioAlias }}/{{ $bucket.name }};
+              {{- $versioning := default "Suspended" $bucket.versioning }}
+              {{- if kindIs "bool" $bucket.versioning }}
+              {{- $versioning = ternary "Versioned" "Suspended" $bucket.versioning }}
+              {{- end }}
+              {{- if eq $versioning "Versioned" }}
+              mc version enable {{ $minioAlias }}/{{ $bucket.name }};
+              {{- else if eq $versioning "Suspended" }}
+              mc version suspend {{ $minioAlias }}/{{ $bucket.name }};
+              {{- else if ne $versioning "Unchanged" }}
+              {{- fail (printf "Invalid value '%s' for versioning of bucket '%s'" $versioning $bucket.name) }}
+              {{- end }}
               {{- end }}
               {{- end }}
 
@@ -249,8 +269,19 @@ spec:
             {{- end }}
           {{- if .Values.provisioning.resources }}
           resources: {{- toYaml .Values.provisioning.resources | nindent 12 }}
+          {{- else if ne .Values.provisioning.resourcesPreset "none" }}
+          resources: {{- include "common.resources.preset" (dict "type" .Values.provisioning.resourcesPreset) | nindent 12 }}
           {{- end }}
           volumeMounts:
+            - name: empty-dir
+              mountPath: /.mc
+              subPath: app-mc-dir
+            - name: empty-dir
+              mountPath: /opt/bitnami/minio/tmp
+              subPath: app-tmp-dir
+            - name: empty-dir
+              mountPath: /tmp
+              subPath: tmp-dir
             {{- if .Values.provisioning.enabled }}
             - name: minio-provisioning
               mountPath: /etc/ilm
@@ -275,7 +306,12 @@ spec:
       {{- if .Values.tolerations }}
       tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.tolerations "context" $) | nindent 8 }}
       {{- end }}
+      {{- if .Values.provisioning.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.provisioning.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
       volumes:
+        - name: empty-dir
+          emptyDir: {}
         {{- if .Values.provisioning.enabled }}
         - name: minio-provisioning
           configMap:
