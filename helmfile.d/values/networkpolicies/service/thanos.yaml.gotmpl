@@ -88,6 +88,8 @@ policies:
         - rule: egress-rule-query
       ingress:
         - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 9090
         - name: ingress-rule-grafana-datasource
           peers:
             - namespaceSelectorLabels:
@@ -99,7 +101,7 @@ policies:
               podSelectorLabels:
                 app: grafana-label-enforcer
           ports:
-            - tcp: 10902
+            - tcp: 9090
 
     thanos-query:
       podSelectorLabels:

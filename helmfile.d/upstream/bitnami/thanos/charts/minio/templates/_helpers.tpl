@@ -1,3 +1,8 @@
+{{/*
+Copyright VMware, Inc.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
 {{/* vim: set filetype=mustache: */}}
 
 {{/*
@@ -26,7 +31,7 @@ Return the proper image name (for the init container volume-permissions image)
 Return the proper Docker Image Registry Secret Names
 */}}
 {{- define "minio.imagePullSecrets" -}}
-{{- include "common.images.pullSecrets" (dict "images" (list .Values.image .Values.clientImage .Values.volumePermissions.image) "global" .Values.global) -}}
+{{- include "common.images.renderPullSecrets" (dict "images" (list .Values.image .Values.clientImage .Values.volumePermissions.image) "context" $) -}}
 {{- end -}}
 
 {{/*
@@ -66,18 +71,6 @@ Get the password to use to access MinIO&reg;
     {{- include "getValueFromSecret" (dict "Namespace" .Release.Namespace "Name" (include "common.names.fullname" .) "Length" 10 "Key" "root-password")  -}}
 {{- else -}}
     {{ required "A root password is required!" .Values.auth.rootPassword }}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Get existing password to access MinIO&reg without generating a new password;
-*/}}
-{{- define "minio.secret.existingPassword" -}}
-{{- $obj := (lookup "v1" "Secret" .Release.Namespace (include "minio.secretName" .)).data -}}
-{{- if $obj }}
-{{- index $obj "root-password" | b64dec -}}
-{{- else -}}
-{{- "" -}}
 {{- end -}}
 {{- end -}}
 
@@ -214,8 +207,9 @@ Return true if a TLS secret object should be created
 Provisioning job labels (exclude matchLabels from standard labels)
 */}}
 {{- define "minio.labels.provisioning" -}}
-{{- $provisioningLabels := (include "common.labels.standard" . | fromYaml ) -}}
-{{- range (include "common.labels.matchLabels" . | fromYaml | keys ) -}}
+{{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.provisioning.podLabels .Values.commonLabels ) "context" . ) }}
+{{- $provisioningLabels := (include "common.labels.standard" ( dict "customLabels" $podLabels "context" $ ) | fromYaml ) -}}
+{{- range (include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | fromYaml | keys ) -}}
 {{- $_ := unset $provisioningLabels . -}}
 {{- end -}}
 {{- print ($provisioningLabels | toYaml) -}}
@@ -239,12 +233,12 @@ Return the api ingress anotation
 Return the ingress hostname
 */}}
 {{- define "minio.ingress.hostname" -}}
-{{- .Values.ingress.hostname -}}
+{{- tpl .Values.ingress.hostname $ -}}
 {{- end -}}
 
 {{/*
 Return the api ingress hostname
 */}}
 {{- define "minio.apiIngress.hostname" -}}
-{{- .Values.apiIngress.hostname -}}
+{{- tpl .Values.apiIngress.hostname $ -}}
 {{- end -}}

@@ -1,3 +1,8 @@
+{{/*
+Copyright VMware, Inc.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
 {{/* vim: set filetype=mustache: */}}
 
 {{/*
@@ -14,6 +19,62 @@ Fully qualified app name for PostgreSQL
 {{- printf "%s-%s-minio" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
+{{- end -}}
+
+{{/*
+Return the proper Thanos bucketweb fullname
+*/}}
+{{- define "thanos.bucketweb.fullname" -}}
+{{- printf "%s-%s" (include "common.names.fullname" .) "bucketweb" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Return the proper Thanos compactor fullname
+*/}}
+{{- define "thanos.compactor.fullname" -}}
+{{- printf "%s-%s" (include "common.names.fullname" .) "compactor" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Return the proper Thanos query-frontend fullname
+*/}}
+{{- define "thanos.query-frontend.fullname" -}}
+{{- printf "%s-%s" (include "common.names.fullname" .) "query-frontend" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Return the proper Thanos query fullname
+*/}}
+{{- define "thanos.query.fullname" -}}
+{{- printf "%s-%s" (include "common.names.fullname" .) "query" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Return the proper Thanos receive-distributor fullname
+*/}}
+{{- define "thanos.receive-distributor.fullname" -}}
+{{- printf "%s-%s" (include "common.names.fullname" .) "receive-distributor" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Return the proper Thanos receive fullname
+*/}}
+{{- define "thanos.receive.fullname" -}}
+{{- printf "%s-%s" (include "common.names.fullname" .) "receive" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Return the proper Thanos compactor fullname
+*/}}
+{{- define "thanos.ruler.fullname" -}}
+{{- printf "%s-%s" (include "common.names.fullname" .) "ruler" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Return the proper Thanos storegateway fullname
+*/}}
+{{- define "thanos.storegateway.fullname" -}}
+{{- printf "%s-%s" (include "common.names.fullname" .) "storegateway" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -59,6 +120,64 @@ Return true if a secret object should be created
 {{- end -}}
 
 {{/*
+Return the object store config
+*/}}
+{{- define "thanos.objstoreConfig" -}}
+{{- if and .Values.objstoreConfig (not .Values.existingObjstoreSecret) }}
+objstore.yml: |-
+  {{- include "common.tplvalues.render" (dict "value" .Values.objstoreConfig "context" $) | b64enc | nindent 2 }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Return the storegateway config
+*/}}
+{{- define "thanos.storegatewayConfigMap" -}}
+config.yml: |-
+  {{- include "common.tplvalues.render" (dict "value" .Values.storegateway.config "context" $) | nindent 2 }}
+{{- if .Values.indexCacheConfig }}
+index-cache.yml: |-
+  {{- include "common.tplvalues.render" (dict "value" .Values.indexCacheConfig "context" $) | b64enc | nindent 2 }}
+{{- end }}
+{{- if .Values.bucketCacheConfig }}
+bucket-cache.yml: |-
+  {{- include "common.tplvalues.render" (dict "value" .Values.bucketCacheConfig "context" $) | b64enc | nindent 2 }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Return the ruler config
+*/}}
+{{- define "thanos.rulerConfigMap" -}}
+ruler.yml: |-
+  {{- include "common.tplvalues.render" (dict "value" .Values.ruler.config "context" $) | nindent 2 }}
+{{- end -}}
+
+{{/*
+Return the receive config
+*/}}
+{{- define "thanos.receiveConfigMap" -}}
+hashrings.json: |-
+  {{- include "common.tplvalues.render" (dict "value" (include "thanos.receive.config" .) "context" .) | nindent 2 }}
+{{- end -}}
+
+{{/*
+Return the query config
+*/}}
+{{- define "thanos.querySDConfigMap" -}}
+servicediscovery.yml: |-
+  {{- include "common.tplvalues.render" (dict "value" .Values.query.sdConfig "context" $) | nindent 2 }}
+{{- end -}}
+
+{{/*
+Return the query frontend config
+*/}}
+{{- define "thanos.queryFrontendConfigMap" -}}
+config.yml: |-
+  {{- include "common.tplvalues.render" (dict "value" .Values.queryFrontend.config "context" $) | nindent 2 }}
+{{- end -}}
+
+{{/*
 Return the Thanos HTTPS and basic auth configuration secret.
 */}}
 {{- define "thanos.httpConfigEnabled" -}}
@@ -100,30 +219,13 @@ Return true if a secret object should be created
 {{- end -}}
 
 {{/*
-Return a YAML of either .Values.query or .Values.querier
-If .Values.querier is used, we merge in the defaults from .Values.query, giving preference to .Values.querier
-*/}}
-{{- define "thanos.query.values" -}}
-{{- if .Values.querier -}}
-    {{- if .Values.query -}}
-        {{- mergeOverwrite .Values.query .Values.querier | toYaml -}}
-    {{- else -}}
-        {{- .Values.querier | toYaml -}}
-    {{- end -}}
-{{- else -}}
-    {{- .Values.query | toYaml -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
 Return the Thanos Query Service Discovery configuration configmap.
 */}}
 {{- define "thanos.query.SDConfigmapName" -}}
-{{- $query := (include "thanos.query.values" . | fromYaml) -}}
-{{- if $query.existingSDConfigmap -}}
-    {{- printf "%s" (tpl $query.existingSDConfigmap $) -}}
+{{- if .Values.query.existingSDConfigmap -}}
+    {{- printf "%s" (tpl .Values.query.existingSDConfigmap $) -}}
 {{- else -}}
-    {{- printf "%s-query-sd-configmap" (include "common.names.fullname" .) -}}
+    {{- printf "%s-query-sd" (include "common.names.fullname" .) -}}
 {{- end -}}
 {{- end -}}
 
@@ -131,8 +233,7 @@ Return the Thanos Query Service Discovery configuration configmap.
 Return true if a configmap object should be created
 */}}
 {{- define "thanos.query.createSDConfigmap" -}}
-{{- $query := (include "thanos.query.values" . | fromYaml) -}}
-{{- if and $query.sdConfig (not $query.existingSDConfigmap) }}
+{{- if and .Values.query.sdConfig (not .Values.query.existingSDConfigmap) }}
     {{- true -}}
 {{- else -}}
 {{- end -}}
@@ -145,7 +246,7 @@ Return the Thanos Ruler configuration configmap.
 {{- if .Values.ruler.existingConfigmap -}}
     {{- printf "%s" (tpl .Values.ruler.existingConfigmap $) -}}
 {{- else -}}
-    {{- printf "%s-ruler-configmap" (include "common.names.fullname" .) -}}
+    {{- printf "%s-ruler" (include "common.names.fullname" .) -}}
 {{- end -}}
 {{- end -}}
 
@@ -153,11 +254,14 @@ Return the Thanos Ruler configuration configmap.
 Return the queryURL used by Thanos Ruler.
 */}}
 {{- define "thanos.ruler.queryURL" -}}
-{{- $query := (include "thanos.query.values" . | fromYaml) -}}
+{{- if and .Values.queryFrontend.enabled .Values.queryFrontend.ingress.enabled .Values.queryFrontend.ingress.hostname .Values.queryFrontend.ingress.overrideAlertQueryURL -}}
+    {{- printf "%s://%s" (ternary "https" "http" .Values.queryFrontend.ingress.tls) (tpl .Values.queryFrontend.ingress.hostname .) -}}
+{{- else -}}
 {{- if .Values.ruler.queryURL -}}
     {{- printf "%s" (tpl .Values.ruler.queryURL $) -}}
 {{- else -}}
-    {{- printf "http://%s-query.%s.svc.%s:%d" (include "common.names.fullname" . ) .Release.Namespace .Values.clusterDomain (int  $query.service.ports.http) -}}
+    {{- printf "http://%s-query.%s.svc.%s:%d" (include "common.names.fullname" . ) .Release.Namespace .Values.clusterDomain (int  .Values.query.service.ports.http) -}}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 
@@ -178,7 +282,7 @@ Return the Thanos storegateway configuration configmap.
 {{- if .Values.storegateway.existingConfigmap -}}
     {{- printf "%s" (tpl .Values.storegateway.existingConfigmap $) -}}
 {{- else -}}
-    {{- printf "%s-storegateway-configmap" (include "common.names.fullname" .) -}}
+    {{- printf "%s-storegateway" (include "common.names.fullname" .) -}}
 {{- end -}}
 {{- end -}}
 
@@ -189,7 +293,7 @@ Return the Thanos Query Frontend configuration configmap.
 {{- if .Values.queryFrontend.existingConfigmap -}}
     {{- printf "%s" (tpl .Values.queryFrontend.existingConfigmap $) -}}
 {{- else -}}
-    {{- printf "%s-query-frontend-configmap" (include "common.names.fullname" .) -}}
+    {{- printf "%s-query-frontend" (include "common.names.fullname" .) -}}
 {{- end -}}
 {{- end -}}
 
@@ -210,6 +314,94 @@ Return true if a configmap object should be created
 {{- if and .Values.storegateway.config (not .Values.storegateway.existingConfigmap) }}
     {{- true -}}
 {{- else -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use (bucketweb)
+*/}}
+{{- define "thanos.bucketweb.serviceAccountName" -}}
+{{- if .Values.bucketweb.serviceAccount.create -}}
+    {{ default (include "thanos.bucketweb.fullname" .) .Values.bucketweb.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.bucketweb.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use (compactor)
+*/}}
+{{- define "thanos.compactor.serviceAccountName" -}}
+{{- if .Values.compactor.serviceAccount.create -}}
+    {{ default (include "thanos.compactor.fullname" .) .Values.compactor.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.compactor.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use (query)
+*/}}
+{{- define "thanos.query.serviceAccountName" -}}
+{{- if .Values.query.serviceAccount.create -}}
+    {{ default (include "thanos.query.fullname" .) .Values.query.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.query.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use (queryFrontend)
+*/}}
+{{- define "thanos.query-frontend.serviceAccountName" -}}
+{{- if .Values.queryFrontend.serviceAccount.create -}}
+    {{ default (include "thanos.query-frontend.fullname" .) .Values.queryFrontend.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.queryFrontend.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use (receive)
+*/}}
+{{- define "thanos.receive.serviceAccountName" -}}
+{{- if .Values.receive.serviceAccount.create -}}
+    {{ default (include "thanos.receive.fullname" .) .Values.receive.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.receive.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use (receiveDistributor)
+*/}}
+{{- define "thanos.receive-distributor.serviceAccountName" -}}
+{{- if .Values.receiveDistributor.serviceAccount.create -}}
+    {{ default (include "thanos.receive-distributor.fullname" .) .Values.receiveDistributor.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.receiveDistributor.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use (ruler)
+*/}}
+{{- define "thanos.ruler.serviceAccountName" -}}
+{{- if .Values.ruler.serviceAccount.create -}}
+    {{ default (include "thanos.ruler.fullname" .) .Values.ruler.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.ruler.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use (storegateway)
+*/}}
+{{- define "thanos.storegateway.serviceAccountName" -}}
+{{- if .Values.storegateway.serviceAccount.create -}}
+    {{ default (include "thanos.storegateway.fullname" .) .Values.storegateway.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.storegateway.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
 
@@ -336,51 +528,6 @@ false
 {{- end }}
 {{- end }}
 
-{{/* Service account name
-Usage:
-{{ include "thanos.serviceAccountName" (dict "component" "bucketweb" "context" $) }}
-*/}}
-{{- define "thanos.serviceAccountName" -}}
-{{- $component := index .context.Values .component -}}
-{{- if eq .component "query-frontend" -}}
-{{- $component = index .context.Values "queryFrontend" -}}
-{{- else if eq .component "receive-distributor" -}}
-{{- $component = index .context.Values "receiveDistributor" -}}
-{{- end -}}
-{{- if not (include "thanos.serviceAccount.useExisting" (dict "component" .component "context" .context)) -}}
-    {{- if $component.serviceAccount.create -}}
-        {{- if eq .context.Values.serviceAccount.name "" -}}
-            {{ default (printf "%s-%s" (include "common.names.fullname" .context) .component) $component.serviceAccount.name }}
-        {{- else -}}
-            {{ default (printf "%s-%s" (.context.Values.serviceAccount.name) .component) $component.serviceAccount.name }}
-        {{- end -}}
-    {{- else if .context.Values.serviceAccount.create -}}
-        {{ default (include "common.names.fullname" .context) .context.Values.serviceAccount.name  }}
-    {{- else -}}
-        {{ default "default" (coalesce $component.serviceAccount.name .context.Values.serviceAccount.name ) }}
-    {{- end -}}
-{{- else -}}
-    {{ default (printf "%s-%s" (include "common.names.fullname" .context) .component) (coalesce $component.serviceAccount.existingServiceAccount .context.Values.existingServiceAccount) }}
-{{- end -}}
-{{- end -}}
-
-{{/* Service account use existing
-{{- include "thanos.serviceAccount.useExisting" (dict "component" "bucketweb" "context" $) -}}
-*/}}
-{{- define "thanos.serviceAccount.useExisting" -}}
-{{- $component := index .context.Values .component -}}
-{{- if eq .component "query-frontend" -}}
-{{- $component = index .context.Values "queryFrontend" -}}
-{{- else if eq .component "receive-distributor" -}}
-{{- $component = index .context.Values "receiveDistributor" -}}
-{{- end -}}
-{{- if .context.Values.existingServiceAccount -}}
-    {{- true -}}
-{{- else if $component.serviceAccount.existingServiceAccount -}}
-    {{- true -}}
-{{- end -}}
-{{- end -}}
-
 {{/*
 Return true if a hashring configmap object should be created
 */}}
@@ -390,7 +537,6 @@ Return true if a hashring configmap object should be created
 {{- else -}}
 {{- end -}}
 {{- end -}}
-
 
 {{/*
 Return the Thanos receive hashring configuration configmap.
@@ -447,5 +593,24 @@ Usage:
 {{- else -}}
 {{- .Values.receive.config | toPrettyJson -}}
 {{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Labels to use on serviceMonitor.spec.selector and svc.metadata.labels
+*/}}
+{{- define "thanos.servicemonitor.matchLabels" -}}
+{{- if and .Values.metrics.enabled .Values.metrics.serviceMonitor.enabled -}}
+prometheus-operator/monitor: 'true'
+{{- end }}
+{{- end }}
+
+{{/*
+Labels to use on serviceMonitor.spec.selector
+*/}}
+{{- define "thanos.servicemonitor.selector" -}}
+{{- include "thanos.servicemonitor.matchLabels" $ }}
+{{ if .Values.metrics.serviceMonitor.selector -}}
+{{- include "common.tplvalues.render" (dict "value" .Values.metrics.serviceMonitor.selector "context" $)}}
 {{- end -}}
 {{- end -}}
