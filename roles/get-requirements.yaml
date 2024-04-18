@@ -43,6 +43,7 @@
         version: "{{ yajsv_version }}"
         url: https://github.com/neilpa/yajsv/releases/download/v{{ yajsv_version }}/yajsv.linux.amd64
         dest: "{{ install_path }}/yajsv"
+        version_flag: "-v"
 
   connection: local
   become: yes
