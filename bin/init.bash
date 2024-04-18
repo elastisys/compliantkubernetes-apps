@@ -320,34 +320,6 @@ set_nginx_config() {
     fi
 }
 
-# Usage: set_fluentd_config <config-file>
-# baremetal support is experimental, keep as separate case until stable
-set_fluentd_config() {
-    file="${1}"
-    if [[ ! -f "${file}" ]]; then
-        log_error "ERROR: invalid file - ${file}"
-        exit 1
-    fi
-    case ${CK8S_CLOUD_PROVIDER} in
-        safespring | citycloud | exoscale | upcloud | elastx)
-            use_region_endpoint=true
-            ;;
-
-        aws | azure)
-            use_region_endpoint=false
-            ;;
-
-        baremetal)
-            use_region_endpoint=true
-            ;;
-        none)
-            return
-            ;;
-    esac
-
-    replace_set_me "${file}" '.fluentd.forwarder.useRegionEndpoint' "${use_region_endpoint}"
-}
-
 # Usage: set_lbsvc_safeguard <config-file>
 set_lbsvc_safeguard() {
     file="${1}"
@@ -787,7 +759,6 @@ update_config           "${config[override_common]}"
 
 if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
   generate_default_config        "${config[default_sc]}"
-  set_fluentd_config             "${config[default_sc]}"
   set_harbor_config              "${config[default_sc]}"
   set_s3bucketalertscount_config "${config[default_sc]}"
   update_config                  "${config[override_sc]}"
