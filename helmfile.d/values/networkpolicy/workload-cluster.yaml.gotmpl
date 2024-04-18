@@ -42,7 +42,9 @@ ingressNginx:
   enabled: {{ .Values.networkPolicies.ingressNginx.enabled }}
   ingressOverride:
     enabled : {{ .Values.networkPolicies.ingressNginx.ingressOverride.enabled }}
+    {{- if .Values.networkPolicies.ingressNginx.ingressOverride.enabled }}
     ips: {{- toYaml .Values.networkPolicies.ingressNginx.ingressOverride.ips | nindent 4 }}
+    {{- end }}
 
 alertmanager:
   enabled: {{ and .Values.user.alertmanager.enabled .Values.networkPolicies.alertmanager.enabled }}
