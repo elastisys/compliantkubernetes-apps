@@ -4,7 +4,7 @@
   register: command_exists
 
 - name: Check {{ item.dest }}
-  command: "{{ item.command }} --version"
+  command: "{{ item.command }} {{ item.version_flag | d('--version') }}"
   register: current_command_version
   ignore_errors: yes
   when: command_exists.stat.exists
