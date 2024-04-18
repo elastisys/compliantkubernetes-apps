@@ -86,14 +86,14 @@ generate_sops_config() {
     sops_config_write_fingerprints "${fingerprint}"
 }
 
-# Only writes value if it is set to "set-me"
+# Only writes value if it is set to "set-me*"
 # Usage: replace_set_me <file> <field> <value>
 replace_set_me(){
     if [[ $# -ne 3 ]]; then
         log_error "ERROR: number of args in replace_set_me must be 3. #=[$#]"
         exit 1
     fi
-    if [[ $(yq4 "${2}" "${1}") == "set-me" ]]; then
+    if [[ $(yq4 "${2}" "${1}") =~ ^set-me.* ]]; then
         yq4 --inplace "${2} = ${3}" "${1}"
     fi
 }
@@ -305,7 +305,6 @@ set_nginx_config() {
     if [ "${CK8S_CLOUD_PROVIDER}" = "azure" ]; then
         replace_set_me "${file}" '.externalTrafficPolicy.local' 'true'
         replace_set_me "${file}" '.networkPolicies.ingressNginx.ingressOverride.enabled' 'true'
-        replace_set_me "${file}" '.networkPolicies.ingressNginx.ingressOverride.ips' "[ 0.0.0.0/0 ]"
     else
         replace_set_me "${file}" '.externalTrafficPolicy.local' 'false'
         replace_set_me "${file}" '.networkPolicies.ingressNginx.ingressOverride.enabled' 'false'
@@ -317,6 +316,17 @@ set_nginx_config() {
     else
         replace_set_me "${file}" '.ingressNginx.controller.service.type' "\"${service_type}\""
         replace_set_me "${file}" '.ingressNginx.controller.service.annotations' "${service_annotations}"
+    fi
+}
+
+set_nginx_config_ingress_override() {
+    file="${1}"
+    if [[ ! -f "${file}" ]]; then
+        log_error "ERROR: invalid file - ${file}"
+        exit 1
+    fi
+    if [ "${CK8S_CLOUD_PROVIDER}" = "azure" ]; then
+        replace_set_me "${file}" '.networkPolicies.ingressNginx.ingressOverride.ips' '["0.0.0.0/0"]'
     fi
 }
 
@@ -762,11 +772,13 @@ if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
   set_harbor_config              "${config[default_sc]}"
   set_s3bucketalertscount_config "${config[default_sc]}"
   update_config                  "${config[override_sc]}"
+  set_nginx_config_ingress_override "${config[default_sc]}"
 fi
 
 if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
   generate_default_config "${config[default_wc]}"
   update_config           "${config[override_wc]}"
+  set_nginx_config_ingress_override "${config[default_wc]}"
 fi
 
 gen_new_secrets=true
