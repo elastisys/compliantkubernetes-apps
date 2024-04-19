@@ -14,6 +14,9 @@ templates:
     needs:
       - monitoring/networkpolicy
       - monitoring/podsecuritypolicy
+      {{- if .Values | get "kubeStateMetrics.clusterAPIMetrics.enabled" false }}
+      - monitoring/kube-state-metrics-extra-resource-metrics
+      {{- end }}
     values:
       {{- if .Values | get "ck8sManagementCluster.enabled" false }}
       - values/kube-prometheus-stack-sc.yaml.gotmpl
