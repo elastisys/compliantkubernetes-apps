@@ -1454,8 +1454,10 @@ properties:
                   type: string
                 type: object
               clusterIP:
-                format: ipv4
                 type: string
+                oneOf:
+                  - format: ipv4
+                  - const: ""
               enabled:
                 type: boolean
               loadBalancerSourceRanges:
