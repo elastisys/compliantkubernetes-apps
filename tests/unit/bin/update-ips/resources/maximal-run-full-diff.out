@@ -1,6 +1,6 @@
 [1m--- common-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -16,7 +16,7 @@[0m
+[36m@@ -17,7 +17,7 @@[0m
    global:
      objectStorage:
        ips:
@@ -12,7 +12,7 @@
 [[33mck8s[0m] Diff found for .networkPolicies.global.objectStorage.ips in common-config.yaml (diff shows actions needed to be up to date)
 [1m--- common-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -18,7 +18,7 @@[0m
+[36m@@ -19,7 +19,7 @@[0m
        ips:
          - set-me
        ports:
@@ -24,7 +24,7 @@
 [[33mck8s[0m] Diff found for .networkPolicies.global.objectStorage.ports in common-config.yaml (diff shows actions needed to be up to date)
 [1m--- common-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -21,7 +21,7 @@[0m
+[36m@@ -22,7 +22,7 @@[0m
          - set-me
      scIngress:
        ips:
@@ -36,7 +36,7 @@
 [[33mck8s[0m] Diff found for .networkPolicies.global.scIngress.ips in common-config.yaml (diff shows actions needed to be up to date)
 [1m--- common-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -24,7 +24,7 @@[0m
+[36m@@ -25,7 +25,7 @@[0m
          - set-me
      wcIngress:
        ips:
@@ -95,6 +95,7 @@
 [32m+        - 127.0.3.7/32[0m
 [32m+        - 127.0.3.8/32[0m
 [32m+        - 127.0.3.9/32[0m
+[32m+        - 127.0.3.81/32[0m
    monitoring:
      grafana:
        externalDashboardProvider:
@@ -183,9 +184,9 @@
 [[33mck8s[0m] Diff found for .networkPolicies.global.wcNodes.ips in wc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -29,6 +29,9 @@[0m
+[36m@@ -29,6 +29,10 @@[0m
            - set-me
-   rcloneSync:
+   rclone:
      enabled: true
 [32m+    sync:[0m
 [32m+      objectStorage:[0m
@@ -194,25 +195,12 @@
  objectStorage:
    swift:
      authUrl: https://keystone.foo.dev-ck8s.com:5678
-[[33mck8s[0m] Diff found for .networkPolicies.rcloneSync.destinationObjectStorageS3.ips in sc-config.yaml (diff shows actions needed to be up to date)
-[1m--- sc-config.yaml[0m
-[1m+++ expected[0m
-[36m@@ -29,6 +29,9 @@[0m
-           - set-me
-   rcloneSync:
-     enabled: true
-[32m+    destinationObjectStorageS3:[0m
-[32m+      ports:[0m
-[32m+        - 1234[0m
- objectStorage:
-   swift:
-     authUrl: https://keystone.foo.dev-ck8s.com:5678
-[[33mck8s[0m] Diff found for .networkPolicies.rcloneSync.destinationObjectStorageS3.ports in sc-config.yaml (diff shows actions needed to be up to date)
+[[33mck8s[0m] Diff found for .networkPolicies.rclone.sync.objectStorage.ips in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
 [36m@@ -29,6 +29,10 @@[0m
            - set-me
-   rcloneSync:
+   rclone:
      enabled: true
 [32m+    sync:[0m
 [32m+      objectStorage:[0m
@@ -224,8 +212,8 @@
 [[33mck8s[0m] Diff found for .networkPolicies.rclone.sync.objectStorage.ports in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -49,6 +49,11 @@[0m
-         - set-me
+[36m@@ -29,6 +29,11 @@[0m
+           - set-me
    rclone:
      enabled: true
 [32m+    sync:[0m
@@ -239,8 +227,8 @@
 [[33mck8s[0m] Diff found for .networkPolicies.rclone.sync.objectStorageSwift.ips in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -49,6 +49,11 @@[0m
-         - set-me
+[36m@@ -29,6 +29,11 @@[0m
+           - set-me
    rclone:
      enabled: true
 [32m+    sync:[0m
@@ -256,7 +244,7 @@
 [1m+++ expected[0m
 [36m@@ -29,6 +29,10 @@[0m
            - set-me
-   rcloneSync:
+   rclone:
      enabled: true
 [32m+    sync:[0m
 [32m+      secondaryUrl:[0m
@@ -268,9 +256,9 @@
 [[33mck8s[0m] Diff found for .networkPolicies.rclone.sync.secondaryUrl.ips in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -29,6 +29,9 @@[0m
+[36m@@ -29,6 +29,10 @@[0m
            - set-me
-   rcloneSync:
+   rclone:
      enabled: true
 [32m+    sync:[0m
 [32m+      secondaryUrl:[0m
@@ -279,17 +267,4 @@
  objectStorage:
    swift:
      authUrl: https://keystone.foo.dev-ck8s.com:5678
-[[33mck8s[0m] Diff found for .networkPolicies.rcloneSync.secondaryUrl.ips in sc-config.yaml (diff shows actions needed to be up to date)
-[1m--- sc-config.yaml[0m
-[1m+++ expected[0m
-[36m@@ -29,6 +29,9 @@[0m
-           - set-me
-   rcloneSync:
-     enabled: true
-[32m+    secondaryUrl:[0m
-[32m+      ports:[0m
-[32m+        - 1234[0m
- objectStorage:
-   swift:
-     authUrl: https://keystone.foo.dev-ck8s.com:5678
-[[33mck8s[0m] Diff found for .networkPolicies.rcloneSync.secondaryUrl.ports in sc-config.yaml (diff shows actions needed to be up to date)
+[[33mck8s[0m] Diff found for .networkPolicies.rclone.sync.secondaryUrl.ports in sc-config.yaml (diff shows actions needed to be up to date)
