@@ -37,7 +37,7 @@ repos:
           - MD042 # No empty links
           - MD051 # Link fragments should be valid
           - --
-        exclude: ^helmfile\.d/upstream/|^helmfile\.d/charts/grafana-dashboards/files/welcome.md$|^helmfile\.d/charts/opensearch/configurer/files/dashboards-resources/welcome.md$|^images/elasticsearch-curator/README.md
+        exclude: ^helmfile\.d/upstream/|^helmfile\.d/charts/grafana-dashboards/files/welcome.md$|^helmfile\.d/charts/opensearch/configurer/files/dashboards-resources/welcome.md$|^images/elasticsearch-curator/README.md|^docs/sbom.md
 
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
     rev: 2.7.3
