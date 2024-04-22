@@ -1,0 +1,899 @@
+# Requirements
+- domain: Requirements
+  name: Ansible
+  copyright_owner: Ansible community
+  license: LGPL-3.0-or-later
+- domain: Requirements
+  name: curl
+  copyright_owner: "Daniel Stenberg, <daniel@haxx.se>, and many contributors"
+  license: curl
+- domain: Requirements
+  name: Kubernetes
+  license: Apache-2.0
+  app_version: 1.28.6
+  cncf_status: graduated
+  copyright_owner: Kubernetes Authors, Linux Foundation
+- domain: Requirements
+  name: Helm
+  app_version: 3.13.3
+  copyright_owner: Helm Authors, Linux Foundation
+  cncf_status: graduated
+  license: Apache-2.0
+- domain: Requirements
+  name: Helmfile
+  app_version: 0.162.0
+  copyright_owner: "Rob Boll (@robboll)"
+  license: MIT
+- domain: Requirements
+  name: Helmdiff
+  app_version: 3.9.4
+  copyright_owner: "Fabian Ruff (@databus23)"
+  license: Apache-2.0
+- domain: Requirements
+  name: Helm Secrets
+  app_version: 4.5.1
+  copyright_owner: "Jan-Otto Kröpke (@jkroepke), Zendesk"
+  license: Apache-2.0
+- domain: Requirements
+  name: Jq
+  app_version: "1.6"
+  copyright_owner: "[Various](https://github.com/stedolan/jq/blob/master/AUTHORS)"
+  license: LGPL-3.0-or-later
+  comment: Similar to the MIT license
+- domain: Requirements
+  name: s3cmd
+  app_version: "2.*"
+  copyright_owner: "TGRMN Software - http://www.tgrmn.com - and contributors"
+  license: GPL-2.0-or-later
+- domain: Requirements
+  name: sops
+  app_version: 3.8.1
+  copyright_owner: Mozilla
+  license: MPL-2.0
+- domain: Requirements
+  name: yq3
+  app_version: 3.4.1
+  copyright_owner: Various contributors
+  license: MIT
+- domain: Requirements
+  name: yq4
+  app_version: 4.42.1
+  copyright_owner: Various contributors
+  license: MIT
+- domain: Requirements
+  name: yajsv
+  app_version: 1.4.1
+  copyright_owner: Neil Pankey <npankey@gmail.com>
+  license: MIT
+- domain: Requirements
+  name: pwgen
+  app_version: 3.4.1
+  copyright_owner: "Theodore Ts'o tytso@alum.mit.edu"
+  license: MIT
+- domain: Requirements
+  name: apache2 utils
+  app_version: "2.4.*"
+  copyright_owner: Apache Software Foundation
+  license: Apache-2.0
+
+# Upstream helm charts
+- domain: Upstream Helm Charts
+  name: cert-manager
+  license: "[Apache-2.0](https://github.com/cert-manager/cert-manager/blob/master/LICENSE)"
+  app_version: v1.12.8
+  chart_version: v1.12.8
+  copyright_owner: Cert-manager Authors, Linux Foundation
+  cncf_status: incubating
+- domain: Upstream Helm Charts
+  name: common
+  license: "[Apache-2.0](https://github.com/bitnami/charts/tree/main/bitnami/common#license)"
+  app_version: 2.2.5
+  chart_version: 2.2.5
+  copyright_owner: Broadcom
+  cncf_status: ''
+  comment: 'From Thanos minio chart'
+- domain: Upstream Helm Charts
+  name: common
+  license: "[Apache-2.0](https://github.com/bitnami/charts/tree/main/bitnami/common#license)"
+  app_version: 2.4.0
+  chart_version: 2.4.0
+  copyright_owner: Broadcom
+  cncf_status: ''
+  comment: 'From Thanos chart'
+- domain: Upstream Helm Charts
+  name: common
+  license: "[Apache-2.0](https://github.com/bitnami/charts/tree/main/bitnami/common#license)"
+  app_version: 2.4.0
+  chart_version: 2.4.0
+  copyright_owner: Broadcom
+  cncf_status: ''
+  comment: 'From Fluentd chart'
+- domain: Upstream Helm Charts
+  name: crds
+  license: "Apache-2.0"
+  app_version: ''
+  chart_version: "0.0.0"
+  copyright_owner: Prometheus Authors, Linux Foundation
+  cncf_status: ''
+  comment: 'Sub-chart of Kube-prometheus-stack'
+- domain: Upstream Helm Charts
+  name: dex
+  license: "[Apache-2.0](https://github.com/dexidp/dex/blob/master/LICENSE)"
+  app_version: 2.36.0
+  chart_version: "0.14.1"
+  copyright_owner: Dex IdP Contributors, Linux Foundation
+  cncf_status: 'sandbox'
+  comment: ''
+- domain: Upstream Helm Charts
+  name: falco
+  license: "[Apache-2.0](https://github.com/falcosecurity/falco/blob/master/COPYING)"
+  app_version: 0.37.1
+  chart_version: "4.2.2"
+  copyright_owner: Falco Authors, Linux Foundation
+  cncf_status: 'incubating'
+  comment: ''
+- domain: Upstream Helm Charts
+  name: falco-exporter
+  license: "[Apache-2.0](https://github.com/falcosecurity/falco/blob/master/COPYING)"
+  app_version: 0.8.3
+  chart_version: "0.9.11"
+  copyright_owner: Falco Authors, Linux Foundation
+  cncf_status: 'incubating'
+  comment: ''
+- domain: Upstream Helm Charts
+  name: falcosidekick
+  license: "[Apache-2.0](https://github.com/falcosecurity/falco/blob/master/COPYING)"
+  app_version: 2.28.0
+  chart_version: "0.7.11"
+  copyright_owner: Falco Authors, Linux Foundation
+  cncf_status: 'incubating'
+  comment: ''
+- domain: Upstream Helm Charts
+  name: fluentd
+  license: "[Apache-2.0](https://github.com/fluent/fluentd/blob/master/LICENSE)"
+  app_version: 1.16.1
+  chart_version: 5.8.2
+  copyright_owner: Fluentd Project
+  cncf_status: 'graduated'
+  comment: ''
+- domain: Upstream Helm Charts
+  name: fluentd-elasticsearch
+  license: "[GPL-3.0-or-later](https://github.com/kokuwaio/helm-charts/blob/main/LICENSE)"
+  app_version: v4.3.9
+  chart_version: 13.10.0
+  copyright_owner: "[Kokuwa.io](http://kokuwa.io/)"
+  cncf_status: ''
+  comment: 'Mostly relicenses Apache-2.0 code, 3 contributors'
+- domain: Upstream Helm Charts
+  name: gatekeeper
+  license: "[Apache-2.0](https://github.com/open-policy-agent/gatekeeper/blob/master/LICENSE)"
+  app_version: v3.11.0
+  chart_version: 3.11.0
+  copyright_owner: Open Policy Agent contributors
+  cncf_status: 'graduated'
+  comment: ''
+- domain: Upstream Helm Charts
+  name: grafana
+  license: "[AGPL-3.0-only](https://github.com/grafana/grafana/blob/main/LICENSE)"
+  app_version: 10.3.1
+  chart_version: 7.3.0
+  copyright_owner: Grafana Labs
+  cncf_status: ''
+  comment: 'From Kube-prometheus-stack. Not used.'
+- domain: Upstream Helm Charts
+  name: grafana
+  license: "[AGPL-3.0-only](https://github.com/grafana/grafana/blob/main/LICENSE)"
+  app_version: 10.4.0
+  chart_version: 7.3.7
+  copyright_owner: Grafana Labs
+  cncf_status: ''
+  comment: ''
+- domain: Upstream Helm Charts
+  name: harbor
+  license: "[Apache-2.0](https://github.com/goharbor/harbor/blob/main/LICENSE)"
+  app_version: 2.9.1
+  chart_version: 1.13.1
+  copyright_owner: Harbor Authors, Linux Foundation
+  cncf_status: 'graduated'
+  comment: ''
+- domain: Upstream Helm Charts
+  name: ingress-nginx
+  license: "[Apache-2.0](https://github.com/kubernetes/ingress-nginx/blob/main/LICENSE)"
+  app_version: 1.9.6
+  chart_version: 4.9.1
+  copyright_owner: Linux Foundation
+  cncf_status: ''
+  comment: ''
+- domain: Upstream Helm Charts
+  name: k8s-metacollector
+  license: "[Apache-2.0](https://github.com/falcosecurity/falco/blob/master/COPYING)"
+  app_version: 0.1.0
+  chart_version: 0.1.7
+  copyright_owner: Falco Authors, Linux Foundation
+  cncf_status: ''
+  comment: 'Deployed by falco if collectors.kubernetes.enabled'
+- domain: Upstream Helm Charts
+  name: kube-prometheus-stack
+  license: Apache-2.0
+  app_version: v0.71.2
+  chart_version: 56.6.2
+  copyright_owner: Prometheus Authors, Linux Foundation
+  cncf_status: 'graduated'
+  comment: ''
+- domain: Upstream Helm Charts
+  name: kube-state-metrics
+  license: "[Apache-2.0](https://github.com/kubernetes/kube-state-metrics/blob/main/LICENSE)"
+  app_version: 2.10.1
+  chart_version: 5.16.0
+  copyright_owner: Linux Foundation
+  cncf_status: ''
+  comment: ''
+- domain: Upstream Helm Charts
+  name: kured
+  license: "[Apache-2.0](https://github.com/kubereboot/kured/blob/main/LICENSE)"
+  app_version: 1.13.1
+  chart_version: 4.5.1
+  copyright_owner: Kured authors
+  cncf_status: 'sandbox'
+  comment: ''
+- domain: Upstream Helm Charts
+  name: metrics-server
+  license: "[Apache-2.0](https://github.com/kubernetes-sigs/metrics-server/blob/master/LICENSE)"
+  app_version: 0.6.3
+  chart_version: 3.10.0
+  copyright_owner: Linux Foundation
+  cncf_status: ''
+  comment: ''
+- domain: Upstream Helm Charts
+  name: minio
+  license: "[AGPL-3.0-or-later](https://github.com/minio/minio/blob/master/LICENSE)"
+  app_version: 2023.5.4
+  chart_version: 12.6.0
+  copyright_owner: MinIO, Inc
+  cncf_status: ''
+  comment: 'From Thanos helm chart'
+- domain: Upstream Helm Charts
+  name: minio
+  license: "[AGPL-3.0-or-later](https://github.com/minio/minio/blob/master/LICENSE)"
+  app_version: RELEASE.2023-09-30T07-02-29Z
+  chart_version: 5.0.14
+  copyright_owner: MinIO, Inc
+  cncf_status: ''
+  comment: 'S3 Storage for local dev clusters'
+- domain: Upstream Helm Charts
+  name: opensearch
+  license: "[Apache-2.0](https://github.com/opensearch-project/OpenSearch/blob/main/LICENSE.txt)"
+  app_version: 2.12.0
+  chart_version: 2.18.0
+  copyright_owner: OpenSearch Contributors
+  cncf_status: ''
+  comment: ''
+- domain: Upstream Helm Charts
+  name: opensearch-dashboards
+  license: "[Apache-2.0](https://github.com/opensearch-project/OpenSearch-Dashboards/blob/main/LICENSE.txt)"
+  app_version: 2.12.0
+  chart_version: 2.18.0
+  copyright_owner: OpenSearch Contributors
+  cncf_status: ''
+  comment: ''
+- domain: Upstream Helm Charts
+  name: prometheus-blackbox-exporter
+  license: "[Apache-2.0](https://github.com/prometheus/blackbox_exporter/blob/master/LICENSE)"
+  app_version: v0.24.0
+  chart_version: 8.2.0
+  copyright_owner: "[Prometheus Authors](https://github.com/prometheus/blackbox_exporter/blob/master/NOTICE)"
+  cncf_status: ''
+  comment: ''
+- domain: Upstream Helm Charts
+  name: prometheus-elasticsearch-exporter
+  license: "[Apache-2.0](https://github.com/prometheus-community/elasticsearch_exporter/blob/master/NOTICE)"
+  app_version: 1.5.0
+  chart_version: 5.1.1
+  copyright_owner: "[Prometheus Authors](https://github.com/prometheus-community/elasticsearch_exporter/blob/master/NOTICE)"
+  cncf_status: ''
+  comment: ''
+- domain: Upstream Helm Charts
+  name: prometheus-node-exporter
+  license: "[Apache-2.0](https://github.com/prometheus/node_exporter/blob/master/LICENSE)"
+  app_version: 1.7.0
+  chart_version: 4.26.1
+  copyright_owner: "[Prometheus Authors and others](https://github.com/prometheus/node_exporter/blob/master/NOTICE)"
+  cncf_status: ''
+  comment: ''
+- domain: Upstream Helm Charts
+  name: prometheus-windows-exporter
+  license: "[MIT](https://github.com/prometheus-community/windows_exporter/blob/master/LICENSE#L1)"
+  app_version: 0.25.1
+  chart_version: 0.3.0
+  copyright_owner: "[Martin Lindhe](https://github.com/prometheus-community/windows_exporter/blob/master/LICENSE#L3C20-L3C33)"
+  cncf_status: ''
+  comment: 'From Kube-prometheus-stack. Not used.'
+- domain: Upstream Helm Charts
+  name: thanos
+  license: "[Apache-2.0](https://github.com/thanos-io/thanos/blob/main/LICENSE)"
+  app_version: 0.31.0
+  chart_version: 12.6.2
+  copyright_owner: Thanos Authors, Linux Foundation
+  cncf_status: 'incubating'
+  comment: ''
+- domain: Upstream Helm Charts
+  name: tigera-operator
+  license: "[Apache-2.0](https://github.com/projectcalico/calico/blob/master/LICENSE.md)"
+  app_version: v3.26.4
+  chart_version: v3.26.4
+  copyright_owner: "[The Kubernetes Authors](https://github.com/projectcalico/calico/blob/master/LICENSE.md)"
+  cncf_status: ''
+  comment: ''
+- domain: Upstream Helm Charts
+  name: trivy-operator
+  license: "[Apache-2.0](https://github.com/aquasecurity/starboard/blob/main/LICENSE)"
+  app_version: 0.17.1
+  chart_version: 0.19.1
+  copyright_owner: "[Aqua Security Software Ltd.](https://github.com/aquasecurity/starboard/blob/main/NOTICE)"
+  cncf_status: ''
+  comment: ''
+- domain: Upstream Helm Charts
+  name: velero
+  license: "[Apache-2.0](https://github.com/vmware-tanzu/velero/blob/main/LICENSE)"
+  app_version: 0.17.1
+  chart_version: 0.19.1
+  copyright_owner: "[Velero contributors](https://github.com/vmware-tanzu/velero/blob/main/cmd/velero/velero.go#L2)"
+  cncf_status: ''
+  comment: ''
+
+# Custom helm charts
+- domain: Custom Helm Charts
+  name: autoscaling-monitoring
+  app_version: 1.16.0
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: calico-accountant
+  app_version: "1.0"
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: calico-default-deny
+  app_version: "1.0"
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: calico-felix-metrics
+  app_version: "1.0"
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: cluster-admin-rbac
+  app_version: "1.0"
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: falco-psp-rbac
+  app_version: 0.1.0
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: file-copier
+  app_version: "1.0"
+  chart_version: "0.1.0"
+- domain: Custom Helm Charts
+  name: gatekeeper-constraints
+  app_version: "1.0"
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: gatekeeper-metrics
+  app_version: ''
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: gatekeeper-mutations
+  app_version: "1.0"
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: gatekeeper-templates
+  app_version: "1.0"
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name:  grafana-dashboards
+  app_version: 0.1.0
+  chart_version: 0.3.0
+- domain: Custom Helm Charts
+  name: grafana-label-enforcer
+  app_version: "1.0"
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: harbor-backup
+  app_version: ''
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: harbor-certs
+  app_version: "1.0"
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: hnc
+  app_version: v1.1.0
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: hnc-config
+  app_version: v1.1.0
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: ingress-nginx-probe-ingress
+  app_version: 1.16.0
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: init-harbor
+  app_version: ''
+  chart_version: 0.2.0
+- domain: Custom Helm Charts
+  name: kube-state-metrics-extra-resource-metrics
+  app_version: ''
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: kubeapi-metrics
+  app_version: 1.16.0
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: kured-secret
+  app_version: "1.0"
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: letsencrypt
+  app_version: ''
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: log-manager
+  app_version: 0.2.0
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: namespaces
+  app_version: ''
+  chart_version: 0.1.1
+- domain: Custom Helm Charts
+  name: networkpolicy-generator
+  app_version: 0.1.0
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: networkpolicy-service
+  app_version: "1.0"
+  chart_version: 0.2.0
+- domain: Custom Helm Charts
+  name: networkpolicy-service
+  app_version: "1.0"
+  chart_version: 0.2.0
+- domain: Custom Helm Charts
+  name: networkpolicy-service
+  app_version: "1.0"
+  chart_version: 0.2.0
+- domain: Custom Helm Charts
+  name: networkpolicy-workload
+  app_version: "1.0"
+  chart_version: 0.2.0
+- domain: Custom Helm Charts
+  name: node-local-dns
+  app_version: ''
+  chart_version: 0.1.1
+- domain: Custom Helm Charts
+  name: opensearch-backup
+  app_version: 0.1.0
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: opensearch-configurer
+  app_version: 0.1.0
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: opensearch-curator
+  app_version: 0.1.0
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: opensearch-secrets
+  app_version: 0.1.0
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: opensearch-securityadmin
+  app_version: 0.1.0
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: opensearch-slm
+  app_version: 0.1.0
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: openstack-monitoring
+  app_version: 1.16.0
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: podsecuritypolicies
+  app_version: ''
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: prometheus-alerts
+  app_version: "1.0"
+  chart_version: 0.1.1
+- domain: Custom Helm Charts
+  name: prometheus-servicemonitor
+  app_version: "1.0"
+  chart_version: 0.1.1
+- domain: Custom Helm Charts
+  name: rclone-sync
+  app_version: 0.1.0
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: s3-exporter
+  app_version: 0.5.0
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: thanos-ingress-secret
+  app_version: "1.0"
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: thanos-ruler
+  app_version: 0.1.0
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: user-alertmanager
+  app_version: "1.0"
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: user-crds
+  app_version: "1.0"
+  chart_version: 0.1.0
+- domain: Custom Helm Charts
+  name: user-rbac
+  app_version: "1.0"
+  chart_version: 0.1.0
+
+# Container images
+- domain: Container images
+  name: "quay.io/jetstack/cert-manager-controller"
+  tag: "v1.12.8"
+  helm_chart_ref:
+    - cert-manager
+- domain: Container images
+  name: "quay.io/jetstack/cert-manager-webhook"
+  tag: "v1.12.8"
+  helm_chart_ref:
+    - cert-manager
+- domain: Container images
+  name: "quay.io/jetstack/cert-manager-cainjector"
+  tag: "v1.12.8"
+  helm_chart_ref:
+    - cert-manager
+- domain: Container images
+  name: "quay.io/jetstack/cert-manager-acmesolver"
+  tag: "v1.12.8"
+  helm_chart_ref:
+    - cert-manager
+- domain: Container images
+  name: "quay.io/jetstack/cert-manager-ctl"
+  tag: "v1.12.8"
+  helm_chart_ref:
+    - cert-manager
+- domain: Container images
+  name: "ghcr.io/dexidp/dex"
+  tag: "v2.36.0"
+  helm_chart_ref:
+    - dex
+- domain: Container images
+  name: "docker.io/falcosecurity/falcoctl"
+  tag: "0.7.2"
+  helm_chart_ref:
+    - falco
+- domain: Container images
+  name: "docker.io/falcosecurity/falco-driver-loader"
+  tag: "0.37.1"
+  helm_chart_ref:
+    - falco
+- domain: Container images
+  name: "docker.io/falcosecurity/falco-no-driver"
+  tag: "0.37.1"
+  helm_chart_ref:
+    - falco
+- domain: Container images
+  name: "docker.io/falcosecurity/falco-exporter"
+  tag: "0.8.3"
+  helm_chart_ref:
+    - falco-exporter
+- domain: Container images
+  name: "docker.io/falcosecurity/falcosidekick"
+  tag: "2.28.0"
+  helm_chart_ref:
+    - falcosidekick
+- domain: Container images
+  name: "docker.io/bitnami/fluentd"
+  tag: "1.16.1-debian-11-r12"
+  helm_chart_ref:
+    - fluentd
+- domain: Container images
+  name: "ghcr.io/elastisys/fluentd"
+  tag: "v4.3.9-ck8s1"
+  helm_chart_ref:
+    - fluentd-elasticsearch
+- domain: Container images
+  name: "docker.io/openpolicyagent/gatekeeper"
+  tag: "v3.11.0"
+  helm_chart_ref:
+    - gatekeeper
+- domain: Container images
+  name: "docker.io/grafana/grafana"
+  tag: "10.3.1"
+  helm_chart_ref:
+    - grafana
+- domain: Container images
+  name: "docker.io/curlimages/curl"
+  tag: "7.85.0"
+  helm_chart_ref:
+    - grafana
+- domain: Container images
+  name: "docker.io/library/busybox"
+  tag: "1.31.1"
+  helm_chart_ref:
+    - grafana
+- domain: Container images
+  name: "quay.io/kiwigrid/k8s-sidecar"
+  tag: "1.25.2"
+  helm_chart_ref:
+    - grafana
+- domain: Container images
+  name: "docker.io/grafana/grafana-image-renderer"
+  tag: "latest"
+  helm_chart_ref:
+    - grafana
+- domain: Container images
+  name: "docker.io/grafana/grafana"
+  tag: "10.4.0"
+  helm_chart_ref:
+    - grafana
+- domain: Container images
+  name: "quay.io/kiwigrid/k8s-sidecar"
+  tag: "1.26.1"
+  helm_chart_ref:
+    - grafana
+- domain: Container images
+  name: "docker.io/goharbor/harbor-core"
+  tag: "v2.9.1"
+  helm_chart_ref:
+    - harbor
+- domain: Container images
+  name: "docker.io/goharbor/harbor-db"
+  tag: "v2.9.1"
+  helm_chart_ref:
+    - harbor
+- domain: Container images
+  name: "docker.io/goharbor/harbor-exporter"
+  tag: "v2.9.1"
+  helm_chart_ref:
+    - harbor
+- domain: Container images
+  name: "docker.io/goharbor/harbor-jobservice"
+  tag: "v2.9.1"
+  helm_chart_ref:
+    - harbor
+- domain: Container images
+  name: "docker.io/goharbor/harbor-portal"
+  tag: "v2.9.1"
+  helm_chart_ref:
+    - harbor
+- domain: Container images
+  name: "docker.io/goharbor/redis-photon"
+  tag: "v2.9.1"
+  helm_chart_ref:
+    - harbor
+- domain: Container images
+  name: "docker.io/goharbor/registry-photon"
+  tag: "v2.9.1"
+  helm_chart_ref:
+    - harbor
+- domain: Container images
+  name: "docker.io/goharbor/harbor-registryctl"
+  tag: "v2.9.1"
+  helm_chart_ref:
+    - harbor
+- domain: Container images
+  name: "docker.io/goharbor/trivy-adapter-photon"
+  tag: "v2.9.1"
+  helm_chart_ref:
+    - harbor
+- domain: Container images
+  name: "registry.k8s.io/ingress-nginx/controller-chroot"
+  tag: "v1.9.6"
+  helm_chart_ref:
+    - ingress-nginx
+- domain: Container images
+  name: "registry.k8s.io/defaultbackend-amd64"
+  tag: "1.5"
+  helm_chart_ref:
+    - ingress-nginx
+- domain: Container images
+  name: "registry.k8s.io/ingress-nginx/kube-webhook-certgen"
+  tag: "v20231226-1a7112e06"
+  helm_chart_ref:
+    - ingress-nginx
+- domain: Container images
+  name: "docker.io/falcosecurity/k8s-metacollector"
+  tag: "0.1.0"
+  helm_chart_ref:
+    - k8s-metalcollector
+- domain: Container images
+  name: "quay.io/prometheus-operator/admission-webhook"
+  tag: "v0.71.2"
+  helm_chart_ref:
+    - kube-prometheus-stack
+- domain: Container images
+  name: "registry.k8s.io/ingress-nginx/kube-webhook-certgen"
+  tag: "v20221220-controller-v1.5.1-58-g787ea74b6"
+  helm_chart_ref:
+    - kube-prometheus-stack
+- domain: Container images
+  name: "quay.io/prometheus-operator/prometheus-operator"
+  tag: "v0.71.2"
+  helm_chart_ref:
+    - kube-prometheus-stack
+- domain: Container images
+  name: "quay.io/prometheus-operator/prometheus-config-reloader"
+  tag: "v0.71.2"
+  helm_chart_ref:
+    - kube-prometheus-stack
+    - user-alertmanager
+- domain: Container images
+  name: "quay.io/prometheus/prometheus"
+  tag: "v2.49.1"
+  helm_chart_ref:
+    - kube-prometheus-stack
+- domain: Container images
+  name: "quay.io/prometheus/alertmanager"
+  tag: "v0.26.0"
+  helm_chart_ref:
+    - kube-prometheus-stack
+    - user-alertmanager
+- domain: Container images
+  name: "registry.k8s.io/kube-state-metrics/kube-state-metrics"
+  tag: "v2.10.1"
+  helm_chart_ref:
+    - kube-state-metrics
+- domain: Container images
+  name: "ghcr.io/kubereboot/kured"
+  tag: "1.13.1"
+  helm_chart_ref:
+    - kured
+- domain: Container images
+  name: "registry.k8s.io/metrics-server/metrics-server"
+  tag: "v0.6.3"
+  helm_chart_ref:
+    - metrics-server
+- domain: Container images
+  name: "docker.io/bitnami/minio"
+  tag: "2023.5.4-debian-11-r1"
+  helm_chart_ref:
+    - minio
+- domain: Container images
+  name: "quay.io/minio/minio"
+  tag: "RELEASE.2023-09-30T07-02-29Z"
+  helm_chart_ref:
+    - minio
+- domain: Container images
+  name: "quay.io/minio/mc"
+  tag: "RELEASE.2023-09-29T16-41-22Z"
+  helm_chart_ref:
+    - minio
+- domain: Container images
+  name: "docker.io/opensearchproject/opensearch"
+  tag: "2.12.0"
+  helm_chart_ref:
+    - opensearch
+- domain: Container images
+  name: "ghcr.io/elastisys/curl-jq"
+  tag: "1.0.0"
+  helm_chart_ref:
+    - opensearch
+    - init-harbor
+    - opensearch-configurer
+    - opensearch-backup
+- domain: Container images
+  name: "docker.io/opensearchproject/opensearch-dashboards"
+  tag: "2.12.0"
+  helm_chart_ref:
+    - opensearch-dashboards
+- domain: Container images
+  name: "quay.io/prometheus/blackbox-exporter"
+  tag: "v0.24.0"
+  helm_chart_ref:
+    - prometheus-blackbox-exporter
+- domain: Container images
+  name: "quay.io/prometheuscommunity/elasticsearch-exporter"
+  tag: "v1.5.0"
+  helm_chart_ref:
+    - prometheus-elasticsearch-exporter
+- domain: Container images
+  name: "quay.io/prometheus/node-exporter"
+  tag: "v1.7.0"
+  helm_chart_ref:
+    - prometheus-node-exporter
+- domain: Container images
+  name: "ghcr.io/prometheus-community/windows-exporter"
+  tag: "0.25.1"
+  helm_chart_ref:
+    - prometheus-windows-exporter
+- domain: Container images
+  name: "docker.io/bitnami/thanos"
+  tag: "0.31.0-scratch-r5"
+  helm_chart_ref:
+    - thanos
+- domain: Container images
+  name: "quay.io/prometheus-operator/prometheus-config-reloader"
+  tag: "v0.50.0"
+  helm_chart_ref:
+    - thanos
+- domain: Container images
+  name: "docker.io/calico/ctl"
+  tag: "v3.26.4"
+  helm_chart_ref:
+    - tigera-operator
+- domain: Container images
+  name: "quay.io/tigera/operator"
+  tag: "v1.30.9"
+  helm_chart_ref:
+    - tigera-operator
+- domain: Container images
+  name: "ghcr.io/aquasecurity/trivy-operator"
+  tag: "0.17.1"
+  helm_chart_ref:
+    - trivy-operator
+- domain: Container images
+  name: "ghcr.io/aquasecurity/trivy"
+  tag: "0.47.0"
+  helm_chart_ref:
+    - trivy-operator
+- domain: Container images
+  name: "docker.io/velero/velero"
+  tag: "v1.11.1"
+  helm_chart_ref:
+    - velero
+
+- domain: Container images
+  name: "ghcr.io/elastisys/calico-accountant"
+  tag: "0.1.6"
+  helm_chart_ref:
+    - calico-accountant
+- domain: Container images
+  name: "docker.io/busybox"
+  tag: "1.36"
+  helm_chart_ref:
+    - file-copier
+- domain: Container images
+  name: "docker.io/bitnami/kubectl"
+  tag: "1.25"
+  helm_chart_ref:
+    - gatekeeper-templates
+- domain: Container images
+  name: "quay.io/prometheuscommunity/prom-label-proxy"
+  tag: "master"
+  helm_chart_ref:
+    - grafana-label-enforcer
+- domain: Container images
+  name: "ghcr.io/elastisys/backup-postgres"
+  tag: "1.3.0"
+  helm_chart_ref:
+    - harbor-backup
+- domain: Container images
+  name: "gcr.io/k8s-staging-multitenancy/hnc-manager"
+  tag: "v1.1.0"
+  helm_chart_ref:
+    - hnc
+- domain: Container images
+  name: "ghcr.io/elastisys/compliantkubernetes-apps-log-manager"
+  tag: "0.2.0"
+  helm_chart_ref:
+    - log-manager
+- domain: Container images
+  name: "registry.k8s.io/dns/k8s-dns-node-cache"
+  tag: "1.22.20"
+  helm_chart_ref:
+    - node-local-dns
+- domain: Container images
+  name: "ghcr.io/elastisys/bitnami/elasticsearch-curator"
+  tag: "5.8.4-debian-10-r235"
+  helm_chart_ref:
+    - opensearch-curator
+- domain: Container images
+  name: "ghcr.io/elastisys/rclone-sync"
+  tag: "1.63.0"
+  helm_chart_ref:
+    - rclone-sync
+- domain: Container images
+  name: "ghcr.io/elastisys/s3-exporter"
+  tag: "0.5.0"
+  helm_chart_ref:
+    - s3-exporter
