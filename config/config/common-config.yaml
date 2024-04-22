@@ -879,6 +879,12 @@ opa:
   rejectLoadBalancerService:
     enabled: set-me
     enforcement: deny
+
+  ## Enable rule that warns about minimum replica number
+  minimumDeploymentReplicas:
+    enabled: true
+    enforcement: warn
+
 trivy:
   enabled: true
   # comma separated list of namespaces (or glob patterns) to be excluded from scanning

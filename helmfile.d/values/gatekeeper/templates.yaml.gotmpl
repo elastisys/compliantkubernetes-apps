@@ -21,6 +21,9 @@ waitFor:
   - k8srejectloadbalancerservice
   - k8srequirenetworkpolicy
   - k8sresourcerequests
+{{- if and (eq .Environment.Name "workload_cluster") }}
+  - k8sminimumreplicas
+{{- end }}
 {{- if and (eq .Environment.Name "workload_cluster") (eq .Values.gatekeeper.allowUserCRDs.enabled true) }}
   - k8susercrds
 {{- end }}
@@ -28,4 +31,6 @@ waitFor:
 {{- if eq .Environment.Name "workload_cluster" }}
 userCRDs:
     enabled: {{ .Values.gatekeeper.allowUserCRDs.enabled }}
+minimumDeploymentReplicas:
+    enabled: {{ .Values.opa.minimumDeploymentReplicas.enabled }}
 {{- end }}

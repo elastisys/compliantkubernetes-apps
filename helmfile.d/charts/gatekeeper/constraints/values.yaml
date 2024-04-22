@@ -16,6 +16,9 @@ allowUserCRDs:
 rejectLoadBalancerService:
     enable: true
     enforcementAction: dryrun
+minimumDeploymentReplicas:
+    enable: true
+    enforcementAction: warn
 
 imageRegistryURL: registry.example.com
 
