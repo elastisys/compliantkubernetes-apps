@@ -144,13 +144,18 @@ $defs:
     minimum: 0
     title: Percentage
     type: number
+  port:
+    maximum: 65535
+    minimum: 1
+    type:
+      - integer
+      - string
+    regex: ^[0-9]{0,5}$
   portlist:
     title: Port number
     description: A 16 bit unsigned integer
     items:
-      maximum: 65535
-      minimum: 1
-      type: integer
+      $ref: '#/$defs/port'
     type: array
   kubernetesResourceRequirements:
     title: Resource requirements
@@ -1497,12 +1502,10 @@ properties:
                 properties:
                   http:
                     default: 30080
-                    type:
-                      - string
-                      - integer
+                    $ref: '#/$defs/port'
                   https:
                     default: 30443
-                    type: integer
+                    $ref: '#/$defs/port'
                 type: object
               type:
                 description: See [reference](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types)
@@ -1729,7 +1732,7 @@ properties:
                 type: array
               port:
                 default: 6443
-                type: number
+                $ref: '#/$defs/port'
             required:
               - ips
             type: object
@@ -1756,7 +1759,7 @@ properties:
                 $ref: '#/$defs/iplist'
               port:
                 default: 443
-                type: number
+                $ref: '#/$defs/port'
             required:
               - ips
             type: object
@@ -1978,10 +1981,9 @@ properties:
               ips:
                 $ref: '#/$defs/iplist'
               ports:
-                items:
-                  default: 443
-                  type: number
-                type: array
+                $ref: '#/$defs/portlist'
+                default:
+                  - 443
             type: object
         type: object
       rookCeph:
