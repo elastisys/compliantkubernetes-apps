@@ -113,12 +113,24 @@ config_validate() {
 
     defaults="$(yq_merge "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/${1}-config.yaml")"
     setmes="$(yq_paths "set-me" <<< "${defaults}")"
+    conditional_setmes="$(yq_paths "set-me-if-*" <<< "${defaults}")"
 
     for setme in ${setmes}; do
       compare=$(diff <(yq4 -oj "${setme}" <<< "${defaults}") <(yq4 -oj "${setme}" <<< "${CONFIG["${1}"]}") || true)
       if [[ -z "${compare}" ]]; then
           log_error "error: \"${setme//\"/}\" is unset in ${1}-config"
           pass="false"
+      fi
+    done
+
+    for condsetme in ${conditional_setmes}; do
+      required_condition=$(yq4 "${condsetme}" <<< "${defaults}" | sed -rn 's/set-me-if-(.*)/\1/p' | yq4 "[.] | flatten | .[0]")
+      if [[ $(yq4 "${required_condition}" <<< "${CONFIG["${1}"]}") == "true" ]]; then
+        compare=$(diff <(yq4 -oj "${condsetme}" <<< "${defaults}") <(yq4 -oj "${condsetme}" <<< "${CONFIG["${1}"]}") || true)
+        if [[ -z "${compare}" ]]; then
+            log_error "error: \"${condsetme//\"/}\" is unset in ${1}-config"
+            pass="false"
+        fi
       fi
     done
 
