@@ -93,7 +93,7 @@ replace_set_me(){
         log_error "ERROR: number of args in replace_set_me must be 3. #=[$#]"
         exit 1
     fi
-    if [[ $(yq4 "${2}" "${1}") =~ ^set-me.* ]]; then
+    if [[ $(yq4 "${2}" "${1}") == "set-me" ]]; then
         yq4 --inplace "${2} = ${3}" "${1}"
     elif [[ $(yq4 "${2}" "${1}") =~ ^set\-me\-if\-.*$ ]]; then
         required_condition=$(yq4 "${2}" "${1}" | sed -rn 's/^set-me-if-(.*)/\1/p')
