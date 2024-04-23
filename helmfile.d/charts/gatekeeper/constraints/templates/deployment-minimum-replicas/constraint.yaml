@@ -6,11 +6,11 @@ spec:
   enforcementAction: warn
   match:
     kinds:
-    - apiGroups:
-      - apps
-      kinds:
-      - Deployment
-      - StatefulSet
+      - apiGroups:
+          - apps
+        kinds:
+          - Deployment
+          - StatefulSet
     excludedNamespaces:
       - alertmanager
       - calico-apiserver
@@ -30,4 +30,4 @@ spec:
       - tiger-operator
       - velero
     parameters:
-        - min_replicas: 2
+      - min_replicas: 2
