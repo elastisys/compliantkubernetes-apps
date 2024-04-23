@@ -125,7 +125,7 @@ _refute_condition_and_warn() {
   _assert_condition_and_warn .\"networkPolicies\".\"coredns\".\"externalDns\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"global\".\"objectStorageSwift\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"opensearch\".\"plugins\".\"ips\"
-  _assert_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"secondaryUrl\".\"ips\"
+  _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"secondaryUrl\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"ingressNginx\".\"ingressOverride\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"dex\".\"connectors\".\"ips\"
 
@@ -144,7 +144,7 @@ _refute_condition_and_warn() {
   _refute_condition_and_warn .\"networkPolicies\".\"coredns\".\"externalDns\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"global\".\"objectStorageSwift\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"opensearch\".\"plugins\".\"ips\"
-  _refute_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"secondaryUrl\".\"ips\"
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"secondaryUrl\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"ingressNginx\".\"ingressOverride\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"dex\".\"connectors\".\"ips\"
 
@@ -300,22 +300,22 @@ _refute_condition_and_warn() {
   yq_set sc .objectStorage.sync.enabled 'true'
   yq_set sc .objectStorage.type \"s3\"
   run _apply_normalise_sc
-  _assert_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"destinationObjectStorageS3\".\"ips\"
+  _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorage\".\"ips\"
 
   yq_set sc .objectStorage.sync.enabled 'true'
   yq_set sc .objectStorage.type \"swift\"
   run _apply_normalise_sc
-  _refute_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"destinationObjectStorageS3\".\"ips\"
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorage\".\"ips\"
 
   yq_set sc .objectStorage.sync.enabled 'false'
   yq_set sc .objectStorage.type \"s3\"
   run _apply_normalise_sc
-  _refute_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"destinationObjectStorageS3\".\"ips\"
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorage\".\"ips\"
 
   yq_set sc .objectStorage.sync.enabled 'false'
   yq_set sc .objectStorage.type \"swift\"
   run _apply_normalise_sc
-  _refute_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"destinationObjectStorageS3\".\"ips\"
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorage\".\"ips\"
 }
 
 @test "conditional-set-me - multiple conditions: network policies rclone swift" {
@@ -325,110 +325,110 @@ _refute_condition_and_warn() {
   yq_set sc .harbor.persistence.type \"swift\"
   yq_set sc .thanos.objectStorage.type \"swift\"
   run _apply_normalise_sc
-  _assert_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"destinationObjectStorageSwift\".\"ips\"
+  _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
   yq_set sc .objectStorage.sync.enabled 'true'
   yq_set sc .objectStorage.type \"swift\"
   yq_set sc .harbor.persistence.type \"swift\"
   yq_set sc .thanos.objectStorage.type \"s3\"
   run _apply_normalise_sc
-  _assert_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"destinationObjectStorageSwift\".\"ips\"
+  _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
   yq_set sc .objectStorage.sync.enabled 'true'
   yq_set sc .objectStorage.type \"swift\"
   yq_set sc .harbor.persistence.type \"s3\"
   yq_set sc .thanos.objectStorage.type \"swift\"
   run _apply_normalise_sc
-  _assert_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"destinationObjectStorageSwift\".\"ips\"
+  _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
   yq_set sc .objectStorage.sync.enabled 'true'
   yq_set sc .objectStorage.type \"s3\"
   yq_set sc .harbor.persistence.type \"swift\"
   yq_set sc .thanos.objectStorage.type \"swift\"
   run _apply_normalise_sc
-  _assert_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"destinationObjectStorageSwift\".\"ips\"
+  _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
   yq_set sc .objectStorage.sync.enabled 'true'
   yq_set sc .objectStorage.type \"swift\"
   yq_set sc .harbor.persistence.type \"s3\"
   yq_set sc .thanos.objectStorage.type \"s3\"
   run _apply_normalise_sc
-  _assert_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"destinationObjectStorageSwift\".\"ips\"
+  _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
   yq_set sc .objectStorage.sync.enabled 'true'
   yq_set sc .objectStorage.type \"s3\"
   yq_set sc .harbor.persistence.type \"swift\"
   yq_set sc .thanos.objectStorage.type \"s3\"
   run _apply_normalise_sc
-  _assert_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"destinationObjectStorageSwift\".\"ips\"
+  _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
   yq_set sc .objectStorage.sync.enabled 'true'
   yq_set sc .objectStorage.type \"s3\"
   yq_set sc .harbor.persistence.type \"s3\"
   yq_set sc .thanos.objectStorage.type \"swift\"
   run _apply_normalise_sc
-  _assert_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"destinationObjectStorageSwift\".\"ips\"
+  _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
   yq_set sc .objectStorage.sync.enabled 'true'
   yq_set sc .objectStorage.type \"s3\"
   yq_set sc .harbor.persistence.type \"s3\"
   yq_set sc .thanos.objectStorage.type \"s3\"
   run _apply_normalise_sc
-  _refute_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"destinationObjectStorageSwift\".\"ips\"
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
   yq_set sc .objectStorage.sync.enabled 'false'
   yq_set sc .objectStorage.type \"swift\"
   yq_set sc .harbor.persistence.type \"swift\"
   yq_set sc .thanos.objectStorage.type \"swift\"
   run _apply_normalise_sc
-  _refute_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"destinationObjectStorageSwift\".\"ips\"
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
   yq_set sc .objectStorage.sync.enabled 'false'
   yq_set sc .objectStorage.type \"swift\"
   yq_set sc .harbor.persistence.type \"swift\"
   yq_set sc .thanos.objectStorage.type \"s3\"
   run _apply_normalise_sc
-  _refute_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"destinationObjectStorageSwift\".\"ips\"
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
   yq_set sc .objectStorage.sync.enabled 'false'
   yq_set sc .objectStorage.type \"swift\"
   yq_set sc .harbor.persistence.type \"s3\"
   yq_set sc .thanos.objectStorage.type \"swift\"
   run _apply_normalise_sc
-  _refute_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"destinationObjectStorageSwift\".\"ips\"
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
   yq_set sc .objectStorage.sync.enabled 'false'
   yq_set sc .objectStorage.type \"s3\"
   yq_set sc .harbor.persistence.type \"swift\"
   yq_set sc .thanos.objectStorage.type \"swift\"
   run _apply_normalise_sc
-  _refute_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"destinationObjectStorageSwift\".\"ips\"
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
   yq_set sc .objectStorage.sync.enabled 'false'
   yq_set sc .objectStorage.type \"swift\"
   yq_set sc .harbor.persistence.type \"s3\"
   yq_set sc .thanos.objectStorage.type \"s3\"
   run _apply_normalise_sc
-  _refute_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"destinationObjectStorageSwift\".\"ips\"
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
   yq_set sc .objectStorage.sync.enabled 'false'
   yq_set sc .objectStorage.type \"s3\"
   yq_set sc .harbor.persistence.type \"swift\"
   yq_set sc .thanos.objectStorage.type \"s3\"
   run _apply_normalise_sc
-  _refute_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"destinationObjectStorageSwift\".\"ips\"
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
   yq_set sc .objectStorage.sync.enabled 'false'
   yq_set sc .objectStorage.type \"s3\"
   yq_set sc .harbor.persistence.type \"s3\"
   yq_set sc .thanos.objectStorage.type \"swift\"
   run _apply_normalise_sc
-  _refute_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"destinationObjectStorageSwift\".\"ips\"
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
   yq_set sc .objectStorage.sync.enabled 'false'
   yq_set sc .objectStorage.type \"s3\"
   yq_set sc .harbor.persistence.type \"s3\"
   yq_set sc .thanos.objectStorage.type \"s3\"
   run _apply_normalise_sc
-  _refute_condition_and_warn .\"networkPolicies\".\"rcloneSync\".\"destinationObjectStorageSwift\".\"ips\"
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 }
