@@ -1497,7 +1497,9 @@ properties:
                 properties:
                   http:
                     default: 30080
-                    type: integer
+                    type:
+                      - string
+                      - integer
                   https:
                     default: 30443
                     type: integer
