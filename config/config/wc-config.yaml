@@ -292,8 +292,7 @@ networkPolicies:
 
   ingressNginx:
     ingressOverride:
-      ips:
-      - set-me-if-(.networkPolicies.ingressNginx.ingressOverride.enabled)
+      ips: set-me-if-(.networkPolicies.ingressNginx.ingressOverride.enabled)
 
   certManager:
     namespaces: []

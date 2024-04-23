@@ -1309,8 +1309,7 @@ networkPolicies:
 
   ingressNginx:
     ingressOverride:
-      ips:
-        - set-me-if-(.networkPolicies.ingressNginx.ingressOverride.enabled)
+      ips: set-me-if-(.networkPolicies.ingressNginx.ingressOverride.enabled)
   dex:
     enabled: true
     # Ip to connector, e.g. Google, LDAP, ...
