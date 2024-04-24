@@ -15,6 +15,9 @@ spec:
               min_replicas:
                 description: The minimum number of replicas allowed, inclusive.
                 type: integer
+              label:
+                description: If this label is set the constraint is ignored.
+                type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |

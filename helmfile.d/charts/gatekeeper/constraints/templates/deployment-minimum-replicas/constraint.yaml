@@ -27,7 +27,8 @@ spec:
       - kube-public
       - kube-system
       - monitoring
-      - tiger-operator
+      - tigera-operator
       - velero
-    parameters:
-      - min_replicas: 2
+  parameters:
+    min_replicas: 2
+    label: ignoreMinimumReplicas
