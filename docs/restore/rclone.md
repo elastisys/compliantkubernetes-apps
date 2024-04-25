@@ -1,6 +1,7 @@
 # Restore rclone
 
-This will guide you through restoring object storage if you primary object storage is corrupted or unavailable, and allows for data to be restore with point in time if using versioning (currently only supported for S3) in your off-site backup.
+This will guide you through restoring object storage if your primary object storage is corrupted or unavailable.
+Additionally it allows for data to be restored with point in time if using versioning (currently only supported for S3) in your off-site backup.
 
 > [!important]
 > Ensure that all `rclone-sync` CronJobs are suspended or removed so they cannot corrupt the backup!
@@ -145,16 +146,11 @@ _This will remove `rclone-sync` if you did not do that before._
 Then run the generated restore CronJobs manually:
 
 ```console
-$ ./bin/ck8s ops kubectl sc -n rclone get cronjobs -lapp.kubernetes.io/instance=rclone-restore
-<rclone restore cronjobs>...
+for cronjob in $(./bin/ck8s ops kubectl sc -n rclone get cronjobs -lapp.kubernetes.io/instance=rclone-restore -oname); do
+  ./bin/ck8s ops kubectl sc -n rclone create job --from "${cronjob}" "${cronjob/#cronjob.batch\/}"
+done
 
-$ ./bin/ck8s ops kubectl sc -n rclone create job --from cronjob/<cronjob-name> <job-name>
-
-$ ./bin/ck8s ops kubectl sc -n rclone get jobs -lapp.kubernetes.io/instance=rclone-restore
-<rclone restore jobs>...
-
-$ ./bin/ck8s ops kubectl sc -n rclone get pods -lapp.kubernetes.io/instance=rclone-restore -w
-<rclone restore pods>...
+./bin/ck8s ops kubectl sc -n rclone get pods -lapp.kubernetes.io/instance=rclone-restore -w
 ```
 
 Then wait for completion and verify the logs of the `rclone-restore` Pods to ensure that they managed to restore all data.
