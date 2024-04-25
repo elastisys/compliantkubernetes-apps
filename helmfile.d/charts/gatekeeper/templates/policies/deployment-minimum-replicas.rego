@@ -10,7 +10,7 @@ violation[{"msg": msg}] {
     metadata := input.review.object.metadata
     not input_replica_limit(spec)
     not check_label(metadata)
-    msg := sprintf("The provided number of replicas is low for %v: %v. Elastisys Compliant Kubernetes recommends a minimum of 2 replicas.", [object_kind, object_name])
+    msg := sprintf("The provided number of replicas is too low for %v: %v. Elastisys Compliant Kubernetes recommends a minimum of 2 replicas.", [object_kind, object_name])
 }
 
 input_replica_limit(spec) {
