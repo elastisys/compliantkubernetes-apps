@@ -217,6 +217,11 @@ Some tests need pregenerated resources that are used as the assertion during tes
 
 To regenerate these resources export `CK8S_TESTS_REGENERATE_RESOURCES="true"` and run tests with the `resources` tag.
 
+```bash
+export CK8S_TESTS_REGENERATE_RESOURCES="true"
+make run-unit-static,resources
+```
+
 When writing tests that uses resources that may change ensure that the tests can regenerate their resources when this variable is set.
 
 ## Regression tests
