@@ -93,7 +93,7 @@ FROM base AS main
 USER root
 
 RUN apt-get update && \
-    apt-get install -y npm libasound2 libgbm-dev libgtk2.0-0 libgtk-3-0 libnotify-dev libnss3 libxss1 libxtst6 xauth xvfb && \
+    apt-get install -y npm libasound2t64 libgbm-dev libgtk2.0-0 libgtk-3-0 libnotify-dev libnss3 libxss1 libxtst6 xauth xvfb && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
