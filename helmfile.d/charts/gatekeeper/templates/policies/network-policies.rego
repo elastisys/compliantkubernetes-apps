@@ -1,6 +1,10 @@
 package k8sRequireNetworkPolicy
 
 violation[{"msg": msg}] {
+    # allow modification to pod without network policy after it has been marked
+    # for deletion, e.g. changes to finalizers
+    not (input.review.object.metadata.deletionTimestamp)
+
     namespace := input.review.object.metadata.namespace
 
     res = [x | x := allChecks(data.inventory.namespace[namespace]["networking.k8s.io/v1"]["NetworkPolicy"][_])]
