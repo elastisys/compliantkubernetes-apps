@@ -19,6 +19,21 @@ generate_pod(namespace, labels) = obj {
     }
 }
 
+generate_pod_deletion(namespace, labels) = obj {
+    obj := {
+        "review": {
+            "operation": "DELETE",
+            "object": {
+                "kind": "Pod",
+                "metadata": {
+                    "namespace": namespace,
+                    "labels": labels
+                }
+            }
+        }
+    }
+}
+
 generate_resource_controller(kind, namespace, labels) = obj {
     obj := {
         "review": {
@@ -471,6 +486,21 @@ test_pod_multiple_policies_allow {
             ]
         )
     ]}}}}
+}
+
+# Deleting should be allowed to prevent race conditions
+test_pod_delete {
+    count(k8sRequireNetworkPolicy.violation) == 0 with input as generate_pod_deletion(
+        "default",
+        {
+            "wrongKey": "value"
+        }
+    ) with data.inventory as {"namespace": {"default": {"networking.k8s.io/v1": {"NetworkPolicy": [generate_network_policy(
+        {
+            "key": "value"
+        },
+        []
+    )]}}}}
 }
 
 kinds := [

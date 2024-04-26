@@ -4,6 +4,11 @@ violation[{"msg": msg}] {
     namespace := input.review.object.metadata.namespace
 
     res = [x | x := allChecks(data.inventory.namespace[namespace]["networking.k8s.io/v1"]["NetworkPolicy"][_])]
+    allowedOperations := [
+        "CREATE",
+        "UPDATE"
+    ]
+    input.review.operation == allowedOperations[_]
     all(res) #all networkpolicies failed to match
     msg := sprintf("No matching networkpolicy found. Elastisys Compliant Kubernetes requires that all pods are targeted by NetworkPolicies. Read more at https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-networkpolicies/", [])
 }
@@ -19,6 +24,7 @@ allChecks(netwPolicy) = res {
     #return true if any part of the networkpolicy does not match
     res := any({r1, r2, r3, r4, r5, r6})
 }
+
 
 matchLabelsMissingKeys(netwPolicy) = res {
     res3 := {key | netwPolicy.spec.podSelector.matchLabels[key]}
