@@ -69,6 +69,8 @@ operator:
   vulnerabilityScannerEnabled: true
   # -- the flag to enable sbom generation
   sbomGenerationEnabled: true
+  # -- the flag to enable cluster sbom cache generation
+  clusterSbomCacheEnabled: true
   # -- scannerReportTTL the flag to set how long a report should exist. "" means that the ScannerReportTTL feature is disabled
   scannerReportTTL: "24h"
   # -- cacheReportTTL the flag to set how long a cluster sbom report should exist. "" means that the cacheReportTTL feature is disabled
@@ -279,7 +281,7 @@ trivy:
     # -- repository of the Trivy image
     repository: aquasecurity/trivy
     # -- tag version of the Trivy image
-    tag: 0.47.0
+    tag: 0.48.1
     # -- imagePullSecret is the secret name to be used when pulling trivy image from private registries example : reg-secret
     # It is the user responsibility to create the secret for the private registry in `trivy-operator` namespace
     imagePullSecret: ~
@@ -290,6 +292,13 @@ trivy:
   # -- mode is the Trivy client mode. Either Standalone or ClientServer. Depending
   # on the active mode other settings might be applicable or required.
   mode: Standalone
+
+  # -- sbomSources trivy will try to retrieve SBOM from the specified sources (oci,rekor)
+  sbomSources: ""
+
+  # -- includeDevDeps include development dependencies in the report (supported: npm, yarn) (default: false)
+  # note: this flag is only applicable when trivy.command is set to filesystem
+  includeDevDeps: false
 
   # -- whether to use a storage class for trivy server or emptydir (one mey want to use ephemeral storage)
   storageClassEnabled: true
@@ -430,6 +439,14 @@ trivy:
   dbRegistry: "ghcr.io"
   dbRepository: "aquasecurity/trivy-db"
 
+  # -- The username for dbRepository authentication
+  #
+  dbRepositoryUsername: ~
+
+  # -- The password for dbRepository authentication
+  #
+  dbRepositoryPassword: ~
+
   # -- javaDbRegistry is the registry for the Java vulnerability database.
   javaDbRegistry: "ghcr.io"
   javaDbRepository: "aquasecurity/trivy-java-db"
@@ -567,7 +584,7 @@ nodeCollector:
   # -- repository of the node-collector image
   repository: aquasecurity/node-collector
   # -- tag version of the node-collector image
-  tag: 0.0.9
+  tag: 0.1.1
   # -- imagePullSecret is the secret name to be used when pulling node-collector image from private registries example : reg-secret
   # It is the user responsibility to create the secret for the private registry in `trivy-operator` namespace
   imagePullSecret: ~
