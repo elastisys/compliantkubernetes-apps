@@ -164,52 +164,11 @@ The makefile will generate bats files to run the cypress to integrate it into th
 
 ### Writing template tests
 
-Since bats lack a way to generate tests based on data we employ a generator to transform yaml specs into bats tests.
+Since bats lacks parametric tests we employ a generator to work with go-templates using [gomplate](https://github.com/hairyhenderson/gomplate) check their documentation for the functions it provides.
 
-The base for the format is as follows:
+The templates themselves are evaluated without any external values and are discovered using the file ending `.bats.gotmpl` and generated to the file ending `.gen.bats`.
 
-```yaml
-# required: name of the test suite
-name: test suite name
-# optional: tags to apply to all tests in the file
-tagsFile:
-  - static
-
-# optional: functions to render
-functions:
-  setup_file: |-
-    function body for setup_file
-  teardown_file: |-
-    function body for teardown_file
-  setup: |-
-    function body for setup
-  teardown: |-
-    function body for teardown
-  # <declaration>: |-
-  #   <definition>
-
-# required: list of the tests
-tests:
-    # required: list of clusters the test applies to, renders down to use "with_kubeconfig <cluster>"
-  - clusters: [ sc, wc ]
-    # required: list of namespaces the test applies to, renders down to use "with_namespace <namespace>"
-    namespaces: [ kube-public, kube-system ]
-    # required: name of the test function to run
-    function: test_function
-    # optional: expression of test condition evaluated during runtime against the config
-    condition: .feature.enabled
-    # optional: name of the target to test, passed to the test function as the first parameter
-    target: feature
-    # optional: list of additional arguments passed to the test function
-    args: [ argument ]
-    # optional: list of additional tests
-    tests: []
-```
-
-The format is recursive and keeps variables set for one test as it goes deeper into the spec.
-Any `clusters`, `namespaces` and `function` fields overwrites the previously set variable, while `condition` fields are accumulative.
-Any `target` field will case tests to be emitted for each cluster and namespace combo, skipping the `tests` fields in the same spec.
-Arguments starting with a `.` are treated as an expression and evaluated during runtime against the config.
+It is possible to template one test suite into multiple files, see the `unit/bin/init/` or `unit/validate/` for reference.
 
 ### Writing resource tests
 

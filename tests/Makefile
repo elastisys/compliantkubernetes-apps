@@ -5,16 +5,13 @@ dirs := unit regression integration end-to-end
 # Skip looking up files when building
 ifndef CK8S_TESTS_BUILD
 
-# Plain tests
-bats_suites = $(filter-out %.gen.bats,$(foreach dir,$(dirs),$(shell find $(dir) -type f -name *.bats)))
-
 # Cypress tests
 cypress_suites = $(foreach dir,$(dirs),$(wildcard $(dir)/*.cy.js))
 cypress_gen = $(cypress_suites:.cy.js=.gen.bats)
 
 # Template tests
-template_suites = $(foreach dir,$(dirs),$(shell find $(dir) -type f -name *.bats.yaml))
-template_gen = $(template_suites:.bats.yaml=.gen.bats)
+template_suites = $(foreach dir,$(dirs),$(shell find $(dir) -type f -name *.bats.gotmpl))
+template_gen = $(template_suites:.bats.gotmpl=.gen.bats)
 
 endif
 
@@ -63,51 +60,53 @@ found_apt := $(shell command -v apt 2>/dev/null)
 found_bats := $(shell command -v bats 2>/dev/null)
 found_npm := $(shell command -v npm 2>/dev/null)
 
-all := $(bats_suites) $(cypress_gen) $(template_gen)
+all := $(cypress_gen) $(template_gen)
+
+nproc := $(shell nproc)
 
 all: $(all) | dep
 	@echo --- bats all
-	@bats -r unit regression integration end-to-end
+	@bats -j $(nproc) -r unit regression integration end-to-end
 
 run-unit: $(filter unit/%,$(all)) | dep-bats
 	@echo --- bats unit
-	@bats -r unit
+	@bats -j $(nproc) -r unit
 
 run-regression: $(filter regression/%,$(all)) | dep
 	@echo --- bats regression
-	@bats -r regression
+	@bats -j $(nproc) -r regression
 
 run-integration: $(filter integration/%,$(all)) | dep
 	@echo --- bats integration
-	@bats -r integration
+	@bats -j $(nproc) -r integration
 
 run-end-to-end: $(filter end-to-end/%,$(all)) | dep
 	@echo --- bats end-to-end
-	@bats -r end-to-end
+	@bats -j $(nproc) -r end-to-end
 
 run-all-%: $(all) | dep
 	@echo --- bats all $*
-	@bats -r unit regression integration end-to-end --filter-tags $*
+	@bats -j $(nproc) -r unit regression integration end-to-end --filter-tags $*
 
 run-unit-%: $(filter unit/%,$(all)) | dep-bats
 	@echo --- bats unit $*
-	@bats -r unit --filter-tags $*
+	@bats -j $(nproc) -r unit --filter-tags $*
 
 run-regression-%: $(filter regression/%,$(all)) | dep
 	@echo --- bats unit $*
-	@bats -r regression --filter-tags $*
+	@bats -j $(nproc) -r regression --filter-tags $*
 
 run-integration-%: $(filter integration/%,$(all)) | dep
 	@echo --- bats unit $*
-	@bats -r integration --filter-tags $*
+	@bats -j $(nproc) -r integration --filter-tags $*
 
 run-end-to-end-%: $(filter end-to-end/%,$(all)) | dep
 	@echo --- bats unit $*
-	@bats -r end-to-end --filter-tags $*
+	@bats -j $(nproc) -r end-to-end --filter-tags $*
 
 $(all:.bats=): %: %.bats
 	@echo --- bats $*.bats
-	@bats -r $*.bats
+	@bats -j $(nproc) -r $*.bats
 
 check-bats:
 ifndef found_bats
@@ -175,13 +174,11 @@ gen-cypress: $(cypress_gen)
 
 gen-template: $(template_gen)
 
-$(cypress_gen): %.gen.bats: %.cy.js common/gen-cypress.bash
-	@echo gen-cypress $< to $@
-	@./common/gen-cypress.bash $< > $@
+$(cypress_gen): %.gen.bats: %.cy.js common/gen.bash
+	@./common/gen.bash cypress tests/$<
 
-$(template_gen): %.gen.bats: %.bats.yaml common/gen-bats.bash
-	@echo gen-bats $< to $@
-	@./common/gen-bats.bash $< > $@
+$(template_gen): %.gen.bats: %.bats.gotmpl common/gen.bash
+	@./common/gen.bash template tests/$<
 
 clean: clean-dep clean-gen
 
@@ -194,8 +191,8 @@ clean-dep:
 	@rm -rf node_modules
 
 clean-gen:
-	@echo rm $(foreach dir, $(dirs), $(wildcard $(dir)/*.gen.bats))
-	@rm -f $(foreach dir, $(dirs), $(wildcard $(dir)/*.gen.bats))
+	@echo rm $(foreach dir, $(dirs), $(dir)/*.gen.bats)
+	@rm $(foreach dir, $(dirs), $(shell find $(dir) -type f -name *.gen.bats))
 
 build: build-main
 

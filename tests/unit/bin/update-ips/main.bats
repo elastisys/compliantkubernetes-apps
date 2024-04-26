@@ -3,12 +3,14 @@
 # bats file_tags=static,general,bin:update_ips
 
 setup_file() {
+  export BATS_NO_PARALLELIZE_WITHIN_FILE=true
+
   load "../../../common/lib"
   load "../../../common/lib/env"
   load "../../../common/lib/gpg"
 
-  env.setup
   gpg.setup
+  env.setup
 
   common_setup
 
@@ -23,6 +25,7 @@ setup_file() {
 teardown_file() {
   env.cache_delete
 
+  env.teardown
   gpg.teardown
 }
 

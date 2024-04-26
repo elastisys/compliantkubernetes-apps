@@ -1,0 +1,57 @@
+#!/usr/bin/env bats
+
+{{- define "template" -}}
+#!/usr/bin/env bats
+
+# Generated from {{ tmpl.Path }}
+
+# bats file_tags=static,bin:init,{{ .provider }}
+
+setup_file() {
+  # Not supported right now, might be able to leverage env.cache with some adaptions
+  export BATS_NO_PARALLELIZE_WITHIN_FILE=true
+
+  load "../../../common/lib"
+  load "../../../common/lib/env"
+  load "../../../common/lib/gpg"
+
+  gpg.setup
+  env.setup
+
+  env.init {{ .flavor }} {{ .provider }}
+  env.cache_create
+}
+
+setup() {
+  load "../../../common/lib"
+  load "../../../common/lib/env"
+  load "script"
+
+  common_setup
+  env.cache_restore
+}
+
+teardown_file() {
+  env.cache_delete
+  env.teardown
+  gpg.teardown
+}
+
+@test "init is successful - {{ .provider }}:{{ .flavor }}" {
+  test_init_successful
+}
+
+@test "init is idempotent - {{ .provider }}:{{ .flavor }}" {
+  test_init_idempotent
+}
+{{ end }}
+
+# These tests are generated into these files:
+{{- range $provider := coll.Slice "aws" "baremetal" "citycloud" "elastx" "exoscale" "safespring" "upcloud" }}
+{{- range $flavor := coll.Slice "air-gapped" "dev" "prod" }}
+{{- $file := tmpl.Path | path.Dir }}
+{{- $file = printf "test-%s-%s.gen.bats" $provider $flavor | path.Join $file }}
+# - {{ $file }}
+{{- coll.Dict "flavor" $flavor "provider" $provider | tmpl.Exec "template" | file.Write $file }}
+{{- end }}
+{{- end }}

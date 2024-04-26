@@ -66,3 +66,23 @@ repos:
         args:
         - --color=always
         - --external-sources
+
+  - repo: local
+    hooks:
+      - id: generate-cypress-tests
+        name: generate cypress tests
+        language: script
+        require_serial: true
+        files: '.*\.cy.js'
+        entry: tests/common/gen.bash
+        args:
+          - cypress
+
+      - id: generate-template-tests
+        name: generate template tests
+        language: script
+        require_serial: true
+        files: '.*\.bats.gotmpl'
+        entry: tests/common/gen.bash
+        args:
+          - template
