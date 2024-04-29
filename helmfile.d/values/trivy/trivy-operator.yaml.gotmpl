@@ -32,6 +32,12 @@ trivy:
     mirror:
       {{ toYaml .mirror | nindent 6 }}
   {{- end }}
+  {{- if .Values.trivy.scanner.resources }}
+  resources: {{- toYaml .Values.trivy.scanner.resources | nindent 4 }}
+  {{- end }}
+  {{- if .Values.trivy.scanner.timeout }}
+  timeout: {{- toYaml .Values.trivy.scanner.timeout | nindent 4 }}
+  {{- end }}
 
 operator:
 
