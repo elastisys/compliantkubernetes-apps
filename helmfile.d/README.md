@@ -39,7 +39,7 @@ The workflow for managing helm charts is to add them under `charts/` if they are
 
 ### Where to put releases
 
-Releases are templated under `stacks/` where it defines name, namespace, labels, chart and version, dependencies, and finally values.
+Helm releases are templated under `stacks/` where it defines name, namespace, labels, chart and version, dependencies, and finally values.
 
 Releases are defined in `state.yaml` which imports the files under `stacks/`.
 
@@ -55,9 +55,16 @@ Prefer to use this construct within state and stack files to ensure they can bui
 >
 > Set `disableValidationOnInstall` for releases that install custom resources that is not predefined in the environment.
 
+### Where to put manifests
+
+Helm releases may sometimes not be the best method to apply resources, especially for a create-once-update-never lifecycle.
+To facilitate this it is possible to use scripts under `hooks/` as hooks within releases.
+
+These can trigger on certain events such as `presync` or `postsync` which is before or after every install or upgrade.
+
 ### Where to put values
 
-Release values templates are stored under `values/` which uses a similar templating as `helm` however `helmfile` has stricter rules and will fail templating when values are missing.
+Helm release values templates are stored under `values/` which uses a similar templating as `helm` however `helmfile` has stricter rules and will fail templating when values are missing.
 Perform values validation within the values templates with descriptive error messages as the trace `helmfile` gives may not be easy to parse.
 
 Values templates can be split up into multiple files that are merged during templating.

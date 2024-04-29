@@ -28,6 +28,13 @@ templates:
     needs:
       - hnc-system/hnc-config-and-crds # creates hierarchyconfigurations
     {{- end }}
+    hooks:
+      - events: [ presync ]
+        showlogs: true
+        command: hooks/create-from-manifest.sh
+        args:
+          - "{{ .Environment.Name }}"
+          - dev-rbac/extra-user-view.yaml
     values:
       - values/user-rbac.yaml.gotmpl
 

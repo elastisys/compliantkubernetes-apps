@@ -1,0 +1,34 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: fluentd
+    app.kubernetes.io/name: fluentd-elasticsearch
+  name: fluentd-extra-config
+  namespace: fluentd
+data:
+  01-custom.conf: |-
+    # Use this configmap to add extra fluentd configuration.
+    # The *.conf files in this configmap will be @included by fluentd with the
+    # rest of the configuration.
+    #
+    # Note that files will be included in alphabetical order, so make sure you
+    # name them accordingly.
+    # https://docs.fluentd.org/configuration/config-file#6-re-use-your-config-the-include-directive
+    #
+    # <filter myapp.access>
+    #   @type record_transformer
+    #   <record>
+    #     host_param "#{Socket.gethostname}"
+    #   </record>
+    # </filter>
+  02-custom.conf: |-
+    # This is another custom config file that will be @included by fluentd.
+    #
+    # <filter myapp.access>
+    #   @type record_transformer
+    #   <record>
+    #     host_param "#{Socket.gethostname}"
+    #   </record>
+    # </filter>

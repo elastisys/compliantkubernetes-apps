@@ -111,7 +111,7 @@ Support matrix:
 | cert-manager   | 🟩️ | 🟩️ | |
 | dex            | 🟩️ | ⬜️ | Does not pull in cert-manager or ingress-nginx. For full functionality use: <br/> `-lapp=cert-manager -lapp=dex -lapp=ingress-nginx -lapp=node-local-dns` |
 | falco          | 🟥️ | 🟥️ | Installs but cannot start due to lack of permissions inside Kind. |
-| fluentd        | 🟩️ | 🟨️ | Installs but cannot start without creating initial resources on WC. |
+| fluentd        | 🟩️ | 🟩️ | |
 | gatekeeper     | 🟩️ | 🟩️ | |
 | grafana        | 🟩️ | ⬜️ | Does not pull in cert-manager, dex, ingress-nginx, monitors, rules, or thanos. For full functionality use: <br/> `-lapp=cert-manager -lapp=dex -lapp=ingress-nginx -lapp=node-local-dns -lapp=prometheus` |
 | harbor         | 🟩️ | ⬜️ | Does not pull in dex or ingress-nginx. For full functionality use: <br/> `-lapp=cert-manager -lapp=dex -lapp=harbor -lapp=ingress-nginx -lapp=node-local-dns` |

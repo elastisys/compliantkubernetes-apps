@@ -75,6 +75,14 @@ templates:
       - fluentd-system/podsecuritypolicy
       - kube-system/workload-cluster-np
       - monitoring/kube-prometheus-stack # creates servicemonitors and prometheusrules
+    hooks:
+      - events: [ presync ]
+        showlogs: true
+        command: hooks/create-from-manifest.sh
+        args:
+          - "{{ .Environment.Name }}"
+          - fluentd/extra-config.yaml
+          - fluentd/extra-plugins.yaml
     values:
       - values/fluentd/forwarder-common.yaml.gotmpl
       - values/fluentd/forwarder-workload-cluster.yaml.gotmpl
