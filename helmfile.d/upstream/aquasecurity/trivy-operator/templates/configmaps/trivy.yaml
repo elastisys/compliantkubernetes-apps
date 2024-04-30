@@ -79,7 +79,7 @@ data:
   {{- end }}
   {{- if .Values.trivy.ignoreFile }}
   trivy.ignoreFile: |
-  {{- range .Values.trivy.ignoreFile }}
+{{- range .Values.trivy.ignoreFile }}
     {{ . | indent 4 }}
   {{- end }}
   {{- end }}
@@ -125,6 +125,7 @@ data:
   TRIVY_DEBUG: {{ .Values.trivy.debug | quote }}
   TRIVY_SKIP_DB_UPDATE: "false"
   TRIVY_DB_REPOSITORY: "{{ .Values.trivy.dbRegistry }}/{{ .Values.trivy.dbRepository }}"
+  TRIVY_INSECURE: "{{ .Values.operator.builtInServerRegistryInsecure }}"
   {{- end }}
 {{- end }}
 {{- end }}
