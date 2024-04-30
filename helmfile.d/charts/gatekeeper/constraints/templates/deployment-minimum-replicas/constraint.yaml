@@ -3,7 +3,7 @@ kind: K8sMinimumReplicas
 metadata:
   name: elastisys-warn-minimum-replicas
 spec:
-  enforcementAction: warn
+  enforcementAction: {{ .Values.minimumDeploymentReplicas.enforcementAction }}
   match:
     kinds:
       - apiGroups:
