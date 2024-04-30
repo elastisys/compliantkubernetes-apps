@@ -35,6 +35,7 @@ usage() {
     echo "  validate <wc|sc>                               validates config files" 1>&2
     echo "  providers                                      lists supported cloud providers" 1>&2
     echo "  flavors                                        lists supported configuration flavors" 1>&2
+    echo "  explain <config|secrets> [key.to.parameter]    explains the config or secrets" 1>&2
     echo "  update-ips <wc|sc|both> <apply|dry-run>        Automatically fetches and applies the IPs for network policies" 1>&2
     echo "  clean <wc|sc>                                  Cleans the cluster of apps" 1>&2
     echo "  diagnostics <wc|sc>                            Runs diagnostics of apps" 1>&2
@@ -143,6 +144,11 @@ case "${1}" in
         ;;
     providers) echo "${ck8s_cloud_providers[@]}" ;;
     flavors) echo "${ck8s_flavors[@]}" ;;
+    explain)
+        [[ "${2}" =~ ^(config|secrets)$ ]] || usage
+        shift
+        "${here}/explain.bash" "${@}"
+        ;;
     update-ips)
         [[ "${2}" =~ ^(wc|sc|both)$ ]] || usage
         [[ "${3}" =~ ^(apply|dry-run)$ ]] || usage
