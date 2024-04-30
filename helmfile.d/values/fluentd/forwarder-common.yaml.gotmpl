@@ -13,9 +13,6 @@ serviceMonitor:
   jobLabel: '""'
   interval: 30s
 
-prometheusRule:
-  enabled: true
-
 fluentdArgs: "--no-supervisor -q"
 
 {{ with .Values.fluentd.forwarder.buffer -}}
