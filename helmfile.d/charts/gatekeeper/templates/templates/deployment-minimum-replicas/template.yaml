@@ -1,0 +1,24 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sminimumreplicas
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sMinimumReplicas
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+            type: object
+            properties:
+              min_replicas:
+                description: The minimum number of replicas allowed, inclusive.
+                type: integer
+              label:
+                description: This label allows to suppress the warning of the constraint if the number of replicas is lower than the required minimum.
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ .Files.Get "policies/deployment-minimum-replicas.rego"  | indent 8 }}

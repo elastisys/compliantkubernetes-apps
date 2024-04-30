@@ -17,6 +17,9 @@ rejectLoadBalancerService:
 allowUserCRDs:
     enable: {{ .Values.gatekeeper.allowUserCRDs.enabled }}
     enforcementAction: {{ .Values.gatekeeper.allowUserCRDs.enforcement }}
+minimumDeploymentReplicas:
+    enable: {{ .Values.opa.minimumDeploymentReplicas.enabled }}
+    enforcementAction: {{ .Values.opa.minimumDeploymentReplicas.enforcement }}
 {{- end }}
 
 imageRegistryURL: {{- toYaml .Values.opa.imageRegistry.URL | nindent 2}}
