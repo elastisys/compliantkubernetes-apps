@@ -12,23 +12,16 @@ spec:
           - Deployment
           - StatefulSet
     excludedNamespaces:
-      - alertmanager
-      - calico-apiserver
       - calico-system
-      - cert-manager
-      - falco
-      - fluentd
-      - fluentd-system
-      - gatekeeper-system
-      - gpu-operator
-      - hnc-system
-      - ingress-nginx
       - kube-note-lease
       - kube-public
       - kube-system
-      - monitoring
-      - tigera-operator
-      - velero
+    namespaceSelector:
+      matchExpressions:
+      - key: owner
+        operator: NotIn
+        values:
+        - operator
   parameters:
     min_replicas: 2
     label: ignoreMinimumReplicas
