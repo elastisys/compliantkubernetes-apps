@@ -1452,75 +1452,81 @@ properties:
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
           service:
-            additionalProperties: false
-            properties:
-              annotations:
-                additionalProperties:
-                  type: string
-                type: object
-              clusterIP:
-                type: string
-                oneOf:
-                  - format: ipv4
-                  - const: ""
-              enabled:
-                type: boolean
-              loadBalancerSourceRanges:
-                items:
-                  type: string
-                type: array
-              ipFamilyPolicy:
-                type: string
-                description: |-
-                  Represents the dual-stack-ness requested or required by this Service. When
-                  utilizing an internal loadbalancer service (ie MetalLB), set this field to
-                  "RequireDualStack" if you want both IPv4 and IPv6 connectivity. The
-                  ipFamilies and clusterIPs fields depend on the value of this field.
-
-                  See [reference](https://kubernetes.io/docs/concepts/services-networking/dual-stack/)
-                enum:
-                  - ""
-                  - SingleStack
-                  - PreferDualStack
-                  - RequireDualStack
-                default: SingleStack
-              ipFamilies:
-                type: array
-                description: |-
-                  List of IP families (e.g. IPv4, IPv6) assigned to the service. Default is IPv4 only. When utilizing an internal loadbalancer service (ie MetalLB),
-                  IPv6 would also need to be included in order for the ingress service to allocate an address in that family.
-                uniqueItems: true
-                items:
-                  type: string
-                  enum:
-                    - IPv4
-                    - IPv6
-                default:
-                  - IPv4
-              nodePorts:
-                additionalProperties: false
-                properties:
-                  http:
-                    default: 30080
-                    $ref: '#/$defs/port'
-                  https:
-                    default: 30443
-                    $ref: '#/$defs/port'
-                type: object
-              type:
-                description: See [reference](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types)
-                enum:
-                  - ClusterIP
-                  - NodePort
-                  - LoadBalancer
-                  - ExternalName
-                type: string
-              allocateLoadBalancerNodePorts:
-                type: boolean
-                default: false
-                title: Enable node port allocation
-                description: See [reference](https://kubernetes.io/docs/concepts/services-networking/service/#load-balancer-nodeport-allocation)
             type: object
+            oneOf:
+              - properties:
+                  enabled:
+                    type: boolean
+                    const: false
+              - additionalProperties: false
+                properties:
+                  annotations:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  clusterIP:
+                    type: string
+                    oneOf:
+                      - format: ipv4
+                      - const: ""
+                  enabled:
+                    type: boolean
+                    const: true
+                  loadBalancerSourceRanges:
+                    items:
+                      type: string
+                    type: array
+                  ipFamilyPolicy:
+                    type: string
+                    description: |-
+                      Represents the dual-stack-ness requested or required by this Service. When
+                      utilizing an internal loadbalancer service (ie MetalLB), set this field to
+                      "RequireDualStack" if you want both IPv4 and IPv6 connectivity. The
+                      ipFamilies and clusterIPs fields depend on the value of this field.
+
+                      See [reference](https://kubernetes.io/docs/concepts/services-networking/dual-stack/)
+                    enum:
+                      - ""
+                      - SingleStack
+                      - PreferDualStack
+                      - RequireDualStack
+                    default: SingleStack
+                  ipFamilies:
+                    type: array
+                    description: |-
+                      List of IP families (e.g. IPv4, IPv6) assigned to the service. Default is IPv4 only. When utilizing an internal loadbalancer service (ie MetalLB),
+                      IPv6 would also need to be included in order for the ingress service to allocate an address in that family.
+                    uniqueItems: true
+                    items:
+                      type: string
+                      enum:
+                        - IPv4
+                        - IPv6
+                    default:
+                      - IPv4
+                  nodePorts:
+                    additionalProperties: false
+                    properties:
+                      http:
+                        default: 30080
+                        $ref: '#/$defs/port'
+                      https:
+                        default: 30443
+                        $ref: '#/$defs/port'
+                    type: object
+                  type:
+                    description: See [reference](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types)
+                    enum:
+                      - ClusterIP
+                      - NodePort
+                      - LoadBalancer
+                      - ExternalName
+                    type: string
+                  allocateLoadBalancerNodePorts:
+                    type: boolean
+                    default: false
+                    title: Enable node port allocation
+                    description: See [reference](https://kubernetes.io/docs/concepts/services-networking/service/#load-balancer-nodeport-allocation)
           tolerations:
             $ref: '#/$defs/kubernetesTolerations'
           useHostPort:
@@ -2039,7 +2045,10 @@ properties:
               loop
               forward . 127.0.0.1:9005
             }
-        type: string
+        type:
+          - string
+          - "null"
+        default: null
       resources:
         $ref: '#/$defs/kubernetesResourceRequirements'
     type: object
