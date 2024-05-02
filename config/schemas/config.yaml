@@ -1877,7 +1877,10 @@ properties:
                 default: false
                 type: boolean
               ips:
-                $ref: '#/$defs/iplist'
+                oneOf:
+                  - $ref: '#/$defs/iplist'
+                  - type: string
+                    const: set-me-if-enabled
             type: object
         type: object
       kubeSystem:
