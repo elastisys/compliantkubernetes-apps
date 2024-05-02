@@ -1890,9 +1890,23 @@ properties:
             default: true
             type: boolean
           openstack:
-            $ref: '#/$defs/netpolRule'
+            type: object
+            properties:
+              enabled:
+                type: boolean
+              ips:
+                $ref: '#/$defs/iplist'
+              ports:
+                $ref: '#/$defs/portlist'
           upcloud:
-            $ref: '#/$defs/netpolRule'
+            type: object
+            properties:
+              enabled:
+                type: boolean
+              ips:
+                $ref: '#/$defs/iplist'
+              ports:
+                $ref: '#/$defs/portlist'
         type: object
       kured:
         additionalProperties: false
