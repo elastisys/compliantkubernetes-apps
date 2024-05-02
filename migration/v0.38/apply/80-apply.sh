@@ -14,9 +14,11 @@ declare -a skipped_sc
 skipped_sc=(
   "netpol!=service"
   "netpol!=rclone"
+  "app!=trivy-operator"
 )
 declare -a skipped_wc
 skipped_wc=(
+  "app!=trivy-operator"
 )
 
 run() {
