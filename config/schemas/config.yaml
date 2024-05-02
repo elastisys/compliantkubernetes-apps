@@ -23,6 +23,8 @@ $defs:
         $ref: '#/$defs/kubernetesTolerations'
       topologySpreadConstraints:
         $ref: '#/$defs/kubernetesTopologySpreadConstraints'
+      extraArgs:
+        $ref: '#/$defs/extraArgs'
     required: [] # Shouldn't at least 'enabled' be required?
     title: Common Resource
     type: object
