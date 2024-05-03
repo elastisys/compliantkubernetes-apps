@@ -1,0 +1,6 @@
+server = "https://ghcr.io"
+
+[host."http://local-cache-ghcr-io:5000"]
+  capabilities = ["pull", "resolve"]
+[host."https://ghcr.io"]
+  capabilities = ["pull", "resolve"]

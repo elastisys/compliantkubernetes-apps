@@ -1,0 +1,6 @@
+server = "https://docker.io"
+
+[host."http://local-cache-docker-io:5000"]
+  capabilities = ["pull", "resolve"]
+[host."https://registry-1.docker.io"]
+  capabilities = ["pull", "resolve"]

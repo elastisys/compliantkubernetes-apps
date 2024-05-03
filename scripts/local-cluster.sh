@@ -34,6 +34,7 @@ log.fatal() {
 }
 log.usage() {
   log.fatal "$0 usage:
+  - cache <create|delete>                                                    - manages local caches for local clusters
   - config <name> <flavor> <domain> [ops-prefix]                             - configures a local cluster
   - create <name> <profile-name|profile-path> [--skip-calico] [--skip-minio] - creates a local cluster
   - delete <name>                                                            - deletes a local cluster
@@ -86,6 +87,59 @@ index.state() {
 
 cluster.exist() {
   kind get clusters 2>/dev/null | grep -E "^${1}$" &>/dev/null
+}
+
+cache() {
+  local action
+  action="${1:-}"
+
+  if [[ -z "${action}" ]]; then
+    log.usage
+  fi
+
+  local -a registryfiles
+  readarray -t registryfiles <<< "$(find "${HERE}/local-clusters/registries/" -type f)"
+
+  for registryfile in "${registryfiles[@]}"; do
+    local downstream name upstream
+
+    downstream="$(yq4 -oy '.host | keys | .[0]' "${registryfile}")"
+
+    name="$(sed -e 's#http://##' -e 's#:.*##' <<< "${downstream}")"
+
+    upstream="$(yq4 -oy '.host | keys | .[1]' "${registryfile}")"
+
+    log.info "---"
+    log.info "${action}: ${registryfile}"
+
+    case "${action}" in
+    create)
+      if ! docker network inspect kind > /dev/null 2>&1; then
+        log.info "- creating kind network"
+        docker network create kind
+      fi
+      if ! docker volume inspect "${name}" > /dev/null 2>&1; then
+        log.info "- creating proxy cache volume ${name}"
+        docker volume create "${name}"
+      fi
+      if ! docker container inspect "${name}" > /dev/null 2>&1; then
+        log.info "- creating proxy cache container ${name}"
+        docker run --detach --env "REGISTRY_PROXY_REMOTEURL=${upstream}" --env REGISTRY_PROXY_TTL=168h --env REGISTRY_STORAGE_DELETE_ENABLED=true --env REGISTRY --mount "type=volume,src=${name},dst=/var/lib/registry" --name "${name}" --network kind docker.io/library/registry:2
+      fi
+      ;;
+    delete)
+      if docker container inspect "${name}" > /dev/null 2>&1; then
+        log.warn "- deleting proxy cache container ${name}"
+        docker container stop "${name}"
+        docker container rm "${name}"
+      fi
+      if docker volume inspect "${name}" > /dev/null 2>&1; then
+        log.warn "- deleting proxy cache volume ${name}"
+        docker volume rm "${name}"
+      fi
+      ;;
+    esac
+  done
 }
 
 config() {
@@ -181,7 +235,7 @@ create() {
 
   if [[ "$(index.state "${cluster}")" == "creating" ]]; then
     log.info "kind create cluster \"${cluster}\" using \"${config}\""
-    kind create cluster --name "${cluster}" --config "${config}"
+    kind create cluster --name "${cluster}" --config /dev/stdin <<< "$(envsubst < "${config}")"
     index.state "${cluster}" "configuring"
   fi
 
@@ -257,6 +311,14 @@ main() {
   subcommand="${2:-}"
 
   case "${command}" in
+  cache)
+    case "${subcommand}" in
+    create|delete)
+      cache "${subcommand}" ;;
+    *)
+      log.usage ;;
+    esac
+    ;;
   config)
     config "${@:2}" ;;
   create)

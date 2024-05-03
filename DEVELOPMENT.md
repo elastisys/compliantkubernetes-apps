@@ -37,6 +37,11 @@ This requires that `kind` is installed and that either `podman` or `docker` is a
 > 1. the kind-config/local-cluster-profile must not bind the ingress controller to the same address, and
 > 1. the node-local-dns config must be updated to point towards the correct clusters.
 
+> [!tip]
+> Since local clusters are effectively ephemeral they can pull a lot of images and `kind` has no build in system to manage images.
+> So, for the local clusters script there are commands to create and delete local pull through registry caches for a few upstream registries.
+> Commands to do so is `./scripts/local-cluster.sh cache <create|delete>`, then one can make use of the local cluster profiles `<single|multi>-node-cache` that are prepared to use it by default.
+
 ```sh
 # with CK8S_CONFIG_PATH and CK8S_PGP_FP set
 ./scripts/local-cluster.sh config <name> <apps-flavor> <domain>
