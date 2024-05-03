@@ -1105,7 +1105,7 @@ rookCeph:
 nodeLocalDns:
   # See docs for details about the config format and options:
   # https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/#coredns-configmap-options
-  customConfig: #|-
+  customConfig: "" #|-
   #  example.com:53 {
   #      errors
   #      cache 30
