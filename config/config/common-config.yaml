@@ -641,6 +641,7 @@ velero:
   enabled: true
   tolerations: []
   nodeSelector: {}
+  uploaderType: restic
   schedule: 0 0 * * * # once per day
   retentionPeriod: 720h0m0s
   resources:

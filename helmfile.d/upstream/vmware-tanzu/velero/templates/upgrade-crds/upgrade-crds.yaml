@@ -15,6 +15,9 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     helm.sh/chart: {{ include "velero.chart" . }}
+  {{- with .Values.kubectl.labels }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   backoffLimit: 3
   template:
@@ -75,7 +78,7 @@ spec:
           args:
             - -c
             - /velero install --crds-only --dry-run -o yaml | /tmp/kubectl apply -f -
-          {{- with .Values.resources }}
+          {{- with .Values.upgradeJobResources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -86,9 +89,24 @@ spec:
           volumeMounts:
             - mountPath: /tmp
               name: crds
+          {{- if (.Values.upgradeCRDsJob).extraVolumeMounts }}
+          {{- toYaml .Values.upgradeCRDsJob.extraVolumeMounts | nindent 12 }}
+          {{- end }}
+          {{- if (.Values.upgradeCRDsJob).extraEnvVars }}
+          env:
+          {{- with .Values.upgradeCRDsJob.extraEnvVars }}
+          {{- range $key, $value := . }}
+            - name: {{ default "none" $key }}
+              value: {{ default "none" $value | quote }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
       volumes:
         - name: crds
           emptyDir: {}
+        {{- if (.Values.upgradeCRDsJob).extraVolumes }}
+        {{- toYaml .Values.upgradeCRDsJob.extraVolumes | nindent 8 }}
+        {{- end }}
       restartPolicy: OnFailure
       {{- with $podSecurityContext }}
       securityContext:

@@ -8,7 +8,7 @@ nodeSelector: {{- toYaml .Values.velero.nodeSelector | nindent 2  }}
 initContainers:
   {{- if eq .Values.objectStorage.type "s3" }}
   - name: velero-plugin-for-aws
-    image: velero/velero-plugin-for-aws:v1.5.1
+    image: velero/velero-plugin-for-aws:v1.9.0
     imagePullPolicy: IfNotPresent
     securityContext:
       allowPrivilegeEscalation: false
@@ -20,7 +20,7 @@ initContainers:
         name: plugins
   {{- else if eq .Values.objectStorage.type "gcs" }}
   - name: velero-plugin-for-gcs
-    image: velero/velero-plugin-for-gcp:v1.5.1
+    image: velero/velero-plugin-for-gcp:v1.9.1
     imagePullPolicy: IfNotPresent
     securityContext:
       allowPrivilegeEscalation: false
@@ -32,7 +32,7 @@ initContainers:
         name: plugins
   {{- else if eq .Values.objectStorage.type "azure" }}
   - name: velero-plugin-for-microsoft-azure
-    image: velero/velero-plugin-for-microsoft-azure:v1.9.0
+    image: velero/velero-plugin-for-microsoft-azure:v1.9.2
     imagePullPolicy: IfNotPresent
     securityContext:
       allowPrivilegeEscalation: false
@@ -48,6 +48,8 @@ snapshotsEnabled: false
 
 configuration:
   defaultVolumesToFsBackup: true
+
+  uploaderType: {{ .Values.velero.uploaderType }} # default is kopia
 
   # https://velero.io/docs/v1.11/api-types/backupstoragelocation/
   backupStorageLocation:
@@ -90,11 +92,10 @@ nodeAgent:
   resources:   {{- toYaml .Values.velero.nodeAgent.resources | nindent 4  }}
   tolerations: {{- toYaml .Values.velero.nodeAgent.tolerations | nindent 4  }}
 
-  privileged: true
-
   containerSecurityContext:
-    runAsUser: 0
     allowPrivilegeEscalation: true
+    privileged: true
+    runAsUser: 0
 
 schedules:
   daily-backup:
