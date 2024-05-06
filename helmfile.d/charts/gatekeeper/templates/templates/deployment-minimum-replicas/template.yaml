@@ -15,8 +15,8 @@ spec:
               min_replicas:
                 description: The minimum number of replicas allowed, inclusive.
                 type: integer
-              label:
-                description: This label allows to suppress the warning of the constraint if the number of replicas is lower than the required minimum.
+              annotation:
+                description: This annotation allows to suppress the warning of the constraint if the number of replicas is lower than the required minimum.
                 type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
