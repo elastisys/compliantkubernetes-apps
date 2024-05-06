@@ -33,10 +33,20 @@ spec:
       {{- if .Values.podLabels }}
         {{- toYaml .Values.podLabels | nindent 8 }}
       {{- end }}
-      {{- with .Values.podAnnotations }}
+    {{- if or .Values.podAnnotations .Values.metrics.enabled (and .Values.credentials.useSecret (not .Values.credentials.existingSecret)) }}
       annotations:
+      {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if and (.Values.metrics.enabled) (not .Values.metrics.nodeAgentPodMonitor.enabled) }}
+        {{- with .Values.metrics.podAnnotations }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- end }}
+      {{- if and .Values.credentials.useSecret (not .Values.credentials.existingSecret) }}
+        checksum/secret: {{ template "chart.config-checksum" . }}
+      {{- end }}
+    {{- end }}
     spec:
     {{- if .Values.image.imagePullSecrets }}
       imagePullSecrets:
@@ -143,7 +153,7 @@ spec:
           {{- with .Values.configuration.extraEnvVars }}
           {{- range $key, $value := . }}
             - name: {{ default "none" $key }}
-              value: {{ default "none" $value | quote }}
+              value: {{ tpl (default "none" $value) $ | quote }}
           {{- end }}
           {{- end }}
           {{- with .Values.credentials.extraEnvVars }}
@@ -165,7 +175,6 @@ spec:
           lifecycle: {{ toYaml .Values.nodeAgent.lifecycle | nindent 12 }}
           {{- end }}
           securityContext:
-            privileged: {{ .Values.nodeAgent.privileged }}
             {{- with $containerSecurityContext }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -184,7 +193,7 @@ spec:
       {{- with .Values.nodeAgent.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
-      {{- end }}      
+      {{- end }}
     {{- with .Values.nodeAgent.dnsConfig }}
     dnsConfig:
       {{- toYaml . | nindent 8 }}

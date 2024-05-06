@@ -1,4 +1,3 @@
-
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -6,8 +5,7 @@ metadata:
   labels:
     component: velero
   annotations:
-    controller-gen.kubebuilder.io/version: v0.7.0
-  creationTimestamp: null
+    controller-gen.kubebuilder.io/version: v0.12.0
   name: backups.velero.io
 spec:
   group: velero.io
@@ -43,6 +41,11 @@ spec:
                 description: CSISnapshotTimeout specifies the time used to wait for
                   CSI VolumeSnapshot status turns to ReadyToUse during creation, before
                   returning error as timeout. The default value is 10 minute.
+                type: string
+              datamover:
+                description: DataMover specifies the data mover to be used by the
+                  backup. If DataMover is "" or "velero", the built-in data mover
+                  will be used.
                 type: string
               defaultVolumesToFsBackup:
                 description: DefaultVolumesToFsBackup specifies whether pod volume
@@ -177,6 +180,7 @@ spec:
                                 contains only "value". The requirements are ANDed.
                               type: object
                           type: object
+                          x-kubernetes-map-type: atomic
                         name:
                           description: Name is the name of this hook.
                           type: string
@@ -362,6 +366,7 @@ spec:
                       are ANDed.
                     type: object
                 type: object
+                x-kubernetes-map-type: atomic
               metadata:
                 properties:
                   labels:
@@ -422,6 +427,7 @@ spec:
                         are ANDed.
                       type: object
                   type: object
+                  x-kubernetes-map-type: atomic
                 nullable: true
                 type: array
               orderedResources:
@@ -454,6 +460,12 @@ spec:
                 - kind
                 - name
                 type: object
+                x-kubernetes-map-type: atomic
+              snapshotMoveData:
+                description: SnapshotMoveData specifies whether snapshot data should
+                  be moved
+                nullable: true
+                type: boolean
               snapshotVolumes:
                 description: SnapshotVolumes specifies whether to take snapshots of
                   any PV's referenced in the set of objects included in the Backup.
@@ -467,6 +479,15 @@ spec:
                 description: TTL is a time.Duration-parseable string describing how
                   long the Backup should be retained for.
                 type: string
+              uploaderConfig:
+                description: UploaderConfig specifies the configuration for the uploader.
+                nullable: true
+                properties:
+                  parallelFilesUpload:
+                    description: ParallelFilesUpload is the number of files parallel
+                      uploads to perform when using the uploader.
+                    type: integer
+                type: object
               volumeSnapshotLocations:
                 description: VolumeSnapshotLocations is a list containing names of
                   VolumeSnapshotLocations associated with this backup.
@@ -525,6 +546,22 @@ spec:
                 description: FormatVersion is the backup format version, including
                   major, minor, and patch version.
                 type: string
+              hookStatus:
+                description: HookStatus contains information about the status of the
+                  hooks.
+                nullable: true
+                properties:
+                  hooksAttempted:
+                    description: HooksAttempted is the total number of attempted hooks
+                      Specifically, HooksAttempted represents the number of hooks
+                      that failed to execute and the number of hooks that executed
+                      successfully.
+                    type: integer
+                  hooksFailed:
+                    description: HooksFailed is the total number of hooks which ended
+                      with an error
+                    type: integer
+                type: object
               phase:
                 description: Phase is the current state of the Backup.
                 enum:
@@ -593,9 +630,3 @@ spec:
         type: object
     served: true
     storage: true
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []

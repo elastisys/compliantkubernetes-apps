@@ -1323,6 +1323,11 @@ properties:
       enabled:
         default: true
         type: boolean
+      uploaderType:
+        enum:
+          - restic
+          - kopia
+        type: string
       nodeAgent:
         additionalProperties: false
         properties:
