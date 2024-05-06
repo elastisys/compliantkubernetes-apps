@@ -49,6 +49,8 @@ snapshotsEnabled: false
 configuration:
   defaultVolumesToFsBackup: true
 
+  uploaderType: {{ .Values.velero.uploaderType }} # default is kopia
+
   # https://velero.io/docs/v1.11/api-types/backupstoragelocation/
   backupStorageLocation:
     - bucket: {{ .Values.objectStorage.buckets.velero }}
