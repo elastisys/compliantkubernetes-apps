@@ -43,11 +43,21 @@ log.usage() {
   "
 }
 log.continue() {
-  log.warn.no_newline "${1} [y/N]: "
+  if [[ "${CK8S_AUTO_APPROVE:-false}" != "true" ]]; then
+    log.warn.no_newline "${1} [y/N]: "
 
-  read -r reply
-  if ! [[ "${reply}" =~ ^(y|Y|yes|Yes|YES)$ ]]; then
-    log.fatal "aborted"
+    read -r reply
+    if ! [[ "${reply}" =~ ^(y|Y|yes|Yes|YES)$ ]]; then
+      log.fatal "aborted"
+    fi
+  fi
+}
+
+yq() {
+  if command -v yq4 > /dev/null; then
+    command yq4 "${@}"
+  else
+    command yq "${@}"
   fi
 }
 
@@ -77,11 +87,11 @@ index.state() {
 
   case "${state}" in
   "")
-    yq4 ".\"${cluster}\"" "${CK8S_CONFIG_PATH}/cluster-index.yaml" ;;
+    yq ".\"${cluster}\"" "${CK8S_CONFIG_PATH}/cluster-index.yaml" ;;
   "delete")
-    yq4 -i "del(.\"${cluster}\")" "${CK8S_CONFIG_PATH}/cluster-index.yaml" ;;
+    yq -i "del(.\"${cluster}\")" "${CK8S_CONFIG_PATH}/cluster-index.yaml" ;;
   *)
-    yq4 -i ".\"${cluster}\" = \"${state}\"" "${CK8S_CONFIG_PATH}/cluster-index.yaml" ;;
+    yq -i ".\"${cluster}\" = \"${state}\"" "${CK8S_CONFIG_PATH}/cluster-index.yaml" ;;
   esac
 }
 
@@ -103,11 +113,11 @@ cache() {
   for registryfile in "${registryfiles[@]}"; do
     local downstream name upstream
 
-    downstream="$(yq4 -oy '.host | keys | .[0]' "${registryfile}")"
+    downstream="$(yq -oy '.host | keys | .[0]' "${registryfile}")"
 
     name="$(sed -e 's#http://##' -e 's#:.*##' <<< "${downstream}")"
 
-    upstream="$(yq4 -oy '.host | keys | .[1]' "${registryfile}")"
+    upstream="$(yq -oy '.host | keys | .[1]' "${registryfile}")"
 
     log.info "---"
     log.info "${action}: ${registryfile}"
@@ -178,14 +188,14 @@ config() {
     touch "${CK8S_CONFIG_PATH}/wc-config.yaml"
   fi
 
-  yq4 -Pi 'with(select(. == null); . = {}) | . *= (load(env(HERE) + "/local-clusters/configs/common-config.yaml") | (.. | select(tag == "!!str")) |= envsubst)' "${CK8S_CONFIG_PATH}/common-config.yaml"
-  yq4 -Pi 'with(select(. == null); . = {}) | . *= (load(env(HERE) + "/local-clusters/configs/sc-config.yaml") | (.. | select(tag == "!!str")) |= envsubst)' "${CK8S_CONFIG_PATH}/sc-config.yaml"
-  yq4 -Pi 'with(select(. == null); . = {}) | . *= (load(env(HERE) + "/local-clusters/configs/wc-config.yaml") | (.. | select(tag == "!!str")) |= envsubst)' "${CK8S_CONFIG_PATH}/wc-config.yaml"
+  yq -Pi 'with(select(. == null); . = {}) | . *= (load(env(HERE) + "/local-clusters/configs/common-config.yaml") | (.. | select(tag == "!!str")) |= envsubst)' "${CK8S_CONFIG_PATH}/common-config.yaml"
+  yq -Pi 'with(select(. == null); . = {}) | . *= (load(env(HERE) + "/local-clusters/configs/sc-config.yaml") | (.. | select(tag == "!!str")) |= envsubst)' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq -Pi 'with(select(. == null); . = {}) | . *= (load(env(HERE) + "/local-clusters/configs/wc-config.yaml") | (.. | select(tag == "!!str")) |= envsubst)' "${CK8S_CONFIG_PATH}/wc-config.yaml"
 
   if ! [[ -f "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" ]]; then
     mkdir -p "${CK8S_CONFIG_PATH}/defaults"
     touch "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
-    yq4 -Pi '. = {
+    yq -Pi '. = {
       "global": {
           "ck8sCloudProvider": "none",
           "ck8sEnvironmentName": (env(name)),
