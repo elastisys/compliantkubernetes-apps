@@ -90,11 +90,10 @@ nodeAgent:
   resources:   {{- toYaml .Values.velero.nodeAgent.resources | nindent 4  }}
   tolerations: {{- toYaml .Values.velero.nodeAgent.tolerations | nindent 4  }}
 
-  privileged: true
-
   containerSecurityContext:
-    runAsUser: 0
     allowPrivilegeEscalation: true
+    privileged: true
+    runAsUser: 0
 
 schedules:
   daily-backup:
