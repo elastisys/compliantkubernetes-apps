@@ -127,6 +127,14 @@ properties:
           - containerd
           - docker
     additionalProperties: false
+  velero:
+    additionalProperties: true
+    properties:
+      uploaderType:
+        enum:
+          - restic
+          - kopia
+        type: string
 additionalProperties:
   type: object
   properties: {}
