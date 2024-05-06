@@ -1,4 +1,3 @@
-
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -6,8 +5,7 @@ metadata:
   labels:
     component: velero
   annotations:
-    controller-gen.kubebuilder.io/version: v0.7.0
-  creationTimestamp: null
+    controller-gen.kubebuilder.io/version: v0.12.0
   name: schedules.velero.io
 spec:
   group: velero.io
@@ -65,6 +63,16 @@ spec:
                 description: Schedule is a Cron expression defining when to run the
                   Backup.
                 type: string
+              skipImmediately:
+                description: 'SkipImmediately specifies whether to skip backup if
+                  schedule is due immediately from `schedule.status.lastBackup` timestamp
+                  when schedule is unpaused or if schedule is new. If true, backup
+                  will be skipped immediately when schedule is unpaused if it is due
+                  based on .Status.LastBackupTimestamp or schedule is new, and will
+                  run at next schedule time. If false, backup will not be skipped
+                  immediately when schedule is unpaused, but will run at next schedule
+                  time. If empty, will follow server configuration (default: false).'
+                type: boolean
               template:
                 description: Template is the definition of the Backup to be run on
                   the provided schedule
@@ -73,6 +81,11 @@ spec:
                     description: CSISnapshotTimeout specifies the time used to wait
                       for CSI VolumeSnapshot status turns to ReadyToUse during creation,
                       before returning error as timeout. The default value is 10 minute.
+                    type: string
+                  datamover:
+                    description: DataMover specifies the data mover to be used by
+                      the backup. If DataMover is "" or "velero", the built-in data
+                      mover will be used.
                     type: string
                   defaultVolumesToFsBackup:
                     description: DefaultVolumesToFsBackup specifies whether pod volume
@@ -208,6 +221,7 @@ spec:
                                     requirements are ANDed.
                                   type: object
                               type: object
+                              x-kubernetes-map-type: atomic
                             name:
                               description: Name is the name of this hook.
                               type: string
@@ -398,6 +412,7 @@ spec:
                           "value". The requirements are ANDed.
                         type: object
                     type: object
+                    x-kubernetes-map-type: atomic
                   metadata:
                     properties:
                       labels:
@@ -458,6 +473,7 @@ spec:
                             only "value". The requirements are ANDed.
                           type: object
                       type: object
+                      x-kubernetes-map-type: atomic
                     nullable: true
                     type: array
                   orderedResources:
@@ -490,6 +506,12 @@ spec:
                     - kind
                     - name
                     type: object
+                    x-kubernetes-map-type: atomic
+                  snapshotMoveData:
+                    description: SnapshotMoveData specifies whether snapshot data
+                      should be moved
+                    nullable: true
+                    type: boolean
                   snapshotVolumes:
                     description: SnapshotVolumes specifies whether to take snapshots
                       of any PV's referenced in the set of objects included in the
@@ -504,6 +526,16 @@ spec:
                     description: TTL is a time.Duration-parseable string describing
                       how long the Backup should be retained for.
                     type: string
+                  uploaderConfig:
+                    description: UploaderConfig specifies the configuration for the
+                      uploader.
+                    nullable: true
+                    properties:
+                      parallelFilesUpload:
+                        description: ParallelFilesUpload is the number of files parallel
+                          uploads to perform when using the uploader.
+                        type: integer
+                    type: object
                   volumeSnapshotLocations:
                     description: VolumeSnapshotLocations is a list containing names
                       of VolumeSnapshotLocations associated with this backup.
@@ -529,6 +561,11 @@ spec:
                 format: date-time
                 nullable: true
                 type: string
+              lastSkipped:
+                description: LastSkipped is the last time a Schedule was skipped
+                format: date-time
+                nullable: true
+                type: string
               phase:
                 description: Phase is the current phase of the Schedule
                 enum:
@@ -547,9 +584,3 @@ spec:
     served: true
     storage: true
     subresources: {}
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []
