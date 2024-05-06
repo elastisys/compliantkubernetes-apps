@@ -1,229 +1,106 @@
 #!/usr/bin/env make
 
-dirs := unit regression integration end-to-end
+# If more complexity is to be added, write a script instead.
 
-# Skip looking up files when building
-ifndef CK8S_TESTS_BUILD
+# name of container image
+image := compliantkubernetes-apps-tests
 
-# Cypress tests
-cypress_suites = $(foreach dir,$(dirs),$(wildcard $(dir)/*.cy.js))
-cypress_gen = $(cypress_suites:.cy.js=.gen.bats)
+# paths
+tests := $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
+roots := $(patsubst %/,%,$(dir $(tests)))
 
-# Template tests
-template_suites = $(foreach dir,$(dirs),$(shell find $(dir) -type f -name *.bats.gotmpl))
-template_gen = $(template_suites:.bats.gotmpl=.gen.bats)
+# launcher
+launcher := $(roots)/scripts/run-from-container.sh
 
-endif
+# test types
+types := unit regression integration end-to-end
 
-uid := $(shell id -u)
-gid := $(shell id -g)
+# test targets
+targets = $(patsubst %/,%,$(foreach type,$(types),$(tests)/$(type)/))
 
-found_docker := $(shell command -v docker 2>/dev/null)
-found_podman := $(shell command -v podman 2>/dev/null)
+# test suites
+suites = $(patsubst %/,%,$(foreach target,$(targets),$(wildcard $(target)/*/)))
 
-ifdef found_docker
-# Check if podman shadows docker
-found_podman := $(shell docker version | grep Podman)
-ifdef found_podman
-undefine found_docker
-else
-endif
-endif
+# test files
+files = $(foreach suite,$(suites),$(wildcard $(suite)/*.bats))
 
-container_image := compliantkubernetes-apps-tests
+cypress_files = $(foreach suite,$(suites),$(wildcard $(suite)/*.cy.js))
+template_files = $(foreach suite,$(suites),$(wildcard $(suite)/*.bats.gotmpl))
 
-ifndef GNUPGHOME
-GNUPGHOME := ${HOME}/.gnupg
-endif
+generated_files = $(cypress_files:.cy.js=.gen.bats) $(template_files:.bats.gotmpl=.gen.bats)
 
-ifndef CI
-container_args += --interactive --tty
-endif
+nproc = $(shell nproc)
 
-container_args += --rm --user $(uid):$(gid) --env=ROOT/apps
-
-ifdef CK8S_CONFIG_PATH
-container_args += --env=CK8S_CONFIG_PATH=${CK8S_CONFIG_PATH}
-container_args += --mount type=bind,source=${CK8S_CONFIG_PATH},target=${CK8S_CONFIG_PATH}
-endif
-
-ifndef CK8S_TESTS_STATIC # Skip mount with static tests
-container_args += --mount type=bind,source=${GNUPGHOME},target=/home/ubuntu/.gnupg,readonly
-container_args += --mount type=bind,source=${HOME}/.kube/cache/oidc-login,target=/home/ubuntu/.kube/cache/oidc-login
-container_args += --mount type=bind,source=/run/user/$(uid),target=/run/user/$(uid),readonly
-container_args += --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock
-container_args += --group-add $(shell getent group docker | cut -d: -f3)
-endif
-
-container_args += --network=host
-
-found_apt := $(shell command -v apt 2>/dev/null)
-
-found_bats := $(shell command -v bats 2>/dev/null)
-found_npm := $(shell command -v npm 2>/dev/null)
-
-all := $(cypress_gen) $(template_gen)
-
-nproc := $(shell nproc)
-
-all: $(all) | dep
-	@echo --- bats all
-	@bats -j $(nproc) -r unit regression integration end-to-end
-
-run-unit: $(filter unit/%,$(all)) | dep-bats
-	@echo --- bats unit
-	@bats -j $(nproc) -r unit
-
-run-regression: $(filter regression/%,$(all)) | dep
-	@echo --- bats regression
-	@bats -j $(nproc) -r regression
-
-run-integration: $(filter integration/%,$(all)) | dep
-	@echo --- bats integration
-	@bats -j $(nproc) -r integration
-
-run-end-to-end: $(filter end-to-end/%,$(all)) | dep
-	@echo --- bats end-to-end
-	@bats -r end-to-end
-
-run-all-%: $(all) | dep
-	@echo --- bats all $*
-	@bats -j $(nproc) -r unit regression integration end-to-end --filter-tags $*
-
-run-unit-%: $(filter unit/%,$(all)) | dep-bats
-	@echo --- bats unit $*
-	@bats -j $(nproc) -r unit --filter-tags $*
-
-run-regression-%: $(filter regression/%,$(all)) | dep
-	@echo --- bats unit $*
-	@bats -j $(nproc) -r regression --filter-tags $*
-
-run-integration-%: $(filter integration/%,$(all)) | dep
-	@echo --- bats unit $*
-	@bats -j $(nproc) -r integration --filter-tags $*
-
-run-end-to-end-%: $(filter end-to-end/%,$(all)) | dep
-	@echo --- bats unit $*
-	@bats -r end-to-end --filter-tags $*
-
-$(all:.bats=): %: %.bats
-	@echo --- bats $*.bats
-	@bats -j $(nproc) -r $*.bats
-
-check-bats:
-ifndef found_bats
-ifdef found_apt
-	@echo "missing dependency: bats - install it using 'sudo apt install bats'"
-else
-	@echo "missing dependency: bats - install it using your method of choice"
-endif
-	@exit 1
-endif
-
-check-npm:
-ifndef found_npm
-ifdef found_apt
-	@echo "missing dependency: npm - install it using 'sudo apt install npm'"
-else
-	@echo "missing dependency: npm - install it using your method of choice"
-endif
-	@exit 1
-endif
-
-dep: dep-bats dep-docs dep-npm
-dep-bats: check-bats common/bats/assert common/bats/detik common/bats/file common/bats/mock common/bats/support
-dep-docs: common/docs
-dep-npm: check-npm node_modules
-
-common/bats/assert:
-	@echo --- git clone github.com/bats-core/bats-assert
-	@git clone --depth 1 https://github.com/bats-core/bats-assert.git common/bats/assert
-	@echo
-
-common/bats/detik:
-	@echo --- git clone github.com/bats-core/bats-detik
-	@git clone --depth 1 https://github.com/bats-core/bats-detik.git common/bats/detik
-	@echo
-
-common/bats/file:
-	@echo --- git clone github.com/bats-core/bats-file
-	@git clone --depth 1 https://github.com/bats-core/bats-file.git common/bats/file
-	@echo
-
-common/bats/mock:
-	@echo --- git clone github.com/grayhemp/bats-mock
-	@git clone --depth 1 https://github.com/grayhemp/bats-mock.git common/bats/mock
-	@echo
-
-common/bats/support:
-	@echo --- git clone github.com/bats-core/bats-support
-	@git clone --depth 1 https://github.com/bats-core/bats-support.git common/bats/support
-	@echo
-
-common/docs:
-	@echo --- git clone github.com/elastisys/compliantkubernetes
-	@git clone --depth 1 https://github.com/elastisys/compliantkubernetes.git common/docs
-	@echo
-
-node_modules:
-	@echo --- npm install
-	@npm install --save-dev
-	@echo
-
-gen: gen-template gen-cypress
-
-gen-cypress: $(cypress_gen)
-
-gen-template: $(template_gen)
-
-$(cypress_gen): %.gen.bats: %.cy.js common/gen.bash
-	@./common/gen.bash cypress tests/$<
-
-$(template_gen): %.gen.bats: %.bats.gotmpl common/gen.bash
-	@./common/gen.bash template tests/$<
-
-clean: clean-dep clean-gen
-
-clean-dep:
-	@echo rm common/bats
-	@rm -rf common/bats
-	@echo rm common/docs
-	@rm -rf common/docs
-	@echo rm node_modules
-	@rm -rf node_modules
-
-clean-gen:
-	@echo rm $(foreach dir, $(dirs), $(dir)/*.gen.bats)
-	@rm $(foreach dir, $(dirs), $(shell find $(dir) -type f -name *.gen.bats))
+list:
+	@echo $(patsubst $(tests)/%,%,$(targets)) | tr ' ' '\n'
+$(patsubst $(tests)/%,list-%,$(targets)): list-%:
+	@echo $(patsubst $(tests)/%,%,$(filter $(tests)/$*/%,$(suites))) | tr ' ' '\n'
+$(patsubst $(tests)/%,list-%,$(suites)): list-%:
+	@echo $(patsubst $(tests)/%,%,$(filter $(tests)/$*/%,$(files))) | tr ' ' '\n'
 
 build: build-main
-
 build-main build-unit: build-%:
-ifdef found_docker
-	docker build --build-arg=UID=$(uid) --build-arg=GID=$(gid) --file Dockerfile --target $* --tag $(container_image):$* ../
-else ifdef found_podman
-	podman build --build-arg=UID=$(uid) --build-arg=GID=$(gid) --file Dockerfile --target $* --tag $(container_image):$* ../
-else
-	@echo "error: no container engine found to build the tests image!" >&2 && exit 1
-endif
+	docker build --file Dockerfile --target $* --tag $(image):$* ../
 
-ctr-%:
-ifdef found_docker
-	docker run $(container_args) $(container_image):main make $*
-else ifdef found_podman
-	podman run --userns=keep-id $(container_args) $(container_image):main make $*
-else
-	@echo "error: no container engine found to run the tests image!" >&2 && exit 1
-endif
+clean:
+	@echo "--- clean"
+	@echo $(foreach target,$(targets),$(target)/*.gen.bats) | tr ' ' '\n'
+	@rm $(foreach target,$(targets),$(shell find $(target) -type f -name *.gen.bats))
 
-ctr-run-unit-%:
-ifdef found_docker
-	docker run $(container_args) $(container_image):unit make run-unit-$*
-else ifdef found_podman
-	podman run --userns=keep-id $(container_args) $(container_image):unit make run-unit-$*
-else
-	@echo "error: no container engine found to run the tests image!" >&2 && exit 1
-endif
+gen: gen-cypress gen-template
+gen-cypress: $(cypress_files:.cy.js=.gen.bats)
+gen-template: $(template_files:.bats.gotmpl=.gen.bats)
 
-print-%:
-	@echo $($*)
+$(cypress_files:.cy.js=.gen.bats): %.gen.bats: %.cy.js common/gen.bash
+	@$(tests)/common/gen.bash cypress
+$(template_files:.bats.gotmpl=.gen.bats): %.gen.bats: %.bats.gotmpl common/gen.bash
+	@$(tests)/common/gen.bash template
+
+$(foreach type,$(types),preflight-$(type)): preflight-%:
+	@$(tests)/common/exec.bash preflight $*
+
+run-all:
+	@FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true $(launcher) $(image):main make --no-print-directory -C tests container-all
+# run-<target/suite/file> wild card
+run-unit $(patsubst $(tests)/%,run-%,$(filter $(tests)/unit/%,$(suites) $(files))): run-%: preflight-unit
+	@$(launcher) $(image):unit make --no-print-directory -C tests container-$*
+run-regression $(patsubst $(tests)/%,run-%,$(filter $(tests)/regression/%,$(suites) $(files))): run-%: preflight-regression
+	@FORWARD_RUNTIME=true $(launcher) $(image):main make --no-print-directory -C tests container-$*
+run-integration $(patsubst $(tests)/%,run-%,$(filter $(tests)/integration/%,$(suites) $(files))): run-%: preflight-integration
+	@FORWARD_RUNTIME=true $(launcher) $(image):main make --no-print-directory -C tests container-$*
+run-end-to-end $(patsubst $(tests)/%,run-%,$(filter $(tests)/end-to-end/%,$(suites) $(files))): run-%: preflight-end-to-end
+	@FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true $(launcher) $(image):main make --no-print-directory -C tests container-$*
+
+container-all: container-unit container-regression container-integration container-end-to-end
+container-unit: $(patsubst $(tests)/%,container-%,$(filter $(tests)/unit/%,$(suites)))
+container-regression: $(patsubst $(tests)/%,container-%,$(filter $(tests)/regression/%,$(suites)))
+container-integration: $(patsubst $(tests)/%,container-%,$(filter $(tests)/integration/%,$(suites)))
+container-end-to-end: $(patsubst $(tests)/%,container-%,$(filter $(tests)/end-to-end/%,$(suites)))
+
+# container-<target/suite/file> wild card
+$(patsubst $(tests)/%,container-%,$(filter $(tests)/unit/%,$(suites) $(files))): container-%: $(filter $(tests)/unit/$(%)%,$(generated_files))
+	@echo "--- run $*"
+	@bats --tap -j $(nproc) -r "$(tests)/$*"
+$(patsubst $(tests)/%,container-%,$(filter $(tests)/regression/%,$(suites) $(files))): container-%: $(filter $(tests)/regression/$(%)%,$(generated_files))
+	@echo "--- run $*"
+	@bats  --tap --no-parallelize-across-files -j $(nproc) -r "$(tests)/$*"
+$(patsubst $(tests)/%,container-%,$(filter $(tests)/integration/%,$(suites) $(files))): container-%: $(filter $(tests)/integration/$(%)%,$(generated_files))
+	@echo "--- run $*"
+	@bats  --tap --no-parallelize-across-files -j $(nproc) -r "$(tests)/$*"
+$(patsubst $(tests)/%,container-%,$(filter $(tests)/end-to-end/%,$(suites) $(files))): container-%: $(filter $(tests)/end-to-end/$(%)%,$(generated_files))
+	@echo "--- run $*"
+	@bats  --tap -r "$(tests)/$*"
+
+enter-unit: preflight-unit
+	@$(launcher) $(image):unit bash
+enter-regression: preflight-regression
+	@FORWARD_RUNTIME=true $(launcher) $(image):main bash
+enter-integration: preflight-integration
+	@FORWARD_RUNTIME=true $(launcher) $(image):main bash
+enter-end-to-end: preflight-end-to-end
+	@FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true $(launcher) $(image):main bash
+
+$(patsubst $(tests)/%,setup-%,$(suites)): setup-%:
+	@$(tests)/common/exec.bash suite setup $*
+$(patsubst $(tests)/%,teardown-%,$(suites)): teardown-%:
+	@$(tests)/common/exec.bash suite teardown $*

@@ -1,0 +1,60 @@
+#!/usr/bin/env bats
+
+{{- define "template" -}}
+#!/usr/bin/env bats
+
+# Generated from {{ tmpl.Path }}
+
+# bats file_tags=static,bin:init,{{ .provider }}
+
+setup_file() {
+  load "../../bats.lib.bash"
+  load_common "env.bash"
+  load_common "gpg.bash"
+  load_common "yq.bash"
+
+  gpg.setup
+  env.setup
+
+  env.init {{ .provider }} {{ .installer }} {{ .flavor }}
+}
+
+setup() {
+  load "../../bats.lib.bash"
+  load_common "env.bash"
+  load_assert
+  load_file
+  load "../templates/bin-init.bash"
+
+  env.private
+}
+
+teardown() {
+  env.teardown
+}
+
+teardown_file() {
+  env.teardown
+  gpg.teardown
+}
+
+@test "init is successful - {{ .provider }}:{{ .installer }}:{{ .flavor }}" {
+  test_init_successful
+}
+
+@test "init is idempotent - {{ .provider }}:{{ .installer }}:{{ .flavor }}" {
+  test_init_idempotent
+}
+{{ end }}
+
+# These tests are generated into these files:
+{{- range $provider := coll.Slice "aws" "azure" "baremetal" "elastx" "openstack" "safespring" "upcloud" }}
+{{- range $installer := coll.Slice "capi" "kubespray" }}
+{{- range $flavor := coll.Slice "air-gapped" "dev" "prod" }}
+{{- $file := tmpl.Path | path.Dir }}
+{{- $file = printf "../%s/bin-init-%s-%s.gen.bats" $provider $installer $flavor | path.Join $file }}
+# - {{ $file }}
+{{- coll.Dict "provider" $provider "installer" $installer "flavor" $flavor | tmpl.Exec "template" | file.Write $file }}
+{{- end }}
+{{- end }}
+{{- end }}

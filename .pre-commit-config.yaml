@@ -39,13 +39,6 @@ repos:
           - --
         exclude: ^helmfile\.d/upstream/|^helmfile\.d/charts/grafana-dashboards/files/welcome.md$|^helmfile\.d/charts/opensearch/configurer/files/dashboards-resources/welcome.md$|^images/elasticsearch-curator/README.md|^docs/sbom.md
 
-  - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
-    rev: 2.7.3
-    hooks:
-      - id: editorconfig-checker
-        name: check indentation
-        exclude: ^helmfile\.d/upstream/|^helmfile\.d/charts/grafana-dashboards/dashboards/|^LICENSE$|^tests/.*/resources/
-
   - repo: https://github.com/codespell-project/codespell
     rev: v2.2.6
     hooks:

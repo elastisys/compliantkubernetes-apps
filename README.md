@@ -1,8 +1,6 @@
 # Elastisys Compliant Kubernetes Apps
 
-## Build status
-
-![End-to-end tests](https://github.com/elastisys/compliantkubernetes-apps/actions/workflows/end-to-end.yml/badge.svg)
+[![tests](https://github.com/elastisys/compliantkubernetes-apps/actions/workflows/tests.yml/badge.svg)](https://github.com/elastisys/compliantkubernetes-apps/actions/workflows/tests.yml)
 
 ## Overview
 

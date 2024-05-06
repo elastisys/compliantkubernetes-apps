@@ -1,0 +1,45 @@
+#!/usr/bin/env bats
+
+# These tests are generated into these files:
+# - tests/unit/aws/validate-capi-air-gapped.gen.bats
+# - tests/unit/aws/validate-capi-dev.gen.bats
+# - tests/unit/aws/validate-capi-prod.gen.bats
+# - tests/unit/aws/validate-kubespray-air-gapped.gen.bats
+# - tests/unit/aws/validate-kubespray-dev.gen.bats
+# - tests/unit/aws/validate-kubespray-prod.gen.bats
+# - tests/unit/azure/validate-capi-air-gapped.gen.bats
+# - tests/unit/azure/validate-capi-dev.gen.bats
+# - tests/unit/azure/validate-capi-prod.gen.bats
+# - tests/unit/azure/validate-kubespray-air-gapped.gen.bats
+# - tests/unit/azure/validate-kubespray-dev.gen.bats
+# - tests/unit/azure/validate-kubespray-prod.gen.bats
+# - tests/unit/baremetal/validate-capi-air-gapped.gen.bats
+# - tests/unit/baremetal/validate-capi-dev.gen.bats
+# - tests/unit/baremetal/validate-capi-prod.gen.bats
+# - tests/unit/baremetal/validate-kubespray-air-gapped.gen.bats
+# - tests/unit/baremetal/validate-kubespray-dev.gen.bats
+# - tests/unit/baremetal/validate-kubespray-prod.gen.bats
+# - tests/unit/elastx/validate-capi-air-gapped.gen.bats
+# - tests/unit/elastx/validate-capi-dev.gen.bats
+# - tests/unit/elastx/validate-capi-prod.gen.bats
+# - tests/unit/elastx/validate-kubespray-air-gapped.gen.bats
+# - tests/unit/elastx/validate-kubespray-dev.gen.bats
+# - tests/unit/elastx/validate-kubespray-prod.gen.bats
+# - tests/unit/openstack/validate-capi-air-gapped.gen.bats
+# - tests/unit/openstack/validate-capi-dev.gen.bats
+# - tests/unit/openstack/validate-capi-prod.gen.bats
+# - tests/unit/openstack/validate-kubespray-air-gapped.gen.bats
+# - tests/unit/openstack/validate-kubespray-dev.gen.bats
+# - tests/unit/openstack/validate-kubespray-prod.gen.bats
+# - tests/unit/safespring/validate-capi-air-gapped.gen.bats
+# - tests/unit/safespring/validate-capi-dev.gen.bats
+# - tests/unit/safespring/validate-capi-prod.gen.bats
+# - tests/unit/safespring/validate-kubespray-air-gapped.gen.bats
+# - tests/unit/safespring/validate-kubespray-dev.gen.bats
+# - tests/unit/safespring/validate-kubespray-prod.gen.bats
+# - tests/unit/upcloud/validate-capi-air-gapped.gen.bats
+# - tests/unit/upcloud/validate-capi-dev.gen.bats
+# - tests/unit/upcloud/validate-capi-prod.gen.bats
+# - tests/unit/upcloud/validate-kubespray-air-gapped.gen.bats
+# - tests/unit/upcloud/validate-kubespray-dev.gen.bats
+# - tests/unit/upcloud/validate-kubespray-prod.gen.bats

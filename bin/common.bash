@@ -17,6 +17,7 @@ mapfile -t ck8s_flavors < <(find "${root_path}/config/flavors" -mindepth 1 -maxd
 
 # shellcheck disable=SC2034
 mapfile -t ck8s_k8s_installers < <(find "${root_path}/config/k8s-installers" -mindepth 1 -maxdepth 1 -type d -printf '%f\n')
+ck8s_k8s_installers+=( "none" )
 
 CK8S_AUTO_APPROVE=${CK8S_AUTO_APPROVE:-"false"}
 

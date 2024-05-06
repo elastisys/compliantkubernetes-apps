@@ -1,0 +1,45 @@
+#!/usr/bin/env bats
+
+# These tests are generated into these files:
+# - tests/unit/aws/bin-init-capi-air-gapped.gen.bats
+# - tests/unit/aws/bin-init-capi-dev.gen.bats
+# - tests/unit/aws/bin-init-capi-prod.gen.bats
+# - tests/unit/aws/bin-init-kubespray-air-gapped.gen.bats
+# - tests/unit/aws/bin-init-kubespray-dev.gen.bats
+# - tests/unit/aws/bin-init-kubespray-prod.gen.bats
+# - tests/unit/azure/bin-init-capi-air-gapped.gen.bats
+# - tests/unit/azure/bin-init-capi-dev.gen.bats
+# - tests/unit/azure/bin-init-capi-prod.gen.bats
+# - tests/unit/azure/bin-init-kubespray-air-gapped.gen.bats
+# - tests/unit/azure/bin-init-kubespray-dev.gen.bats
+# - tests/unit/azure/bin-init-kubespray-prod.gen.bats
+# - tests/unit/baremetal/bin-init-capi-air-gapped.gen.bats
+# - tests/unit/baremetal/bin-init-capi-dev.gen.bats
+# - tests/unit/baremetal/bin-init-capi-prod.gen.bats
+# - tests/unit/baremetal/bin-init-kubespray-air-gapped.gen.bats
+# - tests/unit/baremetal/bin-init-kubespray-dev.gen.bats
+# - tests/unit/baremetal/bin-init-kubespray-prod.gen.bats
+# - tests/unit/elastx/bin-init-capi-air-gapped.gen.bats
+# - tests/unit/elastx/bin-init-capi-dev.gen.bats
+# - tests/unit/elastx/bin-init-capi-prod.gen.bats
+# - tests/unit/elastx/bin-init-kubespray-air-gapped.gen.bats
+# - tests/unit/elastx/bin-init-kubespray-dev.gen.bats
+# - tests/unit/elastx/bin-init-kubespray-prod.gen.bats
+# - tests/unit/openstack/bin-init-capi-air-gapped.gen.bats
+# - tests/unit/openstack/bin-init-capi-dev.gen.bats
+# - tests/unit/openstack/bin-init-capi-prod.gen.bats
+# - tests/unit/openstack/bin-init-kubespray-air-gapped.gen.bats
+# - tests/unit/openstack/bin-init-kubespray-dev.gen.bats
+# - tests/unit/openstack/bin-init-kubespray-prod.gen.bats
+# - tests/unit/safespring/bin-init-capi-air-gapped.gen.bats
+# - tests/unit/safespring/bin-init-capi-dev.gen.bats
+# - tests/unit/safespring/bin-init-capi-prod.gen.bats
+# - tests/unit/safespring/bin-init-kubespray-air-gapped.gen.bats
+# - tests/unit/safespring/bin-init-kubespray-dev.gen.bats
+# - tests/unit/safespring/bin-init-kubespray-prod.gen.bats
+# - tests/unit/upcloud/bin-init-capi-air-gapped.gen.bats
+# - tests/unit/upcloud/bin-init-capi-dev.gen.bats
+# - tests/unit/upcloud/bin-init-capi-prod.gen.bats
+# - tests/unit/upcloud/bin-init-kubespray-air-gapped.gen.bats
+# - tests/unit/upcloud/bin-init-kubespray-dev.gen.bats
+# - tests/unit/upcloud/bin-init-kubespray-prod.gen.bats

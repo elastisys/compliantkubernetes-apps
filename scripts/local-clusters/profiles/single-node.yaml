@@ -10,16 +10,6 @@ nodes:
   - role: control-plane
   - role: worker
     extraPortMappings:
-      # Expose local resolve
-      - containerPort: 30053
-        hostPort: 53
-        listenAddress: 127.0.64.43
-        protocol: UDP
-      - containerPort: 30053
-        hostPort: 53
-        listenAddress: 127.0.64.43
-        protocol: TCP
-      # Expose local ingress
       - containerPort: 30080
         hostPort: 80
         listenAddress: 127.0.64.43

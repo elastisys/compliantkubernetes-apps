@@ -1146,8 +1146,9 @@ properties:
       ck8sK8sInstaller:
         type: string
         enum:
-          - kubespray
           - capi
+          - kubespray
+          - none
       baseDomain:
         title: Base Domain
         description: |-

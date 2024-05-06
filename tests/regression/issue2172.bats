@@ -2,16 +2,21 @@
 
 # bats file_tags=regression,bin:init
 
-setup() {
-  load "../common/lib"
-  load "../common/lib/env"
+setup_file() {
+  load "../bats.lib.bash"
+  load_common "env.bash"
+  load_common "gpg.bash"
+  load_common "yq.bash"
+
   env.setup
-  env.init "dev" "baremetal"
-  common_setup
+  gpg.setup
+
+  env.init baremetal kubespray prod
 }
 
-teardown() {
+teardown_file() {
   env.teardown
+  gpg.teardown
 }
 
 @test "issue 2172 has not regressed" {

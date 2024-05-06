@@ -1,7 +1,11 @@
 # Apps Tests
 
-The test suite is implemented using [`bats`](https://github.com/bats-core/bats-core) and [`cypress`](https://github.com/cypress-io/cypress), with unit, regression, integration, and end-to-end tests under their own respective directory.
-Tests implemented with `cypress` can and will be integrated into the `bats` test suite using generators.
+The test harness is implemented using [`bats`](https://github.com/bats-core/bats-core) and [`cypress`](https://github.com/cypress-io/cypress), with unit, regression, integration, and end-to-end _test targets_ each under their own respective directory.
+Furthermore each test target is composed of one or more _test suites_ each under their own directory container one or more _test files_.
+
+Plain `bats` tests are generated from `cypress` tests to integrate them into the rest of the test harness, additionally plain `bats` tests are generated from `gotmpl` tests to provide parametric tests.
+
+The test harness is implemented to be run in a container using either rootful `docker` or rootless `podman`.
 
 ## Usage
 
@@ -9,85 +13,69 @@ Tests implemented with `cypress` can and will be integrated into the `bats` test
 > All instructions assume that you are standing in the `tests/` directory.
 
 > [!warning]
-> Known issue that tests requiring use of `docker` or `podman` cannot run within the test container.
+> Do not use `docker` or `podman` directly from tests, as they take differing arguments and may depend on variables present on the host not available within the tests container.
+> Instead use tools like `buildah` for building and pushing or `skopeo` for syncing and pulling.
 >
-> Additionally tests running in the test container might hang on interrupts, requiring the container to be killed.
+> Additionally tests running in the test container might hang when interrupted, this might be due to long running teardown tasks, however should it hang for more then a few minutes the container needs to be killed manually.
 
-The tests differentiate between static and dynamic tests, all static tests can be run without setting up an environment, and all dynamic tests requires an environment to test.
-Static tests are tagged with `static`.
-
-The `tests / unit-static` workflow on GitHub is invoked with the following commands:
+The `tests / unit` workflow on GitHub is invoked with the following commands:
 
 ```bash
+# build and run
 make build-unit
-make ctr-run-unit-static
+make run-unit
+```
+
+The `tests / integration` workflow on GitHub is invoked with the following commands:
+
+```bash
+# prepare local cache and local resolve:
+../scripts/local-cluster.sh cache create
+../scripts/local-cluster.sh resolve create integration.dev-ck8s.com
+# build and run
+make build-main
+make run-integration
 ```
 
 ### Usage with Makefile
 
 > [!note]
-> You can also use `make build`, then `make ctr-<command>` to run each command in a container, skip `make ctr-dep` as they are integrated into the image.
-> You must rebuild the image for it to contain your changes.
->
-> If you get errors from `bats` about tags then you `bats` version is to old, either update or run in the container.
->
-> If you get warnings from `docker` about that the "legacy builder is deprecated" then you need to setup [`buildx`](https://docs.docker.com/go/buildx) on your system.
->
 > The container might struggle to prompt for kube-login and gpg-agent, but if those are activated before by accessing the clusters and using gpg then the session can be reused.
+> This is applicable for regression, integration, and end-to-end tests.
 
-You must have `bats`, `make` and `npm` installed
-
-```bash
-# For deb based distributions
-sudo apt install bats make npm
-```
-
-Supporting libraries including `cypress` are fetched automatically as a dependency or with:
-
-```bash
-make dep
-```
-
-Certain test suites are generated automatically as a dependency or with:
-
-```bash
-make gen
-```
+You must have `make` and either rootful `docker` or rootless `podman` installed!
+Check the [DEVELOPMENT](../DEVELOPMENT.md) docs additional requirements to run local-clusters for integration and regression tests.
 
 Run all tests:
 
 ```bash
-make
+make run-all
 ```
 
 Run selected tests:
 
 ```bash
-make run-<unit|regression|integration|end-to-end>
+make run-<target>                # list targets with make list
+make run-<target>/<suite>        # list targets with make list-<target>
+make run-<target>/<suite>/<file> # list targets with make list-<target>/<suite>
 ```
 
-Additionally tests can be filtered via tags using the `-<tags,...>` suffix to the `run-<target>` command.
-
-Run individual tests:
-
-```bash
-make <file/path> # without trailing .bats, for generated files use the .gen ending
-```
-
-Clean up:
+Normally plain bats tests are generated for cypress and template tests as a prerequisite before running them.
+If cypress and template tests are not being updated and run via bats as expected then you can force a clean up and regeneration of them:
 
 ```bash
-# remove dependencies and generated files
 make clean
-
-# remove dependencies
-make clean-dep
-
-# remove generated files
-make clean-gen
+make gen
 ```
 
-### Usage with `bats`
+### Direct usage with `bats` or `cypress`
+
+Direct usage is possible by entering the tests container:
+
+```bash
+make enter-<unit|regression|integration|end-to-end>
+cd tests/
+```
 
 The plain `bats` test suite can be manually run by simply running `bats` and listing the target directories or files.
 
@@ -98,30 +86,42 @@ bats -r .
 bats -r <unit|regression|integration|end-to-end>
 # files
 bats <path/to/file.bats>
+# to filter on tags add the argument --filter-tags <tags,...>
 ```
 
-Additionally tests can be filtered via tags using the `--filter-tags <tags,...>` argument.
+> [!important]
+> When running `cypress` tests as described below there will be no automatic setup or teardown done if defined by the test suite.
+>
+> This can be manually done and will generate environment variables that must be sourced before running any tests:
+>
+> ```bash
+> make setup-<target>/<suite>
+>
+> set -a; source suite.env; set +a
+>
+> # commands running cypress tests...
+>
+> make teardown-<target>/<suite>
+> ```
 
-### Usage with `cypress`
-
-The plain `cypress` test suite can be manually run as follows:
+The `cypress` tests can also be manually run directly through `cypress`:
 
 ```bash
 # all
-npx cypress run
+cypress run
 # dirs
-npx cypress run --spec <unit|regression|integration|end-to-end>
+cypress run --spec <unit|regression|integration|end-to-end>
 # files
-npx cypress run --spec <path/to/file.cy.js>
+cypress run --spec <path/to/file.cy.js>
 ```
 
 It can be useful to open `cypress` as it will give you a view of how the tests execute, helping in the development and review process:
 
 ```bash
-npx cypress open
+cypress open
 ```
 
-Then it will auto-reload and auto-execute as tests are updated, use `it.only` instead of `it` to run only selected tests.
+It will auto-reload and auto-execute as tests are updated, use `it.only` instead of `it` to run only selected tests.
 
 ## Writing
 
@@ -136,14 +136,25 @@ The following template should be used for each file:
 #!/usr/bin/env bats
 
 setup() {
-  # $repo-root/tests/common/lib
-  load "../common/lib"
+  load "../../bats.lib.bash"
 
-  common_setup
+  # additional loads for helpers
+  # check the bats.lib.bash for load functions, and common/bats/ for helpers
 }
 ```
 
-One can define `setup_file` and `teardown_file` functions to run things before and after the file is executed, as well as `setup` and `teardown` functions to run things before and after each test is executed.
+One can define setup / teardown functions for each test suite, each test file, and each test.
+For each test suite create a `setup_suite.bash` file in that suite and implement the functions `setup_suite` / `teardown_suite`.
+For each test file implement the functions `setup_file` / `teardown_suite`.
+For each test implement the functions `setup` / `teardown`.
+
+Exported environment variables will have the following scope:
+
+- ( `setup_suite` ( `setup_file` ( `setup` ( `@test` ) `teardown` ) `teardown_file` ) `teardown_suite` ).
+
+Sourced functions will have the following scope:
+
+- ( `setup_suite`, `teardown_suite` ), ( `setup_file`, `teardown_file` ), ( `setup` ( `@test` ) `teardown` ).
 
 The following template can be used to define tests, except for the test definition itself all syntax is regular bash syntax:
 
@@ -153,14 +164,12 @@ The following template can be used to define tests, except for the test definiti
 }
 ```
 
-We currently import [`bats-assert`](https://github.com/bats-core/bats-assert), [`bats-detik`](https://github.com/bats-core/bats-detik), [`bats-support`](https://github.com/bats-core/bats-support), as well as our own [`common/lib.bash`](common/lib.bash).
-
 ### Writing cypress tests
 
 Cypress have an extensive [documentation](https://docs.cypress.io) for writing tests.
 We currently import our own [`cypress.support.js`](cypress.support.js) support file that provide helper functions available using the `cy` object from within tests.
 
-The makefile will generate bats files to run the cypress to integrate it into the same test suite.
+The makefile will generate bats files to run the cypress to integrate both into the same test harness.
 
 ### Writing template tests
 
@@ -168,7 +177,7 @@ Since bats lacks parametric tests we employ a generator to work with go-template
 
 The templates themselves are evaluated without any external values and are discovered using the file ending `.bats.gotmpl` and generated to the file ending `.gen.bats`.
 
-It is possible to template one test suite into multiple files, see the `unit/bin/init/` or `unit/validate/` for reference.
+It is possible to template one test suite into multiple files, see the `unit/templates/` for reference.
 
 ### Writing resource tests
 
@@ -178,7 +187,8 @@ To regenerate these resources export `CK8S_TESTS_REGENERATE_RESOURCES="true"` an
 
 ```bash
 export CK8S_TESTS_REGENERATE_RESOURCES="true"
-make run-unit-static,resources
+make enter-<target>
+bats <file> --filter-tags resources
 ```
 
 When writing tests that uses resources that may change ensure that the tests can regenerate their resources when this variable is set.

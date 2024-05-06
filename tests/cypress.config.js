@@ -16,4 +16,6 @@ module.exports = defineConfig({
     supportFile: "cypress.support.js",
     defaultCommandTimeout: 10000,
   },
+  experimentalMemoryManagement: true,
+  numTestsKeptInMemory: 1
 });

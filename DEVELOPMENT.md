@@ -35,7 +35,7 @@ This requires that `kind` is installed and that either `podman` or `docker` is a
 > To setup two independent clusters the following must be changed manually:
 >
 > 1. the kind-config/local-cluster-profile must not bind the ingress controller to the same address, and
-> 1. the node-local-dns config must be updated to point towards the correct clusters.
+> 1. the node-local-dns/local-resolve config must be updated to point towards the correct clusters.
 
 > [!tip]
 > Since local clusters are effectively ephemeral they can pull a lot of images and `kind` has no build in system to manage images.
@@ -81,28 +81,14 @@ helmfile -e workload_cluster <operation> --selector app=<application> --include-
 Use `helmfile -e <service|workload>_cluster list` to list all releases and to view their labels.
 By default all releases have `name=<release-name>` and `chart=<chart-name>` as predefined labels.
 
-Enabling ingress and resolve requires a special setup for `ingress-nginx` and `node-local-dns` respectively.
-Both will by default be port-mapped on the local address `127.0.64.43` and once both are running you need to change your computer's network settings to use this address as the DNS resolver, then you can access service endpoints using the configured domain.
+Enabling ingress and resolve requires a special setup.
+The ingress will by default be port-mapped on the local address `127.0.64.43`.
+The local clusters script provide commands to create and delete a local DNS server to resolve any domain on and to the same `127.0.64.43` local address.
+Commands to do so is `./scripts/local-cluster.sh resolve <create|delete> <domain>`, matching the base domain of the cluster.
+Note that this will make a temporary override of your current DNS server, and you may need to rerun it if you network settings are reset.
 
-Both are already pre-configured by `scripts/local-cluster.sh` and can be deployed by using:
-
-```sh
-helmfile -e <service|workload>_cluster -lapp=ingress-nginx -lapp=node-local-dns apply --include-transitive-needs
-```
-
-> [!important]
-> To use `podman` with their `aardvark` DNS resolver you must edit the CoreDNS ConfigMap to prefer UDP:
->
-> ```diff
-> $ kubectl --namespace edit configmap coredns
->
->   forward . ./etc/resolv.conf {
->     max_concurrent 1000
-> +   prefer_udp
->   }
->
-> $ kubectl --namespace rollout restart deployment coredns
-> ```
+> [!note]
+> To use `podman` with their `aardvark` DNS resolver the CoreDNS ConfigMap must be patched to prefer UDP, this is done automatically, but should DNS resolution fail you may need to check its config.
 
 > [!important]
 > To use certificates from Let's Encrypt you must enable [DNS-01 challenges in `cert-manager`](https://cert-manager.io/docs/configuration/acme/dns01/).
