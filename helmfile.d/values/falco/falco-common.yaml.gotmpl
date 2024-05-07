@@ -109,34 +109,37 @@ customRules:
       items: [
         docker.io/elastisys/curl-jq,
         docker.io/jaegertracing/jaeger-operator,
+        docker.io/kiwigrid/k8s-sidecar,
         docker.io/library/rabbitmq,
         docker.io/openpolicyagent/gatekeeper,
+        docker.io/openpolicyagent/gatekeeper-crds,
         docker.io/rabbitmqoperator/cluster-operator,
         docker.io/velero/velero,
         gcr.io/k8s-staging-multitenancy/hnc-manager,
+        gcr.io/tekton-releases/github.com/tektoncd/dashboard/cmd/dashboard,
+        gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/controller,
+        gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/resolvers,
+        gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/webhook,
+        ghcr.io/aquasecurity/node-collector,
         ghcr.io/aquasecurity/trivy-operator,
+        ghcr.io/dexidp/dex,
         ghcr.io/elastisys/argocd-managed-namespaces-manager,
         ghcr.io/elastisys/fluentd,
         ghcr.io/elastisys/logical-backup,
-        ghcr.io/zalando/spilo-15,
         ghcr.io/elastisys/spilo-15,
+        ghcr.io/kiwigrid/k8s-sidecar,
+        ghcr.io/kubereboot/kured,
+        ghcr.io/zalando/spilo-15,
         quay.io/argoproj/argocd,
         quay.io/calico/node,
         quay.io/jetstack/cert-manager-controller,
         quay.io/jetstack/cert-manager-webhook,
         quay.io/kiwigrid/k8s-sidecar,
+        quay.io/metallb/controller,
         quay.io/prometheus/prometheus,
         registry.k8s.io/ingress-nginx/controller-chroot,
         registry.k8s.io/ingress-nginx/controller,
-        quay.io/metallb/controller,
-        registry.k8s.io/kube-state-metrics/kube-state-metrics,
-        gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/webhook,
-        gcr.io/tekton-releases/github.com/tektoncd/dashboard/cmd/dashboard,
-        gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/controller,
-        gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/resolvers,
-        ghcr.io/kubereboot/kured,
-        ghcr.io/dexidp/dex,
-        ghcr.io/aquasecurity/node-collector
+        registry.k8s.io/kube-state-metrics/kube-state-metrics
         ]
 
     # Contact K8S API Server From Container
@@ -148,6 +151,8 @@ customRules:
           proc.cmdline = "kubectl get rolebindings --all-namespaces -o json"
         ) or (
           proc.cmdline startswith "kubectl patch secret -n argocd-system argocd-manager-config -p"
+        ) or (
+          proc.cmdline glob "kubectl get crd *.constraints.gatekeeper.sh -o jsonpath={.status.conditions[?(@.type=="Established")].status}"
         )
 
     # Run shell untrusted
@@ -156,7 +161,7 @@ customRules:
 
     # Read sensitive file trusted after startup
     - macro: user_known_read_sensitive_files_activities
-      condition: ( container.image.repository = ghcr.io/zalando/spilo-15 )
+      condition: ( container.image.repository in (ghcr.io/elastisys/spilo-15, ghcr.io/zalando/spilo-15) )
 
     # Redirect STDOUT/STDIN to Network Connection in Container
     - macro: user_known_stand_streams_redirect_activities
