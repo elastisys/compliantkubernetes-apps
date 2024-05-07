@@ -25,5 +25,5 @@ spec:
         - operator
   parameters:
     min_replicas: 2
-    label: ignoreMinimumReplicas
+    annotation: elastisys.io/ignore-minimum-replicas
 {{- end }}
