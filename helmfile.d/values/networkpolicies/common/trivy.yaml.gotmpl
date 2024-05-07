@@ -6,6 +6,8 @@ policies:
         app.kubernetes.io/name: trivy-operator
       egress:
         - rule: egress-rule-apiserver
+        - rule: egress-rule-dns
+        - rule: egress-rule-trivy
       ingress:
         - rule: ingress-rule-prometheus
           ports:

@@ -923,6 +923,8 @@ trivy:
   # configurations for an offline / air-gapped environment
   # ref: https://github.com/aquasecurity/trivy-operator/tree/main/deploy/helm#values
   scanner:
+    resources: {}
+    timeout: ""
     offlineScanEnabled: false
     dbRegistry: ""
     dbRepository: ""
