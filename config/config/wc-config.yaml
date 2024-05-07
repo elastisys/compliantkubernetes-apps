@@ -300,6 +300,15 @@ networkPolicies:
   alertmanager:
     enabled: true
 
+  prometheus:
+    # This feature can be enabled to create Network Policies that allow internal traffic to Prometheus.
+    # Access is granted to:
+    # Pods with the label `elastisys.io/prometheus-access: allow` that belong to a namespace from a configurable list of namespaces
+    internalAccess:
+      enabled: false
+      # A list of namespaces from which to allow traffic from pods that have the required label.
+      namespaces: []
+
 ## Open Policy Agent Gatekeeper configuration
 gatekeeper:
   allowUserCRDs:

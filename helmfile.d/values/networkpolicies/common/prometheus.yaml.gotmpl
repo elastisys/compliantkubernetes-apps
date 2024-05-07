@@ -33,6 +33,18 @@ policies:
         - rule: ingress-rule-apiserver
           ports:
             - tcp: 9090
+        {{- if and .Values.networkPolicies.prometheus.internalAccess.enabled .Values.networkPolicies.prometheus.internalAccess.namespaces }}
+        - name: ingress-rule-internal-prometheus
+          peers:
+            {{- range $namespace := .Values.networkPolicies.prometheus.internalAccess.namespaces }}
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: {{ $namespace }}
+              podSelectorLabels:
+                elastisys.io/prometheus-access: allow
+            {{- end }}
+          ports:
+            - tcp: 9090
+        {{- end }}
         {{- end }}
         - rule: ingress-rule-blackbox
           ports:
