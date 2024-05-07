@@ -42,8 +42,8 @@ function check_wc_hnc_creation_removal() {
     no_error=true
     debug_msg=""
 
-    user_namespaces=$(yq4 -e '.user.namespaces[]' "${config['config_file_wc']}")
-    user_admin_users=$(yq4 -e '.user.adminUsers[]' "${config['config_file_wc']}")
+    mapfile -t user_namespaces < <(yq4 -e '.user.namespaces[]' "${config['config_file_wc']}")
+    mapfile -t user_admin_users < <(yq4 -e '.user.adminUsers[]' "${config['config_file_wc']}")
 
     VERBS=(
         create
@@ -63,23 +63,23 @@ function check_wc_hnc_creation_removal() {
         velero
     )
 
-    for user in ${user_admin_users}; do
-        for namespace in ${user_namespaces}; do
+    for user in "${user_admin_users[@]}"; do
+        for namespace in "${user_namespaces[@]}"; do
             for verb in "${VERBS[@]}"; do
-                if ! kubectl auth can-i "$verb" "subns" -n "$namespace" --as "$user" >/dev/null 2>&1; then
+                if ! kubectl auth can-i "${verb}" "subns" -n "${namespace}" --as "${user}" >/dev/null 2>&1; then
                     no_error=false
-                    debug_msg+="[ERROR] $user cannot $verb sub namespace under $namespace namespace\n"
+                    debug_msg+="[ERROR] ${user} cannot ${verb} sub namespace under ${namespace} namespace\n"
                 fi
             done
         done
     done
 
-    for user in ${user_admin_users}; do
+    for user in "${user_admin_users[@]}"; do
         for namespace in "${CK8S_NAMESPACES[@]}"; do
             for verb in "${VERBS[@]}"; do
-                if kubectl auth can-i "$verb" "subns" -n "$namespace" --as "$user" >/dev/null 2>&1; then
+                if kubectl auth can-i "${verb}" "subns" -n "${namespace}" --as "${user}" >/dev/null 2>&1; then
                     no_error=false
-                    debug_msg+="[ERROR] $user can $verb subnamespace anchors under $namespace namespace\n"
+                    debug_msg+="[ERROR] ${user} can ${verb} subnamespace anchors under ${namespace} namespace\n"
                 fi
             done
         done
@@ -90,7 +90,7 @@ function check_wc_hnc_creation_removal() {
         echo -e "[DEBUG] Users are able to create/delete subnamespaces anchors"
     else
         echo "failure ❌"
-        echo -e "$debug_msg"
+        echo -e "${debug_msg}"
     fi
 }
 
@@ -110,10 +110,10 @@ function check_wc_hnc_system_namespaces() {
     )
 
     for namespace in "${CK8S_NAMESPACES[@]}"; do
-        hnc_label_exists=$(kubectl get ns "$namespace" -ojson | jq -r '.metadata.labels | .["hnc.x-k8s.io/included-namespace"]')
-        if [[ "$hnc_label_exists" == "true" ]]; then
+        hnc_label_exists=$(kubectl get ns "${namespace}" -ojson | jq -r '.metadata.labels | .["hnc.x-k8s.io/included-namespace"]')
+        if [[ "${hnc_label_exists}" == "true" ]]; then
             no_error=false
-            debug_msg+="[ERROR] The $namespace namespace is labelled by HNC\n"
+            debug_msg+="[ERROR] The ${namespace} namespace is labelled by HNC\n"
         fi
     done
 
@@ -122,6 +122,6 @@ function check_wc_hnc_system_namespaces() {
         echo -e "[DEBUG] No system namespace is labelled by HNC"
     else
         echo "failure ❌"
-        echo -e "$debug_msg"
+        echo -e "${debug_msg}"
     fi
 }
