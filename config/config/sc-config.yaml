@@ -199,8 +199,8 @@ harbor:
                     - core
             topologyKey: "kubernetes.io/hostname"
   database:
-  # if external database is used, set "type" to "external"
-  # and fill the connection information in "external" section
+    # if external database is used, set "type" to "external"
+    # and fill the connection information in "external" section
     type: internal
     internal:
       persistentVolumeClaim:
@@ -223,22 +223,13 @@ harbor:
                     values:
                       - database
               topologyKey: "kubernetes.io/hostname"
-  #external:
-  #  host: "set-me"
-  #  port: "5432"
-  #  username: "set-me"
-  #  password: "set-me"
-  #  coreDatabase: "registry"
-  #  # if using existing secret, the key must be "password"
-  #  existingSecret: ""
-  #  # "disable" - No SSL
-  #  # "require" - Always SSL (skip verification)
-  #  # "verify-ca" - Always SSL (verify that the certificate presented by the
-  #  # server was signed by a trusted CA)
-  #  # "verify-full" - Always SSL (verify that the certification presented by the
-  #  # server was signed by a trusted CA and the server host name matches the one
-  #  # in the certificate)
-  #  sslmode: "disable"
+    #external:
+    #  host: "set-me"
+    #  port: "5432"
+    #  username: "set-me"
+    #  password: "set-me"
+    #  coreDatabase: "registry"
+    #  sslmode: "disable"
   exporter:
     resources:
       requests:
