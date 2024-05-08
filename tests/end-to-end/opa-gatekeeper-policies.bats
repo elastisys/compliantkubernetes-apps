@@ -1,6 +1,8 @@
 #!/usr/bin/env bats
 
 # Tests opa gatekeeper policies
+#
+# bats file_tags=opa
 
 setup_file() {
   load "../common/lib"

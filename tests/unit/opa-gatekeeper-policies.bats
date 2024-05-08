@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-# bats file_tags=static,general
+# bats file_tags=static,general,opa
 
 setup() {
   load "../common/lib"
