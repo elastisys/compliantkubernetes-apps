@@ -98,6 +98,7 @@ data:
         errors {
           {{ .Values.errorConfig }}
         }
+        template ANY AAAA { rcode NOERROR }
         cache 30
         reload
         loop
