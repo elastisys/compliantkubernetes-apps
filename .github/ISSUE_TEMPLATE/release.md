@@ -88,7 +88,7 @@ assignees: ""
 - [ ] Can delegate admin access
 
   ```console
-  $ kubectl -n "${NAMESPACE}" edit rolebinding extra-workload-admins
+  $ kubectl -n "${PARENT_NAMESPACE}" edit rolebinding extra-workload-admins
     # Add some subject
     subjects:
       # You can specify more than one "subject"
@@ -276,7 +276,7 @@ assignees: ""
 - [ ] With valid values, try to deploy, should succeed
 
   ```bash
-  helm -n "${NAMESPACE}" upgrade --atomic --install "${PUBLIC_DOCS_PATH}/user-demo/deploy/ck8s-user-demo" \
+  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/ck8s-user-demo" \
       --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/ck8s-user-demo" \
       --set image.tag="${TAG}" \
       --set ingress.hostname="demoapp.${DOMAIN}"
