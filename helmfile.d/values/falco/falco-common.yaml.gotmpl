@@ -13,13 +13,13 @@ falco:
     enabled: true
 
   rules_file:
-    {{- if eq .Values.falco.rulesFiles.default.enabled true }}
+    {{- if .Values.falco.rulesFiles.default.enabled }}
     - /etc/falco/falco_rules.yaml
     {{end}}
-    {{- if eq .Values.falco.rulesFiles.incubating.enabled true }}
+    {{- if .Values.falco.rulesFiles.incubating.enabled }}
     - /etc/falco/falco-incubating_rules.yaml
     {{end}}
-    {{- if eq .Values.falco.rulesFiles.sandbox.enabled true }}
+    {{- if .Values.falco.rulesFiles.sandbox.enabled }}
     - /etc/falco/falco-sandbox_rules.yaml
     {{end}}
     - /etc/falco/falco_rules.local.yaml
@@ -74,13 +74,13 @@ falcoctl:
     artifact:
       install:
         refs:
-          {{- if eq .Values.falco.rulesFiles.default.enabled true }}
+          {{- if .Values.falco.rulesFiles.default.enabled }}
           - falco-rules:{{.Values.falco.rulesFiles.default.version}}
           {{end}}
-          {{- if eq .Values.falco.rulesFiles.incubating.enabled true }}
+          {{- if .Values.falco.rulesFiles.incubating.enabled }}
           - falco-incubating-rules:{{.Values.falco.rulesFiles.incubating.version}}
           {{end}}
-          {{- if eq .Values.falco.rulesFiles.sandbox.enabled true }}
+          {{- if .Values.falco.rulesFiles.sandbox.enabled }}
           - falco-sandbox-rules:{{.Values.falco.rulesFiles.sandbox.version}}
           {{end}}
     {{- with .Values.falco.customIndexes }}
@@ -92,7 +92,7 @@ customRules:
     {{ toYaml .Values.falco.customRules | nindent 2}}
   {{- end }}
   overwrites.yaml: |-
-    {{- if eq  .Values.falco.rulesFiles.default.enabled true }}
+    {{- if .Values.falco.rulesFiles.default.enabled }}
     # This will be added in a later falco rules version as well
     # The fix was added upstream here (with a new condition): https://github.com/falcosecurity/rules/pull/177
     - macro: allowed_clear_log_files
@@ -169,9 +169,18 @@ customRules:
           (container.image.repository = quay.io/calico/node and proc.name = calico-node) or
           (container.image.repository = registry.k8s.io/dns/k8s-dns-node-cache and proc.name = node-cache)
         )
+
+    {{- if and .Values.calicoAccountant.enabled (eq .Values.calicoAccountant.backend "nftables") }}
+
+    # Drop and execute new binary in container
+    - list: known_drop_and_execute_containers
+      items:
+        - ghcr.io/elastisys/calico-accountant
+    {{- end }}
     {{- end }}
 
-    {{- if eq .Values.falco.rulesFiles.incubating.enabled true }}
+    {{- if .Values.falco.rulesFiles.incubating.enabled }}
+
     # Change thread namespace
     - macro: user_known_change_thread_namespace_activities
       condition: (
@@ -277,7 +286,7 @@ customRules:
         condition: append
     {{- end }}
 
-    {{- if eq .Values.falco.rulesFiles.sandbox.enabled true }}
+    {{- if .Values.falco.rulesFiles.sandbox.enabled }}
     # Decoding Payload in Container
     - list: known_decode_payload_containers
       items: [ghcr.io/aquasecurity/trivy]
