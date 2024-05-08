@@ -8,6 +8,7 @@ import data.k8sRequireNetworkPolicy
 generate_pod(namespace, labels) = obj {
     obj := {
         "review": {
+            "operation": "CREATE",
             "object": {
                 "kind": "Pod",
                 "metadata": {
@@ -37,6 +38,7 @@ generate_pod_deletion(namespace, labels) = obj {
 generate_resource_controller(kind, namespace, labels) = obj {
     obj := {
         "review": {
+            "operation": "CREATE",
             "object": {
                 "kind": kind,
                 "metadata": {
@@ -57,6 +59,7 @@ generate_resource_controller(kind, namespace, labels) = obj {
 generate_cronJob(namespace, labels) = obj {
     obj := {
         "review": {
+            "operation": "CREATE",
             "object": {
                 "kind": "CronJob",
                 "metadata": {
