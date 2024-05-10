@@ -199,6 +199,8 @@ harbor:
                     - core
             topologyKey: "kubernetes.io/hostname"
   database:
+    # if external database is used, set "type" to "external"
+    # and fill the connection information in "external" section
     type: internal
     internal:
       persistentVolumeClaim:
@@ -221,6 +223,13 @@ harbor:
                     values:
                       - database
               topologyKey: "kubernetes.io/hostname"
+    # external:
+    #   host: set-me
+    #   port: 5432
+    #   username: set-me
+    #   # password: set-me # should be set in secrets.yaml
+    #   coreDatabase: registry
+    #   sslmode: disable
   exporter:
     resources:
       requests:
