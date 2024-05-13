@@ -2049,6 +2049,8 @@ properties:
         properties:
           enabled:
             type: boolean
+      externalDns:
+        $ref: '#/$defs/netpolRule'
     type: object
   nodeLocalDns:
     additionalProperties: false
