@@ -129,6 +129,8 @@ $defs:
     title: IP and port list
     additionalProperties: false
     properties:
+      enabled:
+        type: boolean
       ips:
         $ref: '#/$defs/iplist'
       ports:
