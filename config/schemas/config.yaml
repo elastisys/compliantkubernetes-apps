@@ -1976,6 +1976,19 @@ properties:
                   - 443
             type: object
         type: object
+      prometheus:
+        additionalProperties: false
+        properties:
+          internalAccess:
+            additionalProperties: false
+            properties:
+              enabled:
+                default: false
+                type: boolean
+              namespaces:
+                items:
+                  type: string
+                type: array
       rcloneSync:
         additionalProperties: false
         properties:
