@@ -152,7 +152,7 @@ customRules:
         ) or (
           proc.cmdline startswith "kubectl patch secret -n argocd-system argocd-manager-config -p"
         ) or (
-          proc.cmdline glob "kubectl get crd *.constraints.gatekeeper.sh -o jsonpath={.status.conditions[?(@.type=="Established")].status}"
+          proc.cmdline glob 'kubectl get crd *.constraints.gatekeeper.sh -o jsonpath={.status.conditions[?(@.type=="Established")].status}'
         )
 
     # Run shell untrusted
