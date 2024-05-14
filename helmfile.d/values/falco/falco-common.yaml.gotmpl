@@ -214,6 +214,7 @@ customRules:
     - macro: ec2_metadata_containers
       condition: (
           container.image.repository = ghcr.io/zalando/spilo-15 or
+          container.image.repository = ghcr.io/elastisys/spilo-15 or
           container.image.repository = gcr.io/k8s-staging-multitenancy/hnc-manager or
           container.image.repository = docker.io/k8scloudprovider/cinder-csi-plugin
         )
@@ -228,6 +229,7 @@ customRules:
     - macro: user_known_set_setuid_or_setgid_bit_conditions
       condition: (
           container.image.repository = ghcr.io/zalando/spilo-15 or
+          container.image.repository = ghcr.io/elastisys/spilo-15 or
           container.image.repository = quay.io/calico/cni or
           proc.name = containerd
         )
@@ -239,7 +241,8 @@ customRules:
           ghcr.io/elastisys/compliantkubernetes-apps-log-manager,
           ghcr.io/elastisys/logical-backup,
           docker.io/elastisys/rabbitmqadmin,
-          ghcr.io/zalando/spilo-15
+          ghcr.io/zalando/spilo-15,
+          ghcr.io/elastisys/spilo-15
         ) or (
           proc.pname = systemd and proc.name = check-new-relea
         ) or (
@@ -269,18 +272,23 @@ customRules:
     # DB program spawned process
     - macro: user_known_db_spawned_processes
       condition: (
-          container.image.repository = ghcr.io/zalando/spilo-15
+          container.image.repository = ghcr.io/zalando/spilo-15 or
+          container.image.repository = ghcr.io/elastisys/spilo-15
         )
 
     # Schedule Cron Jobs
     - macro: user_known_cron_jobs
-      condition: ( container.image.repository = ghcr.io/zalando/spilo-15 )
+      condition: (
+          container.image.repository = ghcr.io/zalando/spilo-15 or
+          container.image.repository = ghcr.io/elastisys/spilo-15
+        )
 
     # Contact cloud metadata service from container
     - macro: user_known_metadata_access
       condition: or (
           container.image.repository = gcr.io/k8s-staging-multitenancy/hnc-manager or
-          container.image.repository = ghcr.io/zalando/spilo-15
+          container.image.repository = ghcr.io/zalando/spilo-15 or
+          container.image.repository = ghcr.io/elastisys/spilo-15
         )
       override:
         condition: append
@@ -307,7 +315,8 @@ customRules:
     - macro: user_known_k8s_client_container
       condition: or (
           container.image.repository = ghcr.io/elastisys/argocd-managed-namespaces-manager or
-          container.image.repository = ghcr.io/zalando/spilo-15
+          container.image.repository = ghcr.io/zalando/spilo-15 or
+          container.image.repository = ghcr.io/elastisys/spilo-15
         ) or (
           proc.cmdline = "kubectl get rolebindings --all-namespaces -o json"
         )
@@ -318,7 +327,8 @@ customRules:
     - macro: user_known_write_etc_conditions
       condition: or (
           container.image.repository = quay.io/prometheus-operator/prometheus-config-reloader or
-          container.image.repository = ghcr.io/zalando/spilo-15
+          container.image.repository = ghcr.io/zalando/spilo-15 or
+          container.image.repository = ghcr.io/elastisys/spilo-15
         )
       override:
         condition: append
