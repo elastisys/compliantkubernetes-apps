@@ -37,6 +37,8 @@ spec:
                   value: {{ .bucket }}
                 - name: S3_PREFIX
                   value: {{ .prefix }}
+                - name: STORAGE_SERVICE
+                  value: s3
                 {{- else if $.Values.azure.enabled }}
                 - name: AZURE_STORAGE_CONNECTION_STRING
                   valueFrom:
