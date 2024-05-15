@@ -1,10 +1,10 @@
 $schema: https://json-schema.org/draft/2020-12/schema
 $id: https://github.com/elastisys/compliantkubernetes-apps/raw/main/config/schemas/config.yaml
-title: Compliant Kubernetes Apps settings
+title: Compliant Kubernetes Apps Config
 description: |
-  This describes the structure of the configuration for both the service
-  cluster and the workload cluster, but keep in mind that each configuration
-  file will contain different settings.
+  This describes the structure of the config for both the service and workload clusters.
+
+  Keep in mind that this is evaluated on the merged config, and each config file will contain different properties.
 $defs:
   component:
     deprecated: true
