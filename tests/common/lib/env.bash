@@ -28,10 +28,10 @@ env.init() {
   if ! [[ "$*" =~ --skip-object-storage ]]; then
     yq_set 'common' '.objectStorage.type' '"s3"'
     yq_set 'common' '.objectStorage.s3.region' '"example-region"'
-    yq_set 'common' '.objectStorage.s3.regionEndpoint' '"example-region-endpoint"'
+    yq_set 'common' '.objectStorage.s3.regionEndpoint' '"https://example-region-endpoint"'
     yq_set 'common' '.objectStorage.s3.forcePathStyle' 'true'
-    yq_set 'common' '.objectStorage.s3.accessKey' '"example-access-key"'
-    yq_set 'common' '.objectStorage.s3.secretKey' '"example-secret-key"'
+    yq_set 'secrets' '["objectStorage"]["s3"]["accessKey"]' '"example-access-key"'
+    yq_set 'secrets' '["objectStorage"]["s3"]["secretKey"]' '"example-secret-key"'
 
     if [[ "${CK8S_CLOUD_PROVIDER}" = "citycloud" ]]; then
       yq_set 'sc' '.objectStorage.swift.authVersion' '0'
@@ -40,8 +40,8 @@ env.init() {
       yq_set 'sc' '.objectStorage.swift.projectDomainId' '"example-project-domain-id"'
       yq_set 'sc' '.objectStorage.swift.projectId' '"example-project-id"'
       yq_set 'sc' '.objectStorage.swift.domainId' '"example-domain-id"'
-      yq_set 'sc' '.objectStorage.swift.username' '"example-username"'
-      yq_set 'sc' '.objectStorage.swift.password' '"example-password"'
+      yq_set 'secrets' '["objectStorage"]["swift"]["username"]' '"example-username"'
+      yq_set 'secrets' '["objectStorage"]["swift"]["password"]' '"example-password"'
     fi
   fi
 

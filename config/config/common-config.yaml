@@ -799,7 +799,7 @@ opa:
       ndotAmount: 3
       labelSelector:
         # None for clusterwide effect or one for each pod or podgroup to be effected by this mutation.
-        matchLabels:
+        matchLabels: {}
           # labelkey: labelvalue
 
   controllerManager:
@@ -954,7 +954,7 @@ kured:
     enabled: true
     interval: 60s
     labels: {}
-  extraArgs: {}
+  extraArgs: []
   extraEnvVars: {}
   notification:
     slack:
@@ -986,23 +986,23 @@ networkPolicies:
   additionalEgressPolicies: []
   additionalIngressPolicies: []
 
-  additional: {}
-# |-
-#   kind: NetworkPolicy
-#   apiVersion: networking.k8s.io/v1
-#   metadata:
-#     name: example-np
-#     namespace: default
-#   spec:
-#     policyTypes:
-#       - Ingress
-#       - Egress
-#     podSelector:
-#       matchLabels:
-#         foo: bar
-#     ingress: {}
-#     egress: {}
-# ---
+  additional: ""
+    # |-
+    # ---
+    #   apiVersion: networking.k8s.io/v1
+    #   kind: NetworkPolicy
+    #   metadata:
+    #     namespace: default
+    #     name: example-np
+    #   spec:
+    #     podSelector:
+    #       matchLabels:
+    #         foo: bar
+    #     policyTypes:
+    #       - Ingress
+    #       - Egress
+    #     ingress: {}
+    #     egress: {}
   global:
     objectStorage:
       # ips to s3 service
