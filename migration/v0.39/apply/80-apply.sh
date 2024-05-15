@@ -9,11 +9,10 @@ source "${ROOT}/scripts/migration/lib.sh"
 # Example: "app!=something"
 declare -a skipped
 skipped=(
+  "app!=trivy-operator"
 )
 declare -a skipped_sc
 skipped_sc=(
-  "netpol!=service"
-  "netpol!=rclone"
 )
 declare -a skipped_wc
 skipped_wc=(

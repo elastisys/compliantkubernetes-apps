@@ -1,7 +1,7 @@
-# Upgrade to v0.38.x
+# Upgrade to v0.39.x
 
 > [!WARNING]
-> Upgrade only supported from v0.37.x.
+> Upgrade only supported from v0.38.x.
 
 <!--
 Notice to developers on writing migration steps:
@@ -58,17 +58,15 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     git pull
-    git switch -d v0.38.x
+    git switch -d v0.39.x
     ```
-
-1. If you have enabled `externalDns` and want to adopt already created dns records you can set `CK8S_HOSTED_ZONE_ID` to the hosted zone id.
 
 1. Prepare upgrade - *non-disruptive*
 
     > *Done before maintenance window.*
 
     ```bash
-    ./bin/ck8s upgrade both v0.38 prepare
+    ./bin/ck8s upgrade both v0.39 prepare
 
     # check if the netpol IPs need to be updated
     ./bin/ck8s update-ips both dry-run
@@ -80,8 +78,8 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > It is possible to upgrade `wc` and `sc` clusters separately by replacing `both` when running the `upgrade` command, e.g. the following will only upgrade the workload cluster:
 
     ```bash
-    ./bin/ck8s upgrade wc v0.38 prepare
-    ./bin/ck8s upgrade wc v0.38 apply
+    ./bin/ck8s upgrade wc v0.39 prepare
+    ./bin/ck8s upgrade wc v0.39 apply
     ```
 
 1. Apply upgrade - *disruptive*
@@ -89,7 +87,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > *Done during maintenance window.*
 
     ```bash
-    ./bin/ck8s upgrade both v0.38 apply
+    ./bin/ck8s upgrade both v0.39 apply
     ```
 
 ## Manual method
@@ -102,25 +100,13 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     git pull
-    git switch -d v0.38.x
+    git switch -d v0.39.x
     ```
 
 1. Set whether or not upgrade should be prepared for `both` clusters or for one of `sc` or `wc`:
 
     ```bash
     export CK8S_CLUSTER=<wc|sc|both>
-    ```
-
-1. Check if environment is running on Upcloud with S3 object storage V1, and if so enable total size of all S3 buckets alert:
-
-    ```bash
-    ./migration/v0.38/prepare/30-check-upcloud-s3-version.sh
-    ```
-
-1. Update service and rclone networkpolicies:
-
-    ```bash
-    ./migration/v0.38/prepare/40-service-rclone-netpol.sh
     ```
 
 1. Update apps configuration:
@@ -130,12 +116,18 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ```bash
     ./bin/ck8s init
     # or
-    ./migration/v0.38/prepare/50-init.sh
+    ./migration/v0.39/prepare/50-init.sh
 
     # check if the netpol IPs need to be updated
     ./bin/ck8s update-ips  dry-run
     # if you agree with the changes apply
     ./bin/ck8s update-ips  apply
+    ```
+
+1. If you have enabled `externalDns` and you can adopt already configured records:
+
+    ```bash
+    ./migration/v0.39/prepare/60-adopt-dns-records.sh
     ```
 
 ### Apply upgrade - *disruptive*
@@ -148,10 +140,16 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
-1. Upgrade service and rclone networkpolicies:
+1. Upgrade Trivy operator:
 
     ```bash
-    ./migration/v0.38/apply/70-service-rclone-netpol.sh execute
+    ./migration/v0.39/apply/10-trivy-operator-upgrade.sh execute
+    ```
+
+1. Upgrade Velero CRDs and fix annotations:
+
+    ```bash
+    ./migration/v0.39/apply/20-velero-crds-upgrade.sh execute
     ```
 
 1. Upgrade applications:
@@ -159,7 +157,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ```bash
     ./bin/ck8s apply {sc|wc}
     # or
-    ./migration/v0.38/apply/80-apply.sh execute
+    ./migration/v0.39/apply/80-apply.sh execute
     ```
 
 ## Postrequisite:
