@@ -4,17 +4,14 @@
 
 Here you can find the most relevant features and changes for the last couple of releases of Compliant Kubernetes
 
+- Thanos was upgraded to v0.34.1. **[v0.38]**
+- Gatekeeper was upgraded to v3.15.1. **[v0.38]**
+- A new Gatekeeper constraint was added. It will warn if the user tries to deploy a Deployment or StatefulSet with less than 2 replicas. **[v0.38]**
 - Opensearch and Opensearch Dashboards were upgraded to v2.12. **[v0.37]**
 - Grafana was upgraded to v10.4. **[v0.37]**
 - Falco was upgraded to v0.37.1. **[v0.37]**
 - A new capacity management Grafana dashboard is now available. This will give better visibility over resource usage per node groups. **[v0.37]**
 - We recommend using the [ingressClassName](https://cert-manager.io/docs/configuration/acme/http01/#ingressclassname) field over the `class` field for cert-manager issuers. **[v0.37]**
-- A probe ingress is added to monitor services that are not responding successfully. **[v0.36]**
-- Velero was upgraded to v1.11.1. **[v0.36]**
-- The CIS Kubernetes Benchmark is removed since we migrated to trivy operator. **[v0.36]**
-- Harbor was upgraded to v2.9.1. As part of this upgrade, Notary V1 is removed. **[v0.35]**
-- Chroot is enabled by default for ingress-nginx controller, to improve security and limit NGINX inside the controller container from having access to list cluster-wide secrets **[v0.35]**
-- Application developers can now self manage CRDs for Kafka **[v0.35]**
 
 ## Public docs
 
