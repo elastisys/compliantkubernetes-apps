@@ -30,6 +30,14 @@ find_schemas() {
   refute_output
 }
 
+@test "root schemas should have type" {
+  declare -a schemas && find_schemas
+
+  run yq4 '{ filename: .type // "" } | select(.[] == "")' "${schemas[@]}"
+
+  refute_output
+}
+
 # Any complex object should have a title
 @test "schemas with properties should have titles" {
   declare -a schemas && find_schemas
@@ -78,6 +86,20 @@ find_schemas() {
       .. | select(has("items") and (.description == null or .description == "")) | path | join "."
     ]
   } | select(.[].[] != "")' "${schemas[@]}"
+
+  refute_output
+}
+
+# Any property should have a title
+@test "properties should have types" {
+  declare -a schemas && find_schemas
+
+  # shellcheck disable=SC2016
+  run yq4 '{
+    filename: [
+      .. | select((parent | key == "properties") and ((.$ref // "") == "") and ((.type // "") == "")) | path | join "."
+    ]
+  } | select((.[] | length) != 0 and .[].[] != "")' "${schemas[@]}"
 
   refute_output
 }

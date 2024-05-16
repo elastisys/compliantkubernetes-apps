@@ -1213,7 +1213,7 @@ properties:
       - Fluentd audit logs
       - Fluentd service cluster logs
       - Harbor database backups and registry storaga
-      - OpenSearch log snapshots
+      - OpenSearch workload cluster log snapshots
       - Rclone object storage sync source and restore destnation
       - Thanos metrics storage
       - Velero resource backups and volume snapshots
@@ -1241,6 +1241,7 @@ properties:
         additionalProperties: false
         title: Azure Backend Config
         description: Only supports Azure Public Cloud.
+        type: object
         properties:
           resourceGroup:
             description: Resource group of the storage account.
@@ -1249,6 +1250,7 @@ properties:
         additionalProperties: false
         title: S3 Backend Config
         description: Supports both AWS and non-AWS implementations.
+        type: object
         properties:
           region:
             description: S3 region.
@@ -1266,7 +1268,6 @@ properties:
 
               Generally `false` when using AWS, Exoscale, and UpCloud and `true` for other providers.
             type: boolean
-        type: object
       swift:
         additionalProperties: false
         title: Swift Backend Config
@@ -1436,6 +1437,7 @@ properties:
             title: Rclone Restore Destinations
             description: |-
               Allows for complete or partial overrides of the destinations of the restore, the main object storage configuration.
+            type: object
             properties:
               azure:
                 $ref: '#/properties/objectStorage/properties/azure'
@@ -1448,6 +1450,7 @@ properties:
             title: Rclone Restore Sources
             description: |-
               Allows for complete or partial overrides of the sources of the restore, the sync object storage configuration.
+            type: object
             properties:
               azure:
                 $ref: '#/properties/objectStorage/properties/azure'
@@ -1459,7 +1462,7 @@ properties:
           decrypt:
             description: |-
               Allows for complete or partial overrides of the decrypt of the restore, the sync encrypt configuration.
-            ref: '#/properties/objectStorage/properties/sync/properties/encrypt'
+            $ref: '#/properties/objectStorage/properties/sync/properties/encrypt'
             default: {}
   rookCeph:
     additionalProperties: false
