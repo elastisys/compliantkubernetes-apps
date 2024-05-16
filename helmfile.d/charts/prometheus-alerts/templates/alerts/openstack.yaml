@@ -19,28 +19,28 @@ spec:
     rules:
     - alert: OpenStackCloudControllerDown
       annotations:
-        summary: Openstack cloud controller manager has disappeared.
+        summary: OpenStack cloud controller manager has disappeared.
       expr: (group(present_over_time(up{job="openstack-monitoring"}[6h])) by (cluster) unless group(up{job="openstack-monitoring"}) by (cluster)) or (absent(up{job="openstack-monitoring"} == 1))
       for: 10m
       labels:
         severity: critical
     - alert: OpenStackApiRequestFailed
       annotations:
-        summary: Failed openstack api call.
+        summary: Failed OpenStack API call.
       expr: rate(openstack_api_request_errors_total[5m]) > 0.01
       for: 5m
       labels:
         severity: high
     - alert: OpenStackApiRequestDuration
       annotations:
-        summary: Openstack api has taken longer then 15 seconds.
+        summary: OpenStack API has taken longer than 15 seconds.
       expr: rate(openstack_api_request_duration_seconds_sum[5m]) / rate(openstack_api_request_duration_seconds_count[5m]) > 15
       for: 5m
       labels:
         severity: high
     - alert: OpenStackApiRequestTotal
       annotations:
-        summary: Too high amount of openstack api calls.
+        summary: Too high amount of OpenStack API calls.
       expr: (delta(openstack_api_requests_total[5m]))/5 > 20
       for: 5m
       labels:
@@ -54,7 +54,7 @@ spec:
         severity: high
     - alert: OpenStackReconcileDuration
       annotations:
-        summary: Reconciliation has taken longer then 10 minute.
+        summary: Reconciliation has taken longer than 10 minutes.
       expr: rate(cloudprovider_openstack_reconcile_duration_seconds_sum[5m]) / rate(cloudprovider_openstack_reconcile_duration_seconds_count[5m]) > 600
       for: 10m
       labels:
