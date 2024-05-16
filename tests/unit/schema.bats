@@ -14,20 +14,70 @@ find_schemas() {
   readarray -t schemas <<< "$(find "${ROOT}/config/schemas/" -type f -name '*.yaml')"
 }
 
-@test "schema should have titles for root schemas" {
+@test "root schemas should have titles" {
   declare -a schemas && find_schemas
-  for schema in "${schemas[@]}"; do
-    echo "# ${schema}" >&2
-    run yq4 '.title // ""' "${schema}"
-    assert_output
-  done
+
+  run yq4 '{ filename: .title // "" } | select(.[] == "")' "${schemas[@]}"
+
+  refute_output
 }
 
-@test "schema should have descriptions for root schemas" {
+@test "root schemas should have descriptions" {
   declare -a schemas && find_schemas
-  for schema in "${schemas[@]}"; do
-    echo "# ${schema}" >&2
-    run yq4 '.description // ""' "${schema}"
-    assert_output
-  done
+
+  run yq4 '{ filename: .description // "" } | select(.[] == "")' "${schemas[@]}"
+
+  refute_output
+}
+
+# Any complex object should have a title
+@test "schemas with properties should have titles" {
+  declare -a schemas && find_schemas
+
+  run yq4 '{
+    filename: [
+      .. | select(has("properties") and (.title == null or .title == "")) | path | join "."
+    ]
+  } | select(.[].[] != "")' "${schemas[@]}"
+
+  refute_output
+}
+
+# Any complex object should have a description
+@test "schemas with properties should have descriptions" {
+  declare -a schemas && find_schemas
+
+  run yq4 '{
+    filename: [
+      .. | select(has("properties") and (.description == null or .description == "")) | path | join "."
+    ]
+  } | select(.[].[] != "")' "${schemas[@]}"
+
+  refute_output
+}
+
+# Any complex array should have a title
+@test "schemas with items should have titles" {
+  declare -a schemas && find_schemas
+
+  run yq4 '{
+    filename: [
+      .. | select(has("items") and (.title == null or .title == "")) | path | join "."
+    ]
+  } | select(.[].[] != "")' "${schemas[@]}"
+
+  refute_output
+}
+
+# Any complex array should have a description
+@test "schemas with items should have descriptions" {
+  declare -a schemas && find_schemas
+
+  run yq4 '{
+    filename: [
+      .. | select(has("items") and (.description == null or .description == "")) | path | join "."
+    ]
+  } | select(.[].[] != "")' "${schemas[@]}"
+
+  refute_output
 }
