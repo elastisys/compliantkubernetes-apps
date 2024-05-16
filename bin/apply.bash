@@ -47,7 +47,7 @@ apps_apply() {
   log_info "---"
   log_info "Start Apps ${action} on ${2/_/ }"
 
-  if (with_kubeconfig "${config["kube_config_$1"]}" helmfile -e "$2" "${action}" "${concurrency}" "${suppress:-}"); then
+  if (with_kubeconfig "${config["kube_config_$1"]}" helmfile -f "${here}/../helmfile.d/state.yaml" -e "$2" "${action}" "${concurrency}" "${suppress:-}"); then
     log_info "---"
     log_info "Successful Apps ${action} on ${2/_/ }!"
   else
