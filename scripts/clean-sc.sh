@@ -33,6 +33,9 @@ if [ -n "${GATE_VALWEBHOOK}" ]; then
     "${here}/.././bin/ck8s" ops kubectl sc delete "${GATE_VALWEBHOOK}"
 fi
 
+# Makes sure to uninstall Velero properly: https://velero.io/docs/v1.13/uninstalling/
+"${here}/.././bin/ck8s" ops velero sc uninstall
+
 # Destroy all helm releases
 "${here}/.././bin/ck8s" ops helmfile sc -l app!=cert-manager destroy
 

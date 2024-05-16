@@ -45,6 +45,9 @@ fi
 # Might fail to be destroyed the first time, therefore run it once now
 "${here}/.././bin/ck8s" ops helmfile wc -l app=hnc destroy
 
+# Makes sure to uninstall Velero properly: https://velero.io/docs/v1.13/uninstalling/
+"${here}/.././bin/ck8s" ops velero wc uninstall
+
 # Destroy all helm releases
 "${here}/.././bin/ck8s" ops helmfile wc -l app!=cert-manager destroy
 
