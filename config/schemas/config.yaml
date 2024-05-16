@@ -1204,101 +1204,263 @@ properties:
     type: object
   objectStorage:
     additionalProperties: false
-    description: Swift can be enabled separately for Harbor, Thanos and rclone-sync only.
+    title: Object Storage Config
+    description: |-
+      Configuration options for using object storage in Compliant Kubernetes
+
+      This is used for:
+
+      - Fluentd audit logs
+      - Fluentd service cluster logs
+      - Harbor database backups and registry storaga
+      - OpenSearch log snapshots
+      - Rclone object storage sync source and restore destnation
+      - Thanos metrics storage
+      - Velero resource backups and volume snapshots
+
+      Harbor, Rclone, and Thanos have additional configuration to use Swift.
+    type: object
     properties:
       buckets:
         additionalProperties:
           type: string
         description: Buckets where each respective application will store its backups.
         type: object
+      type:
+        description: |-
+          Object storage type to use.
+
+          In addition to this Harbor, Rclone, and Thanos have additional configuration to use Swift.
+        type: string
+        enum:
+          - azure
+          - gcs
+          - s3
+          - none
+      azure:
+        additionalProperties: false
+        title: Azure Backend Config
+        description: Only supports Azure Public Cloud.
+        properties:
+          resourceGroup:
+            description: Resource group of the storage account.
+            type: string
       s3:
         additionalProperties: false
+        title: S3 Backend Config
+        description: Supports both AWS and non-AWS implementations.
         properties:
-          accessKey:
-            type: string
-          forcePathStyle:
-            description: Generally false when using AWS and Exoscale and true for other providers.
-            type: boolean
           region:
+            description: S3 region.
             type: string
           regionEndpoint:
-            description: S3 endpoint for non-AWS implementation of S3. Make sure to prepend the protocol (i.e., https:// or http://) with the URL, e.g., https://s3.sto1.safedc.net
+            description: |-
+              Endpoint to reach the S3 service, mainly applicable for non-AWS implementations.
+
+              Make sure to prepend the protocol (e.g. `https://`).
             type: string
-          secretKey:
-            type: string
-        type: object
-      sync:
-        additionalProperties: false
-        properties:
-          buckets:
-            type: array
-          defaultSchedule:
-            default: 0 5 * * *
-            type: string
-          destinationType:
-            default: s3
-            type: string
-          enabled:
-            default: false
-            type: boolean
-          encrypt:
-            additionalProperties: false
-            properties:
-              directoryNames:
-                default: false
-                type: boolean
-              enabled:
-                default: false
-                type: boolean
-              fileNames:
-                default: false
-                type: boolean
-            type: object
-          resources:
-            $ref: '#/$defs/kubernetesResourceRequirements'
-          s3:
-            $ref: '#/properties/objectStorage/properties/s3'
-          syncDefaultBuckets:
-            default: false
+            format: uri
+          forcePathStyle:
+            description: |-
+              Force the use of path style access instead of virtual host style access.
+
+              Generally `false` when using AWS, Exoscale, and UpCloud and `true` for other providers.
             type: boolean
         type: object
-      type:
-        enum:
-          - s3
-          - gcs
-          - none
-        type: string
       swift:
+        additionalProperties: false
+        title: Swift Backend Config
+        description: |-
+          > [!note]
+          > Supported as an option only for Harbor, Rclone, and Thanos.
         type: object
         properties:
           authVersion:
-            type: number
+            description: |-
+              OpenStack authentication version.
+
+              Set `0` for auto detect from authentication url.
+            type: integer
+            default: 0
           authUrl:
+            description: |-
+              OpenStack authentication url.
+
+              Make sure to prepend the protocol (e.g. `https://`) and append the authentication version (e.g. `/v3`).
             type: string
             format: uri
           region:
+            description: |-
+              OpenStack region.
             type: string
           domainId:
+            description: |-
+              The user domain ID to use.
+
+              User domain is required when authenticating with `username`, set either `domainId` or `domainName`.
             type: string
           domainName:
+            description: |-
+              The user domain name to use.
+
+              User domain is required when authenticating with `username`, set either `domainId` or `domainName`.
             type: string
-            format: hostname
           projectDomainId:
+            description: |-
+              The project domain ID to use.
+
+              Project domain is required when authenticating with `projectName`, set either `projectDomainId` or `projectDomainName`.
             type: string
           projectDomainName:
+            description: |-
+              The project domain name to use.
+
+              Project domain is required when authenticating with `projectName`, set either `projectDomainId` or `projectDomainName`.
             type: string
-            format: hostname
           projectId:
+            description: |-
+              The project ID to use.
+
+              Project is required when authenticating with `username`, set either `projectId` or `projectName`.
             type: string
           projectName:
+            description: |-
+              The project name to use, requires project domain to be set.
+
+              Project is required when authenticating with `username`, set either `projectId` or `projectName`.
             type: string
           segmentsContainerSuffix:
+            description: |-
+              The container suffix to use for segment containers.
+
+              These are created to store large objects with SLOs/DLOs, and with s3api middleware for multipart uploads.
             type: string
-      restore:
+            default: +segments
+      sync:
+        additionalProperties: false
+        title: Rclone Sync Config
+        description: |-
+          Sync object storage from the primary site to a secondary site with Rclone.
         type: object
-        properties: {}
-        $comment: TODO
-    type: object
+        properties:
+          enabled:
+            type: boolean
+            default: false
+          dryrun:
+            description: Deploy Rclone with dryrun enabled.
+            type: boolean
+            default: false
+          syncDefaultBuckets:
+            description: Sync the buckets set under `.objectStorage.buckets`.
+            type: boolean
+            default: false
+          defaultSchedule:
+            description: Default schedule to run the sync CronJobs.
+            type: string
+            default: 0 5 * * *
+          buckets:
+            description: Additional buckets to sync.
+            type: array
+            default: []
+          destinationType:
+            description: |-
+              Object storage type to use.
+            type: string
+            enum:
+              - azure
+              - gcs
+              - s3
+              - swift
+          azure:
+            $ref: '#/properties/objectStorage/properties/azure'
+          s3:
+            $ref: '#/properties/objectStorage/properties/s3'
+          swift:
+            $ref: '#/properties/objectStorage/properties/swift'
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          encrypt:
+            additionalProperties: false
+            title: Rclone Crypt
+            description: |-
+              Encrypt data when syncing.
+            properties:
+              enabled:
+                type: boolean
+                default: false
+              fileNames:
+                description: Encrypt file names when syncing.
+                type: boolean
+                default: false
+              directoryNames:
+                description: Encrypt directory names when syncing, requires file names to be encrypted.
+                type: boolean
+                default: false
+            type: object
+      restore:
+        additionalProperties: false
+        title: Rclone Restore Config
+        description: |-
+          Restore object storage from a secondary site to the primary site with Rclone.
+
+          > [!note]
+          > When enabled this will disable Rclone sync to prevent it from modifying the secondary site.
+        type: object
+        properties:
+          enabled:
+            type: boolean
+            default: false
+          dryrun:
+            description: Deploy Rclone with dryrun enabled.
+            type: boolean
+            default: false
+          addTargetsFromSync:
+            description: |-
+              Automatically configure the restore from a secondary site to the primary site.
+
+              Essentially this will configure Rclone restore to do the inverse of Rclone sync.
+            type: boolean
+            default: false
+          targets:
+            description: Targets to restore
+            type: array
+            default: []
+          timestamp:
+            description: |-
+              Perform point-in-time restore if possible.
+
+              This is only supported for S3 sources.
+            type: string
+            default: ""
+          destinations:
+            title: Rclone Restore Destinations
+            description: |-
+              Allows for complete or partial overrides of the destinations of the restore, the main object storage configuration.
+            properties:
+              azure:
+                $ref: '#/properties/objectStorage/properties/azure'
+              s3:
+                $ref: '#/properties/objectStorage/properties/s3'
+              swift:
+                $ref: '#/properties/objectStorage/properties/swift'
+            default: {}
+          sources:
+            title: Rclone Restore Sources
+            description: |-
+              Allows for complete or partial overrides of the sources of the restore, the sync object storage configuration.
+            properties:
+              azure:
+                $ref: '#/properties/objectStorage/properties/azure'
+              s3:
+                $ref: '#/properties/objectStorage/properties/s3'
+              swift:
+                $ref: '#/properties/objectStorage/properties/swift'
+            default: {}
+          decrypt:
+            description: |-
+              Allows for complete or partial overrides of the decrypt of the restore, the sync encrypt configuration.
+            ref: '#/properties/objectStorage/properties/sync/properties/encrypt'
+            default: {}
   rookCeph:
     additionalProperties: false
     properties:

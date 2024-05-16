@@ -131,7 +131,7 @@ yq_dig() {
 
 # usage: yq_set <config-file> <config-key> <value>
 yq_set() {
-  if ! [[ "${1:-}" =~ ^(common|sc|wc)$ ]]; then
+  if ! [[ "${1:-}" =~ ^(common|secrets|sc|wc)$ ]]; then
     fail "invalid or missing config file argument"
   elif [[ -z "${2:-}" ]]; then
     fail "missing config key argument"
@@ -139,7 +139,11 @@ yq_set() {
     fail "missing value argument"
   fi
 
-  yq4 -i "${2} = ${3}" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
+  if [[ "${1}" =~ ^(common|sc|wc)$ ]]; then
+    yq4 -i "${2} = ${3}" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
+  elif [[ "${1}" == "secrets" ]]; then
+    sops --set "${2} ${3}" "${CK8S_CONFIG_PATH}/secrets.yaml"
+  fi
 }
 
 # usage: yq_secret <config-key> <default>
