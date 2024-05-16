@@ -72,6 +72,17 @@ ops_helmfile() {
         helmfile -f "${here}/../helmfile.d/" -e ${cluster} "${@}"
 }
 
+# Run arbitrary Velero commands as cluster admin.
+ops_velero() {
+    case "${1}" in
+        sc) kubeconfig="${config[kube_config_sc]}" ;;
+        wc) kubeconfig="${config[kube_config_wc]}" ;;
+        *) usage ;;
+    esac
+    shift
+    with_kubeconfig "${kubeconfig}" velero "${@}"
+}
+
 case "${1}" in
     kubectl)
         shift
@@ -88,6 +99,10 @@ case "${1}" in
     helmfile)
         shift
         ops_helmfile "${@}"
+    ;;
+    velero)
+        shift
+        ops_velero "${@}"
     ;;
     *) usage ;;
 esac

@@ -28,6 +28,7 @@ usage() {
     #       confident that the apply command and migrations are good enough
     #       that direct Helmfile access is not necessary.
     echo "  ops helmfile <wc|sc>                           run helmfile as cluster admin" 1>&2
+    echo "  ops velero <wc|sc>                             run velero as cluster admin" 1>&2
     echo "  s3cmd [cmd]                                    run s3cmd" 1>&2
     echo "  kubeconfig <user|dev|admin>                    generate user kubeconfig, stored at CK8S_CONFIG_PATH/user"
     echo "  completion bash                                output shell completion code for bash" 1>&2
@@ -116,6 +117,11 @@ case "${1}" in
                 [[ "${3}" =~ ^(wc|sc)$ ]] || usage
                 shift 2
                 "${here}/ops.bash" helmfile "${@}"
+            ;;
+            velero)
+                [[ "${3}" =~ ^(wc|sc)$ ]] || usage
+                shift 2
+                "${here}/ops.bash" velero "${@}"
             ;;
             *) usage ;;
         esac

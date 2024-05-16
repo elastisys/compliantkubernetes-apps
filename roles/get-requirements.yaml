@@ -4,21 +4,22 @@
   vars:
     install_path: "{{ lookup('env', 'CK8S_INSTALL_PATH', default='/usr/local/bin') }}"
     install_user: "{{ lookup('env','USER') }}"
-    kubectl_version: "{{ requirements['kubectl'].version | regex_replace('^v', '') }}"
-    helm_version: "{{ requirements['helm.sh/helm/v3'].version | regex_replace('^v', '') }}"
-    helmfile_version: "{{ requirements['github.com/helmfile/helmfile'].version | regex_replace('^v', '') }}"
-    helmdiff_version: "{{ requirements['github.com/databus23/helm-diff/v3'].version | regex_replace('^v', '') }}"
-    helmsecrets_version: "{{ requirements['helm-secrets'].version | regex_replace('^v', '') }}"
-    jq_version: "{{ requirements['jq'].version | regex_replace('^jq-', '') }}"
-    s3cmd_version: "{{ requirements['s3cmd'].version }}"
-    sops_version: "{{ requirements['getsops/sops/v3'].version | regex_replace('^v', '') }}"
-    yq_version: "{{ requirements['github.com/mikefarah/yq/v3'].version }}"
-    yq4_version: "{{ requirements['github.com/mikefarah/yq/v4'].version | regex_replace('^v', '') }}"
-    yajsv_version: "{{ requirements['github.com/neilpa/yajsv'].version | regex_replace('^v', '') }}"
-    pwgen_version: "{{ requirements['pwgen'].version }}"
     apache2_utils_version: "{{ requirements['apache2-utils'].version }}"
     curl_version: "{{ requirements['curl'].version }}"
     dnsutils_version: "{{ requirements['dnsutils'].version }}"
+    helm_version: "{{ requirements['helm.sh/helm/v3'].version | regex_replace('^v', '') }}"
+    helmdiff_version: "{{ requirements['github.com/databus23/helm-diff/v3'].version | regex_replace('^v', '') }}"
+    helmfile_version: "{{ requirements['github.com/helmfile/helmfile'].version | regex_replace('^v', '') }}"
+    helmsecrets_version: "{{ requirements['helm-secrets'].version | regex_replace('^v', '') }}"
+    jq_version: "{{ requirements['jq'].version | regex_replace('^jq-', '') }}"
+    kubectl_version: "{{ requirements['kubectl'].version | regex_replace('^v', '') }}"
+    pwgen_version: "{{ requirements['pwgen'].version }}"
+    s3cmd_version: "{{ requirements['s3cmd'].version }}"
+    sops_version: "{{ requirements['getsops/sops/v3'].version | regex_replace('^v', '') }}"
+    velero_version: "{{ requirements['github.com/vmware-tanzu/velero'].version }}"
+    yajsv_version: "{{ requirements['github.com/neilpa/yajsv'].version | regex_replace('^v', '') }}"
+    yq_version: "{{ requirements['github.com/mikefarah/yq/v3'].version }}"
+    yq4_version: "{{ requirements['github.com/mikefarah/yq/v4'].version | regex_replace('^v', '') }}"
     apt_list:
       - curl={{ curl_version }}
       - s3cmd={{ s3cmd_version }}
@@ -85,6 +86,28 @@
           when: (not kubectl_exists.stat.exists) or
             (current_kubectl_version.stdout == "") or
             (kubectl_version | string not in current_kubectl_version.stdout | from_json | json_query('clientVersion.gitVersion'))
+
+    - name: Velero
+      block:
+        - name: Check if Velero exists
+          stat:
+            path: "{{ install_path }}/velero"
+          register: velero_exists
+
+        - name: Check Velero
+          command: "velero version --client-only | grep Version | awk '{print $2}'"
+          register: current_velero_version
+          when: velero_exists.stat.exists
+
+        - name: Get Velero
+          unarchive:
+            src: https://github.com/vmware-tanzu/velero/releases/download/{{ velero_version }}/velero-{{ velero_version }}-linux-amd64.tar.gz
+            dest: "{{ install_path }}"
+            remote_src: yes
+            extra_opts: [--strip-components=1]
+          when: (not velero_exists.stat.exists) or
+            (current_velero_version.stdout == "") or
+            (velero_version | string not in current_velero_version.stdout)
 
     - name: Helm
       block:
