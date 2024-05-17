@@ -1,4 +1,5 @@
 - name: Download compliantkubernetes-apps requirements
+  connection: local
   hosts: localhost
   vars:
     install_path: /usr/local/bin
@@ -45,11 +46,10 @@
         dest: "{{ install_path }}/yajsv"
         version_flag: "-v"
 
-  connection: local
-  become: yes
-  become_user: root
   tasks:
     - name: Install apt-packages
+      become: yes
+      become_user: root
       apt:
         pkg: "{{ apt_list }}"
         update_cache: yes
