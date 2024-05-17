@@ -1198,9 +1198,14 @@ properties:
     type: object
   storageClasses:
     additionalProperties: false
+    title: Storage Classes Config
+    description: |-
+      Configuration options for using block storage in Compliant Kubernetes
     properties:
       default:
+        description: The StorageClass to use for all persistent volumes in Compliant Kubernetes.
         type: string
+        default: default
     type: object
   objectStorage:
     additionalProperties: false
