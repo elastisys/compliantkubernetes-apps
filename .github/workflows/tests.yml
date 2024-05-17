@@ -28,10 +28,6 @@ jobs:
       - name: build tests container image
         uses: docker/build-push-action@v5
         with:
-          build-args: |
-            CK8S_TESTS_BUILD=true
-            UID=1001
-            GID=121
           cache-from: type=gha
           context: .
           target: unit
@@ -43,8 +39,7 @@ jobs:
       - name: run static unit tests
         working-directory: ./tests
         env:
-          CI: true
-          CK8S_TESTS_STATIC: true
+          CK8S_AUTO_APPROVE: true
         run: make ctr-run-unit-static,${{ matrix.tag }}
 
   integration:
@@ -57,10 +52,6 @@ jobs:
       - name: build tests container image
         uses: docker/build-push-action@v5
         with:
-          build-args: |
-            CK8S_TESTS_BUILD=true
-            UID=1001
-            GID=121
           cache-from: type=gha
           context: .
           target: main
@@ -74,8 +65,7 @@ jobs:
       - name: run integration tests
         working-directory: ./tests
         env:
-          CI: true
-          CK8S_TESTS_STATIC: true
+          CK8S_AUTO_APPROVE: true
         run: make ctr-run-integration
       - name: delete local cache
         if: always()

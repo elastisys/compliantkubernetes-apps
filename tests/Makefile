@@ -58,7 +58,6 @@ container_args += --network=host
 found_apt := $(shell command -v apt 2>/dev/null)
 
 found_bats := $(shell command -v bats 2>/dev/null)
-found_npm := $(shell command -v npm 2>/dev/null)
 
 all := $(cypress_gen) $(template_gen)
 
@@ -118,20 +117,9 @@ endif
 	@exit 1
 endif
 
-check-npm:
-ifndef found_npm
-ifdef found_apt
-	@echo "missing dependency: npm - install it using 'sudo apt install npm'"
-else
-	@echo "missing dependency: npm - install it using your method of choice"
-endif
-	@exit 1
-endif
-
-dep: dep-bats dep-docs dep-npm
+dep: dep-bats dep-docs
 dep-bats: check-bats common/bats/assert common/bats/detik common/bats/file common/bats/mock common/bats/support
 dep-docs: common/docs
-dep-npm: check-npm node_modules
 
 common/bats/assert:
 	@echo --- git clone github.com/bats-core/bats-assert
@@ -161,11 +149,6 @@ common/bats/support:
 common/docs:
 	@echo --- git clone github.com/elastisys/compliantkubernetes
 	@git clone --depth 1 https://github.com/elastisys/compliantkubernetes.git common/docs
-	@echo
-
-node_modules:
-	@echo --- npm install
-	@npm install --save-dev
 	@echo
 
 gen: gen-template gen-cypress
@@ -198,30 +181,23 @@ build: build-main
 
 build-main build-unit: build-%:
 ifdef found_docker
-	docker build --build-arg=UID=$(uid) --build-arg=GID=$(gid) --file Dockerfile --target $* --tag $(container_image):$* ../
+	docker build --file Dockerfile --target $* --tag $(container_image):$* ../
 else ifdef found_podman
-	podman build --build-arg=UID=$(uid) --build-arg=GID=$(gid) --file Dockerfile --target $* --tag $(container_image):$* ../
+	podman build --file Dockerfile --target $* --tag $(container_image):$* ../
 else
 	@echo "error: no container engine found to build the tests image!" >&2 && exit 1
 endif
 
 ctr-%:
-ifdef found_docker
-	docker run $(container_args) $(container_image):main make $*
-else ifdef found_podman
-	podman run --userns=keep-id $(container_args) $(container_image):main make $*
-else
-	@echo "error: no container engine found to run the tests image!" >&2 && exit 1
-endif
-
+	FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main make -C tests $*
+ctr-run-integration-%:
+	FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main make -C tests run-integration-$*
+ctr-run-integration:
+	FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main make -C tests run-integration
 ctr-run-unit-%:
-ifdef found_docker
-	docker run $(container_args) $(container_image):unit make run-unit-$*
-else ifdef found_podman
-	podman run --userns=keep-id $(container_args) $(container_image):unit make run-unit-$*
-else
-	@echo "error: no container engine found to run the tests image!" >&2 && exit 1
-endif
+	../scripts/run-from-container.sh $(container_image):unit make -C tests run-unit-$*
+ctr-run-unit:
+	../scripts/run-from-container.sh $(container_image):unit make -C tests run-unit
 
 print-%:
 	@echo $($*)
