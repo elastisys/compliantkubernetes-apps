@@ -2,7 +2,7 @@
   connection: local
   hosts: localhost
   vars:
-    install_path: /usr/local/bin
+    install_path: "{{ lookup('env', 'CK8S_INSTALL_PATH', default='/usr/local/bin') }}"
     install_user: "{{ lookup('env','USER') }}"
     kubectl_version: 1.28.6
     helm_version: 3.13.3
