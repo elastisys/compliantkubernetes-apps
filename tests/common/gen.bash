@@ -99,7 +99,18 @@ template() {
     args+=("--file=${file}" "--out=${file/%.bats.gotmpl/.gen.bats}")
   done
 
-  "${root}/scripts/run-from-container.sh" "docker.io/hairyhenderson/gomplate:v3.11.7-alpine" "${args[@]}"
+  if command -v gomplate > /dev/null; then
+    pushd ../
+    gomplate "${args[@]}"
+    popd
+  else
+    "${root}/scripts/run-from-container.sh" "docker.io/hairyhenderson/gomplate:v3.11.7-alpine" "${args[@]}"
+  fi
+
+  for file in "${files[@]}"; do
+    # Ensure they are up to date according to make when gomplate does not have any changes
+    touch "${file/%.bats.gotmpl/.gen.bats}"
+  done
 }
 
 case "${1:-}" in
