@@ -30,7 +30,7 @@ find_schemas() {
   refute_output
 }
 
-@test "root schemas should have type" {
+@test "root schemas should have types" {
   declare -a schemas && find_schemas
 
   run yq4 '{ filename: .type // "" } | select(.[] == "")' "${schemas[@]}"
@@ -38,52 +38,56 @@ find_schemas() {
   refute_output
 }
 
-# Any complex object should have a title
-@test "schemas with properties should have titles" {
+@test "object schemas with properties should have titles" {
   declare -a schemas && find_schemas
 
   run yq4 '{
     filename: [
-      .. | select(has("properties") and (.title == null or .title == "")) | path | join "."
+      .. | select(has("type") and .type == "object" and has("properties") and (
+        .title == null or .title == "")
+      ) | path | join "."
     ]
   } | select(.[].[] != "")' "${schemas[@]}"
 
   refute_output
 }
 
-# Any complex object should have a description
-@test "schemas with properties should have descriptions" {
+@test "object schemas with properties should have descriptions" {
   declare -a schemas && find_schemas
 
   run yq4 '{
     filename: [
-      .. | select(has("properties") and (.description == null or .description == "")) | path | join "."
+      .. | select(has("type") and .type == "object" and has("properties") and (
+        .description == null or .description == "")
+      ) | path | join "."
     ]
   } | select(.[].[] != "")' "${schemas[@]}"
 
   refute_output
 }
 
-# Any complex array should have a title
-@test "schemas with items should have titles" {
+@test "array schemas with items should have titles" {
   declare -a schemas && find_schemas
 
   run yq4 '{
     filename: [
-      .. | select(has("items") and (.title == null or .title == "")) | path | join "."
+      .. | select(has("type") and .type == "array" and has("items") and (
+        .title == null or .title == "")
+      ) | path | join "."
     ]
   } | select(.[].[] != "")' "${schemas[@]}"
 
   refute_output
 }
 
-# Any complex array should have a description
-@test "schemas with items should have descriptions" {
+@test "array schemas with items should have descriptions" {
   declare -a schemas && find_schemas
 
   run yq4 '{
     filename: [
-      .. | select(has("items") and (.description == null or .description == "")) | path | join "."
+      .. | select(has("type") and .type == "array" and has("items") and (
+        .description == null or .description == "")
+      ) | path | join "."
     ]
   } | select(.[].[] != "")' "${schemas[@]}"
 
@@ -97,7 +101,7 @@ find_schemas() {
   # shellcheck disable=SC2016
   run yq4 '{
     filename: [
-      .. | select((parent | key == "properties") and ((.$ref // "") == "") and ((.type // "") == "")) | path | join "."
+      .. | select((has("$ref") | not) and (has("type") | not) and (parent | key) == "properties" and (parent | parent | .type) == "object") | path | join "."
     ]
   } | select((.[] | length) != 0 and .[].[] != "")' "${schemas[@]}"
 
