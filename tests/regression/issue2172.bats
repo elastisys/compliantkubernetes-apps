@@ -6,7 +6,7 @@ setup() {
   load "../common/lib"
   load "../common/lib/env"
   env.setup
-  env.init "dev" "baremetal"
+  env.init baremetal kubespray dev
   common_setup
 }
 

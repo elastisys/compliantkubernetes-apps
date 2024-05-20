@@ -13,7 +13,7 @@ setup_file() {
   gpg.setup
   env.setup
 
-  env.init prod citycloud kubespray
+  env.init citycloud kubespray prod
 
   helmfile_template_releases sc
   helmfile_template_releases wc

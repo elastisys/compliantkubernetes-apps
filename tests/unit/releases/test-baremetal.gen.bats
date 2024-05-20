@@ -13,7 +13,7 @@ setup_file() {
   gpg.setup
   env.setup
 
-  env.init prod baremetal kubespray
+  env.init baremetal kubespray prod
 
   helmfile_template_releases sc
   helmfile_template_releases wc

@@ -21,8 +21,8 @@ setup() {
   export CK8S_CONFIG_PATH
   export CK8S_ENVIRONMENT_NAME="unit-test"
   export CK8S_CLOUD_PROVIDER="baremetal"
-  export CK8S_FLAVOR="dev"
   export CK8S_K8S_INSTALLER="kubespray"
+  export CK8S_FLAVOR="dev"
 
   common_setup
 }
