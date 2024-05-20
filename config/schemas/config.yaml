@@ -1217,9 +1217,9 @@ properties:
 
       - Fluentd audit logs
       - Fluentd service cluster logs
-      - Harbor database backups and registry storaga
+      - Harbor database backups and registry storage
       - OpenSearch workload cluster log snapshots
-      - Rclone object storage sync source and restore destnation
+      - Rclone object storage sync source and restore destination
       - Thanos metrics storage
       - Velero resource backups and volume snapshots
 
@@ -1227,11 +1227,20 @@ properties:
     type: object
     properties:
       buckets:
-        additionalProperties:
-          type: string
-        description: Buckets where each respective application will store its backups.
+        title: Object Storage Buckets
+        description: |-
+          Buckets or containers for each respective application to use for application data or backup storage.
+
+          Keys are used as identifiers for buckets or containers, while the values are used as the bucket or container name.
+
+          Additional entries added here will have monitoring enabled.
         type: object
+        additionalProperties:
+          title: Bucket Name
+          description: The bucket or container name.
+          type: string
       type:
+        title: Object Storage Type
         description: |-
           Object storage type to use.
 
@@ -1249,6 +1258,7 @@ properties:
         type: object
         properties:
           resourceGroup:
+            title: Azure Resource Group
             description: Resource group of the storage account.
             type: string
       s3:
@@ -1258,9 +1268,11 @@ properties:
         type: object
         properties:
           region:
-            description: S3 region.
+            title: S3 Region
+            description: Region to store data.
             type: string
           regionEndpoint:
+            title: S3 Region Endpoint
             description: |-
               Endpoint to reach the S3 service, mainly applicable for non-AWS implementations.
 
@@ -1268,6 +1280,7 @@ properties:
             type: string
             format: uri
           forcePathStyle:
+            title: S3 Force Path Style
             description: |-
               Force the use of path style access instead of virtual host style access.
 
@@ -1282,6 +1295,7 @@ properties:
         type: object
         properties:
           authVersion:
+            title: OpenStack Authentication Version
             description: |-
               OpenStack authentication version.
 
@@ -1289,53 +1303,62 @@ properties:
             type: integer
             default: 0
           authUrl:
+            title: OpenStack Authentication URL
             description: |-
-              OpenStack authentication url.
+              OpenStack authentication URL.
 
               Make sure to prepend the protocol (e.g. `https://`) and append the authentication version (e.g. `/v3`).
             type: string
             format: uri
           region:
+            title: OpenStack Region
             description: |-
               OpenStack region.
             type: string
           domainId:
+            title: OpenStack Domain ID
             description: |-
               The user domain ID to use.
 
               User domain is required when authenticating with `username`, set either `domainId` or `domainName`.
             type: string
           domainName:
+            title: OpenStack Domain Name
             description: |-
               The user domain name to use.
 
               User domain is required when authenticating with `username`, set either `domainId` or `domainName`.
             type: string
           projectDomainId:
+            title: OpenStack Project Domain ID
             description: |-
               The project domain ID to use.
 
               Project domain is required when authenticating with `projectName`, set either `projectDomainId` or `projectDomainName`.
             type: string
           projectDomainName:
+            title: OpenStack Project Domain Name
             description: |-
               The project domain name to use.
 
               Project domain is required when authenticating with `projectName`, set either `projectDomainId` or `projectDomainName`.
             type: string
           projectId:
+            title: OpenStack Project ID
             description: |-
               The project ID to use.
 
               Project is required when authenticating with `username`, set either `projectId` or `projectName`.
             type: string
           projectName:
+            title: OpenStack Project Name
             description: |-
               The project name to use, requires project domain to be set.
 
               Project is required when authenticating with `username`, set either `projectId` or `projectName`.
             type: string
           segmentsContainerSuffix:
+            title: Swift Segments Container Suffix
             description: |-
               The container suffix to use for segment containers.
 
@@ -1350,25 +1373,31 @@ properties:
         type: object
         properties:
           enabled:
+            title: Rclone Sync Enable
             type: boolean
             default: false
           dryrun:
+            title: Rclone Sync Dryrun
             description: Deploy Rclone with dryrun enabled.
             type: boolean
             default: false
           syncDefaultBuckets:
-            description: Sync the buckets set under `.objectStorage.buckets`.
+            title: Rclone Sync Default Buckets
+            description: Sync the buckets or containers set under `.objectStorage.buckets`.
             type: boolean
             default: false
           defaultSchedule:
+            title: Rclone Sync Default Schedule
             description: Default schedule to run the sync CronJobs.
             type: string
             default: 0 5 * * *
           buckets:
+            title: Rclone Sync Buckets
             description: Additional buckets to sync.
             type: array
             default: []
           destinationType:
+            title: Rclone Sync Destination Type
             description: |-
               Object storage type to use.
             type: string
@@ -1389,16 +1418,19 @@ properties:
             additionalProperties: false
             title: Rclone Crypt
             description: |-
-              Encrypt data when syncing.
+              Encrypt data when syncing and decrypt data when restoring.
             properties:
               enabled:
+                title: Rclone Crypt Enable
                 type: boolean
                 default: false
               fileNames:
+                title: Rclone Crypt Crypt File Names
                 description: Encrypt file names when syncing.
                 type: boolean
                 default: false
               directoryNames:
+                title: Rclone Crypt Crypt Directory Names
                 description: Encrypt directory names when syncing, requires file names to be encrypted.
                 type: boolean
                 default: false
@@ -1414,13 +1446,16 @@ properties:
         type: object
         properties:
           enabled:
+            title: Rclone Restore Enable
             type: boolean
             default: false
           dryrun:
+            title: Rclone Restore Dryrun
             description: Deploy Rclone with dryrun enabled.
             type: boolean
             default: false
           addTargetsFromSync:
+            title: Rclone Restore Targets From Sync
             description: |-
               Automatically configure the restore from a secondary site to the primary site.
 
@@ -1428,10 +1463,12 @@ properties:
             type: boolean
             default: false
           targets:
+            title: Rclone Restore Targets
             description: Targets to restore
             type: array
             default: []
           timestamp:
+            title: Rclone Restore Timestamp
             description: |-
               Perform point-in-time restore if possible.
 
