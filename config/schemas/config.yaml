@@ -1816,62 +1816,64 @@ properties:
     type: object
   falco:
     additionalProperties: false
+    title: Falco Config
     description: |
-      Falco alerting configuration.
-
-      Available rule files and addons can be found at: <https://falcosecurity.github.io/falcoctl/index.yaml>
+      Configuration for Falco, runtime security tool and threat detection.
+    type: object
     properties:
-      affinity:
-        $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      enabled:
+        title: Falco Enabled
+        type: boolean
+        default: true
       alerts:
         additionalProperties: false
-        description: Falco alerts will come from prometheus metrics
+        title: Falco Alerts
+        description: Configure Falco alerts sent from Falco sidekick.
+        type: object
         properties:
           enabled:
-            default: false
+            title: Falco Alerts Enabled
             type: boolean
-          hostPort:
-            default: http://alertmanager-operated.monitoring:9093
-            format: uri
-            type: string
-          priority:
-            default: notice
-            type: string
+            default: false
           type:
+            title: Falco Alerts Type
+            description: Configure the notification channel for Falco alerts.
+            type: string
             default: alertmanager
             enum:
               - alertmanager
               - slack
+          hostPort:
+            title: Falco Alerts Host Port
+            description: Configure the notification channel for Falco alerts.
             type: string
-        type: object
-      artifact:
-        additionalProperties: false
-        properties:
-          install:
-            additionalProperties: false
-            description: set to false in an air-gapped environment, unless artifacts are self-hosted
-            properties:
-              enabled:
-                type: boolean
-            type: object
-        type: object
-      customIndexes:
-        type: array
-      customRules:
-        additionalProperties:
-          format: yaml
-          type: string
-        type: object
+            format: uri
+            default: http://alertmanager-operated.monitoring:9093
+          priority:
+            title: Falco Alerts Priority
+            description: Configure the notification priority for Falco alerts.
+            type: string
+            default: notice
       driver:
+        title: Falco Driver
+        description: |-
+          Configuration for the Falco syscall driver used to collect events.
+
+          See [the upstream documentation](https://falco.org/docs/event-sources/kernel/) for more information.
+        type: object
         properties:
           kind:
-            default: kmod
+            title: Falco Driver Kind
             type: string
+            default: kmod
             enum:
               - kmod
-              - ebpf
               - modern-bpf
-        type: object
+              - ebpf
+            meta:enum:
+              kmod: Kernel module (default)
+              modern-bpf: Modern eBPF probe
+              ebpf: Legacy eBPF probe
         if:
           properties:
             kind:
@@ -1880,106 +1882,191 @@ properties:
           properties:
             module:
               additionalProperties: false
-              description: override the URL used for downloading driver modules, e.g. to use a self hosted file server in an air-gapped environment
+              title: Falco Kmod Driver Config
+              description: Configuration for the Falco Kmod Driver.
+              type: object
               properties:
                 repoURL:
+                  title: Falco Kmod Driver URL
+                  description: Override the URL used to download driver modules, e.g. to use a self hosted file server in an air-gapped environment
+                  type: string
                   oneOf:
                     - contst: ""
                     - format: uri
-                  type: string
-              type: object
         else:
           properties:
             kind:
               type: string
               enum:
-                - ebpf
                 - modern-bpf
+                - ebpf
             ebpf:
               additionalProperties: false
+              title: Falco eBPF Driver Config
+              description: Configuration for the Falco eBPF Driver.
+              type: object
               properties:
                 hostNetwork:
-                  description: Needed to enable eBPF JIT at runtime for performance reasons. Can be skipped if eBPF JIT is enabled from outside the container
-                  default: false
+                  title: Falco eBPF Host Network
+                  description: |-
+                    Needed to enable eBPF JIT at runtime for performance reasons.
+                    Can be skipped if eBPF JIT is enabled from outside the container
                   type: boolean
+                  default: false
                 path:
-                  description: Path where the eBPF probe is located. It comes in handy when the probe have been installed in the nodes using tools other than the init container deployed with the chart.
-                  type:
-                    - string
-                    - "null"
-                  $comment: Phase out the null default from the default config eventually
-              type: object
-      enabled:
-        default: true
-        type: boolean
-      falcoExporter:
+                  title: Falco eBPF Path
+                  description: |-
+                    Path where the eBPF probe is located.
+                    It comes in handy when the probe have been installed in the nodes using tools other than the init container deployed with the chart.
+                  type: string
+                  default: ""
+      artifact:
+        title: Falcoctl Artifact
+        description: |-
+          Configure Falcoctl artefact management.
+
+          See [the upstream repository](https://github.com/falcosecurity/falcoctl) for reference.
         additionalProperties: false
-        properties:
-          affinity:
-            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
-          nodeSelector:
-            $ref: '#/$defs/kubernetesNodeSelector'
-          resources:
-            $ref: '#/$defs/kubernetesResourceRequirements'
-          tolerations:
-            $ref: '#/$defs/kubernetesTolerations'
         type: object
-      falcoSidekick:
-        additionalProperties: false
         properties:
-          affinity:
-            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
-          nodeSelector:
-            $ref: '#/$defs/kubernetesNodeSelector'
-          resources:
-            $ref: '#/$defs/kubernetesResourceRequirements'
-          tolerations:
-            $ref: '#/$defs/kubernetesTolerations'
-        type: object
-      nodeSelector:
-        $ref: '#/$defs/kubernetesNodeSelector'
-      resources:
-        $ref: '#/$defs/kubernetesResourceRequirements'
+          install:
+            title: Falcoctl Artifact Install
+            description: Configure Falcoctl artefact install.
+            additionalProperties: false
+            type: object
+            properties:
+              enabled:
+                title: Falcoctl Artifact Install Enabled
+                description: |-
+                  Configure Falcoctl to install additional artifacts before Falco starts.
+
+                  Set this to false in an air-gapped environment, unless artifacts are self-hosted and `customIndexes` are configured.
+                type: boolean
+                default: false
+      customIndexes:
+        title: Falcoctl Custom Artifact Indices
+        description: Configure custom artefact indices for Falcoctl.
+        type: array
+        items:
+          title: Falcoctl Custom Artifact Index
+          description: Configure custom artefact index for Falcoctl.
+          type: object
+          properties:
+            name:
+              title: Falcoctl Artifact Index Name
+              type: string
+            url:
+              title: Falcoctl Artifact Index URL
+              type: string
+              format: uri
       rulesFiles:
+        title: Falco Rule Files
+        description: |-
+          Configure standard rules to use in Falco.
+
+          See [the upstream documentation](https://falcosecurity.github.io/rules/) for reference.
         additionalProperties: false
+        type: object
         properties:
           default:
             additionalProperties: false
+            title: Falco Default Rules
+            description: Configure Falco default rules
+            type: object
             properties:
               enabled:
-                default: true
+                title: Falco Default Rules Enabled
                 type: boolean
+                default: true
               version:
-                default: 2.0.0
+                title: Falco Default Rules Version
                 type: string
-            type: object
+                default: 3.0.1
           incubating:
             additionalProperties: false
+            title: Falco Incubating Rules
+            description: Configure Falco incubating rules
+            type: object
             properties:
               enabled:
-                default: false
+                title: Falco Incubating Rules Enabled
                 type: boolean
+                default: false
               version:
-                default: 2.0.0
+                title: Falco Incubating Rules Version
                 type: string
-            type: object
+                default: 3.0.1
           sandbox:
             additionalProperties: false
+            title: Falco Sandbox Rules
+            description: Configure Falco sandbox rules
+            type: object
             properties:
               enabled:
-                default: false
+                title: Falco Sandbox Rules Enabled
                 type: boolean
+                default: false
               version:
-                default: 2.0.0
+                title: Falco Sandbox Rules Version
                 type: string
-            type: object
+                default: 3.0.1
+      customRules:
+        title: Falco Custom Rules
+        description:
+          Configure custom rules to use in Falco.
+
+          > [note]
+          > The keys will become the file name of the generated rule file, and all files are parsed in alphabetical order.
+
+          See [the upstream documentation](https://falco.org/docs/rules/) for reference.
+        additionalProperties:
+          format: yaml
+          type: string
         type: object
+      tty:
+        title: Falco Allocate TTY
+        description: |-
+          Attach the Falco process to a TTY inside the container.
+
+          Needed to flush Falco logs as soon as they are emitted.
+        type: boolean
+        default: true
+      falcoExporter:
+        additionalProperties: false
+        title: Falco Exporter
+        description: Basic configuration for Falco Exporter, the daemon set that exposes Falco alerts to Prometheus.
+        type: object
+        properties:
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      falcoSidekick:
+        additionalProperties: false
+        title: Falco Sidekick
+        description: Basic configuration for Falco Sidekick, the deployment that forwards Falco alerts to Alertmanager.
+        type: object
+        properties:
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
       tolerations:
         $ref: '#/$defs/kubernetesTolerations'
-      tty:
-        default: true
-        type: boolean
-    type: object
+      nodeSelector:
+        $ref: '#/$defs/kubernetesNodeSelector'
+      affinity:
+        $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
   gatekeeper:
     title: Open Policy Agent Gatekeeper configuration
     type: object
