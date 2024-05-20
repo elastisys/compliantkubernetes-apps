@@ -2,12 +2,13 @@
 
 # Generated from tests/unit/releases/template.bats.gotmpl
 
-# bats file_tags=static,aws
+# bats file_tags=static,releases,aws
 
 setup_file() {
-  load "../../common/lib"
-  load "../../common/lib/env"
-  load "../../common/lib/gpg"
+  load "../../bats.lib.bash"
+  load_common "env.bash"
+  load_common "gpg.bash"
+  load_common "yq.bash"
   load "script"
 
   gpg.setup
@@ -20,10 +21,9 @@ setup_file() {
 }
 
 setup() {
-  load "../../common/lib"
+  load "../../bats.lib.bash"
+  load_common "yq.bash"
   load "script"
-
-  common_setup
 }
 
 teardown_file() {
