@@ -93,14 +93,13 @@ template() {
 
   for file in "${files[@]}"; do
     file="${file##"${root}/"}"
-
     echo "- ${file}"
 
     args+=("--file=${file}" "--out=${file/%.bats.gotmpl/.gen.bats}")
   done
 
   if command -v gomplate > /dev/null; then
-    pushd ../
+    pushd "${root}"
     gomplate "${args[@]}"
     popd
   else
@@ -111,6 +110,7 @@ template() {
     # Ensure they are up to date according to make when gomplate does not have any changes
     touch "${file/%.bats.gotmpl/.gen.bats}"
   done
+
 }
 
 case "${1:-}" in
