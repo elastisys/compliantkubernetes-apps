@@ -101,7 +101,13 @@ find_schemas() {
   # shellcheck disable=SC2016
   run yq4 '{
     filename: [
-      .. | select((has("$ref") | not) and (has("type") | not) and (parent | key) == "properties" and (parent | parent | .type) == "object") | path | join "."
+      .. | select(
+        (has("$ref") | not) and
+        (has("allOf") | not) and
+        (has("type") | not) and
+        (parent | key) == "properties" and
+        (parent | parent | .type) == "object"
+      ) | path | join "."
     ]
   } | select((.[] | length) != 0 and .[].[] != "")' "${schemas[@]}"
 

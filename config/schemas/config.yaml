@@ -498,6 +498,132 @@ $defs:
       - operator
     type: object
     $comment: Imported from Kubernetes project
+  io.k8s.api.core.v1.EnvVar:
+    title: Environment Variable
+    description: EnvVar represents an environment variable present in a Container.
+    type: object
+    properties:
+      name:
+        title: Environment Variable Name
+        description: |-
+          Name of the environment variable.
+
+          Must be a C_IDENTIFIER.
+        type: string
+      value:
+        title: Environment Variable Value
+        description: |-
+          Variable references `$(VAR_NAME)` are expanded using the previously defined environment variables in the container and any service environment variables.
+          If a variable cannot be resolved, the reference in the input string will be unchanged.
+          Double `$$` are reduced to a single `$`, which allows for escaping the `$(VAR_NAME)` syntax: i.e. `$$(VAR_NAME)` will produce the string literal `$(VAR_NAME)`.
+          Escaped references will never be expanded, regardless of whether the variable exists or not.
+        type: string
+      valueFrom:
+        $ref: '#/$defs/io.k8s.api.core.v1.EnvVarSource'
+    required:
+      - name
+    $comment: Imported from Kubernetes project
+  io.k8s.api.core.v1.EnvVarSource:
+    title: Environment Variable Source
+    description: Environment Variable Source represents a source for the value of an Environment Variable.
+    type: object
+    properties:
+      configMapKeyRef:
+        $ref: '#/components/schemas/io.k8s.api.core.v1.ConfigMapKeySelector'
+      fieldRef:
+        $ref: '#/components/schemas/io.k8s.api.core.v1.ObjectFieldSelector'
+      resourceFieldRef:
+        $ref: '#/components/schemas/io.k8s.api.core.v1.ResourceFieldSelector'
+      secretKeyRef:
+        $ref: '#/components/schemas/io.k8s.api.core.v1.SecretKeySelector'
+    $comment: Imported from Kubernetes project
+  io.k8s.api.core.v1.ConfigMapKeySelector:
+    title: Config Map Key Selector
+    description: Selects a key from a ConfigMap.
+    type: object
+    properties:
+      key:
+        title: Config Map Key
+        description: The key to select.
+        type: string
+        default: ""
+      name:
+        title: Config Map Name
+        type: string
+        description: |-
+          Name of the referent.
+
+          This field is effectively required, but due to backwards compatibility is allowed to be empty.
+          Instances of this type with an empty value here are almost certainly wrong.
+          More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+        default: ""
+      optional:
+        title: Config Map Optional
+        description: Specify whether the ConfigMap or its key must be defined.
+        type: boolean
+    required:
+      - key
+    $comment: Imported from Kubernetes project
+  io.k8s.api.core.v1.ObjectFieldSelector:
+    title: Object Field Selector
+    description: ObjectFieldSelector selects an APIVersioned field of an object.
+    properties:
+      apiVersion:
+        title: API Version
+        description: Version of the schema the FieldPath is written in terms of, defaults to `v1`.
+        type: string
+      fieldPath:
+        title: Field Path
+        default: ""
+        description: Path of the field to select in the specified API version.
+        type: string
+    required:
+      - fieldPath
+    $comment: Imported from Kubernetes project
+  io.k8s.api.core.v1.ResourceFieldSelector:
+    title: Resource Field Selector
+    description: ResourceFieldSelector represents container resources (cpu, memory) and their output format.
+    type: object
+    properties:
+      containerName:
+        title: Container Name
+        description: Container name, required for volumes, optional for env vars
+        type: string
+      divisor:
+        title: Divisor
+        description: Specifies the output format of the exposed resources, defaults to `1`.
+        $ref: "#/$defs/KubernetesQuantity"
+      resource:
+        title: Resource
+        description: Required, resource to select"
+        type: string
+        default: ""
+    $comment: Imported from Kubernetes project
+  io.k8s.api.core.v1.SecretKeySelector:
+    title: Secret Key Selector
+    description: SecretKeySelector selects a key of a Secret.
+    type: object
+    properties:
+      key:
+        description: |-
+          The key of the secret to select from.
+          Must be a valid secret key.
+        type: string
+        default: ""
+      name:
+        description: |-
+          Name of the referent.
+          This field is effectively required, but due to backwards compatibility is allowed to be empty.
+          Instances of this type with an empty value here are almost certainly wrong.
+          More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+        type: string
+        default: ""
+      optional:
+        description: Specify whether the Secret or its key must be defined
+        type: boolean
+    required:
+      - key
+    $comment: Imported from Kubernetes project
 type: object
 required:
   - global
@@ -1859,6 +1985,7 @@ properties:
     type: object
     properties:
       allowUserCRDs:
+        type: object
         properties:
           enabled:
             type: boolean
@@ -1895,64 +2022,131 @@ properties:
     additionalProperties: false
   kured:
     additionalProperties: false
+    title: Kured Config
+    description: |-
+      Configuration for Kured (Kubernetes Reboot Daemon).
+
+      Kured orchestrates node reboots to allow nodes to automatically perform system updates and patches.
+    type: object
     properties:
-      affinity:
-        $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
-      configuration:
-        $comment: Would it be possible to extract schema from somewhere else in the future?
-        description: |-
-          Passed through as-is to Kured chart
-          See <helmfile.d/upstream/kubereboot/kured/README.md#Configuration>
-        properties: {}
-        type: object
-      drainTimeout: true
-      dsAnnotations:
-        type: object
       enabled:
+        title: Kured Enabled
         default: false
         type: boolean
-      endTime: true
-      extraArgs:
+      configuration:
+        title: Kured Config
+        description: |-
+          Kured configuration parameters.
+
+          See [the upstream documentation for reference](https://kured.dev/docs/configuration/).
+          Most parameters are mapped from `camelCase` to `--kebab-case`, others can be set via `extraArgs`.
         type: object
+        properties:
+          drainTimeout:
+            title: Kured Drain Timeout
+            description: |-
+              Timeout after which the drain is aborted.
+
+              Default 0, infinite time.
+            $ref: '#/$defs/goDuration'
+            default: "0"
+          timeZone:
+            title: Kured Schedule Time Zone
+            type: string
+            default: UTC
+          startTime:
+            title: Kured Schedule Start Time
+            description: Schedule reboots only after this time of day.
+            type: string
+            default: 0:00
+          endTime:
+            title: Kured Schedule End Time
+            description: Schedule reboots only before this time of day.
+            type: string
+            default: 23:59:59
+          rebootDays:
+            title: Kured Schedule Reboot Days
+            description: Only reboot on these days.
+            type: array
+            items:
+              type: string
+              examples:
+                - mo
+                - tu
+                - we
+                - th
+                - fr
+                - sa
+                - su
+            default:
+              - mo
+              - tu
+              - we
+              - th
+              - fr
+              - sa
+              - su
+          period:
+            title: Kured Reboot Check Period
+            description: Sentinel check period.
+            $ref: '#/$defs/goDuration'
+            default: 1h
+          lockReleaseDelay:
+            title: Kured Reboot Lock Release Delay
+            description: Hold lock after reboot by this amount of time.
+            $ref: '#/$defs/goDuration'
+            default: 5m
+      extraArgs:
+        $ref: '#/$defs/extraArgs'
       extraEnvVars:
         type: object
       metrics:
+        title: Kured Metrics
+        description: Configuration for Kured metrics
         additionalProperties: false
         properties:
           enabled:
-            default: true
+            title: Kured Metrics Enabled
             type: boolean
+            default: true
           interval:
+            title: Kured Metrics Duration
+            $ref: "#/$defs/goDuration"
             default: 60s
-            type: string
           labels:
+            title: Kured Metrics Labels
             type: object
         type: object
-      nodeSelector:
-        $ref: '#/$defs/kubernetesNodeSelector'
       notification:
+        title: Kured Notification
+        description: Send notification from Kured when nodes are rebooted.
         additionalProperties: false
+        type: object
         properties:
           slack:
+            title: Kured Slack Notification
+            description: Send notification from Kured to Slack when nodes are rebooted.
             additionalProperties: false
+            type: object
             properties:
-              channel:
-                default: ""
-                type: string
               enabled:
+                title: Kured Slack Notification Enabled
                 default: false
                 type: boolean
-            type: object
+              channel:
+                title: Kured Slack Notification Channel
+                default: ""
+                type: string
+      dsAnnotations:
         type: object
-      period: true
-      rebootDays: true
       resources:
         $ref: '#/$defs/kubernetesResourceRequirements'
-      startTime: true
-      timeZone: true
       tolerations:
         $ref: '#/$defs/kubernetesTolerations'
-    type: object
+      nodeSelector:
+        $ref: '#/$defs/kubernetesNodeSelector'
+      affinity:
+        $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
   opa:
     additionalProperties: false
     properties:
@@ -2150,7 +2344,6 @@ properties:
           configurations for an offline / air-gapped environment
           ref: <https://github.com/aquasecurity/trivy-operator/tree/main/deploy/helm#values>
         properties:
-          additionalProperties: false
           dbRegistry:
             type: string
           dbRepository:
@@ -3604,7 +3797,6 @@ properties:
       - indexPerNamespace
       - dashboards
     type: object
-  elasticsearch: true
 additionalProperties:
   type: object
   properties: {}
