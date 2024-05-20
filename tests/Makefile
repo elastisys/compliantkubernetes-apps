@@ -15,9 +15,6 @@ template_gen = $(template_suites:.bats.gotmpl=.gen.bats)
 
 endif
 
-uid := $(shell id -u)
-gid := $(shell id -g)
-
 found_docker := $(shell command -v docker 2>/dev/null)
 found_podman := $(shell command -v podman 2>/dev/null)
 
@@ -40,8 +37,6 @@ ifndef CI
 container_args += --interactive --tty
 endif
 
-container_args += --rm --user $(uid):$(gid) --env=ROOT/apps
-
 ifdef CK8S_CONFIG_PATH
 container_args += --env=CK8S_CONFIG_PATH=${CK8S_CONFIG_PATH}
 container_args += --mount type=bind,source=${CK8S_CONFIG_PATH},target=${CK8S_CONFIG_PATH}
@@ -55,101 +50,53 @@ endif
 
 container_args += --network=host
 
-found_apt := $(shell command -v apt 2>/dev/null)
-
-found_bats := $(shell command -v bats 2>/dev/null)
-
 all := $(cypress_gen) $(template_gen)
 
 nproc := $(shell nproc)
 
-all: $(all) | dep
+all: $(all)
 	@echo --- bats all
 	@bats -j $(nproc) -r unit regression integration end-to-end
 
-run-unit: $(filter unit/%,$(all)) | dep-bats
+run-unit: $(filter unit/%,$(all))
 	@echo --- bats unit
 	@bats -j $(nproc) -r unit
 
-run-regression: $(filter regression/%,$(all)) | dep
+run-regression: $(filter regression/%,$(all))
 	@echo --- bats regression
 	@bats -j $(nproc) -r regression
 
-run-integration: $(filter integration/%,$(all)) | dep
+run-integration: $(filter integration/%,$(all))
 	@echo --- bats integration
 	@bats -j $(nproc) -r integration
 
-run-end-to-end: $(filter end-to-end/%,$(all)) | dep
+run-end-to-end: $(filter end-to-end/%,$(all))
 	@echo --- bats end-to-end
 	@bats -j $(nproc) -r end-to-end
 
-run-all-%: $(all) | dep
+run-all-%: $(all)
 	@echo --- bats all $*
 	@bats -j $(nproc) -r unit regression integration end-to-end --filter-tags $*
 
-run-unit-%: $(filter unit/%,$(all)) | dep-bats
+run-unit-%: $(filter unit/%,$(all))
 	@echo --- bats unit $*
 	@bats -j $(nproc) -r unit --filter-tags $*
 
-run-regression-%: $(filter regression/%,$(all)) | dep
+run-regression-%: $(filter regression/%,$(all))
 	@echo --- bats unit $*
 	@bats -j $(nproc) -r regression --filter-tags $*
 
-run-integration-%: $(filter integration/%,$(all)) | dep
+run-integration-%: $(filter integration/%,$(all))
 	@echo --- bats unit $*
 	@bats -j $(nproc) -r integration --filter-tags $*
 
-run-end-to-end-%: $(filter end-to-end/%,$(all)) | dep
+run-end-to-end-%: $(filter end-to-end/%,$(all))
 	@echo --- bats unit $*
 	@bats -j $(nproc) -r end-to-end --filter-tags $*
 
 $(all:.bats=): %: %.bats
 	@echo --- bats $*.bats
 	@bats -j $(nproc) -r $*.bats
-
-check-bats:
-ifndef found_bats
-ifdef found_apt
-	@echo "missing dependency: bats - install it using 'sudo apt install bats'"
-else
-	@echo "missing dependency: bats - install it using your method of choice"
-endif
-	@exit 1
-endif
-
-dep: dep-bats dep-docs
-dep-bats: check-bats common/bats/assert common/bats/detik common/bats/file common/bats/mock common/bats/support
-dep-docs: common/docs
-
-common/bats/assert:
-	@echo --- git clone github.com/bats-core/bats-assert
-	@git clone --depth 1 https://github.com/bats-core/bats-assert.git common/bats/assert
-	@echo
-
-common/bats/detik:
-	@echo --- git clone github.com/bats-core/bats-detik
-	@git clone --depth 1 https://github.com/bats-core/bats-detik.git common/bats/detik
-	@echo
-
-common/bats/file:
-	@echo --- git clone github.com/bats-core/bats-file
-	@git clone --depth 1 https://github.com/bats-core/bats-file.git common/bats/file
-	@echo
-
-common/bats/mock:
-	@echo --- git clone github.com/grayhemp/bats-mock
-	@git clone --depth 1 https://github.com/grayhemp/bats-mock.git common/bats/mock
-	@echo
-
-common/bats/support:
-	@echo --- git clone github.com/bats-core/bats-support
-	@git clone --depth 1 https://github.com/bats-core/bats-support.git common/bats/support
-	@echo
-
-common/docs:
-	@echo --- git clone github.com/elastisys/compliantkubernetes
-	@git clone --depth 1 https://github.com/elastisys/compliantkubernetes.git common/docs
-	@echo
 
 gen: gen-template gen-cypress
 

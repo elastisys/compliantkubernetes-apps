@@ -1,3 +1,4 @@
+# Container to run unit tests
 FROM ubuntu:rolling AS unit
 LABEL org.opencontainers.image.source https://github.com/elastisys/compliantkubernetes-apps
 
@@ -72,9 +73,16 @@ RUN curl -LOs "https://github.com/hairyhenderson/gomplate/releases/download/v${G
     install -Tm 755 gomplate_linux-amd64 /usr/local/bin/gomplate && \
     rm gomplate_linux-amd64
 
+# Currently all from main as most do not have current releases
+RUN git clone --depth 1 https://github.com/bats-core/bats-assert.git /usr/local/lib/bats/assert
+RUN git clone --depth 1 https://github.com/bats-core/bats-detik.git /usr/local/lib/bats/detik
+RUN git clone --depth 1 https://github.com/bats-core/bats-file.git /usr/local/lib/bats/file
+RUN git clone --depth 1 https://github.com/grayhemp/bats-mock.git /usr/local/lib/bats/mock
+RUN git clone --depth 1 https://github.com/bats-core/bats-support.git /usr/local/lib/bats/support
 
+RUN git clone --depth 1 https://github.com/elastisys/compliantkubernetes.git /usr/local/share/docs
 
-# Container to run all tests
+# Container to run integration and end-to-end tests
 FROM unit AS main
 
 RUN apt-get update && \
@@ -96,17 +104,3 @@ RUN curl -LOs "https://github.com/containers/podman/releases/download/v${PODMAN_
     tar -zxvf podman-remote-static-linux_amd64.tar.gz bin/podman-remote-static-linux_amd64 && \
     install -Tm 755 bin/podman-remote-static-linux_amd64 /usr/local/bin/podman && \
     rm bin/podman-remote-static-linux_amd64 podman-remote-static-linux_amd64.tar.gz
-
-# USER ubuntu
-
-# ENV ROOT="/apps"
-
-# COPY --chown=ubuntu:ubuntu tests/Makefile tests/package.json tests/package-lock.json /apps/tests/
-
-# WORKDIR /apps/tests
-
-# RUN CK8S_TESTS_BUILD=true make dep
-
-# COPY --chown=ubuntu:ubuntu . /apps/
-
-# RUN make gen
