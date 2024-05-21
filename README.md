@@ -58,18 +58,8 @@ The apps are installed using a combination of helm charts and manifests with the
 
 ### :wrench: Requirements :wrench:
 
-- [compliantkubernetes-kubespray][compliantkubernetes-kubespray] environment
-- [kubectl](https://github.com/kubernetes/kubernetes/releases) (tested with 1.24.4)
-- [helm](https://github.com/helm/helm/releases) (tested with 3.8.0)
-- [helmfile](https://github.com/helmfile/helmfile) (tested with v0.154.0)
-- [helm-diff](https://github.com/databus23/helm-diff) (tested with 3.5.0)
-- [helm-secrets](https://github.com/futuresimple/helm-secrets) (tested with 3.12.0)
-- [jq](https://github.com/stedolan/jq) (tested with jq-1.6)
-- [sops](https://github.com/getsops/sops) (tested with 3.7.3)
-- [s3cmd](https://s3tools.org/s3cmd) available directly in Ubuntus repositories (tested with 2.0.1)
-- [yq4](https://github.com/mikefarah/yq) (tested with 4.26.1)
-- [pwgen](https://sourceforge.net/projects/pwgen/) available directly in Ubuntus repositories (tested with 2.08)
-- [htpasswd](https://httpd.apache.org/docs/2.4/programs/htpasswd.html) available directly in Ubuntus repositories (tested with 2.4.41)
+To operate compliantkubernetes-apps some tools need to be installed.
+They are declared in the file [REQUIREMENTS](./REQUIREMENTS) as [PURLs](https://github.com/package-url/purl-spec).
 
 Install the requirements to use compliantkubernetes-apps:
 
