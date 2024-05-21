@@ -3557,40 +3557,42 @@ properties:
     type: object
     additionalProperties: false
     $defs:
-      nodeJavaOpts:
-        title: OpenSearch Node Java Options
-        description: |-
-          Set Java Virtual Machine Options to control the memory allocation of OpenSearch.
+      node:
+        title: OpenSearch Node
+        description: Definitions for OpenSearch nodes.
+        type: object
+        properties:
+          javaOpts:
+            title: OpenSearch Node Java Options
+            description: |-
+              Set Java Virtual Machine Options to control the memory allocation of OpenSearch.
 
-          As a rule of thumb the minimum allocation `-Xms` and maximum allocation `-Xmx` arguments should be the same to be more predictable.
-          Additionally until memory allocation is at 2 GiB and more it is recommended that the memory limit set in Kubernetes is twice the allocation as OpenSearch uses this for cache.
-        type: string
-        default: -Xms512m -Xmx512m
-      nodeStorageClass:
-        title: OpenSearch Node Storage Class
-        type:
-          - string
-          - "null"
-        description: |-
-          Set storage class for OpenSearch.
+              As a rule of thumb the minimum allocation `-Xms` and maximum allocation `-Xmx` arguments should be the same to be more predictable.
+              Additionally until memory allocation is at 2 GiB and more it is recommended that the memory limit set in Kubernetes is twice the allocation as OpenSearch uses this for cache.
+            type: string
+            default: -Xms512m -Xmx512m
+          storageClass:
+            title: OpenSearch Node Storage Class
+            type:
+              - string
+              - "null"
+            description: |-
+              Set storage class for OpenSearch.
 
-          - If set to `null`, the default storage class will be used to provision the volumes.
-          - If set to `-`, no storage class will be used to provision the volumes.
-      nodeStorageSize:
-        title: OpenSearch Node Storage Size
-        description: Configure the requested size of the persistent volume for this OpenSerch node.
-        type: string
+              - If set to `null`, the default storage class will be used to provision the volumes.
+              - If set to `-`, no storage class will be used to provision the volumes.
+          storageSize:
+            title: OpenSearch Node Storage Size
+            description: Configure the requested size of the persistent volume for this OpenSerch node.
+            type: string
       role:
         title: OpenSearch Role
-        description: |-
-          Configures a role for OpenSearch Security.
-
-          > [!note]
-          > See [the upstream documentation](https://opensearch.org/docs/latest/security/configuration/yaml/#rolesyml) for reference.
-        additionalProperties: false
+        description: Definitions for OpenSearch roles.
+        type: object
         properties:
-          role_name:
+          name:
             title: OpenSearch Role Name
+            description: Configures the name of the create role.
             type: string
           definition:
             title: OpenSearch Role Definition
@@ -3599,43 +3601,73 @@ properties:
             type: object
             properties:
               cluster_permissions:
-                $ref: "#/properties/opensearch/$defs/roleClusterPermissions"
+                $ref: "#/properties/opensearch/$defs/role/properties/clusterPermissions"
               index_permissions:
-                $ref: "#/properties/opensearch/$defs/roleIndexPermissions"
-      roleClusterPermissions:
-        title: OpenSearch Role Cluster Permissions
-        description: Configure permissions that applies cluster-wide.
-        type: array
-        items:
-          title: OpenSearch Cluster Permission
-          type: string
-      roleIndexPermissions:
-        title: OpenSearch Role Index Permissions
-        description: Configure permissions that applies per index.
-        type: array
-        items:
-          title: OpenSearch Role Index Permission
-          description: Configure permission that applies per index.
-          type: object
-          properties:
-            index_patterns:
-              $ref: "#/properties/opensearch/$defs/roleIndexPatterns"
-            allowed_actions:
-              $ref: "#/properties/opensearch/$defs/roleAllowedActions"
-      roleIndexPatterns:
-        title: OpenSearch Role Index Patterns
-        description: Configure the index pattern this permission applies to.
-        type: array
-        items:
-          title: OpenSearch Role Index Pattern
-          type: string
-      roleAllowedActions:
-        title: OpenSearch Role Allowed Actions
-        description: Configure the actions this permission allows.
-        type: array
-        items:
-          title: OpenSearch Role Allowed Action
-          type: string
+                $ref: "#/properties/opensearch/$defs/role/properties/indexPermissions"
+          clusterPermissions:
+            title: OpenSearch Role Cluster Permissions
+            description: Configure permissions that applies cluster-wide.
+            type: array
+            items:
+              title: OpenSearch Cluster Permission
+              type: string
+          indexPermissions:
+            title: OpenSearch Role Index Permissions
+            description: Configure permissions that applies per index.
+            type: array
+            items:
+              title: OpenSearch Role Index Permission
+              description: Configure permission that applies per index.
+              type: object
+              properties:
+                index_patterns:
+                  $ref: "#/properties/opensearch/$defs/role/properties/indexPatterns"
+                allowed_actions:
+                  $ref: "#/properties/opensearch/$defs/role/properties/allowedActions"
+          indexPatterns:
+            title: OpenSearch Role Index Patterns
+            description: Configure the index pattern this permission applies to.
+            type: array
+            items:
+              title: OpenSearch Role Index Pattern
+              type: string
+          allowedActions:
+            title: OpenSearch Role Allowed Actions
+            description: Configure the actions this permission allows.
+            type: array
+            items:
+              title: OpenSearch Role Allowed Action
+              type: string
+      roleMapping:
+        title: OpenSearch Role Mapping
+        description: Definitions for OpenSearch role mappings.
+        type: object
+        properties:
+          name:
+            title: OpenSearch Role Mapping Name
+            type: string
+          definition:
+            title: OpenSearch Role Mapping Definition
+            description: Configures the backend roles or groups and users the role mapping applies to.
+            $comment: This schema does not cover the entire upstream object.
+            type: object
+            properties:
+              backend_roles:
+                $ref: "#/properties/opensearch/$defs/roleMapping/properties/groups"
+              users:
+                $ref: "#/properties/opensearch/$defs/roleMapping/properties/users"
+          groups:
+            title: OpenSearch Role Mapping Groups
+            description: Configures the backend roles or groups that this role mapping applies to.
+            type: array
+            items:
+              type: string
+          users:
+            title: OpenSearch Role Mapping Users
+            description: Configures the user that this role mapping applies to.
+            type: array
+            items:
+              type: string
     properties:
       enabled:
         title: OpenSearch Enabled
@@ -3718,11 +3750,11 @@ properties:
             default: 1
             type: number
           javaOpts:
-            $ref: "#/properties/opensearch/$defs/nodeJavaOpts"
+            $ref: "#/properties/opensearch/$defs/node/properties/javaOpts"
           storageClass:
-            $ref: "#/properties/opensearch/$defs/nodeStorageClass"
+            $ref: "#/properties/opensearch/$defs/node/properties/storageClass"
           storageSize:
-            $ref: "#/properties/opensearch/$defs/nodeStorageSize"
+            $ref: "#/properties/opensearch/$defs/node/properties/storageSize"
             default: 8Gi
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
@@ -3749,11 +3781,11 @@ properties:
             type: number
             default: 2
           javaOpts:
-            $ref: "#/properties/opensearch/$defs/nodeJavaOpts"
+            $ref: "#/properties/opensearch/$defs/node/properties/javaOpts"
           storageClass:
-            $ref: "#/properties/opensearch/$defs/nodeStorageClass"
+            $ref: "#/properties/opensearch/$defs/node/properties/storageClass"
           storageSize:
-            $ref: "#/properties/opensearch/$defs/nodeStorageSize"
+            $ref: "#/properties/opensearch/$defs/node/properties/storageSize"
             default: 25Gi
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
@@ -3780,7 +3812,7 @@ properties:
             type: number
             default: 1
           javaOpts:
-            $ref: "#/properties/opensearch/$defs/nodeJavaOpts"
+            $ref: "#/properties/opensearch/$defs/node/properties/javaOpts"
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
           tolerations:
@@ -3794,10 +3826,25 @@ properties:
         description: Configures extra roles for OpenSearch Security.
         type: array
         items:
-          $ref: "#/properties/opensearch/$defs/role"
+          title: OpenSearch Role
+          description: |-
+            Configures a role for OpenSearch Security.
+
+            > [!note]
+            > See [the upstream documentation](https://opensearch.org/docs/latest/security/configuration/yaml/#rolesyml) for reference.
+          type: object
+          additionalProperties: false
+          properties:
+            role_name:
+              $ref: "#/properties/opensearch/$defs/role/properties/name"
+            definition:
+              $ref: "#/properties/opensearch/$defs/role/properties/definition"
       extraRoleMappings:
         title: OpenSearch Extra Role Mappings
-        description: Configures extra role mappings for OpenSearch Security.
+        description: |-
+          Configures extra role mappings for OpenSearch Security.
+
+          Extra users can be configured in `secrets.yaml` under `extraUsers` and extra roles under `extraRoles`.
         type: array
         items:
           title: OpenSearch Role Mapping
@@ -3810,26 +3857,9 @@ properties:
           additionalProperties: false
           properties:
             mapping_name:
-              title: OpenSearch Role Mapping Name
-              type: string
+              $ref: "#/properties/opensearch/$defs/roleMapping/properties/name"
             definition:
-              title: OpenSearch Role Mapping Definition
-              description: Configures the backend roles or groups and users the role mapping applies to.
-              $comment: This schema does not cover the entire upstream object.
-              type: object
-              properties:
-                backend_roles:
-                  title: OpenSearch Role Mapping Groups
-                  description: Configures the backend roles or groups that this role mapping applies to.
-                  type: array
-                  items:
-                    type: string
-                users:
-                  title: OpenSearch Role Mapping Users
-                  description: Configures the user that this role mapping applies to.
-                  type: array
-                  items:
-                    type: string
+              $ref: "#/properties/opensearch/$defs/roleMapping/properties/definition"
       indexPerNamespace:
         title: OpenSearch Index Per Namespace
         description: |-
