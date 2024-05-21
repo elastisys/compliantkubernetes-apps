@@ -595,7 +595,7 @@ $defs:
         $ref: "#/$defs/KubernetesQuantity"
       resource:
         title: Resource
-        description: Required, resource to select"
+        description: Required, resource to select.
         type: string
         default: ""
     $comment: Imported from Kubernetes project
@@ -3546,344 +3546,618 @@ properties:
           description: configmap content
     type: object
   opensearch:
-    title: OpenSearch
+    title: OpenSearch Config
+    description: |-
+      Configuration for OpenSearch.
+
+      OpenSearch ingests logs sent from Fluentd in the workload cluster, and presents them in OpenSearch Dashboards.
+
+      > [!note]
+      > OpenSearch and its components are installed in the service cluster, so this configuration mainly applies there.
+    type: object
     additionalProperties: false
-    properties:
-      additionalTemplates:
-        type: object
-      clientNode:
+    $defs:
+      nodeJavaOpts:
+        title: OpenSearch Node Java Options
+        description: |-
+          Set Java Virtual Machine Options to control the memory allocation of OpenSearch.
+
+          As a rule of thumb the minimum allocation `-Xms` and maximum allocation `-Xmx` arguments should be the same to be more predictable.
+          Additionally until memory allocation is at 2 GiB and more it is recommended that the memory limit set in Kubernetes is twice the allocation as OpenSearch uses this for cache.
+        type: string
+        default: -Xms512m -Xmx512m
+      nodeStorageClass:
+        title: OpenSearch Node Storage Class
+        type:
+          - string
+          - "null"
+        description: |-
+          Set storage class for OpenSearch.
+
+          - If set to `null`, the default storage class will be used to provision the volumes.
+          - If set to `-`, no storage class will be used to provision the volumes.
+      nodeStorageSize:
+        title: OpenSearch Node Storage Size
+        description: Configure the requested size of the persistent volume for this OpenSerch node.
+        type: string
+      role:
+        title: OpenSearch Role
+        description: |-
+          Configures a role for OpenSearch Security.
+
+          > [!note]
+          > See [the upstream documentation](https://opensearch.org/docs/latest/security/configuration/yaml/#rolesyml) for reference.
         additionalProperties: false
         properties:
-          affinity:
-            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
-          count:
-            default: 1
-            type: number
-          dedicatedPods:
-            default: true
-            type: boolean
-          javaOpts:
-            default: -Xms512m -Xmx512m
+          role_name:
+            title: OpenSearch Role Name
             type: string
-          nodeSelector:
-            $ref: '#/$defs/kubernetesNodeSelector'
-          resources:
-            $ref: '#/$defs/kubernetesResourceRequirements'
-          tolerations:
-            $ref: '#/$defs/kubernetesTolerations'
-        type: object
+          definition:
+            title: OpenSearch Role Definition
+            description: Configures the permissions the role will have.
+            $comment: This schema does not cover the entire upstream object.
+            type: object
+            properties:
+              cluster_permissions:
+                $ref: "#/properties/opensearch/$defs/roleClusterPermissions"
+              index_permissions:
+                $ref: "#/properties/opensearch/$defs/roleIndexPermissions"
+      roleClusterPermissions:
+        title: OpenSearch Role Cluster Permissions
+        description: Configure permissions that applies cluster-wide.
+        type: array
+        items:
+          title: OpenSearch Cluster Permission
+          type: string
+      roleIndexPermissions:
+        title: OpenSearch Role Index Permissions
+        description: Configure permissions that applies per index.
+        type: array
+        items:
+          title: OpenSearch Role Index Permission
+          description: Configure permission that applies per index.
+          type: object
+          properties:
+            index_patterns:
+              $ref: "#/properties/opensearch/$defs/roleIndexPatterns"
+            allowed_actions:
+              $ref: "#/properties/opensearch/$defs/roleAllowedActions"
+      roleIndexPatterns:
+        title: OpenSearch Role Index Patterns
+        description: Configure the index pattern this permission applies to.
+        type: array
+        items:
+          title: OpenSearch Role Index Pattern
+          type: string
+      roleAllowedActions:
+        title: OpenSearch Role Allowed Actions
+        description: Configure the actions this permission allows.
+        type: array
+        items:
+          title: OpenSearch Role Allowed Action
+          type: string
+    properties:
+      enabled:
+        title: OpenSearch Enabled
+        description: |-
+          > [!note]
+          > Must be set for both service and workload cluster.
+        type: boolean
+        default: true
       clusterName:
+        title: OpenSearch Cluster Name
         default: opensearch
         type: string
-      createIndices:
-        default: true
-        description: Create initial indices upon first startup
-        type: boolean
-      curator:
-        additionalProperties: false
-        properties:
-          activeDeadlineSeconds:
-            default: 2700
-            type: number
-          affinity:
-            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
-          enabled:
-            default: true
-            type: boolean
-          nodeSelector:
-            $ref: '#/$defs/kubernetesNodeSelector'
-          resources:
-            $ref: '#/$defs/kubernetesResourceRequirements'
-          retention:
-            items:
-              additionalProperties: false
-              properties:
-                ageDays:
-                  default: 7
-                  type: number
-                pattern:
-                  default: other-*
-                  type: string
-                sizeGB:
-                  default: 1
-                  type: number
-              type: object
-            type: array
-          startingDeadlineSeconds:
-            default: 600
-            type: number
-          tolerations:
-            $ref: '#/$defs/kubernetesTolerations'
+      subdomain:
+        title: OpenSearch Subdomain
+        description: |-
+          Subdomain of `opsDomain` that the Ingress to OpenSearch will be created with.
+
+          > [!note]
+          > Must be set for both service and workload cluster.
+        type: string
+        format: hostname
+        default: opensearch
+      sso:
+        title: OpenSearch Single Sign On
+        description: Configures Single Sign On to OpenSearch via Dex.
         type: object
-      dashboards:
         additionalProperties: false
         properties:
-          affinity:
-            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
-          nodeSelector:
-            $ref: '#/$defs/kubernetesNodeSelector'
-          resources:
-            $ref: '#/$defs/kubernetesResourceRequirements'
+          enabled:
+            title: OpenSearch Single Sign On
+            default: false
+            type: boolean
+          scope:
+            title: OpenSearch Single Sign On Scopes
+            default: openid profile email groups
+            type: string
+          subjectKey:
+            title: OpenSearch Single Sign On Subject Key
+            default: email
+            type: string
+          rolesKey:
+            title: OpenSearch Single Sign On Roles Key
+            default: groups
+            type: string
+      dashboards:
+        title: OpenSearch Dashboards
+        description: |-
+          Configures the Dashboards deployment of OpenSearch providing the UI to view and query logs.
+        type: object
+        additionalProperties: false
+        properties:
           subdomain:
+            title: OpenSearch Dashboards Subdomain
+            description: |-
+              Subdomain of `baseDomain` that the Ingress to OpenSearch Dashboards will be created with.
+
+              > [!note]
+              > Must be set for both service and workload cluster.
             default: opensearch
             type: string
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
           tolerations:
             $ref: '#/$defs/kubernetesTolerations'
           topologySpreadConstraints:
             $ref: '#/$defs/kubernetesTopologySpreadConstraints'
-        type: object
-      dataNode:
-        additionalProperties: false
-        properties:
-          affinity:
-            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
-          count:
-            default: 2
-            type: number
-          dedicatedPods:
-            default: true
-            type: boolean
-          javaOpts:
-            default: -Xms512m -Xmx512m
-            type: string
           nodeSelector:
             $ref: '#/$defs/kubernetesNodeSelector'
-          resources:
-            $ref: '#/$defs/kubernetesResourceRequirements'
-          storageClass:
-            examples:
-              - '-'
-            type:
-              - string
-              - "null"
-            description: |
-              If null, no storageclass is specified in pvc and default storageClass is used
-              if the DefaultStorageClass admission plugin is enabled.
-              If "-", "" will be used as storageClassName.
-          storageSize:
-            default: 25Gi
-            type: string
-          tolerations:
-            $ref: '#/$defs/kubernetesTolerations'
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      masterNode:
+        title: OpenSearch Master Node
+        description: |-
+          Configures the main stateful set of OpenSearch that takes on all roles not provided by other nodes (`dataNode`, `clientNode`).
         type: object
-      defaultTemplates:
-        default: true
-        type: boolean
-      enabled:
-        default: true
-        type: boolean
-      exporter:
         additionalProperties: false
         properties:
+          count:
+            title: OpenSearch Master Node Replicas
+            default: 1
+            type: number
+          javaOpts:
+            $ref: "#/properties/opensearch/$defs/nodeJavaOpts"
+          storageClass:
+            $ref: "#/properties/opensearch/$defs/nodeStorageClass"
+          storageSize:
+            $ref: "#/properties/opensearch/$defs/nodeStorageSize"
+            default: 8Gi
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
-          serviceMonitor:
-            additionalProperties: false
-            properties:
-              interval:
-                default: 30s
-                type: string
-              scrapeTimeout:
-                default: 30s
-                type: string
-            type: object
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
           tolerations:
             $ref: '#/$defs/kubernetesTolerations'
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      dataNode:
+        title: OpenSearch Data Node
+        description: |-
+          Configures the data stateful set of OpenSearch that takes on the roll to index and store logs.
         type: object
-      extraRoleMappings:
+        additionalProperties: false
+        properties:
+          dedicatedPods:
+            title: OpenSearch Data Node Enabled
+            description: When disabled the master nodes will take on these rolls.
+            type: boolean
+            default: true
+          count:
+            title: OpenSearch Data Node Replicas
+            type: number
+            default: 2
+          javaOpts:
+            $ref: "#/properties/opensearch/$defs/nodeJavaOpts"
+          storageClass:
+            $ref: "#/properties/opensearch/$defs/nodeStorageClass"
+          storageSize:
+            $ref: "#/properties/opensearch/$defs/nodeStorageSize"
+            default: 25Gi
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      clientNode:
+        title: OpenSearch Client Node
+        description: |-
+          Configures the client stateful set of OpenSearch that takes on the roll to ingest and query logs.
+        type: object
+        additionalProperties: false
+        properties:
+          dedicatedPods:
+            title: OpenSearch Client Node Enabled
+            description: When disabled the master nodes will take on these rolls.
+            type: boolean
+            default: true
+          count:
+            title: OpenSearch Client Node Replicas
+            type: number
+            default: 1
+          javaOpts:
+            $ref: "#/properties/opensearch/$defs/nodeJavaOpts"
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      extraRoles:
+        title: OpenSearch Extra Roles
+        description: Configures extra roles for OpenSearch Security.
+        type: array
         items:
+          $ref: "#/properties/opensearch/$defs/role"
+      extraRoleMappings:
+        title: OpenSearch Extra Role Mappings
+        description: Configures extra role mappings for OpenSearch Security.
+        type: array
+        items:
+          title: OpenSearch Role Mapping
+          description: |-
+            Configures a role mapping for OpenSearch Security.
+
+            > [!note]
+            > See [the upstream documentation](https://opensearch.org/docs/latest/security/configuration/yaml/#roles_mappingyml) for reference.
+          type: object
           additionalProperties: false
           properties:
+            mapping_name:
+              title: OpenSearch Role Mapping Name
+              type: string
             definition:
-              additionalProperties: false
+              title: OpenSearch Role Mapping Definition
+              description: Configures the backend roles or groups and users the role mapping applies to.
+              $comment: This schema does not cover the entire upstream object.
+              type: object
               properties:
                 backend_roles:
+                  title: OpenSearch Role Mapping Groups
+                  description: Configures the backend roles or groups that this role mapping applies to.
+                  type: array
                   items:
                     type: string
-                  type: array
                 users:
+                  title: OpenSearch Role Mapping Users
+                  description: Configures the user that this role mapping applies to.
+                  type: array
                   items:
                     type: string
-                  type: array
-              type: object
-            mapping_name:
-              default: kibana_user
-              type: string
-          type: object
-        type: array
-      extraRoles:
-        type: array
       indexPerNamespace:
-        default: false
+        title: OpenSearch Index Per Namespace
+        description: |-
+          When enabled logs are ingested into multiple indices per namespace.
+          When disabled logs are ingested into a single `kubernetes` index.
+
+          > [!note]
+          > Must be set for both service and workload cluster.
         type: boolean
+        default: false
+      defaultTemplates:
+        title: OpenSearch Default Templates
+        description: |-
+          When enabled OpenSearch will be configured with the default index templates for:
+
+          - `authlog`
+          - `kubeaudit`
+          - `kubernetes`
+          - `other`
+        type: boolean
+        default: true
+      overwriteTemplates:
+        title: OpenSearch Overwrite Templates
+        description: |-
+          When set OpenSearch can be configured with index templates via `additionalTemplates` that overwrite the ones configured via `defaultTemplates`.
+        type: boolean
+        default: true
+      additionalTemplates:
+        title: OpenSearch Additional Templates
+        description: |-
+          When set OpenSearch will be configured with additional index templates.
+
+          The keys will be used as the name of the index templates.
+
+          > [!note]
+          > See [the upstream documentation](https://opensearch.org/docs/latest/im-plugin/index-templates/) for reference.
+        type: object
+        additionalProperties:
+          type: string
+          format: json
+      createIndices:
+        title: OpenSearch Create Indices
+        description: |-
+          When enabled OpenSearch will be configured with initial indices for:
+
+          - `authlog`
+          - `kubeaudit`
+          - `kubernetes`
+          - `other`
+        type: boolean
+        default: true
+      ism:
+        title: OpenSearch Index State Management
+        description: Configures index state management in OpenSearch.
+        type: object
+        additionalProperties: false
+        properties:
+          defaultPolicies:
+            title: OpenSearch Default Policies
+            description: |-
+              When enabled OpenSearch will be configured with the default index state management policies for:
+
+              - `authlog`
+              - `kubeaudit`
+              - `kubernetes`
+              - `other`
+            type: boolean
+            default: true
+          overwritePolicies:
+            title: OpenSearch Overwrite Policies
+            description: |-
+              When set OpenSearch can be configured with index state management policies via `additionalPolicies` that overwrite the ones configured via `defaultPolicies`.
+            type: boolean
+            default: true
+          additionalPolicies:
+            title: OpenSearch Additional Policies
+            description: |-
+              When set OpenSearch will be configured with additional index state management policies.
+
+              The keys will be used as the name of the index state management policy.
+
+              > [!note]
+              > See [the upstream documentation](https://opensearch.org/docs/latest/im-plugin/ism/policies/) for reference.
+            type: object
+            additionalProperties:
+              type: string
+              format: json
+          rolloverAgeDays:
+            title: OpenSearch Rollover Age Days
+            description: Configures the age a write index must reach before it is rolled over to a new one.
+            type: number
+            default: 1
+          rolloverSizeGB:
+            title: OpenSearch Rollover Size GB
+            description: Configures the size a write index must reach before it is rolled over to a new one.
+            type: number
+            default: 1
       ingress:
+        title: OpenSearch Ingress
+        description: Configures the ingress for OpenSearch master or client nodes.
+        type: object
         additionalProperties: false
         properties:
           maxbodysize:
+            title: OpenSearch Ingress Max Body
+            type: string
             default: 32m
-            type: string
+      maxClauseCount:
+        title: OpenSearch Maximum Clause Count
+        description: Configures the maximum number of clauses permitted in a query.
+        type: number
+        default: 1024
+      maxShardsPerNode:
+        title: OpenSearch Maximum Shards Per Node
+        description: Configures the maximum number of shards permitted on one node.
+        type: number
+        default: 1000
+      curator:
+        title: OpenSearch Curator
+        description: Configures the CronJob that removes indices.
         type: object
-      ism:
         additionalProperties: false
         properties:
-          additionalPolicies:
-            type: object
-          defaultPolicies:
-            default: true
+          enabled:
+            title: OpenSearch Curator Enabled
             type: boolean
-          overwritePolicies:
             default: true
-            type: boolean
-          rolloverAgeDays:
-            default: 1
+          retention:
+            title: OpenSearch Curator Retention
+            description: Configures the retention of indices in OpenSearch.
+            type: array
+            items:
+              title: OpenSearch Curator Retention
+              description: Configures the retention of indices in OpenSearch.
+              additionalProperties: false
+              type: object
+              properties:
+                pattern:
+                  title: OpenSearch Curator Index Pattern
+                  type: string
+                ageDays:
+                  title: OpenSearch Curator Index Age Days
+                  type: number
+                sizeGB:
+                  title: OpenSearch Curator Index Pattern Size GB
+                  description: |-
+                    > [!note]
+                    > This is evaluated against the entire index pattern.
+                  type: number
+            default:
+              - pattern: authlog-*
+                ageDays: 30
+                sizeGB: 1
+              - pattern: kubeaudit-*
+                ageDays: 30
+                sizeGB: 50
+              - pattern: kubernetes-*
+                ageDays: 30
+                sizeGB: 50
+              - pattern: other-*
+                ageDays: 7
+                sizeGB: 1
+              - pattern: security-auditlog-*
+                ageDays: 7
+                sizeGB: 1
+          startingDeadlineSeconds:
+            title: OpenSearch Curator Starting Deadline Seconds
             type: number
-          rolloverSizeGB:
-            default: 1
+            default: 600
+          activeDeadlineSeconds:
+            title: OpenSearch Curator Active Deadline Seconds
             type: number
-        type: object
-      masterNode:
-        additionalProperties: false
-        properties:
-          affinity:
-            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
-          count:
-            default: 1
-            type: number
-          javaOpts:
-            default: -Xms512m -Xmx512m
-            type: string
-          nodeSelector:
-            $ref: '#/$defs/kubernetesNodeSelector'
+            default: 2700
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
-          storageClass:
-            type:
-              - string
-              - "null"
-            description: |-
-              If null, no storageclass is specified in pvc and default storageClass is used
-              if the DefaultStorageClass admission plugin is enabled.
-              If "-", "" will be used as storageClassName.
-          storageSize:
-            default: 8Gi
-            type: string
           tolerations:
             $ref: '#/$defs/kubernetesTolerations'
-        type: object
-      maxClauseCount:
-        default: 1024
-        description: Change this value before applying opensearch to adjust indices.query.bool.max_clause_count
-        type: number
-      maxShardsPerNode:
-        default: 1000
-        type: number
-      overwriteTemplates:
-        default: true
-        type: boolean
-      plugins:
-        additionalProperties: false
-        properties:
-          additionalPlugins:
-            description: in an air-gapped environment this can be used to install plugins from known sources
-            type: array
-          installExternalObjectStoragePlugin:
-            description: |-
-              in an air-gapped environment where the nodes are not connected to the Internet, set
-              following variable to false to prevent downloading external object storage plugin
-            type: boolean
-        type: object
-      promIndexAlerts:
-        items:
-          additionalProperties: false
-          properties:
-            alertSizeMB:
-              default: 5500
-              type: number
-            prefix:
-              default: kubernetes-default
-              type: string
-          type: object
-        type: array
-      securityadmin:
-        additionalProperties: false
-        properties:
-          activeDeadlineSeconds:
-            default: 1200
-            type: number
-          enabled:
-            default: true
-            type: boolean
-          resources:
-            $ref: '#/$defs/kubernetesResourceRequirements'
-        type: object
+          nodeSelector:
+            $ref: '#/$defs/kubernetesNodeSelector'
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
       snapshot:
+        title: OpenSearch Snapshot
+        description: |-
+          Configures the CronJob and repository to take snapshots in OpenSearch.
+
+          This requires that `objectStorage` is configured, and will use the bucket or container set in `objectStorage.buckets.opensearch`.
+        type: object
         additionalProperties: false
         properties:
+          enabled:
+            title: OpenSearch Snapshot Enabled
+            type: boolean
+            default: true
+          repository:
+            title: OpenSearch Snapshot Repository
+            type: string
+            default: opensearch-snapshots
           ageSeconds:
             default: 864000
             type: number
-          backupActiveDeadlineSeconds:
-            default: 600
+          min:
+            title: OpenSearch Minimum Retained Snapshots
             type: number
-          backupSchedule:
-            default: 0 */2 * * *
-            type: string
-          backupStartingDeadlineSeconds:
-            default: 600
-            type: number
-          enabled:
-            default: true
-            type: boolean
+            default: 7
           max:
+            title: OpenSearch Maximum Retained Snapshots
             default: 14
             type: number
           maxRequestSeconds:
+            type: number
             default: 1200
-            type: number
-          min:
-            default: 7
-            type: number
-          repository:
-            default: opensearch-snapshots
+          backupSchedule:
+            title: OpenSearch Backup CronJob Schedule
             type: string
-          retentionActiveDeadlineSeconds:
-            default: 2700
+            default: 0 */2 * * *
+          backupStartingDeadlineSeconds:
+            title: OpenSearch Backup Job Starting Deadline
             type: number
+            default: 600
+          backupActiveDeadlineSeconds:
+            title: OpenSearch Backup Job Active Deadline
+            type: number
+            default: 600
+          retentionSchedule:
+            title: OpenSearch Retention CronJob Schedule
+            type: string
+            default: '@daily'
+          retentionStartingDeadlineSeconds:
+            title: OpenSearch Retention Job Starting Deadline
+            type: number
+            default: 600
+          retentionActiveDeadlineSeconds:
+            title: OpenSearch Retention Job Active Deadline
+            type: number
+            default: 2700
           retentionResources:
             $ref: '#/$defs/kubernetesResourceRequirements'
-          retentionSchedule:
-            default: '@daily'
-            type: string
-          retentionStartingDeadlineSeconds:
-            default: 600
-            type: number
+      securityadmin:
+        title: OpenSearch Security Admin
+        description: Configures the Job that initialises OpenSearch Security.
         type: object
-      sso:
         additionalProperties: false
         properties:
           enabled:
-            default: false
+            title: OpenSearch Security Admin Enabled
             type: boolean
-          rolesKey:
-            default: groups
-            type: string
-          scope:
-            default: openid profile email groups
-            type: string
-          subjectKey:
-            default: email
-            type: string
+            default: true
+          activeDeadlineSeconds:
+            title: OpenSearch Security Admin Active Deadline Seconds
+            type: number
+            default: 1200
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+      exporter:
+        title: OpenSearch Exporter
+        description: Configures the exporter exposing metrics from OpenSearch.
         type: object
-      subdomain:
-        default: opensearch
-        format: hostname
-        type: string
+        additionalProperties: false
+        properties:
+          serviceMonitor:
+            title: OpenSearch Exporter Service Monitor
+            description: Configures the service monitor of the exporter.
+            type: object
+            additionalProperties: false
+            properties:
+              interval:
+                title: Scrape interval for the service monitor.
+                type: string
+                default: 30s
+              scrapeTimeout:
+                title: Scrape timeout for the service monitor.
+                type: string
+                default: 30s
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+      promIndexAlerts:
+        title: OpenSearch Prometheus Index Alerts
+        description: Configures the index alerts monitoring the function of index state management.
+        type: array
+        items:
+          title: OpenSearch Prometheus Index Alert
+          description: Configures the index alert monitoring the function of index state management.
+          type: object
+          additionalProperties: false
+          properties:
+            prefix:
+              title: OpenSearch Index Prefix
+              type: string
+            alertSizeMB:
+              title: OpenSearch Index Alert Size
+              type: number
+        default:
+          - prefix: authlog-default
+            alertSizeMB: 2
+          - prefix: kubeaudit-default
+            alertSizeMB: 5500
+          - prefix: kubernetes-default
+            alertSizeMB: 5500
+          - prefix: other-default
+            alertSizeMB: 400
+      plugins:
+        title: OpenSearch Plugins
+        description: Configures plugins used in OpenSearch.
+        additionalProperties: false
+        properties:
+          installExternalObjectStoragePlugin:
+            title: OpenSearch Install External Object Storage Plugin
+            description: |-
+              When enabled OpenSearch will install the required object storage plugin when it starts.
+
+              In an air-gapped environment where the nodes are not connected to the Internet, set this to `false` to prevent downloading any external object storage plugins.
+            type: boolean
+          additionalPlugins:
+            title: OpenSearch Install Additional Plugins
+            description: |-
+              Configures OpenSearch to install plugins when it starts.
+
+              In an air-gapped environment this can be used to install plugins from known sources.
+            type: array
+        type: object
     required:
       - enabled
       - subdomain
-      - indexPerNamespace
       - dashboards
-    type: object
+      - indexPerNamespace
 additionalProperties:
   type: object
   properties: {}
