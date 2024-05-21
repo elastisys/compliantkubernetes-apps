@@ -4,23 +4,25 @@
   vars:
     install_path: "{{ lookup('env', 'CK8S_INSTALL_PATH', default='/usr/local/bin') }}"
     install_user: "{{ lookup('env','USER') }}"
-    kubectl_version: 1.28.6
-    helm_version: 3.13.3
-    helmfile_version: 0.162.0
-    helmdiff_version: 3.9.4
-    helmsecrets_version: 4.5.1
-    jq_version: 1.6
-    s3cmd_version: 2.*
-    sops_version: 3.8.1
-    yq_version: 3.4.1
-    yq4_version: 4.42.1
-    yajsv_version: 1.4.1
-    pwgen_version: 2.08*
-    apache2_utils_version: 2.4.*
+    kubectl_version: "{{ requirements['kubectl'].version | regex_replace('^v', '') }}"
+    helm_version: "{{ requirements['helm.sh/helm/v3'].version | regex_replace('^v', '') }}"
+    helmfile_version: "{{ requirements['github.com/helmfile/helmfile'].version | regex_replace('^v', '') }}"
+    helmdiff_version: "{{ requirements['github.com/databus23/helm-diff/v3'].version | regex_replace('^v', '') }}"
+    helmsecrets_version: "{{ requirements['helm-secrets'].version | regex_replace('^v', '') }}"
+    jq_version: "{{ requirements['jq'].version | regex_replace('^jq-', '') }}"
+    s3cmd_version: "{{ requirements['s3cmd'].version }}"
+    sops_version: "{{ requirements['getsops/sops/v3'].version | regex_replace('^v', '') }}"
+    yq_version: "{{ requirements['github.com/mikefarah/yq/v3'].version }}"
+    yq4_version: "{{ requirements['github.com/mikefarah/yq/v4'].version | regex_replace('^v', '') }}"
+    yajsv_version: "{{ requirements['github.com/neilpa/yajsv'].version | regex_replace('^v', '') }}"
+    pwgen_version: "{{ requirements['pwgen'].version }}"
+    apache2_utils_version: "{{ requirements['apache2-utils'].version }}"
+    curl_version: "{{ requirements['curl'].version }}"
+    dnsutils_version: "{{ requirements['dnsutils'].version }}"
     apt_list:
-      - curl
+      - curl={{ curl_version }}
       - s3cmd={{ s3cmd_version }}
-      - dnsutils
+      - dnsutils={{ dnsutils_version }}
       - apache2-utils={{ apache2_utils_version }}
       - pwgen={{ pwgen_version }}
     get_url_list:
@@ -47,6 +49,14 @@
         version_flag: "-v"
 
   tasks:
+    - name: Parse requirement PURLs
+      command: ../scripts/requirements/parse.py
+      register: parse_requirements_result
+
+    - name: Set requirements facts
+      set_fact:
+        requirements: "{{ parse_requirements_result.stdout | from_json }}"
+
     - name: Install apt-packages
       become: yes
       become_user: root
