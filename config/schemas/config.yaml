@@ -2012,13 +2012,13 @@ properties:
                 default: 3.0.1
       customRules:
         title: Falco Custom Rules
-        description:
+        description: |-
           Configure custom rules to use in Falco.
 
-          > [note]
+          > [!note]
+          > See [the upstream documentation](https://falco.org/docs/rules/) for reference.
+          >
           > The keys will become the file name of the generated rule file, and all files are parsed in alphabetical order.
-
-          See [the upstream documentation](https://falco.org/docs/rules/) for reference.
         additionalProperties:
           format: yaml
           type: string
@@ -2657,444 +2657,526 @@ properties:
         type: boolean
     type: object
   prometheus:
-    title: Prometheus
-    additionalProperties: false
-    properties:
-      affinity:
-        $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
-      alertmanagerSpec:
+    title: Prometheus Config
+    description: |-
+      Configure Prometheus.
+
+      Prometheus automatically collects metrics via ServiceMonitors, PodMonitors, and Probes, and pushes metrics to Thanos for long term storage.
+      Additionally Prometheus evaluates recording rules for both service and workload cluster, and all alerting rules for the workload cluster.
+
+      > [!note]
+      > Prometheus is installed in both service cluster and workload cluster, so this configuration applies there with some exceptions.
+    type: object
+    $defs:
+      capacityManagementAlerts:
+        title: Capacity Management Alerts
+        description: Definitions for capacity management alerts.
+        type: object
+        properties:
+          persistentVolume:
+            title: Capacity Management Alerts Persistent Volumes
+            description: Configure capacity management alerts on persistent volumes.
+            type: object
+            additionalProperties: false
+            properties:
+              enabled:
+                $ref: "#/properties/prometheus/$defs/capacityManagementAlerts/properties/persistentVolumeEnabled"
+              limit:
+                $ref: "#/properties/prometheus/$defs/capacityManagementAlerts/properties/persistentVolumeLimit"
+          persistentVolumeEnabled:
+            title: Capacity Management Alerts Persistent Volumes Enabled
+            type: boolean
+            default: true
+          persistentVolumeLimit:
+            title: Capacity Management Alerts Persistent Volumes Enabled
+            description: Alert when a persistent volume's usage reaches the limit in percent.
+            type: number
+            default: 75
+
+          disklimit:
+            title: Capacity Management Alerts Disk Limit
+            description: Alert when a disk's usage reaches the limit in percent.
+            type: number
+            default: 75
+
+          requestlimit:
+            title: Capacity Management Alerts Request Limit
+            description: Alert when a node's resource requests reaches the limits in percent.
+            type: object
+            additionalProperties: false
+            properties:
+              cpu:
+                title: Capacity Management Alerts CPU Request Limit
+                $ref: "#/properties/prometheus/$defs/capacityManagementAlerts/properties/requestlimitList"
+              memory:
+                title: Capacity Management Alerts Memory Request Limit
+                $ref: "#/properties/prometheus/$defs/capacityManagementAlerts/properties/requestlimitList"
+          requestlimitList:
+            title: Capacity Management Alerts Request Limit List
+            description: Configure a list of node patterns and request limits to alert for.
+            type: array
+            items:
+              $ref: "#/properties/prometheus/$defs/capacityManagementAlerts/properties/requestlimitTerm"
+          requestlimitTerm:
+            title: Capacity Management Alerts Request Limit Term
+            description: Configure a node pattern and the request limit to alert for.
+            type: object
+            additionalProperties: false
+            properties:
+              name:
+                type: string
+                examples:
+                  - worker
+              pattern:
+                type: string
+                examples:
+                  - .*-worker-.*
+              limit:
+                type: number
+                examples:
+                  - 80
+
+      diskAlerts:
+        title: Disk Alerts
+        description: Definitions for disk alerts.
+        type: object
         additionalProperties: false
         properties:
+          storage:
+            title: Disk Alerts Storage
+            description: Configure disk alerts based on storage usage.
+            type: object
+            additionalProperties: false
+            properties:
+              predictLinear:
+                $ref: "#/properties/prometheus/$defs/diskAlerts/properties/patternRules"
+              space:
+                $ref: "#/properties/prometheus/$defs/diskAlerts/properties/patternRules"
+
+          inode:
+            title: Disk Alerts Inode
+            description: Configure disk alerts based on inode usage.
+            type: object
+            additionalProperties: false
+            properties:
+              predictLinear:
+                $ref: "#/properties/prometheus/$defs/diskAlerts/properties/patternRules"
+              space:
+                $ref: "#/properties/prometheus/$defs/diskAlerts/properties/patternRules"
+
+          patternRules:
+            title: Disk Alert Pattern Rules
+            description: Configure disk alerts when disk usage is predicted to reach the limit.
+            type: array
+            items:
+              $ref: "#/properties/prometheus/$defs/diskAlerts/properties/patternRule"
+          patternRule:
+            title: Disk Alert Pattern Rule
+            description: |-
+              Configure disk alerts when disk usage is predicted to reach the limit.
+
+              The `hours` key is only supported when configured under `predictLinear`.
+            type: object
+            additionalProperties: false
+            properties:
+              hours:
+                title: Alert Rule Prediction Window
+                type: number
+                default: 24
+              freeSpacePercentage:
+                $ref: '#/$defs/percentage'
+                default: 5
+              for:
+                $ref: '#/$defs/timeRange'
+                default: 1h
+              severity:
+                title: Alert Rule Severity
+                type: string
+                default: warning
+              pattern:
+                $ref: "#/properties/prometheus/$defs/diskAlerts/properties/patterns"
+          patterns:
+            title: Disk Alert Patterns
+            description: Select applicable nodes and disks to include or exclude using patterns.
+            type: object
+            additionalProperties: false
+            properties:
+              include:
+                $ref: "#/properties/prometheus/$defs/diskAlerts/properties/pattern"
+              exclude:
+                $ref: "#/properties/prometheus/$defs/diskAlerts/properties/pattern"
+          pattern:
+            title: Disk Alert Pattern
+            description: Select applicable nodes and disks using patterns.
+            type: object
+            additionalProperties: false
+            properties:
+              node:
+                title: Disk Alert Node Pattern
+                type: string
+                default: ""
+              disk:
+                title: Disk Alert Disk Pattern
+                type: string
+                default: ""
+
+          perf:
+            title: Disk Alerts Perf
+            description: Configure performance disk alerts.
+            type: object
+            properties:
+              enabled:
+                $ref: "#/properties/prometheus/$defs/diskAlerts/properties/perfEnabled"
+              queueSizeThreshold:
+                $ref: "#/properties/prometheus/$defs/diskAlerts/properties/perfQueueSizeThreshold"
+              readWaitTimeThreshold:
+                $ref: "#/properties/prometheus/$defs/diskAlerts/properties/perfReadWaitTimeThreshold"
+              writeWaitTimeThreshold:
+                $ref: "#/properties/prometheus/$defs/diskAlerts/properties/perfWriteWaitTimeThreshold"
+          perfEnabled:
+            title: Disk Alerts Perf Enabled
+            type: boolean
+          perfQueueSizeThreshold:
+            title: Disk Alerts Perf Queue Size
+            type: number
+            default: 0.5
+          perfReadWaitTimeThreshold:
+            title: Disk Alerts Perf Read Wait
+            type: number
+            default: 0.01
+          perfWriteWaitTimeThreshold:
+            title: Disk Alerts Perf Write Wait
+            type: number
+            default: 0.1
+
+      s3BucketAlerts:
+        title: S3 Bucket Alerts
+        description: Definitions for S3 bucket alerts.
+        type: object
+        additionalProperties: false
+        properties:
+          objects:
+            title: S3 Bucket Alerts Objects
+            description: Alert when an S3 buckets reaches the set percentage of the set number of objects.
+            type: object
+            additionalProperties: false
+            properties:
+              enabled:
+                title: S3 Bucket Alerts Objects Enabled
+                type: boolean
+                default: false
+              percent:
+                title: S3 Bucket Alerts Objects Percentage
+                $ref: '#/$defs/percentage'
+                default: 80
+              count:
+                title: S3 Bucket Alerts Objects Quota
+                default: 1638400
+                type: number
+          size:
+            title: S3 Bucket Alerts Size
+            description: Alert when an S3 bucket reaches the set percentage of the set size.
+            type: object
+            additionalProperties: false
+            properties:
+              enabled:
+                title: S3 Bucket Alerts Size Enabled
+                type: boolean
+                default: false
+              percent:
+                title: S3 Bucket Alerts Size Percentage
+                $ref: '#/$defs/percentage'
+                default: 80
+              sizeQuotaGB:
+                title: S3 Bucket Alerts Size Quota
+                type: number
+                default: 1000
+          totalSize:
+            title: S3 Bucket Alerts Total Size
+            description: Alert when all S3 buckets reaches the set percentage of the set size.
+            type: object
+            additionalProperties: false
+            properties:
+              enabled:
+                title: S3 Bucket Alerts Total Size Enabled
+                type: boolean
+                default: false
+              percent:
+                title: S3 Bucket Alerts Total Size Percentage
+                $ref: '#/$defs/percentage'
+                default: 80
+              sizeQuotaGB:
+                title: S3 Bucket Alerts Total Size Quota
+                type: number
+                default: 1000
+          exclude:
+            title: S3 Bucket Alerts Exclude
+            description: Exclude buckets from S3 alerts.
+            type: array
+            items:
+              title: S3 Bucket Name
+              type: string
+
+    additionalProperties: false
+    properties:
+      replicas:
+        title: Prometheus Relicas
+        type: number
+        default: 1
+      storage:
+        title: Prometheus Storage
+        description: Configure the persistent volume claim used for Promtheus storage.
+        additionalProperties: false
+        properties:
+          enabled:
+            title: Proemtheus Storage Enabled
+            description: |-
+              By default Prometheus instances run without storage and are treated as ephemeral.
+              See [ADR-0007](https://elastisys.io/compliantkubernetes/adr/0007-make-monitoring-forwarders-storage-independent/) for context.
+            type: boolean
+            default: false
+          size:
+            title: Proemtheus Storage Size
+            type: string
+            default: 5Gi
+        type: object
+      retention:
+        title: Prometheus Retention
+        description: Configure retention for Prometheus.
+        type: object
+        additionalProperties: false
+        properties:
+          age:
+            title: Prometheus Retention Age
+            description: Configure the time range Prometheus will retain metrics for.
+            type: string
+            default: 3d
+          size:
+            title: Prometheus Retention Size
+            description: Configure the total size Prometheus will retain metrics for.
+            type: string
+            default: 4GiB
+          alertmanager:
+            title: Prometheus Retention Alertmanager
+            description: Configure the time range Alertmanager will retain metrics for.
+            $ref: '#/$defs/timeRange'
+            default: 72h
+      additionalScrapeConfigs:
+        title: Prometheus Additional Scrape Configs
+        description: |-
+          Configure additional scrape configs for Prometheus.
+
+          > [!note]
+          > See [the upstream documentation](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config) for reference.
+        type: array
+      alertmanagerSpec:
+        title: Alertmanager Config
+        description: |-
+          Configure service cluster Alertmanager.
+
+          Alertmanager receives alerts from Prometheus and Thanos and forwards them to the configured notification channel.
+
+          > [!note]
+          > Alertmanager is installed in both service cluster and workload cluster, however this configuration key only applies to the service cluster, use `user.alertmanager` to configure it in the workload cluster.
+        type: object
+        additionalProperties: false
+        properties:
+          replicas:
+            title: Alertmanager Replicas
+            type: number
+            default: 2
+          storage:
+            title: Alertmanager Storage
+            description: Configure persistent storage for Alertmanager.
+            type: object
+            additionalProperties: false
+            properties:
+              volumeClaimTemplate:
+                title: Alertmanager Volume Claim Template
+                description: Configure persistent storage for Alertmanager.
+                type: object
+                additionalProperties: false
+                properties:
+                  spec:
+                    title: Alertmanager Volume Claim Spec
+                    description: Configure persistent storage for Alertmanager.
+                    type: object
+                    additionalProperties: false
+                    properties:
+                      accessModes:
+                        title: Alertmanager Volume Access Mode
+                        description: Configure the access mode of the persistent storage for Alertmanager.
+                        type: array
+                        items:
+                          type: string
+                          default: ReadWriteOnce
+                      resources:
+                        title: Alertmanager Volume Resources
+                        description: Configure the resources of the persistent storage for Alertmanager.
+                        $ref: '#/$defs/kubernetesResourceRequirements'
           groupBy:
+            title: Alertmanager Group By
+            description: |-
+              Configure Alertmanager to group certain alerts based on labels.
+
+              > [!note]
+              > See [the upstream documentation](https://prometheus.io/docs/alerting/latest/configuration/) for reference.
             items:
               default: '...'
               type: string
             type: array
-          replicas:
-            default: 2
-            type: number
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
-          storage:
-            additionalProperties: false
-            properties:
-              volumeClaimTemplate:
-                additionalProperties: false
-                properties:
-                  spec:
-                    additionalProperties: false
-                    properties:
-                      accessModes:
-                        items:
-                          default: ReadWriteOnce
-                          type: string
-                        type: array
-                      resources:
-                        $ref: '#/$defs/kubernetesResourceRequirements'
-                    type: object
-                type: object
-            type: object
           topologySpreadConstraints:
             $ref: '#/$defs/kubernetesTopologySpreadConstraints'
           affinity:
             $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
-        type: object
       capacityManagementAlerts:
+        title: Capacity Management Alerts
+        description: Configure capacity management alerts.
+        type: object
         additionalProperties:
           type: number
         properties:
-          disklimit:
-            default: 75
-            type: number
           enabled:
-            default: true
+            title: Capacity Management Alerts Enabled
             type: boolean
+            default: true
+          predictUsage:
+            title: Capacity Management Alerts Predict Usage
+            type: boolean
+            default: false
           persistentVolume:
-            additionalProperties: false
-            properties:
-              enabled:
-                default: true
-                type: boolean
-              limit:
-                default: 75
-                type: number
-            type: object
+            $ref: "#/properties/prometheus/$defs/capacityManagementAlerts/properties/persistentVolume"
+          disklimit:
+            $ref: "#/properties/prometheus/$defs/capacityManagementAlerts/properties/disklimit"
           requestlimit:
-            additionalProperties: false
-            properties:
-              cpu:
-                items:
-                  additionalProperties: false
-                  properties:
-                    limit:
-                      examples:
-                        - 80
-                      type: number
-                    name:
-                      examples:
-                        - worker
-                        - elastisys
-                      type: string
-                    pattern:
-                      examples:
-                        - .*-worker-.*
-                        - .*-elastisys-.*
-                      type: string
-                  type: object
-                type: array
-              memory:
-                items:
-                  additionalProperties: false
-                  properties:
-                    limit:
-                      examples:
-                        - 80
-                      type: number
-                    name:
-                      default: worker
-                      type: string
-                    pattern:
-                      default: .*-worker-.*
-                      type: string
-                  type: object
-                type: array
-            type: object
+            $ref: "#/properties/prometheus/$defs/capacityManagementAlerts/properties/requestlimit"
           usagelimit:
             default: 95
             type: number
-          predictUsage:
-            type: boolean
-        type: object
       diskAlerts:
+        title: Disk Alerts
+        description: Configure disk alerts.
+        type: object
         additionalProperties: false
         properties:
-          inode:
-            additionalProperties: false
-            properties:
-              predictLinear:
-                items:
-                  additionalProperties: false
-                  properties:
-                    for:
-                      $ref: '#/$defs/timeRange'
-                      default: 1h
-                    freeSpacePercentage:
-                      $ref: '#/$defs/percentage'
-                      default: 40
-                    hours:
-                      default: 24
-                      type: number
-                    pattern:
-                      additionalProperties: false
-                      properties:
-                        exclude:
-                          additionalProperties: false
-                          properties:
-                            disk:
-                              default: ""
-                              type: string
-                            node:
-                              default: ""
-                              type: string
-                          type: object
-                        include:
-                          additionalProperties: false
-                          properties:
-                            disk:
-                              default: .*
-                              type: string
-                            node:
-                              default: .*
-                              type: string
-                          type: object
-                      type: object
-                    severity:
-                      default: warning
-                      type: string
-                  type: object
-                type: array
-              space:
-                items:
-                  additionalProperties: false
-                  properties:
-                    for:
-                      $ref: '#/$defs/timeRange'
-                      default: 1h
-                    freeSpacePercentage:
-                      $ref: '#/$defs/percentage'
-                      default: 5
-                    pattern:
-                      additionalProperties: false
-                      properties:
-                        exclude:
-                          additionalProperties: false
-                          properties:
-                            disk:
-                              default: ""
-                              type: string
-                            node:
-                              default: ""
-                              type: string
-                          type: object
-                        include:
-                          additionalProperties: false
-                          properties:
-                            disk:
-                              default: .*
-                              type: string
-                            node:
-                              default: .*
-                              type: string
-                          type: object
-                      type: object
-                    severity:
-                      default: warning
-                      type: string
-                  type: object
-                type: array
-            type: object
-          perf:
-            additionalProperties: false
-            properties:
-              enabled:
-                type: boolean
-              queueSizeThreshold:
-                type: number
-              readWaitTimeThreshold:
-                type: number
-              writeWaitTimeThreshold:
-                type: number
-            type: object
           storage:
-            additionalProperties: false
-            properties:
-              predictLinear:
-                items:
-                  additionalProperties: false
-                  properties:
-                    for:
-                      $ref: '#/$defs/timeRange'
-                      default: 1h
-                    freeSpacePercentage:
-                      $ref: '#/$defs/percentage'
-                      default: 30
-                    hours:
-                      default: 24
-                      type: number
-                    pattern:
-                      additionalProperties: false
-                      properties:
-                        exclude:
-                          additionalProperties: false
-                          properties:
-                            disk:
-                              default: ""
-                              type: string
-                            node:
-                              default: ""
-                              type: string
-                          type: object
-                        include:
-                          additionalProperties: false
-                          properties:
-                            disk:
-                              default: .*
-                              type: string
-                            node:
-                              default: .*
-                              type: string
-                          type: object
-                      type: object
-                    severity:
-                      default: warning
-                      type: string
-                  type: object
-                type: array
-              space:
-                items:
-                  additionalProperties: false
-                  properties:
-                    for:
-                      default: 30m
-                      type: string
-                    freeSpacePercentage:
-                      $ref: '#/$defs/percentage'
-                      default: 5
-                    pattern:
-                      additionalProperties: false
-                      properties:
-                        exclude:
-                          additionalProperties: false
-                          properties:
-                            disk:
-                              default: ""
-                              type: string
-                            node:
-                              default: ""
-                              type: string
-                          type: object
-                        include:
-                          additionalProperties: false
-                          properties:
-                            disk:
-                              default: .*
-                              type: string
-                            node:
-                              default: .*
-                              type: string
-                          type: object
-                      type: object
-                    severity:
-                      default: warning
-                      type: string
-                  type: object
-                type: array
-            type: object
-        type: object
-      nodeSelector:
-        $ref: '#/$defs/kubernetesNodeSelector'
-      replicas:
-        default: 1
-        type: number
-      resources:
-        $ref: '#/$defs/kubernetesResourceRequirements'
-      retention:
-        additionalProperties: false
-        properties:
-          age:
-            default: 3d
-            type: string
-          alertmanager:
-            $ref: '#/$defs/timeRange'
-            default: 72h
-          size:
-            default: 4GiB
-            type: string
-        type: object
+            $ref: "#/properties/prometheus/$defs/diskAlerts/properties/storage"
+          inode:
+            $ref: "#/properties/prometheus/$defs/diskAlerts/properties/inode"
+          perf:
+            $ref: "#/properties/prometheus/$defs/diskAlerts/properties/perf"
       s3BucketAlerts:
+        title: S3 Bucket Alerts
+        description: Configure S3 bucket alerts.
+        type: object
         additionalProperties: false
         properties:
-          exclude:
-            type: array
           objects:
-            additionalProperties: false
-            properties:
-              count:
-                default: 1638400
-                type: number
-              enabled:
-                default: false
-                type: boolean
-              percent:
-                $ref: '#/$defs/percentage'
-                default: 80
-            type: object
+            $ref: "#/properties/prometheus/$defs/s3BucketAlerts/properties/objects"
           size:
-            type: object
-            additionalProperties: false
-            properties:
-              enabled:
-                default: false
-                type: boolean
-              percent:
-                $ref: '#/$defs/percentage'
-                default: 80
-              sizeQuotaGB:
-                default: 1000
-                type: number
+            $ref: "#/properties/prometheus/$defs/s3BucketAlerts/properties/size"
           totalSize:
-            type: object
-            additionalProperties: false
-            properties:
-              enabled:
-                default: false
-                type: boolean
-              percent:
-                $ref: '#/$defs/percentage'
-                default: 80
-              sizeQuotaGB:
-                default: 1000
-                type: number
+            $ref: "#/properties/prometheus/$defs/s3BucketAlerts/properties/totalSize"
+          exclude:
+            $ref: "#/properties/prometheus/$defs/s3BucketAlerts/properties/exclude"
+      webhookAlerts:
+        title: Webhook Alerts
+        description: Configure webhook alerts.
         type: object
-      storage:
-        additionalProperties: false
         properties:
           enabled:
-            default: false
+            title: Webhook Alerts Enabled
             type: boolean
-          size:
-            default: 5Gi
-            type: string
-        type: object
+            default: true
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
       tolerations:
         $ref: '#/$defs/kubernetesTolerations'
       topologySpreadConstraints:
         $ref: '#/$defs/kubernetesTopologySpreadConstraints'
-      webhookAlerts:
-        type: object
-        properties:
-          enabled:
-            type: boolean
-      additionalScrapeConfigs:
-        type: array
-        title: Additional prometheus scrape config.
-        description: |
-          Ref: <https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config>
-    type: object
-  prometheusBlackboxExporter:
-    $title: Prometheus Blackbox Exporter
-    additionalProperties: false
-    properties:
-      customKubeapiTargets:
-        items:
-          properties:
-            domain:
-              format: hostname
-              type: string
-            name:
-              type: string
-          type: object
-        type: array
-      hostAliases:
-        items:
-          properties:
-            hostNames:
-              items:
-                type: string
-              type: array
-            ip:
-              format: ipv4
-              type: string
-          type: object
-        type: array
-      resources:
-        $ref: '#/$defs/kubernetesResourceRequirements'
-      targets:
-        properties:
-          additionalProperties:
-            type: boolean
-        type: object
-    type: object
-  prometheusNodeExporter:
-    title: Prometheus Node Exporter
-    additionalProperties: false
-    properties:
-      resources:
-        $ref: '#/$defs/kubernetesResourceRequirements'
-    type: object
+      nodeSelector:
+        $ref: '#/$defs/kubernetesNodeSelector'
+      affinity:
+        $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
   prometheusOperator:
     title: Prometheus Operator
+    description: Configure Prometheus Operator.
+    type: object
     additionalProperties: false
     properties:
       prometheusConfigReloader:
+        title: Prometheus Operator Config Reloader
+        description: Configure Prometheus Operator config reloader.
+        type: object
         additionalProperties: false
         properties:
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
-        type: object
       resources:
         $ref: '#/$defs/kubernetesResourceRequirements'
+  prometheusBlackboxExporter:
+    title: Prometheus Blackbox Exporter
+    description: Configure Prometheus Blackbox Exporter, the exporter used for probing endpoints.
     type: object
+    additionalProperties: false
+    properties:
+      targets:
+        title: Prometheus Blackbox Exporter Targets
+        description: Configure the targets Prometheus Blackbox Exporter should probe.
+        type: object
+        additionalProperties:
+          type: boolean
+      customKubeapiTargets:
+        title: Prometheus Blackbox Exporter Custom Kube API Targets
+        description: Configure custom Kube API targets Prometheus Blackbox Exporter should probe.
+        type: array
+        items:
+          title: Custom Kube API target
+          description: Custom Kube API target Prometheus Blackbox Exporter should probe.
+          type: object
+          additionalProperties: false
+          properties:
+            name:
+              title: Custom Kube API Target Name
+              type: string
+            domain:
+              title: Custom Kube API Target Domain
+              type: string
+              format: hostname
+      hostAliases:
+        title: Host Aliases
+        description: Configure host aliases to resolve internally within the Pod.
+        type: array
+        items:
+          title: Host Alias
+          description: Configure a host alias to resolve internally within the Pod.
+          type: object
+          additionalProperties: false
+          properties:
+            hostNames:
+              title: Host Names
+              description: Configure the hostname for the host alias.
+              type: array
+              items:
+                title: Host Name
+                type: string
+            ip:
+              title: IP Address
+              description: Configure the IP address for the host alias.
+              type: string
+              format: ipv4
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+  prometheusNodeExporter:
+    title: Prometheus Node Exporter
+    description: Configure Prometheus Node Exporter, the exporter used for collecting node metrics.
+    type: object
+    additionalProperties: false
+    properties:
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
   s3Exporter:
     title: S3 Exporter
     additionalProperties: false
