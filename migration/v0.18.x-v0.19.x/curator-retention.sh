@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 : "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Check https://compliantkubernetes.io/operator-manual/disaster-recovery/ for instructions
 set -e
 

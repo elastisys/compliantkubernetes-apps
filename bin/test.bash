@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script tests the applications deployed via `ck8s apply`
 # It's not to be executed on its own but rather via `ck8s test`.

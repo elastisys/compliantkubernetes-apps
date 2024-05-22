@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script takes care of initializing a CK8S configuration path for apps.
 # It writes the default configuration files to the config path and generates

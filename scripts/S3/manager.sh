@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Simple script for managing the creation and deletion of S3 buckets using s3cmd.
 # Users can point to their s3cmd config file via the option '--s3cfg config-path'.
