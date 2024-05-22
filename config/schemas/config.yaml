@@ -3118,192 +3118,313 @@ properties:
         $ref: '#/$defs/kubernetesTolerations'
     type: object
   thanos:
-    title: Thanos
+    title: Thanos Config
+    description: |-
+      Configuration for Thanos.
+
+      Thanos ingests metrics sent from Prometheus in both the service and workload clusters, and stores them in object storage.
+
+      This requires that `objectStorage` is configured, and will use the bucket or container set in `objectStorage.buckets.thanos`.
+
+      > [!note]
+      > Thanos and its components are installed in the service cluster, so this configuration mainly applies there.
+    type: object
     additionalProperties: false
     properties:
-      bucketweb:
-        additionalProperties: false
-        properties:
-          resources:
-            $ref: '#/$defs/kubernetesResourceRequirements'
-        type: object
-      compactor:
-        additionalProperties: false
-        properties:
-          deduplication:
-            default: none
-            type: string
-          persistence:
-            additionalProperties: false
-            properties:
-              enabled:
-                default: true
-                type: boolean
-              size:
-                default: 8Gi
-                type: string
-            type: object
-          resources:
-            $ref: '#/$defs/kubernetesResourceRequirements'
-          retentionResolution1h:
-            $ref: '#/$defs/timeRange'
-            default: 0s
-          retentionResolution5m:
-            $ref: '#/$defs/timeRange'
-            default: 90d
-          retentionResolutionRaw:
-            $ref: '#/$defs/timeRange'
-            default: 30d
-          verticalCompaction:
-            default: false
-            type: boolean
-        type: object
       enabled:
-        default: true
+        title: Thanos Enabled
+        description: |-
+          > [!note]
+          > Must be set for both service and workload cluster.
         type: boolean
-      metrics:
-        additionalProperties: false
-        properties:
-          enabled:
-            default: true
-            type: boolean
-          serviceMonitor:
-            additionalProperties: false
-            properties:
-              enabled:
-                default: true
-                type: boolean
-            type: object
-        type: object
+        default: true
       objectStorage:
+        title: Thanos Object Storage
+        description: |-
+          Configure Object Storage for Thanos.
+
+          Allows for using OpenStack Swift as the object storage backend type.
         additionalProperties: false
         properties:
           type:
+            title: Thanos Object Storage Type
             default: ""
             type: string
+            enum:
+              - ""
+              - swift
+            meta:enum:
+              "": Use global object storage type (default).
+              swift: Use OpenStack Swift object storage type.
         type: object
+      bucketweb:
+        title: Thanos Bucket Web
+        description: Configure Thanos Bucket Web, the UI to view the state of the bucket or container in use by Thanos.
+        type: object
+        additionalProperties: false
+        properties:
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+      compactor:
+        title: Thanos Compactor
+        description: |-
+          Configure Thanos Compactor, the component compacting and deduplicating metrics stored by Thanos.
+
+          > [!note]
+          > See [the upstream documentation](https://thanos.io/tip/components/compact.md/) for reference.
+        type: object
+        additionalProperties: false
+        properties:
+          verticalCompaction:
+            title: Thanos Vertical Compactor
+            description: When enabled series of metrics from multiple replicas will be merged into one.
+            type: boolean
+            default: false
+          deduplication:
+            title: Thanos Deduplication
+            description: Configure deduplication of metrics.
+            type: string
+            default: none
+            enum:
+              - none
+              - receiverReplicas
+              - prometheusReplicas
+            meta:enum:
+              none: Disable deduplication of metrics (default).
+              receiverReplicas: Enable light deduplication of metrics from different Thanos Receiver replicas.
+              prometheusReplicas: Enable heavy deduplication of metrics from different Prometheus replicas.
+          persistence:
+            title: Thanos Compactor Persistence
+            description: Configure persistence for Thanos Compactor.
+            type: object
+            additionalProperties: false
+            properties:
+              enabled:
+                title: Thanos Compactor Persistence Enabled
+                type: boolean
+                default: true
+              size:
+                title: Thanos Compactor Persistence Size
+                type: string
+                default: 8Gi
+          retentionResolutionRaw:
+            description: The retention duration of metrics with raw resolution.
+            $ref: '#/$defs/timeRange'
+            default: 30d
+          retentionResolution5m:
+            description: The retention duration of metrics with 5m resolution.
+            $ref: '#/$defs/timeRange'
+            default: 90d
+          retentionResolution1h:
+            description: The retention duration of metrics with 1h resolution.
+            $ref: '#/$defs/timeRange'
+            default: 0s
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+      queryFrontend:
+        title: Thanos Query Frontend
+        description: Configure Thanos Query Frontend, the component serving query requests from Grafana.
+        type: object
+        additionalProperties: false
+        properties:
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
       query:
+        title: Thanos Query
+        description: Configure Thanos Query, the component executing metric queries.
+        type: object
         additionalProperties: false
         properties:
           enabled:
-            default: true
+            title: Thanos Query Enabled
             type: boolean
+            default: true
           replicaCount:
-            default: 1
+            title: Thanos Query Replicas
             type: number
+            default: 1
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
           topologySpreadConstraints:
             $ref: '#/$defs/kubernetesTopologySpreadConstraints'
           affinity:
             $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
-        type: object
-      queryFrontend:
-        additionalProperties: false
-        properties:
-          resources:
-            $ref: '#/$defs/kubernetesResourceRequirements'
-        type: object
       receiveDistributor:
+        title: Thanos Receive Distributor
+        description: |-
+          Configure Thanos Receive Distributor, the component serving remote write requests from Prometheus.
+
+          Also called routing receiver upstream.
+        type: object
         additionalProperties: false
         properties:
           replicationFactor:
-            default: 1
+            title: Thanos Replication Factor
+            description: Requires that incoming remote write requests are replicated `(replicationFactor + 1) / 2`.
             type: number
+            default: 1
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
-        type: object
       receiver:
+        title: Thanos Receiver
+        description: |-
+          Configure Thanos Receiver, the component ingesting metrics collected by Prometheus and storing them in object storage.
+
+          Also called ingesting receiver upstream.
         additionalProperties: false
         properties:
+          enabled:
+            title: Thanos Receiver Enabled
+            type: boolean
+            default: true
+          mode:
+            title: Thanos Receiver Mode
+            type: string
+            default: dual-mode
+            enum:
+              - standalone
+              - dual-mode
+            meta:enum:
+              standalone: Run only the ingesting receiver
+              dual-mode: Run both the routing and ingesting receiver
           basic_auth:
+            title: Thanos Receiver Basic Auth
+            description: Configure authentication to Thanos Receiver,
             additionalProperties: false
             properties:
               username:
-                default: thanos
+                title: Thanos Receiver Basic Auth Username
+                description: |-
+                  Configure the username for authenticating to Thanos Receiver.
+
+                  > [!note]
+                  > Must be set for both service and workload clusters.
                 type: string
+                default: thanos
             type: object
-          enabled:
-            default: true
-            type: boolean
-          mode:
-            default: dual-mode
+          subdomain:
+            title: Thanos Receive Subdomain
+            description: |-
+              Subdomain of `opsDomain` that the Ingress to Thanos Receive will be created with.
+
+              > [!note]
+              > Must be set for both service and workload clusters.
             type: string
+            format: hostname
+            default: thanos-receiver
           outOfOrderTimeWindow:
-            default: 600s
+            title: Thanos Out Of Order Time Window
             type: string
+            default: 600s
+          tsdbRetention:
+            title: Thanos TSDB Retention
+            type: string
+            default: 15d
+          replicaCount:
+            title: Thanos Receiver Replcias
+            type: number
+            default: 2
           persistence:
+            title: Thanos Receiver Persistence
+            description: Configure persistence for Thanos Receiver.
+            type: object
             additionalProperties: false
             properties:
               enabled:
-                default: true
+                title: Thanos Receiver Persistence Enabled
                 type: boolean
+                default: true
               size:
-                default: 50Gi
+                title: Thanos Receiver Persistence Size
                 type: string
-            type: object
-          replicaCount:
-            default: 2
-            type: number
+                default: 50Gi
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
-          subdomain:
-            default: thanos-receiver
-            type: string
           topologySpreadConstraints:
             $ref: '#/$defs/kubernetesTopologySpreadConstraints'
-          tsdbRetention:
-            default: 15d
-            type: string
           affinity:
             $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
         type: object
       ruler:
+        title: Thanos Ruler
+        description: Configure Thanos Ruler, the component evaluating alerting and recording rules.
+        type: object
         additionalProperties: false
         properties:
+          enabled:
+            title: Thanos Ruler Enabled
+            type: boolean
+            default: true
+          replicaCount:
+            title: Thanos Ruler Replcias
+            type: number
+            default: 2
+          persistence:
+            title: Thanos Ruler Persistence
+            description: Configure persistence for Thanos Ruler.
+            type: object
+            additionalProperties: false
+            properties:
+              enabled:
+                title: Thanos Ruler Persistence Enabled
+                type: boolean
+                default: false
+              size:
+                title: Thanos Ruler Persistence Size
+                type: string
+                default: 8Gi
           configReloader:
+            title: Thanos Ruler Config Reloader
+            description: Configure the config reloader sidecar for Thanos Ruler.
+            type: object
             additionalProperties: false
             properties:
               resources:
                 $ref: '#/$defs/kubernetesResourceRequirements'
-            type: object
-          enabled:
-            default: true
-            type: boolean
-          persistence:
-            additionalProperties: false
-            properties:
-              enabled:
-                default: false
-                type: boolean
-              size:
-                default: 8Gi
-                type: string
-            type: object
-          replicaCount:
-            default: 2
-            type: number
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
           topologySpreadConstraints:
             $ref: '#/$defs/kubernetesTopologySpreadConstraints'
           affinity:
             $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
-        type: object
       storegateway:
+        title: Thanos Store Gateway
+        description: Configure Thanos Store Gateway, the component fetching metrics from object storage.
+        type: object
         additionalProperties: false
         properties:
           persistence:
+            title: Thanos Store Gateway Persistence
+            description: Configure persistence for Thanos Store Gateway.
+            type: object
             additionalProperties: false
             properties:
               size:
-                default: 8Gi
+                title: Thanos Store Gateway Persistence Size
                 type: string
-            type: object
+                default: 8Gi
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
+      metrics:
+        title: Thanos Metrics
+        description: Configure metrics collected from Thanos.
         type: object
-    type: object
+        additionalProperties: false
+        properties:
+          enabled:
+            title: Thanos Metrics Enabled
+            type: boolean
+            default: true
+          serviceMonitor:
+            title: Thanos Metrics Service Monitor
+            description: Configure the service monitor used to collect metrics from Thanos.
+            type: object
+            additionalProperties: false
+            properties:
+              enabled:
+                title: Thanos Metrics Service Monitor Enabled
+                type: boolean
+                default: true
   wcProbeIngress:
     title: Workcload Cluster Ingress Probe
     additionalProperties: false
