@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Set variables and array adapted for the workload cluster and call functions in prometheus-common
 

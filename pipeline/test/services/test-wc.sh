@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 SCRIPTS_PATH="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 if [[ ! -f $1 ]];then

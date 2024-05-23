@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This is an abstraction of SOPS that makes it possible to share CK8S secrets.
 

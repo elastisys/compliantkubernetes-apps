@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 : "${PG_HOSTNAME:?Missing PG_HOSTNAME}"
 backup_dir="${BACKUP_DIR:-/backup}"

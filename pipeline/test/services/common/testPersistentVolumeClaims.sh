@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 testPersistentVolumeClaims() {
   local pvcs name namespace phase output

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 LOGGING=${LOGGING:-""}
 PIPELINE=${PIPELINE:-false}
 if [ -z "$PIPELINE" ]
