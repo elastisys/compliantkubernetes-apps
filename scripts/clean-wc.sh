@@ -51,6 +51,18 @@ fi
 # Clean up namespaces and any other resources left behind by the apps
 "${here}/.././bin/ck8s" ops kubectl wc delete ns alertmanager falco fluentd-system fluentd gatekeeper-system hnc-system ingress-nginx monitoring velero kured
 
+# Clean up any leftover challenges
+mapfile -t CHALLENGES < <(
+    "${here}/.././bin/ck8s" ops kubectl wc get challenge -A -oyaml | \
+        yq4 '.items[] | .metadata.name + "," + .metadata.namespace'
+    )
+for challenge in "${CHALLENGES[@]}"; do
+    IFS=, read -r name namespace <<< "${challenge}"
+    "${here}/.././bin/ck8s" ops \
+        kubectl wc patch challenge "${name}" -n "${namespace}" \
+        -p '{"metadata":{"finalizers":null}}' --type=merge
+done
+
 if [ "${clusterAPIEnabled}" = "false" ]; then
   # Destroy cert-manager helm release
   "${here}/.././bin/ck8s" ops helmfile wc -l app=cert-manager destroy

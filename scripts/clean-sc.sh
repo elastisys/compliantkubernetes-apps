@@ -40,21 +40,16 @@ fi
 "${here}/.././bin/ck8s" ops kubectl sc delete ns dex opensearch-system harbor fluentd-system gatekeeper-system thanos ingress-nginx monitoring kured falco velero
 
 # Clean up any leftover challenges
-CHALLENGES=$(
+mapfile -t CHALLENGES < <(
+    "${here}/.././bin/ck8s" ops kubectl sc get challenge -A -oyaml | \
+        yq4 '.items[] | .metadata.name + "," + .metadata.namespace'
+    )
+for challenge in "${CHALLENGES[@]}"; do
+    IFS=, read -r name namespace <<< "${challenge}"
     "${here}/.././bin/ck8s" ops \
-      kubectl sc get challenge -A \
-      "-o=jsonpath='{range .items[*]}{.metadata.name}{\",\"}{.metadata.namespace}{\"\n\"}{end}'"
-  )
-if [ -n "$CHALLENGES" ]; then
-  for challenge in "${CHALLENGES[@]}"; do
-      IFS=, read -r name namespace <<< "$challenge"
-      "${here}/.././bin/ck8s" ops \
-          kubectl sc patch challenge \
-          "$name" -n "$namespace" \
-          "-p '{\"metadata\":{\"finalizers\":null}}'" \
-          --type=merge
-  done
-fi
+        kubectl sc patch challenge "${name}" -n "${namespace}" \
+        -p '{"metadata":{"finalizers":null}}' --type=merge
+done
 
 if [ "${clusterAPIEnabled}" = "false" ]; then
   # Destroy cert-manager helm release
