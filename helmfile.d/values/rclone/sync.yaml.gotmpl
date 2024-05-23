@@ -18,7 +18,7 @@ targets:
   {{- range $key, $value := $main.buckets }}
   - destinationName: {{ $value }}
     destinationCrypt: {{ $crypt | get "enabled" false }}
-    {{- $destinationType := $sync.type }}
+    {{- $destinationType := $sync.destinationType }}
     {{- $sourceType := $main.type }}
 
     {{- if eq $key "harbor" }}
@@ -40,8 +40,8 @@ targets:
   {{- range $sync.buckets }}
   - destinationName: {{ get "destination" .source . }}
     destinationCrypt: {{ $crypt | get "enabled" false }}
-    {{- $destinations = get "destinationType" $sync.type . | append $destinations }}
-    destinationType: {{ get "destinationType" $sync.type . }}
+    {{- $destinations = get "destinationType" $sync.destinationType . | append $destinations }}
+    destinationType: {{ get "destinationType" $sync.destinationType . }}
     sourceName: {{ .source }}
     {{- $sources = get "sourceType" $main.type . | append $sources }}
     sourceType: {{ get "sourceType" $main.type . }}

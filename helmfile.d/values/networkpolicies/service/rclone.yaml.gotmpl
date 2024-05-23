@@ -71,7 +71,7 @@ policies:
         - rule: egress-rule-object-storage-main-swift
         {{- end }}
 
-        {{- if has $sync.type $destinations }}
+        {{- if has $sync.destinationType $destinations }}
         - rule: egress-rule-object-storage-sync
         {{- end }}
         {{- if has "swift" $destinations }}
@@ -112,7 +112,7 @@ policies:
         - rule: egress-rule-object-storage-main-swift
         {{- end }}
 
-        {{- if has $sync.type $destinations }}
+        {{- if has $sync.destinationType $destinations }}
         - rule: egress-rule-object-storage-sync
         {{- end }}
         {{- if has "swift" $destinations }}
