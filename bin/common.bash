@@ -107,7 +107,7 @@ ask_abort() {
 check_tools() {
   local req
 
-  req="${root_path}/roles/get-requirements.yaml"
+  req="$("${scripts_path}/requirements/parse.py")"
 
   local warn
   local err
@@ -132,7 +132,7 @@ check_tools() {
     local v1
     local v2
 
-    v1="$(sed -r -e 's/^v//' -e 's/\.[0-9]$/\.\*/' -e 's/\./\\\./g' -e 's/\*/\.*/g' <<< "${1}")"
+    v1="$(sed -r -e 's/^v//' -e 's/\.[0-9](-[0-9])?$/\.\*/' -e 's/\./\\\./g' -e 's/\*/\.*/g' <<< "${1}")"
     v2="$(sed -nr 's/.*([0-9]+\.[0-9]+\.[0-9]+).*/\1/p' <<< "${2}")"
 
     if ! [[ "${v2}" =~ ${v1} ]]; then
@@ -141,14 +141,14 @@ check_tools() {
     fi
   }
 
-  check_minor "$(yq4 '.[0].vars.yq4_version' "${req}")" "$(yq4 --version)" yq4
-  check_minor "$(yq4 '.[0].vars.kubectl_version' "${req}")" "$(kubectl version -oyaml 2> /dev/null | yq4 '.clientVersion.gitVersion')" kubectl
-  check_minor "$(yq4 '.[0].vars.helm_version' "${req}")" "$(helm version --template='{{.Version}}')" helm
-  check_minor "$(yq4 '.[0].vars.helmfile_version' "${req}")" "$(helmfile --version)" helmfile
-  check_minor "$(yq4 '.[0].vars.helmdiff_version' "${req}")" "$(helm plugin list | grep diff)" "helm diff plugin"
-  check_minor "$(yq4 '.[0].vars.helmsecrets_version' "${req}")" "$(helm plugin list | grep secrets)" "helm secrets plugin"
-  check_minor "$(yq4 '.[0].vars.sops_version' "${req}")" "$(sops --version)" "sops"
-  check_minor "$(yq4 '.[0].vars.s3cmd_version' "${req}")" "$(s3cmd --version)" "s3cmd"
+  check_minor "$(echo "${req}" | jq -r '.["github.com/mikefarah/yq/v4"].version')" "$(yq4 --version)" yq4
+  check_minor "$(echo "${req}" | jq -r '.["kubectl"].version')" "$(kubectl version -oyaml 2> /dev/null | yq4 '.clientVersion.gitVersion')" kubectl
+  check_minor "$(echo "${req}" | jq -r '.["helm.sh/helm/v3"].version')" "$(helm version --template='{{.Version}}')" helm
+  check_minor "$(echo "${req}" | jq -r '.["github.com/helmfile/helmfile"].version')" "$(helmfile --version)" helmfile
+  check_minor "$(echo "${req}" | jq -r '.["github.com/databus23/helm-diff/v3"].version')" "$(helm plugin list | grep diff)" "helm diff plugin"
+  check_minor "$(echo "${req}" | jq -r '.["helm-secrets"].version')" "$(helm plugin list | grep secrets)" "helm secrets plugin"
+  check_minor "$(echo "${req}" | jq -r '.["getsops/sops/v3"].version')" "$(sops --version)" "sops"
+  check_minor "$(echo "${req}" | jq -r '.["s3cmd"].version')" "$(s3cmd --version)" "s3cmd"
 
   if [[ "${warn}" != 0 ]]; then
     if [[ -t 1 ]]; then
