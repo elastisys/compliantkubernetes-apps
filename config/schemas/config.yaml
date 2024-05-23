@@ -1247,6 +1247,9 @@ properties:
           enabled:
             default: false
             type: boolean
+          dryrun:
+            default: false
+            type: boolean
           encrypt:
             additionalProperties: false
             properties:
