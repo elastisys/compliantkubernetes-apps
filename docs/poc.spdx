@@ -1,0 +1,1214 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: Compliantkubernetes-apps SBOM
+DocumentNamespace: https://spdx.org/spdx-docs/compliantkubernetes-apps-poc
+Creator: Organization: Elastisys AB
+Creator: Person: Olle Larsson (olle.larsson@elastisys.com)
+Creator: Tool: Olle's brain
+Created: 2024-12-12T12:12:12Z
+
+# Root
+PackageName: compliantkubernetes-apps
+SPDXID: SPDXRef-Package-compliantkubernetes-apps
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: Copyright 2021 Elastisys AB
+FilesAnalyzed: true
+PackageDownloadLocation: git+https://github.com/elastisys/compliantkubernetes-apps.git@v0.38.0
+PackageVersion: v0.38.0
+
+# Helm chart: helmfile.d/upstream/aquasecurity/trivy-operator/
+PackageName: helmfile.d-upstream-aquasecurity-trivy-operator
+SPDXID: SPDXRef-Package-helmfile.d-upstream-aquasecurity-trivy-operator
+PackageVersion: 0.19.1
+PackageSupplier: Organization: Aqua Security (info@aquasec.com)
+PackageDownloadLocation: git+https://github.com/aquasecurity/trivy-operator.git@v0.19.1#/deploy/helm/
+FilesAnalyzed: true
+PackageHomePage: https://github.com/aquasecurity/trivy-operator
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: NONE
+PackageLicenseComments: No license found in the helm chart, therefore assumed to be the same as the license declared in the home page. 
+PackageCopyrightText: <text>
+    trivy-operator
+    Copyright 2019-2022 Aqua Security Software Ltd.
+
+    This product includes software developed by Aqua Security (https://aquasec.com).
+</text>
+PackageComment: Our assessment of this package!
+
+# Container image: ghcr.io/aquasecurity/trivy-operator
+PackageName: ghcr.io-aquasecurity-trivy-operator-0.17.1
+SPDXID: SPDXRef-Package-ghcr.io-aquasecurity-trivy-operator-0.17.1
+PackageVersion: 0.17.1
+PackageSupplier: Organization: Aqua Security (info@aquasec.com)
+PackageDownloadLocation: ghcr.io/aquasecurity/trivy-operator:0.17.1
+FilesAnalyzed: false
+PackageChecksum: SHA256: b52ac37bb44a750562faa9e8304268833403fa011596deb52af1a0e38b2164e1
+PackageHomePage: https://github.com/aquasecurity/trivy-operator/pkgs/container/trivy-operator
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageLicenseComments: The license was stated on the homepage of where the container image can be downloaded.
+PackageCopyrightText: NONE
+PackageComment: Our assessment of this package!
+
+# Container image: ghcr.io/aquasecurity/trivy
+PackageName: ghcr.io-aquasecurity-trivy-0.47.0
+SPDXID: SPDXRef-Package-ghcr.io-aquasecurity-trivy-0.47.0
+PackageVersion: 0.47.0
+PackageSupplier: Organization: Aqua Security (info@aquasec.com)
+PackageDownloadLocation: ghcr.io/aquasecurity/trivy:0.47.0
+FilesAnalyzed: false
+PackageChecksum: SHA256: 163b935486680eefe46e38534eaeabd95e36e0e6b7b3fa5d08fb1e05c6ad9f20
+PackageHomePage: https://github.com/aquasecurity/trivy-operator/pkgs/container/trivy
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageLicenseComments: The license was stated on the homepage of where the container image can be downloaded.
+PackageCopyrightText: NONE
+PackageComment: Our assessment of this package!
+
+# Container image: ghcr.io/aquasecurity/node-collector
+PackageName: ghcr.io-aquasecurity-node-collector-0.0.9
+SPDXID: SPDXRef-Package-ghcr.io-aquasecurity-node-collector-0.0.9
+PackageVersion: 0.0.9
+PackageSupplier: Organization: Aqua Security (info@aquasec.com)
+PackageDownloadLocation: ghcr.io/aquasecurity/node-collector:0.0.9
+FilesAnalyzed: false
+PackageChecksum: SHA256: be6403cdb49a412fb5def28d279c0542a29df7a6f7e85bb39706014d83a7c4a2
+PackageHomePage: https://github.com/aquasecurity/k8s-node-collector/pkgs/container/node-collector
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageLicenseComments: The license was stated on the homepage of the container image.
+PackageCopyrightText: NONE
+PackageComment: Our assessment of this package!
+ 
+# Start here
+ 
+PackageName: helmfile.d-upstream-bitnami-fluentd
+SPDXID: SPDXRef-Package-helmfile.d-upstream-bitnami-fluentd
+PackageVersion: 5.8.2
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-bitnami-fluentd-charts-common
+SPDXID: SPDXRef-Package-helmfile.d-upstream-bitnami-fluentd-charts-common
+PackageVersion: 2.4.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-bitnami-thanos
+SPDXID: SPDXRef-Package-helmfile.d-upstream-bitnami-thanos
+PackageVersion: 15.0.5
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-bitnami-thanos-charts-common
+SPDXID: SPDXRef-Package-helmfile.d-upstream-bitnami-thanos-charts-common
+PackageVersion: 2.19.1
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-bitnami-thanos-charts-minio
+SPDXID: SPDXRef-Package-helmfile.d-upstream-bitnami-thanos-charts-minio
+PackageVersion: 14.1.4
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-bitnami-thanos-charts-minio-charts-common
+SPDXID: SPDXRef-Package-helmfile.d-upstream-bitnami-thanos-charts-minio-charts-common
+PackageVersion: 2.19.1
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-dexidp-dex
+SPDXID: SPDXRef-Package-helmfile.d-upstream-dexidp-dex
+PackageVersion: 0.14.1
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-falcosecurity-falco
+SPDXID: SPDXRef-Package-helmfile.d-upstream-falcosecurity-falco
+PackageVersion: 4.2.2
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-falcosecurity-falco-exporter
+SPDXID: SPDXRef-Package-helmfile.d-upstream-falcosecurity-falco-exporter
+PackageVersion: 0.9.11
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-falcosecurity-falco-charts-falcosidekick
+SPDXID: SPDXRef-Package-helmfile.d-upstream-falcosecurity-falco-charts-falcosidekick
+PackageVersion: 0.7.11
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-falcosecurity-falco-charts-k8s-metacollector
+SPDXID: SPDXRef-Package-helmfile.d-upstream-falcosecurity-falco-charts-k8s-metacollector
+PackageVersion: 0.1.7
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-goharbor-harbor
+SPDXID: SPDXRef-Package-helmfile.d-upstream-goharbor-harbor
+PackageVersion: 1.13.1
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-grafana-grafana
+SPDXID: SPDXRef-Package-helmfile.d-upstream-grafana-grafana
+PackageVersion: 7.3.7
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-jetstack-cert-manager
+SPDXID: SPDXRef-Package-helmfile.d-upstream-jetstack-cert-manager
+PackageVersion: v1.12.8
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-kokuwa-fluentd-elasticsearch
+SPDXID: SPDXRef-Package-helmfile.d-upstream-kokuwa-fluentd-elasticsearch
+PackageVersion: 13.10.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-kubereboot-kured
+SPDXID: SPDXRef-Package-helmfile.d-upstream-kubereboot-kured
+PackageVersion: 4.5.1
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-kubernetes-ingress-nginx-ingress-nginx
+SPDXID: SPDXRef-Package-helmfile.d-upstream-kubernetes-ingress-nginx-ingress-nginx
+PackageVersion: 4.9.1
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-kubernetes-metrics-server-metrics-server
+SPDXID: SPDXRef-Package-helmfile.d-upstream-kubernetes-metrics-server-metrics-server
+PackageVersion: 3.10.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-minio-minio
+SPDXID: SPDXRef-Package-helmfile.d-upstream-minio-minio
+PackageVersion: 5.0.14
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-open-policy-agent-gatekeeper-gatekeeper
+SPDXID: SPDXRef-Package-helmfile.d-upstream-open-policy-agent-gatekeeper-gatekeeper
+PackageVersion: 3.15.1
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-opensearch-project-opensearch
+SPDXID: SPDXRef-Package-helmfile.d-upstream-opensearch-project-opensearch
+PackageVersion: 2.18.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-opensearch-project-opensearch-dashboards
+SPDXID: SPDXRef-Package-helmfile.d-upstream-opensearch-project-opensearch-dashboards
+PackageVersion: 2.16.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-projectcalico-tigera-operator
+SPDXID: SPDXRef-Package-helmfile.d-upstream-projectcalico-tigera-operator
+PackageVersion: v3.26.4
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-prometheus-community-kube-prometheus-stack
+SPDXID: SPDXRef-Package-helmfile.d-upstream-prometheus-community-kube-prometheus-stack
+PackageVersion: 56.6.2
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-prometheus-community-kube-prometheus-stack-charts-crds
+SPDXID: SPDXRef-Package-helmfile.d-upstream-prometheus-community-kube-prometheus-stack-charts-crds
+PackageVersion: 0.0.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-prometheus-community-kube-prometheus-stack-charts-grafana
+SPDXID: SPDXRef-Package-helmfile.d-upstream-prometheus-community-kube-prometheus-stack-charts-grafana
+PackageVersion: 7.3.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-prometheus-community-kube-prometheus-stack-charts-kube-state-metrics
+SPDXID: SPDXRef-Package-helmfile.d-upstream-prometheus-community-kube-prometheus-stack-charts-kube-state-metrics
+PackageVersion: 5.16.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-prometheus-community-kube-prometheus-stack-charts-prometheus-node-exporter
+SPDXID: SPDXRef-Package-helmfile.d-upstream-prometheus-community-kube-prometheus-stack-charts-prometheus-node-exporter
+PackageVersion: 4.26.1
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-prometheus-community-kube-prometheus-stack-charts-prometheus-windows-exporter
+SPDXID: SPDXRef-Package-helmfile.d-upstream-prometheus-community-kube-prometheus-stack-charts-prometheus-windows-exporter
+PackageVersion: 0.3.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-prometheus-community-prometheus-blackbox-exporter
+SPDXID: SPDXRef-Package-helmfile.d-upstream-prometheus-community-prometheus-blackbox-exporter
+PackageVersion: 8.13.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-prometheus-community-prometheus-elasticsearch-exporter
+SPDXID: SPDXRef-Package-helmfile.d-upstream-prometheus-community-prometheus-elasticsearch-exporter
+PackageVersion: 5.1.1
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-upstream-vmware-tanzu-velero
+SPDXID: SPDXRef-Package-helmfile.d-upstream-vmware-tanzu-velero
+PackageVersion: 4.1.5
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-autoscaling-monitoring
+SPDXID: SPDXRef-Package-helmfile.d-charts-autoscaling-monitoring
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-calico-accountant
+SPDXID: SPDXRef-Package-helmfile.d-charts-calico-accountant
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-calico-default-deny
+SPDXID: SPDXRef-Package-helmfile.d-charts-calico-default-deny
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-calico-felix-metrics
+SPDXID: SPDXRef-Package-helmfile.d-charts-calico-felix-metrics
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-cluster-admin-rbac
+SPDXID: SPDXRef-Package-helmfile.d-charts-cluster-admin-rbac
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-falco-psp-rbac
+SPDXID: SPDXRef-Package-helmfile.d-charts-falco-psp-rbac
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-file-copier
+SPDXID: SPDXRef-Package-helmfile.d-charts-file-copier
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-gatekeeper-constraints
+SPDXID: SPDXRef-Package-helmfile.d-charts-gatekeeper-constraints
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-gatekeeper-metrics
+SPDXID: SPDXRef-Package-helmfile.d-charts-gatekeeper-metrics
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-gatekeeper-mutations
+SPDXID: SPDXRef-Package-helmfile.d-charts-gatekeeper-mutations
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-gatekeeper-podsecuritypolicies
+SPDXID: SPDXRef-Package-helmfile.d-charts-gatekeeper-podsecuritypolicies
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-gatekeeper-templates
+SPDXID: SPDXRef-Package-helmfile.d-charts-gatekeeper-templates
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-grafana-dashboards
+SPDXID: SPDXRef-Package-helmfile.d-charts-grafana-dashboards
+PackageVersion: 0.3.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-grafana-label-enforcer
+SPDXID: SPDXRef-Package-helmfile.d-charts-grafana-label-enforcer
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-harbor-harbor-backup
+SPDXID: SPDXRef-Package-helmfile.d-charts-harbor-harbor-backup
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-harbor-harbor-certs
+SPDXID: SPDXRef-Package-helmfile.d-charts-harbor-harbor-certs
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-harbor-init-harbor
+SPDXID: SPDXRef-Package-helmfile.d-charts-harbor-init-harbor
+PackageVersion: 0.2.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-hnc-config-and-crds
+SPDXID: SPDXRef-Package-helmfile.d-charts-hnc-config-and-crds
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-hnc-controller
+SPDXID: SPDXRef-Package-helmfile.d-charts-hnc-controller
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-ingress-nginx-probe-ingress
+SPDXID: SPDXRef-Package-helmfile.d-charts-ingress-nginx-probe-ingress
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-issuers
+SPDXID: SPDXRef-Package-helmfile.d-charts-issuers
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-kube-state-metrics-extra-resource-metrics
+SPDXID: SPDXRef-Package-helmfile.d-charts-kube-state-metrics-extra-resource-metrics
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-kubeapi-metrics
+SPDXID: SPDXRef-Package-helmfile.d-charts-kubeapi-metrics
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-kured-secret
+SPDXID: SPDXRef-Package-helmfile.d-charts-kured-secret
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-log-manager
+SPDXID: SPDXRef-Package-helmfile.d-charts-log-manager
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-namespaces
+SPDXID: SPDXRef-Package-helmfile.d-charts-namespaces
+PackageVersion: 0.1.1
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-networkpolicy-common
+SPDXID: SPDXRef-Package-helmfile.d-charts-networkpolicy-common
+PackageVersion: 0.2.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-networkpolicy-generator
+SPDXID: SPDXRef-Package-helmfile.d-charts-networkpolicy-generator
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-networkpolicy-service-cluster
+SPDXID: SPDXRef-Package-helmfile.d-charts-networkpolicy-service-cluster
+PackageVersion: 0.2.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-networkpolicy-workload-cluster
+SPDXID: SPDXRef-Package-helmfile.d-charts-networkpolicy-workload-cluster
+PackageVersion: 0.2.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-node-local-dns
+SPDXID: SPDXRef-Package-helmfile.d-charts-node-local-dns
+PackageVersion: 0.1.1
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-opensearch-backup
+SPDXID: SPDXRef-Package-helmfile.d-charts-opensearch-backup
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-opensearch-configurer
+SPDXID: SPDXRef-Package-helmfile.d-charts-opensearch-configurer
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-opensearch-curator
+SPDXID: SPDXRef-Package-helmfile.d-charts-opensearch-curator
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-opensearch-secrets
+SPDXID: SPDXRef-Package-helmfile.d-charts-opensearch-secrets
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-opensearch-securityadmin
+SPDXID: SPDXRef-Package-helmfile.d-charts-opensearch-securityadmin
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-opensearch-slm
+SPDXID: SPDXRef-Package-helmfile.d-charts-opensearch-slm
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-openstack-monitoring
+SPDXID: SPDXRef-Package-helmfile.d-charts-openstack-monitoring
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-prometheus-alerts
+SPDXID: SPDXRef-Package-helmfile.d-charts-prometheus-alerts
+PackageVersion: 0.1.1
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-prometheus-servicemonitor
+SPDXID: SPDXRef-Package-helmfile.d-charts-prometheus-servicemonitor
+PackageVersion: 0.1.1
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-rclone
+SPDXID: SPDXRef-Package-helmfile.d-charts-rclone
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-s3-exporter
+SPDXID: SPDXRef-Package-helmfile.d-charts-s3-exporter
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-tekton-pipelines
+SPDXID: SPDXRef-Package-helmfile.d-charts-tekton-pipelines
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-thanos-ingress-secret
+SPDXID: SPDXRef-Package-helmfile.d-charts-thanos-ingress-secret
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-thanos-ruler
+SPDXID: SPDXRef-Package-helmfile.d-charts-thanos-ruler
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-user-alertmanager
+SPDXID: SPDXRef-Package-helmfile.d-charts-user-alertmanager
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-user-crds
+SPDXID: SPDXRef-Package-helmfile.d-charts-user-crds
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+PackageName: helmfile.d-charts-user-rbac
+SPDXID: SPDXRef-Package-helmfile.d-charts-user-rbac
+PackageVersion: 0.1.0
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: true
+PackageHomePage: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseComments: NOASSERTION
+PackageCopyrightText: <text> </text>
+PackageComment: NOASSERTION
+
+# Relationships
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-package-compliantkubernetes-apps
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-aquasecurity-trivy-operator
+Relationship: SPDXRef-Package-helmfile.d-upstream-aquasecurity-trivy-operator CONTAINS SPDXRef-Package-ghcr.io-aquasecurity-trivy-operator-0.17.1
+Relationship: SPDXRef-Package-helmfile.d-upstream-aquasecurity-trivy-operator CONTAINS SPDXRef-Package-ghcr.io-aquasecurity-trivy-0.47.0
+Relationship: SPDXRef-Package-helmfile.d-upstream-aquasecurity-trivy-operator CONTAINS SPDXRef-Package-ghcr.io-aquasecurity-node-collector-0.0.9
+
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-bitnami-fluentd
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-bitnami-fluentd-charts-common
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-bitnami-thanos
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-bitnami-thanos-charts-common
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-bitnami-thanos-charts-minio
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-bitnami-thanos-charts-minio-charts-common
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-dexidp-dex
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-falcosecurity-falco
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-falcosecurity-falco-exporter
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-falcosecurity-falco-charts-falcosidekick
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-falcosecurity-falco-charts-k8s-metacollector
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-goharbor-harbor
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-grafana-grafana
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-jetstack-cert-manager
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-kokuwa-fluentd-elasticsearch
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-kubereboot-kured
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-kubernetes-ingress-nginx-ingress-nginx
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-kubernetes-metrics-server-metrics-server
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-minio-minio
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-open-policy-agent-gatekeeper-gatekeeper
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-opensearch-project-opensearch
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-opensearch-project-opensearch-dashboards
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-projectcalico-tigera-operator
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-prometheus-community-kube-prometheus-stack
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-prometheus-community-kube-prometheus-stack-charts-crds
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-prometheus-community-kube-prometheus-stack-charts-grafana
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-prometheus-community-kube-prometheus-stack-charts-kube-state-metrics
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-prometheus-community-kube-prometheus-stack-charts-prometheus-node-exporter
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-prometheus-community-kube-prometheus-stack-charts-prometheus-windows-exporter
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-prometheus-community-prometheus-blackbox-exporter
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-prometheus-community-prometheus-elasticsearch-exporter
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-upstream-vmware-tanzu-velero
+
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-autoscaling-monitoring
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-calico-accountant
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-calico-default-deny
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-calico-felix-metrics
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-cluster-admin-rbac
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-falco-psp-rbac
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-file-copier
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-gatekeeper-constraints
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-gatekeeper-metrics
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-gatekeeper-mutations
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-gatekeeper-podsecuritypolicies
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-gatekeeper-templates
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-grafana-dashboards
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-grafana-label-enforcer
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-harbor-harbor-backup
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-harbor-harbor-certs
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-harbor-init-harbor
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-hnc-config-and-crds
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-hnc-controller
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-ingress-nginx-probe-ingress
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-issuers
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-kube-state-metrics-extra-resource-metrics
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-kubeapi-metrics
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-kured-secret
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-log-manager
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-namespaces
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-networkpolicy-common
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-networkpolicy-generator
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-networkpolicy-service-cluster
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-networkpolicy-workload-cluster
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-node-local-dns
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-opensearch-backup
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-opensearch-configurer
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-opensearch-curator
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-opensearch-secrets
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-opensearch-securityadmin
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-opensearch-slm
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-openstack-monitoring
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-prometheus-alerts
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-prometheus-servicemonitor
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-rclone
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-s3-exporter
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-tekton-pipelines
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-thanos-ingress-secret
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-thanos-ruler
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-user-alertmanager
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-user-crds
+Relationship: SPDXRef-Package-compliantkubernetes-apps CONTAINS SPDXRef-Package-helmfile.d-charts-user-rbac
