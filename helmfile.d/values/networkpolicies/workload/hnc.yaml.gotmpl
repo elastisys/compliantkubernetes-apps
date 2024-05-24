@@ -10,6 +10,7 @@ policies:
         app.kubernetes.io/component: hnc-controller-manager
       egress:
         - rule: egress-rule-apiserver
+        - rule: egress-rule-dns
       ingress:
         {{- if not .Values.hnc.ha }}
         - rule: ingress-rule-apiserver
@@ -26,6 +27,7 @@ policies:
         app.kubernetes.io/component: hnc-webhook
       egress:
         - rule: egress-rule-apiserver
+        - rule: egress-rule-dns
       ingress:
         - rule: ingress-rule-apiserver
           ports:
