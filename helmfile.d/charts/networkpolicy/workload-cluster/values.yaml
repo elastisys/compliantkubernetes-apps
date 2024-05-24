@@ -2,7 +2,7 @@ global:
   wcApiserver:
     ips:
       - "0.0.0.0/0"
-    port: 6443
+    port: 443
   wcNodes:
     ips:
       - "0.0.0.0/0"
@@ -33,6 +33,10 @@ global:
         - port: 53
           protocol: TCP
         - port: 53
+          protocol: UDP
+        - port: 8053
+          protocol: TCP
+        - port: 8053
           protocol: UDP
 
   objectStoreEgress:

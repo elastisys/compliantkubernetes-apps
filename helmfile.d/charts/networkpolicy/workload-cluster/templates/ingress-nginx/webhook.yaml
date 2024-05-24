@@ -16,6 +16,10 @@ spec:
           protocol: UDP
         - port: 53
           protocol: TCP
+        - port: 8053
+          protocol: UDP
+        - port: 8053
+          protocol: TCP
     {{- if and .Values.global.wcApiserver.ips .Values.global.wcApiserver.port }}
     - to:
         {{- range $IP := .Values.global.wcApiserver.ips }}
