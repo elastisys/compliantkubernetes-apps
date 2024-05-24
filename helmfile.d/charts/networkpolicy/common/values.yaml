@@ -47,6 +47,10 @@ global:
           protocol: TCP
         - port: 53
           protocol: UDP
+        - port: 8053
+          protocol: TCP
+        - port: 8053
+          protocol: UDP
 
   objectStoreEgress:
     - to:

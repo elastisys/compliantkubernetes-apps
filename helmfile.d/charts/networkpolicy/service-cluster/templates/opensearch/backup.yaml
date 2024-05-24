@@ -12,14 +12,10 @@ spec:
       app.kubernetes.io/instance: opensearch-backup
   egress:
     - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/component: opensearch-master
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/component: opensearch-master
       ports:
-        - port: 9200
-    - ports:
-        - port: 53
-          protocol: UDP
-        - port: 53
-          protocol: TCP
+      - port: 9200
+    {{- toYaml .Values.global.dnsServerEgress | nindent 4 }}
 {{ end }}

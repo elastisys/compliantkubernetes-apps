@@ -30,9 +30,5 @@ spec:
               app.kubernetes.io/component: opensearch-master
       ports:
         - port: 9200
-    - ports:
-        - port: 53
-          protocol: UDP
-        - port: 53
-          protocol: TCP
+    {{- toYaml .Values.global.dnsServerEgress | nindent 4 }}
 {{ end }}

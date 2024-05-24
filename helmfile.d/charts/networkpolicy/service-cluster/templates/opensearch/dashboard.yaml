@@ -77,9 +77,5 @@ spec:
       ports:
         - protocol: TCP
           port: 443
-    - ports:
-        - port: 53
-          protocol: UDP
-        - port: 53
-          protocol: TCP
+    {{- toYaml .Values.global.dnsServerEgress | nindent 4 }}
 {{ end }}

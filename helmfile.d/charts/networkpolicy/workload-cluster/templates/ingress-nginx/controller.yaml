@@ -77,6 +77,10 @@ spec:
           protocol: UDP
         - port: 53
           protocol: TCP
+        - port: 8053
+          protocol: UDP
+        - port: 8053
+          protocol: TCP
     {{- if or .Values.ingressNginx.ingressOverride.ips .Values.global.wcIngress.ips }}
     - to:
       {{- if and .Values.ingressNginx.ingressOverride.enabled .Values.ingressNginx.ingressOverride.ips }}
