@@ -43,3 +43,25 @@ load_file() {
 load_mock() {
   bats_load_library "mock/load.bash"
 }
+
+# sets the kubeconfig to use
+# usage: with_kubeconfig <cluster>
+with_kubeconfig() {
+  if ! [[ "${1:-}" =~ ^(sc|wc)$ ]]; then
+    fail "invalid or missing cluster argument"
+  fi
+
+  export KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_$1.yaml"
+  export DETIK_CLIENT_NAME="kubectl"
+}
+
+# sets the namespace to use
+# usage: with_namespace <namespace>
+with_namespace() {
+  if [[ -z "${1:-}" ]]; then
+    fail "missing namespace argument"
+  fi
+
+  export DETIK_CLIENT_NAMESPACE="$1"
+  export NAMESPACE="$1"
+}
