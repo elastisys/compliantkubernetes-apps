@@ -73,8 +73,6 @@ args+=("--hostname" "compliantkubernetes-apps-tests" "--workdir" "${root}")
 if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]] || [[ "${FORWARD_RUNTIME:-false}" == "true" ]]; then
   log.continue "forward your environment and/or runtime to container ${1:-}?"
   args+=("--network" "host")
-else
-  args+=("--network" "none")
 fi
 
 args+=("--user" "$(id -u):$(id -g)")
