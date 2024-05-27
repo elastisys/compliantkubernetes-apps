@@ -3,46 +3,39 @@
 # bats file_tags=static,general,bin:update_ips
 
 setup_file() {
-  export BATS_NO_PARALLELIZE_WITHIN_FILE=true
-
-  load "../../../common/lib"
-  load "../../../common/lib/env"
-  load "../../../common/lib/gpg"
+  load "../../../bats.lib.bash"
+  load_common "env.bash"
+  load_common "gpg.bash"
+  load_common "yq.bash"
 
   gpg.setup
   env.setup
 
-  common_setup
-
   env.init baremetal kubespray dev --skip-object-storage --skip-network-policies
 
-  yq_set common .objectStorage.type '"s3"'
-  yq_set common .objectStorage.s3.regionEndpoint '"https://s3.foo.dev-ck8s.com:1234"'
+  yq.set common .objectStorage.type '"s3"'
+  yq.set common .objectStorage.s3.regionEndpoint '"https://s3.foo.dev-ck8s.com:1234"'
 
-  yq_set sc .objectStorage.swift.authUrl '"https://keystone.foo.dev-ck8s.com:5678"'
-  yq_set sc .objectStorage.swift.region '"swift-region"'
+  yq.set sc .objectStorage.swift.authUrl '"https://keystone.foo.dev-ck8s.com:5678"'
+  yq.set sc .objectStorage.swift.region '"swift-region"'
 
   sops --set '["objectStorage"]["swift"]["username"] "swift-sync-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
 
-  yq_set sc .objectStorage.sync.enabled 'true'
+  yq.set sc .objectStorage.sync.enabled 'true'
 
-  yq_set sc .objectStorage.sync.destinationType '"none"'
-  yq_set sc .objectStorage.sync.syncDefaultBuckets 'false'
+  yq.set sc .objectStorage.sync.destinationType '"none"'
+  yq.set sc .objectStorage.sync.syncDefaultBuckets 'false'
 
-  yq_set sc .networkPolicies.rclone.enabled 'true'
-}
-
-teardown_file() {
-  env.teardown
-  gpg.teardown
+  yq.set sc .networkPolicies.rclone.enabled 'true'
 }
 
 setup() {
-  load "../../../common/lib"
-  load "../../../common/lib/env"
-  load "../../../common/lib/update-ips"
-
-  common_setup
+  load "../../../bats.lib.bash"
+  load_common "env.bash"
+  load_common "update-ips.bash"
+  load_common "yq.bash"
+  load_assert
+  load_mock
 
   env.private
 
@@ -57,26 +50,31 @@ teardown() {
   env.teardown
 }
 
+teardown_file() {
+  env.teardown
+  gpg.teardown
+}
+
 # ---- setup -----------------------------------------------------------------------------------------------------------
 
 _setup_s3() {
   update_ips.mock_rclone_s3
 
-  yq_set sc "${1}" '"s3"'
-  yq_set sc .objectStorage.sync.s3.regionEndpoint '"https://s3.foo.dev-ck8s.com:1234"'
+  yq.set sc "${1}" '"s3"'
+  yq.set sc .objectStorage.sync.s3.regionEndpoint '"https://s3.foo.dev-ck8s.com:1234"'
 }
 
 _setup_s3_and_swift() {
   update_ips.mock_rclone_s3_and_swift
 
-  yq_set sc "${1}" '"s3"'
-  yq_set sc .objectStorage.sync.s3.regionEndpoint '"https://s3.foo.dev-ck8s.com:1234"'
+  yq.set sc "${1}" '"s3"'
+  yq.set sc .objectStorage.sync.s3.regionEndpoint '"https://s3.foo.dev-ck8s.com:1234"'
 
-  yq_set sc .objectStorage.sync.swift.authUrl '"https://keystone.foo.dev-ck8s.com:5678"'
-  yq_set sc .objectStorage.sync.swift.region '"swift-region"'
-  yq_set sc .objectStorage.sync.swift.domainName '"swift-domain"'
-  yq_set sc .objectStorage.sync.swift.projectDomainName '"swift-project-domain"'
-  yq_set sc .objectStorage.sync.swift.projectName '"swift-project"'
+  yq.set sc .objectStorage.sync.swift.authUrl '"https://keystone.foo.dev-ck8s.com:5678"'
+  yq.set sc .objectStorage.sync.swift.region '"swift-region"'
+  yq.set sc .objectStorage.sync.swift.domainName '"swift-domain"'
+  yq.set sc .objectStorage.sync.swift.projectDomainName '"swift-project-domain"'
+  yq.set sc .objectStorage.sync.swift.projectName '"swift-project"'
 
   sops --set '["objectStorage"]["sync"]["swift"]["username"] "swift-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
   sops --set '["objectStorage"]["sync"]["swift"]["password"] "swift-password"' "${CK8S_CONFIG_PATH}/secrets.yaml"
@@ -85,12 +83,12 @@ _setup_s3_and_swift() {
 _setup_swift() {
   update_ips.mock_rclone_swift
 
-  yq_set sc "${1}" '"swift"'
-  yq_set sc .objectStorage.sync.swift.authUrl '"https://keystone.foo.dev-ck8s.com:5678"'
-  yq_set sc .objectStorage.sync.swift.region '"swift-region"'
-  yq_set sc .objectStorage.sync.swift.domainName '"swift-domain"'
-  yq_set sc .objectStorage.sync.swift.projectDomainName '"swift-project-domain"'
-  yq_set sc .objectStorage.sync.swift.projectName '"swift-project"'
+  yq.set sc "${1}" '"swift"'
+  yq.set sc .objectStorage.sync.swift.authUrl '"https://keystone.foo.dev-ck8s.com:5678"'
+  yq.set sc .objectStorage.sync.swift.region '"swift-region"'
+  yq.set sc .objectStorage.sync.swift.domainName '"swift-domain"'
+  yq.set sc .objectStorage.sync.swift.projectDomainName '"swift-project-domain"'
+  yq.set sc .objectStorage.sync.swift.projectName '"swift-project"'
 
   sops --set '["objectStorage"]["sync"]["swift"]["username"] "swift-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
   sops --set '["objectStorage"]["sync"]["swift"]["password"] "swift-password"' "${CK8S_CONFIG_PATH}/secrets.yaml"
@@ -99,23 +97,23 @@ _setup_swift() {
 _setup_swift_and_s3() {
   update_ips.mock_rclone_s3_and_swift
 
-  yq_set sc "${1}" '"swift"'
-  yq_set sc .objectStorage.sync.swift.authUrl '"https://keystone.foo.dev-ck8s.com:5678"'
-  yq_set sc .objectStorage.sync.swift.region '"swift-region"'
-  yq_set sc .objectStorage.sync.swift.domainName '"swift-domain"'
-  yq_set sc .objectStorage.sync.swift.projectDomainName '"swift-project-domain"'
-  yq_set sc .objectStorage.sync.swift.projectName '"swift-project"'
+  yq.set sc "${1}" '"swift"'
+  yq.set sc .objectStorage.sync.swift.authUrl '"https://keystone.foo.dev-ck8s.com:5678"'
+  yq.set sc .objectStorage.sync.swift.region '"swift-region"'
+  yq.set sc .objectStorage.sync.swift.domainName '"swift-domain"'
+  yq.set sc .objectStorage.sync.swift.projectDomainName '"swift-project-domain"'
+  yq.set sc .objectStorage.sync.swift.projectName '"swift-project"'
 
   sops --set '["objectStorage"]["sync"]["swift"]["username"] "swift-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
   sops --set '["objectStorage"]["sync"]["swift"]["password"] "swift-password"' "${CK8S_CONFIG_PATH}/secrets.yaml"
 
-  yq_set sc .objectStorage.sync.s3.regionEndpoint '"https://s3.foo.dev-ck8s.com:1234"'
+  yq.set sc .objectStorage.sync.s3.regionEndpoint '"https://s3.foo.dev-ck8s.com:1234"'
 }
 
 # --- s3 only ----------------------------------------------------------------------------------------------------------
 
 _test_rclone_sync_s3_requires_s3_endpoint() {
-  yq_set sc "${1}" '"s3"'
+  yq.set sc "${1}" '"s3"'
 
   run ck8s update-ips both apply
   assert_failure
@@ -124,11 +122,11 @@ _test_rclone_sync_s3_requires_s3_endpoint() {
   update_ips.assert_none
 }
 
-@test "rclone sync - s3 - requires s3 endpoint - buckets destination type" {
+@test "ck8s update-ips requires s3 endpoint for rclone sync s3 - buckets destination type" {
   _test_rclone_sync_s3_requires_s3_endpoint '.objectStorage.sync.buckets.[0].destinationType'
 }
 
-@test "rclone sync - s3 - requires s3 endpoint - sync destination type" {
+@test "ck8s update-ips requires s3 endpoint for rclone sync s3 - destination type" {
   _test_rclone_sync_s3_requires_s3_endpoint '.objectStorage.sync.destinationType'
 }
 
@@ -140,11 +138,11 @@ _test_apply_rclone_sync_s3() {
   update_ips.assert_rclone_s3
 }
 
-@test "rclone sync - s3 - buckets destination type" {
+@test "ck8s update-ips sets s3 for rclone sync - buckets destination type" {
   _test_apply_rclone_sync_s3 '.objectStorage.sync.buckets.[0].destinationType'
 }
 
-@test "rclone sync - s3 - sync destination type" {
+@test "ck8s update-ips sets s3 for rclone sync - destination type" {
   _test_apply_rclone_sync_s3 '.objectStorage.sync.destinationType'
 }
 
@@ -153,8 +151,8 @@ _test_apply_rclone_sync_s3() {
 _test_apply_rclone_sync_s3_remove_swift() {
   _setup_s3 "${1}"
 
-  yq_set sc .networkPolicies.rclone.sync.objectStorageSwift.ips '["127.0.0.5/32"]'
-  yq_set sc .networkPolicies.rclone.sync.objectStorageSwift.ports '[5678]'
+  yq.set sc .networkPolicies.rclone.sync.objectStorageSwift.ips '["127.0.0.5/32"]'
+  yq.set sc .networkPolicies.rclone.sync.objectStorageSwift.ports '[5678]'
 
   run ck8s update-ips both apply
 
@@ -163,11 +161,11 @@ _test_apply_rclone_sync_s3_remove_swift() {
   update_ips.assert_rclone_s3
 }
 
-@test "rclone sync - s3 and remove swift - buckets destination type" {
+@test "ck8s update-ips sets s3 and removes swift for rclone sync - buckets destination type" {
   _test_apply_rclone_sync_s3_remove_swift '.objectStorage.sync.buckets.[0].destinationType'
 }
 
-@test "rclone sync - s3 and remove swift - sync destination type" {
+@test "ck8s update-ips sets s3 and removes swift for rclone sync - destination type" {
   _test_apply_rclone_sync_s3_remove_swift '.objectStorage.sync.destinationType'
 }
 
@@ -181,11 +179,11 @@ _test_apply_rclone_sync_s3_add_swift() {
   update_ips.assert_rclone_s3_and_swift
 }
 
-@test "rclone sync - s3 and add swift - buckets destination type" {
+@test "ck8s update-ips sets s3 and adds swift for rclone sync - buckets destination type" {
   _test_apply_rclone_sync_s3_add_swift '.objectStorage.sync.buckets.[0].destinationType'
 }
 
-@test "rclone sync - s3 and add swift - sync destination type" {
+@test "ck8s update-ips sets s3 and adds swift for rclone sync - destination type" {
   _test_apply_rclone_sync_s3_add_swift '.objectStorage.sync.destinationType'
 }
 
@@ -194,7 +192,7 @@ _test_apply_rclone_sync_s3_add_swift() {
 _test_apply_rclone_sync_swift_requires_swift_endpoint() {
   _setup_swift "${1}"
 
-  yq_set sc .objectStorage.sync.swift.authUrl '""'
+  yq.set sc .objectStorage.sync.swift.authUrl '""'
 
   run ck8s update-ips both apply
   assert_failure
@@ -203,22 +201,22 @@ _test_apply_rclone_sync_swift_requires_swift_endpoint() {
   update_ips.assert_none
 }
 
-@test "rclone sync - swift - requires swift endpoint - buckets destination type" {
+@test "ck8s update-ips requires swift endpoint for rclone sync - buckets destination type" {
   _test_apply_rclone_sync_swift_requires_swift_endpoint '.objectStorage.sync.buckets.[0].destinationType'
 }
 
-@test "rclone sync - swift - requires swift endpoint - sync destination type" {
+@test "ck8s update-ips requires swift endpoint for rclone sync - destination type" {
   _test_apply_rclone_sync_swift_requires_swift_endpoint '.objectStorage.sync.destinationType'
 }
 
-@test "rclone sync - swift - requires swift endpoint - harbor" {
-  yq_set sc .objectStorage.sync.syncDefaultBuckets "true"
+@test "ck8s update-ips requires swift endpoint for rclone sync - harbor" {
+  yq.set sc .objectStorage.sync.syncDefaultBuckets "true"
 
   _test_apply_rclone_sync_swift_requires_swift_endpoint '.harbor.persistence.type'
 }
 
-@test "rclone sync - swift - requires swift endpoint - thanos" {
-  yq_set sc .objectStorage.sync.syncDefaultBuckets "true"
+@test "ck8s update-ips requires swift endpoint for rclone sync - thanos" {
+  yq.set sc .objectStorage.sync.syncDefaultBuckets "true"
 
   _test_apply_rclone_sync_swift_requires_swift_endpoint '.thanos.objectStorage.type'
 }
@@ -231,11 +229,11 @@ _test_apply_rclone_sync_swift() {
   update_ips.assert_rclone_swift
 }
 
-@test "rclone sync - swift - buckets destination type" {
+@test "ck8s update-ips sets swift for rclone sync - buckets destination type" {
   _test_apply_rclone_sync_swift '.objectStorage.sync.buckets.[0].destinationType'
 }
 
-@test "rclone sync - swift - sync destination type" {
+@test "ck8s update-ips sets swift for rclone sync - destination type" {
   _test_apply_rclone_sync_swift '.objectStorage.sync.destinationType'
 }
 
@@ -244,8 +242,8 @@ _test_apply_rclone_sync_swift() {
 _test_apply_rclone_sync_swift_remove_s3() {
   _setup_swift "${1}"
 
-  yq_set sc .networkPolicies.rclone.sync.objectStorage.ips '["127.0.0.5/32"]'
-  yq_set sc .networkPolicies.rclone.sync.objectStorage.ports '[5678]'
+  yq.set sc .networkPolicies.rclone.sync.objectStorage.ips '["127.0.0.5/32"]'
+  yq.set sc .networkPolicies.rclone.sync.objectStorage.ports '[5678]'
 
   run ck8s update-ips both apply
 
@@ -254,11 +252,11 @@ _test_apply_rclone_sync_swift_remove_s3() {
   update_ips.assert_rclone_swift
 }
 
-@test "rclone sync - swift and remove s3 - buckets destination type" {
+@test "ck8s update-ips sets swift and remove s3 for rclone sync - buckets destination type" {
   _test_apply_rclone_sync_swift_remove_s3 '.objectStorage.sync.buckets.[0].destinationType'
 }
 
-@test "rclone sync - swift and remove s3 - sync destination type" {
+@test "ck8s update-ips sets swift and remove s3 for rclone sync - destination type" {
   _test_apply_rclone_sync_swift_remove_s3 '.objectStorage.sync.destinationType'
 }
 
@@ -273,18 +271,18 @@ _test_apply_rclone_sync_swift_add_s3() {
   update_ips.assert_rclone_s3_and_swift
 }
 
-@test "rclone sync - swift and add s3 - buckets destination type" {
+@test "ck8s update-ips sets swift and adds s3 for rclone sync - buckets destination type" {
   _test_apply_rclone_sync_swift_add_s3 '.objectStorage.sync.buckets.[0].destinationType'
 }
 
-@test "rclone sync - swift and add s3 - sync destination type" {
+@test "ck8s update-ips sets swift and adds s3 for rclone sync - destination type" {
   _test_apply_rclone_sync_swift_add_s3 '.objectStorage.sync.destinationType'
 }
 
 # --- s3 and swift -----------------------------------------------------------------------------------------------------
 
 _test_apply_rclone_sync_s3_and_swift_requires_s3_endpoint() {
-  yq_set sc .objectStorage.sync.s3.regionEndpoint '""'
+  yq.set sc .objectStorage.sync.s3.regionEndpoint '""'
 
   run ck8s update-ips both apply
   assert_failure
@@ -293,24 +291,24 @@ _test_apply_rclone_sync_s3_and_swift_requires_s3_endpoint() {
   update_ips.assert_none
 }
 
-@test "rclone sync - s3 and swift requires s3 endpoint - s3" {
+@test "ck8s update-ips requires s3 endpoint for rclone sync - s3 destination type and swift bucket destination type" {
   _setup_s3_and_swift '.objectStorage.sync.destinationType'
-  yq_set sc .objectStorage.sync.buckets.[0].destinationType '"s3"'
-  yq_set sc .objectStorage.sync.buckets.[1].destinationType '"swift"'
+  yq.set sc .objectStorage.sync.buckets.[0].destinationType '"s3"'
+  yq.set sc .objectStorage.sync.buckets.[1].destinationType '"swift"'
 
   _test_apply_rclone_sync_s3_and_swift_requires_s3_endpoint
 }
 
-@test "rclone sync - s3 and swift requires s3 endpoint - swift" {
+@test "ck8s update-ips requires s3 endpoint for rclone sync - swift destination type and s3 bucket destination type" {
   _setup_swift_and_s3 '.objectStorage.sync.destinationType'
-  yq_set sc .objectStorage.sync.buckets.[0].destinationType '"swift"'
-  yq_set sc .objectStorage.sync.buckets.[1].destinationType '"s3"'
+  yq.set sc .objectStorage.sync.buckets.[0].destinationType '"swift"'
+  yq.set sc .objectStorage.sync.buckets.[1].destinationType '"s3"'
 
   _test_apply_rclone_sync_s3_and_swift_requires_s3_endpoint
 }
 
 _test_apply_rclone_sync_s3_and_swift_requires_swift_endpoint() {
-  yq_set sc .objectStorage.sync.swift.authUrl '""'
+  yq.set sc .objectStorage.sync.swift.authUrl '""'
 
   run ck8s update-ips both apply
   assert_failure
@@ -319,18 +317,18 @@ _test_apply_rclone_sync_s3_and_swift_requires_swift_endpoint() {
   update_ips.assert_none
 }
 
-@test "rclone sync - s3 and swift requires swift endpoint - s3" {
+@test "ck8s update-ips requires swift endpoint for rclone sync - s3 destination type and swift bucket destination type" {
   _setup_s3_and_swift '.objectStorage.sync.destinationType'
-  yq_set sc .objectStorage.sync.buckets.[0].destinationType '"s3"'
-  yq_set sc .objectStorage.sync.buckets.[1].destinationType '"swift"'
+  yq.set sc .objectStorage.sync.buckets.[0].destinationType '"s3"'
+  yq.set sc .objectStorage.sync.buckets.[1].destinationType '"swift"'
 
   _test_apply_rclone_sync_s3_and_swift_requires_swift_endpoint
 }
 
-@test "rclone sync - s3 and swift requires swift endpoint - swift" {
+@test "ck8s update-ips requires swift endpoint for rclone sync - swift destination type and s3 bucket destination type" {
   _setup_swift_and_s3 '.objectStorage.sync.destinationType'
-  yq_set sc .objectStorage.sync.buckets.[0].destinationType '"swift"'
-  yq_set sc .objectStorage.sync.buckets.[1].destinationType '"s3"'
+  yq.set sc .objectStorage.sync.buckets.[0].destinationType '"swift"'
+  yq.set sc .objectStorage.sync.buckets.[1].destinationType '"s3"'
 
   _test_apply_rclone_sync_s3_and_swift_requires_swift_endpoint
 }
@@ -341,43 +339,43 @@ _test_apply_rclone_sync_s3_and_swift() {
   update_ips.assert_rclone_s3_and_swift
 }
 
-@test "rclone sync - s3 and swift - s3" {
+@test "ck8s update-ips sets s3 and swift for rclone sync - s3 destination type and swift bucket destination type" {
   _setup_s3_and_swift '.objectStorage.sync.destinationType'
-  yq_set sc .objectStorage.sync.buckets.[0].destinationType '"s3"'
-  yq_set sc .objectStorage.sync.buckets.[1].destinationType '"swift"'
+  yq.set sc .objectStorage.sync.buckets.[0].destinationType '"s3"'
+  yq.set sc .objectStorage.sync.buckets.[1].destinationType '"swift"'
 
   _test_apply_rclone_sync_s3_and_swift
 }
 
-@test "rclone sync - s3 and swift - swift" {
+@test "ck8s update-ips sets swift and s3 for rclone sync - swift destination type and s3 bucket destination type" {
   _setup_swift_and_s3 '.objectStorage.sync.destinationType'
-  yq_set sc .objectStorage.sync.buckets.[0].destinationType '"swift"'
-  yq_set sc .objectStorage.sync.buckets.[1].destinationType '"s3"'
+  yq.set sc .objectStorage.sync.buckets.[0].destinationType '"swift"'
+  yq.set sc .objectStorage.sync.buckets.[1].destinationType '"s3"'
 
   _test_apply_rclone_sync_s3_and_swift
 }
 
 # --- secondary --------------------------------------------------------------------------------------------------------
 
-@test "rclone sync - secondary add" {
-  yq_set sc .objectStorage.sync.secondaryUrl '"https://s3.foo.dev-ck8s.com:1234"'
+@test "ck8s update-ips sets secondary URL for rclone sync" {
+  yq.set sc .objectStorage.sync.secondaryUrl '"https://s3.foo.dev-ck8s.com:1234"'
 
   update_ips.mock_minimal
   mock_set_output "${mock_dig}" "127.0.0.4" 4 # .objectStorage.sync.secondaryUrl
 
   run ck8s update-ips both apply
 
-  assert_equal "$(yq_dig sc '.networkPolicies.rclone.sync.secondaryUrl.ips | . style="flow"')" "[127.0.0.4/32]"
-  assert_equal "$(yq_dig sc '.networkPolicies.rclone.sync.secondaryUrl.ports | . style="flow"')" "[1234]"
+  assert_equal "$(yq.dig sc '.networkPolicies.rclone.sync.secondaryUrl.ips | . style="flow"')" "[127.0.0.4/32]"
+  assert_equal "$(yq.dig sc '.networkPolicies.rclone.sync.secondaryUrl.ports | . style="flow"')" "[1234]"
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 4
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16
   assert_equal "$(mock_get_call_num "${mock_curl}")" 0
 }
 
-@test "rclone sync - secondary remove" {
-  yq_set sc .networkPolicies.rclone.sync.secondaryUrl.ips '["127.0.0.4"]'
-  yq_set sc .networkPolicies.rclone.sync.secondaryUrl.ports '[1234]'
+@test "ck8s update-ips removes secondary URL for rclone sync" {
+  yq.set sc .networkPolicies.rclone.sync.secondaryUrl.ips '["127.0.0.4"]'
+  yq.set sc .networkPolicies.rclone.sync.secondaryUrl.ports '[1234]'
 
   update_ips.mock_minimal
   run ck8s update-ips both apply
@@ -391,7 +389,7 @@ _test_apply_rclone_sync_s3_and_swift() {
 
 # --- get-swift-url ----------------------------------------------------------------------------------------------------
 
-@test "rclone sync - get-swift-url" {
+@test "ck8s update-ips gets swift url for rclone sync" {
   _setup_swift '.objectStorage.sync.destinationType'
 
   mock_set_output "${mock_dig}" ""
