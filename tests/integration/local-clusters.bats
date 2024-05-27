@@ -1,23 +1,25 @@
 #!/usr/bin/env bats
 
 setup_file() {
-  load "../common/lib/local-cluster"
+  load "../bats.lib.bash"
+  load_common "local-cluster.bash"
 
   local_cluster.setup dev integration.dev-ck8s.com
   local_cluster.create single-node-cache
 }
 
 teardown_file() {
-  load "../common/lib/local-cluster"
+  load "../bats.lib.bash"
+  load_common "local-cluster.bash"
 
-  local_cluster.teardown
   local_cluster.delete
+  local_cluster.teardown
 }
 
 setup() {
-  load "../common/lib"
-
-  common_setup
+  load "../bats.lib.bash"
+  load_assert
+  load_detik
 }
 
 helm_status() {

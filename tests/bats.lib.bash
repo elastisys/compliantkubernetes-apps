@@ -32,8 +32,8 @@ load_assert() {
 }
 
 load_detik() {
-  bats_load_library "detik/utils.bash"
-  bats_load_library "detik/detik.bash"
+  bats_load_library "detik/lib/utils.bash"
+  bats_load_library "detik/lib/detik.bash"
 }
 
 load_file() {
@@ -64,4 +64,59 @@ with_namespace() {
 
   export DETIK_CLIENT_NAMESPACE="$1"
   export NAMESPACE="$1"
+}
+
+# note: expects with_kubeconfig and with_namespace to be set
+# usage: test_cronjob <name>
+test_cronjob() {
+  if [[ -z "${1:-}" ]]; then
+    fail "missing cronjob name argument"
+  fi
+
+  verify "there is 1 cronjob named '^$1$'"
+}
+
+# note: expects with_kubeconfig and with_namespace to be set
+# usage: test_daemonset <name>
+test_daemonset() {
+  if [[ -z "${1:-}" ]]; then
+    fail "missing daemonset name argument"
+  fi
+
+  verify "there is 1 daemonset named '^$1$'"
+  verify "'status' is 'running' for pods named '$1-[[:alnum:]]\+[[:space:]]'"
+}
+
+# note: expects with_kubeconfig and with_namespace to be set
+# usage: test_deployment <name> <replicas>
+test_deployment() {
+  if [[ -z "${1:-}" ]]; then
+    fail "missing deployment name argument"
+  fi
+
+  verify "there is 1 deployment named '^$1$'"
+  verify "there are ${2:-1} pods named '$1-[[:alnum:]]\+-[[:alnum:]]\+$'"
+  verify "'status' is 'running' for pods named '$1-[[:alnum:]]\+-[[:alnum:]]\+[[:space:]]'"
+}
+
+# note: expects with_kubeconfig and with_namespace to be set
+# usage: test_statefulset <name> <replicas>
+test_statefulset() {
+  if [[ -z "${1:-}" ]]; then
+    fail "missing statefulset name argument"
+  fi
+
+  verify "there is 1 statefulset named '^$1$'"
+  verify "there are ${2-1} pods named '$1-[[:digit:]]\+$'"
+  verify "'status' is 'running' for pods named '$1-[[:digit:]]\+[[:space:]]'"
+}
+
+# note: expects with_kubeconfig and with_namespace to be set
+# usage: test_logs_contains <resource-type/name> <container> <regex>...
+test_logs_contains() {
+  run kubectl -n "${NAMESPACE}" logs "$1" grafana-sc-dashboard
+
+  for arg in "${@:2}"; do
+    assert_line --regexp "${arg}"
+  done
 }
