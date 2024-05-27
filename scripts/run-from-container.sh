@@ -64,7 +64,7 @@ fi
 declare -a args
 args=("--rm")
 
-if [[ -t 1 ]]; then
+if [[ -t 1 ]] && [[ -z "${CI:-}" ]]; then
   args+=("-it")
 fi
 

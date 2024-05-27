@@ -15,15 +15,11 @@ setup() {
   load_assert
   load_file
 
-  load "../../common/lib"
-
   CK8S_CONFIG_PATH="$(mktemp --directory)"
   export CK8S_CONFIG_PATH
   export CK8S_ENVIRONMENT_NAME="unit-test"
   export CK8S_CLOUD_PROVIDER="baremetal"
   export CK8S_FLAVOR="dev"
-
-  common_setup
 }
 
 teardown() {
