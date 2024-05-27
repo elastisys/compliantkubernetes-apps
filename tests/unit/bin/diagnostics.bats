@@ -2,29 +2,21 @@
 
 # bats file_tags=general,bin:diagnostics
 
-setup_file() {
-  load "../../common/lib"
-
-  common_setup
-
-  with_kubeconfig sc
-}
-
 setup() {
-  load "../../common/lib"
-
-  common_setup
+  load "../../bats.lib.bash"
+  load_assert
+  load_file
 
   with_kubeconfig sc
 }
 
-@test "diagnostics - requires CK8S_CONFIG_PATH" {
+@test "ck8s diagnostics requires CK8S_CONFIG_PATH" {
   CK8S_CONFIG_PATH="" run ck8s diagnostics sc
   assert_failure
   assert_output --partial "Missing CK8S_CONFIG_PATH"
 }
 
-@test "diagnostics - creates diagnostics file" {
+@test "ck8s diagnostics creates diagnostics file" {
   run ck8s diagnostics sc
   assert_success
 
