@@ -5,9 +5,10 @@
 # bats file_tags=static,bin:init,elastx
 
 setup_file() {
-  load "../../../common/lib"
-  load "../../../common/lib/env"
-  load "../../../common/lib/gpg"
+  load "../../../bats.lib.bash"
+  load_common "env.bash"
+  load_common "gpg.bash"
+  load_common "yq.bash"
 
   gpg.setup
   env.setup
@@ -16,11 +17,12 @@ setup_file() {
 }
 
 setup() {
-  load "../../../common/lib"
-  load "../../../common/lib/env"
+  load "../../../bats.lib.bash"
+  load_common "env.bash"
+  load_assert
+  load_file
   load "script"
 
-  common_setup
   env.private
 }
 
@@ -33,10 +35,10 @@ teardown_file() {
   gpg.teardown
 }
 
-@test "init is successful - elastx:air-gapped" {
+@test "ck8s init is successful - elastx:air-gapped" {
   test_init_successful
 }
 
-@test "init is idempotent - elastx:air-gapped" {
+@test "ck8s init is idempotent - elastx:air-gapped" {
   test_init_idempotent
 }

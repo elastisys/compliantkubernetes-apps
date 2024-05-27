@@ -7,7 +7,7 @@ setup() {
   load_assert
 }
 
-@test "opa gatekeeper policies - opa test" {
+@test "opa gatekeeper policies is valid" {
   run opa test -v "${CHARTS}/gatekeeper/templates/policies/"
 
   assert_success
