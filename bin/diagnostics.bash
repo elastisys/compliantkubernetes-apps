@@ -44,73 +44,117 @@ run_diagnostics() {
     # -- Nodes --
     echo "Fetching Nodes that are NotReady (<node>)"
     nodes=$("${here}/ops.bash" kubectl "${cluster}" get nodes -o=yaml | yq4 '.items[] | select(.status.conditions[] | select(.type == "Ready" and .status != "True")) | .metadata.name' | tr '\n' ' ')
+    if [ -z "${nodes}" ]; then
+    echo -e "All Nodes are ready"
+    else
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     echo "${nodes}" | xargs "${here}/ops.bash" kubectl "${cluster}" get nodes -o wide
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     echo -e "\nDescribing Nodes"
     echo "${nodes}" | xargs "${here}/ops.bash" kubectl "${cluster}" describe nodes
-
-
+    fi
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     # -- DS and Deployments --
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     echo -e "\nFetching Deployments without desired number of ready pods (<deployment>)"
-    "${here}/ops.bash" kubectl "${cluster}" get deployments -A -o wide | grep -v -E "([0-9]+)/\1"
+    deployments=$("${here}"/ops.bash kubectl "${cluster}" get deployments -A -o=yaml | yq4 '.items[] | select(.status.conditions[] | select((.type == "Progressing" and .status != "True") or (.type == "Available" and .status != "True")))')
+    if [ -z "${deployments}" ]; then
+    echo -e "All Deployments are ready"
+    else
+    echo "${deployments}"
+    fi
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
     echo -e "\nFetching DaemonSets without desired number of ready pods (<daemonset>)"
-    "${here}/ops.bash" kubectl "${cluster}" get daemonsets -A -o wide | grep -v -E "([0-9]+)/\1"
+    daemonsets=$("${here}"/ops.bash kubectl "${cluster}" get daemonsets -A -o=yaml | yq4 '.items[] | select(.status.numberMisscheduled != 0)')
+    if [ -z "${daemonsets}" ]; then
+    echo -e "All daemonsets are ready"
+    else
+    echo "${daemonsets}"
+    fi
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
     echo -e "\nFetching StatefulSets without desired number of ready pods (<statefulset>)"
-    "${here}/ops.bash" kubectl "${cluster}" get statefulsets -A -o wide | grep -v -E "([0-9]+)/\1"
+    statefulsets=$("${here}"/ops.bash kubectl "${cluster}" get statefulsets -A -o=yaml | yq4 '.items[] | select(.status.collisionCount != 0 and .status.readyReplicas != .status.updatedReplicas and .status.replicas != .status.readyReplicas)')
+    if [ -z "${statefulsets}" ]; then
+    echo -e "All statefulsets are ready"
+    else
+    echo "${statefulsets}"
+    fi
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
     # -- Pods --
     echo -e "\nFetching Pods that are NotReady (<pod>)"
-
-    "${here}/ops.bash" kubectl "${cluster}" get pods -A -o wide | grep -v -E "Running|Completed"
     pods=$("${here}/ops.bash" kubectl "${cluster}" get pod -A -o=yaml | yq4 '.items[] | select(.status.conditions[] | select(.type == "Ready" and .status != "True" and .reason != "PodCompleted")) | [{"name": .metadata.name, "namespace": .metadata.namespace}]')
     readarray pod_arr < <(echo "$pods" | yq4 e -o=j -I=0 '.[]')
 
-    for pod in "${pod_arr[@]}"; do
-        pod_name=$(echo "$pod" | jq -r '.name')
-        namespace=$(echo "$pod" | jq -r '.namespace')
+    if [ "${pods}" == '[]' ]; then
+    echo -e "All pods are ready"
+    else
+        for pod in "${pod_arr[@]}"; do
+            pod_name=$(echo "$pod" | jq -r '.name')
+            namespace=$(echo "$pod" | jq -r '.namespace')
 
-        echo -e "\nDescribing pod <${pod_name}>"
-        "${here}/ops.bash" kubectl "${cluster}" describe pod "${pod_name}" -n "${namespace}"
+            echo -e "\nDescribing pod <${pod_name}>"
+            "${here}/ops.bash" kubectl "${cluster}" describe pod "${pod_name}" -n "${namespace}"
 
-        echo -e "\nGetting logs from pod: <${pod_name}>"
-        logs=$("${here}/ops.bash" kubectl "${cluster}" logs "${pod_name}" -n "${namespace}" --tail 20 || true)
-        status="$?"
-        if [ "${status}" -eq 0 ]; then
-            echo "${logs}"
-        fi
+            echo -e "\nGetting logs from pod: <${pod_name}>"
+            logs=$("${here}/ops.bash" kubectl "${cluster}" logs "${pod_name}" -n "${namespace}" --tail 20 || true)
+            status="$?"
+            if [ "${status}" -eq 0 ]; then
+                echo "${logs}"
+            fi
 
-        echo -e "\nGetting previous logs from pod: <${pod_name}>"
-        logs_prev=$("${here}/ops.bash" kubectl "${cluster}" logs -p "${pod_name}" -n "${namespace}" --tail 20 || true)
-        status="$?"
-        if [ "${status}" -eq 0 ]; then
-            echo "${logs_prev}"
-        fi
-    done
+            echo -e "\nGetting previous logs from pod: <${pod_name}>"
+            logs_prev=$("${here}/ops.bash" kubectl "${cluster}" logs -p "${pod_name}" -n "${namespace}" --tail 20 || true)
+            status="$?"
+            if [ "${status}" -eq 0 ]; then
+                echo "${logs_prev}"
+            fi
+        done
+    fi
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
     # -- Top --
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     echo -e "\nFetching cluster resource usage <top>"
     "${here}/ops.bash" kubectl "${cluster}" top nodes
     "${here}/ops.bash" kubectl "${cluster}" top pods -A
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
     # -- Helm --
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     echo -e "\nFetching Helm releases that are not deployed (<helm>)"
-    "${here}/ops.bash" helm "${cluster}" list -A --all | grep -v deployed
+    helm=$("${here}"/ops.bash helm wc list -A --all -o yaml | yq4 '.[] | select(.status != "deployed")')
+    if [ -z "${helm}" ]; then
+        echo -e "All charts are deployed"
+    else
+        echo "${helm}"
+    fi
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
     # -- Cert --
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     echo -e "\nFetching cert-manager resources (<cert>)"
     "${here}/ops.bash" kubectl "${cluster}" get clusterissuers,issuers,certificates,orders,challenges --all-namespaces -o wide
 
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     echo -e "\nDescribing failed Challenges (<challenge>)"
     challenges=$("${here}/ops.bash" kubectl "${cluster}" get challenge -A -o=yaml | yq4 '.items[] | select(.status.state != "valid") | [{"name": .metadata.name, "namespace": .metadata.namespace}]')
     readarray challenge_arr < <(echo "$challenges" | yq4 e -o=j -I=0 '.[]')
-    for challenge in "${challenge_arr[@]}"; do
-        challenge_name=$(echo "$challenge" | jq -r '.name')
-        namespace=$(echo "$challenge" | jq -r '.namespace')
-        "${here}/ops.bash" kubectl "${cluster}" describe challenge "${challenge_name}" -n "${namespace}"
-    done
+    if [ "${challenges}" == '[]' ]; then
+        echo -e "All challenges are valid"
+    else
+        for challenge in "${challenge_arr[@]}"; do
+            challenge_name=$(echo "$challenge" | jq -r '.name')
+            namespace=$(echo "$challenge" | jq -r '.namespace')
+            "${here}/ops.bash" kubectl "${cluster}" describe challenge "${challenge_name}" -n "${namespace}"
+        done
+    fi
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
     # -- Events --
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     echo -e "\nFetching all Events (<event>)"
     "${here}/ops.bash" kubectl "${cluster}" get events -A --sort-by=.metadata.creationTimestamp
 }
