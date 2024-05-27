@@ -4234,6 +4234,4 @@ properties:
           AWS route53 can not handle CNAME records and TXT with the same name.
           When --aws-prefer-cname is used, add a prefix to make it work.
     type: object
-additionalProperties:
-  type: object
-  properties: {}
+additionalProperties: false
