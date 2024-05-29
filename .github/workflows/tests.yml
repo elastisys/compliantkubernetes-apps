@@ -40,10 +40,11 @@ jobs:
         working-directory: ./tests
         env:
           CK8S_AUTO_APPROVE: true
-        run: make ctr-run-unit-static,${{ matrix.tag }}
+        run: make run-unit-static,${{ matrix.tag }}
 
   integration:
     runs-on: ubuntu-latest
+    needs: [ unit-static ]
     steps:
       - name: checkout compliantkubernetes-apps
         uses: actions/checkout@v4
@@ -66,7 +67,7 @@ jobs:
         working-directory: ./tests
         env:
           CK8S_AUTO_APPROVE: true
-        run: make ctr-run-integration
+        run: make run-integration
       - name: delete local cache
         if: always()
         run: ./scripts/local-cluster.sh cache delete
