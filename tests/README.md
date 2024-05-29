@@ -3,6 +3,8 @@
 The test suite is implemented using [`bats`](https://github.com/bats-core/bats-core) and [`cypress`](https://github.com/cypress-io/cypress), with unit, regression, integration, and end-to-end tests under their own respective directory.
 Tests implemented with `cypress` can and will be integrated into the `bats` test suite using generators.
 
+The test harness is implemented to be run in a container using either rootful `docker` or rootless `podman`.
+
 ## Usage
 
 > [!note]
@@ -16,37 +18,29 @@ Tests implemented with `cypress` can and will be integrated into the `bats` test
 The tests differentiate between static and dynamic tests, all static tests can be run without setting up an environment, and all dynamic tests requires an environment to test.
 Static tests are tagged with `static`.
 
+> [!danger]
+> This type of distinction will be phased out and all unit, regression, and integration tests will be required to be static!
+
 The `tests / unit-static` workflow on GitHub is invoked with the following commands:
 
 ```bash
 make build-unit
-make ctr-run-unit-static
+make run-unit-static
+```
+
+The `tests / integration` workflow on GitHub is invoked with the following commands:
+
+```bash
+make build-main
+make run-integration
 ```
 
 ### Usage with Makefile
 
 > [!note]
-> You can also use `make build`, then `make ctr-<command>` to run each command in a container, skip `make ctr-dep` as they are integrated into the image.
-> You must rebuild the image for it to contain your changes.
->
-> If you get errors from `bats` about tags then you `bats` version is to old, either update or run in the container.
->
-> If you get warnings from `docker` about that the "legacy builder is deprecated" then you need to setup [`buildx`](https://docs.docker.com/go/buildx) on your system.
->
 > The container might struggle to prompt for kube-login and gpg-agent, but if those are activated before by accessing the clusters and using gpg then the session can be reused.
 
-You must have `bats`, `make` and `npm` installed
-
-```bash
-# For deb based distributions
-sudo apt install bats make npm
-```
-
-Supporting libraries including `cypress` are fetched automatically as a dependency or with:
-
-```bash
-make dep
-```
+You must have `make` installed
 
 Certain test suites are generated automatically as a dependency or with:
 
@@ -57,7 +51,7 @@ make gen
 Run all tests:
 
 ```bash
-make
+make all
 ```
 
 Run selected tests:
@@ -80,14 +74,14 @@ Clean up:
 # remove dependencies and generated files
 make clean
 
-# remove dependencies
-make clean-dep
-
 # remove generated files
 make clean-gen
 ```
 
 ### Usage with `bats`
+
+> [!warning]
+> Direct usage with `bats` is currently not supported.
 
 The plain `bats` test suite can be manually run by simply running `bats` and listing the target directories or files.
 
@@ -103,6 +97,9 @@ bats <path/to/file.bats>
 Additionally tests can be filtered via tags using the `--filter-tags <tags,...>` argument.
 
 ### Usage with `cypress`
+
+> [!warning]
+> Direct usage with `cypress` is currently not supported.
 
 The plain `cypress` test suite can be manually run as follows:
 
@@ -136,10 +133,10 @@ The following template should be used for each file:
 #!/usr/bin/env bats
 
 setup() {
-  # $repo-root/tests/common/lib
-  load "../common/lib"
+  load "../bats.lib.bash"
 
-  common_setup
+  # additional loads for helpers
+  # check the bats.lib.bash for load functions, and common/bats/ for helper functions
 }
 ```
 
@@ -152,8 +149,6 @@ The following template can be used to define tests, except for the test definiti
   assert true
 }
 ```
-
-We currently import [`bats-assert`](https://github.com/bats-core/bats-assert), [`bats-detik`](https://github.com/bats-core/bats-detik), [`bats-support`](https://github.com/bats-core/bats-support), as well as our own [`common/lib.bash`](common/lib.bash).
 
 ### Writing cypress tests
 
