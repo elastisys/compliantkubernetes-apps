@@ -9,6 +9,7 @@ webhook:
   nodeSelector: {{- toYaml .Values.certmanager.webhook.nodeSelector | nindent 4 }}
   affinity:     {{- toYaml .Values.certmanager.webhook.affinity | nindent 4 }}
   tolerations:  {{- toYaml .Values.certmanager.webhook.tolerations | nindent 4 }}
+  serviceAnnotations:  {{- toYaml .Values.certmanager.webhook.serviceAnnotations | nindent 4 }}
 
 cainjector:
   resources:    {{- toYaml .Values.certmanager.cainjector.resources | nindent 4 }}
