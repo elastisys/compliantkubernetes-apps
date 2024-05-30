@@ -11,15 +11,7 @@ spec:
   policyTypes:
     - Egress
   egress:
-    - ports:
-        - port: 53
-          protocol: UDP
-        - port: 53
-          protocol: TCP
-        - port: 8053
-          protocol: UDP
-        - port: 8053
-          protocol: TCP
+    {{- toYaml .Values.global.dnsServerEgress | nindent 4 }}
     {{- if and .Values.global.scApiserver.ips .Values.global.scApiserver.port }}
     - to:
         {{- range $IP := .Values.global.scApiserver.ips }}
