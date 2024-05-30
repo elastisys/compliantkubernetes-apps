@@ -177,6 +177,11 @@ run_diagnostics() {
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     echo -e "\nFetching all Events (<event>)"
     "${here}/ops.bash" kubectl "${cluster}" get events -A --sort-by=.metadata.creationTimestamp
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+
+    # -- Test --
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+    "${here}/ck8s" test "${cluster}"
 }
 
 log_info "Running diagnostics..."
