@@ -65,6 +65,7 @@ policies:
         app: kube-prometheus-stack-operator
       egress:
         - rule: egress-rule-apiserver
+        - rule: egress-rule-dns
       ingress:
         - rule: ingress-rule-apiserver
           ports:
