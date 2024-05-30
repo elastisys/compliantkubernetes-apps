@@ -84,9 +84,5 @@ spec:
       ports:
         - port: {{ .Values.global.scApiserver.port }}
     {{- end }}
-    - ports:
-      - protocol: UDP
-        port: 53
-      - protocol: TCP
-        port: 53
+    {{- toYaml .Values.global.dnsServerEgress | nindent 4 }}
 {{- end }}

@@ -24,11 +24,7 @@ spec:
         - port: 8443
     {{- end }}
   egress:
-    - ports:
-        - port: 53
-          protocol: UDP
-        - port: 53
-          protocol: TCP
+    - ports: {{- toYaml (index .Values.global.dnsServerEgress 0).ports | nindent 6 }}
     {{- if and .Values.global.apiserver.ips .Values.global.apiserver.port }}
     - to:
         {{- range .Values.global.apiserver.ips }}

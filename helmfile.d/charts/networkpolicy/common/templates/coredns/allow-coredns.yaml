@@ -11,11 +11,7 @@ spec:
     - Egress
     - Ingress
   ingress:
-    - ports:
-      - port: 53
-        protocol: UDP
-      - port: 53
-        protocol: TCP
+    {{- toYaml .Values.global.dnsServerEgress | nindent 4 }}
     - from:
       - podSelector:
           matchLabels:
@@ -59,10 +55,6 @@ spec:
           cidr: {{ $IP }}
       {{- end }}
       {{- end }}
-      ports:
-        - port: 53
-          protocol: UDP
-        - port: 53
-          protocol: TCP
+      ports: {{- toYaml (index .Values.global.dnsServerEgress 0).ports | nindent 6 }}
     {{- end }}
 {{- end }}
