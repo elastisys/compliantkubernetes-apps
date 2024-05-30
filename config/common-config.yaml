@@ -735,6 +735,7 @@ certmanager:
     nodeSelector: {}
     tolerations: []
     affinity: {}
+    serviceAnnotations: {}
 
   cainjector:
     resources:
