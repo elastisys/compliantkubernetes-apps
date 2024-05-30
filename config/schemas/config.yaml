@@ -5997,6 +5997,19 @@ properties:
             title: Network Policies Fluentd Enabled
             type: boolean
             default: true
+          extraOutput:
+            title: Extra Output Rule
+            description: |-
+                Configure extra output egress rules.
+
+                This may be used to allow application developers to send logs externally from user Fluentd with extra config and plugins.
+            type: object
+            additionalProperties: false
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+              ports:
+                $ref: '#/$defs/portlist'
       opensearch:
         title: Network Policies OpenSearch
         description: Configure OpenSearch network policy rules.
