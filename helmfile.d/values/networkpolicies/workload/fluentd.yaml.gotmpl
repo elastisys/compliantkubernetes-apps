@@ -1,0 +1,59 @@
+{{- $netpol := .Values.networkPolicies -}}
+
+policies:
+  fluentd-system:
+    forwarder-to-opensearch:
+      podSelectorLabels:
+        app.kubernetes.io/instance: fluentd-forwarder
+      egress:
+        - rule: egress-rule-sc-ingress
+    aggregator-from-user:
+      podSelectorLabels:
+        app.kubernetes.io/instance: fluentd-aggregator
+      ingress:
+        - name: fluentd-elasticsearch
+          peers:
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: fluentd
+              podSelectorLabels:
+                app.kubernetes.io/instance: fluentd-elasticsearch
+          ports:
+            - tcp: 24224
+
+  fluentd:
+    all-deny:
+      podSelectorLabels: {}
+      egress: {}
+      ingress: {}
+
+    forwarder:
+      podSelectorLabels:
+        app.kubernetes.io/name: fluentd-elasticsearch
+      egress:
+        - rule: egress-rule-apiserver
+        - rule: egress-rule-dns
+        - rule: egress-rule-sc-ingress
+        - name: fluentd-aggregator
+          peers:
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: fluentd-system
+              podSelectorLabels:
+                app.kubernetes.io/instance: fluentd-aggregator
+          ports:
+            - tcp: 24224
+
+        {{- if and $netpol.fluentd.extraOutput.ips $netpol.fluentd.extraOutput.ports }}
+        - name: fluentd-extra-output
+          peers:
+            {{- range $netpol.fluentd.extraOutput.ips }}
+            - cidr: {{ . }}
+            {{- end }}
+          ports:
+            {{- range $netpol.fluentd.extraOutput.ports }}
+            - tcp: {{ . }}
+            {{- end }}
+        {{- end }}
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 24231

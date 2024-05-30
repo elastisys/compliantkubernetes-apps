@@ -1,0 +1,8 @@
+policies:
+  fluentd-system:
+    log-manager:
+      podSelectorLabels:
+        app.kubernetes.io/name: log-manager
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-object-storage

@@ -5,6 +5,24 @@ templates:
     labels:
       app: fluentd
 
+  fluentd-networkpolicy:
+    inherit:
+      - template: fluentd
+      - template: networkpolicies
+    installed: {{ and (.Values | get "fluentd.enabled" false) (.Values | get "networkPolicies.fluentd.enabled" false) }}
+    labels:
+      netpol: fluentd
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/common/fluentd.yaml.gotmpl
+      {{- if .Values | get "ck8sManagementCluster.enabled" false }}
+      - values/networkpolicies/service/fluentd.yaml.gotmpl
+      {{- else if .Values | get "ck8sWorkloadCluster.enabled" false }}
+      - values/networkpolicies/workload/fluentd.yaml.gotmpl
+      {{ end }}
+
   fluentd-podsecuritypolicy:
     inherit:
       - template: fluentd
@@ -27,8 +45,8 @@ templates:
     {{- end }}
     name: fluentd-aggregator
     needs:
+      - fluentd-system/networkpolicy
       - fluentd-system/podsecuritypolicy
-      - kube-system/common-np
       - monitoring/kube-prometheus-stack # creates servicemonitors
     values:
       - values/fluentd/aggregator-common.yaml.gotmpl
@@ -50,8 +68,8 @@ templates:
     {{- end }}
     name: fluentd-forwarder
     needs:
+      - fluentd-system/networkpolicy
       - fluentd-system/podsecuritypolicy
-      - kube-system/common-np
       - monitoring/kube-prometheus-stack # creates servicemonitors and prometheusrules
     values:
       - values/fluentd/forwarder-common.yaml.gotmpl
@@ -72,8 +90,8 @@ templates:
     namespace: fluentd
     name: fluentd
     needs:
+      - fluentd-system/networkpolicy
       - fluentd-system/podsecuritypolicy
-      - kube-system/workload-cluster-np
       - monitoring/kube-prometheus-stack # creates servicemonitors and prometheusrules
     hooks:
       - events: [ presync ]
@@ -95,8 +113,8 @@ templates:
     chart: charts/log-manager
     version: 0.1.0
     name: log-manager
-    needs:
-      - kube-system/service-cluster-np
-      - fluentd-system/podsecuritypolicy
     values:
       - values/fluentd/log-manager.yaml.gotmpl
+    needs:
+      - fluentd-system/networkpolicy
+      - fluentd-system/podsecuritypolicy

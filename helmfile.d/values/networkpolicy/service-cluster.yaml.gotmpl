@@ -63,9 +63,6 @@ opensearch:
     ips: {{- toYaml .Values.networkPolicies.opensearch.plugins.ips | nindent 8 }}
     ports: {{- toYaml .Values.networkPolicies.opensearch.plugins.ports | nindent 8 }}
 
-fluentd:
-  enabled: {{ and .Values.fluentd.enabled .Values.networkPolicies.fluentd.enabled }}
-
 s3Exporter:
   enabled: {{ and (eq .Values.objectStorage.type "s3") (and .Values.s3Exporter.enabled .Values.networkPolicies.s3Exporter.enabled) }}
 

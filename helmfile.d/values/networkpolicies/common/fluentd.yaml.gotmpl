@@ -1,0 +1,43 @@
+policies:
+  fluentd-system:
+    all-deny:
+      podSelectorLabels: {}
+      egress: {}
+      ingress: {}
+
+    aggregator:
+      podSelectorLabels:
+        app.kubernetes.io/instance: fluentd-aggregator
+      egress:
+        - rule: egress-rule-dns
+        - rule: egress-rule-object-storage
+      ingress:
+        - name: fluentd-forwarder
+          peers:
+            - podSelectorLabels:
+                app.kubernetes.io/instance: fluentd-forwarder
+          ports:
+            - tcp: 24224
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 24231
+        - rule: ingress-rule-blackbox
+          ports:
+            - tcp: 9880
+
+    forwarder:
+      podSelectorLabels:
+        app.kubernetes.io/instance: fluentd-forwarder
+      egress:
+        - rule: egress-rule-apiserver
+        - rule: egress-rule-dns
+        - name: fluentd-aggregator
+          peers:
+            - podSelectorLabels:
+                app.kubernetes.io/instance: fluentd-aggregator
+          ports:
+            - tcp: 24224
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 24231
