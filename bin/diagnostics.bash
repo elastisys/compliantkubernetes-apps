@@ -13,21 +13,21 @@ file="${CK8S_CONFIG_PATH}/diagnostics-${cluster}-$(date +%y%m%d%H%M%S).log"
 touch "${file}"
 
 if [ -z "${CK8S_PGP_FP:-}" ]; then
-  fingerprints=$(yq4 '.creation_rules[].pgp' "${sops_config}")
+    fingerprints=$(yq4 '.creation_rules[].pgp' "${sops_config}")
 
-  log_warning "Notice for self-managed customers:"
-  echo -e "\tEncrypting using the fingerprints: $fingerprints." 1>&2
-  echo -e "\tIf you want to send diagnostic data to Elastisys, make sure to do:\n" 1>&2
+    log_warning "Notice for self-managed customers:"
+    echo -e "\tEncrypting using the fingerprints: $fingerprints." 1>&2
+    echo -e "\tIf you want to send diagnostic data to Elastisys, make sure to do:\n" 1>&2
 
-  echo -e "\tCK8S_PGP_FP=<fingerprint provided during onboarding> ./bin/ck8s diagnostics [sc|wc]\n" 1>&2
+    echo -e "\tCK8S_PGP_FP=<fingerprint provided during onboarding> ./bin/ck8s diagnostics [sc|wc]\n" 1>&2
 
-  echo -e "\tIf in doubt, contact support@elastisys.com." 1>&2
+    echo -e "\tIf in doubt, contact support@elastisys.com." 1>&2
 
-  log_warning_no_newline "Do you want to continue anyway? (y/N): "
-  read -r reply
-  if [[ ! "${reply}" =~ ^[yY]$ ]]; then
-      exit 1
-  fi
+    log_warning_no_newline "Do you want to continue anyway? (y/N): "
+    read -r reply
+    if [[ ! "${reply}" =~ ^[yY]$ ]]; then
+        exit 1
+    fi
 fi
 
 sops_encrypt_file() {
@@ -66,13 +66,13 @@ run_diagnostics() {
     echo "Fetching Nodes that are NotReady (<node>)"
     nodes=$("${here}/ops.bash" kubectl "${cluster}" get nodes -o=yaml | yq4 '.items[] | select(.status.conditions[] | select(.type == "Ready" and .status != "True")) | .metadata.name' | tr '\n' ' ')
     if [ -z "${nodes}" ]; then
-    echo -e "All Nodes are ready"
+        echo -e "All Nodes are ready"
     else
-    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-    echo "${nodes}" | xargs "${here}/ops.bash" kubectl "${cluster}" get nodes -o wide
-    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-    echo -e "\nDescribing Nodes"
-    echo "${nodes}" | xargs "${here}/ops.bash" kubectl "${cluster}" describe nodes
+        printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+        echo "${nodes}" | xargs "${here}/ops.bash" kubectl "${cluster}" get nodes -o wide
+        printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+        echo -e "\nDescribing Nodes"
+        echo "${nodes}" | xargs "${here}/ops.bash" kubectl "${cluster}" describe nodes
     fi
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     # -- DS and Deployments --
@@ -80,27 +80,27 @@ run_diagnostics() {
     echo -e "\nFetching Deployments without desired number of ready pods (<deployment>)"
     deployments=$("${here}"/ops.bash kubectl "${cluster}" get deployments -A -o=yaml | yq4 '.items[] | select(.status.conditions[] | select((.type == "Progressing" and .status != "True") or (.type == "Available" and .status != "True")))')
     if [ -z "${deployments}" ]; then
-    echo -e "All Deployments are ready"
+        echo -e "All Deployments are ready"
     else
-    echo "${deployments}"
+        echo "${deployments}"
     fi
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
     echo -e "\nFetching DaemonSets without desired number of ready pods (<daemonset>)"
     daemonsets=$("${here}"/ops.bash kubectl "${cluster}" get daemonsets -A -o=yaml | yq4 '.items[] | select(.status.numberMisscheduled != 0)')
     if [ -z "${daemonsets}" ]; then
-    echo -e "All daemonsets are ready"
+        echo -e "All daemonsets are ready"
     else
-    echo "${daemonsets}"
+        echo "${daemonsets}"
     fi
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
     echo -e "\nFetching StatefulSets without desired number of ready pods (<statefulset>)"
     statefulsets=$("${here}"/ops.bash kubectl "${cluster}" get statefulsets -A -o=yaml | yq4 '.items[] | select(.status.collisionCount != 0 and .status.readyReplicas != .status.updatedReplicas and .status.replicas != .status.readyReplicas)')
     if [ -z "${statefulsets}" ]; then
-    echo -e "All statefulsets are ready"
+        echo -e "All statefulsets are ready"
     else
-    echo "${statefulsets}"
+        echo "${statefulsets}"
     fi
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
@@ -110,7 +110,7 @@ run_diagnostics() {
     readarray pod_arr < <(echo "$pods" | yq4 e -o=j -I=0 '.[]')
 
     if [ "${pods}" == '[]' ]; then
-    echo -e "All pods are ready"
+        echo -e "All pods are ready"
     else
         for pod in "${pod_arr[@]}"; do
             pod_name=$(echo "$pod" | jq -r '.name')
@@ -227,9 +227,9 @@ run_diagnostics_namespaced() {
     echo "Fetching ConfigMaps"
     cfg1=$("${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml | yq4 '.items[] | select(.status.conditions[] | select(.type != "Ready" and .status != "True")) | [.spec.volumes[].configMap.name]')
     readarray cfg1_arr < <(echo "$cfg1" | yq4 e -o=j -I=0 '.[]')
-    cfg2=$("${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml |  yq4 '.items[] | select(.status.conditions[] | select(.type != "Ready" and .status != "True")) | .spec.containers[].envFrom[].configMapRef.name')
+    cfg2=$("${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml | yq4 '.items[] | select(.status.conditions[] | select(.type != "Ready" and .status != "True")) | .spec.containers[].envFrom[].configMapRef.name')
     readarray cfg2_arr < <(echo "$cfg2" | yq4 e -o=j -I=0 '.[]')
-    cfg3=$("${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml |  yq4 '.items[] | select(.status.conditions[] | select(.type != "Ready" and .status != "True")) | .spec.containers[].env[].ValueFrom.configMapKeyRef.name')
+    cfg3=$("${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml | yq4 '.items[] | select(.status.conditions[] | select(.type != "Ready" and .status != "True")) | .spec.containers[].env[].ValueFrom.configMapKeyRef.name')
     readarray cfg3_arr < <(echo "$cfg3" | yq4 e -o=j -I=0 '.[]')
     cfgs=("${cfg1_arr[@]}" "${cfg2_arr[@]}" "${cfg3_arr[@]}")
     # shellcheck disable=SC2060
@@ -240,8 +240,8 @@ run_diagnostics_namespaced() {
         if [ "$cfg" == "null" ]; then
             :
         else
-        configmap=$(sed -e 's/^"//' -e 's/"$//' <<<"$cfg")
-        "${here}/ops.bash" kubectl "${cluster}" get configmap -n "${namespace}" "$configmap" -o yaml
+            configmap=$(sed -e 's/^"//' -e 's/"$//' <<<"$cfg")
+            "${here}/ops.bash" kubectl "${cluster}" get configmap -n "${namespace}" "$configmap" -o yaml
         fi
     done
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' '
@@ -258,13 +258,12 @@ run_diagnostics_namespaced() {
     done
 }
 
-
 log_info "Running diagnostics..."
 config_load "${1}"
 if [ -z "${namespace}" ]; then
-    run_diagnostics > "${file}" 2>&1
+    run_diagnostics >"${file}" 2>&1
 else
-    run_diagnostics_namespaced > "${file}" 2>&1
+    run_diagnostics_namespaced >"${file}" 2>&1
 fi
 log_info "Diagnostics done. Saving and encrypting file ${file}"
 
