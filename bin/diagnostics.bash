@@ -181,8 +181,8 @@ run_diagnostics() {
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
     # # -- Test --
-    # printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-    # "${here}/ck8s" test "${cluster}"
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+    "${here}/ck8s" test "${cluster}"
 }
 
 run_diagnostics_namespaced() {
@@ -260,6 +260,7 @@ run_diagnostics_namespaced() {
 
 
 log_info "Running diagnostics..."
+config_load "${1}"
 if [ -z "${namespace}" ]; then
     run_diagnostics > "${file}" 2>&1
 else
