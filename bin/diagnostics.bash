@@ -7,6 +7,7 @@ here="$(dirname "$(readlink -f "$0")")"
 source "${here}/common.bash"
 
 cluster="${1}"
+namespace="${2:-}"
 
 file="${CK8S_CONFIG_PATH}/diagnostics-${cluster}-$(date +%y%m%d%H%M%S).log"
 touch "${file}"
@@ -179,13 +180,91 @@ run_diagnostics() {
     "${here}/ops.bash" kubectl "${cluster}" get events -A --sort-by=.metadata.creationTimestamp
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
-    # -- Test --
-    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-    "${here}/ck8s" test "${cluster}"
+    # # -- Test --
+    # printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+    # "${here}/ck8s" test "${cluster}"
 }
 
+run_diagnostics_namespaced() {
+    echo "Running in the ${namespace} namespace"
+    # -- Pods --
+    echo -e "Fetching all pods"
+    "${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+
+    # -- Top --
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+    echo "Fetching pods resources usage"
+    "${here}/ops.bash" kubectl "${cluster}" top pods -n "${namespace}"
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+
+    # -- Deployments --
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+    echo "Fetching Deployments"
+    "${here}/ops.bash" kubectl "${cluster}" get deployments -n "${namespace}" -o yaml
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+
+    # -- Daemonsets --
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+    echo "Fetching Daemonsets"
+    "${here}/ops.bash" kubectl "${cluster}" get daemonsets -n "${namespace}" -o yaml
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+
+    # -- Statefulsets --
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+    echo "Fetching Statefulsets"
+    "${here}/ops.bash" kubectl "${cluster}" get statefulsets -n "${namespace}" -o yaml
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+
+    # -- Events --
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+    echo "Fetching Events"
+    "${here}/ops.bash" kubectl "${cluster}" get events -n "${namespace}"
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+
+    # -- ConfigMaps --
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+    echo "Fetching ConfigMaps"
+    cfg1=$("${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml | yq4 '.items[] | select(.status.conditions[] | select(.type != "Ready" and .status != "True")) | [.spec.volumes[].configMap.name]')
+    readarray cfg1_arr < <(echo "$cfg1" | yq4 e -o=j -I=0 '.[]')
+    cfg2=$("${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml |  yq4 '.items[] | select(.status.conditions[] | select(.type != "Ready" and .status != "True")) | .spec.containers[].envFrom[].configMapRef.name')
+    readarray cfg2_arr < <(echo "$cfg2" | yq4 e -o=j -I=0 '.[]')
+    cfg3=$("${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml |  yq4 '.items[] | select(.status.conditions[] | select(.type != "Ready" and .status != "True")) | .spec.containers[].env[].ValueFrom.configMapKeyRef.name')
+    readarray cfg3_arr < <(echo "$cfg3" | yq4 e -o=j -I=0 '.[]')
+    cfgs=("${cfg1_arr[@]}" "${cfg2_arr[@]}" "${cfg3_arr[@]}")
+    # shellcheck disable=SC2060
+    # shellcheck disable=SC2207
+    cfgs=($(echo "${cfgs[@]}" | tr [:space:] '\n' | awk '!a[$0]++'))
+
+    for cfg in "${cfgs[@]}"; do
+        if [ "$cfg" == "null" ]; then
+            :
+        else
+        configmap=$(sed -e 's/^"//' -e 's/"$//' <<<"$cfg")
+        "${here}/ops.bash" kubectl "${cluster}" get configmap -n "${namespace}" "$configmap" -o yaml
+        fi
+    done
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' '
+
+    # -- Logs --
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' '
+    echo "Fetching Logs"
+    pods=$("{$here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml | yq4 '.items[] | .metadata.name')
+    readarray pods_arr < <(echo "$pods" | yq4 e -o=j -I=0 '.[]')
+
+    for pod in "${pods_arr[@]}"; do
+        echo "Error logs for pod: ${pod}"
+        "${here}/ops.bash" kubectl "${cluster}" logs -n "${namespace}" "${pods}" | grep -e error -e err
+    done
+}
+
+
 log_info "Running diagnostics..."
-run_diagnostics > "${file}" 2>&1
+if [ -z "${namespace}" ]; then
+    run_diagnostics > "${file}" 2>&1
+else
+    run_diagnostics_namespaced > "${file}" 2>&1
+fi
 log_info "Diagnostics done. Saving and encrypting file ${file}"
 
 sops_encrypt_file "${file}"
