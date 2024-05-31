@@ -88,3 +88,6 @@ harbor:
   redis:
     type: {{ .Values.harbor.redis.type }}
   alerts: {{ toYaml .Values.harbor.alerts | nindent 4 }}
+
+nodeLocalDns:
+  enabled: {{ .Values.nodeLocalDns.enabled }}

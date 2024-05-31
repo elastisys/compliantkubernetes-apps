@@ -1,4 +1,8 @@
 {{- if and .Values.defaultRules.create .Values.defaultRules.rules.dns }}
+{{ $dnsComponents := list "coredns"  }}
+{{- if .Values.nodeLocalDns.enabled }}
+{{ $dnsComponents = list "coredns" "node-local-dns" }}
+{{ end }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -17,7 +21,7 @@ spec:
   groups:
   - name: dns
     rules:
-    {{- range list "coredns" "node-local-dns" }}
+    {{- range $dnsComponents  }}
     - alert: {{ . | title }}Down
       annotations:
         description: {{ . | title }} has disappeared from Prometheus target discovery.
