@@ -22,6 +22,7 @@ spec:
       ports:
         - port: 8888
   egress:
+    {{- toYaml .Values.global.dnsServerEgress | nindent 4 }}
     {{- if and .Values.global.apiserver.ips .Values.global.apiserver.port }}
     - to:
         {{- range $IP := .Values.global.apiserver.ips }}
