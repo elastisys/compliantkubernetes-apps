@@ -53,6 +53,7 @@ templates:
     chart: charts/node-local-dns
     version: 0.1.1
     name: node-local-dns
+    installed: {{ .Values | get "nodeLocalDns.enabled" false }}
     labels:
       app: node-local-dns
     needs:
