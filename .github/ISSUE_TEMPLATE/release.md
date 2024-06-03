@@ -56,6 +56,7 @@ assignees: ""
   ```
 
   </details>
+- [ ] Rclone sync - Enabled and preferably configured to a different infrastructure provider.
 - [ ] Set the environment variable `NAMESPACE` to an application developer namespace (this cannot be a subnamespace)
 - [ ] Set the environment variable `DOMAIN` to the environment domain
 
@@ -519,6 +520,17 @@ Follow the public disaster recovery documentation to take backups:
 - [ ] Can [take Harbor backup](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#backup_1)
 - [ ] Can [take OpenSearch snapshot](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#backup)
 - [ ] Can [take Velero snapshot](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#backup_2)
+- [ ] Can run Rclone sync:
+
+  ```bash
+  # create rclone sync jobs for all cronjobs:
+  for cronjob in $(./bin/ck8s ops kubectl sc -n rclone get cronjobs -lapp.kubernetes.io/instance=rclone-sync -oname); do
+    ./bin/ck8s ops kubectl sc -n rclone create job --from "${cronjob}" "${cronjob/#cronjob.batch\/}"
+  done
+
+  # wait for rclone sync jobs to finish
+  ./bin/ck8s ops kubectl sc -n rclone get pods -lapp.kubernetes.io/instance=rclone-sync -w
+  ```
 
 ### Restore backups and snapshots
 
@@ -527,6 +539,7 @@ Follow the public disaster recovery documentation to take backups:
 
 Follow the public disaster recovery documentation to perform restores from the prepared backups:
 
+- [ ] Can [run Rclone restore](https://github.com/elastisys/compliantkubernetes-apps/blob/main/docs/restore/rclone.md)
 - [ ] Can [restore Harbor backup](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#restore_1)
 - [ ] Can [restore OpenSearch snapshot](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#restore)
 - [ ] Can [restore Velero snapshot](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#restore_2)
@@ -566,6 +579,7 @@ Follow the public disaster recovery documentation to perform restores from the p
   ```
 
   </details>
+- [ ] Rclone sync - Enabled and preferably configured to a different infrastructure provider.
 - [ ] Set the environment variable `NAMESPACE` to an application developer namespace (this cannot be a subnamespace)
 - [ ] Set the environment variable `DOMAIN` to the environment domain
 
@@ -680,6 +694,17 @@ Follow the public disaster recovery documentation to take backups:
 - [ ] Can [take Harbor backup](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#backup_1)
 - [ ] Can [take OpenSearch snapshot](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#backup)
 - [ ] Can [take Velero snapshot](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#backup_2)
+- [ ] Can run Rclone sync:
+
+  ```bash
+  # create rclone sync jobs for all cronjobs:
+  for cronjob in $(./bin/ck8s ops kubectl sc -n rclone get cronjobs -lapp.kubernetes.io/instance=rclone-sync -oname); do
+    ./bin/ck8s ops kubectl sc -n rclone create job --from "${cronjob}" "${cronjob/#cronjob.batch\/}"
+  done
+
+  # wait for rclone sync jobs to finish
+  ./bin/ck8s ops kubectl sc -n rclone get pods -lapp.kubernetes.io/instance=rclone-sync -w
+  ```
 
 ### Upgrade
 
@@ -1041,6 +1066,7 @@ Follow the public disaster recovery documentation to take backups:
 
 Follow the public disaster recovery documentation to perform restores from the prepared backups:
 
+- [ ] Can [run Rclone restore](https://github.com/elastisys/compliantkubernetes-apps/blob/main/docs/restore/rclone.md)
 - [ ] Can [restore Harbor backup](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#restore_1)
 - [ ] Can [restore OpenSearch snapshot](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#restore)
 - [ ] Can [restore Velero snapshot](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#restore_2)
