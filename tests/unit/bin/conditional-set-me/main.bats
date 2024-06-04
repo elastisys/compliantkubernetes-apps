@@ -15,13 +15,10 @@ setup_file() {
   export CK8S_FLAVOR=dev
   export CK8S_CLOUD_PROVIDER=baremetal
   ck8s init both
-
-  env.cache_create
 }
 
 teardown_file() {
-  env.cache_delete
-
+  env.teardown
   gpg.teardown
 }
 
@@ -31,7 +28,7 @@ setup() {
 
   common_setup
 
-  env.cache_restore
+  env.private
 }
 
 _apply_normalise_sc() {
