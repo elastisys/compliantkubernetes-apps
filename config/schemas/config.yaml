@@ -853,6 +853,30 @@ allOf:
                 properties:
                   ips:
                     $ref: '#/$defs/iplist'
+- if:
+    properties:
+      kured:
+        properties:
+          enabled:
+            type: boolean
+            const: true
+          notification:
+            properties:
+              slack:
+                properties:
+                  enabled:
+                    type: boolean
+                    const: true
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          kured:
+            properties:
+              notificationSlack:
+                properties:
+                  ips:
+                    $ref: '#/$defs/iplist'
 properties:
   global:
     title: Global options
@@ -6210,8 +6234,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
               ports:
                 $ref: '#/$defs/portlist'
                 default:
