@@ -1066,7 +1066,7 @@ networkPolicies:
   externalDns:
     enabled: false
     ips:
-      - set-me-if-externalDns.enabled
+      - set-me-if-(.externalDns.enabled)
     ports:
       - 443
 
@@ -1131,7 +1131,7 @@ externalDns:
   # Example: https://kubernetes-sigs.github.io/external-dns/v0.14.1/tutorials/aws/
   enabled: false
   provider: aws
-  txtOwnerId: set-me-if-externalDns.enabled
+  txtOwnerId: set-me-if-(.externalDns.enabled)
   sources:
     crd: false
     ingress: true
