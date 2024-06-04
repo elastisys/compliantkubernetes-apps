@@ -1,0 +1,46 @@
+storageClasses:
+  default: ebs-gp2
+objectStorage:
+  type: s3
+  s3:
+    region: set-me
+    regionEndpoint: set-me
+    forcePathStyle: false
+ingressNginx:
+  controller:
+    config:
+      useProxyProtocol: false
+    useHostPort: false
+    service:
+      enabled: true
+      type: LoadBalancer
+      annotations:
+        service.beta.kubernetes.io/aws-load-balancer-type: nlb
+      allocateLoadBalancerNodePorts: true
+networkPolicies:
+  global:
+    externalLoadBalancer: false
+    ingressUsingHostNetwork: false
+  ingressNginx:
+    ingressOverride:
+      enabled: false
+  coredns:
+    serviceIp:
+      ips:
+        - 10.233.0.3/32
+externalTrafficPolicy:
+  local: false
+opa:
+  rejectLoadBalancerService:
+    enabled: false
+clusterApi:
+  enabled: false
+  monitoring:
+    enabled: false
+kubeStateMetrics:
+  clusterAPIMetrics:
+    enabled: false
+calicoAccountant:
+  backend: iptables
+global:
+  clusterDns: 10.233.0.3

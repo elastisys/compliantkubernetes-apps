@@ -1,0 +1,55 @@
+storageClasses:
+  default: rook-ceph-block
+objectStorage:
+  type: s3
+  s3:
+    region: set-me
+    regionEndpoint: set-me
+    forcePathStyle: false
+ingressNginx:
+  controller:
+    config:
+      useProxyProtocol: false
+    useHostPort: true
+    service:
+      enabled: false
+      allocateLoadBalancerNodePorts: true
+      type: set-me-if-ingressNginx.controller.service.enabled
+      annotations: set-me-if-ingressNginx.controller.service.enabled
+networkPolicies:
+  global:
+    externalLoadBalancer: true
+    ingressUsingHostNetwork: true
+  ingressNginx:
+    ingressOverride:
+      enabled: false
+  coredns:
+    serviceIp:
+      ips:
+        - 10.233.0.3/32
+  rookCeph:
+    enabled: true
+externalTrafficPolicy:
+  local: false
+opa:
+  rejectLoadBalancerService:
+    enabled: true
+clusterApi:
+  enabled: false
+  monitoring:
+    enabled: false
+kubeStateMetrics:
+  clusterAPIMetrics:
+    enabled: false
+calicoAccountant:
+  backend: iptables
+global:
+  clusterDns: 10.233.0.3
+prometheusBlackboxExporter:
+  targets:
+    rook: true
+rookCeph:
+  monitoring:
+    enabled: true
+  gatekeeperPsp:
+    enabled: true

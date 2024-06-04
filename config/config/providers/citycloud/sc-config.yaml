@@ -1,0 +1,20 @@
+harbor:
+  persistence:
+    type: swift
+    disableRedirect: true
+objectStorage:
+  swift:
+    authVersion: 0
+    authUrl: set-me
+    region: set-me
+    domainId: set-me
+    domainName: set-me-or-domainId
+    projectDomainId: set-me
+    projectDomainName: set-me-or-projectDomainId
+    projectId: set-me
+    projectName: set-me
+prometheus:
+  s3BucketAlerts:
+    objects:
+      enabled: true
+      count: 1638400

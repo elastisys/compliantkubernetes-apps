@@ -127,7 +127,7 @@ You configure ExternalDNS later in the process.
     #
     # If 'none', no infra provider tailored configuration will be performed!
     #
-    export CK8S_CLOUD_PROVIDER=[exoscale|safespring|citycloud|elastx|aws|baremetal|none]
+    export CK8S_CLOUD_PROVIDER=[exoscale|safespring|citycloud|elastx|upcloud|azure|aws|baremetal|none]
     ```
 
     > [!NOTE]

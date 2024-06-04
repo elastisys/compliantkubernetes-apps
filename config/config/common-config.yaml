@@ -1052,6 +1052,8 @@ networkPolicies:
     enabled: true
     ingressOverride:
       enabled: set-me
+      ips:
+        - set-me-if-enabled
 
   falco:
     enabled: true
