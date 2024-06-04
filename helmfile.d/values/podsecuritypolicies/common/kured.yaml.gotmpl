@@ -9,3 +9,10 @@ constraints:
         privileged: true
         runAsUser:
           rule: RunAsAny
+        volumes:
+          - emptyDir
+          - projected
+          - hostPath
+          - configMap
+        allowedHostPaths:
+          - pathPrefix: "/var/run"

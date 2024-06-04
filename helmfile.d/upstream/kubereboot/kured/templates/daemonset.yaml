@@ -12,6 +12,7 @@ metadata:
   {{- end }}
   {{- end }}
 spec:
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
   updateStrategy:
     type: {{ .Values.updateStrategy }}
 {{- if eq .Values.updateStrategy "RollingUpdate"}}
@@ -65,6 +66,12 @@ spec:
           args:
             - --ds-name={{ template "kured.fullname" . }}
             - --ds-namespace={{ .Release.Namespace }}
+          {{- if .Values.configuration.metricsHost }}
+            - --metrics-host={{ .Values.configuration.metricsHost }}
+          {{- end }}
+          {{- if .Values.configuration.metricsPort }}
+            - --metrics-port={{ .Values.configuration.metricsPort }}
+          {{- end }}
           {{- if .Values.configuration.lockTtl }}
             - --lock-ttl={{ .Values.configuration.lockTtl }}
           {{- end }}
@@ -76,6 +83,9 @@ spec:
           {{- end }}
           {{- if .Values.configuration.alertFiringOnly }}
             - --alert-firing-only={{ .Values.configuration.alertFiringOnly }}
+          {{- end }}
+          {{- if .Values.configuration.alertFilterMatchOnly }}
+            - --alert-filter-match-only={{ .Values.configuration.alertFilterMatchOnly }}
           {{- end }}
           {{- range .Values.configuration.blockingPodSelector }}
             - --blocking-pod-selector={{ . }}
@@ -94,6 +104,12 @@ spec:
           {{- end }}
           {{- if .Values.configuration.drainGracePeriod }}
             - --drain-grace-period={{ .Values.configuration.drainGracePeriod }}
+          {{- end }}
+          {{- if .Values.configuration.drainPodSelector }}
+            - --drain-pod-selector={{ .Values.configuration.drainPodSelector }}
+          {{- end }}
+          {{- if .Values.configuration.drainDelay }}
+            - --drain-delay={{ .Values.configuration.drainDelay }}
           {{- end }}
           {{- if .Values.configuration.drainTimeout }}
             - --drain-timeout={{ .Values.configuration.drainTimeout }}
@@ -114,9 +130,13 @@ spec:
             - --post-reboot-node-labels={{ . }}
           {{- end }}
           {{- if .Values.configuration.rebootSentinel }}
+            {{- if .Values.configuration.useRebootSentinelHostPath }}
+            - --reboot-sentinel=/sentinel/{{ base .Values.configuration.rebootSentinel }}
+            {{ else }}
             - --reboot-sentinel={{ .Values.configuration.rebootSentinel }}
+            {{- end }}
           {{- end }}
-          {{- if .Values.configuration.rebootSentinelCommand }}
+          {{- if and .Values.configuration.rebootSentinelCommand (not .Values.configuration.useRebootSentinelHostPath) }}
             - --reboot-sentinel-command={{ .Values.configuration.rebootSentinelCommand }}
           {{- end }}
           {{- if .Values.configuration.rebootCommand }}
@@ -124,6 +144,12 @@ spec:
           {{- end }}
           {{- if .Values.configuration.rebootDelay }}
             - --reboot-delay={{ .Values.configuration.rebootDelay }}
+          {{- end }}
+          {{- if .Values.configuration.rebootMethod }}
+            - --reboot-method={{ .Values.configuration.rebootMethod }}
+          {{- end }}
+          {{- if .Values.configuration.rebootSignal }}
+            - --reboot-signal={{ .Values.configuration.rebootSignal }}
           {{- end }}
           {{- if .Values.configuration.slackChannel }}
             - --slack-channel={{ tpl .Values.configuration.slackChannel . }}
@@ -161,6 +187,9 @@ spec:
           {{- if .Values.configuration.logFormat }}
             - --log-format={{ .Values.configuration.logFormat }}
           {{- end }}
+          {{- if .Values.configuration.concurrency }}
+            - --concurrency={{ .Values.configuration.concurrency }}
+          {{- end }}
           {{- range $key, $value := .Values.extraArgs }}
             {{- if $value }}
             - --{{ $key }}={{ $value }}
@@ -168,12 +197,19 @@ spec:
             - --{{ $key }}
             {{- end }}
           {{- end }}
-{{- if .Values.volumeMounts }}
+        {{- if or .Values.volumeMounts .Values.configuration.useRebootSentinelHostPath }}
           volumeMounts:
-{{- toYaml .Values.volumeMounts  | nindent 12 }}
-{{- end }}
+        {{- end }}
+        {{- if .Values.configuration.useRebootSentinelHostPath }}
+          - mountPath: /sentinel
+            name: sentinel
+            readOnly: true
+        {{- end }}
+        {{- if .Values.volumeMounts }}
+{{- toYaml .Values.volumeMounts  | nindent 10 }}
+        {{- end }}
           ports:
-            - containerPort: 8080
+            - containerPort: {{ .Values.configuration.metricsPort }}
               name: metrics
           env:
             # Pass in the name of the node on which this pod is scheduled
@@ -185,6 +221,12 @@ spec:
             {{- if .Values.extraEnvVars }}
               {{ toYaml .Values.extraEnvVars | nindent 12 }}
             {{- end }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe: {{- toYaml . | nindent 12 }}
+          {{- end }}
       tolerations:
       {{- if .Values.tolerations }}
           {{- with .Values.tolerations }}
@@ -204,7 +246,15 @@ spec:
       affinity:
 {{ toYaml . | indent 8 }}
       {{- end }}
-{{- if .Values.volumes }}
+    {{- if or .Values.volumes .Values.configuration.useRebootSentinelHostPath }}
       volumes:
+    {{- end }}
+    {{- if .Values.configuration.useRebootSentinelHostPath }}
+        - name: sentinel
+          hostPath:
+            path: {{ dir .Values.configuration.rebootSentinel }}
+            type: Directory
+    {{- end }}
+    {{- if .Values.volumes }}
 {{- toYaml .Values.volumes  | nindent 8 }}
-{{- end }}
+    {{- end }}
