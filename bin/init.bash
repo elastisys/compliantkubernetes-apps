@@ -315,10 +315,7 @@ set_nginx_config() {
         replace_set_me "${file}" '.networkPolicies.ingressNginx.ingressOverride.enabled' 'false'
     fi
 
-    if [ "${service_enabled}" = 'false' ]; then
-        replace_set_me "${file}" '.ingressNginx.controller.service.type' '"set-me-if-(.ingressNginx.controller.service.enabled)"'
-        replace_set_me "${file}" '.ingressNginx.controller.service.annotations' '"set-me-if-(.ingressNginx.controller.service.enabled)"'
-    else
+    if [ "${service_enabled}" = 'true' ]; then
         replace_set_me "${file}" '.ingressNginx.controller.service.type' "\"${service_type}\""
         replace_set_me "${file}" '.ingressNginx.controller.service.annotations' "${service_annotations}"
     fi

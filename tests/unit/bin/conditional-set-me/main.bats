@@ -49,19 +49,24 @@ _refute_condition_and_warn() {
   refute_output --partial "WARN: ${1} is not set in config"
 }
 
+# bats test_tags=conditional_set_me_ingress_nginx
 @test "conditional-set-me - singular conditions: ingressNginx" {
 
   yq_set common .ingressNginx.controller.service.enabled 'true'
   run _apply_normalise_sc
   _assert_condition_and_warn .\"ingressNginx\".\"controller\".\"service\".\"type\"
+  _assert_condition_and_warn .\"ingressNginx\".\"controller\".\"service\".\"annotations\"
   run _apply_normalise_wc
   _assert_condition_and_warn .\"ingressNginx\".\"controller\".\"service\".\"type\"
+  _assert_condition_and_warn .\"ingressNginx\".\"controller\".\"service\".\"annotations\"
 
   yq_set common .ingressNginx.controller.service.enabled 'false'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"ingressNginx\".\"controller\".\"service\".\"type\"
+  _refute_condition_and_warn .\"ingressNginx\".\"controller\".\"service\".\"annotations\"
   run _apply_normalise_wc
   _refute_condition_and_warn .\"ingressNginx\".\"controller\".\"service\".\"type\"
+  _refute_condition_and_warn .\"ingressNginx\".\"controller\".\"service\".\"annotations\"
 }
 
 @test "conditional-set-me - singular conditions: letsencrypt" {
