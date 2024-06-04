@@ -5866,6 +5866,17 @@ properties:
         description: Configure cert-manager network policy rules.
         type: object
         additionalProperties: false
+        if:
+          properties:
+            enabled:
+              type: boolean
+              const: true
+        then:
+          properties:
+            letsencrypt:
+              properties:
+                ips:
+                  $ref: '#/$defs/iplist'
         properties:
           enabled:
             title: Network Policies cert-manager Enabled
@@ -5881,8 +5892,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
           dns01:
             title: Network Policies cert-manager DNS-01
             description: Configure network policy rule to allow cert-manager perform DNS-01 challenges.
