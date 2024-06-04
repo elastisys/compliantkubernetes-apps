@@ -6475,6 +6475,18 @@ properties:
       > See [the upstream documentation](https://kubernetes-sigs.github.io/external-dns/) for reference.
     type: object
     additionalProperties: false
+    if:
+      properties:
+        enabled:
+          type: boolean
+          const: true
+    then:
+      properties:
+        txtOwnerId:
+          title: External DNS TXT Owner ID
+          type: string
+          examples:
+            - set-me-if-externalDns.enabled
     properties:
       enabled:
         title: External DNS Enabled
@@ -6509,11 +6521,7 @@ properties:
         items:
           title: External DNS Domain
           type: string
-      txtOwnerId:
-        title: External DNS TXT Owner ID
-        type: string
-        examples:
-          - set-me-if-externalDns.enabled
+      txtOwnerId: true
       txtPrefix:
         title: External DNS TXT Prefix
         type: string
