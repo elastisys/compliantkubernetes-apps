@@ -110,6 +110,7 @@ _refute_condition_and_warn() {
   _refute_condition_and_warn .\"alerts\".\"slack\".\"channel\"
 }
 
+# bats test_tags=conditional_set_me_netpol_singular
 @test "conditional-set-me - singular conditions: network policies sc" {
 
   yq_set common .trivy.enabled 'true'
@@ -125,6 +126,7 @@ _refute_condition_and_warn() {
   _assert_condition_and_warn .\"networkPolicies\".\"global\".\"trivy\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"certManager\".\"letsencrypt\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"coredns\".\"externalDns\".\"ips\"
+  _assert_condition_and_warn .\"networkPolicies\".\"coredns\".\"serviceIp\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"global\".\"objectStorageSwift\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"opensearch\".\"plugins\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"secondaryUrl\".\"ips\"
@@ -144,6 +146,7 @@ _refute_condition_and_warn() {
   _refute_condition_and_warn .\"networkPolicies\".\"global\".\"trivy\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"certManager\".\"letsencrypt\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"coredns\".\"externalDns\".\"ips\"
+  _refute_condition_and_warn .\"networkPolicies\".\"coredns\".\"serviceIp\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"global\".\"objectStorageSwift\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"opensearch\".\"plugins\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"secondaryUrl\".\"ips\"

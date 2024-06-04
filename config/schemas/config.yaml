@@ -6370,6 +6370,21 @@ properties:
         description: Configure CoreDNS network policy rules.
         type: object
         additionalProperties: false
+        if:
+          properties:
+            enabled:
+              type: boolean
+              const: true
+        then:
+          properties:
+            externalDns:
+              properties:
+                ips:
+                  $ref: '#/$defs/iplist'
+            serviceIp:
+              properties:
+                ips:
+                  $ref: '#/$defs/iplist'
         properties:
           enabled:
             title: Network Policies CoreDNS
@@ -6381,16 +6396,14 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
           serviceIp:
             title: Network Policies CoreDNS Service IP
             description: Configure network policy rule to allow CoreDNS to query the internal service IP.
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
       rookCeph:
         title: Network Policies Rook Ceph
         description: Configure Rook Ceph network policy rules.
