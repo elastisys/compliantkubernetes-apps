@@ -173,6 +173,8 @@ policies:
         - rule: egress-rule-object-storage
       ingress:
         - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 19291
         - rule: ingress-rule-query
         - name: ingress-rule-receive-distributor
           peers:
