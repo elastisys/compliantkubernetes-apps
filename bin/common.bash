@@ -351,7 +351,6 @@ validate_config() {
 
         # Loop all lines in ${template_config} and checks if same option has conditional set-me in ${merged_config}
         options=$(yq_read_block "${template_config}" "set-me-if-*")
-        maybe_exit="false"
         for opt in ${options}; do
             opt_value=$(yq4 "${opt}" "${merged_config}")
             opt_value_no_list=$(echo "${opt_value}" | yq4 "[.] | flatten | .[0]")
@@ -380,7 +379,6 @@ validate_config() {
 
         # Loop all lines in ${template_config} and warns if same option is not available in ${merged_config}
         options=$(yq_read_block "${template_config}" "set-me")
-        maybe_exit="false"
         for opt in ${options}; do
             compare=$(diff <(yq4 -oj "${opt}" "${template_config}") <(yq4 -oj "${opt}" "${merged_config}") || true)
             if [[ -z "${compare}" ]]; then
@@ -388,10 +386,6 @@ validate_config() {
                 maybe_exit="true"
             fi
         done
-
-        if ${maybe_exit} && ! ${CK8S_AUTO_APPROVE}; then
-            ask_abort
-        fi
     }
 
     schema_validate() {
@@ -411,15 +405,12 @@ validate_config() {
             done
             maybe_exit="true"
         fi
-
-        if ${maybe_exit} && ! ${CK8S_AUTO_APPROVE}; then
-            ask_abort
-        fi
     }
 
     template_file=$(mktemp --suffix="-tpl.yaml")
     append_trap "rm ${template_file}" EXIT
 
+    maybe_exit="false"
     if [[ $1 == "sc" ]]; then
         check_config "${config_template_path}/config/common-config.yaml" \
             "${config_template_path}/config/sc-config.yaml" \
@@ -449,6 +440,10 @@ validate_config() {
     else
         log_error "ERROR: usage validate_config <sc|wc>"
         exit 1
+    fi
+
+    if ${maybe_exit} && ! ${CK8S_AUTO_APPROVE}; then
+        ask_abort
     fi
 }
 
