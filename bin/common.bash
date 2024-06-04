@@ -400,8 +400,10 @@ validate_config() {
             sed -r 's/^.*_(..-config\.yaml): fail: (.*)/\1: \2/; / failed validation$/q' < "${schema_validation_result}"
             grep -oP '(?<=fail: )[^:]+' "${schema_validation_result}" | sort -u |
             while read -r jpath; do
-              echo -n ".$jpath = "
-              yq4 -oj ".$jpath" "${merged_config}"
+              if [[ $jpath != "(root)" ]]; then
+                echo -n ".$jpath = "
+                yq4 -oj ".$jpath" "${merged_config}"
+              fi
             done
             maybe_exit="true"
         fi

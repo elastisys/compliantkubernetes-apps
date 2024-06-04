@@ -208,7 +208,7 @@ $defs:
       List of IP netmasks
     items:
       type: string
-      regex: ^[0-9a-f.:]{2,45}/[0-9]{1,3}$
+      pattern: ^[0-9a-f.:]{2,45}/[0-9]{1,3}$
       description: A IP address with netmask
       examples:
         - 0.0.0.0/0
@@ -835,6 +835,24 @@ $defs:
 type: object
 required:
   - global
+allOf:
+- if:
+    properties:
+      trivy:
+        properties:
+          enabled:
+            type: boolean
+            const: true
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          global:
+            properties:
+              trivy:
+                properties:
+                  ips:
+                    $ref: '#/$defs/iplist'
 properties:
   global:
     title: Global options
@@ -5780,8 +5798,7 @@ properties:
               Used for Trivy to fetch vulnerability databases both in Harbor and Trivy Operator.
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
               port:
                 $ref: '#/$defs/port'
                 default: 443
