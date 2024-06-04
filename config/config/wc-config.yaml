@@ -293,10 +293,6 @@ networkPolicies:
       ips: []
       ports: []
 
-  ingressNginx:
-    ingressOverride:
-      ips: set-me-if-enabled
-
   certManager:
     namespaces: []
 

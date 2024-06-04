@@ -1,0 +1,47 @@
+storageClasses:
+  default: standard
+objectStorage:
+  type: azure
+  azure:
+    resourceGroup: ${CK8S_ENVIRONMENT_NAME}-storage
+    storageAccountName: ${CK8S_ENVIRONMENT_NAME}
+ingressNginx:
+  controller:
+    config:
+      useProxyProtocol: false
+    useHostPort: false
+    service:
+      enabled: true
+      type: LoadBalancer
+      annotations:
+        service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
+      allocateLoadBalancerNodePorts: false
+networkPolicies:
+  global:
+    externalLoadBalancer: false
+    ingressUsingHostNetwork: false
+  ingressNginx:
+    ingressOverride:
+      enabled: true
+      ips:
+        - 0.0.0.0/0
+  coredns:
+    serviceIp:
+      ips:
+        - 10.233.0.10/32
+externalTrafficPolicy:
+  local: true
+opa:
+  rejectLoadBalancerService:
+    enabled: false
+clusterApi:
+  enabled: true
+  monitoring:
+    enabled: true
+kubeStateMetrics:
+  clusterAPIMetrics:
+    enabled: true
+calicoAccountant:
+  backend: nftables
+global:
+  clusterDns: 10.233.0.10

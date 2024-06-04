@@ -1,0 +1,52 @@
+storageClasses:
+  default: standard
+networkPolicies:
+  global:
+    externalLoadBalancer: true
+    ingressUsingHostNetwork: true
+  ingressNginx:
+    ingressOverride:
+      enabled: false
+  kubeSystem:
+    upcloud:
+      enabled: true
+      ips:
+        - 94.237.0.0/23
+      ports:
+        - 443
+  coredns:
+    serviceIp:
+      ips:
+        - 10.233.0.3/32
+objectStorage:
+  type: s3
+  s3:
+    region: set-me
+    regionEndpoint: set-me
+    forcePathStyle: true
+ingressNginx:
+  controller:
+    config:
+      useProxyProtocol: false
+    useHostPort: true
+    service:
+      enabled: false
+      allocateLoadBalancerNodePorts: true
+      type: set-me-if-ingressNginx.controller.service.enabled
+      annotations: set-me-if-ingressNginx.controller.service.enabled
+externalTrafficPolicy:
+  local: false
+opa:
+  rejectLoadBalancerService:
+    enabled: true
+clusterApi:
+  enabled: false
+  monitoring:
+    enabled: false
+kubeStateMetrics:
+  clusterAPIMetrics:
+    enabled: false
+calicoAccountant:
+  backend: iptables
+global:
+  clusterDns: 10.233.0.3

@@ -1308,9 +1308,6 @@ networkPolicies:
       - opensearch-system
       - thanos
 
-  ingressNginx:
-    ingressOverride:
-      ips: set-me-if-enabled
   dex:
     enabled: true
     # Ip to connector, e.g. Google, LDAP, ...
