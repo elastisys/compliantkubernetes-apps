@@ -1847,6 +1847,10 @@ properties:
         description: Only supports Azure Public Cloud.
         type: object
         properties:
+          storageAccountName:
+            title: Azure Storage Account Name
+            description: Name of the storage account
+            type: string
           resourceGroup:
             title: Azure Resource Group
             description: Resource group of the storage account.
