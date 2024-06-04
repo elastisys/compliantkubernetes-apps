@@ -901,6 +901,28 @@ allOf:
                 properties:
                   ips:
                     $ref: '#/$defs/iplist'
+- if:
+    properties:
+      externalDns:
+        properties:
+          enabled:
+            type: boolean
+            const: true
+      networkPolicies:
+        properties:
+          externalDns:
+            properties:
+              enabled:
+                type: boolean
+                const: true
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          externalDns:
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
 properties:
   global:
     title: Global options
@@ -5940,7 +5962,16 @@ properties:
                 - opensearch-system
                 - thanos
       externalDns:
-        $ref: '#/$defs/netpolRule'
+        title: Network Policies ExternalDNS
+        description: Configure ExternalDNS [network policy](https://kubernetes.io/docs/concepts/services-networking/network-policies/) rules.
+        additionalProperties: false
+        properties:
+          enabled:
+            type: boolean
+          ips: true
+          ports:
+            $ref: '#/$defs/portlist'
+        type: object
       dex:
         title: Network Policies Dex
         description: Configure Dex network policy rules.

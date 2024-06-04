@@ -239,6 +239,38 @@ _refute_condition_and_warn() {
   _refute_condition_and_warn .\"networkPolicies\".\"falco\".\"plugins\".\"ips\"
 }
 
+# bats test_tags=conditional_set_me_netpol_externaldns
+@test "conditional-set-me - multiple conditions: network policies externalDns" {
+
+  yq_set common .externalDns.enabled 'true'
+  yq_set common .networkPolicies.externalDns.enabled 'true'
+  run _apply_normalise_sc
+  _assert_condition_and_warn .\"networkPolicies\".\"externalDns\".\"ips\"
+  run _apply_normalise_wc
+  _assert_condition_and_warn .\"networkPolicies\".\"externalDns\".\"ips\"
+
+  yq_set common .externalDns.enabled 'true'
+  yq_set common .networkPolicies.externalDns.enabled 'false'
+  run _apply_normalise_sc
+  _refute_condition_and_warn .\"networkPolicies\".\"externalDns\".\"ips\"
+  run _apply_normalise_wc
+  _refute_condition_and_warn .\"networkPolicies\".\"externalDns\".\"ips\"
+
+  yq_set common .externalDns.enabled 'false'
+  yq_set common .networkPolicies.externalDns.enabled 'true'
+  run _apply_normalise_sc
+  _refute_condition_and_warn .\"networkPolicies\".\"externalDns\".\"ips\"
+  run _apply_normalise_wc
+  _refute_condition_and_warn .\"networkPolicies\".\"externalDns\".\"ips\"
+
+  yq_set common .externalDns.enabled 'false'
+  yq_set common .networkPolicies.externalDns.enabled 'false'
+  run _apply_normalise_sc
+  _refute_condition_and_warn .\"networkPolicies\".\"externalDns\".\"ips\"
+  run _apply_normalise_wc
+  _refute_condition_and_warn .\"networkPolicies\".\"externalDns\".\"ips\"
+}
+
 @test "conditional-set-me - multiple conditions: network policies harbor" {
 
   yq_set sc .harbor.enabled 'true'
