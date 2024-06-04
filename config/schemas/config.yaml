@@ -877,6 +877,30 @@ allOf:
                 properties:
                   ips:
                     $ref: '#/$defs/iplist'
+- if:
+    properties:
+      falco:
+        properties:
+          enabled:
+            type: boolean
+            const: true
+      networkPolicies:
+        properties:
+          falco:
+            properties:
+              enabled:
+                type: boolean
+                const: true
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          falco:
+            properties:
+              plugins:
+                properties:
+                  ips:
+                    $ref: '#/$defs/iplist'
 properties:
   global:
     title: Global options
@@ -6222,8 +6246,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
               ports:
                 $ref: '#/$defs/portlist'
                 default:
