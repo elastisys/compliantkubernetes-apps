@@ -184,7 +184,7 @@
 [[33mck8s[0m] Diff found for .networkPolicies.global.wcNodes.ips in wc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -29,6 +29,10 @@[0m
+[36m@@ -31,6 +31,10 @@[0m
            - set-me
    rclone:
      enabled: true
@@ -198,7 +198,7 @@
 [[33mck8s[0m] Diff found for .networkPolicies.rclone.sync.objectStorage.ips in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -29,6 +29,10 @@[0m
+[36m@@ -31,6 +31,10 @@[0m
            - set-me
    rclone:
      enabled: true
@@ -212,7 +212,7 @@
 [[33mck8s[0m] Diff found for .networkPolicies.rclone.sync.objectStorage.ports in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -29,6 +29,11 @@[0m
+[36m@@ -31,6 +31,11 @@[0m
            - set-me
    rclone:
      enabled: true
@@ -227,7 +227,7 @@
 [[33mck8s[0m] Diff found for .networkPolicies.rclone.sync.objectStorageSwift.ips in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -29,6 +29,11 @@[0m
+[36m@@ -31,6 +31,11 @@[0m
            - set-me
    rclone:
      enabled: true
@@ -242,7 +242,7 @@
 [[33mck8s[0m] Diff found for .networkPolicies.rclone.sync.objectStorageSwift.ports in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -29,6 +29,10 @@[0m
+[36m@@ -31,6 +31,10 @@[0m
            - set-me
    rclone:
      enabled: true
@@ -256,7 +256,7 @@
 [[33mck8s[0m] Diff found for .networkPolicies.rclone.sync.secondaryUrl.ips in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
-[36m@@ -29,6 +29,10 @@[0m
+[36m@@ -31,6 +31,10 @@[0m
            - set-me
    rclone:
      enabled: true
