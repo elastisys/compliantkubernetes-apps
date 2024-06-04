@@ -5571,6 +5571,23 @@ properties:
         description: Configure issuers for cert-manager using Let's Encrypt.
         type: object
         additionalProperties: false
+        if:
+          properties:
+            enabled:
+              type: boolean
+              const: true
+        then:
+          properties:
+            prod:
+              properties:
+                email:
+                  title: Issuer Email
+                  type: string
+            staging:
+              properties:
+                email:
+                  title: Issuer Email
+                  type: string
         properties:
           enabled:
             title: Let's Encrypt Enabled
@@ -5582,9 +5599,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              email:
-                title: Issuer Email
-                type: string
+              email: true
               solvers:
                 title: Issuer Solver
                 type: array
@@ -5594,9 +5609,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              email:
-                title: Issuer Email
-                type: string
+              email: true
               solvers:
                 title: Issuer Solver
                 type: array
