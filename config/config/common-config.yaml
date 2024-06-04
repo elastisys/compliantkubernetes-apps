@@ -70,23 +70,21 @@ storageClasses:
 
 ## Object storage configuration for backups.
 objectStorage:
-  ## Options are 's3', 'gcs', 'azure' or 'none'
+  ## Options are 's3', 'azure' or 'none'
   ## If "none", remember to disable features that depend on object storage:
   ##   All backups (Velero, Harbor, OpenSearch), SC logs (Fluentd)
   ##   Long term metrics with Thanos.
   ##   Also set Harbor persistence to "filesystem" or "swift"
   ## Otherwise configure the features to match this type.
   type: set-me
-  # azure:
-  #  resourceGroup: set-me
-  # gcs:
-  #   project: set-me
-  # s3:
-  #   region: set-me
-  #   # S3 endpoint for non-AWS implementation of S3. Make sure to prepend the protocol (i.e., https:// or http://) with the URL, e.g., https://s3.sto1.safedc.net
-  #   regionEndpoint: set-me
-  #   # Generally false when using AWS and Exoscale and true for other providers.
-  #   forcePathStyle: set-me
+  azure:
+    resourceGroup: set-me-if-(.objectStorage.type == "azure")
+  s3:
+    region: set-me-if-(.objectStorage.type == "s3")
+    # S3 endpoint for non-AWS implementation of S3. Make sure to prepend the protocol (i.e., https:// or http://) with the URL, e.g., https://s3.sto1.safedc.net
+    regionEndpoint: set-me-if-(.objectStorage.type == "s3")
+    # Generally false when using AWS and Exoscale and true for other providers.
+    forcePathStyle: set-me-if-(.objectStorage.type == "s3")
 
   ## Buckets where each respctive application will store its backups.
   buckets:

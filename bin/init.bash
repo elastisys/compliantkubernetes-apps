@@ -202,22 +202,16 @@ set_object_storage() {
     case ${CK8S_CLOUD_PROVIDER} in
         aws | exoscale)
             object_storage_type="s3"
-            yq4 --inplace '.objectStorage.s3.region = "set-me"' "${file}"
-            yq4 --inplace '.objectStorage.s3.regionEndpoint = "set-me"' "${file}"
             yq4 --inplace '.objectStorage.s3.forcePathStyle = false' "${file}"
             ;;
 
         citycloud | safespring | upcloud | elastx)
             object_storage_type="s3"
-            yq4 --inplace '.objectStorage.s3.region = "set-me"' "${file}"
-            yq4 --inplace '.objectStorage.s3.regionEndpoint = "set-me"' "${file}"
             yq4 --inplace '.objectStorage.s3.forcePathStyle = true' "${file}"
             ;;
 
         azure)
             object_storage_type="azure"
-            yq4 --inplace '.objectStorage.azure.resourceGroup = "set-me"' "${file}"
-            yq4 --inplace '.objectStorage.azure.storageAccountName = "set-me"' "${file}"
             ;;
 
         baremetal)

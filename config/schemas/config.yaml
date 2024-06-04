@@ -1812,7 +1812,61 @@ properties:
 
       Harbor, Rclone, and Thanos have additional configuration to use Swift.
     type: object
+    allOf:
+    - if:
+        properties:
+          type:
+            title: Object Storage Type is Azure
+            type: string
+            const: azure
+      then:
+        properties:
+          azure:
+            additionalProperties: false
+            title: Azure Backend Config
+            description: Only supports Azure Public Cloud.
+            type: object
+            properties:
+              resourceGroup:
+                title: Azure Resource Group
+                description: Resource group of the storage account.
+                type: string
+    - if:
+        properties:
+          type:
+            title: Object Storage Type is S3
+            type: string
+            const: s3
+      then:
+        properties:
+          s3:
+            additionalProperties: false
+            title: S3 Backend Config
+            description: Supports both AWS and non-AWS implementations.
+            type: object
+            properties:
+              region:
+                title: S3 Region
+                description: Region to store data.
+                type: string
+              regionEndpoint:
+                title: S3 Region Endpoint
+                description: |-
+                  Endpoint to reach the S3 service, mainly applicable for non-AWS implementations.
+
+                  Make sure to prepend the protocol (e.g. `https://`).
+                type: string
+                format: uri
+              forcePathStyle:
+                title: S3 Force Path Style
+                description: |-
+                  Force the use of path style access instead of virtual host style access.
+
+                  Generally `false` when using AWS, Exoscale, and UpCloud and `true` for other providers.
+                type: boolean
     properties:
+      azure: true
+      s3: true
       buckets:
         title: Object Storage Buckets
         description: |-
@@ -1835,44 +1889,8 @@ properties:
         type: string
         enum:
           - azure
-          - gcs
           - s3
           - none
-      azure:
-        additionalProperties: false
-        title: Azure Backend Config
-        description: Only supports Azure Public Cloud.
-        type: object
-        properties:
-          resourceGroup:
-            title: Azure Resource Group
-            description: Resource group of the storage account.
-            type: string
-      s3:
-        additionalProperties: false
-        title: S3 Backend Config
-        description: Supports both AWS and non-AWS implementations.
-        type: object
-        properties:
-          region:
-            title: S3 Region
-            description: Region to store data.
-            type: string
-          regionEndpoint:
-            title: S3 Region Endpoint
-            description: |-
-              Endpoint to reach the S3 service, mainly applicable for non-AWS implementations.
-
-              Make sure to prepend the protocol (e.g. `https://`).
-            type: string
-            format: uri
-          forcePathStyle:
-            title: S3 Force Path Style
-            description: |-
-              Force the use of path style access instead of virtual host style access.
-
-              Generally `false` when using AWS, Exoscale, and UpCloud and `true` for other providers.
-            type: boolean
       swift:
         additionalProperties: false
         title: Swift Backend Config
@@ -1994,9 +2012,9 @@ properties:
               - s3
               - swift
           azure:
-            $ref: '#/properties/objectStorage/properties/azure'
+            $ref: '#/properties/objectStorage/allOf/0/then/properties/azure'
           s3:
-            $ref: '#/properties/objectStorage/properties/s3'
+            $ref: '#/properties/objectStorage/allOf/1/then/properties/s3'
           swift:
             $ref: '#/properties/objectStorage/properties/swift'
           resources:
@@ -2069,9 +2087,9 @@ properties:
             type: object
             properties:
               azure:
-                $ref: '#/properties/objectStorage/properties/azure'
+                $ref: '#/properties/objectStorage/allOf/0/then/properties/azure'
               s3:
-                $ref: '#/properties/objectStorage/properties/s3'
+                $ref: '#/properties/objectStorage/allOf/1/then/properties/s3'
               swift:
                 $ref: '#/properties/objectStorage/properties/swift'
             default: {}
@@ -2082,9 +2100,9 @@ properties:
             type: object
             properties:
               azure:
-                $ref: '#/properties/objectStorage/properties/azure'
+                $ref: '#/properties/objectStorage/allOf/0/then/properties/azure'
               s3:
-                $ref: '#/properties/objectStorage/properties/s3'
+                $ref: '#/properties/objectStorage/allOf/1/then/properties/s3'
               swift:
                 $ref: '#/properties/objectStorage/properties/swift'
             default: {}
