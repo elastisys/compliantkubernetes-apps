@@ -133,3 +133,10 @@ rules:
           kubernetes.io/metadata.name: monitoring
         podSelectorLabels:
           app.kubernetes.io/name: prometheus
+
+  ingress-rule-gardener-vpn:
+    peers:
+      - namespaceSelectorLabels:
+          kubernetes.io/metadata.name: kube-system
+        podSelectorLabels:
+          app: vpn-shoot

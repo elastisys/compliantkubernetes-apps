@@ -29,6 +29,7 @@ policies:
         - rule: egress-rule-apiserver
         - rule: egress-rule-dns
       ingress:
+        - rule: ingress-rule-gardener-vpn
         - rule: ingress-rule-apiserver
           ports:
             - tcp: 9443
