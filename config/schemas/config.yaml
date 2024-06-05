@@ -3347,6 +3347,18 @@ properties:
     description: Configure alerting.
     type: object
     additionalProperties: false
+    if:
+      properties:
+        alertTo:
+          type: string
+          const: slack
+    then:
+      properties:
+        slack:
+          properties:
+            channel:
+              title: Slack Channel
+              type: string
     properties:
       alertTo:
         title: Alert To
@@ -3403,9 +3415,7 @@ properties:
         type: object
         additionalProperties: false
         properties:
-          channel:
-            title: Slack Channel
-            type: string
+          channel: true
           customTemplate:
             title: Slack Custom Template
             type: object
