@@ -3370,30 +3370,33 @@ properties:
         description: Configure heartbeats to OpsGenie.
         type: object
         additionalProperties: false
-        properties:
-          enabled:
-            title: OpsGenie Heartbeat Enabled
-            type: boolean
-            default: false
-          name:
-            title: OpsGenie Heartbeat Name
-            type: string
-          url:
-            title: OpsGenie Heartbeat URL
-            type: string
-            format: uri
-            default: https://api.eu.opsgenie.com/v2/heartbeats
-        required:
-          - enabled
         if:
           properties:
             enabled:
-              title: OpsGenie Heartbeat Enabled
+              type: boolean
               const: true
         then:
           required:
             - name
             - url
+          properties:
+            name:
+              title: OpsGenie Heartbeat Name
+              type: string
+            url:
+              title: OpsGenie Heartbeat URL
+              type: string
+              format: uri
+              default: https://api.eu.opsgenie.com/v2/heartbeats
+        properties:
+          enabled:
+            title: OpsGenie Heartbeat Enabled
+            type: boolean
+            default: false
+          name: true
+          url: true
+        required:
+          - enabled
       slack:
         title: Alert Slack Config
         description: Configure alerting to Slack.
