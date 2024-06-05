@@ -942,6 +942,38 @@ allOf:
                 properties:
                   ips:
                     $ref: '#/$defs/iplist'
+- if:
+    properties:
+      harbor:
+        properties:
+          enabled:
+            type: boolean
+            const: true
+      networkPolicies:
+        properties:
+          harbor:
+            properties:
+              enabled:
+                type: boolean
+                const: true
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          harbor:
+            properties:
+              registries:
+                properties:
+                  ips:
+                    $ref: '#/$defs/iplist'
+              jobservice:
+                properties:
+                  ips:
+                    $ref: '#/$defs/iplist'
+              trivy:
+                properties:
+                  ips:
+                    $ref: '#/$defs/iplist'
 properties:
   global:
     title: Global options
@@ -6107,8 +6139,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
               ports:
                 $ref: '#/$defs/portlist'
                 default:
@@ -6119,8 +6150,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
               ports:
                 $ref: '#/$defs/portlist'
                 default:
@@ -6131,8 +6161,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
               ports:
                 $ref: '#/$defs/portlist'
                 default:
