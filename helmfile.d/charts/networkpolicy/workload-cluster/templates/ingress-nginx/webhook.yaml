@@ -10,6 +10,14 @@ spec:
       app.kubernetes.io/component: admission-webhook
   policyTypes:
     - Egress
+  ingress:
+    - from:
+      - podSelector:
+            matchLabels:
+              app: vpn-shoot
+        namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: kube-system
   egress:
     {{- toYaml .Values.global.dnsServerEgress | nindent 4 }}
     {{- if and .Values.global.wcApiserver.ips .Values.global.wcApiserver.port }}
