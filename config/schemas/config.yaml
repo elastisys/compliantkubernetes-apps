@@ -923,6 +923,25 @@ allOf:
             properties:
               ips:
                 $ref: '#/$defs/iplist'
+- if:
+    properties:
+      harbor:
+        properties:
+          persistence:
+            properties:
+              type:
+                type: string
+                const: swift
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          global:
+            properties:
+              objectStorageSwift:
+                properties:
+                  ips:
+                    $ref: '#/$defs/iplist'
 properties:
   global:
     title: Global options
@@ -5780,8 +5799,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
               ports:
                 $ref: '#/$defs/portlist'
                 default:
