@@ -52,8 +52,8 @@ policies:
     {{- end }}
 
     {{- range $sync.buckets }}
-    {{- $destinations = get "sourceType" $main.type . | append $destinations }}
-    {{- $sources = get "destinationType" $sync.destinationType . | append $sources }}
+    {{- $sources = get "sourceType" $main.type . | append $sources }}
+    {{- $destinations = get "destinationType" $sync.destinationType . | append $destinations }}
     {{- end }}
 
     {{- if .Values | get "objectStorage.sync.enabled" false }}
