@@ -10,3 +10,6 @@ customConfig: {{ toYaml .Values.nodeLocalDns.customConfig }}
 {{- end }}
 
 resources: {{- toYaml .Values.nodeLocalDns.resources | nindent 2 }}
+
+service:
+  targetPort: {{ .Values.nodeLocalDns.service.targetPort }}

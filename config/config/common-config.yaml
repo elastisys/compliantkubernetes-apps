@@ -1112,3 +1112,5 @@ nodeLocalDns:
     requests:
       cpu: 25m
       memory: 40Mi
+  service:
+    targetPort: 53
