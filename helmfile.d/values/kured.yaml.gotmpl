@@ -9,7 +9,7 @@ affinity:     {{- toYaml .Values.kured.affinity | nindent 2 }}
 tolerations:  {{- toYaml .Values.kured.tolerations | nindent 2 }}
 
 configuration: {{- toYaml .Values.kured.configuration | nindent 2 }}
-
+  rebootMethod: signal
 extraArgs: {{- toYaml .Values.kured.extraArgs | nindent 2 }}
 
 extraEnvVars:
@@ -25,6 +25,8 @@ extraEnvVars:
 {{ end }}
 
 dsAnnotations: {{- toYaml .Values.kured.dsAnnotations | nindent 2 }}
+podAnnotations:
+  container.apparmor.security.beta.kubernetes.io/kured: unconfined
 
 {{- if .Values.kured.notification.slack.enabled }}
 slack:
@@ -37,3 +39,11 @@ hostNetwork: false
 
 containerSecurityContext:
   runAsUser: 0
+  privileged: false
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    add:
+    - CAP_KILL
+    drop:
+    - '*'
