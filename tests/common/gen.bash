@@ -38,13 +38,15 @@ cypress_gen() {
   file="${file/#${root}/\$\{ROOT\}}"
 
   echo '#!/usr/bin/env bats'
-  echo ''
-  echo "# bats ${bats}"
+  if [[ -n "${bats:-}" ]]; then
+    echo ''
+    echo "# bats ${bats}"
+  fi
   echo ''
   echo 'setup_file() {'
   echo '  load "../../bats.lib.bash"'
   echo ''
-  if [[ -n "${cluster}" ]] && [[ -n "${helmfile}" ]]; then
+  if [[ -n "${cluster:-}" ]] && [[ -n "${helmfile:-}" ]]; then
     echo "  auto_setup ${cluster} ${helmfile}"
   fi
   echo "  cypress_setup \"${file}\""
@@ -59,7 +61,7 @@ cypress_gen() {
   echo '  load "../../bats.lib.bash"'
   echo ''
   echo "  cypress_teardown \"${file}\""
-  if [[ -n "${cluster}" ]] && [[ -n "${helmfile}" ]]; then
+  if [[ -n "${cluster:-}" ]] && [[ -n "${helmfile:-}" ]]; then
     echo "  auto_teardown"
   fi
   echo '}'

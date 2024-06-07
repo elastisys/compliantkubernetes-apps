@@ -1,15 +1,20 @@
 #!/usr/bin/env bats
 
 setup_file() {
-  load "../common/lib"
+  load "../../bats.lib.bash"
 
   cypress_setup "${ROOT}/tests/end-to-end/harbor-manage-resources.cy.js"
 }
 
 setup() {
-  load "../common/lib"
+  load "../../bats.lib.bash"
+  load_assert
+}
 
-  common_setup
+teardown_file() {
+  load "../../bats.lib.bash"
+
+  cypress_teardown "${ROOT}/tests/end-to-end/harbor-manage-resources.cy.js"
 }
 
 @test "harbor manage resources can create project" {
@@ -34,10 +39,4 @@ setup() {
 
 @test "harbor manage resources can delete project" {
   cypress_test "harbor manage resources can delete project"
-}
-
-teardown_file() {
-  load "../common/lib"
-
-  cypress_teardown "${ROOT}/tests/end-to-end/harbor-manage-resources.cy.js"
 }
