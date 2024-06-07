@@ -251,6 +251,13 @@ fluentd:
     nodeSelector: {}
     affinity: {}
 
+kubeapiMetrics:
+  service:
+    type: ClusterIP
+
+    # set if service type is ExternalName
+    externalName: ""
+
 externalTrafficPolicy:
   # Whitelisting requires externalTrafficPolicy.local to be true
   # local: true

@@ -7,3 +7,6 @@ ingress:
   extraAnnotations:
     nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.kubeapiMetrics }}
   {{ end }}
+service:
+  type: {{ .Values.kubeapiMetrics.service.type }}
+  externalName: {{ .Values.kubeapiMetrics.service.externalName }}
