@@ -1,4 +1,4 @@
-describe("grafana admin authentication", function() {
+describe("opensearch admin authentication", function() {
   before(function() {
     cy.yq("sc", ".opensearch.dashboards.subdomain + \".\" + .global.baseDomain")
       .should("not.contain.empty")
