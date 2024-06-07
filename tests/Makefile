@@ -82,7 +82,7 @@ run-integration: $(filter integration/%,$(all)) | dep
 
 run-end-to-end: $(filter end-to-end/%,$(all)) | dep
 	@echo --- bats end-to-end
-	@bats -j $(nproc) -r end-to-end
+	@bats -r end-to-end
 
 run-all-%: $(all) | dep
 	@echo --- bats all $*
@@ -102,7 +102,7 @@ run-integration-%: $(filter integration/%,$(all)) | dep
 
 run-end-to-end-%: $(filter end-to-end/%,$(all)) | dep
 	@echo --- bats unit $*
-	@bats -j $(nproc) -r end-to-end --filter-tags $*
+	@bats -r end-to-end --filter-tags $*
 
 $(all:.bats=): %: %.bats
 	@echo --- bats $*.bats
