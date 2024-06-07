@@ -12,8 +12,8 @@ setup() {
   common_setup
 }
 
-@test "grafana admin authentication can login via static dex user" {
-  cypress_test "grafana admin authentication can login via static dex user"
+@test "opensearch admin authentication can login via static dex user" {
+  cypress_test "opensearch admin authentication can login via static dex user"
 }
 
 teardown_file() {
