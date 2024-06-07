@@ -1,13 +1,12 @@
 #!/usr/bin/env bats
 
-# bats file_tags=static,general
+# bats file_tags=static,general,schema
 
 setup() {
-  load "../common/lib"
+  load "../bats.lib.bash"
+  load_assert
 
   export CK8S_CONFIG_PATH="/dev/null"
-
-  common_setup
 }
 
 find_schemas() {
