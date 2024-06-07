@@ -44,3 +44,13 @@ local_cluster.teardown() {
   env.teardown
   gpg.teardown
 }
+
+local_cluster.configure_selfsigned() {
+  yq.set 'common' '.global.issuer' '"selfsigned"'
+  yq.set 'common' '.global.verifyTls' 'false'
+
+  yq.set 'common' '.issuers.extraIssuers' '[{ "apiVersion": "cert-manager.io/v1", "kind": "ClusterIssuer", "metadata": { "name": "selfsigned" }, "spec": { "selfSigned": {}}}]'
+
+  yq.set 'common' '.issuers.letsencrypt.prod.email' '"admin@example.com"'
+  yq.set 'common' '.issuers.letsencrypt.staging.email' '"admin@example.com"'
+}

@@ -1,15 +1,13 @@
 #!/usr/bin/env bats
 
 setup_file() {
-  load "../common/lib"
+  load "../bats.lib.bash"
 
   cypress_setup "${ROOT}/tests/end-to-end/harbor-authentication.cy.js"
 }
 
 setup() {
-  load "../common/lib"
-
-  common_setup
+  load "../bats.lib.bash"
 }
 
 @test "harbor authentication can login via static admin user" {
@@ -25,7 +23,7 @@ setup() {
 }
 
 teardown_file() {
-  load "../common/lib"
+  load "../bats.lib.bash"
 
   cypress_teardown "${ROOT}/tests/end-to-end/harbor-authentication.cy.js"
 }

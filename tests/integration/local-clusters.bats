@@ -1,5 +1,7 @@
 #!/usr/bin/env bats
 
+# bats file_tags=general,local-clusters
+
 setup_file() {
   load "../bats.lib.bash"
   load_common "local-cluster.bash"

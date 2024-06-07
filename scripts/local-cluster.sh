@@ -34,7 +34,8 @@ log.fatal() {
 }
 log.usage() {
   log.fatal "$0 usage:
-  - cache <create|delete>                                                    - manages local caches for local clusters
+  - cache <create|delete>                                                    - manages local cache for local clusters
+  - resolve <create|delete> <domain>                                         - manages local resolve for local clusters
   - config <name> <flavor> <domain> [ops-prefix]                             - configures a local cluster
   - create <name> <profile-name|profile-path> [--skip-calico] [--skip-minio] - creates a local cluster
   - delete <name>                                                            - deletes a local cluster
@@ -54,12 +55,22 @@ log.continue() {
 }
 
 yq() {
-  if command -v yq4 > /dev/null; then
+  if command -v yq4 >/dev/null; then
     command yq4 "${@}"
   else
     command yq "${@}"
   fi
 }
+
+declare runtime
+if command -v docker >/dev/null && docker --version >/dev/null 2>&1 && [[ ! "$(docker --version)" =~ Podman ]]; then
+  runtime="docker"
+elif command -v podman >/dev/null; then
+  runtime="podman"
+  export KIND_EXPERIMENTAL_PROVIDER="podman"
+else
+  log.fatal "no container runtime found" >&2
+fi
 
 list.clusters() {
   kind get clusters 2>/dev/null
@@ -99,6 +110,40 @@ cluster.exist() {
   kind get clusters 2>/dev/null | grep -E "^${1}$" &>/dev/null
 }
 
+network.create() {
+  if ! "${runtime}" network inspect "${1}" > /dev/null 2>&1; then
+    log.info "- creating network ${1}"
+    "${runtime}" network create "${1}"
+  fi
+}
+container.create() {
+  if ! "${runtime}" container inspect "${1}" > /dev/null 2>&1; then
+    log.info "- creating container ${1}"
+    "${runtime}" run --detach "${@:2}"
+  else
+    "${runtime}" start "${1}"
+  fi
+}
+container.delete() {
+  if "${runtime}" container inspect "${1}" > /dev/null 2>&1; then
+    log.warn "- deleting container ${1}"
+    "${runtime}" container stop "${1}"
+    "${runtime}" container rm "${1}"
+  fi
+}
+volume.create() {
+  if ! "${runtime}" volume inspect "${1}" > /dev/null 2>&1; then
+    log.info "- creating volume ${1}"
+    "${runtime}" volume create "${1}"
+  fi
+}
+volume.delete() {
+  if "${runtime}" volume inspect "${1}" > /dev/null 2>&1; then
+    log.warn "- deleting volume ${1}"
+    "${runtime}" volume rm "${1}"
+  fi
+}
+
 cache() {
   local action
   action="${1:-}"
@@ -124,32 +169,50 @@ cache() {
 
     case "${action}" in
     create)
-      if ! docker network inspect kind > /dev/null 2>&1; then
-        log.info "- creating kind network"
-        docker network create kind
-      fi
-      if ! docker volume inspect "${name}" > /dev/null 2>&1; then
-        log.info "- creating proxy cache volume ${name}"
-        docker volume create "${name}"
-      fi
-      if ! docker container inspect "${name}" > /dev/null 2>&1; then
-        log.info "- creating proxy cache container ${name}"
-        docker run --detach --env "REGISTRY_PROXY_REMOTEURL=${upstream}" --env REGISTRY_PROXY_TTL=168h --env REGISTRY_STORAGE_DELETE_ENABLED=true --env REGISTRY --mount "type=volume,src=${name},dst=/var/lib/registry" --name "${name}" --network kind docker.io/library/registry:2
-      fi
+      network.create kind
+      volume.create "${name}"
+      container.create "${name}" --env "REGISTRY_PROXY_REMOTEURL=${upstream}" --env REGISTRY_PROXY_TTL=168h --env REGISTRY_STORAGE_DELETE_ENABLED=true --env REGISTRY --mount "type=volume,src=${name},dst=/var/lib/registry" --name "${name}" --network kind docker.io/library/registry:2
       ;;
     delete)
-      if docker container inspect "${name}" > /dev/null 2>&1; then
-        log.warn "- deleting proxy cache container ${name}"
-        docker container stop "${name}"
-        docker container rm "${name}"
-      fi
-      if docker volume inspect "${name}" > /dev/null 2>&1; then
-        log.warn "- deleting proxy cache volume ${name}"
-        docker volume rm "${name}"
-      fi
+      container.delete "${name}"
+      volume.delete "${name}"
       ;;
     esac
   done
+}
+
+resolve() {
+  local action domain
+  action="${1:-}"
+  domain="${2:-}"
+
+  if [[ -z "${action}" ]]; then
+    log.usage
+  fi
+
+  case "${action}" in
+  create)
+    if [[ -z "${domain}" ]]; then
+      log.usage
+    fi
+    export domain
+
+    network.create kind
+    container.create local-resolve --env domain --mount "type=bind,src=${HERE}/local-clusters/resolves/Corefile,dst=/home/nonroot/Corefile" --name local-resolve --network kind --publish 127.0.64.43:53:53/tcp,127.0.64.43:53:53/udp docker.io/coredns/coredns:1.11.1
+    if command -v resolvectl >/dev/null 2>&1; then
+      local link
+      link="$(resolvectl default-route | sed -rn 's/.*\((.+)\): yes/\1/p')"
+      log.continue "set local-resolve as current dns server on ${link}?"
+      resolvectl dns "${link}" 127.0.64.43
+    else
+      log.warn "set local-resolve as the current dns server 127.0.64.43"
+    fi
+    ;;
+  delete)
+    container.delete local-resolve
+    log.warn "reconnect your current network connection or restart systemd-resolved to restore previous dns servers!"
+    ;;
+  esac
 }
 
 config() {
@@ -258,6 +321,11 @@ create() {
 
   export KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml"
 
+  if [[ -n "${KIND_EXPERIMENTAL_PROVIDER:-}" ]]; then
+    # Ensure DNS resolution works when running in podman
+    kubectl get configmap -n kube-system coredns -oyaml | sed '/forward/a \           prefer_udp' | kubectl apply -f -
+  fi
+
   kubectl label namespace local-path-storage owner=operator
 
   # install calico
@@ -325,6 +393,14 @@ main() {
     case "${subcommand}" in
     create|delete)
       cache "${subcommand}" ;;
+    *)
+      log.usage ;;
+    esac
+    ;;
+  resolve)
+    case "${subcommand}" in
+    create|delete)
+      resolve "${subcommand}" "${@:3}" ;;
     *)
       log.usage ;;
     esac

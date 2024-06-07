@@ -80,8 +80,6 @@ RUN git clone --depth 1 https://github.com/bats-core/bats-file.git /usr/local/li
 RUN git clone --depth 1 https://github.com/grayhemp/bats-mock.git /usr/local/lib/bats/mock
 RUN git clone --depth 1 https://github.com/bats-core/bats-support.git /usr/local/lib/bats/support
 
-RUN git clone --depth 1 https://github.com/elastisys/compliantkubernetes.git /usr/local/share/docs
-
 # Container to run integration and end-to-end tests
 FROM unit AS main
 
@@ -96,11 +94,16 @@ RUN curl -LOs "https://github.com/kubernetes-sigs/kind/releases/download/v${KIND
     rm kind-linux-amd64
 
 ENV CYPRESS_VERSION "13.9.0"
+ENV CYPRESS_CACHE_FOLDER /usr/local/lib/cypress
+ENV NODE_PATH /usr/local/lib/node_modules
 RUN npm install --global "cypress@${CYPRESS_VERSION}"
+RUN chmod --recursive a+w "${CYPRESS_CACHE_FOLDER}"
 
 ENV PODMAN_REMOTE_VERSION "5.0.3"
-
 RUN curl -LOs "https://github.com/containers/podman/releases/download/v${PODMAN_REMOTE_VERSION}/podman-remote-static-linux_amd64.tar.gz" && \
     tar -zxvf podman-remote-static-linux_amd64.tar.gz bin/podman-remote-static-linux_amd64 && \
     install -Tm 755 bin/podman-remote-static-linux_amd64 /usr/local/bin/podman && \
     rm bin/podman-remote-static-linux_amd64 podman-remote-static-linux_amd64.tar.gz
+
+ENV DOCS_PATH "/usr/local/share/docs"
+RUN git clone --depth 1 https://github.com/elastisys/compliantkubernetes.git "${DOCS_PATH}"
