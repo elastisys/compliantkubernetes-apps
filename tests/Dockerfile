@@ -97,6 +97,12 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+ENV DOCKER_VERSION "26.1.4"
+RUN curl -LOs "https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz" && \
+    tar -zxvf "docker-${DOCKER_VERSION}.tgz" docker/docker && \
+    install -Tm 755 docker/docker /usr/local/bin/docker && \
+    rm -rf docker "docker-${DOCKER_VERSION}.tgz"
+
 USER ubuntu
 
 ENV ROOT="/apps"

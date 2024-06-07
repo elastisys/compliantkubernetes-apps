@@ -51,6 +51,8 @@ ifndef CK8S_TESTS_STATIC # Skip mount with static tests
 container_args += --mount type=bind,source=${GNUPGHOME},target=/home/ubuntu/.gnupg,readonly
 container_args += --mount type=bind,source=${HOME}/.kube/cache/oidc-login,target=/home/ubuntu/.kube/cache/oidc-login
 container_args += --mount type=bind,source=/run/user/$(uid),target=/run/user/$(uid),readonly
+container_args += --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock
+container_args += --group-add $(shell getent group docker | cut -d: -f3)
 endif
 
 container_args += --network=host
