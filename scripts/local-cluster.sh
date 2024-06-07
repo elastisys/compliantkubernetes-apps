@@ -199,16 +199,26 @@ resolve() {
 
     network.create kind
     container.create local-resolve --env domain --mount "type=bind,src=${HERE}/local-clusters/resolves/Corefile,dst=/home/nonroot/Corefile" --name local-resolve --network kind --publish 127.0.64.43:53:53/tcp --publish 127.0.64.43:53:53/udp docker.io/coredns/coredns:1.11.1
-    if command -v resolvectl >/dev/null 2>&1; then
-      local link
-      link="$(resolvectl default-route | sed -rn 's/.*\((.+)\): yes/\1/p')"
-      log.continue "set local-resolve as current dns server on ${link}?"
-      resolvectl dns "${link}" 127.0.64.43
+    if [[ -n "${CI:-}" ]]; then
+      sudo mkdir -p /etc/systemd/resolved.conf.d/
+      echo -e '[Resolve]\nDNS=127.0.64.43\nDomains=~.' | sudo tee /etc/systemd/resolved.conf.d/00-local-resolve.conf
+      sudo systemctl restart systemd-resolved.service
     else
-      log.warn "set local-resolve as the current dns server 127.0.64.43"
+      if command -v resolvectl >/dev/null 2>&1; then
+        local link
+        link="$(resolvectl default-route | sed -rn 's/.*\((.+)\): yes/\1/p')"
+        log.continue "set local-resolve as current dns server on ${link}?"
+        resolvectl dns "${link}" 127.0.64.43
+      else
+        log.warn "set local-resolve as the current dns server 127.0.64.43"
+      fi
     fi
     ;;
   delete)
+    if [[ -n "${CI:-}" ]]; then
+      sudo rm /etc/systemd/resolved.conf.d/00-local-resolve.conf
+      sudo systemctl restart systemd-resolved.service
+    fi
     container.delete local-resolve
     log.warn "reconnect your current network connection or restart systemd-resolved to restore previous dns servers!"
     ;;

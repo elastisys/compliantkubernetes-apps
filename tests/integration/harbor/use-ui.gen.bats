@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-# bats file_tags=general,harbor,use-ui
+# bats file_tags=harbor,use-ui
 
 setup_file() {
   load "../../bats.lib.bash"

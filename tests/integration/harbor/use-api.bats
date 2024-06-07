@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-# bats file_tags=general,harbor,use-api
+# bats file_tags=harbor,use-api
 
 # Integration test: Harbor API
 
@@ -77,7 +77,7 @@ teardown_file() {
 }
 
 @test "harbor api can authenticate with robot account" {
-  run ctr login "$(ctr.insecure)" "${harbor_endpoint}" --username "${harbor_robot_fullname}" --password-stdin < "${harbor_robot_secret_path}"
+  run ctr.insecure login "${harbor_endpoint}" --username "${harbor_robot_fullname}" --password-stdin < "${harbor_robot_secret_path}"
 
   assert_line --regexp "Login Succeeded"
   assert_success
@@ -86,13 +86,13 @@ teardown_file() {
 @test "harbor api can push image with robot account" {
   ctr pull docker.io/library/busybox
   ctr tag docker.io/library/busybox "${harbor_endpoint}/${harbor_project}/busybox:latest"
-  ctr push "$(ctr.insecure)" "${harbor_endpoint}/${harbor_project}/busybox:latest"
+  ctr.insecure push "${harbor_endpoint}/${harbor_project}/busybox:latest"
 }
 
 @test "harbor api can pull image with robot account" {
   ctr rmi docker.io/library/busybox
   ctr rmi "${harbor_endpoint}/${harbor_project}/busybox:latest"
-  ctr pull "$(ctr.insecure)" "${harbor_endpoint}/${harbor_project}/busybox:latest"
+  ctr.insecure pull "${harbor_endpoint}/${harbor_project}/busybox:latest"
   ctr tag "${harbor_endpoint}/${harbor_project}/busybox:latest" "ctr.io/library/busybox"
   ctr rmi "${harbor_endpoint}/${harbor_project}/busybox:latest"
 }

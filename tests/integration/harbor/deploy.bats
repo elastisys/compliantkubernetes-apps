@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-# bats file_tags=general,harbor,deploy
+# bats file_tags=harbor,deploy
 
 # Integration test: Harbor deployment
 
