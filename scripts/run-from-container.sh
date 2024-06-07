@@ -111,7 +111,6 @@ if [[ -n "${XDG_RUNTIME_DIR}" ]]; then
     args+=("--tmpfs" "${XDG_RUNTIME_DIR}:uid=$(id -u),gid=$(id -g)")
   else
     args+=("--mount" "type=tmpfs,dst=${XDG_RUNTIME_DIR},chown")
-    # args+=("--mount" "type=bind,src=${XDG_RUNTIME_DIR},dst=${XDG_RUNTIME_DIR}")
   fi
 fi
 

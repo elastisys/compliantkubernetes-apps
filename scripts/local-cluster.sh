@@ -198,7 +198,7 @@ resolve() {
     export domain
 
     network.create kind
-    container.create local-resolve --env domain --mount "type=bind,src=${HERE}/local-clusters/resolves/Corefile,dst=/home/nonroot/Corefile" --name local-resolve --network kind --publish 127.0.64.43:53:53/tcp,127.0.64.43:53:53/udp docker.io/coredns/coredns:1.11.1
+    container.create local-resolve --env domain --mount "type=bind,src=${HERE}/local-clusters/resolves/Corefile,dst=/home/nonroot/Corefile" --name local-resolve --network kind --publish 127.0.64.43:53:53/tcp --publish 127.0.64.43:53:53/udp docker.io/coredns/coredns:1.11.1
     if command -v resolvectl >/dev/null 2>&1; then
       local link
       link="$(resolvectl default-route | sed -rn 's/.*\((.+)\): yes/\1/p')"
