@@ -120,3 +120,87 @@ test_logs_contains() {
     assert_line --regexp "${arg}"
   done
 }
+
+auto_setup() {
+  export CK8S_AUTO_APPROVE="true"
+
+  local cluster="${1}"
+  shift
+
+  load_common "local-cluster.bash"
+
+  local_cluster.setup dev integration.dev-ck8s.com
+  local_cluster.create single-node-cache
+
+  local_cluster.configure_selfsigned
+
+  ck8s ops helmfile "${cluster}" apply --include-transitive-needs --output simple "${@/#''/-l}"
+}
+
+auto_teardown() {
+  load_common "local-cluster.bash"
+
+  local_cluster.delete
+  local_cluster.teardown
+}
+
+# note: not intended for direct use
+# usage: cypress_setup <path-to-cypress-spec>
+cypress_setup() {
+  if ! [[ -f "${1:-}" ]]; then
+    log_fatal "invalid or missing file argument"
+  fi
+
+  CYPRESS_REPORT="$(mktemp)"
+
+  pushd "${ROOT}/tests" || exit 1
+
+  cypress run --spec "$1" --reporter json-stream --quiet > "${CYPRESS_REPORT}" || true
+
+  popd || exit 1
+
+  # Without json events we have some failure
+  if ! grep -q '^\[.*\]$' < "${CYPRESS_REPORT}"; then
+    cat "${CYPRESS_REPORT}" >&2
+    exit 1
+  fi
+
+  # Filter json events
+  grep '^\[.*\]$' < "${CYPRESS_REPORT}" > "${CYPRESS_REPORT}.tmp"
+  mv "${CYPRESS_REPORT}.tmp" "${CYPRESS_REPORT}"
+
+  # Check for any auto-generated error
+  if [[ -n "$(jq -r 'select(.[1].title == "An uncaught error was detected outside of a test")' "${CYPRESS_REPORT}" 2>&1)" ]]; then
+    echo "An uncaught error was detected outside of a test" >&2
+    jq -r 'select(.[1].title == "An uncaught error was detected outside of a test") | .[1].stack' "${CYPRESS_REPORT}"
+    exit 1
+  fi
+
+  export CYPRESS_REPORT
+}
+
+# note: not intended for direct use
+# usage: cypress_test <group + test name>
+cypress_test() {
+  if ! [[ -f "${CYPRESS_REPORT:-}" ]]; then
+    fail "invalid or missing cypress report"
+  elif [[ -z "${1:-}" ]]; then
+    fail "invalid or missing file argument"
+  fi
+
+  if [[ "$(jq -r "select(.[1].fullTitle == \"$1\") | .[0]" "${CYPRESS_REPORT}")" == "fail" ]]; then
+    fail "$(jq -r "select(.[1].fullTitle == \"$1\") | .[1].stack" "${CYPRESS_REPORT}")"
+  elif [[ "$(jq -r "select(.[1].fullTitle == \"$1\") | .[0]" "${CYPRESS_REPORT}")" == "pass" ]]; then
+    assert true
+  else
+    skip "cypress skipped this test"
+  fi
+}
+
+# note: not intended for direct use
+# usage: cypress_teardown
+cypress_teardown() {
+  if [[ -f "${CYPRESS_REPORT:-}" ]]; then
+    rm "${CYPRESS_REPORT}"
+  fi
+}

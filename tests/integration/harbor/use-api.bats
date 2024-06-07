@@ -1,17 +1,30 @@
 #!/usr/bin/env bats
 
-# bats file_tags=static,harbor,api
+# bats file_tags=general,harbor,use-api
 
-# Test using Harbor via the API
+# Integration test: Harbor API
 
 setup_file() {
   export BATS_NO_PARALLELIZE_WITHIN_FILE=true
+  export CK8S_AUTO_APPROVE="true"
 
-  load "../bats.lib.bash"
+  load "../../bats.lib.bash"
   load_common "ctr.bash"
   load_common "harbor.bash"
+  load_common "local-cluster.bash"
   load_common "yq.bash"
-  load_assert
+
+  local_cluster.setup dev integration.dev-ck8s.com
+  local_cluster.create single-node-cache
+
+  local_cluster.configure_selfsigned
+
+  ck8s ops helmfile sc apply --include-transitive-needs --output simple \
+    -lapp=cert-manager \
+    -lapp=dex \
+    -lapp=harbor \
+    -lapp=ingress-nginx \
+    -lapp=node-local-dns
 
   harbor.load_env "harbor-api"
 
@@ -23,16 +36,20 @@ setup_file() {
   export harbor_robot_secret_path
 }
 
-teardown_file() {
-  harbor.teardown_project
-}
-
 setup() {
-  load "../bats.lib.bash"
+  load "../../bats.lib.bash"
   load_common "ctr.bash"
   load_common "harbor.bash"
   load_common "yq.bash"
   load_assert
+}
+
+teardown_file() {
+  load "../../bats.lib.bash"
+  load_common "local-cluster.bash"
+
+  local_cluster.delete
+  local_cluster.teardown
 }
 
 @test "harbor api can authenticate" {

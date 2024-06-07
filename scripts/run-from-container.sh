@@ -2,8 +2,9 @@
 
 # This script ensure that regardless if one uses docker or podman it is still possible to manage files properly from within containers.
 
-# FORWARD_ENVIRONMENT - To be used for end-to-end tests
-# FORWARD_RUNTIME - To be used for integration tests
+# Environment variables:
+# - FORWARD_ENVIRONMENT - Used for end-to-end tests
+# - FORWARD_RUNTIME - Used for integration tests
 
 set -euo pipefail
 
@@ -53,9 +54,9 @@ yq() {
 
 declare runtime
 
-if command -v docker > /dev/null; then
+if command -v docker >/dev/null && docker version >/dev/null 2>&1 && [[ ! "$(docker version)" =~ Podman ]]; then
   runtime="docker"
-elif command -v podman > /dev/null; then
+elif command -v podman >/dev/null; then
   runtime="podman"
 else
   log.fatal "no container runtime found" >&2
@@ -68,42 +69,101 @@ if [[ -t 1 ]] && [[ -z "${CI:-}" ]]; then
   args+=("-it")
 fi
 
-args+=("--hostname" "compliantkubernetes-apps-tests" "--workdir" "${root}")
+args+=("--hostname" "compliantkubernetes-apps-tests")
+args+=("--workdir" "${root}")
+args+=("--env" "LANG=C.UTF-8")
 
+if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]] && [[ "${FORWARD_RUNTIME:-false}" == "true" ]]; then
+  log.continue "forward your environment and runtime to container ${1:-}?"
+elif [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]]; then
+  log.continue "forward your environment to container ${1:-}?"
+elif [[ "${FORWARD_RUNTIME:-false}" == "true" ]]; then
+  log.continue "forward your runtime to container ${1:-}?"
+fi
+
+# Prepare podman to work with selinux
+if [[ "${runtime}" == "podman" ]]; then
+  if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]] || [[ "${FORWARD_RUNTIME:-false}" == "true" ]]; then
+    args+=("--security-opt" "label=disable")
+  else
+    relabel=",relabel=shared"
+  fi
+fi
+
+# Use host network to allow container work with the environment as the host would
 if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]] || [[ "${FORWARD_RUNTIME:-false}" == "true" ]]; then
-  log.continue "forward your environment and/or runtime to container ${1:-}?"
   args+=("--network" "host")
 fi
 
+# Use host user to allow container work with the files as the host would
 args+=("--user" "$(id -u):$(id -g)")
-
-if [[ "$("${runtime}" version)" =~ Podman ]]; then
-  runtime="podman"
-
-  args+=("--userns" "keep-id")
-
-  if [[ "$(podman info | yq '.host.security.selinuxEnabled')" == "true" ]]; then
-    declare relabel=",relabel=shared"
-  fi
-
-  args+=("--mount" "type=bind,src=${root},dst=${root}${relabel:-}")
-
-  if [[ "${FORWARD_RUNTIME:-false}" == "true" ]]; then
-    args+=("--env" "KIND_EXPERIMENTAL_PROVIDER=podman")
-    args+=("--env" "XDG_RUNTIME_DIR")
-    args+=("--mount" "type=tmpfs,dst=${XDG_RUNTIME_DIR},chown")
-    args+=("--mount" "type=bind,src=${XDG_RUNTIME_DIR}/podman/podman.sock,dst=${XDG_RUNTIME_DIR}/podman/podman.sock${relabel:-}")
-    args+=("--security-opt" "label=disable")
-  fi
-else
+if [[ "${runtime}" == "docker" ]]; then
   args+=("--mount" "type=bind,src=/etc/passwd,dst=/etc/passwd,ro")
   args+=("--mount" "type=bind,src=/etc/group,dst=/etc/group,ro")
+else
+  args+=("--userns" "keep-id")
+fi
 
-  args+=("--mount" "type=bind,src=${root},dst=${root}")
-
-  if [[ "${FORWARD_RUNTIME:-false}" == "true" ]]; then
-    args+=("--mount" "type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock")
+# Prepare runtime directory for additional mounts
+if [[ -n "${XDG_RUNTIME_DIR}" ]]; then
+  args+=("--env" "XDG_RUNTIME_DIR")
+  if [[ "${runtime}" == "docker" ]]; then
+    args+=("--tmpfs" "${XDG_RUNTIME_DIR}:uid=$(id -u),gid=$(id -g)")
+  else
+    args+=("--mount" "type=tmpfs,dst=${XDG_RUNTIME_DIR},chown")
+    # args+=("--mount" "type=bind,src=${XDG_RUNTIME_DIR},dst=${XDG_RUNTIME_DIR}")
   fi
 fi
+
+# Prepare container runtime socket
+if [[ "${FORWARD_RUNTIME:-false}" == "true" ]]; then
+  if [[ "${runtime}" == "docker" ]]; then
+    args+=("--mount" "type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock")
+  else
+    args+=("--mount" "type=bind,src=${XDG_RUNTIME_DIR}/podman/podman.sock,dst=${XDG_RUNTIME_DIR}/podman/podman.sock")
+  fi
+fi
+
+# Prepare container graphics
+if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]] || [[ "${FORWARD_RUNTIME:-false}" == "true" ]]; then
+  if [[ -n "${DISPLAY}" ]]; then
+    args+=("--env" "DISPLAY")
+  fi
+  if [[ -n "${XAUTHORITY}" ]]; then
+    args+=("--env" "XAUTHORITY")
+    args+=("--mount" "type=bind,src=${XAUTHORITY},dst=${XAUTHORITY}")
+  fi
+  args+=("--mount" "type=bind,src=/run/dbus,dst=/run/dbus")
+fi
+
+if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]]; then
+  # Prepare container home
+  args+=("--env" "HOME")
+  if [[ "${runtime}" == "docker" ]]; then
+    args+=("--tmpfs" "${HOME}:uid=$(id -u),gid=$(id -g)")
+  else
+    args+=("--mount" "type=tmpfs,dst=${HOME},chown")
+  fi
+  args+=("--mount" "type=bind,src=${HOME}/.kube/cache/oidc-login,dst=${HOME}/.kube/cache/oidc-login")
+
+  # Prepare container gpg
+  declare GNUPGHOME GNUPGSOCKETDIR
+  GNUPGHOME="${GNUPGHOME:-"${HOME}/.gnupg"}"
+  GNUPGSOCKETDIR="$(gpgconf --list-dirs socketdir)"
+  export GNUPGHOME
+
+  args+=("--env" "GNUPGHOME")
+  args+=("--mount" "type=bind,src=${GNUPGHOME},dst=${GNUPGHOME}")
+  if [[ "${GNUPGHOME}" != "${GNUPGSOCKETDIR}" ]]; then
+    args+=("--mount" "type=bind,src=${GNUPGSOCKETDIR},dst=${GNUPGSOCKETDIR}")
+  fi
+
+  # Prepare container env
+  args+=("--env" "CK8S_CONFIG_PATH")
+  args+=("--mount" "type=bind,src=${CK8S_CONFIG_PATH},dst=${CK8S_CONFIG_PATH}")
+fi
+
+# Prepare container repo
+args+=("--mount" "type=bind,src=${root},dst=${root}${relabel:-}")
 
 "${runtime}" run "${args[@]}" "${@}"

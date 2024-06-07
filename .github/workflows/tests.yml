@@ -45,6 +45,12 @@ jobs:
   integration:
     runs-on: ubuntu-latest
     needs: [ unit-static ]
+    strategy:
+      fail-fast: false
+      matrix:
+        tag:
+          - general
+          - harbor
     steps:
       - name: checkout compliantkubernetes-apps
         uses: actions/checkout@v4
@@ -63,11 +69,16 @@ jobs:
           tags: compliantkubernetes-apps-tests:main
       - name: create local cache
         run: ./scripts/local-cluster.sh cache create
+      - name: create local resolve
+        run: ./scripts/local-cluster.sh resolve create integration.dev-ck8s.com
       - name: run integration tests
         working-directory: ./tests
         env:
           CK8S_AUTO_APPROVE: true
-        run: make run-integration
+        run: make run-integration-${{ matrix.tag }}
+      - name: delete local resolve
+        if: always()
+        run: ./scripts/local-cluster.sh resolve delete
       - name: delete local cache
         if: always()
         run: ./scripts/local-cluster.sh cache delete

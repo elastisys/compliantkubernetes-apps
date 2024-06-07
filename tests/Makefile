@@ -45,7 +45,7 @@ internal-end-to-end: $(filter end-to-end/%,$(all))
 	@echo --- bats end-to-end
 	@bats -r end-to-end
 internal-end-to-end-%: $(filter end-to-end/%,$(all))
-	@echo --- bats unit $*
+	@echo --- bats end-to-end $*
 	@bats -r end-to-end --filter-tags $*
 
 $(all:.bats=): %: %.bats
@@ -85,7 +85,10 @@ run-integration:
 run-unit-%:
 	../scripts/run-from-container.sh $(container_image):unit make -C tests internal-unit-$*
 run-unit:
-	../scripts/run-from-container.sh $(container_image):unit make -C tests internal-unit
+	../scripts/run-from-container.sh $(container_image):unit cypress open --project tests/
+
+run-cypress-open:
+	../scripts/run-from-container.sh $(container_image):unit
 
 print-%:
 	@echo $($*)

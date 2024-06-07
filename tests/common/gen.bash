@@ -15,12 +15,18 @@ cypress_gen() {
 
   readarray -t input < "${file}"
 
-  local describe test
+  local bats cluster helmfile describe test
 
   local -a its
 
   for line in "${input[@]}"; do
-    if [[ "${line}" =~ [[:space:]]*describe\( ]]; then
+    if [[ "${line}" =~ "// bats" ]]; then
+      bats="${line##// bats }"
+    elif [[ "${line}" =~ "// cluster" ]]; then
+      cluster="${line##// cluster }"
+    elif [[ "${line}" =~ "// helmfile" ]]; then
+      helmfile="${line##// helmfile }"
+    elif [[ "${line}" =~ [[:space:]]*describe\( ]]; then
       describe="$(sed -n "s/describe([\"\']\(.\+\)[\"\'],.\+/\1/p" <<< "${line}")"
     elif [[ "${line}" =~ [[:space:]]+it\( ]]; then
       test="$(sed -n "s/[[:space:]]\+it([\"\']\(.\+\)[\"\'],.\+/\1/p" <<< "${line}")"
@@ -33,16 +39,29 @@ cypress_gen() {
 
   echo '#!/usr/bin/env bats'
   echo ''
-  echo 'setup_file() {'
-  echo '  load "../common/lib"'
+  echo "# bats ${bats}"
   echo ''
+  echo 'setup_file() {'
+  echo '  load "../../bats.lib.bash"'
+  echo ''
+  if [[ -n "${cluster}" ]] && [[ -n "${helmfile}" ]]; then
+    echo "  auto_setup ${cluster} ${helmfile}"
+  fi
   echo "  cypress_setup \"${file}\""
   echo '}'
   echo ''
   echo 'setup() {'
-  echo '  load "../common/lib"'
+  echo '  load "../../bats.lib.bash"'
+  echo '  load_assert'
+  echo '}'
   echo ''
-  echo '  common_setup'
+  echo 'teardown_file() {'
+  echo '  load "../../bats.lib.bash"'
+  echo ''
+  echo "  cypress_teardown \"${file}\""
+  if [[ -n "${cluster}" ]] && [[ -n "${helmfile}" ]]; then
+    echo "  auto_teardown"
+  fi
   echo '}'
 
   for it in "${its[@]}"; do
@@ -51,13 +70,6 @@ cypress_gen() {
     echo "  cypress_test \"${it}\""
     echo '}'
   done
-
-  echo ''
-  echo 'teardown_file() {'
-  echo '  load "../common/lib"'
-  echo ''
-  echo "  cypress_teardown \"${file}\""
-  echo '}'
 }
 
 cypress() {
