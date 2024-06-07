@@ -63,7 +63,7 @@ describe("grafana dev authentication", function() {
       .as("ingress")
 
     // Cypress does not like trailing dots
-    cy.yqDig("sc", ".grafana.ops.trailingDots")
+    cy.yqDig("sc", ".grafana.user.trailingDots")
       .should("not.equal", "true")
   })
 
