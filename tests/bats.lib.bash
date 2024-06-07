@@ -129,11 +129,14 @@ auto_setup() {
 
   load_common "local-cluster.bash"
 
+  echo "# auto setup: local cluster setup" >&3
   local_cluster.setup dev integration.dev-ck8s.com
+  echo "# auto setup: local cluster create" >&3
   local_cluster.create single-node-cache
 
   local_cluster.configure_selfsigned
 
+  echo "# auto setup: apply ${cluster} ${*}" >&3
   ck8s ops helmfile "${cluster}" apply --include-transitive-needs --output simple "${@/#''/-l}"
 }
 
@@ -155,6 +158,7 @@ cypress_setup() {
 
   pushd "${ROOT}/tests" || exit 1
 
+  echo "# cypress run: $1" >&3
   cypress run --spec "$1" --reporter json-stream --quiet > "${CYPRESS_REPORT}" || true
 
   popd || exit 1

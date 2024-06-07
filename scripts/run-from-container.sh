@@ -105,7 +105,7 @@ else
 fi
 
 # Prepare runtime directory for additional mounts
-if [[ -n "${XDG_RUNTIME_DIR}" ]]; then
+if [[ -n "${XDG_RUNTIME_DIR:-}" ]]; then
   args+=("--env" "XDG_RUNTIME_DIR")
   if [[ "${runtime}" == "docker" ]]; then
     args+=("--tmpfs" "${XDG_RUNTIME_DIR}:uid=$(id -u),gid=$(id -g)")
@@ -119,23 +119,20 @@ if [[ "${FORWARD_RUNTIME:-false}" == "true" ]]; then
   if [[ "${runtime}" == "docker" ]]; then
     args+=("--mount" "type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock")
   else
+    args+=("--env" "KIND_EXPERIMENTAL_PROVIDER=podman")
     args+=("--mount" "type=bind,src=${XDG_RUNTIME_DIR}/podman/podman.sock,dst=${XDG_RUNTIME_DIR}/podman/podman.sock")
   fi
 fi
 
-# Prepare container graphics
 if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]] || [[ "${FORWARD_RUNTIME:-false}" == "true" ]]; then
-  if [[ -n "${DISPLAY}" ]]; then
+  # Prepare container graphics
+  if [[ -n "${DISPLAY:-}" ]] && [[ -n "${XAUTHORITY:-}" ]]; then
     args+=("--env" "DISPLAY")
-  fi
-  if [[ -n "${XAUTHORITY}" ]]; then
     args+=("--env" "XAUTHORITY")
     args+=("--mount" "type=bind,src=${XAUTHORITY},dst=${XAUTHORITY}")
+    args+=("--mount" "type=bind,src=/run/dbus,dst=/run/dbus")
   fi
-  args+=("--mount" "type=bind,src=/run/dbus,dst=/run/dbus")
-fi
 
-if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]]; then
   # Prepare container home
   args+=("--env" "HOME")
   if [[ "${runtime}" == "docker" ]]; then
@@ -143,6 +140,9 @@ if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]]; then
   else
     args+=("--mount" "type=tmpfs,dst=${HOME},chown")
   fi
+fi
+
+if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]]; then
   args+=("--mount" "type=bind,src=${HOME}/.kube/cache/oidc-login,dst=${HOME}/.kube/cache/oidc-login")
 
   # Prepare container gpg

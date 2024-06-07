@@ -1,4 +1,4 @@
-// bats file_tags=general,harbor,use-ui
+// bats file_tags=harbor,use-ui
 // cluster sc
 // helmfile app=cert-manager app=dex app=harbor app=ingress-nginx app=node-local-dns
 
