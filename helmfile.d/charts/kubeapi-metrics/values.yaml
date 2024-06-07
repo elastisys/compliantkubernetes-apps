@@ -4,6 +4,7 @@ fullnameOverride: ""
 service:
   type: ClusterIP
   port: 6443
+  externalName: ""
 
 ingress:
   enabled: false

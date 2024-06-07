@@ -6,6 +6,9 @@ metadata:
     {{- include "kubeapi-metrics.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
+  {{- if eq .Values.service.type "ExternalName" }}
+  externalName: {{ .Values.service.externalName }}
+  {{- else }}
   ports:
     - port: {{ .Values.service.port }}
       targetPort: 6443
@@ -14,3 +17,4 @@ spec:
   selector:
     component: kube-apiserver
     tier: control-plane
+  {{- end }}
