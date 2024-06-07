@@ -23,10 +23,10 @@ describe("grafana admin datasources", function() {
       }
     })
 
-    cy.get('button[aria-label="Toggle menu"]')
+    cy.get('button[aria-label="Open menu"]')
       .click()
 
-    cy.contains("Connections")
+    cy.get('button[aria-label="Expand section Connections"]')
       .click()
 
     cy.contains("Data sources")
@@ -89,10 +89,10 @@ describe("grafana dev datasources", function() {
       }
     })
 
-    cy.get('button[aria-label="Toggle menu"]')
+    cy.get('button[aria-label="Open menu"]')
       .click()
 
-    cy.contains("Connections")
+    cy.get('button[aria-label="Expand section Connections"]')
       .click()
 
     cy.contains("Data sources")
