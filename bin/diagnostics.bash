@@ -188,7 +188,7 @@ run_diagnostics() {
 run_diagnostics_namespaced() {
     echo "Running in the ${namespace} namespace"
     # -- Pods --
-    echo -e "Fetching all pods"
+    echo -e "Fetching all pods <pods>"
     "${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
@@ -200,31 +200,31 @@ run_diagnostics_namespaced() {
 
     # -- Deployments --
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-    echo "Fetching Deployments"
+    echo "Fetching Deployments <deployments>"
     "${here}/ops.bash" kubectl "${cluster}" get deployments -n "${namespace}" -o yaml
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
     # -- Daemonsets --
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-    echo "Fetching Daemonsets"
+    echo "Fetching Daemonsets <daemonsets>"
     "${here}/ops.bash" kubectl "${cluster}" get daemonsets -n "${namespace}" -o yaml
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
     # -- Statefulsets --
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-    echo "Fetching Statefulsets"
+    echo "Fetching Statefulsets <statefulsets>"
     "${here}/ops.bash" kubectl "${cluster}" get statefulsets -n "${namespace}" -o yaml
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
     # -- Events --
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-    echo "Fetching Events"
+    echo "Fetching Events <events>"
     "${here}/ops.bash" kubectl "${cluster}" get events -n "${namespace}"
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
     # -- ConfigMaps --
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-    echo "Fetching ConfigMaps"
+    echo "Fetching ConfigMaps <configmaps>"
     cfg1=$("${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml | yq4 '.items[] | select(.status.conditions[] | select(.type != "Ready" and .status != "True")) | [.spec.volumes[].configMap.name]')
     readarray cfg1_arr < <(echo "$cfg1" | yq4 e -o=j -I=0 '.[]')
     cfg2=$("${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml | yq4 '.items[] | select(.status.conditions[] | select(.type != "Ready" and .status != "True")) | .spec.containers[].envFrom[].configMapRef.name')
@@ -248,7 +248,7 @@ run_diagnostics_namespaced() {
 
     # -- Logs --
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' '
-    echo "Fetching Logs"
+    echo "Fetching Logs <logs>"
     pods=$("{$here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml | yq4 '.items[] | .metadata.name')
     readarray pods_arr < <(echo "$pods" | yq4 e -o=j -I=0 '.[]')
 
