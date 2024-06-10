@@ -3,6 +3,10 @@
 #   <service-name>:
 #     podSelectorLabels:
 #       foo: bar
+#     podSelectorExpressions:
+#       - key: "foo"
+#         operator: "In"
+#         values: ["bar"]
 #     # Every "allow" is an override, and is optional.
 #     # If a override is NOT part of "allow", the default constraint is applied
 #     allow:
