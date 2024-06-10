@@ -136,9 +136,7 @@ harbor.delete() {
 }
 
 harbor.get_current_user() {
-  set -x
   harbor.get users/current
-  set +x
 }
 
 harbor.create_project() {
