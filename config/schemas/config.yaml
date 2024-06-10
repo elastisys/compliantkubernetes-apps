@@ -6216,6 +6216,30 @@ properties:
         description: Configure monitoring network policy rules.
         type: object
         additionalProperties: false
+        if:
+          properties:
+            enabled:
+              type: boolean
+              const: true
+            grafana:
+              properties:
+                externalDataSources:
+                  properties:
+                    enabled:
+                      type: boolean
+                      const: true
+        then:
+          properties:
+            grafana:
+              properties:
+                externalDataSources:
+                  properties:
+                    ips:
+                      $ref: '#/$defs/iplist'
+                    ports:
+                      $ref: '#/$defs/portlist'
+                      default:
+                        - 443
         properties:
           enabled:
             title: Network Policies Monitoring Enabled
@@ -6240,29 +6264,16 @@ properties:
                     default:
                       - 443
               externalDataSources:
-                if:
-                  title: Grafana External Datasources
-                  description: Configure network policy rules to allow Grafana to use external datasources.
-                  type: object
-                  properties:
-                    enabled:
-                      title: Grafana External Datasources Enabled
-                      type: boolean
-                      default: false
-                      const: true
-                then:
-                  title: Grafana External Datasources
-                  description: Configure network policy rules to allow Grafana to use external datasources.
-                  type: object
-                  properties:
-                    enabled:
-                      title: Grafana External Datasources Enabled
-                      default: false
-                      type: boolean
-                    ips:
-                      $ref: '#/$defs/iplist'
-                    ports:
-                      $ref: '#/$defs/portlist'
+                title: Grafana External Datasources
+                description: Configure network policy rules to allow Grafana to use external datasources.
+                type: object
+                properties:
+                  enabled:
+                    title: Grafana External Datasources Enabled
+                    default: false
+                    type: boolean
+                  ips: true
+                  ports: true
       alertmanager:
         title: Network Policies Alertmanager
         description: Configure Alertmanager network policy rules.

@@ -308,25 +308,25 @@ _refute_condition_and_warn() {
 @test "conditional-set-me - multiple conditions: network policies monitoring" {
 
   yq_set sc .networkPolicies.monitoring.enabled 'true'
-  yq_set sc .networkPolicies.monitoring.externalDataSources.enabled 'true'
+  yq_set sc .networkPolicies.monitoring.grafana.externalDataSources.enabled 'true'
   run _apply_normalise_sc
   _assert_condition_and_warn .\"networkPolicies\".\"monitoring\".\"grafana\".\"externalDataSources\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"monitoring\".\"grafana\".\"externalDataSources\".\"ports\"
 
   yq_set sc .networkPolicies.monitoring.enabled 'true'
-  yq_set sc .networkPolicies.monitoring.externalDataSources.enabled 'false'
+  yq_set sc .networkPolicies.monitoring.grafana.externalDataSources.enabled 'false'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"monitoring\".\"grafana\".\"externalDataSources\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"monitoring\".\"grafana\".\"externalDataSources\".\"ports\"
 
   yq_set sc .networkPolicies.monitoring.enabled 'false'
-  yq_set sc .networkPolicies.monitoring.externalDataSources.enabled 'true'
+  yq_set sc .networkPolicies.monitoring.grafana.externalDataSources.enabled 'true'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"monitoring\".\"grafana\".\"externalDataSources\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"monitoring\".\"grafana\".\"externalDataSources\".\"ports\"
 
   yq_set sc .networkPolicies.monitoring.enabled 'false'
-  yq_set sc .networkPolicies.monitoring.externalDataSources.enabled 'false'
+  yq_set sc .networkPolicies.monitoring.grafana.externalDataSources.enabled 'false'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"monitoring\".\"grafana\".\"externalDataSources\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"monitoring\".\"grafana\".\"externalDataSources\".\"ports\"

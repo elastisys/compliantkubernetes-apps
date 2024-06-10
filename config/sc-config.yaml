@@ -1254,9 +1254,9 @@ networkPolicies:
       externalDataSources:
         enabled: false
         ips:
-          - set-me-if-(.networkPolicies.monitoring.enabled and .networkPolicies.monitoring.externalDataSources.enabled)
+          - set-me-if-(.networkPolicies.monitoring.enabled and .networkPolicies.monitoring.grafana.externalDataSources.enabled)
         ports:
-          - set-me-if-(.networkPolicies.monitoring.enabled and .networkPolicies.monitoring.externalDataSources.enabled)
+          - set-me-if-(.networkPolicies.monitoring.enabled and .networkPolicies.monitoring.grafana.externalDataSources.enabled)
       # loading dashboards from grafana website
       externalDashboardProvider:
         ips:
