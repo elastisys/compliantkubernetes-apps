@@ -63,11 +63,11 @@ yq() {
 }
 
 declare runtime
-if command -v docker >/dev/null && docker --version >/dev/null 2>&1 && [[ ! "$(docker --version)" =~ Podman ]]; then
+if command -v docker >/dev/null && docker version >/dev/null 2>&1 && [[ ! "$(docker version)" =~ Podman ]]; then
   runtime="docker"
 elif command -v podman >/dev/null; then
-  runtime="podman"
   export KIND_EXPERIMENTAL_PROVIDER="podman"
+  runtime="podman"
 else
   log.fatal "no container runtime found" >&2
 fi
@@ -331,8 +331,8 @@ create() {
 
   export KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml"
 
-  if [[ -n "${KIND_EXPERIMENTAL_PROVIDER:-}" ]]; then
-    # Ensure DNS resolution works when running in podman
+  if [[ "${runtime}" == "podman" ]]; then
+    log.info "patch coredns config for podman"
     kubectl get configmap -n kube-system coredns -oyaml | sed '/forward/a \           prefer_udp' | kubectl apply -f -
   fi
 

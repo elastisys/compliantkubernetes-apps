@@ -29,6 +29,6 @@ teardown_file() {
   cypress_test "harbor dex auth can login via static dex user"
 }
 
-@test "harbor dex auth promote static dex user to admin" {
-  cypress_test "harbor dex auth promote static dex user to admin"
+@test "harbor dex auth can promote static dex user to admin" {
+  cypress_test "harbor dex auth can promote static dex user to admin"
 }
