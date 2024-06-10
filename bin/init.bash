@@ -205,6 +205,11 @@ update_secrets() {
 
     yq4 eval-all 'select(fi == 0)' "${config_template_path}/config/secrets.yaml" > "${tmpfile}"
 
+    template_file="${config_template_path}/config/providers/${CK8S_CLOUD_PROVIDER}/secrets.yaml"
+    if [[ -a "${template_file}" ]]; then
+        yq4 -i ". *= load(\"${template_file}\")" "${tmpfile}"
+    fi
+
     generate_secrets "${tmpfile}"
 
     if [[ -f "${file}" ]]; then
