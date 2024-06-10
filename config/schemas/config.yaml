@@ -974,6 +974,30 @@ allOf:
                 properties:
                   ips:
                     $ref: '#/$defs/iplist'
+- if:
+    properties:
+      objectStorage:
+        properties:
+          sync:
+            properties:
+              enabled:
+                type: boolean
+                const: true
+          type:
+            type: string
+            const: s3
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          rclone:
+            properties:
+              sync:
+                properties:
+                  objectStorage:
+                    properties:
+                      ips:
+                        $ref: '#/$defs/iplist'
 properties:
   global:
     title: Global options
@@ -6392,6 +6416,15 @@ properties:
           enabled:
             title: Network Policies Rclone Enabled
             type: boolean
+          sync:
+            properties:
+              objectStorage:
+                properties:
+                  ips: true
+                  ports:
+                    $ref: '#/$defs/portlist'
+                    default:
+                      - 443
       velero:
         title: Network Policies Velero
         description: Configure Velero network policy rules.
