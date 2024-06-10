@@ -203,7 +203,7 @@ update_secrets() {
     tmpfile=$(mktemp)
     append_trap "rm ${tmpfile}" EXIT
 
-    yq4 eval-all 'select(fi == 0) * select(fi == 1)' "${config_template_path}/secrets/sc-secrets.yaml" "${config_template_path}/secrets/wc-secrets.yaml" > "${tmpfile}"
+    yq4 eval-all 'select(fi == 0)' "${config_template_path}/config/secrets.yaml" > "${tmpfile}"
 
     generate_secrets "${tmpfile}"
 
