@@ -105,7 +105,7 @@ This can be enabled this in other repositories by editing the file `.vscode/sett
 ```json
 {
   "yaml.schemas": {
-    ".../path/to/ck8s-apps/config/schemas/config.yaml": "config/config/*-config.yaml"
+    ".../path/to/ck8s-apps/config/schemas/config.yaml": "config/*-config.yaml"
   }
 }
 ```
