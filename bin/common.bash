@@ -393,24 +393,24 @@ validate_config() {
     if [[ $1 == "sc" ]]; then
         check_config "${config_template_path}/config/common-config.yaml" \
             "${config_template_path}/config/sc-config.yaml" \
-            "${config_template_path}/secrets/sc-secrets.yaml"
+            "${config_template_path}/config/secrets.yaml"
         yq_merge "${config_template_path}/config/common-config.yaml" \
             "${config_template_path}/config/sc-config.yaml" \
             > "${template_file}"
         validate "${config[config_file_sc]}" "${template_file}"
         schema_validate "${config[config_file_sc]}" "${config_template_path}/schemas/config.yaml"
-        validate "${secrets[secrets_file]}" "${config_template_path}/secrets/sc-secrets.yaml"
+        validate "${secrets[secrets_file]}" "${config_template_path}/config/secrets.yaml"
         schema_validate "${secrets[secrets_file]}" "${config_template_path}/schemas/secrets.yaml"
     elif [[ $1 == "wc" ]]; then
         check_config "${config_template_path}/config/common-config.yaml" \
             "${config_template_path}/config/wc-config.yaml" \
-            "${config_template_path}/secrets/wc-secrets.yaml"
+            "${config_template_path}/config/secrets.yaml"
         yq_merge "${config_template_path}/config/common-config.yaml" \
             "${config_template_path}/config/wc-config.yaml" \
             > "${template_file}"
         validate "${config[config_file_wc]}" "${template_file}"
         schema_validate "${config[config_file_wc]}" "${config_template_path}/schemas/config.yaml"
-        validate "${secrets[secrets_file]}" "${config_template_path}/secrets/wc-secrets.yaml"
+        validate "${secrets[secrets_file]}" "${config_template_path}/config/secrets.yaml"
         schema_validate "${secrets[secrets_file]}" "${config_template_path}/schemas/secrets.yaml"
     else
         log_error "ERROR: usage validate_config <sc|wc>"
