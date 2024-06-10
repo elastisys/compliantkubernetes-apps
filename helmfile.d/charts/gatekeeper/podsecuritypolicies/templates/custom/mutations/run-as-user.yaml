@@ -12,7 +12,7 @@ spec:
       kinds: ["Pod"]
       versions: ["v1"]
   match:
-    {{- dict "namespace" $namespace "labels" $value.podSelectorLabels | include "podsecuritypolicies.renderMatchInclusion" | nindent 4 }}
+    {{- dict "namespace" $namespace "labels" $value.podSelectorLabels "expressions" $value.podSelectorExpressions | include "podsecuritypolicies.renderMatchInclusion" | nindent 4 }}
   location: "spec.containers[name: *].securityContext.runAsUser"
   parameters:
     assign:
@@ -31,7 +31,7 @@ spec:
       kinds: ["Pod"]
       versions: ["v1"]
   match:
-    {{- dict "namespace" $namespace "labels" $value.podSelectorLabels | include "podsecuritypolicies.renderMatchInclusion" | nindent 4 }}
+    {{- dict "namespace" $namespace "labels" $value.podSelectorLabels "expressions" $value.podSelectorExpressions | include "podsecuritypolicies.renderMatchInclusion" | nindent 4 }}
   location: "spec.ephemeralContainers[name: *].securityContext.runAsUser"
   parameters:
     assign:
@@ -50,7 +50,7 @@ spec:
       kinds: ["Pod"]
       versions: ["v1"]
   match:
-    {{- dict "namespace" $namespace "labels" $value.podSelectorLabels | include "podsecuritypolicies.renderMatchInclusion" | nindent 4 }}
+    {{- dict "namespace" $namespace "labels" $value.podSelectorLabels "expressions" $value.podSelectorExpressions | include "podsecuritypolicies.renderMatchInclusion" | nindent 4 }}
   location: "spec.initContainers[name: *].securityContext.runAsUser"
   parameters:
     assign:

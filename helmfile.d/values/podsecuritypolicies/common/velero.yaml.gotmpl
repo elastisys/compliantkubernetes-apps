@@ -16,3 +16,20 @@ constraints:
           rule: RunAsAny
         privileged: true
         allowPrivilegeEscalation: true
+    data-download:
+      podSelectorExpressions:
+        - key: velero.io/data-download
+          operator: Exists
+      allow:
+        runAsUser:
+          rule: RunAsNonRoot
+      mutation:
+        runAsUser: 1000
+    data-upload:
+      podSelectorLabels:
+        velero.io/exposer-pod-group: snapshot-exposer
+      allow:
+        runAsUser:
+          rule: RunAsNonRoot
+      mutation:
+        runAsUser: 1000

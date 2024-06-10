@@ -41,6 +41,12 @@ kinds:
 namespaces:
   - {{ .namespace }}
 labelSelector:
+  {{- if .labels }}
   matchLabels:
     {{- toYaml .labels | nindent 4 }}
+  {{- end }}
+  {{- if .expressions }}
+  matchExpressions:
+    {{- toYaml .expressions | nindent 4 }}
+  {{- end }}
 {{- end }}
