@@ -84,7 +84,7 @@ RUN git clone --depth 1 https://github.com/bats-core/bats-support.git /usr/local
 FROM unit AS main
 
 RUN apt-get update && \
-    apt-get install -y docker.io libasound2t64 libgbm-dev libgtk2.0-0 libgtk-3-0 libnotify-dev libnss3 libxss1 libxtst6 npm xauth xvfb && \
+    apt-get install -y docker.io libasound2t64 libgbm-dev libgtk2.0-0 libgtk-3-0 libnotify-dev libnss3 libxss1 libxtst6 npm skopeo xauth xvfb && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
