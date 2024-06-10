@@ -118,10 +118,10 @@ generate_default_config() {
     append_trap "rm ${new_config}; chmod 444 ${default_config}" EXIT
 
     local -a files
-    files=("${config_template_path}/config/${config_name}" "${config_template_path}/config/flavors/${CK8S_FLAVOR}/${config_name}")
+    files=("${config_template_path}/${config_name}" "${config_template_path}/flavors/${CK8S_FLAVOR}/${config_name}")
 
-    if [[ -f "${config_template_path}/config/providers/${CK8S_CLOUD_PROVIDER}/${config_name}" ]]; then
-        files+=("${config_template_path}/config/providers/${CK8S_CLOUD_PROVIDER}/${config_name}")
+    if [[ -f "${config_template_path}/providers/${CK8S_CLOUD_PROVIDER}/${config_name}" ]]; then
+        files+=("${config_template_path}/providers/${CK8S_CLOUD_PROVIDER}/${config_name}")
     fi
 
     yq_merge "${files[@]}" | envsubst > "${new_config}"
@@ -203,9 +203,9 @@ update_secrets() {
     tmpfile=$(mktemp)
     append_trap "rm ${tmpfile}" EXIT
 
-    yq4 eval-all 'select(fi == 0)' "${config_template_path}/config/secrets.yaml" > "${tmpfile}"
+    yq4 eval-all 'select(fi == 0)' "${config_template_path}/secrets.yaml" > "${tmpfile}"
 
-    template_file="${config_template_path}/config/providers/${CK8S_CLOUD_PROVIDER}/secrets.yaml"
+    template_file="${config_template_path}/providers/${CK8S_CLOUD_PROVIDER}/secrets.yaml"
     if [[ -a "${template_file}" ]]; then
         yq4 -i ". *= load(\"${template_file}\")" "${tmpfile}"
     fi
