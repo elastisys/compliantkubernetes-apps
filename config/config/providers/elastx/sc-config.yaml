@@ -2,3 +2,18 @@ harbor:
   persistence:
     type: objectStorage
     disableRedirect: true
+objectStorage:
+  swift:
+    authVersion: 0
+    authUrl: https://ops.elastx.cloud:5000/v3
+    region: se-sto
+    domainId: default
+    domainName: Default
+    projectDomainId: default
+    projectDomainName: default
+    projectId: set-me
+    projectName: set-me
+    segmentsContainerSuffix: +segments
+thanos:
+  objectStorage:
+    type: swift
