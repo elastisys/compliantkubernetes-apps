@@ -89,10 +89,10 @@ run-regression:
 run-unit-%:
 	../scripts/run-from-container.sh $(container_image):unit make -C tests internal-unit-$*
 run-unit:
-	../scripts/run-from-container.sh $(container_image):unit cypress open --project tests/
+	../scripts/run-from-container.sh $(container_image):unit make -C tests internal-unit
 
 run-cypress-open:
-	../scripts/run-from-container.sh $(container_image):unit
+	FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main  cypress open --project tests/
 
 print-%:
 	@echo $($*)
