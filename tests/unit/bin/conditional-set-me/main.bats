@@ -69,6 +69,7 @@ _refute_condition_and_warn() {
   _refute_condition_and_warn .\"ingressNginx\".\"controller\".\"service\".\"annotations\"
 }
 
+# bats test_tags=conditional_set_me_letsencrypt
 @test "conditional-set-me - singular conditions: letsencrypt" {
 
   yq_set common .issuers.letsencrypt.enabled 'true'
@@ -88,6 +89,7 @@ _refute_condition_and_warn() {
   _refute_condition_and_warn .\"issuers\".\"letsencrypt\".\"staging\".\"email\"
 }
 
+# bats test_tags=conditional_set_me_opsgenie_alerts
 @test "conditional-set-me - singular conditions: opsgenie alerts" {
 
   yq_set common .alerts.opsGenieHeartbeat.enabled 'true'
@@ -99,6 +101,7 @@ _refute_condition_and_warn() {
   _refute_condition_and_warn .\"alerts\".\"opsGenieHeartbeat\".\"name\"
 }
 
+# bats test_tags=conditional_set_me_slack_alerts
 @test "conditional-set-me - singular conditions: slack alerts" {
 
   yq_set common .alerts.alertTo \"slack\"
@@ -110,7 +113,7 @@ _refute_condition_and_warn() {
   _refute_condition_and_warn .\"alerts\".\"slack\".\"channel\"
 }
 
-# bats test_tags=conditional_set_me_netpol_singular
+# bats test_tags=conditional_set_me_netpol_singular_sc
 @test "conditional-set-me - singular conditions: network policies sc" {
 
   yq_set common .trivy.enabled 'true'
@@ -155,6 +158,7 @@ _refute_condition_and_warn() {
 
 }
 
+# bats test_tags=conditional_set_me_netpol_singular_wc
 @test "conditional-set-me - singular conditions: network policies wc" {
 
   yq_set common .trivy.enabled 'true'
@@ -180,6 +184,7 @@ _refute_condition_and_warn() {
   _refute_condition_and_warn .\"networkPolicies\".\"ingressNginx\".\"ingressOverride\".\"ips\"
 }
 
+# bats test_tags=conditional_set_me_netpol_kured
 @test "conditional-set-me - multiple conditions: network policies kured" {
 
   yq_set common .kured.enabled 'true'
@@ -211,6 +216,7 @@ _refute_condition_and_warn() {
   _refute_condition_and_warn .\"networkPolicies\".\"kured\".\"notificationSlack\".\"ips\"
 }
 
+# bats test_tags=conditional_set_me_netpol_falco
 @test "conditional-set-me - multiple conditions: network policies falco" {
 
   yq_set common .falco.enabled 'true'
@@ -274,6 +280,7 @@ _refute_condition_and_warn() {
   _refute_condition_and_warn .\"networkPolicies\".\"externalDns\".\"ips\"
 }
 
+# bats test_tags=conditional_set_me_netpol_harbor
 @test "conditional-set-me - multiple conditions: network policies harbor" {
 
   yq_set sc .harbor.enabled 'true'
@@ -305,6 +312,7 @@ _refute_condition_and_warn() {
   _refute_condition_and_warn .\"networkPolicies\".\"harbor\".\"trivy\".\"ips\"
 }
 
+# bats test_tags=conditional_set_me_netpol_monitoring
 @test "conditional-set-me - multiple conditions: network policies monitoring" {
 
   yq_set sc .networkPolicies.monitoring.enabled 'true'
@@ -332,6 +340,7 @@ _refute_condition_and_warn() {
   _refute_condition_and_warn .\"networkPolicies\".\"monitoring\".\"grafana\".\"externalDataSources\".\"ports\"
 }
 
+# bats test_tags=conditional_set_me_netpol_rclone_s3
 @test "conditional-set-me - multiple conditions: network policies rclone s3" {
 
   yq_set sc .objectStorage.sync.enabled 'true'
