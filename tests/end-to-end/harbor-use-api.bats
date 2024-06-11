@@ -1,14 +1,15 @@
 #!/usr/bin/env bats
 
-# bats file_tags=static,harbor,api
+# bats file_tags=harbor,use-api
 
-# Test using Harbor via the API
+# End-to-end test: Harbor use API
+# Same as integration test without local-cluster setup and with verify tls.
 
 setup_file() {
   export BATS_NO_PARALLELIZE_WITHIN_FILE=true
+  export CK8S_AUTO_APPROVE="true"
 
   load "../bats.lib.bash"
-  load_common "ctr.bash"
   load_common "harbor.bash"
   load_common "yq.bash"
   load_assert
@@ -23,16 +24,15 @@ setup_file() {
   export harbor_robot_secret_path
 }
 
-teardown_file() {
-  harbor.teardown_project
-}
-
 setup() {
   load "../bats.lib.bash"
-  load_common "ctr.bash"
   load_common "harbor.bash"
   load_common "yq.bash"
   load_assert
+}
+
+teardown_file() {
+  harbor.teardown_project
 }
 
 @test "harbor api can authenticate" {
@@ -60,29 +60,29 @@ setup() {
 }
 
 @test "harbor api can authenticate with robot account" {
-  run ctr login "$(ctr.insecure)" "${harbor_endpoint}" --username "${harbor_robot_fullname}" --password-stdin < "${harbor_robot_secret_path}"
+  run skopeo login "${harbor_endpoint}" --username "${harbor_robot_fullname}" --password-stdin < "${harbor_robot_secret_path}"
 
   assert_line --regexp "Login Succeeded"
   assert_success
 }
 
 @test "harbor api can push image with robot account" {
-  ctr pull docker.io/library/busybox
-  ctr tag docker.io/library/busybox "${harbor_endpoint}/${harbor_project}/busybox:latest"
-  ctr push "$(ctr.insecure)" "${harbor_endpoint}/${harbor_project}/busybox:latest"
+  run skopeo sync --src docker --dest docker docker.io/library/busybox:stable "${harbor_endpoint}/${harbor_project}"
+  assert_success
 }
 
 @test "harbor api can pull image with robot account" {
-  ctr rmi docker.io/library/busybox
-  ctr rmi "${harbor_endpoint}/${harbor_project}/busybox:latest"
-  ctr pull "$(ctr.insecure)" "${harbor_endpoint}/${harbor_project}/busybox:latest"
-  ctr tag "${harbor_endpoint}/${harbor_project}/busybox:latest" "ctr.io/library/busybox"
-  ctr rmi "${harbor_endpoint}/${harbor_project}/busybox:latest"
+  local dest
+  dest="$(mktemp -d)"
+
+  run skopeo sync --src docker --dest dir "${harbor_endpoint}/${harbor_project}/busybox:stable" "${dest}"
+  assert_success
+
+  rm -r "${dest}"
 }
 
 @test "harbor api can scan image with robot account" {
   run harbor.create_artefact_vulnerability_scan "${harbor_project}" "busybox" "latest"
-
   refute_output
   assert_success
 
@@ -90,7 +90,6 @@ setup() {
     echo "${each} try" >&2
 
     run harbor.get_artefact_vulnerabilities "${harbor_project}" "busybox" "latest"
-
     assert_success
 
     if [[ "${output}" != "{}" ]]; then
@@ -104,14 +103,14 @@ setup() {
 }
 
 @test "harbor api can unauthenticate with robot account" {
-  ctr logout "${harbor_endpoint}"
+  run skopeo logout "${harbor_endpoint}"
+  assert_success
 }
 
 @test "harbor api can delete robot account" {
   read -r harbor_robot_id < "${harbor_robot_id_path}"
 
   run harbor.delete_robot "${harbor_robot_id}"
-
   refute_output
   assert_success
 
@@ -120,14 +119,12 @@ setup() {
 
 @test "harbor api can delete repository" {
   run harbor.delete_repository "${harbor_project}" "busybox"
-
   refute_output
   assert_success
 }
 
 @test "harbor api can delete project" {
   run harbor.delete_project "${harbor_project}"
-
   refute_output
   assert_success
 }

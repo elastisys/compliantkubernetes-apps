@@ -1,44 +1,37 @@
+// bats file_tags=harbor,use-ui
+// same as integration test without local-cluster setup
+
+import "../../common/cypress/harbor.js"
+
 const opt = { matchCase: false }
 const slug = "end-to-end-tests-harbor-manage-resources"
 
-function harborDexStaticLogin(cy, ingress) {
-  cy.session([ingress], () => {
-    cy.visit(`https://${ingress}`)
-
-    cy.dexStaticLogin()
-
-    cy.url().then(url => {
-      if (url.includes("oidc-onboard")) {
-        cy.contains("label", "Username")
-          .siblings()
-          .get("input")
-          .clear()
-          .type("dex-static-user")
-
-        cy.contains("SAVE")
-          .click()
-      }
-    })
-
-    cy.contains("Projects")
-      .should("exist")
-  })
-
-  cy.visit(`https://${ingress}`)
-
-  cy.contains("Projects")
-    .should("exist")
-}
-
-describe("harbor manage resources", function() {
+describe("harbor ui", function() {
   before(function() {
     cy.yq("sc", '.harbor.subdomain + "." + .global.baseDomain')
       .should("not.be.empty")
       .as('ingress')
+      .then(() => {
+        cy.harborStaticDexLogin(this.ingress)
+
+        cy.contains("dex-static-user", opt)
+          .click()
+
+        cy.contains("log out", opt)
+          .click()
+
+        cy.harborAdminLogin(this.ingress)
+
+        cy.harborStaticDexPromote(this.ingress)
+      })
   })
 
   beforeEach(function() {
-    harborDexStaticLogin(cy, this.ingress)
+    cy.session([this.ingress], () => {
+      cy.harborStaticDexLogin(this.ingress)
+    })
+
+    cy.visit(`https://${this.ingress}`)
 
     cy.viewport(1280, 720)
   })

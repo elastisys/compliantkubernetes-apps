@@ -5,7 +5,7 @@
 import "../../common/cypress/harbor.js"
 
 const opt = { matchCase: false }
-const slug = "end-to-end-tests-harbor-manage-resources"
+const slug = "integration-tests-harbor-manage-resources"
 
 describe("harbor ui", function() {
   before(function() {
