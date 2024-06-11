@@ -157,6 +157,9 @@ operator:
   # -- webhookBroadcastTimeout the flag to set timeout for webhook requests if webhookBroadcastURL is enabled
   webhookBroadcastTimeout: 30s
 
+  # -- webhookBroadcastCustomHeaders the flag to set webhook endpoint sent with custom defined headers if webhookBroadcastURL is enabled
+  webhookBroadcastCustomHeaders: ""
+
   # -- webhookSendDeletedReports the flag to enable sending deleted reports if webhookBroadcastURL is enabled
   webhookSendDeletedReports: false
 
@@ -165,6 +168,15 @@ operator:
 
   # -- mergeRbacFindingWithConfigAudit the flag to enable merging rbac finding with config-audit report
   mergeRbacFindingWithConfigAudit: false
+
+  # -- httpProxy is the HTTP proxy used by Trivy operator to download the default policies from GitHub.
+  httpProxy: ~
+
+  # -- httpsProxy is the HTTPS proxy used by Trivy operator to download the default policies from GitHub.
+  httpsProxy: ~
+
+  # -- noProxy is a comma separated list of IPs and domain names that are not subject to proxy settings.
+  noProxy: ~
 
   # -- vaulesFromConfigMap name of a ConfigMap to apply OPERATOR_* environment variables. Will override Helm values.
   valuesFromConfigMap: ""
@@ -259,8 +271,8 @@ trivyOperator:
   # -- scanJobAutomountServiceAccountToken the flag to enable automount for service account token on scan job
   scanJobAutomountServiceAccountToken: false
 
-  # -- scanJobAnnotations comma-separated representation of the annotations which the user wants the scanner pods to be
-  # annotated with. Example: `foo=bar,env=stage` will annotate the scanner pods with the annotations `foo: bar` and `env: stage`
+  # -- scanJobAnnotations comma-separated representation of the annotations which the user wants the scanner jobs and pods to be
+  # annotated with. Example: `foo=bar,env=stage` will annotate the scanner jobs and pods with the annotations `foo: bar` and `env: stage`
   scanJobAnnotations: ""
 
   # -- scanJobPodTemplateLabels comma-separated representation of the labels which the user wants the scanner pods to be
@@ -314,6 +326,10 @@ trivyOperator:
   # See https://github.com/aquasecurity/trivy-operator/blob/main/docs/tutorials/writing-custom-configuration-audit-policies.md for more details.
   policiesConfig: ""
 
+  # -- excludeImages is comma separated glob patterns for excluding images from scanning.
+  # Example: pattern: `k8s.gcr.io/*/*` will exclude image: `k8s.gcr.io/coredns/coredns:v1.8.0`.
+  excludeImages: ""
+
 trivy:
   # -- createConfig indicates whether to create config objects
   createConfig: true
@@ -323,7 +339,7 @@ trivy:
     # -- repository of the Trivy image
     repository: aquasecurity/trivy
     # -- tag version of the Trivy image
-    tag: 0.50.2
+    tag: 0.52.0
     # -- imagePullSecret is the secret name to be used when pulling trivy image from private registries example : reg-secret
     # It is the user responsibility to create the secret for the private registry in `trivy-operator` namespace
     imagePullSecret: ~
@@ -519,9 +535,13 @@ trivy:
   #
   dbRepositoryInsecure: "false"
 
-  # -- The Flag to enable the usage of builtin rego policies by default
+  # -- The Flag to enable the usage of builtin rego policies by default, these policies are downloaded by default from ghcr.io/aquasecurity/trivy-checks
   #
   useBuiltinRegoPolicies: "true"
+
+  # -- To enable the usage of embedded rego policies, set the flag useEmbeddedRegoPolicies. This should serve as a fallback for air-gapped environments.
+  # When useEmbeddedRegoPolicies is set to true, useBuiltinRegoPolicies should be set to false.
+  useEmbeddedRegoPolicies: "false"
 
   # -- The Flag is the list of supported kinds separated by comma delimiter to be scanned by the config audit scanner
   #
@@ -658,6 +678,8 @@ policiesBundle:
   # Overrides policiesBundle.registryUser, policiesBundle.registryPassword values.
   # Note: The secret has to be named "trivy-operator".
   existingSecret: false
+  # -- insecure is the flag to enable insecure connection to the policy bundle registry
+  insecure: false
 
 
 nodeCollector:
@@ -668,7 +690,7 @@ nodeCollector:
   # -- repository of the node-collector image
   repository: aquasecurity/node-collector
   # -- tag version of the node-collector image
-  tag: 0.1.4
+  tag: 0.2.1
   # -- imagePullSecret is the secret name to be used when pulling node-collector image from private registries example : reg-secret
   # It is the user responsibility to create the secret for the private registry in `trivy-operator` namespace
   imagePullSecret: ~
