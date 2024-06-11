@@ -706,7 +706,7 @@ thanos:
       enabled: true
 
   objectStorage:
-    # Available options "s3" or "swift", defaults " when empty
+    # Available options "s3" or "swift", defaults to "objectStorage.type" when empty
     # Configure the storage credentials in the global "objectStorage"
     type: ""
 
