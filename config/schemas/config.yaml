@@ -6463,6 +6463,13 @@ properties:
                     $ref: '#/$defs/portlist'
                     default:
                       - 443
+              objectStorageSwift:
+                properties:
+                  ips: true
+                  ports:
+                    $ref: '#/$defs/portlist'
+                    default:
+                      - 5000
       velero:
         title: Network Policies Velero
         description: Configure Velero network policy rules.
