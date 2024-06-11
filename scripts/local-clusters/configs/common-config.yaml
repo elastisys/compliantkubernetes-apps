@@ -17,11 +17,22 @@ objectStorage:
     forcePathStyle: true
     accessKey: minioaccesskey
     secretKey: miniosecretkey
+calicoAccountant:
+  backend: nftables
+clusterApi:
+  enabled: false
+  monitoring:
+    enabled: false
+kubeStateMetrics:
+  clusterAPIMetrics:
+    enabled: false
 opa:
   imageRegistry:
     URL:
       - harbor.${domain}
       - quay.io/jetstack/cert-manager-acmesolver
+  rejectLoadBalancerService:
+    enabled: false
 ingressNginx:
   controller:
     service:
@@ -82,6 +93,9 @@ networkPolicies:
     externalDns:
       ips:
         - 0.0.0.0/0
+    serviceIp:
+      ips:
+        - 10.96.0.10/32
   falco:
     plugins:
       ips:

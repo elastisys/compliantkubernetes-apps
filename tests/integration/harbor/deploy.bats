@@ -8,19 +8,8 @@ setup_file() {
   export CK8S_AUTO_APPROVE="true"
 
   load "../../bats.lib.bash"
-  load_common "local-cluster.bash"
 
-  local_cluster.setup dev integration.dev-ck8s.com
-  local_cluster.create single-node-cache
-
-  local_cluster.configure_selfsigned
-
-  ck8s ops helmfile sc apply --include-transitive-needs --output simple \
-    -lapp=cert-manager \
-    -lapp=dex \
-    -lapp=harbor \
-    -lapp=ingress-nginx \
-    -lapp=node-local-dns
+  auto_setup sc app=cert-manager app=dex app=harbor app=ingress-nginx app=node-local-dns
 }
 
 setup() {
@@ -31,10 +20,8 @@ setup() {
 
 teardown_file() {
   load "../../bats.lib.bash"
-  load_common "local-cluster.bash"
 
-  local_cluster.delete
-  local_cluster.teardown
+  auto_teardown
 }
 
 @test "harbor has been deployed" {
