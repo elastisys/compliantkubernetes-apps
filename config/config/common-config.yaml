@@ -920,6 +920,8 @@ trivy:
     interval: 5m
   tolerations: []
   affinity: {}
+  nodeCollector:
+    tolerations: []
 
   # configurations for an offline / air-gapped environment
   # ref: https://github.com/aquasecurity/trivy-operator/tree/main/deploy/helm#values
