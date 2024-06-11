@@ -913,7 +913,7 @@ trivy:
       memory: 128Mi
     limits:
       cpu: 500m  # needs more memory at startup
-      memory: 600Mi  # needs more memory at startup
+      memory: 1000Mi  # needs more memory at startup
   serviceMonitor:
   # enabled determines whether a serviceMonitor should be deployed
     enabled: true
