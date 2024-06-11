@@ -112,6 +112,7 @@ grafana.ini:
   auth.generic_oauth:
     name: dex
     enabled: {{ .Values.grafana.ops.oidc.enabled }}
+    use_pkce: true
     client_id: grafana-ops
     client_secret: $__env{opsClientSecret}
     scopes: {{ .Values.grafana.ops.oidc.scopes }}
