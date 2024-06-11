@@ -117,6 +117,9 @@ fi
 # Prepare container runtime socket
 if [[ "${FORWARD_RUNTIME:-false}" == "true" ]]; then
   if [[ "${runtime}" == "docker" ]]; then
+    declare docker_gid
+    docker_gid="$(getent group docker | awk -F: '{ print $3 }')"
+    args+=("--group-add" "${docker_gid}")
     args+=("--mount" "type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock")
   else
     args+=("--env" "KIND_EXPERIMENTAL_PROVIDER=podman")
