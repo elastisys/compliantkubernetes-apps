@@ -1,6 +1,6 @@
 # trivy-operator
 
-![Version: 0.22.1](https://img.shields.io/badge/Version-0.22.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.20.1](https://img.shields.io/badge/AppVersion-0.20.1-informational?style=flat-square)
+![Version: 0.23.3](https://img.shields.io/badge/Version-0.23.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.21.3](https://img.shields.io/badge/AppVersion-0.21.3-informational?style=flat-square)
 
 Keeps security report resources updated
 
@@ -31,7 +31,7 @@ Keeps security report resources updated
 | nodeCollector.imagePullSecret | string | `nil` | imagePullSecret is the secret name to be used when pulling node-collector image from private registries example : reg-secret It is the user responsibility to create the secret for the private registry in `trivy-operator` namespace |
 | nodeCollector.registry | string | `"ghcr.io"` | registry of the node-collector image |
 | nodeCollector.repository | string | `"aquasecurity/node-collector"` | repository of the node-collector image |
-| nodeCollector.tag | string | `"0.1.4"` | tag version of the node-collector image |
+| nodeCollector.tag | string | `"0.2.1"` | tag version of the node-collector image |
 | nodeCollector.tolerations | list | `[]` | tolerations to be applied to the node-collector so that they can run on nodes with matching taints |
 | nodeCollector.useNodeSelector | bool | `true` | useNodeSelector determine if to use nodeSelector (by auto detecting node name) with node-collector scan job |
 | nodeCollector.volumeMounts | list | `[{"mountPath":"/var/lib/etcd","name":"var-lib-etcd","readOnly":true},{"mountPath":"/var/lib/kubelet","name":"var-lib-kubelet","readOnly":true},{"mountPath":"/var/lib/kube-scheduler","name":"var-lib-kube-scheduler","readOnly":true},{"mountPath":"/var/lib/kube-controller-manager","name":"var-lib-kube-controller-manager","readOnly":true},{"mountPath":"/etc/systemd","name":"etc-systemd","readOnly":true},{"mountPath":"/lib/systemd/","name":"lib-systemd","readOnly":true},{"mountPath":"/etc/kubernetes","name":"etc-kubernetes","readOnly":true},{"mountPath":"/etc/cni/net.d/","name":"etc-cni-netd","readOnly":true}]` | node-collector pod volume mounts definition for collecting config files information |
@@ -50,6 +50,8 @@ Keeps security report resources updated
 | operator.configAuditScannerScanOnlyCurrentRevisions | bool | `true` | configAuditScannerScanOnlyCurrentRevisions the flag to only create config audit scans on the current revision of a deployment. |
 | operator.controllerCacheSyncTimeout | string | `"5m"` | controllerCacheSyncTimeout the duration to wait for controller resources cache sync (default: 5m). |
 | operator.exposedSecretScannerEnabled | bool | `true` | exposedSecretScannerEnabled the flag to enable exposed secret scanner |
+| operator.httpProxy | string | `nil` | httpProxy is the HTTP proxy used by Trivy operator to download the default policies from GitHub. |
+| operator.httpsProxy | string | `nil` | httpsProxy is the HTTPS proxy used by Trivy operator to download the default policies from GitHub. |
 | operator.infraAssessmentScannerEnabled | bool | `true` | infraAssessmentScannerEnabled the flag to enable infra assessment scanner |
 | operator.labels | object | `{}` | additional labels for the operator deployment |
 | operator.leaderElectionId | string | `"trivyoperator-lock"` | leaderElectionId determines the name of the resource that leader election will use for holding the leader lock. |
@@ -64,6 +66,7 @@ Keeps security report resources updated
 | operator.metricsRbacAssessmentInfo | bool | `false` | MetricsRbacAssessmentInfo the flag to enable metrics about Rbac Assessment be aware of metrics cardinality is significantly increased with this feature enabled. |
 | operator.metricsVulnIdEnabled | bool | `false` | metricsVulnIdEnabled the flag to enable metrics about cve vulns id be aware of metrics cardinality is significantly increased with this feature enabled. |
 | operator.namespace | string | `""` | namespace to install the operator, defaults to the .Release.Namespace |
+| operator.noProxy | string | `nil` | noProxy is a comma separated list of IPs and domain names that are not subject to proxy settings. |
 | operator.podLabels | object | `{}` | additional labels for the operator pod |
 | operator.privateRegistryScanSecretsNames | object | `{}` | privateRegistryScanSecretsNames is map of namespace:secrets, secrets are comma seperated which can be used to authenticate in private registries in case if there no imagePullSecrets provided example : {"mynamespace":"mySecrets,anotherSecret"} |
 | operator.rbacAssessmentScannerEnabled | bool | `true` | rbacAssessmentScannerEnabled the flag to enable rbac assessment scanner |
@@ -83,12 +86,14 @@ Keeps security report resources updated
 | operator.valuesFromSecret | string | `""` | valuesFromSecret name of a Secret to apply OPERATOR_* environment variables. Will override Helm AND ConfigMap values. |
 | operator.vulnerabilityScannerEnabled | bool | `true` | the flag to enable vulnerability scanner |
 | operator.vulnerabilityScannerScanOnlyCurrentRevisions | bool | `true` | vulnerabilityScannerScanOnlyCurrentRevisions the flag to only create vulnerability scans on the current revision of a deployment. |
+| operator.webhookBroadcastCustomHeaders | string | `""` | webhookBroadcastCustomHeaders the flag to set webhook endpoint sent with custom defined headers if webhookBroadcastURL is enabled |
 | operator.webhookBroadcastTimeout | string | `"30s"` | webhookBroadcastTimeout the flag to set timeout for webhook requests if webhookBroadcastURL is enabled |
 | operator.webhookBroadcastURL | string | `""` | webhookBroadcastURL the flag to set reports should be sent to a webhook endpoint. "" means that the webhookBroadcastURL feature is disabled |
 | operator.webhookSendDeletedReports | bool | `false` | webhookSendDeletedReports the flag to enable sending deleted reports if webhookBroadcastURL is enabled |
 | podAnnotations | object | `{}` | podAnnotations annotations added to the operator's pod |
 | podSecurityContext | object | `{}` |  |
 | policiesBundle.existingSecret | bool | `false` | existingSecret if a secret containing registry credentials that have been created outside the chart (e.g external-secrets, sops, etc...). Keys must be at least one of the following: policies.bundle.oci.user, policies.bundle.oci.password Overrides policiesBundle.registryUser, policiesBundle.registryPassword values. Note: The secret has to be named "trivy-operator". |
+| policiesBundle.insecure | bool | `false` | insecure is the flag to enable insecure connection to the policy bundle registry |
 | policiesBundle.registry | string | `"ghcr.io"` | registry of the policies bundle |
 | policiesBundle.registryPassword | string | `nil` | registryPassword is the password for the registry |
 | policiesBundle.registryUser | string | `nil` | registryUser is the user for the registry |
@@ -138,7 +143,7 @@ Keeps security report resources updated
 | trivy.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy is the imge pull policy used for trivy image , valid values are (Always, Never, IfNotPresent) |
 | trivy.image.registry | string | `"ghcr.io"` | registry of the Trivy image |
 | trivy.image.repository | string | `"aquasecurity/trivy"` | repository of the Trivy image |
-| trivy.image.tag | string | `"0.50.2"` | tag version of the Trivy image |
+| trivy.image.tag | string | `"0.52.0"` | tag version of the Trivy image |
 | trivy.imageScanCacheDir | string | `"/tmp/trivy/.cache"` | imageScanCacheDir the flag to set custom path for trivy image scan `cache-dir` parameter. Only applicable in image scan mode. |
 | trivy.includeDevDeps | bool | `false` | includeDevDeps include development dependencies in the report (supported: npm, yarn) (default: false) note: this flag is only applicable when trivy.command is set to filesystem |
 | trivy.insecureRegistries | object | `{}` | The registry to which insecure connections are allowed. There can be multiple registries with different keys. |
@@ -176,16 +181,18 @@ Keeps security report resources updated
 | trivy.storageSize | string | `"5Gi"` | storageSize is the size of the trivy server PVC |
 | trivy.supportedConfigAuditKinds | string | `"Workload,Service,Role,ClusterRole,NetworkPolicy,Ingress,LimitRange,ResourceQuota"` | The Flag is the list of supported kinds separated by comma delimiter to be scanned by the config audit scanner  |
 | trivy.timeout | string | `"5m0s"` | timeout is the duration to wait for scan completion. |
-| trivy.useBuiltinRegoPolicies | string | `"true"` | The Flag to enable the usage of builtin rego policies by default  |
+| trivy.useBuiltinRegoPolicies | string | `"true"` | The Flag to enable the usage of builtin rego policies by default, these policies are downloaded by default from ghcr.io/aquasecurity/trivy-checks  |
+| trivy.useEmbeddedRegoPolicies | string | `"false"` | To enable the usage of embedded rego policies, set the flag useEmbeddedRegoPolicies. This should serve as a fallback for air-gapped environments. When useEmbeddedRegoPolicies is set to true, useBuiltinRegoPolicies should be set to false. |
 | trivy.vulnType | string | `nil` | vulnType can be used to tell Trivy to filter vulnerabilities by a pkg-type (library, os) |
 | trivyOperator.additionalReportLabels | string | `""` | additionalReportLabels comma-separated representation of the labels which the user wants the scanner pods to be labeled with. Example: `foo=bar,env=stage` will labeled the reports with the labels `foo: bar` and `env: stage` |
 | trivyOperator.configAuditReportsPlugin | string | `"Trivy"` | configAuditReportsPlugin the name of the plugin that generates config audit reports. |
+| trivyOperator.excludeImages | string | `""` | excludeImages is comma separated glob patterns for excluding images from scanning. Example: pattern: `k8s.gcr.io/*/*` will exclude image: `k8s.gcr.io/coredns/coredns:v1.8.0`. |
 | trivyOperator.metricsResourceLabelsPrefix | string | `"k8s_label_"` | metricsResourceLabelsPrefix Prefix that will be prepended to the labels names indicated in `reportResourceLabels` when including them in the Prometheus metrics |
 | trivyOperator.policiesConfig | string | `""` | policiesConfig Custom Rego Policies to be used by the config audit scanner See https://github.com/aquasecurity/trivy-operator/blob/main/docs/tutorials/writing-custom-configuration-audit-policies.md for more details. |
 | trivyOperator.reportRecordFailedChecksOnly | bool | `true` | reportRecordFailedChecksOnly flag is to record only failed checks on misconfiguration reports (config-audit and rbac assessment) |
 | trivyOperator.reportResourceLabels | string | `""` | reportResourceLabels comma-separated scanned resource labels which the user wants to include in the Prometheus metrics report. Example: `owner,app` |
 | trivyOperator.scanJobAffinity | list | `[]` | scanJobAffinity affinity to be applied to the scanner pods and node-collector |
-| trivyOperator.scanJobAnnotations | string | `""` | scanJobAnnotations comma-separated representation of the annotations which the user wants the scanner pods to be annotated with. Example: `foo=bar,env=stage` will annotate the scanner pods with the annotations `foo: bar` and `env: stage` |
+| trivyOperator.scanJobAnnotations | string | `""` | scanJobAnnotations comma-separated representation of the annotations which the user wants the scanner jobs and pods to be annotated with. Example: `foo=bar,env=stage` will annotate the scanner jobs and pods with the annotations `foo: bar` and `env: stage` |
 | trivyOperator.scanJobAutomountServiceAccountToken | bool | `false` | scanJobAutomountServiceAccountToken the flag to enable automount for service account token on scan job |
 | trivyOperator.scanJobCompressLogs | bool | `true` | scanJobCompressLogs control whether scanjob output should be compressed or plain |
 | trivyOperator.scanJobCustomVolumes | list | `[]` | scanJobCustomVolumes add custom volumes to the scan job |
