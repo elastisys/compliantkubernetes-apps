@@ -706,7 +706,7 @@ thanos:
       enabled: true
 
   objectStorage:
-    # Available options "s3" or "swift", defaults to "objectStorage.type" when empty
+    # Available options "s3" or "swift", defaults " when empty
     # Configure the storage credentials in the global "objectStorage"
     type: ""
 
@@ -1288,7 +1288,7 @@ networkPolicies:
           - 443
       objectStorageSwift:
         ips:
-          - set-me-if-(.objectStorage.sync.enabled and (.objectStorage.type == "swift" or .harbor.persistence.type == "swift" or .thanos.objectStorage.type == "swift"))
+          - set-me-if-(.objectStorage.sync.enabled and (.harbor.persistence.type == "swift" or .thanos.objectStorage.type == "swift"))
         ports:
           - 5000
       secondaryUrl:

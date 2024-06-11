@@ -998,6 +998,44 @@ allOf:
                     properties:
                       ips:
                         $ref: '#/$defs/iplist'
+- if:
+    properties:
+      objectStorage:
+        properties:
+          sync:
+            properties:
+              enabled:
+                type: boolean
+                const: true
+    anyOf:
+    - properties:
+        harbor:
+          properties:
+            persistence:
+              properties:
+                type:
+                  type: string
+                  const: swift
+    - properties:
+        thanos:
+          properties:
+            objectStorage:
+              properties:
+                type:
+                  type: string
+                  const: swift
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          rclone:
+            properties:
+              sync:
+                properties:
+                  objectStorageSwift:
+                    properties:
+                      ips:
+                        $ref: '#/$defs/iplist'
 properties:
   global:
     title: Global options
