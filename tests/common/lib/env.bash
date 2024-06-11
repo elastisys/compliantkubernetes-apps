@@ -59,6 +59,8 @@ env.init() {
 
   yq_set 'sc' '.opensearch.extraRoleMappings' '[]'
 
+  yq_set 'sc' '.alerts.opsGenieHeartbeat.name' '"example"'
+
   if ! [[ "$*" =~ --skip-network-policies ]]; then
     yq_set 'common' '.networkPolicies.global.objectStorage.ips' '["0.0.0.0/0"]'
     yq_set 'common' '.networkPolicies.global.objectStorage.ports' '[443]'
@@ -90,6 +92,8 @@ env.init() {
 
     yq_set 'sc' '.networkPolicies.monitoring.grafana.externalDashboardProvider.ips' '["0.0.0.0/0"]'
     yq_set 'sc' '.networkPolicies.opensearch.plugins.ips' '["0.0.0.0/0"]'
+
+    yq_set 'common' '.networkPolicies.kubeSystem.openstack.ips' '["0.0.0.0/0"]'
   fi
 
   yq_set 'wc' '.opa.imageRegistry.URL' '["harbor.ck8s.example.com"]'
