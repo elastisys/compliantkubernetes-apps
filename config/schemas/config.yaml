@@ -1065,6 +1065,28 @@ allOf:
                     properties:
                       ips:
                         $ref: '#/$defs/iplist'
+- if:
+    properties:
+      networkPolicies:
+        properties:
+          ingressNginx:
+            properties:
+              ingressOverride:
+                properties:
+                  enabled:
+                    type: boolean
+                    const: true
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          ingressNginx:
+            properties:
+              ingressOverride:
+                properties:
+                  ips:
+                    title: Network Policies Ingress Override IPs
+                    $ref: '#/$defs/iplist'
 properties:
   global:
     title: Global options
@@ -6059,12 +6081,7 @@ properties:
                 title: Network Policies Ingress Override Enabled
                 type: boolean
                 default: false
-              ips:
-                title: Network Policies Ingress Override IPs
-                oneOf:
-                  - $ref: '#/$defs/iplist'
-                  - type: string
-                    const: set-me-if-enabled
+              ips: true
       certManager:
         title: Network Policies cert-manager
         description: Configure cert-manager network policy rules.
