@@ -83,3 +83,6 @@ serviceMonitor:
   # enabled determines whether a serviceMonitor should be deployed
   enabled: {{ .Values.trivy.serviceMonitor.enabled }}
   interval: {{ .Values.trivy.serviceMonitor.interval }}
+
+nodeCollector:
+  tolerations: {{- toYaml .Values.trivy.nodeCollector.tolerations | nindent 4 }}

@@ -3259,6 +3259,14 @@ properties:
             default: true
           interval:
             $ref: '#/$defs/timeRange'
+      nodeCollector:
+        title: Trivy Node Collector
+        description: Configure the node collector created by Trivy.
+        type: object
+        additionalProperties: false
+        properties:
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
       resources:
         $ref: '#/$defs/kubernetesResourceRequirements'
       tolerations:
