@@ -1036,6 +1036,35 @@ allOf:
                     properties:
                       ips:
                         $ref: '#/$defs/iplist'
+- if:
+    properties:
+      objectStorage:
+        properties:
+          sync:
+            properties:
+              secondaryUrl:
+                type: string
+                format: uri
+    not:
+      properties:
+        objectStorage:
+          properties:
+            sync:
+              properties:
+                secondaryUrl:
+                  const: ""
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          rclone:
+            properties:
+              sync:
+                properties:
+                  secondaryUrl:
+                    properties:
+                      ips:
+                        $ref: '#/$defs/iplist'
 properties:
   global:
     title: Global options
@@ -2194,6 +2223,10 @@ properties:
               - gcs
               - s3
               - swift
+          secondaryUrl:
+            title: Rclone Sync Secondary URL
+            type: string
+            format: uri
           azure:
             $ref: '#/properties/objectStorage/properties/azure'
           s3:
@@ -6470,6 +6503,13 @@ properties:
                     $ref: '#/$defs/portlist'
                     default:
                       - 5000
+              secondaryUrl:
+                properties:
+                  ips: true
+                  ports:
+                    $ref: '#/$defs/portlist'
+                    default:
+                      - 443
       velero:
         title: Network Policies Velero
         description: Configure Velero network policy rules.
