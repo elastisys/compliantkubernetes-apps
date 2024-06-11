@@ -6152,6 +6152,17 @@ properties:
         description: Configure Dex network policy rules.
         type: object
         additionalProperties: false
+        if:
+          properties:
+            enabled:
+              type: boolean
+              const: true
+        then:
+          properties:
+            connectors:
+              properties:
+                ips:
+                  $ref: '#/$defs/iplist'
         properties:
           enabled:
             title: Network Policies Dex Enabled
@@ -6163,8 +6174,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
               ports:
                 $ref: '#/$defs/portlist'
                 default:
