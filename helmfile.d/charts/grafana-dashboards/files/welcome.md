@@ -4,14 +4,12 @@
 
 Here you can find the most relevant features and changes for the last couple of releases of Compliant Kubernetes
 
+- Trivy Operator was upgraded to v0.20.1. **[v0.39]**
+- Velero was upgraded to v1.13.0. **[v0.39]**
+- Pods can now be granted access to the API of Prometheus from Application Developer namespaces per request. **[v0.39]**
 - Thanos was upgraded to v0.34.1. **[v0.38]**
 - Gatekeeper was upgraded to v3.15.1. **[v0.38]**
 - A new Gatekeeper constraint was added. It will warn if the user tries to deploy a Deployment or StatefulSet with less than 2 replicas. **[v0.38]**
-- Opensearch and Opensearch Dashboards were upgraded to v2.12. **[v0.37]**
-- Grafana was upgraded to v10.4. **[v0.37]**
-- Falco was upgraded to v0.37.1. **[v0.37]**
-- A new capacity management Grafana dashboard is now available. This will give better visibility over resource usage per node groups. **[v0.37]**
-- We recommend using the [ingressClassName](https://cert-manager.io/docs/configuration/acme/http01/#ingressclassname) field over the `class` field for cert-manager issuers. **[v0.37]**
 
 ## Public docs
 
