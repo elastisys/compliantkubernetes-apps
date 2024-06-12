@@ -6515,8 +6515,15 @@ properties:
             title: Network Policies Rclone Enabled
             type: boolean
           sync:
+            title: Network Policies Rclone Sync
+            description: Configure network policy rules to allow rclone to sync.
+            type: object
+            additionalProperties: false
             properties:
               objectStorage:
+                title: Network Policies Rclone Sync Object Storage
+                description: Configure network policy rules to allow rclone to sync object storage.
+                type: object
                 properties:
                   ips: true
                   ports:
@@ -6524,6 +6531,9 @@ properties:
                     default:
                       - 443
               objectStorageSwift:
+                title: Network Policies Rclone Sync Object Storage
+                description: Configure network policy rules to allow rclone to sync object storage with Swift.
+                type: object
                 properties:
                   ips: true
                   ports:
@@ -6531,6 +6541,9 @@ properties:
                     default:
                       - 5000
               secondaryUrl:
+                title: Network Policies Rclone Sync Object Storage
+                description: Configure network policy rules to allow rclone to sync with a secondary URL.
+                type: object
                 properties:
                   ips: true
                   ports:
