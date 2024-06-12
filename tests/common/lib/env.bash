@@ -93,7 +93,9 @@ env.init() {
     yq_set 'sc' '.networkPolicies.monitoring.grafana.externalDashboardProvider.ips' '["0.0.0.0/0"]'
     yq_set 'sc' '.networkPolicies.opensearch.plugins.ips' '["0.0.0.0/0"]'
 
-    yq_set 'common' '.networkPolicies.kubeSystem.openstack.ips' '["0.0.0.0/0"]'
+    if [[ "$(yq_dig sc .networkPolicies.kubeSystem.openstack.enabled)" == "true" ]]; then
+      yq_set 'common' '.networkPolicies.kubeSystem.openstack.ips' '["0.0.0.0/0"]'
+    fi
   fi
 
   yq_set 'wc' '.opa.imageRegistry.URL' '["harbor.ck8s.example.com"]'
