@@ -44,7 +44,7 @@ jobs:
 
   integration:
     runs-on: ubuntu-latest
-    # needs: [ unit-static ]
+    needs: [ unit-static ]
     if: github.ref_name == 'main' || contains(github.event.pull_request.labels.*.name, 'test/integration')
     env:
       CK8S_AUTO_APPROVE: true

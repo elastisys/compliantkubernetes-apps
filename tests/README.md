@@ -1,7 +1,8 @@
 # Apps Tests
 
 The test suite is implemented using [`bats`](https://github.com/bats-core/bats-core) and [`cypress`](https://github.com/cypress-io/cypress), with unit, regression, integration, and end-to-end tests under their own respective directory.
-Tests implemented with `cypress` can and will be integrated into the `bats` test suite using generators.
+
+Generators are employed to generate `bats` tests from `cypress` and `gotmpl` tests to integrate it into the rest of test suites.
 
 The test harness is implemented to be run in a container using either rootful `docker` or rootless `podman`.
 
@@ -11,7 +12,8 @@ The test harness is implemented to be run in a container using either rootful `d
 > All instructions assume that you are standing in the `tests/` directory.
 
 > [!warning]
-> Known issue that tests requiring use of `docker` or `podman` cannot run within the test container.
+> Do not use `docker` or `podman` directly from tests, as they take differing arguments and may depend on variables present on the host not available within the tests container.
+> Instead use tools like `buildah` for building and pushing or `skopeo` for syncing and pulling.
 >
 > Additionally tests running in the test container might hang on interrupts, requiring the container to be killed.
 
@@ -24,6 +26,7 @@ Static tests are tagged with `static`.
 The `tests / unit-static` workflow on GitHub is invoked with the following commands:
 
 ```bash
+# build and run
 make build-unit
 make run-unit-static
 ```
@@ -31,6 +34,10 @@ make run-unit-static
 The `tests / integration` workflow on GitHub is invoked with the following commands:
 
 ```bash
+# prepare local cache and local resolve:
+../scripts/local-cluster.sh cache create
+../scripts/local-cluster.sh resolve create integration.dev-ck8s.com
+# build and run
 make build-main
 make run-integration
 ```
@@ -40,7 +47,8 @@ make run-integration
 > [!note]
 > The container might struggle to prompt for kube-login and gpg-agent, but if those are activated before by accessing the clusters and using gpg then the session can be reused.
 
-You must have `make` installed
+You must have `make` installed and either rootful `docker` or rootless `podman`!
+Check the [DEVELOPMENT](../DEVELOPMENT.md) docs additional requirements to run local-clusters for integration and regression tests.
 
 Certain test suites are generated automatically as a dependency or with:
 
@@ -62,12 +70,6 @@ make run-<unit|regression|integration|end-to-end>
 
 Additionally tests can be filtered via tags using the `-<tags,...>` suffix to the `run-<target>` command.
 
-Run individual tests:
-
-```bash
-make <file/path> # without trailing .bats, for generated files use the .gen ending
-```
-
 Clean up:
 
 ```bash
@@ -78,10 +80,14 @@ make clean
 make clean-gen
 ```
 
-### Usage with `bats`
+### Direct usage with `bats` or `cypress`
 
-> [!warning]
-> Direct usage with `bats` is currently not supported.
+Direct usage is possible by entering the tests container:
+
+```bash
+make enter-<unit|regression|integration|end-to-end>
+cd tests/
+```
 
 The plain `bats` test suite can be manually run by simply running `bats` and listing the target directories or files.
 
@@ -96,29 +102,28 @@ bats <path/to/file.bats>
 
 Additionally tests can be filtered via tags using the `--filter-tags <tags,...>` argument.
 
-### Usage with `cypress`
-
-> [!warning]
-> Direct usage with `cypress` is currently not supported.
-
-The plain `cypress` test suite can be manually run as follows:
-
 ```bash
 # all
-npx cypress run
+cypress run
 # dirs
-npx cypress run --spec <unit|regression|integration|end-to-end>
+cypress run --spec <unit|regression|integration|end-to-end>
 # files
-npx cypress run --spec <path/to/file.cy.js>
+cypress run --spec <path/to/file.cy.js>
 ```
 
 It can be useful to open `cypress` as it will give you a view of how the tests execute, helping in the development and review process:
 
 ```bash
-npx cypress open
+cypress open
 ```
 
 Then it will auto-reload and auto-execute as tests are updated, use `it.only` instead of `it` to run only selected tests.
+
+This is also possible to do from outside of the container with:
+
+```bash
+make run-cypress-open
+```
 
 ## Writing
 
@@ -136,7 +141,7 @@ setup() {
   load "../bats.lib.bash"
 
   # additional loads for helpers
-  # check the bats.lib.bash for load functions, and common/bats/ for helper functions
+  # check the bats.lib.bash for load functions, and common/bats/ for helpers
 }
 ```
 
