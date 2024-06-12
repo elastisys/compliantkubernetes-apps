@@ -1,15 +1,20 @@
 #!/usr/bin/env bats
 
 setup_file() {
-  load "../common/lib"
+  load "../../bats.lib.bash"
 
   cypress_setup "${ROOT}/tests/end-to-end/grafana-dashboards.cy.js"
 }
 
 setup() {
-  load "../common/lib"
+  load "../../bats.lib.bash"
+  load_assert
+}
 
-  common_setup
+teardown_file() {
+  load "../../bats.lib.bash"
+
+  cypress_teardown "${ROOT}/tests/end-to-end/grafana-dashboards.cy.js"
 }
 
 @test "grafana admin dashboards open the Backup status dashboard" {
@@ -66,10 +71,4 @@ setup() {
 
 @test "grafana dev dashboards open the Falco dashboard" {
   cypress_test "grafana dev dashboards open the Falco dashboard"
-}
-
-teardown_file() {
-  load "../common/lib"
-
-  cypress_teardown "${ROOT}/tests/end-to-end/grafana-dashboards.cy.js"
 }

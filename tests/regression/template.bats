@@ -1,9 +1,8 @@
 #!/usr/bin/env bats
 
 setup() {
-  load "../common/lib"
-
-  common_setup
+  load "../bats.lib.bash"
+  load_assert
 }
 
 @test "this is a template" {

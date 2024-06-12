@@ -1,4 +1,5 @@
 dex:
+  replicaCount: 1
   enableStaticLogin: true
 
 harbor:
@@ -43,6 +44,10 @@ opensearch:
     enabled: false
     backupSchedule: 0 */12 * * * # run twice/day
     retentionSchedule: 0 1 * * * # 1am
+
+prometheus:
+  alertmanagerSpec:
+    replicas: 1
 
 fluentd:
   enabled: false

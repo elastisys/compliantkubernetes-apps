@@ -130,33 +130,33 @@ update_ips.mock_swift() {
 # --- populate ---------------------------------------------------------------------------------------------------------
 
 update_ips.populate_minimal() {
-  yq_set common .networkPolicies.global.objectStorage.ips '["127.0.0.1/32"]'
-  yq_set common .networkPolicies.global.objectStorage.ports '[1234]'
+  yq.set common .networkPolicies.global.objectStorage.ips '["127.0.0.1/32"]'
+  yq.set common .networkPolicies.global.objectStorage.ports '[1234]'
 
-  yq_set common .networkPolicies.global.scIngress.ips '["127.0.0.2/32"]'
-  yq_set common .networkPolicies.global.wcIngress.ips '["127.0.0.3/32"]'
+  yq.set common .networkPolicies.global.scIngress.ips '["127.0.0.2/32"]'
+  yq.set common .networkPolicies.global.wcIngress.ips '["127.0.0.3/32"]'
 
-  yq_set sc .networkPolicies.global.scApiserver.ips '["127.0.1.1/32", "127.0.1.2/32", "127.0.1.3/32", "127.0.1.21/32", "127.0.2.1/32", "127.0.2.2/32", "127.0.2.3/32", "127.0.2.21/32", "127.0.3.1/32", "127.0.3.2/32", "127.0.3.3/32", "127.0.3.21/32"]'
-  yq_set sc .networkPolicies.global.scNodes.ips '["127.0.1.7/32", "127.0.1.8/32", "127.0.1.9/32", "127.0.1.81/32", "127.0.2.7/32", "127.0.2.8/32", "127.0.2.9/32", "127.0.2.81/32", "127.0.3.7/32", "127.0.3.8/32", "127.0.3.9/32", "127.0.3.81/32"]'
+  yq.set sc .networkPolicies.global.scApiserver.ips '["127.0.1.1/32", "127.0.1.2/32", "127.0.1.3/32", "127.0.1.21/32", "127.0.2.1/32", "127.0.2.2/32", "127.0.2.3/32", "127.0.2.21/32", "127.0.3.1/32", "127.0.3.2/32", "127.0.3.3/32", "127.0.3.21/32"]'
+  yq.set sc .networkPolicies.global.scNodes.ips '["127.0.1.7/32", "127.0.1.8/32", "127.0.1.9/32", "127.0.1.81/32", "127.0.2.7/32", "127.0.2.8/32", "127.0.2.9/32", "127.0.2.81/32", "127.0.3.7/32", "127.0.3.8/32", "127.0.3.9/32", "127.0.3.81/32"]'
 
-  yq_set wc .networkPolicies.global.wcApiserver.ips '["127.0.1.4/32", "127.0.1.5/32", "127.0.1.6/32", "127.0.1.51/32", "127.0.2.4/32", "127.0.2.5/32", "127.0.2.6/32", "127.0.2.51/32", "127.0.3.4/32", "127.0.3.5/32", "127.0.3.6/32", "127.0.3.51/32"]'
-  yq_set wc .networkPolicies.global.wcNodes.ips '["127.0.1.10/32", "127.0.1.11/32", "127.0.1.12/32", "127.0.1.111/32", "127.0.2.10/32", "127.0.2.11/32", "127.0.2.12/32", "127.0.2.111/32", "127.0.3.10/32", "127.0.3.11/32", "127.0.3.12/32", "127.0.3.111/32"]'
+  yq.set wc .networkPolicies.global.wcApiserver.ips '["127.0.1.4/32", "127.0.1.5/32", "127.0.1.6/32", "127.0.1.51/32", "127.0.2.4/32", "127.0.2.5/32", "127.0.2.6/32", "127.0.2.51/32", "127.0.3.4/32", "127.0.3.5/32", "127.0.3.6/32", "127.0.3.51/32"]'
+  yq.set wc .networkPolicies.global.wcNodes.ips '["127.0.1.10/32", "127.0.1.11/32", "127.0.1.12/32", "127.0.1.111/32", "127.0.2.10/32", "127.0.2.11/32", "127.0.2.12/32", "127.0.2.111/32", "127.0.3.10/32", "127.0.3.11/32", "127.0.3.12/32", "127.0.3.111/32"]'
 }
 
 update_ips.populate_maximal() {
   update_ips.populate_minimal
 
-  yq_set sc .networkPolicies.global.objectStorageSwift.ips '["127.1.0.4/32", "127.1.0.5/32"]'
-  yq_set sc .networkPolicies.global.objectStorageSwift.ports '[5678, 91011]'
+  yq.set sc .networkPolicies.global.objectStorageSwift.ips '["127.1.0.4/32", "127.1.0.5/32"]'
+  yq.set sc .networkPolicies.global.objectStorageSwift.ports '[5678, 91011]'
 
-  yq_set sc .networkPolicies.rclone.sync.objectStorage.ips '["127.1.0.6/32"]'
-  yq_set sc .networkPolicies.rclone.sync.objectStorage.ports '[1234]'
+  yq.set sc .networkPolicies.rclone.sync.objectStorage.ips '["127.1.0.6/32"]'
+  yq.set sc .networkPolicies.rclone.sync.objectStorage.ports '[1234]'
 
-  yq_set sc .networkPolicies.rclone.sync.objectStorageSwift.ips '["127.1.0.7/32", "127.1.0.8/32"]'
-  yq_set sc .networkPolicies.rclone.sync.objectStorageSwift.ports '[443, 5678]'
+  yq.set sc .networkPolicies.rclone.sync.objectStorageSwift.ips '["127.1.0.7/32", "127.1.0.8/32"]'
+  yq.set sc .networkPolicies.rclone.sync.objectStorageSwift.ports '[443, 5678]'
 
-  yq_set sc .networkPolicies.rclone.sync.secondaryUrl.ips '["127.1.0.9/32"]'
-  yq_set sc .networkPolicies.rclone.sync.secondaryUrl.ports '[1234]'
+  yq.set sc .networkPolicies.rclone.sync.secondaryUrl.ips '["127.1.0.9/32"]'
+  yq.set sc .networkPolicies.rclone.sync.secondaryUrl.ports '[1234]'
 }
 
 # --- asserts ----------------------------------------------------------------------------------------------------------
@@ -168,17 +168,17 @@ update_ips.assert_none() {
 }
 
 update_ips.assert_minimal() {
-  assert_equal "$(yq_dig common '.networkPolicies.global.objectStorage.ips | . style="flow"')" "[127.0.0.1/32]"
-  assert_equal "$(yq_dig common '.networkPolicies.global.objectStorage.ports | . style="flow"')" "[1234]"
+  assert_equal "$(yq.dig common '.networkPolicies.global.objectStorage.ips | . style="flow"')" "[127.0.0.1/32]"
+  assert_equal "$(yq.dig common '.networkPolicies.global.objectStorage.ports | . style="flow"')" "[1234]"
 
-  assert_equal "$(yq_dig common '.networkPolicies.global.scIngress.ips | . style="flow"')" "[127.0.0.2/32]"
-  assert_equal "$(yq_dig common '.networkPolicies.global.wcIngress.ips | . style="flow"')" "[127.0.0.3/32]"
+  assert_equal "$(yq.dig common '.networkPolicies.global.scIngress.ips | . style="flow"')" "[127.0.0.2/32]"
+  assert_equal "$(yq.dig common '.networkPolicies.global.wcIngress.ips | . style="flow"')" "[127.0.0.3/32]"
 
-  assert_equal "$(yq_dig sc '.networkPolicies.global.scApiserver.ips | . style="flow"')" "[127.0.1.1/32, 127.0.1.2/32, 127.0.1.3/32, 127.0.1.21/32, 127.0.2.1/32, 127.0.2.2/32, 127.0.2.3/32, 127.0.2.21/32, 127.0.3.1/32, 127.0.3.2/32, 127.0.3.3/32, 127.0.3.21/32]"
-  assert_equal "$(yq_dig sc '.networkPolicies.global.scNodes.ips | . style="flow"')" "[127.0.1.7/32, 127.0.1.8/32, 127.0.1.9/32, 127.0.1.81/32, 127.0.2.7/32, 127.0.2.8/32, 127.0.2.9/32, 127.0.2.81/32, 127.0.3.7/32, 127.0.3.8/32, 127.0.3.9/32, 127.0.3.81/32]"
+  assert_equal "$(yq.dig sc '.networkPolicies.global.scApiserver.ips | . style="flow"')" "[127.0.1.1/32, 127.0.1.2/32, 127.0.1.3/32, 127.0.1.21/32, 127.0.2.1/32, 127.0.2.2/32, 127.0.2.3/32, 127.0.2.21/32, 127.0.3.1/32, 127.0.3.2/32, 127.0.3.3/32, 127.0.3.21/32]"
+  assert_equal "$(yq.dig sc '.networkPolicies.global.scNodes.ips | . style="flow"')" "[127.0.1.7/32, 127.0.1.8/32, 127.0.1.9/32, 127.0.1.81/32, 127.0.2.7/32, 127.0.2.8/32, 127.0.2.9/32, 127.0.2.81/32, 127.0.3.7/32, 127.0.3.8/32, 127.0.3.9/32, 127.0.3.81/32]"
 
-  assert_equal "$(yq_dig wc '.networkPolicies.global.wcApiserver.ips | . style="flow"')" "[127.0.1.4/32, 127.0.1.5/32, 127.0.1.6/32, 127.0.1.51/32, 127.0.2.4/32, 127.0.2.5/32, 127.0.2.6/32, 127.0.2.51/32, 127.0.3.4/32, 127.0.3.5/32, 127.0.3.6/32, 127.0.3.51/32]"
-  assert_equal "$(yq_dig wc '.networkPolicies.global.wcNodes.ips | . style="flow"')" "[127.0.1.10/32, 127.0.1.11/32, 127.0.1.12/32, 127.0.1.111/32, 127.0.2.10/32, 127.0.2.11/32, 127.0.2.12/32, 127.0.2.111/32, 127.0.3.10/32, 127.0.3.11/32, 127.0.3.12/32, 127.0.3.111/32]"
+  assert_equal "$(yq.dig wc '.networkPolicies.global.wcApiserver.ips | . style="flow"')" "[127.0.1.4/32, 127.0.1.5/32, 127.0.1.6/32, 127.0.1.51/32, 127.0.2.4/32, 127.0.2.5/32, 127.0.2.6/32, 127.0.2.51/32, 127.0.3.4/32, 127.0.3.5/32, 127.0.3.6/32, 127.0.3.51/32]"
+  assert_equal "$(yq.dig wc '.networkPolicies.global.wcNodes.ips | . style="flow"')" "[127.0.1.10/32, 127.0.1.11/32, 127.0.1.12/32, 127.0.1.111/32, 127.0.2.10/32, 127.0.2.11/32, 127.0.2.12/32, 127.0.2.111/32, 127.0.3.10/32, 127.0.3.11/32, 127.0.3.12/32, 127.0.3.111/32]"
 
   assert_equal "$(mock_get_call_num "${mock_curl}")" 0
   assert_equal "$(mock_get_call_num "${mock_dig}")" 3
@@ -186,8 +186,8 @@ update_ips.assert_minimal() {
 }
 
 update_ips.assert_swift() {
-  assert_equal "$(yq_dig sc '.networkPolicies.global.objectStorageSwift.ips | . style="flow"')" "[127.0.0.4/32, 127.0.0.5/32]"
-  assert_equal "$(yq_dig sc '.networkPolicies.global.objectStorageSwift.ports | . style="flow"')" "[5678, 91011]"
+  assert_equal "$(yq.dig sc '.networkPolicies.global.objectStorageSwift.ips | . style="flow"')" "[127.0.0.4/32, 127.0.0.5/32]"
+  assert_equal "$(yq.dig sc '.networkPolicies.global.objectStorageSwift.ports | . style="flow"')" "[5678, 91011]"
 
   assert_equal "$(mock_get_call_num "${mock_curl}")" 2
   assert_equal "$(mock_get_call_num "${mock_dig}")" 5
@@ -195,8 +195,8 @@ update_ips.assert_swift() {
 }
 
 update_ips.assert_rclone_s3() {
-  assert_equal "$(yq_dig sc '.networkPolicies.rclone.sync.objectStorage.ips | . style="flow"')" "[127.0.0.4/32]"
-  assert_equal "$(yq_dig sc '.networkPolicies.rclone.sync.objectStorage.ports | . style="flow"')" "[1234]"
+  assert_equal "$(yq.dig sc '.networkPolicies.rclone.sync.objectStorage.ips | . style="flow"')" "[127.0.0.4/32]"
+  assert_equal "$(yq.dig sc '.networkPolicies.rclone.sync.objectStorage.ports | . style="flow"')" "[1234]"
 
   assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorageSwift' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
 

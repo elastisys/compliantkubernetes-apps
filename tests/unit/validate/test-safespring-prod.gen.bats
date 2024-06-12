@@ -2,15 +2,13 @@
 
 # Generated from tests/unit/validate/template.bats.gotmpl
 
-# bats file_tags=static,safespring
+# bats file_tags=static,validate,safespring,prod
 
 setup_file() {
-  # Not supported right now, might be able to leverage env.cache with some adaptions
-  export BATS_NO_PARALLELIZE_WITHIN_FILE=true
-
-  load "../../common/lib"
-  load "../../common/lib/env"
-  load "../../common/lib/gpg"
+  load "../../bats.lib.bash"
+  load_common "env.bash"
+  load_common "gpg.bash"
+  load_common "yq.bash"
 
   gpg.setup
   env.setup
@@ -19,10 +17,17 @@ setup_file() {
 }
 
 setup() {
-  load "../../common/lib"
+  load "../../bats.lib.bash"
+  load_assert
+  load_common "env.bash"
+  load_common "yq.bash"
   load "script"
 
-  common_setup
+  env.private
+}
+
+teardown() {
+  env.teardown
 }
 
 teardown_file() {
@@ -43,14 +48,14 @@ teardown_file() {
 }
 
 @test "configuration is invalid - safespring:prod - service cluster" {
-  run yq_set 'sc' '.global.baseDomain' '"this is not a valid hostname"'
+  run yq.set 'sc' '.global.baseDomain' '"this is not a valid hostname"'
   run ck8s validate sc <<< $'y\n'
 
   assert_output --partial 'global.baseDomain'
 }
 
 @test "configuration is invalid - safespring:prod - workload cluster" {
-  run yq_set 'wc' '.global.baseDomain' '"this is not a valid hostname"'
+  run yq.set 'wc' '.global.baseDomain' '"this is not a valid hostname"'
   run ck8s validate wc <<< $'y\n'
 
   assert_output --partial '"this is not a valid hostname"'

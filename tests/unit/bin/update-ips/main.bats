@@ -3,34 +3,27 @@
 # bats file_tags=static,general,bin:update_ips
 
 setup_file() {
-  export BATS_NO_PARALLELIZE_WITHIN_FILE=true
-
-  load "../../../common/lib"
-  load "../../../common/lib/env"
-  load "../../../common/lib/gpg"
+  load "../../../bats.lib.bash"
+  load_common "env.bash"
+  load_common "gpg.bash"
+  load_common "yq.bash"
 
   gpg.setup
   env.setup
 
-  common_setup
-
   env.init dev baremetal --skip-object-storage --skip-network-policies
 
-  yq_set common .objectStorage.type '"s3"'
-  yq_set common .objectStorage.s3.regionEndpoint '"https://s3.foo.dev-ck8s.com:1234"'
-}
-
-teardown_file() {
-  env.teardown
-  gpg.teardown
+  yq.set common .objectStorage.type '"s3"'
+  yq.set common .objectStorage.s3.regionEndpoint '"https://s3.foo.dev-ck8s.com:1234"'
 }
 
 setup() {
-  load "../../../common/lib"
-  load "../../../common/lib/env"
-  load "../../../common/lib/update-ips"
-
-  common_setup
+  load "../../../bats.lib.bash"
+  load_common "env.bash"
+  load_common "update-ips.bash"
+  load_common "yq.bash"
+  load_assert
+  load_mock
 
   env.private
 
@@ -45,11 +38,16 @@ teardown() {
   env.teardown
 }
 
+teardown_file() {
+  env.teardown
+  gpg.teardown
+}
+
 _apply_normalise() {
   ck8s update-ips both dry-run 2>&1 | sed "s#${CK8S_CONFIG_PATH}#/tmp/ck8s-apps-config#g"
 }
 
-@test "update-ips - requires CK8S_CONFIG_PATH" {
+@test "ck8s update-ips requires CK8S_CONFIG_PATH" {
   CK8S_CONFIG_PATH="" run ck8s update-ips both apply
   assert_failure
   assert_output --partial "Missing CK8S_CONFIG_PATH"
@@ -57,8 +55,8 @@ _apply_normalise() {
   update_ips.assert_mocks_none
 }
 
-@test "update-ips - requires .global.baseDomain" {
-  yq_set common .global.baseDomain '""'
+@test "ck8s update-ips requires .global.baseDomain" {
+  yq.set common .global.baseDomain '""'
 
   run ck8s update-ips both apply
   assert_failure
@@ -67,8 +65,8 @@ _apply_normalise() {
   update_ips.assert_mocks_none
 }
 
-@test "update-ips - requires .global.opsDomain" {
-  yq_set common .global.opsDomain '""'
+@test "ck8s update-ips requires .global.opsDomain" {
+  yq.set common .global.opsDomain '""'
 
   run ck8s update-ips both apply
   assert_failure
@@ -77,8 +75,8 @@ _apply_normalise() {
   update_ips.assert_mocks_none
 }
 
-@test "update-ips - requires .objectStorage.s3.regionEndpoint" {
-  yq_set common .objectStorage.s3.regionEndpoint '""'
+@test "ck8s update-ips requires .objectStorage.s3.regionEndpoint" {
+  yq.set common .objectStorage.s3.regionEndpoint '""'
 
   run ck8s update-ips both apply
   assert_failure
@@ -87,7 +85,7 @@ _apply_normalise() {
   update_ips.assert_mocks_none
 }
 
-@test "update-ips - minimal run" {
+@test "ck8s update-ips performs minimal run" {
   update_ips.mock_minimal
 
   run ck8s update-ips both apply
@@ -95,7 +93,7 @@ _apply_normalise() {
   update_ips.assert_minimal
 }
 
-@test "update-ips - minimal run zero diff" {
+@test "ck8s update-ips performs minimal run with zero diff" {
   update_ips.mock_minimal
   update_ips.populate_minimal
 
@@ -105,7 +103,7 @@ _apply_normalise() {
   assert_output "$(cat "${BATS_TEST_DIRNAME}/resources/zero-diff.out")"
 }
 
-@test "update-ips - sorts ips" {
+@test "ck8s update-ips sorts ips" {
   update_ips.mock_minimal
   update_ips.populate_minimal
 
@@ -113,68 +111,68 @@ _apply_normalise() {
 
   run ck8s update-ips both apply
 
-  assert_equal "$(yq_dig sc '.networkPolicies.global.scApiserver.ips | . style="flow"')" "[126.0.0.3/32, 126.0.0.20/32, 127.0.1.1/32, 127.0.1.2/32, 127.0.1.3/32, 127.0.1.21/32, 127.0.2.1/32, 127.0.2.2/32, 127.0.2.3/32, 127.0.2.21/32, 127.0.3.1/32, 127.0.3.2/32, 127.0.3.3/32, 127.0.3.21/32]"
+  assert_equal "$(yq.dig sc '.networkPolicies.global.scApiserver.ips | . style="flow"')" "[126.0.0.3/32, 126.0.0.20/32, 127.0.1.1/32, 127.0.1.2/32, 127.0.1.3/32, 127.0.1.21/32, 127.0.2.1/32, 127.0.2.2/32, 127.0.2.3/32, 127.0.2.21/32, 127.0.3.1/32, 127.0.3.2/32, 127.0.3.3/32, 127.0.3.21/32]"
 
   assert_equal "$(mock_get_call_num "${mock_curl}")" 0
   assert_equal "$(mock_get_call_num "${mock_dig}")" 3
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16
 }
 
-@test "update-ips - skips ips in existing cidrs" {
+@test "ck8s update-ips skips ips in existing cidrs" {
   update_ips.mock_minimal
   update_ips.populate_minimal
 
-  yq_set sc .networkPolicies.global.scApiserver.ips '["127.0.0.0/16", "127.1.0.0/16"]'
+  yq.set sc .networkPolicies.global.scApiserver.ips '["127.0.0.0/16", "127.1.0.0/16"]'
 
   mock_set_output "${mock_kubectl}" "127.0.1.1 127.0.2.1 127.0.3.1 127.1.0.0 127.1.0.1 127.2.0.1" 1 # .networkPolicies.global.scApiserver.ips internal ip
 
   run ck8s update-ips both apply
 
-  assert_equal "$(yq_dig sc '.networkPolicies.global.scApiserver.ips | . style="flow"')" "[127.0.0.0/16, 127.1.0.0/16, 127.2.0.1/32]"
+  assert_equal "$(yq.dig sc '.networkPolicies.global.scApiserver.ips | . style="flow"')" "[127.0.0.0/16, 127.1.0.0/16, 127.2.0.1/32]"
 
   assert_equal "$(mock_get_call_num "${mock_curl}")" 0
   assert_equal "$(mock_get_call_num "${mock_dig}")" 3
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16
 }
 
-@test "update-ips - s3 region endpoint can be ip" {
+@test "ck8s update-ips allows s3 region endpoint to be an ip" {
   update_ips.mock_minimal
 
-  yq_set common .objectStorage.s3.regionEndpoint '"http://192.168.1.1:8080"'
+  yq.set common .objectStorage.s3.regionEndpoint '"http://192.168.1.1:8080"'
 
   run ck8s update-ips both apply
 
-  assert_equal "$(yq_dig common '.networkPolicies.global.objectStorage.ips | . style="flow"')" "[192.168.1.1/32]"
-  assert_equal "$(yq_dig common '.networkPolicies.global.objectStorage.ports | . style="flow"')" "[8080]"
+  assert_equal "$(yq.dig common '.networkPolicies.global.objectStorage.ips | . style="flow"')" "[192.168.1.1/32]"
+  assert_equal "$(yq.dig common '.networkPolicies.global.objectStorage.ports | . style="flow"')" "[8080]"
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 2
 }
 
-@test "update-ips - s3 region endpoint can be cluster local with kubeadm config" {
+@test "ck8s update-ips allows s3 region endpoint to be cluster local with kubeadm config" {
   update_ips.mock_minimal
 
-  yq_set common .objectStorage.s3.regionEndpoint '"http://minio.minio-system.svc.cluster.local"'
+  yq.set common .objectStorage.s3.regionEndpoint '"http://minio.minio-system.svc.cluster.local"'
 
   mock_set_output "${mock_kubectl}" 'data: { ClusterConfiguration: "networking: { podSubnet: 10.244.0.0/16 }" }' 1
 
   run ck8s update-ips both apply
 
-  assert_equal "$(yq_dig common '.networkPolicies.global.objectStorage.ips | . style="flow"')" "[10.244.0.0/16]"
+  assert_equal "$(yq.dig common '.networkPolicies.global.objectStorage.ips | . style="flow"')" "[10.244.0.0/16]"
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 2
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 17
 }
 
-@test "update-ips - s3 region endpoint can be cluster local without kubeadm config" {
+@test "ck8s update-ips allows s3 region endpoint to be cluster local without kubeadm config" {
   update_ips.mock_minimal
 
-  yq_set common .objectStorage.s3.regionEndpoint '"http://minio.minio-system.svc.cluster.local"'
+  yq.set common .objectStorage.s3.regionEndpoint '"http://minio.minio-system.svc.cluster.local"'
 
   mock_set_output "${mock_kubectl}" "" 1
 
   run ck8s update-ips both apply
 
-  assert_equal "$(yq_dig common '.networkPolicies.global.objectStorage.ips | . style="flow"')" "[0.0.0.0/0]"
+  assert_equal "$(yq.dig common '.networkPolicies.global.objectStorage.ips | . style="flow"')" "[0.0.0.0/0]"
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 2
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 17
@@ -183,25 +181,25 @@ _apply_normalise() {
 # --- maximal ----------------------------------------------------------------------------------------------------------
 
 _configure_maximal() {
-  yq_set sc .harbor.persistence.type '"swift"'
-  yq_set sc .objectStorage.swift.authUrl '"https://keystone.foo.dev-ck8s.com:5678"'
-  yq_set sc .objectStorage.swift.region '"swift-region"'
+  yq.set sc .harbor.persistence.type '"swift"'
+  yq.set sc .objectStorage.swift.authUrl '"https://keystone.foo.dev-ck8s.com:5678"'
+  yq.set sc .objectStorage.swift.region '"swift-region"'
 
   sops --set '["objectStorage"]["swift"]["username"] "swift-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
 
-  yq_set sc .objectStorage.sync.enabled 'true'
-  yq_set sc .networkPolicies.rclone.enabled 'true'
-  yq_set sc .objectStorage.sync.s3.regionEndpoint '"https://s3.foo.dev-ck8s.com:1234"'
-  yq_set sc .objectStorage.sync.swift.authUrl '"https://keystone.foo.dev-ck8s.com:5678"'
-  yq_set sc .objectStorage.sync.swift.region '"swift-region"'
+  yq.set sc .objectStorage.sync.enabled 'true'
+  yq.set sc .networkPolicies.rclone.enabled 'true'
+  yq.set sc .objectStorage.sync.s3.regionEndpoint '"https://s3.foo.dev-ck8s.com:1234"'
+  yq.set sc .objectStorage.sync.swift.authUrl '"https://keystone.foo.dev-ck8s.com:5678"'
+  yq.set sc .objectStorage.sync.swift.region '"swift-region"'
 
   sops --set '["objectStorage"]["sync"]["swift"]["username"] "swift-sync-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
 
-  yq_set sc .objectStorage.sync.secondaryUrl '"https://s3.foo.dev-ck8s.com:1234"'
+  yq.set sc .objectStorage.sync.secondaryUrl '"https://s3.foo.dev-ck8s.com:1234"'
 }
 
 # bats test_tags=resources
-@test "update-ips - maximal run full diff" {
+@test "ck8s update-ips performs maximal run with full diff" {
   update_ips.mock_maximal
 
   _configure_maximal
@@ -217,7 +215,7 @@ _configure_maximal() {
   assert_output "$(cat "${BATS_TEST_DIRNAME}/resources/maximal-run-full-diff.out")"
 }
 
-@test "update-ips - maximal run zero diff" {
+@test "ck8s update-ips performs maximal run with zero diff" {
   update_ips.mock_maximal
   update_ips.populate_maximal
 

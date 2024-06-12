@@ -23,16 +23,23 @@
 
 harbor.load_env() {
   if [[ -z "${1:-}" ]]; then
-    log_fatal "usage: harbor.load_env [slug]"
+    log.fatal "usage: harbor.load_env [slug]"
   fi
 
-  harbor_endpoint="$(yq sc '.harbor.subdomain + "." + .global.baseDomain')"
+  harbor_secure="$(yq.get sc '.global.verifyTls')"
+  export harbor_secure
+
+  if [[ "${harbor_secure}" != "true" ]]; then
+    export ctr_insecure="true"
+  fi
+
+  harbor_endpoint="$(yq.get sc '.harbor.subdomain + "." + .global.baseDomain')"
   export harbor_endpoint
 
   harbor_username="admin"
   export harbor_username
 
-  harbor_password="$(yq_secret ".harbor.password")"
+  harbor_password="$(yq.secret ".harbor.password")"
   export harbor_password
 
   export harbor_project="end-to-end-${1:-"user-demo"}-project"
@@ -49,8 +56,8 @@ harbor.setup_user_demo_image() {
   export user_demo="${docs_path}/user-demo/"
   export user_demo_image="${harbor_endpoint}/${harbor_project}/user-demo:test"
 
-  docker build "${user_demo}" -t "${user_demo_image}"
-  docker push "${user_demo_image}"
+  ctr build "${user_demo}" -t "${user_demo_image}"
+  ctr push "$(ctr.insecure)" "${user_demo_image}"
 }
 
 # Expects variables to be set with harbor.load_env
@@ -63,13 +70,13 @@ harbor.setup_project() {
   jq -r .id <<< "${output}" > "${harbor_robot_id_path}"
   jq -r .secret <<< "${output}" > "${harbor_robot_secret_path}"
 
-  docker login --username "${harbor_robot_fullname}" --password-stdin "${harbor_endpoint}" < "${harbor_robot_secret_path}"
+  ctr login "$(ctr.insecure)" --username "${harbor_robot_fullname}" --password-stdin "${harbor_endpoint}" < "${harbor_robot_secret_path}"
 }
 
 # Expects variables to be set with harbor.load_env
 harbor.teardown_project() {
   # Allow failure
-  docker logout "${harbor_endpoint}" || true
+  ctr logout "${harbor_endpoint}" || true
 
   readarray -t robots < <(harbor.get_robots "${harbor_project}" | jq -r '.[].id')
   if [[ -n "${robots[*]}" ]]; then
@@ -92,26 +99,40 @@ harbor.teardown_project() {
 
 harbor.get() {
   if [[ "${#}" -lt 1 ]]; then
-    log_fatal "usage: harbor.get [resource/path] <additional curl args...>"
+    log.fatal "usage: harbor.get [resource/path] <additional curl args...>"
   fi
 
-  curl -s -u "${harbor_username}:${harbor_password}" "https://${harbor_endpoint}/api/v2.0/${1}" -H "accept: application/json" "${@:2}"
+  if [[ "${harbor_secure}" == "true" ]]; then
+    curl -s -u "${harbor_username}:${harbor_password}" "https://${harbor_endpoint}/api/v2.0/${1}" -H "accept: application/json" "${@:2}"
+  else
+    curl -k -s -u "${harbor_username}:${harbor_password}" "https://${harbor_endpoint}/api/v2.0/${1}" -H "accept: application/json" "${@:2}"
+  fi
+
 }
 
 harbor.post() {
   if [[ "${#}" -lt 1 ]]; then
-    log_fatal "usage: harbor.post [resource/path] [json data] <additional curl args...>"
+    log.fatal "usage: harbor.post [resource/path] [json data] <additional curl args...>"
   fi
 
-  curl -s -u "${harbor_username}:${harbor_password}" "https://${harbor_endpoint}/api/v2.0/${1}" -H "accept: application/json" -H "content-type: application/json" -d "${2}" "${@:3}"
+
+  if [[ "${harbor_secure}" == "true" ]]; then
+    curl -s -u "${harbor_username}:${harbor_password}" "https://${harbor_endpoint}/api/v2.0/${1}" -H "accept: application/json" -H "content-type: application/json" -d "${2}" "${@:3}"
+  else
+    curl -k -s -u "${harbor_username}:${harbor_password}" "https://${harbor_endpoint}/api/v2.0/${1}" -H "accept: application/json" -H "content-type: application/json" -d "${2}" "${@:3}"
+  fi
 }
 
 harbor.delete() {
   if [[ "${#}" -lt 1 ]]; then
-    log_fatal "usage: harbor.delete [resource/path] <additional curl args...>"
+    log.fatal "usage: harbor.delete [resource/path] <additional curl args...>"
   fi
 
-  curl -s -u "${harbor_username}:${harbor_password}" -X DELETE "https://${harbor_endpoint}/api/v2.0/${1}" -H "accept: application/json" "${@:2}"
+  if [[ "${harbor_secure}" == "true" ]]; then
+    curl -s -u "${harbor_username}:${harbor_password}" -X DELETE "https://${harbor_endpoint}/api/v2.0/${1}" -H "accept: application/json" "${@:2}"
+  else
+    curl -k -s -u "${harbor_username}:${harbor_password}" -X DELETE "https://${harbor_endpoint}/api/v2.0/${1}" -H "accept: application/json" "${@:2}"
+  fi
 }
 
 harbor.get_current_user() {
@@ -120,7 +141,7 @@ harbor.get_current_user() {
 
 harbor.create_project() {
   if [[ "${#}" -lt 1 ]]; then
-    log_fatal "usage: harbor.create_project [project]"
+    log.fatal "usage: harbor.create_project [project]"
   fi
 
   data="$(jq -cn --arg name "${1}" '
@@ -134,7 +155,7 @@ harbor.create_project() {
 
 harbor.delete_project() {
   if [[ "${#}" -lt 1 ]]; then
-    log_fatal "usage: harbor.delete_project [project]"
+    log.fatal "usage: harbor.delete_project [project]"
   fi
 
   harbor.delete "projects/${1}"
@@ -224,10 +245,10 @@ harbor.create_pull_secret() {
   with_kubeconfig "${1}"
   with_namespace "${2}"
 
-  kubectl -n "${NAMESPACE}" create secret docker-registry pull-secret \
-    "--docker-server=${harbor_endpoint}" \
-    "--docker-username=${harbor_robot_fullname}" \
-    "--docker-password=$(<"${harbor_robot_secret_path}")"
+  kubectl -n "${NAMESPACE}" create secret ctr-registry pull-secret \
+    "--ctr-server=${harbor_endpoint}" \
+    "--ctr-username=${harbor_robot_fullname}" \
+    "--ctr-password=$(<"${harbor_robot_secret_path}")"
 
   kubectl -n "${NAMESPACE}" patch serviceaccount default -p '{"imagePullSecrets": [{"name": "pull-secret"}]}'
 }

@@ -34,7 +34,8 @@ log.fatal() {
 }
 log.usage() {
   log.fatal "$0 usage:
-  - cache <create|delete>                                                    - manages local caches for local clusters
+  - cache <create|delete>                                                    - manages local cache for local clusters
+  - resolve <create|delete> <domain>                                         - manages local resolve for local clusters
   - config <name> <flavor> <domain> [ops-prefix]                             - configures a local cluster
   - create <name> <profile-name|profile-path> [--skip-calico] [--skip-minio] - creates a local cluster
   - delete <name>                                                            - deletes a local cluster
@@ -43,13 +44,33 @@ log.usage() {
   "
 }
 log.continue() {
-  log.warn.no_newline "${1} [y/N]: "
+  if [[ "${CK8S_AUTO_APPROVE:-false}" != "true" ]]; then
+    log.warn.no_newline "${1} [y/N]: "
 
-  read -r reply
-  if ! [[ "${reply}" =~ ^(y|Y|yes|Yes|YES)$ ]]; then
-    log.fatal "aborted"
+    read -r reply
+    if ! [[ "${reply}" =~ ^(y|Y|yes|Yes|YES)$ ]]; then
+      log.fatal "aborted"
+    fi
   fi
 }
+
+yq() {
+  if command -v yq4 >/dev/null; then
+    command yq4 "${@}"
+  else
+    command yq "${@}"
+  fi
+}
+
+declare runtime
+if command -v docker >/dev/null && docker version >/dev/null 2>&1 && [[ ! "$(docker version)" =~ Podman ]]; then
+  runtime="docker"
+elif command -v podman >/dev/null; then
+  export KIND_EXPERIMENTAL_PROVIDER="podman"
+  runtime="podman"
+else
+  log.fatal "no container runtime found" >&2
+fi
 
 list.clusters() {
   kind get clusters 2>/dev/null
@@ -77,16 +98,50 @@ index.state() {
 
   case "${state}" in
   "")
-    yq4 ".\"${cluster}\"" "${CK8S_CONFIG_PATH}/cluster-index.yaml" ;;
+    yq ".\"${cluster}\"" "${CK8S_CONFIG_PATH}/cluster-index.yaml" ;;
   "delete")
-    yq4 -i "del(.\"${cluster}\")" "${CK8S_CONFIG_PATH}/cluster-index.yaml" ;;
+    yq -i "del(.\"${cluster}\")" "${CK8S_CONFIG_PATH}/cluster-index.yaml" ;;
   *)
-    yq4 -i ".\"${cluster}\" = \"${state}\"" "${CK8S_CONFIG_PATH}/cluster-index.yaml" ;;
+    yq -i ".\"${cluster}\" = \"${state}\"" "${CK8S_CONFIG_PATH}/cluster-index.yaml" ;;
   esac
 }
 
 cluster.exist() {
   kind get clusters 2>/dev/null | grep -E "^${1}$" &>/dev/null
+}
+
+network.create() {
+  if ! "${runtime}" network inspect "${1}" > /dev/null 2>&1; then
+    log.info "- creating network ${1}"
+    "${runtime}" network create "${1}"
+  fi
+}
+container.create() {
+  if ! "${runtime}" container inspect "${1}" > /dev/null 2>&1; then
+    log.info "- creating container ${1}"
+    "${runtime}" run --detach "${@:2}"
+  else
+    "${runtime}" start "${1}"
+  fi
+}
+container.delete() {
+  if "${runtime}" container inspect "${1}" > /dev/null 2>&1; then
+    log.warn "- deleting container ${1}"
+    "${runtime}" container stop "${1}"
+    "${runtime}" container rm "${1}"
+  fi
+}
+volume.create() {
+  if ! "${runtime}" volume inspect "${1}" > /dev/null 2>&1; then
+    log.info "- creating volume ${1}"
+    "${runtime}" volume create "${1}"
+  fi
+}
+volume.delete() {
+  if "${runtime}" volume inspect "${1}" > /dev/null 2>&1; then
+    log.warn "- deleting volume ${1}"
+    "${runtime}" volume rm "${1}"
+  fi
 }
 
 cache() {
@@ -103,43 +158,71 @@ cache() {
   for registryfile in "${registryfiles[@]}"; do
     local downstream name upstream
 
-    downstream="$(yq4 -oy '.host | keys | .[0]' "${registryfile}")"
+    downstream="$(yq -oy '.host | keys | .[0]' "${registryfile}")"
 
     name="$(sed -e 's#http://##' -e 's#:.*##' <<< "${downstream}")"
 
-    upstream="$(yq4 -oy '.host | keys | .[1]' "${registryfile}")"
+    upstream="$(yq -oy '.host | keys | .[1]' "${registryfile}")"
 
     log.info "---"
     log.info "${action}: ${registryfile}"
 
     case "${action}" in
     create)
-      if ! docker network inspect kind > /dev/null 2>&1; then
-        log.info "- creating kind network"
-        docker network create kind
-      fi
-      if ! docker volume inspect "${name}" > /dev/null 2>&1; then
-        log.info "- creating proxy cache volume ${name}"
-        docker volume create "${name}"
-      fi
-      if ! docker container inspect "${name}" > /dev/null 2>&1; then
-        log.info "- creating proxy cache container ${name}"
-        docker run --detach --env "REGISTRY_PROXY_REMOTEURL=${upstream}" --env REGISTRY_PROXY_TTL=168h --env REGISTRY_STORAGE_DELETE_ENABLED=true --env REGISTRY --mount "type=volume,src=${name},dst=/var/lib/registry" --name "${name}" --network kind docker.io/library/registry:2
-      fi
+      network.create kind
+      volume.create "${name}"
+      container.create "${name}" --env "REGISTRY_PROXY_REMOTEURL=${upstream}" --env REGISTRY_PROXY_TTL=168h --env REGISTRY_STORAGE_DELETE_ENABLED=true --env REGISTRY --mount "type=volume,src=${name},dst=/var/lib/registry" --name "${name}" --network kind docker.io/library/registry:2
       ;;
     delete)
-      if docker container inspect "${name}" > /dev/null 2>&1; then
-        log.warn "- deleting proxy cache container ${name}"
-        docker container stop "${name}"
-        docker container rm "${name}"
-      fi
-      if docker volume inspect "${name}" > /dev/null 2>&1; then
-        log.warn "- deleting proxy cache volume ${name}"
-        docker volume rm "${name}"
-      fi
+      container.delete "${name}"
+      volume.delete "${name}"
       ;;
     esac
   done
+}
+
+resolve() {
+  local action domain
+  action="${1:-}"
+  domain="${2:-}"
+
+  if [[ -z "${action}" ]]; then
+    log.usage
+  fi
+
+  case "${action}" in
+  create)
+    if [[ -z "${domain}" ]]; then
+      log.usage
+    fi
+    export domain
+
+    network.create kind
+    container.create local-resolve --env domain --mount "type=bind,src=${HERE}/local-clusters/resolves/Corefile,dst=/home/nonroot/Corefile" --name local-resolve --network kind --publish 127.0.64.43:53:53/tcp --publish 127.0.64.43:53:53/udp docker.io/coredns/coredns:1.11.1
+    if [[ -n "${CI:-}" ]]; then
+      sudo mkdir -p /etc/systemd/resolved.conf.d/
+      echo -e '[Resolve]\nDNS=127.0.64.43\nDomains=~.' | sudo tee /etc/systemd/resolved.conf.d/00-local-resolve.conf
+      sudo systemctl restart systemd-resolved.service
+    else
+      if command -v resolvectl >/dev/null 2>&1; then
+        local link
+        link="$(resolvectl default-route | sed -rn 's/.*\((.+)\): yes/\1/p')"
+        log.continue "set local-resolve as current dns server on ${link}?"
+        resolvectl dns "${link}" 127.0.64.43
+      else
+        log.warn "set local-resolve as the current dns server 127.0.64.43"
+      fi
+    fi
+    ;;
+  delete)
+    if [[ -n "${CI:-}" ]]; then
+      sudo rm /etc/systemd/resolved.conf.d/00-local-resolve.conf
+      sudo systemctl restart systemd-resolved.service
+    fi
+    container.delete local-resolve
+    log.warn "reconnect your current network connection or restart systemd-resolved to restore previous dns servers!"
+    ;;
+  esac
 }
 
 config() {
@@ -178,14 +261,14 @@ config() {
     touch "${CK8S_CONFIG_PATH}/wc-config.yaml"
   fi
 
-  yq4 -Pi 'with(select(. == null); . = {}) | . *= (load(env(HERE) + "/local-clusters/configs/common-config.yaml") | (.. | select(tag == "!!str")) |= envsubst)' "${CK8S_CONFIG_PATH}/common-config.yaml"
-  yq4 -Pi 'with(select(. == null); . = {}) | . *= (load(env(HERE) + "/local-clusters/configs/sc-config.yaml") | (.. | select(tag == "!!str")) |= envsubst)' "${CK8S_CONFIG_PATH}/sc-config.yaml"
-  yq4 -Pi 'with(select(. == null); . = {}) | . *= (load(env(HERE) + "/local-clusters/configs/wc-config.yaml") | (.. | select(tag == "!!str")) |= envsubst)' "${CK8S_CONFIG_PATH}/wc-config.yaml"
+  yq -Pi 'with(select(. == null); . = {}) | . *= (load(env(HERE) + "/local-clusters/configs/common-config.yaml") | (.. | select(tag == "!!str")) |= envsubst)' "${CK8S_CONFIG_PATH}/common-config.yaml"
+  yq -Pi 'with(select(. == null); . = {}) | . *= (load(env(HERE) + "/local-clusters/configs/sc-config.yaml") | (.. | select(tag == "!!str")) |= envsubst)' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq -Pi 'with(select(. == null); . = {}) | . *= (load(env(HERE) + "/local-clusters/configs/wc-config.yaml") | (.. | select(tag == "!!str")) |= envsubst)' "${CK8S_CONFIG_PATH}/wc-config.yaml"
 
   if ! [[ -f "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" ]]; then
     mkdir -p "${CK8S_CONFIG_PATH}/defaults"
     touch "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
-    yq4 -Pi '. = {
+    yq -Pi '. = {
       "global": {
           "ck8sCloudProvider": "none",
           "ck8sEnvironmentName": (env(name)),
@@ -247,6 +330,11 @@ create() {
   chmod 600 "${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml"
 
   export KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml"
+
+  if [[ "${runtime}" == "podman" ]]; then
+    log.info "patch coredns config for podman"
+    kubectl get configmap -n kube-system coredns -oyaml | sed '/forward/a \           prefer_udp' | kubectl apply -f -
+  fi
 
   kubectl label namespace local-path-storage owner=operator
 
@@ -315,6 +403,14 @@ main() {
     case "${subcommand}" in
     create|delete)
       cache "${subcommand}" ;;
+    *)
+      log.usage ;;
+    esac
+    ;;
+  resolve)
+    case "${subcommand}" in
+    create|delete)
+      resolve "${subcommand}" "${@:3}" ;;
     *)
       log.usage ;;
     esac

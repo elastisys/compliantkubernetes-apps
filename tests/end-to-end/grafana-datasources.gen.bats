@@ -1,15 +1,20 @@
 #!/usr/bin/env bats
 
 setup_file() {
-  load "../common/lib"
+  load "../../bats.lib.bash"
 
   cypress_setup "${ROOT}/tests/end-to-end/grafana-datasources.cy.js"
 }
 
 setup() {
-  load "../common/lib"
+  load "../../bats.lib.bash"
+  load_assert
+}
 
-  common_setup
+teardown_file() {
+  load "../../bats.lib.bash"
+
+  cypress_teardown "${ROOT}/tests/end-to-end/grafana-datasources.cy.js"
 }
 
 @test "grafana admin datasources has prometheus" {
@@ -34,10 +39,4 @@ setup() {
 
 @test "grafana dev datasources has workload cluster" {
   cypress_test "grafana dev datasources has workload cluster"
-}
-
-teardown_file() {
-  load "../common/lib"
-
-  cypress_teardown "${ROOT}/tests/end-to-end/grafana-datasources.cy.js"
 }
