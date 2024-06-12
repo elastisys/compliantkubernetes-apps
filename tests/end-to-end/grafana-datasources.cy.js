@@ -1,4 +1,4 @@
-import "../common/lib/grafana.js"
+import "../common/cypress/grafana.js"
 
 describe("grafana admin datasources", function() {
   before(function() {
