@@ -192,9 +192,9 @@
 [32m+      objectStorage:[0m
 [32m+        ips:[0m
 [32m+          - 127.1.0.6/32[0m
- objectStorage:
-   swift:
-     authUrl: https://keystone.foo.dev-ck8s.com:5678
+ alerts:
+   opsGenieHeartbeat:
+     name: example
 [[33mck8s[0m] Diff found for .networkPolicies.rclone.sync.objectStorage.ips in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
@@ -206,9 +206,9 @@
 [32m+      objectStorage:[0m
 [32m+        ports:[0m
 [32m+          - 1234[0m
- objectStorage:
-   swift:
-     authUrl: https://keystone.foo.dev-ck8s.com:5678
+ alerts:
+   opsGenieHeartbeat:
+     name: example
 [[33mck8s[0m] Diff found for .networkPolicies.rclone.sync.objectStorage.ports in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
@@ -221,9 +221,9 @@
 [32m+        ips:[0m
 [32m+          - 127.1.0.7/32[0m
 [32m+          - 127.1.0.8/32[0m
- objectStorage:
-   swift:
-     authUrl: https://keystone.foo.dev-ck8s.com:5678
+ alerts:
+   opsGenieHeartbeat:
+     name: example
 [[33mck8s[0m] Diff found for .networkPolicies.rclone.sync.objectStorageSwift.ips in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
@@ -236,9 +236,9 @@
 [32m+        ports:[0m
 [32m+          - 443[0m
 [32m+          - 5678[0m
- objectStorage:
-   swift:
-     authUrl: https://keystone.foo.dev-ck8s.com:5678
+ alerts:
+   opsGenieHeartbeat:
+     name: example
 [[33mck8s[0m] Diff found for .networkPolicies.rclone.sync.objectStorageSwift.ports in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
@@ -250,9 +250,9 @@
 [32m+      secondaryUrl:[0m
 [32m+        ips:[0m
 [32m+          - 127.1.0.9/32[0m
- objectStorage:
-   swift:
-     authUrl: https://keystone.foo.dev-ck8s.com:5678
+ alerts:
+   opsGenieHeartbeat:
+     name: example
 [[33mck8s[0m] Diff found for .networkPolicies.rclone.sync.secondaryUrl.ips in sc-config.yaml (diff shows actions needed to be up to date)
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
@@ -264,7 +264,7 @@
 [32m+      secondaryUrl:[0m
 [32m+        ports:[0m
 [32m+          - 1234[0m
- objectStorage:
-   swift:
-     authUrl: https://keystone.foo.dev-ck8s.com:5678
+ alerts:
+   opsGenieHeartbeat:
+     name: example
 [[33mck8s[0m] Diff found for .networkPolicies.rclone.sync.secondaryUrl.ports in sc-config.yaml (diff shows actions needed to be up to date)
