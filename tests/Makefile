@@ -4,9 +4,12 @@ dirs := unit regression integration end-to-end
 
 container_image := compliantkubernetes-apps-tests
 
-all := $(cypress_gen) $(template_gen)
+cypress_gen = $(patsubst %.cy.js,%.gen.bats,$(foreach dir, $(dirs), $(shell find $(dir) -type f -name *.cy.js)))
+template_gen = $(patsubst %.bats.gotmpl,%.gen.bats,$(foreach dir, $(dirs), $(shell find $(dir) -type f -name *.bats.gotmpl)))
 
-nproc := $(shell nproc)
+all = $(cypress_gen) $(template_gen)
+
+nproc = $(shell nproc)
 
 # Run without parallelisation
 internal-all: $(all)
@@ -52,7 +55,7 @@ $(all:.bats=): %: %.bats
 	@echo --- bats $*.bats
 	@bats -r $*.bats
 
-gen: gen-template gen-cypress
+gen: gen-cypress gen-template
 gen-cypress: $(cypress_gen)
 gen-template: $(template_gen)
 
@@ -61,8 +64,7 @@ $(cypress_gen): %.gen.bats: %.cy.js common/gen.bash
 $(template_gen): %.gen.bats: %.bats.gotmpl common/gen.bash
 	@./common/gen.bash template tests/$<
 
-clean: clean-gen
-clean-gen:
+clean:
 	@echo rm $(foreach dir, $(dirs), $(dir)/*.gen.bats)
 	@rm $(foreach dir, $(dirs), $(shell find $(dir) -type f -name *.gen.bats))
 
@@ -87,8 +89,17 @@ run-unit-%:
 run-unit:
 	../scripts/run-from-container.sh $(container_image):unit make -C tests internal-unit
 
+enter-end-to-end:
+	FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main bash
+enter-integration:
+	FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main bash
+enter-regression:
+	FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main bash
+enter-unit:
+	../scripts/run-from-container.sh $(container_image):unit bash
+
 run-cypress-open:
-	FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main  cypress open --project tests/
+	FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main cypress open --project tests/
 
 print-%:
 	@echo $($*)
