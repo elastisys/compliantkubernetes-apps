@@ -3,10 +3,13 @@
 # Tests opa gatekeeper policies
 
 setup_file() {
-  load "../common/lib"
-  load "../common/lib/harbor"
+  export BATS_NO_PARALLELIZE_WITHIN_FILE=true
+  export CK8S_AUTO_APPROVE="true"
 
-  common_setup
+  load "../bats.lib.bash"
+  load_common "harbor.bash"
+  load_common "yq.bash"
+  load_assert
 
   harbor.load_env gatekeeper-policies
   harbor.setup_project
@@ -14,7 +17,7 @@ setup_file() {
 
   export harbor_endpoint
 
-  export user_demo_chart="${ROOT}/tests/common/docs/user-demo/deploy/ck8s-user-demo"
+  export user_demo_chart="${DOCS_PATH}/user-demo/deploy/ck8s-user-demo"
   export user_demo_image
 
   if ! docker pull "${user_demo_image}"; then
@@ -31,19 +34,17 @@ setup_file() {
 }
 
 teardown_file() {
-  load "../common/lib"
-  load "../common/lib/harbor"
-
-  common_setup
+  load "../bats.lib.bash"
+  load_common "harbor.bash"
+  load_assert
 
   harbor.delete_pull_secret wc staging
   harbor.teardown_project
 }
 
 setup() {
-  load "../common/lib"
-
-  common_setup
+  load "../bats.lib.bash"
+  load_assert
 
   with_kubeconfig wc
   with_namespace staging
