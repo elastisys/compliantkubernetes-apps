@@ -1182,7 +1182,7 @@ networkPolicies:
   global:
     objectStorageSwift:
       ips:
-        - set-me-if-(.harbor.persistence.type == "swift")
+        - set-me-if-(.harbor.persistence.type == "swift" or .thanos.objectStorage.type == "swift")
       ports:
         - 5000
     scApiserver:

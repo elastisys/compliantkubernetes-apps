@@ -119,7 +119,6 @@ _refute_condition_and_warn() {
   yq_set common .trivy.enabled 'true'
   yq_set common .networkPolicies.certManager.enabled 'true'
   yq_set common .networkPolicies.coredns.enabled 'true'
-  yq_set sc .harbor.persistence.type \"swift\"
   yq_set sc .networkPolicies.opensearch.enabled 'true'
   yq_set sc .objectStorage.sync.secondaryUrl \"example.com\"
   yq_set sc .networkPolicies.ingressNginx.ingressOverride.enabled 'true'
@@ -129,7 +128,6 @@ _refute_condition_and_warn() {
   _assert_condition_and_warn .\"networkPolicies\".\"global\".\"trivy\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"certManager\".\"letsencrypt\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"coredns\".\"externalDns\".\"ips\"
-  _assert_condition_and_warn .\"networkPolicies\".\"global\".\"objectStorageSwift\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"opensearch\".\"plugins\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"secondaryUrl\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"ingressNginx\".\"ingressOverride\".\"ips\"
@@ -138,7 +136,6 @@ _refute_condition_and_warn() {
   yq_set common .trivy.enabled 'false'
   yq_set common .networkPolicies.certManager.enabled 'false'
   yq_set common .networkPolicies.coredns.enabled 'false'
-  yq_set sc .harbor.persistence.type \"s3\"
   yq_set sc .networkPolicies.opensearch.enabled 'false'
   yq_set sc .objectStorage.sync.secondaryUrl \"\"
   yq_set sc .networkPolicies.ingressNginx.ingressOverride.enabled 'false'
@@ -148,7 +145,6 @@ _refute_condition_and_warn() {
   _refute_condition_and_warn .\"networkPolicies\".\"global\".\"trivy\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"certManager\".\"letsencrypt\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"coredns\".\"externalDns\".\"ips\"
-  _refute_condition_and_warn .\"networkPolicies\".\"global\".\"objectStorageSwift\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"opensearch\".\"plugins\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"secondaryUrl\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"ingressNginx\".\"ingressOverride\".\"ips\"
@@ -276,6 +272,34 @@ _refute_condition_and_warn() {
   _refute_condition_and_warn .\"networkPolicies\".\"externalDns\".\"ips\"
   run _apply_normalise_wc
   _refute_condition_and_warn .\"networkPolicies\".\"externalDns\".\"ips\"
+}
+
+# bats test_tags=conditional_set_me_netpol_object_storage_swift
+@test "conditional-set-me - multiple conditions: network policies swift" {
+
+  yq_set sc .harbor.persistence.type \"swift\"
+  yq_set sc .thanos.objectStorage.type \"swift\"
+
+  run _apply_normalise_sc
+  _assert_condition_and_warn .\"networkPolicies\".\"global\".\"objectStorageSwift\".\"ips\"
+
+  yq_set sc .harbor.persistence.type \"s3\"
+  yq_set sc .thanos.objectStorage.type \"swift\"
+
+  run _apply_normalise_sc
+  _assert_condition_and_warn .\"networkPolicies\".\"global\".\"objectStorageSwift\".\"ips\"
+
+  yq_set sc .harbor.persistence.type \"swift\"
+  yq_set sc .thanos.objectStorage.type \"s3\"
+
+  run _apply_normalise_sc
+  _assert_condition_and_warn .\"networkPolicies\".\"global\".\"objectStorageSwift\".\"ips\"
+
+  yq_set sc .harbor.persistence.type \"s3\"
+  yq_set sc .thanos.objectStorage.type \"s3\"
+
+  run _apply_normalise_sc
+  _refute_condition_and_warn .\"networkPolicies\".\"global\".\"objectStorageSwift\".\"ips\"
 }
 
 # bats test_tags=conditional_set_me_netpol_harbor

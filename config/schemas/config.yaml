@@ -932,6 +932,13 @@ allOf:
               type:
                 type: string
                 const: swift
+      thanos:
+        properties:
+          objectStorage:
+            properties:
+              type:
+                type: string
+                const: swift
   then:
     properties:
       networkPolicies:
