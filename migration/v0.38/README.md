@@ -138,6 +138,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s update-ips  apply
     ```
 
+1. Set ingress-nginx annotations, if they are not already set
+
+    ```bash
+    ./migration/v0.38/prepare/60-set-nginx-annotations.sh
+    ```
+
 ### Apply upgrade - *disruptive*
 
 > *Done during maintenance window.*
