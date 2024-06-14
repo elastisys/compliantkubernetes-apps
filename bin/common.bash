@@ -350,16 +350,16 @@ validate_config() {
         template_config="${2}"
 
         # Loop all lines in ${template_config} and checks if same option has conditional set-me in ${merged_config}
-        options=$(yq_read_block "${template_config}" "set-me-if-*")
+        options="$(yq_read_block "${template_config}" "set-me-if-*")"
         for opt in ${options}; do
-            opt_value=$(yq4 "${opt}" "${merged_config}")
-            opt_value_no_list=$(echo "${opt_value}" | yq4 "[.] | flatten | .[0]")
+            opt_value="$(yq4 "${opt}" "${merged_config}")"
+            opt_value_no_list="$(yq4 "[.] | flatten | .[0]" <<< "${opt_value}")"
 
-            if echo "${opt_value_no_list}" | grep -Pq "^set-me-if-.*$"; then
-                required_condition=$(echo "${opt_value_no_list}" | sed -rn 's/^set-me-if-(.*)/\1/p')
-                if [[ $(yq4 "${required_condition}" "${merged_config}") == "true" ]]; then
+            if [[ "${opt_value_no_list}" =~ ^set-me-if-.*$ ]]; then
+                required_condition="$(sed -rn 's/^set-me-if-(.*)/\1/p' <<< "${opt_value_no_list}")"
+                if [[ "$(yq4 "${required_condition}" "${merged_config}")" == "true" ]]; then
                     # If the option is a list, set the first element in the list
-                    if [[ $(yq4 "${opt} | tag" "${merged_config}") == "!!seq" ]]; then
+                    if [[ "$(yq4 "${opt} | tag" "${merged_config}")" == "!!seq" ]]; then
                         yq4 "${opt}[0] = \"set-me\"" -i "${merged_config}"
                         yq4 "${opt}[0] = \"set-me\"" -i "${template_config}"
                         log_info "Set-me condition matched for ${opt}"
