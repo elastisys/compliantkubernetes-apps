@@ -64,6 +64,7 @@
       apt:
         pkg: "{{ apt_list }}"
         update_cache: yes
+        allow_downgrades: yes
 
     - name: Kubectl
       block:
