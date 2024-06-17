@@ -42,6 +42,9 @@ env.init() {
       yq_set 'sc' '.objectStorage.swift.domainId' '"example-domain-id"'
       yq_set 'secrets' '["objectStorage"]["swift"]["username"]' '"example-username"'
       yq_set 'secrets' '["objectStorage"]["swift"]["password"]' '"example-password"'
+    fi
+
+    if [[ "$(yq_dig sc .harbor.persistence.type)" == "swift" || "$(yq_dig sc .thanos.objectStorage.type)" == "swift" ]]; then
       yq_set 'sc' '.networkPolicies.global.objectStorageSwift.ips' '["0.0.0.0/0"]'
     fi
   fi
