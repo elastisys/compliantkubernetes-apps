@@ -1,7 +1,7 @@
 {{- if .Values.user.constraints }}
 constraints:
 {{- range $key, $value := .Values.user.constraints}}
-  {{ $key }}:{{- unset $value "psaLevel" | toYaml | nindent 4 }}
+  {{ $key }}:{{- unset (deepCopy $value) "psaLevel" | toYaml | nindent 4 }}
 {{- end }}
 {{- end }}
 
