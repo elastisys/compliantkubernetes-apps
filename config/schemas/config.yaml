@@ -1030,7 +1030,10 @@ properties:
               Additional properties for user.
             properties: {}
             type: object
-          properties: {}
+          properties:
+            psaLevel:
+              title: Pod Security Admission level on the namespace
+              type: string
           propertyNames:
             title: Service name
             type: string
