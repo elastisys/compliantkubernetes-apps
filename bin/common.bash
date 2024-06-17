@@ -209,7 +209,7 @@ yq_copy_changes() {
     source2=$2
     target=$3
 
-    keys=$(yq4 '.. | select(tag != "!!map") | path | with(.[]; . = ("\"" + .) + "\"" ) | join "."' "$source2" | sed -r 's/\."[0-9]+".*//' | uniq)
+    keys=$(yq4 '.. | select(tag != "!!map" or (keys|length)==0) | path | with(.[]; . = ("\"" + .) + "\"" ) | join "."' "$source2" | sed -r 's/\."[0-9]+".*//' | uniq)
     for key in ${keys}; do
         compare=$(diff <(yq4 -oj ".${key}" "${source1}" ) <(yq4 -oj ".${key}" "${source2}" ) || true)
         if [[ -n "${compare}" ]]; then
