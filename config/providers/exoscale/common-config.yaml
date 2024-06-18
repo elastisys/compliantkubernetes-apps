@@ -21,10 +21,6 @@ networkPolicies:
   ingressNginx:
     ingressOverride:
       enabled: false
-  coredns:
-    serviceIp:
-      ips:
-        - 10.233.0.3/32
   rookCeph:
     enabled: true
 externalTrafficPolicy:
@@ -32,17 +28,6 @@ externalTrafficPolicy:
 opa:
   rejectLoadBalancerService:
     enabled: true
-clusterApi:
-  enabled: false
-  monitoring:
-    enabled: false
-kubeStateMetrics:
-  clusterAPIMetrics:
-    enabled: false
-calicoAccountant:
-  backend: iptables
-global:
-  clusterDns: 10.233.0.3
 prometheusBlackboxExporter:
   targets:
     rook: true

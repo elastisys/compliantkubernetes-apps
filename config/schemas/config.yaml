@@ -1104,6 +1104,7 @@ properties:
       - ck8sCloudProvider
       - ck8sEnvironmentName
       - ck8sFlavor
+      - ck8sK8sInstaller
       - baseDomain
       - opsDomain
     properties:
@@ -1141,6 +1142,11 @@ properties:
           - prod
           - dev
           - air-gapped
+      ck8sK8sInstaller:
+        type: string
+        enum:
+          - kubespray
+          - capi
       baseDomain:
         title: Base Domain
         description: |-
@@ -3756,17 +3762,6 @@ properties:
     type: object
     additionalProperties: false
     properties:
-      clusterAPIMetrics:
-        title: Cluster API Metrics
-        description: |-
-          Configure collection of Cluster API metrics.
-        type: object
-        additionalProperties: false
-        properties:
-          enabled:
-            title: Cluster API Metrics Enabled
-            type: boolean
-            default: false
       resources:
         $ref: '#/$defs/kubernetesResourceRequirements'
   metricsServer:

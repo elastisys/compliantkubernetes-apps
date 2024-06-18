@@ -27,6 +27,12 @@ ck8s_flavors=(
     "air-gapped"
 )
 
+# shellcheck disable=SC2034
+ck8s_k8s_installers=(
+    "capi"
+    "kubespray"
+)
+
 CK8S_AUTO_APPROVE=${CK8S_AUTO_APPROVE:-"false"}
 
 # Create CK8S_CONFIG_PATH if it does not exist and make it absolute
