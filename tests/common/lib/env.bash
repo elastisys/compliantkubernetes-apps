@@ -14,11 +14,12 @@ env.setup() {
 # Initialise environment
 env.init() {
   if [[ -z "${1:-}" ]] || [[ -z "${2:-}" ]]; then
-    log_fatal "usage: env.init [flavour] [cloud]"
+    log_fatal "usage: env.init [flavour] [cloud] [k8s-installer]"
   fi
 
   export CK8S_FLAVOR="${1}"
   export CK8S_CLOUD_PROVIDER="${2}"
+  export K8S_INSTALLER="${3}"
 
   ck8s init both
 
