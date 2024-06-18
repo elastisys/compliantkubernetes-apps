@@ -3762,17 +3762,6 @@ properties:
     type: object
     additionalProperties: false
     properties:
-      clusterAPIMetrics:
-        title: Cluster API Metrics
-        description: |-
-          Configure collection of Cluster API metrics.
-        type: object
-        additionalProperties: false
-        properties:
-          enabled:
-            title: Cluster API Metrics Enabled
-            type: boolean
-            default: false
       resources:
         $ref: '#/$defs/kubernetesResourceRequirements'
   metricsServer:

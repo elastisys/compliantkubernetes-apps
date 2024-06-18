@@ -358,9 +358,6 @@ kubeStateMetrics:
     limits:
       cpu: 30m
       memory: 300Mi
-  # Enable this if your cluster is managed by Cluster API to get Cluster API metrics.
-  clusterAPIMetrics:
-    enabled: set-me
 
 openstackMonitoring:
   ## Enables openstack api metrics.
