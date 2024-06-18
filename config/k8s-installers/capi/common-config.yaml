@@ -1,0 +1,13 @@
+calicoAccountant:
+  backend: nftables
+clusterApi:
+  enabled: true
+  monitoring:
+    enabled: true
+global:
+  clusterDns: 10.233.0.10
+networkPolicies:
+  coredns:
+    serviceIp:
+      ips:
+        - 10.233.0.10/32

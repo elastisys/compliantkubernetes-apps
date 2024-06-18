@@ -13,7 +13,7 @@ setup_file() {
   gpg.setup
   env.setup
 
-  env.init prod exoscale
+  env.init prod exoscale kubespray
 
   helmfile_template_releases sc
   helmfile_template_releases wc
