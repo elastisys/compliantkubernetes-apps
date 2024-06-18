@@ -1962,6 +1962,12 @@ properties:
           Sync object storage from the primary site to a secondary site with Rclone.
         type: object
         properties:
+          activeDeadlineSeconds:
+            title: Rclone Cronjob Active Deadline Seconds
+            description: |-
+              The maximum amount of time that the Rclone job is allowed to run (in seconds).
+            type: number
+            default: 7200
           enabled:
             title: Rclone Sync Enable
             type: boolean
