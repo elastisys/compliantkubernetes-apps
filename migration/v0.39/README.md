@@ -61,8 +61,6 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     git switch -d v0.39.x
     ```
 
-1. If you have enabled `externalDns` and want to adopt already created dns records you can set `CK8S_HOSTED_ZONE_ID` to the hosted zone id.
-
 1. Prepare upgrade - *non-disruptive*
 
     > *Done before maintenance window.*
@@ -83,6 +81,13 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s upgrade wc v0.39 prepare
     ./bin/ck8s upgrade wc v0.39 apply
     ```
+
+1. If you want to enable `externalDns` and adopt already created DNS records:
+
+    - Set `externalDns.enabled` to `true` in `common-config.yaml`
+    - Set `externalDns.awsRoute53.accessKey` and `externalDns.awsRoute53.secretKey` in `secrets.yaml`
+    - Set `CK8S_HOSTED_ZONE_ID` to the hosted zone id
+    - Run `./migration/v0.39/prepare/60-adopt-dns-records.sh`
 
 1. Apply upgrade - *disruptive*
 
