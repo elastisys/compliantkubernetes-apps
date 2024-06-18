@@ -91,6 +91,13 @@ policies:
         - name: egress-rule-probe
           peers:
             - namespaceSelectorLabels: {}
+        {{- if .Values.networkPolicies.prometheusBlackboxExporter.enabled }}
+        - name: egress-custom-endpoints
+          peers:
+          {{- range .Values.networkPolicies.prometheusBlackboxExporter.customEndpoints.ips  }}
+          - cidr: {{ . }}
+          {{- end }}
+        {{- end }}
       ingress:
         - rule: ingress-rule-prometheus
           ports:

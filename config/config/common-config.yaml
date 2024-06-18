@@ -1086,6 +1086,12 @@ networkPolicies:
   dnsAutoscaler:
     enabled: true
 
+  prometheusBlackboxExporter:
+    enabled: false
+    customEndpoints:
+      ips:
+        - []
+
 # Monitoring and Gatekeeper PSP for rook-ceph enabled/disabled
 rookCeph:
   monitoring:
