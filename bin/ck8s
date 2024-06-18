@@ -34,8 +34,9 @@ usage() {
     echo "  completion bash                                output shell completion code for bash" 1>&2
     echo "  install-requirements [--user] [--no-pass]      installs or updates required tools to run compliantkubernetes-apps" 1>&2
     echo "  validate <wc|sc>                               validates config files" 1>&2
-    echo "  providers                                      lists supported cloud providers" 1>&2
     echo "  flavors                                        lists supported configuration flavors" 1>&2
+    echo "  k8s-installers                                 lists supported configuration kubernetes installers" 1>&2
+    echo "  providers                                      lists supported cloud providers" 1>&2
     echo "  explain <config|secrets> [key.to.parameter]    explains the config or secrets" 1>&2
     echo "  update-ips <wc|sc|both> <apply|dry-run>        Automatically fetches and applies the IPs for network policies" 1>&2
     echo "  clean <wc|sc>                                  Cleans the cluster of apps" 1>&2
@@ -151,6 +152,7 @@ case "${1}" in
         ;;
     providers) echo "${ck8s_cloud_providers[@]}" ;;
     flavors) echo "${ck8s_flavors[@]}" ;;
+    k8s-installers) echo "${ck8s_k8s_installers[@]}" ;;
     explain)
         [[ "${2}" =~ ^(config|secrets)$ ]] || usage
         shift
