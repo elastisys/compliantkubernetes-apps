@@ -152,7 +152,7 @@ case "${1}" in
         ;;
     providers) echo "${ck8s_cloud_providers[@]}" ;;
     flavors) echo "${ck8s_flavors[@]}" ;;
-    k8s-installers) echo "${ck8s_k8s_installers[@]}" ;;
+    k8s-installers) echo "${k8s_installers[@]}" ;;
     explain)
         [[ "${2}" =~ ^(config|secrets)$ ]] || usage
         shift

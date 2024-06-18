@@ -69,9 +69,9 @@ if ! array_contains "${CK8S_FLAVOR}" "${ck8s_flavors[@]}"; then
 fi
 
 # Validate the k8s-installer
-if ! array_contains "${K8S_INSTALLER}" "${ck8s_k8s_installers[@]}"; then
+if ! array_contains "${K8S_INSTALLER}" "${k8s_installers[@]}"; then
     log_error "ERROR: Unsupported kubernetes installer: ${K8S_INSTALLER}"
-    log_error "Supported kubernetes installers: ${ck8s_k8s_installers[*]}"
+    log_error "Supported kubernetes installers: ${k8s_installers[*]}"
     exit 1
 fi
 

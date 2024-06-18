@@ -28,7 +28,7 @@ ck8s_flavors=(
 )
 
 # shellcheck disable=SC2034
-ck8s_k8s_installers=(
+k8s_installers=(
     "capi"
     "kubespray"
 )
