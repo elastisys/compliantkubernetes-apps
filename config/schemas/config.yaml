@@ -1104,6 +1104,7 @@ properties:
       - ck8sCloudProvider
       - ck8sEnvironmentName
       - ck8sFlavor
+      - k8sInstaller
       - baseDomain
       - opsDomain
     properties:
@@ -1141,6 +1142,11 @@ properties:
           - prod
           - dev
           - air-gapped
+      k8sInstaller:
+        type: string
+        enum:
+          - kubespray
+          - capi
       baseDomain:
         title: Base Domain
         description: |-

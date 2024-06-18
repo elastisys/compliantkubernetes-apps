@@ -28,6 +28,7 @@ global:
   ck8sCloudProvider: ${CK8S_CLOUD_PROVIDER}
   ck8sEnvironmentName: ${CK8S_ENVIRONMENT_NAME}
   ck8sFlavor: ${CK8S_FLAVOR}
+  k8sInstaller: ${K8S_INSTALLER}
 
   ## Domain intended for ingress usage in the workload cluster
   ## and to reach user facing services such as Grafana, Harbor and OpenSearch Dashboards.
