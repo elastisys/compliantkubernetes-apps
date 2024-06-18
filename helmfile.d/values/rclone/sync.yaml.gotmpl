@@ -13,6 +13,10 @@ dryrun: {{ $sync.dryrun }}
 {{ $crypt := $sync.encrypt -}}
 crypt: {{- include "crypt-provider" $crypt | nindent 2 }}
 
+{{- if hasKey $sync "activeDeadlineSeconds" }}
+activeDeadlineSeconds: {{ $sync.activeDeadlineSeconds }}
+{{- end }}
+
 targets:
   {{- if $sync.syncDefaultBuckets }}
   {{- range $key, $value := $main.buckets }}
