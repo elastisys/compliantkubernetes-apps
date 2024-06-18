@@ -1,0 +1,16 @@
+calicoAccountant:
+  backend: iptables
+clusterApi:
+  enabled: false
+  monitoring:
+    enabled: false
+kubeStateMetrics:
+  clusterAPIMetrics:
+    enabled: false
+global:
+  clusterDns: 10.233.0.3
+networkPolicies:
+  coredns:
+    serviceIp:
+      ips:
+        - 10.233.0.3/32

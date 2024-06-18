@@ -124,6 +124,9 @@ generate_default_config() {
     local -a files
     files=("${config_template_path}/${config_name}" "${config_template_path}/flavors/${CK8S_FLAVOR}/${config_name}")
 
+    if [[ -f "${config_template_path}/k8s-installer/${K8S_INSTALLER}/${config_name}" ]]; then
+        files+=("${config_template_path}/k8s-installer/${K8S_INSTALLER}/${config_name}")
+    fi
     if [[ -f "${config_template_path}/providers/${CK8S_CLOUD_PROVIDER}/${config_name}" ]]; then
         files+=("${config_template_path}/providers/${CK8S_CLOUD_PROVIDER}/${config_name}")
     fi
