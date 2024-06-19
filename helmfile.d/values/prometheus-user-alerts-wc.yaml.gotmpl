@@ -24,7 +24,7 @@ defaultRules:
     networkpolicies: {{ .Values.networkPolicies.enableAlerting }}
     harbor: false
     webhooks: {{ .Values.prometheus.webhookAlerts.enabled }}
-    kured: {{ and .Values.kured.enabled .Values.kured.metrics.enabled }}
+    kured: false
 
 capacityManagementAlertsPersistentVolumeEnabled: {{ .Values.prometheus.capacityManagementAlerts.persistentVolume.enabled }}
 capacityManagementAlertsPersistentVolumeLimit: {{ .Values.prometheus.capacityManagementAlerts.persistentVolume.limit }}
