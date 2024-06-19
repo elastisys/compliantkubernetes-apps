@@ -137,6 +137,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.39/prepare/60-adopt-dns-records.sh
     ```
 
+1. Set `ingress-nginx` annotations:
+
+    ```bash
+    ./migration/v0.39/prepare/70-set-nginx-annotations.sh
+    ```
+
 ### Apply upgrade - *disruptive*
 
 > *Done during maintenance window.*
