@@ -43,12 +43,15 @@ See [Quickstart](#Quickstart) for instructions on how to initialize the repo
 
 ### :cloud: Cloud providers :cloud:
 
-Currently we support four cloud providers:
+Currently we support the following cloud providers:
 
-- Exoscale
-- Safespring
+- AWS
+- Azure
 - Citycloud/Cleura
 - Elastx
+- Exoscale
+- Openstack
+- Safespring
 - UpCloud
 - In addition to this we support running Compliant Kubernetes on bare metal (beta).
 
@@ -127,7 +130,7 @@ You configure ExternalDNS later in the process.
     #
     # If 'none', no infra provider tailored configuration will be performed!
     #
-    export CK8S_CLOUD_PROVIDER=[exoscale|safespring|citycloud|elastx|upcloud|azure|aws|baremetal|none]
+    export CK8S_CLOUD_PROVIDER=[exoscale|safespring|citycloud|elastx|upcloud|azure|aws|baremetal|openstack|none]
     export CK8S_K8S_INSTALLER=[kubespray|capi] # set this to whichever installer was used for the kubernetes layer
     ```
 

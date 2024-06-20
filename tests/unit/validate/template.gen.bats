@@ -22,6 +22,9 @@
 # - tests/unit/validate/test-kubespray-upcloud-air-gapped.gen.bats
 # - tests/unit/validate/test-kubespray-upcloud-dev.gen.bats
 # - tests/unit/validate/test-kubespray-upcloud-prod.gen.bats
+# - tests/unit/validate/test-kubespray-openstack-air-gapped.gen.bats
+# - tests/unit/validate/test-kubespray-openstack-dev.gen.bats
+# - tests/unit/validate/test-kubespray-openstack-prod.gen.bats
 # - tests/unit/validate/test-capi-aws-air-gapped.gen.bats
 # - tests/unit/validate/test-capi-aws-dev.gen.bats
 # - tests/unit/validate/test-capi-aws-prod.gen.bats
@@ -43,3 +46,6 @@
 # - tests/unit/validate/test-capi-upcloud-air-gapped.gen.bats
 # - tests/unit/validate/test-capi-upcloud-dev.gen.bats
 # - tests/unit/validate/test-capi-upcloud-prod.gen.bats
+# - tests/unit/validate/test-capi-openstack-air-gapped.gen.bats
+# - tests/unit/validate/test-capi-openstack-dev.gen.bats
+# - tests/unit/validate/test-capi-openstack-prod.gen.bats
