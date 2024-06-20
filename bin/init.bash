@@ -19,7 +19,7 @@ if [ -f "${config[default_common]}" ]; then
     cloud_provider=$(yq4 '.global.ck8sCloudProvider' "${config[default_common]}")
     environment_name=$(yq4 '.global.ck8sEnvironmentName' "${config[default_common]}")
     flavor=$(yq4 '.global.ck8sFlavor' "${config[default_common]}")
-    ck8s_installer=$(yq4 '.global.ck8sInstaller' "${config[default_common]}")
+    installer=$(yq4 '.global.ck8sInstaller' "${config[default_common]}")
 fi
 if [ -z "${cloud_provider:-}" ]; then
     : "${CK8S_CLOUD_PROVIDER:?Missing CK8S_CLOUD_PROVIDER}"
@@ -45,13 +45,13 @@ elif [ -v CK8S_FLAVOR ] && [ -n "${CK8S_FLAVOR}" ] && [ "${CK8S_FLAVOR}" != "${f
 else
     export CK8S_FLAVOR="${flavor}"
 fi
-if [ -z "${ck8s_installer:-}" ]; then
+if [ -z "${installer:-}" ]; then
     : "${CK8S_INSTALLER:?Missing CK8S_INSTALLER}"
-elif [ -v CK8S_INSTALLER ] && [ "${CK8S_INSTALLER}" != "${ck8s_installer}" ]; then
-    log_error "ERROR: Kubernetes installer mismatch, '${ck8s_installer}' in config and '${CK8S_INSTALLER}' in env"
+elif [ -v CK8S_INSTALLER ] && [ "${CK8S_INSTALLER}" != "${installer}" ]; then
+    log_error "ERROR: Kubernetes installer mismatch, '${installer}' in config and '${CK8S_INSTALLER}' in env"
     exit 1
 else
-    export CK8S_INSTALLER="${ck8s_installer}"
+    export CK8S_INSTALLER="${installer}"
 fi
 
 # Validate the cloud provider
