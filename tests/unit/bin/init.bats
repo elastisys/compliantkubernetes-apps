@@ -22,7 +22,7 @@ setup() {
   export CK8S_ENVIRONMENT_NAME="unit-test"
   export CK8S_CLOUD_PROVIDER="baremetal"
   export CK8S_FLAVOR="dev"
-  export CK8S_INSTALLER="kubespray"
+  export CK8S_K8S_INSTALLER="kubespray"
 
   common_setup
 }
@@ -59,11 +59,11 @@ teardown() {
   assert_output --partial "Missing CK8S_FLAVOR"
 }
 
-@test "bin/ck8s init - requires CK8S_INSTALLER" {
-  CK8S_INSTALLER="" run ck8s init both
+@test "bin/ck8s init - requires CK8S_K8S_INSTALLER" {
+  CK8S_K8S_INSTALLER="" run ck8s init both
 
   assert_failure
-  assert_output --partial "Missing CK8S_INSTALLER"
+  assert_output --partial "Missing CK8S_K8S_INSTALLER"
 }
 
 @test "bin/ck8s init - requires valid CK8S_PGP_FP or valid CK8S_PGP_UID" {

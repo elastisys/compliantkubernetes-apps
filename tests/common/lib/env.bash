@@ -19,7 +19,7 @@ env.init() {
 
   export CK8S_FLAVOR="${1}"
   export CK8S_CLOUD_PROVIDER="${2}"
-  export CK8S_INSTALLER="${3}"
+  export CK8S_K8S_INSTALLER="${3}"
 
   ck8s init both
 

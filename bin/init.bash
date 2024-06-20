@@ -22,7 +22,7 @@ if [ -f "${config[default_common]}" ] && [ -f "${config[override_common]}" ]; th
     cloud_provider=$(yq4 '.global.ck8sCloudProvider' "${merged_common_config}")
     environment_name=$(yq4 '.global.ck8sEnvironmentName' "${merged_common_config}")
     flavor=$(yq4 '.global.ck8sFlavor' "${merged_common_config}")
-    installer=$(yq4 '.global.ck8sInstaller' "${merged_common_config}")
+    k8s_installer=$(yq4 '.global.ck8sK8sInstaller' "${merged_common_config}")
 fi
 if [ -z "${cloud_provider:-}" ]; then
     : "${CK8S_CLOUD_PROVIDER:?Missing CK8S_CLOUD_PROVIDER}"
@@ -48,13 +48,13 @@ elif [ -v CK8S_FLAVOR ] && [ -n "${CK8S_FLAVOR}" ] && [ "${CK8S_FLAVOR}" != "${f
 else
     export CK8S_FLAVOR="${flavor}"
 fi
-if [ -z "${installer:-}" ]; then
-    : "${CK8S_INSTALLER:?Missing CK8S_INSTALLER}"
-elif [ -v CK8S_INSTALLER ] && [ "${CK8S_INSTALLER}" != "${installer}" ]; then
-    log_error "ERROR: Kubernetes installer mismatch, '${installer}' in config and '${CK8S_INSTALLER}' in env"
+if [ -z "${k8s_installer:-}" ]; then
+    : "${CK8S_K8S_INSTALLER:?Missing CK8S_K8S_INSTALLER}"
+elif [ -v CK8S_K8S_INSTALLER ] && [ "${CK8S_K8S_INSTALLER}" != "${k8s_installer}" ]; then
+    log_error "ERROR: Kubernetes installer mismatch, '${k8s_installer}' in config and '${CK8S_K8S_INSTALLER}' in env"
     exit 1
 else
-    export CK8S_INSTALLER="${installer}"
+    export CK8S_K8S_INSTALLER="${k8s_installer}"
 fi
 
 # Validate the cloud provider
@@ -72,9 +72,9 @@ if ! array_contains "${CK8S_FLAVOR}" "${ck8s_flavors[@]}"; then
 fi
 
 # Validate the installer
-if ! array_contains "${CK8S_INSTALLER}" "${ck8s_installers[@]}"; then
-    log_error "ERROR: Unsupported kubernetes installer: ${CK8S_INSTALLER}"
-    log_error "Supported kubernetes installers: ${ck8s_installers[*]}"
+if ! array_contains "${CK8S_K8S_INSTALLER}" "${ck8s_k8s_installers[@]}"; then
+    log_error "ERROR: Unsupported kubernetes installer: ${CK8S_K8S_INSTALLER}"
+    log_error "Supported kubernetes installers: ${ck8s_k8s_installers[*]}"
     exit 1
 fi
 
@@ -127,8 +127,8 @@ generate_default_config() {
     local -a files
     files=("${config_template_path}/${config_name}" "${config_template_path}/flavors/${CK8S_FLAVOR}/${config_name}")
 
-    if [[ -f "${config_template_path}/installers/${CK8S_INSTALLER}/${config_name}" ]]; then
-        files+=("${config_template_path}/installers/${CK8S_INSTALLER}/${config_name}")
+    if [[ -f "${config_template_path}/k8s-installers/${CK8S_K8S_INSTALLER}/${config_name}" ]]; then
+        files+=("${config_template_path}/k8s-installers/${CK8S_K8S_INSTALLER}/${config_name}")
     fi
     if [[ -f "${config_template_path}/providers/${CK8S_CLOUD_PROVIDER}/${config_name}" ]]; then
         files+=("${config_template_path}/providers/${CK8S_CLOUD_PROVIDER}/${config_name}")
