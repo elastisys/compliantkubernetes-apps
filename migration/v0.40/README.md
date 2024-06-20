@@ -112,7 +112,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 1. Check which Kubernetes installer was used for the clusters and set this in config:
 
     ```bash
-    ./migration/v0.40/prepare/10-set-k8s-installer.sh
+    ./migration/v0.40/prepare/10-set-ck8s-installer.sh
     ```
 
 1. Update apps configuration:

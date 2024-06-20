@@ -128,7 +128,7 @@ You configure ExternalDNS later in the process.
     # If 'none', no infra provider tailored configuration will be performed!
     #
     export CK8S_CLOUD_PROVIDER=[exoscale|safespring|citycloud|elastx|upcloud|azure|aws|baremetal|none]
-    export K8S_INSTALLER=[kubespray|capi] # set this to whichever installer was used for the k8s layer
+    export CK8S_INSTALLER=[kubespray|capi] # set this to whichever installer was used for the kubernetes layer
     ```
 
     > [!NOTE]

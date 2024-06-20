@@ -18,7 +18,7 @@ setup_file() {
   gpg.setup
   env.setup
 
-  env.init {{ .flavor }} {{ .provider }} {{ .k8sInstaller }}
+  env.init {{ .flavor }} {{ .provider }} {{ .ck8sInstaller }}
 }
 
 setup() {
@@ -33,39 +33,39 @@ teardown_file() {
   gpg.teardown
 }
 
-@test "configuration is valid - {{ .k8sInstaller }}:{{ .provider }}:{{ .flavor }} - service cluster" {
+@test "configuration is valid - {{ .ck8sInstaller }}:{{ .provider }}:{{ .flavor }} - service cluster" {
   run ck8s validate sc <<< $'y\n'
 
   assert_success
 }
 
-@test "configuration is valid - {{ .k8sInstaller }}:{{ .provider }}:{{ .flavor }} - workload cluster" {
+@test "configuration is valid - {{ .ck8sInstaller }}:{{ .provider }}:{{ .flavor }} - workload cluster" {
   run ck8s validate wc <<< $'y\n'
 
   assert_success
 }
 
-@test "configuration is invalid - {{ .k8sInstaller }}:{{ .provider }}:{{ .flavor }} - service cluster" {
+@test "configuration is invalid - {{ .ck8sInstaller }}:{{ .provider }}:{{ .flavor }} - service cluster" {
   run yq_set 'sc' '.global.baseDomain' '"this is not a valid hostname"'
   run ck8s validate sc <<< $'y\n'
 
   assert_output --partial 'global.baseDomain'
 }
 
-@test "configuration is invalid - {{ .k8sInstaller }}:{{ .provider }}:{{ .flavor }} - workload cluster" {
+@test "configuration is invalid - {{ .ck8sInstaller }}:{{ .provider }}:{{ .flavor }} - workload cluster" {
   run yq_set 'wc' '.global.baseDomain' '"this is not a valid hostname"'
   run ck8s validate wc <<< $'y\n'
 
   assert_output --partial '"this is not a valid hostname"'
 }
 
-@test "manifests are valid - {{ .k8sInstaller }}:{{ .provider }}:{{ .flavor }} - service cluster" {
+@test "manifests are valid - {{ .ck8sInstaller }}:{{ .provider }}:{{ .flavor }} - service cluster" {
   run helmfile_template_kubeconform service_cluster
 
   assert_success
 }
 
-@test "manifests are valid - {{ .k8sInstaller }}:{{ .provider }}:{{ .flavor }} - workload cluster" {
+@test "manifests are valid - {{ .ck8sInstaller }}:{{ .provider }}:{{ .flavor }} - workload cluster" {
   run helmfile_template_kubeconform workload_cluster
 
   assert_success
@@ -73,13 +73,13 @@ teardown_file() {
 {{ end }}
 
 # These tests are generated into these files:
-{{- range $k8sInstaller := coll.Slice "kubespray" "capi" }}
+{{- range $ck8sInstaller := coll.Slice "kubespray" "capi" }}
 {{- range $provider := coll.Slice "aws" "baremetal" "citycloud" "elastx" "exoscale" "safespring" "upcloud" }}
 {{- range $flavor := coll.Slice "air-gapped" "dev" "prod" }}
 {{- $file := tmpl.Path | path.Dir }}
-{{- $file = printf "test-%s-%s-%s.gen.bats" $k8sInstaller $provider $flavor | path.Join $file }}
+{{- $file = printf "test-%s-%s-%s.gen.bats" $ck8sInstaller $provider $flavor | path.Join $file }}
 # - {{ $file }}
-{{- coll.Dict "flavor" $flavor "provider" $provider "k8sInstaller" $k8sInstaller | tmpl.Exec "template" | file.Write $file }}
+{{- coll.Dict "flavor" $flavor "provider" $provider "ck8sInstaller" $ck8sInstaller | tmpl.Exec "template" | file.Write $file }}
 {{- end }}
 {{- end }}
 {{- end }}

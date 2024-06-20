@@ -18,16 +18,8 @@ source "${here}/common.bash"
 if [ -f "${config[default_common]}" ]; then
     cloud_provider=$(yq4 '.global.ck8sCloudProvider' "${config[default_common]}")
     environment_name=$(yq4 '.global.ck8sEnvironmentName' "${config[default_common]}")
-    k8s_installer=$(yq4 '.global.k8sInstaller' "${config[default_common]}")
     flavor=$(yq4 '.global.ck8sFlavor' "${config[default_common]}")
-fi
-if [ -z "${k8s_installer:-}" ]; then
-    : "${K8S_INSTALLER:?Missing K8S_INSTALLER}"
-elif [ -v K8S_INSTALLER ] && [ "${K8S_INSTALLER}" != "${k8s_installer}" ]; then
-    log_error "ERROR: Kubernetes installer mismatch, '${k8s_installer}' in config and '${K8S_INSTALLER}' in env"
-    exit 1
-else
-    export K8S_INSTALLER="${k8s_installer}"
+    ck8s_installer=$(yq4 '.global.ck8sInstaller' "${config[default_common]}")
 fi
 if [ -z "${cloud_provider:-}" ]; then
     : "${CK8S_CLOUD_PROVIDER:?Missing CK8S_CLOUD_PROVIDER}"
@@ -53,6 +45,14 @@ elif [ -v CK8S_FLAVOR ] && [ -n "${CK8S_FLAVOR}" ] && [ "${CK8S_FLAVOR}" != "${f
 else
     export CK8S_FLAVOR="${flavor}"
 fi
+if [ -z "${ck8s_installer:-}" ]; then
+    : "${CK8S_INSTALLER:?Missing CK8S_INSTALLER}"
+elif [ -v CK8S_INSTALLER ] && [ "${CK8S_INSTALLER}" != "${ck8s_installer}" ]; then
+    log_error "ERROR: Kubernetes installer mismatch, '${ck8s_installer}' in config and '${CK8S_INSTALLER}' in env"
+    exit 1
+else
+    export CK8S_INSTALLER="${ck8s_installer}"
+fi
 
 # Validate the cloud provider
 if ! array_contains "${CK8S_CLOUD_PROVIDER}" "${ck8s_cloud_providers[@]}"; then
@@ -68,10 +68,10 @@ if ! array_contains "${CK8S_FLAVOR}" "${ck8s_flavors[@]}"; then
     exit 1
 fi
 
-# Validate the k8s-installer
-if ! array_contains "${K8S_INSTALLER}" "${k8s_installers[@]}"; then
-    log_error "ERROR: Unsupported kubernetes installer: ${K8S_INSTALLER}"
-    log_error "Supported kubernetes installers: ${k8s_installers[*]}"
+# Validate the installer
+if ! array_contains "${CK8S_INSTALLER}" "${ck8s_installers[@]}"; then
+    log_error "ERROR: Unsupported kubernetes installer: ${CK8S_INSTALLER}"
+    log_error "Supported kubernetes installers: ${ck8s_installers[*]}"
     exit 1
 fi
 
@@ -124,8 +124,8 @@ generate_default_config() {
     local -a files
     files=("${config_template_path}/${config_name}" "${config_template_path}/flavors/${CK8S_FLAVOR}/${config_name}")
 
-    if [[ -f "${config_template_path}/k8s-installer/${K8S_INSTALLER}/${config_name}" ]]; then
-        files+=("${config_template_path}/k8s-installer/${K8S_INSTALLER}/${config_name}")
+    if [[ -f "${config_template_path}/installers/${CK8S_INSTALLER}/${config_name}" ]]; then
+        files+=("${config_template_path}/installers/${CK8S_INSTALLER}/${config_name}")
     fi
     if [[ -f "${config_template_path}/providers/${CK8S_CLOUD_PROVIDER}/${config_name}" ]]; then
         files+=("${config_template_path}/providers/${CK8S_CLOUD_PROVIDER}/${config_name}")

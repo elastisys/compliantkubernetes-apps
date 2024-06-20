@@ -13,7 +13,7 @@ fi
 
 # check if kubespray directory exists
 if [[ -d "${CK8S_CONFIG_PATH}/${cluster}-config" ]]; then
-  yq_add common .global.k8sInstaller "\"kubespray\""
+  yq_add common .global.ck8sInstaller "\"kubespray\""
 else
-  yq_add common .global.k8sInstaller "\"capi\""
+  yq_add common .global.ck8sInstaller "\"capi\""
 fi
