@@ -1,0 +1,42 @@
+openstackMonitoring:
+  enabled: true
+storageClasses:
+  default: cinder-csi
+networkPolicies:
+  kubeSystem:
+    openstack:
+      enabled: true
+      ips:
+        - set-me
+      ports:
+        - 5000
+        - 8774
+        - 8776
+  global:
+    externalLoadBalancer: false
+    ingressUsingHostNetwork: false
+  ingressNginx:
+    enabled: true
+    ingressOverride:
+      enabled: false
+objectStorage:
+  type: s3
+  s3:
+    region: set-me
+    regionEndpoint: set-me
+    forcePathStyle: true
+ingressNginx:
+  controller:
+    config:
+      useProxyProtocol: false
+    useHostPort: false
+    service:
+      enabled: true
+      type: LoadBalancer
+      annotations: {}
+      allocateLoadBalancerNodePorts: true
+externalTrafficPolicy:
+  local: false
+opa:
+  rejectLoadBalancerService:
+    enabled: false
