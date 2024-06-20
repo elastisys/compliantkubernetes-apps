@@ -5,33 +5,18 @@
 # are used throughout all of the scripts.
 
 : "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
+here="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+root_path="${here}/.."
 
 # shellcheck disable=SC2034
-ck8s_cloud_providers=(
-    "aws"
-    "azure"
-    "baremetal"
-    "citycloud"
-    "exoscale"
-    "safespring"
-    "upcloud"
-    "elastx"
-    "azure"
-    "none"
-)
+mapfile -t ck8s_cloud_providers < <(find "${root_path}/config/providers" -mindepth 1 -maxdepth 1 -type d -printf '%f\n')
+ck8s_cloud_providers+=( "none" )
 
 # shellcheck disable=SC2034
-ck8s_flavors=(
-    "dev"
-    "prod"
-    "air-gapped"
-)
+mapfile -t ck8s_flavors < <(find "${root_path}/config/flavors" -mindepth 1 -maxdepth 1 -type d -printf '%f\n')
 
 # shellcheck disable=SC2034
-ck8s_k8s_installers=(
-    "capi"
-    "kubespray"
-)
+mapfile -t ck8s_k8s_installers < <(find "${root_path}/config/k8s-installers" -mindepth 1 -maxdepth 1 -type d -printf '%f\n')
 
 CK8S_AUTO_APPROVE=${CK8S_AUTO_APPROVE:-"false"}
 
@@ -40,8 +25,6 @@ mkdir -p "${CK8S_CONFIG_PATH}"
 CK8S_CONFIG_PATH=$(readlink -f "${CK8S_CONFIG_PATH}")
 export CK8S_CONFIG_PATH
 
-here="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
-root_path="${here}/.."
 config_template_path="${root_path}/config"
 # TODO: these are used by sourced scripts.
 # Should we export all "externally" used variables?
