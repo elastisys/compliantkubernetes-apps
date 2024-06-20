@@ -74,7 +74,7 @@ teardown_file() {
 
 # These tests are generated into these files:
 {{- range $ck8sK8sInstaller := coll.Slice "kubespray" "capi" }}
-{{- range $provider := coll.Slice "aws" "baremetal" "citycloud" "elastx" "exoscale" "safespring" "upcloud" }}
+{{- range $provider := coll.Slice "aws" "baremetal" "citycloud" "elastx" "exoscale" "safespring" "upcloud" "openstack" }}
 {{- range $flavor := coll.Slice "air-gapped" "dev" "prod" }}
 {{- $file := tmpl.Path | path.Dir }}
 {{- $file = printf "test-%s-%s-%s.gen.bats" $ck8sK8sInstaller $provider $flavor | path.Join $file }}
