@@ -3426,6 +3426,15 @@ properties:
           additionalDatasources:
             title: Grafana Additional Datasources
             type: object
+          dataproxy:
+            title: Grafana dataproxy values
+            description: Configure Grafana dataproxy values
+            type: object
+            properties:
+              timeout:
+                title: Grafana dataproxy timeout
+                type: number
+                default: 600
           plugins:
             title: Grafana Additional Plugins
             type: array
