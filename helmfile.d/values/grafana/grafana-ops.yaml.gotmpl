@@ -126,6 +126,8 @@ grafana.ini:
     {{- end }}
   users:
     viewers_can_edit: {{ .Values.grafana.ops.viewersCanEdit }}
+  dataproxy:
+    timeout: {{ .Values.grafana.ops.dataproxy.timeout }}
   {{- if .Values.grafana.ops.additionalConfigValues }}
   {{ .Values.grafana.ops.additionalConfigValues | nindent 2 }}
   {{- end }}

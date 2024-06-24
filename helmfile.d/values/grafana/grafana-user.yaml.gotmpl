@@ -121,6 +121,8 @@ grafana.ini:
     viewers_can_edit: {{ .Values.grafana.user.viewersCanEdit }}
   dashboards:
     default_home_dashboard_path: /tmp/dashboards/welcome-dashboard.json
+  dataproxy:
+    timeout: {{ .Values.grafana.user.dataproxy.timeout }}
   {{- if .Values.grafana.user.additionalConfigValues }}
   {{ .Values.grafana.user.additionalConfigValues | nindent 2 }}
   {{- end }}

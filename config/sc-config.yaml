@@ -157,9 +157,8 @@ grafana:
     # the correct IP/range and port should be added to .networkPolicies.monitoring.grafana.externalDataSources
     additionalDatasources: {}
     additionalConfigValues: ""
-    # additionalConfigValues: |-
-    #   dataproxy:
-    #     timeout: 600
+    dataproxy:
+      timeout: 600
   user:
     enabled: true
     # subdomain moved to common-config
