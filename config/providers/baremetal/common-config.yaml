@@ -9,8 +9,6 @@ ingressNginx:
     useHostPort: true
     service:
       enabled: false
-      type: set-me-if-ingressNginx.controller.service.enabled
-      annotations: set-me-if-ingressNginx.controller.service.enabled
       allocateLoadBalancerNodePorts: true
 networkPolicies:
   global:

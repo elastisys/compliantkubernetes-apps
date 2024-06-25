@@ -86,18 +86,6 @@ generate_sops_config() {
     sops_config_write_fingerprints "${fingerprint}"
 }
 
-# Only writes value if it is set to "set-me*"
-# Usage: replace_set_me <file> <field> <value>
-replace_set_me(){
-    if [[ $# -ne 3 ]]; then
-        log_error "ERROR: number of args in replace_set_me must be 3. #=[$#]"
-        exit 1
-    fi
-    if [[ $(yq4 "${2}" "${1}") =~ ^set-me.* ]]; then
-        yq4 --inplace "${2} = ${3}" "${1}"
-    fi
-}
-
 # Usage: generate_default_config <default_config>
 generate_default_config() {
     if [[ $# -ne 1 ]]; then

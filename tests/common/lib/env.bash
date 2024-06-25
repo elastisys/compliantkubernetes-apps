@@ -43,6 +43,10 @@ env.init() {
       yq_set 'secrets' '["objectStorage"]["swift"]["username"]' '"example-username"'
       yq_set 'secrets' '["objectStorage"]["swift"]["password"]' '"example-password"'
     fi
+
+    if [[ "$(yq_dig sc .harbor.persistence.type)" == "swift" || "$(yq_dig sc .thanos.objectStorage.type)" == "swift" ]]; then
+      yq_set 'sc' '.networkPolicies.global.objectStorageSwift.ips' '["0.0.0.0/0"]'
+    fi
   fi
 
   yq_set 'common' '.clusterAdmin.users' '["admin@example.com"]'
@@ -57,6 +61,8 @@ env.init() {
   yq_set 'sc' '.harbor.oidc.adminGroupName' '"admin"'
 
   yq_set 'sc' '.opensearch.extraRoleMappings' '[]'
+
+  yq_set 'sc' '.alerts.opsGenieHeartbeat.name' '"example"'
 
   if ! [[ "$*" =~ --skip-network-policies ]]; then
     yq_set 'common' '.networkPolicies.global.objectStorage.ips' '["0.0.0.0/0"]'
@@ -89,6 +95,10 @@ env.init() {
 
     yq_set 'sc' '.networkPolicies.monitoring.grafana.externalDashboardProvider.ips' '["0.0.0.0/0"]'
     yq_set 'sc' '.networkPolicies.opensearch.plugins.ips' '["0.0.0.0/0"]'
+
+    if [[ "$(yq_dig sc .networkPolicies.kubeSystem.openstack.enabled)" == "true" ]]; then
+      yq_set 'common' '.networkPolicies.kubeSystem.openstack.ips' '["0.0.0.0/0"]'
+    fi
   fi
 
   yq_set 'wc' '.opa.imageRegistry.URL' '["harbor.ck8s.example.com"]'

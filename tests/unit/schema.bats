@@ -102,6 +102,7 @@ find_schemas() {
   run yq4 '{
     filename: [
       .. | select(
+        (. != "true") and
         (has("$ref") | not) and
         (has("allOf") | not) and
         (has("oneOf") | not) and

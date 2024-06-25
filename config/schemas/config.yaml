@@ -208,7 +208,7 @@ $defs:
       List of IP netmasks
     items:
       type: string
-      regex: ^[0-9a-f.:]{2,45}/[0-9]{1,3}$
+      pattern: ^[0-9a-f.:]{2,45}/[0-9]{1,3}$
       description: A IP address with netmask
       examples:
         - 0.0.0.0/0
@@ -835,6 +835,265 @@ $defs:
 type: object
 required:
   - global
+allOf:
+- if:
+    properties:
+      trivy:
+        properties:
+          enabled:
+            type: boolean
+            const: true
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          global:
+            properties:
+              trivy:
+                properties:
+                  ips:
+                    $ref: '#/$defs/iplist'
+- if:
+    properties:
+      kured:
+        properties:
+          enabled:
+            type: boolean
+            const: true
+          notification:
+            properties:
+              slack:
+                properties:
+                  enabled:
+                    type: boolean
+                    const: true
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          kured:
+            properties:
+              notificationSlack:
+                properties:
+                  ips:
+                    $ref: '#/$defs/iplist'
+- if:
+    properties:
+      falco:
+        properties:
+          enabled:
+            type: boolean
+            const: true
+      networkPolicies:
+        properties:
+          falco:
+            properties:
+              enabled:
+                type: boolean
+                const: true
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          falco:
+            properties:
+              plugins:
+                properties:
+                  ips:
+                    $ref: '#/$defs/iplist'
+- if:
+    properties:
+      externalDns:
+        properties:
+          enabled:
+            type: boolean
+            const: true
+      networkPolicies:
+        properties:
+          externalDns:
+            properties:
+              enabled:
+                type: boolean
+                const: true
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          externalDns:
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
+- if:
+    properties:
+      harbor:
+        properties:
+          persistence:
+            properties:
+              type:
+                type: string
+                const: swift
+      thanos:
+        properties:
+          objectStorage:
+            properties:
+              type:
+                type: string
+                const: swift
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          global:
+            properties:
+              objectStorageSwift:
+                properties:
+                  ips:
+                    $ref: '#/$defs/iplist'
+- if:
+    properties:
+      harbor:
+        properties:
+          enabled:
+            type: boolean
+            const: true
+      networkPolicies:
+        properties:
+          harbor:
+            properties:
+              enabled:
+                type: boolean
+                const: true
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          harbor:
+            properties:
+              registries:
+                properties:
+                  ips:
+                    $ref: '#/$defs/iplist'
+              jobservice:
+                properties:
+                  ips:
+                    $ref: '#/$defs/iplist'
+              trivy:
+                properties:
+                  ips:
+                    $ref: '#/$defs/iplist'
+- if:
+    properties:
+      objectStorage:
+        properties:
+          sync:
+            properties:
+              enabled:
+                type: boolean
+                const: true
+          type:
+            type: string
+            const: s3
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          rclone:
+            properties:
+              sync:
+                properties:
+                  objectStorage:
+                    properties:
+                      ips:
+                        $ref: '#/$defs/iplist'
+- if:
+    properties:
+      objectStorage:
+        properties:
+          sync:
+            properties:
+              enabled:
+                type: boolean
+                const: true
+    anyOf:
+    - properties:
+        harbor:
+          properties:
+            persistence:
+              properties:
+                type:
+                  type: string
+                  const: swift
+    - properties:
+        thanos:
+          properties:
+            objectStorage:
+              properties:
+                type:
+                  type: string
+                  const: swift
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          rclone:
+            properties:
+              sync:
+                properties:
+                  objectStorageSwift:
+                    properties:
+                      ips:
+                        $ref: '#/$defs/iplist'
+- if:
+    properties:
+      objectStorage:
+        properties:
+          sync:
+            properties:
+              secondaryUrl:
+                type: string
+                format: uri
+    not:
+      properties:
+        objectStorage:
+          properties:
+            sync:
+              properties:
+                secondaryUrl:
+                  const: ""
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          rclone:
+            properties:
+              sync:
+                properties:
+                  secondaryUrl:
+                    properties:
+                      ips:
+                        $ref: '#/$defs/iplist'
+- if:
+    properties:
+      networkPolicies:
+        properties:
+          ingressNginx:
+            properties:
+              ingressOverride:
+                properties:
+                  enabled:
+                    type: boolean
+                    const: true
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          ingressNginx:
+            properties:
+              ingressOverride:
+                properties:
+                  ips:
+                    title: Network Policies Ingress Override IPs
+                    $ref: '#/$defs/iplist'
 properties:
   global:
     title: Global options
@@ -2006,6 +2265,10 @@ properties:
               - gcs
               - s3
               - swift
+          secondaryUrl:
+            title: Rclone Sync Secondary URL
+            type: string
+            format: uri
           azure:
             $ref: '#/properties/objectStorage/properties/azure'
           s3:
@@ -3280,6 +3543,18 @@ properties:
     description: Configure alerting.
     type: object
     additionalProperties: false
+    if:
+      properties:
+        alertTo:
+          type: string
+          const: slack
+    then:
+      properties:
+        slack:
+          properties:
+            channel:
+              title: Slack Channel
+              type: string
     properties:
       alertTo:
         title: Alert To
@@ -3303,39 +3578,40 @@ properties:
         description: Configure heartbeats to OpsGenie.
         type: object
         additionalProperties: false
-        properties:
-          enabled:
-            title: OpsGenie Heartbeat Enabled
-            type: boolean
-            default: false
-          name:
-            title: OpsGenie Heartbeat Name
-            type: string
-          url:
-            title: OpsGenie Heartbeat URL
-            type: string
-            format: uri
-            default: https://api.eu.opsgenie.com/v2/heartbeats
-        required:
-          - enabled
         if:
           properties:
             enabled:
-              title: OpsGenie Heartbeat Enabled
+              type: boolean
               const: true
         then:
           required:
             - name
             - url
+          properties:
+            name:
+              title: OpsGenie Heartbeat Name
+              type: string
+            url:
+              title: OpsGenie Heartbeat URL
+              type: string
+              format: uri
+              default: https://api.eu.opsgenie.com/v2/heartbeats
+        properties:
+          enabled:
+            title: OpsGenie Heartbeat Enabled
+            type: boolean
+            default: false
+          name: true
+          url: true
+        required:
+          - enabled
       slack:
         title: Alert Slack Config
         description: Configure alerting to Slack.
         type: object
         additionalProperties: false
         properties:
-          channel:
-            title: Slack Channel
-            type: string
+          channel: true
           customTemplate:
             title: Slack Custom Template
             type: object
@@ -5601,6 +5877,23 @@ properties:
         description: Configure issuers for cert-manager using Let's Encrypt.
         type: object
         additionalProperties: false
+        if:
+          properties:
+            enabled:
+              type: boolean
+              const: true
+        then:
+          properties:
+            prod:
+              properties:
+                email:
+                  title: Issuer Email
+                  type: string
+            staging:
+              properties:
+                email:
+                  title: Issuer Email
+                  type: string
         properties:
           enabled:
             title: Let's Encrypt Enabled
@@ -5612,9 +5905,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              email:
-                title: Issuer Email
-                type: string
+              email: true
               solvers:
                 title: Issuer Solver
                 type: array
@@ -5624,9 +5915,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              email:
-                title: Issuer Email
-                type: string
+              email: true
               solvers:
                 title: Issuer Solver
                 type: array
@@ -5696,8 +5985,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
               ports:
                 $ref: '#/$defs/portlist'
                 default:
@@ -5797,8 +6085,7 @@ properties:
               Used for Trivy to fetch vulnerability databases both in Harbor and Trivy Operator.
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
               port:
                 $ref: '#/$defs/port'
                 default: 443
@@ -5831,17 +6118,23 @@ properties:
                 title: Network Policies Ingress Override Enabled
                 type: boolean
                 default: false
-              ips:
-                title: Network Policies Ingress Override IPs
-                oneOf:
-                  - $ref: '#/$defs/iplist'
-                  - type: string
-                    const: set-me-if-enabled
+              ips: true
       certManager:
         title: Network Policies cert-manager
         description: Configure cert-manager network policy rules.
         type: object
         additionalProperties: false
+        if:
+          properties:
+            enabled:
+              type: boolean
+              const: true
+        then:
+          properties:
+            letsencrypt:
+              properties:
+                ips:
+                  $ref: '#/$defs/iplist'
         properties:
           enabled:
             title: Network Policies cert-manager Enabled
@@ -5857,8 +6150,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
           dns01:
             title: Network Policies cert-manager DNS-01
             description: Configure network policy rule to allow cert-manager perform DNS-01 challenges.
@@ -5882,12 +6174,32 @@ properties:
                 - opensearch-system
                 - thanos
       externalDns:
-        $ref: '#/$defs/netpolRule'
+        title: Network Policies ExternalDNS
+        description: Configure ExternalDNS [network policy](https://kubernetes.io/docs/concepts/services-networking/network-policies/) rules.
+        additionalProperties: false
+        properties:
+          enabled:
+            type: boolean
+          ips: true
+          ports:
+            $ref: '#/$defs/portlist'
+        type: object
       dex:
         title: Network Policies Dex
         description: Configure Dex network policy rules.
         type: object
         additionalProperties: false
+        if:
+          properties:
+            enabled:
+              type: boolean
+              const: true
+        then:
+          properties:
+            connectors:
+              properties:
+                ips:
+                  $ref: '#/$defs/iplist'
         properties:
           enabled:
             title: Network Policies Dex Enabled
@@ -5899,8 +6211,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
               ports:
                 $ref: '#/$defs/portlist'
                 default:
@@ -5987,8 +6298,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
               ports:
                 $ref: '#/$defs/portlist'
                 default:
@@ -5999,8 +6309,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
               ports:
                 $ref: '#/$defs/portlist'
                 default:
@@ -6011,8 +6320,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
               ports:
                 $ref: '#/$defs/portlist'
                 default:
@@ -6045,6 +6353,17 @@ properties:
         description: Configure OpenSearch network policy rules.
         type: object
         additionalProperties: false
+        if:
+          properties:
+            enabled:
+              type: boolean
+              const: true
+        then:
+          properties:
+            plugins:
+              properties:
+                ips:
+                  $ref: '#/$defs/iplist'
         properties:
           enabled:
             title: Network Policies OpenSearch Enabled
@@ -6056,8 +6375,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
               ports:
                 $ref: '#/$defs/portlist'
                 default:
@@ -6067,6 +6385,30 @@ properties:
         description: Configure monitoring network policy rules.
         type: object
         additionalProperties: false
+        if:
+          properties:
+            enabled:
+              type: boolean
+              const: true
+            grafana:
+              properties:
+                externalDataSources:
+                  properties:
+                    enabled:
+                      type: boolean
+                      const: true
+        then:
+          properties:
+            grafana:
+              properties:
+                externalDataSources:
+                  properties:
+                    ips:
+                      $ref: '#/$defs/iplist'
+                    ports:
+                      $ref: '#/$defs/portlist'
+                      default:
+                        - 443
         properties:
           enabled:
             title: Network Policies Monitoring Enabled
@@ -6091,29 +6433,16 @@ properties:
                     default:
                       - 443
               externalDataSources:
-                if:
-                  title: Grafana External Datasources
-                  description: Configure network policy rules to allow Grafana to use external datasources.
-                  type: object
-                  properties:
-                    enabled:
-                      title: Grafana External Datasources Enabled
-                      type: boolean
-                      default: false
-                      const: true
-                then:
-                  title: Grafana External Datasources
-                  description: Configure network policy rules to allow Grafana to use external datasources.
-                  type: object
-                  properties:
-                    enabled:
-                      title: Grafana External Datasources Enabled
-                      default: false
-                      type: boolean
-                    ips:
-                      $ref: '#/$defs/iplist'
-                    ports:
-                      $ref: '#/$defs/portlist'
+                title: Grafana External Datasources
+                description: Configure network policy rules to allow Grafana to use external datasources.
+                type: object
+                properties:
+                  enabled:
+                    title: Grafana External Datasources Enabled
+                    default: false
+                    type: boolean
+                  ips: true
+                  ports: true
       alertmanager:
         title: Network Policies Alertmanager
         description: Configure Alertmanager network policy rules.
@@ -6188,8 +6517,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
               ports:
                 $ref: '#/$defs/portlist'
                 default:
@@ -6210,8 +6538,7 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
               ports:
                 $ref: '#/$defs/portlist'
                 default:
@@ -6224,6 +6551,42 @@ properties:
           enabled:
             title: Network Policies Rclone Enabled
             type: boolean
+          sync:
+            title: Network Policies Rclone Sync
+            description: Configure network policy rules to allow rclone to sync.
+            type: object
+            additionalProperties: false
+            properties:
+              objectStorage:
+                title: Network Policies Rclone Sync Object Storage
+                description: Configure network policy rules to allow rclone to sync object storage.
+                type: object
+                properties:
+                  ips: true
+                  ports:
+                    $ref: '#/$defs/portlist'
+                    default:
+                      - 443
+              objectStorageSwift:
+                title: Network Policies Rclone Sync Object Storage
+                description: Configure network policy rules to allow rclone to sync object storage with Swift.
+                type: object
+                properties:
+                  ips: true
+                  ports:
+                    $ref: '#/$defs/portlist'
+                    default:
+                      - 5000
+              secondaryUrl:
+                title: Network Policies Rclone Sync Object Storage
+                description: Configure network policy rules to allow rclone to sync with a secondary URL.
+                type: object
+                properties:
+                  ips: true
+                  ports:
+                    $ref: '#/$defs/portlist'
+                    default:
+                      - 443
       velero:
         title: Network Policies Velero
         description: Configure Velero network policy rules.
@@ -6283,6 +6646,21 @@ properties:
         description: Configure CoreDNS network policy rules.
         type: object
         additionalProperties: false
+        if:
+          properties:
+            enabled:
+              type: boolean
+              const: true
+        then:
+          properties:
+            externalDns:
+              properties:
+                ips:
+                  $ref: '#/$defs/iplist'
+            serviceIp:
+              properties:
+                ips:
+                  $ref: '#/$defs/iplist'
         properties:
           enabled:
             title: Network Policies CoreDNS
@@ -6294,16 +6672,14 @@ properties:
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
           serviceIp:
             title: Network Policies CoreDNS Service IP
             description: Configure network policy rule to allow CoreDNS to query the internal service IP.
             type: object
             additionalProperties: false
             properties:
-              ips:
-                $ref: '#/$defs/iplist'
+              ips: true
       rookCeph:
         title: Network Policies Rook Ceph
         description: Configure Rook Ceph network policy rules.
@@ -6375,6 +6751,16 @@ properties:
       > See [the upstream documentation](https://kubernetes-sigs.github.io/external-dns/) for reference.
     type: object
     additionalProperties: false
+    if:
+      properties:
+        enabled:
+          type: boolean
+          const: true
+    then:
+      properties:
+        txtOwnerId:
+          title: External DNS TXT Owner ID
+          type: string
     properties:
       enabled:
         title: External DNS Enabled
@@ -6409,11 +6795,7 @@ properties:
         items:
           title: External DNS Domain
           type: string
-      txtOwnerId:
-        title: External DNS TXT Owner ID
-        type: string
-        examples:
-          - set-me-if-externalDns.enabled
+      txtOwnerId: true
       txtPrefix:
         title: External DNS TXT Prefix
         type: string

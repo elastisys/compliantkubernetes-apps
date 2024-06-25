@@ -36,8 +36,6 @@ ingressNginx:
     service:
       enabled: false
       allocateLoadBalancerNodePorts: true
-      type: set-me-if-ingressNginx.controller.service.enabled
-      annotations: set-me-if-ingressNginx.controller.service.enabled
 externalTrafficPolicy:
   local: false
 opa:
