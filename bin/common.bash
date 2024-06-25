@@ -420,12 +420,7 @@ validate_config() {
         yq_merge "${config_template_path}/common-config.yaml" \
             "${config_template_path}/sc-config.yaml" \
             > "${template_file}"
-        check_conditionals "${config[config_file_sc]}" "${template_file}"
-        validate "${config[config_file_sc]}" "${template_file}"
-        schema_validate "${config[config_file_sc]}" "${config_template_path}/schemas/config.yaml"
-        check_conditionals "${secrets[secrets_file]}" "${config_template_path}/secrets.yaml"
-        validate "${secrets[secrets_file]}" "${config_template_path}/secrets.yaml"
-        schema_validate "${secrets[secrets_file]}" "${config_template_path}/schemas/secrets.yaml"
+        config_to_validate="${config[config_file_sc]}"
     elif [[ $1 == "wc" ]]; then
         check_config "${config_template_path}/common-config.yaml" \
             "${config_template_path}/wc-config.yaml" \
@@ -433,16 +428,18 @@ validate_config() {
         yq_merge "${config_template_path}/common-config.yaml" \
             "${config_template_path}/wc-config.yaml" \
             > "${template_file}"
-        check_conditionals "${config[config_file_wc]}" "${template_file}"
-        validate "${config[config_file_wc]}" "${template_file}"
-        schema_validate "${config[config_file_wc]}" "${config_template_path}/schemas/config.yaml"
-        check_conditionals "${secrets[secrets_file]}" "${config_template_path}/secrets.yaml"
-        validate "${secrets[secrets_file]}" "${config_template_path}/secrets.yaml"
-        schema_validate "${secrets[secrets_file]}" "${config_template_path}/schemas/secrets.yaml"
+        config_to_validate="${config[config_file_wc]}"
     else
         log_error "ERROR: usage validate_config <sc|wc>"
         exit 1
     fi
+
+    check_conditionals "${config_to_validate}" "${template_file}"
+    validate "${config_to_validate}" "${template_file}"
+    schema_validate "${config_to_validate}" "${config_template_path}/schemas/config.yaml"
+    check_conditionals "${secrets[secrets_file]}" "${config_template_path}/secrets.yaml"
+    validate "${secrets[secrets_file]}" "${config_template_path}/secrets.yaml"
+    schema_validate "${secrets[secrets_file]}" "${config_template_path}/schemas/secrets.yaml"
 
     if ${maybe_exit} && ! ${CK8S_AUTO_APPROVE}; then
         ask_abort
