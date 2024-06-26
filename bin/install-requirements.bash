@@ -11,7 +11,7 @@ if [ "${#}" -ge 1 ] && [ "${1}" = "--user" ]; then
   export CK8S_INSTALL_PATH="${CK8S_INSTALL_PATH:-"${HOME}/bin"}"
   ansible-playbook -e 'ansible_python_interpreter=/usr/bin/python3' --ask-become-pass roles/get-requirements.yaml
 else
-  if [ "${#}" -ge 1 ] && [ "${1}" = "--become" ]; then
+  if [ "${#}" -ge 1 ] && [ "${1}" = "--no-pass" ]; then
     ansible-playbook -e 'ansible_python_interpreter=/usr/bin/python3' --become --become-user root roles/get-requirements.yaml
   else
     ansible-playbook -e 'ansible_python_interpreter=/usr/bin/python3' --ask-become-pass --become --become-user root roles/get-requirements.yaml
