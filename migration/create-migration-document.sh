@@ -38,11 +38,13 @@ if [ -f "${folder_name}/README.md" ]; then
     echo -n "- ${folder_name}/README.md exists. Do you want to replace it? (y/N): "
     read -r reply
     if [[ ${reply} =~ ^[yY]$ ]]; then
-        envsubst < "${here}/template/README.md" > "${folder_name}/README.md"
+        # shellcheck disable=SC2016
+        envsubst '$new_version$old_version' < "${here}/template/README.md" > "${folder_name}/README.md"
         echo "- ${folder_name}/README.md replaced"
     fi
 else
-    envsubst < "${here}/template/README.md" > "${folder_name}/README.md"
+    # shellcheck disable=SC2016
+    envsubst '$new_version$old_version' < "${here}/template/README.md" > "${folder_name}/README.md"
     echo "- ${folder_name}/README.md created"
 fi
 

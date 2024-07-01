@@ -14,7 +14,7 @@ setup_file() {
 
   common_setup
 
-  env.init prod baremetal
+  env.init prod baremetal kubespray
 }
 
 teardown_file() {

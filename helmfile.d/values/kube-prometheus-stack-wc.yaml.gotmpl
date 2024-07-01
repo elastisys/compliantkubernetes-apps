@@ -22,7 +22,7 @@ prometheusOperator:
 
 kube-state-metrics:
   resources: {{- toYaml .Values.kubeStateMetrics.resources | nindent 4 }}
-  {{- if .Values.kubeStateMetrics.clusterAPIMetrics.enabled }}
+  {{- if .Values.clusterApi.enabled }}
   rbac:
     extraRules:
       - apiGroups:

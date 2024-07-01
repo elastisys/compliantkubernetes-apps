@@ -16,7 +16,7 @@ setup_file() {
   gpg.setup
   env.setup
 
-  env.init prod {{ .provider }}
+  env.init prod {{ .provider }} kubespray
 
   helmfile_template_releases sc
   helmfile_template_releases wc

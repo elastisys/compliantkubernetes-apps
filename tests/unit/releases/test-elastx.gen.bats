@@ -13,7 +13,7 @@ setup_file() {
   gpg.setup
   env.setup
 
-  env.init prod elastx
+  env.init prod elastx kubespray
 
   helmfile_template_releases sc
   helmfile_template_releases wc

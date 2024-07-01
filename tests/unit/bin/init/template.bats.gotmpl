@@ -15,7 +15,7 @@ setup_file() {
   gpg.setup
   env.setup
 
-  env.init {{ .flavor }} {{ .provider }}
+  env.init {{ .flavor }} {{ .provider }} {{ .ck8sK8sInstaller }}
 }
 
 setup() {
@@ -36,21 +36,23 @@ teardown_file() {
   gpg.teardown
 }
 
-@test "init is successful - {{ .provider }}:{{ .flavor }}" {
+@test "init is successful - {{ .ck8sK8sInstaller }}:{{ .provider }}:{{ .flavor }}" {
   test_init_successful
 }
 
-@test "init is idempotent - {{ .provider }}:{{ .flavor }}" {
+@test "init is idempotent - {{ .ck8sK8sInstaller }}:{{ .provider }}:{{ .flavor }}" {
   test_init_idempotent
 }
 {{ end }}
 
 # These tests are generated into these files:
+{{- range $ck8sK8sInstaller := coll.Slice "kubespray" "capi" }}
 {{- range $provider := coll.Slice "aws" "baremetal" "citycloud" "elastx" "exoscale" "safespring" "upcloud" }}
 {{- range $flavor := coll.Slice "air-gapped" "dev" "prod" }}
 {{- $file := tmpl.Path | path.Dir }}
-{{- $file = printf "test-%s-%s.gen.bats" $provider $flavor | path.Join $file }}
+{{- $file = printf "test-%s-%s-%s.gen.bats" $ck8sK8sInstaller $provider $flavor | path.Join $file }}
 # - {{ $file }}
-{{- coll.Dict "flavor" $flavor "provider" $provider | tmpl.Exec "template" | file.Write $file }}
+{{- coll.Dict "flavor" $flavor "provider" $provider "ck8sK8sInstaller" $ck8sK8sInstaller | tmpl.Exec "template" | file.Write $file }}
+{{- end }}
 {{- end }}
 {{- end }}

@@ -14,7 +14,7 @@ setup_file() {
 
   common_setup
 
-  env.init dev baremetal --skip-object-storage --skip-network-policies
+  env.init dev baremetal kubespray --skip-object-storage --skip-network-policies
 
   yq_set common .objectStorage.type '"s3"'
   yq_set common .objectStorage.s3.regionEndpoint '"https://s3.foo.dev-ck8s.com:1234"'
