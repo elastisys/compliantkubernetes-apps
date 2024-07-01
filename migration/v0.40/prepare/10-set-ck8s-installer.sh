@@ -11,9 +11,11 @@ if [[ "${CK8S_CLUSTER}" == both ]]; then
   cluster="wc"
 fi
 
+default_common_config="${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
+
 # check if kubespray directory exists
 if [[ -d "${CK8S_CONFIG_PATH}/${cluster}-config" ]]; then
-  yq_add common .global.ck8sK8sInstaller "\"kubespray\""
+  yq4 -i '.global.ck8sK8sInstaller = "kubespray"' "${default_common_config}"
 else
-  yq_add common .global.ck8sK8sInstaller "\"capi\""
+  yq4 -i '.global.ck8sK8sInstaller = "capi"' "${default_common_config}"
 fi

@@ -15,14 +15,11 @@ here="$(dirname "$(readlink -f "$0")")"
 source "${here}/common.bash"
 
 # Load cloud provider, environment name, and flavor from config if available.
-if [ -f "${config[default_common]}" ] && [ -f "${config[override_common]}" ]; then
-    merged_common_config=$(mktemp --suffix="-tpl.yaml")
-    append_trap "rm ${merged_common_config}" EXIT
-    yq_merge "${config[default_common]}" "${config[override_common]}" > "${merged_common_config}"
-    cloud_provider=$(yq4 '.global.ck8sCloudProvider' "${merged_common_config}")
-    environment_name=$(yq4 '.global.ck8sEnvironmentName' "${merged_common_config}")
-    flavor=$(yq4 '.global.ck8sFlavor' "${merged_common_config}")
-    k8s_installer=$(yq4 '.global.ck8sK8sInstaller' "${merged_common_config}")
+if [ -f "${config[default_common]}" ]; then
+    cloud_provider=$(yq4 '.global.ck8sCloudProvider' "${config[default_common]}")
+    environment_name=$(yq4 '.global.ck8sEnvironmentName' "${config[default_common]}")
+    flavor=$(yq4 '.global.ck8sFlavor' "${config[default_common]}")
+    k8s_installer=$(yq4 '.global.ck8sK8sInstaller' "${config[default_common]}")
 fi
 if [ -z "${cloud_provider:-}" ]; then
     : "${CK8S_CLOUD_PROVIDER:?Missing CK8S_CLOUD_PROVIDER}"
