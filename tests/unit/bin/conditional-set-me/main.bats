@@ -14,6 +14,7 @@ setup_file() {
 
   export CK8S_FLAVOR=dev
   export CK8S_CLOUD_PROVIDER=baremetal
+  export CK8S_K8S_INSTALLER=kubespray
   ck8s init both
 }
 
