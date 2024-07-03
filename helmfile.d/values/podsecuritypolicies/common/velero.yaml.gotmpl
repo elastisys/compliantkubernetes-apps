@@ -22,7 +22,7 @@ constraints:
           operator: Exists
       allow:
         runAsUser:
-          rule: RunAsNonRoot
+          rule: MustRunAsNonRoot
       mutation:
         runAsUser: 1000
     data-upload:
@@ -30,6 +30,6 @@ constraints:
         velero.io/exposer-pod-group: snapshot-exposer
       allow:
         runAsUser:
-          rule: RunAsNonRoot
+          rule: MustRunAsNonRoot
       mutation:
         runAsUser: 1000
