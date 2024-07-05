@@ -124,15 +124,21 @@ check_opensearch_snapshots_status() {
                 IFS=$'\n' readarray -t data < <(awk '{ print $1 " " $2 " " $3}' <<<"$snapshots")
                 IFS=" " read -ra last_snapshot <<<"${data[-1]}"
 
-                now_epoch=$(date +%s)
-                last_snapshot_epoch=${last_snapshot[2]}
-                ((diff = now_epoch - last_snapshot_epoch))
 
-                if [[ $diff -gt 86400 ]]; then
-                    no_error=false
-                    debug_msg+="[ERROR] The snapshot has been created for more than 24 hours, with a status: ${last_snapshot[1]}\n"
+                if [[ "${#last_snapshot[@]}" -gt 0 ]]; then
+                    now_epoch=$(date +%s)
+                    last_snapshot_epoch=${last_snapshot[2]}
+                    ((diff = now_epoch - last_snapshot_epoch))
+
+                    if [[ $diff -gt 86400 ]]; then
+                        no_error=false
+                        debug_msg+="[ERROR] The latest snapshot has not been created within the past 24 hours, with status: ${last_snapshot[1]}\n"
+                    else
+                        debug_msg+="[WARNING] The latest snapshot has been created within the past 24 hours, with status: ${last_snapshot[1]}\n"
+                    fi
                 else
-                    debug_msg+="[WARNING] The latest snapshot has been created within 24 hours, with a status: ${last_snapshot[1]}\n"
+                    no_error=false
+                    debug_msg+="[ERROR] No snapshots found, if this is a brand new cluster this can safely be ignored\n"
                 fi
             fi
         else
