@@ -2,7 +2,7 @@
 
 The test suite is implemented using [`bats`](https://github.com/bats-core/bats-core) and [`cypress`](https://github.com/cypress-io/cypress), with unit, regression, integration, and end-to-end tests under their own respective directory.
 
-Generators are employed to generate `bats` tests from `cypress` and `gotmpl` tests to integrate it into the rest of test suites.
+Plain `bats` tests are generated from `cypress` tests to integrate them into the rest of the test suites, additionally plain `bats` tests are generated from `gotmpl` tests to provide parametric tests.
 
 The test harness is implemented to be run in a container using either rootful `docker` or rootless `podman`.
 
@@ -20,7 +20,7 @@ The test harness is implemented to be run in a container using either rootful `d
 The tests differentiate between static and dynamic tests, all static tests can be run without setting up an environment, and all dynamic tests requires an environment to test.
 Static tests are tagged with `static`.
 
-> [!danger]
+> [!caution]
 > This type of distinction will be phased out and all unit, regression, and integration tests will be required to be static!
 
 The `tests / unit-static` workflow on GitHub is invoked with the following commands:
@@ -50,12 +50,6 @@ make run-integration
 You must have `make` installed and either rootful `docker` or rootless `podman`!
 Check the [DEVELOPMENT](../DEVELOPMENT.md) docs additional requirements to run local-clusters for integration and regression tests.
 
-Certain test suites are generated automatically as a dependency or with:
-
-```bash
-make gen
-```
-
 Run all tests:
 
 ```bash
@@ -70,14 +64,11 @@ make run-<unit|regression|integration|end-to-end>
 
 Additionally tests can be filtered via tags using the `-<tags,...>` suffix to the `run-<target>` command.
 
-Clean up:
+To force cypress and template tests to be regenerated run:
 
 ```bash
-# remove dependencies and generated files
 make clean
-
-# remove generated files
-make clean-gen
+make gen
 ```
 
 ### Direct usage with `bats` or `cypress`
@@ -98,9 +89,10 @@ bats -r .
 bats -r <unit|regression|integration|end-to-end>
 # files
 bats <path/to/file.bats>
+# to filter on tags add the argument --filter-tags <tags,...>
 ```
 
-Additionally tests can be filtered via tags using the `--filter-tags <tags,...>` argument.
+The `cypress` test suite can also be manually run directly through `cypress`:
 
 ```bash
 # all
@@ -117,7 +109,7 @@ It can be useful to open `cypress` as it will give you a view of how the tests e
 cypress open
 ```
 
-Then it will auto-reload and auto-execute as tests are updated, use `it.only` instead of `it` to run only selected tests.
+It will auto-reload and auto-execute as tests are updated, use `it.only` instead of `it` to run only selected tests.
 
 This is also possible to do from outside of the container with:
 
