@@ -49,7 +49,7 @@ log.continue() {
 
     read -r reply
     if ! [[ "${reply}" =~ ^(y|Y|yes|Yes|YES)$ ]]; then
-      log.fatal "aborted"
+      return 1
     fi
   fi
 }
@@ -63,7 +63,7 @@ yq() {
 }
 
 declare runtime
-if command -v docker >/dev/null && docker version >/dev/null 2>&1 && [[ ! "$(docker version)" =~ Podman ]]; then
+if command -v docker >/dev/null && docker version &>/dev/null && [[ ! "$(docker version)" =~ Podman ]]; then
   runtime="docker"
 elif command -v podman >/dev/null; then
   export KIND_EXPERIMENTAL_PROVIDER="podman"
@@ -111,13 +111,22 @@ cluster.exist() {
 }
 
 network.create() {
-  if ! "${runtime}" network inspect "${1}" > /dev/null 2>&1; then
+  if ! "${runtime}" network inspect "${1}" &>/dev/null; then
     log.info "- creating network ${1}"
     "${runtime}" network create "${1}"
   fi
 }
+network.delete() {
+  if "${runtime}" network inspect "${1}" &>/dev/null; then
+    log.warn "- deleting network ${1}"
+    if ! "${runtime}" network rm "${1}" &>/dev/null; then
+      log.warn "- unable to delete network ${1}, assuming it is still in use, else this must be deleted manually"
+    fi
+  fi
+}
+
 container.create() {
-  if ! "${runtime}" container inspect "${1}" > /dev/null 2>&1; then
+  if ! "${runtime}" container inspect "${1}" &>/dev/null; then
     log.info "- creating container ${1}"
     "${runtime}" run --detach "${@:2}"
   else
@@ -125,20 +134,20 @@ container.create() {
   fi
 }
 container.delete() {
-  if "${runtime}" container inspect "${1}" > /dev/null 2>&1; then
+  if "${runtime}" container inspect "${1}" &>/dev/null; then
     log.warn "- deleting container ${1}"
     "${runtime}" container stop "${1}"
     "${runtime}" container rm "${1}"
   fi
 }
 volume.create() {
-  if ! "${runtime}" volume inspect "${1}" > /dev/null 2>&1; then
+  if ! "${runtime}" volume inspect "${1}" &>/dev/null; then
     log.info "- creating volume ${1}"
     "${runtime}" volume create "${1}"
   fi
 }
 volume.delete() {
-  if "${runtime}" volume inspect "${1}" > /dev/null 2>&1; then
+  if "${runtime}" volume inspect "${1}" &>/dev/null; then
     log.warn "- deleting volume ${1}"
     "${runtime}" volume rm "${1}"
   fi
@@ -176,6 +185,7 @@ cache() {
     delete)
       container.delete "${name}"
       volume.delete "${name}"
+      network.delete kind
       ;;
     esac
   done
@@ -204,13 +214,17 @@ resolve() {
       echo -e '[Resolve]\nDNS=127.0.64.43\nDomains=~.' | sudo tee /etc/systemd/resolved.conf.d/00-local-resolve.conf
       sudo systemctl restart systemd-resolved.service
     else
-      if command -v resolvectl >/dev/null 2>&1; then
-        local link
-        link="$(resolvectl default-route | sed -rn 's/.*\((.+)\): yes/\1/p')"
-        log.continue "set local-resolve as current dns server on ${link}?"
-        resolvectl dns "${link}" 127.0.64.43
+      if command -v resolvectl &>/dev/null; then
+        local -a links
+        readarray -t links < <(resolvectl default-route | sed -rn 's/.*\((.+)\): yes/\1/p')
+
+        for link in "${links[@]}"; do
+          if log.continue "set local-resolve as current dns server on ${link}?"; then
+            resolvectl dns "${link}" 127.0.64.43
+          fi
+        done
       else
-        log.warn "set local-resolve as the current dns server 127.0.64.43"
+        log.error "for dns to work with your local-cluster you must manually set local-resolve as the current dns server 127.0.64.43!"
       fi
     fi
     ;;
@@ -218,9 +232,15 @@ resolve() {
     if [[ -n "${CI:-}" ]]; then
       sudo rm /etc/systemd/resolved.conf.d/00-local-resolve.conf
       sudo systemctl restart systemd-resolved.service
+    else
+      if command -v resolvectl &>/dev/null && log.continue "restart systemd-resolved to reset dns servers?"; then
+        systemctl restart systemd-resolved.service
+      else
+        log.error "for dns to work with your regular dns server(s) you must manually reset you dns settings!"
+      fi
     fi
     container.delete local-resolve
-    log.warn "reconnect your current network connection or restart systemd-resolved to restore previous dns servers!"
+    network.delete kind
     ;;
   esac
 }
@@ -309,7 +329,7 @@ create() {
       log.info "cluster ${cluster} is in creating state, continuing"
       index.state "${cluster}" "configuring"
     else
-      log.continue "cluster ${cluster} already exists\n  - do you want to adopt it?"
+      log.continue "cluster ${cluster} already exists\n  - do you want to adopt it?" || log.fatal "aborted"
       index.state "${cluster}" "configuring"
     fi
   else
@@ -376,9 +396,9 @@ delete() {
 
   if cluster.exist "${cluster}"; then
     if [[ "$(index.state "${cluster}")" == "null" ]]; then
-      log.continue "cluster ${cluster} is not managed by this index\n  - do you want to delete it?"
+      log.continue "cluster ${cluster} is not managed by this index\n  - do you want to delete it?" || log.fatal "aborted"
     fi
-    log.continue "cluster ${cluster} is about to be deleted\n  - do you want to delete it?"
+    log.continue "cluster ${cluster} is about to be deleted\n  - do you want to delete it?" || log.fatal "aborted"
     log.warn "kind delete cluster \"${cluster}\""
     kind delete cluster --name "${cluster}"
     index.state "${cluster}" "delete"
