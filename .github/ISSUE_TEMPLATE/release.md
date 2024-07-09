@@ -30,9 +30,8 @@ assignees: ""
 
 ### Infrastructure provider
 
-- [ ] Cleura
+- [ ] Azure
 - [ ] Elastx
-- [ ] Exoscale
 - [ ] Safespring
 - [ ] UpCloud
 
@@ -553,9 +552,8 @@ Follow the public disaster recovery documentation to perform restores from the p
 
 ### Infrastructure provider
 
-- [ ] Cleura
+- [ ] Azure
 - [ ] Elastx
-- [ ] Exoscale
 - [ ] Safespring
 - [ ] UpCloud
 
