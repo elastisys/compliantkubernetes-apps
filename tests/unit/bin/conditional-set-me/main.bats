@@ -3,19 +3,15 @@
 # bats file_tags=static,general,bin:conditional_set_me
 
 setup_file() {
-  load "../../../common/lib"
-  load "../../../common/lib/env"
-  load "../../../common/lib/gpg"
+  load "../../../bats.lib.bash"
+  load_common "env.bash"
+  load_common "gpg.bash"
+  load_common "yq.bash"
 
-  env.setup
   gpg.setup
+  env.setup
 
-  common_setup
-
-  export CK8S_FLAVOR=dev
-  export CK8S_CLOUD_PROVIDER=baremetal
-  export CK8S_K8S_INSTALLER=kubespray
-  ck8s init both
+  env.init baremetal kubespray dev --skip-issuers --skip-network-policies
 }
 
 teardown_file() {
@@ -24,10 +20,10 @@ teardown_file() {
 }
 
 setup() {
-  load "../../../common/lib"
-  load "../../../common/lib/env"
-
-  common_setup
+  load "../../../bats.lib.bash"
+  load_common "env.bash"
+  load_common "yq.bash"
+  load_assert
 
   env.private
 }
@@ -53,7 +49,7 @@ _refute_condition_and_warn() {
 # bats test_tags=conditional_set_me_ingress_nginx
 @test "conditional-set-me - singular conditions: ingressNginx" {
 
-  yq_set common .ingressNginx.controller.service.enabled 'true'
+  yq.set common .ingressNginx.controller.service.enabled 'true'
   run _apply_normalise_sc
   _assert_condition_and_warn .\"ingressNginx\".\"controller\".\"service\".\"type\"
   _assert_condition_and_warn .\"ingressNginx\".\"controller\".\"service\".\"annotations\"
@@ -61,7 +57,7 @@ _refute_condition_and_warn() {
   _assert_condition_and_warn .\"ingressNginx\".\"controller\".\"service\".\"type\"
   _assert_condition_and_warn .\"ingressNginx\".\"controller\".\"service\".\"annotations\"
 
-  yq_set common .ingressNginx.controller.service.enabled 'false'
+  yq.set common .ingressNginx.controller.service.enabled 'false'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"ingressNginx\".\"controller\".\"service\".\"type\"
   _refute_condition_and_warn .\"ingressNginx\".\"controller\".\"service\".\"annotations\"
@@ -73,7 +69,7 @@ _refute_condition_and_warn() {
 # bats test_tags=conditional_set_me_letsencrypt
 @test "conditional-set-me - singular conditions: letsencrypt" {
 
-  yq_set common .issuers.letsencrypt.enabled 'true'
+  yq.set common .issuers.letsencrypt.enabled 'true'
   run _apply_normalise_sc
   _assert_condition_and_warn .\"issuers\".\"letsencrypt\".\"prod\".\"email\"
   _assert_condition_and_warn .\"issuers\".\"letsencrypt\".\"staging\".\"email\"
@@ -81,7 +77,7 @@ _refute_condition_and_warn() {
   _assert_condition_and_warn .\"issuers\".\"letsencrypt\".\"prod\".\"email\"
   _assert_condition_and_warn .\"issuers\".\"letsencrypt\".\"staging\".\"email\"
 
-  yq_set common .issuers.letsencrypt.enabled 'false'
+  yq.set common .issuers.letsencrypt.enabled 'false'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"issuers\".\"letsencrypt\".\"prod\".\"email\"
   _refute_condition_and_warn .\"issuers\".\"letsencrypt\".\"staging\".\"email\"
@@ -93,11 +89,11 @@ _refute_condition_and_warn() {
 # bats test_tags=conditional_set_me_opsgenie_alerts
 @test "conditional-set-me - singular conditions: opsgenie alerts" {
 
-  yq_set common .alerts.opsGenieHeartbeat.enabled 'true'
+  yq.set common .alerts.opsGenieHeartbeat.enabled 'true'
   run _apply_normalise_sc
   _assert_condition_and_warn .\"alerts\".\"opsGenieHeartbeat\".\"name\"
 
-  yq_set common .alerts.opsGenieHeartbeat.enabled 'false'
+  yq.set common .alerts.opsGenieHeartbeat.enabled 'false'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"alerts\".\"opsGenieHeartbeat\".\"name\"
 }
@@ -105,11 +101,11 @@ _refute_condition_and_warn() {
 # bats test_tags=conditional_set_me_slack_alerts
 @test "conditional-set-me - singular conditions: slack alerts" {
 
-  yq_set common .alerts.alertTo \"slack\"
+  yq.set common .alerts.alertTo \"slack\"
   run _apply_normalise_sc
   _assert_condition_and_warn .\"alerts\".\"slack\".\"channel\"
 
-  yq_set common .alerts.alertTo \"\"
+  yq.set common .alerts.alertTo \"\"
   run _apply_normalise_sc
   _refute_condition_and_warn .\"alerts\".\"slack\".\"channel\"
 }
@@ -117,13 +113,13 @@ _refute_condition_and_warn() {
 # bats test_tags=conditional_set_me_netpol_singular_sc
 @test "conditional-set-me - singular conditions: network policies sc" {
 
-  yq_set common .trivy.enabled 'true'
-  yq_set common .networkPolicies.certManager.enabled 'true'
-  yq_set common .networkPolicies.coredns.enabled 'true'
-  yq_set sc .networkPolicies.opensearch.enabled 'true'
-  yq_set sc .objectStorage.sync.secondaryUrl \"example.com\"
-  yq_set sc .networkPolicies.ingressNginx.ingressOverride.enabled 'true'
-  yq_set sc .networkPolicies.dex.enabled 'true'
+  yq.set common .trivy.enabled 'true'
+  yq.set common .networkPolicies.certManager.enabled 'true'
+  yq.set common .networkPolicies.coredns.enabled 'true'
+  yq.set sc .networkPolicies.opensearch.enabled 'true'
+  yq.set sc .objectStorage.sync.secondaryUrl \"example.com\"
+  yq.set sc .networkPolicies.ingressNginx.ingressOverride.enabled 'true'
+  yq.set sc .networkPolicies.dex.enabled 'true'
 
   run _apply_normalise_sc
   _assert_condition_and_warn .\"networkPolicies\".\"global\".\"trivy\".\"ips\"
@@ -134,13 +130,13 @@ _refute_condition_and_warn() {
   _assert_condition_and_warn .\"networkPolicies\".\"ingressNginx\".\"ingressOverride\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"dex\".\"connectors\".\"ips\"
 
-  yq_set common .trivy.enabled 'false'
-  yq_set common .networkPolicies.certManager.enabled 'false'
-  yq_set common .networkPolicies.coredns.enabled 'false'
-  yq_set sc .networkPolicies.opensearch.enabled 'false'
-  yq_set sc .objectStorage.sync.secondaryUrl \"\"
-  yq_set sc .networkPolicies.ingressNginx.ingressOverride.enabled 'false'
-  yq_set sc .networkPolicies.dex.enabled 'false'
+  yq.set common .trivy.enabled 'false'
+  yq.set common .networkPolicies.certManager.enabled 'false'
+  yq.set common .networkPolicies.coredns.enabled 'false'
+  yq.set sc .networkPolicies.opensearch.enabled 'false'
+  yq.set sc .objectStorage.sync.secondaryUrl \"\"
+  yq.set sc .networkPolicies.ingressNginx.ingressOverride.enabled 'false'
+  yq.set sc .networkPolicies.dex.enabled 'false'
 
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"global\".\"trivy\".\"ips\"
@@ -156,10 +152,10 @@ _refute_condition_and_warn() {
 # bats test_tags=conditional_set_me_netpol_singular_wc
 @test "conditional-set-me - singular conditions: network policies wc" {
 
-  yq_set common .trivy.enabled 'true'
-  yq_set common .networkPolicies.certManager.enabled 'true'
-  yq_set common .networkPolicies.coredns.enabled 'true'
-  yq_set wc .networkPolicies.ingressNginx.ingressOverride.enabled 'true'
+  yq.set common .trivy.enabled 'true'
+  yq.set common .networkPolicies.certManager.enabled 'true'
+  yq.set common .networkPolicies.coredns.enabled 'true'
+  yq.set wc .networkPolicies.ingressNginx.ingressOverride.enabled 'true'
 
   run _apply_normalise_wc
   _assert_condition_and_warn .\"networkPolicies\".\"global\".\"trivy\".\"ips\"
@@ -167,10 +163,10 @@ _refute_condition_and_warn() {
   _assert_condition_and_warn .\"networkPolicies\".\"coredns\".\"externalDns\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"ingressNginx\".\"ingressOverride\".\"ips\"
 
-  yq_set common .trivy.enabled 'false'
-  yq_set common .networkPolicies.certManager.enabled 'false'
-  yq_set common .networkPolicies.coredns.enabled 'false'
-  yq_set wc .networkPolicies.ingressNginx.ingressOverride.enabled 'false'
+  yq.set common .trivy.enabled 'false'
+  yq.set common .networkPolicies.certManager.enabled 'false'
+  yq.set common .networkPolicies.coredns.enabled 'false'
+  yq.set wc .networkPolicies.ingressNginx.ingressOverride.enabled 'false'
 
   run _apply_normalise_wc
   _refute_condition_and_warn .\"networkPolicies\".\"global\".\"trivy\".\"ips\"
@@ -182,29 +178,29 @@ _refute_condition_and_warn() {
 # bats test_tags=conditional_set_me_netpol_kured
 @test "conditional-set-me - multiple conditions: network policies kured" {
 
-  yq_set common .kured.enabled 'true'
-  yq_set common .kured.notification.slack.enabled 'true'
+  yq.set common .kured.enabled 'true'
+  yq.set common .kured.notification.slack.enabled 'true'
   run _apply_normalise_sc
   _assert_condition_and_warn .\"networkPolicies\".\"kured\".\"notificationSlack\".\"ips\"
   run _apply_normalise_wc
   _assert_condition_and_warn .\"networkPolicies\".\"kured\".\"notificationSlack\".\"ips\"
 
-  yq_set common .kured.enabled 'true'
-  yq_set common .kured.notification.slack.enabled 'false'
+  yq.set common .kured.enabled 'true'
+  yq.set common .kured.notification.slack.enabled 'false'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"kured\".\"notificationSlack\".\"ips\"
   run _apply_normalise_wc
   _refute_condition_and_warn .\"networkPolicies\".\"kured\".\"notificationSlack\".\"ips\"
 
-  yq_set common .kured.enabled 'false'
-  yq_set common .kured.notification.slack.enabled 'true'
+  yq.set common .kured.enabled 'false'
+  yq.set common .kured.notification.slack.enabled 'true'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"kured\".\"notificationSlack\".\"ips\"
   run _apply_normalise_wc
   _refute_condition_and_warn .\"networkPolicies\".\"kured\".\"notificationSlack\".\"ips\"
 
-  yq_set common .kured.enabled 'false'
-  yq_set common .kured.notification.slack.enabled 'false'
+  yq.set common .kured.enabled 'false'
+  yq.set common .kured.notification.slack.enabled 'false'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"kured\".\"notificationSlack\".\"ips\"
   run _apply_normalise_wc
@@ -214,29 +210,29 @@ _refute_condition_and_warn() {
 # bats test_tags=conditional_set_me_netpol_falco
 @test "conditional-set-me - multiple conditions: network policies falco" {
 
-  yq_set common .falco.enabled 'true'
-  yq_set common .networkPolicies.falco.enabled 'true'
+  yq.set common .falco.enabled 'true'
+  yq.set common .networkPolicies.falco.enabled 'true'
   run _apply_normalise_sc
   _assert_condition_and_warn .\"networkPolicies\".\"falco\".\"plugins\".\"ips\"
   run _apply_normalise_wc
   _assert_condition_and_warn .\"networkPolicies\".\"falco\".\"plugins\".\"ips\"
 
-  yq_set common .falco.enabled 'true'
-  yq_set common .networkPolicies.falco.enabled 'false'
+  yq.set common .falco.enabled 'true'
+  yq.set common .networkPolicies.falco.enabled 'false'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"falco\".\"plugins\".\"ips\"
   run _apply_normalise_wc
   _refute_condition_and_warn .\"networkPolicies\".\"falco\".\"plugins\".\"ips\"
 
-  yq_set common .falco.enabled 'false'
-  yq_set common .networkPolicies.falco.enabled 'true'
+  yq.set common .falco.enabled 'false'
+  yq.set common .networkPolicies.falco.enabled 'true'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"falco\".\"plugins\".\"ips\"
   run _apply_normalise_wc
   _refute_condition_and_warn .\"networkPolicies\".\"falco\".\"plugins\".\"ips\"
 
-  yq_set common .falco.enabled 'false'
-  yq_set common .networkPolicies.falco.enabled 'false'
+  yq.set common .falco.enabled 'false'
+  yq.set common .networkPolicies.falco.enabled 'false'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"falco\".\"plugins\".\"ips\"
   run _apply_normalise_wc
@@ -246,29 +242,29 @@ _refute_condition_and_warn() {
 # bats test_tags=conditional_set_me_netpol_externaldns
 @test "conditional-set-me - multiple conditions: network policies externalDns" {
 
-  yq_set common .externalDns.enabled 'true'
-  yq_set common .networkPolicies.externalDns.enabled 'true'
+  yq.set common .externalDns.enabled 'true'
+  yq.set common .networkPolicies.externalDns.enabled 'true'
   run _apply_normalise_sc
   _assert_condition_and_warn .\"networkPolicies\".\"externalDns\".\"ips\"
   run _apply_normalise_wc
   _assert_condition_and_warn .\"networkPolicies\".\"externalDns\".\"ips\"
 
-  yq_set common .externalDns.enabled 'true'
-  yq_set common .networkPolicies.externalDns.enabled 'false'
+  yq.set common .externalDns.enabled 'true'
+  yq.set common .networkPolicies.externalDns.enabled 'false'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"externalDns\".\"ips\"
   run _apply_normalise_wc
   _refute_condition_and_warn .\"networkPolicies\".\"externalDns\".\"ips\"
 
-  yq_set common .externalDns.enabled 'false'
-  yq_set common .networkPolicies.externalDns.enabled 'true'
+  yq.set common .externalDns.enabled 'false'
+  yq.set common .networkPolicies.externalDns.enabled 'true'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"externalDns\".\"ips\"
   run _apply_normalise_wc
   _refute_condition_and_warn .\"networkPolicies\".\"externalDns\".\"ips\"
 
-  yq_set common .externalDns.enabled 'false'
-  yq_set common .networkPolicies.externalDns.enabled 'false'
+  yq.set common .externalDns.enabled 'false'
+  yq.set common .networkPolicies.externalDns.enabled 'false'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"externalDns\".\"ips\"
   run _apply_normalise_wc
@@ -278,26 +274,26 @@ _refute_condition_and_warn() {
 # bats test_tags=conditional_set_me_netpol_object_storage_swift
 @test "conditional-set-me - multiple conditions: network policies swift" {
 
-  yq_set sc .harbor.persistence.type \"swift\"
-  yq_set sc .thanos.objectStorage.type \"swift\"
+  yq.set sc .harbor.persistence.type \"swift\"
+  yq.set sc .thanos.objectStorage.type \"swift\"
 
   run _apply_normalise_sc
   _assert_condition_and_warn .\"networkPolicies\".\"global\".\"objectStorageSwift\".\"ips\"
 
-  yq_set sc .harbor.persistence.type \"s3\"
-  yq_set sc .thanos.objectStorage.type \"swift\"
+  yq.set sc .harbor.persistence.type \"s3\"
+  yq.set sc .thanos.objectStorage.type \"swift\"
 
   run _apply_normalise_sc
   _assert_condition_and_warn .\"networkPolicies\".\"global\".\"objectStorageSwift\".\"ips\"
 
-  yq_set sc .harbor.persistence.type \"swift\"
-  yq_set sc .thanos.objectStorage.type \"s3\"
+  yq.set sc .harbor.persistence.type \"swift\"
+  yq.set sc .thanos.objectStorage.type \"s3\"
 
   run _apply_normalise_sc
   _assert_condition_and_warn .\"networkPolicies\".\"global\".\"objectStorageSwift\".\"ips\"
 
-  yq_set sc .harbor.persistence.type \"s3\"
-  yq_set sc .thanos.objectStorage.type \"s3\"
+  yq.set sc .harbor.persistence.type \"s3\"
+  yq.set sc .thanos.objectStorage.type \"s3\"
 
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"global\".\"objectStorageSwift\".\"ips\"
@@ -306,29 +302,29 @@ _refute_condition_and_warn() {
 # bats test_tags=conditional_set_me_netpol_harbor
 @test "conditional-set-me - multiple conditions: network policies harbor" {
 
-  yq_set sc .harbor.enabled 'true'
-  yq_set sc .networkPolicies.harbor.enabled 'true'
+  yq.set sc .harbor.enabled 'true'
+  yq.set sc .networkPolicies.harbor.enabled 'true'
   run _apply_normalise_sc
   _assert_condition_and_warn .\"networkPolicies\".\"harbor\".\"registries\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"harbor\".\"jobservice\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"harbor\".\"trivy\".\"ips\"
 
-  yq_set sc .harbor.enabled 'true'
-  yq_set sc .networkPolicies.harbor.enabled 'false'
+  yq.set sc .harbor.enabled 'true'
+  yq.set sc .networkPolicies.harbor.enabled 'false'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"harbor\".\"registries\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"harbor\".\"jobservice\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"harbor\".\"trivy\".\"ips\"
 
-  yq_set sc .harbor.enabled 'false'
-  yq_set sc .networkPolicies.harbor.enabled 'true'
+  yq.set sc .harbor.enabled 'false'
+  yq.set sc .networkPolicies.harbor.enabled 'true'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"harbor\".\"registries\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"harbor\".\"jobservice\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"harbor\".\"trivy\".\"ips\"
 
-  yq_set sc .harbor.enabled 'false'
-  yq_set sc .networkPolicies.harbor.enabled 'false'
+  yq.set sc .harbor.enabled 'false'
+  yq.set sc .networkPolicies.harbor.enabled 'false'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"harbor\".\"registries\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"harbor\".\"jobservice\".\"ips\"
@@ -338,26 +334,26 @@ _refute_condition_and_warn() {
 # bats test_tags=conditional_set_me_netpol_monitoring
 @test "conditional-set-me - multiple conditions: network policies monitoring" {
 
-  yq_set sc .networkPolicies.monitoring.enabled 'true'
-  yq_set sc .networkPolicies.monitoring.grafana.externalDataSources.enabled 'true'
+  yq.set sc .networkPolicies.monitoring.enabled 'true'
+  yq.set sc .networkPolicies.monitoring.grafana.externalDataSources.enabled 'true'
   run _apply_normalise_sc
   _assert_condition_and_warn .\"networkPolicies\".\"monitoring\".\"grafana\".\"externalDataSources\".\"ips\"
   _assert_condition_and_warn .\"networkPolicies\".\"monitoring\".\"grafana\".\"externalDataSources\".\"ports\"
 
-  yq_set sc .networkPolicies.monitoring.enabled 'true'
-  yq_set sc .networkPolicies.monitoring.grafana.externalDataSources.enabled 'false'
+  yq.set sc .networkPolicies.monitoring.enabled 'true'
+  yq.set sc .networkPolicies.monitoring.grafana.externalDataSources.enabled 'false'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"monitoring\".\"grafana\".\"externalDataSources\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"monitoring\".\"grafana\".\"externalDataSources\".\"ports\"
 
-  yq_set sc .networkPolicies.monitoring.enabled 'false'
-  yq_set sc .networkPolicies.monitoring.grafana.externalDataSources.enabled 'true'
+  yq.set sc .networkPolicies.monitoring.enabled 'false'
+  yq.set sc .networkPolicies.monitoring.grafana.externalDataSources.enabled 'true'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"monitoring\".\"grafana\".\"externalDataSources\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"monitoring\".\"grafana\".\"externalDataSources\".\"ports\"
 
-  yq_set sc .networkPolicies.monitoring.enabled 'false'
-  yq_set sc .networkPolicies.monitoring.grafana.externalDataSources.enabled 'false'
+  yq.set sc .networkPolicies.monitoring.enabled 'false'
+  yq.set sc .networkPolicies.monitoring.grafana.externalDataSources.enabled 'false'
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"monitoring\".\"grafana\".\"externalDataSources\".\"ips\"
   _refute_condition_and_warn .\"networkPolicies\".\"monitoring\".\"grafana\".\"externalDataSources\".\"ports\"
@@ -366,23 +362,23 @@ _refute_condition_and_warn() {
 # bats test_tags=conditional_set_me_netpol_rclone_s3
 @test "conditional-set-me - multiple conditions: network policies rclone s3" {
 
-  yq_set sc .objectStorage.sync.enabled 'true'
-  yq_set sc .objectStorage.type \"s3\"
+  yq.set sc .objectStorage.sync.enabled 'true'
+  yq.set sc .objectStorage.type \"s3\"
   run _apply_normalise_sc
   _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorage\".\"ips\"
 
-  yq_set sc .objectStorage.sync.enabled 'true'
-  yq_set sc .objectStorage.type \"swift\"
+  yq.set sc .objectStorage.sync.enabled 'true'
+  yq.set sc .objectStorage.type \"swift\"
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorage\".\"ips\"
 
-  yq_set sc .objectStorage.sync.enabled 'false'
-  yq_set sc .objectStorage.type \"s3\"
+  yq.set sc .objectStorage.sync.enabled 'false'
+  yq.set sc .objectStorage.type \"s3\"
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorage\".\"ips\"
 
-  yq_set sc .objectStorage.sync.enabled 'false'
-  yq_set sc .objectStorage.type \"swift\"
+  yq.set sc .objectStorage.sync.enabled 'false'
+  yq.set sc .objectStorage.type \"swift\"
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorage\".\"ips\"
 }
@@ -390,51 +386,51 @@ _refute_condition_and_warn() {
 # bats test_tags=conditional_set_me_netpol_rclone_swift
 @test "conditional-set-me - multiple conditions: network policies rclone swift" {
 
-  yq_set sc .objectStorage.sync.enabled 'true'
-  yq_set sc .harbor.persistence.type \"swift\"
-  yq_set sc .thanos.objectStorage.type \"swift\"
+  yq.set sc .objectStorage.sync.enabled 'true'
+  yq.set sc .harbor.persistence.type \"swift\"
+  yq.set sc .thanos.objectStorage.type \"swift\"
   run _apply_normalise_sc
   _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
-  yq_set sc .objectStorage.sync.enabled 'true'
-  yq_set sc .harbor.persistence.type \"swift\"
-  yq_set sc .thanos.objectStorage.type \"s3\"
+  yq.set sc .objectStorage.sync.enabled 'true'
+  yq.set sc .harbor.persistence.type \"swift\"
+  yq.set sc .thanos.objectStorage.type \"s3\"
   run _apply_normalise_sc
   _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
-  yq_set sc .objectStorage.sync.enabled 'true'
-  yq_set sc .harbor.persistence.type \"s3\"
-  yq_set sc .thanos.objectStorage.type \"swift\"
+  yq.set sc .objectStorage.sync.enabled 'true'
+  yq.set sc .harbor.persistence.type \"s3\"
+  yq.set sc .thanos.objectStorage.type \"swift\"
   run _apply_normalise_sc
   _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
-  yq_set sc .objectStorage.sync.enabled 'true'
-  yq_set sc .harbor.persistence.type \"s3\"
-  yq_set sc .thanos.objectStorage.type \"s3\"
+  yq.set sc .objectStorage.sync.enabled 'true'
+  yq.set sc .harbor.persistence.type \"s3\"
+  yq.set sc .thanos.objectStorage.type \"s3\"
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
-  yq_set sc .objectStorage.sync.enabled 'false'
-  yq_set sc .harbor.persistence.type \"swift\"
-  yq_set sc .thanos.objectStorage.type \"swift\"
+  yq.set sc .objectStorage.sync.enabled 'false'
+  yq.set sc .harbor.persistence.type \"swift\"
+  yq.set sc .thanos.objectStorage.type \"swift\"
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
-  yq_set sc .objectStorage.sync.enabled 'false'
-  yq_set sc .harbor.persistence.type \"swift\"
-  yq_set sc .thanos.objectStorage.type \"s3\"
+  yq.set sc .objectStorage.sync.enabled 'false'
+  yq.set sc .harbor.persistence.type \"swift\"
+  yq.set sc .thanos.objectStorage.type \"s3\"
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
-  yq_set sc .objectStorage.sync.enabled 'false'
-  yq_set sc .harbor.persistence.type \"s3\"
-  yq_set sc .thanos.objectStorage.type \"swift\"
+  yq.set sc .objectStorage.sync.enabled 'false'
+  yq.set sc .harbor.persistence.type \"s3\"
+  yq.set sc .thanos.objectStorage.type \"swift\"
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
-  yq_set sc .objectStorage.sync.enabled 'false'
-  yq_set sc .harbor.persistence.type \"s3\"
-  yq_set sc .thanos.objectStorage.type \"s3\"
+  yq.set sc .objectStorage.sync.enabled 'false'
+  yq.set sc .harbor.persistence.type \"s3\"
+  yq.set sc .thanos.objectStorage.type \"s3\"
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 }

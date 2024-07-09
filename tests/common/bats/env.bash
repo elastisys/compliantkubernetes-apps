@@ -13,7 +13,7 @@ env.setup() {
 
 # Initialise environment
 env.init() {
-  if [[ -z "${1:-}" ]] || [[ -z "${2:-}" ]] || [[ -z "${3:-}" ]; then
+  if [[ -z "${1:-}" ]] || [[ -z "${2:-}" ]] || [[ -z "${3:-}" ]]; then
     log_fatal "usage: env.init [provider] [installer] [flavor]"
   fi
 
@@ -48,9 +48,11 @@ env.init() {
 
   yq.set 'common' '.clusterAdmin.users' '["admin@example.com"]'
 
-  yq.set 'common' '.global.issuer' '"letsencrypt-staging"'
-  yq.set 'common' '.issuers.letsencrypt.prod.email' '"admin@.example.com"'
-  yq.set 'common' '.issuers.letsencrypt.staging.email' '"admin@.example.com"'
+  if ! [[ "$*" =~ --skip-issuers ]]; then
+    yq.set 'common' '.global.issuer' '"letsencrypt-staging"'
+    yq.set 'common' '.issuers.letsencrypt.prod.email' '"admin@.example.com"'
+    yq.set 'common' '.issuers.letsencrypt.staging.email' '"admin@.example.com"'
+  fi
 
   yq.set 'sc' '.grafana.ops.oidc.allowedDomains' '["example.com"]'
   yq.set 'sc' '.grafana.user.oidc.allowedDomains' '["example.com"]'
