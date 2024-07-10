@@ -34,7 +34,7 @@ env.init() {
     yq.set 'secrets' '["objectStorage"]["s3"]["accessKey"]' '"example-access-key"'
     yq.set 'secrets' '["objectStorage"]["s3"]["secretKey"]' '"example-secret-key"'
 
-    if [[ "${CK8S_CLOUD_PROVIDER}" = "citycloud" ]]; then
+    if [[ "${CK8S_CLOUD_PROVIDER}" =~ (citycloud|elastx) ]]; then
       yq.set 'sc' '.objectStorage.swift.authVersion' '0'
       yq.set 'sc' '.objectStorage.swift.authUrl' '"https://auth.url.example"'
       yq.set 'sc' '.objectStorage.swift.region' '"example-region"'
@@ -65,6 +65,10 @@ env.init() {
     yq.set 'common' '.networkPolicies.global.objectStorage.ips' '["0.0.0.0/0"]'
     yq.set 'common' '.networkPolicies.global.objectStorage.ports' '[443]'
 
+    if [[ "${CK8S_CLOUD_PROVIDER}" =~ (citycloud|elastx) ]]; then
+      yq.set 'sc' '.networkPolicies.global.objectStorageSwift.ips' '["0.0.0.0/0"]'
+    fi
+
     yq.set 'common' '.networkPolicies.global.scIngress.ips' '["0.0.0.0/0"]'
     yq.set 'common' '.networkPolicies.global.wcIngress.ips' '["0.0.0.0/0"]'
 
@@ -90,8 +94,16 @@ env.init() {
     yq.set 'sc' '.networkPolicies.harbor.registries.ips' '["0.0.0.0/0"]'
     yq.set 'sc' '.networkPolicies.harbor.trivy.ips' '["0.0.0.0/0"]'
 
+    if [[ "${CK8S_CLOUD_PROVIDER}" =~ (citycloud|elastx|openstack|safespring) ]]; then
+      yq.set 'common' '.networkPolicies.kubeSystem.openstack.ips' '["0.0.0.0/0"]'
+    fi
+
     yq.set 'sc' '.networkPolicies.monitoring.grafana.externalDashboardProvider.ips' '["0.0.0.0/0"]'
     yq.set 'sc' '.networkPolicies.opensearch.plugins.ips' '["0.0.0.0/0"]'
+  fi
+
+  if [[ "${CK8S_FLAVOR}" = "prod" ]]; then
+    yq.set 'sc' '.alerts.opsGenieHeartbeat.name' '"example-heartbeat-name"'
   fi
 
   yq.set 'wc' '.opa.imageRegistry.URL' '["harbor.ck8s.example.com"]'
