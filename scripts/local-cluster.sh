@@ -63,11 +63,13 @@ yq() {
 }
 
 declare runtime
+declare mountflags
 if command -v docker >/dev/null && docker version &>/dev/null && [[ ! "$(docker version)" =~ Podman ]]; then
   runtime="docker"
 elif command -v podman >/dev/null; then
   export KIND_EXPERIMENTAL_PROVIDER="podman"
   runtime="podman"
+  mountflags=",relabel=shared"
 else
   log.fatal "no container runtime found" >&2
 fi
@@ -208,7 +210,7 @@ resolve() {
     export domain
 
     network.create kind
-    container.create local-resolve --env domain --mount "type=bind,src=${HERE}/local-clusters/resolves/Corefile,dst=/home/nonroot/Corefile" --name local-resolve --network kind --publish 127.0.64.43:53:53/tcp --publish 127.0.64.43:53:53/udp docker.io/coredns/coredns:1.11.1
+    container.create local-resolve --env domain --mount "type=bind,src=${HERE}/local-clusters/resolves/Corefile,dst=/home/nonroot/Corefile${mountflags:-}" --name local-resolve --network kind --publish 127.0.64.43:53:53/tcp --publish 127.0.64.43:53:53/udp docker.io/coredns/coredns:1.11.1
     if [[ -n "${CI:-}" ]]; then
       sudo mkdir -p /etc/systemd/resolved.conf.d/
       echo -e '[Resolve]\nDNS=127.0.64.43\nDomains=~.' | sudo tee /etc/systemd/resolved.conf.d/00-local-resolve.conf
@@ -291,6 +293,7 @@ config() {
     yq -Pi '. = {
       "global": {
           "ck8sCloudProvider": "none",
+          "ck8sK8sInstaller": "none",
           "ck8sEnvironmentName": (env(name)),
           "ck8sFlavor": (env(flavor))
       }
