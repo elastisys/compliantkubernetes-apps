@@ -42,8 +42,9 @@ function check_wc_hnc_creation_removal() {
     no_error=true
     debug_msg=""
 
-    mapfile -t user_namespaces < <(yq4 -e '.user.namespaces[]' "${config['config_file_wc']}")
-    mapfile -t user_admin_users < <(yq4 -e '.user.adminUsers[]' "${config['config_file_wc']}")
+    mapfile -t user_namespaces < <(yq4 -e '.user.namespaces - (.user.constraints | keys) | .[]' "${config['config_file_wc']}")
+    mapfile -t user_admin_users < <(yq4 '.user.adminUsers[]' "${config['config_file_wc']}")
+    mapfile -t user_admin_groups < <(yq4 '.user.adminGroups[]' "${config['config_file_wc']}")
 
     VERBS=(
         create
@@ -68,7 +69,17 @@ function check_wc_hnc_creation_removal() {
             for verb in "${VERBS[@]}"; do
                 if ! kubectl auth can-i "${verb}" "subns" -n "${namespace}" --as "${user}" >/dev/null 2>&1; then
                     no_error=false
-                    debug_msg+="[ERROR] ${user} cannot ${verb} sub namespace under ${namespace} namespace\n"
+                    debug_msg+="[ERROR] User ${user} cannot ${verb} sub namespace under ${namespace} namespace\n"
+                fi
+            done
+        done
+    done
+    for group in "${user_admin_groups[@]}"; do
+        for namespace in "${user_namespaces[@]}"; do
+            for verb in "${VERBS[@]}"; do
+                if ! kubectl auth can-i "$verb" "subns" -n "$namespace" --as "test-user" --as-group "${group}" >/dev/null 2>&1; then
+                    no_error=false
+                    debug_msg+="[ERROR] Group ${group} cannot ${verb} sub namespace under ${namespace} namespace\n"
                 fi
             done
         done
@@ -79,7 +90,17 @@ function check_wc_hnc_creation_removal() {
             for verb in "${VERBS[@]}"; do
                 if kubectl auth can-i "${verb}" "subns" -n "${namespace}" --as "${user}" >/dev/null 2>&1; then
                     no_error=false
-                    debug_msg+="[ERROR] ${user} can ${verb} subnamespace anchors under ${namespace} namespace\n"
+                    debug_msg+="[ERROR] User ${user} can ${verb} subnamespace anchors under ${namespace} namespace\n"
+                fi
+            done
+        done
+    done
+    for group in "${user_admin_groups[@]}"; do
+        for namespace in "${CK8S_NAMESPACES[@]}"; do
+            for verb in "${VERBS[@]}"; do
+                if kubectl auth can-i "$verb" "subns" -n "$namespace" --as "test-user" --as-group "${group}" >/dev/null 2>&1; then
+                    no_error=false
+                    debug_msg+="[ERROR] Group ${group} can ${verb} subnamespace anchors under ${namespace} namespace\n"
                 fi
             done
         done
