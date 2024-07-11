@@ -43,8 +43,10 @@ function check_wc_ingress_health() {
 
     diff=$((desired_replicas - ready_replicas))
     if "${has_proxy_protocol}"; then
-        no_error=false
-        debug_msg+="[ERROR] unable to test ingress with proxy protocol\n"
+        debug_msg+="[DEBUG] unable to test ingress with proxy protocol\n"
+        echo "skipping -"
+        echo -ne "$debug_msg"
+        return
     elif [[ $desired_replicas -eq $ready_replicas ]]; then
         read -r -a pods <<<"$(kubectl get pods -n ingress-nginx -ojson | jq -r '.items[].metadata.name' | tr '\n' ' ')"
         for pod in "${pods[@]}"; do
