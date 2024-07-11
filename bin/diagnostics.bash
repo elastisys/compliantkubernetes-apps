@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# TODO: we should maybe be more specific when we want to fail due to an error,
+# and output to terminal if something fails instead of writing everything to file
 set -euo pipefail
 
 here="$(dirname "$(readlink -f "$0")")"
@@ -8,27 +10,40 @@ source "${here}/common.bash"
 
 cluster="${1}"
 namespace="${2:-}"
+keys_url="http://localhost:8080"    # TODO: update this with a real public URL
 
-file="${CK8S_CONFIG_PATH}/diagnostics-${cluster}-$(date +%y%m%d%H%M%S).log"
-touch "${file}"
+retrieve_gpg_keys() {
+    local ck8s_flavor keys_dir
+    CK8S_PGP_FP=""
+    ck8s_flavor="$(yq4 '.global.ck8sFlavor' "${config[default_common]}")"
+    # TODO: should the keys directory be kept or should it be removed with a trap?
+    keys_dir="${CK8S_CONFIG_PATH}/gpg-keys" # TODO: decide where the keys should be downloaded
 
-if [ -z "${CK8S_PGP_FP:-}" ]; then
-    fingerprints=$(yq4 '.creation_rules[].pgp' "${sops_config}")
-
-    log_warning "Notice for self-managed customers:"
-    echo -e "\tEncrypting using the fingerprints: $fingerprints." 1>&2
-    echo -e "\tIf you want to send diagnostic data to Elastisys, make sure to do:\n" 1>&2
-
-    echo -e "\tCK8S_PGP_FP=<fingerprint provided during onboarding> ./bin/ck8s diagnostics [sc|wc]\n" 1>&2
-
-    echo -e "\tIf in doubt, contact support@elastisys.com." 1>&2
-
-    log_warning_no_newline "Do you want to continue anyway? (y/N): "
-    read -r reply
-    if [[ ! "${reply}" =~ ^[yY]$ ]]; then
-        exit 1
+    # TODO: could also check that the Internet is reachable by testing the keys URL
+    if [[ "${ck8s_flavor}" == "air-gapped" ]]; then
+        log_warning "The environment is configured with the air-gapped flavor"
+        log_warning "To be able to encrypt files, please ensure to import all public GPG keys found at ${keys_url}"
+        ask_abort
     fi
-fi
+    if [[ ! -d "${keys_dir}" ]]; then
+        log_info "Directory ${keys_dir} not found, creating now"
+        mkdir "${keys_dir}"
+    fi
+
+    wget --no-verbose -e robots=off -r --no-parent --no-host-directories --reject "index.html*" "${keys_url}/" -P "${keys_dir}"
+
+    for keys_file in "${keys_dir}"/*; do
+        fpr=$(gpg --with-colons --import-options show-only --import --fingerprint "${keys_file}" | awk -F: '$1 == "fpr" {print $10;}' | head -1)
+        if ! gpg --list-keys | grep -q "${fpr}"; then
+            echo -e "Key not imported, importing it now"
+            gpg --import "${keys_file}"
+        fi
+        CK8S_PGP_FP="${fpr},${CK8S_PGP_FP}"
+    done
+
+    # removes trailing ,
+    CK8S_PGP_FP="${CK8S_PGP_FP::-1}"
+}
 
 sops_encrypt_file() {
     if [ -z "${CK8S_PGP_FP:-}" ]; then
@@ -244,22 +259,49 @@ run_diagnostics_namespaced() {
             "${here}/ops.bash" kubectl "${cluster}" get configmap -n "${namespace}" "$configmap" -o yaml
         fi
     done
-    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' '
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
     # -- Logs --
-    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' '
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     echo "Fetching Logs <logs>"
-    pods=$("{$here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml | yq4 '.items[] | .metadata.name')
-    readarray pods_arr < <(echo "$pods" | yq4 e -o=j -I=0 '.[]')
+    mapfile -t pods < <("${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml | yq4 '.items[] | .metadata.name')
 
-    for pod in "${pods_arr[@]}"; do
-        echo "Error logs for pod: ${pod}"
-        "${here}/ops.bash" kubectl "${cluster}" logs -n "${namespace}" "${pods}" | grep -e error -e err
+    for pod in "${pods[@]}"; do
+        echo -e "\nError logs for pod: ${pod}"
+        "${here}/ops.bash" kubectl "${cluster}" logs -n "${namespace}" "${pod}" | grep -e err
     done
 }
 
-log_info "Running diagnostics..."
+if [ -z "${CK8S_PGP_FP:-}" ]; then
+    fingerprints=$(yq4 '.creation_rules[].pgp' "${sops_config}")
+
+    log_warning "Notice for self-managed customers:"
+    echo -e "\tEncrypting using the fingerprints: $fingerprints." 1>&2
+    echo -e "\tIf you want to send diagnostic data to Elastisys, make sure to do:\n" 1>&2
+
+    echo -e "\tCK8S_PGP_FP=<fingerprints are imported from ${keys_url}> ./bin/ck8s diagnostics [sc|wc]\n" 1>&2
+    echo -e "\tIf in doubt, contact support@elastisys.com.\n" 1>&2
+
+
+    log_warning_no_newline "Do you want to retrieve and use GPG keys from ${keys_url}? (y/N): "
+    read -r reply
+    if [[ "${reply}" =~ ^[yY]$ ]]; then
+        retrieve_gpg_keys
+    else
+        log_warning_no_newline "Do you want to continue anyway? (y/N): "
+        read -r reply
+        if [[ ! "${reply}" =~ ^[yY]$ ]]; then
+            exit 1
+        fi
+    fi
+fi
+
 config_load "${1}"
+log_info "Running diagnostics..."
+
+file="${CK8S_CONFIG_PATH}/diagnostics-${cluster}-$(date +%y%m%d%H%M%S).log"
+touch "${file}"
+
 if [ -z "${namespace}" ]; then
     run_diagnostics >"${file}" 2>&1
 else
