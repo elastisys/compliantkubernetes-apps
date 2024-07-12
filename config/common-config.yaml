@@ -595,6 +595,10 @@ ingressNginx:
       ## ref: https://github.com/kubernetes/cloud-provider-openstack/blob/master/docs/openstack-cloud-controller-manager/expose-applications-using-loadbalancer-type-service.md#restrict-access-for-loadbalancer-service
       loadBalancerSourceRanges: []
 
+      # Set this to use an existing floating ip
+      # If you want to change this then you need to recreate the service
+      loadBalancerIP: ""
+
       # -- Represents the dual-stack-ness requested or required by this Service. Possible values are
       # SingleStack (default), PreferDualStack or RequireDualStack. When utilizing an internal loadbalancer service (ie MetalLB),
       # set this field to "RequireDualStack" if you want both IPv4 and IPv6 connectivity.
