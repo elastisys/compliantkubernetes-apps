@@ -19,7 +19,7 @@ spec:
     rules:
     - alert: 'Kured Failed Node Reboot'
       expr: |
-        min_over_time((sum(kured_reboot_required) by (node))[30d:1m]) > 0
+        min_over_time((sum(kured_reboot_required) by (node))[30d:1m]) > 0 and on (node) kube_node_info
       for: 5m
       labels:
         severity: warning
