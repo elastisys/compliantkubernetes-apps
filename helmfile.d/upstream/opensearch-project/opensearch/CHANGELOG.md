@@ -12,9 +12,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 ### Fixed
 ### Security
-
 ---
-
+## [2.21.0]
+### Added
+- Updated OpenSearch appVersion to 2.15.0
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.20.0]
+### Added
+- Updated OpenSearch appVersion to 2.14.0
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.19.0]
+### Added
+- Updated OpenSearch appVersion to 2.13.0
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
 ## [2.18.0]
 ### Added
 ### Breaking
@@ -25,7 +50,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 ### Fixed
 ### Security
-
 ---
 ## [2.17.3]
 ### Added
@@ -397,7 +421,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 
-[Unreleased]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.18.0...HEAD
+[Unreleased]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.21.0...HEAD
+[2.21.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.20.0...opensearch-2.21.0
+[2.20.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.19.0...opensearch-2.20.0
+[2.19.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.18.0...opensearch-2.19.0
 [2.18.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.17.3...opensearch-2.18.0
 [2.17.3]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.17.2...opensearch-2.17.3
 [2.17.2]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.17.1...opensearch-2.17.2
