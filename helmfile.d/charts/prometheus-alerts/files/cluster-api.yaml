@@ -122,7 +122,7 @@
         rulesgroup: cluster-api
         severity: warning
       expr: |
-        capi_machinedeployment_status_replicas > 0 and sum(capi_machinedeployment_status_replicas_ready / capi_machinedeployment_status_replicas) by (cluster_name, name) != 1
+        sum(capi_machinedeployment_status_replicas_ready / (capi_machinedeployment_status_replicas > 0)) by (cluster_name, name) != 1
       for: 15m
     - alert: ClusterApiMachineDeploymentMajorityNotReady
       annotations:
