@@ -113,9 +113,9 @@ template() {
   done
 
   if command -v gomplate > /dev/null; then
-    pushd "${root}"
+    pushd "${root}" &> /dev/null
     gomplate "${args[@]}"
-    popd
+    popd &> /dev/null
   else
     "${root}/scripts/run-from-container.sh" "docker.io/hairyhenderson/gomplate:v3.11.7-alpine" "${args[@]}"
   fi

@@ -1,6 +1,6 @@
 # Apps Tests
 
-The test suite is implemented using [`bats`](https://github.com/bats-core/bats-core) and [`cypress`](https://github.com/cypress-io/cypress), with unit, regression, integration, and end-to-end tests under their own respective directory.
+The test harness is implemented using [`bats`](https://github.com/bats-core/bats-core) and [`cypress`](https://github.com/cypress-io/cypress), with unit, regression, integration, and end-to-end tests under their own respective directory.
 
 Plain `bats` tests are generated from `cypress` tests to integrate them into the rest of the test suites, additionally plain `bats` tests are generated from `gotmpl` tests to provide parametric tests.
 

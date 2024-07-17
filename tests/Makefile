@@ -1,109 +1,101 @@
 #!/usr/bin/env make
 
-dirs := unit regression integration end-to-end
+# name of container image
+image := compliantkubernetes-apps-tests
 
-container_image := compliantkubernetes-apps-tests
+# paths
+tests := $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
+roots := $(patsubst %/,%,$(dir $(tests)))
 
-cypress_gen = $(patsubst %.cy.js,%.gen.bats,$(foreach dir, $(dirs), $(shell find $(dir) -type f -name *.cy.js)))
-template_gen = $(patsubst %.bats.gotmpl,%.gen.bats,$(foreach dir, $(dirs), $(shell find $(dir) -type f -name *.bats.gotmpl)))
+# launcher
+launcher := $(roots)/scripts/run-from-container.sh
 
-all = $(cypress_gen) $(template_gen)
+# test types
+types := unit regression integration end-to-end
+
+# test targets
+targets = $(patsubst %/,%,$(foreach type,$(types),$(tests)/$(type)/))
+
+# test suites
+suites = $(patsubst %/,%,$(foreach target,$(targets),$(wildcard $(target)/*/)))
+
+# test files
+files = $(foreach suite,$(suites),$(wildcard $(suite)/*.bats))
+
+cypress_files = $(foreach suite,$(suites),$(wildcard $(suite)/*.cy.js))
+template_files = $(foreach suite,$(suites),$(wildcard $(suite)/*.bats.gotmpl))
+
+generated_files = $(cypress_files:.cy.js=.gen.bats) $(template_files:.bats.gotmpl=.gen.bats)
 
 nproc = $(shell nproc)
 
-# Run without parallelisation
-internal-all: $(all)
-	@echo --- bats all
-	@bats -r unit regression integration end-to-end
-internal-all-%: $(all)
-	@echo --- bats all $*
-	@bats -r unit regression integration end-to-end --filter-tags $*
-
-# Run with parallelisation both across and within files
-internal-unit: $(filter unit/%,$(all))
-	@echo --- bats unit
-	@bats -j $(nproc) -r unit
-internal-unit-%: $(filter unit/%,$(all))
-	@echo --- bats unit $*
-	@bats -j $(nproc) -r unit --filter-tags $*
-
-# Run with parallelisation within files
-internal-regression: $(filter regression/%,$(all))
-	@echo --- bats regression
-	@bats -j $(nproc) --no-parallelize-across-files -r regression
-internal-regression-%: $(filter regression/%,$(all))
-	@echo --- bats regression $*
-	@bats -j $(nproc) --no-parallelize-across-files -r regression --filter-tags $*
-
-# Run with parallelisation within files
-internal-integration: $(filter integration/%,$(all))
-	@echo --- bats integration
-	@bats -j $(nproc) --no-parallelize-across-files -r integration
-internal-integration-%: $(filter integration/%,$(all))
-	@echo --- bats integration $*
-	@bats -j $(nproc) --no-parallelize-across-files -r integration --filter-tags $*
-
-# Run without parallelisation
-internal-end-to-end: $(filter end-to-end/%,$(all))
-	@echo --- bats end-to-end
-	@bats -r end-to-end
-internal-end-to-end-%: $(filter end-to-end/%,$(all))
-	@echo --- bats end-to-end $*
-	@bats -r end-to-end --filter-tags $*
-
-$(all:.bats=): %: %.bats
-	@echo --- bats $*.bats
-	@bats -r $*.bats
-
-gen: gen-cypress gen-template
-gen-cypress: $(cypress_gen)
-gen-template: $(template_gen)
-
-$(cypress_gen): %.gen.bats: %.cy.js common/gen.bash
-	@./common/gen.bash cypress tests/$<
-$(template_gen): %.gen.bats: %.bats.gotmpl common/gen.bash
-	@./common/gen.bash template tests/$<
-
-clean:
-	@echo rm $(foreach dir, $(dirs), $(dir)/*.gen.bats)
-	@rm $(foreach dir, $(dirs), $(shell find $(dir) -type f -name *.gen.bats))
+list:
+	@echo $(patsubst $(tests)/%,%,$(targets)) | tr ' ' '\n'
+$(patsubst $(tests)/%,list-%,$(targets)): list-%:
+	@echo $(patsubst $(tests)/%,%,$(filter $(tests)/$*/%,$(suites))) | tr ' ' '\n'
+$(patsubst $(tests)/%,list-%,$(suites)): list-%:
+	@echo $(patsubst $(tests)/%,%,$(filter $(tests)/$*/%,$(files))) | tr ' ' '\n'
 
 build: build-main
 build-main build-unit: build-%:
-	docker build --file Dockerfile --target $* --tag $(container_image):$* ../
+	docker build --file Dockerfile --target $* --tag $(image):$* ../
 
-all:
-	FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main make -C tests internal-all
-run-all-%:
-	FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main make -C tests internal-$*
-run-end-to-end-%:
-	FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main make -C tests internal-end-to-end-$*
-run-end-to-end:
-	FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main make -C tests internal-end-to-end
-run-integration-%:
-	FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main make -C tests internal-integration-$*
-run-integration:
-	FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main make -C tests internal-integration
-run-regression-%:
-	FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main make -C tests internal-regression-$*
-run-regression:
-	FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main make -C tests internal-regression
-run-unit-%:
-	../scripts/run-from-container.sh $(container_image):unit make -C tests internal-unit-$*
-run-unit:
-	../scripts/run-from-container.sh $(container_image):unit make -C tests internal-unit
+clean:
+	@echo "--- clean"
+	@echo $(foreach target,$(targets),$(target)/*.gen.bats) | tr ' ' '\n'
+	@rm $(foreach target,$(targets),$(shell find $(target) -type f -name *.gen.bats))
 
-enter-end-to-end:
-	FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main bash
-enter-integration:
-	FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main bash
-enter-regression:
-	FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main bash
+gen: gen-cypress gen-template
+gen-cypress: $(cypress_files:.cy.js=.gen.bats)
+gen-template: $(template_files:.bats.gotmpl=.gen.bats)
+
+$(cypress_files:.cy.js=.gen.bats): %.gen.bats: %.cy.js common/gen.bash
+	@$(tests)/common/gen.bash cypress
+$(template_files:.bats.gotmpl=.gen.bats): %.gen.bats: %.bats.gotmpl common/gen.bash
+	@$(tests)/common/gen.bash template
+
+run-all:
+	@FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true $(launcher) $(image):main make --no-print-directory -C tests container-all
+# run-<target/suite/file> wild card
+run-unit $(patsubst $(tests)/%,run-%,$(filter $(tests)/unit/%,$(suites) $(files))): run-%:
+	@$(launcher) $(image):unit make --no-print-directory -C tests container-$*
+run-regression $(patsubst $(tests)/%,run-%,$(filter $(tests)/regression/%,$(suites) $(files))): run-%:
+	@FORWARD_RUNTIME=true $(launcher) $(image):main make --no-print-directory -C tests container-$*
+run-integration $(patsubst $(tests)/%,run-%,$(filter $(tests)/integration/%,$(suites) $(files))): run-%:
+	@FORWARD_RUNTIME=true $(launcher) $(image):main make --no-print-directory -C tests container-$*
+run-end-to-end $(patsubst $(tests)/%,run-%,$(filter $(tests)/end-to-end/%,$(suites) $(files))): run-%:
+	@FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true $(launcher) $(image):main make --no-print-directory -C tests container-$*
+
+container-all: container-unit container-regression container-integration container-end-to-end
+container-unit: $(patsubst $(tests)/%,container-%,$(filter $(tests)/unit/%,$(suites)))
+container-regression: $(patsubst $(tests)/%,container-%,$(filter $(tests)/regression/%,$(suites)))
+container-integration: $(patsubst $(tests)/%,container-%,$(filter $(tests)/integration/%,$(suites)))
+container-end-to-end: $(patsubst $(tests)/%,container-%,$(filter $(tests)/end-to-end/%,$(suites)))
+
+# container-<target/suite/file> wild card
+$(patsubst $(tests)/%,container-%,$(filter $(tests)/unit/%,$(suites) $(files))): container-%: $(filter $(tests)/unit/$(%)%,$(generated_files))
+	@echo "--- run $*"
+	@bats -j $(nproc) -r "$(tests)/$*"
+$(patsubst $(tests)/%,container-%,$(filter $(tests)/regression/%,$(suites) $(files))): container-%: $(filter $(tests)/regression/$(%)%,$(generated_files))
+	@echo "--- run $*"
+	@bats --no-parallelize-across-files -j $(nproc) -r "$(tests)/$*"
+$(patsubst $(tests)/%,container-%,$(filter $(tests)/integration/%,$(suites) $(files))): container-%: $(filter $(tests)/integration/$(%)%,$(generated_files))
+	@echo "--- run $*"
+	@bats --no-parallelize-across-files -j $(nproc) -r "$(tests)/$*"
+$(patsubst $(tests)/%,container-%,$(filter $(tests)/end-to-end/%,$(suites) $(files))): container-%: $(filter $(tests)/end-to-end/$(%)%,$(generated_files))
+	@echo "--- run $*"
+	@bats -r "$(tests)/$*"
+
 enter-unit:
-	../scripts/run-from-container.sh $(container_image):unit bash
+	$(launcher) $(image):unit bash
+enter-regression:
+	FORWARD_RUNTIME=true $(launcher) $(image):main bash
+enter-integration:
+	FORWARD_RUNTIME=true $(launcher) $(image):main bash
+enter-end-to-end:
+	FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true $(launcher) $(image):main bash
 
-run-cypress-open:
-	FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true ../scripts/run-from-container.sh $(container_image):main cypress open --project tests/
-
-print-%:
-	@echo $($*)
+enter-integration-cypress:
+	FORWARD_RUNTIME=true $(launcher) $(image):main cypress open --project tests/
+enter-end-to-end-cypress:
+	FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true $(launcher) $(image):main cypress open --project tests/

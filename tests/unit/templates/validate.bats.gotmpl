@@ -1,0 +1,90 @@
+#!/usr/bin/env bats
+
+{{- define "template" -}}
+#!/usr/bin/env bats
+
+# Generated from {{ tmpl.Path }}
+
+# bats file_tags=validate,{{ .provider }},{{ .flavor }}
+
+setup_file() {
+  load "../../bats.lib.bash"
+  load_common "env.bash"
+  load_common "gpg.bash"
+  load_common "yq.bash"
+
+  gpg.setup
+  env.setup
+
+  env.init {{ .provider }} {{ .installer }} {{ .flavor }}
+}
+
+setup() {
+  load "../../bats.lib.bash"
+  load_assert
+  load_common "env.bash"
+  load_common "yq.bash"
+  load "../templates/validate.bash"
+
+  env.private
+}
+
+teardown() {
+  env.teardown
+}
+
+teardown_file() {
+  env.teardown
+  gpg.teardown
+}
+
+@test "configuration is valid - {{ .provider }}:{{ .installer }}:{{ .flavor }} - service cluster" {
+  run ck8s validate sc <<< $'y\n'
+
+  assert_success
+}
+
+@test "configuration is valid - {{ .provider }}:{{ .installer }}:{{ .flavor }} - workload cluster" {
+  run ck8s validate wc <<< $'y\n'
+
+  assert_success
+}
+
+@test "configuration is invalid - {{ .provider }}:{{ .installer }}:{{ .flavor }} - service cluster" {
+  run yq.set 'sc' '.global.baseDomain' '"this is not a valid hostname"'
+  run ck8s validate sc <<< $'y\n'
+
+  assert_output --partial 'global.baseDomain'
+}
+
+@test "configuration is invalid - {{ .provider }}:{{ .installer }}:{{ .flavor }} - workload cluster" {
+  run yq.set 'wc' '.global.baseDomain' '"this is not a valid hostname"'
+  run ck8s validate wc <<< $'y\n'
+
+  assert_output --partial '"this is not a valid hostname"'
+}
+
+@test "manifests are valid - {{ .provider }}:{{ .installer }}:{{ .flavor }} - service cluster" {
+  run helmfile_template_kubeconform service_cluster
+
+  assert_success
+}
+
+@test "manifests are valid - {{ .provider }}:{{ .installer }}:{{ .flavor }} - workload cluster" {
+  run helmfile_template_kubeconform workload_cluster
+
+  assert_success
+}
+{{ end }}
+
+# These tests are generated into these files:
+{{- range $provider := coll.Slice "aws" "azure" "baremetal" "elastx" "openstack" "safespring" "upcloud" }}
+{{- range $installer := coll.Slice "capi" "kubespray" }}
+{{- range $flavor := coll.Slice "air-gapped" "dev" "prod" }}
+{{- $file := tmpl.Path | path.Dir }}
+{{- $file = printf "../%s/validate-%s-%s.gen.bats" $provider $installer $flavor | path.Join $file }}
+# - {{ $file }}
+{{- coll.Dict "provider" $provider "installer" $installer "flavor" $flavor | tmpl.Exec "template" | file.Write $file }}
+{{- end }}
+{{- end }}
+{{- end }}
