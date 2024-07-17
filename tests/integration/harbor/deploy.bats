@@ -5,11 +5,10 @@
 # Integration test: Harbor deployment
 
 setup_file() {
-  export CK8S_AUTO_APPROVE="true"
-
   load "../../bats.lib.bash"
+  load "setup_suite.bash"
 
-  auto_setup sc app=cert-manager app=dex app=harbor app=ingress-nginx app=node-local-dns
+  setup_harbor
 }
 
 setup() {
@@ -19,9 +18,7 @@ setup() {
 }
 
 teardown_file() {
-  load "../../bats.lib.bash"
-
-  auto_teardown
+  teardown_harbor
 }
 
 @test "harbor has been deployed" {

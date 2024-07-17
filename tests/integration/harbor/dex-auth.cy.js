@@ -1,6 +1,10 @@
-// bats file_tags=harbor,dex-auth
-// cluster sc
-// helmfile app=cert-manager app=dex app=harbor app=ingress-nginx app=node-local-dns
+// bats file_tags=dex-auth
+
+// setup_file load "setup_suite.bash"
+// setup_file
+// setup_file setup_harbor
+
+// teardown_file teardown_harbor
 
 import "../../common/cypress/harbor.js"
 

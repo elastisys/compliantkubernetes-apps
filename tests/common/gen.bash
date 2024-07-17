@@ -17,7 +17,7 @@ cypress_gen() {
 
   local bats cluster helmfile describe test
 
-  local -a its
+  local -a setup_file=() teardown_file=() its=()
 
   for line in "${input[@]}"; do
     if [[ "${line}" =~ "// bats" ]]; then
@@ -26,6 +26,10 @@ cypress_gen() {
       cluster="${line##// cluster }"
     elif [[ "${line}" =~ "// helmfile" ]]; then
       helmfile="${line##// helmfile }"
+    elif [[ "${line}" =~ "// setup_file" ]]; then
+      setup_file+=("${line##// setup_file }")
+    elif [[ "${line}" =~ "// teardown_file" ]]; then
+      teardown_file+=("${line##// teardown_file }")
     elif [[ "${line}" =~ [[:space:]]*describe\( ]]; then
       describe="$(sed -n "s/describe([\"\']\(.\+\)[\"\'],.\+/\1/p" <<< "${line}")"
     elif [[ "${line}" =~ [[:space:]]+it\( ]]; then
@@ -49,6 +53,13 @@ cypress_gen() {
   if [[ -n "${cluster:-}" ]] && [[ -n "${helmfile:-}" ]]; then
     echo "  auto_setup ${cluster} ${helmfile}"
   fi
+  for step in "${setup_file[@]}"; do
+    if [[ "${step}" == "// setup_file" ]]; then
+      echo
+    else
+      echo "  ${step}"
+    fi
+  done
   echo "  cypress_setup \"${file}\""
   echo '}'
   echo ''
@@ -60,6 +71,13 @@ cypress_gen() {
   echo 'teardown_file() {'
   echo '  load "../../bats.lib.bash"'
   echo ''
+  for step in "${teardown_file[@]}"; do
+    if [[ "${step}" == "// teardown_file" ]]; then
+      echo
+    else
+      echo "  ${step}"
+    fi
+  done
   echo "  cypress_teardown \"${file}\""
   if [[ -n "${cluster:-}" ]] && [[ -n "${helmfile:-}" ]]; then
     echo "  auto_teardown"

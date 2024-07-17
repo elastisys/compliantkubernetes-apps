@@ -13,7 +13,9 @@ setup_file() {
   load_common "yq.bash"
   load_assert
 
-  auto_setup sc app=cert-manager app=dex app=harbor app=ingress-nginx app=node-local-dns
+  load "setup_suite.bash"
+
+  setup_harbor
 
   harbor.load_env "harbor-api"
 
@@ -33,9 +35,7 @@ setup() {
 }
 
 teardown_file() {
-  load "../../bats.lib.bash"
-
-  auto_teardown
+  teardown_harbor
 }
 
 @test "harbor api can authenticate" {
