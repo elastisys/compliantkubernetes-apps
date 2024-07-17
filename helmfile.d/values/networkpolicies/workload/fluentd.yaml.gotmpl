@@ -16,7 +16,7 @@ policies:
             - namespaceSelectorLabels:
                 kubernetes.io/metadata.name: fluentd
               podSelectorLabels:
-                app.kubernetes.io/instance: fluentd-elasticsearch
+                app.kubernetes.io/name: fluentd-elasticsearch
           ports:
             - tcp: 24224
 
