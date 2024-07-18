@@ -1,4 +1,4 @@
-// bats file_tags=dex-auth
+// bats file_tags=harbor,dex-auth
 
 // setup_file load "setup_suite.bash"
 // setup_file

@@ -1,13 +1,13 @@
 #!/usr/bin/env bats
 
-# bats file_tags=dex-auth
+# bats file_tags=harbor,dex-auth
 
 setup_file() {
   load "../../bats.lib.bash"
-
   load "setup_suite.bash"
 
   setup_harbor
+
   cypress_setup "${ROOT}/tests/integration/harbor/dex-auth.cy.js"
 }
 
@@ -17,8 +17,6 @@ setup() {
 }
 
 teardown_file() {
-  load "../../bats.lib.bash"
-
   teardown_harbor
   cypress_teardown "${ROOT}/tests/integration/harbor/dex-auth.cy.js"
 }

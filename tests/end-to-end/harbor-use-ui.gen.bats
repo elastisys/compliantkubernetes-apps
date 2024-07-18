@@ -14,8 +14,6 @@ setup() {
 }
 
 teardown_file() {
-  load "../../bats.lib.bash"
-
   cypress_teardown "${ROOT}/tests/end-to-end/harbor-use-ui.cy.js"
 }
 

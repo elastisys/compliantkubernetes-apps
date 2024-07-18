@@ -49,7 +49,6 @@ cypress_gen() {
   echo ''
   echo 'setup_file() {'
   echo '  load "../../bats.lib.bash"'
-  echo ''
   if [[ -n "${cluster:-}" ]] && [[ -n "${helmfile:-}" ]]; then
     echo "  auto_setup ${cluster} ${helmfile}"
   fi
@@ -60,6 +59,7 @@ cypress_gen() {
       echo "  ${step}"
     fi
   done
+  echo ''
   echo "  cypress_setup \"${file}\""
   echo '}'
   echo ''
@@ -69,8 +69,6 @@ cypress_gen() {
   echo '}'
   echo ''
   echo 'teardown_file() {'
-  echo '  load "../../bats.lib.bash"'
-  echo ''
   for step in "${teardown_file[@]}"; do
     if [[ "${step}" == "// teardown_file" ]]; then
       echo

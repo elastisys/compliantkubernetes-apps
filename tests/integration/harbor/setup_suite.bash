@@ -9,6 +9,8 @@ setup_suite() {
 }
 
 teardown_suite() {
+  load "../../bats.lib.bash"
+
   auto_teardown
 }
 

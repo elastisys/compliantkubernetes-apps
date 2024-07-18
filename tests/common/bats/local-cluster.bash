@@ -10,9 +10,12 @@ declares() {
 
 declares
 
-load_common "env.bash"
-load_common "gpg.bash"
-load_common "yq.bash"
+# shellcheck source=tests/common/bats/env.bash
+source "${lib}/env.bash"
+# shellcheck source=tests/common/bats/gpg.bash
+source "${lib}/gpg.bash"
+# shellcheck source=tests/common/bats/yq.bash
+source "${lib}/yq.bash"
 
 # Usage: local_cluster.setup <config-flavour> <domain>
 local_cluster.setup() {

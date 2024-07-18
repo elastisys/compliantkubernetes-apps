@@ -4,8 +4,6 @@
 
 export BATS_LIB_PATH="/usr/local/lib/bats"
 
-bats_load_library "support/load.bash"
-
 TESTS="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 ROOT="$(dirname "${TESTS}")"
 
@@ -14,6 +12,23 @@ export PATH="${ROOT}/bin:${PATH}"
 export CHARTS="${ROOT}/helmfile.d/charts"
 export TESTS
 export ROOT
+
+log.fatal() {
+  if [[ -e /dev/fd/3 ]]; then
+    echo "error: ${1}" >&3
+  else
+    echo "error: ${1}" >&2
+  fi
+  exit 1
+}
+
+log.trace() {
+  if [[ -e /dev/fd/3 ]]; then
+    echo "# ${1}" >&3
+  else
+    echo "# ${1}" >&2
+  fi
+}
 
 load_common() {
   local target
@@ -28,6 +43,7 @@ load_common() {
 }
 
 load_assert() {
+  bats_load_library "support/load.bash"
   bats_load_library "assert/load.bash"
 }
 
@@ -129,14 +145,14 @@ auto_setup() {
 
   load_common "local-cluster.bash"
 
-  echo "# auto setup: local cluster setup" >&3
+  log.trace "auto setup: local cluster setup"
   local_cluster.setup dev integration.dev-ck8s.com
-  echo "# auto setup: local cluster create" >&3
+  log.trace "auto setup: local cluster create"
   local_cluster.create single-node-cache
 
   local_cluster.configure_selfsigned
 
-  echo "# auto setup: apply ${cluster} ${*}" >&3
+  log.trace "auto setup: apply ${cluster} ${*}"
   ck8s ops helmfile "${cluster}" apply --include-transitive-needs --output simple "${@/#''/-l}"
 }
 
@@ -158,7 +174,7 @@ cypress_setup() {
 
   pushd "${ROOT}/tests" || exit 1
 
-  echo "# cypress run: $1" >&3
+  log.trace "cypress run: $1"
   cypress run --spec "$1" --reporter json-stream --quiet > "${CYPRESS_REPORT}" || true
 
   popd || exit 1

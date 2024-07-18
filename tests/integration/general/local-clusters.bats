@@ -1,34 +1,33 @@
 #!/usr/bin/env bats
 
-# bats file_tags=local-clusters
+# bats file_tags=general,local-clusters
 
 setup_file() {
-  load "../bats.lib.bash"
+  load "../../bats.lib.bash"
   load_common "local-cluster.bash"
+
+  export CK8S_AUTO_APPROVE="true"
 
   local_cluster.setup dev integration.dev-ck8s.com
   local_cluster.create single-node-cache
 }
 
-teardown_file() {
-  load "../bats.lib.bash"
-  load_common "local-cluster.bash"
-
-  local_cluster.delete
-  local_cluster.teardown
-}
-
 setup() {
-  load "../bats.lib.bash"
+  load "../../bats.lib.bash"
   load_assert
   load_detik
+}
+
+teardown_file() {
+  local_cluster.delete
+  local_cluster.teardown
 }
 
 helm_status() {
   helm -n "${1}" status "${2}" -oyaml | yq4 '.info.status'
 }
 
-@test "local cluster has kubeconfigs" {
+@test "local cluster has created kubeconfigs" {
   assert [ -f "${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml" ]
   assert [ -f "${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml" ]
 }

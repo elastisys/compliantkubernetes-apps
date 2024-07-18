@@ -12,8 +12,6 @@ setup() {
 }
 
 teardown_file() {
-  load "../../bats.lib.bash"
-
   cypress_teardown "${ROOT}/tests/end-to-end/grafana-datasources.cy.js"
 }
 

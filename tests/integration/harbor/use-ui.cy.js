@@ -1,4 +1,4 @@
-// bats file_tags=use-ui
+// bats file_tags=harbor,use-ui
 
 // setup_file load "setup_suite.bash"
 // setup_file
