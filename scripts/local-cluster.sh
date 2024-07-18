@@ -283,6 +283,11 @@ config() {
     touch "${CK8S_CONFIG_PATH}/wc-config.yaml"
   fi
 
+  if ! [[ -f "${CK8S_CONFIG_PATH}/secrets.yaml" ]]; then
+    cp "${HERE}/local-clusters/configs/secrets.yaml" "${CK8S_CONFIG_PATH}/secrets.yaml"
+    sops -e -i --pgp "${CK8S_PGP_FP}" "${CK8S_CONFIG_PATH}/secrets.yaml"
+  fi
+
   yq -Pi 'with(select(. == null); . = {}) | . *= (load(env(HERE) + "/local-clusters/configs/common-config.yaml") | (.. | select(tag == "!!str")) |= envsubst)' "${CK8S_CONFIG_PATH}/common-config.yaml"
   yq -Pi 'with(select(. == null); . = {}) | . *= (load(env(HERE) + "/local-clusters/configs/sc-config.yaml") | (.. | select(tag == "!!str")) |= envsubst)' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   yq -Pi 'with(select(. == null); . = {}) | . *= (load(env(HERE) + "/local-clusters/configs/wc-config.yaml") | (.. | select(tag == "!!str")) |= envsubst)' "${CK8S_CONFIG_PATH}/wc-config.yaml"

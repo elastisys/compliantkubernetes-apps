@@ -15,16 +15,11 @@ objectStorage:
     region: local
     regionEndpoint: http://minio.minio-system.svc.cluster.local:9000
     forcePathStyle: true
-    accessKey: minioaccesskey
-    secretKey: miniosecretkey
 calicoAccountant:
   backend: nftables
 clusterApi:
   enabled: false
   monitoring:
-    enabled: false
-kubeStateMetrics:
-  clusterAPIMetrics:
     enabled: false
 opa:
   imageRegistry:
