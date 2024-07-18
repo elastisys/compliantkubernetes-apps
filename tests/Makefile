@@ -95,11 +95,6 @@ enter-integration:
 enter-end-to-end:
 	FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true $(launcher) $(image):main bash
 
-enter-integration-cypress:
-	FORWARD_RUNTIME=true $(launcher) $(image):main cypress open --project tests/
-enter-end-to-end-cypress:
-	FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true $(launcher) $(image):main cypress open --project tests/
-
 $(patsubst $(tests)/%,setup-%,$(suites)): setup-%:
 	@$(tests)/common/exec.bash suite setup $*
 $(patsubst $(tests)/%,teardown-%,$(suites)): teardown-%:
