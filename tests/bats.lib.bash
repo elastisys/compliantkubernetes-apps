@@ -100,7 +100,7 @@ test_daemonset() {
   fi
 
   verify "there is 1 daemonset named '^$1$'"
-  verify "'status' is 'running' for pods named '$1-[[:alnum:]]\+[[:space:]]'"
+  verify "'status' is 'running' for pods named '$1-[[:alnum:]]+$'"
 }
 
 # note: expects with_kubeconfig and with_namespace to be set
@@ -111,8 +111,8 @@ test_deployment() {
   fi
 
   verify "there is 1 deployment named '^$1$'"
-  verify "there are ${2:-1} pods named '$1-[[:alnum:]]\+-[[:alnum:]]\+$'"
-  verify "'status' is 'running' for pods named '$1-[[:alnum:]]\+-[[:alnum:]]\+[[:space:]]'"
+  verify "there are ${2:-1} pods named '$1-[[:alnum:]]+-[[:alnum:]]+$'"
+  verify "'status' is 'running' for pods named '$1-[[:alnum:]]+-[[:alnum:]]+'"
 }
 
 # note: expects with_kubeconfig and with_namespace to be set
@@ -123,8 +123,8 @@ test_statefulset() {
   fi
 
   verify "there is 1 statefulset named '^$1$'"
-  verify "there are ${2-1} pods named '$1-[[:digit:]]\+$'"
-  verify "'status' is 'running' for pods named '$1-[[:digit:]]\+[[:space:]]'"
+  verify "there are ${2-1} pods named '$1-[[:digit:]]+$'"
+  verify "'status' is 'running' for pods named '$1-[[:digit:]]+'"
 }
 
 # note: expects with_kubeconfig and with_namespace to be set
