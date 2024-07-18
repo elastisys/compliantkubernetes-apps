@@ -83,9 +83,10 @@ RUN git clone --depth 1 https://github.com/bats-core/bats-support.git /usr/local
 FROM unit AS main
 
 RUN apt-get update && \
-    apt-get install -y docker.io libasound2t64 libgbm-dev libgtk2.0-0 libgtk-3-0 libnotify-dev libnss3 libxss1 libxtst6 npm skopeo xauth xvfb && \
+    apt-get install -y docker.io libasound2t64 libgbm-dev libgtk2.0-0 libgtk-3-0 libnotify-dev libnss3 libxss1 libxtst6 npm podman-remote skopeo xauth xvfb && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    ln -s /usr/bin/podman-remote /usr/bin/podman
 
 ENV KIND_VERSION="0.22.0"
 RUN curl -LOs "https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-linux-amd64" && \
@@ -97,12 +98,6 @@ ENV CYPRESS_CACHE_FOLDER="/usr/local/lib/cypress"
 ENV NODE_PATH="/usr/local/lib/node_modules"
 RUN npm install --global "cypress@${CYPRESS_VERSION}"
 RUN chmod --recursive a+w "${CYPRESS_CACHE_FOLDER}"
-
-ENV PODMAN_REMOTE_VERSION="5.0.3"
-RUN curl -LOs "https://github.com/containers/podman/releases/download/v${PODMAN_REMOTE_VERSION}/podman-remote-static-linux_amd64.tar.gz" && \
-    tar -zxvf podman-remote-static-linux_amd64.tar.gz bin/podman-remote-static-linux_amd64 && \
-    install -Tm 755 bin/podman-remote-static-linux_amd64 /usr/local/bin/podman && \
-    rm bin/podman-remote-static-linux_amd64 podman-remote-static-linux_amd64.tar.gz
 
 ENV DOCS_PATH="/usr/local/share/docs"
 RUN git clone --depth 1 https://github.com/elastisys/compliantkubernetes.git "${DOCS_PATH}"
