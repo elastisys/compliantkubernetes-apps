@@ -75,16 +75,16 @@ container-end-to-end: $(patsubst $(tests)/%,container-%,$(filter $(tests)/end-to
 # container-<target/suite/file> wild card
 $(patsubst $(tests)/%,container-%,$(filter $(tests)/unit/%,$(suites) $(files))): container-%: $(filter $(tests)/unit/$(%)%,$(generated_files))
 	@echo "--- run $*"
-	@bats -j $(nproc) -r "$(tests)/$*"
+	@bats --tap -j $(nproc) -r "$(tests)/$*"
 $(patsubst $(tests)/%,container-%,$(filter $(tests)/regression/%,$(suites) $(files))): container-%: $(filter $(tests)/regression/$(%)%,$(generated_files))
 	@echo "--- run $*"
-	@bats --no-parallelize-across-files -j $(nproc) -r "$(tests)/$*"
+	@bats  --tap --no-parallelize-across-files -j $(nproc) -r "$(tests)/$*"
 $(patsubst $(tests)/%,container-%,$(filter $(tests)/integration/%,$(suites) $(files))): container-%: $(filter $(tests)/integration/$(%)%,$(generated_files))
 	@echo "--- run $*"
-	@bats --no-parallelize-across-files -j $(nproc) -r "$(tests)/$*"
+	@bats  --tap --no-parallelize-across-files -j $(nproc) -r "$(tests)/$*"
 $(patsubst $(tests)/%,container-%,$(filter $(tests)/end-to-end/%,$(suites) $(files))): container-%: $(filter $(tests)/end-to-end/$(%)%,$(generated_files))
 	@echo "--- run $*"
-	@bats -r "$(tests)/$*"
+	@bats  --tap -r "$(tests)/$*"
 
 enter-unit:
 	$(launcher) $(image):unit bash

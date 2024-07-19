@@ -15,11 +15,14 @@ teardown_suite() {
 }
 
 setup_harbor() {
-  ck8s ops helmfile sc apply --include-transitive-needs --output simple -lapp=harbor
+  ck8s ops helmfile sc apply -lapp=harbor --output simple --wait
+
+  ck8s ops kubectl sc wait pod -n harbor -l app=harbor --for condition=Ready --timeout 60s
 }
 
 teardown_harbor() {
-  ck8s ops helmfile sc destroy -lapp=harbor
+  ck8s ops helmfile sc destroy -lapp=harbor --deleteWait
 
   ck8s ops kubectl sc delete pvc -n harbor --all
+  ck8s ops kubectl sc delete po -n harbor --all
 }

@@ -70,7 +70,7 @@ teardown_file() {
 }
 
 @test "harbor api can push image with robot account" {
-  run skopeo sync --src docker --dest docker --dest-tls-verify=false docker.io/library/busybox:stable "${harbor_endpoint}/${harbor_project}"
+  run skopeo copy --dest-tls-verify=false docker://docker.io/library/busybox:stable "docker://${harbor_endpoint}/${harbor_project}/busybox:stable"
   assert_success
 }
 
@@ -78,7 +78,7 @@ teardown_file() {
   local dest
   dest="$(mktemp -d)"
 
-  run skopeo sync --src docker --src-tls-verify=false --dest dir "${harbor_endpoint}/${harbor_project}/busybox:stable" "${dest}"
+  run skopeo copy --src-tls-verify=false "docker://${harbor_endpoint}/${harbor_project}/busybox:stable" "dir:${dest}"
   assert_success
 
   rm -r "${dest}"
@@ -90,7 +90,7 @@ teardown_file() {
   assert_success
 
   for each in $(seq 30); do
-    echo "${each} try" >&2
+    echo "try ${each}" >&2
 
     run harbor.get_artefact_vulnerabilities "${harbor_project}" "busybox" "stable"
     assert_success
