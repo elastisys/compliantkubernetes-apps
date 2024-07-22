@@ -54,16 +54,19 @@ $(cypress_files:.cy.js=.gen.bats): %.gen.bats: %.cy.js common/gen.bash
 $(template_files:.bats.gotmpl=.gen.bats): %.gen.bats: %.bats.gotmpl common/gen.bash
 	@$(tests)/common/gen.bash template
 
+$(foreach type,$(types),preflight-$(type)): preflight-%:
+	@$(tests)/common/exec.bash preflight $*
+
 run-all:
 	@FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true $(launcher) $(image):main make --no-print-directory -C tests container-all
 # run-<target/suite/file> wild card
-run-unit $(patsubst $(tests)/%,run-%,$(filter $(tests)/unit/%,$(suites) $(files))): run-%:
+run-unit $(patsubst $(tests)/%,run-%,$(filter $(tests)/unit/%,$(suites) $(files))): run-%: preflight-unit
 	@$(launcher) $(image):unit make --no-print-directory -C tests container-$*
-run-regression $(patsubst $(tests)/%,run-%,$(filter $(tests)/regression/%,$(suites) $(files))): run-%:
+run-regression $(patsubst $(tests)/%,run-%,$(filter $(tests)/regression/%,$(suites) $(files))): run-%: preflight-regression
 	@FORWARD_RUNTIME=true $(launcher) $(image):main make --no-print-directory -C tests container-$*
-run-integration $(patsubst $(tests)/%,run-%,$(filter $(tests)/integration/%,$(suites) $(files))): run-%:
+run-integration $(patsubst $(tests)/%,run-%,$(filter $(tests)/integration/%,$(suites) $(files))): run-%: preflight-integration
 	@FORWARD_RUNTIME=true $(launcher) $(image):main make --no-print-directory -C tests container-$*
-run-end-to-end $(patsubst $(tests)/%,run-%,$(filter $(tests)/end-to-end/%,$(suites) $(files))): run-%:
+run-end-to-end $(patsubst $(tests)/%,run-%,$(filter $(tests)/end-to-end/%,$(suites) $(files))): run-%: preflight-end-to-end
 	@FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true $(launcher) $(image):main make --no-print-directory -C tests container-$*
 
 container-all: container-unit container-regression container-integration container-end-to-end
@@ -86,13 +89,13 @@ $(patsubst $(tests)/%,container-%,$(filter $(tests)/end-to-end/%,$(suites) $(fil
 	@echo "--- run $*"
 	@bats  --tap -r "$(tests)/$*"
 
-enter-unit:
+enter-unit: preflight-unit
 	$(launcher) $(image):unit bash
-enter-regression:
+enter-regression: preflight-regression
 	FORWARD_RUNTIME=true $(launcher) $(image):main bash
-enter-integration:
+enter-integration: preflight-integration
 	FORWARD_RUNTIME=true $(launcher) $(image):main bash
-enter-end-to-end:
+enter-end-to-end: preflight-end-to-end
 	FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true $(launcher) $(image):main bash
 
 $(patsubst $(tests)/%,setup-%,$(suites)): setup-%:

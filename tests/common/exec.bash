@@ -4,8 +4,46 @@
 
 set -euo pipefail
 
-declare tests
+declare roots tests
 tests="$(dirname "$(dirname "$(readlink -f "$0")")")"
+roots="$(dirname "${tests}")"
+
+declare runtime
+if command -v docker >/dev/null && docker version &>/dev/null && [[ ! "$(docker version)" =~ Podman ]]; then
+  runtime="docker"
+elif command -v podman >/dev/null; then
+  runtime="podman"
+else
+  echo "no container runtime found" >&2
+  exit 1
+fi
+
+check_image() {
+  if ! "${runtime}" image inspect "${1:-}" &>/dev/null; then
+    echo "error: image ${1:-} is not built" >&2
+    return 1
+  fi
+}
+check_container() {
+  if ! "${runtime}" container inspect "${1:-}" &>/dev/null; then
+    echo "error: container ${1:-} is not running" >&2
+    return 1
+  fi
+  if [[ ! "$("${runtime}" container inspect "${1:-}" --format '{{ .State.Running }}')" == "true" ]]; then
+    echo "error: container ${1:-} is not running" >&2
+    return 1
+  fi
+}
+check_resolve() {
+  if ! resolvectl query dot.integration.dev-ck8s.com &>/dev/null; then
+    echo "error: dns does not resolve with local-resolve" >&2
+    return 1
+  fi
+  if [[ "$(resolvectl query dot.integration.dev-ck8s.com | awk '/dot.integration.dev-ck8s.com:/{ print $2 }')" != "127.0.64.43" ]]; then
+    echo "error: dns does not resolve to local-cluster" >&2
+    return 1
+  fi
+}
 
 # Load override to source bats lib.
 load() {
@@ -24,27 +62,67 @@ load() {
 }
 
 preflight.unit() {
-  # check image is newer than dockerfile mod time
-  echo "unit"
+  local failure="false"
+
+  if ! check_image compliantkubernetes-apps-tests:unit; then failure="true"; fi
+
+  if [[ "${failure}" == "true" ]]; then
+    echo "error: preflight checks failure for unit tests" >&2
+    exit 1
+  fi
 }
 preflight.regression() {
-  # check image is newer than dockerfile mod time
-  # check that local cache is running
-  # check that local resolve is running
-  echo "regression"
+  local failure="false"
+
+  if ! check_image compliantkubernetes-apps-tests:main; then failure="true"; fi
+
+  local -a registries
+  readarray -t registries < <(find "${roots}/scripts/local-clusters/registries" -type d -name '*\.*')
+  for registry in "${registries[@]##"${roots}/scripts/local-clusters/registries/"}"; do
+    if ! check_container "local-cache-${registry//./-}"; then failure="true"; fi
+  done
+  if ! check_container "local-resolve"; then failure="true"; fi
+
+  if ! check_resolve; then failure="true"; fi
+
+  if [[ "${failure}" == "true" ]]; then
+    echo "error: preflight checks failure for regression tests" >&2
+    exit 1
+  fi
 }
 preflight.integration() {
-  # check image is newer than dockerfile mod time
-  # check that local cache is running
-  # check that local resolve is running
-  echo "integration"
+  local failure="false"
+
+  if ! check_image compliantkubernetes-apps-tests:main; then failure="true"; fi
+
+  local -a registries
+  readarray -t registries < <(find "${roots}/scripts/local-clusters/registries" -type d -name '*\.*')
+  for registry in "${registries[@]##"${roots}/scripts/local-clusters/registries/"}"; do
+    if ! check_container "local-cache-${registry//./-}"; then failure="true"; fi
+  done
+  if ! check_container "local-resolve"; then failure="true"; fi
+
+  if ! check_resolve; then failure="true"; fi
+
+  if [[ "${failure}" == "true" ]]; then
+    echo "error: preflight checks failure for integration tests" >&2
+    exit 1
+  fi
 }
 preflight.end_to_end() {
-  # check image is newer than dockerfile mod time
-  # check that local cache is running
-  # check that local resolve is running
-  # check that remote environment is set
-  echo "end-to-end"
+  local failure="false"
+
+  if ! check_image compliantkubernetes-apps-tests:main; then failure="true"; fi
+
+  if [[ ! -d "${CK8S_CONFIG_PATH}" ]]; then
+    echo "error: config path is not set" >&2
+    failure="true"
+  fi
+
+  if [[ "${failure}" == "true" ]]; then
+    echo "error: preflight checks failure for end-to-end tests" >&2
+    exit 1
+  fi
 }
 
 # Runs the setup for a given test suite.
@@ -143,6 +221,24 @@ suite.teardown() {
 main() {
   case "${1:-}" in
   preflight)
+    case "${2:-}" in
+    unit)
+      preflight.unit
+      ;;
+    regression)
+      preflight.regression
+      ;;
+    integration)
+      preflight.integration
+      ;;
+    end-to-end)
+      preflight.end_to_end
+      ;;
+    *)
+      echo "error: invalid argument for preflight" >&2
+      exit 1
+      ;;
+    esac
     ;;
   suite)
     case "${2:-}" in
@@ -152,7 +248,15 @@ main() {
     teardown)
       suite.teardown "${@:3}"
       ;;
+    *)
+      echo "error: invalid argument for suite" >&2
+      exit 1
+      ;;
     esac
+    ;;
+  *)
+    echo "error: invalid command" >&2
+    exit 1
     ;;
   esac
 }
