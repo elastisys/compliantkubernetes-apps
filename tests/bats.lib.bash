@@ -145,19 +145,20 @@ auto_setup() {
 
   load_common "local-cluster.bash"
 
-  log.trace "auto setup: local cluster setup"
+  log.trace "setup local cluster"
   local_cluster.setup dev integration.dev-ck8s.com
-  log.trace "auto setup: local cluster create"
   local_cluster.create single-node-cache
 
   local_cluster.configure_selfsigned
 
-  log.trace "auto setup: apply ${cluster} ${*}"
+  log.trace "setup apply ${cluster} ${*}"
   ck8s ops helmfile "${cluster}" apply --include-transitive-needs --output simple "${@/#''/-l}"
 }
 
 auto_teardown() {
   load_common "local-cluster.bash"
+
+  log.trace "teardown local cluster"
 
   local_cluster.delete
   local_cluster.teardown
