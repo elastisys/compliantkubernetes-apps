@@ -2262,6 +2262,39 @@ properties:
             description: Additional buckets to sync.
             type: array
             default: []
+            items:
+              title: Buckets to sync
+              description: |-
+                List of buckets to sync when `syncDefaultBuckets` is false
+              type: object
+              required:
+                - source
+              properties:
+                source:
+                  type: string
+                  title: Source bucket to sync
+                destination:
+                  type: string
+                  title: Destination bucket to sync
+                schedule:
+                  type: string
+                  title: Sync schedule for this bucket
+                  description: Defaults to `.objectStorage.sync.defaultSchedule`
+                sourceType:
+                  type: string
+                  title: Type of source
+                  examples:
+                    - s3
+                    - swift
+                    - azure
+                destinationType:
+                  type: string
+                  title: Type of destination
+                  examples:
+                    - s3
+                    - swift
+                    - azure
+              additionalProperties: false
           destinationType:
             title: Rclone Sync Destination Type
             description: |-
@@ -2305,6 +2338,15 @@ properties:
                 type: boolean
                 default: false
             type: object
+          sourceType:
+            title: Rclone Sync Source Type
+            description: Object storage type to use. Defaults to .objectStorage.type
+            type: string
+            examples:
+              - azure
+              - gcs
+              - s3
+              - swift
       restore:
         additionalProperties: false
         title: Rclone Restore Config
@@ -2337,6 +2379,35 @@ properties:
             description: Targets to restore
             type: array
             default: []
+            items:
+              title: Rclone restore target
+              description: |-
+                Details of a bucket to restore.
+              type: object
+              required:
+                - destinationName
+              properties:
+                destinationName:
+                  type: string
+                  title: Destination bucket to sync
+                destinationType:
+                  type: string
+                  title: Type of destination
+                  examples:
+                    - s3
+                    - swift
+                    - azure
+                sourceName:
+                  type: string
+                  title: Source bucket to sync
+                sourceType:
+                  type: string
+                  title: Type of source
+                  examples:
+                    - s3
+                    - swift
+                    - azure
+              additionalProperties: false
           timestamp:
             title: Rclone Restore Timestamp
             description: |-

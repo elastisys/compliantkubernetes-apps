@@ -34,8 +34,8 @@ policies:
     {{- if $sync.syncDefaultBuckets }}
     {{- range $key, $value := $main.buckets }}
 
-    {{- $destinationType := $main.type }}
-    {{- $sourceType := $sync.destinationType }}
+    {{- $destinationType := $sync.destinationType }}
+    {{- $sourceType := $main.type }}
 
     {{- if eq $key "harbor" }}
     {{- $destinationType = $.Values.harbor.persistence.type | replace "objectStorage" "" | default $destinationType }}
