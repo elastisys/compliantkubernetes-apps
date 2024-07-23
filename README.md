@@ -1,8 +1,9 @@
 # Elastisys Compliant Kubernetes Apps
 
-## Build status
+## Tests status
 
-![End-to-end tests](https://github.com/elastisys/compliantkubernetes-apps/actions/workflows/end-to-end.yml/badge.svg)
+- [![tests](https://github.com/elastisys/compliantkubernetes-apps/actions/workflows/tests.yml/badge.svg)](https://github.com/elastisys/compliantkubernetes-apps/actions/workflows/tests.yml) - unit / integration.
+- ![End-to-end tests](https://github.com/elastisys/compliantkubernetes-apps/actions/workflows/end-to-end.yml/badge.svg) - currently disabled pending [#2010](https://github.com/elastisys/compliantkubernetes-apps/issues/2010).
 
 ## Overview
 

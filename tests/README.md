@@ -147,8 +147,13 @@ For each test suite create a `setup_suite.bash` file in that suite and implement
 For each test file implement the functions `setup_file` / `teardown_suite`.
 For each test implement the functions `setup` / `teardown`.
 
-Exported environment variables will have the following scope: ( `setup_suite` ( `setup_file` ( `setup` ( `test` ) `teardown` ) `teardown_file` ) `teardown_suite` ).
-Sourced functions will have the following scope: ( `setup_suite`, `teardown_suite` ), ( `setup_file`, `teardown_file` ), ( `setup` ( `test` ) `teardown_suite` ).
+Exported environment variables will have the following scope:
+
+- ( `setup_suite` ( `setup_file` ( `setup` ( `@test` ) `teardown` ) `teardown_file` ) `teardown_suite` ).
+
+Sourced functions will have the following scope:
+
+- ( `setup_suite`, `teardown_suite` ), ( `setup_file`, `teardown_file` ), ( `setup` ( `@test` ) `teardown` ).
 
 The following template can be used to define tests, except for the test definition itself all syntax is regular bash syntax:
 

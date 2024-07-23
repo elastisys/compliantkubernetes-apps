@@ -90,13 +90,13 @@ $(patsubst $(tests)/%,container-%,$(filter $(tests)/end-to-end/%,$(suites) $(fil
 	@bats  --tap -r "$(tests)/$*"
 
 enter-unit: preflight-unit
-	$(launcher) $(image):unit bash
+	@$(launcher) $(image):unit bash
 enter-regression: preflight-regression
-	FORWARD_RUNTIME=true $(launcher) $(image):main bash
+	@FORWARD_RUNTIME=true $(launcher) $(image):main bash
 enter-integration: preflight-integration
-	FORWARD_RUNTIME=true $(launcher) $(image):main bash
+	@FORWARD_RUNTIME=true $(launcher) $(image):main bash
 enter-end-to-end: preflight-end-to-end
-	FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true $(launcher) $(image):main bash
+	@FORWARD_ENVIRONMENT=true FORWARD_RUNTIME=true $(launcher) $(image):main bash
 
 $(patsubst $(tests)/%,setup-%,$(suites)): setup-%:
 	@$(tests)/common/exec.bash suite setup $*

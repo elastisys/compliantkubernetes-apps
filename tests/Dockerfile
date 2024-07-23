@@ -11,66 +11,66 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-ENV SOPS_VERSION="3.8.1"
-RUN curl -LOs "https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux.amd64" && \
-    install -Tm 755 "sops-v${SOPS_VERSION}.linux.amd64" /usr/local/bin/sops && \
-    rm "sops-v${SOPS_VERSION}.linux.amd64"
+ARG GOMPLATE_VERSION="3.11.7"
+RUN curl -LOs "https://github.com/hairyhenderson/gomplate/releases/download/v${GOMPLATE_VERSION}/gomplate_linux-amd64" && \
+    install -Tm 755 gomplate_linux-amd64 /usr/local/bin/gomplate && \
+    rm gomplate_linux-amd64
 
-ENV KUBECTL_VERSION="1.28.6"
-RUN curl -LOs "https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
-    install -Tm 755 kubectl /usr/local/bin/kubectl && \
-    rm kubectl
-
-ENV KUBECONFORM_VERSION="v0.6.3"
-RUN curl -LOs "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" && \
-    tar -zxvf kubeconform-linux-amd64.tar.gz kubeconform && \
-    install -Tm 755 kubeconform /usr/local/bin/kubeconform && \
-    rm kubeconform-linux-amd64.tar.gz kubeconform
-
-ENV KUBELOGIN_VERSION="1.28.0"
-RUN curl -LOs "https://github.com/int128/kubelogin/releases/download/v${KUBELOGIN_VERSION}/kubelogin_linux_amd64.zip" && \
-    unzip kubelogin_linux_amd64.zip && \
-    install -Tm 755 kubelogin /usr/local/bin/kubectl-oidc_login && \
-    rm kubelogin kubelogin_linux_amd64.zip LICENSE README.md
-
-ENV HELM_VERSION="3.13.3"
+ARG HELM_VERSION="3.13.3"
 ENV HELM_DATA_HOME="/usr/local/share/helm"
 RUN curl -LOs "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" && \
     tar -zxvf "helm-v${HELM_VERSION}-linux-amd64.tar.gz" linux-amd64/helm && \
     install -Tm 755 linux-amd64/helm /usr/local/bin/helm && \
     rm -rf linux-amd64 "helm-v${HELM_VERSION}-linux-amd64.tar.gz"
 
-ENV HELM_DIFF_VERSION="3.9.4"
+ARG HELM_DIFF_VERSION="3.9.4"
 RUN helm plugin install https://github.com/databus23/helm-diff --version "v${HELM_DIFF_VERSION}" > /dev/null
 
-ENV HELM_SECRETS_VERSION="4.5.1"
+ARG HELM_SECRETS_VERSION="4.5.1"
 RUN helm plugin install https://github.com/jkroepke/helm-secrets --version "v${HELM_SECRETS_VERSION}" > /dev/null
 
-ENV HELMFILE_VERSION="0.162.0"
+ARG HELMFILE_VERSION="0.162.0"
 RUN curl -LOs "https://github.com/helmfile/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz" && \
     tar -zxvf "helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz" helmfile && \
     install -Tm 755 helmfile /usr/local/bin/helmfile && \
     rm helmfile "helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz"
 
-ENV OPA_VERSION="v0.57.1"
+ARG KUBECTL_VERSION="1.28.6"
+RUN curl -LOs "https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
+    install -Tm 755 kubectl /usr/local/bin/kubectl && \
+    rm kubectl
+
+ARG KUBECONFORM_VERSION="v0.6.3"
+RUN curl -LOs "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" && \
+    tar -zxvf kubeconform-linux-amd64.tar.gz kubeconform && \
+    install -Tm 755 kubeconform /usr/local/bin/kubeconform && \
+    rm kubeconform-linux-amd64.tar.gz kubeconform
+
+ARG KUBELOGIN_VERSION="1.28.0"
+RUN curl -LOs "https://github.com/int128/kubelogin/releases/download/v${KUBELOGIN_VERSION}/kubelogin_linux_amd64.zip" && \
+    unzip kubelogin_linux_amd64.zip && \
+    install -Tm 755 kubelogin /usr/local/bin/kubectl-oidc_login && \
+    rm kubelogin kubelogin_linux_amd64.zip LICENSE README.md
+
+ARG OPA_VERSION="v0.57.1"
 RUN curl -LOs "https://github.com/open-policy-agent/opa/releases/download/${OPA_VERSION}/opa_linux_amd64" && \
     install -Tm 755 opa_linux_amd64 /usr/local/bin/opa && \
     rm opa_linux_amd64
 
-ENV YQ_VERSION="4.42.1"
-RUN curl -LOs "https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64" && \
-    install -Tm 755 yq_linux_amd64 /usr/local/bin/yq4 && \
-    rm yq_linux_amd64
+ARG SOPS_VERSION="3.8.1"
+RUN curl -LOs "https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux.amd64" && \
+    install -Tm 755 "sops-v${SOPS_VERSION}.linux.amd64" /usr/local/bin/sops && \
+    rm "sops-v${SOPS_VERSION}.linux.amd64"
 
-ENV YAJSV_VERSION="1.4.1"
+ARG YAJSV_VERSION="1.4.1"
 RUN curl -LOs "https://github.com/neilpa/yajsv/releases/download/v${YAJSV_VERSION}/yajsv.linux.amd64" && \
     install -Tm 755 yajsv.linux.amd64 /usr/local/bin/yajsv && \
     rm yajsv.linux.amd64
 
-ENV GOMPLATE_VERSION="3.11.7"
-RUN curl -LOs "https://github.com/hairyhenderson/gomplate/releases/download/v${GOMPLATE_VERSION}/gomplate_linux-amd64" && \
-    install -Tm 755 gomplate_linux-amd64 /usr/local/bin/gomplate && \
-    rm gomplate_linux-amd64
+ARG YQ_VERSION="4.42.1"
+RUN curl -LOs "https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64" && \
+    install -Tm 755 yq_linux_amd64 /usr/local/bin/yq4 && \
+    rm yq_linux_amd64
 
 # Currently all from main as most do not have current releases
 RUN git clone --depth 1 https://github.com/bats-core/bats-assert.git /usr/local/lib/bats/assert
@@ -83,21 +83,22 @@ RUN git clone --depth 1 https://github.com/bats-core/bats-support.git /usr/local
 FROM unit AS main
 
 RUN apt-get update && \
-    apt-get install -y docker.io libasound2t64 libgbm-dev libgtk2.0-0 libgtk-3-0 libnotify-dev libnss3 libxss1 libxtst6 npm podman-remote skopeo xauth xvfb && \
+    apt-get install -y buildah docker.io libasound2t64 libgbm-dev libgtk2.0-0 libgtk-3-0 libnotify-dev libnss3 libxss1 libxtst6 npm podman-remote skopeo xauth xvfb && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     ln -s /usr/bin/podman-remote /usr/bin/podman
 
-ENV KIND_VERSION="0.22.0"
-RUN curl -LOs "https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-linux-amd64" && \
-    install -Tm 755 kind-linux-amd64 /usr/local/bin/kind && \
-    rm kind-linux-amd64
-
-ENV CYPRESS_VERSION="13.9.0"
+ARG CYPRESS_VERSION="13.13.1"
 ENV CYPRESS_CACHE_FOLDER="/usr/local/lib/cypress"
+# ENV NODE_OPTIONS="--max_old_space_size=4096"
 ENV NODE_PATH="/usr/local/lib/node_modules"
 RUN npm install --global "cypress@${CYPRESS_VERSION}"
 RUN chmod --recursive a+w "${CYPRESS_CACHE_FOLDER}"
+
+ARG KIND_VERSION="0.22.0"
+RUN curl -LOs "https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-linux-amd64" && \
+    install -Tm 755 kind-linux-amd64 /usr/local/bin/kind && \
+    rm kind-linux-amd64
 
 ENV DOCS_PATH="/usr/local/share/docs"
 RUN git clone --depth 1 https://github.com/elastisys/compliantkubernetes.git "${DOCS_PATH}"
