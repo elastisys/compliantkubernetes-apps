@@ -115,6 +115,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.40/prepare/10-set-ck8s-installer.sh
     ```
 
+1. Update the dex config to follow new structure for google admin email:
+
+    ```bash
+    ./migration/v0.40/prepare/20-update-google-dex-config.sh
+    ```
+
 1. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.
