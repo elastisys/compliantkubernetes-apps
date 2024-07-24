@@ -343,6 +343,30 @@ if [ -z "${CK8S_ROOT_SCRIPT:-}" ]; then
   check_config
 fi
 
+# Normally a signal handler can only run one command. Use this to be able to
+# add multiple traps for a single signal.
+append_trap() {
+    cmd="${1}"
+    signal="${2}"
+
+    if [ "$(trap -p "${signal}")" = "" ]; then
+        # shellcheck disable=SC2064
+        trap "${cmd}" "${signal}"
+        return
+    fi
+
+    # shellcheck disable=SC2317
+    previous_trap_cmd() { printf '%s\n' "$3"; }
+
+    new_trap() {
+        eval "previous_trap_cmd $(trap -p "${signal}")"
+        printf '%s\n' "${cmd}"
+    }
+
+    # shellcheck disable=SC2064
+    trap "$(new_trap)" "${signal}"
+}
+
 # shellcheck source=scripts/migration/helm.sh
 source "${ROOT}/scripts/migration/helm.sh"
 # shellcheck source=scripts/migration/helmfile.sh
