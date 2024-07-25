@@ -76,6 +76,8 @@ hostNetwork:
 
 replicas: 1
 
+revisionHistoryLimit:
+
 updateStrategy: {}
 #   type: RollingUpdate
 #   rollingUpdate:
@@ -127,20 +129,30 @@ addonResizer:
   enabled: false
   image:
     repository: registry.k8s.io/autoscaling/addon-resizer
-    tag: 1.8.14
+    tag: 1.8.20
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+    seccompProfile:
+      type: RuntimeDefault
+    capabilities:
+      drop:
+        - ALL
   resources:
-    limits:
-      cpu: 40m
-      memory: 25Mi
     requests:
       cpu: 40m
       memory: 25Mi
+    limits:
+      cpu: 40m
+      memory: 25Mi
   nanny:
-    cpu: 20m
+    cpu: 0m
     extraCpu: 1m
+    memory: 0Mi
     extraMemory: 2Mi
-    memory: 15Mi
-    minClusterSize: 10
+    minClusterSize: 100
     pollPeriod: 300000
     threshold: 5
 
@@ -156,7 +168,13 @@ serviceMonitor:
   relabelings: []
 
 # See https://github.com/kubernetes-sigs/metrics-server#scaling
-resources: {}
+resources:
+  requests:
+    cpu: 100m
+    memory: 200Mi
+  # limits:
+  #   cpu:
+  #   memory:
 
 extraVolumeMounts: []
 
@@ -170,7 +188,12 @@ affinity: {}
 
 topologySpreadConstraints: []
 
+dnsConfig: {}
+
 # Annotations to add to the deployment
 deploymentAnnotations: {}
 
 schedulerName: ""
+
+tmpVolume:
+  emptyDir: {}
