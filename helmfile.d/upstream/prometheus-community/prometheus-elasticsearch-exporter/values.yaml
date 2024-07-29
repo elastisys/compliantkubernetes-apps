@@ -2,19 +2,43 @@
 ## This allows to set the same values for the imagePullSecrets, obviating the need
 ## to set the same values for each chart (and image) separately
 global:
+  ## Allow either an array of {name: pullSecret} maps (k8s-style), or an array of strings (more common helm-style).
+  ##  imagePullSecrets:
+  ##  - name: pullSecret1
+  ##  - name: pullSecret2
+  ##
+  ## or
+  ##
+  ##  imagePullSecrets:
+  ##  - pullSecret1
+  ##  - pullSecret2
+  ##
+  ## or a templated value
+  ##
+  ##    imagePullSecrets:
+  ##    - "{{ .Values.templateValue }}"
+  ##  templateValue: test
+
   imagePullSecrets: []
+  imageRegistry: ""
 
 ## number of exporter instances
 ##
 replicaCount: 1
+
+## Number of old replicasets to retain ##
+## The default value is 10, 0 will garbage-collect old replicasets ##
+revisionHistoryLimit: 10
 
 ## restart policy for all containers
 ##
 restartPolicy: Always
 
 image:
+  registry: ""
   repository: quay.io/prometheuscommunity/elasticsearch-exporter
-  tag: v1.5.0
+  # if not set appVersion field from Chart.yaml is used
+  tag: ""
   pullPolicy: IfNotPresent
   pullSecret: ""
 
@@ -65,9 +89,15 @@ podAnnotations: {}
 
 podLabels: {}
 
+## Labels to attach to all resources
+commonLabels: {}
+
 affinity: {}
 
+initContainers: []
+
 service:
+  enabled: true
   type: ClusterIP
   httpPort: 9108
   metricsPort:
@@ -78,6 +108,8 @@ service:
 deployment:
   annotations: {}
   labels: {}
+  metricsPort:
+    name: http
 
 ## Extra environment variables that will be passed into the exporter pod
 ## example:
@@ -91,6 +123,16 @@ env: {}
 # extraArgs:
 #   - --es.indices_mappings
 extraArgs: []
+
+# Extra manifests to deploy as an array
+extraManifests: []
+  # - |
+  #   apiVersion: v1
+  #   kind: ConfigMap
+  #   metadata:
+  #     name: prometheus-elasticsearch-exporter-extra
+  #   data:
+  #     extra-data: "value"
 
 ## The name of a secret in the same kubernetes namespace which contain values to be added to the environment
 ## This can be useful for auth tokens, etc
@@ -179,6 +221,10 @@ es:
   ##
   data_stream: false
 
+  ## If true, query stats for Index Lifecycle Management.
+  ##
+  ilm: false
+
   ## Timeout for trying to get stats from Elasticsearch. (ex: 20s)
   ##
   timeout: 30s
@@ -232,8 +278,10 @@ serviceMonitor:
   ## https://github.com/coreos/prometheus-operator
   ##
   enabled: false
-  #  namespace: monitoring
+  apiVersion: "monitoring.coreos.com/v1"
+  namespace: ""
   labels: {}
+    # release: kube-prometheus-stack
   interval: 10s
   jobLabel: ""
   scrapeTimeout: 10s
@@ -243,13 +291,28 @@ serviceMonitor:
   metricRelabelings: []
   sampleLimit: 0
 
+podMonitor:
+  ## If true, a PodMonitor CRD is created for a Prometheus Operator
+  ## https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.PodMonitor
+  ##
+  enabled: false
+  apiVersion: "monitoring.coreos.com/v1"
+  namespace: ""
+  labels: {}
+  interval: 60s
+  scrapeTimeout: 10s
+  honorLabels: true
+  scheme: http
+  relabelings: []
+  metricRelabelings: []
+
 prometheusRule:
   ## If true, a PrometheusRule CRD is created for a prometheus operator
   ## https://github.com/coreos/prometheus-operator
   ##
   ## The rules will be processed as Helm template, allowing to set variables in them.
   enabled: false
-  #  namespace: monitoring
+  namespace: ""
   labels: {}
   rules: []
     # - record: elasticsearch_filesystem_data_used_percent

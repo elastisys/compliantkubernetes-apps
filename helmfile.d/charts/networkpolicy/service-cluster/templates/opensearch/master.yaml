@@ -27,7 +27,7 @@ spec:
               app: opensearch-dashboards
         - podSelector:
             matchLabels:
-              app: prometheus-elasticsearch-exporter
+              app.kubernetes.io/name: prometheus-elasticsearch-exporter
         - podSelector:
             matchLabels:
               app: configurer
