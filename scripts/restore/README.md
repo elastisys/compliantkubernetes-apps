@@ -94,3 +94,11 @@ Then, re-run the init job:
 If the new harbor is using a dex instance with a different domain compared to the dex the old harbor was using, then when users login via dex harbor will not recognize them as the same user. Harbor will have the old OIDC users in the database, but when the new ones are created at first login they will conflict with the old ones and you will get a error like `failed to create user record: user <user> or email <email> already exists`.
 
 To fix this you need to login as an admin user (you can login with the default, non-oidc admin at the URL `/account/sign-in`) and then delete the old users in the list of users. Users can then create new users again by logging. Then you need to set their permissions again.
+
+### Restore between swift and s3
+
+If you are restoring Harbor from an environment that is using swift to an environment that is using s3 (or vice versa), then you need to modify some files in the object storage.
+
+In swift Harbor stores most of the image data under `files/docker/` while in s3 it is stored under just `docker/`. This means that if you simply copy the data from swift to s3, then you need to rename all files under `files/docker/<filename>` to `docker/<filename>` or vice versa.
+
+If you do not do this, then if you try to pull an old image you will get errors like: `Error response from daemon: manifest for <image> not found: manifest unknown: manifest unknown`
