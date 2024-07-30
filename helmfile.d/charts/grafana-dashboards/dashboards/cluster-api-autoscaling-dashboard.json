@@ -117,7 +117,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "cluster_autoscaler_node_groups_count{pod=~\"^$cluster.*\", node_group_type=\"autoscaled\"}",
+          "expr": "cluster_autoscaler_node_groups_count{pod=~\".*$cluster.*\", node_group_type=\"autoscaled\"}",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -198,7 +198,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(cluster_autoscaler_nodes_count{pod=~\"^$cluster.*\"})\n",
+          "expr": "sum(cluster_autoscaler_nodes_count{pod=~\".*$cluster.*\"})\n",
           "format": "time_series",
           "intervalFactor": 2,
           "range": true,
@@ -283,7 +283,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(cluster_autoscaler_nodes_count{state=\"ready\", pod=~\"^$cluster.*\"})/sum(cluster_autoscaler_nodes_count{pod=~\"^$cluster.*\"})*100",
+          "expr": "sum(cluster_autoscaler_nodes_count{state=\"ready\", pod=~\".*$cluster.*\"})/sum(cluster_autoscaler_nodes_count{pod=~\".*$cluster.*\"})*100",
           "format": "time_series",
           "intervalFactor": 2,
           "range": true,
@@ -369,7 +369,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(cluster_autoscaler_cluster_safe_to_autoscale{pod=~\"^$cluster.*\"})",
+          "expr": "sum(cluster_autoscaler_cluster_safe_to_autoscale{pod=~\".*$cluster.*\"})",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "",
@@ -444,7 +444,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(cluster_autoscaler_unschedulable_pods_count{pod=~\"^$cluster.*\"})",
+          "expr": "sum(cluster_autoscaler_unschedulable_pods_count{pod=~\".*$cluster.*\"})",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": " pods",
@@ -525,7 +525,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(time()-cluster_autoscaler_last_activity{activity=\"autoscaling\", pod=~\"^$cluster.*\"})",
+          "expr": "sum(time()-cluster_autoscaler_last_activity{activity=\"autoscaling\", pod=~\".*$cluster.*\"})",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "",
@@ -630,7 +630,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum(increase(cluster_autoscaler_scaled_up_nodes_total{pod=~\"^$cluster.*\"}[30m]))-sum(increase(cluster_autoscaler_scaled_down_nodes_total{pod=~\"^$cluster.*\"}[30m]))",
+          "expr": "sum(increase(cluster_autoscaler_scaled_up_nodes_total{pod=~\".*$cluster.*\"}[30m]))-sum(increase(cluster_autoscaler_scaled_down_nodes_total{pod=~\".*$cluster.*\"}[30m]))",
           "format": "time_series",
           "instant": true,
           "intervalFactor": 2,
@@ -706,7 +706,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(cluster_autoscaler_evicted_pods_total{pod=~\"^$cluster.*\"})",
+          "expr": "sum(cluster_autoscaler_evicted_pods_total{pod=~\".*$cluster.*\"})",
           "format": "time_series",
           "hide": false,
           "intervalFactor": 10,
@@ -722,7 +722,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(cluster_autoscaler_unschedulable_pods_count{pod=~\"^$cluster.*\"})",
+          "expr": "sum(cluster_autoscaler_unschedulable_pods_count{pod=~\".*$cluster.*\"})",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "unscheduled pods",
@@ -827,7 +827,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(cluster_autoscaler_nodes_count{state=\"ready\", pod=~\"^$cluster.*\"})",
+          "expr": "sum(cluster_autoscaler_nodes_count{state=\"ready\", pod=~\".*$cluster.*\"})",
           "format": "time_series",
           "hide": false,
           "intervalFactor": 10,
@@ -843,7 +843,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(cluster_autoscaler_nodes_count{state=\"unready\", pod=~\"^$cluster.*\"})",
+          "expr": "sum(cluster_autoscaler_nodes_count{state=\"unready\", pod=~\".*$cluster.*\"})",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "unready",
@@ -857,7 +857,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(cluster_autoscaler_nodes_count{state=\"notStarted\", pod=~\"^$cluster.*\"})\n",
+          "expr": "sum(cluster_autoscaler_nodes_count{state=\"notStarted\", pod=~\".*$cluster.*\"})\n",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "not started",
@@ -962,7 +962,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "increase(cluster_autoscaler_scaled_up_nodes_total{pod=~\"^$cluster.*\"}[5m])",
+          "expr": "increase(cluster_autoscaler_scaled_up_nodes_total{pod=~\".*$cluster.*\"}[5m])",
           "format": "time_series",
           "hide": false,
           "intervalFactor": 10,
@@ -978,7 +978,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(cluster_autoscaler_unneeded_nodes_count{pod=~\"^$cluster.*\"})",
+          "expr": "sum(cluster_autoscaler_unneeded_nodes_count{pod=~\".*$cluster.*\"})",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "unneeded nodes",
@@ -992,7 +992,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(cluster_autoscaler_nodes_count{pod=~\"^$cluster.*\"})\n",
+          "expr": "sum(cluster_autoscaler_nodes_count{pod=~\".*$cluster.*\"})\n",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "total nodes",
@@ -1006,7 +1006,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(increase(cluster_autoscaler_scaled_down_nodes_total{pod=~\"^$cluster.*\"}[5m]))",
+          "expr": "sum(increase(cluster_autoscaler_scaled_down_nodes_total{pod=~\".*$cluster.*\"}[5m]))",
           "format": "time_series",
           "hide": false,
           "intervalFactor": 10,
@@ -1205,7 +1205,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "cluster_autoscaler_unremovable_nodes_count{pod=~\"^$cluster.*\"}",
+          "expr": "cluster_autoscaler_unremovable_nodes_count{pod=~\".*$cluster.*\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "__auto",
