@@ -5,15 +5,6 @@ Expand the name of the chart.
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
-
-{{/*
-Selector labels
-*/}}
-{{- define "autoscaling-monitoring.serviceSelectorLabels" -}}
-{{ .Values.clusterName }}/cluster: {{ .Values.clusterName }}
-{{ .Values.clusterName }}/component: autoscaler
-{{- end }}
-
 {{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
@@ -55,8 +46,8 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 Selector labels
 */}}
 {{- define "autoscaling-monitoring.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "autoscaling-monitoring.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/instance: cluster-autoscaler-{{ .Values.clusterName }}
+app.kubernetes.io/name: clusterapi-cluster-autoscaler
 {{- end }}
 
 {{/*
