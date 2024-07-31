@@ -28,6 +28,8 @@ volumes:
 {{- end }}
 
 config:
+  oauth2:
+    skipApprovalScreen: true
   expiry:
     deviceRequests: {{ .Values.dex.expiry.deviceRequests }}
     signingKeys: {{ .Values.dex.expiry.signingKeys }}
