@@ -25,18 +25,40 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 {{- end }}
 
-{{/* Helm required labels */}}
-{{- define "harbor.labels" -}}
+{{/* Helm required labels: legacy */}}
+{{- define "harbor.legacy.labels" -}}
 heritage: {{ .Release.Service }}
 release: {{ .Release.Name }}
 chart: {{ .Chart.Name }}
 app: "{{ template "harbor.name" . }}"
 {{- end -}}
 
+{{/* Helm required labels */}}
+{{- define "harbor.labels" -}}
+heritage: {{ .Release.Service }}
+release: {{ .Release.Name }}
+chart: {{ .Chart.Name }}
+app: "{{ template "harbor.name" . }}"
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/name: {{ include "harbor.name" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/part-of: {{ include "harbor.name" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+{{- end -}}
+
 {{/* matchLabels */}}
 {{- define "harbor.matchLabels" -}}
 release: {{ .Release.Name }}
 app: "{{ template "harbor.name" . }}"
+{{- end -}}
+
+{{/* Helper for printing values from existing secrets*/}}
+{{- define "harbor.secretKeyHelper" -}}
+  {{- if and (not (empty .data)) (hasKey .data .key) }}
+    {{- index .data .key | b64dec -}}
+  {{- end -}}
 {{- end -}}
 
 {{- define "harbor.autoGenCert" -}}
@@ -89,7 +111,12 @@ app: "{{ template "harbor.name" . }}"
 
 {{- define "harbor.database.rawPassword" -}}
   {{- if eq .Values.database.type "internal" -}}
-    {{- .Values.database.internal.password -}}
+    {{- $existingSecret := lookup "v1" "Secret" .Release.Namespace (include "harbor.database" .) -}}
+    {{- if and (not (empty $existingSecret)) (hasKey $existingSecret.data "POSTGRES_PASSWORD") -}}
+      {{- .Values.database.internal.password | default (index $existingSecret.data "POSTGRES_PASSWORD" | b64dec) -}}
+    {{- else -}}
+      {{- .Values.database.internal.password -}}
+    {{- end -}}
   {{- else -}}
     {{- .Values.database.external.password -}}
   {{- end -}}

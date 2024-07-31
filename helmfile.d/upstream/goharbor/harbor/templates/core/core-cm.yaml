@@ -67,13 +67,16 @@ data:
   {{- end }}
   {{- template "harbor.traceEnvsForCore" . }}
 
-  {{- if .Values.core.artifactPullAsyncFlushDuration | quote }}
-  ARTIFACT_PULL_ASYNC_FLUSH_DURATION: {{ .Values.core.artifactPullAsyncFlushDuration }}
+  {{- if .Values.core.artifactPullAsyncFlushDuration }}
+  ARTIFACT_PULL_ASYNC_FLUSH_DURATION: {{ .Values.core.artifactPullAsyncFlushDuration | quote }}
   {{- end }}
 
   {{- if .Values.core.gdpr}}
   {{- if .Values.core.gdpr.deleteUser}}
   GDPR_DELETE_USER: "true"
+  {{- end }}
+  {{- if .Values.core.gdpr.auditLogsCompliant}}
+  GDPR_AUDIT_LOGS: "true"
   {{- end }}
   {{- end }}
 
