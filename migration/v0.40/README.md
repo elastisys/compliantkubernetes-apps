@@ -146,6 +146,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
+1. Upgrade prometheus-opensearch-exporter:
+
+    ```bash
+    ./migration/v0.40/apply/10-opensearch-exporter.sh execute
+    ```
+
 1. Upgrade applications:
 
     ```bash

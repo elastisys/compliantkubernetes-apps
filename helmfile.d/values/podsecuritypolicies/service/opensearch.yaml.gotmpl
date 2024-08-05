@@ -28,7 +28,7 @@ constraints:
 
     exporter:
       podSelectorLabels:
-        app: prometheus-elasticsearch-exporter
+        app.kubernetes.io/name: prometheus-elasticsearch-exporter
       allow:
         readOnlyRootFilesystem: true
         volumes:
