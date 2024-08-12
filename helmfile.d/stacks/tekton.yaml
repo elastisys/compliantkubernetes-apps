@@ -1,5 +1,23 @@
 ---
 templates:
+  tekton:
+    namespace: tekton-pipelines
+    labels:
+      app: tekton
+
+  tekton-pipelines-networkpolicy:
+    inherit:
+      - template: tekton
+      - template: networkpolicies
+    installed: {{ and (.Values | get "tektonPipelines.enabled" false) (.Values | get "networkPolicies.tektonPipelines.enabled" false) }}
+    labels:
+      netpol: tekton
+    needs:
+      - kube-system/admin-namespaces
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/service/tektonPipelines.yaml.gotmpl
+
   tekton-pipelines-podsecuritypolicy:
     inherit: [ template: podsecuritypolicies ]
     condition: ck8sManagementCluster.enabled

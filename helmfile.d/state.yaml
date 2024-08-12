@@ -167,5 +167,6 @@ releases:
   - inherit: [ template: opensearch-curator ]
   - inherit: [ template: opensearch-exporter ]
 
+  - inherit: [ template: tekton-pipelines-networkpolicy ]
   - inherit: [ template: tekton-pipelines-podsecuritypolicy ]
   - inherit: [ template: tekton-pipelines ]

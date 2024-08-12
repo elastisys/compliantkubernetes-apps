@@ -1263,6 +1263,19 @@ networkPolicies:
           - set-me
         ports:
           - 443
+  tektonPipelines:
+    enabled: true
+    # Build required network policies for the pipeline.
+    # It is possible to use pre-built rules, such as egress-rule-apiserver.
+    # pipeline:
+    #  upgrade-pod:
+    #    podSelectorLabels:
+    #       app.kubernetes.io/instance: upgrade-apps-pipeline
+    #     ingress: {}
+    #     egress:
+    #       - rule: egress-rule-apiserver
+    pipeline: {}
+
   thanos:
     enabled: true
 
