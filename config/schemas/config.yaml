@@ -6558,6 +6558,41 @@ properties:
             title: Network Policies S3 Exporter Enabled
             type: boolean
             default: true
+      tektonPipelines:
+        title: Network Policies Tekton Piepline
+        description: |-
+          Enable network policies for tekton and the peipline.
+        type: object
+        additionalProperties: false
+        properties:
+          enabled:
+            title: Network Policies Tekton Enabled
+            type: boolean
+            default: true
+          pipeline:
+            title: Network Policies Tekton Pipeline
+            description: |-
+              Add required networkpolicies for the pipeline under the section pipeline.
+
+              The networkpolicies should follow the network policies generator.
+              As such, it is possible to use pre-defined network policies rules.
+              The pre-defined rules can be found [here](https://github.com/elastisys/compliantkubernetes-apps/blob/main/helmfile.d/values/networkpolicies/common/common.yaml.gotmpl).
+
+              ```yaml
+                pipeline:
+                  clone-config-pod:
+                    podSelectorLabels:
+                      tekton.dev/pipeline: upgrade-pipeline
+                    ingress: {}
+                    egress:
+                      - rule: egress-rule-dns # pre-defined network policies rule.
+                      - name: egress-rule-config-access
+                        peers:
+                          - cidr: 1.2.3.4/32
+                        ports:
+                          - tcp: 22
+              ```
+            type: object
       thanos:
         title: Network Policies Thanos
         description: Configure Thanos network policy rules.

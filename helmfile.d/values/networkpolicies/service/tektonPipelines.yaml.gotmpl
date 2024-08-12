@@ -1,0 +1,43 @@
+policies:
+  tekton-pipelines:
+    all-deny:
+      podSelectorLabels: {}
+      ingress: {}
+      egress: {}
+
+    controller:
+      podSelectorLabels:
+        app: tekton-pipelines-controller
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 9090
+      egress:
+        - rule: egress-rule-apiserver
+
+    resolvers:
+      podSelectorLabels:
+        app: tekton-pipelines-resolvers
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 9090
+      egress:
+        - rule: egress-rule-apiserver
+
+    webhook:
+      podSelectorLabels:
+        app: tekton-pipelines-webhook
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 9090
+        - rule: ingress-rule-apiserver
+          ports:
+            - tcp: 8443
+      egress:
+        - rule: egress-rule-apiserver
+
+    {{ if .Values.networkPolicies.tektonPipelines.pipeline }}
+    {{ toYaml .Values.networkPolicies.tektonPipelines.pipeline | nindent 4 }}
+    {{- end }}
