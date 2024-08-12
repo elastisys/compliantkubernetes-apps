@@ -10,37 +10,32 @@ source "${here}/common.bash"
 
 usage() {
     echo "COMMANDS:" 1>&2
-    echo "  init <wc|sc|both> [--generate-new-secrets]              initialize the config path" 1>&2
     echo "  apply <wc|sc> [--sync] [--concurrency=<num>]            deploy the apps" 1>&2
-    echo "  test <wc|sc> [--logging-enabled]                        test the applications" 1>&2
+    echo "  clean <wc|sc>                                           Cleans the cluster of apps" 1>&2
+    echo "  completion bash                                         output shell completion code for bash" 1>&2
+    echo "  diagnostics <wc|sc> [-n namespace] [--include-config]   Runs diagnostics of apps" 1>&2
     echo "  dry-run <wc|sc> [--kubectl]                             runs helmfile diff" 1>&2
+    echo "  explain <config|secrets> [key.to.parameter]             explains the config or secrets" 1>&2
     echo "  fix-psp-violations <wc|sc>                              Checks and restarts pods that violates Pod Security Polices, applicable for new environments" 1>&2
-    echo "  upgrade <wc|sc|both> <vX.Y> prepare                     runs all prepare steps upgrading the configuration" 1>&2
-    echo "  upgrade <wc|sc|both> <vX.Y> apply                       runs all apply steps upgrading the environment" 1>&2
+    echo "  flavors                                                 lists supported configuration flavors" 1>&2
+    echo "  init <wc|sc|both> [--generate-new-secrets]              initialize the config path" 1>&2
+    echo "  install-requirements [--user] [--no-pass]               installs or updates required tools to run compliantkubernetes-apps" 1>&2
+    echo "  k8s-installers                                          lists supported kubernetes installers" 1>&2
+    echo "  kubeconfig <user|dev|admin>                             generate user kubeconfig, stored at CK8S_CONFIG_PATH/user" 1>&2
+    echo "  ops helm <wc|sc>                                        run helm as cluster admin" 1>&2
+    echo "  ops helmfile <wc|sc>                                    run helmfile as cluster admin" 1>&2
+    echo "  ops kubecolor <wc|sc>                                   run kubecolor as cluster admin" 1>&2
+    echo "  ops kubectl <wc|sc>                                     run kubectl as cluster admin" 1>&2
+    echo "  ops velero <wc|sc>                                      run velero as cluster admin" 1>&2
+    echo "  providers                                               lists supported cloud providers" 1>&2
+    echo "  s3cmd [cmd]                                             run s3cmd" 1>&2
     echo "  team add-pgp <fp>                                       add a new PGP key to secrets" 1>&2
     echo "  team remove-pgp <fp>                                    remove a PGP key from secrets and rotate the data encryption key" 1>&2
-    # TODO: We might want to make this command less visible once we have proper
-    #       support for OIDC logins.
-    echo "  ops kubectl <wc|sc>                                     run kubectl as cluster admin" 1>&2
-    echo "  ops kubecolor <wc|sc>                                   run kubecolor as cluster admin" 1>&2
-    echo "  ops helm <wc|sc>                                        run helm as cluster admin" 1>&2
-    # TODO: We might want to make this command less visible once we feel
-    #       confident that the apply command and migrations are good enough
-    #       that direct Helmfile access is not necessary.
-    echo "  ops helmfile <wc|sc>                                    run helmfile as cluster admin" 1>&2
-    echo "  ops velero <wc|sc>                                      run velero as cluster admin" 1>&2
-    echo "  s3cmd [cmd]                                             run s3cmd" 1>&2
-    echo "  kubeconfig <user|dev|admin>                             generate user kubeconfig, stored at CK8S_CONFIG_PATH/user" 1>&2
-    echo "  completion bash                                         output shell completion code for bash" 1>&2
-    echo "  install-requirements [--user] [--no-pass]               installs or updates required tools to run compliantkubernetes-apps" 1>&2
-    echo "  validate <wc|sc>                                        validates config files" 1>&2
-    echo "  providers                                               lists supported cloud providers" 1>&2
-    echo "  flavors                                                 lists supported configuration flavors" 1>&2
-    echo "  k8s-installers                                          lists supported kubernetes installers" 1>&2
+    echo "  test <wc|sc> [--logging-enabled]                        test the applications" 1>&2
     echo "  update-ips <wc|sc|both> <apply|dry-run>                 Automatically fetches and applies the IPs for network policies" 1>&2
-    echo "  explain <config|secrets> [key.to.parameter]             explains the config or secrets" 1>&2
-    echo "  clean <wc|sc>                                           Cleans the cluster of apps" 1>&2
-    echo "  diagnostics <wc|sc> [-n namespace] [--include-config]   Runs diagnostics of apps" 1>&2
+    echo "  upgrade <wc|sc|both> <vX.Y> apply                       runs all apply steps upgrading the environment" 1>&2
+    echo "  upgrade <wc|sc|both> <vX.Y> prepare                     runs all prepare steps upgrading the configuration" 1>&2
+    echo "  validate <wc|sc>                                        validates config files" 1>&2
     exit 1
 }
 
