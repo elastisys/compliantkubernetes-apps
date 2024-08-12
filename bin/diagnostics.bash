@@ -6,8 +6,43 @@ here="$(dirname "$(readlink -f "$0")")"
 # shellcheck source=bin/common.bash
 source "${here}/common.bash"
 
+usage() {
+    log_info "usage: ck8s diagnostics <sc|wc> [--namespace namespace] [--include-config]"
+    log_info
+    log_info "Collects diagnostics from the current environment set by CK8S_CONFIG_PATH and"
+    log_info "store them in a file in the CK8S_CONFIG_PATH directory encrypted with SOPS using"
+    log_info "any GPG keys listed in CK8S_CONFIG_PATH/.sops.yaml or set by CK8S_PGP_FP"
+    log_info ""
+    log_info "\t-h, --help\t\tdisplay help for this command and exit"
+    log_info "\t-n, --namespace\t\trun diagnostics for specified namespace only"
+    log_info "\t    --include-config\tinclude config yaml files found in CK8S_CONFIG_PATH"
+    exit 1
+}
+
+include_config=false
+namespace=""
 cluster="${1}"
-namespace="${2:-}"
+shift
+
+while [ "${#}" -gt 0 ] ; do
+    case "${1}" in
+        -n | --namespace)
+            namespace="${2:-}"
+            shift
+            ;;
+        --include-config)
+            include_config=true
+            ;;
+        -h | --help)
+            usage
+            ;;
+        *)
+            log_error "error: invalid argument: \"${1:-}\""
+            usage
+            ;;
+    esac
+    shift
+done
 
 file="${CK8S_CONFIG_PATH}/diagnostics-${cluster}-$(date +%y%m%d%H%M%S).log"
 touch "${file}"
@@ -244,12 +279,12 @@ run_diagnostics_namespaced() {
             "${here}/ops.bash" kubectl "${cluster}" get configmap -n "${namespace}" "$configmap" -o yaml
         fi
     done
-    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' '
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
     # -- Logs --
-    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' '
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     echo "Fetching Logs <logs>"
-    pods=$("{$here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml | yq4 '.items[] | .metadata.name')
+    pods=$("${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml | yq4 '.items[] | .metadata.name')
     readarray pods_arr < <(echo "$pods" | yq4 e -o=j -I=0 '.[]')
 
     for pod in "${pods_arr[@]}"; do
@@ -258,13 +293,35 @@ run_diagnostics_namespaced() {
     done
 }
 
+get_config_files() {
+    mapfile -t config_files < <(find "${CK8S_CONFIG_PATH}" -name "*-config.yaml")
+
+    for config_file in "${config_files[@]}"; do
+        printf '\n%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+        echo -n "Config file: "
+        if [[ $(basename "$(dirname "${config_file}")") == "defaults" ]]; then
+            echo "defaults/$(basename "${config_file}")"
+        else
+            basename "${config_file}"
+        fi
+        cat "${config_file}"
+    done
+}
+
 log_info "Running diagnostics..."
-config_load "${1}"
+config_load "${cluster}"
 if [ -z "${namespace}" ]; then
     run_diagnostics >"${file}" 2>&1
 else
+    # check that namespace exists
+    "${here}/ops.bash" kubectl "${cluster}" get namespace "${namespace}" > /dev/null
     run_diagnostics_namespaced >"${file}" 2>&1
 fi
+
+if [[ "${include_config}" == "true" ]]; then
+    get_config_files >>"${file}" 2>&1
+fi
+
 log_info "Diagnostics done. Saving and encrypting file ${file}"
 
 sops_encrypt_file "${file}"
