@@ -87,6 +87,10 @@ policies:
         - rule: egress-rule-dns
         - rule: egress-rule-query
       ingress:
+        # This is needed to allow the diagnostic script proxying Thanos through the API server.
+        - rule: ingress-rule-apiserver
+          ports:
+            - tcp: 9090
         - rule: ingress-rule-prometheus
           ports:
             - tcp: 9090
