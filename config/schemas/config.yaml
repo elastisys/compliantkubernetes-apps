@@ -2495,6 +2495,10 @@ properties:
         enum:
           - kopia
           - restic
+      useVolumeSnapshots:
+        title: Velero Use Volume Snapshots
+        type: boolean
+        default: false
       schedule:
         title: Velero Backup Schedule
         default: 0 0 * * *

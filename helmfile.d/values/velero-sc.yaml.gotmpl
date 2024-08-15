@@ -1,11 +1,27 @@
 {{ if not (or (eq .Values.objectStorage.type "s3") (eq .Values.objectStorage.type "gcs") (eq .Values.objectStorage.type "azure") ) }}
 {{ fail "\nERROR: Velero requires s3 or gcs or azure object storage, see Values.objectStorage.type" }}
 {{ end }}
+{{ if and .Values.velero.useVolumeSnapshots (not (eq .Values.velero.uploaderType "kopia")) }}
+{{ fail "\nERROR: Velero Volume snapshots are only supported when using the kopia uploader" }}
+{{ end }}
 resources:    {{- toYaml .Values.velero.resources | nindent 2  }}
 tolerations:  {{- toYaml .Values.velero.tolerations | nindent 2  }}
 nodeSelector: {{- toYaml .Values.velero.nodeSelector | nindent 2  }}
 
 initContainers:
+  {{- if .Values.velero.useVolumeSnapshots }}
+  - name: velero-plugin-for-csi
+    image: velero/velero-plugin-for-csi:v0.7.0
+    imagePullPolicy: IfNotPresent
+    securityContext:
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+      runAsGroup: 10000
+      runAsUser: 10000
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+  {{- end }}
   {{- if eq .Values.objectStorage.type "s3" }}
   - name: velero-plugin-for-aws
     image: velero/velero-plugin-for-aws:v1.9.0
@@ -44,12 +60,15 @@ initContainers:
         name: plugins
   {{- end }}
 
-snapshotsEnabled: false
+snapshotsEnabled: {{ .Values.velero.useVolumeSnapshots }}
 
 configuration:
   defaultVolumesToFsBackup: true
+  {{- if .Values.velero.useVolumeSnapshots }}
+  features: "EnableCSI"
+  {{- end }}
 
-  uploaderType: {{ .Values.velero.uploaderType }} # default is kopia
+  uploaderType: {{ .Values.velero.uploaderType }}
 
   # https://velero.io/docs/v1.11/api-types/backupstoragelocation/
   backupStorageLocation:
@@ -70,6 +89,24 @@ configuration:
         storageAccount: {{ .Values.objectStorage.azure.storageAccountName }}
         storageAccountKeyEnvVar: AZURE_STORAGE_ACCOUNT_ACCESS_KEY
       {{- end }}
+
+  {{- if .Values.velero.useVolumeSnapshots }}
+  # https://velero.io/docs/v1.11/api-types/volumesnapshotlocation/
+  volumeSnapshotLocation:
+    {{- if eq .Values.objectStorage.type "s3" }}
+    - provider: aws
+      config:
+        region: {{ .Values.objectStorage.s3.region }}
+    {{- else if eq .Values.objectStorage.type "gcs" }}
+    - provider: gcp
+      config:
+        project: {{ .Values.objectStorage.gcs.project }}
+    {{- else if eq .Values.objectStorage.type "azure" }}
+    - provider: azure
+      config:
+        resourceGroup: {{ .Values.objectStorage.azure.resourceGroup }}
+    {{- end }}
+  {{- end }}
 
 credentials:
   # Create secret with credentials
@@ -102,6 +139,7 @@ schedules:
     schedule: {{ .Values.velero.schedule }}
     template:
       storageLocation: default
+      snapshotMoveData: {{ .Values.velero.useVolumeSnapshots }}
       labelSelector:
         matchLabels:
           velero: backup
@@ -153,3 +191,17 @@ configMaps:
     data:
       secCtxRunAsUser: "1000"
       secCtxRunAsGroup: "1000"
+
+{{- if .Values.velero.useVolumeSnapshots }}
+extraVolumes:
+  - name: udmrepo
+    emptyDir: {}
+  - name: cache
+    emptyDir: {}
+
+extraVolumeMounts:
+  - name: udmrepo
+    mountPath: /udmrepo
+  - name: cache
+    mountPath: /.cache
+{{- end }}
