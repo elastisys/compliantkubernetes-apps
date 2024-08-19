@@ -609,7 +609,10 @@ fi
 allow_ingress
 
 if [[ "${check_cluster}" =~ ^(sc|both)$ ]]; then
-  # allow_nodes "sc" '.networkPolicies.global.scApiserver.ips' "node-role.kubernetes.io/control-plane="
+  external_api_server=$(yq_read "sc" '.networkPolicies.global.externalApiServer' "false")
+  if [[ "${external_api_server}" == false ]]; then
+    allow_nodes "sc" '.networkPolicies.global.scApiserver.ips' "node-role.kubernetes.io/control-plane="
+  fi
   allow_nodes "sc" '.networkPolicies.global.scNodes.ips' ""
 
   if swift_enabled; then
@@ -618,8 +621,11 @@ if [[ "${check_cluster}" =~ ^(sc|both)$ ]]; then
 fi
 
 if [[ "${check_cluster}" =~ ^(wc|both)$ ]]; then
-  # allow_nodes "wc" '.networkPolicies.global.wcApiserver.ips' "node-role.kubernetes.io/control-plane="
+  external_api_server=$(yq_read "wc" '.networkPolicies.global.externalApiServer' "false")
+  if [[ "${external_api_server}" == false ]]; then
+    allow_nodes "wc" '.networkPolicies.global.wcApiserver.ips' "node-role.kubernetes.io/control-plane="
   allow_nodes "wc" '.networkPolicies.global.wcNodes.ips' ""
+  fi
 fi
 
 if rclone_enabled; then
