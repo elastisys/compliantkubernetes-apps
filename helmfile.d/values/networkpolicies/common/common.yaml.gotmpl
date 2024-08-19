@@ -31,10 +31,10 @@ rules:
           k8s-app: kube-dns
       - cidr: {{ .Values.global.clusterDns }}/32
     ports:
-      - tcp: 53
-      - udp: 53
-      - tcp: 8053
-      - udp: 8053
+      {{- range $netpol.global.dnsServerEgress.ports }}
+      - tcp: {{ . }}
+      - udp: {{ . }}
+      {{- end }}
 
   egress-rule-apiserver:
     peers:

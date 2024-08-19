@@ -11,6 +11,7 @@ spec:
   policyTypes:
     - Egress
   ingress:
+    {{- if .Values.global.externalApiServer }}
     - from:
       - podSelector:
             matchLabels:
@@ -18,6 +19,7 @@ spec:
         namespaceSelector:
           matchLabels:
             kubernetes.io/metadata.name: kube-system
+    {{- end }}
   egress:
     {{- toYaml .Values.global.dnsServerEgress | nindent 4 }}
     {{- if and .Values.global.scApiserver.ips .Values.global.scApiserver.port }}

@@ -65,21 +65,27 @@ policies:
         app: kube-prometheus-stack-admission-create
       egress:
         - rule: egress-rule-apiserver
+        {{- if .Values.global.externalApiServer }}
         - rule: egress-rule-dns
+        {{- end }}
 
     prometheus-admission-patch:
       podSelectorLabels:
         app: kube-prometheus-stack-admission-patch
       egress:
         - rule: egress-rule-apiserver
+        {{- if .Values.global.externalApiServer }}
         - rule: egress-rule-dns
+        {{- end }}
 
     prometheus-operator:
       podSelectorLabels:
         app: kube-prometheus-stack-operator
       egress:
         - rule: egress-rule-apiserver
+        {{- if .Values.global.externalApiServer }}
         - rule: egress-rule-dns
+        {{- end }}
       ingress:
         - rule: ingress-rule-apiserver
           ports:

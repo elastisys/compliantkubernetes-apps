@@ -35,6 +35,7 @@ global:
     ports:
       - 443
   ingressUsingHostNetwork: false
+  externalApiServer: false
   externalLoadBalancer: false # not true if loadbalancer is controlled by a kubernetes cloud controller
   trivy:
     # trivy vulnerability database
@@ -46,10 +47,6 @@ global:
         - port: 53
           protocol: TCP
         - port: 53
-          protocol: UDP
-        - port: 8053
-          protocol: TCP
-        - port: 8053
           protocol: UDP
 
   objectStoreEgress:
