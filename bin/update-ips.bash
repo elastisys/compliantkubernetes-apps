@@ -609,6 +609,7 @@ fi
 allow_ingress
 
 if [[ "${check_cluster}" =~ ^(sc|both)$ ]]; then
+  # TODO: add config and logic for retrieving and setting IP from external apiserver domain
   external_api_server=$(yq_read "sc" '.networkPolicies.global.externalApiServer' "false")
   if [[ "${external_api_server}" == false ]]; then
     allow_nodes "sc" '.networkPolicies.global.scApiserver.ips' "node-role.kubernetes.io/control-plane="
@@ -621,6 +622,7 @@ if [[ "${check_cluster}" =~ ^(sc|both)$ ]]; then
 fi
 
 if [[ "${check_cluster}" =~ ^(wc|both)$ ]]; then
+  # TODO: add config and logic for retrieving and setting IP from external apiserver domain
   external_api_server=$(yq_read "wc" '.networkPolicies.global.externalApiServer' "false")
   if [[ "${external_api_server}" == false ]]; then
     allow_nodes "wc" '.networkPolicies.global.wcApiserver.ips' "node-role.kubernetes.io/control-plane="
