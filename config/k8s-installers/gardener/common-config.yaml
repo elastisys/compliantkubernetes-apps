@@ -1,0 +1,24 @@
+calicoAccountant:
+  backend: nftables
+clusterApi:
+  enabled: true
+  monitoring:
+    enabled: true
+global:
+  clusterDns: set-me
+metricsServer:
+  enabled: false
+nodeLocalDns:
+  service:
+    targetPort: 8053
+networkPolicies:
+  coredns:
+    serviceIp:
+      ips:
+        - set-me/32
+  global:
+    externalApiServer: true
+    dnsServerEgress:
+      ports:
+        - 53
+        - 8053

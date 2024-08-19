@@ -1,0 +1,10 @@
+kubeapiMetrics:
+  service:
+    type: ExternalName
+    externalName: set-me
+networkPolicies:
+  global:
+    wcApiserver:
+      ips:
+        - set-me
+      port: 443
