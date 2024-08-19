@@ -1016,6 +1016,9 @@ networkPolicies:
     #     ingress: {}
     #     egress: {}
   global:
+    dnsServerEgress:
+      ports:
+      - 53
     objectStorage:
       # ips to s3 service
       ips:
@@ -1031,6 +1034,8 @@ networkPolicies:
       # ip(s) to wc loadbalancer if available, otherwise wc worker nodes
       ips:
         - set-me
+    # set to true if api server is accessed with a domain that needs to be resolved
+    externalApiServer: false
     # only true if loadbalancer is not controlled by a kubernetes cloud controller
     externalLoadBalancer: set-me
     ingressUsingHostNetwork: set-me

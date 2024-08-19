@@ -66,7 +66,9 @@ policies:
         - rule: ingress-rule-apiserver
           ports:
             - tcp: 10250
+        {{- if .Values.global.externalApiServer }}
         - rule: ingress-rule-gardener-vpn
+        {{- end }}
 
     startupapicheck:
       podSelectorLabels:

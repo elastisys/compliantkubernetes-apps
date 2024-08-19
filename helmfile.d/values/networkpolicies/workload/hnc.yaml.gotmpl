@@ -29,7 +29,9 @@ policies:
         - rule: egress-rule-apiserver
         - rule: egress-rule-dns
       ingress:
+        {{- if .Values.global.externalApiServer }}
         - rule: ingress-rule-gardener-vpn
+        {{- end }}
         - rule: ingress-rule-apiserver
           ports:
             - tcp: 9443
