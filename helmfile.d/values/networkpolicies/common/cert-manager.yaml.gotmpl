@@ -66,7 +66,7 @@ policies:
         - rule: ingress-rule-apiserver
           ports:
             - tcp: 10250
-        {{- if .Values.global.externalApiServer }}
+        {{- if .Values.networkPolicies.global.externalApiServer }}
         - rule: ingress-rule-gardener-vpn
         {{- end }}
 
@@ -75,6 +75,6 @@ policies:
         app.kubernetes.io/component: startupapicheck
       egress:
         - rule: egress-rule-apiserver
-        {{- if .Values.global.externalApiServer }}
+        {{- if .Values.networkPolicies.global.externalApiServer }}
         - rule: egress-rule-dns
         {{- end }}

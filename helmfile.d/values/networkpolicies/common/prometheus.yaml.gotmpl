@@ -65,7 +65,7 @@ policies:
         app: kube-prometheus-stack-admission-create
       egress:
         - rule: egress-rule-apiserver
-        {{- if .Values.global.externalApiServer }}
+        {{- if .Values.networkPolicies.global.externalApiServer }}
         - rule: egress-rule-dns
         {{- end }}
 
@@ -74,7 +74,7 @@ policies:
         app: kube-prometheus-stack-admission-patch
       egress:
         - rule: egress-rule-apiserver
-        {{- if .Values.global.externalApiServer }}
+        {{- if .Values.networkPolicies.global.externalApiServer }}
         - rule: egress-rule-dns
         {{- end }}
 
@@ -83,7 +83,7 @@ policies:
         app: kube-prometheus-stack-operator
       egress:
         - rule: egress-rule-apiserver
-        {{- if .Values.global.externalApiServer }}
+        {{- if .Values.networkPolicies.global.externalApiServer }}
         - rule: egress-rule-dns
         {{- end }}
       ingress:
@@ -127,7 +127,7 @@ policies:
         app.kubernetes.io/name: kube-state-metrics
       egress:
         - rule: egress-rule-apiserver
-        {{- if .Values.global.externalApiServer }}
+        {{- if .Values.networkPolicies.global.externalApiServer }}
         - rule: egress-rule-dns
         {{- end }}
       ingress:
