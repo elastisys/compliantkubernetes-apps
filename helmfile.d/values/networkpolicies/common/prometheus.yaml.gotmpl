@@ -127,7 +127,9 @@ policies:
         app.kubernetes.io/name: kube-state-metrics
       egress:
         - rule: egress-rule-apiserver
+        {{- if .Values.global.externalApiServer }}
         - rule: egress-rule-dns
+        {{- end }}
       ingress:
         - rule: ingress-rule-prometheus
           ports:

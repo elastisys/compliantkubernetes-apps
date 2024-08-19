@@ -10,7 +10,9 @@ policies:
         app.kubernetes.io/component: hnc-controller-manager
       egress:
         - rule: egress-rule-apiserver
+        {{- if .Values.global.externalApiServer }}
         - rule: egress-rule-dns
+        {{- end }}
       ingress:
         {{- if not .Values.hnc.ha }}
         - rule: ingress-rule-apiserver
@@ -27,7 +29,9 @@ policies:
         app.kubernetes.io/component: hnc-webhook
       egress:
         - rule: egress-rule-apiserver
+        {{- if .Values.global.externalApiServer }}
         - rule: egress-rule-dns
+        {{- end }}
       ingress:
         {{- if .Values.global.externalApiServer }}
         - rule: ingress-rule-gardener-vpn

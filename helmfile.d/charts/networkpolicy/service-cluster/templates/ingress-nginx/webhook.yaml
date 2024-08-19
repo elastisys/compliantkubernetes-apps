@@ -11,7 +11,7 @@ spec:
   policyTypes:
     - Egress
   ingress:
-    {{- if .Values.global.externalApiServer }}
+    {{- if eq .Values.global.ck8sK8sInstaller "gardener" }}
     - from:
       - podSelector:
             matchLabels:
@@ -21,7 +21,9 @@ spec:
             kubernetes.io/metadata.name: kube-system
     {{- end }}
   egress:
+    {{- if .Values.global.externalApiServer }}
     {{- toYaml .Values.global.dnsServerEgress | nindent 4 }}
+    {{- end }}
     {{- if and .Values.global.scApiserver.ips .Values.global.scApiserver.port }}
     - to:
         {{- range $IP := .Values.global.scApiserver.ips }}

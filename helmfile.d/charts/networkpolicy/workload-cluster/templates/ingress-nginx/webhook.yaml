@@ -11,7 +11,7 @@ spec:
   policyTypes:
     - Egress
   ingress:
-    {{- if .Values.global.externalApiServer }}
+    {{- if eq .Values.global.ck8sK8sInstaller "gardener" }}
     - from:
       - podSelector:
             matchLabels:
