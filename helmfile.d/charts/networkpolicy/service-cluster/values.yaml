@@ -125,3 +125,8 @@ dex:
   enabled: true
   ips:
     - "0.0.0.0/0"
+
+coredns:
+  serviceIp:
+    ports:
+      - 53

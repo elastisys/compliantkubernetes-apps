@@ -24,6 +24,6 @@ policies:
         app: node-collector
       egress:
         - rule: egress-rule-apiserver
-        {{- if .Values.global.externalApiServer }}
+        {{- if .Values.networkPolicies.global.externalApiServer }}
         - rule: egress-rule-dns
         {{- end }}
