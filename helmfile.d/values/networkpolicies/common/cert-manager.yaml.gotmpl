@@ -75,4 +75,6 @@ policies:
         app.kubernetes.io/component: startupapicheck
       egress:
         - rule: egress-rule-apiserver
+        {{- if .Values.global.externalApiServer }}
         - rule: egress-rule-dns
+        {{- end }}
