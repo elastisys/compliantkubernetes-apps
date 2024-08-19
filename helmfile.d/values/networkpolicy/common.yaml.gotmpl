@@ -27,9 +27,6 @@ global:
   objectStorage:
     ips: {{- toYaml .Values.networkPolicies.global.objectStorage.ips | nindent 6 }}
     ports: {{- toYaml .Values.networkPolicies.global.objectStorage.ports | nindent 6 }}
-  dnsServerEgress:
-    ips: {{- toYaml .Values.networkPolicies.global.dnsServerEgress.ips | nindent 6 }}
-    ports: {{- toYaml .Values.networkPolicies.global.dnsServerEgress.ports | nindent 6 }}
   externalLoadBalancer: {{ .Values.networkPolicies.global.externalApiServer }}
   externalLoadBalancer: {{ .Values.networkPolicies.global.externalLoadBalancer }}
   ingressUsingHostNetwork: {{ .Values.ingressNginx.controller.useHostPort }}
@@ -130,6 +127,7 @@ coredns:
     ips: {{- toYaml .Values.networkPolicies.coredns.externalDns.ips | nindent 6 }}
   serviceIp:
     ips: {{- toYaml .Values.networkPolicies.coredns.serviceIp.ips | nindent 6 }}
+    ports: {{- toYaml .Values.networkPolicies.coredns.serviceIp.ports | nindent 6 }}
 
 dnsAutoscaler:
   enabled: {{ .Values.networkPolicies.dnsAutoscaler.enabled }}

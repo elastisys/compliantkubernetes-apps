@@ -29,13 +29,6 @@ global:
         - protocol: TCP
           port: 80
 
-  dnsServerEgress:
-    - ports:
-        - port: 53
-          protocol: TCP
-        - port: 53
-          protocol: UDP
-
   objectStoreEgress:
     - to:
         - ipBlock:

@@ -72,7 +72,15 @@ spec:
         - protocol: TCP
           port: 8443 ## admission
   egress:
-    {{- toYaml .Values.global.dnsServerEgress | nindent 4 }}
+    {{- if .Values.coredns.serviceIp.ports }}
+    - ports:
+    {{- range $PORT := .Values.coredns.serviceIp.ports }}
+      - port: {{ $PORT }}
+        protocol: TCP
+      - port: {{ $PORT }}
+        protocol: UDP
+    {{- end }}
+    {{- end }}
     {{- if or .Values.ingressNginx.ingressOverride.ips .Values.global.scIngress.ips }}
     - to:
       {{- if and .Values.ingressNginx.ingressOverride.enabled .Values.ingressNginx.ingressOverride.ips }}
