@@ -4,12 +4,13 @@
 
 Here you can find the most relevant features and changes for the last couple of releases of Compliant Kubernetes
 
+- Disabled kured alerts in WC. **[v0.40]**
+- Opensearch and Opensearch dashboards was upgraded to v2.15.0. **[v0.40]**
+- Harbor was upgraded to v2.11.0. **[v0.40]**
+- Dex was upgraded to v2.40.0. **[v0.40]**
 - Trivy Operator was upgraded to v0.20.1. **[v0.39]**
 - Velero was upgraded to v1.13.0. **[v0.39]**
 - Pods can now be granted access to the API of Prometheus from Application Developer namespaces per request. **[v0.39]**
-- Thanos was upgraded to v0.34.1. **[v0.38]**
-- Gatekeeper was upgraded to v3.15.1. **[v0.38]**
-- A new Gatekeeper constraint was added. It will warn if the user tries to deploy a Deployment or StatefulSet with less than 2 replicas. **[v0.38]**
 
 ## Public docs
 
