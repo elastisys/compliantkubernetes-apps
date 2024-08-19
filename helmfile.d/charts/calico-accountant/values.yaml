@@ -2,7 +2,7 @@ calicoDataStore: "kubernetes"
 backend: nftables
 image:
   repository: ghcr.io/elastisys/calico-accountant
-  tag: 0.1.6
+  tag: 0.1.6.ck8s1
 resources:
   limits:
     cpu: 100m
