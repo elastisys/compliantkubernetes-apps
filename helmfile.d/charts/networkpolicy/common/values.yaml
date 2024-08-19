@@ -42,13 +42,6 @@ global:
     ips:
       - "0.0.0.0/0"
 
-  dnsServerEgress:
-    - ports:
-        - port: 53
-          protocol: TCP
-        - port: 53
-          protocol: UDP
-
   objectStoreEgress:
     - to:
         - ipBlock:
@@ -125,6 +118,8 @@ coredns:
   serviceIp:
     ips:
       - "10.233.0.3/32"
+    ports:
+      - 53
 
 dnsAutoscaler:
   enabled: true

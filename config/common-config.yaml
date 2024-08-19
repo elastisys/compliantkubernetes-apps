@@ -1016,9 +1016,6 @@ networkPolicies:
     #     ingress: {}
     #     egress: {}
   global:
-    dnsServerEgress:
-      ports:
-      - 53
     objectStorage:
       # ips to s3 service
       ips:
@@ -1113,6 +1110,8 @@ networkPolicies:
       ips:
         - set-me-if-(.networkPolicies.coredns.enabled)
     serviceIp:
+      ports:
+        - 53
       ips:
         - set-me-if-(.networkPolicies.coredns.enabled)
 

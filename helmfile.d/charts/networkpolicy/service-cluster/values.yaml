@@ -20,13 +20,6 @@ global:
   ingressUsingHostNetwork: false
   externalLoadBalancer: false # not true if loadbalancer is controlled by a kubernetes cloud controller
 
-  dnsServerEgress:
-    - ports:
-        - port: 53
-          protocol: TCP
-        - port: 53
-          protocol: UDP
-
   objectStoreEgress:
     - to:
         - ipBlock:

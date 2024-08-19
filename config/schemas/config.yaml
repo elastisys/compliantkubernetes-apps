@@ -6098,11 +6098,6 @@ properties:
             description: |-
               When enabled create Network Policy rules for ingress via host network.
             type: boolean
-          dnsServerEgress:
-            title: Network Policies DNS Server Egress Ports
-            properties:
-              ports:
-                $ref: '#/$defs/portlist'
           objectStorage:
             title: Network Policies ObjectStorage
             description: |-

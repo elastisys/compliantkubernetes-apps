@@ -21,8 +21,14 @@ spec:
             kubernetes.io/metadata.name: kube-system
     {{- end }}
   egress:
-    {{- if .Values.global.externalApiServer }}
-    {{- toYaml .Values.global.dnsServerEgress | nindent 4 }}
+    {{- if and .Values.global.externalApiServer .Values.coredns.serviceIp.ports }}
+    - ports:
+    {{- range $PORT := .Values.coredns.serviceIp.ports }}
+      - port: {{ $PORT }}
+        protocol: TCP
+      - port: {{ $PORT }}
+        protocol: UDP
+    {{- end }}
     {{- end }}
     {{- if and .Values.global.scApiserver.ips .Values.global.scApiserver.port }}
     - to:

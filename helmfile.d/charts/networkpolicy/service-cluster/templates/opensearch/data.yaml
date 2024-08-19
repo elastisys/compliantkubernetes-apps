@@ -62,6 +62,14 @@ spec:
           port: {{ $port }}
         {{- end }}
     {{- end }}
-    {{- toYaml .Values.global.dnsServerEgress | nindent 4 }}
+    {{- if .Values.coredns.serviceIp.ports }}
+    - ports:
+    {{- range $PORT := .Values.coredns.serviceIp.ports }}
+      - port: {{ $PORT }}
+        protocol: TCP
+      - port: {{ $PORT }}
+        protocol: UDP
+    {{- end }}
+    {{- end }}
 {{- end }}
 {{ end }}

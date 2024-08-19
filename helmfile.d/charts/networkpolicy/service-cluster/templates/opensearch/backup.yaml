@@ -17,5 +17,13 @@ spec:
             app.kubernetes.io/component: opensearch-master
       ports:
       - port: 9200
-    {{- toYaml .Values.global.dnsServerEgress | nindent 4 }}
+    {{- if .Values.coredns.serviceIp.ports }}
+    - ports:
+    {{- range $PORT := .Values.coredns.serviceIp.ports }}
+      - port: {{ $PORT }}
+        protocol: TCP
+      - port: {{ $PORT }}
+        protocol: UDP
+    {{- end }}
+    {{- end }}
 {{ end }}
