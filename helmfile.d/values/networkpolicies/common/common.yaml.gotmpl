@@ -31,7 +31,7 @@ rules:
           k8s-app: kube-dns
       - cidr: {{ .Values.global.clusterDns }}/32
     ports:
-      {{- range $netpol.coredns.serverIp.ports }}
+      {{- range $netpol.coredns.serviceIp.ports }}
       - tcp: {{ . }}
       - udp: {{ . }}
       {{- end }}
