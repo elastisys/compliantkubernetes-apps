@@ -16,9 +16,7 @@ networkPolicies:
     serviceIp:
       ips:
         - set-me/32
-  global:
-    externalApiServer: true
-    dnsServerEgress:
       ports:
         - 53
-        - 8053
+  global:
+    externalApiServer: true

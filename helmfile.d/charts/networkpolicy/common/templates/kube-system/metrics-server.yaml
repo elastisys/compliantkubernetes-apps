@@ -24,7 +24,15 @@ spec:
         - port: 8443
     {{- end }}
   egress:
-    - ports: {{- toYaml (index .Values.global.dnsServerEgress 0).ports | nindent 6 }}
+    {{- if .Values.coredns.serviceIp.ports }}
+    - ports:
+    {{- range $PORT := .Values.coredns.serviceIp.ports }}
+      - port: {{ $PORT }}
+        protocol: TCP
+      - port: {{ $PORT }}
+        protocol: UDP
+    {{- end }}
+    {{- end }}
     {{- if and .Values.global.apiserver.ips .Values.global.apiserver.port }}
     - to:
         {{- range .Values.global.apiserver.ips }}

@@ -22,8 +22,14 @@ spec:
       ports:
         - port: 8888
   egress:
-    {{- if .Values.global.externalApiServer }}
-    {{- toYaml .Values.global.dnsServerEgress | nindent 4 }}
+    {{- if and .Values.global.externalApiServer .Values.coredns.serviceIp.ports }}
+    - ports:
+    {{- range $PORT := .Values.coredns.serviceIp.ports }}
+      - port: {{ $PORT }}
+        protocol: TCP
+      - port: {{ $PORT }}
+        protocol: UDP
+    {{- end }}
     {{- end }}
     {{- if and .Values.global.apiserver.ips .Values.global.apiserver.port }}
     - to:

@@ -11,7 +11,15 @@ spec:
     - Egress
     - Ingress
   ingress:
-    {{- toYaml .Values.global.dnsServerEgress | nindent 4 }}
+    - ports:
+    {{- if .Values.coredns.serviceIp.ports }}
+    {{- range $PORT := .Values.coredns.serviceIp.ports }}
+      - port: {{ $PORT }}
+        protocol: TCP
+      - port: {{ $PORT }}
+        protocol: UDP
+    {{- end }}
+    {{- end }}
     - from:
       - podSelector:
           matchLabels:
@@ -55,6 +63,14 @@ spec:
           cidr: {{ $IP }}
       {{- end }}
       {{- end }}
-      ports: {{- toYaml (index .Values.global.dnsServerEgress 0).ports | nindent 6 }}
+      ports:
+      {{- if .Values.coredns.serviceIp.ports }}
+      {{- range $PORT := .Values.coredns.serviceIp.ports }}
+        - port: {{ $PORT }}
+          protocol: TCP
+        - port: {{ $PORT }}
+          protocol: UDP
+      {{- end }}
+      {{- end }}
     {{- end }}
 {{- end }}

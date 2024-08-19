@@ -23,5 +23,13 @@ spec:
               app: opensearch-dashboards
       ports:
         - port: 5601
-    {{- toYaml .Values.global.dnsServerEgress | nindent 4 }}
+    {{- if .Values.coredns.serviceIp.ports }}
+    - ports:
+    {{- range $PORT := .Values.coredns.serviceIp.ports }}
+      - port: {{ $PORT }}
+        protocol: TCP
+      - port: {{ $PORT }}
+        protocol: UDP
+    {{- end }}
+    {{- end }}
 {{ end }}
