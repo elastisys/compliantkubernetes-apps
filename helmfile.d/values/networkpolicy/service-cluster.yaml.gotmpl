@@ -21,6 +21,18 @@ global:
       {{- end }}
   externalLoadBalancer: {{ .Values.networkPolicies.global.externalLoadBalancer }}
   ingressUsingHostNetwork: {{ .Values.ingressNginx.controller.useHostPort }}
+  {{- if eq .Values.global.ck8sK8sInstaller "gardener" }}
+  webhookVPN:
+    enabled: true
+    ingressRule:
+    - podSelector:
+        matchLabels:
+          podLabel:
+            app: vpn-shoot
+      namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+  {{- end }}
 
   # TODO: Add Swift
   objectStoreEgress:

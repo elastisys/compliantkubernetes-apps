@@ -19,6 +19,16 @@ global:
       - 443
   ingressUsingHostNetwork: false
   externalLoadBalancer: false # not true if loadbalancer is controlled by a kubernetes cloud controller
+  webhookVPN:
+    enabled: false
+    ingressRule: {}
+    # - podSelector:
+    #     matchLabels:
+    #       podLabel:
+    #         app: vpn
+    #   namespaceSelector:
+    #     matchLabels:
+    #       kubernetes.io/metadata.name: kube-system
 
   objectStoreEgress:
     - to:
