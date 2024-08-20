@@ -15,6 +15,16 @@ global:
       - "0.0.0.0/0" # ips of wc nodes or loadbalancer
   externalLoadBalancer: false
   externalApiServer: false
+  webhookVPN:
+    enabled: false
+    ingressRule: {}
+    # - podSelector:
+    #     matchLabels:
+    #       podLabel:
+    #         app: vpn
+    #   namespaceSelector:
+    #     matchLabels:
+    #       kubernetes.io/metadata.name: kube-system
   objectStorage:
     ips:
       - "0.0.0.0/0"

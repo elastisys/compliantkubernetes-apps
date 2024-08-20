@@ -10,16 +10,12 @@ spec:
       app.kubernetes.io/component: admission-webhook
   policyTypes:
     - Egress
-  ingress:
-    {{- if eq .Values.global.ck8sK8sInstaller "gardener" }}
-    - from:
-      - podSelector:
-            matchLabels:
-              app: vpn-shoot
-        namespaceSelector:
-          matchLabels:
-            kubernetes.io/metadata.name: kube-system
-    {{- end }}
+  {{- if .Values.global.webhookVPN.enabled }}
+  {{- with .Values.global.webhookVPN.ingressRule }}
+    - Ingress
+  ingress: {{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- end }}
   egress:
     {{- if and .Values.global.externalApiServer .Values.coredns.serviceIp.ports }}
     - ports:

@@ -33,6 +33,18 @@ global:
   trivy:
     ips: {{- toYaml .Values.networkPolicies.global.trivy.ips | nindent 6 }}
     port: {{ .Values.networkPolicies.global.trivy.port }}
+  {{- if eq .Values.global.ck8sK8sInstaller "gardener" }}
+  webhookVPN:
+    enabled: true
+    ingressRule:
+    - podSelector:
+        matchLabels:
+          podLabel:
+            app: vpn-shoot
+      namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+  {{- end }}
 
   apiServerEgress:
     {{- if eq .Environment.Name "service_cluster" }}
