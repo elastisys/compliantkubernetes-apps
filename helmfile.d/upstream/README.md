@@ -80,6 +80,7 @@ Check for chart verification:
 ## To consider when upgrading a chart
 
 ### kube-prometheus-stack
-1. All rules are split between alerts and records, modified to preserve the cluster label in aggregations, and maintained separately in [prometheus-alerts chart](helmfile/charts/prometheus-alerts/)
-1. The user Grafana needs to be updated separately in [grafana chart](helmfile/upstream/grafana)
-1. The user AlertManager needs to be updated separately in [user-alertmanager chart](helmfile/charts/examples/user-alertmanager)
+
+1. All rules are split between alerts and records, modified to preserve the cluster label in aggregations, and maintained separately in [prometheus-alerts chart](../charts/prometheus-alerts/)
+1. The user Grafana needs to be updated separately in [grafana chart](./grafana)
+1. The user AlertManager needs to be updated separately in [user-alertmanager chart](../charts/user-alertmanager)
