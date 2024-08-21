@@ -58,9 +58,9 @@ alertmanager-mixin: # Clone the alertmanager-mixin repo and build the dashboards
 	@$(call clone_mixin_repo,$@,"github.com/prometheus/alertmanager/doc/alertmanager-mixin@main")
 	@$(call create_dashboards,$@)
 
-#node-mixin: # Clone the node-exporter-mixin and build the dashboards - not working
-#	@$(call clone_mixin_repo,$@,"github.com/prometheus/node_exporter/docs/node-mixin@master")
-#	@$(call create_dashboards,$@)
+node-mixin: # Clone the node-exporter-mixin and build the dashboards - not working
+	@$(call clone_mixin_repo,$@,"github.com/prometheus/node_exporter/docs/node-mixin@master")
+	@$(call create_dashboards,$@)
 
 grafana-dashboards: # Get the Grafana dashboard from upstream
 	curl -o $(DASHBOARDS_PATH)/grafana/grafana-overview-dashboard.json -L https://raw.githubusercontent.com/grafana/grafana/main/grafana-mixin/dashboards/grafana-overview.json
