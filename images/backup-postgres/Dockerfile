@@ -22,6 +22,7 @@ RUN apt-get update     \
     && apt-get update \
     && curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
     && apt-get install --no-install-recommends -y  \
+        postgresql-client-15  \
         postgresql-client-14  \
         postgresql-client-13  \
         postgresql-client-12  \

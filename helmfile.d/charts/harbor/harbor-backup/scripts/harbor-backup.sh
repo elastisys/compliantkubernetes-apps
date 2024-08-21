@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -e -o pipefail
 : "${PG_HOSTNAME:?Missing PG_HOSTNAME}"
 backup_dir="${BACKUP_DIR:-/backup}"
 dump_dir="${backup_dir}/dbdump"
