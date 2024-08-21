@@ -920,8 +920,10 @@ trivy:
   tolerations: []
   affinity: {}
   nodeCollector:
-    tolerations: []
-
+    tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
   # configurations for an offline / air-gapped environment
   # ref: https://github.com/aquasecurity/trivy-operator/tree/main/deploy/helm#values
   scanner:
