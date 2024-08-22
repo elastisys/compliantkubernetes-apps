@@ -172,3 +172,5 @@ defaultBackend:
   nodeSelector: {{- toYaml .Values.ingressNginx.defaultBackend.nodeSelector | nindent 4 }}
 
   resources: {{- toYaml .Values.ingressNginx.defaultBackend.resources | nindent 4 }}
+
+  topologySpreadConstraints: {{- toYaml .Values.ingressNginx.defaultBackend.topologySpreadConstraints | nindent 4 }}
