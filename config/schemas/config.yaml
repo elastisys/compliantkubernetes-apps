@@ -5937,6 +5937,8 @@ properties:
             $ref: '#/$defs/kubernetesNodeSelector'
           affinity:
             $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          topologySpreadConstraints:
+            $ref: '#/$defs/kubernetesTopologySpreadConstraints'
   issuers:
     title: Issuers Config
     description: Configure issuers for cert-manager.
