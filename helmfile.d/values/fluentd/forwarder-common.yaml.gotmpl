@@ -253,6 +253,22 @@ extraConfigMaps:
       de_dot_nested true
     </filter>
 
+    # count the number of incoming records per tag
+    <filter **>
+      @type prometheus
+      @id filter_prometheus
+      <metric>
+        name fluentd_input_status_num_records_total
+        type counter
+        desc The total number of incoming records
+        <labels>
+          tag ${tag_parts[0]}
+          hostname ${hostname}
+          namespace $.kubernetes.namespace_name
+        </labels>
+      </metric>
+    </filter>
+
 # Liveliness probe reverted from upstream changes to prevent that it fails if just one buffer is inactive.
 # E.g. the authlog buffer will often be inactive, so it would make the probe fail.
 livenessProbe:
