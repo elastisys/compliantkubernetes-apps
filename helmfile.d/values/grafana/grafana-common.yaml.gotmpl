@@ -1,8 +1,3 @@
-# TODO: remove the image override next time the Grafana chart is upgraded
-# see https://github.com/elastisys/compliantkubernetes-apps/pull/2240 for context.
-image:
-  tag: 10.4.7
-
 testFramework:
     enabled: false
 
@@ -24,6 +19,7 @@ persistence:
   size: 10Gi
   accessModes:
     - ReadWriteOnce
+  lookupVolumeName: false
 
 sidecar:
   dashboards:
