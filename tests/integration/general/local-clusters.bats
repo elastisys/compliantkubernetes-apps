@@ -8,7 +8,7 @@ setup_file() {
 
   export CK8S_AUTO_APPROVE="true"
 
-  local_cluster.setup dev integration.dev-ck8s.com
+  local_cluster.setup dev test.dev-ck8s.com
   local_cluster.create single-node-cache
 }
 

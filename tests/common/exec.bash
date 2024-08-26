@@ -35,11 +35,11 @@ check_container() {
   fi
 }
 check_resolve() {
-  if ! resolvectl query dot.integration.dev-ck8s.com &>/dev/null; then
+  if ! resolvectl query dot.test.dev-ck8s.com &>/dev/null; then
     echo "error: dns does not resolve with local-resolve" >&2
     return 1
   fi
-  if [[ "$(resolvectl query dot.integration.dev-ck8s.com | awk '/dot.integration.dev-ck8s.com:/{ print $2 }')" != "127.0.64.43" ]]; then
+  if [[ "$(resolvectl query dot.test.dev-ck8s.com | awk '/dot.test.dev-ck8s.com:/{ print $2 }')" != "127.0.64.43" ]]; then
     echo "error: dns does not resolve to local-cluster" >&2
     return 1
   fi

@@ -26,12 +26,23 @@ make build-unit
 make run-unit
 ```
 
+The `tests / regression` workflow on GitHub is invoked with the following commands:
+
+```bash
+# prepare local cache and local resolve:
+../scripts/local-cluster.sh cache create
+../scripts/local-cluster.sh resolve create test.dev-ck8s.com
+# build and run
+make build-main
+make run-regression
+```
+
 The `tests / integration` workflow on GitHub is invoked with the following commands:
 
 ```bash
 # prepare local cache and local resolve:
 ../scripts/local-cluster.sh cache create
-../scripts/local-cluster.sh resolve create integration.dev-ck8s.com
+../scripts/local-cluster.sh resolve create test.dev-ck8s.com
 # build and run
 make build-main
 make run-integration
