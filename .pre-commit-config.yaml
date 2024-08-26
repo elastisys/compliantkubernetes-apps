@@ -17,6 +17,7 @@ repos:
       - id: trailing-whitespace
         exclude: ^helmfile\.d/upstream/|^tests/.*/resources/
 
+  # TODO: Migrate to same config as compliantkubernetes repo.
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.39.0
     hooks:
@@ -24,6 +25,7 @@ repos:
         name: lint markdown
         args:
           - --disable
+          - MD007 # Unordered list indentation
           - MD013 # Line length
           - MD024 # Multiple headings with the same content
           - MD026 # Trailing punctuation in heading
