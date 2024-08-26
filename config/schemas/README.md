@@ -140,7 +140,7 @@ These guidelines aims to help to create better quality reference documentation.
 - Should be written with full sentences, including proper punctuation.
 - Should include a leading explanation of what the option does and affect.
     - For the root of larger schemas, e.g:
-        -  `.dex` - "Configure Dex, the federated OpenID connect identity provider."
+        - `.dex` - "Configure Dex, the federated OpenID connect identity provider."
     - For the root of smaller schemas, e.g.:
         - `.dex.expiry` - "Configure expiry when authenticating via Dex."
     - For the leaf of schemas, e.g.:
@@ -155,7 +155,7 @@ These guidelines aims to help to create better quality reference documentation.
     - `.fluentd.forwarder.buffer` - "See \[the upstream documentation for reference\]\(\<link\>\), set keys will converted from `camelCase` to `snake_case` as required."
 - Should include a note about which cluster it is applicable, either in schema roots as a general case or in schema leafs as an exception, wrapped in a note GFM alert:
     - For the root of larger schemas, e.g.:
-        - `.dex` - "Dex is installed in the service cluster, therefor this configuration mainly applies there."
+        - `.dex` - "Dex is installed in the service cluster, therefore this configuration mainly applies there."
     - For the leaf of schemas, e.g.:
         - `.dex.subdomain` - "Must be set for both service and workload clusters."
 
