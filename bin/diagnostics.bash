@@ -408,6 +408,7 @@ run_diagnostics_query_metric() {
 
 log_info "Running diagnostics..."
 config_load "${cluster}"
+export CK8S_AUTO_APPROVE=true
 
 case "${sub_command}" in
     namespace)
