@@ -406,8 +406,8 @@ run_diagnostics_query_metric() {
     curl "${endpoint}/query" -k --header "${header}" --data-urlencode query="${1}" | jq
 }
 
-log_info "Running diagnostics..."
 config_load "${cluster}"
+log_info "Running diagnostics..."
 export CK8S_AUTO_APPROVE=true
 
 case "${sub_command}" in
