@@ -7,11 +7,12 @@ here="$(dirname "$(readlink -f "$0")")"
 source "${here}/common.bash"
 
 usage() {
-    log_info "usage: ck8s diagnostics <sc|wc> [namespace namespace] [query-default-metrics-since date] [query-metric metric] [--include-config]"
-    log_info
+    log_info "usage: ck8s diagnostics <sc|wc> [command] [options]"
+    log_info ""
     log_info "Collects diagnostics from the current environment set by CK8S_CONFIG_PATH and"
     log_info "store them in a file in the CK8S_CONFIG_PATH directory encrypted with SOPS using"
-    log_info "any GPG keys listed in CK8S_CONFIG_PATH/.sops.yaml or set by CK8S_PGP_FP"
+    log_info "by default GPG keys found in CK8S_CONFIG_PATH/diagnostics_receiver.gpg or by"
+    log_info "setting the CK8S_PGP_FP environment variable manually."
     log_info ""
     log_info "Commands:"
     log_info "     namespace                     run diagnostics for specified namespace only"
@@ -24,6 +25,7 @@ usage() {
     exit 1
 }
 
+gpg_file="${CK8S_CONFIG_PATH}/diagnostics_receiver.gpg"
 include_config=false
 cluster="${1}"
 sub_command=""
@@ -33,6 +35,9 @@ shift
 
 while [ "${#}" -gt 0 ] ; do
     case "${1}" in
+        -h | --help)
+            usage
+            ;;
         --include-config)
             include_config=true
             ;;
@@ -42,39 +47,54 @@ while [ "${#}" -gt 0 ] ; do
             command_arg="${2:-}"
             shift
             ;;
-        -h | --help)
-            usage
-            ;;
         *)
-            log_error "error: invalid argument: \"${1:-}\""
+            log_error "ERROR: invalid argument: \"${1:-}\""
             usage
             ;;
     esac
     shift
 done
 
-if [ -z "${CK8S_PGP_FP:-}" ]; then
-    fingerprints=$(yq4 '.creation_rules[].pgp' "${sops_config}")
+log_self_managed_notice() {
+    log_warning "WARNING: Notice for self-managed customers:"
 
-    log_warning "Notice for self-managed customers:"
-    echo -e "\tEncrypting using the fingerprints: $fingerprints." 1>&2
-    echo -e "\tIf you want to send diagnostic data to Elastisys, make sure to do:\n" 1>&2
+    echo -e "\tIf you are an Elastisys self-managed customer, you can send diagnostic data to Elastisys." 1>&2
+    echo -e "\tMake sure to store GPG keys retrieved during onboarding in a file named:\n" 1>&2
+    echo -e "\t\${CK8S_CONFIG_PATH}/diagnostics_receiver.gpg\n" 1>&2
 
-    echo -e "\tCK8S_PGP_FP=<fingerprint provided during onboarding> ./bin/ck8s diagnostics [sc|wc]\n" 1>&2
+    echo -e "\tIf you are an Elastisys self-managed customer, you get support by contacting sme-support@elastisys.com\n" 1>&2
 
-    echo -e "\tIf in doubt, contact support@elastisys.com." 1>&2
+    usage
+}
 
-    if [[ "${CK8S_AUTO_APPROVE:-}" != true ]]; then
-        log_warning_no_newline "Do you want to continue anyway? (y/N): "
-        read -r reply
-        if [[ ! "${reply}" =~ ^[yY]$ ]]; then
-            exit 1
-        fi
+import_gpg_file() {
+    local fingerprints
+    local gpg_file="${1}"
+    if [[ ! -f "${gpg_file}" ]]; then
+        log_error "ERROR: file \"${gpg_file}\" not found"
+        log_self_managed_notice
     fi
-fi
+    log_info "Attempting to import GPG keys from ${gpg_file}"
 
-file="${CK8S_CONFIG_PATH}/diagnostics-${cluster}-$(date +%y%m%d%H%M%S).log"
-touch "${file}"
+    if ! gpg --import "${gpg_file}"; then
+        log_error "ERROR: Could not import GPG keys from ${gpg_file}"
+        log_self_managed_notice
+    fi
+
+    # get only fingerprints used for encryption
+    mapfile -t fingerprints < <(gpg --with-colons --import-options show-only --import --fingerprint "${CK8S_CONFIG_PATH}/diagnostics_receiver.gpg" | awk -F: '
+        /^fpr/ {
+            if (!main_fpr) {
+                print $10;
+                main_fpr = 1;
+            }
+        }
+        /^pub/ {
+            main_fpr = 0;
+        }'
+    )
+    CK8S_PGP_FP=$(IFS=, ; echo "${fingerprints[*]}")
+}
 
 sops_encrypt_file() {
     if [ -z "${CK8S_PGP_FP:-}" ]; then
@@ -90,7 +110,7 @@ sops_encrypt_file() {
 fetch_oidc_token() {
     # shellcheck disable=SC2016
     readarray -t args <<< "$(yq4 '. as $root | ($root.contexts[] | select(.name == $root.current-context) | .context) as $context | ($root.users[] | select(.name == $context.user) | .user) as $user | $user.exec.args[]' "${config["kube_config_sc"]}")"
-    [[ "${args[0]}" == "oidc-login" ]] || log_fatal "Error: This command requires the kubeconfig to use OIDC"
+    [[ "${args[0]}" == "oidc-login" ]] || log_fatal "ERROR: This command requires the kubeconfig to use OIDC"
     kubectl "${args[@]}" | yq4 '.status.token'
 }
 
@@ -400,8 +420,18 @@ run_diagnostics_query_metric() {
     curl "${endpoint}/query" -k --header "${header}" --data-urlencode query="${1}" | jq
 }
 
-log_info "Running diagnostics..."
+if [[ -z "${CK8S_PGP_FP:-}" ]]; then
+    import_gpg_file "${gpg_file}"
+fi
+log_info "Using the following fingerprints:"
+log_info "${CK8S_PGP_FP}"
+
+file="${CK8S_CONFIG_PATH}/diagnostics-${cluster}-$(date +%y%m%d%H%M%S).log"
+touch "${file}"
+
 config_load "${cluster}"
+log_info "Running diagnostics..."
+export CK8S_AUTO_APPROVE=true
 
 case "${sub_command}" in
     namespace)
