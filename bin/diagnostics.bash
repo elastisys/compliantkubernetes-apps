@@ -7,11 +7,14 @@ here="$(dirname "$(readlink -f "$0")")"
 source "${here}/common.bash"
 
 usage() {
-    log_info "usage: ck8s diagnostics <sc|wc> [namespace namespace] [query-default-metrics-since date] [query-metric metric] [--include-config]"
-    log_info
+    log_info "usage: ck8s diagnostics <sc|wc> [command] [options]"
+    log_info ""
     log_info "Collects diagnostics from the current environment set by CK8S_CONFIG_PATH and"
     log_info "store them in a file in the CK8S_CONFIG_PATH directory encrypted with SOPS using"
-    log_info "any GPG keys listed in CK8S_CONFIG_PATH/.sops.yaml or set by CK8S_PGP_FP"
+    log_info "either any GPG keys found in CK8S_CONFIG_PATH/.sops.yaml (default), by"
+    log_info "GPG keys found in sops file provided with the \"--sops-config\" flag, or"
+    log_info "set by the environment variable CK8S_PGP_FP. CK8S_PGP_FP variable takes precedence"
+    log_info "over the rest."
     log_info ""
     log_info "Commands:"
     log_info "     namespace                     run diagnostics for specified namespace only"
@@ -21,6 +24,7 @@ usage() {
     log_info "Global options:"
     log_info " -h, --help                        display help for this command and exit"
     log_info "     --include-config              include config yaml files found in CK8S_CONFIG_PATH"
+    log_info "     --sops-config <file>          path to sops config file, see example filehttps://github.com/getsops/sops/blob/main/.sops.yaml"
     exit 1
 }
 
@@ -36,15 +40,17 @@ while [ "${#}" -gt 0 ] ; do
         --include-config)
             include_config=true
             ;;
-        namespace|query-default-metrics-since|query-metric)
-            [[ ${#} -ge 2 && "${2}" != -* && -z "$sub_command" ]] || usage
-            sub_command="${1:-}"
-            command_arg="${2:-}"
-            shift
-            ;;
         -h | --help)
             usage
             ;;
+        --sops-config)
+            [[ ${#} -lt 2 || "${2}" = -* ]] && log_error "error: no file provided with --sops-config flag" && usage
+            [[ -n "${CK8S_PGP_FP:-}" ]] && log_warning "CK8S_PGP_FP is set, ignoring file set by \"--sops-config\""
+            sops_config="${2}"
+            shift
+            ;;
+        namespace|query-default-metrics-since|query-metric)
+            [[ ${#} -ge 2 && "${2}" != -* && -z "$sub_command" ]] || usage
         *)
             log_error "error: invalid argument: \"${1:-}\""
             usage
@@ -54,7 +60,9 @@ while [ "${#}" -gt 0 ] ; do
 done
 
 if [ -z "${CK8S_PGP_FP:-}" ]; then
+    [[ ! -f "${sops_config}" ]] && log_error "error: file  \"${sops_config}\" not found" && usage
     fingerprints=$(yq4 '.creation_rules[].pgp' "${sops_config}")
+    echo "$fingerprints"
 
     log_warning "Notice for self-managed customers:"
     echo -e "\tEncrypting using the fingerprints: $fingerprints." 1>&2
