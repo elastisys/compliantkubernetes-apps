@@ -239,6 +239,13 @@ cypress_setup() {
     exit 1
   fi
 
+  # Check for "before-all" hook failure
+  if [[ -n "$(jq -r 'select((.[0] == "fail") and (.[1].title | contains("\"before all\" hook for")))' "${CYPRESS_REPORT}")" ]]; then
+    echo "One or more \"before all\" hooks failed" >&2
+    jq -r 'select((.[0] == "fail") and (.[1].title | contains("\"before all\" hook for"))) | .[1].stack' "${CYPRESS_REPORT}"
+    exit 1
+  fi
+
   export CYPRESS_REPORT
 }
 
