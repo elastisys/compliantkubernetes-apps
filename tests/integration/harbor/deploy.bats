@@ -1,7 +1,5 @@
 #!/usr/bin/env bats
 
-# bats file_tags=harbor,deploy
-
 # Integration test: Harbor deployment
 
 setup_file() {

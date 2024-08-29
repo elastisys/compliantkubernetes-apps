@@ -1,5 +1,5 @@
-// bats file_tags=harbor,dex-auth
-// same as integration test without local-cluster setup
+// End-to-end test: Harbor Dex auth
+// Same as integration test without local-cluster setup
 
 import "../../common/cypress/harbor.js"
 

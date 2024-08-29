@@ -1,7 +1,5 @@
 #!/usr/bin/env bats
 
-# bats file_tags=harbor,dex-auth
-
 setup_file() {
   load "../../bats.lib.bash"
   load "setup_suite.bash"

@@ -1,4 +1,4 @@
-// bats file_tags=harbor,dex-auth
+// Integration test: Harbor Dex auth
 
 // setup_file load "setup_suite.bash"
 // setup_file

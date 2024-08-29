@@ -1,5 +1,5 @@
-// bats file_tags=harbor,use-ui
-// same as integration test without local-cluster setup
+// End-to-end test: Harbor use UI
+// Same as integration test without local-cluster setup
 
 import "../../common/cypress/harbor.js"
 
@@ -73,14 +73,6 @@ describe("harbor ui", function() {
       .find("input")
       .clear()
       .type(`${slug}-robot`)
-
-    cy.contains(`${slug}-project`)
-      .parent()
-      .parent()
-      .parent()
-      .parent()
-      .find("input[type=checkbox]")
-      .check({ force: true })
 
     cy.contains("button", "next", opt)
       .click()

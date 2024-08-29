@@ -1,7 +1,5 @@
 #!/usr/bin/env bats
 
-# bats file_tags=harbor,use-api
-
 # End-to-end test: Harbor use API
 # Same as integration test without local-cluster setup and with verify tls.
 
@@ -9,10 +7,15 @@ setup_file() {
   export BATS_NO_PARALLELIZE_WITHIN_FILE=true
   export CK8S_AUTO_APPROVE="true"
 
-  load "../bats.lib.bash"
+  load "../../bats.lib.bash"
   load_common "harbor.bash"
   load_common "yq.bash"
   load_assert
+
+  mark.setup
+  mark.punch
+
+  export TESTS_MARKER
 
   harbor.load_env "harbor-api"
 
@@ -25,14 +28,24 @@ setup_file() {
 }
 
 setup() {
-  load "../bats.lib.bash"
+  load "../../bats.lib.bash"
   load_common "harbor.bash"
   load_common "yq.bash"
   load_assert
+
+  mark.check
+}
+
+teardown() {
+  if [[ "${BATS_TEST_COMPLETED:-}" == 1 ]]; then
+    mark.punch
+  fi
 }
 
 teardown_file() {
   harbor.teardown_project
+
+  mark.teardown
 }
 
 @test "harbor api can authenticate" {
@@ -82,14 +95,14 @@ teardown_file() {
 }
 
 @test "harbor api can scan image with robot account" {
-  run harbor.create_artefact_vulnerability_scan "${harbor_project}" "busybox" "latest"
+  run harbor.create_artefact_vulnerability_scan "${harbor_project}" "busybox" "stable"
   refute_output
   assert_success
 
   for each in $(seq 30); do
     echo "${each} try" >&2
 
-    run harbor.get_artefact_vulnerabilities "${harbor_project}" "busybox" "latest"
+    run harbor.get_artefact_vulnerabilities "${harbor_project}" "busybox" "stable"
     assert_success
 
     if [[ "${output}" != "{}" ]]; then

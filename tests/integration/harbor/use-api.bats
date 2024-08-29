@@ -1,7 +1,5 @@
 #!/usr/bin/env bats
 
-# bats file_tags=harbor,use-api
-
 # Integration test: Harbor use API
 
 setup_file() {
@@ -32,6 +30,12 @@ setup_file() {
   export harbor_robot_secret_path
 }
 
+teardown() {
+  if [[ "${BATS_TEST_COMPLETED:-}" == 1 ]]; then
+    mark.punch
+  fi
+}
+
 setup() {
   load "../../bats.lib.bash"
   load_common "harbor.bash"
@@ -52,8 +56,6 @@ teardown_file() {
 
   assert_line --regexp ".*\"username\":\"admin\".*"
   assert_success
-
-  mark.punch
 }
 
 @test "harbor api can create project" {
@@ -61,8 +63,6 @@ teardown_file() {
 
   refute_output
   assert_success
-
-  mark.punch
 }
 
 @test "harbor api can create robot account" {
@@ -73,8 +73,6 @@ teardown_file() {
 
   jq -r .id <<< "${output}" > "${harbor_robot_id_path}"
   jq -r .secret <<< "${output}" > "${harbor_robot_secret_path}"
-
-  mark.punch
 }
 
 @test "harbor api can authenticate with robot account" {
@@ -82,16 +80,12 @@ teardown_file() {
 
   assert_line --regexp "Login Succeeded"
   assert_success
-
-  mark.punch
 }
 
 @test "harbor api can push image with robot account" {
   run skopeo copy --dest-tls-verify=false docker://docker.io/library/busybox:stable "docker://${harbor_endpoint}/${harbor_project}/busybox:stable"
 
   assert_success
-
-  mark.punch
 }
 
 @test "harbor api can pull image with robot account" {
@@ -102,8 +96,6 @@ teardown_file() {
   assert_success
 
   rm -r "${dest}"
-
-  mark.punch
 }
 
 @test "harbor api can scan image with robot account" {
@@ -125,15 +117,11 @@ teardown_file() {
   done
 
   refute_line --regexp ".*errors.*"
-
-  mark.punch
 }
 
 @test "harbor api can unauthenticate with robot account" {
   run skopeo logout "${harbor_endpoint}"
   assert_success
-
-  mark.punch
 }
 
 @test "harbor api can delete robot account" {
@@ -144,22 +132,16 @@ teardown_file() {
   assert_success
 
   rm -f "${harbor_robot_id_path}" "${harbor_robot_secret_path}"
-
-  mark.punch
 }
 
 @test "harbor api can delete repository" {
   run harbor.delete_repository "${harbor_project}" "busybox"
   refute_output
   assert_success
-
-  mark.punch
 }
 
 @test "harbor api can delete project" {
   run harbor.delete_project "${harbor_project}"
   refute_output
   assert_success
-
-  mark.punch
 }

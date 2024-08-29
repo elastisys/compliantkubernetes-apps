@@ -1,4 +1,4 @@
-// bats file_tags=harbor,use-ui
+// Integration test: Harbor use UI
 
 // setup_file load "setup_suite.bash"
 // setup_file

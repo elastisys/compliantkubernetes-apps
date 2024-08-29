@@ -1,11 +1,9 @@
 #!/usr/bin/env bats
 
-# bats file_tags=harbor,dex-auth
-
 setup_file() {
   load "../../bats.lib.bash"
 
-  cypress_setup "${ROOT}/tests/end-to-end/harbor/harbor-dex-auth.cy.js"
+  cypress_setup "${ROOT}/tests/end-to-end/harbor/dex-auth.cy.js"
 }
 
 setup() {
@@ -14,7 +12,7 @@ setup() {
 }
 
 teardown_file() {
-  cypress_teardown "${ROOT}/tests/end-to-end/harbor/harbor-dex-auth.cy.js"
+  cypress_teardown "${ROOT}/tests/end-to-end/harbor/dex-auth.cy.js"
 }
 
 @test "harbor dex auth can login via static admin user" {
