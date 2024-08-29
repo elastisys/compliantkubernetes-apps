@@ -6,7 +6,7 @@ describe("grafana admin authentication", function() {
 
     // Cypress does not like trailing dots
     cy.yqDig("sc", ".grafana.ops.trailingDots")
-      .should("not.equal", "true")
+      .should((value) => assert(value !== "true", ".grafana.ops.trailingDots in sc config must not be 'true'"))
   })
 
   it("can login via static admin user", function() {
@@ -64,7 +64,7 @@ describe("grafana dev authentication", function() {
 
     // Cypress does not like trailing dots
     cy.yqDig("sc", ".grafana.user.trailingDots")
-      .should("not.equal", "true")
+      .should((value) => assert(value !== "true", ".grafana.user.trailingDots in sc config must not be 'true'"))
   })
 
   it("can login via static admin user", function() {
