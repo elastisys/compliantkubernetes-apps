@@ -129,13 +129,16 @@ fi
 
 if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]] || [[ "${FORWARD_RUNTIME:-false}" == "true" ]]; then
   # Prepare container graphics
-  if [[ -n "${DISPLAY:-}" ]] && [[ -n "${XAUTHORITY:-}" ]]; then
+  if [[ -n "${DISPLAY:-}" ]]; then
     args+=("--env" "DISPLAY")
-    args+=("--env" "XAUTHORITY")
-    args+=("--mount" "type=bind,src=${XAUTHORITY},dst=${XAUTHORITY}")
     args+=("--mount" "type=bind,src=/run/dbus,dst=/run/dbus")
     args+=("--device" "/dev/dri")
     args+=("--ipc" "host")
+  fi
+
+  if [[ -n "${XAUTHORITY:-}" ]]; then
+    args+=("--env" "XAUTHORITY")
+    args+=("--mount" "type=bind,src=${XAUTHORITY},dst=${XAUTHORITY}")
   fi
 
   # Prepare container home
