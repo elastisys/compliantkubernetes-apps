@@ -46,9 +46,9 @@ spec:
                       name: {{ include "log-manager.fullname" $ }}-storage-credentials
                       key: azure-storage-connection-string
                 - name: AZURE_CONTAINER_NAME
-                  value: {{ $.Values.azure.containerName }}
+                  value: {{ .bucket }}
                 - name: AZURE_PREFIX
-                  value: logs
+                  value: {{ .prefix }}
                 - name: STORAGE_SERVICE
                   value: azure
                 {{- end }}
