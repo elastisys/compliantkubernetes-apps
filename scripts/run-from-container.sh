@@ -73,14 +73,6 @@ args+=("--hostname" "compliantkubernetes-apps-tests")
 args+=("--workdir" "${root}")
 args+=("--env" "LANG=C.UTF-8")
 
-if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]] && [[ "${FORWARD_RUNTIME:-false}" == "true" ]]; then
-  log.continue "forward your environment and runtime to container ${1:-}?"
-elif [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]]; then
-  log.continue "forward your environment to container ${1:-}?"
-elif [[ "${FORWARD_RUNTIME:-false}" == "true" ]]; then
-  log.continue "forward your runtime to container ${1:-}?"
-fi
-
 # Prepare podman to work with selinux
 if [[ "${runtime}" == "podman" ]]; then
   if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]] || [[ "${FORWARD_RUNTIME:-false}" == "true" ]]; then
