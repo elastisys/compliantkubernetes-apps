@@ -24,6 +24,8 @@ opensearch:
       definition:
         users:
           - admin@example.com
+  sso:
+    enabled: true
 networkPolicies:
   global:
     scApiserver:

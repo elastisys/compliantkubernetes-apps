@@ -3,7 +3,7 @@
 setup_file() {
   load "../../bats.lib.bash"
 
-  cypress_setup "${ROOT}/tests/end-to-end/opensearch/opensearch-dashboards.cy.js"
+  cypress_setup "${ROOT}/tests/end-to-end/opensearch/dashboards.cy.js"
 }
 
 setup() {
@@ -12,7 +12,7 @@ setup() {
 }
 
 teardown_file() {
-  cypress_teardown "${ROOT}/tests/end-to-end/opensearch/opensearch-dashboards.cy.js"
+  cypress_teardown "${ROOT}/tests/end-to-end/opensearch/dashboards.cy.js"
 }
 
 @test "opensearch dashboards open the audit user dashboard" {
