@@ -3,7 +3,7 @@
 setup_file() {
   load "../../bats.lib.bash"
 
-  cypress_setup "${ROOT}/tests/end-to-end/grafana/grafana-authentication.cy.js"
+  cypress_setup "${ROOT}/tests/end-to-end/grafana/authentication.cy.js"
 }
 
 setup() {
@@ -12,7 +12,7 @@ setup() {
 }
 
 teardown_file() {
-  cypress_teardown "${ROOT}/tests/end-to-end/grafana/grafana-authentication.cy.js"
+  cypress_teardown "${ROOT}/tests/end-to-end/grafana/authentication.cy.js"
 }
 
 @test "grafana admin authentication can login via static admin user" {

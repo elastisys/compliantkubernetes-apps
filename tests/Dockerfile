@@ -3,13 +3,16 @@ FROM ubuntu:rolling AS unit
 LABEL org.opencontainers.image.source=https://github.com/elastisys/compliantkubernetes-apps
 
 ARG DEBIAN_FRONTEND="noninteractive"
+ENV LANGUAGE="en"
+ENV LANG="en_US.utf8"
 ARG TZ="Etc/UTC"
 
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y apache2-utils bats curl dnsutils gettext-base git gpg iputils-ping jq make net-tools pwgen s3cmd ssh unzip && \
+    apt-get install -y apache2-utils bats curl dnsutils gettext-base git gpg iputils-ping jq locales make net-tools pwgen s3cmd ssh unzip && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 
 ARG GOMPLATE_VERSION="3.11.7"
 RUN curl -LOs "https://github.com/hairyhenderson/gomplate/releases/download/v${GOMPLATE_VERSION}/gomplate_linux-amd64" && \
@@ -88,9 +91,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     ln -s /usr/bin/podman-remote /usr/bin/podman
 
-ARG CYPRESS_VERSION="13.13.2"
+ARG CYPRESS_VERSION="13.14.1"
 ENV CYPRESS_CACHE_FOLDER="/usr/local/lib/cypress"
-ENV NODE_OPTIONS="--max-old-space-size=4096"
 ENV NODE_PATH="/usr/local/lib/node_modules"
 RUN npm install --global "cypress@${CYPRESS_VERSION}"
 RUN chmod --recursive a+w "${CYPRESS_CACHE_FOLDER}"

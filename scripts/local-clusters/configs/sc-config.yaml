@@ -7,10 +7,12 @@ grafana:
     oidc:
       allowedDomains:
         - example.com
+    trailingDots: false
   user:
     oidc:
       allowedDomains:
         - example.com
+    trailingDots: false
 harbor:
   persistence:
     disableRedirect: true

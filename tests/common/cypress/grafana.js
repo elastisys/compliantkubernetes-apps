@@ -1,18 +1,24 @@
 // Available as cy.testGrafanaDashboard("grafana.example.com", "the names of the Grafana dashboard", "to look for and expandRows rows", "the no of completed api req to wait")
 Cypress.Commands.add('testGrafanaDashboard', (ingress, dashboardName, expandRows, requestsToWait) => {
+
   cy.intercept("/api/**")
     .as("api")
 
+  // View and load as much of the dashboard as possible
+  cy.viewport(1920, 2560)
+
   cy.visit(`https://${ingress}/dashboards`)
 
-  // View and load as much of the dashboard as possible
-  cy.viewport(2560, 2260)
-
   // The dashboard view in Grafana need a scroll action to load all the dashboard names
-  cy.contains('Kubernetes').trigger("wheel", { deltaY: -66.666666, wheelDelta: 120, wheelDeltaX: 0, wheelDeltaY: 120, bubbles: true})
+  cy.contains('Kubernetes')
+    .trigger("wheel", { deltaY: -66.666666, wheelDelta: 120, wheelDeltaX: 0, wheelDeltaY: 120, bubbles: true})
 
+  // Navigate to the dashboard
   cy.contains(dashboardName)
     .click()
+
+  // Wait for the dashboard to load
+  cy.contains(dashboardName)
 
   // Check that the datasource selector exists and is the default
   cy.get("form")

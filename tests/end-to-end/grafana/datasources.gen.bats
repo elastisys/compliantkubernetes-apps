@@ -3,7 +3,7 @@
 setup_file() {
   load "../../bats.lib.bash"
 
-  cypress_setup "${ROOT}/tests/end-to-end/grafana/grafana-datasources.cy.js"
+  cypress_setup "${ROOT}/tests/end-to-end/grafana/datasources.cy.js"
 }
 
 setup() {
@@ -12,7 +12,7 @@ setup() {
 }
 
 teardown_file() {
-  cypress_teardown "${ROOT}/tests/end-to-end/grafana/grafana-datasources.cy.js"
+  cypress_teardown "${ROOT}/tests/end-to-end/grafana/datasources.cy.js"
 }
 
 @test "grafana admin datasources has prometheus" {

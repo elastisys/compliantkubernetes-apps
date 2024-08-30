@@ -3,7 +3,7 @@
 setup_file() {
   load "../../bats.lib.bash"
 
-  cypress_setup "${ROOT}/tests/end-to-end/grafana/grafana-dashboards.cy.js"
+  cypress_setup "${ROOT}/tests/end-to-end/grafana/dashboards.cy.js"
 }
 
 setup() {
@@ -12,7 +12,7 @@ setup() {
 }
 
 teardown_file() {
-  cypress_teardown "${ROOT}/tests/end-to-end/grafana/grafana-dashboards.cy.js"
+  cypress_teardown "${ROOT}/tests/end-to-end/grafana/dashboards.cy.js"
 }
 
 @test "grafana admin dashboards open the Backup status dashboard" {

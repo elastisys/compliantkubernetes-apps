@@ -1,4 +1,4 @@
-import "../common/cypress/grafana.js"
+import "../../common/cypress/grafana.js"
 
 describe("grafana admin dashboards", function() {
   before(function() {
