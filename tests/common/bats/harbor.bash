@@ -258,10 +258,10 @@ harbor.create_pull_secret() {
   with_kubeconfig "${1}"
   with_namespace "${2}"
 
-  kubectl -n "${NAMESPACE}" create secret ctr-registry pull-secret \
-    "--ctr-server=${harbor_endpoint}" \
-    "--ctr-username=${harbor_robot_fullname}" \
-    "--ctr-password=$(<"${harbor_robot_secret_path}")"
+  kubectl -n "${NAMESPACE}" create secret docker-registry pull-secret \
+    "--docker-server=${harbor_endpoint}" \
+    "--docker-username=${harbor_robot_fullname}" \
+    "--docker-password=$(<"${harbor_robot_secret_path}")"
 
   kubectl -n "${NAMESPACE}" patch serviceaccount default -p '{"imagePullSecrets": [{"name": "pull-secret"}]}'
 }
