@@ -1,0 +1,48 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: velero-test
+  namespace: velero-test
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: velero-test
+  namespace: velero-test
+spec:
+  containers:
+  - image: ${image}
+    args:
+      - sleep
+      - "3600"
+    name: velero-test
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    securityContext:
+      runAsUser: 1000
+    volumeMounts:
+      - name: velero-test
+        mountPath: /test
+  volumes:
+    - name: velero-test
+      persistentVolumeClaim:
+        claimName: velero-test
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: velero-test
+  namespace: velero-test
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

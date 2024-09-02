@@ -1,0 +1,45 @@
+#!/usr/bin/env bats
+
+{{- define "template" -}}
+#!/usr/bin/env bats
+
+# Generated from {{ tmpl.Path }}
+
+setup() {
+  load "../../bats.lib.bash"
+  load_assert
+  load "./common.bash"
+}
+
+@test "velero backup spec {{ .cluster }}" {
+  run velero_backups_spec {{ .cluster }}
+  assert_success
+  assert_output "$(cat "${BATS_TEST_DIRNAME}/resources/backup-spec-{{ .cluster }}.yaml")"
+}
+
+@test "velero backup and restore {{ .cluster }}" {
+  backup_name="test-backup-$(date +%s)"
+  restore_name="test-restore-$(date +%s)"
+
+  run velero_backup_create {{ .cluster }} "${backup_name}"
+  assert_success
+
+  run velero_backup_get_phase {{ .cluster }} "${backup_name}"
+  assert_success
+  assert_output Completed
+
+  run velero_restore_create {{ .cluster }} "${restore_name}" "${backup_name}"
+  assert_success
+
+  run velero_restore_get_phase {{ .cluster }} "${restore_name}"
+  assert_success
+  assert_output Completed
+}
+{{ end }}
+
+# These tests are generated into these files:
+{{- range $cluster := coll.Slice "sc" "wc" }}
+{{- $file := path.Join (tmpl.Path | path.Dir) (printf "./backup-restore-%s.gen.bats" $cluster) }}
+# - {{ $file }}
+{{- coll.Dict "cluster" $cluster | tmpl.Exec "template" | file.Write $file }}
+{{- end }}
