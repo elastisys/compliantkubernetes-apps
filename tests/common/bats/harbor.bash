@@ -29,10 +29,6 @@ harbor.load_env() {
   harbor_secure="$(yq.get sc '.global.verifyTls')"
   export harbor_secure
 
-  if [[ "${harbor_secure}" != "true" ]]; then
-    export ctr_insecure="true"
-  fi
-
   harbor_endpoint="$(yq.get sc '.harbor.subdomain + "." + .global.baseDomain')"
   export harbor_endpoint
 
@@ -57,7 +53,11 @@ harbor.setup_user_demo_image() {
   export user_demo_image="${harbor_endpoint}/${harbor_project}/user-demo:test"
 
   ctr build "${user_demo}" -t "${user_demo_image}"
-  ctr push "$(ctr.insecure)" "${user_demo_image}"
+  if [[ "${harbor_secure}" != "true" ]]; then
+    ctr.insecure push "${user_demo_image}"
+  else
+    ctr push "${user_demo_image}"
+  fi
 }
 
 # Expects variables to be set with harbor.load_env
@@ -70,13 +70,21 @@ harbor.setup_project() {
   jq -r .id <<< "${output}" > "${harbor_robot_id_path}"
   jq -r .secret <<< "${output}" > "${harbor_robot_secret_path}"
 
-  ctr login "$(ctr.insecure)" --username "${harbor_robot_fullname}" --password-stdin "${harbor_endpoint}" < "${harbor_robot_secret_path}"
+  if [[ "${harbor_secure}" != "true" ]]; then
+    ctr.insecure login --username "${harbor_robot_fullname}" --password-stdin "${harbor_endpoint}" < "${harbor_robot_secret_path}"
+  else
+    ctr login --username "${harbor_robot_fullname}" --password-stdin "${harbor_endpoint}" < "${harbor_robot_secret_path}"
+  fi
 }
 
 # Expects variables to be set with harbor.load_env
 harbor.teardown_project() {
   # Allow failure
-  ctr logout "${harbor_endpoint}" || true
+  if [[ "${harbor_secure}" != "true" ]]; then
+    ctr.insecure logout "${harbor_endpoint}" || true
+  else
+    ctr logout "${harbor_endpoint}" || true
+  fi
 
   readarray -t robots < <(harbor.get_robots "${harbor_project}" | jq -r '.[].id')
   if [[ -n "${robots[*]}" ]]; then
