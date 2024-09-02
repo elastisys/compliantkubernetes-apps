@@ -102,5 +102,11 @@ RUN curl -LOs "https://github.com/kubernetes-sigs/kind/releases/download/v${KIND
     install -Tm 755 kind-linux-amd64 /usr/local/bin/kind && \
     rm kind-linux-amd64
 
+ARG VELERO_VERSION="1.13.0"
+RUN curl -LOs "https://github.com/vmware-tanzu/velero/releases/download/v${VELERO_VERSION}/velero-v${VELERO_VERSION}-linux-amd64.tar.gz" && \
+  tar -zxvf "velero-v${VELERO_VERSION}-linux-amd64.tar.gz" "velero-v${VELERO_VERSION}-linux-amd64" && \
+  install -Tm 755 "velero-v${VELERO_VERSION}-linux-amd64/velero" /usr/local/bin/velero && \
+  rm -r "velero-v${VELERO_VERSION}-linux-amd64.tar.gz" "velero-v${VELERO_VERSION}-linux-amd64"
+
 ENV DOCS_PATH="/usr/local/share/docs"
 RUN git clone --depth 1 https://github.com/elastisys/compliantkubernetes.git "${DOCS_PATH}"

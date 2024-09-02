@@ -1,0 +1,40 @@
+csiSnapshotTimeout: 0s
+excludedNamespaces:
+  - cert-manager
+  - falco
+  - fluentd
+  - hnc-system
+  - ingress-nginx
+  - kube-node-lease
+  - kube-public
+  - kube-system
+  - kured
+  - monitoring
+  - rook-ceph
+  - velero
+  - gatekeeper-system
+  - jaeger-system
+  - postgres-system
+  - rabbitmq-system
+  - redis-system
+excludedResources:
+  - clustercompliancereports.aquasecurity.github.io
+  - clusterconfigauditreports.aquasecurity.github.io
+  - clusterinfraassessmentreports.aquasecurity.github.io
+  - clusterrbacassessmentreports.aquasecurity.github.io
+  - clustersbomreports.aquasecurity.github.io
+  - configauditreports.aquasecurity.github.io
+  - exposedsecretreports.aquasecurity.github.io
+  - infraassessmentreports.aquasecurity.github.io
+  - rbacassessmentreports.aquasecurity.github.io
+  - sbomreports.aquasecurity.github.io
+  - vulnerabilityreports.aquasecurity.github.io
+hooks: {}
+itemOperationTimeout: 0s
+labelSelector:
+  matchExpressions:
+    - key: compliantkubernetes.io/nobackup
+      operator: DoesNotExist
+metadata: {}
+storageLocation: default
+ttl: 720h0m0s
