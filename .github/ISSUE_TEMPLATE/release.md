@@ -66,7 +66,7 @@ assignees: ""
 
 - [ ] Successful `./bin/ck8s test sc|wc`
 - [ ] From `tests/` successful `make build-main`
-- [ ] From `tests/` successful `make ctr-run-end-to-end`
+- [ ] From `tests/` successful `make run-end-to-end`
 
 ### Kubernetes access
 
@@ -715,7 +715,7 @@ Follow the public disaster recovery documentation to take backups:
 
 - [ ] Successful `./bin/ck8s test sc|wc`
 - [ ] From `tests/` successful `make build-main`
-- [ ] From `tests/` successful `make ctr-run-end-to-end`
+- [ ] From `tests/` successful `make run-end-to-end`
 
 ### Kubernetes access
 
