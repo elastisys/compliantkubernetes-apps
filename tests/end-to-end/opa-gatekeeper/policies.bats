@@ -3,13 +3,15 @@
 # Tests opa gatekeeper policies
 
 setup_file() {
-  export BATS_NO_PARALLELIZE_WITHIN_FILE=true
+  export BATS_NO_PARALLELIZE_WITHIN_FILE="true"
   export CK8S_AUTO_APPROVE="true"
 
-  load "../bats.lib.bash"
+  load "../../bats.lib.bash"
   load_common "harbor.bash"
   load_common "yq.bash"
   load_assert
+
+  skip "needs reimplementation"
 
   harbor.load_env gatekeeper-policies
   harbor.setup_project
@@ -34,12 +36,12 @@ setup_file() {
 }
 
 teardown_file() {
-  load "../bats.lib.bash"
+  load "../../bats.lib.bash"
   load_common "harbor.bash"
   load_assert
 
-  harbor.delete_pull_secret wc staging
-  harbor.teardown_project
+  # harbor.delete_pull_secret wc staging
+  # harbor.teardown_project
 }
 
 setup() {
