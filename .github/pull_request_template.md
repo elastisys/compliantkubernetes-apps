@@ -69,6 +69,14 @@ How to run / how to test.
 Include screenshots if applicable to help explain these changes.
 --->
 
+#### Documentation update
+
+- [ ] I have checked the public docs and no updates are needed
+- [ ] I have checked the public docs and some updates are needed, PR is linked below
+<!--
+Link to the related public docs PR if needed.
+-->
+
 #### Checklist
 
 <!-- This section is not added to the changelog or release notes, it is to help you as a contributor and reviewers. -->
