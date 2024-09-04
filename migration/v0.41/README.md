@@ -82,6 +82,24 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s upgrade wc v0.41 apply
     ```
 
+1. For `dev` and `prod` flavours: The default network policies for cert-manager has changed, and now it is allowed egress to:
+
+    - `0.0.0.0/0:53/udp`
+    - `0.0.0.0/0:53/tcp`
+    - `0.0.0.0/0:80/tcp`
+    - `0.0.0.0/0:443/tcp`
+
+    To allow it to perform any DNS-01 or HTTP-01 challenge by default.
+    If you have previously overridden it you can remove the overrides to opt into the new defaults, and if you want to restrict it you need to configure the network policies manually.
+
+    To remove previous overrides:
+
+    ```bash
+    yq4 -i 'del(.networkPolicies.certManager)' "${CK8S_CONFIG_PATH}/common-config.yaml"
+    yq4 -i 'del(.networkPolicies.certManager)' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+    yq4 -i 'del(.networkPolicies.certManager)' "${CK8S_CONFIG_PATH}/wc-config.yaml"
+    ```
+
 1. If Tekton is enabled, ensure to add appropriate network policies for the pipeline.
 
   To check if the tekton is enabled, run the following command

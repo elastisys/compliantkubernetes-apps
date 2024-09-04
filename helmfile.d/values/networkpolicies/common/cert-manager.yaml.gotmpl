@@ -31,6 +31,16 @@ policies:
           ports:
             - tcp: 443
         {{- end }}
+        {{- with .Values | get "networkPolicies.certManager.http01.ips" list }}
+        - name: egress-rule-http01
+          peers:
+            {{- range . }}
+            - cidr: {{ . }}
+            {{- end }}
+          ports:
+            - tcp: 443
+            - tcp: 80
+        {{- end }}
         {{- with .Values | get "networkPolicies.certManager.dns01.ips" list }}
         - name: egress-rule-dns01
           peers:

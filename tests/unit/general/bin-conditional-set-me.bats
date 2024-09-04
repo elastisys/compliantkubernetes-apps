@@ -11,7 +11,7 @@ setup_file() {
   gpg.setup
   env.setup
 
-  env.init baremetal kubespray dev --skip-issuers --skip-network-policies
+  env.init baremetal kubespray air-gapped --skip-issuers --skip-network-policies
 }
 
 teardown_file() {
@@ -101,11 +101,11 @@ _refute_condition_and_warn() {
 # bats test_tags=conditional_set_me_slack_alerts
 @test "conditional-set-me - singular conditions: slack alerts" {
 
-  yq.set common .alerts.alertTo \"slack\"
+  yq.set sc .alerts.alertTo \"slack\"
   run _apply_normalise_sc
   _assert_condition_and_warn .\"alerts\".\"slack\".\"channel\"
 
-  yq.set common .alerts.alertTo \"\"
+  yq.set sc .alerts.alertTo \"\"
   run _apply_normalise_sc
   _refute_condition_and_warn .\"alerts\".\"slack\".\"channel\"
 }

@@ -1048,6 +1048,9 @@ networkPolicies:
     letsencrypt:
       ips:
         - set-me-if-(.networkPolicies.certManager.enabled)
+    # Configure this if HTTP-01 challenges need to be enabled in cert-manager for other endpoints than the ingress-controller
+    http01:
+      ips: []
     # Configure this if DNS-01 challenges are enabled in cert-manager
     dns01:
       ips: []

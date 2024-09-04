@@ -6,3 +6,16 @@ prometheus:
     size: 15Gi
   retention:
     size: 12GiB
+
+networkPolicies:
+  # ADR: https://elastisys.io/compliantkubernetes/adr/0051-open-cert-manager-netpols/
+  certManager:
+    letsencrypt:
+      ips:
+        - 0.0.0.0/0
+    http01:
+      ips:
+        - 0.0.0.0/0
+    dns01:
+      ips:
+        - 0.0.0.0/0
