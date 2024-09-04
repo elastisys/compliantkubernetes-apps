@@ -11,10 +11,10 @@ usage() {
     log_info ""
     log_info "Collects diagnostics from the current environment set by CK8S_CONFIG_PATH and"
     log_info "store them in a file in the CK8S_CONFIG_PATH directory encrypted with SOPS using"
-    log_info "either any GPG keys found in CK8S_CONFIG_PATH/.sops.yaml (default), by"
-    log_info "GPG keys found in sops file provided with the \"--sops-config\" flag, or"
-    log_info "set by the environment variable CK8S_PGP_FP. CK8S_PGP_FP variable takes precedence"
-    log_info "over the rest."
+    log_info "by default GPG keys found in CK8S_CONFIG_PATH/diagnostics_receiver.gpg."
+    log_info "The \"--sops-config\" flag can be used to override and use a custom sops file,"
+    log_info "or by setting the CK8S_PGP_FP environment variable. If CK8S_PGP_FP is set it"
+    log_info "takes precedence over the rest."
     log_info ""
     log_info "Commands:"
     log_info "     namespace                     run diagnostics for specified namespace only"
@@ -28,47 +28,17 @@ usage() {
     exit 1
 }
 
-include_config=false
-cluster="${1}"
-sub_command=""
-command_arg=""
+log_self_managed_noticed() {
+    local sops_config="${1}"
+    log_warning "WARNING: Notice for self-managed customers:"
+    log_warning "WARNING: using ${sops_config} instead\n"
 
-shift
-
-while [ "${#}" -gt 0 ] ; do
-    case "${1}" in
-        --include-config)
-            include_config=true
-            ;;
-        -h | --help)
-            usage
-            ;;
-        --sops-config)
-            [[ ${#} -lt 2 || "${2}" = -* ]] && log_error "error: no file provided with --sops-config flag" && usage
-            [[ -n "${CK8S_PGP_FP:-}" ]] && log_warning "CK8S_PGP_FP is set, ignoring file set by \"--sops-config\""
-            sops_config="${2}"
-            shift
-            ;;
-        namespace|query-default-metrics-since|query-metric)
-            [[ ${#} -ge 2 && "${2}" != -* && -z "$sub_command" ]] || usage
-        *)
-            log_error "error: invalid argument: \"${1:-}\""
-            usage
-            ;;
-    esac
-    shift
-done
-
-if [ -z "${CK8S_PGP_FP:-}" ]; then
-    [[ ! -f "${sops_config}" ]] && log_error "error: file  \"${sops_config}\" not found" && usage
     fingerprints=$(yq4 '.creation_rules[].pgp' "${sops_config}")
-    echo "$fingerprints"
 
-    log_warning "Notice for self-managed customers:"
-    echo -e "\tEncrypting using the fingerprints: $fingerprints." 1>&2
-    echo -e "\tIf you want to send diagnostic data to Elastisys, make sure to do:\n" 1>&2
-
-    echo -e "\tCK8S_PGP_FP=<fingerprint provided during onboarding> ./bin/ck8s diagnostics [sc|wc]\n" 1>&2
+    echo -e "\tEncrypting using the fingerprints: $fingerprints.\n" 1>&2
+    echo -e "\tIf you want to send diagnostic data to Elastisys, make sure to store fingerprints " 1>&2
+    echo -e "\tretrieved during onboarding in a file named:\n" 1>&2
+    echo -e "\t${CK8S_CONFIG_PATH}/diagnostics_receiver.gpg\n" 1>&2
 
     echo -e "\tIf in doubt, contact support@elastisys.com." 1>&2
 
@@ -77,6 +47,71 @@ if [ -z "${CK8S_PGP_FP:-}" ]; then
     if [[ ! "${reply}" =~ ^[yY]$ ]]; then
         exit 1
     fi
+}
+
+validate_sops_file() {
+    local sops_config="${1}"
+    if [[ ! -f "${sops_config}" ]]; then
+        log_error "error: file \"${sops_config}\" not found"
+        usage
+    fi
+    fingerprints=$(yq4 '.creation_rules[].pgp' "${sops_config}")
+    if [[ -z "${fingerprints}" ]]; then
+        log_error "error: no fingerprints found in file ${sops_config}"
+        usage
+    fi
+}
+
+include_config=false
+sops_config_flag=false
+cluster="${1}"
+sub_command=""
+command_arg=""
+
+shift
+
+while [ "${#}" -gt 0 ] ; do
+    case "${1}" in
+        -h | --help)
+            usage
+            ;;
+        --include-config)
+            include_config=true
+            ;;
+        --sops-config)
+            [[ ${#} -ge 2 && "${2}" != -* ]] || (log_error "error: no file provided with --sops-config flag" && usage)
+            if [[ -n "${CK8S_PGP_FP:-}" ]]; then
+                log_warning "CK8S_PGP_FP is set, ignoring \"--sops-config\" flag"
+            else
+                validate_sops_file "${2}"
+                sops_config="${2}"
+                sops_config_flag=true
+            fi
+            shift
+            ;;
+        namespace|query-default-metrics-since|query-metric)
+            [[ ${#} -ge 2 && "${2}" != -* && -z "$sub_command" ]] || usage
+            sub_command="${1:-}"
+            command_arg="${2:-}"
+            shift
+            ;;
+        *)
+            log_error "error: invalid argument: \"${1:-}\""
+            usage
+            ;;
+    esac
+    shift
+done
+
+if [[ -z "${CK8S_PGP_FP:-}" ]]; then
+    if [[ -f "${CK8S_CONFIG_PATH}/diagnostics_receiver.gpg" ]] && [[ "${sops_config_flag}" == false ]]; then
+        sops_config="${CK8S_CONFIG_PATH}/diagnostics_receiver.gpg"
+    else
+        log_self_managed_noticed "${sops_config}"
+    fi
+    validate_sops_file "${sops_config}"
+else
+    log_info "Using fingerprints set by CK8S_PGP_FP"
 fi
 
 file="${CK8S_CONFIG_PATH}/diagnostics-${cluster}-$(date +%y%m%d%H%M%S).log"
