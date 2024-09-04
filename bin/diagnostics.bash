@@ -11,10 +11,8 @@ usage() {
     log_info ""
     log_info "Collects diagnostics from the current environment set by CK8S_CONFIG_PATH and"
     log_info "store them in a file in the CK8S_CONFIG_PATH directory encrypted with SOPS using"
-    log_info "by default GPG keys found in CK8S_CONFIG_PATH/diagnostics_receiver.gpg."
-    log_info "The \"--sops-config\" flag can be used to override and use a custom sops file,"
-    log_info "or by setting the CK8S_PGP_FP environment variable. If CK8S_PGP_FP is set it"
-    log_info "takes precedence over the rest."
+    log_info "by default GPG keys found in CK8S_CONFIG_PATH/diagnostics_receiver.gpg or by"
+    log_info "setting the CK8S_PGP_FP environment variable manually."
     log_info ""
     log_info "Commands:"
     log_info "     namespace                     run diagnostics for specified namespace only"
@@ -24,43 +22,11 @@ usage() {
     log_info "Global options:"
     log_info " -h, --help                        display help for this command and exit"
     log_info "     --include-config              include config yaml files found in CK8S_CONFIG_PATH"
-    log_info "     --sops-config <file>          path to sops config file, see example filehttps://github.com/getsops/sops/blob/main/.sops.yaml"
     exit 1
 }
 
-log_self_managed_noticed() {
-    local sops_config="${1}"
-    log_warning "WARNING: Notice for self-managed customers:"
-
-    fingerprints=$(yq4 '.creation_rules[].pgp' "${sops_config}")
-
-    echo -e "\tEncrypting using the fingerprints: $fingerprints.\n" 1>&2
-    echo -e "\tIf you want to send diagnostic data to Elastisys, make sure to use fingerprints retrieved during onboarding," 1>&2
-    echo -e "\tthe fingerprints should be stored in a file named:\n" 1>&2
-    echo -e "\t\${CK8S_CONFIG_PATH}/diagnostics_receiver.gpg\n" 1>&2
-
-    echo -e "\tIf in doubt, contact support@elastisys.com\n" 1>&2
-
-    if ! "${CK8S_AUTO_APPROVE}"; then
-        ask_abort
-    fi
-}
-
-validate_sops_file() {
-    local sops_config="${1}"
-    if [[ ! -f "${sops_config}" ]]; then
-        log_error "error: file \"${sops_config}\" not found"
-        usage
-    fi
-    fingerprints=$(yq4 '.creation_rules[].pgp' "${sops_config}")
-    if [[ -z "${fingerprints}" ]]; then
-        log_error "error: no fingerprints found in file ${sops_config}"
-        usage
-    fi
-}
-
+gpg_file="${CK8S_CONFIG_PATH}/diagnostics_receiver.gpg"
 include_config=false
-sops_config_flag=false
 cluster="${1}"
 sub_command=""
 command_arg=""
@@ -75,17 +41,6 @@ while [ "${#}" -gt 0 ] ; do
         --include-config)
             include_config=true
             ;;
-        --sops-config)
-            [[ ${#} -ge 2 && "${2}" != -* ]] || (log_error "error: no file provided with --sops-config flag" && usage)
-            if [[ -n "${CK8S_PGP_FP:-}" ]]; then
-                log_warning "CK8S_PGP_FP is set, ignoring \"--sops-config\" flag"
-            else
-                validate_sops_file "${2}"
-                sops_config="${2}"
-                sops_config_flag=true
-            fi
-            shift
-            ;;
         namespace|query-default-metrics-since|query-metric)
             [[ ${#} -ge 2 && "${2}" != -* && -z "$sub_command" ]] || usage
             sub_command="${1:-}"
@@ -93,24 +48,53 @@ while [ "${#}" -gt 0 ] ; do
             shift
             ;;
         *)
-            log_error "error: invalid argument: \"${1:-}\""
+            log_error "ERROR: invalid argument: \"${1:-}\""
             usage
             ;;
     esac
     shift
 done
 
-if [[ -z "${CK8S_PGP_FP:-}" ]]; then
-    if [[ -f "${CK8S_CONFIG_PATH}/diagnostics_receiver.gpg" ]] && [[ "${sops_config_flag}" == false ]]; then
-        sops_config="${CK8S_CONFIG_PATH}/diagnostics_receiver.gpg"
-    else
-        log_self_managed_noticed "${sops_config}"
-    fi
-    validate_sops_file "${sops_config}"
-fi
+log_self_managed_notice() {
+    log_warning "WARNING: Notice for self-managed customers:"
 
-file="${CK8S_CONFIG_PATH}/diagnostics-${cluster}-$(date +%y%m%d%H%M%S).log"
-touch "${file}"
+    echo -e "\tIf you want to send diagnostic data to Elastisys, make sure to store GPG keys" 1>&2
+    echo -e "\tretrieved during onboarding in a file named:\n" 1>&2
+    echo -e "\t\${CK8S_CONFIG_PATH}/diagnostics_receiver.gpg\n" 1>&2
+
+    echo -e "\tIf in doubt, contact support@elastisys.com\n" 1>&2
+
+    usage
+}
+
+import_gpg_file() {
+    local fingerprints
+    local gpg_file="${1}"
+    if [[ ! -f "${CK8S_CONFIG_PATH}/diagnostics_receiver.gpg" ]]; then
+        log_error "ERROR: file \"${gpg_file}\" not found"
+        log_self_managed_notice
+    fi
+    log_info "Attempting to import GPG keys from ${gpg_file}"
+
+    if ! gpg --import "${gpg_file}"; then
+        log_error "ERROR: Could not import GPG keys from ${gpg_file}"
+        log_self_managed_notice
+    fi
+
+    # get only fingerprints used for encryption
+    mapfile -t fingerprints < <(gpg --with-colons --import-options show-only --import --fingerprint "${CK8S_CONFIG_PATH}/diagnostics_receiver.gpg" | awk -F: '
+        /^fpr/ {
+            if (!main_fpr) {
+                print $10;
+                main_fpr = 1;
+            }
+        }
+        /^pub/ {
+            main_fpr = 0;
+        }'
+    )
+    CK8S_PGP_FP=$(IFS=, ; echo "${fingerprints[*]}")
+}
 
 sops_encrypt_file() {
     if [ -z "${CK8S_PGP_FP:-}" ]; then
@@ -126,7 +110,7 @@ sops_encrypt_file() {
 fetch_oidc_token() {
     # shellcheck disable=SC2016
     readarray -t args <<< "$(yq4 '. as $root | ($root.contexts[] | select(.name == $root.current-context) | .context) as $context | ($root.users[] | select(.name == $context.user) | .user) as $user | $user.exec.args[]' "${config["kube_config_sc"]}")"
-    [[ "${args[0]}" == "oidc-login" ]] || log_fatal "Error: This command requires the kubeconfig to use OIDC"
+    [[ "${args[0]}" == "oidc-login" ]] || log_fatal "ERROR: This command requires the kubeconfig to use OIDC"
     kubectl "${args[@]}" | yq4 '.status.token'
 }
 
@@ -435,6 +419,15 @@ run_diagnostics_query_metric() {
 
     curl "${endpoint}/query" -k --header "${header}" --data-urlencode query="${1}" | jq
 }
+
+if [[ -z "${CK8S_PGP_FP:-}" ]]; then
+    import_gpg_file "${gpg_file}"
+fi
+log_info "Using the following fingerprints:"
+log_info "${CK8S_PGP_FP}"
+
+file="${CK8S_CONFIG_PATH}/diagnostics-${cluster}-$(date +%y%m%d%H%M%S).log"
+touch "${file}"
 
 config_load "${cluster}"
 log_info "Running diagnostics..."
