@@ -120,18 +120,18 @@ run_diagnostics() {
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     if [ -d "${CK8S_CONFIG_PATH}/capi" ]; then
         # shellcheck disable=SC2002
-        capi_version=$(cat "${CK8S_CONFIG_PATH}"/capi/defaults/values.yaml | yq4 '.clusterApiVersion')
+        capi_version=$(cat "${CK8S_CONFIG_PATH}/capi/defaults/values.yaml" | yq4 '.clusterApiVersion')
         echo "CAPI version: ${capi_version}"
-    elif [ -d "${CK8S_CONFIG_PATH}/sc-config" ]; then
+    elif [ -d "${CK8S_CONFIG_PATH}/${cluster}-config" ]; then
         # shellcheck disable=SC2002
-        kubespray_version=$(cat "${CK8S_CONFIG_PATH}"/sc-config/group_vars/all/ck8s-kubespray-general.yaml | yq4 '.ck8sKubesprayVersion')
+        kubespray_version=$(cat "${CK8S_CONFIG_PATH}/${cluster}-config/group_vars/all/ck8s-kubespray-general.yaml" | yq4 '.ck8sKubesprayVersion')
         echo "Kubespray version: ${kubespray_version}"
     else
         echo "Can't find config directory"
     fi
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     # shellcheck disable=SC2002
-    apps_version=$(cat "${CK8S_CONFIG_PATH}"/defaults/common-config.yaml | yq4 '.global.ck8sVersion')
+    apps_version=$(cat "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" | yq4 '.global.ck8sVersion')
     echo "Apps version: ${apps_version}"
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     # -- Nodes --
@@ -219,7 +219,7 @@ run_diagnostics() {
     # -- Helm --
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     echo -e "\nFetching Helm releases that are not deployed (<helm>)"
-    helm=$("${here}"/ops.bash helm wc list -A --all -o yaml | yq4 '.[] | select(.status != "deployed")')
+    helm=$("${here}"/ops.bash helm "${cluster}" list -A --all -o yaml | yq4 '.[] | select(.status != "deployed")')
     if [ -z "${helm}" ]; then
         echo -e "All charts are deployed"
     else
