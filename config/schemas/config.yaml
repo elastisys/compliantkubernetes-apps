@@ -5897,6 +5897,14 @@ properties:
                   items:
                     type: string
                   default: []
+                loadBalancerIP:
+                  title: Load Balancer IP
+                  description: |-
+                    Configure the Load Balancer IP from the list of floating ip's created beforehand via openstack cli.
+
+                    This should be enabled when we want to have predefined ip's for the Load Balancer.
+                  type: string
+                  default: ""
                 nodePorts:
                   title: Node Ports
                   description: Configure the node ports to allocate for the Service.
