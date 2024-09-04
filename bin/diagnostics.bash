@@ -31,16 +31,15 @@ usage() {
 log_self_managed_noticed() {
     local sops_config="${1}"
     log_warning "WARNING: Notice for self-managed customers:"
-    log_warning "WARNING: using ${sops_config} instead\n"
 
     fingerprints=$(yq4 '.creation_rules[].pgp' "${sops_config}")
 
     echo -e "\tEncrypting using the fingerprints: $fingerprints.\n" 1>&2
-    echo -e "\tIf you want to send diagnostic data to Elastisys, make sure to store fingerprints " 1>&2
-    echo -e "\tretrieved during onboarding in a file named:\n" 1>&2
-    echo -e "\t${CK8S_CONFIG_PATH}/diagnostics_receiver.gpg\n" 1>&2
+    echo -e "\tIf you want to send diagnostic data to Elastisys, make sure to use fingerprints retrieved during onboarding," 1>&2
+    echo -e "\tthe fingerprints should be stored in a file named:\n" 1>&2
+    echo -e "\t\${CK8S_CONFIG_PATH}/diagnostics_receiver.gpg\n" 1>&2
 
-    echo -e "\tIf in doubt, contact support@elastisys.com." 1>&2
+    echo -e "\tIf in doubt, contact support@elastisys.com\n" 1>&2
 
     if ! "${CK8S_AUTO_APPROVE}"; then
         ask_abort
