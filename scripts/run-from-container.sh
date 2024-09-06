@@ -63,7 +63,7 @@ else
 fi
 
 declare -a args
-args=("--rm")
+args=("--init" "--rm")
 
 if [[ -t 1 ]] && [[ -z "${CI:-}" ]]; then
   args+=("-it")
