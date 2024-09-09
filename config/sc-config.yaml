@@ -1101,7 +1101,7 @@ alerts:
   slack:
     channel: set-me-if-(.alerts.alertTo == "slack")
     # Alertmanager templating: https://prometheus.io/docs/alerting/notifications/
-    customTemplate: {}
+    customTemplate: ""
     ## Example:
     # customTemplate: |-
     #   *Common summary:* {{ .CommonAnnotations.summary }}
