@@ -1124,6 +1124,13 @@ nodeLocalDns:
   #      loop
   #      forward . 127.0.0.1:9005
   #      }
+
+  # Configure .53 host zone
+  hostZone:
+    extraConfig: "" #|
+    #   template ANY ANY {
+    #     rcode NXDOMAIN
+    #   }
   resources:
     limits:
       cpu: 100m

@@ -9,6 +9,12 @@ resources:
     cpu: 25m
     memory: 40Mi
 
+hostZone:
+  extraConfig: #|
+    # template ANY ANY {
+    #   rcode NXDOMAIN
+    # }
+
 
 # See docs for details about the config format and options:
 # https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/#coredns-configmap-options

@@ -10,3 +10,8 @@ customConfig: {{ toYaml .Values.nodeLocalDns.customConfig }}
 {{- end }}
 
 resources: {{- toYaml .Values.nodeLocalDns.resources | nindent 2 }}
+
+{{- if dig "nodeLocalDns" "hostZone" "extraConfig" false .Values }}
+hostZone:
+  extraConfig: {{ toYaml .Values.nodeLocalDns.hostZone.extraConfig | nindent 4}}
+{{- end }}
