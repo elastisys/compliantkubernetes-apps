@@ -98,6 +98,9 @@ data:
         errors {
           {{ .Values.errorConfig }}
         }
+        {{- with .Values.hostZone.extraConfig }}
+        {{- . | nindent 8 }}
+        {{- end }}
         cache 30
         reload
         loop

@@ -6858,6 +6858,26 @@ properties:
               loop
               forward . 127.0.0.1:9005
             }
+      hostZone:
+        title: Host zone for node-local-dns
+        description: Configure the host zone for node-local-dns
+        type: object
+        additionalProperties: false
+        properties:
+          extraConfig:
+            title: Extra config for host zone
+            description: |-
+              Configure extra config for the host zone .53 for node-local-dns.
+
+              > [!note]
+              > See [the upstream documentation](https://coredns.io/manual/configuration/) for reference.
+            type: string
+            default: ""
+            examples:
+              - |-
+                template ANY ANY {
+                  rcode NXDOMAIN
+                }
       resources:
         $ref: '#/$defs/kubernetesResourceRequirements'
   externalDns:
