@@ -13,4 +13,5 @@ metadata:
   annotations:
     kubernetes.io/service-account.name: "{{ $serviceAccount }}"
 type: kubernetes.io/service-account-token
+---
 {{- end }}
