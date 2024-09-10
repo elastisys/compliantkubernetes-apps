@@ -127,6 +127,9 @@ controller:
     {{- with .Values | get "ingressNginx.controller.service.clusterIP" "" }}
     clusterIP: {{ . }}
     {{- end }}
+    {{- with .Values | get "ingressNginx.controller.service.loadBalancerIP" "" }}
+    loadBalancerIP: {{ . }}
+    {{- end }}
 
   metrics:
     enabled: true
