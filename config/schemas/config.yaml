@@ -5900,9 +5900,10 @@ properties:
                 loadBalancerIP:
                   title: Load Balancer IP
                   description: |-
-                    Configure the Load Balancer IP from the list of floating ip's created beforehand via openstack cli.
+                    Configure the Load Balancer IP to use an existing IP if supported by the infrastructure provider.
 
-                    This should be enabled when we want to have predefined ip's for the Load Balancer.
+                    > [!important]
+                    > With OpenStack Octavia the floating IP can be created via the CLI beforehand, and one should set the annotation `loadbalancer.openstack.org/keep-floatingip: "true"` to prevent the floating IP to be deleted.
                   type: string
                   default: ""
                 nodePorts:
