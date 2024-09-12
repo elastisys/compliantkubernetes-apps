@@ -69,14 +69,6 @@ How to run / how to test.
 Include screenshots if applicable to help explain these changes.
 --->
 
-#### Documentation update
-
-- [ ] I have checked the public docs and no updates are needed
-- [ ] I have checked the public docs and some updates are needed, PR is linked below
-<!--
-Link to the related public docs PR if needed.
--->
-
 #### Checklist
 
 <!-- This section is not added to the changelog or release notes, it is to help you as a contributor and reviewers. -->
@@ -101,6 +93,9 @@ Link to the related public docs PR if needed.
   - [ ] The change requires migration steps
   - [ ] The change upgrades CRDs
   - [ ] The change updates the config *and* the schema
+- Documentation checks:
+  - [ ] The [public documentation](https://github.com/elastisys/compliantkubernetes) required no updates
+  - [ ] The [public documentation](https://github.com/elastisys/compliantkubernetes) required an update - [link to change](set-me\)
 - Metrics checks:
   - [ ] The metrics are still exposed and present in Grafana after the change
   - [ ] The metrics names didn't change (Grafana dashboards and Prometheus alerts are not affected)

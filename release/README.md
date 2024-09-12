@@ -139,17 +139,24 @@ release/generate-release-notes.sh X.Y.Z
 The public release notes are aimed towards application developers.
 Remove irrelevant entries and/or reword entries so that they are easy to understand for the application developers.
 
-### For major/minor releases
+### For major and minor releases
 
-In the [compliantkubernetes repo](https://github.com/elastisys/compliantkubernetes), create two new branches `release-vX.Y` and `<personal-tag>/release-vX.Y`.
-Add the release notes to `<personal-tag>/release-vX.Y` and then create two PRs, one to `release-vX.Y` and one to `main`.
+This will be done in two steps, first to add it to the main branch, second to create a new release branch.
+
+1. In the [elastisys/compliantkubernetes](https://github.com/elastisys/compliantkubernetes) repository, create a new branch `<personal-tag>/release-vX.Y.Z` from the `main` branch.
+    Then add the release notes to the `<personal-tag>/release-vX.Y.Z` and create a pull request to the `main` branch.
+
+1. When the pull-request is merged create a new branch `release-vX.Y` from the `main` branch and push it to create it.
 
 ### For patch releases
 
-In the [compliantkubernetes repo](https://github.com/elastisys/compliantkubernetes), create a new branch `<personal-tag>/release-vX.Y.Z` from the branch `release-vX.Y`.
-Add the release notes to `<personal-tag>/release-vX.Y.Z` and commit it.
-Create another branch `<personal-tag>/release-vX.Y.Z-main` from `main` and cherry-pick the commit you just created.
-Then, create a PR to `release-vX.Y` with your first branch and another to `main` with your second branch.
+This will be done in two steps, first to add it to the release branch, second to add it to the main branch.
+
+1. In the [elastisys/compliantkubernetes](https://github.com/elastisys/compliantkubernetes) repository, create a new branch `<personal-tag>/release-vX.Y.Z` from the `release-vX.Y` branch.
+    Then add the release notes to the `<personal-tag>/release-vX.Y.Z` and create a pull request to the `release-vX.Y` branch.
+
+1. When the first pull-request is merged create a new branch `<personal-tag>/release-vX.Y.Z-main` from the `main` branch.
+    Then cherry-pick the commit you did on the other branch and create pull request to the `main` branch.
 
 ## Update the main branch
 

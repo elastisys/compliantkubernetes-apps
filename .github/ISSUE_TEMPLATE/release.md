@@ -45,6 +45,7 @@ assignees: ""
   ```bash
   # configure
   yq4 -i '.grafana.user.oidc.allowedDomains += ["example.com"]' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq4 -i '.grafana.ops.oidc.allowedDomains += ["example.com"]' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   yq4 -i 'with(.opensearch.extraRoleMappings[]; with(select(.mapping_name != "all_access"); .definition.users += ["admin@example.com"]))' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   yq4 -i '.user.adminUsers += ["admin@example.com"]' "${CK8S_CONFIG_PATH}/wc-config.yaml"
   yq4 -i '.dex.enableStaticLogin = true' "${CK8S_CONFIG_PATH}/sc-config.yaml"
@@ -567,6 +568,7 @@ Follow the public disaster recovery documentation to perform restores from the p
   ```bash
   # configure
   yq4 -i '.grafana.user.oidc.allowedDomains += ["example.com"]' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+  yq4 -i '.grafana.ops.oidc.allowedDomains += ["example.com"]' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   yq4 -i 'with(.opensearch.extraRoleMappings[]; with(select(.mapping_name != "all_access"); .definition.users += ["admin@example.com"]))' "${CK8S_CONFIG_PATH}/sc-config.yaml"
   yq4 -i '.user.adminUsers += ["admin@example.com"]' "${CK8S_CONFIG_PATH}/wc-config.yaml"
   yq4 -i '.dex.enableStaticLogin = true' "${CK8S_CONFIG_PATH}/sc-config.yaml"
