@@ -65,7 +65,7 @@ kube-state-metrics:
   {{- end }}
 
   metricLabelsAllowlist:
-  - nodes=[topology.kubernetes.io/zone,elastisys.io/node-group]
+  - nodes=[topology.kubernetes.io/zone,elastisys.io/node-group,node.kubernetes.io/instance-type]
 
 prometheus-node-exporter:
   resources: {{- toYaml .Values.prometheusNodeExporter.resources | nindent 4 }}
