@@ -14,6 +14,9 @@ run() {
     if [[ "${CK8S_CLUSTER}" =~ ^(sc|both)$ ]]; then
       log_info "operation on service cluster"
       kubectl_delete sc deployment opensearch-system prometheus-opensearch-exporter
+      log_info "- Removing opensearch-configurer"
+      helmfile_destroy sc name=opensearch-configurer
+      log_info "- Upgrading Opensearch"
       helmfile_do sc -lapp=opensearch -lnetpol=service sync
     fi
     ;;
