@@ -75,6 +75,7 @@ teardown() {
   assert_output Completed
 
   delete_test_application
+  delete_test_namespace
 
   run velero_restore_create wc "${restore_name}" "${backup_name}"
   assert_success
@@ -83,6 +84,7 @@ teardown() {
   assert_success
   assert_output Completed
 
+  wait_test_namespace
   wait_test_application
 
   run kubectl -n velero-test exec velero-test -- test -f /test/hello
