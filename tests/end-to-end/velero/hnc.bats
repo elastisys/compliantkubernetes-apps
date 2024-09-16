@@ -4,6 +4,10 @@ create_test_namespace() {
   kubectl apply -f "${BATS_TEST_DIRNAME}/resources/test-namespace.yaml" --wait
 }
 
+wait_test_namespace() {
+  kubectl wait --for jsonpath='{.status.phase}'=Active namespace/velero-test
+}
+
 delete_test_namespace() {
   kubectl delete -f "${BATS_TEST_DIRNAME}/resources/test-namespace.yaml" --wait
 }
@@ -40,6 +44,7 @@ setup() {
   with_kubeconfig wc
 
   create_test_namespace
+  wait_test_namespace
 
   harbor.create_pull_secret wc velero-test
 
