@@ -60,7 +60,7 @@ teardown() {
   harbor.teardown_project
 }
 
-@test "velero backup and restore hns" {
+@test "velero backup and restore user application" {
   backup_name="test-backup-$(date +%s)"
   restore_name="test-restore-$(date +%s)"
 
