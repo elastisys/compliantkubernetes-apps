@@ -134,6 +134,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
+1. Upgrade Grafana and fix lookup volumeName templating issue:
+
+    ```bash
+    ./migration/v0.42/apply/10-upgrade-grafana.sh execute
+    ```
+
 1. Upgrade applications:
 
     ```bash
