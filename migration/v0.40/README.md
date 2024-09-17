@@ -2,6 +2,7 @@
 
 > [!WARNING]
 > Upgrade only supported from v0.39.x.
+> Do not upgrade from v0.39.2 to v0.40.0, use v0.40.1 instead.
 
 <!--
 Notice to developers on writing migration steps:
@@ -146,10 +147,10 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
-1. Upgrade prometheus-opensearch-exporter:
+1. Upgrade Opensearch:
 
     ```bash
-    ./migration/v0.40/apply/10-opensearch-exporter.sh execute
+    ./migration/v0.40/apply/10-upgrade-opensearch.sh execute
     ```
 
 1. Upgrade applications:
