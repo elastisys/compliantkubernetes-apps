@@ -93,6 +93,9 @@ Include screenshots if applicable to help explain these changes.
   - [ ] The change requires migration steps
   - [ ] The change upgrades CRDs
   - [ ] The change updates the config *and* the schema
+- Documentation checks:
+  - [ ] The [public documentation](https://github.com/elastisys/compliantkubernetes) required no updates
+  - [ ] The [public documentation](https://github.com/elastisys/compliantkubernetes) required an update - [link to change](set-me\)
 - Metrics checks:
   - [ ] The metrics are still exposed and present in Grafana after the change
   - [ ] The metrics names didn't change (Grafana dashboards and Prometheus alerts are not affected)
