@@ -1,10 +1,10 @@
 apiVersion: v2
-appVersion: 0.37.1
+appVersion: 0.38.2
 dependencies:
 - condition: falcosidekick.enabled
   name: falcosidekick
   repository: https://falcosecurity.github.io/charts
-  version: 0.7.11
+  version: 0.8.*
 - condition: collectors.kubernetes.enabled
   name: k8s-metacollector
   repository: https://falcosecurity.github.io/charts
@@ -25,4 +25,4 @@ maintainers:
 name: falco
 sources:
 - https://github.com/falcosecurity/falco
-version: 4.2.2
+version: 4.8.2

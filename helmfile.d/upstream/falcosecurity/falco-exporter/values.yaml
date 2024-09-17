@@ -170,13 +170,16 @@ serviceMonitor:
   # If the target does not respond within the specified timeout, Prometheus considers the scrape as failed for
   # that target.
   scrapeTimeout: ""
-
+    # -- aditionalProperties allows setting additional properties on the endpoint such as relabelings, metricRelabelings etc.
+  additionalProperties: {}
 # -- grafanaDashboard contains the configuration related to grafana dashboards.
 grafanaDashboard:
   # -- enabled specifies whether the dashboard should be deployed.
   enabled: false
-  # -- folder where the dashboard is stored by grafana.
+  # -- folder creates and set folderAnnotation to specify where the dashboard is stored in grafana.
   folder: ""
+  # -- folderAnnotation sets the annotation's name used by folderAnnotation in grafana's helm-chart.
+  folderAnnotation: "grafana_dashboard_folder"
   # -- namespace specifies the namespace for the configmap.
   namespace: default
   # -- prometheusDatasourceName name of the data source.
@@ -195,20 +198,25 @@ prometheusRules:
       enabled: true
       rate_interval: "5m"
       threshold: 0
+      for: "15m"
     error:
       enabled: true
       rate_interval: "5m"
       threshold: 0
+      for: "15m"
     critical:
       enabled: true
       rate_interval: "5m"
       threshold: 0
+      for: "15m"
     alert:
       enabled: true
       rate_interval: "5m"
       threshold: 0
+      for: "5m"
     emergency:
       enabled: true
       rate_interval: "1m"
       threshold: 0
+      for: "1m"
     additionalAlerts: {}

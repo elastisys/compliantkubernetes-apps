@@ -15,11 +15,11 @@ constraints:
         {{- if eq .Values.falco.driver.kind "ebpf" }}
         - pathPrefix: /sys/kernel/debug
         {{- else if eq .Values.falco.driver.kind "kmod" }}
-        - pathPrefix: /sys/module/falco
+        - pathPrefix: /sys/module
         {{- end }}
-        - pathPrefix: /var/run/docker.sock
-        - pathPrefix: /run/containerd/containerd.sock
-        - pathPrefix: /run/crio/crio.sock
+        - pathPrefix: /var/run/
+        - pathPrefix: /run/containerd/
+        - pathPrefix: /run/crio/
         - pathPrefix: /proc
         - pathPrefix: /var/run/falco
         volumes:

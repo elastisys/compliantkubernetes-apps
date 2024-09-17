@@ -377,7 +377,7 @@ Based on the user input it populates the driver configuration in the falco confi
 */}}
 {{- define "falco.engineConfiguration" -}}
 {{- if .Values.driver.enabled -}}
-{{- $supportedDrivers := list "kmod" "ebpf" "modern_ebpf" "gvisor" -}}
+{{- $supportedDrivers := list "kmod" "ebpf" "modern_ebpf" "gvisor" "auto" -}}
 {{- $aliasDrivers := list "module" "modern-bpf" -}}
 {{- if and (not (has .Values.driver.kind $supportedDrivers)) (not (has .Values.driver.kind $aliasDrivers)) -}}
 {{- fail (printf "unsupported driver kind: \"%s\". Supported drivers %s, alias %s" .Values.driver.kind $supportedDrivers $aliasDrivers) -}}
@@ -395,6 +395,9 @@ Based on the user input it populates the driver configuration in the falco confi
 {{- $root := printf "/host%s/k8s.io" .Values.driver.gvisor.runsc.root -}}
 {{- $gvisorConfig := dict "kind" "gvisor" "gvisor" (dict "config" "/gvisor-config/pod-init.json" "root" $root) -}}
 {{- $_ := set .Values.falco "engine" $gvisorConfig -}}
+{{- else if eq .Values.driver.kind "auto" -}}
+{{- $engineConfig := dict "kind" "modern_ebpf" "kmod" (dict "buf_size_preset" .Values.driver.kmod.bufSizePreset "drop_failed_exit" .Values.driver.kmod.dropFailedExit) "ebpf" (dict "buf_size_preset" .Values.driver.ebpf.bufSizePreset "drop_failed_exit" .Values.driver.ebpf.dropFailedExit "probe" .Values.driver.ebpf.path) "modern_ebpf" (dict "buf_size_preset" .Values.driver.modernEbpf.bufSizePreset "drop_failed_exit" .Values.driver.modernEbpf.dropFailedExit "cpus_for_each_buffer" .Values.driver.modernEbpf.cpusForEachBuffer) -}}
+{{- $_ := set .Values.falco "engine" $engineConfig -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
@@ -403,15 +406,29 @@ Based on the user input it populates the driver configuration in the falco confi
 It returns "true" if the driver loader has to be enabled, otherwise false.
 */}}
 {{- define "driverLoader.enabled" -}}
-{{- if or
-        (eq .Values.driver.kind "modern_ebpf")
-        (eq .Values.driver.kind "modern-bpf")
-        (eq .Values.driver.kind "gvisor")
-        (not .Values.driver.enabled)
-        (not .Values.driver.loader.enabled)
--}}
+{{- if or (eq .Values.driver.kind "modern_ebpf") (eq .Values.driver.kind "modern-bpf") (eq .Values.driver.kind "gvisor") (not .Values.driver.enabled) (not .Values.driver.loader.enabled) -}}
 false
 {{- else -}}
 true
+{{- end -}}
+{{- end -}}
+
+{{/*
+Based on the use input it populates the metrics configuration in the falco config map.
+*/}}
+{{- define "falco.metricsConfiguration" -}}
+{{- if .Values.metrics.enabled -}}
+{{- $_ := set .Values.falco.webserver "prometheus_metrics_enabled" true -}}
+{{- $_ = set .Values.falco.webserver "enabled" true -}}
+{{- $_ = set .Values.falco.metrics "enabled" .Values.metrics.enabled -}}
+{{- $_ = set .Values.falco.metrics "interval" .Values.metrics.interval -}}
+{{- $_ = set .Values.falco.metrics "output_rule" .Values.metrics.outputRule -}}
+{{- $_ = set .Values.falco.metrics "rules_counters_enabled" .Values.metrics.rulesCountersEnabled -}}
+{{- $_ = set .Values.falco.metrics "resource_utilization_enabled" .Values.metrics.resourceUtilizationEnabled -}}
+{{- $_ = set .Values.falco.metrics "state_counters_enabled" .Values.metrics.stateCountersEnabled -}}
+{{- $_ = set .Values.falco.metrics "kernel_event_counters_enabled" .Values.metrics.kernelEventCountersEnabled -}}
+{{- $_ = set .Values.falco.metrics "libbpf_stats_enabled" .Values.metrics.libbpfStatsEnabled -}}
+{{- $_ = set .Values.falco.metrics "convert_memory_to_mb" .Values.metrics.convertMemoryToMB -}}
+{{- $_ = set .Values.falco.metrics "include_empty_values" .Values.metrics.includeEmptyValues -}}
 {{- end -}}
 {{- end -}}
