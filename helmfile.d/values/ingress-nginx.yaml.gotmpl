@@ -48,6 +48,9 @@ controller:
   ##
   hostPort:
     enabled: {{ .Values.ingressNginx.controller.useHostPort }}
+    ports:
+      http: {{ .Values.ingressNginx.controller.hostPortHttpPort }}
+      https: {{ .Values.ingressNginx.controller.hostPortHttpsPort }}
 
   ## Allows customization of the source of the IP address or FQDN to report
   ## in the ingress status field. By default, it reads the information provided
