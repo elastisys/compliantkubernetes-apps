@@ -63,13 +63,17 @@ spec:
         {{- include "falco.configSyscallSource" . | indent 8 }}
         {{- with .Values.collectors }}
         {{- if .enabled }}
+        {{- if .docker.enabled }}
+        - --cri
+        - /var/run/{{ base .docker.socket }}
+        {{- end }}
         {{- if .containerd.enabled }}
         - --cri
-        - /run/containerd/containerd.sock
+        - /run/containerd/{{ base .containerd.socket }}
         {{- end }}
         {{- if .crio.enabled }}
         - --cri
-        - /run/crio/crio.sock
+        - /run/crio/{{ base .crio.socket }}
         {{- end }}
         - -pk
         {{- end }}
@@ -78,6 +82,12 @@ spec:
       {{- toYaml . | nindent 8 }}
     {{- end }}
       env:
+        - name: HOST_ROOT
+          value: /host
+        - name: FALCO_HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         - name: FALCO_K8S_NODE_NAME
           valueFrom:
             fieldRef:
@@ -141,12 +151,12 @@ spec:
           name: etc-fs
           readOnly: true
         {{- end -}}
-        {{- if and .Values.driver.enabled (or (eq .Values.driver.kind "kmod") (eq .Values.driver.kind "module")) }}
+        {{- if and .Values.driver.enabled (or (eq .Values.driver.kind "kmod") (eq .Values.driver.kind "module") (eq .Values.driver.kind "auto")) }}
         - mountPath: /host/dev
           name: dev-fs
           readOnly: true
         - name: sys-fs
-          mountPath: /sys/module/falco
+          mountPath: /sys/module
         {{- end }}
         {{- if and .Values.driver.enabled (and (eq .Values.driver.kind "ebpf") (contains "falco-no-driver" .Values.image.repository)) }}
         - name: debugfs
@@ -155,15 +165,15 @@ spec:
         {{- with .Values.collectors }}
         {{- if .enabled }}
         {{- if .docker.enabled }}
-        - mountPath: /host/var/run/docker.sock
+        - mountPath: /host/var/run/
           name: docker-socket
         {{- end }}
         {{- if .containerd.enabled }}
-        - mountPath: /host/run/containerd/containerd.sock
+        - mountPath: /host/run/containerd/
           name: containerd-socket
         {{- end }}
         {{- if .crio.enabled }}
-        - mountPath: /host/run/crio/crio.sock
+        - mountPath: /host/run/crio/
           name: crio-socket
         {{- end }}
         {{- end }}
@@ -180,7 +190,7 @@ spec:
           name: certs-volume
           readOnly: true
         {{- end }}
-        {{- if or .Values.certs.existingSecret (and .Values.certs.client.key .Values.certs.client.crt .Values.certs.ca.crt) }}
+        {{- if or .Values.certs.existingClientSecret (and .Values.certs.client.key .Values.certs.client.crt .Values.certs.ca.crt) }}
         - mountPath: /etc/falco/certs/client
           name: client-certs-volume
           readOnly: true
@@ -239,13 +249,13 @@ spec:
       hostPath:
         path: /etc
     {{- end }}
-    {{- if and .Values.driver.enabled (or (eq .Values.driver.kind "kmod") (eq .Values.driver.kind "module")) }}
+    {{- if and .Values.driver.enabled (or (eq .Values.driver.kind "kmod") (eq .Values.driver.kind "module") (eq .Values.driver.kind "auto")) }}
     - name: dev-fs
       hostPath:
         path: /dev
     - name: sys-fs
       hostPath:
-        path: /sys/module/falco
+        path: /sys/module
     {{- end }}
     {{- if and .Values.driver.enabled (and (eq .Values.driver.kind "ebpf") (contains "falco-no-driver" .Values.image.repository)) }}
     - name: debugfs
@@ -257,17 +267,17 @@ spec:
     {{- if .docker.enabled }}
     - name: docker-socket
       hostPath:
-        path: {{ .docker.socket }}
+        path: {{ dir .docker.socket }}
     {{- end }}
     {{- if .containerd.enabled }}
     - name: containerd-socket
       hostPath:
-        path: {{ .containerd.socket }}
+        path: {{ dir .containerd.socket }}
     {{- end }}
     {{- if .crio.enabled }}
     - name: crio-socket
       hostPath:
-        path: {{ .crio.socket }}
+        path: {{ dir .crio.socket }}
     {{- end }}
     {{- end }}
     {{- end }}
@@ -317,7 +327,7 @@ spec:
         secretName: {{ include "falco.fullname" . }}-certs
         {{- end }}
     {{- end }}
-    {{- if or .Values.certs.existingSecret (and .Values.certs.client.key .Values.certs.client.crt .Values.certs.ca.crt) }}
+    {{- if or .Values.certs.existingClientSecret (and .Values.certs.client.key .Values.certs.client.crt .Values.certs.ca.crt) }}
     - name: client-certs-volume
       secret:
         {{- if .Values.certs.existingClientSecret }}
@@ -340,9 +350,13 @@ spec:
   {{- with .Values.driver.loader.initContainer.args }}
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  {{- if eq .Values.driver.kind "ebpf" }}
-    - ebpf
-   {{- end }}
+  {{- if eq .Values.driver.kind "module" }}
+    - kmod
+  {{- else if eq .Values.driver.kind "modern-bpf"}}
+    - modern_ebpf
+  {{- else }}
+    - {{ .Values.driver.kind }}
+  {{- end }}
   {{- with .Values.driver.loader.initContainer.resources }}
   resources:
     {{- toYaml . | nindent 4 }}
@@ -350,7 +364,7 @@ spec:
   securityContext:
   {{- if .Values.driver.loader.initContainer.securityContext }}
     {{- toYaml .Values.driver.loader.initContainer.securityContext | nindent 4 }}
-  {{- else if (or (eq .Values.driver.kind "kmod") (eq .Values.driver.kind "module")) }}
+  {{- else if (or (eq .Values.driver.kind "kmod") (eq .Values.driver.kind "module") (eq .Values.driver.kind "auto")) }}
     privileged: true
   {{- end }}
   volumeMounts:
@@ -371,15 +385,26 @@ spec:
       name: etc-fs
       readOnly: true
   env:
+    - name: HOST_ROOT
+      value: /host
   {{- if .Values.driver.loader.initContainer.env }}
   {{- include "falco.renderTemplate" ( dict "value" .Values.driver.loader.initContainer.env "context" $) | nindent 4 }}
+  {{- end }}
+  {{- if eq .Values.driver.kind "auto" }}
+    - name: FALCOCTL_DRIVER_CONFIG_NAMESPACE
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.namespace
+  {{- else }}
+    - name: FALCOCTL_DRIVER_CONFIG_UPDATE_FALCO
+      value: "false"
   {{- end }}
 {{- end -}}
 
 {{- define "falco.securityContext" -}}
 {{- $securityContext := dict -}}
 {{- if .Values.driver.enabled -}}
-  {{- if (or (eq .Values.driver.kind "kmod") (eq .Values.driver.kind "module")) -}}
+  {{- if (or (eq .Values.driver.kind "kmod") (eq .Values.driver.kind "module") (eq .Values.driver.kind "auto")) -}}
     {{- $securityContext := set $securityContext "privileged" true -}}
   {{- end -}}
   {{- if eq .Values.driver.kind "ebpf" -}}

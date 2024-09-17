@@ -70,7 +70,7 @@ helm install falco-exporter \
 
 ## Configuration
 
-The following table lists the main configurable parameters of the falco-exporter chart v0.9.11 and their default values. Please, refer to [values.yaml](./values.yaml) for the full list of configurable parameters.
+The following table lists the main configurable parameters of the falco-exporter chart v0.12.1 and their default values. Please, refer to [values.yaml](./values.yaml) for the full list of configurable parameters.
 
 ## Values
 
@@ -84,9 +84,10 @@ The following table lists the main configurable parameters of the falco-exporter
 | falco.grpcTimeout | string | `"2m"` | grpcTimeout timout value for grpc connection. |
 | falco.grpcUnixSocketPath | string | `"unix:///run/falco/falco.sock"` | grpcUnixSocketPath path to the falco's grpc unix socket. |
 | fullnameOverride | string | `""` | fullNameOverride same as nameOverride but for the full name. |
-| grafanaDashboard | object | `{"enabled":false,"folder":"","namespace":"default","prometheusDatasourceName":"Prometheus"}` | grafanaDashboard contains the configuration related to grafana dashboards. |
+| grafanaDashboard | object | `{"enabled":false,"folder":"","folderAnnotation":"grafana_dashboard_folder","namespace":"default","prometheusDatasourceName":"Prometheus"}` | grafanaDashboard contains the configuration related to grafana dashboards. |
 | grafanaDashboard.enabled | bool | `false` | enabled specifies whether the dashboard should be deployed. |
-| grafanaDashboard.folder | string | `""` | folder where the dashboard is stored by grafana. |
+| grafanaDashboard.folder | string | `""` | folder creates and set folderAnnotation to specify where the dashboard is stored in grafana. |
+| grafanaDashboard.folderAnnotation | string | `"grafana_dashboard_folder"` | folderAnnotation sets the annotation's name used by folderAnnotation in grafana's helm-chart. |
 | grafanaDashboard.namespace | string | `"default"` | namespace specifies the namespace for the configmap. |
 | grafanaDashboard.prometheusDatasourceName | string | `"Prometheus"` | prometheusDatasourceName name of the data source. |
 | healthChecks | object | `{"livenessProbe":{"initialDelaySeconds":60,"periodSeconds":15,"probesPort":19376,"timeoutSeconds":5},"readinessProbe":{"initialDelaySeconds":30,"periodSeconds":15,"probesPort":19376,"timeoutSeconds":5}}` | healthChecks contains the configuration for liveness and readiness probes. |
@@ -115,18 +116,23 @@ The following table lists the main configurable parameters of the falco-exporter
 | priorityClassName | string | `""` | priorityClassName specifies the name of the PriorityClass for the pods. |
 | prometheusRules.alerts.additionalAlerts | object | `{}` |  |
 | prometheusRules.alerts.alert.enabled | bool | `true` |  |
+| prometheusRules.alerts.alert.for | string | `"5m"` |  |
 | prometheusRules.alerts.alert.rate_interval | string | `"5m"` |  |
 | prometheusRules.alerts.alert.threshold | int | `0` |  |
 | prometheusRules.alerts.critical.enabled | bool | `true` |  |
+| prometheusRules.alerts.critical.for | string | `"15m"` |  |
 | prometheusRules.alerts.critical.rate_interval | string | `"5m"` |  |
 | prometheusRules.alerts.critical.threshold | int | `0` |  |
 | prometheusRules.alerts.emergency.enabled | bool | `true` |  |
+| prometheusRules.alerts.emergency.for | string | `"1m"` |  |
 | prometheusRules.alerts.emergency.rate_interval | string | `"1m"` |  |
 | prometheusRules.alerts.emergency.threshold | int | `0` |  |
 | prometheusRules.alerts.error.enabled | bool | `true` |  |
+| prometheusRules.alerts.error.for | string | `"15m"` |  |
 | prometheusRules.alerts.error.rate_interval | string | `"5m"` |  |
 | prometheusRules.alerts.error.threshold | int | `0` |  |
 | prometheusRules.alerts.warning.enabled | bool | `true` |  |
+| prometheusRules.alerts.warning.for | string | `"15m"` |  |
 | prometheusRules.alerts.warning.rate_interval | string | `"5m"` |  |
 | prometheusRules.alerts.warning.threshold | int | `0` |  |
 | prometheusRules.enabled | bool | `false` | enabled specifies whether the prometheus rules should be deployed. |
@@ -145,8 +151,9 @@ The following table lists the main configurable parameters of the falco-exporter
 | service.type | string | `"ClusterIP"` | type denotes the service type. Setting it to "ClusterIP" we ensure that are accessible from within the cluster. |
 | serviceAccount | object | `{"annotations":{},"create":true,"name":""}` | serviceAccount is the configuration for the service account. |
 | serviceAccount.name | string | `""` | name is the name of the service account to use. If not set and create is true, a name is generated using the fullname template. If set and create is false, an already existing serviceAccount must be provided. |
-| serviceMonitor | object | `{"additionalLabels":{},"enabled":false,"interval":"","scrapeTimeout":""}` | serviceMonitor holds the configuration for the ServiceMonitor CRD. A ServiceMonitor is a custom resource definition (CRD) used to configure how Prometheus should discover and scrape metrics from the exporter service. |
+| serviceMonitor | object | `{"additionalLabels":{},"additionalProperties":{},"enabled":false,"interval":"","scrapeTimeout":""}` | serviceMonitor holds the configuration for the ServiceMonitor CRD. A ServiceMonitor is a custom resource definition (CRD) used to configure how Prometheus should discover and scrape metrics from the exporter service. |
 | serviceMonitor.additionalLabels | object | `{}` | additionalLabels specifies labels to be added on the Service Monitor. |
+| serviceMonitor.additionalProperties | object | `{}` | aditionalProperties allows setting additional properties on the endpoint such as relabelings, metricRelabelings etc. |
 | serviceMonitor.enabled | bool | `false` | enable the deployment of a Service Monitor for the Prometheus Operator. |
 | serviceMonitor.interval | string | `""` | interval specifies the time interval at which Prometheus should scrape metrics from the service. |
 | serviceMonitor.scrapeTimeout | string | `""` | scrapeTimeout determines the maximum time Prometheus should wait for a target to respond to a scrape request. If the target does not respond within the specified timeout, Prometheus considers the scrape as failed for that target. |

@@ -12,7 +12,7 @@ falco:
   grpc_output:
     enabled: true
 
-  rules_file:
+  rules_files:
     {{- if .Values.falco.rulesFiles.default.enabled }}
     - /etc/falco/falco_rules.yaml
     {{end}}
