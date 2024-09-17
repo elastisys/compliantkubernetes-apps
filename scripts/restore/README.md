@@ -37,7 +37,7 @@ Then set:
 export SPECIFIC_BACKUP=<backups/xxxxxxxxxx.sql.gz> # Optional
 ```
 
-## Restore
+## Restore job S3
 
 Setup the necessary job.yaml and configmap:
 
@@ -45,6 +45,17 @@ Setup the necessary job.yaml and configmap:
 envsubst > tmp-job.yaml < scripts/restore/restore-harbor-job.yaml
 ./bin/ck8s ops kubectl sc create configmap -n harbor restore-harbor --from-file=scripts/restore/restore-harbor.sh
 ```
+
+## Restore job Azure
+
+Setup the necessary job.yaml and configmap:
+
+```bash
+envsubst > tmp-job.yaml < scripts/restore/restore-harbor-job-azure.yaml
+./bin/ck8s ops kubectl sc create configmap -n harbor restore-harbor --from-file=scripts/restore/restore-harbor.sh
+```
+
+## Restore common
 
 While restoring we need to stop all harbor pods except for the database.
 
