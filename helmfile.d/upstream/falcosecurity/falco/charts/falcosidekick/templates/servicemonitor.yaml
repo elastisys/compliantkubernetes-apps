@@ -7,19 +7,30 @@ metadata:
   labels:
     {{- include "falcosidekick.labels" . | nindent 4 }}
     app.kubernetes.io/component: core
-    {{- range $key, $value := .Values.serviceMonitor.additionalLabels }}
-    {{ $key }}: {{ $value | quote }}
+    {{- with .Values.serviceMonitor.additionalLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.customLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- with .Values.customAnnotations }}
+    {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
   endpoints:
-  - port: metrics
+  - port: http
     {{- if .Values.serviceMonitor.interval }}
     interval: {{ .Values.serviceMonitor.interval }}
     {{- end }}
     {{- if .Values.serviceMonitor.scrapeTimeout }}
     scrapeTimeout: {{ .Values.serviceMonitor.scrapeTimeout }}
     {{- end }}
+    {{- with .Values.serviceMonitor.additionalProperties }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
   selector:
     matchLabels:
-      {{- include "falcosidekick.selectorLabels" . | nindent 6 }}
+      {{- include "falcosidekick.labels" . | nindent 6 }}
+      app.kubernetes.io/component: core
 {{- end }}

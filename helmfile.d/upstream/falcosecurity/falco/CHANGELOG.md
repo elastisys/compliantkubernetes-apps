@@ -3,6 +3,111 @@
 This file documents all notable changes to Falco Helm Chart. The release
 numbering uses [semantic versioning](http://semver.org).
 
+## v4.8.2
+
+* fix(falco): correctly mount host filesystems when driver.kind is auto
+
+  When falco runs with kmod/module driver it needs special filesystems
+  to be mounted from the host such /dev and /sys/module/falco.
+  This commit ensures that we mount them in the falco container.
+
+  Note that, the /sys/module/falco is now mounted as /sys/module since
+  we do not know which kind of driver will be used. The falco folder 
+  exists under /sys/module only when the kernel module is loaded, 
+  hence it's not possible to use the /sys/module/falco hostpath when driver.kind 
+  is set to auto.
+
+## v4.8.1
+
+* fix(falcosidekick): add support for custom service type for webui redis
+
+## v4.8.0
+
+* Upgrade Falco version to 0.38.2
+
+## v4.7.2
+
+* use rules_files key in the preset values files
+
+## v4.7.1
+
+* fix(falco/config): use rules_files instead of deprecated key rules_file
+
+## v4.7.0
+
+* bump k8smeta plugin to version 0.2.0. The new version, resolves a bug that prevented the plugin
+  from populating the k8smeta fields. For more info see:
+  * https://github.com/falcosecurity/plugins/issues/514
+  * https://github.com/falcosecurity/plugins/pull/517
+
+## v4.6.3
+
+* fix(falco): mount client-certs-volume only if certs.existingClientSecret is defined
+
+## v4.6.2
+
+* bump falcosidekick dependency to v0.8.* to match with future versions
+
+## v4.6.1
+
+* bump falcosidekick dependency to v0.8.2 (fixes bug when using externalRedis in UI)
+
+## v4.6.0
+
+* feat(falco): add support for Falco metrics
+
+## v4.5.2
+
+* bump falcosidekick dependency version to v0.8.0, for falcosidekick 2.29.0
+
+## v4.5.2
+
+* reording scc configuration, making it more robust to plain yaml comparison
+
+## v4.5.1
+
+* falco is now able to reconnect to containerd.socket
+
+## v4.5.0
+
+* bump Falco version to 0.38.1
+
+## v4.4.3
+
+* Added a `labels` field in the controller to provide extra labeling for the daemonset/deployment
+
+## v4.4.2
+
+* fix wrong check in pod template where `existingSecret` was used instead of `existingClientSecret`
+
+## v4.4.1
+
+* bump k8s-metacollector dependency version to v0.1.1. See: https://github.com/falcosecurity/k8s-metacollector/releases
+
+## v4.3.1
+
+* bump falcosidekick dependency version to v0.7.19 install latest version through falco chart
+
+## v4.3.0
+
+* `FALCO_HOSTNAME` and `HOST_ROOT` are now set by default in pods configuration.
+
+## v4.2.6
+
+* bump falcosidekick dependency version to v0.7.17 install latest version through falco chart
+
+## v4.2.5
+
+* fix docs
+
+## v4.2.4
+
+* bump falcosidekick dependency version to v0.7.15 install latest version through falco chart
+
+## v4.2.3
+
+* fix(falco/helpers): adjust formatting to be compatible with older helm versions
+
 ## v4.2.2
 
 * fix(falco/README): dead link
