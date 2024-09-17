@@ -78,7 +78,38 @@ cleanup_local_files(){
   rmdir ${backup_dir}
 }
 
-s3_download
+azure_download() {
+  : "${AZURE_ACCOUNT_NAME:?Missing AZURE_ACCOUNT_NAME}"
+  : "${AZURE_ACCOUNT_KEY:?Missing AZURE_ACCOUNT_KEY}"
+  : "${AZURE_CONTAINER_NAME:?Missing AZURE_CONTAINER_NAME}"
+
+  if [[ -n "$SPECIFIC_BACKUP" ]]; then
+      backup_key=$SPECIFIC_BACKUP
+  else
+      backup_key="$(az storage blob list \
+        --account-name "${AZURE_ACCOUNT_NAME}" \
+        --account-key "${AZURE_ACCOUNT_KEY}" \
+        --container-name "${AZURE_CONTAINER_NAME}" \
+        --prefix "backups" \
+        --query 'sort_by([].{name:name, lastModified:properties.lastModified}, &lastModified)[-1].name' \
+        -otsv)"
+  fi
+
+  echo "Downloading from Azure Blob Storage: ${backup_key}" >&2
+  az storage blob download \
+    --account-name "${AZURE_ACCOUNT_NAME}" \
+    --account-key "${AZURE_ACCOUNT_KEY}" \
+    --container-name "${AZURE_CONTAINER_NAME}" \
+    --name "${backup_key}" \
+    --file "harbor.tgz"
+}
+
+if [[ ${STORAGE_TYPE} == "s3" ]]; then
+  s3_download
+elif [[ ${STORAGE_TYPE} == "azure" ]]; then
+  azure_download
+fi
+
 extract_backup
 wait_for_db_ready
 clean_database_data
