@@ -20,27 +20,30 @@ spec:
       restartPolicy: Never
       containers:
         - name: run
-          image: ghcr.io/elastisys/backup-postgres:1.3.0
+          image: ghcr.io/elastisys/backup-postgres:1.5.0
           command:
             - /bin/bash
             - /scripts/restore-harbor.sh
           env:
-            - name: AWS_ACCESS_KEY_ID
+            - name: AZURE_ACCOUNT_KEY
               valueFrom:
                 secretKeyRef:
                   name: harbor-backup-secret
-                  key: aws-access-key-id
-            - name: AWS_SECRET_ACCESS_KEY
+                  key: azure-account-key
+            - name: AZURE_CONTAINER_NAME
               valueFrom:
                 secretKeyRef:
                   name: harbor-backup-secret
-                  key: aws-secret-access-key
+                  key: azure-container-name
+            - name: AZURE_ACCOUNT_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: harbor-backup-secret
+                  key: azure-account-name
             - name: STORAGE_TYPE
-              value: "s3"
+              value: "azure"
             - name: S3_BUCKET
               value: ${S3_BUCKET}
-            - name: S3_REGION_ENDPOINT
-              value: ${S3_REGION_ENDPOINT}
             - name: SPECIFIC_BACKUP
               value: ${SPECIFIC_BACKUP}
             - name: PGPASSWORD
