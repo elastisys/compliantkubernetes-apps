@@ -9,7 +9,7 @@ groups:
           severity_level: warning
           storage_type: ceph
         expr: |
-          (kubelet_volume_stats_used_bytes * on (namespace,persistentvolumeclaim) group_left(storageclass, provisioner) (kube_persistentvolumeclaim_info * on (storageclass)  group_left(provisioner) kube_storageclass_info {provisioner=~"(.*rbd.csi.ceph.com)|(.*cephfs.csi.ceph.com)"})) / (kubelet_volume_stats_capacity_bytes * on (namespace,persistentvolumeclaim) group_left(storageclass, provisioner) (kube_persistentvolumeclaim_info * on (storageclass)  group_left(provisioner) kube_storageclass_info {provisioner=~"(.*rbd.csi.ceph.com)|(.*cephfs.csi.ceph.com)"})) > 0.75
+          (kubelet_volume_stats_used_bytes * on (namespace,persistentvolumeclaim,cluster) group_left(storageclass, provisioner) (kube_persistentvolumeclaim_info * on (storageclass,cluster)  group_left(provisioner) kube_storageclass_info {provisioner=~"(.*rbd.csi.ceph.com)|(.*cephfs.csi.ceph.com)"})) / (kubelet_volume_stats_capacity_bytes * on (namespace,persistentvolumeclaim,cluster) group_left(storageclass, provisioner) (kube_persistentvolumeclaim_info * on (storageclass,cluster)  group_left(provisioner) kube_storageclass_info {provisioner=~"(.*rbd.csi.ceph.com)|(.*cephfs.csi.ceph.com)"})) > 0.75
         for: 5s
         labels:
           severity: warning
@@ -20,7 +20,7 @@ groups:
           severity_level: error
           storage_type: ceph
         expr: |
-          (kubelet_volume_stats_used_bytes * on (namespace,persistentvolumeclaim) group_left(storageclass, provisioner) (kube_persistentvolumeclaim_info * on (storageclass)  group_left(provisioner) kube_storageclass_info {provisioner=~"(.*rbd.csi.ceph.com)|(.*cephfs.csi.ceph.com)"})) / (kubelet_volume_stats_capacity_bytes * on (namespace,persistentvolumeclaim) group_left(storageclass, provisioner) (kube_persistentvolumeclaim_info * on (storageclass)  group_left(provisioner) kube_storageclass_info {provisioner=~"(.*rbd.csi.ceph.com)|(.*cephfs.csi.ceph.com)"})) > 0.85
+          (kubelet_volume_stats_used_bytes * on (namespace,persistentvolumeclaim,cluster) group_left(storageclass, provisioner) (kube_persistentvolumeclaim_info * on (storageclass,cluster)  group_left(provisioner) kube_storageclass_info {provisioner=~"(.*rbd.csi.ceph.com)|(.*cephfs.csi.ceph.com)"})) / (kubelet_volume_stats_capacity_bytes * on (namespace,persistentvolumeclaim,cluster) group_left(storageclass, provisioner) (kube_persistentvolumeclaim_info * on (storageclass,cluster)  group_left(provisioner) kube_storageclass_info {provisioner=~"(.*rbd.csi.ceph.com)|(.*cephfs.csi.ceph.com)"})) > 0.85
         for: 5s
         labels:
           severity: critical
@@ -348,7 +348,7 @@ groups:
         expr: |
           (
             rate(ceph_osd_up[5m])
-            * on(ceph_daemon) group_left(hostname) ceph_osd_metadata
+            * on(ceph_daemon,cluster) group_left(hostname) ceph_osd_metadata
           ) * 60 > 1
         labels:
           severity: warning
@@ -745,7 +745,7 @@ groups:
     rules:
       - alert: CephPoolGrowthWarning
         expr: |
-          (predict_linear((max(ceph_pool_percent_used) without (pod, instance))[2d:1h], 3600 * 24 * 5) * on(pool_id)
+          (predict_linear((max(ceph_pool_percent_used) without (pod, instance))[2d:1h], 3600 * 24 * 5) * on(pool_id,cluster)
               group_right ceph_pool_metadata) >= 95
         labels:
           severity: warning
