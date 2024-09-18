@@ -46,6 +46,10 @@ spec:
           port: 80
     {{- end }}
     - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: controller
+              app.kubernetes.io/instance: ingress-nginx
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: monitoring
