@@ -4363,6 +4363,10 @@ properties:
               format: ipv4
       resources:
         $ref: '#/$defs/kubernetesResourceRequirements'
+      tolerations:
+        $ref: '#/$defs/kubernetesTolerations'
+      affinity:
+        $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
   prometheusNodeExporter:
     title: Prometheus Node Exporter
     description: Configure Prometheus Node Exporter, the exporter used for collecting node metrics.

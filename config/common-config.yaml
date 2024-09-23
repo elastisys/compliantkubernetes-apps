@@ -319,6 +319,8 @@ prometheusBlackboxExporter:
     limits:
       cpu: 20m
       memory: 50Mi
+  tolerations: []
+  affinity: {}
   targets:
     rook: false
     nginx: true
