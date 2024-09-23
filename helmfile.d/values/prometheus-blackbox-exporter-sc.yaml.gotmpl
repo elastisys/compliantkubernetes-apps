@@ -1,5 +1,8 @@
 resources: {{- toYaml .Values.prometheusBlackboxExporter.resources | nindent 4 }}
 
+tolerations: {{- toYaml .Values.prometheusBlackboxExporter.tolerations | nindent 4 }}
+affinity: {{- toYaml .Values.prometheusBlackboxExporter.affinity | nindent 4 }}
+
 pspEnabled: false
 
 config:
