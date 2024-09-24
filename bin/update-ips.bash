@@ -182,8 +182,11 @@ get_swift_url() {
   auth_url="$(yq_read "sc" "${swift_config_option}.authUrl" "")"
   swift_region="$(yq_read "sc" "${swift_config_option}.region" "")"
 
+  headers=$(mktemp --suffix="_headers")
+  append_trap "rm ${headers}" EXIT
+
   if [ -n "$(yq_read_secret "${swift_config_option}.username" "")" ]; then
-    response=$(curl -i -s -H "Content-Type: application/json" -d '
+    response=$(curl -s -D "${headers}" -H "Content-Type: application/json" -d '
         {
           "auth": {
             "identity": {
@@ -205,7 +208,7 @@ get_swift_url() {
           }
         }' "${auth_url}/auth/tokens")
   elif [ -n "$(yq_read_secret "${swift_config_option}.applicationCredentialID" "")" ]; then
-    response=$(curl -i -s -H "Content-Type: application/json" -d '
+    response=$(curl -s -D "${headers}" -H "Content-Type: application/json" -d '
         {
           "auth": {
             "identity": {
@@ -222,8 +225,8 @@ get_swift_url() {
     exit 1
   fi
 
-  os_token=$(echo "${response}" | grep -oP "x-subject-token:\s+\K\S+")
-  swift_url=$(echo "${response}" | tail -n +15 | jq -r '.[].catalog[] | select( .type == "object-store" and .name == "swift") | .endpoints[] | select(.interface == "public" and .region == "'"${swift_region}"'") | .url')
+  os_token=$(grep -oP "x-subject-token:\s+\K\S+" "${headers}")
+  swift_url=$(echo "${response}" | jq -r '.token.catalog[] | select( .type == "object-store" and .name == "swift") | .endpoints[] | select(.interface == "public" and .region == "'"${swift_region}"'") | .url')
 
   curl -i -s -X DELETE -H "X-Auth-Token: ${os_token}" -H "X-Subject-Token: ${os_token}" "${auth_url}/auth/tokens" >/dev/null
 

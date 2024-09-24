@@ -392,6 +392,8 @@ _test_apply_rclone_sync_s3_and_swift() {
 @test "ck8s update-ips gets swift url for rclone sync" {
   _setup_swift '.objectStorage.sync.destinationType'
 
+  update_ips.setup_mktemp_mock
+
   mock_set_output "${mock_dig}" ""
 
   run ck8s update-ips both apply

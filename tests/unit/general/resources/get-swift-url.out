@@ -1,4 +1,4 @@
--i -s -H Content-Type: application/json -d 
+-s -D /tmp/tmp.mock_headers -H Content-Type: application/json -d 
         {
           "auth": {
             "identity": {
