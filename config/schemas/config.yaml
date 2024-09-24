@@ -3853,6 +3853,10 @@ properties:
         default: true
       resources:
         $ref: '#/$defs/kubernetesResourceRequirements'
+      tolerations:
+        $ref: '#/$defs/kubernetesTolerations'
+      affinity:
+        $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
   openstackMonitoring:
     title: Openstack Monitoring
     description: Configure the collection of metrics for OpenStack components.
