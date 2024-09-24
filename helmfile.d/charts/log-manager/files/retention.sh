@@ -35,24 +35,25 @@ s3_list_chunks() {
 s3_rm_chunks() {
   CHUNK_LIST="$1"
 
-  xargs -n1000 s3cmd --config "$S3_CONFIG" rm < "$CHUNK_LIST" > /dev/null
+  xargs -n1000 s3cmd --config "$S3_CONFIG" rm <"$CHUNK_LIST" >/dev/null
 }
 
 # Define Azure Blob functions
 azure_list_days() {
-    az storage blob directory list --container-name "$AZURE_CONTAINER_NAME" --directory-path "$AZURE_PREFIX" --prefix "$AZURE_PREFIX/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | awk '{print $1}'
+  az storage fs file list --file-system "$AZURE_CONTAINER_NAME" --path "$AZURE_PREFIX" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | awk '{print $9}' | sed "s#$AZURE_PREFIX/##" | sed 's/\/.*$//' | uniq
 }
 
 azure_list_chunks() {
-    AZURE_PATH="$1"
-    az storage blob list --container-name "$AZURE_CONTAINER_NAME" --prefix "${AZURE_PREFIX}/${AZURE_PATH}/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | grep '\.gz\|\.zst' | awk '{print $1}'
+  AZURE_PATH="$1"
+
+  az storage fs file list --file-system "$AZURE_CONTAINER_NAME" --path "${AZURE_PREFIX}/${AZURE_PATH}/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | grep '\.gz\|\.zst' | awk '{print $9}' | sed "s#${AZURE_PREFIX}/${AZURE_PATH}/##"
 }
 
 azure_rm_chunks() {
-    CHUNK_LIST="$1"
-    while IFS= read -r line; do
-        az storage blob delete --container-name "$AZURE_CONTAINER_NAME" --name "${AZURE_PREFIX}/${line}" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" > /dev/null
-    done < "$CHUNK_LIST"
+  CHUNK_LIST="$1"
+  while IFS= read -r line; do
+    az storage blob delete --container-name "$AZURE_CONTAINER_NAME" --name "${AZURE_PREFIX}/${line}" --delete-snapshots "include" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" >/dev/null
+  done <"$CHUNK_LIST"
 }
 
 # Main loop
@@ -61,7 +62,7 @@ if [[ "$STORAGE_SERVICE" == "azure" ]]; then
     if [[ "$DAY" < "$LIMIT" ]]; then
       echo "- day: $DAY -----"
       echo "----- listing Azure chunks"
-      azure_list_chunks "$DAY" > "$TMPFILE"
+      azure_list_chunks "$DAY" >"$TMPFILE"
       echo "----- clearing Azure chunks"
       azure_rm_chunks "$TMPFILE"
     fi
@@ -71,7 +72,7 @@ else
     if [[ "$DAY" < "$LIMIT" ]]; then
       echo "- day: $DAY -----"
       echo "----- listing S3 chunks"
-      s3_list_chunks "$DAY" > "$TMPFILE"
+      s3_list_chunks "$DAY" >"$TMPFILE"
       echo "----- clearing S3 chunks"
       s3_rm_chunks "$TMPFILE"
     fi
