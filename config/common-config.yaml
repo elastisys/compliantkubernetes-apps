@@ -762,6 +762,8 @@ metricsServer:
     limits:
       cpu: 100m
       memory: 100Mi
+  tolerations: []
+  affinity: {}
 
 calicoAccountant:
   enabled: true

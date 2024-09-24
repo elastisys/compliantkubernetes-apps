@@ -20,3 +20,6 @@ resources:
 # the pod failed to start due to a liveness probe timeout so we had to increase the period to 20
 livenessProbe:
   periodSeconds: 20
+
+tolerations: {{- toYaml .Values.metricsServer.tolerations | nindent 2 }}
+affinity: {{- toYaml .Values.metricsServer.affinity | nindent 2 }}
