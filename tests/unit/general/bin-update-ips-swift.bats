@@ -169,6 +169,7 @@ _test_apply_swift_application_credential_id() {
   yq.set sc .harbor.persistence.type '"swift"'
 
   update_ips.mock_swift
+  update_ips.setup_mktemp_mock
 
   sops --set '["objectStorage"]["swift"]["username"] "swift-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
   sops --set '["objectStorage"]["swift"]["password"] "swift-password"' "${CK8S_CONFIG_PATH}/secrets.yaml"
