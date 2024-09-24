@@ -2,3 +2,10 @@ harbor:
   persistence:
     type: objectStorage
     disableRedirect: false
+
+fluentd:
+  logManager:
+    compaction:
+      # azcopy is used by az CLI for downloading files
+      azureCopyBufferGB: 0.3
+      azureCopyConcurrency: 8

@@ -2,8 +2,9 @@
 azure:
   storageAccountName: {{ .Values.objectStorage.azure.storageAccountName }}
   storageAccountKey: {{ .Values.objectStorage.azure.storageAccountKey }}
-  containerName: {{ .Values.objectStorage.buckets.audit }}
   enabled: true
+  azcopyBufferGB: {{ .Values.fluentd.logManager.compaction.azureCopyBufferGB }}
+  azcopyConcurrency: {{ .Values.fluentd.logManager.compaction.azureCopyConcurrency }}
 {{- else if eq .Values.objectStorage.type "s3"}}
 s3:
   forcePathStyle: {{ .Values.objectStorage.s3.forcePathStyle }}

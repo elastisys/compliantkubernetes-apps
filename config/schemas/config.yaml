@@ -4978,6 +4978,12 @@ properties:
             type: object
             additionalProperties: false
             properties:
+              azureCopyBufferGB:
+                type: number
+                description: Configure the memory buffer size in GB (accepts decimals) for Azure copy operations.
+              azureCopyConcurrency:
+                type: number
+                description: Configure the maximum number of concurrent download requests for Azure copy operations.
               volume:
                 title: Log Manager Compaction Volume
                 description: Configure log-manager compaction volume.
