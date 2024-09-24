@@ -31,7 +31,7 @@ extraDeploy:
 image:
   registry: ghcr.io
   repository: elastisys/fluentd
-  tag: v5.19.0-ck8s1
+  tag: v5.19.1-ck8s1
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -163,18 +163,11 @@ aggregator:
 
       force_path_style {{ .Values.objectStorage.s3.forcePathStyle }}
       {{- else if eq .Values.objectStorage.type "azure" }}
-      @type azure-storage-append-blob
+      @type azurestorage
 
       azure_storage_account {{ .Values.objectStorage.azure.storageAccountName }}
       azure_storage_access_key {{ .Values.objectStorage.azure.storageAccountKey }}
-      path logs/${tag}/%Y%m%d/
-      azure_container_name {{ .Values.objectStorage.buckets.audit }}
-      auto_create_container true
-      buffer_type file
-      buffer_path /var/log/fluent/azureblob/
-      flush_interval 60s
-      retry_wait 10s
-      max_retry 12
+      auto_create_container false
       {{- end }}
 
     audit.output.conf: |

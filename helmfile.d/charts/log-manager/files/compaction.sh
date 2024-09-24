@@ -2,12 +2,12 @@
 
 set -euo pipefail
 if [ "$STORAGE_SERVICE" = "azure" ]; then
-# Azure Blob configuration
+  # Azure Blob configuration
   : "${AZURE_STORAGE_CONNECTION_STRING:?Missing AZURE_STORAGE_CONNECTION_STRING}"
   : "${AZURE_CONTAINER_NAME:?Missing AZURE_CONTAINER_NAME}"
   : "${AZURE_PREFIX:?Missing AZURE_PREFIX}"
 else
-# S3 configuration
+  # S3 configuration
   : "${S3_CONFIG:?Missing S3_CONFIG}"
   : "${S3_BUCKET:?Missing S3_BUCKET}"
   : "${S3_PREFIX:?Missing S3_PREFIX}"
@@ -49,54 +49,58 @@ s3_get_chunks() {
   S3_PATH="$1"
   CHUNK_DIR="$2"
 
-  s3cmd --config "$S3_CONFIG" get -r "s3://$S3_BUCKET/$S3_PREFIX/$S3_PATH" "$CHUNK_DIR" > /dev/null
+  s3cmd --config "$S3_CONFIG" get -r "s3://$S3_BUCKET/$S3_PREFIX/$S3_PATH" "$CHUNK_DIR" >/dev/null
 }
 
 s3_put_chunk() {
   S3_PATH="$1"
   CHUNK_FILE="$2"
 
-  s3cmd --config "$S3_CONFIG" put --no-preserve "$CHUNK_FILE" "s3://$S3_BUCKET/$S3_PREFIX/$S3_PATH/" > /dev/null
+  s3cmd --config "$S3_CONFIG" put --no-preserve "$CHUNK_FILE" "s3://$S3_BUCKET/$S3_PREFIX/$S3_PATH/" >/dev/null
 }
 
 s3_rm_chunks() {
   CHUNK_LIST="$1"
 
-  xargs -n1000 s3cmd --config "$S3_CONFIG" rm < "$CHUNK_LIST" > /dev/null
+  xargs -n1000 s3cmd --config "$S3_CONFIG" rm <"$CHUNK_LIST" >/dev/null
 }
 
 # Define functions for Azure operations
 azure_list_days() {
-    az storage blob directory list --container-name "$AZURE_CONTAINER_NAME" --directory-path "$AZURE_PREFIX" --prefix "$AZURE_PREFIX/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | awk '{print $1}'
+  az storage fs file list --file-system "$AZURE_CONTAINER_NAME" --path "$AZURE_PREFIX" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | awk '{print $9}' | sed "s#$AZURE_PREFIX/##" | sed 's/\/.*$//' | uniq
 }
 
 azure_list_indices() {
-    AZURE_PATH="$1"
-    az storage blob directory list --container-name "$AZURE_CONTAINER_NAME"  --directory-path "$AZURE_PREFIX" --prefix "${AZURE_PREFIX}/${AZURE_PATH}/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | awk '{print $1}'
+  AZURE_PATH="$1"
+
+  az storage fs file list --file-system "$AZURE_CONTAINER_NAME" --path "${AZURE_PREFIX}/${AZURE_PATH}/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | awk '{print $9}' | sed "s#${AZURE_PREFIX}/${AZURE_PATH}/##" | sed 's/\/.*$//' | uniq
 }
 
 azure_list_chunks() {
-    AZURE_PATH="$1"
-    az storage blob list --container-name "$AZURE_CONTAINER_NAME" --prefix "${AZURE_PREFIX}/${AZURE_PATH}/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | grep '\.gz\|\.zst' | awk '{print $1}'
+  AZURE_PATH="$1"
+
+  az storage fs file list --file-system "$AZURE_CONTAINER_NAME" --path "${AZURE_PREFIX}/${AZURE_PATH}/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | grep '\.gz\|\.zst' | awk '{print $9}' | sed "s#${AZURE_PREFIX}/${AZURE_PATH}/##"
 }
 
 azure_get_chunks() {
-    AZURE_PATH="$1"
-    CHUNK_DIR="$2"
-    az storage blob download-batch -d "$CHUNK_DIR" --pattern '*.gz' --pattern '*.zst' --source "${AZURE_CONTAINER_NAME}/${AZURE_PREFIX}/${AZURE_PATH}" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" > /dev/null
+  AZURE_PATH="$1"
+  CHUNK_DIR="$2"
+
+  az storage fs directory download --destination-path "$CHUNK_DIR" --file-system "${AZURE_CONTAINER_NAME}" --source-path "${AZURE_PREFIX}/${AZURE_PATH}/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --recursive >/dev/null
 }
 
 azure_put_chunk() {
-    AZURE_PATH="$1"
-    CHUNK_FILE="$2"
-    az storage blob upload --file "$CHUNK_FILE" --container-name "$AZURE_CONTAINER_NAME" --name "${AZURE_PREFIX}/${AZURE_PATH}/$(basename "$CHUNK_FILE")" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" > /dev/null
+  AZURE_PATH="$1"
+  CHUNK_FILE="$2"
+
+  az storage blob upload --file "$CHUNK_FILE" --container-name "$AZURE_CONTAINER_NAME" --name "${AZURE_PREFIX}/${AZURE_PATH}/$(basename "$CHUNK_FILE")" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" >/dev/null
 }
 
 azure_rm_chunks() {
-    CHUNK_LIST="$1"
-    while IFS= read -r line; do
-        az storage blob delete --container-name "$AZURE_CONTAINER_NAME" --name "${AZURE_PREFIX}/${line}" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" > /dev/null
-    done < "$CHUNK_LIST"
+  CHUNK_LIST="$1"
+  while IFS= read -r line; do
+    az storage blob delete --container-name "$AZURE_CONTAINER_NAME" --name "${AZURE_PREFIX}/${line}" --delete-snapshots "include" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" >/dev/null
+  done <"$CHUNK_LIST"
 }
 
 merge_chunks() {
@@ -135,9 +139,9 @@ merge_chunks() {
       fi
 
       if [ "$STORAGE_SERVICE" = "azure" ]; then
-        echo "azure://${AZURE_CONTAINER_NAME}/${AZURE_PREFIX}/${DAY}/${FILE/$LM_TMP\//}" >> "$TMPFILE.idx"
+        echo "${DAY}/${FILE/$LM_TMP\//}" >>"$TMPFILE.idx"
       else
-        echo "s3://$S3_BUCKET/$S3_PREFIX/$DAY/${FILE/$LM_TMP\//}" >> "$TMPFILE.idx"
+        echo "s3://$S3_BUCKET/$S3_PREFIX/$DAY/${FILE/$LM_TMP\//}" >>"$TMPFILE.idx"
       fi
 
       zstd --rm -c -d "$FILE"
@@ -167,7 +171,6 @@ merge_chunks() {
     SEQ=$((SEQ + 1))
   done
 }
-
 
 if [[ "$STORAGE_SERVICE" == "azure" ]]; then
   days=$(azure_list_days)
