@@ -1301,7 +1301,7 @@ networkPolicies:
           - 443
       objectStorageSwift:
         ips:
-          - set-me-if-(.objectStorage.sync.enabled and (.harbor.persistence.type == "swift" or .thanos.objectStorage.type == "swift"))
+          - set-me-if-(.objectStorage.sync.enabled and ((.harbor.persistence.type == "swift" and (.objectStorage.sync.buckets | select(all_c(.source != "*harbor*") or any_c(.source == "*harbor*" and has("destinationType") | not)))) or (.thanos.objectStorage.type == "swift" and (.objectStorage.sync.buckets | select(all_c(.source != "*thanos*") or any_c(.source == "*thanos*" and has("destinationType") | not)))) or (.objectStorage.sync.buckets | any_c(.destinationType == "swift"))))
         ports:
           - 5000
       secondaryUrl:
