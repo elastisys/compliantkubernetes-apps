@@ -1023,6 +1023,18 @@ allOf:
                 type:
                   type: string
                   const: swift
+        objectStorage:
+          properties:
+            sync:
+              properties:
+                buckets:
+                  items:
+                    properties:
+                      source:
+                        pattern: '.*harbor.*'
+                    not:
+                      properties:
+                        destinationType: {}
     - properties:
         thanos:
           properties:
@@ -1031,6 +1043,28 @@ allOf:
                 type:
                   type: string
                   const: swift
+        objectStorage:
+          properties:
+            sync:
+              properties:
+                buckets:
+                  items:
+                    properties:
+                      source:
+                        pattern: '.*thanos.*'
+                    not:
+                      properties:
+                        destinationType: {}
+    - properties:
+        objectStorage:
+          properties:
+            sync:
+              properties:
+                buckets:
+                  items:
+                    properties:
+                      destinationType:
+                        const: "swift"
   then:
     properties:
       networkPolicies:
