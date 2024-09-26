@@ -387,50 +387,153 @@ _refute_condition_and_warn() {
 @test "conditional-set-me - multiple conditions: network policies rclone swift" {
 
   yq.set sc .objectStorage.sync.enabled 'true'
-  yq.set sc .harbor.persistence.type \"swift\"
   yq.set sc .thanos.objectStorage.type \"swift\"
+  yq.set sc .harbor.persistence.type \"objectStorage\"
+  yq.set sc .objectStorage.sync.buckets "[]"
+  yq.set sc .objectStorage.sync.buckets[0].source \"thanos-bucket\"
   run _apply_normalise_sc
   _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
   yq.set sc .objectStorage.sync.enabled 'true'
-  yq.set sc .harbor.persistence.type \"swift\"
-  yq.set sc .thanos.objectStorage.type \"s3\"
+  yq.set sc .thanos.objectStorage.type \"swift\"
+  yq.set sc .harbor.persistence.type \"objectStorage\"
+  yq.set sc .objectStorage.sync.buckets "[]"
+  yq.set sc .objectStorage.sync.buckets[0].source \"thanos-bucket\"
+  yq.set sc .objectStorage.sync.buckets[0].destinationType \"swift\"
   run _apply_normalise_sc
   _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
   yq.set sc .objectStorage.sync.enabled 'true'
-  yq.set sc .harbor.persistence.type \"s3\"
   yq.set sc .thanos.objectStorage.type \"swift\"
+  yq.set sc .harbor.persistence.type \"objectStorage\"
+  yq.set sc .objectStorage.sync.buckets "[]"
+  yq.set sc .objectStorage.sync.buckets[0].source \"harbor-bucket\"
   run _apply_normalise_sc
   _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
   yq.set sc .objectStorage.sync.enabled 'true'
-  yq.set sc .harbor.persistence.type \"s3\"
   yq.set sc .thanos.objectStorage.type \"s3\"
-  run _apply_normalise_sc
-  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
-
-  yq.set sc .objectStorage.sync.enabled 'false'
   yq.set sc .harbor.persistence.type \"swift\"
-  yq.set sc .thanos.objectStorage.type \"swift\"
+  yq.set sc .objectStorage.sync.buckets "[]"
+  yq.set sc .objectStorage.sync.buckets[0].source \"harbor-bucket\"
+  yq.set sc .objectStorage.sync.buckets[0].destinationType \"swift\"
   run _apply_normalise_sc
-  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
+  _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
-  yq.set sc .objectStorage.sync.enabled 'false'
+  yq.set sc .objectStorage.sync.enabled 'true'
+  yq.set sc .thanos.objectStorage.type \"swift\"
+  yq.set sc .harbor.persistence.type \"objectStorage\"
+  yq.set sc .objectStorage.sync.buckets "[]"
+  run _apply_normalise_sc
+  _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
+
+  yq.set sc .objectStorage.sync.enabled 'true'
+  yq.set sc .thanos.objectStorage.type \"s3\"
   yq.set sc .harbor.persistence.type \"swift\"
-  yq.set sc .thanos.objectStorage.type \"s3\"
+  yq.set sc .objectStorage.sync.buckets "[]"
   run _apply_normalise_sc
-  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
+  _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
-  yq.set sc .objectStorage.sync.enabled 'false'
-  yq.set sc .harbor.persistence.type \"s3\"
+  yq.set sc .objectStorage.sync.enabled 'true'
+  yq.set sc .thanos.objectStorage.type \"s3\"
+  yq.set sc .harbor.persistence.type \"objectStorage\"
+  yq.set sc .objectStorage.sync.buckets "[]"
+  yq.set sc .objectStorage.sync.buckets[0].source \"opensearch-bucket\"
+  yq.set sc .objectStorage.sync.buckets[0].destinationType \"swift\"
+  run _apply_normalise_sc
+  _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
+
+  yq.set sc .objectStorage.sync.enabled 'true'
   yq.set sc .thanos.objectStorage.type \"swift\"
+  yq.set sc .harbor.persistence.type \"swift\"
+  yq.set sc .objectStorage.sync.buckets "[]"
+  yq.set sc .objectStorage.sync.buckets[0].source \"thanos-bucket\"
+  yq.set sc .objectStorage.sync.buckets[0].destinationType \"swift\"
+  yq.set sc .objectStorage.sync.buckets[1].source \"harbor-bucket\"
+  yq.set sc .objectStorage.sync.buckets[1].destinationType \"swift\"
+  run _apply_normalise_sc
+  _assert_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
+
+  yq.set sc .objectStorage.sync.enabled 'true'
+  yq.set sc .thanos.objectStorage.type \"s3\"
+  yq.set sc .harbor.persistence.type \"objectStorage\"
+  yq.set sc .objectStorage.sync.buckets "[]"
+  run _apply_normalise_sc
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
+
+  yq.set sc .objectStorage.sync.enabled 'true'
+  yq.set sc .thanos.objectStorage.type \"swift\"
+  yq.set sc .harbor.persistence.type \"objectStorage\"
+  yq.set sc .objectStorage.sync.buckets "[]"
+  yq.set sc .objectStorage.sync.buckets[0].source \"thanos-bucket\"
+  yq.set sc .objectStorage.sync.buckets[0].destinationType \"s3\"
+  run _apply_normalise_sc
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
+
+  yq.set sc .objectStorage.sync.enabled 'true'
+  yq.set sc .thanos.objectStorage.type \"s3\"
+  yq.set sc .harbor.persistence.type \"swift\"
+  yq.set sc .objectStorage.sync.buckets "[]"
+  yq.set sc .objectStorage.sync.buckets[0].source \"harbor-bucket\"
+  yq.set sc .objectStorage.sync.buckets[0].destinationType \"s3\"
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
   yq.set sc .objectStorage.sync.enabled 'false'
-  yq.set sc .harbor.persistence.type \"s3\"
   yq.set sc .thanos.objectStorage.type \"s3\"
+  yq.set sc .harbor.persistence.type \"swift\"
+  yq.set sc .objectStorage.sync.buckets "[]"
+  yq.set sc .objectStorage.sync.buckets[0].source \"harbor-bucket\"
+  yq.set sc .objectStorage.sync.buckets[0].destinationType \"swift\"
+  run _apply_normalise_sc
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
+
+
+  yq.set sc .objectStorage.sync.enabled 'false'
+  yq.set sc .thanos.objectStorage.type \"swift\"
+  yq.set sc .harbor.persistence.type \"objectStorage\"
+  yq.set sc .objectStorage.sync.buckets "[]"
+  yq.set sc .objectStorage.sync.buckets[0].source \"thanos-bucket\"
+  yq.set sc .objectStorage.sync.buckets[0].destinationType \"swift\"
+  run _apply_normalise_sc
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
+
+  yq.set sc .objectStorage.sync.enabled 'false'
+  yq.set sc .thanos.objectStorage.type \"swift\"
+  yq.set sc .harbor.persistence.type \"swift\"
+  yq.set sc .objectStorage.sync.buckets "[]"
+  yq.set sc .objectStorage.sync.buckets[0].source \"thanos-bucket\"
+  yq.set sc .objectStorage.sync.buckets[0].destinationType \"swift\"
+  yq.set sc .objectStorage.sync.buckets[1].source \"harbor-bucket\"
+  yq.set sc .objectStorage.sync.buckets[1].destinationType \"swift\"
+  run _apply_normalise_sc
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
+
+  yq.set sc .objectStorage.sync.enabled 'false'
+  yq.set sc .thanos.objectStorage.type \"swift\"
+  yq.set sc .harbor.persistence.type \"swift\"
+  yq.set sc .objectStorage.sync.buckets "[]"
+  run _apply_normalise_sc
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
+
+  yq.set sc .objectStorage.sync.enabled 'false'
+  yq.set sc .thanos.objectStorage.type \"s3\"
+  yq.set sc .harbor.persistence.type \"swift\"
+  yq.set sc .objectStorage.sync.buckets "[]"
+  run _apply_normalise_sc
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
+
+  yq.set sc .objectStorage.sync.enabled 'false'
+  yq.set sc .thanos.objectStorage.type \"swift\"
+  yq.set sc .harbor.persistence.type \"objectStorage\"
+  yq.set sc .objectStorage.sync.buckets "[]"
+  run _apply_normalise_sc
+  _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
+
+  yq.set sc .objectStorage.sync.enabled 'false'
+  yq.set sc .thanos.objectStorage.type \"s3\"
+  yq.set sc .harbor.persistence.type \"objectStorage\"
+  yq.set sc .objectStorage.sync.buckets "[]"
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 }
