@@ -7,31 +7,40 @@ here="$(dirname "$(readlink -f "$0")")"
 source "${here}/common.bash"
 
 usage() {
-    log_info "usage: ck8s diagnostics <sc|wc> [--namespace namespace] [--include-config]"
+    log_info "usage: ck8s diagnostics <sc|wc> [namespace namespace] [query-default-metrics-since date] [query-metric metric] [--include-config]"
     log_info
     log_info "Collects diagnostics from the current environment set by CK8S_CONFIG_PATH and"
     log_info "store them in a file in the CK8S_CONFIG_PATH directory encrypted with SOPS using"
     log_info "any GPG keys listed in CK8S_CONFIG_PATH/.sops.yaml or set by CK8S_PGP_FP"
     log_info ""
-    log_info "\t-h, --help\t\tdisplay help for this command and exit"
-    log_info "\t-n, --namespace\t\trun diagnostics for specified namespace only"
-    log_info "\t    --include-config\tinclude config yaml files found in CK8S_CONFIG_PATH"
+    log_info "Commands:"
+    log_info "     namespace                     run diagnostics for specified namespace only"
+    log_info "     query-default-metrics-since   query a predefined set of metrics since the specified date"
+    log_info "     query-metric                  query any arbitrary metric"
+    log_info ""
+    log_info "Global options:"
+    log_info " -h, --help                        display help for this command and exit"
+    log_info "     --include-config              include config yaml files found in CK8S_CONFIG_PATH"
     exit 1
 }
 
 include_config=false
-namespace=""
 cluster="${1}"
+sub_command=""
+command_arg=""
+
 shift
 
 while [ "${#}" -gt 0 ] ; do
     case "${1}" in
-        -n | --namespace)
-            namespace="${2:-}"
-            shift
-            ;;
         --include-config)
             include_config=true
+            ;;
+        namespace|query-default-metrics-since|query-metric)
+            [[ ${#} -ge 2 && "${2}" != -* && -z "$sub_command" ]] || usage
+            sub_command="${1:-}"
+            command_arg="${2:-}"
+            shift
             ;;
         -h | --help)
             usage
@@ -43,9 +52,6 @@ while [ "${#}" -gt 0 ] ; do
     esac
     shift
 done
-
-file="${CK8S_CONFIG_PATH}/diagnostics-${cluster}-$(date +%y%m%d%H%M%S).log"
-touch "${file}"
 
 if [ -z "${CK8S_PGP_FP:-}" ]; then
     fingerprints=$(yq4 '.creation_rules[].pgp' "${sops_config}")
@@ -65,6 +71,9 @@ if [ -z "${CK8S_PGP_FP:-}" ]; then
     fi
 fi
 
+file="${CK8S_CONFIG_PATH}/diagnostics-${cluster}-$(date +%y%m%d%H%M%S).log"
+touch "${file}"
+
 sops_encrypt_file() {
     if [ -z "${CK8S_PGP_FP:-}" ]; then
         sops_encrypt "${file}"
@@ -74,6 +83,13 @@ sops_encrypt_file() {
     log_info "Encrypting ${file}"
 
     sops --pgp "${CK8S_PGP_FP}" -e -i "${file}"
+}
+
+fetch_oidc_token() {
+    # shellcheck disable=SC2016
+    readarray -t args <<< "$(yq4 '. as $root | ($root.contexts[] | select(.name == $root.current-context) | .context) as $context | ($root.users[] | select(.name == $context.user) | .user) as $user | $user.exec.args[]' "${config["kube_config_sc"]}")"
+    [[ "${args[0]}" == "oidc-login" ]] || log_fatal "Error: This command requires the kubeconfig to use OIDC"
+    kubectl "${args[@]}" | yq4 '.status.token'
 }
 
 run_diagnostics() {
@@ -221,6 +237,7 @@ run_diagnostics() {
 }
 
 run_diagnostics_namespaced() {
+    namespace="${1}"
     echo "Running in the ${namespace} namespace"
     # -- Pods --
     echo -e "Fetching all pods <pods>"
@@ -308,15 +325,100 @@ get_config_files() {
     done
 }
 
+run_diagnostics_default_metrics() {
+    token="$(fetch_oidc_token)"
+    domain="https://kube.$(yq4 '.global.opsDomain' "${config["config_file_sc"]}"):6443"
+    endpoint="${domain}/api/v1/namespaces/thanos/services/thanos-query-query-frontend:9090/proxy/api/v1"
+    header="Authorization: Bearer ${token}"
+    range_arg=("--data-urlencode" "start=$(date -d -"${1}" -Iseconds)" "--data-urlencode" "end=$(date -Iseconds)" "--data-urlencode" "step=1m")
+
+    query_and_parse() {
+        query="${1}"
+        print_func="${2}"
+        res="$(curl "${endpoint}/query_range" -k -s --header "${header}" --data-urlencode query="${query}" "${range_arg[@]}")"
+        if [[ $(jq '.data.result | length' <<< "${res}") -gt 0  ]]; then
+            readarray metric_results_arr < <(jq -c '.data.result[]' <<< "${res}")
+            for row in "${metric_results_arr[@]}"; do
+                "${print_func}" "${row}"
+            done
+        fi
+    }
+
+    print_fluentd() {
+        echo "Fluentd output error rate over 0 on the dates:"
+        jq '.values[][0]' <<< "${1}" | xargs -I {} date -d@{}
+        echo
+    }
+
+    # Fluentd output error/retry rate
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+    echo "Querying fluentd output error rate."
+    query_and_parse 'sum(rate(fluentd_output_status_retry_count[1m])) > 0' print_fluentd
+
+    print_dropped_packages() {
+        direction="$([[ $(jq -r .metric.type <<< "${1}") == "fw" ]] && echo "from" || echo "to")"
+        pod="$(jq '.metric.exported_pod' <<< "${1}")"
+        echo "Found dropped packages going ${direction} pod: ${pod} on dates:"
+        jq '.values[][0]' <<< "${1}" | xargs -I {} date -d@{}
+        echo
+    }
+
+    # Dropped packets going from pod
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+    echo "Querying dropped packages."
+    query_and_parse 'rate(no_policy_drop_counter[1m]) > 0' print_dropped_packages
+
+    print_uptime() {
+        echo "The target $(jq '.metric.target' <<< "${1}") was down on dates:"
+        jq '.values[][0]' <<< "${1}" | xargs -I {} date -d@{}
+        echo
+    }
+
+    # Uptime
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+    echo "Querying uptime."
+    query_and_parse 'max by (target) (probe_success) < 1' print_uptime
+
+    # Opensearch status <instant Query>
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+    echo "Querying Opensearch cluster status"
+    res="$(curl "${endpoint}/query" -k -s --header "${header}" --data-urlencode query='elasticsearch_cluster_health_status{color=~"yellow|red"} > 0')"
+    if [[ $(jq '.data.result | length' <<< "${res}" ) -gt 0 ]]; then
+        echo "Opensearch is in $(jq '.data.result[0].metric.color' <<< "${res}") state!"
+    fi
+}
+
+# run_diagnostics_query_metric <metric>
+run_diagnostics_query_metric() {
+    token=$(fetch_oidc_token)
+    domain="https://kube.$(yq4 '.global.opsDomain' "${config["config_file_sc"]}"):6443"
+    endpoint="${domain}/api/v1/namespaces/thanos/services/thanos-query-query-frontend:9090/proxy/api/v1"
+    header="Authorization: Bearer ${token}"
+
+    curl "${endpoint}/query" -k --header "${header}" --data-urlencode query="${1}" | jq
+}
+
 log_info "Running diagnostics..."
 config_load "${cluster}"
-if [ -z "${namespace}" ]; then
-    run_diagnostics >"${file}" 2>&1
-else
-    # check that namespace exists
-    "${here}/ops.bash" kubectl "${cluster}" get namespace "${namespace}" > /dev/null
-    run_diagnostics_namespaced >"${file}" 2>&1
-fi
+
+case "${sub_command}" in
+    namespace)
+        # check that namespace exists
+        "${here}/ops.bash" kubectl "${cluster}" get namespace "${command_arg}" >/dev/null
+        run_diagnostics_namespaced "${command_arg}" >"${file}" 2>&1
+        ;;
+    query-default-metrics-since)
+        # Verify date argument
+        date -d -"${command_arg}" >/dev/null
+        run_diagnostics_default_metrics "${command_arg}" >"${file}" 2>&1
+        ;;
+    query-metric)
+        run_diagnostics_query_metric "${command_arg}" >"${file}" 2>&1
+        ;;
+    *)
+        run_diagnostics >"${file}" 2>&1
+        ;;
+esac
 
 if [[ "${include_config}" == "true" ]]; then
     get_config_files >>"${file}" 2>&1

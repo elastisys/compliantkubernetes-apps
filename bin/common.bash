@@ -85,6 +85,11 @@ log_error() {
     log_error_no_newline "${*}\n"
 }
 
+log_fatal() {
+  log_error "${*}"
+  exit 1
+}
+
 ask_abort() {
   log_warning_no_newline "Do you want to abort? (y/N): "
   read -r reply
