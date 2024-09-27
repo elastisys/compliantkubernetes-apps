@@ -35,7 +35,7 @@ Cypress.Commands.add('testGrafanaDashboard', (ingress, dashboardName, expandRows
 
   // Expand all dashboard rows
   if (expandRows === true) {
-    cy.get(".dashboard-row--collapsed")
+    cy.get('[data-testid="dashboard-row-container"] > [aria-expanded="false"]')
       .each((element) => {
         cy.wrap(element)
           .click()
