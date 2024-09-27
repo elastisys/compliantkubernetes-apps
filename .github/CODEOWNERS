@@ -1,6 +1,6 @@
 /.github/ @elastisys/goto-pipeline/qa/release
 
-/bin/ @scripts-goto
+/bin/ @elastisys/goto-scripts
 
 /changelog/ @elastisys/goto-pipeline/qa/release
 
@@ -23,7 +23,7 @@
 # TODO Refine per dashboard later
 /helmfile.d/charts/grafana-dashboards/ @elastisys/goto-monitoring-stack
 /helmfile.d/charts/grafana-label-enforcer/ @elastisys/goto-monitoring-stack
-/helmfile.d/charts/habor/ @elastisys/goto-container-registry
+/helmfile.d/charts/harbor/ @elastisys/goto-container-registry
 /helmfile.d/charts/hnc/ @elastisys/goto-security
 /helmfile.d/charts/ingress-nginx-probe-ingress/ @elastisys/goto-ingress/auth
 /helmfile.d/charts/issuers/ @elastisys/goto-ingress/auth
@@ -65,23 +65,27 @@
 /helmfile.d/stacks/dex.yaml @elastisys/goto-ingress/auth
 /helmfile.d/stacks/external-dns.yaml @elastisys/goto-ingress/auth
 /helmfile.d/stacks/falco.yaml @elastisys/goto-security
-/helmfile.d/stacks/fluentd.yaml @elatisys/logging-stack-goto
+/helmfile.d/stacks/fluentd.yaml @elastisys/goto-logging-stack
 /helmfile.d/stacks/gatekeeper.yaml @elastisys/goto-security
 /helmfile.d/stacks/hnc.yaml @elastisys/goto-security
 /helmfile.d/stacks/ingress-nginx.yaml @elastisys/goto-ingress/auth
 /helmfile.d/stacks/kured.yaml @elastisys/goto-security
-# /helmfile.d/stacks/local.yaml
 /helmfile.d/stacks/monitoring-grafana.yaml @elastisys/goto-monitoring-stack
 /helmfile.d/stacks/monitoring-prometheus.yaml @elastisys/goto-monitoring-stack
 /helmfile.d/stacks/monitoring.yaml @elastisys/goto-monitoring-stack
-# /helmfile.d/stacks/namespaces.yaml
 /helmfile.d/stacks/opensearch.yaml @elastisys/goto-logging-stack
 /helmfile.d/stacks/rbac.yaml @elastisys/goto-security
 /helmfile.d/stacks/rclone.yaml @elastisys/goto-security
 /helmfile.d/stacks/system.yaml @elastisys/goto-security # node-local-dns here as well
 /helmfile.d/stacks/tekton.yaml @elastisys/goto-continous-delivery
-/helmfile.d/stacks/thanos.yaml @elastisys/monitoring-stack
-/helmfile.d/stacks/velero.yaml @ elastisys/security-goto
+/helmfile.d/stacks/thanos.yaml @elastisys/goto-monitoring-stack
+/helmfile.d/stacks/velero.yaml @elastisys/goto-security
+
+#
+# Skipped files in /helmfile.d/stacks/
+# local.yaml
+# namespaces.yaml
+#
 
 #
 # helmfile.d/upstream/
@@ -154,7 +158,7 @@
 /helmfile.d/values/prometheus-user-alerts-wc.yaml.gotmpl @elastisys/goto-monitoring-stack
 /helmfile.d/values/s3-exporter.yaml.gotmpl @elastisys/goto-monitoring-stack
 /helmfile.d/values/sc-servicemonitor.yaml.gotmpl @elastisys/goto-monitoring-stack
-/helmfile.d/values/tekton.gotmpl @elastisys/goto-monitoring-stack
+/helmfile.d/values/tekton.gotmpl @elastisys/goto-continous-delivery
 /helmfile.d/values/user-alertmanager.yaml.gotmpl @elastisys/goto-monitoring-stack
 /helmfile.d/values/user-rbac.yaml.gotmpl @elastisys/goto-security
 /helmfile.d/values/velero-* @elastisys/goto-security
