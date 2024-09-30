@@ -1028,13 +1028,18 @@ allOf:
             sync:
               properties:
                 buckets:
-                  items:
-                    properties:
-                      source:
-                        pattern: '.*harbor.*'
-                    not:
+                  if:
+                    contains:
                       properties:
-                        destinationType: {}
+                        source:
+                          pattern: '.*harbor.*'
+                  then:
+                    contains:
+                      properties:
+                        source:
+                          pattern: '.*harbor.*'
+                        destinationType:
+                          const: "swift"
     - properties:
         thanos:
           properties:
@@ -1048,20 +1053,27 @@ allOf:
             sync:
               properties:
                 buckets:
-                  items:
-                    properties:
-                      source:
-                        pattern: '.*thanos.*'
-                    not:
+                  if:
+                    contains:
                       properties:
-                        destinationType: {}
+                        source:
+                          pattern: '.*thanos.*'
+                  then:
+                    contains:
+                      properties:
+                        source:
+                          pattern: '.*thanos.*'
+                        destinationType:
+                          const: "swift"
     - properties:
         objectStorage:
           properties:
             sync:
               properties:
                 buckets:
-                  items:
+                  contains:
+                    required:
+                    - destinationType
                     properties:
                       destinationType:
                         const: "swift"
