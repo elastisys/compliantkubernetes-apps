@@ -67,7 +67,7 @@ teardown() {
   run kubectl -n velero-test exec velero-test -- touch /test/hello
   assert_success
 
-  run ck8s ops velero wc backup create --include-namespaces velero-test "${backup_name}" --wait
+  run velero_backup_create wc "${backup_name}"
   assert_success
 
   run velero_backup_get_phase wc "${backup_name}"
