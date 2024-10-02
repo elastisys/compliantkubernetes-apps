@@ -42,8 +42,8 @@ export SPECIFIC_BACKUP=<backups/xxxxxxxxxx.sql.gz> # Optional
 Setup the necessary job.yaml and configmap:
 
 ```bash
-envsubst > tmp-job.yaml < scripts/restore/restore-harbor-job.yaml
-./bin/ck8s ops kubectl sc create configmap -n harbor restore-harbor --from-file=scripts/restore/restore-harbor.sh
+envsubst > tmp-job.yaml < restore/harbor/restore-harbor-job.yaml
+./bin/ck8s ops kubectl sc create configmap -n harbor restore-harbor --from-file=restore/harbor/restore-harbor.sh
 ```
 
 ## Restore job Azure
@@ -51,8 +51,8 @@ envsubst > tmp-job.yaml < scripts/restore/restore-harbor-job.yaml
 Setup the necessary job.yaml and configmap:
 
 ```bash
-envsubst > tmp-job.yaml < scripts/restore/restore-harbor-job-azure.yaml
-./bin/ck8s ops kubectl sc create configmap -n harbor restore-harbor --from-file=scripts/restore/restore-harbor.sh
+envsubst > tmp-job.yaml < restore/harbor/restore-harbor-job-azure.yaml
+./bin/ck8s ops kubectl sc create configmap -n harbor restore-harbor --from-file=restore/harbor/restore-harbor.sh
 ```
 
 ## Restore common
@@ -66,7 +66,7 @@ While restoring we need to stop all harbor pods except for the database.
 Create the job and wait until it has completed:
 
 ```
-./bin/ck8s ops kubectl sc apply -n harbor -f scripts/restore/network-policies-harbor.yaml
+./bin/ck8s ops kubectl sc apply -n harbor -f restore/harbor/network-policies-harbor.yaml
 ./bin/ck8s ops kubectl sc apply -n harbor -f tmp-job.yaml
 ./bin/ck8s ops kubectl sc wait --for=condition=complete job -n harbor restore-harbor-job --timeout=-1s
 ```
@@ -80,7 +80,7 @@ Restore the pods:
 Clean up:
 
 ```
-./bin/ck8s ops kubectl sc delete -n harbor -f scripts/restore/network-policies-harbor.yaml
+./bin/ck8s ops kubectl sc delete -n harbor -f restore/harbor/network-policies-harbor.yaml
 ./bin/ck8s ops kubectl sc delete -n harbor -f tmp-job.yaml
 ./bin/ck8s ops kubectl sc delete configmap -n harbor restore-harbor
 rm -v tmp-job.yaml
