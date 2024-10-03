@@ -94,9 +94,13 @@ velero:
 
   ## Excluded namespaces
   excludedNamespaces:
+    - calico-apiserver
+    - calico-system
     - cert-manager
     - falco
     - fluentd
+    - gatekeeper-system
+    - gpu-operator
     - hnc-system
     - ingress-nginx
     - kube-node-lease
@@ -104,9 +108,9 @@ velero:
     - kube-system
     - kured
     - monitoring
+    - openstack-system
     - rook-ceph
     - velero
-    - gatekeeper-system
 
   ## Extra excluded namespace, here we should add the namespaces that are more likely to change
   excludedExtraNamespaces: []
