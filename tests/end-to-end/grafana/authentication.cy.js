@@ -41,6 +41,13 @@ describe("grafana admin authentication", function() {
         }
       })
 
+    cy.yqDigParse("sc", ".grafana.ops.oidc.allowedDomains")
+      .then(domains => {
+        if (!domains.includes("example.com")) {
+          this.skip("example.com not set in .grafana.ops.oidc.allowedDomains")
+        }
+      })
+
     cy.visit(`https://${this.ingress}`)
 
     cy.contains("Sign in with dex")
@@ -95,6 +102,13 @@ describe("grafana dev authentication", function() {
       .then(staticLoginEnabled => {
         if (staticLoginEnabled !== "true") {
           this.skip("dex static login is not enabled")
+        }
+      })
+
+    cy.yqDigParse("sc", ".grafana.user.oidc.allowedDomains")
+      .then(domains => {
+        if (!domains.includes("example.com")) {
+          this.skip("example.com not set in .grafana.user.oidc.allowedDomains")
         }
       })
 
