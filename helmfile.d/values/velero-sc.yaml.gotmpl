@@ -143,6 +143,8 @@ schedules:
       labelSelector:
         matchLabels:
           velero: backup
+      includedNamespaces:
+        - monitoring
       excludedResources:
         - clustercompliancereports.aquasecurity.github.io
         - clusterconfigauditreports.aquasecurity.github.io
