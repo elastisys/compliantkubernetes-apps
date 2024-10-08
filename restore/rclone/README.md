@@ -72,6 +72,9 @@ objectStorage:
 
 Specify destinations and sources you want to use, follows the same structure as `.objectStorage.type` does:
 
+> [!warning]
+> [Known issue](https://github.com/elastisys/compliantkubernetes-apps/issues/2303): Restoring Harbor from S3 to Azure does not currently work.
+
 ```yaml
 # file: sc-config.yaml
 objectStorage:
