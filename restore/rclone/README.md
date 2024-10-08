@@ -70,7 +70,7 @@ objectStorage:
     enabled: true
 ```
 
-Specify destinations and sources you want to use, follows the same structure as `.objectStorage.type` does:
+Specify destinations and sources you want to use, follows the same structure as `.objectStorage.type` does ([config schema](https://elastisys.io/compliantkubernetes/operator-manual/schema/config-properties-object-storage-config-properties-rclone-restore-config)) ([secrets schema](https://elastisys.io/compliantkubernetes/operator-manual/schema/secrets-properties-object-storage-secrets-properties-rclone-restore-secrets/)):
 
 ```yaml
 # file: sc-config.yaml
@@ -93,7 +93,7 @@ objectStorage:
         ...
 ```
 
-Specify decryption parameters if the sources are encrypted:
+Specify decryption parameters if the sources are encrypted ([config schema](https://elastisys.io/compliantkubernetes/operator-manual/schema/config-properties-object-storage-config-properties-rclone-sync-config-properties-rclone-crypt/)) ([secrets schema](https://elastisys.io/compliantkubernetes/operator-manual/schema/secrets-properties-object-storage-secrets-properties-rclone-sync-secrets-properties-rclone-crypt-secrets/)):
 
 ```yaml
 objectStorage:
@@ -108,7 +108,7 @@ objectStorage:
       directoryName: false # decrypt directory names
 ```
 
-Finally specify the targets you want to restore:
+Finally specify the targets you want to restore ([config schema](https://elastisys.io/compliantkubernetes/operator-manual/schema/config-properties-object-storage-config-properties-rclone-restore-config-properties-rclone-restore-targets-rclone-restore-target/)):
 
 ```yaml
 objectStorage:
