@@ -169,7 +169,6 @@ _test_apply_swift_application_credential_id() {
   yq.set sc .harbor.persistence.type '"swift"'
 
   update_ips.mock_swift
-  update_ips.setup_mktemp_mock
 
   sops --set '["objectStorage"]["swift"]["username"] "swift-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
   sops --set '["objectStorage"]["swift"]["password"] "swift-password"' "${CK8S_CONFIG_PATH}/secrets.yaml"
@@ -177,4 +176,5 @@ _test_apply_swift_application_credential_id() {
   run ck8s update-ips both apply
 
   assert_equal "$(mock_get_call_args "${mock_curl}" 1)" "$(cat "${BATS_TEST_DIRNAME}/resources/get-swift-url.out")"
+  assert_equal "$(mock_get_call_args "${mock_curl}" 2)" '-i -s -X DELETE -H X-Auth-Token: 123456789 -H X-Subject-Token: 123456789 https://keystone.foo.dev-ck8s.com:5678/auth/tokens'
 }

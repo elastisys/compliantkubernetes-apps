@@ -26,20 +26,6 @@ update_ips.setup_mocks() {
   export -f kubectl
 }
 
-update_ips.setup_mktemp_mock(){
-  mock_mktemp="$(mock_create)"
-  export mock_mktemp
-  mktemp() {
-    # shellcheck disable=SC2317
-    touch /tmp/tmp.mock_headers
-    # shellcheck disable=SC2317
-    "${mock_mktemp}" "${@}"
-  }
-  export -f mktemp
-
-  mock_set_output "${mock_mktemp}" /tmp/tmp.mock_headers
-}
-
 update_ips.assert_mocks_none() {
   assert_equal "$(mock_get_call_num "${mock_curl}")" 0
   assert_equal "$(mock_get_call_num "${mock_dig}")" 0
@@ -134,7 +120,9 @@ update_ips.mock_swift() {
   update_ips.mock_minimal
 
   # GET /auth/tokens
-  mock_set_output "${mock_curl}" '{"token":{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com:91011"}]}]}}' 1
+  mock_set_output "${mock_curl}" 'x-subject-token: 123456789
+
+  {"token":{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com:91011"}]}]}}' 1
   mock_set_output "${mock_curl}" "" 2 # DELETE /auth/tokens
 
   mock_set_output "${mock_dig}" "127.0.0.4" 4 # keystone endpoint
