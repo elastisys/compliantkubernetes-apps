@@ -1,34 +1,29 @@
 # Restore Harbor
 
-With the k8s job you can restore the database in Harbor from a backup in S3.
+With the k8s job you can restore the database in Harbor from a backup in S3 or Azure blob storage.
 *Note this restore is only designed for internal harbor database and not for an external database*
 The steps should be performed from the `compliantkubernetes-apps` root directory.
-*Note this k8s job does not include restore from gcs.*
 
 Before restoring the database, make sure that Harbor is installed.
 It can be installed normally.
 
-## Env variables
+## Specific backup
 
-Set these variables for the restore job:
-
-```bash
-export CK8S_CONFIG_PATH=<your config path>
-export S3_BUCKET=$(yq4 '.objectStorage.buckets.harbor' "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml" )
-export S3_REGION_ENDPOINT=$(yq4 '.objectStorage.s3.regionEndpoint' "${CK8S_CONFIG_PATH}/common-config.yaml")
-echo $CK8S_CONFIG_PATH
-echo $S3_BUCKET
-echo $S3_REGION_ENDPOINT
-```
-
-### Optional env variables
-
-The job will restore the latest backup.
+By default the job will restore the latest backup.
 `$SPECIFIC_BACKUP` can be used to specify which backup.
 To get a list of available backups use:
 
-```
+S3:
+
+```bash
 s3cmd --config <(sops -d ${CK8S_CONFIG_PATH}/.state/s3cfg.ini) ls s3://${S3_BUCKET}/backups/
+```
+
+Azure:
+
+```bash
+export AZURE_LOCATION=swedencentral
+./scripts/azure/storage-manager.sh list-harbor-backups
 ```
 
 Then set:
@@ -42,6 +37,8 @@ export SPECIFIC_BACKUP=<backups/xxxxxxxxxx.sql.gz> # Optional
 Setup the necessary job.yaml and configmap:
 
 ```bash
+export S3_BUCKET=$(yq4 '.objectStorage.buckets.harbor' "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml" )
+export S3_REGION_ENDPOINT=$(yq4 '.objectStorage.s3.regionEndpoint' "${CK8S_CONFIG_PATH}/common-config.yaml")
 envsubst > tmp-job.yaml < restore/harbor/restore-harbor-job.yaml
 ./bin/ck8s ops kubectl sc create configmap -n harbor restore-harbor --from-file=restore/harbor/restore-harbor.sh
 ```
