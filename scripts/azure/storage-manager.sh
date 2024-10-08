@@ -7,6 +7,7 @@ set -euo pipefail
 
 readonly CREATE_ACTION="create"
 readonly DELETE_ACTION="delete"
+readonly LIST_HARBOR_BACKUPS="list-harbor-backups"
 
 log_info() {
     echo -e "[\e[34mck8s\e[0m] ${*}" 1>&2
@@ -67,6 +68,9 @@ create)
     ;;
 delete)
     ACTION=$DELETE_ACTION
+    ;;
+list-harbor-backups)
+    ACTION=$LIST_HARBOR_BACKUPS
     ;;
 esac
 shift
@@ -147,6 +151,11 @@ function delete_all() {
     az group delete --name "${RESOURCE_GROUP}"
 }
 
+function list_harbor_backups() {
+  CONTAINER=$(echo "${sc_config}" | yq4 '.objectStorage.buckets.harbor')
+  az storage blob list --account-name "${STORAGE_ACCOUNT}" --container-name "${CONTAINER}" --prefix "backups" -o table
+}
+
 if [[ "$ACTION" == "$CREATE_ACTION" ]]; then
     log_info "Creating Resource Group" >&2
     create_resource_group
@@ -159,6 +168,9 @@ if [[ "$ACTION" == "$CREATE_ACTION" ]]; then
 elif [[ "$ACTION" == "$DELETE_ACTION" ]]; then
     log_info "deleting..." >&2
     delete_all
+elif [[ "$ACTION" == "$LIST_HARBOR_BACKUPS" ]]; then
+    log_info "Listing harbor backups" >&2
+    list_harbor_backups
 else
     log_error 'Unknown action - Aborting!' >&2 && usage
     exit 1
