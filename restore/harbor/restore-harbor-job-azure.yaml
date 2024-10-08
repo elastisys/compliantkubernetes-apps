@@ -42,8 +42,6 @@ spec:
                   key: azure-account-name
             - name: STORAGE_TYPE
               value: "azure"
-            - name: S3_BUCKET
-              value: ${S3_BUCKET}
             - name: SPECIFIC_BACKUP
               value: ${SPECIFIC_BACKUP}
             - name: PGPASSWORD
