@@ -165,16 +165,32 @@ _test_apply_swift_application_credential_id() {
   _test_apply_swift_application_credential_id '.objectStorage.sync.buckets.[0].sourceType'
 }
 
-@test "ck8s update-ips gets swift url" {
+@test "ck8s update-ips extract swift url using username" {
   yq.set sc .harbor.persistence.type '"swift"'
 
   update_ips.mock_swift
-  update_ips.setup_mktemp_mock
 
   sops --set '["objectStorage"]["swift"]["username"] "swift-username"' "${CK8S_CONFIG_PATH}/secrets.yaml"
   sops --set '["objectStorage"]["swift"]["password"] "swift-password"' "${CK8S_CONFIG_PATH}/secrets.yaml"
 
   run ck8s update-ips both apply
 
-  assert_equal "$(mock_get_call_args "${mock_curl}" 1)" "$(cat "${BATS_TEST_DIRNAME}/resources/get-swift-url.out")"
+  assert_equal "$(mock_get_call_args "${mock_curl}" 1)" "$(cat "${BATS_TEST_DIRNAME}/resources/get-swift-url-username.out")"
+  assert_equal "$(mock_get_call_args "${mock_curl}" 2)" '-i -s -X DELETE -H X-Auth-Token: 123456789 -H X-Subject-Token: 123456789 https://keystone.foo.dev-ck8s.com:5678/auth/tokens'
+  assert_equal "$(mock_get_call_args "${mock_dig}" 5)" '+short swift.foo.dev-ck8s.com'
+}
+
+@test "ck8s update-ips extract swift url using application credential id" {
+  yq.set sc .harbor.persistence.type '"swift"'
+
+  update_ips.mock_swift
+
+  sops --set '["objectStorage"]["swift"]["applicationCredentialID"] "swift-application-credential-id"' "${CK8S_CONFIG_PATH}/secrets.yaml"
+  sops --set '["objectStorage"]["swift"]["applicationCredentialSecret"] "swift-application-credential-secret"' "${CK8S_CONFIG_PATH}/secrets.yaml"
+
+  run ck8s update-ips both apply
+
+  assert_equal "$(mock_get_call_args "${mock_curl}" 1)" "$(cat "${BATS_TEST_DIRNAME}/resources/get-swift-url-application-credentails.out")"
+  assert_equal "$(mock_get_call_args "${mock_curl}" 2)" '-i -s -X DELETE -H X-Auth-Token: 123456789 -H X-Subject-Token: 123456789 https://keystone.foo.dev-ck8s.com:5678/auth/tokens'
+  assert_equal "$(mock_get_call_args "${mock_dig}" 5)" '+short swift.foo.dev-ck8s.com'
 }
