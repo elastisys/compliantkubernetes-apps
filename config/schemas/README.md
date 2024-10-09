@@ -169,6 +169,10 @@ These guidelines aims to help to create better quality reference documentation.
 
 These guidelines aims to help to create schemas that are easier to read and write.
 
+- All schemas must define a type.
+- All schemas should define a single type to not cause type confusion.
+- All schemas should use `additionalProperties: false` when no additional properties should be defined to make it easier to find misspelled keys.
+
 #### Defines
 
 Defines here refer to the use of `$defs` to define schemas, and `$ref`:s to use schemas.
@@ -199,8 +203,8 @@ The same guidelines for defines are applicable here as well.
 
 #### Compositions and Conditions
 
-Conditions here refers to the use of `allOf`, `anyOf`, and `oneOf` to define schema compositions and conditions.
+Compositions and conditions here refers to the use of `allOf`, `anyOf`, and `oneOf`, etc. to define schema compositions and conditions.
 
-- Must set defaults as they can else not be fully resolved.
-- Should set examples as they can else not be fully resolved.
-- Should **not** use `if` `then` `else` as it has less support in tooling, and has a semantic that is generally different from other schema constructs.
+- Schemas with compositions and conditions must set defaults because otherwise they cannot be fully resolved.
+- Schemas with compositions and conditions should set examples because otherwise they cannot be fully resolved.
+- Should not use `if` `then` `else` as it has less support in tooling, and has a semantic that is generally different from other schema constructs.
