@@ -17,6 +17,7 @@ if [[ "${CK8S_CLUSTER}" =~ ^(sc|both)$ ]]; then
   if yq_check sc .objectStorage.sync.enabled true; then
     if yq_null sc .objectStorage.sync.destinationType; then
       log_info "objectStorage sync is enabled, will keep previous default destinationType: s3"
+      yq_add sc .objectStorage.sync.destinationType "\"s3\""
     else
       log_info "sync destinationType already has an override, skipping"
     fi
