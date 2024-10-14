@@ -1693,6 +1693,13 @@ properties:
               `RetentionDays` defines how old a backup should be before deleting it.
             default: 7
             type: number
+          schedule:
+            title: Schedule for backup job
+            description: |-
+              `schedule` defines when the backup job for Harbor will run.
+              This should be set to run shortly after Velero backups in the workload cluster, in order to ensure that images needed for Velero backups are backed up in Harbor.
+            default: "30 0 * * *"
+            type: string
         type: object
       core:
         title: Core Config
