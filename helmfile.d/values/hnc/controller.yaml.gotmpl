@@ -18,7 +18,12 @@ managedNamespaceLabels: {{- toYaml .Values.hnc.managedNamespaceLabels | nindent 
 
 rbac:
   user:
-    namespaces: {{- toYaml (without .Values.user.namespaces (keys .Values.user.constraints | join " ")) | nindent 6 }}
+    namespaces:
+    {{- range $namespace := .Values.user.namespaces }}
+    {{- if not (hasKey $.Values.user.constraints $namespace) }}
+        - {{ $namespace }}
+    {{- end }}
+    {{- end }}
     groups: {{- toYaml .Values.user.adminGroups | nindent 6 }}
     users: {{- toYaml .Values.user.adminUsers | nindent 6 }}
 
