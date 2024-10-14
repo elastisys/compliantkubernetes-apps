@@ -9,3 +9,8 @@ fluentd:
       # azcopy is used by az CLI for downloading files
       azureCopyBufferGB: 0.3
       azureCopyConcurrency: 8
+
+objectStorage:
+  sync:
+    ## If Harbor or Thanos are using Swift then we will automatically use Swift for the sync of Harbor or Thanos, regardless of the value set for destinationType.
+    destinationType: azure

@@ -127,6 +127,15 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
+1. Update `objectStorage.sync.destinationType` for Azure clusters
+
+    Ensure that `objectStorage.sync.destinationType` keeps current value for Azure clusters that have sync enabled.
+    Default is updated to `azure` for Azure clusters.
+
+    ```bash
+    ./migration/v0.42/prepare/40-azure-sync-destination-type.sh
+    ```
+
 1. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.
