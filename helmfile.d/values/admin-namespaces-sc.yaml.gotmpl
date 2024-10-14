@@ -63,7 +63,7 @@ namespaces:
       pod-security.kubernetes.io/audit: privileged
       pod-security.kubernetes.io/enforce: privileged
       pod-security.kubernetes.io/warn: privileged
-  {{ if .Values.objectStorage.sync.enabled }}
+  {{ if or (.Values.objectStorage.sync.enabled) (.Values.objectStorage.restore.enabled) }}
   - name: rclone
     labels:
       pod-security.kubernetes.io/audit: restricted
