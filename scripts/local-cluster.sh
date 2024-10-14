@@ -267,6 +267,10 @@ config() {
     log.fatal "CK8S_CONFIG_PATH is unset"
   fi
 
+  if [[ -z "${CK8S_PGP_FP:-}" ]]; then
+    log.fatal "CK8S_PGP_FP is unset"
+  fi
+
   if ! [[ -d "${CK8S_CONFIG_PATH}" ]]; then
     mkdir -p "${CK8S_CONFIG_PATH}"
   fi
@@ -315,6 +319,10 @@ create() {
 
   if [[ -z "${cluster}" ]]; then
     log.usage
+  fi
+
+  if [[ -z "${CK8S_CONFIG_PATH:-}" ]]; then
+    log.fatal "CK8S_CONFIG_PATH is unset"
   fi
 
   if [[ -f "${config}" ]]; then
@@ -400,6 +408,10 @@ delete() {
 
   if [[ -z "${cluster}" ]]; then
     log.usage
+  fi
+
+  if [[ -z "${CK8S_CONFIG_PATH:-}" ]]; then
+    log.fatal "CK8S_CONFIG_PATH is unset"
   fi
 
   if cluster.exist "${cluster}"; then
