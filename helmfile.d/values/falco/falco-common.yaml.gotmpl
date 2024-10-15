@@ -108,41 +108,59 @@ customRules:
     # Run shell untrusted
     # Contact K8S API Server From Container
     - list: trusted_image_repositories
-      items: [
-        docker.io/elastisys/curl-jq,
-        docker.io/jaegertracing/jaeger-operator,
-        docker.io/kiwigrid/k8s-sidecar,
-        docker.io/library/rabbitmq,
-        docker.io/openpolicyagent/gatekeeper,
-        docker.io/openpolicyagent/gatekeeper-crds,
-        docker.io/rabbitmqoperator/cluster-operator,
-        docker.io/velero/velero,
-        gcr.io/k8s-staging-multitenancy/hnc-manager,
-        gcr.io/tekton-releases/github.com/tektoncd/dashboard/cmd/dashboard,
-        gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/controller,
-        gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/resolvers,
-        gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/webhook,
-        ghcr.io/aquasecurity/node-collector,
-        ghcr.io/aquasecurity/trivy-operator,
-        ghcr.io/dexidp/dex,
-        ghcr.io/elastisys/argocd-managed-namespaces-manager,
-        ghcr.io/elastisys/fluentd,
-        ghcr.io/elastisys/logical-backup,
-        ghcr.io/elastisys/spilo-15,
-        ghcr.io/elastisys/spilo-16,
-        ghcr.io/kiwigrid/k8s-sidecar,
-        ghcr.io/kubereboot/kured,
-        quay.io/argoproj/argocd,
-        quay.io/calico/node,
-        quay.io/jetstack/cert-manager-controller,
-        quay.io/jetstack/cert-manager-webhook,
-        quay.io/kiwigrid/k8s-sidecar,
-        quay.io/metallb/controller,
-        quay.io/prometheus/prometheus,
-        registry.k8s.io/ingress-nginx/controller-chroot,
-        registry.k8s.io/ingress-nginx/controller,
-        registry.k8s.io/kube-state-metrics/kube-state-metrics
-        ]
+      items:
+        - docker.io/calico/ctl
+        - docker.io/elastisys/curl-jq
+        - docker.io/jaegertracing/jaeger-operator
+        - docker.io/kiwigrid/k8s-sidecar
+        - docker.io/library/rabbitmq
+        - docker.io/openpolicyagent/gatekeeper
+        - docker.io/openpolicyagent/gatekeeper-crds
+        - docker.io/rabbitmqoperator/cluster-operator
+        - docker.io/rook/ceph
+        - docker.io/velero/velero
+        - gcr.io/k8s-staging-multitenancy/hnc-manager
+        - gcr.io/tekton-releases/github.com/tektoncd/dashboard/cmd/dashboard
+        - gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/controller
+        - gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/resolvers
+        - gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/webhook
+        - ghcr.io/aquasecurity/node-collector
+        - ghcr.io/aquasecurity/trivy-operator
+        - ghcr.io/dexidp/dex
+        - ghcr.io/elastisys/argocd-managed-namespaces-manager
+        - ghcr.io/elastisys/calico-accountant
+        - ghcr.io/elastisys/fluentd
+        - ghcr.io/elastisys/logical-backup
+        - ghcr.io/elastisys/spilo-15
+        - ghcr.io/elastisys/spilo-16
+        - ghcr.io/kiwigrid/k8s-sidecar
+        - ghcr.io/kubereboot/kured
+        - quay.io/argoproj/argocd
+        - quay.io/calico/apiserver
+        - quay.io/calico/cni
+        - quay.io/calico/kube-controllers
+        - quay.io/calico/node
+        - quay.io/calico/typha
+        - quay.io/ceph/ceph
+        - quay.io/cephcsi/cephcsi
+        - quay.io/tigera/operator
+        - quay.io/jetstack/cert-manager-controller
+        - quay.io/jetstack/cert-manager-webhook
+        - quay.io/kiwigrid/k8s-sidecar
+        - quay.io/metallb/controller
+        - quay.io/prometheus/prometheus
+        - registry.k8s.io/autoscaling/cluster-autoscaler
+        - registry.k8s.io/capi-openstack/capi-openstack-controller
+        - registry.k8s.io/cluster-api/cluster-api-controller
+        - registry.k8s.io/cluster-api/kubeadm-bootstrap-controller
+        - registry.k8s.io/cluster-api/kubeadm-control-plane-controller
+        - registry.k8s.io/ingress-nginx/controller-chroot
+        - registry.k8s.io/ingress-nginx/controller
+        - registry.k8s.io/kube-state-metrics/kube-state-metrics
+        - registry.k8s.io/sig-storage/csi-attacher
+        - registry.k8s.io/sig-storage/csi-provisioner
+        - registry.k8s.io/sig-storage/csi-resizer
+        - registry.k8s.io/sig-storage/csi-snapshotter
 
     # Contact K8S API Server From Container
     - macro: user_known_contact_k8s_api_server_activities
@@ -150,11 +168,9 @@ customRules:
         (
           container.image.repository in (trusted_image_repositories)
         ) or (
-          proc.cmdline = "kubectl get rolebindings --all-namespaces -o json"
-        ) or (
-          proc.cmdline startswith "kubectl patch secret -n argocd-system argocd-manager-config -p"
-        ) or (
-          proc.cmdline glob 'kubectl get crd *.constraints.gatekeeper.sh -o jsonpath={.status.conditions[?(@.type=="Established")].status}'
+          container.image.repository = "docker.io/bitnami/kubectl" and
+          k8s.ns.name = "gatekeeper-system" and
+          k8s.pod.name startswith "gatekeeper-templates-wait"
         )
 
     # Run shell untrusted
