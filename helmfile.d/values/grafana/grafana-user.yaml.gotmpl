@@ -60,8 +60,12 @@ datasources:
       If only one workload cluster, don't bother naming the datasource and set to default.
       Otherwise set the name of the clusters so users know what they are looking at.
       */}}
-    {{- if eq (len .Values.global.clustersMonitoring) 1 }}
+    {{- with first .Values.global.clustersMonitoring }}
+    {{- if eq (len $.Values.global.clustersMonitoring) 1 }}
     - name: "Workload Cluster"
+    {{- else }}
+    - name: "Workload Cluster {{ . }}"
+    {{- end }}
       access: proxy
       basicAuth: false
       editable: false
@@ -71,11 +75,11 @@ datasources:
       url: http://grafana-label-enforcer:9090
       version: 1
       jsonData:
-        customQueryParameters: "tenant_id={{ first .Values.global.clustersMonitoring }}"
+        customQueryParameters: "tenant_id={{ . }}"
         manageAlerts: false
-    {{- else }}
-    {{- range .Values.global.clustersMonitoring }}
-    - name: "{{ . }}"
+    {{- end }}
+    {{- range rest .Values.global.clustersMonitoring }}
+    - name: "Workload Cluster {{ . }}"
       access: proxy
       basicAuth: false
       editable: false
@@ -87,7 +91,6 @@ datasources:
       jsonData:
         customQueryParameters: "tenant_id={{ . }}"
         manageAlerts: false
-    {{- end }}
     {{- end }}
     {{- end }}
 
