@@ -8,7 +8,7 @@ describe("grafana admin datasources", function() {
 
     // Cypress does not like trailing dots
     cy.yqDig("sc", ".grafana.ops.trailingDots")
-      .should("not.equal", "true")
+      .should((value) => assert(value !== "true", ".grafana.ops.trailingDots in sc config must not be 'true'"))
   })
 
   beforeEach(function() {
@@ -74,7 +74,7 @@ describe("grafana dev datasources", function() {
 
     // Cypress does not like trailing dots
     cy.yqDig("sc", ".grafana.user.trailingDots")
-      .should("not.equal", "true")
+      .should((value) => assert(value !== "true", ".grafana.ops.trailingDots in sc config must not be 'true'"))
   })
 
   beforeEach(function() {
@@ -109,10 +109,18 @@ describe("grafana dev datasources", function() {
   })
 
   it("has workload cluster", function() {
-    cy.contains("Workload Cluster")
-      .should("exist")
-      .siblings()
-      .contains("default")
-      .should("exist")
+    cy.yqDigParse("sc", ".global.clustersMonitoring")
+      .then(([first_cluster, ...rest_clusters]) => {
+        cy.contains(`Workload Cluster${rest_clusters.length === 0 ? "" : " " + first_cluster}`)
+          .should("exist")
+          .siblings()
+          .contains("default")
+          .should("exist")
+
+        for (const cluster of rest_clusters) {
+          cy.contains(`Workload Cluster ${cluster}`)
+            .should("exist")
+        }
+      })
   })
 })
