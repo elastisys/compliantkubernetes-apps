@@ -37,6 +37,7 @@ monitoring:
 
 ingressNginx:
   enabled: {{ .Values.networkPolicies.ingressNginx.enabled }}
+  externalTrafficPolicyLocal: {{ .Values.externalTrafficPolicy.local }}
   ingressOverride:
     enabled : {{ .Values.networkPolicies.ingressNginx.ingressOverride.enabled }}
     {{- if .Values.networkPolicies.ingressNginx.ingressOverride.enabled }}
