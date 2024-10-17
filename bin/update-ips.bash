@@ -221,9 +221,15 @@ get_swift_url() {
     log_error "Could not find Swift credentials in ${swift_config_option}"
     exit 1
   fi
-  body=$(echo "${response}" | tr '\r\n' '!' | sed 's/!!/\n/g' | tail -n 1 | tr '!!' '\n')
-  os_token=$(echo "${response}" | grep -oP "x-subject-token:\s+\K\S+")
-  swift_url=$(echo "${body}" | jq -r '.token.catalog[] | select( .type == "object-store" and .name == "swift") | .endpoints[] | select(.interface == "public" and .region == "'"${swift_region}"'") | .url')
+
+  {
+    # shellcheck disable=SC2162
+    while read -d $'\r\n' header value; do
+      [[ -z "${header}" ]] && break
+      [[ "${header}" == "x-subject-token:" ]] && os_token="${value}"
+    done
+    swift_url=$(jq -r '.token.catalog[] | select( .type == "object-store" and .name == "swift") | .endpoints[] | select(.interface == "public" and .region == "'"${swift_region}"'") | .url')
+  } <<< "${response}"
 
   curl -i -s -X DELETE -H "X-Auth-Token: ${os_token}" -H "X-Subject-Token: ${os_token}" "${auth_url}/auth/tokens" >/dev/null
 

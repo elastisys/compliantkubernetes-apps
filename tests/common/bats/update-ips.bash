@@ -63,7 +63,16 @@ update_ips.mock_maximal() {
   # main swift
 
   # GET /auth/tokens
-  mock_set_output "${mock_curl}" '{"token":{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com:91011"}]}]}}' 1
+  mock_set_output "${mock_curl}" $'HTTP/2 200\r
+  date: Wed, 09 Oct 2024 14:14:40 GMT\r
+  expires: -1\r
+  cache-control: private, max-age=0\r
+  content-type: text/html; charset=ISO-8859-1\r
+  x-subject-token: 123456789\r
+  accept-ranges: none\r
+  vary: Accept-Encoding\r
+  \r
+  {"token":{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com:91011"}]}]}}' 1
   # DELETE /auth/tokens
   mock_set_output "${mock_curl}" "" 2
   mock_set_output "${mock_dig}" "127.1.0.4" 4 # keystone endpoint
@@ -76,7 +85,16 @@ update_ips.mock_maximal() {
   # rclone sync swift
 
   # GET /auth/tokens
-  mock_set_output "${mock_curl}" '{"token":{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com"}]}]}}' 3
+  mock_set_output "${mock_curl}" $'HTTP/2 200\r
+  date: Wed, 09 Oct 2024 14:14:40 GMT\r
+  expires: -1\r
+  cache-control: private, max-age=0\r
+  content-type: text/html; charset=ISO-8859-1\r
+  x-subject-token: 123456789\r
+  accept-ranges: none\r
+  vary: Accept-Encoding\r
+  \r
+  {"token":{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com"}]}]}}' 3
   # DELETE /auth/tokens
   mock_set_output "${mock_curl}" "" 4
 
@@ -98,7 +116,16 @@ update_ips.mock_rclone_s3_and_swift() {
   update_ips.mock_rclone_s3
 
   # GET /auth/tokens
-  mock_set_output "${mock_curl}" '{"token":{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com"}]}]}}' 1
+  mock_set_output "${mock_curl}" $'HTTP/2 200\r
+  date: Wed, 09 Oct 2024 14:14:40 GMT\r
+  expires: -1\r
+  cache-control: private, max-age=0\r
+  content-type: text/html; charset=ISO-8859-1\r
+  x-subject-token: 123456789\r
+  accept-ranges: none\r
+  vary: Accept-Encoding\r
+  \r
+  {"token":{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com"}]}]}}' 1
   mock_set_output "${mock_curl}" "" 2 # DELETE /auth/tokens
 
   mock_set_output "${mock_dig}" "127.0.0.5" 5 # networkPolicies.rclone.sync.objectStorageSwift.ips keystone endpoint
@@ -109,7 +136,16 @@ update_ips.mock_rclone_swift() {
   update_ips.mock_minimal
 
   # GET /auth/tokens
-  mock_set_output "${mock_curl}" '{"token":{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com"}]}]}}' 1
+  mock_set_output "${mock_curl}" $'HTTP/2 200\r
+  date: Wed, 09 Oct 2024 14:14:40 GMT\r
+  expires: -1\r
+  cache-control: private, max-age=0\r
+  content-type: text/html; charset=ISO-8859-1\r
+  x-subject-token: 123456789\r
+  accept-ranges: none\r
+  vary: Accept-Encoding\r
+  \r
+  {"token":{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com"}]}]}}' 1
   mock_set_output "${mock_curl}" "" 2 # DELETE /auth/tokens
 
   mock_set_output "${mock_dig}" "127.0.0.5" 4 # networkPolicies.rclone.sync.objectStorageSwift.ips keystone endpoint
@@ -120,8 +156,15 @@ update_ips.mock_swift() {
   update_ips.mock_minimal
 
   # GET /auth/tokens
-  mock_set_output "${mock_curl}" 'x-subject-token: 123456789
-
+  mock_set_output "${mock_curl}" $'HTTP/2 200\r
+  date: Wed, 09 Oct 2024 14:14:40 GMT\r
+  expires: -1\r
+  cache-control: private, max-age=0\r
+  content-type: text/html; charset=ISO-8859-1\r
+  x-subject-token: 123456789\r
+  accept-ranges: none\r
+  vary: Accept-Encoding\r
+  \r
   {"token":{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com:91011"}]}]}}' 1
   mock_set_output "${mock_curl}" "" 2 # DELETE /auth/tokens
 
@@ -226,7 +269,16 @@ update_ips.assert_rclone_swift() {
   assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorage' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
 
   # GET /auth/tokens
-  mock_set_output "${mock_curl}" '{"token":{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com"}]}]}}' 1
+  mock_set_output "${mock_curl}" $'HTTP/2 200\r
+  date: Wed, 09 Oct 2024 14:14:40 GMT\r
+  expires: -1\r
+  cache-control: private, max-age=0\r
+  content-type: text/html; charset=ISO-8859-1\r
+  x-subject-token: 123456789\r
+  accept-ranges: none\r
+  vary: Accept-Encoding\r
+  \r
+  {"token":{"catalog":[{"type": "object-store", "name": "swift", "endpoints": [{"interface":"public", "region": "swift-region", "url": "https://swift.foo.dev-ck8s.com"}]}]}}' 1
   mock_set_output "${mock_curl}" "" 2 # DELETE /auth/tokens
   mock_set_output "${mock_dig}" "127.0.0.4" 4 # keystone endpoint
   mock_set_output "${mock_dig}" "127.0.0.5" 5 # swift endpoint
