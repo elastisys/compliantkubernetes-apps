@@ -7067,6 +7067,54 @@ properties:
         $ref: '#/$defs/kubernetesTopologySpreadConstraints'
       affinity:
         $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+  tektonPipelines:
+    title: Tekton Pipelines Config
+    description: Configure Tekton Pipelines
+    type: object
+    properties:
+      enabled:
+        title: Enable Tekton Flag
+        type: boolean
+      controller:
+        title: Tekton Controller Config
+        description: Configure the Tekton Controller
+        type: object
+        properties:
+          replicas:
+            title: Number of controller replicas
+            type: integer
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+      webhook:
+        title: Tekton Webhook Config
+        description: Configure the Tekton Webhook
+        type: object
+        properties:
+          replicas:
+            title: Number of webhook replicas
+            type: integer
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+      remoteResolvers:
+        title: Tekton Remote Resolvers Config
+        description: Configure the Tekton Remote Resolver
+        type: object
+        properties:
+          replicas:
+            title: Number of remote resolver replicas
+            type: integer
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+      customConfigDefaults:
+        title: Custom default config
+        description: |-
+          Configure custom default options for Tekton
+
+          > [!note]
+          > See [the upstream documentation](https://tekton.dev/docs/pipelines/additional-configs/) for available default config options.
+        examples:
+          - default-timeout-minutes: "30"
+        type: object
 additionalProperties:
   title: Additional Properties
   description: Configure additional properties not covered by the schema.
