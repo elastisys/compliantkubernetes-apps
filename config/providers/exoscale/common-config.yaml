@@ -23,8 +23,6 @@ networkPolicies:
       enabled: false
   rookCeph:
     enabled: true
-externalTrafficPolicy:
-  local: false
 opa:
   rejectLoadBalancerService:
     enabled: true

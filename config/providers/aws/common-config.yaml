@@ -24,8 +24,6 @@ networkPolicies:
   ingressNginx:
     ingressOverride:
       enabled: false
-externalTrafficPolicy:
-  local: false
 opa:
   rejectLoadBalancerService:
     enabled: false

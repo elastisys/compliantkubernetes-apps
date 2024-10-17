@@ -6,7 +6,7 @@ clusterAdmin:
   users:
     - admin@example.com
 externalTrafficPolicy:
-  local: false
+  local: true
 storageClasses:
   default: standard
 objectStorage:
