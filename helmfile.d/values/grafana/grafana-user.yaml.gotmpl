@@ -61,7 +61,11 @@ datasources:
       Otherwise set the name of the clusters so users know what they are looking at.
       */}}
     {{- with first .Values.global.clustersMonitoring }}
+    {{- if eq (len $.Values.global.clustersMonitoring) 1 }}
+    - name: "Workload Cluster"
+    {{- else }}
     - name: "Workload Cluster {{ . }}"
+    {{- end }}
       access: proxy
       basicAuth: false
       editable: false
