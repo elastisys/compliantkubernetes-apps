@@ -396,5 +396,5 @@ _test_apply_rclone_sync_s3_and_swift() {
 
   run ck8s update-ips both apply
 
-  assert_equal "$(mock_get_call_args "${mock_curl}" 1)" "$(cat "${BATS_TEST_DIRNAME}/resources/get-swift-url.out")"
+  assert_equal "$(mock_get_call_args "${mock_curl}" 1)" "$(cat "${BATS_TEST_DIRNAME}/resources/get-swift-url-username.out")"
 }
