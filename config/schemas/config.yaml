@@ -7111,6 +7111,13 @@ properties:
             $ref: '#/$defs/kubernetesResourceRequirements'
       customConfigDefaults:
         title: Custom default config
+        description: |-
+          Configure custom default options for Tekton
+
+          > [!note]
+          > See [the upstream documentation](https://tekton.dev/docs/pipelines/additional-configs/) for available default config options.
+        examples:
+          - default-timeout-minutes: "30"
         type: object
 additionalProperties:
   title: Additional Properties
