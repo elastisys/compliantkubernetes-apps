@@ -1,0 +1,12 @@
+-s -i -H Content-Type: application/json -d 
+        {
+          "auth": {
+            "identity": {
+              "methods": ["application_credential"],
+              "application_credential": {
+                "id": "swift-application-credential-id",
+                "secret": "swift-application-credential-secret"
+              }
+            }
+          }
+        } https://keystone.foo.dev-ck8s.com:5678/auth/tokens
