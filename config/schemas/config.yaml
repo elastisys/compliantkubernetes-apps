@@ -832,6 +832,9 @@ $defs:
         description: Value is the taint value the toleration matches to. If the operator is Exists, the value should be empty, otherwise just a regular string.
         type: string
     type: object
+  cronSchedule:
+    type: string
+    pattern: ^(((\*\/)?([0-5]?[0-9])((\,|\-|\/)([0-5]?[0-9]))*|\*)[^\S\r\n]+((\*\/)?((2[0-3]|1[0-9]|[0-9]|00))((\,|\-|\/)(2[0-3]|1[0-9]|[0-9]|00))*|\*)[^\S\r\n]+((\*\/)?([1-9]|[12][0-9]|3[01])((\,|\-|\/)([1-9]|[12][0-9]|3[01]))*|\*)[^\S\r\n]+((\*\/)?([1-9]|1[0-2])((\,|\-|\/)([1-9]|1[0-2]))*|\*|(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))[^\S\r\n]+((\*\/)?[0-6]((\,|\-|\/)[0-6])*|\*|00|(sun|mon|tue|wed|thu|fri|sat)))$|^@(annually|yearly|monthly|weekly|daily|hourly|reboot)$
 type: object
 required:
   - global
@@ -1698,8 +1701,9 @@ properties:
             description: |-
               `schedule` defines when the backup job for Harbor will run.
               This should be set to run shortly after Velero backups in the workload cluster, in order to ensure that images needed for Velero backups are backed up in Harbor.
+              Uses the Cron format, see https://en.wikipedia.org/wiki/Cron.
             default: "30 0 * * *"
-            type: string
+            $ref: '#/$defs/cronSchedule'
         type: object
       core:
         title: Core Config
@@ -1813,6 +1817,8 @@ properties:
             title: Schedule
             description: |-
               Defines a CRON schedule when the garbage collection job should run.
+              Uses a special Cron format that adds "seconds" as the first entry.
+              Order: "seconds, minutes, hours, day of month, month, day of week".
             default: 0 0 0 * * SUN
             type: string
         type: object
@@ -2318,9 +2324,11 @@ properties:
             default: false
           defaultSchedule:
             title: Rclone Sync Default Schedule
-            description: Default schedule to run the sync CronJobs.
-            type: string
+            description: |-
+              Default schedule to run the sync CronJobs.
+              Uses the Cron format, see https://en.wikipedia.org/wiki/Cron.
             default: 0 5 * * *
+            $ref: '#/$defs/cronSchedule'
           buckets:
             title: Rclone Sync Buckets
             description: Additional buckets to sync.
@@ -2343,7 +2351,10 @@ properties:
                 schedule:
                   type: string
                   title: Sync schedule for this bucket
-                  description: Defaults to `.objectStorage.sync.defaultSchedule`
+                  description: |-
+                    Defaults to `.objectStorage.sync.defaultSchedule`
+                    Uses the Cron format, see https://en.wikipedia.org/wiki/Cron.
+                  $ref: '#/$defs/cronSchedule'
                 sourceType:
                   type: string
                   title: Type of source
@@ -2565,8 +2576,11 @@ properties:
         default: false
       schedule:
         title: Velero Backup Schedule
+        description: |-
+          Schedule for Velero backup schedule "velero-daily-backup"
+          Uses the Cron format, see https://en.wikipedia.org/wiki/Cron.
         default: 0 0 * * *
-        type: string
+        $ref: '#/$defs/cronSchedule'
       retentionPeriod:
         title: Velero Backup Retention Period
         $ref: '#/$defs/goDuration'
@@ -4914,7 +4928,10 @@ properties:
             type: number
           jobSchedule:
             title: Log Manager Job Schema
-            type: string
+            description: |-
+              Schema for when to run Log Manager Job.
+              Uses the Cron format, see https://en.wikipedia.org/wiki/Cron.
+            $ref: '#/$defs/cronSchedule'
           jobEphemeralVolumes:
             title: Log Manager Job Ephemeral Volume
             description: Configure the job to run with an ephemeral volume if the nodes risk running out of storage.
@@ -5619,8 +5636,11 @@ properties:
             default: 1200
           backupSchedule:
             title: OpenSearch Backup CronJob Schedule
-            type: string
+            description: |-
+              Schedule to trigger Opensearch backups.
+              Uses the Cron format, see https://en.wikipedia.org/wiki/Cron.
             default: 0 */2 * * *
+            $ref: '#/$defs/cronSchedule'
           backupStartingDeadlineSeconds:
             title: OpenSearch Backup Job Starting Deadline
             type: number
@@ -5631,8 +5651,11 @@ properties:
             default: 600
           retentionSchedule:
             title: OpenSearch Retention CronJob Schedule
-            type: string
+            description: |-
+              Schedule to check for and remove old snapshots.
+              Uses the Cron format, see https://en.wikipedia.org/wiki/Cron.
             default: '@daily'
+            $ref: '#/$defs/cronSchedule'
           retentionStartingDeadlineSeconds:
             title: OpenSearch Retention Job Starting Deadline
             type: number
