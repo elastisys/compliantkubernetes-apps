@@ -215,3 +215,11 @@ prometheus:
     {{- with .Values.prometheus.additionalScrapeConfigs }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
+
+{{- if eq .Values.global.ck8sK8sInstaller "gardener" }}
+kubeProxy:
+  service:
+    enabled: true
+    selector:
+      role: proxy
+{{- end }}

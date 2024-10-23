@@ -251,3 +251,11 @@ prometheus-node-exporter:
           sourceLabels:
           - __meta_kubernetes_pod_node_name
           targetLabel: instance
+
+{{- if eq .Values.global.ck8sK8sInstaller "gardener" }}
+kubeProxy:
+  service:
+    enabled: true
+    selector:
+      role: proxy
+{{- end }}
