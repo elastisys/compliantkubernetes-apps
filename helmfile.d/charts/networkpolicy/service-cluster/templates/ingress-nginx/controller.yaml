@@ -12,6 +12,12 @@ spec:
     - Ingress
     - Egress
   ingress:
+    {{- if .Values.global.webhookVPN.enabled }}
+    - from:
+      {{- with .Values.global.webhookVPN.ingressRule }}
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- end }}
     {{- if or .Values.ingressNginx.ingressOverride.ips .Values.global.scNodes.ips .Values.global.scIngress.ips }}
     - from:
       {{- if and .Values.ingressNginx.ingressOverride.enabled .Values.ingressNginx.ingressOverride.ips }}
