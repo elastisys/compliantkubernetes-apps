@@ -39,3 +39,6 @@ capacityManagementAlertsNodeGroupCpuLimit1h: {{ .Values.prometheus.capacityManag
 capacityManagementAlertsNodeGroupMemoryLimit1h: {{ .Values.prometheus.capacityManagementAlerts.nodeGroupMemoryLimit1h }}
 capacityManagementAlertsNodeCpuLimit1h: {{ .Values.prometheus.capacityManagementAlerts.nodeCpuLimit1h }}
 capacityManagementAlertsNodeMemoryLimit1h: {{ .Values.prometheus.capacityManagementAlerts.nodeMemoryLimit1h }}
+
+kubeApiServer:
+  enabled: {{ ne .Values.global.ck8sK8sInstaller "gardener" }}

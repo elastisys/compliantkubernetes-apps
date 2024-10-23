@@ -91,3 +91,6 @@ harbor:
 
 nodeLocalDns:
   enabled: {{ .Values.nodeLocalDns.enabled }}
+
+kubeApiServer:
+  enabled: {{ ne .Values.global.ck8sK8sInstaller "gardener" }}
