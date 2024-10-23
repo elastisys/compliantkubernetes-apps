@@ -13,7 +13,9 @@ spec:
   {{- if .Values.global.webhookVPN.enabled }}
   {{- with .Values.global.webhookVPN.ingressRule }}
     - Ingress
-  ingress: {{ toYaml . | nindent 4 }}
+  ingress:
+    - from:
+      {{ toYaml . | nindent 6 }}
   {{- end }}
   {{- end }}
   egress:

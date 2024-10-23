@@ -9,6 +9,7 @@ global:
   scIngress:
     ips: {{- toYaml .Values.networkPolicies.global.scIngress.ips | nindent 6 }}
   ingressUsingHostNetwork: {{ .Values.ingressNginx.controller.useHostPort }}
+  externalApiServer: {{ .Values.networkPolicies.global.externalApiServer }}
   externalLoadBalancer: {{ .Values.networkPolicies.global.externalLoadBalancer }}
   {{- if eq .Values.global.ck8sK8sInstaller "gardener" }}
   webhookVPN:
@@ -16,8 +17,7 @@ global:
     ingressRule:
     - podSelector:
         matchLabels:
-          podLabel:
-            app: vpn-shoot
+          app: vpn-shoot
       namespaceSelector:
         matchLabels:
           kubernetes.io/metadata.name: kube-system

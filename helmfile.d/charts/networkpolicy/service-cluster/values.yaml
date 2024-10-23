@@ -18,10 +18,11 @@ global:
     ports:
       - 443
   ingressUsingHostNetwork: false
+  externalApiServer: false
   externalLoadBalancer: false # not true if loadbalancer is controlled by a kubernetes cloud controller
   webhookVPN:
     enabled: false
-    ingressRule: {}
+    ingressRule: []
     # - podSelector:
     #     matchLabels:
     #       podLabel:
