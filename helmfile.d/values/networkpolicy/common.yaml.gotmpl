@@ -27,7 +27,7 @@ global:
   objectStorage:
     ips: {{- toYaml .Values.networkPolicies.global.objectStorage.ips | nindent 6 }}
     ports: {{- toYaml .Values.networkPolicies.global.objectStorage.ports | nindent 6 }}
-  externalLoadBalancer: {{ .Values.networkPolicies.global.externalApiServer }}
+  externalApiServer: {{ .Values.networkPolicies.global.externalApiServer }}
   externalLoadBalancer: {{ .Values.networkPolicies.global.externalLoadBalancer }}
   ingressUsingHostNetwork: {{ .Values.ingressNginx.controller.useHostPort }}
   trivy:
@@ -39,8 +39,7 @@ global:
     ingressRule:
     - podSelector:
         matchLabels:
-          podLabel:
-            app: vpn-shoot
+          app: vpn-shoot
       namespaceSelector:
         matchLabels:
           kubernetes.io/metadata.name: kube-system

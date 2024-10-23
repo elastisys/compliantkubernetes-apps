@@ -67,6 +67,17 @@ global:
           app.kubernetes.io/name: prometheus
           app.kubernetes.io/instance: kube-prometheus-stack-prometheus
 
+  webhookVPN:
+    enabled: false
+    ingressRule: []
+    # - podSelector:
+    #     matchLabels:
+    #       podLabel:
+    #         app: vpn
+    #   namespaceSelector:
+    #     matchLabels:
+    #       kubernetes.io/metadata.name: kube-system
+
 kured:
   enabled: true
   notificationSlack:

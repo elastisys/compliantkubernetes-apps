@@ -19,6 +19,7 @@ global:
       {{- if and (or (eq .Values.harbor.persistence.type "swift") (eq .Values.thanos.objectStorage.type "swift")) (.Values.networkPolicies.global.objectStorageSwift.ports) }}
       {{- toYaml .Values.networkPolicies.global.objectStorageSwift.ports | nindent 6 }}
       {{- end }}
+  externalApiServer: {{ .Values.networkPolicies.global.externalApiServer }}
   externalLoadBalancer: {{ .Values.networkPolicies.global.externalLoadBalancer }}
   ingressUsingHostNetwork: {{ .Values.ingressNginx.controller.useHostPort }}
   {{- if eq .Values.global.ck8sK8sInstaller "gardener" }}
@@ -27,8 +28,7 @@ global:
     ingressRule:
     - podSelector:
         matchLabels:
-          podLabel:
-            app: vpn-shoot
+          app: vpn-shoot
       namespaceSelector:
         matchLabels:
           kubernetes.io/metadata.name: kube-system
