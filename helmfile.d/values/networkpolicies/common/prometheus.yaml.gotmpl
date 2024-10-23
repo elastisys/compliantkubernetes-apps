@@ -93,6 +93,9 @@ policies:
         - rule: ingress-rule-prometheus
           ports:
             - tcp: 10250
+        {{- if .Values.networkPolicies.global.externalApiServer }}
+        - rule: ingress-rule-gardener-vpn
+        {{- end }}
 
     prometheus-blackbox-exporter:
       podSelectorLabels:
