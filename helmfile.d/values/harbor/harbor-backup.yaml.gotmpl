@@ -7,6 +7,7 @@
 
 dbPassword: {{ .Values.harbor.internal.databasePassword }}
 retentionDays: {{ .Values.harbor.backup.retentionDays }}
+schedule: {{ .Values.harbor.backup.schedule | quote }}
 {{ if eq .Values.objectStorage.type "s3" -}}
 s3:
   enabled: true

@@ -1693,6 +1693,14 @@ properties:
               `RetentionDays` defines how old a backup should be before deleting it.
             default: 7
             type: number
+          schedule:
+            title: Schedule for backup job
+            description: |-
+              `schedule` defines when the backup job for harbor will run.
+              This should be set to run shortly after velero backups in wc, in order to ensure that images needed for velero backups are backed up in harbor.
+              Uses the Cron format, see https://en.wikipedia.org/wiki/Cron.
+            default: "30 0 * * *"
+            type: string
         type: object
       core:
         title: Core Config
@@ -1806,6 +1814,7 @@ properties:
             title: Schedule
             description: |-
               Defines a CRON schedule when the garbage collection job should run.
+              Uses the Cron format, see https://en.wikipedia.org/wiki/Cron.
             default: 0 0 0 * * SUN
             type: string
         type: object
@@ -2301,7 +2310,9 @@ properties:
             default: false
           defaultSchedule:
             title: Rclone Sync Default Schedule
-            description: Default schedule to run the sync CronJobs.
+            description: |-
+              Default schedule to run the sync CronJobs.
+              Uses the Cron format, see https://en.wikipedia.org/wiki/Cron.
             type: string
             default: 0 5 * * *
           buckets:
@@ -2326,7 +2337,9 @@ properties:
                 schedule:
                   type: string
                   title: Sync schedule for this bucket
-                  description: Defaults to `.objectStorage.sync.defaultSchedule`
+                  description: |-
+                    Defaults to `.objectStorage.sync.defaultSchedule`
+                    Uses the Cron format, see https://en.wikipedia.org/wiki/Cron.
                 sourceType:
                   type: string
                   title: Type of source
@@ -2548,6 +2561,9 @@ properties:
         default: false
       schedule:
         title: Velero Backup Schedule
+        description: |-
+          Schedule for Velero backup schedule "velero-daily-backup"
+          Uses the Cron format, see https://en.wikipedia.org/wiki/Cron.
         default: 0 0 * * *
         type: string
       retentionPeriod:
@@ -4897,6 +4913,9 @@ properties:
             type: number
           jobSchedule:
             title: Log Manager Job Schema
+            description: |-
+              Schema for when to run Log Manager Job.
+              Uses the Cron format, see https://en.wikipedia.org/wiki/Cron.
             type: string
           jobEphemeralVolumes:
             title: Log Manager Job Ephemeral Volume
@@ -5603,6 +5622,9 @@ properties:
           backupSchedule:
             title: OpenSearch Backup CronJob Schedule
             type: string
+            description: |-
+              Schedule to trigger Opensearch backups.
+              Uses the Cron format, see https://en.wikipedia.org/wiki/Cron.
             default: 0 */2 * * *
           backupStartingDeadlineSeconds:
             title: OpenSearch Backup Job Starting Deadline
@@ -5614,6 +5636,9 @@ properties:
             default: 600
           retentionSchedule:
             title: OpenSearch Retention CronJob Schedule
+            description: |-
+              Schedule to check for and remove old snapshots.
+              Uses the Cron format, see https://en.wikipedia.org/wiki/Cron.
             type: string
             default: '@daily'
           retentionStartingDeadlineSeconds:

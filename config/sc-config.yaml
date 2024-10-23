@@ -402,6 +402,7 @@ harbor:
   backup:
     enabled: true
     retentionDays: 7
+    schedule: "30 0 * * *"
     ephemeralBackupStore:
       enabled: false
       storageSize: 10Gi
