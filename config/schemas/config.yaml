@@ -1193,6 +1193,7 @@ properties:
         type: string
         enum:
           - capi
+          - gardener
           - kubespray
           - none
       baseDomain:
@@ -6088,6 +6089,11 @@ properties:
         type: object
         additionalProperties: false
         properties:
+          externalApiServer:
+            title: Network Policies External Api Server
+            description: |-
+              When enabled creates Network Policy rules for an external Api Server.
+            type: boolean
           externalLoadBalancer:
             title: Network Policies External Load Balancer
             description: |-
@@ -6632,6 +6638,17 @@ properties:
                   title: Namespace Name
                   type: string
                 default: []
+      prometheusBlackboxExporter:
+        additionalProperties: false
+        properties:
+          enabled:
+            title: Network Policies Prometheus Blackbox Exporter Enabled
+            type: boolean
+            default: true
+          customEndpoints:
+            properties:
+              ips:
+                $ref: '#/$defs/iplist'
       s3Exporter:
         title: Network Policies S3 Exporter
         description: Configure S3 exporter network policy rules.
@@ -6847,6 +6864,8 @@ properties:
               properties:
                 ips:
                   $ref: '#/$defs/iplist'
+                ports:
+                  $ref: '#/$defs/portlist'
         properties:
           enabled:
             title: Network Policies CoreDNS
@@ -6866,6 +6885,7 @@ properties:
             additionalProperties: false
             properties:
               ips: true
+              ports: true
       rookCeph:
         title: Network Policies Rook Ceph
         description: Configure Rook Ceph network policy rules.
@@ -6943,6 +6963,14 @@ properties:
                 }
       resources:
         $ref: '#/$defs/kubernetesResourceRequirements'
+      service:
+        title: Configure node-local-dns Service resource
+        additionalProperties: false
+        properties:
+          targetPort:
+            title: Configure targetPort for node-local-dns Service
+            default: 53
+            type: integer
   externalDns:
     title: External DNS Config
     description: |-
