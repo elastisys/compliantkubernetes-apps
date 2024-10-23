@@ -48,6 +48,7 @@ kube-state-metrics:
   metricLabelsAllowlist:
   - nodes=[topology.kubernetes.io/zone,elastisys.io/node-group]
 kubeApiServer:
+  enabled: {{ ne .Values.global.ck8sK8sInstaller "gardener" }}
   serviceMonitor:
     metricRelabelings:
       - action: keep

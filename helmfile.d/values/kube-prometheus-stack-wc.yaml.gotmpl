@@ -78,6 +78,7 @@ prometheus-node-exporter:
           targetLabel: instance
 
 kubeApiServer:
+  enabled: {{ ne .Values.global.ck8sK8sInstaller "gardener" }}
   serviceMonitor:
     metricRelabelings:
       - action: keep
