@@ -20,9 +20,6 @@ if [[ "${2}" == "apply" ]]; then
 fi
 has_diff=0
 
-#TODO: To be changed when decision made on networkpolicies for azure storage
-storage_service=$(yq4 '.objectStorage.type' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
-
 # Get the value of the config option or the provided default value if the
 # config option is unset.
 #
@@ -440,8 +437,12 @@ allow_ingress() {
   base_domain="$(yq_read "${cluster}" '.global.baseDomain' "")"
   ops_domain="$(yq_read "${cluster}" '.global.opsDomain' "")"
 
-  allow_domain "${config["override_common"]}" '.networkPolicies.global.scIngress.ips' "grafana.${ops_domain}"
-  allow_domain "${config["override_common"]}" '.networkPolicies.global.wcIngress.ips' "non-existing-subdomain.${base_domain}"
+  if [[ "${cluster}" =~ ^(sc|both)$ ]]; then
+    allow_domain "${config["override_common"]}" '.networkPolicies.global.scIngress.ips' "grafana.${ops_domain}"
+  fi
+  if [[ "${cluster}" =~ ^(wc|both)$ ]]; then
+    allow_domain "${config["override_common"]}" '.networkPolicies.global.wcIngress.ips' "nonexistingsubdomain.${base_domain}"
+  fi
 }
 
 # Synchronize the Swift object storage network policy configuration.
@@ -539,7 +540,9 @@ validate_config() {
   fi
 
   #TODO: To be changed when decision made on networkpolicies for azure storage
-  if [ "$storage_service" == "azure" ]; then
+  if [ "$storage_service" == "none" ]; then
+    return
+  elif [ "$storage_service" == "azure" ]; then
     :
   else
     yq_read_required "${cluster}" '.objectStorage.s3.regionEndpoint'
@@ -599,11 +602,19 @@ validate_config() {
   fi
 }
 
+#TODO: To be changed when decision made on networkpolicies for azure storage
+if [[ "${check_cluster}" == "both" ]]; then
+  storage_service=$(yq_read sc '.objectStorage.type' "none")
+else
+  storage_service=$(yq_read "${check_cluster}" '.objectStorage.type' "none")
+fi
+
 validate_config
 #TODO: To be changed when decision made on networkpolicies for azure storage
+
 if [ "$storage_service" == "azure" ]; then
   :
-else
+elif [ "$storage_service" != "none" ]; then
   allow_object_storage
 fi
 allow_ingress
@@ -626,8 +637,8 @@ if [[ "${check_cluster}" =~ ^(wc|both)$ ]]; then
   external_api_server=$(yq_read "wc" '.networkPolicies.global.externalApiServer' "false")
   if [[ "${external_api_server}" == false ]]; then
     allow_nodes "wc" '.networkPolicies.global.wcApiserver.ips' "node-role.kubernetes.io/control-plane="
-  allow_nodes "wc" '.networkPolicies.global.wcNodes.ips' ""
   fi
+  allow_nodes "wc" '.networkPolicies.global.wcNodes.ips' ""
 fi
 
 if rclone_enabled; then
