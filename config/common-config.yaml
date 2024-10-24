@@ -1033,7 +1033,7 @@ networkPolicies:
         - set-me
     # set to true if api server is accessed with a domain that needs to be resolved
     externalApiServer: false
-    # only true if loadbalancer is not controlled by a kubernetes cloud controller
+    # only true if loadbalancer is not controlled by a kubernetes cloud controller (or e.g. MetalLB)
     externalLoadBalancer: set-me
     ingressUsingHostNetwork: set-me
     trivy:

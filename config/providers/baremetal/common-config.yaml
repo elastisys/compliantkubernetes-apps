@@ -5,14 +5,14 @@ objectStorage:
 ingressNginx:
   controller:
     config:
-      useProxyProtocol: false
-    useHostPort: true
+      useProxyProtocol: set-me
+    useHostPort: set-me
     service:
-      enabled: false
-      allocateLoadBalancerNodePorts: true
+      enabled: set-me
+      allocateLoadBalancerNodePorts: set-me
 networkPolicies:
   global:
-    externalLoadBalancer: true
+    externalLoadBalancer: set-me
     ingressUsingHostNetwork: true
   ingressNginx:
     ingressOverride:
