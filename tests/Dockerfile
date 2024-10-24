@@ -1,5 +1,5 @@
 # Container to run unit tests
-FROM ubuntu:rolling AS unit
+FROM ubuntu:24.04 AS unit
 LABEL org.opencontainers.image.source=https://github.com/elastisys/compliantkubernetes-apps
 
 ARG DEBIAN_FRONTEND="noninteractive"
