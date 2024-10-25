@@ -37,7 +37,7 @@ fi
 "${here}/.././bin/ck8s" ops velero sc uninstall
 
 # Destroy all helm releases
-"${here}/.././bin/ck8s" ops helmfile sc -l app!=cert-manager destroy
+"${here}/.././bin/ck8s" ops helmfile sc -l app!=cert-manager -l app!=admin-rbac destroy
 
 # Clean up namespaces and any other resources left behind by the apps
 "${here}/.././bin/ck8s" ops kubectl sc delete ns dex opensearch-system harbor fluentd-system gatekeeper-system thanos ingress-nginx monitoring kured falco velero
@@ -132,3 +132,5 @@ if [ -n "$GATE_CONS" ]; then
     # shellcheck disable=SC2086
     "${here}/.././bin/ck8s" ops kubectl sc delete --ignore-not-found=true $GATE_CONS
 fi
+
+"${here}/.././bin/ck8s" ops helmfile sc -l app=admin-rbac destroy
