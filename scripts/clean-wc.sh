@@ -49,7 +49,7 @@ fi
 "${here}/.././bin/ck8s" ops velero wc uninstall
 
 # Destroy all helm releases
-"${here}/.././bin/ck8s" ops helmfile wc -l app!=cert-manager destroy
+"${here}/.././bin/ck8s" ops helmfile wc -l app!=cert-manager -l app!=admin-rbac destroy
 
 # Clean up namespaces and any other resources left behind by the apps
 "${here}/.././bin/ck8s" ops kubectl wc delete ns alertmanager falco fluentd-system fluentd gatekeeper-system hnc-system ingress-nginx monitoring velero kured
@@ -137,3 +137,5 @@ fi
     hierarchyconfigurations.hnc.x-k8s.io \
     hncconfigurations.hnc.x-k8s.io \
     subnamespaceanchors.hnc.x-k8s.io
+
+"${here}/.././bin/ck8s" ops helmfile wc -l app=admin-rbac destroy
