@@ -6638,17 +6638,6 @@ properties:
                   title: Namespace Name
                   type: string
                 default: []
-      prometheusBlackboxExporter:
-        additionalProperties: false
-        properties:
-          enabled:
-            title: Network Policies Prometheus Blackbox Exporter Enabled
-            type: boolean
-            default: true
-          customEndpoints:
-            properties:
-              ips:
-                $ref: '#/$defs/iplist'
       s3Exporter:
         title: Network Policies S3 Exporter
         description: Configure S3 exporter network policy rules.
