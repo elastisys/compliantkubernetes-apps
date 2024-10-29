@@ -135,6 +135,12 @@ labels:
 podLabels:
   velero: backup
 
+{{- if .Values.velero.useVolumeSnapshots }}
+persistence:
+  extraPvcLabels:
+    velero: backup
+{{- end }}
+
 resources: {{- toYaml .Values.grafana.user.resources | nindent 2 }}
 nodeSelector: {{- toYaml .Values.grafana.user.nodeSelector | nindent 2 }}
 affinity: {{- toYaml .Values.grafana.user.affinity | nindent 2  }}
