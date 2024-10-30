@@ -7,6 +7,8 @@ setup() {
   load_assert
   load_file
 
+  export CK8S_AUTO_APPROVE=true
+
   with_kubeconfig sc
 }
 
