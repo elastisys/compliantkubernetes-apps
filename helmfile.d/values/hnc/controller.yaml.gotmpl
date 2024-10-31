@@ -11,10 +11,9 @@ excludedNamespaces:
   {{- toYaml . | nindent 2 }}
   {{- end }}
 
-unpropagatedAnnotations: {{ .Values.hnc.unpropagatedAnnotations }}
-
-managedNamespaceAnnotations: {{ .Values.hnc.managedNamespaceAnnotations }}
-managedNamespaceLabels: {{- toYaml .Values.hnc.managedNamespaceLabels | nindent 4 }}
+unpropagatedAnnotations: {{- toYaml .Values.hnc.unpropagatedAnnotations | nindent 2 }}
+managedNamespaceAnnotations: {{- toYaml .Values.hnc.managedNamespaceAnnotations | nindent 2 }}
+managedNamespaceLabels: {{- toYaml .Values.hnc.managedNamespaceLabels | nindent 2 }}
 
 rbac:
   user:
