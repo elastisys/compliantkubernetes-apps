@@ -171,6 +171,10 @@ customRules:
           container.image.repository = "docker.io/bitnami/kubectl" and
           k8s.ns.name = "gatekeeper-system" and
           k8s.pod.name startswith "gatekeeper-templates-wait"
+        ) or (
+          container.image.repository = "gcr.io/tekton-releases/dogfooding/tkn" and
+          k8s.ns.name = "tekton-pipelines" and
+          k8s.pod.name startswith "cleanup-runs"
         )
 
     # Run shell untrusted
