@@ -26,6 +26,15 @@ wcTargets=(
     "serviceMonitor/monitoring/kube-prometheus-stack-operator/0 1"
     "serviceMonitor/monitoring/kube-prometheus-stack-prometheus-node-exporter/0 ${totalNodes}"
     "serviceMonitor/monitoring/kube-prometheus-stack-prometheus/0 1"
+    "serviceMonitor/monitoring/prometheus-blackbox-exporter-falco/0 1"
+    "serviceMonitor/monitoring/prometheus-blackbox-exporter-gatekeeper/0 1"
+    "serviceMonitor/monitoring/prometheus-blackbox-exporter-nginx/0 1"
+    "serviceMonitor/monitoring/prometheus-blackbox-exporter-prometheus/0 1"
+    "serviceMonitor/monitoring/prometheus-blackbox-exporter-sc-dex/0 1"
+    "serviceMonitor/monitoring/prometheus-blackbox-exporter-sc-opensearch-ops/0 1"
+    "serviceMonitor/monitoring/prometheus-blackbox-exporter-sc-thanos-recv-ops/0 1"
+    "serviceMonitor/monitoring/prometheus-blackbox-exporter-sc-user-grafana/0 1"
+    "serviceMonitor/monitoring/trivy-operator/0 1"
 )
 
 test_targets_retry "svc/kube-prometheus-stack-prometheus" "${wcTargets[@]}"

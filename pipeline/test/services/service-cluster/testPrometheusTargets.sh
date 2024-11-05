@@ -38,8 +38,15 @@ scTargets=(
     "serviceMonitor/monitoring/kube-prometheus-stack-prometheus/0 ${totalPrometheus}"
     "serviceMonitor/monitoring/ops-grafana/0 1"
     "serviceMonitor/monitoring/prometheus-blackbox-exporter-dex/0 1"
+    "serviceMonitor/monitoring/prometheus-blackbox-exporter-fluentd/0 1"
     "serviceMonitor/monitoring/prometheus-blackbox-exporter-grafana/0 1"
+    "serviceMonitor/monitoring/prometheus-blackbox-exporter-harbor/0 1"
+    "serviceMonitor/monitoring/prometheus-blackbox-exporter-nginx/0 1"
     "serviceMonitor/monitoring/prometheus-blackbox-exporter-opensearch-dashboards/0 1"
+    "serviceMonitor/monitoring/prometheus-blackbox-exporter-prometheus/0 1"
+    "serviceMonitor/monitoring/prometheus-blackbox-exporter-thanos-internal-receiver/0 1"
+    "serviceMonitor/monitoring/prometheus-blackbox-exporter-thanos-query/0 1"
+    "serviceMonitor/monitoring/prometheus-blackbox-exporter-thanos-receiver/0 1"
     "serviceMonitor/opensearch-system/prometheus-opensearch-exporter/0 1"
 )
 if [ ${#custom_kubeapi_targets[@]} -gt 0 ]; then
