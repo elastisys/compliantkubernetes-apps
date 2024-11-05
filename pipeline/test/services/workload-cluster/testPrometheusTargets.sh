@@ -15,18 +15,16 @@ echo
 echo "Testing workload cluster prometheus"
 echo "==================================="
 
-# Not using these targets atm
-# TODO: add elements to the list when they start being used.
-# "monitoring/kube-prometheus-stack-kube-etcd/0 1"
-# "monitoring/kube-prometheus-stack-kube-proxy/0 1"
 wcTargets=(
     "serviceMonitor/monitoring/kube-prometheus-stack-apiserver/0 ${masterNodes}"
     "serviceMonitor/monitoring/kube-prometheus-stack-coredns/0 2"
+    "serviceMonitor/monitoring/kube-prometheus-stack-kube-etcd/0 ${masterNodes}"
+    "serviceMonitor/monitoring/kube-prometheus-stack-kube-proxy/0 ${totalNodes}"
     "serviceMonitor/monitoring/kube-prometheus-stack-kube-state-metrics/0 1"
     "serviceMonitor/monitoring/kube-prometheus-stack-kubelet/0 ${totalNodes}"
     "serviceMonitor/monitoring/kube-prometheus-stack-kubelet/1 ${totalNodes}"
-    "serviceMonitor/monitoring/kube-prometheus-stack-prometheus-node-exporter/0 ${totalNodes}"
     "serviceMonitor/monitoring/kube-prometheus-stack-operator/0 1"
+    "serviceMonitor/monitoring/kube-prometheus-stack-prometheus-node-exporter/0 ${totalNodes}"
     "serviceMonitor/monitoring/kube-prometheus-stack-prometheus/0 1"
 )
 
