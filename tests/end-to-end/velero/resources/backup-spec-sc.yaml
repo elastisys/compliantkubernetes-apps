@@ -12,10 +12,13 @@ excludedResources:
   - sbomreports.aquasecurity.github.io
   - vulnerabilityreports.aquasecurity.github.io
 hooks: {}
+includedNamespaces:
+  - monitoring
 itemOperationTimeout: 0s
 labelSelector:
   matchLabels:
     velero: backup
 metadata: {}
+snapshotMoveData: false
 storageLocation: default
 ttl: 720h0m0s
