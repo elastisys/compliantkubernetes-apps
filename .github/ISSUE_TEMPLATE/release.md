@@ -157,7 +157,7 @@ assignees: ""
 > [!note]
 > As application developer `admin@example.com`
 
-- [ ] [Can create a subnamespace by following the application developer docs](https://elastisys.io/compliantkubernetes/user-guide/namespaces/#namespace-management)
+- [ ] [Can create a subnamespace by following the application developer docs](https://elastisys.io/welkin/user-guide/namespaces/#namespace-management)
   <details><summary>Commands</summary>
 
   ```bash
@@ -202,8 +202,8 @@ assignees: ""
   - Re-login with `admin@example.com`
 
   </details>
-- [ ] [Can create projects and push images by following the application developer docs](https://elastisys.io/compliantkubernetes/user-guide/registry/#running-example)
-- [ ] [Can configure image pull secret by following the application developer docs](https://elastisys.io/compliantkubernetes/user-guide/kubernetes-api/#configure-an-image-pull-secret)
+- [ ] [Can create projects and push images by following the application developer docs](https://elastisys.io/welkin/user-guide/registry/#running-example)
+- [ ] [Can configure image pull secret by following the application developer docs](https://elastisys.io/welkin/user-guide/kubernetes-api/#configure-an-image-pull-secret)
 - [ ] Can scan image for vulnerabilities
 - [ ] Configure project to disallow vulnerabilities
   - Try to pull image with vulnerabilities, should fail
@@ -322,16 +322,23 @@ assignees: ""
 - [ ] Dashboards are available and viewable
 - [ ] Metrics are available from all clusters
 - [ ] Metrics are available from user demo application
-- [ ] [CISO dashboards available and working](https://elastisys.io/compliantkubernetes/ciso-guide/)
+  <details><summary>Steps</summary>
+
+  - Go to explore page
+  - Enter `rate(http_request_duration_seconds_count{container="welkin-user-demo"}[1m])`
+  - Metrics should show up
+
+  </details>
+- [ ] [CISO dashboards available and working](https://elastisys.io/welkin/ciso-guide/)
   <details><summary>List</summary>
 
-  - [Backup / Backup Status](https://elastisys.io/compliantkubernetes/ciso-guide/backup/)
-  - [Cryptography / NGINX Ingress Controller](https://elastisys.io/compliantkubernetes/ciso-guide/cryptography/)
-  - [Intrusion Detection / Falco](https://elastisys.io/compliantkubernetes/ciso-guide/intrusion-detection/)
-  - [Policy-as-Code / Gatekeeper](https://elastisys.io/compliantkubernetes/ciso-guide/policy-as-code/)
-  - [Network Security / NetworkPolicy](https://elastisys.io/compliantkubernetes/ciso-guide/network-security/)
-  - [Capacity Management / Kubernetes Cluster Status](https://elastisys.io/compliantkubernetes/ciso-guide/capacity-management/)
-  - [Vulnerability / Trivy Operator Dashboard](https://elastisys.io/compliantkubernetes/ciso-guide/vulnerability/)
+  - [Backup / Backup Status](https://elastisys.io/welkin/ciso-guide/backup/)
+  - [Cryptography / NGINX Ingress Controller](https://elastisys.io/welkin/ciso-guide/cryptography/)
+  - [Intrusion Detection / Falco](https://elastisys.io/welkin/ciso-guide/intrusion-detection/)
+  - [Policy-as-Code / Gatekeeper](https://elastisys.io/welkin/ciso-guide/policy-as-code/)
+  - [Network Security / NetworkPolicy](https://elastisys.io/welkin/ciso-guide/network-security/)
+  - [Capacity Management / Kubernetes Cluster Status](https://elastisys.io/welkin/ciso-guide/capacity-management/)
+  - [Vulnerability / Trivy Operator Dashboard](https://elastisys.io/welkin/ciso-guide/vulnerability/)
 
   </details>
 
@@ -346,9 +353,9 @@ assignees: ""
 > [!note]
 > As application developer `admin@example.com`
 
-- [ ] [Access Prometheus following the application developer docs](https://elastisys.io/compliantkubernetes/user-guide/metrics/#accessing-prometheus)
+- [ ] [Access Prometheus following the application developer docs](https://elastisys.io/welkin/user-guide/metrics/#accessing-prometheus)
 - [ ] Prometheus picked up user demo ServiceMonitor and PrometheusRule
-- [ ] [Access Alertmanager following the application developer docs](https://elastisys.io/compliantkubernetes/user-guide/alerts/#accessing-user-alertmanager)
+- [ ] [Access Alertmanager following the application developer docs](https://elastisys.io/welkin/user-guide/alerts/#accessing-user-alertmanager)
 - [ ] Alertmanager `Watchdog` firing
 
 ### Logs
@@ -368,7 +375,7 @@ assignees: ""
 - [ ] Can login to OpenSearch Dashboards via Dex with static user
 - [ ] Welcome dashboard presented first
 - [ ] Logs available (kubeaudit, kubernetes)
-- [ ] [CISO dashboards available and working](https://elastisys.io/compliantkubernetes/ciso-guide/audit-logs/)
+- [ ] [CISO dashboards available and working](https://elastisys.io/welkin/ciso-guide/audit-logs/)
 
 ### Falco
 
@@ -437,7 +444,7 @@ Prepare items to test disaster recovery:
   docker push "harbor.${DOMAIN}/${REGISTRY_PROJECT}/curl-jq:1.0.0"
   ```
 
-- [ ] [Create an image pull secret following the application developer docs](https://elastisys.io/compliantkubernetes/user-guide/deploy/#configure-an-image-pull-secret)
+- [ ] [Create an image pull secret following the application developer docs](https://elastisys.io/welkin/user-guide/deploy/#configure-an-image-pull-secret)
 - [ ] Deploy a Pod with a PersistantVolume on the workload cluster:
   <details><summary>Commands</summary>
 
@@ -517,9 +524,9 @@ Prepare items to test disaster recovery:
 
 Follow the public disaster recovery documentation to take backups:
 
-- [ ] Can [take Harbor backup](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#backup_1)
-- [ ] Can [take OpenSearch snapshot](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#backup)
-- [ ] Can [take Velero snapshot](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#backup_2)
+- [ ] Can [take Harbor backup](https://elastisys.io/welkin/operator-manual/disaster-recovery/#backup_1)
+- [ ] Can [take OpenSearch snapshot](https://elastisys.io/welkin/operator-manual/disaster-recovery/#backup)
+- [ ] Can [take Velero snapshot](https://elastisys.io/welkin/operator-manual/disaster-recovery/#backup_2)
 - [ ] Can run Rclone sync:
 
   ```bash
@@ -540,9 +547,9 @@ Follow the public disaster recovery documentation to take backups:
 Follow the public disaster recovery documentation to perform restores from the prepared backups:
 
 - [ ] Can [run Rclone restore](https://github.com/elastisys/compliantkubernetes-apps/blob/main/docs/restore/rclone.md)
-- [ ] Can [restore Harbor backup](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#restore_1)
-- [ ] Can [restore OpenSearch snapshot](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#restore)
-- [ ] Can [restore Velero snapshot](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#restore_2)
+- [ ] Can [restore Harbor backup](https://elastisys.io/welkin/operator-manual/disaster-recovery/#restore_1)
+- [ ] Can [restore OpenSearch snapshot](https://elastisys.io/welkin/operator-manual/disaster-recovery/#restore)
+- [ ] Can [restore Velero snapshot](https://elastisys.io/welkin/operator-manual/disaster-recovery/#restore_2)
 
 ## <a href="#user-content-upgrade-qa-steps" id="upgrade-qa-steps">#</a> Upgrade QA steps
 
@@ -611,7 +618,7 @@ Prepare items to test disaster recovery:
   docker push "harbor.${DOMAIN}/${REGISTRY_PROJECT}/curl-jq:1.0.0"
   ```
 
-- [ ] [Create an image pull secret following the application developer docs](https://elastisys.io/compliantkubernetes/user-guide/deploy/#configure-an-image-pull-secret)
+- [ ] [Create an image pull secret following the application developer docs](https://elastisys.io/welkin/user-guide/deploy/#configure-an-image-pull-secret)
 - [ ] Deploy a Pod with a PersistantVolume on the workload cluster:
   <details><summary>Commands</summary>
 
@@ -691,9 +698,9 @@ Prepare items to test disaster recovery:
 
 Follow the public disaster recovery documentation to take backups:
 
-- [ ] Can [take Harbor backup](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#backup_1)
-- [ ] Can [take OpenSearch snapshot](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#backup)
-- [ ] Can [take Velero snapshot](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#backup_2)
+- [ ] Can [take Harbor backup](https://elastisys.io/welkin/operator-manual/disaster-recovery/#backup_1)
+- [ ] Can [take OpenSearch snapshot](https://elastisys.io/welkin/operator-manual/disaster-recovery/#backup)
+- [ ] Can [take Velero snapshot](https://elastisys.io/welkin/operator-manual/disaster-recovery/#backup_2)
 - [ ] Can run Rclone sync:
 
   ```bash
@@ -807,7 +814,7 @@ Follow the public disaster recovery documentation to take backups:
 > [!note]
 > As application developer `admin@example.com`
 
-- [ ] [Can create a subnamespace by following the application developer docs](https://elastisys.io/compliantkubernetes/user-guide/namespaces/#namespace-management)
+- [ ] [Can create a subnamespace by following the application developer docs](https://elastisys.io/welkin/user-guide/namespaces/#namespace-management)
   <details><summary>Commands</summary>
 
   ```bash
@@ -852,8 +859,8 @@ Follow the public disaster recovery documentation to take backups:
   - Re-login with `admin@example.com`
 
   </details>
-- [ ] [Can create projects and push images by following the application developer docs](https://elastisys.io/compliantkubernetes/user-guide/registry/#running-example)
-- [ ] [Can configure image pull secret by following the application developer docs](https://elastisys.io/compliantkubernetes/user-guide/kubernetes-api/#configure-an-image-pull-secret)
+- [ ] [Can create projects and push images by following the application developer docs](https://elastisys.io/welkin/user-guide/registry/#running-example)
+- [ ] [Can configure image pull secret by following the application developer docs](https://elastisys.io/welkin/user-guide/kubernetes-api/#configure-an-image-pull-secret)
 - [ ] Can scan image for vulnerabilities
 - [ ] Configure project to disallow vulnerabilities
   - Try to pull image with vulnerabilities, should fail
@@ -972,16 +979,23 @@ Follow the public disaster recovery documentation to take backups:
 - [ ] Dashboards are available and viewable
 - [ ] Metrics are available from all clusters
 - [ ] Metrics are available from user demo application
-- [ ] [CISO dashboards available and working](https://elastisys.io/compliantkubernetes/ciso-guide/)
+  <details><summary>Steps</summary>
+
+  - Go to explore page
+  - Enter `rate(http_request_duration_seconds_count{container="welkin-user-demo"}[1m])`
+  - Metrics should show up
+
+  </details>
+- [ ] [CISO dashboards available and working](https://elastisys.io/welkin/ciso-guide/)
   <details><summary>List</summary>
 
-  - [Backup / Backup Status](https://elastisys.io/compliantkubernetes/ciso-guide/backup/)
-  - [Cryptography / NGINX Ingress Controller](https://elastisys.io/compliantkubernetes/ciso-guide/cryptography/)
-  - [Intrusion Detection / Falco](https://elastisys.io/compliantkubernetes/ciso-guide/intrusion-detection/)
-  - [Policy-as-Code / Gatekeeper](https://elastisys.io/compliantkubernetes/ciso-guide/policy-as-code/)
-  - [Network Security / NetworkPolicy](https://elastisys.io/compliantkubernetes/ciso-guide/network-security/)
-  - [Capacity Management / Kubernetes Cluster Status](https://elastisys.io/compliantkubernetes/ciso-guide/capacity-management/)
-  - [Vulnerability / Trivy Operator Dashboard](https://elastisys.io/compliantkubernetes/ciso-guide/vulnerability/)
+  - [Backup / Backup Status](https://elastisys.io/welkin/ciso-guide/backup/)
+  - [Cryptography / NGINX Ingress Controller](https://elastisys.io/welkin/ciso-guide/cryptography/)
+  - [Intrusion Detection / Falco](https://elastisys.io/welkin/ciso-guide/intrusion-detection/)
+  - [Policy-as-Code / Gatekeeper](https://elastisys.io/welkin/ciso-guide/policy-as-code/)
+  - [Network Security / NetworkPolicy](https://elastisys.io/welkin/ciso-guide/network-security/)
+  - [Capacity Management / Kubernetes Cluster Status](https://elastisys.io/welkin/ciso-guide/capacity-management/)
+  - [Vulnerability / Trivy Operator Dashboard](https://elastisys.io/welkin/ciso-guide/vulnerability/)
 
   </details>
 
@@ -996,9 +1010,9 @@ Follow the public disaster recovery documentation to take backups:
 > [!note]
 > As application developer `admin@example.com`
 
-- [ ] [Access Prometheus following the application developer docs](https://elastisys.io/compliantkubernetes/user-guide/metrics/#accessing-prometheus)
+- [ ] [Access Prometheus following the application developer docs](https://elastisys.io/welkin/user-guide/metrics/#accessing-prometheus)
 - [ ] Prometheus picked up user demo ServiceMonitor and PrometheusRule
-- [ ] [Access Alertmanager following the application developer docs](https://elastisys.io/compliantkubernetes/user-guide/alerts/#accessing-user-alertmanager)
+- [ ] [Access Alertmanager following the application developer docs](https://elastisys.io/welkin/user-guide/alerts/#accessing-user-alertmanager)
 - [ ] Alertmanager `Watchdog` firing
 
 ### Logs
@@ -1018,7 +1032,7 @@ Follow the public disaster recovery documentation to take backups:
 - [ ] Can login to OpenSearch Dashboards via Dex with static user
 - [ ] Welcome dashboard presented first
 - [ ] Logs available (kubeaudit, kubernetes)
-- [ ] [CISO dashboards available and working](https://elastisys.io/compliantkubernetes/ciso-guide/audit-logs/)
+- [ ] [CISO dashboards available and working](https://elastisys.io/welkin/ciso-guide/audit-logs/)
 
 ### Falco
 
@@ -1067,9 +1081,9 @@ Follow the public disaster recovery documentation to take backups:
 Follow the public disaster recovery documentation to perform restores from the prepared backups:
 
 - [ ] Can [run Rclone restore](https://github.com/elastisys/compliantkubernetes-apps/blob/main/docs/restore/rclone.md)
-- [ ] Can [restore Harbor backup](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#restore_1)
-- [ ] Can [restore OpenSearch snapshot](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#restore)
-- [ ] Can [restore Velero snapshot](https://elastisys.io/compliantkubernetes/operator-manual/disaster-recovery/#restore_2)
+- [ ] Can [restore Harbor backup](https://elastisys.io/welkin/operator-manual/disaster-recovery/#restore_1)
+- [ ] Can [restore OpenSearch snapshot](https://elastisys.io/welkin/operator-manual/disaster-recovery/#restore)
+- [ ] Can [restore Velero snapshot](https://elastisys.io/welkin/operator-manual/disaster-recovery/#restore_2)
 
 ## <a href="#user-content-post-qa-steps" id="post-qa-steps">#</a> Post-QA steps
 
