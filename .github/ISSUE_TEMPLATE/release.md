@@ -353,7 +353,7 @@ assignees: ""
 > [!note]
 > As application developer `admin@example.com`
 
-- [ ] [Access Prometheus following the application developer docs](https://elastisys.io/welkin/user-guide/metrics/#accessing-prometheus)
+- [ ] [Access Prometheus following the application developer docs](https://elastisys.io/welkin/user-guide/metrics/#accessing-the-prometheus-ui)
 - [ ] Prometheus picked up user demo ServiceMonitor and PrometheusRule
 - [ ] [Access Alertmanager following the application developer docs](https://elastisys.io/welkin/user-guide/alerts/#accessing-user-alertmanager)
 - [ ] Alertmanager `Watchdog` firing
@@ -1010,7 +1010,7 @@ Follow the public disaster recovery documentation to take backups:
 > [!note]
 > As application developer `admin@example.com`
 
-- [ ] [Access Prometheus following the application developer docs](https://elastisys.io/welkin/user-guide/metrics/#accessing-prometheus)
+- [ ] [Access Prometheus following the application developer docs](https://elastisys.io/welkin/user-guide/metrics/#accessing-the-prometheus-ui)
 - [ ] Prometheus picked up user demo ServiceMonitor and PrometheusRule
 - [ ] [Access Alertmanager following the application developer docs](https://elastisys.io/welkin/user-guide/alerts/#accessing-user-alertmanager)
 - [ ] Alertmanager `Watchdog` firing
