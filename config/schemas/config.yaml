@@ -1,6 +1,6 @@
 $schema: https://json-schema.org/draft/2020-12/schema
 $id: https://github.com/elastisys/compliantkubernetes-apps/raw/main/config/schemas/config.yaml
-title: Compliant Kubernetes Apps Config
+title: Welkin Apps Config
 description: |-
   This describes the structure of the config for both the service and workload clusters.
 
@@ -1155,7 +1155,7 @@ properties:
       - opsDomain
     properties:
       ck8sVersion:
-        title: Compliant Kubernetes Apps version
+        title: Welkin Apps version
         description: |-
           Use version number if you are exactly at a release tag.
           Otherwise use full commit hash of current commit.
@@ -2103,10 +2103,10 @@ properties:
     additionalProperties: false
     title: Storage Classes Config
     description: |-
-      Configuration options for using block storage in Compliant Kubernetes
+      Configuration options for using block storage in Welkin
     properties:
       default:
-        description: The StorageClass to use for all persistent volumes in Compliant Kubernetes.
+        description: The StorageClass to use for all persistent volumes in Welkin.
         type: string
         default: default
     type: object
@@ -2114,7 +2114,7 @@ properties:
     additionalProperties: false
     title: Object Storage Config
     description: |-
-      Configuration options for using object storage in Compliant Kubernetes
+      Configuration options for using object storage in Welkin
 
       This is used for:
 
@@ -3009,7 +3009,7 @@ properties:
       Some preconfigured services can be found under the key `user`.
 
       > [!note]
-      > See [the admin docs](https://elastisys.io/compliantkubernetes/operator-manual/user-managed-crds/) for context.
+      > See [the admin docs](https://elastisys.io/welkin/operator-manual/user-managed-crds/) for context.
     type: object
     additionalProperties: false
     properties:
@@ -3222,7 +3222,7 @@ properties:
     description: |-
       Configure Open Policy Agent, constraints and mutations enforced by Gatekeeper.
 
-      [Compliant Kubernetes contains multiple safeguards to make it easy to follow security best practices](https://elastisys.io/compliantkubernetes/user-guide/safeguards/).
+      [Welkin contains multiple safeguards to make it easy to follow security best practices](https://elastisys.io/welkin/user-guide/safeguards/).
 
       This includes an implementation of constraints and mutations with similar behaviour as Pod Security Policies, and application developer centric safeguards.
     type: object
@@ -3250,7 +3250,7 @@ properties:
           Configure constraint to disallow configured tags on container images.
 
           > [!note]
-          > See [the dev docs](https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-no-latest-tag/) for context.
+          > See [the dev docs](https://elastisys.io/welkin/user-guide/safeguards/enforce-no-latest-tag/) for context.
         type: object
         additionalProperties: false
         properties:
@@ -3284,7 +3284,7 @@ properties:
           Configure constraint to only allow configured registries for container images.
 
           > [!note]
-          > See [the dev docs](https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-trusted-registries/) for context.
+          > See [the dev docs](https://elastisys.io/welkin/user-guide/safeguards/enforce-trusted-registries/) for context.
         type: object
         additionalProperties: false
         properties:
@@ -3324,7 +3324,7 @@ properties:
           Configure constraint to only allow Deployments and StatefulSets with more than one replica.
 
           > [!note]
-          > See [the dev docs](https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-minimum-replicas/) for context.
+          > See [the dev docs](https://elastisys.io/welkin/user-guide/safeguards/enforce-minimum-replicas/) for context.
         type: object
         additionalProperties: false
         properties:
@@ -3350,7 +3350,7 @@ properties:
           Configure constraint to only allow Pods targeted by NetworkPolicies.
 
           > [!note]
-          > See [the dev docs](https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-networkpolicies/) for context.
+          > See [the dev docs](https://elastisys.io/welkin/user-guide/safeguards/enforce-networkpolicies/) for context.
         type: object
         additionalProperties: false
         properties:
@@ -3378,7 +3378,7 @@ properties:
           Advantageous if the cluster cannot automatically provision LoadBalancers, e.g. because the infrastructure provider do not offer such Kubernetes integration.
 
           > [!note]
-          > See [the dev docs](https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-no-load-balancer-service/) for context.
+          > See [the dev docs](https://elastisys.io/welkin/user-guide/safeguards/enforce-no-load-balancer-service/) for context.
         type: object
         additionalProperties: false
         properties:
@@ -3404,7 +3404,7 @@ properties:
           Configure constraint to only allow Pods configured with resource requests.
 
           > [!note]
-          > See [the dev docs](https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-resources/) for context.
+          > See [the dev docs](https://elastisys.io/welkin/user-guide/safeguards/enforce-resources/) for context.
         additionalProperties: false
         properties:
           enabled:
@@ -3440,7 +3440,7 @@ properties:
               Configure mutations to set time to live on deployed Jobs.
 
               > [!note]
-              > See [the dev docs](https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-job-ttl/) for context.
+              > See [the dev docs](https://elastisys.io/welkin/user-guide/safeguards/enforce-job-ttl/) for context.
             type: object
             additionalProperties: false
             properties:
@@ -3563,7 +3563,7 @@ properties:
 
           > [!note]
           > Many of these must be configured to support an air-gapped environment.
-          > See [the admin documentation](https://elastisys.io/compliantkubernetes/operator-manual/air-gapped/#trivy) for reference.
+          > See [the admin documentation](https://elastisys.io/welkin/operator-manual/air-gapped/#trivy) for reference.
         type: object
         additionalProperties: false
         properties:
@@ -3749,7 +3749,7 @@ properties:
     description: |-
       Configure Grafana, the metrics visualisation dashboard.
 
-      Compliant Kubernetes hosts two instances of Grafana one for the Platform Administrator and one for the Application Developer.
+      Welkin hosts two instances of Grafana one for the Platform Administrator and one for the Application Developer.
 
       > [!note]
       > Grafana is installed in the service cluster, so this configuration mainly applies there.
@@ -4181,7 +4181,7 @@ properties:
             title: Proemtheus Storage Enabled
             description: |-
               By default Prometheus instances run without storage and are treated as ephemeral.
-              See [ADR-0007](https://elastisys.io/compliantkubernetes/adr/0007-make-monitoring-forwarders-storage-independent/) for context.
+              See [ADR-0007](https://elastisys.io/welkin/adr/0007-make-monitoring-forwarders-storage-independent/) for context.
             type: boolean
             default: false
           size:
@@ -4811,7 +4811,7 @@ properties:
             releasenotes:
               description: Link to release notes for the component
               examples:
-                - https://elastisys.io/compliantkubernetes/release-notes/
+                - https://elastisys.io/welkin/release-notes/
               format: uri
               type: string
             subdomain:
