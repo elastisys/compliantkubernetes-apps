@@ -209,14 +209,14 @@ assignees: ""
   - Try to pull image with vulnerabilities, should fail
 
     ```bash
-    docker pull "harbor.${DOMAIN}/${REGISTRY_PROJECT}/ck8s-user-demo:${TAG}"
+    docker pull "harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo:${TAG}"
     ```
 
 - [ ] Configure project to allow vulnerabilities
   - Try to pull image with vulnerabilities, should succeed
 
     ```bash
-    docker pull "harbor.${DOMAIN}/${REGISTRY_PROJECT}/ck8s-user-demo:${TAG}"
+    docker pull "harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo:${TAG}"
     ```
 
 ### Gatekeeper
@@ -231,7 +231,7 @@ assignees: ""
   ```
 
 > [!note]
-> Using [the user demo helm chart](https://github.com/elastisys/compliantkubernetes/tree/main/user-demo/deploy/ck8s-user-demo)
+> Using [the user demo helm chart](https://github.com/elastisys/compliantkubernetes/tree/main/user-demo/deploy/welkin-user-demo)
 >
 > Set `NAMESPACE` to an application developer namespaces
 > Set `PUBLIC_DOCS_PATH` to the path of the public docs repo
@@ -239,8 +239,8 @@ assignees: ""
 - [ ] With invalid image repository, try to deploy, should warn due to constraint
 
   ```bash
-  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/ck8s-user-demo" \
-      --set image.repository="${REGISTRY_PROJECT}/ck8s-user-demo" \
+  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/welkin-user-demo" \
+      --set image.repository="${REGISTRY_PROJECT}/welkin-user-demo" \
       --set image.tag="${TAG}" \
       --set ingress.hostname="demoapp.${DOMAIN}"
   ```
@@ -248,8 +248,8 @@ assignees: ""
 - [ ] With invalid image tag, try to deploy, should fail due to constraint
 
   ```bash
-  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/ck8s-user-demo" \
-      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/ck8s-user-demo" \
+  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/welkin-user-demo" \
+      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo" \
       --set image.tag=latest \
       --set ingress.hostname="demoapp.${DOMAIN}"
   ```
@@ -257,8 +257,8 @@ assignees: ""
 - [ ] With unset networkpolicies, try to deploy, should warn due to constraint
 
   ```bash
-  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/ck8s-user-demo" \
-      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/ck8s-user-demo" \
+  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/welkin-user-demo" \
+      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo" \
       --set image.tag="${TAG}" \
       --set ingress.hostname="demoapp.${DOMAIN}" \
       --set networkPolicy.enabled=false
@@ -267,8 +267,8 @@ assignees: ""
 - [ ] With unset resources, try to deploy, should fail due to constraint
 
   ```bash
-  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/ck8s-user-demo" \
-      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/ck8s-user-demo" \
+  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/welkin-user-demo" \
+      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo" \
       --set image.tag="${TAG}" \
       --set ingress.hostname="demoapp.${DOMAIN}" \
       --set resources.requests=null
@@ -277,8 +277,8 @@ assignees: ""
 - [ ] With valid values, try to deploy, should succeed
 
   ```bash
-  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/ck8s-user-demo" \
-      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/ck8s-user-demo" \
+  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/welkin-user-demo" \
+      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo" \
       --set image.tag="${TAG}" \
       --set ingress.hostname="demoapp.${DOMAIN}"
   ```
@@ -859,14 +859,14 @@ Follow the public disaster recovery documentation to take backups:
   - Try to pull image with vulnerabilities, should fail
 
     ```bash
-    docker pull "harbor.${DOMAIN}/${REGISTRY_PROJECT}/ck8s-user-demo:${TAG}"
+    docker pull "harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo:${TAG}"
     ```
 
 - [ ] Configure project to allow vulnerabilities
   - Try to pull image with vulnerabilities, should succeed
 
     ```bash
-    docker pull "harbor.${DOMAIN}/${REGISTRY_PROJECT}/ck8s-user-demo:${TAG}"
+    docker pull "harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo:${TAG}"
     ```
 
 ### Gatekeeper
@@ -881,7 +881,7 @@ Follow the public disaster recovery documentation to take backups:
   ```
 
 > [!note]
-> Using [the user demo helm chart](https://github.com/elastisys/compliantkubernetes/tree/main/user-demo/deploy/ck8s-user-demo)
+> Using [the user demo helm chart](https://github.com/elastisys/compliantkubernetes/tree/main/user-demo/deploy/welkin-user-demo)
 >
 > Set `NAMESPACE` to an application developer namespaces
 > Set `PUBLIC_DOCS_PATH` to the path of the public docs repo
@@ -889,8 +889,8 @@ Follow the public disaster recovery documentation to take backups:
 - [ ] With invalid image repository, try to deploy, should warn due to constraint
 
   ```bash
-  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/ck8s-user-demo" \
-      --set image.repository="${REGISTRY_PROJECT}/ck8s-user-demo" \
+  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/welkin-user-demo" \
+      --set image.repository="${REGISTRY_PROJECT}/welkin-user-demo" \
       --set image.tag="${TAG}" \
       --set ingress.hostname="demoapp.${DOMAIN}"
   ```
@@ -898,8 +898,8 @@ Follow the public disaster recovery documentation to take backups:
 - [ ] With invalid image tag, try to deploy, should fail due to constraint
 
   ```bash
-  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/ck8s-user-demo" \
-      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/ck8s-user-demo" \
+  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/welkin-user-demo" \
+      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo" \
       --set image.tag=latest \
       --set ingress.hostname="demoapp.${DOMAIN}"
   ```
@@ -907,8 +907,8 @@ Follow the public disaster recovery documentation to take backups:
 - [ ] With unset networkpolicies, try to deploy, should warn due to constraint
 
   ```bash
-  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/ck8s-user-demo" \
-      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/ck8s-user-demo" \
+  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/welkin-user-demo" \
+      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo" \
       --set image.tag="${TAG}" \
       --set ingress.hostname="demoapp.${DOMAIN}" \
       --set networkPolicy.enabled=false
@@ -917,8 +917,8 @@ Follow the public disaster recovery documentation to take backups:
 - [ ] With unset resources, try to deploy, should fail due to constraint
 
   ```bash
-  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/ck8s-user-demo" \
-      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/ck8s-user-demo" \
+  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/welkin-user-demo" \
+      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo" \
       --set image.tag="${TAG}" \
       --set ingress.hostname="demoapp.${DOMAIN}" \
       --set resources.requests=null
@@ -927,8 +927,8 @@ Follow the public disaster recovery documentation to take backups:
 - [ ] With valid values, try to deploy, should succeed
 
   ```bash
-  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/ck8s-user-demo" \
-      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/ck8s-user-demo" \
+  helm -n "${NAMESPACE}" upgrade --atomic --install demo "${PUBLIC_DOCS_PATH}/user-demo/deploy/welkin-user-demo" \
+      --set image.repository="harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo" \
       --set image.tag="${TAG}" \
       --set ingress.hostname="demoapp.${DOMAIN}"
   ```
