@@ -546,7 +546,7 @@ Follow the public disaster recovery documentation to take backups:
 
 Follow the public disaster recovery documentation to perform restores from the prepared backups:
 
-- [ ] Can [run Rclone restore](https://github.com/elastisys/compliantkubernetes-apps/blob/main/docs/restore/rclone.md)
+- [ ] Can [run Rclone restore](https://github.com/elastisys/compliantkubernetes-apps/blob/main/restore/rclone/README.md)
 - [ ] Can [restore Harbor backup](https://elastisys.io/welkin/operator-manual/disaster-recovery/#restore_1)
 - [ ] Can [restore OpenSearch snapshot](https://elastisys.io/welkin/operator-manual/disaster-recovery/#restore)
 - [ ] Can [restore Velero snapshot](https://elastisys.io/welkin/operator-manual/disaster-recovery/#restore_2)
@@ -1080,7 +1080,7 @@ Follow the public disaster recovery documentation to take backups:
 
 Follow the public disaster recovery documentation to perform restores from the prepared backups:
 
-- [ ] Can [run Rclone restore](https://github.com/elastisys/compliantkubernetes-apps/blob/main/docs/restore/rclone.md)
+- [ ] Can [run Rclone restore](https://github.com/elastisys/compliantkubernetes-apps/blob/main/restore/rclone/README.md)
 - [ ] Can [restore Harbor backup](https://elastisys.io/welkin/operator-manual/disaster-recovery/#restore_1)
 - [ ] Can [restore OpenSearch snapshot](https://elastisys.io/welkin/operator-manual/disaster-recovery/#restore)
 - [ ] Can [restore Velero snapshot](https://elastisys.io/welkin/operator-manual/disaster-recovery/#restore_2)
