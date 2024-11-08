@@ -9,7 +9,7 @@ $defs:
   component:
     deprecated: true
     additionalProperties: false
-    description: This is meant to describe the base class if you will, for ck8s resources.
+    description: This is meant to describe the base class if you will, for Welkin resources.
     properties:
       affinity:
         $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
