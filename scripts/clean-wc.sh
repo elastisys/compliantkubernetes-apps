@@ -90,32 +90,16 @@ else
   log_info "Cluster API provisioned cluster, skipping deletion of cert-manager namespace"
 fi
 
-# Prometheus specific removal
-PROM_CRDS=$(
-    "${here}/.././bin/ck8s" ops \
-        kubectl wc api-resources \
-        --api-group=monitoring.coreos.com \
-        -o name
-    )
-if [ -n "$PROM_CRDS" ]; then
-    # shellcheck disable=SC2086
-    # We definitely want word splitting here.
-    "${here}/.././bin/ck8s" ops kubectl wc delete crds $PROM_CRDS
+# Delete kube prometheus stack CRDs
+mapfile -t PROM_CRDS < <("${here}/.././bin/ck8s" ops kubectl wc api-resources --api-group=monitoring.coreos.com -o name)
+if [[ "${#PROM_CRDS[@]}" -gt 0 ]]; then
+    "${here}/.././bin/ck8s" ops kubectl wc delete crds "${PROM_CRDS[@]}"
 fi
 
-# Trivy specific removal
-TRIVY_CRDS=$(
-    "${here}/.././bin/ck8s" ops \
-        kubectl wc api-resources \
-        --api-group=aquasecurity.github.io \
-        -o name
-    )
-
-# Delete CRDs
-if [ -n "$TRIVY_CRDS" ]; then
-    # shellcheck disable=SC2086
-    # We definitely want word splitting here.
-    "${here}/.././bin/ck8s" ops kubectl wc delete crds $TRIVY_CRDS
+# Delete Trivy CRDs
+mapfile -t TRIVY_CRDS < <("${here}/.././bin/ck8s" ops kubectl wc api-resources --api-group=aquasecurity.github.io -o name)
+if [[ "${#TRIVY_CRDS[@]}" -gt 0 ]]; then
+    "${here}/.././bin/ck8s" ops kubectl wc delete crds "${TRIVY_CRDS[@]}"
 fi
 
 # Delete Gatekeeper CRDs
@@ -131,9 +115,8 @@ if [ -n "$GATE_CONS" ]; then
     "${here}/.././bin/ck8s" ops kubectl wc delete --ignore-not-found=true $GATE_CONS
 fi
 
-# Delete hnc crds
-"${here}/.././bin/ck8s" ops kubectl wc delete crds \
-    hierarchicalresourcequotas.hnc.x-k8s.io \
-    hierarchyconfigurations.hnc.x-k8s.io \
-    hncconfigurations.hnc.x-k8s.io \
-    subnamespaceanchors.hnc.x-k8s.io
+# Delete HNC CRDs
+mapfile -t HNC_CRDS < <("${here}/.././bin/ck8s" ops kubectl wc api-resources --api-group=hnc.x-k8s.io -o name)
+if [[ "${#HNC_CRDS[@]}" -gt 0 ]]; then
+    "${here}/.././bin/ck8s" ops kubectl wc delete crds "${HNC_CRDS[@]}"
+fi
