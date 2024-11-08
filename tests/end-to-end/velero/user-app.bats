@@ -61,8 +61,6 @@ teardown() {
 }
 
 @test "velero backup and restore user application" {
-  # TODO: Remove skip when fixed https://github.com/elastisys/compliantkubernetes-apps/issues/2321
-  skip "This does not currently work and is a known issue"
 
   backup_name="test-backup-$(date +%s)"
   restore_name="test-restore-$(date +%s)"

@@ -1,8 +1,12 @@
 csiSnapshotTimeout: 0s
 excludedNamespaces:
+  - calico-apiserver
+  - calico-system
   - cert-manager
   - falco
   - fluentd
+  - gatekeeper-system
+  - gpu-operator
   - hnc-system
   - ingress-nginx
   - kube-node-lease
@@ -10,9 +14,9 @@ excludedNamespaces:
   - kube-system
   - kured
   - monitoring
+  - openstack-system
   - rook-ceph
   - velero
-  - gatekeeper-system
   - jaeger-system
   - postgres-system
   - rabbitmq-system
@@ -36,5 +40,6 @@ labelSelector:
     - key: compliantkubernetes.io/nobackup
       operator: DoesNotExist
 metadata: {}
+snapshotMoveData: false
 storageLocation: default
 ttl: 720h0m0s
