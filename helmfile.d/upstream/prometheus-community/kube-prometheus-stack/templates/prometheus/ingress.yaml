@@ -11,7 +11,7 @@ kind: Ingress
 metadata:
 {{- if .Values.prometheus.ingress.annotations }}
   annotations:
-{{ toYaml .Values.prometheus.ingress.annotations | indent 4 }}
+    {{- tpl (toYaml .Values.prometheus.ingress.annotations) . | nindent 4 }}
 {{- end }}
   name: {{ $serviceName }}
   namespace: {{ template "kube-prometheus-stack.namespace" . }}
@@ -30,7 +30,7 @@ spec:
   rules:
   {{- if .Values.prometheus.ingress.hosts }}
   {{- range $host := .Values.prometheus.ingress.hosts }}
-    - host: {{ tpl $host $ }}
+    - host: {{ tpl $host $ | quote }}
       http:
         paths:
   {{- range $p := $paths }}
