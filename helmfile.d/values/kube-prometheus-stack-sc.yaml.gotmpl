@@ -165,6 +165,9 @@ alertmanager:
     affinity: {{- toYaml .Values.prometheus.alertmanagerSpec.affinity | nindent 6 }}
 {{- if .Values | get "prometheus.alertmanagerSpec.image" nil }}
     image: {{- toYaml .Values.prometheus.alertmanagerSpec.image | nindent 6 }}
+{{- else }}
+    image:
+      tag: v0.26.0
 {{- end }}
 
 kubeControllerManager:
