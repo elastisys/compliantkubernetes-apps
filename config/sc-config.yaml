@@ -973,22 +973,9 @@ opensearch:
     repository: opensearch-snapshots # Uses the bucket set in `objectStorage.buckets.opensearch`
     min: 7
     max: 14
-    ageSeconds: 864000
-    maxRequestSeconds: 1200
+    retentionAge: 10d
     backupSchedule: 0 */2 * * *
-    backupStartingDeadlineSeconds: 600
-    backupActiveDeadlineSeconds: 600
-    retentionSchedule: '@daily'
-    retentionStartingDeadlineSeconds: 600
-    retentionActiveDeadlineSeconds: 2700
-    retentionResources:
-      requests:
-        cpu: 50m
-        memory: 32Mi
-      limits:
-        cpu: 100m
-        memory: 128Mi
-
+    retentionSchedule: 0 0 * * *
   exporter:
     serviceMonitor:
       interval: 30s
