@@ -117,6 +117,12 @@ securityConfig:
       - "cluster:admin/repository/get"
       - "cluster_manage_index_templates"
       - "cluster:admin/opendistro/ism/policy/*"
+      - "cluster:admin/snapshot/get"
+      - "cluster:admin/snapshot/create"
+      - "cluster:admin/snapshot/delete"
+      - "cluster:admin/opensearch/snapshot_management/policy/get"
+      - "cluster:admin/opensearch/snapshot_management/policy/search"
+      - "cluster:admin/opensearch/snapshot_management/policy/write"
       - indices:admin/index_template/put
       index_permissions:
       - index_patterns:
