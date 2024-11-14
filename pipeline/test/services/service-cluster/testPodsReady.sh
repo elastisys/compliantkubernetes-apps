@@ -197,7 +197,6 @@ if "${enable_harbor}" && "${enable_harbor_backup}"; then
 fi
 if "${enable_opensearch_snapshot}"; then
   cronjobs+=(
-    "opensearch-system opensearch-backup"
     "opensearch-system opensearch-slm"
   )
 fi

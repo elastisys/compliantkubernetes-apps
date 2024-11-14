@@ -123,8 +123,6 @@ tests:
           - function: test_cronjob
             tests:
               - condition: .opensearch.snapshot.enabled
-                target: opensearch-backup
-              - condition: .opensearch.snapshot.enabled
                 target: opensearch-slm
               - condition: .opensearch.curator.enabled
                 target: opensearch-curator

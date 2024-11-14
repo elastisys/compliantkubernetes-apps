@@ -467,10 +467,6 @@
   app_version: ''
   chart_version: 0.1.1
 - domain: Custom Helm Charts
-  name: opensearch-backup
-  app_version: 0.1.0
-  chart_version: 0.1.0
-- domain: Custom Helm Charts
   name: opensearch-configurer
   app_version: 0.1.0
   chart_version: 0.1.0
@@ -780,7 +776,6 @@
     - opensearch
     - init-harbor
     - opensearch-configurer
-    - opensearch-backup
 - domain: Container images
   name: "docker.io/opensearchproject/opensearch-dashboards"
   tag: "2.12.0"

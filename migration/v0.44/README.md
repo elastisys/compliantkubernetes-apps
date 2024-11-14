@@ -152,6 +152,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.44/apply/20-migrate-gpu-operator-ns.sh
     ```
 
+1. Upgrade OpenSearch:
+
+    ```bash
+    ./migration/v0.44/apply/40-opensearch-backup.sh execute
+    ```
+
 1. Upgrade applications:
 
     ```bash

@@ -65,35 +65,11 @@ spec:
       for: 1h
       labels:
         severity: warning
-    - alert: OpenSearchBackupHaveFailed24Hours
-      annotations:
-        description: The job daily backup job elasticsearch-backup have failed over 24 hours.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-elasticsearchbackup
-        summary: The daily backup job elasticsearch-backup have failed over 24 hours.
-      expr: |-
-        (
-          min((time()-kube_job_status_completion_time{job_name=~"opensearch-backup-.*", cluster=~".*"})/3600) > 24
-        )
-      for: 1h
-      labels:
-        severity: warning
-    - alert: OpenSearchBackupHaveFailed48Hours
-      annotations:
-        description: The job daily backup job elasticsearch-backup have failed over 48 hours.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-elasticsearchbackup
-        summary: The daily backup job elasticsearch-backup have failed over 48 hours.
-      expr: |-
-        (
-          min((time()-kube_job_status_completion_time{job_name=~"opensearch-backup-.*", cluster=~".*"})/3600) > 48
-        )
-      for: 1h
-      labels:
-        severity: warning
     - alert: OpenSearchSnapshotHaveFailed24Hours
       annotations:
-        description: The job daily backup job {{`{{`}} $labels.repository {{`}}`}} have failed over 24 hours.
+        description: There have been no successful OpenSearch snapshots for over 24 hours.
         runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-elasticsearchsnap
-        summary: The daily backup job elasticsearch snapshot have failed over 24 hours.
+        summary: OpenSearch snapshots have failed for over 24 hours.
       expr: |-
         (
           (time()-elasticsearch_snapshot_stats_snapshot_start_time_timestamp{state="SUCCESS", cluster=~".*"})/3600 > 24
@@ -105,9 +81,9 @@ spec:
         severity: warning
     - alert: OpenSearchSnapshotHaveFailed48Hours
       annotations:
-        description: The job daily backup job {{`{{`}} $labels.repository {{`}}`}} have failed over 48 hours.
+        description: There have been no successful OpenSearch snapshots for over 48 hours.
         runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-elasticsearchsnap
-        summary: The daily backup job elasticsearch snapshot have failed over 48 hours.
+        summary: OpenSearch snapshots have failed for over 48 hours.
       expr: |-
         (
           (time()-elasticsearch_snapshot_stats_snapshot_start_time_timestamp{state="SUCCESS", cluster=~".*"})/3600 > 48

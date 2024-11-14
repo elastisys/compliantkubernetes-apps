@@ -8,11 +8,11 @@ As part of our effort to make our Helm charts available for public and internal 
 
     ```terminal
     cd helmfile.d/charts
-    helm pull --verify oci://ghcr.io/elastisys/opensearch-slm --version 0.1.0 --keyring public.gpg
+    helm pull --verify oci://ghcr.io/elastisys/opensearch-configurer --version 0.1.0 --keyring public.gpg
     ```
 
 1. Pull and install charts e.g:
 
     ```terminal
-    helm install opensearch-slm oci://ghcr.io/elastisys/opensearch-slm --version 0.1.0 --namespace <NAMESPACE>
+    helm install opensearch-configurer oci://ghcr.io/elastisys/opensearch-configurer --version 0.1.0 --namespace <NAMESPACE>
     ```
