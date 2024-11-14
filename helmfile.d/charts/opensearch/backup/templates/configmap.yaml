@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "opensearch-backup.fullname" . }}
-  labels:
-    {{- include "opensearch-backup.labels" . | nindent 4 }}
-data:
-  backup.sh: |-
-    {{- .Files.Get "scripts/backup.sh" | nindent 4 }}

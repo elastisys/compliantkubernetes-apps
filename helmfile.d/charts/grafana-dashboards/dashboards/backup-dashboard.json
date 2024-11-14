@@ -218,7 +218,7 @@
       "pluginVersion": "8.2.7",
       "targets": [
         {
-          "expr": "min((time()-kube_job_status_completion_time{job_name=~\"opensearch-backup-.*\", cluster=~\"$cluster\"})/3600)",
+          "expr": "min((time()-elasticsearch_snapshot_stats_latest_snapshot_timestamp_seconds{cluster=~\"$cluster\"})/3600)",
           "instant": false,
           "interval": "",
           "legendFormat": "{{job_name}}",

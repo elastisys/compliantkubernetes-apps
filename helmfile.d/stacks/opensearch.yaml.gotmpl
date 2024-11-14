@@ -128,17 +128,6 @@ templates:
       - values/opensearch/securityadmin.yaml.gotmpl
       - values/opensearch/configurer.yaml.gotmpl
 
-  opensearch-backup:
-    inherit: [ template: opensearch ]
-    installed: {{ and ( .Values | get "opensearch.enabled" false) (.Values | get "opensearch.snapshot.enabled" false) }}
-    chart: charts/opensearch/backup
-    version: 0.1.0
-    name: opensearch-backup
-    needs:
-      - opensearch-system/opensearch-configurer
-    values:
-      - values/opensearch/backup.yaml.gotmpl
-
   opensearch-slm:
     inherit: [ template: opensearch ]
     installed: {{ and ( .Values | get "opensearch.enabled" false) (.Values | get "opensearch.snapshot.enabled" false) }}

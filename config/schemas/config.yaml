@@ -5889,7 +5889,7 @@ properties:
       snapshot:
         title: OpenSearch Snapshot
         description: |-
-          Configures the CronJob and repository to take snapshots in OpenSearch.
+          Configure OpenSearch snapshot creation and retention.
 
           This requires that `objectStorage` is configured, and will use the bucket or container set in `objectStorage.buckets.opensearch`.
         type: object
@@ -5918,26 +5918,18 @@ properties:
             type: number
             default: 1200
           backupSchedule:
-            title: OpenSearch Backup CronJob Schedule
+            title: OpenSearch Snapshot Backup Schedule
             description: |-
               Schedule to trigger Opensearch backups.
               Uses the Cron format, see https://en.wikipedia.org/wiki/Cron.
             default: 0 */2 * * *
             $ref: '#/$defs/cronSchedule'
-          backupStartingDeadlineSeconds:
-            title: OpenSearch Backup Job Starting Deadline
-            type: number
-            default: 600
-          backupActiveDeadlineSeconds:
-            title: OpenSearch Backup Job Active Deadline
-            type: number
-            default: 600
           retentionSchedule:
-            title: OpenSearch Retention CronJob Schedule
+            title: OpenSearch Snapshot Retention Schedule
             description: |-
               Schedule to check for and remove old snapshots.
               Uses the Cron format, see https://en.wikipedia.org/wiki/Cron.
-            default: '@daily'
+            default: '0 0 * * *'
             $ref: '#/$defs/cronSchedule'
           retentionStartingDeadlineSeconds:
             title: OpenSearch Retention Job Starting Deadline
@@ -5949,6 +5941,10 @@ properties:
             default: 2700
           retentionResources:
             $ref: '#/$defs/kubernetesResourceRequirements'
+          retentionAge:
+            title: OpenSearch Maximum Snapshot Age
+            type: string
+            default: '10d'
       securityadmin:
         title: OpenSearch Security Admin
         description: Configures the Job that initialises OpenSearch Security.

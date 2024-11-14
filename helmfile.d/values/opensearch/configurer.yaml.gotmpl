@@ -35,7 +35,16 @@ config:
     rolloverAge: {{ .Values.opensearch.ism.rolloverAgeDays }}
 
   {{- if .Values.opensearch.snapshot.enabled }}
-  snapshotRepository: {{ .Values.opensearch.snapshot.repository }}
+  snapshots:
+    repository: {{ .Values.opensearch.snapshot.repository }}
+    min: {{ .Values.opensearch.snapshot.min }}
+    max: {{ .Values.opensearch.snapshot.max }}
+    backupSchedule: {{ .Values.opensearch.snapshot.backupSchedule | quote }}
+    retentionSchedule: {{ .Values.opensearch.snapshot.retentionSchedule | quote }}
+    retentionAge: {{ .Values.opensearch.snapshot.retentionAge }}
+    # Ignore security plugin index as per
+    # https://opendistro.github.io/for-elasticsearch-docs/docs/elasticsearch/snapshot-restore/#security-plugin-considerations
+    indices: "*,-.opendistro_security"
 
   {{- if eq .Values.objectStorage.type "s3" }}
   s3:

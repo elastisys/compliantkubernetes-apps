@@ -43,7 +43,6 @@ opensearch:
   snapshot:
     enabled: false
     backupSchedule: 0 */12 * * * # run twice/day
-    retentionSchedule: 0 1 * * * # 1am
 
 prometheus:
   alertmanagerSpec:

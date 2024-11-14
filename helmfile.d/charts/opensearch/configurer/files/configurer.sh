@@ -15,7 +15,7 @@ auth="${OPENSEARCH_USERNAME}:${OPENSEARCH_PASSWORD}"
 os_url="https://{{ .Values.opensearch.clusterEndpoint }}"
 osd_url="http://{{ .Values.opensearch.dashboardsEndpoint }}"
 
-snapshot_repository="{{ .Values.config.snapshotRepository }}"
+snapshot_repository="{{ .Values.config.snapshots.repository }}"
 
 create_indices="{{ .Values.config.createIndices }}"
 
@@ -267,6 +267,96 @@ create_user() {
   esac
 }
 
+create_update_snapshot_policy() {
+  echo
+  echo "Checking if snapshot policy exists"
+  policy_resp=$(curl --insecure -X GET "${os_url}/_plugins/_sm/policies/snapshot_management_policy" -s -k -u "${auth}")
+  seq_no=$(echo "${policy_resp}" | grep "^{" | jq -r '._seq_no')
+  primary_term=$(echo "${policy_resp}" | grep "^{" | jq -r '._primary_term')
+  if [ "${seq_no}" != "null" ] && [ "${primary_term}" != "null" ]; then
+    echo "Updating snapshot policy"
+    resp=$(curl --insecure -X PUT "${os_url}/_plugins/_sm/policies/snapshot_management_policy?if_seq_no=${seq_no}&if_primary_term=${primary_term}" \
+    -H 'Content-Type: application/json' \
+    -s -k -u "${auth}" \
+    -d '{
+      "description": "Snapshot Management Policy",
+      "creation": {
+        "schedule": {
+          "cron": {
+            "expression": "{{ .Values.config.snapshots.backupSchedule }}",
+            "timezone": "UTC"
+          }
+        },
+        "time_limit": "1h"
+      },
+      "deletion": {
+        "schedule": {
+          "cron": {
+            "expression": "{{ .Values.config.snapshots.retentionSchedule }}",
+            "timezone": "UTC"
+          }
+        },
+        "condition": {
+          "max_age": "{{ .Values.config.snapshots.retentionAge }}",
+          "min_count": {{ .Values.config.snapshots.min }},
+          "max_count": {{ .Values.config.snapshots.max }}
+        },
+        "time_limit": "1h"
+      },
+      "snapshot_config": {
+        "repository": "{{ .Values.config.snapshots.repository }}",
+        "date_format": "yyyy-MM-dd-HH:mm:ss",
+        "timezone": "UTC",
+        "indices": "{{ .Values.config.snapshots.indices }}",
+        "include_global_state": "false"
+      }
+    }')
+  else
+    echo "Creating snapshot policy"
+    resp=$(curl --insecure -X POST "${os_url}/_plugins/_sm/policies/snapshot_management_policy" \
+      -H 'Content-Type: application/json' \
+      -s -k -u "${auth}" \
+      -d '{
+        "description": "Snapshot Management Policy",
+        "creation": {
+          "schedule": {
+            "cron": {
+              "expression": "{{ .Values.config.snapshots.backupSchedule }}",
+              "timezone": "UTC"
+            }
+          },
+          "time_limit": "1h"
+        },
+        "deletion": {
+          "schedule": {
+            "cron": {
+              "expression": "{{ .Values.config.snapshots.retentionSchedule }}",
+              "timezone": "UTC"
+            }
+          },
+          "condition": {
+            "max_age": "{{ .Values.config.snapshots.retentionAge }}",
+            "min_count": {{ .Values.config.snapshots.min }},
+            "max_count": {{ .Values.config.snapshots.max }}
+          },
+          "time_limit": "1h"
+        },
+        "snapshot_config": {
+          "repository": "{{ .Values.config.snapshots.repository }}",
+          "date_format": "yyyy-MM-dd-HH:mm:ss",
+          "timezone": "UTC",
+          "indices": "{{ .Values.config.snapshots.indices }}",
+          "include_global_state": "false"
+        }
+      }')
+  fi
+
+  policy_id=$(echo "${resp}" | grep "^{" | jq -r '._id')
+  if [ "${policy_id}" == "null" ]; then
+    log_error_exit "Failed to create snapshot policy" "${resp}"
+  fi
+}
+
 wait_for_dashboards
 setup_dashboards
 
@@ -329,6 +419,8 @@ for row in $(echo "${users}"  | jq -r '.[] | @base64'); do
 
     create_user "$(_jq '.username')" "$(_jq '.definition')"
 done
+
+create_update_snapshot_policy
 
 echo
 echo "Done configuring OpenSearch and Dashboards"

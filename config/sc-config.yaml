@@ -983,12 +983,13 @@ opensearch:
     repository: opensearch-snapshots # Uses the bucket set in `objectStorage.buckets.opensearch`
     min: 7
     max: 14
+    retentionAge: 10d
+    backupSchedule: 0 */2 * * *
+    retentionSchedule: 0 0 * * *
+
+    # Needed while migration to Snapshot Management Policy
     ageSeconds: 864000
     maxRequestSeconds: 1200
-    backupSchedule: 0 */2 * * *
-    backupStartingDeadlineSeconds: 600
-    backupActiveDeadlineSeconds: 600
-    retentionSchedule: '@daily'
     retentionStartingDeadlineSeconds: 600
     retentionActiveDeadlineSeconds: 2700
     retentionResources:
