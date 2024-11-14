@@ -5572,7 +5572,7 @@ properties:
       snapshot:
         title: OpenSearch Snapshot
         description: |-
-          Configures the CronJob and repository to take snapshots in OpenSearch.
+          Configure OpenSearch snapshot creation and retention.
 
           This requires that `objectStorage` is configured, and will use the bucket or container set in `objectStorage.buckets.opensearch`.
         type: object
@@ -5586,9 +5586,6 @@ properties:
             title: OpenSearch Snapshot Repository
             type: string
             default: opensearch-snapshots
-          ageSeconds:
-            default: 864000
-            type: number
           min:
             title: OpenSearch Minimum Retained Snapshots
             type: number
@@ -5597,35 +5594,18 @@ properties:
             title: OpenSearch Maximum Retained Snapshots
             default: 14
             type: number
-          maxRequestSeconds:
-            type: number
-            default: 1200
           backupSchedule:
-            title: OpenSearch Backup CronJob Schedule
+            title: OpenSearch Backup Schedule
             type: string
             default: 0 */2 * * *
-          backupStartingDeadlineSeconds:
-            title: OpenSearch Backup Job Starting Deadline
-            type: number
-            default: 600
-          backupActiveDeadlineSeconds:
-            title: OpenSearch Backup Job Active Deadline
-            type: number
-            default: 600
           retentionSchedule:
-            title: OpenSearch Retention CronJob Schedule
+            title: OpenSearch Snapshot Retention Schedule
             type: string
-            default: '@daily'
-          retentionStartingDeadlineSeconds:
-            title: OpenSearch Retention Job Starting Deadline
-            type: number
-            default: 600
-          retentionActiveDeadlineSeconds:
-            title: OpenSearch Retention Job Active Deadline
-            type: number
-            default: 2700
-          retentionResources:
-            $ref: '#/$defs/kubernetesResourceRequirements'
+            default: '0 0 * * *'
+          retentionAge:
+            title: OpenSearch Maximum Snapshot Age
+            type: string
+            default: '10d'
       securityadmin:
         title: OpenSearch Security Admin
         description: Configures the Job that initialises OpenSearch Security.
