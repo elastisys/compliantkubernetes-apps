@@ -10,6 +10,13 @@ excludedNamespaces:
   {{- with (keys .Values.user.constraints) }}
   {{- toYaml . | nindent 2 }}
   {{- end }}
+  {{- if eq .Values.global.ck8sK8sInstaller "capi" }}
+  - calico-apiserver
+  - calico-system
+  - openstack-system
+  - gpu-operator
+  - tigera-operator
+  {{- end }}
 
 unpropagatedAnnotations: {{- toYaml .Values.hnc.unpropagatedAnnotations | nindent 2 }}
 managedNamespaceAnnotations: {{- toYaml .Values.hnc.managedNamespaceAnnotations | nindent 2 }}
