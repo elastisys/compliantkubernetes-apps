@@ -12,9 +12,6 @@ config:
         - Authorization
         - securitytenant
 
-    opensearchDashboards:
-      index: .opensearch_dashboards
-
     opensearch_security:
       {{ if .Values.opensearch.sso.enabled }}
       auth:
