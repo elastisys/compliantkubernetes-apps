@@ -172,27 +172,8 @@ hnc:
   ## Included namespaces, empty string will include all
   includedNamespacesRegex: ""
 
-  ## Excluded namespaces
-  excludedNamespaces:
-    - alertmanager
-    - cert-manager
-    - falco
-    - fluentd
-    - fluentd-system
-    - hnc-system
-    - ingress-nginx
-    - kube-node-lease
-    - kube-public
-    - kube-system
-    - kured
-    - monitoring
-    - rook-ceph
-    - velero
-    - gatekeeper-system
-    - metallb-system
-
   ## Extra excluded namespace, here we should add the namespaces that are more likely to change
-  excludedExtraNamespaces: []
+  excludedNamespaces: []
 
   ## Additional resources to enable opt-in propagation for.
   ## Objects that should be propagated must have one of the annotations listed here https://github.com/kubernetes-sigs/hierarchical-namespaces/blob/master/docs/user-guide/how-to.md#limit-the-propagation-of-an-object-to-descendant-namespaces

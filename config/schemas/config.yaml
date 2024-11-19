@@ -1739,37 +1739,16 @@ properties:
           - resource: networkpolicies
             group: networking.k8s.io
         type: array
-      excludedExtraNamespaces:
-        title: Excluded Extra Namespaces
-        description: |-
-          Extra excluded namespace, here we should add the namespaces that are more likely to change
-
-          [Including and excluding namespaces](https://github.com/kubernetes-sigs/hierarchical-namespaces/blob/master/docs/user-guide/how-to.md#including-and-excluding-namespaces-from-hnc)
-        items:
-          type: string
-        type: array
       excludedNamespaces:
         title: Excluded Namespaces
         description: |-
-          Excluded namespaces
+          Namespaces excluded by HNC, here you can configure a list of namespaces to exclude from HNC in addition to the default excluded namespaces.
+
+          [Including and excluding namespaces](https://github.com/kubernetes-sigs/hierarchical-namespaces/blob/master/docs/user-guide/how-to.md#including-and-excluding-namespaces-from-hnc)
         items:
           examples:
-            - alertmanager
-            - cert-manager
-            - falco
-            - fluentd
-            - fluentd-system
-            - gatekeeper-system
-            - hnc-system
-            - ingress-nginx
-            - kube-node-lease
-            - kube-public
-            - kube-system
-            - kured
-            - metallb-system
-            - monitoring
-            - rook-ceph
-            - velero
+            - mongodb-system
+            - sealed-secrets
           type: string
         type: array
       ha:

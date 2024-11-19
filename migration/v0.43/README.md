@@ -82,6 +82,8 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s upgrade wc v0.43 apply
     ```
 
+1. The config for `.hnc.excludedExtraNamespaces` has been moved to `.hnc.excludedNamespaces`. As such aliases used for `.hnc.excludedExtraNamespaces` in `$CK8S_CONFIG_PATH/wc-config.yaml` may be overwritten to the actual values, and need to be manually replaced with the alias again if desired.
+
 1. If Tekton is enabled, ensure to add appropriate network policies that allow traffic from Tekton to OpenSearch.
 
     To check if the tekton is enabled, run the following command
@@ -149,6 +151,11 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     ./migration/v0.43/prepare/10-capacity-alerts.sh
+
+1. Migrate `.hnc.excludedExtraNamespaces` to `.hnc.excludedNamespaces`:
+
+    ```bash
+    ./migration/v0.43/prepare/20-hnc-config.sh
     ```
 
 1. Update apps configuration:
