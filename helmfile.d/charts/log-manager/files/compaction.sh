@@ -79,7 +79,7 @@ azure_list_indices() {
 azure_list_chunks() {
   AZURE_PATH="$1"
 
-  az storage fs file list --file-system "$AZURE_CONTAINER_NAME" --path "${AZURE_PREFIX}/${AZURE_PATH}/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | grep '\.gz\|\.zst' | awk '{print $9}' | sed "s#${AZURE_PREFIX}/${AZURE_PATH}/##"
+  az storage fs file list --file-system "$AZURE_CONTAINER_NAME" --path "${AZURE_PREFIX}/${AZURE_PATH}/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | (grep '\.gz\|\.zst' || true) | awk '{print $9}' | sed "s#${AZURE_PREFIX}/${AZURE_PATH}/##"
 }
 
 azure_get_chunks() {
