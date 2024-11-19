@@ -4,12 +4,30 @@ excludedNamespaces:
   {{- with .Values.hnc.excludedNamespaces }}
   {{- toYaml . | nindent 2 }}
   {{- end }}
-  {{- with .Values.hnc.excludedExtraNamespaces }}
-  {{- toYaml . | nindent 2 }}
-  {{- end }}
   {{- with (keys .Values.user.constraints) }}
   {{- toYaml . | nindent 2 }}
   {{- end }}
+  - alertmanager
+  - calico-apiserver
+  - calico-system
+  - cert-manager
+  - falco
+  - fluentd
+  - fluentd-system
+  - gatekeeper-system
+  - gpu-operator
+  - hnc-system
+  - ingress-nginx
+  - kube-node-lease
+  - kube-public
+  - kube-system
+  - kured
+  - metallb-system
+  - monitoring
+  - openstack-system
+  - rook-ceph
+  - tigera-operator
+  - velero
 
 unpropagatedAnnotations: {{- toYaml .Values.hnc.unpropagatedAnnotations | nindent 2 }}
 managedNamespaceAnnotations: {{- toYaml .Values.hnc.managedNamespaceAnnotations | nindent 2 }}
