@@ -124,7 +124,11 @@
 /helmfile.d/upstream/prometheus-community/prometheus-elasticsearch-exporter/ @elastisys/goto-logging-stack
 /helmfile.d/upstream/vmware-tanzu/velero/ @elastisys/goto-security
 /helmfile.d/upstream/README.md @elastisys/goto-scripts
-/helmfile.d/upstream/index.yaml @elastisys/goto-scripts
+
+#
+# Skipped files in helmfile.d/upstream/
+# index.yaml
+#
 
 #
 # helmfile.d/values
