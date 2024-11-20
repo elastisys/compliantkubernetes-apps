@@ -1470,6 +1470,22 @@ properties:
             title: Enable Kafka
             type: boolean
         additionalProperties: false
+      teleport:
+        title: Teleport
+        description: |-
+          Installs required cluster resources needed to install Teleport.
+
+          Requires that `gatekeeper.allowUserCRDs.enabled` is enabled.
+        type: object
+        properties:
+          enabled:
+            title: Enable Teleport
+            type: boolean
+          namespace:
+            title: Namespace which Teleport should be installed in
+            type: string
+            default: teleport
+        additionalProperties: false
   hnc:
     additionalProperties: false
     title: HNC (Hierarchical Namespace Controller) Config

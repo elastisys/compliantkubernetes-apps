@@ -1,0 +1,11 @@
+{{- if .Values.user.teleport.enabled }}
+clusterRoleBindings:
+  teleport-auth:
+    roleRef:
+      name: system:auth-delegator
+      kind: ClusterRole
+    subjects:
+    - kind: ServiceAccount
+      name: teleport
+      namespace: {{ .Values.user.teleport.namespace }}
+{{- end }}

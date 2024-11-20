@@ -72,6 +72,11 @@ user:
   # Requires that gatekeeper.allowUserCRDs.enabled is enabled.
   kafka:
     enabled: false
+  # Installs required cluster resources needed to install teleport
+  # Requires that gatekeeper.allowUserCRDs.enabled is enabled.
+  teleport:
+    enabled: false
+    namespace: teleport
 
 falco:
   ## Falco alerting configuration.

@@ -51,7 +51,8 @@ templates:
     labels:
       app: dev-rbac
     values:
-      - values/userCRDs/common.yaml.gotmpl
       - values/userCRDs/bitnami/sealedsecrets.yaml.gotmpl
-      - values/userCRDs/mongodbcommunity/mongodb.yaml.gotmpl
+      - values/userCRDs/common.yaml.gotmpl
       - values/userCRDs/flux/fluxv2.yaml.gotmpl
+      - values/userCRDs/mongodbcommunity/mongodb.yaml.gotmpl
+      - values/userCRDs/teleport/teleport.yaml.gotmpl
