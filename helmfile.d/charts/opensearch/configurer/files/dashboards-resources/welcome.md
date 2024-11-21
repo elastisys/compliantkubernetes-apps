@@ -1,8 +1,8 @@
-# Welcome to Compliant Kubernetes!
+# Welcome to Welkin!
 
 ## What's new
 
-Here you can find the most relevant features and changes for the last couple of releases of Compliant Kubernetes
+Here you can find the most relevant features and changes for the last couple of releases of Welkin
 
 - Updated Grafana dashboards containing deprecated panels. **[v0.41]**
 - Grafana was upgraded to v10.4.7. **[v0.41]**
@@ -16,17 +16,17 @@ Here you can find the most relevant features and changes for the last couple of 
 
 ## Public docs
 
-In case you get lost, don't forget to check out the [public docs](https://elastisys.io/compliantkubernetes/). Here are the most common topics:
+In case you get lost, don't forget to check out the [public docs](https://elastisys.io/welkin/). Here are the most common topics:
 
-- [Getting started](https://elastisys.io/compliantkubernetes/user-guide/prepare/)
-- [Maintenance expectations](https://elastisys.io/compliantkubernetes/user-guide/maintenance/)
-- [Adding extra workload admins](https://elastisys.io/compliantkubernetes/user-guide/delegation/#kubernetes-api)
-- [Troubleshooting](https://elastisys.io/compliantkubernetes/user-guide/troubleshooting/)
-- [FAQ](https://elastisys.io/compliantkubernetes/user-guide/faq/)
+- [Getting started](https://elastisys.io/welkin/user-guide/prepare/)
+- [Maintenance expectations](https://elastisys.io/welkin/user-guide/maintenance/)
+- [Adding extra workload admins](https://elastisys.io/welkin/user-guide/delegation/#kubernetes-api)
+- [Troubleshooting](https://elastisys.io/welkin/user-guide/troubleshooting/)
+- [FAQ](https://elastisys.io/welkin/user-guide/faq/)
 
-## Compliant Kubernetes Version
+## Welkin Version
 
-- Apps: **{{ .Values.dashboard.ck8sVersion }}** - [Release Notes](https://elastisys.io/compliantkubernetes/release-notes/)
+- Apps: **{{ .Values.dashboard.ck8sVersion }}** - [Release Notes](https://elastisys.io/welkin/release-notes/)
 
 ## Web Portals
 
@@ -36,7 +36,7 @@ In case you get lost, don't forget to check out the [public docs](https://elasti
 
 ## Did you know?
 
-As a user of Compliant Kubernetes you can request to see your Cluster configuration (without secrets) by asking your administrator.
+As a user of Welkin you can request to see your Cluster configuration (without secrets) by asking your administrator.
 
 {{ if .Values.dashboard.extraTextOpensearch }}
 ## {{ .Values.dashboard.extraTextOpensearch }}
