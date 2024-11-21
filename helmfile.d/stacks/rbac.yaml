@@ -42,7 +42,7 @@ templates:
     inherit: [ template: rbac ]
     condition: ck8sWorkloadCluster.enabled
     installed: {{ .Values | get "gatekeeper.allowUserCRDs.enabled" false }}
-    chart: charts/user-crds
+    chart: charts/user-rbac-generator
     version: 1.0.0
     namespace: gatekeeper-system
     name: user-crds
