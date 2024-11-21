@@ -37,6 +37,9 @@ templates:
           - dev-rbac/extra-user-view.yaml
     values:
       - values/user-rbac.yaml.gotmpl
+      {{- if .Values | get "gatekeeper.allowUserCRDs.enabled" false }}
+      - values/user-crds/rbac/user-crds.yaml.gotmpl
+      {{- end }}
 
   dev-rbac-crds:
     inherit: [ template: rbac ]
@@ -51,7 +54,7 @@ templates:
     labels:
       app: dev-rbac
     values:
-      - values/user-rbac-generator/dev-rbac-crds/common.yaml.gotmpl
-      - values/user-rbac-generator/dev-rbac-crds/bitnami/sealedsecrets.yaml.gotmpl
-      - values/user-rbac-generator/dev-rbac-crds/mongodbcommunity/mongodb.yaml.gotmpl
-      - values/user-rbac-generator/dev-rbac-crds/flux/fluxv2.yaml.gotmpl
+      - values/user-crds/rbac/generator/common.yaml.gotmpl
+      - values/user-crds/rbac/generator/bitnami/sealedsecrets.yaml.gotmpl
+      - values/user-crds/rbac/generator/mongodbcommunity/mongodb.yaml.gotmpl
+      - values/user-crds/rbac/generator/flux/fluxv2.yaml.gotmpl
