@@ -98,6 +98,9 @@ alertmanager:
         - receiver: 'null'
           matchers:
             - alertname =~ "CPUThrottlingHigh|KubeCPUOvercommit|KubeMemOvercommit"
+      {{ if gt (len .Values.alerts.customRoutes) 0 -}}
+      {{ toYaml .Values.alerts.customRoutes | nindent 8 }}
+      {{- end }}
     receivers:
     - name: 'null'
     - name: heartbeat

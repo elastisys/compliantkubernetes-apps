@@ -4007,6 +4007,20 @@ properties:
       customReceivers:
         title: Alert Custom Receivers
         type: array
+        description: |-
+          Additional receivers that will be added to the configuration of alertmanager
+
+          > [!note]
+          > See [the upstream documentation](https://prometheus.io/docs/alerting/latest/configuration/#receiver) for reference.
+      customRoutes:
+        title: Additional custom routes
+        description: |-
+          Additional route receivers that will be added to the configuration of alertmanager
+
+          > [!note]
+          > See [the upstream documentation](https://prometheus.io/docs/alerting/latest/configuration/#route) for reference.
+        default: []
+        type: array
       opsGenie:
         title: Alert OpsGenie Config
         description: Configure alerting to OpsGenie.
