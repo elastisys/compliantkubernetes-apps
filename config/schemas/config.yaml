@@ -1923,7 +1923,17 @@ properties:
         additionalProperties: false
         properties:
           disableRedirect:
+            title: Harbor registry disable object storage redirect
             type: boolean
+            description: |-
+              Controls whether or not Harbor registry redirects users to the object storage endpoint.
+              Set this to true if the object storage is not reachable by users when pushing images to Harbor,
+              e.g. if you run into this timeout error:
+
+              ```console
+              dial tcp <IP>:<PORT>: i/o timeout
+              ```
+            default: false
           type:
             title: Persistence type
             description: This should match what is set in global config
