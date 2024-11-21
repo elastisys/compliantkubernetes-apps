@@ -55,3 +55,16 @@ templates:
       - values/userCRDs/bitnami/sealedsecrets.yaml.gotmpl
       - values/userCRDs/mongodbcommunity/mongodb.yaml.gotmpl
       - values/userCRDs/flux/fluxv2.yaml.gotmpl
+
+  dev-rbac-extra:
+    inherit: [ template: rbac ]
+    condition: ck8sWorkloadCluster.enabled
+    chart: charts/user-crds
+    version: 1.0.0
+    name: dev-rbac-extra
+    needs:
+      - kube-system/user-rbac
+    labels:
+      app: dev-rbac
+    values:
+      - values/dev-rbac-extra.yaml.gotmpl
