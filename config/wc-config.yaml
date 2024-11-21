@@ -78,6 +78,11 @@ user:
     enabled: false
     namespace: teleport
 
+  extraRoles: {}
+  extraRoleBindings: {}
+  extraClusterRoles: {}
+  extraClusterRoleBindings: {}
+
 falco:
   ## Falco alerting configuration.
   alerts:
