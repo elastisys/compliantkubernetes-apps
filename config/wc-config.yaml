@@ -73,6 +73,58 @@ user:
   kafka:
     enabled: false
 
+  # Create extra application developer RBAC
+  extraRoles: {}
+  ## Example:
+  # extraRoles:
+  #   example-role:
+  #     rules:
+  #     - apiGroups:
+  #         - ""
+  #       resources:
+  #         - pods
+  #       verbs:
+  #         - get
+  #         - list
+  #         - watch
+
+  extraRoleBindings: {}
+  ## Example:
+  # extraRoleBindings:
+  #   example-rolebinding:
+  #     roleRef:
+  #       name: example-clusterrole
+  #       kind: Role
+  #     subjects:
+  #     - kind: ServiceAccount
+  #       name: example-serviceaccount
+  #       namespace: example-namespace
+
+  extraClusterRoles: {}
+  ## Example:
+  # extraClusterRoles:
+  #   example-clusterrole:
+  #     rules:
+  #     - apiGroups:
+  #         - ""
+  #       resources:
+  #         - pods
+  #       verbs:
+  #         - get
+  #         - list
+  #         - watch
+
+  extraClusterRoleBindings: {}
+  ## Example:
+  # extraClusterRoleBindings:
+  #   example-clusterrolebinding:
+  #     roleRef:
+  #       name: example-clusterrole
+  #     subjects:
+  #     - kind: ServiceAccount
+  #       name: example-serviceaccount
+  #       namespace: example-namespace
+
 falco:
   ## Falco alerting configuration.
   alerts:

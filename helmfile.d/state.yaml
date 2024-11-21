@@ -39,6 +39,7 @@ releases:
   - inherit: [ template: admin-rbac ]
   - inherit: [ template: dev-rbac ]
   - inherit: [ template: dev-rbac-crds ]
+  - inherit: [ template: dev-rbac-extra ]
 
   - inherit: [ template: networkpolicies-common ]
   - inherit: [ template: networkpolicies-service ]
