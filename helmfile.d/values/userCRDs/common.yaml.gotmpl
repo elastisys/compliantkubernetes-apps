@@ -1,1 +1,6 @@
 namespaces: {{ toYaml .Values.user.namespaces | nindent 2 }}
+
+roles: {{- toYaml .Values.user.extraRoles | nindent 2 }}
+roleBindings: {{- toYaml .Values.user.extraRoleBindings | nindent 2 }}
+clusterRoles: {{- toYaml .Values.user.extraClusterRoles | nindent 2 }}
+clusterRoleBindings: {{- toYaml .Values.user.extraClusterRoleBindings | nindent 2 }}
