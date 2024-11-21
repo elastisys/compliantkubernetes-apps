@@ -73,6 +73,11 @@ user:
   kafka:
     enabled: false
 
+  extraRoles: {}
+  extraRoleBindings: {}
+  extraClusterRoles: {}
+  extraClusterRoleBindings: {}
+
 falco:
   ## Falco alerting configuration.
   alerts:
