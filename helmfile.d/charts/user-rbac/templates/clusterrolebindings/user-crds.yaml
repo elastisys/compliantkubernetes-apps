@@ -1,4 +1,4 @@
-{{- if .Values.userCRDs.enabled }}
+{{- if and .Values.userCRDs.enabled .Values.userCRDs.resourceNames }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
