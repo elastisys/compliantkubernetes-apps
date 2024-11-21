@@ -54,7 +54,7 @@ templates:
       - gatekeeper-system/gatekeeper-templates # creates gatekeeper/constraints
     values:
       - values/gatekeeper/constraints.yaml.gotmpl
-      - values/userCRDs/userCRDs.yaml.gotmpl
+      - values/gatekeeper/userCRDs.yaml.gotmpl
 
   gatekeeper-metrics:
     disableValidationOnInstall: true
