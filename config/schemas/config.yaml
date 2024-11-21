@@ -1473,6 +1473,18 @@ properties:
             title: Enable Kafka
             type: boolean
         additionalProperties: false
+      extraRoles:
+        title: Configure extra Roles for application developers
+        type: object
+      extraRoleBindings:
+        title: Configure extra RoleBindings for application developers
+        type: object
+      extraClusterRoles:
+        title: Configure extra ClusterRoles for application developers
+        type: object
+      extraClusterRoleBindings:
+        title: Configure extra ClusterRoleBindings for application developers
+        type: object
   hnc:
     additionalProperties: false
     title: HNC (Hierarchical Namespace Controller) Config
