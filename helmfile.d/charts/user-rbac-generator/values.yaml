@@ -1,0 +1,24 @@
+clusterRoles: {}
+clusterRoleBindings: {}
+# clusterRoleBindings:
+#   example-clusterrolebinding:
+#     roleRef:
+#       name: example-clusterrole
+#     subjects:
+#     - kind: ServiceAccount
+#       name: example-serviceaccount
+#       namespace: example-namespace
+
+namespaces: []
+roles: {}
+
+roleBindings: {}
+# roleBindings:
+#   example-rolebinding:
+#     roleRef:
+#       name: example-clusterrole
+#       kind: ClusterROle
+#     subjects:
+#     - kind: ServiceAccount
+#       name: example-serviceaccount
+#       namespace: example-namespace
