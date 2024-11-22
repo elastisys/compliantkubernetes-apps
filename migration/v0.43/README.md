@@ -82,6 +82,16 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s upgrade wc v0.43 apply
     ```
 
+1. If Tekton is enabled, ensure to add appropriate network policies that allow traffic to OpenSearch.
+
+  To check if the tekton is enabled, run the following command
+
+  ```
+  yq4 '.tektonPipelines.enabled == true' $CK8S_CONFIG_PATH/sc-config.yaml
+  ```
+
+  Example of how the network policies for the pipeline can be found on the [documentation page](https://elastisys.io/welkin/operator-manual/schema/config-properties-network-policies-config-properties-network-policies-tekton-pipeline/#pipeline).
+
 1. Apply upgrade - *disruptive*
 
     > *Done during maintenance window.*
@@ -137,7 +147,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 1. Upgrade Opensearch:
 
     ```bash
-    ./migration/v0.43/apply/10-upgrade-opensearch.sh execute
+    ./migration/v0.43/apply/20-upgrade-opensearch.sh execute
     ```
 
 1. Upgrade applications:
