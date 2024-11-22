@@ -67,7 +67,7 @@ s3_rm_chunks() {
 
 # Define functions for Azure operations
 azure_list_days() {
-  az storage fs file list --file-system "$AZURE_CONTAINER_NAME" --path "$AZURE_PREFIX" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | awk '{print $9}' | sed "s#$AZURE_PREFIX/##" | sed 's/\/.*$//' | uniq
+  az storage blob list --container-name "$AZURE_CONTAINER_NAME" --prefix "${AZURE_PREFIX}/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output yaml --delimiter '/' --query '[].name' | cut -d '/' -f 2
 }
 
 azure_list_indices() {
