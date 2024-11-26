@@ -1,11 +1,11 @@
 name: Chart Upgrade Request
-description: Create a chart upgrade request to update a component of Compliant Kubernetes Apps
+description: Create a chart upgrade request to update a component of Welkin Apps
 labels: kind/improvement
 body:
   - type: markdown
     attributes:
       value: |-
-        Thank you for taking the time to help improve Compliant Kubernetes!
+        Thank you for taking the time to help improve Welkin!
 
         > [!warning]
         > **This is a public repository, ensure not to disclose:**
@@ -43,8 +43,8 @@ body:
       placeholder: When can this chart upgrade be considered done
       value: |-
         - I checked the migration of the new chart version:
-          - [ ] The upgrade does not require migration steps
-          - [ ] The upgrade requires migration steps
+            - [ ] The upgrade does not require migration steps
+            - [ ] The upgrade requires migration steps
         - I tested the functionality of the new chart version:
-          - [ ] The upgrade does not change current functionality
-          - [ ] The upgrade changes current functionality
+            - [ ] The upgrade does not change current functionality
+            - [ ] The upgrade changes current functionality

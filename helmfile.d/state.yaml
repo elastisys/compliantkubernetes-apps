@@ -1,33 +1,33 @@
 ---
 missingFileHandler: Error
 bases:
-  - bases/environments.yaml
-  - bases/upstream.yaml
+  - bases/environments.yaml.gotmpl
+  - bases/upstream.yaml.gotmpl
 ---
 bases:
-  - stacks/calico.yaml
-  - stacks/cert-manager.yaml
-  - stacks/dex.yaml
-  - stacks/external-dns.yaml
-  - stacks/falco.yaml
-  - stacks/fluentd.yaml
-  - stacks/gatekeeper.yaml
-  - stacks/harbor.yaml
-  - stacks/hnc.yaml
-  - stacks/ingress-nginx.yaml
-  - stacks/kured.yaml
-  - stacks/local.yaml
-  - stacks/monitoring.yaml
-  - stacks/monitoring-grafana.yaml
-  - stacks/monitoring-prometheus.yaml
-  - stacks/namespaces.yaml
-  - stacks/opensearch.yaml
-  - stacks/rbac.yaml
-  - stacks/rclone.yaml
-  - stacks/system.yaml
-  - stacks/tekton.yaml
-  - stacks/thanos.yaml
-  - stacks/velero.yaml
+  - stacks/calico.yaml.gotmpl
+  - stacks/cert-manager.yaml.gotmpl
+  - stacks/dex.yaml.gotmpl
+  - stacks/external-dns.yaml.gotmpl
+  - stacks/falco.yaml.gotmpl
+  - stacks/fluentd.yaml.gotmpl
+  - stacks/gatekeeper.yaml.gotmpl
+  - stacks/harbor.yaml.gotmpl
+  - stacks/hnc.yaml.gotmpl
+  - stacks/ingress-nginx.yaml.gotmpl
+  - stacks/kured.yaml.gotmpl
+  - stacks/local.yaml.gotmpl
+  - stacks/monitoring.yaml.gotmpl
+  - stacks/monitoring-grafana.yaml.gotmpl
+  - stacks/monitoring-prometheus.yaml.gotmpl
+  - stacks/namespaces.yaml.gotmpl
+  - stacks/opensearch.yaml.gotmpl
+  - stacks/rbac.yaml.gotmpl
+  - stacks/rclone.yaml.gotmpl
+  - stacks/system.yaml.gotmpl
+  - stacks/tekton.yaml.gotmpl
+  - stacks/thanos.yaml.gotmpl
+  - stacks/velero.yaml.gotmpl
 ---
 releases:
   - inherit: [ template: tigera ]

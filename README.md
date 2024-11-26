@@ -37,7 +37,7 @@ A service-cluster (sc) or workload-cluster (wc) can be created separately but al
 
 All config files will be located under `CK8S_CONFIG_PATH`.
 There will be four config files: `common-config.yaml`, `wc-config.yaml`, `sc-config.yaml` and `secrets.yaml`.
-See [Quickstart](#Quickstart) for instructions on how to initialize the repo
+See [Quickstart](#quickstart) for instructions on how to initialize the repo
 
 ### :cloud: Cloud providers :cloud:
 
@@ -102,15 +102,15 @@ There are two options when managing DNS records, manually or ExternalDNS.
 
 - Manually point these domains to the workload cluster ingress controller:
 
-  - `*.example.com`
+    - `*.example.com`
 
 - Manually point these domains to the service cluster ingress controller:
 
-  - `*.ops.example.com`
-  - `dex.example.com`
-  - `grafana.example.com`
-  - `harbor.example.com`
-  - `opensearch.example.com`
+    - `*.ops.example.com`
+    - `dex.example.com`
+    - `grafana.example.com`
+    - `harbor.example.com`
+    - `opensearch.example.com`
 
 Assuming you already have everything needed to install the apps, this is what you need to do.
 
@@ -249,8 +249,8 @@ The user kubeconfig will be configured to use the first namespace by default.
 **OpenSearch Dashboards** access for the user can be provided either by setting up OIDC or using the internal user database in OpenSearch:
 
 - OIDC:
-  - Set `opensearch.sso.enabled=true` in `sc-config.yaml`.
-  - Configure extra role mappings under `opensearch.extraRoleMappings` to give the users the necessary roles.
+    - Set `opensearch.sso.enabled=true` in `sc-config.yaml`.
+    - Configure extra role mappings under `opensearch.extraRoleMappings` to give the users the necessary roles.
 
     ```yaml
     extraRoleMappings:
@@ -266,9 +266,9 @@ The user kubeconfig will be configured to use the first namespace by default.
     ```
 
 - Internal user database:
-  - Log in to OpenSearch Dashboards using the admin account.
-  - Create an account for the user.
-  - Give the `kibana_user` and `kubernetes_log_reader` roles to the user.
+    - Log in to OpenSearch Dashboards using the admin account.
+    - Create an account for the user.
+    - Give the `kibana_user` and `kubernetes_log_reader` roles to the user.
 
 Users will be able to log in to **Grafana** using dex, but they will have read only access by default.
 To give them more privileges, you need to first ask them to log in (so that they show up in the users list) and then change their roles.
@@ -294,9 +294,9 @@ It is up to the operator to set these up in a HA mode.
 The following list is requirements on the external postgres
 
 - Password encryption: none or md5
-  - [scram-sha-256 is not supported](https://github.com/goharbor/harbor/issues/15731#issuecomment-1100666831).
+    - [scram-sha-256 is not supported](https://github.com/goharbor/harbor/issues/15731#issuecomment-1100666831).
 - Initial empty databases must be created before harbor starts
-  - registry
+    - registry
 
 **Config**:
 

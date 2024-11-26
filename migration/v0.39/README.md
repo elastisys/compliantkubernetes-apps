@@ -61,9 +61,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     git switch -d v0.39.x
     ```
 
-1. Prepare upgrade - *non-disruptive*
+1. Prepare upgrade - _non-disruptive_
 
-    > *Done before maintenance window.*
+    > _Done before maintenance window._
 
     ```bash
     ./bin/ck8s upgrade both v0.39 prepare
@@ -89,9 +89,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     - Set `CK8S_HOSTED_ZONE_ID` to the hosted zone id
     - Run `./migration/v0.39/prepare/60-adopt-dns-records.sh`
 
-1. Apply upgrade - *disruptive*
+1. Apply upgrade - _disruptive_
 
-    > *Done during maintenance window.*
+    > _Done during maintenance window._
 
     ```bash
     ./bin/ck8s upgrade both v0.39 apply
@@ -99,9 +99,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
 ## Manual method
 
-### Prepare upgrade - *non-disruptive*
+### Prepare upgrade - _non-disruptive_
 
-> *Done before maintenance window.*
+> _Done before maintenance window._
 
 1. Pull the latest changes and switch to the correct branch:
 
@@ -143,9 +143,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.39/prepare/70-set-nginx-annotations.sh
     ```
 
-### Apply upgrade - *disruptive*
+### Apply upgrade - _disruptive_
 
-> *Done during maintenance window.*
+> _Done during maintenance window._
 
 1. Set whether or not upgrade should be applied for `both` clusters or for one of `sc` or `wc`:
 
@@ -173,7 +173,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.39/apply/80-apply.sh execute
     ```
 
-## Postrequisite:
+## Postrequisite
 
 - [ ] Check the state of the environment, pods and nodes:
 

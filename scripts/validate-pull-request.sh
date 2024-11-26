@@ -201,7 +201,7 @@ fi
 for line in "${input[@]}"; do
   if [[ "${line}" =~ ^[[:space:]]*-[[:space:]]+\[x\][[:space:]]*+\[kind/adr\]\(\) ]]; then
     output+=("pull request has kind/adr but no link")
-  elif [[ "${line}" =~ ^[[:space:]]*-[[:space:]]+\[x\][[:space:]]*+\[kind/adr\] ]] && ! [[ "${line}" =~ ^[[:space:]]*-[[:space:]]+\[x\][[:space:]]*+\[kind/adr\]\(https://elastisys.io/compliantkubernetes/adr/ ]]; then
+  elif [[ "${line}" =~ ^[[:space:]]*-[[:space:]]+\[x\][[:space:]]*+\[kind/adr\] ]] && ! [[ "${line}" =~ ^[[:space:]]*-[[:space:]]+\[x\][[:space:]]*+\[kind/adr\]\(https://elastisys.io/welkin/adr/ ]]; then
     output+=("pull request has kind/adr with invalid link")
   fi
 done

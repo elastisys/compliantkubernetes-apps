@@ -10,7 +10,7 @@ Here you can find the most relevant features and changes for the last couple of 
 - Updated Grafana dashboards containing deprecated panels. **[v0.41]**
 - Grafana was upgraded to v10.4.7. **[v0.41]**
 - Ingress-nginx was upgraded to v1.11.2. **[v0.41]**
-  - Drops support for Kubernetes v1.25 and adds support for v1.30.
+    - Drops support for Kubernetes v1.25 and adds support for v1.30.
 - NodeLocal DNS was upgraded to v1.23.1. **[v0.41]**
 
 ## Public docs
@@ -38,7 +38,9 @@ In case you get lost, don't forget to check out the [public docs](https://elasti
 As a user of Welkin you can request to see your Cluster configuration (without secrets) by asking your administrator.
 
 {{ if .Values.dashboard.extraTextOpensearch }}
+
 ## {{ .Values.dashboard.extraTextOpensearch }}
+
 {{ else }}
 {{ end }}
 

@@ -10,17 +10,16 @@ jobs:
     name: create-release
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Check on release branch
+      - name: Check branch
         run: for branch in $(git branch -r --contains tags/${GITHUB_REF_NAME}); do [[ "${branch}" =~ release-.* ]] && exit 0; done; exit 1
-      - name: Get release series
-        id: get_release_series
+      - name: Get series
+        id: get_series
         run: echo "SERIES=$(echo "${{ github.ref_name }}" | sed 's/v\(.*\)\.[0-9]*$/\1/')" >> "${GITHUB_OUTPUT}"
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           body: |
-            See [CHANGELOG](https://github.com/elastisys/compliantkubernetes-apps/blob/${{ github.ref_name }}/changelog/${{ steps.get_release_series.outputs.SERIES }}.md) for details.
+            See [CHANGELOG](https://github.com/elastisys/compliantkubernetes-apps/blob/${{ github.ref_name }}/changelog/${{ steps.get_series.outputs.SERIES }}.md) for details.

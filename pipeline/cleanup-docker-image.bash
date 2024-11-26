@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Remove Docker image GITHUB_SHA tag created by pipeline from Docker Hub
 set -eu -o pipefail
 

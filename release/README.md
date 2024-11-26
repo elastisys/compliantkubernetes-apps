@@ -8,63 +8,63 @@ The following constraints apply on releases:
 
 1. Major releases (v**X**.Y.Z and v0.**Y**.Z):
 
-    > *Updates that bring new features and improvements that require coordination with the user.*
+    > _Updates that bring new features and improvements that require coordination with the user._
 
     - May perform major additions, modifications, or deletions to the application and command line interfaces.
 
-      Example of major change would be to change the way commands are processed.
+        Example of major change would be to change the way commands are processed.
 
     - May perform major additions, modifications, or deletions to the configuration structure.
 
-      Example of major change would be to change the way configuration is processed.
+        Example of major change would be to change the way configuration is processed.
 
     - May perform major upgrades and updates to the deployed services and third party tools.
 
-      Example of major change would be to upgrade or replace major services or stacks.
+        Example of major change would be to upgrade or replace major services or stacks.
 
 1. Minor releases (vX.**Y**.Z):
 
-    > *Updates that bring new features and improvements that does not require coordination with the user.*
+    > _Updates that bring new features and improvements that does not require coordination with the user._
 
     - May **only** perform minor additions, modifications, or deletions to the application and command line interfaces.
 
-      The interfaces *should* keep similar behaviour between different minor releases to ensure that they work with similar sets of features and tools on the same major version.
+          The interfaces _should_ keep similar behaviour between different minor releases to ensure that they work with similar sets of features and tools on the same major version.
 
-      Example of minor change would be to change the way commands are processed in a backwards compatible way.
+          Example of minor change would be to change the way commands are processed in a backwards compatible way.
 
     - May **only** perform minor additions, modifications, or deletions to the configuration structure.
 
-      The configuration *should* keep similar management and structure between different minor releases to ensure that they work with similar sets of features and tools on the same major version.
+          The configuration _should_ keep similar management and structure between different minor releases to ensure that they work with similar sets of features and tools on the same major version.
 
-      Example of minor change would be to change parts of the configuration for services and components in a backwards compatible way.
+          Example of minor change would be to change parts of the configuration for services and components in a backwards compatible way.
 
     - May **only** perform minor upgrades or updates to the deployed services and third party tools.
 
-      The deployed services *should* be the same between different minor releases to ensure that they work with similar sets of features and tools on the same major version.
+          The deployed services _should_ be the same between different minor releases to ensure that they work with similar sets of features and tools on the same major version.
 
-      Example of minor change would be to upgrade or change minor services or components.
+          Example of minor change would be to upgrade or change minor services or components.
 
 1. Patch releases (vX.Y.**Z**):
 
-    > *Patches to fix known vulnerabilities threatening user data assessed as an immediate risk.*
+    > _Patches to fix known vulnerabilities threatening user data assessed as an immediate risk._
 
     - May **only** perform patch additions or modifications to the application and command line interfaces.
 
-      The interfaces **must** keep similar behaviour between different patch releases to ensure that they work with the same sets of features and tools, and can be applied over any patch version on the same minor version.
+          The interfaces **must** keep similar behaviour between different patch releases to ensure that they work with the same sets of features and tools, and can be applied over any patch version on the same minor version.
 
-      Example of allowed patches would be to correct faulty behaviour.
+          Example of allowed patches would be to correct faulty behaviour.
 
     - May **only** perform patch additions or modifications to the configuration structure.
 
-      The configuration **must** keep similar management and structure between different patch releases to ensure that they work with the same sets of features and tools, and can be applied over any patch version on the same minor version.
+          The configuration **must** keep similar management and structure between different patch releases to ensure that they work with the same sets of features and tools, and can be applied over any patch version on the same minor version.
 
-      Example of allowed patches would be for missing or invalid configurations.
+          Example of allowed patches would be for missing or invalid configurations.
 
     - May **only** perform patch or security updates to the deployed services or third party tools.
 
-      The deployed services **must** be the same between different patch releases to ensure that they work with the same sets of features and tools, and can be applied over any patch version on the same minor version.
+          The deployed services **must** be the same between different patch releases to ensure that they work with the same sets of features and tools, and can be applied over any patch version on the same minor version.
 
-      Example of allowed patches would be for upgrading patch versions of services and third party tools due to security vulnerabilities.
+          Example of allowed patches would be for upgrading patch versions of services and third party tools due to security vulnerabilities.
 
 ## Feature freeze
 
@@ -129,7 +129,7 @@ A [GitHub actions workflow pipeline](/.github/workflows/release.yml) will create
 
 ## Update public release notes
 
-When a release is published [the public application developer facing release notes](https://github.com/elastisys/compliantkubernetes/blob/main/docs/release-notes/ck8s.md) needs to be updated.
+When a release is published [the public application developer facing release notes](https://github.com/elastisys/welkin/blob/main/docs/release-notes/welkin.md) needs to be updated.
 The new release needs to be added and the list can be trimmed down to only include the supported versions.
 
 ```bash
@@ -143,7 +143,7 @@ Remove irrelevant entries and/or reword entries so that they are easy to underst
 
 This will be done in two steps, first to add it to the main branch, second to create a new release branch.
 
-1. In the [elastisys/compliantkubernetes](https://github.com/elastisys/compliantkubernetes) repository, create a new branch `<personal-tag>/release-vX.Y.Z` from the `main` branch.
+1. In the [elastisys/welkin](https://github.com/elastisys/welkin) repository, create a new branch `<personal-tag>/release-vX.Y.Z` from the `main` branch.
     Then add the release notes to the `<personal-tag>/release-vX.Y.Z` and create a pull request to the `main` branch.
 
 1. When the pull-request is merged create a new branch `release-vX.Y` from the `main` branch and push it to create it.
@@ -152,7 +152,7 @@ This will be done in two steps, first to add it to the main branch, second to cr
 
 This will be done in two steps, first to add it to the release branch, second to add it to the main branch.
 
-1. In the [elastisys/compliantkubernetes](https://github.com/elastisys/compliantkubernetes) repository, create a new branch `<personal-tag>/release-vX.Y.Z` from the `release-vX.Y` branch.
+1. In the [elastisys/welkin](https://github.com/elastisys/welkin) repository, create a new branch `<personal-tag>/release-vX.Y.Z` from the `release-vX.Y` branch.
     Then add the release notes to the `<personal-tag>/release-vX.Y.Z` and create a pull request to the `release-vX.Y` branch.
 
 1. When the first pull-request is merged create a new branch `<personal-tag>/release-vX.Y.Z-main` from the `main` branch.

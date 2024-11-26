@@ -296,7 +296,7 @@ generate_secrets() {
     yq4 --inplace ".thanos.receiver.basic_auth.passwordHash= \"${THANOS_INGRESS_PASS_HASH}\"" "${tmpfile}"
 }
 
-# Usage: backup_file <file> [sufix]
+# Usage: backup_file <file> [suffix]
 backup_file() {
     file="${1}"
     if [ ! -f "${file}" ]; then

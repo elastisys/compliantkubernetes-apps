@@ -8,12 +8,12 @@ The script will clone the upstream mixin repositories for the Grafana dashboards
 
 - `Makefile` - contains all the commands for creating the dashboards. The script will use the [helmfile.d/charts/grafana-dashboards/dashboards](https://github.com/elastisys/compliantkubernetes-apps/tree/main/helmfile.d/charts/grafana-dashboards/dashboards) as the destination for writing the new dashboards.
 - `configs` - contains all the mixin configs, each folder name matching the upstream source repository.
-  - [alertmanager-mixin](https://github.com/prometheus/alertmanager/tree/main/doc/alertmanager-mixin)
-  - [etcd-mixin](https://github.com/etcd-io/etcd/tree/main/contrib/mixin)
-  - [kubernetes-mixin](https://github.com/kubernetes-monitoring/kubernetes-mixin)
-  - [node-mixin](https://github.com/prometheus/node_exporter/tree/master/docs/node-mixin)
-  - [prometheus-mixin](https://github.com/prometheus/prometheus/tree/main/documentation/prometheus-mixin)
-  - [thanos-mixin](https://github.com/thanos-io/thanos/tree/main/mixin)
+    - [alertmanager-mixin](https://github.com/prometheus/alertmanager/tree/main/doc/alertmanager-mixin)
+    - [etcd-mixin](https://github.com/etcd-io/etcd/tree/main/contrib/mixin)
+    - [kubernetes-mixin](https://github.com/kubernetes-monitoring/kubernetes-mixin)
+    - [node-mixin](https://github.com/prometheus/node_exporter/tree/master/docs/node-mixin)
+    - [prometheus-mixin](https://github.com/prometheus/prometheus/tree/main/documentation/prometheus-mixin)
+    - [thanos-mixin](https://github.com/thanos-io/thanos/tree/main/mixin)
 
 In each of this directories you will find two files:
 

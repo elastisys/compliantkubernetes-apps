@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 set -eu
 
 opensearch_url=https://opensearch.ops.pipeline-exoscale.elastisys.se/api/status

@@ -1,7 +1,7 @@
 # Restore Harbor
 
 With the k8s job you can restore the database in Harbor from a backup in S3 or Azure blob storage.
-*Note this restore is only designed for internal harbor database and not for an external database*
+_Note this restore is only designed for internal harbor database and not for an external database_
 The steps should be performed from the `compliantkubernetes-apps` root directory.
 
 Before restoring the database, make sure that Harbor is installed.
@@ -56,13 +56,13 @@ envsubst > tmp-job.yaml < restore/harbor/restore-harbor-job-azure.yaml
 
 While restoring we need to stop all harbor pods except for the database.
 
-```
+```bash
 ./bin/ck8s ops kubectl sc scale deployment --replicas 0 -n harbor --all
 ```
 
 Create the job and wait until it has completed:
 
-```
+```bash
 ./bin/ck8s ops kubectl sc apply -n harbor -f restore/harbor/network-policies-harbor.yaml
 ./bin/ck8s ops kubectl sc apply -n harbor -f tmp-job.yaml
 ./bin/ck8s ops kubectl sc wait --for=condition=complete job -n harbor restore-harbor-job --timeout=-1s
@@ -70,13 +70,13 @@ Create the job and wait until it has completed:
 
 Restore the pods:
 
-```
+```bash
 ./bin/ck8s ops kubectl sc scale deployment --replicas 1 -n harbor --all
 ```
 
 Clean up:
 
-```
+```bash
 ./bin/ck8s ops kubectl sc delete -n harbor -f restore/harbor/network-policies-harbor.yaml
 ./bin/ck8s ops kubectl sc delete -n harbor -f tmp-job.yaml
 ./bin/ck8s ops kubectl sc delete configmap -n harbor restore-harbor
@@ -87,14 +87,14 @@ rm -v tmp-job.yaml
 
 If you are restoring harbor to a new environment with a different domain, you need to re-run the init job. First, make sure the harbor admin password is the same as in the old environment:
 
-```console
+```bash
 # Edit harbor.password
 sops ${CK8S_CONFIG_PATH}/secrets.yaml
 ```
 
 Then, re-run the init job:
 
-```console
+```bash
 ./bin/ck8s ops kubectl sc delete job -n harbor init-harbor-job
 ./bin/ck8s ops helmfile sc -l app=harbor sync
 ```
