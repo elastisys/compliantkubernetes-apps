@@ -12,13 +12,13 @@
 
 1. Migrate nginx service annotations from a string to a map
 
-    ```
+    ```bash
     ./migration/v0.27.x-v0.28.x/move-nginx-controller-service-annotation-to-map.sh
     ```
 
 1. Migrate harbor jobservice port to ports (array)
 
-    ```
+    ```bash
     ./migration/v0.27.x-v0.28.x/move-harbor-jobservice-port-to-ports.sh
     ```
 
@@ -32,13 +32,13 @@
 
     - Set `networkPolicies.coredns.extarnalDns.ips` to your upstream DNS servers.
 
-      > *If you are unsure of which your upstream DNS servers are set this to `0.0.0.0/0`.*
+      > _If you are unsure of which your upstream DNS servers are set this to `0.0.0.0/0`._
 
-    - *With OpenStack Cinder blockstorage:* Set `networkPolicies.kubeSystem.openstack.ips` to your OpenStack endpoints for Keystone, Nova, and Cinder.
+    - _With OpenStack Cinder blockstorage:_ Set `networkPolicies.kubeSystem.openstack.ips` to your OpenStack endpoints for Keystone, Nova, and Cinder.
 
-      > *Usually these are the same endpoint and you can discover them by issuing `openstack catalog list`, then resolve the hostname of the public endpoint to find all IP addresses. If they do not use the standard ports `5000`, `8774`, and `8776` then be sure to configure them as well.*
+      > _Usually these are the same endpoint and you can discover them by issuing `openstack catalog list`, then resolve the hostname of the public endpoint to find all IP addresses. If they do not use the standard ports `5000`, `8774`, and `8776` then be sure to configure them as well._
 
-    - *With OpenStack Octavia load balancer:* Reconfigure `networkPolicies.global.scNodes` and `networkPolicies.global.wcNodes` to use the full subnet of your private network.
+    - _With OpenStack Octavia load balancer:_ Reconfigure `networkPolicies.global.scNodes` and `networkPolicies.global.wcNodes` to use the full subnet of your private network.
 
 1. Upgrade applications:
 

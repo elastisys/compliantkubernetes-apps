@@ -18,7 +18,7 @@
 
     The `update-ips` script does not update IPs for all network policies, go through `sc-config.yaml` and `common-config.yaml` and set the IPs of the external services to whatever suits your need.
 
-    > **_Optional_**: *If you want to set the network policy IPs of all of these external services to `0.0.0.0/0` then you can run this script, note that this exposes the services to any connections*
+    > **_Optional_**: _If you want to set the network policy IPs of all of these external services to `0.0.0.0/0` then you can run this script, note that this exposes the services to any connections_
 
     ```bash
     ./migration/v0.26.x-v0.27.x/set-external-netpol-ips.sh
@@ -75,7 +75,7 @@
 
     This can be done by adding the following line to the `config` part in the connector
 
-    ```
+    ```yaml
     issuer: https://accounts.google.com
     ```
 

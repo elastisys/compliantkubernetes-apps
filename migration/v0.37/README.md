@@ -88,9 +88,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s-kubespray run-playbook wc cluster.yml -b --tags=external-openstack
     ```
 
-1. Prepare upgrade - *non-disruptive*
+1. Prepare upgrade - _non-disruptive_
 
-    > *Done before maintenance window.*
+    > _Done before maintenance window._
 
     ```bash
     ./bin/ck8s upgrade both v0.37 prepare
@@ -109,9 +109,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > ./bin/ck8s upgrade wc v0.37 apply
     > ```
 
-1. Apply upgrade - *disruptive*
+1. Apply upgrade - _disruptive_
 
-    > *Done during maintenance window.*
+    > _Done during maintenance window._
 
     ```bash
     ./bin/ck8s upgrade both v0.37 apply
@@ -119,9 +119,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
 ## Manual method
 
-### Prepare upgrade - *non-disruptive*
+### Prepare upgrade - _non-disruptive_
 
-> *Done before maintenance window.*
+> _Done before maintenance window._
 
 1. Pull the latest changes and switch to the correct branch:
 
@@ -175,9 +175,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.37/prepare/70-configure-hnc-webhook.sh
     ```
 
-### Apply upgrade - *disruptive*
+### Apply upgrade - _disruptive_
 
-> *Done during maintenance window.*
+> _Done during maintenance window._
 
 1. Set whether or not upgrade should be applied for `both` clusters or for one of `sc` or `wc`:
 

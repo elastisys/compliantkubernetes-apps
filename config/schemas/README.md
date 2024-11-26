@@ -179,7 +179,7 @@ Defines here refer to the use of `$defs` to define schemas, and `$ref`:s to use 
 This is usable in two situations:
 
 1. To reuse common schemas
-2. To reduce and flatten nested schemas
+1. To reduce and flatten nested schemas
 
 - Must be grouped, so documentation can be generated for it, e.g.:
     - `.opensearch.$defs.roles` is not used on its own, but contains schemas that are reused.

@@ -102,9 +102,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     git switch -d v0.33.x
     ```
 
-1. Prepare upgrade - *non-disruptive*
+1. Prepare upgrade - _non-disruptive_
 
-    > *Done before maintenance window.*
+    > _Done before maintenance window._
 
     ```bash
     ./bin/ck8s upgrade v0.33 prepare
@@ -115,9 +115,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s update-ips both apply
     ```
 
-1. Apply upgrade - *disruptive*
+1. Apply upgrade - _disruptive_
 
-    > *Done during maintenance window.*
+    > _Done during maintenance window._
 
     ```bash
     ./bin/ck8s upgrade v0.33 apply
@@ -125,9 +125,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
 ## Manual method
 
-### Prepare upgrade - *non-disruptive*
+### Prepare upgrade - _non-disruptive_
 
-> *Done before maintenance window.*
+> _Done before maintenance window._
 
 1. Pull the latest changes and switch to the correct branch:
 
@@ -169,9 +169,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s update-ips both apply
     ```
 
-### Apply upgrade - *disruptive*
+### Apply upgrade - _disruptive_
 
-> *Done during maintenance window.*
+> _Done during maintenance window._
 
 1. Rerun bootstrap:
 
@@ -201,7 +201,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.33/apply/80-apply.sh execute
     ```
 
-## Postrequisite:
+## Postrequisite
 
 - [ ] Unsuspend any `rclone-sync` jobs that were suspended before the upgrade;
 - [ ] Check the state of the environment, pods and nodes:

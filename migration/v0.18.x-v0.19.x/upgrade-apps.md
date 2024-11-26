@@ -60,7 +60,7 @@
 1. Migrate from ODFE to OpenSearch:
 
     This will set up a fresh OpenSearch cluster and migrate the data from ODFE via snapshots if enabled.
-    **Note** that this will *not* carry over security settings.
+    **Note** that this will _not_ carry over security settings.
     Any user, role, or rolemapping that has been manually created must be either be added into the configuration manifests or later manually added when the data migration is complete.
 
     If there is enough resources in the service cluster, and OpenSearch will be running under a new subdomain, then the two clusters can run in parallel during migration allowing you to verify that everything is carried over.

@@ -38,13 +38,13 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
 - [ ] Upgrade your version of helmfile and helm diff by following these steps:
 
-  - Uninstall `helm-diff` so that the new version can be installed:
+    - Uninstall `helm-diff` so that the new version can be installed:
 
       ```bash
       helm plugin uninstall diff
       ```
 
-  - From the root of your `compliantkubernetes-apps` directory, run ansible to get the updated requirements:
+    - From the root of your `compliantkubernetes-apps` directory, run ansible to get the updated requirements:
 
       ```bash
       ansible-playbook -e 'ansible_python_interpreter=/usr/bin/python3' --ask-become-pass --connection local --inventory 127.0.0.1, get-requirements.yaml
@@ -95,9 +95,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > If the environment has rclone-sync enabled you will need to create the audit in the destination S3
     > To set the elastisys nodes tolerations and affinity for fluentd aggregator in wc edit `vim "$CK8S_CONFIG_PATH/wc-config.yaml"` and add them under `fluentd.aggregator`
 
-1. Prepare upgrade - *non-disruptive*
+1. Prepare upgrade - _non-disruptive_
 
-    > *Done before maintenance window.*
+    > _Done before maintenance window._
 
     ```bash
     ./bin/ck8s upgrade v0.29 prepare
@@ -106,9 +106,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > [!NOTE]
     > To set the elastisys nodes tolerations and affinity for fluentd aggregator in wc edit `vim "$CK8S_CONFIG_PATH/wc-config.yaml"` and add them under `fluentd.aggregator`
 
-1. Apply upgrade - *disruptive*
+1. Apply upgrade - _disruptive_
 
-    > *Done during maintenance window.*
+    > _Done during maintenance window._
 
     ```bash
     ./bin/ck8s upgrade v0.29 apply
@@ -116,9 +116,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
 ## Manual method
 
-### Prepare upgrade - *non-disruptive*
+### Prepare upgrade - _non-disruptive_
 
-> *Done before maintenance window.*
+> _Done before maintenance window._
 
 1. Pull the latest changes and switch to the correct branch:
 
@@ -171,9 +171,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     - If the new default is `warn` and the environment has `deny`, then leave it at `deny` (possibly requiring an override config).
     - If the new default is `warn` and the environment has `dryrun`, then use `warn` (possibly requiring removal of override config) and inform the user that they will start seeing warnings from that policy.
 
-### Apply upgrade - *disruptive*
+### Apply upgrade - _disruptive_
 
-> *Done during maintenance window.*
+> _Done during maintenance window._
 
 1. Rerun bootstrap:
 
@@ -227,7 +227,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.29/apply/90-uninstalls.sh execute
     ```
 
-## Postrequisite:
+## Postrequisite
 
 - [ ] Check the state of the environment, pods and nodes:
 
