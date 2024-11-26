@@ -61,9 +61,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     git switch -d v0.41.x
     ```
 
-1. Prepare upgrade - *non-disruptive*
+1. Prepare upgrade - _non-disruptive_
 
-    > *Done before maintenance window.*
+    > _Done before maintenance window._
 
     ```bash
     ./bin/ck8s upgrade both v0.41 prepare
@@ -86,15 +86,15 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
   To check if the tekton is enabled, run the following command
 
-  ```
+  ```bash
   yq4 '.tektonPipelines.enabled == true' $CK8S_CONFIG_PATH/sc-config.yaml
   ```
 
   Example of how the network policies for the pipeline can be found on the [documentation page](https://elastisys.io/compliantkubernetes/operator-manual/schema/config-properties-network-policies-config-properties-network-policies-tekton-piepline/#piepline).
 
-1. Apply upgrade - *disruptive*
+1. Apply upgrade - _disruptive_
 
-    > *Done during maintenance window.*
+    > _Done during maintenance window._
 
     ```bash
     ./bin/ck8s upgrade both v0.41 apply
@@ -102,9 +102,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
 ## Manual method
 
-### Prepare upgrade - *non-disruptive*
+### Prepare upgrade - _non-disruptive_
 
-> *Done before maintenance window.*
+> _Done before maintenance window._
 
 1. Pull the latest changes and switch to the correct branch:
 
@@ -138,15 +138,15 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
   To check if the Tekton is enabled, run the following command
 
-  ```
+  ```bash
   yq4 '.tektonPipelines.enabled == true' $CK8S_CONFIG_PATH/sc-config.yaml
   ```
 
   Example of how the network policies for the pipeline can be found on the [documentation page](https://elastisys.io/compliantkubernetes/operator-manual/schema/config-properties-network-policies-config-properties-network-policies-tekton-piepline/#piepline).
 
-### Apply upgrade - *disruptive*
+### Apply upgrade - _disruptive_
 
-> *Done during maintenance window.*
+> _Done during maintenance window._
 
 1. Set whether or not upgrade should be applied for `both` clusters or for one of `sc` or `wc`:
 
@@ -162,7 +162,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.41/apply/80-apply.sh execute
     ```
 
-## Postrequisite:
+## Postrequisite
 
 - [ ] Check the state of the environment, pods and nodes:
 
