@@ -95,6 +95,32 @@ customRules:
   {{- end }}
   overwrites.yaml: |-
     {{- if .Values.falco.rulesFiles.default.enabled }}
+    # Dropping these rules since they are a relatively weak indication of intrusion.
+    # They would also require a significant amount of tuning before they are really useful.
+    - rule: Read sensitive file trusted after startup
+      enabled: false
+      override:
+        enabled: replace
+    - rule: Read sensitive file untrusted
+      enabled: false
+      override:
+        enabled: replace
+
+    # Dropping these rules since they produce significant spam due to false positives.
+    # For the same reasons they are also not a strong indication of intrusion.
+    - rule: Terminal shell in container
+      enabled: false
+      override:
+        enabled: replace
+    - rule: Contact K8S API Server From Container
+      enabled: false
+      override:
+        enabled: replace
+    - rule: Redirect STDOUT/STDIN to Network Connection in Container
+      enabled: false
+      override:
+        enabled: replace
+
     # This will be added in a later falco rules version as well
     # The fix was added upstream here (with a new condition): https://github.com/falcosecurity/rules/pull/177
     - macro: allowed_clear_log_files
@@ -106,7 +132,6 @@ customRules:
 
     # Adding a repository to this list will add an exception to the rules:
     # Run shell untrusted
-    # Contact K8S API Server From Container
     - list: trusted_image_repositories
       items:
         - docker.io/calico/ctl
@@ -164,35 +189,9 @@ customRules:
         - registry.k8s.io/sig-storage/csi-resizer
         - registry.k8s.io/sig-storage/csi-snapshotter
 
-    # Contact K8S API Server From Container
-    - macro: user_known_contact_k8s_api_server_activities
-      condition: >
-        (
-          container.image.repository in (trusted_image_repositories)
-        ) or (
-          container.image.repository = "docker.io/bitnami/kubectl" and
-          k8s.ns.name = "gatekeeper-system" and
-          k8s.pod.name startswith "gatekeeper-templates-wait"
-        ) or (
-          container.image.repository = "gcr.io/tekton-releases/dogfooding/tkn" and
-          k8s.ns.name = "tekton-pipelines" and
-          k8s.pod.name startswith "cleanup-runs"
-        )
-
     # Run shell untrusted
     - macro: user_shell_container_exclusions
       condition: ( container.image.repository in (trusted_image_repositories) )
-
-    # Read sensitive file trusted after startup
-    - macro: user_known_read_sensitive_files_activities
-      condition: ( container.image.repository in (ghcr.io/elastisys/spilo-15, ghcr.io/zalando/spilo-15) )
-
-    # Redirect STDOUT/STDIN to Network Connection in Container
-    - macro: user_known_stand_streams_redirect_activities
-      condition: (
-          (container.image.repository = quay.io/calico/node and proc.name = calico-node) or
-          (container.image.repository = registry.k8s.io/dns/k8s-dns-node-cache and proc.name = node-cache)
-        )
 
     {{- if and .Values.calicoAccountant.enabled (eq .Values.calicoAccountant.backend "nftables") }}
 
