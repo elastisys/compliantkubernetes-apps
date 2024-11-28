@@ -65,12 +65,12 @@ if [ -z "${CK8S_PGP_FP:-}" ]; then
     echo -e "\tIf in doubt, contact support@elastisys.com." 1>&2
 
     if [[ "${CK8S_AUTO_APPROVE:-}" != true ]]; then
-      log_warning_no_newline "Do you want to continue anyway? (y/N): "
-      read -r reply
-      if [[ ! "${reply}" =~ ^[yY]$ ]]; then
-          exit 1
-      fi
-  fi
+        log_warning_no_newline "Do you want to continue anyway? (y/N): "
+        read -r reply
+        if [[ ! "${reply}" =~ ^[yY]$ ]]; then
+            exit 1
+        fi
+    fi
 fi
 
 file="${CK8S_CONFIG_PATH}/diagnostics-${cluster}-$(date +%y%m%d%H%M%S).log"
