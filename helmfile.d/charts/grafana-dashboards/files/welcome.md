@@ -4,15 +4,14 @@
 
 Here you can find the most relevant features and changes for the last couple of releases of Welkin
 
+- Upgraded Grafana to v11.2.3. **[v0.42]**
+  - Drops support for dashboards using Angular plugins. See [here](https://grafana.com/docs/grafana/latest/developers/angular_deprecation/) for more information.
+- Upgraded Falco to v0.38.2. **[v0.42]**
 - Updated Grafana dashboards containing deprecated panels. **[v0.41]**
 - Grafana was upgraded to v10.4.7. **[v0.41]**
 - Ingress-nginx was upgraded to v1.11.2. **[v0.41]**
   - Drops support for Kubernetes v1.25 and adds support for v1.30.
 - NodeLocal DNS was upgraded to v1.23.1. **[v0.41]**
-- Disabled kured alerts in WC. **[v0.40]**
-- Opensearch and Opensearch dashboards was upgraded to v2.15.0. **[v0.40]**
-- Harbor was upgraded to v2.11.0. **[v0.40]**
-- Dex was upgraded to v2.40.0. **[v0.40]**
 
 ## Public docs
 
