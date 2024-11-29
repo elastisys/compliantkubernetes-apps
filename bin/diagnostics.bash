@@ -262,13 +262,13 @@ run_diagnostics_namespaced() {
     namespace="${1}"
     echo "Running in the ${namespace} namespace"
     # -- Pods --
-    echo -e "Fetching all pods <pods>"
+    echo -e "Fetching All Pods <pods>"
     "${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
     # -- Top --
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-    echo "Fetching pods resources usage"
+    echo "Fetching Pods Resources Usage <top>"
     "${here}/ops.bash" kubectl "${cluster}" top pods -n "${namespace}"
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
@@ -299,36 +299,18 @@ run_diagnostics_namespaced() {
     # -- ConfigMaps --
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     echo "Fetching ConfigMaps <configmaps>"
-    cfg1=$("${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml | yq4 '.items[] | select(.status.conditions[] | select(.type != "Ready" and .status != "True")) | [.spec.volumes[].configMap.name]')
-    readarray cfg1_arr < <(echo "$cfg1" | yq4 e -o=j -I=0 '.[]')
-    cfg2=$("${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml | yq4 '.items[] | select(.status.conditions[] | select(.type != "Ready" and .status != "True")) | .spec.containers[].envFrom[].configMapRef.name')
-    readarray cfg2_arr < <(echo "$cfg2" | yq4 e -o=j -I=0 '.[]')
-    cfg3=$("${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml | yq4 '.items[] | select(.status.conditions[] | select(.type != "Ready" and .status != "True")) | .spec.containers[].env[].ValueFrom.configMapKeyRef.name')
-    readarray cfg3_arr < <(echo "$cfg3" | yq4 e -o=j -I=0 '.[]')
-    cfgs=("${cfg1_arr[@]}" "${cfg2_arr[@]}" "${cfg3_arr[@]}")
-    # shellcheck disable=SC2060
-    # shellcheck disable=SC2207
-    cfgs=($(echo "${cfgs[@]}" | tr [:space:] '\n' | awk '!a[$0]++'))
-
-    for cfg in "${cfgs[@]}"; do
-        if [ "$cfg" == "null" ]; then
-            :
-        else
-            configmap=$(sed -e 's/^"//' -e 's/"$//' <<<"$cfg")
-            "${here}/ops.bash" kubectl "${cluster}" get configmap -n "${namespace}" "$configmap" -o yaml
-        fi
-    done
+    "${here}/ops.bash" kubectl "${cluster}" get configmaps -n "${namespace}" -o yaml
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
     # -- Logs --
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-    echo "Fetching Logs <logs>"
-    pods=$("${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml | yq4 '.items[] | .metadata.name')
-    readarray pods_arr < <(echo "$pods" | yq4 e -o=j -I=0 '.[]')
-
+    echo "Fetching Error Logs <logs>"
+    mapfile -t pods_arr < <("${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml | yq4 '.items[] | .metadata.name')
     for pod in "${pods_arr[@]}"; do
         echo "Error logs for pod: ${pod}"
-        "${here}/ops.bash" kubectl "${cluster}" logs -n "${namespace}" "${pods}" | grep -e error -e err
+        "${here}/ops.bash" kubectl "${cluster}" logs -n "${namespace}" "${pod}" | \
+            # need 'OR true' here to not exit script in case of no match
+            grep -iE '401|403|500|bad|blocked|denied|deny|err|expired|fail|unauthorized|unknown' || true
     done
 }
 
@@ -431,6 +413,8 @@ touch "${file}"
 
 config_load "${cluster}"
 log_info "Running diagnostics..."
+
+# Setting this to true to avoid validation prompts when running diagnostics
 export CK8S_AUTO_APPROVE=true
 
 case "${sub_command}" in
