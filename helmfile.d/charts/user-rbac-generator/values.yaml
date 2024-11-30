@@ -1,0 +1,53 @@
+#define ClusterRoles
+clusterRoles: {}
+# clusterRoles:
+#   example-clusterrole:
+#     rules:
+#     - apiGroups:
+#         - ""
+#       resources:
+#         - pods
+#       verbs:
+#         - get
+#         - list
+#         - watch
+
+# define ClusterRoleBindings
+clusterRoleBindings: {}
+# clusterRoleBindings:
+#   example-clusterrolebinding:
+#     roleRef:
+#       name: example-clusterrole
+#     subjects:
+#     - kind: ServiceAccount
+#       name: example-serviceaccount
+#       namespace: example-namespace
+
+# list of namespaces in which roles and roleBindings should be created in
+namespaces: []
+
+# define Roles
+roles: {}
+# roles:
+#   example-role:
+#     rules:
+#     - apiGroups:
+#         - ""
+#       resources:
+#         - pods
+#       verbs:
+#         - get
+#         - list
+#         - watch
+
+# define RoleBindings
+roleBindings: {}
+# roleBindings:
+#   example-rolebinding:
+#     roleRef:
+#       name: example-clusterrole
+#       kind: ClusterROle
+#     subjects:
+#     - kind: ServiceAccount
+#       name: example-serviceaccount
+#       namespace: example-namespace
