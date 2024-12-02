@@ -1515,34 +1515,13 @@ properties:
       excludedExtraNamespaces:
         title: Excluded Extra Namespaces
         description: |-
-          Extra excluded namespace, here we should add the namespaces that are more likely to change
+          Extra namespaces excluded by HNC, here we should add the namespaces that are more likely to change
 
           [Including and excluding namespaces](https://github.com/kubernetes-sigs/hierarchical-namespaces/blob/master/docs/user-guide/how-to.md#including-and-excluding-namespaces-from-hnc)
         items:
-          type: string
-        type: array
-      excludedNamespaces:
-        title: Excluded Namespaces
-        description: |-
-          Excluded namespaces
-        items:
           examples:
-            - alertmanager
-            - cert-manager
-            - falco
-            - fluentd
-            - fluentd-system
-            - gatekeeper-system
-            - hnc-system
-            - ingress-nginx
-            - kube-node-lease
-            - kube-public
-            - kube-system
-            - kured
-            - metallb-system
-            - monitoring
-            - rook-ceph
-            - velero
+            - mongodb-system
+            - sealed-secrets
           type: string
         type: array
       ha:
