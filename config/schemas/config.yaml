@@ -4076,7 +4076,7 @@ properties:
             description: Alert when a disk's usage reaches the limit in percent.
             type: number
             default: 75
-          requestlimit:
+          requestLimit:
             title: Capacity Management Alerts Request Limit
             description: Alert when a node's resource requests reaches the limits in percent.
             type: object
@@ -4084,34 +4084,20 @@ properties:
             properties:
               cpu:
                 title: Capacity Management Alerts CPU Request Limit
-                $ref: "#/properties/prometheus/$defs/capacityManagementAlerts/properties/requestlimitList"
+                description: Configure a CPU request percentage limit to alert for.
+                type: number
+                default: 80
               memory:
                 title: Capacity Management Alerts Memory Request Limit
-                $ref: "#/properties/prometheus/$defs/capacityManagementAlerts/properties/requestlimitList"
-          requestlimitList:
-            title: Capacity Management Alerts Request Limit List
-            description: Configure a list of node patterns and request limits to alert for.
-            type: array
-            items:
-              $ref: "#/properties/prometheus/$defs/capacityManagementAlerts/properties/requestlimitTerm"
-          requestlimitTerm:
-            title: Capacity Management Alerts Request Limit Term
-            description: Configure a node pattern and the request limit to alert for.
-            type: object
-            additionalProperties: false
-            properties:
-              name:
-                type: string
-                examples:
-                  - worker
-              pattern:
-                type: string
-                examples:
-                  - .*-worker-.*
-              limit:
+                description: Configure a memory request percentage limit to alert for.
                 type: number
-                examples:
-                  - 80
+                default: 80
+          nodeGroupRequestsExcludePattern:
+            title: Capacity Management Alerts Request Exclude Pattern
+            description: Configure a pattern of node groups to exclude from the resource request alerts. This can be used to exclude certain node groups from request alerts, while still getting usage alerts for those node groups.
+            type: string
+            default: ""
+            examples: ".*redis.*|.*postgres.*"
       diskAlerts:
         title: Disk Alerts
         description: Definitions for disk alerts.
@@ -4421,8 +4407,10 @@ properties:
             $ref: "#/properties/prometheus/$defs/capacityManagementAlerts/properties/persistentVolume"
           disklimit:
             $ref: "#/properties/prometheus/$defs/capacityManagementAlerts/properties/disklimit"
-          requestlimit:
-            $ref: "#/properties/prometheus/$defs/capacityManagementAlerts/properties/requestlimit"
+          requestLimit:
+            $ref: "#/properties/prometheus/$defs/capacityManagementAlerts/properties/requestLimit"
+          nodeGroupRequestsExcludePattern:
+            $ref: "#/properties/prometheus/$defs/capacityManagementAlerts/properties/nodeGroupRequestsExcludePattern"
           usagelimit:
             default: 95
             type: number

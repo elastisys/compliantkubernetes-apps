@@ -116,6 +116,8 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     This is because of an issue in Harbor where it is saving image data in the path `//docker/` but rclone by default skips the `//` path. So we need to add a manual config to sync that. The default sync job would also remove the docker folder from the destination since it is skipping it in the source, that is why the default job needs to be disabled.
 
+1. The resource request capacity management alerts have been reworked to target the `elastisys.io/node-group` label instead of being based on node name patterns. As such, any previous override config for `prometheus.capacityManagementAlerts.requestLimit` has been removed. These can be manually reconfigured if the new defaults are not suitable.
+
 1. Apply upgrade - _disruptive_
 
     > _Done during maintenance window._
@@ -141,6 +143,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     export CK8S_CLUSTER=<wc|sc|both>
+    ```
+
+1. Remove outdated capacity alert config:
+
+    ```bash
+    ./migration/v0.43/prepare/10-capacity-alerts.sh
     ```
 
 1. Update apps configuration:
