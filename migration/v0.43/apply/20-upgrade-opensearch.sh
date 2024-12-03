@@ -59,38 +59,23 @@ run() {
             log_fatal "Failed to clone index '${os_dashboards_index}' to .kibana_1" "${resp}"
           fi
 
-
-          log_info "- Disabling read-only mode for '${os_dashboards_index}'"
-          resp=$(curl -sS -kL -u "${user}:${password}" -X PUT "${os_url}"/"${os_dashboards_index}"/_settings -H 'Content-Type: application/json' -d'
-          {
-            "settings": {
-              "index.blocks.write": false
-            }
-          }
-          ')
-          acknowledged=$(echo "${resp}" | grep "^{" | jq -r '.acknowledged')
-          if [ "${acknowledged}" = "true" ]; then
-            log_info "- Successfully disabled read-only mode for '${os_dashboards_index}'"
-          else
-            log_fatal "Failed to disable read-only mode for '${os_dashboards_index}'" "${resp}"
-          fi
-
-          log_info "- Disabling read-only mode for .kibana_1"
-          resp=$(curl -sS -kL -u "${user}:${password}" -X PUT "${os_url}"/.kibana_1/_settings -H 'Content-Type: application/json' -d'
-          {
-            "settings": {
-              "index.blocks.write": false
-            }
-          }
-          ')
-          acknowledged=$(echo "${resp}" | grep "^{" | jq -r '.acknowledged')
-          if [ "${acknowledged}" = "true" ]; then
-            log_info "- Successfully disabled read-only mode for .kibana_1"
-          else
-            log_fatal "Failed to disable read-only mode for .kibana_1" "${resp}"
-          fi
         else
           log_fatal "Failed to check if index .kibana_1 already exists" "${resp}"
+        fi
+
+        log_info "- Disabling read-only mode for .kibana_1"
+        resp=$(curl -sS -kL -u "${user}:${password}" -X PUT "${os_url}"/.kibana_1/_settings -H 'Content-Type: application/json' -d'
+        {
+          "settings": {
+            "index.blocks.write": false
+          }
+        }
+        ')
+        acknowledged=$(echo "${resp}" | grep "^{" | jq -r '.acknowledged')
+        if [ "${acknowledged}" = "true" ]; then
+          log_info "- Successfully disabled read-only mode for .kibana_1"
+        else
+          log_fatal "Failed to disable read-only mode for .kibana_1" "${resp}"
         fi
 
         resp=$(curl -sS -kL -u "${user}:${password}" -X GET "${os_url}"/_alias/.kibana)
@@ -131,7 +116,7 @@ run() {
       else
 
         log_info "- OpenSearch chart version already 2.26.1, executing generic apply"
-        helmfile_do sc -lapp=opensearch apply
+        helmfile_upgrade sc app=opensearch
 
       fi
     fi
