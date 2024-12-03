@@ -415,21 +415,10 @@ prometheus:
     nodeCpuLimit1h: 95
     nodeMemoryLimit1h: 85
     ## for each cpu and memory add the node pattern for which you want to create an alert
-    requestlimit:
-      cpu:
-        - name: worker
-          pattern: ".*-worker-.*"
-          limit: 80
-        - name: elastisys
-          pattern: ".*-elastisys-.*"
-          limit: 80
-      memory:
-        - name: worker
-          pattern: ".*-worker-.*"
-          limit: 80
-        - name: elastisys
-          pattern: ".*-elastisys-.*"
-          limit: 80
+    requestLimit:
+      cpu: 80
+      memory: 80
+    nodeGroupRequestsExcludePattern: ""
   diskAlerts:
     storage:
       predictLinear:
