@@ -3999,13 +3999,13 @@ properties:
                 $ref: "#/properties/prometheus/$defs/capacityManagementAlerts/properties/requestlimitList"
           requestlimitList:
             title: Capacity Management Alerts Request Limit List
-            description: Configure a list of node patterns and request limits to alert for.
+            description: Configure a list of node groups and request limits to alert for.
             type: array
             items:
               $ref: "#/properties/prometheus/$defs/capacityManagementAlerts/properties/requestlimitTerm"
           requestlimitTerm:
             title: Capacity Management Alerts Request Limit Term
-            description: Configure a node pattern and the request limit to alert for.
+            description: Configure a node group and the request limit to alert for. Nodes within that group must have a matching `elastisys.io/node-group` label.
             type: object
             additionalProperties: false
             properties:
@@ -4013,10 +4013,6 @@ properties:
                 type: string
                 examples:
                   - worker
-              pattern:
-                type: string
-                examples:
-                  - .*-worker-.*
               limit:
                 type: number
                 examples:

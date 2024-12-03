@@ -418,17 +418,13 @@ prometheus:
     requestlimit:
       cpu:
         - name: worker
-          pattern: ".*-worker-.*"
           limit: 80
         - name: elastisys
-          pattern: ".*-elastisys-.*"
           limit: 80
       memory:
         - name: worker
-          pattern: ".*-worker-.*"
           limit: 80
         - name: elastisys
-          pattern: ".*-elastisys-.*"
           limit: 80
   diskAlerts:
     storage:
