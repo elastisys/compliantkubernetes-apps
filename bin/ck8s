@@ -123,7 +123,7 @@ install-requirements)
 validate)
   [[ "${2}" =~ ^(wc|sc)$ ]] || usage
   check_tools
-  config_load "$2"
+  config_load "$2" -v
   echo "Config validation successful"
   ;;
 providers) echo "${ck8s_cloud_providers[@]}" ;;

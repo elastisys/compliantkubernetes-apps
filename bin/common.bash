@@ -393,13 +393,15 @@ validate_config() {
     if ! yajsv -s "${schema_file}" "${merged_config}" >"${schema_validation_result}"; then
       log_warning "Failed schema validation:"
       sed -r 's/^.*_(..-config\.yaml): fail: (.*)/\1: \2/; / failed validation$/q' <"${schema_validation_result}"
-      grep -oP '(?<=fail: )[^:]+' "${schema_validation_result}" | sort -u |
-        while read -r jpath; do
-          if [[ $jpath != "(root)" ]]; then
-            echo -n ".$jpath = "
-            yq4 -oj ".$jpath" "${merged_config}"
-          fi
-        done
+      if [[ "${3:-}" == "-v" ]]; then
+        grep -oP '(?<=fail: )[^:]+' "${schema_validation_result}" | sort -u |
+          while read -r jpath; do
+            if [[ $jpath != "(root)" ]]; then
+              echo -n ".$jpath = "
+              yq4 -oj ".$jpath" "${merged_config}"
+            fi
+          done
+      fi
       maybe_exit="true"
     fi
   }
@@ -431,10 +433,10 @@ validate_config() {
 
   check_conditionals "${config_to_validate}" "${template_file}"
   validate "${config_to_validate}" "${template_file}"
-  schema_validate "${config_to_validate}" "${config_template_path}/schemas/config.yaml"
+  schema_validate "${config_to_validate}" "${config_template_path}/schemas/config.yaml" "${2:-}"
   check_conditionals "${secrets[secrets_file]}" "${config_template_path}/secrets.yaml"
   validate "${secrets[secrets_file]}" "${config_template_path}/secrets.yaml"
-  schema_validate "${secrets[secrets_file]}" "${config_template_path}/schemas/secrets.yaml"
+  schema_validate "${secrets[secrets_file]}" "${config_template_path}/schemas/secrets.yaml" "${2:-}"
 
   if ${maybe_exit} && ! ${CK8S_AUTO_APPROVE}; then
     ask_abort
@@ -473,13 +475,13 @@ validate_sops_config() {
 }
 
 # Load and validate all configuration options from the config path.
-# Usage: config_load <sc|wc> [sk]
+# Usage: config_load <sc|wc> [--skip-validation|-v]
 config_load() {
   load_config "$1"
 
   if [[ "--skip-validation" != "${2:-''}" ]]; then
     validate_version "$1"
-    validate_config "$1"
+    validate_config "$1" "${2:-''}"
     validate_sops_config
   fi
 }
