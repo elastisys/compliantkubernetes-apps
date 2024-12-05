@@ -4,7 +4,7 @@
 
 1. Create a backup for harbor
 
-    ```
+    ```bash
     ./bin/ck8s ops kubectl sc create job -n harbor harbor-backup-v026 --from=cronjobs/harbor-backup-cronjob
     ./bin/ck8s ops kubectl sc wait --for=condition=complete job -n harbor harbor-backup-v026 --timeout=-1s
     ```
@@ -21,13 +21,13 @@
 
 1. Migrate harbor jobservice persistence storage size variable and prepare harbor for upgrade.
 
-    ```
+    ```bash
     ./migration/v0.25.x-v0.26.x/migrate-harbor-database-variables.sh
     ./bin/ck8s ops kubectl sc delete ingress -n harbor --all
     ./bin/ck8s ops kubectl sc delete jobs -n harbor init-harbor-job
     ```
 
-1. *Optional:* If you are upgrading an environment of an Elastisys customer then run this script to add a customer support message to the grafana/opensearch "welcoming dashboards":
+1. _Optional:_ If you are upgrading an environment of an Elastisys customer then run this script to add a customer support message to the grafana/opensearch "welcoming dashboards":
 
     > [!NOTE]
     > This script requires yq4
@@ -36,7 +36,7 @@
     ./migration/v0.25.x-v0.26.x/add-support-message.sh
     ```
 
-1. *Optional:* You can remove the Opensearch role mapping `readall_and_monitor` from `${CK8S_CONFIG_PATH}/sc-config.yaml` if you aren't using it in any meaningful way
+1. _Optional:_ You can remove the Opensearch role mapping `readall_and_monitor` from `${CK8S_CONFIG_PATH}/sc-config.yaml` if you aren't using it in any meaningful way
 
 1. Apply `starboard-operator` to temporarily remove the starboard psp
 
@@ -44,11 +44,11 @@
     bin/ck8s ops helmfile {sc|wc} -l app=starboard-operator apply
     ```
 
-1. *Optional:* You can enable kured reboot slack notifications:
+1. _Optional:_ You can enable kured reboot slack notifications:
 
     a. Go to [Manage Slack Apps](https://api.slack.com/apps), `Install App` tab and copy the `Bot User OAuth Token` to `${CK8S_CONFIG_PATH}/secrets.yaml` file. You may need to ask your Administrator to add you as a collaborator:
 
-    ```
+    ```yaml
     kured:
       slack:
         botToken: abcxyz-...
@@ -56,14 +56,14 @@
 
     b. Enable the slack notification and add the channel in `${CK8S_CONFIG_PATH}/common-config.yaml`:
 
-    ```
+    ```yaml
     notification:
       slack:
         enabled: true
         channel: kured-notification
     ```
 
-1. *Note:* About OpenSearch certificates
+1. _Note:_ About OpenSearch certificates
 
     > Applicable if OpenSearch Securityadmin fails when running apply with something similar to this:
     >
@@ -121,13 +121,13 @@
 
 1. Delete old harbor pvc
 
-    ```
+    ```bash
     ./bin/ck8s ops kubectl sc delete pvc -n harbor data-harbor-harbor-redis-0 data-harbor-harbor-trivy-0 database-data-harbor-harbor-database-0 harbor-harbor-jobservice
     ```
 
 1. Remove any old stuck jobs in the monitoring namespace. Other wise starboard operator will not create any new jobs.
 
-    ```
+    ```bash
     ./bin/ck8s ops kubectl sc delete jobs -n monitoring --all
     ./bin/ck8s ops kubectl wc delete jobs -n monitoring --all
     ```

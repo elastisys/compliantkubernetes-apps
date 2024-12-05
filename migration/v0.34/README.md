@@ -61,9 +61,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     git switch -d v0.34.x
     ```
 
-1. Prepare upgrade - *non-disruptive*
+1. Prepare upgrade - _non-disruptive_
 
-    > *Done before maintenance window.*
+    > _Done before maintenance window._
 
     ```bash
     ./bin/ck8s upgrade both v0.34 prepare
@@ -82,9 +82,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > ./bin/ck8s upgrade wc v0.34 apply
     > ```
 
-1. Apply upgrade - *disruptive*
+1. Apply upgrade - _disruptive_
 
-    > *Done during maintenance window.*
+    > _Done during maintenance window._
 
     ```bash
     ./bin/ck8s upgrade both v0.34 apply
@@ -92,9 +92,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
 ## Manual method
 
-### Prepare upgrade - *non-disruptive*
+### Prepare upgrade - _non-disruptive_
 
-> *Done before maintenance window.*
+> _Done before maintenance window._
 
 1. Pull the latest changes and switch to the correct branch:
 
@@ -117,12 +117,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     Expected output:
 
-    ```
+    ```console
     No resources found in elastic-system namespace.
     No resources found in influxdb-prometheus namespace.
     ```
 
-    If resources *are* present, verify that they are not something important.
+    If resources _are_ present, verify that they are not something important.
 
 1. Update apps configuration:
 
@@ -139,9 +139,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s update-ips ${CK8S_CLUSTER} apply
     ```
 
-### Apply upgrade - *disruptive*
+### Apply upgrade - _disruptive_
 
-> *Done during maintenance window.*
+> _Done during maintenance window._
 
 1. Set whether or not upgrade should be applied for `both` clusters or for one of `sc` or `wc`:
 
@@ -195,7 +195,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.34/apply/80-apply.sh execute
     ```
 
-## Postrequisite:
+## Postrequisite
 
 - [ ] Check the state of the environment, pods and nodes:
 

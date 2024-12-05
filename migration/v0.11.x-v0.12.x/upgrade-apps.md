@@ -10,11 +10,11 @@
 
 1. If you want to keep PVCs for prometheus (not recommended) edit:
 
-    * `sc-config.yaml`
-      * set `prometheus.storage.enabled`: `true`
-      * set `prometheus.wcReader.storage.enabled`: `true`
-    * `wc-config.yaml`
-      * set `prometheus.storage.enabled`: `true`
+    - `sc-config.yaml`
+      - set `prometheus.storage.enabled`: `true`
+      - set `prometheus.wcReader.storage.enabled`: `true`
+    - `wc-config.yaml`
+      - set `prometheus.storage.enabled`: `true`
 
 1. If you had disabled OPA/gatekeeper because it could not be run on kubernetes v1.19+, then you can now enable it again in your config.
   Otherwise, if you have enabled OPA/gatekeeper, then delete the old gatekeeper chart (note this will temporarily disable any gatekeeper policy and create a possible security issue):
