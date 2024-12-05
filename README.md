@@ -246,6 +246,12 @@ You configure ExternalDNS later in the process.
     ./bin/ck8s ops helmfile wc apply -lapp=ingress-nginx --include-transitive-needs
     ```
 
+    After configuring the DNS, update the Network Policies again.
+
+    ```bash
+    ./bin/ck8s update-ips both apply
+    ```
+
 1. **Note**, for this step each cluster need to be up and running already.
     Deploy the apps:
 
