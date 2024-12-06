@@ -5300,6 +5300,22 @@ properties:
             $ref: '#/$defs/kubernetesNodeSelector'
           affinity:
             $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          customAntiAffinity:
+            title: Custom Anti Affinity
+            description: Define custom anti-affinity rules for OpenSearch.
+            type: object
+            properties:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                description: Hard anti-affinity rules.
+                type: array
+                items:
+                  $ref: '#/$defs/io.k8s.api.core.v1.PodAffinityTerm'
+              preferredDuringSchedulingIgnoredDuringExecution:
+                description: Soft anti-affinity rules.
+                type: array
+                items:
+                  $ref: '#/$defs/io.k8s.api.core.v1.WeightedPodAffinityTerm'
+            additionalProperties: false
       masterNode:
         title: OpenSearch Master Node
         description: |-
@@ -5326,6 +5342,22 @@ properties:
             $ref: '#/$defs/kubernetesTolerations'
           affinity:
             $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+            customAntiAffinity:
+              title: Custom Anti Affinity
+              description: Define custom anti-affinity rules for OpenSearch.
+              type: object
+              properties:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  description: Hard anti-affinity rules.
+                  type: array
+                  items:
+                    $ref: '#/$defs/io.k8s.api.core.v1.PodAffinityTerm'
+                preferredDuringSchedulingIgnoredDuringExecution:
+                  description: Soft anti-affinity rules.
+                  type: array
+                  items:
+                    $ref: '#/$defs/io.k8s.api.core.v1.WeightedPodAffinityTerm'
+              additionalProperties: false
       dataNode:
         title: OpenSearch Data Node
         description: |-
@@ -5357,6 +5389,22 @@ properties:
             $ref: '#/$defs/kubernetesNodeSelector'
           affinity:
             $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          customAntiAffinity:
+            title: Custom Anti Affinity
+            description: Define custom anti-affinity rules for OpenSearch.
+            type: object
+            properties:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                description: Hard anti-affinity rules.
+                type: array
+                items:
+                  $ref: '#/$defs/io.k8s.api.core.v1.PodAffinityTerm'
+              preferredDuringSchedulingIgnoredDuringExecution:
+                description: Soft anti-affinity rules.
+                type: array
+                items:
+                  $ref: '#/$defs/io.k8s.api.core.v1.WeightedPodAffinityTerm'
+            additionalProperties: false
       clientNode:
         title: OpenSearch Client Node
         description: |-
@@ -5383,6 +5431,22 @@ properties:
             $ref: '#/$defs/kubernetesNodeSelector'
           affinity:
             $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+            customAntiAffinity:
+              title: Custom Anti Affinity
+              description: Define custom anti-affinity rules for OpenSearch.
+              type: object
+              properties:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  description: Hard anti-affinity rules.
+                  type: array
+                  items:
+                    $ref: '#/$defs/io.k8s.api.core.v1.PodAffinityTerm'
+                preferredDuringSchedulingIgnoredDuringExecution:
+                  description: Soft anti-affinity rules.
+                  type: array
+                  items:
+                    $ref: '#/$defs/io.k8s.api.core.v1.WeightedPodAffinityTerm'
+              additionalProperties: false
       extraRoles:
         title: OpenSearch Extra Roles
         description: Configures extra roles for OpenSearch Security.
@@ -5751,6 +5815,30 @@ properties:
               In an air-gapped environment this can be used to install plugins from known sources.
             type: array
         type: object
+      customLabelSelector:
+        title: Custom Label Selector
+        description: |-
+          Custom label selector for pod anti-affinity rules. If not set, defaults to the standard OpenSearch labels.
+        type: object
+        properties:
+          matchLabels:
+            type: object
+            additionalProperties:
+              type: string
+          matchExpressions:
+            type: array
+            items:
+              type: object
+              properties:
+                key:
+                  type: string
+                operator:
+                  type: string
+                  enum: ["In", "NotIn", "Exists", "DoesNotExist"]
+                values:
+                  type: array
+                  items:
+                    type: string
     required:
       - enabled
       - subdomain
