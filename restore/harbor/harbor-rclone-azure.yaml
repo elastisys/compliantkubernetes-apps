@@ -1,0 +1,76 @@
+apiVersion: v1
+stringData:
+  rclone.conf: |-
+    [azure]
+    account = ${AZURE_ACCOUNT}
+    key = ${AZURE_KEY}
+    type = azureblob
+kind: Secret
+metadata:
+  name: harbor-restore-rclone-move
+  namespace: harbor
+type: Opaque
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: harbor-restore-rclone-move
+  namespace: harbor
+spec:
+  activeDeadlineSeconds: 14400
+  selector:
+    matchLabels:
+      job-name: harbor-restore-rclone-move
+  template:
+    metadata:
+      labels:
+        job-name: harbor-restore-rclone-move
+    spec:
+      containers:
+      - args:
+        - move
+        - azure:${S3_BUCKET}/docker
+        - azure:${S3_BUCKET}//docker
+        - --log-level
+        - INFO
+        image: ghcr.io/elastisys/rclone-sync:1.63.0
+        imagePullPolicy: IfNotPresent
+        name: rclone
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 500Mi
+          requests:
+            cpu: 200m
+            memory: 100Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - mountPath: /home/rclone/.config/rclone/
+          name: config
+      restartPolicy: Never
+      volumes:
+      - name: config
+        secret:
+          defaultMode: 420
+          secretName: harbor-restore-rclone-move
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-harbor-restore-rclone-move-egress
+  namespace: harbor
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      job-name: harbor-restore-rclone-move
+  egress:
+  - {}

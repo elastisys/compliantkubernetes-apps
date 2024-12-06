@@ -35,23 +35,29 @@ targets:
 
     {{- $destinations = append $destinations $destinationType }}
     destinationType: {{ $destinationType }}
+    destinationPath: ""
     sourceName: {{ $value }}
     {{- $sources = append $sources $sourceType }}
     sourceType: {{ $sourceType }}
+    sourcePath: ""
+    nameSuffix: default
   {{- end }}
   {{- end }}
 
   {{- range $sync.buckets }}
-  - destinationName: {{ get "destination" .source . }}
+  - destinationName: {{ . | get "destination" .source }}
     destinationCrypt: {{ $crypt | get "enabled" false }}
-    {{- $destinations = get "destinationType" $sync.destinationType . | append $destinations }}
-    destinationType: {{ get "destinationType" $sync.destinationType . }}
+    {{- $destinations = . | get "destinationType" $sync.destinationType | append $destinations }}
+    destinationType: {{ . | get "destinationType" $sync.destinationType }}
+    destinationPath: {{ . | get "destinationPath" "" }}
     sourceName: {{ .source }}
-    {{- $sources = get "sourceType" $main.type . | append $sources }}
-    sourceType: {{ get "sourceType" $main.type . }}
-    {{- with get "schedule" "" . }}
+    {{- $sources = . | get "sourceType" $main.type | append $sources }}
+    sourceType: {{ . | get "sourceType" $main.type }}
+    sourcePath: {{ . | get "sourcePath" "" }}
+    {{- with . | get "schedule" "" }}
     schedule: {{ . }}
     {{- end }}
+    nameSuffix: {{ . | get "nameSuffix" "custom" }}
   {{- end }}
 
 providers:

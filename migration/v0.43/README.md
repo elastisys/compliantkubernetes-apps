@@ -92,6 +92,30 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
   Example of how the network policies for the pipeline can be found on the [documentation page](https://elastisys.io/welkin/operator-manual/schema/config-properties-network-policies-config-properties-network-policies-tekton-pipeline/#pipeline).
 
+1. If Harbor is using azure object storage and you are using rclone sync, then you need to disable default sync buckets and configure them manually.
+
+    You should set `objectStorage.sync.syncDefaultBuckets: false` and add the default buckets to the list of sync buckets. Except for the harbor bucket, there you instead need to add something like this:
+
+    ```yaml
+    objectStorage:
+        sync:
+            enabled: true
+            destinationType: s3
+            syncDefaultBuckets: false
+            buckets:
+            - source: <azure-env-name>-harbor
+                sourcePath: //docker
+                destinationPath: /docker # set //docker if syncing from azure to azure
+                nameSuffix: docker
+            - source: <azure-env-name>-harbor
+                sourcePath: /backups
+                destinationPath: /backups
+                nameSuffix: backups
+            # config for the other default buckets need to be added here as well
+    ```
+
+    This is because of an issue in Harbor where it is saving image data in the path `//docker/` but rclone by default skips the `//` path. So we need to add a manual config to sync that. The default sync job would also remove the docker folder from the destination since it is skipping it in the source, that is why the default job needs to be disabled.
+
 1. Apply upgrade - _disruptive_
 
     > _Done during maintenance window._
