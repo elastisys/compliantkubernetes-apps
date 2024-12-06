@@ -30,33 +30,42 @@ targets:
 
     {{- $destinations = append $destinations $destinationType }}
     destinationType: {{ $destinationType }}
+    destinationPath: ""
     sourceName: {{ $value }}
     sourceCrypt: {{ $crypt | get "enabled" false }}
     {{- $sources = append $sources $sourceType }}
     sourceType: {{ $sourceType }}
+    sourcePath: ""
+    nameSuffix: default
   {{- end }}
   {{- end }}
 
   {{- range $sync.buckets }}
   - destinationName: {{ .source }}
-    {{- $destinations = get "sourceType" $main.type . | append $destinations }}
-    destinationType: {{ get "sourceType" $main.type . }}
-    sourceName: {{ get "destination" .source . }}
+    {{- $destinations = . | get "sourceType" $main.type | append $destinations }}
+    destinationType: {{ . | get "sourceType" $main.type }}
+    destinationPath: {{ . | get "sourcePath" "" }}
+    sourceName: {{ . | get "destination" .source }}
     sourceCrypt: {{ $crypt | get "enabled" false }}
-    {{- $sources = get "destinationType" $sync.destinationType . | append $sources }}
-    sourceType: {{ get "destinationType" $sync.destinationType . }}
+    {{- $sources = . | get "destinationType" $sync.destinationType | append $sources }}
+    sourceType: {{ . | get "destinationType" $sync.destinationType }}
+    sourcePath: {{ . | get "destinationPath" "" }}
+    nameSuffix: {{ . | get "nameSuffix" "custom" }}
   {{- end }}
 
   {{- end }}
 
   {{- range $restore.targets }}
   - destinationName: {{ .destinationName }}
-    {{- $destinations = get "destinationType" $main.type . | append $destinations }}
-    destinationType: {{ get "destinationType" $main.type . }}
-    sourceName: {{ get "sourceName" .destinationName . }}
+    {{- $destinations = . | get "destinationType" $main.type | append $destinations }}
+    destinationType: {{ . | get "destinationType" $main.type }}
+    destinationPath: {{ . | get "destinationPath" "" }}
+    sourceName: {{ . | get "sourceName" .destinationName }}
     sourceCrypt: {{ $crypt | get "enabled" false }}
-    {{- $sources = get "sourceType" $sync.destinationType . | append $sources }}
-    sourceType: {{ get "sourceType" $sync.destinationType . }}
+    {{- $sources = . | get "sourceType" $sync.destinationType | append $sources }}
+    sourceType: {{ . | get "sourceType" $sync.destinationType }}
+    sourcePath: {{ . | get "sourcePath" "" }}
+    nameSuffix: {{ . | get "nameSuffix" "custom" }}
   {{- end }}
 
 providers:

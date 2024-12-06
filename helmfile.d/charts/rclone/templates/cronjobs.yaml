@@ -5,7 +5,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   labels: {{- include "rclone.labels" $ | nindent 4 }}
-  name: {{ printf "%s-%s" (include "rclone.fullname" $) .destinationName | trunc 63 | trimSuffix "-" }}
+  name: {{ printf "%s-%s-%s" (include "rclone.fullname" $) .destinationName .nameSuffix | trunc 63 | trimSuffix "-" }}
 spec:
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: {{ $.Values.failedJobsHistoryLimit }}
@@ -38,14 +38,14 @@ spec:
               args:
                 - sync
                 {{- if get . "sourceCrypt" | default false }}
-                - "decrypt-{{ .sourceName }}:"
+                - "decrypt-{{ .sourceName }}:{{ .sourcePath }}"
                 {{- else }}
-                - "source-{{ .sourceType }}:{{ .sourceName }}"
+                - "source-{{ .sourceType }}:{{ .sourceName }}{{ .sourcePath }}"
                 {{- end }}
                 {{- if get . "destinationCrypt" | default false }}
-                - "encrypt-{{ .destinationName }}:"
+                - "encrypt-{{ .destinationName }}:{{ .destinationPath }}"
                 {{- else }}
-                - "destination-{{ .destinationType }}:{{ .destinationName }}"
+                - "destination-{{ .destinationType }}:{{ .destinationName }}{{ .destinationPath }}"
                 {{- end }}
                 - --log-level
                 - INFO
