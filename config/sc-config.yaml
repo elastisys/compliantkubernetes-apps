@@ -1005,15 +1005,6 @@ opensearch:
   ingress:
     maxbodysize: 32m
 
-  customLabelSelector:
-    matchLabels:
-      app.kubernetes.io/name: custom-opensearch
-    matchExpressions:
-      - key: environment
-        operator: In
-        values:
-          - production
-
 opa:
   ## Enable rule that requires pods to come from
   ## the image registry defined by "URL".

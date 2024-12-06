@@ -529,13 +529,3 @@ extraObjects: []
   #      selector:
   #        matchLabels:
   #          {{- include "opensearch.selectorLabels" . | nindent 6 }}
-
-# Custom label selector for pod anti-affinity rules
-customLabelSelector: {}
-  # matchLabels:
-  #   app.kubernetes.io/name: opensearch
-  # matchExpressions:
-  #   - key: app.kubernetes.io/instance
-  #     operator: In
-  #     values:
-  #       - opensearch-master

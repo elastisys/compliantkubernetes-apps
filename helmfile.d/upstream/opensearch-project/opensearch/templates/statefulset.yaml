@@ -106,12 +106,7 @@ spec:
       {{- end }}
       affinity:
       {{- end }}
-      {{- if eq .Values.antiAffinity "custom" }}
-        {{- with .Values.customAntiAffinity }}
-        podAntiAffinity:
-          {{- toYaml . | nindent 10 }}
-        {{- end }}
-      {{- else if eq .Values.antiAffinity "hard" }}
+      {{- if eq .Values.antiAffinity "hard" }}
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
@@ -141,6 +136,11 @@ spec:
                   operator: In
                   values:
                   - {{ include "opensearch.name" . }}
+      {{- else if eq .Values.antiAffinity "custom" }}
+        {{- with .Values.customAntiAffinity }}
+        podAntiAffinity:
+{{ toYaml . | indent 10 }}
+        {{- end }}
       {{- end }}
       {{- with .Values.podAffinity }}
         podAffinity:
