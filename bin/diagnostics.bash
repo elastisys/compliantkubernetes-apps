@@ -304,7 +304,7 @@ run_diagnostics_namespaced() {
 
     # -- Logs --
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-    echo "Fetching error Logs <logs>"
+    echo "Fetching Error Logs <logs>"
     mapfile -t pods_arr < <("${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml | yq4 '.items[] | .metadata.name')
     for pod in "${pods_arr[@]}"; do
         echo "Error logs for pod: ${pod}"
