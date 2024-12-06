@@ -2369,6 +2369,18 @@ properties:
                     - s3
                     - swift
                     - azure
+                customArgs:
+                  type: array
+                  title: Set custom arguments to rclone cronjob
+                  description: |-
+                    Can be used to replace the regular sync command.
+                    If used you must specify all arguments (excluding "rclone")
+                nameSuffix:
+                  type: string
+                  title: Suffix to cronjob name
+                  description: |-
+                    Suffix added to the end of cronjob name.
+                    Defaults to "custom". The default buckets have "default" as suffix
               additionalProperties: false
           destinationType:
             title: Rclone Sync Destination Type
