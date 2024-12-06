@@ -38,6 +38,8 @@ targets:
     sourceName: {{ $value }}
     {{- $sources = append $sources $sourceType }}
     sourceType: {{ $sourceType }}
+    customArgs: []
+    nameSuffix: default
   {{- end }}
   {{- end }}
 
@@ -52,6 +54,13 @@ targets:
     {{- with get "schedule" "" . }}
     schedule: {{ . }}
     {{- end }}
+    {{- if empty (get "customArgs" "" .) }}
+    customArgs: []
+    {{- else }}
+    customArgs:
+    {{- toYaml .customArgs | nindent 6 }}
+    {{- end }}
+    nameSuffix: {{ get "nameSuffix" "custom" . }}
   {{- end }}
 
 providers:

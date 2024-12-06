@@ -5,7 +5,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   labels: {{- include "rclone.labels" $ | nindent 4 }}
-  name: {{ printf "%s-%s" (include "rclone.fullname" $) .destinationName | trunc 63 | trimSuffix "-" }}
+  name: {{ printf "%s-%s-%s" (include "rclone.fullname" $) .destinationName .nameSuffix | trunc 63 | trimSuffix "-" }}
 spec:
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: {{ $.Values.failedJobsHistoryLimit }}
@@ -36,6 +36,7 @@ spec:
             - name: {{ $.Chart.Name }}
               image: {{ $.Values.image.repository }}:{{ $.Values.image.tag | default $.Chart.AppVersion }}
               args:
+                {{- if (empty .customArgs) }}
                 - sync
                 {{- if get . "sourceCrypt" | default false }}
                 - "decrypt-{{ .sourceName }}:"
@@ -51,6 +52,9 @@ spec:
                 - INFO
                 {{- if $.Values.dryrun }}
                 - --dry-run
+                {{- end }}
+                {{- else }}
+                {{- toYaml .customArgs | nindent 16 }}
                 {{- end }}
               resources: {{ toYaml $.Values.resources | nindent 16 }}
               securityContext:
