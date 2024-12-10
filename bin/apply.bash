@@ -28,6 +28,12 @@ update_ips_dryrun() {
   fi
 }
 
+check_upgrade() {
+  if get_upgrade_status "${1}" &>/dev/null; then
+    log_fatal "Upgrade ongoing, try again when it has completed or use 'ck8s upgrade unlock'"
+  fi
+}
+
 apps_apply() {
   local suppress
 
@@ -49,6 +55,14 @@ apps_apply() {
 
   if (with_kubeconfig "${config["kube_config_$1"]}" helmfile -f "${here}/../helmfile.d/" -e "$2" "${action}" "${concurrency}" "${suppress:-}"); then
     log_info "---"
+    local current_version
+    current_version="$(get_apps_version "${2}" 2>/dev/null || true)"
+    if [ -n "${current_version}" ]; then
+      log_info "Current version is ${current_version}"
+    else
+      set_apps_version "${2}" "$(get_repo_version)"
+      log_info "Current version is ${current_version}"
+    fi
     log_info "Successful Apps ${action} on ${2/_/ }!"
   else
     log_error "---"
@@ -73,4 +87,7 @@ esac
 
 update_ips_dryrun "$1" "${environment}"
 config_load "$1"
+validate_version "${1}"
+check_upgrade "$1"
+[[ -z "${CK8S_CI_SKIP_APPLY:-}" ]] || exit 0 # Improve mockability in the future
 apps_apply "$1" "${environment}" "${@:2}"
