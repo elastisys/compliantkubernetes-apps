@@ -397,7 +397,7 @@ mkdir -p "${default_config_path}"
 #       for generating user configurations and not store it as a part of
 #       the ck8s configuration.
 mkdir -p "${CK8S_CONFIG_PATH}/user"
-CK8S_VERSION=$(version_get)
+CK8S_VERSION=$(get_repo_version)
 export CK8S_VERSION
 
 generate_default_config "${config[default_common]}"

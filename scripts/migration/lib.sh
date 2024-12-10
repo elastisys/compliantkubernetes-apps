@@ -256,8 +256,8 @@ check_config() {
 
 # usage: check_version <sc|wc> <prepare|apply>
 check_version() {
-  if [[ ! "${1:-}" =~ ^(sc|wc)$ ]] || [[ ! "${2:-}" =~ ^(prepare|apply)$ ]]; then
-    log_fatal "usage: check_version <sc|wc> <prepare|apply>"
+  if [[ ! "${1:-}" =~ ^(sc|wc)$ ]] || [[ ! "${2:-}" =~ ^(prepare|apply|unlock)$ ]]; then
+    log_fatal "usage: check_version <sc|wc> <prepare|apply|unlock>"
   elif [ -z "${CK8S_TARGET_VERSION:-}" ]; then
     log_fatal "error: \"CK8S_TARGET_VERSION\" is unset"
   fi
@@ -282,6 +282,48 @@ check_version() {
       fi
     fi
   fi
+
+  cluster_version="$(get_apps_version "${1}" >/dev/null 2>&1 || true)"
+  case "${2:-}" in
+  prepare)
+    # Ensure not in the middle of upgrading
+    if get_prepared_version "${1}" &>/dev/null; then
+      log_warn "Migration already in progress"
+      if [[ -t 1 ]]; then
+        log_warn_no_newline "Do you want to continue [y/N]: "
+        read -r reply
+        if [[ "${reply}" != "y" ]]; then
+          exit 1
+        fi
+      else
+        # Don't automatically proceed
+        exit 1
+      fi
+    fi
+
+    if [[ -z "${cluster_version}" ]]; then
+      log_warning "Welkin Apps cluster version:     Unknown"
+      log_warning "Welkin Apps config version:      ${VERSION["${1}-config"]%.*}"
+    elif [[ "${cluster_version}" != "${VERSION["${1}-config"]%.*}" ]]; then
+      log_warning "Version mismatch!"
+      log_warning "Welkin Apps cluster version:     ${cluster_version}"
+      log_warning "Welkin Apps config version:      ${VERSION["${1}-config"]%.*}"
+      if [[ -t 1 ]]; then
+        log_warn_no_newline "Do you want to continue [y/N]: "
+        read -r reply
+        if [[ "${reply}" != "y" ]]; then
+          exit 1
+        fi
+      else
+        # On mismatch, don't automatically proceed
+        exit 1
+      fi
+    fi
+    ;;
+  apply)
+    ensure_upgrade_prepared "${1}"
+    ;;
+  esac
 
   if [[ ! "${VERSION["${1}-config"]}" =~ v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
     log_warn "reducing version validation of ${1}-config for version \"${VERSION["${1}-config"]}\""
@@ -367,6 +409,115 @@ append_trap() {
 
   # shellcheck disable=SC2064
   trap "$(new_trap)" "${signal}"
+}
+
+# usage: [[ "$(get_apps_version)" == "0.x" ]]
+get_apps_version() {
+  kubectl_do "${1}" get configmap --namespace kube-system welkin-apps-meta --output=jsonpath --template="{.data.version}"
+}
+
+unlock_upgrade() {
+  kubectl_do "${1}" delete configmap --namespace kube-system welkin-apps-upgrade &>/dev/null ||
+    log_warn "Could not unlock upgrade or upgrade not locked"
+}
+
+# Get currently prepared version, $CK8S_TARGET_VERSION (vX.Y) given when preparing an upgrade
+get_prepared_version() {
+  kubectl_do "${1}" get configmap --namespace kube-system welkin-apps-upgrade --output=jsonpath --template="{.data.version}"
+}
+
+check_prepared_version() {
+  local prepared_version
+  prepared_version="$(get_prepared_version "${1}" || true)"
+  if [ -z "${prepared_version}" ]; then
+    log_fatal "'prepare' step does not appear to have been run, do so first"
+  fi
+
+  if [[ "${prepared_version}" != "${CK8S_TARGET_VERSION}" ]]; then
+    log_fatal "'prepare' step in ${1} appears to have been run for version ${prepared_version}, not ${CK8S_TARGET_VERSION}"
+  fi
+}
+
+# Usage: record_upgrade_prepare_done sc|wc
+# Records that upgrade has been prepared by storing a timestamp in the config and in the cluster along with the target
+# version.
+record_upgrade_prepare_done() {
+  local apps_config_timestamp
+  apps_config_timestamp="$(date -uIs)"
+
+  # This ConfigMap should only exist while doing an upgrade.
+  # Abort if it already exists
+  log_info "Locking cluster ${1} for upgrade"
+  if kubectl_do "${1}" create configmap --dry-run=client --output=yaml \
+    --namespace kube-system welkin-apps-upgrade \
+    --from-literal "version=${CK8S_TARGET_VERSION}" \
+    --from-literal "timestamp=${apps_config_timestamp}" |
+    yq '.metadata.labels["app.kubernetes.io/managed-by"] = "welkin-apps-upgrade"' - |
+    kubectl_do "${1}" create --filename -; then
+
+    ts="${apps_config_timestamp}" \
+      yq_add common '.global.ck8sConfigSerial' 'strenv(ts)'
+    log_info "Cluster ${1} locked for upgrade"
+    return 0
+  else
+    log_warn "prepare already started in ${1} ('ck8s upgrade ${1} unlock' to try again)"
+  fi
+}
+
+# Usage: ensure_upgrade_prepared sc|wc
+# Ensures that the timestamp and version recorded in the config matches that recorded in the cluster.
+ensure_upgrade_prepared() {
+  local apps_upgrade
+  local apps_version
+  local apps_cluster_timestamp
+  local apps_config_timestamp
+
+  if apps_upgrade="$(kubectl_do "${1}" get --namespace kube-system configmap welkin-apps-upgrade --output=yaml 2>/dev/null)"; then
+    apps_version="$(yq '.data.version' <<<"${apps_upgrade}")"
+  else
+    log_fatal "Upgrade has not been prepared, run 'ck8s upgrade prepare' first"
+  fi
+
+  if [[ "${apps_version}" != "${CK8S_TARGET_VERSION}" ]] >/dev/null; then
+    log_fatal "Version mismatch, upgrading to ${CK8S_TARGET_VERSION} but cluster ${1} was prepared for ${apps_version}"
+  fi
+
+  apps_config_timestamp="$(yq '.data.timestamp' <<<"${apps_upgrade}")"
+  apps_cluster_timestamp="$(yq_dig common '.global.ck8sConfigSerial')"
+  if [[ "${apps_config_timestamp}" != "${apps_cluster_timestamp}" ]]; then
+    log_fatal "Config timestamp mismatch, ${apps_cluster_timestamp} in ${1} but ${apps_config_timestamp} in config"
+  fi
+}
+
+# Usage: record_upgrade_apply_step sc|wc step-description
+# Records the last migration snippet that ran successfully, to allow where a failed migration stopped
+record_upgrade_apply_step() {
+  local apps_upgrade
+  apps_upgrade="$(kubectl_do "${1}" get --namespace kube-system configmap welkin-apps-upgrade --output=yaml)"
+  if ! yq --exit-status 'select(.data.version == strenv(CK8S_TARGET_VERSION))' <<<"${apps_upgrade}" >/dev/null; then
+    log_fatal "version mismatch, upgrading to ${CK8S_TARGET_VERSION} but cluster ${1} was prepared for $(
+      yq '.data.version' <<<"${apps_upgrade}"
+    )"
+  fi
+  apps_upgrade="$(last_step="${2##*/}" yq --exit-status '.data.last_apply_step = strenv(last_step)' <<<"${apps_upgrade}")"
+  log_info "Recording upgrade checkpoint"
+  if ! kubectl_do "${1}" replace --filename - <<<"${apps_upgrade}" >/dev/null; then
+    log_fatal "could not record completed upgrade step in ${1}"
+  fi
+}
+
+# Usage: record_upgrade_done sc|wc
+# Records that the upgrade has been completed and records the version upgraded to.
+record_upgrade_done() {
+  # Record the upgraded-to version. Create if it does not already exist.
+  log_info "Recording new apps version in cluster"
+  if ! kubectl_do "${1}" patch --namespace kube-system configmap welkin-apps-meta --type=merge --patch "$(yq --null-input --output-format json '.data.version = strenv(CK8S_TARGET_VERSION)')"; then
+    if ! kubectl_do "${1}" create configmap --namespace kube-system welkin-apps-meta --from-literal "version=${CK8S_TARGET_VERSION}"; then
+      log_fatal "could not record new apps version in ${1}"
+    fi
+  fi
+  # Complete the upgrade.
+  kubectl_do "${1}" delete configmap --namespace kube-system welkin-apps-upgrade >/dev/null
 }
 
 # shellcheck source=scripts/migration/helm.sh

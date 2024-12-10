@@ -106,6 +106,9 @@ env.init() {
     yq.set 'sc' '.alerts.opsGenieHeartbeat.name' '"example-heartbeat-name"'
   fi
 
+  yq.set 'secrets' '["alerts"]["opsGenie"]["apiKey"]' '"ZXhhbXBsZS1hcGlrZXkx"'
+  yq.set 'secrets' '["alerts"]["slack"]["apiUrl"]' '"https://slack.example/channel/ZXhhbXBsZS1jaGFubmVs"'
+
   yq.set 'wc' '.opa.imageRegistry.URL' '["harbor.ck8s.example.com"]'
 
   yq.set 'wc' '.user.adminUsers' '["user@example.com"]'
