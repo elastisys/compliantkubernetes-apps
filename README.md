@@ -114,6 +114,21 @@ There are two options when managing DNS records, manually or ExternalDNS.
 
 Assuming you already have everything needed to install the apps, this is what you need to do.
 
+> [!NOTE]
+> Depending on your infrastructure, you might utilize a Service of type LoadBalancer for the ingress controller. This means you will not have an IP for the domains before installing the ingress controller. After configuring and validating the config, you can install just the ingress controller before the rest of apps with the following command
+>
+> ```bash
+> ./bin/ck8s ops helmfile sc apply -lapp=ingress-nginx --include-transitive-needs
+> ./bin/ck8s ops helmfile wc apply -lapp=ingress-nginx --include-transitive-needs
+> ```
+>
+> The IP is then available on the ingress controller Service
+>
+> ```bash
+> ./bin/ck8s ops kubectl sc -n ingress-nginx get svc ingress-nginx-controller
+> ./bin/ck8s ops kubectl wc -n ingress-nginx get svc ingress-nginx-controller
+> ```
+
 The other option is to let ExternalDNS manage your DNS records, currently only AWS Route 53 is supported.
 You configure ExternalDNS later in the process.
 
@@ -132,10 +147,10 @@ You configure ExternalDNS later in the process.
     export CK8S_K8S_INSTALLER=[kubespray|capi] # set this to whichever installer was used for the kubernetes layer
     ```
 
-    > [!NOTE]
-    > The `air-gapped` flavor has a lot of the same settings as the `prod` flavor but with some additional variables that you need to configure yourself (these are set to `set-me`).
+> [!NOTE]
+> The `air-gapped` flavor has a lot of the same settings as the `prod` flavor but with some additional variables that you need to configure yourself (these are set to `set-me`).
 
-1. Then set the path to where the ck8s configuration should be stored and the PGP fingerprint of the key(s) to use for encryption:
+2. Then set the path to where the ck8s configuration should be stored and the PGP fingerprint of the key(s) to use for encryption:
 
     ```bash
     export CK8S_CONFIG_PATH=${HOME}/.ck8s/my-ck8s-cluster
@@ -154,22 +169,27 @@ You configure ExternalDNS later in the process.
     ./bin/ck8s init both
     ```
 
-    > [!NOTE]
-    > It is possible to initialize `wc` and `sc` clusters separately by replacing `both` when running the `init` command:
-    >
-    > ```bash
-    > ./bin/ck8s init wc
-    > ./bin/ck8s init sc
-    > ```
+> [!NOTE]
+> It is possible to initialize `wc` and `sc` clusters separately by replacing `both` when running the `init` command:
+>
+> ```bash
+> ./bin/ck8s init wc
+> ./bin/ck8s init sc
+> ```
 
-1. Edit the configuration files that have been initialized in the configuration path.
+4. Edit the configuration files that have been initialized in the configuration path.
     Make sure that the `objectStorage` values are set in `common-config.yaml` or `sc-config.yaml` and `wc-config.yaml`, as well as required credentials in `secrets.yaml` according to your `objectStorage.type`.
     The type may already be set in the default configuration found in the `defaults/` directory depending on your selected cloud provider.
     Set `objectStorage.s3.*` if you are using S3 or `objectStorage.gcs.*` if you are using GCS.
     Enable ExternalDNS `externalDns.enabled` and set the required variables, if you want ExternalDNS to manage your records from inside your cluster.
     It requires credentials to route53, `txtOwnerId`, `endpoints` if `externalDns.sources.crd` is enabled.
 
-1. Create S3 buckets - optional
+> [!NOTE]
+> One important configuration is whether or not you need to use proxy protocol for the ingress controller which depends on what infrastructure you use. You enable it and need to set an annotation depending on your infrastructure. Example for openstack
+> `ingressNginx.controller.config.useProxyProtocol: true`
+> `ingressNginx.controller.service.annotations: { loadbalancer.openstack.org/proxy-protocol: "true" }`
+
+5. Create S3 buckets - optional
     If you have set `objectStorage.type: s3`, then you need to create the buckets specified under `objectStorage.buckets` in your configuration files.
     You can run the script `scripts/S3/entry.sh create` to create the buckets required.
     The script uses `s3cmd` in the background and it uses the `${HOME}/.s3cfg` file for configuration and authentication for your S3 provider.
@@ -203,6 +223,35 @@ You configure ExternalDNS later in the process.
           [ ${?} = 0 ] && echo "Bucket ${bucket} exists!"
       done
     )
+    ```
+
+1. Update Network Policies
+
+    ```bash
+    ./bin/ck8s update-ips both dry-run
+    ./bin/ck8s update-ips both apply
+    ```
+
+1. Validate config and fill in missing values
+    This should indicate any missing configuration that still needs to be set.
+
+    ```bash
+    ./bin/ck8s validate sc
+    ./bin/ck8s validate wc
+    ```
+
+1. **Optional step**, install ingress controller and setup DNS as explained above.
+
+    ```bash
+    ./bin/ck8s ops helmfile sc apply -lapp=ingress-nginx --include-transitive-needs
+    ./bin/ck8s ops helmfile wc apply -lapp=ingress-nginx --include-transitive-needs
+    ```
+
+    After configuring the DNS, update the Network Policies again.
+
+    ```bash
+    ./bin/ck8s update-ips both dry-run
+    ./bin/ck8s update-ips both apply
     ```
 
 1. **Note**, for this step each cluster need to be up and running already.
