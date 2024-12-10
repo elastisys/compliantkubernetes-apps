@@ -35,8 +35,10 @@ usage() {
   echo "  update-ips <wc|sc|both> <apply|dry-run>         Automatically fetches and applies the IPs for network policies" 1>&2
   echo "  upgrade <wc|sc|both> <vX.Y> apply               runs all apply steps upgrading the environment" 1>&2
   echo "  upgrade <wc|sc|both> <vX.Y> prepare             runs all prepare steps upgrading the configuration" 1>&2
+  echo "  upgrade <wc|sc|both> unlock                     reset an upgrade to allow trying again" 1>&2
   echo "  validate <wc|sc>                                validates config files" 1>&2
   echo "  check-requirements                              check the locally installed tool versions" 1>&2
+  echo "  version <all|both|config|sc|wc>                 shows apps version" 1>&2
   exit 1
 }
 
@@ -83,11 +85,13 @@ dry-run)
   ;;
 upgrade)
   [[ "${2}" =~ ^(wc|sc|both)$ ]] || usage
-  [[ "${3}" =~ ^(v[0-9]+\.[0-9]+)$ ]] || usage
-  [[ "${4}" =~ ^(prepare|apply)$ ]] || usage
+  [[ "${3}" =~ ^(v[0-9]+\.[0-9]+|unlock)$ ]] || usage
+  if [[ "${3}" != "unlock" ]]; then
+    [[ "${4}" =~ ^(prepare|apply)$ ]] || usage
+  fi
   check_tools
   export CK8S_CLUSTER="${2}"
-  "${here}/upgrade.bash" "${3}" "${4}"
+  "${here}/upgrade.bash" "${3}" "${4:-}"
   ;;
 team)
   case "${2}" in
@@ -158,6 +162,19 @@ diagnostics)
   [[ "${2}" =~ ^(wc|sc)$ ]] || usage
   shift
   "${here}/diagnostics.bash" "${@}"
+  ;;
+version) # all|both|sc|wc
+  shift
+  [[ "${1}" =~ ^(all|both|config|wc|sc)$ ]] || usage
+  if [[ "${1}" =~ ^(all|config)$ ]]; then
+    log_info "config version:" "$(yq '.global.ck8sVersion' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")"
+  fi
+  if [[ "${1}" =~ ^(all|both|sc)$ ]]; then
+    log_info "sc version:" "$(get_apps_version "sc")"
+  fi
+  if [[ "${1}" =~ ^(all|both|wc)$ ]]; then
+    log_info "wc version:" "$(get_apps_version "wc")"
+  fi
   ;;
 *) usage ;;
 esac
