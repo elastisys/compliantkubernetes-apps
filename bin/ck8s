@@ -36,6 +36,7 @@ usage() {
   echo "  upgrade <wc|sc|both> <vX.Y> apply               runs all apply steps upgrading the environment" 1>&2
   echo "  upgrade <wc|sc|both> <vX.Y> prepare             runs all prepare steps upgrading the configuration" 1>&2
   echo "  validate <wc|sc>                                validates config files" 1>&2
+  echo "  version <wc|sc>                                 shows apps version" 1>&2
   exit 1
 }
 
@@ -152,6 +153,18 @@ diagnostics)
   [[ "${2}" =~ ^(wc|sc)$ ]] || usage
   shift
   "${here}/diagnostics.bash" "${@}"
+  ;;
+version)
+  shift
+  case "${1:-both}" in
+  both)
+    log_info "sc version:" "$(get_version "sc")"
+    log_info "wc version:" "$(get_version "wc")"
+    ;;
+  sc | wc)
+    log_info "${1} version:" "$(get_version "${1}")"
+    ;;
+  esac
   ;;
 *) usage ;;
 esac
