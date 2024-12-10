@@ -8,7 +8,7 @@ metadata:
   namespace: {{ $namespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: Role
+  kind: {{ $roleBinding.roleRef.kind | default "Role" }}
   name: {{ $roleBinding.roleRef.name }}
 subjects: {{- toYaml $roleBinding.subjects | nindent 2 }}
 {{- end }}
