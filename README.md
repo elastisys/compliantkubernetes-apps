@@ -228,6 +228,7 @@ You configure ExternalDNS later in the process.
 1. Update Network Policies
 
     ```bash
+    ./bin/ck8s update-ips both dry-run
     ./bin/ck8s update-ips both apply
     ```
 
@@ -249,6 +250,7 @@ You configure ExternalDNS later in the process.
     After configuring the DNS, update the Network Policies again.
 
     ```bash
+    ./bin/ck8s update-ips both dry-run
     ./bin/ck8s update-ips both apply
     ```
 
