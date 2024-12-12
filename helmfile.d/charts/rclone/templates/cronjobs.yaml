@@ -36,25 +36,21 @@ spec:
             - name: {{ $.Chart.Name }}
               image: {{ $.Values.image.repository }}:{{ $.Values.image.tag | default $.Chart.AppVersion }}
               args:
-                {{- if (empty .customArgs) }}
                 - sync
                 {{- if get . "sourceCrypt" | default false }}
-                - "decrypt-{{ .sourceName }}:"
+                - "decrypt-{{ .sourceName }}:{{ .sourcePath }}"
                 {{- else }}
-                - "source-{{ .sourceType }}:{{ .sourceName }}"
+                - "source-{{ .sourceType }}:{{ .sourceName }}{{ .sourcePath }}"
                 {{- end }}
                 {{- if get . "destinationCrypt" | default false }}
-                - "encrypt-{{ .destinationName }}:"
+                - "encrypt-{{ .destinationName }}:{{ .destinationPath }}"
                 {{- else }}
-                - "destination-{{ .destinationType }}:{{ .destinationName }}"
+                - "destination-{{ .destinationType }}:{{ .destinationName }}{{ .destinationPath }}"
                 {{- end }}
                 - --log-level
                 - INFO
                 {{- if $.Values.dryrun }}
                 - --dry-run
-                {{- end }}
-                {{- else }}
-                {{- toYaml .customArgs | nindent 16 }}
                 {{- end }}
               resources: {{ toYaml $.Values.resources | nindent 16 }}
               securityContext:

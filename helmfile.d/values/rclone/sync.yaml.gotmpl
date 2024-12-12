@@ -35,10 +35,11 @@ targets:
 
     {{- $destinations = append $destinations $destinationType }}
     destinationType: {{ $destinationType }}
+    destinationPath: ""
     sourceName: {{ $value }}
     {{- $sources = append $sources $sourceType }}
     sourceType: {{ $sourceType }}
-    customArgs: []
+    sourcePath: ""
     nameSuffix: default
   {{- end }}
   {{- end }}
@@ -48,17 +49,13 @@ targets:
     destinationCrypt: {{ $crypt | get "enabled" false }}
     {{- $destinations = get "destinationType" $sync.destinationType . | append $destinations }}
     destinationType: {{ get "destinationType" $sync.destinationType . }}
+    destinationPath: {{ get "destinationPath" "" . }}
     sourceName: {{ .source }}
     {{- $sources = get "sourceType" $main.type . | append $sources }}
     sourceType: {{ get "sourceType" $main.type . }}
+    sourcePath: {{ get "sourcePath" "" . }}
     {{- with get "schedule" "" . }}
     schedule: {{ . }}
-    {{- end }}
-    {{- if empty (get "customArgs" "" .) }}
-    customArgs: []
-    {{- else }}
-    customArgs:
-    {{- toYaml .customArgs | nindent 6 }}
     {{- end }}
     nameSuffix: {{ get "nameSuffix" "custom" . }}
   {{- end }}

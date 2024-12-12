@@ -2318,6 +2318,7 @@ properties:
             type: boolean
             default: false
           syncDefaultBuckets:
+            # TODO: if azure and this enabled, warn
             title: Rclone Sync Default Buckets
             description: Sync the buckets or containers set under `.objectStorage.buckets`.
             type: boolean
@@ -2339,6 +2340,8 @@ properties:
               description: |-
                 List of buckets to sync when `syncDefaultBuckets` is false
               type: object
+              examples: []
+                #TODO add examples for harbor in azure here
               required:
                 - source
               properties:
@@ -2362,6 +2365,13 @@ properties:
                     - s3
                     - swift
                     - azure
+                sourcePath:
+                  type: string
+                  title: Path to sync from
+                  description: |-
+                    Rclone will sync all files from this path.
+                    Defaults to "" (root of bucket).
+                  default: ""
                 destinationType:
                   type: string
                   title: Type of destination
@@ -2369,12 +2379,13 @@ properties:
                     - s3
                     - swift
                     - azure
-                customArgs:
-                  type: array
-                  title: Set custom arguments to rclone cronjob
+                destinationPath:
+                  type: string
+                  title: Path to sync to
                   description: |-
-                    Can be used to replace the regular sync command.
-                    If used you must specify all arguments (excluding "rclone")
+                    Rclone will sync files to this patch.
+                    Defaults to "" (root of bucket).
+                  default: ""
                 nameSuffix:
                   type: string
                   title: Suffix to cronjob name
