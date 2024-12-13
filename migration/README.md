@@ -1,5 +1,10 @@
 # Migration steps
 
+This directory contains the migration steps for each major and minor version, including the documentation with instructions and the snippets for automation of the upgrade process.
+
+> [!note]
+> Only the five latest major and minor releases are kept, if you want to see the migration guides for older versions then you need to check out that version of the repository.
+
 ## Migration template and script
 
 > [!NOTE]
