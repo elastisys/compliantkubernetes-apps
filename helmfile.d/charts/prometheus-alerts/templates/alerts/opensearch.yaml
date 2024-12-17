@@ -68,7 +68,7 @@ spec:
         description: Opensearch Cluster is in a Red status VALUE = {{`{{ $value }}`}}  LABELS = {{`{{ $labels }}`}}
     {{- range $prefixes := .Values.osIndexAlerts }}
     - alert: OpenSearch{{ $prefixes.prefix | trimSuffix "-" | title }}IndexSizeOverLimit
-      expr: (elasticsearch_indices_store_size_bytes_primary{namespace="opensearch-system", index=~"{{ $prefixes.prefix }}.+"} / (1024 ^ 2) > {{ $prefixes.alertSizeMB }}) * clamp(rate(elasticsearch_indices_docs_total{namespace="opensearch-system", index=~"{{ $prefixes.prefix }}.+"}[1h]) > 0, 1, 1)
+      expr: (elasticsearch_indices_store_size_bytes_primary{namespace="opensearch-system", index=~"{{ $prefixes.prefix }}.+"} / (1024 ^ 2) > {{ $prefixes.alertSizeMB }}) * clamp(rate(elasticsearch_indices_docs_primary{namespace="opensearch-system", index=~"{{ $prefixes.prefix }}.+"}[1h]) > 0, 1, 1)
       for: 15m
       labels:
         severity: warning
