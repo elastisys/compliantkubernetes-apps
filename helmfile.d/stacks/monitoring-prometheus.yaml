@@ -91,6 +91,7 @@ templates:
   kube-state-metrics-extra-resources:
     inherit: [ template: prometheus ]
     installed: {{ .Values | get "clusterApi.enabled" "false" }}
+    condition: ck8sManagementCluster.enabled
     chart: charts/kube-state-metrics-extra-resource-metrics
     version: 0.1.0
     name: kube-state-metrics-extra-resource-metrics
