@@ -20,53 +20,53 @@
 # helmfile.d/charts/
 #
 
-/helmfile.d/charts/autoscaling-monitoring/ @elastisys/goto-kubernetes
-/helmfile.d/charts/calico-accountant/ @elastisys/goto-kubernetes
-/helmfile.d/charts/calico-default-deny/ @elastisys/goto-kubernetes
-/helmfile.d/charts/calico-felix-metrics/ @elastisys/goto-kubernetes
-/helmfile.d/charts/cluster-admin-rbac/ @elastisys/goto-security
+/helmfile.d/charts/autoscaling-monitoring/ @elastisys/goto-cluster-api
+/helmfile.d/charts/calico-accountant/ @elastisys/goto-networking
+/helmfile.d/charts/calico-default-deny/ @elastisys/goto-networking
+/helmfile.d/charts/calico-felix-metrics/ @elastisys/goto-networking
+/helmfile.d/charts/cluster-admin-rbac/ @elastisys/goto-access-control
 /helmfile.d/charts/external-dns-endpoints/ @elastisys/goto-ingress-auth
 /helmfile.d/charts/external-dns-secrets/ @elastisys/goto-ingress-auth
 /helmfile.d/charts/file-copier/ @elastisys/goto-ingress-auth
-/helmfile.d/charts/gatekeeper/ @elastisys/goto-security
+/helmfile.d/charts/gatekeeper/ @elastisys/goto-access-control
 # TODO Refine per dashboard later
 /helmfile.d/charts/grafana-dashboards/ @elastisys/goto-monitoring-stack
 /helmfile.d/charts/grafana-label-enforcer/ @elastisys/goto-monitoring-stack
 /helmfile.d/charts/harbor/ @elastisys/goto-container-registry
-/helmfile.d/charts/hnc/ @elastisys/goto-security
+/helmfile.d/charts/hnc/ @elastisys/goto-access-control
 /helmfile.d/charts/ingress-nginx-probe-ingress/ @elastisys/goto-ingress-auth
 /helmfile.d/charts/issuers/ @elastisys/goto-ingress-auth
 /helmfile.d/charts/kube-state-metrics-extra-resource-metrics/ @elastisys/goto-monitoring-stack
 /helmfile.d/charts/kubeapi-metrics @elastisys/goto-monitoring-stack
 /helmfile.d/charts/kured-secret/ @elastisys/goto-security
 /helmfile.d/charts/log-manager/ @elastisys/goto-logging-stack
-/helmfile.d/charts/namespaces/ @elastisys/goto-kubernetes
-/helmfile.d/charts/networkpolicy/ @elastisys/goto-security
-/helmfile.d/charts/node-local-dns/ @elastisys/goto-kubernetes
+/helmfile.d/charts/networkpolicy/ @elastisys/goto-networking
+/helmfile.d/charts/node-local-dns/ @elastisys/goto-networking
 /helmfile.d/charts/opensearch/ @elastisys/goto-logging-stack
-/helmfile.d/charts/openstack-monitoring/ @elastisys/goto-kubernetes
+/helmfile.d/charts/openstack-monitoring/ @elastisys/goto-kubespray
 /helmfile.d/charts/prometheus-alerts/ @elastisys/goto-monitoring-stack
 /helmfile.d/charts/prometheus-servicemonitor/ @elastisys/goto-monitoring-stack
-/helmfile.d/charts/rclone/ @elastisys/goto-security
+/helmfile.d/charts/rclone/ @elastisys/goto-backups
 /helmfile.d/charts/s3-exporter/ @elastisys/goto-monitoring-stack
-/helmfile.d/charts/tekton-pipelines/ @elastisys/goto-continuous-delivery
+/helmfile.d/charts/tekton-pipelines/ @elastisys/goto-tekton
 /helmfile.d/charts/thanos/ @elastisys/goto-monitoring-stack
 /helmfile.d/charts/user-alertmanager/ @elastisys/goto-monitoring-stack
-/helmfile.d/charts/user-crds/ @elastisys/goto-security
-/helmfile.d/charts/user-rbac/ @elastisys/goto-security
+/helmfile.d/charts/user-crds/ @elastisys/goto-access-control
+/helmfile.d/charts/user-rbac/ @elastisys/goto-access-control
 /helmfile.d/charts/README.md @elastisys/goto-scripts
 
 #
 # Skipped files in helmfile.d/charts/
 # .gitignore
 # public.gpg
+# namespaces/
 #
 
 #
 # helmfile.d/hooks/
 #
 
-/helmfile.d/hooks/dev-rbac/ @elastisys/goto-security
+/helmfile.d/hooks/dev-rbac/ @elastisys/goto-access-control
 /helmfile.d/hooks/fluentd/ @elastisys/goto-logging-stack
 /helmfile.d/hooks/create-from-manifest.sh @elastisys/goto-scripts
 
@@ -74,14 +74,14 @@
 # helmfile.d/stacks/
 #
 
-/helmfile.d/stacks/calico.yaml @elastisys/goto-kubernetes
+/helmfile.d/stacks/calico.yaml @elastisys/goto-networking
 /helmfile.d/stacks/cert-manager.yaml @elastisys/goto-ingress-auth
 /helmfile.d/stacks/dex.yaml @elastisys/goto-ingress-auth
 /helmfile.d/stacks/external-dns.yaml @elastisys/goto-ingress-auth
 /helmfile.d/stacks/falco.yaml @elastisys/goto-security
 /helmfile.d/stacks/fluentd.yaml @elastisys/goto-logging-stack
-/helmfile.d/stacks/gatekeeper.yaml @elastisys/goto-security
-/helmfile.d/stacks/hnc.yaml @elastisys/goto-security
+/helmfile.d/stacks/gatekeeper.yaml @elastisys/goto-access-control
+/helmfile.d/stacks/hnc.yaml @elastisys/goto-access-control
 /helmfile.d/stacks/harbor.yaml @elastisys/goto-container-registry
 /helmfile.d/stacks/ingress-nginx.yaml @elastisys/goto-ingress-auth
 /helmfile.d/stacks/kured.yaml @elastisys/goto-security
@@ -89,14 +89,18 @@
 /helmfile.d/stacks/monitoring-grafana.yaml @elastisys/goto-monitoring-stack
 /helmfile.d/stacks/monitoring-prometheus.yaml @elastisys/goto-monitoring-stack
 /helmfile.d/stacks/monitoring.yaml @elastisys/goto-monitoring-stack
-/helmfile.d/stacks/namespaces.yaml @elastisys/goto-kubernetes
 /helmfile.d/stacks/opensearch.yaml @elastisys/goto-logging-stack
-/helmfile.d/stacks/rbac.yaml @elastisys/goto-security
-/helmfile.d/stacks/rclone.yaml @elastisys/goto-security
-/helmfile.d/stacks/system.yaml @elastisys/goto-security
-/helmfile.d/stacks/tekton.yaml @elastisys/goto-continuous-delivery
+/helmfile.d/stacks/rbac.yaml @elastisys/goto-access-control
+/helmfile.d/stacks/rclone.yaml @elastisys/goto-backups
+/helmfile.d/stacks/system.yaml @elastisys/goto-access-control @elastisys/goto-networking
+/helmfile.d/stacks/tekton.yaml @elastisys/goto-tekton
 /helmfile.d/stacks/thanos.yaml @elastisys/goto-monitoring-stack
-/helmfile.d/stacks/velero.yaml @elastisys/goto-security
+/helmfile.d/stacks/velero.yaml @elastisys/goto-backups
+
+#
+# Skipped files in helmfile.d/stacks/
+# namespaces.yaml
+#
 
 #
 # helmfile.d/upstream/
@@ -116,13 +120,13 @@
 /helmfile.d/upstream/kubernetes-ingress-nginx/ @elastisys/goto-ingress-auth
 /helmfile.d/upstream/kubernetes-metrics-server/ @elastisys/goto-monitoring-stack
 /helmfile.d/upstream/minio/ @elastisys/goto-pipeline-qa-release
-/helmfile.d/upstream/open-policy-agent-gatekeeper/ @elastisys/goto-security
+/helmfile.d/upstream/open-policy-agent-gatekeeper/ @elastisys/goto-access-control
 /helmfile.d/upstream/opensearch-project/ @elastisys/goto-logging-stack
-/helmfile.d/upstream/projectcalico/ @elastisys/goto-kubernetes
+/helmfile.d/upstream/projectcalico/ @elastisys/goto-networking
 /helmfile.d/upstream/prometheus-community/kube-prometheus-stack/ @elastisys/goto-monitoring-stack
 /helmfile.d/upstream/prometheus-community/prometheus-blackbox-exporter/ @elastisys/goto-monitoring-stack
 /helmfile.d/upstream/prometheus-community/prometheus-elasticsearch-exporter/ @elastisys/goto-logging-stack
-/helmfile.d/upstream/vmware-tanzu/velero/ @elastisys/goto-security
+/helmfile.d/upstream/vmware-tanzu/velero/ @elastisys/goto-backups
 /helmfile.d/upstream/README.md @elastisys/goto-scripts
 
 #
@@ -137,25 +141,23 @@
 /helmfile.d/values/external-dns/ @elastisys/goto-ingress-auth
 /helmfile.d/values/falco/ @elastisys/goto-security
 /helmfile.d/values/fluentd/ @elastisys/goto-logging-stack
-/helmfile.d/values/gatekeeper/ @elastisys/goto-security
+/helmfile.d/values/gatekeeper/ @elastisys/goto-access-control
 /helmfile.d/values/grafana/ @elastisys/goto-monitoring-stack
 /helmfile.d/values/harbor/ @elastisys/goto-container-registry
-/helmfile.d/values/hnc/ @elastisys/goto-security
-/helmfile.d/values/networkpolicies/ @elastisys/goto-security
-/helmfile.d/values/networkpolicy/ @elastisys/goto-security
+/helmfile.d/values/hnc/ @elastisys/goto-access-control
+/helmfile.d/values/networkpolicies/ @elastisys/goto-networking
+/helmfile.d/values/networkpolicy/ @elastisys/goto-networking
 /helmfile.d/values/opensearch/ @elastisys/goto-logging-stack
-/helmfile.d/values/podsecuritypolicies/ @elastisys/goto-security
-/helmfile.d/values/rclone/ @elastisys/goto-security
+/helmfile.d/values/podsecuritypolicies/ @elastisys/goto-access-control
+/helmfile.d/values/rclone/ @elastisys/goto-backups
 /helmfile.d/values/thanos/ @elastisys/goto-monitoring-stack
 /helmfile.d/values/trivy/ @elastisys/goto-security
-/helmfile.d/values/userCRDs/ @elastisys/goto-security
-/helmfile.d/values/admin-namespaces-sc.yaml.gotmpl @elastisys/goto-kubernetes
-/helmfile.d/values/admin-namespaces-wc.yaml.gotmpl @elastisys/goto-kubernetes
-/helmfile.d/values/autoscaling-monitoring.yaml.gotmpl @elastisys/goto-kubernetes
-/helmfile.d/values/calico-accountant.yaml.gotmpl @elastisys/goto-kubernetes
-/helmfile.d/values/calico-default-deny.yaml.gotmpl @elastisys/goto-kubernetes
+/helmfile.d/values/userCRDs/ @elastisys/goto-access-control
+/helmfile.d/values/autoscaling-monitoring.yaml.gotmpl @elastisys/goto-cluster-api
+/helmfile.d/values/calico-accountant.yaml.gotmpl @elastisys/goto-networking
+/helmfile.d/values/calico-default-deny.yaml.gotmpl @elastisys/goto-networking
 /helmfile.d/values/cert-manager.yaml.gotmpl @elastisys/goto-ingress-auth
-/helmfile.d/values/cluster-admin-rbac.yaml.gotmpl @elastisys/goto-security
+/helmfile.d/values/cluster-admin-rbac.yaml.gotmpl @elastisys/goto-access-control
 /helmfile.d/values/dev-namespaces.yaml.gotmpl @elastisys/goto-monitoring-stack
 /helmfile.d/values/dex.yaml.gotmpl @elastisys/goto-ingress-auth
 /helmfile.d/values/file-copier.yaml.gotmpl @elastisys/goto-ingress-auth
@@ -168,19 +170,25 @@
 /helmfile.d/values/letsencrypt.yaml.gotmpl @elastisys/goto-ingress-auth
 /helmfile.d/values/metrics-server.yaml.gotmpl @elastisys/goto-monitoring-stack
 /helmfile.d/values/minio.yaml.gotmpl @elastisys/goto-pipeline-qa-release
-/helmfile.d/values/node-local-dns.yaml.gotmpl @elastisys/goto-kubernetes
-/helmfile.d/values/openstack-monitoring.yaml.gotmpl @elastisys/goto-logging-stack
+/helmfile.d/values/node-local-dns.yaml.gotmpl @elastisys/goto-networking
+/helmfile.d/values/openstack-monitoring.yaml.gotmpl @elastisys/goto-kubespray
 /helmfile.d/values/prometheus-alerts-sc.yaml.gotmpl @elastisys/goto-monitoring-stack
 /helmfile.d/values/prometheus-blackbox-exporter-* @elastisys/goto-monitoring-stack
 /helmfile.d/values/prometheus-opensearch-exporter.yaml.gotmpl @elastisys/goto-logging-stack
 /helmfile.d/values/prometheus-user-alerts-wc.yaml.gotmpl @elastisys/goto-monitoring-stack
 /helmfile.d/values/s3-exporter.yaml.gotmpl @elastisys/goto-monitoring-stack
 /helmfile.d/values/sc-servicemonitor.yaml.gotmpl @elastisys/goto-monitoring-stack
-/helmfile.d/values/tekton.gotmpl @elastisys/goto-continuous-delivery
+/helmfile.d/values/tekton.gotmpl @elastisys/goto-tekton
 /helmfile.d/values/user-alertmanager.yaml.gotmpl @elastisys/goto-monitoring-stack
-/helmfile.d/values/user-rbac.yaml.gotmpl @elastisys/goto-security
-/helmfile.d/values/velero-* @elastisys/goto-security
+/helmfile.d/values/user-rbac.yaml.gotmpl @elastisys/goto-access-control
+/helmfile.d/values/velero-* @elastisys/goto-backups
 /helmfile.d/values/wc-servicemonitor.yaml.gotmpl @elastisys/goto-monitoring-stack
+
+#
+# Skipped files in helmfile.d/values/
+# admin-namespaces-sc.yaml.gotmpl
+# admin-namespaces-wc.yaml.gotmpl
+#
 
 #
 # /helmfile.d/
@@ -194,11 +202,11 @@
 #
 
 /images/backup-postgres/ @elastisys/goto-postgresql
-/images/calico-accountant/ @elastisys/goto-kubernetes
+/images/calico-accountant/ @elastisys/goto-networking
 /images/elasticsearch-curator/ @elastisys/goto-logging-stack
 /images/fluentd-elasticsearch/ @elastisys/goto-logging-stack
 /images/log-manager/ @elastisys/goto-logging-stack
-/images/rclone-sync/ @elastisys/goto-security
+/images/rclone-sync/ @elastisys/goto-backups
 
 #
 # Skipped files in images
@@ -212,7 +220,7 @@
 /release/ @elastisys/goto-pipeline-qa-release
 
 /restore/harbor/ @elastisys/goto-container-registry
-/restore/rclone/ @elastisys/goto-security
+/restore/rclone/ @elastisys/goto-backups
 
 /roles/ @elastisys/goto-scripts
 
