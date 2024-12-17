@@ -14,7 +14,7 @@ templates:
     needs:
       - monitoring/networkpolicy
       - monitoring/podsecuritypolicy
-      {{- if .Values | get "clusterApi.enabled" false }}
+      {{- if and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "clusterApi.enabled" false) }}
       - monitoring/kube-state-metrics-extra-resource-metrics
       {{- end }}
     values:
@@ -90,6 +90,7 @@ templates:
 
   kube-state-metrics-extra-resources:
     inherit: [ template: prometheus ]
+    condition: ck8sManagementCluster.enabled
     installed: {{ .Values | get "clusterApi.enabled" "false" }}
     chart: charts/kube-state-metrics-extra-resource-metrics
     version: 0.1.0

@@ -22,47 +22,6 @@ prometheusOperator:
 
 kube-state-metrics:
   resources: {{- toYaml .Values.kubeStateMetrics.resources | nindent 4 }}
-  {{- if .Values.clusterApi.enabled }}
-  rbac:
-    extraRules:
-      - apiGroups:
-          - apiextensions.k8s.io
-        resources:
-          - customresourcedefinitions
-        verbs:
-          - list
-          - watch
-      - apiGroups:
-          - cluster.x-k8s.io
-        resources:
-          - clusters
-          - machinedeployments
-          - machinesets
-          - machines
-          - machinehealthchecks
-          - machinepools
-        verbs:
-          - get
-          - list
-          - watch
-      - apiGroups:
-          - controlplane.cluster.x-k8s.io
-        resources:
-          - kubeadmcontrolplanes
-        verbs:
-          - get
-          - list
-          - watch
-  volumeMounts:
-    - mountPath: /etc/config
-      name: kube-state-metrics-clusterapi-volume
-  volumes:
-    - configMap:
-        name: kube-state-metrics-clusterapi
-      name: kube-state-metrics-clusterapi-volume
-  extraArgs:
-    - "--custom-resource-state-config-file=/etc/config/clusterapi-metrics.yaml"
-  {{- end }}
 
   metricLabelsAllowlist:
   - nodes=[topology.kubernetes.io/zone,elastisys.io/node-group,node.kubernetes.io/instance-type]
