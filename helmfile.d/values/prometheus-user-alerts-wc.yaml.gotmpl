@@ -32,9 +32,9 @@ capacityManagementAlertsDiskLimit: {{ .Values.prometheus.capacityManagementAlert
 capacityManagementAlertsPredictUsage: {{ .Values.prometheus.capacityManagementAlerts.predictUsage }}
 capacityManagementAlertsUsageLimit: {{ .Values.prometheus.capacityManagementAlerts.usagelimit }}
 capacityManagementAlertsRequestLimit:
-{{ toYaml .Values.prometheus.capacityManagementAlerts.requestlimit.cpu | indent 2 }}
+{{ toYaml .Values.prometheus.capacityManagementAlerts.requestLimit.cpu | indent 2 }}
 capacityManagementAlertsMemoryRequestLimit:
-{{ toYaml .Values.prometheus.capacityManagementAlerts.requestlimit.memory | nindent 2 }}
+{{ toYaml .Values.prometheus.capacityManagementAlerts.requestLimit.memory | nindent 2 }}
 capacityManagementAlertsRequestsExcludePattern: {{ .Values.prometheus.capacityManagementAlerts.nodeGroupRequestsExcludePattern }}
 capacityManagementAlertsNodeGroupCpuLimit24h: {{ .Values.prometheus.capacityManagementAlerts.nodeGroupCpuLimit24h }}
 capacityManagementAlertsNodeGroupMemoryLimit24h: {{ .Values.prometheus.capacityManagementAlerts.nodeGroupMemoryLimit24h }}

@@ -93,28 +93,28 @@ spec:
       for: 5m
       labels:
         severity: warning
-    - alert: NodeGroupCpuRequest80Percent
+    - alert: NodeGroupCpuRequest{{ .Values.capacityManagementAlertsCpuRequestLimit }}Percent
       annotations:
         message: Average CPU requests is over {{ .Values.capacityManagementAlertsCpuRequestLimit }}% in the Node Group {{`{{ $labels.label_elastisys_io_node_group }}`}} in Cluster {{`{{ $labels.cluster }}`}}.
       expr: avg by (label_elastisys_io_node_group,cluster) (sum by (node,cluster) (kube_pod_container_resource_requests{cluster=~".*",namespace=~".*",resource="cpu"} and on(pod, namespace, cluster) kube_pod_status_phase{cluster=~".*",namespace=~".*",phase="Running"} == 1) / (sum by(node,cluster) (kube_node_status_allocatable{cluster=~".*",resource="cpu"})) * on (node) group_left (label_elastisys_io_node_group) label_replace(kube_node_labels{label_elastisys_io_node_group!~'{{ .Values.capacityManagementAlertsRequestsExcludePattern }}'}, "instance", "$1", "node", "(.*)")) >= 20/100
       for: 5m
       labels:
         severity: warning
-    - alert: NodeGroupMemoryRequest80Percent
+    - alert: NodeGroupMemoryRequest{{ .Values.capacityManagementAlertsMemoryRequestLimit }}Percent
       annotations:
         message: Average memory requests is over {{ .Values.capacityManagementAlertsMemoryRequestLimit }}% in the Node Group {{`{{ $labels.label_elastisys_io_node_group }}`}} in Cluster {{`{{ $labels.cluster }}`}}.
       expr: avg by (label_elastisys_io_node_group,cluster) (sum by (node,cluster) (kube_pod_container_resource_requests{cluster=~".*",namespace=~".*",resource="memory"} and on(pod, namespace, cluster) kube_pod_status_phase{cluster=~".*",namespace=~".*",phase="Running"} == 1) / (sum by(node,cluster) (kube_node_status_allocatable{cluster=~".*",resource="memory"})) * on (node) group_left (label_elastisys_io_node_group) label_replace(kube_node_labels{label_elastisys_io_node_group!~'{{ .Values.capacityManagementAlertsRequestsExcludePattern }}'}, "instance", "$1", "node", "(.*)")) >= 20/100
       for: 5m
       labels:
         severity: warning
-    - alert: NodeCpuRequest80Percent
+    - alert: NodeCpuRequest{{ .Values.capacityManagementAlertsCpuRequestLimit }}Percent
       annotations:
         message: CPU requests is over {{ .Values.capacityManagementAlertsCpuRequestLimit }}% for the Node {{`{{ $labels.node }}`}} in Cluster {{`{{ $labels.cluster }}`}}.
       expr: sum by (node,cluster) (kube_pod_container_resource_requests{cluster=~".*",namespace=~".*",resource="cpu"} and on(pod, namespace, cluster) kube_pod_status_phase{cluster=~".*",namespace=~".*",phase="Running"} == 1) / (sum by(node,cluster) (kube_node_status_allocatable{cluster=~".*",resource="cpu"})) * on (node) group_left (label_elastisys_io_node_group) label_replace(kube_node_labels{label_elastisys_io_node_group!~'{{ .Values.capacityManagementAlertsRequestsExcludePattern }}'}, "instance", "$1", "node", "(.*)") >= {{ .Values.capacityManagementAlertsCpuRequestLimit }}/100
       for: 5m
       labels:
         severity: warning
-    - alert: NodeMemoryRequest80Percent
+    - alert: NodeMemoryRequest{{ .Values.capacityManagementAlertsMemoryRequestLimit }}Percent
       annotations:
         message: Memory requests is over {{ .Values.capacityManagementAlertsMemoryRequestLimit }}% for the Node {{`{{ $labels.node}}`}} in Cluster {{`{{ $labels.cluster }}`}}.
       expr: sum by (node,cluster) (kube_pod_container_resource_requests{cluster=~".*",namespace=~".*",resource="memory"} and on(pod, namespace, cluster) kube_pod_status_phase{cluster=~".*",namespace=~".*",phase="Running"} == 1) / (sum by(node,cluster) (kube_node_status_allocatable{cluster=~".*",resource="memory"})) * on (node) group_left (label_elastisys_io_node_group) label_replace(kube_node_labels{label_elastisys_io_node_group!~'{{ .Values.capacityManagementAlertsRequestsExcludePattern }}'}, "instance", "$1", "node", "(.*)") >= {{ .Values.capacityManagementAlertsMemoryRequestLimit }}/100
