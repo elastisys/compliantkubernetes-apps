@@ -4,6 +4,7 @@ repos:
     hooks:
       - id: check-executables-have-shebangs
       - id: check-merge-conflict
+        exclude: ^helmfile.d/upstream/opensearch-project/opensearch/CHANGELOG.md$
       - id: check-json
         exclude: ^helmfile\.d/upstream/
       - id: check-toml
@@ -21,36 +22,6 @@ repos:
       - id: no-commit-to-branch
       - id: trailing-whitespace
         exclude: ^helmfile\.d/upstream/|^tests/.*/.*\.out$
-
-  - repo: https://github.com/koalaman/shellcheck-precommit
-    rev: v0.10.0
-    hooks:
-      - id: shellcheck
-        name: check scripts
-        exclude: ^helmfile\.d/charts/opensearch/configurer/files/|^helmfile\.d/upstream/
-        require_serial: true
-        args:
-        - --color=always
-        - --external-sources
-
-  - repo: https://github.com/codespell-project/codespell
-    rev: v2.3.0
-    hooks:
-      - id: codespell
-        name: check spelling
-        exclude: ^helmfile\.d/charts/hnc/config-and-crds/crds/|^helmfile\.d/upstream/
-        args:
-          - -I
-          - .codespellignore
-
-  - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.14.0
-    hooks:
-      - id: markdownlint-cli2
-        name: lint markdown files
-        exclude: ^changelog/|^docs/sbom.md$|^helmfile\.d/charts/opensearch/configurer/files/|^helmfile\.d/upstream/|^images/elasticsearch-curator/
-        args:
-          - --fix
 
   - repo: local
     hooks:
@@ -71,3 +42,49 @@ repos:
         entry: tests/common/gen.bash
         args:
           - template
+
+      - id: shellcheck
+        name: check scripts
+        types: [shell]
+        exclude_types: [csh, tcsh, zsh]
+        exclude: ^helmfile\.d/charts/opensearch/configurer/files/|^helmfile\.d/upstream/|^images/elasticsearch-curator/
+        language: script
+        require_serial: true
+        entry: scripts/run-from-container.sh
+        args:
+          - --network=none
+          - docker.io/koalaman/shellcheck:v0.10.0@sha256:2097951f02e735b613f4a34de20c40f937a6c8f18ecb170612c88c34517221fb
+          - --color=always
+          - --external-sources
+
+      - id: shfmt
+        name: format scripts
+        types: [shell]
+        exclude_types: [csh, tcsh, zsh]
+        exclude: ^helmfile\.d/charts/opensearch/configurer/files/|^helmfile\.d/upstream/|^images/elasticsearch-curator/
+        language: script
+        require_serial: true
+        entry: scripts/run-from-container.sh
+        args:
+          - --network=none
+          - docker.io/mvdan/shfmt:v3.10.0@sha256:d19cc37644449fe9a488f234d2c0cf0b770eaf6a5a40e30103e8099013ef8f9e
+          - -w
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.3.0
+    hooks:
+      - id: codespell
+        name: check spelling
+        exclude: ^helmfile\.d/charts/hnc/config-and-crds/crds/|^helmfile\.d/upstream/
+        args:
+          - -I
+          - .codespellignore
+
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.14.0
+    hooks:
+      - id: markdownlint-cli2
+        name: lint markdown files
+        exclude: ^changelog/|^docs/sbom.md$|^helmfile\.d/charts/opensearch/configurer/files/|^helmfile\.d/upstream/|^images/elasticsearch-curator/
+        args:
+          - --fix

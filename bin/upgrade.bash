@@ -111,10 +111,10 @@ apply() {
 
       if "${snippet}" rollback; then
         log_warn "apply snippet rollback success"
-        exit $(( return + 2 )) # 3 on rollback failure/success 4 on rollback success/success
+        exit $((return + 2)) # 3 on rollback failure/success 4 on rollback success/success
       else
         log_error "apply snippet rollback failure"
-        exit $(( return )) # 1 on rollback failure/failure 2 on rollback success/failure
+        exit $((return)) # 1 on rollback failure/failure 2 on rollback success/failure
       fi
     fi
   done

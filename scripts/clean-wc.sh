@@ -9,7 +9,7 @@ echo -e "Your current \u1b[33mCK8S_CONFIG_PATH\033[m is set to: \u1b[33;4m${CK8S
 echo -n "Do you want to continue (y/N): "
 read -r reply
 if [[ ${reply} != "y" ]]; then
-    exit 1
+  exit 1
 fi
 
 here="$(dirname "$(readlink -f "$0")")"
@@ -22,16 +22,16 @@ config_load wc
 clusterAPIEnabled=$(yq4 '.clusterApi.enabled' "${config[config_file_wc]}")
 
 GATE_VALWEBHOOK=$(
-    "${here}/.././bin/ck8s" ops \
-        kubectl wc get \
-        validatingwebhookconfigurations \
-        -l gatekeeper.sh/system=yes \
-        -oname
-    )
+  "${here}/.././bin/ck8s" ops \
+    kubectl wc get \
+    validatingwebhookconfigurations \
+    -l gatekeeper.sh/system=yes \
+    -oname
+)
 
 if [ -n "${GATE_VALWEBHOOK}" ]; then
-    # Destroy gatekeeper validatingwebhook which could potentially prevent other resources from being deleted
-    "${here}/.././bin/ck8s" ops kubectl wc delete "${GATE_VALWEBHOOK}"
+  # Destroy gatekeeper validatingwebhook which could potentially prevent other resources from being deleted
+  "${here}/.././bin/ck8s" ops kubectl wc delete "${GATE_VALWEBHOOK}"
 fi
 
 # Destroy user subnamespaces before their parent namespaces,
@@ -56,14 +56,14 @@ fi
 
 # Clean up any leftover challenges
 mapfile -t CHALLENGES < <(
-    "${here}/.././bin/ck8s" ops kubectl wc get challenge -A -oyaml | \
-        yq4 '.items[] | .metadata.name + "," + .metadata.namespace'
-    )
+  "${here}/.././bin/ck8s" ops kubectl wc get challenge -A -oyaml |
+    yq4 '.items[] | .metadata.name + "," + .metadata.namespace'
+)
 for challenge in "${CHALLENGES[@]}"; do
-    IFS=, read -r name namespace <<< "${challenge}"
-    "${here}/.././bin/ck8s" ops \
-        kubectl wc patch challenge "${name}" -n "${namespace}" \
-        -p '{"metadata":{"finalizers":null}}' --type=merge
+  IFS=, read -r name namespace <<<"${challenge}"
+  "${here}/.././bin/ck8s" ops \
+    kubectl wc patch challenge "${name}" -n "${namespace}" \
+    -p '{"metadata":{"finalizers":null}}' --type=merge
 done
 
 if [ "${clusterAPIEnabled}" = "false" ]; then
@@ -93,32 +93,32 @@ fi
 # Delete kube prometheus stack CRDs
 mapfile -t PROM_CRDS < <("${here}/.././bin/ck8s" ops kubectl wc api-resources --api-group=monitoring.coreos.com -o name)
 if [[ "${#PROM_CRDS[@]}" -gt 0 ]]; then
-    "${here}/.././bin/ck8s" ops kubectl wc delete crds "${PROM_CRDS[@]}"
+  "${here}/.././bin/ck8s" ops kubectl wc delete crds "${PROM_CRDS[@]}"
 fi
 
 # Delete Trivy CRDs
 mapfile -t TRIVY_CRDS < <("${here}/.././bin/ck8s" ops kubectl wc api-resources --api-group=aquasecurity.github.io -o name)
 if [[ "${#TRIVY_CRDS[@]}" -gt 0 ]]; then
-    "${here}/.././bin/ck8s" ops kubectl wc delete crds "${TRIVY_CRDS[@]}"
+  "${here}/.././bin/ck8s" ops kubectl wc delete crds "${TRIVY_CRDS[@]}"
 fi
 
 # Delete Gatekeeper CRDs
 GATE_CRDS=$("${here}/.././bin/ck8s" ops kubectl wc get crds -l gatekeeper.sh/system=yes -oname)
 if [ -n "$GATE_CRDS" ]; then
-    # shellcheck disable=SC2086
-    "${here}/.././bin/ck8s" ops kubectl wc delete --ignore-not-found=true $GATE_CRDS
+  # shellcheck disable=SC2086
+  "${here}/.././bin/ck8s" ops kubectl wc delete --ignore-not-found=true $GATE_CRDS
 fi
 
 GATE_CONS=$("${here}/.././bin/ck8s" ops kubectl wc get crds -l gatekeeper.sh/constraint=yes -oname)
 if [ -n "$GATE_CONS" ]; then
-    # shellcheck disable=SC2086
-    "${here}/.././bin/ck8s" ops kubectl wc delete --ignore-not-found=true $GATE_CONS
+  # shellcheck disable=SC2086
+  "${here}/.././bin/ck8s" ops kubectl wc delete --ignore-not-found=true $GATE_CONS
 fi
 
 # Delete HNC CRDs
 mapfile -t HNC_CRDS < <("${here}/.././bin/ck8s" ops kubectl wc api-resources --api-group=hnc.x-k8s.io -o name)
 if [[ "${#HNC_CRDS[@]}" -gt 0 ]]; then
-    "${here}/.././bin/ck8s" ops kubectl wc delete crds "${HNC_CRDS[@]}"
+  "${here}/.././bin/ck8s" ops kubectl wc delete crds "${HNC_CRDS[@]}"
 fi
 
 "${here}/.././bin/ck8s" ops helmfile wc -l app=admin-rbac destroy

@@ -13,7 +13,7 @@ delete_test_namespace() {
 }
 
 create_test_application() {
-  image="${1}" envsubst < "${BATS_TEST_DIRNAME}/resources/test-application.yaml" | kubectl apply -f - --wait
+  image="${1}" envsubst <"${BATS_TEST_DIRNAME}/resources/test-application.yaml" | kubectl apply -f - --wait
 }
 
 wait_test_application() {

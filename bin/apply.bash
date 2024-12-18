@@ -61,11 +61,14 @@ declare environment
 
 case "${1:-}" in
 sc)
-  environment="service_cluster" ;;
+  environment="service_cluster"
+  ;;
 wc)
-  environment="workload_cluster" ;;
+  environment="workload_cluster"
+  ;;
 *)
-  usage "${1:-}" ;;
+  usage "${1:-}"
+  ;;
 esac
 
 update_ips_dryrun "$1" "${environment}"

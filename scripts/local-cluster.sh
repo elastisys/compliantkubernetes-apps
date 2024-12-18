@@ -100,11 +100,14 @@ index.state() {
 
   case "${state}" in
   "")
-    yq ".\"${cluster}\"" "${CK8S_CONFIG_PATH}/cluster-index.yaml" ;;
+    yq ".\"${cluster}\"" "${CK8S_CONFIG_PATH}/cluster-index.yaml"
+    ;;
   "delete")
-    yq -i "del(.\"${cluster}\")" "${CK8S_CONFIG_PATH}/cluster-index.yaml" ;;
+    yq -i "del(.\"${cluster}\")" "${CK8S_CONFIG_PATH}/cluster-index.yaml"
+    ;;
   *)
-    yq -i ".\"${cluster}\" = \"${state}\"" "${CK8S_CONFIG_PATH}/cluster-index.yaml" ;;
+    yq -i ".\"${cluster}\" = \"${state}\"" "${CK8S_CONFIG_PATH}/cluster-index.yaml"
+    ;;
   esac
 }
 
@@ -164,14 +167,14 @@ cache() {
   fi
 
   local -a registryfiles
-  readarray -t registryfiles <<< "$(find "${HERE}/local-clusters/registries/" -type f)"
+  readarray -t registryfiles <<<"$(find "${HERE}/local-clusters/registries/" -type f)"
 
   for registryfile in "${registryfiles[@]}"; do
     local downstream name upstream
 
     downstream="$(yq -oy '.host | keys | .[0]' "${registryfile}")"
 
-    name="$(sed -e 's#http://##' -e 's#:.*##' <<< "${downstream}")"
+    name="$(sed -e 's#http://##' -e 's#:.*##' <<<"${downstream}")"
 
     upstream="$(yq -oy '.host | keys | .[1]' "${registryfile}")"
 
@@ -354,13 +357,13 @@ create() {
 
   if [[ "$(index.state "${cluster}")" == "creating" ]]; then
     log.info "kind create cluster \"${cluster}\" using \"${config}\""
-    kind create cluster --name "${cluster}" --config /dev/stdin <<< "$(envsubst < "${config}")"
+    kind create cluster --name "${cluster}" --config /dev/stdin <<<"$(envsubst <"${config}")"
     index.state "${cluster}" "configuring"
   fi
 
   mkdir -p "${CK8S_CONFIG_PATH}/.state"
-  kind get kubeconfig --name "${cluster}" > "${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml"
-  kind get kubeconfig --name "${cluster}" > "${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml"
+  kind get kubeconfig --name "${cluster}" >"${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml"
+  kind get kubeconfig --name "${cluster}" >"${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml"
 
   chmod 600 "${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml"
   chmod 600 "${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml"
@@ -441,38 +444,49 @@ main() {
   case "${command}" in
   cache)
     case "${subcommand}" in
-    create|delete)
-      cache "${subcommand}" ;;
+    create | delete)
+      cache "${subcommand}"
+      ;;
     *)
-      log.usage ;;
+      log.usage
+      ;;
     esac
     ;;
   resolve)
     case "${subcommand}" in
-    create|delete)
-      resolve "${subcommand}" "${@:3}" ;;
+    create | delete)
+      resolve "${subcommand}" "${@:3}"
+      ;;
     *)
-      log.usage ;;
+      log.usage
+      ;;
     esac
     ;;
   config)
-    config "${@:2}" ;;
+    config "${@:2}"
+    ;;
   create)
-    create "${@:2}" ;;
+    create "${@:2}"
+    ;;
   delete)
-    delete "${@:2}" ;;
+    delete "${@:2}"
+    ;;
   list)
     case "${subcommand}" in
-      clusters|cluster)
-        list.clusters ;;
-      profiles|profile)
-        list.profiles ;;
-      *)
-        log.usage ;;
+    clusters | cluster)
+      list.clusters
+      ;;
+    profiles | profile)
+      list.profiles
+      ;;
+    *)
+      log.usage
+      ;;
     esac
     ;;
   *)
-    log.usage ;;
+    log.usage
+    ;;
   esac
 }
 

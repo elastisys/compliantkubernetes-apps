@@ -27,14 +27,13 @@ testEndpoint OpenSearch "https://${opensearch_subdomain}.${ops_domain}/"
 testEndpoint OpenSearchDashboards "https://${opensearch_dashboards_subdomain}.${base_domain}/"
 
 if [ "$enable_harbor" == true ]; then
-    testEndpoint Harbor "https://${harbor_subdomain}.${base_domain}/"
+  testEndpoint Harbor "https://${harbor_subdomain}.${base_domain}/"
 fi
 
 testEndpoint Grafana "https://${grafana_ops_subdomain}.${ops_domain}/"
 
-if [ "$enable_user_grafana" == "true" ]
-then
-    testEndpoint Grafana-user "https://${grafana_subdomain}.${base_domain}/"
+if [ "$enable_user_grafana" == "true" ]; then
+  testEndpoint Grafana-user "https://${grafana_subdomain}.${base_domain}/"
 fi
 
 echo
@@ -43,13 +42,11 @@ echo "Testing endpoints protection"
 echo "============================="
 
 if [ "$enable_harbor" == true ]; then
-    testEndpointProtected Harbor "https://${harbor_subdomain}.${base_domain}/api/v2.0/users" 401
+  testEndpointProtected Harbor "https://${harbor_subdomain}.${base_domain}/api/v2.0/users" 401
 fi
 
-
-if [ "$enable_user_grafana" == "true" ]
-then
-    testEndpointProtected Grafana-user "https://${grafana_subdomain}.${base_domain}/admin/users" 302
+if [ "$enable_user_grafana" == "true" ]; then
+  testEndpointProtected Grafana-user "https://${grafana_subdomain}.${base_domain}/admin/users" 302
 fi
 
 testEndpointProtected Grafana "https://${grafana_ops_subdomain}.${ops_domain}/" 302
@@ -59,5 +56,5 @@ testEndpointProtected OpenSearch "https://${opensearch_subdomain}.${ops_domain}/
 testEndpointProtected OpenSearchDashboards "https://${opensearch_dashboards_subdomain}.${base_domain}/" 302
 
 if [[ "${enable_thanos}" == "true" ]] && [[ "${enable_thanos_receiver}" == "true" ]]; then
-    testEndpointProtected ThanosReceiver "https://${thanos_subdomain}.${ops_domain}/" 401
+  testEndpointProtected ThanosReceiver "https://${thanos_subdomain}.${ops_domain}/" 401
 fi

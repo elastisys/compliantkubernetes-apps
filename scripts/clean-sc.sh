@@ -21,16 +21,16 @@ config_load sc
 clusterAPIEnabled=$(yq4 '.clusterApi.enabled' "${config[config_file_sc]}")
 
 GATE_VALWEBHOOK=$(
-    "${here}/.././bin/ck8s" ops \
-        kubectl sc get \
-        validatingwebhookconfigurations \
-        -l gatekeeper.sh/system=yes \
-        -oname
-    )
+  "${here}/.././bin/ck8s" ops \
+    kubectl sc get \
+    validatingwebhookconfigurations \
+    -l gatekeeper.sh/system=yes \
+    -oname
+)
 
 if [ -n "${GATE_VALWEBHOOK}" ]; then
-    # Destroy gatekeeper validatingwebhook which could potentially prevent other resources from being deleted
-    "${here}/.././bin/ck8s" ops kubectl sc delete "${GATE_VALWEBHOOK}"
+  # Destroy gatekeeper validatingwebhook which could potentially prevent other resources from being deleted
+  "${here}/.././bin/ck8s" ops kubectl sc delete "${GATE_VALWEBHOOK}"
 fi
 
 # Makes sure to uninstall Velero properly: https://velero.io/docs/v1.13/uninstalling/
@@ -44,14 +44,14 @@ fi
 
 # Clean up any leftover challenges
 mapfile -t CHALLENGES < <(
-    "${here}/.././bin/ck8s" ops kubectl sc get challenge -A -oyaml | \
-        yq4 '.items[] | .metadata.name + "," + .metadata.namespace'
-    )
+  "${here}/.././bin/ck8s" ops kubectl sc get challenge -A -oyaml |
+    yq4 '.items[] | .metadata.name + "," + .metadata.namespace'
+)
 for challenge in "${CHALLENGES[@]}"; do
-    IFS=, read -r name namespace <<< "${challenge}"
-    "${here}/.././bin/ck8s" ops \
-        kubectl sc patch challenge "${name}" -n "${namespace}" \
-        -p '{"metadata":{"finalizers":null}}' --type=merge
+  IFS=, read -r name namespace <<<"${challenge}"
+  "${here}/.././bin/ck8s" ops \
+    kubectl sc patch challenge "${name}" -n "${namespace}" \
+    -p '{"metadata":{"finalizers":null}}' --type=merge
 done
 
 if [ "${clusterAPIEnabled}" = "false" ]; then
@@ -81,56 +81,56 @@ fi
 # Dex specific removal
 # Keep for now, we won't use Dex CRDs in the future
 "${here}/.././bin/ck8s" ops kubectl sc delete crds \
-    authcodes.dex.coreos.com \
-    authrequests.dex.coreos.com \
-    connectors.dex.coreos.com \
-    oauth2clients.dex.coreos.com \
-    offlinesessionses.dex.coreos.com \
-    passwords.dex.coreos.com \
-    refreshtokens.dex.coreos.com \
-    signingkeies.dex.coreos.com \
-    devicerequests.dex.coreos.com \
-    devicetokens.dex.coreos.com
+  authcodes.dex.coreos.com \
+  authrequests.dex.coreos.com \
+  connectors.dex.coreos.com \
+  oauth2clients.dex.coreos.com \
+  offlinesessionses.dex.coreos.com \
+  passwords.dex.coreos.com \
+  refreshtokens.dex.coreos.com \
+  signingkeies.dex.coreos.com \
+  devicerequests.dex.coreos.com \
+  devicetokens.dex.coreos.com
 
 # Prometheus specific removal
 PROM_CRDS=$(
-    "${here}/.././bin/ck8s" ops \
-        kubectl sc api-resources \
-        --api-group=monitoring.coreos.com \
-        -o name
-    )
+  "${here}/.././bin/ck8s" ops \
+    kubectl sc api-resources \
+    --api-group=monitoring.coreos.com \
+    -o name
+)
 if [ -n "$PROM_CRDS" ]; then
-    # shellcheck disable=SC2086
-    # We definitely want word splitting here.
-    "${here}/.././bin/ck8s" ops kubectl sc delete crds $PROM_CRDS
+  # shellcheck disable=SC2086
+  # We definitely want word splitting here.
+  "${here}/.././bin/ck8s" ops kubectl sc delete crds $PROM_CRDS
 fi
 
 # Trivy specific removal
 TRIVY_CRDS=$(
-    "${here}/.././bin/ck8s" ops \
-        kubectl sc api-resources \
-        --api-group=aquasecurity.github.io \
-        -o name
-    )
+  "${here}/.././bin/ck8s" ops \
+    kubectl sc api-resources \
+    --api-group=aquasecurity.github.io \
+    -o name
+)
 
 # Delete CRDs
 if [ -n "$TRIVY_CRDS" ]; then
-    # shellcheck disable=SC2086
-    # We definitely want word splitting here.
-    "${here}/.././bin/ck8s" ops kubectl sc delete crds $TRIVY_CRDS
+  # shellcheck disable=SC2086
+  # We definitely want word splitting here.
+  "${here}/.././bin/ck8s" ops kubectl sc delete crds $TRIVY_CRDS
 fi
 
 # Delete Gatekeeper CRDs
 GATE_CRDS=$("${here}/.././bin/ck8s" ops kubectl sc get crds -l gatekeeper.sh/system=yes -oname)
 if [ -n "$GATE_CRDS" ]; then
-    # shellcheck disable=SC2086
-    "${here}/.././bin/ck8s" ops kubectl sc delete --ignore-not-found=true $GATE_CRDS
+  # shellcheck disable=SC2086
+  "${here}/.././bin/ck8s" ops kubectl sc delete --ignore-not-found=true $GATE_CRDS
 fi
 
 GATE_CONS=$("${here}/.././bin/ck8s" ops kubectl sc get crds -l gatekeeper.sh/constraint=yes -oname)
 if [ -n "$GATE_CONS" ]; then
-    # shellcheck disable=SC2086
-    "${here}/.././bin/ck8s" ops kubectl sc delete --ignore-not-found=true $GATE_CONS
+  # shellcheck disable=SC2086
+  "${here}/.././bin/ck8s" ops kubectl sc delete --ignore-not-found=true $GATE_CONS
 fi
 
 "${here}/.././bin/ck8s" ops helmfile sc -l app=admin-rbac destroy

@@ -7,10 +7,10 @@ ROOT="$(readlink -f "${HERE}/../../../")"
 source "${ROOT}/scripts/migration/lib.sh"
 
 case "${CK8S_CLUSTER}" in
-  both|sc|wc)
-    "${ROOT}/bin/ck8s" init "${CK8S_CLUSTER}"
-    ;;
-  *)
-    log_fatal "usage: 50-init.sh <wc|sc|both>"
-    ;;
+both | sc | wc)
+  "${ROOT}/bin/ck8s" init "${CK8S_CLUSTER}"
+  ;;
+*)
+  log_fatal "usage: 50-init.sh <wc|sc|both>"
+  ;;
 esac

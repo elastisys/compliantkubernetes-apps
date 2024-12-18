@@ -29,44 +29,44 @@ echo "=================================="
 # "monitoring/kube-prometheus-stack-kube-etcd/0 1"
 # "monitoring/kube-prometheus-stack-kube-proxy/0 1"
 scTargets=(
-    "serviceMonitor/opensearch-system/prometheus-opensearch-exporter/0 1"
-    "serviceMonitor/monitoring/prometheus-blackbox-exporter-dex/0 1"
-    "serviceMonitor/monitoring/prometheus-blackbox-exporter-grafana/0 1"
-    "serviceMonitor/monitoring/prometheus-blackbox-exporter-opensearch-dashboards/0 1"
-    "serviceMonitor/monitoring/kube-prometheus-stack-alertmanager/0 2"
-    "serviceMonitor/monitoring/kube-prometheus-stack-apiserver/0 ${masterNodes}"
-    "serviceMonitor/monitoring/kube-prometheus-stack-coredns/0 2"
-    "serviceMonitor/monitoring/ops-grafana/0 1"
-    "serviceMonitor/monitoring/kube-prometheus-stack-kube-state-metrics/0 1"
-    "serviceMonitor/monitoring/kube-prometheus-stack-kubelet/0 ${totalNodes}"
-    "serviceMonitor/monitoring/kube-prometheus-stack-kubelet/1 ${totalNodes}"
-    "serviceMonitor/monitoring/kube-prometheus-stack-prometheus-node-exporter/0 ${totalNodes}"
-    "serviceMonitor/monitoring/kube-prometheus-stack-operator/0 1"
-    "serviceMonitor/monitoring/kube-prometheus-stack-prometheus/0 ${totalPrometheus}"
+  "serviceMonitor/opensearch-system/prometheus-opensearch-exporter/0 1"
+  "serviceMonitor/monitoring/prometheus-blackbox-exporter-dex/0 1"
+  "serviceMonitor/monitoring/prometheus-blackbox-exporter-grafana/0 1"
+  "serviceMonitor/monitoring/prometheus-blackbox-exporter-opensearch-dashboards/0 1"
+  "serviceMonitor/monitoring/kube-prometheus-stack-alertmanager/0 2"
+  "serviceMonitor/monitoring/kube-prometheus-stack-apiserver/0 ${masterNodes}"
+  "serviceMonitor/monitoring/kube-prometheus-stack-coredns/0 2"
+  "serviceMonitor/monitoring/ops-grafana/0 1"
+  "serviceMonitor/monitoring/kube-prometheus-stack-kube-state-metrics/0 1"
+  "serviceMonitor/monitoring/kube-prometheus-stack-kubelet/0 ${totalNodes}"
+  "serviceMonitor/monitoring/kube-prometheus-stack-kubelet/1 ${totalNodes}"
+  "serviceMonitor/monitoring/kube-prometheus-stack-prometheus-node-exporter/0 ${totalNodes}"
+  "serviceMonitor/monitoring/kube-prometheus-stack-operator/0 1"
+  "serviceMonitor/monitoring/kube-prometheus-stack-prometheus/0 ${totalPrometheus}"
 )
 if [ ${#custom_kubeapi_targets[@]} -gt 0 ]; then
-    for target_name in "${custom_kubeapi_targets[@]}"; do
-        scTargets+=("serviceMonitor/monitoring/prometheus-blackbox-exporter-${target_name}/0 1")
-    done
+  for target_name in "${custom_kubeapi_targets[@]}"; do
+    scTargets+=("serviceMonitor/monitoring/prometheus-blackbox-exporter-${target_name}/0 1")
+  done
 else
-    scTargets+=("serviceMonitor/monitoring/prometheus-blackbox-exporter-user-api-server/0 1")
+  scTargets+=("serviceMonitor/monitoring/prometheus-blackbox-exporter-user-api-server/0 1")
 fi
 if [[ "${enable_thanos}" == "true" ]] && [[ "${enable_thanos_service_monitor}" == "true" ]] && [[ "${enable_thanos_receiver}" == "true" ]]; then
-    scTargets+=(
-        "serviceMonitor/thanos/thanos-receiver-bucketweb/0 1"
-        "serviceMonitor/thanos/thanos-receiver-compactor/0 1"
-        "serviceMonitor/thanos/thanos-receiver-receive/0 3"
-        "serviceMonitor/thanos/thanos-receiver-storegateway/0 1"
-    )
+  scTargets+=(
+    "serviceMonitor/thanos/thanos-receiver-bucketweb/0 1"
+    "serviceMonitor/thanos/thanos-receiver-compactor/0 1"
+    "serviceMonitor/thanos/thanos-receiver-receive/0 3"
+    "serviceMonitor/thanos/thanos-receiver-storegateway/0 1"
+  )
 fi
 if [[ "${enable_thanos}" == "true" ]] && [[ "${enable_thanos_service_monitor}" == "true" ]] && [[ "${enable_thanos_ruler}" == "true" ]]; then
-    scTargets+=("serviceMonitor/thanos/thanos-receiver-ruler/0 4")
+  scTargets+=("serviceMonitor/thanos/thanos-receiver-ruler/0 4")
 fi
 if [[ "${enable_thanos}" == "true" ]] && [[ "${enable_thanos_service_monitor}" == "true" ]] && [[ "${enable_thanos_query}" == "true" ]]; then
-    scTargets+=(
-        "serviceMonitor/thanos/thanos-query-query/0 2"
-        "serviceMonitor/thanos/thanos-query-query-frontend/0 1"
-    )
+  scTargets+=(
+    "serviceMonitor/thanos/thanos-query-query/0 2"
+    "serviceMonitor/thanos/thanos-query-query-frontend/0 1"
+  )
 fi
 
 test_targets_retry "svc/kube-prometheus-stack-prometheus" "${scTargets[@]}"

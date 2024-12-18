@@ -9,34 +9,34 @@ here="$(dirname "$(readlink -f "$0")")"
 source "${here}/common.bash"
 
 usage() {
-    echo "COMMANDS:" 1>&2
-    echo "  apply <wc|sc> [--sync] [--concurrency=<num>]    deploy the apps" 1>&2
-    echo "  clean <wc|sc>                                   Cleans the cluster of apps" 1>&2
-    echo "  completion bash                                 output shell completion code for bash" 1>&2
-    echo "  diagnostics <wc|sc> [--help]                    Runs diagnostics of apps" 1>&2
-    echo "  dry-run <wc|sc> [--kubectl]                     runs helmfile diff" 1>&2
-    echo "  explain <config|secrets> [key.to.parameter]     explains the config or secrets" 1>&2
-    echo "  fix-psp-violations <wc|sc>                      Checks and restarts pods that violates Pod Security Polices, applicable for new environments" 1>&2
-    echo "  flavors                                         lists supported configuration flavors" 1>&2
-    echo "  init <wc|sc|both> [--generate-new-secrets]      initialize the config path" 1>&2
-    echo "  install-requirements [--user] [--no-pass]       installs or updates required tools to run compliantkubernetes-apps" 1>&2
-    echo "  k8s-installers                                  lists supported kubernetes installers" 1>&2
-    echo "  kubeconfig <user|dev|admin>                     generate user kubeconfig, stored at CK8S_CONFIG_PATH/user" 1>&2
-    echo "  ops helm <wc|sc>                                run helm as cluster admin" 1>&2
-    echo "  ops helmfile <wc|sc>                            run helmfile as cluster admin" 1>&2
-    echo "  ops kubecolor <wc|sc>                           run kubecolor as cluster admin" 1>&2
-    echo "  ops kubectl <wc|sc>                             run kubectl as cluster admin" 1>&2
-    echo "  ops velero <wc|sc>                              run velero as cluster admin" 1>&2
-    echo "  providers                                       lists supported cloud providers" 1>&2
-    echo "  s3cmd [cmd]                                     run s3cmd" 1>&2
-    echo "  team add-pgp <fp>                               add a new PGP key to secrets" 1>&2
-    echo "  team remove-pgp <fp>                            remove a PGP key from secrets and rotate the data encryption key" 1>&2
-    echo "  test <wc|sc> [--logging-enabled]                test the applications" 1>&2
-    echo "  update-ips <wc|sc|both> <apply|dry-run>         Automatically fetches and applies the IPs for network policies" 1>&2
-    echo "  upgrade <wc|sc|both> <vX.Y> apply               runs all apply steps upgrading the environment" 1>&2
-    echo "  upgrade <wc|sc|both> <vX.Y> prepare             runs all prepare steps upgrading the configuration" 1>&2
-    echo "  validate <wc|sc>                                validates config files" 1>&2
-    exit 1
+  echo "COMMANDS:" 1>&2
+  echo "  apply <wc|sc> [--sync] [--concurrency=<num>]    deploy the apps" 1>&2
+  echo "  clean <wc|sc>                                   Cleans the cluster of apps" 1>&2
+  echo "  completion bash                                 output shell completion code for bash" 1>&2
+  echo "  diagnostics <wc|sc> [--help]                    Runs diagnostics of apps" 1>&2
+  echo "  dry-run <wc|sc> [--kubectl]                     runs helmfile diff" 1>&2
+  echo "  explain <config|secrets> [key.to.parameter]     explains the config or secrets" 1>&2
+  echo "  fix-psp-violations <wc|sc>                      Checks and restarts pods that violates Pod Security Polices, applicable for new environments" 1>&2
+  echo "  flavors                                         lists supported configuration flavors" 1>&2
+  echo "  init <wc|sc|both> [--generate-new-secrets]      initialize the config path" 1>&2
+  echo "  install-requirements [--user] [--no-pass]       installs or updates required tools to run compliantkubernetes-apps" 1>&2
+  echo "  k8s-installers                                  lists supported kubernetes installers" 1>&2
+  echo "  kubeconfig <user|dev|admin>                     generate user kubeconfig, stored at CK8S_CONFIG_PATH/user" 1>&2
+  echo "  ops helm <wc|sc>                                run helm as cluster admin" 1>&2
+  echo "  ops helmfile <wc|sc>                            run helmfile as cluster admin" 1>&2
+  echo "  ops kubecolor <wc|sc>                           run kubecolor as cluster admin" 1>&2
+  echo "  ops kubectl <wc|sc>                             run kubectl as cluster admin" 1>&2
+  echo "  ops velero <wc|sc>                              run velero as cluster admin" 1>&2
+  echo "  providers                                       lists supported cloud providers" 1>&2
+  echo "  s3cmd [cmd]                                     run s3cmd" 1>&2
+  echo "  team add-pgp <fp>                               add a new PGP key to secrets" 1>&2
+  echo "  team remove-pgp <fp>                            remove a PGP key from secrets and rotate the data encryption key" 1>&2
+  echo "  test <wc|sc> [--logging-enabled]                test the applications" 1>&2
+  echo "  update-ips <wc|sc|both> <apply|dry-run>         Automatically fetches and applies the IPs for network policies" 1>&2
+  echo "  upgrade <wc|sc|both> <vX.Y> apply               runs all apply steps upgrading the environment" 1>&2
+  echo "  upgrade <wc|sc|both> <vX.Y> prepare             runs all prepare steps upgrading the configuration" 1>&2
+  echo "  validate <wc|sc>                                validates config files" 1>&2
+  exit 1
 }
 
 SYNC=""
@@ -44,133 +44,112 @@ KUBECTL=""
 GEN_NEW_SECRETS=""
 CONCURRENCY="--concurrency=8"
 
-for arg in "$@"; do
-  case "$arg" in
-    "--sync") SYNC="sync" ;;
-    "--kubectl") KUBECTL="kubectl" ;;
-    "--generate-new-secrets") GEN_NEW_SECRETS="--generate-new-secrets" ;;
-    "--concurrency="*) CONCURRENCY="$arg" ;;
+for arg in "${@}"; do
+  case "${arg}" in
+  "--sync") SYNC="sync" ;;
+  "--kubectl") KUBECTL="kubectl" ;;
+  "--generate-new-secrets") GEN_NEW_SECRETS="--generate-new-secrets" ;;
+  "--concurrency="*) CONCURRENCY="${arg}" ;;
   esac
 done
 
 case "${1}" in
-    init)
-        [[ "${2}" =~ ^(wc|sc|both)$ ]] || usage
-        check_tools
-        export CK8S_CLUSTER="${2}"
-        "${here}/init.bash" "${GEN_NEW_SECRETS}"
-        ;;
-    apply)
-        [[ "${2}" =~ ^(wc|sc)$ ]] || usage
-        check_tools
-        "${here}/apply.bash" "${2}" "${SYNC}" "${CONCURRENCY}"
-        ;;
-    test)
-        [[ "${2}" =~ ^(wc|sc)$ ]] || usage
-        check_tools
-        with_kubeconfig "${config["kube_config_${2}"]}" "${here}/test.bash" "${@:2}"
-        ;;
-    dry-run)
-        [[ "${2}" =~ ^(wc|sc)$ ]] || usage
-        check_tools
-        "${here}/dry-run.bash" "${2}" "${KUBECTL}"
-        ;;
-    upgrade)
-        [[ "${2}" =~ ^(wc|sc|both)$ ]] || usage
-        [[ "${3}" =~ ^(v[0-9]+\.[0-9]+)$ ]] || usage
-        [[ "${4}" =~ ^(prepare|apply)$ ]] || usage
-        check_tools
-        export CK8S_CLUSTER="${2}"
-        "${here}/upgrade.bash" "${3}" "${4}"
-        ;;
-    team)
-        case "${2}" in
-            add-pgp|remove-pgp)
-                [ -n "${3}" ] || usage
-                "${here}/team.bash" "${2}" "${3}"
-                ;;
-            *) usage ;;
-        esac
-        ;;
-    ops)
-        case "${2}" in
-            kubectl)
-                [[ "${3}" =~ ^(wc|sc)$ ]] || usage
-                shift 2
-                "${here}/ops.bash" kubectl "${@}"
-            ;;
-            kubecolor)
-                [[ "${3}" =~ ^(wc|sc)$ ]] || usage
-                shift 2
-                "${here}/ops.bash" kubecolor "${@}"
-            ;;
-            helm)
-                [[ "${3}" =~ ^(wc|sc)$ ]] || usage
-                shift 2
-                "${here}/ops.bash" helm "${@}"
-            ;;
-            helmfile)
-                [[ "${3}" =~ ^(wc|sc)$ ]] || usage
-                shift 2
-                "${here}/ops.bash" helmfile "${@}"
-            ;;
-            velero)
-                [[ "${3}" =~ ^(wc|sc)$ ]] || usage
-                shift 2
-                "${here}/ops.bash" velero "${@}"
-            ;;
-            *) usage ;;
-        esac
+init)
+  [[ "${2}" =~ ^(wc|sc|both)$ ]] || usage
+  check_tools
+  export CK8S_CLUSTER="${2}"
+  "${here}/init.bash" "${GEN_NEW_SECRETS}"
+  ;;
+apply)
+  [[ "${2}" =~ ^(wc|sc)$ ]] || usage
+  check_tools
+  "${here}/apply.bash" "${2}" "${SYNC}" "${CONCURRENCY}"
+  ;;
+test)
+  [[ "${2}" =~ ^(wc|sc)$ ]] || usage
+  check_tools
+  with_kubeconfig "${config["kube_config_${2}"]}" "${here}/test.bash" "${@:2}"
+  ;;
+dry-run)
+  [[ "${2}" =~ ^(wc|sc)$ ]] || usage
+  check_tools
+  "${here}/dry-run.bash" "${2}" "${KUBECTL}"
+  ;;
+upgrade)
+  [[ "${2}" =~ ^(wc|sc|both)$ ]] || usage
+  [[ "${3}" =~ ^(v[0-9]+\.[0-9]+)$ ]] || usage
+  [[ "${4}" =~ ^(prepare|apply)$ ]] || usage
+  check_tools
+  export CK8S_CLUSTER="${2}"
+  "${here}/upgrade.bash" "${3}" "${4}"
+  ;;
+team)
+  case "${2}" in
+  add-pgp | remove-pgp)
+    [ -n "${3}" ] || usage
+    "${here}/team.bash" "${2}" "${3}"
     ;;
-    s3cmd)
-        shift
-        sops_exec_file "${secrets[s3cfg_file]}" 's3cmd --config="{}" '"${*}"
+  *) usage ;;
+  esac
+  ;;
+ops)
+  case "${2}" in
+  kubectl | kubecolor | helm | helmfile | velero)
+    [[ "${3}" =~ ^(wc|sc)$ ]] || usage
+    shift 2
+    "${here}/ops.bash" "${2}" "${@}"
     ;;
-    kubeconfig)
-        shift
-        "${here}/kubeconfig.bash" "${@}"
-        ;;
-    completion)
-        [ -f "${here}/../completion/${2}" ] || usage
-        cat "${here}/../completion/${2}"
-        ;;
-    install-requirements)
-        shift
-        [ -f "${here}/install-requirements.bash" ] || usage
-        "${here}/install-requirements.bash" "${@}"
-        ;;
-    validate)
-        [[ "${2}" =~ ^(wc|sc)$ ]] || usage
-        check_tools
-        config_load "$2"
-        echo "Config validation successful"
-        ;;
-    providers) echo "${ck8s_cloud_providers[@]}" ;;
-    flavors) echo "${ck8s_flavors[@]}" ;;
-    k8s-installers) echo "${ck8s_k8s_installers[@]}" ;;
-    explain)
-        [[ "${2}" =~ ^(config|secrets)$ ]] || usage
-        shift
-        "${here}/explain.bash" "${@}"
-        ;;
-    update-ips)
-        [[ "${2}" =~ ^(wc|sc|both)$ ]] || usage
-        [[ "${3}" =~ ^(apply|dry-run)$ ]] || usage
-        "${here}/update-ips.bash" "${2}" "${3}"
-        ;;
-    fix-psp-violations)
-        [[ "${2}" =~ ^(wc|sc)$ ]] || usage
-        check_tools
-        export CK8S_CLUSTER="${2}"
-        "${here}/fix-psp-violations.bash"
-        ;;
-    clean)
-        "${here}/clean.bash" "${2}"
-        ;;
-    diagnostics)
-        [[ "${2}" =~ ^(wc|sc)$ ]] || usage
-        shift
-        "${here}/diagnostics.bash" "${@}"
-        ;;
-    *) usage ;;
+  *) usage ;;
+  esac
+  ;;
+s3cmd)
+  shift
+  sops_exec_file "${secrets[s3cfg_file]}" 's3cmd --config="{}" '"${*}"
+  ;;
+kubeconfig)
+  shift
+  "${here}/kubeconfig.bash" "${@}"
+  ;;
+completion)
+  [ -f "${here}/../completion/${2}" ] || usage
+  cat "${here}/../completion/${2}"
+  ;;
+install-requirements)
+  shift
+  "${here}/install-requirements.bash" "${@}"
+  ;;
+validate)
+  [[ "${2}" =~ ^(wc|sc)$ ]] || usage
+  check_tools
+  config_load "$2"
+  echo "Config validation successful"
+  ;;
+providers) echo "${ck8s_cloud_providers[@]}" ;;
+flavors) echo "${ck8s_flavors[@]}" ;;
+k8s-installers) echo "${ck8s_k8s_installers[@]}" ;;
+explain)
+  [[ "${2}" =~ ^(config|secrets)$ ]] || usage
+  shift
+  "${here}/explain.bash" "${@}"
+  ;;
+update-ips)
+  [[ "${2}" =~ ^(wc|sc|both)$ ]] || usage
+  [[ "${3}" =~ ^(apply|dry-run)$ ]] || usage
+  "${here}/update-ips.bash" "${2}" "${3}"
+  ;;
+fix-psp-violations)
+  [[ "${2}" =~ ^(wc|sc)$ ]] || usage
+  check_tools
+  export CK8S_CLUSTER="${2}"
+  "${here}/fix-psp-violations.bash"
+  ;;
+clean)
+  "${here}/clean.bash" "${2}"
+  ;;
+diagnostics)
+  [[ "${2}" =~ ^(wc|sc)$ ]] || usage
+  shift
+  "${here}/diagnostics.bash" "${@}"
+  ;;
+*) usage ;;
 esac

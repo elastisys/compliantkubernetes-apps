@@ -51,7 +51,7 @@ teardown_file() {
 
 _test_requires_auth_endpoint() {
   yq.set sc "${1}" '"swift"'
-  yq.set sc  .objectStorage.swift.authUrl '""'
+  yq.set sc .objectStorage.swift.authUrl '""'
 
   run ck8s update-ips both apply
   assert_failure

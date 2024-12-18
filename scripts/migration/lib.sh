@@ -64,7 +64,7 @@ log_fatal() {
 # --- git version
 
 git_version() {
-  git -C "${ROOT}" describe --exact-match --tags 2> /dev/null || git -C "${ROOT}" rev-parse HEAD
+  git -C "${ROOT}" describe --exact-match --tags 2>/dev/null || git -C "${ROOT}" rev-parse HEAD
 }
 
 # --- config functions ---
@@ -78,7 +78,7 @@ config_version() {
   local prefix="${1}"
 
   local version
-  version="$(yq4 ".global.ck8sVersion" <<< "${CONFIG["${prefix}"]}")"
+  version="$(yq4 ".global.ck8sVersion" <<<"${CONFIG["${prefix}"]}")"
 
   VERSION["${prefix}-config"]="${version}"
   version="${version#v}"
@@ -108,40 +108,40 @@ config_validate() {
     done
     ;;
 
-  sc|wc)
+  sc | wc)
     log_info "validating ${1}-config"
 
     defaults="$(yq_merge "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/${1}-config.yaml")"
-    setmes="$(yq_paths "set-me" <<< "${defaults}")"
-    conditional_setmes="$(yq_paths "set-me-if-*" <<< "${defaults}")"
+    setmes="$(yq_paths "set-me" <<<"${defaults}")"
+    conditional_setmes="$(yq_paths "set-me-if-*" <<<"${defaults}")"
 
     for setme in ${setmes}; do
-      compare=$(diff <(yq4 -oj "${setme}" <<< "${defaults}") <(yq4 -oj "${setme}" <<< "${CONFIG["${1}"]}") || true)
+      compare=$(diff <(yq4 -oj "${setme}" <<<"${defaults}") <(yq4 -oj "${setme}" <<<"${CONFIG["${1}"]}") || true)
       if [[ -z "${compare}" ]]; then
-          log_error "error: \"${setme//\"/}\" is unset in ${1}-config"
-          pass="false"
+        log_error "error: \"${setme//\"/}\" is unset in ${1}-config"
+        pass="false"
       fi
     done
 
     for condsetme in ${conditional_setmes}; do
-      required_condition=$(yq4 "${condsetme}" <<< "${defaults}" | sed -rn 's/set-me-if-(.*)/\1/p' | yq4 "[.] | flatten | .[0]")
-      if [[ $(yq4 "${required_condition}" <<< "${CONFIG["${1}"]}") == "true" ]]; then
-        compare=$(diff <(yq4 -oj "${condsetme}" <<< "${defaults}") <(yq4 -oj "${condsetme}" <<< "${CONFIG["${1}"]}") || true)
+      required_condition=$(yq4 "${condsetme}" <<<"${defaults}" | sed -rn 's/set-me-if-(.*)/\1/p' | yq4 "[.] | flatten | .[0]")
+      if [[ $(yq4 "${required_condition}" <<<"${CONFIG["${1}"]}") == "true" ]]; then
+        compare=$(diff <(yq4 -oj "${condsetme}" <<<"${defaults}") <(yq4 -oj "${condsetme}" <<<"${CONFIG["${1}"]}") || true)
         if [[ -z "${compare}" ]]; then
-            log_error "error: \"${condsetme//\"/}\" is unset in ${1}-config"
-            pass="false"
+          log_error "error: \"${condsetme//\"/}\" is unset in ${1}-config"
+          pass="false"
         fi
       fi
     done
 
-    sync_enabled=$(yq4 '.objectStorage.sync.enabled' <<< "${CONFIG["${1}"]}")
-    sync_default_enabled=$(yq4 '.objectStorage.sync.syncDefaultBuckets' <<< "${CONFIG["${1}"]}")
+    sync_enabled=$(yq4 '.objectStorage.sync.enabled' <<<"${CONFIG["${1}"]}")
+    sync_default_enabled=$(yq4 '.objectStorage.sync.syncDefaultBuckets' <<<"${CONFIG["${1}"]}")
     if [[ "${1}" = "sc" ]] && [[ "${sync_enabled}" = "true" ]] && [[ "${sync_default_enabled}" = "true" ]]; then
       log_info "checking sync swift"
 
-      check_harbor="$(yq4 '.harbor.persistence.type' <<< "${CONFIG["${1}"]}")"
-      check_thanos="$(yq4 '.thanos.objectStorage.type' <<< "${CONFIG["${1}"]}")"
-      check_sync_swift="$(yq4 '.objectStorage.sync.swift' <<< "${CONFIG["${1}"]}")"
+      check_harbor="$(yq4 '.harbor.persistence.type' <<<"${CONFIG["${1}"]}")"
+      check_thanos="$(yq4 '.thanos.objectStorage.type' <<<"${CONFIG["${1}"]}")"
+      check_sync_swift="$(yq4 '.objectStorage.sync.swift' <<<"${CONFIG["${1}"]}")"
 
       if { [[ "${check_harbor}" = "swift" ]] || [[ "${check_thanos}" = "swift" ]]; } && [[ "${check_sync_swift}" = "null" ]]; then
         log_error "error: swift is enabled for Harbor/Thanos, but .objectStorage.sync is missing swift configuration"
@@ -159,7 +159,7 @@ config_validate() {
       log_warn_no_newline "config validation failed do you still want to continue? [y/N]: "
       read -r reply
       if [[ "${reply}" != "y" ]]; then
-          exit 1
+        exit 1
       fi
     else
       exit 1
@@ -231,8 +231,8 @@ check_config() {
   fi
 
   if ! check_sops "${CK8S_CONFIG_PATH}/secrets.yaml"; then
-      log_error "error: \"secrets.yaml\" is not encrypted"
-      pass="false"
+    log_error "error: \"secrets.yaml\" is not encrypted"
+    pass="false"
   fi
 
   if [[ "${pass}" = "false" ]]; then
@@ -346,25 +346,25 @@ fi
 # Normally a signal handler can only run one command. Use this to be able to
 # add multiple traps for a single signal.
 append_trap() {
-    cmd="${1}"
-    signal="${2}"
+  cmd="${1}"
+  signal="${2}"
 
-    if [ "$(trap -p "${signal}")" = "" ]; then
-        # shellcheck disable=SC2064
-        trap "${cmd}" "${signal}"
-        return
-    fi
-
-    # shellcheck disable=SC2317
-    previous_trap_cmd() { printf '%s\n' "$3"; }
-
-    new_trap() {
-        eval "previous_trap_cmd $(trap -p "${signal}")"
-        printf '%s\n' "${cmd}"
-    }
-
+  if [ "$(trap -p "${signal}")" = "" ]; then
     # shellcheck disable=SC2064
-    trap "$(new_trap)" "${signal}"
+    trap "${cmd}" "${signal}"
+    return
+  fi
+
+  # shellcheck disable=SC2317
+  previous_trap_cmd() { printf '%s\n' "$3"; }
+
+  new_trap() {
+    eval "previous_trap_cmd $(trap -p "${signal}")"
+    printf '%s\n' "${cmd}"
+  }
+
+  # shellcheck disable=SC2064
+  trap "$(new_trap)" "${signal}"
 }
 
 # shellcheck source=scripts/migration/helm.sh

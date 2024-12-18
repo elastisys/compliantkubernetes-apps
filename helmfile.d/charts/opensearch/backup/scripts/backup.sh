@@ -9,10 +9,10 @@ set -euo pipefail
 : "${INDICES:?Missing INDICES}"
 
 curl --insecure -s -i -u "${OPENSEARCH_USERNAME}:${OPENSEARCH_PASSWORD}" \
-    -XPUT "https://${OPENSEARCH_ENDPOINT}/_snapshot/${SNAPSHOT_REPOSITORY}/snapshot-$(date --utc +%Y%m%d_%H%M%Sz)" \
-    -H "Content-Type: application/json" -d'
+  -XPUT "https://${OPENSEARCH_ENDPOINT}/_snapshot/${SNAPSHOT_REPOSITORY}/snapshot-$(date --utc +%Y%m%d_%H%M%Sz)" \
+  -H "Content-Type: application/json" -d'
     {
         "indices": "'"${INDICES}"'",
         "include_global_state": false
-    }' \
-    | tee /dev/stderr | grep "200 OK"
+    }' |
+  tee /dev/stderr | grep "200 OK"

@@ -3,13 +3,13 @@
 set -euo pipefail
 
 usage() {
-    echo "This script must have apps old and new major versions as arguments."
-    echo "Usage: $0 [old_version] [new_version]"
-    echo "Example: ./create-migration-document.sh v0.22 v0.23"
+  echo "This script must have apps old and new major versions as arguments."
+  echo "Usage: $0 [old_version] [new_version]"
+  echo "Example: ./create-migration-document.sh v0.22 v0.23"
 }
-if [  $# -lt 2 ]; then
-    usage
-    exit 1
+if [ $# -lt 2 ]; then
+  usage
+  exit 1
 fi
 
 here="$(dirname "$(readlink -f "$0")")"
@@ -28,24 +28,24 @@ if [[ ! "${reply}" =~ ^[yY]$ ]]; then
 fi
 
 if [ -d "${folder_name}" ]; then
-    echo "- ${folder_name} directory exists"
+  echo "- ${folder_name} directory exists"
 else
-    mkdir "${folder_name}"
-    echo "- ${folder_name} directory created"
+  mkdir "${folder_name}"
+  echo "- ${folder_name} directory created"
 fi
 
 if [ -f "${folder_name}/README.md" ]; then
-    echo -n "- ${folder_name}/README.md exists. Do you want to replace it? (y/N): "
-    read -r reply
-    if [[ ${reply} =~ ^[yY]$ ]]; then
-        # shellcheck disable=SC2016
-        envsubst '$new_version$old_version' < "${here}/template/README.md" > "${folder_name}/README.md"
-        echo "- ${folder_name}/README.md replaced"
-    fi
-else
+  echo -n "- ${folder_name}/README.md exists. Do you want to replace it? (y/N): "
+  read -r reply
+  if [[ ${reply} =~ ^[yY]$ ]]; then
     # shellcheck disable=SC2016
-    envsubst '$new_version$old_version' < "${here}/template/README.md" > "${folder_name}/README.md"
-    echo "- ${folder_name}/README.md created"
+    envsubst '$new_version$old_version' <"${here}/template/README.md" >"${folder_name}/README.md"
+    echo "- ${folder_name}/README.md replaced"
+  fi
+else
+  # shellcheck disable=SC2016
+  envsubst '$new_version$old_version' <"${here}/template/README.md" >"${folder_name}/README.md"
+  echo "- ${folder_name}/README.md created"
 fi
 
 cp -r "${here}/template/apply" "${folder_name}/"

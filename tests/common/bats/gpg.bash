@@ -26,7 +26,7 @@ gpg.setup() {
   for n in $(seq 3); do
     # Retry as gpg-agent might not reliably start
     if gpg.auto_generate_key; then
-      break;
+      break
     fi
     echo "failed to generate gpg key try ${n}" >&2
     n="0"

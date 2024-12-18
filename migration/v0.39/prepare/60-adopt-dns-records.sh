@@ -50,29 +50,28 @@ export AWS_SECRET_ACCESS_KEY="${aws_secret_key_id}"
 
 log_info "Fetching records..."
 records=$(mktemp --suffix="aws_records.json")
-aws route53 list-resource-record-sets --hosted-zone-id "${hostedZoneId}" --output json > "${records}"
+aws route53 list-resource-record-sets --hosted-zone-id "${hostedZoneId}" --output json >"${records}"
 
 log_info "Filtering..."
-baseDomain=$(yq4 ".global.baseDomain" "$CK8S_CONFIG_PATH/common-config.yaml" )
+baseDomain=$(yq4 ".global.baseDomain" "$CK8S_CONFIG_PATH/common-config.yaml")
 baseDomainRecords=$(jq ".ResourceRecordSets[] | select(.Name | test(\".*.${baseDomain}.$\"))" "${records}")
 ARecords=$(echo "${baseDomainRecords}" | jq '. | select(.Type == "A")')
-readarray -t recordNames < <(echo "${ARecords}" | jq -r '.Name' )
+readarray -t recordNames < <(echo "${ARecords}" | jq -r '.Name')
 
 log_info "Fetching txtOwnerId..."
-ownerId=$(yq4 ".externalDns.txtOwnerId" <(yq_merge "$CK8S_CONFIG_PATH/common-config.yaml" "$CK8S_CONFIG_PATH/sc-config.yaml" "$CK8S_CONFIG_PATH/wc-config.yaml") )
+ownerId=$(yq4 ".externalDns.txtOwnerId" <(yq_merge "$CK8S_CONFIG_PATH/common-config.yaml" "$CK8S_CONFIG_PATH/sc-config.yaml" "$CK8S_CONFIG_PATH/wc-config.yaml"))
 if [[ "${ownerId}" == "null" ]]; then
   log_fatal "Missing txtOwnerId!"
 fi
 
 log_info "Fetching txtPrefix..."
-txtPrefix=$(yq4 ".externalDns.txtPrefix" <(yq_merge "$CK8S_CONFIG_PATH/common-config.yaml" "$CK8S_CONFIG_PATH/sc-config.yaml" "$CK8S_CONFIG_PATH/wc-config.yaml") )
+txtPrefix=$(yq4 ".externalDns.txtPrefix" <(yq_merge "$CK8S_CONFIG_PATH/common-config.yaml" "$CK8S_CONFIG_PATH/sc-config.yaml" "$CK8S_CONFIG_PATH/wc-config.yaml"))
 if [[ "${txtPrefix}" == "null" ]]; then
-  txtPrefix="";
+  txtPrefix=""
 fi
 
 recordFile=$(mktemp --suffix="record-file.json")
-for record in "${recordNames[@]}"
-do
+for record in "${recordNames[@]}"; do
   record="${record/\\052/"*"}"
   log_info "Creating owner record for ${record}..."
   echo "{
@@ -92,6 +91,6 @@ do
                 }
               }
             ]
-          }" > "${recordFile}"
+          }" >"${recordFile}"
   aws route53 change-resource-record-sets --no-cli-pager --hosted-zone-id "${hostedZoneId}" --change-batch "file://${recordFile}"
 done

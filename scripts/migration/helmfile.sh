@@ -74,19 +74,19 @@ helmfile_change_dispatch() {
   fi
 
   local list
-  if ! list="$(helmfile_list "${2}" "${@:3}" 2> /dev/null)"; then
-      log_warn "warning: ${2} ${*:3} had no matching releases"
-      return
+  if ! list="$(helmfile_list "${2}" "${@:3}" 2>/dev/null)"; then
+    log_warn "warning: ${2} ${*:3} had no matching releases"
+    return
   fi
-  list="$(yq4 -P '[.[] | select(.enabled and .installed)]' <<< "${list}")"
+  list="$(yq4 -P '[.[] | select(.enabled and .installed)]' <<<"${list}")"
 
   local length
-  length="$(yq4 -P 'length' <<< "${list}")"
+  length="$(yq4 -P 'length' <<<"${list}")"
   for index in $(seq 0 $((length - 1))); do
-    namespace="$(yq4 -P ".[${index}].namespace" <<< "${list}")"
-    name="$(yq4 -P ".[${index}].name" <<< "${list}")"
+    namespace="$(yq4 -P ".[${index}].namespace" <<<"${list}")"
+    name="$(yq4 -P ".[${index}].name" <<<"${list}")"
 
-    if helmfile_change "${2}" "namespace=${namespace},name=${name}" > /dev/null 2>&1; then
+    if helmfile_change "${2}" "namespace=${namespace},name=${name}" >/dev/null 2>&1; then
       log_info "  - skipping ${2} ${namespace}/${name} no change"
       continue
     fi

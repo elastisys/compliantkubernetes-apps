@@ -5,9 +5,9 @@ set -euo pipefail
 here="$(dirname "$(readlink -f "${0}")")"
 root="$(dirname "$(dirname "${here}")")"
 
-if command -v kube-score &> /dev/null; then
+if command -v kube-score &>/dev/null; then
   cmd="kube-score"
-elif command -v docker &> /dev/null; then
+elif command -v docker &>/dev/null; then
   echo "warning: kube-score (https://github.com/zegl/kube-score) is not installed, using docker (docker.io/zegl/kube-score:latest)" >&2
   cmd="docker run -i --rm docker.io/zegl/kube-score:latest"
 else
@@ -22,15 +22,15 @@ score() {
   shift
 
   local releases
-  releases="$(helmfile --allow-no-matching-release -e  "${target}_cluster" -f "${root}/helmfile.d/" list "${@/#/-l}" -q --output json)"
-  releases="$(yq4 -Poj '[.[] | select(.enabled and .installed) | {"namespace": .namespace, "name": .name}] | sort_by(.namespace, .name)' <<< "${releases}")"
+  releases="$(helmfile --allow-no-matching-release -e "${target}_cluster" -f "${root}/helmfile.d/" list "${@/#/-l}" -q --output json)"
+  releases="$(yq4 -Poj '[.[] | select(.enabled and .installed) | {"namespace": .namespace, "name": .name}] | sort_by(.namespace, .name)' <<<"${releases}")"
 
   local length
-  length="$(yq4 -Poy 'length' <<< "${releases}")"
+  length="$(yq4 -Poy 'length' <<<"${releases}")"
 
   for index in $(seq 0 $((length - 1))); do
-    namespace="$(yq4 -Poy ".[${index}].namespace" <<< "${releases}")"
-    name="$(yq4 -Poy ".[${index}].name" <<< "${releases}")"
+    namespace="$(yq4 -Poy ".[${index}].namespace" <<<"${releases}")"
+    name="$(yq4 -Poy ".[${index}].name" <<<"${releases}")"
 
     echo "templating ${target}/${namespace}/${name}" >&2
     helmfile -e "${target}_cluster" -f "${root}/helmfile.d/" template -q "-lnamespace=${namespace},name=${name}" | yq4 "with(select(.metadata.namespace == null); .metadata.namespace = \"${namespace}\")"

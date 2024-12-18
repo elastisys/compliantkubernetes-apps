@@ -31,113 +31,113 @@ OPENSEARCH_URL="https://${OPENSEARCH_ENDPOINT}"
 # Snapshots returned from this function should be succeeded, or depending on how it was created, partial.
 # https://opensearch.org/docs/latest/opensearch/snapshot-restore
 function get_snapshots {
-    local url="${OPENSEARCH_URL}/_cat/snapshots/${SNAPSHOT_REPOSITORY}"
-    curl --insecure "${url}" -f -X GET --max-time "${REQUEST_TIMEOUT_SECONDS}" --no-progress-meter \
-        --basic --user "${OPENSEARCH_USERNAME}:${OPENSEARCH_PASSWORD}"
+  local url="${OPENSEARCH_URL}/_cat/snapshots/${SNAPSHOT_REPOSITORY}"
+  curl --insecure "${url}" -f -X GET --max-time "${REQUEST_TIMEOUT_SECONDS}" --no-progress-meter \
+    --basic --user "${OPENSEARCH_USERNAME}:${OPENSEARCH_PASSWORD}"
 }
 
 function get_snapshot_age {
-    local snapshots=$1
-    local idx=$2
-    local snapshot_start_date_seconds
-    local now_seconds
-    local age_seconds
+  local snapshots=$1
+  local idx=$2
+  local snapshot_start_date_seconds
+  local now_seconds
+  local age_seconds
 
-    snapshot_start_date_seconds=$(sed "${idx}q;d" <(echo "${snapshots}") | awk '{ print $3 }')
-    now_seconds=$(date +%s)
-    age_seconds=$((now_seconds - snapshot_start_date_seconds))
-    echo "${age_seconds}"
+  snapshot_start_date_seconds=$(sed "${idx}q;d" <(echo "${snapshots}") | awk '{ print $3 }')
+  now_seconds=$(date +%s)
+  age_seconds=$((now_seconds - snapshot_start_date_seconds))
+  echo "${age_seconds}"
 }
 
 function remove_snapshots {
-    local snapshots_to_delete=$1
-    local url="${OPENSEARCH_URL}/_snapshot/${SNAPSHOT_REPOSITORY}/${snapshots_to_delete}"
-    echo "Deleting snapshots: ${snapshots_to_delete}"
-    curl --insecure "${url}" -f -X DELETE --max-time "${REQUEST_TIMEOUT_SECONDS}" --no-progress-meter \
-        --basic --user "${OPENSEARCH_USERNAME}:${OPENSEARCH_PASSWORD}"
-    echo ""
+  local snapshots_to_delete=$1
+  local url="${OPENSEARCH_URL}/_snapshot/${SNAPSHOT_REPOSITORY}/${snapshots_to_delete}"
+  echo "Deleting snapshots: ${snapshots_to_delete}"
+  curl --insecure "${url}" -f -X DELETE --max-time "${REQUEST_TIMEOUT_SECONDS}" --no-progress-meter \
+    --basic --user "${OPENSEARCH_USERNAME}:${OPENSEARCH_PASSWORD}"
+  echo ""
 }
 
 function check_snapshot_count {
-    local snapshot_count=$1
-    if [ "${snapshot_count}" -le "${MIN_SNAPSHOTS}" ]; then
-        echo "Snapshot count: ${snapshot_count} fewer than minimum: ${MIN_SNAPSHOTS}, do nothing"
-        return 1
-    fi
+  local snapshot_count=$1
+  if [ "${snapshot_count}" -le "${MIN_SNAPSHOTS}" ]; then
+    echo "Snapshot count: ${snapshot_count} fewer than minimum: ${MIN_SNAPSHOTS}, do nothing"
+    return 1
+  fi
 }
 
 function check_old_snapshots {
-    local snapshots=$1
-    if [ "$(get_snapshot_age "${snapshots}" 1)" -le "${MAX_AGE_SECONDS}" ]; then
-        echo "No old snapshots"
-        return 1
-    fi
+  local snapshots=$1
+  if [ "$(get_snapshot_age "${snapshots}" 1)" -le "${MAX_AGE_SECONDS}" ]; then
+    echo "No old snapshots"
+    return 1
+  fi
 }
 
 function remove_old_snapshots {
-    local idx=1
-    local snapshots
-    local snapshot_count
-    local snapshots_to_delete=""
+  local idx=1
+  local snapshots
+  local snapshot_count
+  local snapshots_to_delete=""
 
-    echo "Checking for old snapshots."
+  echo "Checking for old snapshots."
 
-    snapshots=$(get_snapshots)
-    if [[ -z ${snapshots} ]]; then
-        snapshot_count=0
-    else
-        snapshot_count=$(echo "${snapshots}" | wc -l)
+  snapshots=$(get_snapshots)
+  if [[ -z ${snapshots} ]]; then
+    snapshot_count=0
+  else
+    snapshot_count=$(echo "${snapshots}" | wc -l)
+  fi
+
+  check_snapshot_count "${snapshot_count}" || return 0
+  check_old_snapshots "${snapshots}" || return 0
+
+  while [ $((snapshot_count - idx)) -ge "${MIN_SNAPSHOTS}" ]; do
+    local age_seconds
+    age_seconds=$(get_snapshot_age "${snapshots}" "${idx}")
+    if [ "${age_seconds}" -gt "${MAX_AGE_SECONDS}" ]; then
+      local snapshot_name
+      snapshot_name=$(sed "${idx}q;d" <(echo "${snapshots}") | awk '{ print $1 }')
+      echo "Snapshot ${snapshot_name} is ${age_seconds} s old, max ${MAX_AGE_SECONDS} s"
+      snapshots_to_delete="${snapshots_to_delete}${snapshot_name},"
     fi
-
-    check_snapshot_count "${snapshot_count}" || return 0
-    check_old_snapshots  "${snapshots}"      || return 0
-
-    while [ $((snapshot_count - idx )) -ge "${MIN_SNAPSHOTS}" ]; do
-        local age_seconds
-        age_seconds=$(get_snapshot_age "${snapshots}" "${idx}")
-        if [ "${age_seconds}" -gt "${MAX_AGE_SECONDS}" ]; then
-            local snapshot_name
-            snapshot_name=$(sed "${idx}q;d" <(echo "${snapshots}") | awk '{ print $1 }')
-            echo "Snapshot ${snapshot_name} is ${age_seconds} s old, max ${MAX_AGE_SECONDS} s"
-            snapshots_to_delete="${snapshots_to_delete}${snapshot_name},"
-        fi
-        idx=$((idx + 1))
-    done
-    if [ -n "${snapshots_to_delete}" ]; then
-        remove_snapshots "${snapshots_to_delete}"
-    fi
+    idx=$((idx + 1))
+  done
+  if [ -n "${snapshots_to_delete}" ]; then
+    remove_snapshots "${snapshots_to_delete}"
+  fi
 }
 
 function remove_excess_snapshots {
-    local idx=1
-    local snapshots
-    local snapshot_count
-    local snapshots_to_delete=""
+  local idx=1
+  local snapshots
+  local snapshot_count
+  local snapshots_to_delete=""
 
-    echo "Checking number of snapshots."
+  echo "Checking number of snapshots."
 
-    snapshots=$(get_snapshots)
-    if [[ -z ${snapshots} ]]; then
-        snapshot_count=0
-    else
-        snapshot_count=$(echo "${snapshots}" | wc -l)
-    fi
-    echo "Number of snapshots: $snapshot_count"
+  snapshots=$(get_snapshots)
+  if [[ -z ${snapshots} ]]; then
+    snapshot_count=0
+  else
+    snapshot_count=$(echo "${snapshots}" | wc -l)
+  fi
+  echo "Number of snapshots: $snapshot_count"
 
-    check_snapshot_count "${snapshot_count}" || return 0
+  check_snapshot_count "${snapshot_count}" || return 0
 
-    while [ $((snapshot_count - idx )) -ge "${MAX_SNAPSHOTS}" ]; do
-        local snapshot_name
-        snapshot_name=$(sed "${idx}q;d" <(echo "${snapshots}") | awk '{ print $1 }')
-        echo "Too many snapshots: $snapshot_count, max ${MAX_SNAPSHOTS}"
-        snapshots_to_delete="${snapshots_to_delete}${snapshot_name},"
-        idx=$((idx + 1))
-    done
-    if [ -n "${snapshots_to_delete}" ]; then
-        remove_snapshots "${snapshots_to_delete}"
-    else
-        echo "Snapshot count: ${snapshot_count} is not more than maximum: ${MAX_SNAPSHOTS}, do nothing"
-    fi
+  while [ $((snapshot_count - idx)) -ge "${MAX_SNAPSHOTS}" ]; do
+    local snapshot_name
+    snapshot_name=$(sed "${idx}q;d" <(echo "${snapshots}") | awk '{ print $1 }')
+    echo "Too many snapshots: $snapshot_count, max ${MAX_SNAPSHOTS}"
+    snapshots_to_delete="${snapshots_to_delete}${snapshot_name},"
+    idx=$((idx + 1))
+  done
+  if [ -n "${snapshots_to_delete}" ]; then
+    remove_snapshots "${snapshots_to_delete}"
+  else
+    echo "Snapshot count: ${snapshot_count} is not more than maximum: ${MAX_SNAPSHOTS}, do nothing"
+  fi
 }
 
 echo "SLM retention procedure started"

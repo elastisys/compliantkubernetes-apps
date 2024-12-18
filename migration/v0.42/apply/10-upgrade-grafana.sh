@@ -28,8 +28,8 @@ run() {
         clusters_monitoring=$(yq4 '[.global.clustersMonitoring[] | {"name": .}]' "${CK8S_CONFIG_PATH}/sc-config.yaml" -ojson)
         export clusters_monitoring
 
-        user_grafana_cm=$(kubectl_do sc get cm user-grafana -n monitoring -o=jsonpath='{.data.datasources\.yaml}' \
-          | yq4 '.deleteDatasources = env(clusters_monitoring)' -o json)
+        user_grafana_cm=$(kubectl_do sc get cm user-grafana -n monitoring -o=jsonpath='{.data.datasources\.yaml}' |
+          yq4 '.deleteDatasources = env(clusters_monitoring)' -o json)
 
         PATCH="[
           {

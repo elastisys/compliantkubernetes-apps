@@ -8,7 +8,6 @@ helmfile_build_releases() {
   local releases expression
   releases="${CK8S_CONFIG_PATH}/pre-build/${1}.yaml"
 
-
   if ! [[ -f "${releases}" ]]; then
     mkdir -p "$(dirname "${releases}")"
 
@@ -31,10 +30,10 @@ helmfile_build_releases() {
 
     case "${1:-}" in
     sc)
-      helmfile -e service_cluster -f "${ROOT}/helmfile.d" -q build | yq -oj -I0 "${expression}" > "${target}"
+      helmfile -e service_cluster -f "${ROOT}/helmfile.d" -q build | yq -oj -I0 "${expression}" >"${target}"
       ;;
     wc)
-      helmfile -e workload_cluster -f "${ROOT}/helmfile.d" -q build | yq -oj -I0 "${expression}" > "${target}"
+      helmfile -e workload_cluster -f "${ROOT}/helmfile.d" -q build | yq -oj -I0 "${expression}" >"${target}"
       ;;
     *)
       echo "error: usage: helmfile_build_releases <sc|wc>"
@@ -68,7 +67,7 @@ helmfile_build_needs() {
       .[] | select(
         .selector | match(\"${incoming// /|}\")
       ) | .needs + [.selector] | .[]
-    ] | sort | unique | join(\" \") " <<< "${releases}")"
+    ] | sort | unique | join(\" \") " <<<"${releases}")"
   done
 
   echo "${outgoing// /$'\n'}"
@@ -107,7 +106,7 @@ helmfile_template_release() {
     namespace="${namespace%%,name=*}"
 
     local -a files
-    readarray -t files <<< "$(find "${release}" -type f -name '*.yaml')"
+    readarray -t files <<<"$(find "${release}" -type f -name '*.yaml')"
 
     for file in "${files[@]}"; do
       yq ".metadata.namespace = (.metadata.namespace // \"${namespace}\")" "${file}"
@@ -123,7 +122,7 @@ helmfile_template_release() {
 # caches the results
 helmfile_template_release_needs() {
   local -a selectors
-  readarray -t selectors <<< "$(helmfile_build_needs "${1}" "${2}")"
+  readarray -t selectors <<<"$(helmfile_build_needs "${1}" "${2}")"
 
   local selector
   for selector in "${selectors[@]}"; do
@@ -143,7 +142,7 @@ releases_have_through_needs() {
   created_expression="${3}"
 
   local -a selectors
-  readarray -t selectors <<< "$(helmfile_build_releases "${cluster}" | yq -r -oj -I0 '.[] | "namespace=" + .namespace + ",name=" + .name')"
+  readarray -t selectors <<<"$(helmfile_build_releases "${cluster}" | yq -r -oj -I0 '.[] | "namespace=" + .namespace + ",name=" + .name')"
 
   local fail=false
 
@@ -157,7 +156,7 @@ releases_have_through_needs() {
 
     local uniques
     # print used resources once and created resources twice, then filter on totally unique identifiers
-    uniques="$(tr ' ' '\n' <<< "${used_resources} ${created_resources} ${created_resources}" | sort | uniq -u | tr '\n' ' ')"
+    uniques="$(tr ' ' '\n' <<<"${used_resources} ${created_resources} ${created_resources}" | sort | uniq -u | tr '\n' ' ')"
 
     # if we have a totally unique identifier then we have an issue
     if [[ -n "${uniques%% }" ]]; then
@@ -173,7 +172,7 @@ releases_have_through_needs() {
 
 release_with_custom_resources_have_validation_on_install_disabled() {
   local -a selectors
-  readarray -t selectors <<< "$(helmfile_build_releases "${1}" | yq -r -oj -I0 '.[] | select(.disableValidationOnInstall != true) | "namespace=" + .namespace + ",name=" + .name')"
+  readarray -t selectors <<<"$(helmfile_build_releases "${1}" | yq -r -oj -I0 '.[] | select(.disableValidationOnInstall != true) | "namespace=" + .namespace + ",name=" + .name')"
 
   local fail=false
 

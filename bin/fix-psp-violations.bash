@@ -61,7 +61,7 @@ function is_customer_namespace() {
   namespace="$1"
   operator_ns_regex="^($(kubectl_do "${CK8S_CLUSTER}" get ns -l owner=operator '-ojsonpath={.items[*].metadata.name}' | sed 's/ /|/g'))$"
 
-  if [[ "$namespace" =~ $operator_ns_regex  ]]; then return 1; fi
+  if [[ "$namespace" =~ $operator_ns_regex ]]; then return 1; fi
 }
 
 function restart_violating_resources() {

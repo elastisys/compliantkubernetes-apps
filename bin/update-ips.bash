@@ -35,10 +35,10 @@ yq_read() {
   local value
 
   for config_file in "${config["override_${cluster}"]}" \
-                      "${config["override_common"]}" \
-                      "${config["default_${cluster}"]}" \
-                      "${config["default_common"]}"
-  do
+    "${config["override_common"]}" \
+    "${config["default_${cluster}"]}" \
+    "${config["default_common"]}"; do
+
     value=$(yq4 "${config_option}" "${config_file}")
 
     if [[ "${value}" != "null" ]]; then
@@ -87,8 +87,8 @@ yq_eval() {
   fi
 
   diff -U3 --color=always \
-      --label "${config_filename}" <(yq4 -P "${config_file}") \
-      --label expected <(yq4 -P "${expression}" "${config_file}") > "${out}" && return
+    --label "${config_filename}" <(yq4 -P "${config_file}") \
+    --label expected <(yq4 -P "${expression}" "${config_file}") >"${out}" && return
 
   if ${dry_run}; then
     log_warning "Diff found for ${config_option} in ${config_filename} (diff shows actions needed to be up to date)"
@@ -142,7 +142,7 @@ get_kubectl_ips() {
   mapfile -t ips_wireguard < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4WireguardInterfaceAddr}')
 
   local -a ips
-  read -r -a ips <<< "${ips_internal[*]} ${ips_calico_vxlan[*]} ${ips_calico_ipip[*]} ${ips_wireguard[*]}"
+  read -r -a ips <<<"${ips_internal[*]} ${ips_calico_vxlan[*]} ${ips_calico_ipip[*]} ${ips_wireguard[*]}"
 
   if [ ${#ips[@]} -eq 0 ]; then
     log_error "No IPs for ${cluster} nodes with label ${label} was found"
@@ -229,7 +229,7 @@ get_swift_url() {
       [[ "${header}" == "x-subject-token:" ]] && os_token="${value}"
     done
     swift_url=$(jq -r '.token.catalog[] | select( .type == "object-store" and .name == "swift") | .endpoints[] | select(.interface == "public" and .region == "'"${swift_region}"'") | .url')
-  } <<< "${response}"
+  } <<<"${response}"
 
   curl -i -s -X DELETE -H "X-Auth-Token: ${os_token}" -H "X-Subject-Token: ${os_token}" "${auth_url}/auth/tokens" >/dev/null
 
@@ -267,7 +267,7 @@ process_ips_to_cidrs() {
   local -a new_cidrs
   local -a old_cidrs
 
-  readarray -t old_cidrs <<< "$(yq4 "${config_option} | .[]" "${config_file}")"
+  readarray -t old_cidrs <<<"$(yq4 "${config_option} | .[]" "${config_file}")"
 
   for ip in "${@}"; do
     for cidr in "${old_cidrs[@]}"; do
@@ -280,7 +280,7 @@ process_ips_to_cidrs() {
     new_cidrs+=("${ip}/32")
   done
 
-  yq4 'split(" ") | unique | .[]' <<< "${new_cidrs[@]}"
+  yq4 'split(" ") | unique | .[]' <<<"${new_cidrs[@]}"
 }
 
 # Parse the host from an URL.
@@ -295,11 +295,11 @@ parse_url_port() {
   port="$(echo "${1}" | sed 's/https\?:\/\///' | sed 's/[A-Za-z.0-9-]*:\?//' | sed 's/\/.*//')"
   [ -n "${port}" ] && echo "${port}" && return
   case "${1}" in
-    http://*) echo 80 ;;
-    https://*) echo 443 ;;
-    *)
-      log_error "Could not determine default port for ${2}, missing protocol: ${1}"
-      exit 1
+  http://*) echo 80 ;;
+  https://*) echo 443 ;;
+  *)
+    log_error "Could not determine default port for ${2}, missing protocol: ${1}"
+    exit 1
     ;;
   esac
 }
@@ -313,10 +313,10 @@ allow_ips() {
   shift 2
 
   local -a ips
-  readarray -t ips <<< "$(sort_ips "${@}")"
+  readarray -t ips <<<"$(sort_ips "${@}")"
 
   local -a cidrs
-  readarray -t cidrs <<< "$(process_ips_to_cidrs "${config_file}" "${config_option}" "${ips[@]}")"
+  readarray -t cidrs <<<"$(process_ips_to_cidrs "${config_file}" "${config_option}" "${ips[@]}")"
 
   local list
   list=$(echo "[$(for v in "${cidrs[@]}"; do echo "${v},"; done)]" | yq4 -oj)
@@ -348,7 +348,7 @@ allow_domain() {
 
   local -a ips dns_ips
   dns_ips=$(get_dns_ips "${dns_record}")
-  readarray -t ips <<< "$(echo "${dns_ips}" | tr ' ' '\n')"
+  readarray -t ips <<<"$(echo "${dns_ips}" | tr ' ' '\n')"
 
   allow_ips "${config_file}" "${config_option}" "${ips[@]}"
 }
@@ -357,7 +357,7 @@ allow_domain() {
 #
 # Usage: is_ip_address <string>
 is_ip_address() {
-  python3 -c "import ipaddress; import sys; ipaddress.ip_address(sys.argv[1])" "${1}" > /dev/null 2>&1
+  python3 -c "import ipaddress; import sys; ipaddress.ip_address(sys.argv[1])" "${1}" >/dev/null 2>&1
 }
 
 # Updates the configuration to allow the host domain or IP address.
@@ -377,7 +377,7 @@ allow_host() {
     fi
 
     pod_subnet="$("${here}/ops.bash" kubectl "${cluster}" get configmap --namespace kube-system kubeadm-config --ignore-not-found --output yaml)"
-    pod_subnet="$(yq4 '.data.ClusterConfiguration | @yamld | .networking.podSubnet // "0.0.0.0/0"' <<< "${pod_subnet}")"
+    pod_subnet="$(yq4 '.data.ClusterConfiguration | @yamld | .networking.podSubnet // "0.0.0.0/0"' <<<"${pod_subnet}")"
 
     log_warning "Found cluster local endpoint ${host} for ${config_option} using ${pod_subnet}"
 
@@ -404,7 +404,7 @@ allow_nodes() {
 
   local -a ips kubectl_ips
   kubectl_ips=$(get_kubectl_ips "${cluster}" "${label}")
-  readarray -t ips <<< "$(echo "${kubectl_ips}" | tr ' ' '\n')"
+  readarray -t ips <<<"$(echo "${kubectl_ips}" | tr ' ' '\n')"
 
   allow_ips "${config_file}" "${config_option}" "${ips[@]}"
 }
@@ -575,7 +575,7 @@ validate_config() {
 
   if [ "${sync_default_buckets}" == "true" ]; then
     if [ "${harbor_persistence_type}" == "swift" ] || [ "${thanos_object_storage_type}" == "swift" ]; then
-        destination_swift=true
+      destination_swift=true
     fi
   fi
   for bucket_type in ${bucket_destination_types}; do
