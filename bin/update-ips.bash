@@ -161,8 +161,8 @@ get_dns_ips() {
   local -a ips
   mapfile -t ips < <(dig +short "${domain}" | grep '^[.0-9]*$')
   if [ ${#ips[@]} -eq 0 ]; then
-    log_error "No IPs for ${domain} was found"
-    exit 1
+    log_error "No IPs for ${domain} was found. Will block all IPs"
+    echo "0.0.0.0"
   fi
   echo "${ips[@]}"
 }
