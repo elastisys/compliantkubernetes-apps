@@ -12,14 +12,14 @@ export CK8S_CONFIG_PATH
 export XDG_DATA_HOME="/root/.config"
 
 config_update() {
-    yq4 -i "${2} = \"${3}\"" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
+  yq4 -i "${2} = \"${3}\"" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
 }
 
 secrets_update() {
-    local secrets_yaml="${CK8S_CONFIG_PATH}/secrets.yaml"
-    # TODO: install editor in pipeline and set TERM properly to write using
-    # `sops --set` instead.
-    sops --config "${CK8S_CONFIG_PATH}/.sops.yaml" -d -i "${secrets_yaml}"
-    yq4 -i "${1} =  \"${2}\"" "${secrets_yaml}"
-    sops --config "${CK8S_CONFIG_PATH}/.sops.yaml" -e -i "${secrets_yaml}"
+  local secrets_yaml="${CK8S_CONFIG_PATH}/secrets.yaml"
+  # TODO: install editor in pipeline and set TERM properly to write using
+  # `sops --set` instead.
+  sops --config "${CK8S_CONFIG_PATH}/.sops.yaml" -d -i "${secrets_yaml}"
+  yq4 -i "${1} =  \"${2}\"" "${secrets_yaml}"
+  sops --config "${CK8S_CONFIG_PATH}/.sops.yaml" -e -i "${secrets_yaml}"
 }

@@ -20,7 +20,7 @@ create_from_manifest() {
       exit 1
     fi
 
-    if "${ck8s}" ops kubectl "${cluster}" get -f "$1" > /dev/null; then
+    if "${ck8s}" ops kubectl "${cluster}" get -f "$1" >/dev/null; then
       echo "note: resources already created from manifest { ${file} }"
     else
       echo "note: creating resources from manifest { ${file} }"

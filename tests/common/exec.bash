@@ -175,7 +175,7 @@ suite.setup() {
   declare postvariables
   postvariables="$(env)"
 
-  sort <<< "$prevariables"$'\n'"$postvariables" | uniq -u > "suite.env"
+  sort <<<"$prevariables"$'\n'"$postvariables" | uniq -u >"suite.env"
 
   echo "info: environment set during setup: suite.env"
   echo "- make sure to export these variables before running the test suite and teardown suite!"

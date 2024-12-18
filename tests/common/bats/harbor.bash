@@ -67,13 +67,13 @@ harbor.setup_project() {
   harbor.create_project "${harbor_project}"
   output="$(harbor.create_robot "${harbor_project}" "${harbor_robot}")"
 
-  jq -r .id <<< "${output}" > "${harbor_robot_id_path}"
-  jq -r .secret <<< "${output}" > "${harbor_robot_secret_path}"
+  jq -r .id <<<"${output}" >"${harbor_robot_id_path}"
+  jq -r .secret <<<"${output}" >"${harbor_robot_secret_path}"
 
   if [[ "${harbor_secure}" != "true" ]]; then
-    ctr.insecure login --username "${harbor_robot_fullname}" --password-stdin "${harbor_endpoint}" < "${harbor_robot_secret_path}"
+    ctr.insecure login --username "${harbor_robot_fullname}" --password-stdin "${harbor_endpoint}" <"${harbor_robot_secret_path}"
   else
-    ctr login --username "${harbor_robot_fullname}" --password-stdin "${harbor_endpoint}" < "${harbor_robot_secret_path}"
+    ctr login --username "${harbor_robot_fullname}" --password-stdin "${harbor_endpoint}" <"${harbor_robot_secret_path}"
   fi
 }
 
@@ -122,7 +122,6 @@ harbor.post() {
   if [[ "${#}" -lt 1 ]]; then
     log.fatal "usage: harbor.post [resource/path] [json data] <additional curl args...>"
   fi
-
 
   if [[ "${harbor_secure}" == "true" ]]; then
     curl -s -u "${harbor_username}:${harbor_password}" "https://${harbor_endpoint}/api/v2.0/${1}" -H "accept: application/json" -H "content-type: application/json" -d "${2}" "${@:3}"

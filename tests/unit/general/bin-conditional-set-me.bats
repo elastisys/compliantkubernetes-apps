@@ -488,7 +488,6 @@ _refute_condition_and_warn() {
   run _apply_normalise_sc
   _refute_condition_and_warn .\"networkPolicies\".\"rclone\".\"sync\".\"objectStorageSwift\".\"ips\"
 
-
   yq.set sc .objectStorage.sync.enabled 'false'
   yq.set sc .thanos.objectStorage.type \"swift\"
   yq.set sc .harbor.persistence.type \"objectStorage\"

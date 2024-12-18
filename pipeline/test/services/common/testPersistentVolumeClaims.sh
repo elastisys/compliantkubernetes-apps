@@ -17,10 +17,10 @@ testPersistentVolumeClaims() {
     output="$namespace/$name: $phase"
     if [ "$phase" = Bound ]; then
       echo "$output ✔"
-      SUCCESSES=$((SUCCESSES+1))
+      SUCCESSES=$((SUCCESSES + 1))
     else
       echo "$output ❌"
-      FAILURES=$((FAILURES+1))
+      FAILURES=$((FAILURES + 1))
       DEBUG_OUTPUT+=$pvc
     fi
   done < <(echo "$pvcs" | jq -c '.items[]')
