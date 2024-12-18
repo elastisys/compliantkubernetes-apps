@@ -35,9 +35,15 @@ This repository installs all the applications of ck8s on top of already created 
 To setup the clusters see [compliantkubernetes-kubespray][compliantkubernetes-kubespray].
 A service-cluster (sc) or workload-cluster (wc) can be created separately but all of the applications will not work correctly unless both are running.
 
-All config files will be located under `CK8S_CONFIG_PATH`.
+We follow the "configuration as code" principle which means that all configuration necessary to configure and operate the platform resides in the `CK8S_CONFIG_PATH` directory.
 There will be four config files: `common-config.yaml`, `wc-config.yaml`, `sc-config.yaml` and `secrets.yaml`.
-See [Quickstart](#quickstart) for instructions on how to initialize the repo
+
+We strongly suggest to make your config directory part of a git repository so that it is stored safely and to allow you to rollback previously applied changes.
+We additionally suggest that you make Apps a submodule of your config repository in order to properly track which version of Apps you have applied and make your config repository the single source of truth of your environment.
+
+All operations are done through the `./bin/ck8s` command line tool. Run `./bin/ck8s help` for a complete set of possible commands.
+
+See [Quickstart](#Quickstart) for instructions on how to initialize the repo
 
 ### :cloud: Cloud providers :cloud:
 
