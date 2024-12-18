@@ -48,7 +48,7 @@ envsubst > tmp-job.yaml < restore/harbor/restore-harbor-job.yaml
 ### Rclone move data
 
 If you are restoring Harbor in Azure from a bucket that was previously a rclone destination where the source was not Azure, then the path for the Harbor image data is likely wrong.
-Due to an issue with Harbor it is storing image data with an extra `/` at the start of the path for Azure.
+Due to an [issue with Harbor](https://github.com/distribution/distribution/issues/1247) it is storing image data with an extra `/` at the start of the path for Azure.
 But it is not the same for other object storage types, so if the data was copied from e.g. S3 then it will likely be wrong now.
 The following steps will create a rclone job that will move all of the harbor image data to the correct path with an extra `/`.
 
