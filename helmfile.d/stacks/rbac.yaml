@@ -57,15 +57,15 @@ templates:
       - values/userCRDs/mongodbcommunity/mongodb.yaml.gotmpl
       - values/userCRDs/strimzi/kafka.yaml.gotmpl
 
-  extra-dev-rbac:
+  dev-rbac-extra:
     inherit: [ template: rbac ]
     condition: ck8sWorkloadCluster.enabled
     chart: charts/user-crds
     version: 1.0.0
-    name: extra-dev-rbac
+    name: dev-rbac-extra
     needs:
       - kube-system/user-rbac
     labels:
       app: dev-rbac
     values:
-      - values/extra-dev-rbac.yaml.gotmpl
+      - values/dev-rbac-extra.yaml.gotmpl
