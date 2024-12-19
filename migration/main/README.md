@@ -38,9 +38,6 @@ to: main
 
 ## Automatic method
 
-> [!tip]
-> It is possible to either upgrade both the service and workload cluster together, or upgrade service clusters and workload clusters separately by supplying the upgrade command with the `both`, `sc`, or `wc` target cluster arguments.
-
 1. Switch to the main branch and pull the latest changes:
 
     ```bash
@@ -48,17 +45,25 @@ to: main
     git pull
     ```
 
+1. Set upgrade target
+
+    Set to upgrade `both` the service cluster and workload cluster together, or `sc` or `wc` to upgrade them separately.
+
+    ```bash
+    export CK8S_CLUSTER="<both|sc|wc>"
+    ```
+
 1. Prepare upgrade
 
     > _Non-disruptive, done before maintenance window._
 
     ```bash
-    ./bin/ck8s upgrade <target-cluster> main prepare
+    ./bin/ck8s upgrade "${CK8S_CLUSTER}" main prepare
 
     # Check if any NetworkPolicy IPs need to be updated
-    ./bin/ck8s update-ips <target-cluster> dry-run
+    ./bin/ck8s update-ips "${CK8S_CLUSTER}" dry-run
     # Apply the changes if you agree with them
-    ./bin/ck8s update-ips <target-cluster> apply
+    ./bin/ck8s update-ips "${CK8S_CLUSTER}" apply
     ```
 
 1. Apply upgrade
@@ -66,15 +71,21 @@ to: main
     > **Disruptive, done during maintenance window.**
 
     ```bash
-    ./bin/ck8s upgrade both <target-cluster> apply
+    ./bin/ck8s upgrade both "${CK8S_CLUSTER}" apply
     ```
 
 ## Manual method
 
 > [!warning]
-> When running migration snippets directly you can target to either upgrade both the service and workload cluster together, or to upgrade service clusters and workload clusters separately by setting and exporting the environment variable `CK8S_CLUSTER` with `both`, `sc`, or `wc` respectively.
->
-> This must be set and exported for both the prepare and apply upgrade steps!
+> When running migration snippets manually you must be sure to set the target cluster, this must be set and exported for both the prepare and apply upgrade steps!
+
+1. Set upgrade target
+
+    Set to upgrade `both` the service cluster and workload cluster together, or `sc` or `wc` to upgrade them separately.
+
+    ```bash
+    export CK8S_CLUSTER="<both|sc|wc>"
+    ```
 
 ### Prepare upgrade
 
@@ -95,9 +106,9 @@ to: main
     ./migration/main/prepare/50-init.sh
 
     # Check if any NetworkPolicy IPs need to be updated
-    ./bin/ck8s update-ips ${CK8S_CLUSTER} dry-run
+    ./bin/ck8s update-ips "${CK8S_CLUSTER}" dry-run
     # Apply the changes if you agree with them
-    ./bin/ck8s update-ips ${CK8S_CLUSTER} apply
+    ./bin/ck8s update-ips "${CK8S_CLUSTER}" apply
     ```
 
 ### Apply upgrade - *disruptive*
