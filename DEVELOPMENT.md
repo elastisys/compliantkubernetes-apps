@@ -2,7 +2,7 @@
 
 ## Requirements
 
-* See [README.md](./README.md).
+- See [README.md](./README.md).
 
 ## Local clusters
 
@@ -139,17 +139,17 @@ kubectl delete pvc --all -A
 
 ### Bash
 
-* See [Googles style guide](https://google.github.io/styleguide/shellguide.html).
+- See [Googles style guide](https://google.github.io/styleguide/shellguide.html).
 
 ### Markdown
 
-* Use Github flavored markdown.
-* One sentence per line - do not line break long sentences.
+- Use Github flavored markdown.
+- One sentence per line - do not line break long sentences.
 
 ### TODO
 
-* Naming conventions?
-* Line length limit (except for markdown)?
+- Naming conventions?
+- Line length limit (except for markdown)?
 
 ## Tooling
 
@@ -185,11 +185,11 @@ The plugin will set up project-specific editor configuration based on the values
 
 Some recommended plugins:
 
-* `timonwong.shellcheck`
-* `davidanson.vscode-markdownlint`
-* `redhat.vscode-yaml`
-* `editorconfig.editorconfig`
-* `signageos.vscode-sops`
+- `timonwong.shellcheck`
+- `davidanson.vscode-markdownlint`
+- `redhat.vscode-yaml`
+- `editorconfig.editorconfig`
+- `signageos.vscode-sops`
 
 #### Other editors
 
