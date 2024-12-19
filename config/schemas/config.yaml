@@ -1484,6 +1484,9 @@ properties:
           properties:
             rules:
               title: PolicyRules for this Role
+              description: |
+                PolicyRules for this Role
+                Reference: https://kubernetes.io/docs/reference/kubernetes-api/authorization-resources/role-v1/
               type: array
               default: []
           additionalProperties: false
@@ -1498,10 +1501,12 @@ properties:
           properties:
             roleRef:
               title: The reference to a role to use for this RoleBinding
+              description: The reference to a role to use for this RoleBinding
               type: object
               properties:
                 name:
                   title: Name of the Role or ClusterRole to bind subjects with
+                  description: Name of the Role or ClusterRole to bind subjects with
                   type: string
                 kind:
                   title: Either ClusterRole or Role
@@ -1513,6 +1518,9 @@ properties:
               additionalProperties: false
             subjects:
               title: Subjects to apply role to
+              description: |
+                Configure Subjects that a role apply to
+                Reference: https://kubernetes.io/docs/reference/kubernetes-api/authorization-resources/role-binding-v1/
               type: array
               default: []
           additionalProperties: false
@@ -1527,6 +1535,9 @@ properties:
           properties:
             rules:
               title: PolicyRules for this Role
+              description: |
+                PolicyRules for this ClusterRole
+                Reference: https://kubernetes.io/docs/reference/kubernetes-api/authorization-resources/cluster-role-v1/
               type: array
               default: []
           additionalProperties: false
@@ -1540,6 +1551,7 @@ properties:
           properties:
             roleRef:
               title: The reference to a role to use for this RoleBinding
+              description: The reference to a role to use for this RoleBinding
               type: object
               properties:
                 name:
@@ -1548,6 +1560,9 @@ properties:
               additionalProperties: false
             subjects:
               title: Subjects to apply role to
+              description: |
+                Configure Subjects that a role apply to
+                Reference: https://kubernetes.io/docs/reference/kubernetes-api/authorization-resources/cluster-role-binding-v1/
               type: array
               default: []
           additionalProperties: false
