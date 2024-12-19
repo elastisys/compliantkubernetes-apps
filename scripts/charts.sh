@@ -57,7 +57,7 @@ run_diff() {
     ;;
   all)
     rm -rf "/tmp/charts/${chart}"
-    helm pull "${chart}" --version "${requested_version}" --untar --untardir "/tmp/charts/${chart%%/*}" 2>&1 >/dev/null 2>/dev/null
+    helm pull "${chart}" --version "${requested_version}" --untar --untardir "/tmp/charts/${chart%%/*}" &>/dev/null
     if diff -r --color -U3 "${CHARTS}/${chart}" "/tmp/charts/${chart}"; then
       out "  state: \e[32mvalid\e[0m"
       RETURN="1"
