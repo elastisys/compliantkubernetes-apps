@@ -75,6 +75,7 @@ diskAlerts:
 
 defaultRules:
   create: true
+  runbookUrl: "https://runbooks.prometheus-operator.dev/runbooks/"
   ## Any labels to add to the alert rules
   # alertLabels:
   #   key: value
