@@ -36,27 +36,27 @@ teardown_file() {
 }
 
 @test "configuration is valid - aws:capi:air-gapped - service cluster" {
-  run ck8s validate sc <<< $'y\n'
+  run ck8s validate sc <<<$'y\n'
 
   assert_success
 }
 
 @test "configuration is valid - aws:capi:air-gapped - workload cluster" {
-  run ck8s validate wc <<< $'y\n'
+  run ck8s validate wc <<<$'y\n'
 
   assert_success
 }
 
 @test "configuration is invalid - aws:capi:air-gapped - service cluster" {
   run yq.set 'sc' '.global.baseDomain' '"this is not a valid hostname"'
-  run ck8s validate sc <<< $'y\n'
+  run ck8s validate sc <<<$'y\n'
 
   assert_output --partial 'global.baseDomain'
 }
 
 @test "configuration is invalid - aws:capi:air-gapped - workload cluster" {
   run yq.set 'wc' '.global.baseDomain' '"this is not a valid hostname"'
-  run ck8s validate wc <<< $'y\n'
+  run ck8s validate wc <<<$'y\n'
 
   assert_output --partial '"this is not a valid hostname"'
 }

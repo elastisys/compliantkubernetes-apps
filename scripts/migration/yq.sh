@@ -55,7 +55,7 @@ yq_move_to_file() {
   if ! yq_null "${1}" "${2}"; then
     log_info "  - move: ${1} ${2} to ${4} ${3}"
     yq4 -oj -I0 "${2}" "${CK8S_CONFIG_PATH}/${1}-config.yaml" |
-    yq4 -i "${4} = load(\"/dev/stdin\")" "${CK8S_CONFIG_PATH}/${3}-config.yaml"
+      yq4 -i "${4} = load(\"/dev/stdin\")" "${CK8S_CONFIG_PATH}/${3}-config.yaml"
     yq4 -i "del(${2})" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
   fi
 }

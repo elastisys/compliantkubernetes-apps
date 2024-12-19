@@ -68,12 +68,12 @@ teardown_file() {
   assert_line --regexp ".*\"name\":\"robot.*"
   assert_success
 
-  jq -r .id <<< "${output}" > "${harbor_robot_id_path}"
-  jq -r .secret <<< "${output}" > "${harbor_robot_secret_path}"
+  jq -r .id <<<"${output}" >"${harbor_robot_id_path}"
+  jq -r .secret <<<"${output}" >"${harbor_robot_secret_path}"
 }
 
 @test "harbor api can authenticate with robot account" {
-  run skopeo login "${harbor_endpoint}" --username "${harbor_robot_fullname}" --password-stdin < "${harbor_robot_secret_path}"
+  run skopeo login "${harbor_endpoint}" --username "${harbor_robot_fullname}" --password-stdin <"${harbor_robot_secret_path}"
 
   assert_line --regexp "Login Succeeded"
   assert_success
@@ -121,7 +121,7 @@ teardown_file() {
 }
 
 @test "harbor api can delete robot account" {
-  read -r harbor_robot_id < "${harbor_robot_id_path}"
+  read -r harbor_robot_id <"${harbor_robot_id_path}"
 
   run harbor.delete_robot "${harbor_robot_id}"
   refute_output

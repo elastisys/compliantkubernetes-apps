@@ -260,7 +260,6 @@ _test_apply_rclone_sync_swift_remove_s3() {
   _test_apply_rclone_sync_swift_remove_s3 '.objectStorage.sync.destinationType'
 }
 
-
 # --- swift add s3 -----------------------------------------------------------------------------------------------------
 
 _test_apply_rclone_sync_swift_add_s3() {

@@ -205,7 +205,7 @@ _configure_maximal() {
   _configure_maximal
 
   if [[ "${CK8S_TESTS_REGENERATE_RESOURCES:-}" == "true" ]]; then
-    _apply_normalise > "${BATS_TEST_DIRNAME}/resources/maximal-run-full-diff.out"
+    _apply_normalise >"${BATS_TEST_DIRNAME}/resources/maximal-run-full-diff.out"
     return
   fi
 

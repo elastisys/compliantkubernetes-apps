@@ -57,7 +57,7 @@ mark.check() {
 # punch a marker for serial tests
 mark.punch() {
   if [[ -n "${TESTS_MARKER:-}" ]]; then
-    echo "pass" > "${TESTS_MARKER}"
+    echo "pass" >"${TESTS_MARKER}"
   else
     fail "cannot punch missing marker"
   fi
@@ -212,24 +212,24 @@ cypress_setup() {
   for seq in $(seq 3); do
     [[ "${seq}" == "1" ]] || log.trace "cypress run: try ${seq}/3"
 
-    cypress run --no-runner-ui --spec "$1" --reporter json-stream --quiet > "${CYPRESS_REPORT}" || true
+    cypress run --no-runner-ui --spec "$1" --reporter json-stream --quiet >"${CYPRESS_REPORT}" || true
 
     # This happen seemingly at random
     if ! grep "Fatal JavaScript out of memory" "${CYPRESS_REPORT}" &>/dev/null; then
-      break;
+      break
     fi
   done
 
   popd || exit 1
 
   # Without json events we have some failure
-  if ! grep -q '^\[.*\]$' < "${CYPRESS_REPORT}"; then
+  if ! grep -q '^\[.*\]$' <"${CYPRESS_REPORT}"; then
     cat "${CYPRESS_REPORT}" >&2
     exit 1
   fi
 
   # Filter json events
-  grep '^\[.*\]$' < "${CYPRESS_REPORT}" > "${CYPRESS_REPORT}.tmp"
+  grep '^\[.*\]$' <"${CYPRESS_REPORT}" >"${CYPRESS_REPORT}.tmp"
   mv "${CYPRESS_REPORT}.tmp" "${CYPRESS_REPORT}"
 
   # Check for any auto-generated error

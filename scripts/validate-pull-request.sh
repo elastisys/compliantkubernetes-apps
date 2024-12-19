@@ -8,7 +8,7 @@ declare -a output
 # Raw input stage
 declare -a raw
 if [[ -f "${1:-}" ]]; then
-  readarray -t raw < "${1}"
+  readarray -t raw <"${1}"
 else
   echo "error: missing or invalid file argument" >&2
   exit 1
@@ -78,7 +78,6 @@ for line in "${raw[@]}"; do
     fi
   done
 done
-
 
 # Find kinds
 declare -a kinds
@@ -209,9 +208,9 @@ done
 # Output stage: Custom annotations for GitHub Actions and regular error output otherwise
 if [[ -n "${output[*]:-}" ]]; then
   if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
-    echo "pull request failed validation:" >> "${GITHUB_STEP_SUMMARY:-}"
+    echo "pull request failed validation:" >>"${GITHUB_STEP_SUMMARY:-}"
     for line in "${output[@]}"; do
-      echo "- ${line}" >> "${GITHUB_STEP_SUMMARY:-}"
+      echo "- ${line}" >>"${GITHUB_STEP_SUMMARY:-}"
       echo "::error ::${line}"
     done
   else

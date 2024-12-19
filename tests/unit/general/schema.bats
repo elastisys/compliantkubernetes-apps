@@ -10,7 +10,7 @@ setup() {
 }
 
 find_schemas() {
-  readarray -t schemas <<< "$(find "${ROOT}/config/schemas/" -type f -name '*.yaml')"
+  readarray -t schemas <<<"$(find "${ROOT}/config/schemas/" -type f -name '*.yaml')"
 }
 
 @test "root schemas should have titles" {

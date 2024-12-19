@@ -13,7 +13,7 @@ cypress_gen() {
 
   local -a input
 
-  readarray -t input < "${file}"
+  readarray -t input <"${file}"
 
   local bats cluster helmfile describe test
 
@@ -31,9 +31,9 @@ cypress_gen() {
     elif [[ "${line}" =~ "// teardown_file" ]]; then
       teardown_file+=("${line##// teardown_file }")
     elif [[ "${line}" =~ [[:space:]]*describe\( ]]; then
-      describe="$(sed -n "s/describe([\"\']\(.\+\)[\"\'],.\+/\1/p" <<< "${line}")"
+      describe="$(sed -n "s/describe([\"\']\(.\+\)[\"\'],.\+/\1/p" <<<"${line}")"
     elif [[ "${line}" =~ [[:space:]]+it\( ]]; then
-      test="$(sed -n "s/[[:space:]]\+it([\"\']\(.\+\)[\"\'],.\+/\1/p" <<< "${line}")"
+      test="$(sed -n "s/[[:space:]]\+it([\"\']\(.\+\)[\"\'],.\+/\1/p" <<<"${line}")"
 
       its+=("${describe} ${test}")
     fi
@@ -96,7 +96,7 @@ cypress() {
   local -a files
 
   if [[ "$#" -eq 0 ]]; then
-    readarray -t files <<< "$(find "${tests}" -type f -name '*.cy.js')"
+    readarray -t files <<<"$(find "${tests}" -type f -name '*.cy.js')"
   else
     files=("${@/#/"$(dirname "${tests}")/"}")
   fi
@@ -104,7 +104,7 @@ cypress() {
   for file in "${files[@]}"; do
     echo "- ${file##"${root}/"}"
 
-    cypress_gen "${file}" > "${file/%.cy.js/.gen.bats}"
+    cypress_gen "${file}" >"${file/%.cy.js/.gen.bats}"
   done
 }
 
@@ -114,7 +114,7 @@ template() {
   local -a files
 
   if [[ "$#" -eq 0 ]]; then
-    readarray -t files <<< "$(find "${tests}" -type f -name '*.bats.gotmpl')"
+    readarray -t files <<<"$(find "${tests}" -type f -name '*.bats.gotmpl')"
   else
     files=("${@/#/"$(dirname "${tests}")/"}")
   fi
@@ -128,10 +128,10 @@ template() {
     args+=("--file=${file}" "--out=${file/%.bats.gotmpl/.gen.bats}")
   done
 
-  if command -v gomplate > /dev/null; then
-    pushd "${root}" &> /dev/null
+  if command -v gomplate >/dev/null; then
+    pushd "${root}" &>/dev/null
     gomplate "${args[@]}"
-    popd &> /dev/null
+    popd &>/dev/null
   else
     "${root}/scripts/run-from-container.sh" "docker.io/hairyhenderson/gomplate:v3.11.7-alpine" "${args[@]}"
   fi

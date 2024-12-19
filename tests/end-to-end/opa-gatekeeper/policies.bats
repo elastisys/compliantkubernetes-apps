@@ -28,7 +28,7 @@ setup_file() {
 
   with_kubeconfig wc
 
-  if ! kubectl get ns staging &> /dev/null || [[ "$(kubectl get ns staging '-ojsonpath={.metadata.labels.owner}')" == "operator" ]]; then
+  if ! kubectl get ns staging &>/dev/null || [[ "$(kubectl get ns staging '-ojsonpath={.metadata.labels.owner}')" == "operator" ]]; then
     fail "these tests requires that you have a 'staging' user namespace"
   fi
 

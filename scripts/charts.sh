@@ -15,7 +15,7 @@ out() {
   if [[ -t 1 ]]; then
     echo -e "${*}"
   else
-    sed -E 's/\\e\[[0-9]+m//g' <<< "${*}"
+    sed -E 's/\\e\[[0-9]+m//g' <<<"${*}"
   fi
 }
 
@@ -31,7 +31,7 @@ run_diff() {
   chart="${1}"
   out "${chart}:"
 
-  current_version="$(yq4 .version "${CHARTS}/${chart}/Chart.yaml" 2> /dev/null || true)"
+  current_version="$(yq4 .version "${CHARTS}/${chart}/Chart.yaml" 2>/dev/null || true)"
   if [[ -z "${current_version}" ]] || [[ "${current_version}" == "null" ]]; then
     out "  state: \e[33mskipped\e[0m - missing"
     return
@@ -42,8 +42,8 @@ run_diff() {
     requested_version="$(yq4 ".charts.\"${chart}\"" "${INDEX}")"
   fi
 
-  error="$(helm show chart "${chart}" --version "${requested_version}" 2>&1 > /dev/null || true)"
-  error="$(grep "Error" <<< "${error}" || true)"
+  error="$(helm show chart "${chart}" --version "${requested_version}" 2>&1 >/dev/null || true)"
+  error="$(grep "Error" <<<"${error}" || true)"
   if [[ "${error}" =~ ^Error: ]]; then
     out "  state: \e[31mfailure\e[0m - ${error##Error: }"
     return
@@ -57,15 +57,15 @@ run_diff() {
     ;;
   all)
     rm -rf "/tmp/charts/${chart}"
-    helm pull "${chart}" --version "${requested_version}" 2>&1 > /dev/null --untar --untardir "/tmp/charts/${chart%%/*}" 2> /dev/null
+    helm pull "${chart}" --version "${requested_version}" --untar --untardir "/tmp/charts/${chart%%/*}" &>/dev/null
     if diff -r --color -U3 "${CHARTS}/${chart}" "/tmp/charts/${chart}"; then
       out "  state: \e[32mvalid\e[0m"
       RETURN="1"
     fi
     rm -rf "/tmp/charts/${chart}"
     ;;
-  chart|crds|readme|values)
-    if diff --color -U3 --label "current: ${chart} - ${current_version}" <(helm show "${part}" "${CHARTS}/${chart}" 2> /dev/null) --label "requested: ${chart} - ${requested_version}" <(helm show "${part}" "${chart}" --version "${requested_version}" 2> /dev/null); then
+  chart | crds | readme | values)
+    if diff --color -U3 --label "current: ${chart} - ${current_version}" <(helm show "${part}" "${CHARTS}/${chart}" 2>/dev/null) --label "requested: ${chart} - ${requested_version}" <(helm show "${part}" "${chart}" --version "${requested_version}" 2>/dev/null); then
       out "  state: \e[32mvalid\e[0m"
       RETURN="1"
     fi
@@ -83,11 +83,11 @@ run_list() {
 
   requested_version="$(yq4 ".charts.\"${chart}\"" "${INDEX}")"
 
-  current_version="$(yq4 '.version + " - " + .appVersion' "${CHARTS}/${chart}/Chart.yaml" 2> /dev/null || true)"
+  current_version="$(yq4 '.version + " - " + .appVersion' "${CHARTS}/${chart}/Chart.yaml" 2>/dev/null || true)"
   current_appversion="${current_version#* - }"
   current_version="${current_version%% - *}"
 
-  latest_version="$(helm show chart "${chart}" 2> /dev/null | yq4 '.version + " - " + .appVersion' || true)"
+  latest_version="$(helm show chart "${chart}" 2>/dev/null | yq4 '.version + " - " + .appVersion' || true)"
   latest_appversion="${latest_version#* - }"
   latest_version="${latest_version%% - *}"
 
@@ -121,7 +121,7 @@ run_pull() {
   requested_version="$(yq4 ".charts.\"${chart}\"" "${INDEX}")"
   out "  requested-version: \e[34m${requested_version}\e[0m"
 
-  current_version="$(yq4 .version "${CHARTS}/${chart}/Chart.yaml" 2> /dev/null || true)"
+  current_version="$(yq4 .version "${CHARTS}/${chart}/Chart.yaml" 2>/dev/null || true)"
   if [[ "${current_version}" == "${requested_version}" ]] && [[ "${2:-}" != "--force" ]]; then
     out "  state: \e[33mskipped\e[0m - up to date"
     return
@@ -133,8 +133,8 @@ run_pull() {
 
   mkdir -p "${CHARTS}/tmp"
 
-  error="$(helm pull "${chart}" --version "${requested_version}" --untar --untardir "${CHARTS}/tmp/${chart%%/*}" 2>&1 > /dev/null || true)"
-  error="$(grep "Error" <<< "${error}" || true)"
+  error="$(helm pull "${chart}" --version "${requested_version}" --untar --untardir "${CHARTS}/tmp/${chart%%/*}" 2>&1 >/dev/null || true)"
+  error="$(grep "Error" <<<"${error}" || true)"
   if [[ -z "${error}" ]]; then
     rm -rf "${CHARTS:?}/${chart:?}"
     mkdir -p "${CHARTS}/${chart%%/*}"
@@ -152,14 +152,14 @@ run_verify() {
   chart="${1}"
   out "${chart}:"
 
-  current_version="$(yq4 .version "${CHARTS}/${chart}/Chart.yaml" 2> /dev/null || true)"
+  current_version="$(yq4 .version "${CHARTS}/${chart}/Chart.yaml" 2>/dev/null || true)"
   if [[ -z "${current_version}" ]] || [[ "${current_version}" == "null" ]]; then
     out "  state: \e[33mskipped\e[0m - missing"
     return
   fi
 
-  error="$(helm show chart "${chart}" --version "${current_version}" 2>&1 > /dev/null || true)"
-  error="$(grep "Error" <<< "${error}" || true)"
+  error="$(helm show chart "${chart}" --version "${current_version}" 2>&1 >/dev/null || true)"
+  error="$(grep "Error" <<<"${error}" || true)"
   if [[ "${error}" =~ ^Error: ]]; then
     out "  state: \e[31mfailure\e[0m - ${error##Error: }"
     RETURN="1"
@@ -168,7 +168,7 @@ run_verify() {
 
   rm -rf "/tmp/charts/${chart}"
 
-  helm pull "${chart}" --version "${current_version}" --untar --untardir "/tmp/charts/${chart%%/*}" 2> /dev/null
+  helm pull "${chart}" --version "${current_version}" --untar --untardir "/tmp/charts/${chart%%/*}" 2>/dev/null
 
   remote="$(find "/tmp/charts/${chart}" -type f -exec sha256sum {} + | awk '{print $1}' | sort | sha256sum)"
   local="$(find "${CHARTS}/${chart}" -type f -exec sha256sum {} + | awk '{print $1}' | sort | sha256sum)"
@@ -196,7 +196,7 @@ usage() {
 }
 
 case "${1:-}" in
-diff|list|pull|verify)
+diff | list | pull | verify)
   case "${2:-}" in
   "")
     echo "error: ${1}: missing argument"

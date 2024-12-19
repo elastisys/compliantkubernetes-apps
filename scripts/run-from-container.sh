@@ -45,7 +45,7 @@ log.continue() {
 }
 
 yq() {
-  if command -v yq4 > /dev/null; then
+  if command -v yq4 >/dev/null; then
     command yq4 "${@}"
   else
     command yq "${@}"
