@@ -120,25 +120,6 @@ hnc:
   ## Included namespaces, empty string will include all
   includedNamespacesRegex: ""
 
-  ## Excluded namespaces
-  excludedNamespaces:
-    - alertmanager
-    - cert-manager
-    - falco
-    - fluentd
-    - fluentd-system
-    - hnc-system
-    - ingress-nginx
-    - kube-node-lease
-    - kube-public
-    - kube-system
-    - kured
-    - monitoring
-    - rook-ceph
-    - velero
-    - gatekeeper-system
-    - metallb-system
-
   ## Extra excluded namespace, here we should add the namespaces that are more likely to change
   excludedExtraNamespaces: []
 
