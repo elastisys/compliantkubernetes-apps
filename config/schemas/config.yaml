@@ -1475,16 +1475,82 @@ properties:
         additionalProperties: false
       extraRoles:
         title: Configure extra Roles for application developers
+        description: |
+          Configure extra Roles for application developers
+          The Roles are added to all application developer namespaces configured in user.namespaces
         type: object
+        properties: {}
+        additionalProperties:
+          properties:
+            rules:
+              title: PolicyRules for this Role
+              type: array
+              default: []
+          additionalProperties: false
       extraRoleBindings:
         title: Configure extra RoleBindings for application developers
+        description: |
+          Configure extra RoleBindings for application developers
+          The RoleBindings are added to all application developer namespaces configured in user.namespaces
         type: object
+        properties: {}
+        additionalProperties:
+          properties:
+            roleRef:
+              title: The reference to a role to use for this RoleBinding
+              type: object
+              properties:
+                name:
+                  title: Name of the Role or ClusterRole to bind subjects with
+                  type: string
+                kind:
+                  title: Either ClusterRole or Role
+                  type: string
+                  default: Role
+                  enum:
+                    - ClusterRole
+                    - Role
+              additionalProperties: false
+            subjects:
+              title: Subjects to apply role to
+              type: array
+              default: []
+          additionalProperties: false
       extraClusterRoles:
-        title: Configure extra ClusterRoles for application developers
+        title: Configure extra ClusterRoles
+        description: |
+          Configure extra ClusterRoles that are not originally part of Welkin
+          These are intended to be used for application developers
         type: object
+        properties: {}
+        additionalProperties:
+          properties:
+            rules:
+              title: PolicyRules for this Role
+              type: array
+              default: []
+          additionalProperties: false
       extraClusterRoleBindings:
         title: Configure extra ClusterRoleBindings for application developers
+        description: |
+          Configure extra ClusterRoleBindings for application developers
         type: object
+        properties: {}
+        additionalProperties:
+          properties:
+            roleRef:
+              title: The reference to a role to use for this RoleBinding
+              type: object
+              properties:
+                name:
+                  title: Name of the ClusterRole to bind subjects with
+                  type: string
+              additionalProperties: false
+            subjects:
+              title: Subjects to apply role to
+              type: array
+              default: []
+          additionalProperties: false
   hnc:
     additionalProperties: false
     title: HNC (Hierarchical Namespace Controller) Config
