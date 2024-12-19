@@ -1143,6 +1143,44 @@ allOf:
                   ips:
                     title: Network Policies Ingress Override IPs
                     $ref: '#/$defs/iplist'
+- if:
+    allOf:
+      - properties:
+          harbor:
+            properties:
+              persistence:
+                properties:
+                  type:
+                    const: objectStorage
+          objectStorage:
+            properties:
+              type:
+                const: azure
+      - anyOf:
+          - properties:
+              objectStorage:
+                properties:
+                  sync:
+                    properties:
+                      enabled:
+                        const: true
+          - properties:
+              objectStorage:
+                properties:
+                  restore:
+                    properties:
+                      enabled:
+                        const: true
+                      addTargetsFromSync:
+                        const: true
+  then:
+    properties:
+      objectStorage:
+        properties:
+          sync:
+            properties:
+              syncDefaultBuckets:
+                const: false
 properties:
   global:
     title: Global options
@@ -2339,6 +2377,19 @@ properties:
               description: |-
                 List of buckets to sync when `syncDefaultBuckets` is false
               type: object
+              examples:
+              - source: azure-environment-harbor
+                sourceType: azure
+                sourcePath: //docker
+                destinationPath: /docker
+                destinationType: s3
+                nameSuffix: docker
+              - source: azure-environemnt-harbor
+                sourceType: azure
+                sourcePath: /backups
+                destinationPath: /backups
+                destinationType: s3
+                nameSuffix: backups
               required:
                 - source
               properties:
@@ -2362,6 +2413,13 @@ properties:
                     - s3
                     - swift
                     - azure
+                sourcePath:
+                  type: string
+                  title: Path to sync from
+                  description: |-
+                    Rclone will sync all files from this path.
+                    Defaults to "" (root of bucket).
+                  default: ""
                 destinationType:
                   type: string
                   title: Type of destination
@@ -2369,6 +2427,19 @@ properties:
                     - s3
                     - swift
                     - azure
+                destinationPath:
+                  type: string
+                  title: Path to sync to
+                  description: |-
+                    Rclone will sync files to this patch.
+                    Defaults to "" (root of bucket).
+                  default: ""
+                nameSuffix:
+                  type: string
+                  title: Suffix to cronjob name
+                  description: |-
+                    Suffix added to the end of cronjob name.
+                    Defaults to "custom". The default buckets have "default" as suffix
               additionalProperties: false
           destinationType:
             title: Rclone Sync Destination Type
@@ -2472,6 +2543,13 @@ properties:
                     - s3
                     - swift
                     - azure
+                destinationPath:
+                  type: string
+                  title: Path to restore to
+                  description: |-
+                    Rclone will sync files to this patch.
+                    Defaults to "" (root of bucket).
+                  default: ""
                 sourceName:
                   type: string
                   title: Source bucket to sync
@@ -2482,6 +2560,19 @@ properties:
                     - s3
                     - swift
                     - azure
+                sourcePath:
+                  type: string
+                  title: Path to sync from
+                  description: |-
+                    Rclone will sync all files from this path.
+                    Defaults to "" (root of bucket).
+                  default: ""
+                nameSuffix:
+                  type: string
+                  title: Suffix to cronjob name
+                  description: |-
+                    Suffix added to the end of cronjob name.
+                    Defaults to "custom".
               additionalProperties: false
           timestamp:
             title: Rclone Restore Timestamp

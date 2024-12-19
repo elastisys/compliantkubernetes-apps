@@ -54,9 +54,12 @@ objectStorage:
     ## Restore targets
     targets: []
       # - destinationName: <bucket-or-container-name>
-      #   # destinationType: <object-storage-type> # optional - defaults to main object storage type
-      #   # sourceName: <bucket-or-container-name> # optional - defaults to destination name
-      #   # sourceType: <object-storage-type> # optional - defaults to sync object storage type
+      #   # destinationType: <object-storage-type> # Optional: if set supported values are 's3', 'azure' or 'swift'. Defaults to value of 'objectStorage.type'
+      #   # destinationPath: /folder/name # Optional: Only sync items from this path. Defaults to ""
+      #   # sourceName: <bucket-or-container-name> # Defaults to value of 'destinationName'
+      #   # sourceType: <object-storage-type> # Optional: if set supported values are 's3', 'azure' or 'swift'. Defaults to value of 'objectStorage.sync.destinationType'
+      #   # sourcePath: /folder/name # Optional: Only sync items from this path. Defaults to ""
+      #   # nameSuffix: custom-name # Optional: Used to add a special suffix to the cronjob name. Defaults to "custom"
 
   ## Off-site backup replication between two providers or regions using rclone sync
   sync:
@@ -64,7 +67,8 @@ objectStorage:
     enabled: false
     dryrun: false
 
-    ## If Harbor or Thanos are using Swift then we will automatically use Swift for the sync of Harbor or Thanos, regardless of the value set for destinationType.
+    ## If Harbor or Thanos are using Swift then we will automatically use Swift for the sync of Harbor or Thanos with 'syncDefaultBuckets', regardless of the value set for destinationType.
+    ## Supported values are 's3', 'azure', 'swift'
     destinationType: s3
     # secondaryUrl: set-me if regionEndpoint and or authUrl does not have all the relevant ips and or ports used for rclone-sync networkpolicy.
     # s3:
@@ -87,11 +91,15 @@ objectStorage:
 
     ## Buckets to sync.
     buckets: []
-      # - source: source-bucket
-      #   # destination: destination-bucket # if unset it will be the same as 'source'
-      #   # schedule: 0 5 * * *             # if unset it will be the same as 'defaultSchedule'
-      #   # sourceType: Optional but if included it uses s3 or swift
-      #   # destinationType: Optional but if included it uses s3 or swift.
+      # - source: <bucket-or-container-name>
+      #   # destination: <bucket-or-container-name> # Defaults to value of 'source'
+      #   # schedule: 0 5 * * * # Defaults to value of 'objectStorage.sync.defaultSchedule'
+      #   # sourceType: <object-storage-type> # Optional: if set supported values are 's3', 'azure' or 'swift'. Defaults to value of 'objectStorage.type'
+      #   # sourcePath: /folder/name # Optional: Only sync items from this path. Defaults to ""
+      #   # destinationType: <object-storage-type> # Optional: if set supported values are 's3', 'azure' or 'swift'. Defaults to value of 'objectStorage.sync.destinationType'
+      #   # destinationPath: /folder/name # Optional: Only sync items from this path. Defaults to ""
+      #   # nameSuffix: custom-name # Optional: Used to add a special suffix to the cronjob name. Defaults to "custom"
+
     # Encrypt (symmetric) before syncing
     encrypt:
       enabled: false
