@@ -20,7 +20,7 @@ spec:
     - alert: NodeFilesystemSpaceFillingUp
       annotations:
         description: Filesystem on {{`{{`}} $labels.device {{`}}`}} at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available space left and is filling up.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-nodefilesystemspacefillingup
+        runbook_url: {{ .Values.defaultRules.runbookUrl }}node/nodefilesystemspacefillingup
         summary: Filesystem is predicted to run out of space within the next 3 days.
       expr: |-
         (
