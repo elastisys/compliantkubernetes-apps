@@ -10,31 +10,62 @@ This directory contains the upgrade and migration steps for each major and minor
 Notice to developers on writing migration steps:
 
 - Migration steps:
-  - are written per minor version and placed in a subdirectory of the migration directory with the name `vX.Y/`,
-  - are written to be idempotent and usable no matter which patch version you are upgrading from and to,
-  - are documented in this document to be able to run them manually,
-  - are divided into prepare and apply steps:
-    - Prepare steps:
-      - are placed in the `prepare/` directory,
-      - may **only** modify the configuration of the environment,
-      - may **not** modify the state of the environment,
-      - steps are run in order of their names use two digit prefixes.
-    - Apply steps:
-      - are placed in the `apply/` directory,
-      - may **only** modify the state of the environment,
-      - may **not** modify the configuration of the environment,
-      - are run in order of their names use two digit prefixes,
-      - are run with the argument `execute` on upgrade and should return 1 on failure and 2 on successful internal rollback,
-      - are rerun with the argument `rollback` on execute failure and should return 1 on failure.
+    - are written per major and minor version and placed in a subdirectory of the migration directory with the name `main/`, during release this is promoted to the next release series `vX.Y/`,
+    - are written to be idempotent and usable no matter which patch version you are upgrading from and to,
+    - are documented in `main/README.md` to be able to run them manually,
+    - are divided into prepare and apply steps:
+        - Prepare steps:
+              - are placed in the `prepare/` directory,
+              - may **only** modify the configuration of the environment,
+              - may **not** modify the state of the environment,
+              - steps are run in order of their names using two digit prefixes.
+        - Apply steps:
+              - are placed in the `apply/` directory,
+              - may **only** modify the state of the environment,
+              - may **not** modify the configuration of the environment,
+              - are run in order of their names using two digit prefixes,
+              - are run with the argument `execute` on upgrade and should return 1 on failure and 2 on successful internal rollback,
+              - are rerun with the argument `rollback` on execute failure and should return 1 on failure.
 
 For prepare the init step is given.
-For apply the bootstrap and the apply steps are given, it is expected that releases upgraded in custom steps are excluded from the apply step.
+For apply the apply step is given, it is expected that releases upgraded in custom steps are excluded from the apply step.
+
+> [tip]
+> This can be done by adding label expression of releases into the `skipped*` arrays of the `80-apply.sh` snippet:
+>
+> ```diff
+> --- a/migration/main/apply/80-apply.sh
+> +++ b/migration/main/apply/80-apply.sh
+> @@ -9,12 +9,15 @@ source "${ROOT}/scripts/migration/lib.sh"
+>  # Example: "app!=something"
+>  declare -a skipped
+>  skipped=(
+> +  "app!=something"
+>  )
+>  declare -a skipped_sc
+>  skipped_sc=(
+> +  "app!=something"
+>  )
+>  declare -a skipped_wc
+>  skipped_wc=(
+> +  "app!=something"
+>  )
+>
+>  run() {
+> ```
+>
+> During runtime these are `AND`:ed together.
 
 Upgrades of components that are dependent on each other should be done within the same snippet to easily manage the upgrade to a working state and to be able to rollback to a working state.
 
 Steps should use the `scripts/migration/lib.sh` which will provide helper functions, see the file for available helper functions.
 This script expects the `ROOT` environment variable to be set pointing to the root of the repository.
 As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
+
+> [!important]
+> Since the migration snippets should be idempotent, and usable from and to any patch version, it is important that they only perform actions when needed, especially in the case of destructive actions!
+>
+> Example: if a major upgrade of a component requires that another component is temporarily removed, then it should **only** remove the component if there is a major upgrade in the first place, if there is a minor upgrade then it should be applied without removing the component.
 
 ## Preparing migration steps for releases
 
