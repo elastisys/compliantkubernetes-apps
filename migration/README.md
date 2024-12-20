@@ -30,7 +30,7 @@ Notice to developers on writing migration steps:
 For prepare the init step is given.
 For apply the apply step is given, it is expected that releases upgraded in custom steps are excluded from the apply step.
 
-> [tip]
+> [!tip]
 > This can be done by adding label expression of releases into the `skipped*` arrays of the `80-apply.sh` snippet:
 >
 > ```diff
@@ -78,5 +78,5 @@ To do this run:
 
 This script will create a new directory for the `vX.Y` release series from the `main` directory, and prune old directories to only include the latest five releases.
 
-Once the new directory is created you must manually remove snippets and steps that was specific for the new release.
+Once the new directory is created you must manually remove snippets and steps that was specific for the new release, be sure to remove any exclusions from them set in the `80-apply-sh` snippet based on the tip in the previous section.
 General migration steps, such as snippets for upgrading OpenSearch, Prometheus, or Thanos, may be retained as long as they verify beforehand they run that they are needed, and fall back to a generic upgrade steps if not required.
