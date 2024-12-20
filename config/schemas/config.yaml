@@ -1473,6 +1473,99 @@ properties:
             title: Enable Kafka
             type: boolean
         additionalProperties: false
+      extraRoles:
+        title: Configure extra Roles for application developers
+        description: |
+          Configure extra Roles for application developers
+          The Roles are added to all application developer namespaces configured in user.namespaces
+        type: object
+        properties: {}
+        additionalProperties:
+          properties:
+            rules:
+              title: PolicyRules for this Role
+              description: |
+                PolicyRules for this Role
+                Reference: https://kubernetes.io/docs/reference/kubernetes-api/authorization-resources/role-v1/
+              type: array
+              default: []
+          additionalProperties: false
+      extraRoleBindings:
+        title: Configure extra RoleBindings for application developers
+        description: |
+          Configure extra RoleBindings for application developers
+          The RoleBindings are added to all application developer namespaces configured in user.namespaces
+        type: object
+        properties: {}
+        additionalProperties:
+          properties:
+            roleRef:
+              title: The reference to a role to use for this RoleBinding
+              description: The reference to a role to use for this RoleBinding
+              type: object
+              properties:
+                name:
+                  title: Name of the Role or ClusterRole to bind subjects with
+                  description: Name of the Role or ClusterRole to bind subjects with
+                  type: string
+                kind:
+                  title: Either ClusterRole or Role
+                  type: string
+                  default: Role
+                  enum:
+                    - ClusterRole
+                    - Role
+              additionalProperties: false
+            subjects:
+              title: Subjects to apply role to
+              description: |
+                Configure Subjects that a role apply to
+                Reference: https://kubernetes.io/docs/reference/kubernetes-api/authorization-resources/role-binding-v1/
+              type: array
+              default: []
+          additionalProperties: false
+      extraClusterRoles:
+        title: Configure extra ClusterRoles
+        description: |
+          Configure extra ClusterRoles that are not originally part of Welkin
+          These are intended to be used for application developers
+        type: object
+        properties: {}
+        additionalProperties:
+          properties:
+            rules:
+              title: PolicyRules for this Role
+              description: |
+                PolicyRules for this ClusterRole
+                Reference: https://kubernetes.io/docs/reference/kubernetes-api/authorization-resources/cluster-role-v1/
+              type: array
+              default: []
+          additionalProperties: false
+      extraClusterRoleBindings:
+        title: Configure extra ClusterRoleBindings for application developers
+        description: |
+          Configure extra ClusterRoleBindings for application developers
+        type: object
+        properties: {}
+        additionalProperties:
+          properties:
+            roleRef:
+              title: The reference to a role to use for this RoleBinding
+              description: The reference to a role to use for this RoleBinding
+              type: object
+              properties:
+                name:
+                  title: Name of the ClusterRole to bind subjects with
+                  type: string
+              additionalProperties: false
+            subjects:
+              title: Subjects to apply role to
+              description: |
+                Configure Subjects that a role apply to
+                Reference: https://kubernetes.io/docs/reference/kubernetes-api/authorization-resources/cluster-role-binding-v1/
+              type: array
+              default: []
+          additionalProperties: false
   hnc:
     additionalProperties: false
     title: HNC (Hierarchical Namespace Controller) Config
