@@ -10,28 +10,8 @@ ROOT="$(dirname "${HERE}")"
 export HERE
 export ROOT
 
-log.info.no_newline() {
-  echo -en "[\e[34mck8s\e[0m] ${*}" 1>&2
-}
-log.info() {
-  log.info.no_newline "${*}\n"
-}
-log.warn.no_newline() {
-  echo -e -n "[\e[33mck8s\e[0m] ${*}" 1>&2
-}
-log.warn() {
-  log.warn.no_newline "${*}\n"
-}
-log.error.no_newline() {
-  echo -e -n "[\e[31mck8s\e[0m] ${*}" 1>&2
-}
-log.error() {
-  log.error.no_newline "${*}\n"
-}
-log.fatal() {
-  log.error "${*}"
-  exit 1
-}
+source "${ROOT}/scripts/common.sh"
+
 log.usage() {
   log.fatal "$0 usage:
   - cache <create|delete>                                                    - manages local cache for local clusters
@@ -42,24 +22,6 @@ log.usage() {
   - list clusters                                                            - lists available clusters
   - list profiles                                                            - lists available profiles
   "
-}
-log.continue() {
-  if [[ "${CK8S_AUTO_APPROVE:-false}" != "true" ]]; then
-    log.warn.no_newline "${1} [y/N]: "
-
-    read -r reply
-    if ! [[ "${reply}" =~ ^(y|Y|yes|Yes|YES)$ ]]; then
-      return 1
-    fi
-  fi
-}
-
-yq() {
-  if command -v yq4 >/dev/null; then
-    command yq4 "${@}"
-  else
-    command yq "${@}"
-  fi
 }
 
 declare runtime
