@@ -37,12 +37,15 @@ templates:
           - dev-rbac/extra-user-view.yaml
     values:
       - values/user-rbac.yaml.gotmpl
+      {{- if .Values | get "gatekeeper.allowUserCRDs.enabled" false }}
+      - values/user-crds/rbac/user-crds.yaml.gotmpl
+      {{- end }}
 
   dev-rbac-crds:
     inherit: [ template: rbac ]
     condition: ck8sWorkloadCluster.enabled
     installed: {{ .Values | get "gatekeeper.allowUserCRDs.enabled" false }}
-    chart: charts/user-crds
+    chart: charts/user-rbac-generator
     version: 1.0.0
     namespace: gatekeeper-system
     name: user-crds
@@ -51,7 +54,8 @@ templates:
     labels:
       app: dev-rbac
     values:
-      - values/userCRDs/common.yaml.gotmpl
-      - values/userCRDs/bitnami/sealedsecrets.yaml.gotmpl
-      - values/userCRDs/mongodbcommunity/mongodb.yaml.gotmpl
-      - values/userCRDs/flux/fluxv2.yaml.gotmpl
+      - values/user-crds/rbac/generator/common.yaml.gotmpl
+      - values/user-crds/rbac/generator/bitnami/sealedsecrets.yaml.gotmpl
+      - values/user-crds/rbac/generator/mongodbcommunity/mongodb.yaml.gotmpl
+      - values/user-crds/rbac/generator/flux/fluxv2.yaml.gotmpl
+      - values/user-crds/rbac/generator/strimzi/kafka.yaml.gotmpl
