@@ -22,7 +22,7 @@ main() {
 
   ver.parse next "${series}"
 
-  local target_version="v${ver[next-major]}.${ver[next-minor]}"
+  local target_version="v${ver["next-major"]}.${ver["next-minor"]}"
   local target_migration="${ROOT}/migration/${target_version}"
 
   if [[ -d "${target_migration}" ]]; then

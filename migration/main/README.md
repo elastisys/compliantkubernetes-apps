@@ -111,7 +111,7 @@ to: main
     ./bin/ck8s update-ips "${CK8S_CLUSTER}" apply
     ```
 
-### Apply upgrade - *disruptive*
+### Apply upgrade - _disruptive_
 
 > **Disruptive, done during maintenance window.**
 
