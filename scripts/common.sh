@@ -87,7 +87,7 @@ log.fatal() {
 log.fatal.nested() {
   shopt -s extdebug
   local -a function
-  readarray -t function <<< "$(declare -F "${FUNCNAME[1]}" | tr ' ' '\n')"
+  readarray -t function <<<"$(declare -F "${FUNCNAME[1]}" | tr ' ' '\n')"
 
   log.error "in $(esc.red "${function[0]} at ${function[2]}:${function[1]}"): ${*}\n--- This is invalid use of a helper functions and must be fixed ---"
   exit 1
