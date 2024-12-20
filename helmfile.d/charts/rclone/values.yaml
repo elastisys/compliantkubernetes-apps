@@ -37,12 +37,15 @@ crypt:
 # - Providers translate into the configured provider
 targets:
   - destinationName: dn
+    destinationPath: ""
     destinationCrypt: false
     destinationProvider: dp
     sourceName: sn
+    sourcePath: ""
     sourceCrypt: false
     sourceProvider: sp
     schedule: ""
+    nameSuffix: "default"
 
 # Configure rclone providers
 # Prefix destination providers with "destination-" and source providers with "source-"

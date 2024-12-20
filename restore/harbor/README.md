@@ -45,6 +45,31 @@ envsubst > tmp-job.yaml < restore/harbor/restore-harbor-job.yaml
 
 ## Restore job Azure
 
+### Rclone move data
+
+If you are restoring Harbor in Azure from a bucket that was previously a rclone destination where the source was not Azure, then the path for the Harbor image data is likely wrong.
+Due to an [issue with Harbor](https://github.com/distribution/distribution/issues/1247) it is storing image data with an extra `/` at the start of the path for Azure.
+But it is not the same for other object storage types, so if the data was copied from e.g. S3 then it will likely be wrong now.
+The following steps will create a rclone job that will move all of the harbor image data to the correct path with an extra `/`.
+
+```bash
+export S3_BUCKET=$(yq4 '.objectStorage.buckets.harbor' "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml" )
+export AZURE_ACCOUNT=$(yq4 '.objectStorage.azure.storageAccountName' "${CK8S_CONFIG_PATH}/common-config.yaml" )
+export AZURE_KEY=$(sops -d --extract '["objectStorage"]["azure"]["storageAccountKey"]' "${CK8S_CONFIG_PATH}/secrets.yaml" )
+envsubst > tmp-rclone-job.yaml < restore/harbor/harbor-rclone-azure.yaml
+./bin/ck8s ops kubectl sc apply -f tmp-rclone-job.yaml
+./bin/ck8s ops kubectl sc wait --for=condition=complete job -n rclone harbor-restore-rclone-move --timeout=-1s
+```
+
+Clean up:
+
+```bash
+./bin/ck8s ops kubectl sc delete -f tmp-rclone-job.yaml
+rm -v tmp-rclone-job.yaml
+```
+
+### Prepare for Harbor database restore
+
 Setup the necessary job.yaml and configmap:
 
 ```bash
@@ -56,13 +81,13 @@ envsubst > tmp-job.yaml < restore/harbor/restore-harbor-job-azure.yaml
 
 While restoring we need to stop all harbor pods except for the database.
 
-```
+```bash
 ./bin/ck8s ops kubectl sc scale deployment --replicas 0 -n harbor --all
 ```
 
 Create the job and wait until it has completed:
 
-```
+```bash
 ./bin/ck8s ops kubectl sc apply -n harbor -f restore/harbor/network-policies-harbor.yaml
 ./bin/ck8s ops kubectl sc apply -n harbor -f tmp-job.yaml
 ./bin/ck8s ops kubectl sc wait --for=condition=complete job -n harbor restore-harbor-job --timeout=-1s
@@ -70,13 +95,13 @@ Create the job and wait until it has completed:
 
 Restore the pods:
 
-```
+```bash
 ./bin/ck8s ops kubectl sc scale deployment --replicas 1 -n harbor --all
 ```
 
 Clean up:
 
-```
+```bash
 ./bin/ck8s ops kubectl sc delete -n harbor -f restore/harbor/network-policies-harbor.yaml
 ./bin/ck8s ops kubectl sc delete -n harbor -f tmp-job.yaml
 ./bin/ck8s ops kubectl sc delete configmap -n harbor restore-harbor
@@ -87,14 +112,14 @@ rm -v tmp-job.yaml
 
 If you are restoring harbor to a new environment with a different domain, you need to re-run the init job. First, make sure the harbor admin password is the same as in the old environment:
 
-```console
+```bash
 # Edit harbor.password
 sops ${CK8S_CONFIG_PATH}/secrets.yaml
 ```
 
 Then, re-run the init job:
 
-```console
+```bash
 ./bin/ck8s ops kubectl sc delete job -n harbor init-harbor-job
 ./bin/ck8s ops helmfile sc -l app=harbor sync
 ```
