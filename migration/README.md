@@ -10,22 +10,23 @@ This directory contains the upgrade and migration steps for each major and minor
 Notice to developers on writing migration steps:
 
 - Migration steps:
-    - are written per major and minor version and placed in a subdirectory of the migration directory with the name `main/`, during release this is promoted to the next release series `vX.Y/`,
+    - are written per major and minor version and placed in a subdirectory of the migration directory with the name `main/`,
+        - during release this is promoted to the next release series `vX.Y/`,
     - are written to be idempotent and usable no matter which patch version you are upgrading from and to,
     - are documented in `main/README.md` to be able to run them manually,
     - are divided into prepare and apply steps:
         - Prepare steps:
-              - are placed in the `prepare/` directory,
-              - may **only** modify the configuration of the environment,
-              - may **not** modify the state of the environment,
-              - steps are run in order of their names using two digit prefixes.
+            - are placed in the `prepare/` directory,
+            - may **only** modify the configuration of the environment,
+            - may **not** modify the state of the environment,
+            - steps are run in order of their names using two digit prefixes.
         - Apply steps:
-              - are placed in the `apply/` directory,
-              - may **only** modify the state of the environment,
-              - may **not** modify the configuration of the environment,
-              - are run in order of their names using two digit prefixes,
-              - are run with the argument `execute` on upgrade and should return 1 on failure and 2 on successful internal rollback,
-              - are rerun with the argument `rollback` on execute failure and should return 1 on failure.
+            - are placed in the `apply/` directory,
+            - may **only** modify the state of the environment,
+            - may **not** modify the configuration of the environment,
+            - are run in order of their names using two digit prefixes,
+            - are run with the argument `execute` on upgrade and should return 1 on failure and 2 on successful internal rollback,
+            - are rerun with the argument `rollback` on execute failure and should return 1 on failure.
 
 For prepare the init step is given.
 For apply the apply step is given, it is expected that releases upgraded in custom steps are excluded from the apply step.
