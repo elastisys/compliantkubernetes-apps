@@ -96,8 +96,10 @@ ops)
   case "${2}" in
   kubectl | kubecolor | helm | helmfile | velero)
     [[ "${3}" =~ ^(wc|sc)$ ]] || usage
-    shift 2
-    "${here}/ops.bash" "${2}" "${@}"
+    command="${2}"
+    cluster="${3}"
+    shift 3
+    "${here}/ops.bash" "${command}" "${cluster}" "${@}"
     ;;
   *) usage ;;
   esac
