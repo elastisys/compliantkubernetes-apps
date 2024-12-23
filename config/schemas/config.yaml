@@ -1474,10 +1474,10 @@ properties:
             type: boolean
         additionalProperties: false
       extraRoles:
-        title: Configure extra Roles for application developers
+        title: Extra Application Developer Roles
         description: |
-          Configure extra Roles for application developers
-          The Roles are added to all application developer namespaces configured in user.namespaces
+          Configure extra Roles for Application Developers
+          The Roles are added to all Application Developer namespaces configured in user.namespaces
         type: object
         properties: {}
         additionalProperties:
@@ -1491,10 +1491,10 @@ properties:
               default: []
           additionalProperties: false
       extraRoleBindings:
-        title: Configure extra RoleBindings for application developers
+        title: Extra Application Developer RoleBindings
         description: |
-          Configure extra RoleBindings for application developers
-          The RoleBindings are added to all application developer namespaces configured in user.namespaces
+          Configure extra RoleBindings for Application Developers
+          The RoleBindings are added to all Application Developer namespaces configured in user.namespaces
         type: object
         properties: {}
         additionalProperties:
@@ -1525,10 +1525,10 @@ properties:
               default: []
           additionalProperties: false
       extraClusterRoles:
-        title: Configure extra ClusterRoles
+        title: Extra Application Developer ClusterRoles
         description: |
           Configure extra ClusterRoles that are not originally part of Welkin
-          These are intended to be used for application developers
+          These are intended to be used for Application Developers
         type: object
         properties: {}
         additionalProperties:
@@ -1542,9 +1542,9 @@ properties:
               default: []
           additionalProperties: false
       extraClusterRoleBindings:
-        title: Configure extra ClusterRoleBindings for application developers
+        title: Extra Application Developer ClusterRoleBindings
         description: |
-          Configure extra ClusterRoleBindings for application developers
+          Configure extra ClusterRoleBindings for Application Developers
         type: object
         properties: {}
         additionalProperties:
