@@ -194,7 +194,7 @@ configMaps:
       secCtxRunAsUser: "1000"
       secCtxRunAsGroup: "1000"
 
-{{- if .Values.velero.useVolumeSnapshots }}
+{{- if eq .Values.velero.uploaderType "kopia"  }}
 extraVolumes:
   - name: udmrepo
     emptyDir: {}
