@@ -832,6 +832,80 @@ $defs:
         description: Value is the taint value the toleration matches to. If the operator is Exists, the value should be empty, otherwise just a regular string.
         type: string
     type: object
+  io.k8s.api.rbac.v1.Subject:
+    description: Subject contains a reference to the object or user identities a role
+      binding applies to.  This can either hold a direct API object reference, or a
+      value for non-objects such as user and group names.
+    properties:
+      apiGroup:
+        description: APIGroup holds the API group of the referenced subject. Defaults
+          to "" for ServiceAccount subjects. Defaults to "rbac.authorization.k8s.io"
+          for User and Group subjects.
+        type: string
+      kind:
+        description: Kind of object being referenced. Values defined by this API group
+          are "User", "Group", and "ServiceAccount". If the Authorizer does not recognized
+          the kind value, the Authorizer should report an error.
+        type: string
+        enum:
+          - Group
+          - ServiceAccount
+          - User
+      name:
+        description: Name of the object being referenced.
+        type: string
+      namespace:
+        description: Namespace of the referenced object.  If the object kind is non-namespace,
+          such as "User" or "Group", and this value is not empty the Authorizer should
+          report an error.
+        type: string
+    required:
+    - kind
+    - name
+    type: object
+  io.k8s.api.rbac.v1.PolicyRule:
+    description: PolicyRule holds information that describes a policy rule, but does
+      not contain information about who the rule applies to or which namespace the rule
+      applies to.
+    properties:
+      apiGroups:
+        description: APIGroups is the name of the APIGroup that contains the resources.  If
+          multiple API groups are specified, any action requested against one of the
+          enumerated resources in any API group will be allowed.
+        items:
+          type: string
+        type: array
+      nonResourceURLs:
+        description: NonResourceURLs is a set of partial urls that a user should have
+          access to.  *s are allowed, but only as the full, final step in the path Since
+          non-resource URLs are not namespaced, this field is only applicable for ClusterRoles
+          referenced from a ClusterRoleBinding. Rules can either apply to API resources
+          (such as "pods" or "secrets") or non-resource URL paths (such as "/api"),  but
+          not both.
+        items:
+          type: string
+        type: array
+      resourceNames:
+        description: ResourceNames is an optional white list of names that the rule
+          applies to.  An empty set means that everything is allowed.
+        items:
+          type: string
+        type: array
+      resources:
+        description: Resources is a list of resources this rule applies to.  ResourceAll
+          represents all resources.
+        items:
+          type: string
+        type: array
+      verbs:
+        description: Verbs is a list of Verbs that apply to ALL the ResourceKinds and
+          AttributeRestrictions contained in this rule.  VerbAll represents all kinds.
+        items:
+          type: string
+        type: array
+    required:
+    - verbs
+    type: object
   cronSchedule:
     type: string
     pattern: ^(((\*\/)?([0-5]?[0-9])((\,|\-|\/)([0-5]?[0-9]))*|\*)[^\S\r\n]+((\*\/)?((2[0-3]|1[0-9]|[0-9]|00))((\,|\-|\/)(2[0-3]|1[0-9]|[0-9]|00))*|\*)[^\S\r\n]+((\*\/)?([1-9]|[12][0-9]|3[01])((\,|\-|\/)([1-9]|[12][0-9]|3[01]))*|\*)[^\S\r\n]+((\*\/)?([1-9]|1[0-2])((\,|\-|\/)([1-9]|1[0-2]))*|\*|(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))[^\S\r\n]+((\*\/)?[0-6]((\,|\-|\/)[0-6])*|\*|00|(sun|mon|tue|wed|thu|fri|sat)))$|^@(annually|yearly|monthly|weekly|daily|hourly|reboot)$
@@ -1487,6 +1561,8 @@ properties:
               description: |
                 PolicyRules for this Role
                 Reference: https://kubernetes.io/docs/reference/kubernetes-api/authorization-resources/role-v1/
+              items:
+                $ref: '#/$defs/io.k8s.api.rbac.v1.PolicyRule'
               type: array
               default: []
           additionalProperties: false
@@ -1521,6 +1597,8 @@ properties:
               description: |
                 Configure Subjects that a role apply to
                 Reference: https://kubernetes.io/docs/reference/kubernetes-api/authorization-resources/role-binding-v1/
+              items:
+                $ref: '#/$defs/io.k8s.api.rbac.v1.Subject'
               type: array
               default: []
           additionalProperties: false
@@ -1538,6 +1616,8 @@ properties:
               description: |
                 PolicyRules for this ClusterRole
                 Reference: https://kubernetes.io/docs/reference/kubernetes-api/authorization-resources/cluster-role-v1/
+              items:
+                $ref: '#/$defs/io.k8s.api.rbac.v1.PolicyRule'
               type: array
               default: []
           additionalProperties: false
@@ -1563,6 +1643,8 @@ properties:
               description: |
                 Configure Subjects that a role apply to
                 Reference: https://kubernetes.io/docs/reference/kubernetes-api/authorization-resources/cluster-role-binding-v1/
+              items:
+                $ref: '#/$defs/io.k8s.api.rbac.v1.Subject'
               type: array
               default: []
           additionalProperties: false
