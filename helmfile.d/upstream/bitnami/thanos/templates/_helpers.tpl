@@ -1,5 +1,5 @@
 {{/*
-Copyright VMware, Inc.
+Copyright Broadcom, Inc. All Rights Reserved.
 SPDX-License-Identifier: APACHE-2.0
 */}}
 
@@ -133,15 +133,17 @@ objstore.yml: |-
 Return the storegateway config
 */}}
 {{- define "thanos.storegatewayConfigMap" -}}
+{{- if .Values.storegateway.config }}
 config.yml: |-
   {{- include "common.tplvalues.render" (dict "value" .Values.storegateway.config "context" $) | nindent 2 }}
+{{- end }}
 {{- if .Values.indexCacheConfig }}
 index-cache.yml: |-
-  {{- include "common.tplvalues.render" (dict "value" .Values.indexCacheConfig "context" $) | b64enc | nindent 2 }}
+  {{- include "common.tplvalues.render" (dict "value" .Values.indexCacheConfig "context" $) | nindent 2 }}
 {{- end }}
 {{- if .Values.bucketCacheConfig }}
 bucket-cache.yml: |-
-  {{- include "common.tplvalues.render" (dict "value" .Values.bucketCacheConfig "context" $) | b64enc | nindent 2 }}
+  {{- include "common.tplvalues.render" (dict "value" .Values.bucketCacheConfig "context" $) | nindent 2 }}
 {{- end }}
 {{- end -}}
 
@@ -149,8 +151,10 @@ bucket-cache.yml: |-
 Return the ruler config
 */}}
 {{- define "thanos.rulerConfigMap" -}}
+{{- if and .Values.ruler.config (not .Values.ruler.existingConfigmap) }}
 ruler.yml: |-
   {{- include "common.tplvalues.render" (dict "value" .Values.ruler.config "context" $) | nindent 2 }}
+{{- end }}
 {{- end -}}
 
 {{/*
@@ -165,16 +169,20 @@ hashrings.json: |-
 Return the query config
 */}}
 {{- define "thanos.querySDConfigMap" -}}
+{{- if and .Values.query.sdConfig (not .Values.query.existingSDConfigmap) }}
 servicediscovery.yml: |-
   {{- include "common.tplvalues.render" (dict "value" .Values.query.sdConfig "context" $) | nindent 2 }}
+{{- end }}
 {{- end -}}
 
 {{/*
 Return the query frontend config
 */}}
 {{- define "thanos.queryFrontendConfigMap" -}}
+{{- if and .Values.queryFrontend.config (not .Values.queryFrontend.existingConfigmap) }}
 config.yml: |-
   {{- include "common.tplvalues.render" (dict "value" .Values.queryFrontend.config "context" $) | nindent 2 }}
+{{- end }}
 {{- end -}}
 
 {{/*
@@ -311,7 +319,7 @@ Return true if a configmap object should be created
 Return true if a configmap object should be created
 */}}
 {{- define "thanos.storegateway.createConfigmap" -}}
-{{- if and .Values.storegateway.config (not .Values.storegateway.existingConfigmap) }}
+{{- if and (or .Values.storegateway.config .Values.indexCacheConfig .Values.bucketCacheConfig) (not .Values.storegateway.existingConfigmap) }}
     {{- true -}}
 {{- else -}}
 {{- end -}}
@@ -433,6 +441,7 @@ Compile all warnings into a single message, and call fail.
 {{- $messages := append $messages (include "thanos.validateValues.ruler.alertmanagers" .) -}}
 {{- $messages := append $messages (include "thanos.validateValues.ruler.config" .) -}}
 {{- $messages := append $messages (include "thanos.validateValues.sharded.service" .) -}}
+{{- $messages := append $messages (include "thanos.validateValues.receive" .) -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
 
@@ -451,6 +460,21 @@ thanos: objstore configuration
       1) Provide it using the 'objstoreConfig' parameter
       2) Provide it using an existing Secret and using the 'existingObjstoreSecret' parameter
       3) Put your objstore.yml under the 'files/conf/' directory
+{{- end -}}
+
+{{- end -}}
+{{/* Validate values of Thanos - Objstore configuration */}}
+{{- define "thanos.validateValues.receive" -}}
+{{- if and .Values.receive.enabled .Values.receive.autoscaling.enabled (eq .Values.receive.mode "standalone") -}}
+thanos: receive configuration
+    Thanos receive component cannot be enabled with autoscaling and standalone mode at the same time or the receive hashring will not be properly configured.
+    To achieve autoscaling,
+    1) Set the 'receive.mode' to 'dual-mode' (see ref: https://github.com/thanos-io/thanos/blob/release-0.22/docs/proposals-accepted/202012-receive-split.md)
+    2) Set the 'receive.existingConfigMap' the same as here https://github.com/observatorium/thanos-receive-controller/blob/7140e9476289b57b815692c3ec2dfd95b5fb4b6b/examples/manifests/deployment.yaml#L29
+    3) Set the 'receive.statefulsetLabels' to:
+        controller.receive.thanos.io: thanos-receive-controller
+        controller.receive.thanos.io/hashring: default (same as https://github.com/observatorium/thanos-receive-controller/blob/7140e9476289b57b815692c3ec2dfd95b5fb4b6b/examples/manifests/configmap.yaml#L6)
+    4) Deploy Thanos Receive Controller as shown here: https://github.com/observatorium/thanos-receive-controller/tree/main/examples/manifests (remember to adjust the namespace according to your environment)
 {{- end -}}
 {{- end -}}
 
@@ -516,11 +540,15 @@ thanos: storegateway.sharded.service.grpc.nodePorts
 {{- define "thanos.validateValues.storegateway.sharded.length" -}}
 {{/* Get number of shards */}}
 {{- $shards := int 0 }}
+{{- $hashShards := int 1 }}
+{{- $timeShards := int 1 }}
 {{- if .context.Values.storegateway.sharded.hashPartitioning.shards }}
-  {{- $shards = int .context.Values.storegateway.sharded.hashPartitioning.shards }}
-{{- else }}
-  {{- $shards = len .context.Values.storegateway.sharded.timePartitioning }}
+  {{- $hashShards = int .context.Values.storegateway.sharded.hashPartitioning.shards }}
 {{- end }}
+{{- if not (empty .context.Values.storegateway.sharded.timePartitioning) }}
+  {{- $timeShards = len .context.Values.storegateway.sharded.timePartitioning }}
+{{- end }}
+{{- $shards = mul $hashShards $timeShards }}
 {{- $propertyLength := (len .property) -}}
 {{/* Validate property */}}
 {{- if ne $shards $propertyLength -}}
@@ -562,6 +590,7 @@ Usage:
 {{ include "thanos.receive.config" . }}
 */}}
 {{- define "thanos.receive.config" -}}
+{{- if not .Values.receive.existingConfigmap }}
 {{- if not .Values.receive.config -}}
 {{- if .Values.receive.service.additionalHeadless -}}
 {{- $count := int .Values.receive.replicaCount -}}
@@ -592,6 +621,7 @@ Usage:
 {{- .Values.receive.config -}}
 {{- else -}}
 {{- .Values.receive.config | toPrettyJson -}}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
