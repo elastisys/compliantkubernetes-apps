@@ -144,6 +144,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
+1. Upgrade kube-prometheus-stack:
+
+    ```bash
+    ./migration/v0.43/apply/10-kube-prometheus-stack.sh
+    ```
+
 1. Upgrade Opensearch:
 
     ```bash
