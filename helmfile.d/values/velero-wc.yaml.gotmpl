@@ -181,6 +181,10 @@ containerSecurityContext:
 
 # For kubectl containers
 kubectl:
+  image:
+    repository: ghcr.io/elastisys/bitnami/kubectl
+    tag: 1.29.11
+
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsNonRoot: true
