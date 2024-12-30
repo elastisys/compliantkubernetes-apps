@@ -8,9 +8,9 @@ run() {
   case "${1:-}" in
   execute)
     new_version=66.1.1
-    clusters=( "${CK8S_CLUSTER}" )
+    clusters=("${CK8S_CLUSTER}")
     if [[ "${CK8S_CLUSTER}" == "both" ]]; then
-      clusters=( "wc" "sc" )
+      clusters=("wc" "sc")
     fi
 
     for cluster in "${clusters[@]}"; do
