@@ -1,5 +1,8 @@
 # common values for thanos
 # all components are disabled and are instead enabled in separate values files
+global:
+  security:
+    allowInsecureImages: true
 bucketweb:
   enabled: false
   networkPolicy:
