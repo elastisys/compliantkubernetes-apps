@@ -5,8 +5,6 @@ image:
   repository: elastisys/bitnami/thanos
 
 query:
-  networkPolicy:
-    enabled: false
   enabled: true
   replicaCount: {{ .Values.thanos.query.replicaCount }}
   topologySpreadConstraints: {{- toYaml .Values.thanos.query.topologySpreadConstraints | nindent 4 }}
@@ -40,8 +38,6 @@ query:
       type: RuntimeDefault
 
 queryFrontend:
-  networkPolicy:
-    enabled: false
   enabled: true
   resources: {{- toYaml .Values.thanos.queryFrontend.resources | nindent 4 }}
 
@@ -56,19 +52,3 @@ metrics:
   enabled: {{ .Values.thanos.metrics.enabled }}
   serviceMonitor:
     enabled: {{ .Values.thanos.metrics.serviceMonitor.enabled }}
-
-bucketweb:
-  networkPolicy:
-    enabled: false
-compactor:
-  networkPolicy:
-    enabled: false
-receive:
-  networkPolicy:
-    enabled: false
-ruler:
-  networkPolicy:
-    enabled: false
-storegateway:
-  networkPolicy:
-    enabled: false

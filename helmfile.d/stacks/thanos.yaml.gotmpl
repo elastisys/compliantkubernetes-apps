@@ -47,6 +47,7 @@ templates:
     needs:
       - kube-system/admin-namespaces
     values:
+      - values/thanos/common.yaml.gotmpl
       - values/thanos/objectstorage-secret.yaml.gotmpl
 
   thanos-query:
@@ -60,6 +61,7 @@ templates:
       - monitoring/kube-prometheus-stack # creates servicemonitors
       - thanos/networkpolicy
     values:
+      - values/thanos/common.yaml.gotmpl
       - values/thanos/query.yaml.gotmpl
 
   thanos-receiver:
@@ -74,6 +76,7 @@ templates:
       - thanos/networkpolicy
       - thanos/thanos-objectstorage-secret
     values:
+      - values/thanos/common.yaml.gotmpl
       - values/thanos/receiver.yaml.gotmpl
 
   thanos-ruler:
