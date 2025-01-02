@@ -4311,6 +4311,15 @@ properties:
             $ref: '#/$defs/kubernetesTopologySpreadConstraints'
           affinity:
             $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          additionalReceivers:
+            title: Additional receivers for alertmanager
+            description: |-
+              Additional receivers that will be added to the configuration of alertmanager
+
+              > [!note]
+              > See [the upstream documentation](https://prometheus.io/docs/alerting/latest/configuration/#route) for reference.
+            default: []
+            type: array
       capacityManagementAlerts:
         title: Capacity Management Alerts
         description: Configure capacity management alerts.
