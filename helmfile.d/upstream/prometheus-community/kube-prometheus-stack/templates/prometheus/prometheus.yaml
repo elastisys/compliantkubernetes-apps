@@ -17,6 +17,9 @@ metadata:
 {{ toYaml .Values.prometheus.annotations | indent 4 }}
 {{- end }}
 spec:
+{{- if not (kindIs "invalid" .Values.prometheus.prometheusSpec.automountServiceAccountToken) }}
+  automountServiceAccountToken: {{ .Values.prometheus.prometheusSpec.automountServiceAccountToken }}
+{{- end }}
 {{- if and (not .Values.prometheus.agentMode) (or .Values.prometheus.prometheusSpec.alertingEndpoints .Values.alertmanager.enabled) }}
   alerting:
     alertmanagers:
@@ -103,13 +106,17 @@ spec:
 {{- end }}
 {{- if and (not .Values.prometheus.agentMode) .Values.prometheus.prometheusSpec.exemplars }}
   exemplars:
-  {{ toYaml .Values.prometheus.prometheusSpec.exemplars | indent 4 }}
+    {{- toYaml .Values.prometheus.prometheusSpec.exemplars | nindent 4 }}
 {{- end }}
 {{- if .Values.prometheus.prometheusSpec.enableFeatures }}
   enableFeatures:
 {{- range $enableFeatures := .Values.prometheus.prometheusSpec.enableFeatures }}
   - {{ tpl $enableFeatures $ }}
 {{- end }}
+{{- end }}
+{{- with .Values.prometheus.prometheusSpec.scrapeClasses }}
+  scrapeClasses:
+    {{- tpl (toYaml . | nindent 4) $ }}
 {{- end }}
 {{- if .Values.prometheus.prometheusSpec.scrapeInterval }}
   scrapeInterval: {{ .Values.prometheus.prometheusSpec.scrapeInterval }}
@@ -248,18 +255,22 @@ spec:
   scrapeConfigSelector:
     matchLabels:
       release: {{ $.Release.Name | quote }}
-{{ else }}
+{{ else if not (kindIs "invalid" .Values.prometheus.prometheusSpec.scrapeConfigSelector) }}
   scrapeConfigSelector: {}
 {{- end }}
 {{- if .Values.prometheus.prometheusSpec.scrapeConfigNamespaceSelector }}
   scrapeConfigNamespaceSelector:
 {{ tpl (toYaml .Values.prometheus.prometheusSpec.scrapeConfigNamespaceSelector | indent 4) . }}
-{{ else }}
+{{ else if not (kindIs "invalid" .Values.prometheus.prometheusSpec.scrapeConfigNamespaceSelector) }}
   scrapeConfigNamespaceSelector: {}
 {{- end }}
 {{- if .Values.prometheus.prometheusSpec.storageSpec }}
   storage:
 {{ tpl (toYaml .Values.prometheus.prometheusSpec.storageSpec | indent 4) . }}
+{{- end }}
+{{- with .Values.prometheus.prometheusSpec.persistentVolumeClaimRetentionPolicy }}
+  persistentVolumeClaimRetentionPolicy:
+    {{- toYaml . | nindent 4 }}
 {{- end }}
 {{- if .Values.prometheus.prometheusSpec.podMetadata }}
   podMetadata:
@@ -460,6 +471,9 @@ spec:
 {{- if .Values.prometheus.prometheusSpec.tracingConfig }}
   tracingConfig:
 {{ toYaml .Values.prometheus.prometheusSpec.tracingConfig | indent 4 }}
+{{- end }}
+{{- if .Values.prometheus.prometheusSpec.serviceDiscoveryRole }}
+  serviceDiscoveryRole: {{ .Values.prometheus.prometheusSpec.serviceDiscoveryRole }}
 {{- end }}
 {{- with .Values.prometheus.prometheusSpec.additionalConfig }}
   {{- tpl (toYaml .) $ | nindent 2 }}
