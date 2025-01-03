@@ -82,6 +82,14 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s upgrade wc v0.43 apply
     ```
 
+1. Check if `.hnc.excludedNamespaces` is overridden in `$CK8S_CONFIG_PATH/wc-config.yaml`. If set it must be moved to `.hnc.excludedExtraNamespaces` in order to be used.
+
+  To check if `.hnc.excludedNamespaces` is set, run the following command:
+
+  ```
+  yq4 '.hnc.excludedNamespaces != null' $CK8S_CONFIG_PATH/wc-config.yaml
+  ```
+
 1. If Tekton is enabled, ensure to add appropriate network policies that allow traffic from Tekton to OpenSearch.
 
     To check if the tekton is enabled, run the following command
