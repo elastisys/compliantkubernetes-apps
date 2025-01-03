@@ -1,5 +1,10 @@
 # Changelog
 
+## 2025.01.03
+
+1. helmfile.d/charts/prometheus-alerts/templates/alerts/alertmanager.rules.yaml
+    - MODIFIED - Added runbookURLs for the alertmanager alerts
+
 ## 2022.12.01
 
 1. helmfile/charts/prometheus-alerts/templates/alerts/kubernetes-system-kubelet.yaml
