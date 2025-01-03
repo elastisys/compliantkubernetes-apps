@@ -93,6 +93,15 @@ _apply_normalise() {
   update_ips.assert_minimal
 }
 
+@test "ck8s update-ips blocks all without domain records" {
+  run ck8s update-ips both apply
+
+  assert_equal "$(yq.dig wc '.networkPolicies.global.scIngress.ips | . style="flow"')" "[0.0.0.0/32]"
+  assert_equal "$(yq.dig wc '.networkPolicies.global.wcIngress.ips | . style="flow"')" "[0.0.0.0/32]"
+  assert_equal "$(yq.dig sc '.networkPolicies.global.scIngress.ips | . style="flow"')" "[0.0.0.0/32]"
+  assert_equal "$(yq.dig sc '.networkPolicies.global.wcIngress.ips | . style="flow"')" "[0.0.0.0/32]"
+}
+
 @test "ck8s update-ips performs minimal run with zero diff" {
   update_ips.mock_minimal
   update_ips.populate_minimal
