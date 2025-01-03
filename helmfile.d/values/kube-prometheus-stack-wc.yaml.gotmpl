@@ -21,6 +21,8 @@ prometheusOperator:
     resources: {{- toYaml .Values.prometheusOperator.prometheusConfigReloader.resources | nindent 6 }}
 
 kube-state-metrics:
+  selfMonitor:
+    enabled: true
   resources: {{- toYaml .Values.kubeStateMetrics.resources | nindent 4 }}
 
   metricLabelsAllowlist:
