@@ -122,6 +122,7 @@ policies:
         - rule: ingress-rule-prometheus
           ports:
             - tcp: 8080
+            - tcp: 8081
 
     {{- if eq .Environment.Name "service_cluster" }}
     {{- if eq .Values.objectStorage.type "s3" | and .Values.s3Exporter.enabled .Values.networkPolicies.s3Exporter.enabled }}

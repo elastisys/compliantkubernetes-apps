@@ -3,6 +3,8 @@ defaultRules:
   create: false
 
 kube-state-metrics:
+  selfMonitor:
+    enabled: true
   resources: {{- toYaml .Values.kubeStateMetrics.resources | nindent 4 }}
   {{- if .Values.clusterApi.enabled }}
   rbac:
