@@ -7,6 +7,11 @@
 1. helmfile.d/charts/prometheus-alerts/templates/alerts/kubernetes-resources.yaml
     - MODIFIED - KubeCPUOvercommit properly compute per cluster as done upstream
     - MODIFIED - KubeMemoryOvercommit properly compute per cluster as done upstream
+1. helmfile.d/charts/prometheus-alerts/templates/alerts/kube-state-metrics.yaml
+    - MODIFIED - KubeStateMetricsListErrors properly compute per cluster as done upstream
+    - MODIFIED - KubeStateMetricsWatchErrors properly compute per cluster as done upstream
+    - MODIFIED - KubeStateMetricsShardingMismatch properly compute per cluster as done upstream
+    - MODIFIED - KubeStateMetricsShardsMissing properly compute per cluster as done upstream
 
 ## 2022.12.01
 
