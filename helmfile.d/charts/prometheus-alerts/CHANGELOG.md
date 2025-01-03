@@ -4,6 +4,9 @@
 
 1. helmfile.d/charts/prometheus-alerts/templates/alerts/alertmanager.rules.yaml
     - MODIFIED - Added runbookURLs for the alertmanager alerts
+1. helmfile.d/charts/prometheus-alerts/templates/alerts/kubernetes-resources.yaml
+    - MODIFIED - KubeCPUOvercommit properly compute per cluster as done upstream
+    - MODIFIED - KubeMemoryOvercommit properly compute per cluster as done upstream
 
 ## 2022.12.01
 
