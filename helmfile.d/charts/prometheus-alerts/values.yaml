@@ -141,6 +141,9 @@ capacityManagementAlertsNodeGroupCpuLimit1h: 95
 capacityManagementAlertsNodeGroupMemoryLimit1h: 85
 capacityManagementAlertsNodeCpuLimit1h: 95
 capacityManagementAlertsNodeMemoryLimit1h: 85
+capacityManagementAlertsCpuRequestLimit: 80
+capacityManagementAlertsMemoryRequestLimit: 80
+capacityManagementAlertsRequestsExcludePattern: ""
 
 buckets:
   harbor: set-me
