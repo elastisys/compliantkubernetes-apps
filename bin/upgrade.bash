@@ -58,7 +58,9 @@ prepare() {
     fi
 
     log_info "prepare snippet \"${snippet##"${ROOT}/migration/"}\":"
-    if "${snippet}"; then
+    if [[ "${CK8S_DRY_RUN:-false}" == "true" ]]; then
+      log_warn "prepare snippet dry-run\n---"
+    elif "${snippet}"; then
       log_info "prepare snippet success\n---"
     else
       log_fatal "prepare snippet failure"
@@ -99,7 +101,9 @@ apply() {
     fi
 
     log_info "apply snippet \"${snippet##"${ROOT}/migration/"}\":"
-    if "${snippet}" execute; then
+    if [[ "${CK8S_DRY_RUN:-false}" == "true" ]]; then
+      log_warn "apply snippet dry-run\n---"
+    elif "${snippet}" execute; then
       log_info "apply snippet success\n---"
     else
       local return="${?}"
