@@ -28,8 +28,9 @@ Notice to developers on writing migration steps:
             - are run with the argument `execute` on upgrade and should return 1 on failure and 2 on successful internal rollback,
             - are rerun with the argument `rollback` on execute failure and should return 1 on failure.
 
-For prepare the init step is given.
-For apply the apply step is given, it is expected that releases upgraded in custom steps are excluded from the apply step.
+[Prepare snippets](main/prepare) are supposed to update the environment configuration to the target version, an example snippet is the init step which runs the `ck8s init` command.
+[Apply snippets](main/apply) are supposed to update the environment application to the target version, and example sippet is the apply step which run `helmfile upgrade` on all releases that have changed.
+It is expected that releases upgraded in other snippets are excluded from the apply snippet.
 
 > [!tip]
 > This can be done by adding label expression of releases into the `skipped*` arrays of the `80-apply.sh` snippet:
