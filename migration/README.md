@@ -29,7 +29,7 @@ Notice to developers on writing migration steps:
             - are rerun with the argument `rollback` on execute failure and should return 1 on failure.
 
 [Prepare snippets](main/prepare) are supposed to update the environment configuration to the target version, an example snippet is the init step which runs the `ck8s init` command.
-[Apply snippets](main/apply) are supposed to update the environment application to the target version, and example sippet is the apply step which run `helmfile upgrade` on all releases that have changed.
+[Apply snippets](main/apply) are supposed to update the environment application to the target version, and example snippet is the apply step which run `helmfile upgrade` on all releases that have changed.
 It is expected that releases upgraded in other snippets are excluded from the apply snippet.
 
 > [!tip]
