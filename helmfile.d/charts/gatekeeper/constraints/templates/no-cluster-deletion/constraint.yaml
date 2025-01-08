@@ -1,0 +1,15 @@
+{{- if .Values.noClusterDeletion.enable -}}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sNoClusterDeletion
+metadata:
+  name: elastisys-no-cluster-deletion
+spec:
+  enforcementAction: {{ .Values.noClusterDeletion.enforcementAction }}
+  match:
+    kinds:
+      - apiGroups:
+          - [""]
+        kinds:
+          - Cluster
+          - Openstackcluster
+{{- end }}

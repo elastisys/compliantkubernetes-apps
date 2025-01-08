@@ -58,6 +58,8 @@ validatingWebhookCustomRules:
       - DELETE
     resources:
       - customresourcedefinitions
+      - clusters
+      - openstackclusters
       - secrets
 mutatingWebhookCustomRules:
   - apiGroups:
@@ -98,6 +100,18 @@ mutatingWebhookCustomRules:
       - services/proxy
       - nodes/proxy
       - hierarchyconfiguration
+  - apiGroups:
+      - '*'
+    apiVersions:
+      - '*'
+    operations:
+      - CREATE
+      - UPDATE
+      - DELETE
+    resources:
+      - customresourcedefinitions
+      - clusters
+      - openstackclusters
 
 auditMatchKindOnly: true
 

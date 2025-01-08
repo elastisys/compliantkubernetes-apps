@@ -895,6 +895,11 @@ opa:
     enabled: true
     enforcement: warn
 
+  ## Prevent accidental cluster deletion
+  noClusterDeletion:
+    enabled: true
+    enforcement: deny
+
 trivy:
   enabled: true
   # comma separated list of namespaces (or glob patterns) to be excluded from scanning

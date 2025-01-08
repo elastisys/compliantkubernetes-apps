@@ -25,6 +25,7 @@ waitFor:
   - k8srejectloadbalancerservice
   - k8srequirenetworkpolicy
   - k8sresourcerequests
+  - k8snoclusterdeletion
 {{- if and (eq .Environment.Name "workload_cluster") }}
   - k8sminimumreplicas
 {{- end }}

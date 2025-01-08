@@ -3429,6 +3429,29 @@ properties:
               deny: Deny actions violating the constraint.
               warn: Warn actions violating the constraint.
               dryrun: Dryrun actions violating the constraint.
+      noClusterDeletion:
+        title: Safeguard No Cluster Deletion
+        description: |-
+          Configure constraint to reject deletion of cluster resources.
+        type: object
+        additionalProperties: false
+        properties:
+          enabled:
+            title: Safeguard No Cluster Deletion
+            type: boolean
+            default: false
+          enforcement:
+            title: Safeguard No Cluster Deletion Enforcement
+            type: string
+            default: deny
+            enum:
+              - deny
+              - warn
+              - dryrun
+            meta:enum:
+              deny: Deny actions violating the constraint.
+              warn: Warn actions violating the constraint.
+              dryrun: Dryrun actions violating the constraint.
       resourceRequests:
         title: Safeguard Resource Requests
         description: |-
