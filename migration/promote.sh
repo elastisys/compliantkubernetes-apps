@@ -15,22 +15,15 @@ usage() {
   "
 }
 
-main() {
-  local series="${1:-}"
-
-  [[ -n "${series}" ]] || log.fatal "missing required argument $(esc.ylw "<release-series>"), $(usage)"
-
-  ver.parse next "${series}"
-
-  local target_version="v${ver["next-major"]}.${ver["next-minor"]}"
-  local target_migration="${ROOT}/migration/${target_version}"
-
+create() {
+  # check if the target migration already exists
   if [[ -d "${target_migration}" ]]; then
     if log.continue "migration $(esc.ylw "${target_version}") already exists, do you want to recreate it?"; then
       log.warn "removing migration $(esc.ylw "${target_version}")"
       rm -r "${target_migration}"
     else
-      log.warn "skipping"
+      log.warn "skipping recreation"
+      return
     fi
   fi
 
@@ -39,8 +32,7 @@ main() {
     cp -Tr "${ROOT}/migration/main" "${target_migration}"
   fi
 
-  # Find prev
-
+  # find current migration directories
   local -a directories
   readarray -t directories < <(find "${ROOT}/migration" -maxdepth 1 -type d -name 'v*')
 
@@ -49,6 +41,7 @@ main() {
     ver.parse "${directory}" "${directory}"
   done
 
+  # the previous - the greatest excluding the current
   local prev="prev"
   ver.parse "${prev}" "v0.0"
 
@@ -65,25 +58,30 @@ main() {
   yq --inplace --front-matter process ".to =\"${target_version}\"" "${target_migration}/README.md"
   yq --inplace --front-matter process ".from =\"${target_version}\"" "${ROOT}/migration/main/README.md"
 
-  # Update header
+  # update header
   sed -i "s/# Main upgrade and migration/# ${target_version} upgrade and migration/" "${target_migration}/README.md"
-  # Update preamble
+  # update preamble
   sed -i "/^<\!-- begin preamble --->$/,/^<\!--- end preamble --->$/c\\
 > [\!important]\\
 > This is the upgrade and migration process for Welkin Apps ${target_version}.\\
 >\\
 > Upgrade is supported from any patch version of the major or minor version stated in the \`from\` field above!" "${target_migration}/README.md"
-  # Update changelog
+  # update changelog
   sed -i "s#\.\./\.\./changelog#../../changelog/${target_version}.md#" "${target_migration}/README.md"
-  # Update fetch
+  # update fetch
   sed -i "s/Switch to the main branch and pull the latest changes/Fetch the latest changes and switch to the release tag/" "${target_migration}/README.md"
   sed -i "s/git switch main/git fetch/" "${target_migration}/README.md"
   sed -i "s/git pull/git switch -d ${target_version}.z/" "${target_migration}/README.md"
+}
 
-  # Prune
+prune() {
+  # find current migration directories
+  local -a directories
+  readarray -t directories < <(find "${ROOT}/migration" -maxdepth 1 -type d -name 'v*')
 
+  # until we have five migrations left
   while [[ "${#directories[*]}" -gt 5 ]]; do
-    # Find last
+    # the last - the least including the current
     local last="${target_version}"
     ver.parse "${last}" "${target_version}"
 
@@ -98,9 +96,23 @@ main() {
     log.info "pruning old migration $(esc.blu "${last}")"
     rm -r "${ROOT}/migration/${last}"
 
-    local -a directories
     readarray -t directories < <(find "${ROOT}/migration" -maxdepth 1 -type d -name 'v*')
   done
+}
+
+main() {
+  local series="${1:-}"
+
+  [[ -n "${series}" ]] || log.fatal "missing required argument $(esc.ylw "<release-series>"), $(usage)"
+
+  ver.parse next "${series}"
+
+  local target_version="v${ver["next-major"]}.${ver["next-minor"]}"
+  local target_migration="${ROOT}/migration/${target_version}"
+
+  create
+
+  prune
 }
 
 main "${@}"
