@@ -12,6 +12,17 @@ metadata:
     {{- if and .Values.certs (not .Values.certs.existingSecret) }}
     checksum/certs: {{ include (print $.Template.BasePath "/certs-secret.yaml") . | sha256sum }}
     {{- end }}
+    {{- if .Values.driver.enabled }}
+    {{- if (or (eq .Values.driver.kind "modern_ebpf") (eq .Values.driver.kind "modern-bpf")) }}
+    {{- if .Values.driver.modernEbpf.leastPrivileged }}
+    container.apparmor.security.beta.kubernetes.io/{{ .Chart.Name }}: unconfined
+    {{- end }}
+    {{- else if eq .Values.driver.kind "ebpf" }}
+    {{- if .Values.driver.ebpf.leastPrivileged }}
+    container.apparmor.security.beta.kubernetes.io/{{ .Chart.Name }}: unconfined
+    {{- end }}
+    {{- end }}
+    {{- end }}
     {{- with .Values.podAnnotations }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -49,6 +60,7 @@ spec:
   {{- if eq .Values.driver.kind "gvisor" }}
   hostNetwork: true
   hostPID: true
+  dnsPolicy: ClusterFirstWithHostNet
   {{- end }}
   containers:
     - name: {{ .Chart.Name }}
@@ -129,12 +141,14 @@ spec:
           name: plugins-install-dir
       {{- end }}
       {{- end }}
+      {{- if eq (include "driverLoader.enabled" .) "true" }}
+        - mountPath: /etc/falco/config.d
+          name: specialized-falco-configs
+      {{- end }}
         - mountPath: /root/.falco
           name: root-falco-fs
-        {{- if or .Values.driver.enabled .Values.mounts.enforceProcMount }}
         - mountPath: /host/proc
           name: proc-fs
-        {{- end }}
         {{- if and .Values.driver.enabled (not .Values.driver.loader.enabled) }}
           readOnly: true
         - mountPath: /host/boot
@@ -227,6 +241,10 @@ spec:
     {{- include "falcoctl.initContainer" . | nindent 4 }}
   {{- end }}
   volumes:
+    {{- if eq (include "driverLoader.enabled" .) "true" }}
+    - name: specialized-falco-configs
+      emptyDir: {}
+    {{- end }}
     {{- if or .Values.falcoctl.artifact.install.enabled .Values.falcoctl.artifact.follow.enabled }}
     - name: plugins-install-dir
       emptyDir: {}
@@ -281,11 +299,9 @@ spec:
     {{- end }}
     {{- end }}
     {{- end }}
-    {{- if or .Values.driver.enabled .Values.mounts.enforceProcMount }}
     - name: proc-fs
       hostPath:
         path: /proc
-    {{- end }}
     {{- if eq .Values.driver.kind "gvisor" }}
     - name: runsc-path
       hostPath:
@@ -384,6 +400,8 @@ spec:
     - mountPath: /host/etc
       name: etc-fs
       readOnly: true
+    - mountPath: /etc/falco/config.d
+      name: specialized-falco-configs
   env:
     - name: HOST_ROOT
       value: /host
@@ -395,6 +413,8 @@ spec:
       valueFrom:
         fieldRef:
           fieldPath: metadata.namespace
+    - name: FALCOCTL_DRIVER_CONFIG_CONFIGMAP
+      value: {{ include "falco.fullname" . }}
   {{- else }}
     - name: FALCOCTL_DRIVER_CONFIG_UPDATE_FALCO
       value: "false"
