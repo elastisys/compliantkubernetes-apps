@@ -43,6 +43,11 @@ We additionally suggest that you make Apps a submodule of your config repository
 
 All operations are done through the `./bin/ck8s` command line tool. Run `./bin/ck8s help` for a complete set of possible commands.
 
+For more information please read our public documentation:
+
+- [Understand the basics](https://elastisys.io/welkin/operator-manual/understand-the-basics/)
+- [Understand Welkin](https://elastisys.io/welkin/operator-manual/understand-welkin/)
+
 See [Quickstart](#Quickstart) for instructions on how to initialize the repo
 
 ### :cloud: Cloud providers :cloud:
@@ -102,41 +107,9 @@ If this is all new to you, here's a [link](https://riseup.net/en/security/messag
 ### Quickstart
 
 **You probably want to check the [compliantkubernetes-kubespray][compliantkubernetes-kubespray] repository first, since compliantkubernetes-apps depends on having two clusters already set up.**
-In addition to this, you will need to set up the following DNS entries (replace `example.com` with your domain).
-
-There are two options when managing DNS records, manually or ExternalDNS.
-
-- Manually point these domains to the workload cluster ingress controller:
-
-    - `*.example.com`
-
-- Manually point these domains to the service cluster ingress controller:
-
-    - `*.ops.example.com`
-    - `dex.example.com`
-    - `grafana.example.com`
-    - `harbor.example.com`
-    - `opensearch.example.com`
-
-Assuming you already have everything needed to install the apps, this is what you need to do.
 
 > [!NOTE]
-> Depending on your infrastructure, you might utilize a Service of type LoadBalancer for the ingress controller. This means you will not have an IP for the domains before installing the ingress controller. After configuring and validating the config, you can install just the ingress controller before the rest of apps with the following command
->
-> ```bash
-> ./bin/ck8s ops helmfile sc apply -lapp=ingress-nginx --include-transitive-needs
-> ./bin/ck8s ops helmfile wc apply -lapp=ingress-nginx --include-transitive-needs
-> ```
->
-> The IP is then available on the ingress controller Service
->
-> ```bash
-> ./bin/ck8s ops kubectl sc -n ingress-nginx get svc ingress-nginx-controller
-> ./bin/ck8s ops kubectl wc -n ingress-nginx get svc ingress-nginx-controller
-> ```
-
-The other option is to let ExternalDNS manage your DNS records, currently only AWS Route 53 is supported.
-You configure ExternalDNS later in the process.
+> Depending on your configuration of the clusters and OIDC, you might not have access to workload cluster before installing Dex in the service cluster. You would then have to install Apps in each cluster separately, starting with the service cluster.
 
 1. Decide on a name for this environment, the cloud provider to use as well as the flavor and set them as environment variables:
     Note that these will be later kept as global values in the common defaults config to prevent them from being inadvertently changed, as they will affect the default options of the configuration when generated or updated.
@@ -238,7 +211,7 @@ You configure ExternalDNS later in the process.
     ./bin/ck8s update-ips both apply
     ```
 
-1. Validate config and fill in missing values
+8. Validate config and fill in missing values
     This should indicate any missing configuration that still needs to be set.
 
     ```bash
@@ -246,11 +219,32 @@ You configure ExternalDNS later in the process.
     ./bin/ck8s validate wc
     ```
 
-1. **Optional step**, install ingress controller and setup DNS as explained above.
+1. If you decide to not use ExternalDNS for DNS records, you will need to manually set up the following DNS entries (replace `example.com` with your domain).
+
+    - Manually point these domains to the workload cluster ingress controller:
+
+      - `*.example.com`
+
+    - Manually point these domains to the service cluster ingress controller:
+
+        - `*.ops.example.com`
+        - `dex.example.com`
+        - `grafana.example.com`
+        - `harbor.example.com`
+        - `opensearch.example.com`
+
+    Depending on your infrastructure, you might utilize a Service of type LoadBalancer for the ingress controller. This means you will not have an IP for the domains before installing the ingress controller. After configuring and validating the config, you can install just the ingress controller before the rest of apps with the following command
 
     ```bash
     ./bin/ck8s ops helmfile sc apply -lapp=ingress-nginx --include-transitive-needs
     ./bin/ck8s ops helmfile wc apply -lapp=ingress-nginx --include-transitive-needs
+    ```
+
+    The IP is then available on the ingress controller Service
+
+    ```bash
+    ./bin/ck8s ops kubectl sc -n ingress-nginx get svc ingress-nginx-controller
+    ./bin/ck8s ops kubectl wc -n ingress-nginx get svc ingress-nginx-controller
     ```
 
     After configuring the DNS, update the Network Policies again.
