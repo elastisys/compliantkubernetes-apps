@@ -32,7 +32,7 @@ function opensearchDexStaticLogin(cy, ingress) {
     cy.contains("loading opensearch dashboards", opt)
       .should("not.exist")
 
-    cy.contains("Welcome to Compliant Kubernetes")
+    cy.contains("Welcome to Welkin")
       .should("be.visible")
   })
 
@@ -41,7 +41,7 @@ function opensearchDexStaticLogin(cy, ingress) {
   cy.contains("loading opensearch dashboards", opt)
   .should("not.exist")
 
-  cy.contains("Welcome to Compliant Kubernetes")
+  cy.contains("Welcome to Welkin")
     .should("be.visible")
 }
 

@@ -93,7 +93,7 @@ describe("grafana dev authentication", function() {
     cy.contains("Home")
       .should("exist")
 
-    cy.contains("Welcome to Compliant Kubernetes")
+    cy.contains("Welcome to Welkin")
       .should("exist")
   })
 
@@ -122,7 +122,7 @@ describe("grafana dev authentication", function() {
     cy.contains("Home")
       .should("exist")
 
-    cy.contains("Welcome to Compliant Kubernetes")
+    cy.contains("Welcome to Welkin")
       .should("exist")
   })
 })
