@@ -7,7 +7,7 @@ gpg.auto_generate_key() {
   gpg --batch --generate-key <<EOF
 Key-Type: RSA
 Key-Length: 4096
-Name-Real: Compliant Kubernetes / Apps / Tests
+Name-Real: Welkin / Apps / Tests
 Name-Email: support@elastisys.com
 Expire-Date: 1d
 %no-protection

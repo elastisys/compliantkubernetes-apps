@@ -43,7 +43,7 @@ describe("opensearch admin authentication", function() {
     cy.contains("Loading OpenSearch Dashboards")
       .should("not.exist")
 
-    cy.contains("Welcome to Compliant Kubernetes")
+    cy.contains("Welcome to Welkin")
       .should("exist")
   })
 })
