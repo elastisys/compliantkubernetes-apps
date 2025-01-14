@@ -4283,7 +4283,8 @@ properties:
             description: Configure a pattern of node groups to exclude from the resource request alerts. This can be used to exclude certain node groups from request alerts, while still getting usage alerts for those node groups.
             type: string
             default: ""
-            examples: ".*redis.*|.*postgres.*"
+            examples:
+              - ".*redis.*|.*postgres.*"
       diskAlerts:
         title: Disk Alerts
         description: Definitions for disk alerts.
