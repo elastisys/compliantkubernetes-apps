@@ -15,7 +15,7 @@
       }
     ]
   },
-  "description": "Simple Cluster Status Overview\n\n# TODO\n\n- default to 24h view, 5m refresh, (remove?) interval\n- add S3 probe?\n- remove or clarify namespace selector\n- some readme, pointers to datasources for other probes etc\n- worst over time?\n- info about creating your own probes\n\t-\tpublic docs\n",
+  "description": "Simple Cluster Status Overview\n\n# TODO\n\n- add S3 probe?\n- remove or clarify namespace selector\n- some readme, pointers to datasources for other probes etc\n- worst over time?\n- info about creating your own probes\n\t-\tpublic docs",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
@@ -1241,7 +1241,7 @@
     }
   ],
   "preload": false,
-  "refresh": "1m",
+  "refresh": "5m",
   "schemaVersion": 40,
   "tags": [
     "blackbox",
@@ -1261,92 +1261,6 @@
         "refresh": 1,
         "regex": "",
         "type": "datasource"
-      },
-      {
-        "auto": true,
-        "auto_count": 10,
-        "auto_min": "10s",
-        "current": {
-          "text": "1m",
-          "value": "1m"
-        },
-        "label": "Interval",
-        "name": "interval",
-        "options": [
-          {
-            "selected": false,
-            "text": "auto",
-            "value": "$__auto_interval_interval"
-          },
-          {
-            "selected": false,
-            "text": "5s",
-            "value": "5s"
-          },
-          {
-            "selected": false,
-            "text": "10s",
-            "value": "10s"
-          },
-          {
-            "selected": false,
-            "text": "30s",
-            "value": "30s"
-          },
-          {
-            "selected": true,
-            "text": "1m",
-            "value": "1m"
-          },
-          {
-            "selected": false,
-            "text": "10m",
-            "value": "10m"
-          },
-          {
-            "selected": false,
-            "text": "30m",
-            "value": "30m"
-          },
-          {
-            "selected": false,
-            "text": "1h",
-            "value": "1h"
-          },
-          {
-            "selected": false,
-            "text": "6h",
-            "value": "6h"
-          },
-          {
-            "selected": false,
-            "text": "12h",
-            "value": "12h"
-          },
-          {
-            "selected": false,
-            "text": "1d",
-            "value": "1d"
-          },
-          {
-            "selected": false,
-            "text": "7d",
-            "value": "7d"
-          },
-          {
-            "selected": false,
-            "text": "14d",
-            "value": "14d"
-          },
-          {
-            "selected": false,
-            "text": "30d",
-            "value": "30d"
-          }
-        ],
-        "query": "5s,10s,30s,1m,10m,30m,1h,6h,12h,1d,7d,14d,30d",
-        "refresh": 2,
-        "type": "interval"
       },
       {
         "current": {
@@ -1435,7 +1349,7 @@
     ]
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-12h",
     "to": "now"
   },
   "timepicker": {},
