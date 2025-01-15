@@ -17,7 +17,7 @@ spec:
         runAsUser: 1000
       containers:
       - name: prom-label-enforcer
-        image: quay.io/prometheuscommunity/prom-label-proxy:master
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: IfNotPresent
         resources: {{- toYaml .Values.resources | nindent 10 }}
         args:
