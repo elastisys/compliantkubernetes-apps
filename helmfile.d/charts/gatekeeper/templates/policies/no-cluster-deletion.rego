@@ -7,7 +7,7 @@ violation[{"msg": msg}] {
     ]
 
     input.review.object.kind == kinds[_]
-    input.request.operation == "DELETE"
+    input.review.operation == "DELETE"
 
     msg := "Cluster deletion is not allowed."
 }

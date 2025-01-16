@@ -49,7 +49,7 @@ templates:
     chart: charts/gatekeeper/constraints
     version: 0.1.0
     name: gatekeeper-constraints
-    condition: ck8sWorkloadCluster.enabled
+#    condition: ck8sWorkloadCluster.enabled
     needs:
       - gatekeeper-system/gatekeeper-templates # creates gatekeeper/constraints
     values:

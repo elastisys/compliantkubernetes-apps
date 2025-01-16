@@ -7,9 +7,8 @@ spec:
   enforcementAction: {{ .Values.noClusterDeletion.enforcementAction }}
   match:
     kinds:
-      - apiGroups:
-          - [""]
+      - apiGroups: [""]
         kinds:
-          - Cluster
-          - Openstackcluster
+          - Clusters
+          - Openstackclusters
 {{- end }}

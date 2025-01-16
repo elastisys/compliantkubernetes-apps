@@ -22,6 +22,9 @@ minimumDeploymentReplicas:
 noClusterDeletion:
     enable: true
     enforcementAction: deny
+disallowLocalhostSeccomp:
+    enable: true
+    enforcementAction: deny
 
 imageRegistryURL: registry.example.com
 

@@ -1026,6 +1026,12 @@ opa:
   disallowedTags:
     enabled: false
 
+  disallowLocalhostSeccomp:
+    enabled: false
+
+  minimumDeploymentReplicas:
+    enabled: false
+
   controllerManager:
     resources:
       requests:
