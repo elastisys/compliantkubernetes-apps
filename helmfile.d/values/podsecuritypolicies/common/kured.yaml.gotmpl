@@ -5,8 +5,6 @@ constraints:
         app.kubernetes.io/instance: kured
       allow:
         hostNamespace: true
-        allowPrivilegeEscalation: true
-        privileged: true
         runAsUser:
           rule: RunAsAny
         volumes:
@@ -16,3 +14,5 @@ constraints:
           - configMap
         allowedHostPaths:
           - pathPrefix: "/var/run"
+        allowedCapabilities:
+          - CAP_KILL
