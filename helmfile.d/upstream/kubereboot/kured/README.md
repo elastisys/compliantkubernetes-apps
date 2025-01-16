@@ -78,7 +78,7 @@ The following changes have been made compared to the stable chart:
 | Config                                  | Description                                                                 | Default                   |
 | ------                                  | -----------                                                                 | -------                   |
 | `image.repository`                      | Image repository                                                            | `ghcr.io/kubereboot/kured`|
-| `image.tag`                             | Image tag                                                                   | `1.15.1`                  |
+| `image.tag`                             | Image tag                                                                   | `1.17.0`                  |
 | `image.pullPolicy`                      | Image pull policy                                                           | `IfNotPresent`            |
 | `image.pullSecrets`                     | Image pull secrets                                                          | `[]`                      |
 | `revisionHistoryLimit`                  | Number of old history to retain to allow rollback                           | `10`                      |

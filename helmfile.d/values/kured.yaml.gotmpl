@@ -8,7 +8,9 @@ nodeSelector: {{- toYaml .Values.kured.nodeSelector | nindent 2 }}
 affinity:     {{- toYaml .Values.kured.affinity | nindent 2 }}
 tolerations:  {{- toYaml .Values.kured.tolerations | nindent 2 }}
 
-configuration: {{- toYaml .Values.kured.configuration | nindent 2 }}
+configuration:
+  rebootMethod: signal
+  {{- toYaml .Values.kured.configuration | nindent 2 }}
 
 extraArgs: {{- toYaml .Values.kured.extraArgs | nindent 2 }}
 
@@ -37,3 +39,16 @@ hostNetwork: false
 
 containerSecurityContext:
   runAsUser: 0
+  runAsGroup: 0
+  privileged: false
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    add:
+    - CAP_KILL
+    drop:
+    - '*'
+
+podAnnotations:
+  # This is needed to allow kured to send a signal to trigger a node reboot
+  container.apparmor.security.beta.kubernetes.io/kured: unconfined
