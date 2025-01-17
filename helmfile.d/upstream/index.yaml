@@ -3,6 +3,8 @@ repositories:
 
   bitnami: https://charts.bitnami.com/bitnami
 
+  crossplane-stable: https://charts.crossplane.io/stable
+
   dexidp: https://charts.dexidp.io
 
   falcosecurity: https://falcosecurity.github.io/charts
@@ -19,7 +21,6 @@ repositories:
 
   kubernetes-external-dns: https://kubernetes-sigs.github.io/external-dns
   kubernetes-ingress-nginx: https://kubernetes.github.io/ingress-nginx
-  kubernetes-metrics-server: https://kubernetes-sigs.github.io/metrics-server
 
   minio: https://charts.min.io/
 
@@ -35,6 +36,8 @@ repositories:
 
 charts:
   aquasecurity/trivy-operator: 0.23.3
+
+  crossplane-stable/crossplane: 1.18.2
 
   bitnami/fluentd: 5.8.2
   bitnami/thanos: 15.0.5
@@ -56,7 +59,6 @@ charts:
 
   kubernetes-external-dns/external-dns: 1.14.4
   kubernetes-ingress-nginx/ingress-nginx: 4.9.1
-  kubernetes-metrics-server/metrics-server: 3.12.1
 
   minio/minio: 5.0.14
 

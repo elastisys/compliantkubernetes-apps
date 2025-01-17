@@ -7,6 +7,7 @@ bases:
 bases:
   - stacks/calico.yaml.gotmpl
   - stacks/cert-manager.yaml.gotmpl
+  - stacks/crossplane.yaml.gotmpl
   - stacks/dex.yaml.gotmpl
   - stacks/external-dns.yaml.gotmpl
   - stacks/falco.yaml.gotmpl
@@ -30,6 +31,9 @@ bases:
   - stacks/velero.yaml.gotmpl
 ---
 releases:
+  - inherit: [ template: crossplane ]
+  - inherit: [ template: crossplane-packages ]
+
   - inherit: [ template: tigera ]
   - inherit: [ template: minio ]
 
