@@ -76,18 +76,27 @@ if ! array_contains "${CK8S_K8S_INSTALLER}" "${ck8s_k8s_installers[@]}"; then
 fi
 
 generate_sops_config() {
+  local fingerprints
+
   if [ -n "${CK8S_PGP_FP:-}" ]; then
-    if ! gpg --list-keys | grep "${CK8S_PGP_FP}" >/dev/null 2>&1; then
-      log_error "ERROR: Fingerprint does not exist in gpg keyring."
-      log_error "CK8S_PGP_FP=${CK8S_PGP_FP}"
-      exit 1
-    fi
-    fingerprint="${CK8S_PGP_FP}"
+    local fingerprint
+    local -a fingerprints_split
+
+    IFS=, read -ra fingerprints_split <<<"${CK8S_PGP_FP}"
+
+    for fingerprint in "${fingerprints_split[@]}"; do
+      if ! gpg --list-keys "${fingerprint}" >/dev/null 2>&1; then
+        log_error "ERROR: Fingerprint ${fingerprint} does not exist in gpg keyring."
+        log_error "CK8S_PGP_FP=${CK8S_PGP_FP}"
+        exit 1
+      fi
+    done
+    fingerprints="${CK8S_PGP_FP}"
   elif [ -n "${CK8S_PGP_UID:-}" ]; then
-    fingerprint=$(gpg --list-keys --with-colons "${CK8S_PGP_UID}" |
+    fingerprints=$(gpg --list-keys --with-colons "${CK8S_PGP_UID}" |
       awk -F: '$1 == "fpr" {print $10;}' | head -n 1 ||
       echo "")
-    if [ -z "${fingerprint}" ]; then
+    if [ -z "${fingerprints}" ]; then
       log_error "ERROR: Unable to get fingerprint from gpg keyring using UID."
       log_error "CK8S_PGP_UID=${CK8S_PGP_UID}"
       exit 1
@@ -97,9 +106,9 @@ generate_sops_config() {
     exit 1
   fi
 
-  log_info "Initializing SOPS config with PGP fingerprint: ${fingerprint}"
+  log_info "Initializing SOPS config with PGP fingerprints: ${fingerprints}"
 
-  sops_config_write_fingerprints "${fingerprint}"
+  sops_config_write_fingerprints "${fingerprints}"
 }
 
 # Usage: generate_default_config <default_config>

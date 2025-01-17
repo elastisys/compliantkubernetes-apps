@@ -75,7 +75,7 @@ teardown_file() {
 
   CK8S_PGP_FP="123" run ck8s init both
   assert_failure
-  assert_output --partial "Fingerprint does not exist in gpg keyring"
+  assert_output --partial "Fingerprint 123 does not exist in gpg keyring"
 
   CK8S_PGP_UID="asd" run ck8s init both
   assert_failure
