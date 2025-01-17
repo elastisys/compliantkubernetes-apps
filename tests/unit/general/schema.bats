@@ -116,3 +116,13 @@ find_schemas() {
 
   refute_output
 }
+
+@test "documentation should be generated" {
+  pushd "${DOCS_PATH}" || exit 1
+
+  run "./scripts/jsonschema2md.sh" --path "${APPS_PATH}"
+
+  popd || exit 1
+
+  assert_success
+}

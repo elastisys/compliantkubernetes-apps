@@ -9,10 +9,12 @@ ARG TZ="Etc/UTC"
 
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y apache2-utils bats curl dnsutils gettext-base git gpg iputils-ping jq locales make net-tools pwgen s3cmd ssh unzip && \
+    apt-get install -y apache2-utils bats curl dnsutils gettext-base git gpg iputils-ping jq locales make net-tools npm pwgen s3cmd ssh unzip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+
+ENV NODE_PATH="/usr/local/lib/node_modules"
 
 ARG GOMPLATE_VERSION="3.11.7"
 RUN curl -LOs "https://github.com/hairyhenderson/gomplate/releases/download/v${GOMPLATE_VERSION}/gomplate_linux-amd64" && \
@@ -37,6 +39,9 @@ RUN curl -LOs "https://github.com/helmfile/helmfile/releases/download/v${HELMFIL
     tar -zxvf "helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz" helmfile && \
     install -Tm 755 helmfile /usr/local/bin/helmfile && \
     rm helmfile "helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz"
+
+ENV JSONSCHEMA2MD_VERSION="8.0.2"
+RUN npm install --global "@adobe/jsonschema2md@${JSONSCHEMA2MD_VERSION}"
 
 ARG KUBECTL_VERSION="1.29.7"
 RUN curl -LOs "https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
@@ -82,20 +87,23 @@ RUN git clone --depth 1 https://github.com/bats-core/bats-file.git /usr/local/li
 RUN git clone --depth 1 https://github.com/grayhemp/bats-mock.git /usr/local/lib/bats/mock
 RUN git clone --depth 1 https://github.com/bats-core/bats-support.git /usr/local/lib/bats/support
 
+ENV DOCS_PATH="/usr/local/share/docs"
+RUN git clone --depth 1 https://github.com/elastisys/welkin.git "${DOCS_PATH}" && \
+    chmod --recursive a+w "${DOCS_PATH}"
+
 # Container to run integration and end-to-end tests
 FROM unit AS main
 
 RUN apt-get update && \
-    apt-get install -y buildah docker.io libasound2t64 libatk1.0-0 libatk-bridge2.0-0 libcanberra-gtk-module libcanberra-gtk3-module libcups2 libgbm-dev libgbm1 libglib2.0-0 libgtk2.0-0 libgtk2.0-0t64 libgtk-3-0 libgtk-3-0t64 libnotify-dev libnss3 libxss1 libxtst6 npm podman-remote skopeo xauth xvfb && \
+    apt-get install -y buildah docker.io libasound2t64 libatk1.0-0 libatk-bridge2.0-0 libcanberra-gtk-module libcanberra-gtk3-module libcups2 libgbm-dev libgbm1 libglib2.0-0 libgtk2.0-0 libgtk2.0-0t64 libgtk-3-0 libgtk-3-0t64 libnotify-dev libnss3 libxss1 libxtst6 podman-remote skopeo xauth xvfb && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     ln -s /usr/bin/podman-remote /usr/bin/podman
 
 ARG CYPRESS_VERSION="13.14.1"
 ENV CYPRESS_CACHE_FOLDER="/usr/local/lib/cypress"
-ENV NODE_PATH="/usr/local/lib/node_modules"
-RUN npm install --global "cypress@${CYPRESS_VERSION}"
-RUN chmod --recursive a+w "${CYPRESS_CACHE_FOLDER}"
+RUN npm install --global "cypress@${CYPRESS_VERSION}" && \
+    chmod --recursive a+w "${CYPRESS_CACHE_FOLDER}"
 
 ARG KIND_VERSION="0.23.0"
 RUN curl -LOs "https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-linux-amd64" && \
@@ -104,9 +112,6 @@ RUN curl -LOs "https://github.com/kubernetes-sigs/kind/releases/download/v${KIND
 
 ARG VELERO_VERSION="1.13.0"
 RUN curl -LOs "https://github.com/vmware-tanzu/velero/releases/download/v${VELERO_VERSION}/velero-v${VELERO_VERSION}-linux-amd64.tar.gz" && \
-  tar -zxvf "velero-v${VELERO_VERSION}-linux-amd64.tar.gz" "velero-v${VELERO_VERSION}-linux-amd64" && \
-  install -Tm 755 "velero-v${VELERO_VERSION}-linux-amd64/velero" /usr/local/bin/velero && \
-  rm -r "velero-v${VELERO_VERSION}-linux-amd64.tar.gz" "velero-v${VELERO_VERSION}-linux-amd64"
-
-ENV DOCS_PATH="/usr/local/share/docs"
-RUN git clone --depth 1 https://github.com/elastisys/compliantkubernetes.git "${DOCS_PATH}"
+    tar -zxvf "velero-v${VELERO_VERSION}-linux-amd64.tar.gz" "velero-v${VELERO_VERSION}-linux-amd64" && \
+    install -Tm 755 "velero-v${VELERO_VERSION}-linux-amd64/velero" /usr/local/bin/velero && \
+    rm -r "velero-v${VELERO_VERSION}-linux-amd64.tar.gz" "velero-v${VELERO_VERSION}-linux-amd64"

@@ -175,6 +175,7 @@ if command -v git &>/dev/null; then
 fi
 
 # Prepare container repo
+args+=("--env" "APPS_PATH=${root}")
 args+=("--mount" "type=bind,src=${root},dst=${root}${relabel:-}")
 
 "${runtime}" run "${args[@]}" "${@}"
