@@ -38,12 +38,16 @@ templates:
       - values/podsecuritypolicies/common/monitoring.yaml.gotmpl
 
   metrics-server:
-    inherit: [ template: metrics-server-chart ]
+    disableValidationOnInstall: true
+    chart: charts/metrics-server
+    version: 0.0.1
     installed: {{ .Values | get "metricsServer.enabled" false }}
     namespace: kube-system
-    name: metrics-server
+    name: module-metrics-server
     labels:
       app: metrics-server
+    needs:
+      - crossplane-system/crossplane-packages
     values:
       - values/metrics-server.yaml.gotmpl
 

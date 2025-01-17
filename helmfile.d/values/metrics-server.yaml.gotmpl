@@ -1,25 +1,4 @@
-rbac:
-  create: true
-
-# added just to keep only InternalIP as kubelet preferred address
-defaultArgs:
-  - --cert-dir=/tmp
-  - --kubelet-preferred-address-types=InternalIP
-  - --kubelet-use-node-status-port
-  - --metric-resolution=30s
-
-args:
-  - "--kubelet-insecure-tls"
-
-# keeping the container port from the old chart
-containerPort: 8443
-
 resources:
 {{- toYaml .Values.metricsServer.resources | nindent 2 }}
-
-# the pod failed to start due to a liveness probe timeout so we had to increase the period to 20
-livenessProbe:
-  periodSeconds: 20
-
 tolerations: {{- toYaml .Values.metricsServer.tolerations | nindent 2 }}
 affinity: {{- toYaml .Values.metricsServer.affinity | nindent 2 }}

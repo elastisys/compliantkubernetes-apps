@@ -1,0 +1,17 @@
+apiVersion: modules.elastisys.com/v1alpha1
+kind: MetricsServer
+metadata:
+  name: metrics-server
+spec:
+  {{- with .Values.affinity }}
+  affinity:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.resources }}
+  resources:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.tolerations }}
+  tolerations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}

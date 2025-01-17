@@ -75,7 +75,7 @@ repos:
     hooks:
       - id: codespell
         name: check spelling
-        exclude: ^helmfile\.d/charts/hnc/config-and-crds/crds/|^helmfile\.d/upstream/
+        exclude: ^helmfile\.d/charts/hnc/config-and-crds/crds/|^helmfile\.d/upstream/|^modules/metrics-server/apis/definition.yaml
         args:
           - -I
           - .codespellignore
