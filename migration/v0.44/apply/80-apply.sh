@@ -10,6 +10,7 @@ source "${ROOT}/scripts/migration/lib.sh"
 declare -a skipped
 skipped=(
   "app!=prometheus"
+  "name!=gatekeeper-templates"
 )
 declare -a skipped_sc
 skipped_sc=(

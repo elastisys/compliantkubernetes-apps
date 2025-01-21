@@ -3685,6 +3685,29 @@ properties:
               deny: Deny actions violating the constraint.
               warn: Warn actions violating the constraint.
               dryrun: Dryrun actions violating the constraint.
+      preventAccidentalDeletion:
+        title: Safeguard Prevent Accidental Deletion
+        description: |-
+          Configure constraint to reject deletion of sensitive resources.
+        type: object
+        additionalProperties: false
+        properties:
+          enabled:
+            title: Safeguard Prevent Accidental Deletion
+            type: boolean
+            default: false
+          enforcement:
+            title: Safeguard Prevent Accidental Deletion Enforcement
+            type: string
+            default: deny
+            enum:
+              - deny
+              - warn
+              - dryrun
+            meta:enum:
+              deny: Deny actions violating the constraint.
+              warn: Warn actions violating the constraint.
+              dryrun: Dryrun actions violating the constraint.
       resourceRequests:
         title: Safeguard Resource Requests
         description: |-

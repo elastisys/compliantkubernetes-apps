@@ -1,3 +1,4 @@
+{{- if eq .Environment.Name "workload_cluster" }}
 userCRDs:
   enabled: {{ .Values.gatekeeper.allowUserCRDs.enabled }}
   admin:
@@ -71,3 +72,4 @@ userCRDs:
     {{- if .Values.gatekeeper.allowUserCRDs.extraCRDs }}
     {{- toYaml .Values.gatekeeper.allowUserCRDs.extraCRDs | nindent 4 }}
     {{- end }}
+{{- end }}
