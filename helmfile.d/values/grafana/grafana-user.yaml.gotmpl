@@ -112,9 +112,15 @@ grafana.ini:
     client_secret: $__env{clientSecret}
     use_pkce: true
     scopes: {{ .Values.grafana.user.oidc.scopes }}
+    {{- if .Values.grafana.user.oidc.useInternalDex }}
     auth_url: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}{{ $trailingDot }}/auth
     token_url: http://dex.dex.svc.cluster.local{{ $trailingDot }}:5556/token
     api_url: http://dex.dex.svc.cluster.local{{ $trailingDot }}:5556/api
+    {{- else }}
+    auth_url: https://{{ .Values.grafana.user.oidc.externalDexDomain }}{{ $trailingDot }}/auth
+    token_url: https://{{ .Values.grafana.user.oidc.externalDexDomain }}{{ $trailingDot }}/token
+    api_url: https://{{ .Values.grafana.user.oidc.externalDexDomain }}{{ $trailingDot }}/api
+    {{- end }}
     allowed_domains: {{ join " " .Values.grafana.user.oidc.allowedDomains }}
     allow_sign_up: true
     tls_skip_verify_insecure: {{ not .Values.global.verifyTls }}
