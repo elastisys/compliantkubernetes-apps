@@ -3452,6 +3452,29 @@ properties:
               deny: Deny actions violating the constraint.
               warn: Warn actions violating the constraint.
               dryrun: Dryrun actions violating the constraint.
+      disallowLocalhostSeccomp:
+        title: Safeguard Disallow Localhost Seccomp.
+        description: |-
+          Configure constraint to reject the use of Localhost seccompProfile.
+        type: object
+        additionalProperties: false
+        properties:
+          enabled:
+            title: Safeguard Disallow Localhost Seccomp.
+            type: boolean
+            default: false
+          enforcement:
+            title: Safeguard Disallow Localhost Seccomp Enforcement
+            type: string
+            default: deny
+            enum:
+              - deny
+              - warn
+              - dryrun
+            meta:enum:
+              deny: Deny actions violating the constraint.
+              warn: Warn actions violating the constraint.
+              dryrun: Dryrun actions violating the constraint.
       resourceRequests:
         title: Safeguard Resource Requests
         description: |-
