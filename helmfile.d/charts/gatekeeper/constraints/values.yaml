@@ -17,8 +17,14 @@ rejectLoadBalancerService:
     enable: true
     enforcementAction: dryrun
 minimumDeploymentReplicas:
-    enable: true
+    enable: false
     enforcementAction: warn
+preventAccidentalDeletion:
+    enable: true
+    enforcementAction: deny
+disallowLocalhostSeccomp:
+    enable: false
+    enforcementAction: deny
 
 imageRegistryURL: registry.example.com
 

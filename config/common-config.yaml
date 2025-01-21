@@ -884,6 +884,11 @@ opa:
     enabled: true
     enforcement: warn
 
+  ## Prevent accidental deletion
+  preventAccidentalDeletion:
+    enabled: true
+    enforcement: deny
+
 trivy:
   enabled: true
   # comma separated list of namespaces (or glob patterns) to be excluded from scanning

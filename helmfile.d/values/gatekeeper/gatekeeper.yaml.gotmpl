@@ -57,7 +57,10 @@ validatingWebhookCustomRules:
       - UPDATE
       - DELETE
     resources:
+      - azureclusters
       - customresourcedefinitions
+      - clusters
+      - openstackclusters
       - secrets
 mutatingWebhookCustomRules:
   - apiGroups:
