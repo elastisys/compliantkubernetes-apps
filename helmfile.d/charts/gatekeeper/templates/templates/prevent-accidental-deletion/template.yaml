@@ -1,0 +1,26 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8spreventaccidentaldeletion
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPreventAccidentalDeletion
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+            type: object
+            properties:
+              annotation:
+                description: This annotation allows removal of sensitive resources protected from accidental deletion.
+                type: string
+              kinds:
+                description: A list of resource kinds that will be affected by the constraint.
+                type: array
+                items:
+                  type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ .Files.Get "policies/prevent-accidental-deletion.rego"  | indent 8 }}
