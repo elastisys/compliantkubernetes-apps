@@ -48,7 +48,7 @@ For more information please read our public documentation:
 - [Understand the basics](https://elastisys.io/welkin/operator-manual/understand-the-basics/)
 - [Understand Welkin](https://elastisys.io/welkin/operator-manual/understand-welkin/)
 
-See [Quickstart](#Quickstart) for instructions on how to initialize the repo
+See [Quickstart](#quickstart) for instructions on how to initialize the repo
 
 ### :cloud: Cloud providers :cloud:
 
@@ -130,6 +130,8 @@ If this is all new to you, here's a [link](https://riseup.net/en/security/messag
 > [!NOTE]
 > The `air-gapped` flavor has a lot of the same settings as the `prod` flavor but with some additional variables that you need to configure yourself (these are set to `set-me`).
 
+<!-- markdownlint-disable MD029 -->
+
 2. Then set the path to where the ck8s configuration should be stored and the PGP fingerprint of the key(s) to use for encryption:
 
     ```bash
@@ -157,6 +159,8 @@ If this is all new to you, here's a [link](https://riseup.net/en/security/messag
 > ./bin/ck8s init sc
 > ```
 
+<!-- markdownlint-disable MD029 -->
+
 4. Edit the configuration files that have been initialized in the configuration path.
     Make sure that the `objectStorage` values are set in `common-config.yaml` or `sc-config.yaml` and `wc-config.yaml`, as well as required credentials in `secrets.yaml` according to your `objectStorage.type`.
     The type may already be set in the default configuration found in the `defaults/` directory depending on your selected cloud provider.
@@ -168,6 +172,8 @@ If this is all new to you, here's a [link](https://riseup.net/en/security/messag
 > One important configuration is whether or not you need to use proxy protocol for the ingress controller which depends on what infrastructure you use. You enable it and need to set an annotation depending on your infrastructure. Example for openstack
 > `ingressNginx.controller.config.useProxyProtocol: true`
 > `ingressNginx.controller.service.annotations: { loadbalancer.openstack.org/proxy-protocol: "true" }`
+
+<!-- markdownlint-disable MD029 -->
 
 5. Create S3 buckets - optional
     If you have set `objectStorage.type: s3`, then you need to create the buckets specified under `objectStorage.buckets` in your configuration files.
@@ -212,7 +218,7 @@ If this is all new to you, here's a [link](https://riseup.net/en/security/messag
     ./bin/ck8s update-ips both apply
     ```
 
-8. Validate config and fill in missing values
+1. Validate config and fill in missing values
     This should indicate any missing configuration that still needs to be set.
 
     ```bash
