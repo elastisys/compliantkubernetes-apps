@@ -47,7 +47,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s ops kubectl sc|wc get nodes
     ./bin/ck8s ops kubectl sc|wc get jobs -A
     ./bin/ck8s ops helm sc|wc list -A --all
-    velero get backup
+    ./bin/ck8s ops velero sc|wc get backup
     ```
 
 - [ ] Silence the notifications for the alerts. e.g you can use [alertmanager silences](https://prometheus.io/docs/alerting/latest/alertmanager/#silences);

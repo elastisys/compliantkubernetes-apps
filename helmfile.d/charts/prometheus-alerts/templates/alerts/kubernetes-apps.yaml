@@ -51,7 +51,7 @@ spec:
 {{- end }}
     - alert: KubeContainerOOMKilled
       annotations:
-        description: Container {{`{{`}} $labels.container {{`}}`}} in pod {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod {{`}}`}} from {{`{{`}} $labels.cluster {{`}}`}} has been OOMKilled {{`{{`}} $value {{`}}`}} times in the last 10 minutes.
+        description: Container {{`{{`}} $labels.container {{`}}`}} in pod {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod {{`}}`}} from {{`{{`}} $labels.cluster {{`}}`}} has been OOMKilled {{`{{`}} $value {{`}}`}} times in the last 30 minutes.
         summary: Kubernetes container OOMKilled.
       expr: (kube_pod_container_status_restarts_total - kube_pod_container_status_restarts_total offset 30m >= 2) and ignoring (reason) min_over_time(kube_pod_container_status_last_terminated_reason{reason="OOMKilled"}[30m]) == 1
       for: 0m
