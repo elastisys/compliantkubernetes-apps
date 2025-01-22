@@ -19,6 +19,12 @@ s3BucketAlerts:
     count: 1638400
   exclude: []
 
+autoscaledNodeGroupAlerts:
+  enabled: true
+  groupLabel: set-me
+  groupLabelValue:
+    regex: set-me
+
 diskAlerts:
   storage:
     #  - hours: 24 # How many hours to predict over

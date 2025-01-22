@@ -4440,6 +4440,23 @@ properties:
             items:
               title: S3 Bucket Name
               type: string
+      autoscaledNodeGroupAlerts:
+        title: Autoscaled NodeGroup Alerts
+        description: Configure whether to split KubeletDownForXm alerts into autoscaled and non-autoscaled nodes groups.
+        type: object
+        additionalProperties: false
+        properties:
+          groupLabel:
+            title: Autoscaled node group label
+            description: The label to identity whether a node belongs to an autoscaled node group.
+            type: string
+            default: "node-restriction.kubernetes.io/autoscaled-node-type"
+          groupLabelValues:
+            title: Autoscaled node group label values
+            description: The label values to a autoscaled node group if their are multiple autoscaled node groups.
+            type: array
+            items:
+              type: string
     additionalProperties: false
     properties:
       replicas:
@@ -4615,6 +4632,19 @@ properties:
             title: Webhook Alerts Enabled
             type: boolean
             default: true
+      autoscaledNodeGroupAlerts:
+        title: Autoscaled NodeGroup Alerts
+        description: Configure whether to split KubeletDownForXm alerts into autoscaled and non-autoscaled nodes groups.
+        type: object
+        properties:
+          enabled:
+            title: Enabled aleter splitting for autoscaled nodes.
+            type: boolean
+            default: true
+          groupLabel:
+            $ref: "#/properties/prometheus/$defs/autoscaledNodeGroupAlerts/properties/groupLabel"
+          groupLabelValues:
+            $ref: "#/properties/prometheus/$defs/autoscaledNodeGroupAlerts/properties/groupLabelValues"
       resources:
         $ref: '#/$defs/kubernetesResourceRequirements'
       tolerations:

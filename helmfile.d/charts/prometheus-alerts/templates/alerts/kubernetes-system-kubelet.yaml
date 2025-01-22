@@ -176,28 +176,85 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
-    - alert: LessKubeletsThanNodes
+{{- if .Values.autoscaledNodeGroupAlerts.enabled }}
+    - alert: KubletDownForAutoscaledNodeFor15m
       annotations:
-        description: There are less kubelets than nodes for the last 5m.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/LessKubeletsThanNodes
-        summary: There are less kubelets than nodes for the last 5m.
-      expr: up{job="kubelet", metrics_path="/metrics"} == 0
+        description: The kubelet job of an existing autoscaled node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 15m.
+        summary: The kubelet job of an existing autoscaled cluster {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.node }}`}} is down for the last 15m.
+      expr: |-
+          sum by (node, cluster) (kube_node_info and on (node) up{job="kubelet",metrics_path="/metrics"} == 0)
+          and on (node)
+          kube_node_labels{ {{ .Values.autoscaledNodeGroupAlerts.groupLabel }}{{ .Values.autoscaledNodeGroupAlerts.groupLabelValue.regex }} }
+      for: 15m
+      labels:
+        severity: warning
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: KubletDownForAutoscaledNodeFor30m
+      annotations:
+        description: The kubelet job of an existing autoscaled node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 30m.
+        summary: The kubelet job of an existing autoscaled node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 30m.
+      expr: |-
+          sum by (node, cluster) (kube_node_info and on (node) up{job="kubelet",metrics_path="/metrics"} == 0)
+          and on (node)
+          kube_node_labels{ {{ .Values.autoscaledNodeGroupAlerts.groupLabel }}{{ .Values.autoscaledNodeGroupAlerts.groupLabelValue.regex }} }
+      for: 30m
+      labels:
+        severity: critical
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: KubletDownForNonAutoscaledNodeFor5m
+      annotations:
+        description: The kubelet job of an existing non-autoscaled node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 5m.
+        summary: The kubelet job of an existing non-autoscaled node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 5m.
+      expr: |-
+          sum by (node, cluster) (kube_node_info and on (node) up{job="kubelet",metrics_path="/metrics"} == 0)
+          unless on (node)
+          kube_node_labels{ {{ .Values.autoscaledNodeGroupAlerts.groupLabel }}{{ .Values.autoscaledNodeGroupAlerts.groupLabelValue.regex }} }
       for: 5m
       labels:
         severity: warning
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
-    - alert: LessKubeletsThanNodes
+    - alert: KubletDownForNonAutoscaledNodeFor15m
       annotations:
-        description: There are less kubelets than nodes for the last 15m.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/LessKubeletsThanNodes
-        summary: There are less kubelets than nodes for the last 15m.
-      expr: up{job="kubelet", metrics_path="/metrics"} == 0
+        description: The kubelet job of an existing non-autoscaled node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 15m.
+        summary: The kubelet job of an existing non-autoscaled node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 15m.
+      expr: |-
+          sum by (node, cluster) (kube_node_info and on (node) up{job="kubelet",metrics_path="/metrics"} == 0)
+          unless on (node)
+          kube_node_labels{ {{ .Values.autoscaledNodeGroupAlerts.groupLabel }}{{ .Values.autoscaledNodeGroupAlerts.groupLabelValue.regex }} }
       for: 15m
       labels:
         severity: critical
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+{{- else }}
+    - alert: KubeletDownFor5m
+      annotations:
+        description: The kubelet job of an existing node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 5m.
+        summary: The kubelet job of an existing node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 5m.
+      expr: sum by (node, cluster) (kube_node_info and on (node) up{job="kubelet",metrics_path="/metrics"} == 0)
+      for: 5m
+      labels:
+        severity: warning
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
+    - alert: KubeletDownFor15m
+      annotations:
+        description: The kubelet job of an existing node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 15m.
+        summary: The kubelet job of an existing node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 15m.
+      expr: sum by (node, cluster) (kube_node_info and on (node) up{job="kubelet",metrics_path="/metrics"} == 0)
+      for: 15m
+      labels:
+        severity: critical
+{{- if .Values.defaultRules.additionalRuleLabels }}
+{{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
 {{- end }}
 {{- end }}

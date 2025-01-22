@@ -1,5 +1,13 @@
 # Note: These values are used for setting up alerts for the *user*.
 
+# Get and transform autoscaledNodeGroupAlerts label and values
+{{- $groupLabel := .Values.prometheus.autoscaledNodeGroupAlerts.groupLabel -}}
+{{- $transformedGroupLabel := $groupLabel | replace "." "_" | replace "/" "_" | replace "-" "_" -}}
+{{- $groupLabel := printf "label_%s" $transformedGroupLabel -}}
+
+{{- $groupLabelValueArray := .Values.prometheus.autoscaledNodeGroupAlerts.groupLabelValues -}}
+{{- $groupLabelValueArrayRegex := join "|" $groupLabelValueArray -}}
+
 osNodeCount: 0
 alertmanagerJob: alertmanager-operated
 alertmanagerNamespace: alertmanager
@@ -42,3 +50,14 @@ capacityManagementAlertsNodeGroupCpuLimit1h: {{ .Values.prometheus.capacityManag
 capacityManagementAlertsNodeGroupMemoryLimit1h: {{ .Values.prometheus.capacityManagementAlerts.nodeGroupMemoryLimit1h }}
 capacityManagementAlertsNodeCpuLimit1h: {{ .Values.prometheus.capacityManagementAlerts.nodeCpuLimit1h }}
 capacityManagementAlertsNodeMemoryLimit1h: {{ .Values.prometheus.capacityManagementAlerts.nodeMemoryLimit1h }}
+
+autoscaledNodeGroupAlerts:
+  enabled: {{ .Values.prometheus.autoscaledNodeGroupAlerts.enabled }}
+  groupLabel: {{ $groupLabel }}
+  {{- if $groupLabelValueArrayRegex }}
+  groupLabelValue:
+    regex: '=~"{{ $groupLabelValueArrayRegex }}"'
+  {{- else }}
+  groupLabelValue:
+    regex: '!=""'
+  {{- end }}
