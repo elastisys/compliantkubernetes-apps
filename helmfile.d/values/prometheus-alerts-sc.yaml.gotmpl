@@ -4,6 +4,14 @@
 
 # TODO: We should update the rules for things with set namespace and job name to be able to monitor instances in the workload cluster.
 
+# Get and transform autoscaledNodeGroupAlerts label and values
+{{- $groupLabel := .Values.prometheus.autoscaledNodeGroupAlerts.groupLabel -}}
+{{- $transformedGroupLabel := $groupLabel | replace "." "_" | replace "/" "_" | replace "-" "_" -}}
+{{- $groupLabel := printf "label_%s" $transformedGroupLabel -}}
+
+{{- $groupLabelValueArray := .Values.prometheus.autoscaledNodeGroupAlerts.groupLabelValues -}}
+{{- $groupLabelValueArrayRegex := join "|" $groupLabelValueArray -}}
+
 osNodeCount: {{ add .Values.opensearch.dataNode.count .Values.opensearch.clientNode.count .Values.opensearch.masterNode.count }}
 osIndexAlerts: {{ toYaml .Values.opensearch.promIndexAlerts | nindent 2 }}
 
@@ -90,3 +98,14 @@ harbor:
   redis:
     type: {{ .Values.harbor.redis.type }}
   alerts: {{ toYaml .Values.harbor.alerts | nindent 4 }}
+
+autoscaledNodeGroupAlerts:
+  enabled: {{ .Values.prometheus.autoscaledNodeGroupAlerts.enabled }}
+  groupLabel: {{ $groupLabel }}
+  {{- if $groupLabelValueArrayRegex }}
+  groupLabelValue:
+    regex: '=~"{{ $groupLabelValueArrayRegex }}"'
+  {{- else }}
+  groupLabelValue:
+    regex: '!=""'
+  {{- end }}

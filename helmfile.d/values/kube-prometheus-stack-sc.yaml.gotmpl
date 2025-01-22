@@ -47,8 +47,14 @@ kube-state-metrics:
   extraArgs:
     - "--custom-resource-state-config-file=/etc/config/clusterapi-metrics.yaml"
   {{- end }}
+  {{- if .Values.prometheus.autoscaledNodeGroupAlerts.enabled }}
+  metricLabelsAllowlist:
+  - nodes=[topology.kubernetes.io/zone,elastisys.io/node-group,{{ .Values.prometheus.autoscaledNodeGroupAlerts.groupLabel }}]
+  {{- else }}
   metricLabelsAllowlist:
   - nodes=[topology.kubernetes.io/zone,elastisys.io/node-group]
+  {{- end }}
+
 kubeApiServer:
   serviceMonitor:
     metricRelabelings:
