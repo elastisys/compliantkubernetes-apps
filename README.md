@@ -106,7 +106,8 @@ If this is all new to you, here's a [link](https://riseup.net/en/security/messag
 
 ### Quickstart
 
-**You probably want to check the [compliantkubernetes-kubespray][compliantkubernetes-kubespray] repository first, since compliantkubernetes-apps depends on having two clusters already set up.**
+> [!NOTE]
+> **You probably want to check the [compliantkubernetes-kubespray][compliantkubernetes-kubespray] repository first, since compliantkubernetes-apps depends on having two clusters already set up.**
 
 > [!NOTE]
 > Depending on your configuration of the clusters and OIDC, you might not have access to workload cluster before installing Dex in the service cluster. You would then have to install Apps in each cluster separately, starting with the service cluster.
@@ -142,7 +143,7 @@ If this is all new to you, here's a [link](https://riseup.net/en/security/messag
     When new configs are created this will generate new random passwords for all services.
     When configs are updated this will _not_ overwrite existing values in the override configs.
     It will create a backup of the old override configs placed in `backups/`, generate new default configs in `defaults/`, merge common values into `common-config.yaml`, and clear out redundant values set in the override configs that matches the default values.
-    See [compliantkubernetes.io](https://compliantkubernetes.io/) if you are uncertain about what order you should do things in.
+    See [elastisys.io/welkin](https://elastisys.io/welkin) if you are uncertain about what order you should do things in.
 
     ```bash
     ./bin/ck8s init both
@@ -327,7 +328,7 @@ However, users will not be able to see each others (private) projects (unless ex
 This also naturally means that container images uploaded to these private registries cannot automatically be pulled in to the Kubernetes cluster.
 The user will first need to add pull secrets that gives some ServiceAccount access to them before they can be used.
 
-For more details and a list of available services see the [user guide](https://compliantkubernetes.io/user-guide/).
+For more details and a list of available services see the [user guide](https://elastisys.io/welkin/user-guide/).
 
 ### Harbor HA - work in progress
 
@@ -528,7 +529,7 @@ To clean up the workload cluster run:
 
 ### Operator manual
 
-See <https://compliantkubernetes.io/operator-manual/>.
+See <https://elastisys.io/welkin/operator-manual/>.
 
 ### Setting up Google as identity provider for dex
 
