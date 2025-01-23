@@ -4873,6 +4873,15 @@ properties:
         type: object
         additionalProperties: false
         properties:
+          replicaCount:
+            title: Thanos receiveDistributor Replicas
+            type: integer
+            default: 1
+          extraFlags:
+            title: Thanos receiveDistributor extraFlags
+            description: |-
+              When set, the arguments will be passed onto the component as command-line flags. Refer to the [upstream doc](https://github.com/bitnami/charts/blob/main/bitnami/thanos/README.md#adding-extra-flags) for more details.
+            type: array
           replicationFactor:
             title: Thanos Replication Factor
             description: Requires that incoming remote write requests are replicated `(replicationFactor + 1) / 2`.
