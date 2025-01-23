@@ -130,6 +130,7 @@ receiveDistributor:
 
   resources: {{- toYaml .Values.thanos.receiveDistributor.resources | nindent 4 }}
   replicationFactor: {{  .Values.thanos.receiveDistributor.replicationFactor }}
+  replicaCount: {{ .Values.thanos.receiveDistributor.replicaCount }}
 
   containerSecurityContext:
     capabilities:
@@ -137,6 +138,10 @@ receiveDistributor:
         - ALL
     seccompProfile:
       type: RuntimeDefault
+  {{- if .Values.thanos.receiveDistributor.extraFlags }}
+  extraFlags:
+    {{- toYaml .Values.thanos.receiveDistributor.extraFlags | nindent 4 }}
+  {{ end }}
 
 ruler:
   networkPolicy:
