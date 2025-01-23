@@ -381,25 +381,14 @@ get_apps_version() {
   kubectl_do "${1}" get cm -n kube-system apps-meta -o jsonpath --template="{.data.version}"
 }
 
-# Usage: record_migration_prepare_begin sc|wc
-record_migration_prepare_begin() {
+# Usage: record_migration_begin sc|wc
+record_migration_begin() {
   # This ConfigMap should only exist while doing an upgrade.
   # Abort if it already exists
   kubectl_do "${1}" create configmap --dry-run=client -o yaml \
-    -n kube-system apps-upgrade --from-literal "prepare=${CK8S_TARGET_VERSION}" 2>/dev/null |
+    -n kube-system apps-upgrade --from-literal "prepared=${CK8S_TARGET_VERSION}" 2>/dev/null |
     yq4 '.metadata.labels["app.kubernetes.io/managed-by"] = "welck8s-apps-upgrade"' - |
     kubectl_do "${1}" create -f - >/dev/null 2>/dev/null
-}
-
-# Usage: record_migration_prepare_done sc|wc
-record_migration_prepare_done() {
-  # assert that the above begin has been done and from the expected version
-  # yq4 should trip pipefail on version mismatch
-  kubectl_do "${1}" get -n kube-system cm apps-upgrade -o yaml 2>/dev/null |
-    yq4 --exit-status 'select(.data.prepare == strenv(CK8S_TARGET_VERSION)) |
-      .data.prepared = strenv(CK8S_TARGET_VERSION) |
-      del(.data.last_prepare_step)' |
-    kubectl_do "${1}" replace -f - >/dev/null 2>/dev/null
 }
 
 # Get currently prepared version
@@ -407,21 +396,12 @@ get_prepared_version() {
   kubectl_do "${1}" get cm -n kube-system apps-upgrade -o jsonpath --template="{.data.prepared}" 2>/dev/null
 }
 
-# Usage: record_migration_prepare_step sc|wc step-description
-record_migration_prepare_step() {
-  kubectl_do "${1}" get -n kube-system cm apps-upgrade -o yaml 2>/dev/null |
-    last_step="${2##*/}" \
-      yq4 --exit-status 'select(.data.prepare == strenv(CK8S_TARGET_VERSION)) |
-      .data.last_prepare_step = strenv(last_step)' |
-    kubectl_do "${1}" replace -f - >/dev/null 2>/dev/null
-}
-
-# Usage: record_migration_apply_step sc|wc step-description
-record_migration_apply_step() {
+# Usage: record_migration_step sc|wc step-description
+record_migration_step() {
   kubectl_do "${1}" get -n kube-system cm apps-upgrade -o yaml 2>/dev/null |
     last_step="${2##*/}" \
       yq4 --exit-status 'select(.data.prepared == strenv(CK8S_TARGET_VERSION)) |
-      .data.last_apply_step = strenv(last_step)' |
+      .data.last_step = strenv(last_step)' |
     kubectl_do "${1}" replace -f - >/dev/null 2>/dev/null
 }
 
