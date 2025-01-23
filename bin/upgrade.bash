@@ -52,18 +52,6 @@ prepare() {
 
   snippets_check prepare "${snippets}"
 
-  # Create a configmap. This fails if done twice.
-  if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
-    if ! record_migration_prepare_begin sc; then
-      log_fatal "prepare already started in sc (kubectl delete -n kube-system configmap apps-upgrade to try again)"
-    fi
-  fi
-  if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
-    if ! record_migration_prepare_begin wc; then
-      log_fatal "prepare already started in wc (kubectl delete -n kube-system configmap apps-upgrade to try again)"
-    fi
-  fi
-
   for snippet in ${snippets}; do
     if [[ "$(basename "${snippet}")" == "00-template.sh" ]]; then
       continue
@@ -72,12 +60,6 @@ prepare() {
     log_info "prepare snippet \"${snippet##"${ROOT}/migration/"}\":"
     if "${snippet}"; then
       log_info "prepare snippet success\n---"
-      if [[ "${CK8S_CLUSTER:-}" == "both" ]]; then
-        record_migration_prepare_step "sc" "${snippet}"
-        record_migration_prepare_step "wc" "${snippet}"
-      else
-        record_migration_prepare_step "${CK8S_CLUSTER}" "${snippet}"
-      fi
     else
       log_fatal "prepare snippet failure"
     fi
@@ -86,11 +68,9 @@ prepare() {
   config_validate secrets
   if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
     config_validate sc
-    record_migration_prepare_done sc
   fi
   if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
     config_validate wc
-    record_migration_prepare_done wc
   fi
 }
 
@@ -103,6 +83,18 @@ apply() {
     config_validate wc
   fi
 
+  # Create a configmap. This fails if done twice.
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
+    if ! record_migration_begin sc; then
+      log_fatal "prepare already started in sc (kubectl delete -n kube-system configmap apps-upgrade to try again)"
+    fi
+  fi
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
+    if ! record_migration_begin wc; then
+      log_fatal "prepare already started in wc (kubectl delete -n kube-system configmap apps-upgrade to try again)"
+    fi
+  fi
+
   # TODO: Template validation
   # for prefix in sc wc; do
   #   template_validate "${prefix}"
@@ -113,28 +105,6 @@ apply() {
 
   snippets_check apply "${snippets}"
 
-  local prepared_version
-  if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
-    prepared_version="$(get_prepared_version sc || true)"
-    if [ -z "${prepared_version}" ]; then
-      log_fatal "'prepare' step does not appear to have been run, do so first"
-    fi
-
-    if [[ "${prepared_version}" != "${CK8S_TARGET_VERSION}" ]]; then
-      log_fatal "'prepare' step in sc appears to have been run for version ${prepared_version}, not ${CK8S_TARGET_VERSION}"
-    fi
-  fi
-  if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
-    prepared_version="$(get_prepared_version wc || true)"
-    if [ -z "${prepared_version}" ]; then
-      log_fatal "'prepare' step does not appear to have been run, do so first"
-    fi
-
-    if [[ "${prepared_version}" != "${CK8S_TARGET_VERSION}" ]]; then
-      log_fatal "'prepare' step in wc appears to have been run for version ${prepared_version}, not ${CK8S_TARGET_VERSION}"
-    fi
-  fi
-
   for snippet in ${snippets}; do
     if [[ "$(basename "${snippet}")" == "00-template.sh" ]]; then
       continue
@@ -144,10 +114,10 @@ apply() {
     if "${snippet}" execute; then
       log_info "apply snippet success\n---"
       if [[ "${CK8S_CLUSTER:-}" == "both" ]]; then
-        record_migration_apply_step "sc" "${snippet}"
-        record_migration_apply_step "wc" "${snippet}"
+        record_migration_step "sc" "${snippet}"
+        record_migration_step "wc" "${snippet}"
       else
-        record_migration_apply_step "${CK8S_CLUSTER}" "${snippet}"
+        record_migration_step "${CK8S_CLUSTER}" "${snippet}"
       fi
     else
       local return="${?}"
