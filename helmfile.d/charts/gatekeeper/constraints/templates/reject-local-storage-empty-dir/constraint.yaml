@@ -1,0 +1,28 @@
+{{- if .Values.rejectLocalStorageEmptyDir.enable -}}
+apiVersion: constraints.gatekeeper.sh/v1alpha1
+kind: K8sRejectLocalStorageEmptyDir
+metadata:
+  name: elastisys-reject-local-storage-emptydir
+spec:
+  enforcementAction: {{ .Values.rejectLocalStorageEmptyDir.enforcementAction }}
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod", "ReplicationController"]
+      - apiGroups: ["apps"]
+        kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
+      - apiGroups: ["extensions"]
+        kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
+      - apiGroups: ["batch"]
+        kinds: ["Job", "CronJob"]
+    excludedNamespaces: ["kube-system", "kube-public", "kube-node-lease", "calico-system"]
+    namespaceSelector:
+      matchExpressions:
+      - key: owner
+        operator: NotIn
+        values:
+        - operator
+  parameters:
+    volumeAnnotation: cluster-autoscaler.kubernetes.io/safe-to-evict-local-volumes
+    podAnnotation: cluster-autoscaler.kubernetes.io/safe-to-evict
+{{- end }}

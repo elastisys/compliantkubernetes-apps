@@ -3624,6 +3624,32 @@ properties:
               deny: Deny actions violating the constraint.
               warn: Warn actions violating the constraint.
               dryrun: Dryrun actions violating the constraint.
+      rejectLocalStorageEmptyDir:
+        title: Safeguard Reject Local Storage EmptyDir
+        description: |-
+          Configure constraint to reject usage of local storage emptydir.
+
+          > [!note]
+          > See [the dev docs](https://elastisys.io/welkin/user-guide/safeguards/enforce-no-local-storage-emptydir/) for context.
+        type: object
+        additionalProperties: false
+        properties:
+          enabled:
+            title: Safeguard Rejecting Local Storage EmptyDir Enabled
+            type: boolean
+            default: true
+          enforcement:
+            title: Safeguard Reject Local Storage EmptyDir Enforcement
+            type: string
+            default: warn
+            enum:
+              - deny
+              - warn
+              - dryrun
+            meta:enum:
+              deny: Deny actions violating the constraint.
+              warn: Warn actions violating the constraint.
+              dryrun: Dryrun actions violating the constraint.
       networkPolicies:
         title: Safeguard Network Policies
         description: |-

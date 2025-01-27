@@ -1,0 +1,24 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8srejectlocalstorageemptydir
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRejectLocalStorageEmptyDir
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+            type: object
+            properties:
+              volumeAnnotation:
+                description: This annotation allows to suppress the warning of the constraint if the violating volumes are listed in the annotation value.
+                type: string
+              podAnnotation:
+                description: This annotation allows to suppress the warning of the constraint if the annotation value is set to "true".
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ .Files.Get "policies/reject-local-storage-empty-dir.rego"  | indent 8 }}
