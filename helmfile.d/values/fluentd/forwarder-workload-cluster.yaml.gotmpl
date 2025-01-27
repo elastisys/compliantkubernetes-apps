@@ -1,36 +1,4 @@
-{{- if .Values.opensearch.enabled }}
-elasticsearch:
-  outputType: "opensearch"
-  logLevel: "info"
-
-  scheme: https
-  hosts: ["{{ .Values.opensearch.subdomain }}.{{ .Values.global.opsDomain  }}."]
-
-  sslVerify: {{ .Values.global.verifyTls }}
-  auth:
-    enabled: true
-    user: fluentd
-    password: null
-
-  reloadOnFailure: true
-  log400Reason: true
-
-  requestTimeout: {{ .Values.fluentd.forwarder.requestTimeout }}
-
-extraObjects:
-  - apiVersion: v1
-    kind: Secret
-    metadata:
-      name: {{ .Release.Name }}-opensearch-credentials
-    type: Opaque
-    stringData:
-      password: {{ .Values.opensearch.fluentdPassword }}
-
-secret:
-- name: OUTPUT_PASSWORD
-  secret_name: {{ .Release.Name }}-opensearch-credentials
-  secret_key: password
-{{- end }}
+requestTimeout: {{ .Values.fluentd.forwarder.requestTimeout }}
 
 extraConfigMaps:
 {{- if .Values.opensearch.enabled }}

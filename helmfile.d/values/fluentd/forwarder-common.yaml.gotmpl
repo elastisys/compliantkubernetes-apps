@@ -1,39 +1,9 @@
-nameOverride: fluentd
-
-image:
-  # This is our own fork-image (https://github.com/elastisys/fluentd-elasticsearch).
-  # This can later be replaced with the original image (https://github.com/monotek/fluentd-elasticsearch) when our changes is merged.
-  # This image is included in falco k8s_containers and user_known_package_manager_in_container macros
-  repository: ghcr.io/elastisys/fluentd
-  tag: v4.3.9-ck8s1
-
-serviceMonitor:
-  enabled: true
-  # Seems like it is double templated so the end result yields an empty string ""
-  jobLabel: '""'
-  interval: 30s
-
-fluentdArgs: "--no-supervisor -q"
-
 {{ with .Values.fluentd.forwarder.buffer -}}
-elasticsearch:
-  buffer: {{- toYaml . | nindent 4 }}
+buffer: {{- toYaml . | nindent 2 }}
 {{- end }}
 
-env:
-  LIVENESS_THRESHOLD_SECONDS: {{ .Values.fluentd.forwarder.livenessThresholdSeconds }}
-  STUCK_THRESHOLD_SECONDS: {{ .Values.fluentd.forwarder.stuckThresholdSeconds }}
-  OUTPUT_PORT: 443
-  OUTPUT_BUFFER_TOTAL_LIMIT: 20G
-
-configMaps:
-  useDefaults:
-    containersInputConf: false
-    forwardInputConf: false
-    monitoringConf: false
-    outputConf: false
-    systemConf: false
-    systemInputConf: true
+livenessThresholdSeconds: {{ .Values.fluentd.forwarder.livenessThresholdSeconds }}
+stuckThresholdSeconds: {{ .Values.fluentd.forwarder.stuckThresholdSeconds }}
 
 extraConfigMaps:
   buffer.prop: |-
@@ -268,40 +238,3 @@ extraConfigMaps:
         </labels>
       </metric>
     </filter>
-
-# Liveliness probe reverted from upstream changes to prevent that it fails if just one buffer is inactive.
-# E.g. the authlog buffer will often be inactive, so it would make the probe fail.
-livenessProbe:
-  kind:
-    exec:
-      command:
-      # Liveness probe is aimed to help in situations where fluentd
-      # silently hangs for no apparent reasons until manual restart.
-      # The idea of this probe is that if fluentd is not queueing or
-      # flushing chunks for 5 minutes, something is not right. If
-      # you want to change the fluentd configuration, reducing amount of
-      # logs fluentd collects, consider changing the threshold or turning
-      # liveness probe off completely.
-      - '/bin/sh'
-      - '-c'
-      - >
-        LIVENESS_THRESHOLD_SECONDS=${LIVENESS_THRESHOLD_SECONDS:-300};
-        STUCK_THRESHOLD_SECONDS=${STUCK_THRESHOLD_SECONDS:-900};
-        if [ ! -e /var/log/fluentd-buffers ];
-        then
-          echo "Expected directory /var/log/fluentd-buffers does not exist. This is likely a configuration issue.";
-          exit 1;
-        fi;
-        touch -d "${STUCK_THRESHOLD_SECONDS} seconds ago" /tmp/marker-stuck;
-        if [ -z "$(find /var/log/fluentd-buffers -type d -newer /tmp/marker-stuck -print -quit)" ];
-        then
-          echo "Elasticsearch buffers found stuck longer than $STUCK_THRESHOLD_SECONDS seconds. Clearing buffers."
-          rm -rf /var/log/fluentd-buffers;
-          exit 1;
-        fi;
-        touch -d "${LIVENESS_THRESHOLD_SECONDS} seconds ago" /tmp/marker-liveness;
-        if [ -z "$(find /var/log/fluentd-buffers -type d -newer /tmp/marker-liveness -print -quit)" ];
-        then
-          echo "Elasticsearch buffers found stuck longer than $LIVENESS_THRESHOLD_SECONDS seconds."
-          exit 1;
-        fi;

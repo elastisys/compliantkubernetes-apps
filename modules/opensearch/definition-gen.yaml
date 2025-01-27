@@ -1,0 +1,118 @@
+kind: OpenSearch
+version: v1alpha1
+kubernetesDefinitions:
+  - property: master.properties.nodeAffinity
+    definition: io.k8s.api.core.v1.NodeAffinity
+  - property: master.properties.resources
+    definition: io.k8s.api.core.v1.ResourceRequirements
+  - property: master.properties.tolerations
+    definition: io.k8s.api.core.v1.Toleration
+    isArray: true
+  - property: client.properties.nodeAffinity
+    definition: io.k8s.api.core.v1.NodeAffinity
+  - property: client.properties.resources
+    definition: io.k8s.api.core.v1.ResourceRequirements
+  - property: client.properties.tolerations
+    definition: io.k8s.api.core.v1.Toleration
+    isArray: true
+  - property: data.properties.nodeAffinity
+    definition: io.k8s.api.core.v1.NodeAffinity
+  - property: data.properties.resources
+    definition: io.k8s.api.core.v1.ResourceRequirements
+  - property: data.properties.tolerations
+    definition: io.k8s.api.core.v1.Toleration
+    isArray: true
+properties:
+  nodeGroup:
+    type: string
+  roles:
+    type: array
+    items:
+      type: string
+  clusterName:
+    type: string
+  config:
+    type: object
+    additionalProperties:
+      type: string
+  plugins:
+    type: object
+    properties:
+      enabled:
+        type: boolean
+      installList:
+        type: array
+        items:
+          type: string
+    requires:
+      - enabled
+      - installList
+  keystore:
+    type: array
+    items:
+      type: object
+      properties:
+        secretName:
+          type: string
+      requires:
+        - secretName
+  master:
+    type: object
+    properties: &common
+      replicas:
+        type: integer
+      opensearchJavaOpts:
+        type: string
+      persistence:
+        type: object
+        properties:
+          storageClass:
+            type: string
+            nullable: true
+          size:
+            type: string
+        required:
+          - size
+      antiAffinityTopologyKey:
+        type: string
+      antiAffinity:
+        type: string
+      nodeSelector:
+        type: object
+        additionalProperties:
+          type: string
+  client:
+    type: object
+    properties:
+      <<: *common
+      ingress:
+        type: object
+        properties:
+          enabled:
+            type: boolean
+          ingressClassName:
+            type: string
+          annotations:
+            type: object
+            additionalProperties:
+              type: string
+          path:
+            type: string
+          hosts:
+            type: array
+            items:
+              type: string
+          tls:
+            type: array
+            items:
+              type: object
+              properties:
+                secretName:
+                  type: string
+                hosts:
+                  type: array
+                  items:
+                    type: string
+  data:
+    type: object
+    properties: *common
