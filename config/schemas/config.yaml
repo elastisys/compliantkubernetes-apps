@@ -3652,6 +3652,32 @@ properties:
               deny: Deny actions violating the constraint.
               warn: Warn actions violating the constraint.
               dryrun: Dryrun actions violating the constraint.
+      rejectEmptyDir:
+        title: Safeguard Reject Local Storage EmptyDir
+        description: |-
+          Configure constraint to reject usage of local storage emptydir.
+
+          > [!note]
+          > See "TODO add link here" for context.
+        type: object
+        additionalProperties: false
+        properties:
+          enabled:
+            title: Safeguard Rejecting Local Storage EmptyDir Enabled
+            type: boolean
+            default: true
+          enforcement:
+            title: Safeguard Reject Local Storage EmptyDir Enforcement
+            type: string
+            default: warn
+            enum:
+              - deny
+              - warn
+              - dryrun
+            meta:enum:
+              deny: Deny actions violating the constraint.
+              warn: Warn actions violating the constraint.
+              dryrun: Dryrun actions violating the constraint.
       networkPolicies:
         title: Safeguard Network Policies
         description: |-
