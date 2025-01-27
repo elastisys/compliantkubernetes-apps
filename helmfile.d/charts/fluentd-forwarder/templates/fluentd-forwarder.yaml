@@ -1,0 +1,28 @@
+apiVersion: modules.elastisys.com/v1alpha1
+kind: FluentdForwarder
+metadata:
+  name: fluentd-forwarder
+spec:
+  {{- with .Values.buffer }}
+  buffer:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.extraConfigMaps }}
+  extraConfigMaps:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  livenessThresholdSeconds: {{ .Values.livenessThresholdSeconds }}
+  stuckThresholdSeconds: {{ .Values.stuckThresholdSeconds }}
+  requestTimeout: {{ .Values.requestTimeout }}
+  {{- with .Values.affinity }}
+  affinity:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.resources }}
+  resources:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.tolerations }}
+  tolerations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}

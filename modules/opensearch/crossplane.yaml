@@ -1,0 +1,22 @@
+apiVersion: meta.pkg.crossplane.io/v1
+kind: Configuration
+metadata:
+  name: opensearch
+  annotations:
+    meta.crossplane.io/maintainer: Elastisys <support@elastisys.com>
+    meta.crossplane.io/source: github.com/elastisys/compliantkubernetes-apps
+    meta.crossplane.io/license: Apache-2.0
+    meta.crossplane.io/description: |
+      This is where you can describe your configuration.
+    meta.crossplane.io/readme: |
+      This is where you can add a readme for your configuration.
+spec:
+  crossplane:
+    version: ">=v1.17.2"
+  dependsOn:
+    - provider: xpkg.upbound.io/crossplane-contrib/provider-helm
+      version: ">=v0.19.0"
+    - provider: xpkg.upbound.io/crossplane-contrib/provider-kubernetes
+      version: ">=v0.16.2"
+    - function: xpkg.upbound.io/crossplane-contrib/function-patch-and-transform
+      version: ">=v0.7.0"

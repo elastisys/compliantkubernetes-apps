@@ -739,7 +739,7 @@ opensearch:
         cpu: 100m
       limits:
         memory: 1024Mi
-        cpu: 1
+        cpu: "1"
     affinity: {}
     nodeSelector: {}
     tolerations: []
@@ -827,7 +827,7 @@ opensearch:
         cpu: 200m
       limits:
         memory: 1024Mi
-        cpu: 1
+        cpu: "1"
     affinity:
       ## Note: The OpenSearch chart has some restrictions on pod anti affinity:
       ## - Only one rule and term can be set
@@ -866,7 +866,7 @@ opensearch:
         cpu: 200m
       limits:
         memory: 1024Mi
-        cpu: 1
+        cpu: "1"
     affinity:
       ## Note: Same restrictions applies here as on the master nodes
       podAntiAffinity:
@@ -898,7 +898,7 @@ opensearch:
         cpu: 200m
       limits:
         memory: 1024Mi
-        cpu: 1
+        cpu: "1"
     affinity:
       ## Note: Same restrictions applies here as on the master nodes
       podAntiAffinity:

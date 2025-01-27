@@ -1,0 +1,26 @@
+apiVersion: modules.elastisys.com/v1alpha1
+kind: OpenSearch
+metadata:
+  name: opensearch
+spec:
+  clusterName: {{ .Values.clusterName }}
+  {{ with .Values.config -}}
+  config: {{ toYaml . | nindent 4 }}
+  {{ end -}}
+  {{ with .Values.keystore -}}
+  keystore: {{ toYaml . | nindent 4 }}
+  {{ end -}}
+  {{ with .Values.plugins -}}
+  plugins: {{ toYaml . | nindent 4 }}
+  {{ end -}}
+
+  # TODO: Lazy, real implementation should be stricter
+  {{ with .Values.master -}}
+  master: {{ toYaml . | nindent 4 }}
+  {{ end -}}
+  {{ with .Values.client -}}
+  client: {{ toYaml . | nindent 4 }}
+  {{ end -}}
+  {{ with .Values.data -}}
+  data: {{ toYaml . | nindent 4 }}
+  {{ end -}}

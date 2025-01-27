@@ -1,0 +1,14 @@
+apiVersion: secrets.crossplane.io/v1alpha1
+kind: StoreConfig
+metadata:
+  name: wc
+spec:
+  type: Kubernetes
+  defaultScope: fluentd-system
+  kubernetes:
+    auth:
+      source: Secret
+      secretRef:
+        namespace: crossplane-system
+        name: wc-kubeconfig
+        key: value

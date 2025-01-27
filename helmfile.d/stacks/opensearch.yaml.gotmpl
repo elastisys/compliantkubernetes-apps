@@ -28,14 +28,15 @@ templates:
     values:
       - values/opensearch/secrets.yaml.gotmpl
 
-  opensearch-master:
+  module-opensearch:
     disableValidationOnInstall: true
     inherit:
       - template: opensearch
-      - template: opensearch-chart
     installed: {{ .Values | get "opensearch.enabled" false }}
-    name: opensearch-master
+    chart: charts/opensearch/opensearch
+    name: module-opensearch
     needs:
+      - crossplane-system/crossplane-provider-configs
       {{- if .Values | get "opensearch.sso.enabled" false }}
       - dex/dex
       {{- end }}
@@ -43,37 +44,11 @@ templates:
       - opensearch-system/opensearch-secrets
       - opensearch-system/podsecuritypolicy
     values:
+      - values/opensearch/crossplane-store.yaml.gotmpl
+      - values/opensearch/fluentd-password.yaml.gotmpl
       - values/opensearch/common.yaml.gotmpl
       - values/opensearch/master.yaml.gotmpl
-    wait: true
-
-  opensearch-client:
-    inherit:
-      - template: opensearch
-      - template: opensearch-chart
-    installed: {{ and ( .Values | get "opensearch.enabled" false) (.Values | get "opensearch.clientNode.dedicatedPods" false) }}
-    name: opensearch-client
-    needs:
-      - kube-system/service-cluster-np
-      - opensearch-system/opensearch-master
-      - opensearch-system/podsecuritypolicy
-    values:
-      - values/opensearch/common.yaml.gotmpl
       - values/opensearch/client.yaml.gotmpl
-    wait: true
-
-  opensearch-data:
-    inherit:
-      - template: opensearch
-      - template: opensearch-chart
-    installed: {{ and ( .Values | get "opensearch.enabled" false) (.Values | get "opensearch.dataNode.dedicatedPods" false) }}
-    name: opensearch-data
-    needs:
-      - kube-system/service-cluster-np
-      - opensearch-system/opensearch-master
-      - opensearch-system/podsecuritypolicy
-    values:
-      - values/opensearch/common.yaml.gotmpl
       - values/opensearch/data.yaml.gotmpl
     wait: true
 
@@ -88,7 +63,7 @@ templates:
       - dex/dex
       {{- end }}
       - kube-system/service-cluster-np
-      - opensearch-system/opensearch-master
+      - opensearch-system/module-opensearch
       - opensearch-system/podsecuritypolicy
     values:
       - values/opensearch/dashboards.yaml.gotmpl
@@ -101,13 +76,7 @@ templates:
     version: 0.1.0
     name: opensearch-securityadmin
     needs:
-      - opensearch-system/opensearch-master
-      {{- if .Values | get "opensearch.clientNode.dedicatedPods" false }}
-      - opensearch-system/opensearch-client
-      {{- end }}
-      {{- if .Values | get "opensearch.dataNode.dedicatedPods" false }}
-      - opensearch-system/opensearch-data
-      {{- end }}
+      - opensearch-system/module-opensearch
     values:
       - values/opensearch/securityadmin.yaml.gotmpl
 
@@ -121,7 +90,7 @@ templates:
       {{- if .Values | get "opensearch.securityadmin.enabled" false }}
       - opensearch-system/opensearch-securityadmin
       {{- else }}
-      - opensearch-system/opensearch-master
+      - opensearch-system/module-opensearch
       {{- end }}
       - opensearch-system/opensearch-dashboards
     values:
