@@ -25,6 +25,9 @@ preventAccidentalDeletion:
 disallowLocalhostSeccomp:
     enable: false
     enforcementAction: deny
+rejectLocalStorageEmptyDir:
+    enable: false
+    enforcementAction: warn
 
 imageRegistryURL: registry.example.com
 

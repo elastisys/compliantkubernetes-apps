@@ -889,6 +889,11 @@ opa:
     enabled: true
     enforcement: deny
 
+  ## Enable rule that warns about emptydir with local storage, which can prevent cluster autoscaler from evicting when scaling down
+  rejectLocalStorageEmptyDir:
+    enabled: false
+    enforcement: warn
+
 trivy:
   enabled: true
   # comma separated list of namespaces (or glob patterns) to be excluded from scanning
