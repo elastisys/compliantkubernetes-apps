@@ -58,6 +58,11 @@ The configuration contains some `set-me`'s that must be configured manually.
 > [!important]
 > Setting up ingresses properly requires some additional steps documented later in this section.
 
+> [!warning]
+> If you are using Docker and deploying the `allow-coredns` network policy in the `networkpolicy/common` chart DNS resolution will stop working.
+> This seems to be because Kind uses a user-defined Docker network which in turn uses an embedded DNS server that isn't actually listening on port 53.
+> To solve this remove the port 53 restriction from the `allow-coredns` egress network policy and things should start working again.
+
 Manage apps by using `helmfile` directly and with needs it will pull in all required releases:
 
 ```sh
