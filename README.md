@@ -35,8 +35,19 @@ This repository installs all the applications of ck8s on top of already created 
 To setup the clusters see [compliantkubernetes-kubespray][compliantkubernetes-kubespray].
 A service-cluster (sc) or workload-cluster (wc) can be created separately but all of the applications will not work correctly unless both are running.
 
-All config files will be located under `CK8S_CONFIG_PATH`.
+We follow the "configuration as code" principle which means that all configuration necessary to configure and operate the platform resides in the `CK8S_CONFIG_PATH` directory.
 There will be four config files: `common-config.yaml`, `wc-config.yaml`, `sc-config.yaml` and `secrets.yaml`.
+
+We strongly suggest to make your config directory part of a git repository so that it is stored safely and to allow you to rollback previously applied changes.
+We additionally suggest that you make Apps a submodule of your config repository in order to properly track which version of Apps you have applied and make your config repository the single source of truth of your environment.
+
+All operations are done through the `./bin/ck8s` command line tool. Run `./bin/ck8s help` for a complete set of possible commands.
+
+For more information please read our public documentation:
+
+- [Understand the basics](https://elastisys.io/welkin/operator-manual/understand-the-basics/)
+- [Understand Welkin](https://elastisys.io/welkin/operator-manual/understand-welkin/)
+
 See [Quickstart](#quickstart) for instructions on how to initialize the repo
 
 ### :cloud: Cloud providers :cloud:
@@ -95,27 +106,11 @@ If this is all new to you, here's a [link](https://riseup.net/en/security/messag
 
 ### Quickstart
 
-**You probably want to check the [compliantkubernetes-kubespray][compliantkubernetes-kubespray] repository first, since compliantkubernetes-apps depends on having two clusters already set up.**
-In addition to this, you will need to set up the following DNS entries (replace `example.com` with your domain).
+> [!NOTE]
+> **You probably want to check the [compliantkubernetes-kubespray][compliantkubernetes-kubespray] repository first, since compliantkubernetes-apps depends on having two clusters already set up.**
 
-There are two options when managing DNS records, manually or ExternalDNS.
-
-- Manually point these domains to the workload cluster ingress controller:
-
-    - `*.example.com`
-
-- Manually point these domains to the service cluster ingress controller:
-
-    - `*.ops.example.com`
-    - `dex.example.com`
-    - `grafana.example.com`
-    - `harbor.example.com`
-    - `opensearch.example.com`
-
-Assuming you already have everything needed to install the apps, this is what you need to do.
-
-The other option is to let ExternalDNS manage your DNS records, currently only AWS Route 53 is supported.
-You configure ExternalDNS later in the process.
+> [!NOTE]
+> Depending on your configuration of the clusters and OIDC, you might not have access to workload cluster before installing Dex in the service cluster. You would then have to install Apps in each cluster separately, starting with the service cluster.
 
 1. Decide on a name for this environment, the cloud provider to use as well as the flavor and set them as environment variables:
     Note that these will be later kept as global values in the common defaults config to prevent them from being inadvertently changed, as they will affect the default options of the configuration when generated or updated.
@@ -132,10 +127,12 @@ You configure ExternalDNS later in the process.
     export CK8S_K8S_INSTALLER=[kubespray|capi] # set this to whichever installer was used for the kubernetes layer
     ```
 
-    > [!NOTE]
-    > The `air-gapped` flavor has a lot of the same settings as the `prod` flavor but with some additional variables that you need to configure yourself (these are set to `set-me`).
+> [!NOTE]
+> The `air-gapped` flavor has a lot of the same settings as the `prod` flavor but with some additional variables that you need to configure yourself (these are set to `set-me`).
 
-1. Then set the path to where the ck8s configuration should be stored and the PGP fingerprint of the key(s) to use for encryption:
+<!-- markdownlint-disable MD029 -->
+
+2. Then set the path to where the ck8s configuration should be stored and the PGP fingerprint of the key(s) to use for encryption:
 
     ```bash
     export CK8S_CONFIG_PATH=${HOME}/.ck8s/my-ck8s-cluster
@@ -148,28 +145,37 @@ You configure ExternalDNS later in the process.
     When new configs are created this will generate new random passwords for all services.
     When configs are updated this will _not_ overwrite existing values in the override configs.
     It will create a backup of the old override configs placed in `backups/`, generate new default configs in `defaults/`, merge common values into `common-config.yaml`, and clear out redundant values set in the override configs that matches the default values.
-    See [compliantkubernetes.io](https://compliantkubernetes.io/) if you are uncertain about what order you should do things in.
+    See [elastisys.io/welkin](https://elastisys.io/welkin) if you are uncertain about what order you should do things in.
 
     ```bash
     ./bin/ck8s init both
     ```
 
-    > [!NOTE]
-    > It is possible to initialize `wc` and `sc` clusters separately by replacing `both` when running the `init` command:
-    >
-    > ```bash
-    > ./bin/ck8s init wc
-    > ./bin/ck8s init sc
-    > ```
+> [!NOTE]
+> It is possible to initialize `wc` and `sc` clusters separately by replacing `both` when running the `init` command:
+>
+> ```bash
+> ./bin/ck8s init wc
+> ./bin/ck8s init sc
+> ```
 
-1. Edit the configuration files that have been initialized in the configuration path.
+<!-- markdownlint-disable MD029 -->
+
+4. Edit the configuration files that have been initialized in the configuration path.
     Make sure that the `objectStorage` values are set in `common-config.yaml` or `sc-config.yaml` and `wc-config.yaml`, as well as required credentials in `secrets.yaml` according to your `objectStorage.type`.
     The type may already be set in the default configuration found in the `defaults/` directory depending on your selected cloud provider.
     Set `objectStorage.s3.*` if you are using S3 or `objectStorage.gcs.*` if you are using GCS.
     Enable ExternalDNS `externalDns.enabled` and set the required variables, if you want ExternalDNS to manage your records from inside your cluster.
     It requires credentials to route53, `txtOwnerId`, `endpoints` if `externalDns.sources.crd` is enabled.
 
-1. Create S3 buckets - optional
+> [!NOTE]
+> One important configuration is whether or not you need to use proxy protocol for the ingress controller which depends on what infrastructure you use. You enable it and need to set an annotation depending on your infrastructure. Example for openstack
+> `ingressNginx.controller.config.useProxyProtocol: true`
+> `ingressNginx.controller.service.annotations: { loadbalancer.openstack.org/proxy-protocol: "true" }`
+
+<!-- markdownlint-disable MD029 -->
+
+5. Create S3 buckets - optional
     If you have set `objectStorage.type: s3`, then you need to create the buckets specified under `objectStorage.buckets` in your configuration files.
     You can run the script `scripts/S3/entry.sh create` to create the buckets required.
     The script uses `s3cmd` in the background and it uses the `${HOME}/.s3cfg` file for configuration and authentication for your S3 provider.
@@ -203,6 +209,56 @@ You configure ExternalDNS later in the process.
           [ ${?} = 0 ] && echo "Bucket ${bucket} exists!"
       done
     )
+    ```
+
+1. Update Network Policies
+
+    ```bash
+    ./bin/ck8s update-ips both dry-run
+    ./bin/ck8s update-ips both apply
+    ```
+
+1. Validate config and fill in missing values
+    This should indicate any missing configuration that still needs to be set.
+
+    ```bash
+    ./bin/ck8s validate sc
+    ./bin/ck8s validate wc
+    ```
+
+1. If you decide to not use ExternalDNS for DNS records, you will need to manually set up the following DNS entries (replace `example.com` with your domain).
+
+    - Manually point these domains to the workload cluster ingress controller:
+
+      - `*.example.com`
+
+    - Manually point these domains to the service cluster ingress controller:
+
+        - `*.ops.example.com`
+        - `dex.example.com`
+        - `grafana.example.com`
+        - `harbor.example.com`
+        - `opensearch.example.com`
+
+    Depending on your infrastructure, you might utilize a Service of type LoadBalancer for the ingress controller. This means you will not have an IP for the domains before installing the ingress controller. After configuring and validating the config, you can install just the ingress controller before the rest of apps with the following command
+
+    ```bash
+    ./bin/ck8s ops helmfile sc apply -lapp=ingress-nginx --include-transitive-needs
+    ./bin/ck8s ops helmfile wc apply -lapp=ingress-nginx --include-transitive-needs
+    ```
+
+    The IP is then available on the ingress controller Service
+
+    ```bash
+    ./bin/ck8s ops kubectl sc -n ingress-nginx get svc ingress-nginx-controller
+    ./bin/ck8s ops kubectl wc -n ingress-nginx get svc ingress-nginx-controller
+    ```
+
+    After configuring the DNS, update the Network Policies again.
+
+    ```bash
+    ./bin/ck8s update-ips both dry-run
+    ./bin/ck8s update-ips both apply
     ```
 
 1. **Note**, for this step each cluster need to be up and running already.
@@ -278,7 +334,7 @@ However, users will not be able to see each others (private) projects (unless ex
 This also naturally means that container images uploaded to these private registries cannot automatically be pulled in to the Kubernetes cluster.
 The user will first need to add pull secrets that gives some ServiceAccount access to them before they can be used.
 
-For more details and a list of available services see the [user guide](https://compliantkubernetes.io/user-guide/).
+For more details and a list of available services see the [user guide](https://elastisys.io/welkin/user-guide/).
 
 ### Harbor HA - work in progress
 
@@ -479,7 +535,7 @@ To clean up the workload cluster run:
 
 ### Operator manual
 
-See <https://compliantkubernetes.io/operator-manual/>.
+See <https://elastisys.io/welkin/operator-manual/>.
 
 ### Setting up Google as identity provider for dex
 
