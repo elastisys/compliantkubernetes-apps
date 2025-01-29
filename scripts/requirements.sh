@@ -6,6 +6,23 @@
 set -euo pipefail
 shopt -s extglob
 
+# host information
+declare distro_name distro_version
+# arch="$(uname -m)"
+if [[ -f /etc/os-release ]]; then
+  distro_name="$(grep '^ID=' /etc/os-release)"
+  distro_name="${distro_name#"ID="}"
+
+  case "${distro_name}" in
+  ubuntu)
+    distro_version="$(grep '^VERSION_CODENAME=' /etc/os-release)"
+    distro_version="${distro_version#"VERSION_CODENAME="}"
+    ;;
+  esac
+else
+  echo "warning, unable to determine distro"
+fi
+
 # purl variables
 declare -a packages
 declare -A types
@@ -67,29 +84,47 @@ parse-requirements() {
 
 # <purl>
 parse-package() {
-  local purl="${1}" remainder component
+  local purl="${1}" remainder component segment
+  local -a segments
 
   purl="${purl##+([[:space:]])}"
   purl="${purl%%+([[:space:]])}"
 
   remainder="${purl}"
 
+  # subpaths: split, discard dot and empty segments, decode, rejoin
   if [[ "${remainder}" =~ "#" ]]; then
     component="${purl##*"#"}"
-    component="${component##"/"}"
-    # TODO: Split, discard dot and empty segments, decode, and rejoin
-    subpaths["${purl}"]="${component%%"/"}"
+
+    readarray -d '/' -t segments <<<"${component}"
+
+    component=""
+    for segment in "${segments[@]}"; do
+      segment="${segment##+([[:space:]])}"
+      segment="${segment%%+([[:space:]])}"
+
+      if ! [[ "${segment}" =~ ^(|"."|"..")$ ]]; then
+        component+="/${segment}"
+      fi
+    done
+    component="${component#"/"}"
+
+    subpaths["${purl}"]="$(echo -en "${component//"%"/"\\x"}")"
     remainder="${purl%"#"*}"
   fi
 
+  # qualifiers: split, split, lowercase keys, discard empty values, decode values, split checksums
   if [[ "${remainder}" =~ "?" ]]; then
-    # TODO: Manage key value pairs
+    # TODO: split, split, lowercase keys, discard empty values, decode values, split checksums - done on demand
     qualifiers["${purl}"]="${remainder##*"?"}"
     remainder="${remainder%"?"*}"
   fi
 
+  # schemes: lowercase
   component="${remainder%%":"*}"
-  if [[ "${component}" != "pkg" ]]; then
+  component="${component##+([[:space:]])}"
+  component="${component%%+([[:space:]])}"
+  if [[ "${component,,}" != "pkg" ]]; then
     echo "invalid purl: invalid scheme"
     return
   fi
@@ -98,46 +133,87 @@ parse-package() {
   remainder="${remainder##"/"}"
   remainder="${remainder%%"/"}"
 
+  # types: lowercase
   component="${remainder%%"/"*}"
+  component="${component##+([[:space:]])}"
+  component="${component%%+([[:space:]])}"
   if [[ -z "${component}" ]]; then
     echo "invalid purl: missing type"
     return
   fi
-  types["${purl}"]="${component}"
+  types["${purl}"]="${component,,}"
   remainder="${remainder#*"/"}"
 
+  # versions: decode
   if [[ "${remainder}" =~ "@" ]]; then
-    # TODO: Decode
-    versions["${purl}"]="${remainder##*"@"}"
+    component="${remainder##*"@"}"
+    component="${component##+([[:space:]])}"
+    component="${component%%+([[:space:]])}"
+
+    versions["${purl}"]="$(echo -en "${component//"%"/"\\x"}")"
     remainder="${remainder%"@"*}"
   fi
 
+  # names: decode, normalise
   component="${remainder##*"/"}"
+  component="${component##+([[:space:]])}"
+  component="${component%%+([[:space:]])}"
   if [[ -z "${component}" ]]; then
     echo "invalid purl: missing name"
     return
   fi
-  # TODO: Decode and normalise
-  names["${purl}"]="${component}"
-  remainder="${remainder%"/"*}"
+  # TODO: normalise - not implemented yet as not types we use requires it
+  names["${purl}"]="$(echo -en "${component//"%"/"\\x"}")"
 
+  # namespaces: split, discard empty segments, decode, normalise, rejoin
   if [[ "${remainder}" =~ "/" ]]; then
-    # TODO: Split, discard empty segments, decode, normalise, and rejoin
-    namespaces["${purl}"]="${remainder}"
+    readarray -d '/' -t segments <<<"${remainder%"/"*}"
+
+    component=""
+    for segment in "${segments[@]}"; do
+      segment="${segment##+([[:space:]])}"
+      segment="${segment%%+([[:space:]])}"
+
+      if [[ -n "${segment}" ]]; then
+        component+="/${segment}"
+      fi
+    done
+    component="${component#"/"}"
+
+    # TODO: normalise - not implemented yet as not types we use requires it
+    namespaces["${purl}"]="$(echo -en "${component//"%"/"\\x"}")"
   fi
 
   packages+=("${purl}")
 
-  # echo "${purl} - pkg: ${types["${purl}"]} / ${namespaces["${purl}"]:-} / ${names["${purl}"]} @ ${versions["${purl}"]:-} ? ${qualifiers["${purl}"]:-} # ${subpaths["${purl}"]:-}"
+  echo "${purl} - pkg: ${types["${purl}"]} / ${namespaces["${purl}"]:-} / ${names["${purl}"]} @ ${versions["${purl}"]:-} ? ${qualifiers["${purl}"]:-} # ${subpaths["${purl}"]:-}"
 }
 
 # <packages...>
 install-from-apt() {
+  if ! which apt-get &>/dev/null; then
+    echo "note: apt-get not found, will not install deb packages"
+    return
+  fi
+
   apt-get update
   apt-get upgrade -y
   apt-get install -y "${@}"
   apt-get clean
   rm -rf /var/lib/apt/lists/*
+}
+
+# <packages...>
+install-from-npm() {
+  if ! which npm &>/dev/null; then
+    echo "note: npm not found, will not install npm packages"
+    return
+  fi
+
+  local package
+  for package in "${@}"; do
+    npm install -g "${package}"
+  done
 }
 
 # <target> <source> <checksum-bin>
@@ -286,10 +362,10 @@ main() {
       fi
       ;;
     npm)
-      if [[ -n "${versions["${pkg}"]}" ]]; then
-        npm+=("${namespace["${pkg}"]}/${names["${pkg}"]}@${versions["${pkg}"]}")
+      if [[ -n "${versions["${pkg}"]:-}" ]]; then
+        npms+=("${namespaces["${pkg}"]}/${names["${pkg}"]}@${versions["${pkg}"]}")
       else
-        npm+=("${namespace["${pkg}"]}/${names["${pkg}"]}")
+        npms+=("${namespaces["${pkg}"]}/${names["${pkg}"]}")
       fi
       ;;
     *)
@@ -300,14 +376,12 @@ main() {
 
   if [[ "${#debs[@]}" -ne 0 ]]; then
     echo ---
-    install-from-apt "${debs[@]}"
+    echo install-from-apt "${debs[@]}"
   fi
 
   if [[ "${#npms[@]}" -ne 0 ]]; then
     echo ---
-    for pkg in "${npms[@]}"; do
-      install-from-npm "${pkg}"
-    done
+    install-from-npm "${npms[@]}"
   fi
 
   if [[ "${#others[@]}" -ne 0 ]]; then
