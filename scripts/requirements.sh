@@ -6,9 +6,12 @@
 set -euo pipefail
 shopt -s extglob
 
+declare prefix
+prefix="${INSTALL_PREFIX:-"/usr/local/bin"}"
+
 # host information
-declare distro_name distro_version
-# arch="$(uname -m)"
+declare arch distro_name distro_version
+arch="$(uname -m)"
 if [[ -f /etc/os-release ]]; then
   distro_name="$(grep '^ID=' /etc/os-release)"
   distro_name="${distro_name#"ID="}"
@@ -50,20 +53,23 @@ parse-mappings() {
   intermediates["${package}"]="${intermediate}"
 }
 
-# parse-mappings /usr/local/bin/gomplate "https://github.com/hairyhenderson/gomplate/releases/download/v\${version}/gomplate_linux-amd64"
-parse-mappings golang/helm.sh/helm/v3 /usr/local/bin/helm "https://get.helm.sh/helm-v\${version}-linux-amd64.tar.gz" linux-amd64/helm
+parse-mappings generic//kind "${prefix}/kind" "https://github.com/kubernetes-sigs/kind/releases/download/v\${version}/kind-linux-amd64"
+parse-mappings generic//kubectl "${prefix}/kubectl" "https://storage.googleapis.com/kubernetes-release/release/v\${version}/bin/linux/amd64/kubectl"
+
+parse-mappings github/getsops/sops "${prefix}/sops" "https://github.com/getsops/sops/releases/download/v\${version}/sops-v\${version}.linux.amd64"
+parse-mappings github/hairyhenderson/gomplate "${prefix}/gomplate" "https://github.com/hairyhenderson/gomplate/releases/download/v\${version}/gomplate_linux-amd64"
+parse-mappings github/helm/helm "${prefix}/helm" "https://get.helm.sh/helm-v\${version}-linux-amd64.tar.gz" linux-amd64/helm
+parse-mappings github/helmfile/helmfile "${prefix}/helmfile" "https://github.com/helmfile/helmfile/releases/download/v\${version}/helmfile_\${version}_linux_amd64.tar.gz" helmfile
+parse-mappings github/int128/kubelogin "${prefix}/kubectl-oidc_login" "https://github.com/int128/kubelogin/releases/download/v\${version}/kubelogin_linux_amd64.zip" kubelogin
+parse-mappings github/mikefarah/yq "${prefix}/yq4" "https://github.com/mikefarah/yq/releases/download/v\${version}/yq_linux_amd64"
+parse-mappings github/mikefarah/yq3 "${prefix}/yq" "https://github.com/mikefarah/yq/releases/download/\${version}/yq_linux_amd64"
+parse-mappings github/neilpa/yajsv "${prefix}/yajsv" "https://github.com/neilpa/yajsv/releases/download/v\${version}/yajsv.linux.amd64"
+parse-mappings github/open-policy-agent/opa "${prefix}/opa" "https://github.com/open-policy-agent/opa/releases/download/v\${version}/opa_linux_amd64" opa_linux_amd64
+parse-mappings github/vmware-tanzu/velero "${prefix}/velero" "https://github.com/vmware-tanzu/velero/releases/download/v\${version}/velero-v\${version}-linux-amd64.tar.gz" "velero-v\${version}-linux-amd64/velero"
+parse-mappings github/yannh/kubeconform "${prefix}/kubeconform" "https://github.com/yannh/kubeconform/releases/download/v\${version}/kubeconform-linux-amd64.tar.gz" kubeconform
+
 # helm plugin install https://github.com/databus23/helm-diff --version "v${HELM_DIFF_VERSION}" >/dev/null
 # helm plugin install https://github.com/jkroepke/helm-secrets --version "v${HELM_SECRETS_VERSION}" >/dev/null
-parse-mappings golang/github.com/helmfile/helmfile /usr/local/bin/helmfile "https://github.com/helmfile/helmfile/releases/download/v\${version}/helmfile_\${version}_linux_amd64.tar.gz" helmfile
-parse-mappings generic//kind /usr/local/bin/kind "https://github.com/kubernetes-sigs/kind/releases/download/v\${version}/kind-linux-amd64"
-parse-mappings generic//kubectl /usr/local/bin/kubectl "https://storage.googleapis.com/kubernetes-release/release/v\${version}/bin/linux/amd64/kubectl"
-# parse-mappings /usr/local/bin/kubeconform "https://github.com/yannh/kubeconform/releases/download/v\${version}/kubeconform-linux-amd64.tar.gz" kubeconform
-# parse-mappings /usr/local/bin/kubectl-oidc_login "https://github.com/int128/kubelogin/releases/download/v\${version}/kubelogin_linux_amd64.zip" kubelogin
-# parse-mappings /usr/local/bin/opa "https://github.com/open-policy-agent/opa/releases/download/\${version}/opa_linux_amd64"
-parse-mappings golang/getsops/sops/v3 /usr/local/bin/sops "https://github.com/getsops/sops/releases/download/v\${version}/sops-v\${version}.linux.amd64"
-parse-mappings golang/github.com/neilpa/yajsv /usr/local/bin/yajsv "https://github.com/neilpa/yajsv/releases/download/v\${version}/yajsv.linux.amd64"
-parse-mappings golang/github.com/vmware-tanzu/velero /usr/local/bin/velero "https://github.com/vmware-tanzu/velero/releases/download/v\${version}/velero-v\${version}-linux-amd64.tar.gz" "velero-v\${version}-linux-amd64/velero"
-parse-mappings golang/github.com/mikefarah/yq/v4 /usr/local/bin/yq4 "https://github.com/mikefarah/yq/releases/download/v\${version}/yq_linux_amd64"
 
 # <file>
 parse-requirements() {
@@ -113,9 +119,8 @@ parse-package() {
     remainder="${purl%"#"*}"
   fi
 
-  # qualifiers: split, split, lowercase keys, discard empty values, decode values, split checksums
+  # qualifiers: done on demand
   if [[ "${remainder}" =~ "?" ]]; then
-    # TODO: split, split, lowercase keys, discard empty values, decode values, split checksums - done on demand
     qualifiers["${purl}"]="${remainder##*"?"}"
     remainder="${remainder%"?"*}"
   fi
@@ -186,13 +191,79 @@ parse-package() {
 
   packages+=("${purl}")
 
-  echo "${purl} - pkg: ${types["${purl}"]} / ${namespaces["${purl}"]:-} / ${names["${purl}"]} @ ${versions["${purl}"]:-} ? ${qualifiers["${purl}"]:-} # ${subpaths["${purl}"]:-}"
+  # echo "${purl} - pkg: ${types["${purl}"]} / ${namespaces["${purl}"]:-} / ${names["${purl}"]} @ ${versions["${purl}"]:-} ? ${qualifiers["${purl}"]:-} # ${subpaths["${purl}"]:-}"
+}
+
+# <package> ${qualifier[string]string}
+parse-qualifier() {
+  local pkg="${1}" pair key value
+  local -a pairs
+
+  # qualifiers: split, split, lowercase keys, discard empty values, decode values
+  readarray -d '&' -t pairs <<<"${qualifiers["${pkg}"]:-}"
+  for pair in "${pairs[@]}"; do
+    [[ "${pair}" =~ "=" ]] || continue
+
+    key="${pair%"="*}"
+    key="${key##+([[:space:]])}"
+    key="${key%%+([[:space:]])}"
+
+    value="${pair#*"="}"
+    value="${value##+([[:space:]])}"
+    value="${value%%+([[:space:]])}"
+
+    [[ -n "${value}" ]] || continue
+
+    # checksum: done on demand
+    qualifier["${key,,}"]="$(echo -en "${value//"%"/"\\x"}")"
+  done
+}
+
+# <package> ${checksum[]string}
+parse-checksum() {
+  local pkg="${1}"
+
+  # checksum: split
+  readarray -d "," -t checksum <<<"${qualifier["checksum"]:-}"
+  checksum=("${checksum[@]##+([[:space:]])}")
+  checksum=("${checksum[@]%%+([[:space:]])}")
+}
+
+# <package>
+version-from-github() {
+  local pkg="${1}" namespace name
+
+  namespace="${namespaces["${pkg}"]}"
+  name="${names["${pkg}"]}"
+
+  if ! which curl &>/dev/null; then
+    echo "warning: curl not found, will not lookup github packages"
+    return 1
+  elif ! which jq &>/dev/null; then
+    echo "warning: jq not found, will not lookup github packages"
+    return 1
+  fi
+
+  local data
+  data=$(curl -Ls "https://api.github.com/repos/${namespace}/${name}/releases/latest")
+
+  local version
+  version="$(jq -r '.tag_name' <<<"${data}")"
+
+  if [[ "${version}" == nil ]]; then
+    echo "warning: unable to lookup github package ${namespace}/${name}"
+    return 1
+  fi
+
+  echo "- resolved github package ${namespace}/${name}@${version}"
+
+  versions["${pkg}"]="${version}"
 }
 
 # <packages...>
 install-from-apt() {
   if ! which apt-get &>/dev/null; then
-    echo "note: apt-get not found, will not install deb packages"
+    echo "warning: apt-get not found, will not install deb packages"
     return
   fi
 
@@ -206,7 +277,7 @@ install-from-apt() {
 # <packages...>
 install-from-npm() {
   if ! which npm &>/dev/null; then
-    echo "note: npm not found, will not install npm packages"
+    echo "warning: npm not found, will not install npm packages"
     return
   fi
 
@@ -218,13 +289,13 @@ install-from-npm() {
 
 # <target> <source> <checksum-bin>
 install-from-bin() {
-  local target="${1}" source="${2}" checksum_bin="${4:-}" checksum
+  local target="${1}" source="${2}" checksum_bin="${3:-}" checksum
 
-  echo "installing ${target}"
+  echo "- installing ${target}"
 
   if [[ -e "${target}" ]] && [[ -n "${checksum_bin}" ]]; then
     checksum="$(sha256sum "${target}")"
-    if [[ "${checksum_bin}" == "${checksum%%" "*}" ]]; then
+    if [[ "${checksum_bin#"sha256:"}" == "${checksum%%" "*}" ]]; then
       echo "- installed ${target} matches desired binary checksum, skipping"
       return
     fi
@@ -236,8 +307,8 @@ install-from-bin() {
   checksum="$(sha256sum "${source##*"/"}")"
   if [[ -n "${checksum_bin}" ]]; then
     echo "- checking binary checksum ${source##*"/"}"
-    if [[ "${checksum_bin}" != "${checksum%%" "*}" ]]; then
-      echo "- error: ${source##*"/"} does not match desired binary checksum, skipping"
+    if [[ "${checksum_bin#"sha256:"}" != "${checksum%%" "*}" ]]; then
+      echo "- error: ${source##*"/"} does not match desired binary checksum (${checksum_bin#"sha256:"} vs ${checksum%%" "*}), skipping"
       return
     fi
   else
@@ -258,7 +329,7 @@ install-from-tar() {
 
   if [[ -e "${target}" ]] && [[ -n "${checksum_bin}" ]]; then
     checksum="$(sha256sum "${target}")"
-    if [[ "${checksum_bin}" == "${checksum%%" "*}" ]]; then
+    if [[ "${checksum_bin#"sha256:"}" == "${checksum%%" "*}" ]]; then
       echo "- installed ${target} matches desired binary checksum, skipping"
       return
     fi
@@ -270,8 +341,8 @@ install-from-tar() {
   checksum="$(sha256sum "${source##*"/"}")"
   if [[ -n "${checksum_pkg}" ]]; then
     echo "- checking package checksum ${source##*"/"}"
-    if [[ "${checksum_pkg}" != "${checksum%%" "*}" ]]; then
-      echo "- error: ${source##*"/"} does not match desired package checksum, skipping"
+    if [[ "${checksum_pkg#"sha256:"}" != "${checksum%%" "*}" ]]; then
+      echo "- error: ${source##*"/"} does not match desired package checksum (${checksum_pkg#"sha256:"} vs ${checksum%%" "*}), skipping"
       return
     fi
   else
@@ -283,8 +354,8 @@ install-from-tar() {
   checksum="$(sha256sum "${intermediate}")"
   if [[ -n "${checksum_bin}" ]]; then
     echo "- checking binary checksum ${intermediate}"
-    if [[ "${checksum_bin}" != "${checksum%%" "*}" ]]; then
-      echo "- error: ${intermediate} does not match desired binary checksum, skipping"
+    if [[ "${checksum_bin#"sha256:"}" != "${checksum%%" "*}" ]]; then
+      echo "- error: ${intermediate} does not match desired binary checksum (${checksum_bin#"sha256:"} vs ${checksum%%" "*}), skipping"
       return
     fi
   else
@@ -305,7 +376,7 @@ install-from-zip() {
 
   if [[ -e "${target}" ]] && [[ -n "${checksum_bin}" ]]; then
     checksum="$(sha256sum "${target}")"
-    if [[ "${checksum_bin}" == "${checksum%%" "*}" ]]; then
+    if [[ "${checksum_bin#"sha256:"}" == "${checksum%%" "*}" ]]; then
       echo "- installed ${target} matches desired binary checksum, skipping"
       return
     fi
@@ -317,7 +388,7 @@ install-from-zip() {
   checksum="$(sha256sum "${source##*"/"}")"
   if [[ -n "${checksum_pkg}" ]]; then
     echo "- checking package checksum ${source##*"/"}"
-    if [[ "${checksum_pkg}" != "${checksum%%" "*}" ]]; then
+    if [[ "${checksum_pkg#"sha256:"}" != "${checksum%%" "*}" ]]; then
       echo "- error: ${source##*"/"} does not match desired package checksum, skipping"
       return
     fi
@@ -330,8 +401,8 @@ install-from-zip() {
   checksum="$(sha256sum "${intermediate}")"
   if [[ -n "${checksum_bin}" ]]; then
     echo "- checking binary checksum ${intermediate}"
-    if [[ "${checksum_bin}" != "${checksum%%" "*}" ]]; then
-      echo "- error: ${intermediate} does not match desired binary checksum, skipping"
+    if [[ "${checksum_bin#"sha256:"}" != "${checksum%%" "*}" ]]; then
+      echo "- error: ${intermediate} does not match desired binary checksum (${checksum_bin#"sha256:"} vs ${checksum%%" "*}), skipping"
       return
     fi
   else
@@ -349,12 +420,25 @@ main() {
 
   parse-requirements "${file}"
 
-  # installing debs
   local -a debs=() npms=() others=()
   for pkg in "${packages[@]}"; do
     case "${types["${pkg}"]}" in
     deb)
-      # TODO: Manage arch and distro from qualifiers
+      local -A qualifier
+      parse-qualifier "${pkg}"
+
+      if [[ "${namespaces["${pkg}"]}" != "${distro_name}" ]]; then
+        echo "note: ${pkg} is not for ${distro_name}, skipping"
+        continue
+      elif [[ "${qualifier["distro"]:-}" != "${distro_version}" ]]; then
+        echo "note: ${pkg} is not for ${distro_version}, skipping"
+        continue
+      # TODO: Generic aliasing for arch
+      elif [[ "${qualifier["arch"]:-}" != "${arch/"x86_64"/"amd64"}" ]]; then
+        echo "note: ${pkg} is not for ${arch}, skipping"
+        continue
+      fi
+
       if [[ -n "${versions["${pkg}"]:-}" ]]; then
         debs+=("${names["${pkg}"]}=${versions["${pkg}"]}")
       else
@@ -376,7 +460,7 @@ main() {
 
   if [[ "${#debs[@]}" -ne 0 ]]; then
     echo ---
-    echo install-from-apt "${debs[@]}"
+    install-from-apt "${debs[@]}"
   fi
 
   if [[ "${#npms[@]}" -ne 0 ]]; then
@@ -392,7 +476,16 @@ main() {
 
       echo ---
 
-      # TODO: fetch and propagate checksums from qualifiers
+      local -A qualifier
+      parse-qualifier "${pkg}"
+      local -a checksum
+      parse-checksum "${pkg}"
+
+      if [[ -z "${version}" ]] && [[ "${types["${pkg}"]}" == "github" ]]; then
+        if version-from-github "${pkg}"; then
+          version="${versions["${pkg}"]:-}"
+        fi
+      fi
 
       if [[ -z "${version}" ]]; then
         echo "error: no version found for ${ref}, skipping..."
@@ -419,17 +512,17 @@ main() {
           echo "error: no intermediate mapping found for ${ref}, skipping..."
           continue
         fi
-        install-from-tar "${target}" "${source}" "${intermediate}"
+        install-from-tar "${target}" "${source}" "${intermediate}" "${checksum[0]:-}" "${checksum[1]:-}"
         ;;
       *.zip)
         if [[ -z "${intermediate}" ]]; then
           echo "error: no intermediate mapping found for ${ref}, skipping..."
           continue
         fi
-        install-from-zip "${target}" "${source}" "${intermediate}"
+        install-from-zip "${target}" "${source}" "${intermediate}" "${checksum[0]:-}" "${checksum[1]:-}"
         ;;
       *)
-        install-from-bin "${target}" "${source}"
+        install-from-bin "${target}" "${source}" "${checksum[0]:-}"
         ;;
       esac
     done
