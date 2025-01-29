@@ -1,9 +1,3 @@
-# targetNamespace defines where you want trivy-operator to operate. By
-# default it will only operate in the namespace its installed in, but you can
-# specify another namespace, or a comma separated list of namespaces, or set it
-# to a blank string to let it operate in all namespaces.
-targetNamespaces: ""
-
 # excludeNamespaces is a comma separated list of namespaces (or glob patterns)
 # to be excluded from scanning. Only applicable in the all namespaces install
 # mode, i.e. when the targetNamespaces values is a blank string.
@@ -40,8 +34,6 @@ trivy:
   {{- end }}
 
 operator:
-
-  replicas: 1
 
   # configAuditScannerEnabled the flag to enable configuration audit scanner
   configAuditScannerEnabled: {{ .Values.trivy.configAuditScannerEnabled }}
