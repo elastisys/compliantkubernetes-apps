@@ -24,7 +24,7 @@ RUN wget --progress=dot:giga "https://github.com/yannh/kubeconform/releases/down
 
 # sops
 # NOTE: This needs to be installed before the helm-secrets plugin.
-ENV SOPS_VERSION="3.8.1"
+ENV SOPS_VERSION="3.9.4"
 RUN wget --progress=dot:giga "https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux.amd64" && \
     install -Tm 755 "sops-v${SOPS_VERSION}.linux.amd64" /usr/local/bin/sops && \
     rm "sops-v${SOPS_VERSION}.linux.amd64"
