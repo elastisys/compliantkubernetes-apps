@@ -34,7 +34,7 @@ usage() {
   echo "  test <wc|sc> [--logging-enabled]                test the applications" 1>&2
   echo "  update-ips <wc|sc|both> <apply|dry-run>         Automatically fetches and applies the IPs for network policies" 1>&2
   echo "  upgrade <wc|sc|both> <vX.Y> apply               runs all apply steps upgrading the environment" 1>&2
-  echo "  upgrade <wc|sc|both> <vX.Y> prepare             runs all prepare steps upgrading the configuration" 1>&2
+  echo "  upgrade <wc|sc|both> <vX.Y> prepare [--force]   runs all prepare steps upgrading the configuration" 1>&2
   echo "  validate <wc|sc>                                validates config files" 1>&2
   echo "  version <wc|sc>                                 shows apps version" 1>&2
   exit 1
@@ -82,7 +82,7 @@ upgrade)
   [[ "${4}" =~ ^(prepare|apply)$ ]] || usage
   check_tools
   export CK8S_CLUSTER="${2}"
-  "${here}/upgrade.bash" "${3}" "${4}"
+  "${here}/upgrade.bash" "${@:3}"
   ;;
 team)
   case "${2}" in
