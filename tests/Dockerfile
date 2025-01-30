@@ -65,7 +65,7 @@ RUN curl -LOs "https://github.com/open-policy-agent/opa/releases/download/${OPA_
     install -Tm 755 opa_linux_amd64 /usr/local/bin/opa && \
     rm opa_linux_amd64
 
-ARG SOPS_VERSION="3.8.1"
+ARG SOPS_VERSION="3.9.4"
 RUN curl -LOs "https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux.amd64" && \
     install -Tm 755 "sops-v${SOPS_VERSION}.linux.amd64" /usr/local/bin/sops && \
     rm "sops-v${SOPS_VERSION}.linux.amd64"
