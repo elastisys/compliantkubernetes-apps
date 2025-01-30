@@ -385,21 +385,31 @@ get_apps_version() {
 record_migration_prepare_begin() {
   # This ConfigMap should only exist while doing an upgrade.
   # Abort if it already exists
-  kubectl_do "${1}" create configmap --dry-run=client -o yaml \
+  if kubectl_do "${1}" create configmap --dry-run=client -o yaml \
     -n kube-system apps-upgrade --from-literal "prepare=${CK8S_TARGET_VERSION}" 2>/dev/null |
-    yq4 '.metadata.labels["app.kubernetes.io/managed-by"] = "welck8s-apps-upgrade"' - |
+    yq4 '.metadata.labels["app.kubernetes.io/managed-by"] = "apps-upgrade"' - |
     kubectl_do "${1}" create -f - >/dev/null 2>/dev/null
+  then
+    return 0
+  else
+    log_fatal "prepare already started in ${1} (kubectl delete -n kube-system configmap apps-upgrade to try again)"
+  fi
 }
 
 # Usage: record_migration_prepare_done sc|wc
 record_migration_prepare_done() {
   # assert that the above begin has been done and from the expected version
   # yq4 should trip pipefail on version mismatch
-  kubectl_do "${1}" get -n kube-system cm apps-upgrade -o yaml 2>/dev/null |
+  if kubectl_do "${1}" get -n kube-system cm apps-upgrade -o yaml 2>/dev/null |
     yq4 --exit-status 'select(.data.prepare == strenv(CK8S_TARGET_VERSION)) |
       .data.prepared = strenv(CK8S_TARGET_VERSION) |
       del(.data.last_prepare_step)' |
     kubectl_do "${1}" replace -f - >/dev/null 2>/dev/null
+  then
+    return 0
+  else
+    log_fatal "could not mark preparation as completed in ${1}"
+  fi
 }
 
 # Get currently prepared version
@@ -409,29 +419,40 @@ get_prepared_version() {
 
 # Usage: record_migration_prepare_step sc|wc step-description
 record_migration_prepare_step() {
-  kubectl_do "${1}" get -n kube-system cm apps-upgrade -o yaml 2>/dev/null |
+  if kubectl_do "${1}" get -n kube-system cm apps-upgrade -o yaml 2>/dev/null |
     last_step="${2##*/}" \
       yq4 --exit-status 'select(.data.prepare == strenv(CK8S_TARGET_VERSION)) |
       .data.last_prepare_step = strenv(last_step)' |
     kubectl_do "${1}" replace -f - >/dev/null 2>/dev/null
+  then
+    return 0
+  else
+    log_fatal "could not record migration prepare step ${2##*/} in ${1}"
+  fi
 }
 
 # Usage: record_migration_apply_step sc|wc step-description
 record_migration_apply_step() {
-  kubectl_do "${1}" get -n kube-system cm apps-upgrade -o yaml 2>/dev/null |
+  if kubectl_do "${1}" get -n kube-system cm apps-upgrade -o yaml 2>/dev/null |
     last_step="${2##*/}" \
       yq4 --exit-status 'select(.data.prepared == strenv(CK8S_TARGET_VERSION)) |
       .data.last_apply_step = strenv(last_step)' |
     kubectl_do "${1}" replace -f - >/dev/null 2>/dev/null
+  then
+    return 0
+  else
+    log_fatal "could not record migration prepare step ${2##*/} in ${1}"
+  fi
 }
 
 # Usage: record_migration_done sc|wc
 record_migration_done() {
   # Record the upgraded-to version. Create if it does not already exist.
-  kubectl_do "${1}" patch -n kube-system cm apps-meta --type=merge \
-    -p "$(yq4 --null-input --output-format json '.data.version = strenv(CK8S_TARGET_VERSION)')" 2>/dev/null ||
-    kubectl_do "${1}" create configmap -n kube-system apps-meta \
-      --from-literal "version=${CK8S_TARGET_VERSION}" 2>/dev/null
+  if ! kubectl_do "${1}" patch -n kube-system cm apps-meta --type=merge -p "$(yq4 --null-input --output-format json '.data.version = strenv(CK8S_TARGET_VERSION)')" 2>/dev/null; then
+    if ! kubectl_do "${1}" create configmap -n kube-system apps-meta --from-literal "version=${CK8S_TARGET_VERSION}" 2>/dev/null; then
+      log_fatal "could not record new apps version in ${1}"
+    fi
+  fi
   # Complete the migration.
   kubectl_do "${1}" delete configmap -n kube-system apps-upgrade >/dev/null 2>/dev/null
 }

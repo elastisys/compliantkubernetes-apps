@@ -54,14 +54,10 @@ prepare() {
 
   # Create a configmap. This fails if done twice.
   if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
-    if ! record_migration_prepare_begin sc; then
-      log_fatal "prepare already started in sc (kubectl delete -n kube-system configmap apps-upgrade to try again)"
-    fi
+    record_migration_prepare_begin sc
   fi
   if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
-    if ! record_migration_prepare_begin wc; then
-      log_fatal "prepare already started in wc (kubectl delete -n kube-system configmap apps-upgrade to try again)"
-    fi
+    record_migration_prepare_begin wc
   fi
 
   for snippet in ${snippets}; do
