@@ -13,10 +13,16 @@ disallowedTags:
 rejectLoadBalancerService:
     enable: {{ .Values.opa.rejectLoadBalancerService.enabled }}
     enforcementAction: {{ .Values.opa.rejectLoadBalancerService.enforcement }}
+preventAccidentalDeletion:
+    enable: {{ .Values.opa.preventAccidentalDeletion.enabled }}
+    enforcementAction: {{ .Values.opa.preventAccidentalDeletion.enforcement }}
 {{- if eq .Environment.Name "workload_cluster" }}
 allowUserCRDs:
     enable: {{ .Values.gatekeeper.allowUserCRDs.enabled }}
     enforcementAction: {{ .Values.gatekeeper.allowUserCRDs.enforcement }}
+disallowLocalhostSeccomp:
+    enable: true
+    enforcementAction: deny
 minimumDeploymentReplicas:
     enable: {{ .Values.opa.minimumDeploymentReplicas.enabled }}
     enforcementAction: {{ .Values.opa.minimumDeploymentReplicas.enforcement }}

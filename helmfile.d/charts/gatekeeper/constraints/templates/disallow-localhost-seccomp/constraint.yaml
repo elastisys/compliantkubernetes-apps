@@ -1,9 +1,10 @@
+{{- if .Values.disallowLocalhostSeccomp.enable -}}
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sDisallowLocalhostSeccomp
 metadata:
   name: elastisys-disallow-localhost-seccomp-profile
 spec:
-  enforcementAction: deny
+  enforcementAction: {{ .Values.disallowLocalhostSeccomp.enforcementAction }}
   match:
     kinds:
     - apiGroups:
@@ -36,3 +37,4 @@ spec:
         operator: NotIn
         values:
         - ingress-nginx
+{{- end -}}
