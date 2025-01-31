@@ -147,6 +147,8 @@ grafana:
         grafanaEditor: grafana_editor  # maps to grafana role editor
         grafanaViewer: grafana_viewer  # maps to grafana role viewer
       scopes: openid profile email groups
+      useInternalDex: true
+      externalDexDomain: set-me
       allowedDomains:
         - set-me
     viewersCanEdit: true
