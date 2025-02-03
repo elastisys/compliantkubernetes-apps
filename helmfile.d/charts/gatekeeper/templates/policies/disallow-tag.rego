@@ -7,7 +7,7 @@ violation[{"msg": msg}] {
 
     tags := [forbid | tag = input.parameters.tags[_] ; forbid = endswith(container.image, concat(":", ["", tag]))]
     any(tags)
-    msg := sprintf("The container named <%v> uses the :latest tag. Elastisys Compliant Kubernetes requires all images to have explicit tags. Read more at https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-no-latest-tag/", [container.name])
+    msg := sprintf("The container named <%v> uses the :latest tag. Welkin® requires all images to have explicit tags. Read more at https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-no-latest-tag/", [container.name])
 }
 
 violation[{"msg": msg}] {
@@ -16,7 +16,7 @@ violation[{"msg": msg}] {
 
     tag := [contains(container.image, ":")]
     not all(tag)
-    msg := sprintf("The container named <%v> didn't specify an image tag. Elastisys Compliant Kubernetes requires all images to have tags to avoid the implicit :latest tag. Read more at https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-no-latest-tag/", [container.name])
+    msg := sprintf("The container named <%v> didn't specify an image tag. Welkin® requires all images to have tags to avoid the implicit :latest tag. Read more at https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-no-latest-tag/", [container.name])
 }
 
 # Get containers for "Pods"
@@ -53,7 +53,7 @@ violation[{"msg": msg}] {
 
     tags := [forbid | tag = input.parameters.tags[_] ; forbid = endswith(container.image, concat(":", ["", tag]))]
     any(tags)
-    msg := sprintf("The container named <%v> uses the :latest tag. Elastisys Compliant Kubernetes requires all images to have explicit tags. Read more at https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-no-latest-tag/", [container.name])
+    msg := sprintf("The container named <%v> uses the :latest tag. Welkin® requires all images to have explicit tags. Read more at https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-no-latest-tag/", [container.name])
 }
 
 violation[{"msg": msg}] {
@@ -62,7 +62,7 @@ violation[{"msg": msg}] {
 
     tag := [contains(container.image, ":")]
     not all(tag)
-    msg := sprintf("The container named <%v> didn't specify an image tag. Elastisys Compliant Kubernetes requires all images to have tags to avoid the implicit :latest tag. Read more at https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-no-latest-tag/", [container.name])
+    msg := sprintf("The container named <%v> didn't specify an image tag. Welkin® requires all images to have tags to avoid the implicit :latest tag. Read more at https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-no-latest-tag/", [container.name])
 }
 
 # Get init containers for "Pods"
