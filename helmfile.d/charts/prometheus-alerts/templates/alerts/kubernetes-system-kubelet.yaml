@@ -181,7 +181,7 @@ spec:
         description: There are less kubelets than nodes for the last 5m.
         runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/LessKubeletsThanNodes
         summary: There are less kubelets than nodes for the last 5m.
-      expr: count(up{job="kubelet", metrics_path="/metrics"} == 1) < count(kube_node_status_condition{condition="Ready", status="true"} == 1)
+      expr: count(up{job="kubelet", metrics_path="/metrics"} == 1) < count(kube_node_info)
       for: 5m
       labels:
         severity: warning
@@ -193,7 +193,7 @@ spec:
         description: There are less kubelets than nodes for the last 15m.
         runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/LessKubeletsThanNodes
         summary: There are less kubelets than nodes for the last 15m.
-      expr: count(up{job="kubelet", metrics_path="/metrics"} == 1) < count(kube_node_status_condition{condition="Ready", status="true"} == 1)
+      expr: count(up{job="kubelet", metrics_path="/metrics"} == 1) < count(kube_node_info)
       for: 15m
       labels:
         severity: critical
