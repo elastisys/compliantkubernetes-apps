@@ -9,7 +9,7 @@ violation[{"msg": msg}] {
 
     res = [x | x := allChecks(data.inventory.namespace[namespace]["networking.k8s.io/v1"]["NetworkPolicy"][_])]
     all(res) #all networkpolicies failed to match
-    msg := sprintf("No matching networkpolicy found. Welkin® requires that all pods are targeted by NetworkPolicies. Read more at https://elastisys.io/compliantkubernetes/user-guide/safeguards/enforce-networkpolicies/", [])
+    msg := sprintf("No matching networkpolicy found. Welkin® requires that all pods are targeted by NetworkPolicies. Read more at https://elastisys.io/welkin/user-guide/safeguards/enforce-networkpolicies/", [])
 }
 
 #Check one networkpolicy, returns true if it does not match
