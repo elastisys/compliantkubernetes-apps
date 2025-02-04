@@ -90,7 +90,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
   yq4 '.tektonPipelines.enabled == true' $CK8S_CONFIG_PATH/sc-config.yaml
   ```
 
-  Example of how the network policies for the pipeline can be found on the [documentation page](https://elastisys.io/welkin/operator-manual/schema/config-properties-network-policies-config-properties-network-policies-tekton-piepline/#piepline).
+  Example of how the network policies for the pipeline can be found on the [documentation page](https://elastisys.io/welkin-v0.41/operator-manual/schema/config-properties-network-policies-config-properties-network-policies-tekton-piepline/#pipeline).
 
 1. Apply upgrade - _disruptive_
 
