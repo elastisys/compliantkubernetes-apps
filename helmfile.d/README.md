@@ -1,6 +1,6 @@
 # Helmfile
 
-Compliant Kubernetes Apps is driven by [`helmfile`](https://github.com/helmfile/helmfile).
+Elastisys Welkin® is driven by [`helmfile`](https://github.com/helmfile/helmfile).
 
 The structure is as follows:
 
