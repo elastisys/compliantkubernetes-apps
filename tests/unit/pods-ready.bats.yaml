@@ -20,8 +20,6 @@ tests:
         tests:
           - function: test_daemonset
             target: falco
-          - function: test_daemonset
-            target: falco-exporter
           - condition: .falco.alerts.enabled
             target: falco-falcosidekick
             args: [ 2 ]

@@ -29,15 +29,3 @@ constraints:
         - emptyDir
         runAsUser:
           rule: RunAsAny
-    exporter:
-      podSelectorLabels:
-        app.kubernetes.io/name: falco-exporter
-      allow:
-        allowedHostPaths:
-        - pathPrefix: /var/run/falco
-        volumes:
-        - configMap
-        - hostPath
-        - projected
-        runAsUser:
-          rule: RunAsAny

@@ -133,14 +133,6 @@
   cncf_status: 'incubating'
   comment: ''
 - domain: Upstream Helm Charts
-  name: falco-exporter
-  license: "[Apache-2.0](https://github.com/falcosecurity/falco/blob/master/COPYING)"
-  app_version: 0.8.3
-  chart_version: "0.9.11"
-  copyright_owner: Falco Authors, Linux Foundation
-  cncf_status: 'incubating'
-  comment: ''
-- domain: Upstream Helm Charts
   name: falcosidekick
   license: "[Apache-2.0](https://github.com/falcosecurity/falco/blob/master/COPYING)"
   app_version: 2.28.0
@@ -581,11 +573,6 @@
   tag: "0.37.1"
   helm_chart_ref:
     - falco
-- domain: Container images
-  name: "docker.io/falcosecurity/falco-exporter"
-  tag: "0.8.3"
-  helm_chart_ref:
-    - falco-exporter
 - domain: Container images
   name: "docker.io/falcosecurity/falcosidekick"
   tag: "2.28.0"
