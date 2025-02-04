@@ -39,7 +39,6 @@
 | crds |  | 0.0.0 |  | Apache-2.0 | Prometheus Authors, Linux Foundation | Sub-chart of Kube-prometheus-stack |
 | dex | 2.36.0 | 0.14.1 | sandbox | [Apache-2.0](https://github.com/dexidp/dex/blob/master/LICENSE) | Dex IdP Contributors, Linux Foundation |  |
 | falco | 0.37.1 | 4.2.2 | incubating | [Apache-2.0](https://github.com/falcosecurity/falco/blob/master/COPYING) | Falco Authors, Linux Foundation |  |
-| falco-exporter | 0.8.3 | 0.9.11 | incubating | [Apache-2.0](https://github.com/falcosecurity/falco/blob/master/COPYING) | Falco Authors, Linux Foundation |  |
 | falcosidekick | 2.28.0 | 0.7.11 | incubating | [Apache-2.0](https://github.com/falcosecurity/falco/blob/master/COPYING) | Falco Authors, Linux Foundation |  |
 | fluentd | 1.16.1 | 5.8.2 | graduated | [Apache-2.0](https://github.com/fluent/fluentd/blob/master/LICENSE) | Fluentd Project |  |
 | fluentd-elasticsearch | v4.3.9 | 13.10.0 |  | [GPL-3.0-or-later](https://github.com/kokuwaio/helm-charts/blob/main/LICENSE) | [Kokuwa.io](http://kokuwa.io/) | Mostly relicenses Apache-2.0 code, 3 contributors |
@@ -132,7 +131,6 @@
 | docker.io/falcosecurity/falcoctl | 0.7.2 | falco |  |  |  |  |
 | docker.io/falcosecurity/falco-driver-loader | 0.37.1 | falco |  |  |  |  |
 | docker.io/falcosecurity/falco-no-driver | 0.37.1 | falco |  |  |  |  |
-| docker.io/falcosecurity/falco-exporter | 0.8.3 | falco-exporter |  |  |  |  |
 | docker.io/falcosecurity/falcosidekick | 2.28.0 | falcosidekick |  |  |  |  |
 | docker.io/bitnami/fluentd | 1.16.1-debian-11-r12 | fluentd |  |  |  |  |
 | ghcr.io/elastisys/fluentd | v4.3.9-ck8s1 | fluentd-elasticsearch |  |  |  |  |

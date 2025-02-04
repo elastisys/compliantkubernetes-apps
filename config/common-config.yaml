@@ -190,24 +190,6 @@ falco:
     affinity: {}
     nodeSelector: {}
 
-  falcoExporter:
-    resources:
-      requests:
-        cpu: 30m
-        memory: 20Mi
-      limits:
-        cpu: 30m
-        memory: 50Mi
-    tolerations:
-      - key: node-role.kubernetes.io/master
-        operator: Exists
-        effect: NoSchedule
-      - key: node-role.kubernetes.io/control-plane
-        operator: Exists
-        effect: NoSchedule
-    affinity: {}
-    nodeSelector: {}
-
 grafana:
   ops:
     subdomain: grafana

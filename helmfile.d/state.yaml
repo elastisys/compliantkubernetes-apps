@@ -61,7 +61,6 @@ releases:
   - inherit: [ template: falco-networkpolicy ]
   - inherit: [ template: falco-podsecuritypolicy ]
   - inherit: [ template: falco-main ]
-  - inherit: [ template: falco-exporter ]
 
   - inherit: [ template: fluentd-networkpolicy ]
   - inherit: [ template: fluentd-podsecuritypolicy ]

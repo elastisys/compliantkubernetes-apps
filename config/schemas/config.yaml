@@ -3258,20 +3258,6 @@ properties:
           Needed to flush Falco logs as soon as they are emitted.
         type: boolean
         default: true
-      falcoExporter:
-        additionalProperties: false
-        title: Falco Exporter
-        description: Basic configuration for Falco Exporter, the daemon set that exposes Falco alerts to Prometheus.
-        type: object
-        properties:
-          resources:
-            $ref: '#/$defs/kubernetesResourceRequirements'
-          tolerations:
-            $ref: '#/$defs/kubernetesTolerations'
-          nodeSelector:
-            $ref: '#/$defs/kubernetesNodeSelector'
-          affinity:
-            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
       falcoSidekick:
         additionalProperties: false
         title: Falco Sidekick
