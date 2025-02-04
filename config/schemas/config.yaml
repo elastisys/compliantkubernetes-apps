@@ -7410,8 +7410,8 @@ properties:
           - default-timeout-minutes: "30"
         type: object
   gpu:
-    title: GPU Operator Config
-    description: Configure GPU Operator
+    title: GPU Config
+    description: Configure the GPU Operator and its dependencies
     type: object
     properties:
       enabled:
@@ -7419,6 +7419,9 @@ properties:
         default: false
         type: boolean
       operator:
+        title: GPU Operator Config
+        description: Configure GPU Operator
+        type: object
         properties:
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
@@ -7427,8 +7430,14 @@ properties:
           affinity:
             $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
       nodeFeatureDiscovery:
+        title: Node Feature Discovery Config
+        description: Configure Node Feature Discovery
+        type: object
         properties:
           master:
+            title: Node Feature Discovery master Config
+            description: Configure Node Feature Discovery masters
+            type: object
             properties:
               resources:
                 $ref: '#/$defs/kubernetesResourceRequirements'
@@ -7437,6 +7446,9 @@ properties:
               affinity:
                 $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
           worker:
+            title: Node Feature Discovery worker Config
+            description: Configure Node Feature Discovery workers
+            type: object
             properties:
               resources:
                 $ref: '#/$defs/kubernetesResourceRequirements'
