@@ -19,6 +19,9 @@ rejectLoadBalancerService:
 minimumDeploymentReplicas:
     enable: true
     enforcementAction: warn
+rejectEmptyDir:
+    enable: false
+    enforcementAction: warn
 
 imageRegistryURL: registry.example.com
 

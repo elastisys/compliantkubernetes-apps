@@ -13,6 +13,9 @@ disallowedTags:
 rejectLoadBalancerService:
     enable: {{ .Values.opa.rejectLoadBalancerService.enabled }}
     enforcementAction: {{ .Values.opa.rejectLoadBalancerService.enforcement }}
+rejectEmptyDir:
+    enable: {{ .Values.opa.rejectEmptyDir.enabled }}
+    enforcementAction: {{ .Values.opa.rejectEmptyDir.enforcement }}
 {{- if eq .Environment.Name "workload_cluster" }}
 allowUserCRDs:
     enable: {{ .Values.gatekeeper.allowUserCRDs.enabled }}
