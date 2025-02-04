@@ -1,16 +1,16 @@
-# Elastisys Compliant Kubernetes Apps
+# Elastisys Welkin® Apps
 
 [![tests](https://github.com/elastisys/compliantkubernetes-apps/actions/workflows/tests.yml/badge.svg)](https://github.com/elastisys/compliantkubernetes-apps/actions/workflows/tests.yml)
 
 ## Overview
 
-This repository is part of the [Compliant Kubernetes][compliantkubernetes] (compliantkubernetes) platform.
+This repository is part of the [Elastisys Welkin®][welkin] application platform.
 The platform consists of the following repositories:
 
 - [compliantkubernetes-kubespray][compliantkubernetes-kubespray] - Code for managing Kubernetes clusters and the infrastructure around them.
 - [compliantkubernetes-apps][compliantkubernetes-apps] - Code, configuration and tools for running various services and applications on top of Kubernetes clusters.
 
-The Elastisys Compliant Kubernetes (compliantkubernetes) platform runs two Kubernetes clusters.
+The Elastisys Welkin® application platform runs two Kubernetes clusters.
 One called "service" and one called "workload".
 
 The _service cluster_ provides observability, log aggregation, private container registry with vulnerability scanning and authentication using the following services:
@@ -27,7 +27,7 @@ The _workload cluster_ manages the user applications as well as providing intrus
 - Fluentd
 - Prometheus
 
-[compliantkubernetes]: https://compliantkubernetes.com/
+[welkin]: https://elastisys.io/welkin/
 [compliantkubernetes-kubespray]: https://github.com/elastisys/compliantkubernetes-kubespray
 [compliantkubernetes-apps]: https://github.com/elastisys/compliantkubernetes-apps
 
@@ -51,7 +51,7 @@ Currently we support the following cloud providers:
 - Openstack
 - Safespring
 - UpCloud
-- In addition to this we support running Compliant Kubernetes on bare metal (beta).
+- In addition to this we support running Welkin on bare metal (beta).
 
 ## Setup
 

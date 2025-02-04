@@ -1,7 +1,7 @@
 ---
 name: (Deprecated) Create new release
 about: Do not create release issues here, use the link to the ck8s-issue-tracker.
-title: Create release Compliant Kubernetes Apps <version>
+title: Create release Elastisys Welkin® Apps <version>
 labels: kind/release
 assignees: ""
 ---
