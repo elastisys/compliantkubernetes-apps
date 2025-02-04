@@ -5,6 +5,30 @@ numbering uses [semantic versioning](http://semver.org).
 
 Before release 0.1.20, the helm chart can be found in `falcosidekick` [repository](https://github.com/falcosecurity/falcosidekick/tree/master/deploy/helm/falcosidekick).
 
+## 0.9.1
+
+- Ugrade to Falcosidekick 2.30.0
+
+## 0.8.9
+
+- Fix customConfig mount path for webui redis
+
+## 0.8.8
+
+- Fix customConfig template for webui redis
+
+## 0.8.7
+
+- Fix securityContext for webui initContainer
+
+## 0.8.6
+
+- Use of `redis-cli` by the initContainer of Falcosidekick-UI to wait til the redis is up and running
+- Add the possibility to override the default redis server settings
+- Allow to set up a password to use with an external redis
+- Fix wrong value used for `OTLP_TRACES_PROTOCOL` env var
+- Used names for the priorities in the prometheus rules
+
 ## 0.8.5
 
 - Fix an issue with the by default missing custom CA cert

@@ -240,6 +240,8 @@ metrics:
   convertMemoryToMB: true
   # -- includeEmptyValues specifies whether the empty values should be included in the metrics.
   includeEmptyValues: false
+  # -- kernelEventCountersPerCPUEnabled specifies whether the event counters per cpu should be enabled.
+  kernelEventCountersPerCPUEnabled: false
   # -- service exposes the metrics service to be accessed from within the cluster.
   # ref: https://kubernetes.io/docs/concepts/services-networking/service/
   service:
@@ -248,6 +250,10 @@ metrics:
     # -- type denotes the service type. Setting it to "ClusterIP" we ensure that are accessible
     # from within the cluster.
     type: ClusterIP
+    # -- labels to add to the service.
+    labels: {}
+    # -- annotations to add to the service.
+    annotations: {}
     # -- ports denotes all the ports on which the Service will listen.
     ports:
       # -- metrics denotes a listening service named "metrics".
@@ -265,8 +271,6 @@ mounts:
   volumes: []
   # -- A list of volumes you want to add to the Falco pods.
   volumeMounts: []
-  # -- By default, `/proc` from the host is only mounted into the Falco pod when `driver.enabled` is set to `true`. This flag allows it to override this behaviour for edge cases where `/proc` is needed but syscall data source is not enabled at the same time (e.g. for specific plugins).
-  enforceProcMount: false
 
 # Driver settings (scenario requirement)
 driver:
@@ -388,7 +392,7 @@ collectors:
     enabled: false
     # --pluginRef is the OCI reference for the k8smeta plugin. It could be a full reference such as:
     # "ghcr.io/falcosecurity/plugins/plugin/k8smeta:0.1.0". Or just name + tag: k8smeta:0.1.0.
-    pluginRef: "ghcr.io/falcosecurity/plugins/plugin/k8smeta:0.2.0"
+    pluginRef: "ghcr.io/falcosecurity/plugins/plugin/k8smeta:0.2.1"
     # -- collectorHostname is the address of the k8s-metacollector. When not specified it will be set to match
     # k8s-metacollector service. e.x: falco-k8smetacollecto.falco.svc. If for any reason you need to override
     # it, make sure to set here the address of the k8s-metacollector.
@@ -398,6 +402,13 @@ collectors:
     # the value of the port named `broker-grpc` in k8s-metacollector.service.ports is used. The default values is 45000.
     # It is used by the k8smeta plugin to connect to the k8s-metacollector.
     collectorPort: ""
+    # verbosity level for the plugin logger: trace, debug, info, warning, error, critical.
+    verbosity: info
+    # The plugin needs to scan the '/proc' of the host on which is running.
+    # In Falco usually we put the host '/proc' folder under '/host/proc' so
+    # the default for this config is '/host'.
+    # The path used here must not have a final '/'.
+    hostProc: /host
 
 
 ###########################
@@ -471,7 +482,7 @@ falcoctl:
     # -- The image repository to pull from.
     repository: falcosecurity/falcoctl
     # -- The image tag to pull.
-    tag: "0.9.0"
+    tag: "0.10.1"
   artifact:
     # -- Runs "falcoctl artifact install" command as an init container. It is used to install artfacts before
     # Falco starts. It provides them to Falco by using an emptyDir volume.
@@ -584,6 +595,22 @@ serviceMonitor:
   # for Falco's metrics.
   endpointPort: "metrics"
 
+# -- grafana contains the configuration related to grafana.
+grafana:
+  # -- dashboards contains configuration for grafana dashboards.
+  dashboards:
+    # -- enabled specifies whether the dashboards should be deployed.
+    enabled: false
+    # --configmaps to be deployed that contain a grafana dashboard.
+    configMaps:
+      # -- falco contains the configuration for falco's dashboard.
+      falco:
+        # -- name specifies the name for the configmap.
+        name: falco-grafana-dashboard
+        # -- namespace specifies the namespace for the configmap.
+        namespace: ""
+        # -- folder where the dashboard is stored by grafana.
+        folder: ""
 
 ######################
 # falco.yaml config  #
@@ -682,7 +709,7 @@ falco:
   #
   # -- Falco utilizes tbb::concurrent_bounded_queue for handling outputs, and this parameter
   # allows you to customize the queue capacity. Please refer to the official documentation:
-  # https://oneapi-src.github.io/oneTBB/main/tbb_userguide/Concurrent_Queue_Classes.html.
+  # https://uxlfoundation.github.io/oneTBB/main/tbb_userguide/Concurrent_Queue_Classes.html.
   # On a healthy system with optimized Falco rules, the queue should not fill up.
   # If it does, it is most likely happening due to the entire event flow being too slow,
   # indicating that the server is under heavy load.
@@ -834,6 +861,15 @@ falco:
   # be added at a later stage, it is recommended to turn it off.
   json_include_tags_property: true
 
+  # [Incubating] `json_include_message_property`
+  #
+  # When using JSON output in Falco, you have the option to include the formatted
+  # rule output without timestamp or priority. For instance, if a rule specifies
+  # an "output" property like "Opened process %proc.name" the "message" field will
+  # only contain "Opened process bash" whereas the "output" field will contain more
+  # information.
+  json_include_message_property: false
+
   # [Stable] `buffered_outputs`
   #
   # -- Enabling buffering for the output queue can offer performance optimization,
@@ -841,30 +877,49 @@ falco:
   # output mechanism. By default, buffering is disabled (false).
   buffered_outputs: false
 
-  # [Stable] `outputs`
+  # [Sandbox] `append_output`
   #
-  # -- A throttling mechanism, implemented as a token bucket, can be used to control
-  # the rate of Falco outputs. Each event source has its own rate limiter,
-  # ensuring that alerts from one source do not affect the throttling of others.
-  # The following options control the mechanism:
-  #  - rate: the number of tokens (i.e. right to send a notification) gained per
-  #    second. When 0, the throttling mechanism is disabled. Defaults to 0.
-  #  - max_burst: the maximum number of tokens outstanding. Defaults to 1000.
+  # Add information to the Falco output.
+  # With this setting you can add more information to the Falco output message, customizable by
+  # rule, tag or source.
+  # You can also add additional data that will appear in the output_fields property
+  # of JSON formatted messages or gRPC output but will not be part of the regular output message.
+  # This allows you to add custom fields that can help you filter your Falco events without
+  # polluting the message text.
   #
-  # For example, setting the rate to 1 allows Falco to send up to 1000
-  # notifications initially, followed by 1 notification per second. The burst
-  # capacity is fully restored after 1000 seconds of no activity.
+  # Each append_output entry has an optional `match` map which specifies which rules will be
+  # affected.
+  # `match`:
+  #   `rule`: append output only to a specific rule
+  #   `source`: append output only to a specific source
+  #   `tags`: append output only to rules that have all of the specified tags
+  # If none of the above are specified (or `match` is omitted)
+  # output is appended to all events.
+  # If more than one match condition is specified output will be appended to events
+  # that match all conditions.
+  # And several options to add output:
+  #   `extra_output`: add output to the Falco message
+  #   `extra_fields`: add new fields to the JSON output and structured output, which will not
+  #             affect the regular Falco message in any way. These can be specified as a
+  #             custom name with a custom format or as any supported field
+  #             (see: https://falco.org/docs/reference/rules/supported-fields/)
   #
-  # Throttling can be useful in various scenarios, such as preventing notification
-  # floods, managing system load, controlling event processing, or complying with
-  # rate limits imposed by external systems or APIs. It allows for better resource
-  # utilization, avoids overwhelming downstream systems, and helps maintain a
-  # balanced and controlled flow of notifications.
+  # Example:
   #
-  # With the default settings, the throttling mechanism is disabled.
-  outputs:
-    rate: 0
-    max_burst: 1000
+  # append_output:
+  #   - match:
+  #       source: syscall
+  #     extra_output: "on CPU %evt.cpu"
+  #     extra_fields:
+  #       - home_directory: "${HOME}"
+  #       - evt.hostname
+  #
+  # In the example above every event coming from the syscall source will get an extra message
+  # at the end telling the CPU number. In addition, if `json_output` is true, in the "output_fields"
+  # property you will find three new ones: "evt.cpu", "home_directory" which will contain the value of the
+  # environment variable $HOME, and "evt.hostname" which will contain the hostname.
+  append_output: []
+
 
   ##########################
   # Falco outputs channels #
@@ -1323,6 +1378,9 @@ falco:
   # counters reflect monotonic values since Falco's start and are exported at a
   # constant stats interval.
   #
+  # `kernel_event_counters_per_cpu_enabled`: Detailed kernel event and drop counters
+  # per CPU. Typically used when debugging and not in production.
+  #
   # `libbpf_stats_enabled`: Exposes statistics similar to `bpftool prog show`,
   # providing information such as the number of invocations of each BPF program
   # attached by Falco and the time spent in each program measured in nanoseconds.
@@ -1352,6 +1410,7 @@ falco:
     libbpf_stats_enabled: true
     convert_memory_to_mb: true
     include_empty_values: false
+    kernel_event_counters_per_cpu_enabled: false
 
 
   #######################################

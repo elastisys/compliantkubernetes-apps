@@ -280,8 +280,8 @@ be temporary and will stay here until we move this logic to the falcoctl tool.
       {{- with .Values.falcoctl.artifact.install.mounts.volumeMounts }}
         {{- toYaml . | nindent 4 }}
       {{- end }}
-  env:
   {{- if .Values.falcoctl.artifact.install.env }}
+  env:
   {{- include "falco.renderTemplate" ( dict "value" .Values.falcoctl.artifact.install.env "context" $) | nindent 4 }}
   {{- end }}
 {{- end -}}
@@ -314,8 +314,8 @@ be temporary and will stay here until we move this logic to the falcoctl tool.
       {{- with .Values.falcoctl.artifact.follow.mounts.volumeMounts }}
         {{- toYaml . | nindent 4 }}
       {{- end }}
-  env:
   {{- if .Values.falcoctl.artifact.follow.env }}
+  env:
   {{- include "falco.renderTemplate" ( dict "value" .Values.falcoctl.artifact.follow.env "context" $) | nindent 4 }}
   {{- end }}
 {{- end -}}
@@ -361,7 +361,7 @@ be temporary and will stay here until we move this logic to the falcoctl tool.
 {{- if not $hasConfig -}}
 {{- $listenPort := default (index .Values "k8s-metacollector" "service" "ports" "broker-grpc" "port") .Values.collectors.kubernetes.collectorPort -}}
 {{- $listenPort = int $listenPort -}}
-{{- $pluginConfig := dict "name" "k8smeta" "library_path" "libk8smeta.so" "init_config" (dict "collectorHostname" $hostname "collectorPort" $listenPort "nodeName" "${FALCO_K8S_NODE_NAME}") -}}
+{{- $pluginConfig := dict "name" "k8smeta" "library_path" "libk8smeta.so" "init_config" (dict "collectorHostname" $hostname "collectorPort" $listenPort "nodeName" "${FALCO_K8S_NODE_NAME}" "verbosity" .Values.collectors.kubernetes.verbosity "hostProc" .Values.collectors.kubernetes.hostProc) -}}
 {{- $newConfig := append .Values.falco.plugins $pluginConfig -}}
 {{- $_ := set .Values.falco "plugins" ($newConfig | uniq) -}}
 {{- $loadedPlugins := append .Values.falco.load_plugins "k8smeta" -}}
@@ -427,6 +427,7 @@ Based on the use input it populates the metrics configuration in the falco confi
 {{- $_ = set .Values.falco.metrics "resource_utilization_enabled" .Values.metrics.resourceUtilizationEnabled -}}
 {{- $_ = set .Values.falco.metrics "state_counters_enabled" .Values.metrics.stateCountersEnabled -}}
 {{- $_ = set .Values.falco.metrics "kernel_event_counters_enabled" .Values.metrics.kernelEventCountersEnabled -}}
+{{- $_ = set .Values.falco.metrics "kernel_event_counters_per_cpu_enabled" .Values.metrics.kernelEventCountersPerCPUEnabled -}}
 {{- $_ = set .Values.falco.metrics "libbpf_stats_enabled" .Values.metrics.libbpfStatsEnabled -}}
 {{- $_ = set .Values.falco.metrics "convert_memory_to_mb" .Values.metrics.convertMemoryToMB -}}
 {{- $_ = set .Values.falco.metrics "include_empty_values" .Values.metrics.includeEmptyValues -}}

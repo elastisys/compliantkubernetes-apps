@@ -28,10 +28,6 @@ policies:
             - tcp: {{ . }}
             {{- end }}
           {{- end }}
-
-    falco-exporter:
-      podSelectorLabels:
-        app.kubernetes.io/name: falco-exporter
       ingress:
         - rule: ingress-rule-prometheus
           ports:

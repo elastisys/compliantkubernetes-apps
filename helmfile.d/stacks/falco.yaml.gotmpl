@@ -50,17 +50,3 @@ templates:
       {{- else if .Values | get "ck8sWorkloadCluster.enabled" false }}
       - values/falco/falco-workload-cluster.yaml.gotmpl
       {{ end }}
-
-  falco-exporter:
-    disableValidationOnInstall: true
-    inherit:
-      - template: falco
-      - template: falco-exporter-chart
-    name: falco-exporter
-    needs:
-      - falco/falco
-      - falco/networkpolicy
-      - falco/podsecuritypolicy
-      - monitoring/kube-prometheus-stack # creates servicemonitors
-    values:
-      - values/falco/falco-exporter.yaml.gotmpl
