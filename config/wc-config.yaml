@@ -360,3 +360,26 @@ gatekeeper:
     extraServiceAccounts: []
     #  - namespace: "gatekeeper-system"
     #    name: "gatekeeper-admin-upgrade-crds"
+
+gpu:
+  enabled: false
+  operator:
+    resources: {}
+    tolerations: {}
+    affinity: {}
+  nodeFeatureDiscovery:
+    worker:
+      resources: {}
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+      affinity: {}
+    master:
+      resources: {}
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Equal
+          value: ""
+      affinity: {}

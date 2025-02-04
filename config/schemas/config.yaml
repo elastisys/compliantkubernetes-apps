@@ -7409,6 +7409,38 @@ properties:
         examples:
           - default-timeout-minutes: "30"
         type: object
+  gpu:
+    properties:
+      enabled:
+        title: GPU Operator Enabled
+        default: false
+        type: boolean
+      operator:
+        properties:
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      nodeFeatureDiscovery:
+        properties:
+          master:
+            properties:
+              resources:
+                $ref: '#/$defs/kubernetesResourceRequirements'
+              tolerations:
+                $ref: '#/$defs/kubernetesTolerations'
+              affinity:
+                $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          worker:
+            properties:
+              resources:
+                $ref: '#/$defs/kubernetesResourceRequirements'
+              tolerations:
+                $ref: '#/$defs/kubernetesTolerations'
+              affinity:
+                $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
 additionalProperties:
   title: Additional Properties
   description: Configure additional properties not covered by the schema.
