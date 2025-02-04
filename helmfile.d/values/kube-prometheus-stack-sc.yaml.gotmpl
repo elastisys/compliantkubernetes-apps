@@ -48,7 +48,7 @@ kube-state-metrics:
     - "--custom-resource-state-config-file=/etc/config/clusterapi-metrics.yaml"
   {{- end }}
   metricLabelsAllowlist:
-  - nodes=[topology.kubernetes.io/zone,elastisys.io/node-group]
+  - nodes=[topology.kubernetes.io/zone,elastisys.io/node-group,node-restriction.kubernetes.io/autoscaled-node-type]
 kubeApiServer:
   serviceMonitor:
     metricRelabelings:

@@ -26,7 +26,7 @@ kube-state-metrics:
   resources: {{- toYaml .Values.kubeStateMetrics.resources | nindent 4 }}
 
   metricLabelsAllowlist:
-  - nodes=[topology.kubernetes.io/zone,elastisys.io/node-group,node.kubernetes.io/instance-type]
+  - nodes=[topology.kubernetes.io/zone,elastisys.io/node-group,node.kubernetes.io/instance-type,node-restriction.kubernetes.io/autoscaled-node-type]
 
 prometheus-node-exporter:
   resources: {{- toYaml .Values.prometheusNodeExporter.resources | nindent 4 }}
