@@ -6,9 +6,7 @@ violation[{"msg": msg}] {
     volume := get_volumes[_]
 	missing(volume.emptyDir, "medium")
     not check_volume_in_annotation(get_metadata, volume)
-    #msg := sprintf("The volume <%v> emptyDir is using local storage emptyDir. This can prevent autoscaler from scaling down a node where this is running. You can choose to instead set \"medium: Memory\" on the emptyDir or ignore this policy by adding the annotation <%v>",[volume, input.parameters.annotation])
-
-	msg := sprintf("The volume <%v>",[volume])
+    msg := sprintf("The volume <%v> emptyDir is using local storage emptyDir. This can prevent autoscaler from scaling down a node where this is running. You can choose to instead set \"medium: Memory\" on the emptyDir or add the annotation <%v> with the volume name as value",[volume, input.parameters.annotation])
 }
 
 # violation if medium is not Memory.
@@ -16,7 +14,7 @@ violation[{"msg": msg}] {
     volume := get_volumes[_]
 	volume.emptyDir.medium != "Memory"
     not check_volume_in_annotation(get_metadata, volume)
-    msg := sprintf("The volume <%v> emptyDir is using local storage emptyDir. This can prevent autoscaler from scaling down a node where this is running. You can choose to instead set \"medium: Memory\" on the emptyDir or ignore this policy by adding the annotation <%v>",[volume, input.parameters.annotation])
+    msg := sprintf("The volume <%v> emptyDir is using local storage emptyDir. This can prevent autoscaler from scaling down a node where this is running. You can choose to instead set \"medium: Memory\" on the emptyDir or add the annotation <%v> with the volume name as value",[volume, input.parameters.annotation])
 }
 
 # Get volumes for "Pods"
