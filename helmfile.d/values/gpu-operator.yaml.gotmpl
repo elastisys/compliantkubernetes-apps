@@ -1,15 +1,16 @@
 gpu:
   enabled: {{ .Values.gpu.enabled }}
-  operator:
-    resources: {{- toYaml .Values.gpu.operator.resources | nindent 6 }}
-    tolerations: {{- toYaml .Values.gpu.operator.tolerations | nindent 6 }}
-    affinity: {{- toYaml .Values.gpu.operator.affinity | nindent 6 }}
-  nodeFeatureDiscovery:
-    worker:
-      resources: {{- toYaml .Values.gpu.nodeFeatureDiscovery.worker.resources | nindent 8 }}
-      tolerations: {{- toYaml .Values.gpu.nodeFeatureDiscovery.worker.tolerations | nindent 8 }}
-      affinity: {{- toYaml .Values.gpu.nodeFeatureDiscovery.worker.affinity | nindent 8 }}
-    master:
-      resources: {{- toYaml .Values.gpu.nodeFeatureDiscovery.master.resources | nindent 8 }}
-      tolerations: {{- toYaml .Values.gpu.nodeFeatureDiscovery.master.tolerations | nindent 8 }}
-      affinity: {{- toYaml .Values.gpu.nodeFeatureDiscovery.master.affinity | nindent 8 }}
+operator:
+  resources: {{- toYaml .Values.gpu.operator.resources | nindent 4 }}
+  tolerations: {{- toYaml .Values.gpu.operator.tolerations | nindent 4 }}
+  affinity: {{- toYaml .Values.gpu.operator.affinity | nindent 4 }}
+node-feature-discovery:
+  worker:
+    resources: {{- toYaml .Values.gpu.nodeFeatureDiscovery.worker.resources | nindent 6 }}
+    tolerations: {{- toYaml .Values.gpu.nodeFeatureDiscovery.worker.tolerations | nindent 6 }}
+    affinity: {{- toYaml .Values.gpu.nodeFeatureDiscovery.worker.affinity | nindent 6 }}
+  master:
+    resources: {{- toYaml .Values.gpu.nodeFeatureDiscovery.master.resources | nindent 6 }}
+    tolerations: {{- toYaml .Values.gpu.nodeFeatureDiscovery.master.tolerations | nindent 6 }}
+    affinity: {{- toYaml .Values.gpu.nodeFeatureDiscovery.master.affinity | nindent 6 }}
+daemonsets: {{- toYaml .Values.gpu.daemonsets | nindent 2 }}

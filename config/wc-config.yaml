@@ -383,3 +383,9 @@ gpu:
           operator: Equal
           value: ""
       affinity: {}
+  daemonsets:
+    tolerations:
+      - key: "elastisys.io/node-type"
+        operator: "Equal"
+        value: "gpu"
+        effect: "NoSchedule"
