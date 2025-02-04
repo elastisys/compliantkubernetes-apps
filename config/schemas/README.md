@@ -146,7 +146,7 @@ These guidelines aim to help in creating better quality reference documentation.
     - For the leaf of schemas, e.g.:
         - `.dex.expiry.idToken` - "Configure expiry of id tokens."
 - Should include a follow up explanation for more details when required, e.g:
-    - `.grafana` - "Compliant Kubernetes hosts two instances of Grafana one for the Platform Administrator and one for the Application Developer"
+    - `.grafana` - "Welkin hosts two instances of Grafana one for the Platform Administrator and one for the Application Developer"
 - Should include a follow up explanation for conditionals, e.g:
     - `.networkPolicies.ingressNginx.ingressOverride` - "When enabled a list of IPs must be set that should override the allowed ingress traffic."
 - Should include a follow up explanation for requirements, e.g:

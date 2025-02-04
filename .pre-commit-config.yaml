@@ -1,4 +1,23 @@
 repos:
+  - repo: local
+    hooks:
+      - id: avoid-old-website-urls
+        name: Avoid old URLs (https://elastisys.io/compliantkubernetes)
+        entry: "elastisys.io/compliantkubernetes"
+        language: pygrep
+        files: ".*[.]md$"
+      - id: avoid-old-names
+        name: Use Welkin consistently
+        entry: "(Compliant[ ]Kubernetes|C[kK]8[sS][^_]|Complaint)"
+        language: pygrep
+        files: ".*[.]md$"
+        exclude: ^changelog/0.43.md$
+      - id: whole-trademark
+        name: Use Elastisys Welkin® consistently
+        entry: python ./scripts/check-elastisys-welkin.py
+        language: python
+        types: [text]
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
