@@ -70,6 +70,13 @@ namespaces:
       pod-security.kubernetes.io/enforce: restricted
       pod-security.kubernetes.io/warn: restricted
   {{ end }}
+  {{ if .Values.gpu.enabled }}
+  - name: gpu-operator
+    labels:
+      pod-security.kubernetes.io/audit: restricted
+      pod-security.kubernetes.io/enforce: restricted
+      pod-security.kubernetes.io/warn: restricted
+  {{ end }}
 
 commonLabels:
   owner: operator
