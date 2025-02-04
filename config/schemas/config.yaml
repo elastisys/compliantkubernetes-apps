@@ -7410,6 +7410,9 @@ properties:
           - default-timeout-minutes: "30"
         type: object
   gpu:
+    title: GPU Operator Config
+    description: Configure GPU Operator
+    type: object
     properties:
       enabled:
         title: GPU Operator Enabled
