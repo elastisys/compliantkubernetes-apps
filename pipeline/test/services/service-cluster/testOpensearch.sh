@@ -101,48 +101,43 @@ check_opensearch_snapshots_status() {
   repo_name=$(yq4 -e '.opensearch.snapshot.repository' "${config['config_file_sc']}")
   repo_exists_status=$(curl -sk -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_snapshot/${repo_name}" | jq "select(.error)")
   if [[ -z "$repo_exists_status" ]]; then
-    if kubectl get "cronjob" -n "opensearch-system" "opensearch-backup" &>/dev/null; then
-      snapshots=$(curl -sk -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_cat/snapshots/${repo_name}")
-      error=$(echo "$snapshots" | jq '.error' 2>/dev/null || true)
-      failed=$(echo "$snapshots" | grep 'FAILED' || true)
-      partial=$(echo "$snapshots" | grep 'PARTIAL' || true)
+    snapshots=$(curl -sk -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_cat/snapshots/${repo_name}")
+    error=$(echo "$snapshots" | jq '.error' 2>/dev/null || true)
+    failed=$(echo "$snapshots" | grep 'FAILED' || true)
+    partial=$(echo "$snapshots" | grep 'PARTIAL' || true)
 
-      if [[ "$error" != "" ]] && [[ "$error" != "null" ]]; then
-        no_error=false
-        debug_msg+="[ERROR] Error in snapshots output: \n $error\n"
-      else
-        if [[ "$failed" != "" ]]; then
-          no_error=false
-          debug_msg+="[ERROR] We found some failed snapshots: \n $failed\n"
-        fi
-
-        if [[ "$partial" != "" ]]; then
-          no_error=false
-          debug_msg+="[WARNING] We found some partial snapshots: \n $partial\n"
-        fi
-
-        IFS=$'\n' readarray -t data < <(awk '{ print $1 " " $2 " " $3}' <<<"$snapshots")
-        IFS=" " read -ra last_snapshot <<<"${data[-1]}"
-
-        if [[ "${#last_snapshot[@]}" -gt 0 ]]; then
-          now_epoch=$(date +%s)
-          last_snapshot_epoch=${last_snapshot[2]}
-          ((diff = now_epoch - last_snapshot_epoch))
-
-          if [[ $diff -gt 86400 ]]; then
-            no_error=false
-            debug_msg+="[ERROR] The latest snapshot has not been created within the past 24 hours, with status: ${last_snapshot[1]}\n"
-          else
-            debug_msg+="[WARNING] The latest snapshot has been created within the past 24 hours, with status: ${last_snapshot[1]}\n"
-          fi
-        else
-          no_error=false
-          debug_msg+="[ERROR] No snapshots found, if this is a brand new cluster this can safely be ignored\n"
-        fi
-      fi
-    else
+    if [[ "$error" != "" ]] && [[ "$error" != "null" ]]; then
       no_error=false
-      debug_msg+="[ERROR] opensearch-backup cronjob doesn't exist\n"
+      debug_msg+="[ERROR] Error in snapshots output: \n $error\n"
+    else
+      if [[ "$failed" != "" ]]; then
+        no_error=false
+        debug_msg+="[ERROR] We found some failed snapshots: \n $failed\n"
+      fi
+
+      if [[ "$partial" != "" ]]; then
+        no_error=false
+        debug_msg+="[WARNING] We found some partial snapshots: \n $partial\n"
+      fi
+
+      IFS=$'\n' readarray -t data < <(awk '{ print $1 " " $2 " " $3}' <<<"$snapshots")
+      IFS=" " read -ra last_snapshot <<<"${data[-1]}"
+
+      if [[ "${#last_snapshot[@]}" -gt 0 ]]; then
+        now_epoch=$(date +%s)
+        last_snapshot_epoch=${last_snapshot[2]}
+        ((diff = now_epoch - last_snapshot_epoch))
+
+        if [[ $diff -gt 86400 ]]; then
+          no_error=false
+          debug_msg+="[ERROR] The latest snapshot has not been created within the past 24 hours, with status: ${last_snapshot[1]}\n"
+        else
+          debug_msg+="[WARNING] The latest snapshot has been created within the past 24 hours, with status: ${last_snapshot[1]}\n"
+        fi
+      else
+        no_error=false
+        debug_msg+="[ERROR] No snapshots found, if this is a brand new cluster this can safely be ignored\n"
+      fi
     fi
   else
     no_error=false
