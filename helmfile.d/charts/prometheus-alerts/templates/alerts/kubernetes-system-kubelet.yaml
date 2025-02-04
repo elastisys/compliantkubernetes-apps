@@ -176,10 +176,10 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
-    - alert: LessKubeletsThanAutoscalableNodes
+    - alert: LessKubeletsThanAutoscaledNodes
       annotations:
-        description: There are less running kubelet jobs than existing nodes in an autoscalable node group for the last 15m.
-        summary: There are less running kubelet jobs than existing nodes in an autoscalable node group for the last 15m.
+        description: There are less running kubelet jobs than existing nodes in an autoscaling enabled node group for the last 15m.
+        summary: There are less running kubelet jobs than existing nodes in an autoscaling enabled node group for the last 15m.
       expr: count((up{job="kubelet", metrics_path="/metrics"} == 1) and on(node) kube_node_labels{label_node_restriction_kubernetes_io_autoscaled_node_type!=""}) < count(kube_node_info and on(node) kube_node_labels{label_node_restriction_kubernetes_io_autoscaled_node_type!=""})
       for: 15m
       labels:
@@ -187,10 +187,10 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
-    - alert: LessKubeletsThanAutoscalableNodes
+    - alert: LessKubeletsThanAutoscaledNodes
       annotations:
-        description: There are less running kubelet jobs than existing nodes in an autoscalable node group for the last 15m.
-        summary: There are less running kubelet jobs than existing nodes in an autoscalable node group for the last 15m.
+        description: There are less running kubelet jobs than existing nodes in an autoscaling enabled group for the last 15m.
+        summary: There are less running kubelet jobs than existing nodes in an autoscaling enabled group for the last 15m.
       expr: count((up{job="kubelet", metrics_path="/metrics"} == 1) and on(node) kube_node_labels{label_node_restriction_kubernetes_io_autoscaled_node_type!=""}) < count(kube_node_info and on(node) kube_node_labels{label_node_restriction_kubernetes_io_autoscaled_node_type!=""})
       for: 30m
       labels:
@@ -198,10 +198,10 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
-    - alert: LessKubeletsThanNonautoscalableNodes
+    - alert: LessKubeletsThanNonautoscaledNodes
       annotations:
-        description: There are less running kubelet jobs than existing nodes in a non-autoscalable node group for the last 5m.
-        summary: There are less running kubelet jobs than existing nodes in a non-autoscalable node group for the last 5m.
+        description: There are less running kubelet jobs than existing nodes in a non-autoscaled node group for the last 5m.
+        summary: There are less running kubelet jobs than existing nodes in a non-autoscaled node group for the last 5m.
       expr: count((up{job="kubelet", metrics_path="/metrics"} == 1) unless on(node) kube_node_labels{label_node_restriction_kubernetes_io_autoscaled_node_type!=""}) < count(kube_node_info unless on(node) kube_node_labels{label_node_restriction_kubernetes_io_autoscaled_node_type!=""})
       for: 5m
       labels:
@@ -209,10 +209,10 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
-    - alert: LessKubeletsThanNonautoscalableNodes
+    - alert: LessKubeletsThanNonautoscaledNodes
       annotations:
-        description: There are less running kubelet jobs than existing nodes in a non-autoscalable node group for the last 15m.
-        summary: There are less running kubelet jobs than existing nodes in a non-autoscalable node group for the last 15m.
+        description: There are less running kubelet jobs than existing nodes in a non-autoscaled node group for the last 15m.
+        summary: There are less running kubelet jobs than existing nodes in a non-autoscaled node group for the last 15m.
       expr: count((up{job="kubelet", metrics_path="/metrics"} == 1) unless on(node) kube_node_labels{label_node_restriction_kubernetes_io_autoscaled_node_type!=""}) < count(kube_node_info unless on(node) kube_node_labels{label_node_restriction_kubernetes_io_autoscaled_node_type!=""})
       for: 15m
       labels:
