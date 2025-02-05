@@ -9,7 +9,7 @@ violation[{"msg": msg}] {
 
     object.spec.securityContext.seccompProfile.type == "Localhost"
 
-    msg := sprintf("The %v named <%v> uses Localhost seccompProfile. Elastisys Compliant Kubernetes does not allow the use of Localhost secompProfile.", [object.kind, object.metadata.name])
+    msg := sprintf("The %v named <%v> uses Localhost seccompProfile. Elastisys Welkin® does not allow the use of Localhost secompProfile.", [object.kind, object.metadata.name])
 }
 
 # Get "Pods"
@@ -27,7 +27,7 @@ violation[{"msg": msg}] {
 
     object.spec.template.spec.securityContext.seccompProfile.type == "Localhost"
 
-    msg := sprintf("The %v named <%v> uses Localhost seccompProfile in the pod template. Elastisys Compliant Kubernetes does not allow the use of Localhost secompProfile.", [object.kind, object.metadata.name])
+    msg := sprintf("The %v named <%v> uses Localhost seccompProfile in the pod template. Elastisys Welkin® does not allow the use of Localhost secompProfile.", [object.kind, object.metadata.name])
 }
 
 # Get resources that use pod templates.
@@ -54,7 +54,7 @@ violation[{"msg": msg}] {
 
     object.spec.jobTemplate.spec.template.spec.securityContext.seccompProfile.type == "Localhost"
 
-    msg := sprintf("The %v named <%v> uses Localhost seccompProfile in the pod template. Elastisys Compliant Kubernetes does not allow the use of Localhost secompProfile.", [object.kind, object.metadata.name])
+    msg := sprintf("The %v named <%v> uses Localhost seccompProfile in the pod template. Elastisys Welkin® does not allow the use of Localhost secompProfile.", [object.kind, object.metadata.name])
 }
 
 # Get "CronJobs"
@@ -72,7 +72,7 @@ violation[{"msg": msg}] {
 
     container.securityContext.seccompProfile.type == "Localhost"
 
-    msg := sprintf("The container named <%v> uses Localhost seccompProfile. Elastisys Compliant Kubernetes does not allow the use of Localhost secompProfile.", [container.name])
+    msg := sprintf("The container named <%v> uses Localhost seccompProfile. Elastisys Welkin® does not allow the use of Localhost secompProfile.", [container.name])
 }
 
 # Get containers for "Pods"
@@ -105,7 +105,7 @@ violation[{"msg": msg}] {
 
     container.securityContext.seccompProfile.type == "Localhost"
 
-    msg := sprintf("The container named <%v> uses Localhost seccompProfile. Elastisys Compliant Kubernetes does not allow the use of Localhost secompProfile.", [container.name])
+    msg := sprintf("The container named <%v> uses Localhost seccompProfile. Elastisys Welkin® does not allow the use of Localhost secompProfile.", [container.name])
 }
 
 # Get init containers for "Pods"
@@ -138,7 +138,7 @@ violation[{"msg": msg}] {
 
     container.securityContext.seccompProfile.type == "Localhost"
 
-    msg := sprintf("The container named <%v> uses Localhost seccompProfile. Elastisys Compliant Kubernetes does not allow the use of Localhost secompProfile.", [container.name])
+    msg := sprintf("The container named <%v> uses Localhost seccompProfile. Elastisys Welkin® does not allow the use of Localhost secompProfile.", [container.name])
 }
 
 # Get ephemeral containers for "Pods"

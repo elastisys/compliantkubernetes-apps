@@ -307,7 +307,7 @@ version_get() {
   popd >/dev/null || exit 1
 }
 
-# Check if the config version matches the current CK8S version.
+# Check if the config version matches the current Welkin Apps version.
 # TODO: Simple hack to make sure version matches, we need to have a proper way
 #       of making sure that the version is supported in the future.
 validate_version() {
@@ -328,7 +328,7 @@ validate_version() {
     [ "${version}" != "${ck8s_version}" ]; then
     log_error "ERROR: Version mismatch. Run init to update config."
     log_error "Config version: ${ck8s_version}"
-    log_error "CK8S version: ${version}"
+    log_error "Welkin Apps version: ${version}"
     exit 1
   fi
 }

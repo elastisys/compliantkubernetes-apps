@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# CK8S operator actions.
+# Welkin operator actions.
 
 set -eu
 

@@ -5,13 +5,14 @@ repos:
         name: Avoid old URLs and use "https://elastisys.io/welkin" instead
         entry: "elastisys.io/compliantkubernetes"
         language: pygrep
-        files: ".*[.]md$"
+        types: [text]
+        exclude: ^.pre-commit-config.yaml$
       - id: avoid-old-names
         name: Avoid old names and use use "Welkin" instead
         entry: "(Compliant[ ]Kubernetes|C[kK]8[sS][^_]|Complaint)"
         language: pygrep
-        files: ".*[.]md$"
-        exclude: ^changelog/0.43.md$
+        types: [text]
+        exclude: ^(.pre-commit-config.yaml|changelog/0.43.md|.github/workflows/push-to-ghcr.yml)$
       - id: consistent-trademark
         name: Either use the trademark "Elastisys Welkin®" consistently or "Welkin" on its own
         entry: "(?<!Elastisys )\\bWelkin®"
