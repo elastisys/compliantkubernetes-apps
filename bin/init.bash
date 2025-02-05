@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This script takes care of initializing a CK8S configuration path for apps.
+# This script takes care of initializing a Welkin Apps configuration path.
 # It writes the default configuration files to the config path and generates
 # some defaults where applicable.
 # It's not to be executed on its own but rather via `ck8s init`.
@@ -377,7 +377,7 @@ backup_retention() {
   fi
 }
 
-log_info "Initializing CK8S configuration for $CK8S_ENVIRONMENT_NAME with $CK8S_CLOUD_PROVIDER:$CK8S_K8S_INSTALLER:$CK8S_FLAVOR"
+log_info "Initializing Welkin configuration for $CK8S_ENVIRONMENT_NAME with $CK8S_CLOUD_PROVIDER:$CK8S_K8S_INSTALLER:$CK8S_FLAVOR"
 
 if [ -f "${sops_config}" ]; then
   log_info "SOPS config already exists: ${sops_config}"

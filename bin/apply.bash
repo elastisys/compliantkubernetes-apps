@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This script takes care of deploying Compliant Kubernetes Apps.
+# This script takes care of deploying Welkin Apps.
 # It's not to be executed on its own but rather via 'ck8s apply'.
 
 set -euo pipefail

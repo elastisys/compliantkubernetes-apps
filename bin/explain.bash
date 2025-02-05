@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This script takes care of explaining Compliant Kubernetes Apps config and secrets.
+# This script takes care of explaining Welkin Apps config and secrets.
 # It's not to be executed on its own but rather via 'ck8s explain'.
 
 set -euo pipefail

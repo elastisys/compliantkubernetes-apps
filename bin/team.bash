@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This is an abstraction of SOPS that makes it possible to share CK8S secrets.
+# This is an abstraction of SOPS that makes it possible to share Welkin secrets.
 
 set -eu -o pipefail
 

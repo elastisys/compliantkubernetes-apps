@@ -120,7 +120,7 @@ fetch_oidc_token() {
 
 run_diagnostics() {
   # -- ck8s --
-  echo "Fetching CK8S software versions"
+  echo "Fetching Welkin software versions"
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
   if [ -d "${CK8S_CONFIG_PATH}/capi" ]; then
     # shellcheck disable=SC2002
