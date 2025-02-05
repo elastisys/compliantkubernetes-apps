@@ -45,8 +45,9 @@ backoffLimit: 0
 
 podAnnotations: {}
 
-podSecurityContext: {}
-  # fsGroup: 2000
+podSecurityContext:
+  fsGroup: 1000
+  fsGroupChangePolicy: "OnRootMismatch"
 
 securityContext:
   runAsNonRoot: true
