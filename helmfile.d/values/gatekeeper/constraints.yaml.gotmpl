@@ -19,6 +19,9 @@ preventAccidentalDeletion:
 rejectEmptyDir:
     enable: {{ .Values.opa.rejectEmptyDir.enabled }}
     enforcementAction: {{ .Values.opa.rejectEmptyDir.enforcement }}
+rejectPodWithoutController:
+    enable: {{ .Values.opa.rejectPodWithoutController.enabled }}
+    enforcementAction: {{ .Values.opa.rejectPodWithoutController.enforcement }}
 {{- if eq .Environment.Name "workload_cluster" }}
 allowUserCRDs:
     enable: {{ .Values.gatekeeper.allowUserCRDs.enabled }}
