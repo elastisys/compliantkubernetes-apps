@@ -12,10 +12,10 @@ repos:
         language: pygrep
         files: ".*[.]md$"
         exclude: ^changelog/0.43.md$
-      - id: whole-trademark
-        name: Use Elastisys Welkin® consistently
-        entry: python ./scripts/check-elastisys-welkin.py
-        language: python
+      - id: consistent-trademark
+        name: Either use the trademark "Elastisys Welkin®" consistently or "Welkin" on its own
+        entry: "(?<!Elastisys )\\bWelkin®"
+        language: pygrep
         types: [text]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
