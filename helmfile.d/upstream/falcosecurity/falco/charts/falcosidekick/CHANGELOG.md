@@ -5,6 +5,22 @@ numbering uses [semantic versioning](http://semver.org).
 
 Before release 0.1.20, the helm chart can be found in `falcosidekick` [repository](https://github.com/falcosecurity/falcosidekick/tree/master/deploy/helm/falcosidekick).
 
+## 0.9.5
+
+- Move the `prometheus.io/scrape` annotation to the default values, to allow overrides.
+
+## 0.9.4
+
+- Fix Prometheus metrics names in Prometheus Rule
+
+## 0.9.3
+
+- Add a Grafana dashboard for the Prometheus metrics
+
+## 0.9.2
+
+- Add new dashboard with Loki
+
 ## 0.9.1
 
 - Ugrade to Falcosidekick 2.30.0
