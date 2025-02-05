@@ -25,6 +25,10 @@ falco:
     - /etc/falco/falco_rules.local.yaml
     - /etc/falco/rules.d
 
+  container_engines:
+    cri:
+      enabled: true
+
 metrics:
   enabled: true
   include_empty_values: true

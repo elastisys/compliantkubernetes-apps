@@ -115,6 +115,23 @@ prometheusRules:
       threshold: 0
     additionalAlerts: {}
 
+# -- grafana contains the configuration related to grafana.
+grafana:
+  # -- dashboards contains configuration for grafana dashboards.
+  dashboards:
+    # -- enabled specifies whether the dashboards should be deployed.
+    enabled: false
+    # --configmaps to be deployed that contain a grafana dashboard.
+    configMaps:
+      # -- falcosidekick contains the configuration for falcosidekick's dashboard.
+      falcosidekick:
+        # -- name specifies the name for the configmap.
+        name: falcosidekick-grafana-dashboard
+        # -- namespace specifies the namespace for the configmap.
+        namespace: ""
+        # -- folder where the dashboard is stored by grafana.
+        folder: ""
+
 config:
   # -- Existing secret with configuration
   existingSecret: ""
@@ -368,6 +385,18 @@ config:
     mutualtls: false
     # -- check if ssl certificate of the output is valid
     checkcert: true
+    # -- dashboard for Grafana
+    grafanaDashboard:
+      # -- enabled specifies whether this dashboard should be deployed.
+      enabled: true
+      # --configmaps to be deployed that contain a grafana dashboard.
+      configMap:
+        # -- name specifies the name for the configmap.
+        name: falcosidekick-loki-dashboard-grafana
+        # -- namespace specifies the namespace for the configmap.
+        namespace: ""
+        # -- folder where the dashboard is stored by grafana.
+        folder: ""
 
   prometheus:
     # -- comma separated list of fields to use as labels additionally to rule, source, priority, tags and custom_fields
@@ -1089,7 +1118,8 @@ service:
   # -- Service port
   port: 2801
   # -- Service annotations
-  annotations: {}
+  annotations:
+    prometheus.io/scrape: "true"
     # networking.gke.io/load-balancer-type: Internal
 
 ingress:

@@ -3,6 +3,24 @@
 This file documents all notable changes to Falco Helm Chart. The release
 numbering uses [semantic versioning](http://semver.org).
 
+## v4.19.0
+
+* fix falco version to 0.40.0
+
+## v4.18.0
+
+* update the chart for falco 0.40;
+* remove deprecated cli flag `--cri` and use instead the configuration file. More info here: https://github.com/falcosecurity/falco/pull/3329
+* use new falco images, for more info see: https://github.com/falcosecurity/falco/issues/3165
+
+## v4.17.2
+
+* update(falco): add ports definition in falco container spec
+
+## v4.17.1
+
+* docs(falco): update README.md to reflect latest driver configuration and correct broken links
+
 ## v4.17.0
 
 * update(falco): bump k8saudit version to 0.11
@@ -328,7 +346,7 @@ The new chart introduces some breaking changes. For folks upgrading Falco please
 ## v3.3.0
 * Upgrade Falco to 0.35.1. For more info see the release notes: https://github.com/falcosecurity/falco/releases/tag/0.35.1
 * Upgrade falcoctl to 0.5.1. For more info see the release notes: https://github.com/falcosecurity/falcoctl/releases/tag/v0.5.1
-* Introduce least privileged mode in modern ebpf. For more info see: https://falco.org/docs/event-sources/kernel/#least-privileged-mode-2
+* Introduce least privileged mode in modern ebpf. For more info see: https://falco.org/docs/setup/container/#docker-least-privileged-modern-ebpf
 
 ## v3.2.1
 * Set falco.http_output.url to empty string in values.yaml file

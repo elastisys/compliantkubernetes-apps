@@ -53,11 +53,11 @@ Note that **a Falco instance can handle multiple event sources in parallel**. yo
 
 Falco needs a **driver** to analyze the system workload and pass security events to userspace. The supported drivers are:
 
-* [Kernel module](https://falco.org/docs/event-sources/drivers/#kernel-module)
-* [eBPF probe](https://falco.org/docs/event-sources/drivers/#ebpf-probe)
-* [Modern eBPF probe](https://falco.org/docs/event-sources/drivers/#modern-ebpf-probe)
+* [Modern eBPF probe](https://falco.org/docs/concepts/event-sources/kernel/#modern-ebpf-probe)
+* [Kernel module](https://falco.org/docs/concepts/event-sources/kernel/#kernel-module)
+* [Legacy eBPF probe](https://falco.org/docs/concepts/event-sources/kernel/#legacy-ebpf-probe)
 
-The driver should be installed on the node where Falco is running. The _kernel module_ (default option) and the _eBPF probe_ are installed on the node through an *init container* (i.e. `falco-driver-loader`) that tries download a prebuilt driver or build it on-the-fly as a fallback. The _Modern eBPF probe_ doesn't require an init container because it is shipped directly into the Falco binary. However, the _Modern eBPF probe_ requires [recent BPF features](https://falco.org/docs/event-sources/kernel/#modern-ebpf-probe).
+The driver must be loaded on the node where Falco is running. Falco now prefers the **Modern eBPF probe** by default. When using **falcoctl** with `driver.kind=auto`, it will automatically choose the best driver for your system. Specifically, it first attempts to use the Modern eBPF probe (which is shipped directly within the Falco binary) and will fall back to the _kernel module_ or the _original eBPF probe_ if the necessary BPF features are not available.
 
 ##### Pre-built drivers
 
@@ -146,20 +146,24 @@ After the clarification of the different [**event sources**](#falco-event-source
 The chart deploys Falco using a `daemonset` or a `deployment` depending on the **event sources**.
 
 #### Daemonset
-When using the [drivers](#about-the-driver), Falco is deployed as `daemonset`. By using a `daemonset`, k8s assures that a Falco instance will be running in each of our nodes even when we add new nodes to our cluster. So it is the perfect match when we need to monitor all the nodes in our cluster.
+When using the [drivers](#about-the-driver), Falco is typically deployed as a `DaemonSet`. By using a DaemonSet, Kubernetes ensures that a Falco instance is running on each node even as new nodes are added to your cluster. This makes it a perfect fit for monitoring across the entire cluster.
+
+By default, with `driver.kind=auto`, the correct driver will will be automatically selected for each node. This is accomplished through the **driver loader** (implemented by `falcoctl`), which generates a new Falco configuration file and picks the right engine driver (Modern eBPF, kmod, or legacy eBPF) based on the underlying environment. If you prefer to manually force a specific driver, see the other available options below.
 
 **Kernel module**
-To run Falco with the [kernel module](https://falco.org/docs/event-sources/drivers/#kernel-module) you can use the default values of the helm chart:
+
+To run Falco with the [eBPF probe](https://falco.org/docs/concepts/event-sources/kernel/#kernel-module) you just need to set `driver.kind=kmod` as shown in the following snippet:
 
 ```bash
 helm install falco falcosecurity/falco \
     --create-namespace \
     --namespace falco
+    --set driver.kind=kmod
 ```
 
-**eBPF probe**
+**Legacy eBPF probe**
 
-To run Falco with the [eBPF probe](https://falco.org/docs/event-sources/drivers/#ebpf-probe) you just need to set `driver.kind=ebpf` as shown in the following snippet:
+To run Falco with the [eBPF probe](http://falco.org/docs/concepts/event-sources/kernel/#legacy-ebpf-probe) you just need to set `driver.kind=ebpf` as shown in the following snippet:
 
 ```bash
 helm install falco falcosecurity/falco \
@@ -177,9 +181,9 @@ helm install falco falcosecurity/falco \
     -f "path-to-custom-values.yaml-file"
 ```
 
-**modern eBPF probe**
+**Modern eBPF probe**
 
-To run Falco with the [modern eBPF probe](https://falco.org/docs/event-sources/drivers/#modern-ebpf-probe-experimental) you just need to set `driver.kind=modern_bpf` as shown in the following snippet:
+To run Falco with the [modern eBPF probe](https://falco.org/docs/concepts/event-sources/kernel/#modern-ebpf-probe) you just need to set `driver.kind=modern_bpf` as shown in the following snippet:
 
 ```bash
 helm install falco falcosecurity/falco \
@@ -581,7 +585,7 @@ If you use a Proxy in your cluster, the requests between `Falco` and `Falcosidek
 
 ## Configuration
 
-The following table lists the main configurable parameters of the falco chart v4.17.0 and their default values. See [values.yaml](./values.yaml) for full list.
+The following table lists the main configurable parameters of the falco chart v4.19.0 and their default values. See [values.yaml](./values.yaml) for full list.
 
 ## Values
 
@@ -618,7 +622,7 @@ The following table lists the main configurable parameters of the falco chart v4
 | driver.ebpf.bufSizePreset | int | `4` | bufSizePreset determines the size of the shared space between Falco and its drivers. This shared space serves as a temporary storage for syscall events. |
 | driver.ebpf.dropFailedExit | bool | `false` | dropFailedExit if set true drops failed system call exit events before pushing them to userspace. |
 | driver.ebpf.hostNetwork | bool | `false` | Needed to enable eBPF JIT at runtime for performance reasons. Can be skipped if eBPF JIT is enabled from outside the container |
-| driver.ebpf.leastPrivileged | bool | `false` | Constrain Falco with capabilities instead of running a privileged container. Ensure the eBPF driver is enabled (i.e., setting the `driver.kind` option to `ebpf`). Capabilities used: {CAP_SYS_RESOURCE, CAP_SYS_ADMIN, CAP_SYS_PTRACE}. On kernel versions >= 5.8 'CAP_PERFMON' and 'CAP_BPF' could replace 'CAP_SYS_ADMIN' but please pay attention to the 'kernel.perf_event_paranoid' value on your system. Usually 'kernel.perf_event_paranoid>2' means that you cannot use 'CAP_PERFMON' and you should fallback to 'CAP_SYS_ADMIN', but the behavior changes across different distros. Read more on that here: https://falco.org/docs/event-sources/kernel/#least-privileged-mode-1 |
+| driver.ebpf.leastPrivileged | bool | `false` | Constrain Falco with capabilities instead of running a privileged container. Ensure the eBPF driver is enabled (i.e., setting the `driver.kind` option to `ebpf`). Capabilities used: {CAP_SYS_RESOURCE, CAP_SYS_ADMIN, CAP_SYS_PTRACE}. On kernel versions >= 5.8 'CAP_PERFMON' and 'CAP_BPF' could replace 'CAP_SYS_ADMIN' but please pay attention to the 'kernel.perf_event_paranoid' value on your system. Usually 'kernel.perf_event_paranoid>2' means that you cannot use 'CAP_PERFMON' and you should fallback to 'CAP_SYS_ADMIN', but the behavior changes across different distros. Read more on that here: https://falco.org/docs/setup/container/#docker-least-privileged-ebpf-probe |
 | driver.ebpf.path | string | `"${HOME}/.falco/falco-bpf.o"` | path where the eBPF probe is located. It comes handy when the probe have been installed in the nodes using tools other than the init container deployed with the chart. |
 | driver.enabled | bool | `true` | Set it to false if you want to deploy Falco without the drivers. Always set it to false when using Falco with plugins. |
 | driver.gvisor | object | `{"runsc":{"config":"/run/containerd/runsc/config.toml","path":"/home/containerd/usr/local/sbin","root":"/run/containerd/runsc"}}` | Gvisor configuration. Based on your system you need to set the appropriate values. Please, remember to add pod tolerations and affinities in order to schedule the Falco pods in the gVisor enabled nodes. |
@@ -642,7 +646,7 @@ The following table lists the main configurable parameters of the falco chart v4
 | driver.modernEbpf.bufSizePreset | int | `4` | bufSizePreset determines the size of the shared space between Falco and its drivers. This shared space serves as a temporary storage for syscall events. |
 | driver.modernEbpf.cpusForEachBuffer | int | `2` | cpusForEachBuffer is the index that controls how many CPUs to assign to a single syscall buffer. |
 | driver.modernEbpf.dropFailedExit | bool | `false` | dropFailedExit if set true drops failed system call exit events before pushing them to userspace. |
-| driver.modernEbpf.leastPrivileged | bool | `false` | Constrain Falco with capabilities instead of running a privileged container. Ensure the modern bpf driver is enabled (i.e., setting the `driver.kind` option to `modern-bpf`). Capabilities used: {CAP_SYS_RESOURCE, CAP_BPF, CAP_PERFMON, CAP_SYS_PTRACE}. Read more on that here: https://falco.org/docs/event-sources/kernel/#least-privileged-mode-2 |
+| driver.modernEbpf.leastPrivileged | bool | `false` | Constrain Falco with capabilities instead of running a privileged container. Ensure the modern bpf driver is enabled (i.e., setting the `driver.kind` option to `modern-bpf`). Capabilities used: {CAP_SYS_RESOURCE, CAP_BPF, CAP_PERFMON, CAP_SYS_PTRACE}. Read more on that here: https://falco.org/docs/setup/container/#docker-least-privileged-ebpf-probe |
 | extra.args | list | `[]` | Extra command-line arguments. |
 | extra.env | list | `[]` | Extra environment variables that will be pass onto Falco containers. |
 | extra.initContainers | list | `[]` | Additional initContainers for Falco pods. |
@@ -650,6 +654,16 @@ The following table lists the main configurable parameters of the falco chart v4
 | falco.base_syscalls | object | `{"custom_set":[],"repair":false}` | - [Suggestions]  NOTE: setting `base_syscalls.repair: true` automates the following suggestions for you.  These suggestions are subject to change as Falco and its state engine evolve.  For execve* events: Some Falco fields for an execve* syscall are retrieved from the associated `clone`, `clone3`, `fork`, `vfork` syscalls when spawning a new process. The `close` syscall is used to purge file descriptors from Falco's internal thread / process cache table and is necessary for rules relating to file descriptors (e.g. open, openat, openat2, socket, connect, accept, accept4 ... and many more)  Consider enabling the following syscalls in `base_syscalls.custom_set` for process rules: [clone, clone3, fork, vfork, execve, execveat, close]  For networking related events: While you can log `connect` or `accept*` syscalls without the socket syscall, the log will not contain the ip tuples. Additionally, for `listen` and `accept*` syscalls, the `bind` syscall is also necessary.  We recommend the following as the minimum set for networking-related rules: [clone, clone3, fork, vfork, execve, execveat, close, socket, bind, getsockopt]  Lastly, for tracking the correct `uid`, `gid` or `sid`, `pgid` of a process when the running process opens a file or makes a network connection, consider adding the following to the above recommended syscall sets: ... setresuid, setsid, setuid, setgid, setpgid, setresgid, setsid, capset, chdir, chroot, fchdir ... |
 | falco.buffered_outputs | bool | `false` | Enabling buffering for the output queue can offer performance optimization, efficient resource usage, and smoother data flow, resulting in a more reliable output mechanism. By default, buffering is disabled (false). |
 | falco.config_files[0] | string | `"/etc/falco/config.d"` |  |
+| falco.container_engines.bpm.enabled | bool | `false` |  |
+| falco.container_engines.cri.disable_async | bool | `false` |  |
+| falco.container_engines.cri.enabled | bool | `false` |  |
+| falco.container_engines.cri.sockets[0] | string | `"/run/containerd/containerd.sock"` |  |
+| falco.container_engines.cri.sockets[1] | string | `"/run/crio/crio.sock"` |  |
+| falco.container_engines.cri.sockets[2] | string | `"/run/k3s/containerd/containerd.sock"` |  |
+| falco.container_engines.docker.enabled | bool | `false` |  |
+| falco.container_engines.libvirt_lxc.enabled | bool | `false` |  |
+| falco.container_engines.lxc.enabled | bool | `false` |  |
+| falco.container_engines.podman.enabled | bool | `false` |  |
 | falco.falco_libs.thread_table_size | int | `262144` |  |
 | falco.file_output | object | `{"enabled":false,"filename":"./events.txt","keep_alive":false}` | When appending Falco alerts to a file, each new alert will be added to a new line. It's important to note that Falco does not perform log rotation for this file. If the `keep_alive` option is set to `true`, the file will be opened once and continuously written to, else the file will be reopened for each output message. Furthermore, the file will be closed and reopened if Falco receives the SIGUSR1 signal. |
 | falco.grpc | object | `{"bind_address":"unix:///run/falco/falco.sock","enabled":false,"threadiness":0}` | gRPC server using a local unix socket |
@@ -746,7 +760,7 @@ The following table lists the main configurable parameters of the falco chart v4
 | healthChecks.readinessProbe.timeoutSeconds | int | `5` | Number of seconds after which the probe times out. |
 | image.pullPolicy | string | `"IfNotPresent"` | The image pull policy. |
 | image.registry | string | `"docker.io"` | The image registry to pull from. |
-| image.repository | string | `"falcosecurity/falco-no-driver"` | The image repository to pull from |
+| image.repository | string | `"falcosecurity/falco"` | The image repository to pull from |
 | image.tag | string | `""` | The image tag to pull. Overrides the image tag whose default is the chart appVersion. |
 | imagePullSecrets | list | `[]` | Secrets containing credentials when pulling from private/secure registries. |
 | metrics | object | `{"convertMemoryToMB":true,"enabled":false,"includeEmptyValues":false,"interval":"1h","kernelEventCountersEnabled":true,"kernelEventCountersPerCPUEnabled":false,"libbpfStatsEnabled":true,"outputRule":false,"resourceUtilizationEnabled":true,"rulesCountersEnabled":true,"service":{"annotations":{},"create":true,"labels":{},"ports":{"metrics":{"port":8765,"protocol":"TCP","targetPort":8765}},"type":"ClusterIP"},"stateCountersEnabled":true}` | metrics configures Falco to enable and expose the metrics. |

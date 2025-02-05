@@ -75,18 +75,6 @@ spec:
         {{- include "falco.configSyscallSource" . | indent 8 }}
         {{- with .Values.collectors }}
         {{- if .enabled }}
-        {{- if .docker.enabled }}
-        - --cri
-        - /var/run/{{ base .docker.socket }}
-        {{- end }}
-        {{- if .containerd.enabled }}
-        - --cri
-        - /run/containerd/{{ base .containerd.socket }}
-        {{- end }}
-        {{- if .crio.enabled }}
-        - --cri
-        - /run/crio/{{ base .crio.socket }}
-        {{- end }}
         - -pk
         {{- end }}
         {{- end }}
@@ -109,6 +97,10 @@ spec:
       {{- end }}
       tty: {{ .Values.tty }}
       {{- if .Values.falco.webserver.enabled }}
+      ports:
+        - containerPort: {{ .Values.falco.webserver.listen_port }}
+          name: web
+          protocol: TCP
       livenessProbe:
         initialDelaySeconds: {{ .Values.healthChecks.livenessProbe.initialDelaySeconds }}
         timeoutSeconds: {{ .Values.healthChecks.livenessProbe.timeoutSeconds }}
