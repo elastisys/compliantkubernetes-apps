@@ -930,6 +930,10 @@ opa:
   rejectLocalStorageEmptyDir:
     enabled: false
     enforcement: warn
+  ## Enable rule that warns about pods without a controller, which can prevent cluster autoscaler from evicting when scaling down
+  rejectPodWithoutController:
+    enabled: false
+    enforcement: warn
 
 trivy:
   enabled: true
