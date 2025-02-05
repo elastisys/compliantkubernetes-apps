@@ -1,0 +1,21 @@
+{{- if .Values.rejectPodWithoutController.enable -}}
+apiVersion: constraints.gatekeeper.sh/v1alpha1
+kind: K8sRejectPodWithoutController
+metadata:
+  name: elastisys-reject-pod-without-controller
+spec:
+  enforcementAction: {{ .Values.rejectPodWithoutController.enforcementAction }}
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    excludedNamespaces: ["kube-system", "kube-public", "kube-node-lease", "calico-system"]
+    namespaceSelector:
+      matchExpressions:
+      - key: owner
+        operator: NotIn
+        values:
+        - operator
+  parameters:
+    annotation: "cluster-autoscaler.kubernetes.io/safe-to-evict"
+{{- end }}

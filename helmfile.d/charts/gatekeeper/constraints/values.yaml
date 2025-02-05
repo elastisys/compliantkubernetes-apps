@@ -28,6 +28,9 @@ disallowLocalhostSeccomp:
 rejectLocalStorageEmptyDir:
     enable: false
     enforcementAction: warn
+rejectPodWithoutController:
+    enable: false
+    enforcementAction: warn
 
 imageRegistryURL: registry.example.com
 

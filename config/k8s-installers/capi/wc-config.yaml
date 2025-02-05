@@ -2,3 +2,6 @@ opa:
   rejectLocalStorageEmptyDir:
     # In cluster api cluster autoscaler is regularly enabled, which is when we want to have this enabled
     enabled: true
+  rejectPodWithoutController:
+    # In cluster api cluster autoscaler is regularly enabled, which is when we want to have this enabled
+    enabled: true
