@@ -124,6 +124,13 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s update-ips ${CK8S_CLUSTER} apply
     ```
 
+1. Remove falco-exporter config and uninstall it:
+
+    ```bash
+    ./migration/v0.44/prepare/10-remove-falco-exporter-config.sh
+    ./migration/v0.44/apply/20-uninstall-falco-exporter.sh execute
+    ```
+
 ### Apply upgrade - _disruptive_
 
 > _Done during maintenance window._
