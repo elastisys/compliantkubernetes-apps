@@ -7456,6 +7456,13 @@ properties:
                 $ref: '#/$defs/kubernetesTolerations'
               affinity:
                 $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      daemonsets:
+        title: GPU Daemonsets Config
+        description: Configure GPU Daemonsets
+        type: object
+        properties:
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
 additionalProperties:
   title: Additional Properties
   description: Configure additional properties not covered by the schema.
