@@ -2,7 +2,7 @@ package k8srejectpodwithoutcontroller
 
 metadata := input.review.object.metadata
 
-# violation if volume has no medium.
+# violation if pod has no ownerReferences.
 violation[{"msg": msg}] {
     input.review.object.kind == "Pod"
 	missing(metadata, "ownerReferences")
@@ -10,7 +10,7 @@ violation[{"msg": msg}] {
     msg := sprintf("The Pod <%v> does not have any ownerReferences. This can prevent autoscaler from scaling down a node where this is running. Consider running the pod as part of a Deployment (or other controller) or add the annotation %v: \"true\" ",[metadata.name, input.parameters.annotation])
 }
 
-# violation if medium is not Memory.
+# violation if ownerReferences is empty.
 violation[{"msg": msg}] {
     input.review.object.kind == "Pod"
 	metadata.ownerReferences == []

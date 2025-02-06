@@ -26,7 +26,7 @@ generate_pod(annotation, metadata) = obj {
 
 test_with_owner_reference {
     count(k8srejectpodwithoutcontroller.violation) == 0 with input as generate_pod(
-        "cluster-autoscaler.kubernetes.io/safe-to-evict-local-volumes",
+        "cluster-autoscaler.kubernetes.io/safe-to-evict",
 		{
 			"name": "pod-name",
 			"ownerReferences": [
@@ -45,7 +45,7 @@ test_with_owner_reference {
 
 test_without_owner_reference {
     count(k8srejectpodwithoutcontroller.violation) == 1 with input as generate_pod(
-        "cluster-autoscaler.kubernetes.io/safe-to-evict-local-volumes",
+        "cluster-autoscaler.kubernetes.io/safe-to-evict",
 		{
 			"name": "pod-name"
 		}
@@ -54,7 +54,7 @@ test_without_owner_reference {
 
 test_with_empty_owner_reference {
     count(k8srejectpodwithoutcontroller.violation) == 1 with input as generate_pod(
-        "cluster-autoscaler.kubernetes.io/safe-to-evict-local-volumes",
+        "cluster-autoscaler.kubernetes.io/safe-to-evict",
 		{
 			"name": "pod-name",
 			"ownerReferences": []
@@ -64,11 +64,11 @@ test_with_empty_owner_reference {
 
 test_with_annotation {
     count(k8srejectpodwithoutcontroller.violation) == 0 with input as generate_pod(
-        "cluster-autoscaler.kubernetes.io/safe-to-evict-local-volumes",
+        "cluster-autoscaler.kubernetes.io/safe-to-evict",
 		{
 			"name": "pod-name",
 			"annotations": {
-				"cluster-autoscaler.kubernetes.io/safe-to-evict-local-volumes": "true"
+				"cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
 			}
 		}
     )
@@ -76,7 +76,7 @@ test_with_annotation {
 
 test_with_wrong_annotation_key {
     count(k8srejectpodwithoutcontroller.violation) == 1 with input as generate_pod(
-        "cluster-autoscaler.kubernetes.io/safe-to-evict-local-volumes",
+        "cluster-autoscaler.kubernetes.io/safe-to-evict",
 		{
 			"name": "pod-name",
 			"annotations": {
@@ -88,11 +88,11 @@ test_with_wrong_annotation_key {
 
 test_with_wrong_annotation_value {
     count(k8srejectpodwithoutcontroller.violation) == 1 with input as generate_pod(
-        "cluster-autoscaler.kubernetes.io/safe-to-evict-local-volumes",
+        "cluster-autoscaler.kubernetes.io/safe-to-evict",
 		{
 			"name": "pod-name",
 			"annotations": {
-				"cluster-autoscaler.kubernetes.io/safe-to-evict-local-volumes": "wrong"
+				"cluster-autoscaler.kubernetes.io/safe-to-evict": "wrong"
 			}
 		}
     )
