@@ -52,7 +52,7 @@ fi
 "${here}/.././bin/ck8s" ops helmfile wc -l app!=cert-manager -l app!=admin-rbac destroy
 
 # Clean up namespaces and any other resources left behind by the apps
-"${here}/.././bin/ck8s" ops kubectl wc delete ns alertmanager falco fluentd-system fluentd gatekeeper-system hnc-system ingress-nginx monitoring velero kured
+"${here}/.././bin/ck8s" ops kubectl wc delete ns alertmanager falco fluentd-system fluentd gatekeeper-system gpu-operator hnc-system ingress-nginx monitoring velero kured
 
 # Clean up any leftover challenges
 mapfile -t CHALLENGES < <(
