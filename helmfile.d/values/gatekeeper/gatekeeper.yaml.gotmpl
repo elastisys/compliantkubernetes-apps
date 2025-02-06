@@ -6,8 +6,6 @@ validatingWebhookExemptNamespacesLabels:
   - kube-public
   - kube-node-lease
   - calico-system
-  - fluentd
-  - fluentd-system
 mutatingWebhookFailurePolicy: Fail
 mutatingWebhookTimeoutSeconds: {{ .Values.opa.mutatingWebhookTimeoutSeconds }}
 mutatingWebhookExemptNamespacesLabels:
@@ -16,8 +14,6 @@ mutatingWebhookExemptNamespacesLabels:
   - kube-public
   - kube-node-lease
   - calico-system
-  - fluentd
-  - fluentd-system
 
 validatingWebhookCustomRules:
   - apiGroups:

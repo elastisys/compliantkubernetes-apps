@@ -25,6 +25,13 @@ constraints:
       mutation:
         dropAllCapabilities: false
 
+    aggregator:
+      podSelectorLabels:
+        app.kubernetes.io/instance: fluentd-aggregator
+      allow:
+        runAsUser:
+          rule: RunAsAny
+
     {{- if eq .Environment.Name "service_cluster" }}
     log-manager:
       podSelectorLabels:
