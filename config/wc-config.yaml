@@ -371,9 +371,10 @@ gpu:
     worker:
       resources: {}
       tolerations:
-        - key: nvidia.com/gpu
-          operator: Exists
-          effect: NoSchedule
+        - key: "elastisys.io/node-type"
+          operator: "Equal"
+          value: "gpu"
+          effect: "NoSchedule"
       affinity: {}
     master:
       resources: {}
