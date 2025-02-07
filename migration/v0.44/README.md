@@ -109,6 +109,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
+1. Because `harbor.core.replicas` was previously used by the jobservice component any nondefault value for it will be copied to `harbor.jobservice.replicas`:
+
+    ```bash
+    ./migration/v0.44/prepare/20-jobservice-replicas.sh
+    ```
+
 1. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.

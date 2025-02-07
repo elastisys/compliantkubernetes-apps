@@ -2075,6 +2075,12 @@ properties:
               default: file
               type: string
             type: array
+          replicas:
+            title: Jobservice replication
+            description: |-
+              Number of Jobservice pods
+            default: 1
+            type: number
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
           scanDataExports:
