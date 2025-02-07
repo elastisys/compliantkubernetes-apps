@@ -137,7 +137,13 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 1. Upgrade kube-prometheus-stack:
 
     ```bash
-    ./migration/v0.43/apply/10-kube-prometheus-stack.sh
+    ./migration/v0.44/apply/10-kube-prometheus-stack.sh
+    ```
+
+1. Migrate gpu-operator namespace if it exists:
+
+    ```bash
+    ./migration/v0.44/apply/20-migrate-gpu-operator-ns.sh
     ```
 
 1. Upgrade applications:
