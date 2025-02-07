@@ -265,6 +265,7 @@ harbor:
     scanDataExports:
       persistentVolumeClaim:
         size: 1Gi
+    replicas: 1
     resources:
       requests:
         cpu: 50m

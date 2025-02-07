@@ -125,7 +125,7 @@ core:
   tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
 
 jobservice:
-  replicas:     {{ .Values.harbor.core.replicas }}
+  replicas:     {{ .Values.harbor.jobservice.replicas }}
   secret:       {{ .Values.harbor.jobserviceSecret }}
   resources:    {{- toYaml .Values.harbor.jobservice.resources | nindent 4 }}
   nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
