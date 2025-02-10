@@ -54,15 +54,9 @@ prepare() {
 
   # Create a configmap. This fails if done twice.
   if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
-    if [[ "${3:-}" == "--force" ]]; then
-      kubectl_do sc delete configmap -n kube-system apps-upgrade >/dev/null 2>/dev/null
-    fi
     record_migration_prepare_begin sc
   fi
   if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
-    if [[ "${3:-}" == "--force" ]]; then
-      kubectl_do sc delete configmap -n kube-system apps-upgrade >/dev/null 2>/dev/null
-    fi
     record_migration_prepare_begin wc
   fi
 
