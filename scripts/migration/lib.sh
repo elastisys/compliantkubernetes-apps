@@ -254,8 +254,8 @@ check_config() {
 
 # usage: check_version <sc|wc> <prepare|apply>
 check_version() {
-  if [[ ! "${1:-}" =~ ^(sc|wc)$ ]] || [[ ! "${2:-}" =~ ^(prepare|apply)$ ]]; then
-    log_fatal "usage: check_version <sc|wc> <prepare|apply>"
+  if [[ ! "${1:-}" =~ ^(sc|wc)$ ]] || [[ ! "${2:-}" =~ ^(prepare|apply|unlock)$ ]]; then
+    log_fatal "usage: check_version <sc|wc> <prepare|apply|unlock>"
   elif [ -z "${CK8S_TARGET_VERSION:-}" ]; then
     log_fatal "error: \"CK8S_TARGET_VERSION\" is unset"
   fi
