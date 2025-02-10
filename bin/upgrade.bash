@@ -219,4 +219,14 @@ main() {
   log_info "${action} complete"
 }
 
+unlock() {
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
+    unlock_migration "sc"
+  fi
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
+    unlock_migration "wc"
+  fi
+  log_info "Cluster migration unlocked. You can now retry the migration"
+}
+
 main "${@}"
