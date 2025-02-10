@@ -36,7 +36,7 @@ usage() {
   echo "  upgrade <wc|sc|both> <vX.Y> apply               runs all apply steps upgrading the environment" 1>&2
   echo "  upgrade <wc|sc|both> <vX.Y> prepare [--force]   runs all prepare steps upgrading the configuration" 1>&2
   echo "  validate <wc|sc>                                validates config files" 1>&2
-  echo "  version <wc|sc>                                 shows apps version" 1>&2
+  echo "  version <all|both|config|sc|wc>                 shows apps version" 1>&2
   exit 1
 }
 
@@ -154,12 +154,20 @@ diagnostics)
   shift
   "${here}/diagnostics.bash" "${@}"
   ;;
-version)
+version) # all|both|sc|wc
   shift
-  case "${1:-both}" in
+  case "${1:-all}" in
+    all)
+    log_info "config version:" "$(yq4 '.global.ck8sVersion' "${CK8S_CONFIG_PATH}/common-config.yaml")"
+    log_info "sc version:" "$(get_version "sc")"
+    log_info "wc version:" "$(get_version "wc")"
+    ;;
   both)
     log_info "sc version:" "$(get_version "sc")"
     log_info "wc version:" "$(get_version "wc")"
+    ;;
+  config)
+    log_info "config version:" "$(yq4 '.global.ck8sVersion' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")"
     ;;
   sc | wc)
     log_info "${1} version:" "$(get_version "${1}")"
