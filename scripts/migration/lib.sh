@@ -381,6 +381,10 @@ get_apps_version() {
   kubectl_do "${1}" get cm -n kube-system apps-meta -o jsonpath --template="{.data.version}"
 }
 
+unlock_migration() {
+  kubectl_do "${1}" delete configmap -n kube-system apps-upgrade >/dev/null
+}
+
 # Usage: record_migration_prepare_begin sc|wc
 record_migration_prepare_begin() {
   # This ConfigMap should only exist while doing an upgrade.
