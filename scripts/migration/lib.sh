@@ -407,7 +407,7 @@ record_migration_prepare_done() {
     yq4 --exit-status 'select(.data.prepare == strenv(CK8S_TARGET_VERSION)) |
       .data.prepared = strenv(CK8S_TARGET_VERSION) |
       del(.data.last_prepare_step)' |
-    kubectl_do "${1}" replace -f - >/dev/null then
+    kubectl_do "${1}" replace -f - >/dev/null; then
     return 0
   else
     log_fatal "could not mark preparation as completed in ${1}"
