@@ -17,7 +17,7 @@ spec:
   groups:
   - name: harbor
     rules:
-    - alert: 'Harbor Core Is Down'
+    - alert: HarborCoreDown
       expr: |
         harbor_up{component="core"} == 0
       for: 5m
@@ -25,8 +25,9 @@ spec:
         severity: critical
       annotations:
         description: Harbor Core Is Down
+        runbook_url: {{ .Values.runbookUrls.harbor.HarborCoreDown }}
     {{- if eq .Values.harbor.database.type "internal" }}
-    - alert: 'Harbor Database Is Down'
+    - alert: HarborDatabaseDown
       expr: |
         harbor_up{component="database"} == 0
       for: 5m
@@ -34,8 +35,9 @@ spec:
         severity: critical
       annotations:
         description: Harbor Database Is Down
+        runbook_url: {{ .Values.runbookUrls.harbor.HarborDatabaseDown }}
     {{- end }}
-    - alert: 'Harbor Registry Is Down'
+    - alert: HarborRegistryDown
       expr: |
         harbor_up{component="registry"} == 0
       for: 5m
@@ -43,8 +45,9 @@ spec:
         severity: critical
       annotations:
         description: Harbor Registry Is Down
+        runbook_url: {{ .Values.runbookUrls.harbor.HarborRegistryDown }}
     {{- if eq .Values.harbor.redis.type "internal" }}
-    - alert: 'Harbor Redis Is Down'
+    - alert: HarborRedisDown
       expr: |
         harbor_up{component="redis"} == 0
       for: 5m
@@ -52,8 +55,9 @@ spec:
         severity: critical
       annotations:
         description: Harbor Redis Is Down
+        runbook_url: {{ .Values.runbookUrls.harbor.HarborRedisDown }}
     {{- end }}
-    - alert: 'Harbor Trivy Is Down'
+    - alert: HarborTrivyDown
       expr: |
         harbor_up{component="trivy"} == 0
       for: 5m
@@ -61,7 +65,8 @@ spec:
         severity: critical
       annotations:
         description: Harbor Trivy Is Down
-    - alert: 'Harbor JobService Is Down'
+        runbook_url: {{ .Values.runbookUrls.harbor.HarborTrivyDown }}
+    - alert: HarborJobServiceDown
       expr: |
         harbor_up{component="jobservice"} == 0
       for: 5m
@@ -69,7 +74,8 @@ spec:
         severity: critical
       annotations:
         description: Harbor JobService Is Down
-    - alert: 'Harbor storage Usage Is Above the Limit'
+        runbook_url: {{ .Values.runbookUrls.harbor.HarborJobServiceDown }}
+    - alert: HarborStorageUsageAboveLimit
       expr: |
         sum(harbor_project_quota_usage_byte) / (1024^3) > {{ .Values.harbor.alerts.maxTotalStorageUsedGB }}
       for: 5m
@@ -77,7 +83,8 @@ spec:
         severity: medium
       annotations:
         description: Total used storage for Harbor is above the limit of {{ .Values.harbor.alerts.maxTotalStorageUsedGB }}GB
-    - alert: 'Harbor p99 latency is higher than 10 seconds'
+        runbook_url: {{ .Values.runbookUrls.harbor.HarborStorageUsageAboveLimit }}
+    - alert: HarborP99LatencyHigherThan10Seconds
       expr: |
         histogram_quantile(0.99,  sum  (rate(registry_http_request_duration_seconds_bucket[30m]) ) by (le)) > 10
       for: 5m
@@ -85,7 +92,8 @@ spec:
         severity: low
       annotations:
         description: Harbor p99 latency is higher than 10 seconds
-    - alert: 'Harbor Error Rate is High'
+        runbook_url: {{ .Values.runbookUrls.harbor.HarborP99LatencyHigherThan10Seconds }}
+    - alert: HarborErrorRateHigh
       expr: |
         sum(rate(registry_http_requests_total{code=~"4..|5.."}[5m]))/sum(rate(registry_http_requests_total[5m])) > 0.15
       for: 5m
@@ -93,7 +101,8 @@ spec:
         severity: low
       annotations:
         description: Harbor Error Rate is High
-    - alert: 'Harbor Total Number of Artifacts is above the limit'
+        runbook_url: {{ .Values.runbookUrls.harbor.HarborErrorRateHigh }}
+    - alert: HarborTotalNumberOfArtifactsAboveLimit
       expr: |
         sum(harbor_project_artifact_total) > {{ .Values.harbor.alerts.maxTotalArtifacts }}
       for: 5m
@@ -101,4 +110,5 @@ spec:
         severity: low
       annotations:
         description: Total number of artifacts is above the limit of {{ .Values.harbor.alerts.maxTotalArtifacts }}
+        runbook_url: {{ .Values.runbookUrls.harbor.HarborTotalNumberOfArtifactsAboveLimit }}
 {{- end }}

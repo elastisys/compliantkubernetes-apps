@@ -21,6 +21,7 @@ spec:
     - alert: S3BucketSizeOver{{.Values.s3BucketAlerts.size.percent}}Percent
       annotations:
         message: Over {{.Values.s3BucketAlerts.size.percent}} percent of the total s3bucket size limit is used in bucket {{`{{ $labels.bucket }}`}}.
+        runbook_url: {{ .Values.runbookUrls.dailyChecks.S3BucketSizeOverXPercent }}
       expr: |-
         (
           sum(s3_objects_size_sum_bytes{bucket!~"{{ join "|" .Values.s3BucketAlerts.exclude }}"}) by (bucket) >= ({{ .Values.s3BucketAlerts.size.sizeQuotaGB }} * (1024^3)) * ({{ .Values.s3BucketAlerts.size.percent }} / 100)
@@ -33,6 +34,7 @@ spec:
     - alert: S3BucketsTotalSizeOver{{.Values.s3BucketAlerts.totalSize.percent}}Percent
       annotations:
         message: Over {{.Values.s3BucketAlerts.totalSize.percent}} percent for the total size of all s3 buckets.
+        runbook_url: {{ .Values.runbookUrls.dailyChecks.S3BucketsTotalSizeOverXPercent }}
       expr: |-
         (
           sum(max_over_time(s3_objects_size_sum_bytes[1h])) >= ({{ .Values.s3BucketAlerts.totalSize.sizeQuotaGB }} * (1024^3)) * ({{ .Values.s3BucketAlerts.totalSize.percent }} / 100)
@@ -45,6 +47,7 @@ spec:
     - alert: S3BucketObjectsOver{{.Values.s3BucketAlerts.objects.percent}}Percent
       annotations:
         message: Over {{.Values.s3BucketAlerts.objects.percent}} percent of the total s3bucket object limit is used in bucket {{`{{ $labels.bucket }}`}}.
+        runbook_url: {{ .Values.runbookUrls.dailyChecks.S3BucketObjectsOverXPercent }}
       expr: |-
         (
           sum(s3_objects{bucket!~"{{ join "|" .Values.s3BucketAlerts.exclude }}"}) by (bucket) > {{ .Values.s3BucketAlerts.objects.count }} * ({{ .Values.s3BucketAlerts.objects.percent }} / 100)
@@ -56,6 +59,7 @@ spec:
     - alert: Bucket36hActivityCheck
       annotations:
         message: The bucket {{`{{ $labels.bucket }}`}} haven't had any activity in 36h hours.
+        runbook_url: {{ .Values.runbookUrls.dailyChecks.Bucket36hActivityCheck }}
       expr: |-
         (
           sum(time() - s3_last_modified_object_date{bucket!~"{{- join "|" .Values.s3BucketAlerts.exclude }}"}) by (bucket) / 3600 > 36

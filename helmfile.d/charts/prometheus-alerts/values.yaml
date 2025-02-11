@@ -81,7 +81,6 @@ diskAlerts:
 
 defaultRules:
   create: true
-  runbookUrl: "https://runbooks.prometheus-operator.dev/runbooks/"
   ## Any labels to add to the alert rules
   # alertLabels:
   #   key: value
@@ -166,3 +165,36 @@ harbor:
   alerts:
     maxTotalStorageUsedGB: 500
     maxTotalArtifacts: 1000
+
+runbookUrls:
+  alertmanager: {}
+  backupStatus: {}
+  blackbox: {}
+  certManager: {}
+  clusterApi: {}
+  clusterCapacityManagement: {}
+  configReloaders: {}
+  coreDns: {}
+  dailyChecks: {}
+  diskPerf: {}
+  falco: {}
+  fluentd: {}
+  general: {}
+  harbor: {}
+  hnc: {}
+  kubeStateMetrics: {}
+  kubernetesApps: {}
+  kubernetesResources: {}
+  kubernetesStorage: {}
+  kubernetesSystem: {}
+  kured: {}
+  missingMetrics: {}
+  nodeExporter: {}
+  nodeNetwork: {}
+  opensearch: {}
+  openstack: {}
+  packetsDropped: {}
+  prometheusOperator: {}
+  prometheus: {}
+  thanos: {}
+  webhook: {}

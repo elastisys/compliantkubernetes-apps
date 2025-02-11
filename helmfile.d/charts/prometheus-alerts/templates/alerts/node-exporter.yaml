@@ -21,7 +21,7 @@ spec:
     - alert: NodeFilesystemAlmostOutOfSpace
       annotations:
         description: Filesystem on {{`{{`}} $labels.device {{`}}`}} at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available space left.
-        runbook_url: {{ $.Values.defaultRules.runbookUrl }}node/nodefilesystemalmostoutofspace
+        runbook_url: {{ $.Values.runbookUrls.nodeExporter.NodeFilesystemAlmostOutOfSpace }}
         summary: Filesystem has less than {{ .freeSpacePercentage }}% space left.
       expr: |-
         (
@@ -40,7 +40,7 @@ spec:
     - alert: NodeFilesystemSpaceFillingUp
       annotations:
         description: Filesystem on {{`{{`}} $labels.device {{`}}`}} at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available space left and is filling up.
-        runbook_url: {{ $.Values.defaultRules.runbookUrl }}node/nodefilesystemspacefillingup
+        runbook_url: {{ $.Values.runbookUrls.nodeExporter.NodeFilesystemSpaceFillingUp }}
         summary: Filesystem is predicted to run out of space within the next {{ .hours }} hours.
       expr: |-
         (
@@ -61,7 +61,7 @@ spec:
     - alert: NodeFilesystemAlmostOutOfSpace
       annotations:
         description: Filesystem on {{`{{`}} $labels.device {{`}}`}} at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available inodes left.
-        runbook_url: {{ $.Values.defaultRules.runbookUrl }}node/nodefilesystemalmostoutoffiles
+        runbook_url: {{ $.Values.runbookUrls.nodeExporter.NodeFilesystemAlmostOutOfSpace }}
         summary: Filesystem has less than {{ .freeSpacePercentage }}% inodes left.
       expr: |-
         (
@@ -80,7 +80,7 @@ spec:
     - alert: NodeFilesystemSpaceFillingUp
       annotations:
         description: Filesystem on {{`{{`}} $labels.device {{`}}`}} at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available inodes left and is filling up fast.
-        runbook_url: {{ $.Values.defaultRules.runbookUrl }}node/nodefilesystemfilesfillingup
+        runbook_url: {{ $.Values.runbookUrls.nodeExporter.NodeFilesystemSpaceFillingUp }}
         summary: Filesystem is predicted to run out of inodes within the next {{ .hours }} hours.
       expr: |-
         (
@@ -100,7 +100,7 @@ spec:
     - alert: NodeNetworkReceiveErrs
       annotations:
         description: '{{`{{`}} $labels.instance {{`}}`}} interface {{`{{`}} $labels.device {{`}}`}} has encountered {{`{{`}} printf "%.0f" $value {{`}}`}} receive errors in the last two minutes.'
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}node/nodenetworkreceiveerrs
+        runbook_url: {{ $.Values.runbookUrls.nodeExporter.NodeNetworkReceiveErrs }}
         summary: Network interface is reporting many receive errors.
       expr: rate(node_network_receive_errs_total[2m]) / rate(node_network_receive_packets_total[2m]) > 0.01
       for: 1h
@@ -112,7 +112,7 @@ spec:
     - alert: NodeNetworkTransmitErrs
       annotations:
         description: '{{`{{`}} $labels.instance {{`}}`}} interface {{`{{`}} $labels.device {{`}}`}} has encountered {{`{{`}} printf "%.0f" $value {{`}}`}} transmit errors in the last two minutes.'
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}node/nodenetworktransmiterrs
+        runbook_url: {{ $.Values.runbookUrls.nodeExporter.NodeNetworkTransmitErrs }}
         summary: Network interface is reporting many transmit errors.
       expr: rate(node_network_transmit_errs_total[2m]) / rate(node_network_transmit_packets_total[2m]) > 0.01
       for: 1h
@@ -124,7 +124,7 @@ spec:
     - alert: NodeHighNumberConntrackEntriesUsed
       annotations:
         description: '{{`{{`}} $value | humanizePercentage {{`}}`}} of conntrack entries are used.'
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}node/nodehighnumberconntrackentriesused
+        runbook_url: {{ $.Values.runbookUrls.nodeExporter.NodeHighNumberConntrackEntriesUsed }}
         summary: Number of conntrack are getting close to the limit.
       expr: (node_nf_conntrack_entries / node_nf_conntrack_entries_limit) > 0.75
       labels:
@@ -135,7 +135,7 @@ spec:
     - alert: NodeTextFileCollectorScrapeError
       annotations:
         description: Node Exporter text file collector failed to scrape.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}node/nodetextfilecollectorscrapeerror
+        runbook_url: {{ $.Values.runbookUrls.nodeExporter.NodeTextFileCollectorScrapeError }}
         summary: Node Exporter text file collector failed to scrape.
       expr: node_textfile_scrape_error{job="node-exporter"} == 1
       labels:
@@ -146,7 +146,7 @@ spec:
     - alert: NodeClockSkewDetected
       annotations:
         description: Clock on {{`{{`}} $labels.instance {{`}}`}} is out of sync by more than 300s. Ensure NTP is configured correctly on this host.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}node/nodeclockskewdetected
+        runbook_url: {{ $.Values.runbookUrls.nodeExporter.NodeClockSkewDetected }}
         summary: Clock skew detected.
       expr: |-
         (
@@ -169,7 +169,7 @@ spec:
     - alert: NodeClockNotSynchronising
       annotations:
         description: Clock on {{`{{`}} $labels.instance {{`}}`}} is not synchronising. Ensure NTP is configured on this host.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}node/nodeclocknotsynchronising
+        runbook_url: {{ $.Values.runbookUrls.nodeExporter.NodeClockNotSynchronising }}
         summary: Clock not synchronising.
       expr: |-
         min_over_time(node_timex_sync_status{job="node-exporter"}[5m]) == 0
@@ -184,7 +184,7 @@ spec:
     - alert: NodeFileDescriptorLimit
       annotations:
         description: File descriptors limit at {{`{{`}} $labels.instance {{`}}`}} is currently at {{`{{`}} printf "%.2f" $value {{`}}`}}%.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}node/nodefiledescriptorlimit
+        runbook_url: {{ $.Values.runbookUrls.nodeExporter.NodeFileDescriptorLimit }}
         summary: Kernel is predicted to exhaust file descriptors limit soon.
       expr: |-
         (
@@ -199,7 +199,7 @@ spec:
     - alert: NodeFileDescriptorLimit
       annotations:
         description: File descriptors limit at {{`{{`}} $labels.instance {{`}}`}} is currently at {{`{{`}} printf "%.2f" $value {{`}}`}}%.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}node/nodefiledescriptorlimit
+        runbook_url: {{ $.Values.runbookUrls.nodeExporter.NodeFileDescriptorLimit }}
         summary: Kernel is predicted to exhaust file descriptors limit soon.
       expr: |-
         (

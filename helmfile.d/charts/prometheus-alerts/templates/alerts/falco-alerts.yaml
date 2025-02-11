@@ -20,6 +20,7 @@ spec:
     - alert: FalcoAlert
       annotations:
         message: 'Pod: {{`{{ $labels.pod }}`}}, Rule: {{`{{ $labels.rule }}`}}'
+        runbook_url: {{ .Values.runbookUrls.falco.FalcoAlert }}
       expr: |-
         falcosecurity_falcosidekick_falco_events_total != 0
       labels:

@@ -21,6 +21,7 @@ spec:
       annotations:
         description: Number of packets dropped to workload {{ "{{ $labels.exported_pod }}" }} in namespace {{ "{{ $labels.pod_namespace }}" }}, because no policies matched them
         summary: Number of packets dropped to workload in {{ "{{ $labels.cluster }}" }} cluster
+        runbook_url: {{ .Values.runbookUrls.packetsDropped.FrequentPacketsDroppedToWorkload }}
       expr: |
         increase(no_policy_drop_counter{type="tw"}[15m]) > 0
       for: 5m
@@ -33,6 +34,7 @@ spec:
       annotations:
         description: Number of packets dropped to workload {{ "{{ $labels.exported_pod }}" }} in namespace {{ "{{ $labels.pod_namespace }}" }}, because no policies matched them
         summary: Number of packets dropped to workload in {{ "{{ $labels.cluster }}" }} cluster
+        runbook_url: {{ .Values.runbookUrls.packetsDropped.ScarcePacketsDroppedToWorkload }}
       expr: |
         increase(no_policy_drop_counter{type="tw"}[3h]) > 20
       for: 6h
@@ -45,6 +47,7 @@ spec:
       annotations:
         description: Number of packets dropped from workload {{ "{{ $labels.exported_pod }}" }} in namespace {{ "{{ $labels.pod_namespace }}" }}, because no policies matched them
         summary: Number of packets dropped from workload in {{ "{{ $labels.cluster }}" }} cluster
+        runbook_url: {{ .Values.runbookUrls.packetsDropped.FrequentPacketsDroppedFromWorkload }}
       expr: |
         increase(no_policy_drop_counter{type="fw"}[15m]) > 0
       for: 5m
@@ -57,6 +60,7 @@ spec:
       annotations:
         description: Number of packets dropped from workload {{ "{{ $labels.exported_pod }}" }} in namespace {{ "{{ $labels.pod_namespace }}" }}, because no policies matched them
         summary: Number of packets dropped from workload in {{ "{{ $labels.cluster }}" }} cluster
+        runbook_url: {{ .Values.runbookUrls.packetsDropped.ScarcePacketsDroppedFromWorkload }}
       expr: |
         increase(no_policy_drop_counter{type="fw"}[3h]) > 20
       for: 6h

@@ -3,9 +3,10 @@
     - alert: HierarchicalNamespaceControllerNamespaceCondition
       annotations:
         description: |
-          The Hierarchical Namespace Controller is reporting `{{ $value }}` Namespace condition(s) `{{ $labels.Condition }}` due to `{{ $labels.Reason }}` for longer than one minute.
+          The Hierarchical Namespace Controller is reporting {{"`{{ $value }}`"}} Namespace condition(s) {{"`{{ $labels.Condition }}`"}} due to {{"`{{ $labels.Reason }}`"}} for longer than one minute.
         summary: |
-          The Hierarchical Namespace Controller is reporting `{{ $value }}` Namespace condition(s) `{{ $labels.Condition }}` due to `{{ $labels.Reason }}` for longer than one minute.
+          The Hierarchical Namespace Controller is reporting {{"`{{ $value }}`"}} Namespace condition(s) {{"`{{ $labels.Condition }}`"}} due to {{"`{{ $labels.Reason }}`"}} for longer than one minute.
+        runbook_url: {{ .Values.runbookUrls.hnc.HierarchicalNamespaceControllerNamespaceCondition }}
       labels:
         rulesgroup: hnc
         severity: warning

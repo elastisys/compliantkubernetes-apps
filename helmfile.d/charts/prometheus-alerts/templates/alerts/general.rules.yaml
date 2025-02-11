@@ -20,7 +20,7 @@ spec:
     - alert: TargetDown
       annotations:
         description: '{{`{{`}} printf "%.4g" $value {{`}}`}}% of the {{`{{`}} $labels.job {{`}}`}}/{{`{{`}} $labels.service {{`}}`}} targets in {{`{{`}} $labels.namespace {{`}}`}} namespace are down.'
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}general/targetdown
+        runbook_url: {{ .Values.runbookUrls.general.TargetDown }}
         summary: One or more targets are unreachable.
       expr: 100 * (count(up == 0) by (cluster, namespace, service, job) / count(up) by (cluster, namespace, service, job)) > 10
       for: 10m
@@ -42,7 +42,7 @@ spec:
           "DeadMansSnitch" integration in PagerDuty.
 
           '
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}general/watchdog
+        runbook_url: {{ .Values.runbookUrls.general.Watchdog }}
         summary: An alert that should always be firing to certify that Alertmanager is working properly.
       expr: vector(1)
       labels:

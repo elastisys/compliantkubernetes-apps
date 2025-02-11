@@ -17,7 +17,7 @@ spec:
   groups:
   - name: kured
     rules:
-    - alert: 'Kured Failed Node Reboot'
+    - alert: KuredFailedNodeReboot
       expr: |
         min_over_time((sum(kured_reboot_required) by (node))[30d:1m]) > 0 and on (node) kube_node_info
       for: 5m
@@ -25,4 +25,5 @@ spec:
         severity: warning
       annotations:
         description: "Kured has failed with required reboot of node {{`{{ $labels.node }}`}} over 30 days."
+        runbook_url: {{ .Values.runbookUrls.kured.KuredFailedNodeReboot }}
 {{- end }}

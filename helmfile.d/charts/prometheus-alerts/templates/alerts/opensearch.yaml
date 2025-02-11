@@ -25,15 +25,16 @@ spec:
       annotations:
         description: There are only {{`{{ $value }}`}}  OpenSearch nodes running
         summary: OpenSearch running on less than {{ .Values.osNodeCount }} nodes
+        runbook_url: {{ .Values.runbookUrls.opensearch.OpenSearchTooFewNodesRunning }}
     - alert: OpenSearchHeapTooHigh
-      expr: elasticsearch_jvm_memory_used_bytes{namespace="opensearch-system",area="heap"} / elasticsearch_jvm_memory_max_bytes{namespace="opensearch-system",area="heap"}
-        > 0.9
+      expr: elasticsearch_jvm_memory_used_bytes{namespace="opensearch-system",area="heap"} / elasticsearch_jvm_memory_max_bytes{namespace="opensearch-system",area="heap"} > 0.9
       for: 15m
       labels:
         severity: critical
       annotations:
         description: The heap usage is over 90% for 15m
         summary: OpenSearch node {{`{{ $labels.node}}`}} heap usage is high
+        runbook_url: {{ .Values.runbookUrls.opensearch.OpenSearchHeapTooHigh }}
     - alert: OpenSearchFieldLimit
       expr: (sum(max_over_time(elasticsearch_indices_mappings_stats_fields{namespace="opensearch-system"}[5m])) by (index) / sum(max_over_time(elasticsearch_indices_settings_total_fields{namespace="opensearch-system"}[5m])) by (index)) * 100 > 80
       for: 15m
@@ -42,6 +43,7 @@ spec:
       annotations:
         description: Index {{`{{ $labels.index }}`}} is using {{`{{ $value }}`}} percent of max field limit
         summary: Index {{`{{ $labels.index }}`}} is using {{`{{ $value }}`}} percent of max field limit
+        runbook_url: {{ .Values.runbookUrls.opensearch.OpenSearchFieldLimit }}
     - alert: OpenSearchFieldLimit
       expr: (sum(max_over_time(elasticsearch_indices_mappings_stats_fields{namespace="opensearch-system"}[5m])) by (index) / sum(max_over_time(elasticsearch_indices_settings_total_fields{namespace="opensearch-system"}[5m])) by (index)) * 100 > 95
       for: 15m
@@ -50,6 +52,7 @@ spec:
       annotations:
         description: Index {{`{{ $labels.index }}`}} is using {{`{{ $value }}`}} percent of max field limit
         summary: Index {{`{{ $labels.index }}`}} is using {{`{{ $value }}`}} percent of max field limit
+        runbook_url: {{ .Values.runbookUrls.opensearch.OpenSearchFieldLimit }}
     - alert: OpensearchClusterYellow
       expr: elasticsearch_cluster_health_status{namespace="opensearch-system",color="yellow"} == 1
       for: 15m
@@ -58,6 +61,7 @@ spec:
       annotations:
         summary: Opensearch Cluster Yellow (instance {{`{{ $labels.instance }}`}})
         description: Opensearch Cluster is in a Yellow status VALUE = {{`{{ $value }}`}}  LABELS = {{`{{ $labels }}`}}
+        runbook_url: {{ .Values.runbookUrls.opensearch.OpensearchClusterYellow }}
     - alert: OpensearchClusterRed
       expr: elasticsearch_cluster_health_status{namespace="opensearch-system",color="red"} == 1
       for: 15m
@@ -66,6 +70,7 @@ spec:
       annotations:
         summary: Opensearch Cluster Red (instance {{`{{ $labels.instance }}`}})
         description: Opensearch Cluster is in a Red status VALUE = {{`{{ $value }}`}}  LABELS = {{`{{ $labels }}`}}
+        runbook_url: {{ .Values.runbookUrls.opensearch.OpensearchClusterRed }}
     {{- range $prefixes := .Values.osIndexAlerts }}
     - alert: OpenSearch{{ $prefixes.prefix | trimSuffix "-" | title }}IndexSizeOverLimit
       expr: (elasticsearch_indices_store_size_bytes_primary{namespace="opensearch-system", index=~"{{ $prefixes.prefix }}.+"} / (1024 ^ 2) > {{ $prefixes.alertSizeMB }}) * clamp(rate(elasticsearch_indices_docs_primary{namespace="opensearch-system", index=~"{{ $prefixes.prefix }}.+"}[4h]) > 0, 1, 1)
@@ -75,5 +80,6 @@ spec:
       annotations:
         message: Active primary shard size for index {{`{{ $labels.index }}`}} has increased over the limit of {{ $prefixes.alertSizeMB }}MB, current size is {{`{{ $value | printf "%.0f" }}`}}MB
         description: This indicates a problem with index state management preventing the alias to roll over to a new index.
+        runbook_url: {{ $.Values.runbookUrls.opensearch.OpenSearchXIndexSizeOverLimit }}
     {{- end }}
 {{- end }}

@@ -20,7 +20,7 @@ spec:
     - alert: NodeFilesystemSpaceFillingUp
       annotations:
         description: Filesystem on {{`{{`}} $labels.device {{`}}`}} at {{`{{`}} $labels.instance {{`}}`}} has only {{`{{`}} printf "%.2f" $value {{`}}`}}% available space left and is filling up.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}node/nodefilesystemspacefillingup
+        runbook_url: {{ .Values.runbookUrls.clusterCapacityManagement.NodeFilesystemSpaceFillingUp }}
         summary: Filesystem is predicted to run out of space within the next 3 days.
       expr: |-
         (
@@ -37,6 +37,7 @@ spec:
     - alert: PersistentVolume{{.Values.capacityManagementAlertsPersistentVolumeLimit}}PercentInThreeDays
       annotations:
         message: The PersistentVolume claimed by {{`{{ $labels.persistentvolumeclaim }}`}} in Namespace {{`{{ $labels.namespace }}`}} will go over {{.Values.capacityManagementAlertsPersistentVolumeLimit}} in three days.
+        runbook_url: {{ .Values.runbookUrls.clusterCapacityManagement.PersistentVolumeXPercentInThreeDays }}
       expr: predict_linear(kubelet_volume_stats_available_bytes[24h], 3*24*60*60) <= (kubelet_volume_stats_capacity_bytes*(1-{{ .Values.capacityManagementAlertsPersistentVolumeLimit }}/100))
       for: 5m
       labels:
@@ -46,6 +47,7 @@ spec:
     - alert: Memory{{.Values.capacityManagementAlertsUsageLimit}}PercentInThreeDays
       annotations:
         message: Memory usage in Cluster {{`{{ $labels.cluster }}`}} Instance {{`{{ $labels.instance }}`}} is predicted to go over {{.Values.capacityManagementAlertsUsageLimit}}% within the next 3 days at current use rate.
+        runbook_url: {{ .Values.runbookUrls.clusterCapacityManagement.MemoryXPercentInThreeDays }}
       expr: predict_linear(node_memory_MemAvailable_bytes[24h], 3*24*60*60) <= (node_memory_MemTotal_bytes*(1-{{ .Values.capacityManagementAlertsUsageLimit }}/100))
       for: 5m
       labels:
@@ -54,6 +56,7 @@ spec:
     - alert: NodeGroupCPU{{.Values.capacityManagementAlertsNodeGroupCpuLimit24h}}PercentOver24h
       annotations:
         message: CPU usage has been over {{.Values.capacityManagementAlertsNodeGroupCpuLimit24h}}% on average over the span of 24h in the Node Group {{`{{ $labels.label_elastisys_io_node_group }}`}} in Cluster {{`{{ $labels.cluster }}`}}.
+        runbook_url: {{ .Values.runbookUrls.clusterCapacityManagement.NodeGroupCPUXPercentOver24h }}
       expr: avg by (label_elastisys_io_node_group,cluster) (sum by (instance) (rate(node_cpu_seconds_total{mode!='idle',cluster=~".*"}[24h])) / on (instance) instance:node_num_cpu:sum * on (instance) group_left (label_elastisys_io_node_group,cluster) label_replace(kube_node_labels{label_elastisys_io_node_group!=""}, "instance", "$1", "node", "(.*)")) > {{.Values.capacityManagementAlertsNodeGroupCpuLimit24h}}/100
       for: 5m
       labels:
@@ -61,6 +64,7 @@ spec:
     - alert: NodeGroupCPU{{.Values.capacityManagementAlertsNodeGroupCpuLimit1h}}PercentOver1h
       annotations:
         message: CPU usage has been over {{.Values.capacityManagementAlertsNodeGroupCpuLimit1h}}% on average over the span of 1h in the Node Group {{`{{ $labels.label_elastisys_io_node_group }}`}} in Cluster {{`{{ $labels.cluster }}`}}.
+        runbook_url: {{ .Values.runbookUrls.clusterCapacityManagement.NodeGroupCPUXPercentOver1h }}
       expr: avg by (label_elastisys_io_node_group,cluster) (sum by (instance) (rate(node_cpu_seconds_total{mode!='idle',cluster=~".*"}[1h])) / on (instance) instance:node_num_cpu:sum * on (instance) group_left (label_elastisys_io_node_group,cluster) label_replace(kube_node_labels{label_elastisys_io_node_group!=""}, "instance", "$1", "node", "(.*)")) > {{.Values.capacityManagementAlertsNodeGroupCpuLimit1h}}/100
       for: 5m
       labels:
@@ -68,6 +72,7 @@ spec:
     - alert: NodeGroupMemory{{.Values.capacityManagementAlertsNodeGroupMemoryLimit24h}}PercentOver24h
       annotations:
         message: Memory usage has been over {{.Values.capacityManagementAlertsNodeGroupMemoryLimit24h}}% on average over the span of 24h in the Node Group {{`{{ $labels.label_elastisys_io_node_group }}`}} in Cluster {{`{{ $labels.cluster }}`}}.
+        runbook_url: {{ .Values.runbookUrls.clusterCapacityManagement.NodeGroupMemoryXPercentOver24h }}
       expr: avg by (label_elastisys_io_node_group,cluster) ((avg_over_time (instance:node_memory_utilisation:ratio{cluster=~".*"}[24h])) * on (instance) group_left (label_elastisys_io_node_group) label_replace(kube_node_labels{label_elastisys_io_node_group!=""}, "instance", "$1", "node", "(.*)")) > {{.Values.capacityManagementAlertsNodeGroupMemoryLimit24h}}/100
       for: 5m
       labels:
@@ -75,6 +80,7 @@ spec:
     - alert: NodeGroupMemory{{.Values.capacityManagementAlertsNodeGroupMemoryLimit1h}}PercentOver1h
       annotations:
         message: Memory usage has been over {{.Values.capacityManagementAlertsNodeGroupMemoryLimit1h}}% on average over the span of 1h in the Node Group {{`{{ $labels.label_elastisys_io_node_group }}`}} in Cluster {{`{{ $labels.cluster }}`}}.
+        runbook_url: {{ .Values.runbookUrls.clusterCapacityManagement.NodeGroupMemoryXPercentOver1h }}
       expr: avg by (label_elastisys_io_node_group,cluster) ((avg_over_time (instance:node_memory_utilisation:ratio{cluster=~".*"}[1h])) * on (instance) group_left (label_elastisys_io_node_group) label_replace(kube_node_labels{label_elastisys_io_node_group!=""}, "instance", "$1", "node", "(.*)")) > {{.Values.capacityManagementAlertsNodeGroupMemoryLimit1h}}/100
       for: 5m
       labels:
@@ -82,6 +88,7 @@ spec:
     - alert: NodeCPU{{.Values.capacityManagementAlertsNodeCpuLimit1h}}PercentOver1h
       annotations:
         message: CPU usage has been over {{.Values.capacityManagementAlertsNodeCpuLimit1h}}% on average over the span of 1h for the node {{`{{ $labels.instance }}`}} in Cluster {{`{{ $labels.cluster }}`}}.
+        runbook_url: {{ .Values.runbookUrls.clusterCapacityManagement.NodeCPUXPercentOver1h }}
       expr: sum by (instance) (rate(node_cpu_seconds_total{mode!='idle',cluster=~".*"}[1h])) / on (instance) instance:node_num_cpu:sum * on (instance) group_left (label_elastisys_io_node_group,cluster) label_replace(kube_node_labels{label_elastisys_io_node_group!=""}, "instance", "$1", "node", "(.*)") > {{.Values.capacityManagementAlertsNodeCpuLimit1h}}/100
       for: 5m
       labels:
@@ -89,6 +96,7 @@ spec:
     - alert: NodeMemory{{.Values.capacityManagementAlertsNodeMemoryLimit1h}}PercentOver1h
       annotations:
         message: Memory usage has been over {{.Values.capacityManagementAlertsNodeMemoryLimit1h}}% on average over the span of 1h for the Node {{`{{ $labels.instance }}`}} in Cluster {{`{{ $labels.cluster }}`}}.
+        runbook_url: {{ .Values.runbookUrls.clusterCapacityManagement.NodeMemoryXPercentOver1h }}
       expr: |-
         (
           avg_over_time (instance:node_memory_utilisation:ratio{cluster=~".*"}[1h]) * on (instance) group_left (label_elastisys_io_node_group)
@@ -100,6 +108,7 @@ spec:
     - alert: NodeGroupCpuRequest{{ .Values.capacityManagementAlertsCpuRequestLimit }}Percent
       annotations:
         message: Average CPU requests is over {{ .Values.capacityManagementAlertsCpuRequestLimit }}% in the Node Group {{`{{ $labels.label_elastisys_io_node_group }}`}} in Cluster {{`{{ $labels.cluster }}`}}.
+        runbook_url: {{ .Values.runbookUrls.clusterCapacityManagement.NodeGroupCpuRequestXPercent }}
       expr: |-
         (
           avg by (label_elastisys_io_node_group,cluster) (sum by (node,cluster) (kube_pod_container_resource_requests{cluster=~".*",namespace=~".*",resource="cpu"}
@@ -115,6 +124,7 @@ spec:
     - alert: NodeGroupMemoryRequest{{ .Values.capacityManagementAlertsMemoryRequestLimit }}Percent
       annotations:
         message: Average memory requests is over {{ .Values.capacityManagementAlertsMemoryRequestLimit }}% in the Node Group {{`{{ $labels.label_elastisys_io_node_group }}`}} in Cluster {{`{{ $labels.cluster }}`}}.
+        runbook_url: {{ .Values.runbookUrls.clusterCapacityManagement.NodeGroupMemoryRequestXPercent }}
       expr: |-
         (
           avg by (label_elastisys_io_node_group,cluster) (sum by (node,cluster) (kube_pod_container_resource_requests{cluster=~".*",namespace=~".*",resource="memory"}

@@ -4061,6 +4061,131 @@ properties:
           customTemplate:
             title: Slack Custom Template
             type: string
+      runbookUrls:
+        title: Alert runbooks
+        description: |-
+          Configure runbooks for alerts
+
+          Runbooks can be configured on an alert group level or per individual alert
+        type: object
+        additionalProperties: false
+        $defs:
+          upstreamRunbook:
+            title: Runbooks for alerts
+            description: |-
+              Example:
+
+              group: link-to-alert-group-runbook
+              AlertName: link-to-specific-alert-runbook
+
+              Uses upstream runbooks by default
+
+              https://runbooks.prometheus-operator.dev/runbooks/
+            type: object
+            additionalProperties:
+              type: string
+              description: Alert runbook URL
+            properties:
+              group:
+                title: Alert group runbook URL
+                type: string
+          noUpstreamRunbook:
+            title: Runbooks for alerts
+            description: |-
+              Example:
+
+              group: link-to-alert-group-runbook
+              AlertName: link-to-specific-alert-runbook
+
+              Uses no upstream runbook by default
+            type: object
+            additionalProperties:
+              type: string
+              description: Alert runbook URL
+            properties:
+              group:
+                title: Alert group runbook URL
+                type: string
+        properties:
+          alertmanager:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
+          backupStatus:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
+          blackbox:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
+          certManager:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
+          clusterApi:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
+          clusterCapacityManagement:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
+          configReloaders:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
+          coreDns:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
+          dailyChecks:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
+          diskPerf:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
+          falco:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
+          fluentd:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
+          general:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
+          harbor:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
+          hnc:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
+          kubeStateMetrics:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
+          kubernetesApps:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
+          kubernetesResources:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
+          kubernetesStorage:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
+          kubernetesSystem:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
+          kured:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
+          missingMetrics:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
+          nodeExporter:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
+          nodeNetwork:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
+          opensearch:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
+          openstack:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
+          packetsDropped:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
+          prometheusOperator:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
+          prometheus:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
+          thanos:
+            title: Runbooks for thanos alerts
+            description: |-
+              Example:
+
+              group: link-to-alert-group-runbook
+              AlertName: link-to-specific-alert-runbook
+
+              Uses upstream runbooks by default
+
+              https://github.com/thanos-io/thanos/tree/main/mixin/runbook.md
+            type: object
+            additionalProperties:
+              type: string
+              description: Alert runbook URL
+            properties:
+              group:
+                title: Alert group runbook URL
+                type: string
+          webhook:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
   grafana:
     title: Grafana Config
     description: |-

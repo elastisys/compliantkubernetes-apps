@@ -26,6 +26,7 @@ spec:
       annotations:
         summary: fluentd cannot be scraped
         description: Prometheus could not scrape {{ "{{ $labels.job }}" }} for more than 10 minutes
+        runbook_url: {{ .Values.runbookUrls.fluentd.FluentdNodeDown }}
     - alert: FluentdNodeDown
       expr: up{job=~"fluentd.*"} == 0
       for: 30m
@@ -35,6 +36,7 @@ spec:
       annotations:
         summary: fluentd cannot be scraped
         description: Prometheus could not scrape {{ "{{ $labels.job }}" }} for more than 30 minutes
+        runbook_url: {{ .Values.runbookUrls.fluentd.FluentdNodeDown }}
     - alert: FluentdQueueLength
       expr: rate(fluentd_status_buffer_queue_length[15m]) > 0.3
       for: 5m
@@ -44,6 +46,7 @@ spec:
       annotations:
         summary: fluentd node are failing
         description: In the last 15 minutes, fluentd queues increased 30%. Current value is {{ "{{ $value }}" }}
+        runbook_url: {{ .Values.runbookUrls.fluentd.FluentdQueueLength }}
     - alert: FluentdQueueLength
       expr: rate(fluentd_status_buffer_queue_length[5m]) > 0.5
       for: 1m
@@ -53,6 +56,7 @@ spec:
       annotations:
         summary: fluentd node are critical
         description: In the last 5 minutes, fluentd queues increased 50%. Current value is {{ "{{ $value }}" }}
+        runbook_url: {{ .Values.runbookUrls.fluentd.FluentdQueueLength }}
     - alert: FluentdAvailableSpaceBuffer
       expr: sum(fluentd_output_status_buffer_available_space_ratio) by (pod, cluster, plugin_id) < 50
       for: 5m
@@ -62,6 +66,7 @@ spec:
       annotations:
         summary: fluentd available space in buffer is less than 50%
         description: For the last 5 minutes, the available buffer space for pod {{ "{{ $labels.pod }}" }}, plugin-id {{  "{{ $labels.plugin_id }}" }} in cluster {{ "{{ $labels.cluster }}" }} is below 50%. Current value is {{ "{{ $value }}" }}
+        runbook_url: {{ .Values.runbookUrls.fluentd.FluentdAvailableSpaceBuffer }}
     - alert: FluentdAvailableSpaceBuffer
       expr: sum(fluentd_output_status_buffer_available_space_ratio) by (pod, cluster, plugin_id) < 10
       for: 5m
@@ -71,6 +76,7 @@ spec:
       annotations:
         summary: fluentd available space in buffer is less than 90%
         description: For the last 5 minutes, the available buffer space for pod {{ "{{ $labels.pod }}" }}, plugin-id {{  "{{ $labels.plugin_id }}" }} in cluster {{ "{{ $labels.cluster }}" }} is below 10%. Current value is {{ "{{ $value }}" }}
+        runbook_url: {{ .Values.runbookUrls.fluentd.FluentdAvailableSpaceBuffer }}
     - alert: FluentdRecordsCountsHigh
       expr: >
         sum(rate(fluentd_output_status_emit_records{job="fluentd-metrics"}[5m]))
@@ -83,6 +89,7 @@ spec:
       annotations:
         summary: fluentd records count are critical
         description: In the last 5m, records counts increased 3 times, comparing to the latest 15 min.
+        runbook_url: {{ .Values.runbookUrls.fluentd.FluentdRecordsCountsHigh }}
     - alert: FluentdRetry
       expr: sum(increase(fluentd_status_retry_count[10m])) by (pod, cluster, service) > 0
       for: 30m
@@ -92,6 +99,7 @@ spec:
       annotations:
         description: Fluentd retry count has been  {{ "{{ $value }}" }} for the last 10 minutes
         summary: Fluentd retry count has been  {{ "{{ $value }}" }} for the last 10 minutes
+        runbook_url: {{ .Values.runbookUrls.fluentd.FluentdRetry }}
     - alert: FluentdOutputError
       expr: sum(increase(fluentd_output_status_num_errors[10m])) by (pod, cluster, service) > 0
       for: 30m
@@ -101,4 +109,5 @@ spec:
       annotations:
         description: Fluentd output error count is {{ "{{ $value }}" }} for the last 10 minutes
         summary: There have been Fluentd output error(s) for the last 10 minutes
+        runbook_url: {{ .Values.runbookUrls.fluentd.FluentdOutputError }}
 {{- end }}
