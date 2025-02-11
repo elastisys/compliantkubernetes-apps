@@ -177,7 +177,7 @@ spec:
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
 {{- if .Values.autoscaledNodeGroupAlerts.enabled }}
-    - alert: LessKubeletsThanAutoscaledNodes
+    - alert: KubletDownForAutoscaledNodeFor15m
       annotations:
         description: The kubelet job of an existing auntoscaled node {{`{{`}} $labels.node {{`}}`}} in cluster {{`{{`}} $labels.cluster {{`}}`}} is down for the last 15m.
         summary: The kubelet job of an existing auntoscaled cluster {{`{{`}} $labels.node {{`}}`}} in cluster {{`{{`}} $labels.node {{`}}`}} is down for the last 15m.
@@ -191,7 +191,7 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
-    - alert: LessKubeletsThanAutoscaledNodes
+    - alert: KubletDownForAutoscaledNodeFor30m
       annotations:
         description: The kubelet job of an existing auntoscaled node {{`{{`}} $labels.node {{`}}`}} in cluster {{`{{`}} $labels.cluster {{`}}`}} is down for the last 30m.
         summary: The kubelet job of an existing auntoscaled node {{`{{`}} $labels.node {{`}}`}} in cluster {{`{{`}} $labels.cluster {{`}}`}} is down for the last 30m.
@@ -205,7 +205,7 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
-    - alert: LessKubeletsThanNonautoscaledNodes
+    - alert: KubletDownForNonAutoscaledNodeFor5m
       annotations:
         description: The kubelet job of an existing non-auntoscaled node {{`{{`}} $labels.node {{`}}`}} in cluster {{`{{`}} $labels.cluster {{`}}`}} is down for the last 5m.
         summary: The kubelet job of an existing non-auntoscaled node {{`{{`}} $labels.node {{`}}`}} in cluster {{`{{`}} $labels.cluster {{`}}`}} is down for the last 5m.
@@ -219,7 +219,7 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
-    - alert: LessKubeletsThanNonautoscaledNodes
+    - alert: KubletDownForNonAutoscaledNodeFor15m
       annotations:
         description: The kubelet job of an existing non-auntoscaled node {{`{{`}} $labels.node {{`}}`}} in cluster {{`{{`}} $labels.cluster {{`}}`}} is down for the last 15m.
         summary: The kubelet job of an existing non-auntoscaled node {{`{{`}} $labels.node {{`}}`}} in cluster {{`{{`}} $labels.cluster {{`}}`}} is down for the last 15m.
@@ -234,7 +234,7 @@ spec:
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
 {{- else }}
-    - alert: LessKubeletsThanNodes
+    - alert: KubeletDownFor5m
       annotations:
         description: The kubelet job of an existing node {{`{{`}} $labels.node {{`}}`}} in cluster {{`{{`}} $labels.cluster {{`}}`}} is down for the last 5m.
         summary: The kubelet job of an existing node {{`{{`}} $labels.node {{`}}`}} in cluster {{`{{`}} $labels.cluster {{`}}`}} is down for the last 5m.
@@ -245,7 +245,7 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
-    - alert: LessKubeletsThanNodes
+    - alert: KubeletDownFor15m
       annotations:
         description: The kubelet job of an existing node {{`{{`}} $labels.node {{`}}`}} in cluster {{`{{`}} $labels.cluster {{`}}`}} is down for the last 15m.
         summary: The kubelet job of an existing node {{`{{`}} $labels.node {{`}}`}} in cluster {{`{{`}} $labels.cluster {{`}}`}} is down for the last 15m.
