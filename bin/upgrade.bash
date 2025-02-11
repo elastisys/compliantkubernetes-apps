@@ -225,6 +225,7 @@ main() {
 }
 
 unlock() {
+  check_config
   if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
     config_load "sc"
     unlock_migration "sc"
