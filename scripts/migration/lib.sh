@@ -426,7 +426,7 @@ record_migration_prepare_step() {
   if ! yq4 --exit-status 'select(.data.prepare == strenv(CK8S_TARGET_VERSION))' <<<"${apps_upgrade}" >/dev/null; then
     log_fatal "version mismatch, upgrading to ${CK8S_TARGET_VERSION} but cluster ${1} was prepared for $(yq4 '.data.prepare' <<<"${apps_upgrade}")"
   fi
-  apps_upgrade="$(apps_upgrade="$(last_step="${2##*/}" yq4 -e '.data.last_prepare_step = strenv(last_step)')")"
+  apps_upgrade="$(last_step="${2##*/}" yq4 -e '.data.last_prepare_step = strenv(last_step)' <<< "${apps_upgrade}")"
   if ! kubectl_do "${1}" replace -f - <<<"${apps_upgrade}" >/dev/null; then
     log_fatal "could not record completed migration step in ${1}"
   fi
@@ -439,8 +439,8 @@ record_migration_apply_step() {
   if ! yq4 --exit-status 'select(.data.prepare == strenv(CK8S_TARGET_VERSION))' <<<"${apps_upgrade}" >/dev/null; then
     log_fatal "version mismatch, upgrading to ${CK8S_TARGET_VERSION} but cluster ${1} was prepared for $(yq4 '.data.prepare' <<<"${apps_upgrade}")"
   fi
-  apps_upgrade="$(last_step="${2##*/}" yq4 --exit-status '.data.last_apply_step = strenv(last_step)')"
-  if ! kubectl_do "${1}" replace -f - >/dev/null; then
+  apps_upgrade="$(last_step="${2##*/}" yq4 -e '.data.last_apply_step = strenv(last_step)'<<<"${apps_upgrade}")"
+  if ! kubectl_do "${1}" replace -f - <<< "${apps_upgrade}">/dev/null; then
     log_fatal "could not record completed migration step in ${1}"
   fi
 }
