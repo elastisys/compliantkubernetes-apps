@@ -186,6 +186,11 @@ usage() {
 }
 
 main() {
+  if [[ "${1}" == "unlock" ]]; then
+    unlock
+    return
+  fi
+
   local version="${1}"
   local action="${2}"
 
