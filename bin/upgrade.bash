@@ -66,19 +66,13 @@ prepare() {
     fi
 
     log_info "prepare snippet \"${snippet##"${ROOT}/migration/"}\":"
-    if [[ "${CK8S_CLUSTER:-}" == "both" ]]; then
-      record_migration_prepare_step "sc" "${snippet}"
-      record_migration_prepare_step "wc" "${snippet}"
-    else
-      record_migration_prepare_step "${CK8S_CLUSTER}" "${snippet} started"
-    fi
     if "${snippet}"; then
       log_info "prepare snippet success\n---"
       if [[ "${CK8S_CLUSTER:-}" == "both" ]]; then
         record_migration_prepare_step "sc" "${snippet}"
         record_migration_prepare_step "wc" "${snippet}"
       else
-        record_migration_prepare_step "${CK8S_CLUSTER}" "${snippet} completed"
+        record_migration_prepare_step "${CK8S_CLUSTER}" "${snippet}"
       fi
     else
       log_fatal "prepare snippet failure"
