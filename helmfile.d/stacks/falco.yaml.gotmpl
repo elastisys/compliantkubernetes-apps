@@ -1,6 +1,7 @@
 ---
 templates:
   falco:
+    disableValidationOnInstall: true
     installed: {{ .Values | get "falco.enabled" false }}
     namespace: falco
     labels:
