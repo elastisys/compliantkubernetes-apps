@@ -360,3 +360,33 @@ gatekeeper:
     extraServiceAccounts: []
     #  - namespace: "gatekeeper-system"
     #    name: "gatekeeper-admin-upgrade-crds"
+
+gpu:
+  enabled: false
+  operator:
+    resources: {}
+    tolerations: []
+    affinity: {}
+  nodeFeatureDiscovery:
+    worker:
+      resources: {}
+      tolerations:
+        - key: elastisys.io/node-type
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
+      affinity: {}
+    controlPlane:
+      resources: {}
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Equal
+          value: ""
+      affinity: {}
+  daemonsets:
+    tolerations:
+      - key: elastisys.io/node-type
+        operator: Equal
+        value: gpu
+        effect: NoSchedule

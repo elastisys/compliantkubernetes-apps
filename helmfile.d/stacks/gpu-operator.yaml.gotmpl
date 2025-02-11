@@ -1,0 +1,12 @@
+---
+templates:
+  nvidia-gpu-operator:
+    inherit: [ template: gpu-operator-chart ]
+    name: nvidia-gpu-operator
+    namespace: gpu-operator
+    labels:
+      app: gpu-operator
+    disableValidationOnInstall: true
+    installed: {{ .Values | get "gpu.enabled" false }}
+    values:
+      - values/gpu-operator.yaml.gotmpl

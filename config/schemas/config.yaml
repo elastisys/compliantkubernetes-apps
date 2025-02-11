@@ -7432,6 +7432,60 @@ properties:
         examples:
           - default-timeout-minutes: "30"
         type: object
+  gpu:
+    title: GPU Config
+    description: Configure the GPU Operator and its dependencies
+    type: object
+    properties:
+      enabled:
+        title: GPU Operator Enabled
+        default: false
+        type: boolean
+      operator:
+        title: GPU Operator Config
+        description: Configure GPU Operator
+        type: object
+        properties:
+          resources:
+            $ref: '#/$defs/kubernetesResourceRequirements'
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
+          affinity:
+            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      nodeFeatureDiscovery:
+        title: Node Feature Discovery Config
+        description: Configure Node Feature Discovery
+        type: object
+        properties:
+          controlPlane:
+            title: Node Feature Discovery Control Plane Config
+            description: Configure Node Feature Discovery Control Plane
+            type: object
+            properties:
+              resources:
+                $ref: '#/$defs/kubernetesResourceRequirements'
+              tolerations:
+                $ref: '#/$defs/kubernetesTolerations'
+              affinity:
+                $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+          worker:
+            title: Node Feature Discovery worker Config
+            description: Configure Node Feature Discovery workers
+            type: object
+            properties:
+              resources:
+                $ref: '#/$defs/kubernetesResourceRequirements'
+              tolerations:
+                $ref: '#/$defs/kubernetesTolerations'
+              affinity:
+                $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      daemonsets:
+        title: GPU Daemonsets Config
+        description: Configure GPU Daemonsets
+        type: object
+        properties:
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
 additionalProperties:
   title: Additional Properties
   description: Configure additional properties not covered by the schema.

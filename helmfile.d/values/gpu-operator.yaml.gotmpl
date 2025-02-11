@@ -1,0 +1,16 @@
+gpu:
+  enabled: {{ .Values.gpu.enabled }}
+operator:
+  resources: {{- toYaml .Values.gpu.operator.resources | nindent 4 }}
+  tolerations: {{- toYaml .Values.gpu.operator.tolerations | nindent 4 }}
+  affinity: {{- toYaml .Values.gpu.operator.affinity | nindent 4 }}
+node-feature-discovery:
+  worker:
+    resources: {{- toYaml .Values.gpu.nodeFeatureDiscovery.worker.resources | nindent 6 }}
+    tolerations: {{- toYaml .Values.gpu.nodeFeatureDiscovery.worker.tolerations | nindent 6 }}
+    affinity: {{- toYaml .Values.gpu.nodeFeatureDiscovery.worker.affinity | nindent 6 }}
+  master:
+    resources: {{- toYaml .Values.gpu.nodeFeatureDiscovery.controlPlane.resources | nindent 6 }}
+    tolerations: {{- toYaml .Values.gpu.nodeFeatureDiscovery.controlPlane.tolerations | nindent 6 }}
+    affinity: {{- toYaml .Values.gpu.nodeFeatureDiscovery.controlPlane.affinity | nindent 6 }}
+daemonsets: {{- toYaml .Values.gpu.daemonsets | nindent 2 }}

@@ -12,6 +12,7 @@ bases:
   - stacks/falco.yaml.gotmpl
   - stacks/fluentd.yaml.gotmpl
   - stacks/gatekeeper.yaml.gotmpl
+  - stacks/gpu-operator.yaml.gotmpl
   - stacks/harbor.yaml.gotmpl
   - stacks/hnc.yaml.gotmpl
   - stacks/ingress-nginx.yaml.gotmpl
@@ -171,3 +172,5 @@ releases:
   - inherit: [ template: tekton-pipelines-networkpolicy ]
   - inherit: [ template: tekton-pipelines-podsecuritypolicy ]
   - inherit: [ template: tekton-pipelines ]
+
+  - inherit: [ template: nvidia-gpu-operator ]
