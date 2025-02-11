@@ -4,6 +4,10 @@
 
 nameOverride: fluentd
 
+global:
+  security:
+      allowInsecureImages: true
+
 metrics:
   enabled: true
   serviceMonitor:
@@ -30,8 +34,8 @@ extraDeploy:
 
 image:
   registry: ghcr.io
-  repository: elastisys/fluentd
-  tag: v5.19.1-ck8s1
+  repository: elastisys/fluentd-aggregator
+  tag: v7.1.1-ck8s1
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -51,6 +55,15 @@ aggregator:
     size: {{ .Values.fluentd.aggregator.persistence.storage }}
 
   extraEnvVarsSecret: {{ .Release.Name }}-storage-credentials
+
+  networkPolicy:
+    enabled: false
+
+  pdb:
+    create: false
+
+  serviceAccount:
+    create: false
 
   configMapFiles:
     fluentd.conf: |
