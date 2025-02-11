@@ -68,6 +68,10 @@ The following constraints apply on releases:
 
 ## Feature freeze
 
+> [!warning]
+> This step is only done for major or minor releases.
+> For patch releases switch to the existing release branch.
+
 Create a release branch `release-X.Y` from the main branch:
 
 ```bash

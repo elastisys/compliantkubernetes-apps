@@ -1,45 +1,56 @@
----
-name: (Deprecated) Create new release
-about: Do not create release issues here, use the link to the ck8s-issue-tracker.
-title: Create release Elastisys Welkin® Apps <version>
-labels: kind/release
-assignees: ""
----
+# Quality Assurance Checklist
 
-> [!important]
-> This release issue is kept as reference and is not part of the current release process.
-> It will eventually be replaced by another document detailing our quality assurance in this repository.
+Elastisys Welkin® Apps
 
-## Overview
+## Checklist
 
 > [!note]
-> Whenever you need to change access from operator admin to `admin@example.com` prefer to re-login by clearing the `~/.kube/cache/oidc-login` cache instead of impersonation `--as=admin@example.com`.
+> This document is maintained as a reference for the quality assurance checklist for Welkin Apps.
+> The actual release and quality assurance process is driven by an internal issue template, as it also ties together with internal processes, however these are templated from the same source so the main steps are accurate.
 
-- [Pre-QA steps](#pre-qa-steps)
+### Overview
+
+**Sections**:
+
+- [Before QA steps](#before-qa-steps)
 - [Install QA steps](#install-qa-steps)
 - [Upgrade QA steps](#upgrade-qa-steps)
-- [Post-QA steps](#post-qa-steps)
+- [After QA steps](#after-qa-steps)
 - [Release steps](#release-steps)
+- [Final steps](#final-steps)
 
-## Pre-QA steps
+### Before QA steps
+
+> [!note]
+> Whenever you need to change access from platform administrator to application developer `admin@example.com` prefer to re-login rather than impersonation `--as=admin@example.com`.
+> For this you have two options:
+>
+> - Either set a different cache directory `export KUBECACHEDIR=${HOME}/.kube-static/cache` when switching to application developer and restore `unset KUBECACHEDIR` when switching to platform administrator.
+> - Or clear the cache `rm -r ~/.kube/cache/oidc-login` whenever you switch between.
 
 - [ ] Ensure the release follows [the release constraints](https://github.com/elastisys/compliantkubernetes-apps/tree/main/release#constraints)
 - [ ] Complete [the feature freeze step](https://github.com/elastisys/compliantkubernetes-apps/tree/main/release#feature-freeze)
 - [ ] Complete [the staging step](https://github.com/elastisys/compliantkubernetes-apps/tree/main/release#staging)
-- [ ] Complete all pre-QA steps in the internal checklist
 
-## Install QA steps
+### Install QA steps
 
 > _Apps install scenario_
 
-### Infrastructure provider
+#### Environment setup
 
-- [ ] Azure
-- [ ] Elastx
-- [ ] Safespring
-- [ ] UpCloud
+**Provider**:
 
-### Configuration
+- [ ] Azure (alpha)
+- [ ] Elastx (prod)
+- [ ] Safespring (prod)
+- [ ] UpCloud (prod)
+
+**Installer**:
+
+- [ ] Cluster API (beta)
+- [ ] Kubespray (prod)
+
+**Configuration**:
 
 - [ ] Flavor - Prod
 - [ ] Dex IdP - Google
@@ -60,11 +71,24 @@ assignees: ""
     ```
 
     </details>
+- [ ] Grafana trailing dots - Disabled
+    <details><summary>Commands</summary>
+
+    ```sh
+    yq4 -i '.grafana.user.trailingDots = false' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+    yq4 -i '.grafana.ops.trailingDots = false' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+
+    # apply
+    ./bin/ck8s ops helmfile sc -lapp=grafana diff
+    ./bin/ck8s ops helmfile sc -lapp=grafana apply
+    ```
+
+    </details>
 - [ ] Rclone sync - Enabled and preferably configured to a different infrastructure provider.
 - [ ] Set the environment variable `NAMESPACE` to an application developer namespace (this cannot be a subnamespace)
 - [ ] Set the environment variable `DOMAIN` to the environment domain
 
-### Status tests
+#### Status tests
 
 > [!note]
 > As platform administrator
@@ -86,13 +110,15 @@ assignees: ""
     - Best is to perform the install at the end of the day to give it the night to stabilise.
     - Otherwise give it at least one to two hours to stabilise if possible.
 
-### Automated tests
+#### Automated tests
 
 > [!note]
 > As platform administrator
 
 - [ ] Successful `make build-main` from the `tests/` directory
 - [ ] Successful `make run-end-to-end` from the `tests/` directory
+
+#### Kubernetes access
 
 > [!note]
 > As platform administrator
@@ -175,7 +201,7 @@ assignees: ""
     EOF
     ```
 
-### Hierarchical Namespaces
+#### Hierarchical Namespaces
 
 > [!note]
 > As application developer `admin@example.com`
@@ -207,7 +233,7 @@ assignees: ""
 
     </details>
 
-### Harbor
+#### Harbor
 
 > [!note]
 > As application developer `admin@example.com`
@@ -242,7 +268,7 @@ assignees: ""
     docker pull "harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo:${TAG}"
     ```
 
-### Gatekeeper
+#### Gatekeeper
 
 > [!note]
 > As application developer `admin@example.com`
@@ -306,7 +332,7 @@ assignees: ""
       --set ingress.hostname="demoapp.${DOMAIN}"
     ```
 
-### cert-manager and Ingress-NGINX
+#### cert-manager and Ingress-NGINX
 
 > [!note]
 > As platform administrator
@@ -316,7 +342,7 @@ assignees: ""
     - [ ] Endpoints are reachable
     - [ ] Status includes correct IP addresses
 
-### Metrics
+#### Metrics
 
 > [!note]
 > As platform administrator
@@ -365,7 +391,7 @@ assignees: ""
 
     </details>
 
-### Alerts
+#### Alerts
 
 > [!note]
 > As platform administrator
@@ -381,7 +407,7 @@ assignees: ""
 - [ ] [Access Alertmanager following the application developer docs](https://elastisys.io/welkin/user-guide/alerts/#accessing-user-alertmanager)
 - [ ] Alertmanager `Watchdog` firing
 
-### Logs
+#### Logs
 
 > [!note]
 > As platform administrator
@@ -443,7 +469,7 @@ assignees: ""
 - [ ] Logs available (Kubeaudit, Kubernetes)
 - [ ] [CISO dashboards available and working](https://elastisys.io/welkin/ciso-guide/audit-logs/)
 
-### Falco
+#### Falco
 
 > [!note]
 > As platform administrator
@@ -478,11 +504,11 @@ assignees: ""
 - [ ] Logs are available in OpenSearch Dashboards
 - [ ] Logs are relevant
 
-### Network Policies
+#### Network Policies
 
 - [ ] No dropped packets in NetworkPolicy Grafana dashboard
 
-### Take backups and snapshots
+#### Take backups and snapshots
 
 > [!note]
 > As platform administrator
@@ -605,11 +631,11 @@ Follow the public disaster recovery documentation to take backups:
     ./bin/ck8s ops kubectl sc -n rclone get pods -lapp.kubernetes.io/instance=rclone-sync -w
     ```
 
-### Restore backups and snapshots
+#### Restore backups and snapshots
 
 > [!note]
 > As platform administrator
-
+<!--divide-->
 > [!important]
 > Before running each restore you should either completely or partially delete the data within the target service, and after each restore validate that the data is restored.
 
@@ -624,21 +650,25 @@ Follow the public disaster recovery documentation to perform restores from the p
 - [ ] Can [restore Velero snapshot](https://elastisys.io/welkin/operator-manual/disaster-recovery/#restore_2)
     - _Examples of deleted data: Complete or partial removal of application developer Kubernetes resources._
 
-## Upgrade QA steps
+### Upgrade QA steps
 
 > _Apps upgrade scenario_
 
-> [!note]
-> The upgrade is done as part of the checklist.
+#### Environment setup
 
-### Infrastructure provider
+**Provider**:
 
-- [ ] Azure
-- [ ] Elastx
-- [ ] Safespring
-- [ ] UpCloud
+- [ ] Azure (alpha)
+- [ ] Elastx (prod)
+- [ ] Safespring (prod)
+- [ ] UpCloud (prod)
 
-### Configuration
+**Installer**:
+
+- [ ] Cluster API (beta)
+- [ ] Kubespray (prod)
+
+**Configuration**:
 
 - [ ] Flavor - Prod
 - [ ] Dex IdP - Google
@@ -659,11 +689,24 @@ Follow the public disaster recovery documentation to perform restores from the p
     ```
 
     </details>
+- [ ] Grafana trailing dots - Disabled
+    <details><summary>Commands</summary>
+
+    ```sh
+    yq4 -i '.grafana.user.trailingDots = false' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+    yq4 -i '.grafana.ops.trailingDots = false' "${CK8S_CONFIG_PATH}/sc-config.yaml"
+
+    # apply
+    ./bin/ck8s ops helmfile sc -lapp=grafana diff
+    ./bin/ck8s ops helmfile sc -lapp=grafana apply
+    ```
+
+    </details>
 - [ ] Rclone sync - Enabled and preferably configured to a different infrastructure provider.
 - [ ] Set the environment variable `NAMESPACE` to an application developer namespace (this cannot be a subnamespace)
 - [ ] Set the environment variable `DOMAIN` to the environment domain
 
-### Take backups and snapshots
+#### Take backups and snapshots
 
 > [!note]
 > As platform administrator
@@ -786,11 +829,11 @@ Follow the public disaster recovery documentation to take backups:
     ./bin/ck8s ops kubectl sc -n rclone get pods -lapp.kubernetes.io/instance=rclone-sync -w
     ```
 
-### Upgrade
+#### Upgrade
 
 - [ ] Can upgrade according to [the migration docs for this version](https://github.com/elastisys/compliantkubernetes-apps/tree/main/migration)
 
-### Status tests
+#### Status tests
 
 > [!note]
 > As platform administrator
@@ -812,7 +855,7 @@ Follow the public disaster recovery documentation to take backups:
     - Best is to perform the upgrade at the end of the day to give it the night to stabilise.
     - Otherwise give it at least one to two hours to stabilise if possible.
 
-### Automated tests
+#### Automated tests
 
 > [!note]
 > As platform administrator
@@ -820,7 +863,7 @@ Follow the public disaster recovery documentation to take backups:
 - [ ] Successful `make build-main` from the `tests/` directory
 - [ ] Successful `make run-end-to-end` from the `tests/` directory
 
-### Kubernetes access
+#### Kubernetes access
 
 > [!note]
 > As platform administrator
@@ -903,7 +946,7 @@ Follow the public disaster recovery documentation to take backups:
     EOF
     ```
 
-### Hierarchical Namespaces
+#### Hierarchical Namespaces
 
 > [!note]
 > As application developer `admin@example.com`
@@ -935,7 +978,7 @@ Follow the public disaster recovery documentation to take backups:
 
     </details>
 
-### Harbor
+#### Harbor
 
 > [!note]
 > As application developer `admin@example.com`
@@ -970,7 +1013,7 @@ Follow the public disaster recovery documentation to take backups:
     docker pull "harbor.${DOMAIN}/${REGISTRY_PROJECT}/welkin-user-demo:${TAG}"
     ```
 
-### Gatekeeper
+#### Gatekeeper
 
 > [!note]
 > As application developer `admin@example.com`
@@ -1034,7 +1077,7 @@ Follow the public disaster recovery documentation to take backups:
       --set ingress.hostname="demoapp.${DOMAIN}"
     ```
 
-### cert-manager and Ingress-NGINX
+#### cert-manager and Ingress-NGINX
 
 > [!note]
 > As platform administrator
@@ -1044,7 +1087,7 @@ Follow the public disaster recovery documentation to take backups:
     - [ ] Endpoints are reachable
     - [ ] Status includes correct IP addresses
 
-### Metrics
+#### Metrics
 
 > [!note]
 > As platform administrator
@@ -1102,7 +1145,7 @@ Follow the public disaster recovery documentation to take backups:
 
     </details>
 
-### Alerts
+#### Alerts
 
 > [!note]
 > As platform administrator
@@ -1118,7 +1161,7 @@ Follow the public disaster recovery documentation to take backups:
 - [ ] [Access Alertmanager following the application developer docs](https://elastisys.io/welkin/user-guide/alerts/#accessing-user-alertmanager)
 - [ ] Alertmanager `Watchdog` firing
 
-### Logs
+#### Logs
 
 > [!note]
 > As platform administrator
@@ -1189,7 +1232,7 @@ Follow the public disaster recovery documentation to take backups:
 - [ ] Logs available (Kubeaudit, Kubernetes)
 - [ ] [CISO dashboards available and working](https://elastisys.io/welkin/ciso-guide/audit-logs/)
 
-### Falco
+#### Falco
 
 > [!note]
 > As platform administrator
@@ -1224,15 +1267,15 @@ Follow the public disaster recovery documentation to take backups:
 - [ ] Logs are available in OpenSearch Dashboards
 - [ ] Logs are relevant
 
-### Network Policies
+#### Network Policies
 
 - [ ] No dropped packets in NetworkPolicy Grafana dashboard
 
-### Restore backups and snapshots
+#### Restore backups and snapshots
 
 > [!note]
 > As platform administrator
-
+<!--divide-->
 > [!important]
 > Before running each restore you should either completely or partially delete the data within the target service, and after each restore validate that the data is restored.
 
@@ -1247,7 +1290,7 @@ Follow the public disaster recovery documentation to perform restores from the p
 - [ ] Can [restore Velero snapshot](https://elastisys.io/welkin/operator-manual/disaster-recovery/#restore_2)
     - _Examples of deleted data: Complete or partial removal of application developer Kubernetes resources._
 
-## Post-QA steps
+### After QA steps
 
 - [ ] Update the Welcoming Dashboards "What's New" section.
 
@@ -1255,14 +1298,16 @@ Follow the public disaster recovery documentation to perform restores from the p
 
   Remove items for releases older than two major or minor versions, e.g. for `v0.25` you keep items for `v0.25` and `v0.24` and remove all items for all older versions.
 
-    - Edit the [Grafana dashboard](../helmfile.d/charts/grafana-dashboards/files/welcome.md)
-    - Edit the [OpenSearch dashboard](../helmfile.d/charts/opensearch/configurer/files/dashboards-resources/welcome.md)
-- [ ] Complete [the code freeze step](https://github.com/elastisys/compliantkubernetes-apps/tree/main/release#code-freeze)
-- [ ] Complete all post-QA steps in the internal checklist
+    - Edit the [Grafana dashboard](https://github.com/elastisys/compliantkubernetes-apps/tree/main/helmfile.d/charts/grafana-dashboards/files/welcome.md)
+    - Edit the [OpenSearch dashboard](https://github.com/elastisys/compliantkubernetes-apps/tree/main/helmfile.d/charts/opensearch/configurer/files/dashboards-resources/welcome.md)
 
-## Release steps
+- [ ] Complete [the code freeze step](https://github.com/elastisys/compliantkubernetes-apps/tree/main/release#code-freeze)
+- [ ] The staging pull request must be approved
+
+### Release steps
 
 - [ ] Complete [the release step](https://github.com/elastisys/compliantkubernetes-apps/tree/main/release#release)
 - [ ] Complete [the update public release notes step](https://github.com/elastisys/compliantkubernetes-apps/tree/main/release#update-public-release-notes)
-- [ ] Complete [the update the main branch step](https://github.com/elastisys/compliantkubernetes-apps/tree/main/release#update-the-main-branch)
-- [ ] Complete all post release steps in the internal checklist
+- [ ] Complete [the update main branch step](https://github.com/elastisys/compliantkubernetes-apps/tree/main/release#update-the-main-branch)
+
+### Final steps
