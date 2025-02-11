@@ -10,7 +10,7 @@ node-feature-discovery:
     tolerations: {{- toYaml .Values.gpu.nodeFeatureDiscovery.worker.tolerations | nindent 6 }}
     affinity: {{- toYaml .Values.gpu.nodeFeatureDiscovery.worker.affinity | nindent 6 }}
   master:
-    resources: {{- toYaml .Values.gpu.nodeFeatureDiscovery.master.resources | nindent 6 }}
-    tolerations: {{- toYaml .Values.gpu.nodeFeatureDiscovery.master.tolerations | nindent 6 }}
-    affinity: {{- toYaml .Values.gpu.nodeFeatureDiscovery.master.affinity | nindent 6 }}
+    resources: {{- toYaml .Values.gpu.nodeFeatureDiscovery.controlPlane.resources | nindent 6 }}
+    tolerations: {{- toYaml .Values.gpu.nodeFeatureDiscovery.controlPlane.tolerations | nindent 6 }}
+    affinity: {{- toYaml .Values.gpu.nodeFeatureDiscovery.controlPlane.affinity | nindent 6 }}
 daemonsets: {{- toYaml .Values.gpu.daemonsets | nindent 2 }}

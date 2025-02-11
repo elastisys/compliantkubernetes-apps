@@ -7434,9 +7434,9 @@ properties:
         description: Configure Node Feature Discovery
         type: object
         properties:
-          master:
-            title: Node Feature Discovery master Config
-            description: Configure Node Feature Discovery masters
+          controlPlane:
+            title: Node Feature Discovery Control Plane Config
+            description: Configure Node Feature Discovery Control Plane
             type: object
             properties:
               resources:

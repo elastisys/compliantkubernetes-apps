@@ -376,7 +376,7 @@ gpu:
           value: gpu
           effect: NoSchedule
       affinity: {}
-    master:
+    controlPlane:
       resources: {}
       tolerations:
         - effect: NoSchedule
