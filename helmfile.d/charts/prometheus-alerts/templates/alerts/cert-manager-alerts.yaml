@@ -21,6 +21,7 @@ spec:
     - alert: CertificateExpiringSoon
       annotations:
         message: The Certificate {{`{{$labels.name}}`}} is expiring within 20 days.
+        runbook_url: {{ .Values.runbookUrls.certManager.CertificateExpiringSoon }}
       # Fire the alert when there are less than 20 days = 60*60*24*20 seconds left
       expr: certmanager_certificate_expiration_timestamp_seconds - time() < 60*60*24*20
       for: 10m
@@ -29,6 +30,7 @@ spec:
     - alert: CertificateNotReady
       annotations:
         message: The Certificate {{`{{$labels.name}}`}} is not ready!
+        runbook_url: {{ .Values.runbookUrls.certManager.CertificateNotReady }}
       # Fire the alert when the Certificaet is not ready
       expr: certmanager_certificate_ready_status{condition="False"} > 0
       for: 10m

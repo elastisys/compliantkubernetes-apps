@@ -4,6 +4,7 @@
     annotations:
       description: Metrics from the worker cluster is missing
       summary: Metrics from the worker cluster is not being received.
+      runbook_url: {{ .Values.runbookUrls.missingMetrics.MetricsFromWcClusterIsMissing }}
     expr: |
       absent(prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus",tenant_id!~".*-sc"}) > 0 or prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus",tenant_id!~".*-sc"} == 0
     for: 5m
@@ -13,6 +14,7 @@
     annotations:
       description: Metrics from the service cluster is missing
       summary: Metrics from the service cluster is not being received.
+      runbook_url: {{ .Values.runbookUrls.missingMetrics.MetricsFromScClusterIsMissing }}
     expr: |
       absent(prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus",tenant_id!~".*-wc"}) > 0 or prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus",tenant_id!~".*-wc"} == 0
     for: 15m

@@ -26,6 +26,7 @@ spec:
           annotations:
             description: Disk {{`{{`}} $labels.device {{`}}`}} Wait Time on {{`{{`}} $labels.instance {{`}}`}} is {{`{{`}} $value {{`}}`}}, check the workload
             summary: Disk {{`{{`}} $labels.device {{`}}`}} Wait Time is high on {{`{{`}} $labels.instance {{`}}`}}
+            runbook_url: {{ .Values.runbookUrls.diskPerf.DiskReadWaitTimeHigh }}
             severity_level: warning
             storage_type: local
           expr: |
@@ -41,6 +42,7 @@ spec:
           annotations:
             description: Disk {{`{{`}} $labels.device {{`}}`}} Wait Time on {{`{{`}} $labels.instance {{`}}`}} is {{`{{`}} $value {{`}}`}}, check the workload
             summary: Disk {{`{{`}} $labels.device {{`}}`}} Wait Time is high on {{`{{`}} $labels.instance {{`}}`}}
+            runbook_url: {{ .Values.runbookUrls.diskPerf.DiskWriteWaitTimeHigh }}
             severity_level: warning
             storage_type: local
           expr: |
@@ -56,6 +58,7 @@ spec:
           annotations:
             description: Disk {{`{{`}} $labels.device {{`}}`}} Queue Size on {{`{{`}} $labels.instance {{`}}`}} is {{`{{`}} $value {{`}}`}}, check the workload
             summary: Disk {{`{{`}} $labels.device {{`}}`}} has very large Queue Size on {{`{{`}} $labels.instance {{`}}`}}
+            runbook_url: {{ .Values.runbookUrls.diskPerf.DiskQueueSizeHigh }}
             severity_level: warning
             storage_type: local
           expr: |

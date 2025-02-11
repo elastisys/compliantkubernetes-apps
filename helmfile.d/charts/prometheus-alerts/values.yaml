@@ -160,3 +160,35 @@ harbor:
   alerts:
     maxTotalStorageUsedGB: 500
     maxTotalArtifacts: 1000
+
+runbookUrls:
+  alertmanager: {}
+  backupStatus: {}
+  blackbox: {}
+  certManager: {}
+  clusterApi: {}
+  clusterCapacityManagement: {}
+  configReloaders: {}
+  coreDns: {}
+  dailyChecks: {}
+  diskPerf: {}
+  fluentd: {}
+  general: {}
+  harbor: {}
+  hnc: {}
+  kubeStateMetrics: {}
+  kubernetesApps: {}
+  kubernetesResources: {}
+  kubernetesStorage: {}
+  kubernetesSystemApiserver: {}
+  kured: {}
+  missingMetrics: {}
+  nodeExporter: {}
+  nodeNetwork: {}
+  opensearch: {}
+  openstack: {}
+  packetsDropped: {}
+  prometheusOperator: {}
+  prometheus: {}
+  thanos: {}
+  webhook: {}

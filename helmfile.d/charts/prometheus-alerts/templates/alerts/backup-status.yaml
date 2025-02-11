@@ -20,7 +20,7 @@ spec:
     - alert: HarborBackupHaveFailed24Hours
       annotations:
         description: The job daily backup job harbor-backup have failed over 24 hours.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-harborbackup
+        runbook_url: {{ .Values.runbookUrls.backupStatus.HarborBackupHaveFailed24Hours }}
         summary: The daily backup job harbor-backup have failed over 24 hours.
       expr: |-
         (
@@ -32,7 +32,7 @@ spec:
     - alert: HarborBackupHaveFailed48Hours
       annotations:
         description: The job daily backup job harbor-backup have failed over 48 hours.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-harborbackup
+        runbook_url: {{ .Values.runbookUrls.backupStatus.HarborBackupHaveFailed48Hours }}
         summary: The daily backup job harbor-backup have failed over 48 hours.
       expr: |-
         (
@@ -44,7 +44,7 @@ spec:
     - alert: VeleroBackupHaveFailed24Hours
       annotations:
         description: The job daily backup job velero-backup have failed over 24 hours.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-velerobackup
+        runbook_url: {{ .Values.runbookUrls.backupStatus.VeleroBackupHaveFailed24Hours }}
         summary: The daily backup job velero-backup have failed over 24 hours.
       expr: |-
         (
@@ -56,7 +56,7 @@ spec:
     - alert: VeleroBackupHaveFailed48Hours
       annotations:
         description: The job daily backup job velero-backup have failed over 48 hours.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-velerobackup
+        runbook_url: {{ .Values.runbookUrls.backupStatus.VeleroBackupHaveFailed48Hours }}
         summary: The daily backup job velero-backup have failed over 48 hours.
       expr: |-
         (
@@ -68,7 +68,7 @@ spec:
     - alert: OpenSearchSnapshotHaveFailed24Hours
       annotations:
         description: There have been no successful OpenSearch snapshots for over 24 hours.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-elasticsearchsnap
+        runbook_url: {{ .Values.runbookUrls.backupStatus.OpenSearchSnapshotHaveFailed24Hours }}
         summary: OpenSearch snapshots have failed for over 24 hours.
       expr: |-
         (
@@ -82,7 +82,7 @@ spec:
     - alert: OpenSearchSnapshotHaveFailed48Hours
       annotations:
         description: There have been no successful OpenSearch snapshots for over 48 hours.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}alert-name-elasticsearchsnap
+        runbook_url: {{ .Values.runbookUrls.backupStatus.OpenSearchSnapshotHaveFailed48Hours }}
         summary: OpenSearch snapshots have failed for over 48 hours.
       expr: |-
         (

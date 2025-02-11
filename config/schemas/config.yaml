@@ -4061,6 +4061,140 @@ properties:
           customTemplate:
             title: Slack Custom Template
             type: string
+      runbookUrls:
+        title: Alert runbooks
+        description: |-
+          Configure runbooks for alerts
+
+          Runbooks can be configured on an alert group level or per individual alert
+        type: object
+        additionalProperties: false
+        properties:
+          alertmanager:
+            title: Runbooks for alertmanager alerts
+            description: |-
+              Example:
+
+              group: https://runbooks.prometheus-operator.dev/runbooks/alertmanager/
+              AlertmanagerFailedReload: https://runbooks.prometheus-operator.dev/runbooks/alertmanager/alertmanagerfailedreload/
+              AlertName: link-to-specific-alert-runbook
+            type: object
+          backupStatus:
+            title: Runbooks for backup status alerts
+            description: Runbooks for backup status alerts
+            type: object
+          blackbox:
+            title: Runbooks for blackbox alerts
+            description: Runbooks for blackbox alerts
+            type: object
+          certManager:
+            title: Runbooks for cert manager alerts
+            description: Runbooks for cert manager alerts
+            type: object
+          clusterApi:
+            title: Runbooks for cluster api alerts
+            description: Runbooks for cluster api alerts
+            type: object
+          clusterCapacityManagement:
+            title: Runbooks for cluster capacity management alerts
+            description: Runbooks for cluster capacity management alerts
+            type: object
+          configReloaders:
+            title: Runbooks for config reloaders alerts
+            description: Runbooks for config reloaders alerts
+            type: object
+          coreDns:
+            title: Runbooks for core dns alerts
+            description: Runbooks for core dns alerts
+            type: object
+          dailyChecks:
+            title: Runbooks for daily checks alerts
+            description: Runbooks for daily checks alerts
+            type: object
+          diskPerf:
+            title: Runbooks for disk performance alerts
+            description: Runbooks for disk performance alerts
+            type: object
+          fluentd:
+            title: Runbooks for fluentd alerts
+            description: Runbooks for fluentd alerts
+            type: object
+          general:
+            title: Runbooks for general alerts
+            description: Runbooks for general alerts
+            type: object
+          harbor:
+            title: Runbooks for harbor alerts
+            description: Runbooks for harbor alerts
+            type: object
+          hnc:
+            title: Runbooks for hnc alerts
+            description: Runbooks for hnc alerts
+            type: object
+          kubeStateMetrics:
+            title: Runbooks for kube state metrics alerts
+            description: Runbooks for kube state metrics alerts
+            type: object
+          kubernetesApps:
+            title: Runbooks for kubernetes apps alerts
+            description: Runbooks for kubernetes apps alerts
+            type: object
+          kubernetesResources:
+            title: Runbooks for kubernetes resources alerts
+            description: Runbooks for kubernetes resources alerts
+            type: object
+          kubernetesStorage:
+            title: Runbooks for kubernetes storage alerts
+            description: Runbooks for kubernetes storage alerts
+            type: object
+          kubernetesSystemApiserver:
+            title: Runbooks for kubernetes system api server alerts
+            description: Runbooks for kubernetes system api server alerts
+            type: object
+          kured:
+            title: Runbooks for kured alerts
+            description: Runbooks for kured alerts
+            type: object
+          missingMetrics:
+            title: Runbooks for missing metrics alerts
+            description: Runbooks for missing metrics alerts
+            type: object
+          nodeExporter:
+            title: Runbooks for node exporter alerts
+            description: Runbooks for node exporter alerts
+            type: object
+          nodeNetwork:
+            title: Runbooks for node network alerts
+            description: Runbooks for node network alerts
+            type: object
+          opensearch:
+            title: Runbooks for opensearch alerts
+            description: Runbooks for opensearch alerts
+            type: object
+          openstack:
+            title: Runbooks for openstack alerts
+            description: Runbooks for openstack alerts
+            type: object
+          packetsDropped:
+            title: Runbooks for packets dropped alerts
+            description: Runbooks for packets dropped alerts
+            type: object
+          prometheusOperator:
+            title: Runbooks for prometheus operator alerts
+            description: Runbooks for prometheus operator alerts
+            type: object
+          prometheus:
+            title: Runbooks for prometheus alerts
+            description: Runbooks for prometheus alerts
+            type: object
+          thanos:
+            title: Runbooks for thanos alerts
+            description: Runbooks for thanos alerts
+            type: object
+          webhook:
+            title: Runbooks for webhook alerts
+            description: Runbooks for webhook alerts
+            type: object
   grafana:
     title: Grafana Config
     description: |-
