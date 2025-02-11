@@ -137,6 +137,14 @@ apply() {
     fi
   fi
 
+  # Create a configmap. This fails if done twice.
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
+    record_migration_apply_begin sc
+  fi
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
+    record_migration_apply_begin wc
+  fi
+
   for snippet in ${snippets}; do
     if [[ "$(basename "${snippet}")" == "00-template.sh" ]]; then
       continue
