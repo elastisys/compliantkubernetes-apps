@@ -162,23 +162,16 @@ diagnostics)
   ;;
 version) # all|both|sc|wc
   shift
-  case "${1:-all}" in
-  all)
-    log_info "config version:" "$(yq4 '.global.ck8sVersion' "${CK8S_CONFIG_PATH}/common-config.yaml")"
-    log_info "sc version:" "$(get_version "sc")"
-    log_info "wc version:" "$(get_version "wc")"
-    ;;
-  both)
-    log_info "sc version:" "$(get_version "sc")"
-    log_info "wc version:" "$(get_version "wc")"
-    ;;
-  config)
+  [[ "${1}" =~ ^(all|both|config|wc|sc)$ ]] || usage
+  if [[ "${1}" =~ ^(all|config)$ ]]; then
     log_info "config version:" "$(yq4 '.global.ck8sVersion' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")"
-    ;;
-  sc | wc)
-    log_info "${1} version:" "$(get_version "${1}")"
-    ;;
-  esac
+  fi
+  if [[ "${1}" =~ ^(all|both|sc)$ ]]; then
+    log_info "sc version:" "$(get_version "sc")"
+  fi
+  if [[ "${1}" =~ ^(all|both|wc)$ ]]; then
+    log_info "wc version:" "$(get_version "wc")"
+  fi
   ;;
 *) usage ;;
 esac
