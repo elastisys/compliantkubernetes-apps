@@ -158,7 +158,7 @@ diagnostics)
 version) # all|both|sc|wc
   shift
   case "${1:-all}" in
-    all)
+  all)
     log_info "config version:" "$(yq4 '.global.ck8sVersion' "${CK8S_CONFIG_PATH}/common-config.yaml")"
     log_info "sc version:" "$(get_version "sc")"
     log_info "wc version:" "$(get_version "wc")"
