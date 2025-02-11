@@ -226,9 +226,11 @@ main() {
 
 unlock() {
   if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
+    config_load "sc"
     unlock_migration "sc"
   fi
   if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
+    config_load "wc"
     unlock_migration "wc"
   fi
   log_info "Cluster migration unlocked. You can now retry the migration"
