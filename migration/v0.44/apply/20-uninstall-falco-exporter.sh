@@ -7,7 +7,10 @@ source "${ROOT}/scripts/migration/lib.sh"
 run() {
   case "${1:-}" in
   execute)
-    clusters=("wc" "sc")
+    clusters=("${CK8S_CLUSTER}")
+    if [[ "${CK8S_CLUSTER}" == "both" ]]; then
+      clusters=("wc" "sc")
+    fi
     for cluster in "${clusters[@]}"; do
       log_info "  - Uninstalling falco-exporter in ${cluster}"
       helm_uninstall "${cluster}" falco falco-exporter
