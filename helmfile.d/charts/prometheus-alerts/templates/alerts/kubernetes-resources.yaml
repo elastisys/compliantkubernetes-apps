@@ -20,7 +20,7 @@ spec:
     - alert: KubeCPUOvercommit
       annotations:
         description: Cluster has overcommitted CPU resource requests for Pods by {{`{{`}} $value {{`}}`}} CPU shares and cannot tolerate node failure.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/kubecpuovercommit
+        runbook_url: {{ .Values.runbookUrls.kubernetesResources.KubeCPUOvercommit }}
         summary: Cluster has overcommitted CPU resource requests.
       expr: |-
         sum(namespace_cpu:kube_pod_container_resource_requests:sum{}) by (cluster) - (sum(kube_node_status_allocatable{resource="cpu"}) by (cluster) - max(kube_node_status_allocatable{resource="cpu"}) by (cluster)) > 0
@@ -35,7 +35,7 @@ spec:
     - alert: KubeMemoryOvercommit
       annotations:
         description: Cluster has overcommitted memory resource requests for Pods by {{`{{`}} $value | humanize {{`}}`}} bytes and cannot tolerate node failure.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/kubememoryovercommit
+        runbook_url: {{ .Values.runbookUrls.kubernetesResources.KubeMemoryOvercommit }}
         summary: Cluster has overcommitted memory resource requests.
       expr: |-
         sum(namespace_memory:kube_pod_container_resource_requests:sum{}) by (cluster) - (sum(kube_node_status_allocatable{resource="memory"}) by (cluster) - max(kube_node_status_allocatable{resource="memory"}) by (cluster)) > 0
@@ -50,7 +50,7 @@ spec:
     - alert: CPUThrottlingHigh
       annotations:
         description: '{{`{{`}} $value | humanizePercentage {{`}}`}} throttling of CPU in namespace {{`{{`}} $labels.namespace {{`}}`}} for container {{`{{`}} $labels.container {{`}}`}} in pod {{`{{`}} $labels.pod {{`}}`}}.'
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/cputhrottlinghigh
+        runbook_url: {{ .Values.runbookUrls.kubernetesResources.CPUThrottlingHigh }}
         summary: Processes experience elevated CPU throttling.
       expr: |-
         sum(increase(container_cpu_cfs_throttled_periods_total{container!="", }[5m])) by (cluster, container, pod, namespace)

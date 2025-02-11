@@ -17,5 +17,5 @@ metadata:
   namespace: "monitoring"
 spec:
   groups:
-    {{- .Files.Get "files/missing-metrics-alerts.yaml" | nindent 4}}
+    {{- tpl (.Files.Get "files/missing-metrics-alerts.yaml") . | nindent 4}}
 {{- end }}

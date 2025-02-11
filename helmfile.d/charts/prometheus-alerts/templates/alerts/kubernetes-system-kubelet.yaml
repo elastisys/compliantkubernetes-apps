@@ -20,7 +20,7 @@ spec:
     - alert: KubeNodeNotReady
       annotations:
         description: '{{`{{`}} $labels.node {{`}}`}} has been unready for more than 15 minutes.'
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/kubenodenotready
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubeNodeNotReady }}
         summary: Node is not ready.
       expr: kube_node_status_condition{job="kube-state-metrics",condition="Ready",status="true"} == 0
       for: 15m
@@ -32,7 +32,7 @@ spec:
     - alert: KubeNodeUnreachable
       annotations:
         description: '{{`{{`}} $labels.node {{`}}`}} is unreachable and some workloads may be rescheduled.'
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/kubenodeunreachable
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubeNodeUnreachable }}
         summary: Node is unreachable.
       expr: (kube_node_spec_taint{job="kube-state-metrics",key="node.kubernetes.io/unreachable",effect="NoSchedule"} unless ignoring(key,value) kube_node_spec_taint{job="kube-state-metrics",key=~"ToBeDeletedByClusterAutoscaler|cloud.google.com/impending-node-termination|aws-node-termination-handler/spot-itn"}) == 1
       for: 15m
@@ -44,7 +44,7 @@ spec:
     - alert: KubeletTooManyPods
       annotations:
         description: Kubelet '{{`{{`}} $labels.node {{`}}`}}' is running at {{`{{`}} $value | humanizePercentage {{`}}`}} of its Pod capacity.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/kubelettoomanypods
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubeletTooManyPods }}
         summary: Kubelet is running at capacity.
       expr: |-
         count by(cluster,node) (
@@ -63,7 +63,7 @@ spec:
     - alert: KubeNodeReadinessFlapping
       annotations:
         description: The readiness status of node {{`{{`}} $labels.node {{`}}`}} has changed {{`{{`}} $value {{`}}`}} times in the last 15 minutes.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/kubenodereadinessflapping
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubeNodeReadinessFlapping }}
         summary: Node readiness status is flapping.
       expr: sum(changes(kube_node_status_condition{status="true",condition="Ready"}[15m])) by (cluster,node) > 2
       for: 15m
@@ -75,7 +75,7 @@ spec:
     - alert: KubeletPlegDurationHigh
       annotations:
         description: The Kubelet Pod Lifecycle Event Generator has a 99th percentile duration of {{`{{`}} $value {{`}}`}} seconds on node {{`{{`}} $labels.node {{`}}`}}.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/kubeletplegdurationhigh
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubeletPlegDurationHigh }}
         summary: Kubelet Pod Lifecycle Event Generator is taking too long to relist.
       expr: node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile{quantile="0.99"} >= 10
       for: 5m
@@ -87,7 +87,7 @@ spec:
     - alert: KubeletPodStartUpLatencyHigh
       annotations:
         description: Kubelet Pod startup 99th percentile latency is {{`{{`}} $value {{`}}`}} seconds on node {{`{{`}} $labels.node {{`}}`}}.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/kubeletpodstartuplatencyhigh
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubeletPodStartUpLatencyHigh }}
         summary: Kubelet Pod startup latency is too high.
       expr: histogram_quantile(0.99, sum(rate(kubelet_pod_worker_duration_seconds_bucket{job="kubelet", metrics_path="/metrics"}[5m])) by (cluster,instance,le)) * on(cluster,instance) group_left(node) kubelet_node_name{job="kubelet", metrics_path="/metrics"} > 60
       for: 15m
@@ -99,7 +99,7 @@ spec:
     - alert: KubeletClientCertificateExpiration
       annotations:
         description: Client certificate for Kubelet on node {{`{{`}} $labels.node {{`}}`}} expires in {{`{{`}} $value | humanizeDuration {{`}}`}}.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/kubeletclientcertificateexpiration
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubeletClientCertificateExpiration }}
         summary: Kubelet client certificate is about to expire.
       expr: kubelet_certificate_manager_client_ttl_seconds < 604800
       labels:
@@ -110,7 +110,7 @@ spec:
     - alert: KubeletClientCertificateExpiration
       annotations:
         description: Client certificate for Kubelet on node {{`{{`}} $labels.node {{`}}`}} expires in {{`{{`}} $value | humanizeDuration {{`}}`}}.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/kubeletclientcertificateexpiration
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubeletClientCertificateExpiration }}
         summary: Kubelet client certificate is about to expire.
       expr: kubelet_certificate_manager_client_ttl_seconds < 86400
       labels:
@@ -121,7 +121,7 @@ spec:
     - alert: KubeletServerCertificateExpiration
       annotations:
         description: Server certificate for Kubelet on node {{`{{`}} $labels.node {{`}}`}} expires in {{`{{`}} $value | humanizeDuration {{`}}`}}.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/kubeletservercertificateexpiration
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubeletServerCertificateExpiration }}
         summary: Kubelet server certificate is about to expire.
       expr: kubelet_certificate_manager_server_ttl_seconds < 604800
       labels:
@@ -132,7 +132,7 @@ spec:
     - alert: KubeletServerCertificateExpiration
       annotations:
         description: Server certificate for Kubelet on node {{`{{`}} $labels.node {{`}}`}} expires in {{`{{`}} $value | humanizeDuration {{`}}`}}.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/kubeletservercertificateexpiration
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubeletServerCertificateExpiration }}
         summary: Kubelet server certificate is about to expire.
       expr: kubelet_certificate_manager_server_ttl_seconds < 86400
       labels:
@@ -143,7 +143,7 @@ spec:
     - alert: KubeletClientCertificateRenewalErrors
       annotations:
         description: Kubelet on node {{`{{`}} $labels.node {{`}}`}} has failed to renew its client certificate ({{`{{`}} $value | humanize {{`}}`}} errors in the last 5 minutes).
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/kubeletclientcertificaterenewalerrors
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubeletClientCertificateRenewalErrors }}
         summary: Kubelet has failed to renew its client certificate.
       expr: increase(kubelet_certificate_manager_client_expiration_renew_errors[5m]) > 0
       for: 15m
@@ -155,7 +155,7 @@ spec:
     - alert: KubeletServerCertificateRenewalErrors
       annotations:
         description: Kubelet on node {{`{{`}} $labels.node {{`}}`}} has failed to renew its server certificate ({{`{{`}} $value | humanize {{`}}`}} errors in the last 5 minutes).
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/kubeletservercertificaterenewalerrors
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubeletServerCertificateRenewalErrors }}
         summary: Kubelet has failed to renew its server certificate.
       expr: increase(kubelet_server_expiration_renew_errors[5m]) > 0
       for: 15m
@@ -167,7 +167,7 @@ spec:
     - alert: KubeletDown
       annotations:
         description: Kubelet has disappeared from Prometheus target discovery.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/kubeletdown
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubeletDown }}
         summary: Target disappeared from Prometheus target discovery.
       expr: absent(up{job="kubelet", metrics_path="/metrics"} == 1)
       for: 15m
@@ -180,6 +180,7 @@ spec:
     - alert: KubletDownForAutoscaledNodeFor15m
       annotations:
         description: The kubelet job of an existing autoscaled node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 15m.
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubletDownForAutoscaledNodeFor15m }}
         summary: The kubelet job of an existing autoscaled cluster {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.node }}`}} is down for the last 15m.
       expr: |-
           sum by (node, cluster) (kube_node_info and on (node) up{job="kubelet",metrics_path="/metrics"} == 0)
@@ -194,6 +195,7 @@ spec:
     - alert: KubletDownForAutoscaledNodeFor30m
       annotations:
         description: The kubelet job of an existing autoscaled node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 30m.
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubletDownForAutoscaledNodeFor30m }}
         summary: The kubelet job of an existing autoscaled node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 30m.
       expr: |-
           sum by (node, cluster) (kube_node_info and on (node) up{job="kubelet",metrics_path="/metrics"} == 0)
@@ -208,6 +210,7 @@ spec:
     - alert: KubletDownForNonAutoscaledNodeFor5m
       annotations:
         description: The kubelet job of an existing non-autoscaled node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 5m.
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubletDownForNonAutoscaledNodeFor5m }}
         summary: The kubelet job of an existing non-autoscaled node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 5m.
       expr: |-
           sum by (node, cluster) (kube_node_info and on (node) up{job="kubelet",metrics_path="/metrics"} == 0)
@@ -222,6 +225,7 @@ spec:
     - alert: KubletDownForNonAutoscaledNodeFor15m
       annotations:
         description: The kubelet job of an existing non-autoscaled node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 15m.
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubletDownForNonAutoscaledNodeFor15m }}
         summary: The kubelet job of an existing non-autoscaled node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 15m.
       expr: |-
           sum by (node, cluster) (kube_node_info and on (node) up{job="kubelet",metrics_path="/metrics"} == 0)
@@ -237,6 +241,7 @@ spec:
     - alert: KubeletDownFor5m
       annotations:
         description: The kubelet job of an existing node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 5m.
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubeletDownFor5m }}
         summary: The kubelet job of an existing node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 5m.
       expr: sum by (node, cluster) (kube_node_info and on (node) up{job="kubelet",metrics_path="/metrics"} == 0)
       for: 5m
@@ -248,6 +253,7 @@ spec:
     - alert: KubeletDownFor15m
       annotations:
         description: The kubelet job of an existing node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 15m.
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubeletDownFor15m }}
         summary: The kubelet job of an existing node {{`{{ $labels.node }}`}} in cluster {{`{{ $labels.cluster }}`}} is down for the last 15m.
       expr: sum by (node, cluster) (kube_node_info and on (node) up{job="kubelet",metrics_path="/metrics"} == 0)
       for: 15m

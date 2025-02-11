@@ -1,0 +1,273 @@
+{{- define "tpl.prometheus-operator" -}}
+{{- $output := . | dig "override" .name | lower | printf "https://runbooks.prometheus-operator.dev/runbooks/%s/%s" .subpath }}
+{{- $output = .config | dig "group" $output }}
+{{- $output = .config | dig .name $output }}
+    {{ .name }}: {{ $output }}
+{{- end }}
+
+{{- define "tpl.thanos" -}}
+{{- $output := printf "https://github.com/thanos-io/thanos/tree/main/mixin/runbook.md#%s" .header }}
+{{- $output = .config | dig "group" $output }}
+{{- $output = .config | dig .name $output }}
+    {{ .name }}: {{ $output }}
+{{- end }}
+
+{{- define "tpl.missing-runbook" -}}
+{{- $output := printf "Missing runbook" }}
+{{- $output = .config | dig "group" $output }}
+{{- $output = .config | dig .name $output }}
+    {{ .name }}: {{ $output }}
+{{- end }}
+
+{{- with .Values.alerts.runbookUrls }}
+runbookUrls:
+  alertmanager:
+    {{- dict "name" "AlertmanagerConfigInconsistent" "subpath" "alertmanager" "config" .alertmanager | include "tpl.prometheus-operator" }}
+    {{- dict "name" "AlertmanagerFailedReload" "subpath" "alertmanager" "config" .alertmanager | include "tpl.prometheus-operator" }}
+    {{- dict "name" "AlertmanagerMembersInconsistent" "subpath" "alertmanager" "config" .alertmanager | include "tpl.prometheus-operator" }}
+  backupStatus:
+    {{- dict "name" "HarborBackupHaveFailed24Hours" "config" .backupStatus | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborBackupHaveFailed48Hours" "config" .backupStatus | include "tpl.missing-runbook" }}
+    {{- dict "name" "VeleroBackupHaveFailed24Hours" "config" .backupStatus | include "tpl.missing-runbook" }}
+    {{- dict "name" "VeleroBackupHaveFailed48Hours" "config" .backupStatus | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpenSearchSnapshotHaveFailed24Hours" "config" .backupStatus | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpenSearchSnapshotHaveFailed48Hours" "config" .backupStatus | include "tpl.missing-runbook" }}
+  blackbox:
+    {{- dict "name" "EndpointDown" "config" .blackbox | include "tpl.missing-runbook" }}
+  certManager:
+    {{- dict "name" "CertificateExpiringSoon" "config" .certManager | include "tpl.missing-runbook" }}
+    {{- dict "name" "CertificateNotReady" "config" .certManager | include "tpl.missing-runbook" }}
+  clusterApi:
+    {{- dict "name" "ClusterApiClusterIsPaused" "config" .clusterApi | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterApiClusterControlPlaneNotInitialized" "config" .clusterApi | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterApiClusterNotReady" "config" .clusterApi | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterApiClusterInfrastructureNotReady" "config" .clusterApi | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterApiClusterNotProvisionedState" "config" .clusterApi | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterApiKubeadmControlPlaneNotFullyReady" "config" .clusterApi | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterApiKubeadmControlPlaneCloseToMajorityNotReady" "config" .clusterApi | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterApiKubeadmControlPlaneMajorityNotReady" "config" .clusterApi | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterApiMachineDeploymentNotFullyReady" "config" .clusterApi | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterApiMachineDeploymentMajorityNotReady" "config" .clusterApi | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterApiMachineConditionNotTrue" "config" .clusterApi | include "tpl.missing-runbook" }}
+  clusterCapacityManagement:
+    {{- dict "name" "NodeFilesystemSpaceFillingUp" "subpath" "node" "config" .clusterCapacityManagement | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PersistentVolumeXPercentInThreeDays" "subpath" "kubernetes" "override" "kubepersistentvolumefillingup" "config" .clusterCapacityManagement | include "tpl.prometheus-operator" }}
+    {{- dict "name" "MemoryXPercentInThreeDays" "config" .clusterCapacityManagement | include "tpl.missing-runbook" }}
+    {{- dict "name" "NodeGroupCPUXPercentOver24h" "config" .clusterCapacityManagement | include "tpl.missing-runbook" }}
+    {{- dict "name" "NodeGroupCPUXPercentOver1h" "config" .clusterCapacityManagement | include "tpl.missing-runbook" }}
+    {{- dict "name" "NodeGroupMemoryXPercentOver24h" "config" .clusterCapacityManagement | include "tpl.missing-runbook" }}
+    {{- dict "name" "NodeGroupMemoryXPercentOver1h" "config" .clusterCapacityManagement | include "tpl.missing-runbook" }}
+    {{- dict "name" "NodeCPUXPercentOver1h" "config" .clusterCapacityManagement | include "tpl.missing-runbook" }}
+    {{- dict "name" "NodeMemoryXPercentOver1h" "config" .clusterCapacityManagement | include "tpl.missing-runbook" }}
+    {{- dict "name" "NodeGroupCpuRequestXPercent" "config" .clusterCapacityManagement | include "tpl.missing-runbook" }}
+    {{- dict "name" "NodeGroupMemoryRequestXPercent" "config" .clusterCapacityManagement | include "tpl.missing-runbook" }}
+  configReloaders:
+    {{- dict "name" "ConfigReloaderSidecarErrors" "subpath" "prometheus-operator" "config" .configReloaders | include "tpl.prometheus-operator" }}
+  coreDns:
+    {{- dict "name" "CorednsDown" "config" .coreDns | include "tpl.missing-runbook" }}
+    {{- dict "name" "CorednsLatencyHigh" "config" .coreDns | include "tpl.missing-runbook" }}
+    {{- dict "name" "CorednsErrorsHigh" "config" .coreDns | include "tpl.missing-runbook" }}
+    {{- dict "name" "CorednsForwardLatencyHigh" "config" .coreDns | include "tpl.missing-runbook" }}
+    {{- dict "name" "CorednsForwardErrorsHigh" "config" .coreDns | include "tpl.missing-runbook" }}
+    {{- dict "name" "CorednsForwardHealthcheckFailureCount" "config" .coreDns | include "tpl.missing-runbook" }}
+    {{- dict "name" "CorednsForwardHealthcheckBrokenCount" "config" .coreDns | include "tpl.missing-runbook" }}
+    {{- dict "name" "CorednsPanicCount" "config" .coreDns | include "tpl.missing-runbook" }}
+  dailyChecks:
+    {{- dict "name" "S3BucketSizeOverXPercent" "config" .dailyChecks | include "tpl.missing-runbook" }}
+    {{- dict "name" "S3BucketsTotalSizeOverXPercent" "config" .dailyChecks | include "tpl.missing-runbook" }}
+    {{- dict "name" "S3BucketObjectsOverXPercent" "config" .dailyChecks | include "tpl.missing-runbook" }}
+    {{- dict "name" "Bucket36hActivityCheck" "config" .dailyChecks | include "tpl.missing-runbook" }}
+  diskPerf:
+    {{- dict "name" "DiskReadWaitTimeHigh" "config" .diskPerf | include "tpl.missing-runbook" }}
+    {{- dict "name" "DiskWriteWaitTimeHigh" "config" .diskPerf | include "tpl.missing-runbook" }}
+    {{- dict "name" "DiskQueueSizeHigh" "config" .diskPerf | include "tpl.missing-runbook" }}
+  falco:
+    {{- dict "name" "FalcoAlert" "config" .falco | include "tpl.missing-runbook" }}
+  fluentd:
+    {{- dict "name" "FluentdNodeDown" "config" .fluentd | include "tpl.missing-runbook" }}
+    {{- dict "name" "FluentdQueueLength" "config" .fluentd | include "tpl.missing-runbook" }}
+    {{- dict "name" "FluentdAvailableSpaceBuffer" "config" .fluentd | include "tpl.missing-runbook" }}
+    {{- dict "name" "FluentdRecordsCountsHigh" "config" .fluentd | include "tpl.missing-runbook" }}
+    {{- dict "name" "FluentdRetry" "config" .fluentd | include "tpl.missing-runbook" }}
+    {{- dict "name" "FluentdOutputError" "config" .fluentd | include "tpl.missing-runbook" }}
+  general:
+    {{- dict "name" "TargetDown" "subpath" "general" "config" .general | include "tpl.prometheus-operator" }}
+    {{- dict "name" "Watchdog" "subpath" "general" "config" .general | include "tpl.prometheus-operator" }}
+  harbor:
+    {{- dict "name" "HarborCoreDown" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborDatabaseDown" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborRegistryDown" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborRedisDown" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborTrivyDown" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborJobServiceDown" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborStorageUsageAboveLimit" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborP99LatencyHigherThan10Seconds" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborErrorRateHigh" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborTotalNumberOfArtifactsAboveLimit" "config" .harbor | include "tpl.missing-runbook" }}
+  hnc:
+    {{- dict "name" "HierarchicalNamespaceControllerNamespaceCondition" "config" .hnc | include "tpl.missing-runbook" }}
+  kubeStateMetrics:
+    {{- dict "name" "KubeStateMetricsListErrors" "subpath" "kube-state-metrics" "config" .kubeStateMetrics | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeStateMetricsWatchErrors" "subpath" "kube-state-metrics" "config" .kubeStateMetrics | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeStateMetricsShardingMismatch" "subpath" "kube-state-metrics" "config" .kubeStateMetrics | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeStateMetricsShardsMissing" "subpath" "kube-state-metrics" "config" .kubeStateMetrics | include "tpl.prometheus-operator" }}
+  kubernetesApps:
+    {{- dict "name" "KubePodCrashLooping" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubePodNotReady" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeContainerOOMKilled" "config" .kubernetesApps | include "tpl.missing-runbook" }}
+    {{- dict "name" "KubeDeploymentGenerationMismatch" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeDeploymentReplicasMismatch" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeStatefulSetReplicasMismatch" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeStatefulSetGenerationMismatch" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeStatefulSetUpdateNotRolledOut" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeDaemonSetRolloutStuck" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeContainerWaiting" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeDaemonSetNotScheduled" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeDaemonSetMisScheduled" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeJobNotCompleted" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeJobFailed" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeFailedEvictedPods" "config" .kubernetesApps | include "tpl.missing-runbook" }}
+  kubernetesResources:
+    {{- dict "name" "KubeCPUOvercommit" "subpath" "kubernetes" "config" .kubernetesResources | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeMemoryOvercommit" "subpath" "kubernetes" "config" .kubernetesResources | include "tpl.prometheus-operator" }}
+    {{- dict "name" "CPUThrottlingHigh" "subpath" "kubernetes" "config" .kubernetesResources | include "tpl.prometheus-operator" }}
+  kubernetesStorage:
+    {{- dict "name" "KubePersistentVolumeFillingUp" "subpath" "kubernetes" "config" .kubernetesStorage | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubePersistentVolumeErrors" "subpath" "kubernetes" "config" .kubernetesStorage | include "tpl.prometheus-operator" }}
+  kubernetesSystem:
+    {{- dict "name" "KubeClientCertificateExpiration" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeAggregatedAPIErrors" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeAggregatedAPIDown" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeAPIDown" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeAPITerminatedRequests" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeProxyDown" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeNodeNotReady" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeNodeUnreachable" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeletTooManyPods" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeNodeReadinessFlapping" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeletPlegDurationHigh" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeletPodStartUpLatencyHigh" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeletClientCertificateExpiration" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeletServerCertificateExpiration" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeletClientCertificateRenewalErrors" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeletServerCertificateRenewalErrors" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeletDown" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubletDownForAutoscaledNodeFor15m" "subpath" "kubernetes" "override" "kubeletdown" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubletDownForAutoscaledNodeFor30m" "subpath" "kubernetes" "override" "kubeletdown" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubletDownForNonAutoscaledNodeFor5m" "subpath" "kubernetes" "override" "kubeletdown" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubletDownForNonAutoscaledNodeFor15m" "subpath" "kubernetes" "override" "kubeletdown" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeletDownFor5m" "subpath" "kubernetes" "override" "kubeletdown" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeletDownFor15m" "subpath" "kubernetes" "override" "kubeletdown" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeVersionMismatch" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeClientErrors" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+  kured:
+    {{- dict "name" "KuredFailedNodeReboot" "config" .kured | include "tpl.missing-runbook" }}
+  missingMetrics:
+    {{- dict "name" "MetricsFromWcClusterIsMissing" "config" .missingMetrics | include "tpl.missing-runbook" }}
+    {{- dict "name" "MetricsFromScClusterIsMissing" "config" .missingMetrics | include "tpl.missing-runbook" }}
+  nodeExporter:
+    {{- dict "name" "NodeFilesystemAlmostOutOfSpace" "subpath" "node" "config" .nodeExporter | include "tpl.prometheus-operator" }}
+    {{- dict "name" "NodeFilesystemSpaceFillingUp" "subpath" "node" "config" .nodeExporter | include "tpl.prometheus-operator" }}
+    {{- dict "name" "NodeNetworkReceiveErrs" "subpath" "node" "config" .nodeExporter | include "tpl.prometheus-operator" }}
+    {{- dict "name" "NodeNetworkTransmitErrs" "subpath" "node" "config" .nodeExporter | include "tpl.prometheus-operator" }}
+    {{- dict "name" "NodeHighNumberConntrackEntriesUsed" "subpath" "node" "config" .nodeExporter | include "tpl.prometheus-operator" }}
+    {{- dict "name" "NodeTextFileCollectorScrapeError" "subpath" "node" "config" .nodeExporter | include "tpl.prometheus-operator" }}
+    {{- dict "name" "NodeClockSkewDetected" "subpath" "node" "config" .nodeExporter | include "tpl.prometheus-operator" }}
+    {{- dict "name" "NodeClockNotSynchronising" "subpath" "node" "config" .nodeExporter | include "tpl.prometheus-operator" }}
+    {{- dict "name" "NodeFileDescriptorLimit" "subpath" "node" "config" .nodeExporter | include "tpl.prometheus-operator" }}
+  nodeNetwork:
+    {{- dict "name" "NodeNetworkInterfaceFlapping" "subpath" "general" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+  opensearch:
+    {{- dict "name" "OpenSearchTooFewNodesRunning" "config" .opensearch | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpenSearchHeapTooHigh" "config" .opensearch | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpenSearchFieldLimit" "config" .opensearch | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpensearchClusterYellow" "config" .opensearch | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpensearchClusterRed" "config" .opensearch | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpenSearchXIndexSizeOverLimit" "config" .opensearch | include "tpl.missing-runbook" }}
+  openstack:
+    {{- dict "name" "OpenStackCloudControllerDown" "config" .openstack | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpenStackApiRequestFailed" "config" .openstack | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpenStackApiRequestDuration" "config" .openstack | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpenStackApiRequestTotal" "config" .openstack | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpenStackReconcileFailed" "config" .openstack | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpenStackReconcileDuration" "config" .openstack | include "tpl.missing-runbook" }}
+  packetsDropped:
+    {{- dict "name" "FrequentPacketsDroppedToWorkload" "config" .packetsDropped | include "tpl.missing-runbook" }}
+    {{- dict "name" "ScarcePacketsDroppedToWorkload" "config" .packetsDropped | include "tpl.missing-runbook" }}
+    {{- dict "name" "FrequentPacketsDroppedFromWorkload" "config" .packetsDropped | include "tpl.missing-runbook" }}
+    {{- dict "name" "ScarcePacketsDroppedFromWorkload" "config" .packetsDropped | include "tpl.missing-runbook" }}
+  prometheusOperator:
+    {{- dict "name" "PrometheusOperatorListErrors" "subpath" "prometheus-operator" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusOperatorWatchErrors" "subpath" "prometheus-operator" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusOperatorSyncFailed" "subpath" "prometheus-operator" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusOperatorReconcileErrors" "subpath" "prometheus-operator" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusOperatorNodeLookupErrors" "subpath" "prometheus-operator" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusOperatorNotReady" "subpath" "prometheus-operator" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusOperatorRejectedResources" "subpath" "prometheus-operator" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+  prometheus:
+    {{- dict "name" "PrometheusBadConfig" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusNotificationQueueRunningFull" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusErrorSendingAlertsToSomeAlertmanagers" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusNotConnectedToAlertmanagers" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusTSDBReloadsFailing" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusTSDBCompactionsFailing" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusNotIngestingSamples" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusDuplicateTimestamps" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusOutOfOrderTimestamps" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusRemoteStorageFailures" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusRemoteWriteBehind" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusRemoteWriteDesiredShards" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusRuleFailures" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusMissingRuleEvaluations" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusTargetLimitHit" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusLabelLimitHit" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusScrapeBodySizeLimitHit" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusScrapeSampleLimitHit" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusTargetSyncFailure" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusErrorSendingAlertsToAnyAlertmanager" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+  thanos:
+    {{- dict "name" "ThanosRuleIsDown" "header" "thanos-component-absent" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosRuleQueueIsDroppingAlerts" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosRuleSenderIsFailingAlerts" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosRuleHighRuleEvaluationFailures" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosRuleHighRuleEvaluationWarnings" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosRuleRuleEvaluationLatencyHigh" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosRuleGrpcErrorRate" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosRuleConfigReloadFailure" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosRuleQueryHighDNSFailures" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosRuleAlertmanagerHighDNSFailures" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosRuleNoEvaluationFor10Intervals" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosNoRuleEvaluations" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosCompactMultipleRunning" "header" "thanos-compact" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosCompactHalted" "header" "thanos-compact" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosCompactHighCompactionFailures" "header" "thanos-compact" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosCompactBucketHighOperationFailures" "header" "thanos-compact" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosCompactHasNotRun" "header" "thanos-compact" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosQueryHttpRequestQueryErrorRateHigh" "header" "thanos-query" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosQueryHttpRequestQueryRangeErrorRateHigh" "header" "thanos-query" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosQueryGrpcServerErrorRate" "header" "thanos-query" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosQueryGrpcClientErrorRate" "header" "thanos-query" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosQueryHighDNSFailures" "header" "thanos-query" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosQueryInstantLatencyHigh" "header" "thanos-query" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosQueryRangeLatencyHigh" "header" "thanos-query" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosReceiveHttpRequestErrorRateHigh" "header" "thanos-receive" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosReceiveHttpRequestLatencyHigh" "header" "thanos-receive" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosReceiveHighReplicationFailures" "header" "thanos-receive" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosReceiveHighForwardRequestFailures" "header" "thanos-receive" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosReceiveHighHashringFileRefreshFailures" "header" "thanos-receive" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosReceiveConfigReloadFailure" "header" "thanos-receive" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosReceiveNoUpload" "header" "thanos-receive" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosReceiveTrafficBelowThreshold" "header" "thanos-receive" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosStoreGrpcErrorRate" "header" "thanos-store" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosStoreSeriesGateLatencyHigh" "header" "thanos-store" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosStoreBucketHighOperationFailures" "header" "thanos-store" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosStoreObjstoreOperationLatencyHigh" "header" "thanos-store" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosBucketReplicateErrorRate" "header" "thanos-bucket-replicate" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosBucketReplicateRunLatency" "header" "thanos-bucket-replicate" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosCompactIsDown" "header" "thanos-component-absent" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosQueryIsDown" "header" "thanos-component-absent" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosReceiveIsDown" "header" "thanos-component-absent" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosStoreIsDown" "header" "thanos-component-absent" "config" .thanos | include "tpl.thanos" }}
+  webhook:
+    {{- dict "name" "WebhookFailing" "config" .webhook | include "tpl.missing-runbook" }}
+{{- end }}

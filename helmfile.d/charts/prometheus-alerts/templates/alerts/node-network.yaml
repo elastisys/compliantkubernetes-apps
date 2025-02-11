@@ -20,7 +20,7 @@ spec:
     - alert: NodeNetworkInterfaceFlapping
       annotations:
         description: Network interface "{{`{{`}} $labels.device {{`}}`}}" changing it's up status often on node-exporter {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod {{`}}`}}
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}general/nodenetworkinterfaceflapping
+        runbook_url: {{ .Values.runbookUrls.nodeNetwork.NodeNetworkInterfaceFlapping }}
         summary: Network interface is often changing it's status
       expr: changes(node_network_up{job="node-exporter",device!~"veth.+"}[2m]) > 2
       for: 2m

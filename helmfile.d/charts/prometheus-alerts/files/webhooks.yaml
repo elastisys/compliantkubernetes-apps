@@ -4,6 +4,7 @@
     annotations:
       description: Webhooks have been failing during the last 10m
       summary: Webhooks requests are failing
+      runbook_url: {{ .Values.runbookUrls.webhook.WebhookFailing }}
     expr: rate(apiserver_admission_webhook_rejection_count{error_type!="no_error"}[5m]) > 0
     for: 10m
     labels:

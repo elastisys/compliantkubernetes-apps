@@ -20,6 +20,7 @@ spec:
     - alert: OpenStackCloudControllerDown
       annotations:
         summary: OpenStack cloud controller manager has disappeared.
+        runbook_url: {{ .Values.runbookUrls.openstack.OpenStackCloudControllerDown }}
       expr: (group(present_over_time(up{job="openstack-monitoring"}[6h])) by (cluster) unless group(up{job="openstack-monitoring"}) by (cluster)) or (absent(up{job="openstack-monitoring"} == 1))
       for: 10m
       labels:
@@ -27,6 +28,7 @@ spec:
     - alert: OpenStackApiRequestFailed
       annotations:
         summary: Failed OpenStack API call.
+        runbook_url: {{ .Values.runbookUrls.openstack.OpenStackApiRequestFailed }}
       expr: rate(openstack_api_request_errors_total[5m]) > 0.01
       for: 5m
       labels:
@@ -34,6 +36,7 @@ spec:
     - alert: OpenStackApiRequestDuration
       annotations:
         summary: OpenStack API has taken longer than 15 seconds.
+        runbook_url: {{ .Values.runbookUrls.openstack.OpenStackApiRequestDuration }}
       expr: rate(openstack_api_request_duration_seconds_sum[5m]) / rate(openstack_api_request_duration_seconds_count[5m]) > 15
       for: 5m
       labels:
@@ -41,6 +44,7 @@ spec:
     - alert: OpenStackApiRequestTotal
       annotations:
         summary: Too high amount of OpenStack API calls.
+        runbook_url: {{ .Values.runbookUrls.openstack.OpenStackApiRequestTotal }}
       expr: (delta(openstack_api_requests_total[5m]))/5 > 20
       for: 5m
       labels:
@@ -48,6 +52,7 @@ spec:
     - alert: OpenStackReconcileFailed
       annotations:
         summary: Increased reconciliation errors.
+        runbook_url: {{ .Values.runbookUrls.openstack.OpenStackReconcileFailed }}
       expr: rate(cloudprovider_openstack_reconcile_errors_total[5m]) > 0
       for: 10m
       labels:
@@ -55,6 +60,7 @@ spec:
     - alert: OpenStackReconcileDuration
       annotations:
         summary: Reconciliation has taken longer than 10 minutes.
+        runbook_url: {{ .Values.runbookUrls.openstack.OpenStackReconcileDuration }}
       expr: rate(cloudprovider_openstack_reconcile_duration_seconds_sum[5m]) / rate(cloudprovider_openstack_reconcile_duration_seconds_count[5m]) > 600
       for: 10m
       labels:

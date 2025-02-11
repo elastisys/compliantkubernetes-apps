@@ -20,7 +20,7 @@ spec:
     - alert: KubeVersionMismatch
       annotations:
         description: There are {{`{{`}} $value {{`}}`}} different semantic versions of Kubernetes components running.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/kubeversionmismatch
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubeVersionMismatch }}
         summary: Different semantic versions of Kubernetes components running.
       expr: count(count by (cluster, git_version) (label_replace(kubernetes_build_info{job!~"kube-dns|coredns|openstack-monitoring"},"git_version","$1","git_version","(v[0-9]*.[0-9]*).*"))) by (cluster) > 1
       for: 15m
@@ -32,7 +32,7 @@ spec:
     - alert: KubeClientErrors
       annotations:
         description: Kubernetes API server client '{{`{{`}} $labels.job {{`}}`}}/{{`{{`}} $labels.instance {{`}}`}}' is experiencing {{`{{`}} $value | humanizePercentage {{`}}`}} errors.'
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/kubeclienterrors
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubeClientErrors }}
         summary: Kubernetes API server client is experiencing errors.
       expr: |-
         (sum(rate(rest_client_requests_total{code=~"5.."}[5m])) by (cluster, instance, job, namespace)

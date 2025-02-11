@@ -15,5 +15,5 @@ metadata:
 {{ toYaml .Values.defaultRules.annotations | indent 4 }}
 {{- end }}
 spec:
-  {{- .Files.Get "files/thanos.yaml" | nindent 2}}
+  {{- tpl (.Files.Get "files/thanos.yaml") . | nindent 2}}
 {{- end }}
