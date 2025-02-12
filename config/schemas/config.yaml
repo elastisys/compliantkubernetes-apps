@@ -6231,7 +6231,7 @@ properties:
         meta:enum:
           iptables: The classical kernel netfilter interface. Use with Ubuntu 20.04 and older
           nftables: More modern netfilter interface. Use with Ubuntu 22.04 and newer
-        default: iptables
+        default: nftables
       enabled:
         default: true
         type: boolean
