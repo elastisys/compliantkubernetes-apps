@@ -111,7 +111,7 @@ falco:
   ## Falco alerting configuration.
   alerts:
     enabled: true
-    ## supported: 'alertmanager', 'slack'.
+    ## supported: 'alertmanager', 'slack', 'none'.
     type: alertmanager
     priority: notice
   enabled: true
