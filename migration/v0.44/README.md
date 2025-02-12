@@ -140,29 +140,35 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
-1. Remove falco-exporter config and uninstall it:
-
-    ```bash
-    ./migration/v0.44/prepare/10-remove-falco-exporter-config.sh
-    ./migration/v0.44/apply/20-uninstall-falco-exporter.sh execute
-    ```
-
 1. Upgrade kube-prometheus-stack:
 
     ```bash
     ./migration/v0.44/apply/10-kube-prometheus-stack.sh
     ```
 
+1. Upgrade Gatekeeper CRDs:
+
+    ```bash
+    ./migration/v0.44/apply/20-gatekeeper-crds.sh
+    ```
+
+1. Remove falco-exporter config and uninstall it:
+
+    ```bash
+    ./migration/v0.44/prepare/10-remove-falco-exporter-config.sh
+    ./migration/v0.44/apply/30-uninstall-falco-exporter.sh execute
+    ```
+
 1. Migrate gpu-operator namespace if it exists:
 
     ```bash
-    ./migration/v0.44/apply/20-migrate-gpu-operator-ns.sh
+    ./migration/v0.44/apply/40-migrate-gpu-operator-ns.sh
     ```
 
 1. Upgrade OpenSearch:
 
     ```bash
-    ./migration/v0.44/apply/40-opensearch-backup.sh execute
+    ./migration/v0.44/apply/50-opensearch-backup.sh execute
     ```
 
 1. Upgrade applications:
