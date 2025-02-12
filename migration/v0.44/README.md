@@ -147,6 +147,13 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
+1. Remove falco-exporter config and uninstall it:
+
+    ```bash
+    ./migration/v0.44/prepare/10-remove-falco-exporter-config.sh
+    ./migration/v0.44/apply/20-uninstall-falco-exporter.sh execute
+    ```
+
 1. Upgrade kube-prometheus-stack:
 
     ```bash
