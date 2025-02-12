@@ -108,6 +108,12 @@ user:
 
 ## Falco configuration.
 falco:
+  ## Falco alerting configuration.
+  alerts:
+    enabled: true
+    ## supported: 'alertmanager', 'slack'.
+    type: alertmanager
+    priority: notice
   enabled: true
   # Available rule files and addons can be found at: https://falcosecurity.github.io/falcoctl/index.yaml
   rulesFiles:

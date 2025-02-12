@@ -3064,6 +3064,7 @@ properties:
             enum:
               - alertmanager
               - slack
+              - none
           hostPort:
             title: Falco Alerts Host Port
             description: Configure the notification channel for Falco alerts.

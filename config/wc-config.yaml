@@ -126,12 +126,7 @@ user:
   #       namespace: example-namespace
 
 falco:
-  ## Falco alerting configuration.
   alerts:
-    enabled: true
-    ## supported: 'alertmanager', 'slack'.
-    type: alertmanager
-    priority: notice
     hostPort: http://alertmanager-operated.alertmanager:9093
 
 ## Prometheus configuration.
