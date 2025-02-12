@@ -70,3 +70,6 @@ policies:
                 app.kubernetes.io/name: falco
           ports:
             - tcp: 2801
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 2801
