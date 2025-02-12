@@ -791,7 +791,7 @@ metricsServer:
 calicoAccountant:
   enabled: true
   # Backend for networkpolicy rules - Ubuntu 20.04 and older use iptables - Ubuntu 22.04 and newer use nftables
-  backend: set-me
+  backend: nftables
   tolerations:
     - key: node-role.kubernetes.io/master
       operator: Exists
