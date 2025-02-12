@@ -21,7 +21,7 @@ spec:
       annotations:
         message: 'Pod: {{`{{ $labels.pod }}`}}, Rule: {{`{{ $labels.rule }}`}}'
       expr: |-
-        falco_events != 0
+        falcosecurity_falcosidekick_falco_events_total != 0
       labels:
         severity: warning
 {{- end }}
