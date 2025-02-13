@@ -4,6 +4,8 @@
 crossplane xpkg init dex configuration-template
 ```
 
+Edit `crossplane.yaml` and fill in metadata and dependencies etc.
+
 Generate XRD:
 
 ```shell
