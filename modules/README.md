@@ -1,5 +1,9 @@
 # Modules
 
+``` shell
+crossplane xpkg init dex configuration-template
+```
+
 Generate XRD:
 
 ```shell

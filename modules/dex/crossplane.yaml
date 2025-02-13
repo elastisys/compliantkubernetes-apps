@@ -1,0 +1,24 @@
+apiVersion: meta.pkg.crossplane.io/v1
+kind: Configuration
+metadata:
+  name: your-configuration
+  annotations:
+    # Set the annotations defining the maintainer, source, license, and description of your Configuration
+    meta.crossplane.io/maintainer: You <myself@me.io>
+    meta.crossplane.io/source: github.com/your-organization/your-repo
+    # Set the license of your Configuration
+    meta.crossplane.io/license: Apache-2.0
+    meta.crossplane.io/description: |
+      This is where you can describe your configuration.
+    meta.crossplane.io/readme: |
+      This is where you can add a readme for your configuration.
+spec:
+  # (Optional) Set the minimum version of Crossplane that this Configuration is compatible with
+  crossplane:
+    version: ">=v1.14.1-0"
+  # Add your dependencies here
+  dependsOn:
+    - provider: xpkg.upbound.io/crossplane-contrib/provider-kubernetes
+      version: "v0.12.1"
+    - function: xpkg.upbound.io/crossplane-contrib/function-patch-and-transform
+      version: "v0.3.0"

@@ -1,0 +1,18 @@
+A template for writing a Configuration (https://docs.crossplane.io/latest/concepts/packages).
+
+To use this template:
+1. Replace the name, metadata in crossplane.yaml to reflect your Configuration.
+2. Add dependencies in crossplane.yaml.
+3. Update the sample CompositeResourceDefinition and Composition in the `apis/`
+   directory to reflect the API you're designing for your platform, and optionally add more if needed.
+4. Add/Update examples in the `examples/` directory.
+5. Update the `README.md`, to be about your Configuration!
+
+To build and push your Configuration to a registry, run the following commands
+using the Crossplane CLI:
+
+`crossplane xpkg build`
+(Optionally) `crossplane xpkg login`
+`crossplane xpkg push your-org/your-repo:v1.0.0`
+
+Check the README.md for more information and have fun building your Configuration!

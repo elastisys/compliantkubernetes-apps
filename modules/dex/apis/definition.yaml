@@ -1,0 +1,29 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xcfgresources.cfg.example.org
+spec:
+  group: cfg.example.org
+  names:
+    kind: XCfgResource
+    plural: xcfgresources
+  claimNames:
+    kind: CfgResource
+    plural: cfgresources
+  connectionSecretKeys:
+    - test
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                data:
+                  type: string
+              required:
+                - data
