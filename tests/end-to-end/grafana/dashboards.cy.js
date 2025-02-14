@@ -131,7 +131,7 @@ describe("grafana dev dashboards", function() {
   })
 
   it('open the NGINX Ingress controller dashboard', function () {
-    cy.testGrafanaDashboard(this.ingress, 'NGINX Ingress controller', false, 30)
+    cy.testGrafanaDashboard(this.ingress, 'NGINX Ingress controller', false, 26)
 
     cy.get('[data-testid="data-testid Panel header Controller Request Volume"]')
       .should('exist')
