@@ -16,6 +16,9 @@ rejectLoadBalancerService:
 preventAccidentalDeletion:
     enable: {{ .Values.opa.preventAccidentalDeletion.enabled }}
     enforcementAction: {{ .Values.opa.preventAccidentalDeletion.enforcement }}
+rejectEmptyDir:
+    enable: {{ .Values.opa.rejectEmptyDir.enabled }}
+    enforcementAction: {{ .Values.opa.rejectEmptyDir.enforcement }}
 {{- if eq .Environment.Name "workload_cluster" }}
 allowUserCRDs:
     enable: {{ .Values.gatekeeper.allowUserCRDs.enabled }}
