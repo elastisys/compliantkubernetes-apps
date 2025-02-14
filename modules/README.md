@@ -5,6 +5,7 @@ crossplane xpkg init dex configuration-template
 ```
 
 Edit `crossplane.yaml` and fill in metadata and dependencies etc.
+Update the Composition in `apis/composition.yaml`.
 
 Generate XRD:
 
