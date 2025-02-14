@@ -387,6 +387,12 @@ prometheus:
   nodeSelector: {}
   webhookAlerts:
     enabled: true
+  # Split alerts for autoscaled node from normal node
+  # TODO: .autoscaledNodeGroupAlerts.groupLabel must have value if autoscaledNodeGroupAlerts is enabled, can be configured with a different label in the future
+  autoscaledNodeGroupAlerts:
+    enabled: true
+    groupLabel: "node-restriction.kubernetes.io/autoscaled-node-type"
+    groupLabelValues: []
   ## Predictive alert if the resource usage will hit the set percentage in 3 days
   capacityManagementAlerts:
     enabled: true

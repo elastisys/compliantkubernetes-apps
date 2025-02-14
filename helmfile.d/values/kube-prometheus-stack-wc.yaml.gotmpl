@@ -25,8 +25,13 @@ kube-state-metrics:
     enabled: true
   resources: {{- toYaml .Values.kubeStateMetrics.resources | nindent 4 }}
 
+  {{- if .Values.prometheus.autoscaledNodeGroupAlerts.enabled }}
+  metricLabelsAllowlist:
+  - nodes=[topology.kubernetes.io/zone,elastisys.io/node-group,node.kubernetes.io/instance-type,{{ .Values.prometheus.autoscaledNodeGroupAlerts.groupLabel }}]
+  {{- else }}
   metricLabelsAllowlist:
   - nodes=[topology.kubernetes.io/zone,elastisys.io/node-group,node.kubernetes.io/instance-type]
+  {{- end }}
 
 prometheus-node-exporter:
   resources: {{- toYaml .Values.prometheusNodeExporter.resources | nindent 4 }}
