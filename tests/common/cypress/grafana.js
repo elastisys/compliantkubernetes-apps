@@ -21,7 +21,7 @@ Cypress.Commands.add('testGrafanaDashboard', (ingress, dashboardName, expandRows
   cy.contains(dashboardName)
 
   // Check that the datasource selector exists and is the default
-  cy.get("form")
+  cy.get('[data-testid="data-testid dashboard controls"]')
     .contains("datasource")
     .should("exist")
     .siblings()
@@ -29,7 +29,7 @@ Cypress.Commands.add('testGrafanaDashboard', (ingress, dashboardName, expandRows
     .should("exist")
 
   // Check that the cluster selector exists
-  cy.get("form")
+  cy.get('[data-testid="data-testid dashboard controls"]')
     .contains("cluster")
     .should("exist")
 
@@ -43,7 +43,7 @@ Cypress.Commands.add('testGrafanaDashboard', (ingress, dashboardName, expandRows
   }
 
   // Wait for dashboards to load
-  cy.wait(Array(requestsToWait).fill('@api'))
+  cy.wait(Array(requestsToWait).fill('@api'), { timeout: 20000 })
 
   // After all graphs have loaded, search for text
   // Some dashboards will contain "No data" because an overwrite for NaN or Null doesn't exist
