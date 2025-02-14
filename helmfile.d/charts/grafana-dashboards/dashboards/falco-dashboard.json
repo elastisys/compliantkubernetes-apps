@@ -23,12 +23,46 @@
   "links": [],
   "panels": [
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 7,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "# Detailed falco logs can be found in OpenSearch Dashboards:\n\n\n<<opensearchdashboardsURL>>",
+        "mode": "markdown"
+      },
+      "pluginVersion": "11.3.0-77222",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Falco logs",
+      "type": "text"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 0
+        "y": 1
       },
       "id": 7,
       "panels": [],
@@ -61,7 +95,7 @@
         "h": 9,
         "w": 9,
         "x": 0,
-        "y": 1
+        "y": 2
       },
       "id": 1,
       "options": {
@@ -95,7 +129,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(rule_name) (increase(falcosecurity_falco_rules_matches_total{source=~\"$source\", priority=~\"$priority\", pod=~\"$pod\"}[$__rate_interval]))",
+          "expr": "sum by(rule_name) (increase(falcosecurity_falco_rules_matches_total{cluster=~\"$cluster\", source=~\"$source\", priority=~\"$priority\", pod=~\"$pod\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -134,7 +168,7 @@
         "h": 9,
         "w": 8,
         "x": 9,
-        "y": 1
+        "y": 2
       },
       "id": 2,
       "options": {
@@ -168,7 +202,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(source) (increase(falcosecurity_falco_rules_matches_total{source=~\"$source\", priority=~\"$priority\", pod=~\"$pod\"}[$__rate_interval]))",
+          "expr": "sum by(source) (increase(falcosecurity_falco_rules_matches_total{cluster=~\"$cluster\", source=~\"$source\", priority=~\"$priority\", pod=~\"$pod\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "includeNullMetadata": false,
           "instant": false,
@@ -269,7 +303,7 @@
         "h": 9,
         "w": 7,
         "x": 17,
-        "y": 1
+        "y": 2
       },
       "id": 3,
       "options": {
@@ -303,7 +337,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(priority) (increase(falcosecurity_falco_rules_matches_total{source=~\"$source\", priority=~\"$priority\", pod=~\"$pod\"}[$__rate_interval]))",
+          "expr": "sum by(priority) (increase(falcosecurity_falco_rules_matches_total{cluster=~\"$cluster\", source=~\"$source\", priority=~\"$priority\", pod=~\"$pod\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -477,7 +511,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(priority) (increase(falcosecurity_falco_rules_matches_total{source=~\"$source\", priority=~\"$priority\", pod=~\"$pod\"}[$__rate_interval]))",
+          "expr": "sum by(priority) (increase(falcosecurity_falco_rules_matches_total{cluster=~\"$cluster\", source=~\"$source\", priority=~\"$priority\", pod=~\"$pod\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -651,7 +685,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(source) (increase(falcosecurity_falco_rules_matches_total{source=~\"$source\", priority=~\"$priority\", pod=~\"$pod\"}[$__rate_interval]))",
+          "expr": "sum by(source) (increase(falcosecurity_falco_rules_matches_total{cluster=~\"$cluster\", source=~\"$source\", priority=~\"$priority\", pod=~\"$pod\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -826,7 +860,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(rule_name) (increase(falcosecurity_falco_rules_matches_total{source=~\"$source\", priority=~\"$priority\", pod=~\"$pod\"}[$__rate_interval]))",
+          "expr": "sum by(rule_name) (increase(falcosecurity_falco_rules_matches_total{cluster=~\"$cluster\", source=~\"$source\", priority=~\"$priority\", pod=~\"$pod\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -1044,7 +1078,7 @@
           "disableTextWrap": false,
           "editorMode": "builder",
           "exemplar": false,
-          "expr": "sum by(pod) (increase(falcosecurity_scap_n_evts_total{pod=~\"$pod\"}[$__rate_interval]))",
+          "expr": "sum by(pod) (increase(falcosecurity_scap_n_evts_total{cluster=~\"$cluster\", pod=~\"$pod\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1171,7 +1205,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "avg by(pod, raw_name) (falcosecurity_falco_memory_rss_bytes{pod=~\"$pod\"})",
+          "expr": "avg by(pod, raw_name) (falcosecurity_falco_memory_rss_bytes{cluster=~\"$cluster\", pod=~\"$pod\"})",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -1279,7 +1313,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "avg by(pod, raw_name) (falcosecurity_falco_memory_vsz_bytes{pod=~\"$pod\"})",
+          "expr": "avg by(pod, raw_name) (falcosecurity_falco_memory_vsz_bytes{cluster=~\"$cluster\", pod=~\"$pod\"})",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -1295,7 +1329,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "avg by(pod, raw_name) (falcosecurity_falco_memory_vsz_bytes)",
+          "expr": "avg by(pod, raw_name) (falcosecurity_falco_memory_vsz_bytes{cluster=~\"$cluster\"})",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -1402,7 +1436,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "avg by(pod) (falcosecurity_falco_cpu_usage_ratio{pod=~\"$pod\"})",
+          "expr": "avg by(pod) (falcosecurity_falco_cpu_usage_ratio{cluster=~\"$cluster\", pod=~\"$pod\"})",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -1508,7 +1542,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_total{pod=~\"$pod\"}[$__rate_interval]))",
+          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_total{cluster=~\"$cluster\", pod=~\"$pod\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -1614,7 +1648,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(pod) (increase(falcosecurity_falco_outputs_queue_num_drops_total{pod=~\"$pod\"}[$__rate_interval]))",
+          "expr": "sum by(pod) (increase(falcosecurity_falco_outputs_queue_num_drops_total{cluster=~\"$cluster\", pod=~\"$pod\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -1720,7 +1754,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"enter\", drop=\"clone_fork\"}[$__rate_interval]))",
+          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{cluster=~\"$cluster\", pod=~\"$pod\", dir=\"enter\", drop=\"clone_fork\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -1736,7 +1770,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"enter\", drop=\"connect\"}[$__rate_interval]))",
+          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{cluster=~\"$cluster\", pod=~\"$pod\", dir=\"enter\", drop=\"connect\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1753,7 +1787,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"enter\", drop=\"dir_file\"}[$__rate_interval]))",
+          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{cluster=~\"$cluster\", pod=~\"$pod\", dir=\"enter\", drop=\"dir_file\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1770,7 +1804,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"enter\", drop=\"execve\"}[$__rate_interval]))",
+          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{cluster=~\"$cluster\", pod=~\"$pod\", dir=\"enter\", drop=\"execve\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1787,7 +1821,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"enter\", drop=\"open\"}[$__rate_interval]))",
+          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{cluster=~\"$cluster\", pod=~\"$pod\", dir=\"enter\", drop=\"open\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1804,7 +1838,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"enter\", drop=\"other_interest\"}[$__rate_interval]))",
+          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{cluster=~\"$cluster\", pod=~\"$pod\", dir=\"enter\", drop=\"other_interest\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1911,7 +1945,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"exit\", drop=\"clone_fork\"}[$__rate_interval]))",
+          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{cluster=~\"$cluster\", pod=~\"$pod\", dir=\"exit\", drop=\"clone_fork\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -1927,7 +1961,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"exit\", drop=\"connect\"}[$__rate_interval]))",
+          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{cluster=~\"$cluster\", pod=~\"$pod\", dir=\"exit\", drop=\"connect\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1944,7 +1978,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"exit\", drop=\"dir_file\"}[$__rate_interval]))",
+          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{cluster=~\"$cluster\", pod=~\"$pod\", dir=\"exit\", drop=\"dir_file\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1961,7 +1995,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"exit\", drop=\"execve\"}[$__rate_interval]))",
+          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{cluster=~\"$cluster\", pod=~\"$pod\", dir=\"exit\", drop=\"execve\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1978,7 +2012,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"exit\", drop=\"open\"}[$__rate_interval]))",
+          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{cluster=~\"$cluster\", pod=~\"$pod\", dir=\"exit\", drop=\"open\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1995,7 +2029,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"exit\", drop=\"other_interest\"}[$__rate_interval]))",
+          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{cluster=~\"$cluster\", pod=~\"$pod\", dir=\"exit\", drop=\"other_interest\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -2100,7 +2134,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_cpu_total{pod=~\"$pod\"}[$__rate_interval]))",
+          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_cpu_total{cluster=~\"$cluster\", pod=~\"$pod\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -2204,7 +2238,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_full_threadtable_total{pod=~\"$pod\"}[$__rate_interval]))",
+          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_full_threadtable_total{cluster=~\"$cluster\", pod=~\"$pod\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -2308,7 +2342,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_scratch_map_total{pod=~\"$pod\"}[$__rate_interval]))",
+          "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_scratch_map_total{cluster=~\"$cluster\", pod=~\"$pod\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -2395,7 +2429,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "count by(version) (falcosecurity_falco_version_info{pod=~\"$pod\"})",
+          "expr": "count by(version) (falcosecurity_falco_version_info{cluster=~\"$cluster\", pod=~\"$pod\"})",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "legendFormat": "__auto",
@@ -2468,7 +2502,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "count by(engine_name) (falcosecurity_scap_engine_name_info{pod=~\"$pod\"})",
+          "expr": "count by(engine_name) (falcosecurity_scap_engine_name_info{cluster=~\"$cluster\", pod=~\"$pod\"})",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "legendFormat": "__auto",
@@ -2493,8 +2527,9 @@
     "list": [
       {
         "current": {
-          "text": "grafanacloud-issif-prom",
-          "value": "grafanacloud-prom"
+          "selected": false,
+          "text": "default",
+          "value": "default"
         },
         "name": "datasource",
         "options": [],
@@ -2615,6 +2650,41 @@
         "regex": "",
         "sort": 4,
         "type": "query"
+      },
+      {
+        "allValue": "",
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values(falcosecurity_falco_version_info,cluster)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "cluster",
+        "multi": true,
+        "name": "cluster",
+        "options": [],
+        "query": {
+          "query": "label_values(falcosecurity_falco_version_info,cluster)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
       }
     ]
   },
