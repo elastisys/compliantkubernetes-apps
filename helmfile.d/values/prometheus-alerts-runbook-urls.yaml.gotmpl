@@ -1,1101 +1,270 @@
+{{- define "tpl.prometheus-operator" -}}
+{{- $output := . | dig "override" .name | lower | printf "https://runbooks.prometheus-operator.dev/runbooks/%s/%s" .subpath }}
+{{- $output = .config | dig "group" $output }}
+{{- $output = .config | dig .name $output }}
+    {{ .name }}: {{ $output }}
+{{- end }}
+
+{{- define "tpl.thanos" -}}
+{{- $output := printf "https://github.com/thanos-io/thanos/tree/main/mixin/runbook.md#%s" .header }}
+{{- $output = .config | dig "group" $output }}
+{{- $output = .config | dig .name $output }}
+    {{ .name }}: {{ $output }}
+{{- end }}
+
+{{- define "tpl.missing-runbook" -}}
+{{- $output := printf "Missing runbook" }}
+{{- $output = .config | dig "group" $output }}
+{{- $output = .config | dig .name $output }}
+    {{ .name }}: {{ $output }}
+{{- end }}
+
+{{ $missingRunbook := "Missing runbook" }}
+{{ $thanosRunbookUrl := "https://github.com/thanos-io/thanos/tree/main/mixin/runbook.md" }}
+{{- with .Values.alerts.runbookUrls }}
 runbookUrls:
-  {{ $prometheusOperatorRunbookUrl := "https://runbooks.prometheus-operator.dev/runbooks" }}
-  {{ $missingRunbook := "Missing runbook" }}
   alertmanager:
-    {{ $runbookUrl := printf "%s/alertmanager/alertmanagerconfiginconsistent" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "alertmanager" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "alertmanager" "AlertmanagerConfigInconsistent" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    AlertmanagerConfigInconsistent: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/alertmanager/alertmanagerfailedreload" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "alertmanager" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "alertmanager" "AlertmanagerFailedReload" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    AlertmanagerFailedReload: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/alertmanager/alertmanagermembersinconsistent" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "alertmanager" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "alertmanager" "AlertmanagerMembersInconsistent" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    AlertmanagerMembersInconsistent: {{ $runbookUrl }}
+    {{- dict "name" "AlertmanagerConfigInconsistent" "subpath" "alertmanager" "config" .alertmanager | include "tpl.prometheus-operator" }}
+    {{- dict "name" "AlertmanagerFailedReload" "subpath" "alertmanager" "config" .alertmanager | include "tpl.prometheus-operator" }}
+    {{- dict "name" "AlertmanagerMembersInconsistent" "subpath" "alertmanager" "config" .alertmanager | include "tpl.prometheus-operator" }}
   backupStatus:
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "backupStatus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "backupStatus" "HarborBackupHaveFailed24Hours" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    HarborBackupHaveFailed24Hours: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "backupStatus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "backupStatus" "HarborBackupHaveFailed48Hours" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    HarborBackupHaveFailed48Hours: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "backupStatus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "backupStatus" "VeleroBackupHaveFailed24Hours" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    VeleroBackupHaveFailed24Hours: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "backupStatus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "backupStatus" "VeleroBackupHaveFailed48Hours" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    VeleroBackupHaveFailed48Hours: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "backupStatus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "backupStatus" "OpenSearchBackupHaveFailed24Hours" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    OpenSearchSnapshotHaveFailed24Hours: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "backupStatus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "backupStatus" "OpenSearchSnapshotHaveFailed48Hours" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    OpenSearchSnapshotHaveFailed48Hours: {{ $runbookUrl }}
+    {{- dict "name" "HarborBackupHaveFailed24Hours" "config" .backupStatus | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborBackupHaveFailed48Hours" "config" .backupStatus | include "tpl.missing-runbook" }}
+    {{- dict "name" "VeleroBackupHaveFailed24Hours" "config" .backupStatus | include "tpl.missing-runbook" }}
+    {{- dict "name" "VeleroBackupHaveFailed48Hours" "config" .backupStatus | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpenSearchSnapshotHaveFailed24Hours" "config" .backupStatus | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpenSearchSnapshotHaveFailed48Hours" "config" .backupStatus | include "tpl.missing-runbook" }}
   blackbox:
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "blackbox" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "blackbox" "EndpointDown" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    EndpointDown: {{ $runbookUrl }}
+    {{- dict "name" "EndpointDown" "config" .blackbox | include "tpl.missing-runbook" }}
   certManager:
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "certManager" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "certManager" "CertificateExpiringSoon" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    CertificateExpiringSoon: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "certManager" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "certManager" "CertificateNotReady" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    CertificateNotReady: {{ $runbookUrl }}
+    {{- dict "name" "CertificateExpiringSoon" "config" .certManager | include "tpl.missing-runbook" }}
+    {{- dict "name" "CertificateNotReady" "config" .certManager | include "tpl.missing-runbook" }}
   clusterApi:
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "clusterApi" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterApi" "ClusterApiClusterIsPaused" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ClusterApiClusterIsPaused: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "clusterApi" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterApi" "ClusterApiClusterControlPlaneNotInitialized" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ClusterApiClusterControlPlaneNotInitialized: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "clusterApi" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterApi" "ClusterApiClusterNotReady" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ClusterApiClusterNotReady: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "clusterApi" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterApi" "ClusterApiClusterInfrastructureNotReady" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ClusterApiClusterInfrastructureNotReady: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "clusterApi" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterApi" "ClusterApiClusterNotProvisionedState" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ClusterApiClusterNotProvisionedState: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "clusterApi" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterApi" "ClusterApiKubeadmControlPlaneNotFullyReady" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ClusterApiKubeadmControlPlaneNotFullyReady: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "clusterApi" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterApi" "ClusterApiKubeadmControlPlaneCloseToMajorityNotReady" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ClusterApiKubeadmControlPlaneCloseToMajorityNotReady: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "clusterApi" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterApi" "ClusterApiKubeadmControlPlaneMajorityNotReady" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ClusterApiKubeadmControlPlaneMajorityNotReady: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "clusterApi" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterApi" "ClusterApiMachineDeploymentNotFullyReady" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ClusterApiMachineDeploymentNotFullyReady: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "clusterApi" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterApi" "ClusterApiMachineDeploymentMajorityNotReady" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ClusterApiMachineDeploymentMajorityNotReady: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "clusterApi" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterApi" "ClusterApiMachineConditionNotTrue" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ClusterApiMachineConditionNotTrue: {{ $runbookUrl }}
+    {{- dict "name" "ClusterApiClusterIsPaused" "config" .clusterApi | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterApiClusterControlPlaneNotInitialized" "config" .clusterApi | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterApiClusterNotReady" "config" .clusterApi | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterApiClusterInfrastructureNotReady" "config" .clusterApi | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterApiClusterNotProvisionedState" "config" .clusterApi | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterApiKubeadmControlPlaneNotFullyReady" "config" .clusterApi | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterApiKubeadmControlPlaneCloseToMajorityNotReady" "config" .clusterApi | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterApiKubeadmControlPlaneMajorityNotReady" "config" .clusterApi | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterApiMachineDeploymentNotFullyReady" "config" .clusterApi | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterApiMachineDeploymentMajorityNotReady" "config" .clusterApi | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterApiMachineConditionNotTrue" "config" .clusterApi | include "tpl.missing-runbook" }}
   clusterCapacityManagement:
-    {{ $runbookUrl := printf "%s/node/nodefilesystemspacefillingup" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "clusterCapacityManagement" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterCapacityManagement" "NodeFilesystemSpaceFillingUp" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    NodeFilesystemSpaceFillingUp: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubepersistentvolumefillingup/" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "clusterCapacityManagement" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterCapacityManagement" "PersistentVolumeXPercentInThreeDays" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PersistentVolumeXPercentInThreeDays: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubepersistentvolumefillingup/" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "clusterCapacityManagement" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterCapacityManagement" "MemoryXPercentInThreeDays" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    MemoryXPercentInThreeDays: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "clusterCapacityManagement" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterCapacityManagement" "NodeGroupCPUXPercentOver24h" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    NodeGroupCPUXPercentOver24h: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "clusterCapacityManagement" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterCapacityManagement" "NodeGroupCPUXPercentOver1h" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    NodeGroupCPUXPercentOver1h: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "clusterCapacityManagement" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterCapacityManagement" "NodeGroupMemoryXPercentOver24h" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    NodeGroupMemoryXPercentOver24h: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "clusterCapacityManagement" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterCapacityManagement" "NodeGroupMemoryXPercentOver1h" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    NodeGroupMemoryXPercentOver1h: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "clusterCapacityManagement" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterCapacityManagement" "NodeCPUXPercentOver1h" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    NodeCPUXPercentOver1h: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "clusterCapacityManagement" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterCapacityManagement" "NodeMemoryXPercentOver1h" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    NodeMemoryXPercentOver1h: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "clusterCapacityManagement" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterCapacityManagement" "NodeGroupCpuRequestXPercent" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    NodeGroupCpuRequestXPercent: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "clusterCapacityManagement" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "clusterCapacityManagement" "NodeGroupMemoryRequestXPercent" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    NodeGroupMemoryRequestXPercent: {{ $runbookUrl }}
+    {{- dict "name" "NodeFilesystemSpaceFillingUp" "subpath" "node" "config" .clusterCapacityManagement | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PersistentVolumeXPercentInThreeDays" "subpath" "kubernetes" "override" "kubepersistentvolumefillingup" "config" .clusterCapacityManagement | include "tpl.prometheus-operator" }}
+    {{- dict "name" "MemoryXPercentInThreeDays" "config" .clusterCapacityManagement | include "tpl.missing-runbook" }}
+    {{- dict "name" "NodeGroupCPUXPercentOver24h" "config" .clusterCapacityManagement | include "tpl.missing-runbook" }}
+    {{- dict "name" "NodeGroupCPUXPercentOver1h" "config" .clusterCapacityManagement | include "tpl.missing-runbook" }}
+    {{- dict "name" "NodeGroupMemoryXPercentOver24h" "config" .clusterCapacityManagement | include "tpl.missing-runbook" }}
+    {{- dict "name" "NodeGroupMemoryXPercentOver1h" "config" .clusterCapacityManagement | include "tpl.missing-runbook" }}
+    {{- dict "name" "NodeCPUXPercentOver1h" "config" .clusterCapacityManagement | include "tpl.missing-runbook" }}
+    {{- dict "name" "NodeMemoryXPercentOver1h" "config" .clusterCapacityManagement | include "tpl.missing-runbook" }}
+    {{- dict "name" "NodeGroupCpuRequestXPercent" "config" .clusterCapacityManagement | include "tpl.missing-runbook" }}
+    {{- dict "name" "NodeGroupMemoryRequestXPercent" "config" .clusterCapacityManagement | include "tpl.missing-runbook" }}
   configReloaders:
-    {{ $runbookUrl := printf "%s/prometheus-operator/configreloadersidecarerrors" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "configReloaders" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "configReloaders" "ConfigReloaderSidecarErrors" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ConfigReloaderSidecarErrors: {{ $runbookUrl }}
-  {{ $corednsRunbookUrl := "https://github.com/povilasv/coredns-mixin/tree/master/runbook.md" }}
+    {{- dict "name" "ConfigReloaderSidecarErrors" "subpath" "prometheus-operator" "config" .configReloaders | include "tpl.prometheus-operator" }}
   coreDns:
-    {{ $runbookUrl := printf "%s#alert-name-corednsdown" $corednsRunbookUrl }}
-    {{ $group := dig "coreDns" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "coreDns" "CorednsDown" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    CorednsDown: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#alert-name-corednslatencyhigh" $corednsRunbookUrl }}
-    {{ $group := dig "coreDns" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "coreDns" "CorednsLatencyHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    CorednsLatencyHigh: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#alert-name-corednserrorshigh" $corednsRunbookUrl }}
-    {{ $group := dig "coreDns" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "coreDns" "CorednsErrorsHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    CorednsErrorsHigh: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#alert-name-corednsforwardlatencyhigh" $corednsRunbookUrl }}
-    {{ $group := dig "coreDns" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "coreDns" "CorednsForwardLatencyHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    CorednsForwardLatencyHigh: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#alert-name-corednsforwarderrorshigh" $corednsRunbookUrl }}
-    {{ $group := dig "coreDns" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "coreDns" "CorednsForwardErrorsHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    CorednsForwardErrorsHigh: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#alert-name-corednsforwardhealthcheckfailurecount" $corednsRunbookUrl }}
-    {{ $group := dig "coreDns" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "coreDns" "CorednsForwardHealthcheckFailureCount" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    CorednsForwardHealthcheckFailureCount: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#alert-name-corednsforwardhealthcheckbrokencount" $corednsRunbookUrl }}
-    {{ $group := dig "coreDns" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "coreDns" "CorednsForwardHealthcheckBrokenCount" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    CorednsForwardHealthcheckBrokenCount: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#alert-name-corednspaniccount" $corednsRunbookUrl }}
-    {{ $group := dig "coreDns" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "coreDns" "CorednsPanicCount" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    CorednsPanicCount: {{ $runbookUrl }}
+    {{- dict "name" "CorednsDown" "config" .coreDns | include "tpl.missing-runbook" }}
+    {{- dict "name" "CorednsLatencyHigh" "config" .coreDns | include "tpl.missing-runbook" }}
+    {{- dict "name" "CorednsErrorsHigh" "config" .coreDns | include "tpl.missing-runbook" }}
+    {{- dict "name" "CorednsForwardLatencyHigh" "config" .coreDns | include "tpl.missing-runbook" }}
+    {{- dict "name" "CorednsForwardErrorsHigh" "config" .coreDns | include "tpl.missing-runbook" }}
+    {{- dict "name" "CorednsForwardHealthcheckFailureCount" "config" .coreDns | include "tpl.missing-runbook" }}
+    {{- dict "name" "CorednsForwardHealthcheckBrokenCount" "config" .coreDns | include "tpl.missing-runbook" }}
+    {{- dict "name" "CorednsPanicCount" "config" .coreDns | include "tpl.missing-runbook" }}
   dailyChecks:
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "dailyChecks" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "dailyChecks" "S3BucketSizeOverXPercent" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    S3BucketSizeOverXPercent: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "dailyChecks" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "dailyChecks" "S3BucketsTotalSizeOverXPercent" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    S3BucketsTotalSizeOverXPercent: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "dailyChecks" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "dailyChecks" "S3BucketObjectsOverXPercent" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    S3BucketObjectsOverXPercent: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "dailyChecks" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "dailyChecks" "Bucket36hActivityCheck" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    Bucket36hActivityCheck: {{ $runbookUrl }}
+    {{- dict "name" "S3BucketSizeOverXPercent" "config" .dailyChecks | include "tpl.missing-runbook" }}
+    {{- dict "name" "S3BucketsTotalSizeOverXPercent" "config" .dailyChecks | include "tpl.missing-runbook" }}
+    {{- dict "name" "S3BucketObjectsOverXPercent" "config" .dailyChecks | include "tpl.missing-runbook" }}
+    {{- dict "name" "Bucket36hActivityCheck" "config" .dailyChecks | include "tpl.missing-runbook" }}
   diskPerf:
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "diskPerf" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "diskPerf" "DiskReadWaitTimeHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    DiskReadWaitTimeHigh: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "diskPerf" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "diskPerf" "DiskWriteWaitTimeHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    DiskWriteWaitTimeHigh: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "diskPerf" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "diskPerf" "DiskQueueSizeHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    DiskQueueSizeHigh: {{ $runbookUrl }}
+    {{- dict "name" "DiskReadWaitTimeHigh" "config" .diskPerf | include "tpl.missing-runbook" }}
+    {{- dict "name" "DiskWriteWaitTimeHigh" "config" .diskPerf | include "tpl.missing-runbook" }}
+    {{- dict "name" "DiskQueueSizeHigh" "config" .diskPerf | include "tpl.missing-runbook" }}
   falco:
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "falco" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "falco" "FalcoAlert" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    FalcoAlert: {{ $runbookUrl }}
+    {{- dict "name" "FalcoAlert" "config" .falco | include "tpl.missing-runbook" }}
   fluentd:
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "fluentd" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "fluentd" "FluentdNodeDown" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    FluentdNodeDown: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "fluentd" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "fluentd" "FluentdQueueLength" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    FluentdQueueLength: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "fluentd" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "fluentd" "FluentdAvailableSpaceBuffer" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    FluentdAvailableSpaceBuffer: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "fluentd" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "fluentd" "FluentdRecordsCountsHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    FluentdRecordsCountsHigh: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "fluentd" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "fluentd" "FluentdRetry" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    FluentdRetry: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "fluentd" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "fluentd" "FluentdOutputError" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    FluentdOutputError: {{ $runbookUrl }}
+    {{- dict "name" "FluentdNodeDown" "config" .fluentd | include "tpl.missing-runbook" }}
+    {{- dict "name" "FluentdQueueLength" "config" .fluentd | include "tpl.missing-runbook" }}
+    {{- dict "name" "FluentdAvailableSpaceBuffer" "config" .fluentd | include "tpl.missing-runbook" }}
+    {{- dict "name" "FluentdRecordsCountsHigh" "config" .fluentd | include "tpl.missing-runbook" }}
+    {{- dict "name" "FluentdRetry" "config" .fluentd | include "tpl.missing-runbook" }}
+    {{- dict "name" "FluentdOutputError" "config" .fluentd | include "tpl.missing-runbook" }}
   general:
-    {{ $runbookUrl := printf "%s/general/targetdown" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "general" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "general" "TargetDown" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    TargetDown: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/general/watchdog" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "general" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "general" "Watchdog" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    Watchdog: {{ $runbookUrl }}
+    {{- dict "name" "TargetDown" "subpath" "general" "config" .general | include "tpl.prometheus-operator" }}
+    {{- dict "name" "Watchdog" "subpath" "general" "config" .general | include "tpl.prometheus-operator" }}
   harbor:
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "harbor" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "harbor" "HarborCoreDown" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    HarborCoreDown: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "harbor" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "harbor" "HarborDatabaseDown" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    HarborDatabaseDown: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "harbor" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "harbor" "HarborRegistryDown" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    HarborRegistryDown: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "harbor" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "harbor" "HarborRedisDown" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    HarborRedisDown: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "harbor" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "harbor" "HarborTrivyDown" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    HarborTrivyDown: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "harbor" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "harbor" "HarborJobServiceDown" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    HarborJobServiceDown: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "harbor" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "harbor" "HarborStorageUsageAboveLimit" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    HarborStorageUsageAboveLimit: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "harbor" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "harbor" "HarborP99LatencyHigherThan10Seconds" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    HarborP99LatencyHigherThan10Seconds: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "harbor" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "harbor" "HarborErrorRateHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    HarborErrorRateHigh: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "harbor" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "harbor" "HarborTotalNumberOfArtifactsAboveLimit" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    HarborTotalNumberOfArtifactsAboveLimit: {{ $runbookUrl }}
+    {{- dict "name" "HarborCoreDown" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborDatabaseDown" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborRegistryDown" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborRedisDown" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborTrivyDown" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborJobServiceDown" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborStorageUsageAboveLimit" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborP99LatencyHigherThan10Seconds" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborErrorRateHigh" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborTotalNumberOfArtifactsAboveLimit" "config" .harbor | include "tpl.missing-runbook" }}
   hnc:
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "hnc" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "hnc" "HierarchicalNamespaceControllerNamespaceCondition" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    HierarchicalNamespaceControllerNamespaceCondition: {{ $runbookUrl }}
+    {{- dict "name" "HierarchicalNamespaceControllerNamespaceCondition" "config" .hnc | include "tpl.missing-runbook" }}
   kubeStateMetrics:
-    {{ $runbookUrl := printf "%s/kube-state-metrics/kubestatemetricslisterrors" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubeStateMetrics" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubeStateMetrics" "KubeStateMetricsListErrors" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeStateMetricsListErrors: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kube-state-metrics/kubestatemetricswatcherrors" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubeStateMetrics" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubeStateMetrics" "KubeStateMetricsWatchErrors" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeStateMetricsWatchErrors: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kube-state-metrics/kubestatemetricsshardingmismatch" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubeStateMetrics" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubeStateMetrics" "KubeStateMetricsShardingMismatch" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeStateMetricsShardingMismatch: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kube-state-metrics/kubestatemetricsshardsmissing" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubeStateMetrics" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubeStateMetrics" "KubeStateMetricsShardsMissing" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeStateMetricsShardsMissing: {{ $runbookUrl }}
+    {{- dict "name" "KubeStateMetricsListErrors" "subpath" "kube-state-metrics" "config" .kubeStateMetrics | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeStateMetricsWatchErrors" "subpath" "kube-state-metrics" "config" .kubeStateMetrics | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeStateMetricsShardingMismatch" "subpath" "kube-state-metrics" "config" .kubeStateMetrics | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeStateMetricsShardsMissing" "subpath" "kube-state-metrics" "config" .kubeStateMetrics | include "tpl.prometheus-operator" }}
   kubernetesApps:
-    {{ $runbookUrl := printf "%s/kubernetes/kubepodcrashlooping" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesApps" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesApps" "KubePodCrashLooping" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubePodCrashLooping: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubepodnotready" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesApps" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesApps" "KubePodNotReady" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubePodNotReady: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "kubernetesApps" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesApps" "KubeContainerOOMKilled" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeContainerOOMKilled: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubedeploymentgenerationmismatch" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesApps" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesApps" "KubeDeploymentGenerationMismatch" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeDeploymentGenerationMismatch: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubedeploymentreplicasmismatch" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesApps" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesApps" "KubeDeploymentReplicasMismatch" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeDeploymentReplicasMismatch: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubestatefulsetreplicasmismatch" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesApps" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesApps" "KubeStatefulSetReplicasMismatch" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeStatefulSetReplicasMismatch: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubestatefulsetgenerationmismatch" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesApps" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesApps" "KubeStatefulSetGenerationMismatch" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeStatefulSetGenerationMismatch: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubestatefulsetupdatenotrolledout" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesApps" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesApps" "KubeStatefulSetUpdateNotRolledOut" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeStatefulSetUpdateNotRolledOut: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubedaemonsetrolloutstuck" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesApps" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesApps" "KubeDaemonSetRolloutStuck" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeDaemonSetRolloutStuck: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubecontainerwaiting" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesApps" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesApps" "KubeContainerWaiting" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeContainerWaiting: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubedaemonsetnotscheduled" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesApps" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesApps" "KubeDaemonSetNotScheduled" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeDaemonSetNotScheduled: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubedaemonsetmisscheduled" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesApps" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesApps" "KubeDaemonSetMisScheduled" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeDaemonSetMisScheduled: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubejobnotcompleted" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesApps" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesApps" "KubeJobNotCompleted" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeJobNotCompleted: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubejobfailed" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesApps" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesApps" "KubeJobFailed" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeJobFailed: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "kubernetesApps" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesApps" "KubeFailedEvictedPods" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeFailedEvictedPods: {{ $runbookUrl }}
+    {{- dict "name" "KubePodCrashLooping" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubePodNotReady" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeContainerOOMKilled" "config" .kubernetesApps | include "tpl.missing-runbook" }}
+    {{- dict "name" "KubeDeploymentGenerationMismatch" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeDeploymentReplicasMismatch" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeStatefulSetReplicasMismatch" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeStatefulSetGenerationMismatch" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeStatefulSetUpdateNotRolledOut" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeDaemonSetRolloutStuck" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeContainerWaiting" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeDaemonSetNotScheduled" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeDaemonSetMisScheduled" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeJobNotCompleted" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeJobFailed" "subpath" "kubernetes" "config" .kubernetesApps | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeFailedEvictedPods" "config" .kubernetesApps | include "tpl.missing-runbook" }}
   kubernetesResources:
-    {{ $runbookUrl := printf "%s/kubernetes/kubecpuovercommit" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesApps" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesApps" "KubeCPUOvercommit" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeCPUOvercommit: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubememoryovercommit" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesApps" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesApps" "KubeMemoryOvercommit" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeMemoryOvercommit: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/cputhrottlinghigh" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesApps" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesApps" "CPUThrottlingHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    CPUThrottlingHigh: {{ $runbookUrl }}
+    {{- dict "name" "KubeCPUOvercommit" "subpath" "kubernetes" "config" .kubernetesResources | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeMemoryOvercommit" "subpath" "kubernetes" "config" .kubernetesResources | include "tpl.prometheus-operator" }}
+    {{- dict "name" "CPUThrottlingHigh" "subpath" "kubernetes" "config" .kubernetesResources | include "tpl.prometheus-operator" }}
   kubernetesStorage:
-    {{ $runbookUrl := printf "%s/kubernetes/kubepersistentvolumefillingup" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesStorage" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesStorage" "KubePersistentVolumeFillingUp" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubePersistentVolumeFillingUp: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubepersistentvolumeerrors" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesStorage" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesStorage" "KubePersistentVolumeErrors" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubePersistentVolumeErrors: {{ $runbookUrl }}
+    {{- dict "name" "KubePersistentVolumeFillingUp" "subpath" "kubernetes" "config" .kubernetesStorage | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubePersistentVolumeErrors" "subpath" "kubernetes" "config" .kubernetesStorage | include "tpl.prometheus-operator" }}
   kubernetesSystem:
-    {{ $runbookUrl := printf "%s/kubernetes/kubeclientcertificateexpiration" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesSystem" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesSystem" "KubeClientCertificateExpiration" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeClientCertificateExpiration: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubeaggregatedapierrors" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesSystem" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesSystem" "KubeAggregatedAPIErrors" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeAggregatedAPIErrors: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubeaggregatedapidown" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesSystem" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesSystem" "KubeAggregatedAPIDown" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeAggregatedAPIDown: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubeapidown" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesSystem" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesSystem" "KubeAPIDown" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeAPIDown: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubeapiterminatedrequests" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesSystem" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesSystem" "KubeAPITerminatedRequests" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeAPITerminatedRequests: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubeproxydown" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesSystem" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesSystem" "KubeProxyDown" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeProxyDown: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubenodenotready" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesSystem" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesSystem" "KubeNodeNotReady" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeNodeNotReady: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubenodeunreachable" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesSystem" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesSystem" "KubeNodeUnreachable" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeNodeUnreachable: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubelettoomanypods" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesSystem" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesSystem" "KubeletTooManyPods" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeletTooManyPods: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubenodereadinessflapping" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesSystem" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesSystem" "KubeNodeReadinessFlapping" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeNodeReadinessFlapping: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubeletplegdurationhigh" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesSystem" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesSystem" "KubeletPlegDurationHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeletPlegDurationHigh: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubeletpodstartuplatencyhigh" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesSystem" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesSystem" "KubeletPodStartUpLatencyHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeletPodStartUpLatencyHigh: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubeletclientcertificateexpiration" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesSystem" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesSystem" "KubeletClientCertificateExpiration" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeletClientCertificateExpiration: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubeletservercertificateexpiration" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesSystem" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesSystem" "KubeletServerCertificateExpiration" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeletServerCertificateExpiration: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubeletclientcertificaterenewalerrors" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesSystem" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesSystem" "KubeletClientCertificateRenewalErrors" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeletClientCertificateRenewalErrors: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubeletservercertificaterenewalerrors" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesSystem" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesSystem" "KubeletServerCertificateRenewalErrors" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeletServerCertificateRenewalErrors: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubeletdown" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesSystem" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesSystem" "KubeletDown" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeletDown: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/LessKubeletsThanNodes" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesSystem" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesSystem" "LessKubeletsThanNodes" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    LessKubeletsThanNodes: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubeversionmismatch" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesSystem" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesSystem" "KubeVersionMismatch" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeVersionMismatch: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/kubernetes/kubeclienterrors" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "kubernetesSystem" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kubernetesSystem" "KubeClientErrors" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KubeClientErrors: {{ $runbookUrl }}
+    {{- dict "name" "KubeClientCertificateExpiration" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeAggregatedAPIErrors" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeAggregatedAPIDown" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeAPIDown" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeAPITerminatedRequests" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeProxyDown" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeNodeNotReady" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeNodeUnreachable" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeletTooManyPods" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeNodeReadinessFlapping" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeletPlegDurationHigh" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeletPodStartUpLatencyHigh" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeletClientCertificateExpiration" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeletServerCertificateExpiration" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeletClientCertificateRenewalErrors" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeletServerCertificateRenewalErrors" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeletDown" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "LessKubeletsThanNodes" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeVersionMismatch" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
+    {{- dict "name" "KubeClientErrors" "subpath" "kubernetes" "config" .kubernetesSystem | include "tpl.prometheus-operator" }}
   kured:
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "kured" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "kured" "KuredFailedNodeReboot" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    KuredFailedNodeReboot: {{ $runbookUrl }}
+    {{- dict "name" "KuredFailedNodeReboot" "config" .kured | include "tpl.missing-runbook" }}
   missingMetrics:
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "missingMetrics" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "missingMetrics" "MetricsFromWcClusterIsMissing" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    MetricsFromWcClusterIsMissing: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "missingMetrics" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "missingMetrics" "MetricsFromScClusterIsMissing" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    MetricsFromScClusterIsMissing: {{ $runbookUrl }}
+    {{- dict "name" "MetricsFromWcClusterIsMissing" "config" .missingMetrics | include "tpl.missing-runbook" }}
+    {{- dict "name" "MetricsFromScClusterIsMissing" "config" .missingMetrics | include "tpl.missing-runbook" }}
   nodeExporter:
-    {{ $runbookUrl := printf "%s/node/nodefilesystemalmostoutofspace" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "nodeExporter" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "nodeExporter" "NodeFilesystemAlmostOutOfSpace" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    NodeFilesystemAlmostOutOfSpace: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/node/nodefilesystemspacefillingup" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "nodeExporter" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "nodeExporter" "NodeFilesystemSpaceFillingUp" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    NodeFilesystemSpaceFillingUp: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/node/nodenetworkreceiveerrs" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "nodeExporter" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "nodeExporter" "NodeNetworkReceiveErrs" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    NodeNetworkReceiveErrs: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/node/nodenetworktransmiterrs" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "nodeExporter" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "nodeExporter" "NodeNetworkTransmitErrs" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    NodeNetworkTransmitErrs: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/node/nodehighnumberconntrackentriesused" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "nodeExporter" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "nodeExporter" "NodeHighNumberConntrackEntriesUsed" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    NodeHighNumberConntrackEntriesUsed: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/node/nodetextfilecollectorscrapeerror" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "nodeExporter" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "nodeExporter" "NodeTextFileCollectorScrapeError" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    NodeTextFileCollectorScrapeError: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/node/nodeclockskewdetected" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "nodeExporter" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "nodeExporter" "NodeClockSkewDetected" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    NodeClockSkewDetected: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/node/nodeclocknotsynchronising" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "nodeExporter" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "nodeExporter" "NodeClockNotSynchronising" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    NodeClockNotSynchronising: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/node/nodefiledescriptorlimit" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "nodeExporter" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "nodeExporter" "NodeFileDescriptorLimit" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    NodeFileDescriptorLimit: {{ $runbookUrl }}
+    {{- dict "name" "NodeFilesystemAlmostOutOfSpace" "subpath" "node" "config" .nodeExporter | include "tpl.prometheus-operator" }}
+    {{- dict "name" "NodeFilesystemSpaceFillingUp" "subpath" "node" "config" .nodeExporter | include "tpl.prometheus-operator" }}
+    {{- dict "name" "NodeNetworkReceiveErrs" "subpath" "node" "config" .nodeExporter | include "tpl.prometheus-operator" }}
+    {{- dict "name" "NodeNetworkTransmitErrs" "subpath" "node" "config" .nodeExporter | include "tpl.prometheus-operator" }}
+    {{- dict "name" "NodeHighNumberConntrackEntriesUsed" "subpath" "node" "config" .nodeExporter | include "tpl.prometheus-operator" }}
+    {{- dict "name" "NodeTextFileCollectorScrapeError" "subpath" "node" "config" .nodeExporter | include "tpl.prometheus-operator" }}
+    {{- dict "name" "NodeClockSkewDetected" "subpath" "node" "config" .nodeExporter | include "tpl.prometheus-operator" }}
+    {{- dict "name" "NodeClockNotSynchronising" "subpath" "node" "config" .nodeExporter | include "tpl.prometheus-operator" }}
+    {{- dict "name" "NodeFileDescriptorLimit" "subpath" "node" "config" .nodeExporter | include "tpl.prometheus-operator" }}
   nodeNetwork:
-    {{ $runbookUrl := printf "%s/general/nodenetworkinterfaceflapping" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "nodeNetwork" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "nodeNetwork" "NodeNetworkInterfaceFlapping" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    NodeNetworkInterfaceFlapping: {{ $runbookUrl }}
+    {{- dict "name" "NodeNetworkInterfaceFlapping" "subpath" "general" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
   opensearch:
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "opensearch" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "opensearch" "OpenSearchTooFewNodesRunning" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    OpenSearchTooFewNodesRunning: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "opensearch" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "opensearch" "OpenSearchHeapTooHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    OpenSearchHeapTooHigh: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "opensearch" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "opensearch" "OpenSearchFieldLimit" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    OpenSearchFieldLimit: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "opensearch" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "opensearch" "OpensearchClusterYellow" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    OpensearchClusterYellow: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "opensearch" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "opensearch" "OpensearchClusterRed" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    OpensearchClusterRed: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "opensearch" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "opensearch" "OpenSearchXIndexSizeOverLimit" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    OpenSearchXIndexSizeOverLimit: {{ $runbookUrl }}
+    {{- dict "name" "OpenSearchTooFewNodesRunning" "config" .opensearch | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpenSearchHeapTooHigh" "config" .opensearch | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpenSearchFieldLimit" "config" .opensearch | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpensearchClusterYellow" "config" .opensearch | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpensearchClusterRed" "config" .opensearch | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpenSearchXIndexSizeOverLimit" "config" .opensearch | include "tpl.missing-runbook" }}
   openstack:
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "openstack" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "openstack" "OpenStackCloudControllerDown" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    OpenStackCloudControllerDown: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "openstack" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "openstack" "OpenStackApiRequestFailed" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    OpenStackApiRequestFailed: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "openstack" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "openstack" "OpenStackApiRequestDuration" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    OpenStackApiRequestDuration: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "openstack" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "openstack" "OpenStackApiRequestTotal" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    OpenStackApiRequestTotal: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "openstack" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "openstack" "OpenStackReconcileFailed" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    OpenStackReconcileFailed: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "openstack" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "openstack" "OpenStackReconcileDuration" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    OpenStackReconcileDuration: {{ $runbookUrl }}
+    {{- dict "name" "OpenStackCloudControllerDown" "config" .openstack | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpenStackApiRequestFailed" "config" .openstack | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpenStackApiRequestDuration" "config" .openstack | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpenStackApiRequestTotal" "config" .openstack | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpenStackReconcileFailed" "config" .openstack | include "tpl.missing-runbook" }}
+    {{- dict "name" "OpenStackReconcileDuration" "config" .openstack | include "tpl.missing-runbook" }}
   packetsDropped:
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "packetsDropped" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "packetsDropped" "FrequentPacketsDroppedToWorkload" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    FrequentPacketsDroppedToWorkload: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "packetsDropped" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "packetsDropped" "ScarcePacketsDroppedToWorkload" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ScarcePacketsDroppedToWorkload: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "packetsDropped" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "packetsDropped" "FrequentPacketsDroppedFromWorkload" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    FrequentPacketsDroppedFromWorkload: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "packetsDropped" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "packetsDropped" "ScarcePacketsDroppedFromWorkload" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ScarcePacketsDroppedFromWorkload: {{ $runbookUrl }}
+    {{- dict "name" "FrequentPacketsDroppedToWorkload" "config" .packetsDropped | include "tpl.missing-runbook" }}
+    {{- dict "name" "ScarcePacketsDroppedToWorkload" "config" .packetsDropped | include "tpl.missing-runbook" }}
+    {{- dict "name" "FrequentPacketsDroppedFromWorkload" "config" .packetsDropped | include "tpl.missing-runbook" }}
+    {{- dict "name" "ScarcePacketsDroppedFromWorkload" "config" .packetsDropped | include "tpl.missing-runbook" }}
   prometheusOperator:
-    {{ $runbookUrl := printf "%s/prometheus-operator/prometheusoperatorlisterrors" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheusOperator" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheusOperator" "PrometheusOperatorListErrors" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusOperatorListErrors: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus-operator/prometheusoperatorwatcherrors" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheusOperator" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheusOperator" "PrometheusOperatorWatchErrors" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusOperatorWatchErrors: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus-operator/prometheusoperatorsyncfailed" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheusOperator" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheusOperator" "PrometheusOperatorSyncFailed" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusOperatorSyncFailed: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus-operator/prometheusoperatorreconcileerrors" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheusOperator" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheusOperator" "PrometheusOperatorReconcileErrors" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusOperatorReconcileErrors: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus-operator/prometheusoperatornodelookuperrors" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheusOperator" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheusOperator" "PrometheusOperatorNodeLookupErrors" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusOperatorNodeLookupErrors: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus-operator/prometheusoperatornotready" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheusOperator" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheusOperator" "PrometheusOperatorNotReady" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusOperatorNotReady: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus-operator/prometheusoperatorrejectedresources" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheusOperator" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheusOperator" "PrometheusOperatorRejectedResources" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusOperatorRejectedResources: {{ $runbookUrl }}
+    {{- dict "name" "PrometheusOperatorListErrors" "subpath" "prometheus-operator" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusOperatorWatchErrors" "subpath" "prometheus-operator" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusOperatorSyncFailed" "subpath" "prometheus-operator" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusOperatorReconcileErrors" "subpath" "prometheus-operator" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusOperatorNodeLookupErrors" "subpath" "prometheus-operator" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusOperatorNotReady" "subpath" "prometheus-operator" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusOperatorRejectedResources" "subpath" "prometheus-operator" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
   prometheus:
-    {{ $runbookUrl := printf "%s/prometheus/prometheusbadconfig" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheus" "PrometheusBadConfig" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusBadConfig: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus/prometheusnotificationqueuerunningfull" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheus" "PrometheusNotificationQueueRunningFull" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusNotificationQueueRunningFull: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus/prometheuserrorsendingalertstosomealertmanagers" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheus" "PrometheusErrorSendingAlertsToSomeAlertmanagers" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusErrorSendingAlertsToSomeAlertmanagers: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus/prometheusnotconnectedtoalertmanagers" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheus" "PrometheusNotConnectedToAlertmanagers" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusNotConnectedToAlertmanagers: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus/prometheustsdbreloadsfailing" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheus" "PrometheusTSDBReloadsFailing" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusTSDBReloadsFailing: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus/prometheustsdbcompactionsfailing" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheus" "PrometheusTSDBCompactionsFailing" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusTSDBCompactionsFailing: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus/prometheusnotingestingsamples" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheus" "PrometheusNotIngestingSamples" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusNotIngestingSamples: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus/prometheusduplicatetimestamps" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheus" "PrometheusDuplicateTimestamps" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusDuplicateTimestamps: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus/prometheusoutofordertimestamps" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheus" "PrometheusOutOfOrderTimestamps" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusOutOfOrderTimestamps: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus/prometheusremotestoragefailures" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheus" "PrometheusRemoteStorageFailures" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusRemoteStorageFailures: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus/prometheusremotewritebehind" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheus" "PrometheusRemoteWriteBehind" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusRemoteWriteBehind: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus/prometheusremotewritedesiredshards" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheus" "PrometheusRemoteWriteDesiredShards" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusRemoteWriteDesiredShards: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus/prometheusrulefailures" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheus" "PrometheusRuleFailures" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusRuleFailures: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus/prometheusmissingruleevaluations" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheus" "PrometheusMissingRuleEvaluations" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusMissingRuleEvaluations: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus/prometheustargetlimithit" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheus" "PrometheusTargetLimitHit" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusTargetLimitHit: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus/prometheuslabellimithit" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheus" "PrometheusLabelLimitHit" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusLabelLimitHit: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus/prometheusscrapebodysizelimithit" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheus" "PrometheusScrapeBodySizeLimitHit" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusScrapeBodySizeLimitHit: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus/prometheusscrapesamplelimithit" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheus" "PrometheusScrapeSampleLimitHit" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusScrapeSampleLimitHit: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus/prometheustargetsyncfailure" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheus" "PrometheusTargetSyncFailure" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusTargetSyncFailure: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s/prometheus/prometheuserrorsendingalertstoanyalertmanager" $prometheusOperatorRunbookUrl }}
-    {{ $group := dig "prometheus" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "prometheus" "PrometheusErrorSendingAlertsToAnyAlertmanager" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    PrometheusErrorSendingAlertsToAnyAlertmanager: {{ $runbookUrl }}
-  {{ $thanosRunbookUrl := "https://github.com/thanos-io/thanos/tree/main/mixin/runbook.md" }}
+    {{- dict "name" "PrometheusBadConfig" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusNotificationQueueRunningFull" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusErrorSendingAlertsToSomeAlertmanagers" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusNotConnectedToAlertmanagers" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusTSDBReloadsFailing" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusTSDBCompactionsFailing" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusNotIngestingSamples" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusDuplicateTimestamps" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusOutOfOrderTimestamps" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusRemoteStorageFailures" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusRemoteWriteBehind" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusRemoteWriteDesiredShards" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusRuleFailures" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusMissingRuleEvaluations" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusTargetLimitHit" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusLabelLimitHit" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusScrapeBodySizeLimitHit" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusScrapeSampleLimitHit" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusTargetSyncFailure" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
+    {{- dict "name" "PrometheusErrorSendingAlertsToAnyAlertmanager" "subpath" "prometheus" "config" .nodeNetwork | include "tpl.prometheus-operator" }}
   thanos:
-    {{ $runbookUrl := printf "%s#thanos-component-absent" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosRuleIsDown" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosRuleIsDown: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-rule" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosRuleQueueIsDroppingAlerts" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosRuleQueueIsDroppingAlerts: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-rule" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosRuleSenderIsFailingAlerts" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosRuleSenderIsFailingAlerts: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-rule" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosRuleHighRuleEvaluationFailures" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosRuleHighRuleEvaluationFailures: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-rule" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosRuleHighRuleEvaluationWarnings" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosRuleHighRuleEvaluationWarnings: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-rule" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosRuleRuleEvaluationLatencyHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosRuleRuleEvaluationLatencyHigh: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-rule" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosRuleGrpcErrorRate" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosRuleGrpcErrorRate: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-rule" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosRuleConfigReloadFailure" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosRuleConfigReloadFailure: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-rule" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosRuleQueryHighDNSFailures" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosRuleQueryHighDNSFailures: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-rule" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosRuleAlertmanagerHighDNSFailures" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosRuleAlertmanagerHighDNSFailures: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-rule" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosRuleNoEvaluationFor10Intervals" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosRuleNoEvaluationFor10Intervals: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-rule" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosNoRuleEvaluations" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosNoRuleEvaluations: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-compact" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosCompactMultipleRunning" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosCompactMultipleRunning: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-compact" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosCompactHalted" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosCompactHalted: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-compact" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosCompactHighCompactionFailures" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosCompactHighCompactionFailures: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-compact" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosCompactBucketHighOperationFailures" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosCompactBucketHighOperationFailures: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-compact" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosCompactHasNotRun" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosCompactHasNotRun: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-query" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosQueryHttpRequestQueryErrorRateHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosQueryHttpRequestQueryErrorRateHigh: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-query" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosQueryHttpRequestQueryRangeErrorRateHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosQueryHttpRequestQueryRangeErrorRateHigh: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-query" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosQueryGrpcServerErrorRate" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosQueryGrpcServerErrorRate: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-query" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosQueryGrpcClientErrorRate" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosQueryGrpcClientErrorRate: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-query" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosQueryHighDNSFailures" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosQueryHighDNSFailures: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-query" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosQueryInstantLatencyHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosQueryInstantLatencyHigh: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-query" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosQueryRangeLatencyHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosQueryRangeLatencyHigh: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-receive" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosReceiveHttpRequestErrorRateHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosReceiveHttpRequestErrorRateHigh: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-receive" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosReceiveHttpRequestLatencyHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosReceiveHttpRequestLatencyHigh: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-receive" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosReceiveHighReplicationFailures" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosReceiveHighReplicationFailures: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-receive" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosReceiveHighForwardRequestFailures" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosReceiveHighForwardRequestFailures: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-receive" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosReceiveHighHashringFileRefreshFailures" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosReceiveHighHashringFileRefreshFailures: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-receive" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosReceiveConfigReloadFailure" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosReceiveConfigReloadFailure: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-receive" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosReceiveNoUpload" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosReceiveNoUpload: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-receive" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosReceiveTrafficBelowThreshold" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosReceiveTrafficBelowThreshold: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-store" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosStoreGrpcErrorRate" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosStoreGrpcErrorRate: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-store" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosStoreSeriesGateLatencyHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosStoreSeriesGateLatencyHigh: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-store" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosStoreBucketHighOperationFailures" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosStoreBucketHighOperationFailures: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-store" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosStoreObjstoreOperationLatencyHigh" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosStoreObjstoreOperationLatencyHigh: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-bucket-replicate" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosBucketReplicateErrorRate" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosBucketReplicateErrorRate: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-bucket-replicate" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosBucketReplicateRunLatency" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosBucketReplicateRunLatency: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-component-absent" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosCompactIsDown" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosCompactIsDown: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-component-absent" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosQueryIsDown" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosQueryIsDown: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-component-absent" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosReceiveIsDown" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosReceiveIsDown: {{ $runbookUrl }}
-    {{ $runbookUrl := printf "%s#thanos-component-absent" $thanosRunbookUrl }}
-    {{ $group := dig "thanos" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "thanos" "ThanosStoreIsDown" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    ThanosStoreIsDown: {{ $runbookUrl }}
+    {{- dict "name" "ThanosRuleIsDown" "header" "thanos-component-absent" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosRuleQueueIsDroppingAlerts" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosRuleSenderIsFailingAlerts" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosRuleHighRuleEvaluationFailures" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosRuleHighRuleEvaluationWarnings" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosRuleRuleEvaluationLatencyHigh" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosRuleGrpcErrorRate" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosRuleConfigReloadFailure" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosRuleQueryHighDNSFailures" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosRuleAlertmanagerHighDNSFailures" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosRuleNoEvaluationFor10Intervals" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosNoRuleEvaluations" "header" "thanos-rule" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosCompactMultipleRunning" "header" "thanos-compact" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosCompactHalted" "header" "thanos-compact" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosCompactHighCompactionFailures" "header" "thanos-compact" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosCompactBucketHighOperationFailures" "header" "thanos-compact" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosCompactHasNotRun" "header" "thanos-compact" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosQueryHttpRequestQueryErrorRateHigh" "header" "thanos-query" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosQueryHttpRequestQueryRangeErrorRateHigh" "header" "thanos-query" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosQueryGrpcServerErrorRate" "header" "thanos-query" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosQueryGrpcClientErrorRate" "header" "thanos-query" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosQueryHighDNSFailures" "header" "thanos-query" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosQueryInstantLatencyHigh" "header" "thanos-query" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosQueryRangeLatencyHigh" "header" "thanos-query" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosReceiveHttpRequestErrorRateHigh" "header" "thanos-receive" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosReceiveHttpRequestLatencyHigh" "header" "thanos-receive" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosReceiveHighReplicationFailures" "header" "thanos-receive" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosReceiveHighForwardRequestFailures" "header" "thanos-receive" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosReceiveHighHashringFileRefreshFailures" "header" "thanos-receive" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosReceiveConfigReloadFailure" "header" "thanos-receive" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosReceiveNoUpload" "header" "thanos-receive" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosReceiveTrafficBelowThreshold" "header" "thanos-receive" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosStoreGrpcErrorRate" "header" "thanos-store" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosStoreSeriesGateLatencyHigh" "header" "thanos-store" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosStoreBucketHighOperationFailures" "header" "thanos-store" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosStoreObjstoreOperationLatencyHigh" "header" "thanos-store" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosBucketReplicateErrorRate" "header" "thanos-bucket-replicate" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosBucketReplicateRunLatency" "header" "thanos-bucket-replicate" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosCompactIsDown" "header" "thanos-component-absent" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosQueryIsDown" "header" "thanos-component-absent" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosReceiveIsDown" "header" "thanos-component-absent" "config" .thanos | include "tpl.thanos" }}
+    {{- dict "name" "ThanosStoreIsDown" "header" "thanos-component-absent" "config" .thanos | include "tpl.thanos" }}
   webhook:
-    {{ $runbookUrl := printf "%s" $missingRunbook }}
-    {{ $group := dig "webhook" "group" "" .Values.alerts.runbookUrls }}
-    {{ $override := dig "webhook" "WebhookFailing" $group .Values.alerts.runbookUrls }}
-    {{ if not (eq $override "") }}{{ $runbookUrl = $override }}{{ end }}
-    WebhookFailing: {{ $runbookUrl }}
+    {{- dict "name" "WebhookFailing" "config" .webhook | include "tpl.missing-runbook" }}
+{{- end }}
