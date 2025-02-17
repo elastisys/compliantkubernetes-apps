@@ -58,44 +58,44 @@ config:
 
     # Start OpenSearch Security Demo Configuration
     # WARNING: revise all the lines below before you go into production
-    plugins:
-      security:
-        ssl:
-          transport:
-            pemcert_filepath: esnode.pem
-            pemkey_filepath: esnode-key.pem
-            pemtrustedcas_filepath: root-ca.pem
-            enforce_hostname_verification: false
-          http:
-            enabled: true
-            pemcert_filepath: esnode.pem
-            pemkey_filepath: esnode-key.pem
-            pemtrustedcas_filepath: root-ca.pem
-        allow_unsafe_democertificates: true
-        allow_default_init_securityindex: true
-        authcz:
-          admin_dn:
-            - CN=kirk,OU=client,O=client,L=test,C=de
-        audit.type: internal_opensearch
-        enable_snapshot_restore_privilege: true
-        check_snapshot_restore_write_privileges: true
-        restapi:
-          roles_enabled: ["all_access", "security_rest_api_access"]
-        system_indices:
-          enabled: true
-          indices:
-            [
-              ".opendistro-alerting-config",
-              ".opendistro-alerting-alert*",
-              ".opendistro-anomaly-results*",
-              ".opendistro-anomaly-detector*",
-              ".opendistro-anomaly-checkpoints",
-              ".opendistro-anomaly-detection-state",
-              ".opendistro-reports-*",
-              ".opendistro-notifications-*",
-              ".opendistro-notebooks",
-              ".opendistro-asynchronous-search-response*",
-            ]
+    # plugins:
+    #   security:
+    #     ssl:
+    #       transport:
+    #         pemcert_filepath: esnode.pem
+    #         pemkey_filepath: esnode-key.pem
+    #         pemtrustedcas_filepath: root-ca.pem
+    #         enforce_hostname_verification: false
+    #       http:
+    #         enabled: true
+    #         pemcert_filepath: esnode.pem
+    #         pemkey_filepath: esnode-key.pem
+    #         pemtrustedcas_filepath: root-ca.pem
+    #     allow_unsafe_democertificates: true
+    #     allow_default_init_securityindex: true
+    #     authcz:
+    #       admin_dn:
+    #         - CN=kirk,OU=client,O=client,L=test,C=de
+    #     audit.type: internal_opensearch
+    #     enable_snapshot_restore_privilege: true
+    #     check_snapshot_restore_write_privileges: true
+    #     restapi:
+    #       roles_enabled: ["all_access", "security_rest_api_access"]
+    #     system_indices:
+    #       enabled: true
+    #       indices:
+    #         [
+    #           ".opendistro-alerting-config",
+    #           ".opendistro-alerting-alert*",
+    #           ".opendistro-anomaly-results*",
+    #           ".opendistro-anomaly-detector*",
+    #           ".opendistro-anomaly-checkpoints",
+    #           ".opendistro-anomaly-detection-state",
+    #           ".opendistro-reports-*",
+    #           ".opendistro-notifications-*",
+    #           ".opendistro-notebooks",
+    #           ".opendistro-asynchronous-search-response*",
+    #         ]
     ######## End OpenSearch Security Demo Configuration ########
   # log4j2.properties:
 
@@ -491,6 +491,8 @@ plugins:
   enabled: false
   installList: []
   # - example-fake-plugin
+  removeList: []
+  # - example-fake-plugin
 
 # -- Array of extra K8s manifests to deploy
 extraObjects: []
@@ -534,6 +536,12 @@ extraObjects: []
 
 # ServiceMonitor Configuration for Prometheus
 # Enabling this option will create a ServiceMonitor resource that allows Prometheus to scrape metrics from the OpenSearch service.
+# This only creates the serviceMonitor, to actually have metrics Make sure to install the prometheus-exporter plugin needed for
+# serving metrics over the `.Values.plugins` value:
+# plugins:
+#   enabled: true
+#   installList:
+#     - https://github.com/aiven/prometheus-exporter-plugin-for-opensearch/releases/download/x.x.x.x/prometheus-exporter-x.x.x.x.zip
 serviceMonitor:
   # Set to true to enable the ServiceMonitor resource
   enabled: false
@@ -541,6 +549,9 @@ serviceMonitor:
   # HTTP path where metrics are exposed.
   # Ensure this matches your OpenSearch service configuration.
   path: /_prometheus/metrics
+
+  # Scheme to use for scraping.
+  scheme: http
 
   # Frequency at which Prometheus will scrape metrics.
   # Adjust based on your needs.
@@ -550,3 +561,17 @@ serviceMonitor:
   # labels:
   #  k8s.example.com/prometheus: kube-prometheus
   labels: {}
+
+  # additional tlsConfig to be added to the ServiceMonitor
+  tlsConfig: {}
+
+  # Basic Auth configuration for the service monitor
+  # You can either use existingSecret, which expects a secret to be already present with data.username and data.password
+  # or set the credentials over the helm values, making helm create a secret for you
+  # basicAuth:
+  #   enaled: true
+  #   existingSecret: my-secret
+  #   username:  my-username
+  #   password: my-password
+  basicAuth:
+    enabled: false
