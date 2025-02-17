@@ -63,6 +63,7 @@ templates:
       - monitoring/kube-prometheus-stack # creates prometheus-operator/prometheusrules
     values:
       - values/prometheus-alerts-sc.yaml.gotmpl
+      - values/prometheus-alerts-runbook-urls.yaml.gotmpl
 
   prometheus-wc-monitors:
     disableValidationOnInstall: true
@@ -87,6 +88,7 @@ templates:
       - monitoring/kube-prometheus-stack # creates prometheus-operator/prometheusrules
     values:
       - values/prometheus-user-alerts-wc.yaml.gotmpl
+      - values/prometheus-alerts-runbook-urls.yaml.gotmpl
 
   kube-state-metrics-extra-resources:
     inherit: [ template: prometheus ]
