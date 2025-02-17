@@ -52,7 +52,19 @@ notDeveloperVisible:
 
 {{- if .Values.objectStorage.sync.enabled }}
 sync:
+  {{- $buckets := (list) }}
   {{- range .Values.objectStorage.sync.buckets }}
-  - {{ .source }}
+  {{- if .source }}
+  {{- $buckets = append $buckets .source }}
+  {{- end }}
+  {{- end }}
+  {{- if .Values.objectStorage.sync.syncDefaultBuckets }}
+  {{- range .Values.objectStorage.buckets }}
+  {{- $buckets = append $buckets . }}
+  {{- end }}
+  {{- $buckets = $buckets | uniq | sortAlpha }}
+  {{- end }}
+  {{- range $buckets }}
+  - {{ . }}
   {{- end }}
 {{- end }}
