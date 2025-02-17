@@ -4073,11 +4073,17 @@ properties:
           alertmanager:
             title: Runbooks for alertmanager alerts
             description: |-
+              Runbooks for alertmanager alerts
+
               Example:
 
               group: https://runbooks.prometheus-operator.dev/runbooks/alertmanager/
               AlertmanagerFailedReload: https://runbooks.prometheus-operator.dev/runbooks/alertmanager/alertmanagerfailedreload/
               AlertName: link-to-specific-alert-runbook
+
+              Uses upstream runbooks by default
+
+              https://runbooks.prometheus-operator.dev/runbooks/
             type: object
           backupStatus:
             title: Runbooks for backup status alerts
@@ -4097,11 +4103,21 @@ properties:
             type: object
           clusterCapacityManagement:
             title: Runbooks for cluster capacity management alerts
-            description: Runbooks for cluster capacity management alerts
+            description: |-
+              Runbooks for cluster capacity management alerts
+
+              Uses upstream runbooks by default
+
+              https://runbooks.prometheus-operator.dev/runbooks/
             type: object
           configReloaders:
             title: Runbooks for config reloaders alerts
-            description: Runbooks for config reloaders alerts
+            description: |-
+              Runbooks for config reloaders alerts
+
+              Uses upstream runbooks by default
+
+              https://runbooks.prometheus-operator.dev/runbooks/
             type: object
           coreDns:
             title: Runbooks for core dns alerts
@@ -4125,7 +4141,12 @@ properties:
             type: object
           general:
             title: Runbooks for general alerts
-            description: Runbooks for general alerts
+            description: |-
+              Runbooks for general alerts
+
+              Uses upstream runbooks by default
+
+              https://runbooks.prometheus-operator.dev/runbooks/
             type: object
           harbor:
             title: Runbooks for harbor alerts
@@ -4137,23 +4158,48 @@ properties:
             type: object
           kubeStateMetrics:
             title: Runbooks for kube state metrics alerts
-            description: Runbooks for kube state metrics alerts
+            description: |-
+              Runbooks for kube state metrics alerts
+
+              Uses upstream runbooks by default
+
+              https://runbooks.prometheus-operator.dev/runbooks/
             type: object
           kubernetesApps:
             title: Runbooks for kubernetes apps alerts
-            description: Runbooks for kubernetes apps alerts
+            description: |-
+              Runbooks for kubernetes apps alerts
+
+              Uses upstream runbooks by default
+
+              https://runbooks.prometheus-operator.dev/runbooks/
             type: object
           kubernetesResources:
             title: Runbooks for kubernetes resources alerts
-            description: Runbooks for kubernetes resources alerts
+            description: |-
+              Runbooks for kubernetes resources alerts
+
+              Uses upstream runbooks by default
+
+              https://runbooks.prometheus-operator.dev/runbooks/
             type: object
           kubernetesStorage:
             title: Runbooks for kubernetes storage alerts
-            description: Runbooks for kubernetes storage alerts
+            description: |-
+              Runbooks for kubernetes storage alerts
+
+              Uses upstream runbooks by default
+
+              https://runbooks.prometheus-operator.dev/runbooks/
             type: object
           kubernetesSystem:
             title: Runbooks for kubernetes system alerts
-            description: Runbooks for kubernetes system alerts
+            description: |-
+              Runbooks for kubernetes system alerts
+
+              Uses upstream runbooks by default
+
+              https://runbooks.prometheus-operator.dev/runbooks/
             type: object
           kured:
             title: Runbooks for kured alerts
@@ -4165,11 +4211,21 @@ properties:
             type: object
           nodeExporter:
             title: Runbooks for node exporter alerts
-            description: Runbooks for node exporter alerts
+            description: |-
+              Runbooks for node exporter alerts
+
+              Uses upstream runbooks by default
+
+              https://runbooks.prometheus-operator.dev/runbooks/
             type: object
           nodeNetwork:
             title: Runbooks for node network alerts
-            description: Runbooks for node network alerts
+            description: |-
+              Runbooks for node network alerts
+
+              Uses upstream runbooks by default
+
+              https://runbooks.prometheus-operator.dev/runbooks/
             type: object
           opensearch:
             title: Runbooks for opensearch alerts
@@ -4185,15 +4241,30 @@ properties:
             type: object
           prometheusOperator:
             title: Runbooks for prometheus operator alerts
-            description: Runbooks for prometheus operator alerts
+            description: |-
+              Runbooks for prometheus operator alerts
+
+              Uses upstream runbooks by default
+
+              https://runbooks.prometheus-operator.dev/runbooks/
             type: object
           prometheus:
             title: Runbooks for prometheus alerts
-            description: Runbooks for prometheus alerts
+            description: |-
+              Runbooks for prometheus alerts
+
+              Uses upstream runbooks by default
+
+              https://runbooks.prometheus-operator.dev/runbooks/
             type: object
           thanos:
             title: Runbooks for thanos alerts
-            description: Runbooks for thanos alerts
+            description: |-
+              Runbooks for thanos alerts
+
+              Uses upstream runbooks by default
+
+              https://github.com/thanos-io/thanos/tree/main/mixin/runbook.md
             type: object
           webhook:
             title: Runbooks for webhook alerts
