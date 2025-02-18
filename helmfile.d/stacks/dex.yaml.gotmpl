@@ -1,16 +1,18 @@
 ---
 templates:
-  dex:
+  module-dex:
     disableValidationOnInstall: true
-    inherit: [ template: dex-chart ]
+    chart: charts/dex
+    version: 0.0.1
     condition: ck8sManagementCluster.enabled
     namespace: dex
-    name: dex
+    name: module-dex
     labels:
       app: dex
     needs:
       - kube-system/service-cluster-np
       - monitoring/kube-prometheus-stack # creates servicemonitors
+      - crossplane-system/crossplane-packages
     values:
       - values/dex.yaml.gotmpl
     wait: true
