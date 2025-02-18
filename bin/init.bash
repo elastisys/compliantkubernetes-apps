@@ -271,6 +271,9 @@ generate_secrets() {
   HARBOR_REGISTRY_PASS=$(pwgen -cns 20 1)
   HARBOR_REGISTRY_PASS_HTPASSWD=$(htpasswd -bnB "harbor_registry_user" "${HARBOR_REGISTRY_PASS}" | tr -d '\n')
 
+  KUBEAPI_METRICS_PASS=$(pwgen -cns 20 1)
+  KUBEAPI_METRICS_PASS_HTPASSWD=$(htpasswd -bnB "kubeapiuser" "${KUBEAPI_METRICS_PASS}" | tr -d '\n')
+
   yq4 --inplace ".grafana.password= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
   yq4 --inplace ".grafana.clientSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
   yq4 --inplace ".grafana.opsClientSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
@@ -295,7 +298,8 @@ generate_secrets() {
   yq4 --inplace ".opensearch.curatorPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
   yq4 --inplace ".opensearch.snapshotterPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
   yq4 --inplace ".opensearch.metricsExporterPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
-  yq4 --inplace ".kubeapiMetricsPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+  yq4 --inplace ".kubeapiMetricsPassword= \"${KUBEAPI_METRICS_PASS}\"" "${tmpfile}"
+  yq4 --inplace ".kubeapiMetricsPasswordHtpasswd= \"${KUBEAPI_METRICS_PASS_HTPASSWD}\"" "${tmpfile}"
   yq4 --inplace ".dex.staticPasswordNotHashed= \"${DEX_STATIC_PASS}\"" "${tmpfile}"
   yq4 --inplace ".dex.staticPassword= \"${DEX_STATIC_PASS_HASH}\"" "${tmpfile}"
   yq4 --inplace ".dex.kubeloginClientSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
