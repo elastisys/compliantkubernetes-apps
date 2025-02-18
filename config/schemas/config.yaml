@@ -4072,7 +4072,6 @@ properties:
         $defs:
           upstreamRunbook:
             title: Runbooks for alerts
-            type: object
             description: |-
               Example:
 
@@ -4082,6 +4081,15 @@ properties:
               Uses upstream runbooks by default
 
               https://runbooks.prometheus-operator.dev/runbooks/
+            type: object
+            additionalProperties: true
+            properties:
+              group:
+                title: Alert group runbook URL
+                type: string
+              AlertName:
+                title: Alert runbook URL
+                type: string
           noUpstreamRunbook:
             title: Runbooks for alerts
             description: |-
@@ -4092,6 +4100,14 @@ properties:
 
               Uses no upstream runbook by default
             type: object
+            additionalProperties: true
+            properties:
+              group:
+                title: Alert group runbook URL
+                type: string
+              AlertName:
+                title: Alert runbook URL
+                type: string
         properties:
           alertmanager:
             $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
