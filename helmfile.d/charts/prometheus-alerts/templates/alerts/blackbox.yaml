@@ -24,4 +24,5 @@ spec:
             severity: "critical"
           annotations:
             summary: "Endpoint {{`{{ $labels.target }}`}} at {{`{{ $labels.instance }}`}} down"
+            runbook_url: {{ .Values.runbookUrls.blackbox.EndpointDown }}
 {{- end }}

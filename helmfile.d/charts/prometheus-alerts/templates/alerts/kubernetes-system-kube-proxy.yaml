@@ -20,7 +20,7 @@ spec:
     - alert: KubeProxyDown
       annotations:
         description: KubeProxy has disappeared from Prometheus target discovery.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}kubernetes/kubeproxydown
+        runbook_url: {{ .Values.runbookUrls.kubernetesSystem.KubeProxyDown }}
         summary: Target disappeared from Prometheus target discovery.
       expr: absent(up{job="kube-proxy"} == 1)
       for: 15m

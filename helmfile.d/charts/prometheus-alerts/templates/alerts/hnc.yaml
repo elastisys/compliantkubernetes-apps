@@ -15,5 +15,5 @@ metadata:
   {{- end }}
 spec:
   groups:
-    {{- .Files.Get "files/hnc.yaml" | nindent 4 }}
+    {{- tpl (.Files.Get "files/hnc.yaml") . | nindent 4 }}
 {{- end }}

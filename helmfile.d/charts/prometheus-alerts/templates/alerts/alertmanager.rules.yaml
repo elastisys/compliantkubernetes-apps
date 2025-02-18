@@ -28,7 +28,7 @@ spec:
     - alert: AlertmanagerConfigInconsistent
       annotations:
         description: Alertmanager instances within the {{`{{`}}$labels.job{{`}}`}} cluster have different configurations.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}/alertmanager/alertmanagerconfiginconsistent
+        runbook_url: {{ .Values.runbookUrls.alertmanager.AlertmanagerConfigInconsistent }}
         summary: Alertmanager instances within the same cluster have different configurations.
       expr: |-
         count by (cluster,service) (
@@ -41,7 +41,7 @@ spec:
     - alert: AlertmanagerFailedReload
       annotations:
         description: Configuration has failed to load for {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod{{`}}`}}.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}/alertmanager/alertmanagerfailedreload
+        runbook_url: {{ .Values.runbookUrls.alertmanager.AlertmanagerFailedReload }}
         summary: Reloading an Alertmanager configuration has failed.
       expr: |-
         # Without max_over_time, failed scrapes could create false negatives, see
@@ -53,7 +53,7 @@ spec:
     - alert: AlertmanagerMembersInconsistent
       annotations:
         description: Alertmanager {{`{{`}} $labels.namespace {{`}}`}}/{{`{{`}} $labels.pod{{`}}`}} has only found {{`{{`}} $value {{`}}`}} members of the {{`{{`}}$labels.job{{`}}`}} cluster.
-        runbook_url: {{ .Values.defaultRules.runbookUrl }}/alertmanager/alertmanagermembersinconsistent
+        runbook_url: {{ .Values.runbookUrls.alertmanager.AlertmanagerMembersInconsistent }}
         summary: A member of an Alertmanager cluster has not found all other cluster members.
       expr: |-
         # Without max_over_time, failed scrapes could create false negatives, see

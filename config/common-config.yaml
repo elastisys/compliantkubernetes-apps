@@ -106,6 +106,46 @@ user:
     ingress:
       enabled: false
 
+alerts:
+  # Configure runbook URLs for alerts, can be configured on an alert group level or
+  # per individual alert
+  runbookUrls:
+    alertmanager: {}
+    ## Example:
+    # group: https://runbooks.prometheus-operator.dev/runbooks/alertmanager/
+    # AlertmanagerFailedReload: https://runbooks.prometheus-operator.dev/runbooks/alertmanager/alertmanagerfailedreload/
+    # AlertName: link-to-specific-alert-runbook
+    backupStatus: {}
+    blackbox: {}
+    certManager: {}
+    clusterApi: {}
+    clusterCapacityManagement: {}
+    configReloaders: {}
+    coreDns: {}
+    dailyChecks: {}
+    diskPerf: {}
+    falco: {}
+    fluentd: {}
+    general: {}
+    harbor: {}
+    hnc: {}
+    kubeStateMetrics: {}
+    kubernetesApps: {}
+    kubernetesResources: {}
+    kubernetesStorage: {}
+    kubernetesSystem: {}
+    kured: {}
+    missingMetrics: {}
+    nodeExporter: {}
+    nodeNetwork: {}
+    opensearch: {}
+    openstack: {}
+    packetsDropped: {}
+    prometheusOperator: {}
+    prometheus: {}
+    thanos: {}
+    webhook: {}
+
 ## Falco configuration.
 falco:
   ## Falco alerting configuration.

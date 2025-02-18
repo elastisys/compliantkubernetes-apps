@@ -30,7 +30,7 @@ repos:
       - id: check-toml
         exclude: ^helmfile\.d/upstream/
       - id: check-yaml
-        exclude: ^helmfile\.d/.*/templates/|^helmfile\.d/upstream/|^helmfile\.d/state.yaml$
+        exclude: ^helmfile\.d/.*/templates/|^helmfile\.d/upstream/|^helmfile\.d/state.yaml$|^helmfile\.d/charts/prometheus-alerts/files/
         args:
           - --allow-multiple-documents
       - id: detect-private-key
