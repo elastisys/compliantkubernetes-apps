@@ -7,6 +7,8 @@ crossplane xpkg init dex configuration-template
 Edit `crossplane.yaml` and fill in metadata and dependencies etc.
 Update the Composition in `apis/composition.yaml`.
 
+Create a chart (`../helmfile.d/charts`)
+
 Generate XRD:
 
 ```shell
