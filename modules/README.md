@@ -9,6 +9,8 @@ Update the Composition in `apis/composition.yaml`.
 
 Create a chart (`../helmfile.d/charts`)
 
+Create `definition-gen.yaml`
+
 Generate XRD:
 
 ```shell
