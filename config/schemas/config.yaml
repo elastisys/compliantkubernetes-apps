@@ -920,6 +920,28 @@ $defs:
   cronSchedule:
     type: string
     pattern: ^(((\*\/)?([0-5]?[0-9])((\,|\-|\/)([0-5]?[0-9]))*|\*)[^\S\r\n]+((\*\/)?((2[0-3]|1[0-9]|[0-9]|00))((\,|\-|\/)(2[0-3]|1[0-9]|[0-9]|00))*|\*)[^\S\r\n]+((\*\/)?([1-9]|[12][0-9]|3[01])((\,|\-|\/)([1-9]|[12][0-9]|3[01]))*|\*)[^\S\r\n]+((\*\/)?([1-9]|1[0-2])((\,|\-|\/)([1-9]|1[0-2]))*|\*|(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))[^\S\r\n]+((\*\/)?[0-6]((\,|\-|\/)[0-6])*|\*|00|(sun|mon|tue|wed|thu|fri|sat)))$|^@(annually|yearly|monthly|weekly|daily|hourly|reboot)$
+  alertUpstreamRunbook:
+    title: Runbooks for alerts
+    type: object
+    description: |-
+      Example:
+
+      group: link-to-alert-group-runbook
+      AlertName: link-to-specific-alert-runbook
+
+      Uses upstream runbooks by default
+
+      https://runbooks.prometheus-operator.dev/runbooks/
+  alertNoUpstreamRunbook:
+    title: Runbooks for alerts
+    description: |-
+      Example:
+
+      group: link-to-alert-group-runbook
+      AlertName: link-to-specific-alert-runbook
+
+      Uses no upstream runbook by default
+    type: object
 type: object
 required:
   - global
@@ -4071,205 +4093,77 @@ properties:
         additionalProperties: false
         properties:
           alertmanager:
-            title: Runbooks for alertmanager alerts
-            description: |-
-              Runbooks for alertmanager alerts
-
-              Example:
-
-              group: https://runbooks.prometheus-operator.dev/runbooks/alertmanager/
-              AlertmanagerFailedReload: https://runbooks.prometheus-operator.dev/runbooks/alertmanager/alertmanagerfailedreload/
-              AlertName: link-to-specific-alert-runbook
-
-              Uses upstream runbooks by default
-
-              https://runbooks.prometheus-operator.dev/runbooks/
-            type: object
+            $ref: '#/$defs/alertUpstreamRunbook'
           backupStatus:
-            title: Runbooks for backup status alerts
-            description: Runbooks for backup status alerts
-            type: object
+            $ref: '#/$defs/alertNoUpstreamRunbook'
           blackbox:
-            title: Runbooks for blackbox alerts
-            description: Runbooks for blackbox alerts
-            type: object
+            $ref: '#/$defs/alertNoUpstreamRunbook'
           certManager:
-            title: Runbooks for cert manager alerts
-            description: Runbooks for cert manager alerts
-            type: object
+            $ref: '#/$defs/alertNoUpstreamRunbook'
           clusterApi:
-            title: Runbooks for cluster api alerts
-            description: Runbooks for cluster api alerts
-            type: object
+            $ref: '#/$defs/alertNoUpstreamRunbook'
           clusterCapacityManagement:
-            title: Runbooks for cluster capacity management alerts
-            description: |-
-              Runbooks for cluster capacity management alerts
-
-              Uses upstream runbooks by default
-
-              https://runbooks.prometheus-operator.dev/runbooks/
-            type: object
+            $ref: '#/$defs/alertUpstreamRunbook'
           configReloaders:
-            title: Runbooks for config reloaders alerts
-            description: |-
-              Runbooks for config reloaders alerts
-
-              Uses upstream runbooks by default
-
-              https://runbooks.prometheus-operator.dev/runbooks/
-            type: object
+            $ref: '#/$defs/alertUpstreamRunbook'
           coreDns:
-            title: Runbooks for core dns alerts
-            description: Runbooks for core dns alerts
-            type: object
+            $ref: '#/$defs/alertNoUpstreamRunbook'
           dailyChecks:
-            title: Runbooks for daily checks alerts
-            description: Runbooks for daily checks alerts
-            type: object
+            $ref: '#/$defs/alertNoUpstreamRunbook'
           diskPerf:
-            title: Runbooks for disk performance alerts
-            description: Runbooks for disk performance alerts
-            type: object
+            $ref: '#/$defs/alertNoUpstreamRunbook'
           falco:
-            title: Runbooks for falco alerts
-            description: Runbooks for falco alerts
-            type: object
+            $ref: '#/$defs/alertNoUpstreamRunbook'
           fluentd:
-            title: Runbooks for fluentd alerts
-            description: Runbooks for fluentd alerts
-            type: object
+            $ref: '#/$defs/alertNoUpstreamRunbook'
           general:
-            title: Runbooks for general alerts
-            description: |-
-              Runbooks for general alerts
-
-              Uses upstream runbooks by default
-
-              https://runbooks.prometheus-operator.dev/runbooks/
-            type: object
+            $ref: '#/$defs/alertUpstreamRunbook'
           harbor:
-            title: Runbooks for harbor alerts
-            description: Runbooks for harbor alerts
-            type: object
+            $ref: '#/$defs/alertNoUpstreamRunbook'
           hnc:
-            title: Runbooks for hnc alerts
-            description: Runbooks for hnc alerts
-            type: object
+            $ref: '#/$defs/alertNoUpstreamRunbook'
           kubeStateMetrics:
-            title: Runbooks for kube state metrics alerts
-            description: |-
-              Runbooks for kube state metrics alerts
-
-              Uses upstream runbooks by default
-
-              https://runbooks.prometheus-operator.dev/runbooks/
-            type: object
+            $ref: '#/$defs/alertUpstreamRunbook'
           kubernetesApps:
-            title: Runbooks for kubernetes apps alerts
-            description: |-
-              Runbooks for kubernetes apps alerts
-
-              Uses upstream runbooks by default
-
-              https://runbooks.prometheus-operator.dev/runbooks/
-            type: object
+            $ref: '#/$defs/alertUpstreamRunbook'
           kubernetesResources:
-            title: Runbooks for kubernetes resources alerts
-            description: |-
-              Runbooks for kubernetes resources alerts
-
-              Uses upstream runbooks by default
-
-              https://runbooks.prometheus-operator.dev/runbooks/
-            type: object
+            $ref: '#/$defs/alertUpstreamRunbook'
           kubernetesStorage:
-            title: Runbooks for kubernetes storage alerts
-            description: |-
-              Runbooks for kubernetes storage alerts
-
-              Uses upstream runbooks by default
-
-              https://runbooks.prometheus-operator.dev/runbooks/
-            type: object
+            $ref: '#/$defs/alertUpstreamRunbook'
           kubernetesSystem:
-            title: Runbooks for kubernetes system alerts
-            description: |-
-              Runbooks for kubernetes system alerts
-
-              Uses upstream runbooks by default
-
-              https://runbooks.prometheus-operator.dev/runbooks/
-            type: object
+            $ref: '#/$defs/alertUpstreamRunbook'
           kured:
-            title: Runbooks for kured alerts
-            description: Runbooks for kured alerts
-            type: object
+            $ref: '#/$defs/alertNoUpstreamRunbook'
           missingMetrics:
-            title: Runbooks for missing metrics alerts
-            description: Runbooks for missing metrics alerts
-            type: object
+            $ref: '#/$defs/alertNoUpstreamRunbook'
           nodeExporter:
-            title: Runbooks for node exporter alerts
-            description: |-
-              Runbooks for node exporter alerts
-
-              Uses upstream runbooks by default
-
-              https://runbooks.prometheus-operator.dev/runbooks/
-            type: object
+            $ref: '#/$defs/alertUpstreamRunbook'
           nodeNetwork:
-            title: Runbooks for node network alerts
-            description: |-
-              Runbooks for node network alerts
-
-              Uses upstream runbooks by default
-
-              https://runbooks.prometheus-operator.dev/runbooks/
-            type: object
+            $ref: '#/$defs/alertUpstreamRunbook'
           opensearch:
-            title: Runbooks for opensearch alerts
-            description: Runbooks for opensearch alerts
-            type: object
+            $ref: '#/$defs/alertNoUpstreamRunbook'
           openstack:
-            title: Runbooks for openstack alerts
-            description: Runbooks for openstack alerts
-            type: object
+            $ref: '#/$defs/alertNoUpstreamRunbook'
           packetsDropped:
-            title: Runbooks for packets dropped alerts
-            description: Runbooks for packets dropped alerts
-            type: object
+            $ref: '#/$defs/alertNoUpstreamRunbook'
           prometheusOperator:
-            title: Runbooks for prometheus operator alerts
-            description: |-
-              Runbooks for prometheus operator alerts
-
-              Uses upstream runbooks by default
-
-              https://runbooks.prometheus-operator.dev/runbooks/
-            type: object
+            $ref: '#/$defs/alertUpstreamRunbook'
           prometheus:
-            title: Runbooks for prometheus alerts
-            description: |-
-              Runbooks for prometheus alerts
-
-              Uses upstream runbooks by default
-
-              https://runbooks.prometheus-operator.dev/runbooks/
-            type: object
+            $ref: '#/$defs/alertUpstreamRunbook'
           thanos:
             title: Runbooks for thanos alerts
             description: |-
-              Runbooks for thanos alerts
+              Example:
+
+              group: link-to-alert-group-runbook
+              AlertName: link-to-specific-alert-runbook
 
               Uses upstream runbooks by default
 
               https://github.com/thanos-io/thanos/tree/main/mixin/runbook.md
             type: object
           webhook:
-            title: Runbooks for webhook alerts
-            description: Runbooks for webhook alerts
-            type: object
+            $ref: '#/$defs/alertNoUpstreamRunbook'
   grafana:
     title: Grafana Config
     description: |-
