@@ -920,28 +920,6 @@ $defs:
   cronSchedule:
     type: string
     pattern: ^(((\*\/)?([0-5]?[0-9])((\,|\-|\/)([0-5]?[0-9]))*|\*)[^\S\r\n]+((\*\/)?((2[0-3]|1[0-9]|[0-9]|00))((\,|\-|\/)(2[0-3]|1[0-9]|[0-9]|00))*|\*)[^\S\r\n]+((\*\/)?([1-9]|[12][0-9]|3[01])((\,|\-|\/)([1-9]|[12][0-9]|3[01]))*|\*)[^\S\r\n]+((\*\/)?([1-9]|1[0-2])((\,|\-|\/)([1-9]|1[0-2]))*|\*|(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))[^\S\r\n]+((\*\/)?[0-6]((\,|\-|\/)[0-6])*|\*|00|(sun|mon|tue|wed|thu|fri|sat)))$|^@(annually|yearly|monthly|weekly|daily|hourly|reboot)$
-  alertUpstreamRunbook:
-    title: Runbooks for alerts
-    type: object
-    description: |-
-      Example:
-
-      group: link-to-alert-group-runbook
-      AlertName: link-to-specific-alert-runbook
-
-      Uses upstream runbooks by default
-
-      https://runbooks.prometheus-operator.dev/runbooks/
-  alertNoUpstreamRunbook:
-    title: Runbooks for alerts
-    description: |-
-      Example:
-
-      group: link-to-alert-group-runbook
-      AlertName: link-to-specific-alert-runbook
-
-      Uses no upstream runbook by default
-    type: object
 type: object
 required:
   - global
@@ -4091,65 +4069,88 @@ properties:
           Runbooks can be configured on an alert group level or per individual alert
         type: object
         additionalProperties: false
+        $defs:
+          upstreamRunbook:
+            title: Runbooks for alerts
+            type: object
+            description: |-
+              Example:
+
+              group: link-to-alert-group-runbook
+              AlertName: link-to-specific-alert-runbook
+
+              Uses upstream runbooks by default
+
+              https://runbooks.prometheus-operator.dev/runbooks/
+          noUpstreamRunbook:
+            title: Runbooks for alerts
+            description: |-
+              Example:
+
+              group: link-to-alert-group-runbook
+              AlertName: link-to-specific-alert-runbook
+
+              Uses no upstream runbook by default
+            type: object
         properties:
           alertmanager:
-            $ref: '#/$defs/alertUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
           backupStatus:
-            $ref: '#/$defs/alertNoUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
           blackbox:
-            $ref: '#/$defs/alertNoUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
           certManager:
-            $ref: '#/$defs/alertNoUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
           clusterApi:
-            $ref: '#/$defs/alertNoUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
           clusterCapacityManagement:
-            $ref: '#/$defs/alertUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
           configReloaders:
-            $ref: '#/$defs/alertUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
           coreDns:
-            $ref: '#/$defs/alertNoUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
           dailyChecks:
-            $ref: '#/$defs/alertNoUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
           diskPerf:
-            $ref: '#/$defs/alertNoUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
           falco:
-            $ref: '#/$defs/alertNoUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
           fluentd:
-            $ref: '#/$defs/alertNoUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
           general:
-            $ref: '#/$defs/alertUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
           harbor:
-            $ref: '#/$defs/alertNoUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
           hnc:
-            $ref: '#/$defs/alertNoUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
           kubeStateMetrics:
-            $ref: '#/$defs/alertUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
           kubernetesApps:
-            $ref: '#/$defs/alertUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
           kubernetesResources:
-            $ref: '#/$defs/alertUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
           kubernetesStorage:
-            $ref: '#/$defs/alertUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
           kubernetesSystem:
-            $ref: '#/$defs/alertUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
           kured:
-            $ref: '#/$defs/alertNoUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
           missingMetrics:
-            $ref: '#/$defs/alertNoUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
           nodeExporter:
-            $ref: '#/$defs/alertUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
           nodeNetwork:
-            $ref: '#/$defs/alertUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
           opensearch:
-            $ref: '#/$defs/alertNoUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
           openstack:
-            $ref: '#/$defs/alertNoUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
           packetsDropped:
-            $ref: '#/$defs/alertNoUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
           prometheusOperator:
-            $ref: '#/$defs/alertUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
           prometheus:
-            $ref: '#/$defs/alertUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
           thanos:
             title: Runbooks for thanos alerts
             description: |-
@@ -4163,7 +4164,7 @@ properties:
               https://github.com/thanos-io/thanos/tree/main/mixin/runbook.md
             type: object
           webhook:
-            $ref: '#/$defs/alertNoUpstreamRunbook'
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
   grafana:
     title: Grafana Config
     description: |-
