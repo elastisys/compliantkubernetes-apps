@@ -19,8 +19,6 @@
     {{ .name }}: {{ $output }}
 {{- end }}
 
-{{ $missingRunbook := "Missing runbook" }}
-{{ $thanosRunbookUrl := "https://github.com/thanos-io/thanos/tree/main/mixin/runbook.md" }}
 {{- with .Values.alerts.runbookUrls }}
 runbookUrls:
   alertmanager:
