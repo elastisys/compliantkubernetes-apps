@@ -270,9 +270,6 @@ check_version() {
   cluster_version="$(get_apps_version "${1}" >/dev/null 2>&1 || true)"
   if [ -n "${cluster_version}" ]; then
     log_info "Currently running ${cluster_version} according to cluster"
-    if [ "${VERSION["${1}-config"]%.*}" != "${cluster_version}" ]; then
-      log_warn "Version mismatch, cluster ${cluster_version}, config ${VERSION["${1}-config"]%.*}"
-    fi
   fi
 
   # `--exit-status` can be used instead of comparing to "null"
