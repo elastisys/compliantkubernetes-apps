@@ -463,7 +463,12 @@ allow_subnet() {
   local environment_name
   environment_name="$(yq_read "${cluster}" '.global.ck8sEnvironmentName' "")"
 
-  # TODO: We should not have to do this in the future...
+  # TODO: Currently Apps requires two clusters named "sc" and "wc" exactly.
+  # However, in cluster API it's common to refer to the cluster
+  # controlling CAPI resources the "management cluster" and therefore it's not
+  # uncommon that we name the service cluster "mc" instead of "sc" there. This
+  # code should be improved once we have better alignment between the
+  # repositories.
   capi_cluster_name="${environment_name}-${cluster}"
   if [ "${cluster}" = "sc" ]; then
     # If no cluster named <environment>-sc is found, try <environment>-mc
