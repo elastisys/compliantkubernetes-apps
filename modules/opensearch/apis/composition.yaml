@@ -424,6 +424,7 @@ spec:
                     fieldPath: data.password
                     toConnectionSecretKey: password
                 managementPolicies: [Observe]
+                watch: true
                 forProvider:
                   manifest:
                     apiVersion: v1
