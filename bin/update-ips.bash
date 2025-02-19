@@ -463,6 +463,9 @@ allow_subnet() {
   local environment_name
   environment_name="$(yq_read "${cluster}" '.global.ck8sEnvironmentName' "")"
 
+  # TODO: Support for other CAPI providers could be added here by supporting
+  # other resource types than "openstackcluster".
+
   # TODO: Currently Apps requires two clusters named "sc" and "wc" exactly.
   # However, in cluster API it's common to refer to the cluster
   # controlling CAPI resources the "management cluster" and therefore it's not
