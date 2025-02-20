@@ -1,17 +1,6 @@
 defaultRules:
   labels: {}
 
-certMonitor:
-  enabled: true
-  name: "cert-monitor"
-  instance: "ck8s"
-  namespace: "cert-manager"
-  target:
-    name: "cert-manager"
-    instance: "cert-manager"
-  port: 9402
-  relabelings: []
-
 rookMonitor:
   enabled: false
   namespace: rook-ceph

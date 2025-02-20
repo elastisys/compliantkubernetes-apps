@@ -11,6 +11,10 @@ policies:
       egress:
         - rule: egress-rule-dns
         - rule: egress-rule-apiserver
+      ingress:
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 9402
 
     controller:
       podSelectorLabels:
@@ -66,6 +70,9 @@ policies:
         - rule: ingress-rule-apiserver
           ports:
             - tcp: 10250
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 9402
 
     startupapicheck:
       podSelectorLabels:
