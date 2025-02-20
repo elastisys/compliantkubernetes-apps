@@ -938,7 +938,7 @@ opensearch:
     retention:
       - pattern: other-*
         sizeGB: 1
-        ageDays: 7
+        ageDays: 30
       - pattern: kubeaudit-*
         sizeGB: 50
         ageDays: 30
@@ -1047,7 +1047,7 @@ fluentd:
       ephemeralVolumes:
         enabled: false
       schedule: 0 1/6 * * *
-      days: 10
+      days: 30
     retention:
       enabled: true
       schedule: 0 20 * * *
@@ -1060,11 +1060,11 @@ fluentd:
       ephemeralVolumes:
         enabled: false
       schedule: 0 2/6 * * *
-      days: 7
+      days: 30
     retention:
       enabled: true
       schedule: 0 21 * * *
-      days: 7
+      days: 30
 
   aggregator:
     resources:
