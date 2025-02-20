@@ -19,3 +19,7 @@ networkPolicies:
     dns01:
       ips:
         - 0.0.0.0/0
+
+fluentd:
+  audit:
+    enabled: true
