@@ -1,0 +1,42 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: dex.modules.elastisys.com
+spec:
+  compositeTypeRef:
+    apiVersion: modules.elastisys.com/v1alpha1
+    kind: Dex
+  mode: Pipeline
+  pipeline:
+    - functionRef:
+        name: function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        resources:
+          - base:
+              apiVersion: helm.crossplane.io/v1beta1
+              kind: Release
+              metadata:
+                name: dex
+              spec:
+                forProvider:
+                  chart:
+                    name: dex
+                    repository: https://charts.dexidp.io
+                    version: 0.20.0
+                  namespace: dex
+                providerConfigRef:
+                  name: helm
+            name: dex
+            patches:
+              - fromFieldPath: spec.affinity
+                toFieldPath: spec.forProvider.values.affinity
+                type: FromCompositeFieldPath
+              - fromFieldPath: spec.resources
+                toFieldPath: spec.forProvider.values.resources
+                type: FromCompositeFieldPath
+              - fromFieldPath: spec.tolerations
+                toFieldPath: spec.forProvider.values.tolerations
+                type: FromCompositeFieldPath
+      step: patch-and-transform
