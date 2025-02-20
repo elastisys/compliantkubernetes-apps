@@ -4,8 +4,8 @@ image:
   # This is our own fork-image (https://github.com/elastisys/fluentd-elasticsearch).
   # This can later be replaced with the original image (https://github.com/monotek/fluentd-elasticsearch) when our changes is merged.
   # This image is included in falco k8s_containers and user_known_package_manager_in_container macros
-  repository: ghcr.io/elastisys/fluentd
-  tag: v4.3.9-ck8s1
+  repository: {{ .Values.fluentd.forwarder.image.repository }}
+  tag: {{ .Values.fluentd.forwarder.image.tag }}
 
 serviceMonitor:
   enabled: true
