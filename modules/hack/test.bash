@@ -19,8 +19,8 @@ helm_template() {
 }
 
 helm_template_main() {
-  git worktree add main --quiet
-  trap 'git worktree remove main' RETURN ERR
+  git worktree add -b "hack$$" main --quiet
+  trap 'git worktree remove main; git branch -d '"hack$$" RETURN ERR
 
   helmfile -f "./main/helmfile.d" -e "${helmfile_environment}" template --selector name="${old_release_name}"
   : # TODO: helmfile as the last command prevents the trap from firing for some reason
