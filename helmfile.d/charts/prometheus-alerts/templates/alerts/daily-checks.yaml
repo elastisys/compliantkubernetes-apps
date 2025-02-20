@@ -24,7 +24,7 @@ spec:
         runbook_url: {{ .Values.runbookUrls.dailyChecks.S3BucketSizeOverXPercent }}
       expr: |-
         (
-          sum(s3_objects_size_sum_bytes{bucket!~"{{ join "|" .Values.s3BucketAlerts.exclude }}"}) by (bucket) >= ({{ .Values.s3BucketAlerts.size.sizeQuotaGB }} * (1024^3)) * ({{ .Values.s3BucketAlerts.size.percent }} / 100)
+          sum(s3_objects_size_sum_bytes{bucket!~"{{ join "|" .Values.s3BucketAlerts.exclude }}",prefix!~".+"}) by (bucket) >= ({{ .Values.s3BucketAlerts.size.sizeQuotaGB }} * (1024^3)) * ({{ .Values.s3BucketAlerts.size.percent }} / 100)
         )
       for: 1h
       labels:
@@ -37,7 +37,7 @@ spec:
         runbook_url: {{ .Values.runbookUrls.dailyChecks.S3BucketsTotalSizeOverXPercent }}
       expr: |-
         (
-          sum(max_over_time(s3_objects_size_sum_bytes[1h])) >= ({{ .Values.s3BucketAlerts.totalSize.sizeQuotaGB }} * (1024^3)) * ({{ .Values.s3BucketAlerts.totalSize.percent }} / 100)
+          sum(max_over_time(s3_objects_size_sum_bytes{prefix!~".+"}[1h])) >= ({{ .Values.s3BucketAlerts.totalSize.sizeQuotaGB }} * (1024^3)) * ({{ .Values.s3BucketAlerts.totalSize.percent }} / 100)
         )
       for: 1h
       labels:
