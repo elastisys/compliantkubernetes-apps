@@ -295,6 +295,9 @@ fluentd:
     affinity: {}
 
   forwarder:
+    image:
+      repository: ghcr.io/elastisys/fluentd-forwarder
+      tag: v4.7.5-ck8s1
     buffer:
       totalLimitSize: 20GB
 
