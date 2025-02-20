@@ -19,12 +19,14 @@ templates:
       - values/networkpolicies/common/cert-manager.yaml.gotmpl
 
   cert-manager-controller:
+    disableValidationOnInstall: true
     inherit:
       - template: cert-manager
       - template: cert-manager-chart
     name: cert-manager
     needs:
       - cert-manager/networkpolicy
+      - monitoring/kube-prometheus-stack # creates servicemonitors
     values:
       - values/cert-manager.yaml.gotmpl
 
