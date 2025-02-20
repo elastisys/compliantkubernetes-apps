@@ -961,7 +961,7 @@ opensearch:
     nodeSelector: {}
     tolerations: []
 
-  # Config for https://github.com/elastisys/compliantkubernetes-apps/blob/main/helmfile/charts/prometheus-alerts/templates/alerts/opensearch.yaml#L70:L77
+  # Config for https://github.com/elastisys/compliantkubernetes-apps/blob/main/helmfile.d/charts/prometheus-alerts/templates/alerts/opensearch.yaml#L75:L83
   promIndexAlerts:
     - prefix: kubernetes-default
       alertSizeMB: 5500
