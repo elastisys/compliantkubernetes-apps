@@ -73,8 +73,10 @@ else
   log_info "Cluster API provisioned cluster, skipping deletion of cert-manager Helm release"
 fi
 
-# Destroy local-cluster minio release, otherwise pvc cleanup will get stuck
-helmfile -e local_cluster -f "${here}/../helmfile.d" -l app=minio destroy
+if [[ -f "${CK8S_CONFIG_PATH}/cluster-index.yaml" ]]; then
+  # Destroy local-cluster minio release, otherwise pvc cleanup will get stuck
+  helmfile -e local_cluster -f "${here}/../helmfile.d" -l app=minio destroy
+fi
 
 # Remove any lingering persistent volume claims
 "${here}/.././bin/ck8s" ops kubectl wc delete pvc -A --all
