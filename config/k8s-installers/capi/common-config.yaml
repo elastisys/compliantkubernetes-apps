@@ -9,3 +9,11 @@ networkPolicies:
     serviceIp:
       ips:
         - 10.233.0.10/32
+metricsServer:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node-restriction.kubernetes.io/autoscaled-node-type
+                operator: DoesNotExist
