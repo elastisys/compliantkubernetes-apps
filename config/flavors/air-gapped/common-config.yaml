@@ -30,3 +30,7 @@ trivy:
         "index.docker.io": set-me
         "quay.io": set-me
         "registry.k8s.io": set-me
+
+fluentd:
+  audit:
+    enabled: true
