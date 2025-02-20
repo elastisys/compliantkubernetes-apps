@@ -5301,6 +5301,17 @@ properties:
         type: object
         additionalProperties: false
         properties:
+          image:
+            title: Fluentd Forwarder Image Config
+            description: Configure Fluentd forwarder image repository and tag
+            type: object
+            properties:
+              repository:
+                default: ghcr.io/elastisys/fluentd-forwarder
+                type: string
+              tag:
+                default: v4.7.5-ck8s1
+                type: string
           buffer:
             $ref: '#/$defs/fluentdBuffer'
           livenessThresholdSeconds:

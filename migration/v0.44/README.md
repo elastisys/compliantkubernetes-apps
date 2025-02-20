@@ -82,6 +82,16 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s upgrade wc v0.44 apply
     ```
 
+1. If the environment is still on Ubuntu 20.04, you may want to override the fluentd-forwarder image to the previous one, as the new image has some known issues on Ubuntu 20.04. This can be done in the `common-config.yaml`:
+
+    ```yaml
+    fluentd:
+      forwarder:
+        image:
+          repository: ghcr.io/elastisys/fluentd
+          tag: v4.3.9-ck8s1
+    ```
+
 1. Apply upgrade - _disruptive_
 
     > _Done during maintenance window._
@@ -107,6 +117,16 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     export CK8S_CLUSTER=<wc|sc|both>
+    ```
+
+1. If the environment is still on Ubuntu 20.04, you may want to override the fluentd-forwarder image to the previous one, as the new image has some known issues on Ubuntu 20.04. This can be done in the `common-config.yaml`:
+
+    ```yaml
+    fluentd:
+      forwarder:
+        image:
+          repository: ghcr.io/elastisys/fluentd
+          tag: v4.3.9-ck8s1
     ```
 
 1. Because `harbor.core.replicas` was previously used by the jobservice component any nondefault value for it will be copied to `harbor.jobservice.replicas`:
