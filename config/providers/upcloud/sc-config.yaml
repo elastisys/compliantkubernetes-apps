@@ -1,4 +1,37 @@
 harbor:
+  database:
+    internal:
+      persistentVolumeClaim:
+        size: 10Gi
+  jobservice:
+    jobLog:
+      persistentVolumeClaim:
+        size: 10Gi
+    scanDataExports:
+      persistentVolumeClaim:
+        size: 10Gi
+  registry:
+    persistentVolumeClaim:
+      size: 10Gi
+  redis:
+    internal:
+      persistentVolumeClaim:
+        size: 10Gi
+  trivy:
+    persistentVolumeClaim:
+      size: 10Gi
   persistence:
     type: objectStorage
     disableRedirect: true
+thanos:
+  storegateway:
+    persistence:
+      size: 10Gi
+prometheus:
+  alertmanagerSpec:
+    storage:
+      volumeClaimTemplate:
+        spec:
+          resources:
+            requests:
+              storage: 10Gi
