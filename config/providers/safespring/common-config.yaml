@@ -13,7 +13,7 @@ networkPolicies:
     openstack:
       enabled: true
       ips:
-        - set-me
+        - 185.189.29.233/32
       ports:
         - 5000
         - 8774
@@ -21,8 +21,8 @@ networkPolicies:
 objectStorage:
   type: s3
   s3:
-    region: set-me
-    regionEndpoint: set-me
+    region: sto1
+    regionEndpoint: https://s3.sto1.safedc.net
     forcePathStyle: true
 ingressNginx:
   controller:
