@@ -1,0 +1,2 @@
+environmentName: {{ .Values.global.ck8sEnvironmentName }}
+clusters: {{ .Values.clusterApi.clusters | toYaml | nindent 2 }}

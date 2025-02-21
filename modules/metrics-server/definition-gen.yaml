@@ -1,0 +1,10 @@
+kind: MetricsServer
+version: v1alpha1
+kubernetesDefinitions:
+ - property: affinity
+   definition: io.k8s.api.core.v1.Affinity
+ - property: resources
+   definition: io.k8s.api.core.v1.ResourceRequirements
+ - property: tolerations
+   definition: io.k8s.api.core.v1.Toleration
+   isArray: true

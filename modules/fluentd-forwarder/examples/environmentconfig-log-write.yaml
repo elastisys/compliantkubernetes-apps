@@ -1,0 +1,17 @@
+apiVersion: apiextensions.crossplane.io/v1beta1
+kind: EnvironmentConfig
+metadata:
+  name: welkin.modules.capability.log-write
+data:
+  host:
+    secretKeyRef:
+      name: welkin.modules.capability.log-write
+      key: host
+  username:
+    secretKeyRef:
+      name: welkin.modules.capability.log-write
+      key: username
+  password:
+    secretKeyRef:
+      name: welkin.modules.capability.log-write
+      key: password

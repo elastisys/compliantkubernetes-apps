@@ -1,0 +1,98 @@
+apiVersion: modules.elastisys.com/v1alpha1
+kind: OpenSearch
+metadata:
+  name: opensearch-master
+spec:
+  clusterName: opensearch
+  master:
+    replicas: 1
+    opensearchJavaOpts: "-Xms1024m -Xmx1024m"
+  keystore:
+    - secretName: opensearch-s3-secret
+  plugins:
+    enabled: true
+    installList:
+      - repository-s3
+  config:
+    opensearch.yml: |
+      cluster:
+        name: opensearch
+        max_shards_per_node: 1000
+
+      network:
+        host: 0.0.0.0
+
+      indices:
+        query:
+          bool:
+            max_clause_count: 1024
+
+      compatibility:
+        override_main_response_version: true
+      action:
+        auto_create_index: ".opensearch*,.opendistro-*,security-auditlog-*"
+
+      node:
+        attr:
+          box_type: hot
+
+      # Security plugin configuration
+      plugins:
+        security:
+          ssl:
+            transport:
+              pemcert_filepath: transport/tls.crt
+              pemkey_filepath: transport/tls.key
+              pemtrustedcas_filepath: transport/ca.crt
+              enforce_hostname_verification: false
+            http:
+              enabled: true
+              pemcert_filepath: http/tls.crt
+              pemkey_filepath: http/tls.key
+              pemtrustedcas_filepath: http/ca.crt
+          allow_unsafe_democertificates: false
+          allow_default_init_securityindex: false
+          authcz:
+            admin_dn:
+              - "CN=admin.opensearch-system.cluster.local,O=compliantkubernetes"
+          audit:
+            type: log4j
+            config:
+              log4j:
+                logger_name: audit
+                level: INFO
+            # In example config, but not supported
+            # ignore_users:
+            #   - kibanaserver
+          enable_snapshot_restore_privilege: true
+          check_snapshot_restore_write_privileges: true
+          nodes_dn:
+            - "CN=nodes.opensearch-system.cluster.local,O=compliantkubernetes"
+          restapi:
+            roles_enabled:
+              - all_access
+              - configurer
+              - security_rest_api_access
+          system_indices:
+            enabled: true
+            indices:
+              [
+                ".opendistro-alerting-config",
+                ".opendistro-alerting-alert*",
+                ".opendistro-anomaly-results*",
+                ".opendistro-anomaly-detector*",
+                ".opendistro-anomaly-checkpoints",
+                ".opendistro-anomaly-detection-state",
+                ".opendistro-reports-*",
+                ".opendistro-notifications-*",
+                ".opendistro-notebooks",
+                ".opendistro-asynchronous-search-response*",
+              ]
+
+      # Object storage configuration
+      s3:
+        client:
+          default:
+            endpoint: http://minio.minio-system.svc.cluster.local:9000
+            path_style_access: true
+            region: local

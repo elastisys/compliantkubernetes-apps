@@ -13,11 +13,11 @@ crossplane_release_contents="$(cat "${3}")"
 
 helm_temporary_repo_name="welkin-crossplane-module-diff-${release_name}"
 
-release_namespace=$(echo "${crossplane_release_contents}" | yq4 '.spec.forProvider.namespace')
-chart_repository=$(echo "${crossplane_release_contents}" | yq4 '.spec.forProvider.chart.repository')
-chart_name=$(echo "${crossplane_release_contents}" | yq4 '.spec.forProvider.chart.name')
-chart_version=$(echo "${crossplane_release_contents}" | yq4 '.spec.forProvider.chart.version')
-values="$(echo "${crossplane_release_contents}" | yq4 -o json '.spec.forProvider.values')"
+release_namespace=$(yq4 '.spec.forProvider.namespace' <<<"${crossplane_release_contents}")
+chart_repository=$(yq4 '.spec.forProvider.chart.repository' <<<"${crossplane_release_contents}")
+chart_name=$(yq4 '.spec.forProvider.chart.name' <<<"${crossplane_release_contents}")
+chart_version=$(yq4 '.spec.forProvider.chart.version' <<<"${crossplane_release_contents}")
+values="$(yq4 -o json '.spec.forProvider.values' <<<"${crossplane_release_contents}")"
 
 helm repo add "${helm_temporary_repo_name}" "${chart_repository}" >/dev/null
 trap 'helm repo remove "${helm_temporary_repo_name}" >/dev/null' EXIT

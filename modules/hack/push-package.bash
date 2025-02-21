@@ -11,7 +11,7 @@ repository="harbor.long-running.dev-ck8s.com/apps-crossplane-poc"
 
 pushd "${here}/../${name}" >/dev/null
 
-crossplane xpkg build -o "/tmp/${name}.xpkg"
+crossplane xpkg build --ignore definition-gen.yaml -o "/tmp/${name}.xpkg"
 trap 'rm "/tmp/${name}.xpkg"' EXIT
 
 crossplane xpkg push -f "/tmp/${name}.xpkg" "${repository}/${name}:${version}"

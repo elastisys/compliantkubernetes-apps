@@ -1,57 +1,26 @@
-nodeGroup: master
+master:
+  replicas: {{ .Values.opensearch.masterNode.count }}
 
-roles:
-  - master
-  {{- if not .Values.opensearch.dataNode.dedicatedPods }}
-  - data
-  {{- end }}
-  {{- if not .Values.opensearch.clientNode.dedicatedPods }}
-  - ingest
-  - remote_cluster_client
-  {{- end }}
+  opensearchJavaOpts: {{ .Values.opensearch.masterNode.javaOpts }}
 
-replicas: {{ .Values.opensearch.masterNode.count }}
+  resources: {{- toYaml .Values.opensearch.masterNode.resources | nindent 4 }}
 
-opensearchJavaOpts: {{ .Values.opensearch.masterNode.javaOpts }}
+  persistence:
+    size: {{ .Values.opensearch.masterNode.storageSize }}
+    storageClass: {{ toYaml .Values.opensearch.masterNode.storageClass }}
 
-resources: {{- toYaml .Values.opensearch.masterNode.resources | nindent 2 }}
+  {{ if (hasKey .Values.opensearch.masterNode.affinity.podAntiAffinity "requiredDuringSchedulingIgnoredDuringExecution") -}}
+  antiAffinityTopologyKey: {{ (first .Values.opensearch.masterNode.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution).podAffinityTerm.topologyKey | quote }}
+  antiAffinity: hard
+  {{ else if (hasKey .Values.opensearch.masterNode.affinity.podAntiAffinity "preferredDuringSchedulingIgnoredDuringExecution") -}}
+  antiAffinityTopologyKey: {{ (first .Values.opensearch.masterNode.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution).podAffinityTerm.topologyKey | quote }}
+  antiAffinity: soft
+  {{ end -}}
 
-persistence:
-  size: {{ .Values.opensearch.masterNode.storageSize }}
-  storageClass: {{ toYaml .Values.opensearch.masterNode.storageClass }}
+  {{ if (hasKey .Values.opensearch.masterNode.affinity "nodeAffinity") -}}
+  nodeAffinity: {{ toYaml .Values.opensearch.masterNode.affinity.nodeAffinity | nindent 4 }}
+  {{ end -}}
 
-{{ if (hasKey .Values.opensearch.masterNode.affinity.podAntiAffinity "requiredDuringSchedulingIgnoredDuringExecution") -}}
-antiAffinityTopologyKey: {{ (first .Values.opensearch.masterNode.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution).podAffinityTerm.topologyKey | quote }}
-antiAffinity: hard
-{{ else if (hasKey .Values.opensearch.masterNode.affinity.podAntiAffinity "preferredDuringSchedulingIgnoredDuringExecution") -}}
-antiAffinityTopologyKey: {{ (first .Values.opensearch.masterNode.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution).podAffinityTerm.topologyKey | quote }}
-antiAffinity: soft
-{{ end -}}
+  nodeSelector: {{- toYaml .Values.opensearch.masterNode.nodeSelector | nindent 4 }}
 
-{{ if (hasKey .Values.opensearch.masterNode.affinity "nodeAffinity") -}}
-nodeAffinity: {{ toYaml .Values.opensearch.masterNode.affinity.nodeAffinity | nindent 2 }}
-{{ end -}}
-
-nodeSelector: {{- toYaml .Values.opensearch.masterNode.nodeSelector | nindent 2 }}
-
-tolerations:  {{- toYaml .Values.opensearch.masterNode.tolerations | nindent 2 }}
-
-{{- if not .Values.opensearch.clientNode.dedicatedPods }}
-ingress:
-  enabled: true
-  ingressClassName: nginx
-  annotations:
-    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-    cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
-    nginx.ingress.kubernetes.io/proxy-body-size: {{ .Values.opensearch.ingress.maxbodysize }}
-    {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.opensearch }}
-    nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.opensearch }}
-    {{ end }}
-  path: /
-  hosts:
-    - {{ .Values.opensearch.subdomain }}.{{ .Values.global.opsDomain }}
-  tls:
-    - secretName: opensearch-ingress-cert
-      hosts:
-        - {{ .Values.opensearch.subdomain }}.{{ .Values.global.opsDomain }}
-{{- end }}
+  tolerations:  {{- toYaml .Values.opensearch.masterNode.tolerations | nindent 4 }}

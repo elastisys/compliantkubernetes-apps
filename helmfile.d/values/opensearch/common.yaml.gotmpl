@@ -1,13 +1,11 @@
-{{ if and .Values.opensearch.dataNode.dedicatedPods (eq .Values.opensearch.dataNode.count 0) }}
-{{ fail "\nERROR: Using 0 replicas with dedicated data pods is not supported by OpenSearch" }}
+{{ if not .Values.opensearch.dataNode.dedicatedPods }}
+{{ fail "\nERROR: Dedicated data pods is required by OpenSearch" }}
 {{ end }}
-{{ if and .Values.opensearch.clientNode.dedicatedPods (eq .Values.opensearch.clientNode.count 0) }}
-{{ fail "\nERROR: Using 0 replicas with dedicated client pods is not supported by OpenSearch" }}
+{{ if not .Values.opensearch.clientNode.dedicatedPods }}
+{{ fail "\nERROR: Dedicated client pods is required by OpenSearch" }}
 {{ end }}
 
 clusterName: {{ .Values.opensearch.clusterName }}
-
-masterService: {{ .Values.opensearch.clusterName }}-master
 
 config:
   opensearch.yml: |
@@ -110,56 +108,6 @@ config:
     {{- end }}
     {{- end }}
 
-# To prevent the demo certs from generating: https://github.com/opensearch-project/helm-charts/issues/154
-extraEnvs:
-  - name: DISABLE_INSTALL_DEMO_CONFIG
-    value: "true"
-
-# This is a workaround to set vm.max_map_count before OpenSearch starts.
-# The chart provides this using non privileged container, and instead allows the unsafe sysctl through PSP.
-# However this relies on the unsafe sysctl to be allowed in kubelet, which it is not by default.
-extraInitContainers:
-  - name: init-sysctl
-    image: ghcr.io/elastisys/curl-jq:1.0.0
-    command:
-      - sysctl
-      - -w
-      - vm.max_map_count=262144
-    securityContext:
-      allowPrivilegeEscalation: true
-      privileged: true
-      runAsNonRoot: false
-      runAsUser: 0
-
-secretMounts:
-  - secretName: opensearch-transport-cert
-    name: opensearch-transport-cert
-    path: /usr/share/opensearch/config/transport
-    defaultMode: 0400
-  - secretName: opensearch-http-cert
-    name: opensearch-http-cert
-    path: /usr/share/opensearch/config/http
-    defaultMode: 0400
-
-rbac:
-  create: true
-
-persistence:
-  enableInitChown: false
-
-podSecurityContext:
-  fsGroup: 1000
-
-securityContext:
-  runAsNonRoot: true
-  runAsGroup: 1000
-  runAsUser: 1000
-  capabilities:
-    drop:
-      - ALL
-
-networkPolicy:
-  create: true
 
 {{- if .Values.opensearch.snapshot.enabled }}
 keystore:

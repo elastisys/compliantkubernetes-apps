@@ -33,6 +33,7 @@ bases:
 releases:
   - inherit: [ template: crossplane ]
   - inherit: [ template: crossplane-packages ]
+  - inherit: [ template: crossplane-provider-configs ]
 
   - inherit: [ template: tigera ]
   - inherit: [ template: minio ]
@@ -69,7 +70,7 @@ releases:
   - inherit: [ template: fluentd-networkpolicy ]
   - inherit: [ template: fluentd-podsecuritypolicy ]
   - inherit: [ template: fluentd-aggregator ]
-  - inherit: [ template: fluentd-forwarder ]
+  - inherit: [ template: module-fluentd-forwarder ]
   - inherit: [ template: fluentd-user ]
   - inherit: [ template: log-manager ]
 
@@ -161,9 +162,7 @@ releases:
 
   - inherit: [ template: opensearch-podsecuritypolicy ]
   - inherit: [ template: opensearch-secrets ]
-  - inherit: [ template: opensearch-master ]
-  - inherit: [ template: opensearch-client ]
-  - inherit: [ template: opensearch-data ]
+  - inherit: [ template: module-opensearch ]
   - inherit: [ template: opensearch-dashboards ]
   - inherit: [ template: opensearch-securityadmin ]
   - inherit: [ template: opensearch-configurer ]
