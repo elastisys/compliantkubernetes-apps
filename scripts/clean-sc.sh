@@ -61,7 +61,7 @@ else
   log_info "Cluster API provisioned cluster, skipping deletion of cert-manager Helm release"
 fi
 
-if [ -z "$("${here}/local-cluster.sh list clusters")" ]; then
+if [[ -f "${CK8S_CONFIG_PATH}/cluster-index.yaml" ]]; then
   # Destroy local-cluster minio release, otherwise pvc cleanup will get stuck
   helmfile -e local_cluster -f "${here}/../helmfile.d" -l app=minio destroy
 fi
