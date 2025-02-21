@@ -117,13 +117,13 @@ rclone_enabled() {
   return 1
 }
 
-# Fetch the InternalIP, Calico tunnel IP and Wireguard IP of Kubernetes
+# Fetch the Calico tunnel IP and Wireguard IP of Kubernetes
 # nodes using a label selector.
 #
 # If the label selector isn't specified, all nodes will be returned.
 #
-# Usage: get_kubectl_ips <cluster> <label>
-get_kubectl_ips() {
+# Usage: get_tunnel_ips <cluster> <label>
+get_tunnel_ips() {
   local cluster="${1}"
   local label="${2}"
 
@@ -132,17 +132,40 @@ get_kubectl_ips() {
     label_argument="-l ${label}"
   fi
 
-  local -a ips_internal
   local -a ips_calico_ipip
   local -a ips_calico_vxlan
   local -a ips_wireguard
-  mapfile -t ips_internal < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')
   mapfile -t ips_calico_vxlan < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4VXLANTunnelAddr}')
   mapfile -t ips_calico_ipip < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4IPIPTunnelAddr}')
   mapfile -t ips_wireguard < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4WireguardInterfaceAddr}')
 
   local -a ips
-  read -r -a ips <<<"${ips_internal[*]} ${ips_calico_vxlan[*]} ${ips_calico_ipip[*]} ${ips_wireguard[*]}"
+  read -r -a ips <<<"${ips_calico_vxlan[*]} ${ips_calico_ipip[*]} ${ips_wireguard[*]}"
+
+  if [ ${#ips[@]} -eq 0 ]; then
+    log_error "No IPs for ${cluster} nodes with label ${label} was found"
+    exit 1
+  fi
+
+  echo "${ips[@]}"
+}
+
+# Fetch the InternalIP of Kubernetes nodes using a label selector.
+#
+# If the label selector isn't specified, all nodes will be returned.
+#
+# Usage: get_internal_ips <cluster> <label>
+get_internal_ips() {
+  local cluster="${1}"
+  local label="${2}"
+
+  local label_argument="--ignore-not-found"
+  if [[ "${label}" != "" ]]; then
+    label_argument="-l ${label}"
+  fi
+
+  local -a ips
+  mapfile -t ips < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')
 
   if [ ${#ips[@]} -eq 0 ]; then
     log_error "No IPs for ${cluster} nodes with label ${label} was found"
@@ -238,9 +261,9 @@ get_swift_url() {
 
 # Sort IP addresses.
 #
-# For example, [1.0.0.10, 1.0.0.2] would be reordered to [1.0.0.2, 1.0.0.10].
-sort_ips() {
-  python3 -c "import ipaddress; import sys; ips = [ipaddress.ip_address(ip) for ip in sys.argv[1:]]; ips.sort(); [print(ip) for ip in ips]" "${@}"
+# For example, [1.0.0.10/32, 1.0.0.2/32] would be reordered to [1.0.0.2/32, 1.0.0.10/32].
+sort_cidrs() {
+  python3 -c "import ipaddress; import sys; cidrs = [ipaddress.ip_network(cidr) for cidr in sys.argv[1:]]; cidrs.sort(); [print(cidr) for cidr in cidrs]" "${@}"
 }
 
 # Check if an IP address is part of a CIDR address block.
@@ -304,6 +327,23 @@ parse_url_port() {
   esac
 }
 
+# Updates the configuration to allow CIDRs.
+#
+# Usage: allow_cidrs <config_file> <config_options> <cidr> [<cidr> ...]
+allow_cidrs() {
+  local config_file="${1}"
+  local config_option="${2}"
+  shift 2
+
+  local -a cidrs
+  readarray -t cidrs <<<"$(sort_cidrs "${@}")"
+
+  local list
+  list=$(echo "[$(for v in "${cidrs[@]}"; do echo "${v},"; done)]" | yq4 -oj)
+
+  yq_eval "${config_file}" "${config_option}" "${config_option} = ${list}"
+}
+
 # Updates the configuration to allow IPs.
 #
 # Usage: allow_ips <config_file> <config_option> <ip> [<ip> ...]
@@ -312,16 +352,10 @@ allow_ips() {
   local config_option="${2}"
   shift 2
 
-  local -a ips
-  readarray -t ips <<<"$(sort_ips "${@}")"
-
   local -a cidrs
-  readarray -t cidrs <<<"$(process_ips_to_cidrs "${config_file}" "${config_option}" "${ips[@]}")"
+  readarray -t cidrs <<<"$(process_ips_to_cidrs "${config_file}" "${config_option}" "${@}")"
 
-  local list
-  list=$(echo "[$(for v in "${cidrs[@]}"; do echo "${v},"; done)]" | yq4 -oj)
-
-  yq_eval "${config_file}" "${config_option}" "${config_option} = ${list}"
+  allow_cidrs "${config_file}" "${config_option}" "${cidrs[@]}"
 }
 
 # Updates the configuration to allow ports.
@@ -402,11 +436,68 @@ allow_nodes() {
 
   local config_file="${config["override_${cluster}"]}"
 
-  local -a ips kubectl_ips
-  kubectl_ips=$(get_kubectl_ips "${cluster}" "${label}")
-  readarray -t ips <<<"$(echo "${kubectl_ips}" | tr ' ' '\n')"
+  local -a ips internal_ips tunnel_ips
+  internal_ips=$(get_internal_ips "${cluster}" "${label}")
+  tunnel_ips=$(get_tunnel_ips "${cluster}" "${label}")
+  readarray -t ips <<<"$(echo "${internal_ips}" "${tunnel_ips}" | tr ' ' '\n')"
 
   allow_ips "${config_file}" "${config_option}" "${ips[@]}"
+}
+
+# Updates the configuration to allow the subnet.
+#
+# Usage: allow_subnet <cluster> <config_option>
+allow_subnet() {
+  local cluster="${1}"
+  local config_option="${2}"
+
+  # Allowing the subnet is currently only supported for clusters setup with
+  # CAPI on OpenStack. Fallback on allowing individual nodes otherwise.
+  if [ "$(yq_read "${cluster}" '.global.ck8sK8sInstaller' "")" != "capi" ] || [ "$(yq_read "${cluster}" '.global.ck8sCloudProvider' "")" != "openstack" ]; then
+    allow_nodes "${cluster}" "${config_option}" ""
+    return
+  fi
+
+  local config_file="${config["override_${cluster}"]}"
+
+  local environment_name
+  environment_name="$(yq_read "${cluster}" '.global.ck8sEnvironmentName' "")"
+
+  # TODO: Support for other CAPI providers could be added here by supporting
+  # other resource types than "openstackcluster".
+
+  # TODO: Currently Apps requires two clusters named "sc" and "wc" exactly.
+  # However, in cluster API it's common to refer to the cluster
+  # controlling CAPI resources the "management cluster" and therefore it's not
+  # uncommon that we name the service cluster "mc" instead of "sc" there. This
+  # code should be improved once we have better alignment between the
+  # repositories.
+  capi_cluster_name="${environment_name}-${cluster}"
+  if [ "${cluster}" = "sc" ]; then
+    # If no cluster named <environment>-sc is found, try <environment>-mc
+    if ! "${here}/ops.bash" kubectl sc -n capi-cluster get openstackcluster "${capi_cluster_name}" >/dev/null 2>&1; then
+      capi_cluster_name="${environment_name}-mc"
+    fi
+  fi
+
+  # Fallback on allowing individual nodes if the cluster is still not found.
+  if ! "${here}/ops.bash" kubectl sc -n capi-cluster get openstackcluster "${capi_cluster_name}"; then
+    allow_nodes "${cluster}" "${config_option}" ""
+    return
+  fi
+
+  local subnet_cidr
+  subnet_cidr=$("${here}/ops.bash" kubectl sc -n capi-cluster get openstackcluster "${capi_cluster_name}" -o jsonpath='{.status.network.subnets[0].cidr}')
+
+  local -a tunnel_ips
+  readarray -t tunnel_ips <<<"$(get_tunnel_ips "${cluster}" "" | tr ' ' '\n')"
+
+  local -a cidrs
+  readarray -t cidrs <<<"$(process_ips_to_cidrs "${config_file}" "${config_option}" "${tunnel_ips[@]}")"
+
+  cidrs+=("${subnet_cidr}")
+
+  allow_cidrs "${config_file}" "${config_option}" "${cidrs[@]}"
 }
 
 # Allow object storage in the common network policy configuration.
@@ -610,7 +701,7 @@ allow_ingress
 
 if [[ "${check_cluster}" =~ ^(sc|both)$ ]]; then
   allow_nodes "sc" '.networkPolicies.global.scApiserver.ips' "node-role.kubernetes.io/control-plane="
-  allow_nodes "sc" '.networkPolicies.global.scNodes.ips' ""
+  allow_subnet "sc" '.networkPolicies.global.scNodes.ips'
 
   if swift_enabled; then
     sync_swift '.objectStorage.swift' '.networkPolicies.global.objectStorageSwift'
@@ -619,7 +710,7 @@ fi
 
 if [[ "${check_cluster}" =~ ^(wc|both)$ ]]; then
   allow_nodes "wc" '.networkPolicies.global.wcApiserver.ips' "node-role.kubernetes.io/control-plane="
-  allow_nodes "wc" '.networkPolicies.global.wcNodes.ips' ""
+  allow_subnet "wc" '.networkPolicies.global.wcNodes.ips'
 fi
 
 if rclone_enabled; then
