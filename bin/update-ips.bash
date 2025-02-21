@@ -628,4 +628,4 @@ if rclone_enabled; then
   sync_rclone '.objectStorage.sync.secondaryUrl' '.networkPolicies.rclone.sync.secondaryUrl'
 fi
 
-exit ${has_diff}
+${dry_run} && exit ${has_diff}
