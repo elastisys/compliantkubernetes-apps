@@ -480,6 +480,12 @@ allow_subnet() {
     fi
   fi
 
+  # Fallback on allowing individual nodes if the cluster is still not found.
+  if ! "${here}/ops.bash" kubectl sc -n capi-cluster get openstackcluster "${capi_cluster_name}"; then
+    allow_nodes "${cluster}" "${config_option}" ""
+    return
+  fi
+
   local subnet_cidr
   subnet_cidr=$("${here}/ops.bash" kubectl sc -n capi-cluster get openstackcluster "${capi_cluster_name}" -o jsonpath='{.status.network.subnets[0].cidr}')
 
