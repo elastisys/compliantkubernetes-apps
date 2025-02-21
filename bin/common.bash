@@ -638,3 +638,8 @@ with_s3cfg() {
   #       bucket needs to be created.
   sops_exec_file_no_fifo "${s3cfg}" 'S3COMMAND_CONFIG_FILE="{}" '"${*}"
 }
+
+# Retrieve apps version from configmap
+get_version() {
+  "${here}/ops.bash" kubectl "${1}" get cm -n kube-system apps-meta -o jsonpath --template='{.data.version}'
+}
