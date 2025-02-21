@@ -260,6 +260,22 @@ version-from-github() {
   versions["${pkg}"]="${version}"
 }
 
+# <checksum> <target>
+validate-checksum() {
+  local sum="${1##*":"}" type="${1%%":"*}" target="${2}"
+
+  case "${type}" in
+  sha256)
+    echo "- validating checksum ${target}"
+    "${type}sum" --check - <<<"${sum} ${target}" &>/dev/null
+    ;;
+  *)
+    echo "unsupported checksum type ${type}!" >&2
+    exit 1
+    ;;
+  esac
+}
+
 # <packages...>
 install-from-apt() {
   if ! which apt-get &>/dev/null; then
@@ -287,49 +303,14 @@ install-from-npm() {
   done
 }
 
-# <target> <source> <checksum-bin>
-install-from-bin() {
-  local target="${1}" source="${2}" checksum_bin="${3:-}" checksum
-
-  echo "- installing ${target}"
-
-  if [[ -e "${target}" ]] && [[ -n "${checksum_bin}" ]]; then
-    checksum="$(sha256sum "${target}")"
-    if [[ "${checksum_bin#"sha256:"}" == "${checksum%%" "*}" ]]; then
-      echo "- installed ${target} matches desired binary checksum, skipping"
-      return
-    fi
-  fi
-
-  echo "- fetching ${target}"
-  curl -#LOs "${source}"
-
-  checksum="$(sha256sum "${source##*"/"}")"
-  if [[ -n "${checksum_bin}" ]]; then
-    echo "- checking binary checksum ${source##*"/"}"
-    if [[ "${checksum_bin#"sha256:"}" != "${checksum%%" "*}" ]]; then
-      echo "- error: ${source##*"/"} does not match desired binary checksum (${checksum_bin#"sha256:"} vs ${checksum%%" "*}), skipping"
-      return
-    fi
-  else
-    echo "- warning: missing desired binary checksum, skipping validation (bin sha256:${checksum%%" "*})"
-  fi
-
-  install -Tm 755 "${source##*"/"}" "${target}"
-  rm -rf "${source##*"/"}"
-
-  echo "- installed ${target}"
-}
-
 # <target> <source> <intermediate> <checksum-bin> <checksum-pkg>
-install-from-tar() {
-  local target="${1}" source="${2}" intermediate="${3}" checksum_bin="${4:-}" checksum_pkg="${5:-}" checksum
+install-from-url() {
+  local target="${1}" source="${2}" intermediate="${3}" checksum_bin="${4:-}" checksum_pkg="${5:-}"
 
   echo "installing ${target}"
 
   if [[ -e "${target}" ]] && [[ -n "${checksum_bin}" ]]; then
-    checksum="$(sha256sum "${target}")"
-    if [[ "${checksum_bin#"sha256:"}" == "${checksum%%" "*}" ]]; then
+    if validate-checksum "${checksum_bin}" "${target}"; then
       echo "- installed ${target} matches desired binary checksum, skipping"
       return
     fi
@@ -338,75 +319,39 @@ install-from-tar() {
   echo "- fetching ${target}"
   curl -#LO "${source}"
 
-  checksum="$(sha256sum "${source##*"/"}")"
-  if [[ -n "${checksum_pkg}" ]]; then
-    echo "- checking package checksum ${source##*"/"}"
-    if [[ "${checksum_pkg#"sha256:"}" != "${checksum%%" "*}" ]]; then
-      echo "- error: ${source##*"/"} does not match desired package checksum (${checksum_pkg#"sha256:"} vs ${checksum%%" "*}), skipping"
-      return
+  if [[ -n "${intermediate}" ]]; then
+    if [[ -n "${checksum_pkg}" ]]; then
+      if ! validate-checksum "${checksum_pkg}" "${source##*"/"}"; then
+        echo "- error: ${source##*"/"} does not match desired package checksum, skipping installation"
+        return
+      fi
+    else
+      echo "- warning: missing desired package checksum, skipping validation"
     fi
+
+    case "${source}" in
+    *.tar.gz | *.tgz)
+      tar -xf "${source##*"/"}" "${intermediate}"
+      ;;
+    *.zip)
+      unzip "${source##*"/"}" "${intermediate}"
+      ;;
+    *)
+      echo "- warning: unsupported package for ${source}, skipping installation" >&2
+      return
+      ;;
+    esac
   else
-    echo "- warning: missing desired package checksum, skipping validation (pkg sha256:${checksum%%" "*})"
+    intermediate="${source##*"/"}"
   fi
 
-  tar -xf "${source##*"/"}" "${intermediate}"
-
-  checksum="$(sha256sum "${intermediate}")"
   if [[ -n "${checksum_bin}" ]]; then
-    echo "- checking binary checksum ${intermediate}"
-    if [[ "${checksum_bin#"sha256:"}" != "${checksum%%" "*}" ]]; then
-      echo "- error: ${intermediate} does not match desired binary checksum (${checksum_bin#"sha256:"} vs ${checksum%%" "*}), skipping"
+    if ! validate-checksum "${checksum_bin}" "${intermediate}"; then
+      echo "- error: ${intermediate} does not match desired binary checksum, skipping installation"
       return
     fi
   else
-    echo "- warning: missing desired binary checksum, skipping validation (bin sha256:${checksum%%" "*})"
-  fi
-
-  install -Tm 755 "${intermediate}" "${target}"
-  rm -rf "${source##*"/"}" "${intermediate%%"/"*}"
-
-  echo "- installed ${target}"
-}
-
-# <target> <source> <intermediate> <checksum-pkg> <checksum-bin>
-install-from-zip() {
-  local target="${1}" source="${2}" intermediate="${3}" checksum_bin="${4:-}" checksum_pkg="${5:-}" checksum
-
-  echo "installing ${target}"
-
-  if [[ -e "${target}" ]] && [[ -n "${checksum_bin}" ]]; then
-    checksum="$(sha256sum "${target}")"
-    if [[ "${checksum_bin#"sha256:"}" == "${checksum%%" "*}" ]]; then
-      echo "- installed ${target} matches desired binary checksum, skipping"
-      return
-    fi
-  fi
-
-  echo "- fetching ${target}"
-  curl -#LOs "${source}"
-
-  checksum="$(sha256sum "${source##*"/"}")"
-  if [[ -n "${checksum_pkg}" ]]; then
-    echo "- checking package checksum ${source##*"/"}"
-    if [[ "${checksum_pkg#"sha256:"}" != "${checksum%%" "*}" ]]; then
-      echo "- error: ${source##*"/"} does not match desired package checksum, skipping"
-      return
-    fi
-  else
-    echo "- warning: missing desired package checksum, skipping validation (pkg sha256:${checksum%%" "*})"
-  fi
-
-  unzip "${source##*"/"}" "${intermediate}"
-
-  checksum="$(sha256sum "${intermediate}")"
-  if [[ -n "${checksum_bin}" ]]; then
-    echo "- checking binary checksum ${intermediate}"
-    if [[ "${checksum_bin#"sha256:"}" != "${checksum%%" "*}" ]]; then
-      echo "- error: ${intermediate} does not match desired binary checksum (${checksum_bin#"sha256:"} vs ${checksum%%" "*}), skipping"
-      return
-    fi
-  else
-    echo "- warning: missing desired binary checksum, skipping validation (bin sha256:${checksum%%" "*})"
+    echo "- warning: missing desired binary checksum, skipping validation"
   fi
 
   install -Tm 755 "${intermediate}" "${target}"
@@ -502,29 +447,12 @@ main() {
       source="$(envsubst <<<"${source}")"
       intermediate="$(envsubst <<<"${intermediate}")"
 
-      case "${source}" in
-      "")
+      if [[ -z "${source}" ]]; then
         echo "error: no source mapping found for ${ref}, skipping..."
         continue
-        ;;
-      *.tar.gz | *.tgz)
-        if [[ -z "${intermediate}" ]]; then
-          echo "error: no intermediate mapping found for ${ref}, skipping..."
-          continue
-        fi
-        install-from-tar "${target}" "${source}" "${intermediate}" "${checksum[0]:-}" "${checksum[1]:-}"
-        ;;
-      *.zip)
-        if [[ -z "${intermediate}" ]]; then
-          echo "error: no intermediate mapping found for ${ref}, skipping..."
-          continue
-        fi
-        install-from-zip "${target}" "${source}" "${intermediate}" "${checksum[0]:-}" "${checksum[1]:-}"
-        ;;
-      *)
-        install-from-bin "${target}" "${source}" "${checksum[0]:-}"
-        ;;
-      esac
+      fi
+
+      install-from-url "${target}" "${source}" "${intermediate:-}" "${checksum[0]:-}" "${checksum[1]:-}"
     done
   fi
 }
