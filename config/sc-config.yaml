@@ -814,19 +814,19 @@ opensearch:
     additionalPolicies: {}
 
   masterNode:
-    count: 1
+    count: 3
     ## If null, no storageclass is specified in pvc and default storageClass is used
     ## if the DefaultStorageClass admission plugin is enabled.
     ## If "-", "" will be used as storageClassName.
     storageClass: null
-    storageSize: 8Gi
-    javaOpts: -Xms512m -Xmx512m
+    storageSize: 100Gi
+    javaOpts: -Xms1536m -Xmx1536m
     resources:
       requests:
-        memory: 1024Mi
+        memory: 2Gi
         cpu: 200m
       limits:
-        memory: 1024Mi
+        memory: 3Gi
         cpu: 1
     affinity:
       ## Note: The OpenSearch chart has some restrictions on pod anti affinity:
@@ -852,8 +852,8 @@ opensearch:
 
   dataNode:
     ## Enables dedicated statefulset for data nodes, else the master nodes will assume data role.
-    dedicatedPods: true
-    count: 2
+    dedicatedPods: false
+    count: 0
     ## If null, no storageclass is specified in pvc and default storageClass is used
     ## if the DefaultStorageClass admission plugin is enabled.
     ## If "-", "" will be used as storageClassName.
@@ -889,8 +889,8 @@ opensearch:
 
   clientNode:
     ## Enables dedicated deployment for client/ingest nodes, else the master nodes will assume client/ingest roles
-    dedicatedPods: true
-    count: 1
+    dedicatedPods: false
+    count: 0
     javaOpts: -Xms512m -Xmx512m
     resources:
       requests:
