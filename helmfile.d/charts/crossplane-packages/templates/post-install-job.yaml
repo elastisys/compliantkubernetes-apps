@@ -57,7 +57,12 @@ spec:
             providers.pkg.crossplane.io/provider-kubernetes,
             functions.pkg.crossplane.io/function-patch-and-transform,
             functions.pkg.crossplane.io/function-environment-configs,
+            functions.pkg.crossplane.io/function-auto-ready,
+            functions.pkg.crossplane.io/function-extra-resources,
+            functions.pkg.crossplane.io/function-go-templating,
+            functions.pkg.crossplane.io/function-sequencer,
             configurations.pkg.crossplane.io/metrics-server,
             configurations.pkg.crossplane.io/opensearch,
-            configurations.pkg.crossplane.io/fluentd-forwarder
+            configurations.pkg.crossplane.io/fluentd-forwarder,
+            configurations.pkg.crossplane.io/capability-log-write
         ]

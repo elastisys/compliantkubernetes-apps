@@ -46,12 +46,12 @@ install-ingress)
   "${root}/bin/ck8s" ops helmfile sc apply -l name=issuers
   "${root}/bin/ck8s" ops helmfile sc apply -l name=ingress-nginx --include-transitive-needs
   ensure_ingress_dns
-  "${root}/bin/ck8s" update-ips both apply || true
+  "${root}/bin/ck8s" update-ips both apply
   "${root}/bin/ck8s" ops helmfile sc apply -l name=ingress-nginx --include-transitive-needs
   ;;
 install-opensearch-deps)
   "${root}/bin/ck8s" ops helmfile sc apply -l netpol=service --include-transitive-needs
-  "${root}/bin/ck8s" ops helmfile sc apply -l name=crossplane-provider-configs --include-transitive-needs
+  "${root}/bin/ck8s" ops helmfile sc apply -l name=capability-log-write --include-transitive-needs
   "${root}/bin/ck8s" ops helmfile sc apply -l name=opensearch-secrets --include-transitive-needs
   "${root}/bin/ck8s" ops helmfile sc apply -l app=opensearch,policy=psp --include-transitive-needs
   ;;
@@ -68,7 +68,7 @@ uninstall-opensearch)
   "${root}/bin/ck8s" ops helmfile sc destroy -l name=module-opensearch
   ;;
 install-fluentd-deps)
-  "${root}/bin/ck8s" ops helmfile wc apply -l name=crossplane-provider-configs --include-transitive-needs
+  "${root}/bin/ck8s" ops helmfile wc apply -l name=capability-log-write --include-transitive-needs
   "${root}/bin/ck8s" ops helmfile wc apply -l app=fluentd,policy=netpol --include-transitive-needs
   "${root}/bin/ck8s" ops helmfile wc apply -l app=fluentd,policy=psp --include-transitive-needs
   "${root}/bin/ck8s" ops helmfile wc apply -l name=kube-prometheus-stack --include-transitive-needs

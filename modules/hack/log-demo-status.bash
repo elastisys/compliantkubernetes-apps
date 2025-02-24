@@ -21,7 +21,7 @@ print_ds_env() {
   secret_key="$(jq -r .key <<<"${secret_key_ref}")"
   value=$("${root}/bin/ck8s" ops kubectl wc -n fluentd-system get secret "${secret_name}" -o jsonpath='{.data.'"${secret_key}"'}' | base64 -d)
 
-  echo "${1}: ${value}"
+  echo "${1}: ${value:-"N/A"}"
 }
 
 search() {
@@ -60,6 +60,29 @@ search() {
 }
 
 case "${1}" in
+cap | all)
+  echo -e "\033[1m== CAPABILITY LOGWRITE ==\033[0m"
+  echo
+  echo -e "\033[1m= MC =\033[0m"
+  echo
+  echo -e "\033[1mCapability\033[0m"
+  "${root}/bin/ck8s" ops kubectl sc get logwrite -o custom-columns='NAME:.metadata.name,SYNCED:status.conditions[?(@.type=="Synced")].status,READY:status.conditions[?(@.type=="Ready")].status'
+  echo
+  echo -e "\033[1mProducers\033[0m"
+  "${root}/bin/ck8s" ops kubectl sc get opensearch -l logwrites.capabilities.elastisys.com="" -o custom-columns='NAME:.metadata.name'
+  echo
+  echo -e "\033[1mConsumers\033[0m"
+  "${root}/bin/ck8s" ops kubectl sc get object -o json | jq -r '.items[] | select(.spec.forProvider.manifest.kind == "Secret" and .metadata.ownerReferences[0].kind == "LogWrite") | [.spec.providerConfigRef.name, .spec.forProvider.manifest.metadata.namespace, .spec.forProvider.manifest.metadata.name] | join("¶")' | column -t -s '¶' -N PROVIDER-CONFIG,NAMESPACE,NAME
+  echo
+  echo -e "\033[1m= WC =\033[0m"
+  echo
+  echo -e "\033[1mCapability\033[0m"
+  "${root}/bin/ck8s" ops kubectl wc get logwrite -o custom-columns='NAME:.metadata.name,SYNCED:status.conditions[?(@.type=="Synced")].status,READY:status.conditions[?(@.type=="Ready")].status'
+  echo
+  echo -e "\033[1mConsumers\033[0m"
+  "${root}/bin/ck8s" ops kubectl wc get environmentconfigs consumers.logwrites.capabilities.elastisys.com -o jsonpath='{.data.secretRefs}' | jq -r '.[] | [.namespace, .name] | join("¶")' | column -t -s '¶' -N NAMESPACE,NAME
+  echo
+  ;;&
 mc | sc | all)
   echo -e "\033[1m== MANAGEMENT CLUSTER ==\033[0m"
   echo
@@ -79,16 +102,13 @@ wc | all)
   echo -e "\033[1mModule\033[0m"
   "${root}/bin/ck8s" ops kubectl wc get fluentdforwarder -o custom-columns='NAME:.metadata.name,SYNCED:status.conditions[?(@.type=="Synced")].status,READY:status.conditions[?(@.type=="Ready")].status'
   echo
-  echo -e "\033[1mFluentd Pods\033[0m"
-  "${root}/bin/ck8s" ops kubectl wc -n fluentd-system get po | awk 'NF=3' | column -t
-  echo
-  echo -e "\033[1mEnvironmentConfigs\033[0m"
-  "${root}/bin/ck8s" ops kubectl wc get environmentconfig
-  echo
   echo -e "\033[1mFluentd DaemonSet env\033[0m"
   print_ds_env OUTPUT_HOSTS
   print_ds_env OUTPUT_USER
   print_ds_env OUTPUT_PASSWORD
+  echo
+  echo -e "\033[1mFluentd Pods\033[0m"
+  "${root}/bin/ck8s" ops kubectl wc -n fluentd-system get po | awk 'NF=3' | column -t
   echo
   ;;&
 logs | all)

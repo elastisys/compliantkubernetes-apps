@@ -5,20 +5,24 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: $plural.$api.elastisys.com
+  name: logwrites.capabilities.elastisys.com
 spec:
-  group: $api.elastisys.com
+  group: capabilities.elastisys.com
   names:
-    kind: $kind
-    plural: $plural
+    kind: LogWrite
+    plural: logwrites
   versions:
     - name: v1alpha1
-      served: true
       referenceable: true
       schema:
         openAPIV3Schema:
-          type: object
           properties:
             spec:
-              type: object
               properties:
+                clusters:
+                  items:
+                    type: string
+                  type: array
+              type: object
+          type: object
+      served: true

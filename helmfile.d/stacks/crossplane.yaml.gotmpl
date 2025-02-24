@@ -37,3 +37,17 @@ templates:
       - crossplane-system/crossplane-packages
     values:
       - values/crossplane-provider-configs.yaml.gotmpl
+
+  capability-log-write:
+    disableValidationOnInstall: true
+    chart: charts/capability-log-write
+    version: 0.0.1
+    wait: true
+    namespace: crossplane-system
+    name: capability-log-write
+    labels:
+      app: crossplane
+    needs:
+      - crossplane-system/crossplane-provider-configs
+    values:
+      - values/capability-log-write.yaml.gotmpl

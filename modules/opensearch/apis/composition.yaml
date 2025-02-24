@@ -3,9 +3,7 @@ kind: Composition
 metadata:
   name: opensearch.modules.elastisys.com
 spec:
-  writeConnectionSecretsToNamespace: fluentd-system
-  publishConnectionDetailsWithStoreConfigRef:
-    name: fluentd-wc
+  writeConnectionSecretsToNamespace: opensearch-system
   compositeTypeRef:
     apiVersion: modules.elastisys.com/v1alpha1
     kind: OpenSearch
@@ -432,72 +430,6 @@ spec:
                     metadata:
                       name: fluentd-credentials
                       namespace: opensearch-system
-          - name: capability-log-write-env
-            base:
-              apiVersion: kubernetes.crossplane.io/v1alpha2
-              kind: Object
-              spec:
-                providerConfigRef:
-                  name: kubernetes
-                forProvider:
-                  manifest:
-                    apiVersion: apiextensions.crossplane.io/v1beta1
-                    kind: EnvironmentConfig
-                    metadata:
-                      name: welkin.modules.capability.log-write
-                    data:
-                      host:
-                        secretKeyRef:
-                          key: host
-                      username:
-                        secretKeyRef:
-                          key: username
-                      password:
-                        secretKeyRef:
-                          key: password
-            patches:
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.writeConnectionSecretToRef.name # TODO: or metadata.uid
-                toFieldPath: spec.forProvider.manifest.data.host.secretKeyRef.name
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.writeConnectionSecretToRef.name # TODO: or metadata.uid
-                toFieldPath: spec.forProvider.manifest.data.username.secretKeyRef.name
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.writeConnectionSecretToRef.name # TODO: or metadata.uid
-                toFieldPath: spec.forProvider.manifest.data.password.secretKeyRef.name
-          - name: capability-log-write-env-wc
-            base:
-              apiVersion: kubernetes.crossplane.io/v1alpha2
-              kind: Object
-              spec:
-                providerConfigRef:
-                  name: kubernetes-wc
-                forProvider:
-                  manifest:
-                    apiVersion: apiextensions.crossplane.io/v1beta1
-                    kind: EnvironmentConfig
-                    metadata:
-                      name: welkin.modules.capability.log-write
-                    data:
-                      host:
-                        secretKeyRef:
-                          key: host
-                      username:
-                        secretKeyRef:
-                          key: username
-                      password:
-                        secretKeyRef:
-                          key: password
-            patches:
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.publishConnectionDetailsTo.name # TODO: or metadata.uid
-                toFieldPath: spec.forProvider.manifest.data.host.secretKeyRef.name
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.publishConnectionDetailsTo.name # TODO: or metadata.uid
-                toFieldPath: spec.forProvider.manifest.data.username.secretKeyRef.name
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.publishConnectionDetailsTo.name # TODO: or metadata.uid
-                toFieldPath: spec.forProvider.manifest.data.password.secretKeyRef.name
     - step: detect-readiness
       functionRef:
         name: function-auto-ready
@@ -511,5 +443,3 @@ spec:
           - sequence:
             - opensearch-.*
             - capability-log-write-secret
-            - capability-log-write-env
-            - capability-log-write-env-wc

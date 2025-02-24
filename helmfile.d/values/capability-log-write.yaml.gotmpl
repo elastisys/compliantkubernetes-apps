@@ -1,4 +1,3 @@
-environmentName: {{ .Values.global.ck8sEnvironmentName }}
 clusters:
   {{- if .Values | get "ck8sManagementCluster.enabled" true }}
   {{- range .Values.clusterApi.clusters }}

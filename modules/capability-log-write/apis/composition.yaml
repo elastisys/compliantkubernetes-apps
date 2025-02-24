@@ -1,0 +1,188 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: logwrites.capabilities.elastisys.com
+spec:
+  compositeTypeRef:
+    apiVersion: capabilities.elastisys.com/v1alpha1
+    kind: LogWrite
+  mode: Pipeline
+  pipeline:
+    - step: discovery
+      functionRef:
+        name: function-extra-resources
+      input:
+        apiVersion: extra-resources.fn.crossplane.io/v1beta1
+        kind: Input
+        spec:
+          extraResources:
+            - apiVersion: modules.elastisys.com/v1alpha1
+              kind: OpenSearch
+              into: producers
+              type: Selector
+              selector:
+                maxMatch: 1
+                minMatch: 0
+                matchLabels:
+                  - key: logwrites.capabilities.elastisys.com
+                    type: Value
+                    value: ""
+            - apiVersion: v1
+              kind: Secret
+              into: consumers
+              type: Selector
+              selector:
+                maxMatch: 2
+                minMatch: 0
+                matchLabels:
+                  - key: logwrites.capabilities.elastisys.com
+                    type: Value
+                    value: ""
+    - step: consumers-environment-config
+      functionRef:
+        name: function-go-templating
+      input:
+        apiVersion: gotemplating.fn.crossplane.io/v1beta1
+        kind: GoTemplate
+        source: Inline
+        inline:
+          template: |
+            {{- $localConsumers := index (index .context "apiextensions.crossplane.io/extra-resources") "consumers" }}
+            apiVersion: apiextensions.crossplane.io/v1beta1
+            kind: EnvironmentConfig
+            metadata:
+              name: consumers.logwrites.capabilities.elastisys.com
+              annotations:
+                gotemplating.fn.crossplane.io/composition-resource-name: local-environment-config-consumers
+                gotemplating.fn.crossplane.io/ready: "True"
+            data:
+              secretRefs:
+                {{- range $_, $r := $localConsumers }}
+                - name: {{ $r.metadata.name }}
+                  namespace: {{ $r.metadata.namespace }}
+                {{- end }}
+    - step: remote-consumer-discovery
+      functionRef:
+        name: function-go-templating
+      input:
+        apiVersion: gotemplating.fn.crossplane.io/v1beta1
+        kind: GoTemplate
+        source: Inline
+        inline:
+          template: |
+            {{- range $_, $cluster := .observed.composite.resource.spec.clusters }}
+            ---
+            apiVersion: kubernetes.crossplane.io/v1alpha2
+            kind: Object
+            metadata:
+              annotations:
+                gotemplating.fn.crossplane.io/composition-resource-name: remote-environment-config-consumers-{{ $cluster }}
+                gotemplating.fn.crossplane.io/ready: "True"
+            spec:
+              providerConfigRef:
+                name: kubernetes-{{ $cluster }}
+              managementPolicies: [Observe]
+              watch: true
+              forProvider:
+                manifest:
+                  apiVersion: apiextensions.crossplane.io/v1beta1
+                  kind: EnvironmentConfig
+                  metadata:
+                    name: consumers.logwrites.capabilities.elastisys.com
+            {{- end }}
+    - step: patch-consumer-secrets
+      functionRef:
+        name: function-go-templating
+      input:
+        apiVersion: gotemplating.fn.crossplane.io/v1beta1
+        kind: GoTemplate
+        source: Inline
+        inline:
+          template: |
+            {{- $isManager := .observed.composite.resource.spec.clusters }}
+            {{- if $isManager }}
+            {{- $producer := "" }}
+            {{- $producers := index (index .context "apiextensions.crossplane.io/extra-resources") "producers" }}
+            {{- if and $producers (eq (len $producers) 1) }}
+            {{- $producer = index $producers 0 }}
+            {{- end }}
+            {{- $clusters := list }}
+            {{- $localConsumers := index (index .context "apiextensions.crossplane.io/extra-resources") "consumers" }}
+            {{- if $localConsumers }}
+              {{- $cluster := dict
+                "providerConfigRef" "kubernetes"
+                "secrets" list
+              }}
+              {{- range $_, $secret := $localConsumers }}
+                  {{- $cluster = set $cluster "secrets" (append $cluster.secrets (dict "name" $secret.metadata.name "namespace" $secret.metadata.namespace)) }}
+              {{- end }}
+              {{- $clusters = append $clusters $cluster }}
+            {{- end }}
+            {{- if hasKey .observed "resources" }}
+            {{- range $_, $remoteClusterName := .observed.composite.resource.spec.clusters }}
+            {{- with index $.observed.resources (print "remote-environment-config-consumers-" $remoteClusterName) }}
+            {{- $remoteConsumers := .resource.status.atProvider.manifest.data.secretRefs }}
+            {{- if $remoteConsumers }}
+              {{- $cluster := dict
+                "providerConfigRef" (print "kubernetes-" $remoteClusterName)
+                "secrets" list
+              }}
+              {{- range $_, $secret := $remoteConsumers }}
+                  {{- $cluster = set $cluster "secrets" (append $cluster.secrets (dict "name" $secret.name "namespace" $secret.namespace)) }}
+              {{- end }}
+              {{- $clusters = append $clusters $cluster }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- range $_, $cluster := $clusters }}
+            {{- range $_, $secret := $cluster.secrets }}
+            ---
+            apiVersion: kubernetes.crossplane.io/v1alpha2
+            kind: Object
+            metadata:
+              annotations:
+                gotemplating.fn.crossplane.io/composition-resource-name: capability-log-write-{{ $cluster.providerConfigRef }}-{{ $secret.namespace }}-{{ $secret.name }}
+            spec:
+              managementPolicies: [Observe, Create, Update, Delete]
+              watch: true
+              providerConfigRef:
+                name: {{ $cluster.providerConfigRef }}
+              forProvider:
+                manifest:
+                  apiVersion: v1
+                  kind: Secret
+                  metadata:
+                    name: {{ $secret.name }}
+                    namespace: {{ $secret.namespace }}
+                  data:
+                    host: ""
+                    username: ""
+                    password: ""
+              {{- if $producer }}
+              references:
+              - patchesFrom:
+                  apiVersion: v1
+                  kind: Secret
+                  namespace: opensearch-system
+                  name: {{ $producer.metadata.uid }}
+                  fieldPath: data.host
+              - patchesFrom:
+                  apiVersion: v1
+                  kind: Secret
+                  namespace: opensearch-system
+                  name: {{ $producer.metadata.uid }}
+                  fieldPath: data.username
+              - patchesFrom:
+                  apiVersion: v1
+                  kind: Secret
+                  namespace: opensearch-system
+                  name: {{ $producer.metadata.uid }}
+                  fieldPath: data.password
+              {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+    - step: detect-readiness
+      functionRef:
+        name: function-auto-ready
