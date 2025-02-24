@@ -394,7 +394,7 @@ record_migration_prepare_begin() {
     kubectl_do "${1}" create -f - >/dev/null; then
     return 0
   else
-    log_fatal "prepare already started in ${1} ('ck8s unlock-upgrade ${1}' to try again)"
+    log_fatal "prepare already started in ${1} ('ck8s upgrade-unlock ${1}' to try again)"
   fi
 }
 
