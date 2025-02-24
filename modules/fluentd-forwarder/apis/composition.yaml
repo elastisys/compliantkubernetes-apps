@@ -8,20 +8,6 @@ spec:
     kind: FluentdForwarder
   mode: Pipeline
   pipeline:
-    - step: environmentConfigs
-      functionRef:
-        name: function-environment-configs
-      input:
-        apiVersion: environmentconfigs.fn.crossplane.io/v1beta1
-        kind: Input
-        spec:
-          policy:
-            resolution: Optional
-          environmentConfigs:
-            - type: Reference
-              ref:
-                name: welkin.modules.capability.log-write
-
     - step: go-template
       functionRef:
         name: function-go-templating
@@ -31,8 +17,34 @@ spec:
         source: Inline
         inline:
           template: |
-            {{- $capabilityLogWrite := index .context "apiextensions.crossplane.io/environment" }}
-            {{- $opensearchEnabled := hasKey $capabilityLogWrite "host" }}
+            apiVersion: kubernetes.crossplane.io/v1alpha2
+            kind: Object
+            metadata:
+              annotations:
+                gotemplating.fn.crossplane.io/composition-resource-name: opensearch-credentials
+            spec:
+              watch: true
+              managementPolicies: [Observe, Create, Delete]
+              providerConfigRef:
+                name: kubernetes
+              forProvider:
+                manifest:
+                  apiVersion: v1
+                  kind: Secret
+                  metadata:
+                    name: opensearch-credentials
+                    namespace: fluentd-system
+                    labels:
+                      logwrites.capabilities.elastisys.com: ""
+            ---
+            {{- $opensearchEnabled := false }}
+            {{- if hasKey .observed "resources" }}
+            {{- with index .observed.resources "opensearch-credentials" }}
+            {{- with .resource.status.atProvider.manifest.data }}
+            {{- $opensearchEnabled = and .host .username .password }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
             apiVersion: helm.crossplane.io/v1beta1
             kind: Release
             metadata:
@@ -44,7 +56,7 @@ spec:
                 name: helm
               forProvider:
                 wait: true
-                waitTimeout: 10s # TODO: For demo purposes to not end up having to wait 5m if something goes wrong
+                waitTimeout: 30s # TODO: For demo purposes to not end up having to wait 5m if something goes wrong
                 namespace: fluentd-system
                 chart:
                   repository: https://kokuwaio.github.io/helm-charts
@@ -52,20 +64,16 @@ spec:
                   version: "13.12.2"
                 values:
                   secret:
-                  {{- with $capabilityLogWrite.host }}
+                  {{- if $opensearchEnabled }}
                   - name: OUTPUT_HOSTS
-                    secret_name: {{ .secretKeyRef.name }}
-                    secret_key: {{ .secretKeyRef.key }}
-                  {{- end }}
-                  {{- with $capabilityLogWrite.username }}
+                    secret_name: opensearch-credentials
+                    secret_key: host
                   - name: OUTPUT_USER
-                    secret_name: {{ .secretKeyRef.name }}
-                    secret_key: {{ .secretKeyRef.key }}
-                  {{- end }}
-                  {{- with $capabilityLogWrite.password }}
+                    secret_name: opensearch-credentials
+                    secret_key: username
                   - name: OUTPUT_PASSWORD
-                    secret_name: {{ .secretKeyRef.name }}
-                    secret_key: {{ .secretKeyRef.key }}
+                    secret_name: opensearch-credentials
+                    secret_key: password
                   {{- end }}
                   affinity: {{ .observed.composite.resource.spec.affinity | toYaml | nindent 8 }}
                   resources: {{ .observed.composite.resource.spec.resources | toYaml | nindent 8 }}

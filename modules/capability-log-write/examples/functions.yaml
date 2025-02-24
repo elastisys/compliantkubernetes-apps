@@ -1,0 +1,20 @@
+apiVersion: pkg.crossplane.io/v1beta1
+kind: Function
+metadata:
+  name: function-extra-resources
+spec:
+  package: xpkg.upbound.io/crossplane-contrib/function-extra-resources:v0.0.3
+---
+apiVersion: pkg.crossplane.io/v1beta1
+kind: Function
+metadata:
+  name: function-go-templating
+spec:
+  package: xpkg.upbound.io/crossplane-contrib/function-go-templating:v0.9.2
+---
+apiVersion: pkg.crossplane.io/v1beta1
+kind: Function
+metadata:
+  name: function-auto-ready
+spec:
+  package: xpkg.upbound.io/crossplane-contrib/function-auto-ready:v0.4.2
