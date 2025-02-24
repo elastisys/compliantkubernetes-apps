@@ -21,7 +21,7 @@ persistence:
   storageClass: {{ toYaml .Values.opensearch.masterNode.storageClass }}
 
 {{ if (hasKey .Values.opensearch.masterNode.affinity.podAntiAffinity "requiredDuringSchedulingIgnoredDuringExecution") -}}
-antiAffinityTopologyKey: {{ (first .Values.opensearch.masterNode.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution).podAffinityTerm.topologyKey | quote }}
+antiAffinityTopologyKey: {{ (first .Values.opensearch.masterNode.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution).topologyKey | quote }}
 antiAffinity: hard
 {{ else if (hasKey .Values.opensearch.masterNode.affinity.podAntiAffinity "preferredDuringSchedulingIgnoredDuringExecution") -}}
 antiAffinityTopologyKey: {{ (first .Values.opensearch.masterNode.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution).podAffinityTerm.topologyKey | quote }}
