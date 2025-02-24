@@ -418,6 +418,18 @@ get_prepared_version() {
   kubectl_do "${1}" get cm -n kube-system apps-upgrade -o jsonpath --template="{.data.prepared}"
 }
 
+check_prepared_version() {
+  local prepared_version
+  prepared_version="$(get_prepared_version "${1}" || true)"
+  if [ -z "${prepared_version}" ]; then
+    log_fatal "'prepare' step does not appear to have been run, do so first"
+  fi
+
+  if [[ "${prepared_version}" != "${CK8S_TARGET_VERSION}" ]]; then
+    log_fatal "'prepare' step in "${1}" appears to have been run for version ${prepared_version}, not ${CK8S_TARGET_VERSION}"
+  fi
+}
+
 # Usage: record_migration_prepare_step sc|wc step-description
 record_migration_prepare_step() {
   local apps_upgrade
