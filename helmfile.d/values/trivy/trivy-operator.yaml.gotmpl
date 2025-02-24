@@ -33,8 +33,6 @@ trivy:
   timeout: {{- toYaml .Values.trivy.scanner.timeout | nindent 4 }}
   {{- end }}
 
-  useEmbeddedRegoPolicies: "false"
-
 operator:
 
   # configAuditScannerEnabled the flag to enable configuration audit scanner
