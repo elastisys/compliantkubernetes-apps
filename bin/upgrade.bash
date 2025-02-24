@@ -109,26 +109,11 @@ apply() {
 
   snippets_check apply "${snippets}"
 
-  local prepared_version
   if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
-    prepared_version="$(get_prepared_version sc || true)"
-    if [ -z "${prepared_version}" ]; then
-      log_fatal "'prepare' step does not appear to have been run, do so first"
-    fi
-
-    if [[ "${prepared_version}" != "${CK8S_TARGET_VERSION}" ]]; then
-      log_fatal "'prepare' step in sc appears to have been run for version ${prepared_version}, not ${CK8S_TARGET_VERSION}"
-    fi
+    check_prepared_version "sc"
   fi
   if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
-    prepared_version="$(get_prepared_version wc || true)"
-    if [ -z "${prepared_version}" ]; then
-      log_fatal "'prepare' step does not appear to have been run, do so first"
-    fi
-
-    if [[ "${prepared_version}" != "${CK8S_TARGET_VERSION}" ]]; then
-      log_fatal "'prepare' step in wc appears to have been run for version ${prepared_version}, not ${CK8S_TARGET_VERSION}"
-    fi
+    check_prepared_version "wc"
   fi
 
   # Create a configmap. This fails if done twice.
