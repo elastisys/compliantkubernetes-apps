@@ -426,7 +426,7 @@ check_prepared_version() {
   fi
 
   if [[ "${prepared_version}" != "${CK8S_TARGET_VERSION}" ]]; then
-    log_fatal "'prepare' step in "${1}" appears to have been run for version ${prepared_version}, not ${CK8S_TARGET_VERSION}"
+    log_fatal "'prepare' step in ${1} appears to have been run for version ${prepared_version}, not ${CK8S_TARGET_VERSION}"
   fi
 }
 
