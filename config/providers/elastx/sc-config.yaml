@@ -85,24 +85,48 @@ opensearch:
   masterNode:
     affinity:
       podAntiAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-          - podAffinityTerm:
-              topologyKey: topology.kubernetes.io/zone
-            weight: 1
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/instance
+              operator: In
+              values:
+              - opensearch-master
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+              - opensearch
+          topologyKey: topology.kubernetes.io/zone
   dataNode:
     affinity:
       podAntiAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-          - podAffinityTerm:
-              topologyKey: topology.kubernetes.io/zone
-            weight: 1
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/instance
+              operator: In
+              values:
+              - opensearch-data
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+              - opensearch
+          topologyKey: topology.kubernetes.io/zone
   clientNode:
     affinity:
       podAntiAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-          - podAffinityTerm:
-              topologyKey: topology.kubernetes.io/zone
-            weight: 1
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/instance
+              operator: In
+              values:
+              - opensearch-client
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+              - opensearch
+          topologyKey: topology.kubernetes.io/zone
 dex:
   topologySpreadConstraints:
     - labelSelector:
