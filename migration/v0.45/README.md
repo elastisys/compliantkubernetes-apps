@@ -65,6 +65,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     > _Done before maintenance window._
 
+    > [!WARNING]
+    > Default Opensearch setup has been changed. Opensearch is now configured to use 3 master nodes, 0 data nodes and 0 client nodes by default. There's no easy migration path for the new configuration, if the old default Opensearch setup is used it should be added to the override config.
+
     ```bash
     ./bin/ck8s upgrade both v0.45 prepare
 
