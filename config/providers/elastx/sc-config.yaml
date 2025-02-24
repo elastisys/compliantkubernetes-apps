@@ -17,3 +17,154 @@ objectStorage:
 thanos:
   objectStorage:
     type: swift
+  receiver:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: topology.kubernetes.io/zone
+                  operator: In
+                  values:
+                    - sto1
+                    - sto2
+    topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/component: receive
+            app.kubernetes.io/instance: thanos-receiver
+            app.kubernetes.io/name: thanos
+        maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: DoNotSchedule
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/component: receive
+            app.kubernetes.io/instance: thanos-receiver
+            app.kubernetes.io/name: thanos
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+  ruler:
+    topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: thanos
+            app.kubernetes.io/instance: thanos-receiver
+            app.kubernetes.io/component: ruler
+        maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: DoNotSchedule
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: thanos
+            app.kubernetes.io/instance: thanos-receiver
+            app.kubernetes.io/component: ruler
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+  query:
+    topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: thanos
+            app.kubernetes.io/instance: thanos-query
+            app.kubernetes.io/component: query
+        maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: DoNotSchedule
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: thanos
+            app.kubernetes.io/instance: thanos-query
+            app.kubernetes.io/component: query
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+opensearch:
+  masterNode:
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/instance
+              operator: In
+              values:
+              - opensearch-master
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+              - opensearch
+          topologyKey: topology.kubernetes.io/zone
+  dataNode:
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/instance
+              operator: In
+              values:
+              - opensearch-data
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+              - opensearch
+          topologyKey: topology.kubernetes.io/zone
+  clientNode:
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/instance
+              operator: In
+              values:
+              - opensearch-client
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+              - opensearch
+          topologyKey: topology.kubernetes.io/zone
+dex:
+  topologySpreadConstraints:
+    - labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: dex
+      maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: DoNotSchedule
+    - labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: dex
+      maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: DoNotSchedule
+prometheus:
+  alertmanagerSpec:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: topology.kubernetes.io/zone
+                  operator: In
+                  values:
+                    - sto1
+                    - sto2
+    topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: alertmanager
+            app.kubernetes.io/instance: kube-prometheus-stack-alertmanager
+        maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: DoNotSchedule
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: alertmanager
+            app.kubernetes.io/instance: kube-prometheus-stack-alertmanager
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule

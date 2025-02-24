@@ -676,7 +676,7 @@ thanos:
     # https://thanos.io/v0.24/components/compact.md/#disk
     persistence:
       enabled: true
-      size: 8Gi
+      size: 20Gi
 
     resources:
       requests:
@@ -814,19 +814,19 @@ opensearch:
     additionalPolicies: {}
 
   masterNode:
-    count: 1
+    count: 3
     ## If null, no storageclass is specified in pvc and default storageClass is used
     ## if the DefaultStorageClass admission plugin is enabled.
     ## If "-", "" will be used as storageClassName.
     storageClass: null
-    storageSize: 8Gi
-    javaOpts: -Xms512m -Xmx512m
+    storageSize: 100Gi
+    javaOpts: -Xms1536m -Xmx1536m
     resources:
       requests:
-        memory: 1024Mi
+        memory: 1536Mi
         cpu: 200m
       limits:
-        memory: 1024Mi
+        memory: 1536Mi
         cpu: 1
     affinity:
       ## Note: The OpenSearch chart has some restrictions on pod anti affinity:
@@ -852,8 +852,8 @@ opensearch:
 
   dataNode:
     ## Enables dedicated statefulset for data nodes, else the master nodes will assume data role.
-    dedicatedPods: true
-    count: 2
+    dedicatedPods: false
+    count: 0
     ## If null, no storageclass is specified in pvc and default storageClass is used
     ## if the DefaultStorageClass admission plugin is enabled.
     ## If "-", "" will be used as storageClassName.
@@ -889,8 +889,8 @@ opensearch:
 
   clientNode:
     ## Enables dedicated deployment for client/ingest nodes, else the master nodes will assume client/ingest roles
-    dedicatedPods: true
-    count: 1
+    dedicatedPods: false
+    count: 0
     javaOpts: -Xms512m -Xmx512m
     resources:
       requests:
@@ -938,7 +938,7 @@ opensearch:
     retention:
       - pattern: other-*
         sizeGB: 1
-        ageDays: 7
+        ageDays: 30
       - pattern: kubeaudit-*
         sizeGB: 50
         ageDays: 30
@@ -961,7 +961,7 @@ opensearch:
     nodeSelector: {}
     tolerations: []
 
-  # Config for https://github.com/elastisys/compliantkubernetes-apps/blob/main/helmfile/charts/prometheus-alerts/templates/alerts/opensearch.yaml#L70:L77
+  # Config for https://github.com/elastisys/compliantkubernetes-apps/blob/main/helmfile.d/charts/prometheus-alerts/templates/alerts/opensearch.yaml#L75:L83
   promIndexAlerts:
     - prefix: kubernetes-default
       alertSizeMB: 5500
@@ -1047,7 +1047,7 @@ fluentd:
       ephemeralVolumes:
         enabled: false
       schedule: 0 1/6 * * *
-      days: 10
+      days: 30
     retention:
       enabled: true
       schedule: 0 20 * * *
@@ -1060,11 +1060,11 @@ fluentd:
       ephemeralVolumes:
         enabled: false
       schedule: 0 2/6 * * *
-      days: 7
+      days: 30
     retention:
       enabled: true
       schedule: 0 21 * * *
-      days: 7
+      days: 30
 
   aggregator:
     resources:
