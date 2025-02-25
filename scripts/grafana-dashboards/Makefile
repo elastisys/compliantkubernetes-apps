@@ -38,8 +38,13 @@ dep: # Download the jsonnet dependencies
 	go install github.com/google/go-jsonnet/cmd/jsonnet-lint@latest && \
 	go install github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@latest
 
-thanos-mixin: # Clone the thanos-mixin repo and build the dashboards
-	@$(call clone_mixin_repo,$@,"github.com/thanos-io/thanos/mixin@main")
+
+alertmanager-mixin: # Clone the alertmanager-mixin repo and build the dashboards
+	@$(call clone_mixin_repo,$@,"github.com/prometheus/alertmanager/doc/alertmanager-mixin@main")
+	@$(call create_dashboards,$@)
+
+cert-manager-mixin:
+	@$(call clone_mixin_repo,$@,"gitlab.com/uneeq-oss/cert-manager-mixin@master")
 	@$(call create_dashboards,$@)
 
 etcd-mixin: # Clone the etcd-mixin repo and build the dashboards
@@ -50,23 +55,24 @@ kubernetes-mixin: # Clone the kubernetes-mixin repo and build the dashboards
 	@$(call clone_mixin_repo,$@,"github.com/kubernetes-monitoring/kubernetes-mixin@master")
 	@$(call create_dashboards,$@)
 
-prometheus-mixin: # Clone the prometheus-mixin repo and build the dashboards
-	@$(call clone_mixin_repo,$@,"github.com/prometheus/prometheus/documentation/prometheus-mixin@main")
-	@$(call create_dashboards,$@)
-
-alertmanager-mixin: # Clone the alertmanager-mixin repo and build the dashboards
-	@$(call clone_mixin_repo,$@,"github.com/prometheus/alertmanager/doc/alertmanager-mixin@main")
-	@$(call create_dashboards,$@)
-
 node-mixin: # Clone the node-exporter-mixin and build the dashboards - not working
 	@$(call clone_mixin_repo,$@,"github.com/prometheus/node_exporter/docs/node-mixin@master")
 	@$(call create_dashboards,$@)
 
-grafana-dashboards: # Get the Grafana dashboard from upstream
-	curl -o $(DASHBOARDS_PATH)/grafana/grafana-overview-dashboard.json -L https://raw.githubusercontent.com/grafana/grafana/main/grafana-mixin/dashboards/grafana-overview.json
+prometheus-mixin: # Clone the prometheus-mixin repo and build the dashboards
+	@$(call clone_mixin_repo,$@,"github.com/prometheus/prometheus/documentation/prometheus-mixin@main")
+	@$(call create_dashboards,$@)
+
+thanos-mixin: # Clone the thanos-mixin repo and build the dashboards
+	@$(call clone_mixin_repo,$@,"github.com/thanos-io/thanos/mixin@main")
+	@$(call create_dashboards,$@)
 
 coredns-dashboards: # Get the CoreDNS dashboard from kube-prometheus-stack repo
 	curl -o $(DASHBOARDS_PATH)/coredns/k8s-coredns-dashboard.json -L https://raw.githubusercontent.com/prometheus-community/helm-charts/main/charts/kube-prometheus-stack/files/dashboards/k8s-coredns.json
+
+grafana-dashboards: # Get the Grafana dashboard from upstream
+	curl -o $(DASHBOARDS_PATH)/grafana/grafana-overview-dashboard.json -L https://raw.githubusercontent.com/grafana/grafana/main/grafana-mixin/dashboards/grafana-overview.json
+
 
 clean: # Clean the mixin folders
 	@grep -Po '^[a-z]+[-].*(?=:)' Makefile | while read -r l; do if [ -d $$l ]; then rm -rf $$l; fi; done
