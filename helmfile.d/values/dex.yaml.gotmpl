@@ -109,7 +109,7 @@ securityContext:
 serviceMonitor:
   enabled: {{ .Values.dex.serviceMonitor.enabled }}
 
-resources:
+resources: # DONE
 {{- toYaml .Values.dex.resources | nindent 2 }}
 
 nodeSelector:
@@ -118,8 +118,8 @@ nodeSelector:
 topologySpreadConstraints:
 {{- toYaml .Values.dex.topologySpreadConstraints | nindent 2  }}
 
-affinity:
+affinity: # DONE
 {{- toYaml .Values.dex.affinity | nindent 2  }}
 
-tolerations:
+tolerations: # DONE
 {{- toYaml .Values.dex.tolerations | nindent 2  }}
