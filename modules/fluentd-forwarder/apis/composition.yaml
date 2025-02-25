@@ -16,153 +16,230 @@ spec:
         kind: Input
         spec:
           policy:
-            resolution: Required
+            resolution: Optional
           environmentConfigs:
             - type: Reference
               ref:
                 name: welkin.modules.capability.log-write
-    - step: patch-and-transform
+
+    - step: go-template
       functionRef:
-        name: function-patch-and-transform
+        name: function-go-templating
       input:
-        apiVersion: pt.fn.crossplane.io/v1beta1
-        kind: Resources
-        resources:
-          - name: fluentd-forwarder
-            base:
-              apiVersion: helm.crossplane.io/v1beta1
-              kind: Release
-              metadata:
-                name: fluentd-forwarder
-              spec:
-                providerConfigRef:
-                  name: helm
-                forProvider:
-                  wait: true
-                  namespace: fluentd-system
-                  chart:
-                    repository: https://kokuwaio.github.io/helm-charts
-                    name: fluentd-elasticsearch
-                    version: "13.10.0"
-                  values:
-                    elasticsearch:
-                      setOutputHostEnvVar: false
-                      outputType: "opensearch"
-                      logLevel: "info"
-                      scheme: https
-                      sslVerify: true
-                      reloadOnFailure: true
-                      log400Reason: true
-                      auth:
-                        enabled: true
-                        password: null
-                    secret:
-                    - name: OUTPUT_HOSTS
-                    - name: OUTPUT_USER
-                    - name: OUTPUT_PASSWORD
-                    nameOverride: fluentd
-                    image:
-                      # This is our own fork-image (https://github.com/elastisys/fluentd-elasticsearch).
-                      # This can later be replaced with the original image (https://github.com/monotek/fluentd-elasticsearch) when our changes is merged.
-                      # This image is included in falco k8s_containers and user_known_package_manager_in_container macros
-                      repository: ghcr.io/elastisys/fluentd
-                      tag: v4.3.9-ck8s1
-                    serviceMonitor:
+        apiVersion: gotemplating.fn.crossplane.io/v1beta1
+        kind: GoTemplate
+        source: Inline
+        inline:
+          template: |
+            {{- $capabilityLogWrite := index .context "apiextensions.crossplane.io/environment" }}
+            {{- $opensearchEnabled := hasKey $capabilityLogWrite "host" }}
+            apiVersion: helm.crossplane.io/v1beta1
+            kind: Release
+            metadata:
+              name: fluentd-forwarder
+              annotations:
+                gotemplating.fn.crossplane.io/composition-resource-name: release-fluentd-forwarder
+            spec:
+              providerConfigRef:
+                name: helm
+              forProvider:
+                wait: true
+                namespace: fluentd-system
+                chart:
+                  repository: https://kokuwaio.github.io/helm-charts
+                  name: fluentd-elasticsearch
+                  version: "13.10.0"
+                values:
+                  secret:
+                  {{- with $capabilityLogWrite.host }}
+                  - name: OUTPUT_HOSTS
+                    secret_name: {{ .secretKeyRef.name }}
+                    secret_key: {{ .secretKeyRef.key }}
+                  {{- end }}
+                  {{- with $capabilityLogWrite.username }}
+                  - name: OUTPUT_USER
+                    secret_name: {{ .secretKeyRef.name }}
+                    secret_key: {{ .secretKeyRef.key }}
+                  {{- end }}
+                  {{- with $capabilityLogWrite.password }}
+                  - name: OUTPUT_PASSWORD
+                    secret_name: {{ .secretKeyRef.name }}
+                    secret_key: {{ .secretKeyRef.key }}
+                  {{- end }}
+                  affinity: {{ .observed.composite.resource.spec.affinity | toYaml | nindent 8 }}
+                  resources: {{ .observed.composite.resource.spec.resources | toYaml | nindent 8 }}
+                  tolerations: {{ .observed.composite.resource.spec.tolerations | toYaml | nindent 8 }}
+                  elasticsearch:
+                    buffer: {{ .observed.composite.resource.spec.buffer | toYaml | nindent 10 }}
+                    requestTimeout: {{ .observed.composite.resource.spec.requestTimeout }}
+                    setOutputHostEnvVar: false
+                    outputType: "opensearch"
+                    logLevel: "info"
+                    scheme: https
+                    sslVerify: true
+                    reloadOnFailure: true
+                    log400Reason: true
+                    auth:
                       enabled: true
-                      # Seems like it is double templated so the end result yields an empty string ""
-                      jobLabel: '""'
-                      interval: 30s
-                    fluentdArgs: "--no-supervisor -q"
-                    env:
-                      OUTPUT_PORT: 443
-                      OUTPUT_BUFFER_TOTAL_LIMIT: 20G
-                    configMaps:
-                      useDefaults:
-                        containersInputConf: false
-                        forwardInputConf: false
-                        monitoringConf: false
-                        outputConf: false
-                        systemConf: false
-                        systemInputConf: true
-                    # Liveliness probe reverted from upstream changes to prevent that it fails if just one buffer is inactive.
-                    # E.g. the authlog buffer will often be inactive, so it would make the probe fail.
-                    livenessProbe:
-                      kind:
-                        exec:
-                          command:
-                          # Liveness probe is aimed to help in situations where fluentd
-                          # silently hangs for no apparent reasons until manual restart.
-                          # The idea of this probe is that if fluentd is not queueing or
-                          # flushing chunks for 5 minutes, something is not right. If
-                          # you want to change the fluentd configuration, reducing amount of
-                          # logs fluentd collects, consider changing the threshold or turning
-                          # liveness probe off completely.
-                          - '/bin/sh'
-                          - '-c'
-                          - >
-                            LIVENESS_THRESHOLD_SECONDS=${LIVENESS_THRESHOLD_SECONDS:-300};
-                            STUCK_THRESHOLD_SECONDS=${STUCK_THRESHOLD_SECONDS:-900};
-                            if [ ! -e /var/log/fluentd-buffers ];
-                            then
-                              echo "Expected directory /var/log/fluentd-buffers does not exist. This is likely a configuration issue.";
-                              exit 1;
-                            fi;
-                            touch -d "${STUCK_THRESHOLD_SECONDS} seconds ago" /tmp/marker-stuck;
-                            if [ -z "$(find /var/log/fluentd-buffers -type d -newer /tmp/marker-stuck -print -quit)" ];
-                            then
-                              echo "Elasticsearch buffers found stuck longer than $STUCK_THRESHOLD_SECONDS seconds. Clearing buffers."
-                              rm -rf /var/log/fluentd-buffers;
-                              exit 1;
-                            fi;
-                            touch -d "${LIVENESS_THRESHOLD_SECONDS} seconds ago" /tmp/marker-liveness;
-                            if [ -z "$(find /var/log/fluentd-buffers -type d -newer /tmp/marker-liveness -print -quit)" ];
-                            then
-                              echo "Elasticsearch buffers found stuck longer than $LIVENESS_THRESHOLD_SECONDS seconds."
-                              exit 1;
-                            fi;
-            patches:
-              # log-write capability
-              - type: FromEnvironmentFieldPath
-                fromFieldPath: host.secretKeyRef.name
-                toFieldPath: spec.forProvider.values.secret[0].secret_name
-              - type: FromEnvironmentFieldPath
-                fromFieldPath: host.secretKeyRef.key
-                toFieldPath: spec.forProvider.values.secret[0].secret_key
-              - type: FromEnvironmentFieldPath
-                fromFieldPath: username.secretKeyRef.name
-                toFieldPath: spec.forProvider.values.secret[1].secret_name
-              - type: FromEnvironmentFieldPath
-                fromFieldPath: username.secretKeyRef.key
-                toFieldPath: spec.forProvider.values.secret[1].secret_key
-              - type: FromEnvironmentFieldPath
-                fromFieldPath: password.secretKeyRef.name
-                toFieldPath: spec.forProvider.values.secret[2].secret_name
-              - type: FromEnvironmentFieldPath
-                fromFieldPath: password.secretKeyRef.key
-                toFieldPath: spec.forProvider.values.secret[2].secret_key
-              # spec
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.affinity
-                toFieldPath: spec.forProvider.values.affinity
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.resources
-                toFieldPath: spec.forProvider.values.resources
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.tolerations
-                toFieldPath: spec.forProvider.values.tolerations
-              # TODO: Lazy, real implementation should be stricter
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.buffer
-                toFieldPath: spec.forProvider.values.elasticsearch.buffer
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.extraConfigMaps
-                toFieldPath: spec.forProvider.values.extraConfigMaps
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.livenessThresholdSeconds
-                toFieldPath: spec.forProvider.values.env.LIVENESS_THRESHOLD_SECONDS
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.stuckThresholdSeconds
-                toFieldPath: spec.forProvider.values.env.STUCK_THRESHOLD_SECONDS
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.requestTimeout
-                toFieldPath: spec.forProvider.values.elasticsearch.requestTimeout
+                      password: null
+                  nameOverride: fluentd
+                  image:
+                    # This is our own fork-image (https://github.com/elastisys/fluentd-elasticsearch).
+                    # This can later be replaced with the original image (https://github.com/monotek/fluentd-elasticsearch) when our changes is merged.
+                    # This image is included in falco k8s_containers and user_known_package_manager_in_container macros
+                    repository: ghcr.io/elastisys/fluentd
+                    tag: v4.3.9-ck8s1
+                  serviceMonitor:
+                    enabled: true
+                    # Seems like it is double templated so the end result yields an empty string ""
+                    jobLabel: '""'
+                    interval: 30s
+                  fluentdArgs: "--no-supervisor -q"
+                  env:
+                    OUTPUT_PORT: 443
+                    OUTPUT_BUFFER_TOTAL_LIMIT: 20G
+                    LIVENESS_THRESHOLD_SECONDS: {{ .observed.composite.resource.spec.livenessThresholdSeconds }}
+                    STUCK_THRESHOLD_SECONDS: {{ .observed.composite.resource.spec.stuckThresholdSeconds }}
+                  configMaps:
+                    useDefaults:
+                      containersInputConf: false
+                      forwardInputConf: false
+                      monitoringConf: false
+                      outputConf: false
+                      systemConf: false
+                      systemInputConf: true
+                  # Liveliness probe reverted from upstream changes to prevent that it fails if just one buffer is inactive.
+                  # E.g. the authlog buffer will often be inactive, so it would make the probe fail.
+                  livenessProbe:
+                    kind:
+                      exec:
+                        command:
+                        # Liveness probe is aimed to help in situations where fluentd
+                        # silently hangs for no apparent reasons until manual restart.
+                        # The idea of this probe is that if fluentd is not queueing or
+                        # flushing chunks for 5 minutes, something is not right. If
+                        # you want to change the fluentd configuration, reducing amount of
+                        # logs fluentd collects, consider changing the threshold or turning
+                        # liveness probe off completely.
+                        - '/bin/sh'
+                        - '-c'
+                        - >
+                          LIVENESS_THRESHOLD_SECONDS=${LIVENESS_THRESHOLD_SECONDS:-300};
+                          STUCK_THRESHOLD_SECONDS=${STUCK_THRESHOLD_SECONDS:-900};
+                          if [ ! -e /var/log/fluentd-buffers ];
+                          then
+                            echo "Expected directory /var/log/fluentd-buffers does not exist. This is likely a configuration issue.";
+                            exit 1;
+                          fi;
+                          touch -d "${STUCK_THRESHOLD_SECONDS} seconds ago" /tmp/marker-stuck;
+                          if [ -z "$(find /var/log/fluentd-buffers -type d -newer /tmp/marker-stuck -print -quit)" ];
+                          then
+                            echo "Elasticsearch buffers found stuck longer than $STUCK_THRESHOLD_SECONDS seconds. Clearing buffers."
+                            rm -rf /var/log/fluentd-buffers;
+                            exit 1;
+                          fi;
+                          touch -d "${LIVENESS_THRESHOLD_SECONDS} seconds ago" /tmp/marker-liveness;
+                          if [ -z "$(find /var/log/fluentd-buffers -type d -newer /tmp/marker-liveness -print -quit)" ];
+                          then
+                            echo "Elasticsearch buffers found stuck longer than $LIVENESS_THRESHOLD_SECONDS seconds."
+                            exit 1;
+                          fi;
+
+                  extraConfigMaps: {{ .observed.composite.resource.spec.extraConfigMaps | toYaml | nindent 8 }}
+                    {{- if $opensearchEnabled }}
+                    opensearch-store.prop: |-
+                      @type "#{ENV['OUTPUT_TYPE']}"
+                      @log_level "#{ENV['OUTPUT_LOG_LEVEL']}"
+                      include_tag_key "#{ENV['OUTPUT_INCLUDE_TAG_KEY']}"
+                      hosts "#{ENV['OUTPUT_HOSTS']}"
+                      port "#{ENV['OUTPUT_PORT']}"
+                      path "#{ENV['OUTPUT_PATH']}"
+                      scheme "#{ENV['OUTPUT_SCHEME']}"
+                      ssl_verify "#{ENV['OUTPUT_SSL_VERIFY']}"
+                      ssl_version "#{ENV['OUTPUT_SSL_VERSION']}"
+                      user "#{ENV['OUTPUT_USER']}"
+                      password "#{ENV['OUTPUT_PASSWORD']}"
+                      log_os_400_reason "#{ENV['OUTPUT_LOG_400_REASON']}"
+                      reconnect_on_error "#{ENV['OUTPUT_RECONNECT_ON_ERROR']}"
+                      reload_on_failure "#{ENV['OUTPUT_RELOAD_ON_FAILURE']}"
+                      reload_connections "#{ENV['OUTPUT_RELOAD_CONNECTIONS']}"
+                      request_timeout "#{ENV['OUTPUT_REQUEST_TIMEOUT']}"
+
+                      # custom
+                      include_timestamp true # defaults to false
+                      default_opensearch_version 2
+                    {{- end }}
+
+                    22-labels.conf: |-
+                      # Conditional labels
+                        {{- if $opensearchEnabled }}
+                      # Relabel others
+                      <match **>
+                        @type relabel
+                        @label @STORE
+                        {{- else }}
+                      # Discard others
+                      <match **>
+                        @type null
+                        {{- end }}
+                      </match>
+
+                    30-output.conf: |-
+                      # Conditional output
+
+                      {{- if $opensearchEnabled }}
+                      <label @STORE>
+                        <match authlog.**>
+                          @id opensearch_authlog
+                          @include opensearch-store.prop
+
+                          index_name authlog
+
+                          <buffer>
+                            @include buffer.prop
+
+                            path /var/log/fluentd-buffers/kubernetes.authlog.system.buffer
+                          </buffer>
+                        </match>
+
+                        <match kubeaudit.**>
+                          @id opensearch_kubeaudit
+                          @include opensearch-store.prop
+
+                          index_name kubeaudit
+
+                          <buffer>
+                            @include buffer.prop
+
+                            path /var/log/fluentd-buffers/kubernetes.kubeaudit.system.buffer
+                          </buffer>
+                        </match>
+
+                        <match kubernetes.**>
+                          @id opensearch_kubernetes
+                          @include opensearch-store.prop
+                          index_name kubernetes
+                          <buffer>
+                            @include buffer.prop
+
+                            path /var/log/fluentd-buffers/kubernetes.kubernetes.system.buffer
+                          </buffer>
+                        </match>
+
+                        <match **>
+                          @id opensearch
+                          @include opensearch-store.prop
+
+                          index_name other
+
+                          <buffer>
+                            @include buffer.prop
+
+                            path /var/log/fluentd-buffers/kubernetes.system.buffer
+                          </buffer>
+                        </match>
+                      </label>
+                      {{- end }}
+    - step: automatically-detect-ready-composed-resources
+      functionRef:
+        name: function-auto-ready

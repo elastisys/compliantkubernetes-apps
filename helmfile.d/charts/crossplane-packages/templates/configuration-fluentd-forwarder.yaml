@@ -3,6 +3,6 @@ kind: Configuration
 metadata:
   name: fluentd-forwarder
 spec:
-  package: harbor.long-running.dev-ck8s.com/apps-crossplane-poc/fluentd-forwarder:v0.0.1
+  package: harbor.long-running.dev-ck8s.com/apps-crossplane-poc/fluentd-forwarder:v0.0.2
   # Setting this to true to make us handle all dependency management instead of Crossplane.
   skipDependencyResolution: true

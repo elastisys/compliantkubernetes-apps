@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#
+# fluentd-forwarder release difference: ./test.bash diff-main-template workload_cluster fluentd-forwarder
+# fluentd-forwarder can be installed without opensearch credentials even though opensearch.enabled = true
+#
+
 set -euo pipefail
 
 here="$(dirname "$(readlink -f "$0")")"
@@ -37,24 +42,39 @@ ensure_ingress_dns() {
 }
 
 case "${1}" in
-install)
+install-ingress)
   "${root}/bin/ck8s" ops helmfile sc apply -l name=issuers
-
   "${root}/bin/ck8s" ops helmfile sc apply -l name=ingress-nginx --include-transitive-needs
-
   ensure_ingress_dns
-
-  "${root}/bin/ck8s" update-ips both apply
-
+  "${root}/bin/ck8s" update-ips both apply || true
   "${root}/bin/ck8s" ops helmfile sc apply -l name=ingress-nginx --include-transitive-needs
-
-  "${root}/bin/ck8s" ops helmfile sc apply -l name=module-opensearch --include-transitive-needs
-
-  "${root}/bin/ck8s" ops helmfile sc apply -l name=opensearch-securityadmin --include-transitive-needs
-
-  "${root}/bin/ck8s" ops helmfile sc apply -l name=opensearch-configurer --include-transitive-needs
-
-  "${root}/bin/ck8s" ops helmfile wc apply -l name=module-fluentd-forwarder --include-transitive-needs
+  ;;
+install-opensearch-deps)
+  "${root}/bin/ck8s" ops helmfile sc apply -l netpol=service --include-transitive-needs
+  "${root}/bin/ck8s" ops helmfile sc apply -l name=crossplane-provider-configs --include-transitive-needs
+  "${root}/bin/ck8s" ops helmfile sc apply -l name=opensearch-secrets --include-transitive-needs
+  "${root}/bin/ck8s" ops helmfile sc apply -l app=opensearch,policy=psp --include-transitive-needs
+  ;;
+install-opensearch)
+  "${root}/bin/ck8s" ops helmfile sc apply -l name=module-opensearch
+  "${root}/bin/ck8s" ops helmfile sc apply -l name=opensearch-securityadmin
+  "${root}/bin/ck8s" ops helmfile sc apply -l name=opensearch-configurer
+  ;;
+uninstall-opensearch)
+  "${root}/bin/ck8s" ops helmfile sc destroy -l name=opensearch-configurer
+  "${root}/bin/ck8s" ops helmfile sc destroy -l name=opensearch-securityadmin
+  "${root}/bin/ck8s" ops helmfile sc destroy -l name=module-opensearch
+  ;;
+install-fluentd-deps)
+  "${root}/bin/ck8s" ops helmfile wc apply -l name=crossplane-provider-configs --include-transitive-needs
+  "${root}/bin/ck8s" ops helmfile wc apply -l app=fluentd,policy=netpol --include-transitive-needs
+  "${root}/bin/ck8s" ops helmfile wc apply -l app=fluentd,policy=psp --include-transitive-needs
+  ;;
+install-fluentd)
+  "${root}/bin/ck8s" ops helmfile wc apply -l name=module-fluentd-forwarder
+  ;;
+uninstall-fluentd)
+  "${root}/bin/ck8s" ops helmfile wc destroy -l name=module-fluentd-forwarder
   ;;
 uninstall)
   "${root}/bin/ck8s" clean wc
