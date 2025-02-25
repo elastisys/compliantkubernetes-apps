@@ -44,6 +44,7 @@ spec:
                 name: helm
               forProvider:
                 wait: true
+                waitTimeout: 10s # TODO: For demo purposes to not end up having to wait 5m if something goes wrong
                 namespace: fluentd-system
                 chart:
                   repository: https://kokuwaio.github.io/helm-charts
