@@ -330,7 +330,7 @@ process_ips_to_cidrs() {
       fi
     done
 
-    if [[ "${ip}" =~ ":" ]]; then
+    if [[ "${ip}" =~ ^(\:\:)?[0-9a-fA-F]{1,4}(\:\:?[0-9a-fA-F]{1,4}){0,7}(\:\:)?$ ]]; then
       new_cidrs+=("${ip}/128")
     else
       new_cidrs+=("${ip}/32")
