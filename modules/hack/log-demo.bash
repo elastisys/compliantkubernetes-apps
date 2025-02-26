@@ -57,12 +57,14 @@ install-opensearch-deps)
   ;;
 install-opensearch)
   "${root}/bin/ck8s" ops helmfile sc apply -l name=module-opensearch
+  "${root}/bin/ck8s" ops helmfile sc apply -l name=opensearch-dashboards
   "${root}/bin/ck8s" ops helmfile sc apply -l name=opensearch-securityadmin
   "${root}/bin/ck8s" ops helmfile sc apply -l name=opensearch-configurer
   ;;
 uninstall-opensearch)
   "${root}/bin/ck8s" ops helmfile sc destroy -l name=opensearch-configurer
   "${root}/bin/ck8s" ops helmfile sc destroy -l name=opensearch-securityadmin
+  "${root}/bin/ck8s" ops helmfile sc destroy -l name=opensearch-dashboards
   "${root}/bin/ck8s" ops helmfile sc destroy -l name=module-opensearch
   ;;
 install-fluentd-deps)
