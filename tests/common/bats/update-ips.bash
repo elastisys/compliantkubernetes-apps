@@ -35,26 +35,37 @@ update_ips.assert_mocks_none() {
 # --- mocks ------------------------------------------------------------------------------------------------------------
 
 update_ips.mock_minimal() {
-  mock_set_output "${mock_dig}" "127.0.0.1" 1 # .networkPolicies.global.objectStorage.ips
-  mock_set_output "${mock_dig}" "127.0.0.2" 2 # .networkPolicies.global.scIngress.ips
-  mock_set_output "${mock_dig}" "127.0.0.3" 3 # .networkPolicies.global.wcIngress.ips
+  mock_set_output "${mock_dig}" "127.0.0.1" 1              # .networkPolicies.global.objectStorage.ips
+  mock_set_output "${mock_dig}" "127.0.0.2" 2              # .networkPolicies.global.scIngress.ips
+  mock_set_output "${mock_dig}" "fd3e:fab4:5eda:b233::4" 3 # .networkPolicies.global.scIngress.ips
+  mock_set_output "${mock_dig}" "127.0.0.3" 4              # .networkPolicies.global.wcIngress.ips
+  mock_set_output "${mock_dig}" "fd3e:fab4:5eda:b233::5" 5 # .networkPolicies.global.wcIngress.ips
 
-  mock_set_output "${mock_kubectl}" "127.0.1.1 127.0.2.1 127.0.3.1" 1        # .networkPolicies.global.scApiserver.ips node internal
-  mock_set_output "${mock_kubectl}" "127.0.1.2 127.0.2.2 127.0.3.2" 2        # .networkPolicies.global.scApiserver.ips calico ipip
-  mock_set_output "${mock_kubectl}" "127.0.1.21 127.0.2.21 127.0.3.21" 3     # .networkPolicies.global.scApiserver.ips calico vxlan
-  mock_set_output "${mock_kubectl}" "127.0.1.3 127.0.2.3 127.0.3.3" 4        # .networkPolicies.global.scApiserver.ips calico wireguard
-  mock_set_output "${mock_kubectl}" "127.0.1.7 127.0.2.7 127.0.3.7" 5        # .networkPolicies.global.scNodes.ips node internal
-  mock_set_output "${mock_kubectl}" "127.0.1.8 127.0.2.8 127.0.3.8" 6        # .networkPolicies.global.scNodes.ips calico ipip
-  mock_set_output "${mock_kubectl}" "127.0.1.81 127.0.2.81 127.0.3.81" 7     # .networkPolicies.global.scNodes.ips calico vxlan
-  mock_set_output "${mock_kubectl}" "127.0.1.9 127.0.2.9 127.0.3.9" 8        # .networkPolicies.global.scNodes.ips calico wireguard
-  mock_set_output "${mock_kubectl}" "127.0.1.4 127.0.2.4 127.0.3.4" 9        # .networkPolicies.global.wcApiserver.ips node internal
-  mock_set_output "${mock_kubectl}" "127.0.1.5 127.0.2.5 127.0.3.5" 10       # .networkPolicies.global.wcApiserver.ips calico ipip
-  mock_set_output "${mock_kubectl}" "127.0.1.51 127.0.2.51 127.0.3.51" 11    # .networkPolicies.global.wcApiserver.ips calico vxlan
-  mock_set_output "${mock_kubectl}" "127.0.1.6 127.0.2.6 127.0.3.6" 12       # .networkPolicies.global.wcApiserver.ips calico wireguard
-  mock_set_output "${mock_kubectl}" "127.0.1.10 127.0.2.10 127.0.3.10" 13    # .networkPolicies.global.wcNodes.ips node internal
-  mock_set_output "${mock_kubectl}" "127.0.1.11 127.0.2.11 127.0.3.11" 14    # .networkPolicies.global.wcNodes.ips calico ipip
-  mock_set_output "${mock_kubectl}" "127.0.1.111 127.0.2.111 127.0.3.111" 15 # .networkPolicies.global.wcNodes.ips calico vxlan
-  mock_set_output "${mock_kubectl}" "127.0.1.12 127.0.2.12 127.0.3.12" 16    # .networkPolicies.global.wcNodes.ips calico wireguard
+  mock_set_output "${mock_kubectl}" "127.0.1.1 127.0.2.1 127.0.3.1" 1                                            # .networkPolicies.global.scApiserver.ips node internal
+  mock_set_output "${mock_kubectl}" "127.0.1.2 127.0.2.2 127.0.3.2" 2                                            # .networkPolicies.global.scApiserver.ips calico ipip
+  mock_set_output "${mock_kubectl}" "127.0.1.21 127.0.2.21 127.0.3.21" 3                                         # .networkPolicies.global.scApiserver.ips calico vxlan
+  mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::6 fd3e:fab4:5eda:b233::7 fd3e:fab4:5eda:b233::8" 4     # .networkPolicies.global.scApiserver.ips calico ipip6
+  mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::9 fd3e:fab4:5eda:b233::10 fd3e:fab4:5eda:b233::11" 5   # .networkPolicies.global.scApiserver.ips calico vxlan6
+  mock_set_output "${mock_kubectl}" "127.0.1.3 127.0.2.3 127.0.3.3" 6                                            # .networkPolicies.global.scApiserver.ips calico wireguard
+  mock_set_output "${mock_kubectl}" "127.0.1.7 127.0.2.7 127.0.3.7" 7                                            # .networkPolicies.global.scNodes.ips node internal
+  mock_set_output "${mock_kubectl}" "127.0.1.8 127.0.2.8 127.0.3.8" 8                                            # .networkPolicies.global.scNodes.ips calico ipip
+  mock_set_output "${mock_kubectl}" "127.0.1.81 127.0.2.81 127.0.3.81" 9                                         # .networkPolicies.global.scNodes.ips calico vxlan
+  mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::12 fd3e:fab4:5eda:b233::13 fd3e:fab4:5eda:b233::14" 10 # .networkPolicies.global.scNodes.ips calico ipip6
+  mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::15 fd3e:fab4:5eda:b233::16 fd3e:fab4:5eda:b233::17" 11 # .networkPolicies.global.scNodes.ips calico vxlan6
+  mock_set_output "${mock_kubectl}" "127.0.1.9 127.0.2.9 127.0.3.9" 12                                           # .networkPolicies.global.scNodes.ips calico wireguard
+  mock_set_output "${mock_kubectl}" "127.0.1.4 127.0.2.4 127.0.3.4" 13                                           # .networkPolicies.global.wcApiserver.ips node internal
+  mock_set_output "${mock_kubectl}" "127.0.1.5 127.0.2.5 127.0.3.5" 14                                           # .networkPolicies.global.wcApiserver.ips calico ipip
+  mock_set_output "${mock_kubectl}" "127.0.1.51 127.0.2.51 127.0.3.51" 15                                        # .networkPolicies.global.wcApiserver.ips calico vxlan
+  mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::18 fd3e:fab4:5eda:b233::19 fd3e:fab4:5eda:b233::20" 16 # .networkPolicies.global.wcApiserver.ips calico ipip6
+  mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::21 fd3e:fab4:5eda:b233::22 fd3e:fab4:5eda:b233::23" 17 # .networkPolicies.global.wcApiserver.ips calico vxlan6
+  mock_set_output "${mock_kubectl}" "127.0.1.6 127.0.2.6 127.0.3.6" 18                                           # .networkPolicies.global.wcApiserver.ips calico wireguard
+  mock_set_output "${mock_kubectl}" "127.0.1.10 127.0.2.10 127.0.3.10" 19                                        # .networkPolicies.global.wcNodes.ips node internal
+  mock_set_output "${mock_kubectl}" "127.0.1.11 127.0.2.11 127.0.3.11" 20                                        # .networkPolicies.global.wcNodes.ips calico ipip
+  mock_set_output "${mock_kubectl}" "127.0.1.111 127.0.2.111 127.0.3.111" 21                                     # .networkPolicies.global.wcNodes.ips calico vxlan
+  mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::24 fd3e:fab4:5eda:b233::25 fd3e:fab4:5eda:b233::26" 22 # .networkPolicies.global.wcNodes.ips calico ipip6
+  mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::27 fd3e:fab4:5eda:b233::28 fd3e:fab4:5eda:b233::29" 23 # .networkPolicies.global.wcNodes.ips calico vxlan6
+  mock_set_output "${mock_kubectl}" "127.0.1.12 127.0.2.12 127.0.3.12" 24                                        # .networkPolicies.global.wcNodes.ips calico wireguard
+
 }
 
 update_ips.mock_maximal() {
@@ -226,8 +237,8 @@ update_ips.assert_minimal() {
   assert_equal "$(yq.dig wc '.networkPolicies.global.wcNodes.ips | . style="flow"')" "[127.0.1.10/32, 127.0.1.11/32, 127.0.1.12/32, 127.0.1.111/32, 127.0.2.10/32, 127.0.2.11/32, 127.0.2.12/32, 127.0.2.111/32, 127.0.3.10/32, 127.0.3.11/32, 127.0.3.12/32, 127.0.3.111/32]"
 
   assert_equal "$(mock_get_call_num "${mock_curl}")" 0
-  assert_equal "$(mock_get_call_num "${mock_dig}")" 3
-  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16
+  assert_equal "$(mock_get_call_num "${mock_dig}")" 5
+  assert_equal "$(mock_get_call_num "${mock_kubectl}")" 24
 }
 
 update_ips.assert_swift() {
