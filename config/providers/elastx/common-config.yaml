@@ -7,7 +7,9 @@ networkPolicies:
     openstack:
       enabled: true
       ips:
-        - set-me
+        - 217.61.244.51/32
+        - 217.61.244.53/32
+        - 217.61.244.55/32
       ports:
         - 5000
         - 8774
@@ -22,19 +24,29 @@ networkPolicies:
 objectStorage:
   type: s3
   s3:
-    region: set-me
-    regionEndpoint: set-me
+    region: us-east-1
+    regionEndpoint: https://swift.elastx.cloud
     forcePathStyle: true
 ingressNginx:
   controller:
     config:
-      useProxyProtocol: false
+      useProxyProtocol: true
     useHostPort: false
     service:
       enabled: true
       type: LoadBalancer
-      annotations: {}
+      annotations:
+        loadbalancer.openstack.org/proxy-protocol: "true"
       allocateLoadBalancerNodePorts: true
 opa:
   rejectLoadBalancerService:
     enabled: false
+  controllerManager:
+    topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app: gatekeeper
+            control-plane: controller-manager
+        maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: DoNotSchedule

@@ -244,7 +244,7 @@ grafana:
 
 fluentd:
   audit:
-    enabled: false
+    enabled: true
     # Add filter stages to capture audit logs, add the audit tag prefix
     filters: ""
       ## Example:
