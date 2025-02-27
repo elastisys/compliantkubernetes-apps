@@ -71,6 +71,7 @@ install-fluentd-deps)
   "${root}/bin/ck8s" ops helmfile wc apply -l name=crossplane-provider-configs --include-transitive-needs
   "${root}/bin/ck8s" ops helmfile wc apply -l app=fluentd,policy=netpol --include-transitive-needs
   "${root}/bin/ck8s" ops helmfile wc apply -l app=fluentd,policy=psp --include-transitive-needs
+  "${root}/bin/ck8s" ops helmfile wc apply -l name=kube-prometheus-stack --include-transitive-needs
   ;;
 install-fluentd)
   "${root}/bin/ck8s" ops helmfile wc apply -l name=module-fluentd-forwarder

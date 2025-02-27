@@ -498,3 +498,18 @@ spec:
               - type: FromCompositeFieldPath
                 fromFieldPath: spec.publishConnectionDetailsTo.name # TODO: or metadata.uid
                 toFieldPath: spec.forProvider.manifest.data.password.secretKeyRef.name
+    - step: detect-readiness
+      functionRef:
+        name: function-auto-ready
+    - step: sequence-creation
+      functionRef:
+        name: function-sequencer
+      input:
+        apiVersion: sequencer.fn.crossplane.io/v1beta1
+        kind: Input
+        rules:
+          - sequence:
+            - opensearch-.*
+            - capability-log-write-secret
+            - capability-log-write-env
+            - capability-log-write-env-wc

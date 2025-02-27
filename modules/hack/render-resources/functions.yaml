@@ -25,3 +25,10 @@ metadata:
   name: function-auto-ready
 spec:
   package: xpkg.upbound.io/crossplane-contrib/function-auto-ready:v0.4.2
+---
+apiVersion: pkg.crossplane.io/v1beta1
+kind: Function
+metadata:
+  name: function-sequencer
+spec:
+  package: xpkg.upbound.io/crossplane-contrib/function-sequencer:v0.2.2
