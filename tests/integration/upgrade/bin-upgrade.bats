@@ -14,12 +14,14 @@ setup() {
   load_common "env.bash"
   load_common "git-version.bash"
   load_common "yq.bash"
+  load_common "migration-override.bash"
   load_assert
   load_file
   load_mock
 
   gitversion.setup_mocks
 
+  migration.override_path
   env.setup
   env.init baremetal kubespray prod
 }
@@ -33,25 +35,25 @@ teardown_file() {
 }
 
 @test "it works" {
-  gitversion.mock_static "v0.42.0"
+  run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
 
-  run ck8s init sc
+  run ck8s version config
+  assert_success
+  assert_output --partial "v0.41"
+
+# TODO need a cluster running here
+#
+  gitversion.mock_static "v0.42.0"
+  run ck8s upgrade sc "v0.42" prepare
+  assert_success
+
+  gitversion.mock_static "v0.42.0"
+  run ck8s upgrade sc "v0.42" apply
   assert_success
 
   run ck8s version config
   assert_success
   assert_output --partial "v0.42"
-
-  gitversion.mock_upgrade "v0.42.0" "v0.43.0"
-
-  run ck8s upgrade sc "v0.43" prepare
-  assert_success
-
-  gitversion.mock_static "v0.43.0"
-
-  run ck8s version config
-  assert_success
-  assert_output --partial "v0.43"
 }
 
 # COMMANDS
@@ -87,10 +89,13 @@ teardown_file() {
 # any other combo must throw error
 #
 # need a cluster for the apply steps, how much can be static?
+# may want to have a separate migration directory for tests
 #
 # TODO @test "no upgrade apply without upgrade prepare" {
+# run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
+# gitversion.mock_static "v0.42.0"
 # run ck8s upgrade apply
-# assert_failure
+# assert_failure # because trying to apply 0.42 when config says 0.41
 # }
 
 # TODO @test "no ck8s apply without ck8s upgrade" {
@@ -99,7 +104,15 @@ teardown_file() {
 # assert_failure
 # }
 
-# TODO @test "prevent " {
+# TODO @test "prevent upgrade apply without upgrade prepare" {
 # run ck8s upgrade apply
+# assert_failure
+# }
+#
+# TODO @test "prevent apply using older config" {
+# ### snapshot config
+# ### upgrade
+# ### revert config
+# run ck8s apply
 # assert_failure
 # }
