@@ -616,14 +616,11 @@ with_kubeconfig() {
   fi
 
   if sops_check "${kubeconfig}"; then
-    log_info "Using encrypted kubeconfig ${kubeconfig}"
-
     # TODO: Can't use a FIFO since we can't know that the kubeconfig is not
     #       read multiple times. Let's try to eliminate the need for writing
     #       the kubeconfig to disk in the future.
     sops_exec_file_no_fifo "${kubeconfig}" 'KUBECONFIG="{}" '"${*}"
   else
-    log_info "Using unencrypted kubeconfig ${kubeconfig}"
     # shellcheck disable=SC2048
     KUBECONFIG=${kubeconfig} "$@"
   fi
