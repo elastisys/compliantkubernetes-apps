@@ -5,6 +5,8 @@
 here="$(readlink -f "$(dirname "${0}")")"
 
 ROOT="$(readlink -f "${here}/../")"
+# Allow overriding from test suite
+MIGRATION_ROOT="${MIGRATION_ROOT:-$ROOT/migration}"
 
 CK8S_STACK="$(basename "$0")"
 export CK8S_STACK
@@ -17,7 +19,7 @@ snippets_list() {
     log_fatal "usage: snippets_list <prepare|apply>"
   fi
 
-  echo "${ROOT}/migration/${CK8S_TARGET_VERSION}/${1}/"* | sort
+  echo "${MIGRATION_ROOT}/${CK8S_TARGET_VERSION}/${1}/"* | sort
 }
 
 snippets_check() {
@@ -65,7 +67,7 @@ prepare() {
       continue
     fi
 
-    log_info "prepare snippet \"${snippet##"${ROOT}/migration/"}\":"
+    log_info "prepare snippet \"${snippet##"${MIGRATION_ROOT}/"}\":"
     if "${snippet}"; then
       log_info "prepare snippet success\n---"
       if [[ "${CK8S_CLUSTER:-}" == "both" ]]; then
@@ -129,7 +131,7 @@ apply() {
       continue
     fi
 
-    log_info "apply snippet \"${snippet##"${ROOT}/migration/"}\":"
+    log_info "apply snippet \"${snippet##"${MIGRATION_ROOT}/"}\":"
     if "${snippet}" execute; then
       log_info "apply snippet success\n---"
       if [[ "${CK8S_CLUSTER:-}" == "both" ]]; then
@@ -189,7 +191,7 @@ main() {
 
   local pass="true"
   for dir in "" "prepare" "apply"; do
-    if [[ ! -d "${ROOT}/migration/${version}/${dir}" ]]; then
+    if [[ ! -d "${MIGRATION_ROOT}/${version}/${dir}" ]]; then
       log_error "error: migration/${version}/${dir} is not a directory, did you specify the correct version?"
       pass="false"
     fi
