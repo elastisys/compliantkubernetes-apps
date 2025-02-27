@@ -67,7 +67,7 @@ mc | sc | all)
   "${root}/bin/ck8s" ops kubectl sc get opensearch -o custom-columns='NAME:.metadata.name,SYNCED:status.conditions[?(@.type=="Synced")].status,READY:status.conditions[?(@.type=="Ready")].status'
   echo
   echo -e "\033[1mOpenSearch Pods\033[0m"
-  "${root}/bin/ck8s" ops kubectl sc -n opensearch-system get po -l '!job-name' | awk 'NF=3' | column -t
+  "${root}/bin/ck8s" ops kubectl sc -n opensearch-system get po | awk 'NF=3' | column -t
   echo
   echo -e "\033[1mOpenSearch Ingress\033[0m"
   "${root}/bin/ck8s" ops kubectl sc -n opensearch-system get ingress -o custom-columns=NAME:.metadata.name,HOSTS:.spec.rules[].host
@@ -77,7 +77,7 @@ wc | all)
   echo -e "\033[1m== WORKLOAD CLUSTER ==\033[0m"
   echo
   echo -e "\033[1mModule\033[0m"
-  "${root}/bin/ck8s" ops kubectl wc get fluentdforwarder | awk 'NF=3' | column -t
+  "${root}/bin/ck8s" ops kubectl wc get fluentdforwarder -o custom-columns='NAME:.metadata.name,SYNCED:status.conditions[?(@.type=="Synced")].status,READY:status.conditions[?(@.type=="Ready")].status'
   echo
   echo -e "\033[1mFluentd Pods\033[0m"
   "${root}/bin/ck8s" ops kubectl wc -n fluentd-system get po | awk 'NF=3' | column -t
