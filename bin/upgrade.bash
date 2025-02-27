@@ -5,6 +5,8 @@
 here="$(readlink -f "$(dirname "${0}")")"
 
 ROOT="$(readlink -f "${here}/../")"
+# Allow overriding from test suite
+MIGRATION_ROOT="${MIGRATION_ROOT:-$ROOT/migration}"
 
 CK8S_STACK="$(basename "$0")"
 export CK8S_STACK
@@ -17,7 +19,7 @@ snippets_list() {
     log_fatal "usage: snippets_list <prepare|apply>"
   fi
 
-  echo "${ROOT}/migration/${CK8S_TARGET_VERSION}/${1}/"* | sort
+  echo "${MIGRATION_ROOT}/${CK8S_TARGET_VERSION}/${1}/"* | sort
 }
 
 snippets_check() {
@@ -52,14 +54,28 @@ prepare() {
 
   snippets_check prepare "${snippets}"
 
+  # Create a configmap. This fails if done twice.
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
+    record_migration_prepare_begin sc
+  fi
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
+    record_migration_prepare_begin wc
+  fi
+
   for snippet in ${snippets}; do
     if [[ "$(basename "${snippet}")" == "00-template.sh" ]]; then
       continue
     fi
 
-    log_info "prepare snippet \"${snippet##"${ROOT}/migration/"}\":"
+    log_info "prepare snippet \"${snippet##"${MIGRATION_ROOT}/"}\":"
     if "${snippet}"; then
       log_info "prepare snippet success\n---"
+      if [[ "${CK8S_CLUSTER:-}" == "both" ]]; then
+        record_migration_prepare_step "sc" "${snippet}"
+        record_migration_prepare_step "wc" "${snippet}"
+      else
+        record_migration_prepare_step "${CK8S_CLUSTER}" "${snippet}"
+      fi
     else
       log_fatal "prepare snippet failure"
     fi
@@ -68,9 +84,11 @@ prepare() {
   config_validate secrets
   if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
     config_validate sc
+    record_migration_prepare_done sc
   fi
   if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
     config_validate wc
+    record_migration_prepare_done wc
   fi
 }
 
@@ -93,14 +111,35 @@ apply() {
 
   snippets_check apply "${snippets}"
 
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
+    check_prepared_version "sc"
+  fi
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
+    check_prepared_version "wc"
+  fi
+
+  # Create a configmap. This fails if done twice.
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
+    record_migration_apply_begin sc
+  fi
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
+    record_migration_apply_begin wc
+  fi
+
   for snippet in ${snippets}; do
     if [[ "$(basename "${snippet}")" == "00-template.sh" ]]; then
       continue
     fi
 
-    log_info "apply snippet \"${snippet##"${ROOT}/migration/"}\":"
+    log_info "apply snippet \"${snippet##"${MIGRATION_ROOT}/"}\":"
     if "${snippet}" execute; then
       log_info "apply snippet success\n---"
+      if [[ "${CK8S_CLUSTER:-}" == "both" ]]; then
+        record_migration_apply_step "sc" "${snippet}"
+        record_migration_apply_step "wc" "${snippet}"
+      else
+        record_migration_apply_step "${CK8S_CLUSTER}" "${snippet}"
+      fi
     else
       local return="${?}"
       log_error "apply snippet execute failure"
@@ -118,6 +157,13 @@ apply() {
       fi
     fi
   done
+
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
+    record_migration_done sc
+  fi
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
+    record_migration_done wc
+  fi
 }
 
 usage() {
@@ -135,12 +181,17 @@ usage() {
 }
 
 main() {
+  if [[ "${1}" == "unlock" ]]; then
+    unlock
+    return
+  fi
+
   local version="${1}"
   local action="${2}"
 
   local pass="true"
   for dir in "" "prepare" "apply"; do
-    if [[ ! -d "${ROOT}/migration/${version}/${dir}" ]]; then
+    if [[ ! -d "${MIGRATION_ROOT}/${version}/${dir}" ]]; then
       log_error "error: migration/${version}/${dir} is not a directory, did you specify the correct version?"
       pass="false"
     fi
@@ -166,6 +217,19 @@ main() {
   "${action}"
 
   log_info "${action} complete"
+}
+
+unlock() {
+  check_config
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
+    config_load "sc"
+    unlock_migration "sc"
+  fi
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
+    config_load "wc"
+    unlock_migration "wc"
+  fi
+  log_info "Cluster migration unlocked. You can now retry the migration"
 }
 
 main "${@}"
