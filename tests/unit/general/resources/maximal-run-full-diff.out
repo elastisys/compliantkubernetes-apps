@@ -46,10 +46,6 @@
      alertReceivers:
        ips:
 [[33mck8s[0m] Diff found for .networkPolicies.global.wcIngress.ips in common-config.yaml (diff shows actions needed to be up to date)
-[[34mck8s[0m] Using unencrypted kubeconfig /tmp/ck8s-apps-config/.state/kube_config_sc.yaml
-[[34mck8s[0m] Using unencrypted kubeconfig /tmp/ck8s-apps-config/.state/kube_config_sc.yaml
-[[34mck8s[0m] Using unencrypted kubeconfig /tmp/ck8s-apps-config/.state/kube_config_sc.yaml
-[[34mck8s[0m] Using unencrypted kubeconfig /tmp/ck8s-apps-config/.state/kube_config_sc.yaml
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
 [36m@@ -20,7 +20,18 @@[0m
@@ -73,10 +69,6 @@
        ips:
          - set-me
 [[33mck8s[0m] Diff found for .networkPolicies.global.scApiserver.ips in sc-config.yaml (diff shows actions needed to be up to date)
-[[34mck8s[0m] Using unencrypted kubeconfig /tmp/ck8s-apps-config/.state/kube_config_sc.yaml
-[[34mck8s[0m] Using unencrypted kubeconfig /tmp/ck8s-apps-config/.state/kube_config_sc.yaml
-[[34mck8s[0m] Using unencrypted kubeconfig /tmp/ck8s-apps-config/.state/kube_config_sc.yaml
-[[34mck8s[0m] Using unencrypted kubeconfig /tmp/ck8s-apps-config/.state/kube_config_sc.yaml
 [1m--- sc-config.yaml[0m
 [1m+++ expected[0m
 [36m@@ -23,7 +23,18 @@[0m
@@ -128,10 +120,6 @@
      grafana:
        externalDashboardProvider:
 [[33mck8s[0m] Diff found for .networkPolicies.global.objectStorageSwift.ports in sc-config.yaml (diff shows actions needed to be up to date)
-[[34mck8s[0m] Using unencrypted kubeconfig /tmp/ck8s-apps-config/.state/kube_config_wc.yaml
-[[34mck8s[0m] Using unencrypted kubeconfig /tmp/ck8s-apps-config/.state/kube_config_wc.yaml
-[[34mck8s[0m] Using unencrypted kubeconfig /tmp/ck8s-apps-config/.state/kube_config_wc.yaml
-[[34mck8s[0m] Using unencrypted kubeconfig /tmp/ck8s-apps-config/.state/kube_config_wc.yaml
 [1m--- wc-config.yaml[0m
 [1m+++ expected[0m
 [36m@@ -14,7 +14,18 @@[0m
@@ -155,10 +143,6 @@
        ips:
          - set-me
 [[33mck8s[0m] Diff found for .networkPolicies.global.wcApiserver.ips in wc-config.yaml (diff shows actions needed to be up to date)
-[[34mck8s[0m] Using unencrypted kubeconfig /tmp/ck8s-apps-config/.state/kube_config_wc.yaml
-[[34mck8s[0m] Using unencrypted kubeconfig /tmp/ck8s-apps-config/.state/kube_config_wc.yaml
-[[34mck8s[0m] Using unencrypted kubeconfig /tmp/ck8s-apps-config/.state/kube_config_wc.yaml
-[[34mck8s[0m] Using unencrypted kubeconfig /tmp/ck8s-apps-config/.state/kube_config_wc.yaml
 [1m--- wc-config.yaml[0m
 [1m+++ expected[0m
 [36m@@ -17,7 +17,18 @@[0m
