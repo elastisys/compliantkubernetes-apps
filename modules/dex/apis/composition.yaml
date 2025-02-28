@@ -24,8 +24,65 @@ spec:
                   chart:
                     name: dex
                     repository: https://charts.dexidp.io
-                    version: 0.20.0
+                    version: 0.18.0
                   namespace: dex
+                  values:
+                    replicaCount: 1
+                    ingress:
+                      enabled: true
+                      className: nginx
+                      annotations:
+                        cert-manager.io/cluster-issuer: letsencrypt-prod
+                      tls:
+                        - secretName: dex-tls
+                          hosts: []
+                      hosts:
+                        - host: "dex.kapitest.dev-ck8s.com"
+                          paths:
+                            - path: /
+                              pathType: ImplementationSpecific
+                    volumeMounts:
+                      - mountPath: /etc/dex/google
+                        name: google-sa
+                    volumes:
+                      - name: google-sa
+                        secret:
+                          secretName: google-sa
+                    config:
+                      oauth2:
+                        skipApprovalScreen: true
+                      expiry:
+                        deviceRequests: 5m
+                        signingKeys: 6h
+                        idTokens: 24h
+                        refreshTokens:
+                          reuseInterval: 3s
+                          validIfNotUsedFor: 2160h
+                          absoluteLifetime: 3960h
+                      storage:
+                        type: kubernetes
+                        config:
+                          inCluster: true
+                      issuer: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}
+                      connectors: {}
+                      staticClients:
+                        - id: kubelogin
+                          name: 'Kubernetes CLI'
+                          secret: ""
+                          redirectURIs:
+                            - http://localhost:8000
+                            - http://localhost:18000
+                            - http://localhost:8080/oauth2/callback
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                      runAsNonRoot: true
+                      seccompProfile:
+                        type: RuntimeDefault
+                    serviceMonitor:
+                      enabled: true
                 providerConfigRef:
                   name: helm
             name: dex
