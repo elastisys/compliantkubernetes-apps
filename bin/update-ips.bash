@@ -183,9 +183,8 @@ get_internal_ips() {
 #
 # Usage: get_dns_ips <domain>
 get_dns_ips() {
+  echo "test dns" >&3
   local domain="${1}"
-
-  local -a ips
   local -a ips4
   local -a ips6
   mapfile -t ips4 < <(dig A +short "${domain}" | grep '^[.0-9]*$')
@@ -198,6 +197,8 @@ get_dns_ips() {
     log_error "No IPs for ${domain} was found. Will block all IPs"
     echo "0.0.0.0"
   fi
+  echo "${domain}" >&3
+  echo "${ips[@]}" >&3
   echo "${ips[@]}"
 }
 
