@@ -58,19 +58,21 @@ update_ips.mock_minimal() {
 
 }
 
-update_ips.mock_minimal_v6() {
-  mock_set_output "${mock_dig}" "fd3e:fab4:5eda:b233::1" 1 # .networkPolicies.global.scIngress.ips
-  mock_set_output "${mock_dig}" "fd3e:fab4:5eda:b233::2" 2 # .networkPolicies.global.wcIngress.ips
+if [ -n "${CK8S_IPV6_ENABLED+x}" ]; then
+  update_ips.mock_minimal_v6() {
+    mock_set_output "${mock_dig}" "fd3e:fab4:5eda:b233::1" 1 # .networkPolicies.global.scIngress.ips
+    mock_set_output "${mock_dig}" "fd3e:fab4:5eda:b233::2" 2 # .networkPolicies.global.wcIngress.ips
 
-  mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::6 fd3e:fab4:5eda:b233::7 fd3e:fab4:5eda:b233::8" 1    # .networkPolicies.global.scApiserver.ips calico ipip6
-  mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::9 fd3e:fab4:5eda:b233::10 fd3e:fab4:5eda:b233::11" 2  # .networkPolicies.global.scApiserver.ips calico vxlan6
-  mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::12 fd3e:fab4:5eda:b233::13 fd3e:fab4:5eda:b233::14" 3 # .networkPolicies.global.scNodes.ips calico ipip6
-  mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::15 fd3e:fab4:5eda:b233::16 fd3e:fab4:5eda:b233::17" 4 # .networkPolicies.global.scNodes.ips calico vxlan6
-  mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::18 fd3e:fab4:5eda:b233::19 fd3e:fab4:5eda:b233::20" 5 # .networkPolicies.global.wcApiserver.ips calico ipip6
-  mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::21 fd3e:fab4:5eda:b233::22 fd3e:fab4:5eda:b233::23" 6 # .networkPolicies.global.wcApiserver.ips calico vxlan6
-  mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::24 fd3e:fab4:5eda:b233::25 fd3e:fab4:5eda:b233::26" 7 # .networkPolicies.global.wcNodes.ips calico ipip6
-  mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::27 fd3e:fab4:5eda:b233::28 fd3e:fab4:5eda:b233::29" 8 # .networkPolicies.global.wcNodes.ips calico vxlan6
-}
+    mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::6 fd3e:fab4:5eda:b233::7 fd3e:fab4:5eda:b233::8" 1    # .networkPolicies.global.scApiserver.ips calico ipip6
+    mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::9 fd3e:fab4:5eda:b233::10 fd3e:fab4:5eda:b233::11" 2  # .networkPolicies.global.scApiserver.ips calico vxlan6
+    mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::12 fd3e:fab4:5eda:b233::13 fd3e:fab4:5eda:b233::14" 3 # .networkPolicies.global.scNodes.ips calico ipip6
+    mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::15 fd3e:fab4:5eda:b233::16 fd3e:fab4:5eda:b233::17" 4 # .networkPolicies.global.scNodes.ips calico vxlan6
+    mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::18 fd3e:fab4:5eda:b233::19 fd3e:fab4:5eda:b233::20" 5 # .networkPolicies.global.wcApiserver.ips calico ipip6
+    mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::21 fd3e:fab4:5eda:b233::22 fd3e:fab4:5eda:b233::23" 6 # .networkPolicies.global.wcApiserver.ips calico vxlan6
+    mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::24 fd3e:fab4:5eda:b233::25 fd3e:fab4:5eda:b233::26" 7 # .networkPolicies.global.wcNodes.ips calico ipip6
+    mock_set_output "${mock_kubectl}" "fd3e:fab4:5eda:b233::27 fd3e:fab4:5eda:b233::28 fd3e:fab4:5eda:b233::29" 8 # .networkPolicies.global.wcNodes.ips calico vxlan6
+  }
+fi
 
 update_ips.mock_maximal() {
   update_ips.mock_minimal

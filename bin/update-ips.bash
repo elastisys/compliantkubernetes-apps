@@ -188,8 +188,9 @@ get_dns_ips() {
   local -a ips4
   local -a ips6
   mapfile -t ips4 < <(dig A +short "${domain}" | grep '^[.0-9]*$')
-  mapfile -t ips6 < <(dig AAAA +short "${domain}" | grep -E '^(\:\:)?[0-9a-fA-F]{1,4}(\:\:?[0-9a-fA-F]{1,4}){0,7}(\:\:)?$')
-
+  if [ -n "${CK8S_IPV6_ENABLED+x}" ]; then
+    mapfile -t ips6 < <(dig AAAA +short "${domain}" | grep -E '^(\:\:)?[0-9a-fA-F]{1,4}(\:\:?[0-9a-fA-F]{1,4}){0,7}(\:\:)?$')
+  fi
   local -a ips
   read -r -a ips <<<"${ips4[*]} ${ips6[*]}"
 
@@ -418,7 +419,6 @@ allow_domain() {
   local -a ips dns_ips
   dns_ips=$(get_dns_ips "${dns_record}")
   readarray -t ips <<<"$(echo "${dns_ips}" | tr ' ' '\n')"
-
   allow_ips "${config_file}" "${config_option}" "${ips[@]}"
 }
 
