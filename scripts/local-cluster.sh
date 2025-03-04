@@ -227,12 +227,12 @@ resolve() {
   if [[ -z "${action}" ]]; then
     log.usage
   fi
+  if [[ -z "${domain}" ]]; then
+    log.usage
+  fi
 
   case "${action}" in
   create)
-    if [[ -z "${domain}" ]]; then
-      log.usage
-    fi
     export domain
 
     network.create kind
@@ -251,6 +251,10 @@ resolve() {
             resolvectl dns "${link}" 127.0.64.43
           fi
         done
+      elif command -v unbound-control || [[ -x /usr/sbin/unbound-control ]]; then
+        if log.continue "forward queries for ${domain} to 127.0.64.43?"; then
+          sudo unbound-control forward_add +i "${domain}" 127.0.64.43
+        fi
       else
         log.error "for dns to work with your local-cluster you must manually set local-resolve as the current dns server 127.0.64.43!"
       fi
@@ -263,6 +267,8 @@ resolve() {
     else
       if command -v resolvectl &>/dev/null && log.continue "restart systemd-resolved to reset dns servers?"; then
         systemctl restart systemd-resolved.service
+      elif command -v unbound-control || [[ -x /usr/sbin/unbound-control ]] && log.continue "remove forward for ${domain}?"; then
+        sudo unbound-control forward_remove +i "${domain}"
       else
         log.error "for dns to work with your regular dns server(s) you must manually reset you dns settings!"
       fi
