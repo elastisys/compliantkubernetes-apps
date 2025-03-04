@@ -90,7 +90,7 @@ jobs:
         run: make run-regression/${{ matrix.tag }}
       - name: delete local resolve
         if: always()
-        run: ./scripts/local-cluster.sh resolve delete
+        run: ./scripts/local-cluster.sh resolve delete test.dev-ck8s.com
       - name: delete local cache
         if: always()
         run: ./scripts/local-cluster.sh cache delete
@@ -136,7 +136,7 @@ jobs:
         run: make run-integration/${{ matrix.tag }}
       - name: delete local resolve
         if: always()
-        run: ./scripts/local-cluster.sh resolve delete
+        run: ./scripts/local-cluster.sh resolve delete test.dev-ck8s.com
       - name: delete local cache
         if: always()
         run: ./scripts/local-cluster.sh cache delete
