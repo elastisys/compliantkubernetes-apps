@@ -138,10 +138,13 @@ get_tunnel_ips() {
   local -a ips6_calico_vxlan
   local -a ips_wireguard
   mapfile -t ips_calico_vxlan < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4VXLANTunnelAddr}')
-  mapfile -t ips6_calico_vxlan < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv6VXLANTunnelAddr}')
   mapfile -t ips_calico_ipip < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4IPIPTunnelAddr}')
-  mapfile -t ips6_calico_ipip < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv6IPIPTunnelAddr}')
   mapfile -t ips_wireguard < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4WireguardInterfaceAddr}')
+
+  if [ -n "${CK8S_IPV6_ENABLED+x}" ]; then
+    mapfile -t ips6_calico_vxlan < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv6VXLANTunnelAddr}')
+    mapfile -t ips6_calico_ipip < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv6IPIPTunnelAddr}')
+  fi
 
   local -a ips
   read -r -a ips <<<"${ips_calico_vxlan[*]} ${ips_calico_ipip[*]} ${ips6_calico_vxlan[*]} ${ips6_calico_ipip[*]} ${ips_wireguard[*]}"
@@ -150,7 +153,6 @@ get_tunnel_ips() {
     log_error "No IPs for ${cluster} nodes with label ${label} was found"
     exit 1
   fi
-
   echo "${ips[@]}"
 }
 
@@ -175,7 +177,6 @@ get_internal_ips() {
     log_error "No IPs for ${cluster} nodes with label ${label} was found"
     exit 1
   fi
-
   echo "${ips[@]}"
 }
 
@@ -183,7 +184,6 @@ get_internal_ips() {
 #
 # Usage: get_dns_ips <domain>
 get_dns_ips() {
-  echo "test dns" >&3
   local domain="${1}"
   local -a ips4
   local -a ips6
@@ -198,8 +198,6 @@ get_dns_ips() {
     log_error "No IPs for ${domain} was found. Will block all IPs"
     echo "0.0.0.0"
   fi
-  echo "${domain}" >&3
-  echo "${ips[@]}" >&3
   echo "${ips[@]}"
 }
 
@@ -475,7 +473,6 @@ allow_nodes() {
   internal_ips=$(get_internal_ips "${cluster}" "${label}")
   tunnel_ips=$(get_tunnel_ips "${cluster}" "${label}")
   readarray -t ips <<<"$(echo "${internal_ips}" "${tunnel_ips}" | tr ' ' '\n')"
-
   allow_ips "${config_file}" "${config_option}" "${ips[@]}"
 }
 
