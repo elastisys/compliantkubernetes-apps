@@ -56,26 +56,28 @@ prepare() {
 
   # Create a configmap. This fails if done twice.
   if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
-    record_migration_prepare_begin sc
+    : record_migration_prepare_begin sc
   fi
   if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
-    record_migration_prepare_begin wc
+    : record_migration_prepare_begin wc
   fi
 
   for snippet in ${snippets}; do
     if [[ "$(basename "${snippet}")" == "00-template.sh" ]]; then
       continue
     fi
-
     log_info "prepare snippet \"${snippet##"${MIGRATION_ROOT}/"}\":"
     if "${snippet}"; then
       log_info "prepare snippet success\n---"
+      #shellcheck disable=SC2016
+      : '
       if [[ "${CK8S_CLUSTER:-}" == "both" ]]; then
         record_migration_prepare_step "sc" "${snippet}"
         record_migration_prepare_step "wc" "${snippet}"
       else
         record_migration_prepare_step "${CK8S_CLUSTER}" "${snippet}"
       fi
+      '
     else
       log_fatal "prepare snippet failure"
     fi
