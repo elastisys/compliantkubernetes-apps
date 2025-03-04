@@ -5,6 +5,10 @@
 setup_file() {
   load "../../bats.lib.bash"
   load_common "gpg.bash"
+  load_common "local-cluster.bash"
+
+  local_cluster.setup prod test.dev-ck8s.com
+  local_cluster.create single-node-cache
 
   gpg.setup
 }
@@ -27,6 +31,8 @@ setup() {
 }
 
 teardown() {
+  local_cluster.delete
+  local_cluster.teardown
   env.teardown
 }
 
