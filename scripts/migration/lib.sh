@@ -268,9 +268,6 @@ check_version() {
   # check that the config and the cluster agree on version
   # does this even make sense? the config is changed on `init`
   cluster_version="$(get_apps_version "${1}" >/dev/null 2>&1 || true)"
-  if [ -n "${cluster_version}" ]; then
-    log_info "Currently running ${cluster_version} according to cluster"
-  fi
 
   # `--exit-status` can be used instead of comparing to "null"
   common_override=$(yq4 '.global.ck8sVersion' "${CK8S_CONFIG_PATH}/common-config.yaml")
@@ -285,6 +282,21 @@ check_version() {
       read -r reply
       if [[ "${reply}" != "y" ]]; then
         exit 1
+      fi
+    fi
+  fi
+
+  if [ -z "${cluster_version}" ]; then
+    log_warn "Unknown cluster version!"
+  elif [[ "${2}" == "prepare" ]]; then
+    if [[ "${cluster_version}" != "${VERSION["${1}-config"]%.*}" ]]; then
+      log_warn "Version mismatch, cluster ${cluster_version}, config ${VERSION["${1}-config"]%.*}"
+      if [[ -t 1 ]]; then
+        log_warn_no_newline "Do you want to continue [y/N]: "
+        read -r reply
+        if [[ "${reply}" != "y" ]]; then
+          exit 1
+        fi
       fi
     fi
   fi
