@@ -47,8 +47,8 @@ teardown_file() {
   assert_success
   assert_output --partial "v0.41"
 
-# TODO need a cluster running here
-#
+  # TODO need a cluster running here
+  #
   gitversion.mock_static "v0.42.0"
   run ck8s upgrade sc "v0.42" prepare
   assert_success
