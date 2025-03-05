@@ -4,18 +4,17 @@
 
 setup_file() {
   load "../../bats.lib.bash"
-  load_common "gpg.bash"
   load_common "local-cluster.bash"
 
-  local_cluster.setup prod test.dev-ck8s.com
-  local_cluster.create single-node-cache
+  export CK8S_AUTO_APPROVE="true"
 
-  gpg.setup
+  local_cluster.setup dev test.dev-ck8s.com
+  local_cluster.create single-node-cache
 }
 
 setup() {
   load "../../bats.lib.bash"
-  load_common "env.bash"
+  load_common "local-cluster.bash"
   load_common "git-version.bash"
   load_common "yq.bash"
   load_common "migration-override.bash"
@@ -23,21 +22,14 @@ setup() {
   load_file
   load_mock
 
+  migration.override_path
   gitversion.setup_mocks
 
-  migration.override_path
-  env.setup
-  env.init baremetal kubespray prod
-}
-
-teardown() {
-  local_cluster.delete
-  local_cluster.teardown
-  env.teardown
 }
 
 teardown_file() {
-  gpg.teardown
+  local_cluster.delete
+  local_cluster.teardown
 }
 
 @test "it works" {
