@@ -286,6 +286,7 @@ check_version() {
     fi
   fi
 
+  # Make sure **config** and **cluster** is on the same (old) version
   if [ -z "${cluster_version}" ]; then
     log_warn "Unknown cluster version!"
   elif [[ "${2}" == "prepare" ]]; then
@@ -299,8 +300,15 @@ check_version() {
         fi
       fi
     fi
+
+    # TODO
+    # * Not in the middle of upgrading
+    #   * How?
+    # * Solution: Make sure that **.global.ck8sVersion** is not updated until prepare is done
   fi
 
+  # **Config** must be previous minor or patch in the same minor
+  # The following?
   if [[ ! "${VERSION["${1}-config"]}" =~ v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
     log_warn "reducing version validation of ${1}-config for version \"${VERSION["${1}-config"]}\""
   else
