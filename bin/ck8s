@@ -43,6 +43,7 @@ SYNC=""
 KUBECTL=""
 GEN_NEW_SECRETS=""
 CONCURRENCY="--concurrency=8"
+CK8S_IPV6_ENABLED=""
 
 for arg in "${@}"; do
   case "${arg}" in
@@ -50,6 +51,7 @@ for arg in "${@}"; do
   "--kubectl") KUBECTL="kubectl" ;;
   "--generate-new-secrets") GEN_NEW_SECRETS="--generate-new-secrets" ;;
   "--concurrency="*) CONCURRENCY="${arg}" ;;
+  "--ipv6") export CK8S_IPV6_ENABLED="true" ;;
   esac
 done
 
