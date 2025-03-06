@@ -304,10 +304,22 @@ check_version() {
       fi
     fi
 
-    # TODO
-    # * Not in the middle of upgrading
-    #   * How?
-    # * Solution: Make sure that **.global.ck8sVersion** is not updated until prepare is done
+    # Ensure not in the middle of upgrading
+    if get_prepared_version &>/dev/null; then
+      log_warn "Migration already in progress"
+      if [[ -t 1 ]]; then
+        log_warn_no_newline "Do you want to continue [y/N]: "
+        read -r reply
+        if [[ "${reply}" != "y" ]]; then
+          exit 1
+        fi
+      else
+        # Don't automatically proceed
+        exit 1
+      fi
+    fi
+
+    # Make sure that **.global.ck8sVersion** is not updated until prepare is done
   fi
 
   # **Config** must be previous minor or patch in the same minor
