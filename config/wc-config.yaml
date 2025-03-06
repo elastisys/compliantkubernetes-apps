@@ -385,3 +385,5 @@ gpu:
         operator: Equal
         value: gpu
         effect: NoSchedule
+  mig:
+    strategy: single
