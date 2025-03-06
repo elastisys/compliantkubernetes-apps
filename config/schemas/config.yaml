@@ -7720,6 +7720,13 @@ properties:
               - mixed
               - single
               - none
+      devicePlugin:
+        title: Device Plugin Configuration
+        description: Configuration for the device plugin, e.g. timeslicing
+        type: object
+      extraMetrics:
+        title: Enable Additional DCGM Metrics
+        description: Adds some profiling metrics in DCGM if it's available in your GPU setup
         type: boolean
 
 additionalProperties:
