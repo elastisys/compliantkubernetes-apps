@@ -39,6 +39,7 @@ spec:
       enableServiceLinks: false
       securityContext:
         {{- toYaml .Values.master.podSecurityContext | nindent 8 }}
+      hostNetwork: {{ .Values.master.hostNetwork }}
       containers:
         - name: master
           securityContext:
@@ -46,26 +47,24 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           livenessProbe:
-            grpc:
-              port: 8082
-            initialDelaySeconds: 10
-            periodSeconds: 10
+            {{- toYaml .Values.master.livenessProbe | nindent 12 }}
           readinessProbe:
-            grpc:
-              port: 8082
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            failureThreshold: 10
+            {{- toYaml .Values.master.readinessProbe | nindent 12 }}
           ports:
           - containerPort: {{ .Values.master.port | default "8080" }}
             name: grpc
           - containerPort: {{ .Values.master.metricsPort | default "8081" }}
             name: metrics
+          - containerPort: {{ .Values.master.healthPort  | default "8082" }}
+            name: health
           env:
           - name: NODE_NAME
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
+        {{- with .Values.master.extraEnvs }}
+          {{- toYaml . | nindent 8 }}
+        {{- end}}
           command:
             - "nfd-master"
           resources:
@@ -116,6 +115,7 @@ spec:
             - "-feature-gates={{ $key }}={{ $value }}"
             {{- end }}
             - "-metrics={{ .Values.master.metricsPort  | default "8081" }}"
+            - "-grpc-health={{ .Values.master.healthPort  | default "8082" }}"
           volumeMounts:
             {{- if .Values.tls.enable }}
             - name: nfd-master-cert

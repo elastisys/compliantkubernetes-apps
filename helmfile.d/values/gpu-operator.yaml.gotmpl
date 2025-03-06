@@ -150,3 +150,8 @@ dcgmExporter:
       DCGM_FI_DEV_FB_TOTAL         , gauge, total
       DCGM_FI_PROF_GR_ENGINE_ACTIVE, gauge, uuh
   {{- end }}
+
+
+# Handle CRD ourselves in accordance with ADR-0046
+operator:
+  upgradeCRD: false
