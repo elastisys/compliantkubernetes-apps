@@ -128,7 +128,7 @@ teardown_file() {
   gitversion.mock_static "v0.41.0"
   run ck8s apply sc
   assert_failure
-  assert_output --partial "TODO what does it say here"
+  assert_output --partial "Version mismatch. Run migration to update config."
 }
 
 # TODO how to test attempted concurrent
