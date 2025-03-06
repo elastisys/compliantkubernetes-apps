@@ -12,6 +12,7 @@ setup_file() {
   local_cluster.create single-node-cache
   yq.set sc '.issuers.letsencrypt.prod.email' '"noreply@welkin.example"'
   yq.set sc '.issuers.letsencrypt.staging.email' '"noreply@welkin.example"'
+  mkdir -p "${CK8S_CONFIG_PATH}/backups"
 }
 
 setup() {
