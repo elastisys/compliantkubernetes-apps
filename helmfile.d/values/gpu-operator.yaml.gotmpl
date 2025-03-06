@@ -25,3 +25,5 @@ toolkit:
     value: "false"
   - name: ACCEPT_NVIDIA_VISIBLE_DEVICES_AS_VOLUME_MOUNTS
     value: "true"
+
+mig: {{- toYaml .Values.gpu.mig | nindent 2 }}
