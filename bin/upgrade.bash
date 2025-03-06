@@ -70,6 +70,7 @@ prepare() {
     if "${snippet}"; then
       log_info "prepare snippet success\n---"
       #shellcheck disable=SC2016
+      # TODO should this be ... what?
       : '
       if [[ "${CK8S_CLUSTER:-}" == "both" ]]; then
         record_migration_prepare_step "sc" "${snippet}"
