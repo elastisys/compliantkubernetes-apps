@@ -298,6 +298,9 @@ check_version() {
         if [[ "${reply}" != "y" ]]; then
           exit 1
         fi
+      else
+        # On mismatch, don't automatically proceed
+        exit 1
       fi
     fi
 
