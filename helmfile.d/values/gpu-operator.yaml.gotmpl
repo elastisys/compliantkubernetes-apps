@@ -27,3 +27,7 @@ toolkit:
     value: "true"
 
 mig: {{- toYaml .Values.gpu.mig | nindent 2 }}
+
+{{- if .Values.gpu.devicePlugin }}
+devicePlugin: {{- toYaml .Values.gpu.devicePlugin | nindent 2 }}
+{{- end }}
