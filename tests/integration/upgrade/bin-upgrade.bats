@@ -91,31 +91,44 @@ teardown_file() {
 # need a cluster for the apply steps, how much can be static?
 # may want to have a separate migration directory for tests
 #
+
 @test "no upgrade apply without upgrade prepare" {
   run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
+
   gitversion.mock_static "v0.42.0"
-  run ck8s upgrade apply
+  run ck8s upgrade sc "v0.42" apply
   assert_failure # because trying to apply 0.42 when config says 0.41
+  assert_output --partial "TODO what does it say here"
 }
 
 @test "no ck8s apply without ck8s upgrade" {
-  run ck8s upgrade prepare
+  run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
+
+  gitversion.mock_static "v0.42.0"
+  run ck8s upgrade sc "v0.42" prepare
+  assert_success
+
   run ck8s apply
   assert_failure
+  assert_output --partial "TODO what does it say here"
 }
 
 @test "prevent upgrade apply without upgrade prepare" {
   run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
+
   gitversion.mock_static "v0.42.0"
-  run ck8s upgrade apply
+  run ck8s upgrade sc "v0.42" prepare
   assert_failure
+  assert_output --partial "TODO what does it say here"
 }
-#
-# TODO @test "prevent apply using older config" {
-# ### snapshot config
-# ### upgrade
-# ### revert config
-# run ck8s apply
-# assert_failure
-# }
-#
+
+@test "prevent apply using older config" {
+  run yq -i '.global.ck8sVersion="v0.42.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
+
+  gitversion.mock_static "v0.41.0"
+  run ck8s apply sc
+  assert_failure
+  assert_output --partial "TODO what does it say here"
+}
+
+# TODO how to test attempted concurrent
