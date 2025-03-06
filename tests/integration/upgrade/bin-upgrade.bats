@@ -108,7 +108,7 @@ teardown_file() {
   run ck8s upgrade sc "v0.42" prepare
   assert_success
 
-  run ck8s apply
+  run ck8s apply sc
   assert_failure
   assert_output --partial "TODO what does it say here"
 }
