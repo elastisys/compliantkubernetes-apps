@@ -10,9 +10,6 @@ setup_file() {
 
   local_cluster.setup dev test.dev-ck8s.com
   local_cluster.create single-node-cache
-
-  yq.set 'secrets' '["alerts"]["opsGenie"]["apiKey"]' '"ZXhhbXBsZS1hcGlrZXkx"'
-  yq.set 'secrets' '["alerts"]["slack"]["apiUrl"]' '"https://slack.example/channel/ZXhhbXBsZS1jaGFubmVs"'
 }
 
 setup() {
