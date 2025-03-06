@@ -14,3 +14,14 @@ node-feature-discovery:
     tolerations: {{- toYaml .Values.gpu.nodeFeatureDiscovery.controlPlane.tolerations | nindent 6 }}
     affinity: {{- toYaml .Values.gpu.nodeFeatureDiscovery.controlPlane.affinity | nindent 6 }}
 daemonsets: {{- toYaml .Values.gpu.daemonsets | nindent 2 }}
+
+# By default anyone can use this env var to use the GPU, even if it's not
+# requested, this option makes the runtime instead inject volume mounts
+# before the container can make use of the gpu
+# https://docs.google.com/document/d/1zy0key-EL6JH50MZgwg96RPYxxXXnVUdxLZwGiyqLd8
+toolkit:
+  env:
+  - name: ACCEPT_NVIDIA_VISIBLE_DEVICES_ENVVAR_WHEN_UNPRIVILEGED
+    value: "false"
+  - name: ACCEPT_NVIDIA_VISIBLE_DEVICES_AS_VOLUME_MOUNTS
+    value: "true"
