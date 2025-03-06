@@ -7707,6 +7707,21 @@ properties:
         properties:
           tolerations:
             $ref: '#/$defs/kubernetesTolerations'
+      mig:
+        title: MIG Configuration
+        description: Configure MIG options like strategy
+        type: object
+        properties:
+          strategy:
+            title: MIG Strategy
+            description: None ignores MIG entirely, single makes MIG devices a standard GPU resource, and shared creates one resource type for each MIG configuration
+            type: string
+            enum:
+              - mixed
+              - single
+              - none
+        type: boolean
+
 additionalProperties:
   title: Additional Properties
   description: Configure additional properties not covered by the schema.
