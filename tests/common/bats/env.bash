@@ -117,6 +117,8 @@ env.init() {
   mkdir -p "${CK8S_CONFIG_PATH}/.state"
   touch "${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml"
   touch "${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml"
+
+  mkdir -p "${CK8S_CONFIG_PATH}/backups"
 }
 
 # Teardown environment
