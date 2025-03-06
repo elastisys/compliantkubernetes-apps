@@ -74,6 +74,10 @@ spec:
         - name: {{ . }}
       {{- end }}
       {{- end }}
+      {{- with .Values.operator.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: upgrade-crd
           image: {{ include "gpu-operator.fullimage" . }}
@@ -82,7 +86,7 @@ spec:
           - /bin/sh
           - -c
           - >
-            kubectl apply -f /opt/gpu-operator/nvidia.com_clusterpolicies_crd.yaml;
+            kubectl apply -f /opt/gpu-operator/nvidia.com_clusterpolicies.yaml;
             kubectl apply -f /opt/gpu-operator/nvidia.com_nvidiadrivers.yaml;
         {{- if .Values.nfd.enabled }}
             kubectl apply -f /opt/gpu-operator/nfd-api-crds.yaml;
