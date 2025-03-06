@@ -387,3 +387,26 @@ gpu:
         effect: NoSchedule
   mig:
     strategy: single
+
+  #devicePlugin:
+  #  config:
+  #    default: "default"
+  #    name: time-slicing-config-default
+  #    create: true
+  #    data:
+  #      default: |-
+  #        version: v1
+  #        plugin:
+  #          deviceListStrategy: "volume-mounts"
+  #        flags:
+  #          migStrategy: mixed
+  #        migStrategy: mixed
+  #        sharing:
+  #          timeSlicing:
+  #            renameByDefault: true
+  #            failRequestsGreaterThanOne: true
+  #            resources:
+  #              - name: nvidia.com/gpu
+  #                replicas: 2
+  #              - name: nvidia.com/mig-3g.20gb
+  #                replicas: 4
