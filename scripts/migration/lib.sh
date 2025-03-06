@@ -289,6 +289,7 @@ check_version() {
   # Make sure **config** and **cluster** is on the same (old) version
   if [ -z "${cluster_version}" ]; then
     log_warn "Unknown cluster version!"
+    # TODO ensure this configmap exists on first-run
   elif [[ "${2}" == "prepare" ]]; then
     if [[ "${cluster_version}" != "${VERSION["${1}-config"]%.*}" ]]; then
       log_warn "Version mismatch, cluster ${cluster_version}, config ${VERSION["${1}-config"]%.*}"
