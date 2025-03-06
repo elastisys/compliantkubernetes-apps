@@ -10,6 +10,8 @@ setup_file() {
 
   local_cluster.setup dev test.dev-ck8s.com
   local_cluster.create single-node-cache
+  yq.set sc '.issuers.letsencrypt.prod.email' '"noreply@welkin.example"'
+  yq.set sc '.issuers.letsencrypt.staging.email' '"noreply@welkin.example"'
 }
 
 setup() {
@@ -89,23 +91,25 @@ teardown_file() {
 # need a cluster for the apply steps, how much can be static?
 # may want to have a separate migration directory for tests
 #
-# TODO @test "no upgrade apply without upgrade prepare" {
-# run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
-# gitversion.mock_static "v0.42.0"
-# run ck8s upgrade apply
-# assert_failure # because trying to apply 0.42 when config says 0.41
-# }
+@test "no upgrade apply without upgrade prepare" {
+  run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
+  gitversion.mock_static "v0.42.0"
+  run ck8s upgrade apply
+  assert_failure # because trying to apply 0.42 when config says 0.41
+}
 
-# TODO @test "no ck8s apply without ck8s upgrade" {
-# run ck8s upgrade prepare
-# run ck8s apply
-# assert_failure
-# }
+@test "no ck8s apply without ck8s upgrade" {
+  run ck8s upgrade prepare
+  run ck8s apply
+  assert_failure
+}
 
-# TODO @test "prevent upgrade apply without upgrade prepare" {
-# run ck8s upgrade apply
-# assert_failure
-# }
+@test "prevent upgrade apply without upgrade prepare" {
+  run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
+  gitversion.mock_static "v0.42.0"
+  run ck8s upgrade apply
+  assert_failure
+}
 #
 # TODO @test "prevent apply using older config" {
 # ### snapshot config
@@ -114,3 +118,4 @@ teardown_file() {
 # run ck8s apply
 # assert_failure
 # }
+#
