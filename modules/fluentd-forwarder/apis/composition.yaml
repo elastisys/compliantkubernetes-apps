@@ -20,7 +20,6 @@ spec:
             apiVersion: kubernetes.crossplane.io/v1alpha2
             kind: Object
             metadata:
-              name: opensearch-credentials
               annotations:
                 gotemplating.fn.crossplane.io/composition-resource-name: opensearch-credentials
             spec:

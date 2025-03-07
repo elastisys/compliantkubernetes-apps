@@ -53,7 +53,7 @@ spec:
             metadata:
               name: consumers.logwrites.capabilities.elastisys.com
               annotations:
-                gotemplating.fn.crossplane.io/composition-resource-name: environment-config-consumers
+                gotemplating.fn.crossplane.io/composition-resource-name: local-environment-config-consumers
                 gotemplating.fn.crossplane.io/ready: "True"
             data:
               secretRefs:
@@ -75,9 +75,8 @@ spec:
             apiVersion: kubernetes.crossplane.io/v1alpha2
             kind: Object
             metadata:
-              name: remote-consumers-environment-config-{{ $cluster }}
               annotations:
-                gotemplating.fn.crossplane.io/composition-resource-name: remote-consumers-environment-config-{{ $cluster }}
+                gotemplating.fn.crossplane.io/composition-resource-name: remote-environment-config-consumers-{{ $cluster }}
                 gotemplating.fn.crossplane.io/ready: "True"
             spec:
               providerConfigRef:
@@ -109,7 +108,6 @@ spec:
             apiVersion: kubernetes.crossplane.io/v1alpha2
             kind: Object
             metadata:
-              name: capability-log-write-patch-local-{{ $r.metadata.namespace }}-{{ $r.metadata.name }}
               annotations:
                 gotemplating.fn.crossplane.io/composition-resource-name: capability-log-write-patch-local-{{ $r.metadata.namespace }}-{{ $r.metadata.name }}
             spec:
@@ -146,13 +144,12 @@ spec:
             {{- end }}
             {{- if hasKey .observed "resources" }}
             {{- range $_, $cluster := .observed.composite.resource.spec.clusters }}
-            {{- with index $.observed.resources (print "remote-consumers-environment-config-" $cluster) }}
+            {{- with index $.observed.resources (print "remote-environment-config-consumers-" $cluster) }}
             {{- range $_, $r := .resource.status.atProvider.manifest.data.secretRefs }}
             ---
             apiVersion: kubernetes.crossplane.io/v1alpha2
             kind: Object
             metadata:
-              name: capability-log-write-patch-remote-{{ $cluster }}-{{ $r.namespace }}-{{ $r.name }}
               annotations:
                 gotemplating.fn.crossplane.io/composition-resource-name: capability-log-write-patch-remote-{{ $cluster }}-{{ $r.namespace }}-{{ $r.name }}
             spec:

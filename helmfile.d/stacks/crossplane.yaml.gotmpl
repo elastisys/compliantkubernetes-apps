@@ -49,3 +49,5 @@ templates:
       app: crossplane
     needs:
       - crossplane-system/crossplane-provider-configs
+    values:
+      - values/capability-log-write.yaml.gotmpl

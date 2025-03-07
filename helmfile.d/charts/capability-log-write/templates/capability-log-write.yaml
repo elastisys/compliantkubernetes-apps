@@ -1,5 +1,9 @@
-apiVersion: capability.elastisys.com/v1alpha1
+apiVersion: capabilities.elastisys.com/v1alpha1
 kind: LogWrite
 metadata:
-  name: log-write
-spec: {}
+  name: logwrite
+spec:
+  clusters:
+    {{- range .Values.clusters }}
+    - {{ . }}
+    {{- end }}
