@@ -265,9 +265,16 @@ check_version() {
     return
   fi
 
+  # TODO
+  # if $2 == prepare then
+  # config version should not yet have been touched
+  # elif $2 == apply then
+  # ensure config version == target version, set by init during prepare
+  #
+  # wasn't that already done somewhere?
+
   # check that the config and the cluster agree on version
   # does this even make sense? the config is changed on `init`
-  cluster_version="$(get_apps_version "${1}" >/dev/null 2>&1 || true)"
 
   # `--exit-status` can be used instead of comparing to "null"
   common_override=$(yq4 '.global.ck8sVersion' "${CK8S_CONFIG_PATH}/common-config.yaml")
@@ -287,6 +294,7 @@ check_version() {
   fi
 
   # Make sure **config** and **cluster** is on the same (old) version
+  cluster_version="$(get_apps_version "${1}" >/dev/null 2>&1 || true)"
   if [ -z "${cluster_version}" ]; then
     log_warn "Unknown cluster version!"
     # TODO ensure this configmap exists on first-run
