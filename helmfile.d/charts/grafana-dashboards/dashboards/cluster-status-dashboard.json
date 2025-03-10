@@ -395,7 +395,7 @@
           "editorMode": "code",
           "expr": "probe_success{cluster=~\"$cluster\",target=~\"$target\"}",
           "format": "time_series",
-          "interval": "$interval",
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "{{ target }}",
           "range": true,
@@ -523,7 +523,7 @@
           },
           "expr": "probe_success{cluster=~\"$cluster\",target=~\"$target\"}",
           "format": "time_series",
-          "interval": "$interval",
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "{{cluster}}",
           "refId": "A"
@@ -618,7 +618,7 @@
           },
           "expr": "probe_http_duration_seconds{cluster=~\"$cluster\",target=~\"$target\"}",
           "format": "time_series",
-          "interval": "$interval",
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "{{ phase }}",
           "refId": "B"
@@ -713,7 +713,7 @@
           },
           "expr": "probe_duration_seconds{cluster=~\"$cluster\",target=~\"$target\"}",
           "format": "time_series",
-          "interval": "$interval",
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "seconds",
           "refId": "A"
@@ -808,7 +808,7 @@
           },
           "expr": "probe_http_status_code{cluster=~\"$cluster\",target=~\"$target\"}",
           "format": "time_series",
-          "interval": "$interval",
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "{{cluster}}",
           "refId": "A"
@@ -979,7 +979,7 @@
           },
           "expr": "probe_http_ssl{cluster=~\"$cluster\",target=~\"$target\"}",
           "format": "time_series",
-          "interval": "$interval",
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "{{cluster}}",
           "refId": "A"
@@ -1074,7 +1074,7 @@
           },
           "expr": "probe_ssl_earliest_cert_expiry{cluster=~\"$cluster\",target=~\"$target\"} - time()",
           "format": "time_series",
-          "interval": "$interval",
+          "interval": "",
           "intervalFactor": 1,
           "legendFormat": "{{cluster}}",
           "orientation": "auto",
@@ -1153,7 +1153,7 @@
           },
           "expr": "avg(probe_duration_seconds{cluster=~\"$cluster\",target=~\"$target\"})",
           "format": "time_series",
-          "interval": "$interval",
+          "interval": "",
           "intervalFactor": 1,
           "refId": "A"
         }
@@ -1231,7 +1231,7 @@
           },
           "expr": "avg(probe_dns_lookup_time_seconds{cluster=~\"$cluster\",target=~\"$target\"})",
           "format": "time_series",
-          "interval": "$interval",
+          "interval": "",
           "intervalFactor": 1,
           "refId": "A"
         }
