@@ -328,7 +328,7 @@ backup_file() {
 
   log_info "Creating backup ${backup_config_path}/${backup_name}"
 
-  cp "${file}" "${backup_config_path}/${backup_name}"
+  cp -b "${file}" "${backup_config_path}/${backup_name}"
 }
 
 backup_retention() {
