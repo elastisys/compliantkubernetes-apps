@@ -16,6 +16,13 @@ run() {
     fi
 
     for cluster in "${clusters[@]}"; do
+      trivy_enabled=$(yq_dig "${cluster}" '.trivy.enabled')
+
+      if [[ "${trivy_enabled}" == "false" ]]; then
+        log_info "  - Trivy not enabled for ${cluster}, skipping"
+        continue
+      fi
+
       current_version=$(helm_do "${cluster}" get metadata -n monitoring trivy-operator -ojson | jq -r '.version')
 
       log_info "  - Checking if trivy-operator CRDs needs to be upgraded"

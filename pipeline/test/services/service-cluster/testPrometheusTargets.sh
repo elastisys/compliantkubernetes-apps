@@ -55,12 +55,13 @@ if [[ "${enable_thanos}" == "true" ]] && [[ "${enable_thanos_service_monitor}" =
   scTargets+=(
     "serviceMonitor/thanos/thanos-receiver-bucketweb/0 1"
     "serviceMonitor/thanos/thanos-receiver-compactor/0 1"
-    "serviceMonitor/thanos/thanos-receiver-receive/0 3"
+    "serviceMonitor/thanos/thanos-receiver-receive/0 2"
+    "serviceMonitor/thanos/thanos-receiver-receive-distributor/0 1"
     "serviceMonitor/thanos/thanos-receiver-storegateway/0 1"
   )
 fi
 if [[ "${enable_thanos}" == "true" ]] && [[ "${enable_thanos_service_monitor}" == "true" ]] && [[ "${enable_thanos_ruler}" == "true" ]]; then
-  scTargets+=("serviceMonitor/thanos/thanos-receiver-ruler/0 4")
+  scTargets+=("serviceMonitor/thanos/thanos-receiver-ruler/0 2")
 fi
 if [[ "${enable_thanos}" == "true" ]] && [[ "${enable_thanos_service_monitor}" == "true" ]] && [[ "${enable_thanos_query}" == "true" ]]; then
   scTargets+=(
