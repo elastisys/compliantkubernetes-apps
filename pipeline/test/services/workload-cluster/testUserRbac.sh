@@ -175,31 +175,14 @@ for user in "${user_admin_users[@]}"; do
     done
 done
 
-FLUENTD_VERBS=(
-    patch
-)
-FLUENTD_RESOURCES=(
-    configmaps/fluentd-extra-config
-    configmaps/fluentd-extra-plugins
-)
-
-for user in "${user_admin_users[@]}"; do
-    for resource in "${FLUENTD_RESOURCES[@]}"; do
-        for verb in "${FLUENTD_VERBS[@]}"; do
-            testCanUserDoInNamespace "$verb" "$resource" "fluentd" "$user"
-        done
-    done
-done
-
-if [[ $ENABLE_USER_ALERTMANAGER == "true" ]]
-then
-    ALERTMANAGER_SECRET_VERBS=(
-        update
-    )
-    ALERTMANAGER_SECRET_RESOURCES=(
-        secret/alertmanager-alertmanager
-        secret/user-alertmanager-auth
-    )
+if [[ $ENABLE_USER_ALERTMANAGER == "true" ]]; then
+  ALERTMANAGER_SECRET_VERBS=(
+    update
+  )
+  ALERTMANAGER_SECRET_RESOURCES=(
+    secret/alertmanager-alertmanager
+    secret/user-alertmanager-auth
+  )
 
     for user in "${user_admin_users[@]}"; do
         for resource in "${ALERTMANAGER_SECRET_RESOURCES[@]}"; do
@@ -309,31 +292,14 @@ for group in "${user_admin_groups[@]}"; do
     done
 done
 
-FLUENTD_VERBS=(
-    patch
-)
-FLUENTD_RESOURCES=(
-    configmaps/fluentd-extra-config
-    configmaps/fluentd-extra-plugins
-)
-
-for group in "${user_admin_groups[@]}"; do
-    for resource in "${FLUENTD_RESOURCES[@]}"; do
-        for verb in "${FLUENTD_VERBS[@]}"; do
-            testCanGroupDoInNamespace "$verb" "$resource" "fluentd" "$group"
-        done
-    done
-done
-
-if [[ $ENABLE_USER_ALERTMANAGER == "true" ]]
-then
-    ALERTMANAGER_SECRET_VERBS=(
-        update
-    )
-    ALERTMANAGER_SECRET_RESOURCES=(
-        secret/alertmanager-alertmanager
-        secret/user-alertmanager-auth
-    )
+if [[ $ENABLE_USER_ALERTMANAGER == "true" ]]; then
+  ALERTMANAGER_SECRET_VERBS=(
+    update
+  )
+  ALERTMANAGER_SECRET_RESOURCES=(
+    secret/alertmanager-alertmanager
+    secret/user-alertmanager-auth
+  )
 
     for group in "${user_admin_groups[@]}"; do
         for resource in "${ALERTMANAGER_SECRET_RESOURCES[@]}"; do
