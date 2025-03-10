@@ -57,7 +57,7 @@ teardown_file() {
   run ck8s upgrade sc "v0.42" apply
   assert_success
 
-  run ck8s version config
+  run ck8s version sc
   assert_success
   assert_output --partial "v0.42"
 }
@@ -103,9 +103,12 @@ teardown_file() {
   run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
 
   gitversion.mock_static "v0.42.0"
+  run ck8s version config
+  assert_success
+  assert_output --partial "v0.41"
   run ck8s upgrade sc "v0.42" apply
   assert_failure # because trying to apply 0.42 when config says 0.41
-  assert_output --partial "TODO what does it say here"
+  assert_output --partial "version mismatch"
 }
 
 @test "no ck8s apply without ck8s upgrade" {
