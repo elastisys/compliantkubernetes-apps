@@ -7707,6 +7707,22 @@ properties:
         properties:
           tolerations:
             $ref: '#/$defs/kubernetesTolerations'
+      mig:
+        title: MIG Configuration
+        properties:
+          strategy:
+            type: string
+            enum:
+              - mixed
+              - single
+              - none
+      devicePlugin:
+        title: Device Plugin Configuration
+        type: object
+      extraMetrics:
+        title: Enable Additional DCGM Metrics
+        type: boolean
+
 additionalProperties:
   title: Additional Properties
   description: Configure additional properties not covered by the schema.
