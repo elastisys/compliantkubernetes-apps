@@ -177,7 +177,7 @@ _test_apply_swift_application_credential_id() {
 
   assert_equal "$(mock_get_call_args "${mock_curl}" 1)" "$(cat "${BATS_TEST_DIRNAME}/resources/get-swift-url-username.out")"
   assert_equal "$(mock_get_call_args "${mock_curl}" 2)" '-i -s -X DELETE -H X-Auth-Token: 123456789 -H X-Subject-Token: 123456789 https://keystone.foo.dev-ck8s.com:5678/auth/tokens'
-  assert_equal "$(mock_get_call_args "${mock_dig}" 5)" '+short swift.foo.dev-ck8s.com'
+  assert_equal "$(mock_get_call_args "${mock_dig}" 5)" 'A +short swift.foo.dev-ck8s.com'
 }
 
 @test "ck8s update-ips extract swift url using application credential id" {
@@ -192,5 +192,5 @@ _test_apply_swift_application_credential_id() {
 
   assert_equal "$(mock_get_call_args "${mock_curl}" 1)" "$(cat "${BATS_TEST_DIRNAME}/resources/get-swift-url-application-credentails.out")"
   assert_equal "$(mock_get_call_args "${mock_curl}" 2)" '-i -s -X DELETE -H X-Auth-Token: 123456789 -H X-Subject-Token: 123456789 https://keystone.foo.dev-ck8s.com:5678/auth/tokens'
-  assert_equal "$(mock_get_call_args "${mock_dig}" 5)" '+short swift.foo.dev-ck8s.com'
+  assert_equal "$(mock_get_call_args "${mock_dig}" 5)" 'A +short swift.foo.dev-ck8s.com'
 }

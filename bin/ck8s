@@ -43,6 +43,7 @@ SYNC=""
 KUBECTL=""
 GEN_NEW_SECRETS=""
 CONCURRENCY="--concurrency=8"
+CK8S_IPV6_ENABLED="false"
 
 for arg in "${@}"; do
   case "${arg}" in
@@ -50,6 +51,7 @@ for arg in "${@}"; do
   "--kubectl") KUBECTL="kubectl" ;;
   "--generate-new-secrets") GEN_NEW_SECRETS="--generate-new-secrets" ;;
   "--concurrency="*) CONCURRENCY="${arg}" ;;
+  "--ipv6") CK8S_IPV6_ENABLED="true" ;;
   esac
 done
 
@@ -137,7 +139,7 @@ explain)
 update-ips)
   [[ "${2}" =~ ^(wc|sc|both)$ ]] || usage
   [[ "${3}" =~ ^(apply|dry-run)$ ]] || usage
-  "${here}/update-ips.bash" "${2}" "${3}"
+  "${here}/update-ips.bash" "${2}" "${3}" "${CK8S_IPV6_ENABLED}"
   ;;
 fix-psp-violations)
   [[ "${2}" =~ ^(wc|sc)$ ]] || usage

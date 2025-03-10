@@ -23,6 +23,8 @@ has_diff=0
 #TODO: To be changed when decision made on networkpolicies for azure storage
 storage_service=$(yq4 '.objectStorage.type' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
 
+CK8S_IPV6_ENABLED="${3:-"false"}"
+
 # Get the value of the config option or the provided default value if the
 # config option is unset.
 #
@@ -134,13 +136,20 @@ get_tunnel_ips() {
 
   local -a ips_calico_ipip
   local -a ips_calico_vxlan
+  local -a ips6_calico_ipip
+  local -a ips6_calico_vxlan
   local -a ips_wireguard
   mapfile -t ips_calico_vxlan < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4VXLANTunnelAddr}')
   mapfile -t ips_calico_ipip < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4IPIPTunnelAddr}')
   mapfile -t ips_wireguard < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4WireguardInterfaceAddr}')
 
+  if [ "${CK8S_IPV6_ENABLED}" = "true" ]; then
+    mapfile -t ips6_calico_vxlan < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv6VXLANTunnelAddr}')
+    mapfile -t ips6_calico_ipip < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv6IPIPTunnelAddr}')
+  fi
+
   local -a ips
-  read -r -a ips <<<"${ips_calico_vxlan[*]} ${ips_calico_ipip[*]} ${ips_wireguard[*]}"
+  read -r -a ips <<<"${ips_calico_vxlan[*]} ${ips_calico_ipip[*]} ${ips6_calico_vxlan[*]} ${ips6_calico_ipip[*]} ${ips_wireguard[*]}"
 
   if [ ${#ips[@]} -eq 0 ]; then
     log_error "No IPs for ${cluster} nodes with label ${label} was found"
@@ -180,13 +189,20 @@ get_internal_ips() {
 # Usage: get_dns_ips <domain>
 get_dns_ips() {
   local domain="${1}"
-
+  local -a ips4
+  local -a ips6
+  mapfile -t ips4 < <(dig A +short "${domain}" | grep '^[.0-9]*$')
+  if [ "${CK8S_IPV6_ENABLED}" = "true" ]; then
+    mapfile -t ips6 < <(dig AAAA +short "${domain}" | grep -E '^(\:\:)?[0-9a-fA-F]{1,4}(\:\:?[0-9a-fA-F]{1,4}){0,7}(\:\:)?$')
+  fi
   local -a ips
-  mapfile -t ips < <(dig +short "${domain}" | grep '^[.0-9]*$')
+  read -r -a ips <<<"${ips4[*]} ${ips6[*]}"
+
   if [ ${#ips[@]} -eq 0 ]; then
     log_error "No IPs for ${domain} was found. Will block all IPs"
     echo "0.0.0.0"
   fi
+
   echo "${ips[@]}"
 }
 
@@ -263,7 +279,26 @@ get_swift_url() {
 #
 # For example, [1.0.0.10/32, 1.0.0.2/32] would be reordered to [1.0.0.2/32, 1.0.0.10/32].
 sort_cidrs() {
-  python3 -c "import ipaddress; import sys; cidrs = [ipaddress.ip_network(cidr) for cidr in sys.argv[1:]]; cidrs.sort(); [print(cidr) for cidr in cidrs]" "${@}"
+  python3 -c "
+import ipaddress
+import sys
+
+cidrs = [ipaddress.ip_network(cidr) for cidr in sys.argv[1:]]
+
+cidrs4 = []
+cidrs6 = []
+for cidr in cidrs:
+    if cidr.version == 4: cidrs4.append(cidr)
+
+for cidr in cidrs:
+    if cidr.version == 6: cidrs6.append(cidr)
+
+cidrs4.sort()
+cidrs6.sort()
+
+cidrSorted = cidrs4 + cidrs6
+[print(cidr) for cidr in cidrSorted]
+" "${@}"
 }
 
 # Check if an IP address is part of a CIDR address block.
@@ -294,13 +329,17 @@ process_ips_to_cidrs() {
 
   for ip in "${@}"; do
     for cidr in "${old_cidrs[@]}"; do
-      if [[ "${cidr}" != "" ]] && [[ "${cidr}" != "set-me" ]] && ! [[ "${cidr}" =~ .*/32 ]] && check_ip_in_cidr "${ip}" "${cidr}"; then
+      if [[ "${cidr}" != "" ]] && [[ "${cidr}" != "set-me" ]] && ! [[ "${cidr}" =~ [0-9.]*/32 ]] && ! [[ "${cidr}" =~ [0-9a-f:]*/128 ]] && check_ip_in_cidr "${ip}" "${cidr}"; then
         new_cidrs+=("${cidr}")
         continue 2
       fi
     done
 
-    new_cidrs+=("${ip}/32")
+    if [[ "${ip}" =~ ^(\:\:)?[0-9a-fA-F]{1,4}(\:\:?[0-9a-fA-F]{1,4}){0,7}(\:\:)?$ ]]; then
+      new_cidrs+=("${ip}/128")
+    else
+      new_cidrs+=("${ip}/32")
+    fi
   done
 
   yq4 'split(" ") | unique | .[]' <<<"${new_cidrs[@]}"

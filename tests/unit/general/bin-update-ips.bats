@@ -93,6 +93,14 @@ _apply_normalise() {
   update_ips.assert_minimal
 }
 
+@test "ck8s update-ips performs minimal run dualStack" {
+  update_ips.mock_minimal_v6
+
+  run ck8s update-ips both apply --ipv6
+
+  update_ips.assert_minimal_v6
+}
+
 @test "ck8s update-ips blocks all without domain records" {
   run ck8s update-ips both apply
 
