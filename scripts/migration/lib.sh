@@ -265,16 +265,17 @@ check_version() {
     return
   fi
 
-  # TODO
-  # if $2 == prepare then
-  # config version should not yet have been touched
-  # elif $2 == apply then
-  # ensure config version == target version, set by init during prepare
-  #
-  # wasn't that already done somewhere?
-
-  # check that the config and the cluster agree on version
-  # does this even make sense? the config is changed on `init`
+  if [ "${2}" == "prepare" ]; then
+    echo TODO >/dev/null
+    # config version should not yet have been touched
+    # how to ensure this?
+  elif [ "${2}" == "apply" ]; then
+    # ensure config version == target version, set by init during prepare DONE? DONE?
+    if [ "${VERSION["${1}-config"]%.*}" != "${CK8S_TARGET_VERSION}" ]; then
+      log_fatal "version mismatch '${VERSION["${1}-config"]%.*}' != '${CK8S_TARGET_VERSION}'"
+      # TODO improve wording, remember to update tests
+    fi
+  fi
 
   # `--exit-status` can be used instead of comparing to "null"
   common_override=$(yq4 '.global.ck8sVersion' "${CK8S_CONFIG_PATH}/common-config.yaml")
