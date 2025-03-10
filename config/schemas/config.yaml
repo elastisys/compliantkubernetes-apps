@@ -5292,7 +5292,7 @@ properties:
             $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
       user:
         title: Fluentd Forwarder User
-        description: Configure Fluentd forwarder, used to collect and forward logs on worker nodes.
+        description: Configure Fluentd forwarder, used to collect and forward logs on worker nodes that applications developers run their workload on.
         type: object
         additionalProperties: false
         properties:
