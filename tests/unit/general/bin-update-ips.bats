@@ -96,7 +96,7 @@ _apply_normalise() {
 @test "ck8s update-ips performs minimal run dualStack" {
   update_ips.mock_minimal_v6
 
-  CK8S_IPV6_ENABLED=true run ck8s update-ips both apply
+  run ck8s update-ips both apply --ipv6
 
   update_ips.assert_minimal_v6
 }

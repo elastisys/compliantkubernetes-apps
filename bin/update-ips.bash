@@ -23,7 +23,7 @@ has_diff=0
 #TODO: To be changed when decision made on networkpolicies for azure storage
 storage_service=$(yq4 '.objectStorage.type' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
 
-CK8S_IPV6_ENABLED="${4}"
+CK8S_IPV6_ENABLED="${3:-"false"}"
 
 # Get the value of the config option or the provided default value if the
 # config option is unset.
@@ -143,7 +143,7 @@ get_tunnel_ips() {
   mapfile -t ips_calico_ipip < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4IPIPTunnelAddr}')
   mapfile -t ips_wireguard < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv4WireguardInterfaceAddr}')
 
-  if [ -n "${CK8S_IPV6_ENABLED+x}" ]; then
+  if [ "${CK8S_IPV6_ENABLED}" = "true" ]; then
     mapfile -t ips6_calico_vxlan < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv6VXLANTunnelAddr}')
     mapfile -t ips6_calico_ipip < <("${here}/ops.bash" kubectl "${cluster}" get node "${label_argument}" -o jsonpath='{.items[*].metadata.annotations.projectcalico\.org/IPv6IPIPTunnelAddr}')
   fi
@@ -192,7 +192,7 @@ get_dns_ips() {
   local -a ips4
   local -a ips6
   mapfile -t ips4 < <(dig A +short "${domain}" | grep '^[.0-9]*$')
-  if [ -n "${CK8S_IPV6_ENABLED+x}" ]; then
+  if [ "${CK8S_IPV6_ENABLED}" = "true" ]; then
     mapfile -t ips6 < <(dig AAAA +short "${domain}" | grep -E '^(\:\:)?[0-9a-fA-F]{1,4}(\:\:?[0-9a-fA-F]{1,4}){0,7}(\:\:)?$')
   fi
   local -a ips
