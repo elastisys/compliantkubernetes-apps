@@ -504,3 +504,8 @@ See <https://compliantkubernetes.io/operator-manual/>.
 - OpenSearch Dashboards Single Sign On (SSO) via OpenID/Dex requires LetsEncrypt Production.
 
 For more, please check the public GitHub issues: <https://github.com/elastisys/compliantkubernetes-apps/issues>.
+
+## 📜 Licensing Information
+
+All source files in this repository are licensed under the Apache License, Version 2.0 unless otherwise stated.
+See the [LICENSE](./LICENSE) file for full details.
