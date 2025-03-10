@@ -23,6 +23,8 @@ has_diff=0
 #TODO: To be changed when decision made on networkpolicies for azure storage
 storage_service=$(yq4 '.objectStorage.type' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
 
+CK8S_IPV6_ENABLED="${4}"
+
 # Get the value of the config option or the provided default value if the
 # config option is unset.
 #
@@ -153,6 +155,7 @@ get_tunnel_ips() {
     log_error "No IPs for ${cluster} nodes with label ${label} was found"
     exit 1
   fi
+
   echo "${ips[@]}"
 }
 
@@ -177,6 +180,7 @@ get_internal_ips() {
     log_error "No IPs for ${cluster} nodes with label ${label} was found"
     exit 1
   fi
+
   echo "${ips[@]}"
 }
 
@@ -198,6 +202,7 @@ get_dns_ips() {
     log_error "No IPs for ${domain} was found. Will block all IPs"
     echo "0.0.0.0"
   fi
+
   echo "${ips[@]}"
 }
 
@@ -324,7 +329,7 @@ process_ips_to_cidrs() {
 
   for ip in "${@}"; do
     for cidr in "${old_cidrs[@]}"; do
-      if [[ "${cidr}" != "" ]] && [[ "${cidr}" != "set-me" ]] && ! [[ "${cidr}" =~ .*/32 ]] && ! [[ "${cidr}" =~ .*/128 ]] && check_ip_in_cidr "${ip}" "${cidr}"; then
+      if [[ "${cidr}" != "" ]] && [[ "${cidr}" != "set-me" ]] && ! [[ "${cidr}" =~ [0-9.].*/32 ]] && ! [[ "${cidr}" =~ [0-9a-f:].*/128 ]] && check_ip_in_cidr "${ip}" "${cidr}"; then
         new_cidrs+=("${cidr}")
         continue 2
       fi
@@ -417,6 +422,7 @@ allow_domain() {
   local -a ips dns_ips
   dns_ips=$(get_dns_ips "${dns_record}")
   readarray -t ips <<<"$(echo "${dns_ips}" | tr ' ' '\n')"
+
   allow_ips "${config_file}" "${config_option}" "${ips[@]}"
 }
 
@@ -473,6 +479,7 @@ allow_nodes() {
   internal_ips=$(get_internal_ips "${cluster}" "${label}")
   tunnel_ips=$(get_tunnel_ips "${cluster}" "${label}")
   readarray -t ips <<<"$(echo "${internal_ips}" "${tunnel_ips}" | tr ' ' '\n')"
+
   allow_ips "${config_file}" "${config_option}" "${ips[@]}"
 }
 

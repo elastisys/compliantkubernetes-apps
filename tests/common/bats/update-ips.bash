@@ -210,20 +210,6 @@ update_ips.populate_minimal() {
   yq.set wc .networkPolicies.global.wcNodes.ips '["127.0.1.10/32", "127.0.1.11/32", "127.0.1.12/32", "127.0.1.111/32", "127.0.2.10/32", "127.0.2.11/32", "127.0.2.12/32", "127.0.2.111/32", "127.0.3.10/32", "127.0.3.11/32", "127.0.3.12/32", "127.0.3.111/32"]'
 }
 
-# update_ips.populate_minimal_v6() {
-#   yq.set common .networkPolicies.global.objectStorage.ips '["127.0.0.1/32"]'
-#   yq.set common .networkPolicies.global.objectStorage.ports '[1234]'
-
-#   yq.set common .networkPolicies.global.scIngress.ips '["127.0.0.2/32", "fd3e:fab4:5eda:b233::1/128"]'
-#   yq.set common .networkPolicies.global.wcIngress.ips '["127.0.0.3/32", "fd3e:fab4:5eda:b233::2/128"]'
-
-#   yq.set sc .networkPolicies.global.scApiserver.ips '["127.0.1.1/32", "127.0.1.2/32", "127.0.1.3/32", "127.0.1.21/32", "127.0.2.1/32", "127.0.2.2/32", "127.0.2.3/32", "127.0.2.21/32", "127.0.3.1/32", "127.0.3.2/32", "127.0.3.3/32", "127.0.3.21/32", "fd3e:fab4:5eda:b233::6/128", "fd3e:fab4:5eda:b233::7/128", "fd3e:fab4:5eda:b233::8/128", "fd3e:fab4:5eda:b233::9/128", "fd3e:fab4:5eda:b233::10/128", "fd3e:fab4:5eda:b233::11/128"]'
-#   yq.set sc .networkPolicies.global.scNodes.ips '["127.0.1.7/32", "127.0.1.8/32", "127.0.1.9/32", "127.0.1.81/32", "127.0.2.7/32", "127.0.2.8/32", "127.0.2.9/32", "127.0.2.81/32", "127.0.3.7/32", "127.0.3.8/32", "127.0.3.9/32", "127.0.3.81/32", "fd3e:fab4:5eda:b233::12/128", "fd3e:fab4:5eda:b233::13/128", "fd3e:fab4:5eda:b233::14/128", "fd3e:fab4:5eda:b233::15/128", "fd3e:fab4:5eda:b233::16/128", "fd3e:fab4:5eda:b233::17/128"]'
-
-#   yq.set wc .networkPolicies.global.wcApiserver.ips '["127.0.1.4/32", "127.0.1.5/32", "127.0.1.6/32", "127.0.1.51/32", "127.0.2.4/32", "127.0.2.5/32", "127.0.2.6/32", "127.0.2.51/32", "127.0.3.4/32", "127.0.3.5/32", "127.0.3.6/32", "127.0.3.51/32", "fd3e:fab4:5eda:b233::18/128", "fd3e:fab4:5eda:b233::19/128", "fd3e:fab4:5eda:b233::20/128", "fd3e:fab4:5eda:b233::21/128", "fd3e:fab4:5eda:b233::22/128", "fd3e:fab4:5eda:b233::23/128"]'
-#   yq.set wc .networkPolicies.global.wcNodes.ips '["127.0.1.10/32", "127.0.1.11/32", "127.0.1.12/32", "127.0.1.111/32", "127.0.2.10/32", "127.0.2.11/32", "127.0.2.12/32", "127.0.2.111/32", "127.0.3.10/32", "127.0.3.11/32", "127.0.3.12/32", "127.0.3.111/32", "fd3e:fab4:5eda:b233::24/128", "fd3e:fab4:5eda:b233::25/128", "fd3e:fab4:5eda:b233::26/128", "fd3e:fab4:5eda:b233::27/128", "fd3e:fab4:5eda:b233::28/128", "fd3e:fab4:5eda:b233::29/128"]'
-# }
-
 update_ips.populate_maximal() {
   update_ips.populate_minimal
 
