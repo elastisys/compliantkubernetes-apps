@@ -1,0 +1,132 @@
+cluster:
+  name: {{ .Values.opensearch.clusterName }}
+
+  general:
+    additionalConfig:
+        cluster.name: {{ .Values.opensearch.clusterName }}
+        cluster.max_shards_per_node: {{ .Values.opensearch.maxShardsPerNode | quote}}
+
+        network.host: 0.0.0.0
+
+        indices.query.bool.max_clause_count: {{ .Values.opensearch.maxClauseCount | quote }}
+
+        compatibility.override_main_response_version: "true"
+
+        {{- if .Values.opensearch.indexPerNamespace }}
+        action.auto_create_index: "-kubeaudit,-authlog,-other,+*"
+        {{- else }}
+        action.auto_create_index: ".opensearch*,.opendistro-*,security-auditlog-*"
+        {{- end }}
+
+        node.attr.box_type: hot
+
+        # Security plugin configuration
+        plugins: |
+          security:
+            ssl:
+              transport:
+                pemcert_filepath: transport/tls.crt
+                pemkey_filepath: transport/tls.key
+                pemtrustedcas_filepath: transport/ca.crt
+                enforce_hostname_verification: false
+              http:
+                enabled: true
+                pemcert_filepath: http/tls.crt
+                pemkey_filepath: http/tls.key
+                pemtrustedcas_filepath: http/ca.crt
+            allow_unsafe_democertificates: false
+            allow_default_init_securityindex: false
+            authcz:
+              admin_dn:
+                - "CN=admin.opensearch-system.cluster.local,O=compliantkubernetes"
+            audit:
+              type: log4j
+              config:
+                log4j:
+                  logger_name: audit
+                  level: INFO
+              # In example config, but not supported
+              # ignore_users:
+              #   - kibanaserver
+            enable_snapshot_restore_privilege: true
+            check_snapshot_restore_write_privileges: true
+            nodes_dn:
+              - "CN=nodes.opensearch-system.cluster.local,O=compliantkubernetes"
+            restapi:
+              roles_enabled:
+                - all_access
+                - configurer
+                - security_rest_api_access
+            system_indices:
+              enabled: true
+              indices:
+                [
+                  ".opendistro-alerting-config",
+                  ".opendistro-alerting-alert*",
+                  ".opendistro-anomaly-results*",
+                  ".opendistro-anomaly-detector*",
+                  ".opendistro-anomaly-checkpoints",
+                  ".opendistro-anomaly-detection-state",
+                  ".opendistro-reports-*",
+                  ".opendistro-notifications-*",
+                  ".opendistro-notebooks",
+                  ".opendistro-asynchronous-search-response*",
+                ]
+
+        {{ if .Values.opensearch.snapshot.enabled -}}
+        # Object storage configuration
+        {{ if eq .Values.objectStorage.type "s3" -}}
+        s3: |
+          client:
+            default:
+              endpoint: {{ .Values.objectStorage.s3.regionEndpoint }}
+              path_style_access: {{ .Values.objectStorage.s3.forcePathStyle }}
+              region: {{ .Values.objectStorage.s3.region }}
+        {{ else if eq .Values.objectStorage.type "gcs" -}}
+        # TODO: Add config for GCS if any.
+        {{ else if eq .Values.objectStorage.type "azure" -}}
+        azure: |
+          client:
+            default:
+              account: {{ .Values.objectStorage.azure.storageAccountName }}
+        {{- end }}
+        {{- end }}
+
+    {{- if .Values.opensearch.snapshot.enabled }}
+    keystore:
+      {{- if (eq .Values.objectStorage.type "s3") }}
+      - secret:
+          name: opensearch-s3-secret
+      {{- else if (eq .Values.objectStorage.type "gcs") }}
+      - secret:
+          name: opensearch-gcs-secret
+      {{- else if (eq .Values.objectStorage.type "azure") }}
+      - secret:
+          name: opensearch-azure-secret
+      {{- end }}
+    pluginsList:
+      {{- if .Values.opensearch.plugins.installExternalObjectStoragePlugin }}
+      {{- if (eq .Values.objectStorage.type "s3") }}
+      - repository-s3
+      {{- else if (eq .Values.objectStorage.type "gcs") }}
+      - repository-gcs
+      {{- else if (eq .Values.objectStorage.type "azure") }}
+      - repository-azure
+      {{- end }}
+      {{- end }}
+      {{- with .Values.opensearch.plugins.additionalPlugins }}
+      {{- toYaml . | nindent 4 }}
+      {{- end }}
+    {{- end}}
+    setVMMaxMapCount: true
+
+    podSecurityContext:
+      fsGroup: 1000
+
+    securityContext:
+      runAsNonRoot: true
+      runAsGroup: 1000
+      runAsUser: 1000
+      capabilities:
+        drop:
+          - ALL

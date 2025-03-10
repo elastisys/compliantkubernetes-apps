@@ -1,0 +1,49 @@
+---
+templates:
+  opensearch-op:
+    condition: ck8sManagementCluster.enabled
+    namespace: opensearch-system
+    labels:
+      app: opensearch-op
+
+  opensearch-podsecuritypolicy:
+    inherit:
+      - template: opensearch-op
+      - template: podsecuritypolicies
+    installed: {{ .Values | get "opensearch.enabled" false }}
+    labels:
+      psp: opensearch
+    values:
+      - values/podsecuritypolicies/service/opensearch.yaml.gotmpl
+
+  opensearch-secrets:
+    disableValidationOnInstall: true # creates cert-manager/certificates
+    inherit: [ template: opensearch-op ]
+    installed: {{ .Values | get "opensearch.enabled" false }}
+    chart: charts/opensearch/secrets
+    version: 0.1.0
+    name: opensearch-secrets
+    needs:
+      - cert-manager/cert-manager
+    values:
+      - values/opensearch/secrets.yaml.gotmpl
+
+  opensearch-cluster:
+    disableValidationOnInstall: true
+    inherit:
+      - template: opensearch-op
+      - template: opensearch-cluster-chart
+    installed: {{ .Values | get "opensearch.enabled" false }}
+    name: opensearch-cluster
+    needs:
+      {{- if .Values | get "opensearch.sso.enabled" false }}
+      - dex/dex
+      {{- end }}
+      - kube-system/service-cluster-np
+      - opensearch-system/opensearch-secrets
+      - opensearch-system/podsecuritypolicy
+    values:
+      - values/opensearch-op/cluster.yaml.gotmpl
+      - values/opensearch-op/dashboards.yaml.gotmpl
+      - values/opensearch-op/ingress.yaml.gotmpl
+    wait: true
