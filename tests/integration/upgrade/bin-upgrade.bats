@@ -58,6 +58,8 @@ teardown_file() {
   run ck8s upgrade sc "v0.42" apply
   assert_success
 
+  ck8s apply --dry-run
+
   run ck8s version sc
   assert_success
   assert_output --partial "v0.42"
@@ -122,7 +124,7 @@ teardown_file() {
   run ck8s upgrade sc "v0.42" prepare
   assert_success
 
-  run ck8s apply sc
+  run ck8s apply sc --dry-run
   assert_failure
   assert_output --partial "TODO what does it say here"
 }
@@ -136,7 +138,7 @@ teardown_file() {
   run ck8s upgrade sc "v0.42" prepare
   assert_success
 
-  run ck8s apply sc
+  run ck8s apply sc --dry-run
   assert_failure
   assert_output --partial "TODO what does it say here"
 }
@@ -146,7 +148,7 @@ teardown_file() {
   run yq -i '.global.ck8sVersion="v0.42.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
 
   gitversion.mock_static "v0.41.0"
-  run ck8s apply sc
+  run ck8s apply sc --dry-run
   assert_failure
   assert_output --partial "Version mismatch. Run migration to update config."
 }
