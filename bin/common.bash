@@ -648,3 +648,10 @@ with_s3cfg() {
 get_version() {
   "${here}/ops.bash" kubectl "${1}" get cm -n kube-system apps-meta -o jsonpath --template='{.data.version}'
 }
+
+
+migration_status() {
+  local repo_version
+  repo_version="$(version_get)"
+  "${here}/ops.bash" kubectl "${1}" get cm -n kube-system apps-upgrade >/dev/null
+}

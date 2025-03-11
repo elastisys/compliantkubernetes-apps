@@ -47,6 +47,9 @@ apps_apply() {
   log_info "---"
   log_info "Start Apps ${action} on ${2/_/ }"
 
+  validate_version
+  # TODO ensure not in the middle of migration
+
   if [ "${5:-}" == "--dry-run" ]; then
     log_info "---"
     log_info "Skipping apps ${action} because dry-run"
