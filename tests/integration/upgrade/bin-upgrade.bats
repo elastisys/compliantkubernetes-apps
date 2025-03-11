@@ -112,6 +112,7 @@ teardown_file() {
 }
 
 @test "no ck8s apply without ck8s upgrade" {
+  # test 3
   run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
 
   gitversion.mock_static "v0.42.0"
@@ -124,6 +125,7 @@ teardown_file() {
 }
 
 @test "prevent upgrade apply without upgrade prepare" {
+  # test 4
   run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
 
   gitversion.mock_static "v0.42.0"
@@ -133,6 +135,7 @@ teardown_file() {
 }
 
 @test "prevent apply using older config" {
+  # test 5
   run yq -i '.global.ck8sVersion="v0.42.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
 
   gitversion.mock_static "v0.41.0"
