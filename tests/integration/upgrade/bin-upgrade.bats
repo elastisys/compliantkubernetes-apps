@@ -14,6 +14,7 @@ setup_file() {
 
   local_cluster.setup dev test.dev-ck8s.com
   local_cluster.create single-node-cache
+  local_cluster.configure_selfsigned
   yq.set sc '.issuers.letsencrypt.prod.email' '"noreply@welkin.example"'
   yq.set sc '.issuers.letsencrypt.staging.email' '"noreply@welkin.example"'
 }
@@ -58,7 +59,7 @@ teardown_file() {
   run ck8s upgrade sc "v0.42" apply
   assert_success
 
-  ck8s apply --dry-run
+  ck8s apply sc --dry-run
 
   run ck8s version sc
   assert_success
