@@ -930,10 +930,16 @@ opa:
   rejectLocalStorageEmptyDir:
     enabled: false
     enforcement: warn
+
   ## Enable rule that warns about pods without a controller, which can prevent cluster autoscaler from evicting when scaling down
   rejectPodWithoutController:
     enabled: false
     enforcement: warn
+
+  ## Enable rule that denies PDBs and connected pod controllers if PDB does not allow for at least 1 pod disruption
+  restrictPodDisruptionBudgets:
+    enabled: true
+    enforcement: deny
 
 trivy:
   enabled: true
