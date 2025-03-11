@@ -2,6 +2,8 @@ apiVersion: modules.elastisys.com/v1alpha1
 kind: OpenSearch
 metadata:
   name: opensearch
+  labels:
+    logwrites.capabilities.elastisys.com: ""
 spec:
   clusterName: {{ .Values.clusterName }}
   {{ with .Values.config -}}

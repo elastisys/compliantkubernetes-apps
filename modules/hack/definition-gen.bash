@@ -5,6 +5,7 @@ set -euo pipefail
 here="$(dirname "$(readlink -f "$0")")"
 
 name="${1}"
+api="${2:-"modules"}"
 
 package_path="${here}/../${name}"
 definition_path="${package_path}/apis/definition.yaml"
@@ -32,6 +33,7 @@ plural="${kind,,}s"
 
 export kind
 export plural
+export api
 yq4 '(.. | select(tag == "!!str")) |= envsubst(nu)' "${here}/definition-base.yaml" >"${definition_path}"
 
 yq4 '.properties' "${package_path}/definition-gen.yaml" | yq4 --inplace '.spec.versions[0].schema.openAPIV3Schema.properties.spec.properties = load("/dev/stdin")' "${definition_path}"

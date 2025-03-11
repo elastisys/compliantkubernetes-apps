@@ -26,7 +26,6 @@ spec:
             - name: package-runtime
               args:
                 - --debug
-                - --sanitize-secrets
                 - --enable-watches
 ---
 apiVersion: rbac.authorization.k8s.io/v1

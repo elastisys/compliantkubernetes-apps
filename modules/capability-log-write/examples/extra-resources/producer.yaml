@@ -1,0 +1,8 @@
+apiVersion: modules.elastisys.com/v1alpha1
+kind: OpenSearch
+metadata:
+  uid: opensearch-module-uid
+  name: opensearch
+  labels:
+    logwrites.capabilities.elastisys.com: ""
+spec:
