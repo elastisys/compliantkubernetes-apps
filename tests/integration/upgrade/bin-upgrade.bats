@@ -40,7 +40,7 @@ teardown_file() {
 }
 
 @test "it works" {
-  # test 1
+  # test 1, the happy path where everyhing goes well
   run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
 
   run ck8s version config
