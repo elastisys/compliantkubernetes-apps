@@ -3676,6 +3676,32 @@ properties:
               deny: Deny actions violating the constraint.
               warn: Warn actions violating the constraint.
               dryrun: Dryrun actions violating the constraint.
+      restrictPodDisruptionBudgets:
+        title: Safeguard Restrict PodDisruptionBudget
+        description: |-
+          Configure constraint to reject PodDisruptionBudgets and connected Pod controllers if the PDB does not allow for at least 1 pod disruption.
+
+          > [!note]
+          > See [the dev docs](https://elastisys.io/welkin/user-guide/safeguards/enforce-restricted-pod-disruption-budgets/) for context.
+        type: object
+        additionalProperties: false
+        properties:
+          enabled:
+            title: Safeguard Restrict PodDisruptionBudget Enabled
+            type: boolean
+            default: true
+          enforcement:
+            title: Safeguard Restrict PodDisruptionBudget Enforcement
+            type: string
+            default: deny
+            enum:
+              - deny
+              - warn
+              - dryrun
+            meta:enum:
+              deny: Deny actions violating the constraint.
+              warn: Warn actions violating the constraint.
+              dryrun: Dryrun actions violating the constraint.
       networkPolicies:
         title: Safeguard Network Policies
         description: |-

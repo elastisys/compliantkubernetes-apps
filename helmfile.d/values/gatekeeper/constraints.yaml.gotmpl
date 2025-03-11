@@ -22,6 +22,9 @@ rejectLocalStorageEmptyDir:
 rejectPodWithoutController:
     enable: {{ .Values.opa.rejectPodWithoutController.enabled }}
     enforcementAction: {{ .Values.opa.rejectPodWithoutController.enforcement }}
+restrictPodDisruptionBudgets:
+    enable: {{ .Values.opa.restrictPodDisruptionBudgets.enabled }}
+    enforcementAction: {{ .Values.opa.restrictPodDisruptionBudgets.enforcement }}
 {{- if eq .Environment.Name "workload_cluster" }}
 allowUserCRDs:
     enable: {{ .Values.gatekeeper.allowUserCRDs.enabled }}

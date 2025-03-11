@@ -31,6 +31,9 @@ rejectLocalStorageEmptyDir:
 rejectPodWithoutController:
     enable: false
     enforcementAction: warn
+restrictPodDisruptionBudgets:
+    enable: true
+    enforcementAction: deny
 
 imageRegistryURL: registry.example.com
 
