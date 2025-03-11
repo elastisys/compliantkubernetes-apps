@@ -31,6 +31,7 @@ setup() {
   migration.override_path
   gitversion.setup_mocks
 
+  # TODO set version in config, reset in-cluster version cm
 }
 
 teardown_file() {
@@ -124,12 +125,16 @@ teardown_file() {
   assert_output --partial "TODO what does it say here"
 }
 
-@test "prevent upgrade apply without upgrade prepare" {
+@test "prevent apply after prepare" {
   # test 4
   run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
+  run ck8s ops kubectl sc delete -n kube-system configmap apps-version
 
   gitversion.mock_static "v0.42.0"
   run ck8s upgrade sc "v0.42" prepare
+  assert_success
+
+  run ck8s apply sc
   assert_failure
   assert_output --partial "TODO what does it say here"
 }
