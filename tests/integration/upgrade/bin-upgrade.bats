@@ -102,6 +102,7 @@ teardown_file() {
 @test "no upgrade apply without upgrade prepare" {
   # test 2
   run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
+  run ck8s ops kubectl sc delete -n kube-system configmap apps-version
 
   gitversion.mock_static "v0.42.0"
   run ck8s version config
@@ -115,6 +116,7 @@ teardown_file() {
 @test "no ck8s apply without ck8s upgrade" {
   # test 3
   run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
+  run ck8s ops kubectl sc delete -n kube-system configmap apps-version
 
   gitversion.mock_static "v0.42.0"
   run ck8s upgrade sc "v0.42" prepare
