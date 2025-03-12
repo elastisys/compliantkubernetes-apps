@@ -32,6 +32,7 @@ prometheus-node-exporter:
   resources: {{- toYaml .Values.prometheusNodeExporter.resources | nindent 4 }}
   prometheus:
     monitor:
+      scrapeTimeout: {{ .Values.prometheusNodeExporter.scrapeTimeout }}
       relabelings:
         - action: replace
           sourceLabels:
