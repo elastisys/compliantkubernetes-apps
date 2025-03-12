@@ -211,7 +211,6 @@ spec:
 {{- if .Values.defaultRules.additionalRuleLabels }}
 {{ toYaml .Values.defaultRules.additionalRuleLabels | indent 8 }}
 {{- end }}
-{{- end }}
     - alert: NodeMissingElastisysLabel
       annotations:
         description: "The node {{`{{`}} $labels.node {{`}}`}} in {{`{{`}} $labels.cluster {{`}}`}}  is missing the 'elastisys.io/node-group' label. This might affect capacity management."
@@ -223,4 +222,5 @@ spec:
         severity: warning
 {{- if $.Values.defaultRules.additionalRuleLabels }}
 {{ toYaml $.Values.defaultRules.additionalRuleLabels | indent 8 }}
+{{- end }}
 {{- end }}
