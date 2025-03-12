@@ -644,6 +644,6 @@ get_version() {
 
 migration_status() {
   local repo_version
-  repo_version="$(version_get)"
+  repo_version="$(version_get "${1}")"
   "${here}/ops.bash" kubectl "${1}" get cm -n kube-system apps-upgrade >/dev/null
 }
