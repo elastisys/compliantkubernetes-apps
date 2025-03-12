@@ -157,6 +157,7 @@ policies:
                 app.kubernetes.io/component: receive
           ports:
             - tcp: 10901
+            - tcp: 19391
       ingress:
         - rule: ingress-rule-blackbox
           ports:
@@ -184,6 +185,7 @@ policies:
                 app.kubernetes.io/component: receive-distributor
           ports:
             - tcp: 10901
+            - tcp: 19391
 
     thanos-ruler:
       podSelectorLabels:
