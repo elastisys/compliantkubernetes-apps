@@ -1,0 +1,13 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8srestrictpoddisruptionbudgets
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRestrictPodDisruptionBudgets
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ .Files.Get "policies/restrict-pod-disruption-budgets.rego"  | indent 8 }}
