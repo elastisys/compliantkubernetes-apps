@@ -15,8 +15,10 @@ setup_file() {
   local_cluster.setup dev test.dev-ck8s.com
   local_cluster.create single-node-cache
   local_cluster.configure_selfsigned
+
   yq.set sc '.issuers.letsencrypt.prod.email' '"noreply@welkin.example"'
   yq.set sc '.issuers.letsencrypt.staging.email' '"noreply@welkin.example"'
+  yq.set sc '.global.issuer' '"letsencrypt-staging"'
 }
 
 setup() {
@@ -32,11 +34,16 @@ setup() {
   migration.override_path
   gitversion.setup_mocks
 
-  # TODO set version in config, reset in-cluster version cm
+  # consistent state at start
+  ck8s ops kubectl sc delete -n kube-system configmap apps-version &>/dev/null || true
+  ck8s ops kubectl sc create -n kube-system configmap apps-version --from-literal "version=v0.41" &>/dev/null || true
+  run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
 }
 
 teardown() {
-  ck8s ops kubectl sc delete -n kube-system configmap apps-version || true
+  # reset
+  ck8s ops kubectl sc delete -n kube-system configmap apps-version &>/dev/null || true
+  ck8s ops kubectl sc delete -n kube-system configmap apps-upgrade &>/dev/null || true
 }
 
 teardown_file() {
@@ -47,14 +54,11 @@ teardown_file() {
 
 @test "it works" {
   # test 1, the happy path where everyhing goes well
-  run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
 
   run ck8s version config
   assert_success
   assert_output --partial "v0.41"
 
-  # TODO need a cluster running here
-  #
   gitversion.mock_static "v0.42.0"
   run ck8s upgrade sc "v0.42" prepare
   assert_success
@@ -141,7 +145,6 @@ teardown_file() {
 
 @test "no upgrade apply without upgrade prepare" {
   # test 2
-  run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
 
   gitversion.mock_static "v0.42.0"
   run ck8s version config
@@ -154,8 +157,6 @@ teardown_file() {
 
 @test "no ck8s apply without ck8s upgrade" {
   # test 3
-  run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
-  run ck8s ops kubectl sc delete -n kube-system configmap apps-version
 
   gitversion.mock_static "v0.42.0"
   run ck8s upgrade sc "v0.42" prepare
@@ -168,8 +169,6 @@ teardown_file() {
 
 @test "prevent apply after prepare" {
   # test 4
-  run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
-  run ck8s ops kubectl sc delete -n kube-system configmap apps-version
 
   gitversion.mock_static "v0.42.0"
   run ck8s upgrade sc "v0.42" prepare
@@ -182,7 +181,11 @@ teardown_file() {
 
 @test "prevent apply using older config" {
   # test 5
+  #
+  # pretend we already upgraded
   run yq -i '.global.ck8sVersion="v0.42.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
+  ck8s ops kubectl sc delete -n kube-system configmap apps-version &>/dev/null || true
+  ck8s ops kubectl sc create -n kube-system configmap apps-version --from-literal "version=v0.42" &>/dev/null || true
 
   gitversion.mock_static "v0.41.0"
   run ck8s apply sc --dry-run
