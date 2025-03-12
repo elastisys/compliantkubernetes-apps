@@ -20,20 +20,7 @@ skipped_wc=(
 run() {
   case "${1:-}" in
   execute)
-    local -a filters
-    local selector
-
-    if [[ "${CK8S_CLUSTER}" =~ ^(sc|both)$ ]]; then
-      filters=("${skipped[@]}" "${skipped_sc[@]}")
-      selector="${filters[*]:-"app!=null"}"
-      helmfile_upgrade sc "${selector// /,}"
-    fi
-
-    if [[ "${CK8S_CLUSTER}" =~ ^(wc|both)$ ]]; then
-      filters=("${skipped[@]}" "${skipped_wc[@]}")
-      selector="${filters[*]:-"app!=null"}"
-      helmfile_upgrade wc "${selector// /,}"
-    fi
+    log_warn "execute not implemented"
     ;;
 
   rollback)
