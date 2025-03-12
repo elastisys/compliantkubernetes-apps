@@ -9,9 +9,9 @@ externalDns:
   accessKey: {{ .Values.externalDns.awsRoute53.accessKey }}
   secretKey: {{ .Values.externalDns.awsRoute53.secretKey }}
 
-resources: {{ .Values.externalDns.resources }}
+resources: {{- toYaml .Values.externalDns.resources | nindent 2 }}
 tolerations: {{ .Values.externalDns.tolerations }}
-affinity: {{ .Values.externalDns.affinity }}
+affinity: {{- toYaml .Values.externalDns.affinity | nindent 2 }}
 topologySpreadConstraints: {{ .Values.externalDns.topologySpreadConstraints }}
 
 namespaced: {{ .Values.externalDns.namespaced | default false }}
