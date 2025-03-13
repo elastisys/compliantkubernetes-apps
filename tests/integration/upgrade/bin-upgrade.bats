@@ -1,6 +1,7 @@
 #!/usr/bin/env bats
 
 # bats file_tags=static,general,bin:upgrade
+# TODO move to ../general
 
 setup_file() {
   load "../../bats.lib.bash"
