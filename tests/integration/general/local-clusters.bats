@@ -2,25 +2,10 @@
 
 # bats file_tags=general,local-clusters
 
-setup_file() {
-  load "../../bats.lib.bash"
-  load_common "local-cluster.bash"
-
-  export CK8S_AUTO_APPROVE="true"
-
-  local_cluster.setup dev test.dev-ck8s.com
-  local_cluster.create sc single-node-cache
-}
-
 setup() {
   load "../../bats.lib.bash"
   load_assert
   load_detik
-}
-
-teardown_file() {
-  local_cluster.delete sc
-  local_cluster.teardown
 }
 
 helm_status() {
