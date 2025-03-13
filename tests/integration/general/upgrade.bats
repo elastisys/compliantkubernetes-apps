@@ -4,6 +4,8 @@
 # TODO move to ../general
 
 setup_file() {
+  load "../../bats.lib.bash"
+  load_common "local-cluster.bash"
   local_cluster.configure_selfsigned
 
   yq.set sc '.issuers.letsencrypt.prod.email' '"noreply@welkin.example"'
