@@ -42,7 +42,7 @@ teardown() {
   env.teardown
 }
 
-@test "it works" {
+@test "upgrading works" {
   # test 1, the happy path where everyhing goes well
 
   run ck8s version config
@@ -57,12 +57,8 @@ teardown() {
   run ck8s upgrade sc "v0.42" apply
   assert_success
 
-  # FIXME
-  # Error: unable to build kubernetes objects from release manifest: resource mapping not found for name: "cert-manager"
-  # namespace: "cert-manager" from "": no matches for kind "ServiceMonitor" in version "monitoring.coreos.com/v1" ensure
-  # CRDs are installed first
-  #
-  # ck8s apply sc --dry-run
+  run ck8s apply sc --dry-run
+  assert_success
 
   run ck8s version sc
   assert_success
