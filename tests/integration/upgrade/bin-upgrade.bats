@@ -16,6 +16,7 @@ setup_file() {
   yq.set sc '.issuers.letsencrypt.prod.email' '"noreply@welkin.example"'
   yq.set sc '.issuers.letsencrypt.staging.email' '"noreply@welkin.example"'
   yq.set sc '.global.issuer' '"letsencrypt-staging"'
+  run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
 }
 
 setup() {
@@ -28,19 +29,22 @@ setup() {
   load_file
   load_mock
 
+  env.private
+
   migration.override_path
   gitversion.setup_mocks
 
   # consistent state at start
   ck8s ops kubectl sc delete -n kube-system configmap apps-version &>/dev/null || true
   ck8s ops kubectl sc create -n kube-system configmap apps-version --from-literal "version=v0.41" &>/dev/null || true
-  run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
 }
 
 teardown() {
   # reset
   ck8s ops kubectl sc delete -n kube-system configmap apps-version &>/dev/null || true
   ck8s ops kubectl sc delete -n kube-system configmap apps-upgrade &>/dev/null || true
+
+  env.teardown
 }
 
 teardown_file() {
