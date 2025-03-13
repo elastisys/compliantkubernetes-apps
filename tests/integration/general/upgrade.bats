@@ -4,14 +4,6 @@
 # TODO move to ../general
 
 setup_file() {
-  load "../../bats.lib.bash"
-  load_common "env.bash"
-  load_common "local-cluster.bash"
-
-  export CK8S_AUTO_APPROVE="true"
-
-  local_cluster.setup dev test.dev-ck8s.com
-  local_cluster.create single-node-cache
   local_cluster.configure_selfsigned
 
   yq.set sc '.issuers.letsencrypt.prod.email' '"noreply@welkin.example"'
@@ -46,11 +38,6 @@ teardown() {
   ck8s ops kubectl sc delete -n kube-system configmap apps-upgrade &>/dev/null || true
 
   env.teardown
-}
-
-teardown_file() {
-  local_cluster.delete
-  local_cluster.teardown
 }
 
 @test "it works" {
