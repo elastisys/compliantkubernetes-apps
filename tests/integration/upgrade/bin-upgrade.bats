@@ -165,11 +165,12 @@ teardown_file() {
 
   run ck8s apply sc --dry-run
   assert_failure
-  assert_output --partial "TODO what does it say here"
+  assert_output --partial "Migration ongoing"
 }
 
 @test "prevent apply after prepare" {
   # test 4
+  # XXX Why is this the same as test 3?
 
   gitversion.mock_static "v0.42.0"
   run ck8s upgrade sc "v0.42" prepare
@@ -177,7 +178,7 @@ teardown_file() {
 
   run ck8s apply sc --dry-run
   assert_failure
-  assert_output --partial "TODO what does it say here"
+  assert_output --partial "Migration ongoing"
 }
 
 @test "prevent apply using older config" {
