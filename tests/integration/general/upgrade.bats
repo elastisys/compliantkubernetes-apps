@@ -152,6 +152,8 @@ teardown() {
   run ck8s upgrade sc "v0.42" prepare
   assert_success
 
+  # Oops, forgot to ck8s upgrade apply
+
   run ck8s apply sc --dry-run
   assert_failure
   assert_output --partial "Migration ongoing"
