@@ -449,7 +449,9 @@ check_prepared_version() {
 record_migration_prepare_done() {
   local apps_config_timestamp
   apps_config_timestamp="$(date +uIs)"
-  yq4 -i "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" .global.ck8sLastChange "\"${apps_config_timestamp}\""
+
+  ts="${apps_config_timestamp}" \
+    yq4 -i '.global.ck8sLastChange=strenv(ts)' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
 
   # This ConfigMap should only exist while doing an upgrade.
   # Abort if it already exists
