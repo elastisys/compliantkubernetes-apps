@@ -47,6 +47,17 @@ apps_apply() {
   log_info "---"
   log_info "Start Apps ${action} on ${2/_/ }"
 
+  validate_version "${1}"
+  if migration_status "${1}" &>/dev/null; then
+    log_fatal "Migration ongoing, try again when it has completed or 'ck8s upgrade unlock'"
+  fi
+
+  if [ "${5:-}" == "--dry-run" ]; then
+    log_info "---"
+    log_info "Skipping apps ${action} because dry-run"
+    exit
+  fi
+
   if (with_kubeconfig "${config["kube_config_$1"]}" helmfile -f "${here}/../helmfile.d/state.yaml" -e "$2" "${action}" "${concurrency}" "${suppress:-}"); then
     log_info "---"
     log_info "Successful Apps ${action} on ${2/_/ }!"
