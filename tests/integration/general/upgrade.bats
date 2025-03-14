@@ -142,7 +142,21 @@ teardown() {
 }
 
 @test "prevent apply using unmerged config" {
-  # TODO how to test attempted concurrent
-  # store marker/timestamp in config and cluster on prepare, assert equality on apply?
-  false
+  # test 5
+
+  gitversion.mock_static "v0.42.0"
+  run ck8s version config
+  assert_success
+  assert_output --partial "v0.41"
+
+  run ck8s upgrade sc "v0.42" prepare
+  assert_success
+
+  # someone changes the config
+  run yq -i '.global.ck8sLastChange="something"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
+
+  run ck8s upgrade sc "v0.42" apply
+  assert_failure
+  assert_output --partial "Config timestamp mismatch"
+
 }
