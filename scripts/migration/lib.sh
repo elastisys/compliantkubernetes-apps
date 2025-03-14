@@ -446,6 +446,12 @@ check_prepared_version() {
   fi
 }
 
+# Usage: record_migration_prepare_done sc|wc
+record_migration_prepare_done() {
+  # TODO record a timestamp in the config and also in the cluster
+  false
+}
+
 # Usage: record_migration_apply_begin sc|wc
 record_migration_apply_begin() {
   # This ConfigMap should only exist while doing an upgrade.
