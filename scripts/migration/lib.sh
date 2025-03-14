@@ -272,8 +272,7 @@ check_version() {
   elif [ "${2}" == "apply" ]; then
     # ensure config version == target version, set by init during prepare DONE? DONE?
     if [ "${VERSION["${1}-config"]%.*}" != "${CK8S_TARGET_VERSION}" ]; then
-      log_fatal "version mismatch '${VERSION["${1}-config"]%.*}' != '${CK8S_TARGET_VERSION}'"
-      # TODO improve wording, remember to update tests
+      log_fatal "Apps version mismatch, '${VERSION["${1}-config"]%.*}' in config but upgrading to '${CK8S_TARGET_VERSION}'"
     fi
   fi
 

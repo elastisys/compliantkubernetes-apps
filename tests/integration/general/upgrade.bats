@@ -109,7 +109,7 @@ teardown() {
   assert_output --partial "v0.41"
   run ck8s upgrade sc "v0.42" apply
   assert_failure # because trying to apply 0.42 when config says 0.41
-  assert_output --partial "version mismatch"
+  assert_output --partial "Apps version mismatch"
 }
 
 @test "no ck8s apply without ck8s upgrade" {
