@@ -99,34 +99,6 @@ teardown() {
 #   ck8s apply ?
 #
 # any other combo must throw error
-#
-# need a cluster for the apply steps, how much can be static?
-# may want to have a separate migration directory for tests
-#
-#
-#       +----------------------+
-#       |      ck8s init       |
-#       +----------------------+
-#         |
-#         |
-#         v
-#       +----------------------+
-#  +--- |                      |
-#  |    |      ck8s apply      |
-#  +--> |                      | <+
-#       +----------------------+  |
-#         |                       |
-#         |                       |
-#         v                       |
-#       +----------------------+  |
-#       | ck8s upgrade prepare |  |
-#       +----------------------+  |
-#         |                       |
-#         |                       |
-#         v                       |
-#       +----------------------+  |
-#       |  ck8s upgrade apply  | -+
-#       +----------------------+
 
 @test "no upgrade apply without upgrade prepare" {
   # test 2
