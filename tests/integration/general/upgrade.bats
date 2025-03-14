@@ -154,31 +154,23 @@ teardown() {
   assert_output --partial "Migration ongoing"
 }
 
-@test "prevent apply after prepare" {
-  # test 4
-  # XXX Why is this the same as test 3?
-
-  gitversion.mock_static "v0.42.0"
-  run ck8s upgrade sc "v0.42" prepare
-  assert_success
-
-  run ck8s apply sc --dry-run
-  assert_failure
-  assert_output --partial "Migration ongoing"
-}
-
 @test "prevent apply using older config" {
-  # test 5
+  # test 4
   #
   # pretend we already upgraded
   run yq -i '.global.ck8sVersion="v0.42.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
   ck8s ops kubectl sc delete -n kube-system configmap apps-version &>/dev/null || true
   ck8s ops kubectl sc create -n kube-system configmap apps-version --from-literal "version=v0.42" &>/dev/null || true
 
+  # downgrade
   gitversion.mock_static "v0.41.0"
   run ck8s apply sc --dry-run
   assert_failure
   assert_output --partial "Version mismatch. Run migration to update config."
 }
 
-# TODO how to test attempted concurrent
+@test "prevent apply using unmerged config" {
+  # TODO how to test attempted concurrent
+  # store marker/timestamp in config and cluster on prepare, assert equality on apply?
+  false
+}
