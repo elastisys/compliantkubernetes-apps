@@ -448,21 +448,41 @@ check_prepared_version() {
 
 # Usage: record_migration_prepare_done sc|wc
 record_migration_prepare_done() {
-  # TODO record a timestamp in the config and also in the cluster
-  false
-}
+  local apps_config_timestamp
+  apps_config_timestamp="$(date +uIs)"
+  yq4 -i "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" .global.ck8sLastChange "\"${apps_config_timestamp}\""
 
-# Usage: record_migration_apply_begin sc|wc
-record_migration_apply_begin() {
   # This ConfigMap should only exist while doing an upgrade.
   # Abort if it already exists
   if kubectl_do "${1}" create configmap --dry-run=client -o yaml \
-    -n kube-system apps-upgrade --from-literal "version=${CK8S_TARGET_VERSION}" |
+    -n kube-system apps-upgrade \
+    --from-literal "version=${CK8S_TARGET_VERSION}" \
+    --from-literal "timestamp=${apps_config_timestamp}" |
     yq4 '.metadata.labels["app.kubernetes.io/managed-by"] = "apps-upgrade"' - |
     kubectl_do "${1}" create -f - >/dev/null; then
     return 0
   else
     log_fatal "prepare already started in ${1} ('ck8s upgrade-unlock ${1}' to try again)"
+  fi
+}
+
+ensure_migration_prepared() {
+  local apps_upgrade
+  local apps_version
+  local apps_cluster_timestamp
+  local apps_config_timestamp
+
+  apps_upgrade="$(kubectl_do "${1}" get -n kube-system cm apps-upgrade -o yaml)"
+  apps_version="$(yq4 '.data.version' <<<"${apps_upgrade}")"
+
+  if ! yq4 --exit-status 'select(.data.version == strenv(CK8S_TARGET_VERSION))' <<<"${apps_upgrade}" >/dev/null; then
+    log_fatal "version mismatch, upgrading to ${CK8S_TARGET_VERSION} but cluster ${1} was prepared for ${apps_version}"
+  fi
+
+  apps_config_timestamp="$(yq4 '.data.timestamp' <<<"${apps_upgrade}")"
+  apps_cluster_timestamp="$(yq4 '.global.ck8sLastChange' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")"
+  if [[ "${apps_config_timestamp}" != "${apps_cluster_timestamp}" ]]; then
+    log_fatal "Config timestamp mismatch, ${apps_cluster_timestamp} in ${1} but ${apps_config_timestamp} in config"
   fi
 }
 

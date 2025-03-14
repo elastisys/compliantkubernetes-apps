@@ -66,6 +66,13 @@ prepare() {
     fi
   done
 
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
+    record_migration_prepare_done sc
+  fi
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
+    record_migration_prepare_done wc
+  fi
+
   config_validate secrets
   if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
     config_validate sc
@@ -94,12 +101,11 @@ apply() {
 
   snippets_check apply "${snippets}"
 
-  # Create a configmap. This fails if done twice.
   if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
-    record_migration_apply_begin sc
+    ensure_migration_prepared sc
   fi
   if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
-    record_migration_apply_begin wc
+    ensure_migration_prepared wc
   fi
 
   for snippet in ${snippets}; do
