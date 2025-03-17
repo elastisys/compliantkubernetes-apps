@@ -33,3 +33,12 @@ cluster:
 
     opensearchCredentialsSecret:
       secret: opensearch-dashboards-user
+
+    podSecurityContext:
+      fsGroup: 1000
+      runAsNonRoot: true
+    securityContext:
+      capabilities:
+        drop:
+        - ALL
+      privileged: false

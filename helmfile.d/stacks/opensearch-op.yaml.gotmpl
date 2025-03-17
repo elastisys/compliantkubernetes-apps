@@ -26,7 +26,19 @@ templates:
     needs:
       - cert-manager/cert-manager
     values:
-      - values/opensearch/secrets.yaml.gotmpl
+      - values/opensearch-op/secrets.yaml.gotmpl
+
+  opensearch-operator:
+    disableValidationOnInstall: true
+    inherit:
+      - template: opensearch-op
+      - template: opensearch-operator-chart
+    installed: {{ .Values | get "opensearch.enabled" false }}
+    name: opensearch-operator
+    needs:
+      - cert-manager/cert-manager
+      - opensearch-system/podsecuritypolicy
+    wait: true
 
   opensearch-cluster:
     disableValidationOnInstall: true
@@ -39,11 +51,14 @@ templates:
       {{- if .Values | get "opensearch.sso.enabled" false }}
       - dex/dex
       {{- end }}
-      - kube-system/service-cluster-np
+      # - kube-system/service-cluster-np
       - opensearch-system/opensearch-secrets
       - opensearch-system/podsecuritypolicy
+      - opensearch-operator
     values:
       - values/opensearch-op/cluster.yaml.gotmpl
       - values/opensearch-op/dashboards.yaml.gotmpl
       - values/opensearch-op/ingress.yaml.gotmpl
+      - values/opensearch-op/roles.yaml.gotmpl
+      - values/opensearch-op/users.yaml.gotmpl
     wait: true

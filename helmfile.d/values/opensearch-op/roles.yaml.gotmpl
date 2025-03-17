@@ -1,0 +1,70 @@
+roles:
+    - name: log-forwarder
+      clusterPermissions:
+      - "cluster:monitor/main"
+      - "indices:data/write/bulk"
+      indexPermissions:
+      {{- if .Values.opensearch.indexPerNamespace }}
+      - indexPatterns:
+        # Only allow indices not starting with ".", except ".orphaned-"
+        - '/^[^.].*/'
+        - ".orphaned-*"
+        allowedActions:
+        - "indices:admin/create"
+        - "index"
+      {{- else }}
+      - indexPatterns:
+        - "kubernetes-*"
+        - "kubeaudit-*"
+        - "other-*"
+        - "authlog-*"
+        allowedActions:
+        - "index"
+      {{- end }}
+    - name: kubernetes-log-reader
+      indexPermissions:
+      - indexPatterns:
+        {{- if .Values.opensearch.indexPerNamespace }}
+        - '/^(?!kube-system|gatekeeper-system|other|authlog|\.).*/'
+        {{- else }}
+        - "kubernetes-*"
+        - "kubeaudit-*"
+        {{- end }}
+        allowedActions:
+        - "read"
+    # This role should be modified by removing the "read" as that can be
+    # given by the "kubernetes-log-reader" role.
+    - name: backup-exporter
+      clusterPermissions:
+      - "cluster:monitor/state"
+      - "cluster:monitor/health"
+      indexPermissions:
+      - indexPatterns:
+        - "*"
+        allowedActions:
+        - "monitor"
+      - indexPatterns:
+        {{- if .Values.opensearch.indexPerNamespace }}
+        - '/^(?!kube-system|gatekeeper-system|other|authlog|\.).*/'
+        {{- else }}
+        - "kubernetes-*"
+        - "kubeaudit-*"
+        {{- end }}
+        allowedActions:
+        - "read"
+    - name: metrics-exporter
+      clusterPermissions:
+      - "cluster_monitor"
+      - "cluster:admin/repository/get"
+      - "cluster:admin/snapshot/get"
+      - "cluster:admin/snapshot/status"
+      indexPermissions:
+      - indexPatterns:
+        - "*"
+        allowedActions:
+        - "indices_monitor"
+        - "indices:admin/mappings/get"
+        - "indices:admin/aliases/get"
+    {{- with .Values.opensearch.extraRoles }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}

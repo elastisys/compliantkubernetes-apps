@@ -121,12 +121,9 @@ cluster:
     setVMMaxMapCount: true
 
     podSecurityContext:
-      fsGroup: 1000
-
-    securityContext:
-      runAsNonRoot: true
-      runAsGroup: 1000
       runAsUser: 1000
-      capabilities:
-        drop:
-          - ALL
+      runAsGroup: 1000
+      runAsNonRoot: true
+    securityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
