@@ -14,3 +14,6 @@ node-feature-discovery:
     tolerations: {{- toYaml .Values.gpu.nodeFeatureDiscovery.controlPlane.tolerations | nindent 6 }}
     affinity: {{- toYaml .Values.gpu.nodeFeatureDiscovery.controlPlane.affinity | nindent 6 }}
 daemonsets: {{- toYaml .Values.gpu.daemonsets | nindent 2 }}
+driver:
+  version: {{ .Values.gpu.driver.version }}
+  env: {{- toYaml .Values.gpu.driver.env | nindent 4 }}
