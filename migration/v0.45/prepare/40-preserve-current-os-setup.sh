@@ -8,5 +8,5 @@ source "${ROOT}/scripts/migration/lib.sh"
 
 if [[ "${CK8S_CLUSTER}" =~ ^(sc|both)$ ]]; then
   log_info "Moving current Opensearch configuration to override config"
-  yq_add sc .opensearch "$(yq_dig sc .opensearch | yq4 -o json)"
+  yq_add sc .opensearch "$(yq4 ".opensearch" <(yq_merge "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml" "${CK8S_CONFIG_PATH}/sc-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" | yq4 -o json))"
 fi
