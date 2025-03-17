@@ -155,3 +155,6 @@ dcgmExporter:
 # Handle CRD ourselves in accordance with ADR-0046
 operator:
   upgradeCRD: false
+driver:
+  version: {{ .Values.gpu.driver.version }}
+  env: {{- toYaml .Values.gpu.driver.env | nindent 4 }}
