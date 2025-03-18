@@ -421,8 +421,8 @@ harbor:
     schedule: "0 0 0 * * SUN"
   alerts:
     # Alert if values are above the below threshold
-    maxTotalStorageUsedGB: 500
-    maxTotalArtifacts: 1000
+    maxTotalStorageUsedGB: 1500
+    maxTotalArtifacts: 3000
 
 grafanaLabelEnforcer:
   resources:
