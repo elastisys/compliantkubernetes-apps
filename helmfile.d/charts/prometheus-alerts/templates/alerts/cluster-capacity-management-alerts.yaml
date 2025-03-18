@@ -137,4 +137,13 @@ spec:
       for: 5m
       labels:
         severity: warning
+    - alert: NodeMissingElastisysNodeGroupLabel
+      annotations:
+        description: "The node {{`{{`}} $labels.node {{`}}`}} in {{`{{`}} $labels.cluster {{`}}`}}  is missing the 'elastisys.io/node-group' label. This might affect capacity management monitoring."
+        summary: "Node {{`{{`}} $labels.node {{`}}`}} in {{`{{`}} $labels.cluster {{`}}`}} is missing the  'elastisys.io/node-group' label."
+      expr: |
+        kube_node_labels{label_elastisys_io_node_group=""}
+      for: 60m
+      labels:
+        severity: warning
 {{- end }}
