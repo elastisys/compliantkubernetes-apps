@@ -82,7 +82,7 @@ spec:
       labels:
         severity: medium
       annotations:
-        description: Total used storage for Harbor is high (above the threshold of {{ .Values.harbor.alerts.maxTotalStorageUsedGB }}GB). This indicates that users have not set up artifact retention. If the total size of artifacts continues to grow, then Harbor will likely consume more resources and slow down. This might also cause issues with object storage quota at the cloud provider.
+        description: Total used storage for Harbor is high (above the threshold of {{ .Values.harbor.alerts.maxTotalStorageUsedGB }}GB). This indicates that users have not set up artifact retention. If the total size of artifacts continues to grow, then Harbor will likely consume more resources and slow down. This might also cause issues with object storage quota at the infrastructure provider.
         runbook_url: {{ .Values.runbookUrls.harbor.HarborStorageUsageAboveThreshold }}
     - alert: HarborP99LatencyHigherThan10Seconds
       expr: |
