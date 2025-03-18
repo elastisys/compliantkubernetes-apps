@@ -260,7 +260,10 @@ check_version() {
     log_fatal "error: \"CK8S_TARGET_VERSION\" is unset"
   fi
 
-  if [ "${VERSION["${1}-config"]}" = "any" ]; then
+  if [[ "${CK8S_TARGET_VERSION}" == "main" ]]; then
+    log_warn "skipping version validation of ${1}-config for upgrade to \"${CK8S_TARGET_VERSION}\""
+    return
+  elif [ "${VERSION["${1}-config"]}" = "any" ]; then
     log_warn "skipping version validation of ${1}-config for version \"${VERSION["${1}-config"]}\""
     return
   fi
