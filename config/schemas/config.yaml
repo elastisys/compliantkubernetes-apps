@@ -1859,13 +1859,13 @@ properties:
             title: Alert For Max Total Artifacts
             description: |-
               Alert when the total number of artifacts is above the set number.
-            default: 1000
+            default: 3000
             type: number
           maxTotalStorageUsedGB:
             title: Alert For Max Total Storage Used (GB)
             description: |-
               Alert when the total storage usage is above the set number.
-            default: 500
+            default: 1500
             type: number
         type: object
       backup:

@@ -112,6 +112,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
+1. The harbor size alerts have changed default values. This will remove overrides to those values if the configured values are lower than the new defaults:
+
+    ```bash
+    ./migration/v0.46/prepare/10-harbor-alerts.sh
+    ```
+
 1. Preserve current Opensearch setup
 
     > [!WARNING]
