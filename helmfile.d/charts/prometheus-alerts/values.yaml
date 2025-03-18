@@ -163,8 +163,8 @@ harbor:
   redis:
     type: internal
   alerts:
-    maxTotalStorageUsedGB: 500
-    maxTotalArtifacts: 1000
+    maxTotalStorageUsedGB: 1500
+    maxTotalArtifacts: 3000
 
 runbookUrls:
   alertmanager: {}

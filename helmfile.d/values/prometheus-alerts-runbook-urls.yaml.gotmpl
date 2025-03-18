@@ -100,10 +100,10 @@ runbookUrls:
     {{- dict "name" "HarborRedisDown" "config" .harbor | include "tpl.missing-runbook" }}
     {{- dict "name" "HarborTrivyDown" "config" .harbor | include "tpl.missing-runbook" }}
     {{- dict "name" "HarborJobServiceDown" "config" .harbor | include "tpl.missing-runbook" }}
-    {{- dict "name" "HarborStorageUsageAboveLimit" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborStorageUsageAboveThreshold" "config" .harbor | include "tpl.missing-runbook" }}
     {{- dict "name" "HarborP99LatencyHigherThan10Seconds" "config" .harbor | include "tpl.missing-runbook" }}
     {{- dict "name" "HarborErrorRateHigh" "config" .harbor | include "tpl.missing-runbook" }}
-    {{- dict "name" "HarborTotalNumberOfArtifactsAboveLimit" "config" .harbor | include "tpl.missing-runbook" }}
+    {{- dict "name" "HarborTotalNumberOfArtifactsAboveThreshold" "config" .harbor | include "tpl.missing-runbook" }}
   hnc:
     {{- dict "name" "HierarchicalNamespaceControllerNamespaceCondition" "config" .hnc | include "tpl.missing-runbook" }}
   kubeStateMetrics:

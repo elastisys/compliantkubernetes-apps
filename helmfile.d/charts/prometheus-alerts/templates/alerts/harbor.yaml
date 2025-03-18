@@ -75,15 +75,15 @@ spec:
       annotations:
         description: Harbor JobService Is Down
         runbook_url: {{ .Values.runbookUrls.harbor.HarborJobServiceDown }}
-    - alert: HarborStorageUsageAboveLimit
+    - alert: HarborStorageUsageAboveThreshold
       expr: |
         sum(harbor_project_quota_usage_byte) / (1024^3) > {{ .Values.harbor.alerts.maxTotalStorageUsedGB }}
       for: 5m
       labels:
         severity: medium
       annotations:
-        description: Total used storage for Harbor is above the limit of {{ .Values.harbor.alerts.maxTotalStorageUsedGB }}GB
-        runbook_url: {{ .Values.runbookUrls.harbor.HarborStorageUsageAboveLimit }}
+        description: Total used storage for Harbor is high (above the threshold of {{ .Values.harbor.alerts.maxTotalStorageUsedGB }}GB). This indicates that users have not set up artifact retention. If the total size of artifacts continues to grow, then Harbor will likely consume more resources and slow down. This might also cause issues with object storage quota at the infrastructure provider.
+        runbook_url: {{ .Values.runbookUrls.harbor.HarborStorageUsageAboveThreshold }}
     - alert: HarborP99LatencyHigherThan10Seconds
       expr: |
         histogram_quantile(0.99,  sum  (rate(registry_http_request_duration_seconds_bucket[30m]) ) by (le)) > 10
@@ -102,13 +102,13 @@ spec:
       annotations:
         description: Harbor Error Rate is High
         runbook_url: {{ .Values.runbookUrls.harbor.HarborErrorRateHigh }}
-    - alert: HarborTotalNumberOfArtifactsAboveLimit
+    - alert: HarborTotalNumberOfArtifactsAboveThreshold
       expr: |
         sum(harbor_project_artifact_total) > {{ .Values.harbor.alerts.maxTotalArtifacts }}
       for: 5m
       labels:
         severity: low
       annotations:
-        description: Total number of artifacts is above the limit of {{ .Values.harbor.alerts.maxTotalArtifacts }}
-        runbook_url: {{ .Values.runbookUrls.harbor.HarborTotalNumberOfArtifactsAboveLimit }}
+        description: Total number of artifacts is high (above alert threshold of {{ .Values.harbor.alerts.maxTotalArtifacts }}). This indicates that users have not set up artifact retention. If the number of artifacts continues to grow, then Harbor will likely consume more resources and slow down.
+        runbook_url: {{ .Values.runbookUrls.harbor.HarborTotalNumberOfArtifactsAboveThreshold }}
 {{- end }}
