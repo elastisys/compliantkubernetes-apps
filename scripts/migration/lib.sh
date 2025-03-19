@@ -455,13 +455,14 @@ record_migration_prepare_done() {
 
   # This ConfigMap should only exist while doing an upgrade.
   # Abort if it already exists
-  log_info "Locking cluster for upgrade"
+  log_info "Locking cluster ${1} for upgrade"
   if kubectl_do "${1}" create configmap --dry-run=client -o yaml \
     -n kube-system apps-upgrade \
     --from-literal "version=${CK8S_TARGET_VERSION}" \
     --from-literal "timestamp=${apps_config_timestamp}" |
     yq4 '.metadata.labels["app.kubernetes.io/managed-by"] = "apps-upgrade"' - |
     kubectl_do "${1}" create -f - ; then
+    log_info "Cluster ${1} locked for upgrade"
     return 0
   else
     log_warn "prepare already started in ${1} ('ck8s upgrade-unlock ${1}' to try again)"
