@@ -455,12 +455,13 @@ record_migration_prepare_done() {
 
   # This ConfigMap should only exist while doing an upgrade.
   # Abort if it already exists
+  log_info "Locking cluster for upgrade"
   if kubectl_do "${1}" create configmap --dry-run=client -o yaml \
     -n kube-system apps-upgrade \
     --from-literal "version=${CK8S_TARGET_VERSION}" \
     --from-literal "timestamp=${apps_config_timestamp}" |
     yq4 '.metadata.labels["app.kubernetes.io/managed-by"] = "apps-upgrade"' - |
-    kubectl_do "${1}" create -f - >/dev/null; then
+    kubectl_do "${1}" create -f - ; then
     return 0
   else
     log_fatal "prepare already started in ${1} ('ck8s upgrade-unlock ${1}' to try again)"
@@ -498,6 +499,7 @@ record_migration_apply_step() {
     )"
   fi
   apps_upgrade="$(last_step="${2##*/}" yq4 -e '.data.last_apply_step = strenv(last_step)' <<<"${apps_upgrade}")"
+  log_info "Recording upgrade checkpoint"
   if ! kubectl_do "${1}" replace -f - <<<"${apps_upgrade}" >/dev/null; then
     log_fatal "could not record completed migration step in ${1}"
   fi
@@ -506,6 +508,7 @@ record_migration_apply_step() {
 # Usage: record_migration_done sc|wc
 record_migration_done() {
   # Record the upgraded-to version. Create if it does not already exist.
+  log_info "Recording new apps version in cluster"
   if ! kubectl_do "${1}" patch -n kube-system cm apps-meta --type=merge -p "$(yq4 --null-input --output-format json '.data.version = strenv(CK8S_TARGET_VERSION)')"; then
     if ! kubectl_do "${1}" create configmap -n kube-system apps-meta --from-literal "version=${CK8S_TARGET_VERSION}"; then
       log_fatal "could not record new apps version in ${1}"
