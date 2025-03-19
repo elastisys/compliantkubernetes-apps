@@ -134,19 +134,25 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
-2. Update gatekeeper CRDs:
+1. Upgrade trivy-operator
+
+    ```bash
+    ./migration/v0.45/apply/10-trivy-operator.sh execute
+
+1. Update gatekeeper CRDs:
 
     ```bash
     ./migration/v0.45/apply/20-gatekeeper-crds.sh execute
     ```
 
-3. If you didn't have gpu-operator installed previously, but had `gpu-operator` namespace created, label the namespace:
+1. If you didn't have gpu-operator installed previously, but had `gpu-operator` namespace created, label the namespace:
+
    ```bash
    # only for `gpu-operator` installation
    ./migration/v0.45/apply/40-migrate-gpu-operator-ns.sh execute
    ```
 
-4. Upgrade applications:
+1. Upgrade applications:
 
     ```bash
     ./bin/ck8s apply {sc|wc}

@@ -4,6 +4,8 @@
 
 Here you can find the most relevant features and changes for the last couple of releases of Welkin
 
+- Upgrade trivy-operator to v0.26.0 and application to v0.24.0. **[v0.45]**
+- Upgraded cert-manager chart to v1.17.1. **[v0.45]**
 - Upgraded Thanos chart to v15.13.1. **[v0.45]**
 - Added NVIDIA GPU driver support for Ubuntu 24.04. **[v0.45]**
 - Added NVIDIA GPU operator to Welkin. **[v0.44]**
