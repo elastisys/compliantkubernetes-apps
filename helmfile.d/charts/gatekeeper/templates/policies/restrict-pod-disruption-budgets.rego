@@ -115,19 +115,26 @@ not_valid_pdb_max_unavailable(pdb) {
 
 # Check one podDisruptionBudget and pod(controller), returns true if it does not match
 mismatched_selector(pdb, obj) = res {
-    r1 := match_labels(pdb, obj)
-    r2 := match_expressions_exists(pdb, obj)
-    r3 := match_expressions_does_not_exist(pdb, obj)
-    r4 := any(match_expressions_in(pdb, obj))
-    r5 := any(match_expressions_not_in(pdb, obj))
+    r1 := matchLabelsMissingKeys(pdb, obj)
+    r2 := any(matchLabelsValues(pdb, obj))
+    r3 := match_expressions_exists(pdb, obj)
+    r4 := match_expressions_does_not_exist(pdb, obj)
+    r5 := any(match_expressions_in(pdb, obj))
+    r6 := any(match_expressions_not_in(pdb, obj))
     # Return true if any part of the podDisruptionBudget and pod(controller) does not match
-    res := any({r1, r2, r3, r4, r5})
+    res := any({r1, r2, r3, r4, r5, r6})
 }
 
-match_labels(pdb, obj) = res {
-    pdb_match_labels := { [label, value] | some label; value := pdb.spec.selector.matchLabels[label] }
-    obj_match_labels := { [label, value] | some label; value := obj.spec.selector.matchLabels[label] }
-    res := count(pdb_match_labels - obj_match_labels) != 0
+matchLabelsMissingKeys(pdb, obj) = res {
+    res3 := {key | pdb.spec.selector.matchLabels[key]}
+    res4 := {key | get_labels(obj)[key]}
+    res := count(res3 - res4) != 0
+}
+
+matchLabelsValues(pdb, obj) = res {
+    res := [x |
+        get_labels(obj)[key1] != pdb.spec.selector.matchLabels[key3];
+        x := key1 == key3]
 }
 
 match_expressions_exists(pdb, obj) = res {
