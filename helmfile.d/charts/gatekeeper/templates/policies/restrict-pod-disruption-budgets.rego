@@ -2,7 +2,7 @@ package k8srestrictpoddisruptionbudgets
 
 # Reject PDB if maxUnavailable does not allow at least 1 pod disruption
 violation[{"msg": msg}] {
-    input.review.kind.kind == "PodDisruptionBudget"
+    input.review.object.kind == "PodDisruptionBudget"
     pdb := input.review.object
 
     pdb.spec.maxUnavailable
@@ -17,11 +17,12 @@ violation[{"msg": msg}] {
 
 # Reject PDB if minAvailable does not allow at least 1 pod disruption
 violation[{"msg": msg}] {
-    input.review.kind.kind == "PodDisruptionBudget"
+    input.review.object.kind == "PodDisruptionBudget"
     pdb := input.review.object
 
     pdb.spec.minAvailable
 
+	# TODO add support for replicationcontroller group "v1" and restrict to just the four kinds
     objs := [controllers | controllers := data.inventory.namespace[pdb.metadata.namespace]["apps/v1"][_]]
     obj := objs[_][_]
 
@@ -30,7 +31,6 @@ violation[{"msg": msg}] {
     not_valid_pdb_min_available(obj, pdb)
     not replica_set_under_deployment(obj)
 
-    keys := [key | data.inventory.namespace[pdb.metadata.namespace]["apps/v1"][key]]
     msg := sprintf(
     "PodDisruptionBudget rejected: %v <%v> has %v replica(s) but PodDisruptionBudget <%v> has minAvailable of %v, minAvailable should always be lower than replica(s), and not used when replica(s) is set to 1.",
     [obj.kind, obj.metadata.name, obj.spec.replicas, pdb.metadata.name, pdb.spec.minAvailable],
@@ -39,7 +39,7 @@ violation[{"msg": msg}] {
 
 # Reject pod controller if connected PDBs maxUnavailable does not allow at least 1 pod disruption
 violation[{"msg": msg}] {
-    input.review.kind.kind == podControllerKinds[_]
+    input.review.object.kind == podControllerKinds[_]
     obj := input.review.object
     not replica_set_under_deployment(obj)
 
@@ -58,7 +58,7 @@ violation[{"msg": msg}] {
 
 # Reject pod controller if connected PDBs minAvailable does not allow at least 1 pod disruption
 violation[{"msg": msg}] {
-    input.review.kind.kind == podControllerKinds[_]
+    input.review.object.kind == podControllerKinds[_]
     obj := input.review.object
     not replica_set_under_deployment(obj)
 
