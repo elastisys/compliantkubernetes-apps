@@ -165,6 +165,9 @@ EOF
   run ck8s upgrade sc "v0.42" prepare
   assert_success
 
+  run ck8s ops kubectl sc get -n kube-system configmap apps-upgrade
+  assert_success
+
   # someone changes the config
   run yq -i '.global.ck8sLastChange="something"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
 
