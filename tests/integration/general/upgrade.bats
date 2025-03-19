@@ -29,7 +29,7 @@ setup() {
 
   # consistent state at start
   run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
-  ck8s ops kubectl sc delete -n kube-system configmap apps-upgrade || true
+  ck8s ops kubectl sc delete -n kube-system configmap apps-upgrade --wait || true
   ck8s ops kubectl sc apply -f - <<EOF
 apiVersion: v1
 data:
