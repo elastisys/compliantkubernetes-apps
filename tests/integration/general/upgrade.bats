@@ -124,6 +124,7 @@ teardown() {
   gitversion.mock_static "v0.42.0"
   run ck8s upgrade sc "v0.42" prepare
   assert_success
+  assert_output --partial "locked for upgrade"
 
   run ck8s ops kubectl sc get -n kube-system configmap apps-upgrade -o jsonpath --template='{.data.version}'
   assert_success
