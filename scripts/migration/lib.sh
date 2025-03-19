@@ -430,7 +430,7 @@ unlock_migration() {
 
 # Get currently prepared version
 get_prepared_version() {
-  kubectl_do "${1}" get cm -n kube-system apps-upgrade -o jsonpath --template="{.data.prepared}"
+  kubectl_do "${1}" get cm -n kube-system apps-upgrade -o jsonpath --template="{.data.version}"
 }
 
 check_prepared_version() {
