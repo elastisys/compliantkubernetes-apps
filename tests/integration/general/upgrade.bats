@@ -30,9 +30,15 @@ setup() {
 
   # consistent state at start
   ck8s ops kubectl sc delete -n kube-system configmap apps-upgrade || true
-  ck8s ops kubectl sc delete -n kube-system configmap apps-version || true
-
-  ck8s ops kubectl sc create -n kube-system configmap apps-version --from-literal "version=v0.41"
+  ck8s ops kubectl sc apply -f - <<EOF
+apiVersion: v1
+data:
+  version: v0.41
+kind: ConfigMap
+metadata:
+  name: apps-meta
+  namespace: kube-system
+EOF
 }
 
 teardown() {
@@ -131,8 +137,15 @@ teardown() {
   #
   # pretend we already upgraded
   run yq -i '.global.ck8sVersion="v0.42.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
-  ck8s ops kubectl sc delete -n kube-system configmap apps-version &>/dev/null || true
-  ck8s ops kubectl sc create -n kube-system configmap apps-version --from-literal "version=v0.42" &>/dev/null || true
+  ck8s ops kubectl sc apply -f - <<EOF
+apiVersion: v1
+data:
+  version: v0.41
+kind: ConfigMap
+metadata:
+  name: apps-meta
+  namespace: kube-system
+EOF
 
   # downgrade
   gitversion.mock_static "v0.41.0"
