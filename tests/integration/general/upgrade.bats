@@ -29,14 +29,14 @@ setup() {
   gitversion.setup_mocks
 
   # consistent state at start
+  ck8s ops kubectl sc delete -n kube-system configmap apps-upgrade || true
   ck8s ops kubectl sc delete -n kube-system configmap apps-version || true
+
   ck8s ops kubectl sc create -n kube-system configmap apps-version --from-literal "version=v0.41"
 }
 
 teardown() {
   # reset
-  ck8s ops kubectl sc delete -n kube-system configmap apps-version &>/dev/null || true
-  ck8s ops kubectl sc delete -n kube-system configmap apps-upgrade &>/dev/null || true
 
   env.teardown
 }
