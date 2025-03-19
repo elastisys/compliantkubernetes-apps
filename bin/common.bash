@@ -642,6 +642,6 @@ get_version() {
 }
 
 
-migration_status() {
+get_migration_status() {
   "${here}/ops.bash" kubectl "${1}" get -n kube-system configmap apps-upgrade
 }
