@@ -48,7 +48,7 @@ apps_apply() {
   log_info "Start Apps ${action} on ${2/_/ }"
 
   validate_version "${1}"
-  if migration_status "${1}" &>/dev/null; then
+  if get_migration_status "${1}" &>/dev/null; then
     log_fatal "Migration ongoing, try again when it has completed or 'ck8s upgrade unlock'"
   fi
 
