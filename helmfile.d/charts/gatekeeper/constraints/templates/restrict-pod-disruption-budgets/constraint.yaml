@@ -8,13 +8,9 @@ spec:
   match:
     kinds:
       - apiGroups: [""]
-        kinds: ["Pod", "ReplicationController"]
+        kinds: ["ReplicationController"]
       - apiGroups: ["apps"]
-        kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
-      - apiGroups: ["extensions"]
-        kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
-      - apiGroups: ["batch"]
-        kinds: ["Job", "CronJob"]
+        kinds: ["Deployment", "StatefulSet", "ReplicaSet"]
       - apiGroups: ["policy"]
         kinds: ["PodDisruptionBudget"]
     excludedNamespaces: ["kube-system", "kube-public", "kube-node-lease", "calico-system"]
