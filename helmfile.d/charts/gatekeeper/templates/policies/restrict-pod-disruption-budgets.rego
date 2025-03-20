@@ -22,8 +22,8 @@ violation[{"msg": msg}] {
 
     pdb.spec.minAvailable
 
-	# TODO add support for replicationcontroller group "v1" and restrict to just the four kinds
-    objs := [controllers | controllers := data.inventory.namespace[pdb.metadata.namespace]["apps/v1"][_]]
+    pod_controller_group_kind := pod_controller_groups_kinds[_]
+    objs := [controllers | controllers := data.inventory.namespace[pdb.metadata.namespace][pod_controller_group_kind.group][pod_controller_group_kind.kind]]
     obj := objs[_][_]
 
     not mismatched_selector(pdb, obj)
@@ -39,7 +39,7 @@ violation[{"msg": msg}] {
 
 # Reject pod controller if connected PDBs maxUnavailable does not allow at least 1 pod disruption
 violation[{"msg": msg}] {
-    input.review.object.kind == podControllerKinds[_]
+    input.review.object.kind == pod_controller_groups_kinds[_].kind
     obj := input.review.object
     not replica_set_under_deployment(obj)
 
@@ -58,7 +58,7 @@ violation[{"msg": msg}] {
 
 # Reject pod controller if connected PDBs minAvailable does not allow at least 1 pod disruption
 violation[{"msg": msg}] {
-    input.review.object.kind == podControllerKinds[_]
+    input.review.object.kind == pod_controller_groups_kinds[_].kind
     obj := input.review.object
     not replica_set_under_deployment(obj)
 
@@ -76,11 +76,11 @@ violation[{"msg": msg}] {
 }
 
 # The type of pod controller to validate
-podControllerKinds := [
-    "Deployment",
-    "StatefulSet",
-    "ReplicaSet",
-    "ReplicationController"
+pod_controller_groups_kinds := [
+    {"group": "apps/v1", "kind": "Deployment"},
+    {"group": "apps/v1", "kind": "StatefulSet"},
+    {"group": "apps/v1", "kind": "ReplicaSet"},
+    {"group": "v1", "kind": "ReplicationController"}
 ]
 
 # Do not reject replicasets that are controlled by deployment, instead reject the deploymentd
