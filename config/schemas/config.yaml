@@ -6293,9 +6293,6 @@ properties:
             title: OpenSearch Snapshot Repository
             type: string
             default: opensearch-snapshots
-          ageSeconds:
-            default: 864000
-            type: number
           min:
             title: OpenSearch Minimum Retained Snapshots
             type: number
@@ -6304,9 +6301,6 @@ properties:
             title: OpenSearch Maximum Retained Snapshots
             default: 14
             type: number
-          maxRequestSeconds:
-            type: number
-            default: 1200
           backupSchedule:
             title: OpenSearch Snapshot Backup Schedule
             description: |-
@@ -6321,16 +6315,6 @@ properties:
               Uses the Cron format, see https://en.wikipedia.org/wiki/Cron.
             default: '0 0 * * *'
             $ref: '#/$defs/cronSchedule'
-          retentionStartingDeadlineSeconds:
-            title: OpenSearch Retention Job Starting Deadline
-            type: number
-            default: 600
-          retentionActiveDeadlineSeconds:
-            title: OpenSearch Retention Job Active Deadline
-            type: number
-            default: 2700
-          retentionResources:
-            $ref: '#/$defs/kubernetesResourceRequirements'
           retentionAge:
             title: OpenSearch Maximum Snapshot Age
             type: string
@@ -8436,8 +8420,6 @@ properties:
           dashboards:
             $ref: '#/$defs/containerImage'
           configurerJob:
-            $ref: '#/$defs/containerImage'
-          slmCronjob:
             $ref: '#/$defs/containerImage'
           curatorCronjob:
             $ref: '#/$defs/containerImage'
