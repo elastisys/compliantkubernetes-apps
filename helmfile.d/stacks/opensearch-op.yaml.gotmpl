@@ -1,0 +1,93 @@
+---
+templates:
+  opensearch-op:
+    condition: ck8sManagementCluster.enabled
+    namespace: opensearch-system
+    labels:
+      app: opensearch-op
+
+  opensearch-podsecuritypolicy:
+    inherit:
+      - template: opensearch-op
+      - template: podsecuritypolicies
+    installed: {{ .Values | get "opensearch.enabled" false }}
+    labels:
+      psp: opensearch
+    values:
+      - values/podsecuritypolicies/service/opensearch.yaml.gotmpl
+
+  opensearch-secrets:
+    disableValidationOnInstall: true # creates cert-manager/certificates
+    inherit: [ template: opensearch-op ]
+    installed: {{ .Values | get "opensearch.enabled" false }}
+    chart: charts/opensearch/secrets
+    version: 0.1.0
+    name: opensearch-secrets
+    needs:
+      - cert-manager/cert-manager
+    values:
+      - values/opensearch-op/secrets.yaml.gotmpl
+      - values/opensearch-op/security.yaml.gotmpl
+
+  opensearch-operator:
+    disableValidationOnInstall: true
+    inherit:
+      - template: opensearch-op
+      - template: opensearch-operator-chart
+    installed: {{ .Values | get "opensearch.enabled" false }}
+    name: opensearch-operator
+    needs:
+      - cert-manager/cert-manager
+      - opensearch-system/podsecuritypolicy
+    wait: true
+
+  opensearch-configurer:
+    inherit: [ template: opensearch-op ]
+    installed: {{ .Values | get "opensearch.enabled" false }}
+    chart: charts/opensearch/configurer
+    version: 0.1.0
+    name: opensearch-configurer
+    needs:
+      - opensearch-cluster
+    values:
+      - values/opensearch/configurer.yaml.gotmpl
+
+
+  opensearch-cluster:
+    disableValidationOnInstall: true
+    inherit:
+      - template: opensearch-op
+      - template: opensearch-cluster-chart
+    installed: {{ .Values | get "opensearch.enabled" false }}
+    name: opensearch-cluster
+    needs:
+      {{- if .Values | get "opensearch.sso.enabled" false }}
+      - dex/dex
+      {{- end }}
+      # - kube-system/service-cluster-np
+      - opensearch-system/opensearch-secrets
+      - opensearch-system/podsecuritypolicy
+      - opensearch-operator
+    values:
+      - values/opensearch-op/cluster.yaml.gotmpl
+      - values/opensearch-op/dashboards.yaml.gotmpl
+      - values/opensearch-op/ingress.yaml.gotmpl
+      - values/opensearch-op/roles.yaml.gotmpl
+      - values/opensearch-op/users.yaml.gotmpl
+      - values/opensearch-op/userrolesbindings.yaml.gotmpl
+      - values/opensearch-op/indextemplates.yaml.gotmpl
+      - values/opensearch-op/ismpolicies.yaml.gotmpl
+    wait: true
+
+  opensearch-exporter:
+    disableValidationOnInstall: true # creates prometheus-operator/servicemonitors
+    inherit:
+      - template: opensearch-op
+      - template: prometheus-elasticsearch-exporter-chart
+    installed: {{ .Values | get "opensearch.enabled" false }}
+    name: prometheus-opensearch-exporter
+    needs:
+      - monitoring/kube-prometheus-stack
+      - opensearch-system/opensearch-configurer
+    values:
+      - values/prometheus-opensearch-exporter.yaml.gotmpl

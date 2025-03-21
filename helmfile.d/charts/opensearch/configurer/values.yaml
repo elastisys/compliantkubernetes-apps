@@ -15,8 +15,8 @@ securityConfig: {}
 
 opensearch:
   userSecret: opensearch-configurer-user
-  clusterEndpoint: opensearch-cluster-master:9200
-  dashboardsEndpoint: opensearch-dashboards:5601
+  clusterEndpoint: opensearch-cluster-masters:9200
+  dashboardsEndpoint: opensearch-cluster-dashboards:5601
 
 activeDeadlineSeconds: 600
 backoffLimit: 10

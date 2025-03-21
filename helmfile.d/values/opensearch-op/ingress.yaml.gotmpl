@@ -1,0 +1,45 @@
+cluster:
+  ingress:
+    opensearch:
+      {{- if not .Values.opensearch.clientNode.dedicatedPods }}
+      enabled: true
+      ClassName: nginx
+      annotations:
+        nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+        cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
+        nginx.ingress.kubernetes.io/proxy-body-size: {{ .Values.opensearch.ingress.maxbodysize }}
+        {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.opensearch }}
+        nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.opensearch }}
+        {{ end }}
+
+      hosts:
+        - host: {{ .Values.opensearch.subdomain }}.{{ .Values.global.opsDomain }}
+          paths:
+           - path: /
+             pathType: ImplementationSpecific
+      tls:
+        - secretName: opensearch-ingress-cert
+          hosts:
+            - {{ .Values.opensearch.subdomain }}.{{ .Values.global.opsDomain }}
+      {{- end }}
+
+    dashboards:
+      enabled: true
+      ClassName: nginx
+      annotations:
+        nginx.ingress.kubernetes.io/backend-protocol: HTTP
+        cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
+        nginx.ingress.kubernetes.io/proxy-body-size: {{ .Values.opensearch.ingress.maxbodysize }}
+        {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.opensearchDashboards }}
+        nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.opensearchDashboards }}
+        {{ end }}
+      # Due to template structure, variables need to be set to empty or "" to satisfy skeleton requirements
+      hosts:
+        - host: {{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+      tls:
+        - secretName: opensearch-dashboards-ingress-cert
+          hosts:
+            - {{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}

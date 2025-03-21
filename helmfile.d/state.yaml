@@ -22,7 +22,7 @@ bases:
   - stacks/monitoring-grafana.yaml.gotmpl
   - stacks/monitoring-prometheus.yaml.gotmpl
   - stacks/namespaces.yaml.gotmpl
-  - stacks/opensearch.yaml.gotmpl
+  - stacks/opensearch-op.yaml.gotmpl
   - stacks/rbac.yaml.gotmpl
   - stacks/rclone.yaml.gotmpl
   - stacks/system.yaml.gotmpl
@@ -157,14 +157,9 @@ releases:
 
   - inherit: [ template: opensearch-podsecuritypolicy ]
   - inherit: [ template: opensearch-secrets ]
-  - inherit: [ template: opensearch-master ]
-  - inherit: [ template: opensearch-client ]
-  - inherit: [ template: opensearch-data ]
-  - inherit: [ template: opensearch-dashboards ]
-  - inherit: [ template: opensearch-securityadmin ]
+  - inherit: [ template: opensearch-cluster ]
+  - inherit: [ template: opensearch-operator ]
   - inherit: [ template: opensearch-configurer ]
-  - inherit: [ template: opensearch-slm ]
-  - inherit: [ template: opensearch-curator ]
   - inherit: [ template: opensearch-exporter ]
 
   - inherit: [ template: tekton-pipelines-networkpolicy ]
