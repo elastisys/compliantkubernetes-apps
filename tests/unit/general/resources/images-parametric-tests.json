@@ -283,12 +283,6 @@
       "template_file": "sc/opensearch-configurer/templates/job.yaml"
     },
     {
-      "image_property": "opensearch.slmCronjob",
-      "helmfile_selector": "app=opensearch",
-      "container_name": "run",
-      "template_file": "sc/opensearch-slm/templates/cronjob.yaml"
-    },
-    {
       "image_property": "opensearch.curatorCronjob",
       "helmfile_selector": "app=opensearch",
       "container_name": "opensearch-curator",

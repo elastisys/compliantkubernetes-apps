@@ -115,6 +115,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.48/prepare/10-move-calico-config.sh
     ```
 
+1. Remove OpenSearch SLM config, as it has been replaced by SM Policy:
+
+    ```bash
+    ./migration/v0.48/prepare/20-opensearch-slm.sh
+    ```
+
 1. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.
@@ -136,9 +142,18 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
 1. Set whether or not upgrade should be applied for `both` clusters or for one of `sc` or `wc`:
 
-   ```bash
-   export CK8S_CLUSTER=<wc|sc|both>
-   ```
+    ```bash
+    export CK8S_CLUSTER=<wc|sc|both>
+    ```
+
+1. Remove OpenSearch SLM as it has been replaced by SM Policy:
+
+    ```bash
+    ./migration/v0.48/apply/10-opensearch-slm.sh execute
+    ```
+
+    > **Note:**
+    > Snapshots that are _not_ created by the SM policy will no longer be automatically be removed, and will require manual cleanup once their retention period is up.
 
 1. Upgrade applications:
 

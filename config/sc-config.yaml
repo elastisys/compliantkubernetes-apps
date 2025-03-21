@@ -987,19 +987,6 @@ opensearch:
     backupSchedule: 0 */2 * * *
     retentionSchedule: 0 0 * * *
 
-    # Needed while migration to Snapshot Management Policy
-    ageSeconds: 864000
-    maxRequestSeconds: 1200
-    retentionStartingDeadlineSeconds: 600
-    retentionActiveDeadlineSeconds: 2700
-    retentionResources:
-      requests:
-        cpu: 50m
-        memory: 32Mi
-      limits:
-        cpu: 100m
-        memory: 128Mi
-
   exporter:
     serviceMonitor:
       interval: 30s
