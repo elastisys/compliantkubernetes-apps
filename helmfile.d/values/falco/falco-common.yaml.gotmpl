@@ -136,11 +136,17 @@ customRules:
     # This will be added in a later falco rules version as well
     # The fix was added upstream here (with a new condition): https://github.com/falcosecurity/rules/pull/177
     - macro: allowed_clear_log_files
-      condition: (
-        proc.name=containerd and (
-          fd.name startswith "/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/" or
-          fd.name startswith "/var/lib/containerd/tmpmounts/"
-        ))
+      condition: or (
+          proc.name = containerd and (
+            fd.name startswith "/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/" or
+            fd.name startswith "/var/lib/containerd/tmpmounts/"
+          )
+        ) or (
+          proc.name = nvidia-installe and
+          fd.name startswith "/var/log/nvidia-installer.log"
+        )
+      override:
+        condition: append
 
     # Adding a repository to this list will add an exception to the rules:
     # Run shell untrusted
@@ -207,12 +213,32 @@ customRules:
       condition: ( container.image.repository in (trusted_image_repositories) )
 
     {{- if and .Values.calicoAccountant.enabled (eq .Values.calicoAccountant.backend "nftables") }}
-
     # Drop and execute new binary in container
     - list: known_drop_and_execute_containers
       items:
         - ghcr.io/elastisys/calico-accountant
+      override:
+        items: append
     {{- end }}
+
+    {{- if .Values.gpu.enabled }}
+    # Drop and execute new binary in container
+    - list: known_drop_and_execute_containers
+      items:
+        - nvcr.io/nvidia/cloud-native/gpu-operator-validator
+        - nvcr.io/nvidia/driver
+        - nvcr.io/nvidia/k8s/dcgm-exporter
+      override:
+        items: append
+
+    # Linux Kernel Module Injection Detected
+    - list: allowed_container_images_loading_kernel_module
+      items:
+        - nvcr.io/nvidia/driver
+      override:
+        items: append
+    {{- end }}
+
     {{- end }}
 
     {{- if .Values.falco.rulesFiles.incubating.enabled }}
