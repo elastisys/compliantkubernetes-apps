@@ -464,14 +464,14 @@ test_bad_replicaset_under_deployment_minAvailable_int {
 # --- Test different selectors ---
 
 test_matching_match_labels {
-	namespace := "default"
+    namespace := "default"
     selector := {"matchLabels": {"key": "val"}}
     labels := {"key": "val"}
 
     count(k8srestrictpoddisruptionbudgets.violation) == 1
         with input as input_wrap(generate_pod_controller(
             "Deployment",
-			3,
+            3,
             namespace,
             labels
         ))
@@ -484,14 +484,14 @@ test_matching_match_labels {
 }
 
 test_matching_match_labels {
-	namespace := "default"
+    namespace := "default"
     selector := {"matchLabels": {"key": "val", "key2": "val2"}}
     labels := {"key": "val", "key2": "val2"}
 
     count(k8srestrictpoddisruptionbudgets.violation) == 1
         with input as input_wrap(generate_pod_controller(
             "Deployment",
-			3,
+            3,
             namespace,
             labels
         ))
@@ -504,14 +504,14 @@ test_matching_match_labels {
 }
 
 test_mismatching_match_labels_wrong_key {
-	namespace := "default"
+    namespace := "default"
     selector := {"matchLabels": {"key": "val", "wrong_key": "val2"}}
     labels := {"key": "val", "key2": "val2"}
 
     count(k8srestrictpoddisruptionbudgets.violation) == 0
         with input as input_wrap(generate_pod_controller(
             "Deployment",
-			3,
+            3,
             namespace,
             labels
         ))
@@ -524,14 +524,14 @@ test_mismatching_match_labels_wrong_key {
 }
 
 test_mismatching_match_labels_wrong_val {
-	namespace := "default"
+    namespace := "default"
     selector := {"matchLabels": {"key": "val", "key2": "wrong_val"}}
     labels := {"key": "val", "key2": "val2"}
 
     count(k8srestrictpoddisruptionbudgets.violation) == 0
         with input as input_wrap(generate_pod_controller(
             "Deployment",
-			3,
+            3,
             namespace,
             labels
         ))
@@ -544,14 +544,14 @@ test_mismatching_match_labels_wrong_val {
 }
 
 test_matching_match_expression_exists {
-	namespace := "default"
+    namespace := "default"
     selector := {"matchExpression": [{"key": "key", "operator": "Exists"}]}
     labels := {"key": "val", "key2": "val2"}
 
     count(k8srestrictpoddisruptionbudgets.violation) == 1
         with input as input_wrap(generate_pod_controller(
             "Deployment",
-			3,
+            3,
             namespace,
             labels
         ))
@@ -564,14 +564,14 @@ test_matching_match_expression_exists {
 }
 
 test_mismatching_match_expression_exists {
-	namespace := "default"
+    namespace := "default"
     selector := {"matchExpressions": [{"key": "wrong_key", "operator": "Exists"}]}
     labels := {"key": "val", "key2": "val2"}
 
     count(k8srestrictpoddisruptionbudgets.violation) == 0
         with input as input_wrap(generate_pod_controller(
             "Deployment",
-			3,
+            3,
             namespace,
             labels
         ))
@@ -584,14 +584,14 @@ test_mismatching_match_expression_exists {
 }
 
 test_matching_match_expression_does_not_exist {
-	namespace := "default"
+    namespace := "default"
     selector := {"matchExpression": [{"key": "other_key", "operator": "DoesNotExist"}]}
     labels := {"key": "val", "key2": "val2"}
 
     count(k8srestrictpoddisruptionbudgets.violation) == 1
         with input as input_wrap(generate_pod_controller(
             "Deployment",
-			3,
+            3,
             namespace,
             labels
         ))
@@ -604,14 +604,14 @@ test_matching_match_expression_does_not_exist {
 }
 
 test_mismatching_match_expression_does_not_exist {
-	namespace := "default"
+    namespace := "default"
     selector := {"matchExpressions": [{"key": "key", "operator": "DoesNotExist"}]}
     labels := {"key": "val", "key2": "val2"}
 
     count(k8srestrictpoddisruptionbudgets.violation) == 0
         with input as input_wrap(generate_pod_controller(
             "Deployment",
-			3,
+            3,
             namespace,
             labels
         ))
@@ -624,13 +624,13 @@ test_mismatching_match_expression_does_not_exist {
 }
 
 test_matching_match_expression_in {
-	namespace := "default"
+    namespace := "default"
     selector := {"matchExpressions": [{"key": "key", "operator": "In", "values": ["val"]}]}
     labels := {"key": "val", "key2": "val2"}
     count(k8srestrictpoddisruptionbudgets.violation) == 1
         with input as input_wrap(generate_pod_controller(
             "Deployment",
-			3,
+            3,
             namespace,
             labels
         ))
@@ -643,14 +643,14 @@ test_matching_match_expression_in {
 }
 
 test_mismatching_match_expression_in_wrong_key {
-	namespace := "default"
+    namespace := "default"
     selector := {"matchExpressions": [{"key": "wrong_key", "operator": "In", "values": ["val"]}]}
     labels := {"key": "val", "key2": "val2"}
 
     count(k8srestrictpoddisruptionbudgets.violation) == 0
         with input as input_wrap(generate_pod_controller(
             "Deployment",
-			3,
+            3,
             namespace,
             labels
         ))
@@ -663,14 +663,14 @@ test_mismatching_match_expression_in_wrong_key {
 }
 
 test_mismatching_match_expression_in_wrong_val {
-	namespace := "default"
+    namespace := "default"
     selector := {"matchExpressions": [{"key": "wrong_key", "operator": "In", "values": ["wrong_val"]}]}
     labels := {"key": "val", "key2": "val2"}
 
     count(k8srestrictpoddisruptionbudgets.violation) == 0
         with input as input_wrap(generate_pod_controller(
             "Deployment",
-			3,
+            3,
             namespace,
             labels
         ))
@@ -683,13 +683,13 @@ test_mismatching_match_expression_in_wrong_val {
 }
 
 test_matching_match_expression_not_in_other_key {
-	namespace := "default"
+    namespace := "default"
     selector := {"matchExpressions": [{"key": "other_key", "operator": "NotIn", "values": ["val"]}]}
     labels := {"key": "val", "key2": "val2"}
     count(k8srestrictpoddisruptionbudgets.violation) == 1
         with input as input_wrap(generate_pod_controller(
             "Deployment",
-			3,
+            3,
             namespace,
             labels
         ))
@@ -703,13 +703,13 @@ test_matching_match_expression_not_in_other_key {
 
 
 test_matching_match_expression_not_in_other_val {
-	namespace := "default"
+    namespace := "default"
     selector := {"matchExpressions": [{"key": "key", "operator": "NotIn", "values": ["other_val"]}]}
     labels := {"key": "val", "key2": "val2"}
     count(k8srestrictpoddisruptionbudgets.violation) == 1
         with input as input_wrap(generate_pod_controller(
             "Deployment",
-			3,
+            3,
             namespace,
             labels
         ))
@@ -722,14 +722,14 @@ test_matching_match_expression_not_in_other_val {
 }
 
 test_mismatching_match_expression_not_in {
-	namespace := "default"
+    namespace := "default"
     selector := {"matchExpressions": [{"key": "key", "operator": "NotIn", "values": ["val"]}]}
     labels := {"key": "val", "key2": "val2"}
 
     count(k8srestrictpoddisruptionbudgets.violation) == 0
         with input as input_wrap(generate_pod_controller(
             "Deployment",
-			3,
+            3,
             namespace,
             labels
         ))
