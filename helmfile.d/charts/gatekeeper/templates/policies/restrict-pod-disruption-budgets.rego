@@ -83,7 +83,7 @@ pod_controller_groups_kinds := [
     {"group": "v1", "kind": "ReplicationController"}
 ]
 
-# Do not reject replicasets that are controlled by deployment, instead reject the deploymentd
+# Do not reject replicasets that are controlled by deployment, instead reject the deployment
 replica_set_under_deployment(obj) {
     obj.kind == "ReplicaSet"
     count([i | obj.metadata.ownerReferences[i].kind == "Deployment"]) > 0
