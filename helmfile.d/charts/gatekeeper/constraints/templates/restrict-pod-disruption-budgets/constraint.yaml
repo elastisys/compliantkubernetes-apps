@@ -1,0 +1,18 @@
+{{- if .Values.restrictPodDisruptionBudgets.enable -}}
+apiVersion: constraints.gatekeeper.sh/v1alpha1
+kind: K8sRestrictPodDisruptionBudgets
+metadata:
+  name: elastisys-restrict-pod-disruption-budgets
+spec:
+  enforcementAction: {{ .Values.restrictPodDisruptionBudgets.enforcementAction }}
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["ReplicationController"]
+      - apiGroups: ["apps"]
+        kinds: ["Deployment", "StatefulSet", "ReplicaSet"]
+      - apiGroups: ["policy"]
+        kinds: ["PodDisruptionBudget"]
+    excludedNamespaces: ["kube-system", "kube-public", "kube-node-lease", "calico-system"]
+    # Note that this does not exclude all namespaces with label owner=operator
+{{- end }}
