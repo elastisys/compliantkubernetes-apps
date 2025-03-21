@@ -1,7 +1,7 @@
 es:
   # Set to null! This is set through env instead.
   # See https://github.com/justwatchcom/elasticsearch_exporter/issues/307
-  uri: https://{{ .Values.opensearch.clusterName }}-master:9200
+  uri: https://{{ .Values.opensearch.clusterName }}-cluster:9200
   all: true
   indices: true
   indices_settings: true

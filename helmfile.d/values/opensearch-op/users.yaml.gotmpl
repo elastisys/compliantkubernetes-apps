@@ -1,11 +1,17 @@
 users:
-    - name: fluentd
-      secretName: "opensearch-fluentd-user"
-      secretKey: "password"
-      opendistroSecurityRoles:
-        - log_forwarder
-    - name: metrics-exporter
-      secretName: "opensearch-metrics-exporter-user"
-      secretKey: "password"
-      opendistroSecurityRoles:
-        - metrics_exporter
+  - name: fluentd
+    secretName: "opensearch-fluentd-user"
+    secretKey: "password"
+    opendistroSecurityRoles:
+      - log-forwarder
+  - name: metrics-exporter
+    secretName: "opensearch-metrics-exporter-user"
+    secretKey: "password"
+    opendistroSecurityRoles:
+      - metrics-exporter
+  - name: configurer
+    secretKey: "password"
+    secretName: "opensearch-configurer-user"
+    opendistroSecurityRoles:
+      - "kibana_user"
+      - "configurer"

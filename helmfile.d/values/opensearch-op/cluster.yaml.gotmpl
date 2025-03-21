@@ -1,6 +1,22 @@
 cluster:
   name: {{ .Values.opensearch.clusterName }}
 
+  bootstrap:
+    {{- if .Values.opensearch.snapshot.enabled }}
+    pluginsList:
+      {{- if .Values.opensearch.plugins.installExternalObjectStoragePlugin }}
+      {{- if (eq .Values.objectStorage.type "s3") }}
+      - repository-s3
+      {{- else if (eq .Values.objectStorage.type "gcs") }}
+      - repository-gcs
+      {{- else if (eq .Values.objectStorage.type "azure") }}
+      - repository-azure
+      {{- end }}
+      {{- end }}
+      {{- with .Values.opensearch.plugins.additionalPlugins }}
+      {{- toYaml . | nindent 4 }}
+      {{- end }}
+    {{- end}}
   general:
     additionalConfig:
         cluster.name: {{ .Values.opensearch.clusterName }}
@@ -12,33 +28,17 @@ cluster:
 
         compatibility.override_main_response_version: "true"
 
-        {{- if .Values.opensearch.indexPerNamespace }}
-        action.auto_create_index: "-kubeaudit,-authlog,-other,+*"
-        {{- else }}
-        action.auto_create_index: ".opensearch*,.opendistro-*,security-auditlog-*"
-        {{- end }}
+
+        action.auto_create_index: "true"
+
 
         node.attr.box_type: hot
 
         # Security plugin configuration
         plugins: |
           security:
-            ssl:
-              transport:
-                pemcert_filepath: transport/tls.crt
-                pemkey_filepath: transport/tls.key
-                pemtrustedcas_filepath: transport/ca.crt
-                enforce_hostname_verification: false
-              http:
-                enabled: true
-                pemcert_filepath: http/tls.crt
-                pemkey_filepath: http/tls.key
-                pemtrustedcas_filepath: http/ca.crt
             allow_unsafe_democertificates: false
             allow_default_init_securityindex: false
-            authcz:
-              admin_dn:
-                - "CN=admin.opensearch-system.cluster.local,O=compliantkubernetes"
             audit:
               type: log4j
               config:
@@ -50,12 +50,9 @@ cluster:
               #   - kibanaserver
             enable_snapshot_restore_privilege: true
             check_snapshot_restore_write_privileges: true
-            nodes_dn:
-              - "CN=nodes.opensearch-system.cluster.local,O=compliantkubernetes"
             restapi:
               roles_enabled:
                 - all_access
-                - configurer
                 - security_rest_api_access
             system_indices:
               enabled: true
@@ -84,11 +81,6 @@ cluster:
               region: {{ .Values.objectStorage.s3.region }}
         {{ else if eq .Values.objectStorage.type "gcs" -}}
         # TODO: Add config for GCS if any.
-        {{ else if eq .Values.objectStorage.type "azure" -}}
-        azure: |
-          client:
-            default:
-              account: {{ .Values.objectStorage.azure.storageAccountName }}
         {{- end }}
         {{- end }}
 
@@ -121,9 +113,19 @@ cluster:
     setVMMaxMapCount: true
 
     podSecurityContext:
-      runAsUser: 1000
-      runAsGroup: 1000
-      runAsNonRoot: true
+      fsGroup: 1000
+
     securityContext:
-      allowPrivilegeEscalation: false
-      privileged: false
+      runAsNonRoot: true
+      runAsGroup: 1000
+      runAsUser: 1000
+      capabilities:
+        drop:
+          - ALL
+
+  security:
+    config:
+      adminCredentialsSecret:
+        name: "opensearch-admin-user"
+      securityConfigSecret:
+        name: "opensearch-securityconfig"

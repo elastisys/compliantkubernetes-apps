@@ -159,6 +159,8 @@ releases:
   - inherit: [ template: opensearch-secrets ]
   - inherit: [ template: opensearch-cluster ]
   - inherit: [ template: opensearch-operator ]
+  - inherit: [ template: opensearch-configurer ]
+  - inherit: [ template: opensearch-exporter ]
 
   - inherit: [ template: tekton-pipelines-networkpolicy ]
   - inherit: [ template: tekton-pipelines-podsecuritypolicy ]

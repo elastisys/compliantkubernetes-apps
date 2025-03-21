@@ -1,0 +1,44 @@
+indexTemplates:
+  - name: authlog
+    indexPatterns:
+      - "authlog*"
+    templateSpec:
+        settings:
+            index.refresh_interval: "10s"
+            plugins.index_state_management.rollover_alias: "authlog"
+            mapping.total_fields.limit: "1000"
+
+
+  - name: kubeaudit
+    indexPatterns:
+      - "kubeaudit*"
+    templateSpec:
+        settings:
+            index.refresh_interval: "10s"
+            plugins.index_state_management.rollover_alias: "kubeaudit"
+
+
+
+  - name: kubernetes
+    indexPatterns:
+      - "kubernetes*"
+    templateSpec:
+        settings:
+            index.refresh_interval: "10s"
+            plugins.index_state_management.rollover_alias: "kubernetes"
+            mapping.total_fields.limit: "1000"
+        mappings:
+            properties:
+                timestamp:
+                    type: "date"
+                ts:
+                    type: "text"
+
+  - name: other
+    indexPatterns:
+      - "other*"
+    templateSpec:
+        settings:
+            index.refresh_interval: "10s"
+            plugins.index_state_management.rollover_alias: "other"
+            mapping.total_fields.limit: "1000"

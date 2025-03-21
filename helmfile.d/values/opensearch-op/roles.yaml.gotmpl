@@ -65,6 +65,60 @@ roles:
         - "indices_monitor"
         - "indices:admin/mappings/get"
         - "indices:admin/aliases/get"
+
+    # Allows users to view monitors, destinations and alerts
+    - name: alerting-read-access
+      clusterPermissions:
+        - cluster:admin/opendistro/alerting/alerts/get
+        - cluster:admin/opendistro/alerting/destination/get
+        - cluster:admin/opendistro/alerting/monitor/get
+        - cluster:admin/opendistro/alerting/monitor/search
+
+    # Allows users to view and acknowledge alerts
+    - name: alerting-ack-alerts
+      clusterPermissions:
+        - cluster:admin/opendistro/alerting/alerts/*
+
+    # Allows users to use all alerting functionality
+    - name: alerting-full-access
+      clusterPermissions:
+          - cluster_monitor
+          - cluster:admin/opendistro/alerting/*
+          - cluster:admin/opensearch/notifications/*
+      indexPermissions:
+      - indexPatterns:
+          - kubernetes-*
+          - kubeaudit-*
+        allowedActions:
+          - indices_monitor
+          - indices:admin/aliases/get
+          - indices:admin/mappings/get
+
+    - name: configurer
+      clusterPermissions:
+      - "cluster:admin/repository/put"
+      - "cluster:admin/repository/get"
+      - "cluster_manage_index_templates"
+      - "cluster:admin/opendistro/ism/policy/*"
+      - "cluster:admin/snapshot/get"
+      - "cluster:admin/snapshot/create"
+      - "cluster:admin/snapshot/delete"
+      - "cluster:admin/opensearch/snapshot_management/policy/get"
+      - "cluster:admin/opensearch/snapshot_management/policy/search"
+      - "cluster:admin/opensearch/snapshot_management/policy/write"
+      - indices:admin/index_template/put
+      indexPermissions:
+      - indexPatterns:
+        - "*"
+        allowedActions:
+        - "create_index"
+        - "crud"
+        - "manage_aliases"
+        - "indices:admin/index_template/*"
+        - "indices:admin/opensearch/ism/managedindex"
+        - "indices:admin/rollover"
+        - "indices:monitor/stats"
+
     {{- with .Values.opensearch.extraRoles }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
