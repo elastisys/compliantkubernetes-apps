@@ -22,7 +22,7 @@ daemonsets: {{- toYaml .Values.gpu.daemonsets | nindent 2 }}
 toolkit:
   env:
   - name: ACCEPT_NVIDIA_VISIBLE_DEVICES_ENVVAR_WHEN_UNPRIVILEGED
-    value: "false"
+    value: "true"
   - name: ACCEPT_NVIDIA_VISIBLE_DEVICES_AS_VOLUME_MOUNTS
     value: "true"
 
