@@ -28,9 +28,23 @@ toolkit:
 
 mig: {{- toYaml .Values.gpu.mig | nindent 2 }}
 
-{{- if .Values.gpu.devicePlugin }}
-devicePlugin: {{- toYaml .Values.gpu.devicePlugin | nindent 2 }}
-{{- end }}
+devicePlugin:
+  env:
+    - name: PASS_DEVICE_SPECS
+      value: "true"
+    - name: FAIL_ON_INIT_ERROR
+      value: "true"
+    - name: DEVICE_LIST_STRATEGY
+      value: volume-mounts
+    - name: DEVICE_ID_STRATEGY
+      value: uuid
+    - name: NVIDIA_VISIBLE_DEVICES
+      value: all
+    - name: NVIDIA_DRIVER_CAPABILITIES
+      value: all
+  {{- if .Values.gpu.devicePlugin.config }}
+  config: {{- toYaml .Values.gpu.devicePlugin.config | nindent 2 }}
+  {{- end }}
 
 dcgmExporter:
   env:
