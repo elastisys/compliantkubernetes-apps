@@ -1354,9 +1354,6 @@ properties:
           Normally one of `letsencrypt-staging` or `letsencrypt-prod`.
         type: string
         default: letsencrypt-staging
-        enum:
-          - letsencrypt-staging
-          - letsencrypt-prod
       verifyTls:
         description: Verify ingress certificates
         type: boolean
@@ -6582,6 +6579,17 @@ properties:
     title: Issuers Config
     description: Configure issuers for cert-manager.
     type: object
+
+    # Need to either define your own issuers or enable letsencrypt
+    anyOf:
+      - properties:
+          letsencrypt:
+            properties:
+              enabled:
+                type: boolean
+                const: true
+      - required:
+          - extraIssuers
     additionalProperties: false
     properties:
       letsencrypt:
@@ -6634,6 +6642,18 @@ properties:
       extraIssuers:
         title: Extra Issuers
         type: array
+        minItems: 1
+        items:
+          $ref: "https://github.com/datreeio/CRDs-catalog/raw/refs/heads/main/cert-manager.io/clusterissuer_v1.json"
+          type: object
+          required:
+            - metadata
+          properties:
+            metadata:
+              type: object
+              required:
+                - name
+
   networkPolicies:
     title: Network Policies Config
     description: |-
