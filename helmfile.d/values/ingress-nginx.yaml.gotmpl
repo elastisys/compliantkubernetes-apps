@@ -1,8 +1,10 @@
 ## nginx configuration
 ## Ref: https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/index.md
 ##
-
 controller:
+  admissionWebhooks:
+    enabled: false
+
   ingressClassResource:
     default: true
 
