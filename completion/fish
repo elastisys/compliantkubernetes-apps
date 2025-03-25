@@ -1,0 +1,170 @@
+# Loading functions from kubectl completion
+source (kubectl completion fish | psub)
+
+# Since Fish completions are only loaded once the user triggers them, we trigger them ourselves
+# so we can properly delete any completions provided by another script.
+# Only do this if the program can be found, or else fish may print some errors; besides,
+# the existing completions will only be loaded if the program can be found.
+if type -q "ck8s"
+    # The space after the program name is essential to trigger completion for the program
+    # and not completion of the program name itself.
+    # Also, we use '> /dev/null 2>&1' since '&>' is not supported in older versions of fish.
+    complete --do-complete "kubectl " > /dev/null 2>&1
+    complete --do-complete "ck8s " > /dev/null 2>&1
+end
+
+# Remove any pre-existing completions for the program since we will be handling all of them.
+complete -c ck8s -e
+
+# this will get called after the two calls below and clear the $__kubectl_perform_completion_once_result global
+#complete -c ck8s -n '__kubectl_clear_perform_completion_once_result'
+# The call to __kubectl_prepare_completions will setup __kubectl_comp_results
+# which provides the program's completion choices.
+# If this doesn't require order preservation, we don't use the -k flag
+#complete -c ck8s -n 'not __kubectl_requires_order_preservation && __kubectl_prepare_completions' -f -a '$__kubectl_comp_results'
+# otherwise we use the -k flag
+#complete -k -c ck8s -n '__kubectl_requires_order_preservation && __kubectl_prepare_completions' -f -a '$__kubectl_comp_results'
+
+
+complete -c ck8s -n "__fish_use_subcommand" -a "apply" -d "deploy the apps"
+complete -c ck8s -n "__fish_seen_subcommand_from apply; and not __fish_seen_subcommand_from wc" -a "wc"
+complete -c ck8s -f
+
+
+complete -c ck8s -n '__kubectl_clear_perform_completion_once_result'
+complete -c ck8s -n "__fish_use_subcommand" -a "ops" -d "perform operations on the cluster"
+complete -c ck8s -n "__fish_seen_subcommand_from ops && __fish_is_nth_token 2" -a "kubectl"
+complete -c ck8s -n "__fish_seen_subcommand_from ops && __fish_is_nth_token 2" -a "kubecolor"
+complete -c ck8s -n "__fish_seen_subcommand_from ops && __fish_is_nth_token 2" -a "helmfile"
+complete -c ck8s -n "__fish_seen_subcommand_from ops && __fish_is_nth_token 2" -a "helm"
+complete -c ck8s -n "__fish_seen_subcommand_from ops && __fish_is_nth_token 2" -a "opensearch-cli"
+complete -c ck8s -n "__fish_seen_subcommand_from ops && __fish_is_nth_token 2" -a "velero"
+#complete -c ck8s -n "__fish_seen_subcommand_from kubectl; and not __fish_seen_subcommand_from wc" -a "wc"
+#echo $__kubectl_comp_results '\n'
+#complete -c ck8s -n "__fish_seen_subcommand_from kubectl && __fish_seen_subcommand_from wc && __kubectl_prepare_completions" -f -a '$__kubectl_comp_results'
+
+function workload_or_service_cluster -a subcommand -a index
+  complete -c ck8s -n "__fish_is_nth_token $index && __fish_seen_subcommand_from $subcommand" -a "wc" -d "workload cluster"
+  complete -c ck8s -n "__fish_is_nth_token $index && __fish_seen_subcommand_from $subcommand" -a "sc" -d "service cluster"
+end
+
+function both_clusters -a subcommand -a index
+  workload_or_service_cluster $subcommand $index
+  complete -c ck8s -n "__fish_is_nth_token $index && __fish_seen_subcommand_from $subcommand" -a "both" -d "both clusters"
+end
+complete -c ck8s -n "__fish_is_nth_token 1" -a "clean" -n "__fish_use_subcommand" -d "Cleans the cluster of apps"
+complete -c ck8s -n "__fish_is_nth_token 1" -a "completion" -d "output shell completion code"
+complete -c ck8s -n "__fish_is_nth_token 1" -a "bash" -d "output shell completion code for bash"
+complete -c ck8s -n "__fish_is_nth_token 1" -a "diagnostics" -d "Runs diagnostics of apps"
+workload_or_service_cluster diagnostics 2
+
+complete -c ck8s -n "__fish_is_nth_token 1" -a "dry-run" -d "runs helmfile diff"
+workload_or_service_cluster "dry-run" 2
+complete -c ck8s -n "__fish_seen_subcommand_from dry-run && __fish_is_nth_token 3" -l "kubectl"     -d "pipe changes into kubectl diff"
+
+complete -c ck8s -n "__fish_is_nth_token 1" -a "explain"              -d "explains the config or secrets"
+complete -c ck8s -n "__fish_seen_subcommand_from explain && __fish_is_nth_token 2" -a "config"      -d "[key.to.parameter]     explains the config"
+complete -c ck8s -n "__fish_seen_subcommand_from explain && __fish_is_nth_token 2" -a "secrets"     -d "[key.to.parameter]     explains the secrets"
+
+complete -c ck8s -n "__fish_is_nth_token 1" -a "fix-psp-violations"             -d "Checks and restarts pods that violates Pod Security Polices, applicable for new environments"
+workload_or_service_cluster fix-psp-violations 2
+complete -c ck8s -n "__fish_is_nth_token 1" -a "flavors"                                              -d "lists supported configuration flavors"
+complete -c ck8s -n "__fish_is_nth_token 1" -a "init"                                       -d "initialize the config path"
+complete -c ck8s -n "__fish_seen_subcommand_from init" -l "generate-new-secrets"        -d "initialize secrets too"
+both_clusters init 2
+complete -c ck8s -n "__fish_is_nth_token 1" -a "install-requirements"                 -d "installs or updates required tools to run compliantkubernetes-apps"
+complete -c ck8s -n "__fish_seen_subcommand_from install-requirements && __fish_use_subcommand install-requirements" -l "user" -l "no-pass"        -d "installs or updates required tools to run compliantkubernetes-apps"
+complete -c ck8s -n "__fish_is_nth_token 1" -a "k8s-installers"                                     -d "lists supported kubernetes installers"
+complete -c ck8s -n "__fish_is_nth_token 1" -a "kubeconfig"                                       -d "generate kubeconfig"
+complete -c ck8s -n "__fish_seen_subcommand_from kubeconfig && __fish_is_nth_token 2" -a "user"                 -d "generate user kubeconfig"
+complete -c ck8s -n "__fish_seen_subcommand_from kubeconfig && __fish_is_nth_token 2" -a "dev"                  -d "generate user kubeconfig, stored at CK8S_CONFIG_PATH/user"
+complete -c ck8s -n "__fish_seen_subcommand_from kubeconfig && __fish_is_nth_token 2" -a "admin"                -d "generate admin kubeconfig"
+workload_or_service_cluster "admin" 3
+complete -c ck8s -n "__fish_is_nth_token 1" -a "providers"                                          -d "lists supported cloud providers"
+complete -c ck8s -n "__fish_is_nth_token 1" -a "s3cmd"                                              -d "run s3cmd"
+complete -c ck8s -n "__fish_is_nth_token 1" -a "team"                                               -d "manage cluster teams"
+complete -c ck8s -n "__fish_seen_subcommand_from team && __fish_is_nth_token 2" -a "add-pgp"      -d "add a new PGP key to secrets"
+complete -c ck8s -n "__fish_seen_subcommand_from team && __fish_is_nth_token 2" -a "remove-pgp"     -d "remove a PGP key from secrets and rotate the data encryption key"
+complete -c ck8s -n "__fish_is_nth_token 1" -a "test"                                     -d "test the applications"
+workload_or_service_cluster "test" 2
+complete -c ck8s -n "__fish_seen_subcommand_from test" -l "logging-enabled"
+complete -c ck8s -n "__fish_is_nth_token 1" -a "update-ips"                                               -d "automatically fetches and applies the IPs for network policies"
+both_clusters "update-ips" 2
+complete -c ck8s -n "__fish_is_nth_token 3 && __fish_seen_subcommand_from update-ips" -a "dry-run"              -d "show what would be changed"
+complete -c ck8s -n "__fish_is_nth_token 3 && __fish_seen_subcommand_from update-ips" -a "apply"                -d "update the network policies"
+
+complete -c ck8s -n "__fish_is_nth_token 1" -a "upgrade"              -d "runs all prepare steps upgrading the configuration"
+both_clusters "upgrade" 2
+complete -c ck8s -n "__fish_is_nth_token 3 && __fish_seen_subcommand_from upgrade" -a "(git -C $CK8S_CONFIG_PATH/../compliantkubernetes-apps tag --list  --sort=v:refname | tail -6)"
+complete -c ck8s -n "__fish_is_nth_token 4 && __fish_seen_subcommand_from upgrade" -a "prepare"     -d "run prepare steps before upgrade"
+complete -c ck8s -n "__fish_is_nth_token 4 && __fish_seen_subcommand_from upgrade" -a "apply"       -d "run apply steps upgrading the environment"
+
+complete -c ck8s -n "__fish_is_nth_token 1" -a "validate"               -d "validates config files"
+workload_or_service_cluster "validate" 2
+
+complete -c ck8s -n '__kubectl_clear_perform_completion_once_result'
+
+complete -c ck8s -n '__fish_seen_subcommand_from sc || __fish_seen_subcommand_from wc && __fish_seen_subcommand_from ops' -f -a '(__ck8s_perform_completion)'
+
+workload_or_service_cluster kubectl 3
+workload_or_service_cluster helmfile 3
+workload_or_service_cluster helm 3
+workload_or_service_cluster velero 3
+workload_or_service_cluster kubecolor 3
+workload_or_service_cluster opensearch-cli 3
+
+function __ck8s_perform_completion
+    __kubectl_debug "Starting __ck8s_perform_completion"
+
+    # Extract all args except the last one
+    set -l args (commandline -opc)
+    # Extract the last arg and escape it in case it is a space
+    #set -l lastArg (string escape -- (commandline -ct))
+
+    __kubectl_debug "args: $args, $args[1]"
+
+    set -l lastArg
+    set -l requestComp
+    if test $args[1] = "ck8s"
+      set lastArg (string escape -- (string escape -- (commandline -ct)))
+      set requestComp "ACTIVE_HELP=0 $args[1..4] __complete $args[5..-1] $lastArg"
+    else
+      set lastArg (string escape -- (commandline -ct))
+      set requestComp "ACTIVE_HELP=0 $args[1] __complete $args[2..-1] $lastArg"
+    end
+    __kubectl_debug "last arg: $lastArg"
+    # Disable ActiveHelp which is not supported for fish shell
+
+    __kubectl_debug "Calling $requestComp"
+    set -l results (eval $requestComp 2> /dev/null)
+
+    # Some programs may output extra empty lines after the directive.
+    # Let's ignore them or else it will break completion.
+    # Ref: https://github.com/spf13/cobra/issues/1279
+    for line in $results[-1..1]
+        if test (string trim -- $line) = ""
+            # Found an empty line, remove it
+            set results $results[1..-2]
+        else
+            # Found non-empty line, we have our proper output
+            break
+        end
+    end
+
+    set -l comps $results[1..-2]
+    set -l directiveLine $results[-1]
+
+    # For Fish, when completing a flag with an = (e.g., <program> -n=<TAB>)
+    # completions must be prefixed with the flag
+    set -l flagPrefix (string match -r -- '-.*=' "$lastArg")
+
+    __kubectl_debug "Comps: $comps"
+    __kubectl_debug "DirectiveLine: $directiveLine"
+    __kubectl_debug "flagPrefix: $flagPrefix"
+
+    for comp in $comps
+        printf "%s%s\n" "$flagPrefix" "$comp"
+    end
+
+    printf "%s\n"
+end

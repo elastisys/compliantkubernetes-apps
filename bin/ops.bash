@@ -52,7 +52,12 @@ ops_helm() {
 
 # Run arbitrary Helmfile commands as cluster admin.
 ops_helmfile() {
-  config_load "$1"
+  # Skip validation when fetching completions
+  if [ "$2" == "__complete" ]; then
+    config_load "$1" --skip-validation
+  else
+    config_load "$1"
+  fi
 
   case "${1}" in
   sc)

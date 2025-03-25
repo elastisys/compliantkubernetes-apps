@@ -12,7 +12,7 @@ usage() {
   echo "COMMANDS:" 1>&2
   echo "  apply <wc|sc> [--sync] [--concurrency=<num>]    deploy the apps" 1>&2
   echo "  clean <wc|sc>                                   Cleans the cluster of apps" 1>&2
-  echo "  completion bash                                 output shell completion code for bash" 1>&2
+  echo "  completion <bash|fish>                          output shell completion code for bash/fish" 1>&2
   echo "  diagnostics <wc|sc> [--help]                    Runs diagnostics of apps" 1>&2
   echo "  dry-run <wc|sc> [--kubectl]                     runs helmfile diff" 1>&2
   echo "  explain <config|secrets> [key.to.parameter]     explains the config or secrets" 1>&2
