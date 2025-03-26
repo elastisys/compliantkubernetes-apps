@@ -15,10 +15,6 @@ helm:
 securityConfig: {}
 
 opensearch:
-  clusterService: opensearch-master
-  clusterPort: 9200
-
-  adminCertSecret: opensearch-admin-cert
   securityConfigSecret: opensearch-securityconfig
 
 activeDeadlineSeconds: 600
