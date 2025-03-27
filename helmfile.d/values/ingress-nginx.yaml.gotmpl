@@ -8,6 +8,7 @@ controller:
 
   watchIngressWithoutClass: true
   extraArgs: {{- toYaml .Values.ingressNginx.controller.extraArgs | nindent 4 }}
+  extraEnvs: {{- toYaml .Values.ingressNginx.controller.extraEnvs | nindent 4 }}
 
   # Will add custom configuration options to Nginx https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
   config:
