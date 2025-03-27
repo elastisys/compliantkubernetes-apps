@@ -92,7 +92,6 @@ releases:
   - inherit: [ template: prometheus-wc-monitors ]
   - inherit: [ template: prometheus-wc-rules ]
 
-  #- inherit: [ template: dev-alertmanager ]
 
   {{- range .Values | get "clusterApi.clusters" list }}
   - inherit: [ template: autoscaling-monitoring ]
