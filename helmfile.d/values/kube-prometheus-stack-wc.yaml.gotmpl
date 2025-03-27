@@ -143,6 +143,46 @@ prometheus:
     {{- end }}
 
     additionalScrapeConfigs:
+
+        {{ if .Values.user.alertmanager.enabled }}
+    - job_name: 'alertmanager/alertmanager-operated'
+      scrape_interval: 30s
+      metrics_path: /metrics
+      scheme: http
+      kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+          - alertmanager
+        selectors:
+          - role: endpoints
+            label: 'operated-alertmanager=true'
+      relabel_configs:
+        - source_labels: [__meta_kubernetes_endpoint_port_name]
+          action: keep
+          regex: http-web # keep only the web port (9093 by default) and drop the remaining (for example 9094)
+        - source_labels: [__meta_kubernetes_endpoints_name]
+          action: replace
+          target_label: job # needed to make Prometheus realize that it is the alertmanager
+        - source_labels: [__meta_kubernetes_namespace]
+          action: replace
+          target_label: namespace # needed to make Prometheus realize that it is the alertmanager
+        # The remaining items are to keep the set of labels for this target consistent with the other targets.
+        # Without replacing them, the labels with __ prefix are dropped.
+        - source_labels: [__meta_kubernetes_endpoint_port_name]
+          action: replace
+          target_label: endpoint
+        - source_labels: [__address__]
+          action: replace
+          target_label: instance
+        - source_labels: [__meta_kubernetes_service_name]
+          action: replace
+          target_label: service
+        - source_labels: [__meta_kubernetes_pod_name]
+          action: replace
+          target_label: pod
+    {{ end }}
+    
     {{- with .Values.prometheus.additionalScrapeConfigs }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
