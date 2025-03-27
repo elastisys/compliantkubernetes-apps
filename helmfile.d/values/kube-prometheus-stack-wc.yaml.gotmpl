@@ -2,8 +2,45 @@ defaultRules:
   # Provided by prometheus-alerts instead
   create: false
 
+{{- if .Values.prometheus.useralertmanager.enabled }}
 alertmanager:
-  enabled: false
+  namespaceOverride: {{ .Values.prometheus.useralertmanager.namespace }}
+  {{ if eq .Values.prometheus.useralertmanager.ingressenabled true }}
+  extraSecret:
+      name: user-alertmanager-auth
+      data:
+        auth: |
+         {{ htpasswd .Values.prometheus.useralertmanager.username .Values.user.alertmanagerPassword }}
+  ingress:
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
+      nginx.ingress.kubernetes.io/auth-secret: user-alertmanager-auth
+      nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
+      nginx.ingress.kubernetes.io/auth-type: basic
+    hosts:
+      - alertmanager.{{ .Values.global.baseDomain }}
+    paths:
+      - /
+    tls:
+    - hosts:
+      - alertmanager.{{ .Values.global.baseDomain }}
+      secretName: alertmanager-certs
+  {{ end }}
+  config:
+    route:
+      group_by: {{ toYaml .Values.prometheus.alertmanagerSpec.groupBy | nindent 8 }}
+  alertmanagerSpec:
+    replicas: {{ .Values.prometheus.alertmanagerSpec.replicas }}
+    retention: {{ .Values.prometheus.retention.alertmanager }}
+    resources: {{- toYaml .Values.prometheus.alertmanagerSpec.resources | nindent 6 }}
+    tolerations: {{- toYaml .Values.prometheus.alertmanagerSpec.tolerations | nindent 6 }}
+    affinity: {{- toYaml .Values.prometheus.alertmanagerSpec.affinity | nindent 6 }}
+    storage: {{- toYaml .Values.prometheus.alertmanagerSpec.storage | nindent 6 }}
+{{- if .Values | get "prometheus.alertmanagerSpec.image" nil }}
+    image: {{- toYaml .Values.prometheus.alertmanagerSpec.image | nindent 6 }}
+{{- end }}
+{{- end }}
 
 grafana:
   enabled: false
@@ -101,8 +138,7 @@ prometheus:
     podMonitorSelectorNilUsesHelmValues: false
     probeSelectorNilUsesHelmValues: false
 
-
-    {{ if .Values.user.alertmanager.enabled }}
+    {{ if .Values.prometheus.useralertmanager.enabled }}
     # Connect to separately managed alertmanager
     alertingEndpoints:
       - name: alertmanager-operated
@@ -110,6 +146,7 @@ prometheus:
         port: http-web
         pathPrefix: /
     {{ end }}
+
 
     resources:    {{- toYaml .Values.prometheus.resources | nindent 6 }}
     nodeSelector: {{- toYaml .Values.prometheus.nodeSelector | nindent 6 }}
@@ -140,7 +177,7 @@ prometheus:
 
     additionalScrapeConfigs:
 
-    {{ if .Values.user.alertmanager.enabled }}
+    {{ if .Values.prometheus.useralertmanager.enabled }}
     - job_name: 'alertmanager/alertmanager-operated'
       scrape_interval: 30s
       metrics_path: /metrics

@@ -19,6 +19,8 @@ prometheusNamespace: monitoring
 defaultRules:
   # TODO: Keeping current behavior, but this should probably default to false!
   create: true
+  alertLabels:
+    evaluate_prometheus: "1"
   # labels:
   #   cluster: workload
   rules:

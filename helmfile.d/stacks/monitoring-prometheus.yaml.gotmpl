@@ -109,19 +109,3 @@ templates:
     values:
       - values/kube-state-metrics-extra-resource-metrics.yaml.gotmpl
 
-  dev-alertmanager:
-    disableValidationOnInstall: true
-    condition: ck8sWorkloadCluster.enabled
-    installed: {{ and (.Values | get "ck8sWorkloadCluster.enabled" false) (.Values | get "user.alertmanager.enabled" false) }}
-    chart: charts/user-alertmanager
-    version: 0.1.0
-    namespace: alertmanager
-    name: user-alertmanager
-    labels:
-      app: dev-alertmanager
-    needs:
-      - kube-system/dev-namespaces
-      - kube-system/user-rbac
-      - monitoring/kube-prometheus-stack # creates prometheus-operator/alertmanagers
-    values:
-      - values/user-alertmanager.yaml.gotmpl
