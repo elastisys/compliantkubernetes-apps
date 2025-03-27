@@ -6422,6 +6422,11 @@ properties:
               title: Ingress NGINX Arg
               type: string
             default: {}
+          extraEnvs:
+            title: Ingress NGINX Extra Environment Variables
+            description: Configure extra environment variables to Ingress NGINX Controller.
+            type: array
+            default: []
           enablepublishService:
             title: Ingress-NGINX Publish Service
             description: |-
