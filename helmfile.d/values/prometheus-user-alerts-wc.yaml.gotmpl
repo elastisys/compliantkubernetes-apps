@@ -10,7 +10,7 @@
 
 osNodeCount: 0
 alertmanagerJob: alertmanager-operated
-alertmanagerNamespace: alertmanager
+alertmanagerNamespace: monitoring
 prometheusJob: kube-prometheus-stack-prometheus
 operatorJob: kube-prometheus-stack-operator
 
@@ -19,6 +19,8 @@ prometheusNamespace: monitoring
 defaultRules:
   # TODO: Keeping current behavior, but this should probably default to false!
   create: true
+  alertLabels:
+    evaluate_prometheus: "1"
   # labels:
   #   cluster: workload
   rules:

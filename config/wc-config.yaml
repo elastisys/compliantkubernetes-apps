@@ -43,7 +43,11 @@ user:
 
   ## User controlled alertmanager configuration.
   alertmanager:
+    retention: 72h
     enabled: true
+    replicas: 2
+    groupBy:
+      - 'alertname'
     resources:
       requests:
         cpu: 10m
@@ -51,6 +55,14 @@ user:
       limits:
         cpu: 50m
         memory: 100Mi
+    storage:
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
     tolerations: []
     affinity: {}
     topologySpreadConstraints: []
