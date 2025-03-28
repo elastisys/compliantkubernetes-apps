@@ -144,7 +144,7 @@ prometheus:
 
     additionalScrapeConfigs:
 
-        {{ if .Values.user.alertmanager.enabled }}
+    {{ if .Values.user.alertmanager.enabled }}
     - job_name: 'alertmanager/alertmanager-operated'
       scrape_interval: 30s
       metrics_path: /metrics
@@ -182,7 +182,7 @@ prometheus:
           action: replace
           target_label: pod
     {{ end }}
-    
+
     {{- with .Values.prometheus.additionalScrapeConfigs }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
