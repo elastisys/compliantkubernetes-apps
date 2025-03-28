@@ -3,7 +3,21 @@ defaultRules:
   create: false
 
 alertmanager:
-  enabled: false
+  enabled: true
+
+alertmanager:
+  config:
+    route:
+      group_by: {{ toYaml .Values.user.alertmanager.groupBy | nindent 8 }}
+  alertmanagerSpec:
+    replicas: {{ .Values.user.alertmanager.replicas }}
+    retention: {{ .Values.user.alertmanager.retention }}
+    resources: {{- toYaml .Values.user.alertmanager.resources | nindent 6 }}
+    tolerations: {{- toYaml .Values.user.alertmanager.tolerations | nindent 6 }}
+    storage: {{- toYaml .Values.user.alertmanager.storage | nindent 6 }}
+{{- if .Values | get "prometheus.alertmanagerSpec.image" nil }}
+    image: {{- toYaml .Values.prometheus.alertmanagerSpec.image | nindent 6 }}
+{{- end }}
 
 grafana:
   enabled: false
@@ -100,15 +114,6 @@ prometheus:
     podMonitorSelectorNilUsesHelmValues: false
     probeSelectorNilUsesHelmValues: false
 
-
-    {{ if .Values.user.alertmanager.enabled }}
-    # Connect to separately managed alertmanager
-    alertingEndpoints:
-      - name: alertmanager-operated
-        namespace: alertmanager
-        port: http-web
-        pathPrefix: /
-    {{ end }}
 
     resources:    {{- toYaml .Values.prometheus.resources | nindent 6 }}
     nodeSelector: {{- toYaml .Values.prometheus.nodeSelector | nindent 6 }}
