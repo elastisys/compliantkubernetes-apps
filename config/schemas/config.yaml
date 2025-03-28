@@ -1554,7 +1554,7 @@ properties:
             title: Prometheus Retention Alertmanager
             description: Configure the time range Alertmanager will retain metrics for.
             $ref: '#/$defs/timeRange'
-            default: 72h  
+            default: 72h
           storage:
             title: Alertmanager Storage
             description: Configure persistent storage for Alertmanager.
