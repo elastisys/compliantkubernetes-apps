@@ -1,0 +1,11 @@
+user:
+  alertmanager:
+    enabled: true
+    storage:
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 10Gi
