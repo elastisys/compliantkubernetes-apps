@@ -56,6 +56,17 @@ rules:
   - roles
   verbs:
   - bind
+#Allow getting pods 
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  resourceNames:
+  - alertmanager-kube-prometheus-stack-alertmanager-0
+  - alertmanager-kube-prometheus-stack-alertmanager-1
+# Allow creating port-forward
 - apiGroups:
   - ""
   resources:
@@ -63,5 +74,5 @@ rules:
   verbs:
   - create
   resourceNames:
-  - alertmanager-alertmanager-0
-  - alertmanager-alertmanager-1
+  - alertmanager-kube-prometheus-stack-alertmanager-0
+  - alertmanager-kube-prometheus-stack-alertmanager-1
