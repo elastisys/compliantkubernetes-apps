@@ -1540,93 +1540,6 @@ properties:
         items:
           type: string
         type: array
-      alertmanager:
-        title: Alertmanager Config
-        description: |-
-          Configuration for application developer controlled alertmanager.
-        additionalProperties: false
-        properties:
-          replicas:
-            title: Alertmanager Replicas
-            type: number
-            default: 2
-          retention:
-            title: Prometheus Retention Alertmanager
-            description: Configure the time range Alertmanager will retain metrics for.
-            $ref: '#/$defs/timeRange'
-            default: 72h
-          storage:
-            title: Alertmanager Storage
-            description: Configure persistent storage for Alertmanager.
-            type: object
-            additionalProperties: false
-            properties:
-              volumeClaimTemplate:
-                title: Alertmanager Volume Claim Template
-                description: Configure persistent storage for Alertmanager.
-                type: object
-                additionalProperties: false
-                properties:
-                  spec:
-                    title: Alertmanager Volume Claim Spec
-                    description: Configure persistent storage for Alertmanager.
-                    type: object
-                    additionalProperties: false
-                    properties:
-                      accessModes:
-                        title: Alertmanager Volume Access Mode
-                        description: Configure the access mode of the persistent storage for Alertmanager.
-                        type: array
-                        items:
-                          type: string
-                          default: ReadWriteOnce
-                      resources:
-                        title: Alertmanager Volume Resources
-                        description: Configure the resources of the persistent storage for Alertmanager.
-                        $ref: '#/$defs/kubernetesResourceRequirements'
-          groupBy:
-            title: Alertmanager Group By
-            description: |-
-              Configure Alertmanager to group certain alerts based on labels.
-
-              > [!note]
-              > See [the upstream documentation](https://prometheus.io/docs/alerting/latest/configuration/) for reference.
-            items:
-              default: 'alertname'
-              type: string
-            type: array
-          affinity:
-            $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
-          enabled:
-            title: Enable User Alertmanager
-            type: boolean
-          nodeSelector:
-            $ref: '#/$defs/kubernetesNodeSelector'
-          resources:
-            $ref: '#/$defs/kubernetesResourceRequirements'
-          tolerations:
-            $ref: '#/$defs/kubernetesTolerations'
-          topologySpreadConstraints:
-            $ref: '#/$defs/kubernetesTopologySpreadConstraints'
-          ingress:
-            title: Ingress for Alertmanager
-            description: |-
-              Ingress configuration for user alertmanager.
-
-              Creates basic-auth protected ingress to alertmanager.
-            type: object
-            properties:
-              enabled:
-                title: Enable User Alertmanager Ingress
-                type: boolean
-          image:
-            title: Alermanager Image Override Config
-            description: |-
-              Override the alertmanager container image.
-            type: string
-            examples:
-              - quay.io/prometheus/alertmanager:vX.Y.Z
-        type: object
       sealedSecrets:
         title: SealedSecrets
         description: |-
@@ -4821,10 +4734,23 @@ properties:
           > [!note]
           > See [the upstream documentation](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config) for reference.
         type: array
+      useralertmanager:
+        title: user Alertmanager 
+        type: object
+        properties:
+          enabled:
+           title: Enable user Alertmanager
+           type: boolean
+          ingressenabled: 
+            title: Enable User Alertmanager ingress
+            type: boolean
+          username:
+            title: Username for  Alertmanager login
+            type: string
       alertmanagerSpec:
         title: Alertmanager Config
         description: |-
-          Configure service cluster Alertmanager.
+          Configure service cluster & workload cluster Alertmanager.
 
           Alertmanager receives alerts from Prometheus and Thanos and forwards them to the configured notification channel.
 
@@ -4881,6 +4807,8 @@ properties:
             $ref: '#/$defs/kubernetesResourceRequirements'
           topologySpreadConstraints:
             $ref: '#/$defs/kubernetesTopologySpreadConstraints'
+          tolerations:
+            $ref: '#/$defs/kubernetesTolerations'
           affinity:
             $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
       capacityManagementAlerts:

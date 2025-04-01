@@ -1,4 +1,4 @@
-{{ if and (eq .Values.falco.alerts.type "alertmanager") .Values.user.alertmanager.enabled }}
+{{ if and (eq .Values.falco.alerts.type "alertmanager") .Values.prometheus.useralertmanager.enabled }}
 falcosidekick:
   config:
     alertmanager:

@@ -45,7 +45,7 @@ ingressNginx:
     {{- end }}
 
 alertmanager:
-  enabled: {{ and .Values.user.alertmanager.enabled .Values.networkPolicies.alertmanager.enabled }}
+  enabled: {{ and .Values.prometheus.useralertmanager.enabled .Values.networkPolicies.alertmanager.enabled }}
   alertReceivers:
     ips: {{- toYaml .Values.networkPolicies.alertmanager.alertReceivers.ips | nindent 6 }}
     ports: {{- toYaml .Values.networkPolicies.alertmanager.alertReceivers.ports | nindent 6 }}

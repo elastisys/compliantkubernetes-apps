@@ -27,11 +27,3 @@ thanos:
   storegateway:
     persistence:
       size: 10Gi
-prometheus:
-  alertmanagerSpec:
-    storage:
-      volumeClaimTemplate:
-        spec:
-          resources:
-            requests:
-              storage: 10Gi
