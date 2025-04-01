@@ -12,7 +12,7 @@ alertmanager:
          {{ htpasswd .Values.prometheus.useralertmanager.username .Values.user.alertmanagerPassword }}
   ingress:
     enabled: true
-    annotations: 
+    annotations:
       cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
       nginx.ingress.kubernetes.io/auth-secret: user-alertmanager-auth
       nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
