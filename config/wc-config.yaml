@@ -41,33 +41,6 @@ user:
   adminGroups:
     - set-me
 
-  ## User controlled alertmanager configuration.
-  alertmanager:
-    retention: 72h
-    enabled: true
-    replicas: 2
-    groupBy:
-      - 'alertname'
-    resources:
-      requests:
-        cpu: 10m
-        memory: 50Mi
-      limits:
-        cpu: 50m
-        memory: 100Mi
-    storage:
-      volumeClaimTemplate:
-        spec:
-          accessModes:
-            - ReadWriteOnce
-          resources:
-            requests:
-              storage: 1Gi
-    tolerations: []
-    affinity: {}
-    topologySpreadConstraints: []
-    # image: quay.io/prometheus/alertmanager:vX.Y.Z
-
   # Installs required cluster resources needed to install sealedSecrets
   # Requires that gatekeeper.allowUserCRDs.enabled is enabled.
   sealedSecrets:
@@ -147,6 +120,12 @@ prometheus:
   ## Additional prometheus scrape config.
   ## ref: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config
   additionalScrapeConfigs: []
+  useralertmanager:
+     ingressenabled: false
+     username: alertmanager
+  alertmanagerSpec:
+   groupBy:
+     - alertname
 
 velero:
   storagePrefix: workload-cluster
