@@ -4735,13 +4735,13 @@ properties:
           > See [the upstream documentation](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config) for reference.
         type: array
       useralertmanager:
-        title: user Alertmanager 
+        title: user Alertmanager
         type: object
         properties:
           enabled:
            title: Enable user Alertmanager
            type: boolean
-          ingressenabled: 
+          ingressenabled:
             title: Enable User Alertmanager ingress
             type: boolean
           username:

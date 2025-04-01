@@ -388,7 +388,7 @@ openstackMonitoring:
 
 prometheus:
   replicas: 1
-  useralertmanager: 
+  useralertmanager:
     enabled: true
   alertmanagerSpec:
     affinity: {}
@@ -426,7 +426,7 @@ prometheus:
   retention:
     size: 4GiB
     age: 3d
-
+    alertmanager: 72h
   resources:
     requests:
       memory: 1Gi
