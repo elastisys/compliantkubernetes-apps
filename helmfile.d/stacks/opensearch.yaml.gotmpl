@@ -10,7 +10,7 @@ templates:
     inherit:
       - template: opensearch
       - template: podsecuritypolicies
-    installed: {{ .Values | get "opensearch.enabled" false }}
+    installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "opensearch.enabled" false) }}
     labels:
       psp: opensearch
     values:
@@ -19,7 +19,7 @@ templates:
   opensearch-secrets:
     disableValidationOnInstall: true # creates cert-manager/certificates
     inherit: [ template: opensearch ]
-    installed: {{ .Values | get "opensearch.enabled" false }}
+    installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "opensearch.enabled" false) }}
     chart: charts/opensearch/secrets
     version: 0.1.0
     name: opensearch-secrets
@@ -33,7 +33,7 @@ templates:
     inherit:
       - template: opensearch
       - template: opensearch-chart
-    installed: {{ .Values | get "opensearch.enabled" false }}
+    installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "opensearch.enabled" false) }}
     name: opensearch-master
     needs:
       {{- if .Values | get "opensearch.sso.enabled" false }}
@@ -51,7 +51,7 @@ templates:
     inherit:
       - template: opensearch
       - template: opensearch-chart
-    installed: {{ and ( .Values | get "opensearch.enabled" false) (.Values | get "opensearch.clientNode.dedicatedPods" false) }}
+    installed: {{ and (.Values | get "opensearch.enabled" false) (.Values | get "opensearch.clientNode.dedicatedPods" false) }}
     name: opensearch-client
     needs:
       - kube-system/service-cluster-np
@@ -66,7 +66,7 @@ templates:
     inherit:
       - template: opensearch
       - template: opensearch-chart
-    installed: {{ and ( .Values | get "opensearch.enabled" false) (.Values | get "opensearch.dataNode.dedicatedPods" false) }}
+    installed: {{ and (.Values | get "opensearch.enabled" false) (.Values | get "opensearch.dataNode.dedicatedPods" false) }}
     name: opensearch-data
     needs:
       - kube-system/service-cluster-np
@@ -81,7 +81,7 @@ templates:
     inherit:
       - template: opensearch
       - template: opensearch-dashboards-chart
-    installed: {{ .Values | get "opensearch.enabled" false }}
+    installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "opensearch.enabled" false) }}
     name: opensearch-dashboards
     needs:
       {{- if .Values | get "opensearch.sso.enabled" false }}
@@ -96,7 +96,7 @@ templates:
 
   opensearch-securityadmin:
     inherit: [ template: opensearch ]
-    installed: {{ and ( .Values | get "opensearch.enabled" false) (.Values | get "opensearch.securityadmin.enabled" false) }}
+    installed: {{ and (.Values | get "opensearch.enabled" false) (.Values | get "opensearch.securityadmin.enabled" false) }}
     chart: charts/opensearch/securityadmin
     version: 0.1.0
     name: opensearch-securityadmin
@@ -113,7 +113,7 @@ templates:
 
   opensearch-configurer:
     inherit: [ template: opensearch ]
-    installed: {{ .Values | get "opensearch.enabled" false }}
+    installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "opensearch.enabled" false) }}
     chart: charts/opensearch/configurer
     version: 0.1.0
     name: opensearch-configurer
@@ -155,7 +155,7 @@ templates:
     inherit:
       - template: opensearch
       - template: prometheus-elasticsearch-exporter-chart
-    installed: {{ .Values | get "opensearch.enabled" false }}
+    installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "opensearch.enabled" false) }}
     name: prometheus-opensearch-exporter
     needs:
       - monitoring/kube-prometheus-stack

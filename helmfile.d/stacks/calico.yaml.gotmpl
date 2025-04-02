@@ -1,10 +1,11 @@
 ---
 templates:
   calico:
-    {{- if .Values | get "clusterApi.enabled" false }}
-    namespace: calico-system
-    {{- else }}
+    condition: ck8sAnyCluster.enabled
+    {{- if .Values | get "global.ck8sK8sInstaller" "none" | eq "kubespray" }}
     namespace: kube-system
+    {{- else }}
+    namespace: calico-system
     {{- end }}
     labels:
       app: calico
@@ -37,7 +38,6 @@ templates:
     installed: {{ .Values | get "calicoFelixMetrics.enabled" false }}
     chart: charts/calico-felix-metrics
     version: 0.1.0
-    namespace: kube-system
     name: calico-felix-metrics
     needs:
       - monitoring/kube-prometheus-stack # creates servicemonitors

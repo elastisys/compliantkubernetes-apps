@@ -11,9 +11,12 @@ templates:
     inherit:
       - template: grafana
       - template: grafana-chart
+    installed: {{ .Values | get "ck8sManagementCluster.enabled" false }}
     name: ops-grafana
     needs:
+      {{- if .Values | get "networkPolicies.monitoring.enabled" false }}
       - monitoring/networkpolicy
+      {{- end }}
       - monitoring/podsecuritypolicy
       - monitoring/kube-prometheus-stack # creates servicemonitors
     values:
@@ -27,7 +30,9 @@ templates:
     installed: {{ .Values | get "grafana.user.enabled" false }}
     name: user-grafana
     needs:
+      {{- if .Values | get "networkPolicies.monitoring.enabled" false }}
       - monitoring/networkpolicy
+      {{- end }}
       - monitoring/podsecuritypolicy
     values:
       - values/grafana/grafana-common.yaml.gotmpl
@@ -35,18 +40,21 @@ templates:
 
   grafana-label-enforcer:
     inherit: [ template: grafana ]
-    installed: {{ and (.Values | get "thanos.enabled" false) (.Values | get "thanos.receiver.enabled" false) }}
+    installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "thanos.enabled" false) (.Values | get "thanos.receiver.enabled" false) }}
     chart: charts/grafana-label-enforcer
     version: 0.1.0
     name: grafana-label-enforcer
     needs:
+      {{- if .Values | get "networkPolicies.monitoring.enabled" false }}
       - monitoring/networkpolicy
+      {{- end }}
       - monitoring/podsecuritypolicy
     values:
       - values/grafana/grafana-label-enforcer.yaml.gotmpl
 
   grafana-dashboards:
     inherit: [ template: grafana ]
+    installed: {{ .Values | get "ck8sManagementCluster.enabled" false }}
     chart: charts/grafana-dashboards
     version: 0.3.0
     name: grafana-dashboards

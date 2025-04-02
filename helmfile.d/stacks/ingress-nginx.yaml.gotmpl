@@ -1,17 +1,18 @@
 ---
 templates:
   ingress-nginx:
+    condition: ck8sAnyCluster.enabled
     namespace: ingress-nginx
     labels:
       app: ingress-nginx
 
   file-copier:
     inherit: [ template: ingress-nginx ]
-    name: file-copier
+    installed: {{ .Values | get "ingressNginx.controller.chroot" false }}
     namespace: kube-system
+    name: file-copier
     chart: charts/file-copier
     version: 0.1.0
-    installed: {{ .Values | get "ingressNginx.controller.chroot" false }}
     values:
       - values/file-copier.yaml.gotmpl
 
@@ -19,6 +20,7 @@ templates:
     inherit:
       - template: ingress-nginx
       - template: podsecuritypolicies
+    installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
     labels:
       psp: ingress-nginx
     values:
@@ -29,6 +31,7 @@ templates:
     inherit:
       - template: ingress-nginx
       - template: ingress-nginx-chart
+    installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
     name: ingress-nginx
     needs:
       - ingress-nginx/podsecuritypolicy
@@ -52,7 +55,7 @@ templates:
       - template: networkpolicies
     installed: {{ .Values | get "wcProbeIngress.enabled" false }}
     labels:
-      netpol: ingress-nginx-probe
+      netpol: ingress-nginx
     needs:
       - kube-system/admin-namespaces
     values:
@@ -60,13 +63,11 @@ templates:
       - values/networkpolicies/workload/ingress-nginx-probe.yaml.gotmpl
 
   ingress-nginx-probe-ingress:
-    name: ingress-nginx-probe-ingress
     condition: ck8sWorkloadCluster.enabled
-    namespace: ingress-nginx
-    labels:
-      app: ingress-nginx-probe-ingress
-    chart: charts/ingress-nginx-probe-ingress
+    inherit: [ template: ingress-nginx ]
     installed: {{ .Values | get "wcProbeIngress.enabled" false }}
+    name: ingress-nginx-probe-ingress
+    chart: charts/ingress-nginx-probe-ingress
     version: 0.1.0
     needs:
       - ingress-nginx/networkpolicy

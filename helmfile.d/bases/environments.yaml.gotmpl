@@ -31,7 +31,7 @@ environments:
       - ck8sManagementCluster: { enabled: true }
       - ck8sWorkloadCluster: { enabled: false }
       - ck8sLocalCluster: { enabled: false }
-      - ck8sAnyCluster: { enabled: false }
+      - ck8sAnyCluster: { enabled: true }
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/sc-config.yaml
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml
@@ -43,7 +43,7 @@ environments:
       - ck8sManagementCluster: { enabled: false }
       - ck8sWorkloadCluster: { enabled: true }
       - ck8sLocalCluster: { enabled: false }
-      - ck8sAnyCluster: { enabled: false }
+      - ck8sAnyCluster: { enabled: true }
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/wc-config.yaml
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml

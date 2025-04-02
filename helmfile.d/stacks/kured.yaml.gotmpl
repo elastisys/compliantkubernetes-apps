@@ -1,6 +1,8 @@
 ---
 templates:
   kured:
+    condition: ck8sAnyCluster.enabled
+    installed: {{ .Values | get "kured.enabled" false }}
     namespace: kured
     labels:
       app: kured
@@ -9,7 +11,6 @@ templates:
     inherit:
       - template: kured
       - template: podsecuritypolicies
-    installed: {{ .Values | get "kured.enabled" false }}
     labels:
       psp: kured
     values:
@@ -31,7 +32,6 @@ templates:
     inherit:
       - template: kured
       - template: kured-chart
-    installed: {{ .Values | get "kured.enabled" false }}
     name: kured
     needs:
       - kube-system/common-np

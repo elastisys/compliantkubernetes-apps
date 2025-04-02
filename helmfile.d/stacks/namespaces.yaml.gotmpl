@@ -1,6 +1,7 @@
 ---
 templates:
   namespaces:
+    condition: ck8sAnyCluster.enabled
     namespace: kube-system
     chart: charts/namespaces
     version: 0.1.1
@@ -9,6 +10,7 @@ templates:
   admin-namespaces:
     name: admin-namespaces
     inherit: [ template: namespaces ]
+    installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
     labels:
       app: admin-namespaces
     values:
@@ -19,9 +21,10 @@ templates:
       {{ end }}
 
   dev-namespaces:
-    name: dev-namespaces
-    inherit: [ template: namespaces ]
     condition: ck8sWorkloadCluster.enabled
+    inherit: [ template: namespaces ]
+    installed: {{ .Values | get "ck8sWorkloadCluster.enabled" false }}
+    name: dev-namespaces
     labels:
       app: dev-namespaces
     values:

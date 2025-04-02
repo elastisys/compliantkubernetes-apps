@@ -23,7 +23,7 @@ templates:
     inherit:
       - template: harbor
       - template: podsecuritypolicies
-    installed: {{ .Values | get "harbor.enabled" false }}
+    installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "harbor.enabled" false) }}
     labels:
       psp: harbor
     values:
@@ -32,7 +32,7 @@ templates:
   harbor-certs:
     disableValidationOnInstall: true
     inherit: [ template: harbor ]
-    installed: {{ .Values | get "harbor.enabled" false }}
+    installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "harbor.enabled" false) }}
     chart: charts/harbor/harbor-certs
     version: 0.1.0
     name: harbor-certs
@@ -46,10 +46,12 @@ templates:
     inherit:
       - template: harbor
       - template: harbor-chart
-    installed: {{ .Values | get "harbor.enabled" false }}
+    installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "harbor.enabled" false) }}
     name: harbor
     needs:
+      {{- if .Values | get "networkPolicies.harbor.enabled" false }}
       - harbor/networkpolicy
+      {{- end }}
       - harbor/podsecuritypolicy
       - harbor/harbor-certs
       - monitoring/kube-prometheus-stack # creates servicemonitors
@@ -59,12 +61,14 @@ templates:
 
   harbor-init:
     inherit: [ template: harbor ]
-    installed: {{ .Values | get "harbor.enabled" false }}
+    installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "harbor.enabled" false) }}
     chart: charts/harbor/init-harbor
     version: 0.2.0
     name: init-harbor
     needs:
+      {{- if .Values | get "networkPolicies.harbor.enabled" false }}
       - harbor/networkpolicy
+      {{- end }}
       - harbor/podsecuritypolicy
       - harbor/harbor
     values:
@@ -77,7 +81,9 @@ templates:
     version: 0.1.0
     name: harbor-backup
     needs:
+      {{- if .Values | get "networkPolicies.harbor.enabled" false }}
       - harbor/networkpolicy
+      {{- end }}
       - harbor/podsecuritypolicy
       - harbor/harbor
     values:
