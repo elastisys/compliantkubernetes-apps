@@ -1,6 +1,7 @@
 ---
 templates:
   kyverno:
+    condition: ck8sAnyCluster.enabled
     namespace: kyverno
     name: kyverno
     labels:

@@ -1,6 +1,7 @@
 ---
 templates:
   external-dns:
+    condition: ck8sAnyCluster.enabled
     namespace: external-dns
     labels:
       app: external-dns
@@ -37,18 +38,21 @@ templates:
     installed: {{ .Values | get "externalDns.enabled" false }}
     name: external-dns
     needs:
+      {{- if .Values | get "networkPolicies.externalDns.enabled" false }}
       - external-dns/networkpolicy
+      {{- end }}
       - monitoring/kube-prometheus-stack # creates servicemonitors
     values:
       - values/external-dns/external-dns.yaml.gotmpl
 
   external-dns-endpoints:
+    disableValidationOnInstall: true
     inherit: [ template: external-dns ]
     installed: {{ and (.Values | get "externalDns.enabled" false) (.Values | get "externalDns.sources.crd" false) }}
     chart: charts/external-dns-endpoints
     version: 0.1.0
     name: external-dns-endpoints
     needs:
-      - external-dns/external-dns
+      - external-dns/external-dns # creates dns endpoints
     values:
     - values/external-dns/external-dns.yaml.gotmpl

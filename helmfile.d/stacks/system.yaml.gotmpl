@@ -1,10 +1,12 @@
 ---
 templates:
   system:
+    condition: ck8sAnyCluster.enabled
     namespace: kube-system
 
   networkpolicies-common:
     inherit: [ template: system ]
+    installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
     chart: charts/networkpolicy/common
     version: 0.2.0
     name: common-np
@@ -20,8 +22,9 @@ templates:
     - values/networkpolicy/common.yaml.gotmpl
 
   networkpolicies-service:
-    inherit: [ template: system ]
     condition: ck8sManagementCluster.enabled
+    inherit: [ template: system ]
+    installed: {{ .Values | get "ck8sManagementCluster.enabled" false }}
     chart: charts/networkpolicy/service-cluster
     version: 0.2.0
     name: service-cluster-np
@@ -34,8 +37,9 @@ templates:
       - values/networkpolicy/service-cluster.yaml.gotmpl
 
   networkpolicies-workload:
-    inherit: [ template: system ]
     condition: ck8sWorkloadCluster.enabled
+    inherit: [ template: system ]
+    installed: {{ .Values | get "ck8sWorkloadCluster.enabled" false }}
     chart: charts/networkpolicy/workload-cluster
     version: 0.2.0
     name: workload-cluster-np
@@ -50,6 +54,7 @@ templates:
   node-local-dns:
     disableValidationOnInstall: true
     inherit: [ template: system ]
+    installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
     chart: charts/node-local-dns
     version: 0.1.1
     name: node-local-dns
@@ -61,8 +66,9 @@ templates:
       - values/node-local-dns.yaml.gotmpl
 
   default-podsecuritypolicy:
-    inherit: [ template: podsecuritypolicies ]
     condition: ck8sWorkloadCluster.enabled
+    inherit: [ template: podsecuritypolicies ]
+    installed: {{ .Values | get "ck8sWorkloadCluster.enabled" false }}
     namespace: default
     labels:
       app: dev-rbac
@@ -71,6 +77,7 @@ templates:
       - values/podsecuritypolicies/workload/default.yaml.gotmpl
 
   rook-ceph-podsecuritypolicy:
+    condition: ck8sAnyCluster.enabled
     inherit: [ template: podsecuritypolicies ]
     installed: {{ .Values | get "rookCeph.gatekeeperPsp.enabled" false }}
     namespace: rook-ceph

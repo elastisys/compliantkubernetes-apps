@@ -1,6 +1,7 @@
 ---
 templates:
   monitoring:
+    condition: ck8sAnyCluster.enabled
     namespace: monitoring
     labels:
       app: monitoring
@@ -32,12 +33,14 @@ templates:
     inherit:
       - template: monitoring
       - template: podsecuritypolicies
+    installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
     labels:
       psp: monitoring
     values:
       - values/podsecuritypolicies/common/monitoring.yaml.gotmpl
 
   metrics-server:
+    condition: ck8sAnyCluster.enabled
     inherit: [ template: metrics-server-chart ]
     installed: {{ .Values | get "metricsServer.enabled" false }}
     namespace: kube-system
@@ -50,12 +53,11 @@ templates:
   autoscaling-monitoring:
     disableValidationOnInstall: true
     condition: ck8sManagementCluster.enabled
-    installed: {{ .Values | get "clusterApi.monitoring.enabled" false }}
+    inherit: [ template: monitoring ]
+    installed: {{ .Values | get "global.ck8sK8sInstaller" "none" | eq "capi" }}
     chart: charts/autoscaling-monitoring
     version: 0.1.0
     namespace: capi-cluster
-    labels:
-      app: autoscaling-monitoring
     needs:
       - monitoring/kube-prometheus-stack # creates servicemonitors
     values:
@@ -63,13 +65,14 @@ templates:
 
   openstack-monitoring:
     disableValidationOnInstall: true
+    inherit: [ template: monitoring ]
     installed: {{ .Values | get "openstackMonitoring.enabled" false }}
     chart: charts/openstack-monitoring
     version: 0.1.0
-    {{- if .Values | get "clusterApi.enabled" false }}
-    namespace: openstack-system
-    {{- else }}
+    {{- if .Values | get "global.ck8sK8sInstaller" "none" | eq "kubespray" }}
     namespace: kube-system
+    {{- else }}
+    namespace: openstack-system
     {{- end }}
     name: openstack-monitoring
     labels:
@@ -95,8 +98,8 @@ templates:
 
   s3-exporter:
     disableValidationOnInstall: true
-    inherit: [ template: monitoring ]
     condition: ck8sManagementCluster.enabled
+    inherit: [ template: monitoring ]
     installed: {{ and (.Values | get "s3Exporter.enabled" false) (.Values | get "objectStorage.type" "" | eq "s3") }}
     chart: charts/s3-exporter
     version: 0.1.0
@@ -108,6 +111,7 @@ templates:
 
   kubeapi-metrics:
     condition: ck8sWorkloadCluster.enabled
+    installed: {{ .Values | get "ck8sWorkloadCluster.enabled" false }}
     chart: charts/kubeapi-metrics
     version: 0.1.0
     namespace: kube-system

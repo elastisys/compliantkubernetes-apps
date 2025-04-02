@@ -1,6 +1,7 @@
 ---
 templates:
   cert-manager:
+    condition: ck8sAnyCluster.enabled
     namespace: cert-manager
     labels:
       app: cert-manager
@@ -23,17 +24,20 @@ templates:
     inherit:
       - template: cert-manager
       - template: cert-manager-chart
+    installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
     name: cert-manager
     needs:
+      {{- if .Values | get "networkPolicies.certManager.enabled" false }}
       - cert-manager/networkpolicy
+      {{- end }}
       - monitoring/kube-prometheus-stack # creates servicemonitors
     values:
       - values/cert-manager.yaml.gotmpl
 
   cert-manager-issuers:
     disableValidationOnInstall: true
-    inherit:
-      - template: cert-manager
+    inherit: [ template: cert-manager ]
+    installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
     chart: charts/issuers
     version: 0.1.0
     name: issuers
