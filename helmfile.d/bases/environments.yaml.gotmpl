@@ -4,11 +4,21 @@ helmDefaults:
   timeout: 1800
 
 environments:
+  {{- if .Environment.Name | eq "default" }}
+  default:
+    values:
+      - ck8sManagementCluster: { enabled: false }
+      - ck8sWorkloadCluster: { enabled: false }
+      - ck8sLocalCluster: { enabled: false }
+      - ck8sAnyCluster: { enabled: false }
+
+  {{- else }}
   local_cluster:
     values:
       - ck8sManagementCluster: { enabled: false }
       - ck8sWorkloadCluster: { enabled: false }
       - ck8sLocalCluster: { enabled: true }
+      - ck8sAnyCluster: { enabled: false }
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/sc-config.yaml
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml
@@ -21,6 +31,7 @@ environments:
       - ck8sManagementCluster: { enabled: true }
       - ck8sWorkloadCluster: { enabled: false }
       - ck8sLocalCluster: { enabled: false }
+      - ck8sAnyCluster: { enabled: false }
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/sc-config.yaml
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml
@@ -32,12 +43,15 @@ environments:
       - ck8sManagementCluster: { enabled: false }
       - ck8sWorkloadCluster: { enabled: true }
       - ck8sLocalCluster: { enabled: false }
+      - ck8sAnyCluster: { enabled: false }
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/wc-config.yaml
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/wc-config.yaml
     secrets:
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml
+
+  {{- end }}
 
 templates:
   networkpolicies:
