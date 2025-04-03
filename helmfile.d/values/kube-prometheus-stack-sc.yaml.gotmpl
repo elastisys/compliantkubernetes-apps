@@ -93,7 +93,7 @@ alertmanager:
           matchers:
             # The watchdog alert is always active to show that things are working
             - alertname = Watchdog
-        {{ if not .Values.user.alertmanager.enabled }}
+        {{ if not .Values.prometheus.useralertmanager.enabled }}
         {{- range .Values.global.clustersMonitoring }}
         - receiver: 'null'
           matchers:
