@@ -131,9 +131,16 @@ network.delete() {
 }
 
 container.create() {
+  local run_args
+
+  run_args=()
+  if ! test -z "${CK8S_LOCAL_AUTOSTART_CACHE}"; then
+    run_args=(--restart always)
+  fi
+
   if ! "${runtime}" container inspect "${1}" &>/dev/null; then
     log.info "- creating container ${1}"
-    "${runtime}" run --detach "${@:2}"
+    "${runtime}" run --detach "${run_args[@]}" "${@:2}"
   else
     "${runtime}" start "${1}"
   fi
