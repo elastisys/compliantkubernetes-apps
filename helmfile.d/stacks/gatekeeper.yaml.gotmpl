@@ -1,6 +1,8 @@
 ---
 templates:
   gatekeeper:
+    condition: ck8sAnyCluster.enabled
+    installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
     namespace: gatekeeper-system
     labels:
       app: gatekeeper
@@ -18,8 +20,7 @@ templates:
 
   gatekeeper-templates:
     disableValidationOnInstall: true
-    inherit:
-      - template: gatekeeper
+    inherit: [ template: gatekeeper ]
     chart: charts/gatekeeper/templates
     version: 0.1.0
     name: gatekeeper-templates
@@ -31,8 +32,7 @@ templates:
 
   gatekeeper-mutations:
     disableValidationOnInstall: true
-    inherit:
-      - template: gatekeeper
+    inherit: [ template: gatekeeper ]
     installed: {{ .Values  | get "opa.mutations.enabled" false }}
     chart: charts/gatekeeper/mutations
     version: 0.1.0
@@ -44,8 +44,7 @@ templates:
 
   gatekeeper-constraints:
     disableValidationOnInstall: true
-    inherit:
-      - template: gatekeeper
+    inherit: [ template: gatekeeper ]
     chart: charts/gatekeeper/constraints
     version: 0.1.0
     name: gatekeeper-constraints
@@ -57,8 +56,7 @@ templates:
 
   gatekeeper-metrics:
     disableValidationOnInstall: true
-    inherit:
-      - template: gatekeeper
+    inherit: [ template: gatekeeper ]
     chart: charts/gatekeeper/metrics
     version: 0.1.0
     name: gatekeeper-metrics

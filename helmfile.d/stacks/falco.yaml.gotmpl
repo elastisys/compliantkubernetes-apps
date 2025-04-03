@@ -2,7 +2,7 @@
 templates:
   falco:
     disableValidationOnInstall: true
-    installed: {{ .Values | get "falco.enabled" false }}
+    condition: ck8sAnyCluster.enabled
     namespace: falco
     labels:
       app: falco
@@ -24,6 +24,7 @@ templates:
     inherit:
       - template: falco
       - template: podsecuritypolicies
+    installed: {{ .Values | get "falco.enabled" false }}
     labels:
       psp: falco
     needs:
@@ -35,9 +36,12 @@ templates:
     inherit:
       - template: falco
       - template: falco-chart
+    installed: {{ .Values | get "falco.enabled" false }}
     name: falco
     needs:
+      {{- if .Values | get "networkPolicies.falco.enabled" false }}
       - falco/networkpolicy
+      {{- end }}
       - falco/podsecuritypolicy
       {{- if .Values | get "ck8sManagementCluster.enabled" false }}
       - kube-system/service-cluster-np

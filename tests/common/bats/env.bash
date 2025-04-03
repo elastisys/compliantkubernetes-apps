@@ -116,6 +116,62 @@ env.init() {
   touch "${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml"
 }
 
+env.predictable-secrets() {
+  local password="staticpasswordfortests"
+  local token="staticpasswordforteststhatislong"
+
+  # shellcheck disable=SC2016
+  local general_hash='$2y$10$ifHr8Gi/iek6NPjdxzARmeRQyGT9yii8pRiKXXfwta9eqmLhqUkf6'
+  # shellcheck disable=SC2016
+  local dex_hash='$2a$10$ifHr8Gi/iek6NPjdxzARmeRQyGT9yii8pRiKXXfwta9eqmLhqUkf6'
+  # shellcheck disable=SC2016
+  local harbor_hash='harbor_registry_user$2y$05$YnzTGBh66xklfdQQrAOvTuYL2/okzhV1A4Mffbq0tq4.kV13NW3M2'
+  # shellcheck disable=SC2016
+  local kubeapi_hash='kubeapiuser$2y$05$4Wa3D0DIYPFY5mK/D3NASOfJaZVQ0LrSK9LxNUn0Omy.yNsyvvKlW'
+  # shellcheck disable=SC2016
+  local thanos_hash='$apr1$RQu1URGa$ZORkkE1eYe1WlqskTGPFe1'
+
+  yq.set 'secrets' '["dex"]["kubeloginClientSecret"]' "\"${password}\""
+  yq.set 'secrets' '["dex"]["staticPassword"]' "\"${dex_hash}\""
+  yq.set 'secrets' '["dex"]["staticPasswordNotHashed"]' "\"${password}\""
+
+  yq.set 'secrets' '["grafana"]["clientSecret"]' "\"${password}\""
+  yq.set 'secrets' '["grafana"]["opsClientSecret"]' "\"${password}\""
+  yq.set 'secrets' '["grafana"]["password"]' "\"${password}\""
+
+  yq.set 'secrets' '["harbor"]["clientSecret"]' "\"${password}\""
+  yq.set 'secrets' '["harbor"]["coreSecret"]' "\"${password}\""
+  yq.set 'secrets' '["harbor"]["internal"]["databasePassword"]' "\"${password}\""
+  yq.set 'secrets' '["harbor"]["jobserviceSecret"]' "\"${password}\""
+  yq.set 'secrets' '["harbor"]["password"]' "\"${password}\""
+  yq.set 'secrets' '["harbor"]["registryPassword"]' "\"${password}\""
+  yq.set 'secrets' '["harbor"]["registryPasswordHtpasswd"]' "\"${harbor_hash}\""
+  yq.set 'secrets' '["harbor"]["registrySecret"]' "\"${harbor_hash}\""
+  yq.set 'secrets' '["harbor"]["xsrf"]' "\"${token}\""
+
+  yq.set 'secrets' '["kubeapiMetricsPassword"]["xsrf"]' "\"${password}\""
+  yq.set 'secrets' '["kubeapiMetricsPasswordHtpasswd"]["xsrf"]' "\"${kubeapi_hash}\""
+
+  yq.set 'secrets' '["thanos"]["receiver"]["basic_auth"]["password"]' "\"${password}\""
+  yq.set 'secrets' '["thanos"]["receiver"]["basic_auth"]["passwordHash"]' "\"${thanos_hash}\""
+
+  yq.set 'secrets' '["opensearch"]["adminPassword"]' "\"${password}\""
+  yq.set 'secrets' '["opensearch"]["adminHash"]' "\"${general_hash}\""
+  yq.set 'secrets' '["opensearch"]["clientSecret"]' "\"${password}\""
+  yq.set 'secrets' '["opensearch"]["configurerPassword"]' "\"${password}\""
+  yq.set 'secrets' '["opensearch"]["configurerHash"]' "\"${general_hash}\""
+  yq.set 'secrets' '["opensearch"]["dashboardsPassword"]' "\"${password}\""
+  yq.set 'secrets' '["opensearch"]["dashboardsHash"]' "\"${general_hash}\""
+  yq.set 'secrets' '["opensearch"]["dashboardsCookieEncKey"]' "\"${token}\""
+  yq.set 'secrets' '["opensearch"]["curatorPassword"]' "\"${password}\""
+  yq.set 'secrets' '["opensearch"]["fluentdPassword"]' "\"${password}\""
+  yq.set 'secrets' '["opensearch"]["metricsExporterPassword"]' "\"${password}\""
+  yq.set 'secrets' '["opensearch"]["snapshotterPassword"]' "\"${password}\""
+
+  yq.set 'secrets' '["user"]["alertmanagerPassword"]' "\"${password}\""
+  yq.set 'secrets' '["user"]["grafanaPassword"]' "\"${password}\""
+}
+
 # Teardown environment
 env.teardown() {
   rm -rf "${CK8S_CONFIG_PATH}"

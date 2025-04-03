@@ -197,8 +197,9 @@ Some tests need pregenerated resources that are used as the assertion during tes
 To regenerate these resources export `CK8S_TESTS_REGENERATE_RESOURCES="true"` and run tests with the `resources` tag.
 
 ```bash
-export CK8S_TESTS_REGENERATE_RESOURCES="true"
 make enter-<target>
+export CK8S_TESTS_REGENERATE_RESOURCES="true"
+cd tests
 bats <file> --filter-tags resources
 ```
 
