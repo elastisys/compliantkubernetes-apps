@@ -4736,13 +4736,16 @@ properties:
         type: array
       useralertmanager:
         title: user Alertmanager
+        description: Configuration options for deploying a user-specific Alertmanager 
         type: object
         properties:
           enabled:
            title: Enable user Alertmanager
+           description: Allows to enable alertmanager for user
            type: boolean
           ingressenabled:
             title: Enable User Alertmanager ingress
+            description: Allows to have ingress for user alertmanager with basic auth
             type: boolean
           username:
             title: Username for  Alertmanager login
