@@ -49,7 +49,7 @@ This requires that `kind` is installed and that either `podman` or `docker` is a
 ```
 
 This will configure apps with `ck8sCloudProvider: none` and `ck8sFlavor: <apps-flavor>` and set some default values to run on local clusters.
-By default it will use `calico` for networking, `local-path-provisioner` for block storage, and `minio` for object storage.
+By default, it will use `calico` for networking, `local-path-provisioner` for block storage, and `minio` for object storage.
 
 The configuration contains some `set-me`'s that must be configured manually.
 
@@ -84,7 +84,7 @@ helmfile -e workload_cluster <operation> --selector app=<application> --include-
 > So one have to be explicit about which features to install.
 
 Use `helmfile -e <service|workload>_cluster list` to list all releases and to view their labels.
-By default all releases have `name=<release-name>` and `chart=<chart-name>` as predefined labels.
+By default, all releases have `name=<release-name>` and `chart=<chart-name>` as predefined labels.
 
 Enabling ingress and resolve requires a special setup.
 The ingress will by default be port-mapped on the local address `127.0.64.43`.
