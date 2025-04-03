@@ -26,7 +26,7 @@ repos:
       - id: check-merge-conflict
         exclude: ^helmfile.d/upstream/opensearch-project/opensearch/CHANGELOG.md$
       - id: check-json
-        exclude: ^helmfile\.d/upstream/
+        exclude: ^(helmfile\.d/upstream/|tests/unit/general/resources/template-list-default.json$)
       - id: check-toml
         exclude: ^helmfile\.d/upstream/
       - id: check-yaml
