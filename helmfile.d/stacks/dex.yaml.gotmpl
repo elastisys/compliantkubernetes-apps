@@ -2,8 +2,9 @@
 templates:
   dex:
     disableValidationOnInstall: true
-    inherit: [ template: dex-chart ]
     condition: ck8sManagementCluster.enabled
+    inherit: [ template: dex-chart ]
+    installed: {{ .Values | get "ck8sManagementCluster.enabled" false }}
     namespace: dex
     name: dex
     labels:

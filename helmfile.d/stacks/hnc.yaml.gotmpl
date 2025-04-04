@@ -2,7 +2,7 @@
 templates:
   hnc:
     condition: ck8sWorkloadCluster.enabled
-    installed: {{ .Values | get "hnc.enabled" false }}
+    installed: {{ and (.Values | get "ck8sWorkloadCluster.enabled" false) (.Values | get "hnc.enabled" false) }}
     namespace: hnc-system
     labels:
       app: hnc

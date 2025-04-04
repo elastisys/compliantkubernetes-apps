@@ -20,14 +20,12 @@ templates:
       - values/networkpolicies/service/thanos.yaml.gotmpl
 
   thanos-ingress-secret:
+    condition: ck8sAnyCluster.enabled
+    inherit: [ template: thanos ]
     installed: {{ .Values | get "thanos.enabled" false }}
     chart: charts/thanos/ingress-secret
     version: 0.1.0
-    {{- if .Values | get "ck8sManagementCluster.enabled" false }}
-    namespace: thanos
-    labels:
-      app: thanos
-    {{- else if .Values | get "ck8sWorkloadCluster.enabled" false }}
+    {{- if .Values | get "ck8sWorkloadCluster.enabled" false }}
     namespace: monitoring
     labels:
       app: prometheus
@@ -42,7 +40,7 @@ templates:
     inherit:
       - template: thanos
       - template: thanos-chart
-    installed: {{ .Values | get "thanos.enabled" false }}
+    installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "thanos.enabled" false) }}
     name: thanos-objectstorage-secret
     needs:
       - kube-system/admin-namespaces
@@ -59,7 +57,9 @@ templates:
     name: thanos-query
     needs:
       - monitoring/kube-prometheus-stack # creates servicemonitors
+      {{- if .Values | get "networkPolicies.thanos.enabled" false }}
       - thanos/networkpolicy
+      {{- end }}
     values:
       - values/thanos/common.yaml.gotmpl
       - values/thanos/query.yaml.gotmpl
@@ -69,11 +69,13 @@ templates:
     inherit:
       - template: thanos
       - template: thanos-chart
-    installed: {{ and (.Values | get "thanos.enabled" false) (.Values | get "thanos.receiver.enabled" false) }}
+    installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false)  (.Values | get "thanos.enabled" false) (.Values | get "thanos.receiver.enabled" false) }}
     name: thanos-receiver
     needs:
       - monitoring/kube-prometheus-stack # creates servicemonitors
+      {{- if .Values | get "networkPolicies.thanos.enabled" false }}
       - thanos/networkpolicy
+      {{- end }}
       - thanos/thanos-objectstorage-secret
     values:
       - values/thanos/common.yaml.gotmpl
@@ -88,7 +90,9 @@ templates:
     name: thanos-ruler
     needs:
       - monitoring/kube-prometheus-stack # creates thanosrulers
+      {{- if .Values | get "networkPolicies.thanos.enabled" false }}
       - thanos/networkpolicy
+      {{- end }}
       - thanos/thanos-objectstorage-secret
     values:
       - values/thanos/ruler.yaml.gotmpl

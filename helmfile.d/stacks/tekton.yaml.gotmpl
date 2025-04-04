@@ -1,6 +1,8 @@
 ---
 templates:
   tekton:
+    condition: ck8sManagementCluster.enabled
+    installed: {{ .Values | get "tektonPipelines.enabled" false }}
     namespace: tekton-pipelines
     labels:
       app: tekton
@@ -19,12 +21,10 @@ templates:
       - values/networkpolicies/service/tektonPipelines.yaml.gotmpl
 
   tekton-pipelines-podsecuritypolicy:
-    inherit: [ template: podsecuritypolicies ]
-    condition: ck8sManagementCluster.enabled
-    installed: {{ .Values | get "tektonPipelines.enabled" false }}
-    namespace: tekton-pipelines
+    inherit:
+      - template: tekton
+      - template: podsecuritypolicies
     labels:
-      app: tekton
       psp: tekton
     values:
       - values/podsecuritypolicies/service/tekton-pipelines.yaml.gotmpl
@@ -32,16 +32,16 @@ templates:
   tekton-pipelines:
     disableValidationOnInstall: true
     condition: ck8sManagementCluster.enabled
-    installed: {{ .Values | get "tektonPipelines.enabled" false }}
-    namespace: tekton-pipelines
-    name: tekton-pipelines
-    labels:
-      app: tekton
+    inherit: [ template: tekton ]
     chart: charts/tekton-pipelines
     version: 0.1.0
+    name: tekton-pipelines
     needs:
       - kube-system/admin-namespaces
       - monitoring/kube-prometheus-stack # creates servicemonitors and prometheusrules
+      {{- if .Values | get "networkPolicies.tektonPipelines.enabled" false }}
+      - tekton-pipelines/networkpolicy
+      {{- end }}
       - tekton-pipelines/podsecuritypolicy
     values:
       - values/tekton.gotmpl

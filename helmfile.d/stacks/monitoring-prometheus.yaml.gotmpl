@@ -1,6 +1,7 @@
 ---
 templates:
   prometheus:
+    condition: ck8sAnyCluster.enabled
     namespace: monitoring
     labels:
       app: prometheus
@@ -10,6 +11,7 @@ templates:
     inherit:
       - template: prometheus
       - template: kube-prometheus-stack-chart
+    installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
     name: kube-prometheus-stack
     needs:
       - monitoring/networkpolicy
@@ -30,6 +32,7 @@ templates:
     inherit:
       - template: prometheus
       - template: prometheus-blackbox-exporter-chart
+    installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
     name: prometheus-blackbox-exporter
     needs:
       - monitoring/kube-prometheus-stack # creates prometheus-operator/servicemonitors
@@ -42,8 +45,9 @@ templates:
 
   prometheus-sc-monitors:
     disableValidationOnInstall: true
-    inherit: [ template: prometheus ]
     condition: ck8sManagementCluster.enabled
+    inherit: [ template: prometheus ]
+    installed: {{ .Values | get "ck8sManagementCluster.enabled" false }}
     chart: charts/prometheus-servicemonitor
     version: 0.1.1
     name: sc-servicemonitor
@@ -54,8 +58,9 @@ templates:
 
   prometheus-sc-rules:
     disableValidationOnInstall: true
-    inherit: [ template: prometheus ]
     condition: ck8sManagementCluster.enabled
+    inherit: [ template: prometheus ]
+    installed: {{ .Values | get "ck8sManagementCluster.enabled" false }}
     chart: charts/prometheus-alerts
     version: 0.1.1
     name: sc-alerts
@@ -67,8 +72,9 @@ templates:
 
   prometheus-wc-monitors:
     disableValidationOnInstall: true
-    inherit: [ template: prometheus ]
     condition: ck8sWorkloadCluster.enabled
+    inherit: [ template: prometheus ]
+    installed: {{ .Values | get "ck8sWorkloadCluster.enabled" false }}
     chart: charts/prometheus-servicemonitor
     version: 0.1.1
     name: wc-servicemonitor
@@ -79,8 +85,9 @@ templates:
 
   prometheus-wc-rules:
     disableValidationOnInstall: true
-    inherit: [ template: prometheus ]
     condition: ck8sWorkloadCluster.enabled
+    inherit: [ template: prometheus ]
+    installed: {{ .Values | get "ck8sWorkloadCluster.enabled" false }}
     chart: charts/prometheus-alerts
     version: 0.1.1
     name: ck8s-alerts
@@ -91,9 +98,9 @@ templates:
       - values/prometheus-alerts-runbook-urls.yaml.gotmpl
 
   kube-state-metrics-extra-resources:
-    inherit: [ template: prometheus ]
     condition: ck8sManagementCluster.enabled
-    installed: {{ .Values | get "clusterApi.enabled" "false" }}
+    inherit: [ template: prometheus ]
+    installed: {{ .Values | get "ck8sManagementCluster.enabled" false }}
     chart: charts/kube-state-metrics-extra-resource-metrics
     version: 0.1.0
     name: kube-state-metrics-extra-resource-metrics
@@ -105,7 +112,7 @@ templates:
   dev-alertmanager:
     disableValidationOnInstall: true
     condition: ck8sWorkloadCluster.enabled
-    installed: {{ .Values | get "user.alertmanager.enabled" false }}
+    installed: {{ and (.Values | get "ck8sWorkloadCluster.enabled" false) (.Values | get "user.alertmanager.enabled" false) }}
     chart: charts/user-alertmanager
     version: 0.1.0
     namespace: alertmanager

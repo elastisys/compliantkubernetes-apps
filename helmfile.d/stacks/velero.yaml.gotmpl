@@ -1,6 +1,7 @@
 ---
 templates:
   velero:
+    condition: ck8sAnyCluster.enabled
     namespace: velero
     labels:
       app: velero

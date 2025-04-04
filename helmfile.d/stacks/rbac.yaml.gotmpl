@@ -1,12 +1,14 @@
 ---
 templates:
   rbac:
+    condition: ck8sAnyCluster.enabled
     namespace: kube-system
     labels:
       policy: rbac
 
   admin-rbac:
     inherit: [ template: rbac ]
+    installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
     chart: charts/cluster-admin-rbac
     version: 0.1.0
     name: cluster-admin-rbac
@@ -17,8 +19,9 @@ templates:
 
   dev-rbac:
     disableValidationOnInstall: true
-    inherit: [ template: rbac ]
     condition: ck8sWorkloadCluster.enabled
+    inherit: [ template: rbac ]
+    installed: {{ .Values | get "ck8sWorkloadCluster.enabled" false }}
     chart: charts/user-rbac
     version: 0.1.0
     name: user-rbac
@@ -39,8 +42,8 @@ templates:
       - values/user-rbac.yaml.gotmpl
 
   dev-rbac-crds:
-    inherit: [ template: rbac ]
     condition: ck8sWorkloadCluster.enabled
+    inherit: [ template: rbac ]
     installed: {{ .Values | get "gatekeeper.allowUserCRDs.enabled" false }}
     chart: charts/user-crds
     version: 1.0.0
@@ -58,8 +61,9 @@ templates:
       - values/userCRDs/strimzi/kafka.yaml.gotmpl
 
   dev-rbac-extra:
-    inherit: [ template: rbac ]
     condition: ck8sWorkloadCluster.enabled
+    inherit: [ template: rbac ]
+    installed: {{ .Values | get "gatekeeper.allowUserCRDs.enabled" false }}
     chart: charts/user-crds
     version: 1.0.0
     name: dev-rbac-extra

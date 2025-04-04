@@ -2,16 +2,18 @@
 templates:
   tigera:
     disableValidationOnInstall: true
-    inherit: [ template: tigera-operator-chart ]
     condition: ck8sLocalCluster.enabled
+    inherit: [ template: tigera-operator-chart ]
+    installed: {{ .Values | get "ck8sLocalCluster.enabled" false }}
     namespace: tigera-operator
     name: tigera
     labels:
       app: tigera
 
   minio:
-    inherit: [ template: minio-chart ]
     condition: ck8sLocalCluster.enabled
+    inherit: [ template: minio-chart ]
+    installed: {{ .Values | get "ck8sLocalCluster.enabled" false }}
     namespace: minio-system
     name: minio
     labels:
