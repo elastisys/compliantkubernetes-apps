@@ -1,0 +1,266 @@
+---
+# Source: gatekeeper-constraints/templates/image-registry/constraint.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sAllowedRepos
+metadata:
+  name: elastisys-require-harbor-registry
+spec:
+  enforcementAction: warn
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod", "ReplicationController"]
+      - apiGroups: ["apps"]
+        kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
+      - apiGroups: ["extensions"]
+        kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
+      - apiGroups: ["batch"]
+        kinds: ["Job", "CronJob"]
+    excludedNamespaces: ["kube-system", "kube-public", "kube-node-lease", "calico-system"]
+    namespaceSelector:
+      matchExpressions:
+      - key: owner
+        operator: NotIn
+        values:
+        - operator
+  parameters:
+    repos:
+      - harbor.ck8s.example.com
+---
+# Source: gatekeeper-constraints/templates/disallow-localhost-seccomp/constraint.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sDisallowLocalhostSeccomp
+metadata:
+  name: elastisys-disallow-localhost-seccomp-profile
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+    - apiGroups:
+      - ""
+      kinds:
+      - Pod
+      - ReplicationController
+    - apiGroups:
+      - apps
+      kinds:
+      - Deployment
+      - StatefulSet
+      - DaemonSet
+      - ReplicaSet
+    - apiGroups:
+      - extensions
+      kinds:
+      - Deployment
+      - StatefulSet
+      - DaemonSet
+      - ReplicaSet
+    - apiGroups:
+      - batch
+      kinds:
+      - Job
+      - CronJob
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: NotIn
+        values:
+        - ingress-nginx
+---
+# Source: gatekeeper-constraints/templates/disallow-tag/constraint.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sDisallowedTags
+metadata:
+  name: elastisys-container-image-must-not-have-disallowed-tags
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod", "ReplicationController"]
+      - apiGroups: ["apps"]
+        kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
+      - apiGroups: ["extensions"]
+        kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
+      - apiGroups: ["batch"]
+        kinds: ["Job", "CronJob"]
+    excludedNamespaces: ["kube-system", "kube-public", "kube-node-lease", "calico-system"]
+    namespaceSelector:
+      matchExpressions:
+      - key: owner
+        operator: NotIn
+        values:
+        - operator
+  parameters:
+    tags:
+      - latest
+---
+# Source: gatekeeper-constraints/templates/deployment-minimum-replicas/constraint.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sMinimumReplicas
+metadata:
+  name: elastisys-warn-minimum-replicas
+spec:
+  enforcementAction: warn
+  match:
+    kinds:
+      - apiGroups:
+          - apps
+        kinds:
+          - Deployment
+          - StatefulSet
+    excludedNamespaces:
+      - calico-system
+      - kube-note-lease
+      - kube-public
+      - kube-system
+    namespaceSelector:
+      matchExpressions:
+      - key: owner
+        operator: NotIn
+        values:
+        - operator
+  parameters:
+    min_replicas: 2
+    annotation: elastisys.io/ignore-minimum-replicas
+---
+# Source: gatekeeper-constraints/templates/prevent-accidental-deletion/constraint.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPreventAccidentalDeletion
+metadata:
+  name: elastisys-prevent-accidental-deletion
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+      - apiGroups: ["cluster.x-k8s.io"]
+        kinds:
+          - Cluster
+      - apiGroups: ["infrastructure.cluster.x-k8s.io"]
+        kinds:
+          - OpenStackCluster
+          - AzureCluster
+  parameters:
+    annotation: elastisys.io/ok-to-delete
+    kinds:
+      - Cluster
+      - OpenstackCluster
+      - AzureCluster
+---
+# Source: gatekeeper-constraints/templates/reject-local-storage-empty-dir/constraint.yaml
+apiVersion: constraints.gatekeeper.sh/v1alpha1
+kind: K8sRejectLocalStorageEmptyDir
+metadata:
+  name: elastisys-reject-local-storage-emptydir
+spec:
+  enforcementAction: warn
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod", "ReplicationController"]
+      - apiGroups: ["apps"]
+        kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
+      - apiGroups: ["extensions"]
+        kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
+      - apiGroups: ["batch"]
+        kinds: ["Job", "CronJob"]
+    excludedNamespaces: ["kube-system", "kube-public", "kube-node-lease", "calico-system"]
+    namespaceSelector:
+      matchExpressions:
+      - key: owner
+        operator: NotIn
+        values:
+        - operator
+  parameters:
+    volumeAnnotation: cluster-autoscaler.kubernetes.io/safe-to-evict-local-volumes
+    podAnnotation: cluster-autoscaler.kubernetes.io/safe-to-evict
+---
+# Source: gatekeeper-constraints/templates/reject-pod-without-controller/constraint.yaml
+apiVersion: constraints.gatekeeper.sh/v1alpha1
+kind: K8sRejectPodWithoutController
+metadata:
+  name: elastisys-reject-pod-without-controller
+spec:
+  enforcementAction: warn
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    excludedNamespaces: ["kube-system", "kube-public", "kube-node-lease", "calico-system"]
+    namespaceSelector:
+      matchExpressions:
+      - key: owner
+        operator: NotIn
+        values:
+        - operator
+  parameters:
+    annotation: "cluster-autoscaler.kubernetes.io/safe-to-evict"
+---
+# Source: gatekeeper-constraints/templates/networkpolicies/constraint.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequireNetworkPolicy
+metadata:
+  name: elastisys-require-networkpolicy
+spec:
+  enforcementAction: warn
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod", "ReplicationController"]
+      - apiGroups: ["apps"]
+        kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
+      - apiGroups: ["extensions"]
+        kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
+      - apiGroups: ["batch"]
+        kinds: ["Job", "CronJob"]
+    excludedNamespaces: ["kube-system", "kube-public", "kube-node-lease", "calico-system"]
+    namespaceSelector:
+      matchExpressions:
+      - key: owner
+        operator: NotIn
+        values:
+        - operator
+---
+# Source: gatekeeper-constraints/templates/resource-requests/constraint.yaml
+apiVersion: constraints.gatekeeper.sh/v1alpha1
+kind: K8sResourceRequests
+metadata:
+  name: elastisys-require-resource-requests
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod", "ReplicationController"]
+      - apiGroups: ["apps"]
+        kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
+      - apiGroups: ["extensions"]
+        kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
+      - apiGroups: ["batch"]
+        kinds: ["Job", "CronJob"]
+    excludedNamespaces: ["kube-system", "kube-public", "kube-node-lease", "calico-system"]
+    namespaceSelector:
+      matchExpressions:
+      - key: owner
+        operator: NotIn
+        values:
+        - operator
+---
+# Source: gatekeeper-constraints/templates/restrict-pod-disruption-budgets/constraint.yaml
+apiVersion: constraints.gatekeeper.sh/v1alpha1
+kind: K8sRestrictPodDisruptionBudgets
+metadata:
+  name: elastisys-restrict-pod-disruption-budgets
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["ReplicationController"]
+      - apiGroups: ["apps"]
+        kinds: ["Deployment", "StatefulSet", "ReplicaSet"]
+      - apiGroups: ["policy"]
+        kinds: ["PodDisruptionBudget"]
+    excludedNamespaces: ["kube-system", "kube-public", "kube-node-lease", "calico-system"]
+    # Note that this does not exclude all namespaces with label owner=operator
+

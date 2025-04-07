@@ -1,0 +1,3905 @@
+---
+# Source: podsecuritypolicies/templates/custom/mutations/fsgroup.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: fsgroup-rook-ceph-crashcollector
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-crashcollector
+  location: "spec.securityContext.fsGroup"
+  parameters:
+    assign:
+      value: 167
+    pathTests:
+      - subPath: "spec.securityContext.fsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/fsgroup.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: fsgroup-rook-ceph-tools
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-tools
+  location: "spec.securityContext.fsGroup"
+  parameters:
+    assign:
+      value: 2016
+    pathTests:
+      - subPath: "spec.securityContext.fsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-crashcollector-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-crashcollector
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-crashcollector-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-crashcollector
+  location: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-crashcollector-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-crashcollector
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-csi-detect-version-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-csi-detect-version
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-csi-detect-version-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-csi-detect-version
+  location: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-csi-detect-version-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-csi-detect-version
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-csi-rbdplugin-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: csi-rbdplugin
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-csi-rbdplugin-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: csi-rbdplugin
+  location: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-csi-rbdplugin-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: csi-rbdplugin
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-csi-rbdplugin-provisioner-contai
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: csi-rbdplugin-provisioner
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-csi-rbdplugin-provisioner-epheme
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: csi-rbdplugin-provisioner
+  location: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-csi-rbdplugin-provisioner-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: csi-rbdplugin-provisioner
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-detect-version-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-detect-version
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-detect-version-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-detect-version
+  location: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-detect-version-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-detect-version
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-mgr-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-mgr
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-mgr-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-mgr
+  location: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-mgr-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-mgr
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-mon-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-mon
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-mon-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-mon
+  location: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-mon-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-mon
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-operator-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-operator
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-operator-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-operator
+  location: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-operator-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-operator
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-osd-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-osd
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-osd-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-osd
+  location: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-osd-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-osd
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-osd-prepare-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-osd-prepare
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-osd-prepare-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-osd-prepare
+  location: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-osd-prepare-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-osd-prepare
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-tools-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-tools
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-tools-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-tools
+  location: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-tools-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-tools
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-csi-detect-version-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-csi-detect-version
+  location: "spec.containers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-csi-detect-version-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-csi-detect-version
+  location: "spec.ephemeralContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-csi-detect-version-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-csi-detect-version
+  location: "spec.initContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-csi-rbdplugin-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: csi-rbdplugin
+  location: "spec.containers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-csi-rbdplugin-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: csi-rbdplugin
+  location: "spec.ephemeralContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-csi-rbdplugin-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: csi-rbdplugin
+  location: "spec.initContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-csi-rbdplugin-provisioner-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: csi-rbdplugin-provisioner
+  location: "spec.containers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-csi-rbdplugin-provisioner-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: csi-rbdplugin-provisioner
+  location: "spec.ephemeralContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-csi-rbdplugin-provisioner-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: csi-rbdplugin-provisioner
+  location: "spec.initContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-detect-version-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-detect-version
+  location: "spec.containers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-detect-version-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-detect-version
+  location: "spec.ephemeralContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-detect-version-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-detect-version
+  location: "spec.initContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-operator-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-operator
+  location: "spec.containers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-operator-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-operator
+  location: "spec.ephemeralContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-operator-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-operator
+  location: "spec.initContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-osd-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-osd
+  location: "spec.containers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-osd-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-osd
+  location: "spec.ephemeralContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-osd-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-osd
+  location: "spec.initContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-osd-prepare-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-osd-prepare
+  location: "spec.containers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-osd-prepare-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-osd-prepare
+  location: "spec.ephemeralContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-osd-prepare-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-osd-prepare
+  location: "spec.initContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/run-as-group.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-group-rook-ceph-crashcollector-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-crashcollector
+  location: "spec.containers[name: *].securityContext.runAsGroup"
+  parameters:
+    assign:
+      value: 167
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.runAsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/run-as-group.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-group-rook-ceph-crashcollector-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-crashcollector
+  location: "spec.ephemeralContainers[name: *].securityContext.runAsGroup"
+  parameters:
+    assign:
+      value: 167
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.runAsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/run-as-group.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-group-rook-ceph-crashcollector-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-crashcollector
+  location: "spec.initContainers[name: *].securityContext.runAsGroup"
+  parameters:
+    assign:
+      value: 167
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.runAsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/run-as-user.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-user-rook-ceph-crashcollector-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-crashcollector
+  location: "spec.containers[name: *].securityContext.runAsUser"
+  parameters:
+    assign:
+      value: 167
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.runAsUser"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/run-as-user.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-user-rook-ceph-crashcollector-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-crashcollector
+  location: "spec.ephemeralContainers[name: *].securityContext.runAsUser"
+  parameters:
+    assign:
+      value: 167
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.runAsUser"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/run-as-user.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-user-rook-ceph-crashcollector-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-crashcollector
+  location: "spec.initContainers[name: *].securityContext.runAsUser"
+  parameters:
+    assign:
+      value: 167
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.runAsUser"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/fsgroup.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: fsgroup-rook-ceph-restricted
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-crashcollector"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-tools"
+  location: "spec.securityContext.fsGroup"
+  parameters:
+    assign:
+      value: 1
+    pathTests:
+      - subPath: "spec.securityContext.fsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/host-ipc.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: host-ipc-rook-ceph-restricted
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+  location: "spec.hostIPC"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.hostIPC"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/host-pid.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: host-pid-rook-ceph-restricted
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+  location: "spec.hostPID"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.hostPID"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privilege-escalation.yaml
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-crashcollector"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-csi-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin-provisioner"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mgr"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mon"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-operator"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd-prepare"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-tools"
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-crashcollector"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-csi-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin-provisioner"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mgr"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mon"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-operator"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd-prepare"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-tools"
+  location: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-rook-ceph-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-crashcollector"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-csi-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin-provisioner"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mgr"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mon"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-operator"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd-prepare"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-tools"
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+  location: "spec.containers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+  location: "spec.ephemeralContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-rook-ceph-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+  location: "spec.initContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-group.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-group-rook-ceph-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-crashcollector"
+  location: "spec.containers[name: *].securityContext.runAsGroup"
+  parameters:
+    assign:
+      value: 1
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.runAsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-group.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-group-rook-ceph-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-crashcollector"
+  location: "spec.ephemeralContainers[name: *].securityContext.runAsGroup"
+  parameters:
+    assign:
+      value: 1
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.runAsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-group.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-group-rook-ceph-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-crashcollector"
+  location: "spec.initContainers[name: *].securityContext.runAsGroup"
+  parameters:
+    assign:
+      value: 1
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.runAsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-non-root.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-non-root-rook-ceph-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-csi-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin-provisioner"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mgr"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mon"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-operator"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd-prepare"
+  location: "spec.containers[name: *].securityContext.runAsNonRoot"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.runAsNonRoot"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-non-root.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-non-root-rook-ceph-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-csi-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin-provisioner"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mgr"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mon"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-operator"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd-prepare"
+  location: "spec.ephemeralContainers[name: *].securityContext.runAsNonRoot"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.runAsNonRoot"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-non-root.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-non-root-rook-ceph-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-csi-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin-provisioner"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mgr"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mon"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-operator"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd-prepare"
+  location: "spec.initContainers[name: *].securityContext.runAsNonRoot"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.runAsNonRoot"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/seccomp-profile.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: seccomp-profile-rook-ceph-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+  location: "spec.securityContext.seccompProfile.type"
+  parameters:
+    assign:
+      value: RuntimeDefault
+    pathTests:
+      - subPath: "spec.securityContext.seccompProfile.type"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/seccomp-profile.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: seccomp-profile-rook-ceph-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+  location: "spec.ephemeralContainers[name: *].securityContext.seccompProfile.type"
+  parameters:
+    assign:
+      value: RuntimeDefault
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.seccompProfile.type"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/seccomp-profile.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: seccomp-profile-rook-ceph-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+  location: "spec.initContainers[name: *].securityContext.seccompProfile.type"
+  parameters:
+    assign:
+      value: RuntimeDefault
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.seccompProfile.type"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/privilege-escalation.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowPrivilegeEscalationContainer
+metadata:
+  name: privilege-escalation-rook-ceph-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-crashcollector"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-csi-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin-provisioner"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mgr"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mon"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-operator"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd-prepare"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-tools"
+---
+# Source: podsecuritypolicies/templates/custom/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-rook-ceph-crashcollector
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-crashcollector
+  parameters:
+    runAsUser:
+      rule: MustRunAsNonRoot
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/custom/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-rook-ceph-csi-detect-version
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-csi-detect-version
+  parameters:
+    runAsUser:
+      rule: RunAsAny
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/custom/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-rook-ceph-csi-rbdplugin
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: csi-rbdplugin
+  parameters:
+    runAsUser:
+      rule: RunAsAny
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/custom/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-rook-ceph-csi-rbdplugin-provisioner
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: csi-rbdplugin-provisioner
+  parameters:
+    runAsUser:
+      rule: RunAsAny
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/custom/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-rook-ceph-detect-version
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-detect-version
+  parameters:
+    runAsUser:
+      rule: RunAsAny
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/custom/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-rook-ceph-mgr
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-mgr
+  parameters:
+    runAsUser:
+      rule: RunAsAny
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/custom/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-rook-ceph-mon
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-mon
+  parameters:
+    runAsUser:
+      rule: RunAsAny
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/custom/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-rook-ceph-operator
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-operator
+  parameters:
+    runAsUser:
+      rule: RunAsAny
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/custom/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-rook-ceph-osd
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-osd
+  parameters:
+    runAsUser:
+      rule: RunAsAny
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/custom/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-rook-ceph-osd-prepare
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-osd-prepare
+  parameters:
+    runAsUser:
+      rule: RunAsAny
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/custom/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-rook-ceph-tools
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-tools
+  parameters:
+    runAsUser:
+      rule: MustRunAsNonRoot
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/default/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-rook-ceph-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-crashcollector"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-csi-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin-provisioner"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mgr"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mon"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-operator"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd-prepare"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-tools"
+  parameters:
+    runAsUser:
+      rule: MustRunAsNonRoot
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/default/capabilities.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPCapabilities
+metadata:
+  name: capabilities-rook-ceph-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-csi-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin-provisioner"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mgr"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mon"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-operator"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd-prepare"
+  parameters:
+    requiredDropCapabilities:
+      - ALL
+---
+# Source: podsecuritypolicies/templates/default/sysctls.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPForbiddenSysctls
+metadata:
+  name: sysctls-rook-ceph-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+  parameters:
+    allowedSysctls: []
+    forbiddenSysctls:
+      - "*"
+---
+# Source: podsecuritypolicies/templates/custom/host-paths.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostFilesystem
+metadata:
+  name: host-paths-rook-ceph-crashcollector
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-crashcollector
+  parameters:
+    allowedHostPaths:
+      - pathPrefix: /var/lib/rook
+---
+# Source: podsecuritypolicies/templates/custom/host-paths.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostFilesystem
+metadata:
+  name: host-paths-rook-ceph-csi-rbdplugin
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: csi-rbdplugin
+  parameters:
+    allowedHostPaths:
+      - pathPrefix: /run/udev
+      - pathPrefix: /dev
+      - pathPrefix: /var/lib/rook
+      - pathPrefix: /var/lib/kubelet/plugins_registry
+      - pathPrefix: /var/lib/kubelet/plugins
+      - pathPrefix: /var/lib/kubelet/pods
+      - pathPrefix: /sys
+      - pathPrefix: /run/mount
+      - pathPrefix: /lib/modules
+---
+# Source: podsecuritypolicies/templates/custom/host-paths.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostFilesystem
+metadata:
+  name: host-paths-rook-ceph-csi-rbdplugin-provisioner
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: csi-rbdplugin-provisioner
+  parameters:
+    allowedHostPaths:
+      - pathPrefix: /dev
+      - pathPrefix: /sys
+      - pathPrefix: /lib/modules
+---
+# Source: podsecuritypolicies/templates/custom/host-paths.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostFilesystem
+metadata:
+  name: host-paths-rook-ceph-mgr
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-mgr
+  parameters:
+    allowedHostPaths:
+      - pathPrefix: /var/lib/rook
+---
+# Source: podsecuritypolicies/templates/custom/host-paths.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostFilesystem
+metadata:
+  name: host-paths-rook-ceph-mon
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-mon
+  parameters:
+    allowedHostPaths:
+      - pathPrefix: /var/lib/rook
+---
+# Source: podsecuritypolicies/templates/custom/host-paths.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostFilesystem
+metadata:
+  name: host-paths-rook-ceph-osd
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-osd
+  parameters:
+    allowedHostPaths:
+      - pathPrefix: /run/udev
+      - pathPrefix: /dev
+      - pathPrefix: /var/lib/rook
+---
+# Source: podsecuritypolicies/templates/custom/host-paths.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostFilesystem
+metadata:
+  name: host-paths-rook-ceph-osd-prepare
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-osd-prepare
+  parameters:
+    allowedHostPaths:
+      - pathPrefix: /
+---
+# Source: podsecuritypolicies/templates/default/host-paths.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostFilesystem
+metadata:
+  name: host-paths-rook-ceph-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-crashcollector"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin-provisioner"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mgr"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mon"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd-prepare"
+  parameters:
+    allowedHostPaths: []
+---
+# Source: podsecuritypolicies/templates/default/host-namespace.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostNamespace
+metadata:
+  name: host-namespace-rook-ceph-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin"
+---
+# Source: podsecuritypolicies/templates/custom/host-network-ports.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostNetworkingPorts
+metadata:
+  name: host-network-ports-rook-ceph-csi-rbdplugin
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: csi-rbdplugin
+  parameters:
+    hostNetwork: true
+    min: 1
+    max: 65535
+---
+# Source: podsecuritypolicies/templates/default/host-network-ports.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostNetworkingPorts
+metadata:
+  name: host-network-ports-rook-ceph-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin"
+  parameters:
+    hostNetwork: false
+    min: 0
+    max: 0
+---
+# Source: podsecuritypolicies/templates/default/privileged.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPPrivilegedContainer
+metadata:
+  name: privileged-rook-ceph-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-csi-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin-provisioner"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-operator"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd-prepare"
+---
+# Source: podsecuritypolicies/templates/custom/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-rook-ceph-crashcollector
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-crashcollector
+  parameters:
+    volumes:
+      - secret
+      - projected
+      - hostPath
+---
+# Source: podsecuritypolicies/templates/custom/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-rook-ceph-csi-detect-version
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-csi-detect-version
+  parameters:
+    volumes:
+      - emptyDir
+      - projected
+---
+# Source: podsecuritypolicies/templates/custom/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-rook-ceph-csi-rbdplugin
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: csi-rbdplugin
+  parameters:
+    volumes:
+      - emptyDir
+      - projected
+      - hostPath
+      - configMap
+---
+# Source: podsecuritypolicies/templates/custom/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-rook-ceph-csi-rbdplugin-provisioner
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: csi-rbdplugin-provisioner
+  parameters:
+    volumes:
+      - emptyDir
+      - projected
+      - hostPath
+      - configMap
+---
+# Source: podsecuritypolicies/templates/custom/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-rook-ceph-detect-version
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-detect-version
+  parameters:
+    volumes:
+      - emptyDir
+      - projected
+---
+# Source: podsecuritypolicies/templates/custom/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-rook-ceph-mgr
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-mgr
+  parameters:
+    volumes:
+      - emptyDir
+      - secret
+      - projected
+      - hostPath
+---
+# Source: podsecuritypolicies/templates/custom/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-rook-ceph-mon
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-mon
+  parameters:
+    volumes:
+      - secret
+      - projected
+      - hostPath
+---
+# Source: podsecuritypolicies/templates/custom/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-rook-ceph-operator
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-operator
+  parameters:
+    volumes:
+      - emptyDir
+      - projected
+---
+# Source: podsecuritypolicies/templates/custom/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-rook-ceph-osd
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-osd
+  parameters:
+    volumes:
+      - secret
+      - projected
+      - hostPath
+      - emptyDir
+---
+# Source: podsecuritypolicies/templates/custom/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-rook-ceph-osd-prepare
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-osd-prepare
+  parameters:
+    volumes:
+      - secret
+      - emptyDir
+      - projected
+      - hostPath
+---
+# Source: podsecuritypolicies/templates/custom/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-rook-ceph-tools
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - rook-ceph
+    labelSelector:
+      matchLabels:
+        app: rook-ceph-tools
+  parameters:
+    volumes:
+      - configMap
+      - emptyDir
+      - projected
+---
+# Source: podsecuritypolicies/templates/default/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-rook-ceph-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-crashcollector"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-csi-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin-provisioner"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mgr"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mon"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-operator"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd-prepare"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-tools"
+  parameters:
+    volumes:
+      - configMap
+      - downwardAPI
+      - emptyDir
+      - persistentVolumeClaim
+      - projected
+      - secret
+---
+# Source: podsecuritypolicies/templates/default/mutations/capabilities.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: capabilities-rook-ceph-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-csi-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin-provisioner"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mgr"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mon"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd-prepare"
+  location: "spec.containers[name: *].securityContext.capabilities.drop"
+  parameters:
+    values:
+      fromList:
+        - ALL
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.capabilities.drop"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/capabilities.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: capabilities-rook-ceph-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-csi-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin-provisioner"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mgr"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mon"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd-prepare"
+  location: "spec.ephemeralContainers[name: *].securityContext.capabilities.drop"
+  parameters:
+    values:
+      fromList:
+        - ALL
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.capabilities.drop"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/capabilities.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: capabilities-rook-ceph-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-csi-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin"
+        - key: app
+          operator: NotIn
+          values:
+            - "csi-rbdplugin-provisioner"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-detect-version"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mgr"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-mon"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd"
+        - key: app
+          operator: NotIn
+          values:
+            - "rook-ceph-osd-prepare"
+  location: "spec.initContainers[name: *].securityContext.capabilities.drop"
+  parameters:
+    values:
+      fromList:
+        - ALL
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.capabilities.drop"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/supplemental-groups.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: supplemental-groups-rook-ceph-restricted
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - rook-ceph
+  location: "spec.securityContext.supplementalGroups"
+  parameters:
+    values:
+      fromList:
+        - 1
+    pathTests:
+      - subPath: "spec.securityContext.supplementalGroups"
+        condition: MustNotExist
+

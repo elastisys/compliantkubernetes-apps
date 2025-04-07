@@ -1,0 +1,156 @@
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: all-deny
+  namespace: falco
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+    - Ingress
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: falco
+  namespace: falco
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: falco
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.3/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # base: egress-rule-apiserver
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 6443
+    # rule: egress-rule-falco-sidekick
+    - to:
+        - podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: falcosidekick
+      ports:
+        - protocol: TCP
+          port: 2801
+    # rule: egress-rule-falco-plugins
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+  ingress:
+    # base: ingress-rule-prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 8765
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: falco-sidekick
+  namespace: falco
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: falcosidekick
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.3/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # rule: egress-rule-alertmanager
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/instance: kube-prometheus-stack-alertmanager
+      ports:
+        - protocol: TCP
+          port: 9093
+  ingress:
+    # rule: ingress-rule-falco
+    - from:
+        - podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: falco
+      ports:
+        - protocol: TCP
+          port: 2801
+    # base: ingress-rule-prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 2801
+

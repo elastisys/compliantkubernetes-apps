@@ -1,0 +1,1272 @@
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-opensearch-system-nodes-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - opensearch-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: opensearch
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-opensearch-system-nodes-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - opensearch-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: opensearch
+  location: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-opensearch-system-nodes-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - opensearch-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: opensearch
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-opensearch-system-nodes-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - opensearch-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: opensearch
+  location: "spec.containers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-opensearch-system-nodes-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - opensearch-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: opensearch
+  location: "spec.ephemeralContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-opensearch-system-nodes-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - opensearch-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: opensearch
+  location: "spec.initContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/read-only-root.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: read-only-root-opensearch-system-exporter-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: ["*"]
+        kinds: ["Pod"]
+    namespaces:
+      - opensearch-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: prometheus-elasticsearch-exporter
+  location: "spec.containers[name: *].securityContext.readOnlyRootFilesystem"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.readOnlyRootFilesystem"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/read-only-root.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: read-only-root-opensearch-system-exporter-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: ["*"]
+        kinds: ["Pod"]
+    namespaces:
+      - opensearch-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: prometheus-elasticsearch-exporter
+  location: "spec.ephemeralContainers[name: *].securityContext.readOnlyRootFilesystem"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.readOnlyRootFilesystem"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/read-only-root.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: read-only-root-opensearch-system-exporter-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - opensearch-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: prometheus-elasticsearch-exporter
+  location: "spec.initContainers[name: *].securityContext.readOnlyRootFilesystem"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.readOnlyRootFilesystem"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/fsgroup.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: fsgroup-opensearch-system-restricted
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+  location: "spec.securityContext.fsGroup"
+  parameters:
+    assign:
+      value: 1
+    pathTests:
+      - subPath: "spec.securityContext.fsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/host-ipc.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: host-ipc-opensearch-system-restricted
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+  location: "spec.hostIPC"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.hostIPC"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/host-pid.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: host-pid-opensearch-system-restricted
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+  location: "spec.hostPID"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.hostPID"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privilege-escalation.yaml
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-opensearch-system-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: NotIn
+          values:
+            - "opensearch"
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-opensearch-system-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: NotIn
+          values:
+            - "opensearch"
+  location: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-opensearch-system-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: NotIn
+          values:
+            - "opensearch"
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-opensearch-system-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+  location: "spec.containers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-opensearch-system-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+  location: "spec.ephemeralContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-opensearch-system-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+  location: "spec.initContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-group.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-group-opensearch-system-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+  location: "spec.containers[name: *].securityContext.runAsGroup"
+  parameters:
+    assign:
+      value: 1
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.runAsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-group.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-group-opensearch-system-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+  location: "spec.ephemeralContainers[name: *].securityContext.runAsGroup"
+  parameters:
+    assign:
+      value: 1
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.runAsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-group.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-group-opensearch-system-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+  location: "spec.initContainers[name: *].securityContext.runAsGroup"
+  parameters:
+    assign:
+      value: 1
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.runAsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-non-root.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-non-root-opensearch-system-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: NotIn
+          values:
+            - "opensearch"
+  location: "spec.containers[name: *].securityContext.runAsNonRoot"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.runAsNonRoot"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-non-root.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-non-root-opensearch-system-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: NotIn
+          values:
+            - "opensearch"
+  location: "spec.ephemeralContainers[name: *].securityContext.runAsNonRoot"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.runAsNonRoot"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-non-root.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-non-root-opensearch-system-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: NotIn
+          values:
+            - "opensearch"
+  location: "spec.initContainers[name: *].securityContext.runAsNonRoot"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.runAsNonRoot"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/seccomp-profile.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: seccomp-profile-opensearch-system-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+  location: "spec.securityContext.seccompProfile.type"
+  parameters:
+    assign:
+      value: RuntimeDefault
+    pathTests:
+      - subPath: "spec.securityContext.seccompProfile.type"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/seccomp-profile.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: seccomp-profile-opensearch-system-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+  location: "spec.ephemeralContainers[name: *].securityContext.seccompProfile.type"
+  parameters:
+    assign:
+      value: RuntimeDefault
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.seccompProfile.type"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/seccomp-profile.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: seccomp-profile-opensearch-system-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+  location: "spec.initContainers[name: *].securityContext.seccompProfile.type"
+  parameters:
+    assign:
+      value: RuntimeDefault
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.seccompProfile.type"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/privilege-escalation.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowPrivilegeEscalationContainer
+metadata:
+  name: privilege-escalation-opensearch-system-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: NotIn
+          values:
+            - "opensearch"
+---
+# Source: podsecuritypolicies/templates/custom/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-opensearch-system-nodes
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - opensearch-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: opensearch
+  parameters:
+    runAsUser:
+      rule: RunAsAny
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/default/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-opensearch-system-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: NotIn
+          values:
+            - "opensearch"
+  parameters:
+    runAsUser:
+      rule: MustRunAsNonRoot
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/default/capabilities.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPCapabilities
+metadata:
+  name: capabilities-opensearch-system-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: NotIn
+          values:
+            - "opensearch"
+  parameters:
+    requiredDropCapabilities:
+      - ALL
+---
+# Source: podsecuritypolicies/templates/default/sysctls.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPForbiddenSysctls
+metadata:
+  name: sysctls-opensearch-system-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+  parameters:
+    allowedSysctls: []
+    forbiddenSysctls:
+      - "*"
+---
+# Source: podsecuritypolicies/templates/default/host-paths.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostFilesystem
+metadata:
+  name: host-paths-opensearch-system-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+  parameters:
+    allowedHostPaths: []
+---
+# Source: podsecuritypolicies/templates/default/host-namespace.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostNamespace
+metadata:
+  name: host-namespace-opensearch-system-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+---
+# Source: podsecuritypolicies/templates/default/host-network-ports.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostNetworkingPorts
+metadata:
+  name: host-network-ports-opensearch-system-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+  parameters:
+    hostNetwork: false
+    min: 0
+    max: 0
+---
+# Source: podsecuritypolicies/templates/default/privileged.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPPrivilegedContainer
+metadata:
+  name: privileged-opensearch-system-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: NotIn
+          values:
+            - "opensearch"
+---
+# Source: podsecuritypolicies/templates/custom/read-only-root.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPReadOnlyRootFilesystem
+metadata:
+  name: read-only-root-opensearch-system-exporter
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - opensearch-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: prometheus-elasticsearch-exporter
+---
+# Source: podsecuritypolicies/templates/custom/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-opensearch-system-dashboards
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - opensearch-system
+    labelSelector:
+      matchLabels:
+        app: opensearch-dashboards
+  parameters:
+    volumes:
+      - configMap
+      - projected
+      - secret
+---
+# Source: podsecuritypolicies/templates/custom/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-opensearch-system-exporter
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - opensearch-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: prometheus-elasticsearch-exporter
+  parameters:
+    volumes:
+      - projected
+      - secret
+---
+# Source: podsecuritypolicies/templates/custom/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-opensearch-system-nodes
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - opensearch-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: opensearch
+  parameters:
+    volumes:
+      - configMap
+      - emptyDir
+      - persistentVolumeClaim
+      - projected
+      - secret
+---
+# Source: podsecuritypolicies/templates/default/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-opensearch-system-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "opensearch-dashboards"
+        - key: app.kubernetes.io/name
+          operator: NotIn
+          values:
+            - "prometheus-elasticsearch-exporter"
+        - key: app.kubernetes.io/name
+          operator: NotIn
+          values:
+            - "opensearch"
+  parameters:
+    volumes:
+      - configMap
+      - downwardAPI
+      - emptyDir
+      - persistentVolumeClaim
+      - projected
+      - secret
+---
+# Source: podsecuritypolicies/templates/default/mutations/capabilities.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: capabilities-opensearch-system-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+  location: "spec.containers[name: *].securityContext.capabilities.drop"
+  parameters:
+    values:
+      fromList:
+        - ALL
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.capabilities.drop"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/capabilities.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: capabilities-opensearch-system-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+  location: "spec.ephemeralContainers[name: *].securityContext.capabilities.drop"
+  parameters:
+    values:
+      fromList:
+        - ALL
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.capabilities.drop"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/capabilities.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: capabilities-opensearch-system-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+  location: "spec.initContainers[name: *].securityContext.capabilities.drop"
+  parameters:
+    values:
+      fromList:
+        - ALL
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.capabilities.drop"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/supplemental-groups.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: supplemental-groups-opensearch-system-restricted
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - opensearch-system
+  location: "spec.securityContext.supplementalGroups"
+  parameters:
+    values:
+      fromList:
+        - 1
+    pathTests:
+      - subPath: "spec.securityContext.supplementalGroups"
+        condition: MustNotExist
+

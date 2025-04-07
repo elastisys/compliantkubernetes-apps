@@ -1,0 +1,924 @@
+---
+# Source: hnc/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: hnc-controller
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: hnc/templates/admin-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: hnc-controller-admin-role
+rules:
+- apiGroups:
+  - hnc.x-k8s.io
+  resources:
+  - '*'
+  verbs:
+  - '*'
+---
+# Source: hnc/templates/manager-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: hnc-controller-manager-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - resourcequotas
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - hnc.x-k8s.io
+  resources:
+  - hierarchicalresourcequotas
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - hnc.x-k8s.io
+  resources:
+  - hierarchicalresourcequotas/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - hnc.x-k8s.io
+  resources:
+  - hierarchies
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - hnc.x-k8s.io
+  resources:
+  - hierarchies/status
+  verbs:
+  - get
+  - patch
+  - update
+---
+# Source: hnc/templates/user-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: hnc-controller-user-role
+rules:
+- apiGroups:
+  - hnc.x-k8s.io
+  resources:
+  - hierarchyconfigurations
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - hnc.x-k8s.io
+  resources:
+  - hncconfigurations
+  verbs:
+  - get
+  - list
+  - watch
+---
+# Source: hnc/templates/manager-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: hnc-controller-manager-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: hnc-controller-manager-role
+subjects:
+- kind: ServiceAccount
+  name: hnc-controller
+  namespace: hnc-system
+---
+# Source: hnc/templates/user-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: hnc-controller-user-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: hnc-controller-user-role
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: group@example.com
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: user@example.com
+---
+# Source: hnc/templates/leaderelection-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: hnc-controller-leader-election-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - configmaps/status
+  verbs:
+  - get
+  - update
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+---
+# Source: hnc/templates/user-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: hnc-controller-user-role
+  namespace: set-me
+rules:
+- apiGroups:
+  - hnc.x-k8s.io
+  resources:
+  - subnamespaceanchors
+  verbs:
+  - '*'
+---
+# Source: hnc/templates/user-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: hnc-controller-user-role
+  namespace: production
+rules:
+- apiGroups:
+  - hnc.x-k8s.io
+  resources:
+  - subnamespaceanchors
+  verbs:
+  - '*'
+---
+# Source: hnc/templates/user-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: hnc-controller-user-role
+  namespace: staging
+rules:
+- apiGroups:
+  - hnc.x-k8s.io
+  resources:
+  - subnamespaceanchors
+  verbs:
+  - '*'
+---
+# Source: hnc/templates/leaderelection-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: hnc-controller-leader-election-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: hnc-controller-leader-election-role
+subjects:
+- kind: ServiceAccount
+  name: hnc-controller
+  namespace: hnc-system
+---
+# Source: hnc/templates/user-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: hnc-controller-user-rolebinding
+  namespace: set-me
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: hnc-controller-user-role
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: group@example.com
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: user@example.com
+---
+# Source: hnc/templates/user-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: hnc-controller-user-rolebinding
+  namespace: production
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: hnc-controller-user-role
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: group@example.com
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: user@example.com
+---
+# Source: hnc/templates/user-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: hnc-controller-user-rolebinding
+  namespace: staging
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: hnc-controller-user-role
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: group@example.com
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: user@example.com
+---
+# Source: hnc/templates/manager-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: hnc-controller-manager
+  name: hnc-controller-controller-manager-metrics-service
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/component: hnc-controller-manager
+  ports:
+    - name: metrics
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+---
+# Source: hnc/templates/webhook-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: hnc-controller-webhook-service
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/component: hnc-webhook
+  ports:
+    - name: webhook-server
+      port: 443
+      targetPort: 9443
+      protocol: TCP
+---
+# Source: hnc/templates/manager-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: hnc-controller-manager
+  name: hnc-controller-controller-manager
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: hnc
+      app.kubernetes.io/instance: hnc-controller
+      app.kubernetes.io/component: hnc-controller-manager
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: hnc
+        app.kubernetes.io/instance: hnc-controller
+        app.kubernetes.io/component: hnc-controller-manager
+    spec:
+      serviceAccountName: hnc-controller
+      securityContext:
+        fsGroup: 2000
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: hnc-controller-manager
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          image: "gcr.io/k8s-staging-multitenancy/hnc-manager:v1.1.0"
+          imagePullPolicy: IfNotPresent
+          command:
+            - /manager
+          args:
+            - --no-webhooks
+            - --metrics-addr=:8080
+            - --max-reconciles=10
+            - --apiserver-qps-throttle=50
+            - --excluded-namespace=alertmanager
+            - --excluded-namespace=calico-apiserver
+            - --excluded-namespace=calico-system
+            - --excluded-namespace=cert-manager
+            - --excluded-namespace=falco
+            - --excluded-namespace=fluentd
+            - --excluded-namespace=fluentd-system
+            - --excluded-namespace=gatekeeper-system
+            - --excluded-namespace=gpu-operator
+            - --excluded-namespace=hnc-system
+            - --excluded-namespace=ingress-nginx
+            - --excluded-namespace=kube-node-lease
+            - --excluded-namespace=kube-public
+            - --excluded-namespace=kube-system
+            - --excluded-namespace=kured
+            - --excluded-namespace=metallb-system
+            - --excluded-namespace=monitoring
+            - --excluded-namespace=openstack-system
+            - --excluded-namespace=rook-ceph
+            - --excluded-namespace=tigera-operator
+            - --excluded-namespace=velero
+            - --managed-namespace-label=pod-security.kubernetes.io/enforce
+            - --managed-namespace-label=pod-security.kubernetes.io/audit
+            - --managed-namespace-label=pod-security.kubernetes.io/warn
+          ports:
+            - name: metrics
+              containerPort: 8080
+              protocol: TCP
+          startupProbe:
+            failureThreshold: 100
+            httpGet:
+              path: /readyz
+              port: 8081
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8081
+            periodSeconds: 5
+          livenessProbe:
+            failureThreshold: 1
+            httpGet:
+              path: /healthz
+              port: 8081
+            periodSeconds: 10
+          resources:
+            limits:
+              cpu: 100m
+              memory: 300Mi
+            requests:
+              cpu: 100m
+              memory: 150Mi
+          volumeMounts:
+            - mountPath: /tmp/k8s-webhook-server/serving-certs
+              name: cert
+              readOnly: true
+      terminationGracePeriodSeconds: 10
+      volumes:
+      - name: cert
+        secret:
+          defaultMode: 420
+          secretName: hnc-controller-webhook-server-cert
+---
+# Source: hnc/templates/webhook-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: hnc-webhook
+  name: hnc-controller-webhook
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: hnc
+      app.kubernetes.io/instance: hnc-controller
+      app.kubernetes.io/component: hnc-webhook
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 0%
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: hnc
+        app.kubernetes.io/instance: hnc-controller
+        app.kubernetes.io/component: hnc-webhook
+    spec:
+      serviceAccountName: hnc-controller
+      securityContext:
+        fsGroup: 2000
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: hnc-webhook
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          image: "gcr.io/k8s-staging-multitenancy/hnc-manager:v1.1.0"
+          imagePullPolicy: IfNotPresent
+          command:
+            - /manager
+          args:
+            - --webhooks-only
+            - --webhook-server-port=9443
+            - --max-reconciles=10
+            - --apiserver-qps-throttle=50
+            - --excluded-namespace=alertmanager
+            - --excluded-namespace=calico-apiserver
+            - --excluded-namespace=calico-system
+            - --excluded-namespace=cert-manager
+            - --excluded-namespace=falco
+            - --excluded-namespace=fluentd
+            - --excluded-namespace=fluentd-system
+            - --excluded-namespace=gatekeeper-system
+            - --excluded-namespace=gpu-operator
+            - --excluded-namespace=hnc-system
+            - --excluded-namespace=ingress-nginx
+            - --excluded-namespace=kube-node-lease
+            - --excluded-namespace=kube-public
+            - --excluded-namespace=kube-system
+            - --excluded-namespace=kured
+            - --excluded-namespace=metallb-system
+            - --excluded-namespace=monitoring
+            - --excluded-namespace=openstack-system
+            - --excluded-namespace=rook-ceph
+            - --excluded-namespace=tigera-operator
+            - --excluded-namespace=velero
+            - --managed-namespace-label=pod-security.kubernetes.io/enforce
+            - --managed-namespace-label=pod-security.kubernetes.io/audit
+            - --managed-namespace-label=pod-security.kubernetes.io/warn
+          ports:
+            - name: webhook-server
+              containerPort: 9443
+              protocol: TCP
+          startupProbe:
+            failureThreshold: 100
+            httpGet:
+              path: /readyz
+              port: 8081
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8081
+            periodSeconds: 5
+          livenessProbe:
+            failureThreshold: 1
+            httpGet:
+              path: /healthz
+              port: 8081
+            periodSeconds: 10
+          resources:
+            limits:
+              cpu: 100m
+              memory: 300Mi
+            requests:
+              cpu: 100m
+              memory: 150Mi
+          volumeMounts:
+            - mountPath: /tmp/k8s-webhook-server/serving-certs
+              name: cert
+              readOnly: true
+      terminationGracePeriodSeconds: 10
+      topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: hnc-webhook
+          maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+      volumes:
+      - name: cert
+        secret:
+          defaultMode: 420
+          secretName: hnc-controller-webhook-server-cert
+---
+# Source: hnc/templates/certificate.yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: hnc-controller-webhook-server-cert
+spec:
+  commonName: hnc-controller-webhook-service.hnc-system.svc
+  dnsNames:
+  - hnc-controller-webhook-service.hnc-system.svc.cluster.local
+  - hnc-controller-webhook-service.hnc-system.svc
+  issuerRef:
+    kind: Issuer
+    name: hnc-controller-selfsigned-issuer
+  secretName: hnc-controller-webhook-server-cert
+---
+# Source: hnc/templates/issuer.yaml
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: hnc-controller-selfsigned-issuer
+spec:
+  selfSigned: {}
+---
+# Source: hnc/templates/label-mutation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: namespace-restricted-label
+spec:
+  applyTo:
+  - groups: ["hnc.x-k8s.io"]
+    kinds: ["HierarchyConfiguration"]
+    versions: ["v1alpha2"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: ["hnc.x-k8s.io"]
+        kinds: ["HierarchyConfiguration"]
+    namespaces:
+      - set-me
+      - production
+      - staging
+  location: "spec.labels"
+  parameters:
+    operation: merge
+    values:
+      fromList:
+        - key: pod-security.kubernetes.io/enforce
+          value: restricted
+        - key: pod-security.kubernetes.io/audit
+          value: restricted
+        - key: pod-security.kubernetes.io/warn
+          value: restricted
+---
+# Source: hnc/templates/webhooks.yaml
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  annotations:
+    cert-manager.io/inject-ca-from: hnc-system/hnc-controller-webhook-server-cert
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: hnc-controller-mutating-webhook-configuration
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: hnc-controller-webhook-service
+      namespace: hnc-system
+      path: /mutate-namespace
+  failurePolicy: Ignore
+  name: namespacelabel.hnc.x-k8s.io
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - namespaces
+  sideEffects: None
+---
+# Source: hnc/templates/servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: hnc-controller-service-monitor
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: hnc
+      app.kubernetes.io/instance: hnc-controller
+      app.kubernetes.io/component: hnc-controller-manager
+  endpoints:
+  - relabelings:
+      []
+    targetPort: 8080
+---
+# Source: hnc/templates/webhooks.yaml
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  annotations:
+    cert-manager.io/inject-ca-from: hnc-system/hnc-controller-webhook-server-cert
+  labels:
+    helm.sh/chart: hnc-0.1.0
+    app.kubernetes.io/name: hnc
+    app.kubernetes.io/instance: hnc-controller
+    app.kubernetes.io/version: "v1.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: hnc-controller-validating-webhook-configuration
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: hnc-controller-webhook-service
+      namespace: hnc-system
+      path: /validate-hnc-x-k8s-io-v1alpha2-subnamespaceanchors
+  failurePolicy: Fail
+  name: subnamespaceanchors.hnc.x-k8s.io
+  rules:
+  - apiGroups:
+    - hnc.x-k8s.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    - DELETE
+    resources:
+    - subnamespaceanchors
+  sideEffects: None
+  matchConditions:
+    - name: 'exclude-velero'
+      expression: '!(request.userInfo.username == "system:serviceaccount:velero:velero-server")'
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: hnc-controller-webhook-service
+      namespace: hnc-system
+      path: /validate-hnc-x-k8s-io-v1alpha2-hierarchyconfigurations
+  failurePolicy: Fail
+  name: hierarchyconfigurations.hnc.x-k8s.io
+  rules:
+  - apiGroups:
+    - hnc.x-k8s.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - hierarchyconfigurations
+  sideEffects: None
+  matchConditions:
+    - name: 'exclude-velero'
+      expression: '!(request.userInfo.username == "system:serviceaccount:velero:velero-server")'
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: hnc-controller-webhook-service
+      namespace: hnc-system
+      path: /validate-objects
+  failurePolicy: Fail
+  name: objects.hnc.x-k8s.io
+  namespaceSelector:
+    matchLabels:
+      hnc.x-k8s.io/included-namespace: "true"
+  rules:
+  - apiGroups:
+    - '*'
+    apiVersions:
+    - '*'
+    operations:
+    - CREATE
+    - UPDATE
+    - DELETE
+    resources:
+    - '*'
+    scope: Namespaced
+  sideEffects: None
+  timeoutSeconds: 2
+  matchConditions:
+    - name: 'exclude-velero'
+      expression: '!(request.userInfo.username == "system:serviceaccount:velero:velero-server")'
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: hnc-controller-webhook-service
+      namespace: hnc-system
+      path: /validate-hnc-x-k8s-io-v1alpha2-hncconfigurations
+  failurePolicy: Fail
+  name: hncconfigurations.hnc.x-k8s.io
+  rules:
+  - apiGroups:
+    - hnc.x-k8s.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    - DELETE
+    resources:
+    - hncconfigurations
+  sideEffects: None
+  matchConditions:
+    - name: 'exclude-velero'
+      expression: '!(request.userInfo.username == "system:serviceaccount:velero:velero-server")'
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: hnc-controller-webhook-service
+      namespace: hnc-system
+      path: /validate-v1-namespace
+  failurePolicy: Fail
+  name: namespaces.hnc.x-k8s.io
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - DELETE
+    - CREATE
+    - UPDATE
+    resources:
+    - namespaces
+  sideEffects: None
+  matchConditions:
+    - name: 'exclude-velero'
+      expression: '!(request.userInfo.username == "system:serviceaccount:velero:velero-server")'
+

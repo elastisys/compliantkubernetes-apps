@@ -1,0 +1,24 @@
+---
+# Source: harbor-certs/templates/core-cert.yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: harbor-core-cert
+  namespace: 
+spec:
+  secretName: harbor-core-cert
+  commonName: harbor.ck8s.example.com
+  isCA: false
+  issuerRef:
+    name: selfsigning-issuer
+    kind: Issuer
+---
+# Source: harbor-certs/templates/selfsigning-issuer.yaml
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: selfsigning-issuer
+  namespace: 
+spec:
+  selfSigned: {}
+

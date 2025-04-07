@@ -1,0 +1,144 @@
+---
+# Source: namespaces/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cert-manager
+  labels:
+    owner: operator
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
+  annotations:
+    helm.sh/resource-policy: keep
+---
+# Source: namespaces/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dex
+  labels:
+    owner: operator
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
+  annotations:
+    helm.sh/resource-policy: keep
+---
+# Source: namespaces/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: falco
+  labels:
+    owner: operator
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/warn: privileged
+  annotations:
+    helm.sh/resource-policy: keep
+---
+# Source: namespaces/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fluentd-system
+  labels:
+    owner: operator
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/warn: privileged
+  annotations:
+    helm.sh/resource-policy: keep
+---
+# Source: namespaces/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gatekeeper-system
+  labels:
+    owner: operator
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
+  annotations:
+    helm.sh/resource-policy: keep
+---
+# Source: namespaces/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: harbor
+  labels:
+    owner: operator
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
+  annotations:
+    helm.sh/resource-policy: keep
+---
+# Source: namespaces/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ingress-nginx
+  labels:
+    owner: operator
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/warn: privileged
+  annotations:
+    helm.sh/resource-policy: keep
+---
+# Source: namespaces/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+  labels:
+    owner: operator
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/warn: privileged
+  annotations:
+    helm.sh/resource-policy: keep
+---
+# Source: namespaces/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: opensearch-system
+  labels:
+    owner: operator
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/warn: privileged
+  annotations:
+    helm.sh/resource-policy: keep
+---
+# Source: namespaces/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: thanos
+  labels:
+    owner: operator
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
+  annotations:
+    helm.sh/resource-policy: keep
+---
+# Source: namespaces/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: velero
+  labels:
+    owner: operator
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/warn: privileged
+  annotations:
+    helm.sh/resource-policy: keep
+

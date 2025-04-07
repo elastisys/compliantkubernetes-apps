@@ -1,0 +1,646 @@
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: all-deny
+  namespace: thanos
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+    - Ingress
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: cert-manager-http01-solver
+  namespace: thanos
+spec:
+  podSelector:
+    matchLabels:
+      acme.cert-manager.io/http01-solver: "true"
+  policyTypes:
+    - Ingress
+  ingress:
+    # base: ingress-rule-ingress
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: ingress-nginx
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/component: controller
+              app.kubernetes.io/name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8089
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: thanos-bucketweb
+  namespace: thanos
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: bucketweb
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # base: egress-rule-object-storage
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 5000
+        - protocol: TCP
+          port: 443
+  ingress:
+    # base: ingress-rule-prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 8080
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: thanos-compactor
+  namespace: thanos
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: compactor
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # base: egress-rule-object-storage
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 5000
+        - protocol: TCP
+          port: 443
+  ingress:
+    # base: ingress-rule-prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 10902
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: thanos-query
+  namespace: thanos
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: query
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # rule: egress-rule-store-api
+    - to:
+        - podSelector:
+            matchLabels: 
+              app.kubernetes.io/component: storegateway
+        - podSelector:
+            matchLabels: 
+              app.kubernetes.io/component: receive
+        - podSelector:
+            matchLabels: 
+              app.kubernetes.io/component: ruler
+      ports:
+        - protocol: TCP
+          port: 10901
+  ingress:
+    # base: ingress-rule-blackbox
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus-blackbox-exporter
+      ports:
+        - protocol: TCP
+          port: 10902
+    # base: ingress-rule-prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 10902
+    # rule: ingress-rule-query-api
+    - from:
+        - podSelector:
+            matchLabels: 
+              app.kubernetes.io/component: query-frontend
+        - podSelector:
+            matchLabels: 
+              app.kubernetes.io/component: ruler
+      ports:
+        - protocol: TCP
+          port: 10902
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: thanos-query-frontend
+  namespace: thanos
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: query-frontend
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # base: egress-rule-query
+    - to:
+        - podSelector:
+            matchLabels: 
+              app.kubernetes.io/component: query
+      ports:
+        - protocol: TCP
+          port: 10902
+  ingress:
+    # base: ingress-rule-apiserver
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 9090
+    # base: ingress-rule-prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 9090
+    # rule: ingress-rule-grafana-datasource
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: grafana
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app: grafana-label-enforcer
+      ports:
+        - protocol: TCP
+          port: 9090
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: thanos-receive
+  namespace: thanos
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: receive
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # base: egress-rule-object-storage
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 5000
+        - protocol: TCP
+          port: 443
+  ingress:
+    # base: ingress-rule-prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 10902
+    # base: ingress-rule-query
+    - from:
+        - podSelector:
+            matchLabels: 
+              app.kubernetes.io/component: query
+      ports:
+        - protocol: TCP
+          port: 10901
+    # rule: ingress-rule-receive-distributor
+    - from:
+        - podSelector:
+            matchLabels: 
+              app.kubernetes.io/component: receive-distributor
+      ports:
+        - protocol: TCP
+          port: 10901
+        - protocol: TCP
+          port: 19391
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: thanos-receive-distributor
+  namespace: thanos
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: receive-distributor
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # rule: egress-rule-receive
+    - to:
+        - podSelector:
+            matchLabels: 
+              app.kubernetes.io/component: receive
+      ports:
+        - protocol: TCP
+          port: 10901
+        - protocol: TCP
+          port: 19391
+  ingress:
+    # base: ingress-rule-blackbox
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus-blackbox-exporter
+      ports:
+        - protocol: TCP
+          port: 10902
+    # base: ingress-rule-prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 10902
+        - protocol: TCP
+          port: 19291
+    # base: ingress-rule-ingress
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: ingress-nginx
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/component: controller
+              app.kubernetes.io/name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 19291
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: thanos-ruler
+  namespace: thanos
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: ruler
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # base: egress-rule-object-storage
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 5000
+        - protocol: TCP
+          port: 443
+    # base: egress-rule-query
+    - to:
+        - podSelector:
+            matchLabels: 
+              app.kubernetes.io/component: query
+      ports:
+        - protocol: TCP
+          port: 10902
+    # rule: egress-rule-alertmanager
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: alertmanager
+      ports:
+        - protocol: TCP
+          port: 9093
+  ingress:
+    # base: ingress-rule-prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 10902
+    # base: ingress-rule-query
+    - from:
+        - podSelector:
+            matchLabels: 
+              app.kubernetes.io/component: query
+      ports:
+        - protocol: TCP
+          port: 10901
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: thanos-storegateway
+  namespace: thanos
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: storegateway
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # base: egress-rule-object-storage
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 5000
+        - protocol: TCP
+          port: 443
+  ingress:
+    # base: ingress-rule-prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 10902
+    # base: ingress-rule-query
+    - from:
+        - podSelector:
+            matchLabels: 
+              app.kubernetes.io/component: query
+      ports:
+        - protocol: TCP
+          port: 10901
+

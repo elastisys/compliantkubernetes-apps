@@ -1,0 +1,32 @@
+---
+# Source: prometheus-servicemonitor/templates/rook-monitor.yaml
+# Based on https://github.com/rook/rook/blob/master/cluster/examples/kubernetes/ceph/monitoring/service-monitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: sc-servicemonitor-prometheus-servicemonitor-rook-ceph-mgr
+  namespace: rook-ceph
+  labels:
+    team: rook
+    app.kubernetes.io/name: prometheus-servicemonitor
+    helm.sh/chart: prometheus-servicemonitor-0.1.1
+    app.kubernetes.io/instance: sc-servicemonitor
+    app.kubernetes.io/version: "1.0"
+    app.kubernetes.io/managed-by: Helm
+    cluster: service
+spec:
+  namespaceSelector:
+    matchNames:
+      - rook-ceph
+  selector:
+    matchLabels:
+      app: rook-ceph-mgr
+      rook_cluster: rook-ceph
+  endpoints:
+  - port: http-metrics
+    path: /metrics
+    interval: 15s
+    # Add the correct cluster labels so we know what cluster this comes from.
+    relabelings:
+      []
+

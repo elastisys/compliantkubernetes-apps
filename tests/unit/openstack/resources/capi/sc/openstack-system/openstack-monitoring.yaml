@@ -1,0 +1,49 @@
+---
+# Source: openstack-monitoring/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    helm.sh/chart: openstack-monitoring-0.1.0
+    app.kubernetes.io/name: openstack-monitoring
+    app.kubernetes.io/instance: openstack-monitoring
+    k8s-app: openstack-cloud-controller-manager
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  name: openstack-monitoring
+spec:
+  ports:
+  - name: http
+    port: 10258
+    protocol: TCP
+  selector:
+    app: openstack-cloud-controller-manager
+---
+# Source: openstack-monitoring/templates/servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    helm.sh/chart: openstack-monitoring-0.1.0
+    app.kubernetes.io/name: openstack-monitoring
+    app.kubernetes.io/instance: openstack-monitoring
+    k8s-app: openstack-cloud-controller-manager
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  name: openstack-monitoring
+spec:
+  endpoints:
+  - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+    interval: 30s
+    port: http
+    scheme: https
+    tlsConfig:
+      insecureSkipVerify: true
+  jobLabel: component
+  namespaceSelector:
+    matchNames:
+    - openstack-system
+  selector:
+    matchLabels:
+      k8s-app: openstack-cloud-controller-manager
+

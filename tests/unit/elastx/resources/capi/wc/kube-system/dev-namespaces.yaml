@@ -1,0 +1,11 @@
+---
+# Source: namespaces/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: alertmanager
+  labels:
+    owner: operator
+  annotations:
+    helm.sh/resource-policy: keep
+

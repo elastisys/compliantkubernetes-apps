@@ -1,0 +1,1403 @@
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-fluentd-system-forwarder-user-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - fluentd
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/instance: fluentd
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-fluentd-system-forwarder-user-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - fluentd
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/instance: fluentd
+  location: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-fluentd-system-forwarder-user-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - fluentd
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/instance: fluentd
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-fluentd-system-forwarder-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - fluentd-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/instance: fluentd-forwarder
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-fluentd-system-forwarder-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - fluentd-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/instance: fluentd-forwarder
+  location: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/custom/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-fluentd-system-forwarder-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - fluentd-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/instance: fluentd-forwarder
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/fsgroup.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: fsgroup-fluentd-system-restricted
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+  location: "spec.securityContext.fsGroup"
+  parameters:
+    assign:
+      value: 1
+    pathTests:
+      - subPath: "spec.securityContext.fsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/host-ipc.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: host-ipc-fluentd-system-restricted
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+  location: "spec.hostIPC"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.hostIPC"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/host-pid.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: host-pid-fluentd-system-restricted
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+  location: "spec.hostPID"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.hostPID"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privilege-escalation.yaml
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-fluentd-system-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd"
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd-forwarder"
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-fluentd-system-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd"
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd-forwarder"
+  location: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-fluentd-system-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd"
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd-forwarder"
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-fluentd-system-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+  location: "spec.containers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-fluentd-system-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+  location: "spec.ephemeralContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-fluentd-system-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+  location: "spec.initContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-group.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-group-fluentd-system-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+  location: "spec.containers[name: *].securityContext.runAsGroup"
+  parameters:
+    assign:
+      value: 1
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.runAsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-group.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-group-fluentd-system-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+  location: "spec.ephemeralContainers[name: *].securityContext.runAsGroup"
+  parameters:
+    assign:
+      value: 1
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.runAsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-group.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-group-fluentd-system-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+  location: "spec.initContainers[name: *].securityContext.runAsGroup"
+  parameters:
+    assign:
+      value: 1
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.runAsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-non-root.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-non-root-fluentd-system-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd"
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd-aggregator"
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd-forwarder"
+  location: "spec.containers[name: *].securityContext.runAsNonRoot"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.runAsNonRoot"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-non-root.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-non-root-fluentd-system-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd"
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd-aggregator"
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd-forwarder"
+  location: "spec.ephemeralContainers[name: *].securityContext.runAsNonRoot"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.runAsNonRoot"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-non-root.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-non-root-fluentd-system-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd"
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd-aggregator"
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd-forwarder"
+  location: "spec.initContainers[name: *].securityContext.runAsNonRoot"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.runAsNonRoot"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/seccomp-profile.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: seccomp-profile-fluentd-system-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+  location: "spec.securityContext.seccompProfile.type"
+  parameters:
+    assign:
+      value: RuntimeDefault
+    pathTests:
+      - subPath: "spec.securityContext.seccompProfile.type"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/seccomp-profile.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: seccomp-profile-fluentd-system-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+  location: "spec.ephemeralContainers[name: *].securityContext.seccompProfile.type"
+  parameters:
+    assign:
+      value: RuntimeDefault
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.seccompProfile.type"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/seccomp-profile.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: seccomp-profile-fluentd-system-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+  location: "spec.initContainers[name: *].securityContext.seccompProfile.type"
+  parameters:
+    assign:
+      value: RuntimeDefault
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.seccompProfile.type"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/privilege-escalation.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowPrivilegeEscalationContainer
+metadata:
+  name: privilege-escalation-fluentd-system-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd"
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd-forwarder"
+---
+# Source: podsecuritypolicies/templates/custom/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-fluentd-system-forwarder-user
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - fluentd
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/instance: fluentd
+  parameters:
+    runAsUser:
+      rule: RunAsAny
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/custom/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-fluentd-system-aggregator
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - fluentd-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/instance: fluentd-aggregator
+  parameters:
+    runAsUser:
+      rule: RunAsAny
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/custom/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-fluentd-system-forwarder
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - fluentd-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/instance: fluentd-forwarder
+  parameters:
+    runAsUser:
+      rule: RunAsAny
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/default/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-fluentd-system-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd"
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd-aggregator"
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd-forwarder"
+  parameters:
+    runAsUser:
+      rule: MustRunAsNonRoot
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/custom/capabilities.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPCapabilities
+metadata:
+  name: capabilities-fluentd-system-forwarder-user
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - fluentd
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/instance: fluentd
+  parameters:
+    allowedCapabilities:
+      []
+---
+# Source: podsecuritypolicies/templates/custom/capabilities.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPCapabilities
+metadata:
+  name: capabilities-fluentd-system-forwarder
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - fluentd-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/instance: fluentd-forwarder
+  parameters:
+    allowedCapabilities:
+      []
+---
+# Source: podsecuritypolicies/templates/default/capabilities.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPCapabilities
+metadata:
+  name: capabilities-fluentd-system-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd"
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd-forwarder"
+  parameters:
+    requiredDropCapabilities:
+      - ALL
+---
+# Source: podsecuritypolicies/templates/default/sysctls.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPForbiddenSysctls
+metadata:
+  name: sysctls-fluentd-system-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+  parameters:
+    allowedSysctls: []
+    forbiddenSysctls:
+      - "*"
+---
+# Source: podsecuritypolicies/templates/custom/host-paths.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostFilesystem
+metadata:
+  name: host-paths-fluentd-system-forwarder-user
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - fluentd
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/instance: fluentd
+  parameters:
+    allowedHostPaths:
+      - pathPrefix: /var/log
+      - pathPrefix: /var/lib/docker/containers
+        readOnly: true
+      - pathPrefix: /usr/lib64
+        readOnly: true
+---
+# Source: podsecuritypolicies/templates/custom/host-paths.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostFilesystem
+metadata:
+  name: host-paths-fluentd-system-forwarder
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - fluentd-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/instance: fluentd-forwarder
+  parameters:
+    allowedHostPaths:
+      - pathPrefix: /var/log
+      - pathPrefix: /var/lib/docker/containers
+        readOnly: true
+      - pathPrefix: /usr/lib64
+        readOnly: true
+---
+# Source: podsecuritypolicies/templates/default/host-paths.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostFilesystem
+metadata:
+  name: host-paths-fluentd-system-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd"
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd-forwarder"
+  parameters:
+    allowedHostPaths: []
+---
+# Source: podsecuritypolicies/templates/default/host-namespace.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostNamespace
+metadata:
+  name: host-namespace-fluentd-system-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+---
+# Source: podsecuritypolicies/templates/default/host-network-ports.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostNetworkingPorts
+metadata:
+  name: host-network-ports-fluentd-system-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+  parameters:
+    hostNetwork: false
+    min: 0
+    max: 0
+---
+# Source: podsecuritypolicies/templates/default/privileged.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPPrivilegedContainer
+metadata:
+  name: privileged-fluentd-system-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+---
+# Source: podsecuritypolicies/templates/custom/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-fluentd-system-forwarder-user
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - fluentd
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/instance: fluentd
+  parameters:
+    volumes:
+      - configMap
+      - emptyDir
+      - hostPath
+      - projected
+---
+# Source: podsecuritypolicies/templates/custom/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-fluentd-system-forwarder
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - fluentd-system
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/instance: fluentd-forwarder
+  parameters:
+    volumes:
+      - configMap
+      - emptyDir
+      - hostPath
+      - projected
+---
+# Source: podsecuritypolicies/templates/default/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-fluentd-system-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd"
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd-forwarder"
+  parameters:
+    volumes:
+      - configMap
+      - downwardAPI
+      - emptyDir
+      - persistentVolumeClaim
+      - projected
+      - secret
+---
+# Source: podsecuritypolicies/templates/default/mutations/capabilities.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: capabilities-fluentd-system-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd"
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd-forwarder"
+  location: "spec.containers[name: *].securityContext.capabilities.drop"
+  parameters:
+    values:
+      fromList:
+        - ALL
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.capabilities.drop"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/capabilities.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: capabilities-fluentd-system-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd"
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd-forwarder"
+  location: "spec.ephemeralContainers[name: *].securityContext.capabilities.drop"
+  parameters:
+    values:
+      fromList:
+        - ALL
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.capabilities.drop"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/capabilities.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: capabilities-fluentd-system-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd"
+        - key: app.kubernetes.io/instance
+          operator: NotIn
+          values:
+            - "fluentd-forwarder"
+  location: "spec.initContainers[name: *].securityContext.capabilities.drop"
+  parameters:
+    values:
+      fromList:
+        - ALL
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.capabilities.drop"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/supplemental-groups.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: supplemental-groups-fluentd-system-restricted
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - fluentd
+            - fluentd-system
+  location: "spec.securityContext.supplementalGroups"
+  parameters:
+    values:
+      fromList:
+        - 1
+    pathTests:
+      - subPath: "spec.securityContext.supplementalGroups"
+        condition: MustNotExist
+

@@ -1,0 +1,123 @@
+---
+# Source: user-alertmanager/templates/role.yaml
+# This role grants users privileges to configure a specific secret used by alertmanager
+# and to grant others these same privileges by creating rolebindings to this role.
+#
+# Note! This makes it possible for the user to break alertmanager both by adding
+# bad config and by deleting the rolebinding used to give alertmanager access to the
+# restricted PSP.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: alertmanager-configurer
+  namespace: alertmanager
+rules:
+# Allow editing the alertmanager-alertmanager secret
+- apiGroups:
+  - ""
+  resourceNames:
+  - alertmanager-alertmanager
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - patch
+# Allow proxying alertmanager web service
+- apiGroups:
+  - ""
+  resourceNames:
+  - alertmanager-operated:9093
+  resources:
+  - services/proxy
+  verbs:
+  - get
+  - create
+  - delete
+# Allow editing the user-alertmanager-auth secret
+- apiGroups:
+  - ""
+  resourceNames:
+  - user-alertmanager-auth
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - patch
+# Allow creating rolebindings (to give others permission to configure alertmanager)
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - rolebindings
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+# Allow binding this role specifically
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resourceNames:
+  - alertmanager-configurer
+  resources:
+  - roles
+  verbs:
+  - bind
+- apiGroups:
+  - ""
+  resources:
+  - pods/portforward
+  verbs:
+  - create
+  resourceNames:
+  - alertmanager-alertmanager-0
+---
+# Source: user-alertmanager/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: alertmanager-configurer
+  namespace: alertmanager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: alertmanager-configurer
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: user@example.com
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: group@example.com
+---
+# Source: user-alertmanager/templates/alertmanager.yaml
+# https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#alertmanager
+apiVersion: monitoring.coreos.com/v1
+kind: Alertmanager
+metadata:
+  name: alertmanager
+  labels:
+    app: alertmanager
+spec:
+  replicas: 1
+  securityContext:
+    fsGroup: 2000
+    runAsNonRoot: true
+    runAsUser: 1000
+  resources:
+    limits:
+      cpu: 50m
+      memory: 100Mi
+    requests:
+      cpu: 10m
+      memory: 50Mi
+  portName: http-web
+

@@ -1,0 +1,42 @@
+---
+# Source: gatekeeper-constraints/templates/prevent-accidental-deletion/constraint.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPreventAccidentalDeletion
+metadata:
+  name: elastisys-prevent-accidental-deletion
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+      - apiGroups: ["cluster.x-k8s.io"]
+        kinds:
+          - Cluster
+      - apiGroups: ["infrastructure.cluster.x-k8s.io"]
+        kinds:
+          - OpenStackCluster
+          - AzureCluster
+  parameters:
+    annotation: elastisys.io/ok-to-delete
+    kinds:
+      - Cluster
+      - OpenstackCluster
+      - AzureCluster
+---
+# Source: gatekeeper-constraints/templates/restrict-pod-disruption-budgets/constraint.yaml
+apiVersion: constraints.gatekeeper.sh/v1alpha1
+kind: K8sRestrictPodDisruptionBudgets
+metadata:
+  name: elastisys-restrict-pod-disruption-budgets
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["ReplicationController"]
+      - apiGroups: ["apps"]
+        kinds: ["Deployment", "StatefulSet", "ReplicaSet"]
+      - apiGroups: ["policy"]
+        kinds: ["PodDisruptionBudget"]
+    excludedNamespaces: ["kube-system", "kube-public", "kube-node-lease", "calico-system"]
+    # Note that this does not exclude all namespaces with label owner=operator
+

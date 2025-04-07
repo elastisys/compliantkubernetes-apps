@@ -1,0 +1,53 @@
+---
+# Source: grafana-label-enforcer/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-label-enforcer
+  namespace: monitoring
+spec:
+  ports:
+  - name: promql
+    port: 9090
+    targetPort: promql
+  selector:
+    app: grafana-label-enforcer
+---
+# Source: grafana-label-enforcer/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana-label-enforcer
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana-label-enforcer
+  template:
+    metadata:
+      labels:
+        app: grafana-label-enforcer
+    spec:
+      securityContext:
+        runAsUser: 1000
+      containers:
+      - name: prom-label-enforcer
+        image: "quay.io/prometheuscommunity/prom-label-proxy:v0.11.0"
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 100m
+            memory: 50Mi
+          requests:
+            cpu: 20m
+            memory: 20Mi
+        args:
+        - "--insecure-listen-address=0.0.0.0:9090"
+        - "--upstream=http://thanos-query-query-frontend.thanos:9090"
+        - "--label=tenant_id"
+        - "--enable-label-apis=true"
+        ports:
+        - containerPort: 9090
+          name: promql
+

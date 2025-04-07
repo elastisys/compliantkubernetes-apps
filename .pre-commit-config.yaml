@@ -26,22 +26,22 @@ repos:
       - id: check-merge-conflict
         exclude: ^helmfile.d/upstream/opensearch-project/opensearch/CHANGELOG.md$
       - id: check-json
-        exclude: ^(helmfile\.d/upstream/|tests/unit/general/resources/template-list-default.json$)
+        exclude: ^(helmfile\.d/upstream/|tests/.*/resources/)
       - id: check-toml
-        exclude: ^helmfile\.d/upstream/
+        exclude: ^(helmfile\.d/upstream/|tests/.*/resources/)
       - id: check-yaml
-        exclude: ^helmfile\.d/.*/templates/|^helmfile\.d/upstream/|^helmfile\.d/state.yaml$|^helmfile\.d/charts/prometheus-alerts/files/
+        exclude: ^(helmfile\.d/(.*/templates/|charts/prometheus-alerts/files/|upstream/|state.yaml$)|tests/.*/resources/)
         args:
           - --allow-multiple-documents
       - id: detect-private-key
         exclude: ^helmfile\.d/upstream/
       - id: end-of-file-fixer
-        exclude: ^helmfile\.d/upstream/|^tests/.*/.*\.out$
+        exclude: ^(helmfile\.d/upstream/|tests/.*/resources/)
       - id: mixed-line-ending
         exclude: ^helmfile\.d/upstream/
       - id: no-commit-to-branch
       - id: trailing-whitespace
-        exclude: ^helmfile\.d/upstream/|^tests/.*/.*\.out$
+        exclude: ^(helmfile\.d/upstream/|tests/.*/resources/)
 
   - repo: local
     hooks:

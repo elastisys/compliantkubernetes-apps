@@ -1,0 +1,81 @@
+---
+# Source: gatekeeper-metrics/templates/gatekeeper-audit-metrics.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: gatekeeper-metrics
+    chart: gatekeeper-metrics
+    control-plane: audit-controller
+    type: metrics
+  name: gatekeeper-metrics-audit
+spec:
+  ports:
+  - port: 8888
+    name: metrics
+    protocol: TCP
+    targetPort: 8888
+  selector:
+    app: gatekeeper
+    chart: gatekeeper
+    control-plane: audit-controller
+---
+# Source: gatekeeper-metrics/templates/gatekeeper-controller-metrics.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: gatekeeper-metrics
+    chart: gatekeeper-metrics
+    control-plane: controller-manager
+    type: metrics
+  name: gatekeeper-metrics-controller
+spec:
+  ports:
+  - port: 8888
+    name: metrics
+    protocol: TCP
+    targetPort: 8888
+  selector:
+    app: gatekeeper
+    chart: gatekeeper
+    control-plane: controller-manager
+---
+# Source: gatekeeper-metrics/templates/gatekeeper-audit-metrics.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: gatekeeper-metrics
+    chart: gatekeeper-metrics
+    control-plane: audit-controller
+  name: gatekeeper-metrics-audit
+spec:
+  endpoints:
+  - port: metrics
+  selector:
+    matchLabels:
+      app: gatekeeper-metrics
+      chart: gatekeeper-metrics
+      control-plane: audit-controller
+      type: metrics
+---
+# Source: gatekeeper-metrics/templates/gatekeeper-controller-metrics.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: gatekeeper-metrics
+    chart: gatekeeper-metrics
+    control-plane: controller-manager
+  name: gatekeeper-metrics-controller
+spec:
+  endpoints:
+  - port: metrics
+  selector:
+    matchLabels:
+      app: gatekeeper-metrics
+      chart: gatekeeper-metrics
+      control-plane: controller-manager
+      type: metrics
+

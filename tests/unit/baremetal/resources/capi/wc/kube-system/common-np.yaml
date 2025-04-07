@@ -1,0 +1,871 @@
+---
+# Source: networkpolicy-service/templates/cert-manager/resolver.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-cert-manager-resolver
+  namespace: set-me
+spec:
+  podSelector:
+    matchLabels:
+      acme.cert-manager.io/http01-solver: "true"
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 8089
+          protocol: TCP
+---
+# Source: networkpolicy-service/templates/cert-manager/resolver.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-cert-manager-resolver
+  namespace: production
+spec:
+  podSelector:
+    matchLabels:
+      acme.cert-manager.io/http01-solver: "true"
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 8089
+          protocol: TCP
+---
+# Source: networkpolicy-service/templates/cert-manager/resolver.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-cert-manager-resolver
+  namespace: staging
+spec:
+  podSelector:
+    matchLabels:
+      acme.cert-manager.io/http01-solver: "true"
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 8089
+          protocol: TCP
+---
+# Source: networkpolicy-service/templates/coredns/allow-coredns.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-coredns
+spec:
+  podSelector:
+    matchLabels:
+      k8s-app: kube-dns
+  policyTypes:
+    - Egress
+    - Ingress
+  ingress:
+    - ports:
+      - port: 53
+        protocol: UDP
+      - port: 53
+        protocol: TCP
+    - from:
+      - podSelector:
+          matchLabels:
+            k8s-app: kube-dns
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+          namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 9153
+  egress:
+    - to:
+      - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6443
+    - to:
+      - ipBlock:
+            cidr: 0.0.0.0/0
+      - ipBlock:
+          cidr: 10.233.0.10/32
+      - ipBlock:
+          cidr: 0.0.0.0/0
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+---
+# Source: networkpolicy-service/templates/dns-autoscaler/allow-dns-autoscaler.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-dns-autoscaler
+spec:
+  podSelector:
+    matchLabels:
+      k8s-app: dns-autoscaler
+  policyTypes:
+    - Egress
+    - Ingress
+  ingress:
+    - from:
+      - ipBlock:
+          cidr: 0.0.0.0/0
+      - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 8080
+          protocol: TCP
+  egress:
+    - to:
+      - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6443
+---
+# Source: networkpolicy-service/templates/gatekeeper/allow-controller-manager.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-controller-manager
+  namespace: gatekeeper-system
+spec:
+  podSelector:
+    matchLabels:
+      control-plane: controller-manager
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+      ports:
+        - port: 8888
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus-blackbox-exporter
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 8443
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 6443
+---
+# Source: networkpolicy-service/templates/gatekeeper/allow-gatekeeper-audit-controller.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-gatekeeper-audit-controller
+  namespace: gatekeeper-system
+spec:
+  podSelector:
+    matchLabels:
+      control-plane: audit-controller
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+      ports:
+        - port: 8888
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 6443
+---
+# Source: networkpolicy-service/templates/gatekeeper/allow-gatekeeper-templates-wait.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-gatekeeper-templates-wait
+  namespace: gatekeeper-system
+spec:
+  podSelector:
+    matchLabels:
+      job-name: gatekeeper-templates-wait
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 6443
+---
+# Source: networkpolicy-service/templates/gatekeeper/allow-gatekeeper-update-crds-hook.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-gatekeeper-update-crds-hook
+  namespace: gatekeeper-system
+spec:
+  podSelector:
+    matchLabels:
+      job-name: gatekeeper-update-crds-hook
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 6443
+---
+# Source: networkpolicy-service/templates/gatekeeper/allow-gatekeeper-update-namespace-label.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-gatekeeper-update-namespace-label
+  namespace: gatekeeper-system
+spec:
+  podSelector:
+    matchLabels:
+      job-name: gatekeeper-update-namespace-label
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 6443
+---
+# Source: networkpolicy-service/templates/gatekeeper/default-deny.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: gatekeeper-default-deny-all
+  namespace: gatekeeper-system
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+# Source: networkpolicy-service/templates/kube-system/metrics-server.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-service-0.2.0
+    app.kubernetes.io/name: networkpolicy-service
+    app.kubernetes.io/instance: common-np
+    app.kubernetes.io/version: "1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: allow-metrics-server
+  namespace: kube-system
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: metrics-server
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 8443
+  egress:
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6443
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 10250
+---
+# Source: networkpolicy-service/templates/kube-system/snapshot-controller.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-service-0.2.0
+    app.kubernetes.io/name: networkpolicy-service
+    app.kubernetes.io/instance: common-np
+    app.kubernetes.io/version: "1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: allow-snapshot-controller
+  namespace: kube-system
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      app: snapshot-controller
+  ingress: []
+  egress:
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6443
+---
+# Source: networkpolicy-service/templates/rook-ceph/ceph-tools.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-rook-ceph-tools
+  namespace: rook-ceph
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      app: rook-ceph-tools
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6443
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mgr
+      ports:
+        - port: 6800
+          protocol: TCP
+          endPort: 7300
+        - port: 9283
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mon
+      ports:
+        - port: 6789
+          protocol: TCP
+        - port: 3300
+          protocol: TCP
+        - port: 7000
+          protocol: TCP
+---
+# Source: networkpolicy-service/templates/rook-ceph/crashcollector.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-rook-ceph-crashcollector
+  namespace: rook-ceph
+spec:
+  egress:
+  - ports:
+    - port: 6800
+      protocol: TCP
+    - port: 7000
+      protocol: TCP
+    to:
+    - podSelector:
+        matchLabels:
+          app: rook-ceph-mgr
+  - ports:
+    - port: 6789
+      protocol: TCP
+    - port: 3300
+      protocol: TCP
+    to:
+    - podSelector:
+        matchLabels:
+          app: rook-ceph-mon
+  podSelector:
+    matchLabels:
+      app: rook-ceph-crashcollector
+  policyTypes:
+    - Egress
+---
+# Source: networkpolicy-service/templates/rook-ceph/csi-detect-version.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-rook-ceph-csi-detect-version
+  namespace: rook-ceph
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      app: rook-ceph-csi-detect-version
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6443
+          protocol: TCP
+---
+# Source: networkpolicy-service/templates/rook-ceph/csi-rbdplugin-provisioner.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-rook-ceph-csi-rbdplugin-provisioner
+  namespace: rook-ceph
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      app: csi-rbdplugin-provisioner
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6443
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-osd
+      ports:
+        - port: 6800
+          protocol: TCP
+          endPort: 7300
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mgr
+      ports:
+        - port: 6800
+          protocol: TCP
+          endPort: 7300
+        - port: 9283
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mon
+      ports:
+        - port: 3300
+          protocol: TCP
+        - port: 6789
+          protocol: TCP
+---
+# Source: networkpolicy-service/templates/rook-ceph/default-deny.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: rook-ceph-default-deny-all
+  namespace: rook-ceph
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+# Source: networkpolicy-service/templates/rook-ceph/detect-version.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-rook-ceph-detect-version
+  namespace: rook-ceph
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      app: rook-ceph-detect-version
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6443
+          protocol: TCP
+---
+# Source: networkpolicy-service/templates/rook-ceph/mgr.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-rook-ceph-mgr
+  namespace: rook-ceph
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      app: rook-ceph-mgr
+  ingress:
+    - from: 
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: kube-prometheus-stack-prometheus
+              app.kubernetes.io/name: prometheus
+      ports:
+        - port: 9283
+    - from: 
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: prometheus-blackbox-exporter
+      ports:
+        - port: 9283
+    - from:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-crashcollector
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-operator
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-tools
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mon
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-osd
+        - ipBlock:
+            cidr: 0.0.0.0/0
+        - podSelector:
+            matchLabels:
+              app: csi-rbdplugin-provisioner
+      ports:
+        - port: 6800
+          protocol: TCP
+          endPort: 7300
+        - port: 9283
+          protocol: TCP
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-osd
+      ports:
+        - port: 6800
+          protocol: TCP
+          endPort: 7300
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6443
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mon
+      ports:
+        - port: 6789
+          protocol: TCP
+        - port: 3300
+          protocol: TCP
+        - port: 7000
+          protocol: TCP
+---
+# Source: networkpolicy-service/templates/rook-ceph/mon.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-rook-ceph-mon
+  namespace: rook-ceph
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      app: rook-ceph-mon
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-crashcollector
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mon
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-operator
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-osd
+        - ipBlock:
+            cidr: 0.0.0.0/0
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mgr
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-tools
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-osd-prepare
+      ports:
+        - port: 6789
+          protocol: TCP
+        - port: 3300
+          protocol: TCP
+        - port: 7000
+          protocol: TCP
+    - from:
+        - podSelector:
+            matchLabels:
+              app: csi-rbdplugin-provisioner
+      ports:
+        - port: 3300
+          protocol: TCP
+        - port: 6789
+          protocol: TCP
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mgr
+      ports:
+        - port: 6800
+          protocol: TCP
+          endPort: 7300
+        - port: 9283
+          protocol: TCP
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6443
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-osd
+      ports:
+        - port: 6800
+          protocol: TCP
+          endPort: 7300
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mon
+      ports:
+        - port: 6789
+          protocol: TCP
+        - port: 3300
+          protocol: TCP
+        - port: 7000
+          protocol: TCP
+---
+# Source: networkpolicy-service/templates/rook-ceph/operator.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-rook-ceph-operator
+  namespace: rook-ceph
+spec:
+  policyTypes:
+    - Egress
+    - Ingress
+  podSelector:
+    matchLabels:
+      app: rook-ceph-operator
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 9443
+          protocol: TCP
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mon
+      ports:
+        - port: 6789
+          protocol: TCP
+        - port: 3300
+          protocol: TCP
+        - port: 7000
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mgr
+      ports:
+        - port: 6800
+          protocol: TCP
+          endPort: 7300
+        - port: 9283
+          protocol: TCP
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6443
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-osd
+      ports:
+        - port: 6800
+          protocol: TCP
+          endPort: 7300
+---
+# Source: networkpolicy-service/templates/rook-ceph/osd-prepare.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-rook-ceph-osd-prepare
+  namespace: rook-ceph
+spec:
+  policyTypes:
+    - Egress
+  podSelector:
+    matchLabels:
+      app: rook-ceph-osd-prepare
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6443
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-osd
+      ports:
+        - port: 6800
+          protocol: TCP
+          endPort: 7300
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mon
+      ports:
+        - port: 6789
+          protocol: TCP
+        - port: 3300
+          protocol: TCP
+        - port: 7000
+          protocol: TCP
+---
+# Source: networkpolicy-service/templates/rook-ceph/osd.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-rook-ceph-osd
+  namespace: rook-ceph
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      app: rook-ceph-osd
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-osd
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mgr
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-operator
+        - podSelector:
+            matchLabels:
+              app: csi-rbdplugin-provisioner
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6800
+          protocol: TCP
+          endPort: 7300
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mgr
+      ports:
+        - port: 6800
+          protocol: TCP
+          endPort: 7300
+        - port: 9283
+          protocol: TCP
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6443
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mon
+      ports:
+        - port: 6789
+          protocol: TCP
+        - port: 3300
+          protocol: TCP
+        - port: 7000
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-osd
+      ports:
+        - port: 6800
+          protocol: TCP
+          endPort: 7300
+

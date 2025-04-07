@@ -1,0 +1,72 @@
+---
+# Source: kubeapi-metrics/templates/secret-auth.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "kubeapi-metrics-auth"
+  labels:
+    helm.sh/chart: kubeapi-metrics-0.1.0
+    app.kubernetes.io/name: kubeapi-metrics
+    app.kubernetes.io/instance: kubeapi-metrics
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+stringData:
+  auth: |
+    map[xsrf:kubeapiuser$2y$05$4Wa3D0DIYPFY5mK/D3NASOfJaZVQ0LrSK9LxNUn0Omy.yNsyvvKlW]
+---
+# Source: kubeapi-metrics/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubeapi-metrics
+  labels:
+    helm.sh/chart: kubeapi-metrics-0.1.0
+    app.kubernetes.io/name: kubeapi-metrics
+    app.kubernetes.io/instance: kubeapi-metrics
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6443
+      targetPort: 6443
+      protocol: TCP
+      name: api
+  selector:
+    component: kube-apiserver
+    tier: control-plane
+---
+# Source: kubeapi-metrics/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kubeapi-metrics
+  labels:
+    helm.sh/chart: kubeapi-metrics-0.1.0
+    app.kubernetes.io/name: kubeapi-metrics
+    app.kubernetes.io/instance: kubeapi-metrics
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/auth-type: "basic"
+    nginx.ingress.kubernetes.io/auth-secret: "kubeapi-metrics-auth"
+    nginx.ingress.kubernetes.io/limit-connections: "5"
+    nginx.ingress.kubernetes.io/limit-rps: "5"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - "kube-apiserver.ck8s.example.com"
+  rules:
+    - host: "kube-apiserver.ck8s.example.com"
+      http:
+        paths:
+        - backend:
+            service:
+              name: kubeapi-metrics
+              port:
+                number: 6443
+          path: /healthz
+          pathType: Exact
+

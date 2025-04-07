@@ -1,0 +1,305 @@
+---
+# Source: opensearch-curator/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opensearch-curator
+  labels:
+    helm.sh/chart: opensearch-curator-0.1.0
+    app.kubernetes.io/name: opensearch-curator
+    app.kubernetes.io/instance: opensearch-curator
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  action_file.yml: |-
+    actions:
+      1:
+        action: delete_indices
+        description: "Delete oldest other-* indices that exceeds total disk size 5GB"
+        options:
+          ignore_empty_list: True
+          allow_ilm_indices: True
+          continue_if_exception: True
+        filters:
+        - filtertype: pattern
+          kind: regex
+          value: 'other-*'
+        - filtertype: space
+          disk_space: 5
+          use_age: True
+          source: name
+          timestring: '%Y.%m.%d'
+        - filtertype: pattern
+          kind: regex
+          value: '^\.opensearch_dashboards.*$'
+          exclude: True
+      2:
+        action: delete_indices
+        description: "Delete other-* indices that are older than 10 days"
+        options:
+          ignore_empty_list: True
+          allow_ilm_indices: True
+          continue_if_exception: True
+        filters:
+        - filtertype: pattern
+          kind: regex
+          value: 'other-*'
+        - filtertype: age
+          source: name
+          direction: older
+          timestring: '%Y.%m.%d'
+          unit: days
+          unit_count: 10
+        - filtertype: pattern
+          kind: regex
+          value: '^\.opensearch_dashboards.*$'
+          exclude: True
+      3:
+        action: delete_indices
+        description: "Delete oldest kubeaudit-* indices that exceeds total disk size 50GB"
+        options:
+          ignore_empty_list: True
+          allow_ilm_indices: True
+          continue_if_exception: True
+        filters:
+        - filtertype: pattern
+          kind: regex
+          value: 'kubeaudit-*'
+        - filtertype: space
+          disk_space: 50
+          use_age: True
+          source: name
+          timestring: '%Y.%m.%d'
+        - filtertype: pattern
+          kind: regex
+          value: '^\.opensearch_dashboards.*$'
+          exclude: True
+      4:
+        action: delete_indices
+        description: "Delete kubeaudit-* indices that are older than 30 days"
+        options:
+          ignore_empty_list: True
+          allow_ilm_indices: True
+          continue_if_exception: True
+        filters:
+        - filtertype: pattern
+          kind: regex
+          value: 'kubeaudit-*'
+        - filtertype: age
+          source: name
+          direction: older
+          timestring: '%Y.%m.%d'
+          unit: days
+          unit_count: 30
+        - filtertype: pattern
+          kind: regex
+          value: '^\.opensearch_dashboards.*$'
+          exclude: True
+      5:
+        action: delete_indices
+        description: "Delete oldest kubernetes-* indices that exceeds total disk size 50GB"
+        options:
+          ignore_empty_list: True
+          allow_ilm_indices: True
+          continue_if_exception: True
+        filters:
+        - filtertype: pattern
+          kind: regex
+          value: 'kubernetes-*'
+        - filtertype: space
+          disk_space: 50
+          use_age: True
+          source: name
+          timestring: '%Y.%m.%d'
+        - filtertype: pattern
+          kind: regex
+          value: '^\.opensearch_dashboards.*$'
+          exclude: True
+      6:
+        action: delete_indices
+        description: "Delete kubernetes-* indices that are older than 30 days"
+        options:
+          ignore_empty_list: True
+          allow_ilm_indices: True
+          continue_if_exception: True
+        filters:
+        - filtertype: pattern
+          kind: regex
+          value: 'kubernetes-*'
+        - filtertype: age
+          source: name
+          direction: older
+          timestring: '%Y.%m.%d'
+          unit: days
+          unit_count: 30
+        - filtertype: pattern
+          kind: regex
+          value: '^\.opensearch_dashboards.*$'
+          exclude: True
+      7:
+        action: delete_indices
+        description: "Delete oldest authlog-* indices that exceeds total disk size 5GB"
+        options:
+          ignore_empty_list: True
+          allow_ilm_indices: True
+          continue_if_exception: True
+        filters:
+        - filtertype: pattern
+          kind: regex
+          value: 'authlog-*'
+        - filtertype: space
+          disk_space: 5
+          use_age: True
+          source: name
+          timestring: '%Y.%m.%d'
+        - filtertype: pattern
+          kind: regex
+          value: '^\.opensearch_dashboards.*$'
+          exclude: True
+      8:
+        action: delete_indices
+        description: "Delete authlog-* indices that are older than 30 days"
+        options:
+          ignore_empty_list: True
+          allow_ilm_indices: True
+          continue_if_exception: True
+        filters:
+        - filtertype: pattern
+          kind: regex
+          value: 'authlog-*'
+        - filtertype: age
+          source: name
+          direction: older
+          timestring: '%Y.%m.%d'
+          unit: days
+          unit_count: 30
+        - filtertype: pattern
+          kind: regex
+          value: '^\.opensearch_dashboards.*$'
+          exclude: True
+      9:
+        action: delete_indices
+        description: "Delete oldest security-auditlog-* indices that exceeds total disk size 1GB"
+        options:
+          ignore_empty_list: True
+          allow_ilm_indices: True
+          continue_if_exception: True
+        filters:
+        - filtertype: pattern
+          kind: regex
+          value: 'security-auditlog-*'
+        - filtertype: space
+          disk_space: 1
+          use_age: True
+          source: name
+          timestring: '%Y.%m.%d'
+        - filtertype: pattern
+          kind: regex
+          value: '^\.opensearch_dashboards.*$'
+          exclude: True
+      10:
+        action: delete_indices
+        description: "Delete security-auditlog-* indices that are older than 14 days"
+        options:
+          ignore_empty_list: True
+          allow_ilm_indices: True
+          continue_if_exception: True
+        filters:
+        - filtertype: pattern
+          kind: regex
+          value: 'security-auditlog-*'
+        - filtertype: age
+          source: name
+          direction: older
+          timestring: '%Y.%m.%d'
+          unit: days
+          unit_count: 14
+        - filtertype: pattern
+          kind: regex
+          value: '^\.opensearch_dashboards.*$'
+          exclude: True
+
+  config.yml:   |-
+    ---
+    client:
+      hosts:
+      - ${OPENSEARCH_ENDPOINT}
+      use_ssl: true
+      ssl_no_validate: true
+      username: ${OPENSEARCH_USERNAME}
+      password: ${OPENSEARCH_PASSWORD}
+      timeout: 30
+      master_only: False
+    logging:
+      loglevel: INFO
+      logformat: default
+      blacklist: ['elasticsearch', 'urllib3']
+---
+# Source: opensearch-curator/templates/cronjob.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: opensearch-curator
+  labels:
+    helm.sh/chart: opensearch-curator-0.1.0
+    app.kubernetes.io/name: opensearch-curator
+    app.kubernetes.io/instance: opensearch-curator
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 600
+  failedJobsHistoryLimit: 3
+  successfulJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 2700
+      template:
+        metadata:
+          labels:
+            helm.sh/chart: opensearch-curator-0.1.0
+            app.kubernetes.io/name: opensearch-curator
+            app.kubernetes.io/instance: opensearch-curator
+            app.kubernetes.io/version: "0.1.0"
+            app.kubernetes.io/managed-by: Helm
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: opensearch-curator
+              image: ghcr.io/elastisys/bitnami/elasticsearch-curator:5.8.4-debian-10-r235
+              imagePullPolicy: IfNotPresent
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 128Mi
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+              args:
+                - --config
+                - /etc/config/config.yml
+                - /etc/config/action_file.yml
+              env:
+                - name: OPENSEARCH_ENDPOINT
+                  value: opensearch-master:9200
+                - name: OPENSEARCH_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: opensearch-curator-user
+                      key: username
+                - name: OPENSEARCH_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: opensearch-curator-user
+                      key: password
+              volumeMounts:
+                - name: curator-config
+                  mountPath: /etc/config
+          volumes:
+            - name: curator-config
+              configMap:
+                name: opensearch-curator
+          securityContext:
+            runAsUser: 1001
+

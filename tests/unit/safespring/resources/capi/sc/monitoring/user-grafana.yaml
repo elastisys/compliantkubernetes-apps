@@ -1,0 +1,433 @@
+---
+# Source: grafana/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+automountServiceAccountToken: false
+metadata:
+  labels:
+    helm.sh/chart: grafana-8.9.1
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/instance: user-grafana
+    app.kubernetes.io/version: "11.5.1"
+  name: user-grafana
+  namespace: monitoring
+---
+# Source: grafana/templates/secret-env.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: user-grafana-env
+  namespace: monitoring
+  labels:
+    helm.sh/chart: grafana-8.9.1
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/instance: user-grafana
+    app.kubernetes.io/version: "11.5.1"
+type: Opaque
+data:
+  admin-password: "c3RhdGljcGFzc3dvcmRmb3J0ZXN0cw=="
+  admin-user: "YWRtaW4="
+  clientSecret: "c3RhdGljcGFzc3dvcmRmb3J0ZXN0cw=="
+---
+# Source: grafana/templates/configmap-dashboard-provider.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    helm.sh/chart: grafana-8.9.1
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/instance: user-grafana
+    app.kubernetes.io/version: "11.5.1"
+  name: user-grafana-config-dashboards
+  namespace: monitoring
+data:
+  provider.yaml: |-
+    apiVersion: 1
+    providers:
+      - name: 'sidecarProvider'
+        orgId: 1
+        folder: ''
+        folderUid: ''
+        type: file
+        disableDeletion: false
+        allowUiUpdates: false
+        updateIntervalSeconds: 30
+        options:
+          foldersFromFilesStructure: false
+          path: /tmp/dashboards
+---
+# Source: grafana/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-grafana
+  namespace: monitoring
+  labels:
+    helm.sh/chart: grafana-8.9.1
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/instance: user-grafana
+    app.kubernetes.io/version: "11.5.1"
+data:
+  
+  grafana.ini: |
+    [analytics]
+    check_for_updates = false
+    reporting_enabled = false
+    [auth]
+    oauth_allow_insecure_email_lookup = true
+    [auth.generic_oauth]
+    allow_sign_up = true
+    allowed_domains = example.com
+    api_url = http://dex.dex.svc.cluster.local.:5556/api
+    auth_url = https://dex.ck8s.example.com./auth
+    client_id = grafana
+    client_secret = $__env{clientSecret}
+    enabled = true
+    name = dex
+    role_attribute_path = contains(groups[*], 'grafana_admin') && 'Admin' || contains(groups[*], 'grafana_editor') && 'Editor' || contains(groups[*], 'grafana_viewer') && 'Viewer'
+    scopes = openid profile email groups
+    skip_org_role_sync = false
+    tls_skip_verify_insecure = false
+    token_url = http://dex.dex.svc.cluster.local.:5556/token
+    use_pkce = true
+    [dashboards]
+    default_home_dashboard_path = /tmp/dashboards/welcome-dashboard.json
+    [dataproxy]
+    timeout = 600
+    [grafana_net]
+    url = https://grafana.net
+    [log]
+    mode = console
+    [paths]
+    data = /var/lib/grafana/
+    logs = /var/log/grafana
+    plugins = /var/lib/grafana/plugins
+    provisioning = /etc/grafana/provisioning
+    [server]
+    domain = grafana.ck8s.example.com
+    root_url = https://grafana.ck8s.example.com
+    [users]
+    viewers_can_edit = true
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+    - access: proxy
+      basicAuth: false
+      editable: false
+      isDefault: false
+      jsonData:
+        customQueryParameters: tenant_id=apps-tests-sc
+        manageAlerts: false
+      name: Service Cluster
+      orgId: 1
+      type: prometheus
+      url: http://grafana-label-enforcer:9090
+      version: 1
+    - access: proxy
+      basicAuth: false
+      editable: false
+      isDefault: true
+      jsonData:
+        customQueryParameters: tenant_id=apps-tests-wc
+        manageAlerts: false
+      name: Workload Cluster
+      orgId: 1
+      type: prometheus
+      url: http://grafana-label-enforcer:9090
+      version: 1
+---
+# Source: grafana/templates/pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: user-grafana
+  namespace: monitoring
+  labels:
+    helm.sh/chart: grafana-8.9.1
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/instance: user-grafana
+    app.kubernetes.io/version: "11.5.1"
+  finalizers:
+    - kubernetes.io/pvc-protection
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: "10Gi"
+---
+# Source: grafana/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: user-grafana
+  namespace: monitoring
+  labels:
+    helm.sh/chart: grafana-8.9.1
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/instance: user-grafana
+    app.kubernetes.io/version: "11.5.1"
+rules:
+  - apiGroups: [""] # "" indicates the core API group
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "watch", "list"]
+---
+# Source: grafana/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: user-grafana
+  namespace: monitoring
+  labels:
+    helm.sh/chart: grafana-8.9.1
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/instance: user-grafana
+    app.kubernetes.io/version: "11.5.1"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: user-grafana
+subjects:
+- kind: ServiceAccount
+  name: user-grafana
+  namespace: monitoring
+---
+# Source: grafana/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-grafana
+  namespace: monitoring
+  labels:
+    helm.sh/chart: grafana-8.9.1
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/instance: user-grafana
+    app.kubernetes.io/version: "11.5.1"
+spec:
+  type: ClusterIP
+  ports:
+    - name: service
+      port: 80
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/instance: user-grafana
+---
+# Source: grafana/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-grafana
+  namespace: monitoring
+  labels:
+    helm.sh/chart: grafana-8.9.1
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/instance: user-grafana
+    app.kubernetes.io/version: "11.5.1"
+    velero: backup
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: grafana
+      app.kubernetes.io/instance: user-grafana
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: grafana-8.9.1
+        app.kubernetes.io/name: grafana
+        app.kubernetes.io/instance: user-grafana
+        app.kubernetes.io/version: "11.5.1"
+        velero: backup
+      annotations:
+        checksum/config: 23bf760b0e1b28f7069df07f4773d956a364b27ebb4efbe8e3e5cdf7e9b705f4
+        checksum/sc-dashboard-provider-config: e70bf6a851099d385178a76de9757bb0bef8299da6d8443602590e44f05fdf24
+        checksum/secret-env: d76a0d069f12f94590936037cfd0fd199629d6d73c5c84aa3a5a5869f8e0007c
+        kubectl.kubernetes.io/default-container: grafana
+    spec:
+      
+      serviceAccountName: user-grafana
+      automountServiceAccountToken: true
+      securityContext:
+        fsGroup: 472
+        runAsGroup: 472
+        runAsNonRoot: true
+        runAsUser: 472
+      initContainers:
+      enableServiceLinks: true
+      containers:
+        - name: grafana-sc-dashboard
+          image: "quay.io/kiwigrid/k8s-sidecar:1.30.0"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: METHOD
+              value: WATCH
+            - name: LABEL
+              value: "grafana_dashboard"
+            - name: LABEL_VALUE
+              value: "1"
+            - name: FOLDER
+              value: "/tmp/dashboards"
+            - name: RESOURCE
+              value: "both"
+            - name: REQ_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: user-grafana-env
+                  key: admin-user
+            - name: REQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: user-grafana-env
+                  key: admin-password
+            - name: REQ_URL
+              value: http://localhost:3000/api/admin/provisioning/dashboards/reload
+            - name: REQ_METHOD
+              value: POST
+          resources:
+            limits:
+              cpu: 250m
+              memory: 200Mi
+            requests:
+              cpu: 10m
+              memory: 150Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: sc-dashboard-volume
+              mountPath: "/tmp/dashboards"
+        - name: grafana
+          image: "docker.io/grafana/grafana:11.5.1"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: config
+              mountPath: "/etc/grafana/grafana.ini"
+              subPath: grafana.ini
+            - name: storage
+              mountPath: "/var/lib/grafana"
+            - name: config
+              mountPath: "/etc/grafana/provisioning/datasources/datasources.yaml"
+              subPath: "datasources.yaml"
+            - name: sc-dashboard-volume
+              mountPath: "/tmp/dashboards"
+            - name: sc-dashboard-provider
+              mountPath: "/etc/grafana/provisioning/dashboards/sc-dashboardproviders.yaml"
+              subPath: provider.yaml
+          ports:
+            - name: grafana
+              containerPort: 3000
+              protocol: TCP
+            - name: gossip-tcp
+              containerPort: 9094
+              protocol: TCP
+            - name: gossip-udp
+              containerPort: 9094
+              protocol: UDP
+            - name: profiling
+              containerPort: 6060
+              protocol: TCP
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: GF_SECURITY_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: user-grafana-env
+                  key: admin-user
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: user-grafana-env
+                  key: admin-password
+            - name: GF_PATHS_DATA
+              value: /var/lib/grafana/
+            - name: GF_PATHS_LOGS
+              value: /var/log/grafana
+            - name: GF_PATHS_PLUGINS
+              value: /var/lib/grafana/plugins
+            - name: GF_PATHS_PROVISIONING
+              value: /etc/grafana/provisioning
+          envFrom:
+            - secretRef:
+                name: user-grafana-env
+          livenessProbe:
+            failureThreshold: 10
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 60
+            timeoutSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+          resources:
+            limits:
+              cpu: 100m
+              memory: 160Mi
+            requests:
+              cpu: 50m
+              memory: 80Mi
+      volumes:
+        - name: config
+          configMap:
+            name: user-grafana
+        - name: storage
+          persistentVolumeClaim:
+            claimName: user-grafana
+        - name: sc-dashboard-volume
+          emptyDir:
+            {}
+        - name: sc-dashboard-provider
+          configMap:
+            name: user-grafana-config-dashboards
+---
+# Source: grafana/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: user-grafana
+  namespace: monitoring
+  labels:
+    helm.sh/chart: grafana-8.9.1
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/instance: user-grafana
+    app.kubernetes.io/version: "11.5.1"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - grafana.ck8s.example.com
+      secretName: user-grafana-tls
+  rules:
+    - host: "grafana.ck8s.example.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: user-grafana
+                port:
+                  number: 80
+

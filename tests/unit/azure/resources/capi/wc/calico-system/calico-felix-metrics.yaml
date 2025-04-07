@@ -1,0 +1,33 @@
+---
+# Source: calico-felix-metrics/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+      app: "calico-felix-metrics"
+  name: calico-felix-metrics-svc
+spec:
+  ports:
+  - port: 9091
+    name: metrics
+    protocol: TCP
+    targetPort: 9091
+  selector:
+      k8s-app: "calico-node"
+  sessionAffinity: None
+  type: ClusterIP
+---
+# Source: calico-felix-metrics/templates/service.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+      app: "calico-felix-metrics"
+  name: "calico-felix-metrics"
+spec:
+  endpoints:
+  - port: metrics
+  selector:
+    matchLabels:
+      app: "calico-felix-metrics"
+

@@ -1,0 +1,526 @@
+---
+# Source: opensearch/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: opensearch-master-opensearch-net
+  labels:
+    helm.sh/chart: opensearch-2.30.1
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/instance: opensearch-master
+    app.kubernetes.io/version: "2.18.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: opensearch-master
+spec:
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          opensearch-master-transport-client: "true"
+  podSelector:
+    matchLabels:
+      opensearch-master-transport-client: "true"
+---
+# Source: opensearch/templates/poddisruptionbudget.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: "opensearch-master-pdb"
+  labels:
+    helm.sh/chart: opensearch-2.30.1
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/instance: opensearch-master
+    app.kubernetes.io/version: "2.18.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: opensearch-master
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: opensearch
+      app.kubernetes.io/instance: opensearch-master
+---
+# Source: opensearch/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "opensearch-master"
+  labels:
+    helm.sh/chart: opensearch-2.30.1
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/instance: opensearch-master
+    app.kubernetes.io/version: "2.18.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: opensearch-master
+  annotations:
+---
+# Source: opensearch/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opensearch-master-config
+  labels:
+    helm.sh/chart: opensearch-2.30.1
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/instance: opensearch-master
+    app.kubernetes.io/version: "2.18.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: opensearch-master
+data:
+  opensearch.yml: |
+    cluster:
+      name: opensearch
+      max_shards_per_node: 1000
+    
+    network:
+      host: 0.0.0.0
+    
+    indices:
+      query:
+        bool:
+          max_clause_count: 1024
+    
+    compatibility:
+      override_main_response_version: true
+    action:
+      auto_create_index: ".opensearch*,.opendistro-*,security-auditlog-*"
+    
+    node:
+      attr:
+        box_type: hot
+    
+    # Security plugin configuration
+    plugins:
+      security:
+        ssl:
+          transport:
+            pemcert_filepath: transport/tls.crt
+            pemkey_filepath: transport/tls.key
+            pemtrustedcas_filepath: transport/ca.crt
+            enforce_hostname_verification: false
+          http:
+            enabled: true
+            pemcert_filepath: http/tls.crt
+            pemkey_filepath: http/tls.key
+            pemtrustedcas_filepath: http/ca.crt
+        allow_unsafe_democertificates: false
+        allow_default_init_securityindex: false
+        authcz:
+          admin_dn:
+            - "CN=admin.opensearch-system.cluster.local,O=compliantkubernetes"
+        audit:
+          type: log4j
+          config:
+            log4j:
+              logger_name: audit
+              level: INFO
+          # In example config, but not supported
+          # ignore_users:
+          #   - kibanaserver
+        enable_snapshot_restore_privilege: true
+        check_snapshot_restore_write_privileges: true
+        nodes_dn:
+          - "CN=nodes.opensearch-system.cluster.local,O=compliantkubernetes"
+        restapi:
+          roles_enabled:
+            - all_access
+            - configurer
+            - security_rest_api_access
+        system_indices:
+          enabled: true
+          indices:
+            [
+              ".opendistro-alerting-config",
+              ".opendistro-alerting-alert*",
+              ".opendistro-anomaly-results*",
+              ".opendistro-anomaly-detector*",
+              ".opendistro-anomaly-checkpoints",
+              ".opendistro-anomaly-detection-state",
+              ".opendistro-reports-*",
+              ".opendistro-notifications-*",
+              ".opendistro-notebooks",
+              ".opendistro-asynchronous-search-response*",
+            ]
+    
+    # Object storage configuration
+    s3:
+      client:
+        default:
+          endpoint: https://example-region-endpoint
+          path_style_access: true
+          region: example-region
+---
+# Source: opensearch/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: "opensearch-master"
+  labels:
+    helm.sh/chart: opensearch-2.30.1
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/instance: opensearch-master
+    app.kubernetes.io/version: "2.18.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: opensearch-master
+rules:
+  - apiGroups:
+      - extensions
+    resources:
+      - podsecuritypolicies
+    resourceNames:
+      - "opensearch-master"
+    verbs:
+      - use
+---
+# Source: opensearch/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: "opensearch-master"
+  labels:
+    helm.sh/chart: opensearch-2.30.1
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/instance: opensearch-master
+    app.kubernetes.io/version: "2.18.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: opensearch-master
+subjects:
+  - kind: ServiceAccount
+    name: "opensearch-master"
+    namespace: "opensearch-system"
+roleRef:
+  kind: Role
+  name: "opensearch-master"
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: opensearch/templates/service.yaml
+kind: Service
+apiVersion: v1
+metadata:
+  name: opensearch-master
+  labels:
+    helm.sh/chart: opensearch-2.30.1
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/instance: opensearch-master
+    app.kubernetes.io/version: "2.18.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: opensearch-master
+  annotations:
+    {}
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/instance: opensearch-master
+  ports:
+  - name: http
+    protocol: TCP
+    port: 9200
+  - name: transport
+    protocol: TCP
+    port: 9300
+  - name: metrics
+    protocol: TCP
+    port: 9600
+---
+# Source: opensearch/templates/service.yaml
+kind: Service
+apiVersion: v1
+metadata:
+  name: opensearch-master-headless
+  labels:
+    helm.sh/chart: opensearch-2.30.1
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/instance: opensearch-master
+    app.kubernetes.io/version: "2.18.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: opensearch-master
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  clusterIP: None # This is needed for statefulset hostnames like opensearch-0 to resolve
+  # Create endpoints also if the related pod isn't ready
+  publishNotReadyAddresses: true
+  selector:
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/instance: opensearch-master
+  ports:
+  - name: http
+    port: 9200
+  - name: transport
+    port: 9300
+  - name: metrics
+    port: 9600
+---
+# Source: opensearch/templates/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: opensearch-master
+  labels:
+    helm.sh/chart: opensearch-2.30.1
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/instance: opensearch-master
+    app.kubernetes.io/version: "2.18.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: opensearch-master
+  annotations:
+    majorVersion: "2"
+spec:
+  serviceName: opensearch-master-headless
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: opensearch
+      app.kubernetes.io/instance: opensearch-master
+  replicas: 3
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      name: opensearch-master
+    spec:
+      accessModes:
+      - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: "100Gi"
+  template:
+    metadata:
+      name: "opensearch-master"
+      labels:
+        helm.sh/chart: opensearch-2.30.1
+        app.kubernetes.io/name: opensearch
+        app.kubernetes.io/instance: opensearch-master
+        app.kubernetes.io/version: "2.18.0"
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/component: opensearch-master
+      annotations:
+        configchecksum: e7d3f62da3c5d3deda3ffe7f7784dd538046ca0517348a84318e5aa3383ecce
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+      serviceAccountName: "opensearch-master"
+      automountServiceAccountToken: false
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app.kubernetes.io/instance
+                operator: In
+                values:
+                - opensearch-master
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                - opensearch
+            topologyKey: topology.kubernetes.io/zone
+      terminationGracePeriodSeconds: 120
+      volumes:
+      - name: config
+        configMap:
+          name: opensearch-master-config
+      - emptyDir: {}
+        name: config-emptydir
+      - name: opensearch-transport-cert
+        secret:
+          secretName: opensearch-transport-cert
+          defaultMode: 256
+      - name: opensearch-http-cert
+        secret:
+          secretName: opensearch-http-cert
+          defaultMode: 256
+      - name: keystore
+        emptyDir: {}
+      - name: keystore-opensearch-s3-secret
+        secret: 
+            secretName: opensearch-s3-secret
+
+      enableServiceLinks: true
+      initContainers:
+      - name: configfile
+        image: "opensearchproject/opensearch:2.18.0"
+        imagePullPolicy: "IfNotPresent"
+        command:
+        - sh
+        - -c
+        - |
+          #!/usr/bin/env bash
+          cp -r /tmp/configfolder/*  /tmp/config/
+        resources:
+          {}
+        volumeMounts:
+          - mountPath: /tmp/config/
+            name: config-emptydir
+          - name: config
+            mountPath: /tmp/configfolder/opensearch.yml
+            subPath: opensearch.yml
+      - name: keystore
+        image: "opensearchproject/opensearch:2.18.0"
+        imagePullPolicy: "IfNotPresent"
+        command:
+        - sh
+        - -c
+        - |
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          /usr/share/opensearch/bin/opensearch-keystore create
+
+          for i in /tmp/keystoreSecrets/*/*; do
+            [ -f "$i" ] || continue
+            key=$(basename $i)
+            echo "Adding file $i to keystore key $key"
+            /usr/share/opensearch/bin/opensearch-keystore add-file "$key" "$i"
+          done
+
+          # Add the bootstrap password since otherwise the opensearch entrypoint tries to do this on startup
+          if [ ! -z ${PASSWORD+x} ]; then
+            echo 'Adding env $PASSWORD to keystore as key bootstrap.password'
+            echo "$PASSWORD" | /usr/share/opensearch/bin/opensearch-keystore add -x bootstrap.password
+          fi
+
+          cp -a /usr/share/opensearch/config/opensearch.keystore /tmp/keystore/
+        env: 
+          - name: DISABLE_INSTALL_DEMO_CONFIG
+            value: "true"
+        envFrom: 
+          []
+        resources:
+          {}
+        volumeMounts:
+        - name: keystore
+          mountPath: /tmp/keystore
+        - name: keystore-opensearch-s3-secret
+          mountPath: /tmp/keystoreSecrets/opensearch-s3-secret
+      # Currently some extra blocks accept strings
+      # to continue with backwards compatibility this is being kept
+      # whilst also allowing for yaml to be specified too.
+      - command:
+        - sysctl
+        - -w
+        - vm.max_map_count=262144
+        image: ghcr.io/elastisys/curl-jq:1.0.0
+        name: init-sysctl
+        securityContext:
+          allowPrivilegeEscalation: true
+          privileged: true
+          runAsNonRoot: false
+          runAsUser: 0
+      containers:
+      - name: "opensearch"
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 1000
+        command:
+        - sh
+        - -c
+        - |
+          #!/usr/bin/env bash
+          set -euo pipefail
+          ./bin/opensearch-plugin install -b repository-s3
+
+          bash opensearch-docker-entrypoint.sh
+
+        image: "opensearchproject/opensearch:2.18.0"
+        imagePullPolicy: "IfNotPresent"
+        readinessProbe:
+          failureThreshold: 3
+          periodSeconds: 5
+          tcpSocket:
+            port: 9200
+          timeoutSeconds: 3
+        startupProbe:
+          failureThreshold: 30
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          tcpSocket:
+            port: 9200
+          timeoutSeconds: 3
+        ports:
+        - name: http
+          containerPort: 9200
+        - name: transport
+          containerPort: 9300
+        - name: metrics
+          containerPort: 9600
+        resources:
+          limits:
+            cpu: 1
+            memory: 3Gi
+          requests:
+            cpu: 100m
+            memory: 2Gi
+        env:
+        - name: node.name
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: cluster.initial_master_nodes
+          value: "opensearch-master-0,opensearch-master-1,opensearch-master-2,"
+        - name: discovery.seed_hosts
+          value: "opensearch-master-headless"
+        - name: cluster.name
+          value: "opensearch"
+        - name: network.host
+          value: "0.0.0.0"
+        - name: OPENSEARCH_JAVA_OPTS
+          value: "-Xms1024m -Xmx1024m"
+        - name: node.roles
+          value: "master,data,ingest,remote_cluster_client,"
+        - name: DISABLE_INSTALL_DEMO_CONFIG
+          value: "true"
+        volumeMounts:
+        - name: "opensearch-master"
+          mountPath: /usr/share/opensearch/data
+        - name: keystore
+          mountPath: /usr/share/opensearch/config/opensearch.keystore
+          subPath: opensearch.keystore
+        - name: opensearch-transport-cert
+          mountPath: /usr/share/opensearch/config/transport
+        - name: opensearch-http-cert
+          mountPath: /usr/share/opensearch/config/http
+        - name: config-emptydir
+          mountPath: /usr/share/opensearch/config/opensearch.yml
+          subPath: opensearch.yml
+---
+# Source: opensearch/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: opensearch-master
+  labels:
+    helm.sh/chart: opensearch-2.30.1
+    app.kubernetes.io/name: opensearch
+    app.kubernetes.io/instance: opensearch-master
+    app.kubernetes.io/version: "2.18.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: opensearch-master
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/proxy-body-size: 32m
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - opensearch.ops.ck8s.example.com
+      secretName: opensearch-ingress-cert
+  rules:
+    - host: "opensearch.ops.ck8s.example.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: opensearch-master
+                port:
+                  number: 9200
+
