@@ -277,7 +277,7 @@ customRules:
       condition: (
           container.image.repository = ghcr.io/zalando/spilo-15 or
           container.image.repository = ghcr.io/elastisys/spilo-15 or
-          container.image.repository = gcr.io/k8s-staging-multitenancy/hnc-manager or
+          container.image.repository = ghcr.io/elastisys/hnc-manager or
           container.image.repository = docker.io/k8scloudprovider/cinder-csi-plugin
         )
 
@@ -348,7 +348,7 @@ customRules:
     # Contact cloud metadata service from container
     - macro: user_known_metadata_access
       condition: or (
-          container.image.repository = gcr.io/k8s-staging-multitenancy/hnc-manager or
+          container.image.repository = ghcr.io/elastisys/hnc-manager or
           container.image.repository = ghcr.io/zalando/spilo-15 or
           container.image.repository = ghcr.io/elastisys/spilo-15
         )
