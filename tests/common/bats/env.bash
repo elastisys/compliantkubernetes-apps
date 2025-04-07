@@ -131,6 +131,8 @@ env.predictable-secrets() {
   # shellcheck disable=SC2016
   local thanos_hash='$apr1$RQu1URGa$ZORkkE1eYe1WlqskTGPFe1'
 
+  yq.set 'common' '.global.ck8sVersion' "\"any\""
+
   yq.set 'secrets' '["dex"]["kubeloginClientSecret"]' "\"${password}\""
   yq.set 'secrets' '["dex"]["staticPassword"]' "\"${dex_hash}\""
   yq.set 'secrets' '["dex"]["staticPasswordNotHashed"]' "\"${password}\""
