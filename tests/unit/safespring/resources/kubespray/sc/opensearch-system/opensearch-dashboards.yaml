@@ -1,0 +1,234 @@
+---
+# Source: opensearch-dashboards/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: opensearch-dashboards-dashboards
+  labels:
+    helm.sh/chart: opensearch-dashboards-2.26.0
+    app.kubernetes.io/name: opensearch-dashboards
+    app.kubernetes.io/instance: opensearch-dashboards
+    app.kubernetes.io/version: "2.18.0"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: opensearch-dashboards/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opensearch-dashboards-config
+  labels: 
+    helm.sh/chart: opensearch-dashboards-2.26.0
+    app.kubernetes.io/name: opensearch-dashboards
+    app.kubernetes.io/instance: opensearch-dashboards
+    app.kubernetes.io/version: "2.18.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  opensearch_dashboards.yml: |
+    opensearch:
+      requestHeadersWhitelist:
+      - Authorization
+      - securitytenant
+      ssl:
+        verificationMode: none
+    opensearch_security:
+      auth:
+        type: openid
+      cookie:
+        secure: false
+      multitenancy:
+        enabled: false
+      openid:
+        base_redirect_url: https://opensearch.ck8s.example.com
+        client_id: opensearch
+        client_secret: staticpasswordfortests
+        connect_url: http://dex.dex.svc.cluster.local:5556/.well-known/openid-configuration
+        logout_url: https://opensearch.ck8s.example.com
+        scope: openid profile email groups
+      readonly_mode:
+        roles:
+        - kibana_read_only
+    server:
+      host: "0"
+---
+# Source: opensearch-dashboards/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    helm.sh/chart: opensearch-dashboards-2.26.0
+    app.kubernetes.io/name: opensearch-dashboards
+    app.kubernetes.io/instance: opensearch-dashboards
+    app.kubernetes.io/version: "2.18.0"
+    app.kubernetes.io/managed-by: Helm
+  name: opensearch-dashboards-dashboards-rolebinding
+roleRef:
+  kind: Role
+  name: opensearch-dashboards-dashboards
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: opensearch-dashboards-dashboards
+  namespace: opensearch-system
+---
+# Source: opensearch-dashboards/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensearch-dashboards
+  labels:
+    helm.sh/chart: opensearch-dashboards-2.26.0
+    app.kubernetes.io/name: opensearch-dashboards
+    app.kubernetes.io/instance: opensearch-dashboards
+    app.kubernetes.io/version: "2.18.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5601
+    protocol: TCP
+    name: http
+    targetPort: 5601
+  - name: metrics
+    protocol: TCP
+    port: 9601
+  selector:
+    app: opensearch-dashboards
+    release: "opensearch-dashboards"
+---
+# Source: opensearch-dashboards/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opensearch-dashboards
+  labels:
+    helm.sh/chart: opensearch-dashboards-2.26.0
+    app.kubernetes.io/name: opensearch-dashboards
+    app.kubernetes.io/instance: opensearch-dashboards
+    app.kubernetes.io/version: "2.18.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: opensearch-dashboards
+      release: "opensearch-dashboards"
+  template:
+    metadata:
+      labels:
+        app: opensearch-dashboards
+        release: "opensearch-dashboards"
+      annotations:
+        configchecksum: 3a8e649c33794eb1f41ffab1940038fa4491b7b57e9cc9c9324bea211a06272
+    spec:
+      securityContext:
+        {}
+      serviceAccountName: opensearch-dashboards-dashboards
+      volumes:
+        - name: config
+          configMap:
+            name: opensearch-dashboards-config
+      containers:
+      - name: dashboards
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          runAsUser: 1000
+        image: "opensearchproject/opensearch-dashboards:2.18.0"
+        imagePullPolicy: "IfNotPresent"
+        readinessProbe:
+          failureThreshold: 10
+          initialDelaySeconds: 10
+          periodSeconds: 20
+          successThreshold: 1
+          tcpSocket:
+            port: 5601
+          timeoutSeconds: 5
+        livenessProbe:
+          failureThreshold: 10
+          initialDelaySeconds: 10
+          periodSeconds: 20
+          successThreshold: 1
+          tcpSocket:
+            port: 5601
+          timeoutSeconds: 5
+        startupProbe:
+          failureThreshold: 20
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: 5601
+          timeoutSeconds: 5
+        env:
+        - name: OPENSEARCH_HOSTS
+          value: "https://opensearch-master:9200"
+        - name: SERVER_HOST
+          value: "0.0.0.0"
+        - name: OPENSEARCH_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: opensearch-dashboards-user
+              key: username
+        - name: OPENSEARCH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: opensearch-dashboards-user
+              key: password
+        - name: COOKIE_PASS
+          valueFrom:
+            secretKeyRef:
+              name: opensearch-dashboards-user
+              key: cookie
+        ports:
+        - containerPort: 5601
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 1
+            memory: 1024Mi
+          requests:
+            cpu: 100m
+            memory: 286Mi
+        volumeMounts:
+          - name: config
+            mountPath: /usr/share/opensearch-dashboards/config/opensearch_dashboards.yml
+            subPath: opensearch_dashboards.yml
+---
+# Source: opensearch-dashboards/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: opensearch-dashboards
+  labels:
+    helm.sh/chart: opensearch-dashboards-2.26.0
+    app.kubernetes.io/name: opensearch-dashboards
+    app.kubernetes.io/instance: opensearch-dashboards
+    app.kubernetes.io/version: "2.18.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+    nginx.ingress.kubernetes.io/proxy-body-size: 32m
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - "opensearch.ck8s.example.com"
+      secretName: opensearch-dashboards-ingress-cert
+  rules:
+    - host: "opensearch.ck8s.example.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: opensearch-dashboards
+                port:
+                  number: 5601
+

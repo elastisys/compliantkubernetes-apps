@@ -1,0 +1,732 @@
+---
+# Source: podsecuritypolicies/templates/default/mutations/fsgroup.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: fsgroup-default-restricted
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.securityContext.fsGroup"
+  parameters:
+    assign:
+      value: 1
+    pathTests:
+      - subPath: "spec.securityContext.fsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/host-ipc.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: host-ipc-default-restricted
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.hostIPC"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.hostIPC"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/host-pid.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: host-pid-default-restricted
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.hostPID"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.hostPID"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privilege-escalation.yaml
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-default-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-default-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-default-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-default-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.containers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-default-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.ephemeralContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-default-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.initContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-group.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-group-default-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.containers[name: *].securityContext.runAsGroup"
+  parameters:
+    assign:
+      value: 1
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.runAsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-group.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-group-default-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.ephemeralContainers[name: *].securityContext.runAsGroup"
+  parameters:
+    assign:
+      value: 1
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.runAsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-group.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-group-default-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.initContainers[name: *].securityContext.runAsGroup"
+  parameters:
+    assign:
+      value: 1
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.runAsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-non-root.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-non-root-default-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.containers[name: *].securityContext.runAsNonRoot"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.runAsNonRoot"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-non-root.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-non-root-default-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.ephemeralContainers[name: *].securityContext.runAsNonRoot"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.runAsNonRoot"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-non-root.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-non-root-default-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.initContainers[name: *].securityContext.runAsNonRoot"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.runAsNonRoot"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/seccomp-profile.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: seccomp-profile-default-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.securityContext.seccompProfile.type"
+  parameters:
+    assign:
+      value: RuntimeDefault
+    pathTests:
+      - subPath: "spec.securityContext.seccompProfile.type"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/seccomp-profile.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: seccomp-profile-default-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.ephemeralContainers[name: *].securityContext.seccompProfile.type"
+  parameters:
+    assign:
+      value: RuntimeDefault
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.seccompProfile.type"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/seccomp-profile.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: seccomp-profile-default-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.initContainers[name: *].securityContext.seccompProfile.type"
+  parameters:
+    assign:
+      value: RuntimeDefault
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.seccompProfile.type"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/capabilities.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: capabilities-default-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.containers[name: *].securityContext.capabilities.drop"
+  parameters:
+    values:
+      fromList:
+        - ALL
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.capabilities.drop"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/capabilities.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: capabilities-default-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.ephemeralContainers[name: *].securityContext.capabilities.drop"
+  parameters:
+    values:
+      fromList:
+        - ALL
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.capabilities.drop"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/capabilities.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: capabilities-default-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.initContainers[name: *].securityContext.capabilities.drop"
+  parameters:
+    values:
+      fromList:
+        - ALL
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.capabilities.drop"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/supplemental-groups.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: supplemental-groups-default-restricted
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: owner
+          operator: NotIn
+          values:
+          - operator
+        - key: pod-security.kubernetes.io/enforce
+          operator: In
+          values:
+          - restricted
+  location: "spec.securityContext.supplementalGroups"
+  parameters:
+    values:
+      fromList:
+        - 1
+    pathTests:
+      - subPath: "spec.securityContext.supplementalGroups"
+        condition: MustNotExist
+

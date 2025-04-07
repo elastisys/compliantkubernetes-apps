@@ -1,0 +1,101 @@
+---
+# Source: calico-accountant/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+      app: "calico-accountant"
+  name: calico-accountant-metrics
+spec:
+  ports:
+  - port: 9009
+    name: metrics
+    protocol: TCP
+    targetPort: 9009
+  selector:
+      app: "calico-accountant"
+  sessionAffinity: None
+  type: ClusterIP
+---
+# Source: calico-accountant/templates/daemonset.yaml
+apiVersion: apps/v1
+kind: "DaemonSet"
+metadata:
+  name: "calico-accountant"
+spec:
+  selector:
+    matchLabels:
+        app: "calico-accountant"
+  template:
+    metadata:
+      labels:
+        app: "calico-accountant"
+    spec:
+      containers:
+        - command:
+          - sh
+          args:
+          - -c
+          - |
+              #!/bin/sh
+              cp /sbin/iptables-nft /sbin/iptables
+              cp /sbin/iptables-nft-restore /sbin/iptables-restore
+              cp /sbin/iptables-nft-save /sbin/iptables-save
+              /calico-accountant -logtostderr=true -v=2
+          env:
+          - name: METRICS_SERVER_PORT
+            value: "9009"
+          - name: DATASTORE_TYPE
+            value: "kubernetes"
+          - name: WAIT_FOR_DATASTORE
+            value: "true"
+          - name: NODENAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          image: "ghcr.io/elastisys/calico-accountant:0.1.6-ck8s2"
+          name: "calico-accountant"
+          ports:
+          - containerPort: 9009
+            name: metrics
+          securityContext:
+            privileged: true
+          volumeMounts:
+          - mountPath: /calico-secrets
+            name: etcd-certs
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+      hostNetwork: true
+      volumes:
+      - hostPath:
+          path: /etc/calico/certs
+          type: ""
+        name: etcd-certs
+      serviceAccount: "calico-node"
+---
+# Source: calico-accountant/templates/service.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+      app: "calico-accountant"
+  name: "calico-accountant"
+spec:
+  endpoints:
+  - port: metrics
+  selector:
+    matchLabels:
+      app: "calico-accountant"
+

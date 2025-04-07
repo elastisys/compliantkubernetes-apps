@@ -1,0 +1,305 @@
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: all-deny
+  namespace: fluentd
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+    - Ingress
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: forwarder
+  namespace: fluentd
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: fluentd-elasticsearch
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-apiserver
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 6443
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # base: egress-rule-sc-ingress
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+    # rule: fluentd-aggregator
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: fluentd-system
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/instance: fluentd-aggregator
+      ports:
+        - protocol: TCP
+          port: 24224
+  ingress:
+    # base: ingress-rule-prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 24231
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: aggregator
+  namespace: fluentd-system
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: fluentd-aggregator
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # base: egress-rule-object-storage
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+  ingress:
+    # rule: fluentd-forwarder
+    - from:
+        - podSelector:
+            matchLabels: 
+              app.kubernetes.io/instance: fluentd-forwarder
+      ports:
+        - protocol: TCP
+          port: 24224
+    # base: ingress-rule-prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 24231
+    # base: ingress-rule-blackbox
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus-blackbox-exporter
+      ports:
+        - protocol: TCP
+          port: 9880
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: aggregator-from-user
+  namespace: fluentd-system
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: fluentd-aggregator
+  policyTypes:
+    - Ingress
+  ingress:
+    # rule: fluentd-elasticsearch
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: fluentd
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: fluentd-elasticsearch
+      ports:
+        - protocol: TCP
+          port: 24224
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: all-deny
+  namespace: fluentd-system
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+    - Ingress
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: forwarder
+  namespace: fluentd-system
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: fluentd-forwarder
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-apiserver
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 6443
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # rule: fluentd-aggregator
+    - to:
+        - podSelector:
+            matchLabels: 
+              app.kubernetes.io/instance: fluentd-aggregator
+      ports:
+        - protocol: TCP
+          port: 24224
+  ingress:
+    # base: ingress-rule-prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 24231
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: forwarder-to-opensearch
+  namespace: fluentd-system
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: fluentd-forwarder
+  policyTypes:
+    - Egress
+  egress:
+    # base: egress-rule-sc-ingress
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+

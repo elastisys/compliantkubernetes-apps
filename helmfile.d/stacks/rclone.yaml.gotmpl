@@ -26,7 +26,9 @@ templates:
     installed: {{ .Values | get "objectStorage.restore.enabled" false }}
     name: rclone-restore
     needs:
+      {{- if .Values | get "networkPolicies.rclone.enabled" false }}
       - rclone/networkpolicy
+      {{- end }}
     values:
       - values/rclone/restore.yaml.gotmpl
 
@@ -35,6 +37,8 @@ templates:
     installed: {{ and (.Values | get "objectStorage.restore.enabled" false | not) (.Values | get "objectStorage.sync.enabled" false) }}
     name: rclone-sync
     needs:
+      {{- if .Values | get "networkPolicies.rclone.enabled" false }}
       - rclone/networkpolicy
+      {{- end }}
     values:
       - values/rclone/sync.yaml.gotmpl

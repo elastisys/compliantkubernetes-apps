@@ -1,0 +1,245 @@
+
+---
+# Source: opensearch-securityadmin/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: opensearch-securityconfig
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "-10"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-failed
+  labels:
+    helm.sh/chart: opensearch-securityadmin-0.1.0
+    app.kubernetes.io/name: opensearch-securityadmin
+    app.kubernetes.io/instance: opensearch-securityadmin
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+type: Opaque
+stringData:
+  action_groups.yml: |-
+    _meta:
+      type: "actiongroups"
+      config_version: 2
+  config.yml: |-
+    _meta:
+      type: "config"
+      config_version: 2
+  
+    config:
+      dynamic:
+        kibana:
+          server_username: dashboards
+        authc:
+          basic_internal_auth_domain:
+            description: "Authenticate via HTTP Basic against internal users database"
+            http_enabled: true
+            transport_enabled: true
+            order: 0
+            http_authenticator:
+              type: basic
+              challenge: false
+            authentication_backend:
+              type: internal
+  
+          openid_auth_domain:
+            description: "OpenID Connect"
+            http_enabled: true
+            transport_enabled: true
+            order: 1
+            http_authenticator:
+              type: openid
+              challenge: false
+              config:
+                openid_connect_url: http://dex.dex.svc.cluster.local:5556/.well-known/openid-configuration
+                openid_connect_idp:
+                  enable_ssl: false
+                  verify_hostnames: false
+                subject_key: email
+                roles_key: groups
+            authentication_backend:
+              type: noop
+  internal_users.yml: |-
+    _meta:
+      type: "internalusers"
+      config_version: 2
+  
+    admin:
+      hash: $2y$10$ifHr8Gi/iek6NPjdxzARmeRQyGT9yii8pRiKXXfwta9eqmLhqUkf6
+      reserved: true
+      opendistro_security_roles:
+      - "all_access"
+      - "manage_snapshots"
+      description: "Admin user"
+  
+    dashboards:
+      hash: $2y$10$ifHr8Gi/iek6NPjdxzARmeRQyGT9yii8pRiKXXfwta9eqmLhqUkf6
+      reserved: true
+      opendistro_security_roles:
+      - "kibana_server"
+      description: "OpenSearch Dashboards user"
+  
+    configurer:
+      hash: $2y$10$ifHr8Gi/iek6NPjdxzARmeRQyGT9yii8pRiKXXfwta9eqmLhqUkf6
+      reserved: true
+      opendistro_security_roles:
+      - "kibana_user"
+      - "configurer"
+      description: "Configurer user"
+  nodes_dn.yml: |-
+    _meta:
+      type: "nodesdn"
+      config_version: 2
+  roles.yml: |-
+    _meta:
+      type: "roles"
+      config_version: 2
+  
+    # Allows users to view monitors, destinations and alerts
+    alerting_read_access:
+      reserved: false
+      cluster_permissions:
+        - cluster:admin/opendistro/alerting/alerts/get
+        - cluster:admin/opendistro/alerting/destination/get
+        - cluster:admin/opendistro/alerting/monitor/get
+        - cluster:admin/opendistro/alerting/monitor/search
+  
+    # Allows users to view and acknowledge alerts
+    alerting_ack_alerts:
+      reserved: false
+      cluster_permissions:
+        - cluster:admin/opendistro/alerting/alerts/*
+  
+    # Allows users to use all alerting functionality
+    alerting_full_access:
+      reserved: false
+      cluster_permissions:
+        - cluster_monitor
+        - cluster:admin/opendistro/alerting/*
+        - cluster:admin/opensearch/notifications/*
+      index_permissions:
+        - index_patterns:
+            - kubernetes-*
+            - kubeaudit-*
+          allowed_actions:
+            - indices_monitor
+            - indices:admin/aliases/get
+            - indices:admin/mappings/get
+  
+    # Can probably be locked down further
+    configurer:
+      static: false
+      hidden: false
+      reserved: false
+      cluster_permissions:
+      - "cluster:admin/repository/put"
+      - "cluster:admin/repository/get"
+      - "cluster_manage_index_templates"
+      - "cluster:admin/opendistro/ism/policy/*"
+      - "cluster:admin/snapshot/get"
+      - "cluster:admin/snapshot/create"
+      - "cluster:admin/snapshot/delete"
+      - "cluster:admin/opensearch/snapshot_management/policy/get"
+      - "cluster:admin/opensearch/snapshot_management/policy/search"
+      - "cluster:admin/opensearch/snapshot_management/policy/write"
+      - indices:admin/index_template/put
+      index_permissions:
+      - index_patterns:
+        - "*"
+        allowed_actions:
+        - "create_index"
+        - "crud"
+        - "manage_aliases"
+        - "indices:admin/index_template/*"
+        - "indices:admin/opensearch/ism/managedindex"
+        - "indices:admin/rollover"
+        - "indices:monitor/stats"
+  roles_mapping.yml: |-
+    _meta:
+      type: "rolesmapping"
+      config_version: 2
+  tenants.yml: |-
+    _meta:
+      type: "tenants"
+      config_version: 2
+  whitelist.yml: |-
+    _meta:
+      type: "whitelist"
+      config_version: 2
+    config:
+      enabled: false
+---
+# Source: opensearch-securityadmin/templates/job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: opensearch-securityadmin
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-failed
+    checksum/securityconfig: eb0ecc4327ba8dd8ec16d0f10aef01df914ba23766912ecd705d00ec35b96951
+  labels:
+    helm.sh/chart: opensearch-securityadmin-0.1.0
+    app.kubernetes.io/name: opensearch-securityadmin
+    app.kubernetes.io/instance: opensearch-securityadmin
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  activeDeadlineSeconds: 1200
+  backoffLimit: 10
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: opensearch-securityadmin
+        app.kubernetes.io/instance: opensearch-securityadmin
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+      containers:
+        - name: opensearch-securityadmin
+          imagePullPolicy: IfNotPresent
+          image: opensearchproject/opensearch:2.18.0
+          command:
+            - /usr/share/opensearch/plugins/opensearch-security/tools/securityadmin.sh
+          args:
+            - -h
+            - "$(OPENSEARCH_HOST)"
+            - -p
+            - "$(OPENSEARCH_PORT)"
+            - -cd
+            - /etc/config/security/
+            - -icl
+            - -nhnv
+            - -cacert
+            - /etc/cert/admin/ca.crt
+            - -cert
+            - /etc/cert/admin/tls.crt
+            - -key
+            - /etc/cert/admin/tls.key
+          env:
+            - name: OPENSEARCH_HOST
+              value: "opensearch-master"
+            - name: OPENSEARCH_PORT
+              value: "9200"
+          volumeMounts:
+            - name: admin-cert
+              mountPath: /etc/cert/admin
+            - name: security-config
+              mountPath: /etc/config/security
+          resources:
+            limits:
+              cpu: 250m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+      volumes:
+        - name: admin-cert
+          secret:
+            secretName: opensearch-admin-cert
+        - name: security-config
+          secret:
+            secretName: opensearch-securityconfig
+

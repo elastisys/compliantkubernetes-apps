@@ -1,0 +1,425 @@
+---
+# Source: velero/templates/serviceaccount-server.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: velero-server
+  namespace: velero
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-6.0.0
+---
+# Source: velero/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: velero
+  namespace: velero
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-6.0.0
+type: Opaque
+data:
+  cloud: "W2RlZmF1bHRdCmF3c19hY2Nlc3Nfa2V5X2lkOiBleGFtcGxlLWFjY2Vzcy1rZXkKYXdzX3NlY3JldF9hY2Nlc3Nfa2V5OiBleGFtcGxlLXNlY3JldC1rZXkK"
+---
+# Source: velero/templates/configmaps.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: velero-restore-helper-config
+  namespace: velero
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-6.0.0
+    velero.io/plugin-config: ""
+    velero.io/pod-volume-restore: RestoreItemAction
+data:
+  secCtxRunAsGroup: "1000"
+  secCtxRunAsUser: "1000"
+---
+# Source: velero/templates/clusterrolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: velero-server
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-6.0.0
+subjects:
+  - kind: ServiceAccount
+    namespace: velero
+    name: velero-server
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: velero/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: velero-server
+  namespace: velero
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-6.0.0
+rules:
+- apiGroups:
+    - "*"
+  resources:
+    - "*"
+  verbs:
+    - "*"
+---
+# Source: velero/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: velero-server
+  namespace: velero
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-6.0.0
+subjects:
+  - kind: ServiceAccount
+    namespace: velero
+    name: velero-server
+roleRef:
+  kind: Role
+  name: velero-server
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: velero/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: velero
+  namespace: velero
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-6.0.0
+spec:
+  type: ClusterIP
+  ports:
+    - name: http-monitoring
+      port: 8085
+      targetPort: http-monitoring
+  selector:
+    name: velero
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+---
+# Source: velero/templates/node-agent-daemonset.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-agent
+  namespace: velero
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-6.0.0
+spec:
+  selector:
+    matchLabels:
+      name: node-agent
+  template:
+    metadata:
+      labels:
+        name: node-agent
+        app.kubernetes.io/name: velero
+        app.kubernetes.io/instance: velero
+        app.kubernetes.io/managed-by: Helm
+        helm.sh/chart: velero-6.0.0
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8085"
+        prometheus.io/scrape: "true"
+        checksum/secret: 710349876d62732334f6604f9b7b80c376e65d100a0d95df090e8699cf190039
+    spec:
+      serviceAccountName: velero-server
+      securityContext:
+        runAsUser: 0
+      terminationGracePeriodSeconds: 3600
+      volumes:
+        - name: cloud-credentials
+          secret:
+            secretName: velero
+        - name: host-pods
+          hostPath:
+            path: /var/lib/kubelet/pods
+        - name: scratch
+          emptyDir: {}
+      dnsPolicy: ClusterFirst
+      containers:
+        - name: node-agent
+          image: "velero/velero:v1.13.0"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http-monitoring
+              containerPort: 8085
+          command:
+            - /velero
+          args:
+            - node-agent
+            - server
+          volumeMounts:
+            - name: cloud-credentials
+              mountPath: /credentials
+            - name: host-pods
+              mountPath: /host_pods
+              mountPropagation: HostToContainer
+            - name: scratch
+              mountPath: /scratch
+          env:
+            - name: VELERO_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: VELERO_SCRATCH_DIR
+              value: /scratch
+            - name: AWS_SHARED_CREDENTIALS_FILE
+              value: /credentials/cloud
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /credentials/cloud
+            - name: AZURE_CREDENTIALS_FILE
+              value: /credentials/cloud
+            - name: ALIBABA_CLOUD_CREDENTIALS_FILE
+              value: /credentials/cloud
+          securityContext:
+            allowPrivilegeEscalation: true
+            privileged: true
+            runAsUser: 0
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+            requests:
+              cpu: 50m
+              memory: 100Mi
+---
+# Source: velero/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: velero
+  namespace: velero
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-6.0.0
+    component: velero
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: velero
+      app.kubernetes.io/name: velero
+  template:
+    metadata:
+      labels:
+        name: velero
+        app.kubernetes.io/name: velero
+        app.kubernetes.io/instance: velero
+        app.kubernetes.io/managed-by: Helm
+        helm.sh/chart: velero-6.0.0
+      annotations:
+        checksum/secret: 710349876d62732334f6604f9b7b80c376e65d100a0d95df090e8699cf190039
+    spec:
+      restartPolicy: Always
+      serviceAccountName: velero-server
+      terminationGracePeriodSeconds: 3600
+      containers:
+        - name: velero
+          image: "velero/velero:v1.13.0"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http-monitoring
+              containerPort: 8085
+          command:
+            - /velero
+          args:
+            - server
+            ### Flags
+            - --uploader-type=restic
+            - --default-volumes-to-fs-backup
+            ### Global Flags
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+            requests:
+              cpu: 50m
+              memory: 100Mi
+          livenessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /metrics
+              port: http-monitoring
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /metrics
+              port: http-monitoring
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsGroup: 10000
+            runAsNonRoot: true
+            runAsUser: 10000
+          volumeMounts:
+            - name: plugins
+              mountPath: /plugins
+            - name: cloud-credentials
+              mountPath: /credentials
+            - name: scratch
+              mountPath: /scratch
+          env:
+            - name: VELERO_SCRATCH_DIR
+              value: /scratch
+            - name: VELERO_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: LD_LIBRARY_PATH
+              value: /plugins
+            - name: AWS_SHARED_CREDENTIALS_FILE
+              value: /credentials/cloud
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /credentials/cloud
+            - name: AZURE_CREDENTIALS_FILE
+              value: /credentials/cloud
+            - name: ALIBABA_CLOUD_CREDENTIALS_FILE
+              value: /credentials/cloud
+      dnsPolicy: ClusterFirst
+      initContainers:
+        - image: velero/velero-plugin-for-aws:v1.9.0
+          imagePullPolicy: IfNotPresent
+          name: velero-plugin-for-aws
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsGroup: 10000
+            runAsNonRoot: true
+            runAsUser: 10000
+          volumeMounts:
+          - mountPath: /target
+            name: plugins
+      volumes:
+        - name: cloud-credentials
+          secret:
+            secretName: velero
+        - name: plugins
+          emptyDir: {}
+        - name: scratch
+          emptyDir: {}
+---
+# Source: velero/templates/backupstoragelocation.yaml
+apiVersion: velero.io/v1
+kind: BackupStorageLocation
+metadata:
+  name: default
+  namespace: velero
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-6.0.0
+spec:
+  provider: aws
+  accessMode: ReadWrite
+  objectStorage:
+    bucket: "apps-tests-velero"
+    prefix: "workload-cluster"
+  config:
+    region: "example-region"
+    s3ForcePathStyle: "true"
+    s3Url: "https://example-region-endpoint"
+---
+# Source: velero/templates/schedule.yaml
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: velero-daily-backup
+  namespace: velero
+  annotations:
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: velero-6.0.0
+spec:
+  schedule: "0 0 * * *"
+  template:
+    excludedNamespaces:
+    - calico-apiserver
+    - calico-system
+    - cert-manager
+    - falco
+    - fluentd
+    - gatekeeper-system
+    - gpu-operator
+    - hnc-system
+    - ingress-nginx
+    - kube-node-lease
+    - kube-public
+    - kube-system
+    - kured
+    - monitoring
+    - openstack-system
+    - rook-ceph
+    - velero
+    excludedResources:
+    - clustercompliancereports.aquasecurity.github.io
+    - clusterconfigauditreports.aquasecurity.github.io
+    - clusterinfraassessmentreports.aquasecurity.github.io
+    - clusterrbacassessmentreports.aquasecurity.github.io
+    - clustersbomreports.aquasecurity.github.io
+    - configauditreports.aquasecurity.github.io
+    - exposedsecretreports.aquasecurity.github.io
+    - infraassessmentreports.aquasecurity.github.io
+    - rbacassessmentreports.aquasecurity.github.io
+    - sbomreports.aquasecurity.github.io
+    - vulnerabilityreports.aquasecurity.github.io
+    labelSelector:
+      matchExpressions:
+      - key: compliantkubernetes.io/nobackup
+        operator: DoesNotExist
+    snapshotMoveData: false
+    storageLocation: default
+    ttl: 720h0m0s
+

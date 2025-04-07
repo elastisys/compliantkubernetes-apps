@@ -1,12 +1,13 @@
 ---
 templates:
   nvidia-gpu-operator:
+    disableValidationOnInstall: true
+    condition: ck8sAnyCluster.enabled
     inherit: [ template: gpu-operator-chart ]
-    name: nvidia-gpu-operator
+    installed: {{ .Values | get "gpu.enabled" false }}
     namespace: gpu-operator
+    name: nvidia-gpu-operator
     labels:
       app: gpu-operator
-    disableValidationOnInstall: true
-    installed: {{ .Values | get "gpu.enabled" false }}
     values:
       - values/gpu-operator.yaml.gotmpl

@@ -1,0 +1,174 @@
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: all-deny
+  namespace: velero
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+    - Ingress
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: velero
+  namespace: velero
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: velero
+      name: velero
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # base: egress-rule-apiserver
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 6443
+    # base: egress-rule-object-storage
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+  ingress:
+    # base: ingress-rule-prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 8085
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: velero-node-agent
+  namespace: velero
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: velero
+      name: node-agent
+  policyTypes:
+    - Egress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # base: egress-rule-apiserver
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 6443
+    # base: egress-rule-object-storage
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: velero-upgrade-crds
+  namespace: velero
+spec:
+  podSelector:
+    matchLabels:
+      job-name: velero-upgrade-crds
+  policyTypes:
+    - Egress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # base: egress-rule-apiserver
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 6443
+

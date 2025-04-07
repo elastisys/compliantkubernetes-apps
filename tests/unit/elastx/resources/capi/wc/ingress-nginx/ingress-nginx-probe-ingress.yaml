@@ -1,0 +1,33 @@
+---
+# Source: ingress-nginx-probe-ingress/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-nginx-probe-ingress
+  labels:
+    helm.sh/chart: ingress-nginx-probe-ingress-0.1.0
+    app.kubernetes.io/name: ingress-nginx-probe-ingress
+    app.kubernetes.io/instance: ingress-nginx-probe-ingress
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+    nginx.ingress.kubernetes.io/whitelist-source-range: 0.0.0.0/0
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - ingress-nginx.ck8s.example.com
+      secretName: "ingress-nginx-probe-ingress-tls"
+  rules:
+    - host: ingress-nginx.ck8s.example.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: ingress-nginx-controller-metrics
+                port:
+                  number: 10254
+            path: /healthz
+            pathType: Exact
+

@@ -1,0 +1,1458 @@
+---
+# Source: thanos/templates/bucketweb/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: thanos-receiver-bucketweb
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: bucketweb
+automountServiceAccountToken: false
+---
+# Source: thanos/templates/compactor/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: thanos-receiver-compactor
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: compactor
+automountServiceAccountToken: false
+---
+# Source: thanos/templates/receive/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: thanos-receiver-receive
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: receive
+automountServiceAccountToken: false
+---
+# Source: thanos/templates/ruler/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: thanos-receiver-ruler
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: ruler
+automountServiceAccountToken: false
+---
+# Source: thanos/templates/storegateway/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: thanos-receiver-storegateway
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: storegateway
+automountServiceAccountToken: false
+---
+# Source: thanos/templates/receive/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: thanos-receiver-receive
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: receive
+data:
+  hashrings.json: |-
+    [
+      {
+        "endpoints": [
+          {
+            "address": "thanos-receiver-receive-0.thanos-receiver-receive-headless.thanos.svc.cluster.local:10901",
+            "capnproto_address": "thanos-receiver-receive-0.thanos-receiver-receive-headless.thanos.svc.cluster.local:19391"
+          },
+          {
+            "address": "thanos-receiver-receive-1.thanos-receiver-receive-headless.thanos.svc.cluster.local:10901",
+            "capnproto_address": "thanos-receiver-receive-1.thanos-receiver-receive-headless.thanos.svc.cluster.local:19391"
+          }
+        ]
+      }
+    ]
+---
+# Source: thanos/templates/compactor/pvc.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: thanos-receiver-compactor
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: compactor
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: "20Gi"
+---
+# Source: thanos/templates/bucketweb/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: thanos-receiver-bucketweb
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: bucketweb
+    prometheus-operator/monitor: 'true'
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+      nodePort: null
+  selector:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/component: bucketweb
+---
+# Source: thanos/templates/compactor/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: thanos-receiver-compactor
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: compactor
+    prometheus-operator/monitor: 'true'
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9090
+      targetPort: http
+      protocol: TCP
+      name: http
+      nodePort: null
+  selector:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/component: compactor
+---
+# Source: thanos/templates/receive/service-headless.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: thanos-receiver-receive-headless
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: receive
+    prometheus-operator/monitor: 'true'
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - port: 10902
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: 10901
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
+    - port: 19391
+      targetPort: capnproto
+      protocol: TCP
+      name: capnproto
+  selector:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/component: receive
+---
+# Source: thanos/templates/receive/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: thanos-receiver-receive
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: receive-distributor
+    
+    prometheus-operator/monitor: 'true'
+spec:
+  type: ClusterIP
+  ports:
+    - port: 10902
+      targetPort: http
+      protocol: TCP
+      name: http
+      nodePort: null
+    - port: 10901
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
+      nodePort: null
+    - port: 19291
+      targetPort: remote-write
+      protocol: TCP
+      name: remote
+      nodePort: null
+    - port: 19391
+      targetPort: capnproto
+      protocol: TCP
+      name: capnproto
+      nodePort: null
+  selector:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/component: receive-distributor
+---
+# Source: thanos/templates/ruler/service-headless.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: thanos-receiver-ruler-headless
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: ruler
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - port: 9090
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: 10901
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
+  selector:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/component: ruler
+---
+# Source: thanos/templates/ruler/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: thanos-receiver-ruler
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: ruler
+    prometheus-operator/monitor: 'true'
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9090
+      targetPort: http
+      protocol: TCP
+      name: http
+      nodePort: null
+    - port: 10901
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
+      nodePort: null
+  selector:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/component: ruler
+---
+# Source: thanos/templates/storegateway/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: thanos-receiver-storegateway
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: storegateway
+    prometheus-operator/monitor: 'true'
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9090
+      targetPort: http
+      protocol: TCP
+      name: http
+      nodePort: null
+    - port: 10901
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
+      nodePort: null
+  selector:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/component: storegateway
+---
+# Source: thanos/templates/bucketweb/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: thanos-receiver-bucketweb
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: bucketweb
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: thanos-receiver
+      app.kubernetes.io/name: thanos
+      app.kubernetes.io/component: bucketweb
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: thanos-receiver
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: thanos
+        app.kubernetes.io/version: 0.37.2
+        helm.sh/chart: thanos-15.13.1
+        app.kubernetes.io/component: bucketweb
+    spec:
+      
+      serviceAccountName: thanos-receiver-bucketweb
+      automountServiceAccountToken: true
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: thanos-receiver
+                    app.kubernetes.io/name: thanos
+                    app.kubernetes.io/component: bucketweb
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: Always
+        supplementalGroups: []
+        sysctls: []
+      containers:
+        - name: bucketweb
+          image: ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+            seLinuxOptions: {}
+            seccompProfile:
+              type: RuntimeDefault
+          args:
+            - tools
+            - bucket
+            - web
+            - --http-address=0.0.0.0:8080
+            - --log.level=info
+            - --log.format=logfmt
+            - --objstore.config-file=/conf/objstore.yml
+            - --refresh=30m
+            - --timeout=5m
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 30
+            httpGet:
+              path: /-/healthy
+              port: http
+              scheme: HTTP
+          readinessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 30
+            httpGet:
+              path: /-/ready
+              port: http
+              scheme: HTTP
+          resources:
+            limits:
+              cpu: 50m
+              memory: 80Mi
+            requests:
+              cpu: 20m
+              memory: 40Mi
+          volumeMounts:
+            - name: objstore-config
+              mountPath: /conf
+      volumes:
+        - name: objstore-config
+          secret:
+            secretName: thanos-objectstorage-secret-objstore-secret
+---
+# Source: thanos/templates/compactor/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: thanos-receiver-compactor
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: compactor
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: thanos-receiver
+      app.kubernetes.io/name: thanos
+      app.kubernetes.io/component: compactor
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: thanos-receiver
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: thanos
+        app.kubernetes.io/version: 0.37.2
+        helm.sh/chart: thanos-15.13.1
+        app.kubernetes.io/component: compactor
+    spec:
+      
+      serviceAccountName: thanos-receiver-compactor
+      automountServiceAccountToken: true
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: thanos-receiver
+                    app.kubernetes.io/name: thanos
+                    app.kubernetes.io/component: compactor
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: Always
+        supplementalGroups: []
+        sysctls: []
+      containers:
+        - name: compactor
+          image: ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+            seLinuxOptions: {}
+            seccompProfile:
+              type: RuntimeDefault
+          args:
+            - compact
+            - --log.level=info
+            - --log.format=logfmt
+            - --http-address=0.0.0.0:10902
+            - --data-dir=/data
+            - --retention.resolution-raw=30d
+            - --retention.resolution-5m=90d
+            - --retention.resolution-1h=0s
+            - --consistency-delay=30m
+            - --compact.concurrency=1
+            - --objstore.config-file=/conf/objstore.yml
+            - --wait
+          ports:
+            - name: http
+              containerPort: 10902
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 30
+            httpGet:
+              path: /-/healthy
+              port: http
+              scheme: HTTP
+          readinessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 30
+            httpGet:
+              path: /-/ready
+              port: http
+              scheme: HTTP
+          resources:
+            limits:
+              cpu: "2"
+              memory: 600Mi
+            requests:
+              cpu: 50m
+              memory: 80Mi
+          volumeMounts:
+            - name: objstore-config
+              mountPath: /conf
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: objstore-config
+          secret:
+            secretName: thanos-objectstorage-secret-objstore-secret
+        - name: data
+          persistentVolumeClaim:
+            claimName: thanos-receiver-compactor
+---
+# Source: thanos/templates/receive-distributor/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: thanos-receiver-receive-distributor
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: receive-distributor
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: thanos-receiver
+      app.kubernetes.io/name: thanos
+      app.kubernetes.io/component: receive-distributor
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: thanos-receiver
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: thanos
+        app.kubernetes.io/version: 0.37.2
+        helm.sh/chart: thanos-15.13.1
+        app.kubernetes.io/component: receive-distributor
+      annotations:
+        checksum/receive-configuration: 478705abdab2bec7e05c423445984331477a55fb44ffcd9c6a5ba16b7a745604
+    spec:
+      
+      serviceAccountName: thanos-receiver-receive
+      automountServiceAccountToken: true
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: thanos-receiver
+                    app.kubernetes.io/name: thanos
+                    app.kubernetes.io/component: receive-distributor
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: Always
+        supplementalGroups: []
+        sysctls: []
+      containers:
+        - name: receive
+          image: ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+            seLinuxOptions: {}
+            seccompProfile:
+              type: RuntimeDefault
+          args:
+            - receive
+            - --log.level=info
+            - --log.format=logfmt
+            - --grpc-address=0.0.0.0:10901
+            - --http-address=0.0.0.0:10902
+            - --remote-write.address=0.0.0.0:19291
+            - --receive.capnproto-address=0.0.0.0:19391
+            - --label=replica="$(NAME)"
+            - --label=receive="true"
+            - --receive.hashrings-file=/var/lib/thanos-receive/hashrings.json
+            - --receive.replication-protocol=capnproto
+            - --receive.replication-factor=1
+          env:
+            - name: NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: OBJSTORE_CONFIG
+              valueFrom:
+                secretKeyRef:
+                  key: objstore.yml
+                  name: thanos-objectstorage-secret-objstore-secret
+          ports:
+            - containerPort: 10901
+              name: grpc
+              protocol: TCP
+            - containerPort: 10902
+              name: http
+              protocol: TCP
+            - containerPort: 19291
+              name: remote-write
+              protocol: TCP
+            - containerPort: 19391
+              name: capnproto
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 30
+            httpGet:
+              path: /-/healthy
+              port: http
+              scheme: HTTP
+          readinessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 30
+            httpGet:
+              path: /-/ready
+              port: http
+              scheme: HTTP
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 150m
+              memory: 100Mi
+          volumeMounts:
+            - name: hashring-config
+              mountPath: /var/lib/thanos-receive
+      volumes:
+        - name: hashring-config
+          configMap:
+            name: thanos-receiver-receive
+---
+# Source: thanos/templates/receive/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: thanos-receiver-receive
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: receive
+spec:
+  replicas: 2
+  revisionHistoryLimit: 10
+  podManagementPolicy: OrderedReady
+  serviceName: thanos-receiver-receive-headless
+  updateStrategy:
+    type: RollingUpdate
+  minReadySeconds: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: thanos-receiver
+      app.kubernetes.io/name: thanos
+      app.kubernetes.io/component: receive
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: thanos-receiver
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: thanos
+        app.kubernetes.io/version: 0.37.2
+        helm.sh/chart: thanos-15.13.1
+        app.kubernetes.io/component: receive
+      annotations:
+        checksum/receive-configuration: 478705abdab2bec7e05c423445984331477a55fb44ffcd9c6a5ba16b7a745604
+    spec:
+      
+      serviceAccountName: thanos-receiver-receive
+      automountServiceAccountToken: true
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: thanos-receiver
+                    app.kubernetes.io/name: thanos
+                    app.kubernetes.io/component: receive
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: Always
+        supplementalGroups: []
+        sysctls: []
+      topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: receive
+              app.kubernetes.io/instance: thanos-receiver
+              app.kubernetes.io/name: thanos
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+      containers:
+        - name: receive
+          image: ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+            seLinuxOptions: {}
+            seccompProfile:
+              type: RuntimeDefault
+          args:
+            - receive
+            - --log.level=info
+            - --log.format=logfmt
+            - --grpc-address=0.0.0.0:10901
+            - --http-address=0.0.0.0:10902
+            - --remote-write.address=0.0.0.0:19291
+            - --receive.capnproto-address=0.0.0.0:19391
+            - --objstore.config=$(OBJSTORE_CONFIG)
+            - --tsdb.path=/var/thanos/receive
+            - --label=replica="$(NAME)"
+            - --label=receive="true"
+            - --tsdb.retention=15d
+            - --receive.local-endpoint=$(NAME).thanos-receiver-receive-headless.$(NAMESPACE).svc.cluster.local:10901
+          env:
+            - name: NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: OBJSTORE_CONFIG
+              valueFrom:
+                secretKeyRef:
+                  key: objstore.yml
+                  name: thanos-objectstorage-secret-objstore-secret
+          ports:
+            - containerPort: 10901
+              name: grpc
+              protocol: TCP
+            - containerPort: 10902
+              name: http
+              protocol: TCP
+            - containerPort: 19291
+              name: remote-write
+              protocol: TCP
+            - containerPort: 19391
+              name: capnproto
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 30
+            httpGet:
+              path: /-/healthy
+              port: http
+              scheme: HTTP
+          readinessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 30
+            httpGet:
+              path: /-/ready
+              port: http
+              scheme: HTTP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 4Gi
+            requests:
+              cpu: 200m
+              memory: 2Gi
+          volumeMounts:
+            - name: hashring-config
+              mountPath: /var/lib/thanos-receive
+            - name: data
+              mountPath: /var/thanos/receive
+      volumes:
+        - name: hashring-config
+          configMap:
+            name: thanos-receiver-receive
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: data
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "50Gi"
+---
+# Source: thanos/templates/ruler/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: thanos-receiver-ruler
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: ruler
+spec:
+  replicas: 2
+  revisionHistoryLimit: 10
+  podManagementPolicy: OrderedReady
+  serviceName: thanos-receiver-ruler-headless
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: thanos-receiver
+      app.kubernetes.io/name: thanos
+      app.kubernetes.io/component: ruler
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: thanos-receiver
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: thanos
+        app.kubernetes.io/version: 0.37.2
+        helm.sh/chart: thanos-15.13.1
+        app.kubernetes.io/component: ruler
+    spec:
+      
+      serviceAccountName: thanos-receiver-ruler
+      automountServiceAccountToken: true
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: thanos-receiver
+                    app.kubernetes.io/name: thanos
+                    app.kubernetes.io/component: ruler
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: Always
+        supplementalGroups: []
+        sysctls: []
+      topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: ruler
+              app.kubernetes.io/instance: thanos-receiver
+              app.kubernetes.io/name: thanos
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+      containers:
+        - args:
+          - --reload-url=http://127.0.0.1:10902/-/reload
+          - --watched-dir=/etc/thanos/rules/thanos-ruler-thanos-ruler-rulefiles-0
+          command:
+          - /bin/prometheus-config-reloader
+          env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          image: quay.io/prometheus-operator/prometheus-config-reloader:v0.50.0
+          imagePullPolicy: IfNotPresent
+          name: config-reloader
+          resources:
+            limits:
+              cpu: 100m
+              memory: 50Mi
+            requests:
+              cpu: 10m
+              memory: 50Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            runAsGroup: 65534
+            runAsNonRoot: true
+            runAsUser: 65534
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+          - mountPath: /etc/thanos/rules/thanos-ruler-thanos-ruler-rulefiles-0
+            name: ruler-config
+        - name: ruler
+          image: ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+            seLinuxOptions: {}
+            seccompProfile:
+              type: RuntimeDefault
+          args:
+            - rule
+            - --log.level=info
+            - --log.format=logfmt
+            - --grpc-address=0.0.0.0:10901
+            - --http-address=0.0.0.0:10902
+            - --data-dir=/data
+            - --eval-interval=1m
+            - --alertmanagers.url=dnssrv+http://_http-web._tcp.alertmanager-operated.monitoring.svc.cluster.local
+            - --alert.query-url=http://thanos-receiver-query.thanos.svc.cluster.local:9090
+            - --label=replica="$(POD_NAME)"
+            - --label=ruler_cluster="apps-tests"
+            - --alert.label-drop=replica
+            - --objstore.config-file=/conf/objstore/objstore.yml
+            - --rule-file="/conf/rules/*.yml"
+            - --query=dnssrv+_http._tcp.thanos-query-query-headless.thanos.svc
+            - --rule-file=/conf/rules/*.yaml
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          ports:
+            - name: http
+              containerPort: 10902
+              protocol: TCP
+            - name: grpc
+              containerPort: 10901
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 30
+            httpGet:
+              path: /-/healthy
+              port: http
+              scheme: HTTP
+          readinessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 30
+            httpGet:
+              path: /-/ready
+              port: http
+              scheme: HTTP
+          resources:
+            limits:
+              cpu: 300m
+              memory: 300Mi
+            requests:
+              cpu: 50m
+              memory: 40Mi
+          volumeMounts:
+            - name: ruler-config
+              mountPath: /conf/rules
+            - name: objstore-config
+              mountPath: /conf/objstore
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: ruler-config
+          configMap:
+            name: thanos-ruler-thanos-ruler-rulefiles-0
+        - name: objstore-config
+          secret:
+            secretName: thanos-objectstorage-secret-objstore-secret
+        - name: data
+          emptyDir: {}
+---
+# Source: thanos/templates/storegateway/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: thanos-receiver-storegateway
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: storegateway
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  podManagementPolicy: OrderedReady
+  serviceName: thanos-receiver-storegateway-headless
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: thanos-receiver
+      app.kubernetes.io/name: thanos
+      app.kubernetes.io/component: storegateway
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: thanos-receiver
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: thanos
+        app.kubernetes.io/version: 0.37.2
+        helm.sh/chart: thanos-15.13.1
+        app.kubernetes.io/component: storegateway
+    spec:
+      
+      serviceAccountName: thanos-receiver-storegateway
+      automountServiceAccountToken: true
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: thanos-receiver
+                    app.kubernetes.io/name: thanos
+                    app.kubernetes.io/component: storegateway
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: Always
+        supplementalGroups: []
+        sysctls: []
+      containers:
+        - name: storegateway
+          image: ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+            seLinuxOptions: {}
+            seccompProfile:
+              type: RuntimeDefault
+          args:
+            - store
+            - --log.level=info
+            - --log.format=logfmt
+            - --grpc-address=0.0.0.0:10901
+            - --http-address=0.0.0.0:10902
+            - --data-dir=/data
+            - --objstore.config-file=/conf/objstore.yml
+          ports:
+            - name: http
+              containerPort: 10902
+              protocol: TCP
+            - name: grpc
+              containerPort: 10901
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 30
+            httpGet:
+              path: /-/healthy
+              port: http
+              scheme: HTTP
+          readinessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 30
+            httpGet:
+              path: /-/ready
+              port: http
+              scheme: HTTP
+          resources:
+            limits:
+              cpu: 300m
+              memory: 2000Mi
+            requests:
+              cpu: 100m
+              memory: 300Mi
+          volumeMounts:
+            - name: objstore-config
+              mountPath: /conf
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: objstore-config
+          secret:
+            secretName: thanos-objectstorage-secret-objstore-secret
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: data
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "10Gi"
+---
+# Source: thanos/templates/receive/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: thanos-receiver-receive
+  namespace: thanos
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: receive
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+    nginx.ingress.kubernetes.io/auth-realm: Authentication Required
+    nginx.ingress.kubernetes.io/auth-secret: thanos-ingress-secret-basic-auth
+    nginx.ingress.kubernetes.io/auth-type: basic
+spec:
+  ingressClassName: "nginx"
+  rules:
+    - host: thanos-receiver.ops.ck8s.example.com
+      http:
+        paths:
+          - path: /api/v1/receive
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: thanos-receiver-receive
+                port:
+                  name: remote
+
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: thanos-receiver-receive
+                port:
+                  name: http
+  tls:
+    - hosts:
+        - thanos-receiver.ops.ck8s.example.com
+      secretName: thanos-receiver.ops.ck8s.example.com-tls
+---
+# Source: thanos/templates/bucketweb/servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: thanos-receiver-bucketweb
+  namespace: "thanos"
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: bucketweb
+spec:
+  endpoints:
+    - port: http
+  namespaceSelector:
+    matchNames:
+      - "thanos"
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: thanos-receiver
+      app.kubernetes.io/name: thanos
+      app.kubernetes.io/component: bucketweb
+      prometheus-operator/monitor: 'true'
+---
+# Source: thanos/templates/compactor/servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: thanos-receiver-compactor
+  namespace: "thanos"
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: compactor
+spec:
+  endpoints:
+    - port: http
+  namespaceSelector:
+    matchNames:
+      - "thanos"
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: thanos-receiver
+      app.kubernetes.io/name: thanos
+      app.kubernetes.io/component: compactor
+      prometheus-operator/monitor: 'true'
+---
+# Source: thanos/templates/receive-distributor/servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: thanos-receiver-receive-distributor
+  namespace: "thanos"
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: receive-distributor
+spec:
+  endpoints:
+    - port: http
+  namespaceSelector:
+    matchNames:
+      - "thanos"
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: thanos-receiver
+      app.kubernetes.io/name: thanos
+      app.kubernetes.io/component: receive-distributor
+---
+# Source: thanos/templates/receive/servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: thanos-receiver-receive
+  namespace: "thanos"
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: receive
+spec:
+  endpoints:
+    - port: http
+  namespaceSelector:
+    matchNames:
+      - "thanos"
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: thanos-receiver
+      app.kubernetes.io/name: thanos
+      app.kubernetes.io/component: receive
+      prometheus-operator/monitor: 'true'
+---
+# Source: thanos/templates/ruler/servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: thanos-receiver-ruler
+  namespace: "thanos"
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: ruler
+spec:
+  endpoints:
+    - port: http
+  namespaceSelector:
+    matchNames:
+      - "thanos"
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: thanos-receiver
+      app.kubernetes.io/name: thanos
+      app.kubernetes.io/component: ruler
+      prometheus-operator/monitor: 'true'
+---
+# Source: thanos/templates/storegateway/servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: thanos-receiver-storegateway
+  namespace: "thanos"
+  labels:
+    app.kubernetes.io/instance: thanos-receiver
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: thanos
+    app.kubernetes.io/version: 0.37.2
+    helm.sh/chart: thanos-15.13.1
+    app.kubernetes.io/component: storegateway
+spec:
+  endpoints:
+    - port: http
+  namespaceSelector:
+    matchNames:
+      - "thanos"
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: thanos-receiver
+      app.kubernetes.io/name: thanos
+      app.kubernetes.io/component: storegateway
+      prometheus-operator/monitor: 'true'
+

@@ -1,0 +1,812 @@
+---
+# Source: log-manager/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: log-manager-storage-credentials
+  labels:
+    helm.sh/chart: log-manager-0.1.0
+    app.kubernetes.io/name: log-manager
+    app.kubernetes.io/instance: log-manager
+    app.kubernetes.io/version: "0.3.2"
+    app.kubernetes.io/managed-by: Helm
+stringData:
+  s3cfg.ini: |
+    use_https         = true
+    host_base         = example-region-endpoint
+    host_bucket       = example-region-endpoint
+    access_key        = example-access-key
+    secret_key        = example-secret-key
+---
+# Source: log-manager/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: log-manager-scripts
+  labels:
+    helm.sh/chart: log-manager-0.1.0
+    app.kubernetes.io/name: log-manager
+    app.kubernetes.io/instance: log-manager
+    app.kubernetes.io/version: "0.3.2"
+    app.kubernetes.io/managed-by: Helm
+data:
+  compaction.sh: |-
+    #!/usr/bin/env bash
+    
+    set -euo pipefail
+    if [ "$STORAGE_SERVICE" = "azure" ]; then
+      # Azure Blob configuration
+      : "${AZURE_STORAGE_CONNECTION_STRING:?Missing AZURE_STORAGE_CONNECTION_STRING}"
+      : "${AZURE_CONTAINER_NAME:?Missing AZURE_CONTAINER_NAME}"
+      : "${AZURE_PREFIX:?Missing AZURE_PREFIX}"
+    else
+      # S3 configuration
+      : "${S3_CONFIG:?Missing S3_CONFIG}"
+      : "${S3_BUCKET:?Missing S3_BUCKET}"
+      : "${S3_PREFIX:?Missing S3_PREFIX}"
+    fi
+    
+    # Days to compact
+    : "${COMPACT_DAYS:?Missing COMPACT_DAYS}"
+    
+    LIMIT="$(date --utc --date="$COMPACT_DAYS days ago" '+%Y%m%d')"
+    NOW="$(date --utc '+%Y%m%d%H%M%S')"
+    
+    SEQ=0
+    
+    TMP_DIR="${TMP_DIR:-"/tmp"}"
+    LM_TMP="${TMP_DIR}/lm"
+    SORT_TMP="${TMP_DIR}/sort"
+    
+    mkdir -p "$LM_TMP"
+    mkdir -p "$SORT_TMP"
+    
+    # Define functions for the S3 operations
+    s3_list_days() {
+      s3cmd --config "$S3_CONFIG" ls "s3://$S3_BUCKET/$S3_PREFIX/" | grep 'DIR' | awk '{print $2}' | sed "s#s3://$S3_BUCKET/$S3_PREFIX/##" | sed 's#/$##'
+    }
+    
+    s3_list_indices() {
+      S3_PATH="$1"
+    
+      s3cmd --config "$S3_CONFIG" ls "s3://$S3_BUCKET/$S3_PREFIX/$S3_PATH/" | grep 'DIR' | awk '{print $2}' | sed "s#s3://$S3_BUCKET/$S3_PREFIX/$S3_PATH/##" | sed 's#/$##'
+    }
+    
+    s3_list_chunks() {
+      S3_PATH="$1"
+    
+      s3cmd --config "$S3_CONFIG" ls -r "s3://$S3_BUCKET/$S3_PREFIX/$S3_PATH/" | grep '\.gz\|\.zst' | awk '{print $4}' | sed "s#s3://$S3_BUCKET/$S3_PREFIX/$S3_PATH/##"
+    }
+    
+    s3_get_chunks() {
+      S3_PATH="$1"
+      CHUNK_DIR="$2"
+    
+      s3cmd --config "$S3_CONFIG" get -r "s3://$S3_BUCKET/$S3_PREFIX/$S3_PATH" "$CHUNK_DIR" >/dev/null
+    }
+    
+    s3_put_chunk() {
+      S3_PATH="$1"
+      CHUNK_FILE="$2"
+    
+      s3cmd --config "$S3_CONFIG" put --no-preserve "$CHUNK_FILE" "s3://$S3_BUCKET/$S3_PREFIX/$S3_PATH/" >/dev/null
+    }
+    
+    s3_rm_chunks() {
+      CHUNK_LIST="$1"
+    
+      xargs -n1000 s3cmd --config "$S3_CONFIG" rm <"$CHUNK_LIST" >/dev/null
+    }
+    
+    # Define functions for Azure operations
+    azure_list_days() {
+      az storage fs file list --file-system "$AZURE_CONTAINER_NAME" --path "$AZURE_PREFIX" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | awk '{print $9}' | sed "s#$AZURE_PREFIX/##" | sed 's/\/.*$//' | uniq
+    }
+    
+    azure_list_indices() {
+      AZURE_PATH="$1"
+    
+      az storage fs file list --file-system "$AZURE_CONTAINER_NAME" --path "${AZURE_PREFIX}/${AZURE_PATH}/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | awk '{print $9}' | sed "s#${AZURE_PREFIX}/${AZURE_PATH}/##" | sed 's/\/.*$//' | uniq
+    }
+    
+    azure_list_chunks() {
+      AZURE_PATH="$1"
+    
+      az storage fs file list --file-system "$AZURE_CONTAINER_NAME" --path "${AZURE_PREFIX}/${AZURE_PATH}/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | (grep '\.gz\|\.zst' || true) | awk '{print $9}' | sed "s#${AZURE_PREFIX}/${AZURE_PATH}/##"
+    }
+    
+    azure_get_chunks() {
+      AZURE_PATH="$1"
+      CHUNK_DIR="$2"
+    
+      az storage fs directory download --destination-path "$CHUNK_DIR" --file-system "${AZURE_CONTAINER_NAME}" --source-path "${AZURE_PREFIX}/${AZURE_PATH}/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --recursive >/dev/null
+    }
+    
+    azure_put_chunk() {
+      AZURE_PATH="$1"
+      CHUNK_FILE="$2"
+    
+      az storage blob upload --file "$CHUNK_FILE" --container-name "$AZURE_CONTAINER_NAME" --name "${AZURE_PREFIX}/${AZURE_PATH}/$(basename "$CHUNK_FILE")" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" >/dev/null
+    }
+    
+    azure_rm_chunks() {
+      CHUNK_LIST="$1"
+      while IFS= read -r line; do
+        az storage blob delete --container-name "$AZURE_CONTAINER_NAME" --name "${AZURE_PREFIX}/${line}" --delete-snapshots "include" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" >/dev/null
+      done <"$CHUNK_LIST"
+    }
+    
+    merge_chunks() {
+      DAY="$1"
+    
+      if [ "$STORAGE_SERVICE" = "azure" ]; then
+        INDICES="$(azure_list_indices "$DAY")"
+        CHUNKS="$(azure_list_chunks "$DAY")"
+      else
+        INDICES="$(s3_list_indices "$DAY")"
+        CHUNKS="$(s3_list_chunks "$DAY")"
+      fi
+    
+      for INDEX in $INDICES; do
+        if [ "$(echo "$CHUNKS" | grep -c "$INDEX")" -lt 2 ]; then
+          continue
+        fi
+    
+        echo "--- merging chunks in $DAY/$INDEX"
+    
+        echo "----- fetching chunks"
+        if [ "$STORAGE_SERVICE" = "azure" ]; then
+          azure_get_chunks "$DAY/$INDEX" "$LM_TMP"
+        else
+          s3_get_chunks "$DAY/$INDEX" "$LM_TMP"
+        fi
+    
+        TMPFILE="$(printf "%s/%s/%s-%05d" "$LM_TMP" "$INDEX" "$NOW" "$SEQ")"
+        touch "$TMPFILE.idx"
+        touch "$TMPFILE.log"
+    
+        echo "----- expanding chunks"
+        for FILE in "$LM_TMP/$INDEX"/*; do
+          if [[ "$FILE" =~ "$TMPFILE"* ]]; then
+            continue
+          fi
+    
+          if [ "$STORAGE_SERVICE" = "azure" ]; then
+            echo "${DAY}/${FILE/$LM_TMP\//}" >>"$TMPFILE.idx"
+          else
+            echo "s3://$S3_BUCKET/$S3_PREFIX/$DAY/${FILE/$LM_TMP\//}" >>"$TMPFILE.idx"
+          fi
+    
+          zstd --rm -c -d "$FILE"
+        done | sort --compress-program=zstd --temporary-directory="$SORT_TMP" -u -S 100M | zstd -o "$TMPFILE.zst"
+    
+        echo "----- uploading chunk"
+        if [ "$STORAGE_SERVICE" = "azure" ]; then
+          azure_put_chunk "$DAY/$INDEX" "$TMPFILE.zst"
+        else
+          s3_put_chunk "$DAY/$INDEX" "$TMPFILE.zst"
+        fi
+    
+        rm "$TMPFILE.zst"
+    
+        echo "----- clearing chunks"
+        if [ "$STORAGE_SERVICE" = "azure" ]; then
+          azure_rm_chunks "$TMPFILE.idx"
+        else
+          s3_rm_chunks "$TMPFILE.idx"
+        fi
+    
+        rm "$TMPFILE.idx"
+    
+        echo "----- clearing temporary files"
+        rm -r "${LM_TMP:?}/$INDEX"
+    
+        SEQ=$((SEQ + 1))
+      done
+    }
+    
+    if [[ "$STORAGE_SERVICE" == "azure" ]]; then
+      days=$(azure_list_days)
+    else
+      days=$(s3_list_days)
+    fi
+    
+    for DAY in ${days}; do
+      if [[ "$DAY" > "$LIMIT" ]]; then
+        echo "- day: $DAY -----"
+        merge_chunks "$DAY"
+      fi
+    done
+    
+    echo "---"
+    echo "end"
+    
+  retention.sh: |-
+    #!/usr/bin/env bash
+    
+    set -euo pipefail
+    
+    if [ "$STORAGE_SERVICE" = "azure" ]; then
+      # Azure Blob configuration
+      : "${AZURE_STORAGE_CONNECTION_STRING:?Missing AZURE_STORAGE_CONNECTION_STRING}"
+      : "${AZURE_CONTAINER_NAME:?Missing AZURE_CONTAINER_NAME}"
+      : "${AZURE_PREFIX:?Missing AZURE_PREFIX}"
+    else
+      # S3 configuration
+      : "${S3_CONFIG:?Missing S3_CONFIG}"
+      : "${S3_BUCKET:?Missing S3_BUCKET}"
+      : "${S3_PREFIX:?Missing S3_PREFIX}"
+    fi
+    
+    # Days to retain
+    : "${RETAIN_DAYS:?Missing RETAIN_DAYS}"
+    
+    LIMIT="$(date --utc --date="$RETAIN_DAYS days ago" '+%Y%m%d')"
+    
+    TMPFILE="/tmp/lm.idx"
+    
+    # Define S3 functions
+    s3_list_days() {
+      s3cmd --config "$S3_CONFIG" ls "s3://$S3_BUCKET/$S3_PREFIX/" | grep 'DIR' | awk '{print $2}' | sed "s#s3://$S3_BUCKET/$S3_PREFIX/##" | sed 's#/$##'
+    }
+    
+    s3_list_chunks() {
+      S3_PATH="$1"
+    
+      s3cmd --config "$S3_CONFIG" ls -r "s3://$S3_BUCKET/$S3_PREFIX/$S3_PATH/" | grep '\.gz\|\.zst' | awk '{print $4}'
+    }
+    
+    s3_rm_chunks() {
+      CHUNK_LIST="$1"
+    
+      xargs -n1000 s3cmd --config "$S3_CONFIG" rm <"$CHUNK_LIST" >/dev/null
+    }
+    
+    # Define Azure Blob functions
+    azure_list_days() {
+      az storage fs file list --file-system "$AZURE_CONTAINER_NAME" --path "$AZURE_PREFIX" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | awk '{print $9}' | sed "s#$AZURE_PREFIX/##" | sed 's/\/.*$//' | uniq
+    }
+    
+    azure_list_chunks() {
+      AZURE_PATH="$1"
+    
+      az storage fs file list --file-system "$AZURE_CONTAINER_NAME" --path "${AZURE_PREFIX}/${AZURE_PATH}/" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" --output tsv | (grep '\.gz\|\.zst' || true) | awk '{print $9}' | sed "s#${AZURE_PREFIX}/${AZURE_PATH}/##"
+    }
+    
+    azure_rm_chunks() {
+      CHUNK_LIST="$1"
+      while IFS= read -r line; do
+        az storage blob delete --container-name "$AZURE_CONTAINER_NAME" --name "${AZURE_PREFIX}/${AZURE_PATH}/${line}" --delete-snapshots "include" --connection-string "$AZURE_STORAGE_CONNECTION_STRING" >/dev/null
+      done <"$CHUNK_LIST"
+    }
+    
+    # Main loop
+    if [[ "$STORAGE_SERVICE" == "azure" ]]; then
+      for DAY in $(azure_list_days); do
+        if [[ "$DAY" < "$LIMIT" ]]; then
+          echo "- day: $DAY -----"
+          echo "----- listing Azure chunks"
+          azure_list_chunks "$DAY" >"$TMPFILE"
+          echo "----- clearing Azure chunks"
+          azure_rm_chunks "$TMPFILE"
+        fi
+      done
+    else
+      for DAY in $(s3_list_days); do
+        if [[ "$DAY" < "$LIMIT" ]]; then
+          echo "- day: $DAY -----"
+          echo "----- listing S3 chunks"
+          s3_list_chunks "$DAY" >"$TMPFILE"
+          echo "----- clearing S3 chunks"
+          s3_rm_chunks "$TMPFILE"
+        fi
+      done
+    fi
+    
+    echo "---"
+    echo "end"
+---
+# Source: log-manager/templates/cronjob-compaction.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: audit-apps-tests-wc-compaction
+  labels:
+    helm.sh/chart: log-manager-0.1.0
+    app.kubernetes.io/name: log-manager
+    app.kubernetes.io/instance: log-manager
+    app.kubernetes.io/version: "0.3.2"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  schedule: "0 1/6 * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 7200
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 21600
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            helm.sh/chart: log-manager-0.1.0
+            app.kubernetes.io/name: log-manager
+            app.kubernetes.io/instance: log-manager
+            app.kubernetes.io/version: "0.3.2"
+            app.kubernetes.io/managed-by: Helm
+        spec:
+          automountServiceAccountToken: false
+          restartPolicy: Never
+          containers:
+            - name: compaction
+              imagePullPolicy: IfNotPresent
+              image: ghcr.io/elastisys/compliantkubernetes-apps-log-manager:0.3.2
+              command: [/scripts/compaction.sh]
+              env:
+                - name: S3_CONFIG
+                  value: /configs/s3cfg.ini
+                - name: S3_BUCKET
+                  value: apps-tests-audit
+                - name: S3_PREFIX
+                  value: apps-tests-wc
+                - name: STORAGE_SERVICE
+                  value: s3
+                - name: COMPACT_DAYS
+                  value: "30"
+                - name: TMP_DIR
+                  value: /scratch
+              securityContext:
+                capabilities:
+                  drop:
+                  - ALL
+                runAsGroup: 1000
+                runAsNonRoot: true
+                runAsUser: 1000
+              resources:
+                limits:
+                  cpu: 1000m
+                  memory: 400Mi
+                requests:
+                  cpu: 200m
+                  memory: 100Mi
+              volumeMounts:
+                - name: s3cfg
+                  mountPath: /configs
+                  readOnly: true
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+                - name: scratch
+                  mountPath: /scratch
+          volumes:
+            - name: s3cfg
+              secret:
+                secretName: log-manager-storage-credentials
+            - name: scripts
+              configMap:
+                name: log-manager-scripts
+                defaultMode: 0777
+            - name: scratch
+              emptyDir: {}
+          securityContext:
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+---
+# Source: log-manager/templates/cronjob-compaction.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: audit-apps-tests-sc-compaction
+  labels:
+    helm.sh/chart: log-manager-0.1.0
+    app.kubernetes.io/name: log-manager
+    app.kubernetes.io/instance: log-manager
+    app.kubernetes.io/version: "0.3.2"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  schedule: "0 1/6 * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 7200
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 21600
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            helm.sh/chart: log-manager-0.1.0
+            app.kubernetes.io/name: log-manager
+            app.kubernetes.io/instance: log-manager
+            app.kubernetes.io/version: "0.3.2"
+            app.kubernetes.io/managed-by: Helm
+        spec:
+          automountServiceAccountToken: false
+          restartPolicy: Never
+          containers:
+            - name: compaction
+              imagePullPolicy: IfNotPresent
+              image: ghcr.io/elastisys/compliantkubernetes-apps-log-manager:0.3.2
+              command: [/scripts/compaction.sh]
+              env:
+                - name: S3_CONFIG
+                  value: /configs/s3cfg.ini
+                - name: S3_BUCKET
+                  value: apps-tests-audit
+                - name: S3_PREFIX
+                  value: apps-tests-sc
+                - name: STORAGE_SERVICE
+                  value: s3
+                - name: COMPACT_DAYS
+                  value: "30"
+                - name: TMP_DIR
+                  value: /scratch
+              securityContext:
+                capabilities:
+                  drop:
+                  - ALL
+                runAsGroup: 1000
+                runAsNonRoot: true
+                runAsUser: 1000
+              resources:
+                limits:
+                  cpu: 1000m
+                  memory: 400Mi
+                requests:
+                  cpu: 200m
+                  memory: 100Mi
+              volumeMounts:
+                - name: s3cfg
+                  mountPath: /configs
+                  readOnly: true
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+                - name: scratch
+                  mountPath: /scratch
+          volumes:
+            - name: s3cfg
+              secret:
+                secretName: log-manager-storage-credentials
+            - name: scripts
+              configMap:
+                name: log-manager-scripts
+                defaultMode: 0777
+            - name: scratch
+              emptyDir: {}
+          securityContext:
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+---
+# Source: log-manager/templates/cronjob-compaction.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sc-logs-logs-compaction
+  labels:
+    helm.sh/chart: log-manager-0.1.0
+    app.kubernetes.io/name: log-manager
+    app.kubernetes.io/instance: log-manager
+    app.kubernetes.io/version: "0.3.2"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  schedule: "0 2/6 * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 7200
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 21600
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            helm.sh/chart: log-manager-0.1.0
+            app.kubernetes.io/name: log-manager
+            app.kubernetes.io/instance: log-manager
+            app.kubernetes.io/version: "0.3.2"
+            app.kubernetes.io/managed-by: Helm
+        spec:
+          automountServiceAccountToken: false
+          restartPolicy: Never
+          containers:
+            - name: compaction
+              imagePullPolicy: IfNotPresent
+              image: ghcr.io/elastisys/compliantkubernetes-apps-log-manager:0.3.2
+              command: [/scripts/compaction.sh]
+              env:
+                - name: S3_CONFIG
+                  value: /configs/s3cfg.ini
+                - name: S3_BUCKET
+                  value: apps-tests-sc-logs
+                - name: S3_PREFIX
+                  value: logs
+                - name: STORAGE_SERVICE
+                  value: s3
+                - name: COMPACT_DAYS
+                  value: "30"
+                - name: TMP_DIR
+                  value: /scratch
+              securityContext:
+                capabilities:
+                  drop:
+                  - ALL
+                runAsGroup: 1000
+                runAsNonRoot: true
+                runAsUser: 1000
+              resources:
+                limits:
+                  cpu: 1000m
+                  memory: 400Mi
+                requests:
+                  cpu: 200m
+                  memory: 100Mi
+              volumeMounts:
+                - name: s3cfg
+                  mountPath: /configs
+                  readOnly: true
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+                - name: scratch
+                  mountPath: /scratch
+          volumes:
+            - name: s3cfg
+              secret:
+                secretName: log-manager-storage-credentials
+            - name: scripts
+              configMap:
+                name: log-manager-scripts
+                defaultMode: 0777
+            - name: scratch
+              emptyDir: {}
+          securityContext:
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+---
+# Source: log-manager/templates/cronjob-retention.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: audit-apps-tests-wc-retention
+  labels:
+    helm.sh/chart: log-manager-0.1.0
+    app.kubernetes.io/name: log-manager
+    app.kubernetes.io/instance: log-manager
+    app.kubernetes.io/version: "0.3.2"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  schedule: "0 20 * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 7200
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 21600
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            helm.sh/chart: log-manager-0.1.0
+            app.kubernetes.io/name: log-manager
+            app.kubernetes.io/instance: log-manager
+            app.kubernetes.io/version: "0.3.2"
+            app.kubernetes.io/managed-by: Helm
+        spec:
+          automountServiceAccountToken: false
+          restartPolicy: Never
+          containers:
+            - name: retention
+              imagePullPolicy: IfNotPresent
+              image: ghcr.io/elastisys/compliantkubernetes-apps-log-manager:0.3.2
+              command: [/scripts/retention.sh]
+              env:
+                - name: S3_CONFIG
+                  value: /configs/s3cfg.ini
+                - name: S3_BUCKET
+                  value: apps-tests-audit
+                - name: S3_PREFIX
+                  value: apps-tests-wc
+                - name: STORAGE_SERVICE
+                  value: s3
+                - name: RETAIN_DAYS
+                  value: "30"
+              securityContext:
+                capabilities:
+                  drop:
+                  - ALL
+                runAsGroup: 1000
+                runAsNonRoot: true
+                runAsUser: 1000
+              resources:
+                limits:
+                  cpu: 200m
+                  memory: 400Mi
+                requests:
+                  cpu: 100m
+                  memory: 50Mi
+              volumeMounts:
+                - name: s3cfg
+                  mountPath: /configs
+                  readOnly: true
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+          volumes:
+            - name: s3cfg
+              secret:
+                secretName: log-manager-storage-credentials
+            - name: scripts
+              configMap:
+                name: log-manager-scripts
+                defaultMode: 0777
+          securityContext:
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+---
+# Source: log-manager/templates/cronjob-retention.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: audit-apps-tests-sc-retention
+  labels:
+    helm.sh/chart: log-manager-0.1.0
+    app.kubernetes.io/name: log-manager
+    app.kubernetes.io/instance: log-manager
+    app.kubernetes.io/version: "0.3.2"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  schedule: "0 20 * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 7200
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 21600
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            helm.sh/chart: log-manager-0.1.0
+            app.kubernetes.io/name: log-manager
+            app.kubernetes.io/instance: log-manager
+            app.kubernetes.io/version: "0.3.2"
+            app.kubernetes.io/managed-by: Helm
+        spec:
+          automountServiceAccountToken: false
+          restartPolicy: Never
+          containers:
+            - name: retention
+              imagePullPolicy: IfNotPresent
+              image: ghcr.io/elastisys/compliantkubernetes-apps-log-manager:0.3.2
+              command: [/scripts/retention.sh]
+              env:
+                - name: S3_CONFIG
+                  value: /configs/s3cfg.ini
+                - name: S3_BUCKET
+                  value: apps-tests-audit
+                - name: S3_PREFIX
+                  value: apps-tests-sc
+                - name: STORAGE_SERVICE
+                  value: s3
+                - name: RETAIN_DAYS
+                  value: "30"
+              securityContext:
+                capabilities:
+                  drop:
+                  - ALL
+                runAsGroup: 1000
+                runAsNonRoot: true
+                runAsUser: 1000
+              resources:
+                limits:
+                  cpu: 200m
+                  memory: 400Mi
+                requests:
+                  cpu: 100m
+                  memory: 50Mi
+              volumeMounts:
+                - name: s3cfg
+                  mountPath: /configs
+                  readOnly: true
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+          volumes:
+            - name: s3cfg
+              secret:
+                secretName: log-manager-storage-credentials
+            - name: scripts
+              configMap:
+                name: log-manager-scripts
+                defaultMode: 0777
+          securityContext:
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+---
+# Source: log-manager/templates/cronjob-retention.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sc-logs-logs-retention
+  labels:
+    helm.sh/chart: log-manager-0.1.0
+    app.kubernetes.io/name: log-manager
+    app.kubernetes.io/instance: log-manager
+    app.kubernetes.io/version: "0.3.2"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  schedule: "0 21 * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 7200
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 21600
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            helm.sh/chart: log-manager-0.1.0
+            app.kubernetes.io/name: log-manager
+            app.kubernetes.io/instance: log-manager
+            app.kubernetes.io/version: "0.3.2"
+            app.kubernetes.io/managed-by: Helm
+        spec:
+          automountServiceAccountToken: false
+          restartPolicy: Never
+          containers:
+            - name: retention
+              imagePullPolicy: IfNotPresent
+              image: ghcr.io/elastisys/compliantkubernetes-apps-log-manager:0.3.2
+              command: [/scripts/retention.sh]
+              env:
+                - name: S3_CONFIG
+                  value: /configs/s3cfg.ini
+                - name: S3_BUCKET
+                  value: apps-tests-sc-logs
+                - name: S3_PREFIX
+                  value: logs
+                - name: STORAGE_SERVICE
+                  value: s3
+                - name: RETAIN_DAYS
+                  value: "30"
+              securityContext:
+                capabilities:
+                  drop:
+                  - ALL
+                runAsGroup: 1000
+                runAsNonRoot: true
+                runAsUser: 1000
+              resources:
+                limits:
+                  cpu: 200m
+                  memory: 400Mi
+                requests:
+                  cpu: 100m
+                  memory: 50Mi
+              volumeMounts:
+                - name: s3cfg
+                  mountPath: /configs
+                  readOnly: true
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+          volumes:
+            - name: s3cfg
+              secret:
+                secretName: log-manager-storage-credentials
+            - name: scripts
+              configMap:
+                name: log-manager-scripts
+                defaultMode: 0777
+          securityContext:
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+

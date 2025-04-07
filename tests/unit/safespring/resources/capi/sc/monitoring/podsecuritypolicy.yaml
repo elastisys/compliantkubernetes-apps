@@ -1,0 +1,1099 @@
+---
+# Source: podsecuritypolicies/templates/default/mutations/fsgroup.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: fsgroup-monitoring-restricted
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  location: "spec.securityContext.fsGroup"
+  parameters:
+    assign:
+      value: 1
+    pathTests:
+      - subPath: "spec.securityContext.fsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/host-ipc.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: host-ipc-monitoring-restricted
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  location: "spec.hostIPC"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.hostIPC"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/host-pid.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: host-pid-monitoring-restricted
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  location: "spec.hostPID"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.hostPID"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privilege-escalation.yaml
+---
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-monitoring-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  location: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-monitoring-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  location: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privilege-escalation.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privilege-escalation-monitoring-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  location: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.allowPrivilegeEscalation"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-monitoring-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  location: "spec.containers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-monitoring-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  location: "spec.ephemeralContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/privileged.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: privileged-monitoring-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  location: "spec.initContainers[name: *].securityContext.privileged"
+  parameters:
+    assign:
+      value: false
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.privileged"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-group.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-group-monitoring-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  location: "spec.containers[name: *].securityContext.runAsGroup"
+  parameters:
+    assign:
+      value: 1
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.runAsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-group.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-group-monitoring-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  location: "spec.ephemeralContainers[name: *].securityContext.runAsGroup"
+  parameters:
+    assign:
+      value: 1
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.runAsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-group.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-group-monitoring-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  location: "spec.initContainers[name: *].securityContext.runAsGroup"
+  parameters:
+    assign:
+      value: 1
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.runAsGroup"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-non-root.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-non-root-monitoring-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "node-collector"
+        - key: vulnerabilityReport.scanner
+          operator: NotIn
+          values:
+            - "Trivy"
+  location: "spec.containers[name: *].securityContext.runAsNonRoot"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.runAsNonRoot"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-non-root.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-non-root-monitoring-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "node-collector"
+        - key: vulnerabilityReport.scanner
+          operator: NotIn
+          values:
+            - "Trivy"
+  location: "spec.ephemeralContainers[name: *].securityContext.runAsNonRoot"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.runAsNonRoot"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/run-as-non-root.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: run-as-non-root-monitoring-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "node-collector"
+        - key: vulnerabilityReport.scanner
+          operator: NotIn
+          values:
+            - "Trivy"
+  location: "spec.initContainers[name: *].securityContext.runAsNonRoot"
+  parameters:
+    assign:
+      value: true
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.runAsNonRoot"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/seccomp-profile.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: seccomp-profile-monitoring-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  location: "spec.securityContext.seccompProfile.type"
+  parameters:
+    assign:
+      value: RuntimeDefault
+    pathTests:
+      - subPath: "spec.securityContext.seccompProfile.type"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/seccomp-profile.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: seccomp-profile-monitoring-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  location: "spec.ephemeralContainers[name: *].securityContext.seccompProfile.type"
+  parameters:
+    assign:
+      value: RuntimeDefault
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.seccompProfile.type"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/seccomp-profile.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
+metadata:
+  name: seccomp-profile-monitoring-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  location: "spec.initContainers[name: *].securityContext.seccompProfile.type"
+  parameters:
+    assign:
+      value: RuntimeDefault
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.seccompProfile.type"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/privilege-escalation.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowPrivilegeEscalationContainer
+metadata:
+  name: privilege-escalation-monitoring-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+---
+# Source: podsecuritypolicies/templates/custom/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-monitoring-trivy-node-info-collector
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - monitoring
+    labelSelector:
+      matchLabels:
+        app: node-collector
+  parameters:
+    runAsUser:
+      rule: RunAsAny
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/custom/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-monitoring-trivy-vulnerability-report-scanner
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - monitoring
+    labelSelector:
+      matchLabels:
+        vulnerabilityReport.scanner: Trivy
+  parameters:
+    runAsUser:
+      rule: RunAsAny
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/default/users.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+  name: users-monitoring-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+    labelSelector:
+      matchExpressions:
+        - key: app
+          operator: NotIn
+          values:
+            - "node-collector"
+        - key: vulnerabilityReport.scanner
+          operator: NotIn
+          values:
+            - "Trivy"
+  parameters:
+    runAsUser:
+      rule: MustRunAsNonRoot
+    runAsGroup:
+      rule: RunAsAny
+    supplementalGroups:
+      rule: RunAsAny
+    fsGroup:
+      rule: RunAsAny
+---
+# Source: podsecuritypolicies/templates/default/capabilities.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPCapabilities
+metadata:
+  name: capabilities-monitoring-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  parameters:
+    requiredDropCapabilities:
+      - ALL
+---
+# Source: podsecuritypolicies/templates/default/sysctls.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPForbiddenSysctls
+metadata:
+  name: sysctls-monitoring-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  parameters:
+    allowedSysctls: []
+    forbiddenSysctls:
+      - "*"
+---
+# Source: podsecuritypolicies/templates/custom/host-paths.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostFilesystem
+metadata:
+  name: host-paths-monitoring-prometheus-node-exporter
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - monitoring
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: prometheus-node-exporter
+  parameters:
+    allowedHostPaths:
+      - pathPrefix: /proc
+        readOnly: true
+      - pathPrefix: /sys
+        readOnly: true
+      - pathPrefix: /
+        readOnly: true
+---
+# Source: podsecuritypolicies/templates/custom/host-paths.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostFilesystem
+metadata:
+  name: host-paths-monitoring-trivy-node-info-collector
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - monitoring
+    labelSelector:
+      matchLabels:
+        app: node-collector
+  parameters:
+    allowedHostPaths:
+      - pathPrefix: /etc/cni/net.d
+        readOnly: true
+      - pathPrefix: /etc/kubernetes
+        readOnly: true
+      - pathPrefix: /etc/systemd
+        readOnly: true
+      - pathPrefix: /lib/systemd
+        readOnly: true
+      - pathPrefix: /var/lib/etcd
+        readOnly: true
+      - pathPrefix: /var/lib/kubelet
+        readOnly: true
+      - pathPrefix: /var/lib/kube-controller-manager
+        readOnly: true
+      - pathPrefix: /var/lib/kube-scheduler
+        readOnly: true
+      - pathPrefix: /etc/kubernetes
+        readOnly: true
+---
+# Source: podsecuritypolicies/templates/default/host-paths.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostFilesystem
+metadata:
+  name: host-paths-monitoring-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: NotIn
+          values:
+            - "prometheus-node-exporter"
+        - key: app
+          operator: NotIn
+          values:
+            - "node-collector"
+  parameters:
+    allowedHostPaths: []
+---
+# Source: podsecuritypolicies/templates/default/host-namespace.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostNamespace
+metadata:
+  name: host-namespace-monitoring-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: NotIn
+          values:
+            - "prometheus-node-exporter"
+        - key: app
+          operator: NotIn
+          values:
+            - "node-collector"
+---
+# Source: podsecuritypolicies/templates/custom/host-network-ports.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostNetworkingPorts
+metadata:
+  name: host-network-ports-monitoring-prometheus-node-exporter
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - monitoring
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: prometheus-node-exporter
+  parameters:
+    hostNetwork: true
+    min: 1
+    max: 65535
+---
+# Source: podsecuritypolicies/templates/default/host-network-ports.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostNetworkingPorts
+metadata:
+  name: host-network-ports-monitoring-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: NotIn
+          values:
+            - "prometheus-node-exporter"
+  parameters:
+    hostNetwork: false
+    min: 0
+    max: 0
+---
+# Source: podsecuritypolicies/templates/default/privileged.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPPrivilegedContainer
+metadata:
+  name: privileged-monitoring-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+---
+# Source: podsecuritypolicies/templates/custom/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-monitoring-prometheus-node-exporter
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - monitoring
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: prometheus-node-exporter
+  parameters:
+    volumes:
+      - configMap
+      - emptyDir
+      - projected
+      - secret
+      - downwardAPI
+      - persistentVolumeClaim
+      - hostPath
+---
+# Source: podsecuritypolicies/templates/custom/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-monitoring-trivy-node-info-collector
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - monitoring
+    labelSelector:
+      matchLabels:
+        app: node-collector
+  parameters:
+    volumes:
+      - configMap
+      - downwardAPI
+      - emptyDir
+      - hostPath
+      - persistentVolumeClaim
+      - projected
+      - secret
+---
+# Source: podsecuritypolicies/templates/default/volumes.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: volumes-monitoring-restricted
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+    labelSelector:
+      matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: NotIn
+          values:
+            - "prometheus-node-exporter"
+        - key: app
+          operator: NotIn
+          values:
+            - "node-collector"
+  parameters:
+    volumes:
+      - configMap
+      - downwardAPI
+      - emptyDir
+      - persistentVolumeClaim
+      - projected
+      - secret
+---
+# Source: podsecuritypolicies/templates/default/mutations/capabilities.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: capabilities-monitoring-restricted-container
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  location: "spec.containers[name: *].securityContext.capabilities.drop"
+  parameters:
+    values:
+      fromList:
+        - ALL
+    pathTests:
+      - subPath: "spec.containers[name: *].securityContext.capabilities.drop"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/capabilities.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: capabilities-monitoring-restricted-ephemeral
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  location: "spec.ephemeralContainers[name: *].securityContext.capabilities.drop"
+  parameters:
+    values:
+      fromList:
+        - ALL
+    pathTests:
+      - subPath: "spec.ephemeralContainers[name: *].securityContext.capabilities.drop"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/capabilities.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: capabilities-monitoring-restricted-init
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  location: "spec.initContainers[name: *].securityContext.capabilities.drop"
+  parameters:
+    values:
+      fromList:
+        - ALL
+    pathTests:
+      - subPath: "spec.initContainers[name: *].securityContext.capabilities.drop"
+        condition: MustNotExist
+---
+# Source: podsecuritypolicies/templates/default/mutations/supplemental-groups.yaml
+apiVersion: mutations.gatekeeper.sh/v1
+kind: ModifySet
+metadata:
+  name: supplemental-groups-monitoring-restricted
+spec:
+  applyTo:
+    - groups: [""]
+      kinds: ["Pod"]
+      versions: ["v1"]
+  match:
+    scope: Namespaced
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - monitoring
+  location: "spec.securityContext.supplementalGroups"
+  parameters:
+    values:
+      fromList:
+        - 1
+    pathTests:
+      - subPath: "spec.securityContext.supplementalGroups"
+        condition: MustNotExist
+

@@ -1,0 +1,26 @@
+---
+# Source: thanos-ruler/templates/thanosruler.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ThanosRuler
+metadata:
+  name: thanos-ruler
+  labels:
+    helm.sh/chart: thanos-ruler-0.1.0
+    app.kubernetes.io/name: thanos-ruler
+    app.kubernetes.io/instance: thanos-ruler
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 0
+  queryEndpoints:
+    - query-endpoint
+  ruleNamespaceSelector: 
+    {}
+  ruleSelector: 
+    matchLabels:
+      evaluate_thanos: "1"
+  securityContext: 
+    runAsGroup: 65534
+    runAsNonRoot: true
+    runAsUser: 65534
+

@@ -1,0 +1,310 @@
+---
+# Source: user-rbac/templates/namespaces.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: set-me
+  labels:
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
+---
+# Source: user-rbac/templates/namespaces.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: production
+  labels:
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
+---
+# Source: user-rbac/templates/namespaces.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: staging
+  labels:
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
+---
+# Source: user-rbac/templates/clusterroles/user-admin-cluster-wide-delegation.yaml
+# Managed by compliantkubernetes-apps
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: user-admin-cluster-wide-delegation
+rules:
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterrolebindings
+  resourceNames:
+  - extra-user-view
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - patch
+---
+# Source: user-rbac/templates/clusterroles/user-admin.yaml
+# This ClusterRole contains privileges needed for using Prometheus.
+# E.g. the user should be able to create ServiceMonitors in order to
+# make Prometheus scrape metrics from their apps.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: user-admin
+  labels:
+    # Add these permissions to the "admin" role.
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+rules:
+- apiGroups: ["monitoring.coreos.com"]
+  resources: ["servicemonitors", "podmonitors", "prometheusrules", "probes"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+# Source: user-rbac/templates/clusterroles/user-view.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: user-view
+rules:
+- apiGroups: [""]
+  resources: ["nodes","namespaces","persistentvolumes"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["metrics.k8s.io"]
+  resources: ["pods","nodes"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: [""]
+  resources: ["pods", "pods/log", events]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["cert-manager.io"]
+  resources: ["clusterissuers"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["constraints.gatekeeper.sh"]
+  resources: ["*"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["storage.k8s.io"]
+  resources: ["storageclasses"]
+  verbs: ["get", "watch", "list"]
+---
+# Source: user-rbac/templates/clusterrolebindings/user-admin-cluster-wide-delegation.yaml
+# Managed by compliantkubernetes-apps
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: user-admin-cluster-wide-delegation
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: user-admin-cluster-wide-delegation
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: user@example.com
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: group@example.com
+---
+# Source: user-rbac/templates/clusterrolebindings/user-view.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: user-view
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: user-view
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: user@example.com
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: group@example.com
+---
+# Source: user-rbac/templates/roles/prometheus-port-fwd.yaml
+# This role grants users privileges to proxy or port-forward to prometheus
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: prometheus-port-fwd
+  namespace: monitoring
+rules:
+# Allow proxying prometheus service
+- apiGroups:
+  - ""
+  resourceNames:
+  - kube-prometheus-stack-prometheus:9090
+  resources:
+  - services/proxy
+  verbs:
+  - get
+  - create
+  - delete
+# Allow binding this role specifically
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resourceNames:
+  - prometheus-port-fwd
+  resources:
+  - roles
+  verbs:
+  - bind
+# Allow port-forward to prometheus service
+- apiGroups:
+  - ""
+  resources:
+  - pods/portforward
+  verbs:
+  - create
+  resourceNames:
+  - prometheus-kube-prometheus-stack-prometheus-0
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+  resourceNames:
+  - kube-prometheus-stack-prometheus
+---
+# Source: user-rbac/templates/rolebindings/falco-viewer.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: falco-viewer
+  namespace: falco
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: user@example.com
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: group@example.com
+---
+# Source: user-rbac/templates/rolebindings/prometheus.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prometheus-port-fwd
+  namespace: monitoring
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: prometheus-port-fwd
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: user@example.com
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: group@example.com
+---
+# Source: user-rbac/templates/rolebindings/workload-admin.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: workload-admin
+  namespace: set-me
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: admin
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: user@example.com
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: group@example.com
+---
+# Source: user-rbac/templates/rolebindings/workload-admin.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: workload-admin
+  namespace: production
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: admin
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: user@example.com
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: group@example.com
+---
+# Source: user-rbac/templates/rolebindings/workload-admin.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: workload-admin
+  namespace: staging
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: admin
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: user@example.com
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: group@example.com
+---
+# Source: user-rbac/templates/hierarchyconfiguration.yaml
+apiVersion: hnc.x-k8s.io/v1alpha2
+kind: HierarchyConfiguration
+metadata:
+  name: hierarchy
+  namespace: set-me
+spec:
+  labels:
+    - key: pod-security.kubernetes.io/enforce
+      value: restricted
+    - key: pod-security.kubernetes.io/audit
+      value: restricted
+    - key: pod-security.kubernetes.io/warn
+      value: restricted
+---
+# Source: user-rbac/templates/hierarchyconfiguration.yaml
+apiVersion: hnc.x-k8s.io/v1alpha2
+kind: HierarchyConfiguration
+metadata:
+  name: hierarchy
+  namespace: production
+spec:
+  labels:
+    - key: pod-security.kubernetes.io/enforce
+      value: restricted
+    - key: pod-security.kubernetes.io/audit
+      value: restricted
+    - key: pod-security.kubernetes.io/warn
+      value: restricted
+---
+# Source: user-rbac/templates/hierarchyconfiguration.yaml
+apiVersion: hnc.x-k8s.io/v1alpha2
+kind: HierarchyConfiguration
+metadata:
+  name: hierarchy
+  namespace: staging
+spec:
+  labels:
+    - key: pod-security.kubernetes.io/enforce
+      value: restricted
+    - key: pod-security.kubernetes.io/audit
+      value: restricted
+    - key: pod-security.kubernetes.io/warn
+      value: restricted
+

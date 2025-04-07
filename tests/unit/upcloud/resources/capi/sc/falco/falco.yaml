@@ -1,0 +1,4603 @@
+---
+# Source: falco/charts/falcosidekick/templates/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: falco-falcosidekick
+  namespace: falco
+---
+# Source: falco/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: falco
+  namespace: falco
+  labels:
+    helm.sh/chart: falco-4.20.0
+    app.kubernetes.io/name: falco
+    app.kubernetes.io/instance: falco
+    app.kubernetes.io/version: "0.40.0"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: falco/charts/falcosidekick/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: falco-falcosidekick
+  namespace: falco
+  labels:
+    helm.sh/chart: falcosidekick-0.9.8
+    app.kubernetes.io/name: falcosidekick
+    app.kubernetes.io/instance: falco
+    app.kubernetes.io/version: "2.31.1"
+    app.kubernetes.io/part-of: falcosidekick
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: core
+  annotations:
+type: Opaque
+data:
+  # Slack Output
+  SLACK_WEBHOOKURL: ""
+  SLACK_CHANNEL: ""
+  SLACK_OUTPUTFORMAT: "YWxs"
+  SLACK_FOOTER: ""
+  SLACK_ICON: ""
+  SLACK_USERNAME: ""
+  SLACK_MINIMUMPRIORITY: ""
+  SLACK_MESSAGEFORMAT: ""
+
+  # RocketChat Output
+  ROCKETCHAT_WEBHOOKURL: ""
+  ROCKETCHAT_OUTPUTFORMAT: "YWxs"
+  ROCKETCHAT_ICON: ""
+  ROCKETCHAT_USERNAME: ""
+  ROCKETCHAT_MINIMUMPRIORITY: ""
+  ROCKETCHAT_MESSAGEFORMAT: ""
+  ROCKETCHAT_MUTUALTLS: "ZmFsc2U="
+  ROCKETCHAT_CHECKCERT: "dHJ1ZQ=="
+
+  # Mattermost Output
+  MATTERMOST_WEBHOOKURL: ""
+  MATTERMOST_OUTPUTFORMAT: "YWxs"
+  MATTERMOST_FOOTER: ""
+  MATTERMOST_ICON: ""
+  MATTERMOST_USERNAME: ""
+  MATTERMOST_MINIMUMPRIORITY: ""
+  MATTERMOST_MESSAGEFORMAT: ""
+  MATTERMOST_MUTUALTLS: "ZmFsc2U="
+  MATTERMOST_CHECKCERT: "dHJ1ZQ=="
+
+  # Teams Output
+  TEAMS_WEBHOOKURL: ""
+  TEAMS_OUTPUTFORMAT: "YWxs"
+  TEAMS_ACTIVITYIMAGE: ""
+  TEAMS_MINIMUMPRIORITY: ""
+
+  # Datadog (Events) Output
+  DATADOG_APIKEY: ""
+  DATADOG_HOST: ""
+  DATADOG_MINIMUMPRIORITY: ""
+
+  # Datadog Logs Output
+  DATADOGLOGS_APIKEY: ""
+  DATADOGLOGS_HOST: ""
+  DATADOGLOGS_SERVICE: ""
+  DATADOGLOGS_MINIMUMPRIORITY: ""
+
+  # AlertManager Output
+  ALERTMANAGER_HOSTPORT: ""
+  ALERTMANAGER_ENDPOINT: "L2FwaS92MS9hbGVydHM="
+  ALERTMANAGER_EXPIRESAFTER: ""
+  ALERTMANAGER_DROPEVENTDEFAULTPRIORITY: "Y3JpdGljYWw="
+  ALERTMANAGER_DROPEVENTTHRESHOLDS: "MTAwMDA6Y3JpdGljYWwsIDEwMDA6Y3JpdGljYWwsIDEwMDpjcml0aWNhbCwgMTA6d2FybmluZywgMTp3YXJuaW5n"
+  ALERTMANAGER_MINIMUMPRIORITY: ""
+  ALERTMANAGER_MUTUALTLS: "ZmFsc2U="
+  ALERTMANAGER_CHECKCERT: "dHJ1ZQ=="
+
+  # InfluxDB Output
+  INFLUXDB_USER: ""
+  INFLUXDB_PASSWORD: ""
+  INFLUXDB_TOKEN: ""
+  INFLUXDB_HOSTPORT: ""
+  INFLUXDB_ORGANIZATION: ""
+  INFLUXDB_PRECISION: "bnM="
+  INFLUXDB_MINIMUMPRIORITY: ""
+  INFLUXDB_DATABASE: "ZmFsY28="
+  INFLUXDB_MUTUALTLS: "ZmFsc2U="
+  INFLUXDB_CHECKCERT: "dHJ1ZQ=="
+
+  # AWS Output
+  AWS_ACCESSKEYID: ""
+  AWS_SECRETACCESSKEY: ""
+  AWS_REGION: ""
+  AWS_CHECKIDENTITY: "dHJ1ZQ=="
+  AWS_LAMBDA_FUNCTIONNAME: ""
+  AWS_LAMBDA_MINIMUMPRIORITY: ""
+  AWS_CLOUDWATCHLOGS_LOGGROUP: ""
+  AWS_CLOUDWATCHLOGS_LOGSTREAM: ""
+  AWS_CLOUDWATCHLOGS_MINIMUMPRIORITY: ""
+  AWS_SNS_TOPICARN: ""
+  AWS_SNS_RAWJSON: "ZmFsc2U="
+  AWS_SNS_MINIMUMPRIORITY: ""
+  AWS_SQS_URL: ""
+  AWS_SQS_MINIMUMPRIORITY: ""
+  AWS_S3_BUCKET: ""
+  AWS_S3_PREFIX: ""
+  AWS_S3_ENDPOINT: ""
+  AWS_S3_OBJECTCANNEDACL: "YnVja2V0LW93bmVyLWZ1bGwtY29udHJvbA=="
+  AWS_S3_MINIMUMPRIORITY: ""
+  AWS_KINESIS_STREAMNAME: ""
+  AWS_KINESIS_MINIMUMPRIORITY: ""
+  AWS_SECURITYLAKE_BUCKET: ""
+  AWS_SECURITYLAKE_REGION: ""
+  AWS_SECURITYLAKE_PREFIX: ""
+  AWS_SECURITYLAKE_ACCOUNTID: ""
+  AWS_SECURITYLAKE_INTERVAL: "NQ=="
+  AWS_SECURITYLAKE_BATCHSIZE: "MTAwMA=="
+  AWS_SECURITYLAKE_MINIMUMPRIORITY: ""
+
+  # SMTP Output
+  SMTP_USER: ""
+  SMTP_PASSWORD: ""
+  SMTP_AUTHMECHANISM: "cGxhaW4="
+  SMTP_TLS: "dHJ1ZQ=="
+  SMTP_HOSTPORT: ""
+  SMTP_FROM: ""
+  SMTP_TO: ""
+  SMTP_TOKEN: ""
+  SMTP_IDENTITY: ""
+  SMTP_TRACE: ""
+  SMTP_OUTPUTFORMAT: "aHRtbA=="
+  SMTP_MINIMUMPRIORITY: ""
+
+  # OpsGenie Output
+  OPSGENIE_APIKEY: ""
+  OPSGENIE_REGION: ""
+  OPSGENIE_MINIMUMPRIORITY: ""
+  OPSGENIE_MUTUALTLS: "ZmFsc2U="
+  OPSGENIE_CHECKCERT: "dHJ1ZQ=="
+
+  # Discord Output
+  DISCORD_WEBHOOKURL: ""
+  DISCORD_ICON: ""
+  DISCORD_MINIMUMPRIORITY: ""
+
+  # GCP Output
+  GCP_CREDENTIALS: ""
+  GCP_PUBSUB_PROJECTID: ""
+  GCP_PUBSUB_TOPIC: ""
+  GCP_PUBSUB_CUSTOMATTRIBUTES: ""
+  GCP_PUBSUB_MINIMUMPRIORITY: ""
+  GCP_STORAGE_BUCKET: ""
+  GCP_STORAGE_PREFIX: ""
+  GCP_STORAGE_MINIMUMPRIORITY: "ZGVidWc="
+  GCP_CLOUDFUNCTIONS_NAME: ""
+  GCP_CLOUDFUNCTIONS_MINIMUMPRIORITY: ""
+  GCP_CLOUDRUN_ENDPOINT: ""
+  GCP_CLOUDRUN_JWT: ""
+  GCP_CLOUDRUN_MINIMUMPRIORITY: ""
+
+  # GoogleChat Output
+  GOOGLECHAT_WEBHOOKURL: ""
+  GOOGLECHAT_OUTPUTFORMAT: "YWxs"
+  GOOGLECHAT_MINIMUMPRIORITY: ""
+  GOOGLECHAT_MESSAGEFORMAT: ""
+
+  # ElasticSearch Output
+  ELASTICSEARCH_HOSTPORT: ""
+  ELASTICSEARCH_INDEX: "ZmFsY28="
+  ELASTICSEARCH_TYPE: "X2RvYw=="
+  ELASTICSEARCH_PIPELINE: ""
+  ELASTICSEARCH_SUFFIX: "ZGFpbHk="
+  ELASTICSEARCH_APIKEY: ""
+  ELASTICSEARCH_USERNAME: ""
+  ELASTICSEARCH_PASSWORD: ""
+  ELASTICSEARCH_FLATTENFIELDS: "ZmFsc2U="
+  ELASTICSEARCH_CREATEINDEXTEMPLATE: "ZmFsc2U="
+  ELASTICSEARCH_ENABLECOMPRESSION: "ZmFsc2U="
+  ELASTICSEARCH_MAXCONCURRENTREQUESTS: "MQ=="
+  ELASTICSEARCH_BATCHING_ENABLED: "dHJ1ZQ=="
+  ELASTICSEARCH_BATCHING_BATCHSIZE: "NTI0Mjg4MA=="
+  ELASTICSEARCH_BATCHING_FLUSHINTERVAL: "MXM="
+  ELASTICSEARCH_NUMBEROFSHARDS: "Mw=="
+  ELASTICSEARCH_NUMBEROFREPLICAS: "Mw=="
+  ELASTICSEARCH_CUSTOMHEADERS: ""
+  ELASTICSEARCH_MUTUALTLS: "ZmFsc2U="
+  ELASTICSEARCH_CHECKCERT: "dHJ1ZQ=="
+  ELASTICSEARCH_MINIMUMPRIORITY: ""
+
+  # Loki Output
+  LOKI_HOSTPORT: ""
+  LOKI_ENDPOINT: "L2xva2kvYXBpL3YxL3B1c2g="
+  LOKI_USER: ""
+  LOKI_APIKEY: ""
+  LOKI_TENANT: ""
+  LOKI_FORMAT: "dGV4dA=="
+  LOKI_EXTRALABELS: ""
+  LOKI_CUSTOMHEADERS: ""
+  LOKI_MINIMUMPRIORITY: ""
+  LOKI_MUTUALTLS: "ZmFsc2U="
+  LOKI_CHECKCERT: "dHJ1ZQ=="
+
+  # Prometheus Output
+  PROMETHEUS_EXTRALABELS: ""
+
+  # Nats Output
+  NATS_HOSTPORT: ""
+  NATS_SUBJECTTEMPLATE: "ZmFsY28uPHByaW9yaXR5Pi48cnVsZT4="
+  NATS_MINIMUMPRIORITY: ""
+  NATS_MUTUALTLS: "ZmFsc2U="
+  NATS_CHECKCERT: "dHJ1ZQ=="
+
+  # Stan Output
+  STAN_HOSTPORT: ""
+  STAN_CLUSTERID: ""
+  STAN_CLIENTID: ""
+  STAN_SUBJECTTEMPLATE: "ZmFsY28uPHByaW9yaXR5Pi48cnVsZT4="
+  STAN_MINIMUMPRIORITY: ""
+  STAN_MUTUALTLS: "ZmFsc2U="
+  STAN_CHECKCERT: "dHJ1ZQ=="
+
+  # Statsd Output
+  STATSD_FORWARDER: ""
+  STATSD_NAMESPACE: "ZmFsY29zaWRla2ljay4="
+
+  # Dogstatsd Output
+  DOGSTATSD_FORWARDER: ""
+  DOGSTATSD_NAMESPACE: "ZmFsY29zaWRla2ljay4="
+  DOGSTATSD_TAGS: ""
+
+  # WebHook Output
+  WEBHOOK_ADDRESS: ""
+  WEBHOOK_METHOD: "UE9TVA=="
+  WEBHOOK_CUSTOMHEADERS: ""
+  WEBHOOK_MINIMUMPRIORITY: ""
+  WEBHOOK_MUTUALTLS: "ZmFsc2U="
+  WEBHOOK_CHECKCERT: "dHJ1ZQ=="
+
+  # Azure Output
+  AZURE_EVENTHUB_NAME: ""
+  AZURE_EVENTHUB_NAMESPACE: ""
+  AZURE_EVENTHUB_MINIMUMPRIORITY: ""
+
+  # Kafka Output
+  KAFKA_HOSTPORT: ""
+  KAFKA_TOPIC: ""
+  KAFKA_SASL: ""
+  KAFKA_TLS: "ZmFsc2U="
+  KAFKA_USERNAME: ""
+  KAFKA_PASSWORD: ""
+  KAFKA_ASYNC: "ZmFsc2U="
+  KAFKA_REQUIREDACKS: "Tk9ORQ=="
+  KAFKA_COMPRESSION: "Tk9ORQ=="
+  KAFKA_BALANCER: "cm91bmRfcm9iaW4="
+  KAFKA_TOPICCREATION: "ZmFsc2U="
+  KAFKA_CLIENTID: ""
+  KAFKA_MINIMUMPRIORITY: ""
+
+  # PagerDuty Output
+  PAGERDUTY_ROUTINGKEY: ""
+  PAGERDUTY_REGION: "dXM="
+  PAGERDUTY_MINIMUMPRIORITY: ""
+
+  # Kubeless Output
+  KUBELESS_FUNCTION: ""
+  KUBELESS_NAMESPACE: ""
+  KUBELESS_PORT: "ODA4MA=="
+  KUBELESS_MINIMUMPRIORITY: ""
+  KUBELESS_MUTUALTLS: "ZmFsc2U="
+  KUBELESS_CHECKCERT: "dHJ1ZQ=="
+
+  # OpenFaaS Output
+  OPENFAAS_GATEWAYNAMESPACE: "b3BlbmZhYXM="
+  OPENFAAS_GATEWAYSERVICE: "Z2F0ZXdheQ=="
+  OPENFAAS_FUNCTIONNAME: ""
+  OPENFAAS_FUNCTIONNAMESPACE: "b3BlbmZhYXMtZm4="
+  OPENFAAS_GATEWAYPORT: "ODA4MA=="
+  OPENFAAS_MINIMUMPRIORITY: ""
+  OPENFAAS_MUTUALTLS: "ZmFsc2U="
+  OPENFAAS_CHECKCERT: "dHJ1ZQ=="
+
+  # Cloud Events Output
+  CLOUDEVENTS_ADDRESS: ""
+  CLOUDEVENTS_EXTENSION: ""
+  CLOUDEVENTS_MINIMUMPRIORITY: ""
+
+  # RabbitMQ Output
+  RABBITMQ_URL: ""
+  RABBITMQ_QUEUE: ""
+  RABBITMQ_MINIMUMPRIORITY: "ZGVidWc="
+
+  # Wavefront Output
+  WAVEFRONT_ENDPOINTTYPE: ""
+  WAVEFRONT_ENDPOINTHOST: ""
+  WAVEFRONT_ENDPOINTTOKEN: ""
+  WAVEFRONT_ENDPOINTMETRICPORT: "Mjg3OA=="
+  WAVEFRONT_FLUSHINTERVALSECONDS: "MQ=="
+  WAVEFRONT_BATCHSIZE: "MTAwMDA="
+  WAVEFRONT_METRICNAME: "ZmFsY28uYWxlcnQ="
+  WAVEFRONT_MINIMUMPRIORITY: "ZGVidWc="
+
+  # Grafana Output
+  GRAFANA_HOSTPORT: ""
+  GRAFANA_APIKEY: ""
+  GRAFANA_DASHBOARDID: ""
+  GRAFANA_PANELID: ""
+  GRAFANA_ALLFIELDSASTAGS: "ZmFsc2U="
+  GRAFANA_CUSTOMHEADERS: ""
+  GRAFANA_MUTUALTLS: "ZmFsc2U="
+  GRAFANA_CHECKCERT: "dHJ1ZQ=="
+  GRAFANA_MINIMUMPRIORITY: ""
+
+  # Grafana On Call Output
+  GRAFANAONCALL_WEBHOOKURL: ""
+  GRAFANAONCALL_CUSTOMHEADERS: ""
+  GRAFANAONCALL_CHECKCERT: "dHJ1ZQ=="
+  GRAFANAONCALL_MUTUALTLS: "ZmFsc2U="
+  GRAFANAONCALL_MINIMUMPRIORITY: ""
+
+  # Fission Output
+  FISSION_FUNCTION: ""
+  FISSION_ROUTERNAMESPACE: "Zmlzc2lvbg=="
+  FISSION_ROUTERSERVICE: "cm91dGVy"
+  FISSION_ROUTERPORT: "ODA="
+  FISSION_MINIMUMPRIORITY: ""
+  FISSION_MUTUALTLS: "ZmFsc2U="
+  FISSION_CHECKCERT: "dHJ1ZQ=="
+
+  # Yandex Output
+  YANDEX_ACCESSKEYID:  ""
+  YANDEX_SECRETACCESSKEY: ""
+  YANDEX_REGION: ""
+  YANDEX_S3_ENDPOINT: ""
+  YANDEX_S3_BUCKET: ""
+  YANDEX_S3_PREFIX: ""
+  YANDEX_S3_MINIMUMPRIORITY: ""
+  YANDEX_DATASTREAMS_ENDPOINT: ""
+  YANDEX_DATASTREAMS_STREAMNAME: ""
+  YANDEX_DATASTREAMS_MINIMUMPRIORITY: ""
+
+  # KafkaRest Output
+  KAFKAREST_ADDRESS: ""
+  KAFKAREST_VERSION: "Mg=="
+  KAFKAREST_MINIMUMPRIORITY: ""
+  KAFKAREST_MUTUALTLS: "ZmFsc2U="
+  KAFKAREST_CHECKCERT: "dHJ1ZQ=="
+
+  # Syslog Output
+  SYSLOG_HOST: ""
+  SYSLOG_PORT: ""
+  SYSLOG_PROTOCOL: "dGNw"
+  SYSLOG_FORMAT: "anNvbg=="
+  SYSLOG_MINIMUMPRIORITY: ""
+
+  # Zoho Cliq Output
+  CLIQ_WEBHOOKURL: ""
+  CLIQ_ICON: ""
+  CLIQ_USEEMOJI: "dHJ1ZQ=="
+  CLIQ_OUTPUTFORMAT: "YWxs"
+  CLIQ_MESSAGEFORMAT: ""
+  CLIQ_MINIMUMPRIORITY: ""
+
+  # Policy Reporter Output
+  POLICYREPORT_ENABLED: "ZmFsc2U="
+  POLICYREPORT_KUBECONFIG: "fi8ua3ViZS9jb25maWc="
+  POLICYREPORT_MAXEVENTS: "MTAwMA=="
+  POLICYREPORT_PRUNEBYPRIORITY: "ZmFsc2U="
+  POLICYREPORT_MINIMUMPRIORITY: ""
+
+  # Node Red Output
+  NODERED_ADDRESS: ""
+  NODERED_USER: ""
+  NODERED_PASSWORD: ""
+  NODERED_CUSTOMHEADERS: ""
+  NODERED_CHECKCERT: "dHJ1ZQ=="
+  NODERED_MINIMUMPRIORITY: ""
+
+  # MQTT Output
+  MQTT_BROKER: ""
+  MQTT_TOPIC: "ZmFsY28vZXZlbnRz"
+  MQTT_QOS: "MA=="
+  MQTT_RETAINED: "ZmFsc2U="
+  MQTT_USER: ""
+  MQTT_PASSWORD: ""
+  MQTT_CHECKCERT: "dHJ1ZQ=="
+  MQTT_MINIMUMPRIORITY: ""
+
+  # Zincsearch Output
+  ZINCSEARCH_HOSTPORT: ""
+  ZINCSEARCH_INDEX: "ZmFsY28="
+  ZINCSEARCH_USERNAME: ""
+  ZINCSEARCH_PASSWORD: ""
+  ZINCSEARCH_CHECKCERT: "dHJ1ZQ=="
+  ZINCSEARCH_MINIMUMPRIORITY: ""
+
+  # Gotify Output
+  GOTIFY_HOSTPORT: ""
+  GOTIFY_TOKEN: ""
+  GOTIFY_FORMAT: "bWFya2Rvd24="
+  GOTIFY_CHECKCERT: "dHJ1ZQ=="
+  GOTIFY_MINIMUMPRIORITY: ""
+
+  # Tekton Output
+  TEKTON_EVENTLISTENER: ""
+  TEKTON_CHECKCERT: "dHJ1ZQ=="
+  TEKTON_MINIMUMPRIORITY: ""
+
+  # Spyderbat Output
+  SPYDERBAT_ORGUID: ""
+  SPYDERBAT_APIKEY: ""
+  SPYDERBAT_APIURL: "aHR0cHM6Ly9hcGkuc3B5ZGVyYmF0LmNvbQ=="
+  SPYDERBAT_SOURCE: "ZmFsY29zaWRla2ljaw=="
+  SPYDERBAT_SOURCEDESCRIPTION: ""
+  SPYDERBAT_MINIMUMPRIORITY: ""
+
+  # TimescaleDB Output
+  TIMESCALEDB_HOST: ""
+  TIMESCALEDB_PORT: "NTQzMg=="
+  TIMESCALEDB_USER: "cG9zdGdyZXM="
+  TIMESCALEDB_PASSWORD: "cG9zdGdyZXM="
+  TIMESCALEDB_DATABASE: ""
+  TIMESCALEDB_HYPERTABLENAME: "ZmFsY29fZXZlbnRz"
+  TIMESCALEDB_MINIMUMPRIORITY: ""
+
+  # Redis Output
+  REDIS_ADDRESS: ""
+  REDIS_PASSWORD: ""
+  REDIS_DATABASE: "MA=="
+  REDIS_KEY: "ZmFsY28="
+  REDIS_STORAGETYPE: "bGlzdA=="
+  REDIS_MINIMUMPRIORITY: ""
+
+  # TELEGRAM Output
+  TELEGRAM_TOKEN: ""
+  TELEGRAM_CHATID: ""
+  TELEGRAM_MESSAGE_THREAD_ID: ""
+  TELEGRAM_MINIMUMPRIORITY: ""
+  TELEGRAM_CHECKCERT: "dHJ1ZQ=="
+
+  # N8N Output
+  N8N_ADDRESS: ""
+  N8N_USER: ""
+  N8N_PASSWORD: ""
+  N8N_MINIMUMPRIORITY: ""
+  N8N_CHECKCERT: "dHJ1ZQ=="
+
+  # Open Observe Output
+  OPENOBSERVE_HOSTPORT: ""
+  OPENOBSERVE_USERNAME: ""
+  OPENOBSERVE_PASSWORD: ""
+  OPENOBSERVE_CHECKCERT: "dHJ1ZQ=="
+  OPENOBSERVE_MUTUALTLS: "ZmFsc2U="
+  OPENOBSERVE_CUSTOMHEADERS: ""
+  OPENOBSERVE_ORGANIZATIONNAME: "ZGVmYXVsdA=="
+  OPENOBSERVE_STREAMNAME: "ZmFsY28="
+  OPENOBSERVE_MINIMUMPRIORITY: ""
+
+  # Dynatrace Output
+  DYNATRACE_APITOKEN: ""
+  DYNATRACE_APIURL: ""
+  DYNATRACE_CHECKCERT: "dHJ1ZQ=="
+  DYNATRACE_MINIMUMPRIORITY: ""
+
+  # OTLP Traces Output
+  OTLP_TRACES_ENDPOINT: ""
+  OTLP_TRACES_PROTOCOL: ""
+  OTLP_TRACES_TIMEOUT: "MTAwMA=="
+  OTLP_TRACES_HEADERS: ""
+  OTLP_TRACES_SYNCED: "ZmFsc2U="
+  OTLP_TRACES_DURATION: "MTAwMA=="
+  OTLP_TRACES_CHECKCERT: "dHJ1ZQ=="
+  OTLP_TRACES_MINIMUMPRIORITY: ""
+  # OTLP Metrics Output
+  OTLP_METRICS_ENDPOINT: ""
+  OTLP_METRICS_PROTOCOL: "Z3JwYw=="
+  OTLP_METRICS_TIMEOUT: "MTAwMA=="
+  OTLP_METRICS_HEADERS: ""
+  OTLP_METRICS_EXTRAATTRIBUTES: ""
+  OTLP_METRICS_CHECKCERT: "dHJ1ZQ=="
+  OTLP_METRICS_MINIMUMPRIORITY: ""
+
+  # Sumologic Output
+  SUMOLOGIC_RECEIVERURL: ""
+  SUMOLOGIC_SOURCECATEGORY: ""
+  SUMOLOGIC_SOURCEHOST: ""
+  SUMOLOGIC_NAME: ""
+  SUMOLOGIC_CHECKCERT: "dHJ1ZQ=="
+  SUMOLOGIC_MINIMUMPRIORITY: ""
+
+  # Quickwit Output
+  QUICKWIT_HOSTPORT: ""
+  QUICKWIT_APIENDPOINT: "L2FwaS92MQ=="
+  QUICKWIT_INDEX: "ZmFsY28="
+  QUICKWIT_AUTOCREATEINDEX: "ZmFsc2U="
+  QUICKWIT_CUSTOMHEADERS: ""
+  QUICKWIT_VERSION: "MC43"
+  QUICKWIT_CHECKCERT: "dHJ1ZQ=="
+  QUICKWIT_MUTUALTLS: "ZmFsc2U="
+  QUICKWIT_MINIMUMPRIORITY: ""
+
+  # Webex Output
+  WEBEX_WEBHOOKURL: ""
+  WEBEX_MINIMUMPRIORITY: ""
+
+  # Talon Output
+  TALON_ADDRESS: ""
+  TALON_CHECKCERT: "dHJ1ZQ=="
+  TALON_MINIMUMPRIORITY: ""
+  
+  # WebUI Output
+---
+# Source: falco/charts/falcosidekick/templates/falcosidekick-loki-dashboard-grafana.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: falcosidekick-loki-dashboard-grafana
+  namespace: falco
+  labels:
+    helm.sh/chart: falcosidekick-0.9.8
+    app.kubernetes.io/name: falcosidekick
+    app.kubernetes.io/instance: falco
+    app.kubernetes.io/version: "2.31.1"
+    app.kubernetes.io/part-of: falcosidekick
+    app.kubernetes.io/managed-by: Helm
+    grafana_dashboard: "1"
+data:
+  falcosidekick-loki-dashboard.json: |-
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "grafana",
+              "uid": "-- Grafana --"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "links": [],
+      "panels": [
+        {
+          "datasource": {
+            "default": false,
+            "type": "loki",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "mappings": []
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 0
+          },
+          "id": 1,
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "pieType": "pie",
+            "reduceOptions": {
+              "calcs": [
+                "sum"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.2.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "count by(priority) (rate({priority=~\".+\"} | logfmt | k8s_ns =~ `$namespace` [$__auto]))",
+              "legendFormat": "{{priority}}",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "Priority counts",
+          "type": "piechart"
+        },
+        {
+          "datasource": {
+            "default": false,
+            "type": "loki",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "mappings": []
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 0
+          },
+          "id": 2,
+          "options": {
+            "displayLabels": [
+              "value",
+              "percent"
+            ],
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true,
+              "values": []
+            },
+            "pieType": "pie",
+            "reduceOptions": {
+              "calcs": [
+                "sum"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.2.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "count by(rule) (rate({priority=~\".+\", rule!=\"Falco internal: metrics snapshot\"} | logfmt | k8s_ns =~ `$namespace` [$__auto]))",
+              "legendFormat": "{{priority}}",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "Rules counts",
+          "type": "piechart"
+        },
+        {
+          "datasource": {
+            "default": false,
+            "type": "loki",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "left",
+                "cellOptions": {
+                  "type": "auto",
+                  "wrapText": false
+                },
+                "filterable": true,
+                "inspect": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Value #A"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Number of Messages"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Time"
+                },
+                "properties": [
+                  {
+                    "id": "custom.hidden",
+                    "value": true
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "k8s_ns"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 96
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "priority"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 91
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "rule"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 450
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 8
+          },
+          "id": 5,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "countRows": false,
+              "enablePagination": false,
+              "fields": "",
+              "reducer": [
+                "last"
+              ],
+              "show": false
+            },
+            "showHeader": true,
+            "sortBy": []
+          },
+          "pluginVersion": "11.2.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "${datasource}"
+              },
+              "editorMode": "builder",
+              "expr": "count by(k8s_pod_name, rule, priority, k8s_ns) (rate({priority=~\".+\"} | logfmt | k8s_ns =~ `$namespace` [$__auto]))",
+              "legendFormat": "",
+              "queryType": "instant",
+              "refId": "A"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "sortBy",
+              "options": {
+                "fields": {},
+                "sort": [
+                  {
+                    "desc": true,
+                    "field": "Value #A"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "table"
+        },
+        {
+          "datasource": {
+            "default": false,
+            "type": "loki",
+            "uid": "${datasource}"
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 24,
+            "x": 0,
+            "y": 16
+          },
+          "id": 6,
+          "options": {
+            "dedupStrategy": "none",
+            "enableLogDetails": true,
+            "prettifyLogMessage": false,
+            "showCommonLabels": false,
+            "showLabels": false,
+            "showTime": false,
+            "sortOrder": "Descending",
+            "wrapLogMessage": false
+          },
+          "pluginVersion": "11.2.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "${datasource}"
+              },
+              "direction": "backward",
+              "editorMode": "builder",
+              "expr": "{priority=~\".+\"} | logfmt | k8s_ns =~ `$namespace`",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "Realtime logs",
+          "type": "logs"
+        },
+        {
+          "datasource": {
+            "default": false,
+            "type": "loki",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 100,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "stepBefore",
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "lineWidth": 1,
+                "pointSize": 4,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "normal"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "fieldMinMax": false,
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 23
+          },
+          "id": 7,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "loki"
+              },
+              "editorMode": "builder",
+              "expr": "count by(priority) (rate({priority=~\".+\"} | logfmt | k8s_ns =~ `$namespace` [1m]))",
+              "legendFormat": "{{priority}}",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "Priorities Rates",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "default": false,
+            "type": "loki",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 100,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "stepBefore",
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "lineWidth": 1,
+                "pointSize": 4,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "normal"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "fieldMinMax": false,
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 23
+          },
+          "id": 8,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "loki"
+              },
+              "editorMode": "builder",
+              "expr": "count by(rule) (rate({priority=~\".+\"} | logfmt | k8s_ns =~ `$namespace` [1m]))",
+              "legendFormat": "{{priority}}",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "Rules Rates",
+          "type": "timeseries"
+        }
+      ],
+      "refresh": "auto",
+      "schemaVersion": 39,
+      "tags": [],
+      "templating": {
+        "list": [
+          {
+            "allValue": "",
+            "current": {
+              "selected": true,
+              "text": [
+                "arr",
+                "core",
+                "falco",
+                "kube-system",
+                "media",
+                "monitoring",
+                "storage",
+                "utilities",
+                "webs"
+              ],
+              "value": [
+                "arr",
+                "core",
+                "falco",
+                "kube-system",
+                "media",
+                "monitoring",
+                "storage",
+                "utilities",
+                "webs"
+              ]
+            },
+            "datasource": {
+              "type": "loki",
+              "uid": "${datasource}"
+            },
+            "definition": "",
+            "description": "",
+            "hide": 0,
+            "includeAll": false,
+            "label": "namespace",
+            "multi": true,
+            "name": "namespace",
+            "options": [],
+            "query": {
+              "label": "namespace",
+              "refId": "LokiVariableQueryEditor-VariableQuery",
+              "stream": "",
+              "type": 1
+            },
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+          },
+          {
+            "current": {
+              "selected": true,
+              "text": "Loki",
+              "value": "loki"
+            },
+            "hide": 0,
+            "includeAll": false,
+            "label": "datasource",
+            "multi": false,
+            "name": "datasource",
+            "options": [],
+            "query": "loki",
+            "queryValue": "",
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "type": "datasource"
+          }
+        ]
+      },
+      "time": {
+        "from": "now-30m",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "browser",
+      "title": "Falco logs",
+      "uid": "de6ixj4nl1kowc",
+      "version": 3,
+      "weekStart": ""
+    }
+---
+# Source: falco/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: falco
+  namespace: falco
+  labels:
+    helm.sh/chart: falco-4.20.0
+    app.kubernetes.io/name: falco
+    app.kubernetes.io/instance: falco
+    app.kubernetes.io/version: "0.40.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  falco.yaml: |-
+    append_output: []
+    base_syscalls:
+      custom_set: []
+      repair: false
+    buffered_outputs: false
+    config_files:
+    - /etc/falco/config.d
+    container_engines:
+      bpm:
+        enabled: false
+      cri:
+        enabled: true
+        sockets:
+        - /run/containerd/containerd.sock
+        - /run/crio/crio.sock
+      docker:
+        enabled: true
+      libvirt_lxc:
+        enabled: false
+      lxc:
+        enabled: false
+      podman:
+        enabled: false
+    engine:
+      kind: kmod
+      kmod:
+        buf_size_preset: 4
+        drop_failed_exit: false
+    falco_libs:
+      thread_table_size: 262144
+    file_output:
+      enabled: false
+      filename: ./events.txt
+      keep_alive: false
+    grpc:
+      bind_address: unix:///var/run/falco/falco.sock
+      enabled: true
+      threadiness: 8
+    grpc_output:
+      enabled: true
+    http_output:
+      ca_bundle: ""
+      ca_cert: ""
+      ca_path: /etc/falco/certs/
+      client_cert: /etc/falco/certs/client/client.crt
+      client_key: /etc/falco/certs/client/client.key
+      compress_uploads: false
+      echo: false
+      enabled: true
+      insecure: false
+      keep_alive: false
+      mtls: false
+      url: http://falco-falcosidekick:2801
+      user_agent: falcosecurity/falco
+    json_include_message_property: false
+    json_include_output_property: true
+    json_include_tags_property: true
+    json_output: true
+    libs_logger:
+      enabled: false
+      severity: debug
+    load_plugins: []
+    log_level: info
+    log_stderr: true
+    log_syslog: true
+    metrics:
+      convert_memory_to_mb: true
+      enabled: true
+      include_empty_values: false
+      interval: 15m
+      kernel_event_counters_enabled: true
+      kernel_event_counters_per_cpu_enabled: false
+      libbpf_stats_enabled: true
+      output_rule: false
+      resource_utilization_enabled: true
+      rules_counters_enabled: true
+      state_counters_enabled: true
+    output_timeout: 2000
+    outputs_queue:
+      capacity: 0
+    plugins:
+    - init_config: null
+      library_path: libk8saudit.so
+      name: k8saudit
+      open_params: http://:9765/k8s-audit
+    - library_path: libcloudtrail.so
+      name: cloudtrail
+    - init_config: ""
+      library_path: libjson.so
+      name: json
+    priority: debug
+    program_output:
+      enabled: false
+      keep_alive: false
+      program: 'jq ''{text: .output}'' | curl -d @- -X POST https://hooks.slack.com/services/XXX'
+    rule_matching: first
+    rules_files:
+    - /etc/falco/falco_rules.yaml
+    - /etc/falco/falco_rules.local.yaml
+    - /etc/falco/rules.d
+    stdout_output:
+      enabled: true
+    syscall_event_drops:
+      actions:
+      - ignore
+      max_burst: 1
+      rate: 0.03333
+      simulate_drops: false
+      threshold: 0.1
+    syscall_event_timeouts:
+      max_consecutives: 1000
+    syslog_output:
+      enabled: true
+    time_format_iso_8601: false
+    watch_config_files: true
+    webserver:
+      enabled: true
+      k8s_healthz_endpoint: /healthz
+      listen_port: 8765
+      prometheus_metrics_enabled: true
+      ssl_certificate: /etc/falco/falco.pem
+      ssl_enabled: false
+      threadiness: 0
+---
+# Source: falco/templates/falco-dashboard-grafana.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: falco-grafana-dashboard
+  namespace: falco
+  labels:
+    helm.sh/chart: falco-4.20.0
+    app.kubernetes.io/name: falco
+    app.kubernetes.io/instance: falco
+    app.kubernetes.io/version: "0.40.0"
+    app.kubernetes.io/managed-by: Helm
+    grafana_dashboard: "1"
+data:
+  falco-dashboard.json: |-
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "grafana",
+              "uid": "-- Grafana --"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "description": "Falco is a cloud-native security tool designed for Linux systems. It employs custom rules on kernel events, which are enriched with container and Kubernetes metadata, to provide real-time alerts. Falco helps you gain visibility into abnormal behavior, potential security threats, and compliance violations, contributing to comprehensive runtime security.",
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 1,
+      "id": 41,
+      "links": [],
+      "panels": [
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 7,
+          "panels": [],
+          "title": "Events",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "mappings": [],
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 9,
+            "x": 0,
+            "y": 1
+          },
+          "id": 1,
+          "options": {
+            "displayLabels": [
+              "name"
+            ],
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "pieType": "donut",
+            "reduceOptions": {
+              "calcs": [
+                "sum"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "11.3.0-77222",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(rule_name) (increase(falcosecurity_falco_rules_matches_total{source=~\"$source\", priority=~\"$priority\", pod=~\"$pod\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{rule_name}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "Rules",
+          "type": "piechart"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "mappings": [],
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 8,
+            "x": 9,
+            "y": 1
+          },
+          "id": 2,
+          "options": {
+            "displayLabels": [
+              "name"
+            ],
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "pieType": "donut",
+            "reduceOptions": {
+              "calcs": [
+                "sum"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "11.3.0-77222",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(source) (increase(falcosecurity_falco_rules_matches_total{source=~\"$source\", priority=~\"$priority\", pod=~\"$pod\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "includeNullMetadata": false,
+              "instant": false,
+              "legendFormat": "{{source}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "Sources",
+          "type": "piechart"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "fieldMinMax": false,
+              "mappings": [],
+              "unit": "none"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "error"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "semi-dark-red",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "critical"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "dark-orange",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "notice"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "semi-dark-blue",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "warning"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "orange",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 7,
+            "x": 17,
+            "y": 1
+          },
+          "id": 3,
+          "options": {
+            "displayLabels": [
+              "name"
+            ],
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "pieType": "donut",
+            "reduceOptions": {
+              "calcs": [
+                "sum"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "11.3.0-77222",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(priority) (increase(falcosecurity_falco_rules_matches_total{source=~\"$source\", priority=~\"$priority\", pod=~\"$pod\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{priority}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "Priorities",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "0",
+                "renamePattern": "default"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "1",
+                "renamePattern": "debug"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "2",
+                "renamePattern": "informational"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "3",
+                "renamePattern": "notice"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "4",
+                "renamePattern": "warning"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "5",
+                "renamePattern": "error"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "6",
+                "renamePattern": "critical"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "7",
+                "renamePattern": "alert"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "8",
+                "renamePattern": "emergency"
+              }
+            }
+          ],
+          "type": "piechart"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.5,
+                "drawStyle": "bars",
+                "fillOpacity": 100,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "normal"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "fieldMinMax": false,
+              "mappings": [],
+              "min": 0.01,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 14,
+            "w": 12,
+            "x": 0,
+            "y": 10
+          },
+          "id": 5,
+          "options": {
+            "legend": {
+              "calcs": [
+                "max",
+                "lastNotNull"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true,
+              "sortBy": "Max",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.3.0-77222",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(priority) (increase(falcosecurity_falco_rules_matches_total{source=~\"$source\", priority=~\"$priority\", pod=~\"$pod\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "interval": "1m",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "by Priority over time",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "0",
+                "renamePattern": "default"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "1",
+                "renamePattern": "debug"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "2",
+                "renamePattern": "informational"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "3",
+                "renamePattern": "notice"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "4",
+                "renamePattern": "warning"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "5",
+                "renamePattern": "error"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "6",
+                "renamePattern": "critical"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "7",
+                "renamePattern": "alert"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "8",
+                "renamePattern": "emergency"
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.5,
+                "drawStyle": "bars",
+                "fillOpacity": 100,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "normal"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 0,
+              "fieldMinMax": false,
+              "mappings": [],
+              "min": 0.01,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 14,
+            "w": 12,
+            "x": 12,
+            "y": 10
+          },
+          "id": 18,
+          "options": {
+            "legend": {
+              "calcs": [
+                "max",
+                "lastNotNull"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.3.0-77222",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(source) (increase(falcosecurity_falco_rules_matches_total{source=~\"$source\", priority=~\"$priority\", pod=~\"$pod\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "interval": "1m",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "by Source over time",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "0",
+                "renamePattern": "default"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "1",
+                "renamePattern": "debug"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "2",
+                "renamePattern": "informational"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "3",
+                "renamePattern": "notice"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "4",
+                "renamePattern": "warning"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "5",
+                "renamePattern": "error"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "6",
+                "renamePattern": "critical"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "7",
+                "renamePattern": "alert"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "8",
+                "renamePattern": "emergency"
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.5,
+                "drawStyle": "bars",
+                "fillOpacity": 100,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "normal"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "fieldMinMax": false,
+              "mappings": [],
+              "min": 0.01,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 15,
+            "w": 24,
+            "x": 0,
+            "y": 24
+          },
+          "id": 19,
+          "options": {
+            "legend": {
+              "calcs": [
+                "max",
+                "lastNotNull"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true,
+              "sortBy": "Last *",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "11.3.0-77222",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(rule_name) (increase(falcosecurity_falco_rules_matches_total{source=~\"$source\", priority=~\"$priority\", pod=~\"$pod\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "interval": "1m",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "by Rule over time",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "0",
+                "renamePattern": "default"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "1",
+                "renamePattern": "debug"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "2",
+                "renamePattern": "informational"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "3",
+                "renamePattern": "notice"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "4",
+                "renamePattern": "warning"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "5",
+                "renamePattern": "error"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "6",
+                "renamePattern": "critical"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "7",
+                "renamePattern": "alert"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "8",
+                "renamePattern": "emergency"
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 39
+          },
+          "id": 8,
+          "panels": [],
+          "title": "Performances",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "total"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "dark-red",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "total"
+                },
+                "properties": [
+                  {
+                    "id": "custom.lineStyle",
+                    "value": {
+                      "dash": [
+                        10,
+                        10
+                      ],
+                      "fill": "dash"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 40
+          },
+          "id": 9,
+          "options": {
+            "legend": {
+              "calcs": [
+                "min",
+                "max",
+                "lastNotNull"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.3.0-77222",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "exemplar": false,
+              "expr": "sum by(pod) (increase(falcosecurity_scap_n_evts_total{pod=~\"$pod\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "hide": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "interval": "1m",
+              "legendFormat": "{{pod}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "exemplar": false,
+              "expr": "sum(irate(falcosecurity_falco_n_evts_total[$__interval]))",
+              "fullMetaSearch": false,
+              "hide": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "interval": "1m",
+              "legendFormat": "total",
+              "range": true,
+              "refId": "B",
+              "useBackend": false
+            }
+          ],
+          "title": "Scap events by instance over time",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "decbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 12,
+            "x": 0,
+            "y": 50
+          },
+          "id": 10,
+          "options": {
+            "legend": {
+              "calcs": [
+                "min",
+                "max",
+                "mean",
+                "last"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.3.0-77222",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "avg by(pod, raw_name) (falcosecurity_falco_memory_rss_bytes{pod=~\"$pod\"})",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "Memory RSS",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "decbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 12,
+            "x": 12,
+            "y": 50
+          },
+          "id": 13,
+          "options": {
+            "legend": {
+              "calcs": [
+                "min",
+                "max",
+                "mean",
+                "last"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "sortBy": "Last",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.3.0-77222",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "avg by(pod, raw_name) (falcosecurity_falco_memory_vsz_bytes{pod=~\"$pod\"})",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}} - {{raw_name}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "avg by(pod, raw_name) (falcosecurity_falco_memory_vsz_bytes)",
+              "fullMetaSearch": false,
+              "hide": true,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}}",
+              "range": true,
+              "refId": "B",
+              "useBackend": false
+            }
+          ],
+          "title": "Memory VSZ",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 24,
+            "x": 0,
+            "y": 62
+          },
+          "id": 11,
+          "options": {
+            "legend": {
+              "calcs": [
+                "min",
+                "max",
+                "mean",
+                "last"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.3.0-77222",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "avg by(pod) (falcosecurity_falco_cpu_usage_ratio{pod=~\"$pod\"})",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "CPU",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 12,
+            "x": 0,
+            "y": 74
+          },
+          "id": 14,
+          "options": {
+            "legend": {
+              "calcs": [
+                "min",
+                "max",
+                "mean",
+                "last"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.3.0-77222",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_total{pod=~\"$pod\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "Scap Drops total",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 12,
+            "x": 12,
+            "y": 74
+          },
+          "id": 24,
+          "options": {
+            "legend": {
+              "calcs": [
+                "min",
+                "max",
+                "mean",
+                "last"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.3.0-77222",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(pod) (increase(falcosecurity_falco_outputs_queue_num_drops_total{pod=~\"$pod\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "Queue Drops",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 16,
+            "w": 12,
+            "x": 0,
+            "y": 86
+          },
+          "id": 20,
+          "options": {
+            "legend": {
+              "calcs": [
+                "max",
+                "mean"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "sortBy": "Max",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.3.0-77222",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"enter\", drop=\"clone_fork\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}} - clone_fork",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"enter\", drop=\"connect\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "hide": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}} - connect",
+              "range": true,
+              "refId": "B",
+              "useBackend": false
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"enter\", drop=\"dir_file\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "hide": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}} - dir_file",
+              "range": true,
+              "refId": "C",
+              "useBackend": false
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"enter\", drop=\"execve\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "hide": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}} - execve",
+              "range": true,
+              "refId": "D",
+              "useBackend": false
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"enter\", drop=\"open\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "hide": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}} - open",
+              "range": true,
+              "refId": "E",
+              "useBackend": false
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"enter\", drop=\"other_interest\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "hide": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}} - other_interest",
+              "range": true,
+              "refId": "F",
+              "useBackend": false
+            }
+          ],
+          "title": "Scap Drops Buffer Enter",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 16,
+            "w": 12,
+            "x": 12,
+            "y": 86
+          },
+          "id": 26,
+          "options": {
+            "legend": {
+              "calcs": [
+                "max",
+                "mean"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "sortBy": "Max",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.3.0-77222",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"exit\", drop=\"clone_fork\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}} - clone_fork",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"exit\", drop=\"connect\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "hide": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}} - connect",
+              "range": true,
+              "refId": "B",
+              "useBackend": false
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"exit\", drop=\"dir_file\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "hide": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}} - dir_file",
+              "range": true,
+              "refId": "C",
+              "useBackend": false
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"exit\", drop=\"execve\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "hide": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}} - execve",
+              "range": true,
+              "refId": "D",
+              "useBackend": false
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"exit\", drop=\"open\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "hide": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}} - open",
+              "range": true,
+              "refId": "E",
+              "useBackend": false
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_buffer_total{pod=~\"$pod\", dir=\"exit\", drop=\"other_interest\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "hide": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}} - other_interest",
+              "range": true,
+              "refId": "F",
+              "useBackend": false
+            }
+          ],
+          "title": "Scap Drops Buffer Exit",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 8,
+            "x": 0,
+            "y": 102
+          },
+          "id": 21,
+          "options": {
+            "legend": {
+              "calcs": [
+                "max",
+                "mean"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.3.0-77222",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_cpu_total{pod=~\"$pod\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "Scap Drops CPU",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 8,
+            "x": 8,
+            "y": 102
+          },
+          "id": 22,
+          "options": {
+            "legend": {
+              "calcs": [
+                "max",
+                "mean"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.3.0-77222",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_full_threadtable_total{pod=~\"$pod\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "Scap Drops Full Threadtable",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 8,
+            "x": 16,
+            "y": 102
+          },
+          "id": 23,
+          "options": {
+            "legend": {
+              "calcs": [
+                "max",
+                "mean"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.3.0-77222",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "sum by(pod) (increase(falcosecurity_scap_n_drops_scratch_map_total{pod=~\"$pod\"}[$__rate_interval]))",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "{{pod}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "Scap Drops Scratch Map",
+          "type": "timeseries"
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 114
+          },
+          "id": 15,
+          "panels": [],
+          "title": "Fleet",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "mappings": []
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 6,
+            "x": 0,
+            "y": 115
+          },
+          "id": 16,
+          "options": {
+            "displayLabels": [
+              "name",
+              "value"
+            ],
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true,
+              "values": []
+            },
+            "pieType": "pie",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.3.0-77222",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "count by(version) (falcosecurity_falco_version_info{pod=~\"$pod\"})",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "Versions",
+          "type": "piechart"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "mappings": []
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 6,
+            "x": 6,
+            "y": 115
+          },
+          "id": 17,
+          "options": {
+            "displayLabels": [
+              "name",
+              "value"
+            ],
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true,
+              "values": []
+            },
+            "pieType": "pie",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.3.0-77222",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "count by(engine_name) (falcosecurity_scap_engine_name_info{pod=~\"$pod\"})",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "Engines",
+          "type": "piechart"
+        }
+      ],
+      "preload": false,
+      "refresh": "",
+      "schemaVersion": 40,
+      "tags": [
+        "falco",
+        "kubernetes",
+        "security"
+      ],
+      "templating": {
+        "list": [
+          {
+            "current": {
+              "text": "grafanacloud-issif-prom",
+              "value": "grafanacloud-prom"
+            },
+            "name": "datasource",
+            "options": [],
+            "query": "prometheus",
+            "refresh": 1,
+            "regex": "",
+            "type": "datasource"
+          },
+          {
+            "current": {
+              "text": [
+                "All"
+              ],
+              "value": [
+                "$__all"
+              ]
+            },
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${datasource}"
+            },
+            "definition": "label_values(falcosecurity_falco_cpu_usage_ratio,namespace)",
+            "includeAll": true,
+            "multi": true,
+            "name": "namespace",
+            "options": [],
+            "query": {
+              "qryType": 1,
+              "query": "label_values(falcosecurity_falco_cpu_usage_ratio,namespace)",
+              "refId": "PrometheusVariableQueryEditor-VariableQuery"
+            },
+            "refresh": 1,
+            "regex": "",
+            "type": "query"
+          },
+          {
+            "current": {
+              "text": [
+                "All"
+              ],
+              "value": [
+                "$__all"
+              ]
+            },
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${datasource}"
+            },
+            "definition": "label_values(falcosecurity_falco_cpu_usage_ratio{namespace=~\"$namespace\"},pod)",
+            "includeAll": true,
+            "multi": true,
+            "name": "pod",
+            "options": [],
+            "query": {
+              "qryType": 1,
+              "query": "label_values(falcosecurity_falco_cpu_usage_ratio{namespace=~\"$namespace\"},pod)",
+              "refId": "PrometheusVariableQueryEditor-VariableQuery"
+            },
+            "refresh": 2,
+            "regex": "",
+            "sort": 1,
+            "type": "query"
+          },
+          {
+            "current": {
+              "text": [
+                "All"
+              ],
+              "value": [
+                "$__all"
+              ]
+            },
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${datasource}"
+            },
+            "definition": "label_values(falcosecurity_falco_rules_matches_total{namespace=~\"$namespace\", pod=~\"$pod\"},source)",
+            "includeAll": true,
+            "label": "source",
+            "multi": true,
+            "name": "source",
+            "options": [],
+            "query": {
+              "qryType": 1,
+              "query": "label_values(falcosecurity_falco_rules_matches_total{namespace=~\"$namespace\", pod=~\"$pod\"},source)",
+              "refId": "PrometheusVariableQueryEditor-VariableQuery"
+            },
+            "refresh": 2,
+            "regex": "",
+            "sort": 4,
+            "type": "query"
+          },
+          {
+            "current": {
+              "text": [
+                "All"
+              ],
+              "value": [
+                "$__all"
+              ]
+            },
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${datasource}"
+            },
+            "definition": "label_values(falcosecurity_falco_rules_matches_total{namespace=~\"$namespace\", source=~\"$source\"},priority)",
+            "includeAll": true,
+            "label": "priority",
+            "multi": true,
+            "name": "priority",
+            "options": [],
+            "query": {
+              "qryType": 1,
+              "query": "label_values(falcosecurity_falco_rules_matches_total{namespace=~\"$namespace\", source=~\"$source\"},priority)",
+              "refId": "PrometheusVariableQueryEditor-VariableQuery"
+            },
+            "refresh": 2,
+            "regex": "",
+            "sort": 4,
+            "type": "query"
+          }
+        ]
+      },
+      "time": {
+        "from": "now-24h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "browser",
+      "title": "Falco",
+      "uid": "ddwe2ug4nfi0wb",
+      "version": 46,
+      "weekStart": ""
+    }
+---
+# Source: falco/templates/falcoctl-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: falco-falcoctl
+  namespace: falco
+  labels:
+    helm.sh/chart: falco-4.20.0
+    app.kubernetes.io/name: falco
+    app.kubernetes.io/instance: falco
+    app.kubernetes.io/version: "0.40.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  falcoctl.yaml: |-
+    artifact:
+      allowedTypes:
+      - rulesfile
+      - plugin
+      follow:
+        every: 6h
+        falcoversions: http://localhost:8765/versions
+        pluginsDir: /plugins
+        refs:
+        - falco-rules:3
+        rulesfilesDir: /rulesfiles
+      install:
+        pluginsDir: /plugins
+        refs:
+        - falco-rules:3.0.1
+        resolveDeps: true
+        rulesfilesDir: /rulesfiles
+    indexes:
+    - name: falcosecurity
+      url: https://falcosecurity.github.io/falcoctl/index.yaml
+---
+# Source: falco/templates/rules-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: falco-rules
+  namespace: falco
+  labels:
+    helm.sh/chart: falco-4.20.0
+    app.kubernetes.io/name: falco
+    app.kubernetes.io/instance: falco
+    app.kubernetes.io/version: "0.40.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  overwrites.yaml: |-
+    # Dropping these rules since they are a relatively weak indication of intrusion.
+    # They would also require a significant amount of tuning before they are really useful.
+    - rule: Read sensitive file trusted after startup
+      enabled: false
+      override:
+        enabled: replace
+    - rule: Read sensitive file untrusted
+      enabled: false
+      override:
+        enabled: replace
+    
+    # Dropping these rules since they produce significant spam due to false positives.
+    # For the same reasons they are also not a strong indication of intrusion.
+    - rule: Terminal shell in container
+      enabled: false
+      override:
+        enabled: replace
+    - rule: Contact K8S API Server From Container
+      enabled: false
+      override:
+        enabled: replace
+    - rule: Redirect STDOUT/STDIN to Network Connection in Container
+      enabled: false
+      override:
+        enabled: replace
+    
+    # This will be added in a later falco rules version as well
+    # The fix was added upstream here (with a new condition): https://github.com/falcosecurity/rules/pull/177
+    - macro: allowed_clear_log_files
+      condition: or (
+          proc.name = containerd and (
+            fd.name startswith "/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/" or
+            fd.name startswith "/var/lib/containerd/tmpmounts/"
+          )
+        ) or (
+          proc.name = nvidia-installe and
+          fd.name startswith "/var/log/nvidia-installer.log"
+        )
+      override:
+        condition: append
+    
+    # Adding a repository to this list will add an exception to the rules:
+    # Run shell untrusted
+    - list: trusted_image_repositories
+      items:
+        - docker.io/calico/ctl
+        - docker.io/elastisys/curl-jq
+        - docker.io/jaegertracing/jaeger-operator
+        - docker.io/kiwigrid/k8s-sidecar
+        - docker.io/library/rabbitmq
+        - docker.io/openpolicyagent/gatekeeper
+        - docker.io/openpolicyagent/gatekeeper-crds
+        - docker.io/rabbitmqoperator/cluster-operator
+        - docker.io/rook/ceph
+        - docker.io/velero/velero
+        - gcr.io/k8s-staging-multitenancy/hnc-manager
+        - gcr.io/tekton-releases/github.com/tektoncd/dashboard/cmd/dashboard
+        - gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/controller
+        - gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/resolvers
+        - gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/webhook
+        - ghcr.io/dexidp/dex
+        - ghcr.io/elastisys/argocd-managed-namespaces-manager
+        - ghcr.io/elastisys/calico-accountant
+        - ghcr.io/elastisys/fluentd
+        - ghcr.io/elastisys/logical-backup
+        - ghcr.io/elastisys/spilo-15
+        - ghcr.io/elastisys/spilo-16
+        - ghcr.io/kiwigrid/k8s-sidecar
+        - ghcr.io/kubereboot/kured
+        - mcr.microsoft.com/k8s/azureserviceoperator
+        - mirror.gcr.io/aquasec/node-collector
+        - mirror.gcr.io/aquasec/trivy
+        - mirror.gcr.io/aquasec/trivy-operator
+        - quay.io/argoproj/argocd
+        - quay.io/calico/apiserver
+        - quay.io/calico/cni
+        - quay.io/calico/kube-controllers
+        - quay.io/calico/node
+        - quay.io/calico/typha
+        - quay.io/ceph/ceph
+        - quay.io/cephcsi/cephcsi
+        - quay.io/jetstack/cert-manager-controller
+        - quay.io/jetstack/cert-manager-webhook
+        - quay.io/kiwigrid/k8s-sidecar
+        - quay.io/metallb/controller
+        - quay.io/prometheus/prometheus
+        - quay.io/tigera/operator
+        - registry.k8s.io/autoscaling/cluster-autoscaler
+        - registry.k8s.io/capi-openstack/capi-openstack-controller
+        - registry.k8s.io/cluster-api-azure/cluster-api-azure-controller
+        - registry.k8s.io/cluster-api/cluster-api-controller
+        - registry.k8s.io/cluster-api/kubeadm-bootstrap-controller
+        - registry.k8s.io/cluster-api/kubeadm-control-plane-controller
+        - registry.k8s.io/ingress-nginx/controller
+        - registry.k8s.io/ingress-nginx/controller-chroot
+        - registry.k8s.io/kube-state-metrics/kube-state-metrics
+        - registry.k8s.io/sig-storage/csi-attacher
+        - registry.k8s.io/sig-storage/csi-provisioner
+        - registry.k8s.io/sig-storage/csi-resizer
+        - registry.k8s.io/sig-storage/csi-snapshotter
+    
+    # Run shell untrusted
+    - macro: user_shell_container_exclusions
+      condition: ( container.image.repository in (trusted_image_repositories) )
+    # Drop and execute new binary in container
+    - list: known_drop_and_execute_containers
+      items:
+        - ghcr.io/elastisys/calico-accountant
+      override:
+        items: append
+---
+# Source: falco/charts/falcosidekick/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: falco-falcosidekick
+  namespace: falco
+  labels:
+    helm.sh/chart: falcosidekick-0.9.8
+    app.kubernetes.io/name: falcosidekick
+    app.kubernetes.io/instance: falco
+    app.kubernetes.io/version: "2.31.1"
+    app.kubernetes.io/part-of: falcosidekick
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: core
+  annotations:
+rules:
+- apiGroups:
+    - ""
+  resources:
+    - endpoints
+  verbs:
+    - get
+---
+# Source: falco/charts/falcosidekick/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: falco-falcosidekick
+  namespace: falco
+  labels:
+    helm.sh/chart: falcosidekick-0.9.8
+    app.kubernetes.io/name: falcosidekick
+    app.kubernetes.io/instance: falco
+    app.kubernetes.io/version: "2.31.1"
+    app.kubernetes.io/part-of: falcosidekick
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: core
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: falco-falcosidekick
+subjects:
+- kind: ServiceAccount
+  name: falco-falcosidekick
+---
+# Source: falco/charts/falcosidekick/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: falco-falcosidekick
+  namespace: falco
+  labels:
+    helm.sh/chart: falcosidekick-0.9.8
+    app.kubernetes.io/name: falcosidekick
+    app.kubernetes.io/instance: falco
+    app.kubernetes.io/version: "2.31.1"
+    app.kubernetes.io/part-of: falcosidekick
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: core
+  annotations:
+    prometheus.io/scrape: "true"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 2801
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: 2810
+      targetPort: http-notls
+      protocol: TCP
+      name: http-notls
+  selector:
+    app.kubernetes.io/name: falcosidekick
+    app.kubernetes.io/instance: falco
+    app.kubernetes.io/component: core
+---
+# Source: falco/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: falco-metrics
+  namespace: falco
+  labels:
+    helm.sh/chart: falco-4.20.0
+    app.kubernetes.io/name: falco
+    app.kubernetes.io/instance: falco
+    app.kubernetes.io/version: "0.40.0"
+    app.kubernetes.io/managed-by: Helm
+    type: "falco-metrics"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8765
+      targetPort: 8765
+      protocol: TCP
+      name: "metrics"
+  selector:
+    app.kubernetes.io/name: falco
+    app.kubernetes.io/instance: falco
+---
+# Source: falco/templates/daemonset.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: falco
+  namespace: falco
+  labels:
+    helm.sh/chart: falco-4.20.0
+    app.kubernetes.io/name: falco
+    app.kubernetes.io/instance: falco
+    app.kubernetes.io/version: "0.40.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: falco
+      app.kubernetes.io/instance: falco
+  template:
+    metadata:
+      name: falco
+      labels:
+        app.kubernetes.io/name: falco
+        app.kubernetes.io/instance: falco
+      annotations:
+        checksum/config: 6d6be1023d871f9b2415fdedc63d5505a9dc7be2427a9ffb5ffa6fa8a7627220
+        checksum/rules: 7270c083a740cd204791bf2d61154c319d54f951dc372afaef9e09879b301282
+        checksum/certs: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    spec:
+      serviceAccountName: falco
+      securityContext:
+        runAsUser: 0
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+      containers:
+        - name: falco
+          image: docker.io/falcosecurity/falco:0.40.0-debian
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 200m
+              memory: 500Mi
+            requests:
+              cpu: 100m
+              memory: 150Mi
+          securityContext:
+            allowPrivilegeEscalation: true
+            privileged: true
+          args:
+            - /usr/bin/falco        
+            - -pk
+          env:
+            - name: HOST_ROOT
+              value: /host
+            - name: FALCO_HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: FALCO_K8S_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          tty: true
+          ports:
+            - containerPort: 8765
+              name: web
+              protocol: TCP
+          livenessProbe:
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+            periodSeconds: 15
+            httpGet:
+              path: /healthz
+              port: 8765
+          readinessProbe:
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+            periodSeconds: 15
+            httpGet:
+              path: /healthz
+              port: 8765
+          volumeMounts:
+            - mountPath: /etc/falco
+              name: rulesfiles-install-dir
+            - mountPath: /usr/share/falco/plugins
+              name: plugins-install-dir
+            - mountPath: /etc/falco/config.d
+              name: specialized-falco-configs
+            - mountPath: /root/.falco
+              name: root-falco-fs
+            - mountPath: /host/proc
+              name: proc-fs
+            - mountPath: /host/etc
+              name: etc-fs
+              readOnly: true
+            - mountPath: /host/dev
+              name: dev-fs
+              readOnly: true
+            - name: sys-fs
+              mountPath: /sys/module
+            - mountPath: /host/var/run/
+              name: docker-socket
+            - mountPath: /host/run/containerd/
+              name: containerd-socket
+            - mountPath: /host/run/crio/
+              name: crio-socket
+            - mountPath: /etc/falco/falco.yaml
+              name: falco-yaml
+              subPath: falco.yaml
+            - mountPath: /etc/falco/rules.d
+              name: rules-volume
+            
+            - mountPath: /var/run/falco
+              name: grpc-socket-dir
+      initContainers:
+        - name: falco-driver-loader
+          image: docker.io/falcosecurity/falco-driver-loader:0.40.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - kmod
+          securityContext:
+            allowPrivilegeEscalation: true
+            privileged: true
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /root/.falco
+              name: root-falco-fs
+            - mountPath: /host/proc
+              name: proc-fs
+              readOnly: true
+            - mountPath: /host/boot
+              name: boot-fs
+              readOnly: true
+            - mountPath: /host/lib/modules
+              name: lib-modules
+            - mountPath: /host/usr
+              name: usr-fs
+              readOnly: true
+            - mountPath: /host/etc
+              name: etc-fs
+              readOnly: true
+            - mountPath: /etc/falco/config.d
+              name: specialized-falco-configs
+          env:
+            - name: HOST_ROOT
+              value: /host
+            - name: FALCOCTL_DRIVER_CONFIG_UPDATE_FALCO
+              value: "false"
+        - name: falcoctl-artifact-install
+          image: docker.io/falcosecurity/falcoctl:0.11.0
+          imagePullPolicy: IfNotPresent
+          args: 
+            - artifact
+            - install
+            - --log-format=json
+          securityContext:
+          volumeMounts:
+            - mountPath: /plugins
+              name: plugins-install-dir
+            - mountPath: /rulesfiles
+              name: rulesfiles-install-dir
+            - mountPath: /etc/falcoctl
+              name: falcoctl-config-volume
+      volumes:
+        - name: specialized-falco-configs
+          emptyDir: {}
+        - name: plugins-install-dir
+          emptyDir: {}
+        - name: rulesfiles-install-dir
+          emptyDir: {}
+        - name: root-falco-fs
+          emptyDir: {}  
+        - name: boot-fs
+          hostPath:
+            path: /boot
+        - name: lib-modules
+          hostPath:
+            path: /lib/modules
+        - name: usr-fs
+          hostPath:
+            path: /usr
+        - name: etc-fs
+          hostPath:
+            path: /etc
+        - name: dev-fs
+          hostPath:
+            path: /dev
+        - name: sys-fs
+          hostPath:
+            path: /sys/module
+        - name: docker-socket
+          hostPath:
+            path: /var/run
+        - name: containerd-socket
+          hostPath:
+            path: /run/containerd
+        - name: crio-socket
+          hostPath:
+            path: /run/crio
+        - name: proc-fs
+          hostPath:
+            path: /proc
+        - name: falcoctl-config-volume
+          configMap: 
+            name: falco-falcoctl
+            items:
+              - key: falcoctl.yaml
+                path: falcoctl.yaml
+        - name: falco-yaml
+          configMap:
+            name: falco
+            items:
+            - key: falco.yaml
+              path: falco.yaml
+        - name: rules-volume
+          configMap:
+            name: falco-rules
+        
+        - name: grpc-socket-dir
+          hostPath:
+            path: /var/run/falco
+  updateStrategy:
+    type: RollingUpdate
+---
+# Source: falco/charts/falcosidekick/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: falco-falcosidekick
+  namespace: falco
+  labels:
+    helm.sh/chart: falcosidekick-0.9.8
+    app.kubernetes.io/name: falcosidekick
+    app.kubernetes.io/instance: falco
+    app.kubernetes.io/version: "2.31.1"
+    app.kubernetes.io/part-of: falcosidekick
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: core
+  annotations:
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: falcosidekick
+      app.kubernetes.io/instance: falco
+      app.kubernetes.io/component: core
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: falcosidekick-0.9.8
+        app.kubernetes.io/name: falcosidekick
+        app.kubernetes.io/instance: falco
+        app.kubernetes.io/version: "2.31.1"
+        app.kubernetes.io/part-of: falcosidekick
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/component: core
+      annotations:
+        checksum/config: ba0efb484120d7241e839e25bb8c030a14499bd7075dafd9a5f0ed26f8c49c48
+    spec:
+      serviceAccountName: falco-falcosidekick
+      securityContext:
+        fsGroup: 1234
+        runAsUser: 1234
+      containers:
+        - name: falcosidekick
+          image: "docker.io/falcosecurity/falcosidekick:2.31.1"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 2801
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          envFrom:
+            - secretRef:
+                name: falco-falcosidekick
+          env:
+            - name: DEBUG
+              value: "false"
+            - name: CUSTOMFIELDS
+              value: ""
+            - name: TEMPLATEDFIELDS
+              value: ""
+            - name: OUTPUTFIELDFORMAT
+              value: ""
+            - name: BRACKETREPLACER
+              value: ""
+            - name: MUTUALTLSFILESPATH
+              value: "/etc/certs"
+            - name: MUTUALTLSCLIENT_CERTFILE
+              value: ""
+            - name: MUTUALTLSCLIENT_KEYFILE
+              value: ""
+            - name: MUTUALTLSCLIENT_CACERTFILE
+              value: ""
+            - name: TLSCLIENT_CACERTFILE
+              value: ""
+          resources:
+            limits:
+              cpu: 20m
+              memory: 250Mi
+            requests:
+              cpu: 10m
+              memory: 25Mi
+---
+# Source: falco/templates/serviceMonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: falco
+  namespace: falco
+  labels:
+    helm.sh/chart: falco-4.20.0
+    app.kubernetes.io/name: falco
+    app.kubernetes.io/instance: falco
+    app.kubernetes.io/version: "0.40.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  endpoints:
+    - port: "metrics"
+      interval: 15s
+      scrapeTimeout: 10s
+      honorLabels: true
+      path: /metrics
+      scheme: http
+  jobLabel: "falco"
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: falco
+      app.kubernetes.io/instance: falco
+      type: "falco-metrics"
+  namespaceSelector:
+    matchNames:
+      - falco
+---
+# Source: falco/charts/falcosidekick/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "falco-falcosidekick-test-connection"
+  namespace: falco
+  labels:
+    app.kubernetes.io/name: falcosidekick
+    helm.sh/chart: falcosidekick-0.9.8
+    app.kubernetes.io/instance: falco
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+    - name: curl
+      image: appropriate/curl
+      command: ['curl']
+      args:  ["-X", "POST", 'falco-falcosidekick:2801/ping']
+  restartPolicy: Never
+

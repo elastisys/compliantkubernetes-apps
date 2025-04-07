@@ -9,7 +9,7 @@ ARG TZ="Etc/UTC"
 
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y apache2-utils bats curl dnsutils gettext-base git gpg iputils-ping jq locales make net-tools npm pwgen s3cmd ssh unzip && \
+    apt-get install -y apache2-utils curl dnsutils gettext-base git gpg iputils-ping jq locales make net-tools npm parallel pwgen s3cmd ssh unzip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
@@ -81,6 +81,13 @@ RUN curl -LOs "https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/
     rm yq_linux_amd64
 
 # Currently all from main as most do not have current releases
+RUN git clone --depth 1 https://github.com/bats-core/bats-core.git bats-core && \
+    install -m755 bats-core/bin/* /usr/local/bin && \
+    mkdir -p /usr/local/libexec/bats-core && \
+    install -m755 bats-core/libexec/bats-core/* /usr/local/libexec/bats-core && \
+    mkdir -p /usr/local/lib/bats-core && \
+    install -m755 bats-core/lib/bats-core/* /usr/local/lib/bats-core && \
+    rm -rf bats-core
 RUN git clone --depth 1 https://github.com/bats-core/bats-assert.git /usr/local/lib/bats/assert
 RUN git clone --depth 1 https://github.com/bats-core/bats-detik.git /usr/local/lib/bats/detik
 RUN git clone --depth 1 https://github.com/bats-core/bats-file.git /usr/local/lib/bats/file

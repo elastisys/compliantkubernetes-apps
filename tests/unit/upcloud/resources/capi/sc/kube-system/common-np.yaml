@@ -1,0 +1,428 @@
+---
+# Source: networkpolicy-service/templates/cert-manager/resolver.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-cert-manager-resolver
+  namespace: dex
+spec:
+  podSelector:
+    matchLabels:
+      acme.cert-manager.io/http01-solver: "true"
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 8089
+          protocol: TCP
+---
+# Source: networkpolicy-service/templates/cert-manager/resolver.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-cert-manager-resolver
+  namespace: harbor
+spec:
+  podSelector:
+    matchLabels:
+      acme.cert-manager.io/http01-solver: "true"
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 8089
+          protocol: TCP
+---
+# Source: networkpolicy-service/templates/cert-manager/resolver.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-cert-manager-resolver
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      acme.cert-manager.io/http01-solver: "true"
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 8089
+          protocol: TCP
+---
+# Source: networkpolicy-service/templates/cert-manager/resolver.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-cert-manager-resolver
+  namespace: opensearch-system
+spec:
+  podSelector:
+    matchLabels:
+      acme.cert-manager.io/http01-solver: "true"
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 8089
+          protocol: TCP
+---
+# Source: networkpolicy-service/templates/cert-manager/resolver.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-cert-manager-resolver
+  namespace: thanos
+spec:
+  podSelector:
+    matchLabels:
+      acme.cert-manager.io/http01-solver: "true"
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 8089
+          protocol: TCP
+---
+# Source: networkpolicy-service/templates/coredns/allow-coredns.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-coredns
+spec:
+  podSelector:
+    matchLabels:
+      k8s-app: kube-dns
+  policyTypes:
+    - Egress
+    - Ingress
+  ingress:
+    - ports:
+      - port: 53
+        protocol: UDP
+      - port: 53
+        protocol: TCP
+    - from:
+      - podSelector:
+          matchLabels:
+            k8s-app: kube-dns
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+          namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 9153
+  egress:
+    - to:
+      - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6443
+    - to:
+      - ipBlock:
+            cidr: 0.0.0.0/0
+      - ipBlock:
+          cidr: 10.233.0.10/32
+      - ipBlock:
+          cidr: 0.0.0.0/0
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+---
+# Source: networkpolicy-service/templates/dns-autoscaler/allow-dns-autoscaler.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-dns-autoscaler
+spec:
+  podSelector:
+    matchLabels:
+      k8s-app: dns-autoscaler
+  policyTypes:
+    - Egress
+    - Ingress
+  ingress:
+    - from:
+      - ipBlock:
+          cidr: 0.0.0.0/0
+      - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 8080
+          protocol: TCP
+  egress:
+    - to:
+      - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6443
+---
+# Source: networkpolicy-service/templates/gatekeeper/allow-controller-manager.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-controller-manager
+  namespace: gatekeeper-system
+spec:
+  podSelector:
+    matchLabels:
+      control-plane: controller-manager
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+      ports:
+        - port: 8888
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus-blackbox-exporter
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 8443
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 6443
+---
+# Source: networkpolicy-service/templates/gatekeeper/allow-gatekeeper-audit-controller.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-gatekeeper-audit-controller
+  namespace: gatekeeper-system
+spec:
+  podSelector:
+    matchLabels:
+      control-plane: audit-controller
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+      ports:
+        - port: 8888
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 6443
+---
+# Source: networkpolicy-service/templates/gatekeeper/allow-gatekeeper-templates-wait.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-gatekeeper-templates-wait
+  namespace: gatekeeper-system
+spec:
+  podSelector:
+    matchLabels:
+      job-name: gatekeeper-templates-wait
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 6443
+---
+# Source: networkpolicy-service/templates/gatekeeper/allow-gatekeeper-update-crds-hook.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-gatekeeper-update-crds-hook
+  namespace: gatekeeper-system
+spec:
+  podSelector:
+    matchLabels:
+      job-name: gatekeeper-update-crds-hook
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 6443
+---
+# Source: networkpolicy-service/templates/gatekeeper/allow-gatekeeper-update-namespace-label.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-gatekeeper-update-namespace-label
+  namespace: gatekeeper-system
+spec:
+  podSelector:
+    matchLabels:
+      job-name: gatekeeper-update-namespace-label
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 6443
+---
+# Source: networkpolicy-service/templates/gatekeeper/default-deny.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: gatekeeper-default-deny-all
+  namespace: gatekeeper-system
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+# Source: networkpolicy-service/templates/kube-system/csi-upcloud.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-service-0.2.0
+    app.kubernetes.io/name: networkpolicy-service
+    app.kubernetes.io/instance: common-np
+    app.kubernetes.io/version: "1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: allow-csi-upcloud-controller-plugin
+  namespace: kube-system
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      app: csi-upcloud-controller
+  ingress: []
+  egress:
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6443
+    - to:
+        - ipBlock:
+            cidr: 94.237.0.0/23
+      ports:
+        - port: 443
+---
+# Source: networkpolicy-service/templates/kube-system/metrics-server.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-service-0.2.0
+    app.kubernetes.io/name: networkpolicy-service
+    app.kubernetes.io/instance: common-np
+    app.kubernetes.io/version: "1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: allow-metrics-server
+  namespace: kube-system
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: metrics-server
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 8443
+  egress:
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6443
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 10250
+---
+# Source: networkpolicy-service/templates/kube-system/snapshot-controller.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-service-0.2.0
+    app.kubernetes.io/name: networkpolicy-service
+    app.kubernetes.io/instance: common-np
+    app.kubernetes.io/version: "1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: allow-snapshot-controller
+  namespace: kube-system
+spec:
+  policyTypes:
+    - Ingress
+    - Egress
+  podSelector:
+    matchLabels:
+      app: snapshot-controller
+  ingress: []
+  egress:
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6443
+

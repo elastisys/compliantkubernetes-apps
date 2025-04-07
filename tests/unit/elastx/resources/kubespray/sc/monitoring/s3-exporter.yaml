@@ -1,0 +1,272 @@
+---
+# Source: s3-exporter/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: s3-exporter
+  labels:
+    helm.sh/chart: s3-exporter-0.1.0
+    app.kubernetes.io/name: s3-exporter
+    app.kubernetes.io/instance: s3-exporter
+    app.kubernetes.io/version: "0.5.0"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: s3-exporter/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: s3-exporter-env
+  labels:
+    helm.sh/chart: s3-exporter-0.1.0
+    app.kubernetes.io/name: s3-exporter
+    app.kubernetes.io/instance: s3-exporter
+    app.kubernetes.io/version: "0.5.0"
+    app.kubernetes.io/managed-by: Helm
+stringData:
+  AWS_ACCESS_KEY_ID: "example-access-key"
+  AWS_SECRET_ACCESS_KEY: "example-secret-key"
+---
+# Source: s3-exporter/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: s3-exporter-env
+  labels:
+    helm.sh/chart: s3-exporter-0.1.0
+    app.kubernetes.io/name: s3-exporter
+    app.kubernetes.io/instance: s3-exporter
+    app.kubernetes.io/version: "0.5.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  AWS_REGION: example-region
+  S3_EXPORTER_S3_ENDPOINT_URL: https://example-region-endpoint
+  S3_EXPORTER_S3_FORCE_PATH_STYLE: "true"
+---
+# Source: s3-exporter/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: s3-exporter
+  labels:
+    helm.sh/chart: s3-exporter-0.1.0
+    app.kubernetes.io/name: s3-exporter
+    app.kubernetes.io/instance: s3-exporter
+    app.kubernetes.io/version: "0.5.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9340
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: s3-exporter
+    app.kubernetes.io/instance: s3-exporter
+---
+# Source: s3-exporter/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: s3-exporter
+  labels:
+    helm.sh/chart: s3-exporter-0.1.0
+    app.kubernetes.io/name: s3-exporter
+    app.kubernetes.io/instance: s3-exporter
+    app.kubernetes.io/version: "0.5.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: s3-exporter
+      app.kubernetes.io/instance: s3-exporter
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: s3-exporter
+        app.kubernetes.io/instance: s3-exporter
+    spec:
+      automountServiceAccountToken: false
+      serviceAccountName: s3-exporter
+      securityContext:
+        {}
+      containers:
+        - name: s3-exporter
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 100
+          image: "ghcr.io/elastisys/s3-exporter:0.5.0"
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: s3-exporter-env
+            - secretRef:
+                name: s3-exporter-env
+          ports:
+            - name: http
+              containerPort: 9340
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            limits: {}
+            requests:
+              cpu: 50m
+              memory: 20Mi
+---
+# Source: s3-exporter/templates/servicemonitors.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: s3-exporter
+  labels:
+    helm.sh/chart: s3-exporter-0.1.0
+    app.kubernetes.io/name: s3-exporter
+    app.kubernetes.io/instance: s3-exporter
+    app.kubernetes.io/version: "0.5.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  endpoints:
+  # One endpoint per bucket so that we can pass the name of the bucket as param
+  - port: http
+    scheme: http
+    path: "/probe"
+    interval: 60m
+    scrapeTimeout: 10m
+    params:
+      bucket:
+      - apps-tests-audit
+      # We could add a prefix here if we are just interested in specific files/folders
+      # prefix: []
+    metricRelabelings:
+      - sourceLabels: [__address__]
+        regex: '^bucket=(.*);prefix=(.*);$'
+        replacement: '${1}'
+        targetLabel: __param_target
+      - sourceLabels: [__address__]
+        regex: '^bucket=(.*);prefix=(.*);$'
+        replacement: '${2}'
+        targetLabel: '__param_prefix'
+      - targetLabel: __address__
+        replacement: 127.0.0.1:9340  # S3 exporter.
+  - port: http
+    scheme: http
+    path: "/probe"
+    interval: 60m
+    scrapeTimeout: 10m
+    params:
+      bucket:
+      - apps-tests-harbor
+      # We could add a prefix here if we are just interested in specific files/folders
+      # prefix: []
+    metricRelabelings:
+      - sourceLabels: [__address__]
+        regex: '^bucket=(.*);prefix=(.*);$'
+        replacement: '${1}'
+        targetLabel: __param_target
+      - sourceLabels: [__address__]
+        regex: '^bucket=(.*);prefix=(.*);$'
+        replacement: '${2}'
+        targetLabel: '__param_prefix'
+      - targetLabel: __address__
+        replacement: 127.0.0.1:9340  # S3 exporter.
+  - port: http
+    scheme: http
+    path: "/probe"
+    interval: 60m
+    scrapeTimeout: 10m
+    params:
+      bucket:
+      - apps-tests-opensearch
+      # We could add a prefix here if we are just interested in specific files/folders
+      # prefix: []
+    metricRelabelings:
+      - sourceLabels: [__address__]
+        regex: '^bucket=(.*);prefix=(.*);$'
+        replacement: '${1}'
+        targetLabel: __param_target
+      - sourceLabels: [__address__]
+        regex: '^bucket=(.*);prefix=(.*);$'
+        replacement: '${2}'
+        targetLabel: '__param_prefix'
+      - targetLabel: __address__
+        replacement: 127.0.0.1:9340  # S3 exporter.
+  - port: http
+    scheme: http
+    path: "/probe"
+    interval: 60m
+    scrapeTimeout: 10m
+    params:
+      bucket:
+      - apps-tests-sc-logs
+      # We could add a prefix here if we are just interested in specific files/folders
+      # prefix: []
+    metricRelabelings:
+      - sourceLabels: [__address__]
+        regex: '^bucket=(.*);prefix=(.*);$'
+        replacement: '${1}'
+        targetLabel: __param_target
+      - sourceLabels: [__address__]
+        regex: '^bucket=(.*);prefix=(.*);$'
+        replacement: '${2}'
+        targetLabel: '__param_prefix'
+      - targetLabel: __address__
+        replacement: 127.0.0.1:9340  # S3 exporter.
+  - port: http
+    scheme: http
+    path: "/probe"
+    interval: 60m
+    scrapeTimeout: 10m
+    params:
+      bucket:
+      - apps-tests-thanos
+      # We could add a prefix here if we are just interested in specific files/folders
+      # prefix: []
+    metricRelabelings:
+      - sourceLabels: [__address__]
+        regex: '^bucket=(.*);prefix=(.*);$'
+        replacement: '${1}'
+        targetLabel: __param_target
+      - sourceLabels: [__address__]
+        regex: '^bucket=(.*);prefix=(.*);$'
+        replacement: '${2}'
+        targetLabel: '__param_prefix'
+      - targetLabel: __address__
+        replacement: 127.0.0.1:9340  # S3 exporter.
+  - port: http
+    scheme: http
+    path: "/probe"
+    interval: 60m
+    scrapeTimeout: 10m
+    params:
+      bucket:
+      - apps-tests-velero
+      # We could add a prefix here if we are just interested in specific files/folders
+      # prefix: []
+    metricRelabelings:
+      - sourceLabels: [__address__]
+        regex: '^bucket=(.*);prefix=(.*);$'
+        replacement: '${1}'
+        targetLabel: __param_target
+      - sourceLabels: [__address__]
+        regex: '^bucket=(.*);prefix=(.*);$'
+        replacement: '${2}'
+        targetLabel: '__param_prefix'
+      - targetLabel: __address__
+        replacement: 127.0.0.1:9340  # S3 exporter.
+  jobLabel: s3_exporter
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: s3-exporter
+      app.kubernetes.io/instance: s3-exporter
+  namespaceSelector:
+    matchNames:
+      - monitoring
+

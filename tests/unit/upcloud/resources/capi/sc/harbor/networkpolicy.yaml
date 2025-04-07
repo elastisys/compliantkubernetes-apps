@@ -1,0 +1,776 @@
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: all-deny
+  namespace: harbor
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+    - Ingress
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: backup
+  namespace: harbor
+spec:
+  podSelector:
+    matchLabels:
+      component: backup
+  policyTypes:
+    - Egress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # base: egress-rule-harbor-database
+    - to:
+        - podSelector:
+            matchLabels: 
+              component: database
+      ports:
+        - protocol: TCP
+          port: 5432
+    # base: egress-rule-object-storage
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: cert-manager-http01-solver
+  namespace: harbor
+spec:
+  podSelector:
+    matchLabels:
+      acme.cert-manager.io/http01-solver: "true"
+  policyTypes:
+    - Ingress
+  ingress:
+    # base: ingress-rule-ingress
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 8089
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: core
+  namespace: harbor
+spec:
+  podSelector:
+    matchLabels:
+      component: core
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # base: egress-rule-ingress
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+    # base: egress-rule-object-storage
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+    # base: egress-rule-harbor-portal
+    - to:
+        - podSelector:
+            matchLabels: 
+              component: portal
+      ports:
+        - protocol: TCP
+          port: 8080
+    # base: egress-rule-harbor-registry
+    - to:
+        - podSelector:
+            matchLabels: 
+              component: registry
+      ports:
+        - protocol: TCP
+          port: 5000
+        - protocol: TCP
+          port: 8080
+    # base: egress-rule-harbor-redis
+    - to:
+        - podSelector:
+            matchLabels: 
+              component: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    # base: egress-rule-harbor-database
+    - to:
+        - podSelector:
+            matchLabels: 
+              component: database
+      ports:
+        - protocol: TCP
+          port: 5432
+    # base: egress-rule-harbor-trivy
+    - to:
+        - podSelector:
+            matchLabels: 
+              component: trivy
+      ports:
+        - protocol: TCP
+          port: 8080
+    # base: egress-rule-harbor-jobservice
+    - to:
+        - podSelector:
+            matchLabels: 
+              component: jobservice
+      ports:
+        - protocol: TCP
+          port: 8080
+    # base: egress-rule-harbor-external-registries
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+  ingress:
+    # base: ingress-rule-prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 8001
+    # base: ingress-rule-ingress
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 8080
+    # rule: ingress-http
+    - from:
+        - podSelector:
+            matchLabels: 
+              component: exporter
+        - podSelector:
+            matchLabels: 
+              component: jobservice
+        - podSelector:
+            matchLabels: 
+              component: trivy
+        - podSelector:
+            matchLabels: 
+              job-name: init-harbor-job
+      ports:
+        - protocol: TCP
+          port: 8080
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: database
+  namespace: harbor
+spec:
+  podSelector:
+    matchLabels:
+      component: database
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: 
+              component: core
+        - podSelector:
+            matchLabels: 
+              component: jobservice
+        - podSelector:
+            matchLabels: 
+              component: registry
+        - podSelector:
+            matchLabels: 
+              component: exporter
+        - podSelector:
+            matchLabels: 
+              component: backup
+      ports:
+        - protocol: TCP
+          port: 5432
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: exporter
+  namespace: harbor
+spec:
+  podSelector:
+    matchLabels:
+      component: exporter
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # base: egress-rule-harbor-core
+    - to:
+        - podSelector:
+            matchLabels: 
+              component: core
+      ports:
+        - protocol: TCP
+          port: 8080
+    # base: egress-rule-harbor-redis
+    - to:
+        - podSelector:
+            matchLabels: 
+              component: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    # base: egress-rule-harbor-database
+    - to:
+        - podSelector:
+            matchLabels: 
+              component: database
+      ports:
+        - protocol: TCP
+          port: 5432
+  ingress:
+    # base: ingress-rule-prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 8001
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: init
+  namespace: harbor
+spec:
+  podSelector:
+    matchLabels:
+      job-name: init-harbor-job
+  policyTypes:
+    - Egress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # base: egress-rule-harbor-core
+    - to:
+        - podSelector:
+            matchLabels: 
+              component: core
+      ports:
+        - protocol: TCP
+          port: 8080
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: jobservice
+  namespace: harbor
+spec:
+  podSelector:
+    matchLabels:
+      component: jobservice
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # base: egress-rule-harbor-core
+    - to:
+        - podSelector:
+            matchLabels: 
+              component: core
+      ports:
+        - protocol: TCP
+          port: 8080
+    # base: egress-rule-harbor-redis
+    - to:
+        - podSelector:
+            matchLabels: 
+              component: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    # base: egress-rule-harbor-database
+    - to:
+        - podSelector:
+            matchLabels: 
+              component: database
+      ports:
+        - protocol: TCP
+          port: 5432
+    # base: egress-rule-harbor-trivy
+    - to:
+        - podSelector:
+            matchLabels: 
+              component: trivy
+      ports:
+        - protocol: TCP
+          port: 8080
+    # base: egress-rule-harbor-registry
+    - to:
+        - podSelector:
+            matchLabels: 
+              component: registry
+      ports:
+        - protocol: TCP
+          port: 5000
+        - protocol: TCP
+          port: 8080
+    # base: egress-rule-harbor-external-registries
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+    # base: egress-rule-harbor-jobservice
+    - to:
+        - podSelector:
+            matchLabels: 
+              component: jobservice
+      ports:
+        - protocol: TCP
+          port: 8080
+    # base: egress-rule-harbor-external-jobservice
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+  ingress:
+    # base: ingress-rule-prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 8001
+    # rule: ingress-rule-harbor-core
+    - from:
+        - podSelector:
+            matchLabels: 
+              component: core
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: portal
+  namespace: harbor
+spec:
+  podSelector:
+    matchLabels:
+      component: portal
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: 
+              component: core
+    # base: ingress-rule-ingress
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 8080
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: redis
+  namespace: harbor
+spec:
+  podSelector:
+    matchLabels:
+      component: redis
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: 
+              component: core
+        - podSelector:
+            matchLabels: 
+              component: jobservice
+        - podSelector:
+            matchLabels: 
+              component: trivy
+        - podSelector:
+            matchLabels: 
+              component: registry
+        - podSelector:
+            matchLabels: 
+              component: exporter
+      ports:
+        - protocol: TCP
+          port: 6379
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: registry
+  namespace: harbor
+spec:
+  podSelector:
+    matchLabels:
+      component: registry
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # base: egress-rule-object-storage
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+    # base: egress-rule-harbor-redis
+    - to:
+        - podSelector:
+            matchLabels: 
+              component: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+  ingress:
+    # base: ingress-rule-prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels: 
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 8001
+    - from:
+        - podSelector:
+            matchLabels: 
+              component: core
+        - podSelector:
+            matchLabels: 
+              component: jobservice
+      ports:
+        - protocol: TCP
+          port: 5000
+        - protocol: TCP
+          port: 8080
+---
+# Source: networkpolicy-generator/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    helm.sh/chart: networkpolicy-generator-0.1.0
+    app.kubernetes.io/name: networkpolicy-generator
+    app.kubernetes.io/instance: networkpolicy
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  name: trivy
+  namespace: harbor
+spec:
+  podSelector:
+    matchLabels:
+      component: trivy
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    # base: egress-rule-dns
+    - to:
+        - namespaceSelector:
+            matchLabels: 
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels: 
+              k8s-app: kube-dns
+        - ipBlock:
+            cidr: 10.233.0.10/32
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    # base: egress-rule-harbor-core
+    - to:
+        - podSelector:
+            matchLabels: 
+              component: core
+      ports:
+        - protocol: TCP
+          port: 8080
+    # base: egress-rule-harbor-redis
+    - to:
+        - podSelector:
+            matchLabels: 
+              component: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    # base: egress-rule-harbor-external-trivy
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: 
+              component: core
+        - podSelector:
+            matchLabels: 
+              component: jobservice
+      ports:
+        - protocol: TCP
+          port: 8080
+
