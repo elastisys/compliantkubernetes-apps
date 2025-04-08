@@ -1,0 +1,35 @@
+cluster:
+  dashboards:
+    additionalConfig:
+
+      server.host: "0"
+
+      opensearch.ssl.verificationMode: none
+      opensearch.requestHeadersAllowlist: |
+        [ "Authorization", "securitytenant" ]
+
+      {{ if .Values.opensearch.sso.enabled }}
+      opensearch_security.auth.type: "openid"
+      opensearch_security.openid.scope: {{ .Values.opensearch.sso.scope }}
+      opensearch_security.openid.connect_url: http://dex.dex.svc.cluster.local:5556/.well-known/openid-configuration
+      opensearch_security.openid.client_id: "opensearch"
+      opensearch_security.openid.client_secret: {{ .Values.opensearch.clientSecret }}
+      opensearch_security.openid.base_redirect_url: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
+      opensearch_security.openid.logout_url: https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
+      {{ end }}
+      opensearch_security.multitenancy.enabled: "false"
+      opensearch_security.readonly_mode.roles: |
+        [ "kibana_read_only" ]
+      # Use this setting if you are running opensearch-dashboards without https
+      opensearch_security.cookie.secure: "false"
+
+    resources: {{- toYaml .Values.opensearch.dashboards.resources | nindent 6 }}
+
+    nodeSelector: {{- toYaml .Values.opensearch.dashboards.nodeSelector | nindent 6 }}
+
+    tolerations: {{- toYaml .Values.opensearch.dashboards.tolerations | nindent 6 }}
+
+    affinity: {{- toYaml .Values.opensearch.dashboards.affinity | nindent 6 }}
+
+    opensearchCredentialsSecret:
+      name: opensearch-dashboards-user

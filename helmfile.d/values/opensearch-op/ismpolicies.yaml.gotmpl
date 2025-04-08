@@ -1,0 +1,60 @@
+ismPolicies:
+  - name: authlog
+    defaultState: hot
+    description: "Authlog ISM policy"
+    states:
+      - name: hot
+        actions:
+          - rollover:
+              minSize: "{{ .Values.opensearch.ism.rolloverSizeGB }}GB"
+              minIndexAge: "{{ .Values.opensearch.ism.rolloverAgeDays }}d"
+        transitions: []
+    ismTemplate:
+      priority: 100
+      indexPatterns:
+        - "authlog*"
+
+  - name: kubeaudit
+    defaultState: hot
+    description: "Kubeaudit ISM policy"
+    states:
+      - name: hot
+        actions:
+          - rollover:
+              minSize: "{{ .Values.opensearch.ism.rolloverSizeGB }}GB"
+              minIndexAge: "{{ .Values.opensearch.ism.rolloverAgeDays }}d"
+        transitions: []
+    ismTemplate:
+      priority: 100
+      indexPatterns:
+        - "kubeaudit*"
+
+  - name: kubernetes
+    defaultState: hot
+    description: "Kubernetes ISM policy"
+    states:
+      - name: hot
+        actions:
+          - rollover:
+              minSize: "{{ .Values.opensearch.ism.rolloverSizeGB }}GB"
+              minIndexAge: "{{ .Values.opensearch.ism.rolloverAgeDays }}d"
+        transitions: []
+    ismTemplate:
+      priority: 100
+      indexPatterns:
+        - "kubernetes*"
+
+  - name: other
+    defaultState: hot
+    description: "Other ISM policy"
+    states:
+      - name: hot
+        actions:
+          - rollover:
+              minSize: "{{ .Values.opensearch.ism.rolloverSizeGB }}GB"
+              minIndexAge: "{{ .Values.opensearch.ism.rolloverAgeDays }}d"
+        transitions: []
+    ismTemplate:
+      priority: 100
+      indexPatterns:
+        - "other*"

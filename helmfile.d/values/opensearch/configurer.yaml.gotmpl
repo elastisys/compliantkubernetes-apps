@@ -1,7 +1,7 @@
 opensearch:
   userSecret: opensearch-configurer-user
-  clusterEndpoint: {{ .Values.opensearch.clusterName }}-master:9200
-  dashboardsEndpoint: opensearch-dashboards:5601
+  clusterEndpoint: opensearch-cluster-masters:9200
+  dashboardsEndpoint: opensearch-cluster-dashboards:5601
 
 activeDeadlineSeconds: 1200
 
@@ -68,119 +68,8 @@ config:
 
   # Create users and roles for ck8s application
   securityPlugin:
-    users:
-    - username: fluentd
-      definition:
-        password: {{ .Values.opensearch.fluentdPassword }}
-        opendistro_security_roles:
-        - log_forwarder
-    - username: curator
-      definition:
-        password: {{ .Values.opensearch.curatorPassword }}
-        opendistro_security_roles:
-        - curator
-    - username: snapshotter
-      definition:
-        password: {{ .Values.opensearch.snapshotterPassword }}
-        opendistro_security_roles:
-        - manage_snapshots
-    - username: metrics_exporter
-      definition:
-        password: {{ .Values.opensearch.metricsExporterPassword }}
-        opendistro_security_roles:
-        - metrics_exporter
-  {{- if .Values.opensearch.extraUsers }}
-    {{- toYaml .Values.opensearch.extraUsers | nindent 4 }}
-  {{- end }}
+    users: []
 
-    roles:
-    - role_name: log_forwarder
-      definition:
-        cluster_permissions:
-        - "cluster:monitor/main"
-        - "indices:data/write/bulk"
-        index_permissions:
-        {{- if .Values.opensearch.indexPerNamespace }}
-        - index_patterns:
-          # Only allow indices not starting with ".", except ".orphaned-"
-          - '/^[^.].*/'
-          - ".orphaned-*"
-          allowed_actions:
-          - "indices:admin/create"
-          - "index"
-        {{- else }}
-        - index_patterns:
-          - "kubernetes-*"
-          - "kubeaudit-*"
-          - "other-*"
-          - "authlog-*"
-          allowed_actions:
-          - "index"
-        {{- end }}
-    - role_name: curator
-      definition:
-        cluster_permissions:
-        - "cluster_monitor"
-        - "cluster_composite_ops_ro"
-        index_permissions:
-        - index_patterns:
-          - "*"
-          allowed_actions:
-          - "indices_monitor"
-        - index_patterns:
-          - '/^[^.].*/'
-          - ".orphaned-*"
-          allowed_actions:
-          - "indices:admin/delete"
-    - role_name: kubernetes_log_reader
-      definition:
-        index_permissions:
-        - index_patterns:
-          {{- if .Values.opensearch.indexPerNamespace }}
-          - '/^(?!kube-system|gatekeeper-system|other|authlog|\.).*/'
-          {{- else }}
-          - "kubernetes-*"
-          - "kubeaudit-*"
-          {{- end }}
-          allowed_actions:
-          - "read"
-    # This role should be modified by removing the "read" as that can be
-    # given by the "kubernetes_log_reader" role.
-    - role_name: backup_exporter
-      definition:
-        cluster_permissions:
-        - "cluster:monitor/state"
-        - "cluster:monitor/health"
-        index_permissions:
-        - index_patterns:
-          - "*"
-          allowed_actions:
-          - "monitor"
-        - index_patterns:
-          {{- if .Values.opensearch.indexPerNamespace }}
-          - '/^(?!kube-system|gatekeeper-system|other|authlog|\.).*/'
-          {{- else }}
-          - "kubernetes-*"
-          - "kubeaudit-*"
-          {{- end }}
-          allowed_actions:
-          - "read"
-    - role_name: metrics_exporter
-      definition:
-        cluster_permissions:
-        - "cluster_monitor"
-        - "cluster:admin/repository/get"
-        - "cluster:admin/snapshot/get"
-        - "cluster:admin/snapshot/status"
-        index_permissions:
-        - index_patterns:
-          - "*"
-          allowed_actions:
-          - "indices_monitor"
-          - "indices:admin/mappings/get"
-          - "indices:admin/aliases/get"
-    {{- with .Values.opensearch.extraRoles }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
+    roles: []
 
-    roles_mapping: {{- toYaml .Values.opensearch.extraRoleMappings | nindent 6 }}
+    roles_mapping: []
