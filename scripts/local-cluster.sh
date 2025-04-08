@@ -343,6 +343,8 @@ create() {
     log.fatal "config or profile \"${config}\" is not valid"
   fi
 
+  export CK8S_LOCAL_LISTEN_ADDRESS="${CK8S_LOCAL_LISTEN_ADDRESS:-"127.0.64.43"}"
+
   if [[ "$(index.state "${cluster}")" == "ready" ]]; then
     log.info "cluster ${cluster} is in ready state, aborting"
     exit
