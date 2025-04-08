@@ -1,0 +1,21 @@
+apiVersion: kubernetes.crossplane.io/v1alpha1
+kind: ProviderConfig
+metadata:
+  name: kubernetes
+spec:
+  credentials:
+    source: InjectedIdentity
+{{- range .Values.clusters }}
+---
+apiVersion: kubernetes.crossplane.io/v1alpha1
+kind: ProviderConfig
+metadata:
+  name: kubernetes-{{ . }}
+spec:
+  credentials:
+    source: Secret
+    secretRef:
+      namespace: capi-cluster
+      name: {{ $.Values.environmentName }}-{{ . }}-kubeconfig
+      key: value
+{{- end }}

@@ -34,6 +34,7 @@ bases:
 releases:
   - inherit: [ template: crossplane ]
   - inherit: [ template: crossplane-packages ]
+  - inherit: [ template: crossplane-provider-configs ]
 
   - inherit: [ template: tigera ]
   - inherit: [ template: minio ]

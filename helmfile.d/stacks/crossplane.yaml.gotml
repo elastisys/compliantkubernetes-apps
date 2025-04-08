@@ -21,3 +21,15 @@ templates:
       app: crossplane
     needs:
       - crossplane-system/crossplane
+
+  crossplane-provider-configs:
+    disableValidationOnInstall: true
+    chart: charts/crossplane-provider-configs
+    version: 0.0.1
+    wait: true
+    namespace: crossplane-system
+    name: crossplane-provider-configs
+    labels:
+      app: crossplane
+    needs:
+      - crossplane-system/crossplane-packages
