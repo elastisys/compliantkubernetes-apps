@@ -186,7 +186,7 @@
 | docker.io/bitnami/kubectl | 1.25 | gatekeeper-templates |  |  |  |  |
 | quay.io/prometheuscommunity/prom-label-proxy | master | grafana-label-enforcer |  |  |  |  |
 | ghcr.io/elastisys/backup-postgres | 1.3.0 | harbor-backup |  |  |  |  |
-| ghcr.io/elastisys/hnc-manager | v1.1.0 | hnc |  |  |  |  |
+| gcr.io/k8s-staging-multitenancy/hnc-manager | v1.1.0 | hnc |  |  |  |  |
 | ghcr.io/elastisys/compliantkubernetes-apps-log-manager | 0.2.0 | log-manager |  |  |  |  |
 | registry.k8s.io/dns/k8s-dns-node-cache | 1.22.20 | node-local-dns |  |  |  |  |
 | ghcr.io/elastisys/bitnami/elasticsearch-curator | 5.8.4-debian-10-r235 | opensearch-curator |  |  |  |  |
