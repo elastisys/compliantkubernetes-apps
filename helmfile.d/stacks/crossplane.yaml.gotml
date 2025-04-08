@@ -1,0 +1,11 @@
+---
+templates:
+  crossplane:
+    inherit: [ template: crossplane-chart ]
+    wait: true
+    namespace: crossplane-system
+    name: crossplane
+    labels:
+      app: crossplane
+    needs:
+      - kube-system/admin-namespaces
