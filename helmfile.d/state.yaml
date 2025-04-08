@@ -33,6 +33,7 @@ bases:
 ---
 releases:
   - inherit: [ template: crossplane ]
+  - inherit: [ template: crossplane-packages ]
 
   - inherit: [ template: tigera ]
   - inherit: [ template: minio ]

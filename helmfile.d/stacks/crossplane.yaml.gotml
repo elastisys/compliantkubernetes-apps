@@ -9,3 +9,15 @@ templates:
       app: crossplane
     needs:
       - kube-system/admin-namespaces
+
+  crossplane-packages:
+    disableValidationOnInstall: true
+    chart: charts/crossplane-packages
+    version: 0.0.1
+    wait: true
+    namespace: crossplane-system
+    name: crossplane-packages
+    labels:
+      app: crossplane
+    needs:
+      - crossplane-system/crossplane
