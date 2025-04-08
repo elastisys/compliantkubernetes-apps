@@ -32,7 +32,7 @@ spec:
                       enabled: true
                       className: nginx
                       annotations:
-                        cert-manager.io/cluster-issuer: letsencrypt-prod
+                        cert-manager.io/cluster-issuer: .global.issuer
                       tls:
                         - secretName: dex-tls
                           hosts: []
@@ -87,13 +87,45 @@ spec:
                   name: helm
             name: dex
             patches:
-              - fromFieldPath: spec.affinity
-                toFieldPath: spec.forProvider.values.affinity
-                type: FromCompositeFieldPath
-              - fromFieldPath: spec.resources
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.replicas
+                toFieldPath: spec.forProvider.values.replicaCount
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.certIssuer
+                toFieldPath: spec.forProvider.values.ingress.annotations["cert-manager.io/cluster-issuer"];
+              - type: FromCompositeFieldPath
+                fromFieldPath: whitelistSourceRange
+                toFieldPath: spec.forProvider.values.ingress.annotations["nginx.ingress.kubernetes.io/whitelist-source-range"];
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.hostname
+                toFieldPath: spec.forProvider.values.ingress.tls[0].hosts[0]
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.hostname
+                toFieldPath: spec.forProvider.values.ingress.hosts[0].host[0]
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.groupsSecret
+                toFieldPath: spec.forProvider.values.volumes[0].secret.secretName
+              - type: CombineFromComposite
+                combine:
+                  variables:
+                    - spec.hostname
+                  strategy: string
+                  string:
+                    fmt: https://%s
+                toFieldPath: spec.forProvider.values.config.issuer
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.resources
                 toFieldPath: spec.forProvider.values.resources
-                type: FromCompositeFieldPath
-              - fromFieldPath: spec.tolerations
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.nodeSelector
+                toFieldPath: spec.forProvider.values.nodeSelector
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.topologySpreadConstraints
+                toFieldPath: spec.forProvider.values.topologySpreadConstraints
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.affinity
+                toFieldPath: spec.forProvider.values.affinity
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.tolerations
                 toFieldPath: spec.forProvider.values.tolerations
-                type: FromCompositeFieldPath
       step: patch-and-transform

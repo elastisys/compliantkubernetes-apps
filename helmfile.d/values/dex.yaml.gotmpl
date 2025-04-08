@@ -1,125 +1,33 @@
-replicaCount: {{ .Values.dex.replicaCount }}
-ingress:
-  enabled: true
-  className: nginx
-  annotations:
-    cert-manager.io/cluster-issuer: {{ .Values.global.issuer }}
-    {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.dex }}
-    nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.dex }}
-    {{ end }}
-  tls:
-    - secretName: dex-tls
-      hosts:
-        - {{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}
-  hosts:
-    - host: {{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-
+replicas: 1
+certIssuer: {{ .Values.global.issuer }}
+{{- if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.dex }}
+whitelistSourceRange: {{ .Values.externalTrafficPolicy.whitelistRange.dex }}
+{{- end }}
+hostname: |-
+  {{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}
 {{- if .Values.dex.google.groupSupport }}
-volumeMounts:
-- mountPath: /etc/dex/google
-  name: google-sa
-volumes:
-- name: google-sa
-  secret:
-      secretName: {{ .Values.dex.google.SASecretName }}
+groupsSecret: |-
+  {{ .Values.dex.google.SASecretName }}
 {{- end }}
+connectors:
+{{- toYaml .Values.dex.connectors | nindent 4 }}
+clients: [] # generate from Environment?
 
-config:
-  oauth2:
-    skipApprovalScreen: true
-  expiry:
-    deviceRequests: {{ .Values.dex.expiry.deviceRequests }}
-    signingKeys: {{ .Values.dex.expiry.signingKeys }}
-    idTokens: {{ .Values.dex.expiry.idToken }}
-    refreshTokens:
-      reuseInterval: {{ .Values.dex.expiry.refreshTokens.reuseInterval }}
-      validIfNotUsedFor: {{ .Values.dex.expiry.refreshTokens.validIfNotUsedFor }}
-      absoluteLifetime: {{ .Values.dex.expiry.refreshTokens.absoluteLifetime }}
-  storage:
-    type: kubernetes
-    config:
-      inCluster: true
-  issuer: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}
-  connectors:
-  {{- toYaml .Values.dex.connectors | nindent 4 }}
-  staticClients:
-    - id: kubelogin
-      name: 'Kubernetes CLI'
-      secret: {{ .Values.dex.kubeloginClientSecret }}
-      redirectURIs:
-      - http://localhost:8000
-      - http://localhost:18000
-      - http://localhost:8080/oauth2/callback
-      {{- range $uri := .Values.dex.additionalKubeloginRedirects }}
-      - {{ $uri }}
-      {{- end }}
-    - id: grafana
-      secret: {{ .Values.grafana.clientSecret }}
-      name: 'Grafana'
-      redirectURIs:
-        - https://{{ .Values.grafana.user.subdomain }}.{{ .Values.global.baseDomain }}/login/generic_oauth
-{{- if .Values.grafana.ops.oidc.enabled }}
-    - id: grafana-ops
-      secret: {{ .Values.grafana.opsClientSecret }}
-      name: 'Grafana ops'
-      redirectURIs:
-        - https://{{ .Values.grafana.ops.subdomain }}.{{ .Values.global.opsDomain }}/login/generic_oauth
-{{- end }}
-{{- if .Values.harbor.enabled }}
-    - id: harbor
-      secret: {{ .Values.harbor.clientSecret }}
-      name: 'Harbor'
-      redirectURIs:
-        - https://{{ .Values.harbor.subdomain }}.{{ .Values.global.baseDomain }}/c/oidc/callback
-{{- end }}
-{{- if .Values.opensearch.sso.enabled }}
-    - id: opensearch
-      secret: {{ .Values.opensearch.clientSecret }}
-      name: 'OpenSearch'
-      redirectURIs:
-        - https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}
-        - https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}/auth/openid/login
-        - https://{{ .Values.opensearch.dashboards.subdomain }}.{{ .Values.global.baseDomain }}/app/home
-{{- end }}
-{{ if .Values.dex.additionalStaticClients }}
-  {{- toYaml .Values.dex.additionalStaticClients | nindent 4 }}
-{{ end }}
+# Enable iff corresponding Consumer exists?
+serviceMonitor: {{ .Values.dex.serviceMonitor.enabled }}
 
-{{ if .Values.dex.enableStaticLogin }}
-  enablePasswordDB: true
-  staticPasswords:
-    - email: "admin@example.com"
-      # bcrypt hash of the string "password"
-      hash: {{ .Values.dex.staticPassword | default "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W" }}
-      username: "admin"
-      userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
-{{ end }}
-
-securityContext:
-  allowPrivilegeEscalation: false
-  capabilities:
-    drop:
-    - ALL
-  runAsNonRoot: true
-  seccompProfile:
-    type: RuntimeDefault
-serviceMonitor:
-  enabled: {{ .Values.dex.serviceMonitor.enabled }}
-
-resources: # DONE
-{{- toYaml .Values.dex.resources | nindent 2 }}
+resources:
+{{- toYaml .Values.dex.resources | nindent 4 }}
 
 nodeSelector:
-{{- toYaml .Values.dex.nodeSelector | nindent 2  }}
+{{- toYaml .Values.dex.nodeSelector | nindent 4  }}
 
 topologySpreadConstraints:
-{{- toYaml .Values.dex.topologySpreadConstraints | nindent 2  }}
+{{- toYaml .Values.dex.topologySpreadConstraints | nindent 4  }}
 
-affinity: # DONE
-{{- toYaml .Values.dex.affinity | nindent 2  }}
+affinity:
+{{- toYaml .Values.dex.affinity | nindent 4  }}
 
-tolerations: # DONE
-{{- toYaml .Values.dex.tolerations | nindent 2  }}
+tolerations:
+{{- toYaml .Values.dex.tolerations | nindent 4  }}
+

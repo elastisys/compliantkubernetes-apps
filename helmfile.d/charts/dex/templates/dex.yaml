@@ -3,15 +3,27 @@ kind: Dex
 metadata:
   name: dex
 spec:
-  {{- with .Values.affinity }}
-  affinity:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-  {{- with .Values.resources }}
+  replicas: 1
+  certIssuer: {{ .Values.certIssuer }}
+{{- if .Values.whitelistSourceRange }}
+  whitelistSourceRange: {{ .Values.whitelistSourceRange }}
+{{- end }}
+  hostname: |-
+    {{ .Values.hostname }}
+  # Enable iff corresponding Consumer exists?
+  serviceMonitor: {{ .Values.serviceMonitor }}
+
   resources:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-  {{- with .Values.tolerations }}
+  {{- toYaml .Values.resources | nindent 4 }}
+
+  nodeSelector:
+  {{- toYaml .Values.nodeSelector | nindent 4  }}
+
+  topologySpreadConstraints:
+  {{- toYaml .Values.topologySpreadConstraints | nindent 4  }}
+
+  affinity:
+  {{- toYaml .Values.affinity | nindent 4  }}
+
   tolerations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+  {{- toYaml .Values.tolerations | nindent 4  }}

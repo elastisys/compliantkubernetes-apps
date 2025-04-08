@@ -573,6 +573,21 @@ spec:
                           x-kubernetes-list-type: atomic
                       type: object
                   type: object
+                certIssuer:
+                  type: string
+                clients:
+                  items: {}
+                  type: array
+                connectors:
+                  additionalProperties: {}
+                  type: object
+                groupsSecret:
+                  type: string
+                hostname:
+                  format: hostname
+                  type: string
+                replicas:
+                  type: integer
                 resources:
                   description: ResourceRequirements describes the compute resource requirements.
                   properties:
@@ -686,6 +701,8 @@ spec:
                       description: 'Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. Requests cannot exceed Limits. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
                       type: object
                   type: object
+                serviceMonitor:
+                  type: boolean
                 tolerations:
                   items:
                     description: The pod this Toleration is attached to tolerates any taint that matches the triple <key,value,effect> using the matching operator <operator>.
@@ -708,6 +725,7 @@ spec:
                         type: string
                     type: object
                   type: array
+                whitelistSourceRange: {}
               type: object
           type: object
       served: true
