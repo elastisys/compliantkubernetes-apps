@@ -1,7 +1,7 @@
 # Application developer kube-config for contributors
 
-There can be situations where you as a contributor needs to act as a application developer.
-This document describes how to add a service account to act as a application developer for development purposes.
+There can be situations where you as a contributor needs to act as an application developer.
+This document describes how to add a service account to act as an application developer for development purposes.
 
 First add a name for the service account in your `wc-config.yaml`
 

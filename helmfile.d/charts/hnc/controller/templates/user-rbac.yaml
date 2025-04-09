@@ -84,7 +84,7 @@ subjects:
   kind: User
   name: {{ . }}
 {{- end }}
-{{- range $.Values.rbac.user.serviceaccounts }}
+{{- range $.Values.rbac.user.serviceAccounts }}
 - kind: ServiceAccount
   name: {{ . }}
   namespace: default
