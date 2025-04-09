@@ -291,9 +291,9 @@ check_opensearch_user_roles() {
   for roleMapping in "${configuredMappings[@]}"; do
     configured_mapping_name=$(echo "$roleMapping" | yq4 e '.mapping_name' -)
     configured_users=$(echo "$roleMapping" | yq4 e '.definition.users[]' -)
-    res=$(echo "$rolesmapping" | jq ".$configured_mapping_name")
+    res=$(echo "$rolesmapping" | jq ".\"$configured_mapping_name\"")
     if [[ $res != "null" ]]; then
-      users=$(echo "$rolesmapping" | jq -r ".$configured_mapping_name.users[]")
+      users=$(echo "$rolesmapping" | jq -r ".\"$configured_mapping_name\".users[]")
       if [[ "$users" != "$configured_users" ]]; then
         no_error=false
         debug_msg+="[ERROR] Missing users < ${configured_users//$'\n'/ }> != < $users >, for role mapping: $configured_mapping_name \n"
@@ -375,6 +375,7 @@ check_opensearch_ism() {
   fi
 }
 
+# TODO: skip if object store is behind firewall (only reachable from cluster/bastion)
 check_object_store_access() {
   echo -ne "Checking opensearch snapshot bucket access... "
   no_error=true
