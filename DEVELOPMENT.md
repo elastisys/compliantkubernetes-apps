@@ -10,6 +10,12 @@ When working on compliantkubernetes-apps it is possible to work with local clust
 
 This requires that `kind` is installed and that either `podman` or `docker` is available and setup to work with `kind`.
 
+### Terminology
+
+- `apps-flavor` - one of `prod`, `dev` or `baremetal` is a global switch for configuring the clusters and deployed applications in different ways. The recommended value when working with local clusters is `dev`.
+- `local-cluster-profile` - a `Cluster` configuration object passed to `kind` when creating or updating local clusters. We use profiles to differentiate between single-/multi-node clusters and/or to enable special features such as container image caching. Use `./bin/local-clusters.sh list profiles` to see a list of built-in profiles.
+- `domain` - a local domain name. Using a subdomain of `.dev-ck8s.com` allows for setting up DNS based challenges for certificates issued by `cert-manager`, thus avoiding the use of self-signed certificates.
+
 ### Setup
 
 > [!warning]
@@ -30,28 +36,69 @@ This requires that `kind` is installed and that either `podman` or `docker` is a
 > sysctl net.ipv4.ip_unprivileged_port_start # expected at 53
 > ```
 
-> [!note]
-> In its current state the local cluster is created to be either SC or WC, and currently the scripts does not support setting up both a SC and WC.
-> To setup two independent clusters the following must be changed manually:
->
-> 1. the kind-config/local-cluster-profile must not bind the ingress controller to the same address, and
-> 1. the node-local-dns/local-resolve config must be updated to point towards the correct clusters.
-
 > [!tip]
-> Since local clusters are effectively ephemeral they can pull a lot of images and `kind` has no build in system to manage images.
+> Since local clusters are effectively ephemeral they can pull a lot of images and `kind` has no built-in system to manage images.
 > So, for the local clusters script there are commands to create and delete local pull through registry caches for a few upstream registries.
-> Commands to do so is `./scripts/local-cluster.sh cache <create|delete>`, then one can make use of the local cluster profiles `<single|multi>-node-cache` that are prepared to use it by default.
+> The command to do so is `./scripts/local-cluster.sh cache <create|delete>`, then one can make use of the local cluster profiles `<single|multi>-node-cache` that are prepared to use it by default.
+
+As a first step, configure the clusters:
 
 ```sh
 # with CK8S_CONFIG_PATH and CK8S_PGP_FP set
 ./scripts/local-cluster.sh config <name> <apps-flavor> <domain>
-./scripts/local-cluster.sh create <name> <kind-config|local-cluster-profile> # use list profiles to see built-in configs
 ```
 
-This will configure apps with `ck8sCloudProvider: none` and `ck8sFlavor: <apps-flavor>` and set some default values to run on local clusters.
-By default, it will use `calico` for networking, `local-path-provisioner` for block storage, and `minio` for object storage.
+This will use the default local listen address of `127.0.64.43` for the worker node. Apps will be configured with `ck8sCloudProvider: none` and `ck8sFlavor: <apps-flavor>` and set some default values to run on local clusters.
+By default, local clusters will use `calico` for networking, `local-path-provisioner` for block storage, and `minio` for object storage.
 
-The configuration contains some `set-me`'s that must be configured manually.
+Next, for the creation phase, to set up two independent clusters the WC must not bind the ingress controller to the same address. In order to do so the script will export the `CK8S_LOCAL_LISTEN_ADDRESS` to `127.0.64.143` for the WC.
+
+We'll also be passing the `--skip-minio` options for the WC, to deploy block storage only to the SC cluster.
+
+```sh
+./scripts/local-cluster.sh create <name>-sc <kind-config-file|local-cluster-profile>
+./scripts/local-cluster.sh create <name>-wc <kind-config-file|local-cluster-profile> --skip-minio
+```
+
+> [!important]
+> To support the integrated SC <--> WC scenario we require that the cluster names be suffixed with either `-sc` or `-wc`
+
+#### In-cluster DNS setup
+
+Making the clusters "aware" of each other will require custom DNS configuration snippets to both the SC and WC that ensure:
+
+- `(grafana|harbor|opensearch|ops).<domain>` resolve to an SC worker node IP from within the WC cluster
+- all other `.<domain>` queries from within the WC cluster resolve to the service IP of the `nginx-ingress`
+- `(grafana|harbor|opensearch|ops).<domain>` resolve to the service IP of the `nginx-ingress` within the SC cluster
+- all other `.<domain>` queries from within the SC cluster resolve to a WC worker node IP
+
+Since these snippets depend on IP address of running containers, they must be added _after_ the initial `create` commands.
+
+The following command will configure node-local DNS and (re)deploy the `node-local-dns` stack:
+
+```sh
+./scripts/local-cluster-sh setup_node_local_dns
+```
+
+#### Self-signed certificate setup
+
+Add the following block to `$CK8S_CONFIG_PATH/common-config.yaml` (you might need to merge the keys in `global` map manually):
+
+```yaml
+global:
+  issuer: selfsigned
+  verifyTls: false
+issuers:
+    letsencrypt:
+      enabled: false
+    extraIssuers:
+    - apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: selfsigned
+      spec:
+        selfSigned: {}
+```
 
 ### Deploy
 
@@ -67,9 +114,9 @@ Manage apps by using `helmfile` directly and with needs it will pull in all requ
 
 ```sh
 # for service cluster
-helmfile -e service_cluster <operation> --selector app=<application> --include-transitive-needs
+./bin/ck8s ops helmfile sc -lapp=<application> -lapp=<application_dependency> <operation> --include-transitive-needs
 # for workload cluster
-helmfile -e workload_cluster <operation> --selector app=<application> --include-transitive-needs
+./bin/ck8s ops helmfile wc -lapp=<application> -lapp=<application_dependency> <operation> --include-transitive-needs
 ```
 
 > [!note]
@@ -81,15 +128,17 @@ helmfile -e workload_cluster <operation> --selector app=<application> --include-
 > Example with OpenSearch:
 > When `app=opensearch` is installed we also get cert-manager through needs, but we do not get ClusterIssuers or Issuers, as they are separate releases within `app=cert-manager`.
 >
-> So one have to be explicit about which features to install.
+> So one has to be explicit about which features to install.
 
 Use `helmfile -e <service|workload>_cluster list` to list all releases and to view their labels.
 By default, all releases have `name=<release-name>` and `chart=<chart-name>` as predefined labels.
 
 Enabling ingress and resolve requires a special setup.
 The ingress will by default be port-mapped on the local address `127.0.64.43`.
-The local clusters script provide commands to create and delete a local DNS server to resolve any domain on and to the same `127.0.64.43` local address.
-Commands to do so is `./scripts/local-cluster.sh resolve <create|delete> <domain>`, matching the base domain of the cluster.
+
+The `local-clusters.sh` script provides commands to create and delete a local DNS server to resolve local domain queries. By default, the local resolve CoreDNS configuration will resolve the `grafana`, `harbor`, `opensearch` and `ops` subdomains to the SC listen address of `127.0.64.43`, while all other subdomains of `<domain>` will resolve to the WC listen address of `127.0.64.143`.
+
+To create the resolver, run `./scripts/local-cluster.sh resolve <create|delete> <domain>`, matching the base domain of the cluster.
 Note that this will make a temporary override of your current DNS server, and you may need to rerun it if you network settings are reset.
 
 > [!note]
@@ -118,7 +167,7 @@ Support matrix:
 | node-local-dns | 🟩️ | 🟩️ | |
 | opensearch     | 🟩️ | ⬜️ | Does not pull ingress-nginx. Prod flavour is heavy on resources. For full functionality use: <br/> `-lapp=cert-manager -lapp=dex -lapp=ingress-nginx -lapp=node-local-dns -lapp=opensearch` |
 | prometheus     | 🟩️ | 🟩️ | |
-| thanos         | 🟩️ | ⬜️ | Does not pull cert-manager, or ingress-nginx. For full functionality use: <br/> `-lapp=cert-manager -lapp=ingress-nginx-lapp=node-local-dns -lapp=opensearch -lapp=thanos` |
+| thanos         | 🟩️ | ⬜️ | Does not pull cert-manager, or ingress-nginx. For full functionality use: <br/> `-lapp=cert-manager -lapp=ingress-nginx -lapp=node-local-dns -lapp=opensearch -lapp=thanos` |
 | trivy-operator | 🟩️ | 🟩️ | |
 | velero         | 🟩️ | 🟩️ | |
 
