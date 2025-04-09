@@ -82,7 +82,7 @@ spec:
                       seccompProfile:
                         type: RuntimeDefault
                     serviceMonitor:
-                      enabled: true
+                      enabled: false
                 providerConfigRef:
                   name: helm
             name: dex
