@@ -22,3 +22,10 @@ networkPolicies:
     dns01:
       ips:
         - 0.0.0.0/0
+  kyverno:
+    imageRegistry:
+      ips:
+        - 0.0.0.0/0
+      ports:
+        - 443
+        - 80

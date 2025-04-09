@@ -1,0 +1,38 @@
+{{- $imageRegistry := .Values.networkPolicies.kyverno.imageRegistry }}
+
+policies:
+  kyverno:
+    all-deny:
+      podSelectorLabels: {}
+      egress: {}
+      ingress: {}
+
+    kyverno-admission-controller:
+      podSelectorLabels:
+        app.kubernetes.io/instance: kyverno
+        app.kubernetes.io/component: admission-controller
+      egress:
+        - rule: egress-rule-apiserver
+        - rule: egress-rule-dns
+        - name: egress-rule-image-registry
+          peers:
+            {{- range $imageRegistry.ips }}
+            - cidr: {{ . }}
+            {{- end }}
+          ports:
+            {{- range $imageRegistry.ports }}
+            - tcp: {{ . }}
+            {{- end }}
+      ingress:
+        - rule: ingress-rule-apiserver
+          ports:
+            - tcp: 9443
+        - rule: ingress-rule-prometheus
+          ports:
+            - tcp: 8000
+
+    kyverno-migrate-resources:
+      podSelectorLabels:
+        job-name: kyverno-migrate-resources
+      egress:
+        - rule: egress-rule-apiserver

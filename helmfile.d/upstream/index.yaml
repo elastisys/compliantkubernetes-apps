@@ -21,6 +21,8 @@ repositories:
   kubernetes-ingress-nginx: https://kubernetes.github.io/ingress-nginx
   kubernetes-metrics-server: https://kubernetes-sigs.github.io/metrics-server
 
+  kyverno: https://kyverno.github.io/kyverno/
+
   minio: https://charts.min.io/
 
   open-policy-agent-gatekeeper: https://open-policy-agent.github.io/gatekeeper/charts
@@ -58,6 +60,8 @@ charts:
   kubernetes-external-dns/external-dns: 1.14.4
   kubernetes-ingress-nginx/ingress-nginx: 4.12.1
   kubernetes-metrics-server/metrics-server: 3.12.1
+
+  kyverno/kyverno: 3.3.6
 
   minio/minio: 5.0.14
 

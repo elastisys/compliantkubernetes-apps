@@ -17,6 +17,7 @@ bases:
   - stacks/hnc.yaml.gotmpl
   - stacks/ingress-nginx.yaml.gotmpl
   - stacks/kured.yaml.gotmpl
+  - stacks/kyverno.yaml.gotmpl
   - stacks/local.yaml.gotmpl
   - stacks/monitoring.yaml.gotmpl
   - stacks/monitoring-grafana.yaml.gotmpl
@@ -55,6 +56,9 @@ releases:
   - inherit: [ template: gatekeeper-constraints ]
   - inherit: [ template: gatekeeper-mutations ]
   - inherit: [ template: gatekeeper-metrics ]
+
+  - inherit: [ template: kyverno-admission-controller ]
+  - inherit: [ template: kyverno-networkpolicy ]
 
   - inherit: [ template: default-podsecuritypolicy ]
 
