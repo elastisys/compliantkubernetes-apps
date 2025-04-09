@@ -4943,6 +4943,13 @@ properties:
     properties:
       resources:
         $ref: '#/$defs/kubernetesResourceRequirements'
+      scrapeTimeout:
+        title: Prometheus Node Exporter ServiceMonitor scrape timeout
+        description: |
+          Configure Prometheus Node Exporter ServiceMonitor scrape timeout.
+          If not set, the upstream default of 10s is used
+        type: string
+        default: ""
   s3Exporter:
     title: S3 Exporter
     description: Configure S3 exporter, used to collect metrics about S3 usage.
