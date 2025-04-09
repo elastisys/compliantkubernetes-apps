@@ -152,6 +152,20 @@ container.delete() {
     "${runtime}" container rm "${1}"
   fi
 }
+container.ip() {
+  local suffix jq_selector container_id
+  suffix="${1:-}"
+
+  case "${runtime}" in
+  "docker") jq_selector=". | select(.Names | endswith(\"${suffix}\")) | .ID" ;;
+  "podman") jq_selector=".[] | select(.Names[] | endswith(\"${suffix}\")) | .Id" ;;
+  *) return ;;
+  esac
+
+  container_id="$(${runtime} ps --format json | jq -r "$jq_selector" | head -1)"
+  test -z "$container_id" && return
+  ${runtime} inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$container_id"
+}
 volume.create() {
   if ! "${runtime}" volume inspect "${1}" &>/dev/null; then
     log.info "- creating volume ${1}"
@@ -425,6 +439,55 @@ create() {
   log.info "cluster ${cluster} is ready"
 }
 
+setup_node_local_dns() {
+  log.info "setting up node local dns"
+  local wc_node_ip sc_node_ip domain
+
+  wc_node_ip=$(container.ip wc-worker)
+
+  if ! test -z "$wc_node_ip"; then
+    log.info "got WC node IP: $wc_node_ip"
+  else
+    log.error "could not get WC node IP"
+    exit 1
+  fi
+
+  sc_node_ip=$(container.ip sc-worker)
+
+  if ! test -z "$sc_node_ip"; then
+    log.info "got SC node IP: $sc_node_ip"
+  else
+    log.error "could not get SC node IP"
+    exit 1
+  fi
+
+  # need domain
+  domain="$(yq4 ".global.baseDomain" <"${CK8S_CONFIG_PATH}/common-config.yaml")"
+
+  export wc_node_ip
+  export sc_node_ip
+  export domain
+
+  # shellcheck source=scripts/migration/yq.sh
+  source "${ROOT}/scripts/migration/yq.sh"
+
+  yq_merge \
+    "$CK8S_CONFIG_PATH/sc-config.yaml" \
+    "${HERE}/local-clusters/configs/partial/sc-node-local-dns.yaml" |
+    envsubst >"$CK8S_CONFIG_PATH/sc-config.yaml.new"
+  mv -f "$CK8S_CONFIG_PATH/sc-config.yaml.new" "$CK8S_CONFIG_PATH/sc-config.yaml"
+
+  yq_merge \
+    "$CK8S_CONFIG_PATH/wc-config.yaml" \
+    "${HERE}/local-clusters/configs/partial/wc-node-local-dns.yaml" |
+    envsubst >"$CK8S_CONFIG_PATH/wc-config.yaml.new"
+  mv -f "$CK8S_CONFIG_PATH/wc-config.yaml.new" "$CK8S_CONFIG_PATH/wc-config.yaml"
+
+  # TODO - ask reviewers if we actually need the transitive needs for the node-local-dns stack?
+  "$ROOT/bin/ck8s" ops helmfile sc -lapp=node-local-dns apply --include-transitive-needs
+  "$ROOT/bin/ck8s" ops helmfile wc -lapp=node-local-dns apply --include-transitive-needs
+}
+
 delete() {
   local cluster
   cluster="${1:-}"
@@ -462,6 +525,9 @@ main() {
   subcommand="${2:-}"
 
   case "${command}" in
+  setup_node_local_dns)
+    setup_node_local_dns
+    ;;
   cache)
     case "${subcommand}" in
     create | delete)
