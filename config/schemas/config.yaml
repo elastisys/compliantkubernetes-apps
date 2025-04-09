@@ -6588,7 +6588,16 @@ properties:
               enabled:
                 type: boolean
                 const: true
-      - required:
+      - properties:
+          letsencrypt:
+            properties:
+              enabled:
+                type: boolean
+                const: false
+          extraIssuers:
+            type: array
+            minItems: 1
+        required:
           - extraIssuers
     additionalProperties: false
     properties:
@@ -6642,7 +6651,6 @@ properties:
       extraIssuers:
         title: Extra Issuers
         type: array
-        minItems: 1
         items:
           $ref: "https://github.com/datreeio/CRDs-catalog/raw/refs/heads/main/cert-manager.io/clusterissuer_v1.json"
           type: object
