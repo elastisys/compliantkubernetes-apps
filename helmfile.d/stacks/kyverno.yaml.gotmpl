@@ -1,0 +1,29 @@
+---
+templates:
+  kyverno:
+    namespace: kyverno
+    name: kyverno
+    labels:
+      app: kyverno
+    needs:
+      - kube-system/admin-namespaces
+
+  kyverno-admission-controller:
+    inherit:
+      - template: kyverno
+      - template: kyverno-chart
+    installed: {{ .Values | get "kyverno.enabled" false }}
+    values:
+      - values/kyverno.yaml.gotmpl
+    wait: true
+
+  kyverno-networkpolicy:
+    inherit:
+      - template: kyverno
+      - template: networkpolicies
+    installed: {{ and (.Values | get "kyverno.enabled" false) (.Values | get "networkPolicies.kyverno.enabled" false) }}
+    labels:
+      netpol: kyverno
+    values:
+      - values/networkpolicies/common/common.yaml.gotmpl
+      - values/networkpolicies/common/kyverno.yaml.gotmpl

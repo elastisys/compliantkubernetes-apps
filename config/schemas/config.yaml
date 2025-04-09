@@ -1266,6 +1266,32 @@ allOf:
             properties:
               syncDefaultBuckets:
                 const: false
+- if:
+    properties:
+      networkPolicies:
+        properties:
+          kyverno:
+            properties:
+              enabled:
+                const: true
+      kyverno:
+        properties:
+          enabled:
+            const: true
+  then:
+    properties:
+      networkPolicies:
+        properties:
+          kyverno:
+            properties:
+              imageRegistry:
+                properties:
+                  ips:
+                    title: NetworkPolicies Kyverno Image Registry IPs
+                    $ref: '#/$defs/iplist'
+                  ports:
+                    title: NetworkPolicies Kyverno Image Registry Ports
+                    $ref: '#/$defs/portlist'
 properties:
   global:
     title: Global options
@@ -7298,6 +7324,22 @@ properties:
                 $ref: '#/$defs/portlist'
                 default:
                   - 443
+      kyverno:
+        title: Network Policies Kyverno
+        description: Configure Kyverno network policy rules.
+        type: object
+        properties:
+          enabled:
+            title: Network Policies Kyverno Enabled
+            type: boolean
+            default: true
+          imageRegistry:
+            title: Network Policies Kyverno Image Registry
+            description: Configure network policy that allows Kyverno to access image registries. This is required for signed image verification.
+            type: object
+            properties:
+              ips: true
+              ports: true
       rclone:
         title: Network Policies Rclone
         description: Configure Rclone network policy rules.
@@ -7759,6 +7801,28 @@ properties:
         title: Enable Additional DCGM Metrics
         description: Adds some profiling metrics in DCGM if it's available in your GPU setup
         type: boolean
+
+  kyverno:
+    title: Kyverno Config
+    description: Configure Kyverno and Kyverno Policies
+    type: object
+    properties:
+      enabled:
+        title: Enable Kyverno
+        default: false
+        type: boolean
+      resources:
+        $ref: '#/$defs/kubernetesResourceRequirements'
+      nodeSelector:
+        $ref: '#/$defs/kubernetesNodeSelector'
+      podAffinity:
+        $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      nodeAffinity:
+        $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+      topologySpreadConstraints:
+        $ref: '#/$defs/kubernetesTopologySpreadConstraints'
+      tolerations:
+        $ref: '#/$defs/kubernetesTolerations'
 
 additionalProperties:
   title: Additional Properties

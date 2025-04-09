@@ -1,0 +1,53 @@
+namespaceOverride: kyverno
+
+admissionController:
+  replicas: 3
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
+  container:
+    resources: {{- toYaml .Values.kyverno.resources | nindent 8 }}
+  nodeSelector: {{- toYaml .Values.kyverno.nodeSelector | nindent 4 }}
+  podAffinity:  {{- toYaml .Values.kyverno.podAffinity | nindent 4 }}
+  nodeAffinity: {{- toYaml .Values.kyverno.nodeAffinity | nindent 4 }}
+  tolerations: {{- toYaml .Values.kyverno.tolerations | nindent 4 }}
+  topologySpreadConstraints: {{- toYaml .Values.kyverno.topologySpreadConstraints | nindent 4 }}
+backgroundController:
+  enabled: false
+cleanupController:
+  enabled: false
+reportsController:
+  enabled: false
+
+policyReportsCleanup:
+  enabled: false
+
+features:
+  admissionReports:
+    enabled: false
+  aggregateReports:
+    enabled: false
+  policyReports:
+    enabled: false
+  reporting:
+    validate: false
+    mutate: false
+    mutateExisting: false
+    imageVerify: false
+    generate: false
+  backgroundScan:
+    enabled: false
+
+crds:
+  groups:
+    kyverno:
+      cleanuppolicies: false
+      clustercleanuppolicies: false
+  migration:
+    resources:
+      - clusterpolicies.kyverno.io
+      - globalcontextentries.kyverno.io
+      - policies.kyverno.io
+      - policyexceptions.kyverno.io
+      - updaterequests.kyverno.io

@@ -1153,6 +1153,14 @@ networkPolicies:
   kubeSystem:
     enabled: true
 
+  kyverno:
+    enabled: true
+    imageRegistry:
+      ips:
+        - set-me-if-(.kyverno.enabled and .networkPolicies.kyverno.enabled)
+      ports:
+        - set-me-if-(.kyverno.enabled and .networkPolicies.kyverno.enabled)
+
   coredns:
     enabled: true
     externalDns:
@@ -1306,3 +1314,18 @@ gpu:
     #              replicas: 4
 
   extraMetrics: false
+
+kyverno:
+  enabled: false
+  resources:
+    limits:
+      cpu: 200m
+      memory: 384Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  nodeSelector: {}
+  podAffinity: {}
+  nodeAffinity: {}
+  topologySpreadConstraints: []
+  tolerations: []

@@ -119,6 +119,7 @@
 /helmfile.d/upstream/kubernetes-external-dns/ @elastisys/goto-ingress-auth
 /helmfile.d/upstream/kubernetes-ingress-nginx/ @elastisys/goto-ingress-auth
 /helmfile.d/upstream/kubernetes-metrics-server/ @elastisys/goto-monitoring-stack
+/helmfile.d/upstream/kyverno/ @elastisys/goto-access-control
 /helmfile.d/upstream/minio/ @elastisys/goto-pipeline-qa-release
 /helmfile.d/upstream/open-policy-agent-gatekeeper/ @elastisys/goto-access-control
 /helmfile.d/upstream/opensearch-project/ @elastisys/goto-logging-stack
@@ -177,6 +178,7 @@
 /helmfile.d/values/kube-prometheus-stack-* @elastisys/goto-monitoring-stack
 /helmfile.d/values/kube-state-metrics-extra-resource-metrics.yaml.gotmpl @elastisys/goto-monitoring-stack
 /helmfile.d/values/kured.yaml.gotmpl @elastisys/goto-security
+/helmfile.d/values/kyverno.yaml.gotmpl @elastisys/goto-access-control
 /helmfile.d/values/letsencrypt.yaml.gotmpl @elastisys/goto-ingress-auth
 /helmfile.d/values/metrics-server.yaml.gotmpl @elastisys/goto-monitoring-stack
 /helmfile.d/values/minio.yaml.gotmpl @elastisys/goto-pipeline-qa-release
