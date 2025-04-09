@@ -323,13 +323,28 @@ config() {
 }
 
 create() {
-  local cluster config
+  local cluster config affix
   cluster="${1:-}"
   config="${2:-}"
 
   if [[ -z "${cluster}" ]]; then
     log.usage
   fi
+
+  case "$cluster" in
+  *-wc)
+    affix="wc"
+    export CK8S_LOCAL_LISTEN_ADDRESS=127.0.64.143
+    ;;
+  *-sc)
+    affix="sc"
+    export CK8S_LOCAL_LISTEN_ADDRESS=127.0.64.43
+    ;;
+  *)
+    echo "Local cluster names must use either the -wc or -sc suffix." >&2
+    exit 1
+    ;;
+  esac
 
   if [[ -z "${CK8S_CONFIG_PATH:-}" ]]; then
     log.fatal "CK8S_CONFIG_PATH is unset"
@@ -342,8 +357,6 @@ create() {
   else
     log.fatal "config or profile \"${config}\" is not valid"
   fi
-
-  export CK8S_LOCAL_LISTEN_ADDRESS="${CK8S_LOCAL_LISTEN_ADDRESS:-"127.0.64.43"}"
 
   if [[ "$(index.state "${cluster}")" == "ready" ]]; then
     log.info "cluster ${cluster} is in ready state, aborting"
@@ -371,13 +384,11 @@ create() {
   fi
 
   mkdir -p "${CK8S_CONFIG_PATH}/.state"
-  kind get kubeconfig --name "${cluster}" >"${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml"
-  kind get kubeconfig --name "${cluster}" >"${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml"
+  kind get kubeconfig --name "${cluster}" >"${CK8S_CONFIG_PATH}/.state/kube_config_${affix}.yaml"
 
-  chmod 600 "${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml"
-  chmod 600 "${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml"
+  chmod 600 "${CK8S_CONFIG_PATH}/.state/kube_config_${affix}.yaml"
 
-  export KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml"
+  export KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_${affix}.yaml"
 
   if [[ "${runtime}" == "podman" ]]; then
     log.info "patch coredns config for podman"
