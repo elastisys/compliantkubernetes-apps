@@ -100,7 +100,13 @@ ask_abort() {
 
 # Checks that all dependencies are available and critical ones for matching minor version.
 check_tools() {
-  local req
+  local req just_check
+
+  if [[ "${1:-}" == "--just-check" ]]; then
+    just_check=1
+  else
+    just_check=0
+  fi
 
   req="$("${scripts_path}/requirements/parse.py")"
 
@@ -148,7 +154,9 @@ check_tools() {
   if [[ "${warn}" != 0 ]]; then
     if [[ -t 1 ]]; then
       log_warning "Run the following command to update: ./bin/ck8s install-requirements"
-      ask_abort
+      if [[ "${just_check}" != 1 ]]; then
+        ask_abort
+      fi
     fi
   fi
 }

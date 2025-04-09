@@ -58,7 +58,7 @@ done
 
 case "${1}" in
 check-tools)
-  check_tools
+  check_tools --just-check
   ;;
 init)
   [[ "${2}" =~ ^(wc|sc|both)$ ]] || usage
