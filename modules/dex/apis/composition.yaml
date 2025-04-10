@@ -108,7 +108,7 @@ spec:
               - type: CombineFromComposite
                 combine:
                   variables:
-                    - spec.hostname
+                    - fromFieldPath: spec.hostname
                   strategy: string
                   string:
                     fmt: https://%s
