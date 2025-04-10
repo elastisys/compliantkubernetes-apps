@@ -128,4 +128,7 @@ spec:
               - type: FromCompositeFieldPath
                 fromFieldPath: spec.tolerations
                 toFieldPath: spec.forProvider.values.tolerations
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.serviceMonitor
+                toFieldPath: spec.forProvider.values.serviceMonitor.enabled
       step: patch-and-transform
