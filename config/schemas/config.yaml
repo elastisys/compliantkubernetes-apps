@@ -6650,9 +6650,12 @@ properties:
                 type: array
       extraIssuers:
         title: Extra Issuers
+        description: A list of custom ClusterIssuer's
         type: array
         items:
           $ref: "https://github.com/datreeio/CRDs-catalog/raw/refs/heads/main/cert-manager.io/clusterissuer_v1.json"
+          title: Issuer
+          description: Configuration for a named ClusterIssuer, e.g. sectigo
           type: object
           required:
             - metadata
