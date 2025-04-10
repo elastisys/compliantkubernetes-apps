@@ -101,7 +101,7 @@ spec:
                 toFieldPath: spec.forProvider.values.ingress.tls[0].hosts[0]
               - type: FromCompositeFieldPath
                 fromFieldPath: spec.hostname
-                toFieldPath: spec.forProvider.values.ingress.hosts[0].host[0]
+                toFieldPath: spec.forProvider.values.ingress.hosts[0].host
               - type: FromCompositeFieldPath
                 fromFieldPath: spec.groupsSecret
                 toFieldPath: spec.forProvider.values.volumes[0].secret.secretName
