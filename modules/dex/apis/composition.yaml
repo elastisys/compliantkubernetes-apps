@@ -37,7 +37,7 @@ spec:
                         - secretName: dex-tls
                           hosts: []
                       hosts:
-                        - host: "dex.kapitest.dev-ck8s.com"
+                        - host: dex.patch-me.invalid
                           paths:
                             - path: /
                               pathType: ImplementationSpecific
@@ -67,7 +67,7 @@ spec:
                       connectors: {}
                       staticClients:
                         - id: kubelogin
-                          name: 'Kubernetes CLI'
+                          name: Kubernetes CLI
                           secret: ""
                           redirectURIs:
                             - http://localhost:8000
