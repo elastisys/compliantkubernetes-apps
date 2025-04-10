@@ -48,10 +48,10 @@ As a first step, configure the clusters:
 ./scripts/local-cluster.sh config <name> <apps-flavor> <domain>
 ```
 
-This will use the default local listen address of `127.0.64.43` for the worker node. Apps will be configured with `ck8sCloudProvider: none` and `ck8sFlavor: <apps-flavor>` and set some default values to run on local clusters.
-By default, local clusters will use `calico` for networking, `local-path-provisioner` for block storage, and `minio` for object storage.
+This will use the default local listen address of `127.0.64.43` for the SC worker node and `127.0.64.143` for the WC worker node.
 
-Next, for the creation phase, to set up two independent clusters the WC must not bind the ingress controller to the same address. In order to do so the script will export the `CK8S_LOCAL_LISTEN_ADDRESS` to `127.0.64.143` for the WC.
+Apps will be configured with `ck8sCloudProvider: none` and `ck8sFlavor: <apps-flavor>` and set some default values to run on local clusters.
+By default, local clusters will use `calico` for networking, `local-path-provisioner` for block storage, and `minio` for object storage.
 
 We'll also be passing the `--skip-minio` options for the WC, to deploy block storage only to the SC cluster.
 
@@ -72,7 +72,7 @@ Making the clusters "aware" of each other will require custom DNS configuration 
 - `(grafana|harbor|opensearch|ops).<domain>` resolve to the service IP of the `nginx-ingress` within the SC cluster
 - all other `.<domain>` queries from within the SC cluster resolve to a WC worker node IP
 
-Since these snippets depend on IP address of running containers, they must be added _after_ the initial `create` commands.
+Since these snippets depend on the IP addresses of running containers, they must be setup _after_ the initial `create` commands.
 
 The following command will configure node-local DNS and (re)deploy the `node-local-dns` stack:
 
