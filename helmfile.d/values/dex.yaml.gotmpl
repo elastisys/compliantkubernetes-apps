@@ -1,4 +1,4 @@
-replicas: 1
+replicas: {{ .Values.dex.replicaCount }}
 certIssuer: {{ .Values.global.issuer }}
 {{- if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.dex }}
 whitelistSourceRange: {{ .Values.externalTrafficPolicy.whitelistRange.dex }}

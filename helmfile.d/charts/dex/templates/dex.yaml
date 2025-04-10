@@ -3,7 +3,7 @@ kind: Dex
 metadata:
   name: dex
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicas }}
   certIssuer: {{ .Values.certIssuer }}
 {{- if .Values.whitelistSourceRange }}
   whitelistSourceRange: {{ .Values.whitelistSourceRange }}
