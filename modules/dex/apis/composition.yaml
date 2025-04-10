@@ -92,10 +92,10 @@ spec:
                 toFieldPath: spec.forProvider.values.replicaCount
               - type: FromCompositeFieldPath
                 fromFieldPath: spec.certIssuer
-                toFieldPath: spec.forProvider.values.ingress.annotations["cert-manager.io/cluster-issuer"];
+                toFieldPath: spec.forProvider.values.ingress.annotations["cert-manager.io/cluster-issuer"]
               - type: FromCompositeFieldPath
                 fromFieldPath: whitelistSourceRange
-                toFieldPath: spec.forProvider.values.ingress.annotations["nginx.ingress.kubernetes.io/whitelist-source-range"];
+                toFieldPath: spec.forProvider.values.ingress.annotations["nginx.ingress.kubernetes.io/whitelist-source-range"]
               - type: FromCompositeFieldPath
                 fromFieldPath: spec.hostname
                 toFieldPath: spec.forProvider.values.ingress.tls[0].hosts[0]
