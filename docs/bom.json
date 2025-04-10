@@ -1,0 +1,1202 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:26cee490-ce71-4516-965f-22a6468a323c",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2025-04-10T15:21:12Z",
+    "tools": {
+      "components": [
+        {
+          "group": "@cyclonedx",
+          "name": "cdxgen",
+          "version": "11.1.3",
+          "purl": "pkg:npm/%40cyclonedx/cdxgen@11.1.3",
+          "type": "application",
+          "bom-ref": "pkg:npm/@cyclonedx/cdxgen@11.1.3",
+          "publisher": "OWASP Foundation",
+          "authors": [
+            {
+              "name": "OWASP Foundation"
+            }
+          ]
+        }
+      ]
+    },
+    "authors": [
+      {
+        "name": "OWASP Foundation"
+      }
+    ],
+    "lifecycles": [
+      {
+        "phase": "build"
+      }
+    ],
+    "properties": [
+      {
+        "name": "cdx:bom:componentTypes",
+        "value": "helm"
+      }
+    ]
+  },
+  "components": [
+    {
+      "group": "",
+      "name": "velero",
+      "version": "6.0.0",
+      "description": "A Helm chart for velero",
+      "purl": "pkg:helm/velero@6.0.0",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/vmware-tanzu/velero"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/velero@6.0.0",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "prometheus-elasticsearch-exporter",
+      "version": "6.1.0",
+      "description": "Elasticsearch stats exporter for Prometheus",
+      "purl": "pkg:helm/prometheus-elasticsearch-exporter@6.1.0",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/prometheus-community/elasticsearch_exporter"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/prometheus-elasticsearch-exporter@6.1.0",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "prometheus-blackbox-exporter",
+      "version": "8.13.0",
+      "description": "Prometheus Blackbox Exporter",
+      "purl": "pkg:helm/prometheus-blackbox-exporter@8.13.0",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/prometheus/blackbox_exporter"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/prometheus-blackbox-exporter@8.13.0",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "kube-prometheus-stack",
+      "version": "67.11.0",
+      "description": "kube-prometheus-stack collects Kubernetes manifests, Grafana dashboards, and Prometheus rules combined with documentation and scripts to provide easy to operate end-to-end Kubernetes cluster monitoring with Prometheus using the Prometheus Operator.",
+      "purl": "pkg:helm/kube-prometheus-stack@67.11.0",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/prometheus-operator/kube-prometheus"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/kube-prometheus-stack@67.11.0",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "crds",
+      "version": "0.0.0",
+      "purl": "pkg:helm/crds@0.0.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/crds@0.0.0",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "kube-state-metrics",
+      "version": "5.28.*",
+      "purl": "pkg:helm/kube-state-metrics@5.28.*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://prometheus-community.github.io/helm-charts"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/kube-state-metrics@5.28.*",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "prometheus-node-exporter",
+      "version": "4.43.*",
+      "purl": "pkg:helm/prometheus-node-exporter@4.43.*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://prometheus-community.github.io/helm-charts"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/prometheus-node-exporter@4.43.*",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "grafana",
+      "version": "8.8.*",
+      "purl": "pkg:helm/grafana@8.8.*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://grafana.github.io/helm-charts"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/grafana@8.8.*",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "prometheus-windows-exporter",
+      "version": "0.7.*",
+      "purl": "pkg:helm/prometheus-windows-exporter@0.7.*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://prometheus-community.github.io/helm-charts"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/prometheus-windows-exporter@0.7.*",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "prometheus-windows-exporter",
+      "version": "0.7.1",
+      "description": "A Helm chart for prometheus windows-exporter",
+      "purl": "pkg:helm/prometheus-windows-exporter@0.7.1",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/prometheus-community/windows_exporter/"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/prometheus-windows-exporter@0.7.1",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "prometheus-node-exporter",
+      "version": "4.43.1",
+      "description": "A Helm chart for prometheus node-exporter",
+      "purl": "pkg:helm/prometheus-node-exporter@4.43.1",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/prometheus/node_exporter/"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/prometheus-node-exporter@4.43.1",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "kube-state-metrics",
+      "version": "5.28.0",
+      "description": "Install kube-state-metrics to generate and expose cluster-level metrics",
+      "purl": "pkg:helm/kube-state-metrics@5.28.0",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/kubernetes/kube-state-metrics/"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/kube-state-metrics@5.28.0",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "grafana",
+      "version": "8.8.2",
+      "description": "The leading tool for querying and visualizing time series and metrics.",
+      "purl": "pkg:helm/grafana@8.8.2",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://grafana.com"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/grafana@8.8.2",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "tigera-operator",
+      "version": "v3.26.4",
+      "description": "Installs the Tigera operator for Calico",
+      "purl": "pkg:helm/tigera-operator@v3.26.4",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://projectcalico.docs.tigera.io/about/about-calico"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/tigera-operator@v3.26.4",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "opensearch-dashboards",
+      "version": "2.26.0",
+      "description": "A Helm chart for OpenSearch Dashboards",
+      "purl": "pkg:helm/opensearch-dashboards@2.26.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/opensearch-dashboards@2.26.0",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "opensearch",
+      "version": "2.30.1",
+      "description": "A Helm chart for OpenSearch",
+      "purl": "pkg:helm/opensearch@2.30.1",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://opensearch.org"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/opensearch@2.30.1",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "gatekeeper",
+      "version": "3.15.1",
+      "description": "A Helm chart for Gatekeeper",
+      "purl": "pkg:helm/gatekeeper@3.15.1",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/open-policy-agent/gatekeeper"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/gatekeeper@3.15.1",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "gpu-operator",
+      "version": "v24.9.2",
+      "description": "NVIDIA GPU Operator creates/configures/manages GPUs atop Kubernetes",
+      "purl": "pkg:helm/gpu-operator@v24.9.2",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/overview.html"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/gpu-operator@v24.9.2",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "node-feature-discovery",
+      "version": "v0.16.6",
+      "purl": "pkg:helm/node-feature-discovery@v0.16.6",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://kubernetes-sigs.github.io/node-feature-discovery/charts"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/node-feature-discovery@v0.16.6",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "node-feature-discovery",
+      "version": "0.16.6",
+      "description": "Detects hardware features available on each node in a Kubernetes cluster, and advertises those features using node labels. ",
+      "purl": "pkg:helm/node-feature-discovery@0.16.6",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/kubernetes-sigs/node-feature-discovery"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/node-feature-discovery@0.16.6",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "minio",
+      "version": "5.0.14",
+      "description": "Multi-Cloud Object Storage",
+      "purl": "pkg:helm/minio@5.0.14",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://min.io"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/minio@5.0.14",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "metrics-server",
+      "version": "3.12.1",
+      "description": "Metrics Server is a scalable, efficient source of container resource metrics for Kubernetes built-in autoscaling pipelines.",
+      "purl": "pkg:helm/metrics-server@3.12.1",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/kubernetes-sigs/metrics-server"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/metrics-server@3.12.1",
+      "tags": [
+        "resource"
+      ],
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "ingress-nginx",
+      "version": "4.12.1",
+      "description": "Ingress controller for Kubernetes using NGINX as a reverse proxy and load balancer",
+      "purl": "pkg:helm/ingress-nginx@4.12.1",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/kubernetes/ingress-nginx"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/ingress-nginx@4.12.1",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "external-dns",
+      "version": "1.14.4",
+      "description": "ExternalDNS synchronizes exposed Kubernetes Services and Ingresses with DNS providers.",
+      "purl": "pkg:helm/external-dns@1.14.4",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/kubernetes-sigs/external-dns/"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/external-dns@1.14.4",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "kured",
+      "version": "5.6.0",
+      "description": "A Helm chart for kured",
+      "purl": "pkg:helm/kured@5.6.0",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/kubereboot/kured"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/kured@5.6.0",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "fluentd-elasticsearch",
+      "version": "13.12.2",
+      "description": "A Fluentd Helm chart for Kubernetes with Elasticsearch output",
+      "purl": "pkg:helm/fluentd-elasticsearch@13.12.2",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://www.fluentd.org/"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/fluentd-elasticsearch@13.12.2",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "cert-manager",
+      "version": "v1.17.1",
+      "description": "A Helm chart for cert-manager",
+      "purl": "pkg:helm/cert-manager@v1.17.1",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://cert-manager.io"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/cert-manager@v1.17.1",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "grafana",
+      "version": "8.9.1",
+      "description": "The leading tool for querying and visualizing time series and metrics.",
+      "purl": "pkg:helm/grafana@8.9.1",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://grafana.com"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/grafana@8.9.1",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "harbor",
+      "version": "1.16.1",
+      "description": "An open source trusted cloud native registry that stores, signs, and scans content",
+      "purl": "pkg:helm/harbor@1.16.1",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://goharbor.io"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/harbor@1.16.1",
+      "tags": [
+        "cloud"
+      ],
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "falco",
+      "version": "4.20.0",
+      "description": "Falco",
+      "purl": "pkg:helm/falco@4.20.0",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://falco.org"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/falco@4.20.0",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "falcosidekick",
+      "version": "0.9.*",
+      "purl": "pkg:helm/falcosidekick@0.9.*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://falcosecurity.github.io/charts"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/falcosidekick@0.9.*",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "k8s-metacollector",
+      "version": "0.1.*",
+      "purl": "pkg:helm/k8s-metacollector@0.1.*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://falcosecurity.github.io/charts"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/k8s-metacollector@0.1.*",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "k8s-metacollector",
+      "version": "0.1.10",
+      "description": "Install k8s-metacollector to fetch and distribute Kubernetes metadata to Falco instances.",
+      "purl": "pkg:helm/k8s-metacollector@0.1.10",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/falcosecurity/k8s-metacollector"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/k8s-metacollector@0.1.10",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "falcosidekick",
+      "version": "0.9.8",
+      "description": "Connect Falco to your ecosystem",
+      "purl": "pkg:helm/falcosidekick@0.9.8",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/falcosecurity/falcosidekick"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/falcosidekick@0.9.8",
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "dex",
+      "version": "0.18.0",
+      "description": "OpenID Connect (OIDC) identity and OAuth 2.0 provider with pluggable connectors.",
+      "purl": "pkg:helm/dex@0.18.0",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://dexidp.io/"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/dex@0.18.0",
+      "tags": [
+        "connect"
+      ],
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "thanos",
+      "version": "15.13.1",
+      "description": "Thanos is a highly available metrics system that can be added on top of existing Prometheus deployments, providing a global query view across all Prometheus installations.",
+      "purl": "pkg:helm/thanos@15.13.1",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://bitnami.com"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/thanos@15.13.1",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "minio",
+      "version": "15.x.x",
+      "purl": "pkg:helm/minio@15.x.x",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "oci://registry-1.docker.io/bitnamicharts"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/minio@15.x.x",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "common",
+      "version": "2.x.x",
+      "purl": "pkg:helm/common@2.x.x",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "oci://registry-1.docker.io/bitnamicharts"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/common@2.x.x",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "minio",
+      "version": "15.0.5",
+      "description": "MinIO(R) is an object storage server, compatible with Amazon S3 cloud storage service, mainly used for storing unstructured data (such as photos, videos, log files, etc.).",
+      "purl": "pkg:helm/minio@15.0.5",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://bitnami.com"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/minio@15.0.5",
+      "tags": [
+        "cloud",
+        "log"
+      ],
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "common",
+      "version": "2.30.0",
+      "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
+      "purl": "pkg:helm/common@2.30.0",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://bitnami.com"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/common@2.30.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "fluentd",
+      "version": "7.1.1",
+      "description": "Fluentd collects events from various data sources and writes them to files, RDBMS, NoSQL, IaaS, SaaS, Hadoop and so on.",
+      "purl": "pkg:helm/fluentd@7.1.1",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://bitnami.com"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/fluentd@7.1.1",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "common",
+      "version": "2.29.0",
+      "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
+      "purl": "pkg:helm/common@2.29.0",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://bitnami.com"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/common@2.29.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "trivy-operator",
+      "version": "0.26.0",
+      "description": "Keeps security report resources updated",
+      "purl": "pkg:helm/trivy-operator@0.26.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/trivy-operator@0.26.0",
+      "tags": [
+        "security"
+      ],
+      "license": "set-me"
+    },
+    {
+      "group": "",
+      "name": "user-rbac",
+      "version": "0.1.0",
+      "description": "A Helm chart for Kubernetes",
+      "purl": "pkg:helm/user-rbac@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/user-rbac@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "user-crds",
+      "version": "0.1.0",
+      "description": "A Helm chart for Kubernetes",
+      "purl": "pkg:helm/user-crds@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/user-crds@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "user-alertmanager",
+      "version": "0.1.0",
+      "description": "A Helm chart for Kubernetes",
+      "purl": "pkg:helm/user-alertmanager@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/user-alertmanager@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "thanos-ruler",
+      "version": "0.1.0",
+      "description": "thanos ruler dummy for prometheus operator to collect prometheus rules",
+      "purl": "pkg:helm/thanos-ruler@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/thanos-ruler@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "thanos-ingress-secret",
+      "version": "0.1.0",
+      "description": "A Helm chart for Kubernetes",
+      "purl": "pkg:helm/thanos-ingress-secret@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/thanos-ingress-secret@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "tekton-pipelines",
+      "version": "0.1.0",
+      "description": "A Helm chart for Tekton pipelines",
+      "purl": "pkg:helm/tekton-pipelines@0.1.0",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/tektoncd/pipeline"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/tekton-pipelines@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "s3-exporter",
+      "version": "0.1.0",
+      "description": "A Helm chart for s3_exporter: https://github.com/ribbybibby/s3_exporter",
+      "purl": "pkg:helm/s3-exporter@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/s3-exporter@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "rclone",
+      "version": "0.1.0",
+      "description": "Run cronjobs with rclone",
+      "purl": "pkg:helm/rclone@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/rclone@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "prometheus-servicemonitor",
+      "version": "0.1.1",
+      "description": "A Helm chart for the prometheus-servicemonitor in both the wc and sc cluster",
+      "purl": "pkg:helm/prometheus-servicemonitor@0.1.1",
+      "type": "library",
+      "bom-ref": "pkg:helm/prometheus-servicemonitor@0.1.1",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "prometheus-alerts",
+      "version": "0.1.1",
+      "description": "A Helm chart for Kubernetes",
+      "purl": "pkg:helm/prometheus-alerts@0.1.1",
+      "type": "library",
+      "bom-ref": "pkg:helm/prometheus-alerts@0.1.1",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "openstack-monitoring",
+      "version": "0.1.0",
+      "description": "A Helm chart for Kubernetes",
+      "purl": "pkg:helm/openstack-monitoring@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/openstack-monitoring@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "opensearch-slm",
+      "version": "0.1.0",
+      "description": "A Helm chart for Kubernetes",
+      "purl": "pkg:helm/opensearch-slm@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/opensearch-slm@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "opensearch-securityadmin",
+      "version": "0.1.0",
+      "description": "A Helm chart for Kubernetes",
+      "purl": "pkg:helm/opensearch-securityadmin@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/opensearch-securityadmin@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "opensearch-secrets",
+      "version": "0.1.0",
+      "description": "OpenSearch secrets",
+      "purl": "pkg:helm/opensearch-secrets@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/opensearch-secrets@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "opensearch-curator",
+      "version": "0.1.0",
+      "description": "A Helm chart for Kubernetes",
+      "purl": "pkg:helm/opensearch-curator@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/opensearch-curator@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "opensearch-configurer",
+      "version": "0.1.0",
+      "description": "A Helm chart for Kubernetes",
+      "purl": "pkg:helm/opensearch-configurer@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/opensearch-configurer@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "node-local-dns",
+      "version": "0.1.1",
+      "purl": "pkg:helm/node-local-dns@0.1.1",
+      "type": "library",
+      "bom-ref": "pkg:helm/node-local-dns@0.1.1",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "networkpolicy-workload",
+      "version": "0.2.0",
+      "description": "This chart will contain the Network Policies for workload cluster.",
+      "purl": "pkg:helm/networkpolicy-workload@0.2.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/networkpolicy-workload@0.2.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "networkpolicy-service",
+      "version": "0.2.0",
+      "description": "This chart will contain the Network Policies for service cluster.",
+      "purl": "pkg:helm/networkpolicy-service@0.2.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/networkpolicy-service@0.2.0",
+      "tags": [
+        "service"
+      ],
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "networkpolicy-generator",
+      "version": "0.1.0",
+      "description": "generate networkpolicies with simplified, stackable, and reusable definitions",
+      "purl": "pkg:helm/networkpolicy-generator@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/networkpolicy-generator@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "namespaces",
+      "version": "0.1.1",
+      "description": "A Helm chart for creating namespaces for sc and wc",
+      "purl": "pkg:helm/namespaces@0.1.1",
+      "type": "library",
+      "bom-ref": "pkg:helm/namespaces@0.1.1",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "log-manager",
+      "version": "0.1.0",
+      "description": "log manager for Welkin",
+      "purl": "pkg:helm/log-manager@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/log-manager@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "kured-secret",
+      "version": "0.1.0",
+      "description": "This chart is for adding secrets to kured.",
+      "purl": "pkg:helm/kured-secret@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/kured-secret@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "kubeapi-metrics",
+      "version": "0.1.0",
+      "description": "A Helm chart for Kubernetes",
+      "purl": "pkg:helm/kubeapi-metrics@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/kubeapi-metrics@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "kube-state-metrics-extra-resource-metrics",
+      "version": "0.1.0",
+      "description": "A Helm chart for Kubernetes",
+      "purl": "pkg:helm/kube-state-metrics-extra-resource-metrics@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/kube-state-metrics-extra-resource-metrics@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "letsencrypt",
+      "version": "0.1.0",
+      "description": "A Helm chart for creating letsencrypt issuers",
+      "purl": "pkg:helm/letsencrypt@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/letsencrypt@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "ingress-nginx-probe-ingress",
+      "version": "0.1.0",
+      "description": "A Helm chart for Kubernetes",
+      "purl": "pkg:helm/ingress-nginx-probe-ingress@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/ingress-nginx-probe-ingress@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "hnc",
+      "version": "0.1.0",
+      "description": "Helm chart for Hierarchical Namespace Controller",
+      "purl": "pkg:helm/hnc@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/hnc@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "hnc-config",
+      "version": "0.1.0",
+      "description": "Helm chart for Hierarchical Namespace Controller config and CRDs",
+      "purl": "pkg:helm/hnc-config@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/hnc-config@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "init-harbor",
+      "version": "0.2.0",
+      "purl": "pkg:helm/init-harbor@0.2.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/init-harbor@0.2.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "harbor-certs",
+      "version": "0.1.0",
+      "description": "This chart creates the certificates used internally by harbor",
+      "purl": "pkg:helm/harbor-certs@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/harbor-certs@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "harbor-backup",
+      "version": "0.1.0",
+      "purl": "pkg:helm/harbor-backup@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/harbor-backup@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "grafana-label-enforcer",
+      "version": "0.1.0",
+      "description": "A Helm chart for the prometheus label proxy https://github.com/prometheus-community/prom-label-proxy",
+      "purl": "pkg:helm/grafana-label-enforcer@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/grafana-label-enforcer@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "grafana-dashboards",
+      "version": "0.3.0",
+      "description": "A Helm chart for Grafana dashboards for operators",
+      "purl": "pkg:helm/grafana-dashboards@0.3.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/grafana-dashboards@0.3.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "gatekeeper-templates",
+      "version": "0.1.0",
+      "description": "Gatekeeper constraint templates",
+      "purl": "pkg:helm/gatekeeper-templates@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/gatekeeper-templates@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "podsecuritypolicies",
+      "version": "0.1.0",
+      "description": "Helm chart for common gatekeeper PSP for both clusters",
+      "purl": "pkg:helm/podsecuritypolicies@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/podsecuritypolicies@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "gatekeeper-mutations",
+      "version": "0.1.0",
+      "description": "A helm chart containing various gatekeeper mutations",
+      "purl": "pkg:helm/gatekeeper-mutations@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/gatekeeper-mutations@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "gatekeeper-metrics",
+      "version": "0.1.0",
+      "description": "A Helm chart for Gatekeeper metrics",
+      "purl": "pkg:helm/gatekeeper-metrics@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/gatekeeper-metrics@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "gatekeeper-constraints",
+      "version": "0.1.0",
+      "description": "A Helm chart for Kubernetes",
+      "purl": "pkg:helm/gatekeeper-constraints@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/gatekeeper-constraints@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "file-copier",
+      "version": "0.1.0",
+      "description": "This chart is for copying files to hosts.",
+      "purl": "pkg:helm/file-copier@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/file-copier@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "external-dns-secrets",
+      "version": "0.1.0",
+      "description": "This chart is for adding secrets for ExternalDNS.",
+      "purl": "pkg:helm/external-dns-secrets@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/external-dns-secrets@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "external-dns-endpoints",
+      "version": "0.1.0",
+      "description": "This chart is for adding endpoints for ExternalDNS.",
+      "purl": "pkg:helm/external-dns-endpoints@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/external-dns-endpoints@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "cluster-admin-rbac",
+      "version": "0.1.0",
+      "description": "A Helm chart for cluster-admin RBAC",
+      "purl": "pkg:helm/cluster-admin-rbac@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/cluster-admin-rbac@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "calico-felix-metrics",
+      "version": "0.1.0",
+      "description": "A Helm chart for calico-felix-metrics",
+      "purl": "pkg:helm/calico-felix-metrics@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/calico-felix-metrics@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "calico-default-deny",
+      "version": "0.1.0",
+      "description": "A Helm chart for calico default deny network policies",
+      "purl": "pkg:helm/calico-default-deny@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/calico-default-deny@0.1.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "calico-accountant",
+      "version": "0.1.1",
+      "description": "A Helm chart for calico-accountant, see https://github.com/monzo/calico-accountant",
+      "purl": "pkg:helm/calico-accountant@0.1.1",
+      "type": "library",
+      "bom-ref": "pkg:helm/calico-accountant@0.1.1",
+      "license": "Apache-2.0"
+    },
+    {
+      "group": "",
+      "name": "autoscaling-monitoring",
+      "version": "0.1.0",
+      "description": "A Helm chart for installing a Service and ServiceMonitor for Cluster Autoscaler",
+      "purl": "pkg:helm/autoscaling-monitoring@0.1.0",
+      "type": "library",
+      "bom-ref": "pkg:helm/autoscaling-monitoring@0.1.0",
+      "tags": [
+        "service"
+      ],
+      "license": "Apache-2.0"
+    }
+  ],
+  "dependencies": [],
+  "annotations": []
+}
