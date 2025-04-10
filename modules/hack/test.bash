@@ -54,6 +54,7 @@ diff_main_template() {
 }
 
 case "${command}" in
+  "foo") helm_template_main;;
 "helm-template") helm_template ;;
 "render") render ;;
 "crossplane-template") crossplane_template ;;

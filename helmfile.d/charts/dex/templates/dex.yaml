@@ -1,0 +1,37 @@
+apiVersion: modules.elastisys.com/v1alpha1
+kind: Dex
+metadata:
+  name: dex
+spec:
+  replicas: {{ .Values.replicas }}
+  certIssuer: {{ .Values.certIssuer }}
+{{- if .Values.whitelistSourceRange }}
+  whitelistSourceRange: {{ .Values.whitelistSourceRange }}
+{{- end }}
+  hostname: |-
+    {{ .Values.hostname }}
+  # Enable iff corresponding Consumer exists?
+  serviceMonitor: {{ .Values.serviceMonitor }}
+
+  # TODO turn into some sort of upstream IdentityProviderProvider
+  connectors:
+  {{- toYaml .Values.connectors | nindent 4 }}
+
+  # TODO turn into IdentityProviderConsumer
+  clients:
+  {{- toYaml .Values.staticClients | nindent 4 }}
+
+  resources:
+  {{- toYaml .Values.resources | nindent 4 }}
+
+  nodeSelector:
+  {{- toYaml .Values.nodeSelector | nindent 4  }}
+
+  topologySpreadConstraints:
+  {{- toYaml .Values.topologySpreadConstraints | nindent 4  }}
+
+  affinity:
+  {{- toYaml .Values.affinity | nindent 4  }}
+
+  tolerations:
+  {{- toYaml .Values.tolerations | nindent 4  }}

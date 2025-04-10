@@ -38,7 +38,7 @@ templates:
     needs:
       - crossplane-system/crossplane-provider-configs
       {{- if .Values | get "opensearch.sso.enabled" false }}
-      - dex/dex
+      - dex/module-dex
       {{- end }}
       - kube-system/service-cluster-np
       - opensearch-system/opensearch-secrets
@@ -60,7 +60,7 @@ templates:
     name: opensearch-dashboards
     needs:
       {{- if .Values | get "opensearch.sso.enabled" false }}
-      - dex/dex
+      - dex/module-dex
       {{- end }}
       - kube-system/service-cluster-np
       - opensearch-system/module-opensearch

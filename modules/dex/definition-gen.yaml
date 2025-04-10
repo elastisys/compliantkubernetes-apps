@@ -1,0 +1,38 @@
+kind: Dex
+version: v1alpha2
+kubernetesDefinitions:
+  - property: affinity
+    definition: io.k8s.api.core.v1.Affinity
+    isArray:
+  - property: nodeSelector
+    definition: io.k8s.api.core.v1.NodeSelector
+    isArray:
+  - property: resources
+    definition: io.k8s.api.core.v1.ResourceRequirements
+    isArray:
+  - property: tolerations
+    definition: io.k8s.api.core.v1.Toleration
+    isArray: true
+  - property: topologySpreadConstraints
+    definition: io.k8s.api.core.v1.TopologySpreadConstraint
+    isArray: true
+properties:
+  replicas:
+    type: integer
+  certIssuer:
+    type: string
+  whitelistSourceRange:
+    type: string
+  hostname:
+    type: string
+    format: hostname
+  groupsSecret:
+    type: string
+  connectors:
+    type: object
+    additionalProperties: {}
+  clients:
+    type: array
+    items: {}
+  serviceMonitor:
+    type: boolean
