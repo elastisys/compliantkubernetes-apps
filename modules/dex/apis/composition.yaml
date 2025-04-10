@@ -65,14 +65,7 @@ spec:
                           inCluster: true
                       issuer: https://{{ .Values.dex.subdomain }}.{{ .Values.global.baseDomain }}
                       connectors: {}
-                      staticClients:
-                        - id: kubelogin
-                          name: Kubernetes CLI
-                          secret: ""
-                          redirectURIs:
-                            - http://localhost:8000
-                            - http://localhost:18000
-                            - http://localhost:8080/oauth2/callback
+                      staticClients: []
                     securityContext:
                       allowPrivilegeEscalation: false
                       capabilities:
@@ -114,6 +107,14 @@ spec:
                     fmt: https://%s
                 toFieldPath: spec.forProvider.values.config.issuer
               - type: FromCompositeFieldPath
+                fromFieldPath: spec.connectors
+                toFieldPath: spec.forProvider.values.config.connectors
+                  # TODO collect from Capabilities
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.clients
+                toFieldPath: spec.forProvider.values.config.staticClients
+                  # TODO collect from Capabilities
+              - type: FromCompositeFieldPath
                 fromFieldPath: spec.resources
                 toFieldPath: spec.forProvider.values.resources
               - type: FromCompositeFieldPath
@@ -131,4 +132,6 @@ spec:
               - type: FromCompositeFieldPath
                 fromFieldPath: spec.serviceMonitor
                 toFieldPath: spec.forProvider.values.serviceMonitor.enabled
+                  # TODO replace with Metrics Provider
       step: patch-and-transform
+        # TODO collect stub connectors using https://github.com/crossplane-contrib/function-extra-resources/

@@ -13,6 +13,14 @@ spec:
   # Enable iff corresponding Consumer exists?
   serviceMonitor: {{ .Values.serviceMonitor }}
 
+  # TODO turn into some sort of upstream IdentityProviderProvider
+  connectors:
+  {{- toYaml .Values.connectors | nindent 4 }}
+
+  # TODO turn into IdentityProviderConsumer
+  clients:
+  {{- toYaml .Values.staticClients | nindent 4 }}
+
   resources:
   {{- toYaml .Values.resources | nindent 4 }}
 
