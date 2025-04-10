@@ -375,6 +375,7 @@ prometheusOperator:
         memory: 50Mi
 
 prometheusNodeExporter:
+  scrapeTimeout: ""
   resources:
     requests:
       cpu: 25m
