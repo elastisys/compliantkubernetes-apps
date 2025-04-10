@@ -42,6 +42,7 @@ rbac:
     {{- end }}
     {{- end }}
     groups: {{- toYaml .Values.user.adminGroups | nindent 6 }}
+    serviceAccounts: {{- toYaml .Values.user.serviceAccounts | nindent 6 }}
     users: {{- toYaml .Values.user.adminUsers | nindent 6 }}
 
 managerDeployment:
