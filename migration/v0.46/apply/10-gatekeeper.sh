@@ -10,12 +10,14 @@ run() {
   execute)
 
     if [[ "${CK8S_CLUSTER}" =~ ^(sc|both)$ ]]; then
-      log_info "installing gatekeeper crds in service cluster"
+      log_info "upgrading gatekeeper in service cluster"
       helmfile_do sc -l name=gatekeeper-templates apply
+      helmfile_upgrade sc app=gatekeeper
     fi
     if [[ "${CK8S_CLUSTER}" =~ ^(wc|both)$ ]]; then
-      log_info "installing gatekeeper crds in workload cluster"
+      log_info "upgrading gatekeeper in workload cluster"
       helmfile_do wc -l name=gatekeeper-templates apply
+      helmfile_upgrade wc app=gatekeeper
     fi
     ;;
   rollback)
