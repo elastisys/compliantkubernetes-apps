@@ -9,6 +9,7 @@ source "${ROOT}/scripts/migration/lib.sh"
 # Example: "app!=something"
 declare -a skipped
 skipped=(
+  "app!=gatekeeper"
 )
 declare -a skipped_sc
 skipped_sc=(
