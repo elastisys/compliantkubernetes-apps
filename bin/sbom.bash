@@ -2,6 +2,8 @@
 
 # TODO:
 # - grouping management and workload? can potentially have differing container images fpr the same chart
+# - clean up tmp files
+# - checker for "set-me"s
 
 set -euo pipefail
 
@@ -16,6 +18,9 @@ sbom_file="${root}/docs/bom.json"
 
 # shellcheck source=bin/common.bash
 source "${here}/common.bash"
+
+# trap for removing all sbom files generated in /tmp
+append_trap "rm /tmp/*sbom*.json" EXIT
 
 # TODO:
 # - add containers per chart
@@ -45,41 +50,50 @@ _get_license() {
   log_info "Getting licenses"
 
   # Upstream charts
+  # TODO: make this global since it is used in several functions
+  # TODO: filter out unused charts before processing?
   mapfile -t charts < <(find "${helmfile_folder}/upstream" -name "Chart.yaml")
 
   for chart in "${charts[@]}"; do
-    licenses=()
     chart_name=$(yq4 ".name" "${chart}")
 
-    # TODO: figure out licenses
+    licenses=$(mktemp --suffix="${chart_name}-sbom-licenses.json")
+
     annotation=$(yq4 ".annotations.licenses" "${chart}")
     annotation_artifacthub=$(yq4 ".annotations.artifacthub.io/license" "${chart}")
     if [[ -n "${annotation}" && "${annotation}" != "null" ]]; then
-      licenses+=("${annotation}")
+      yq4 -o json -i ". |= (. + [\"${annotation}\"] | unique)" "${licenses}"
     elif [[ -n "${annotation_artifacthub}" && "${annotation_artifacthub}" != "null" ]]; then
-      licenses+=("${annotation_artifacthub}")
+      yq4 -o json -i ". |= (. + [\"${annotation_artifacthub}\"] | unique)" "${licenses}"
     else
-      licenses+=("set-me")
+      # yq4 -o json -i ". += \"set-me\"" "${licenses}"
       # TODO: handle multiple licenses, or, stick with one
-      # mapfile -t sources < <(yq4 '.sources[]' "${chart}")
+      mapfile -t sources < <(yq4 '.sources[]' "${chart}")
 
-      # for source in "${sources[@]}"; do
-      #   repo=${source##*github.com/}
-      #   echo "repo: $repo"
+      if [[ "${licenses_in_git[*]}" == "null" ]]; then
+        yq4 -o json -i ". |= (. + [\"set-me\"] | unique)" "${licenses}"
+      else
+        for source in "${sources[@]}"; do
+          repo=${source##*github.com/}
 
-      #   # API rate limits :grimacing:
-      #   mapfile -t licenses_in_git < <(curl -L -s \
-      #     -H "Accept: application/vnd.github+json" \
-      #     -H "X-GitHub-Api-Version: 2022-11-28" \
-      #     "https://api.github.com/repos/${repo}" | jq -r '.license.name')
+          # API rate limits :grimacing:
+          mapfile -t licenses_in_git < <(curl -L -s \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${repo}" | jq -r '.license.name')
 
-      #   for l in "${licenses_in_git[@]}"; do
-      #     licenses+=( "${l}" )
-      #   done
-      # done
+          if [[ "${licenses_in_git[*]}" == "null" ]]; then
+            yq4 -o json -i ". |= (. + [\"set-me\"] | unique)" "${licenses}"
+          else
+            for l in "${licenses_in_git[@]}"; do
+              yq4 -o json -i ". |= (. + [\"${l}\"] | unique)" "${licenses}"
+            done
+          fi
+        done
+      fi
     fi
-
-    sbom_add "${chart_name}" "licenses[]" "${licenses[@]}"
+    # sbom_add "${chart_name}" "licenses[]" "[]"
+    yq4 -e -i -o json "(.components[] | select(.name == \"${chart_name}\") | .licenses) += $(cat "${licenses}" | jq -c)" "${sbom_file}"
   done
 
   # Welkin charts
@@ -105,7 +119,7 @@ _get_container_images() {
   fi
   log_info "Getting container images"
 
-  mapfile -t charts < <(find "${helmfile_folder}/upstream" -name "Chart.yaml")
+  mapfile -t charts < <(find "${helmfile_folder}" -name "Chart.yaml")
 
   helmfile_list=$("${here}/ops.bash" helmfile sc list --output json)
 
@@ -116,16 +130,15 @@ _get_container_images() {
     chart_folder_name="${chart#"${helmfile_folder}/"}"
     chart_folder_name="${chart_folder_name%\/Chart.yaml}"
 
+    sbom_add "${chart_name}" "containers[]" "[]"
+
     # release=$(echo "${helmfile_list}" | jq ".[] | select(.chart == \"${chart_folder_name}\")")
     mapfile -t releases < <(echo "${helmfile_list}" | jq -c ".[] | select(.chart == \"${chart_folder_name}\")")
 
     if [[ ${#releases[@]} -eq 0 ]]; then
 
       log_warning "no releases for $chart_name"
-      # TODO: remove these from sbom?
-      # Although these contains e.g. prometheus-node-exporter which we run but through kube-prometheus-stack
-      # Maybe add a check for sub-charts that are part of umbrella charts?
-      sbom_add "${chart_name}" "containers[]" "[]"
+      # Maybe add a check for sub-charts that are part of umbrella charts e.g. prometheus-node-exporter?
       continue
     fi
 
@@ -133,6 +146,7 @@ _get_container_images() {
       release_name=$(echo "${release}" | jq -r ".name")
       # TODO: what if a chart deploys pods in different namespace then release?
       release_namespace=$(echo "${release}" | jq -r ".namespace")
+      # TODO: pods created by operators e.g. scan-vulnerability job?
       mapfile -t containers < <("${here}/ops.bash" kubectl sc get pods \
         --selector app.kubernetes.io/instance="${release_name}" \
         --namespace "${release_namespace}" \
@@ -142,11 +156,13 @@ _get_container_images() {
         # TODO: remove these from sbom?
         # Although these contains e.g. prometheus-node-exporter which we run but through kube-prometheus-stack
         # Maybe add a check for sub-charts that are part of umbrella charts?
-        sbom_add "${chart_name}" "containers[]" "[]"
+
         continue
       fi
-      echo sbom_add "${chart_name}" "containers" "${containers[@]}"
-      sbom_add "${chart_name}" "containers[]" "${containers[@]}"
+
+      for container in "${containers[@]}"; do
+        yq4 -e -i -o json "(.components[] | select(.name == \"${chart_name}\") | .containers) += \"${container}\"" "${sbom_file}"
+      done
     done
 
     # TODO: mapping chart names to release names?
@@ -163,28 +179,25 @@ sbom_add() {
   # - only support for certain "keys" per component
   # - error handling if component does not exist
   # - add dry-run option
-  if [[ "$#" -lt 3 ]]; then
+  if [[ "$#" -ne 3 ]]; then
     usage
   fi
 
   component="${1}"
   key="${2}"
-  shift 2
-  values=("${@}")
+  value="${3}"
 
   # if [[ ! "${key}" =~ ^(licenses|containers)$ ]]; then
   #   log_fatal "unsupported key, currently only supports \"licenses|containers\""
   # fi
 
-  for value in "${values[@]}"; do
-    yq4 -e -i -o json "(.components[] | select(.name == \"${component}\") | .${key}) |= \"${value}\"" "${sbom_file}"
-  done
+  yq4 -e -i -o json "(.components[] | select(.name == \"${component}\") | .${key}) |= \"${value}\"" "${sbom_file}"
 }
 
 sbom_generate() {
   # TODO:
   # check/compare existing bom.json file?
-  tmp_sbom_file=$(mktemp --suffix=sbom)
+  tmp_sbom_file=$(mktemp --suffix=-sbom.json)
   if [[ ! -f "${sbom_file}" ]]; then
     log_info "SBOM file does not exists, creating new"
     tmp_sbom_file="${sbom_file}"
