@@ -118,7 +118,7 @@ ops)
   ;;
 sbom)
   case "${2}" in
-  add | generate | remove)
+  add | generate | get-unset | remove)
     command="${2}"
     shift 2
     "${here}/sbom.bash" "${command}" "${@}"
