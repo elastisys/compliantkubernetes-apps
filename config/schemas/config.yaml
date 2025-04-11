@@ -1380,9 +1380,10 @@ properties:
           Normally one of `letsencrypt-staging` or `letsencrypt-prod`.
         type: string
         default: letsencrypt-staging
-        enum:
+        examples:
           - letsencrypt-staging
           - letsencrypt-prod
+          - selfsigned
       verifyTls:
         description: Verify ingress certificates
         type: boolean
