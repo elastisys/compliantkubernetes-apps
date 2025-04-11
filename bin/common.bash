@@ -326,7 +326,7 @@ validate_version() {
     exit 1
   elif [ "${ck8s_version}" != "any" ] &&
     [ "${version}" != "${ck8s_version}" ]; then
-    log_error "ERROR: Version mismatch. Run init to update config."
+    log_error "ERROR: Version mismatch. Run migration to update config."
     log_error "Config version: ${ck8s_version}"
     log_error "Welkin Apps version: ${version}"
     exit 1
@@ -634,4 +634,14 @@ with_s3cfg() {
   # TODO: Can't use a FIFO since the s3cfg is read multiple times when a
   #       bucket needs to be created.
   sops_exec_file_no_fifo "${s3cfg}" 'S3COMMAND_CONFIG_FILE="{}" '"${*}"
+}
+
+# Retrieve apps version from configmap
+get_version() {
+  "${here}/ops.bash" kubectl "${1}" get cm -n kube-system apps-meta -o jsonpath --template='{.data.version}'
+}
+
+
+get_migration_status() {
+  "${here}/ops.bash" kubectl "${1}" get -n kube-system configmap apps-upgrade
 }

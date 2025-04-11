@@ -834,21 +834,15 @@ $defs:
     type: object
   io.k8s.api.rbac.v1.Subject:
     title: Subject
-    description: Subject contains a reference to the object or user identities a role
-      binding applies to.  This can either hold a direct API object reference, or a
-      value for non-objects such as user and group names.
+    description: Subject contains a reference to the object or user identities a role binding applies to.  This can either hold a direct API object reference, or a value for non-objects such as user and group names.
     properties:
       apiGroup:
         title: Kind
-        description: APIGroup holds the API group of the referenced subject. Defaults
-          to "" for ServiceAccount subjects. Defaults to "rbac.authorization.k8s.io"
-          for User and Group subjects.
+        description: APIGroup holds the API group of the referenced subject. Defaults to "" for ServiceAccount subjects. Defaults to "rbac.authorization.k8s.io" for User and Group subjects.
         type: string
       kind:
         title: Kind
-        description: Kind of object being referenced. Values defined by this API group
-          are "User", "Group", and "ServiceAccount". If the Authorizer does not recognized
-          the kind value, the Authorizer should report an error.
+        description: Kind of object being referenced. Values defined by this API group are "User", "Group", and "ServiceAccount". If the Authorizer does not recognized the kind value, the Authorizer should report an error.
         type: string
         enum:
           - Group
@@ -860,62 +854,48 @@ $defs:
         type: string
       namespace:
         title: Namespace
-        description: Namespace of the referenced object.  If the object kind is non-namespace,
-          such as "User" or "Group", and this value is not empty the Authorizer should
-          report an error.
+        description: Namespace of the referenced object.  If the object kind is non-namespace, such as "User" or "Group", and this value is not empty the Authorizer should report an error.
         type: string
     required:
-    - kind
-    - name
+      - kind
+      - name
     type: object
   io.k8s.api.rbac.v1.PolicyRule:
     title: PolicyRule
-    description: PolicyRule holds information that describes a policy rule, but does
-      not contain information about who the rule applies to or which namespace the rule
-      applies to.
+    description: PolicyRule holds information that describes a policy rule, but does not contain information about who the rule applies to or which namespace the rule applies to.
     properties:
       apiGroups:
         title: APIGroups
-        description: APIGroups is the name of the APIGroup that contains the resources.  If
-          multiple API groups are specified, any action requested against one of the
-          enumerated resources in any API group will be allowed.
+        description: APIGroups is the name of the APIGroup that contains the resources.  If multiple API groups are specified, any action requested against one of the enumerated resources in any API group will be allowed.
         items:
           type: string
         type: array
       nonResourceURLs:
         title: NonResourceURLs
-        description: NonResourceURLs is a set of partial urls that a user should have
-          access to.  *s are allowed, but only as the full, final step in the path Since
-          non-resource URLs are not namespaced, this field is only applicable for ClusterRoles
-          referenced from a ClusterRoleBinding. Rules can either apply to API resources
-          (such as "pods" or "secrets") or non-resource URL paths (such as "/api"),  but
-          not both.
+        description: NonResourceURLs is a set of partial urls that a user should have access to.  *s are allowed, but only as the full, final step in the path Since non-resource URLs are not namespaced, this field is only applicable for ClusterRoles referenced from a ClusterRoleBinding. Rules can either apply to API resources (such as "pods" or "secrets") or non-resource URL paths (such as "/api"),  but not both.
         items:
           type: string
         type: array
       resourceNames:
         title: ResourceNames
-        description: ResourceNames is an optional white list of names that the rule
-          applies to.  An empty set means that everything is allowed.
+        description: ResourceNames is an optional white list of names that the rule applies to.  An empty set means that everything is allowed.
         items:
           type: string
         type: array
       resources:
         title: Resources
-        description: Resources is a list of resources this rule applies to.  ResourceAll
-          represents all resources.
+        description: Resources is a list of resources this rule applies to.  ResourceAll represents all resources.
         items:
           type: string
         type: array
       verbs:
         title: Verbs
-        description: Verbs is a list of Verbs that apply to ALL the ResourceKinds and
-          AttributeRestrictions contained in this rule.  VerbAll represents all kinds.
+        description: Verbs is a list of Verbs that apply to ALL the ResourceKinds and AttributeRestrictions contained in this rule.  VerbAll represents all kinds.
         items:
           type: string
         type: array
     required:
-    - verbs
+      - verbs
     type: object
   cronSchedule:
     type: string
@@ -924,186 +904,95 @@ type: object
 required:
   - global
 allOf:
-- if:
-    properties:
-      trivy:
-        properties:
-          enabled:
-            type: boolean
-            const: true
-  then:
-    properties:
-      networkPolicies:
-        properties:
-          global:
-            properties:
-              trivy:
-                properties:
-                  ips:
-                    $ref: '#/$defs/iplist'
-- if:
-    properties:
-      kured:
-        properties:
-          enabled:
-            type: boolean
-            const: true
-          notification:
-            properties:
-              slack:
-                properties:
-                  enabled:
-                    type: boolean
-                    const: true
-  then:
-    properties:
-      networkPolicies:
-        properties:
-          kured:
-            properties:
-              notificationSlack:
-                properties:
-                  ips:
-                    $ref: '#/$defs/iplist'
-- if:
-    properties:
-      falco:
-        properties:
-          enabled:
-            type: boolean
-            const: true
-      networkPolicies:
-        properties:
-          falco:
-            properties:
-              enabled:
-                type: boolean
-                const: true
-  then:
-    properties:
-      networkPolicies:
-        properties:
-          falco:
-            properties:
-              plugins:
-                properties:
-                  ips:
-                    $ref: '#/$defs/iplist'
-- if:
-    properties:
-      externalDns:
-        properties:
-          enabled:
-            type: boolean
-            const: true
-      networkPolicies:
-        properties:
-          externalDns:
-            properties:
-              enabled:
-                type: boolean
-                const: true
-  then:
-    properties:
-      networkPolicies:
-        properties:
-          externalDns:
-            properties:
-              ips:
-                $ref: '#/$defs/iplist'
-- if:
-    properties:
-      harbor:
-        properties:
-          persistence:
-            properties:
-              type:
-                type: string
-                const: swift
-      thanos:
-        properties:
-          objectStorage:
-            properties:
-              type:
-                type: string
-                const: swift
-  then:
-    properties:
-      networkPolicies:
-        properties:
-          global:
-            properties:
-              objectStorageSwift:
-                properties:
-                  ips:
-                    $ref: '#/$defs/iplist'
-- if:
-    properties:
-      harbor:
-        properties:
-          enabled:
-            type: boolean
-            const: true
-      networkPolicies:
-        properties:
-          harbor:
-            properties:
-              enabled:
-                type: boolean
-                const: true
-  then:
-    properties:
-      networkPolicies:
-        properties:
-          harbor:
-            properties:
-              registries:
-                properties:
-                  ips:
-                    $ref: '#/$defs/iplist'
-              jobservice:
-                properties:
-                  ips:
-                    $ref: '#/$defs/iplist'
-              trivy:
-                properties:
-                  ips:
-                    $ref: '#/$defs/iplist'
-- if:
-    properties:
-      objectStorage:
-        properties:
-          sync:
-            properties:
-              enabled:
-                type: boolean
-                const: true
-          type:
-            type: string
-            const: s3
-  then:
-    properties:
-      networkPolicies:
-        properties:
-          rclone:
-            properties:
-              sync:
-                properties:
-                  objectStorage:
-                    properties:
-                      ips:
-                        $ref: '#/$defs/iplist'
-- if:
-    properties:
-      objectStorage:
-        properties:
-          sync:
-            properties:
-              enabled:
-                type: boolean
-                const: true
-    anyOf:
-    - properties:
+  - if:
+      properties:
+        trivy:
+          properties:
+            enabled:
+              type: boolean
+              const: true
+    then:
+      properties:
+        networkPolicies:
+          properties:
+            global:
+              properties:
+                trivy:
+                  properties:
+                    ips:
+                      $ref: '#/$defs/iplist'
+  - if:
+      properties:
+        kured:
+          properties:
+            enabled:
+              type: boolean
+              const: true
+            notification:
+              properties:
+                slack:
+                  properties:
+                    enabled:
+                      type: boolean
+                      const: true
+    then:
+      properties:
+        networkPolicies:
+          properties:
+            kured:
+              properties:
+                notificationSlack:
+                  properties:
+                    ips:
+                      $ref: '#/$defs/iplist'
+  - if:
+      properties:
+        falco:
+          properties:
+            enabled:
+              type: boolean
+              const: true
+        networkPolicies:
+          properties:
+            falco:
+              properties:
+                enabled:
+                  type: boolean
+                  const: true
+    then:
+      properties:
+        networkPolicies:
+          properties:
+            falco:
+              properties:
+                plugins:
+                  properties:
+                    ips:
+                      $ref: '#/$defs/iplist'
+  - if:
+      properties:
+        externalDns:
+          properties:
+            enabled:
+              type: boolean
+              const: true
+        networkPolicies:
+          properties:
+            externalDns:
+              properties:
+                enabled:
+                  type: boolean
+                  const: true
+    then:
+      properties:
+        networkPolicies:
+          properties:
+            externalDns:
+              properties:
+                ips:
+                  $ref: '#/$defs/iplist'
+  - if:
+      properties:
         harbor:
           properties:
             persistence:
@@ -1111,24 +1000,6 @@ allOf:
                 type:
                   type: string
                   const: swift
-        objectStorage:
-          properties:
-            sync:
-              properties:
-                buckets:
-                  if:
-                    contains:
-                      properties:
-                        source:
-                          pattern: '.*harbor.*'
-                  then:
-                    contains:
-                      properties:
-                        source:
-                          pattern: '.*harbor.*'
-                        destinationType:
-                          const: "swift"
-    - properties:
         thanos:
           properties:
             objectStorage:
@@ -1136,136 +1007,245 @@ allOf:
                 type:
                   type: string
                   const: swift
+    then:
+      properties:
+        networkPolicies:
+          properties:
+            global:
+              properties:
+                objectStorageSwift:
+                  properties:
+                    ips:
+                      $ref: '#/$defs/iplist'
+  - if:
+      properties:
+        harbor:
+          properties:
+            enabled:
+              type: boolean
+              const: true
+        networkPolicies:
+          properties:
+            harbor:
+              properties:
+                enabled:
+                  type: boolean
+                  const: true
+    then:
+      properties:
+        networkPolicies:
+          properties:
+            harbor:
+              properties:
+                registries:
+                  properties:
+                    ips:
+                      $ref: '#/$defs/iplist'
+                jobservice:
+                  properties:
+                    ips:
+                      $ref: '#/$defs/iplist'
+                trivy:
+                  properties:
+                    ips:
+                      $ref: '#/$defs/iplist'
+  - if:
+      properties:
         objectStorage:
           properties:
             sync:
               properties:
-                buckets:
-                  if:
-                    contains:
+                enabled:
+                  type: boolean
+                  const: true
+            type:
+              type: string
+              const: s3
+    then:
+      properties:
+        networkPolicies:
+          properties:
+            rclone:
+              properties:
+                sync:
+                  properties:
+                    objectStorage:
                       properties:
-                        source:
-                          pattern: '.*thanos.*'
-                  then:
-                    contains:
-                      properties:
-                        source:
-                          pattern: '.*thanos.*'
-                        destinationType:
-                          const: "swift"
-    - properties:
+                        ips:
+                          $ref: '#/$defs/iplist'
+  - if:
+      properties:
         objectStorage:
           properties:
             sync:
               properties:
-                buckets:
-                  contains:
-                    required:
-                    - destinationType
-                    properties:
-                      destinationType:
-                        const: "swift"
-  then:
-    properties:
-      networkPolicies:
-        properties:
-          rclone:
-            properties:
-              sync:
-                properties:
-                  objectStorageSwift:
-                    properties:
-                      ips:
-                        $ref: '#/$defs/iplist'
-- if:
-    properties:
-      objectStorage:
-        properties:
-          sync:
-            properties:
-              secondaryUrl:
-                type: string
-                format: uri
-    not:
+                enabled:
+                  type: boolean
+                  const: true
+      anyOf:
+        - properties:
+            harbor:
+              properties:
+                persistence:
+                  properties:
+                    type:
+                      type: string
+                      const: swift
+            objectStorage:
+              properties:
+                sync:
+                  properties:
+                    buckets:
+                      if:
+                        contains:
+                          properties:
+                            source:
+                              pattern: '.*harbor.*'
+                      then:
+                        contains:
+                          properties:
+                            source:
+                              pattern: '.*harbor.*'
+                            destinationType:
+                              const: "swift"
+        - properties:
+            thanos:
+              properties:
+                objectStorage:
+                  properties:
+                    type:
+                      type: string
+                      const: swift
+            objectStorage:
+              properties:
+                sync:
+                  properties:
+                    buckets:
+                      if:
+                        contains:
+                          properties:
+                            source:
+                              pattern: '.*thanos.*'
+                      then:
+                        contains:
+                          properties:
+                            source:
+                              pattern: '.*thanos.*'
+                            destinationType:
+                              const: "swift"
+        - properties:
+            objectStorage:
+              properties:
+                sync:
+                  properties:
+                    buckets:
+                      contains:
+                        required:
+                          - destinationType
+                        properties:
+                          destinationType:
+                            const: "swift"
+    then:
+      properties:
+        networkPolicies:
+          properties:
+            rclone:
+              properties:
+                sync:
+                  properties:
+                    objectStorageSwift:
+                      properties:
+                        ips:
+                          $ref: '#/$defs/iplist'
+  - if:
       properties:
         objectStorage:
           properties:
             sync:
               properties:
                 secondaryUrl:
-                  const: ""
-  then:
-    properties:
-      networkPolicies:
+                  type: string
+                  format: uri
+      not:
         properties:
-          rclone:
+          objectStorage:
             properties:
               sync:
                 properties:
                   secondaryUrl:
-                    properties:
-                      ips:
-                        $ref: '#/$defs/iplist'
-- if:
-    properties:
-      networkPolicies:
-        properties:
-          ingressNginx:
-            properties:
-              ingressOverride:
-                properties:
-                  enabled:
-                    type: boolean
-                    const: true
-  then:
-    properties:
-      networkPolicies:
-        properties:
-          ingressNginx:
-            properties:
-              ingressOverride:
-                properties:
-                  ips:
-                    title: Network Policies Ingress Override IPs
-                    $ref: '#/$defs/iplist'
-- if:
-    allOf:
-      - properties:
-          harbor:
-            properties:
-              persistence:
-                properties:
-                  type:
-                    const: objectStorage
-          objectStorage:
-            properties:
-              type:
-                const: azure
-      - anyOf:
-          - properties:
-              objectStorage:
-                properties:
-                  sync:
-                    properties:
-                      enabled:
-                        const: true
-          - properties:
-              objectStorage:
-                properties:
-                  restore:
-                    properties:
-                      enabled:
-                        const: true
-                      addTargetsFromSync:
-                        const: true
-  then:
-    properties:
-      objectStorage:
-        properties:
-          sync:
-            properties:
-              syncDefaultBuckets:
-                const: false
+                    const: ""
+    then:
+      properties:
+        networkPolicies:
+          properties:
+            rclone:
+              properties:
+                sync:
+                  properties:
+                    secondaryUrl:
+                      properties:
+                        ips:
+                          $ref: '#/$defs/iplist'
+  - if:
+      properties:
+        networkPolicies:
+          properties:
+            ingressNginx:
+              properties:
+                ingressOverride:
+                  properties:
+                    enabled:
+                      type: boolean
+                      const: true
+    then:
+      properties:
+        networkPolicies:
+          properties:
+            ingressNginx:
+              properties:
+                ingressOverride:
+                  properties:
+                    ips:
+                      title: Network Policies Ingress Override IPs
+                      $ref: '#/$defs/iplist'
+  - if:
+      allOf:
+        - properties:
+            harbor:
+              properties:
+                persistence:
+                  properties:
+                    type:
+                      const: objectStorage
+            objectStorage:
+              properties:
+                type:
+                  const: azure
+        - anyOf:
+            - properties:
+                objectStorage:
+                  properties:
+                    sync:
+                      properties:
+                        enabled:
+                          const: true
+            - properties:
+                objectStorage:
+                  properties:
+                    restore:
+                      properties:
+                        enabled:
+                          const: true
+                        addTargetsFromSync:
+                          const: true
+    then:
+      properties:
+        objectStorage:
+          properties:
+            sync:
+              properties:
+                syncDefaultBuckets:
+                  const: false
 properties:
   global:
     title: Global options
@@ -1385,6 +1365,15 @@ properties:
         enum:
           - containerd
           - docker
+      ck8sLastChange:
+        title: Timestamp of last migration
+        description: |-
+          This property is used during migrations to track state and ensure that the
+          same version is used during `ck8s upgrade prepare` as during `ck8s upgrade
+          apply`.
+        type: number
+        examples:
+          - 1742394642
     additionalProperties: false
   clusterApi:
     additionalProperties: false
@@ -2549,18 +2538,18 @@ properties:
                 List of buckets to sync when `syncDefaultBuckets` is false
               type: object
               examples:
-              - source: azure-environment-harbor
-                sourceType: azure
-                sourcePath: //docker
-                destinationPath: /docker
-                destinationType: s3
-                nameSuffix: docker
-              - source: azure-environemnt-harbor
-                sourceType: azure
-                sourcePath: /backups
-                destinationPath: /backups
-                destinationType: s3
-                nameSuffix: backups
+                - source: azure-environment-harbor
+                  sourceType: azure
+                  sourcePath: //docker
+                  destinationPath: /docker
+                  destinationType: s3
+                  nameSuffix: docker
+                - source: azure-environemnt-harbor
+                  sourceType: azure
+                  sourcePath: /backups
+                  destinationPath: /backups
+                  destinationType: s3
+                  nameSuffix: backups
               required:
                 - source
               properties:
@@ -7058,9 +7047,9 @@ properties:
           extraOutput:
             title: Extra Output Rule
             description: |-
-                Configure extra output egress rules.
+              Configure extra output egress rules.
 
-                This may be used to allow application developers to send logs externally from user Fluentd with extra config and plugins.
+              This may be used to allow application developers to send logs externally from user Fluentd with extra config and plugins.
             type: object
             additionalProperties: false
             properties:

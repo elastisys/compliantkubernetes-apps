@@ -228,6 +228,8 @@ resolve() {
             resolvectl dns "${link}" 127.0.64.43
           fi
         done
+      elif command -v unbound-control &>/dev/null; then
+        sudo unbound-control forward_add +i test.dev-ck8s.com 127.0.64.43
       else
         log.error "for dns to work with your local-cluster you must manually set local-resolve as the current dns server 127.0.64.43!"
       fi
@@ -240,6 +242,8 @@ resolve() {
     else
       if command -v resolvectl &>/dev/null && log.continue "restart systemd-resolved to reset dns servers?"; then
         systemctl restart systemd-resolved.service
+      elif command -v unbound-control &>/dev/null; then
+        sudo unbound-control forward_remove +i test.dev-ck8s.com
       else
         log.error "for dns to work with your regular dns server(s) you must manually reset you dns settings!"
       fi
