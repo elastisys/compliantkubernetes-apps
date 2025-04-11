@@ -41,6 +41,8 @@ log.usage() {
   - delete <name>                                                            - deletes a local cluster
   - list clusters                                                            - lists available clusters
   - list profiles                                                            - lists available profiles
+  - setup node-local-dns                                                     - configures and deploys the node-local-dns
+                                                                               stack, required for the WC <-> SC link
   "
 }
 log.continue() {
@@ -134,7 +136,7 @@ container.create() {
   local run_args
 
   run_args=()
-  if ! test -z "${CK8S_LOCAL_AUTOSTART_CACHE}"; then
+  if test -n "${CK8S_LOCAL_AUTOSTART_CACHE:-}"; then
     run_args=(--restart always)
   fi
 
@@ -483,7 +485,6 @@ setup_node_local_dns() {
     envsubst >"$CK8S_CONFIG_PATH/wc-config.yaml.new"
   mv -f "$CK8S_CONFIG_PATH/wc-config.yaml.new" "$CK8S_CONFIG_PATH/wc-config.yaml"
 
-  # TODO - ask reviewers if we actually need the transitive needs for the node-local-dns stack?
   "$ROOT/bin/ck8s" ops helmfile sc -lapp=node-local-dns apply --include-transitive-needs
   "$ROOT/bin/ck8s" ops helmfile wc -lapp=node-local-dns apply --include-transitive-needs
 }
@@ -525,8 +526,15 @@ main() {
   subcommand="${2:-}"
 
   case "${command}" in
-  setup_node_local_dns)
-    setup_node_local_dns
+  setup)
+    case "${subcommand}" in
+    node-local-dns)
+      setup_node_local_dns
+      ;;
+    *)
+      log.usage
+      ;;
+    esac
     ;;
   cache)
     case "${subcommand}" in

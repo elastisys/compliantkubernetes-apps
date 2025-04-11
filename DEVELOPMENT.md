@@ -12,9 +12,9 @@ This requires that `kind` is installed and that either `podman` or `docker` is a
 
 ### Terminology
 
-- `apps-flavor` - one of `prod`, `dev` or `baremetal` is a global switch for configuring the clusters and deployed applications in different ways. The recommended value when working with local clusters is `dev`.
-- `local-cluster-profile` - a `Cluster` configuration object passed to `kind` when creating or updating local clusters. We use profiles to differentiate between single-/multi-node clusters and/or to enable special features such as container image caching. Use `./bin/local-clusters.sh list profiles` to see a list of built-in profiles.
-- `domain` - a local domain name. Using a subdomain of `.dev-ck8s.com` allows for setting up DNS based challenges for certificates issued by `cert-manager`, thus avoiding the use of self-signed certificates.
+- `apps-flavor` - one of `prod`, `dev` or `air-gapped` is a global switch for configuring the clusters and deployed applications in different ways. The recommended value when working with local clusters is `dev`.
+- `local-cluster-profile` - a reference to a preconfigured `Cluster` config passed to `kind` when creating or updating local clusters. We use profiles to differentiate between single-/multi-node clusters and/or to enable special features such as container image caching. Use `./bin/local-clusters.sh list profiles` to see a list of built-in profiles.
+- `domain` - a local domain name. This can be arbitrary, but using a real domain (or subdomain) for which we have authority allows for setting up DNS based challenges for certificates issued by `cert-manager`.
 
 ### Setup
 
@@ -48,10 +48,10 @@ As a first step, configure the clusters:
 ./scripts/local-cluster.sh config <name> <apps-flavor> <domain>
 ```
 
-This will use the default local listen address of `127.0.64.43` for the SC worker node and `127.0.64.143` for the WC worker node.
-
 Apps will be configured with `ck8sCloudProvider: none` and `ck8sFlavor: <apps-flavor>` and set some default values to run on local clusters.
 By default, local clusters will use `calico` for networking, `local-path-provisioner` for block storage, and `minio` for object storage.
+
+The local listen address will be set to `127.0.64.43` for the SC worker node, and `127.0.64.143` for the WC worker node.
 
 We'll also be passing the `--skip-minio` options for the WC, to deploy block storage only to the SC cluster.
 
@@ -67,20 +67,28 @@ We'll also be passing the `--skip-minio` options for the WC, to deploy block sto
 
 Making the clusters "aware" of each other will require custom DNS configuration snippets to both the SC and WC that ensure:
 
-- `(grafana|harbor|opensearch|ops).<domain>` resolve to an SC worker node IP from within the WC cluster
-- all other `.<domain>` queries from within the WC cluster resolve to the service IP of the `nginx-ingress`
-- `(grafana|harbor|opensearch|ops).<domain>` resolve to the service IP of the `nginx-ingress` within the SC cluster
-- all other `.<domain>` queries from within the SC cluster resolve to a WC worker node IP
+- From within the WC:
+    - resolve`(grafana|harbor|opensearch|ops).<domain>` queries to an SC worker node IP.
+    - resolve all other `.<domain>` queries to the service IP of `ingress-nginx` in the WC.
+- From within the SC:
+    - resolve `(grafana|harbor|opensearch|ops).<domain>` queries to the service IP of the `ingress-nginx` in the SC.
+    - resolve all other `.<domain>` queries to a WC worker node IP.
+
+> [!note]
+> Even though the subdomains used for the various applications residing in the SC cluster _are_ configurable,
+> the above setup is designed to work with the default values and does not support custom values at the moment.
 
 Since these snippets depend on the IP addresses of running containers, they must be setup _after_ the initial `create` commands.
 
 The following command will configure node-local DNS and (re)deploy the `node-local-dns` stack:
 
 ```sh
-./scripts/local-cluster-sh setup_node_local_dns
+./scripts/local-cluster-sh setup node-local-dns
 ```
 
 #### Self-signed certificate setup
+
+If you cannot configure cert-manager to use DNS-01 challenges for various reasons (e.g. you picked an arbitrary `<domain>` which you don't have authority over), you have the option of using self-signed certificates.
 
 Add the following block to `$CK8S_CONFIG_PATH/common-config.yaml` (you might need to merge the keys in `global` map manually):
 
