@@ -6,9 +6,9 @@
 # - checker for "set-me"s
 # - dry-run option?
 # - trap for removing all sbom files generated in /tmp
-# - cyclonedx validateion (e.g. cyclonedx validate --input-file docs/bom.json)
 # - add cyclonedx & cdxgen to requirements
 # - create tests
+# - currently, some components might get "set-me"s licenses although they have one set
 
 set -euo pipefail
 
@@ -22,6 +22,7 @@ HERE="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 ROOT="$(dirname "${HERE}")"
 HELMFILE_FOLDER="${ROOT}/helmfile.d"
 SBOM_FILE="${ROOT}/docs/bom.json"
+SBOM_TEMPLATE_FILE="${ROOT}/docs/bom.template.json"
 
 # shellcheck source=bin/common.bash
 source "${HERE}/common.bash"
@@ -31,6 +32,7 @@ usage() {
   echo "        get-unset" >&2
   echo "        add <component-name> <key> <value>" >&2
   echo "        remove <component-name> <key> <value>" >&2
+  echo "        validate" >&2
   exit 1
 }
 
@@ -38,7 +40,7 @@ usage() {
 # - runtime sbom?
 # - build sbom?
 
-_yq_add_json() {
+_yq_add_component_json() {
   local component key sbom_file tmp_sbom_file value
 
   sbom_file="${1}"
@@ -47,14 +49,15 @@ _yq_add_json() {
   value="${4}"
 
   tmp_sbom_file=$(mktemp --suffix=-sbom.json)
+  append_trap "rm ${tmp_sbom_file}" EXIT
 
   if [[ ! "${key}" =~ ^(licenses.*|properties.*)$ ]]; then
     log_fatal "unsupported key \"${key}\", currently only supports \"licenses|properties\""
   fi
 
   if ! ${CK8S_AUTO_APPROVE:-}; then
+    cyclonedx_validation "${tmp_sbom_file}"
     yq4 -o json "(.components[] | select(.name == \"${component}\") | .${key}) |= ${value}" "${sbom_file}" > "${tmp_sbom_file}"
-    cyclonedx validate --input-file "${tmp_sbom_file}"
     diff  -U3 --color=always "${sbom_file}" "${tmp_sbom_file}" && log_info "No change" && return
     log_info "Changes found"
     ask_abort
@@ -84,10 +87,10 @@ _format_container_image_object() {
   echo "{\"name\": \"container\", \"value\": \"${container_image}\"}"
 }
 
-_get_license() {
+_get_licenses() {
   local sbom_file
   if [[ "$#" -ne 1 ]]; then
-    log_fatal "usage: _get_license <sbom-file>"
+    log_fatal "usage: _get_licenses <sbom-file>"
   fi
 
   sbom_file="${1}"
@@ -97,32 +100,31 @@ _get_license() {
   log_info "Getting licenses"
 
   # Upstream charts
-  # TODO: make this global since it is used in several functions
-  # TODO: filter out unused charts before processing?
+  # TODO: (maybe) filter out unused charts before processing?
   mapfile -t charts < <(find "${HELMFILE_FOLDER}/upstream" -name "Chart.yaml")
 
   for chart in "${charts[@]}"; do
     chart_name=$(yq4 ".name" "${chart}")
 
-    licenses=$(mktemp --suffix="${chart_name}-sbom-licenses.json")
-    echo "[]" > "${licenses}"
+    licenses_file=$(mktemp --suffix="${chart_name}-sbom-licenses.json")
+    echo "[]" > "${licenses_file}"
 
     # check if chart.yaml contains license in annotations
     annotation=$(yq4 ".annotations.licenses" "${chart}")
     annotation_artifacthub=$(yq4 ".annotations.artifacthub.io/license" "${chart}")
 
     if [[ -n "${annotation}" && "${annotation}" != "null" ]]; then
-      yq4 -o json -i ". + $(_format_license_object "${annotation}")" "${licenses}"
+      yq4 -o json -i ". + $(_format_license_object "${annotation}")" "${licenses_file}"
 
     elif [[ -n "${annotation_artifacthub}" && "${annotation_artifacthub}" != "null" ]]; then
-      yq4 -o json -i ". + $(_format_license_object "${annotation_artifacthub}")" "${licenses}"
+      yq4 -o json -i ". + $(_format_license_object "${annotation_artifacthub}")" "${licenses_file}"
 
     # if no license in annotations, try to get from source (e.g. github)
     else
       # TODO: handle multiple licenses, or, stick with one
       mapfile -t sources < <(yq4 '.sources[]' "${chart}")
       if [[ "${#sources[@]}" -eq 0 ]] || [[ "${sources[*]}" == "null" ]]; then
-        yq4 -o json -i ". + $(_format_license_object "set-me")" "${licenses}"
+        yq4 -o json -i ". + $(_format_license_object "set-me")" "${licenses_file}"
       else
         for source in "${sources[@]}"; do
           # TODO: assumes GitHub source, this is not necessarily guaranteed
@@ -136,16 +138,16 @@ _get_license() {
             "https://api.github.com/repos/${repo}" | jq -r '.license.name')
 
           if [[ "${licenses_in_git[*]}" == "null" ]]; then
-            yq4 -o json -i ". + $(_format_license_object "set-me")" "${licenses}"
+            yq4 -o json -i ". + $(_format_license_object "set-me")" "${licenses_file}"
           else
             for l in "${licenses_in_git[@]}"; do
-              yq4 -o json -i ". + $(_format_license_object "${l}")" "${licenses}"
+              yq4 -o json -i ". + $(_format_license_object "${l}")" "${licenses_file}"
             done
           fi
         done
       fi
     fi
-    _yq_add_json "${sbom_file}" "${chart_name}" "licenses" "$(jq -c 'unique' "${licenses}")"
+    _yq_add_component_json "${sbom_file}" "${chart_name}" "licenses" "$(jq -c 'unique' "${licenses_file}")"
   done
 
   # Welkin charts
@@ -155,14 +157,14 @@ _get_license() {
     chart_name=$(yq4 ".name" "${chart}")
 
     # TODO: licenses for the applications
-    _yq_add_json "${sbom_file}" "${chart_name}" "licenses[0]" "$(_format_license_object "Apache-2.0")"
+    _yq_add_component_json "${sbom_file}" "${chart_name}" "licenses[0]" "$(_format_license_object "Apache-2.0")"
   done
 }
 
 _get_container_images() {
   local sbom_file
   if [[ "$#" -ne 1 ]]; then
-    log_fatal "usage: _get_license <sbom-file>"
+    log_fatal "usage: _get_container_images <sbom-file>"
   fi
 
   sbom_file="${1}"
@@ -182,7 +184,7 @@ _get_container_images() {
     chart_folder_name="${chart#"${HELMFILE_FOLDER}/"}"
     chart_folder_name="${chart_folder_name%\/Chart.yaml}"
 
-    # _yq_add_json "${sbom_file}" "${chart_name}" "properties" "[]"
+    # _yq_add_component_json "${sbom_file}" "${chart_name}" "properties" "[]"
     containers_file=$(mktemp --suffix="${chart_name}-sbom-containers.json")
     echo "[]" > "${containers_file}"
 
@@ -219,7 +221,7 @@ _get_container_images() {
         # yq4 -e -i -o json "(.components[] | select(.name == \"${chart_name}\") | .containers) += \"${container}\"" "${sbom_file}"
         yq4 -o json -i ". + $(_format_container_image_object "${container}")" "${containers_file}"
       done
-      _yq_add_json "${sbom_file}" "${chart_name}" "properties" "$(jq -c 'unique' "${containers_file}")"
+      _yq_add_component_json "${sbom_file}" "${chart_name}" "properties" "$(jq -c 'unique' "${containers_file}")"
     done
 
     # TODO: mapping chart names to release names?
@@ -227,12 +229,24 @@ _get_container_images() {
   done
 }
 
+cyclonedx_validation() {
+  local sbom_file="${1}"
+  log_info "Validating CycloneDX for SBOM file"
+  cyclonedx validate --fail-on-errors --input-file "${sbom_file}" && true; exit_code="$?"
+  if ! ${CK8S_AUTO_APPROVE:-} && [[ "${exit_code}" != 0 ]]; then
+    log_warning_no_newline "CycloneDX Validation failed, do you want to continue anyway? (y/N): "
+    read -r reply
+    if [[ "${reply}" == "n" ]]; then
+      exit 0
+    fi
+  fi
+}
 
 get_unset() {
   log_info "Getting components without licenses"
-  yq4 -o json -r ".components[] | select(.licenses | contains([\"set-me\"])).name" "${sbom_file}"
+  yq4 -o json -r '.components[] | select(.licenses[].license.name | contains("set-me")).name' "${SBOM_FILE}"
   log_info "Getting components without containers"
-  yq4 -o json -r ".components[] | select(.containers | contains([\"set-me\"])).name" "${sbom_file}"
+  yq4 -o json -r '.components[] | select(.properties[].name | contains("set-me")).name' "${SBOM_FILE}"
 }
 
 sbom_remove() {
@@ -249,19 +263,17 @@ sbom_add() {
   component="${1}"
   key="${2}"
 
-  _yq_add_json "${SBOM_FILE}" "${@}"
+  _yq_add_component_json "${SBOM_FILE}" "${@}"
   log_info "Updated ${key} for ${component}"
 }
 
 sbom_generate() {
   local tmp_sbom_file
   tmp_sbom_file=$(mktemp --suffix=-sbom.json)
-  # append_trap "rm /tmp/*sbom*.json" EXIT
+  append_trap "rm ${tmp_sbom_file}" EXIT
 
   export CK8S_AUTO_APPROVE=true
 
-  # TODO:
-  # check/compare existing bom.json file?
   if [[ ! -f "${SBOM_FILE}" ]]; then
     log_info "SBOM file does not exists, creating new"
     touch "${SBOM_FILE}"
@@ -269,17 +281,13 @@ sbom_generate() {
   # create in /tmp and then compare
   cdxgen -t helm --recurse "${HELMFILE_FOLDER}" --output "${tmp_sbom_file}"
 
-  _get_license "${tmp_sbom_file}"
+  yq4 -o json -i ". *= load(\"${SBOM_TEMPLATE_FILE}\")" "${tmp_sbom_file}"
+
+  _get_licenses "${tmp_sbom_file}"
 
   _get_container_images "${tmp_sbom_file}"
-  cyclonedx validate --fail-on-errors --input-file "${tmp_sbom_file}" && true; exit_code="$?"
-  if [[ "${exit_code}" != 0 ]]; then
-    log_warning_no_newline "CycloneDX Validation failed, do you want to continue anyway? (y/N): "
-    read -r reply
-    if [[ "${reply}" == "n" ]]; then
-      exit 0
-    fi
-  fi
+
+  cyclonedx_validation "${tmp_sbom_file}"
 
   diff  -U3 --color=always "${SBOM_FILE}" "${tmp_sbom_file}" && return
   log_warning_no_newline "Do you want to replace SBOM file? (y/N): "
@@ -307,6 +315,9 @@ get-unset)
 remove)
   shift
   sbom_remove "${@}"
+  ;;
+validate)
+  cyclonedx_validation "${SBOM_FILE}"
   ;;
 *) usage ;;
 esac
