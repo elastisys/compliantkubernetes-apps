@@ -446,6 +446,8 @@ check_prepared_version() {
 }
 
 # Usage: record_migration_prepare_done sc|wc
+# Records that migration has been prepared by storing a timestamp in the config and in the cluster along with the target
+# version.
 record_migration_prepare_done() {
   local apps_config_timestamp
   apps_config_timestamp="$(date +uIs)"
@@ -469,6 +471,8 @@ record_migration_prepare_done() {
   fi
 }
 
+# Usage: ensure_migration_prepared sc|wc
+# Ensures that the timestamp and version recorded in the config matches that recorded in the cluster.
 ensure_migration_prepared() {
   local apps_upgrade
   local apps_version
@@ -507,6 +511,7 @@ record_migration_apply_step() {
 }
 
 # Usage: record_migration_done sc|wc
+# Records that the migration has been completed and records the version upgraded to.
 record_migration_done() {
   # Record the upgraded-to version. Create if it does not already exist.
   log_info "Recording new apps version in cluster"

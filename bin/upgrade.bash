@@ -66,6 +66,7 @@ prepare() {
     fi
   done
 
+  # Record, in the cluster, that migration has been prepared so that nobody else starts the apply.
   if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
     record_migration_prepare_done sc
   fi
