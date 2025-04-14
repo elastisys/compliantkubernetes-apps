@@ -2,8 +2,6 @@
 
 # TODO:
 # - grouping management and workload? can potentially have differing container images fpr the same chart
-# - clean up tmp files
-# - checker for "set-me"s
 # - dry-run option?
 # - trap for removing all sbom files generated in /tmp
 # - add cyclonedx & cdxgen to requirements
@@ -107,6 +105,7 @@ _get_licenses() {
     chart_name=$(yq4 ".name" "${chart}")
 
     licenses_file=$(mktemp --suffix="${chart_name}-sbom-licenses.json")
+    append_trap "rm ${licenses_file}" EXIT
     echo "[]" > "${licenses_file}"
 
     # check if chart.yaml contains license in annotations
@@ -186,6 +185,7 @@ _get_container_images() {
 
     # _yq_add_component_json "${sbom_file}" "${chart_name}" "properties" "[]"
     containers_file=$(mktemp --suffix="${chart_name}-sbom-containers.json")
+    append_trap "rm ${containers_file}" EXIT
     echo "[]" > "${containers_file}"
 
     mapfile -t releases < <(echo "${helmfile_list}" | jq -c ".[] | select(.chart == \"${chart_folder_name}\")")
@@ -203,6 +203,7 @@ _get_container_images() {
       # TODO: pods created by operators e.g. scan-vulnerability job?
       # TODO: jobs/cronjobs
       # TODO: what about things disabled by default, e.g. Kured?
+      # use helmfile template instead of checking live cluster?
       mapfile -t containers < <("${HERE}/ops.bash" kubectl sc get pods \
         --selector app.kubernetes.io/instance="${release_name}" \
         --namespace "${release_namespace}" \
@@ -283,6 +284,7 @@ sbom_generate() {
 
   yq4 -o json -i ". *= load(\"${SBOM_TEMPLATE_FILE}\")" "${tmp_sbom_file}"
 
+  # TODO: (maybe) loop over charts here, and retrieve necessary info per chart (would reduce number of for loops)
   _get_licenses "${tmp_sbom_file}"
 
   _get_container_images "${tmp_sbom_file}"
