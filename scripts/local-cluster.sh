@@ -450,8 +450,8 @@ setup_node_local_dns() {
   if ! test -z "$wc_node_ip"; then
     log.info "got WC node IP: $wc_node_ip"
   else
-    log.error "could not get WC node IP"
-    exit 1
+    log.warn "could not get WC node IP, defaulting to 10.96.0.20"
+    wc_node_ip="10.96.0.20"
   fi
 
   sc_node_ip=$(container.ip sc-worker)
@@ -459,8 +459,8 @@ setup_node_local_dns() {
   if ! test -z "$sc_node_ip"; then
     log.info "got SC node IP: $sc_node_ip"
   else
-    log.error "could not get SC node IP"
-    exit 1
+    log.warn "could not get SC node IP, defaulting to 10.96.0.20"
+    sc_node_ip="10.96.0.20"
   fi
 
   # need domain
@@ -485,8 +485,12 @@ setup_node_local_dns() {
     envsubst >"$CK8S_CONFIG_PATH/wc-config.yaml.new"
   mv -f "$CK8S_CONFIG_PATH/wc-config.yaml.new" "$CK8S_CONFIG_PATH/wc-config.yaml"
 
-  "$ROOT/bin/ck8s" ops helmfile sc -lapp=node-local-dns apply --include-transitive-needs
-  "$ROOT/bin/ck8s" ops helmfile wc -lapp=node-local-dns apply --include-transitive-needs
+  if [[ -f "${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml" ]]; then
+    "$ROOT/bin/ck8s" ops helmfile sc -lapp=node-local-dns apply --include-transitive-needs
+  fi
+  if [[ -f "${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml" ]]; then
+    "$ROOT/bin/ck8s" ops helmfile wc -lapp=node-local-dns apply --include-transitive-needs
+  fi
 }
 
 delete() {
