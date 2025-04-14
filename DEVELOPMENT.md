@@ -53,7 +53,7 @@ By default, local clusters will use `calico` for networking, `local-path-provisi
 
 The local listen address will be set to `127.0.64.43` for the SC worker node, and `127.0.64.143` for the WC worker node.
 
-We'll also be passing the `--skip-minio` options for the WC, to deploy block storage only to the SC cluster.
+We'll also be passing the `--skip-minio` options for the WC, to deploy object storage only to the SC cluster.
 
 ```sh
 ./scripts/local-cluster.sh create <name>-sc <kind-config-file|local-cluster-profile>
