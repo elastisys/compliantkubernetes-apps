@@ -1,7 +1,7 @@
 .:53 {
   errors
   template IN A {$domain} {
-    match "(^grafana|^harbor|^opensearch|\.ops)\.{$domain}\.$"
+    match "(^dex|^grafana|^harbor|^opensearch|\.ops)\.{$domain}\.$"
     answer "{{ .Name }} 60 IN A 127.0.64.43"
     fallthrough
   }
