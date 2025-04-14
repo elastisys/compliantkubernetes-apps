@@ -582,7 +582,7 @@ thanos:
         memory: 1Gi
     extraFlags:  #use extraflags when you want to add more command line flags to the component.
       - >-
-        --receive.limits-config={"write":{"global":{"max_concurrency":30}}}
+        --receive.limits-config={"write":{"global":{"max_concurrency":20}}}
   ruler:
     # Enables the ruler component
     # Evaluates alert rules through thanos, record rules and thanos alert rules are still evaluated through prometheus.
