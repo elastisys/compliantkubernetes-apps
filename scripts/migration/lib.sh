@@ -465,7 +465,7 @@ record_migration_prepare_done() {
     log_info "Cluster ${1} locked for upgrade"
     return 0
   else
-    log_warn "prepare already started in ${1} ('ck8s upgrade-unlock ${1}' to try again)"
+    log_warn "prepare already started in ${1} ('ck8s upgrade ${1} unlock' to try again)"
   fi
 }
 
