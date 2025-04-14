@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:af9702a0-e788-4567-a15d-002f93a5a871",
+  "serialNumber": "urn:uuid:0257c9fc-dda9-4efb-b192-891f5b22d560",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-04-11T14:00:06Z",
+    "timestamp": "2025-04-14T14:09:32Z",
     "tools": {
       "components": [
         {
@@ -58,8 +58,14 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "velero/velero:v1.13.0"
         }
       ]
     },
@@ -80,8 +86,14 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "set-me"
           }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "quay.io/prometheuscommunity/elasticsearch-exporter:v1.7.0"
         }
       ]
     },
@@ -102,8 +114,19 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
+        },
+        {
+          "license": {
+            "name": "set-me"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "quay.io/prometheus/blackbox-exporter:v0.24.0"
         }
       ]
     },
@@ -124,8 +147,22 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "quay.io/prometheus-operator/prometheus-operator:v0.79.2"
+        },
+        {
+          "name": "container",
+          "value": "quay.io/prometheus/node-exporter:v1.8.2"
+        },
+        {
+          "name": "container",
+          "value": "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.14.0"
         }
       ]
     },
@@ -139,7 +176,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "set-me"
           }
         }
       ]
@@ -160,7 +197,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "set-me"
           }
         }
       ]
@@ -181,7 +218,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "set-me"
           }
         }
       ]
@@ -202,8 +239,23 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
+        },
+        {
+          "license": {
+            "name": "GNU Affero General Public License v3.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "docker.io/grafana/grafana:11.2.3-security-01"
+        },
+        {
+          "name": "container",
+          "value": "quay.io/kiwigrid/k8s-sidecar:1.28.0"
         }
       ]
     },
@@ -223,7 +275,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "set-me"
           }
         }
       ]
@@ -245,7 +297,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "set-me"
           }
         }
       ]
@@ -267,7 +319,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "set-me"
           }
         }
       ]
@@ -289,7 +341,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "set-me"
           }
         }
       ]
@@ -311,8 +363,23 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
+        },
+        {
+          "license": {
+            "name": "GNU Affero General Public License v3.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "docker.io/grafana/grafana:11.2.3-security-01"
+        },
+        {
+          "name": "container",
+          "value": "quay.io/kiwigrid/k8s-sidecar:1.28.0"
         }
       ]
     },
@@ -333,7 +400,12 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
+          }
+        },
+        {
+          "license": {
+            "name": "set-me"
           }
         }
       ]
@@ -349,7 +421,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "set-me"
           }
         }
       ]
@@ -371,8 +443,14 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "opensearchproject/opensearch:2.18.0"
         }
       ]
     },
@@ -393,8 +471,14 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "set-me"
           }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "openpolicyagent/gatekeeper:v3.15.1"
         }
       ]
     },
@@ -415,7 +499,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
         }
       ]
@@ -436,7 +520,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
         }
       ]
@@ -458,7 +542,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
         }
       ]
@@ -479,7 +563,9 @@
       "bom-ref": "pkg:helm/minio@5.0.14",
       "licenses": [
         {
-          "id": "Apache-2.0"
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
       ]
     },
@@ -503,8 +589,14 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "registry.k8s.io/metrics-server/metrics-server:v0.7.1"
         }
       ]
     },
@@ -525,8 +617,18 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "registry.k8s.io/defaultbackend-amd64:1.5"
+        },
+        {
+          "name": "container",
+          "value": "registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e"
         }
       ]
     },
@@ -547,7 +649,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "set-me"
           }
         }
       ]
@@ -569,8 +671,14 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "ghcr.io/kubereboot/kured:1.17.0"
         }
       ]
     },
@@ -591,8 +699,19 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
+        },
+        {
+          "license": {
+            "name": "set-me"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "ghcr.io/elastisys/fluentd-forwarder:v4.7.5-ck8s1"
         }
       ]
     },
@@ -613,8 +732,22 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "quay.io/jetstack/cert-manager-cainjector:v1.17.1"
+        },
+        {
+          "name": "container",
+          "value": "quay.io/jetstack/cert-manager-controller:v1.17.1"
+        },
+        {
+          "name": "container",
+          "value": "quay.io/jetstack/cert-manager-webhook:v1.17.1"
         }
       ]
     },
@@ -635,8 +768,23 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
+        },
+        {
+          "license": {
+            "name": "GNU Affero General Public License v3.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "docker.io/grafana/grafana:11.2.3-security-01"
+        },
+        {
+          "name": "container",
+          "value": "quay.io/kiwigrid/k8s-sidecar:1.28.0"
         }
       ]
     },
@@ -660,8 +808,46 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "goharbor/harbor-core:v2.12.1"
+        },
+        {
+          "name": "container",
+          "value": "goharbor/harbor-db:v2.12.1"
+        },
+        {
+          "name": "container",
+          "value": "goharbor/harbor-exporter:v2.12.1"
+        },
+        {
+          "name": "container",
+          "value": "goharbor/harbor-jobservice:v2.12.1"
+        },
+        {
+          "name": "container",
+          "value": "goharbor/harbor-portal:v2.12.1"
+        },
+        {
+          "name": "container",
+          "value": "goharbor/harbor-registryctl:v2.12.1"
+        },
+        {
+          "name": "container",
+          "value": "goharbor/redis-photon:v2.12.1"
+        },
+        {
+          "name": "container",
+          "value": "goharbor/registry-photon:v2.12.1"
+        },
+        {
+          "name": "container",
+          "value": "goharbor/trivy-adapter-photon:v2.12.1"
         }
       ]
     },
@@ -682,8 +868,18 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "docker.io/falcosecurity/falco:0.40.0-debian"
+        },
+        {
+          "name": "container",
+          "value": "docker.io/falcosecurity/falcosidekick:2.31.1"
         }
       ]
     },
@@ -703,7 +899,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
         }
       ]
@@ -724,7 +920,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
         }
       ]
@@ -746,7 +942,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
         }
       ]
@@ -768,7 +964,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
         }
       ]
@@ -793,8 +989,19 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
+        },
+        {
+          "license": {
+            "name": "set-me"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "ghcr.io/dexidp/dex:v2.40.0"
         }
       ]
     },
@@ -814,7 +1021,19 @@
       "bom-ref": "pkg:helm/thanos@15.13.1",
       "licenses": [
         {
-          "id": "Apache-2.0"
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8"
+        },
+        {
+          "name": "container",
+          "value": "quay.io/prometheus-operator/prometheus-config-reloader:v0.50.0"
         }
       ]
     },
@@ -833,7 +1052,9 @@
       "bom-ref": "pkg:helm/minio@15.x.x",
       "licenses": [
         {
-          "id": "Apache-2.0"
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
       ]
     },
@@ -852,7 +1073,9 @@
       "bom-ref": "pkg:helm/common@2.x.x",
       "licenses": [
         {
-          "id": "Apache-2.0"
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
       ]
     },
@@ -876,7 +1099,9 @@
       ],
       "licenses": [
         {
-          "id": "Apache-2.0"
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
       ]
     },
@@ -896,7 +1121,9 @@
       "bom-ref": "pkg:helm/common@2.30.0",
       "licenses": [
         {
-          "id": "Apache-2.0"
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
       ]
     },
@@ -916,7 +1143,15 @@
       "bom-ref": "pkg:helm/fluentd@7.1.1",
       "licenses": [
         {
-          "id": "Apache-2.0"
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "ghcr.io/elastisys/fluentd-aggregator:v7.1.1-ck8s1"
         }
       ]
     },
@@ -936,7 +1171,9 @@
       "bom-ref": "pkg:helm/common@2.29.0",
       "licenses": [
         {
-          "id": "Apache-2.0"
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
       ]
     },
@@ -954,7 +1191,7 @@
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "Apache License 2.0"
           }
         }
       ]
@@ -1075,6 +1312,12 @@
             "id": "Apache-2.0"
           }
         }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "ghcr.io/elastisys/s3-exporter:0.5.0"
+        }
       ]
     },
     {
@@ -1155,6 +1398,12 @@
             "id": "Apache-2.0"
           }
         }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "ghcr.io/elastisys/curl-jq:1.0.0"
+        }
       ]
     },
     {
@@ -1202,6 +1451,12 @@
           "license": {
             "id": "Apache-2.0"
           }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "ghcr.io/elastisys/bitnami/elasticsearch-curator:5.8.4-debian-10-r235"
         }
       ]
     },
@@ -1316,6 +1571,12 @@
           "license": {
             "id": "Apache-2.0"
           }
+        }
+      ],
+      "properties": [
+        {
+          "name": "container",
+          "value": "ghcr.io/elastisys/compliantkubernetes-apps-log-manager:0.3.2"
         }
       ]
     },
