@@ -13,6 +13,8 @@
 set -euo pipefail
 
 : "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
+# TODO: figure out a different approach for retrieving licenses, or handle GITHUB_TOKEN better
+: "${GITHUB_TOKEN:?Missing GITHUB_TOKEN}"
 
 export CK8S_SKIP_VALIDATION="true"
 
@@ -46,20 +48,40 @@ _yq_add_json() {
 
   tmp_sbom_file=$(mktemp --suffix=-sbom.json)
 
-  if [[ ! "${key}" =~ ^(licenses.*|containers.*)$ ]]; then
-    log_fatal "unsupported key \"${key}\", currently only supports \"licenses|containers\""
+  if [[ ! "${key}" =~ ^(licenses.*|properties.*)$ ]]; then
+    log_fatal "unsupported key \"${key}\", currently only supports \"licenses|properties\""
   fi
 
   if ! ${CK8S_AUTO_APPROVE:-}; then
     yq4 -o json "(.components[] | select(.name == \"${component}\") | .${key}) |= ${value}" "${sbom_file}" > "${tmp_sbom_file}"
-    # TODO:
-    # cyclonedx validate --input-file "${tmp_sbom_file}"
+    cyclonedx validate --input-file "${tmp_sbom_file}"
     diff  -U3 --color=always "${sbom_file}" "${tmp_sbom_file}" && log_info "No change" && return
     log_info "Changes found"
     ask_abort
   fi
 
   yq4 -i -o json "(.components[] | select(.name == \"${component}\") | .${key}) |= ${value}" "${sbom_file}"
+}
+
+# checks if
+_id_or_name_license() {
+  local license="${1}"
+  if [[ $(curl --silent https://cyclonedx.org/schema/spdx.schema.json | yq4 -r ".enum | contains([\"${license}\"])" ) == "true" ]]; then
+    echo "id"
+    return
+  fi
+  echo "name"
+}
+
+_format_license_object() {
+  local license="${1}"
+  echo "{\"license\": {\"$(_id_or_name_license "${license}")\": \"${license}\"}}"
+
+}
+
+_format_container_image_object() {
+  local container_image="${1}"
+  echo "{\"name\": \"container\", \"value\": \"${container_image}\"}"
 }
 
 _get_license() {
@@ -90,42 +112,40 @@ _get_license() {
     annotation_artifacthub=$(yq4 ".annotations.artifacthub.io/license" "${chart}")
 
     if [[ -n "${annotation}" && "${annotation}" != "null" ]]; then
-      yq4 -o json -i ". + {\"id\": \"${annotation}\"}" "${licenses}"
+      yq4 -o json -i ". + $(_format_license_object "${annotation}")" "${licenses}"
 
     elif [[ -n "${annotation_artifacthub}" && "${annotation_artifacthub}" != "null" ]]; then
-      yq4 -o json -i ". + {\"id\": \"${annotation_artifacthub}\"}" "${licenses}"
+      yq4 -o json -i ". + $(_format_license_object "${annotation_artifacthub}")" "${licenses}"
 
     # if no license in annotations, try to get from source (e.g. github)
     else
       # TODO: handle multiple licenses, or, stick with one
       mapfile -t sources < <(yq4 '.sources[]' "${chart}")
       if [[ "${#sources[@]}" -eq 0 ]] || [[ "${sources[*]}" == "null" ]]; then
-        yq4 -o json -i '. + {"license": {"id": "set-me"}}' "${licenses}"
+        yq4 -o json -i ". + $(_format_license_object "set-me")" "${licenses}"
       else
         for source in "${sources[@]}"; do
-          # TODO: assumes GitHub source, this is not guaranteed
+          # TODO: assumes GitHub source, this is not necessarily guaranteed
           repo=${source##*github.com/}
 
           # API rate limits :grimacing:
           mapfile -t licenses_in_git < <(curl -L -s \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
             "https://api.github.com/repos/${repo}" | jq -r '.license.name')
 
           if [[ "${licenses_in_git[*]}" == "null" ]]; then
-            yq4 -o json -i '. + {"license": {"id": "set-me"}}' "${licenses}"
+            yq4 -o json -i ". + $(_format_license_object "set-me")" "${licenses}"
           else
             for l in "${licenses_in_git[@]}"; do
-              yq4 -o json -i ". + {\"license\": {\"id\": \"${l}\"}}" "${licenses}"
+              yq4 -o json -i ". + $(_format_license_object "${l}")" "${licenses}"
             done
           fi
         done
       fi
     fi
-    # sbom_add "${chart_name}" "licenses[]" "[]"
-    # yq4 -e -i -o json "(.components[] | select(.name == \"${chart_name}\") | .licenses[]) += $(cat "${licenses}" | jq -c)" "${sbom_file}"
-    # cat "${licenses}"
-    _yq_add_json "${sbom_file}" "${chart_name}" "licenses" "$(cat "${licenses}" | jq -c 'unique')"
+    _yq_add_json "${sbom_file}" "${chart_name}" "licenses" "$(jq -c 'unique' "${licenses}")"
   done
 
   # Welkin charts
@@ -135,8 +155,7 @@ _get_license() {
     chart_name=$(yq4 ".name" "${chart}")
 
     # TODO: licenses for the applications
-    # yq4 -e -i -o json "(.components[] | select(.name == \"${chart_name}\") | .licenses[0].id) |= \"Apache-2.0\"" "${sbom_file}"
-    _yq_add_json "${sbom_file}" "${chart_name}" "licenses[0]" '{"license": {"id": "Apache-2.0"}}'
+    _yq_add_json "${sbom_file}" "${chart_name}" "licenses[0]" "$(_format_license_object "Apache-2.0")"
   done
 }
 
@@ -154,22 +173,22 @@ _get_container_images() {
 
   mapfile -t charts < <(find "${HELMFILE_FOLDER}" -name "Chart.yaml")
 
+  # TODO:
+  # - what about wc? this should list all charts in both wc/sc, but should only those enabled/installed=true be checked?
   helmfile_list=$("${HERE}/ops.bash" helmfile sc list --output json)
-
-  # echo "${helmfile_list}" | jq
 
   for chart in "${charts[@]}"; do
     chart_name=$(yq4 ".name" "${chart}")
     chart_folder_name="${chart#"${HELMFILE_FOLDER}/"}"
     chart_folder_name="${chart_folder_name%\/Chart.yaml}"
 
-    sbom_add "${chart_name}" "containers[]" "[]"
+    # _yq_add_json "${sbom_file}" "${chart_name}" "properties" "[]"
+    containers_file=$(mktemp --suffix="${chart_name}-sbom-containers.json")
+    echo "[]" > "${containers_file}"
 
-    # release=$(echo "${helmfile_list}" | jq ".[] | select(.chart == \"${chart_folder_name}\")")
     mapfile -t releases < <(echo "${helmfile_list}" | jq -c ".[] | select(.chart == \"${chart_folder_name}\")")
 
     if [[ ${#releases[@]} -eq 0 ]]; then
-
       # log_warning "no releases for $chart_name"
       # Maybe add a check for sub-charts that are part of umbrella charts e.g. prometheus-node-exporter?
       continue
@@ -180,7 +199,9 @@ _get_container_images() {
       # TODO: what if a chart deploys pods in different namespace then release?
       release_namespace=$(echo "${release}" | jq -r ".namespace")
       # TODO: pods created by operators e.g. scan-vulnerability job?
-      mapfile -t containers < <("${here}/ops.bash" kubectl sc get pods \
+      # TODO: jobs/cronjobs
+      # TODO: what about things disabled by default, e.g. Kured?
+      mapfile -t containers < <("${HERE}/ops.bash" kubectl sc get pods \
         --selector app.kubernetes.io/instance="${release_name}" \
         --namespace "${release_namespace}" \
         -oyaml | yq4 '.items[] | .spec.containers[] | .image' | sort -u)
@@ -194,8 +215,11 @@ _get_container_images() {
       fi
 
       for container in "${containers[@]}"; do
-        yq4 -e -i -o json "(.components[] | select(.name == \"${chart_name}\") | .containers) += \"${container}\"" "${sbom_file}"
+        # TODO: fix only unique container images
+        # yq4 -e -i -o json "(.components[] | select(.name == \"${chart_name}\") | .containers) += \"${container}\"" "${sbom_file}"
+        yq4 -o json -i ". + $(_format_container_image_object "${container}")" "${containers_file}"
       done
+      _yq_add_json "${sbom_file}" "${chart_name}" "properties" "$(jq -c 'unique' "${containers_file}")"
     done
 
     # TODO: mapping chart names to release names?
@@ -216,12 +240,14 @@ sbom_remove() {
 }
 
 sbom_add() {
-  # TODO:
-  # - error handling if component does not exist
-  # - add dry-run option (currently can use CK8S_AUTO_APPROVE)
   if [[ "$#" -ne 3 ]]; then
     usage
   fi
+
+  local component key
+
+  component="${1}"
+  key="${2}"
 
   _yq_add_json "${SBOM_FILE}" "${@}"
   log_info "Updated ${key} for ${component}"
@@ -238,17 +264,24 @@ sbom_generate() {
   # check/compare existing bom.json file?
   if [[ ! -f "${SBOM_FILE}" ]]; then
     log_info "SBOM file does not exists, creating new"
-    tmp_sbom_file="${SBOM_FILE}"
+    touch "${SBOM_FILE}"
   fi
   # create in /tmp and then compare
   cdxgen -t helm --recurse "${HELMFILE_FOLDER}" --output "${tmp_sbom_file}"
 
   _get_license "${tmp_sbom_file}"
 
-  # _get_container_images "${tmp_sbom_file}"
+  _get_container_images "${tmp_sbom_file}"
+  cyclonedx validate --fail-on-errors --input-file "${tmp_sbom_file}" && true; exit_code="$?"
+  if [[ "${exit_code}" != 0 ]]; then
+    log_warning_no_newline "CycloneDX Validation failed, do you want to continue anyway? (y/N): "
+    read -r reply
+    if [[ "${reply}" == "n" ]]; then
+      exit 0
+    fi
+  fi
 
   diff  -U3 --color=always "${SBOM_FILE}" "${tmp_sbom_file}" && return
-
   log_warning_no_newline "Do you want to replace SBOM file? (y/N): "
   read -r reply
   if [[ "${reply}" == "y" ]]; then
