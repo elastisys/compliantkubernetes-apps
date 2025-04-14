@@ -24,22 +24,20 @@ local_cluster.setup() {
   gpg.setup
 
   mkdir -p "${CK8S_CONFIG_PATH}/.state"
-  export KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config.yaml"
 
   "${scripts}/local-cluster.sh" config apps-tests "${@}"
 }
 
-# Usage: local_cluster.create <local-cluster-profile>
+# Usage: local_cluster.create <sc|wc> <local-cluster-profile>
 local_cluster.create() {
   declares
-  "${scripts}/local-cluster.sh" create apps-tests "${@}"
-  cp "${CK8S_CONFIG_PATH}/.state/kube_config.yaml" "${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml"
-  cp "${CK8S_CONFIG_PATH}/.state/kube_config.yaml" "${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml"
+  "${scripts}/local-cluster.sh" create "apps-tests-${1}" "${@:2}"
 }
 
+# Usage: local_cluster.delete <sc|wc>
 local_cluster.delete() {
   declares
-  CK8S_AUTO_APPROVE=true "${scripts}/local-cluster.sh" delete apps-tests
+  CK8S_AUTO_APPROVE=true "${scripts}/local-cluster.sh" delete "apps-tests-${1}"
 }
 
 local_cluster.teardown() {
@@ -56,4 +54,9 @@ local_cluster.configure_selfsigned() {
 
   yq.set 'common' '.issuers.letsencrypt.prod.email' '"admin@example.com"'
   yq.set 'common' '.issuers.letsencrypt.staging.email' '"admin@example.com"'
+}
+
+local_cluster.configure_node_local_dns() {
+  declares
+  "${scripts}/local-cluster.sh" setup node-local-dns
 }
