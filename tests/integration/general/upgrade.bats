@@ -7,7 +7,7 @@ setup_file() {
   export CK8S_AUTO_APPROVE=true
   export CK8S_CI_SKIP_APPLY=true # quicken the apply step
 
-  MIGRATION_ROOT="${ROOT}/tests/migration"
+  MIGRATION_ROOT="${ROOT}/tests/integration/general/migration"
   export MIGRATION_ROOT
 
   load "../../bats.lib.bash"
