@@ -81,4 +81,5 @@ update_ips_dryrun "$1" "${environment}"
 config_load "$1"
 validate_version "${1}"
 check_migration "$1"
+test -n "${CK8S_CI_SKIP_APPLY:-}" && exit 0 # Improve mockability in the future
 apps_apply "$1" "${environment}" "${@:2}"

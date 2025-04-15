@@ -4,6 +4,8 @@
 
 setup_file() {
   export BATS_NO_PARALLELIZE_WITHIN_FILE=true
+  export CK8S_AUTO_APPROVE=true
+  export CK8S_CI_SKIP_APPLY=true # quicken the apply step
 
   MIGRATION_ROOT="${ROOT}/tests/migration"
   export MIGRATION_ROOT
@@ -29,12 +31,6 @@ setup() {
   env.private
 
   gitversion.setup_mocks
-
-  mock_helmfile="$(mock_create)"
-  helmfile() {
-    "${mock_helmfile}" "${@}"
-  }
-  export -f helmfile
 
   # consistent state at start
   run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
