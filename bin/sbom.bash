@@ -124,7 +124,7 @@ _prepare_sbom() {
 
   # create in /tmp and then compare
   # TODO: currently filter out some "dependencies", would like a better way to handle this
-  cdxgen --filter '.*' --filter 'common' -t helm "${HELMFILE_FOLDER}" --output "${sbom_file}"
+  cdxgen --filter '.*' --filter 'common' --filter 'minio'  -t helm "${HELMFILE_FOLDER}" --output "${sbom_file}"
 
   yq4 -o json -i ". *= load(\"${SBOM_TEMPLATE_FILE}\")" "${sbom_file}"
 
