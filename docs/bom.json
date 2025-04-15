@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:8cb6858e-6f4e-4053-8596-e647daec4a09",
+  "serialNumber": "urn:uuid:bdafe0b9-39e5-4a9b-9742-226152c8361d",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-04-15T14:38:56Z",
+    "timestamp": "2025-04-15T15:09:52Z",
     "tools": {
       "components": [
         {
@@ -1291,132 +1291,6 @@
         {
           "name": "container",
           "value": "registry.k8s.io/metrics-server/metrics-server:v0.7.1"
-        }
-      ]
-    },
-    {
-      "group": "",
-      "name": "minio",
-      "version": "15.0.5",
-      "description": "MinIO(R) is an object storage server, compatible with Amazon S3 cloud storage service, mainly used for storing unstructured data (such as photos, videos, log files, etc.).",
-      "purl": "pkg:helm/minio@15.0.5",
-      "externalReferences": [
-        {
-          "type": "website",
-          "url": "https://bitnami.com"
-        }
-      ],
-      "type": "library",
-      "bom-ref": "pkg:helm/minio@15.0.5",
-      "tags": [
-        "cloud",
-        "log"
-      ],
-      "licenses": [
-        {
-          "license": {
-            "name": "GNU Affero General Public License v3.0"
-          }
-        },
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
-        },
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
-        },
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
-        }
-      ]
-    },
-    {
-      "group": "",
-      "name": "minio",
-      "version": "15.x.x",
-      "purl": "pkg:helm/minio@15.x.x",
-      "externalReferences": [
-        {
-          "type": "vcs",
-          "url": "oci://registry-1.docker.io/bitnamicharts"
-        }
-      ],
-      "type": "library",
-      "bom-ref": "pkg:helm/minio@15.x.x",
-      "licenses": [
-        {
-          "license": {
-            "name": "GNU Affero General Public License v3.0"
-          }
-        },
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
-        },
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
-        },
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
-        }
-      ]
-    },
-    {
-      "group": "",
-      "name": "minio",
-      "version": "5.0.14",
-      "description": "Multi-Cloud Object Storage",
-      "purl": "pkg:helm/minio@5.0.14",
-      "externalReferences": [
-        {
-          "type": "website",
-          "url": "https://min.io"
-        }
-      ],
-      "type": "library",
-      "bom-ref": "pkg:helm/minio@5.0.14",
-      "licenses": [
-        {
-          "license": {
-            "name": "GNU Affero General Public License v3.0"
-          }
-        },
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
-        },
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
-        },
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
