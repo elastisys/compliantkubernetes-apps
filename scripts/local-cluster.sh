@@ -41,8 +41,7 @@ log.usage() {
   - delete <name>                                                            - deletes a local cluster
   - list clusters                                                            - lists available clusters
   - list profiles                                                            - lists available profiles
-  - setup node-local-dns                                                     - configures and deploys the node-local-dns
-                                                                               stack, required for the WC <-> SC link
+  - setup node-local-dns                                                     - configures and deploys node-local-dns
   "
 }
 log.continue() {
