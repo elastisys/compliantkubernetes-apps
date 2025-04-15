@@ -62,6 +62,7 @@ teardown() {
   gitversion.mock_static "v0.42.0"
   run ck8s upgrade sc "v0.42" prepare
   assert_success
+  assert_output --partial "locked for upgrade"
 
   gitversion.mock_static "v0.42.0"
   run ck8s upgrade sc "v0.42" apply
