@@ -3,6 +3,8 @@
 # bats file_tags=static,general,bin:upgrade
 
 setup_file() {
+  export BATS_NO_PARALLELIZE_WITHIN_FILE=true
+
   load "../../bats.lib.bash"
   load_common "local-cluster.bash"
   local_cluster.configure_selfsigned
