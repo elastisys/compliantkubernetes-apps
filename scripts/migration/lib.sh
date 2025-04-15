@@ -459,7 +459,7 @@ record_migration_prepare_done() {
   # Abort if it already exists
   log_info "Locking cluster ${1} for upgrade"
   if kubectl_do "${1}" create configmap --dry-run=client -o yaml \
-    -n kube-system apps-upgrade \
+    --namespace kube-system apps-upgrade \
     --from-literal "version=${CK8S_TARGET_VERSION}" \
     --from-literal "timestamp=${apps_config_timestamp}" |
     yq4 '.metadata.labels["app.kubernetes.io/managed-by"] = "apps-upgrade"' - |
