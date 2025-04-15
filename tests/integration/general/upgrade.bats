@@ -5,6 +5,9 @@
 setup_file() {
   export BATS_NO_PARALLELIZE_WITHIN_FILE=true
 
+  MIGRATION_ROOT="${ROOT}/tests/migration"
+  export MIGRATION_ROOT
+
   load "../../bats.lib.bash"
   load_common "local-cluster.bash"
   local_cluster.configure_selfsigned
@@ -19,14 +22,12 @@ setup() {
   load_common "local-cluster.bash"
   load_common "git-version.bash"
   load_common "yq.bash"
-  load_common "migration-override.bash"
   load_assert
   load_file
   load_mock
 
   env.private
 
-  migration.override_path
   gitversion.setup_mocks
 
   # consistent state at start
