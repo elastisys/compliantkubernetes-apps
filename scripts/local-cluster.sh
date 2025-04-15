@@ -41,6 +41,7 @@ log.usage() {
   - delete <name>                                                            - deletes a local cluster
   - list clusters                                                            - lists available clusters
   - list profiles                                                            - lists available profiles
+  - setup node-local-dns                                                     - configures and deploys node-local-dns
   "
 }
 log.continue() {
@@ -131,9 +132,16 @@ network.delete() {
 }
 
 container.create() {
+  local run_args
+
+  run_args=()
+  if test -n "${CK8S_LOCAL_AUTOSTART_CACHE:-}"; then
+    run_args=(--restart always)
+  fi
+
   if ! "${runtime}" container inspect "${1}" &>/dev/null; then
     log.info "- creating container ${1}"
-    "${runtime}" run --detach "${@:2}"
+    "${runtime}" run --detach "${run_args[@]}" "${@:2}"
   else
     "${runtime}" start "${1}"
   fi
@@ -144,6 +152,20 @@ container.delete() {
     "${runtime}" container stop "${1}"
     "${runtime}" container rm "${1}"
   fi
+}
+container.ip() {
+  local suffix jq_selector container_id
+  suffix="${1:-}"
+
+  case "${runtime}" in
+  "docker") jq_selector=". | select(.Names | endswith(\"${suffix}\")) | .ID" ;;
+  "podman") jq_selector=".[] | select(.Names[] | endswith(\"${suffix}\")) | .Id" ;;
+  *) return ;;
+  esac
+
+  container_id="$(${runtime} ps --format json | jq -r "$jq_selector" | head -1)"
+  test -z "$container_id" && return
+  ${runtime} inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$container_id"
 }
 volume.create() {
   if ! "${runtime}" volume inspect "${1}" &>/dev/null; then
@@ -316,13 +338,28 @@ config() {
 }
 
 create() {
-  local cluster config
+  local cluster config affix
   cluster="${1:-}"
   config="${2:-}"
 
   if [[ -z "${cluster}" ]]; then
     log.usage
   fi
+
+  case "$cluster" in
+  *-wc)
+    affix="wc"
+    export CK8S_LOCAL_LISTEN_ADDRESS=127.0.64.143
+    ;;
+  *-sc)
+    affix="sc"
+    export CK8S_LOCAL_LISTEN_ADDRESS=127.0.64.43
+    ;;
+  *)
+    echo "Local cluster names must use either the -wc or -sc suffix." >&2
+    exit 1
+    ;;
+  esac
 
   if [[ -z "${CK8S_CONFIG_PATH:-}" ]]; then
     log.fatal "CK8S_CONFIG_PATH is unset"
@@ -362,13 +399,11 @@ create() {
   fi
 
   mkdir -p "${CK8S_CONFIG_PATH}/.state"
-  kind get kubeconfig --name "${cluster}" >"${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml"
-  kind get kubeconfig --name "${cluster}" >"${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml"
+  kind get kubeconfig --name "${cluster}" >"${CK8S_CONFIG_PATH}/.state/kube_config_${affix}.yaml"
 
-  chmod 600 "${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml"
-  chmod 600 "${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml"
+  chmod 600 "${CK8S_CONFIG_PATH}/.state/kube_config_${affix}.yaml"
 
-  export KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml"
+  export KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_${affix}.yaml"
 
   if [[ "${runtime}" == "podman" ]]; then
     log.info "patch coredns config for podman"
@@ -403,6 +438,58 @@ create() {
 
   index.state "${cluster}" "ready"
   log.info "cluster ${cluster} is ready"
+}
+
+setup_node_local_dns() {
+  log.info "setting up node local dns"
+  local wc_node_ip sc_node_ip domain
+
+  wc_node_ip=$(container.ip wc-worker)
+
+  if ! test -z "$wc_node_ip"; then
+    log.info "got WC node IP: $wc_node_ip"
+  else
+    log.warn "could not get WC node IP, defaulting to 10.96.0.20"
+    wc_node_ip="10.96.0.20"
+  fi
+
+  sc_node_ip=$(container.ip sc-worker)
+
+  if ! test -z "$sc_node_ip"; then
+    log.info "got SC node IP: $sc_node_ip"
+  else
+    log.warn "could not get SC node IP, defaulting to 10.96.0.20"
+    sc_node_ip="10.96.0.20"
+  fi
+
+  # need domain
+  domain="$(yq4 ".global.baseDomain" <"${CK8S_CONFIG_PATH}/common-config.yaml")"
+
+  export wc_node_ip
+  export sc_node_ip
+  export domain
+
+  # shellcheck source=scripts/migration/yq.sh
+  source "${ROOT}/scripts/migration/yq.sh"
+
+  yq_merge \
+    "$CK8S_CONFIG_PATH/sc-config.yaml" \
+    "${HERE}/local-clusters/configs/partial/sc-node-local-dns.yaml" |
+    envsubst >"$CK8S_CONFIG_PATH/sc-config.yaml.new"
+  mv -f "$CK8S_CONFIG_PATH/sc-config.yaml.new" "$CK8S_CONFIG_PATH/sc-config.yaml"
+
+  yq_merge \
+    "$CK8S_CONFIG_PATH/wc-config.yaml" \
+    "${HERE}/local-clusters/configs/partial/wc-node-local-dns.yaml" |
+    envsubst >"$CK8S_CONFIG_PATH/wc-config.yaml.new"
+  mv -f "$CK8S_CONFIG_PATH/wc-config.yaml.new" "$CK8S_CONFIG_PATH/wc-config.yaml"
+
+  if [[ -f "${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml" ]]; then
+    "$ROOT/bin/ck8s" ops helmfile sc -lapp=node-local-dns apply --include-transitive-needs
+  fi
+  if [[ -f "${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml" ]]; then
+    "$ROOT/bin/ck8s" ops helmfile wc -lapp=node-local-dns apply --include-transitive-needs
+  fi
 }
 
 delete() {
@@ -442,6 +529,16 @@ main() {
   subcommand="${2:-}"
 
   case "${command}" in
+  setup)
+    case "${subcommand}" in
+    node-local-dns)
+      setup_node_local_dns
+      ;;
+    *)
+      log.usage
+      ;;
+    esac
+    ;;
   cache)
     case "${subcommand}" in
     create | delete)

@@ -1,0 +1,20 @@
+nodeLocalDns:
+  customConfig: |-
+    $domain:53 {
+      errors
+      bind 169.254.20.10 10.96.0.10
+      template IN A $domain {
+        match "(^dex|^grafana|^harbor|^opensearch|\.ops)\.$domain\.$"
+        answer "{{ .Name }} 60 IN A $sc_node_ip"
+        fallthrough
+      }
+      template IN A $domain {
+        match "\.$domain\.$"
+        answer "{{ .Name }} 60 IN A 10.96.0.20"
+        fallthrough
+      }
+      cache 30
+      reload
+      loop
+      forward . 1.1.1.1 1.0.0.1
+    }

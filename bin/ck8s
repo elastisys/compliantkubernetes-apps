@@ -36,6 +36,7 @@ usage() {
   echo "  upgrade <wc|sc|both> <vX.Y> apply               runs all apply steps upgrading the environment" 1>&2
   echo "  upgrade <wc|sc|both> <vX.Y> prepare             runs all prepare steps upgrading the configuration" 1>&2
   echo "  validate <wc|sc>                                validates config files" 1>&2
+  echo "  check-requirements                              check the locally installed tool versions" 1>&2
   exit 1
 }
 
@@ -56,6 +57,9 @@ for arg in "${@}"; do
 done
 
 case "${1}" in
+check-requirements)
+  check_tools --just-check
+  ;;
 init)
   [[ "${2}" =~ ^(wc|sc|both)$ ]] || usage
   check_tools

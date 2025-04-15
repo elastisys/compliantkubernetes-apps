@@ -9,7 +9,7 @@ setup_file() {
   export CK8S_AUTO_APPROVE="true"
 
   local_cluster.setup dev test.dev-ck8s.com
-  local_cluster.create single-node-cache
+  local_cluster.create sc single-node-cache
 }
 
 setup() {
@@ -19,7 +19,7 @@ setup() {
 }
 
 teardown_file() {
-  local_cluster.delete
+  local_cluster.delete sc
   local_cluster.teardown
 }
 
@@ -27,15 +27,14 @@ helm_status() {
   helm -n "${1}" status "${2}" -oyaml | yq4 '.info.status'
 }
 
-@test "local cluster has created kubeconfigs" {
+@test "local cluster has created kubeconfig" {
   assert [ -f "${CK8S_CONFIG_PATH}/.state/kube_config_sc.yaml" ]
-  assert [ -f "${CK8S_CONFIG_PATH}/.state/kube_config_wc.yaml" ]
 }
 
 @test "local cluster has ready nodes" {
-  run kubectl get no apps-tests-control-plane '-ojsonpath={.status.conditions[?(@.type=="Ready")].status}'
+  run "${ROOT}/bin/ck8s" ops kubectl sc get no apps-tests-sc-control-plane '-ojsonpath={.status.conditions[?(@.type=="Ready")].status}'
   assert_output "True"
-  run kubectl get no apps-tests-worker '-ojsonpath={.status.conditions[?(@.type=="Ready")].status}'
+  run "${ROOT}/bin/ck8s" ops kubectl sc get no apps-tests-sc-worker '-ojsonpath={.status.conditions[?(@.type=="Ready")].status}'
   assert_output "True"
 }
 
