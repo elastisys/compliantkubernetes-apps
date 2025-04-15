@@ -30,6 +30,12 @@ setup() {
 
   gitversion.setup_mocks
 
+  mock_helmfile="$(mock_create)"
+  helmfile() {
+    "${mock_helmfile}" "${@}"
+  }
+  export -f helmfile
+
   # consistent state at start
   run yq -i '.global.ck8sVersion="v0.41.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
   ck8s ops kubectl sc delete -n kube-system configmap apps-upgrade --wait || true
@@ -65,7 +71,7 @@ teardown() {
   run ck8s upgrade sc "v0.42" apply
   assert_success
 
-  run ck8s apply sc --dry-run
+  run ck8s apply sc
   assert_success
 
   run ck8s version sc
@@ -135,7 +141,7 @@ teardown() {
 
   # Oops, forgot to ck8s upgrade apply
 
-  run ck8s apply sc --dry-run
+  run ck8s apply sc
   assert_failure
   assert_output --partial "Migration ongoing"
 }
@@ -157,7 +163,7 @@ EOF
 
   # downgrade
   gitversion.mock_static "v0.41.0"
-  run ck8s apply sc --dry-run
+  run ck8s apply sc
   assert_failure
   assert_output --partial "Version mismatch. Run migration to update config."
 }

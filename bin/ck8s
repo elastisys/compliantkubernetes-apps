@@ -47,7 +47,6 @@ KUBECTL=""
 GEN_NEW_SECRETS=""
 CONCURRENCY="--concurrency=8"
 CK8S_IPV6_ENABLED="false"
-DRY_RUN=""
 
 for arg in "${@}"; do
   case "${arg}" in
@@ -56,7 +55,6 @@ for arg in "${@}"; do
   "--generate-new-secrets") GEN_NEW_SECRETS="--generate-new-secrets" ;;
   "--concurrency="*) CONCURRENCY="${arg}" ;;
   "--ipv6") CK8S_IPV6_ENABLED="true" ;;
-  "--dry-run") DRY_RUN="${arg}" ;;
   esac
 done
 
@@ -73,7 +71,7 @@ init)
 apply)
   [[ "${2}" =~ ^(wc|sc)$ ]] || usage
   check_tools
-  "${here}/apply.bash" "${2}" "${SYNC}" "${CONCURRENCY}" "${DRY_RUN}"
+  "${here}/apply.bash" "${2}" "${SYNC}" "${CONCURRENCY}"
   ;;
 test)
   [[ "${2}" =~ ^(wc|sc)$ ]] || usage
