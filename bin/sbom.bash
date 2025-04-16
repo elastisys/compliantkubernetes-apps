@@ -40,17 +40,6 @@ usage() {
 # - build sbom?
 # - handle if component not in list?
 
-_yq_add() {
-  return
-  # if component + add new
-  # if container + add new
-  # if license + add new
-  # if component + override
-  # if container + override
-  # if license + override
-  # if elastisys-evaluation (always override, should only be one)
-}
-
 _yq_add_component_json() {
   local component key sbom_file tmp_sbom_file value
 
@@ -67,14 +56,16 @@ _yq_add_component_json() {
   fi
 
   if ! ${CK8S_AUTO_APPROVE:-}; then
-    yq4 -o json "(.components[] | select(.name == \"${component}\") | .${key}) += ${value}" "${sbom_file}" > "${tmp_sbom_file}"
+    # yq4 -o json "(.components[] | select(.name == \"${component}\") | .${key}) += ${value}" "${sbom_file}" > "${tmp_sbom_file}"
+    yq4 -o json "with(.components[] | select(.name == \"${component}\"); .${key} |= (. + ${value} | unique_by(to_yaml)))" "${sbom_file}"
     cyclonedx_validation "${tmp_sbom_file}"
     diff  -U3 --color=always "${sbom_file}" "${tmp_sbom_file}" && log_info "No change" && return
     log_info "Changes found"
     ask_abort
   fi
 
-  yq4 -i -o json "(.components[] | select(.name == \"${component}\") | .${key}) += ${value}" "${sbom_file}"
+  # yq4 -i -o json "(.components[] | select(.name == \"${component}\") | .${key}) += ${value}" "${sbom_file}"
+  yq4 -i -o json "with(.components[] | select(.name == \"${component}\"); .${key} |= (. + ${value} | unique_by(to_yaml)))" "${sbom_file}"
 }
 
 # checks if a license is listed as a supported license id
@@ -203,7 +194,7 @@ _get_licenses() {
     chart_name=$(yq4 ".name" "${chart}")
 
     # TODO: licenses for the applications
-    _yq_add_component_json "${sbom_file}" "${chart_name}" "licenses[0]" "$(_format_license_object "Apache-2.0")"
+    _yq_add_component_json "${sbom_file}" "${chart_name}" "licenses" "$(_format_license_object "Apache-2.0")"
   done
 }
 
@@ -259,11 +250,6 @@ _get_container_images() {
     chart_folder_name="${chart#"${HELMFILE_FOLDER}/"}"
     chart_folder_name="${chart_folder_name%\/Chart.yaml}"
 
-    # _yq_add_component_json "${sbom_file}" "${chart_name}" "properties" "[]"
-    # containers_file=$(mktemp --suffix="${chart_name}-sbom-containers.json")
-    # append_trap "rm ${containers_file} >/dev/null 2>&1" EXIT
-    # echo "[]" > "${containers_file}"
-
     mapfile -t releases < <(echo "${helmfile_list}" | jq -c ".[] | select(.chart == \"${chart_folder_name}\")")
 
     if [[ ${#releases[@]} -eq 0 ]]; then
@@ -314,6 +300,7 @@ cyclonedx_validation() {
 get_unset() {
   log_info "Getting components without licenses"
   yq4 -o json -r '.components[] | select(.licenses[].license.name | contains("set-me")).name' "${SBOM_FILE}"
+  yq4 -o json -r '.components[] | select(.licenses | length == 0).name' "${SBOM_FILE}"
   log_info "Getting components without containers"
   yq4 -o json -r '.components[] | select(.properties[].name | contains("set-me")).name' "${SBOM_FILE}"
   log_info "Getting components without Elastisys evaluation"
