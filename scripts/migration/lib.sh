@@ -442,7 +442,7 @@ record_migration_prepare_done() {
   apps_config_timestamp="$(date +uIs)"
 
   ts="${apps_config_timestamp}" \
-    yq4 -i '.global.ck8sLastChange=strenv(ts)' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
+    yq4 -i '.global.ck8sLastChange=strenv(ts)' "${CK8S_CONFIG_PATH}/common-config.yaml"
 
   # This ConfigMap should only exist while doing an upgrade.
   # Abort if it already exists
@@ -476,7 +476,7 @@ ensure_migration_prepared() {
   fi
 
   apps_config_timestamp="$(yq4 '.data.timestamp' <<<"${apps_upgrade}")"
-  apps_cluster_timestamp="$(yq4 '.global.ck8sLastChange' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")"
+  apps_cluster_timestamp="$(yq4 '.global.ck8sLastChange' "${CK8S_CONFIG_PATH}/common-config.yaml")"
   if [[ "${apps_config_timestamp}" != "${apps_cluster_timestamp}" ]]; then
     log_fatal "Config timestamp mismatch, ${apps_cluster_timestamp} in ${1} but ${apps_config_timestamp} in config"
   fi
