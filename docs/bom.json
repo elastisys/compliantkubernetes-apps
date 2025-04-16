@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:1339c05b-c8a3-4148-9636-bffbfc3a4f41",
+  "serialNumber": "urn:uuid:4f8f3f1a-f4ea-4d25-83e7-5e979a209129",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-04-16T13:36:36Z",
+    "timestamp": "2025-04-16T14:34:42Z",
     "tools": {
       "components": [
         {
@@ -162,15 +162,15 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-cert-manager-cainjector",
           "value": "quay.io/jetstack/cert-manager-cainjector:v1.17.1"
         },
         {
-          "name": "container",
+          "name": "container-cert-manager-controller",
           "value": "quay.io/jetstack/cert-manager-controller:v1.17.1"
         },
         {
-          "name": "container",
+          "name": "container-cert-manager-webhook",
           "value": "quay.io/jetstack/cert-manager-webhook:v1.17.1"
         }
       ]
@@ -242,7 +242,7 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-dex",
           "value": "ghcr.io/dexidp/dex:v2.40.0"
         }
       ]
@@ -340,11 +340,11 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-falco",
           "value": "docker.io/falcosecurity/falco:0.40.0-debian"
         },
         {
-          "name": "container",
+          "name": "container-falcosidekick",
           "value": "docker.io/falcosecurity/falcosidekick:2.31.1"
         }
       ]
@@ -426,7 +426,7 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-fluentd-forwarder",
           "value": "ghcr.io/elastisys/fluentd-forwarder:v4.7.5-ck8s1"
         }
       ]
@@ -458,7 +458,7 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-fluentd-aggregator",
           "value": "ghcr.io/elastisys/fluentd-aggregator:v7.1.1-ck8s1"
         }
       ]
@@ -572,7 +572,7 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-gatekeeper",
           "value": "openpolicyagent/gatekeeper:v3.15.1"
         }
       ]
@@ -668,11 +668,6 @@
           "license": {
             "name": "GNU Affero General Public License v3.0"
           }
-        },
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
         }
       ],
       "properties": [
@@ -681,11 +676,11 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-grafana",
           "value": "docker.io/grafana/grafana:11.2.3-security-01"
         },
         {
-          "name": "container",
+          "name": "container-k8s-sidecar",
           "value": "quay.io/kiwigrid/k8s-sidecar:1.28.0"
         }
       ]
@@ -709,11 +704,6 @@
           "license": {
             "name": "GNU Affero General Public License v3.0"
           }
-        },
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
         }
       ],
       "properties": [
@@ -722,11 +712,11 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-grafana",
           "value": "docker.io/grafana/grafana:11.2.3-security-01"
         },
         {
-          "name": "container",
+          "name": "container-k8s-sidecar",
           "value": "quay.io/kiwigrid/k8s-sidecar:1.28.0"
         }
       ]
@@ -804,39 +794,39 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-harbor-core",
           "value": "goharbor/harbor-core:v2.12.1"
         },
         {
-          "name": "container",
+          "name": "container-harbor-db",
           "value": "goharbor/harbor-db:v2.12.1"
         },
         {
-          "name": "container",
+          "name": "container-harbor-exporter",
           "value": "goharbor/harbor-exporter:v2.12.1"
         },
         {
-          "name": "container",
+          "name": "container-harbor-jobservice",
           "value": "goharbor/harbor-jobservice:v2.12.1"
         },
         {
-          "name": "container",
+          "name": "container-harbor-portal",
           "value": "goharbor/harbor-portal:v2.12.1"
         },
         {
-          "name": "container",
+          "name": "container-harbor-registryctl",
           "value": "goharbor/harbor-registryctl:v2.12.1"
         },
         {
-          "name": "container",
+          "name": "container-redis-photon",
           "value": "goharbor/redis-photon:v2.12.1"
         },
         {
-          "name": "container",
+          "name": "container-registry-photon",
           "value": "goharbor/registry-photon:v2.12.1"
         },
         {
-          "name": "container",
+          "name": "container-trivy-adapter-photon",
           "value": "goharbor/trivy-adapter-photon:v2.12.1"
         }
       ]
@@ -934,11 +924,11 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-defaultbackend-amd64",
           "value": "registry.k8s.io/defaultbackend-amd64:1.5"
         },
         {
-          "name": "container",
+          "name": "container-controller-chroot",
           "value": "registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e"
         }
       ]
@@ -1019,15 +1009,15 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-node-exporter",
           "value": "quay.io/prometheus/node-exporter:v1.8.2"
         },
         {
-          "name": "container",
+          "name": "container-prometheus-operator",
           "value": "quay.io/prometheus-operator/prometheus-operator:v0.79.2"
         },
         {
-          "name": "container",
+          "name": "container-kube-state-metrics",
           "value": "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.14.0"
         }
       ]
@@ -1147,7 +1137,7 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-kured",
           "value": "ghcr.io/kubereboot/kured:1.17.0"
         }
       ]
@@ -1195,7 +1185,7 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-compliantkubernetes-apps-log-manager",
           "value": "ghcr.io/elastisys/compliantkubernetes-apps-log-manager:0.3.2"
         }
       ]
@@ -1230,7 +1220,7 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-metrics-server",
           "value": "registry.k8s.io/metrics-server/metrics-server:v0.7.1"
         }
       ]
@@ -1445,7 +1435,7 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-elasticsearch-curator",
           "value": "ghcr.io/elastisys/bitnami/elasticsearch-curator:5.8.4-debian-10-r235"
         }
       ]
@@ -1531,7 +1521,7 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-curl-jq",
           "value": "ghcr.io/elastisys/curl-jq:1.0.0"
         }
       ]
@@ -1563,7 +1553,7 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-opensearch",
           "value": "opensearchproject/opensearch:2.18.0"
         }
       ]
@@ -1661,7 +1651,7 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-blackbox-exporter",
           "value": "quay.io/prometheus/blackbox-exporter:v0.24.0"
         }
       ]
@@ -1687,7 +1677,7 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-elasticsearch-exporter",
           "value": "quay.io/prometheuscommunity/elasticsearch-exporter:v1.7.0"
         }
       ]
@@ -1801,7 +1791,7 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-s3-exporter",
           "value": "ghcr.io/elastisys/s3-exporter:0.5.0"
         }
       ]
@@ -1905,11 +1895,11 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-thanos",
           "value": "ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8"
         },
         {
-          "name": "container",
+          "name": "container-prometheus-config-reloader",
           "value": "quay.io/prometheus-operator/prometheus-config-reloader:v0.50.0"
         }
       ]
@@ -2060,7 +2050,7 @@
           "value": "set-me"
         },
         {
-          "name": "container",
+          "name": "container-velero",
           "value": "velero/velero:v1.13.0"
         }
       ]
