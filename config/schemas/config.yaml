@@ -1412,6 +1412,15 @@ properties:
         enum:
           - containerd
           - docker
+      ck8sLastChange:
+        title: Timestamp of last migration
+        description: |-
+          This property is used during migrations to track state and ensure that the
+          same version is used during `ck8s upgrade prepare` as during `ck8s upgrade
+          apply`.
+        type: number
+        examples:
+          - 1742394642
     additionalProperties: false
   clusterApi:
     additionalProperties: false
