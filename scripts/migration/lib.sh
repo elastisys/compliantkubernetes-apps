@@ -409,17 +409,17 @@ append_trap() {
 
 # usage: [[ "$(get_apps_version)" == "0.x" ]]
 get_apps_version() {
-  kubectl_do "${1}" get cm -n kube-system apps-meta -o jsonpath --template="{.data.version}"
+  kubectl_do "${1}" get cm --namespace kube-system apps-meta --output=jsonpath --template="{.data.version}"
 }
 
 unlock_migration() {
-  kubectl_do "${1}" delete configmap -n kube-system apps-upgrade &>/dev/null ||
+  kubectl_do "${1}" delete configmap --namespace kube-system apps-upgrade &>/dev/null ||
     log_warn "Could not unlock migration or migration not locked"
 }
 
 # Get currently prepared version
 get_prepared_version() {
-  kubectl_do "${1}" get cm -n kube-system apps-upgrade -o jsonpath --template="{.data.version}"
+  kubectl_do "${1}" get cm --namespace kube-system apps-upgrade --output=jsonpath --template="{.data.version}"
 }
 
 check_prepared_version() {
@@ -447,12 +447,12 @@ record_migration_prepare_done() {
   # This ConfigMap should only exist while doing an upgrade.
   # Abort if it already exists
   log_info "Locking cluster ${1} for upgrade"
-  if kubectl_do "${1}" create configmap --dry-run=client -o yaml \
+  if kubectl_do "${1}" create configmap --dry-run=client --output=yaml \
     --namespace kube-system apps-upgrade \
     --from-literal "version=${CK8S_TARGET_VERSION}" \
     --from-literal "timestamp=${apps_config_timestamp}" |
     yq4 '.metadata.labels["app.kubernetes.io/managed-by"] = "apps-upgrade"' - |
-    kubectl_do "${1}" create -f - ; then
+    kubectl_do "${1}" create --filename - ; then
     log_info "Cluster ${1} locked for upgrade"
     return 0
   else
@@ -468,7 +468,7 @@ ensure_migration_prepared() {
   local apps_cluster_timestamp
   local apps_config_timestamp
 
-  apps_upgrade="$(kubectl_do "${1}" get -n kube-system cm apps-upgrade -o yaml)"
+  apps_upgrade="$(kubectl_do "${1}" get --namespace kube-system cm apps-upgrade --output=yaml)"
   apps_version="$(yq4 '.data.version' <<<"${apps_upgrade}")"
 
   if ! yq4 --exit-status 'select(.data.version == strenv(CK8S_TARGET_VERSION))' <<<"${apps_upgrade}" >/dev/null; then
@@ -486,15 +486,15 @@ ensure_migration_prepared() {
 record_migration_apply_step() {
   # Was this needed?
   local apps_upgrade
-  apps_upgrade="$(kubectl_do "${1}" get -n kube-system cm apps-upgrade -o yaml)"
+  apps_upgrade="$(kubectl_do "${1}" get --namespace kube-system cm apps-upgrade --output=yaml)"
   if ! yq4 --exit-status 'select(.data.version == strenv(CK8S_TARGET_VERSION))' <<<"${apps_upgrade}" >/dev/null; then
     log_fatal "version mismatch, upgrading to ${CK8S_TARGET_VERSION} but cluster ${1} was prepared for $(
       yq4 '.data.version' <<<"${apps_upgrade}"
     )"
   fi
-  apps_upgrade="$(last_step="${2##*/}" yq4 -e '.data.last_apply_step = strenv(last_step)' <<<"${apps_upgrade}")"
+  apps_upgrade="$(last_step="${2##*/}" yq4 --exit-status '.data.last_apply_step = strenv(last_step)' <<<"${apps_upgrade}")"
   log_info "Recording upgrade checkpoint"
-  if ! kubectl_do "${1}" replace -f - <<<"${apps_upgrade}" >/dev/null; then
+  if ! kubectl_do "${1}" replace --filename - <<<"${apps_upgrade}" >/dev/null; then
     log_fatal "could not record completed migration step in ${1}"
   fi
 }
@@ -504,13 +504,13 @@ record_migration_apply_step() {
 record_migration_done() {
   # Record the upgraded-to version. Create if it does not already exist.
   log_info "Recording new apps version in cluster"
-  if ! kubectl_do "${1}" patch -n kube-system cm apps-meta --type=merge -p "$(yq4 --null-input --output-format json '.data.version = strenv(CK8S_TARGET_VERSION)')"; then
-    if ! kubectl_do "${1}" create configmap -n kube-system apps-meta --from-literal "version=${CK8S_TARGET_VERSION}"; then
+  if ! kubectl_do "${1}" patch --namespace kube-system cm apps-meta --type=merge --patch "$(yq4 --null-input --output-format json '.data.version = strenv(CK8S_TARGET_VERSION)')"; then
+    if ! kubectl_do "${1}" create configmap --namespace kube-system apps-meta --from-literal "version=${CK8S_TARGET_VERSION}"; then
       log_fatal "could not record new apps version in ${1}"
     fi
   fi
   # Complete the migration.
-  kubectl_do "${1}" delete configmap -n kube-system apps-upgrade >/dev/null
+  kubectl_do "${1}" delete configmap --namespace kube-system apps-upgrade >/dev/null
 }
 
 # shellcheck source=scripts/migration/helm.sh

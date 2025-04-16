@@ -646,10 +646,11 @@ with_s3cfg() {
 
 # Retrieve apps version from configmap
 get_version() {
-  "${here}/ops.bash" kubectl "${1}" get cm -n kube-system apps-meta -o jsonpath --template='{.data.version}'
+  "${here}/ops.bash" kubectl "${1}" get --namespace kube-system configmap apps-meta \
+    --output jsonpath --template='{.data.version}'
 }
 
 
 get_migration_status() {
-  "${here}/ops.bash" kubectl "${1}" get -n kube-system configmap apps-upgrade
+  "${here}/ops.bash" kubectl "${1}" get --namespace kube-system configmap apps-upgrade
 }
