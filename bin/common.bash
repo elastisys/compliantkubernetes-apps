@@ -650,7 +650,6 @@ get_version() {
     --output jsonpath --template='{.data.version}'
 }
 
-
 get_migration_status() {
   "${here}/ops.bash" kubectl "${1}" get --namespace kube-system configmap apps-upgrade
 }

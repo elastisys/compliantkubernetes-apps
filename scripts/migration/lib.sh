@@ -452,7 +452,7 @@ record_migration_prepare_done() {
     --from-literal "version=${CK8S_TARGET_VERSION}" \
     --from-literal "timestamp=${apps_config_timestamp}" |
     yq4 '.metadata.labels["app.kubernetes.io/managed-by"] = "apps-upgrade"' - |
-    kubectl_do "${1}" create --filename - ; then
+    kubectl_do "${1}" create --filename -; then
     log_info "Cluster ${1} locked for upgrade"
     return 0
   else
