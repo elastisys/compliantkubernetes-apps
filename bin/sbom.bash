@@ -30,6 +30,7 @@ usage() {
   echo "Usage:  generate" >&2
   echo "        get-unset" >&2
   echo "        add <component-name> <key> <value>" >&2
+  echo "        get <component-name> [key]" >&2
   echo "        remove <component-name> <key> <value>" >&2
   echo "        validate" >&2
   exit 1
@@ -39,6 +40,34 @@ usage() {
 # - runtime sbom?
 # - build sbom?
 # - handle if component not in list?
+
+
+_yq_update_component_json() {
+  # TODO:
+  local component key sbom_file tmp_sbom_file value
+
+  sbom_file="${1}"
+  component="${2}"
+  key="${3}"
+  value="${4}"
+
+  tmp_sbom_file=$(mktemp --suffix=-sbom.json)
+  append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
+
+  if [[ ! "${key}" =~ ^(licenses.*|properties.*)$ ]]; then
+    log_fatal "unsupported key \"${key}\", currently only supports \"licenses|properties\""
+  fi
+
+  if ! ${CK8S_AUTO_APPROVE:-}; then
+    yq4 -o json "with(.components[] | select(.name == \"${component}\"); .${key} |= (. + ${value} | unique_by(.name)))" "${sbom_file}" > "${tmp_sbom_file}"
+    cyclonedx_validation "${tmp_sbom_file}"
+    diff  -U3 --color=always "${sbom_file}" "${tmp_sbom_file}" && log_info "No change" && return
+    log_info "Changes found"
+    ask_abort
+  fi
+
+  yq4 -i -o json "with(.components[] | select(.name == \"${component}\"); .${key} |= (. + ${value} | unique_by(.name)))" "${sbom_file}"
+}
 
 _yq_add_component_json() {
   local component key sbom_file tmp_sbom_file value
@@ -57,7 +86,7 @@ _yq_add_component_json() {
 
   if ! ${CK8S_AUTO_APPROVE:-}; then
     # yq4 -o json "(.components[] | select(.name == \"${component}\") | .${key}) += ${value}" "${sbom_file}" > "${tmp_sbom_file}"
-    yq4 -o json "with(.components[] | select(.name == \"${component}\"); .${key} |= (. + ${value} | unique_by(to_yaml)))" "${sbom_file}"
+    yq4 -o json "with(.components[] | select(.name == \"${component}\"); .${key} |= (. + ${value} | unique_by(.name)))" "${sbom_file}" > "${tmp_sbom_file}"
     cyclonedx_validation "${tmp_sbom_file}"
     diff  -U3 --color=always "${sbom_file}" "${tmp_sbom_file}" && log_info "No change" && return
     log_info "Changes found"
@@ -65,7 +94,7 @@ _yq_add_component_json() {
   fi
 
   # yq4 -i -o json "(.components[] | select(.name == \"${component}\") | .${key}) += ${value}" "${sbom_file}"
-  yq4 -i -o json "with(.components[] | select(.name == \"${component}\"); .${key} |= (. + ${value} | unique_by(to_yaml)))" "${sbom_file}"
+  yq4 -i -o json "with(.components[] | select(.name == \"${component}\"); .${key} |= (. + ${value} | unique_by(.name)))" "${sbom_file}"
 }
 
 # checks if a license is listed as a supported license id
@@ -93,7 +122,9 @@ _format_property_object() {
 
 _format_container_image_object() {
   local container_image="${1}"
-  _format_property_object "container" "${container_image}"
+  container_image_name=${container_image##*/}
+  container_image_name=${container_image_name%%:*}
+  _format_property_object "container-${container_image_name}" "${container_image}"
 }
 
 _format_elastisys_evaluation_object() {
@@ -222,7 +253,6 @@ _get_pods_container_images() {
   fi
 
   for container in "${containers[@]}"; do
-    # TODO: fix only unique container images
     _yq_add_component_json "${sbom_file}" "${chart_name}" "properties" "$(_format_container_image_object "${container}")"
   done
 }
@@ -325,6 +355,24 @@ sbom_add() {
   log_info "Updated ${key} for ${component}"
 }
 
+sbom_get() {
+  if [[ "$#" -lt 1 ]]; then
+    usage
+  fi
+
+  local component key
+
+  component="${1}"
+  query=".components[] | select(.name ==\"${component}\")"
+  # key="${2}"
+  if [[ "$#" -gt 1 ]]; then
+    key="${2}"
+    query=".components[] | select(.name ==\"${component}\") | .${key}"
+  fi
+
+  yq4 -e -o json "${query}" "${SBOM_FILE}"
+}
+
 sbom_generate() {
   local tmp_sbom_file
   tmp_sbom_file=$(mktemp --suffix=-sbom.json)
@@ -352,6 +400,7 @@ sbom_generate() {
   if [[ "${reply}" == "y" ]]; then
     mv "${tmp_sbom_file}" "${SBOM_FILE}"
     log_info "SBOM file replaced"
+    return
   fi
   log_info "Skipped replacing SBOM"
 }
@@ -364,6 +413,10 @@ add)
 generate)
   shift
   sbom_generate "${@}"
+  ;;
+get)
+  shift
+  sbom_get "${@}"
   ;;
 get-unset)
   shift
