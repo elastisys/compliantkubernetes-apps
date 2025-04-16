@@ -265,18 +265,6 @@ check_version() {
     return
   fi
 
-  if [ "${2}" == "prepare" ]; then
-    echo TODO >/dev/null
-    # config version should not yet have been touched
-    # how to ensure this?
-  elif [ "${2}" == "apply" ]; then
-    # ensure config version == target version, set by init during prepare DONE? DONE?
-    if [ "${VERSION["${1}-config"]%.*}" != "${CK8S_TARGET_VERSION}" ]; then
-      log_fatal "Apps version mismatch, '${VERSION["${1}-config"]%.*}' in config but upgrading to '${CK8S_TARGET_VERSION}'"
-    fi
-  fi
-
-  # `--exit-status` can be used instead of comparing to "null"
   common_override=$(yq4 '.global.ck8sVersion' "${CK8S_CONFIG_PATH}/common-config.yaml")
   sc_wc_override=$(yq4 '.global.ck8sVersion' "${CK8S_CONFIG_PATH}/${1}-config.yaml")
   if [ "$common_override" != "null" ] || [ "$sc_wc_override" != "null" ]; then
