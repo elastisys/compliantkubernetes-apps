@@ -49,12 +49,6 @@ RUN wget --progress=dot:giga "https://github.com/helmfile/helmfile/releases/down
     install -Tm 755 helmfile /usr/local/bin/helmfile && \
     rm helmfile "helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz"
 
-# yq
-ENV YQ_VERSION "3.4.1"
-RUN wget --progress=dot:giga "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" && \
-    install -Tm 755 yq_linux_amd64 /usr/local/bin/yq && \
-    rm yq_linux_amd64
-
 # yq4
 ENV YQ_VERSION "v4.42.1"
 RUN wget --progress=dot:giga "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" && \
