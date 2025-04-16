@@ -413,7 +413,8 @@ get_apps_version() {
 }
 
 unlock_migration() {
-  kubectl_do "${1}" delete configmap -n kube-system apps-upgrade >/dev/null
+  kubectl_do "${1}" delete configmap -n kube-system apps-upgrade &>/dev/null ||
+    log_warn "Could not unlock migration or migration not locked"
 }
 
 # Get currently prepared version
