@@ -196,13 +196,13 @@ If this is all new to you, here's a [link](https://riseup.net/en/security/messag
 
     ```bash
     (
-      access_key=$(sops exec-file ${CK8S_CONFIG_PATH}/secrets.yaml 'yq r {} "objectStorage.s3.accessKey"')
-      secret_key=$(sops exec-file ${CK8S_CONFIG_PATH}/secrets.yaml 'yq r {} "objectStorage.s3.secretKey"')
-      sc_config=$(yq m ${CK8S_CONFIG_PATH}/defaults/common-config.yaml ${CK8S_CONFIG_PATH}/defaults/sc-config.yaml ${CK8S_CONFIG_PATH}/common-config.yaml ${CK8S_CONFIG_PATH}/sc-config.yaml -a overwrite -x)
-      region=$(echo ${sc_config} | yq r - 'objectStorage.s3.region')
-      host=$(echo ${sc_config} | yq r -  'objectStorage.s3.regionEndpoint')
+      access_key=$(sops exec-file ${CK8S_CONFIG_PATH}/secrets.yaml 'yq ".objectStorage.s3.accessKey" {}')
+      secret_key=$(sops exec-file ${CK8S_CONFIG_PATH}/secrets.yaml 'yq ".objectStorage.s3.secretKey" {}')
+      sc_config=$(yq eval-all '. as $item ireduce ({}; . * $item )' ${CK8S_CONFIG_PATH}/defaults/common-config.yaml ${CK8S_CONFIG_PATH}/defaults/sc-config.yaml ${CK8S_CONFIG_PATH}/common-config.yaml ${CK8S_CONFIG_PATH}/sc-config.yaml)
+      region=$(echo ${sc_config} | yq '.objectStorage.s3.region')
+      host=$(echo ${sc_config} | yq '.objectStorage.s3.regionEndpoint')
 
-      for bucket in $(echo ${sc_config} | yq r -  'objectStorage.buckets.*'); do
+      for bucket in $(echo ${sc_config} | yq '.objectStorage.buckets.*'); do
           s3cmd --access_key=${access_key} --secret_key=${secret_key} \
               --region=${region} --host=${host} \
               ls s3://${bucket} > /dev/null
