@@ -53,7 +53,7 @@ teardown() {
 }
 
 @test "upgrading works" {
-  # test 1, the happy path where everyhing goes well
+  # test 1, the happy path where everything goes well
 
   run ck8s version config
   assert_success
