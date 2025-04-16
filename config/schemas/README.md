@@ -61,8 +61,8 @@ Default values can be provided in `default`.
 `type: object` must have a `properties` map describing each value in the object.
 
 Any value not covered by `properties` would be tried against the schema in `additionalProperties`.
-In most cases this should be `false`, which causes validation to fail in order to detect e.g. typos or that the schema is  incomplete.
-Objects where all properties of are the same kind can have a schema object instead as `additionalProperties`.
+In most cases this should be `false`, which causes validation to fail in order to detect e.g. typos or that the schema is incomplete.
+Objects with all properties of the same kind can have a schema object instead as `additionalProperties`.
 
 Any object property that is **required** can be specified as a list in `required`.
 Other properties are allowed to be missing.
