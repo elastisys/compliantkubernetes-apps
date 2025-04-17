@@ -234,6 +234,50 @@ _get_licenses() {
   done
 }
 
+_get_container_images_helmfile_template() {
+  local sbom_file chart_name release_name release_namespace type
+  sbom_file="${1}"
+  chart_name="${2}"
+  release_name="${3}"
+  release_namespace="${4}"
+  type="${5}"
+
+  local sbom_file
+  if [[ "$#" -ne 5 ]]; then
+    log_fatal "usage: _get_container_images_helmfile_template <sbom-file> <chart_name> <release_name> <release_namespace> <type>"
+  fi
+
+  if [[ "${type}" == "pod" ]]; then
+    query='select(.kind == "Pod") | .spec.containers[] | .image'
+  elif [[ "${type}" == "cronjob" ]]; then
+    query='select(.kind == "CronJob") | .spec.jobTemplate.spec.template.spec.containers[] | .image'
+  elif [[ "${type}" == "daemonset" ]]; then
+    query='select(.kind == "DaemonSet") | .spec.template.spec.containers[] | .image'
+  elif [[ "${type}" == "deployment" ]]; then
+    query='select(.kind == "Deployment") | .spec.template.spec.containers[] | .image'
+  elif [[ "${type}" == "job" ]]; then
+    query='select(.kind == "Job") | .spec.template.spec.containers[] | .image'
+  elif [[ "${type}" == "statefulset" ]]; then
+    query='select(.kind == "StateFulset") | .spec.template.spec.containers[] | .image'
+  fi
+
+  export CK8S_SKIP_VALIDATION=true
+  export CK8S_AUTO_APPROVE=true
+  mapfile -t containers < <("${HERE}/ops.bash" helmfile sc -l app=fluentd template | \
+    yq4 "${query}" | sed '/---/d' | sort -u)
+
+  if [[ ${#containers[@]} -eq 0 ]]; then
+    # Although these contains e.g. prometheus-node-exporter which we run but through kube-prometheus-stack
+    # Maybe add a check for sub-charts that are part of umbrella charts?
+    return
+  fi
+
+  for container in "${containers[@]}"; do
+    _yq_add_component_json "${sbom_file}" "${chart_name}" "properties" "$(_format_container_image_object "${container}")"
+  done
+}
+
+
 _get_pods_container_images() {
   local sbom_file chart_name release_name release_namespace
   sbom_file="${1}"
@@ -301,7 +345,12 @@ _get_container_images() {
       # TODO: jobs/cronjobs
       # TODO: what about things disabled by default, e.g. Kured?
       # use helmfile template instead of checking live cluster?
-      _get_pods_container_images "${sbom_file}" "${chart_name}" "${release_name}" "${release_namespace}"
+      _get_container_images_helmfile_template "${sbom_file}" "${chart_name}" "${release_name}" "${release_namespace}" "cronjob"
+      _get_container_images_helmfile_template "${sbom_file}" "${chart_name}" "${release_name}" "${release_namespace}" "pod"
+      _get_container_images_helmfile_template "${sbom_file}" "${chart_name}" "${release_name}" "${release_namespace}" "deployment"
+      _get_container_images_helmfile_template "${sbom_file}" "${chart_name}" "${release_name}" "${release_namespace}" "job"
+      _get_container_images_helmfile_template "${sbom_file}" "${chart_name}" "${release_name}" "${release_namespace}" "daemonset"
+      _get_container_images_helmfile_template "${sbom_file}" "${chart_name}" "${release_name}" "${release_namespace}" "statefulset"
     done
 
     # TODO: mapping chart names to release names?
