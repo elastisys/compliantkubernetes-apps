@@ -25,7 +25,7 @@ dereference() {
   yq4 '. as $root | with(
     .. | select(key == "$ref");
     . = "$root." + (
-      sub("#/", "") | split "/" | with(.[]; . = to_json ) | join "."
+      sub("#/", "") | split("/") | with(.[]; . = to_json(0) ) | join(".")
     )
   ) | with(
     .. | select(has "$ref");
@@ -58,7 +58,7 @@ explain() {
 
   if [[ -n "${target}" ]]; then
     local -a path
-    readarray -t path <<<"$(yq4 'split "." | .[]' <<<"${target}")"
+    readarray -t path <<<"$(yq4 'split(".") | .[]' <<<"${target}")"
 
     for key in "${path[@]}"; do
       case "$(yq4 ".type" <<<"${data}")" in

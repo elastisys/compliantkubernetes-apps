@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This file is not supposed to be executed on it's own, but rather is sourced
+# This file is not supposed to be executed on its own, but rather is sourced
 # by the other scripts in this path. It holds common paths and functions that
 # are used throughout all of the scripts.
 
