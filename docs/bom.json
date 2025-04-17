@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:4f8f3f1a-f4ea-4d25-83e7-5e979a209129",
+  "serialNumber": "urn:uuid:8f2c0c1e-48bd-4359-b6d8-bf8db36cca54",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-04-16T14:34:42Z",
+    "timestamp": "2025-04-17T06:20:27Z",
     "tools": {
       "components": [
         {
@@ -183,6 +183,89 @@
       "purl": "pkg:helm/cluster-admin-rbac@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/cluster-admin-rbac@0.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ]
+    },
+    {
+      "group": "",
+      "name": "common",
+      "version": "2.29.0",
+      "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
+      "purl": "pkg:helm/common@2.29.0",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://bitnami.com"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/common@2.29.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ]
+    },
+    {
+      "group": "",
+      "name": "common",
+      "version": "2.30.0",
+      "description": "A Library Helm Chart for grouping common logic between bitnami charts. This chart is not deployable by itself.",
+      "purl": "pkg:helm/common@2.30.0",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://bitnami.com"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/common@2.30.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ]
+    },
+    {
+      "group": "",
+      "name": "common",
+      "version": "2.x.x",
+      "purl": "pkg:helm/common@2.x.x",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "oci://registry-1.docker.io/bitnamicharts"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/common@2.x.x",
       "licenses": [
         {
           "license": {
@@ -1222,6 +1305,93 @@
         {
           "name": "container-metrics-server",
           "value": "registry.k8s.io/metrics-server/metrics-server:v0.7.1"
+        }
+      ]
+    },
+    {
+      "group": "",
+      "name": "minio",
+      "version": "15.0.5",
+      "description": "MinIO(R) is an object storage server, compatible with Amazon S3 cloud storage service, mainly used for storing unstructured data (such as photos, videos, log files, etc.).",
+      "purl": "pkg:helm/minio@15.0.5",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://bitnami.com"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/minio@15.0.5",
+      "tags": [
+        "cloud",
+        "log"
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "GNU Affero General Public License v3.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ]
+    },
+    {
+      "group": "",
+      "name": "minio",
+      "version": "15.x.x",
+      "purl": "pkg:helm/minio@15.x.x",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "oci://registry-1.docker.io/bitnamicharts"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/minio@15.x.x",
+      "licenses": [
+        {
+          "license": {
+            "name": "GNU Affero General Public License v3.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ]
+    },
+    {
+      "group": "",
+      "name": "minio",
+      "version": "5.0.14",
+      "description": "Multi-Cloud Object Storage",
+      "purl": "pkg:helm/minio@5.0.14",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://min.io"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/minio@5.0.14",
+      "licenses": [
+        {
+          "license": {
+            "name": "GNU Affero General Public License v3.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
         }
       ]
     },
