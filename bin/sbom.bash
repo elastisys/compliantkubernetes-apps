@@ -32,6 +32,7 @@ usage() {
   echo "        add <component-name> <key> <value>" >&2
   echo "        get <component-name> [key]" >&2
   echo "        remove <component-name> <key> <value>" >&2
+  echo "        update <component-name> <key>" >&2
   echo "        validate" >&2
   exit 1
 }
@@ -41,32 +42,39 @@ usage() {
 # - build sbom?
 # - handle if component not in list?
 
-
 _yq_update_component_json() {
-  # TODO:
-  local component key sbom_file tmp_sbom_file value
+  local component key sbom_file tmp_sbom_file
 
   sbom_file="${1}"
   component="${2}"
   key="${3}"
-  value="${4}"
 
   tmp_sbom_file=$(mktemp --suffix=-sbom.json)
   append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
 
-  if [[ ! "${key}" =~ ^(licenses.*|properties.*)$ ]]; then
-    log_fatal "unsupported key \"${key}\", currently only supports \"licenses|properties\""
+  tmp_change=$(mktemp --suffix=-update-sbom.json)
+  append_trap "rm ${tmp_change} >/dev/null 2>&1" EXIT
+
+  # check if key that should be updated exists
+  has_key=$(yq4 -e -o json ".components[] | select(.name == \"${component}\") | has(\"${key}\")" "${sbom_file}")
+  if [[ "${has_key}" == false ]]; then
+    log_fatal "${key} not found"
   fi
 
+  yq4 -e -o json ".components[] | select(.name == \"${component}\") | .${key}" "${sbom_file}" > "${tmp_change}"
+  "${EDITOR}" "${tmp_change}"
+
+  # log_info "here"
+  query="with(.components[] | select(.name == \"${component}\"); .${key} = $(jq -c '.' "${tmp_change}"))"
   if ! ${CK8S_AUTO_APPROVE:-}; then
-    yq4 -o json "with(.components[] | select(.name == \"${component}\"); .${key} |= (. + ${value} | unique_by(.name)))" "${sbom_file}" > "${tmp_sbom_file}"
+    change=${tmp_change} yq4 -o json "${query}" "${sbom_file}" > "${tmp_sbom_file}"
     cyclonedx_validation "${tmp_sbom_file}"
     diff  -U3 --color=always "${sbom_file}" "${tmp_sbom_file}" && log_info "No change" && return
     log_info "Changes found"
     ask_abort
   fi
 
-  yq4 -i -o json "with(.components[] | select(.name == \"${component}\"); .${key} |= (. + ${value} | unique_by(.name)))" "${sbom_file}"
+  yq4 -i -o json "${query}" "${sbom_file}"
 }
 
 _yq_add_component_json() {
@@ -143,9 +151,7 @@ _prepare_sbom() {
   fi
   log_info "Preparing SBOM"
 
-  # create in /tmp and then compare
-  # TODO: currently filter out some "dependencies", would like a better way to handle this
-  cdxgen --filter '.*' --filter 'common' --filter 'minio'  -t helm "${HELMFILE_FOLDER}" --output "${sbom_file}"
+  cdxgen --filter '.*' -t helm "${HELMFILE_FOLDER}" --output "${sbom_file}"
 
   yq4 -o json -i ". *= load(\"${SBOM_TEMPLATE_FILE}\")" "${sbom_file}"
 
@@ -295,7 +301,7 @@ _get_container_images() {
       # TODO: jobs/cronjobs
       # TODO: what about things disabled by default, e.g. Kured?
       # use helmfile template instead of checking live cluster?
-      _get_pods_container_images "${sbom_file}"  "${chart_name}" "${release_name}" "${release_namespace}"
+      _get_pods_container_images "${sbom_file}" "${chart_name}" "${release_name}" "${release_namespace}"
     done
 
     # TODO: mapping chart names to release names?
@@ -372,6 +378,20 @@ sbom_get() {
   yq4 -e -o json "${query}" "${SBOM_FILE}"
 }
 
+sbom_update() {
+  if [[ "$#" -ne 2 ]]; then
+    usage
+  fi
+
+  local component key
+
+  component="${1}"
+  key="${2}"
+
+  _yq_update_component_json "${SBOM_FILE}" "${@}"
+  log_info "Updated ${key} for ${component}"
+}
+
 sbom_generate() {
   local tmp_sbom_file
   tmp_sbom_file=$(mktemp --suffix=-sbom.json)
@@ -424,6 +444,10 @@ get-unset)
 remove)
   shift
   sbom_remove "${@}"
+  ;;
+update)
+  shift
+  sbom_update "${@}"
   ;;
 validate)
   cyclonedx_validation "${SBOM_FILE}"
