@@ -84,17 +84,16 @@ _yq_add_component_json() {
     log_fatal "unsupported key \"${key}\", currently only supports \"licenses|properties\""
   fi
 
+  query="with(.components[] | select(.name == \"${component}\"); .${key} |= (. + ${value} | unique_by(.name)))"
   if ! ${CK8S_AUTO_APPROVE:-}; then
-    # yq4 -o json "(.components[] | select(.name == \"${component}\") | .${key}) += ${value}" "${sbom_file}" > "${tmp_sbom_file}"
-    yq4 -o json "with(.components[] | select(.name == \"${component}\"); .${key} |= (. + ${value} | unique_by(.name)))" "${sbom_file}" > "${tmp_sbom_file}"
+    yq4 -o json "${query}" "${sbom_file}" > "${tmp_sbom_file}"
     cyclonedx_validation "${tmp_sbom_file}"
     diff  -U3 --color=always "${sbom_file}" "${tmp_sbom_file}" && log_info "No change" && return
     log_info "Changes found"
     ask_abort
   fi
 
-  # yq4 -i -o json "(.components[] | select(.name == \"${component}\") | .${key}) += ${value}" "${sbom_file}"
-  yq4 -i -o json "with(.components[] | select(.name == \"${component}\"); .${key} |= (. + ${value} | unique_by(.name)))" "${sbom_file}"
+  yq4 -i -o json "${query}" "${sbom_file}"
 }
 
 # checks if a license is listed as a supported license id
