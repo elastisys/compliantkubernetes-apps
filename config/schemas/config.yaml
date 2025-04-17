@@ -656,13 +656,13 @@ $defs:
     type: object
     properties:
       configMapKeyRef:
-        $ref: '#/components/schemas/io.k8s.api.core.v1.ConfigMapKeySelector'
+        $ref: '#/$defs/io.k8s.api.core.v1.ConfigMapKeySelector'
       fieldRef:
-        $ref: '#/components/schemas/io.k8s.api.core.v1.ObjectFieldSelector'
+        $ref: '#/$defs/io.k8s.api.core.v1.ObjectFieldSelector'
       resourceFieldRef:
-        $ref: '#/components/schemas/io.k8s.api.core.v1.ResourceFieldSelector'
+        $ref: '#/$defs/io.k8s.api.core.v1.ResourceFieldSelector'
       secretKeyRef:
-        $ref: '#/components/schemas/io.k8s.api.core.v1.SecretKeySelector'
+        $ref: '#/$defs/io.k8s.api.core.v1.SecretKeySelector'
     $comment: Imported from Kubernetes project
   io.k8s.api.core.v1.ConfigMapKeySelector:
     title: Config Map Key Selector
@@ -719,7 +719,7 @@ $defs:
       divisor:
         title: Divisor
         description: Specifies the output format of the exposed resources, defaults to `1`.
-        $ref: "#/$defs/KubernetesQuantity"
+        $ref: "#/$defs/kubernetesQuantity"
       resource:
         title: Resource
         description: Required, resource to select.
