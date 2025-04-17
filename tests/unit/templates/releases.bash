@@ -30,10 +30,10 @@ helmfile_build_releases() {
 
     case "${1:-}" in
     sc)
-      helmfile -e service_cluster -f "${ROOT}/helmfile.d" -q build | yq -oj -I0 "${expression}" >"${target}"
+      helmfile -e service_cluster -f "${ROOT}/helmfile.d" -q build | yq4 -oj -I0 "${expression}" >"${target}"
       ;;
     wc)
-      helmfile -e workload_cluster -f "${ROOT}/helmfile.d" -q build | yq -oj -I0 "${expression}" >"${target}"
+      helmfile -e workload_cluster -f "${ROOT}/helmfile.d" -q build | yq4 -oj -I0 "${expression}" >"${target}"
       ;;
     *)
       echo "error: usage: helmfile_build_releases <sc|wc>"
@@ -63,7 +63,7 @@ helmfile_build_needs() {
     # from releases. select anything matching the incoming selectors,
     # generate a list from releases with its selector and needs,
     # take unique selectors and join them with a space
-    outgoing="$(yq "[
+    outgoing="$(yq4 "[
       .[] | select(
         .selector | match(\"${incoming// /|}\")
       ) | .needs + [.selector] | .[]
@@ -109,7 +109,7 @@ helmfile_template_release() {
     readarray -t files <<<"$(find "${release}" -type f -name '*.yaml')"
 
     for file in "${files[@]}"; do
-      yq ".metadata.namespace = (.metadata.namespace // \"${namespace}\")" "${file}"
+      yq4 ".metadata.namespace = (.metadata.namespace // \"${namespace}\")" "${file}"
     done
 
   else
@@ -142,17 +142,17 @@ releases_have_through_needs() {
   created_expression="${3}"
 
   local -a selectors
-  readarray -t selectors <<<"$(helmfile_build_releases "${cluster}" | yq -r -oj -I0 '.[] | "namespace=" + .namespace + ",name=" + .name')"
+  readarray -t selectors <<<"$(helmfile_build_releases "${cluster}" | yq4 -r -oj -I0 '.[] | "namespace=" + .namespace + ",name=" + .name')"
 
   local fail=false
 
   local selector
   for selector in "${selectors[@]}"; do
     local used_resources
-    used_resources="$(helmfile_template_release "${cluster}" "${selector}" | yq -N "select(. != null) | [${used_expression}] | .[]" | sort -u)"
+    used_resources="$(helmfile_template_release "${cluster}" "${selector}" | yq4 -N "select(. != null) | [${used_expression}] | .[]" | sort -u)"
 
     local created_resources
-    created_resources="$(helmfile_template_release_needs "${cluster}" "${selector}" | yq -N "select(. != null) | [${created_expression}] | .[]" | sort -u)"
+    created_resources="$(helmfile_template_release_needs "${cluster}" "${selector}" | yq4 -N "select(. != null) | [${created_expression}] | .[]" | sort -u)"
 
     local uniques
     # print used resources once and created resources twice, then filter on totally unique identifiers
@@ -172,14 +172,14 @@ releases_have_through_needs() {
 
 release_with_custom_resources_have_validation_on_install_disabled() {
   local -a selectors
-  readarray -t selectors <<<"$(helmfile_build_releases "${1}" | yq -r -oj -I0 '.[] | select(.disableValidationOnInstall != true) | "namespace=" + .namespace + ",name=" + .name')"
+  readarray -t selectors <<<"$(helmfile_build_releases "${1}" | yq4 -r -oj -I0 '.[] | select(.disableValidationOnInstall != true) | "namespace=" + .namespace + ",name=" + .name')"
 
   local fail=false
 
   local selector
   for selector in "${selectors[@]}"; do
     local custom_resources
-    custom_resources="$(helmfile_template_release "${1}" "${selector}" | yq -r -oj -I0 'select(.apiVersion | test("^(.+\.k8s\.io/|apps/|batch/|policy/|)v1.*") | not) | .apiVersion + "/" + .kind' | sort -u)"
+    custom_resources="$(helmfile_template_release "${1}" "${selector}" | yq4 -r -oj -I0 'select(.apiVersion | test("^(.+\.k8s\.io/|apps/|batch/|policy/|)v1.*") | not) | .apiVersion + "/" + .kind' | sort -u)"
 
     if [[ -n "${custom_resources}" ]]; then
       echo "error: release {${selector//=/:}} creates custom resources [${custom_resources//$'\n'/,}] and must have { disableValidationOnInstall: true }!"

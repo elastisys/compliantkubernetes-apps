@@ -21,7 +21,7 @@ yq.get() {
   fi
 
   local value
-  value="$(yq ea "explode(.) as \$item ireduce ({}; . * \$item) | $2 | ... comments=\"\"" "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/$1-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" "${CK8S_CONFIG_PATH}/$1-config.yaml")"
+  value="$(yq4 ea "explode(.) as \$item ireduce ({}; . * \$item) | $2 | ... comments=\"\"" "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/$1-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" "${CK8S_CONFIG_PATH}/$1-config.yaml")"
 
   if [[ -n "${value#null}" ]]; then
     echo "${value}"
@@ -40,7 +40,7 @@ yq.dig() {
   fi
 
   local value
-  value="$(yq ea "explode(.) | $2 | select(. != null) | {\"wrapper\": .} as \$item ireduce ({}; . * \$item) | .wrapper | ... comments=\"\"" "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/$1-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" "${CK8S_CONFIG_PATH}/$1-config.yaml")"
+  value="$(yq4 ea "explode(.) | $2 | select(. != null) | {\"wrapper\": .} as \$item ireduce ({}; . * \$item) | .wrapper | ... comments=\"\"" "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/$1-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" "${CK8S_CONFIG_PATH}/$1-config.yaml")"
 
   if [[ -n "${value#null}" ]]; then
     echo "${value}"
@@ -60,7 +60,7 @@ yq.set() {
   fi
 
   if [[ "${1}" =~ ^(common|sc|wc)$ ]]; then
-    yq -i "${2} = ${3}" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
+    yq4 -i "${2} = ${3}" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
   elif [[ "${1}" == "secrets" ]]; then
     sops --set "${2} ${3}" "${CK8S_CONFIG_PATH}/secrets.yaml"
   fi
@@ -73,7 +73,7 @@ yq.secret() {
   fi
 
   local value
-  value="$(sops -d "${CK8S_CONFIG_PATH}/secrets.yaml" | yq "$1 | ... comments=\"\"")"
+  value="$(sops -d "${CK8S_CONFIG_PATH}/secrets.yaml" | yq4 "$1 | ... comments=\"\"")"
 
   if [[ -n "${value#null}" ]]; then
     echo "${value}"
