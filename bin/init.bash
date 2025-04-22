@@ -328,8 +328,7 @@ backup_file() {
 
   log_info "Creating backup ${backup_config_path}/${backup_name}"
 
-  # --force to workaround issue in integration test where file already exists
-  cp --force --backup "${file}" "${backup_config_path}/${backup_name}"
+  cp -b "${file}" "${backup_config_path}/${backup_name}"
 }
 
 backup_retention() {
