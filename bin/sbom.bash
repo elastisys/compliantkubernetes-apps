@@ -20,18 +20,21 @@ SBOM_TEMPLATE_FILE="${ROOT}/docs/bom.template.json"
 source "${HERE}/common.bash"
 
 usage() {
-  echo "Usage:  generate" >&2
-  echo "        get-unset" >&2
-  echo "        add <component-name> <key> <value>" >&2
-  echo "        get <component-name> [key]" >&2
-  echo "        remove <component-name> <key> <value>" >&2
-  echo "        update <component-name> <key>" >&2
-  echo "        validate" >&2
+  echo "COMMANDS:" >&2
+  echo "  generate                            generate new cyclonedx sbom" >&2
+  echo "  add <component-name> <key> <value>  add key-value pair to a component" >&2
+  echo "  get <component-name> [key]          get component from sbom, optionally query for a provided key" >&2
+  echo "  get-charts                          get all charts in sbom" >&2
+  echo "  get-containers                      get all containers in sbom" >&2
+  echo "  get-unset                           get names of components with set-me's or missing licenses" >&2
+  echo "  remove <component-name> <key>       remove key for a component" >&2
+  echo "  update <component-name> <key>       update object under key for a component using $EDITOR" >&2
+  echo "  validate                            validate SBOM using cyclonedx-cli" >&2
   exit 1
 }
 
-_yq_update_component_json() {
-  local component key sbom_file tmp_sbom_file
+_sbom_update_component() {
+  local component key sbom_file tmp_sbom_file query
 
   sbom_file="${1}"
   component="${2}"
@@ -40,7 +43,7 @@ _yq_update_component_json() {
   tmp_sbom_file=$(mktemp --suffix=-sbom.json)
   append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
 
-  tmp_change=$(mktemp --suffix=-update-sbom.json)
+  tmp_change=$(mktemp "--suffix=-update-${component}-sbom.json")
   append_trap "rm ${tmp_change} >/dev/null 2>&1" EXIT
 
   # check if key that should be updated exists
@@ -65,15 +68,15 @@ _yq_update_component_json() {
   yq4 -i -o json "${query}" "${sbom_file}"
 }
 
-_yq_add_component_json() {
-  local component key sbom_file tmp_sbom_file value
+_sbom_add_component() {
+  local component key sbom_file tmp_sbom_file value query
 
   sbom_file="${1}"
   component="${2}"
   key="${3}"
   value="${4}"
 
-  tmp_sbom_file=$(mktemp --suffix=-sbom.json)
+  tmp_sbom_file=$(mktemp "--suffix=-add-${component}-sbom.json")
   append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
 
   if [[ ! "${key}" =~ ^(licenses.*|properties.*)$ ]]; then
@@ -146,9 +149,9 @@ _prepare_sbom() {
   mapfile -t components < <(yq4 -r -o json '.components[].name' "${sbom_file}")
 
   for component in "${components[@]}"; do
-    _yq_add_component_json "${sbom_file}" "${component}" "licenses" "[]"
-    _yq_add_component_json "${sbom_file}" "${component}" "properties" "[]"
-    _yq_add_component_json "${sbom_file}" "${component}" "properties" "$(_format_elastisys_evaluation_object "set-me")"
+    _sbom_add_component "${sbom_file}" "${component}" "licenses" "[]"
+    _sbom_add_component "${sbom_file}" "${component}" "properties" "[]"
+    _sbom_add_component "${sbom_file}" "${component}" "properties" "$(_format_elastisys_evaluation_object "set-me")"
   done
 }
 
@@ -166,9 +169,9 @@ _get_licenses() {
 
   # Upstream charts
   # TODO: (maybe) filter out unused charts before processing?
-  mapfile -t charts < <(find "${HELMFILE_FOLDER}/upstream" -name "Chart.yaml")
+  mapfile -t upstream_charts < <(find "${HELMFILE_FOLDER}/upstream" -name "Chart.yaml")
 
-  for chart in "${charts[@]}"; do
+  for chart in "${upstream_charts[@]}"; do
     chart_name=$(yq4 ".name" "${chart}")
 
     # check if chart.yaml contains license in annotations
@@ -176,10 +179,10 @@ _get_licenses() {
     annotation_artifacthub=$(yq4 ".annotations.artifacthub.io/license" "${chart}")
 
     if [[ -n "${annotation}" && "${annotation}" != "null" ]]; then
-      _yq_add_component_json "${sbom_file}" "${chart_name}" "licenses" "$(_format_license_object "${annotation}")"
+      _sbom_add_component "${sbom_file}" "${chart_name}" "licenses" "$(_format_license_object "${annotation}")"
 
     elif [[ -n "${annotation_artifacthub}" && "${annotation_artifacthub}" != "null" ]]; then
-      _yq_add_component_json "${sbom_file}" "${chart_name}" "licenses" "$(_format_license_object "${annotation_artifacthub}")"
+      _sbom_add_component "${sbom_file}" "${chart_name}" "licenses" "$(_format_license_object "${annotation_artifacthub}")"
 
     # if no license in annotations, try to get from source (e.g. github)
     else
@@ -203,7 +206,7 @@ _get_licenses() {
             continue
           else
             for l in "${licenses_in_git[@]}"; do
-               _yq_add_component_json "${sbom_file}" "${chart_name}" "licenses" "$(_format_license_object "${l}")"
+               _sbom_add_component "${sbom_file}" "${chart_name}" "licenses" "$(_format_license_object "${l}")"
             done
           fi
         done
@@ -212,27 +215,27 @@ _get_licenses() {
   done
 
   # Welkin charts
-  mapfile -t charts < <(find "${HELMFILE_FOLDER}/charts" -name "Chart.yaml")
+  mapfile -t welkin_charts < <(find "${HELMFILE_FOLDER}/charts" -name "Chart.yaml")
 
-  for chart in "${charts[@]}"; do
+  for chart in "${welkin_charts[@]}"; do
     chart_name=$(yq4 ".name" "${chart}")
 
     # TODO: licenses for the applications
-    _yq_add_component_json "${sbom_file}" "${chart_name}" "licenses" "$(_format_license_object "Apache-2.0")"
+    _sbom_add_component "${sbom_file}" "${chart_name}" "licenses" "$(_format_license_object "Apache-2.0")"
   done
 }
 
-_get_container_images_helmfile_template() {
-  local sbom_file helmfile_template_file chart_name release_name type
+_get_container_images_from_template() {
+  local sbom_file template_file chart_name release_name type query
   sbom_file="${1}"
-  helmfile_template_file="${2}"
+  template_file="${2}"
   chart_name="${3}"
   release_name="${4}"
   type="${5}"
 
   local sbom_file
   if [[ "$#" -ne 5 ]]; then
-    log_fatal "usage: _get_container_images_helmfile_template <sbom-file> <helmfile-template-file> <chart_name> <release_name> <type>"
+    log_fatal "usage: _get_container_images_from_template <sbom-file> <helmfile-template-file> <chart_name> <release_name> <type>"
   fi
 
   # TODO: .metadata.labels.release label capture subcharts e.g. node-exporter for kube-prometheus-stack, and will save images under that release
@@ -255,7 +258,7 @@ _get_container_images_helmfile_template() {
     query="select(.kind == \"Alertmanager\" and ${chart_query}) | .spec.image"
   fi
 
-  mapfile -t containers < <(yq4 "${query}" "${helmfile_template_file}" | sed '/---/d' | sort -u)
+  mapfile -t containers < <(yq4 "${query}" "${template_file}" | sed '/---/d' | sort -u)
 
   if [[ ${#containers[@]} -eq 0 ]]; then
     # Although these contains e.g. prometheus-node-exporter which we run but through kube-prometheus-stack
@@ -264,7 +267,7 @@ _get_container_images_helmfile_template() {
   fi
 
   for container in "${containers[@]}"; do
-    _yq_add_component_json "${sbom_file}" "${chart_name}" "properties" "$(_format_container_image_object "${container}")"
+    _sbom_add_component "${sbom_file}" "${chart_name}" "properties" "$(_format_container_image_object "${container}")"
   done
 }
 
@@ -279,23 +282,25 @@ _get_container_images() {
     log_fatal "SBOM file ${sbom_file} does not exist"
   fi
 
-  helmfile_template_file=$(mktemp --suffix=-helmfile_template_file)
-  append_trap "rm ${helmfile_template_file} >/dev/null 2>&1" EXIT
+  template_file=$(mktemp --suffix=-template_file)
+  append_trap "rm ${template_file} >/dev/null 2>&1" EXIT
   helmfile_list=$(mktemp --suffix=-helmfile_list)
   append_trap "rm ${helmfile_list} >/dev/null 2>&1" EXIT
 
   log_info "Getting container images"
 
-  mapfile -t charts < <(find "${HELMFILE_FOLDER}" -name "Chart.yaml")
+  mapfile -t all_charts < <(find "${HELMFILE_FOLDER}" -name "Chart.yaml")
 
   # TODO:
   CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc list --output json 2> /dev/null > "${helmfile_list}"
   # - currently only retrieves enabled/installed charts from using helmfile template
-  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc template 2> /dev/null > "${helmfile_template_file}"
-  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile wc template 2> /dev/null >> "${helmfile_template_file}"
+  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc template 2> /dev/null > "${template_file}"
+  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile wc template 2> /dev/null >> "${template_file}"
 
-  for chart in "${charts[@]}"; do
+  for chart in "${all_charts[@]}"; do
     chart_name=$(yq4 ".name" "${chart}")
+
+    # parsing to get the chart folder path which is used for each helm release
     chart_folder_name="${chart#"${HELMFILE_FOLDER}/"}"
     chart_folder_name="${chart_folder_name%\/Chart.yaml}"
 
@@ -310,13 +315,13 @@ _get_container_images() {
 
     for release in "${releases[@]}"; do
       release_name=$(echo "${release}" | jq -r ".name")
-      _get_container_images_helmfile_template "${sbom_file}" "${helmfile_template_file}" "${chart_name}" "${release_name}" "cronjob"
-      _get_container_images_helmfile_template "${sbom_file}" "${helmfile_template_file}" "${chart_name}" "${release_name}" "pod"
-      _get_container_images_helmfile_template "${sbom_file}" "${helmfile_template_file}" "${chart_name}" "${release_name}" "deployment"
-      _get_container_images_helmfile_template "${sbom_file}" "${helmfile_template_file}" "${chart_name}" "${release_name}" "job"
-      _get_container_images_helmfile_template "${sbom_file}" "${helmfile_template_file}" "${chart_name}" "${release_name}" "daemonset"
-      _get_container_images_helmfile_template "${sbom_file}" "${helmfile_template_file}" "${chart_name}" "${release_name}" "statefulset"
-      _get_container_images_helmfile_template "${sbom_file}" "${helmfile_template_file}" "${chart_name}" "${release_name}" "alertmanager"
+      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${release_name}" "cronjob"
+      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${release_name}" "pod"
+      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${release_name}" "deployment"
+      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${release_name}" "job"
+      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${release_name}" "daemonset"
+      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${release_name}" "statefulset"
+      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${release_name}" "alertmanager"
     done
 
     # TODO: mapping chart names to release names?
@@ -325,13 +330,11 @@ _get_container_images() {
 }
 
 cyclonedx_validation() {
-  local sbom_file
-
   if [[ "$#" -ne 1 ]]; then
     log_fatal "usage: cyclonedx_validation <sbom-file>"
   fi
 
-  sbom_file="${1}"
+  local sbom_file="${1}"
   if [[ ! -f "${sbom_file}" ]]; then
     log_fatal "SBOM file ${sbom_file} does not exist"
   fi
@@ -370,7 +373,7 @@ sbom_add() {
   component="${1}"
   key="${2}"
 
-  _yq_add_component_json "${SBOM_FILE}" "${@}"
+  _sbom_add_component "${SBOM_FILE}" "${@}"
   log_info "Updated ${key} for ${component}"
 }
 
@@ -379,7 +382,7 @@ sbom_get() {
     usage
   fi
 
-  local component key
+  local component key query
 
   component="${1}"
   query=".components[] | select(.name ==\"${component}\")"
@@ -393,15 +396,17 @@ sbom_get() {
 }
 
 sbom_get_charts() {
+  local query
   query='.components[] | .name + "@" + .version'
 
-  yq4 -e -r -o json "${query}" "${SBOM_FILE}"
+  yq4 -e -r -o json "${query}" "${SBOM_FILE}" | sort -u
 }
 
 sbom_get_containers() {
+  local query
   query='.components[].properties[] | select(.name | contains("container")).value'
 
-  yq4 -e -r -o json "${query}" "${SBOM_FILE}"
+  yq4 -e -r -o json "${query}" "${SBOM_FILE}" | sort -u
 }
 
 sbom_update() {
@@ -414,7 +419,7 @@ sbom_update() {
   component="${1}"
   key="${2}"
 
-  _yq_update_component_json "${SBOM_FILE}" "${@}"
+  _sbom_update_component "${SBOM_FILE}" "${@}"
   log_info "Updated ${key} for ${component}"
 }
 
