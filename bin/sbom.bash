@@ -247,7 +247,9 @@ _get_container_images_helmfile_template() {
     log_fatal "usage: _get_container_images_helmfile_template <sbom-file> <helmfile-template-file> <chart_name> <release_name> <type>"
   fi
 
-  chart_query=".metadata.labels.\"helm.sh/chart\" | contains(\"${chart_name}\")"
+  # TODO: .metadata.labels.release label capture subcharts e.g. node-exporter for kube-prometheus-stack, and will save images under that release
+  # although the sbom contains the subcharts, which currently does not get any containers set. Would be nice to improve this
+  chart_query="(.metadata.labels.\"helm.sh/chart\" | contains(\"${chart_name}\")) or (.metadata.labels.release | contains(\"${chart_name}\"))"
 
   if [[ "${type}" == "pod" ]]; then
     query="select(.kind == \"Pod\" and ${chart_query}) | .spec.containers[] | .image"
@@ -261,6 +263,8 @@ _get_container_images_helmfile_template() {
     query="select(.kind == \"Job\" and ${chart_query}) | .spec.template.spec.containers[] | .image"
   elif [[ "${type}" == "statefulset" ]]; then
     query="select(.kind == \"StateFulset\" and ${chart_query}) | .spec.template.spec.containers[] | .image"
+  elif [[ "${type}" == "alertmanager" ]]; then
+    query="select(.kind == \"Alertmanager\" and ${chart_query}) | .spec.image"
   fi
 
   mapfile -t containers < <(yq4 "${query}" "${helmfile_template_file}" | sed '/---/d' | sort -u)
@@ -317,6 +321,7 @@ _get_container_images() {
   fi
 
   helmfile_template_file=$(mktemp --suffix=-helmfile_template_file)
+  append_trap "rm ${helmfile_template_file} >/dev/null 2>&1" EXIT
 
   log_info "Getting container images"
 
@@ -326,7 +331,7 @@ _get_container_images() {
   # - what about wc? this should list all charts in both wc/sc, but should only those enabled/installed=true be checked?
   export CK8S_SKIP_VALIDATION=true
   export CK8S_AUTO_APPROVE=true
-  helmfile_list=$("${HERE}/ops.bash" helmfile sc list --output json)
+  helmfile_list=$("${HERE}/ops.bash" helmfile sc list --output json 2> /dev/null)
   "${HERE}/ops.bash" helmfile sc template 2> /dev/null > "${helmfile_template_file}"
   "${HERE}/ops.bash" helmfile wc template 2> /dev/null >> "${helmfile_template_file}"
 
@@ -351,6 +356,7 @@ _get_container_images() {
       _get_container_images_helmfile_template "${sbom_file}" "${helmfile_template_file}" "${chart_name}" "${release_name}" "job"
       _get_container_images_helmfile_template "${sbom_file}" "${helmfile_template_file}" "${chart_name}" "${release_name}" "daemonset"
       _get_container_images_helmfile_template "${sbom_file}" "${helmfile_template_file}" "${chart_name}" "${release_name}" "statefulset"
+      _get_container_images_helmfile_template "${sbom_file}" "${helmfile_template_file}" "${chart_name}" "${release_name}" "alertmanager"
     done
 
     # TODO: mapping chart names to release names?
