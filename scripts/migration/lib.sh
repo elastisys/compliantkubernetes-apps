@@ -439,7 +439,7 @@ check_prepared_version() {
 # version.
 record_upgrade_prepare_done() {
   local apps_config_timestamp
-  apps_config_timestamp="$(date +uIs)"
+  apps_config_timestamp="$(date -uIs)"
 
   ts="${apps_config_timestamp}" \
     yq_add common '.global.ck8sLastChange' 'strenv(ts)'
@@ -471,7 +471,7 @@ ensure_upgrade_prepared() {
   apps_upgrade="$(kubectl_do "${1}" get --namespace kube-system cm apps-upgrade --output=yaml)"
   apps_version="$(yq4 '.data.version' <<<"${apps_upgrade}")"
 
-  if ! yq4 --exit-status 'select(.data.version == strenv(CK8S_TARGET_VERSION))' <<<"${apps_upgrade}" >/dev/null; then
+  if [[ "${apps_version}" != "${CK8S_TARGET_VERSION}" ]] >/dev/null; then
     log_fatal "version mismatch, upgrading to ${CK8S_TARGET_VERSION} but cluster ${1} was prepared for ${apps_version}"
   fi
 
