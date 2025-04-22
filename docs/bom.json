@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:11a03401-b089-4613-bb11-dc60c24f57d5",
+  "serialNumber": "urn:uuid:f975aee6-af5e-4728-992a-ce8aee446e91",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-04-22T14:54:58Z",
+    "timestamp": "2025-04-22T16:17:19Z",
     "tools": {
       "components": [
         {
@@ -566,6 +566,10 @@
         {
           "name": "container-fluentd-forwarder",
           "value": "ghcr.io/elastisys/fluentd-forwarder:v4.7.5-ck8s1"
+        },
+        {
+          "name": "container-fluentd-aggregator",
+          "value": "ghcr.io/elastisys/fluentd-aggregator:v7.1.1-ck8s1"
         }
       ]
     },
@@ -963,6 +967,18 @@
         {
           "name": "container-registry-photon",
           "value": "goharbor/registry-photon:v2.12.1"
+        },
+        {
+          "name": "container-harbor-db",
+          "value": "goharbor/harbor-db:v2.12.1"
+        },
+        {
+          "name": "container-redis-photon",
+          "value": "goharbor/redis-photon:v2.12.1"
+        },
+        {
+          "name": "container-trivy-adapter-photon",
+          "value": "goharbor/trivy-adapter-photon:v2.12.1"
         }
       ]
     },
@@ -2187,6 +2203,10 @@
         {
           "name": "container-thanos",
           "value": "ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8"
+        },
+        {
+          "name": "container-prometheus-config-reloader",
+          "value": "quay.io/prometheus-operator/prometheus-config-reloader:v0.50.0"
         }
       ]
     },
