@@ -33,15 +33,31 @@ usage() {
   exit 1
 }
 
+_yq_run_query() {
+  local sbom_file tmp_sbom_file query
+  sbom_file="${1}"
+  query="${2}"
+
+  tmp_sbom_file=$(mktemp --suffix=-sbom.json)
+  append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
+
+  if ! ${CK8S_AUTO_APPROVE:-}; then
+    yq4 -o json "${query}" "${sbom_file}" > "${tmp_sbom_file}"
+    cyclonedx_validation "${tmp_sbom_file}"
+    diff  -U3 --color=always "${sbom_file}" "${tmp_sbom_file}" && log_info "No change" && return
+    log_info "Changes found"
+    ask_abort
+  fi
+
+  yq4 -i -o json "${query}" "${sbom_file}"
+}
+
 _sbom_update_component() {
   local component key sbom_file tmp_sbom_file query
 
   sbom_file="${1}"
   component="${2}"
   key="${3}"
-
-  tmp_sbom_file=$(mktemp --suffix=-sbom.json)
-  append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
 
   tmp_change=$(mktemp "--suffix=-update-${component}-sbom.json")
   append_trap "rm ${tmp_change} >/dev/null 2>&1" EXIT
@@ -55,17 +71,9 @@ _sbom_update_component() {
   yq4 -e -o json ".components[] | select(.name == \"${component}\") | .${key}" "${sbom_file}" > "${tmp_change}"
   "${EDITOR}" "${tmp_change}"
 
-  # log_info "here"
   query="with(.components[] | select(.name == \"${component}\"); .${key} = $(jq -c '.' "${tmp_change}"))"
-  if ! ${CK8S_AUTO_APPROVE:-}; then
-    change=${tmp_change} yq4 -o json "${query}" "${sbom_file}" > "${tmp_sbom_file}"
-    cyclonedx_validation "${tmp_sbom_file}"
-    diff  -U3 --color=always "${sbom_file}" "${tmp_sbom_file}" && log_info "No change" && return
-    log_info "Changes found"
-    ask_abort
-  fi
 
-  yq4 -i -o json "${query}" "${sbom_file}"
+  _yq_run_query "${sbom_file}" "${query}"
 }
 
 _sbom_add_component() {
@@ -76,23 +84,13 @@ _sbom_add_component() {
   key="${3}"
   value="${4}"
 
-  tmp_sbom_file=$(mktemp "--suffix=-add-${component}-sbom.json")
-  append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
-
   if [[ ! "${key}" =~ ^(licenses.*|properties.*)$ ]]; then
     log_fatal "unsupported key \"${key}\", currently only supports \"licenses|properties\""
   fi
 
   query="with(.components[] | select(.name == \"${component}\"); .${key} |= (. + ${value} | unique_by(.name)))"
-  if ! ${CK8S_AUTO_APPROVE:-}; then
-    yq4 -o json "${query}" "${sbom_file}" > "${tmp_sbom_file}"
-    cyclonedx_validation "${tmp_sbom_file}"
-    diff  -U3 --color=always "${sbom_file}" "${tmp_sbom_file}" && log_info "No change" && return
-    log_info "Changes found"
-    ask_abort
-  fi
 
-  yq4 -i -o json "${query}" "${sbom_file}"
+  _yq_run_query "${sbom_file}" "${query}"
 }
 
 # checks if a license is listed as a supported license id
