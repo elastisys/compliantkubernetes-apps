@@ -393,6 +393,18 @@ sbom_get() {
   yq4 -e -o json "${query}" "${SBOM_FILE}"
 }
 
+sbom_get_charts() {
+  query='.components[] | .name + "@" + .version'
+
+  yq4 -e -r -o json "${query}" "${SBOM_FILE}"
+}
+
+sbom_get_containers() {
+  query='.components[].properties[] | select(.name | contains("container")).value'
+
+  yq4 -e -r -o json "${query}" "${SBOM_FILE}"
+}
+
 sbom_update() {
   if [[ "$#" -ne 2 ]]; then
     usage
@@ -412,6 +424,8 @@ sbom_generate() {
   tmp_sbom_file=$(mktemp --suffix=-sbom.json)
   append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
 
+  # TODO: figure out a different approach for retrieving licenses, or handle GITHUB_TOKEN better
+  : "${GITHUB_TOKEN:?Missing GITHUB_TOKEN}"
   export CK8S_AUTO_APPROVE=true
 
   if [[ ! -f "${SBOM_FILE}" ]]; then
@@ -451,6 +465,14 @@ generate)
 get)
   shift
   sbom_get "${@}"
+  ;;
+get-charts)
+  shift
+  sbom_get_charts
+  ;;
+get-containers)
+  shift
+  sbom_get_containers
   ;;
 get-unset)
   shift
