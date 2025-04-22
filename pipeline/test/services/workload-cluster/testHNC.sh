@@ -42,9 +42,9 @@ function check_wc_hnc_creation_removal() {
   no_error=true
   debug_msg=""
 
-  mapfile -t user_namespaces < <(yq4 -e '.user.namespaces - (.user.constraints | keys) | .[]' "${config['config_file_wc']}")
-  mapfile -t user_admin_users < <(yq4 '.user.adminUsers[]' "${config['config_file_wc']}")
-  mapfile -t user_admin_groups < <(yq4 '.user.adminGroups[]' "${config['config_file_wc']}")
+  mapfile -t user_namespaces < <(yq -e '.user.namespaces - (.user.constraints | keys) | .[]' "${config['config_file_wc']}")
+  mapfile -t user_admin_users < <(yq '.user.adminUsers[]' "${config['config_file_wc']}")
+  mapfile -t user_admin_groups < <(yq '.user.adminGroups[]' "${config['config_file_wc']}")
 
   VERBS=(
     create

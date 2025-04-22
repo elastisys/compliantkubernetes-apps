@@ -8,7 +8,7 @@ setup() {
   load_file
 
   export CK8S_AUTO_APPROVE=true
-  CK8S_PGP_FP=$(yq4 '.creation_rules[].pgp' "${CK8S_CONFIG_PATH}/.sops.yaml")
+  CK8S_PGP_FP=$(yq '.creation_rules[].pgp' "${CK8S_CONFIG_PATH}/.sops.yaml")
   export CK8S_PGP_FP
 
   with_kubeconfig sc

@@ -21,7 +21,7 @@ fi
 has_diff=0
 
 #TODO: To be changed when decision made on networkpolicies for azure storage
-storage_service=$(yq4 '.objectStorage.type' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
+storage_service=$(yq '.objectStorage.type' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
 
 CK8S_IPV6_ENABLED="${3:-"false"}"
 
@@ -41,7 +41,7 @@ yq_read() {
     "${config["default_${cluster}"]}" \
     "${config["default_common"]}"; do
 
-    value=$(yq4 "${config_option}" "${config_file}")
+    value=$(yq "${config_option}" "${config_file}")
 
     if [[ "${value}" != "null" ]]; then
       echo "${value}"
@@ -61,7 +61,7 @@ yq_read_secret() {
   local default_value="${2}"
 
   local value
-  value=$(sops -d "${secrets["secrets_file"]}" | yq4 "${config_option}")
+  value=$(sops -d "${secrets["secrets_file"]}" | yq "${config_option}")
 
   if [[ "${value}" != "null" ]]; then
     echo "${value}"
@@ -89,13 +89,13 @@ yq_eval() {
   fi
 
   diff -U3 --color=always \
-    --label "${config_filename}" <(yq4 -P "${config_file}") \
-    --label expected <(yq4 -P "${expression}" "${config_file}") >"${out}" && return
+    --label "${config_filename}" <(yq -P "${config_file}") \
+    --label expected <(yq -P "${expression}" "${config_file}") >"${out}" && return
 
   if ${dry_run}; then
     log_warning "Diff found for ${config_option} in ${config_filename} (diff shows actions needed to be up to date)"
   else
-    yq4 -i "${expression}" "${config_file}"
+    yq -i "${expression}" "${config_file}"
   fi
 
   has_diff=$((has_diff + 1))
@@ -325,7 +325,7 @@ process_ips_to_cidrs() {
   local -a new_cidrs
   local -a old_cidrs
 
-  readarray -t old_cidrs <<<"$(yq4 "${config_option} | .[]" "${config_file}")"
+  readarray -t old_cidrs <<<"$(yq "${config_option} | .[]" "${config_file}")"
 
   for ip in "${@}"; do
     for cidr in "${old_cidrs[@]}"; do
@@ -342,7 +342,7 @@ process_ips_to_cidrs() {
     fi
   done
 
-  yq4 'split(" ") | unique | .[]' <<<"${new_cidrs[@]}"
+  yq 'split(" ") | unique | .[]' <<<"${new_cidrs[@]}"
 }
 
 # Parse the host from an URL.
@@ -378,7 +378,7 @@ allow_cidrs() {
   readarray -t cidrs <<<"$(sort_cidrs "${@}")"
 
   local list
-  list=$(echo "[$(for v in "${cidrs[@]}"; do echo "${v},"; done)]" | yq4 -oj)
+  list=$(echo "[$(for v in "${cidrs[@]}"; do echo "${v},"; done)]" | yq -oj)
 
   yq_eval "${config_file}" "${config_option}" "${config_option} = ${list}"
 }
@@ -406,7 +406,7 @@ allow_ports() {
   shift 2
 
   local ports
-  ports=$(echo "[$(for v in "${@}"; do echo "${v},"; done)]" | yq4 -oj sort)
+  ports=$(echo "[$(for v in "${@}"; do echo "${v},"; done)]" | yq -oj sort)
 
   yq_eval "${config_file}" "${config_option}" "${config_option} = ${ports}"
 }
@@ -450,7 +450,7 @@ allow_host() {
     fi
 
     pod_subnet="$("${here}/ops.bash" kubectl "${cluster}" get configmap --namespace kube-system kubeadm-config --ignore-not-found --output yaml)"
-    pod_subnet="$(yq4 '.data.ClusterConfiguration | @yamld | .networking.podSubnet // "0.0.0.0/0"' <<<"${pod_subnet}")"
+    pod_subnet="$(yq '.data.ClusterConfiguration | @yamld | .networking.podSubnet // "0.0.0.0/0"' <<<"${pod_subnet}")"
 
     log_warning "Found cluster local endpoint ${host} for ${config_option} using ${pod_subnet}"
 

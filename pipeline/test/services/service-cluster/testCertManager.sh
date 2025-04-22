@@ -55,11 +55,11 @@ function check_sc_certmanager_cluster_issuers() {
       cluster_issuer_status=$(echo "$jsonData" | jq -r '.status.conditions[] | select(.type=="Ready") | .status')
       if [[ "$cluster_issuer_status" == "True" ]]; then
         IFS='-' read -ra data <<<"$clusterIssuer"
-        readarray custom_solvers < <(yq4 e -o=j -I=0 ".issuers.${data[0]}.${data[1]}.solvers[]" "${config['config_file_sc']}")
+        readarray custom_solvers < <(yq e -o=j -I=0 ".issuers.${data[0]}.${data[1]}.solvers[]" "${config['config_file_sc']}")
         if ! [ ${#custom_solvers[@]} -eq 0 ]; then
           for custom_solver in "${custom_solvers[@]}"; do
             challenge_solver=$(echo "$custom_solver" | jq ". | del( .selector ) | keys[] ")
-            solver_exist=$(kubectl get ClusterIssuer "$clusterIssuer" -oyaml | yq4 e -o=j -I=0 ".spec.acme.solvers[].$challenge_solver")
+            solver_exist=$(kubectl get ClusterIssuer "$clusterIssuer" -oyaml | yq e -o=j -I=0 ".spec.acme.solvers[].$challenge_solver")
             if [[ $solver_exist == "null" ]]; then
               no_error=false
               debug_msg+="[ERROR] Missing custom solver : $challenge_solver for Cluster Issuer : $clusterIssuer\n"
@@ -102,9 +102,9 @@ function check_sc_certmanager_apps_certificates() {
     "opensearch-system opensearch-transport"
   )
 
-  enable_harbor=$(yq4 -e '.harbor.enabled' "${config['config_file_sc']}" 2>/dev/null)
-  enable_thanos=$(yq4 -e '.thanos.enabled' "${config['config_file_sc']}" 2>/dev/null)
-  enable_user_grafana=$(yq4 -e '.grafana.user.enabled' "${config['config_file_sc']}" 2>/dev/null)
+  enable_harbor=$(yq -e '.harbor.enabled' "${config['config_file_sc']}" 2>/dev/null)
+  enable_thanos=$(yq -e '.thanos.enabled' "${config['config_file_sc']}" 2>/dev/null)
+  enable_user_grafana=$(yq -e '.grafana.user.enabled' "${config['config_file_sc']}" 2>/dev/null)
 
   if "${enable_harbor}"; then
     certificates+=(
@@ -121,8 +121,8 @@ function check_sc_certmanager_apps_certificates() {
   fi
 
   if "${enable_thanos}"; then
-    thanos_subdomain=$(yq4 -e '.thanos.receiver.subdomain' "${config['config_file_sc']}")
-    opsDomain=$(yq4 -e '.global.opsDomain' "${config['config_file_sc']}")
+    thanos_subdomain=$(yq -e '.thanos.receiver.subdomain' "${config['config_file_sc']}")
+    opsDomain=$(yq -e '.global.opsDomain' "${config['config_file_sc']}")
     certificates+=(
       "thanos $thanos_subdomain.$opsDomain-tls"
     )

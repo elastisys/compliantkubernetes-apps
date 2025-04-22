@@ -7,7 +7,11 @@ yq() {
   if command -v yq4 >/dev/null; then
     command yq4 "${@}"
   else
-    command yq "${@}"
+    if ! command yq -V | grep --extended-regexp "v4\." >/dev/null 2>&1; then
+      echo -e -n "[\e[31mck8s\e[0m] expecting the yq binary to be at least version v4" 1>&2
+    else
+      command yq "${@}"
+    fi
   fi
 }
 
@@ -21,7 +25,7 @@ yq.get() {
   fi
 
   local value
-  value="$(yq4 ea "explode(.) as \$item ireduce ({}; . * \$item) | $2 | ... comments=\"\"" "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/$1-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" "${CK8S_CONFIG_PATH}/$1-config.yaml")"
+  value="$(yq ea "explode(.) as \$item ireduce ({}; . * \$item) | $2 | ... comments=\"\"" "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/$1-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" "${CK8S_CONFIG_PATH}/$1-config.yaml")"
 
   if [[ -n "${value#null}" ]]; then
     echo "${value}"
@@ -40,7 +44,7 @@ yq.dig() {
   fi
 
   local value
-  value="$(yq4 ea "explode(.) | $2 | select(. != null) | {\"wrapper\": .} as \$item ireduce ({}; . * \$item) | .wrapper | ... comments=\"\"" "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/$1-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" "${CK8S_CONFIG_PATH}/$1-config.yaml")"
+  value="$(yq ea "explode(.) | $2 | select(. != null) | {\"wrapper\": .} as \$item ireduce ({}; . * \$item) | .wrapper | ... comments=\"\"" "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/$1-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" "${CK8S_CONFIG_PATH}/$1-config.yaml")"
 
   if [[ -n "${value#null}" ]]; then
     echo "${value}"
@@ -60,7 +64,7 @@ yq.set() {
   fi
 
   if [[ "${1}" =~ ^(common|sc|wc)$ ]]; then
-    yq4 -i "${2} = ${3}" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
+    yq -i "${2} = ${3}" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
   elif [[ "${1}" == "secrets" ]]; then
     sops --set "${2} ${3}" "${CK8S_CONFIG_PATH}/secrets.yaml"
   fi
@@ -73,7 +77,7 @@ yq.secret() {
   fi
 
   local value
-  value="$(sops -d "${CK8S_CONFIG_PATH}/secrets.yaml" | yq4 "$1 | ... comments=\"\"")"
+  value="$(sops -d "${CK8S_CONFIG_PATH}/secrets.yaml" | yq "$1 | ... comments=\"\"")"
 
   if [[ -n "${value#null}" ]]; then
     echo "${value}"

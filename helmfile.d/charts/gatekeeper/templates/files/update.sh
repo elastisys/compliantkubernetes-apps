@@ -36,8 +36,8 @@ echo "updating waitFor in values.yaml"
 
 readarray -t templates <<<"$(find "${CHART}/templates/" -type f -name "*.yaml" -not -path "*/wait/*" -not -name "config.yaml")"
 
-list="$(for template in "${templates[@]}"; do grep "name:" "${template}"; done | sed "s/name: /- /" | sort | yq4 -oj)"
+list="$(for template in "${templates[@]}"; do grep "name:" "${template}"; done | sed "s/name: /- /" | sort | yq -oj)"
 
-yq4 -i ".waitFor = ${list}" "${CHART}/values.yaml"
+yq -i ".waitFor = ${list}" "${CHART}/values.yaml"
 
 echo "please restore whitespace changes in values.yaml"

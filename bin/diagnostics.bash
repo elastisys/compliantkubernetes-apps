@@ -113,9 +113,9 @@ sops_encrypt_file() {
 
 fetch_oidc_token() {
   # shellcheck disable=SC2016
-  readarray -t args <<<"$(yq4 '. as $root | ($root.contexts[] | select(.name == $root.current-context) | .context) as $context | ($root.users[] | select(.name == $context.user) | .user) as $user | $user.exec.args[]' "${config["kube_config_sc"]}")"
+  readarray -t args <<<"$(yq '. as $root | ($root.contexts[] | select(.name == $root.current-context) | .context) as $context | ($root.users[] | select(.name == $context.user) | .user) as $user | $user.exec.args[]' "${config["kube_config_sc"]}")"
   [[ "${args[0]}" == "oidc-login" ]] || log_fatal "ERROR: This command requires the kubeconfig to use OIDC"
-  kubectl "${args[@]}" | yq4 '.status.token'
+  kubectl "${args[@]}" | yq '.status.token'
 }
 
 run_diagnostics() {
@@ -124,24 +124,24 @@ run_diagnostics() {
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
   if [ -d "${CK8S_CONFIG_PATH}/capi" ]; then
     # shellcheck disable=SC2002
-    capi_version=$(cat "${CK8S_CONFIG_PATH}/capi/defaults/values.yaml" | yq4 '.clusterApiVersion')
+    capi_version=$(cat "${CK8S_CONFIG_PATH}/capi/defaults/values.yaml" | yq '.clusterApiVersion')
     echo "CAPI version: ${capi_version}"
   elif [ -d "${CK8S_CONFIG_PATH}/${cluster}-config" ]; then
     # shellcheck disable=SC2002
-    kubespray_version=$(cat "${CK8S_CONFIG_PATH}/${cluster}-config/group_vars/all/ck8s-kubespray-general.yaml" | yq4 '.ck8sKubesprayVersion')
+    kubespray_version=$(cat "${CK8S_CONFIG_PATH}/${cluster}-config/group_vars/all/ck8s-kubespray-general.yaml" | yq '.ck8sKubesprayVersion')
     echo "Kubespray version: ${kubespray_version}"
   else
     echo "Can't find config directory"
   fi
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
   # shellcheck disable=SC2002
-  apps_version=$(cat "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" | yq4 '.global.ck8sVersion')
+  apps_version=$(cat "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" | yq '.global.ck8sVersion')
   echo "Apps version: ${apps_version}"
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
   # -- Nodes --
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
   echo "Fetching Nodes that are NotReady (<node>)"
-  nodes=$("${here}/ops.bash" kubectl "${cluster}" get nodes -o=yaml | yq4 '.items[] | select(.status.conditions[] | select(.type == "Ready" and .status != "True")) | .metadata.name' | tr '\n' ' ')
+  nodes=$("${here}/ops.bash" kubectl "${cluster}" get nodes -o=yaml | yq '.items[] | select(.status.conditions[] | select(.type == "Ready" and .status != "True")) | .metadata.name' | tr '\n' ' ')
   if [ -z "${nodes}" ]; then
     echo -e "All Nodes are ready"
   else
@@ -155,7 +155,7 @@ run_diagnostics() {
   # -- DS and Deployments --
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
   echo -e "\nFetching Deployments without desired number of ready pods (<deployment>)"
-  deployments=$("${here}"/ops.bash kubectl "${cluster}" get deployments -A -o=yaml | yq4 '.items[] | select(.status.conditions[] | select((.type == "Progressing" and .status != "True") or (.type == "Available" and .status != "True")))')
+  deployments=$("${here}"/ops.bash kubectl "${cluster}" get deployments -A -o=yaml | yq '.items[] | select(.status.conditions[] | select((.type == "Progressing" and .status != "True") or (.type == "Available" and .status != "True")))')
   if [ -z "${deployments}" ]; then
     echo -e "All Deployments are ready"
   else
@@ -164,7 +164,7 @@ run_diagnostics() {
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
   echo -e "\nFetching DaemonSets without desired number of ready pods (<daemonset>)"
-  daemonsets=$("${here}"/ops.bash kubectl "${cluster}" get daemonsets -A -o=yaml | yq4 '.items[] | select(.status.numberMisscheduled != 0)')
+  daemonsets=$("${here}"/ops.bash kubectl "${cluster}" get daemonsets -A -o=yaml | yq '.items[] | select(.status.numberMisscheduled != 0)')
   if [ -z "${daemonsets}" ]; then
     echo -e "All daemonsets are ready"
   else
@@ -173,7 +173,7 @@ run_diagnostics() {
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
   echo -e "\nFetching StatefulSets without desired number of ready pods (<statefulset>)"
-  statefulsets=$("${here}"/ops.bash kubectl "${cluster}" get statefulsets -A -o=yaml | yq4 '.items[] | select(.status.collisionCount != 0 and .status.readyReplicas != .status.updatedReplicas and .status.replicas != .status.readyReplicas)')
+  statefulsets=$("${here}"/ops.bash kubectl "${cluster}" get statefulsets -A -o=yaml | yq '.items[] | select(.status.collisionCount != 0 and .status.readyReplicas != .status.updatedReplicas and .status.replicas != .status.readyReplicas)')
   if [ -z "${statefulsets}" ]; then
     echo -e "All statefulsets are ready"
   else
@@ -183,8 +183,8 @@ run_diagnostics() {
 
   # -- Pods --
   echo -e "\nFetching Pods that are NotReady (<pod>)"
-  pods=$("${here}/ops.bash" kubectl "${cluster}" get pod -A -o=yaml | yq4 '.items[] | select(.status.conditions[] | select(.type == "Ready" and .status != "True" and .reason != "PodCompleted")) | [{"name": .metadata.name, "namespace": .metadata.namespace}]')
-  readarray pod_arr < <(echo "$pods" | yq4 e -o=j -I=0 '.[]')
+  pods=$("${here}/ops.bash" kubectl "${cluster}" get pod -A -o=yaml | yq '.items[] | select(.status.conditions[] | select(.type == "Ready" and .status != "True" and .reason != "PodCompleted")) | [{"name": .metadata.name, "namespace": .metadata.namespace}]')
+  readarray pod_arr < <(echo "$pods" | yq e -o=j -I=0 '.[]')
 
   if [ "${pods}" == '[]' ]; then
     echo -e "All pods are ready"
@@ -223,7 +223,7 @@ run_diagnostics() {
   # -- Helm --
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
   echo -e "\nFetching Helm releases that are not deployed (<helm>)"
-  helm=$("${here}"/ops.bash helm "${cluster}" list -A --all -o yaml | yq4 '.[] | select(.status != "deployed")')
+  helm=$("${here}"/ops.bash helm "${cluster}" list -A --all -o yaml | yq '.[] | select(.status != "deployed")')
   if [ -z "${helm}" ]; then
     echo -e "All charts are deployed"
   else
@@ -238,8 +238,8 @@ run_diagnostics() {
 
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
   echo -e "\nDescribing failed Challenges (<challenge>)"
-  challenges=$("${here}/ops.bash" kubectl "${cluster}" get challenge -A -o=yaml | yq4 '.items[] | select(.status.state != "valid") | [{"name": .metadata.name, "namespace": .metadata.namespace}]')
-  readarray challenge_arr < <(echo "$challenges" | yq4 e -o=j -I=0 '.[]')
+  challenges=$("${here}/ops.bash" kubectl "${cluster}" get challenge -A -o=yaml | yq '.items[] | select(.status.state != "valid") | [{"name": .metadata.name, "namespace": .metadata.namespace}]')
+  readarray challenge_arr < <(echo "$challenges" | yq e -o=j -I=0 '.[]')
   if [ "${challenges}" == '[]' ]; then
     echo -e "All challenges are valid"
   else
@@ -309,7 +309,7 @@ run_diagnostics_namespaced() {
   # -- Logs --
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
   echo "Fetching Error Logs <logs>"
-  mapfile -t pods_arr < <("${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml | yq4 '.items[] | .metadata.name')
+  mapfile -t pods_arr < <("${here}/ops.bash" kubectl "${cluster}" get pods -n "${namespace}" -o yaml | yq '.items[] | .metadata.name')
   for pod in "${pods_arr[@]}"; do
     echo "Error logs for pod: ${pod}"
     "${here}/ops.bash" kubectl "${cluster}" logs -n "${namespace}" "${pod}" |
@@ -335,7 +335,7 @@ get_config_files() {
 
 run_diagnostics_default_metrics() {
   token="$(fetch_oidc_token)"
-  domain="https://kube.$(yq4 '.global.opsDomain' "${config["config_file_sc"]}"):6443"
+  domain="https://kube.$(yq '.global.opsDomain' "${config["config_file_sc"]}"):6443"
   endpoint="${domain}/api/v1/namespaces/thanos/services/thanos-query-query-frontend:9090/proxy/api/v1"
   header="Authorization: Bearer ${token}"
   range_arg=("--data-urlencode" "start=$(date -d -"${1}" -Iseconds)" "--data-urlencode" "end=$(date -Iseconds)" "--data-urlencode" "step=1m")
@@ -399,7 +399,7 @@ run_diagnostics_default_metrics() {
 # run_diagnostics_query_metric <metric>
 run_diagnostics_query_metric() {
   token=$(fetch_oidc_token)
-  domain="https://kube.$(yq4 '.global.opsDomain' "${config["config_file_sc"]}"):6443"
+  domain="https://kube.$(yq '.global.opsDomain' "${config["config_file_sc"]}"):6443"
   endpoint="${domain}/api/v1/namespaces/thanos/services/thanos-query-query-frontend:9090/proxy/api/v1"
   header="Authorization: Bearer ${token}"
 

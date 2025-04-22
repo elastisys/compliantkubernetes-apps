@@ -116,7 +116,7 @@ check_tools() {
   warn=0
   err=0
 
-  for executable in jq yq4 s3cmd sops kubectl helm helmfile dig pwgen htpasswd yajsv; do
+  for executable in jq yq s3cmd sops kubectl helm helmfile dig pwgen htpasswd yajsv; do
     if ! command -v "${executable}" >/dev/null; then
       log_error "Required dependency ${executable} missing"
       err=1
@@ -142,8 +142,8 @@ check_tools() {
     fi
   }
 
-  check_minor "$(echo "${req}" | jq -r '.["github.com/mikefarah/yq/v4"].version')" "$(yq4 --version)" yq4
-  check_minor "$(echo "${req}" | jq -r '.["kubectl"].version')" "$(kubectl version -oyaml 2>/dev/null | yq4 '.clientVersion.gitVersion')" kubectl
+  check_minor "$(echo "${req}" | jq -r '.["github.com/mikefarah/yq/v4"].version')" "$(yq --version)" yq
+  check_minor "$(echo "${req}" | jq -r '.["kubectl"].version')" "$(kubectl version -oyaml 2>/dev/null | yq '.clientVersion.gitVersion')" kubectl
   check_minor "$(echo "${req}" | jq -r '.["helm.sh/helm/v3"].version')" "$(helm version --template='{{.Version}}')" helm
   check_minor "$(echo "${req}" | jq -r '.["github.com/helmfile/helmfile"].version')" "$(helmfile --version)" helmfile
   check_minor "$(echo "${req}" | jq -r '.["github.com/databus23/helm-diff/v3"].version')" "$(helm plugin list | grep diff)" "helm diff plugin"
@@ -165,7 +165,7 @@ check_tools() {
 # Usage: yq_merge <files...>
 yq_merge() {
   # shellcheck disable=SC2016
-  yq4 eval-all --prettyPrint 'explode(.) as $item ireduce ({}; . * $item )' "${@}"
+  yq eval-all --prettyPrint 'explode(.) as $item ireduce ({}; . * $item )' "${@}"
 }
 
 # Reads the path to a block from one file containing the value
@@ -174,16 +174,16 @@ yq_read_block() {
   source=$1
   value=$2
   # shellcheck disable=SC2140
-  yq4 ".. | select(tag != \"!!map\" and . == \"${value}\") | path | with(.[]; . = (\"\\\"\" + .) + \"\\\"\" ) | \".\" + join \".\"" "${source}" | sed -r 's/\."[0-9]+".*//' | sed -r 's/\\//g' | uniq
+  yq ".. | select(tag != \"!!map\" and . == \"${value}\") | path | with(.[]; . = (\"\\\"\" + .) + \"\\\"\" ) | \".\" + join \".\"" "${source}" | sed -r 's/\."[0-9]+".*//' | sed -r 's/\\//g' | uniq
 }
 
 # Copies a block from one file to another
 # Usage: yq_copy_block <source> <target> <key>
 yq_copy_block() {
-  prefix=$(yq4 -n ".$3 | path | reverse | .[] as \$i ireduce(\".\"; \"{\\\"\" + \$i + \"\\\":\" + . + \"}\")")
-  yq4 ".${3}" "${1}" -o json |
-    yq4 "${prefix}" |
-    yq4 eval-all 'select(fi == 0) * select(fi == 1)' -i "${2}" - --prettyPrint
+  prefix=$(yq -n ".$3 | path | reverse | .[] as \$i ireduce(\".\"; \"{\\\"\" + \$i + \"\\\":\" + . + \"}\")")
+  yq ".${3}" "${1}" -o json |
+    yq "${prefix}" |
+    yq eval-all 'select(fi == 0) * select(fi == 1)' -i "${2}" - --prettyPrint
 }
 
 # Usage: yq_copy_commons <source1> <source2> <target>
@@ -192,11 +192,11 @@ yq_copy_commons() {
   source2=$2
   target=$3
 
-  keys=$(yq_merge "${source1}" "${source2}" | yq4 '.. | select(tag != "!!map") | path | with(.[]; . = ("\"" + .) + "\"" ) | join "."' | sed -r 's/\."[0-9]+".*//' | sed -r 's/\\//g' | uniq)
+  keys=$(yq_merge "${source1}" "${source2}" | yq '.. | select(tag != "!!map") | path | with(.[]; . = ("\"" + .) + "\"" ) | join "."' | sed -r 's/\."[0-9]+".*//' | sed -r 's/\\//g' | uniq)
   for key in ${keys}; do
-    compare=$(diff <(yq4 -oj ".${key}" "${source1}") <(yq4 -oj ".${key}" "${source2}") || true)
+    compare=$(diff <(yq -oj ".${key}" "${source1}") <(yq -oj ".${key}" "${source2}") || true)
     if [[ -z "${compare}" ]]; then
-      value=$(yq4 ".${key}" "${source1}")
+      value=$(yq ".${key}" "${source1}")
       if [[ -z "${value}" ]]; then
         log_error "Unknown key to copy from: ${key}"
         exit 1
@@ -212,34 +212,34 @@ yq_copy_changes() {
   source2=$2
   target=$3
 
-  keys=$(yq4 '.. | select(tag != "!!map" or (keys|length)==0) | path | with(.[]; . = ("\"" + .) + "\"" ) | join "."' "$source2" | sed -r 's/\."[0-9]+".*//' | uniq)
+  keys=$(yq '.. | select(tag != "!!map" or (keys|length)==0) | path | with(.[]; . = ("\"" + .) + "\"" ) | join "."' "$source2" | sed -r 's/\."[0-9]+".*//' | uniq)
   for key in ${keys}; do
-    compare=$(diff <(yq4 -oj ".${key}" "${source1}") <(yq4 -oj ".${key}" "${source2}") || true)
+    compare=$(diff <(yq -oj ".${key}" "${source1}") <(yq -oj ".${key}" "${source2}") || true)
     if [[ -n "${compare}" ]]; then
-      if [[ -n "$(yq4 ".${key} | select(tag == \"\") | alias" "${source2}")" ]]; then
+      if [[ -n "$(yq ".${key} | select(tag == \"\") | alias" "${source2}")" ]]; then
         # Creating placeholder for alias
-        yq4 -i ".${key} = {}" "${target}"
+        yq -i ".${key} = {}" "${target}"
       else
         yq_copy_block "${source2}" "${target}" "${key}"
       fi
     fi
   done
 
-  anchors="$(yq4 '.. | select(anchor != "") | path | with(.[]; . = ("\"" + .) + "\"" ) | join "."' "${source2}")"
+  anchors="$(yq '.. | select(anchor != "") | path | with(.[]; . = ("\"" + .) + "\"" ) | join "."' "${source2}")"
   for anchor in ${anchors}; do
-    name="$(yq4 ".$anchor | anchor" "${source2}")"
+    name="$(yq ".$anchor | anchor" "${source2}")"
     # Protecting anchor from unwanted change
-    yq4 -i ".$anchor = (load(\"$source2\") | .$anchor)" "${target}"
+    yq -i ".$anchor = (load(\"$source2\") | .$anchor)" "${target}"
     # Putting anchor in place
-    yq4 -i ".$anchor anchor = \"$name\"" "${target}"
+    yq -i ".$anchor anchor = \"$name\"" "${target}"
   done
 
   # The alias function will return leaf values, but they don't have a tag so filter on those
-  aliases="$(yq4 '.. | select(tag == "") | alias | path | with(.[]; . = ("\"" + .) + "\"" ) | join "."' "${source2}")"
+  aliases="$(yq '.. | select(tag == "") | alias | path | with(.[]; . = ("\"" + .) + "\"" ) | join "."' "${source2}")"
   for alias in ${aliases}; do
-    name="$(yq4 ".$alias | alias" "${source2}")"
+    name="$(yq ".$alias | alias" "${source2}")"
     # Putting alias in place
-    yq4 -i ".$alias alias = \"$name\"" "${target}"
+    yq -i ".$alias alias = \"$name\"" "${target}"
   done
 }
 
@@ -252,7 +252,7 @@ yq_copy_values() {
 
   keys=$(yq_read_block "${source1}" "${value}")
   for key in ${keys}; do
-    compare=$(yq4 "${key}" "${source2}")
+    compare=$(yq "${key}" "${source2}")
     if [[ "${compare}" == "null" ]]; then
       yq_copy_block "${source1}" "${target}" "${key:1}"
     fi
@@ -328,7 +328,7 @@ validate_version() {
     echo log_error "Error: usage validate_version <wc|sc>"
     exit 1
   fi
-  ck8s_version=$(yq4 '.global.ck8sVersion' "${merged_config}")
+  ck8s_version=$(yq '.global.ck8sVersion' "${merged_config}")
   if [[ -z "$ck8s_version" ]]; then
     log_error "ERROR: No version set. Run init to generate config."
     exit 1
@@ -355,20 +355,20 @@ validate_config() {
     # Loop all lines in ${template_config} and checks if same option has conditional set-me in ${merged_config}
     options="$(yq_read_block "${template_config}" "set-me-if-*")"
     for opt in ${options}; do
-      opt_value="$(yq4 "${opt}" "${merged_config}")"
-      opt_value_no_list="$(yq4 "[.] | flatten | .[0]" <<<"${opt_value}")"
+      opt_value="$(yq "${opt}" "${merged_config}")"
+      opt_value_no_list="$(yq "[.] | flatten | .[0]" <<<"${opt_value}")"
 
       if [[ "${opt_value_no_list}" =~ ^set-me-if-.*$ ]]; then
         required_condition="$(sed -rn 's/^set-me-if-(.*)/\1/p' <<<"${opt_value_no_list}")"
-        if [[ "$(yq4 "${required_condition}" "${merged_config}")" == "true" ]]; then
+        if [[ "$(yq "${required_condition}" "${merged_config}")" == "true" ]]; then
           # If the option is a list, set the first element in the list
-          if [[ "$(yq4 "${opt} | tag" "${merged_config}")" == "!!seq" ]]; then
-            yq4 "${opt}[0] = \"set-me\"" -i "${merged_config}"
-            yq4 "${opt}[0] = \"set-me\"" -i "${template_config}"
+          if [[ "$(yq "${opt} | tag" "${merged_config}")" == "!!seq" ]]; then
+            yq "${opt}[0] = \"set-me\"" -i "${merged_config}"
+            yq "${opt}[0] = \"set-me\"" -i "${template_config}"
             log_info "Set-me condition matched for ${opt}"
           else
-            yq4 "${opt} = \"set-me\"" -i "${merged_config}"
-            yq4 "${opt} = \"set-me\"" -i "${template_config}"
+            yq "${opt} = \"set-me\"" -i "${merged_config}"
+            yq "${opt} = \"set-me\"" -i "${template_config}"
             log_info "Set-me condition matched for ${opt}"
           fi
         fi
@@ -383,7 +383,7 @@ validate_config() {
     # Loop all lines in ${template_config} and warns if same option is not available in ${merged_config}
     options=$(yq_read_block "${template_config}" "set-me")
     for opt in ${options}; do
-      compare=$(diff <(yq4 -oj "${opt}" "${template_config}") <(yq4 -oj "${opt}" "${merged_config}") || true)
+      compare=$(diff <(yq -oj "${opt}" "${template_config}") <(yq -oj "${opt}" "${merged_config}") || true)
       if [[ -z "${compare}" ]]; then
         log_warning "WARN: ${opt} is not set in config"
         maybe_exit="true"
@@ -406,7 +406,7 @@ validate_config() {
           while read -r jpath; do
             if [[ $jpath != "(root)" ]]; then
               echo -n ".$jpath = "
-              yq4 -oj ".$jpath" "${merged_config}"
+              yq -oj ".$jpath" "${merged_config}"
             fi
           done
       fi
@@ -457,7 +457,7 @@ validate_sops_config() {
     exit 1
   fi
 
-  rule_count=$(yq4 '.creation_rules | length' "${sops_config}")
+  rule_count=$(yq '.creation_rules | length' "${sops_config}")
   if [ "${rule_count}" -eq 0 ]; then
     log_error "ERROR: SOPS config contains no creation rules."
     exit 1
@@ -465,17 +465,17 @@ validate_sops_config() {
 
   # Compares the keyring with the sops config to see if the config has anything the keyring does not have.
   keyring=$(gpg --with-colons --list-keys | awk -F: '/^pub:.*/ { getline; print $10 }')
-  creation_pgp=$(yq4 '[.creation_rules[].pgp // "" | split(",") | .[]] | unique | .[]' "${sops_config}")
+  creation_pgp=$(yq '[.creation_rules[].pgp // "" | split(",") | .[]] | unique | .[]' "${sops_config}")
   # Pass keyring fingerprints twice to ensure other keys will not be flagged
   fingerprints=$(tr ' ' '\n' <<<"${keyring} ${keyring} ${creation_pgp}" | sort | uniq -u)
 
   # Find rules ending with trailing comma
-  comma_search=$(yq4 '.creation_rules[] | select(.pgp == "*,")' "${sops_config}")
+  comma_search=$(yq '.creation_rules[] | select(.pgp == "*,")' "${sops_config}")
 
   if [ -n "${fingerprints// /}" ] || [ "${comma_search: -1}" == "," ]; then
     log_error "ERROR: SOPS config contains no or invalid PGP keys."
     log_error "SOPS config: ${sops_config}:"
-    yq4 'split(" ") | {"missing or invalid fingerprints": .}' <<<"${fingerprints}" | cat
+    yq 'split(" ") | {"missing or invalid fingerprints": .}' <<<"${fingerprints}" | cat
     log_error "Fingerprints must be uppercase and separated by commas."
     log_error "Recreate or edit the SOPS config to fix the issue"
     exit 1
@@ -524,7 +524,7 @@ sops_check() {
 
 # Write PGP fingerprints to SOPS config
 sops_config_write_fingerprints() {
-  yq4 -n ".creation_rules[0].pgp = \"${1}\"" >"${sops_config}" ||
+  yq -n ".creation_rules[0].pgp = \"${1}\"" >"${sops_config}" ||
     (log_error "ERROR: Failed to write fingerprints" && rm "${sops_config}" && exit 1)
 }
 

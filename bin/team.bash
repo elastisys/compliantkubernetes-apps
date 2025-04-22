@@ -20,7 +20,7 @@ join_by() {
 
 # Load fingerprints from the SOPS config file into `split_fingerprints`.
 sops_load_fingerprints() {
-  fingerprints=$(yq4 'select(documentIndex == 0) | .creation_rules[0].pgp' <"$sops_config")
+  fingerprints=$(yq 'select(documentIndex == 0) | .creation_rules[0].pgp' <"$sops_config")
   IFS=',' read -r -a split_fingerprints <<<"${fingerprints}"
 }
 

@@ -17,22 +17,22 @@ log_error() {
   echo -e "[\e[31mck8s\e[0m] ${*}" 1>&2
 }
 
-common_default=$(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
+common_default=$(yq -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")
 # shellcheck disable=SC2016
-common_config=$(echo "${common_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/common-config.yaml") | yq4 '{"objectStorage":.}' -)
+common_config=$(echo "${common_default}" | yq eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/common-config.yaml") | yq '{"objectStorage":.}' -)
 
 # shellcheck disable=SC2016
-sc_default=$(echo "${common_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml"))
+sc_default=$(echo "${common_default}" | yq eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml"))
 # shellcheck disable=SC2016
-sc_config=$(echo "${sc_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/common-config.yaml") <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/sc-config.yaml") | yq4 '{"objectStorage":.}' -)
+sc_config=$(echo "${sc_default}" | yq eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/common-config.yaml") <(yq -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/sc-config.yaml") | yq '{"objectStorage":.}' -)
 
 # shellcheck disable=SC2016
-wc_default=$(echo "${common_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/defaults/wc-config.yaml"))
+wc_default=$(echo "${common_default}" | yq eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/defaults/wc-config.yaml"))
 # shellcheck disable=SC2016
-wc_config=$(echo "${wc_default}" | yq4 eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/common-config.yaml") <(yq4 -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/wc-config.yaml") | yq4 '{"objectStorage":.}' -)
+wc_config=$(echo "${wc_default}" | yq eval-all --prettyPrint '. as $item ireduce ({}; . * $item )' - <(yq -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/common-config.yaml") <(yq -o j '.objectStorage // {}' "${CK8S_CONFIG_PATH}/wc-config.yaml") | yq '{"objectStorage":.}' -)
 
-objectstorage_type_sc=$(echo "${sc_config}" | yq4 '.objectStorage.type' -)
-objectstorage_type_wc=$(echo "${wc_config}" | yq4 '.objectStorage.type' -)
+objectstorage_type_sc=$(echo "${sc_config}" | yq '.objectStorage.type' -)
+objectstorage_type_wc=$(echo "${wc_config}" | yq '.objectStorage.type' -)
 
 [ "$objectstorage_type_sc" != "azure" ] && log_info "Azure Storage is not enabled in service cluster"
 [ "$objectstorage_type_wc" != "azure" ] && log_info "Azure Storage is not enabled in workload cluster"
@@ -42,11 +42,11 @@ if [ "$objectstorage_type_sc" != "azure" ] && [ "$objectstorage_type_wc" != "azu
   exit 1
 fi
 
-[ "$objectstorage_type_sc" = "azure" ] && buckets_sc=$(echo "${sc_config}" | yq4 '.objectStorage.buckets.*' -)
-[ "$objectstorage_type_wc" = "azure" ] && buckets_wc=$(echo "${wc_config}" | yq4 '.objectStorage.buckets.*' -)
+[ "$objectstorage_type_sc" = "azure" ] && buckets_sc=$(echo "${sc_config}" | yq '.objectStorage.buckets.*' -)
+[ "$objectstorage_type_wc" = "azure" ] && buckets_wc=$(echo "${wc_config}" | yq '.objectStorage.buckets.*' -)
 
-RESOURCE_GROUP=$(echo "${common_config}" | yq4 '.objectStorage.azure.resourceGroup')
-STORAGE_ACCOUNT=$(echo "${common_config}" | yq4 '.objectStorage.azure.storageAccountName')
+RESOURCE_GROUP=$(echo "${common_config}" | yq '.objectStorage.azure.resourceGroup')
+STORAGE_ACCOUNT=$(echo "${common_config}" | yq '.objectStorage.azure.storageAccountName')
 CONTAINERS=$({
   echo "${buckets_sc:-}"
   echo "${buckets_wc:-}"
@@ -155,7 +155,7 @@ function delete_all() {
 }
 
 function list_harbor_backups() {
-  CONTAINER=$(echo "${sc_config}" | yq4 '.objectStorage.buckets.harbor')
+  CONTAINER=$(echo "${sc_config}" | yq '.objectStorage.buckets.harbor')
   az storage blob list --account-name "${STORAGE_ACCOUNT}" --container-name "${CONTAINER}" --prefix "backups" -o table
 }
 

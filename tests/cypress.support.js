@@ -17,7 +17,7 @@ Cypress.Commands.add("yq", function(cluster, expression) {
     cy.fail("yq: expression argument is missing")
   }
 
-  cy.exec(`yq4 ea 'explode(.) as $item ireduce ({}; . * $item) | ${expression} | ...comments=""' ${configFiles}`)
+  cy.exec(`yq ea 'explode(.) as $item ireduce ({}; . * $item) | ${expression} | ...comments=""' ${configFiles}`)
     .then(result => {
       if (result.stderr !== "") {
         cy.fail(`yq: error in exec: ${result.stderr}`)
@@ -46,7 +46,7 @@ Cypress.Commands.add("yqDig", function(cluster, expression) {
     cy.fail("yq: expression argument is missing")
   }
 
-  cy.exec(`yq4 ea 'explode(.) | ${expression} | select(. != null) | {"wrapper": .} as $item ireduce ({}; . *$item) | .wrapper | ... comments=""' ${configFiles}`)
+  cy.exec(`yq ea 'explode(.) | ${expression} | select(. != null) | {"wrapper": .} as $item ireduce ({}; . *$item) | .wrapper | ... comments=""' ${configFiles}`)
     .then(result => {
       if (result.stderr !== "") {
         cy.fail(`yq: error in exec: ${result.stderr}`)
@@ -72,12 +72,12 @@ Cypress.Commands.add("yqDigParse", function(cluster, expression) {
   }
 
   if (cluster === "sc") {
-    cy.exec(`yq4 -oj ea 'explode(.) | ${expression} | select(. != null) | {"wrapper": .} as $item ireduce ({}; . *$item) | .wrapper | ... comments=""' ${configPath}/defaults/common-config.yaml ${configPath}/defaults/sc-config.yaml ${configPath}/common-config.yaml ${configPath}/sc-config.yaml`)
+    cy.exec(`yq -oj ea 'explode(.) | ${expression} | select(. != null) | {"wrapper": .} as $item ireduce ({}; . *$item) | .wrapper | ... comments=""' ${configPath}/defaults/common-config.yaml ${configPath}/defaults/sc-config.yaml ${configPath}/common-config.yaml ${configPath}/sc-config.yaml`)
       .its("stdout")
       .then(JSON.parse)
 
   } else if (cluster === "wc") {
-    cy.exec(`yq4 -oj ea 'explode(.) | ${expression} | select(. != null) | {"wrapper": .} as $item ireduce ({}; . *$item) | .wrapper | ... comments=""' ${configPath}/defaults/common-config.yaml ${configPath}/defaults/wc-config.yaml ${configPath}/common-config.yaml ${configPath}/wc-config.yaml`)
+    cy.exec(`yq -oj ea 'explode(.) | ${expression} | select(. != null) | {"wrapper": .} as $item ireduce ({}; . *$item) | .wrapper | ... comments=""' ${configPath}/defaults/common-config.yaml ${configPath}/defaults/wc-config.yaml ${configPath}/common-config.yaml ${configPath}/wc-config.yaml`)
       .its("stdout")
       .then(JSON.parse)
 
@@ -97,7 +97,7 @@ Cypress.Commands.add("yqSecrets", function(expression) {
     cy.fail("yqSecrets: expression argument is missing")
   }
 
-  cy.exec(`sops -d ${configPath}/secrets.yaml | yq4 e '${expression} | ... comments=""'`)
+  cy.exec(`sops -d ${configPath}/secrets.yaml | yq e '${expression} | ... comments=""'`)
     .then(result => {
       if (result.stderr !== "") {
         cy.fail(`yq: error in exec: ${result.stderr}`)

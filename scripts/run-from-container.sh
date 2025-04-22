@@ -44,11 +44,16 @@ log.continue() {
   fi
 }
 
+# conditionally run yq4 or yq depending on how it is installed
 yq() {
   if command -v yq4 >/dev/null; then
     command yq4 "${@}"
   else
-    command yq "${@}"
+    if ! command yq -V | grep --extended-regexp "v4\." >/dev/null 2>&1; then
+      log.error "expecting the yq binary to be at least version v4"
+    else
+      command yq "${@}"
+    fi
   fi
 }
 

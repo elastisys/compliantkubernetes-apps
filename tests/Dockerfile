@@ -77,7 +77,7 @@ RUN curl -LOs "https://github.com/neilpa/yajsv/releases/download/v${YAJSV_VERSIO
 
 ARG YQ_VERSION="4.45.1"
 RUN curl -LOs "https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64" && \
-    install -Tm 755 yq_linux_amd64 /usr/local/bin/yq4 && \
+    install -Tm 755 yq_linux_amd64 /usr/local/bin/yq && \
     rm yq_linux_amd64
 
 # Currently all from main as most do not have current releases

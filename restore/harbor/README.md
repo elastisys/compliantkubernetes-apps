@@ -37,8 +37,8 @@ export SPECIFIC_BACKUP=<backups/xxxxxxxxxx.sql.gz> # Optional
 Setup the necessary job.yaml and configmap:
 
 ```bash
-export S3_BUCKET=$(yq4 '.objectStorage.buckets.harbor' "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml" )
-export S3_REGION_ENDPOINT=$(yq4 '.objectStorage.s3.regionEndpoint' "${CK8S_CONFIG_PATH}/common-config.yaml")
+export S3_BUCKET=$(yq '.objectStorage.buckets.harbor' "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml" )
+export S3_REGION_ENDPOINT=$(yq '.objectStorage.s3.regionEndpoint' "${CK8S_CONFIG_PATH}/common-config.yaml")
 envsubst > tmp-job.yaml < restore/harbor/restore-harbor-job.yaml
 ./bin/ck8s ops kubectl sc create configmap -n harbor restore-harbor --from-file=restore/harbor/restore-harbor.sh
 ```
@@ -53,8 +53,8 @@ But it is not the same for other object storage types, so if the data was copied
 The following steps will create a rclone job that will move all of the harbor image data to the correct path with an extra `/`.
 
 ```bash
-export S3_BUCKET=$(yq4 '.objectStorage.buckets.harbor' "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml" )
-export AZURE_ACCOUNT=$(yq4 '.objectStorage.azure.storageAccountName' "${CK8S_CONFIG_PATH}/common-config.yaml" )
+export S3_BUCKET=$(yq '.objectStorage.buckets.harbor' "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml" )
+export AZURE_ACCOUNT=$(yq '.objectStorage.azure.storageAccountName' "${CK8S_CONFIG_PATH}/common-config.yaml" )
 export AZURE_KEY=$(sops -d --extract '["objectStorage"]["azure"]["storageAccountKey"]' "${CK8S_CONFIG_PATH}/secrets.yaml" )
 envsubst > tmp-rclone-job.yaml < restore/harbor/harbor-rclone-azure.yaml
 ./bin/ck8s ops kubectl sc apply -f tmp-rclone-job.yaml

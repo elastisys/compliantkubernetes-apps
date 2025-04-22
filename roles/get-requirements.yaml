@@ -18,7 +18,7 @@
     sops_version: "{{ requirements['getsops/sops/v3'].version | regex_replace('^v', '') }}"
     velero_version: "{{ requirements['github.com/vmware-tanzu/velero'].version }}"
     yajsv_version: "{{ requirements['github.com/neilpa/yajsv'].version | regex_replace('^v', '') }}"
-    yq4_version: "{{ requirements['github.com/mikefarah/yq/v4'].version | regex_replace('^v', '') }}"
+    yq_version: "{{ requirements['github.com/mikefarah/yq/v4'].version | regex_replace('^v', '') }}"
     apt_list:
       - curl={{ curl_version }}
       - s3cmd={{ s3cmd_version }}
@@ -34,10 +34,10 @@
         version: "{{ sops_version }}"
         url: https://github.com/getsops/sops/releases/download/v{{ sops_version }}/sops-v{{ sops_version }}.linux.amd64
         dest: "{{ install_path }}/sops"
-      - command: yq4
-        version: "{{ yq4_version }}"
-        url: https://github.com/mikefarah/yq/releases/download/v{{ yq4_version }}/yq_linux_amd64
-        dest: "{{ install_path }}/yq4"
+      - command: yq
+        version: "{{ yq_version }}"
+        url: https://github.com/mikefarah/yq/releases/download/v{{ yq_version }}/yq_linux_amd64
+        dest: "{{ install_path }}/yq"
       - command: yajsv
         version: "{{ yajsv_version }}"
         url: https://github.com/neilpa/yajsv/releases/download/v{{ yajsv_version }}/yajsv.linux.amd64

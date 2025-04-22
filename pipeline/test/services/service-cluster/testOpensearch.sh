@@ -6,9 +6,9 @@ INNER_SCRIPTS_PATH="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 source "${INNER_SCRIPTS_PATH}/../funcs.sh"
 
 pushd "${CK8S_CONFIG_PATH}" || exit
-adminPassword=$(sops -d secrets.yaml | yq4 '.opensearch.adminPassword')
-fluentdPassword=$(sops -d secrets.yaml | yq4 '.opensearch.fluentdPassword')
-opsDomain=$(yq4 '.global.opsDomain' common-config.yaml)
+adminPassword=$(sops -d secrets.yaml | yq '.opensearch.adminPassword')
+fluentdPassword=$(sops -d secrets.yaml | yq '.opensearch.fluentdPassword')
+opsDomain=$(yq '.global.opsDomain' common-config.yaml)
 popd || exit
 
 function opensearch_check_help() {
@@ -98,7 +98,7 @@ check_opensearch_snapshots_status() {
   echo -ne "Checking opensearch snapshots status ... "
   no_error=true
   debug_msg=""
-  repo_name=$(yq4 -e '.opensearch.snapshot.repository' "${config['config_file_sc']}")
+  repo_name=$(yq -e '.opensearch.snapshot.repository' "${config['config_file_sc']}")
   repo_exists_status=$(curl -sk -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_snapshot/${repo_name}" | jq "select(.error)")
   if [[ -z "$repo_exists_status" ]]; then
     snapshots=$(curl -sk -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_cat/snapshots/${repo_name}")
@@ -284,13 +284,13 @@ check_opensearch_user_roles() {
   no_error=true
   debug_msg=""
 
-  readarray configuredMappings < <(yq4 e -o=j -I=0 '.opensearch.extraRoleMappings[]' "${config['config_file_sc']}")
+  readarray configuredMappings < <(yq e -o=j -I=0 '.opensearch.extraRoleMappings[]' "${config['config_file_sc']}")
 
   rolesmapping=$(curl -sk -u admin:"${adminPassword}" -X GET "https://opensearch.${opsDomain}/_plugins/_security/api/rolesmapping")
 
   for roleMapping in "${configuredMappings[@]}"; do
-    configured_mapping_name=$(echo "$roleMapping" | yq4 e '.mapping_name' -)
-    configured_users=$(echo "$roleMapping" | yq4 e '.definition.users[]' -)
+    configured_mapping_name=$(echo "$roleMapping" | yq e '.mapping_name' -)
+    configured_users=$(echo "$roleMapping" | yq e '.definition.users[]' -)
     res=$(echo "$rolesmapping" | jq ".\"$configured_mapping_name\"")
     if [[ $res != "null" ]]; then
       users=$(echo "$rolesmapping" | jq -r ".\"$configured_mapping_name\".users[]")
@@ -318,7 +318,7 @@ check_opensearch_ism() {
   no_error=true
   debug_msg=""
 
-  default_policies_enabled=$(yq4 -e '.opensearch.ism.defaultPolicies' "${config['config_file_sc']}")
+  default_policies_enabled=$(yq -e '.opensearch.ism.defaultPolicies' "${config['config_file_sc']}")
   if [[ $default_policies_enabled == "true" ]]; then
     default_policies=("kubernetes" "kubeaudit" "authlog" "other")
     for policy in "${default_policies[@]}"; do
@@ -330,7 +330,7 @@ check_opensearch_ism() {
     done
   fi
 
-  readarray -t additional_policies < <(yq4 e -o=j -I=0 '.opensearch.ism.additionalPolicies | keys' "${config['config_file_sc']}")
+  readarray -t additional_policies < <(yq e -o=j -I=0 '.opensearch.ism.additionalPolicies | keys' "${config['config_file_sc']}")
 
   additional_policies=("${additional_policies//,/ }")
   additional_policies=("${additional_policies##[}")
@@ -350,7 +350,7 @@ check_opensearch_ism() {
   read -ra write_indices <<<"$write_indices_data"
   for write_index in "${write_indices[@]}"; do
 
-    rollover_age_days=$(yq4 -e '.opensearch.ism.rolloverAgeDays' "${config['config_file_sc']}")
+    rollover_age_days=$(yq -e '.opensearch.ism.rolloverAgeDays' "${config['config_file_sc']}")
     ((rollover_limit = rollover_age_days * 86400000))
 
     epoch_now=$(date +%s%3N)
@@ -384,7 +384,7 @@ check_object_store_access() {
   EX_OK=0
   EX_ACCESSDENIED=77
   EX_CONFIG=78
-  snapshot_bucket=$(yq4 -e '.objectStorage.buckets.opensearch' "${config['config_file_sc']}")
+  snapshot_bucket=$(yq -e '.objectStorage.buckets.opensearch' "${config['config_file_sc']}")
 
   if [ ! -f "${CK8S_CONFIG_PATH}/.state/s3cfg.ini" ]; then
     no_error=false

@@ -16,7 +16,7 @@ grafana_logs() {
 @test "grafana admin can discover dashboards" {
   with_kubeconfig "sc"
 
-  readarray -t dashboards < <(helmfile -e service_cluster -f "${ROOT}/helmfile.d" -l name=grafana-dashboards template | yq4 -N 'select(.kind == "ConfigMap") | .data | keys | .[]')
+  readarray -t dashboards < <(helmfile -e service_cluster -f "${ROOT}/helmfile.d" -l name=grafana-dashboards template | yq -N 'select(.kind == "ConfigMap") | .data | keys | .[]')
 
   run grafana_sc_dashboard_logs ops-grafana
 
@@ -36,7 +36,7 @@ grafana_logs() {
 @test "grafana dev can discover dashboards" {
   with_kubeconfig "sc"
 
-  readarray -t dashboards < <(helmfile -e service_cluster -f "${ROOT}/helmfile.d" -l name=grafana-dashboards template | yq4 -N 'select(.kind == "ConfigMap" and .metadata.labels.grafana_dashboard == "1") | .data | keys | .[]')
+  readarray -t dashboards < <(helmfile -e service_cluster -f "${ROOT}/helmfile.d" -l name=grafana-dashboards template | yq -N 'select(.kind == "ConfigMap" and .metadata.labels.grafana_dashboard == "1") | .data | keys | .[]')
 
   run grafana_sc_dashboard_logs user-grafana
 

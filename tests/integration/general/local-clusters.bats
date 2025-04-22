@@ -24,7 +24,7 @@ teardown_file() {
 }
 
 helm_status() {
-  helm -n "${1}" status "${2}" -oyaml | yq4 '.info.status'
+  helm -n "${1}" status "${2}" -oyaml | yq '.info.status'
 }
 
 @test "local cluster has created kubeconfig" {

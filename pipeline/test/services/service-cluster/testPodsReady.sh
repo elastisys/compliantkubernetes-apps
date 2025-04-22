@@ -4,23 +4,23 @@ INNER_SCRIPTS_PATH="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 # shellcheck source=pipeline/test/services/funcs.sh
 source "${INNER_SCRIPTS_PATH}/../funcs.sh"
 
-enable_harbor=$(yq4 -e '.harbor.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_harbor_backup=$(yq4 -e '.harbor.backup.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_user_grafana=$(yq4 -e '.grafana.user.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_fluentd=$(yq4 -e '.fluentd.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_fluentd_audit=$(yq4 -e '.fluentd.audit.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_fluentd_logs=$(yq4 -e '.fluentd.scLogs.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_opensearch_snapshot=$(yq4 -e '.opensearch.snapshot.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_velero=$(yq4 -e '.velero.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_os_data_sts=$(yq4 -e '.opensearch.dataNode.dedicatedPods' "${CONFIG_FILE}" 2>/dev/null)
-enable_os_client_sts=$(yq4 -e '.opensearch.clientNode.dedicatedPods' "${CONFIG_FILE}" 2>/dev/null)
-enable_thanos=$(yq4 -e '.thanos.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_thanos_query=$(yq4 -e '.thanos.query.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_thanos_receiver=$(yq4 -e '.thanos.receiver.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_thanos_ruler=$(yq4 -e '.thanos.ruler.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_kured=$(yq4 -e '.kured.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_falco_alerts=$(yq4 -e '.falco.alerts.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_falco=$(yq4 -e '.falco.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_harbor=$(yq -e '.harbor.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_harbor_backup=$(yq -e '.harbor.backup.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_user_grafana=$(yq -e '.grafana.user.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_fluentd=$(yq -e '.fluentd.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_fluentd_audit=$(yq -e '.fluentd.audit.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_fluentd_logs=$(yq -e '.fluentd.scLogs.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_opensearch_snapshot=$(yq -e '.opensearch.snapshot.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_velero=$(yq -e '.velero.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_os_data_sts=$(yq -e '.opensearch.dataNode.dedicatedPods' "${CONFIG_FILE}" 2>/dev/null)
+enable_os_client_sts=$(yq -e '.opensearch.clientNode.dedicatedPods' "${CONFIG_FILE}" 2>/dev/null)
+enable_thanos=$(yq -e '.thanos.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_thanos_query=$(yq -e '.thanos.query.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_thanos_receiver=$(yq -e '.thanos.receiver.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_thanos_ruler=$(yq -e '.thanos.ruler.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_kured=$(yq -e '.kured.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_falco_alerts=$(yq -e '.falco.alerts.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_falco=$(yq -e '.falco.enabled' "${CONFIG_FILE}" 2>/dev/null)
 
 echo
 echo
@@ -201,8 +201,8 @@ if "${enable_opensearch_snapshot}"; then
   )
 fi
 if "${enable_fluentd_audit}"; then
-  cluster_name="$(yq4 '.global.clusterName' "${CONFIG_FILE}" 2>/dev/null)"
-  mapfile -t clusters_monitoring < <(yq4 '.global.clustersMonitoring[]' "${CONFIG_FILE}" 2>/dev/null)
+  cluster_name="$(yq '.global.clusterName' "${CONFIG_FILE}" 2>/dev/null)"
+  mapfile -t clusters_monitoring < <(yq '.global.clustersMonitoring[]' "${CONFIG_FILE}" 2>/dev/null)
 
   cronjobs+=(
     "fluentd-system audit-$cluster_name-compaction"
