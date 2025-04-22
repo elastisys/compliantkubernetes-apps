@@ -251,7 +251,7 @@ _get_container_images_from_template() {
   elif [[ "${type}" == "job" ]]; then
     query="select(.kind == \"Job\" and ${chart_query}) | .spec.template.spec.containers[] | .image"
   elif [[ "${type}" == "statefulset" ]]; then
-    query="select(.kind == \"StateFulset\" and ${chart_query}) | .spec.template.spec.containers[] | .image"
+    query="select(.kind == \"StatefulSet\" and ${chart_query}) | .spec.template.spec.containers[] | .image"
   elif [[ "${type}" == "alertmanager" ]]; then
     query="select(.kind == \"Alertmanager\" and ${chart_query}) | .spec.image"
   fi
