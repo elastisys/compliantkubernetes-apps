@@ -235,36 +235,38 @@ _get_licenses() {
 }
 
 _get_container_images_helmfile_template() {
-  local sbom_file chart_name release_name release_namespace type
+  local sbom_file helmfile_template_file chart_name release_name type
   sbom_file="${1}"
-  chart_name="${2}"
-  release_name="${3}"
-  release_namespace="${4}"
+  helmfile_template_file="${2}"
+  chart_name="${3}"
+  log_info "${chart_name}"
+  release_name="${4}"
   type="${5}"
 
   local sbom_file
-  if [[ "$#" -ne 5 ]]; then
-    log_fatal "usage: _get_container_images_helmfile_template <sbom-file> <chart_name> <release_name> <release_namespace> <type>"
+  if [[ "$#" -ne 4 ]]; then
+    log_fatal "usage: _get_container_images_helmfile_template <sbom-file> <helmfile-template-file> <chart_name> <release_name> <type>"
   fi
 
+  chart_query=".metadata.labels.\"helm.sh/chart\" | contains(\"${chart_name}\")"
+
   if [[ "${type}" == "pod" ]]; then
-    query='select(.kind == "Pod") | .spec.containers[] | .image'
+    query="select(.kind == \"Pod\" and ${chart_query}) | .spec.containers[] | .image"
   elif [[ "${type}" == "cronjob" ]]; then
-    query='select(.kind == "CronJob") | .spec.jobTemplate.spec.template.spec.containers[] | .image'
+    query="select(.kind == \"CronJob\" and ${chart_query})) | .spec.jobTemplate.spec.template.spec.containers[] | .image"
   elif [[ "${type}" == "daemonset" ]]; then
-    query='select(.kind == "DaemonSet") | .spec.template.spec.containers[] | .image'
+    query="select(.kind == \"DaemonSet\" and ${chart_query})) | .spec.template.spec.containers[] | .image"
   elif [[ "${type}" == "deployment" ]]; then
-    query='select(.kind == "Deployment") | .spec.template.spec.containers[] | .image'
+    query="select(.kind == \"Deployment\" and ${chart_query})) | .spec.template.spec.containers[] | .image"
   elif [[ "${type}" == "job" ]]; then
-    query='select(.kind == "Job") | .spec.template.spec.containers[] | .image'
+    query="select(.kind == \"Job\" and ${chart_query})) | .spec.template.spec.containers[] | .image"
   elif [[ "${type}" == "statefulset" ]]; then
-    query='select(.kind == "StateFulset") | .spec.template.spec.containers[] | .image'
+    query="select(.kind == \"StateFulset\" and ${chart_query})) | .spec.template.spec.containers[] | .image"
   fi
 
   export CK8S_SKIP_VALIDATION=true
   export CK8S_AUTO_APPROVE=true
-  mapfile -t containers < <("${HERE}/ops.bash" helmfile sc -l app=fluentd template | \
-    yq4 "${query}" | sed '/---/d' | sort -u)
+  mapfile -t containers < <(yq4 "${query}" "${helmfile_template_file}" | sed '/---/d' | sort -u)
 
   if [[ ${#containers[@]} -eq 0 ]]; then
     # Although these contains e.g. prometheus-node-exporter which we run but through kube-prometheus-stack
@@ -278,33 +280,33 @@ _get_container_images_helmfile_template() {
 }
 
 
-_get_pods_container_images() {
-  local sbom_file chart_name release_name release_namespace
-  sbom_file="${1}"
-  chart_name="${2}"
-  release_name="${3}"
-  release_namespace="${4}"
+# _get_pods_container_images() {
+#   local sbom_file chart_name release_name release_namespace
+#   sbom_file="${1}"
+#   chart_name="${2}"
+#   release_name="${3}"
+#   release_namespace="${4}"
 
-  local sbom_file
-  if [[ "$#" -ne 4 ]]; then
-    log_fatal "usage: _get_pods_container_images <sbom-file> <chart_name> <release_name> <release_namespace>"
-  fi
+#   local sbom_file
+#   if [[ "$#" -ne 4 ]]; then
+#     log_fatal "usage: _get_pods_container_images <sbom-file> <chart_name> <release_name> <release_namespace>"
+#   fi
 
-  mapfile -t containers < <("${HERE}/ops.bash" kubectl sc get pods \
-    --selector app.kubernetes.io/instance="${release_name}" \
-    --namespace "${release_namespace}" \
-    -oyaml | yq4 '.items[] | .spec.containers[] | .image' | sort -u)
+#   mapfile -t containers < <("${HERE}/ops.bash" kubectl sc get pods \
+#     --selector app.kubernetes.io/instance="${release_name}" \
+#     --namespace "${release_namespace}" \
+#     -oyaml | yq4 '.items[] | .spec.containers[] | .image' | sort -u)
 
-  if [[ ${#containers[@]} -eq 0 ]]; then
-    # Although these contains e.g. prometheus-node-exporter which we run but through kube-prometheus-stack
-    # Maybe add a check for sub-charts that are part of umbrella charts?
-    return
-  fi
+#   if [[ ${#containers[@]} -eq 0 ]]; then
+#     # Although these contains e.g. prometheus-node-exporter which we run but through kube-prometheus-stack
+#     # Maybe add a check for sub-charts that are part of umbrella charts?
+#     return
+#   fi
 
-  for container in "${containers[@]}"; do
-    _yq_add_component_json "${sbom_file}" "${chart_name}" "properties" "$(_format_container_image_object "${container}")"
-  done
-}
+#   for container in "${containers[@]}"; do
+#     _yq_add_component_json "${sbom_file}" "${chart_name}" "properties" "$(_format_container_image_object "${container}")"
+#   done
+# }
 
 _get_container_images() {
   local sbom_file
@@ -316,6 +318,9 @@ _get_container_images() {
   if [[ ! -f "${sbom_file}" ]]; then
     log_fatal "SBOM file ${sbom_file} does not exist"
   fi
+
+  helmfile_template_file=$(mktemp --suffix helmfile_template_file)
+
   log_info "Getting container images"
 
   mapfile -t charts < <(find "${HELMFILE_FOLDER}" -name "Chart.yaml")
@@ -323,6 +328,8 @@ _get_container_images() {
   # TODO:
   # - what about wc? this should list all charts in both wc/sc, but should only those enabled/installed=true be checked?
   helmfile_list=$("${HERE}/ops.bash" helmfile sc list --output json)
+  "${HERE}/ops.bash" helmfile sc template 2> /dev/null > "${helmfile_template_file}"
+  "${HERE}/ops.bash" helmfile wc template 2> /dev/null >> "${helmfile_template_file}"
 
   for chart in "${charts[@]}"; do
     chart_name=$(yq4 ".name" "${chart}")
@@ -339,18 +346,12 @@ _get_container_images() {
 
     for release in "${releases[@]}"; do
       release_name=$(echo "${release}" | jq -r ".name")
-      # TODO: what if a chart deploys pods in different namespace then release?
-      release_namespace=$(echo "${release}" | jq -r ".namespace")
-      # TODO: pods created by operators e.g. scan-vulnerability job?
-      # TODO: jobs/cronjobs
-      # TODO: what about things disabled by default, e.g. Kured?
-      # use helmfile template instead of checking live cluster?
-      _get_container_images_helmfile_template "${sbom_file}" "${chart_name}" "${release_name}" "${release_namespace}" "cronjob"
-      _get_container_images_helmfile_template "${sbom_file}" "${chart_name}" "${release_name}" "${release_namespace}" "pod"
-      _get_container_images_helmfile_template "${sbom_file}" "${chart_name}" "${release_name}" "${release_namespace}" "deployment"
-      _get_container_images_helmfile_template "${sbom_file}" "${chart_name}" "${release_name}" "${release_namespace}" "job"
-      _get_container_images_helmfile_template "${sbom_file}" "${chart_name}" "${release_name}" "${release_namespace}" "daemonset"
-      _get_container_images_helmfile_template "${sbom_file}" "${chart_name}" "${release_name}" "${release_namespace}" "statefulset"
+      _get_container_images_helmfile_template "${sbom_file}" "${helmfile_template_file}" "${chart_name}" "${release_name}" "cronjob"
+      _get_container_images_helmfile_template "${sbom_file}" "${helmfile_template_file}" "${chart_name}" "${release_name}" "pod"
+      _get_container_images_helmfile_template "${sbom_file}" "${helmfile_template_file}" "${chart_name}" "${release_name}" "deployment"
+      _get_container_images_helmfile_template "${sbom_file}" "${helmfile_template_file}" "${chart_name}" "${release_name}" "job"
+      _get_container_images_helmfile_template "${sbom_file}" "${helmfile_template_file}" "${chart_name}" "${release_name}" "daemonset"
+      _get_container_images_helmfile_template "${sbom_file}" "${helmfile_template_file}" "${chart_name}" "${release_name}" "statefulset"
     done
 
     # TODO: mapping chart names to release names?
