@@ -5,14 +5,10 @@
 # - update sbom version per Welkin release
 # - save manual overrides between runs (currently, and set-me's overrides are removed when running generate)
 # - include images for all configurations? (e.g. different cloud providers can have unique images/charts)
-
+#   - maybe, instead of using an existing environment, generate could create a new CK8S_CONFIG_PATH
 set -euo pipefail
 
 : "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
-# TODO: figure out a different approach for retrieving licenses, or handle GITHUB_TOKEN better
-: "${GITHUB_TOKEN:?Missing GITHUB_TOKEN}"
-
-export CK8S_SKIP_VALIDATION="true"
 
 HERE="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 ROOT="$(dirname "${HERE}")"
@@ -241,7 +237,7 @@ _get_container_images_helmfile_template() {
 
   # TODO: .metadata.labels.release label capture subcharts e.g. node-exporter for kube-prometheus-stack, and will save images under that release
   # although the sbom contains the subcharts, which currently does not get any containers set. Would be nice to improve this
-  chart_query="(.metadata.labels.\"helm.sh/chart\" | contains(\"${chart_name}\")) or (.metadata.labels.release | contains(\"${chart_name}\"))"
+  chart_query="((.metadata.labels.\"helm.sh/chart\" | contains(\"${chart_name}\")) or (.metadata.labels.release == \"${chart_name}\"))"
 
   if [[ "${type}" == "pod" ]]; then
     query="select(.kind == \"Pod\" and ${chart_query}) | .spec.containers[] | .image"
@@ -285,14 +281,16 @@ _get_container_images() {
 
   helmfile_template_file=$(mktemp --suffix=-helmfile_template_file)
   append_trap "rm ${helmfile_template_file} >/dev/null 2>&1" EXIT
+  helmfile_list=$(mktemp --suffix=-helmfile_list)
+  append_trap "rm ${helmfile_list} >/dev/null 2>&1" EXIT
 
   log_info "Getting container images"
 
   mapfile -t charts < <(find "${HELMFILE_FOLDER}" -name "Chart.yaml")
 
   # TODO:
+  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc list --output json 2> /dev/null > "${helmfile_list}"
   # - currently only retrieves enabled/installed charts from using helmfile template
-  CK8S_SKIP_VALIDATION=true helmfile_list=$("${HERE}/ops.bash" helmfile sc list --output json 2> /dev/null)
   CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc template 2> /dev/null > "${helmfile_template_file}"
   CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile wc template 2> /dev/null >> "${helmfile_template_file}"
 
@@ -301,10 +299,11 @@ _get_container_images() {
     chart_folder_name="${chart#"${HELMFILE_FOLDER}/"}"
     chart_folder_name="${chart_folder_name%\/Chart.yaml}"
 
-    mapfile -t releases < <(echo "${helmfile_list}" | jq -c ".[] | select(.chart == \"${chart_folder_name}\")")
+    # get all welkin releases deployed from a chart
+    mapfile -t releases < <(jq -c ".[] | select(.chart == \"${chart_folder_name}\")" "${helmfile_list}")
 
     if [[ ${#releases[@]} -eq 0 ]]; then
-      # log_warning "no releases for $chart_name"
+      # log_warning "no releases for ${chart_name}"
       # Maybe add a check for sub-charts that are part of umbrella charts e.g. prometheus-node-exporter?
       continue
     fi
@@ -423,6 +422,9 @@ sbom_generate() {
   local tmp_sbom_file
   tmp_sbom_file=$(mktemp --suffix=-sbom.json)
   append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
+
+  config_load "sc"
+  config_load "wc"
 
   # TODO: figure out a different approach for retrieving licenses, or handle GITHUB_TOKEN better
   : "${GITHUB_TOKEN:?Missing GITHUB_TOKEN}"
