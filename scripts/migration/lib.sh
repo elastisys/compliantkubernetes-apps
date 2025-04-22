@@ -412,9 +412,9 @@ get_apps_version() {
   kubectl_do "${1}" get cm --namespace kube-system apps-meta --output=jsonpath --template="{.data.version}"
 }
 
-unlock_migration() {
+unlock_upgrade() {
   kubectl_do "${1}" delete configmap --namespace kube-system apps-upgrade &>/dev/null ||
-    log_warn "Could not unlock migration or migration not locked"
+    log_warn "Could not unlock upgrade or upgrade not locked"
 }
 
 # Get currently prepared version
@@ -434,10 +434,10 @@ check_prepared_version() {
   fi
 }
 
-# Usage: record_migration_prepare_done sc|wc
-# Records that migration has been prepared by storing a timestamp in the config and in the cluster along with the target
+# Usage: record_upgrade_prepare_done sc|wc
+# Records that upgrade has been prepared by storing a timestamp in the config and in the cluster along with the target
 # version.
-record_migration_prepare_done() {
+record_upgrade_prepare_done() {
   local apps_config_timestamp
   apps_config_timestamp="$(date +uIs)"
 
@@ -460,9 +460,9 @@ record_migration_prepare_done() {
   fi
 }
 
-# Usage: ensure_migration_prepared sc|wc
+# Usage: ensure_upgrade_prepared sc|wc
 # Ensures that the timestamp and version recorded in the config matches that recorded in the cluster.
-ensure_migration_prepared() {
+ensure_upgrade_prepared() {
   local apps_upgrade
   local apps_version
   local apps_cluster_timestamp
@@ -482,8 +482,8 @@ ensure_migration_prepared() {
   fi
 }
 
-# Usage: record_migration_apply_step sc|wc step-description
-record_migration_apply_step() {
+# Usage: record_upgrade_apply_step sc|wc step-description
+record_upgrade_apply_step() {
   # Was this needed?
   local apps_upgrade
   apps_upgrade="$(kubectl_do "${1}" get --namespace kube-system cm apps-upgrade --output=yaml)"
@@ -495,13 +495,13 @@ record_migration_apply_step() {
   apps_upgrade="$(last_step="${2##*/}" yq4 --exit-status '.data.last_apply_step = strenv(last_step)' <<<"${apps_upgrade}")"
   log_info "Recording upgrade checkpoint"
   if ! kubectl_do "${1}" replace --filename - <<<"${apps_upgrade}" >/dev/null; then
-    log_fatal "could not record completed migration step in ${1}"
+    log_fatal "could not record completed upgrade step in ${1}"
   fi
 }
 
-# Usage: record_migration_done sc|wc
-# Records that the migration has been completed and records the version upgraded to.
-record_migration_done() {
+# Usage: record_upgrade_done sc|wc
+# Records that the upgrade has been completed and records the version upgraded to.
+record_upgrade_done() {
   # Record the upgraded-to version. Create if it does not already exist.
   log_info "Recording new apps version in cluster"
   if ! kubectl_do "${1}" patch --namespace kube-system cm apps-meta --type=merge --patch "$(yq4 --null-input --output-format json '.data.version = strenv(CK8S_TARGET_VERSION)')"; then
@@ -509,7 +509,7 @@ record_migration_done() {
       log_fatal "could not record new apps version in ${1}"
     fi
   fi
-  # Complete the migration.
+  # Complete the upgrade.
   kubectl_do "${1}" delete configmap --namespace kube-system apps-upgrade >/dev/null
 }
 

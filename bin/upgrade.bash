@@ -66,12 +66,12 @@ prepare() {
     fi
   done
 
-  # Record, in the cluster, that migration has been prepared so that nobody else starts the apply.
+  # Record, in the cluster, that an upgrade has been prepared so that nobody else starts the apply.
   if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
-    record_migration_prepare_done sc
+    record_upgrade_prepare_done sc
   fi
   if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
-    record_migration_prepare_done wc
+    record_upgrade_prepare_done wc
   fi
 
   config_validate secrets
@@ -103,10 +103,10 @@ apply() {
   snippets_check apply "${snippets}"
 
   if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
-    ensure_migration_prepared sc
+    ensure_upgrade_prepared sc
   fi
   if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
-    ensure_migration_prepared wc
+    ensure_upgrade_prepared wc
   fi
 
   for snippet in ${snippets}; do
@@ -118,10 +118,10 @@ apply() {
     if "${snippet}" execute; then
       log_info "apply snippet success\n---"
       if [[ "${CK8S_CLUSTER:-}" == "both" ]]; then
-        record_migration_apply_step "sc" "${snippet}"
-        record_migration_apply_step "wc" "${snippet}"
+        record_upgrade_apply_step "sc" "${snippet}"
+        record_upgrade_apply_step "wc" "${snippet}"
       else
-        record_migration_apply_step "${CK8S_CLUSTER}" "${snippet}"
+        record_upgrade_apply_step "${CK8S_CLUSTER}" "${snippet}"
       fi
     else
       local return="${?}"
@@ -142,10 +142,10 @@ apply() {
   done
 
   if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
-    record_migration_done sc
+    record_upgrade_done sc
   fi
   if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
-    record_migration_done wc
+    record_upgrade_done wc
   fi
 }
 
@@ -206,13 +206,13 @@ unlock() {
   check_config
   if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
     config_load "sc"
-    unlock_migration "sc"
+    unlock_upgrade "sc"
   fi
   if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
     config_load "wc"
-    unlock_migration "wc"
+    unlock_upgrade "wc"
   fi
-  log_info "Cluster migration unlocked. You can now retry the migration"
+  log_info "Cluster upgrade unlocked. You can now retry the upgrade"
 }
 
 main "${@}"
