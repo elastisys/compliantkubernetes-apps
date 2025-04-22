@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
 
 # TODO:
-# - grouping management and workload? can potentially have differing container images fpr the same chart
-# - dry-run option?
-# - trap for removing all sbom files generated in /tmp
 # - add cyclonedx & cdxgen to requirements
 # - create tests
-# - currently, some components might get "set-me"s licenses although they have one set
 # - update sbom version per Welkin release
+# - save manual overrides between runs (currently, and set-me's overrides are removed when running generate)
+# - include images for all configurations? (e.g. different cloud providers can have unique images/charts)
 
 set -euo pipefail
 
@@ -36,11 +34,6 @@ usage() {
   echo "        validate" >&2
   exit 1
 }
-
-# TODO:
-# - runtime sbom?
-# - build sbom?
-# - handle if component not in list?
 
 _yq_update_component_json() {
   local component key sbom_file tmp_sbom_file
@@ -280,35 +273,6 @@ _get_container_images_helmfile_template() {
   done
 }
 
-
-# _get_pods_container_images() {
-#   local sbom_file chart_name release_name release_namespace
-#   sbom_file="${1}"
-#   chart_name="${2}"
-#   release_name="${3}"
-#   release_namespace="${4}"
-
-#   local sbom_file
-#   if [[ "$#" -ne 4 ]]; then
-#     log_fatal "usage: _get_pods_container_images <sbom-file> <chart_name> <release_name> <release_namespace>"
-#   fi
-
-#   mapfile -t containers < <("${HERE}/ops.bash" kubectl sc get pods \
-#     --selector app.kubernetes.io/instance="${release_name}" \
-#     --namespace "${release_namespace}" \
-#     -oyaml | yq4 '.items[] | .spec.containers[] | .image' | sort -u)
-
-#   if [[ ${#containers[@]} -eq 0 ]]; then
-#     # Although these contains e.g. prometheus-node-exporter which we run but through kube-prometheus-stack
-#     # Maybe add a check for sub-charts that are part of umbrella charts?
-#     return
-#   fi
-
-#   for container in "${containers[@]}"; do
-#     _yq_add_component_json "${sbom_file}" "${chart_name}" "properties" "$(_format_container_image_object "${container}")"
-#   done
-# }
-
 _get_container_images() {
   local sbom_file
   if [[ "$#" -ne 1 ]]; then
@@ -328,7 +292,7 @@ _get_container_images() {
   mapfile -t charts < <(find "${HELMFILE_FOLDER}" -name "Chart.yaml")
 
   # TODO:
-  # - what about wc? this should list all charts in both wc/sc, but should only those enabled/installed=true be checked?
+  # - currently only retrieves enabled/installed charts from using helmfile template
   export CK8S_SKIP_VALIDATION=true
   export CK8S_AUTO_APPROVE=true
   helmfile_list=$("${HERE}/ops.bash" helmfile sc list --output json 2> /dev/null)
@@ -391,8 +355,7 @@ get_unset() {
   log_info "Getting components without licenses"
   yq4 -o json -r '.components[] | select(.licenses[].license.name | contains("set-me")).name' "${SBOM_FILE}"
   yq4 -o json -r '.components[] | select(.licenses | length == 0).name' "${SBOM_FILE}"
-  log_info "Getting components without containers"
-  yq4 -o json -r '.components[] | select(.properties[].name | contains("set-me")).name' "${SBOM_FILE}"
+
   log_info "Getting components without Elastisys evaluation"
   yq4 -o json -r '.components[] | select(.properties[].value | contains("set-me")).name' "${SBOM_FILE}"
 }
