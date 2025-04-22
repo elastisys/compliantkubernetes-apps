@@ -30,7 +30,7 @@ update_ips_dryrun() {
 
 check_migration() {
   if get_migration_status "${1}" &>/dev/null; then
-    log_fatal "Migration ongoing, try again when it has completed or 'ck8s upgrade unlock'"
+    log_fatal "Upgrade ongoing, try again when it has completed or 'ck8s upgrade unlock'"
   fi
 }
 
