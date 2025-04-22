@@ -140,7 +140,7 @@ teardown() {
 
   run ck8s apply sc
   assert_failure
-  assert_output --partial "Migration ongoing"
+  assert_output --partial "Upgrade ongoing"
 }
 
 @test "prevent apply using older config" {
@@ -162,7 +162,7 @@ EOF
   gitversion.mock_static "v0.41.0"
   run ck8s apply sc
   assert_failure
-  assert_output --partial "Version mismatch. Run migration to update config."
+  assert_output --partial "Version mismatch. Run upgrade to update config."
 }
 
 @test "prevent apply using unmerged config" {
