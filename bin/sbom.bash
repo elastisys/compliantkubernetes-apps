@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 # TODO:
-# - add cyclonedx & cdxgen to requirements
 # - create tests
 # - update sbom version per Welkin release
 # - save manual overrides between runs (currently, and set-me's overrides are removed when running generate)
