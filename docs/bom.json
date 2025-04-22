@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:a101bbd1-049c-49fc-b1fc-c8da00ca4081",
+  "serialNumber": "urn:uuid:11a03401-b089-4613-bb11-dc60c24f57d5",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-04-22T12:04:07Z",
+    "timestamp": "2025-04-22T14:54:58Z",
     "tools": {
       "components": [
         {
@@ -291,6 +291,21 @@
       "purl": "pkg:helm/crds@0.0.0",
       "type": "library",
       "bom-ref": "pkg:helm/crds@0.0.0",
+      "licenses": [],
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ]
+    },
+    {
+      "group": "",
+      "name": "crds",
+      "version": "3.3.6",
+      "purl": "pkg:helm/crds@3.3.6",
+      "type": "library",
+      "bom-ref": "pkg:helm/crds@3.3.6",
       "licenses": [],
       "properties": [
         {
@@ -649,9 +664,9 @@
     {
       "group": "",
       "name": "gatekeeper",
-      "version": "3.15.1",
+      "version": "3.18.2",
       "description": "A Helm chart for Gatekeeper",
-      "purl": "pkg:helm/gatekeeper@3.15.1",
+      "purl": "pkg:helm/gatekeeper@3.18.2",
       "externalReferences": [
         {
           "type": "vcs",
@@ -659,7 +674,7 @@
         }
       ],
       "type": "library",
-      "bom-ref": "pkg:helm/gatekeeper@3.15.1",
+      "bom-ref": "pkg:helm/gatekeeper@3.18.2",
       "licenses": [],
       "properties": [
         {
@@ -668,7 +683,7 @@
         },
         {
           "name": "container-gatekeeper",
-          "value": "openpolicyagent/gatekeeper:v3.15.1"
+          "value": "openpolicyagent/gatekeeper:v3.18.2"
         },
         {
           "name": "container-kubectl",
@@ -676,7 +691,7 @@
         },
         {
           "name": "container-gatekeeper-crds",
-          "value": "openpolicyagent/gatekeeper-crds:v3.15.1"
+          "value": "openpolicyagent/gatekeeper-crds:v3.18.2"
         }
       ]
     },
@@ -749,6 +764,35 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
+        }
+      ]
+    },
+    {
+      "group": "",
+      "name": "grafana",
+      "version": "3.3.6",
+      "purl": "pkg:helm/grafana@3.3.6",
+      "type": "library",
+      "bom-ref": "pkg:helm/grafana@3.3.6",
+      "licenses": [
+        {
+          "license": {
+            "name": "GNU Affero General Public License v3.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        },
+        {
+          "name": "container-grafana",
+          "value": "docker.io/grafana/grafana:11.5.1"
+        },
+        {
+          "name": "container-k8s-sidecar",
+          "value": "quay.io/kiwigrid/k8s-sidecar:1.30.0"
         }
       ]
     },
@@ -1246,6 +1290,34 @@
         {
           "name": "container-kured",
           "value": "ghcr.io/kubereboot/kured:1.17.0"
+        }
+      ]
+    },
+    {
+      "group": "",
+      "name": "kyverno",
+      "version": "3.3.6",
+      "description": "Kubernetes Native Policy Management",
+      "purl": "pkg:helm/kyverno@3.3.6",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://kyverno.io/"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/kyverno@3.3.6",
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
         }
       ]
     },
