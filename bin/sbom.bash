@@ -239,12 +239,11 @@ _get_container_images_helmfile_template() {
   sbom_file="${1}"
   helmfile_template_file="${2}"
   chart_name="${3}"
-  log_info "${chart_name}"
   release_name="${4}"
   type="${5}"
 
   local sbom_file
-  if [[ "$#" -ne 4 ]]; then
+  if [[ "$#" -ne 5 ]]; then
     log_fatal "usage: _get_container_images_helmfile_template <sbom-file> <helmfile-template-file> <chart_name> <release_name> <type>"
   fi
 
@@ -253,19 +252,17 @@ _get_container_images_helmfile_template() {
   if [[ "${type}" == "pod" ]]; then
     query="select(.kind == \"Pod\" and ${chart_query}) | .spec.containers[] | .image"
   elif [[ "${type}" == "cronjob" ]]; then
-    query="select(.kind == \"CronJob\" and ${chart_query})) | .spec.jobTemplate.spec.template.spec.containers[] | .image"
+    query="select(.kind == \"CronJob\" and ${chart_query}) | .spec.jobTemplate.spec.template.spec.containers[] | .image"
   elif [[ "${type}" == "daemonset" ]]; then
-    query="select(.kind == \"DaemonSet\" and ${chart_query})) | .spec.template.spec.containers[] | .image"
+    query="select(.kind == \"DaemonSet\" and ${chart_query}) | .spec.template.spec.containers[] | .image"
   elif [[ "${type}" == "deployment" ]]; then
-    query="select(.kind == \"Deployment\" and ${chart_query})) | .spec.template.spec.containers[] | .image"
+    query="select(.kind == \"Deployment\" and ${chart_query}) | .spec.template.spec.containers[] | .image"
   elif [[ "${type}" == "job" ]]; then
-    query="select(.kind == \"Job\" and ${chart_query})) | .spec.template.spec.containers[] | .image"
+    query="select(.kind == \"Job\" and ${chart_query}) | .spec.template.spec.containers[] | .image"
   elif [[ "${type}" == "statefulset" ]]; then
-    query="select(.kind == \"StateFulset\" and ${chart_query})) | .spec.template.spec.containers[] | .image"
+    query="select(.kind == \"StateFulset\" and ${chart_query}) | .spec.template.spec.containers[] | .image"
   fi
 
-  export CK8S_SKIP_VALIDATION=true
-  export CK8S_AUTO_APPROVE=true
   mapfile -t containers < <(yq4 "${query}" "${helmfile_template_file}" | sed '/---/d' | sort -u)
 
   if [[ ${#containers[@]} -eq 0 ]]; then
@@ -319,7 +316,7 @@ _get_container_images() {
     log_fatal "SBOM file ${sbom_file} does not exist"
   fi
 
-  helmfile_template_file=$(mktemp --suffix helmfile_template_file)
+  helmfile_template_file=$(mktemp --suffix=-helmfile_template_file)
 
   log_info "Getting container images"
 
@@ -327,6 +324,8 @@ _get_container_images() {
 
   # TODO:
   # - what about wc? this should list all charts in both wc/sc, but should only those enabled/installed=true be checked?
+  export CK8S_SKIP_VALIDATION=true
+  export CK8S_AUTO_APPROVE=true
   helmfile_list=$("${HERE}/ops.bash" helmfile sc list --output json)
   "${HERE}/ops.bash" helmfile sc template 2> /dev/null > "${helmfile_template_file}"
   "${HERE}/ops.bash" helmfile wc template 2> /dev/null >> "${helmfile_template_file}"
