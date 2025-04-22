@@ -334,7 +334,7 @@ validate_version() {
     exit 1
   elif [ "${ck8s_version}" != "any" ] &&
     [ "${version}" != "${ck8s_version}" ]; then
-    log_error "ERROR: Version mismatch. Run migration to update config."
+    log_error "ERROR: Version mismatch. Run upgrade to update config."
     log_error "Config version: ${ck8s_version}"
     log_error "Welkin Apps version: ${version}"
     exit 1
@@ -650,6 +650,6 @@ get_version() {
     --output jsonpath --template='{.data.version}'
 }
 
-get_migration_status() {
+get_upgrade_status() {
   "${here}/ops.bash" kubectl "${1}" get --namespace kube-system configmap apps-upgrade
 }

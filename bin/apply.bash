@@ -28,8 +28,8 @@ update_ips_dryrun() {
   fi
 }
 
-check_migration() {
-  if get_migration_status "${1}" &>/dev/null; then
+check_upgrade() {
+  if get_upgrade_status "${1}" &>/dev/null; then
     log_fatal "Upgrade ongoing, try again when it has completed or 'ck8s upgrade unlock'"
   fi
 }
@@ -80,6 +80,6 @@ esac
 update_ips_dryrun "$1" "${environment}"
 config_load "$1"
 validate_version "${1}"
-check_migration "$1"
+check_upgrade "$1"
 test -n "${CK8S_CI_SKIP_APPLY:-}" && exit 0 # Improve mockability in the future
 apps_apply "$1" "${environment}" "${@:2}"
