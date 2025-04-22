@@ -6,6 +6,7 @@
     install_user: "{{ lookup('env','USER') }}"
     apache2_utils_version: "{{ requirements['apache2-utils'].version }}"
     curl_version: "{{ requirements['curl'].version }}"
+    cyclonedx_cli_version: "{{ requirements['github.com/CycloneDX/cyclonedx-cli'].version | regex_replace('^v', '') }}"
     dnsutils_version: "{{ requirements['dnsutils'].version }}"
     helm_version: "{{ requirements['helm.sh/helm/v3'].version | regex_replace('^v', '') }}"
     helmdiff_version: "{{ requirements['github.com/databus23/helm-diff/v3'].version | regex_replace('^v', '') }}"
@@ -30,6 +31,10 @@
         version: "{{ jq_version }}"
         url: https://github.com/stedolan/jq/releases/download/jq-{{ jq_version }}/jq-linux64
         dest: "{{ install_path }}/jq"
+      - command: cyclonedx-cli
+        version: "{{ cyclonedx_cli_version }}"
+        url: https://github.com/CycloneDX/cyclonedx-cli/releases/download/v{{ cyclonedx_cli_version }}/cyclonedx-linux-musl-x64
+        dest: "{{ install_path }}/cyclonedx"
       - command: sops
         version: "{{ sops_version }}"
         url: https://github.com/getsops/sops/releases/download/v{{ sops_version }}/sops-v{{ sops_version }}.linux.amd64
