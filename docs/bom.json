@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:8f2c0c1e-48bd-4359-b6d8-bf8db36cca54",
+  "serialNumber": "urn:uuid:fd5a1460-4181-495a-bc9e-8261db3e8e40",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-04-17T06:20:27Z",
+    "timestamp": "2025-04-22T10:04:20Z",
     "tools": {
       "components": [
         {
@@ -172,6 +172,10 @@
         {
           "name": "container-cert-manager-webhook",
           "value": "quay.io/jetstack/cert-manager-webhook:v1.17.1"
+        },
+        {
+          "name": "container-cert-manager-startupapicheck",
+          "value": "quay.io/jetstack/cert-manager-startupapicheck:v1.17.1"
         }
       ]
     },
@@ -423,12 +427,16 @@
           "value": "set-me"
         },
         {
-          "name": "container-falco",
-          "value": "docker.io/falcosecurity/falco:0.40.0-debian"
+          "name": "container-curl",
+          "value": "appropriate/curl"
         },
         {
           "name": "container-falcosidekick",
           "value": "docker.io/falcosecurity/falcosidekick:2.31.1"
+        },
+        {
+          "name": "container-falco",
+          "value": "docker.io/falcosecurity/falco:0.40.0-debian"
         }
       ]
     },
@@ -541,8 +549,8 @@
           "value": "set-me"
         },
         {
-          "name": "container-fluentd-aggregator",
-          "value": "ghcr.io/elastisys/fluentd-aggregator:v7.1.1-ck8s1"
+          "name": "container-fluentd-forwarder",
+          "value": "ghcr.io/elastisys/fluentd-forwarder:v4.7.5-ck8s1"
         }
       ]
     },
@@ -631,6 +639,10 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
+        },
+        {
+          "name": "container-kubectl",
+          "value": "ghcr.io/elastisys/bitnami/kubectl:1.29.11"
         }
       ]
     },
@@ -655,8 +667,12 @@
           "value": "set-me"
         },
         {
-          "name": "container-gatekeeper",
-          "value": "openpolicyagent/gatekeeper:v3.15.1"
+          "name": "container-kubectl",
+          "value": "ghcr.io/elastisys/bitnami/kubectl:1.29.11"
+        },
+        {
+          "name": "container-gatekeeper-crds",
+          "value": "openpolicyagent/gatekeeper-crds:v3.15.1"
         }
       ]
     },
@@ -760,11 +776,11 @@
         },
         {
           "name": "container-grafana",
-          "value": "docker.io/grafana/grafana:11.2.3-security-01"
+          "value": "docker.io/grafana/grafana:11.5.1"
         },
         {
           "name": "container-k8s-sidecar",
-          "value": "quay.io/kiwigrid/k8s-sidecar:1.28.0"
+          "value": "quay.io/kiwigrid/k8s-sidecar:1.30.0"
         }
       ]
     },
@@ -796,11 +812,11 @@
         },
         {
           "name": "container-grafana",
-          "value": "docker.io/grafana/grafana:11.2.3-security-01"
+          "value": "docker.io/grafana/grafana:11.5.1"
         },
         {
           "name": "container-k8s-sidecar",
-          "value": "quay.io/kiwigrid/k8s-sidecar:1.28.0"
+          "value": "quay.io/kiwigrid/k8s-sidecar:1.30.0"
         }
       ]
     },
@@ -875,42 +891,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-harbor-core",
-          "value": "goharbor/harbor-core:v2.12.1"
-        },
-        {
-          "name": "container-harbor-db",
-          "value": "goharbor/harbor-db:v2.12.1"
-        },
-        {
-          "name": "container-harbor-exporter",
-          "value": "goharbor/harbor-exporter:v2.12.1"
-        },
-        {
-          "name": "container-harbor-jobservice",
-          "value": "goharbor/harbor-jobservice:v2.12.1"
-        },
-        {
-          "name": "container-harbor-portal",
-          "value": "goharbor/harbor-portal:v2.12.1"
-        },
-        {
-          "name": "container-harbor-registryctl",
-          "value": "goharbor/harbor-registryctl:v2.12.1"
-        },
-        {
-          "name": "container-redis-photon",
-          "value": "goharbor/redis-photon:v2.12.1"
-        },
-        {
-          "name": "container-registry-photon",
-          "value": "goharbor/registry-photon:v2.12.1"
-        },
-        {
-          "name": "container-trivy-adapter-photon",
-          "value": "goharbor/trivy-adapter-photon:v2.12.1"
         }
       ]
     },
@@ -955,6 +935,10 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
+        },
+        {
+          "name": "container-hnc-manager",
+          "value": "ghcr.io/elastisys/hnc-manager:v1.1.0"
         }
       ]
     },
@@ -1009,6 +993,10 @@
         {
           "name": "container-defaultbackend-amd64",
           "value": "registry.k8s.io/defaultbackend-amd64:1.5"
+        },
+        {
+          "name": "container-kube-webhook-certgen",
+          "value": "registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2@sha256:e8825994b7a2c7497375a9b945f386506ca6a3eda80b89b74ef2db743f66a5ea"
         },
         {
           "name": "container-controller-chroot",
@@ -1090,18 +1078,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-node-exporter",
-          "value": "quay.io/prometheus/node-exporter:v1.8.2"
-        },
-        {
-          "name": "container-prometheus-operator",
-          "value": "quay.io/prometheus-operator/prometheus-operator:v0.79.2"
-        },
-        {
-          "name": "container-kube-state-metrics",
-          "value": "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.14.0"
         }
       ]
     },
@@ -1581,6 +1557,10 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
+        },
+        {
+          "name": "container-curl-jq",
+          "value": "ghcr.io/elastisys/curl-jq:1.0.0"
         }
       ]
     },
@@ -1623,6 +1603,10 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
+        },
+        {
+          "name": "container-opensearch-dashboards",
+          "value": "opensearchproject/opensearch-dashboards:2.18.0"
         }
       ]
     },
@@ -1667,6 +1651,10 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
+        },
+        {
+          "name": "container-opensearch",
+          "value": "opensearchproject/opensearch:2.18.0"
         }
       ]
     },
@@ -1721,6 +1709,18 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
+        },
+        {
+          "name": "container-elasticsearch-curator",
+          "value": "ghcr.io/elastisys/bitnami/elasticsearch-curator:5.8.4-debian-10-r235"
+        },
+        {
+          "name": "container-curl-jq",
+          "value": "ghcr.io/elastisys/curl-jq:1.0.0"
+        },
+        {
+          "name": "container-opensearch-dashboards",
+          "value": "opensearchproject/opensearch-dashboards:2.18.0"
         },
         {
           "name": "container-opensearch",
@@ -2067,10 +2067,6 @@
         {
           "name": "container-thanos",
           "value": "ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8"
-        },
-        {
-          "name": "container-prometheus-config-reloader",
-          "value": "quay.io/prometheus-operator/prometheus-config-reloader:v0.50.0"
         }
       ]
     },
@@ -2124,6 +2120,10 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
+        },
+        {
+          "name": "container-trivy-operator",
+          "value": "mirror.gcr.io/aquasec/trivy-operator:0.24.0"
         }
       ]
     },
@@ -2217,7 +2217,7 @@
       "properties": [
         {
           "name": "Elastisys evaluation",
-          "value": "OK"
+          "value": "set-me"
         },
         {
           "name": "container-velero",
