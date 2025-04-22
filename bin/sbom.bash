@@ -292,11 +292,9 @@ _get_container_images() {
 
   # TODO:
   # - currently only retrieves enabled/installed charts from using helmfile template
-  export CK8S_SKIP_VALIDATION=true
-  export CK8S_AUTO_APPROVE=true
-  helmfile_list=$("${HERE}/ops.bash" helmfile sc list --output json 2> /dev/null)
-  "${HERE}/ops.bash" helmfile sc template 2> /dev/null > "${helmfile_template_file}"
-  "${HERE}/ops.bash" helmfile wc template 2> /dev/null >> "${helmfile_template_file}"
+  CK8S_SKIP_VALIDATION=true helmfile_list=$("${HERE}/ops.bash" helmfile sc list --output json 2> /dev/null)
+  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc template 2> /dev/null > "${helmfile_template_file}"
+  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile wc template 2> /dev/null >> "${helmfile_template_file}"
 
   for chart in "${charts[@]}"; do
     chart_name=$(yq4 ".name" "${chart}")

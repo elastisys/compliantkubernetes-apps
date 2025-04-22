@@ -118,6 +118,7 @@ ops)
 sbom)
   case "${2}" in
   add | generate | get | get-unset | remove | update | validate)
+    check_tools
     command="${2}"
     shift 2
     "${here}/sbom.bash" "${command}" "${@}"
