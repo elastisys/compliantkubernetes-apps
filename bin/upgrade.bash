@@ -6,7 +6,7 @@ here="$(readlink -f "$(dirname "${0}")")"
 
 ROOT="$(readlink -f "${here}/../")"
 # Allow overriding from test suite
-MIGRATION_ROOT="${MIGRATION_ROOT:-$ROOT/migration}"
+MIGRATION_ROOT="${MIGRATION_ROOT:-"${ROOT}/migration"}"
 
 CK8S_STACK="$(basename "$0")"
 export CK8S_STACK
