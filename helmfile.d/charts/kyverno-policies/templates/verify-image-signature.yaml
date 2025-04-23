@@ -1,0 +1,55 @@
+{{- if .Values.verifyImageSignature.enabled -}}
+{{- if not .Values.verifyImageSignature.attestor }}
+{{- fail "attestor must not be unset" }}
+{{- end }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: com.elastisys.policies.verify-image-signature
+  namespace: kyverno
+data:
+  {{- with .Values.verifyImageSignature.attestor }}
+  attestor: |
+    {{- . | nindent 4 }}
+  {{- end }}
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-image-signature
+spec:
+  webhookConfiguration:
+    failurePolicy: Fail
+    timeoutSeconds: 30
+  background: false
+  rules:
+    - name: verify-image-signature
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaceSelector:
+                matchLabels:
+                  hnc.x-k8s.io/included-namespace: "true"
+      context:
+        - name: entries
+          configMap:
+            name: com.elastisys.policies.verify-image-signature
+            namespace: kyverno
+      verifyImages:
+        - type: {{ .Values.verifyImageSignature.type }}
+          failureAction: Enforce
+          imageReferences: ["*"]
+          attestors:
+            - entries:
+              {{- if eq .Values.verifyImageSignature.type "Cosign" }}
+              - keys:
+                  publicKeys: {{`"{{ entries.data.attestor }}"`}}
+                  rekor:
+                    ignoreTlog: {{ .Values.verifyImageSignature.ignoreRekorTlog }}
+              {{- else if eq .Values.verifyImageSignature.type "Notary" }}
+              - certificates:
+                  cert: {{`"{{ entries.data.attestor }}"`}}
+              {{- end }}
+{{- end }}

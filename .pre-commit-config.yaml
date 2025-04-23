@@ -34,7 +34,7 @@ repos:
         args:
           - --allow-multiple-documents
       - id: detect-private-key
-        exclude: ^helmfile\.d/upstream/
+        exclude: ^helmfile\.d/upstream/|^tests/integration/kyverno/genkeys/
       - id: end-of-file-fixer
         exclude: ^helmfile\.d/upstream/|^tests/.*/.*\.out$
       - id: mixed-line-ending
