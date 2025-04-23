@@ -358,7 +358,19 @@ get_unset() {
 }
 
 sbom_remove() {
-  log_info "TODO:"
+  if [[ "$#" -ne 3 ]]; then
+    usage
+  fi
+
+  local component key value
+
+  component="${1}"
+  key="${2}"
+  value="${3}"
+
+  query="with(.components[] | select(.name == \"${component}\").${key}; del(.[] | select(.name == \"${value}\")))"
+
+  _yq_run_query "${SBOM_FILE}" "${query}"
 }
 
 sbom_add() {
