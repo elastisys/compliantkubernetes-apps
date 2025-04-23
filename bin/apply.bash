@@ -55,6 +55,7 @@ apps_apply() {
 
   if (with_kubeconfig "${config["kube_config_$1"]}" helmfile -f "${here}/../helmfile.d/state.yaml" -e "$2" "${action}" "${concurrency}" "${suppress:-}"); then
     log_info "---"
+    set_apps_version "${2}" || log_info "Current version is $(get_apps_version "${2}")"
     log_info "Successful Apps ${action} on ${2/_/ }!"
   else
     log_error "---"

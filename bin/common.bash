@@ -645,6 +645,13 @@ with_s3cfg() {
   sops_exec_file_no_fifo "${s3cfg}" 'S3COMMAND_CONFIG_FILE="{}" '"${*}"
 }
 
+# Store apps version to configmap
+# Usage: set_apps_version
+set_apps_version() {
+  "${here}/ops.bash" kubectl "${1}" create configmap --namespace kube-system apps-meta \
+    --from-literal "version=${2}" >/dev/null
+}
+
 # Retrieve apps version from configmap
 get_apps_version() {
   "${here}/ops.bash" kubectl "${1}" get --namespace kube-system configmap apps-meta \
