@@ -2,17 +2,13 @@
 
 # Helpers for running yq
 
-# conditionally run yq4 or yq depending on how it is installed
+# sanity-check the yq version
 yq() {
-  if command -v yq4 >/dev/null; then
-    command yq4 "${@}"
+  if ! command yq -V | grep --extended-regexp "v4\." >/dev/null 2>&1; then
+    echo -e -n "[\e[31mck8s\e[0m] expecting the yq binary to be at least version v4" 1>&2
+    exit 1
   else
-    if ! command yq -V | grep --extended-regexp "v4\." >/dev/null 2>&1; then
-      echo -e -n "[\e[31mck8s\e[0m] expecting the yq binary to be at least version v4" 1>&2
-      exit 1
-    else
-      command yq "${@}"
-    fi
+    command yq "${@}"
   fi
 }
 
