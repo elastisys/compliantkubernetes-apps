@@ -177,7 +177,7 @@ EOF
   assert_success
 
   # someone changes the config
-  run yq -i '.global.ck8sLastChange="something"' "${CK8S_CONFIG_PATH}/common-config.yaml"
+  run yq -i '.global.ck8sConfigSerial="something"' "${CK8S_CONFIG_PATH}/common-config.yaml"
 
   run ck8s upgrade sc "v0.42" apply
   assert_failure

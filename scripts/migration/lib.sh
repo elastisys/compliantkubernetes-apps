@@ -442,7 +442,7 @@ record_upgrade_prepare_done() {
   apps_config_timestamp="$(date -uIs)"
 
   ts="${apps_config_timestamp}" \
-    yq_add common '.global.ck8sLastChange' 'strenv(ts)'
+    yq_add common '.global.ck8sConfigSerial' 'strenv(ts)'
 
   # This ConfigMap should only exist while doing an upgrade.
   # Abort if it already exists
@@ -476,7 +476,7 @@ ensure_upgrade_prepared() {
   fi
 
   apps_config_timestamp="$(yq4 '.data.timestamp' <<<"${apps_upgrade}")"
-  apps_cluster_timestamp="$(yq_dig common '.global.ck8sLastChange')"
+  apps_cluster_timestamp="$(yq_dig common '.global.ck8sConfigSerial')"
   if [[ "${apps_config_timestamp}" != "${apps_cluster_timestamp}" ]]; then
     log_fatal "Config timestamp mismatch, ${apps_cluster_timestamp} in ${1} but ${apps_config_timestamp} in config"
   fi
