@@ -7994,6 +7994,44 @@ properties:
         $ref: '#/$defs/kubernetesTopologySpreadConstraints'
       tolerations:
         $ref: '#/$defs/kubernetesTolerations'
+      policies:
+        type: object
+        properties:
+          verifyImageSignature:
+            title: Verify Image Signature Kyverno policy
+            description: A policy that requires that all images in HNC controlled namespaces are signed
+            type: object
+            properties:
+              enabled:
+                title: Enable the Verify Image Signature policy
+                default: false
+                type: boolean
+              type:
+                title: Method of signature validation
+                type: string
+                enum:
+                  - Cosign
+                  - Notary
+              publicKeys:
+                description: A set of public keys used to verify image signatures
+                type: string
+                example: |
+                  -----BEGIN PUBLIC KEY-----
+                  MFkwEwY...
+                  -----END PUBLIC KEY-----
+                  -----BEGIN PUBLIC KEY-----
+                  MFkwEwY...
+                  -----END PUBLIC KEY-----
+              certificates:
+                description: A set of certificates used to verify images
+                type: string
+                example: |
+                  -----BEGIN CERTIFICATE-----
+                  MIIDTTCCA...
+                  -----END CERTIFICATE-----
+                  -----BEGIN CERTIFICATE-----
+                  MIIDTTCCA...
+                  -----END CERTIFICATE-----
 
   images:
     title: Images Configuration
