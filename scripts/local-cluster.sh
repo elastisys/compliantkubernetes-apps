@@ -61,7 +61,7 @@ yq() {
     command yq4 "${@}"
   else
     if ! command yq -V | grep --extended-regexp "v4\." >/dev/null 2>&1; then
-      log.error "expecting the yq binary to be at least version v4"
+      log.fatal "expecting the yq binary to be at least version v4"
     else
       command yq "${@}"
     fi
