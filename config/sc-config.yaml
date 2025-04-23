@@ -743,6 +743,9 @@ opensearch:
     affinity: {}
     nodeSelector: {}
     tolerations: []
+    # cookieTtl: 3600000
+    # sessionTtl: 3600000
+    # sessionKeepalive: true
 
   # Single-sign-on using OIDC, note this requires LetsEncrypt Production
   sso:

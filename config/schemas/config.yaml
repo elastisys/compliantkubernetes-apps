@@ -5855,6 +5855,18 @@ properties:
             $ref: '#/$defs/kubernetesNodeSelector'
           affinity:
             $ref: '#/$defs/io.k8s.api.core.v1.Affinity'
+            cookieTtl:
+              title: OpenSearch Dashboards Cookie TTL
+              description: Time-to-live for the session cookie in milliseconds. Overrides OpenSearch Dashboards internal default if set.
+              type: integer
+            sessionTtl:
+              title: OpenSearch Dashboards Session TTL
+              description: Time-to-live for the session itself in milliseconds. Overrides OpenSearch Dashboards internal default if set.
+              type: integer
+            sessionKeepalive:
+              title: OpenSearch Dashboards Session Keepalive
+              description: Whether the session TTL should be extended upon user activity. Overrides OpenSearch Dashboards internal default if set.
+              type: boolean
       masterNode:
         title: OpenSearch Master Node
         description: |-
