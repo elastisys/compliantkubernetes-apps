@@ -309,7 +309,8 @@ load_config() {
   fi
 }
 
-version_get() {
+# Retrieve version from git
+get_repo_version() {
   pushd "${root_path}" >/dev/null || exit 1
   git describe --exact-match --tags 2>/dev/null || git rev-parse HEAD
   popd >/dev/null || exit 1
@@ -319,7 +320,7 @@ version_get() {
 # TODO: Simple hack to make sure version matches, we need to have a proper way
 #       of making sure that the version is supported in the future.
 validate_version() {
-  version=$(version_get)
+  version=$(get_repo_version)
   if [[ "${1}" == "sc" ]]; then
     merged_config="${config[config_file_sc]}"
   elif [[ "${1}" == "wc" ]]; then
