@@ -30,7 +30,7 @@ update_ips_dryrun() {
 
 check_upgrade() {
   if get_upgrade_status "${1}" &>/dev/null; then
-    log_fatal "Upgrade ongoing, try again when it has completed or 'ck8s upgrade unlock'"
+    log_fatal "Upgrade ongoing, try again when it has completed or use 'ck8s upgrade unlock'"
   fi
 }
 
