@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:f975aee6-af5e-4728-992a-ce8aee446e91",
+  "serialNumber": "urn:uuid:80ab35ec-5ff4-4c1b-9784-0274a8548b29",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-04-22T16:17:19Z",
+    "timestamp": "2025-04-23T14:14:33Z",
     "tools": {
       "components": [
         {
@@ -270,13 +270,7 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/common@2.x.x",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
+      "licenses": [],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -778,25 +772,11 @@
       "purl": "pkg:helm/grafana@3.3.6",
       "type": "library",
       "bom-ref": "pkg:helm/grafana@3.3.6",
-      "licenses": [
-        {
-          "license": {
-            "name": "GNU Affero General Public License v3.0"
-          }
-        }
-      ],
+      "licenses": [],
       "properties": [
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-grafana",
-          "value": "docker.io/grafana/grafana:11.5.1"
-        },
-        {
-          "name": "container-k8s-sidecar",
-          "value": "quay.io/kiwigrid/k8s-sidecar:1.30.0"
         }
       ]
     },
@@ -825,14 +805,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-grafana",
-          "value": "docker.io/grafana/grafana:11.5.1"
-        },
-        {
-          "name": "container-k8s-sidecar",
-          "value": "quay.io/kiwigrid/k8s-sidecar:1.30.0"
         }
       ]
     },
@@ -1441,7 +1413,7 @@
       "licenses": [
         {
           "license": {
-            "name": "GNU Affero General Public License v3.0"
+            "id": "Apache-2.0"
           }
         }
       ],
@@ -1465,13 +1437,7 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/minio@15.x.x",
-      "licenses": [
-        {
-          "license": {
-            "name": "GNU Affero General Public License v3.0"
-          }
-        }
-      ],
+      "licenses": [],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1639,13 +1605,7 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/node-feature-discovery@v0.16.6",
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
+      "licenses": [],
       "properties": [
         {
           "name": "Elastisys evaluation",

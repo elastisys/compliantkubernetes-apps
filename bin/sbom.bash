@@ -21,15 +21,15 @@ source "${HERE}/common.bash"
 
 usage() {
   echo "COMMANDS:" >&2
-  echo "  generate                            generate new cyclonedx sbom" >&2
-  echo "  add <component-name> <key> <value>  add key-value pair to a component" >&2
-  echo "  get <component-name> [key]          get component from sbom, optionally query for a provided key" >&2
-  echo "  get-charts                          get all charts in sbom" >&2
-  echo "  get-containers                      get all containers in sbom" >&2
-  echo "  get-unset                           get names of components with set-me's or missing licenses" >&2
-  echo "  remove <component-name> <key>       remove key for a component" >&2
-  echo "  update <component-name> <key>       update object under key for a component using $EDITOR" >&2
-  echo "  validate                            validate SBOM using cyclonedx-cli" >&2
+  echo "  add <component-name> <component-version> <key> <value>  add key-value pair to a component" >&2
+  echo "  generate                                                generate new cyclonedx sbom" >&2
+  echo "  get <component-name> [component-version] [key]          get component from sbom, optionally query for a provided key" >&2
+  echo "  get-charts                                              get all charts in sbom" >&2
+  echo "  get-containers                                          get all containers in sbom" >&2
+  echo "  get-unset                                               get names of components with set-me's or missing licenses" >&2
+  echo "  remove <component-name> <component-version> <key>       remove key for a component" >&2
+  echo "  update <component-name> <component-version> <key>       update object under key for a component using $EDITOR" >&2
+  echo "  validate                                                validate SBOM using cyclonedx-cli" >&2
   exit 1
 }
 
@@ -38,10 +38,11 @@ _yq_run_query() {
   sbom_file="${1}"
   query="${2}"
 
-  tmp_sbom_file=$(mktemp --suffix=-sbom.json)
-  append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
 
   if ! ${CK8S_AUTO_APPROVE:-}; then
+    tmp_sbom_file=$(mktemp --suffix=-sbom.json)
+    append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
+
     yq4 -o json "${query}" "${sbom_file}" > "${tmp_sbom_file}"
     cyclonedx_validation "${tmp_sbom_file}"
     diff  -U3 --color=always "${sbom_file}" "${tmp_sbom_file}" && log_info "No change" && return
@@ -53,42 +54,44 @@ _yq_run_query() {
 }
 
 _sbom_update_component() {
-  local component key sbom_file tmp_sbom_file query
+  local component_name component_version key sbom_file tmp_sbom_file query
 
   sbom_file="${1}"
-  component="${2}"
-  key="${3}"
+  component_name="${2}"
+  component_version="${3}"
+  key="${4}"
 
-  tmp_change=$(mktemp "--suffix=-update-${component}-sbom.json")
+  tmp_change=$(mktemp "--suffix=-update-${component_name}-sbom.json")
   append_trap "rm ${tmp_change} >/dev/null 2>&1" EXIT
 
   # check if key that should be updated exists
-  has_key=$(yq4 -e -o json ".components[] | select(.name == \"${component}\") | has(\"${key}\")" "${sbom_file}")
+  has_key=$(yq4 -e -o json ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\") | has(\"${key}\")" "${sbom_file}")
   if [[ "${has_key}" == false ]]; then
     log_fatal "${key} not found"
   fi
 
-  yq4 -e -o json ".components[] | select(.name == \"${component}\") | .${key}" "${sbom_file}" > "${tmp_change}"
+  yq4 -e -o json ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\") | .${key}" "${sbom_file}" > "${tmp_change}"
   "${EDITOR}" "${tmp_change}"
 
-  query="with(.components[] | select(.name == \"${component}\"); .${key} = $(jq -c '.' "${tmp_change}"))"
+  query="with(.components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\"); .${key} = $(jq -c '.' "${tmp_change}"))"
 
   _yq_run_query "${sbom_file}" "${query}"
 }
 
 _sbom_add_component() {
-  local component key sbom_file tmp_sbom_file value query
+  local component_name component_version key sbom_file tmp_sbom_file value query
 
   sbom_file="${1}"
-  component="${2}"
-  key="${3}"
-  value="${4}"
+  component_name="${2}"
+  component_version="${3}"
+  key="${4}"
+  value="${5}"
 
   if [[ ! "${key}" =~ ^(licenses.*|properties.*)$ ]]; then
     log_fatal "unsupported key \"${key}\", currently only supports \"licenses|properties\""
   fi
 
-  query="with(.components[] | select(.name == \"${component}\"); .${key} |= (. + ${value} | unique_by(.name)))"
+  query="with(.components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\"); .${key} |= (. + ${value} | unique_by(.name)))"
 
   _yq_run_query "${sbom_file}" "${query}"
 }
@@ -144,12 +147,21 @@ _prepare_sbom() {
 
   yq4 -o json -i ". *= load(\"${SBOM_TEMPLATE_FILE}\")" "${sbom_file}"
 
-  mapfile -t components < <(yq4 -r -o json '.components[].name' "${sbom_file}")
+  # mapfile -t components < <(yq4 -r -o json '.components[].name' "${sbom_file}")
+  mapfile -t components < <(yq4 -o json -I=0 '[.components[] | { "name": .name, "version": .version}] | .[]' "${sbom_file}")
 
   for component in "${components[@]}"; do
-    _sbom_add_component "${sbom_file}" "${component}" "licenses" "[]"
-    _sbom_add_component "${sbom_file}" "${component}" "properties" "[]"
-    _sbom_add_component "${sbom_file}" "${component}" "properties" "$(_format_elastisys_evaluation_object "set-me")"
+    component_name=$(echo "${component}" | jq -r '.name')
+    component_version=$(echo "${component}" | jq -r '.version')
+    _sbom_add_component "${sbom_file}" "${component_name}" "${component_version}" "licenses" "[]"
+    _sbom_add_component "${sbom_file}" "${component_name}" "${component_version}" "properties" "[]"
+
+    # check if component already has an elastisys evaluation
+    elastisys_evaluation=$(yq4 -o json -I=0 ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\").properties[] | select(.name == \"Elastisys evaluation\")" "${SBOM_FILE}")
+    if [[ -z "${elastisys_evaluation}" ]]; then
+      elastisys_evaluation="$(_format_elastisys_evaluation_object "set-me")"
+    fi
+    _sbom_add_component "${sbom_file}" "${component_name}" "${component_version}" "properties" "${elastisys_evaluation}"
   done
 }
 
@@ -171,16 +183,17 @@ _get_licenses() {
 
   for chart in "${upstream_charts[@]}"; do
     chart_name=$(yq4 ".name" "${chart}")
+    chart_version=$(yq4 ".version" "${chart}")
 
     # check if chart.yaml contains license in annotations
     annotation=$(yq4 ".annotations.licenses" "${chart}")
     annotation_artifacthub=$(yq4 ".annotations.artifacthub.io/license" "${chart}")
 
     if [[ -n "${annotation}" && "${annotation}" != "null" ]]; then
-      _sbom_add_component "${sbom_file}" "${chart_name}" "licenses" "$(_format_license_object "${annotation}")"
+      _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "${annotation}")"
 
     elif [[ -n "${annotation_artifacthub}" && "${annotation_artifacthub}" != "null" ]]; then
-      _sbom_add_component "${sbom_file}" "${chart_name}" "licenses" "$(_format_license_object "${annotation_artifacthub}")"
+      _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "${annotation_artifacthub}")"
 
     # if no license in annotations, try to get from source (e.g. github)
     else
@@ -204,7 +217,7 @@ _get_licenses() {
             continue
           else
             for l in "${licenses_in_git[@]}"; do
-               _sbom_add_component "${sbom_file}" "${chart_name}" "licenses" "$(_format_license_object "${l}")"
+               _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "${l}")"
             done
           fi
         done
@@ -217,9 +230,10 @@ _get_licenses() {
 
   for chart in "${welkin_charts[@]}"; do
     chart_name=$(yq4 ".name" "${chart}")
+    chart_version=$(yq4 ".version" "${chart}")
 
     # TODO: licenses for the applications
-    _sbom_add_component "${sbom_file}" "${chart_name}" "licenses" "$(_format_license_object "Apache-2.0")"
+    _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "Apache-2.0")"
   done
 }
 
@@ -228,13 +242,9 @@ _get_container_images_from_template() {
   sbom_file="${1}"
   template_file="${2}"
   chart_name="${3}"
-  release_name="${4}"
-  type="${5}"
-
-  local sbom_file
-  if [[ "$#" -ne 5 ]]; then
-    log_fatal "usage: _get_container_images_from_template <sbom-file> <helmfile-template-file> <chart_name> <release_name> <type>"
-  fi
+  chart_version="${4}"
+  release_name="${5}"
+  type="${6}"
 
   # TODO: .metadata.labels.release label capture subcharts e.g. node-exporter for kube-prometheus-stack, and will save images under that release
   # although the sbom contains the subcharts, which currently does not get any containers set. Would be nice to improve this
@@ -265,7 +275,7 @@ _get_container_images_from_template() {
   fi
 
   for container in "${containers[@]}"; do
-    _sbom_add_component "${sbom_file}" "${chart_name}" "properties" "$(_format_container_image_object "${container}")"
+    _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "properties" "$(_format_container_image_object "${container}")"
   done
 }
 
@@ -289,7 +299,6 @@ _get_container_images() {
 
   mapfile -t all_charts < <(find "${HELMFILE_FOLDER}" -name "Chart.yaml")
 
-  # TODO:
   CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc list --output json 2> /dev/null > "${helmfile_list}"
   # - currently only retrieves enabled/installed charts from using helmfile template
   CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc template 2> /dev/null > "${template_file}"
@@ -297,6 +306,7 @@ _get_container_images() {
 
   for chart in "${all_charts[@]}"; do
     chart_name=$(yq4 ".name" "${chart}")
+    chart_version=$(yq4 ".version" "${chart}")
 
     # parsing to get the chart folder path which is used for each helm release
     chart_folder_name="${chart#"${HELMFILE_FOLDER}/"}"
@@ -313,13 +323,13 @@ _get_container_images() {
 
     for release in "${releases[@]}"; do
       release_name=$(echo "${release}" | jq -r ".name")
-      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${release_name}" "cronjob"
-      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${release_name}" "pod"
-      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${release_name}" "deployment"
-      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${release_name}" "job"
-      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${release_name}" "daemonset"
-      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${release_name}" "statefulset"
-      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${release_name}" "alertmanager"
+      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${release_name}" "cronjob"
+      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${release_name}" "pod"
+      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${release_name}" "deployment"
+      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${release_name}" "job"
+      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${release_name}" "daemonset"
+      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${release_name}" "statefulset"
+      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${release_name}" "alertmanager"
     done
 
     # TODO: mapping chart names to release names?
@@ -358,33 +368,35 @@ get_unset() {
 }
 
 sbom_remove() {
-  if [[ "$#" -ne 3 ]]; then
+  if [[ "$#" -ne 4 ]]; then
     usage
   fi
 
-  local component key value
+  local component_name component_version key value
 
-  component="${1}"
-  key="${2}"
-  value="${3}"
+  component_name="${1}"
+  component_version="${2}"
+  key="${3}"
+  value="${4}"
 
-  query="with(.components[] | select(.name == \"${component}\").${key}; del(.[] | select(.name == \"${value}\")))"
+  query="with(.components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\").${key}; del(.[] | select(.name == \"${value}\")))"
 
   _yq_run_query "${SBOM_FILE}" "${query}"
 }
 
 sbom_add() {
-  if [[ "$#" -ne 3 ]]; then
+  if [[ "$#" -ne 4 ]]; then
     usage
   fi
 
-  local component key
+  local component_name component_version key
 
-  component="${1}"
-  key="${2}"
+  component_name="${1}"
+  component_version="${2}"
+  key="${3}"
 
   _sbom_add_component "${SBOM_FILE}" "${@}"
-  log_info "Updated ${key} for ${component}"
+  log_info "Updated ${key} for ${component_name}@${component_version}"
 }
 
 sbom_get() {
@@ -392,14 +404,17 @@ sbom_get() {
     usage
   fi
 
-  local component key query
+  local component_name component_version key query
 
-  component="${1}"
-  query=".components[] | select(.name ==\"${component}\")"
-  # key="${2}"
+  component_name="${1}"
+  query=".components[] | select(.name == \"${component_name}\" )"
   if [[ "$#" -gt 1 ]]; then
-    key="${2}"
-    query=".components[] | select(.name ==\"${component}\") | .${key}"
+    component_version="${2}"
+    query=".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\")"
+  fi
+  if [[ "$#" -gt 2 ]]; then
+    key="${3}"
+    query=".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\") | .${key}"
   fi
 
   yq4 -e -o json "${query}" "${SBOM_FILE}"
@@ -424,13 +439,13 @@ sbom_update() {
     usage
   fi
 
-  local component key
+  local component_name key
 
-  component="${1}"
+  component_name="${1}"
   key="${2}"
 
   _sbom_update_component "${SBOM_FILE}" "${@}"
-  log_info "Updated ${key} for ${component}"
+  log_info "Updated ${key} for ${component_name}"
 }
 
 sbom_generate() {
