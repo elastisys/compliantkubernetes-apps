@@ -171,10 +171,10 @@ version) # all|both|sc|wc
     log_info "config version:" "$(yq4 '.global.ck8sVersion' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")"
   fi
   if [[ "${1}" =~ ^(all|both|sc)$ ]]; then
-    log_info "sc version:" "$(get_version "sc")"
+    log_info "sc version:" "$(get_apps_version "sc")"
   fi
   if [[ "${1}" =~ ^(all|both|wc)$ ]]; then
-    log_info "wc version:" "$(get_version "wc")"
+    log_info "wc version:" "$(get_apps_version "wc")"
   fi
   ;;
 *) usage ;;
