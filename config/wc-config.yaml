@@ -391,3 +391,11 @@ gatekeeper:
 
 gpu:
   enabled: false
+
+kyverno:
+  policies:
+    verifyImageSignature:
+      enabled: false
+      type: Cosign
+      ignoreRekorTlog: false
+      attestor: ""
