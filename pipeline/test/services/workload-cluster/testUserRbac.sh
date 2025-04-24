@@ -129,8 +129,8 @@ echo
 echo "Testing user RBAC"
 echo "====================="
 
-user_namespaces=$(yq4 '.user.namespaces[]' "$CONFIG_FILE")
-mapfile -t user_admin_users < <(yq4 '.user.adminUsers[]' "$CONFIG_FILE")
+user_namespaces=$(yq '.user.namespaces[]' "$CONFIG_FILE")
+mapfile -t user_admin_users < <(yq '.user.adminUsers[]' "$CONFIG_FILE")
 
 for user in "${user_admin_users[@]}"; do
   testCanUserDo "get" "node" "$user"
@@ -246,8 +246,8 @@ echo
 echo "Testing group RBAC"
 echo "====================="
 
-user_namespaces=$(yq4 '.user.namespaces[]' "$CONFIG_FILE")
-mapfile -t user_admin_groups < <(yq4 '.user.adminGroups[]' "$CONFIG_FILE")
+user_namespaces=$(yq '.user.namespaces[]' "$CONFIG_FILE")
+mapfile -t user_admin_groups < <(yq '.user.adminGroups[]' "$CONFIG_FILE")
 
 for group in "${user_admin_groups[@]}"; do
   testCanGroupDo "get" "node" "$group"

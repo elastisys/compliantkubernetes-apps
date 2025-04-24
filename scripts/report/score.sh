@@ -23,23 +23,23 @@ score() {
 
   local releases
   releases="$(helmfile --allow-no-matching-release -e "${target}_cluster" -f "${root}/helmfile.d/" list "${@/#/-l}" -q --output json)"
-  releases="$(yq4 -Poj '[.[] | select(.enabled and .installed) | {"namespace": .namespace, "name": .name}] | sort_by(.namespace, .name)' <<<"${releases}")"
+  releases="$(yq -Poj '[.[] | select(.enabled and .installed) | {"namespace": .namespace, "name": .name}] | sort_by(.namespace, .name)' <<<"${releases}")"
 
   local length
-  length="$(yq4 -Poy 'length' <<<"${releases}")"
+  length="$(yq -Poy 'length' <<<"${releases}")"
 
   for index in $(seq 0 $((length - 1))); do
-    namespace="$(yq4 -Poy ".[${index}].namespace" <<<"${releases}")"
-    name="$(yq4 -Poy ".[${index}].name" <<<"${releases}")"
+    namespace="$(yq -Poy ".[${index}].namespace" <<<"${releases}")"
+    name="$(yq -Poy ".[${index}].name" <<<"${releases}")"
 
     echo "templating ${target}/${namespace}/${name}" >&2
-    helmfile -e "${target}_cluster" -f "${root}/helmfile.d/" template -q "-lnamespace=${namespace},name=${name}" | yq4 "with(select(.metadata.namespace == null); .metadata.namespace = \"${namespace}\")"
+    helmfile -e "${target}_cluster" -f "${root}/helmfile.d/" template -q "-lnamespace=${namespace},name=${name}" | yq "with(select(.metadata.namespace == null); .metadata.namespace = \"${namespace}\")"
     echo "---"
   done | $cmd score - --output-format=json --ignore-test container-image-pull-policy,container-ephemeral-storage-request-and-limit --kubernetes-version v1.24 || true
 }
 
 human_filter() {
-  yq4 -Poy '{
+  yq -Poy '{
     "'"${1}"'": [
       .[] | {
         "kind": .type_meta.apiVersion + "/" + .type_meta.kind,
@@ -66,7 +66,7 @@ human_filter() {
 }
 
 machine_filter() {
-  yq4 -Pocsv '
+  yq -Pocsv '
     with(.[].[].fails[];
       . |= [
         {

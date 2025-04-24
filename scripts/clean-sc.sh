@@ -18,7 +18,7 @@ source "${here}/../bin/common.bash"
 
 config_load sc
 
-clusterAPIEnabled=$(yq4 '.clusterApi.enabled' "${config[config_file_sc]}")
+clusterAPIEnabled=$(yq '.clusterApi.enabled' "${config[config_file_sc]}")
 
 GATE_VALWEBHOOK=$(
   "${here}/.././bin/ck8s" ops \
@@ -45,7 +45,7 @@ fi
 # Clean up any leftover challenges
 mapfile -t CHALLENGES < <(
   "${here}/.././bin/ck8s" ops kubectl sc get challenge -A -oyaml |
-    yq4 '.items[] | .metadata.name + "," + .metadata.namespace'
+    yq '.items[] | .metadata.name + "," + .metadata.namespace'
 )
 for challenge in "${CHALLENGES[@]}"; do
   IFS=, read -r name namespace <<<"${challenge}"

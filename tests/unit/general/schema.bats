@@ -16,7 +16,7 @@ find_schemas() {
 @test "root schemas should have titles" {
   declare -a schemas && find_schemas
 
-  run yq4 '{ filename: .title // "" } | select(.[] == "")' "${schemas[@]}"
+  run yq '{ filename: .title // "" } | select(.[] == "")' "${schemas[@]}"
 
   refute_output
 }
@@ -24,7 +24,7 @@ find_schemas() {
 @test "root schemas should have descriptions" {
   declare -a schemas && find_schemas
 
-  run yq4 '{ filename: .description // "" } | select(.[] == "")' "${schemas[@]}"
+  run yq '{ filename: .description // "" } | select(.[] == "")' "${schemas[@]}"
 
   refute_output
 }
@@ -32,7 +32,7 @@ find_schemas() {
 @test "root schemas should have types" {
   declare -a schemas && find_schemas
 
-  run yq4 '{ filename: .type // "" } | select(.[] == "")' "${schemas[@]}"
+  run yq '{ filename: .type // "" } | select(.[] == "")' "${schemas[@]}"
 
   refute_output
 }
@@ -40,7 +40,7 @@ find_schemas() {
 @test "object schemas with properties should have titles" {
   declare -a schemas && find_schemas
 
-  run yq4 '{
+  run yq '{
     filename: [
       .. | select(has("type") and .type == "object" and has("properties") and (
         .title == null or .title == "")
@@ -54,7 +54,7 @@ find_schemas() {
 @test "object schemas with properties should have descriptions" {
   declare -a schemas && find_schemas
 
-  run yq4 '{
+  run yq '{
     filename: [
       .. | select(has("type") and .type == "object" and has("properties") and (
         .description == null or .description == "")
@@ -68,7 +68,7 @@ find_schemas() {
 @test "array schemas with items should have titles" {
   declare -a schemas && find_schemas
 
-  run yq4 '{
+  run yq '{
     filename: [
       .. | select(has("type") and .type == "array" and has("items") and (
         .title == null or .title == "")
@@ -82,7 +82,7 @@ find_schemas() {
 @test "array schemas with items should have descriptions" {
   declare -a schemas && find_schemas
 
-  run yq4 '{
+  run yq '{
     filename: [
       .. | select(has("type") and .type == "array" and has("items") and (
         .description == null or .description == "")
@@ -98,7 +98,7 @@ find_schemas() {
   declare -a schemas && find_schemas
 
   # shellcheck disable=SC2016
-  run yq4 '{
+  run yq '{
     filename: [
       .. | select(
         (. != "true") and

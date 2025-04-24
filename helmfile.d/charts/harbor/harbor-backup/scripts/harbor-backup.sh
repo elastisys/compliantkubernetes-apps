@@ -92,7 +92,7 @@ gcs_get_records() {
   # * Select only entries older than given date (epoch time)
   # * Save name of path to key "Key"
   gsutil -o "Credentials:gs_service_key_file=${GCS_KEYFILE}" ls -L "${PATH_TO_BACKUPS}" |
-    yq r - -j |
+    yq eval --output-format json --input-format yaml |
     jq '[to_entries | .[] | ' \
       'select(( .key | test("^gs:\/\/[^\/]+\/backups\/.+")) and ' \
       '(.value."Update time" | strptime("%a, %d %b %Y %H:%M:%S %Z") | mktime <= '"${before_date}"') ) | ' \

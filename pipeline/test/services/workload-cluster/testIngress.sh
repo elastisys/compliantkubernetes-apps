@@ -39,7 +39,7 @@ function check_wc_ingress_health() {
 
   desired_replicas=$(kubectl get daemonset -n ingress-nginx ingress-nginx-controller -ojson | jq ".status.desiredNumberScheduled | tonumber")
   ready_replicas=$(kubectl get daemonset -n ingress-nginx ingress-nginx-controller -ojson | jq ".status.numberReady | tonumber")
-  has_proxy_protocol=$(kubectl get configmap -n ingress-nginx ingress-nginx-controller -oyaml | yq4 '.data.use-proxy-protocol')
+  has_proxy_protocol=$(kubectl get configmap -n ingress-nginx ingress-nginx-controller -oyaml | yq '.data.use-proxy-protocol')
 
   diff=$((desired_replicas - ready_replicas))
   if "${has_proxy_protocol}"; then

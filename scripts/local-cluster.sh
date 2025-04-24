@@ -55,9 +55,10 @@ log.continue() {
   fi
 }
 
+# sanity-check the yq version
 yq() {
-  if command -v yq4 >/dev/null; then
-    command yq4 "${@}"
+  if ! command yq -V | grep --extended-regexp "v4\." >/dev/null 2>&1; then
+    log.fatal "expecting the yq binary to be at least version v4"
   else
     command yq "${@}"
   fi
@@ -463,7 +464,7 @@ setup_node_local_dns() {
   fi
 
   # need domain
-  domain="$(yq4 ".global.baseDomain" <"${CK8S_CONFIG_PATH}/common-config.yaml")"
+  domain="$(yq ".global.baseDomain" <"${CK8S_CONFIG_PATH}/common-config.yaml")"
 
   export wc_node_ip
   export sc_node_ip

@@ -45,7 +45,7 @@ set_dex_credentials() {
 
   config_load sc
   cluster_config="${config[config_file_sc]}"
-  base_domain=$(yq4 '.global.baseDomain' "${cluster_config}")
+  base_domain=$(yq '.global.baseDomain' "${cluster_config}")
 
   kubectl --kubeconfig="${user_kubeconfig}" config set-credentials "${name}@${cluster_name}" \
     --exec-command=kubectl \
@@ -107,7 +107,7 @@ dev)
   log_info "Adding dev ${serviceAccount} context to wc-config"
 
   token=$(with_kubeconfig "${kubeconfig}" kubectl get secrets secret-"${serviceAccount}" -ojsonpath="{.data.token}" | base64 -d)
-  cluster_name=$(yq4 '.global.clusterName' "${cluster_config}")
+  cluster_name=$(yq '.global.clusterName' "${cluster_config}")
 
   kubectl --kubeconfig="${kubeconfig}" config set-credentials "${serviceAccount}@${cluster_name}" \
     --token="${token}"
@@ -148,7 +148,7 @@ fi
 
 log_info "Creating kubeconfig for the ${1}"
 
-cluster_name=$(yq4 '.global.clusterName' "${cluster_config}")
+cluster_name=$(yq '.global.clusterName' "${cluster_config}")
 
 set_cluster "${user_kubeconfig}"
 set_dex_credentials "${user_kubeconfig}" "${1}" "${cluster_name}"
@@ -156,7 +156,7 @@ set_dex_credentials "${user_kubeconfig}" "${1}" "${cluster_name}"
 # Create context with relevant namespace
 # Pick the first namespace
 if [[ ${1} == "user" ]]; then
-  context_namespace=$(yq4 '.user.namespaces[0]' "${config[config_file_wc]}")
+  context_namespace=$(yq '.user.namespaces[0]' "${config[config_file_wc]}")
 else
   context_namespace="default"
 fi

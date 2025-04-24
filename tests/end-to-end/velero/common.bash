@@ -1,5 +1,5 @@
 velero_backups_spec() {
-  ck8s ops velero "${1}" backup create --from-schedule velero-daily-backup -o yaml 2>/dev/null | yq4 .spec
+  ck8s ops velero "${1}" backup create --from-schedule velero-daily-backup -o yaml 2>/dev/null | yq .spec
 }
 
 velero_backup_create() {

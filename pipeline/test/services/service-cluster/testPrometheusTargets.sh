@@ -10,14 +10,14 @@ source "$INNER_SCRIPTS_PATH/../prometheus-common.sh"
 totalNodes=$(kubectl get nodes --no-headers | wc -l)
 masterNodes=$(kubectl get nodes -l node-role.kubernetes.io/control-plane --no-headers | wc -l)
 
-totalPrometheus=$(yq4 -e '.prometheus.replicas' "${CONFIG_FILE}")
+totalPrometheus=$(yq -e '.prometheus.replicas' "${CONFIG_FILE}")
 
-enable_thanos=$(yq4 -e '.thanos.enabled' "${CONFIG_FILE}")
-enable_thanos_receiver=$(yq4 -e '.thanos.receiver.enabled' "${CONFIG_FILE}")
-enable_thanos_query=$(yq4 -e '.thanos.query.enabled' "${CONFIG_FILE}")
-enable_thanos_ruler=$(yq4 -e '.thanos.ruler.enabled' "${CONFIG_FILE}")
-enable_thanos_service_monitor=$(yq4 -e '.thanos.metrics.serviceMonitor.enabled' "${CONFIG_FILE}")
-readarray -t custom_kubeapi_targets < <(yq4 -e '.prometheusBlackboxExporter.customKubeapiTargets[].name' "${CONFIG_FILE}")
+enable_thanos=$(yq -e '.thanos.enabled' "${CONFIG_FILE}")
+enable_thanos_receiver=$(yq -e '.thanos.receiver.enabled' "${CONFIG_FILE}")
+enable_thanos_query=$(yq -e '.thanos.query.enabled' "${CONFIG_FILE}")
+enable_thanos_ruler=$(yq -e '.thanos.ruler.enabled' "${CONFIG_FILE}")
+enable_thanos_service_monitor=$(yq -e '.thanos.metrics.serviceMonitor.enabled' "${CONFIG_FILE}")
+readarray -t custom_kubeapi_targets < <(yq -e '.prometheusBlackboxExporter.customKubeapiTargets[].name' "${CONFIG_FILE}")
 
 echo
 echo

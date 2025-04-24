@@ -31,7 +31,7 @@ run_diff() {
   chart="${1}"
   out "${chart}:"
 
-  current_version="$(yq4 .version "${CHARTS}/${chart}/Chart.yaml" 2>/dev/null || true)"
+  current_version="$(yq .version "${CHARTS}/${chart}/Chart.yaml" 2>/dev/null || true)"
   if [[ -z "${current_version}" ]] || [[ "${current_version}" == "null" ]]; then
     out "  state: \e[33mskipped\e[0m - missing"
     return
@@ -39,7 +39,7 @@ run_diff() {
 
   requested_version="${3:-}"
   if [[ -z "${requested_version}" ]]; then
-    requested_version="$(yq4 ".charts.\"${chart}\"" "${INDEX}")"
+    requested_version="$(yq ".charts.\"${chart}\"" "${INDEX}")"
   fi
 
   error="$(helm show chart "${chart}" --version "${requested_version}" 2>&1 >/dev/null || true)"
@@ -81,13 +81,13 @@ run_list() {
   chart="${1}"
   out "${chart}:"
 
-  requested_version="$(yq4 ".charts.\"${chart}\"" "${INDEX}")"
+  requested_version="$(yq ".charts.\"${chart}\"" "${INDEX}")"
 
-  current_version="$(yq4 '.version + " - " + .appVersion' "${CHARTS}/${chart}/Chart.yaml" 2>/dev/null || true)"
+  current_version="$(yq '.version + " - " + .appVersion' "${CHARTS}/${chart}/Chart.yaml" 2>/dev/null || true)"
   current_appversion="${current_version#* - }"
   current_version="${current_version%% - *}"
 
-  latest_version="$(helm show chart "${chart}" 2>/dev/null | yq4 '.version + " - " + .appVersion' || true)"
+  latest_version="$(helm show chart "${chart}" 2>/dev/null | yq '.version + " - " + .appVersion' || true)"
   latest_appversion="${latest_version#* - }"
   latest_version="${latest_version%% - *}"
 
@@ -118,10 +118,10 @@ run_list() {
 run_pull() {
   chart="${1}"
   out "${chart}:"
-  requested_version="$(yq4 ".charts.\"${chart}\"" "${INDEX}")"
+  requested_version="$(yq ".charts.\"${chart}\"" "${INDEX}")"
   out "  requested-version: \e[34m${requested_version}\e[0m"
 
-  current_version="$(yq4 .version "${CHARTS}/${chart}/Chart.yaml" 2>/dev/null || true)"
+  current_version="$(yq .version "${CHARTS}/${chart}/Chart.yaml" 2>/dev/null || true)"
   if [[ "${current_version}" == "${requested_version}" ]] && [[ "${2:-}" != "--force" ]]; then
     out "  state: \e[33mskipped\e[0m - up to date"
     return
@@ -152,7 +152,7 @@ run_verify() {
   chart="${1}"
   out "${chart}:"
 
-  current_version="$(yq4 .version "${CHARTS}/${chart}/Chart.yaml" 2>/dev/null || true)"
+  current_version="$(yq .version "${CHARTS}/${chart}/Chart.yaml" 2>/dev/null || true)"
   if [[ -z "${current_version}" ]] || [[ "${current_version}" == "null" ]]; then
     out "  state: \e[33mskipped\e[0m - missing"
     return
@@ -203,12 +203,12 @@ diff | list | pull | verify)
     usage
     ;;
   all)
-    for chart in $(yq4 '.charts | keys | .[]' "${INDEX}"); do
+    for chart in $(yq '.charts | keys | .[]' "${INDEX}"); do
       "run_${1}" "${chart}" "${@:3}"
     done
     ;;
   *)
-    charts="$(yq4 ".charts | keys | .[] | select(match(\"${2}\$\"))" "${INDEX}")"
+    charts="$(yq ".charts | keys | .[] | select(match(\"${2}\$\"))" "${INDEX}")"
     if [[ -z "${charts}" ]]; then
       out "\e[31merror\e[0m: invalid chart identifier \"${2}\""
       exit 1
@@ -225,22 +225,22 @@ diff | list | pull | verify)
 repo)
   case "${2:-}" in
   add)
-    for repository in $(yq4 '.repositories | keys | .[]' "${INDEX}"); do
-      helm repo add "${repository}" "$(yq4 ".repositories.\"${repository}\"" "${INDEX}")"
+    for repository in $(yq '.repositories | keys | .[]' "${INDEX}"); do
+      helm repo add "${repository}" "$(yq ".repositories.\"${repository}\"" "${INDEX}")"
     done
     ;;
   list)
-    for repository in $(yq4 '.repositories | keys | .[]' "${INDEX}"); do
-      out "${repository}: $(yq4 ".repositories.\"${repository}\"" "${INDEX}")"
+    for repository in $(yq '.repositories | keys | .[]' "${INDEX}"); do
+      out "${repository}: $(yq ".repositories.\"${repository}\"" "${INDEX}")"
     done
     ;;
   update)
-    for repository in $(yq4 '.repositories | keys | .[]' "${INDEX}"); do
+    for repository in $(yq '.repositories | keys | .[]' "${INDEX}"); do
       helm repo update "${repository}"
     done
     ;;
   remove)
-    for repository in $(yq4 '.repositories | keys | .[]' "${INDEX}"); do
+    for repository in $(yq '.repositories | keys | .[]' "${INDEX}"); do
       helm repo remove "${repository}"
     done
     ;;

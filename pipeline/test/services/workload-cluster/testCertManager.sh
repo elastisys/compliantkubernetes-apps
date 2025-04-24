@@ -55,11 +55,11 @@ function check_wc_certmanager_cluster_issuers() {
       cluster_issuer_status=$(echo "$jsonData" | jq -r '.status.conditions[] | select(.type=="Ready") | .status')
       if [[ "$cluster_issuer_status" == "True" ]]; then
         IFS='-' read -ra data <<<"$clusterIssuer"
-        readarray custom_solvers < <(yq4 e -o=j -I=0 ".issuers.${data[0]}.${data[1]}.solvers[]" "${config['config_file_wc']}")
+        readarray custom_solvers < <(yq e -o=j -I=0 ".issuers.${data[0]}.${data[1]}.solvers[]" "${config['config_file_wc']}")
         if ! [ ${#custom_solvers[@]} -eq 0 ]; then
           for custom_solver in "${custom_solvers[@]}"; do
             challenge_solver=$(echo "$custom_solver" | jq ". | del( .selector ) | keys[] ")
-            solver_exist=$(kubectl get ClusterIssuer "$clusterIssuer" -oyaml | yq4 e -o=j -I=0 ".spec.acme.solvers[].$challenge_solver")
+            solver_exist=$(kubectl get ClusterIssuer "$clusterIssuer" -oyaml | yq e -o=j -I=0 ".spec.acme.solvers[].$challenge_solver")
             if [[ $solver_exist == "null" ]]; then
               no_error=false
               debug_msg+="[ERROR] Missing custom solver : $challenge_solver for Cluster Issuer : $clusterIssuer\n"
@@ -94,7 +94,7 @@ function check_wc_certmanager_apps_certificates() {
 
   certificates=()
 
-  enable_hnc=$(yq4 -e '.hnc.enabled' "${config['config_file_wc']}" 2>/dev/null)
+  enable_hnc=$(yq -e '.hnc.enabled' "${config['config_file_wc']}" 2>/dev/null)
 
   if "${enable_hnc}"; then
     certificates+=(

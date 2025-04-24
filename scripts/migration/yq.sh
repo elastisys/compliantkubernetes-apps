@@ -6,7 +6,7 @@ yq_dig() {
     log_fatal "usage: yq_dig <sc|wc> <target>"
   fi
 
-  yq4 ea "explode(.) | ${2} | select(. != null) | {\"wrapper\": .} as \$item ireduce ({}; . * \$item) | .wrapper | ... comments=\"\"" "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/${1}-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
+  yq ea "explode(.) | ${2} | select(. != null) | {\"wrapper\": .} as \$item ireduce ({}; . * \$item) | .wrapper | ... comments=\"\"" "${CK8S_CONFIG_PATH}/defaults/common-config.yaml" "${CK8S_CONFIG_PATH}/defaults/${1}-config.yaml" "${CK8S_CONFIG_PATH}/common-config.yaml" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
 }
 
 yq_null() {
@@ -14,7 +14,7 @@ yq_null() {
     log_fatal "usage: yq_null <common|sc|wc> <target>"
   fi
 
-  test "$(yq4 "${2}" "${CK8S_CONFIG_PATH}/${1}-config.yaml")" = "null"
+  test "$(yq "${2}" "${CK8S_CONFIG_PATH}/${1}-config.yaml")" = "null"
 }
 
 yq_check() {
@@ -22,7 +22,7 @@ yq_check() {
     log_fatal "usage: yq_check <common|sc|wc> <target> <value>"
   fi
 
-  test "$(yq4 "${2}" "$CK8S_CONFIG_PATH/${1}-config.yaml")" = "${3}"
+  test "$(yq "${2}" "$CK8S_CONFIG_PATH/${1}-config.yaml")" = "${3}"
 }
 
 yq_copy() {
@@ -32,7 +32,7 @@ yq_copy() {
 
   if ! yq_null "${1}" "${2}"; then
     log_info "  - copy: ${2} to ${3}"
-    yq4 -i "${3} = ${2}" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
+    yq -i "${3} = ${2}" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
   fi
 }
 
@@ -43,7 +43,7 @@ yq_move() {
 
   if ! yq_null "${1}" "${2}"; then
     log_info "  - move: ${2} to ${3}"
-    yq4 -i "${3} = ${2} | del(${2})" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
+    yq -i "${3} = ${2} | del(${2})" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
   fi
 }
 
@@ -54,9 +54,9 @@ yq_move_to_file() {
 
   if ! yq_null "${1}" "${2}"; then
     log_info "  - move: ${1} ${2} to ${4} ${3}"
-    yq4 -oj -I0 "${2}" "${CK8S_CONFIG_PATH}/${1}-config.yaml" |
-      yq4 -i "${4} = load(\"/dev/stdin\")" "${CK8S_CONFIG_PATH}/${3}-config.yaml"
-    yq4 -i "del(${2})" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
+    yq -oj -I0 "${2}" "${CK8S_CONFIG_PATH}/${1}-config.yaml" |
+      yq -i "${4} = load(\"/dev/stdin\")" "${CK8S_CONFIG_PATH}/${3}-config.yaml"
+    yq -i "del(${2})" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
   fi
 }
 
@@ -66,7 +66,7 @@ yq_add() {
   fi
 
   log_info "  - add: ${3} to ${2}"
-  yq4 -i "${2} = ${3}" "$CK8S_CONFIG_PATH/${1}-config.yaml"
+  yq -i "${2} = ${3}" "$CK8S_CONFIG_PATH/${1}-config.yaml"
 }
 
 yq_remove() {
@@ -76,14 +76,14 @@ yq_remove() {
 
   if ! yq_null "${1}" "${2}"; then
     log_info "  - remove: ${2}"
-    yq4 -i "del(${2})" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
+    yq -i "del(${2})" "${CK8S_CONFIG_PATH}/${1}-config.yaml"
   fi
 }
 
 yq_merge() {
-  yq4 eval-all --prettyPrint "... comments=\"\" | explode(.) as \$item ireduce ({}; . * \$item )" "${@}"
+  yq eval-all --prettyPrint "... comments=\"\" | explode(.) as \$item ireduce ({}; . * \$item )" "${@}"
 }
 
 yq_paths() {
-  yq4 "[.. | select(tag != \"!!map\" and . == \"${1}\") | path | with(.[]; . = (\"\\\"\" + .) + \"\\\"\") | \".\" + join \".\" | sub(\"\\.\\\"[0-9]\\\"+.*\"; \"\")] | sort | unique | .[]"
+  yq "[.. | select(tag != \"!!map\" and . == \"${1}\") | path | with(.[]; . = (\"\\\"\" + .) + \"\\\"\") | \".\" + join \".\" | sub(\"\\.\\\"[0-9]\\\"+.*\"; \"\")] | sort | unique | .[]"
 }

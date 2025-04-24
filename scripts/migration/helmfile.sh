@@ -78,13 +78,13 @@ helmfile_change_dispatch() {
     log_warn "warning: ${2} ${*:3} had no matching releases"
     return
   fi
-  list="$(yq4 -P '[.[] | select(.enabled and .installed)]' <<<"${list}")"
+  list="$(yq -P '[.[] | select(.enabled and .installed)]' <<<"${list}")"
 
   local length
-  length="$(yq4 -P 'length' <<<"${list}")"
+  length="$(yq -P 'length' <<<"${list}")"
   for index in $(seq 0 $((length - 1))); do
-    namespace="$(yq4 -P ".[${index}].namespace" <<<"${list}")"
-    name="$(yq4 -P ".[${index}].name" <<<"${list}")"
+    namespace="$(yq -P ".[${index}].namespace" <<<"${list}")"
+    name="$(yq -P ".[${index}].name" <<<"${list}")"
 
     if helmfile_change "${2}" "namespace=${namespace},name=${name}" >/dev/null 2>&1; then
       log_info "  - skipping ${2} ${namespace}/${name} no change"

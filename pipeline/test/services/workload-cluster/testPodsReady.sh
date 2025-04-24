@@ -4,15 +4,15 @@ INNER_SCRIPTS_PATH="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 # shellcheck source=pipeline/test/services/funcs.sh
 source "${INNER_SCRIPTS_PATH}/../funcs.sh"
 
-enable_falco_alerts=$(yq4 -e '.falco.alerts.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_falco=$(yq4 -e '.falco.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_hnc=$(yq4 -e '.hnc.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_hnc_ha=$(yq4 -e '.hnc.ha' "${CONFIG_FILE}" 2>/dev/null)
-enable_user_alertmanager=$(yq4 -e '.user.alertmanager.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_velero=$(yq4 -e '.velero.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_kured=$(yq4 -e '.kured.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_fluentd=$(yq4 '.fluentd.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_fluentd_audit=$(yq4 '.fluentd.audit.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_falco_alerts=$(yq -e '.falco.alerts.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_falco=$(yq -e '.falco.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_hnc=$(yq -e '.hnc.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_hnc_ha=$(yq -e '.hnc.ha' "${CONFIG_FILE}" 2>/dev/null)
+enable_user_alertmanager=$(yq -e '.user.alertmanager.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_velero=$(yq -e '.velero.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_kured=$(yq -e '.kured.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_fluentd=$(yq '.fluentd.enabled' "${CONFIG_FILE}" 2>/dev/null)
+enable_fluentd_audit=$(yq '.fluentd.audit.enabled' "${CONFIG_FILE}" 2>/dev/null)
 
 echo
 echo

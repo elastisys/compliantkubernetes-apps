@@ -283,7 +283,7 @@ update_ips.assert_rclone_s3() {
   assert_equal "$(yq.dig sc '.networkPolicies.rclone.sync.objectStorage.ips | . style="flow"')" "[127.0.0.4/32]"
   assert_equal "$(yq.dig sc '.networkPolicies.rclone.sync.objectStorage.ports | . style="flow"')" "[1234]"
 
-  assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorageSwift' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
+  assert_equal "$(yq '.networkPolicies.rclone.sync.objectStorageSwift' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 4
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16
@@ -291,11 +291,11 @@ update_ips.assert_rclone_s3() {
 }
 
 update_ips.assert_rclone_s3_and_swift() {
-  assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorage | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.4/32]"
-  assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorage | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[1234]"
+  assert_equal "$(yq '.networkPolicies.rclone.sync.objectStorage | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.4/32]"
+  assert_equal "$(yq '.networkPolicies.rclone.sync.objectStorage | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[1234]"
 
-  assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorageSwift | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.5/32, 127.0.0.6/32]"
-  assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorageSwift | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[443, 5678]"
+  assert_equal "$(yq '.networkPolicies.rclone.sync.objectStorageSwift | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.5/32, 127.0.0.6/32]"
+  assert_equal "$(yq '.networkPolicies.rclone.sync.objectStorageSwift | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[443, 5678]"
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 6
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16
@@ -303,10 +303,10 @@ update_ips.assert_rclone_s3_and_swift() {
 }
 
 update_ips.assert_rclone_swift() {
-  assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorageSwift | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.5/32, 127.0.0.6/32]"
-  assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorageSwift | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[443, 5678]"
+  assert_equal "$(yq '.networkPolicies.rclone.sync.objectStorageSwift | .ips style="flow" | .ips' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[127.0.0.5/32, 127.0.0.6/32]"
+  assert_equal "$(yq '.networkPolicies.rclone.sync.objectStorageSwift | .ports style="flow" | .ports' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "[443, 5678]"
 
-  assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorage' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
+  assert_equal "$(yq '.networkPolicies.rclone.sync.objectStorage' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
 
   # GET /auth/tokens
   mock_set_output "${mock_curl}" $'HTTP/2 200\r

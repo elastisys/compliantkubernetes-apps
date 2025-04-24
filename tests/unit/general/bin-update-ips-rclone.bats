@@ -156,7 +156,7 @@ _test_apply_rclone_sync_s3_remove_swift() {
 
   run ck8s update-ips both apply
 
-  assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorageSwift' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
+  assert_equal "$(yq '.networkPolicies.rclone.sync.objectStorageSwift' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
 
   update_ips.assert_rclone_s3
 }
@@ -247,7 +247,7 @@ _test_apply_rclone_sync_swift_remove_s3() {
 
   run ck8s update-ips both apply
 
-  assert_equal "$(yq4 '.networkPolicies.rclone.sync.objectStorage' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
+  assert_equal "$(yq '.networkPolicies.rclone.sync.objectStorage' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
 
   update_ips.assert_rclone_swift
 }
@@ -379,7 +379,7 @@ _test_apply_rclone_sync_s3_and_swift() {
   update_ips.mock_minimal
   run ck8s update-ips both apply
 
-  assert_equal "$(yq4 '.networkPolicies.rclone.sync.secondaryUrl' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
+  assert_equal "$(yq '.networkPolicies.rclone.sync.secondaryUrl' "${CK8S_CONFIG_PATH}/sc-config.yaml")" "null"
 
   assert_equal "$(mock_get_call_num "${mock_dig}")" 3
   assert_equal "$(mock_get_call_num "${mock_kubectl}")" 16

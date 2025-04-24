@@ -78,7 +78,7 @@ config_version() {
   local prefix="${1}"
 
   local version
-  version="$(yq4 ".global.ck8sVersion" <<<"${CONFIG["${prefix}"]}")"
+  version="$(yq ".global.ck8sVersion" <<<"${CONFIG["${prefix}"]}")"
 
   VERSION["${prefix}-config"]="${version}"
   version="${version#v}"
@@ -116,7 +116,7 @@ config_validate() {
     conditional_setmes="$(yq_paths "set-me-if-*" <<<"${defaults}")"
 
     for setme in ${setmes}; do
-      compare=$(diff <(yq4 -oj "${setme}" <<<"${defaults}") <(yq4 -oj "${setme}" <<<"${CONFIG["${1}"]}") || true)
+      compare=$(diff <(yq -oj "${setme}" <<<"${defaults}") <(yq -oj "${setme}" <<<"${CONFIG["${1}"]}") || true)
       if [[ -z "${compare}" ]]; then
         log_error "error: \"${setme//\"/}\" is unset in ${1}-config"
         pass="false"
@@ -124,9 +124,9 @@ config_validate() {
     done
 
     for condsetme in ${conditional_setmes}; do
-      required_condition=$(yq4 "${condsetme}" <<<"${defaults}" | sed -rn 's/set-me-if-(.*)/\1/p' | yq4 "[.] | flatten | .[0]")
-      if [[ $(yq4 "${required_condition}" <<<"${CONFIG["${1}"]}") == "true" ]]; then
-        compare=$(diff <(yq4 -oj "${condsetme}" <<<"${defaults}") <(yq4 -oj "${condsetme}" <<<"${CONFIG["${1}"]}") || true)
+      required_condition=$(yq "${condsetme}" <<<"${defaults}" | sed -rn 's/set-me-if-(.*)/\1/p' | yq "[.] | flatten | .[0]")
+      if [[ $(yq "${required_condition}" <<<"${CONFIG["${1}"]}") == "true" ]]; then
+        compare=$(diff <(yq -oj "${condsetme}" <<<"${defaults}") <(yq -oj "${condsetme}" <<<"${CONFIG["${1}"]}") || true)
         if [[ -z "${compare}" ]]; then
           log_error "error: \"${condsetme//\"/}\" is unset in ${1}-config"
           pass="false"
@@ -134,14 +134,14 @@ config_validate() {
       fi
     done
 
-    sync_enabled=$(yq4 '.objectStorage.sync.enabled' <<<"${CONFIG["${1}"]}")
-    sync_default_enabled=$(yq4 '.objectStorage.sync.syncDefaultBuckets' <<<"${CONFIG["${1}"]}")
+    sync_enabled=$(yq '.objectStorage.sync.enabled' <<<"${CONFIG["${1}"]}")
+    sync_default_enabled=$(yq '.objectStorage.sync.syncDefaultBuckets' <<<"${CONFIG["${1}"]}")
     if [[ "${1}" = "sc" ]] && [[ "${sync_enabled}" = "true" ]] && [[ "${sync_default_enabled}" = "true" ]]; then
       log_info "checking sync swift"
 
-      check_harbor="$(yq4 '.harbor.persistence.type' <<<"${CONFIG["${1}"]}")"
-      check_thanos="$(yq4 '.thanos.objectStorage.type' <<<"${CONFIG["${1}"]}")"
-      check_sync_swift="$(yq4 '.objectStorage.sync.swift' <<<"${CONFIG["${1}"]}")"
+      check_harbor="$(yq '.harbor.persistence.type' <<<"${CONFIG["${1}"]}")"
+      check_thanos="$(yq '.thanos.objectStorage.type' <<<"${CONFIG["${1}"]}")"
+      check_sync_swift="$(yq '.objectStorage.sync.swift' <<<"${CONFIG["${1}"]}")"
 
       if { [[ "${check_harbor}" = "swift" ]] || [[ "${check_thanos}" = "swift" ]]; } && [[ "${check_sync_swift}" = "null" ]]; then
         log_error "error: swift is enabled for Harbor/Thanos, but .objectStorage.sync is missing swift configuration"
@@ -265,8 +265,8 @@ check_version() {
     return
   fi
 
-  common_override=$(yq4 '.global.ck8sVersion' "${CK8S_CONFIG_PATH}/common-config.yaml")
-  sc_wc_override=$(yq4 '.global.ck8sVersion' "${CK8S_CONFIG_PATH}/${1}-config.yaml")
+  common_override=$(yq '.global.ck8sVersion' "${CK8S_CONFIG_PATH}/common-config.yaml")
+  sc_wc_override=$(yq '.global.ck8sVersion' "${CK8S_CONFIG_PATH}/${1}-config.yaml")
   if [ "$common_override" != "null" ] || [ "$sc_wc_override" != "null" ]; then
     log_warn "You have set the ck8sVersion in an override config"
     log_warn "If this override version does not match the current repository version then:"

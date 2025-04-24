@@ -16,10 +16,10 @@ source "${here}/common.bash"
 
 # Load cloud provider, environment name, and flavor from config if available.
 if [ -f "${config[default_common]}" ]; then
-  cloud_provider=$(yq4 '.global.ck8sCloudProvider' "${config[default_common]}")
-  environment_name=$(yq4 '.global.ck8sEnvironmentName' "${config[default_common]}")
-  flavor=$(yq4 '.global.ck8sFlavor' "${config[default_common]}")
-  k8s_installer=$(yq4 '.global.ck8sK8sInstaller' "${config[default_common]}")
+  cloud_provider=$(yq '.global.ck8sCloudProvider' "${config[default_common]}")
+  environment_name=$(yq '.global.ck8sEnvironmentName' "${config[default_common]}")
+  flavor=$(yq '.global.ck8sFlavor' "${config[default_common]}")
+  k8s_installer=$(yq '.global.ck8sK8sInstaller' "${config[default_common]}")
 fi
 if [ -z "${cloud_provider:-}" ]; then
   : "${CK8S_CLOUD_PROVIDER:?Missing CK8S_CLOUD_PROVIDER}"
@@ -219,19 +219,19 @@ update_secrets() {
   tmpfile=$(mktemp)
   append_trap "rm ${tmpfile}" EXIT
 
-  yq4 eval-all 'select(fi == 0)' "${config_template_path}/secrets.yaml" >"${tmpfile}"
+  yq eval-all 'select(fi == 0)' "${config_template_path}/secrets.yaml" >"${tmpfile}"
 
   template_file="${config_template_path}/providers/${CK8S_CLOUD_PROVIDER}/secrets.yaml"
   if [[ -e "${template_file}" ]]; then
-    yq4 -i ". *= load(\"${template_file}\")" "${tmpfile}"
+    yq -i ". *= load(\"${template_file}\")" "${tmpfile}"
   fi
 
   generate_secrets "${tmpfile}"
 
   if [[ -f "${file}" ]]; then
     sops_decrypt "${file}"
-    yq4 --inplace '... comments=""' "${tmpfile}"
-    yq4 eval-all --inplace --prettyPrint 'select(fi == 0) * select(fi == 1)' "${tmpfile}" "${file}"
+    yq --inplace '... comments=""' "${tmpfile}"
+    yq eval-all --inplace --prettyPrint 'select(fi == 0) * select(fi == 1)' "${tmpfile}" "${file}"
   fi
 
   if [ "${generate_new_secrets}" = "true" ]; then
@@ -274,39 +274,39 @@ generate_secrets() {
   KUBEAPI_METRICS_PASS=$(pwgen -cns 20 1)
   KUBEAPI_METRICS_PASS_HTPASSWD=$(htpasswd -bnB "kubeapiuser" "${KUBEAPI_METRICS_PASS}" | tr -d '\n')
 
-  yq4 --inplace ".grafana.password= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
-  yq4 --inplace ".grafana.clientSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
-  yq4 --inplace ".grafana.opsClientSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
-  yq4 --inplace ".harbor.password= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
-  yq4 --inplace ".harbor.registryPassword= \"${HARBOR_REGISTRY_PASS}\"" "${tmpfile}"
-  yq4 --inplace ".harbor.registryPasswordHtpasswd= \"${HARBOR_REGISTRY_PASS_HTPASSWD}\"" "${tmpfile}"
-  yq4 --inplace ".harbor.internal.databasePassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
-  yq4 --inplace ".harbor.clientSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
-  yq4 --inplace ".harbor.xsrf= \"$(pwgen -cns 32 1)\"" "${tmpfile}"
-  yq4 --inplace ".harbor.coreSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
-  yq4 --inplace ".harbor.jobserviceSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
-  yq4 --inplace ".harbor.registrySecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
-  yq4 --inplace ".opensearch.adminPassword= \"${OS_ADMIN_PASS}\"" "${tmpfile}"
-  yq4 --inplace ".opensearch.adminHash= \"${OS_ADMIN_PASS_HASH}\"" "${tmpfile}"
-  yq4 --inplace ".opensearch.clientSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
-  yq4 --inplace ".opensearch.configurerPassword= \"${OS_CONF_PASS}\"" "${tmpfile}"
-  yq4 --inplace ".opensearch.configurerHash= \"${OS_CONF_PASS_HASH}\"" "${tmpfile}"
-  yq4 --inplace ".opensearch.dashboardsPassword= \"${OSD_PASS}\"" "${tmpfile}"
-  yq4 --inplace ".opensearch.dashboardsHash= \"${OSD_PASS_HASH}\"" "${tmpfile}"
-  yq4 --inplace ".opensearch.dashboardsCookieEncKey= \"$(pwgen -cns 32 1)\"" "${tmpfile}"
-  yq4 --inplace ".opensearch.fluentdPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
-  yq4 --inplace ".opensearch.curatorPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
-  yq4 --inplace ".opensearch.snapshotterPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
-  yq4 --inplace ".opensearch.metricsExporterPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
-  yq4 --inplace ".kubeapiMetricsPassword= \"${KUBEAPI_METRICS_PASS}\"" "${tmpfile}"
-  yq4 --inplace ".kubeapiMetricsPasswordHtpasswd= \"${KUBEAPI_METRICS_PASS_HTPASSWD}\"" "${tmpfile}"
-  yq4 --inplace ".dex.staticPasswordNotHashed= \"${DEX_STATIC_PASS}\"" "${tmpfile}"
-  yq4 --inplace ".dex.staticPassword= \"${DEX_STATIC_PASS_HASH}\"" "${tmpfile}"
-  yq4 --inplace ".dex.kubeloginClientSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
-  yq4 --inplace ".user.grafanaPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
-  yq4 --inplace ".user.alertmanagerPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
-  yq4 --inplace ".thanos.receiver.basic_auth.password= \"${THANOS_INGRESS_PASS}\"" "${tmpfile}"
-  yq4 --inplace ".thanos.receiver.basic_auth.passwordHash= \"${THANOS_INGRESS_PASS_HASH}\"" "${tmpfile}"
+  yq --inplace ".grafana.password= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+  yq --inplace ".grafana.clientSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+  yq --inplace ".grafana.opsClientSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+  yq --inplace ".harbor.password= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+  yq --inplace ".harbor.registryPassword= \"${HARBOR_REGISTRY_PASS}\"" "${tmpfile}"
+  yq --inplace ".harbor.registryPasswordHtpasswd= \"${HARBOR_REGISTRY_PASS_HTPASSWD}\"" "${tmpfile}"
+  yq --inplace ".harbor.internal.databasePassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+  yq --inplace ".harbor.clientSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+  yq --inplace ".harbor.xsrf= \"$(pwgen -cns 32 1)\"" "${tmpfile}"
+  yq --inplace ".harbor.coreSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+  yq --inplace ".harbor.jobserviceSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+  yq --inplace ".harbor.registrySecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+  yq --inplace ".opensearch.adminPassword= \"${OS_ADMIN_PASS}\"" "${tmpfile}"
+  yq --inplace ".opensearch.adminHash= \"${OS_ADMIN_PASS_HASH}\"" "${tmpfile}"
+  yq --inplace ".opensearch.clientSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+  yq --inplace ".opensearch.configurerPassword= \"${OS_CONF_PASS}\"" "${tmpfile}"
+  yq --inplace ".opensearch.configurerHash= \"${OS_CONF_PASS_HASH}\"" "${tmpfile}"
+  yq --inplace ".opensearch.dashboardsPassword= \"${OSD_PASS}\"" "${tmpfile}"
+  yq --inplace ".opensearch.dashboardsHash= \"${OSD_PASS_HASH}\"" "${tmpfile}"
+  yq --inplace ".opensearch.dashboardsCookieEncKey= \"$(pwgen -cns 32 1)\"" "${tmpfile}"
+  yq --inplace ".opensearch.fluentdPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+  yq --inplace ".opensearch.curatorPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+  yq --inplace ".opensearch.snapshotterPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+  yq --inplace ".opensearch.metricsExporterPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+  yq --inplace ".kubeapiMetricsPassword= \"${KUBEAPI_METRICS_PASS}\"" "${tmpfile}"
+  yq --inplace ".kubeapiMetricsPasswordHtpasswd= \"${KUBEAPI_METRICS_PASS_HTPASSWD}\"" "${tmpfile}"
+  yq --inplace ".dex.staticPasswordNotHashed= \"${DEX_STATIC_PASS}\"" "${tmpfile}"
+  yq --inplace ".dex.staticPassword= \"${DEX_STATIC_PASS_HASH}\"" "${tmpfile}"
+  yq --inplace ".dex.kubeloginClientSecret= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+  yq --inplace ".user.grafanaPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+  yq --inplace ".user.alertmanagerPassword= \"$(pwgen -cns 20 1)\"" "${tmpfile}"
+  yq --inplace ".thanos.receiver.basic_auth.password= \"${THANOS_INGRESS_PASS}\"" "${tmpfile}"
+  yq --inplace ".thanos.receiver.basic_auth.passwordHash= \"${THANOS_INGRESS_PASS_HASH}\"" "${tmpfile}"
 }
 
 # Usage: backup_file <file> [suffix]
@@ -360,14 +360,14 @@ backup_retention() {
 
   if "${CK8S_AUTO_APPROVE}"; then
     log_warning "Removing backups older than ${CK8S_INIT_BACKUP_DAYS:-30} days:"
-    yq4 -M 'split(" ") | sort' <<<"${backups[@]:-}"
+    yq -M 'split(" ") | sort' <<<"${backups[@]:-}"
 
     # Needs to be with force else it'll stop on read-only files
     rm -f "${backups[@]:-}"
 
   elif [[ -t 1 ]]; then
     log_warning "Backups older than ${CK8S_INIT_BACKUP_DAYS:-30} days:"
-    yq4 -M 'split(" ") | sort' <<<"${backups[@]:-}"
+    yq -M 'split(" ") | sort' <<<"${backups[@]:-}"
 
     log_warning_no_newline "Do you want to remove them? (Y/n): " 1>&2
     read -r reply

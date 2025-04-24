@@ -44,9 +44,10 @@ log.continue() {
   fi
 }
 
+# sanity-check the yq version
 yq() {
-  if command -v yq4 >/dev/null; then
-    command yq4 "${@}"
+  if ! command yq -V | grep --extended-regexp "v4\." >/dev/null 2>&1; then
+    log.fatal "expecting the yq binary to be at least version v4"
   else
     command yq "${@}"
   fi

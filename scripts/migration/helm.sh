@@ -17,7 +17,7 @@ helm_chart_name() {
     log_fatal "usage: helm_chart_name <sc|wc> <namespace> <release>"
   fi
 
-  helm_do "${1}" list -n "${2}" -oyaml 2>/dev/null | yq4 ".[] | select(.name == \"${3}\") | .chart | sub(\"-\d+\.\d+\.\d+$\", \"\")"
+  helm_do "${1}" list -n "${2}" -oyaml 2>/dev/null | yq ".[] | select(.name == \"${3}\") | .chart | sub(\"-\d+\.\d+\.\d+$\", \"\")"
 }
 
 helm_chart_version() {
@@ -25,7 +25,7 @@ helm_chart_version() {
     log_fatal "usage: helm_chart_version <sc|wc> <namespace> <release>"
   fi
 
-  helm_do "${1}" list -n "${2}" -oyaml 2>/dev/null | yq4 ".[] | select(.name == \"${3}\") | .chart | match(\"\d+\.\d+\.\d+\") | .string"
+  helm_do "${1}" list -n "${2}" -oyaml 2>/dev/null | yq ".[] | select(.name == \"${3}\") | .chart | match(\"\d+\.\d+\.\d+\") | .string"
 }
 
 helm_installed() {
