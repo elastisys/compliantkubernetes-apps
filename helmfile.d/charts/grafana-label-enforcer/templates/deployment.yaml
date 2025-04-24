@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: {{ include "grafana-label-enforcer.fullname" . }}
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "grafana-label-enforcer.labels" $ | nindent 4 }}
 spec:
   replicas: 1
   selector:
@@ -12,6 +14,7 @@ spec:
     metadata:
       labels:
         app: {{ include "grafana-label-enforcer.fullname" . }}
+        {{ include "grafana-label-enforcer.selectorLabels" . | nindent 8 }}
     spec:
       securityContext:
         runAsUser: 1000
