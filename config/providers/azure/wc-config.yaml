@@ -1,0 +1,8 @@
+ingressNginx:
+  controller:
+    service:
+      internal:
+        enabled: true
+        type: LoadBalancer
+        annotations:
+          service.beta.kubernetes.io/azure-load-balancer-internal: "true"

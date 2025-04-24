@@ -1,0 +1,8 @@
+ingressNginx:
+  controller:
+    service:
+      internal:
+        enabled: false
+        type: LoadBalancer
+        annotations:
+          service.beta.kubernetes.io/openstack-internal-load-balancer: "true"
