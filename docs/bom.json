@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:82734b7a-dcba-4017-8181-a5ab0826d11d",
+  "serialNumber": "urn:uuid:8d3997ba-9022-4ff7-97b2-5b9a32d63429",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-04-24T11:15:46Z",
+    "timestamp": "2025-04-24T13:14:34Z",
     "tools": {
       "components": [
         {
@@ -1161,6 +1161,10 @@
         {
           "name": "container-alertmanager",
           "value": "quay.io/prometheus/alertmanager:v0.27.0"
+        },
+        {
+          "name": "container-prometheus",
+          "value": "quay.io/prometheus/prometheus:v3.1.0"
         }
       ],
       "licenses": [
