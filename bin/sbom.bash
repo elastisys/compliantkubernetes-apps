@@ -251,17 +251,17 @@ _get_container_images_from_template() {
   chart_query="((.metadata.labels.\"helm.sh/chart\" | contains(\"${chart_name}\")) or (.metadata.labels.release == \"${chart_name}\"))"
 
   if [[ "${type}" == "pod" ]]; then
-    query="select(.kind == \"Pod\" and ${chart_query}) | .spec.containers[] | .image"
+    query="select(.kind == \"Pod\" and ${chart_query}) | .spec | ((.initContainers[] | .image), (.containers[] | .image))"
   elif [[ "${type}" == "cronjob" ]]; then
-    query="select(.kind == \"CronJob\" and ${chart_query}) | .spec.jobTemplate.spec.template.spec.containers[] | .image"
+    query="select(.kind == \"CronJob\" and ${chart_query}) | .spec.jobTemplate.spec.template.spec | ((.initContainers[] | .image), (.containers[] | .image))"
   elif [[ "${type}" == "daemonset" ]]; then
-    query="select(.kind == \"DaemonSet\" and ${chart_query}) | .spec.template.spec.containers[] | .image"
+    query="select(.kind == \"DaemonSet\" and ${chart_query}) | .spec.template.spec | ((.initContainers[] | .image), (.containers[] | .image))"
   elif [[ "${type}" == "deployment" ]]; then
-    query="select(.kind == \"Deployment\" and ${chart_query}) | .spec.template.spec.containers[] | .image"
+    query="select(.kind == \"Deployment\" and ${chart_query}) | .spec.template.spec | ((.initContainers[] | .image), (.containers[] | .image))"
   elif [[ "${type}" == "job" ]]; then
-    query="select(.kind == \"Job\" and ${chart_query}) | .spec.template.spec.containers[] | .image"
+    query="select(.kind == \"Job\" and ${chart_query}) | .spec.template.spec | ((.initContainers[] | .image), (.containers[] | .image))"
   elif [[ "${type}" == "statefulset" ]]; then
-    query="select(.kind == \"StatefulSet\" and ${chart_query}) | .spec.template.spec.containers[] | .image"
+    query="select(.kind == \"StatefulSet\" and ${chart_query}) | .spec.template.spec | ((.initContainers[] | .image), (.containers[] | .image))"
   elif [[ "${type}" == "alertmanager" ]]; then
     query="select(.kind == \"Alertmanager\" and ${chart_query}) | .spec.image"
   fi
