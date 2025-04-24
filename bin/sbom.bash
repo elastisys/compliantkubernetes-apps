@@ -4,8 +4,10 @@
 # - create tests
 # - update sbom version per Welkin release
 # - save manual overrides between runs (currently, and set-me's overrides are removed when running generate)
+#   - currently, "generate" will retrieve "Elastisys evaluation" from existing SBOM and use that one always
 # - include images for all configurations? (e.g. different cloud providers can have unique images/charts)
 #   - maybe, instead of using an existing environment, generate could create a new CK8S_CONFIG_PATH
+#     - problem with this is, that currently, Helmfile template requires a KUBECONFIG
 set -euo pipefail
 
 : "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
@@ -268,6 +270,8 @@ _get_container_images_from_template() {
     query="select(.kind == \"StatefulSet\" and ${chart_query}) | .spec.template.spec | ((.initContainers[] | .image), (.containers[] | .image))"
   elif [[ "${type}" == "alertmanager" ]]; then
     query="select(.kind == \"Alertmanager\" and ${chart_query}) | .spec.image"
+  elif [[ "${type}" == "prometheus" ]]; then
+    query="select(.kind == \"Prometheus\" and ${chart_query}) | .spec.image"
   fi
 
   mapfile -t containers < <(yq4 "${query}" "${template_file}" | sed '/---/d' | sort -u)
@@ -334,6 +338,7 @@ _get_container_images() {
       _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${release_name}" "daemonset"
       _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${release_name}" "statefulset"
       _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${release_name}" "alertmanager"
+      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${release_name}" "prometheus"
     done
 
     # TODO: mapping chart names to release names?
