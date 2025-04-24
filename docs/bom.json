@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:8d3997ba-9022-4ff7-97b2-5b9a32d63429",
+  "serialNumber": "urn:uuid:6155f0d2-3f77-45fc-89d9-0afb2d7c9214",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-04-24T13:14:34Z",
+    "timestamp": "2025-04-24T15:08:04Z",
     "tools": {
       "components": [
         {
@@ -425,14 +425,6 @@
           "value": "set-me"
         },
         {
-          "name": "container-curl",
-          "value": "appropriate/curl"
-        },
-        {
-          "name": "container-falcosidekick",
-          "value": "docker.io/falcosecurity/falcosidekick:2.31.1"
-        },
-        {
           "name": "container-falco",
           "value": "docker.io/falcosecurity/falco:0.40.0-debian"
         },
@@ -471,6 +463,14 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
+        },
+        {
+          "name": "container-curl",
+          "value": "appropriate/curl"
+        },
+        {
+          "name": "container-falcosidekick",
+          "value": "docker.io/falcosecurity/falcosidekick:2.31.1"
         }
       ],
       "licenses": [
@@ -553,10 +553,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-fluentd-forwarder",
-          "value": "ghcr.io/elastisys/fluentd-forwarder:v4.7.5-ck8s1"
         },
         {
           "name": "container-fluentd-aggregator",
@@ -685,10 +681,6 @@
         {
           "name": "container-gatekeeper",
           "value": "openpolicyagent/gatekeeper:v3.18.2"
-        },
-        {
-          "name": "container-kubectl",
-          "value": "ghcr.io/elastisys/bitnami/kubectl:1.29.11"
         },
         {
           "name": "container-gatekeeper-crds",
@@ -840,10 +832,6 @@
         {
           "name": "container-k8s-sidecar",
           "value": "quay.io/kiwigrid/k8s-sidecar:1.30.0"
-        },
-        {
-          "name": "container-prom-label-proxy",
-          "value": "quay.io/prometheuscommunity/prom-label-proxy:v0.11.0"
         }
       ],
       "licenses": [
@@ -1215,6 +1203,10 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
+        },
+        {
+          "name": "container-kube-state-metrics",
+          "value": "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.14.0"
         }
       ]
     },
@@ -1810,16 +1802,8 @@
           "value": "set-me"
         },
         {
-          "name": "container-elasticsearch-curator",
-          "value": "ghcr.io/elastisys/bitnami/elasticsearch-curator:5.8.4-debian-10-r235"
-        },
-        {
           "name": "container-curl-jq",
           "value": "ghcr.io/elastisys/curl-jq:1.0.0"
-        },
-        {
-          "name": "container-opensearch-dashboards",
-          "value": "opensearchproject/opensearch-dashboards:2.18.0"
         },
         {
           "name": "container-opensearch",
@@ -1975,6 +1959,10 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
+        },
+        {
+          "name": "container-node-exporter",
+          "value": "quay.io/prometheus/node-exporter:v1.8.2"
         }
       ]
     },
