@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:80ab35ec-5ff4-4c1b-9784-0274a8548b29",
+  "serialNumber": "urn:uuid:5b2b1213-7792-44af-a799-65c957088bfb",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-04-23T14:14:33Z",
+    "timestamp": "2025-04-24T08:36:10Z",
     "tools": {
       "components": [
         {
@@ -446,6 +446,14 @@
         {
           "name": "container-falco",
           "value": "docker.io/falcosecurity/falco:0.40.0-debian"
+        },
+        {
+          "name": "container-falcoctl",
+          "value": "docker.io/falcosecurity/falcoctl:0.11.0"
+        },
+        {
+          "name": "container-falco-driver-loader",
+          "value": "docker.io/falcosecurity/falco-driver-loader:0.40.0"
         }
       ]
     },
@@ -2318,6 +2326,10 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
+        },
+        {
+          "name": "container-velero-plugin-for-aws",
+          "value": "velero/velero-plugin-for-aws:v1.9.0"
         },
         {
           "name": "container-velero",
