@@ -117,7 +117,7 @@ ops)
   ;;
 sbom)
   case "${2}" in
-  add | generate | get | get-charts | get-containers | get-unset | remove | update | validate)
+  add | generate | get | get-charts | get-containers | get-unset | remove | update | update-containers | validate)
     check_tools
     command="${2}"
     shift 2

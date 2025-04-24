@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:5b2b1213-7792-44af-a799-65c957088bfb",
+  "serialNumber": "urn:uuid:82734b7a-dcba-4017-8181-a5ab0826d11d",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-04-24T08:36:10Z",
+    "timestamp": "2025-04-24T11:15:46Z",
     "tools": {
       "components": [
         {
@@ -55,17 +55,17 @@
       "tags": [
         "service"
       ],
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -77,17 +77,17 @@
       "purl": "pkg:helm/calico-accountant@0.1.1",
       "type": "library",
       "bom-ref": "pkg:helm/calico-accountant@0.1.1",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -99,17 +99,17 @@
       "purl": "pkg:helm/calico-default-deny@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/calico-default-deny@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -121,17 +121,17 @@
       "purl": "pkg:helm/calico-felix-metrics@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/calico-felix-metrics@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -149,13 +149,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/cert-manager@v1.17.1",
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -177,6 +170,13 @@
           "name": "container-cert-manager-startupapicheck",
           "value": "quay.io/jetstack/cert-manager-startupapicheck:v1.17.1"
         }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
       ]
     },
     {
@@ -187,17 +187,17 @@
       "purl": "pkg:helm/cluster-admin-rbac@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/cluster-admin-rbac@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -215,17 +215,17 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/common@2.29.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -243,17 +243,17 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/common@2.30.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -270,7 +270,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/common@2.x.x",
-      "licenses": [],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -285,7 +284,6 @@
       "purl": "pkg:helm/crds@0.0.0",
       "type": "library",
       "bom-ref": "pkg:helm/crds@0.0.0",
-      "licenses": [],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -300,7 +298,6 @@
       "purl": "pkg:helm/crds@3.3.6",
       "type": "library",
       "bom-ref": "pkg:helm/crds@3.3.6",
-      "licenses": [],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -325,13 +322,6 @@
       "tags": [
         "connect"
       ],
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -340,6 +330,13 @@
         {
           "name": "container-dex",
           "value": "ghcr.io/dexidp/dex:v2.40.0"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
         }
       ]
     },
@@ -351,17 +348,17 @@
       "purl": "pkg:helm/external-dns-endpoints@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/external-dns-endpoints@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -373,17 +370,17 @@
       "purl": "pkg:helm/external-dns-secrets@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/external-dns-secrets@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -401,7 +398,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/external-dns@1.14.4",
-      "licenses": [],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -423,13 +419,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/falco@4.20.0",
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -455,6 +444,13 @@
           "name": "container-falco-driver-loader",
           "value": "docker.io/falcosecurity/falco-driver-loader:0.40.0"
         }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
       ]
     },
     {
@@ -471,17 +467,17 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/falcosidekick@0.9.8",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "name": "Apache License 2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -493,17 +489,17 @@
       "purl": "pkg:helm/file-copier@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/file-copier@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -521,13 +517,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/fluentd-elasticsearch@13.12.2",
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -536,6 +525,13 @@
         {
           "name": "container-fluentd-forwarder",
           "value": "ghcr.io/elastisys/fluentd-forwarder:v4.7.5-ck8s1"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
         }
       ]
     },
@@ -553,13 +549,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/fluentd@7.1.1",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -573,6 +562,13 @@
           "name": "container-fluentd-aggregator",
           "value": "ghcr.io/elastisys/fluentd-aggregator:v7.1.1-ck8s1"
         }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
       ]
     },
     {
@@ -583,17 +579,17 @@
       "purl": "pkg:helm/gatekeeper-constraints@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/gatekeeper-constraints@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -605,17 +601,17 @@
       "purl": "pkg:helm/gatekeeper-metrics@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/gatekeeper-metrics@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -627,17 +623,17 @@
       "purl": "pkg:helm/gatekeeper-mutations@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/gatekeeper-mutations@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -649,13 +645,6 @@
       "purl": "pkg:helm/gatekeeper-templates@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/gatekeeper-templates@0.1.0",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -664,6 +653,13 @@
         {
           "name": "container-kubectl",
           "value": "ghcr.io/elastisys/bitnami/kubectl:1.29.11"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
       ]
     },
@@ -681,7 +677,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/gatekeeper@3.18.2",
-      "licenses": [],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -715,17 +710,17 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/gpu-operator@v24.9.2",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "name": "Apache License 2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -737,39 +732,43 @@
       "purl": "pkg:helm/grafana-dashboards@0.3.0",
       "type": "library",
       "bom-ref": "pkg:helm/grafana-dashboards@0.3.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
     {
       "group": "",
       "name": "grafana-label-enforcer",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": "A Helm chart for the prometheus label proxy https://github.com/prometheus-community/prom-label-proxy",
-      "purl": "pkg:helm/grafana-label-enforcer@0.1.0",
+      "purl": "pkg:helm/grafana-label-enforcer@0.2.0",
       "type": "library",
-      "bom-ref": "pkg:helm/grafana-label-enforcer@0.1.0",
+      "bom-ref": "pkg:helm/grafana-label-enforcer@0.2.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        },
+        {
+          "name": "container-prom-label-proxy",
+          "value": "quay.io/prometheuscommunity/prom-label-proxy:v0.11.0"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -780,7 +779,6 @@
       "purl": "pkg:helm/grafana@3.3.6",
       "type": "library",
       "bom-ref": "pkg:helm/grafana@3.3.6",
-      "licenses": [],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -802,17 +800,17 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/grafana@8.8.2",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "name": "GNU Affero General Public License v3.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -830,13 +828,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/grafana@8.9.1",
-      "licenses": [
-        {
-          "license": {
-            "name": "GNU Affero General Public License v3.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -849,6 +840,17 @@
         {
           "name": "container-k8s-sidecar",
           "value": "quay.io/kiwigrid/k8s-sidecar:1.30.0"
+        },
+        {
+          "name": "container-prom-label-proxy",
+          "value": "quay.io/prometheuscommunity/prom-label-proxy:v0.11.0"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "GNU Affero General Public License v3.0"
+          }
         }
       ]
     },
@@ -859,17 +861,17 @@
       "purl": "pkg:helm/harbor-backup@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/harbor-backup@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -881,17 +883,17 @@
       "purl": "pkg:helm/harbor-certs@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/harbor-certs@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -911,13 +913,6 @@
       "bom-ref": "pkg:helm/harbor@1.16.1",
       "tags": [
         "cloud"
-      ],
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
       ],
       "properties": [
         {
@@ -960,6 +955,13 @@
           "name": "container-trivy-adapter-photon",
           "value": "goharbor/trivy-adapter-photon:v2.12.1"
         }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
       ]
     },
     {
@@ -970,17 +972,17 @@
       "purl": "pkg:helm/hnc-config@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/hnc-config@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -992,13 +994,6 @@
       "purl": "pkg:helm/hnc@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/hnc@0.1.0",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1007,6 +1002,13 @@
         {
           "name": "container-hnc-manager",
           "value": "ghcr.io/elastisys/hnc-manager:v1.1.0"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
       ]
     },
@@ -1018,17 +1020,17 @@
       "purl": "pkg:helm/ingress-nginx-probe-ingress@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/ingress-nginx-probe-ingress@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -1046,13 +1048,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/ingress-nginx@4.12.1",
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1070,6 +1065,13 @@
           "name": "container-controller-chroot",
           "value": "registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e"
         }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
       ]
     },
     {
@@ -1079,17 +1081,17 @@
       "purl": "pkg:helm/init-harbor@0.2.0",
       "type": "library",
       "bom-ref": "pkg:helm/init-harbor@0.2.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -1107,17 +1109,17 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/k8s-metacollector@0.1.10",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "name": "Apache License 2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -1135,13 +1137,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/kube-prometheus-stack@67.11.0",
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1167,6 +1162,13 @@
           "name": "container-alertmanager",
           "value": "quay.io/prometheus/alertmanager:v0.27.0"
         }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
       ]
     },
     {
@@ -1177,17 +1179,17 @@
       "purl": "pkg:helm/kube-state-metrics-extra-resource-metrics@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/kube-state-metrics-extra-resource-metrics@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -1205,7 +1207,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/kube-state-metrics@5.28.0",
-      "licenses": [],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1221,17 +1222,17 @@
       "purl": "pkg:helm/kubeapi-metrics@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/kubeapi-metrics@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -1243,17 +1244,17 @@
       "purl": "pkg:helm/kured-secret@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/kured-secret@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -1271,13 +1272,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/kured@5.6.0",
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1286,6 +1280,13 @@
         {
           "name": "container-kured",
           "value": "ghcr.io/kubereboot/kured:1.17.0"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
         }
       ]
     },
@@ -1303,17 +1304,17 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/kyverno@3.3.6",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "name": "Apache License 2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -1325,17 +1326,17 @@
       "purl": "pkg:helm/letsencrypt@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/letsencrypt@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -1347,13 +1348,6 @@
       "purl": "pkg:helm/log-manager@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/log-manager@0.1.0",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1362,6 +1356,13 @@
         {
           "name": "container-compliantkubernetes-apps-log-manager",
           "value": "ghcr.io/elastisys/compliantkubernetes-apps-log-manager:0.3.2"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
       ]
     },
@@ -1382,13 +1383,6 @@
       "tags": [
         "resource"
       ],
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1397,6 +1391,13 @@
         {
           "name": "container-metrics-server",
           "value": "registry.k8s.io/metrics-server/metrics-server:v0.7.1"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
         }
       ]
     },
@@ -1418,17 +1419,17 @@
         "cloud",
         "log"
       ],
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -1445,7 +1446,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/minio@15.x.x",
-      "licenses": [],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1467,17 +1467,17 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/minio@5.0.14",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "name": "GNU Affero General Public License v3.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -1489,17 +1489,17 @@
       "purl": "pkg:helm/namespaces@0.1.1",
       "type": "library",
       "bom-ref": "pkg:helm/namespaces@0.1.1",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -1511,17 +1511,17 @@
       "purl": "pkg:helm/networkpolicy-generator@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/networkpolicy-generator@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -1536,17 +1536,17 @@
       "tags": [
         "service"
       ],
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -1558,17 +1558,17 @@
       "purl": "pkg:helm/networkpolicy-workload@0.2.0",
       "type": "library",
       "bom-ref": "pkg:helm/networkpolicy-workload@0.2.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -1586,17 +1586,17 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/node-feature-discovery@0.16.6",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "name": "Apache License 2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -1613,7 +1613,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/node-feature-discovery@v0.16.6",
-      "licenses": [],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1628,17 +1627,17 @@
       "purl": "pkg:helm/node-local-dns@0.1.1",
       "type": "library",
       "bom-ref": "pkg:helm/node-local-dns@0.1.1",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -1650,13 +1649,6 @@
       "purl": "pkg:helm/opensearch-configurer@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/opensearch-configurer@0.1.0",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1665,6 +1657,13 @@
         {
           "name": "container-curl-jq",
           "value": "ghcr.io/elastisys/curl-jq:1.0.0"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
       ]
     },
@@ -1676,13 +1675,6 @@
       "purl": "pkg:helm/opensearch-curator@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/opensearch-curator@0.1.0",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1691,6 +1683,13 @@
         {
           "name": "container-elasticsearch-curator",
           "value": "ghcr.io/elastisys/bitnami/elasticsearch-curator:5.8.4-debian-10-r235"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
       ]
     },
@@ -1702,7 +1701,6 @@
       "purl": "pkg:helm/opensearch-dashboards@2.26.0",
       "type": "library",
       "bom-ref": "pkg:helm/opensearch-dashboards@2.26.0",
-      "licenses": [],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1722,17 +1720,17 @@
       "purl": "pkg:helm/opensearch-secrets@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/opensearch-secrets@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -1744,13 +1742,6 @@
       "purl": "pkg:helm/opensearch-securityadmin@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/opensearch-securityadmin@0.1.0",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1759,6 +1750,13 @@
         {
           "name": "container-opensearch",
           "value": "opensearchproject/opensearch:2.18.0"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
       ]
     },
@@ -1770,13 +1768,6 @@
       "purl": "pkg:helm/opensearch-slm@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/opensearch-slm@0.1.0",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1785,6 +1776,13 @@
         {
           "name": "container-curl-jq",
           "value": "ghcr.io/elastisys/curl-jq:1.0.0"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
       ]
     },
@@ -1802,13 +1800,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/opensearch@2.30.1",
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1830,6 +1821,13 @@
           "name": "container-opensearch",
           "value": "opensearchproject/opensearch:2.18.0"
         }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
       ]
     },
     {
@@ -1840,17 +1838,17 @@
       "purl": "pkg:helm/openstack-monitoring@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/openstack-monitoring@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -1862,17 +1860,17 @@
       "purl": "pkg:helm/podsecuritypolicies@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/podsecuritypolicies@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -1884,17 +1882,17 @@
       "purl": "pkg:helm/prometheus-alerts@0.1.1",
       "type": "library",
       "bom-ref": "pkg:helm/prometheus-alerts@0.1.1",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -1912,13 +1910,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/prometheus-blackbox-exporter@8.13.0",
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1927,6 +1918,13 @@
         {
           "name": "container-blackbox-exporter",
           "value": "quay.io/prometheus/blackbox-exporter:v0.24.0"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
         }
       ]
     },
@@ -1944,7 +1942,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/prometheus-elasticsearch-exporter@6.1.0",
-      "licenses": [],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1970,7 +1967,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/prometheus-node-exporter@4.43.1",
-      "licenses": [],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1986,17 +1982,17 @@
       "purl": "pkg:helm/prometheus-servicemonitor@0.1.1",
       "type": "library",
       "bom-ref": "pkg:helm/prometheus-servicemonitor@0.1.1",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -2014,7 +2010,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/prometheus-windows-exporter@0.7.1",
-      "licenses": [],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2030,17 +2025,17 @@
       "purl": "pkg:helm/rclone@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/rclone@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -2052,13 +2047,6 @@
       "purl": "pkg:helm/s3-exporter@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/s3-exporter@0.1.0",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2067,6 +2055,13 @@
         {
           "name": "container-s3-exporter",
           "value": "ghcr.io/elastisys/s3-exporter:0.5.0"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
       ]
     },
@@ -2084,17 +2079,17 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/tekton-pipelines@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -2106,17 +2101,17 @@
       "purl": "pkg:helm/thanos-ingress-secret@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/thanos-ingress-secret@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -2128,17 +2123,17 @@
       "purl": "pkg:helm/thanos-ruler@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/thanos-ruler@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -2156,13 +2151,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/thanos@15.13.1",
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2175,6 +2163,13 @@
         {
           "name": "container-prometheus-config-reloader",
           "value": "quay.io/prometheus-operator/prometheus-config-reloader:v0.50.0"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
         }
       ]
     },
@@ -2192,17 +2187,17 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/tigera-operator@v3.26.4",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "name": "Apache License 2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -2217,13 +2212,6 @@
       "tags": [
         "security"
       ],
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2232,6 +2220,13 @@
         {
           "name": "container-trivy-operator",
           "value": "mirror.gcr.io/aquasec/trivy-operator:0.24.0"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
         }
       ]
     },
@@ -2243,17 +2238,17 @@
       "purl": "pkg:helm/user-alertmanager@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/user-alertmanager@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -2265,17 +2260,17 @@
       "purl": "pkg:helm/user-crds@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/user-crds@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -2287,17 +2282,17 @@
       "purl": "pkg:helm/user-rbac@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/user-rbac@0.1.0",
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
         }
       ]
     },
@@ -2315,13 +2310,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/velero@6.0.0",
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2334,6 +2322,13 @@
         {
           "name": "container-velero",
           "value": "velero/velero:v1.13.0"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
         }
       ]
     }

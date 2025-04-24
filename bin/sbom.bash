@@ -25,10 +25,11 @@ usage() {
   echo "  generate                                                generate new cyclonedx sbom" >&2
   echo "  get <component-name> [component-version] [key]          get component from sbom, optionally query for a provided key" >&2
   echo "  get-charts                                              get all charts in sbom" >&2
-  echo "  get-containers                                          get all containers in sbom" >&2
+  echo "  get-containers                                          get all container images in sbom" >&2
   echo "  get-unset                                               get names of components with set-me's or missing licenses" >&2
   echo "  remove <component-name> <component-version> <key>       remove key for a component" >&2
   echo "  update <component-name> <component-version> <key>       update object under key for a component using $EDITOR" >&2
+  echo "  update-containers                                       update all container images in sbom"
   echo "  validate                                                validate SBOM using cyclonedx-cli" >&2
   exit 1
 }
@@ -37,7 +38,6 @@ _yq_run_query() {
   local sbom_file tmp_sbom_file query
   sbom_file="${1}"
   query="${2}"
-
 
   if ! ${CK8S_AUTO_APPROVE:-}; then
     tmp_sbom_file=$(mktemp --suffix=-sbom.json)
@@ -87,8 +87,14 @@ _sbom_add_component() {
   key="${4}"
   value="${5}"
 
-  if [[ ! "${key}" =~ ^(licenses.*|properties.*)$ ]]; then
+  if [[ ! "${key}" =~ ^(licenses|properties)$ ]]; then
     log_fatal "unsupported key \"${key}\", currently only supports \"licenses|properties\""
+  fi
+
+  # check if key that should be updated exists
+  has_key=$(yq4 -o json ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\") | has(\"${key}\")" "${sbom_file}")
+  if [[ "${has_key}" == false ]]; then
+    _yq_run_query "${sbom_file}" "with(.components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\"); .${key} = [])"
   fi
 
   query="with(.components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\"); .${key} |= (. + ${value} | unique_by(.name)))"
@@ -153,8 +159,6 @@ _prepare_sbom() {
   for component in "${components[@]}"; do
     component_name=$(echo "${component}" | jq -r '.name')
     component_version=$(echo "${component}" | jq -r '.version')
-    _sbom_add_component "${sbom_file}" "${component_name}" "${component_version}" "licenses" "[]"
-    _sbom_add_component "${sbom_file}" "${component_name}" "${component_version}" "properties" "[]"
 
     # check if component already has an elastisys evaluation
     elastisys_evaluation=$(yq4 -o json -I=0 ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\").properties[] | select(.name == \"Elastisys evaluation\")" "${SBOM_FILE}")
@@ -448,9 +452,21 @@ sbom_update() {
   log_info "Updated ${key} for ${component_name}"
 }
 
+sbom_update_containers() {
+  local tmp_sbom_file query
+  tmp_sbom_file=$(mktemp --suffix=-update-containers-sbom.json)
+  append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
+
+  cdxgen --filter '.*' -t helm "${HELMFILE_FOLDER}" --output "${tmp_sbom_file}"
+  CK8S_AUTO_APPROVE=true _get_container_images "${tmp_sbom_file}"
+
+  query=". *= load(\"${tmp_sbom_file}\")"
+  _yq_run_query "${SBOM_FILE}" "${query}"
+}
+
 sbom_generate() {
   local tmp_sbom_file
-  tmp_sbom_file=$(mktemp --suffix=-sbom.json)
+  tmp_sbom_file=$(mktemp --suffix=-generate-sbom.json)
   append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
 
   config_load "sc"
@@ -517,6 +533,10 @@ remove)
 update)
   shift
   sbom_update "${@}"
+  ;;
+update-containers)
+  shift
+  sbom_update_containers "${@}"
   ;;
 validate)
   cyclonedx_validation "${SBOM_FILE}"
