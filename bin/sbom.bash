@@ -155,8 +155,7 @@ _prepare_sbom() {
 
   yq4 -o json -i ". *= load(\"${SBOM_TEMPLATE_FILE}\")" "${sbom_file}"
 
-  # mapfile -t components < <(yq4 -r -o json '.components[].name' "${sbom_file}")
-  mapfile -t components < <(yq4 -o json -I=0 '[.components[] | { "name": .name, "version": .version}] | .[]' "${sbom_file}")
+  mapfile -t components < <(sbom_get_charts "${sbom_file}")
 
   for component in "${components[@]}"; do
     component_name=$(echo "${component}" | jq -r '.name')
@@ -244,17 +243,16 @@ _get_licenses() {
 }
 
 _get_container_images_from_template() {
-  local sbom_file template_file chart_name release_name type query
+  local sbom_file template_file chart_name type query
   sbom_file="${1}"
   template_file="${2}"
   chart_name="${3}"
   chart_version="${4}"
-  release_name="${5}"
-  type="${6}"
+  type="${5}"
 
   # TODO: .metadata.labels.release label capture subcharts e.g. node-exporter for kube-prometheus-stack, and will save images under that release
   # although the sbom contains the subcharts, which currently does not get any containers set. Would be nice to improve this
-  chart_query="((.metadata.labels.\"helm.sh/chart\" | contains(\"${chart_name}\")) or (.metadata.labels.release == \"${chart_name}\"))"
+  chart_query="((.metadata.labels.\"helm.sh/chart\" == \"${chart_name}-${chart_version}\") or (.metadata.labels.release == \"${chart_name}\"))"
 
   if [[ "${type}" == "pod" ]]; then
     query="select(.kind == \"Pod\" and ${chart_query}) | .spec | ((.initContainers[] | .image), (.containers[] | .image))"
@@ -305,7 +303,7 @@ _get_container_images() {
 
   log_info "Getting container images"
 
-  mapfile -t all_charts < <(find "${HELMFILE_FOLDER}" -name "Chart.yaml")
+  mapfile -t all_charts < <(sbom_get_charts "${sbom_file}")
 
   CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc list --output json 2> /dev/null > "${helmfile_list}"
   # - currently only retrieves enabled/installed charts from using helmfile template
@@ -313,33 +311,17 @@ _get_container_images() {
   CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile wc template 2> /dev/null >> "${template_file}"
 
   for chart in "${all_charts[@]}"; do
-    chart_name=$(yq4 ".name" "${chart}")
-    chart_version=$(yq4 ".version" "${chart}")
+    chart_name=$(yq4 ".name" <<< "${chart}")
+    chart_version=$(yq4 ".version" <<< "${chart}")
 
-    # parsing to get the chart folder path which is used for each helm release
-    chart_folder_name="${chart#"${HELMFILE_FOLDER}/"}"
-    chart_folder_name="${chart_folder_name%\/Chart.yaml}"
-
-    # get all welkin releases deployed from a chart
-    mapfile -t releases < <(jq -c ".[] | select(.chart == \"${chart_folder_name}\")" "${helmfile_list}")
-
-    if [[ ${#releases[@]} -eq 0 ]]; then
-      # log_warning "no releases for ${chart_name}"
-      # Maybe add a check for sub-charts that are part of umbrella charts e.g. prometheus-node-exporter?
-      continue
-    fi
-
-    for release in "${releases[@]}"; do
-      release_name=$(echo "${release}" | jq -r ".name")
-      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${release_name}" "cronjob"
-      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${release_name}" "pod"
-      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${release_name}" "deployment"
-      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${release_name}" "job"
-      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${release_name}" "daemonset"
-      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${release_name}" "statefulset"
-      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${release_name}" "alertmanager"
-      _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${release_name}" "prometheus"
-    done
+    _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "cronjob"
+    _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "pod"
+    _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "deployment"
+    _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "job"
+    _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "daemonset"
+    _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "statefulset"
+    _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "alertmanager"
+    _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "prometheus"
 
     # TODO: mapping chart names to release names?
     # - e.g. for Thanos, we deploy all components from same chart but as separate releases
@@ -430,10 +412,11 @@ sbom_get() {
 }
 
 sbom_get_charts() {
-  local query
-  query='.components[] | .name + "@" + .version'
+  local query sbom_file
+  sbom_file="${1}"
+  query='[.components[] | { "name": .name, "version": .version}] | .[]'
 
-  yq4 -e -r -o json "${query}" "${SBOM_FILE}" | sort -u
+  yq4 -e -o json -I=0 "${query}" "${sbom_file}"
 }
 
 sbom_get_containers() {
@@ -521,7 +504,7 @@ get)
   ;;
 get-charts)
   shift
-  sbom_get_charts
+  sbom_get_charts "${SBOM_FILE}"
   ;;
 get-containers)
   shift
