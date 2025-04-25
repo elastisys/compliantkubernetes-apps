@@ -920,6 +920,9 @@ $defs:
   cronSchedule:
     type: string
     pattern: ^(((\*\/)?([0-5]?[0-9])((\,|\-|\/)([0-5]?[0-9]))*|\*)[^\S\r\n]+((\*\/)?((2[0-3]|1[0-9]|[0-9]|00))((\,|\-|\/)(2[0-3]|1[0-9]|[0-9]|00))*|\*)[^\S\r\n]+((\*\/)?([1-9]|[12][0-9]|3[01])((\,|\-|\/)([1-9]|[12][0-9]|3[01]))*|\*)[^\S\r\n]+((\*\/)?([1-9]|1[0-2])((\,|\-|\/)([1-9]|1[0-2]))*|\*|(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))[^\S\r\n]+((\*\/)?[0-6]((\,|\-|\/)[0-6])*|\*|00|(sun|mon|tue|wed|thu|fri|sat)))$|^@(annually|yearly|monthly|weekly|daily|hourly|reboot)$
+  scrapeTimeout:
+    type: string
+    pattern: ^((([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?|0)$
 type: object
 required:
   - global
@@ -4996,6 +4999,13 @@ properties:
     properties:
       resources:
         $ref: '#/$defs/kubernetesResourceRequirements'
+      scrapeTimeout:
+        title: Prometheus Node Exporter ServiceMonitor scrape timeout
+        description: |
+          Configure Prometheus Node Exporter ServiceMonitor scrape timeout.
+          If not set, the upstream default of 10s is used
+        default: ""
+        $ref: '#/$defs/scrapeTimeout'
   s3Exporter:
     title: S3 Exporter
     description: Configure S3 exporter, used to collect metrics about S3 usage.
@@ -5012,8 +5022,8 @@ properties:
         default: 60m
       scrapeTimeout:
         title: S3 Exporter Scrape Timeout
-        type: string
         default: 10m
+        $ref: '#/$defs/scrapeTimeout'
       resources:
         $ref: '#/$defs/kubernetesResourceRequirements'
       tolerations:
@@ -6251,8 +6261,8 @@ properties:
                 default: 30s
               scrapeTimeout:
                 title: Scrape timeout for the service monitor.
-                type: string
                 default: 30s
+                $ref: '#/$defs/scrapeTimeout'
           resources:
             $ref: '#/$defs/kubernetesResourceRequirements'
           tolerations:
