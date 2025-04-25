@@ -46,14 +46,14 @@ _yq_run_query() {
     tmp_sbom_file=$(mktemp --suffix=-sbom.json)
     append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
 
-    yq4 -o json "${query}" "${sbom_file}" > "${tmp_sbom_file}"
+    yq -o json "${query}" "${sbom_file}" > "${tmp_sbom_file}"
     cyclonedx_validation "${tmp_sbom_file}"
     diff  -U3 --color=always "${sbom_file}" "${tmp_sbom_file}" && log_info "No change" && return
     log_info "Changes found"
     ask_abort
   fi
 
-  yq4 -i -o json "${query}" "${sbom_file}"
+  yq -i -o json "${query}" "${sbom_file}"
 }
 
 _sbom_update_component() {
@@ -68,12 +68,12 @@ _sbom_update_component() {
   append_trap "rm ${tmp_change} >/dev/null 2>&1" EXIT
 
   # check if key that should be updated exists
-  has_key=$(yq4 -e -o json ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\") | has(\"${key}\")" "${sbom_file}")
+  has_key=$(yq -e -o json ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\") | has(\"${key}\")" "${sbom_file}")
   if [[ "${has_key}" == false ]]; then
     log_fatal "${key} not found"
   fi
 
-  yq4 -e -o json ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\") | .${key}" "${sbom_file}" > "${tmp_change}"
+  yq -e -o json ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\") | .${key}" "${sbom_file}" > "${tmp_change}"
   "${EDITOR}" "${tmp_change}"
 
   query="with(.components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\"); .${key} = $(jq -c '.' "${tmp_change}"))"
@@ -95,7 +95,7 @@ _sbom_add_component() {
   fi
 
   # check if key that should be updated exists
-  has_key=$(yq4 -o json ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\") | has(\"${key}\")" "${sbom_file}")
+  has_key=$(yq -o json ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\") | has(\"${key}\")" "${sbom_file}")
   if [[ "${has_key}" == false ]]; then
     _yq_run_query "${sbom_file}" "with(.components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\"); .${key} = [])"
   fi
@@ -108,7 +108,7 @@ _sbom_add_component() {
 # checks if a license is listed as a supported license id
 _id_or_name_license() {
   local license="${1}"
-  if [[ $(curl --silent https://cyclonedx.org/schema/spdx.schema.json | yq4 -r ".enum | contains([\"${license}\"])" ) == "true" ]]; then
+  if [[ $(curl --silent https://cyclonedx.org/schema/spdx.schema.json | yq -r ".enum | contains([\"${license}\"])" ) == "true" ]]; then
     echo "id"
     return
   fi
@@ -154,7 +154,7 @@ _prepare_sbom() {
 
   cdxgen --filter '.*' -t helm "${HELMFILE_FOLDER}" --output "${sbom_file}"
 
-  yq4 -o json -i ". *= load(\"${SBOM_TEMPLATE_FILE}\")" "${sbom_file}"
+  yq -o json -i ". *= load(\"${SBOM_TEMPLATE_FILE}\")" "${sbom_file}"
 
   mapfile -t components < <(sbom_get_charts "${sbom_file}")
 
@@ -163,7 +163,7 @@ _prepare_sbom() {
     component_version=$(echo "${component}" | jq -r '.version')
 
     # check if component already has an elastisys evaluation
-    elastisys_evaluation=$(yq4 -o json -I=0 ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\").properties[] | select(.name == \"Elastisys evaluation\")" "${SBOM_FILE}")
+    elastisys_evaluation=$(yq -o json -I=0 ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\").properties[] | select(.name == \"Elastisys evaluation\")" "${SBOM_FILE}")
     if [[ -z "${elastisys_evaluation}" ]]; then
       elastisys_evaluation="$(_format_elastisys_evaluation_object "set-me")"
     fi
@@ -188,12 +188,12 @@ _get_licenses() {
   mapfile -t upstream_charts < <(find "${HELMFILE_FOLDER}/upstream" -name "Chart.yaml")
 
   for chart in "${upstream_charts[@]}"; do
-    chart_name=$(yq4 ".name" "${chart}")
-    chart_version=$(yq4 ".version" "${chart}")
+    chart_name=$(yq ".name" "${chart}")
+    chart_version=$(yq ".version" "${chart}")
 
     # check if chart.yaml contains license in annotations
-    annotation=$(yq4 ".annotations.licenses" "${chart}")
-    annotation_artifacthub=$(yq4 ".annotations.artifacthub.io/license" "${chart}")
+    annotation=$(yq ".annotations.licenses" "${chart}")
+    annotation_artifacthub=$(yq ".annotations.artifacthub.io/license" "${chart}")
 
     if [[ -n "${annotation}" && "${annotation}" != "null" ]]; then
       _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "${annotation}")"
@@ -204,7 +204,7 @@ _get_licenses() {
     # if no license in annotations, try to get from source (e.g. github)
     else
       # TODO: handle multiple licenses, or, stick with one
-      mapfile -t sources < <(yq4 '.sources[]' "${chart}")
+      mapfile -t sources < <(yq '.sources[]' "${chart}")
       if [[ "${#sources[@]}" -eq 0 ]] || [[ "${sources[*]}" == "null" ]]; then
         continue
       else
@@ -235,8 +235,8 @@ _get_licenses() {
   mapfile -t welkin_charts < <(find "${HELMFILE_FOLDER}/charts" -name "Chart.yaml")
 
   for chart in "${welkin_charts[@]}"; do
-    chart_name=$(yq4 ".name" "${chart}")
-    chart_version=$(yq4 ".version" "${chart}")
+    chart_name=$(yq ".name" "${chart}")
+    chart_version=$(yq ".version" "${chart}")
 
     # TODO: licenses for the applications
     _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "Apache-2.0")"
@@ -274,7 +274,7 @@ _get_container_images_from_template() {
     query="select(.kind == \"Prometheus\" and ${chart_query}) | .spec.image"
   fi
 
-  mapfile -t containers < <(yq4 "${query}" "${template_file}" | sed '/---/d' | sort -u)
+  mapfile -t containers < <(yq "${query}" "${template_file}" | sed '/---/d' | sort -u)
 
   if [[ ${#containers[@]} -eq 0 ]]; then
     return
@@ -311,8 +311,8 @@ _get_container_images() {
   CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile wc template 2> /dev/null >> "${template_file}"
 
   for chart in "${all_charts[@]}"; do
-    chart_name=$(yq4 ".name" <<< "${chart}")
-    chart_version=$(yq4 ".version" <<< "${chart}")
+    chart_name=$(yq ".name" <<< "${chart}")
+    chart_version=$(yq ".version" <<< "${chart}")
 
     _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "cronjob"
     _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "pod"
@@ -351,11 +351,11 @@ cyclonedx_validation() {
 
 get_unset() {
   log_info "Getting components without licenses"
-  yq4 -o json -r '.components[] | select(.licenses[].license.name | contains("set-me")).name' "${SBOM_FILE}"
-  yq4 -o json -r '.components[] | select(.licenses | length == 0).name' "${SBOM_FILE}"
+  yq -o json -r '.components[] | select(.licenses[].license.name | contains("set-me")).name' "${SBOM_FILE}"
+  yq -o json -r '.components[] | select(.licenses | length == 0).name' "${SBOM_FILE}"
 
   log_info "Getting components without Elastisys evaluation"
-  yq4 -o json -r '.components[] | select(.properties[].value | contains("set-me")).name' "${SBOM_FILE}"
+  yq -o json -r '.components[] | select(.properties[].value | contains("set-me")).name' "${SBOM_FILE}"
 }
 
 sbom_remove() {
@@ -408,7 +408,7 @@ sbom_get() {
     query=".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\") | .${key}"
   fi
 
-  yq4 -e -o json "${query}" "${SBOM_FILE}"
+  yq -e -o json "${query}" "${SBOM_FILE}"
 }
 
 sbom_get_charts() {
@@ -416,14 +416,14 @@ sbom_get_charts() {
   sbom_file="${1}"
   query='[.components[] | { "name": .name, "version": .version}] | .[]'
 
-  yq4 -e -o json -I=0 "${query}" "${sbom_file}"
+  yq -e -o json -I=0 "${query}" "${sbom_file}"
 }
 
 sbom_get_containers() {
   local query
   query='.components[].properties[] | select(.name | contains("container")).value'
 
-  yq4 -e -r -o json "${query}" "${SBOM_FILE}" | sort -u
+  yq -e -r -o json "${query}" "${SBOM_FILE}" | sort -u
 }
 
 sbom_update() {
