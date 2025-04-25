@@ -3,6 +3,7 @@
 # TODO:
 # - create tests
 # - update sbom version per Welkin release
+# - include tooling used in this repo in the SBOM (e.g. REQUIREMENTS file)
 # - save manual overrides between runs (currently, and set-me's overrides are removed when running generate)
 #   - currently, "generate" will retrieve "Elastisys evaluation" from existing SBOM and use that one always
 # - include images for all configurations? (e.g. different cloud providers can have unique images/charts)
@@ -250,8 +251,9 @@ _get_container_images_from_template() {
   chart_version="${4}"
   type="${5}"
 
-  # TODO: .metadata.labels.release label capture subcharts e.g. node-exporter for kube-prometheus-stack, and will save images under that release
-  # although the sbom contains the subcharts, which currently does not get any containers set. Would be nice to improve this
+  # TODO: .metadata.labels.release label capture subcharts e.g. node-exporter for kube-prometheus-stack, and will save images under
+  # kube-prometheus-stack as well as the prometheus-node-exporter subchart in the sbom. Would be nice to improve this, as these labels
+  # are not guaranteed to exist either
   chart_query="((.metadata.labels.\"helm.sh/chart\" == \"${chart_name}-${chart_version}\") or (.metadata.labels.release == \"${chart_name}\"))"
 
   if [[ "${type}" == "pod" ]]; then
@@ -275,8 +277,6 @@ _get_container_images_from_template() {
   mapfile -t containers < <(yq4 "${query}" "${template_file}" | sed '/---/d' | sort -u)
 
   if [[ ${#containers[@]} -eq 0 ]]; then
-    # Although these contains e.g. prometheus-node-exporter which we run but through kube-prometheus-stack
-    # Maybe add a check for sub-charts that are part of umbrella charts?
     return
   fi
 
