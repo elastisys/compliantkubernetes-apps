@@ -16,8 +16,8 @@ set -euo pipefail
 HERE="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 ROOT="$(dirname "${HERE}")"
 HELMFILE_FOLDER="${ROOT}/helmfile.d"
-SBOM_FILE="${ROOT}/docs/bom.json"
-SBOM_TEMPLATE_FILE="${ROOT}/docs/bom.template.json"
+SBOM_FILE="${ROOT}/docs/sbom.json"
+SBOM_TEMPLATE_FILE="${ROOT}/docs/sbom.template.json"
 
 # shellcheck source=bin/common.bash
 source "${HERE}/common.bash"
