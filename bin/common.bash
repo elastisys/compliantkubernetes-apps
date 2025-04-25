@@ -101,6 +101,14 @@ ask_abort() {
   fi
 }
 
+ask_continue() {
+  log_warning_no_newline "Do you want to continue? (y/N): "
+  read -r reply
+  if [[ ! "${reply}" =~ ^[yY]$ ]]; then
+    exit 0
+  fi
+}
+
 # Checks that all dependencies are available and critical ones for matching minor version.
 check_tools() {
   # Skip in tests
