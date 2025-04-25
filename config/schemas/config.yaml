@@ -6574,6 +6574,123 @@ properties:
                     https:
                       default: 30443
                       $ref: '#/$defs/port'
+                internal:
+                  title: Ingress-NGINX Internal Service
+                  description: Configure the Internal Service for traffic to Ingress-NGINX.
+                  type: object
+                  properties:
+                    service:
+                      title: Ingress-NGINX Service
+                      description: Configure the Internal Service for traffic to Ingress-NGINX.
+                      type: object
+                      properties:
+                        enabled:
+                          title: Ingress-NGINX Service Enabled
+                          type: boolean
+                      if:
+                        properties:
+                          enabled:
+                            title: Ingress-NGINX Service Enabled
+                            type: boolean
+                            const: true
+                      then:
+                        additionalProperties: false
+                        properties:
+                          enabled:
+                            title: Ingress-NGINX Service Enabled
+                            type: boolean
+                            const: true
+                          annotations:
+                            title: Service Annotations
+                            type: object
+                            additionalProperties:
+                              title: Annotation
+                              type: string
+                              description: Kubernetes annotations should be strings, but other scalars may be coereced during templating.
+                          type:
+                            title: Service Type
+                            description: Configure the type of the Service.
+                            type: string
+                            enum:
+                              - ClusterIP
+                              - LoadBalancer
+                              - NodePort
+                          clusterIP:
+                            title: Service ClusterIP
+                            type: string
+                            oneOf:
+                              - format: ipv4
+                              - const: ""
+                          ipFamilyPolicy:
+                            title: Service IP Family Policy
+                            description: |-
+                              Represents the dual-stack-ness requested or required by this Service. When
+                              utilizing an internal loadbalancer service (ie MetalLB), set this field to
+                              "RequireDualStack" if you want both IPv4 and IPv6 connectivity. The
+                              ipFamilies and clusterIPs fields depend on the value of this field.
+
+                              See [reference](https://kubernetes.io/docs/concepts/services-networking/dual-stack/)
+                            type: string
+                            enum:
+                              - ""
+                              - SingleStack
+                              - PreferDualStack
+                              - RequireDualStack
+                            default: SingleStack
+                          ipFamilies:
+                            title: Service IP Families
+                            description: |-
+                              List of IP families (e.g. IPv4, IPv6) assigned to the service. Default is IPv4 only. When utilizing an internal loadbalancer service (ie MetalLB),
+                              IPv6 would also need to be included in order for the ingress service to allocate an address in that family.
+                            type: array
+                            uniqueItems: true
+                            items:
+                              title: Service IP Family
+                              type: string
+                              enum:
+                                - IPv4
+                                - IPv6
+                            default:
+                              - IPv4
+                          allocateLoadBalancerNodePorts:
+                            title: Load Balancer Node Ports
+                            type: boolean
+                            default: false
+                            description: |-
+                              When enabled node ports will be allocated for the Load Balancer Service.
+
+                              This should be enabled when the cluster is fronted by a proxy load balancer regardless if it is external or internal, and disabled if the cluster uses direct routing of ingress traffic.
+
+                              See [reference](https://kubernetes.io/docs/concepts/services-networking/service/#load-balancer-nodeport-allocation)
+                          loadBalancerSourceRanges:
+                            title: Load Balancer Source Ranges
+                            description: |-
+                              Configure the source ranges to allow via the Load Balancer Service.
+                            type: array
+                            items:
+                              type: string
+                            default: []
+                          loadBalancerIP:
+                            title: Load Balancer IP
+                            description: |-
+                              Configure the Load Balancer IP to use an existing IP if supported by the infrastructure provider.
+
+                              > [!important]
+                              > With OpenStack Octavia the floating IP can be created via the CLI beforehand, and one should set the annotation `loadbalancer.openstack.org/keep-floatingip: "true"` to prevent the floating IP to be deleted.
+                            type: string
+                            default: ""
+                          nodePorts:
+                            title: Node Ports
+                            description: Configure the node ports to allocate for the Service.
+                            type: object
+                            additionalProperties: false
+                            properties:
+                              http:
+                                default: 30080
+                                $ref: '#/$defs/port'
+                              https:
+                                default: 30443
+                                $ref: '#/$defs/port'
           useHostPort:
             title: Ingress-NGINX Host Port
             description: |-
