@@ -131,11 +131,11 @@ controller:
     {{- with .Values | get "ingressNginx.controller.service.loadBalancerIP" "" }}
     loadBalancerIP: {{ . }}
     {{- end }}
+    {{ if .Values.ingressNginx.controller.service.internal.enabled }}
     internal:
       {{- if .Values | get "ingressNginx.controller.service.internal.type" "" | eq "LoadBalancer" }}
       allocateLoadBalancerNodePorts: {{ .Values.ingressNginx.controller.service.internal.allocateLoadBalancerNodePorts }}
       {{- end }}
-      {{ if .Values.ingressNginx.controller.service.internal.enabled }}
       enabled: {{ .Values.ingressNginx.controller.service.internal.enabled }}
       type: {{ .Values.ingressNginx.controller.service.internal.type }}
       annotations: {{- toYaml .Values.ingressNginx.controller.service.internal.annotations | nindent 8 }}
@@ -146,7 +146,6 @@ controller:
       ## Ref: https://kubernetes.io/docs/tutorials/services/source-ip/#source-ip-for-services-with-typeloadbalancer
       ## Required for IP whitelisting
       externalTrafficPolicy: "Local"
-      {{ end }}
       {{ else }}
       enabled: false
       {{ end }}
@@ -165,6 +164,7 @@ controller:
       {{- with .Values | get "ingressNginx.controller.service.internal.loadBalancerIP" "" }}
       loadBalancerIP: {{ . }}
       {{- end }}
+    {{ end }}
 
   metrics:
     enabled: true
