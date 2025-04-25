@@ -1,0 +1,13 @@
+ingressNginx:
+  controller:
+    config:
+      useProxyProtocol: false
+    useHostPort: false
+    service:
+      internal:
+        enabled: true
+        type: LoadBalancer
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-type: nlb
+          service.beta.kubernetes.io/aws-load-balancer-scheme: "internal"
+        allocateLoadBalancerNodePorts: true
