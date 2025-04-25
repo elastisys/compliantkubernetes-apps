@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:771b1112-9f99-43a1-a846-eaa74b216fd3",
+  "serialNumber": "urn:uuid:fa55d757-d2ab-4f6d-b971-65d8f7451126",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-04-25T10:28:00Z",
+    "timestamp": "2025-04-25T11:29:33Z",
     "tools": {
       "components": [
         {
@@ -61,13 +61,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/autoscaling-monitoring"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -83,13 +93,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/calico-accountant"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -105,13 +125,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/calico-default-deny"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -127,13 +157,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/calico-felix-metrics"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -155,6 +195,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -162,6 +205,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/jetstack/cert-manager"
+          }
+        ]
+      },
       "components": [
         {
           "name": "quay.io/jetstack/cert-manager-cainjector",
@@ -199,13 +249,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/cluster-admin-rbac"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -227,13 +287,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/bitnami/fluentd/charts/common"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -255,13 +325,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/bitnami/thanos/charts/common"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -281,7 +361,10 @@
           "name": "Elastisys evaluation",
           "value": "set-me"
         }
-      ]
+      ],
+      "supplier": {
+        "name": "set-me"
+      }
     },
     {
       "group": "",
@@ -295,7 +378,17 @@
           "name": "Elastisys evaluation",
           "value": "set-me"
         }
-      ]
+      ],
+      "supplier": {
+        "name": "set-me"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/crds"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -309,7 +402,17 @@
           "name": "Elastisys evaluation",
           "value": "set-me"
         }
-      ]
+      ],
+      "supplier": {
+        "name": "set-me"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/kyverno/kyverno/charts/crds"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -334,6 +437,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -341,6 +447,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/dexidp/dex"
+          }
+        ]
+      },
       "components": [
         {
           "name": "ghcr.io/dexidp/dex",
@@ -363,13 +476,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/external-dns-endpoints"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -385,13 +508,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/external-dns-secrets"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -412,7 +545,17 @@
           "name": "Elastisys evaluation",
           "value": "set-me"
         }
-      ]
+      ],
+      "supplier": {
+        "name": "set-me"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/kubernetes-external-dns/external-dns"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -434,6 +577,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -441,6 +587,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/falcosecurity/falco"
+          }
+        ]
+      },
       "components": [
         {
           "name": "docker.io/falcosecurity/falco",
@@ -479,6 +632,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -486,6 +642,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/falcosecurity/falco/charts/falcosidekick"
+          }
+        ]
+      },
       "components": [
         {
           "name": "appropriate/curl",
@@ -513,13 +676,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/file-copier"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -541,6 +714,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -548,6 +724,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/kokuwa/fluentd-elasticsearch"
+          }
+        ]
+      },
       "components": [
         {
           "name": "ghcr.io/elastisys/fluentd-forwarder",
@@ -576,6 +759,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -583,6 +769,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/bitnami/fluentd"
+          }
+        ]
+      },
       "components": [
         {
           "name": "ghcr.io/elastisys/fluentd-aggregator",
@@ -605,13 +798,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/gatekeeper/constraints"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -627,13 +830,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/gatekeeper/metrics"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -649,13 +862,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/gatekeeper/mutations"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -671,6 +894,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -678,6 +904,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/gatekeeper/templates"
+          }
+        ]
+      },
       "components": [
         {
           "name": "ghcr.io/elastisys/bitnami/kubectl",
@@ -706,6 +939,16 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/open-policy-agent-gatekeeper/gatekeeper"
+          }
+        ]
+      },
       "components": [
         {
           "name": "openpolicyagent/gatekeeper",
@@ -739,13 +982,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "name": "Apache License 2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/nvidia/gpu-operator"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -761,13 +1014,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/grafana-dashboards"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -783,6 +1046,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -790,6 +1056,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/grafana-label-enforcer"
+          }
+        ]
+      },
       "components": [
         {
           "name": "quay.io/prometheuscommunity/prom-label-proxy",
@@ -810,7 +1083,17 @@
           "name": "Elastisys evaluation",
           "value": "set-me"
         }
-      ]
+      ],
+      "supplier": {
+        "name": "set-me"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/kyverno/kyverno/charts/grafana"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -832,13 +1115,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "name": "GNU Affero General Public License v3.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/grafana"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -860,6 +1153,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -867,6 +1163,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/grafana/grafana"
+          }
+        ]
+      },
       "components": [
         {
           "name": "docker.io/grafana/grafana",
@@ -893,13 +1196,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/harbor/harbor-backup"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -915,13 +1228,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/harbor/harbor-certs"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -946,6 +1269,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -953,6 +1279,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/goharbor/harbor"
+          }
+        ]
+      },
       "components": [
         {
           "name": "goharbor/harbor-core",
@@ -1015,13 +1348,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/hnc/config-and-crds"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -1037,6 +1380,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -1044,6 +1390,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/hnc/controller"
+          }
+        ]
+      },
       "components": [
         {
           "name": "ghcr.io/elastisys/hnc-manager",
@@ -1066,13 +1419,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/ingress-nginx-probe-ingress"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -1094,6 +1457,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -1101,6 +1467,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/kubernetes-ingress-nginx/ingress-nginx"
+          }
+        ]
+      },
       "components": [
         {
           "name": "registry.k8s.io/defaultbackend-amd64",
@@ -1132,13 +1505,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/harbor/init-harbor"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -1160,13 +1543,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "name": "Apache License 2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/falcosecurity/falco/charts/k8s-metacollector"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -1188,6 +1581,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -1195,6 +1591,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack"
+          }
+        ]
+      },
       "components": [
         {
           "name": "quay.io/prometheus-operator/prometheus-operator",
@@ -1242,13 +1645,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/kube-state-metrics-extra-resource-metrics"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -1270,6 +1683,16 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/kube-state-metrics"
+          }
+        ]
+      },
       "components": [
         {
           "name": "registry.k8s.io/kube-state-metrics/kube-state-metrics",
@@ -1292,13 +1715,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/kubeapi-metrics"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -1314,13 +1747,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/kured-secret"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -1342,6 +1785,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -1349,6 +1795,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/kubereboot/kured"
+          }
+        ]
+      },
       "components": [
         {
           "name": "ghcr.io/kubereboot/kured",
@@ -1377,13 +1830,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "name": "Apache License 2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/kyverno/kyverno"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -1399,13 +1862,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/issuers"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -1421,6 +1894,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -1428,6 +1904,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/log-manager"
+          }
+        ]
+      },
       "components": [
         {
           "name": "ghcr.io/elastisys/compliantkubernetes-apps-log-manager",
@@ -1459,6 +1942,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -1466,6 +1952,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/kubernetes-metrics-server/metrics-server"
+          }
+        ]
+      },
       "components": [
         {
           "name": "registry.k8s.io/metrics-server/metrics-server",
@@ -1498,13 +1991,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/bitnami/thanos/charts/minio"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -1524,7 +2027,10 @@
           "name": "Elastisys evaluation",
           "value": "set-me"
         }
-      ]
+      ],
+      "supplier": {
+        "name": "set-me"
+      }
     },
     {
       "group": "",
@@ -1546,13 +2052,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "name": "GNU Affero General Public License v3.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/minio/minio"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -1568,13 +2084,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/namespaces"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -1590,13 +2116,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/networkpolicy/generator"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -1615,13 +2151,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/networkpolicy/service-cluster"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -1637,13 +2183,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/networkpolicy/workload-cluster"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -1665,13 +2221,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "name": "Apache License 2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/nvidia/gpu-operator/charts/node-feature-discovery"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -1691,7 +2257,10 @@
           "name": "Elastisys evaluation",
           "value": "set-me"
         }
-      ]
+      ],
+      "supplier": {
+        "name": "set-me"
+      }
     },
     {
       "group": "",
@@ -1706,13 +2275,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/node-local-dns"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -1728,6 +2307,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -1735,6 +2317,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/opensearch/configurer"
+          }
+        ]
+      },
       "components": [
         {
           "name": "ghcr.io/elastisys/curl-jq",
@@ -1757,6 +2346,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -1764,6 +2356,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/opensearch/curator"
+          }
+        ]
+      },
       "components": [
         {
           "name": "ghcr.io/elastisys/bitnami/elasticsearch-curator",
@@ -1786,6 +2385,16 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/opensearch-project/opensearch-dashboards"
+          }
+        ]
+      },
       "components": [
         {
           "name": "opensearchproject/opensearch-dashboards",
@@ -1808,13 +2417,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/opensearch/secrets"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -1830,6 +2449,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -1837,6 +2459,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/opensearch/securityadmin"
+          }
+        ]
+      },
       "components": [
         {
           "name": "opensearchproject/opensearch",
@@ -1859,6 +2488,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -1866,6 +2498,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/opensearch/slm"
+          }
+        ]
+      },
       "components": [
         {
           "name": "ghcr.io/elastisys/curl-jq",
@@ -1894,6 +2533,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -1901,6 +2543,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/opensearch-project/opensearch"
+          }
+        ]
+      },
       "components": [
         {
           "name": "ghcr.io/elastisys/curl-jq",
@@ -1928,13 +2577,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/openstack-monitoring"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -1950,13 +2609,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/gatekeeper/podsecuritypolicies"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -1972,13 +2641,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/prometheus-alerts"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -2000,6 +2679,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -2007,6 +2689,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/prometheus-community/prometheus-blackbox-exporter"
+          }
+        ]
+      },
       "components": [
         {
           "name": "quay.io/prometheus/blackbox-exporter",
@@ -2035,6 +2724,16 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/prometheus-community/prometheus-elasticsearch-exporter"
+          }
+        ]
+      },
       "components": [
         {
           "name": "quay.io/prometheuscommunity/elasticsearch-exporter",
@@ -2063,6 +2762,16 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/prometheus-node-exporter"
+          }
+        ]
+      },
       "components": [
         {
           "name": "quay.io/prometheus/node-exporter",
@@ -2085,13 +2794,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/prometheus-servicemonitor"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -2112,7 +2831,17 @@
           "name": "Elastisys evaluation",
           "value": "set-me"
         }
-      ]
+      ],
+      "supplier": {
+        "name": "set-me"
+      },
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/prometheus-windows-exporter"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -2128,13 +2857,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/rclone"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -2150,6 +2889,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -2157,6 +2899,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/s3-exporter"
+          }
+        ]
+      },
       "components": [
         {
           "name": "ghcr.io/elastisys/s3-exporter",
@@ -2185,13 +2934,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/tekton-pipelines"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -2207,13 +2966,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/thanos/ingress-secret"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -2229,13 +2998,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/thanos/ruler"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -2257,6 +3036,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -2264,6 +3046,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/bitnami/thanos"
+          }
+        ]
+      },
       "components": [
         {
           "name": "ghcr.io/elastisys/bitnami/thanos",
@@ -2297,13 +3086,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "name": "Apache License 2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/projectcalico/tigera-operator"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -2322,6 +3121,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -2329,6 +3131,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/aquasecurity/trivy-operator"
+          }
+        ]
+      },
       "components": [
         {
           "name": "mirror.gcr.io/aquasec/trivy-operator",
@@ -2351,13 +3160,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/user-alertmanager"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -2373,13 +3192,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/user-crds"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -2395,13 +3224,23 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
             "id": "Apache-2.0"
           }
         }
-      ]
+      ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/user-rbac"
+          }
+        ]
+      }
     },
     {
       "group": "",
@@ -2423,6 +3262,9 @@
           "value": "set-me"
         }
       ],
+      "supplier": {
+        "name": "set-me"
+      },
       "licenses": [
         {
           "license": {
@@ -2430,6 +3272,13 @@
           }
         }
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/vmware-tanzu/velero"
+          }
+        ]
+      },
       "components": [
         {
           "name": "velero/velero-plugin-for-aws",
