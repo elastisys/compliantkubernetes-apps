@@ -167,7 +167,10 @@ if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]]; then
 
   # Prepare container env
   args+=("--env" "CK8S_CONFIG_PATH")
-  args+=("--mount" "type=bind,src=${CK8S_CONFIG_PATH},dst=${CK8S_CONFIG_PATH}")
+  # if the apps repo is a submodule in CK8S_CONFIG_PATH, we do not need to mount it here
+  if [[ "${root}" != "${CK8S_CONFIG_PATH}"* ]]; then
+    args+=("--mount" "type=bind,src=${CK8S_CONFIG_PATH},dst=${CK8S_CONFIG_PATH}")
+  fi
 fi
 
 # Check if we are in a work tree
@@ -185,5 +188,6 @@ fi
 # Prepare container repo
 args+=("--env" "APPS_PATH=${root}")
 args+=("--mount" "type=bind,src=${root},dst=${root}${relabel:-}")
+
 
 "${runtime}" run "${args[@]}" "${@}"
