@@ -2,7 +2,6 @@ ingressNginx:
   controller:
     service:
       internal:
-        enabled: true
         type: LoadBalancer
         annotations:
           service.beta.kubernetes.io/aws-load-balancer-type: nlb
