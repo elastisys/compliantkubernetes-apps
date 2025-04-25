@@ -146,16 +146,17 @@ _format_property_object() {
   echo "{\"name\": \"${name}\", \"value\": \"${value}\"}"
 }
 
+_format_elastisys_evaluation_object() {
+  local evaluation="${1}"
+  _format_property_object "Elastisys evaluation" "${evaluation}"
+}
+
 _format_container_component_object() {
   local container="${1}"
   name="${container%%:*}"
   version="${container##*:}"
-  echo "{\"name\": \"${name}\", \"version\": \"${version}\", \"type\": \"container\"}"
-}
-
-_format_elastisys_evaluation_object() {
-  local evaluation="${1}"
-  _format_property_object "Elastisys evaluation" "${evaluation}"
+  bom_ref="pkg:oci/${container}"
+  echo "{\"name\": \"${name}\", \"version\": \"${version}\", \"type\": \"container\", \"bom-ref\": \"${bom_ref}\"}"
 }
 
 _prepare_sbom() {
