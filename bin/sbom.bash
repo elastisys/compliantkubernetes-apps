@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 # TODO:
+# - add evidence.occurences[].location for each chart
+# -
 # - create tests
 # - update sbom version per Welkin release
 # - include tooling used in this repo in the SBOM (e.g. REQUIREMENTS file)
@@ -90,7 +92,7 @@ _sbom_add_component() {
   key="${4}"
   value="${5}"
 
-  if [[ ! "${key}" =~ ^(licenses|properties)$ ]]; then
+  if [[ ! "${key}" =~ ^(components|licenses|properties)$ ]]; then
     log_fatal "unsupported key \"${key}\", currently only supports \"licenses|properties\""
   fi
 
@@ -118,7 +120,6 @@ _id_or_name_license() {
 _format_license_object() {
   local license="${1}"
   echo "{\"license\": {\"$(_id_or_name_license "${license}")\": \"${license}\"}}"
-
 }
 
 _format_property_object() {
@@ -126,6 +127,13 @@ _format_property_object() {
   name="${1}"
   value="${2}"
   echo "{\"name\": \"${name}\", \"value\": \"${value}\"}"
+}
+
+_format_container_component_object() {
+  local container="${1}"
+  name="${container%%:*}"
+  version="${container##*:}"
+  echo "{\"name\": \"${name}\", \"version\": \"${version}\", \"type\": \"container\"}"
 }
 
 _format_container_image_object() {
@@ -243,7 +251,7 @@ _get_licenses() {
   done
 }
 
-_get_container_images_from_template() {
+_add_container_images_from_template() {
   local sbom_file template_file chart_name type query
   sbom_file="${1}"
   template_file="${2}"
@@ -281,14 +289,14 @@ _get_container_images_from_template() {
   fi
 
   for container in "${containers[@]}"; do
-    _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "properties" "$(_format_container_image_object "${container}")"
+    _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "components" "$(_format_container_component_object "${container}")"
   done
 }
 
-_get_container_images() {
+_add_container_images() {
   local sbom_file
   if [[ "$#" -ne 1 ]]; then
-    log_fatal "usage: _get_container_images <sbom-file>"
+    log_fatal "usage: _add_container_images <sbom-file>"
   fi
 
   sbom_file="${1}"
@@ -314,14 +322,14 @@ _get_container_images() {
     chart_name=$(yq ".name" <<< "${chart}")
     chart_version=$(yq ".version" <<< "${chart}")
 
-    _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "cronjob"
-    _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "pod"
-    _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "deployment"
-    _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "job"
-    _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "daemonset"
-    _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "statefulset"
-    _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "alertmanager"
-    _get_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "prometheus"
+    _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "cronjob"
+    _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "pod"
+    _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "deployment"
+    _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "job"
+    _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "daemonset"
+    _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "statefulset"
+    _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "alertmanager"
+    _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "prometheus"
 
     # TODO: mapping chart names to release names?
     # - e.g. for Thanos, we deploy all components from same chart but as separate releases
@@ -421,9 +429,9 @@ sbom_get_charts() {
 
 sbom_get_containers() {
   local query
-  query='.components[].properties[] | select(.name | contains("container")).value'
+  query='.components[] | [.components[] | { "name": .name, "version": .version}] | .[]'
 
-  yq -e -r -o json "${query}" "${SBOM_FILE}" | sort -u
+  yq -e -o json --colors -I=0 "${query}" "${SBOM_FILE}" | sort -u
 }
 
 sbom_update() {
@@ -446,8 +454,9 @@ sbom_update_containers() {
   append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
 
   cdxgen --filter '.*' -t helm "${HELMFILE_FOLDER}" --output "${tmp_sbom_file}"
-  CK8S_AUTO_APPROVE=true _get_container_images "${tmp_sbom_file}"
+  CK8S_AUTO_APPROVE=true _add_container_images "${tmp_sbom_file}"
 
+  # TODO: fix the merge query
   query=". *= load(\"${tmp_sbom_file}\")"
   _yq_run_query "${SBOM_FILE}" "${query}"
 }
@@ -474,7 +483,7 @@ sbom_generate() {
   # TODO: (maybe) loop over charts here, and retrieve necessary info per chart (would reduce number of for loops)
   _get_licenses "${tmp_sbom_file}"
 
-  _get_container_images "${tmp_sbom_file}"
+  _add_container_images "${tmp_sbom_file}"
 
   cyclonedx_validation "${tmp_sbom_file}"
 

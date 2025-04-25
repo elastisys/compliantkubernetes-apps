@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:6155f0d2-3f77-45fc-89d9-0afb2d7c9214",
+  "serialNumber": "urn:uuid:771b1112-9f99-43a1-a846-eaa74b216fd3",
   "version": 1,
   "metadata": {
-    "timestamp": "2025-04-24T15:08:04Z",
+    "timestamp": "2025-04-25T10:28:00Z",
     "tools": {
       "components": [
         {
@@ -153,22 +153,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-cert-manager-cainjector",
-          "value": "quay.io/jetstack/cert-manager-cainjector:v1.17.1"
-        },
-        {
-          "name": "container-cert-manager-controller",
-          "value": "quay.io/jetstack/cert-manager-controller:v1.17.1"
-        },
-        {
-          "name": "container-cert-manager-webhook",
-          "value": "quay.io/jetstack/cert-manager-webhook:v1.17.1"
-        },
-        {
-          "name": "container-cert-manager-startupapicheck",
-          "value": "quay.io/jetstack/cert-manager-startupapicheck:v1.17.1"
         }
       ],
       "licenses": [
@@ -176,6 +160,28 @@
           "license": {
             "name": "Apache License 2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "quay.io/jetstack/cert-manager-cainjector",
+          "version": "v1.17.1",
+          "type": "container"
+        },
+        {
+          "name": "quay.io/jetstack/cert-manager-controller",
+          "version": "v1.17.1",
+          "type": "container"
+        },
+        {
+          "name": "quay.io/jetstack/cert-manager-webhook",
+          "version": "v1.17.1",
+          "type": "container"
+        },
+        {
+          "name": "quay.io/jetstack/cert-manager-startupapicheck",
+          "version": "v1.17.1",
+          "type": "container"
         }
       ]
     },
@@ -326,10 +332,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-dex",
-          "value": "ghcr.io/dexidp/dex:v2.40.0"
         }
       ],
       "licenses": [
@@ -337,6 +339,13 @@
           "license": {
             "name": "Apache License 2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "ghcr.io/dexidp/dex",
+          "version": "v2.40.0",
+          "type": "container"
         }
       ]
     },
@@ -423,18 +432,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-falco",
-          "value": "docker.io/falcosecurity/falco:0.40.0-debian"
-        },
-        {
-          "name": "container-falcoctl",
-          "value": "docker.io/falcosecurity/falcoctl:0.11.0"
-        },
-        {
-          "name": "container-falco-driver-loader",
-          "value": "docker.io/falcosecurity/falco-driver-loader:0.40.0"
         }
       ],
       "licenses": [
@@ -442,6 +439,23 @@
           "license": {
             "name": "Apache License 2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "docker.io/falcosecurity/falco",
+          "version": "0.40.0-debian",
+          "type": "container"
+        },
+        {
+          "name": "docker.io/falcosecurity/falcoctl",
+          "version": "0.11.0",
+          "type": "container"
+        },
+        {
+          "name": "docker.io/falcosecurity/falco-driver-loader",
+          "version": "0.40.0",
+          "type": "container"
         }
       ]
     },
@@ -463,14 +477,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-curl",
-          "value": "appropriate/curl"
-        },
-        {
-          "name": "container-falcosidekick",
-          "value": "docker.io/falcosecurity/falcosidekick:2.31.1"
         }
       ],
       "licenses": [
@@ -478,6 +484,18 @@
           "license": {
             "name": "Apache License 2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "appropriate/curl",
+          "version": "appropriate/curl",
+          "type": "container"
+        },
+        {
+          "name": "docker.io/falcosecurity/falcosidekick",
+          "version": "2.31.1",
+          "type": "container"
         }
       ]
     },
@@ -521,10 +539,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-fluentd-forwarder",
-          "value": "ghcr.io/elastisys/fluentd-forwarder:v4.7.5-ck8s1"
         }
       ],
       "licenses": [
@@ -532,6 +546,13 @@
           "license": {
             "name": "Apache License 2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "ghcr.io/elastisys/fluentd-forwarder",
+          "version": "v4.7.5-ck8s1",
+          "type": "container"
         }
       ]
     },
@@ -553,10 +574,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-fluentd-aggregator",
-          "value": "ghcr.io/elastisys/fluentd-aggregator:v7.1.1-ck8s1"
         }
       ],
       "licenses": [
@@ -564,6 +581,13 @@
           "license": {
             "id": "Apache-2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "ghcr.io/elastisys/fluentd-aggregator",
+          "version": "v7.1.1-ck8s1",
+          "type": "container"
         }
       ]
     },
@@ -645,10 +669,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-kubectl",
-          "value": "ghcr.io/elastisys/bitnami/kubectl:1.29.11"
         }
       ],
       "licenses": [
@@ -656,6 +676,13 @@
           "license": {
             "id": "Apache-2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "ghcr.io/elastisys/bitnami/kubectl",
+          "version": "1.29.11",
+          "type": "container"
         }
       ]
     },
@@ -677,14 +704,18 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
+        }
+      ],
+      "components": [
+        {
+          "name": "openpolicyagent/gatekeeper",
+          "version": "v3.18.2",
+          "type": "container"
         },
         {
-          "name": "container-gatekeeper",
-          "value": "openpolicyagent/gatekeeper:v3.18.2"
-        },
-        {
-          "name": "container-gatekeeper-crds",
-          "value": "openpolicyagent/gatekeeper-crds:v3.18.2"
+          "name": "openpolicyagent/gatekeeper-crds",
+          "version": "v3.18.2",
+          "type": "container"
         }
       ]
     },
@@ -750,10 +781,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-prom-label-proxy",
-          "value": "quay.io/prometheuscommunity/prom-label-proxy:v0.11.0"
         }
       ],
       "licenses": [
@@ -761,6 +788,13 @@
           "license": {
             "id": "Apache-2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "quay.io/prometheuscommunity/prom-label-proxy",
+          "version": "v0.11.0",
+          "type": "container"
         }
       ]
     },
@@ -824,14 +858,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-grafana",
-          "value": "docker.io/grafana/grafana:11.5.1"
-        },
-        {
-          "name": "container-k8s-sidecar",
-          "value": "quay.io/kiwigrid/k8s-sidecar:1.30.0"
         }
       ],
       "licenses": [
@@ -839,6 +865,18 @@
           "license": {
             "name": "GNU Affero General Public License v3.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "docker.io/grafana/grafana",
+          "version": "11.5.1",
+          "type": "container"
+        },
+        {
+          "name": "quay.io/kiwigrid/k8s-sidecar",
+          "version": "1.30.0",
+          "type": "container"
         }
       ]
     },
@@ -906,42 +944,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-harbor-core",
-          "value": "goharbor/harbor-core:v2.12.1"
-        },
-        {
-          "name": "container-harbor-exporter",
-          "value": "goharbor/harbor-exporter:v2.12.1"
-        },
-        {
-          "name": "container-harbor-jobservice",
-          "value": "goharbor/harbor-jobservice:v2.12.1"
-        },
-        {
-          "name": "container-harbor-portal",
-          "value": "goharbor/harbor-portal:v2.12.1"
-        },
-        {
-          "name": "container-harbor-registryctl",
-          "value": "goharbor/harbor-registryctl:v2.12.1"
-        },
-        {
-          "name": "container-registry-photon",
-          "value": "goharbor/registry-photon:v2.12.1"
-        },
-        {
-          "name": "container-harbor-db",
-          "value": "goharbor/harbor-db:v2.12.1"
-        },
-        {
-          "name": "container-redis-photon",
-          "value": "goharbor/redis-photon:v2.12.1"
-        },
-        {
-          "name": "container-trivy-adapter-photon",
-          "value": "goharbor/trivy-adapter-photon:v2.12.1"
         }
       ],
       "licenses": [
@@ -949,6 +951,53 @@
           "license": {
             "name": "Apache License 2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "goharbor/harbor-core",
+          "version": "v2.12.1",
+          "type": "container"
+        },
+        {
+          "name": "goharbor/harbor-exporter",
+          "version": "v2.12.1",
+          "type": "container"
+        },
+        {
+          "name": "goharbor/harbor-jobservice",
+          "version": "v2.12.1",
+          "type": "container"
+        },
+        {
+          "name": "goharbor/harbor-portal",
+          "version": "v2.12.1",
+          "type": "container"
+        },
+        {
+          "name": "goharbor/harbor-registryctl",
+          "version": "v2.12.1",
+          "type": "container"
+        },
+        {
+          "name": "goharbor/registry-photon",
+          "version": "v2.12.1",
+          "type": "container"
+        },
+        {
+          "name": "goharbor/harbor-db",
+          "version": "v2.12.1",
+          "type": "container"
+        },
+        {
+          "name": "goharbor/redis-photon",
+          "version": "v2.12.1",
+          "type": "container"
+        },
+        {
+          "name": "goharbor/trivy-adapter-photon",
+          "version": "v2.12.1",
+          "type": "container"
         }
       ]
     },
@@ -986,10 +1035,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-hnc-manager",
-          "value": "ghcr.io/elastisys/hnc-manager:v1.1.0"
         }
       ],
       "licenses": [
@@ -997,6 +1042,13 @@
           "license": {
             "id": "Apache-2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "ghcr.io/elastisys/hnc-manager",
+          "version": "v1.1.0",
+          "type": "container"
         }
       ]
     },
@@ -1040,18 +1092,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-defaultbackend-amd64",
-          "value": "registry.k8s.io/defaultbackend-amd64:1.5"
-        },
-        {
-          "name": "container-kube-webhook-certgen",
-          "value": "registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2@sha256:e8825994b7a2c7497375a9b945f386506ca6a3eda80b89b74ef2db743f66a5ea"
-        },
-        {
-          "name": "container-controller-chroot",
-          "value": "registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e"
         }
       ],
       "licenses": [
@@ -1059,6 +1099,23 @@
           "license": {
             "name": "Apache License 2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "registry.k8s.io/defaultbackend-amd64",
+          "version": "1.5",
+          "type": "container"
+        },
+        {
+          "name": "registry.k8s.io/ingress-nginx/kube-webhook-certgen",
+          "version": "e8825994b7a2c7497375a9b945f386506ca6a3eda80b89b74ef2db743f66a5ea",
+          "type": "container"
+        },
+        {
+          "name": "registry.k8s.io/ingress-nginx/controller-chroot",
+          "version": "90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e",
+          "type": "container"
         }
       ]
     },
@@ -1129,30 +1186,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-prometheus-operator",
-          "value": "quay.io/prometheus-operator/prometheus-operator:v0.79.2"
-        },
-        {
-          "name": "container-kube-state-metrics",
-          "value": "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.14.0"
-        },
-        {
-          "name": "container-kube-webhook-certgen",
-          "value": "registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6"
-        },
-        {
-          "name": "container-node-exporter",
-          "value": "quay.io/prometheus/node-exporter:v1.8.2"
-        },
-        {
-          "name": "container-alertmanager",
-          "value": "quay.io/prometheus/alertmanager:v0.27.0"
-        },
-        {
-          "name": "container-prometheus",
-          "value": "quay.io/prometheus/prometheus:v3.1.0"
         }
       ],
       "licenses": [
@@ -1160,6 +1193,38 @@
           "license": {
             "name": "Apache License 2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "quay.io/prometheus-operator/prometheus-operator",
+          "version": "v0.79.2",
+          "type": "container"
+        },
+        {
+          "name": "registry.k8s.io/kube-state-metrics/kube-state-metrics",
+          "version": "v2.14.0",
+          "type": "container"
+        },
+        {
+          "name": "registry.k8s.io/ingress-nginx/kube-webhook-certgen",
+          "version": "v20221220-controller-v1.5.1-58-g787ea74b6",
+          "type": "container"
+        },
+        {
+          "name": "quay.io/prometheus/node-exporter",
+          "version": "v1.8.2",
+          "type": "container"
+        },
+        {
+          "name": "quay.io/prometheus/alertmanager",
+          "version": "v0.27.0",
+          "type": "container"
+        },
+        {
+          "name": "quay.io/prometheus/prometheus",
+          "version": "v3.1.0",
+          "type": "container"
         }
       ]
     },
@@ -1203,10 +1268,13 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
+        }
+      ],
+      "components": [
         {
-          "name": "container-kube-state-metrics",
-          "value": "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.14.0"
+          "name": "registry.k8s.io/kube-state-metrics/kube-state-metrics",
+          "version": "v2.14.0",
+          "type": "container"
         }
       ]
     },
@@ -1272,10 +1340,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-kured",
-          "value": "ghcr.io/kubereboot/kured:1.17.0"
         }
       ],
       "licenses": [
@@ -1283,6 +1347,13 @@
           "license": {
             "name": "Apache License 2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "ghcr.io/kubereboot/kured",
+          "version": "1.17.0",
+          "type": "container"
         }
       ]
     },
@@ -1348,10 +1419,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-compliantkubernetes-apps-log-manager",
-          "value": "ghcr.io/elastisys/compliantkubernetes-apps-log-manager:0.3.2"
         }
       ],
       "licenses": [
@@ -1359,6 +1426,13 @@
           "license": {
             "id": "Apache-2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "ghcr.io/elastisys/compliantkubernetes-apps-log-manager",
+          "version": "0.3.2",
+          "type": "container"
         }
       ]
     },
@@ -1383,10 +1457,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-metrics-server",
-          "value": "registry.k8s.io/metrics-server/metrics-server:v0.7.1"
         }
       ],
       "licenses": [
@@ -1394,6 +1464,13 @@
           "license": {
             "name": "Apache License 2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "registry.k8s.io/metrics-server/metrics-server",
+          "version": "v0.7.1",
+          "type": "container"
         }
       ]
     },
@@ -1649,10 +1726,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-curl-jq",
-          "value": "ghcr.io/elastisys/curl-jq:1.0.0"
         }
       ],
       "licenses": [
@@ -1660,6 +1733,13 @@
           "license": {
             "id": "Apache-2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "ghcr.io/elastisys/curl-jq",
+          "version": "1.0.0",
+          "type": "container"
         }
       ]
     },
@@ -1675,10 +1755,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-elasticsearch-curator",
-          "value": "ghcr.io/elastisys/bitnami/elasticsearch-curator:5.8.4-debian-10-r235"
         }
       ],
       "licenses": [
@@ -1686,6 +1762,13 @@
           "license": {
             "id": "Apache-2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "ghcr.io/elastisys/bitnami/elasticsearch-curator",
+          "version": "5.8.4-debian-10-r235",
+          "type": "container"
         }
       ]
     },
@@ -1701,10 +1784,13 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
+        }
+      ],
+      "components": [
         {
-          "name": "container-opensearch-dashboards",
-          "value": "opensearchproject/opensearch-dashboards:2.18.0"
+          "name": "opensearchproject/opensearch-dashboards",
+          "version": "2.18.0",
+          "type": "container"
         }
       ]
     },
@@ -1742,10 +1828,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-opensearch",
-          "value": "opensearchproject/opensearch:2.18.0"
         }
       ],
       "licenses": [
@@ -1753,6 +1835,13 @@
           "license": {
             "id": "Apache-2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "opensearchproject/opensearch",
+          "version": "2.18.0",
+          "type": "container"
         }
       ]
     },
@@ -1768,10 +1857,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-curl-jq",
-          "value": "ghcr.io/elastisys/curl-jq:1.0.0"
         }
       ],
       "licenses": [
@@ -1779,6 +1864,13 @@
           "license": {
             "id": "Apache-2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "ghcr.io/elastisys/curl-jq",
+          "version": "1.0.0",
+          "type": "container"
         }
       ]
     },
@@ -1800,14 +1892,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-curl-jq",
-          "value": "ghcr.io/elastisys/curl-jq:1.0.0"
-        },
-        {
-          "name": "container-opensearch",
-          "value": "opensearchproject/opensearch:2.18.0"
         }
       ],
       "licenses": [
@@ -1815,6 +1899,18 @@
           "license": {
             "name": "Apache License 2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "ghcr.io/elastisys/curl-jq",
+          "version": "1.0.0",
+          "type": "container"
+        },
+        {
+          "name": "opensearchproject/opensearch",
+          "version": "2.18.0",
+          "type": "container"
         }
       ]
     },
@@ -1902,10 +1998,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-blackbox-exporter",
-          "value": "quay.io/prometheus/blackbox-exporter:v0.24.0"
         }
       ],
       "licenses": [
@@ -1913,6 +2005,13 @@
           "license": {
             "name": "Apache License 2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "quay.io/prometheus/blackbox-exporter",
+          "version": "v0.24.0",
+          "type": "container"
         }
       ]
     },
@@ -1934,10 +2033,13 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
+        }
+      ],
+      "components": [
         {
-          "name": "container-elasticsearch-exporter",
-          "value": "quay.io/prometheuscommunity/elasticsearch-exporter:v1.7.0"
+          "name": "quay.io/prometheuscommunity/elasticsearch-exporter",
+          "version": "v1.7.0",
+          "type": "container"
         }
       ]
     },
@@ -1959,10 +2061,13 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
+        }
+      ],
+      "components": [
         {
-          "name": "container-node-exporter",
-          "value": "quay.io/prometheus/node-exporter:v1.8.2"
+          "name": "quay.io/prometheus/node-exporter",
+          "version": "v1.8.2",
+          "type": "container"
         }
       ]
     },
@@ -2043,10 +2148,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-s3-exporter",
-          "value": "ghcr.io/elastisys/s3-exporter:0.5.0"
         }
       ],
       "licenses": [
@@ -2054,6 +2155,13 @@
           "license": {
             "id": "Apache-2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "ghcr.io/elastisys/s3-exporter",
+          "version": "0.5.0",
+          "type": "container"
         }
       ]
     },
@@ -2147,14 +2255,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-thanos",
-          "value": "ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8"
-        },
-        {
-          "name": "container-prometheus-config-reloader",
-          "value": "quay.io/prometheus-operator/prometheus-config-reloader:v0.50.0"
         }
       ],
       "licenses": [
@@ -2162,6 +2262,18 @@
           "license": {
             "id": "Apache-2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "ghcr.io/elastisys/bitnami/thanos",
+          "version": "0.37.2-debian-12-r8",
+          "type": "container"
+        },
+        {
+          "name": "quay.io/prometheus-operator/prometheus-config-reloader",
+          "version": "v0.50.0",
+          "type": "container"
         }
       ]
     },
@@ -2208,10 +2320,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-trivy-operator",
-          "value": "mirror.gcr.io/aquasec/trivy-operator:0.24.0"
         }
       ],
       "licenses": [
@@ -2219,6 +2327,13 @@
           "license": {
             "name": "Apache License 2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "mirror.gcr.io/aquasec/trivy-operator",
+          "version": "0.24.0",
+          "type": "container"
         }
       ]
     },
@@ -2306,14 +2421,6 @@
         {
           "name": "Elastisys evaluation",
           "value": "set-me"
-        },
-        {
-          "name": "container-velero-plugin-for-aws",
-          "value": "velero/velero-plugin-for-aws:v1.9.0"
-        },
-        {
-          "name": "container-velero",
-          "value": "velero/velero:v1.13.0"
         }
       ],
       "licenses": [
@@ -2321,6 +2428,18 @@
           "license": {
             "name": "Apache License 2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "velero/velero-plugin-for-aws",
+          "version": "v1.9.0",
+          "type": "container"
+        },
+        {
+          "name": "velero/velero",
+          "version": "v1.13.0",
+          "type": "container"
         }
       ]
     }
