@@ -16,4 +16,4 @@ ingressNginx:
         annotations:
           service.beta.kubernetes.io/openstack-internal-load-balancer: "true"
           loadbalancer.openstack.org/proxy-protocol: "true"
-        externalTrafficPolicy: Local
+        allocateLoadBalancerNodePorts: true

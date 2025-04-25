@@ -140,7 +140,13 @@ controller:
       type: {{ .Values.ingressNginx.controller.service.internal.type }}
       annotations: {{- toYaml .Values.ingressNginx.controller.service.internal.annotations | nindent 8 }}
       loadBalancerSourceRanges: {{- toYaml .Values.ingressNginx.controller.service.internal.loadBalancerSourceRanges | nindent 8 }}
-      externalTrafficPolicy: {{ .Values.ingressNginx.controller.service.internal.externalTrafficPolicy }}
+      {{ if .Values.externalTrafficPolicy.local }}
+      ## Set external traffic policy to: "Local" to preserve source IP on
+      ## providers supporting it
+      ## Ref: https://kubernetes.io/docs/tutorials/services/source-ip/#source-ip-for-services-with-typeloadbalancer
+      ## Required for IP whitelisting
+      externalTrafficPolicy: "Local"
+      {{ end }}
       {{ else }}
       enabled: false
       {{ end }}
