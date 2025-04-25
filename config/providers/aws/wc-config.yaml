@@ -1,8 +1,5 @@
 ingressNginx:
   controller:
-    config:
-      useProxyProtocol: false
-    useHostPort: false
     service:
       internal:
         enabled: true
