@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
 
 # TODO:
-# - add evidence.occurences[].location for each chart
-# -
+# - add bom-ref to container components
 # - create tests
 # - update sbom version per Welkin release
-# - include tooling used in this repo in the SBOM (e.g. REQUIREMENTS file)
 # - save manual overrides between runs (currently, and set-me's overrides are removed when running generate)
-#   - currently, "generate" will retrieve "Elastisys evaluation" from existing SBOM and use that one always
+#   - currently, "generate" will retrieve "Elastisys evaluation" & "supplier" from existing SBOM and use that one always
 # - include images for all configurations? (e.g. different cloud providers can have unique images/charts)
 #   - maybe, instead of using an existing environment, generate could create a new CK8S_CONFIG_PATH
 #     - problem with this is, that currently, Helmfile template requires a KUBECONFIG
@@ -92,17 +90,25 @@ _sbom_add_component() {
   key="${4}"
   value="${5}"
 
-  if [[ ! "${key}" =~ ^(components|licenses|properties)$ ]]; then
-    log_fatal "unsupported key \"${key}\", currently only supports \"licenses|properties\""
+  if [[ ! "${key}" =~ ^(components|evidence|licenses|properties|supplier)$ ]]; then
+    log_fatal "unsupported key \"${key}\", currently only supports \"components|evidence|licenses|properties|supplier\""
+  fi
+
+  # change the query depending on if the key is a known array type in cyclonedx 1.6 spec
+  append_query="= ${value}"
+  value_type="{}"
+  if [[ "${key}" =~ ^(components|licenses|properties)$ ]]; then
+    value_type="[]"
+    append_query="|= (. + ${value} | unique_by(.name))"
   fi
 
   # check if key that should be updated exists
   has_key=$(yq -o json ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\") | has(\"${key}\")" "${sbom_file}")
   if [[ "${has_key}" == false ]]; then
-    _yq_run_query "${sbom_file}" "with(.components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\"); .${key} = [])"
+    _yq_run_query "${sbom_file}" "with(.components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\"); .${key} = ${value_type})"
   fi
 
-  query="with(.components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\"); .${key} |= (. + ${value} | unique_by(.name)))"
+  query="with(.components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\"); .${key} ${append_query})"
 
   _yq_run_query "${sbom_file}" "${query}"
 }
@@ -122,6 +128,16 @@ _format_license_object() {
   echo "{\"license\": {\"$(_id_or_name_license "${license}")\": \"${license}\"}}"
 }
 
+_format_supplier_object() {
+  local supplier="${1}"
+  echo "{\"name\": \"${supplier}\"}"
+}
+
+_format_location_object() {
+  local location="${1}"
+  echo "{\"occurrences\": [{\"location\": \"${location}\"}]}"
+}
+
 _format_property_object() {
   local name value
   name="${1}"
@@ -134,13 +150,6 @@ _format_container_component_object() {
   name="${container%%:*}"
   version="${container##*:}"
   echo "{\"name\": \"${name}\", \"version\": \"${version}\", \"type\": \"container\"}"
-}
-
-_format_container_image_object() {
-  local container_image="${1}"
-  container_image_name=${container_image##*/}
-  container_image_name=${container_image_name%%:*}
-  _format_property_object "container-${container_image_name}" "${container_image}"
 }
 
 _format_elastisys_evaluation_object() {
@@ -166,16 +175,23 @@ _prepare_sbom() {
 
   mapfile -t components < <(sbom_get_charts "${sbom_file}")
 
+  # adding "Elastisys evaluation" & "supplier" objects that currently needs to be configured manually
   for component in "${components[@]}"; do
     component_name=$(echo "${component}" | jq -r '.name')
     component_version=$(echo "${component}" | jq -r '.version')
 
     # check if component already has an elastisys evaluation
     elastisys_evaluation=$(yq -o json -I=0 ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\").properties[] | select(.name == \"Elastisys evaluation\")" "${SBOM_FILE}")
-    if [[ -z "${elastisys_evaluation}" ]]; then
+    if [[ -z "${elastisys_evaluation}" ]] || [[ "${elastisys_evaluation}" == null ]]; then
       elastisys_evaluation="$(_format_elastisys_evaluation_object "set-me")"
     fi
     _sbom_add_component "${sbom_file}" "${component_name}" "${component_version}" "properties" "${elastisys_evaluation}"
+
+    supplier=$(yq -o json -I=0 ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\").supplier" "${SBOM_FILE}")
+    if [[ -z "${supplier}" ]] || [[ "${supplier}" == null ]]; then
+      supplier="$(_format_supplier_object "set-me")"
+    fi
+    _sbom_add_component "${sbom_file}" "${component_name}" "${component_version}" "supplier" "${supplier}"
   done
 }
 
@@ -336,6 +352,21 @@ _add_container_images() {
   done
 }
 
+_add_locations() {
+  local chart_name chart_version sbom_file
+  sbom_file="${1}"
+
+  log_info "Getting locations"
+  mapfile -t all_charts < <(find "${HELMFILE_FOLDER}" -name "Chart.yaml")
+  for chart in "${all_charts[@]}"; do
+    chart_name=$(yq ".name" "${chart}")
+    chart_version=$(yq ".version" "${chart}")
+    location="${chart#"${ROOT}/"}"
+    location="${location%/Chart.yaml}"
+    _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "evidence" "$(_format_location_object "${location}")"
+  done
+}
+
 cyclonedx_validation() {
   if [[ "$#" -ne 1 ]]; then
     log_fatal "usage: cyclonedx_validation <sbom-file>"
@@ -483,9 +514,11 @@ sbom_generate() {
   # TODO: (maybe) loop over charts here, and retrieve necessary info per chart (would reduce number of for loops)
   _get_licenses "${tmp_sbom_file}"
 
+  _add_locations "${tmp_sbom_file}"
+
   _add_container_images "${tmp_sbom_file}"
 
-  cyclonedx_validation "${tmp_sbom_file}"
+  CK8S_AUTO_APPROVE=false cyclonedx_validation "${tmp_sbom_file}"
 
   diff  -U3 --color=always "${SBOM_FILE}" "${tmp_sbom_file}" && return
   log_warning_no_newline "Do you want to replace SBOM file? (y/N): "
