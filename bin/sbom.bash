@@ -6,6 +6,7 @@
 # - update sbom version per Welkin release
 # - save manual overrides between runs (currently, and set-me's overrides are removed when running generate)
 #   - currently, "generate" will retrieve "Elastisys evaluation" & "supplier" from existing SBOM and use that one always
+#   - any other objects added manually will be removed when running generate
 # - include images for all configurations? (e.g. different cloud providers can have unique images/charts)
 #   - maybe, instead of using an existing environment, generate could create a new CK8S_CONFIG_PATH
 #     - problem with this is, that currently, Helmfile template requires a KUBECONFIG
@@ -50,7 +51,7 @@ _yq_run_query() {
     cyclonedx_validation "${tmp_sbom_file}"
     diff  -U3 --color=always "${sbom_file}" "${tmp_sbom_file}" && log_info "No change" && return
     log_info "Changes found"
-    ask_abort
+    ask_continue
   fi
 
   yq -i -o json "${query}" "${sbom_file}"
@@ -466,7 +467,7 @@ sbom_get_containers() {
 }
 
 sbom_update() {
-  if [[ "$#" -ne 2 ]]; then
+  if [[ "$#" -ne 3 ]]; then
     usage
   fi
 
