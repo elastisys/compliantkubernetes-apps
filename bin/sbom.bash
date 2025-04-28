@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 # TODO:
-# - add bom-ref to container components
-# - create tests
+# - add more tests
 # - update sbom version per Welkin release
 # - save manual overrides between runs (currently, and set-me's overrides are removed when running generate)
 #   - currently, "generate" will retrieve "Elastisys evaluation" & "supplier" from existing SBOM and use that one always
