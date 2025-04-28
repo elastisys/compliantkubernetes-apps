@@ -100,7 +100,7 @@ dev)
   if [[ ! $(with_kubeconfig "${kubeconfig}" kubectl get serviceaccount "${serviceAccount}" 2>/dev/null) ]]; then
     log_error "Service account ${serviceAccount} not found"
     log_error " Add service account ${serviceAccount} in your wc-config"
-    log_error " Then apply app=user-rbac"
+    log_error " Then apply name=user-rbac"
     exit
   fi
 
