@@ -305,7 +305,7 @@ ingressNginx:
 
         ## Type of service.
         ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
-        type: set-me-if-(.ingressNginx.controller.service.enabled)
+        type: set-me-if-(.ingressNginx.controller.service.internal.enabled)
 
         ## Annotations to add to service
         ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
@@ -313,7 +313,7 @@ ingressNginx:
         ## ref: https://github.com/kubernetes/ingress-nginx/blob/main/charts/ingress-nginx/README.md#additional-internal-load-balancer
         ## For Openstack use `service.beta.kubernetes.io/openstack-internal-load-balancer: "true"`
         ## For Azure use `loadbalancer.openstack.org/proxy-protocol: "true"`
-        annotations: set-me-if-(.ingressNginx.controller.service.enabled)
+        annotations: set-me-if-(.ingressNginx.controller.service.internal.enabled)
 
         ## Enable node port allocation
         ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#load-balancer-nodeport-allocation
