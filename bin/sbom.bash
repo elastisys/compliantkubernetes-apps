@@ -395,6 +395,7 @@ get_unset() {
   log_info "Getting components without licenses"
   yq -o json -r '.components[] | select(.licenses[].license.name | contains("set-me")).name' "${SBOM_FILE}"
   yq -o json -r '.components[] | select(.licenses | length == 0).name' "${SBOM_FILE}"
+  yq -o json -r '.components[] | select(has("licenses") == "false").name' "${SBOM_FILE}"
 
   log_info "Getting components without Elastisys evaluation"
   yq -o json -r '.components[] | select(.properties[].value == "set-me").name' "${SBOM_FILE}"
