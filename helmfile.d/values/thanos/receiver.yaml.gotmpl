@@ -125,10 +125,20 @@ receiveDistributor:
         - ALL
     seccompProfile:
       type: RuntimeDefault
-  {{- if .Values.thanos.receiveDistributor.extraFlags }}
   extraFlags:
-    {{- toYaml .Values.thanos.receiveDistributor.extraFlags | nindent 4 }}
-  {{ end }}
+    {{- if .Values.thanos.receiveDistributor.extraFlags }}
+    {{- toYaml .Values.thanos.receiveDistributor.extraFlags | nindent 2 }}
+    {{- end }}
+    {{- if .Values.thanos.receiveDistributor.receiveMaxConcurrency }}
+    - |-
+      --receive.limits-config=
+      write:
+        global:
+          max_concurrency: {{ .Values.thanos.receiveDistributor.receiveMaxConcurrency }}
+    {{- end }}
+    {{- if .Values.thanos.receiveDistributor.receiveHashringsAlgorithm }}
+    - "--receive.hashrings-algorithm={{ .Values.thanos.receiveDistributor.receiveHashringsAlgorithm }}"
+    {{- end }}
 
 ruler:
   enabled: {{ .Values.thanos.ruler.enabled }}
