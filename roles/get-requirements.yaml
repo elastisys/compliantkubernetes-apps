@@ -38,7 +38,7 @@
         dest: "{{ install_path }}/cdxgen"
       - command: cyclonedx
         version: "{{ cyclonedx_cli_version }}"
-        url: https://github.com/CycloneDX/cyclonedx-cli/releases/download/v{{ cyclonedx_cli_version }}/cyclonedx-linux-musl-x64
+        url: https://github.com/CycloneDX/cyclonedx-cli/releases/download/v{{ cyclonedx_cli_version }}/cyclonedx-linux-x64
         dest: "{{ install_path }}/cyclonedx"
       - command: sops
         version: "{{ sops_version }}"
