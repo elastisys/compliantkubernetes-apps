@@ -1,0 +1,38 @@
+#!/usr/bin/env bats
+#
+# Test only validation, not signing and such
+
+setup_file() {
+  # Configure to use Cosign
+
+  load "../../bats.lib.bash"
+  load_common "yq.bash"
+
+  yq.set wc '.kyverno.enabled' true
+  yq.set wc '.kyverno.policies.verifyImageSignature.enabled' true
+  yq.set wc '.kyverno.policies.verifyImageSignature.type' '"Cosign"'
+  # TODO # yq.set wc '.kyverno.policies.verifyImageSignature.publicKeys or certs?' '"-----BEGIN"'
+
+  ck8s ops helmfile wc apply --include-transitive-needs --output simple -l app=kyverno
+}
+
+setup() {
+  load_assert
+}
+
+@test "ensure signature validation enforced" {
+  # an unsigned image is forbidden
+  run kubectl run test-unsigned --image=harbor.test.dev-ck8s/unsigned
+  assert_failure
+  # TODO assert output
+
+  run kubectl run test-signed --image=harbor.test.dev-ck8s/cosign-signed@sha255:???
+  assert_success
+  # a signed image is allowed
+}
+
+# TODO @test "multiple keys requires multiple signatures" {}
+# TODO @test "signed by untrusted key" {}
+# TODO @test "signed both trusted and untrusted key?" {}
+# TODO @test "deployment?" {}
+# TODO @test "unsigned in some namespace where it is disabled" {}
