@@ -490,8 +490,7 @@ sbom_update_containers() {
   cdxgen --filter '.*' -t helm "${HELMFILE_FOLDER}" --output "${tmp_sbom_file}"
   CK8S_AUTO_APPROVE=true CK8S_SKIP_VALIDATION=true _add_container_images "${tmp_sbom_file}"
 
-  # TODO: fix the merge query
-  query=". *= load(\"${tmp_sbom_file}\")"
+  query=". *d load(\"${tmp_sbom_file}\")"
   _yq_run_query "${SBOM_FILE}" "${query}"
 }
 
