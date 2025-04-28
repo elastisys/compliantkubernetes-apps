@@ -70,3 +70,9 @@ teardown() {
   assert_failure
   assert_output --partial "Missing GITHUB_TOKEN"
 }
+
+@test "ck8s sbom validate should be successful" {
+  run ck8s sbom validate
+  assert_success
+  assert_output --partial "BOM validated successfully."
+}
