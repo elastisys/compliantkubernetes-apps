@@ -107,7 +107,7 @@ dev)
   log_info "Adding dev ${serviceAccount} context to wc-config"
 
   token=$(with_kubeconfig "${kubeconfig}" kubectl get secrets secret-"${serviceAccount}" -ojsonpath="{.data.token}" | base64 -d)
-  cluster_name=$(yq '.global.clusterName' "${cluster_config}")
+  cluster_name=$(kubectl --kubeconfig="${kubeconfig}" config view -o jsonpath='{.contexts[?(@.name == "'"$(kubectl --kubeconfig="${kubeconfig}" config current-context)"'")].context.cluster}')
 
   kubectl --kubeconfig="${kubeconfig}" config set-credentials "${serviceAccount}@${cluster_name}" \
     --token="${token}"
