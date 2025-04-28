@@ -10,6 +10,7 @@
 # - include images for all configurations? (e.g. different cloud providers can have unique images/charts)
 #   - maybe, instead of using an existing environment, generate could create a new CK8S_CONFIG_PATH
 #     - problem with this is, that currently, Helmfile template requires a KUBECONFIG
+# - include licenses for images?
 set -euo pipefail
 
 : "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
@@ -26,7 +27,7 @@ source "${HERE}/common.bash"
 usage() {
   echo "COMMANDS:" >&2
   echo "  add <component-name> <component-version> <key> <value>  add key-value pair to a component" >&2
-  echo "  generate                                                generate new cyclonedx sbom" >&2
+  echo "  generate                                                generate new cyclonedx sbom. GITHUB_TOKEN can be set to avoid GitHub rate limits" >&2
   echo "  get <component-name> [component-version] [key]          get component from sbom, optionally query for a provided key" >&2
   echo "  get-charts                                              get all charts in sbom" >&2
   echo "  get-containers                                          get all container images in sbom" >&2
@@ -43,12 +44,15 @@ _yq_run_query() {
   sbom_file="${1}"
   query="${2}"
 
-  if ! ${CK8S_AUTO_APPROVE:-}; then
-    tmp_sbom_file=$(mktemp --suffix=-sbom.json)
-    append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
+  tmp_sbom_file=$(mktemp --suffix=-sbom.json)
+  append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
 
+  if ! ${CK8S_SKIP_VALIDATION:-}; then
     yq -o json "${query}" "${sbom_file}" > "${tmp_sbom_file}"
     cyclonedx_validation "${tmp_sbom_file}"
+  fi
+  if ! ${CK8S_AUTO_APPROVE:-}; then
+
     diff  -U3 --color=always "${sbom_file}" "${tmp_sbom_file}" && log_info "No change" && return
     log_info "Changes found"
     ask_continue
@@ -382,11 +386,8 @@ cyclonedx_validation() {
   log_info "Validating CycloneDX for SBOM file"
   cyclonedx validate --fail-on-errors --input-file "${sbom_file}" && true; exit_code="$?"
   if ! ${CK8S_AUTO_APPROVE:-} && [[ "${exit_code}" != 0 ]]; then
-    log_warning_no_newline "CycloneDX Validation failed, do you want to continue anyway? (y/N): "
-    read -r reply
-    if [[ "${reply}" == "n" ]]; then
-      exit 0
-    fi
+    log_warning "CycloneDX Validation failed"
+    ask_continue
   fi
 }
 
