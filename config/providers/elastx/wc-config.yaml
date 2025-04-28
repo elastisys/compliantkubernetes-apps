@@ -7,3 +7,12 @@ hnc:
         maxSkew: 1
         topologyKey: topology.kubernetes.io/zone
         whenUnsatisfiable: DoNotSchedule
+ingressNginx:
+  controller:
+    service:
+      internal:
+        type: LoadBalancer
+        annotations:
+          service.beta.kubernetes.io/openstack-internal-load-balancer: "true"
+          loadbalancer.openstack.org/proxy-protocol: "true"
+        allocateLoadBalancerNodePorts: true

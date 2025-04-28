@@ -131,6 +131,38 @@ controller:
     {{- with .Values | get "ingressNginx.controller.service.loadBalancerIP" "" }}
     loadBalancerIP: {{ . }}
     {{- end }}
+    {{ if .Values.ingressNginx.controller.service.internal.enabled }}
+    internal:
+      {{- if .Values | get "ingressNginx.controller.service.internal.type" "" | eq "LoadBalancer" }}
+      allocateLoadBalancerNodePorts: {{ .Values.ingressNginx.controller.service.internal.allocateLoadBalancerNodePorts }}
+      {{- end }}
+      enabled: {{ .Values.ingressNginx.controller.service.internal.enabled }}
+      type: {{ .Values.ingressNginx.controller.service.internal.type }}
+      annotations: {{- toYaml .Values.ingressNginx.controller.service.internal.annotations | nindent 8 }}
+      loadBalancerSourceRanges: {{- toYaml .Values.ingressNginx.controller.service.internal.loadBalancerSourceRanges | nindent 8 }}
+      {{ if .Values.externalTrafficPolicy.local }}
+      ## Set external traffic policy to: "Local" to preserve source IP on
+      ## providers supporting it
+      ## Ref: https://kubernetes.io/docs/tutorials/services/source-ip/#source-ip-for-services-with-typeloadbalancer
+      ## Required for IP whitelisting
+      externalTrafficPolicy: "Local"
+      {{ end }}
+      {{ if .Values.ingressNginx.controller.service.internal.ipFamilyPolicy }}
+      ipFamilyPolicy: {{ .Values.ingressNginx.controller.service.internal.ipFamilyPolicy }}
+      {{ end }}
+      {{ if .Values.ingressNginx.controller.service.internal.ipFamilies }}
+      ipFamilies: {{- toYaml .Values.ingressNginx.controller.service.internal.ipFamilies | nindent 8 }}
+      {{ end }}
+      {{ if eq .Values.ingressNginx.controller.service.internal.type "NodePort" }}
+      nodePorts: {{- toYaml .Values.ingressNginx.controller.service.internal.nodePorts | nindent 8 }}
+      {{ end }}
+      {{- with .Values | get "ingressNginx.controller.service.internal.clusterIP" "" }}
+      clusterIP: {{ . }}
+      {{- end }}
+      {{- with .Values | get "ingressNginx.controller.service.internal.loadBalancerIP" "" }}
+      loadBalancerIP: {{ . }}
+      {{- end }}
+    {{ end }}
 
   metrics:
     enabled: true

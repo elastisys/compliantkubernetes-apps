@@ -298,6 +298,51 @@ prometheusBlackboxExporter:
 
 ingressNginx:
   subDomain: ingress-nginx
+  controller:
+    ## Kubernetes service configuration.
+    service:
+      internal:
+
+        ## Type of service.
+        ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+        type: set-me-if-(.ingressNginx.controller.service.internal.enabled)
+
+        ## Annotations to add to service
+        ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+        ## Set the additional internal loadbalancer annotation if `type` is "LoadBalancer"
+        ## ref: https://github.com/kubernetes/ingress-nginx/blob/main/charts/ingress-nginx/README.md#additional-internal-load-balancer
+        ## For Openstack use `service.beta.kubernetes.io/openstack-internal-load-balancer: "true"`
+        ## For Azure use `loadbalancer.openstack.org/proxy-protocol: "true"`
+        annotations: set-me-if-(.ingressNginx.controller.service.internal.enabled)
+
+        ## Enable node port allocation
+        ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#load-balancer-nodeport-allocation
+        allocateLoadBalancerNodePorts: true
+
+        ## Whitelist IP address for octavia loadbalancer
+        ## ref: https://github.com/kubernetes/cloud-provider-openstack/blob/master/docs/openstack-cloud-controller-manager/expose-applications-using-loadbalancer-type-service.md#restrict-access-for-loadbalancer-service
+        loadBalancerSourceRanges: []
+
+        # Set this to use an existing floating ip
+        # If you want to change this then you need to recreate the service
+        loadBalancerIP: ""
+
+        # -- Represents the dual-stack-ness requested or required by this Service. Possible values are
+        # SingleStack (default), PreferDualStack or RequireDualStack. When utilizing an internal loadbalancer service (ie MetalLB),
+        # set this field to "RequireDualStack" if you want both IPv4 and IPv6 connectivity.
+        # The ipFamilies and clusterIPs fields depend on the value of this field.
+        ## Ref: https://kubernetes.io/docs/concepts/services-networking/dual-stack/
+        ipFamilyPolicy: ""
+        # -- List of IP families (e.g. IPv4, IPv6) assigned to the service. Default is IPv4 only. When utilizing an internal loadbalancer service (ie MetalLB),
+        # IPv6 would also need to be included in order for the ingress service to allocate an address in that family.
+        ipFamilies: []
+
+        ## type: NodePort
+        nodePorts:
+          http: 30080
+          https: 30443
+
+        clusterIP: ""
 
 # Network policies for workload cluster
 networkPolicies:
