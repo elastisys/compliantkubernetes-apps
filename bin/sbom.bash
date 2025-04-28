@@ -488,7 +488,7 @@ sbom_update_containers() {
   append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
 
   cdxgen --filter '.*' -t helm "${HELMFILE_FOLDER}" --output "${tmp_sbom_file}"
-  CK8S_AUTO_APPROVE=true _add_container_images "${tmp_sbom_file}"
+  CK8S_AUTO_APPROVE=true CK8S_SKIP_VALIDATION=true _add_container_images "${tmp_sbom_file}"
 
   # TODO: fix the merge query
   query=". *= load(\"${tmp_sbom_file}\")"
@@ -506,6 +506,7 @@ sbom_generate() {
   # TODO: figure out a different approach for retrieving licenses, or handle GITHUB_TOKEN better
   : "${GITHUB_TOKEN:?Missing GITHUB_TOKEN}"
   export CK8S_AUTO_APPROVE=true
+  export CK8S_SKIP_VALIDATION=true
 
   if [[ ! -f "${SBOM_FILE}" ]]; then
     log_info "SBOM file does not exists, creating new"
@@ -521,7 +522,9 @@ sbom_generate() {
 
   _add_container_images "${tmp_sbom_file}"
 
-  CK8S_AUTO_APPROVE=false cyclonedx_validation "${tmp_sbom_file}"
+  CK8S_AUTO_APPROVE=false
+  CK8S_SKIP_VALIDATION=false
+  cyclonedx_validation "${tmp_sbom_file}"
 
   diff  -U3 --color=always "${SBOM_FILE}" "${tmp_sbom_file}" && return
   log_warning_no_newline "Do you want to replace SBOM file? (y/N): "
