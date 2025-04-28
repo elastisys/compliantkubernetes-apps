@@ -397,7 +397,10 @@ get_unset() {
   yq -o json -r '.components[] | select(.licenses | length == 0).name' "${SBOM_FILE}"
 
   log_info "Getting components without Elastisys evaluation"
-  yq -o json -r '.components[] | select(.properties[].value | contains("set-me")).name' "${SBOM_FILE}"
+  yq -o json -r '.components[] | select(.properties[].value == "set-me").name' "${SBOM_FILE}"
+
+  log_info "Getting components without supplier"
+  yq -o json -r '.components[] | select(.supplier.name == "set-me").name' "${SBOM_FILE}"
 }
 
 sbom_remove() {
