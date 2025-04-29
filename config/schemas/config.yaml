@@ -1418,9 +1418,9 @@ properties:
           This property is used during migrations to track state and ensure that the
           same version is used during `ck8s upgrade prepare` as during `ck8s upgrade
           apply`.
-        type: number
+        type: string
         examples:
-          - 1742394642
+          - "2025-04-29T08:34:21+00:00"
     additionalProperties: false
   clusterApi:
     additionalProperties: false
