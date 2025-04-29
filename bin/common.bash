@@ -105,7 +105,7 @@ ask_continue() {
   if [[ ! "${reply}" =~ ^[yY]$ ]]; then
     exit 0
   fi
-  exit 1
+  return
 }
 
 # Checks that all dependencies are available and critical ones for matching minor version.
