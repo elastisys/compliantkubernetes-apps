@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:8cc66552-a3d6-4335-bc27-f50c618a605f",
-  "version": 1,
+  "serialNumber": "urn:uuid:b894e55d-822b-463c-b9e5-b47d80c735c5",
+  "version": 2,
   "metadata": {
-    "timestamp": "2025-04-25T12:23:33Z",
+    "timestamp": "2025-04-29T15:20:57Z",
     "tools": {
       "components": [
         {
@@ -33,6 +33,14 @@
         "phase": "build"
       }
     ],
+    "component": {
+      "group": "",
+      "name": "Welkin apps",
+      "version": "94e5f43147fa705c0110f5091286f35917fd2de0",
+      "type": "application",
+      "bom-ref": "pkg:application/Welkin apps@94e5f43147fa705c0110f5091286f35917fd2de0",
+      "purl": "pkg:application/Welkin%20apps@94e5f43147fa705c0110f5091286f35917fd2de0"
+    },
     "properties": [
       {
         "name": "cdx:bom:componentTypes",
@@ -3351,5 +3359,36 @@
     }
   ],
   "dependencies": [],
-  "annotations": []
+  "compositions": [
+    {
+      "bom-ref": "pkg:application/Welkin apps@94e5f43147fa705c0110f5091286f35917fd2de0",
+      "aggregate": "incomplete"
+    }
+  ],
+  "annotations": [
+    {
+      "bom-ref": "metadata-annotations",
+      "subjects": [
+        "pkg:application/Welkin apps@94e5f43147fa705c0110f5091286f35917fd2de0"
+      ],
+      "annotator": {
+        "component": {
+          "group": "@cyclonedx",
+          "name": "cdxgen",
+          "version": "11.2.5",
+          "purl": "pkg:npm/%40cyclonedx/cdxgen@11.2.5",
+          "type": "application",
+          "bom-ref": "pkg:npm/@cyclonedx/cdxgen@11.2.5",
+          "publisher": "OWASP Foundation",
+          "authors": [
+            {
+              "name": "OWASP Foundation"
+            }
+          ]
+        }
+      },
+      "timestamp": "2025-04-29T15:20:57Z",
+      "text": "This Software Bill-of-Materials (SBOM) document was created on Tuesday, April 29, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'Welkin apps' with version '94e5f43147fa705c0110f5091286f35917fd2de0'. There are 87 components."
+    }
+  ]
 }
