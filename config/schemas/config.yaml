@@ -5140,6 +5140,15 @@ properties:
             title: Thanos receiveDistributor Replicas
             type: integer
             default: 1
+          receiveHashringsAlgorithm:
+             title: Thanos receiveDistributor algolrithm
+             description: Algorithm used for distributing writes across Thanos receive replicas.
+             type: string
+             default: ketama
+          receiveMaxConcurrency:
+            title: thanos receiveDistributor maximum Concurrency
+            description: Maximum number of concurrent write requests allowed by Thanos receiveDistributor.
+            type: integer
           extraFlags:
             title: Thanos receiveDistributor extraFlags
             description: |-
