@@ -51,8 +51,7 @@ _yq_run_query() {
     cyclonedx_validation "${tmp_sbom_file}"
   fi
   if ! ${CK8S_AUTO_APPROVE:-}; then
-
-    diff  -U3 --color=always "${sbom_file}" "${tmp_sbom_file}" && log_info "No change" && return
+    diff  -U3 --color=always "${sbom_file}" "${tmp_sbom_file}" && log_info "No change" && exit 0
     log_info "Changes found"
     ask_continue
   fi
@@ -174,7 +173,12 @@ _prepare_sbom() {
   fi
   log_info "Preparing SBOM"
 
-  cdxgen --filter '.*' -t helm "${HELMFILE_FOLDER}" --output "${sbom_file}"
+  project_version="$(git name-rev --tags --name-only "$(git rev-parse HEAD)")"
+  if [[ "${project_version}" == "undefined" ]]; then
+    project_version="$(git rev-parse HEAD)"
+  fi
+
+  cdxgen --project-name "Welkin apps" --project-version "${project_version}" --filter '.*' -t helm "${HELMFILE_FOLDER}" --output "${sbom_file}"
 
   yq -o json -i ". *= load(\"${SBOM_TEMPLATE_FILE}\")" "${sbom_file}"
 
@@ -334,10 +338,10 @@ _add_container_images() {
 
   mapfile -t all_charts < <(sbom_get_charts "${sbom_file}")
 
-  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc list --output json 2> /dev/null > "${helmfile_list}"
+  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc list --output json 1> "${helmfile_list}"
   # - currently only retrieves enabled/installed charts from using helmfile template
-  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc template 2> /dev/null > "${template_file}"
-  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile wc template 2> /dev/null >> "${template_file}"
+  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc template 1> "${template_file}"
+  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile wc template 1>> "${template_file}"
 
   for chart in "${all_charts[@]}"; do
     chart_name=$(yq ".name" <<< "${chart}")
@@ -432,6 +436,7 @@ sbom_add() {
   key="${3}"
 
   _sbom_add_component "${SBOM_FILE}" "${@}"
+  yq -o json -i '.version += 1' "${SBOM_FILE}"
   log_info "Updated ${key} for ${component_name}@${component_version}"
 }
 
@@ -482,6 +487,7 @@ sbom_update() {
   key="${2}"
 
   _sbom_update_component "${SBOM_FILE}" "${@}"
+  yq -o json -i '.version += 1' "${SBOM_FILE}"
   log_info "Updated ${key} for ${component_name}"
 }
 
@@ -495,6 +501,7 @@ sbom_update_containers() {
 
   query=". *d load(\"${tmp_sbom_file}\")"
   _yq_run_query "${SBOM_FILE}" "${query}"
+  yq -o json -i '.version += 1' "${SBOM_FILE}"
 }
 
 sbom_generate() {
@@ -533,6 +540,7 @@ sbom_generate() {
   read -r reply
   if [[ "${reply}" == "y" ]]; then
     mv "${tmp_sbom_file}" "${SBOM_FILE}"
+    yq -o json -i '.version += 1' "${SBOM_FILE}"
     log_info "SBOM file replaced"
     return
   fi
