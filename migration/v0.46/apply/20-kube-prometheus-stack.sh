@@ -21,7 +21,6 @@ run() {
   case "${1:-}" in
   execute)
     chart_version=$(yq4 '.version' "${ROOT}/helmfile.d/upstream/prometheus-community/kube-prometheus-stack/Chart.yaml")
-    
     clusters=("${CK8S_CLUSTER}")
     if [[ "${CK8S_CLUSTER}" == "both" ]]; then
       clusters=("wc" "sc")
