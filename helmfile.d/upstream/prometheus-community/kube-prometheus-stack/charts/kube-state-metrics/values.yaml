@@ -106,7 +106,7 @@ kubeRBACProxy:
   image:
     registry: quay.io
     repository: brancz/kube-rbac-proxy
-    tag: v0.18.2
+    tag: v0.19.0
     sha: ""
     pullPolicy: IfNotPresent
 
@@ -304,8 +304,16 @@ containerSecurityContext:
 nodeSelector: {}
 
 ## Affinity settings for pod assignment
+## Can be defined as either a dict or string. String is useful for `tpl` templating.
 ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
 affinity: {}
+# affinity: |
+#   podAntiAffinity:
+#     requiredDuringSchedulingIgnoredDuringExecution:
+#       - labelSelector:
+#           matchLabels:
+#             {{- include "kube-state-metrics.selectorLabels" . | indent 10 }}
+#         topologyKey: kubernetes.io/hostname
 
 ## Tolerations for pod assignment
 ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
@@ -389,6 +397,10 @@ collectors:
   - storageclasses
   - validatingwebhookconfigurations
   - volumeattachments
+  # - ingressclasses
+  # - clusterrolebindings
+  # - clusterroles
+  # - roles
 
 # Enabling kubeconfig will pass the --kubeconfig argument to the container
 kubeconfig:
@@ -506,6 +518,14 @@ containers: []
 initContainers: []
   # - name: crd-sidecar
   #   image: kiwigrid/k8s-sidecar:latest
+
+## dnsPolicy allows to change the default DNS configuration for the pod
+## Ref: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy
+dnsPolicy: ClusterFirst
+
+## dnsConfig allows setting up specific DNS configuration for the pod
+## Ref: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-dns-config
+dnsConfig: {}
 
 ## Settings for startup, liveness and readiness probes
 ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/

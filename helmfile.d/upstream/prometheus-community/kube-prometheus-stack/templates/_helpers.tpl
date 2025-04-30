@@ -72,7 +72,6 @@ The longest name that gets created adds and extra 37 characters, so truncation s
 {{- default (printf "%s-thanos-ruler" (include "kube-prometheus-stack.name" .)) .Values.thanosRuler.name -}}
 {{- end }}
 
-
 {{/* Create chart name and version as used by the chart label. */}}
 {{- define "kube-prometheus-stack.chartref" -}}
 {{- replace "+" "_" .Chart.Version | printf "%s-%s" .Chart.Name -}}
@@ -126,6 +125,7 @@ heritage: {{ $.Release.Service | quote }}
 {{- else -}}
     {{ default "default" .Values.alertmanager.serviceAccount.name }}
 {{- end -}}
+
 {{- end -}}
 
 {{/* Create the name of thanosRuler service account to use */}}
@@ -156,6 +156,17 @@ Use the grafana namespace override for multi-namespace deployments in combined c
     {{- .Values.grafana.namespaceOverride -}}
   {{- else -}}
     {{- .Release.Namespace -}}
+  {{- end -}}
+{{- end -}}
+
+{{/*
+Use the Alertmanager namespace override for multi-namespace deployments in combined charts
+*/}}
+{{- define "kube-prometheus-stack-alertmanager.namespace" -}}
+  {{- if .Values.alertmanager.namespaceOverride -}}
+    {{- .Values.alertmanager.namespaceOverride -}}
+  {{- else -}}
+    {{- include "kube-prometheus-stack.namespace" . -}}
   {{- end -}}
 {{- end -}}
 
