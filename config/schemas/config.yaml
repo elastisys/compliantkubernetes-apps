@@ -5144,7 +5144,7 @@ properties:
              title: Thanos receiveDistributor algolrithm
              description: Algorithm used for distributing writes across Thanos receive replicas.
              type: string
-             enum: 
+             enum:
                - hashmod
                - ketama
              default: ketama
