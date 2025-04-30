@@ -159,7 +159,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     # or
     ./migration/v0.46/apply/80-apply.sh execute
     ```
+    
+1. Upgrade kube-prometheus-stack:
 
+    ```bash
+    ./migration/v0.46/apply/10-kube-prometheus-stack.sh execute
+    ```
 ## Postrequisite
 
 - [ ] Check the state of the environment, pods and nodes:
