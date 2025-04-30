@@ -7995,6 +7995,8 @@ properties:
       tolerations:
         $ref: '#/$defs/kubernetesTolerations'
       policies:
+        title: Kyverno policies
+        description: Kyverno policies configuration
         type: object
         properties:
           verifyImageSignature:
