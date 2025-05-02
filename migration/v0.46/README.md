@@ -160,10 +160,16 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.46/apply/80-apply.sh execute
     ```
 
+1. Upgrade gatekeeper:
+
+    ```bash
+    ./migration/v0.46/apply/10-gatekeeper.sh execute
+    ```
+
 1. Upgrade kube-prometheus-stack:
 
     ```bash
-    ./migration/v0.46/apply/10-kube-prometheus-stack.sh execute
+    ./migration/v0.46/apply/20-kube-prometheus-stack.sh execute
     ```
 
 ## Postrequisite
