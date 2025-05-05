@@ -105,7 +105,7 @@ _sbom_add_component() {
   value_type="{}"
   if [[ "${key}" =~ ^(components|licenses|properties)$ ]]; then
     value_type="[]"
-    append_query="|= (. + ${value} | unique_by(.name))"
+    append_query="|= (. + ${value} | unique_by([.name, .version]))"
   fi
 
   # check if key that should be updated exists
