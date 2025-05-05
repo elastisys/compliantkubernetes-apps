@@ -26,13 +26,13 @@ source "${HERE}/common.bash"
 usage() {
   echo "COMMANDS:" >&2
   echo "  add <component-name> <component-version> <key> <value>  add key-value pair to a component" >&2
+  echo "  edit <component-name> <component-version> <key>         edit object under key for a component using $EDITOR" >&2
   echo "  generate                                                generate new cyclonedx sbom. GITHUB_TOKEN can be set to avoid GitHub rate limits" >&2
   echo "  get <component-name> [component-version] [key]          get component from sbom, optionally query for a provided key" >&2
   echo "  get-charts                                              get all charts in sbom" >&2
   echo "  get-containers                                          get all container images in sbom" >&2
   echo "  get-unset                                               get names of components with set-me's or missing licenses" >&2
   echo "  remove <component-name> <component-version> <key>       remove key for a component" >&2
-  echo "  update <component-name> <component-version> <key>       update object under key for a component using $EDITOR" >&2
   echo "  update-containers [component-name] [component-version]  update all container images in sbom"
   echo "  validate                                                validate SBOM using cyclonedx-cli" >&2
   exit 1
@@ -61,7 +61,7 @@ _yq_run_query() {
 }
 
 # function for updating values of existing components in a input sbom file
-_sbom_update_component() {
+_sbom_edit_component() {
   local component_name component_version key sbom_file tmp_sbom_file query
 
   sbom_file="${1}"
@@ -504,7 +504,7 @@ sbom_get_containers() {
   yq -e -o json --colors -I=0 "${query}" "${SBOM_FILE}" | sort -u
 }
 
-sbom_update() {
+sbom_edit() {
   if [[ "$#" -ne 3 ]]; then
     usage
   fi
@@ -514,7 +514,7 @@ sbom_update() {
   component_name="${1}"
   key="${2}"
 
-  _sbom_update_component "${SBOM_FILE}" "${@}"
+  _sbom_edit_component "${SBOM_FILE}" "${@}"
   yq -o json -i '.version += 1' "${SBOM_FILE}"
   log_info "Updated ${key} for ${component_name}"
 }
@@ -603,6 +603,10 @@ add)
   shift
   sbom_add "${@}"
   ;;
+edit)
+  shift
+  sbom_edit "${@}"
+  ;;
 generate)
   shift
   sbom_generate "${@}"
@@ -626,10 +630,6 @@ get-unset)
 remove)
   shift
   sbom_remove "${@}"
-  ;;
-update)
-  shift
-  sbom_update "${@}"
   ;;
 update-containers)
   shift
