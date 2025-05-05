@@ -33,7 +33,7 @@ usage() {
   echo "  get-unset                                               get names of components with set-me's or missing licenses" >&2
   echo "  remove <component-name> <component-version> <key>       remove key for a component" >&2
   echo "  update <component-name> <component-version> <key>       update object under key for a component using $EDITOR" >&2
-  echo "  update-containers                                       update all container images in sbom"
+  echo "  update-containers [component-name] [component-version]  update all container images in sbom"
   echo "  validate                                                validate SBOM using cyclonedx-cli" >&2
   exit 1
 }
@@ -289,6 +289,16 @@ _get_licenses() {
   done
 }
 
+_generate_helmfile_template_file() {
+  template_file="${1}"
+  if [[ ! -f "${template_file}" ]]; then
+    log_fatal "file ${template_file} does not exist"
+  fi
+  # - currently only retrieves enabled/installed charts from using helmfile template
+  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc template 2> /dev/null > "${template_file}"
+  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile wc template 2> /dev/null >> "${template_file}"
+}
+
 _add_container_images_from_template() {
   local sbom_file template_file chart_name type query
   sbom_file="${1}"
@@ -331,6 +341,23 @@ _add_container_images_from_template() {
   done
 }
 
+_add_container_images_for_component() {
+  sbom_file="${1}"
+  template_file="${2}"
+  chart_name="${3}"
+  chart_version="${4}"
+  _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "cronjob"
+  _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "pod"
+  _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "deployment"
+  _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "job"
+  _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "daemonset"
+  _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "statefulset"
+  _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "alertmanager"
+  _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "prometheus"
+
+}
+
+
 _add_container_images() {
   local sbom_file
   if [[ "$#" -ne 1 ]]; then
@@ -344,30 +371,18 @@ _add_container_images() {
 
   template_file=$(mktemp --suffix=-template_file)
   append_trap "rm ${template_file} >/dev/null 2>&1" EXIT
-  helmfile_list=$(mktemp --suffix=-helmfile_list)
-  append_trap "rm ${helmfile_list} >/dev/null 2>&1" EXIT
+  _generate_helmfile_template_file "${template_file}"
 
   log_info "Getting container images"
 
   mapfile -t all_charts < <(sbom_get_charts "${sbom_file}")
 
-  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc list --output json 2> /dev/null > "${helmfile_list}"
-  # - currently only retrieves enabled/installed charts from using helmfile template
-  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc template 2> /dev/null > "${template_file}"
-  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile wc template 2> /dev/null >> "${template_file}"
 
   for chart in "${all_charts[@]}"; do
     chart_name=$(yq ".name" <<< "${chart}")
     chart_version=$(yq ".version" <<< "${chart}")
 
-    _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "cronjob"
-    _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "pod"
-    _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "deployment"
-    _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "job"
-    _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "daemonset"
-    _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "statefulset"
-    _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "alertmanager"
-    _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "prometheus"
+    _add_container_images_for_component "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}"
 
     # TODO: mapping chart names to release names?
     # - e.g. for Thanos, we deploy all components from same chart but as separate releases
@@ -510,7 +525,29 @@ sbom_update_containers() {
   append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
 
   cdxgen --filter '.*' -t helm "${HELMFILE_FOLDER}" --output "${tmp_sbom_file}"
-  CK8S_AUTO_APPROVE=true CK8S_SKIP_VALIDATION=true _add_container_images "${tmp_sbom_file}"
+
+  if [[ "$#" -gt 0 ]]; then
+    chart_name="${1}"
+    if [[ "$#" -gt 1 ]]; then
+      chart_version="${2}"
+      if [[ ! $(sbom_get "${chart_name}" "${chart_version}") ]]; then
+        log_fatal "${chart_name} not found with version ${chart_version}"
+      fi
+    else
+      # TODO: handle multiple versions (e.g. Grafana)
+      chart_version="$(sbom_get "${chart_name}" | jq -r '.version')"
+      log_info "No chart version provided, will use version found in SBOM: ${chart_version}"
+    fi
+    template_file=$(mktemp --suffix=-template_file)
+    append_trap "rm ${template_file} >/dev/null 2>&1" EXIT
+
+    log_info "Updating container images for ${chart_name}@${chart_version} in SBOM"
+    _generate_helmfile_template_file "${template_file}"
+    CK8S_AUTO_APPROVE=true CK8S_SKIP_VALIDATION=true _add_container_images_for_component "${tmp_sbom_file}" "${template_file}" "${chart_name}" "${chart_version}"
+  else
+    log_info "Updating all container images in SBOM"
+    CK8S_AUTO_APPROVE=true CK8S_SKIP_VALIDATION=true _add_container_images "${tmp_sbom_file}"
+  fi
 
   query=". *d load(\"${tmp_sbom_file}\")"
   _yq_run_query "${SBOM_FILE}" "${query}"
@@ -522,11 +559,12 @@ sbom_generate() {
   tmp_sbom_file=$(mktemp --suffix=-generate-sbom.json)
   append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
 
+  # TODO: figure out a different approach for retrieving licenses, or handle GITHUB_TOKEN better
+  : "${GITHUB_TOKEN:?Missing GITHUB_TOKEN}"
+
   config_load "sc"
   config_load "wc"
 
-  # TODO: figure out a different approach for retrieving licenses, or handle GITHUB_TOKEN better
-  : "${GITHUB_TOKEN:?Missing GITHUB_TOKEN}"
   export CK8S_AUTO_APPROVE=true
   export CK8S_SKIP_VALIDATION=true
 
