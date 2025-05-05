@@ -424,15 +424,17 @@ cyclonedx_validation() {
 
 get_unset() {
   log_info "Getting components without licenses"
-  yq -o json -r '.components[] | select(.licenses[].license.name | contains("set-me")).name' "${SBOM_FILE}"
-  yq -o json -r '.components[] | select(.licenses | length == 0).name' "${SBOM_FILE}"
-  yq -o json -r '.components[] | select(has("licenses") == "false").name' "${SBOM_FILE}"
+  yq -I=0 -o json -r '[.components[] | select(.licenses[].license.name | contains("set-me")) | { "name": .name, "version": .version}] | .[]' "${SBOM_FILE}"
+  yq -I=0 -o json -r '[.components[] | select(.licenses | length == 0) | { "name": .name, "version": .version}] | .[]' "${SBOM_FILE}"
+  yq -I=0 -o json -r '[.components[] | select(has("licenses") == "false") | { "name": .name, "version": .version}] | .[]' "${SBOM_FILE}"
 
+  echo
   log_info "Getting components without Elastisys evaluation"
-  yq -o json -r '.components[] | select(.properties[].value == "set-me").name' "${SBOM_FILE}"
+  yq -I=0 -o json -r '[.components[] | select(.properties[].value == "set-me")  | { "name": .name, "version": .version}] | .[]' "${SBOM_FILE}"
 
+  echo
   log_info "Getting components without supplier"
-  yq -o json -r '.components[] | select(.supplier.name == "set-me").name' "${SBOM_FILE}"
+  yq -I=0 -o json -r '[.components[] | select(.supplier.name == "set-me")  | { "name": .name, "version": .version}] | .[]' "${SBOM_FILE}"
 }
 
 sbom_remove() {
