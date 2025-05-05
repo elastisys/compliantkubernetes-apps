@@ -38,6 +38,7 @@ usage() {
   exit 1
 }
 
+# generic function for running yq queries with prompts for cyclonedx validation and to show diff before merging
 _yq_run_query() {
   local sbom_file tmp_sbom_file query
   sbom_file="${1}"
@@ -59,6 +60,7 @@ _yq_run_query() {
   yq -i -o json "${query}" "${sbom_file}"
 }
 
+# function for updating values of existing components in a input sbom file
 _sbom_update_component() {
   local component_name component_version key sbom_file tmp_sbom_file query
 
@@ -84,6 +86,7 @@ _sbom_update_component() {
   _yq_run_query "${sbom_file}" "${query}"
 }
 
+# function for adding new values to existing components in a input sbom file
 _sbom_add_component() {
   local component_name component_version key sbom_file tmp_sbom_file value query
 
@@ -126,21 +129,29 @@ _id_or_name_license() {
   echo "name"
 }
 
+# format license json object
+# ref: https://cyclonedx.org/docs/1.6/json/#components_items_licenses_oneOf_i0_items_license
 _format_license_object() {
   local license="${1}"
   echo "{\"license\": {\"$(_id_or_name_license "${license}")\": \"${license}\"}}"
 }
 
+# format supplier json object
+# ref: https://cyclonedx.org/docs/1.6/json/#components_items_supplier
 _format_supplier_object() {
   local supplier="${1}"
   echo "{\"name\": \"${supplier}\"}"
 }
 
+# format location json object
+# ref: https://cyclonedx.org/docs/1.6/json/#components_items_evidence_occurrences_items_location
 _format_location_object() {
   local location="${1}"
   echo "{\"occurrences\": [{\"location\": \"${location}\"}]}"
 }
 
+# format properties json object
+# ref: https://cyclonedx.org/docs/1.6/json/#components_items_properties
 _format_property_object() {
   local name value
   name="${1}"
@@ -153,6 +164,8 @@ _format_elastisys_evaluation_object() {
   _format_property_object "Elastisys evaluation" "${evaluation}"
 }
 
+# format component json object for a container image
+# ref: https://cyclonedx.org/docs/1.6/json/#components
 _format_container_component_object() {
   local container="${1}"
   name="${container%%:*}"
@@ -338,10 +351,10 @@ _add_container_images() {
 
   mapfile -t all_charts < <(sbom_get_charts "${sbom_file}")
 
-  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc list --output json 1> "${helmfile_list}"
+  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc list --output json 2> /dev/null > "${helmfile_list}"
   # - currently only retrieves enabled/installed charts from using helmfile template
-  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc template 1> "${template_file}"
-  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile wc template 1>> "${template_file}"
+  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc template 2> /dev/null > "${template_file}"
+  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile wc template 2> /dev/null >> "${template_file}"
 
   for chart in "${all_charts[@]}"; do
     chart_name=$(yq ".name" <<< "${chart}")
