@@ -9,7 +9,7 @@ The structure is as follows:
 - `upstream/` - contains externally developed charts grouped per source
 - `stacks/` - contains release templates for all applications grouped per stack
 - `values/` - contains values templates for most applications grouped per stack
-- `state.yaml` - the state file that pulls in everything and defines releases
+- `state.yaml.gotmpl` - the state file that pulls in everything and defines releases
 
 ## Usage
 
@@ -41,7 +41,7 @@ The workflow for managing helm charts is to add them under `charts/` if they are
 
 Helm releases are templated under `stacks/` where it defines name, namespace, labels, chart and version, dependencies, and finally values.
 
-Releases are defined in `state.yaml` which imports the files under `stacks/`.
+Releases are defined in `state.yaml.gotmpl` which imports the files under `stacks/`.
 
 To differentiate between if a release should be installed on sc or wc set `condition: ck8sManagementCluster.enabled` or `condition: ck8sWorkloadCluster.enabled`.
 These values are predefined in the environment and can be used in templating for conditions using `.Values | get "ck8sManagementCluster.enabled" false`.
