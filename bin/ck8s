@@ -89,7 +89,6 @@ upgrade)
   if [[ "${3}" != "unlock" ]]; then
     [[ "${4}" =~ ^(prepare|apply)$ ]] || usage
   fi
-  [[ "${2}" =~ ^(wc|sc|both)$ ]] || usage
   check_tools
   export CK8S_CLUSTER="${2}"
   "${here}/upgrade.bash" "${3}" "${4:-}"
