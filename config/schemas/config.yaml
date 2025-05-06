@@ -352,6 +352,12 @@ $defs:
           - $ref: '#/$defs/io.k8s.api.core.v1.PodAntiAffinity'
         description: Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).
     type: object
+  containerImage:
+    title: URI for a container image
+    type: string
+    pattern: "^([a-zA-Z0-9][a-zA-Z0-9.-]*\\.[a-zA-Z]{2,}|localhost)/[a-zA-Z0-9_-]+(?:/[a-zA-Z0-9_-]+)*(?::([a-zA-Z0-9._-]+))?(?:@[a-zA-Z0-9_=-]+)?$"
+    examples:
+      - registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e
   io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement:
     title: Label Selector Requirement
     description: |-
@@ -7979,6 +7985,42 @@ properties:
         $ref: '#/$defs/kubernetesTopologySpreadConstraints'
       tolerations:
         $ref: '#/$defs/kubernetesTolerations'
+
+  images:
+    additionalProperties: false
+    properties:
+      global:
+        additionalProperties: false
+        properties:
+          registry:
+            additionalProperties: false
+            properties:
+              enabled:
+                type: boolean
+              uri:
+                examples:
+                  - registry.k8s.io
+                type: string
+            type: object
+          repository:
+            additionalProperties: false
+            properties:
+              enabled:
+                type: boolean
+              uri:
+                examples:
+                  - ingress-nginx
+                type: string
+            type: object
+        type: object
+      ingressNginxChart:
+        additionalProperties: false
+        properties:
+          controller:
+            $ref: '#/$defs/containerImage'
+        type: object
+    type: object
+
 
 additionalProperties:
   title: Additional Properties
