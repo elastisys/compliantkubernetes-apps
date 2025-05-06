@@ -1333,3 +1333,14 @@ kyverno:
   nodeAffinity: {}
   topologySpreadConstraints: []
   tolerations: []
+
+images:
+  global:
+    registry:
+      enabled: false
+      uri: ""
+    repository:
+      enabled: false
+      uri: ""
+  ingressNginxChart:
+    controller: "registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e"
