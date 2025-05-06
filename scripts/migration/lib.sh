@@ -441,9 +441,6 @@ record_upgrade_prepare_done() {
   local apps_config_timestamp
   apps_config_timestamp="$(date -uIs)"
 
-  ts="${apps_config_timestamp}" \
-    yq_add common '.global.ck8sConfigSerial' 'strenv(ts)'
-
   # This ConfigMap should only exist while doing an upgrade.
   # Abort if it already exists
   log_info "Locking cluster ${1} for upgrade"
@@ -453,6 +450,9 @@ record_upgrade_prepare_done() {
     --from-literal "timestamp=${apps_config_timestamp}" |
     yq4 '.metadata.labels["app.kubernetes.io/managed-by"] = "apps-upgrade"' - |
     kubectl_do "${1}" create --filename -; then
+
+    ts="${apps_config_timestamp}" \
+      yq_add common '.global.ck8sConfigSerial' 'strenv(ts)'
     log_info "Cluster ${1} locked for upgrade"
     return 0
   else
