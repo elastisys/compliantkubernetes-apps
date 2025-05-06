@@ -155,9 +155,20 @@ controller:
     serviceMonitor:
       enabled: true
 
-  {{- if .Values.ingressNginx.controller.chroot }}
+  {{- $controllerImage := include "container_uri.parse" (dict
+    "Image" .Values.images.ingressNginxChart.controller
+    "Global" .Values.images.global
+  ) | fromJson }}
+
   image:
-    chroot: true
+    chroot: {{ .Values.ingressNginx.controller.chroot }}
+    {{ if or $controllerImage.registry $controllerImage.repository $controllerImage.image -}}
+    repository: {{ join "/" (compact (list $controllerImage.registry $controllerImage.repository $controllerImage.image)) }}
+    {{- end }}
+    {{ if $controllerImage.tag }}tag: {{ $controllerImage.tag }}{{ end }}
+    {{ if $controllerImage.digest }}digestChroot: {{ $controllerImage.digest }}{{ end }}
+
+  {{- if .Values.ingressNginx.controller.chroot }}
   containerSecurityContext:
     allowPrivilegeEscalation: true
     runAsUser: 101
