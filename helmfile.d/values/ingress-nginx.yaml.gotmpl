@@ -155,6 +155,7 @@ controller:
     serviceMonitor:
       enabled: true
 
+{{ if hasKey .Values.images "ingressNginxChart" -}}
   {{- $controllerImage := include "container_uri.parse" (dict
     "Image" .Values.images.ingressNginxChart.controller
     "Global" .Values.images.global
@@ -167,6 +168,10 @@ controller:
     {{- end }}
     {{ if $controllerImage.tag }}tag: {{ $controllerImage.tag }}{{ end }}
     {{ if $controllerImage.digest }}digestChroot: {{ $controllerImage.digest }}{{ end }}
+{{- else}}
+  image:
+    chroot: {{ .Values.ingressNginx.controller.chroot }}
+{{- end }}
 
   {{- if .Values.ingressNginx.controller.chroot }}
   containerSecurityContext:
