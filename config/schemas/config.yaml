@@ -7992,6 +7992,8 @@ properties:
       and (optionally) enable support for global registry and/or repository.
     type: object
     additionalProperties: false
+    required:
+      - global
     properties:
       global:
         title: Global image settings
@@ -8021,6 +8023,17 @@ properties:
                 examples:
                   - registry.k8s.io
                 pattern: "\\..*"
+            if:
+              properties:
+                enabled:
+                  const: true
+              required:
+                - enabled
+            then:
+              required:
+                - uri
+            required:
+              - enabled
           repository:
             title: Global image repository
             description: If enabled it will be used as the repository of images that don't supply their own.
@@ -8035,6 +8048,17 @@ properties:
                 examples:
                   - ingress-nginx
                 type: string
+            if:
+              properties:
+                enabled:
+                  const: true
+              required:
+                - enabled
+            then:
+              required:
+                - uri
+            required:
+              - enabled
       ingressNginxChart:
         title: ingress-nginx-chart image configuration
         description: ingress-nginx-chart image configuration
