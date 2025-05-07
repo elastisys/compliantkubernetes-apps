@@ -38,6 +38,24 @@ usage() {
   exit 1
 }
 
+sbom_cyclonedx_validation() {
+  if [[ "$#" -ne 1 ]]; then
+    log_fatal "usage: sbom_cyclonedx_validation <sbom-file>"
+  fi
+
+  local sbom_file="${1}"
+  if [[ ! -f "${sbom_file}" ]]; then
+    log_fatal "SBOM file ${sbom_file} does not exist"
+  fi
+
+  log_info "Validating CycloneDX for SBOM file"
+  cyclonedx validate --fail-on-errors --input-file "${sbom_file}" && true; exit_code="$?"
+  if ! ${CK8S_AUTO_APPROVE:-} && [[ "${exit_code}" != 0 ]]; then
+    log_warning "CycloneDX Validation failed"
+    ask_continue
+  fi
+}
+
 # generic function for running yq queries with prompts for cyclonedx validation and to show diff before merging
 _yq_run_query() {
   local sbom_file tmp_sbom_file query
@@ -49,7 +67,7 @@ _yq_run_query() {
 
   if ! ${CK8S_SKIP_VALIDATION:-}; then
     yq -o json "${query}" "${sbom_file}" > "${tmp_sbom_file}"
-    cyclonedx_validation "${tmp_sbom_file}"
+    sbom_cyclonedx_validation "${tmp_sbom_file}"
   fi
   if ! ${CK8S_AUTO_APPROVE:-}; then
     diff  -U3 --color=always "${sbom_file}" "${tmp_sbom_file}" && log_info "No change" && exit 0
@@ -86,7 +104,7 @@ _sbom_edit_component() {
   _yq_run_query "${sbom_file}" "${query}"
 }
 
-# function for adding new values to existing components in a input sbom file
+# function for adding new values to existing components in a input sbom file given a key
 _sbom_add_component() {
   local component_name component_version key sbom_file tmp_sbom_file value query
 
@@ -249,7 +267,6 @@ _get_licenses() {
 
     # if no license in annotations, try to get from source (e.g. github)
     else
-      # TODO: handle multiple licenses, or, stick with one
       mapfile -t sources < <(yq '.sources[]' "${chart}")
       if [[ "${#sources[@]}" -eq 0 ]] || [[ "${sources[*]}" == "null" ]]; then
         continue
@@ -354,7 +371,6 @@ _add_container_images_for_component() {
   _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "statefulset"
   _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "alertmanager"
   _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "prometheus"
-
 }
 
 
@@ -377,15 +393,11 @@ _add_container_images() {
 
   mapfile -t all_charts < <(sbom_get_charts "${sbom_file}")
 
-
   for chart in "${all_charts[@]}"; do
     chart_name=$(yq ".name" <<< "${chart}")
     chart_version=$(yq ".version" <<< "${chart}")
 
     _add_container_images_for_component "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}"
-
-    # TODO: mapping chart names to release names?
-    # - e.g. for Thanos, we deploy all components from same chart but as separate releases
   done
 }
 
@@ -402,39 +414,6 @@ _add_locations() {
     location="${location%/Chart.yaml}"
     _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "evidence" "$(_format_location_object "${location}")"
   done
-}
-
-cyclonedx_validation() {
-  if [[ "$#" -ne 1 ]]; then
-    log_fatal "usage: cyclonedx_validation <sbom-file>"
-  fi
-
-  local sbom_file="${1}"
-  if [[ ! -f "${sbom_file}" ]]; then
-    log_fatal "SBOM file ${sbom_file} does not exist"
-  fi
-
-  log_info "Validating CycloneDX for SBOM file"
-  cyclonedx validate --fail-on-errors --input-file "${sbom_file}" && true; exit_code="$?"
-  if ! ${CK8S_AUTO_APPROVE:-} && [[ "${exit_code}" != 0 ]]; then
-    log_warning "CycloneDX Validation failed"
-    ask_continue
-  fi
-}
-
-get_unset() {
-  log_info "Getting components without licenses"
-  yq -I=0 -o json -r '[.components[] | select(.licenses[].license.name | contains("set-me")) | { "name": .name, "version": .version}] | .[]' "${SBOM_FILE}"
-  yq -I=0 -o json -r '[.components[] | select(.licenses | length == 0) | { "name": .name, "version": .version}] | .[]' "${SBOM_FILE}"
-  yq -I=0 -o json -r '[.components[] | select(has("licenses") == "false") | { "name": .name, "version": .version}] | .[]' "${SBOM_FILE}"
-
-  echo
-  log_info "Getting components without Elastisys evaluation"
-  yq -I=0 -o json -r '[.components[] | select(.properties[].value == "set-me")  | { "name": .name, "version": .version}] | .[]' "${SBOM_FILE}"
-
-  echo
-  log_info "Getting components without supplier"
-  yq -I=0 -o json -r '[.components[] | select(.supplier.name == "set-me")  | { "name": .name, "version": .version}] | .[]' "${SBOM_FILE}"
 }
 
 sbom_remove() {
@@ -489,6 +468,21 @@ sbom_get() {
   fi
 
   yq -e -o json "${query}" "${SBOM_FILE}"
+}
+
+sbom_get_unset() {
+  log_info "Getting components without licenses"
+  yq -I=0 -o json -r '[.components[] | select(.licenses[].license.name | contains("set-me")) | { "name": .name, "version": .version}] | .[]' "${SBOM_FILE}"
+  yq -I=0 -o json -r '[.components[] | select(.licenses | length == 0) | { "name": .name, "version": .version}] | .[]' "${SBOM_FILE}"
+  yq -I=0 -o json -r '[.components[] | select(has("licenses") == "false") | { "name": .name, "version": .version}] | .[]' "${SBOM_FILE}"
+
+  echo
+  log_info "Getting components without Elastisys evaluation"
+  yq -I=0 -o json -r '[.components[] | select(.properties[].value == "set-me")  | { "name": .name, "version": .version}] | .[]' "${SBOM_FILE}"
+
+  echo
+  log_info "Getting components without supplier"
+  yq -I=0 -o json -r '[.components[] | select(.supplier.name == "set-me")  | { "name": .name, "version": .version}] | .[]' "${SBOM_FILE}"
 }
 
 sbom_get_charts() {
@@ -577,7 +571,6 @@ sbom_generate() {
 
   _prepare_sbom "${tmp_sbom_file}"
 
-  # TODO: (maybe) loop over charts here, and retrieve necessary info per chart (would reduce number of for loops)
   _get_licenses "${tmp_sbom_file}"
 
   _add_locations "${tmp_sbom_file}"
@@ -586,7 +579,7 @@ sbom_generate() {
 
   CK8S_AUTO_APPROVE=false
   CK8S_SKIP_VALIDATION=false
-  cyclonedx_validation "${tmp_sbom_file}"
+  sbom_cyclonedx_validation "${tmp_sbom_file}"
 
   diff  -U3 --color=always "${SBOM_FILE}" "${tmp_sbom_file}" && return
   log_warning_no_newline "Do you want to replace SBOM file? (y/N): "
@@ -627,7 +620,7 @@ get-containers)
   ;;
 get-unset)
   shift
-  get_unset "${@}"
+  sbom_get_unset "${@}"
   ;;
 remove)
   shift
@@ -638,7 +631,7 @@ update-containers)
   sbom_update_containers "${@}"
   ;;
 validate)
-  cyclonedx_validation "${SBOM_FILE}"
+  sbom_cyclonedx_validation "${SBOM_FILE}"
   ;;
 *) usage ;;
 esac
