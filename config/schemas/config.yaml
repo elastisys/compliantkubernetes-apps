@@ -7986,39 +7986,63 @@ properties:
         $ref: '#/$defs/kubernetesTolerations'
 
   images:
+    title: Images Configuration
+    description: |-
+      Configure individual container URI for images of all Welkin components,
+      and (optionally) enable support for global registry and/or repository.
+    type: object
     additionalProperties: false
     properties:
       global:
+        title: Global image settings
+        description: |-
+          Global image registry and repository settings.
+
+          If a global registry is supplied and enabled, and an image is specified
+          that doesn't have a registry, the global registry will be used instead.
+
+          If a global repository is supplied and enabled, and an image is specified
+          that doesn't have a repository, the global repository will be used instead.
+        type: object
         additionalProperties: false
         properties:
           registry:
+            title: Global image registry
+            description: If enabled it will be used as the registry of images that don't supply their own.
+            type: object
             additionalProperties: false
             properties:
               enabled:
+                title: Enable the global image registry
                 type: boolean
               uri:
+                title: Global image registry URI
+                type: string
                 examples:
                   - registry.k8s.io
-                type: string
-            type: object
+                pattern: "\\..*"
           repository:
+            title: Global image repository
+            description: If enabled it will be used as the repository of images that don't supply their own.
             additionalProperties: false
+            type: object
             properties:
               enabled:
+                title: Enable the global image repository
                 type: boolean
               uri:
+                title: Global image repository
                 examples:
                   - ingress-nginx
                 type: string
-            type: object
-        type: object
       ingressNginxChart:
+        title: ingress-nginx-chart image configuration
+        description: ingress-nginx-chart image configuration
+        type: object
         additionalProperties: false
         properties:
           controller:
             $ref: '#/$defs/containerImage'
-        type: object
-    type: object
 
 
 additionalProperties:
