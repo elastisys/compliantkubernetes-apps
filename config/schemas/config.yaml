@@ -355,7 +355,6 @@ $defs:
   containerImage:
     title: URI for a container image
     type: string
-    pattern: "^([a-zA-Z0-9][a-zA-Z0-9.-]*\\.[a-zA-Z]{2,}|localhost)/[a-zA-Z0-9_-]+(?:/[a-zA-Z0-9_-]+)*(?::([a-zA-Z0-9._-]+))?(?:@[a-zA-Z0-9_=-]+)?$"
     examples:
       - registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e
   io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement:
