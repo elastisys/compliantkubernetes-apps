@@ -167,7 +167,7 @@ controller:
     repository: {{ join "/" (compact (list $controllerImage.registry $controllerImage.repository $controllerImage.image)) }}
     {{- end }}
     {{ if $controllerImage.tag }}tag: {{ $controllerImage.tag }}{{ end }}
-    {{ if $controllerImage.digest }}digestChroot: {{ $controllerImage.digest }}{{ end }}
+    digestChroot: {{ $controllerImage.digest }}
 {{- else}}
   image:
     chroot: {{ .Values.ingressNginx.controller.chroot }}
