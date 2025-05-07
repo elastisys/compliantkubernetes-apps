@@ -6,6 +6,7 @@ schedulerName: "{{ . }}"
 {{- end }}
 serviceAccountName: {{ include "grafana.serviceAccountName" . }}
 automountServiceAccountToken: {{ .Values.automountServiceAccountToken }}
+shareProcessNamespace: {{ .Values.shareProcessNamespace }}
 {{- with .Values.securityContext }}
 securityContext:
   {{- toYaml . | nindent 2 }}
@@ -24,7 +25,7 @@ dnsConfig:
 {{- with .Values.priorityClassName }}
 priorityClassName: {{ . }}
 {{- end }}
-{{- if ( or .Values.persistence.enabled .Values.dashboards .Values.extraInitContainers (and .Values.sidecar.alerts.enabled .Values.sidecar.alerts.initAlerts) (and .Values.sidecar.datasources.enabled .Values.sidecar.datasources.initDatasources) (and .Values.sidecar.notifiers.enabled .Values.sidecar.notifiers.initNotifiers)) }}
+{{- if ( or (and .Values.persistence.enabled .Values.initChownData.enabled) .Values.dashboards .Values.extraInitContainers (and .Values.sidecar.alerts.enabled .Values.sidecar.alerts.initAlerts) (and .Values.sidecar.datasources.enabled .Values.sidecar.datasources.initDatasources) (and .Values.sidecar.notifiers.enabled .Values.sidecar.notifiers.initNotifiers)) }}
 initContainers:
 {{- end }}
 {{- if ( and .Values.persistence.enabled .Values.initChownData.enabled ) }}
@@ -126,10 +127,10 @@ initContainers:
       - name: METHOD
         value: "LIST"
       - name: LABEL
-        value: "{{ .Values.sidecar.alerts.label }}"
+        value: "{{ tpl .Values.sidecar.alerts.label $root }}"
       {{- with .Values.sidecar.alerts.labelValue }}
       - name: LABEL_VALUE
-        value: {{ quote . }}
+        value: {{ quote (tpl . $root) }}
       {{- end }}
       {{- if or .Values.sidecar.logLevel .Values.sidecar.alerts.logLevel }}
       - name: LOG_LEVEL
@@ -204,10 +205,10 @@ initContainers:
       - name: METHOD
         value: "LIST"
       - name: LABEL
-        value: "{{ .Values.sidecar.datasources.label }}"
+        value: "{{ tpl .Values.sidecar.datasources.label $root }}"
       {{- with .Values.sidecar.datasources.labelValue }}
       - name: LABEL_VALUE
-        value: {{ quote . }}
+        value: {{ quote (tpl . $root) }}
       {{- end }}
       {{- if or .Values.sidecar.logLevel .Values.sidecar.datasources.logLevel }}
       - name: LOG_LEVEL
@@ -262,10 +263,10 @@ initContainers:
       - name: METHOD
         value: LIST
       - name: LABEL
-        value: "{{ .Values.sidecar.notifiers.label }}"
+        value: "{{ tpl .Values.sidecar.notifiers.label $root }}"
       {{- with .Values.sidecar.notifiers.labelValue }}
       - name: LABEL_VALUE
-        value: {{ quote . }}
+        value: {{ quote (tpl . $root) }}
       {{- end }}
       {{- if or .Values.sidecar.logLevel .Values.sidecar.notifiers.logLevel }}
       - name: LOG_LEVEL
@@ -339,10 +340,10 @@ containers:
       - name: METHOD
         value: {{ .Values.sidecar.alerts.watchMethod }}
       - name: LABEL
-        value: "{{ .Values.sidecar.alerts.label }}"
+        value: "{{ tpl .Values.sidecar.alerts.label $root }}"
       {{- with .Values.sidecar.alerts.labelValue }}
       - name: LABEL_VALUE
-        value: {{ quote . }}
+        value: {{ quote (tpl . $root) }}
       {{- end }}
       {{- if or .Values.sidecar.logLevel .Values.sidecar.alerts.logLevel }}
       - name: LOG_LEVEL
@@ -463,10 +464,10 @@ containers:
       - name: METHOD
         value: {{ .Values.sidecar.dashboards.watchMethod }}
       - name: LABEL
-        value: "{{ .Values.sidecar.dashboards.label }}"
+        value: "{{ tpl .Values.sidecar.dashboards.label $root }}"
       {{- with .Values.sidecar.dashboards.labelValue }}
       - name: LABEL_VALUE
-        value: {{ quote . }}
+        value: {{ quote (tpl . $root) }}
       {{- end }}
       {{- if or .Values.sidecar.logLevel .Values.sidecar.dashboards.logLevel }}
       - name: LOG_LEVEL
@@ -591,10 +592,10 @@ containers:
       - name: METHOD
         value: {{ .Values.sidecar.datasources.watchMethod }}
       - name: LABEL
-        value: "{{ .Values.sidecar.datasources.label }}"
+        value: "{{ tpl .Values.sidecar.datasources.label $root }}"
       {{- with .Values.sidecar.datasources.labelValue }}
       - name: LABEL_VALUE
-        value: {{ quote . }}
+        value: {{ quote (tpl . $root) }}
       {{- end }}
       {{- if or .Values.sidecar.logLevel .Values.sidecar.datasources.logLevel }}
       - name: LOG_LEVEL
@@ -710,10 +711,10 @@ containers:
       - name: METHOD
         value: {{ .Values.sidecar.notifiers.watchMethod }}
       - name: LABEL
-        value: "{{ .Values.sidecar.notifiers.label }}"
+        value: "{{ tpl .Values.sidecar.notifiers.label $root }}"
       {{- with .Values.sidecar.notifiers.labelValue }}
       - name: LABEL_VALUE
-        value: {{ quote . }}
+        value: {{ quote (tpl . $root) }}
       {{- end }}
       {{- if or .Values.sidecar.logLevel .Values.sidecar.notifiers.logLevel }}
       - name: LOG_LEVEL
@@ -829,10 +830,10 @@ containers:
       - name: METHOD
         value: {{ .Values.sidecar.plugins.watchMethod }}
       - name: LABEL
-        value: "{{ .Values.sidecar.plugins.label }}"
+        value: "{{ tpl .Values.sidecar.plugins.label $root }}"
       {{- if .Values.sidecar.plugins.labelValue }}
       - name: LABEL_VALUE
-        value: {{ quote .Values.sidecar.plugins.labelValue }}
+        value: {{ quote (tpl .Values.sidecar.plugins.labelValue $) }}
       {{- end }}
       {{- if or .Values.sidecar.logLevel .Values.sidecar.plugins.logLevel }}
       - name: LOG_LEVEL
