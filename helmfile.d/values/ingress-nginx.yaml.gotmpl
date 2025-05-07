@@ -1,7 +1,3 @@
-## nginx configuration
-## Ref: https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/index.md
-##
-
 controller:
   ingressClassResource:
     default: true
@@ -10,159 +6,148 @@ controller:
   extraArgs: {{- toYaml .Values.ingressNginx.controller.extraArgs | nindent 4 }}
   extraEnvs: {{- toYaml .Values.ingressNginx.controller.extraEnvs | nindent 4 }}
 
-  # Will add custom configuration options to Nginx https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
+  # NGINX configuration, ref: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
   config:
+    annotations-risk-level: {{ .Values.ingressNginx.controller.config.annotationsRiskLevel | quote }}
     disable-ipv6-dns: "true"
-    proxy-body-size: "200m"
     client-body-buffer-size: "256k"
+    proxy-body-size: "200m"
     proxy-buffer-size: "8k"
-    {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.global }}
-    whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.global }}
-    {{ end }}
     use-proxy-protocol: {{ .Values.ingressNginx.controller.config.useProxyProtocol | quote }}
+    {{- if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.global }}
+    whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.global }}
+    {{- end }}
     {{- with .Values.ingressNginx.controller.additionalConfig }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-    annotations-risk-level: {{ .Values.ingressNginx.controller.config.annotationsRiskLevel | quote }}
 
-  # Optionally change this to ClusterFirstWithHostNet in case you have 'hostNetwork: true'.
-  # By default, while using host network, name resolution uses the host's DNS. If you wish nginx-controller
-  # to keep resolving names inside the k8s network, use ClusterFirstWithHostNet.
-  {{ if .Values.ingressNginx.controller.useHostPort }}
-  dnsPolicy: ClusterFirstWithHostNet
-  {{ end }}
-
-  # Set allow-snippet-annotations to false in order to mitigate CVE-2021-25742
   allowSnippetAnnotations: {{ .Values.ingressNginx.controller.allowSnippetAnnotations }}
 
   enableAnnotationValidations: {{ .Values.ingressNginx.controller.enableAnnotationValidations }}
 
-  # Required for use with CNI based kubernetes installations (such as ones set up by kubeadm),
-  # since CNI and hostport don't mix yet. Can be deprecated once https://github.com/kubernetes/kubernetes/issues/23920
-  # is merged
-  {{ if .Values.ingressNginx.controller.useHostPort }}
+  {{ if .Values | get "ingressNginx.controller.useHostPort" false }}
+  # Ensure we can resolve names in cluster with host network enabled.
+  dnsPolicy: ClusterFirstWithHostNet
+  # TODO: Can be deprecated since https://github.com/kubernetes/kubernetes/issues/23920 is merged.
   hostNetwork: true
   {{ end }}
 
   ## Use host ports 80 and 443
-  ## Disabled by default
-  ##
   hostPort:
-    enabled: {{ .Values.ingressNginx.controller.useHostPort }}
+    enabled: {{ .Values | get "ingressNginx.controller.useHostPort" false }}
 
-  ## Allows customization of the source of the IP address or FQDN to report
-  ## in the ingress status field. By default, it reads the information provided
-  ## by the service. If disable, the status field reports the IP address of the
-  ## node or nodes where an ingress controller pod is running.
+  # When true, report the address or name of the service in ingress status.
+  # When false, report the addresses of the nodes the ingress controller runs on in ingress status.
   publishService:
     enabled:  {{ .Values.ingressNginx.controller.enablepublishService }}
 
-  ## DaemonSet or Deployment
-  ##
   kind: DaemonSet
 
-  # The update strategy to apply to the Deployment or DaemonSet
-  ##
   updateStrategy:
     type: RollingUpdate
 
-  # minReadySeconds to avoid killing pods before we are ready
-  ##
+  # Avoid killing Pods before they are ready
   minReadySeconds: 10
-
-
-  ## Node tolerations for server scheduling to nodes with taints
-  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  ##
-  tolerations: {{- toYaml .Values.ingressNginx.controller.tolerations | nindent 4 }}
-
-  ## Affinity and anti-affinity
-  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-  ##
-  affinity: {{- toYaml .Values.ingressNginx.controller.affinity | nindent 4 }}
-
-  ## terminationGracePeriodSeconds
-  ## wait up to 1 minutes for the drain of connections
-  ##
+  # Avoid killing Pods immediately to drain connections
   terminationGracePeriodSeconds: 60
 
-  ## Node labels for controller pod assignment
-  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
-  ##
   nodeSelector: {{- toYaml .Values.ingressNginx.controller.nodeSelector | nindent 4 }}
 
-  # Define requests resources to avoid probe issues due to CPU utilization in busy nodes
-  # ref: https://github.com/kubernetes/ingress-nginx/issues/4735#issuecomment-551204903
-  # Ideally, there should be no limits.
-  # https://engineering.indeedblog.com/blog/2019/12/cpu-throttling-regression-fix/
+  tolerations: {{- toYaml .Values.ingressNginx.controller.tolerations | nindent 4 }}
+
+  affinity: {{- toYaml .Values.ingressNginx.controller.affinity | nindent 4 }}
+
   resources: {{- toYaml .Values.ingressNginx.controller.resources | nindent 4 }}
 
   service:
-    {{- if .Values | get "ingressNginx.controller.service.type" "" | eq "LoadBalancer" }}
-    allocateLoadBalancerNodePorts: {{ .Values.ingressNginx.controller.service.allocateLoadBalancerNodePorts }}
-    {{- end }}
-    {{ if .Values.externalTrafficPolicy.local }}
-    ## Set external traffic policy to: "Local" to preserve source IP on
-    ## providers supporting it
-    ## Ref: https://kubernetes.io/docs/tutorials/services/source-ip/#source-ip-for-services-with-typeloadbalancer
-    ## Required for IP whitelisting
-    externalTrafficPolicy: "Local"
-    {{ end }}
-    {{ if .Values.ingressNginx.controller.service.enabled }}
+    {{- if .Values | get "ingressNginx.controller.service.enabled" false }}
     enabled: true
-    type: {{ .Values.ingressNginx.controller.service.type }}
+
     annotations: {{- toYaml .Values.ingressNginx.controller.service.annotations | nindent 6 }}
-    loadBalancerSourceRanges: {{- toYaml .Values.ingressNginx.controller.service.loadBalancerSourceRanges | nindent 6 }}
-    {{ else }}
-    enabled: false
-    {{ end }}
-    {{ if .Values.ingressNginx.controller.service.ipFamilyPolicy }}
-    ipFamilyPolicy: {{ .Values.ingressNginx.controller.service.ipFamilyPolicy }}
-    {{ end }}
-    {{ if .Values.ingressNginx.controller.service.ipFamilies }}
-    ipFamilies: {{- toYaml .Values.ingressNginx.controller.service.ipFamilies | nindent 6 }}
-    {{ end }}
-    {{ if eq .Values.ingressNginx.controller.service.type "NodePort" }}
-    nodePorts: {{- toYaml .Values.ingressNginx.controller.service.nodePorts | nindent 6 }}
-    {{ end }}
+
+    type: {{ .Values.ingressNginx.controller.service.type }}
+
     {{- with .Values | get "ingressNginx.controller.service.clusterIP" "" }}
     clusterIP: {{ . }}
+    {{- end }}
+
+    {{- if .Values.externalTrafficPolicy.local }}
+    # Cause external traffic to only go to Pods local to the receiving Node.
+    # Required to preserve source IP for allowlisting with direct routed and proxy loadbalancers without PROXY protocol.
+    externalTrafficPolicy: Local
+    {{- end }}
+
+    {{- with .Values.ingressNginx.controller.service.ipFamilyPolicy }}
+    ipFamilyPolicy: {{ . }}
+    {{- end }}
+    {{- with .Values.ingressNginx.controller.service.ipFamilies }}
+    ipFamilies: {{- toYaml . | nindent 6 }}
+    {{- end }}
+
+    {{- if .Values | get "ingressNginx.controller.service.type" "" | eq "LoadBalancer" }}
+
+    allocateLoadBalancerNodePorts: {{ .Values.ingressNginx.controller.service.allocateLoadBalancerNodePorts }}
+    {{- with .Values | get "ingressNginx.controller.service.loadBalancerSourceRanges" list }}
+    loadBalancerSourceRanges: {{- toYaml . | nindent 6 }}
     {{- end }}
     {{- with .Values | get "ingressNginx.controller.service.loadBalancerIP" "" }}
     loadBalancerIP: {{ . }}
     {{- end }}
-    {{ if .Values.ingressNginx.controller.service.internal.enabled }}
+
+    {{- else if .Values | get "ingressNginx.controller.service.type" "" | eq "NodePort" }}
+
+    nodePorts: {{- toYaml .Values.ingressNginx.controller.service.nodePorts | nindent 6 }}
+
+    {{- end }}
+
+    {{- else }}
+    enabled: false
+    {{- end }}
+
     internal:
-      {{- if .Values | get "ingressNginx.controller.service.internal.type" "" | eq "LoadBalancer" }}
-      allocateLoadBalancerNodePorts: {{ .Values.ingressNginx.controller.service.internal.allocateLoadBalancerNodePorts }}
-      {{- end }}
-      enabled: {{ .Values.ingressNginx.controller.service.internal.enabled }}
-      type: {{ .Values.ingressNginx.controller.service.internal.type }}
+      {{- if .Values | get "ingressNginx.controller.service.internal.enabled" false }}
+      enabled: true
+
       annotations: {{- toYaml .Values.ingressNginx.controller.service.internal.annotations | nindent 8 }}
-      loadBalancerSourceRanges: {{- toYaml .Values.ingressNginx.controller.service.internal.loadBalancerSourceRanges | nindent 8 }}
-      {{ if .Values.externalTrafficPolicy.local }}
-      ## Set external traffic policy to: "Local" to preserve source IP on
-      ## providers supporting it
-      ## Ref: https://kubernetes.io/docs/tutorials/services/source-ip/#source-ip-for-services-with-typeloadbalancer
-      ## Required for IP whitelisting
-      externalTrafficPolicy: "Local"
-      {{ end }}
-      {{ if .Values.ingressNginx.controller.service.internal.ipFamilyPolicy }}
-      ipFamilyPolicy: {{ .Values.ingressNginx.controller.service.internal.ipFamilyPolicy }}
-      {{ end }}
-      {{ if .Values.ingressNginx.controller.service.internal.ipFamilies }}
-      ipFamilies: {{- toYaml .Values.ingressNginx.controller.service.internal.ipFamilies | nindent 8 }}
-      {{ end }}
-      {{ if eq .Values.ingressNginx.controller.service.internal.type "NodePort" }}
-      nodePorts: {{- toYaml .Values.ingressNginx.controller.service.internal.nodePorts | nindent 8 }}
-      {{ end }}
+
+      type: {{ .Values.ingressNginx.controller.service.internal.type }}
+
       {{- with .Values | get "ingressNginx.controller.service.internal.clusterIP" "" }}
       clusterIP: {{ . }}
+      {{- end }}
+
+      {{- if .Values.externalTrafficPolicy.local }}
+      # Cause external traffic to only go to Pods local to the receiving Node.
+      # Required to preserve source IP for allowlisting with direct routed and proxy loadbalancers without PROXY protocol.
+      externalTrafficPolicy: Local
+      {{- end }}
+
+      {{- with .Values.ingressNginx.controller.service.internal.ipFamilyPolicy }}
+      ipFamilyPolicy: {{ . }}
+      {{- end }}
+      {{- with .Values.ingressNginx.controller.service.internal.ipFamilies }}
+      ipFamilies: {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- if .Values | get "ingressNginx.controller.service.internal.type" "" | eq "LoadBalancer" }}
+
+      allocateLoadBalancerNodePorts: {{ .Values.ingressNginx.controller.service.internal.allocateLoadBalancerNodePorts }}
+      {{- with .Values | get "ingressNginx.controller.service.internal.loadBalancerSourceRanges" list }}
+      loadBalancerSourceRanges: {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values | get "ingressNginx.controller.service.internal.loadBalancerIP" "" }}
       loadBalancerIP: {{ . }}
       {{- end }}
-    {{ end }}
+
+      {{- else if .Values | get "ingressNginx.controller.service.internal.type" "" | eq "NodePort" }}
+
+      nodePorts: {{- toYaml .Values.ingressNginx.controller.service.internal.nodePorts | nindent 8 }}
+
+      {{- end }}
+
+      {{- else }}
+      enabled: false
+      {{- end }}
 
   metrics:
     enabled: true
@@ -174,6 +159,8 @@ controller:
   image:
     chroot: true
   containerSecurityContext:
+    allowPrivilegeEscalation: true
+    runAsUser: 101
     seccompProfile:
       type: Localhost
       localhostProfile: profiles/ingress-nginx-chroot.json
@@ -183,30 +170,19 @@ controller:
       add:
       - NET_BIND_SERVICE
       - SYS_CHROOT
-    runAsUser: 101
-    allowPrivilegeEscalation: true
   {{- end }}
 
-## Default 404 backend
-##
 defaultBackend:
-  ##
   enabled: true
 
   name: default-backend
 
-  ## Node tolerations for server scheduling to nodes with taints
-  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  ##
+  nodeSelector: {{- toYaml .Values.ingressNginx.defaultBackend.nodeSelector | nindent 4 }}
+
   tolerations: {{- toYaml .Values.ingressNginx.defaultBackend.tolerations | nindent 4 }}
 
   affinity: {{- toYaml .Values.ingressNginx.defaultBackend.affinity | nindent 4 }}
 
-  ## Node labels for default backend pod assignment
-  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
-  ##
-  nodeSelector: {{- toYaml .Values.ingressNginx.defaultBackend.nodeSelector | nindent 4 }}
+  topologySpreadConstraints: {{- toYaml .Values.ingressNginx.defaultBackend.topologySpreadConstraints | nindent 4 }}
 
   resources: {{- toYaml .Values.ingressNginx.defaultBackend.resources | nindent 4 }}
-
-  topologySpreadConstraints: {{- toYaml .Values.ingressNginx.defaultBackend.topologySpreadConstraints | nindent 4 }}
