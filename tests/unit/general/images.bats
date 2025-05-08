@@ -164,3 +164,23 @@ _generate_templates() {
 _extract_controller_image() {
   yq '.spec.template.spec.containers[] | select(.name == "controller") | .image' <"${target_template}/ingress-nginx/templates/controller-daemonset.yaml"
 }
+
+@test "the controller DaemonSet should allow overwriting the tag fragment only" {
+  yq.set sc .images.ingressNginxChart.controller '":v1.2.3"'
+
+  _generate_templates
+
+  run _extract_controller_image
+
+  assert_output --regexp '^registry.k8s.io/ingress-nginx/controller-chroot:v1\.2\.3'
+}
+
+@test "the controller DaemonSet should allow overwriting the tag and sha fragments only" {
+  yq.set sc .images.ingressNginxChart.controller '":v1.2.3@sha256:babafacecaca"'
+
+  _generate_templates
+
+  run _extract_controller_image
+
+  assert_output --regexp '^registry.k8s.io/ingress-nginx/controller-chroot:v1\.2\.3@sha256:babafacecaca'
+}
