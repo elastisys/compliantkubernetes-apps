@@ -5,7 +5,7 @@ storageClasses:
 networkPolicies:
   global:
     externalLoadBalancer: true
-    ingressUsingHostNetwork: true
+    ingressUsingHostNetwork: false
   ingressNginx:
     ingressOverride:
       enabled: false
@@ -28,10 +28,11 @@ ingressNginx:
   controller:
     config:
       useProxyProtocol: false
-    useHostPort: true
+    useHostPort: false
     service:
-      enabled: false
+      enabled: true
       allocateLoadBalancerNodePorts: true
+      type: NodePort
 opa:
   rejectLoadBalancerService:
     enabled: true
