@@ -3,10 +3,16 @@ storageClasses:
 networkPolicies:
   global:
     externalLoadBalancer: true
-    ingressUsingHostNetwork: true
+    ingressUsingHostNetwork: false
   ingressNginx:
     ingressOverride:
-      enabled: false
+      enabled: true
+      # Set private IP with listen = false frim terraform.tfstate
+      # include public LB IPs if e.g. the following annotations are used:
+      # - nginx.ingress.kubernetes.io/auth-signin
+      # - nginx.ingress.kubernetes.io/auth-url
+      ips:
+        - set-me
   kubeSystem:
     upcloud:
       enabled: true
@@ -24,10 +30,14 @@ ingressNginx:
   controller:
     config:
       useProxyProtocol: false
-    useHostPort: true
+    useHostPort: false
     service:
-      enabled: false
+      enabled: true
       allocateLoadBalancerNodePorts: true
+      type: NodePort
+      annotations: {}
+externalTrafficPolicy:
+  local: true
 opa:
   rejectLoadBalancerService:
     enabled: true
