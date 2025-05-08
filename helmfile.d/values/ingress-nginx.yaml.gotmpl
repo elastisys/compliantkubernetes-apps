@@ -155,7 +155,7 @@ controller:
     serviceMonitor:
       enabled: true
 
-{{ if hasKey .Values.images "ingressNginxChart" -}}
+{{ if .Values.images | dig "ingressNginxChart" "controller" "" -}}
   {{- $controllerImage := include "container_uri.parse" (dict
     "Image" .Values.images.ingressNginxChart.controller
     "Global" .Values.images.global
