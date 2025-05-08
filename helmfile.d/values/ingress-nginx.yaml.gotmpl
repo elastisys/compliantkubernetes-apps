@@ -211,6 +211,19 @@ defaultBackend:
 
   name: default-backend
 
+{{ if .Values.images | dig "ingressNginxChart" "defaultBackend" "" -}}
+  {{- $defaultBackendImage := include "container_uri.parse" (dict
+    "Image" .Values.images.ingressNginxChart.defaultBackend
+    "Global" .Values.images.global
+  ) | fromJson }}
+  {{ if or $defaultBackendImage.registry $defaultBackendImage.repository $defaultBackendImage.image -}}
+  image:
+    repository: {{ join "/" (compact (list $defaultBackendImage.registry $defaultBackendImage.repository $defaultBackendImage.image)) }}
+    {{ if $defaultBackendImage.tag }}tag: {{ $defaultBackendImage.tag }}{{ end }}
+    {{ if $defaultBackendImage.digest }}digest: {{ $defaultBackendImage.digest }}{{ end }}
+  {{- end }}
+{{- end }}
+
   ## Node tolerations for server scheduling to nodes with taints
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   ##
