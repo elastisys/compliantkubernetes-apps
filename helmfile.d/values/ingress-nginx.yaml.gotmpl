@@ -170,9 +170,25 @@ controller:
     serviceMonitor:
       enabled: true
 
-  {{- if .Values.ingressNginx.controller.chroot }}
+{{ if .Values.images | dig "ingressNginxChart" "controller" "" -}}
+  {{- $controllerImage := include "container_uri.parse" (dict
+    "Image" .Values.images.ingressNginxChart.controller
+    "Global" .Values.images.global
+  ) | fromJson }}
+
   image:
-    chroot: true
+    chroot: {{ .Values.ingressNginx.controller.chroot }}
+    {{ if or $controllerImage.registry $controllerImage.repository $controllerImage.image -}}
+    repository: {{ join "/" (compact (list $controllerImage.registry $controllerImage.repository $controllerImage.image)) }}
+    {{- end }}
+    {{ if $controllerImage.tag }}tag: {{ $controllerImage.tag }}{{ end }}
+    digestChroot: {{ $controllerImage.digest }}
+{{- else}}
+  image:
+    chroot: {{ .Values.ingressNginx.controller.chroot }}
+{{- end }}
+
+  {{- if .Values.ingressNginx.controller.chroot }}
   containerSecurityContext:
     seccompProfile:
       type: Localhost
@@ -194,6 +210,19 @@ defaultBackend:
   enabled: true
 
   name: default-backend
+
+{{ if .Values.images | dig "ingressNginxChart" "defaultBackend" "" -}}
+  {{- $defaultBackendImage := include "container_uri.parse" (dict
+    "Image" .Values.images.ingressNginxChart.defaultBackend
+    "Global" .Values.images.global
+  ) | fromJson }}
+  image:
+    {{ if or $defaultBackendImage.registry $defaultBackendImage.repository $defaultBackendImage.image -}}
+    repository: {{ join "/" (compact (list $defaultBackendImage.registry $defaultBackendImage.repository $defaultBackendImage.image)) }}
+    {{- end }}
+    {{ if $defaultBackendImage.tag }}tag: {{ $defaultBackendImage.tag }}{{ end }}
+    {{ if $defaultBackendImage.digest }}digest: {{ $defaultBackendImage.digest }}{{ end }}
+{{- end }}
 
   ## Node tolerations for server scheduling to nodes with taints
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
