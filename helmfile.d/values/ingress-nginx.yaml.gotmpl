@@ -200,12 +200,12 @@ defaultBackend:
     "Image" .Values.images.ingressNginxChart.defaultBackend
     "Global" .Values.images.global
   ) | fromJson }}
-  {{ if or $defaultBackendImage.registry $defaultBackendImage.repository $defaultBackendImage.image -}}
   image:
+    {{ if or $defaultBackendImage.registry $defaultBackendImage.repository $defaultBackendImage.image -}}
     repository: {{ join "/" (compact (list $defaultBackendImage.registry $defaultBackendImage.repository $defaultBackendImage.image)) }}
+    {{- end }}
     {{ if $defaultBackendImage.tag }}tag: {{ $defaultBackendImage.tag }}{{ end }}
     {{ if $defaultBackendImage.digest }}digest: {{ $defaultBackendImage.digest }}{{ end }}
-  {{- end }}
 {{- end }}
 
   tolerations: {{- toYaml .Values.ingressNginx.defaultBackend.tolerations | nindent 4 }}
