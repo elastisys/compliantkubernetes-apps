@@ -8055,7 +8055,10 @@ properties:
         properties:
           controller:
             $ref: '#/$defs/containerImage'
-
+          defaultBackend:
+            $ref: '#/$defs/containerImage'
+          admissionWebhooks:
+            $ref: '#/$defs/containerImage'
 
 additionalProperties:
   title: Additional Properties
