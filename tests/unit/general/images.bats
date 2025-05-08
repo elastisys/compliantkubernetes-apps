@@ -8,8 +8,6 @@ setup_file() {
   load_common "gpg.bash"
   load_common "yq.bash"
 
-  export BATS_NO_PARALLELIZE_WITHIN_FILE="true"
-
   gpg.setup
   env.setup
 
