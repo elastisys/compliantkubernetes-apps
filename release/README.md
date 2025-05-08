@@ -120,6 +120,13 @@ Mark the staging pull request ready for review.
 
 ## Release
 
+Update the SBOM, ensure it gets validated and carefully look at the diff and address any manual overrides needed:
+
+```sh
+./bin/ck8s sbom generate
+./bin/ck8s sbom get-unset   # update any components listed
+```
+
 When the staging branch has been merged, finalize the release by tagging the HEAD of the release branch and push the tag.
 
 ```bash
