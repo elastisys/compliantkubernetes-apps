@@ -195,6 +195,19 @@ defaultBackend:
 
   nodeSelector: {{- toYaml .Values.ingressNginx.defaultBackend.nodeSelector | nindent 4 }}
 
+{{ if .Values.images | dig "ingressNginxChart" "defaultBackend" "" -}}
+  {{- $defaultBackendImage := include "container_uri.parse" (dict
+    "Image" .Values.images.ingressNginxChart.defaultBackend
+    "Global" .Values.images.global
+  ) | fromJson }}
+  {{ if or $defaultBackendImage.registry $defaultBackendImage.repository $defaultBackendImage.image -}}
+  image:
+    repository: {{ join "/" (compact (list $defaultBackendImage.registry $defaultBackendImage.repository $defaultBackendImage.image)) }}
+    {{ if $defaultBackendImage.tag }}tag: {{ $defaultBackendImage.tag }}{{ end }}
+    {{ if $defaultBackendImage.digest }}digest: {{ $defaultBackendImage.digest }}{{ end }}
+  {{- end }}
+{{- end }}
+
   tolerations: {{- toYaml .Values.ingressNginx.defaultBackend.tolerations | nindent 4 }}
 
   affinity: {{- toYaml .Values.ingressNginx.defaultBackend.affinity | nindent 4 }}
