@@ -9,13 +9,15 @@ if ! command -v releaser >/dev/null; then
 fi
 
 function usage() {
-  echo "Usage: ${0} VERSION" >&2
+  echo "Usage: ${0} VERSION GITHUB_TOKEN" >&2
   exit 1
 }
 
-[ ${#} -eq 1 ] || usage
+[ ${#} -eq 2 ] || usage
 
 full_version="${1}"
+github_token="${2}"
+
 series="$(echo "${full_version}" | cut -d '.' -f 1,2)"
 patch="$(echo "${full_version}" | cut -d '.' -f 3)"
 
@@ -51,7 +53,7 @@ mkdir -p "${changelog_dir}"
 # TODO: Find a nicer way to do this.
 [ "${patch}" != "0" ] && printf "\n#" >>"${changelog_path}"
 
-releaser changelog compliantkubernetes-apps "${full_version}" >>"${changelog_path}"
+releaser changelog compliantkubernetes-apps "${full_version}" --github-token="${github_token}" >>"${changelog_path}"
 
 git add "${changelog_path}"
 git commit -m "Add changelog for release v${full_version}"
