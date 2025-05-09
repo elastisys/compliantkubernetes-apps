@@ -310,12 +310,24 @@ _get_licenses() {
 
 _generate_helmfile_template_file() {
   template_file="${1}"
-  if [[ ! -f "${template_file}" ]]; then
-    log_fatal "file ${template_file} does not exist"
-  fi
-  # - currently only retrieves enabled/installed charts from using helmfile template
-  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile sc template 2> /dev/null > "${template_file}"
-  CK8S_SKIP_VALIDATION=true "${HERE}/ops.bash" helmfile wc template 2> /dev/null >> "${template_file}"
+
+  log_info "Preparing Helmfile templates"
+
+  log_info "  - Workload"
+  mapfile -t releases_workload < <(helmfile -f "${HELMFILE_FOLDER}" -e workload_cluster list --output json 2> /dev/null | yq -I=0 -o json '.[] | select(.enabled == true and .installed == true) | {"location": .chart, "name": .name}')
+  for release in "${releases_workload[@]}"; do
+    release_name=$(yq '.name' <<< "${release}")
+    release_location="helmfile.d/$(yq '.location' <<< "${release}")"
+    helmfile -f "${HELMFILE_FOLDER}" -e workload_cluster template -l "name=${release_name}" 2> /dev/null | yq ".metadata.annotations.release = \"${release_location}\"" >> "${template_file}"
+  done
+
+  log_info "  - Service"
+  mapfile -t releases_service < <(helmfile -f "${HELMFILE_FOLDER}" -e service_cluster list --output json 2> /dev/null | yq -I=0 -o json '.[] | select(.enabled == true and .installed == true) | {"location": .chart, "name": .name}')
+  for release in "${releases_service[@]}"; do
+    release_name=$(yq '.name' <<< "${release}")
+    release_location="helmfile.d/$(yq '.location' <<< "${release}")"
+    helmfile -f "${HELMFILE_FOLDER}" -e service_cluster template -l "name=${release_name}" 2> /dev/null | yq ".metadata.annotations.release = \"${release_location}\"" >> "${template_file}"
+  done
 }
 
 _add_container_images_from_template() {
@@ -324,12 +336,10 @@ _add_container_images_from_template() {
   template_file="${2}"
   chart_name="${3}"
   chart_version="${4}"
-  type="${5}"
+  location="${5}"
+  type="${6}"
 
-  # TODO: .metadata.labels.release label capture subcharts e.g. node-exporter for kube-prometheus-stack, and will save images under
-  # kube-prometheus-stack as well as the prometheus-node-exporter subchart in the sbom. Would be nice to improve this, as these labels
-  # are not guaranteed to exist either
-  chart_query="((.metadata.labels.\"helm.sh/chart\" == \"${chart_name}-${chart_version}\") or (.metadata.labels.release == \"${chart_name}\"))"
+  chart_query="(.metadata.annotations.release == \"${location}\")"
 
   if [[ "${type}" == "pod" ]]; then
     query="select(.kind == \"Pod\" and ${chart_query}) | .spec | ((.initContainers[] | .image), (.containers[] | .image))"
@@ -344,6 +354,7 @@ _add_container_images_from_template() {
   elif [[ "${type}" == "statefulset" ]]; then
     query="select(.kind == \"StatefulSet\" and ${chart_query}) | .spec.template.spec | ((.initContainers[] | .image), (.containers[] | .image))"
   elif [[ "${type}" == "alertmanager" ]]; then
+    # TODO: user-alertmanager Alertmanager resource deployed in its own chart currently does not include the image in the template (switching to kps solves this)
     query="select(.kind == \"Alertmanager\" and ${chart_query}) | .spec.image"
   elif [[ "${type}" == "prometheus" ]]; then
     query="select(.kind == \"Prometheus\" and ${chart_query}) | .spec.image"
@@ -361,18 +372,14 @@ _add_container_images_from_template() {
 }
 
 _add_container_images_for_component() {
-  sbom_file="${1}"
-  template_file="${2}"
-  chart_name="${3}"
-  chart_version="${4}"
-  _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "cronjob"
-  _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "pod"
-  _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "deployment"
-  _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "job"
-  _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "daemonset"
-  _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "statefulset"
-  _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "alertmanager"
-  _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "prometheus"
+  _add_container_images_from_template "${@}" "cronjob"
+  _add_container_images_from_template "${@}" "pod"
+  _add_container_images_from_template "${@}" "deployment"
+  _add_container_images_from_template "${@}" "job"
+  _add_container_images_from_template "${@}" "daemonset"
+  _add_container_images_from_template "${@}" "statefulset"
+  _add_container_images_from_template "${@}" "alertmanager"
+  _add_container_images_from_template "${@}" "prometheus"
 }
 
 
@@ -398,8 +405,9 @@ _add_container_images() {
   for chart in "${all_charts[@]}"; do
     chart_name=$(yq ".name" <<< "${chart}")
     chart_version=$(yq ".version" <<< "${chart}")
+    location=$(yq ".location" <<< "${chart}")
 
-    _add_container_images_for_component "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}"
+    _add_container_images_for_component "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${location}"
   done
 }
 
@@ -490,7 +498,7 @@ sbom_get_unset() {
 sbom_get_charts() {
   local query sbom_file
   sbom_file="${1}"
-  query='[.components[] | { "name": .name, "version": .version}] | .[]'
+  query='[.components[] | { "name": .name, "version": .version, "location": .evidence.occurrences[0].location}] | .[]'
 
   yq -e -o json -I=0 "${query}" "${sbom_file}"
 }
