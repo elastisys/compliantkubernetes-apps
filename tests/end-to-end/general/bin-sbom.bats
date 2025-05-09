@@ -33,7 +33,6 @@ teardown() {
   assert_output --partial "COMMANDS:"
 }
 
-
 @test "ck8s sbom get existing component" {
   run ck8s sbom get velero
   assert_success
@@ -59,7 +58,7 @@ teardown() {
 
 @test "ck8s sbom add component properties with incorrect object format" {
   CK8S_AUTO_APPROVE=false
-  run ck8s sbom add velero "${velero_version}" properties '{"unsupported-key-name": "test", "unsupported-value": "test"}' <<< "y"
+  run ck8s sbom add velero "${velero_version}" properties '{"unsupported-key-name": "test", "unsupported-value": "test"}' <<<"y"
   assert_failure
   assert_output --partial 'Validation failed:'
 }

@@ -7,7 +7,6 @@
 
 # Software Bill of Materials @ v0.37.0
 
-
 ## Requirements
 
 | Name | App Version | CNCF Status | License | Copyright owner | Comment |
