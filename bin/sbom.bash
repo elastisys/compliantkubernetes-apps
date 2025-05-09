@@ -12,8 +12,6 @@
 # - include licenses for images?
 set -euo pipefail
 
-: "${CK8S_CONFIG_PATH:?Missing CK8S_CONFIG_PATH}"
-
 HERE="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 ROOT="$(dirname "${HERE}")"
 HELMFILE_FOLDER="${ROOT}/helmfile.d"
@@ -49,7 +47,8 @@ sbom_cyclonedx_validation() {
   fi
 
   log_info "Validating CycloneDX for SBOM file"
-  cyclonedx validate --fail-on-errors --input-file "${sbom_file}" && true; exit_code="$?"
+  cyclonedx validate --fail-on-errors --input-file "${sbom_file}" && true
+  exit_code="$?"
   if ! ${CK8S_AUTO_APPROVE:-} && [[ "${exit_code}" != 0 ]]; then
     log_warning "CycloneDX Validation failed"
     ask_continue
@@ -66,11 +65,11 @@ _yq_run_query() {
   append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
 
   if ! ${CK8S_SKIP_VALIDATION:-}; then
-    yq -o json "${query}" "${sbom_file}" > "${tmp_sbom_file}"
+    yq -o json "${query}" "${sbom_file}" >"${tmp_sbom_file}"
     sbom_cyclonedx_validation "${tmp_sbom_file}"
   fi
   if ! ${CK8S_AUTO_APPROVE:-}; then
-    diff  -U3 --color=always "${sbom_file}" "${tmp_sbom_file}" && log_info "No change" && exit 0
+    diff -U3 --color=always "${sbom_file}" "${tmp_sbom_file}" && log_info "No change" && exit 0
     log_info "Changes found"
     ask_continue
   fi
@@ -96,7 +95,7 @@ _sbom_edit_component() {
     log_fatal "${key} not found"
   fi
 
-  yq -e -o json ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\") | .${key}" "${sbom_file}" > "${tmp_change}"
+  yq -e -o json ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\") | .${key}" "${sbom_file}" >"${tmp_change}"
   "${EDITOR}" "${tmp_change}"
 
   query="with(.components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\"); .${key} = $(jq -c '.' "${tmp_change}"))"
@@ -140,7 +139,7 @@ _sbom_add_component() {
 # checks if a license is listed as a supported license id
 _id_or_name_license() {
   local license="${1}"
-  if [[ $(curl --silent https://cyclonedx.org/schema/spdx.schema.json | yq -r ".enum | contains([\"${license}\"])" ) == "true" ]]; then
+  if [[ $(curl --silent https://cyclonedx.org/schema/spdx.schema.json | yq -r ".enum | contains([\"${license}\"])") == "true" ]]; then
     echo "id"
     return
   fi
@@ -209,7 +208,7 @@ _prepare_sbom() {
     project_version="$(git rev-parse HEAD)"
   fi
 
-  cdxgen --project-name "Welkin apps" --project-version "${project_version}" --filter '.*' -t helm "${HELMFILE_FOLDER}" --output "${sbom_file}"
+  cdxgen --project-name "welkin-apps" --project-version "${project_version}" --filter '.*' -t helm "${HELMFILE_FOLDER}" --output "${sbom_file}"
 
   sbom_version=$(yq -o json ".version" "${SBOM_FILE}")
   yq -o json -i ".version = \"${sbom_version}\"" "${sbom_file}"
@@ -288,7 +287,7 @@ _get_licenses() {
             continue
           else
             for l in "${licenses_in_git[@]}"; do
-               _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "${l}")"
+              _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "${l}")"
             done
           fi
         done
@@ -308,28 +307,30 @@ _get_licenses() {
   done
 }
 
+# generates manifests for each release using helmfile template adding the chart location as an annotation used later for mapping images to components in the sbom
 _generate_helmfile_template_file() {
   template_file="${1}"
 
   log_info "Preparing Helmfile templates"
 
   log_info "  - Workload"
-  mapfile -t releases_workload < <(helmfile -f "${HELMFILE_FOLDER}" -e workload_cluster list --output json 2> /dev/null | yq -I=0 -o json '.[] | select(.enabled == true and .installed == true) | {"location": .chart, "name": .name}')
+  mapfile -t releases_workload < <(helmfile -f "${HELMFILE_FOLDER}" -e workload_cluster list --output json 2>/dev/null | yq -I=0 -o json '.[] | select(.enabled == true and .installed == true) | {"location": .chart, "name": .name}')
   for release in "${releases_workload[@]}"; do
-    release_name=$(yq '.name' <<< "${release}")
-    release_location="helmfile.d/$(yq '.location' <<< "${release}")"
-    helmfile -f "${HELMFILE_FOLDER}" -e workload_cluster template -l "name=${release_name}" 2> /dev/null | yq ".metadata.annotations.release = \"${release_location}\"" >> "${template_file}"
+    release_name=$(yq '.name' <<<"${release}")
+    release_location="helmfile.d/$(yq '.location' <<<"${release}")"
+    helmfile -f "${HELMFILE_FOLDER}" -e workload_cluster template -l "name=${release_name}" 2>/dev/null | yq ".metadata.annotations.release = \"${release_location}\"" >>"${template_file}"
   done
 
   log_info "  - Service"
-  mapfile -t releases_service < <(helmfile -f "${HELMFILE_FOLDER}" -e service_cluster list --output json 2> /dev/null | yq -I=0 -o json '.[] | select(.enabled == true and .installed == true) | {"location": .chart, "name": .name}')
+  mapfile -t releases_service < <(helmfile -f "${HELMFILE_FOLDER}" -e service_cluster list --output json 2>/dev/null | yq -I=0 -o json '.[] | select(.enabled == true and .installed == true) | {"location": .chart, "name": .name}')
   for release in "${releases_service[@]}"; do
-    release_name=$(yq '.name' <<< "${release}")
-    release_location="helmfile.d/$(yq '.location' <<< "${release}")"
-    helmfile -f "${HELMFILE_FOLDER}" -e service_cluster template -l "name=${release_name}" 2> /dev/null | yq ".metadata.annotations.release = \"${release_location}\"" >> "${template_file}"
+    release_name=$(yq '.name' <<<"${release}")
+    release_location="helmfile.d/$(yq '.location' <<<"${release}")"
+    helmfile -f "${HELMFILE_FOLDER}" -e service_cluster template -l "name=${release_name}" 2>/dev/null | yq ".metadata.annotations.release = \"${release_location}\"" >>"${template_file}"
   done
 }
 
+# adds container images for a specific resource type and chart release based on its location to a input sbom file
 _add_container_images_from_template() {
   local sbom_file template_file chart_name type query
   sbom_file="${1}"
@@ -371,6 +372,7 @@ _add_container_images_from_template() {
   done
 }
 
+# add images for each type for a chart release
 _add_container_images_for_component() {
   _add_container_images_from_template "${@}" "cronjob"
   _add_container_images_from_template "${@}" "pod"
@@ -382,7 +384,7 @@ _add_container_images_for_component() {
   _add_container_images_from_template "${@}" "prometheus"
 }
 
-
+# loops over all charts included in the sbom and adds templated container images to a input sbom file
 _add_container_images() {
   local sbom_file
   if [[ "$#" -ne 1 ]]; then
@@ -403,14 +405,15 @@ _add_container_images() {
   mapfile -t all_charts < <(sbom_get_charts "${sbom_file}")
 
   for chart in "${all_charts[@]}"; do
-    chart_name=$(yq ".name" <<< "${chart}")
-    chart_version=$(yq ".version" <<< "${chart}")
-    location=$(yq ".location" <<< "${chart}")
+    chart_name=$(yq ".name" <<<"${chart}")
+    chart_version=$(yq ".version" <<<"${chart}")
+    location=$(yq ".location" <<<"${chart}")
 
     _add_container_images_for_component "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${location}"
   done
 }
 
+# adds chart locations for all components in a input sbom file
 _add_locations() {
   local chart_name chart_version sbom_file
   sbom_file="${1}"
@@ -591,7 +594,7 @@ sbom_generate() {
   CK8S_SKIP_VALIDATION=false
   sbom_cyclonedx_validation "${tmp_sbom_file}"
 
-  diff  -U3 --color=always "${SBOM_FILE}" "${tmp_sbom_file}" && return
+  diff -U3 --color=always "${SBOM_FILE}" "${tmp_sbom_file}" && return
   log_warning_no_newline "Do you want to replace SBOM file? (y/N): "
   read -r reply
   if [[ "${reply}" == "y" ]]; then

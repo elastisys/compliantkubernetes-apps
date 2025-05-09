@@ -189,5 +189,4 @@ fi
 args+=("--env" "APPS_PATH=${root}")
 args+=("--mount" "type=bind,src=${root},dst=${root}${relabel:-}")
 
-
 "${runtime}" run "${args[@]}" "${@}"
