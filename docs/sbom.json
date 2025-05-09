@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:b894e55d-822b-463c-b9e5-b47d80c735c5",
+  "serialNumber": "urn:uuid:5a88148e-3590-4932-9904-5fdbe984993f",
   "version": 2,
   "metadata": {
-    "timestamp": "2025-04-29T15:20:57Z",
+    "timestamp": "2025-05-09T06:59:13Z",
     "tools": {
       "components": [
         {
@@ -36,10 +36,10 @@
     "component": {
       "group": "",
       "name": "Welkin apps",
-      "version": "94e5f43147fa705c0110f5091286f35917fd2de0",
+      "version": "5f65bd2d7fb0def633afc13bff46139f9b203f5b",
       "type": "application",
-      "bom-ref": "pkg:application/Welkin apps@94e5f43147fa705c0110f5091286f35917fd2de0",
-      "purl": "pkg:application/Welkin%20apps@94e5f43147fa705c0110f5091286f35917fd2de0"
+      "bom-ref": "pkg:application/Welkin apps@5f65bd2d7fb0def633afc13bff46139f9b203f5b",
+      "purl": "pkg:application/Welkin%20apps@5f65bd2d7fb0def633afc13bff46139f9b203f5b"
     },
     "properties": [
       {
@@ -117,7 +117,15 @@
             "location": "helmfile.d/charts/calico-accountant"
           }
         ]
-      }
+      },
+      "components": [
+        {
+          "name": "ghcr.io/elastisys/calico-accountant",
+          "version": "0.1.6-ck8s2",
+          "type": "container",
+          "bom-ref": "pkg:oci/ghcr.io/elastisys/calico-accountant:0.1.6-ck8s2"
+        }
+      ]
     },
     {
       "group": "",
@@ -609,6 +617,18 @@
       },
       "components": [
         {
+          "name": "appropriate/curl",
+          "version": "appropriate/curl",
+          "type": "container",
+          "bom-ref": "pkg:oci/appropriate/curl"
+        },
+        {
+          "name": "docker.io/falcosecurity/falcosidekick",
+          "version": "2.31.1",
+          "type": "container",
+          "bom-ref": "pkg:oci/docker.io/falcosecurity/falcosidekick:2.31.1"
+        },
+        {
           "name": "docker.io/falcosecurity/falco",
           "version": "0.40.0-debian",
           "type": "container",
@@ -664,21 +684,7 @@
             "location": "helmfile.d/upstream/falcosecurity/falco/charts/falcosidekick"
           }
         ]
-      },
-      "components": [
-        {
-          "name": "appropriate/curl",
-          "version": "appropriate/curl",
-          "type": "container",
-          "bom-ref": "pkg:oci/appropriate/curl"
-        },
-        {
-          "name": "docker.io/falcosecurity/falcosidekick",
-          "version": "2.31.1",
-          "type": "container",
-          "bom-ref": "pkg:oci/docker.io/falcosecurity/falcosidekick:2.31.1"
-        }
-      ]
+      }
     },
     {
       "group": "",
@@ -710,7 +716,15 @@
             "location": "helmfile.d/charts/file-copier"
           }
         ]
-      }
+      },
+      "components": [
+        {
+          "name": "busybox",
+          "version": "1.36",
+          "type": "container",
+          "bom-ref": "pkg:oci/busybox:1.36"
+        }
+      ]
     },
     {
       "group": "",
@@ -1238,7 +1252,15 @@
             "location": "helmfile.d/charts/harbor/harbor-backup"
           }
         ]
-      }
+      },
+      "components": [
+        {
+          "name": "ghcr.io/elastisys/backup-postgres",
+          "version": "1.5.0",
+          "type": "container",
+          "bom-ref": "pkg:oci/ghcr.io/elastisys/backup-postgres:1.5.0"
+        }
+      ]
     },
     {
       "group": "",
@@ -1560,7 +1582,15 @@
             "location": "helmfile.d/charts/harbor/init-harbor"
           }
         ]
-      }
+      },
+      "components": [
+        {
+          "name": "ghcr.io/elastisys/curl-jq",
+          "version": "1.0.0",
+          "type": "container",
+          "bom-ref": "pkg:oci/ghcr.io/elastisys/curl-jq:1.0.0"
+        }
+      ]
     },
     {
       "group": "",
@@ -1737,15 +1767,7 @@
             "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/kube-state-metrics"
           }
         ]
-      },
-      "components": [
-        {
-          "name": "registry.k8s.io/kube-state-metrics/kube-state-metrics",
-          "version": "v2.14.0",
-          "type": "container",
-          "bom-ref": "pkg:oci/registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.14.0"
-        }
-      ]
+      }
     },
     {
       "group": "",
@@ -2340,7 +2362,15 @@
             "location": "helmfile.d/charts/node-local-dns"
           }
         ]
-      }
+      },
+      "components": [
+        {
+          "name": "registry.k8s.io/dns/k8s-dns-node-cache",
+          "version": "1.25.0",
+          "type": "container",
+          "bom-ref": "pkg:oci/registry.k8s.io/dns/k8s-dns-node-cache:1.25.0"
+        }
+      ]
     },
     {
       "group": "",
@@ -2829,15 +2859,7 @@
             "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/prometheus-node-exporter"
           }
         ]
-      },
-      "components": [
-        {
-          "name": "quay.io/prometheus/node-exporter",
-          "version": "v1.8.2",
-          "type": "container",
-          "bom-ref": "pkg:oci/quay.io/prometheus/node-exporter:v1.8.2"
-        }
-      ]
+      }
     },
     {
       "group": "",
@@ -3239,7 +3261,15 @@
             "location": "helmfile.d/charts/user-alertmanager"
           }
         ]
-      }
+      },
+      "components": [
+        {
+          "name": "null",
+          "version": "null",
+          "type": "container",
+          "bom-ref": "pkg:oci/null"
+        }
+      ]
     },
     {
       "group": "",
@@ -3361,7 +3391,7 @@
   "dependencies": [],
   "compositions": [
     {
-      "bom-ref": "pkg:application/Welkin apps@94e5f43147fa705c0110f5091286f35917fd2de0",
+      "bom-ref": "pkg:application/Welkin apps@5f65bd2d7fb0def633afc13bff46139f9b203f5b",
       "aggregate": "incomplete"
     }
   ],
@@ -3369,7 +3399,7 @@
     {
       "bom-ref": "metadata-annotations",
       "subjects": [
-        "pkg:application/Welkin apps@94e5f43147fa705c0110f5091286f35917fd2de0"
+        "pkg:application/Welkin apps@5f65bd2d7fb0def633afc13bff46139f9b203f5b"
       ],
       "annotator": {
         "component": {
@@ -3387,8 +3417,8 @@
           ]
         }
       },
-      "timestamp": "2025-04-29T15:20:57Z",
-      "text": "This Software Bill-of-Materials (SBOM) document was created on Tuesday, April 29, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'Welkin apps' with version '94e5f43147fa705c0110f5091286f35917fd2de0'. There are 87 components."
+      "timestamp": "2025-05-09T06:59:13Z",
+      "text": "This Software Bill-of-Materials (SBOM) document was created on Friday, May 9, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'Welkin apps' with version '5f65bd2d7fb0def633afc13bff46139f9b203f5b'. There are 87 components."
     }
   ]
 }
