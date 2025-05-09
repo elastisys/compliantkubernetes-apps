@@ -211,6 +211,8 @@ _prepare_sbom() {
 
   cdxgen --project-name "Welkin apps" --project-version "${project_version}" --filter '.*' -t helm "${HELMFILE_FOLDER}" --output "${sbom_file}"
 
+  sbom_version=$(yq -o json ".version" "${SBOM_FILE}")
+  yq -o json -i ".version = \"${sbom_version}\"" "${sbom_file}"
   yq -o json -i ". *= load(\"${SBOM_TEMPLATE_FILE}\")" "${sbom_file}"
 
   mapfile -t components < <(sbom_get_charts "${sbom_file}")
