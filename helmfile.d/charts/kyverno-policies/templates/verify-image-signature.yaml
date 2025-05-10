@@ -1,0 +1,58 @@
+{{- if .Values.verifyImageSignature.enabled -}}
+{{- if and (not .Values.verifyImageSignature.publicKeys) (not .Values.verifyImageSignature.certificates) }}
+{{- fail "publicKeys and certificates can't both be unset" }}
+{{- end }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: com.elastisys.policies.verify-image-signature
+  namespace: kyverno
+data:
+  {{- with .Values.verifyImageSignature.publicKeys }}
+  publicKeys: |
+    {{- . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.verifyImageSignature.certificates }}
+  certificates: |
+    {{- . | nindent 4 }}
+  {{- end }}
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-image-signature
+spec:
+  webhookConfiguration:
+    failurePolicy: Fail
+    timeoutSeconds: 30
+  background: false
+  rules:
+    - name: verify-image-signature
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaceSelector:
+                matchLabels:
+                  hnc.x-k8s.io/included-namespace: "true"
+      context:
+        - name: entries
+          configMap:
+            name: com.elastisys.policies.verify-image-signature
+            namespace: kyverno
+      verifyImages:
+        - type: {{ .Values.verifyImageSignature.type }}
+          failureAction: Enforce
+          imageReferences: ["*"]
+          attestors:
+            - entries:
+              {{- if .Values.verifyImageSignature.publicKeys }}
+              - keys:
+                  publicKeys: {{`"{{ entries.data.publicKeys }}"`}}
+             {{- end }}
+              {{- if .Values.verifyImageSignature.certificates }}
+              - certificates:
+                  cert: {{`"{{ entries.data.certificates }}"`}}
+             {{- end }}
+{{- end }}

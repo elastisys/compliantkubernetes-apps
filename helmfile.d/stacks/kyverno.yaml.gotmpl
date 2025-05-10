@@ -28,3 +28,16 @@ templates:
     values:
       - values/networkpolicies/common/common.yaml.gotmpl
       - values/networkpolicies/common/kyverno.yaml.gotmpl
+
+  kyverno-policies:
+    disableValidationOnInstall: true
+    inherit:
+      - template: kyverno
+    chart: charts/kyverno-policies
+    name: kyverno-policies
+    version: 0.1.0
+    installed: {{ .Values | get "kyverno.enabled" false }}
+    needs:
+      - kyverno/kyverno
+    values:
+      - values/kyverno-policies.yaml.gotmpl
