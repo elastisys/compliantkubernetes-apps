@@ -1,4 +1,4 @@
-{{/*
+<!--
 Parses a container image URI into its components:
 
 - 'registry' will contain the fragment before the first "/", IF it contains a "."
@@ -12,7 +12,7 @@ Parses a container image URI into its components:
 The function expects two arguments in a dictionary:
 - 'Image' a container URI string
 - 'Global' the object nested under the `.images.global` key from the configuration
-*/}}
+-->
 {{- define "container_uri.parse" }}
   {{- $registry := (include "container_uri.registry" .) | trim }}
   {{- $repository := (include "container_uri.repository" .) | trim }}
@@ -29,10 +29,10 @@ The function expects two arguments in a dictionary:
   }
 {{- end }}
 
-{{/*
+<!--
 A container_uri has a "registry" if there are at least two "/"-separated fragments
 and the first one contains a "."
-*/}}
+-->
 {{- define "container_uri.registry" }}
   {{- $colonParts := regexSplit ":" .Image -1 }}
   {{- $slashParts := regexSplit "/" (first $colonParts) -1 }}
@@ -45,10 +45,10 @@ and the first one contains a "."
   {{- end }}
 {{- end }}
 
-{{/*
+<!--
 A container_uri has a "repository" if there are at least two "/"-separated fragments
 after (potentially) removing the first fragment as the "registry"
-*/}}
+-->
 {{- define "container_uri.repository" }}
   {{- $colonParts := regexSplit ":" .Image -1 }}
   {{- $slashParts := regexSplit "/" (first $colonParts) -1 }}
@@ -73,20 +73,20 @@ but before the ":" tag separator.
   {{ last $slashParts }}
 {{- end }}
 
-{{/*
+<!--
 A container_uri has a tag if the ":" separator is present, and it's the fragment
 after the separator. We also chop after the "@" digest separator if present.
-*/}}
+-->
 {{- define "container_uri.tag" }}
   {{- $atParts := regexSplit "@" .Image -1 }}
   {{- $colonParts := regexSplit ":" (first $atParts) -1 }}
   {{- if eq (len $colonParts) 2 -}}{{ (last $colonParts) }}{{- end}}
 {{- end}}
 
-{{/*
-A container_uri has a digest if the "@" separator is present and it's the fragment
+<!--
+A container_uri has a digest if the "@" separator is present, and it's the fragment
 after the separator.
-*/}}
+-->
 {{- define "container_uri.digest" }}
   {{- $atParts := regexSplit "@" .Image -1 }}
   {{- if eq (len $atParts) 2 -}}{{ (last $atParts) }}{{- end}}
