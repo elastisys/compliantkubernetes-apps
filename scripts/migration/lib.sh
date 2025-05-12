@@ -12,6 +12,8 @@ declare -A VERSION
 SC_KUBECONFIG_FILE=".state/kube_config_sc.yaml"
 WC_KUBECONFIG_FILE=".state/kube_config_wc.yaml"
 
+IMAGE_LIST="${THIS}/../../helmfile.d/lists/images.yaml"
+
 declare -a SC_CONFIG_FILES
 SC_CONFIG_FILES=(
   "defaults/common-config.yaml"
@@ -174,12 +176,12 @@ config_load() {
   case "${1:-}" in
   sc)
     log_info "loading ${1}-config"
-    CONFIG[sc]="$(yq_merge "${SC_CONFIG_FILES[@]/#/"$CK8S_CONFIG_PATH/"}")"
+    CONFIG[sc]="$(yq_merge "${IMAGE_LIST}" "${SC_CONFIG_FILES[@]/#/"$CK8S_CONFIG_PATH/"}")"
     config_version sc
     ;;
   wc)
     log_info "loading ${1}-config"
-    CONFIG[wc]="$(yq_merge "${WC_CONFIG_FILES[@]/#/"$CK8S_CONFIG_PATH/"}")"
+    CONFIG[wc]="$(yq_merge "${IMAGE_LIST}" "${WC_CONFIG_FILES[@]/#/"$CK8S_CONFIG_PATH/"}")"
     config_version wc
     ;;
   *)
