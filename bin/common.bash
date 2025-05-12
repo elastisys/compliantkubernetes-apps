@@ -47,6 +47,8 @@ declare -A secrets
 config["config_file_wc"]=""
 config["config_file_sc"]=""
 
+config["image_list"]="${root_path}/helmfile.d/lists/images.yaml"
+
 config["default_common"]="${default_config_path}/common-config.yaml"
 config["default_wc"]="${default_config_path}/wc-config.yaml"
 config["default_sc"]="${default_config_path}/sc-config.yaml"
@@ -283,7 +285,7 @@ check_config() {
 # Usage: merge_config <default_config> <override_config> <merged_config>
 # Merges the common-default, wc|sc-default, common-override, then wc|sc-override into one.
 merge_config() {
-  yq_merge "${config[default_common]}" "$1" "${config[override_common]}" "$2" >"$3"
+  yq_merge "${config['image_list']}" "${config[default_common]}" "$1" "${config[override_common]}" "$2" >"$3"
 }
 
 # Usage: load_config <wc|sc>
