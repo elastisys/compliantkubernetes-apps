@@ -7,6 +7,7 @@ The structure is as follows:
 - `bases/` - contains the environment definition and some common values
 - `charts/` - contains internally developed charts grouped per stack
 - `upstream/` - contains externally developed charts grouped per source
+- `images/images.yaml` contains container image overrides
 - `stacks/` - contains release templates for all applications grouped per stack
 - `values/` - contains values templates for most applications grouped per stack
 - `state.yaml.gotmpl` - the state file that pulls in everything and defines releases
