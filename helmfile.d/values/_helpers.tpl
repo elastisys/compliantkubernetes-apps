@@ -57,15 +57,16 @@ after (potentially) removing the first fragment as the "registry"
   {{- end }}
 {{- end }}
 
-
-{{/*
-A container_uri always has an "image" and it's the fragment after the last "/"
-but before the ":" tag separator.
-*/}}
+<!--
+A container_uri has an "image" if it doesn't begin with ":" or "@",
+and it's the fragment after the last "/" but before the ":" tag separator.
+-->
 {{- define "container_uri.image" }}
-  {{- $colonParts := regexSplit ":" .Image -1 }}
-  {{- $slashParts := regexSplit "/" (first $colonParts) -1 -}}
-  {{ last $slashParts }}
+  {{- if and (not (hasPrefix "@" .Image)) (not (hasPrefix ":" .Image)) }}
+    {{- $colonParts := regexSplit ":" .Image -1 }}
+    {{- $slashParts := regexSplit "/" (first $colonParts) -1 -}}
+    {{ last $slashParts }}
+  {{- end }}
 {{- end }}
 
 <!--
