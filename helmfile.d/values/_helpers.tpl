@@ -14,8 +14,8 @@ The function expects two arguments in a dictionary:
 - 'Global' the object nested under the `.images.global` key from the configuration
 */}}
 {{- define "container_uri.parse" }}
-  {{- $registry := (include "container_uri.registry" (dict "Image" .Image "Global" .Global.registry)) | trim }}
-  {{- $repository := (include "container_uri.repository" (dict "Image" .Image "Global" .Global.repository)) | trim }}
+  {{- $registry := (include "container_uri.registry" .) | trim }}
+  {{- $repository := (include "container_uri.repository" .) | trim }}
   {{- $image := (include "container_uri.image" (dict "Image" .Image)) | trim }}
   {{- $tag := (include "container_uri.tag" (dict "Image" .Image) | trim )}}
   {{- $digest := (include "container_uri.digest" (dict "Image" .Image) | trim )}}
@@ -39,8 +39,8 @@ and the first one contains a "."
   {{- if and (ge (len $slashParts) 2) (contains "." (first $slashParts)) -}}
     {{ first $slashParts }}
   {{- else }}
-    {{- if and .Global.enabled .Global.uri -}}
-      {{ .Global.uri }}
+    {{- if dig "registry" "enabled" false .Global -}}
+      {{ dig "registry" "uri" "" .Global }}
     {{- end }}
   {{- end }}
 {{- end }}
@@ -56,8 +56,8 @@ after (potentially) removing the first fragment as the "registry"
   {{- if ge (len $keepParts) 2 -}}
     {{ join "/" (slice $keepParts 0 (sub (len $keepParts) 1)) }}
   {{- else }}
-    {{- if and .Global.enabled .Global.uri -}}
-      {{ .Global.uri }}
+    {{- if dig "repository" "enabled" false .Global -}}
+      {{ dig "repository" "uri" "" .Global }}
     {{- end }}
   {{- end }}
 {{- end }}

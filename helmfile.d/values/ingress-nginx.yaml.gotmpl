@@ -158,7 +158,7 @@ controller:
 {{ if .Values.images | dig "ingressNginxChart" "controller" "" -}}
   {{- $controllerImage := include "container_uri.parse" (dict
     "Image" .Values.images.ingressNginxChart.controller
-    "Global" .Values.images.global
+    "Global" (.Values.images | dig "global" dict)
   ) | fromJson }}
 
   image:
@@ -198,7 +198,7 @@ defaultBackend:
 {{ if .Values.images | dig "ingressNginxChart" "defaultBackend" "" -}}
   {{- $defaultBackendImage := include "container_uri.parse" (dict
     "Image" .Values.images.ingressNginxChart.defaultBackend
-    "Global" .Values.images.global
+    "Global" (.Values.images | dig "global" dict)
   ) | fromJson }}
   image:
     {{ if or $defaultBackendImage.registry $defaultBackendImage.repository $defaultBackendImage.image -}}
