@@ -23,10 +23,6 @@ setup() {
 
   export _templates_output="${CK8S_CONFIG_PATH}/tmp/images-templates"
   export _helmfile_selector="-lapp=ingress-nginx"
-
-  export _container_name="controller"
-  export _template_file="${_templates_output}/ingress-nginx/templates/controller-daemonset.yaml"
-  export _image_property="ingressNginxChart.controller"
 }
 
 teardown_file() {
@@ -34,13 +30,54 @@ teardown_file() {
   gpg.teardown
 }
 
-@test "the container image should be set" {
+declare -a _test_functions
+_test_functions=(
+  should_be_set
+  should_use_our_image
+  should_use_our_image_and_tag
+  should_use_our_image_tag_and_digest
+  should_use_our_repository_image_tag_and_digest
+  should_use_our_registry_repository_image_tag_and_digest
+  should_use_its_own_registry_even_when_global_is_enabled
+  should_use_the_global_registry_when_it_doesnt_specify_one
+  should_use_its_own_repository_even_when_global_is_enabled
+  should_use_the_global_repository_when_it_doesnt_specify_one
+  should_use_the_global_repository_with_its_own_registry
+  should_use_the_global_registry_with_its_own_repository
+  should_allow_overwriting_the_tag_fragment_only
+  should_allow_overwriting_the_tag_and_sha_fragments_only
+)
+
+declare -a _parameters
+for _test_case in $(jq -r '.parameters[] | @base64' "${BATS_TEST_DIRNAME}/resources/images-parametric-tests.json"); do
+  _jq() {
+    echo "${_test_case}" | base64 --decode | jq -r "${1}"
+  }
+
+  _image_property="$(_jq '.image_property')"
+  _parameters=(
+    "${_image_property}"
+    "$(_jq '.container_name')"
+    "$(_jq '.template_file')"
+  )
+
+  for _test_function in "${_test_functions[@]}"; do
+    bats_test_function \
+      --description "the ${_image_property} container image ${_test_function//_/ }" \
+      -- "${_test_function}" "${_parameters[@]}"
+  done
+done
+
+should_be_set() {
+  _export_params "${@}"
   _generate_templates
 
   assert [ "$(_extract_image)" != "" ]
 }
 
-@test "the container image should use our image" {
+should_use_our_image() {
+  _export_params "${@}"
+
   _set_container_uri "a-custom-image"
   _generate_templates
   run _extract_image
@@ -48,106 +85,136 @@ teardown_file() {
   assert_output --regexp '^a-custom-image.*$'
 }
 
-@test "the container image should use our image and tag" {
+should_use_our_image_and_tag() {
+  _export_params "${@}"
   _set_container_uri "a-custom-image:v1.2.3"
   _generate_templates
+
   run _extract_image
 
   assert_output --regexp '^a-custom-image:v1\.2\.3$'
 }
 
-@test "the container image should use our image, tag and digest" {
+should_use_our_image_tag_and_digest() {
+  _export_params "${@}"
   _set_container_uri "a-custom-image:v1.2.3@sha256:babafacecaca"
   _generate_templates
+
   run _extract_image
 
   assert_output --regexp '^a-custom-image:v1\.2\.3@sha256:babafacecaca$'
 }
 
-@test "the container image should use our repository, image, tag and digest" {
+should_use_our_repository_image_tag_and_digest() {
+  _export_params "${@}"
   _set_container_uri "a-custom-repo/a-custom-image:v1.2.3@sha256:babafacecaca"
   _generate_templates
+
   run _extract_image
 
   assert_output --regexp '^a-custom-repo/a-custom-image:v1\.2\.3@sha256:babafacecaca$'
 }
 
-@test "the container image should use our registry, repository, image, tag and digest" {
+should_use_our_registry_repository_image_tag_and_digest() {
+  _export_params "${@}"
   _set_container_uri "a-custom-registry.com/a-custom-repo/a-custom-image:v1.2.3@sha256:babafacecaca"
   _generate_templates
+
   run _extract_image
 
   assert_output --regexp '^a-custom-registry\.com/a-custom-repo/a-custom-image:v1\.2\.3@sha256:babafacecaca$'
 }
 
-@test "the container image should use its own registry, even when global is enabled" {
+should_use_its_own_registry_even_when_global_is_enabled() {
+  _export_params "${@}"
   _enable_global_registry "the-global-registry.com"
   _set_container_uri "a-custom-registry.com/a-custom-image:v1.2.3"
   _generate_templates
+
   run _extract_image
 
   assert_output --regexp '^a-custom-registry\.com/a-custom-image:v1\.2\.3'
 }
 
-@test "the container image should use the global registry when it doesn't specify one" {
+should_use_the_global_registry_when_it_doesnt_specify_one() {
+  _export_params "${@}"
   _enable_global_registry "the-global-registry.com"
   _set_container_uri "a-custom-image:v1.2.3"
   _generate_templates
+
   run _extract_image
 
   assert_output --regexp '^the-global-registry\.com/a-custom-image:v1\.2\.3'
 }
 
-@test "the container image should use its own repository, even when global is enabled" {
+should_use_its_own_repository_even_when_global_is_enabled() {
+  _export_params "${@}"
   _enable_global_repository "the-global-repository"
   _set_container_uri "a-custom-repository/a-custom-image:v1.2.3"
   _generate_templates
+
   run _extract_image
 
   assert_output --regexp '^a-custom-repository/a-custom-image:v1\.2\.3'
 }
 
-@test "the container image should use the global repository when it doesn't specify one" {
+should_use_the_global_repository_when_it_doesnt_specify_one() {
+  _export_params "${@}"
   _enable_global_repository "the-global-repository"
   _set_container_uri "a-custom-image:v1.2.3"
   _generate_templates
+
   run _extract_image
 
   assert_output --regexp '^the-global-repository/a-custom-image:v1\.2\.3'
 }
 
-@test "the container image should use the global repository with its own registry" {
+should_use_the_global_repository_with_its_own_registry() {
+  _export_params "${@}"
   _enable_global_repository "the-global-repository"
   _set_container_uri "my-own-registry.com/a-custom-image:v1.2.3"
   _generate_templates
+
   run _extract_image
 
   assert_output --regexp '^my-own-registry\.com/the-global-repository/a-custom-image:v1\.2\.3'
 }
 
-@test "the container image should use the global registry with its own repository" {
+should_use_the_global_registry_with_its_own_repository() {
+  _export_params "${@}"
   _enable_global_registry "the-global-registry.com"
   _set_container_uri "my-own-repository/a-custom-image:v1.2.3"
   _generate_templates
+
   run _extract_image
 
   assert_output --regexp '^the-global-registry\.com/my-own-repository/a-custom-image:v1\.2\.3'
 }
 
-@test "the container image should allow overwriting the tag fragment only" {
+should_allow_overwriting_the_tag_fragment_only() {
+  _export_params "${@}"
   _set_container_uri ":v1.2.3"
   _generate_templates
+
   run _extract_image
 
   assert_output --regexp '^[^:]+:v1\.2\.3'
 }
 
-@test "the container image should allow overwriting the tag and sha fragments only" {
+should_allow_overwriting_the_tag_and_sha_fragments_only() {
+  _export_params "${@}"
   _set_container_uri ":v1.2.3@sha256:babafacecaca"
   _generate_templates
+
   run _extract_image
 
   assert_output --regexp '^[^:]+:v1\.2\.3@sha256:babafacecaca'
+}
+
+_export_params() {
+  export _image_property="${1}"
+  export _container_name="${2}"
+  export _template_file="${_templates_output}/${3}"
 }
 
 _set_container_uri() {

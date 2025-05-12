@@ -1,0 +1,19 @@
+{
+  "parameters": [
+    {
+      "image_property": "ingressNginxChart.controller",
+      "container_name": "controller",
+      "template_file": "ingress-nginx/templates/controller-daemonset.yaml"
+    },
+    {
+      "image_property": "ingressNginxChart.defaultBackend",
+      "container_name": "ingress-nginx-default-backend",
+      "template_file": "ingress-nginx/templates/default-backend-deployment.yaml"
+    },
+    {
+      "image_property": "ingressNginxChart.webhookPatch",
+      "container_name": "patch",
+      "template_file": "ingress-nginx/templates/admission-webhooks/job-patch/job-patchWebhook.yaml"
+    }
+  ]
+}
