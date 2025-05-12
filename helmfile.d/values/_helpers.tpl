@@ -14,19 +14,14 @@ The function expects two arguments in a dictionary:
 - 'Global' the object nested under the `.images.global` key from the configuration
 -->
 {{- define "container_uri.parse" }}
-  {{- $registry := (include "container_uri.registry" .) | trim }}
-  {{- $repository := (include "container_uri.repository" .) | trim }}
-  {{- $image := (include "container_uri.image" (dict "Image" .Image)) | trim }}
-  {{- $tag := (include "container_uri.tag" (dict "Image" .Image) | trim )}}
-  {{- $digest := (include "container_uri.digest" (dict "Image" .Image) | trim )}}
-  {
-    "registry": {{ quote ($registry) }},
-    "repository": {{ quote ($repository) }},
-    "image": {{ quote ($image) }},
-    "tag": {{ quote ($tag) }},
-    "digest": {{ quote ($digest) }},
-    "_orig": {{ quote .Image }}
-  }
+  {{ mustToJson (dict
+    "registry" (include "container_uri.registry" . | trim)
+    "repository" (include "container_uri.repository" . | trim)
+    "image" (include "container_uri.image" . | trim)
+    "tag" (include "container_uri.tag" . | trim)
+    "digest" (include "container_uri.digest" . | trim)
+    "uri" .Image
+  )}}
 {{- end }}
 
 <!--
