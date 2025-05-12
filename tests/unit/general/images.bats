@@ -46,6 +46,7 @@ _test_functions=(
   should_use_the_global_registry_with_its_own_repository
   should_allow_overwriting_the_tag_fragment_only
   should_allow_overwriting_the_tag_and_sha_fragments_only
+  should_not_set_the_image_field_if_only_sha_is_specified
 )
 
 declare -a _parameters
@@ -77,9 +78,9 @@ should_be_set() {
 
 should_use_our_image() {
   _export_params "${@}"
-
   _set_container_uri "a-custom-image"
   _generate_templates
+
   run _extract_image
 
   assert_output --regexp '^a-custom-image.*$'
@@ -209,6 +210,17 @@ should_allow_overwriting_the_tag_and_sha_fragments_only() {
   run _extract_image
 
   assert_output --regexp '^[^:]+:v1\.2\.3@sha256:babafacecaca'
+}
+
+should_not_set_the_image_field_if_only_sha_is_specified() {
+  _export_params "${@}"
+  _set_container_uri "@sha256:babafacecaca"
+  _generate_templates
+
+  local num_appears
+  num_appears="$(_extract_image | grep -o "babafacecaca" | wc -l)"
+
+  assert [ "$num_appears" == "1" ]
 }
 
 _export_params() {
