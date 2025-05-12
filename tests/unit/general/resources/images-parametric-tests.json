@@ -11,7 +11,7 @@
       "template_file": "ingress-nginx/templates/default-backend-deployment.yaml"
     },
     {
-      "image_property": "ingressNginxChart.webhookPatch",
+      "image_property": "ingressNginxChart.admissionWebhooks",
       "container_name": "patch",
       "template_file": "ingress-nginx/templates/admission-webhooks/job-patch/job-patchWebhook.yaml"
     }

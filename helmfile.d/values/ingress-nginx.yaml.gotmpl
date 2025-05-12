@@ -188,9 +188,9 @@ controller:
       - SYS_CHROOT
   {{- end }}
 
-{{ if .Values.images | dig "ingressNginxChart" "webhookPatch" "" -}}
+{{ if .Values.images | dig "ingressNginxChart" "admissionWebhooks" "" -}}
   {{- $patchImage := include "container_uri.parse" (dict
-    "Image" .Values.images.ingressNginxChart.webhookPatch
+    "Image" .Values.images.ingressNginxChart.admissionWebhooks
     "Global" (.Values.images | dig "global" dict)
   ) | fromJson }}
   admissionWebhooks:
