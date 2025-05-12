@@ -121,6 +121,7 @@ prometheus:
   ## ref: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config
   additionalScrapeConfigs: []
   useralertmanager:
+     namespace: alertmanager
      ingressenabled: false
      username: alertmanager
   alertmanagerSpec:

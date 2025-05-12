@@ -4743,6 +4743,11 @@ properties:
            title: Enable user Alertmanager
            description: Allows to enable alertmanager for user
            type: boolean
+          namespace:
+            title: Enable alertmanager in separate Namespace
+            description: Allows to have alertmanager running in custom namespace
+            type: string
+            default: alertmanager
           ingressenabled:
             title: Enable User Alertmanager ingress
             description: Allows to have ingress for user alertmanager with basic auth
