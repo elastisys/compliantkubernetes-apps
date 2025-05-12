@@ -188,6 +188,21 @@ controller:
       - SYS_CHROOT
   {{- end }}
 
+{{ if .Values.images | dig "ingressNginxChart" "webhookPatch" "" -}}
+  {{- $patchImage := include "container_uri.parse" (dict
+    "Image" .Values.images.ingressNginxChart.webhookPatch
+    "Global" (.Values.images | dig "global" dict)
+  ) | fromJson }}
+  admissionWebhooks:
+    patch:
+      image:
+        {{ if or $patchImage.registry $patchImage.repository $patchImage.image -}}
+        repository: {{ join "/" (compact (list $patchImage.registry $patchImage.repository $patchImage.image)) }}
+        {{- end }}
+        {{ if $patchImage.tag }}tag: {{ $patchImage.tag }}{{ end }}
+        digest: {{ $patchImage.digest }}
+{{- end }}
+
 defaultBackend:
   enabled: true
 
@@ -200,12 +215,13 @@ defaultBackend:
     "Image" .Values.images.ingressNginxChart.defaultBackend
     "Global" (.Values.images | dig "global" dict)
   ) | fromJson }}
+
   image:
     {{ if or $defaultBackendImage.registry $defaultBackendImage.repository $defaultBackendImage.image -}}
     repository: {{ join "/" (compact (list $defaultBackendImage.registry $defaultBackendImage.repository $defaultBackendImage.image)) }}
     {{- end }}
     {{ if $defaultBackendImage.tag }}tag: {{ $defaultBackendImage.tag }}{{ end }}
-    {{ if $defaultBackendImage.digest }}digest: {{ $defaultBackendImage.digest }}{{ end }}
+    digest: {{ $defaultBackendImage.digest }}
 {{- end }}
 
   tolerations: {{- toYaml .Values.ingressNginx.defaultBackend.tolerations | nindent 4 }}
