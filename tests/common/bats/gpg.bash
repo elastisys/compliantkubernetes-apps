@@ -3,6 +3,9 @@
 # Helpers to manage gpg for tests
 
 # Generates a temporary key, not intended for direct use
+#
+# NOTE: the short key length of 1024 bits has no serious security implications,
+# as the generated keys are local, ephemeral and used for test purposes only.
 gpg.auto_generate_key() {
   gpg --batch --generate-key <<EOF
 Key-Type: RSA
