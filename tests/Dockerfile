@@ -9,7 +9,7 @@ ARG TZ="Etc/UTC"
 
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y apache2-utils bats curl dnsutils gettext-base git gpg iputils-ping jq locales make net-tools npm pwgen s3cmd ssh unzip && \
+    apt-get install -y apache2-utils curl dnsutils gettext-base parallel git gpg iputils-ping jq locales make net-tools npm pwgen s3cmd ssh unzip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
@@ -79,6 +79,9 @@ ARG YQ_VERSION="4.45.1"
 RUN curl -LOs "https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64" && \
     install -Tm 755 yq_linux_amd64 /usr/local/bin/yq && \
     rm yq_linux_amd64
+
+ARG BATS_CORE_VERSION="1.11.1"
+RUN git clone --depth 1 https://github.com/bats-core/bats-core.git --branch "v${BATS_CORE_VERSION}" /tmp/bats-core && ./tmp/bats-core/install.sh /usr/local && rm -rf /tmp/bats-core
 
 # Currently all from main as most do not have current releases
 RUN git clone --depth 1 https://github.com/bats-core/bats-assert.git /usr/local/lib/bats/assert
