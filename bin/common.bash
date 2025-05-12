@@ -309,7 +309,8 @@ load_config() {
   fi
 }
 
-version_get() {
+# Retrieve version from git
+get_repo_version() {
   pushd "${root_path}" >/dev/null || exit 1
   git describe --exact-match --tags 2>/dev/null || git rev-parse HEAD
   popd >/dev/null || exit 1
@@ -319,7 +320,7 @@ version_get() {
 # TODO: Simple hack to make sure version matches, we need to have a proper way
 #       of making sure that the version is supported in the future.
 validate_version() {
-  version=$(version_get)
+  version=$(get_repo_version)
   if [[ "${1}" == "sc" ]]; then
     merged_config="${config[config_file_sc]}"
   elif [[ "${1}" == "wc" ]]; then
@@ -334,7 +335,7 @@ validate_version() {
     exit 1
   elif [ "${ck8s_version}" != "any" ] &&
     [ "${version}" != "${ck8s_version}" ]; then
-    log_error "ERROR: Version mismatch. Run init to update config."
+    log_error "ERROR: Version mismatch. Run upgrade to update config."
     log_error "Config version: ${ck8s_version}"
     log_error "Welkin Apps version: ${version}"
     exit 1
@@ -642,4 +643,21 @@ with_s3cfg() {
   # TODO: Can't use a FIFO since the s3cfg is read multiple times when a
   #       bucket needs to be created.
   sops_exec_file_no_fifo "${s3cfg}" 'S3COMMAND_CONFIG_FILE="{}" '"${*}"
+}
+
+# Store apps version to configmap
+# Usage: set_apps_version
+set_apps_version() {
+  "${here}/ops.bash" kubectl "${1}" create configmap --namespace kube-system apps-meta \
+    --from-literal "version=${2}" >/dev/null
+}
+
+# Retrieve apps version from configmap
+get_apps_version() {
+  "${here}/ops.bash" kubectl "${1}" get --namespace kube-system configmap apps-meta \
+    --output jsonpath --template='{.data.version}'
+}
+
+get_upgrade_status() {
+  "${here}/ops.bash" kubectl "${1}" get --namespace kube-system configmap apps-upgrade
 }
