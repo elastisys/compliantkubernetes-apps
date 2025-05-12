@@ -21,11 +21,11 @@ setup() {
   load_common "env.bash"
   env.private
 
-  export _target_template="${CK8S_CONFIG_PATH}/sc-images-templates"
+  export _templates_output="${CK8S_CONFIG_PATH}/tmp/images-templates"
   export _helmfile_selector="-lapp=ingress-nginx"
 
   export _container_name="controller"
-  export _template_file="controller-daemonset.yaml"
+  export _template_file="${_templates_output}/ingress-nginx/templates/controller-daemonset.yaml"
   export _image_property="ingressNginxChart.controller"
 }
 
@@ -165,9 +165,9 @@ _enable_global_repository() {
 }
 
 _generate_templates() {
-  helmfile -e service_cluster "${_helmfile_selector}" -f "${ROOT}/helmfile.d" -q template --output-dir-template "${_target_template}"
+  helmfile -e service_cluster "${_helmfile_selector}" -f "${ROOT}/helmfile.d" -q template --output-dir-template "${_templates_output}"
 }
 
 _extract_image() {
-  yq '.spec.template.spec.containers[] | select(.name == "'"${_container_name}"'") | .image' <"${_target_template}/ingress-nginx/templates/${_template_file}"
+  yq '.spec.template.spec.containers[] | select(.name == "'"${_container_name}"'") | .image' <"${_template_file}"
 }
