@@ -14,6 +14,7 @@ Name-Real: Welkin / Apps / Tests / ${1}
 Name-Email: support@elastisys.com
 Expire-Date: 1d
 %no-protection
+%fast-random
 %transient-key
 %commit
 EOF
