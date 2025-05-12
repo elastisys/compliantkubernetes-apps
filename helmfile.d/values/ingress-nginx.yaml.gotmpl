@@ -155,22 +155,28 @@ controller:
     serviceMonitor:
       enabled: true
 
-{{ if .Values.images | dig "ingressNginxChart" "controller" "" -}}
-  {{- $controllerImage := include "container_uri.parse" (dict
-    "Image" .Values.images.ingressNginxChart.controller
-    "Global" (.Values.images | dig "global" dict)
-  ) | fromJson }}
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
 
+{{- $isChroot := .Values.ingressNginx.controller.chroot }}
+{{ with .Values.images | dig "ingressNginxChart" "controller" "" -}}
+  {{- $controllerImage := merge (include "container_uri.parse" . | fromJson) $global }}
   image:
-    chroot: {{ .Values.ingressNginx.controller.chroot }}
-    {{ if or $controllerImage.registry $controllerImage.repository $controllerImage.image -}}
-    repository: {{ join "/" (compact (list $controllerImage.registry $controllerImage.repository $controllerImage.image)) }}
+    chroot: {{ $isChroot }}
+    {{- with include "gen.reg-rep-img" $controllerImage }}
+    repository: {{ . }}
     {{- end }}
     {{ if $controllerImage.tag }}tag: {{ $controllerImage.tag }}{{ end }}
+    {{- if $isChroot }}
     digestChroot: {{ $controllerImage.digest }}
+    {{- else}}
+    digest: {{ $controllerImage.digest }}
+    {{- end}}
 {{- else}}
   image:
-    chroot: {{ .Values.ingressNginx.controller.chroot }}
+    chroot: {{ $isChroot }}
 {{- end }}
 
   {{- if .Values.ingressNginx.controller.chroot }}
@@ -188,16 +194,13 @@ controller:
       - SYS_CHROOT
   {{- end }}
 
-{{ if .Values.images | dig "ingressNginxChart" "admissionWebhooks" "" -}}
-  {{- $patchImage := include "container_uri.parse" (dict
-    "Image" .Values.images.ingressNginxChart.admissionWebhooks
-    "Global" (.Values.images | dig "global" dict)
-  ) | fromJson }}
+{{ with .Values.images | dig "ingressNginxChart" "admissionWebhooks" "" -}}
+  {{- $patchImage := merge (include "container_uri.parse" . | fromJson) $global }}
   admissionWebhooks:
     patch:
       image:
-        {{ if or $patchImage.registry $patchImage.repository $patchImage.image -}}
-        repository: {{ join "/" (compact (list $patchImage.registry $patchImage.repository $patchImage.image)) }}
+        {{- with include "gen.reg-rep-img" $patchImage }}
+        repository: {{ . }}
         {{- end }}
         {{ if $patchImage.tag }}tag: {{ $patchImage.tag }}{{ end }}
         digest: {{ $patchImage.digest }}
@@ -210,15 +213,11 @@ defaultBackend:
 
   nodeSelector: {{- toYaml .Values.ingressNginx.defaultBackend.nodeSelector | nindent 4 }}
 
-{{ if .Values.images | dig "ingressNginxChart" "defaultBackend" "" -}}
-  {{- $defaultBackendImage := include "container_uri.parse" (dict
-    "Image" .Values.images.ingressNginxChart.defaultBackend
-    "Global" (.Values.images | dig "global" dict)
-  ) | fromJson }}
-
+{{ with .Values.images | dig "ingressNginxChart" "defaultBackend" "" -}}
+  {{- $defaultBackendImage := merge (include "container_uri.parse" . | fromJson) $global }}
   image:
-    {{ if or $defaultBackendImage.registry $defaultBackendImage.repository $defaultBackendImage.image -}}
-    repository: {{ join "/" (compact (list $defaultBackendImage.registry $defaultBackendImage.repository $defaultBackendImage.image)) }}
+    {{- with include "gen.reg-rep-img" $defaultBackendImage }}
+    repository: {{ . }}
     {{- end }}
     {{ if $defaultBackendImage.tag }}tag: {{ $defaultBackendImage.tag }}{{ end }}
     digest: {{ $defaultBackendImage.digest }}
