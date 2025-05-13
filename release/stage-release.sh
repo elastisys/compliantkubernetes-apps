@@ -8,16 +8,20 @@ if ! command -v releaser >/dev/null; then
   exit 1
 fi
 
-function usage() {
-  echo "Usage: ${0} VERSION GITHUB_TOKEN" >&2
+function missing_env_var() {
+  echo "Error: Environment variable ${1} is not set." >&2
   exit 1
 }
 
-[ ${#} -eq 2 ] || usage
+function usage() {
+  echo "Usage: ${0} VERSION" >&2
+  exit 1
+}
+
+[ ${#} -eq 1 ] || usage
+[ -n "${CK8S_GITHUB_TOKEN:-}" ] || missing_env_var "CK8S_GITHUB_TOKEN"
 
 full_version="${1}"
-github_token="${2}"
-
 series="$(echo "${full_version}" | cut -d '.' -f 1,2)"
 patch="$(echo "${full_version}" | cut -d '.' -f 3)"
 
@@ -53,7 +57,7 @@ mkdir -p "${changelog_dir}"
 # TODO: Find a nicer way to do this.
 [ "${patch}" != "0" ] && printf "\n#" >>"${changelog_path}"
 
-releaser changelog compliantkubernetes-apps "${full_version}" --github-token="${github_token}" >>"${changelog_path}"
+releaser changelog compliantkubernetes-apps "${full_version}" >>"${changelog_path}"
 
 git add "${changelog_path}"
 git commit -m "Add changelog for release v${full_version}"
