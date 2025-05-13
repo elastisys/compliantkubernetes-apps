@@ -2,7 +2,6 @@
 templates:
   kured:
     condition: ck8sAnyCluster.enabled
-    installed: {{ .Values | get "kured.enabled" false }}
     namespace: kured
     labels:
       app: kured
@@ -11,6 +10,7 @@ templates:
     inherit:
       - template: kured
       - template: podsecuritypolicies
+    installed: {{ .Values | get "kured.enabled" false }}
     labels:
       psp: kured
     values:
@@ -29,6 +29,7 @@ templates:
 
   kured-main:
     disableValidationOnInstall: true
+    installed: {{ .Values | get "kured.enabled" false }}
     inherit:
       - template: kured
       - template: kured-chart
