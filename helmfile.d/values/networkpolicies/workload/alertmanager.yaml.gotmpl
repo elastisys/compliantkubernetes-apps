@@ -4,9 +4,13 @@
 {{- dict "peers" $peers "ports" $ports | toYaml | nindent 10 | trim -}}
 {{- end }}{{ end -}}
 
-{{- if .Values.prometheus.useralertmanager.enabled }}
 policies:
-  monitoring:
+  alertmanager:
+    all-deny:
+      podSelectorLabels: {}
+      egress: {}
+      ingress: {}
+
     alertmanager:
       podSelectorLabels:
         app.kubernetes.io/name: alertmanager
@@ -55,4 +59,3 @@ policies:
                       - default
           ports:
             - tcp: 9093
-{{- end }}
