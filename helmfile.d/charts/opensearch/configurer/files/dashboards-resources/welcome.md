@@ -9,6 +9,7 @@ Here you can find the most relevant features and changes for the last couple of 
 - Upgrade ingress-nginx to v4.12.1. **[v0.46]**
 - Upgrade OPA/gatekeeper to v3.18.2. **[v0.46]**
 - Upgrade kube-prometheus-stack to v70.6.0. **[v0.46]**
+- Add OPA policy to restrict PDBs, always allow at least 1 disruption. **[v0.46]**
 - Upgrade trivy-operator to v0.26.0 and application to v0.24.0. **[v0.45]**
 - Upgraded cert-manager chart to v1.17.1. **[v0.45]**
 - Upgraded Thanos chart to v15.13.1. **[v0.45]**

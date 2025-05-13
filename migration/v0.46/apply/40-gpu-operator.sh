@@ -10,7 +10,7 @@ run() {
   execute)
     chart_version=$(yq '.version' "${ROOT}/helmfile.d/upstream/nvidia/gpu-operator/Chart.yaml")
 
-    if [[ "${CK8S_CLUSTER}" =~ ^(wc|both)$ ]]; then
+    if [[ "${CK8S_CLUSTER}" =~ ^(wc|both)$ && "$(helm_installed wc gpu-operator nvidia-gpu-operator)" ]]; then
       current_version=$(helm_do wc get metadata -n gpu-operator nvidia-gpu-operator -ojson | jq -r '.version')
       log_info "operation on workload cluster"
       if [[ "${current_version}" != "${chart_version}" ]]; then
