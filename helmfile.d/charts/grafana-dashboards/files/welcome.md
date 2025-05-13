@@ -4,13 +4,16 @@
 
 Here you can find the most relevant features and changes for the last couple of releases of Welkin
 
+- Upgrade Grafana to v11.5.1. **[v0.46]**
+- Upgrade GPU operator to v24.9.2 and allow additional configuration options. **[v0.46]**
+- Upgrade ingress-nginx to v4.12.1. **[v0.46]**
+- Upgrade OPA/gatekeeper to v3.18.2. **[v0.46]**
+- Upgrade kube-prometheus-stack to v70.6.0. **[v0.46]**
+- Add OPA policy to restrict PDBs, always allow at least 1 disruption. **[v0.46]**
 - Upgrade trivy-operator to v0.26.0 and application to v0.24.0. **[v0.45]**
 - Upgraded cert-manager chart to v1.17.1. **[v0.45]**
 - Upgraded Thanos chart to v15.13.1. **[v0.45]**
 - Added NVIDIA GPU driver support for Ubuntu 24.04. **[v0.45]**
-- Added NVIDIA GPU operator to Welkin. **[v0.44]**
-- Upgraded kube-prometheus-stack to 67.11.0. **[v0.44]**
-- Upgraded Falco to v0.40.0. **[v0.44]**
 
 ## Public docs
 
