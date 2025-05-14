@@ -50,6 +50,8 @@ spec:
               {{- if .Values.verifyImageSignature.publicKeys }}
               - keys:
                   publicKeys: {{`"{{ entries.data.publicKeys }}"`}}
+                  rekor:
+                    ignoreTlog: {{ .Values.verifyImageSignature.ignoreRekorTlog }}
              {{- end }}
               {{- if .Values.verifyImageSignature.certificates }}
               - certificates:
