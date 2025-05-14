@@ -8014,6 +8014,10 @@ properties:
                 enum:
                   - Cosign
                   - Notary
+              ignoreRekorTlog:
+                title: Ignore Rekor transparency log when verifying image signatures
+                default: false
+                type: boolean
               publicKeys:
                 description: A set of public keys used to verify image signatures
                 type: string
