@@ -93,7 +93,29 @@ find_schemas() {
   refute_output
 }
 
-# Any property should have a title
+@test "properties should have titles" {
+  declare -a schemas && find_schemas
+
+  # shellcheck disable=SC2016
+  run yq '{
+    filename: [
+      .. | select(
+        (. != "true") and
+        (has("$ref") | not) and
+        (has("allOf") | not) and
+        (has("oneOf") | not) and
+        (has("if") | not) and
+        (has("then") | not) and
+        (has("title") | not) and
+        (parent | key) == "properties" and
+        (parent | parent | .type) == "object"
+      ) | path | join "."
+    ]
+  } | select((.[] | length) != 0 and .[].[] != "")' "${schemas[@]}"
+
+  refute_output
+}
+
 @test "properties should have types" {
   declare -a schemas && find_schemas
 
