@@ -33,9 +33,9 @@ extraDeploy:
 
 
 image:
-  registry: ghcr.io
-  repository: elastisys/fluentd-aggregator
-  tag: v7.1.1-ck8s1
+  registry: {{ .Values.fluentd.aggregator.registry }}
+  repository: {{ .Values.fluentd.aggregator.repository }}
+  tag: {{ .Values.fluentd.aggregator.tag }}
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images

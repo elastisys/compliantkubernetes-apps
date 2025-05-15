@@ -220,6 +220,11 @@ fluentd:
       #   </match>
 
   aggregator:
+    image:
+      registry: ghcr.io
+      repository: elastisys/fluentd-aggregator
+      tag: v7.1.1-ck8s1
+
     # All buffer settings are available, keys are transformed to snake_case as required by fluentd config
     buffer:
       chunkLimitSize: 50MB
