@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-
 export CK8S_STACK="migration/delete-user-alertmanager"
 ROOT="$(readlink -f "$(dirname "${0}")/../../../")"
 
