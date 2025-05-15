@@ -146,3 +146,22 @@ Cypress.Commands.add("dexStaticLogin", () => {
         .click()
     })
 })
+
+Cypress.Commands.add("withTestKubeconfig", function(cluster, user, refresh) {
+
+  const base_kubeconfig = Cypress.env("CK8S_CONFIG_PATH") + `/.state/kube_config_${cluster}.yaml`
+  Cypress.env("KUBECONFIG", Cypress.env("CK8S_CONFIG_PATH") + `/.state/kube_config_${cluster}_${user}.yaml`)
+  const kubeconfig = Cypress.env("KUBECONFIG")
+  const homedir = Cypress.env("HOME")
+  cy.exec(`yq4 '.users[0].user.exec.args += "'"--token-cache-dir=~/.kube/cache/oidc-login/test-${user}"'"' < "${base_kubeconfig}" > ${kubeconfig}`)
+    .then(result => {
+      if (result.stderr !== "") {
+        cy.fail(`yq: error in exec: ${result.stderr}`)
+      } else {
+        return result.stdout
+      }
+    })
+  if (refresh === "true") {
+    cy.exec(`rm -rf ~/.kube/cache/oidc-login/test-${user}`)
+  }
+})
