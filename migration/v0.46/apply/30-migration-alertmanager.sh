@@ -10,14 +10,14 @@ source "${ROOT}/scripts/migration/lib.sh"
 config_load wc
 
 # Extract alertmanager config from old secret
-kubectl_do wc get secret alertmanager-alertmanager -n alertmanager -o jsonpath='{.data.alertmanager\.yaml}' | base64 -d > alertmanager.yaml
+kubectl_do wc get secret alertmanager-alertmanager -n alertmanager -o jsonpath='{.data.alertmanager\.yaml}' | base64 -d >alertmanager.yaml
 
 if [[ ! -s alertmanager.yaml ]]; then
   log_fatal "Extracted alertmanager.yaml is empty or missing"
 fi
 
 # Patch the new secret using wc kubeconfig
-kubectl_do wc patch secret alertmanager-kube-prometheus-stack-alertmanager -n alertmanager -p "{\"data\":{\"alertmanager.yaml\":\"$(base64 -w 0 < alertmanager.yaml)\"}}"
+kubectl_do wc patch secret alertmanager-kube-prometheus-stack-alertmanager -n alertmanager -p "{\"data\":{\"alertmanager.yaml\":\"$(base64 -w 0 <alertmanager.yaml)\"}}"
 
 patch_exit=$?
 
