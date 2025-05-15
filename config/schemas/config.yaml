@@ -8065,6 +8065,8 @@ properties:
         properties:
           controller:
             $ref: '#/$defs/containerImage'
+          controllerChroot:
+            $ref: '#/$defs/containerImage'
           defaultBackend:
             $ref: '#/$defs/containerImage'
           admissionWebhooksPatch:
