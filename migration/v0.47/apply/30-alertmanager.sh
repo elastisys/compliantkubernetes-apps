@@ -7,6 +7,10 @@ ROOT="$(readlink -f "$(dirname "${0}")/../../../")"
 
 source "${ROOT}/scripts/migration/lib.sh"
 
+if [[ "${CK8S_CLUSTER:-}" != "wc" ]]; then
+  log_fatal "CK8S_CLUSTER must be set to 'wc' for this migration of user-alertmanager. Please export CK8S_CLUSTER=wc before running."
+fi
+
 # Load workload cluster config (wc)
 config_load wc
 

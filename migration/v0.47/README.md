@@ -134,10 +134,9 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
-1.  User-Alertmanager chart has been replaced wth kube-prometheus-stack chart. This will remove the existing user-alertmanager chart from wc.
+1.  User-Alertmanager chart has been replaced with kube-prometheus-stack chart. This will remove the existing user-alertmanager chart from wc.
 
     ```bash
-    export CK8S_CLUSTER=wc
     ./migration/v0.47/apply/30-alertmanager.sh
     ```
 
