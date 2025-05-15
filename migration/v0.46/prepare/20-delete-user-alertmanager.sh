@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-# Load CK8S environment
+
 export CK8S_STACK="migration/delete-user-alertmanager"
 ROOT="$(readlink -f "$(dirname "${0}")/../../../")"
 
