@@ -118,6 +118,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./migration/v0.46/prepare/10-harbor-alerts.sh
     ```
 
+1. User-Alertmanager chart has been replaced with kube-prometheus-stack chart. This will remove the existing user-alertmanager chart from wc. 
+
+    ```bash
+    ./migration/v0.46/prepare/20-delete-user-alertmanager.sh
+    ```
+
 1. Preserve current Opensearch setup
 
     > [!WARNING]
@@ -170,6 +176,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     ./migration/v0.46/apply/20-kube-prometheus-stack.sh execute
+    ```
+
+1. Migrate existing alertmanager-alertmanager secret configuration to new secret and delete the old secret. 
+
+    ```bash
+    ./migration/v0.46/apply/30-migration-alertmanager.sh
     ```
 
 ## Postrequisite
