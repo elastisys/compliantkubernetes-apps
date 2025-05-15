@@ -120,9 +120,9 @@ prometheus:
   ## Additional prometheus scrape config.
   ## ref: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config
   additionalScrapeConfigs: []
-  useralertmanager:
+  devAlertmanager:
      namespace: alertmanager
-     ingressenabled: false
+     ingressEnabled: false
      username: alertmanager
   alertmanagerSpec:
    groupBy:

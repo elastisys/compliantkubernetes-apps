@@ -2,15 +2,15 @@ defaultRules:
   # Provided by prometheus-alerts instead
   create: false
 
-{{- if .Values.prometheus.useralertmanager.enabled }}
+{{- if .Values.prometheus.devAlertmanager.enabled }}
 alertmanager:
-  namespaceOverride: {{ .Values.prometheus.useralertmanager.namespace }}
-  {{ if eq .Values.prometheus.useralertmanager.ingressenabled true }}
+  namespaceOverride: {{ .Values.prometheus.devAlertmanager.namespace }}
+  {{ if eq .Values.prometheus.devAlertmanager.ingressEnabled true }}
   extraSecret:
       name: user-alertmanager-auth
       data:
         auth: |
-         {{ htpasswd .Values.prometheus.useralertmanager.username .Values.user.alertmanagerPassword }}
+         {{ htpasswd .Values.prometheus.devAlertmanager.username .Values.user.alertmanagerPassword }}
   ingress:
     enabled: true
     annotations:
@@ -138,7 +138,7 @@ prometheus:
     podMonitorSelectorNilUsesHelmValues: false
     probeSelectorNilUsesHelmValues: false
 
-    {{ if .Values.prometheus.useralertmanager.enabled }}
+    {{ if .Values.prometheus.devAlertmanager.enabled }}
     # Connect to separately managed alertmanager
     alertingEndpoints:
       - name: alertmanager-operated
@@ -177,7 +177,7 @@ prometheus:
 
     additionalScrapeConfigs:
 
-    {{ if .Values.prometheus.useralertmanager.enabled }}
+    {{ if .Values.prometheus.devAlertmanager.enabled }}
     - job_name: 'alertmanager/alertmanager-operated'
       scrape_interval: 30s
       metrics_path: /metrics

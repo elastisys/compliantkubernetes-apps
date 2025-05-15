@@ -14,6 +14,7 @@ templates:
     installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
     name: kube-prometheus-stack
     needs:
+      - kube-system/dev-namespaces
       - monitoring/networkpolicy
       - monitoring/podsecuritypolicy
       {{- if and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "clusterApi.enabled" false) }}

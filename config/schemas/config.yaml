@@ -4734,23 +4734,23 @@ properties:
           > [!note]
           > See [the upstream documentation](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config) for reference.
         type: array
-      useralertmanager:
-        title: user Alertmanager
-        description: Configuration options for deploying a user-specific Alertmanager
+      devAlertmanager:
+        title: Application Developer Alertmanager
+        description: Configuration options for deploying an application developer-specific Alertmanager. Configuration shared with the service cluster alertmanager can be configured via `.alertmanagerSpec`.
         type: object
         properties:
           enabled:
            title: Enable user Alertmanager
-           description: Allows to enable alertmanager for user
+           description: Allows to enable alertmanager for application developer.
            type: boolean
           namespace:
             title: Enable alertmanager in separate Namespace
             description: Allows to have alertmanager running in custom namespace
             type: string
             default: alertmanager
-          ingressenabled:
+          ingressEnabled:
             title: Enable User Alertmanager ingress
-            description: Allows to have ingress for user alertmanager with basic auth
+            description: Allows to have ingress for application developer alertmanager with basic auth
             type: boolean
           username:
             title: Username for  Alertmanager login

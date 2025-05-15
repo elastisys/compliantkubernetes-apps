@@ -19,14 +19,12 @@ prometheusNamespace: monitoring
 defaultRules:
   # TODO: Keeping current behavior, but this should probably default to false!
   create: true
-  alertLabels:
-    evaluate_prometheus: "1"
   # labels:
   #   cluster: workload
   rules:
     opensearch: false
     falcoAlerts: false # falco alerts will come from falco sidekick
-    alertmanager: {{ .Values.prometheus.useralertmanager.enabled }}
+    alertmanager: {{ .Values.prometheus.devAlertmanager.enabled }}
     # Rook is handled by the cluster operators. Users would normally not care
     # about these alerts, but we have no other way of gathering them currently.
     rookMonitor: {{ .Values.rookCeph.monitoring.enabled }}

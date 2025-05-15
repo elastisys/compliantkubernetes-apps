@@ -388,7 +388,7 @@ openstackMonitoring:
 
 prometheus:
   replicas: 1
-  useralertmanager:
+  devAlertmanager:
     enabled: true
   alertmanagerSpec:
     affinity: {}
