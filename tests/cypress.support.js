@@ -146,3 +146,62 @@ Cypress.Commands.add("dexStaticLogin", () => {
         .click()
     })
 })
+
+// Available as cy.dexExtraStaticLogin()
+Cypress.Commands.add("dexExtraStaticLogin", function(email) {
+  // Requires dex static login to be enabled
+  cy.yqDig("sc", ".dex.enableStaticLogin")
+    .should("equal", "true")
+
+  cy.yqSecrets(".dex.extraStaticLogins | length")
+    .then(parseInt)
+    .should("be.at.least", 1)
+
+  // Conditionally skip connector selection
+  cy.yqSecrets(".dex.connectors | length")
+    .then(connectors => {
+      if (connectors !== "0") {
+        cy.get("button")
+          .contains("Log in with Email")
+          .click()
+      }
+    })
+
+  cy.yqSecrets(`.dex.extraStaticLogins[] | select(.email == "${email}").password`)
+    .then(password => {
+      cy.get('input[placeholder*="email address"]')
+        .type(email, { log: false })
+
+      cy.get('input[placeholder*="password"]')
+        .type(password, { log: false })
+
+      cy.get("button")
+        .contains("Login")
+        .click()
+    })
+})
+
+Cypress.Commands.add("withTestKubeconfig", function(cluster, user, refresh) {
+
+  const base_kubeconfig = Cypress.env("CK8S_CONFIG_PATH") + `/.state/kube_config_${cluster}.yaml`
+  Cypress.env("KUBECONFIG", Cypress.env("CK8S_CONFIG_PATH") + `/.state/kube_config_${cluster}_${user}.yaml`)
+  const kubeconfig = Cypress.env("KUBECONFIG")
+  const homedir = Cypress.env("HOME")
+  cy.exec(`yq '.users[0].user.exec.args += "'"--token-cache-dir=~/.kube/cache/oidc-login/test-${user}"'"' < "${base_kubeconfig}" > ${kubeconfig}`)
+    .then(result => {
+      if (result.stderr !== "") {
+        cy.fail(`yq: error in exec: ${result.stderr}`)
+      } else {
+        return result.stdout
+      }
+    })
+  if (refresh === "true") {
+    cy.exec(`rm -rf ~/.kube/cache/oidc-login/test-${user}`)
+  }
+})
+
+Cypress.Commands.add("deleteTestKubeconfig", function(cluster, user) {
+
+  const test_kubeconfig = Cypress.env("CK8S_CONFIG_PATH") + `/.state/kube_config_${cluster}_${user}.yaml`
+  cy.exec(`rm ${test_kubeconfig}`)
+})
