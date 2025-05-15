@@ -161,7 +161,8 @@ controller:
 }}
 
 {{- $isChroot := .Values.ingressNginx.controller.chroot }}
-{{ with .Values.images | dig "ingressNginx" "controller" "" -}}
+{{- $controllerKey := ternary "controllerChroot" "controller" $isChroot }}
+{{ with .Values.images | dig "ingressNginx" $controllerKey "" -}}
   {{- $controllerImage := merge (include "container_uri.parse" . | fromJson) $global }}
   image:
     chroot: {{ $isChroot }}

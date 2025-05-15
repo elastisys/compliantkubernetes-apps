@@ -1,7 +1,7 @@
 {
   "parameters": [
     {
-      "image_property": "ingressNginx.controller",
+      "image_property": "ingressNginx.controllerChroot",
       "container_name": "controller",
       "template_file": "ingress-nginx/templates/controller-daemonset.yaml"
     },
