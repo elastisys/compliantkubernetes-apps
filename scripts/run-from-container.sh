@@ -107,6 +107,13 @@ if [[ -n "${XDG_RUNTIME_DIR:-}" ]]; then
   fi
 fi
 
+# Prepare session dbus socket
+if [[ "${FORWARD_ENVIRONMENT:-false}" == "true" ]]; then
+  if [[ -S "${XDG_RUNTIME_DIR:-}/bus" ]]; then
+    args+=("--mount" "type=bind,src=${XDG_RUNTIME_DIR}/bus,dst=${XDG_RUNTIME_DIR}/bus")
+  fi
+fi
+
 # Prepare container runtime socket
 if [[ "${FORWARD_RUNTIME:-false}" == "true" ]]; then
   if [[ "${runtime}" == "docker" ]]; then
