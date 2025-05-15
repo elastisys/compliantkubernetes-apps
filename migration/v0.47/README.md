@@ -1,7 +1,7 @@
-# Upgrade to v0.46.x
+# Upgrade to v0.47.x
 
 > [!WARNING]
-> Upgrade only supported from v0.45.x.
+> Upgrade only supported from v0.46.x.
 
 <!--
 Notice to developers on writing migration steps:
@@ -58,18 +58,15 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     git pull
-    git switch -d v0.46.x
+    git switch -d v0.47.x
     ```
 
 1. Prepare upgrade - _non-disruptive_
 
     > _Done before maintenance window._
 
-    > [!WARNING]
-    > Default Opensearch setup has been changed. Opensearch is now configured to use 3 master nodes, 0 data nodes and 0 client nodes by default. There's no easy migration path for the new configuration, if the old default Opensearch setup is used it should be added to the override config. This is done automatically if you run the prepare command.
-
     ```bash
-    ./bin/ck8s upgrade both v0.46 prepare
+    ./bin/ck8s upgrade both v0.47 prepare
 
     # check if the netpol IPs need to be updated
     ./bin/ck8s update-ips both dry-run
@@ -81,8 +78,8 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > It is possible to upgrade `wc` and `sc` clusters separately by replacing `both` when running the `upgrade` command, e.g. the following will only upgrade the workload cluster:
 
     ```bash
-    ./bin/ck8s upgrade wc v0.46 prepare
-    ./bin/ck8s upgrade wc v0.46 apply
+    ./bin/ck8s upgrade wc v0.47 prepare
+    ./bin/ck8s upgrade wc v0.47 apply
     ```
 
 1. Apply upgrade - _disruptive_
@@ -90,7 +87,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     > _Done during maintenance window._
 
     ```bash
-    ./bin/ck8s upgrade both v0.46 apply
+    ./bin/ck8s upgrade both v0.47 apply
     ```
 
 ## Manual method
@@ -103,28 +100,13 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 
     ```bash
     git pull
-    git switch -d v0.46.x
+    git switch -d v0.47.x
     ```
 
 1. Set whether or not upgrade should be prepared for `both` clusters or for one of `sc` or `wc`:
 
     ```bash
     export CK8S_CLUSTER=<wc|sc|both>
-    ```
-
-1. The harbor size alerts have changed default values. This will remove overrides to those values if the configured values are lower than the new defaults:
-
-    ```bash
-    ./migration/v0.46/prepare/10-harbor-alerts.sh
-    ```
-
-1. Preserve current Opensearch setup
-
-    > [!WARNING]
-    > Default Opensearch setup has been changed. Opensearch is now configured to use 3 master nodes, 0 data nodes and 0 client nodes by default. There's no easy migration path for the new configuration, if the old default Opensearch setup is used it should be added to the override config.
-
-    ```bash
-    migration/v0.46/prepare/40-preserve-current-os-setup.sh
     ```
 
 1. Update apps configuration:
@@ -134,7 +116,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ```bash
     ./bin/ck8s init ${CK8S_CLUSTER}
     # or
-    ./migration/v0.46/prepare/50-init.sh
+    ./migration/v0.47/prepare/50-init.sh
 
     # check if the netpol IPs need to be updated
     ./bin/ck8s update-ips ${CK8S_CLUSTER} dry-run
@@ -152,24 +134,19 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
+1.  User-Alertmanager chart has been replaced wth kube-prometheus-stack chart. This will remove the existing user-alertmanager chart from wc.
+
+    ```bash
+    export CK8S_CLUSTER=wc
+    ./migration/v0.47/apply/30-alertmanager.sh
+    ```
+
 1. Upgrade applications:
 
     ```bash
     ./bin/ck8s apply {sc|wc}
     # or
-    ./migration/v0.46/apply/80-apply.sh execute
-    ```
-
-1. Upgrade gatekeeper:
-
-    ```bash
-    ./migration/v0.46/apply/10-gatekeeper.sh execute
-    ```
-
-1. Upgrade kube-prometheus-stack:
-
-    ```bash
-    ./migration/v0.46/apply/20-kube-prometheus-stack.sh execute
+    ./migration/v0.47/apply/80-apply.sh execute
     ```
 
 ## Postrequisite
