@@ -161,7 +161,7 @@ controller:
 }}
 
 {{- $isChroot := .Values.ingressNginx.controller.chroot }}
-{{ with .Values.images | dig "ingressNginxChart" "controller" "" -}}
+{{ with .Values.images | dig "ingressNginx" "controller" "" -}}
   {{- $controllerImage := merge (include "container_uri.parse" . | fromJson) $global }}
   image:
     chroot: {{ $isChroot }}
@@ -194,7 +194,7 @@ controller:
       - SYS_CHROOT
   {{- end }}
 
-{{ with .Values.images | dig "ingressNginxChart" "admissionWebhooks" "" -}}
+{{ with .Values.images | dig "ingressNginx" "admissionWebhooks" "" -}}
   {{- $patchImage := merge (include "container_uri.parse" . | fromJson) $global }}
   admissionWebhooks:
     patch:
@@ -213,7 +213,7 @@ defaultBackend:
 
   nodeSelector: {{- toYaml .Values.ingressNginx.defaultBackend.nodeSelector | nindent 4 }}
 
-{{ with .Values.images | dig "ingressNginxChart" "defaultBackend" "" -}}
+{{ with .Values.images | dig "ingressNginx" "defaultBackend" "" -}}
   {{- $defaultBackendImage := merge (include "container_uri.parse" . | fromJson) $global }}
   image:
     {{- with include "gen.reg-rep-img" $defaultBackendImage }}
