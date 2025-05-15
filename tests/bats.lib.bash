@@ -106,6 +106,47 @@ with_kubeconfig() {
   export DETIK_CLIENT_NAME="kubectl"
 }
 
+# sets the kubeconfig to use
+# usage: with_test_kubeconfig <cluster> <static-admin|static-dev>
+with_test_kubeconfig() {
+  if ! [[ "${1:-}" =~ ^(sc|wc)$ ]]; then
+    fail "invalid or missing cluster argument"
+  fi
+
+  if [[ -z "${2:-}" ]]; then
+    fail "missing user argument (e.g. static-dev/static-admin)"
+  fi
+
+  BASE_KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_$1.yaml"
+  export KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_$1_$2.yaml"
+  if ! [[ -f "${KUBECONFIG}" ]]; then
+    yq '.users[0].user.exec.args += "'"--token-cache-dir=~/.kube/cache/oidc-login/test-${2}"'"' <"${BASE_KUBECONFIG}" >"${KUBECONFIG}"
+  fi
+  export DETIK_CLIENT_NAME="kubectl"
+}
+
+# deletes a kubeconfig used for tests
+# usage: delete_test_kubeconfig <cluster> <static-admin|static-dev>
+delete_test_kubeconfig() {
+  if ! [[ "${1:-}" =~ ^(sc|wc)$ ]]; then
+    fail "invalid or missing cluster argument"
+  fi
+
+  if [[ -z "${2:-}" ]]; then
+    fail "missing user argument (e.g. static-dev/static-admin)"
+  fi
+
+  rm "${CK8S_CONFIG_PATH}/.state/kube_config_$1_$2.yaml"
+}
+
+clear_kubeconfig_cache() {
+  if [[ -z "${1:-}" ]]; then
+    fail "missing user argument (e.g. static-dev/static-admin)"
+  fi
+
+  rm -rf "${HOME}/.kube/cache/oidc-login/test-${1}"
+}
+
 # sets the namespace to use
 # usage: with_namespace <namespace>
 with_namespace() {
@@ -207,7 +248,7 @@ auto_teardown() {
 # usage: cypress_setup <path-to-cypress-spec>
 cypress_setup() {
   if ! [[ -f "${1:-}" ]]; then
-    log_fatal "invalid or missing file argument"
+    log.fatal "invalid or missing file argument"
   fi
 
   CYPRESS_REPORT="$(mktemp)"
