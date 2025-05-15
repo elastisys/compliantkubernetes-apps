@@ -10,21 +10,28 @@ It can be installed normally.
 ## Specific backup
 
 By default the job will restore the latest backup.
-`$SPECIFIC_BACKUP` can be used to specify which backup.
+The environment variable `SPECIFIC_BACKUP` can be used to specify which backup to use.
+
 To get a list of available backups use:
 
-S3:
+<details>
+    <summary>S3</summary>
 
 ```bash
 s3cmd --config <(sops -d ${CK8S_CONFIG_PATH}/.state/s3cfg.ini) ls s3://${S3_BUCKET}/backups/
 ```
 
-Azure:
+</details>
+
+<details>
+    <summary>Azure</summary>
 
 ```bash
 export AZURE_LOCATION=swedencentral
 ./scripts/azure/storage-manager.sh list-harbor-backups
 ```
+
+</details>
 
 Then set:
 
