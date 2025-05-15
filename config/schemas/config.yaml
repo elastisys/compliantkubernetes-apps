@@ -8067,7 +8067,7 @@ properties:
             $ref: '#/$defs/containerImage'
           defaultBackend:
             $ref: '#/$defs/containerImage'
-          admissionWebhooks:
+          admissionWebhooksPatch:
             $ref: '#/$defs/containerImage'
 
 additionalProperties:

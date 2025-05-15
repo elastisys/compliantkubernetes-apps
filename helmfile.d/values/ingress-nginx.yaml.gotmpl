@@ -194,7 +194,7 @@ controller:
       - SYS_CHROOT
   {{- end }}
 
-{{ with .Values.images | dig "ingressNginx" "admissionWebhooks" "" -}}
+{{ with .Values.images | dig "ingressNginx" "admissionWebhooksPatch" "" -}}
   {{- $patchImage := merge (include "container_uri.parse" . | fromJson) $global }}
   admissionWebhooks:
     patch:
