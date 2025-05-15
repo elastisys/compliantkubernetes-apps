@@ -1,0 +1,13 @@
+global:
+  issuer: self-signed
+  verifyTls: false
+issuers:
+  extraIssuers:
+    - apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: self-signed
+      spec:
+        selfSigned: {}
+  letsencrypt:
+    enabled: false
