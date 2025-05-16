@@ -8066,6 +8066,20 @@ properties:
         properties:
           accountant:
             $ref: '#/$defs/containerImage'
+      certManager:
+        title: cert-manager stack image configuration
+        description: cert-manager stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          controller:
+            $ref: '#/$defs/containerImage'
+          webhook:
+            $ref: '#/$defs/containerImage'
+          cainjector:
+            $ref: '#/$defs/containerImage'
+          startupapicheck:
+            $ref: '#/$defs/containerImage'
       ingressNginx:
         title: ingress-nginx stack image configuration
         description: ingress-nginx stack image configuration

@@ -1,3 +1,20 @@
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
+{{- with .Values.images | dig "certManager" "controller" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+{{- if or .registry .repository .image .tag .digest }}
+image:
+  {{- with include "gen.reg-rep-img" . }}
+  repository: {{ . }}
+  {{- end }}
+  {{- if or .tag .digest }}
+  tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
 resources:    {{- toYaml .Values.certmanager.resources | nindent 2 }}
 nodeSelector: {{- toYaml .Values.certmanager.nodeSelector | nindent 2 }}
 affinity:     {{- toYaml .Values.certmanager.affinity | nindent 2 }}
@@ -9,6 +26,19 @@ webhook:
   nodeSelector: {{- toYaml .Values.certmanager.webhook.nodeSelector | nindent 4 }}
   affinity:     {{- toYaml .Values.certmanager.webhook.affinity | nindent 4 }}
   tolerations:  {{- toYaml .Values.certmanager.webhook.tolerations | nindent 4 }}
+  {{- with .Values.images | dig "certManager" "webhook" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  {{- if or .registry .repository .image .tag .digest }}
+  image:
+    {{- with include "gen.reg-rep-img" . }}
+    repository: {{ . }}
+    {{- end }}
+    {{- if or .tag .digest }}
+    tag: "{{ .tag }}{{ with .digest }}@{{ . }}{{ end }}"
+    {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
 
 cainjector:
   resources:    {{- toYaml .Values.certmanager.cainjector.resources | nindent 4 }}
@@ -16,6 +46,34 @@ cainjector:
   affinity:     {{- toYaml .Values.certmanager.cainjector.affinity | nindent 4 }}
   tolerations:  {{- toYaml .Values.certmanager.cainjector.tolerations | nindent 4 }}
   extraArgs:    {{- toYaml .Values.certmanager.cainjector.extraArgs | nindent 4 }}
+  {{- with .Values.images | dig "certManager" "cainjector" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  {{- if or .registry .repository .image .tag .digest }}
+  image:
+    {{- with include "gen.reg-rep-img" . }}
+    repository: {{ . }}
+    {{ end }}
+    {{- if or .tag .digest }}
+    tag: "{{ .tag }}{{ with .digest }}@{{ . }}{{ end }}"
+    {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
+
+{{- with .Values.images | dig "certManager" "startupapicheck" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+{{- if or .registry .repository .image .tag .digest }}
+startupapicheck:
+  image:
+    {{- with include "gen.reg-rep-img" . }}
+    repository: {{ . }}
+    {{- end }}
+    {{- if or .tag .digest }}
+    tag: "{{ .tag }}{{ with .digest }}@{{ . }}{{ end }}"
+    {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
 
 crds:
   enabled: true
