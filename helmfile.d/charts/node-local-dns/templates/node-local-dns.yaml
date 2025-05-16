@@ -52,62 +52,62 @@ metadata:
 data:
   Corefile: |
     cluster.local:53 {
-        errors {
-          {{ .Values.errorConfig }}
-        }
-        cache {
-                success 9984 30
-                denial 9984 5
-        }
-        reload
-        loop
-        bind {{ .Values.localIP }} {{ .Values.clusterDNS }}
-        forward . __PILLAR__CLUSTER__DNS__ {
-                force_tcp
-        }
-        prometheus :9253
-        health {{ .Values.localIP }}:8080
-        }
+      errors {
+        {{ .Values.errorConfig }}
+      }
+      cache {
+        success 9984 30
+        denial 9984 5
+      }
+      reload
+      loop
+      bind {{ .Values.localIP }} {{ .Values.clusterDNS }}
+      forward . __PILLAR__CLUSTER__DNS__ {
+        force_tcp
+      }
+      prometheus :9253
+      health {{ .Values.localIP }}:8080
+    }
     in-addr.arpa:53 {
-        errors {
-          {{ .Values.errorConfig }}
-        }
-        cache 30
-        reload
-        loop
-        bind {{ .Values.localIP }} {{ .Values.clusterDNS }}
-        forward . __PILLAR__CLUSTER__DNS__ {
-                force_tcp
-        }
-        prometheus :9253
-        }
+      errors {
+        {{ .Values.errorConfig }}
+      }
+      cache 30
+      reload
+      loop
+      bind {{ .Values.localIP }} {{ .Values.clusterDNS }}
+      forward . __PILLAR__CLUSTER__DNS__ {
+        force_tcp
+      }
+      prometheus :9253
+    }
     ip6.arpa:53 {
-        errors {
-          {{ .Values.errorConfig }}
-        }
-        cache 30
-        reload
-        loop
-        bind {{ .Values.localIP }} {{ .Values.clusterDNS }}
-        forward . __PILLAR__CLUSTER__DNS__ {
-                force_tcp
-        }
-        prometheus :9253
-        }
+      errors {
+        {{ .Values.errorConfig }}
+      }
+      cache 30
+      reload
+      loop
+      bind {{ .Values.localIP }} {{ .Values.clusterDNS }}
+      forward . __PILLAR__CLUSTER__DNS__ {
+        force_tcp
+      }
+      prometheus :9253
+    }
     .:53 {
-        errors {
-          {{ .Values.errorConfig }}
-        }
-        {{- with .Values.hostZone.extraConfig }}
-        {{- . | nindent 8 }}
-        {{- end }}
-        cache 30
-        reload
-        loop
-        bind {{ .Values.localIP }} {{ .Values.clusterDNS }}
-        forward . __PILLAR__UPSTREAM__SERVERS__
-        prometheus :9253
-        }
+      errors {
+        {{ .Values.errorConfig }}
+      }
+      {{- with .Values.hostZone.extraConfig }}
+      {{- . | nindent 6 }}
+      {{- end }}
+      cache 30
+      reload
+      loop
+      bind {{ .Values.localIP }} {{ .Values.clusterDNS }}
+      forward . __PILLAR__UPSTREAM__SERVERS__
+      prometheus :9253
+    }
     {{- if .Values.customConfig }}
     {{- .Values.customConfig | nindent 4 }}
     {{- end }}
