@@ -1,5 +1,25 @@
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
 # Use the same affinity as ingress-nginx controller so the files get placed on the same nodes as the controller pods run on.
 ingressNginxChroot:
   enabled: {{ .Values.ingressNginx.controller.chroot }}
   tolerations: {{ toYaml .Values.ingressNginx.controller.tolerations | nindent 4 }}
   affinity: {{ toYaml .Values.ingressNginx.controller.affinity | nindent 4 }}
+{{- with .Values.images | dig "ingressNginx" "fileCopier" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+{{- if or .registry .repository .image .tag .digest }}
+  fileCopierImage:
+    {{- with .tag }}
+    tag: {{ . }}
+    {{- end }}
+    {{- with .digest }}
+    digest: {{ . }}
+    {{- end }}
+    {{- with include "gen.reg-rep-img" . }}
+    image: {{ . }}
+    {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

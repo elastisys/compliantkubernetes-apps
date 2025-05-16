@@ -8072,6 +8072,8 @@ properties:
             $ref: '#/$defs/containerImage'
           admissionWebhooksPatch:
             $ref: '#/$defs/containerImage'
+          fileCopier:
+            $ref: '#/$defs/containerImage'
 
 additionalProperties:
   title: Additional Properties
