@@ -32,6 +32,18 @@ config:
       # Use this setting if you are running opensearch-dashboards without https
       cookie:
         secure: false
+        {{- if hasKey .Values.opensearch.dashboards "cookieTtl" }}
+        ttl: {{ .Values.opensearch.dashboards.cookieTtl }}
+        {{- end }}
+      {{- if or (hasKey .Values.opensearch.dashboards "sessionTtl") (hasKey .Values.opensearch.dashboards "sessionKeepalive") }}
+      session:
+        {{- if hasKey .Values.opensearch.dashboards "sessionTtl" }}
+        ttl: {{ .Values.opensearch.dashboards.sessionTtl }}
+        {{- end }}
+        {{- if hasKey .Values.opensearch.dashboards "sessionKeepalive" }}
+        keepalive: {{ .Values.opensearch.dashboards.sessionKeepalive }}
+        {{- end }}
+      {{- end }}
 
 opensearchAccount:
   secret: opensearch-dashboards-user
