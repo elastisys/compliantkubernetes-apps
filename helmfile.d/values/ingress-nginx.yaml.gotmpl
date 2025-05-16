@@ -155,9 +155,32 @@ controller:
     serviceMonitor:
       enabled: true
 
-  {{- if .Values.ingressNginx.controller.chroot }}
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
+
+{{- $isChroot := .Values.ingressNginx.controller.chroot }}
+{{- $controllerKey := ternary "controllerChroot" "controller" $isChroot }}
+{{ with .Values.images | dig "ingressNginx" $controllerKey "" -}}
+  {{- $controllerImage := merge (include "container_uri.parse" . | fromJson) $global }}
   image:
-    chroot: true
+    chroot: {{ $isChroot }}
+    {{- with include "gen.reg-rep-img" $controllerImage }}
+    repository: {{ . }}
+    {{- end }}
+    {{ if $controllerImage.tag }}tag: {{ $controllerImage.tag }}{{ end }}
+    {{- if $isChroot }}
+    digestChroot: {{ $controllerImage.digest }}
+    {{- else}}
+    digest: {{ $controllerImage.digest }}
+    {{- end}}
+{{- else}}
+  image:
+    chroot: {{ $isChroot }}
+{{- end }}
+
+  {{- if .Values.ingressNginx.controller.chroot }}
   containerSecurityContext:
     allowPrivilegeEscalation: true
     runAsUser: 101
@@ -172,12 +195,34 @@ controller:
       - SYS_CHROOT
   {{- end }}
 
+{{ with .Values.images | dig "ingressNginx" "admissionWebhooksPatch" "" -}}
+  {{- $patchImage := merge (include "container_uri.parse" . | fromJson) $global }}
+  admissionWebhooks:
+    patch:
+      image:
+        {{- with include "gen.reg-rep-img" $patchImage }}
+        repository: {{ . }}
+        {{- end }}
+        {{ if $patchImage.tag }}tag: {{ $patchImage.tag }}{{ end }}
+        digest: {{ $patchImage.digest }}
+{{- end }}
+
 defaultBackend:
   enabled: true
 
   name: default-backend
 
   nodeSelector: {{- toYaml .Values.ingressNginx.defaultBackend.nodeSelector | nindent 4 }}
+
+{{ with .Values.images | dig "ingressNginx" "defaultBackend" "" -}}
+  {{- $defaultBackendImage := merge (include "container_uri.parse" . | fromJson) $global }}
+  image:
+    {{- with include "gen.reg-rep-img" $defaultBackendImage }}
+    repository: {{ . }}
+    {{- end }}
+    {{ if $defaultBackendImage.tag }}tag: {{ $defaultBackendImage.tag }}{{ end }}
+    digest: {{ $defaultBackendImage.digest }}
+{{- end }}
 
   tolerations: {{- toYaml .Values.ingressNginx.defaultBackend.tolerations | nindent 4 }}
 

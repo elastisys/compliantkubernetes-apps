@@ -1333,3 +1333,10 @@ kyverno:
   nodeAffinity: {}
   topologySpreadConstraints: []
   tolerations: []
+
+images:
+  global:
+    registry:
+      enabled: false
+    repository:
+      enabled: false
