@@ -8058,6 +8058,14 @@ properties:
                 - uri
             required:
               - enabled
+      calico:
+        title: calico stack image configuration
+        description: calico stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          accountant:
+            $ref: '#/$defs/containerImage'
       ingressNginx:
         title: ingress-nginx stack image configuration
         description: ingress-nginx stack image configuration

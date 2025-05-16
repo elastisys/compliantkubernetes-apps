@@ -1,3 +1,23 @@
 backend: {{ .Values.calicoAccountant.backend }}
 resources: {{- toYaml .Values.calicoAccountant.resources | nindent 2 }}
 tolerations: {{- toYaml .Values.calicoAccountant.tolerations | nindent 2 }}
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
+{{- with .Values.images | dig "calico" "accountant" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+{{- if or .registry .repository .image .tag .digest }}
+image:
+  {{- with .tag }}
+  tag: {{ . }}
+  {{- end }}
+  {{- with .digest }}
+  digest: {{ . }}
+  {{- end }}
+  {{- with include "gen.reg-rep-img" . }}
+  repository: {{ . }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
