@@ -17,6 +17,12 @@
       "helmfile_selector": "app=ingress-nginx",
       "container_name": "patch",
       "template_file": "ingress-nginx/templates/admission-webhooks/job-patch/job-patchWebhook.yaml"
+    },
+    {
+      "image_property": "ingressNginx.fileCopier",
+      "helmfile_selector": "app=ingress-nginx",
+      "container_name": "file-copier",
+      "template_file": "file-copier/templates/ingress-nginx-chroot-ds.yaml"
     }
   ]
 }
