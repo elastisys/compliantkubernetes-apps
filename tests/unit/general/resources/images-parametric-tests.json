@@ -23,6 +23,12 @@
       "helmfile_selector": "app=ingress-nginx",
       "container_name": "file-copier",
       "template_file": "file-copier/templates/ingress-nginx-chroot-ds.yaml"
+    },
+    {
+      "image_property": "calico.accountant",
+      "helmfile_selector": "app=calico",
+      "container_name": "calico-accountant",
+      "template_file": "calico-accountant/templates/daemonset.yaml"
     }
   ]
 }
