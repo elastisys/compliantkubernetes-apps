@@ -29,6 +29,30 @@
       "helmfile_selector": "app=calico",
       "container_name": "calico-accountant",
       "template_file": "calico-accountant/templates/daemonset.yaml"
+    },
+    {
+      "image_property": "certManager.controller",
+      "helmfile_selector": "app=cert-manager",
+      "container_name": "cert-manager-controller",
+      "template_file": "cert-manager/templates/deployment.yaml"
+    },
+    {
+      "image_property": "certManager.webhook",
+      "helmfile_selector": "app=cert-manager",
+      "container_name": "cert-manager-webhook",
+      "template_file": "cert-manager/templates/webhook-deployment.yaml"
+    },
+    {
+      "image_property": "certManager.cainjector",
+      "helmfile_selector": "app=cert-manager",
+      "container_name": "cert-manager-cainjector",
+      "template_file": "cert-manager/templates/cainjector-deployment.yaml"
+    },
+    {
+      "image_property": "certManager.startupapicheck",
+      "helmfile_selector": "app=cert-manager",
+      "container_name": "cert-manager-startupapicheck",
+      "template_file": "cert-manager/templates/startupapicheck-job.yaml"
     }
   ]
 }
