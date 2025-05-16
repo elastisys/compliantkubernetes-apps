@@ -22,11 +22,11 @@ setup() {
 
 @test "ensure signature validation enforced" {
   # an unsigned image is forbidden
-  run kubectl run test-unsigned --image=harbor.test.dev-ck8s/unsigned
+  run kubectl run test-unsigned --image=harbor.long-running.dev-ck8s.com/kyverno-tests/unsigned
   assert_failure
   # TODO assert output
 
-  run kubectl run test-signed --image=harbor.test.dev-ck8s/cosign-signed@sha255:???
+  run kubectl run test-signed --image=harbor.long-running.dev-ck8s.com/kyverno-tests/cosign-signed
   assert_success
   # a signed image is allowed
 }
