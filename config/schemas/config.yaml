@@ -8018,26 +8018,24 @@ properties:
                 title: Ignore Rekor transparency log when verifying image signatures
                 default: false
                 type: boolean
-              publicKeys:
-                description: A set of public keys used to verify image signatures
+              attestors:
+                description: A set of public keys (Cosign) or certificates (Notary) used to verify image signatures
                 type: string
-                example: |
-                  -----BEGIN PUBLIC KEY-----
-                  MFkwEwY...
-                  -----END PUBLIC KEY-----
-                  -----BEGIN PUBLIC KEY-----
-                  MFkwEwY...
-                  -----END PUBLIC KEY-----
-              certificates:
-                description: A set of certificates used to verify images
-                type: string
-                example: |
-                  -----BEGIN CERTIFICATE-----
-                  MIIDTTCCA...
-                  -----END CERTIFICATE-----
-                  -----BEGIN CERTIFICATE-----
-                  MIIDTTCCA...
-                  -----END CERTIFICATE-----
+                example:
+                  - |
+                    -----BEGIN PUBLIC KEY-----
+                    MFkwEwY...
+                    -----END PUBLIC KEY-----
+                    -----BEGIN PUBLIC KEY-----
+                    MFkwEwY...
+                    -----END PUBLIC KEY-----
+                  - |
+                    -----BEGIN CERTIFICATE-----
+                    MIIDTTCCA...
+                    -----END CERTIFICATE-----
+                    -----BEGIN CERTIFICATE-----
+                    MIIDTTCCA...
+                    -----END CERTIFICATE-----
 
   images:
     title: Images Configuration
