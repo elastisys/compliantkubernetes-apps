@@ -1,6 +1,6 @@
 {{- if .Values.verifyImageSignature.enabled -}}
-{{- if and (not .Values.verifyImageSignature.publicKeys) (not .Values.verifyImageSignature.certificates) }}
-{{- fail "publicKeys and certificates can't both be unset" }}
+{{- if not .Values.verifyImageSignature.attestors }}
+{{- fail "attestors must not be unset" }}
 {{- end }}
 apiVersion: v1
 kind: ConfigMap
@@ -8,12 +8,8 @@ metadata:
   name: com.elastisys.policies.verify-image-signature
   namespace: kyverno
 data:
-  {{- with .Values.verifyImageSignature.publicKeys }}
-  publicKeys: |
-    {{- . | nindent 4 }}
-  {{- end }}
-  {{- with .Values.verifyImageSignature.certificates }}
-  certificates: |
+  {{- with .Values.verifyImageSignature.attestors }}
+  attestors: |
     {{- . | nindent 4 }}
   {{- end }}
 ---
@@ -47,14 +43,13 @@ spec:
           imageReferences: ["*"]
           attestors:
             - entries:
-              {{- if .Values.verifyImageSignature.publicKeys }}
+              {{- if eq .Values.verifyImageSignature.type "Cosign" }}
               - keys:
-                  publicKeys: {{`"{{ entries.data.publicKeys }}"`}}
+                  publicKeys: {{`"{{ entries.data.attestors }}"`}}
                   rekor:
                     ignoreTlog: {{ .Values.verifyImageSignature.ignoreRekorTlog }}
-             {{- end }}
-              {{- if .Values.verifyImageSignature.certificates }}
+              {{- else if eq .Values.verifyImageSignature.certificates "Notary" }}
               - certificates:
-                  cert: {{`"{{ entries.data.certificates }}"`}}
-             {{- end }}
+                  cert: {{`"{{ entries.data.attestors }}"`}}
+              {{- end }}
 {{- end }}
