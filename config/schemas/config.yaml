@@ -8080,6 +8080,14 @@ properties:
             $ref: '#/$defs/containerImage'
           startupapicheck:
             $ref: '#/$defs/containerImage'
+      dex:
+        title: dex stack image configuration
+        description: dex stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          image:
+            $ref: '#/$defs/containerImage'
       ingressNginx:
         title: ingress-nginx stack image configuration
         description: ingress-nginx stack image configuration
