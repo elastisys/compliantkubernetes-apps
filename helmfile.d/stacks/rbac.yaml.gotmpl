@@ -27,10 +27,11 @@ templates:
     name: user-rbac
     labels:
       app: dev-rbac
-    {{- if .Values | get "hnc.enabled" false }}
     needs:
+      - kube-system/dev-namespaces
+      {{- if .Values | get "hnc.enabled" false }}
       - hnc-system/hnc-config-and-crds # creates hierarchyconfigurations
-    {{- end }}
+      {{- end }}
     hooks:
       - events: [ presync ]
         showlogs: true
