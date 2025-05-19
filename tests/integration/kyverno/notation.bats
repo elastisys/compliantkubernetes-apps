@@ -11,7 +11,12 @@ setup_file() {
   yq.set wc '.kyverno.enabled' true
   yq.set wc '.kyverno.policies.verifyImageSignature.enabled' true
   yq.set wc '.kyverno.policies.verifyImageSignature.type' '"Notary"'
-  # TODO # yq.set wc '.kyverno.policies.verifyImageSignature.publicKeys' '"-----BEGIN"'
+  yq.set wc '.kyverno.policies.verifyImageSignature.publicKeys' \
+'"-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8nXRh950IZbRj8Ra/N9sbqOPZrfM
+5/KAQN0/KjHcorm/J5yctVd7iEcnessRQjU917hmKO6JWVGHpDguIyakZA==
+-----END PUBLIC KEY-----
+"'
 
   ck8s ops helmfile wc apply --include-transitive-needs --output simple -l app=kyverno
 }
@@ -22,11 +27,11 @@ setup() {
 
 @test "ensure signature validation enforced" {
   # an unsigned image is forbidden
-  run kubectl run test-unsigned --image=harbor.long-running.dev-ck8s.com/kyverno-tests/unsigned
+  run kubectl run test-unsigned --image=docker.io/library/hello-world
   assert_failure
   # TODO assert output
 
-  run kubectl run test-signed --image=harbor.long-running.dev-ck8s.com/kyverno-tests/notary-signed
+  run kubectl run test-signed --image=ghcr.io/kyverno/test-verify-image:signed
   assert_success
   # a signed image is allowed
 }
