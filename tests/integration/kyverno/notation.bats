@@ -27,14 +27,15 @@ setup() {
 }
 
 @test "signed image allowed" {
-  run kubectl run test-signed --image=ghcr.io/kyverno/test-verify-image:signed
+  run kubectl run test-signed --image=ghcr.io/elastisys/test-verify-image:signed
   assert_success
   # a signed image is allowed
 }
 
 @test "an unsigned image can't run" {
   # an unsigned image is forbidden
-  run kubectl run test-unsigned --image=docker.io/library/hello-world
+  # TODO push an unsigned image to ghcr
+  run kubectl run test-unsigned --image=ghcr.io/elastisys/curl-jq:1.0.0 sleep 0
   assert_failure
   # TODO assert output
 }
