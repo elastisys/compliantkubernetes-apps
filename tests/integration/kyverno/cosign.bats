@@ -22,18 +22,21 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8nXRh950IZbRj8Ra/N9sbqOPZrfM
 }
 
 setup() {
+  load "../../bats.lib.bash"
   load_assert
 }
 
-@test "ensure signature validation enforced" {
+@test "signed image allowed" {
+  run kubectl run test-signed --image=ghcr.io/kyverno/test-verify-image:signed
+  assert_success
+  # a signed image is allowed
+}
+
+@test "an unsigned image can't run" {
   # an unsigned image is forbidden
   run kubectl run test-unsigned --image=docker.io/library/hello-world
   assert_failure
   # TODO assert output
-
-  run kubectl run test-signed --image=ghcr.io/kyverno/test-verify-image:signed
-  assert_success
-  # a signed image is allowed
 }
 
 # TODO @test "multiple keys requires multiple signatures" {}
