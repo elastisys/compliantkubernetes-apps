@@ -89,6 +89,36 @@
       "helmfile_selector": "app=falco",
       "container_name": "falcosidekick",
       "template_file": "falco/charts/falcosidekick/templates/deployment.yaml"
+    },
+    {
+      "image_property": "fluentd.aggregator",
+      "helmfile_selector": "app=fluentd",
+      "container_name": "tmp-dir-permissions",
+      "template_file": "fluentd/templates/aggregator-statefulset.yaml"
+    },
+    {
+      "image_property": "fluentd.aggregator",
+      "helmfile_selector": "app=fluentd",
+      "container_name": "fluentd",
+      "template_file": "fluentd/templates/aggregator-statefulset.yaml"
+    },
+    {
+      "image_property": "fluentd.elasticsearch",
+      "helmfile_selector": "app=fluentd",
+      "container_name": "fluentd-forwarder",
+      "template_file": "fluentd-elasticsearch/templates/daemonset.yaml"
+    },
+    {
+      "image_property": "fluentd.logManager",
+      "helmfile_selector": "app=fluentd",
+      "container_name": "compaction",
+      "template_file": "log-manager/templates/cronjob-compaction.yaml"
+    },
+    {
+      "image_property": "fluentd.logManager",
+      "helmfile_selector": "app=fluentd",
+      "container_name": "retention",
+      "template_file": "log-manager/templates/cronjob-retention.yaml"
     }
   ]
 }

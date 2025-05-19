@@ -32,14 +32,27 @@ extraDeploy:
       {{- end }}
 
 
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
+{{- with .Values.images | dig "fluentd" "aggregator" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+{{- if or .registry .repository .image .tag .digest }}
 image:
-  registry: ghcr.io
-  repository: elastisys/fluentd-aggregator
-  tag: v7.1.1-ck8s1
-  ## Specify a imagePullPolicy
-  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
-  ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
   pullPolicy: IfNotPresent
+  {{- with .registry }}
+  registry: {{ . }}
+  {{- end}}
+  {{- with join "/" (compact (list .repository .image)) }}
+  repository: {{ . }}
+  {{- end }}
+  {{- if or .tag .digest }}
+  tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
 
 aggregator:
   replicaCount: 1

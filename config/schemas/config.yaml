@@ -8110,6 +8110,18 @@ properties:
             $ref: '#/$defs/containerImage'
           sidekick:
             $ref: '#/$defs/containerImage'
+      fluentd:
+        title: fluentd stack image configuration
+        description: fluentd stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          aggregator:
+            $ref: '#/$defs/containerImage'
+          elasticsearch:
+            $ref: '#/$defs/containerImage'
+          logManager:
+            $ref: '#/$defs/containerImage'
       ingressNginx:
         title: ingress-nginx stack image configuration
         description: ingress-nginx stack image configuration

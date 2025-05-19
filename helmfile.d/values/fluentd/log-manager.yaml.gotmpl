@@ -77,3 +77,22 @@ retention:
 tolerations: {{- toYaml .Values.fluentd.logManager.tolerations | nindent 2 }}
 nodeSelector: {{- toYaml .Values.fluentd.logManager.nodeSelector | nindent 2 }}
 affinity: {{- toYaml .Values.fluentd.logManager.affinity | nindent 2 }}
+
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
+{{- with .Values.images | dig "fluentd" "logManager" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+{{- if or .registry .repository .image .tag .digest }}
+image:
+  pullPolicy: IfNotPresent
+  {{- with include "gen.reg-rep-img" . }}
+  repository: {{ . }}
+  {{- end }}
+  {{- if or .tag .digest }}
+  tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
