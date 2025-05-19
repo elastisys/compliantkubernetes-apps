@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:5a88148e-3590-4932-9904-5fdbe984993f",
-  "version": 2,
+  "serialNumber": "urn:uuid:f1620fed-7b34-4a76-93ba-6b2bce8089c8",
+  "version": 3,
   "metadata": {
-    "timestamp": "2025-05-09T06:59:13Z",
+    "timestamp": "2025-05-19T07:14:30Z",
     "tools": {
       "components": [
         {
@@ -35,11 +35,11 @@
     ],
     "component": {
       "group": "",
-      "name": "Welkin apps",
-      "version": "5f65bd2d7fb0def633afc13bff46139f9b203f5b",
+      "name": "welkin-apps",
+      "version": "9b7956036f65bf47c38bc7a72951ffa9a49abde3",
       "type": "application",
-      "bom-ref": "pkg:application/Welkin apps@5f65bd2d7fb0def633afc13bff46139f9b203f5b",
-      "purl": "pkg:application/Welkin%20apps@5f65bd2d7fb0def633afc13bff46139f9b203f5b"
+      "bom-ref": "pkg:application/welkin-apps@9b7956036f65bf47c38bc7a72951ffa9a49abde3",
+      "purl": "pkg:application/welkin-apps@9b7956036f65bf47c38bc7a72951ffa9a49abde3"
     },
     "properties": [
       {
@@ -2954,7 +2954,15 @@
             "location": "helmfile.d/charts/rclone"
           }
         ]
-      }
+      },
+      "components": [
+        {
+          "name": "ghcr.io/elastisys/rclone-sync",
+          "version": "1.63.0",
+          "type": "container",
+          "bom-ref": "pkg:oci/ghcr.io/elastisys/rclone-sync:1.63.0"
+        }
+      ]
     },
     {
       "group": "",
@@ -3391,7 +3399,7 @@
   "dependencies": [],
   "compositions": [
     {
-      "bom-ref": "pkg:application/Welkin apps@5f65bd2d7fb0def633afc13bff46139f9b203f5b",
+      "bom-ref": "pkg:application/welkin-apps@9b7956036f65bf47c38bc7a72951ffa9a49abde3",
       "aggregate": "incomplete"
     }
   ],
@@ -3399,7 +3407,7 @@
     {
       "bom-ref": "metadata-annotations",
       "subjects": [
-        "pkg:application/Welkin apps@5f65bd2d7fb0def633afc13bff46139f9b203f5b"
+        "pkg:application/welkin-apps@9b7956036f65bf47c38bc7a72951ffa9a49abde3"
       ],
       "annotator": {
         "component": {
@@ -3417,8 +3425,8 @@
           ]
         }
       },
-      "timestamp": "2025-05-09T06:59:13Z",
-      "text": "This Software Bill-of-Materials (SBOM) document was created on Friday, May 9, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'Welkin apps' with version '5f65bd2d7fb0def633afc13bff46139f9b203f5b'. There are 87 components."
+      "timestamp": "2025-05-19T07:14:30Z",
+      "text": "This Software Bill-of-Materials (SBOM) document was created on Monday, May 19, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'welkin-apps' with version '9b7956036f65bf47c38bc7a72951ffa9a49abde3'. There are 87 components."
     }
   ]
 }
