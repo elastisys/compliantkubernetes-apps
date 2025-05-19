@@ -8096,6 +8096,20 @@ properties:
         properties:
           image:
             $ref: '#/$defs/containerImage'
+      falco:
+        title: falco stack image configuration
+        description: falco stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          image:
+            $ref: '#/$defs/containerImage'
+          driverLoaderInit:
+            $ref: '#/$defs/containerImage'
+          falcoctl:
+            $ref: '#/$defs/containerImage'
+          sidekick:
+            $ref: '#/$defs/containerImage'
       ingressNginx:
         title: ingress-nginx stack image configuration
         description: ingress-nginx stack image configuration

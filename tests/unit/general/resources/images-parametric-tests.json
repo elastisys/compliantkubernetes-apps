@@ -65,6 +65,30 @@
       "helmfile_selector": "app=external-dns",
       "container_name": "external-dns",
       "template_file": "external-dns/templates/deployment.yaml"
+    },
+    {
+      "image_property": "falco.image",
+      "helmfile_selector": "app=falco",
+      "container_name": "falco",
+      "template_file": "falco/templates/daemonset.yaml"
+    },
+    {
+      "image_property": "falco.driverLoaderInit",
+      "helmfile_selector": "app=falco",
+      "container_name": "falco-driver-loader",
+      "template_file": "falco/templates/daemonset.yaml"
+    },
+    {
+      "image_property": "falco.falcoctl",
+      "helmfile_selector": "app=falco",
+      "container_name": "falcoctl-artifact-install",
+      "template_file": "falco/templates/daemonset.yaml"
+    },
+    {
+      "image_property": "falco.sidekick",
+      "helmfile_selector": "app=falco",
+      "container_name": "falcosidekick",
+      "template_file": "falco/charts/falcosidekick/templates/deployment.yaml"
     }
   ]
 }
