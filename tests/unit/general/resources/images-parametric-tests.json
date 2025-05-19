@@ -53,6 +53,12 @@
       "helmfile_selector": "app=cert-manager",
       "container_name": "cert-manager-startupapicheck",
       "template_file": "cert-manager/templates/startupapicheck-job.yaml"
+    },
+    {
+      "image_property": "dex.image",
+      "helmfile_selector": "app=dex",
+      "container_name": "dex",
+      "template_file": "dex/templates/deployment.yaml"
     }
   ]
 }
