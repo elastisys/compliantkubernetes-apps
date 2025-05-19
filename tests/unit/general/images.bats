@@ -16,6 +16,7 @@ setup_file() {
 
   env.init openstack capi dev
   yq.set sc .externalDns.enabled 'true'
+  yq.set sc .fluentd.enabled 'true'
 }
 
 setup() {
