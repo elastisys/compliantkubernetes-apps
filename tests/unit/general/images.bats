@@ -15,6 +15,7 @@ setup_file() {
   env.setup
 
   env.init openstack capi dev
+  yq.set sc .externalDns.enabled 'true'
 }
 
 setup() {
