@@ -236,6 +236,56 @@ _prepare_sbom() {
   done
 }
 
+_get_upstream_license_for_component() {
+  local chart chart_name chart_version sbom_file
+  sbom_file="${1}"
+  chart="${2}"
+
+  chart_name=$(yq ".name" "${chart}")
+  chart_version=$(yq ".version" "${chart}")
+
+  # check if chart.yaml contains license in annotations
+  annotation=$(yq ".annotations.licenses" "${chart}")
+  annotation_artifacthub=$(yq ".annotations.artifacthub.io/license" "${chart}")
+
+  if [[ -n "${annotation}" && "${annotation}" != "null" ]]; then
+    _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "${annotation}")"
+
+  elif [[ -n "${annotation_artifacthub}" && "${annotation_artifacthub}" != "null" ]]; then
+    _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "${annotation_artifacthub}")"
+
+  # if no license in annotations, try to get from source (e.g. github)
+  else
+    mapfile -t sources < <(yq '.sources[]' "${chart}")
+    if [[ "${#sources[@]}" -eq 0 ]] || [[ "${sources[*]}" == "null" ]]; then
+      return
+    else
+      for source in "${sources[@]}"; do
+        if [[ "${source}" != *"github.com"* ]]; then
+          # TODO: currently only supports GitHub source, this is not necessarily guaranteed
+          continue
+        fi
+        repo=${source##*github.com/}
+
+        # API rate limits :grimacing:
+        mapfile -t licenses_in_git < <(curl -L -s \
+          -H "Accept: application/vnd.github+json" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+          "https://api.github.com/repos/${repo}" | jq -r '.license.name')
+
+        if [[ "${licenses_in_git[*]}" == "null" ]]; then
+          continue
+        else
+          for l in "${licenses_in_git[@]}"; do
+            _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "${l}")"
+          done
+        fi
+      done
+    fi
+  fi
+}
+
 _get_licenses() {
   local sbom_file
   if [[ "$#" -ne 1 ]]; then
@@ -253,46 +303,7 @@ _get_licenses() {
   mapfile -t upstream_charts < <(find "${HELMFILE_FOLDER}/upstream" -name "Chart.yaml")
 
   for chart in "${upstream_charts[@]}"; do
-    chart_name=$(yq ".name" "${chart}")
-    chart_version=$(yq ".version" "${chart}")
-
-    # check if chart.yaml contains license in annotations
-    annotation=$(yq ".annotations.licenses" "${chart}")
-    annotation_artifacthub=$(yq ".annotations.artifacthub.io/license" "${chart}")
-
-    if [[ -n "${annotation}" && "${annotation}" != "null" ]]; then
-      _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "${annotation}")"
-
-    elif [[ -n "${annotation_artifacthub}" && "${annotation_artifacthub}" != "null" ]]; then
-      _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "${annotation_artifacthub}")"
-
-    # if no license in annotations, try to get from source (e.g. github)
-    else
-      mapfile -t sources < <(yq '.sources[]' "${chart}")
-      if [[ "${#sources[@]}" -eq 0 ]] || [[ "${sources[*]}" == "null" ]]; then
-        continue
-      else
-        for source in "${sources[@]}"; do
-          # TODO: assumes GitHub source, this is not necessarily guaranteed
-          repo=${source##*github.com/}
-
-          # API rate limits :grimacing:
-          mapfile -t licenses_in_git < <(curl -L -s \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-            "https://api.github.com/repos/${repo}" | jq -r '.license.name')
-
-          if [[ "${licenses_in_git[*]}" == "null" ]]; then
-            continue
-          else
-            for l in "${licenses_in_git[@]}"; do
-              _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "${l}")"
-            done
-          fi
-        done
-      fi
-    fi
+    _get_upstream_license_for_component "${sbom_file}" "${chart}"
   done
 
   # Welkin charts
