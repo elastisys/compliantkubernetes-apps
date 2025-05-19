@@ -269,9 +269,5 @@ _extract_image() {
 
   echo >&2 "container_name=${_container_name} template_file=${_template_file}"
 
-  yq '(
-      (.spec.template.spec.containers // [])
-    + (.spec.template.spec.initContainers // [])
-    + (.spec.jobTemplate.spec.template.spec.containers // [])
-    ) | .[] | select(.name == "'"${_container_name}"'") | .image' <"${_templates_output}/${_template_file}"
+  yq '((.spec.template.spec.containers // []) + (.spec.template.spec.initContainers // [])) | .[] | select(.name == "'"${_container_name}"'") | .image' <"${_templates_output}/${_template_file}"
 }
