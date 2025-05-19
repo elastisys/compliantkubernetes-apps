@@ -11,11 +11,27 @@ setup_file() {
   yq.set wc '.kyverno.enabled' true
   yq.set wc '.kyverno.policies.verifyImageSignature.enabled' true
   yq.set wc '.kyverno.policies.verifyImageSignature.type' '"Notary"'
-  yq.set wc '.kyverno.policies.verifyImageSignature.publicKeys' \
-'"-----BEGIN PUBLIC KEY-----
-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8nXRh950IZbRj8Ra/N9sbqOPZrfM
-5/KAQN0/KjHcorm/J5yctVd7iEcnessRQjU917hmKO6JWVGHpDguIyakZA==
------END PUBLIC KEY-----
+  yq.set wc '.kyverno.policies.verifyImageSignature.certificates' \
+  '"-----BEGIN CERTIFICATE-----
+MIIDOjCCAiKgAwIBAgIBQDANBgkqhkiG9w0BAQsFADBMMQswCQYDVQQGEwJVUzEL
+MAkGA1UECBMCV0ExEDAOBgNVBAcTB1NlYXR0bGUxDzANBgNVBAoTBk5vdGFyeTEN
+MAsGA1UEAxMEdGVzdDAeFw0yNTA1MDIwOTI5MDVaFw0yNTA1MDMwOTI5MDVaMEwx
+CzAJBgNVBAYTAlVTMQswCQYDVQQIEwJXQTEQMA4GA1UEBxMHU2VhdHRsZTEPMA0G
+A1UEChMGTm90YXJ5MQ0wCwYDVQQDEwR0ZXN0MIIBIjANBgkqhkiG9w0BAQEFAAOC
+AQ8AMIIBCgKCAQEA95K6UdAz7c+ItOwRuS9l6JPBmZh75W4eJX+o8FC/hBr2uZjS
+DeqWP1+J/juOJzhvp1iHgVK7bZ+jBXVRl+XsNJz44KQ0noL0PYmLWupVPUZ8Sf80
+ajXaDFl7KEUUPdCa1TL/gjBwj8Yi1SsiIko2m7gzG4/1D7pTF8QBU6zfe64h9Eu6
+9rHn5g/t9DTvWa9AdMrlhrqRGdOurUntyekSo/seZIBIKv3D5oJcXPYBUdIVGpD5
+ZDT/UU34CXj0i8fZORZbxYjyfgzpHUB6DdpI40GM5FfeTChqN1m6tqqhUUPboL8o
+2jMxGqNrOtSfnRxZA3hlg1amffzzfF1UTTlMkQIDAQABoycwJTAOBgNVHQ8BAf8E
+BAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwDQYJKoZIhvcNAQELBQADggEBAHyL
+CUskewnyfOlcNjDScQuIY5H+nAat+LiQ/XivOIl+yZ+YjUtAQWp1avF5K2Dup0ZT
+UUAxaSBTLHx1xjlT90/4KmHC4K0s8BEmx0mvmCwBiPW+1Bn8BZOl1hx7H3q+EirE
+JHINlZrJw0nNsYdBAJSY5oJMz6IXBTx1ZF1GuVe9G+V0osMP/sGP+dKTEE7VIKdO
+9DsHqUpsMWDN40blZe1r7eROs3V1k8QE8T+3aMyGmB6X+qQuQY8QdRS0S+HFZnRh
+5VV0rToEZqmSHYrvUpIDKbgXzwA+6snF+5lM0HqKJJwh0oMj6cVIXtBDNypAl0PK
+/3Kfd6ZM3scDbITvimU=
+-----END CERTIFICATE-----
 "'
 
   ck8s ops helmfile wc apply --include-transitive-needs --output simple -l app=kyverno
