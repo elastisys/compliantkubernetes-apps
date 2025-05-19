@@ -25,7 +25,7 @@ usage() {
   echo "COMMANDS:" >&2
   echo "  add <component-name> <component-version> <key> <value>  add key-value pair to a component" >&2
   echo "  edit <component-name> <component-version> <key>         edit object under key for a component using $EDITOR" >&2
-  echo "  generate                                                generate new cyclonedx sbom. GITHUB_TOKEN can be set to avoid GitHub rate limits" >&2
+  echo "  generate                                                generate new cyclonedx sbom. Requires GITHUB_TOKEN to be set to avoid GitHub rate limits" >&2
   echo "  get <component-name> [component-version] [key]          get component from sbom, optionally query for a provided key" >&2
   echo "  get-charts                                              get all charts in sbom" >&2
   echo "  get-containers                                          get all container images in sbom" >&2
