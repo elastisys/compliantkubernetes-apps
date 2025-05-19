@@ -1,5 +1,50 @@
 import "../../common/cypress/grafana.js"
 
+function loginNavigate(cy, ingress, passwordKey) {
+  cy.session(ingress, () => {
+    cy.visit(`https://${ingress}`)
+
+    cy.contains("Welcome to Grafana")
+      .should("exist")
+
+    cy.yqSecrets(passwordKey)
+      .then(password => {
+        cy.get('input[placeholder*="username"]')
+          .type("admin", { log: false })
+
+        cy.get('input[placeholder*="password"]')
+          .type(password, { log: false })
+
+        cy.get("button")
+          .contains("Log in")
+          .click()
+      })
+
+    cy.contains("Home")
+      .should("exist")
+  })
+
+  cy.visit(`https://${ingress}`)
+
+  cy.contains("Home")
+    .should("exist")
+
+  cy.on('uncaught:exception', (err, runnable) => {
+    if (err.statusText.includes("Request was aborted")) {
+      return false
+    }
+  })
+
+  cy.get('button[aria-label="Open menu"]')
+    .click()
+
+  cy.get('button[aria-label="Expand section Connections"]')
+    .click()
+
+  cy.contains("Data sources")
+    .click()
+}
+
 describe("grafana admin datasources", function() {
   before(function() {
     cy.yq("sc", ".grafana.ops.subdomain + \".\" + .global.opsDomain")
@@ -12,25 +57,7 @@ describe("grafana admin datasources", function() {
   })
 
   beforeEach(function() {
-    cy.grafanaDexStaticLogin(this.ingress)
-
-    cy.contains("Welcome to Grafana")
-      .should("exist")
-
-    cy.on('uncaught:exception', (err, runnable) => {
-      if (err.statusText.includes("Request was aborted")) {
-        return false
-      }
-    })
-
-    cy.get('button[aria-label="Open menu"]')
-      .click()
-
-    cy.get('button[aria-label="Expand section Connections"]')
-      .click()
-
-    cy.contains("Data sources")
-      .click()
+    loginNavigate(cy, this.ingress, ".grafana.password")
   })
 
   after(function() {
@@ -45,6 +72,7 @@ describe("grafana admin datasources", function() {
   it("has thanos all", function() {
     cy.contains("Thanos All")
       .should("exist")
+      .parent()
       .siblings()
       .contains("default")
       .should("exist")
@@ -78,25 +106,7 @@ describe("grafana dev datasources", function() {
   })
 
   beforeEach(function() {
-    cy.grafanaDexStaticLogin(this.ingress)
-
-    cy.contains("Welcome to Welkin")
-      .should("exist")
-
-    cy.on('uncaught:exception', (err, runnable) => {
-      if (err.statusText.includes("Request was aborted")) {
-        return false
-      }
-    })
-
-    cy.get('button[aria-label="Open menu"]')
-      .click()
-
-    cy.get('button[aria-label="Expand section Connections"]')
-      .click()
-
-    cy.contains("Data sources")
-      .click()
+    loginNavigate(cy, this.ingress, ".user.grafanaPassword")
   })
 
   after(function() {
@@ -113,6 +123,7 @@ describe("grafana dev datasources", function() {
       .then(([first_cluster, ...rest_clusters]) => {
         cy.contains(`Workload Cluster${rest_clusters.length === 0 ? "" : " " + first_cluster}`)
           .should("exist")
+          .parent()
           .siblings()
           .contains("default")
           .should("exist")
