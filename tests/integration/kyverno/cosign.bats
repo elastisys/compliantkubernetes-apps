@@ -34,7 +34,8 @@ setup() {
 
 @test "an unsigned image can't run" {
   # an unsigned image is forbidden
-  run kubectl run test-unsigned --image=docker.io/library/hello-world
+  # TODO push an unsigned image to ghcr
+  run kubectl run test-unsigned --image=ghcr.io/elastisys/curl-jq:1.0.0 sleep 0
   assert_failure
   # TODO assert output
 }
