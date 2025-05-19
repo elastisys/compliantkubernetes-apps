@@ -8088,6 +8088,14 @@ properties:
         properties:
           image:
             $ref: '#/$defs/containerImage'
+      externalDns:
+        title: external-dns stack image configuration
+        description: external-dns stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          image:
+            $ref: '#/$defs/containerImage'
       ingressNginx:
         title: ingress-nginx stack image configuration
         description: ingress-nginx stack image configuration

@@ -59,6 +59,12 @@
       "helmfile_selector": "app=dex",
       "container_name": "dex",
       "template_file": "dex/templates/deployment.yaml"
+    },
+    {
+      "image_property": "externalDns.image",
+      "helmfile_selector": "app=external-dns",
+      "container_name": "external-dns",
+      "template_file": "external-dns/templates/deployment.yaml"
     }
   ]
 }

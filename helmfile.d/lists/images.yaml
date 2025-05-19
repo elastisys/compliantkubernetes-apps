@@ -9,6 +9,8 @@ images:
     startupapicheck: quay.io/jetstack/cert-manager-startupapicheck:v1.17.1
   dex:
     image: ghcr.io/dexidp/dex:v2.40.0
+  externalDns:
+    image: registry.k8s.io/external-dns/external-dns:v0.14.2
   ingressNginx:
     controller: registry.k8s.io/ingress-nginx/controller:v1.12.1@sha256:d2fbc4ec70d8aa2050dd91a91506e998765e86c96f32cffb56c503c9c34eed5b
     controllerChroot: registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e
