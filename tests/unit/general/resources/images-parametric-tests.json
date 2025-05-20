@@ -119,6 +119,30 @@
       "helmfile_selector": "app=fluentd",
       "container_name": "retention",
       "template_file": "log-manager/templates/cronjob-retention.yaml"
+    },
+    {
+      "image_property": "gatekeeper.image",
+      "helmfile_selector": "app=gatekeeper",
+      "container_name": "manager",
+      "template_file": "gatekeeper/templates/gatekeeper-audit-deployment.yaml"
+    },
+    {
+      "image_property": "gatekeeper.preInstallCRDs",
+      "helmfile_selector": "app=gatekeeper",
+      "container_name": "crds-upgrade",
+      "template_file": "gatekeeper/templates/upgrade-crds-hook.yaml"
+    },
+    {
+      "image_property": "gatekeeper.postInstallLabelNamespace",
+      "helmfile_selector": "app=gatekeeper",
+      "container_name": "kubectl-label",
+      "template_file": "gatekeeper/templates/namespace-post-install.yaml"
+    },
+    {
+      "image_property": "gatekeeper.kubectl",
+      "helmfile_selector": "app=gatekeeper",
+      "container_name": "wait",
+      "template_file": "gatekeeper-templates/templates/wait/job.yaml"
     }
   ]
 }

@@ -1,6 +1,18 @@
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
+{{- with .Values.images | dig "gatekeeper" "kubectl" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+{{- if or .registry .repository .image .tag .digest }}
 image:
-  repository: ghcr.io/elastisys/bitnami/kubectl
-  tag: 1.29.11
+  repository: {{ include "gen.reg-rep-img" . | default "" }}
+  {{- if or .tag .digest }}
+  tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
 
 waitFor:
   - k8sallowedrepos
