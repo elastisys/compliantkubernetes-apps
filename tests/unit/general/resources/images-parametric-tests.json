@@ -143,6 +143,18 @@
       "helmfile_selector": "app=gatekeeper",
       "container_name": "wait",
       "template_file": "gatekeeper-templates/templates/wait/job.yaml"
+    },
+    {
+      "image_property": "gpuOperator.nfd",
+      "helmfile_selector": "app=gpu-operator",
+      "container_name": "worker",
+      "template_file": "gpu-operator/charts/node-feature-discovery/templates/worker.yaml"
+    },
+    {
+      "image_property": "gpuOperator.operator",
+      "helmfile_selector": "app=gpu-operator",
+      "container_name": "gpu-operator",
+      "template_file": "gpu-operator/templates/operator.yaml"
     }
   ]
 }

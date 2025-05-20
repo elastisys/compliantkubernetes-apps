@@ -1,3 +1,7 @@
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
 gpu:
   enabled: {{ .Values.gpu.enabled }}
 
@@ -9,7 +13,36 @@ operator:
   # Handle CRD ourselves in accordance with ADR-0046
   upgradeCRD: false
 
+{{- with .Values.images | dig "gpuOperator" "operator" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+{{- if or .registry .repository .image .tag .digest }}
+  {{- if or .registry .repository }}
+  repository: {{ join "/" (compact (list .registry .repository)) }}
+  {{- end }}
+  {{- with .image }}
+  image: {{ . }}
+  {{- end }}
+  {{- if or .tag .digest }}
+  version: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
 node-feature-discovery:
+  {{- with .Values.images | dig "gpuOperator" "nfd" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  {{- if or .registry .repository .image .tag .digest }}
+  image:
+    {{- with include "gen.reg-rep-img" . }}
+    repository: {{ . }}
+    {{- end }}
+    {{- if or .tag .digest }}
+    tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+    {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
   worker:
     resources: {{- toYaml .Values.gpu.nodeFeatureDiscovery.worker.resources | nindent 6 }}
     tolerations: {{- toYaml .Values.gpu.nodeFeatureDiscovery.worker.tolerations | nindent 6 }}
