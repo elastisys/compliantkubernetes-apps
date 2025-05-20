@@ -648,3 +648,22 @@ with_s3cfg() {
   #       bucket needs to be created.
   sops_exec_file_no_fifo "${s3cfg}" 'S3COMMAND_CONFIG_FILE="{}" '"${*}"
 }
+
+check_node_label() {
+  local cluster="${1}"
+  local label="${2}"
+
+  local -a nodes_missing_node_group_label
+
+  readarray -t nodes_missing_node_group_label <<<"$(with_kubeconfig "${config["kube_config_${cluster}"]}" kubectl get node -o name | cut --delimiter / --fields 2-)"
+
+  if [ "${#nodes_missing_node_group_label[@]}" -ne 0 ]; then
+    log_warning "---"
+    log_warning "Found nodes that are missing the label '${label}':"
+    printf '%s\n' "${nodes_missing_node_group_label[@]}"
+
+    if ! "${CK8S_AUTO_APPROVE}"; then
+      ask_abort
+    fi
+  fi
+}

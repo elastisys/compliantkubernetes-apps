@@ -71,6 +71,7 @@ wc)
   ;;
 esac
 
+check_node_label "$1" elastisys.io/node-group
 update_ips_dryrun "$1" "${environment}"
 config_load "$1"
 apps_apply "$1" "${environment}" "${@:2}"
