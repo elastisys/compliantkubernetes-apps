@@ -277,8 +277,8 @@ _get_upstream_license_for_component() {
         if [[ "${licenses_in_git[*]}" == "null" ]]; then
           continue
         else
-          for l in "${licenses_in_git[@]}"; do
-            _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "${l}")"
+          for license in "${licenses_in_git[@]}"; do
+            _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "${license}")"
           done
         fi
       done
@@ -379,6 +379,9 @@ _add_container_images_from_template() {
   fi
 
   for container in "${containers[@]}"; do
+    if [[ "${container}" == "null" ]]; then
+      container="set-me"
+    fi
     _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "components" "$(_format_container_component_object "${container}")"
   done
 }
