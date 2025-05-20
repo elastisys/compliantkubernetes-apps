@@ -542,12 +542,28 @@ sbom_edit() {
   log_info "Updated ${key} for ${component_name}"
 }
 
-sbom_update_containers() {
-  local tmp_sbom_file query
-  tmp_sbom_file=$(mktemp --suffix=-update-containers-sbom.json)
-  append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
+sbom_update_licenses() {
+  local sbom_file query
+  sbom_file="${1}"
+  shift
 
-  cdxgen --filter '.*' -t helm "${HELMFILE_FOLDER}" --output "${tmp_sbom_file}"
+  if [[ "$#" -gt 0 ]]; then
+    log_fatal "Update license per-component not implemented"
+  else
+    log_info "Updating all licenses in SBOM"
+    CK8S_AUTO_APPROVE=true CK8S_SKIP_VALIDATION=true _get_licenses "${sbom_file}"
+  fi
+
+  # TODO: need a better merge query
+  query=". *? load(\"${sbom_file}\")"
+  _yq_run_query "${SBOM_FILE}" "${query}"
+  yq -o json -i '.version += 1' "${SBOM_FILE}"
+}
+
+sbom_update_containers() {
+  local sbom_file query
+  sbom_file="${1}"
+  shift
 
   if [[ "$#" -gt 0 ]]; then
     chart_name="${1}"
@@ -577,13 +593,44 @@ sbom_update_containers() {
   yq -o json -i '.version += 1' "${SBOM_FILE}"
 }
 
+_test_github_token() {
+  log_info "Testing GITHUB_TOKEN"
+  : "${GITHUB_TOKEN:?Missing GITHUB_TOKEN}"
+
+  # test GITHUB token
+  curl --silent --fail --show-error --output /dev/null \
+    -H "Accept: application/vnd.github+json" \
+    -H "X-GitHub-Api-Version: 2022-11-28" \
+    -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+    "https://api.github.com/repos/elastisys/compliantkubernetes-apps"
+}
+
+sbom_update() {
+  local tmp_sbom_file
+  tmp_sbom_file=$(mktemp --suffix=-update-containers-sbom.json)
+  append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
+
+  cdxgen --filter '.*' -t helm "${HELMFILE_FOLDER}" --output "${tmp_sbom_file}"
+  case "${1}" in
+  licenses)
+    shift
+    _test_github_token
+    sbom_update_licenses "${tmp_sbom_file}" "${@}"
+  ;;
+  containers)
+    shift
+    sbom_update_containers "${tmp_sbom_file}" "${@}"
+  ;;
+  *) usage ;;
+  esac
+}
+
 sbom_generate() {
   local tmp_sbom_file
   tmp_sbom_file=$(mktemp --suffix=-generate-sbom.json)
   append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
 
-  # TODO: figure out a different approach for retrieving licenses, or handle GITHUB_TOKEN better
-  : "${GITHUB_TOKEN:?Missing GITHUB_TOKEN}"
+  _test_github_token
 
   config_load "sc"
   config_load "wc"
@@ -653,9 +700,9 @@ remove)
   shift
   sbom_remove "${@}"
   ;;
-update-containers)
+update)
   shift
-  sbom_update_containers "${@}"
+  sbom_update "${@}"
   ;;
 validate)
   sbom_cyclonedx_validation "${SBOM_FILE}"
