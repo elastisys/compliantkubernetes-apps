@@ -1,9 +1,14 @@
 gpu:
   enabled: {{ .Values.gpu.enabled }}
+
 operator:
   resources: {{- toYaml .Values.gpu.operator.resources | nindent 4 }}
   tolerations: {{- toYaml .Values.gpu.operator.tolerations | nindent 4 }}
   affinity: {{- toYaml .Values.gpu.operator.affinity | nindent 4 }}
+
+  # Handle CRD ourselves in accordance with ADR-0046
+  upgradeCRD: false
+
 node-feature-discovery:
   worker:
     resources: {{- toYaml .Values.gpu.nodeFeatureDiscovery.worker.resources | nindent 6 }}
@@ -165,10 +170,6 @@ dcgmExporter:
       DCGM_FI_PROF_GR_ENGINE_ACTIVE, gauge, uuh
   {{- end }}
 
-
-# Handle CRD ourselves in accordance with ADR-0046
-operator:
-  upgradeCRD: false
 driver:
   version: {{ .Values.gpu.driver.version }}
   env: {{- toYaml .Values.gpu.driver.env | nindent 4 }}
