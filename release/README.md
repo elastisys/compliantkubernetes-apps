@@ -123,7 +123,7 @@ Mark the staging pull request ready for review.
 Update the SBOM, ensure it gets validated and carefully look at the diff and address any manual overrides needed:
 
 ```sh
-./bin/ck8s sbom generate
+./bin/ck8s sbom generate vX.Y.Z
 ./bin/ck8s sbom get-unset   # update any components listed
 ```
 
