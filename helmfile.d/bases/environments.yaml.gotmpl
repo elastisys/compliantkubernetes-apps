@@ -11,6 +11,7 @@ environments:
       - ck8sWorkloadCluster: { enabled: false }
       - ck8sLocalCluster: { enabled: false }
       - ck8sAnyCluster: { enabled: false }
+      - lists/images.yaml
 
   {{- else }}
   local_cluster:
@@ -19,6 +20,7 @@ environments:
       - ck8sWorkloadCluster: { enabled: false }
       - ck8sLocalCluster: { enabled: true }
       - ck8sAnyCluster: { enabled: false }
+      - lists/images.yaml
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/sc-config.yaml
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml
@@ -32,6 +34,7 @@ environments:
       - ck8sWorkloadCluster: { enabled: false }
       - ck8sLocalCluster: { enabled: false }
       - ck8sAnyCluster: { enabled: true }
+      - lists/images.yaml
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/sc-config.yaml
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml
@@ -45,6 +48,7 @@ environments:
       - ck8sWorkloadCluster: { enabled: true }
       - ck8sLocalCluster: { enabled: false }
       - ck8sAnyCluster: { enabled: true }
+      - lists/images.yaml
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/wc-config.yaml
       - {{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml
