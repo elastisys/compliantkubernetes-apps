@@ -21,8 +21,16 @@ HELMFILE_FOLDER="${ROOT}/helmfile.d"
 SBOM_FILE="${ROOT}/docs/sbom.json"
 SBOM_TEMPLATE_FILE="${ROOT}/docs/sbom.template.json"
 
+# TODO: setting config path here to be able to source common.bash
+tmp_config_path=$(mktemp -d --suffix -config-path)
+export CK8S_CONFIG_PATH="${tmp_config_path}"
+
 # shellcheck source=bin/common.bash
 source "${ROOT}/bin/common.bash"
+# TODO: sources test scripts to set up new Welkin config, this could be generalized to not rely on test path
+source "${ROOT}/tests/common/bats/env.bash"
+source "${ROOT}/tests/common/bats/yq.bash"
+append_trap "rm -rf ${tmp_config_path} >/dev/null 2>&1" EXIT
 
 usage() {
   echo "COMMANDS:" >&2
@@ -37,6 +45,13 @@ usage() {
   echo "  update-containers [component-name] [component-version]  update all container images in sbom"
   echo "  validate                                                validate SBOM using cyclonedx-cli" >&2
   exit 1
+}
+
+# TODO: currently requires CK8S_PGP_FP to be set, look into creating temp key similar to bats tests?
+init_welkin_config() {
+  export PATH="${ROOT}/bin:${PATH}"
+  env.setup
+  env.init "${@}"
 }
 
 sbom_cyclonedx_validation() {
@@ -199,6 +214,9 @@ _prepare_sbom() {
   if [[ "$#" -lt 1 ]] || [[ "$#" -gt 2 ]]; then
     log_fatal "usage: _prepare_sbom <sbom-file> [version]"
   fi
+
+  # TODO: hardcoded provider and installer for now, look into running for all combinations (either merge or create unique SBOMs for each?)
+  init_welkin_config baremetal kubespray prod
 
   sbom_file="${1}"
   if [[ ! -f "${sbom_file}" ]]; then
@@ -638,9 +656,6 @@ sbom_generate() {
   append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
 
   _test_github_token
-
-  config_load "sc"
-  config_load "wc"
 
   export CK8S_AUTO_APPROVE=true
   export CK8S_SKIP_VALIDATION=true
