@@ -16,13 +16,13 @@
 set -euo pipefail
 
 HERE="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
-ROOT="$(dirname "${HERE}")"
+ROOT="$(dirname "$(dirname "${HERE}")")"
 HELMFILE_FOLDER="${ROOT}/helmfile.d"
 SBOM_FILE="${ROOT}/docs/sbom.json"
 SBOM_TEMPLATE_FILE="${ROOT}/docs/sbom.template.json"
 
 # shellcheck source=bin/common.bash
-source "${HERE}/common.bash"
+source "${ROOT}/bin/common.bash"
 
 usage() {
   echo "COMMANDS:" >&2
@@ -705,6 +705,10 @@ sbom_diff() {
     log_info "No chart changes found"
   fi
 }
+
+if [[ "$#" -lt 1 ]]; then
+  usage
+fi
 
 case "${1}" in
 add)
