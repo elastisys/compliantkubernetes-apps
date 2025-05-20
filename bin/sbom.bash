@@ -10,6 +10,9 @@
 #   - maybe, instead of using an existing environment, generate could create a new CK8S_CONFIG_PATH
 #     - problem with this is, that currently, Helmfile template requires a KUBECONFIG
 # - include licenses for images?
+# - fragments
+#   - look at e.g. if git diff for a chart (location), should prompt to verify that evaluation and supplier is still correct
+#   - possibility to update one fragment/chart-location
 set -euo pipefail
 
 HERE="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
@@ -667,10 +670,44 @@ sbom_generate() {
   log_info "Skipped replacing SBOM"
 }
 
+sbom_diff() {
+  local found_diff
+  mapfile -t diff_files < <(git diff --name-only | grep "helmfile.d/")
+  mapfile -t all_charts < <(sbom_get_charts "${SBOM_FILE}")
+
+  for chart in "${all_charts[@]}"; do
+    found_diff=false
+    chart_name=$(yq '.name' <<<"${chart}")
+    chart_version=$(yq '.version' <<<"${chart}")
+    location=$(yq '.location' <<<"${chart}")
+    for diff_file in "${diff_files[@]}"; do
+      if [[ "${diff_file}" == *${location}* ]]; then
+        found_diff=true
+        continue
+      fi
+    done
+    if [[ "${found_diff}" == true ]]; then
+      log_warning "Changes found in ${location}"
+      log_warning "Verify that the Elastisys evaluation is still valid"
+      sbom_get "${chart_name}" "${chart_version}" "properties"
+      log_warning "Verify that the Supplier is up to date"
+      sbom_get "${chart_name}" "${chart_version}" "supplier"
+    fi
+  done
+
+  if [[ "${found_diff}" == false ]]; then
+    log_info "No chart changes found"
+  fi
+}
+
 case "${1}" in
 add)
   shift
   sbom_add "${@}"
+  ;;
+diff)
+  shift
+  sbom_diff "${@}"
   ;;
 edit)
   shift
