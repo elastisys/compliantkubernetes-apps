@@ -8122,6 +8122,20 @@ properties:
             $ref: '#/$defs/containerImage'
           logManager:
             $ref: '#/$defs/containerImage'
+      gatekeeper:
+        title: gatekeeper stack image configuration
+        description: gatekeeper stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          image:
+            $ref: '#/$defs/containerImage'
+          preInstallCRDs:
+            $ref: '#/$defs/containerImage'
+          postInstallLabelNamespace:
+            $ref: '#/$defs/containerImage'
+          kubectl:
+            $ref: '#/$defs/containerImage'
       ingressNginx:
         title: ingress-nginx stack image configuration
         description: ingress-nginx stack image configuration
