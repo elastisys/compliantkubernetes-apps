@@ -18,6 +18,7 @@ setup_file() {
   yq.set sc .externalDns.enabled 'true'
   yq.set sc .fluentd.enabled 'true'
   yq.set sc .gpu.enabled 'true'
+  yq.set sc .harbor.backup.enabled 'true'
 }
 
 setup() {

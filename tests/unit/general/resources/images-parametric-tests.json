@@ -155,6 +155,66 @@
       "helmfile_selector": "app=gpu-operator",
       "container_name": "gpu-operator",
       "template_file": "gpu-operator/templates/operator.yaml"
+    },
+    {
+      "image_property": "harbor.core",
+      "helmfile_selector": "app=harbor",
+      "container_name": "core",
+      "template_file": "harbor/templates/core/core-dpl.yaml"
+    },
+    {
+      "image_property": "harbor.exporter",
+      "helmfile_selector": "app=harbor",
+      "container_name": "exporter",
+      "template_file": "harbor/templates/exporter/exporter-dpl.yaml"
+    },
+    {
+      "image_property": "harbor.jobservice",
+      "helmfile_selector": "app=harbor",
+      "container_name": "jobservice",
+      "template_file": "harbor/templates/jobservice/jobservice-dpl.yaml"
+    },
+    {
+      "image_property": "harbor.registry",
+      "helmfile_selector": "app=harbor",
+      "container_name": "registry",
+      "template_file": "harbor/templates/registry/registry-dpl.yaml"
+    },
+    {
+      "image_property": "harbor.registryController",
+      "helmfile_selector": "app=harbor",
+      "container_name": "registryctl",
+      "template_file": "harbor/templates/registry/registry-dpl.yaml"
+    },
+    {
+      "image_property": "harbor.database",
+      "helmfile_selector": "app=harbor",
+      "container_name": "database",
+      "template_file": "harbor/templates/database/database-ss.yaml"
+    },
+    {
+      "image_property": "harbor.redis",
+      "helmfile_selector": "app=harbor",
+      "container_name": "redis",
+      "template_file": "harbor/templates/redis/statefulset.yaml"
+    },
+    {
+      "image_property": "harbor.trivyAdapter",
+      "helmfile_selector": "app=harbor",
+      "container_name": "trivy",
+      "template_file": "harbor/templates/trivy/trivy-sts.yaml"
+    },
+    {
+      "image_property": "harbor.initJob",
+      "helmfile_selector": "app=harbor",
+      "container_name": "run",
+      "template_file": "init-harbor/templates/init-harbor-job.yaml"
+    },
+    {
+      "image_property": "harbor.backupJob",
+      "helmfile_selector": "app=harbor",
+      "container_name": "run",
+      "template_file": "harbor-backup/templates/harbor-backup-job.yaml"
     }
   ]
 }

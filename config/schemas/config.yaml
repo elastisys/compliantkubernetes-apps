@@ -8146,6 +8146,34 @@ properties:
             $ref: '#/$defs/containerImage'
           nfd:
             $ref: '#/$defs/containerImage'
+      harbor:
+        title: harbor stack image configuration
+        description: harbor stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          core:
+            $ref: '#/$defs/containerImage'
+          exporter:
+            $ref: '#/$defs/containerImage'
+          jobservice:
+            $ref: '#/$defs/containerImage'
+          portal:
+            $ref: '#/$defs/containerImage'
+          registry:
+            $ref: '#/$defs/containerImage'
+          registryController:
+            $ref: '#/$defs/containerImage'
+          database:
+            $ref: '#/$defs/containerImage'
+          redis:
+            $ref: '#/$defs/containerImage'
+          trivyAdapter:
+            $ref: '#/$defs/containerImage'
+          initJob:
+            $ref: '#/$defs/containerImage'
+          backupJob:
+            $ref: '#/$defs/containerImage'
       ingressNginx:
         title: ingress-nginx stack image configuration
         description: ingress-nginx stack image configuration
