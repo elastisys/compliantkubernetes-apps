@@ -195,9 +195,9 @@ _format_container_component_object() {
 }
 
 _prepare_sbom() {
-  local sbom_file
-  if [[ "$#" -ne 1 ]]; then
-    log_fatal "usage: _prepare_sbom <sbom-file>"
+  local project_version sbom_file
+  if [[ "$#" -lt 1 ]] || [[ "$#" -gt 2 ]]; then
+    log_fatal "usage: _prepare_sbom <sbom-file> [version]"
   fi
 
   sbom_file="${1}"
@@ -206,9 +206,13 @@ _prepare_sbom() {
   fi
   log_info "Preparing SBOM"
 
-  project_version="$(git name-rev --tags --name-only "$(git rev-parse HEAD)")"
-  if [[ "${project_version}" == "undefined" ]]; then
-    project_version="$(git rev-parse HEAD)"
+  if [[ "$#" -gt 1 ]]; then
+    project_version="${2}"
+  else
+    project_version="$(git name-rev --tags --name-only "$(git rev-parse HEAD)")"
+    if [[ "${project_version}" == "undefined" ]]; then
+      project_version="$(git rev-parse HEAD)"
+    fi
   fi
 
   cdxgen --project-name "welkin-apps" --project-version "${project_version}" --filter '.*' -t helm "${HELMFILE_FOLDER}" --output "${sbom_file}"
@@ -646,7 +650,7 @@ sbom_generate() {
     touch "${SBOM_FILE}"
   fi
 
-  _prepare_sbom "${tmp_sbom_file}"
+  _prepare_sbom "${tmp_sbom_file}" "${@}"
 
   _get_licenses "${tmp_sbom_file}"
 
@@ -680,12 +684,14 @@ sbom_diff() {
     chart_name=$(yq '.name' <<<"${chart}")
     chart_version=$(yq '.version' <<<"${chart}")
     location=$(yq '.location' <<<"${chart}")
+
     for diff_file in "${diff_files[@]}"; do
       if [[ "${diff_file}" == *${location}* ]]; then
         found_diff=true
         continue
       fi
     done
+
     if [[ "${found_diff}" == true ]]; then
       log_warning "Changes found in ${location}"
       log_warning "Verify that the Elastisys evaluation is still valid"
