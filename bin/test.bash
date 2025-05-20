@@ -152,6 +152,8 @@ function main() {
     main_help 0
   fi
 
+  check_node_label "$1" elastisys.io/node-group
+
   case ${1} in
   sc)
     config_load "$1"
