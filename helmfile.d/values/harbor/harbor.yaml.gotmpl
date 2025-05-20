@@ -111,6 +111,11 @@ harborAdminPassword: {{ .Values.harbor.password }}
 clair:
   enabled: false
 
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
+
 core:
   replicas: {{ .Values.harbor.core.replicas }}
   secret: {{ .Values.harbor.coreSecret }}
@@ -123,6 +128,19 @@ core:
   nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
   affinity:     {{- toYaml .Values.harbor.core.affinity | nindent 4 }}
   tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
+  {{- with .Values.images | dig "harbor" "core" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  {{- if or .registry .repository .image .tag .digest }}
+  image:
+    {{- with include "gen.reg-rep-img" . }}
+    repository: {{ . }}
+    {{- end }}
+    {{- if or .tag .digest }}
+    tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+    {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
 
 jobservice:
   replicas:     {{ .Values.harbor.jobservice.replicas }}
@@ -132,14 +150,55 @@ jobservice:
   affinity:     {{- toYaml .Values.harbor.jobservice.affinity | nindent 4 }}
   tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
   jobLoggers:   {{- toYaml .Values.harbor.jobservice.jobLoggers | nindent 4 }}
+  {{- with .Values.images | dig "harbor" "jobservice" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  {{- if or .registry .repository .image .tag .digest }}
+  image:
+    {{- with include "gen.reg-rep-img" . }}
+    repository: {{ . }}
+    {{- end }}
+    {{- if or .tag .digest }}
+    tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+    {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
 
 registry:
   replicas: {{ .Values.harbor.registry.replicas }}
   secret:   {{ .Values.harbor.registrySecret }}
   registry:
     resources:  {{- toYaml .Values.harbor.registry.resources | nindent 6 }}
+    {{- with .Values.images | dig "harbor" "registry" "" }}
+    {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+    {{- if or .registry .repository .image .tag .digest }}
+    image:
+      {{- with include "gen.reg-rep-img" . }}
+      repository: {{ . }}
+      {{- end }}
+      {{- if or .tag .digest }}
+      tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+      {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+
   controller:
     resources:  {{- toYaml .Values.harbor.registry.controller.resources | nindent 6 }}
+    {{- with .Values.images | dig "harbor" "registryController" "" }}
+    {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+    {{- if or .registry .repository .image .tag .digest }}
+    image:
+      {{- with include "gen.reg-rep-img" . }}
+      repository: {{ . }}
+      {{- end }}
+      {{- if or .tag .digest }}
+      tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+      {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+
   nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
   affinity:     {{- toYaml .Values.harbor.registry.affinity | nindent 4 }}
   tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
@@ -156,6 +215,20 @@ database:
     nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 6 }}
     affinity:     {{- toYaml .Values.harbor.database.internal.affinity | nindent 6 }}
     tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 6 }}
+    {{- with .Values.images | dig "harbor" "database" "" }}
+    {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+    {{- if or .registry .repository .image .tag .digest }}
+    image:
+      {{- with include "gen.reg-rep-img" . }}
+      repository: {{ . }}
+      {{- end }}
+      {{- if or .tag .digest }}
+      tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+      {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+
   {{- else if eq .Values.harbor.database.type "external" }}
   external:
     host:                 {{ .Values.harbor.database.external.host }}
@@ -172,6 +245,20 @@ trivy:
   nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
   affinity:     {{- toYaml .Values.harbor.trivy.affinity | nindent 4 }}
   tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
+  {{- with .Values.images | dig "harbor" "trivyAdapter" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  {{- if or .registry .repository .image .tag .digest }}
+  image:
+    {{- with include "gen.reg-rep-img" . }}
+    repository: {{ . }}
+    {{- end }}
+    {{- if or .tag .digest }}
+    tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+    {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
+
 
 portal:
   replicas:     {{ .Values.harbor.portal.replicas }}
@@ -179,6 +266,19 @@ portal:
   nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 4 }}
   affinity:     {{- toYaml .Values.harbor.portal.affinity | nindent 4 }}
   tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
+  {{- with .Values.images | dig "harbor" "portal" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  {{- if or .registry .repository .image .tag .digest }}
+  image:
+    {{- with include "gen.reg-rep-img" . }}
+    repository: {{ . }}
+    {{- end }}
+    {{- if or .tag .digest }}
+    tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+    {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
 
 redis:
   type: {{ .Values.harbor.redis.type }}
@@ -188,6 +288,19 @@ redis:
     nodeSelector: {{- toYaml .Values.harbor.nodeSelector | nindent 6 }}
     affinity:     {{- toYaml .Values.harbor.redis.internal.affinity | nindent 6 }}
     tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 6 }}
+    {{- with .Values.images | dig "harbor" "redis" "" }}
+    {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+    {{- if or .registry .repository .image .tag .digest }}
+    image:
+      {{- with include "gen.reg-rep-img" . }}
+      repository: {{ . }}
+      {{- end }}
+      {{- if or .tag .digest }}
+      tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+      {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
   {{- end }}
   {{- if and (eq .Values.harbor.redis.type "external") (.Values.harbor.redis.external) }}
   external:
@@ -196,6 +309,19 @@ redis:
 
 exporter:
   resources: {{- toYaml .Values.harbor.exporter.resources | nindent 4 }}
+  {{- with .Values.images | dig "harbor" "exporter" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  {{- if or .registry .repository .image .tag .digest }}
+  image:
+    {{- with include "gen.reg-rep-img" . }}
+    repository: {{ . }}
+    {{- end }}
+    {{- if or .tag .digest }}
+    tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+    {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
 
 updateStrategy:
   type: Recreate

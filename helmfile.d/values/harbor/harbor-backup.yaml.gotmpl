@@ -35,3 +35,21 @@ azure:
 ephemeralBackupStore:
   enabled: {{ .Values.harbor.backup.ephemeralBackupStore.enabled }}
   storageSize: {{ .Values.harbor.backup.ephemeralBackupStore.storageSize }}
+
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
+{{- with .Values.images | dig "harbor" "backupJob" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+{{- if or .registry .repository .image .tag .digest }}
+image:
+  {{- with include "gen.reg-rep-img" . }}
+  repository: {{ . }}
+  {{- end }}
+  {{- if or .tag .digest }}
+  tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
