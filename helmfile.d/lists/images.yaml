@@ -25,6 +25,9 @@ images:
     preInstallCRDs: docker.io/openpolicyagent/gatekeeper-crds:v3.18.2
     postInstallLabelNamespace: docker.io/openpolicyagent/gatekeeper-crds:v3.18.2
     kubectl: docker.io/bitnami/kubectl:1.25
+  gpuOperator:
+    operator: nvcr.io/nvidia/gpu-operator:v24.9.2
+    nfd: registry.k8s.io/nfd/node-feature-discovery:v0.16.6
   ingressNginx:
     controller: registry.k8s.io/ingress-nginx/controller:v1.12.1@sha256:d2fbc4ec70d8aa2050dd91a91506e998765e86c96f32cffb56c503c9c34eed5b
     controllerChroot: registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e

@@ -8136,6 +8136,16 @@ properties:
             $ref: '#/$defs/containerImage'
           kubectl:
             $ref: '#/$defs/containerImage'
+      gpuOperator:
+        title: gpu-operator stack image configuration
+        description: gpu-operator stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          operator:
+            $ref: '#/$defs/containerImage'
+          nfd:
+            $ref: '#/$defs/containerImage'
       ingressNginx:
         title: ingress-nginx stack image configuration
         description: ingress-nginx stack image configuration
