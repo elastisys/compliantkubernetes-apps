@@ -8256,6 +8256,18 @@ properties:
         properties:
           image:
             $ref: '#/$defs/containerImage'
+      tekton:
+        title: tekton stack image configuration
+        description: tekton stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          controller:
+            $ref: '#/$defs/containerImage'
+          remoteResolvers:
+            $ref: '#/$defs/containerImage'
+          webhook:
+            $ref: '#/$defs/containerImage'
 additionalProperties:
   title: Additional Properties
   description: Configure additional properties not covered by the schema.
