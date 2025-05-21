@@ -15,10 +15,12 @@ setup_file() {
   env.setup
 
   env.init openstack capi dev
+
   yq.set sc .externalDns.enabled 'true'
   yq.set sc .fluentd.enabled 'true'
   yq.set sc .gpu.enabled 'true'
   yq.set sc .harbor.backup.enabled 'true'
+  yq.set wc .hnc.enabled 'true'
 }
 
 setup() {
@@ -238,17 +240,22 @@ should_not_set_the_image_field_if_only_sha_is_specified() {
 _set_container_uris() {
   for _image_property in "${_image_properties[@]}"; do
     yq.set sc ".images.${_image_property}" "\"${1}\""
+    yq.set wc ".images.${_image_property}" "\"${1}\""
   done
 }
 
 _enable_global_registry() {
   yq.set sc .images.global.registry.enabled 'true'
   yq.set sc .images.global.registry.uri "\"${1}\""
+  yq.set wc .images.global.registry.enabled 'true'
+  yq.set wc .images.global.registry.uri "\"${1}\""
 }
 
 _enable_global_repository() {
   yq.set sc .images.global.repository.enabled 'true'
   yq.set sc .images.global.repository.uri "\"${1}\""
+  yq.set wc .images.global.repository.enabled 'true'
+  yq.set wc .images.global.repository.uri "\"${1}\""
 }
 
 _generate_templates() {
@@ -256,7 +263,9 @@ _generate_templates() {
   for _helmfile_selector in "${_helmfile_selectors[@]}"; do
     _selector_args+=("--selector" "${_helmfile_selector}")
   done
-  helmfile -e service_cluster "${_selector_args[@]}" -f "${ROOT}/helmfile.d" -q template --output-dir-template "${_templates_output}"
+
+  helmfile -e service_cluster "${_selector_args[@]}" -f "${ROOT}/helmfile.d" -q template --output-dir-template "${_templates_output}/sc" || true
+  helmfile -e workload_cluster "${_selector_args[@]}" -f "${ROOT}/helmfile.d" -q template --output-dir-template "${_templates_output}/wc" || true
 }
 
 _get_test_prop() {
