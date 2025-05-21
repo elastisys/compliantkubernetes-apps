@@ -982,7 +982,7 @@ opensearch:
   # Snapshot and snapshot lifecycle configuration
   # Requires S3 or GCS to be enabled
   snapshot:
-    enabled: true
+    enabled: true # Snapshots can be enabled after installation but *not* disabled if they have already been enabled (ref: https://github.com/elastisys/compliantkubernetes-apps/pull/2541)
     repository: opensearch-snapshots # Uses the bucket set in `objectStorage.buckets.opensearch`
     min: 7
     max: 14

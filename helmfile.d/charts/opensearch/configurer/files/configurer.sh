@@ -360,6 +360,7 @@ create_update_snapshot_policy() {
 wait_for_dashboards
 setup_dashboards
 
+{{ if .Values.config.snapshots.enabled }}
 {{ if .Values.config.s3.enabled -}}
 if ! check_s3_repository_bucket; then
   register_s3_repository
@@ -376,6 +377,7 @@ else
   echo
   echo "Skip registering Azure Blob Storage snapshot repository"
 fi
+{{- end }}
 {{- end }}
 
 [ -n "${template_names}" ] && echo && echo "Creating index templates"
@@ -420,7 +422,9 @@ for row in $(echo "${users}"  | jq -r '.[] | @base64'); do
     create_user "$(_jq '.username')" "$(_jq '.definition')"
 done
 
+{{ if .Values.config.snapshots.enabled }}
 create_update_snapshot_policy
+{{- end }}
 
 echo
 echo "Done configuring OpenSearch and Dashboards"

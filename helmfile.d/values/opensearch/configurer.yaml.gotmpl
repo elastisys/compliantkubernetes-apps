@@ -34,8 +34,8 @@ config:
     rolloverSize: {{ .Values.opensearch.ism.rolloverSizeGB }}
     rolloverAge: {{ .Values.opensearch.ism.rolloverAgeDays }}
 
-  {{- if .Values.opensearch.snapshot.enabled }}
   snapshots:
+    enabled: {{ .Values.opensearch.snapshot.enabled }}
     repository: {{ .Values.opensearch.snapshot.repository }}
     min: {{ .Values.opensearch.snapshot.min }}
     max: {{ .Values.opensearch.snapshot.max }}
@@ -62,8 +62,6 @@ config:
   azure:
     enabled: true
     containerName: {{ .Values.objectStorage.buckets.opensearch }}
-  {{- end }}
-
   {{- end }}
 
   # Create users and roles for ck8s application
