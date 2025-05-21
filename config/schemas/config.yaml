@@ -8240,6 +8240,14 @@ properties:
             $ref: '#/$defs/containerImage'
           exporter:
             $ref: '#/$defs/containerImage'
+      rclone:
+        title: rclone stack image configuration
+        description: rclone stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          image:
+            $ref: '#/$defs/containerImage'
 additionalProperties:
   title: Additional Properties
   description: Configure additional properties not covered by the schema.

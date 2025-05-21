@@ -63,3 +63,5 @@ images:
     slmCronjob: ghcr.io/elastisys/curl-jq:1.0.0
     curatorCronjob: ghcr.io/elastisys/bitnami/elasticsearch-curator:5.8.4-debian-10-r235
     exporter: quay.io/prometheuscommunity/elasticsearch-exporter:v1.7.0
+  rclone:
+    image: ghcr.io/elastisys/rclone-sync:1.63.0
