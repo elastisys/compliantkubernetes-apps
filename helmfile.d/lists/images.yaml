@@ -55,6 +55,8 @@ images:
     init: ghcr.io/kyverno/kyverno:v1.13.4
     webhooksCleanup: docker.io/bitnami/kubectl:1.30.2
     crdsMigration: ghcr.io/kyverno/kyverno-cli:v1.13.4
+  nodeLocalDNS:
+    image: registry.k8s.io/dns/k8s-dns-node-cache:1.25.0
   opensearch:
     image: docker.io/opensearchproject/opensearch:2.18.0
     initSysctl: ghcr.io/elastisys/curl-jq:1.0.0

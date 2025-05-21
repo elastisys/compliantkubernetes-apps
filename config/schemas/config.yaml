@@ -8220,6 +8220,14 @@ properties:
             $ref: '#/$defs/containerImage'
           crdsMigration:
             $ref: '#/$defs/containerImage'
+      nodeLocalDNS:
+        title: node-local-dns stack image configuration
+        description: node-local-dns stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          image:
+            $ref: '#/$defs/containerImage'
       opensearch:
         title: opensearch stack image configuration
         description: opensearch stack image configuration
