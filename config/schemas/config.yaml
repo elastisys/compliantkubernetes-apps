@@ -8182,6 +8182,14 @@ properties:
         properties:
           image:
             $ref: '#/$defs/containerImage'
+      kured:
+        title: kured stack image configuration
+        description: kured stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          image:
+            $ref: '#/$defs/containerImage'
       ingressNginx:
         title: ingress-nginx stack image configuration
         description: ingress-nginx stack image configuration
