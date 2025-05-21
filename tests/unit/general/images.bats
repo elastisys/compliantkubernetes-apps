@@ -250,7 +250,7 @@ _enable_global_repository() {
 _generate_templates() {
   local _selector_args=()
   for _helmfile_selector in "${_helmfile_selectors[@]}"; do
-    _selector_args+=("-${_helmfile_selector}")
+    _selector_args+=("--selector" "${_helmfile_selector}")
   done
   helmfile -e service_cluster "${_selector_args[@]}" -f "${ROOT}/helmfile.d" -q template --output-dir-template "${_templates_output}"
 }
