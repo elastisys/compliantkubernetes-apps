@@ -227,6 +227,30 @@
       "helmfile_selector": "app=kured",
       "container_name": "kured",
       "template_file": "sc/kured/templates/daemonset.yaml"
+    },
+    {
+      "image_property": "kyverno.main",
+      "helmfile_selector": "app=kyverno",
+      "container_name": "kyverno",
+      "template_file": "sc/kyverno/templates/admission-controller/deployment.yaml"
+    },
+    {
+      "image_property": "kyverno.init",
+      "helmfile_selector": "app=kyverno",
+      "container_name": "kyverno-pre",
+      "template_file": "sc/kyverno/templates/admission-controller/deployment.yaml"
+    },
+    {
+      "image_property": "kyverno.webhooksCleanup",
+      "helmfile_selector": "app=kyverno",
+      "container_name": "kubectl",
+      "template_file": "sc/kyverno/templates/hooks/post-delete-configmap.yaml"
+    },
+    {
+      "image_property": "kyverno.crdsMigration",
+      "helmfile_selector": "app=kyverno",
+      "container_name": "kubectl",
+      "template_file": "sc/kyverno/templates/hooks/post-upgrade-migrate-resources.yaml"
     }
   ]
 }
