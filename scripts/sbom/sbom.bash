@@ -40,7 +40,7 @@ usage() {
   echo "  get-containers                                          get all container images in sbom" >&2
   echo "  get-unset                                               get names of components with set-me's or missing licenses" >&2
   echo "  remove <component-name> <component-version> <key>       remove key for a component" >&2
-  echo "  update-containers [component-name] [component-version]  update all container images in sbom"
+  echo "  update                                                  TODO: update"
   echo "  validate                                                validate SBOM using cyclonedx-cli" >&2
   exit 1
 }
@@ -208,9 +208,9 @@ _format_container_component_object() {
 }
 
 _prepare_sbom() {
-  local project_version sbom_file
-  if [[ "$#" -lt 1 ]] || [[ "$#" -gt 2 ]]; then
-    log_fatal "usage: _prepare_sbom <sbom-file> [version]"
+  local location project_version sbom_file
+  if [[ "$#" -lt 1 ]] || [[ "$#" -gt 3 ]]; then
+    log_fatal "usage: _prepare_sbom <sbom-file> [--version] [--location]"
   fi
 
   # TODO: hardcoded provider and installer for now, look into running for all combinations (either merge or create unique SBOMs for each?)
@@ -222,16 +222,43 @@ _prepare_sbom() {
   fi
   log_info "Preparing SBOM"
 
-  if [[ "$#" -gt 1 ]]; then
-    project_version="${2}"
-  else
+  shift
+  project_version=""
+  location=""
+  while [ "${#}" -gt 0 ] ; do
+    case "${1}" in
+      --version)
+          project_version="${2}"
+          shift
+          ;;
+      --location)
+          location="${2}"
+          shift
+          ;;
+      *)
+          log_fatal "usage: _prepare_sbom <sbom-file> [--version] [--location]"
+          ;;
+    esac
+    shift
+  done
+
+  if [[ -z "${project_version}" ]]; then
     project_version="$(git name-rev --tags --name-only "$(git rev-parse HEAD)")"
     if [[ "${project_version}" == "undefined" ]]; then
       project_version="$(git rev-parse HEAD)"
     fi
   fi
 
-  cdxgen --project-name "welkin-apps" --project-version "${project_version}" --filter '.*' -t helm "${HELMFILE_FOLDER}" --output "${sbom_file}"
+  if [[ -n "${location}" ]]; then
+    full_path_location="${ROOT}/helmfile.d/${location}"
+    if [[ ! -d "${full_path_location}" ]]; then
+      log_fatal "${full_path_location} is not a valid directory"
+    fi
+    # TODO: verify that location contains helm chart and is in the Welkin apps repo
+    cdxgen --project-name "welkin-apps" --project-version "${project_version}" --filter '.*' -t helm "${full_path_location}" --output "${sbom_file}"
+  else
+    cdxgen --project-name "welkin-apps" --project-version "${project_version}" --filter '.*' -t helm "${HELMFILE_FOLDER}" --output "${sbom_file}"
+  fi
 
   sbom_version=$(yq -r -o json ".version" "${SBOM_FILE}")
   yq -o json -i ".version = ${sbom_version}" "${sbom_file}"
@@ -310,7 +337,7 @@ _get_upstream_license_for_component() {
 }
 
 _get_licenses() {
-  local sbom_file
+  local chart_name chart_version sbom_file
   if [[ "$#" -ne 1 ]]; then
     log_fatal "usage: _get_licenses <sbom-file>"
   fi
@@ -343,12 +370,19 @@ _get_licenses() {
 
 # generates manifests for each release using helmfile template adding the chart location as an annotation used later for mapping images to components in the sbom
 _generate_helmfile_template_file() {
+  local location release_name release_location
   template_file="${1}"
 
   log_info "Preparing Helmfile templates"
 
+  select_query='.[] | select(.enabled == true and .installed == true) | {"location": .chart, "name": .name}'
+  if [[ "$#" -gt 1 ]]; then
+    location="${2}"
+    select_query=".[] | select(.enabled == true and .installed == true and .chart == \"${location}\") | {\"location\": .chart, \"name\": .name}"
+  fi
+
   log_info "  - Workload"
-  mapfile -t releases_workload < <(helmfile -f "${HELMFILE_FOLDER}" -e workload_cluster list --output json 2>/dev/null | yq -I=0 -o json '.[] | select(.enabled == true and .installed == true) | {"location": .chart, "name": .name}')
+  mapfile -t releases_workload < <(helmfile -f "${HELMFILE_FOLDER}" -e workload_cluster list --output json 2>/dev/null | yq -I=0 -o json "${select_query}")
   for release in "${releases_workload[@]}"; do
     release_name=$(yq '.name' <<<"${release}")
     release_location="helmfile.d/$(yq '.location' <<<"${release}")"
@@ -356,7 +390,7 @@ _generate_helmfile_template_file() {
   done
 
   log_info "  - Service"
-  mapfile -t releases_service < <(helmfile -f "${HELMFILE_FOLDER}" -e service_cluster list --output json 2>/dev/null | yq -I=0 -o json '.[] | select(.enabled == true and .installed == true) | {"location": .chart, "name": .name}')
+  mapfile -t releases_service < <(helmfile -f "${HELMFILE_FOLDER}" -e service_cluster list --output json 2>/dev/null | yq -I=0 -o json "${select_query}")
   for release in "${releases_service[@]}"; do
     release_name=$(yq '.name' <<<"${release}")
     release_location="helmfile.d/$(yq '.location' <<<"${release}")"
@@ -366,7 +400,7 @@ _generate_helmfile_template_file() {
 
 # adds container images for a specific resource type and chart release based on its location to a input sbom file
 _add_container_images_from_template() {
-  local sbom_file template_file chart_name type query
+  local location sbom_file template_file chart_name type query
   sbom_file="${1}"
   template_file="${2}"
   chart_name="${3}"
@@ -423,9 +457,9 @@ _add_container_images_for_component() {
 
 # loops over all charts included in the sbom and adds templated container images to a input sbom file
 _add_container_images() {
-  local sbom_file
-  if [[ "$#" -ne 1 ]]; then
-    log_fatal "usage: _add_container_images <sbom-file>"
+  local chart_location chart_name chart_version location sbom_file
+  if [[ "$#" -lt 1 ]] || [[ "$#" -gt 2 ]]; then
+    log_fatal "usage: _add_container_images <sbom-file> [location]"
   fi
 
   sbom_file="${1}"
@@ -433,9 +467,12 @@ _add_container_images() {
     log_fatal "SBOM file ${sbom_file} does not exist"
   fi
 
-  template_file=$(mktemp --suffix=-template_file)
+  template_file=$(mktemp --suffix=-sbom-template-file)
   append_trap "rm ${template_file} >/dev/null 2>&1" EXIT
-  _generate_helmfile_template_file "${template_file}"
+
+  shift
+  # check if should only generate templates for one specific chart based on location
+  _generate_helmfile_template_file "${template_file}" "${@}"
 
   log_info "Getting container images"
 
@@ -444,15 +481,15 @@ _add_container_images() {
   for chart in "${all_charts[@]}"; do
     chart_name=$(yq ".name" <<<"${chart}")
     chart_version=$(yq ".version" <<<"${chart}")
-    location=$(yq ".location" <<<"${chart}")
+    chart_location=$(yq ".location" <<<"${chart}")
 
-    _add_container_images_for_component "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${location}"
+    _add_container_images_for_component "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${chart_location}"
   done
 }
 
 # adds chart locations for all components in a input sbom file
 _add_locations() {
-  local chart_name chart_version sbom_file
+  local chart_name chart_version location sbom_file
   sbom_file="${1}"
 
   log_info "Getting locations"
@@ -583,39 +620,6 @@ sbom_update_licenses() {
   yq -o json -i '.version += 1' "${SBOM_FILE}"
 }
 
-sbom_update_containers() {
-  local sbom_file query
-  sbom_file="${1}"
-  shift
-
-  if [[ "$#" -gt 0 ]]; then
-    chart_name="${1}"
-    if [[ "$#" -gt 1 ]]; then
-      chart_version="${2}"
-      if [[ ! $(sbom_get "${chart_name}" "${chart_version}") ]]; then
-        log_fatal "${chart_name} not found with version ${chart_version}"
-      fi
-    else
-      # TODO: handle multiple versions (e.g. Grafana)
-      chart_version="$(sbom_get "${chart_name}" | jq -r '.version')"
-      log_info "No chart version provided, will use version found in SBOM: ${chart_version}"
-    fi
-    template_file=$(mktemp --suffix=-template_file)
-    append_trap "rm ${template_file} >/dev/null 2>&1" EXIT
-
-    log_info "Updating container images for ${chart_name}@${chart_version} in SBOM"
-    _generate_helmfile_template_file "${template_file}"
-    CK8S_AUTO_APPROVE=true CK8S_SKIP_VALIDATION=true _add_container_images_for_component "${tmp_sbom_file}" "${template_file}" "${chart_name}" "${chart_version}"
-  else
-    log_info "Updating all container images in SBOM"
-    CK8S_AUTO_APPROVE=true CK8S_SKIP_VALIDATION=true _add_container_images "${tmp_sbom_file}"
-  fi
-
-  query=". *d load(\"${tmp_sbom_file}\")"
-  _yq_run_query "${SBOM_FILE}" "${query}"
-  yq -o json -i '.version += 1' "${SBOM_FILE}"
-}
-
 _test_github_token() {
   log_info "Testing GITHUB_TOKEN"
   : "${GITHUB_TOKEN:?Missing GITHUB_TOKEN}"
@@ -629,26 +633,42 @@ _test_github_token() {
 }
 
 sbom_update() {
-  local tmp_sbom_file
-  tmp_sbom_file=$(mktemp --suffix=-update-containers-sbom.json)
+  local chart chart_name chart_version location tmp_sbom_file
+  if [[ "$#" -ne 1 ]]; then
+    usage
+  fi
+
+  tmp_sbom_file=$(mktemp --suffix=-update-sbom.json)
   append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
 
-  # TODO: hardcoded provider and installer for now, look into running for all combinations (either merge or create unique SBOMs for each?)
-  init_welkin_config baremetal kubespray prod
+  _test_github_token
 
-  cdxgen --filter '.*' -t helm "${HELMFILE_FOLDER}" --output "${tmp_sbom_file}"
-  case "${1}" in
-  licenses)
-    shift
-    _test_github_token
-    sbom_update_licenses "${tmp_sbom_file}" "${@}"
-  ;;
-  containers)
-    shift
-    sbom_update_containers "${tmp_sbom_file}" "${@}"
-  ;;
-  *) usage ;;
-  esac
+  export CK8S_AUTO_APPROVE=true
+  export CK8S_SKIP_VALIDATION=true
+  # sbom_update_licenses "${tmp_sbom_file}" "${@}"
+
+  location="${1}"
+  _prepare_sbom "${tmp_sbom_file}" --location "${location}"
+  _add_locations "${tmp_sbom_file}"
+  _add_container_images "${tmp_sbom_file}" "${location}"
+
+  CK8S_AUTO_APPROVE=false
+  CK8S_SKIP_VALIDATION=false
+
+  tmp_output_sbom_file=$(mktemp --suffix=-output-sbom.json)
+  # append_trap "rm ${tmp_output_sbom_file} >/dev/null 2>&1" EXIT
+
+  yq eval-all 'select(fileIndex == 0) * select(fileIndex == 1)' "${SBOM_FILE}" "${tmp_sbom_file}" > "${tmp_output_sbom_file}"
+  diff -U3 --color=always "${SBOM_FILE}" "${tmp_output_sbom_file}" && return
+  log_warning_no_newline "Do you want to replace SBOM file? (y/N): "
+  read -r reply
+  if [[ "${reply}" == "y" ]]; then
+    mv "${tmp_output_sbom_file}" "${SBOM_FILE}"
+    yq -o json -i '.version += 1' "${SBOM_FILE}"
+    log_info "SBOM file replaced"
+    return
+  fi
+  log_info "Skipped replacing SBOM"
 }
 
 sbom_generate() {
@@ -691,7 +711,7 @@ sbom_generate() {
 }
 
 sbom_diff() {
-  local found_diff
+  local chart_name chart_version found_diff location
   mapfile -t diff_files < <(git diff --name-only | grep "helmfile.d/")
   mapfile -t all_charts < <(sbom_get_charts "${SBOM_FILE}")
 
