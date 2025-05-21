@@ -39,12 +39,12 @@ _test_functions=(
   should_use_our_image_tag_and_digest
   should_use_our_repository_image_tag_and_digest
   should_use_our_registry_repository_image_tag_and_digest
-  should_use_its_own_registry_even_when_global_is_enabled
+  should_use_their_own_registry_even_when_global_is_enabled
   should_use_the_global_registry_when_it_doesnt_specify_one
-  should_use_its_own_repository_even_when_global_is_enabled
+  should_use_their_own_repository_even_when_global_is_enabled
   should_use_the_global_repository_when_it_doesnt_specify_one
-  should_use_the_global_repository_with_its_own_registry
-  should_use_the_global_registry_with_its_own_repository
+  should_use_the_global_repository_with_their_own_registry
+  should_use_the_global_registry_with_their_own_repository
   should_allow_overwriting_the_tag_fragment_only
   should_allow_overwriting_the_tag_and_sha_fragments_only
   should_not_set_the_image_field_if_only_sha_is_specified
@@ -125,7 +125,7 @@ should_use_our_registry_repository_image_tag_and_digest() {
   done
 }
 
-should_use_its_own_registry_even_when_global_is_enabled() {
+should_use_their_own_registry_even_when_global_is_enabled() {
   _export_params
   _enable_global_registry "the-global-registry.com"
   _set_container_uris "a-custom-registry.com/a-custom-image:v1.2.3"
@@ -151,7 +151,7 @@ should_use_the_global_registry_when_it_doesnt_specify_one() {
   done
 }
 
-should_use_its_own_repository_even_when_global_is_enabled() {
+should_use_their_own_repository_even_when_global_is_enabled() {
   _export_params
   _enable_global_repository "the-global-repository"
   _set_container_uris "a-custom-repository/a-custom-image:v1.2.3"
@@ -177,7 +177,7 @@ should_use_the_global_repository_when_it_doesnt_specify_one() {
   done
 }
 
-should_use_the_global_repository_with_its_own_registry() {
+should_use_the_global_repository_with_their_own_registry() {
   _export_params
   _enable_global_repository "the-global-repository"
   _set_container_uris "my-own-registry.com/a-custom-image:v1.2.3"
@@ -190,7 +190,7 @@ should_use_the_global_repository_with_its_own_registry() {
   done
 }
 
-should_use_the_global_registry_with_its_own_repository() {
+should_use_the_global_registry_with_their_own_repository() {
   _export_params
   _enable_global_registry "the-global-registry.com"
   _set_container_uris "my-own-repository/a-custom-image:v1.2.3"
