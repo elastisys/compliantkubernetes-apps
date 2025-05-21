@@ -2,13 +2,10 @@
 
 # TODO:
 # - add more tests
-# - update sbom version per Welkin release
 # - save manual overrides between runs (currently, and set-me's overrides are removed when running generate)
 #   - currently, "generate" will retrieve "Elastisys evaluation" & "supplier" from existing SBOM and use that one always
 #   - any other objects added manually will be removed when running generate
 # - include images for all configurations? (e.g. different cloud providers can have unique images/charts)
-#   - maybe, instead of using an existing environment, generate could create a new CK8S_CONFIG_PATH
-#     - problem with this is, that currently, Helmfile template requires a KUBECONFIG
 # - include licenses for images?
 # - fragments
 #   - look at e.g. if git diff for a chart (location), should prompt to verify that evaluation and supplier is still correct
@@ -35,6 +32,7 @@ append_trap "rm -rf ${tmp_config_path} >/dev/null 2>&1" EXIT
 usage() {
   echo "COMMANDS:" >&2
   echo "  add <component-name> <component-version> <key> <value>  add key-value pair to a component" >&2
+  echo "  diff                                                    checks if any changes in git requires sbom to be updated" >&2
   echo "  edit <component-name> <component-version> <key>         edit object under key for a component using $EDITOR" >&2
   echo "  generate                                                generate new cyclonedx sbom. Requires GITHUB_TOKEN to be set to avoid GitHub rate limits" >&2
   echo "  get <component-name> [component-version] [key]          get component from sbom, optionally query for a provided key" >&2
@@ -279,7 +277,7 @@ _get_upstream_license_for_component() {
   elif [[ -n "${annotation_artifacthub}" && "${annotation_artifacthub}" != "null" ]]; then
     _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "${annotation_artifacthub}")"
 
-  # if no license in annotations, try to get from source (e.g. github)
+  # if no license in annotations, try to get from source (i.e. github)
   else
     mapfile -t sources < <(yq '.sources[]' "${chart}")
     if [[ "${#sources[@]}" -eq 0 ]] || [[ "${sources[*]}" == "null" ]]; then
@@ -338,7 +336,7 @@ _get_licenses() {
     chart_name=$(yq ".name" "${chart}")
     chart_version=$(yq ".version" "${chart}")
 
-    # TODO: licenses for the applications
+    # TODO: licenses for the containers
     _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "Apache-2.0")"
   done
 }
@@ -634,6 +632,9 @@ sbom_update() {
   local tmp_sbom_file
   tmp_sbom_file=$(mktemp --suffix=-update-containers-sbom.json)
   append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
+
+  # TODO: hardcoded provider and installer for now, look into running for all combinations (either merge or create unique SBOMs for each?)
+  init_welkin_config baremetal kubespray prod
 
   cdxgen --filter '.*' -t helm "${HELMFILE_FOLDER}" --output "${tmp_sbom_file}"
   case "${1}" in
