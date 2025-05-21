@@ -251,6 +251,48 @@
       "helmfile_selector": "app=kyverno",
       "container_name": "kubectl",
       "template_file": "sc/kyverno/templates/hooks/post-upgrade-migrate-resources.yaml"
+    },
+    {
+      "image_property": "opensearch.image",
+      "helmfile_selector": "app=opensearch",
+      "container_name": "opensearch",
+      "template_file": "sc/opensearch/templates/statefulset.yaml"
+    },
+    {
+      "image_property": "opensearch.initSysctl",
+      "helmfile_selector": "app=opensearch",
+      "container_name": "init-sysctl",
+      "template_file": "sc/opensearch/templates/statefulset.yaml"
+    },
+    {
+      "image_property": "opensearch.dashboards",
+      "helmfile_selector": "app=opensearch",
+      "container_name": "dashboards",
+      "template_file": "sc/opensearch-dashboards/templates/deployment.yaml"
+    },
+    {
+      "image_property": "opensearch.configurerJob",
+      "helmfile_selector": "app=opensearch",
+      "container_name": "opensearch-configurer",
+      "template_file": "sc/opensearch-configurer/templates/job.yaml"
+    },
+    {
+      "image_property": "opensearch.slmCronjob",
+      "helmfile_selector": "app=opensearch",
+      "container_name": "run",
+      "template_file": "sc/opensearch-slm/templates/cronjob.yaml"
+    },
+    {
+      "image_property": "opensearch.curatorCronjob",
+      "helmfile_selector": "app=opensearch",
+      "container_name": "opensearch-curator",
+      "template_file": "sc/opensearch-curator/templates/cronjob.yaml"
+    },
+    {
+      "image_property": "opensearch.exporter",
+      "helmfile_selector": "app=opensearch",
+      "container_name": "exporter",
+      "template_file": "sc/prometheus-elasticsearch-exporter/templates/deployment.yaml"
     }
   ]
 }

@@ -42,6 +42,12 @@ images:
     backupJob: ghcr.io/elastisys/backup-postgres:1.5.0
   hnc:
     image: ghcr.io/elastisys/hnc-manager:v1.1.0
+  ingressNginx:
+    controller: registry.k8s.io/ingress-nginx/controller:v1.12.1@sha256:d2fbc4ec70d8aa2050dd91a91506e998765e86c96f32cffb56c503c9c34eed5b
+    controllerChroot: registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e
+    defaultBackend: registry.k8s.io/defaultbackend-amd64:1.5
+    admissionWebhooksPatch: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2@sha256:e8825994b7a2c7497375a9b945f386506ca6a3eda80b89b74ef2db743f66a5ea
+    fileCopier: "docker.io/library/busybox:1.36"
   kured:
     image: ghcr.io/kubereboot/kured:1.17.0
   kyverno:
@@ -49,9 +55,11 @@ images:
     init: ghcr.io/kyverno/kyverno:v1.13.4
     webhooksCleanup: docker.io/bitnami/kubectl:1.30.2
     crdsMigration: ghcr.io/kyverno/kyverno-cli:v1.13.4
-  ingressNginx:
-    controller: registry.k8s.io/ingress-nginx/controller:v1.12.1@sha256:d2fbc4ec70d8aa2050dd91a91506e998765e86c96f32cffb56c503c9c34eed5b
-    controllerChroot: registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e
-    defaultBackend: registry.k8s.io/defaultbackend-amd64:1.5
-    admissionWebhooksPatch: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2@sha256:e8825994b7a2c7497375a9b945f386506ca6a3eda80b89b74ef2db743f66a5ea
-    fileCopier: "docker.io/library/busybox:1.36"
+  opensearch:
+    image: docker.io/opensearchproject/opensearch:2.18.0
+    initSysctl: ghcr.io/elastisys/curl-jq:1.0.0
+    dashboards: docker.io/opensearchproject/opensearch-dashboards:2.18.0
+    configurerJob: ghcr.io/elastisys/curl-jq:1.0.0
+    slmCronjob: ghcr.io/elastisys/curl-jq:1.0.0
+    curatorCronjob: ghcr.io/elastisys/bitnami/elasticsearch-curator:5.8.4-debian-10-r235
+    exporter: quay.io/prometheuscommunity/elasticsearch-exporter:v1.7.0
