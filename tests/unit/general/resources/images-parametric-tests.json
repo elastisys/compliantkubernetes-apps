@@ -305,6 +305,24 @@
       "helmfile_selector": "app=rclone",
       "container_name": "rclone",
       "template_file": "sc/rclone/templates/cronjobs.yaml"
+    },
+    {
+      "image_property": "tekton.controller",
+      "helmfile_selector": "app=tekton",
+      "container_name": "tekton-pipelines-controller",
+      "template_file": "sc/tekton-pipelines/templates/controller/deployment.yaml"
+    },
+    {
+      "image_property": "tekton.remoteResolvers",
+      "helmfile_selector": "app=tekton",
+      "container_name": "controller",
+      "template_file": "sc/tekton-pipelines/templates/remote-resolvers/deployment.yaml"
+    },
+    {
+      "image_property": "tekton.webhook",
+      "helmfile_selector": "app=tekton",
+      "container_name": "webhook",
+      "template_file": "sc/tekton-pipelines/templates/webhook/deployment.yaml"
     }
   ]
 }

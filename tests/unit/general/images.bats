@@ -24,6 +24,7 @@ setup_file() {
   yq.set sc .kured.enabled 'true'
   yq.set sc .kyverno.enabled 'true'
   yq.set sc .opensearch.snapshot.enabled 'true'
+  yq.set sc .tektonPipelines.enabled 'true'
 
   _setup_rclone sc sync
 }
