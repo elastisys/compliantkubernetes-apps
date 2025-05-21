@@ -15,7 +15,6 @@ operator:
 
 {{- with .Values.images | dig "gpuOperator" "operator" "" }}
 {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-{{- if or .registry .repository .image .tag .digest }}
   {{- if or .registry .repository }}
   repository: {{ join "/" (compact (list .registry .repository)) }}
   {{- end }}
@@ -27,12 +26,10 @@ operator:
   {{- end }}
 {{- end }}
 {{- end }}
-{{- end }}
 
 node-feature-discovery:
   {{- with .Values.images | dig "gpuOperator" "nfd" "" }}
   {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-  {{- if or .registry .repository .image .tag .digest }}
   image:
     {{- with include "gen.reg-rep-img" . }}
     repository: {{ . }}
@@ -40,7 +37,6 @@ node-feature-discovery:
     {{- if or .tag .digest }}
     tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
     {{- end }}
-  {{- end }}
   {{- end }}
   {{- end }}
   worker:

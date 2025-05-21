@@ -6,7 +6,6 @@ nameOverride: fluentd
 }}
 {{- with .Values.images | dig "fluentd" "elasticsearch" "" }}
 {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-{{- if or .registry .repository .image .tag .digest }}
 image:
   {{- with include "gen.reg-rep-img" . }}
   repository: {{ . }}
@@ -14,7 +13,6 @@ image:
   {{- if or .tag .digest }}
   tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
   {{- end }}
-{{- end }}
 {{- end }}
 {{- end }}
 

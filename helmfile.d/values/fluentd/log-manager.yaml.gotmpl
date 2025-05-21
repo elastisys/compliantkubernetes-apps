@@ -84,7 +84,6 @@ affinity: {{- toYaml .Values.fluentd.logManager.affinity | nindent 2 }}
 }}
 {{- with .Values.images | dig "fluentd" "logManager" "" }}
 {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-{{- if or .registry .repository .image .tag .digest }}
 image:
   pullPolicy: IfNotPresent
   {{- with include "gen.reg-rep-img" . }}
@@ -93,6 +92,5 @@ image:
   {{- if or .tag .digest }}
   tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
   {{- end }}
-{{- end }}
 {{- end }}
 {{- end }}
