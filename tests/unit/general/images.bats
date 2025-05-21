@@ -52,7 +52,7 @@ _test_functions=(
 
 for _test_function in "${_test_functions[@]}"; do
   bats_test_function \
-    --description "all the container images ${_test_function//_/ }" \
+    --description "container images ${_test_function//_/ }" \
     -- "${_test_function}"
 done
 
