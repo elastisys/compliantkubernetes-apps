@@ -8190,6 +8190,20 @@ properties:
         properties:
           image:
             $ref: '#/$defs/containerImage'
+      kyverno:
+        title: kyverno stack image configuration
+        description: kyverno stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          main:
+            $ref: '#/$defs/containerImage'
+          init:
+            $ref: '#/$defs/containerImage'
+          webhooksCleanup:
+            $ref: '#/$defs/containerImage'
+          crdsMigration:
+            $ref: '#/$defs/containerImage'
       ingressNginx:
         title: ingress-nginx stack image configuration
         description: ingress-nginx stack image configuration

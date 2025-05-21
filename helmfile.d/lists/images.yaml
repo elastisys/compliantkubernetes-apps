@@ -44,6 +44,11 @@ images:
     image: ghcr.io/elastisys/hnc-manager:v1.1.0
   kured:
     image: ghcr.io/kubereboot/kured:1.17.0
+  kyverno:
+    main: ghcr.io/kyverno/kyverno:v1.13.4
+    init: ghcr.io/kyverno/kyverno:v1.13.4
+    webhooksCleanup: docker.io/bitnami/kubectl:1.30.2
+    crdsMigration: ghcr.io/kyverno/kyverno-cli:v1.13.4
   ingressNginx:
     controller: registry.k8s.io/ingress-nginx/controller:v1.12.1@sha256:d2fbc4ec70d8aa2050dd91a91506e998765e86c96f32cffb56c503c9c34eed5b
     controllerChroot: registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e
