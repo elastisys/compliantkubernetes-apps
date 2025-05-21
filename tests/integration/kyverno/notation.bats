@@ -11,7 +11,7 @@ setup_file() {
   yq.set wc '.kyverno.enabled' true
   yq.set wc '.kyverno.policies.verifyImageSignature.enabled' true
   yq.set wc '.kyverno.policies.verifyImageSignature.type' '"Notary"'
-  yq.set wc '.kyverno.policies.verifyImageSignature.certificates' \
+  yq.set wc '.kyverno.policies.verifyImageSignature.attestors' \
 '"-----BEGIN CERTIFICATE-----
 MIIDhDCCAmygAwIBAgIUQDXugI95YJTsy4cKf0fb2F6DMhYwDQYJKoZIhvcNAQEL
 BQAwUTELMAkGA1UEBhMCU0UxEjAQBgNVBAoMCUVsYXN0aXN5czEMMAoGA1UECwwD
