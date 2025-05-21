@@ -2,16 +2,19 @@
   "parameters": [
     {
       "image_property": "ingressNginx.controllerChroot",
+      "helmfile_selector": "-lapp=ingress-nginx",
       "container_name": "controller",
       "template_file": "ingress-nginx/templates/controller-daemonset.yaml"
     },
     {
       "image_property": "ingressNginx.defaultBackend",
+      "helmfile_selector": "-lapp=ingress-nginx",
       "container_name": "ingress-nginx-default-backend",
       "template_file": "ingress-nginx/templates/default-backend-deployment.yaml"
     },
     {
       "image_property": "ingressNginx.admissionWebhooksPatch",
+      "helmfile_selector": "-lapp=ingress-nginx",
       "container_name": "patch",
       "template_file": "ingress-nginx/templates/admission-webhooks/job-patch/job-patchWebhook.yaml"
     }
