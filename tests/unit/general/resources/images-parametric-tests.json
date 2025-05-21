@@ -4,217 +4,217 @@
       "image_property": "ingressNginx.controllerChroot",
       "helmfile_selector": "app=ingress-nginx",
       "container_name": "controller",
-      "template_file": "ingress-nginx/templates/controller-daemonset.yaml"
+      "template_file": "sc/ingress-nginx/templates/controller-daemonset.yaml"
     },
     {
       "image_property": "ingressNginx.defaultBackend",
       "helmfile_selector": "app=ingress-nginx",
       "container_name": "ingress-nginx-default-backend",
-      "template_file": "ingress-nginx/templates/default-backend-deployment.yaml"
+      "template_file": "sc/ingress-nginx/templates/default-backend-deployment.yaml"
     },
     {
       "image_property": "ingressNginx.admissionWebhooksPatch",
       "helmfile_selector": "app=ingress-nginx",
       "container_name": "patch",
-      "template_file": "ingress-nginx/templates/admission-webhooks/job-patch/job-patchWebhook.yaml"
+      "template_file": "sc/ingress-nginx/templates/admission-webhooks/job-patch/job-patchWebhook.yaml"
     },
     {
       "image_property": "ingressNginx.fileCopier",
       "helmfile_selector": "app=ingress-nginx",
       "container_name": "file-copier",
-      "template_file": "file-copier/templates/ingress-nginx-chroot-ds.yaml"
+      "template_file": "sc/file-copier/templates/ingress-nginx-chroot-ds.yaml"
     },
     {
       "image_property": "calico.accountant",
       "helmfile_selector": "app=calico",
       "container_name": "calico-accountant",
-      "template_file": "calico-accountant/templates/daemonset.yaml"
+      "template_file": "sc/calico-accountant/templates/daemonset.yaml"
     },
     {
       "image_property": "certManager.controller",
       "helmfile_selector": "app=cert-manager",
       "container_name": "cert-manager-controller",
-      "template_file": "cert-manager/templates/deployment.yaml"
+      "template_file": "sc/cert-manager/templates/deployment.yaml"
     },
     {
       "image_property": "certManager.webhook",
       "helmfile_selector": "app=cert-manager",
       "container_name": "cert-manager-webhook",
-      "template_file": "cert-manager/templates/webhook-deployment.yaml"
+      "template_file": "sc/cert-manager/templates/webhook-deployment.yaml"
     },
     {
       "image_property": "certManager.cainjector",
       "helmfile_selector": "app=cert-manager",
       "container_name": "cert-manager-cainjector",
-      "template_file": "cert-manager/templates/cainjector-deployment.yaml"
+      "template_file": "sc/cert-manager/templates/cainjector-deployment.yaml"
     },
     {
       "image_property": "certManager.startupapicheck",
       "helmfile_selector": "app=cert-manager",
       "container_name": "cert-manager-startupapicheck",
-      "template_file": "cert-manager/templates/startupapicheck-job.yaml"
+      "template_file": "sc/cert-manager/templates/startupapicheck-job.yaml"
     },
     {
       "image_property": "dex.image",
       "helmfile_selector": "app=dex",
       "container_name": "dex",
-      "template_file": "dex/templates/deployment.yaml"
+      "template_file": "sc/dex/templates/deployment.yaml"
     },
     {
       "image_property": "externalDns.image",
       "helmfile_selector": "app=external-dns",
       "container_name": "external-dns",
-      "template_file": "external-dns/templates/deployment.yaml"
+      "template_file": "sc/external-dns/templates/deployment.yaml"
     },
     {
       "image_property": "falco.image",
       "helmfile_selector": "app=falco",
       "container_name": "falco",
-      "template_file": "falco/templates/daemonset.yaml"
+      "template_file": "sc/falco/templates/daemonset.yaml"
     },
     {
       "image_property": "falco.driverLoaderInit",
       "helmfile_selector": "app=falco",
       "container_name": "falco-driver-loader",
-      "template_file": "falco/templates/daemonset.yaml"
+      "template_file": "sc/falco/templates/daemonset.yaml"
     },
     {
       "image_property": "falco.falcoctl",
       "helmfile_selector": "app=falco",
       "container_name": "falcoctl-artifact-install",
-      "template_file": "falco/templates/daemonset.yaml"
+      "template_file": "sc/falco/templates/daemonset.yaml"
     },
     {
       "image_property": "falco.sidekick",
       "helmfile_selector": "app=falco",
       "container_name": "falcosidekick",
-      "template_file": "falco/charts/falcosidekick/templates/deployment.yaml"
+      "template_file": "sc/falco/charts/falcosidekick/templates/deployment.yaml"
     },
     {
       "image_property": "fluentd.aggregator",
       "helmfile_selector": "app=fluentd",
       "container_name": "tmp-dir-permissions",
-      "template_file": "fluentd/templates/aggregator-statefulset.yaml"
+      "template_file": "sc/fluentd/templates/aggregator-statefulset.yaml"
     },
     {
       "image_property": "fluentd.aggregator",
       "helmfile_selector": "app=fluentd",
       "container_name": "fluentd",
-      "template_file": "fluentd/templates/aggregator-statefulset.yaml"
+      "template_file": "sc/fluentd/templates/aggregator-statefulset.yaml"
     },
     {
       "image_property": "fluentd.elasticsearch",
       "helmfile_selector": "app=fluentd",
       "container_name": "fluentd-forwarder",
-      "template_file": "fluentd-elasticsearch/templates/daemonset.yaml"
+      "template_file": "sc/fluentd-elasticsearch/templates/daemonset.yaml"
     },
     {
       "image_property": "fluentd.logManager",
       "helmfile_selector": "app=fluentd",
       "container_name": "compaction",
-      "template_file": "log-manager/templates/cronjob-compaction.yaml"
+      "template_file": "sc/log-manager/templates/cronjob-compaction.yaml"
     },
     {
       "image_property": "fluentd.logManager",
       "helmfile_selector": "app=fluentd",
       "container_name": "retention",
-      "template_file": "log-manager/templates/cronjob-retention.yaml"
+      "template_file": "sc/log-manager/templates/cronjob-retention.yaml"
     },
     {
       "image_property": "gatekeeper.image",
       "helmfile_selector": "app=gatekeeper",
       "container_name": "manager",
-      "template_file": "gatekeeper/templates/gatekeeper-audit-deployment.yaml"
+      "template_file": "sc/gatekeeper/templates/gatekeeper-audit-deployment.yaml"
     },
     {
       "image_property": "gatekeeper.preInstallCRDs",
       "helmfile_selector": "app=gatekeeper",
       "container_name": "crds-upgrade",
-      "template_file": "gatekeeper/templates/upgrade-crds-hook.yaml"
+      "template_file": "sc/gatekeeper/templates/upgrade-crds-hook.yaml"
     },
     {
       "image_property": "gatekeeper.postInstallLabelNamespace",
       "helmfile_selector": "app=gatekeeper",
       "container_name": "kubectl-label",
-      "template_file": "gatekeeper/templates/namespace-post-install.yaml"
+      "template_file": "sc/gatekeeper/templates/namespace-post-install.yaml"
     },
     {
       "image_property": "gatekeeper.kubectl",
       "helmfile_selector": "app=gatekeeper",
       "container_name": "wait",
-      "template_file": "gatekeeper-templates/templates/wait/job.yaml"
+      "template_file": "sc/gatekeeper-templates/templates/wait/job.yaml"
     },
     {
       "image_property": "gpuOperator.nfd",
       "helmfile_selector": "app=gpu-operator",
       "container_name": "worker",
-      "template_file": "gpu-operator/charts/node-feature-discovery/templates/worker.yaml"
+      "template_file": "sc/gpu-operator/charts/node-feature-discovery/templates/worker.yaml"
     },
     {
       "image_property": "gpuOperator.operator",
       "helmfile_selector": "app=gpu-operator",
       "container_name": "gpu-operator",
-      "template_file": "gpu-operator/templates/operator.yaml"
+      "template_file": "sc/gpu-operator/templates/operator.yaml"
     },
     {
       "image_property": "harbor.core",
       "helmfile_selector": "app=harbor",
       "container_name": "core",
-      "template_file": "harbor/templates/core/core-dpl.yaml"
+      "template_file": "sc/harbor/templates/core/core-dpl.yaml"
     },
     {
       "image_property": "harbor.exporter",
       "helmfile_selector": "app=harbor",
       "container_name": "exporter",
-      "template_file": "harbor/templates/exporter/exporter-dpl.yaml"
+      "template_file": "sc/harbor/templates/exporter/exporter-dpl.yaml"
     },
     {
       "image_property": "harbor.jobservice",
       "helmfile_selector": "app=harbor",
       "container_name": "jobservice",
-      "template_file": "harbor/templates/jobservice/jobservice-dpl.yaml"
+      "template_file": "sc/harbor/templates/jobservice/jobservice-dpl.yaml"
     },
     {
       "image_property": "harbor.registry",
       "helmfile_selector": "app=harbor",
       "container_name": "registry",
-      "template_file": "harbor/templates/registry/registry-dpl.yaml"
+      "template_file": "sc/harbor/templates/registry/registry-dpl.yaml"
     },
     {
       "image_property": "harbor.registryController",
       "helmfile_selector": "app=harbor",
       "container_name": "registryctl",
-      "template_file": "harbor/templates/registry/registry-dpl.yaml"
+      "template_file": "sc/harbor/templates/registry/registry-dpl.yaml"
     },
     {
       "image_property": "harbor.database",
       "helmfile_selector": "app=harbor",
       "container_name": "database",
-      "template_file": "harbor/templates/database/database-ss.yaml"
+      "template_file": "sc/harbor/templates/database/database-ss.yaml"
     },
     {
       "image_property": "harbor.redis",
       "helmfile_selector": "app=harbor",
       "container_name": "redis",
-      "template_file": "harbor/templates/redis/statefulset.yaml"
+      "template_file": "sc/harbor/templates/redis/statefulset.yaml"
     },
     {
       "image_property": "harbor.trivyAdapter",
       "helmfile_selector": "app=harbor",
       "container_name": "trivy",
-      "template_file": "harbor/templates/trivy/trivy-sts.yaml"
+      "template_file": "sc/harbor/templates/trivy/trivy-sts.yaml"
     },
     {
       "image_property": "harbor.initJob",
       "helmfile_selector": "app=harbor",
       "container_name": "run",
-      "template_file": "init-harbor/templates/init-harbor-job.yaml"
+      "template_file": "sc/init-harbor/templates/init-harbor-job.yaml"
     },
     {
       "image_property": "harbor.backupJob",
       "helmfile_selector": "app=harbor",
       "container_name": "run",
-      "template_file": "harbor-backup/templates/harbor-backup-job.yaml"
+      "template_file": "sc/harbor-backup/templates/harbor-backup-job.yaml"
     }
   ]
 }
