@@ -21,6 +21,7 @@ setup_file() {
   yq.set sc .gpu.enabled 'true'
   yq.set sc .harbor.backup.enabled 'true'
   yq.set wc .hnc.enabled 'true'
+  yq.set sc .kured.enabled 'true'
 }
 
 setup() {

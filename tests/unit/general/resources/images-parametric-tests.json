@@ -221,6 +221,12 @@
       "helmfile_selector": "app=hnc",
       "container_name": "hnc-controller-manager",
       "template_file": "wc/hnc/templates/manager-deployment.yaml"
+    },
+    {
+      "image_property": "kured.image",
+      "helmfile_selector": "app=kured",
+      "container_name": "kured",
+      "template_file": "sc/kured/templates/daemonset.yaml"
     }
   ]
 }
