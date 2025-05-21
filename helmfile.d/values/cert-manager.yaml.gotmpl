@@ -4,7 +4,6 @@
 }}
 {{- with .Values.images | dig "certManager" "controller" "" }}
 {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-{{- if or .registry .repository .image .tag .digest }}
 image:
   {{- with include "gen.reg-rep-img" . }}
   repository: {{ . }}
@@ -12,7 +11,6 @@ image:
   {{- if or .tag .digest }}
   tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
   {{- end }}
-{{- end }}
 {{- end }}
 {{- end }}
 resources:    {{- toYaml .Values.certmanager.resources | nindent 2 }}
@@ -28,7 +26,6 @@ webhook:
   tolerations:  {{- toYaml .Values.certmanager.webhook.tolerations | nindent 4 }}
   {{- with .Values.images | dig "certManager" "webhook" "" }}
   {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-  {{- if or .registry .repository .image .tag .digest }}
   image:
     {{- with include "gen.reg-rep-img" . }}
     repository: {{ . }}
@@ -36,7 +33,6 @@ webhook:
     {{- if or .tag .digest }}
     tag: "{{ .tag }}{{ with .digest }}@{{ . }}{{ end }}"
     {{- end }}
-  {{- end }}
   {{- end }}
   {{- end }}
 
@@ -48,7 +44,6 @@ cainjector:
   extraArgs:    {{- toYaml .Values.certmanager.cainjector.extraArgs | nindent 4 }}
   {{- with .Values.images | dig "certManager" "cainjector" "" }}
   {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-  {{- if or .registry .repository .image .tag .digest }}
   image:
     {{- with include "gen.reg-rep-img" . }}
     repository: {{ . }}
@@ -58,11 +53,9 @@ cainjector:
     {{- end }}
   {{- end }}
   {{- end }}
-  {{- end }}
 
 {{- with .Values.images | dig "certManager" "startupapicheck" "" }}
 {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-{{- if or .registry .repository .image .tag .digest }}
 startupapicheck:
   image:
     {{- with include "gen.reg-rep-img" . }}
@@ -71,7 +64,6 @@ startupapicheck:
     {{- if or .tag .digest }}
     tag: "{{ .tag }}{{ with .digest }}@{{ . }}{{ end }}"
     {{- end }}
-{{- end }}
 {{- end }}
 {{- end }}
 

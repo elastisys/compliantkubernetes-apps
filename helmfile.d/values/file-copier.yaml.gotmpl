@@ -9,7 +9,6 @@ ingressNginxChroot:
   affinity: {{ toYaml .Values.ingressNginx.controller.affinity | nindent 4 }}
 {{- with .Values.images | dig "ingressNginx" "fileCopier" "" }}
 {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-{{- if or .registry .repository .image .tag .digest }}
   fileCopierImage:
     {{- with .tag }}
     tag: {{ . }}
@@ -20,6 +19,5 @@ ingressNginxChroot:
     {{- with include "gen.reg-rep-img" . }}
     image: {{ . }}
     {{- end }}
-{{- end }}
 {{- end }}
 {{- end }}

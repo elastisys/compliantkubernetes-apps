@@ -135,7 +135,6 @@ enableGeneratorResourceExpansion: false
 }}
 {{- with .Values.images | dig "gatekeeper" "image" "" }}
 {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-{{- if or .registry .repository .image .tag .digest }}
 image:
   {{- with include "gen.reg-rep-img" . }}
   repository: {{ . }}
@@ -143,7 +142,6 @@ image:
   {{- if or .tag .digest }}
   release: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
   {{- end }}
-{{- end }}
 {{- end }}
 {{- end }}
 
@@ -167,7 +165,6 @@ postInstall:
     enabled: false
   {{- with .Values.images | dig "gatekeeper" "postInstallLabelNamespace" "" }}
   {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-  {{- if or .registry .repository .image .tag .digest }}
   labelNamespace:
     image:
       {{- with include "gen.reg-rep-img" .}}
@@ -176,6 +173,5 @@ postInstall:
       {{- if or .tag .digest }}
       tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
       {{- end }}
-  {{- end }}
   {{- end }}
   {{- end }}

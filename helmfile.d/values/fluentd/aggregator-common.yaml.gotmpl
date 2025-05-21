@@ -38,7 +38,6 @@ extraDeploy:
 }}
 {{- with .Values.images | dig "fluentd" "aggregator" "" }}
 {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-{{- if or .registry .repository .image .tag .digest }}
 image:
   pullPolicy: IfNotPresent
   {{- with .registry }}
@@ -50,7 +49,6 @@ image:
   {{- if or .tag .digest }}
   tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
   {{- end }}
-{{- end }}
 {{- end }}
 {{- end }}
 

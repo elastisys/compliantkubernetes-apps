@@ -20,7 +20,6 @@ The function expects two arguments in a dictionary:
     "image" (include "container_uri.image" . | trim)
     "tag" (include "container_uri.tag" . | trim)
     "digest" (include "container_uri.digest" . | trim)
-    "uri" .
   )}}
 {{- end }}
 

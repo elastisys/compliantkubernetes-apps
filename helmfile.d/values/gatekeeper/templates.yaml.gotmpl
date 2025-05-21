@@ -4,13 +4,11 @@
 }}
 {{- with .Values.images | dig "gatekeeper" "kubectl" "" }}
 {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-{{- if or .registry .repository .image .tag .digest }}
 image:
   repository: {{ include "gen.reg-rep-img" . | default "" }}
   {{- if or .tag .digest }}
   tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
   {{- end }}
-{{- end }}
 {{- end }}
 {{- end }}
 

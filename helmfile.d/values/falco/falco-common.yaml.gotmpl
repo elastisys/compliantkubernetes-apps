@@ -36,7 +36,6 @@ falco:
 
 {{- with .Values.images | dig "falco" "image" "" }}
 {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-{{- if or .registry .repository .image .tag .digest }}
 image:
   registry: ""
   {{- with include "gen.reg-rep-img" . }}
@@ -45,7 +44,6 @@ image:
   {{- if or .tag .digest }}
   tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
   {{- end }}
-{{- end }}
 {{- end }}
 {{- end }}
 
@@ -85,7 +83,6 @@ driver:
     initContainer:
       {{- with .Values.images | dig "falco" "driverLoaderInit" "" }}
       {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-      {{- if or .registry .repository .image .tag .digest }}
       image:
         registry: ""
         {{- with include "gen.reg-rep-img" . }}
@@ -94,7 +91,6 @@ driver:
         {{- if or .tag .digest }}
         tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
         {{- end }}
-      {{- end }}
       {{- end }}
       {{- end }}
       securityContext:
@@ -115,7 +111,6 @@ tolerations: {{- toYaml .Values.falco.tolerations | nindent 2  }}
 falcoctl:
   {{- with .Values.images | dig "falco" "falcoctl" "" }}
   {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-  {{- if or .registry .repository .image .tag .digest }}
   image:
     {{- with .registry }}
     registry: {{ . }}
@@ -126,7 +121,6 @@ falcoctl:
     {{- if or .tag .digest }}
     tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
     {{- end }}
-  {{- end }}
   {{- end }}
   {{- end }}
   artifact:
@@ -482,7 +476,6 @@ falcosidekick:
     {{ end }}
   {{- with .Values.images | dig "falco" "sidekick" "" }}
   {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-  {{- if or .registry .repository .image .tag .digest }}
   image:
     {{- with .registry }}
     registry: {{ . }}
@@ -493,7 +486,6 @@ falcosidekick:
     {{- if or .tag .digest }}
     tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
     {{- end }}
-  {{- end }}
   {{- end }}
   {{- end }}
 

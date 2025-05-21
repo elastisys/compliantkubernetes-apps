@@ -14,7 +14,6 @@ admissionController:
   container:
     {{- with .Values.images | dig "kyverno" "main" "" }}
     {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-    {{- if or .registry .repository .image .tag .digest }}
     image:
       {{- with .registry }}
       registry: {{ . }}
@@ -27,12 +26,10 @@ admissionController:
       {{- end }}
     {{- end }}
     {{- end }}
-    {{- end }}
     resources: {{- toYaml .Values.kyverno.resources | nindent 8 }}
 
   {{- with .Values.images | dig "kyverno" "init" "" }}
   {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-  {{- if or .registry .repository .image .tag .digest }}
   initContainer:
     image:
       {{- with .registry }}
@@ -44,7 +41,6 @@ admissionController:
       {{- if or .tag .digest }}
       tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
       {{- end }}
-  {{- end }}
   {{- end }}
   {{- end }}
 
@@ -93,7 +89,6 @@ crds:
       - updaterequests.kyverno.io
     {{- with .Values.images | dig "kyverno" "crdsMigration" "" }}
     {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-    {{- if or .registry .repository .image .tag .digest }}
     image:
       {{- with .registry }}
       registry: {{ . }}
@@ -106,13 +101,11 @@ crds:
       {{- end }}
     {{- end }}
     {{- end }}
-    {{- end }}
 
 
 
 {{- with .Values.images | dig "kyverno" "webhooksCleanup" "" }}
 {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-{{- if or .registry .repository .image .tag .digest }}
 webhooksCleanup:
   image:
     {{- with .registry }}
@@ -124,6 +117,5 @@ webhooksCleanup:
     {{- if or .tag .digest }}
     tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
     {{- end }}
-{{- end }}
 {{- end }}
 {{- end }}

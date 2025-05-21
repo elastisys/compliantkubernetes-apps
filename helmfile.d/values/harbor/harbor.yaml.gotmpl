@@ -130,7 +130,6 @@ core:
   tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
   {{- with .Values.images | dig "harbor" "core" "" }}
   {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-  {{- if or .registry .repository .image .tag .digest }}
   image:
     {{- with include "gen.reg-rep-img" . }}
     repository: {{ . }}
@@ -138,7 +137,6 @@ core:
     {{- if or .tag .digest }}
     tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
     {{- end }}
-  {{- end }}
   {{- end }}
   {{- end }}
 
@@ -152,7 +150,6 @@ jobservice:
   jobLoggers:   {{- toYaml .Values.harbor.jobservice.jobLoggers | nindent 4 }}
   {{- with .Values.images | dig "harbor" "jobservice" "" }}
   {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-  {{- if or .registry .repository .image .tag .digest }}
   image:
     {{- with include "gen.reg-rep-img" . }}
     repository: {{ . }}
@@ -160,7 +157,6 @@ jobservice:
     {{- if or .tag .digest }}
     tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
     {{- end }}
-  {{- end }}
   {{- end }}
   {{- end }}
 
@@ -171,7 +167,6 @@ registry:
     resources:  {{- toYaml .Values.harbor.registry.resources | nindent 6 }}
     {{- with .Values.images | dig "harbor" "registry" "" }}
     {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-    {{- if or .registry .repository .image .tag .digest }}
     image:
       {{- with include "gen.reg-rep-img" . }}
       repository: {{ . }}
@@ -179,7 +174,6 @@ registry:
       {{- if or .tag .digest }}
       tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
       {{- end }}
-    {{- end }}
     {{- end }}
     {{- end }}
 
@@ -187,7 +181,6 @@ registry:
     resources:  {{- toYaml .Values.harbor.registry.controller.resources | nindent 6 }}
     {{- with .Values.images | dig "harbor" "registryController" "" }}
     {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-    {{- if or .registry .repository .image .tag .digest }}
     image:
       {{- with include "gen.reg-rep-img" . }}
       repository: {{ . }}
@@ -195,7 +188,6 @@ registry:
       {{- if or .tag .digest }}
       tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
       {{- end }}
-    {{- end }}
     {{- end }}
     {{- end }}
 
@@ -217,7 +209,6 @@ database:
     tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 6 }}
     {{- with .Values.images | dig "harbor" "database" "" }}
     {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-    {{- if or .registry .repository .image .tag .digest }}
     image:
       {{- with include "gen.reg-rep-img" . }}
       repository: {{ . }}
@@ -225,7 +216,6 @@ database:
       {{- if or .tag .digest }}
       tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
       {{- end }}
-    {{- end }}
     {{- end }}
     {{- end }}
 
@@ -247,7 +237,6 @@ trivy:
   tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
   {{- with .Values.images | dig "harbor" "trivyAdapter" "" }}
   {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-  {{- if or .registry .repository .image .tag .digest }}
   image:
     {{- with include "gen.reg-rep-img" . }}
     repository: {{ . }}
@@ -255,7 +244,6 @@ trivy:
     {{- if or .tag .digest }}
     tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
     {{- end }}
-  {{- end }}
   {{- end }}
   {{- end }}
 
@@ -268,7 +256,6 @@ portal:
   tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 4 }}
   {{- with .Values.images | dig "harbor" "portal" "" }}
   {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-  {{- if or .registry .repository .image .tag .digest }}
   image:
     {{- with include "gen.reg-rep-img" . }}
     repository: {{ . }}
@@ -276,7 +263,6 @@ portal:
     {{- if or .tag .digest }}
     tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
     {{- end }}
-  {{- end }}
   {{- end }}
   {{- end }}
 
@@ -290,7 +276,6 @@ redis:
     tolerations:  {{- toYaml .Values.harbor.tolerations | nindent 6 }}
     {{- with .Values.images | dig "harbor" "redis" "" }}
     {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-    {{- if or .registry .repository .image .tag .digest }}
     image:
       {{- with include "gen.reg-rep-img" . }}
       repository: {{ . }}
@@ -298,7 +283,6 @@ redis:
       {{- if or .tag .digest }}
       tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
       {{- end }}
-    {{- end }}
     {{- end }}
     {{- end }}
   {{- end }}
@@ -311,7 +295,6 @@ exporter:
   resources: {{- toYaml .Values.harbor.exporter.resources | nindent 4 }}
   {{- with .Values.images | dig "harbor" "exporter" "" }}
   {{- with merge (include "container_uri.parse" . | fromJson) $global }}
-  {{- if or .registry .repository .image .tag .digest }}
   image:
     {{- with include "gen.reg-rep-img" . }}
     repository: {{ . }}
@@ -319,7 +302,6 @@ exporter:
     {{- if or .tag .digest }}
     tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
     {{- end }}
-  {{- end }}
   {{- end }}
   {{- end }}
 
