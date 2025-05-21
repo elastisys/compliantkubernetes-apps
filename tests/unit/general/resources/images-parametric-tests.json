@@ -293,6 +293,12 @@
       "helmfile_selector": "app=opensearch",
       "container_name": "exporter",
       "template_file": "sc/prometheus-elasticsearch-exporter/templates/deployment.yaml"
+    },
+    {
+      "image_property": "rclone.image",
+      "helmfile_selector": "app=rclone",
+      "container_name": "rclone",
+      "template_file": "sc/rclone/templates/cronjobs.yaml"
     }
   ]
 }

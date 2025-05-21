@@ -24,6 +24,8 @@ setup_file() {
   yq.set sc .kured.enabled 'true'
   yq.set sc .kyverno.enabled 'true'
   yq.set sc .opensearch.snapshot.enabled 'true'
+
+  _setup_rclone sc sync
 }
 
 setup() {
@@ -289,4 +291,19 @@ _extract_image() {
     + (.spec.template.spec.initContainers // [])
     + (.spec.jobTemplate.spec.template.spec.containers // [])
     ) | .[] | select(.name == "'"${_container_name}"'") | .image' <"${_templates_output}/${_template_file}"
+}
+
+_setup_rclone() {
+  local _cluster="$1"
+  local _scope="$2"
+  yq.set "${_cluster}" ".objectStorage.${_scope}.enabled" 'true'
+  yq.set "${_cluster}" ".objectStorage.${_scope}.s3.region" '"foo"'
+  yq.set "${_cluster}" ".objectStorage.${_scope}.s3.regionEndpoint" '"bar"'
+  yq.set "${_cluster}" ".objectStorage.${_scope}.s3.accessKey" '"baz"'
+  yq.set "${_cluster}" ".objectStorage.${_scope}.s3.secretKey" '"secret"'
+  yq.set "${_cluster}" ".objectStorage.${_scope}.s3.forcePathStyle" 'false'
+  yq.set "${_cluster}" ".objectStorage.${_scope}.syncDefaultBuckets" 'false'
+  yq.set "${_cluster}" ".objectStorage.${_scope}.buckets" "[]"
+  yq.set "${_cluster}" ".objectStorage.${_scope}.buckets[0].source" '"a-bucket"'
+  yq.set "${_cluster}" ".objectStorage.${_scope}.buckets[0].destinationType" '"s3"'
 }
