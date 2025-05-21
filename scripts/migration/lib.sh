@@ -286,7 +286,7 @@ check_version() {
   # Make sure **config** and **cluster** is on the same (old) version
   cluster_version="$(get_apps_version "${1}" >/dev/null 2>&1 || true)"
   if [[ "${2}" == "prepare" ]]; then
-    if [[ "" != "${cluster_version}" ]] && [[ "${cluster_version}" != "${VERSION["${1}-config"]%.*}" ]]; then
+    if [[ -n "${cluster_version}" ]] && [[ "${cluster_version}" != "${VERSION["${1}-config"]%.*}" ]]; then
       log_warn "Version mismatch, cluster ${cluster_version}, config ${VERSION["${1}-config"]%.*}"
       if [[ -t 1 ]]; then
         log_warn_no_newline "Do you want to continue [y/N]: "
