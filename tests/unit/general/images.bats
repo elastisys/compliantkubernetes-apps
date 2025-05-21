@@ -3,7 +3,9 @@
 # bats file_tags=releases,general
 
 setup_file() {
-  bats_require_minimum_version 1.5.0
+  # for dynamically registering tests using `bats_test_function`
+  bats_require_minimum_version 1.11.1
+
   load "../../bats.lib.bash"
   load_common "env.bash"
   load_common "gpg.bash"
