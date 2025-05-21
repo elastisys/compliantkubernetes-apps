@@ -40,6 +40,8 @@ images:
     trivyAdapter: docker.io/goharbor/trivy-adapter-photon:v2.12.1
     initJob: ghcr.io/elastisys/curl-jq:1.0.0
     backupJob: ghcr.io/elastisys/backup-postgres:1.5.0
+  hnc:
+    image: ghcr.io/elastisys/hnc-manager:v1.1.0
   ingressNginx:
     controller: registry.k8s.io/ingress-nginx/controller:v1.12.1@sha256:d2fbc4ec70d8aa2050dd91a91506e998765e86c96f32cffb56c503c9c34eed5b
     controllerChroot: registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e

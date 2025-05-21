@@ -8174,6 +8174,14 @@ properties:
             $ref: '#/$defs/containerImage'
           backupJob:
             $ref: '#/$defs/containerImage'
+      hnc:
+        title: hnc stack image configuration
+        description: hnc stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          image:
+            $ref: '#/$defs/containerImage'
       ingressNginx:
         title: ingress-nginx stack image configuration
         description: ingress-nginx stack image configuration
