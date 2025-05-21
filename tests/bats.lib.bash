@@ -13,6 +13,8 @@ export CHARTS="${ROOT}/helmfile.d/charts"
 export TESTS
 export ROOT
 
+export CK8S_TESTS_HARNESS="true"
+
 log.fatal() {
   if [[ -e /dev/fd/3 ]]; then
     echo "error: ${1}" >&3

@@ -102,6 +102,9 @@ ask_abort() {
 
 # Checks that all dependencies are available and critical ones for matching minor version.
 check_tools() {
+  # Skip in tests
+  [[ "${CK8S_TESTS_HARNESS:-}" != "true" ]] || return 0
+
   local req just_check
 
   if [[ "${1:-}" == "--just-check" ]]; then

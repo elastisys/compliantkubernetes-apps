@@ -108,9 +108,7 @@ helmfile_template_release() {
     local -a files
     readarray -t files <<<"$(find "${release}" -type f -name '*.yaml')"
 
-    for file in "${files[@]}"; do
-      yq ".metadata.namespace = (.metadata.namespace // \"${namespace}\")" "${file}"
-    done
+    yq ".metadata.namespace = (.metadata.namespace // \"${namespace}\")" "${files[@]}"
 
   else
     echo "error: missing release ${1}/${2}" >&2
@@ -149,10 +147,10 @@ releases_have_through_needs() {
   local selector
   for selector in "${selectors[@]}"; do
     local used_resources
-    used_resources="$(helmfile_template_release "${cluster}" "${selector}" | yq -N "select(. != null) | [${used_expression}] | .[]" | sort -u)"
+    used_resources="$(helmfile_template_release "${cluster}" "${selector}" | yq -N "select(. != null) | [${used_expression}] | sort | unique | .[]")"
 
     local created_resources
-    created_resources="$(helmfile_template_release_needs "${cluster}" "${selector}" | yq -N "select(. != null) | [${created_expression}] | .[]" | sort -u)"
+    created_resources="$(helmfile_template_release_needs "${cluster}" "${selector}" | yq -N "select(. != null) | [${created_expression}] | sort | unique | .[]")"
 
     local uniques
     # print used resources once and created resources twice, then filter on totally unique identifiers
