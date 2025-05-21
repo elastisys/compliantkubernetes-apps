@@ -23,6 +23,7 @@ setup_file() {
   yq.set wc .hnc.enabled 'true'
   yq.set sc .kured.enabled 'true'
   yq.set sc .kyverno.enabled 'true'
+  yq.set sc .opensearch.snapshot.enabled 'true'
 }
 
 setup() {

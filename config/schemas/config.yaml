@@ -8182,6 +8182,22 @@ properties:
         properties:
           image:
             $ref: '#/$defs/containerImage'
+      ingressNginx:
+        title: ingress-nginx stack image configuration
+        description: ingress-nginx stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          controller:
+            $ref: '#/$defs/containerImage'
+          controllerChroot:
+            $ref: '#/$defs/containerImage'
+          defaultBackend:
+            $ref: '#/$defs/containerImage'
+          admissionWebhooksPatch:
+            $ref: '#/$defs/containerImage'
+          fileCopier:
+            $ref: '#/$defs/containerImage'
       kured:
         title: kured stack image configuration
         description: kured stack image configuration
@@ -8204,23 +8220,26 @@ properties:
             $ref: '#/$defs/containerImage'
           crdsMigration:
             $ref: '#/$defs/containerImage'
-      ingressNginx:
-        title: ingress-nginx stack image configuration
-        description: ingress-nginx stack image configuration
+      opensearch:
+        title: opensearch stack image configuration
+        description: opensearch stack image configuration
         type: object
         additionalProperties: false
         properties:
-          controller:
+          image:
             $ref: '#/$defs/containerImage'
-          controllerChroot:
+          initSysctl:
             $ref: '#/$defs/containerImage'
-          defaultBackend:
+          dashboards:
             $ref: '#/$defs/containerImage'
-          admissionWebhooksPatch:
+          configurerJob:
             $ref: '#/$defs/containerImage'
-          fileCopier:
+          slmCronjob:
             $ref: '#/$defs/containerImage'
-
+          curatorCronjob:
+            $ref: '#/$defs/containerImage'
+          exporter:
+            $ref: '#/$defs/containerImage'
 additionalProperties:
   title: Additional Properties
   description: Configure additional properties not covered by the schema.
