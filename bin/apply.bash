@@ -17,6 +17,25 @@ usage() {
   exit 1
 }
 
+check_node_label() {
+  local cluster="${1}"
+  local label="${2}"
+
+  local -a nodes_missing_node_group_label
+
+  readarray -t nodes_missing_node_group_label <<<"$(with_kubeconfig "${config["kube_config_${cluster}"]}" kubectl get no -l "!${label}" -o yaml | yq '.items[] | .metadata.name')"
+
+  if [ "${#nodes_missing_node_group_label[@]}" -ne 0 ]; then
+    log_warning "---"
+    log_warning "Found nodes that are missing the label '${label}':"
+    printf '%s\n' "${nodes_missing_node_group_label[@]}"
+
+    if ! "${CK8S_AUTO_APPROVE}"; then
+      ask_abort
+    fi
+  fi
+}
+
 update_ips_dryrun() {
   if ! "${here}/update-ips.bash" "$1" "dry-run"; then
     log_warning "---"
@@ -71,6 +90,7 @@ wc)
   ;;
 esac
 
+check_node_label "$1" elastisys.io/node-group
 update_ips_dryrun "$1" "${environment}"
 config_load "$1"
 apps_apply "$1" "${environment}" "${@:2}"
