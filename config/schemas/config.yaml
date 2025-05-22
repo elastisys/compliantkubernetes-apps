@@ -8268,6 +8268,16 @@ properties:
             $ref: '#/$defs/containerImage'
           webhook:
             $ref: '#/$defs/containerImage'
+      thanos:
+        title: thanos stack image configuration
+        description: thanos stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          image:
+            $ref: '#/$defs/containerImage'
+          configReloader:
+            $ref: '#/$defs/containerImage'
 additionalProperties:
   title: Additional Properties
   description: Configure additional properties not covered by the schema.

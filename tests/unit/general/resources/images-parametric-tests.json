@@ -323,6 +323,18 @@
       "helmfile_selector": "app=tekton",
       "container_name": "webhook",
       "template_file": "sc/tekton-pipelines/templates/webhook/deployment.yaml"
+    },
+    {
+      "image_property": "thanos.image",
+      "helmfile_selector": "app=thanos",
+      "container_name": "bucketweb",
+      "template_file": "sc/thanos/templates/bucketweb/deployment.yaml"
+    },
+    {
+      "image_property": "thanos.configReloader",
+      "helmfile_selector": "app=thanos",
+      "container_name": "config-reloader",
+      "template_file": "sc/thanos/templates/ruler/statefulset.yaml"
     }
   ]
 }

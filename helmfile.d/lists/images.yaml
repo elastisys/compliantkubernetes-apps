@@ -71,3 +71,6 @@ images:
     controller: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/controller:v0.45.0@sha256:8a302dab54484bbb83d46ff9455b077ea51c1c189641dcda12575f8301bfb257
     remoteResolvers: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/resolvers:v0.45.0@sha256:5bd5240ccd89e0b81796aa8b8bbb4feb2162e63dda1cb0a95e315c9fadeb7ec8
     webhook: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/webhook:v0.45.0@sha256:07390c988b1c651c4810e9f7b15a88dfce8030845a429cf19b762a0d50e18ca7
+  thanos:
+    image: ghcr.io/elastisys/bitnami/thanos:1.63.0
+    configReloader: quay.io/prometheus-operator/prometheus-config-reloader:v0.50.0
