@@ -38,25 +38,25 @@ AZURE_RCLONE_FIXUP_FLAG=false # Default: do not run the Azure rclone fixup job
 # Parse optional arguments
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --backup-id)
-      if [ -n "${2:-}" ]; then
-        SPECIFIC_BACKUP_ARG="$2"
-        shift 2
-      else
-        echo "Error: --backup-id requires a value." >&2
-        echo "Usage: $0 [--backup-id <backup_id_value>] [--azure-rclone-fixup]" >&2
-        exit 1
-      fi
-      ;;
-    --azure-rclone-fixup)
-      AZURE_RCLONE_FIXUP_FLAG=true
-      shift 1
-      ;;
-    *)
-      echo "Error: Unknown argument: $1" >&2
+  --backup-id)
+    if [ -n "${2:-}" ]; then
+      SPECIFIC_BACKUP_ARG="$2"
+      shift 2
+    else
+      echo "Error: --backup-id requires a value." >&2
       echo "Usage: $0 [--backup-id <backup_id_value>] [--azure-rclone-fixup]" >&2
       exit 1
-      ;;
+    fi
+    ;;
+  --azure-rclone-fixup)
+    AZURE_RCLONE_FIXUP_FLAG=true
+    shift 1
+    ;;
+  *)
+    echo "Error: Unknown argument: $1" >&2
+    echo "Usage: $0 [--backup-id <backup_id_value>] [--azure-rclone-fixup]" >&2
+    exit 1
+    ;;
   esac
 done
 
@@ -111,22 +111,29 @@ echo "Scaling down Harbor deployments..."
 # Storage-specific setup
 if [ "${STORAGE_TYPE}" == "s3" ]; then
   echo "Setting up for S3 restore..."
-  export S3_BUCKET=$(yq '.objectStorage.buckets.harbor' "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml")
-  export S3_REGION_ENDPOINT=$(yq '.objectStorage.s3.regionEndpoint' "${CK8S_CONFIG_PATH}/common-config.yaml")
-  envsubst > tmp-job.yaml < restore/harbor/restore-harbor-job.yaml
+  S3_BUCKET=""
+  S3_REGION_ENDPOINT=""
+  S3_BUCKET=$(yq '.objectStorage.buckets.harbor' "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml")
+  S3_REGION_ENDPOINT=$(yq '.objectStorage.s3.regionEndpoint' "${CK8S_CONFIG_PATH}/common-config.yaml")
+  export S3_BUCKET
+  export S3_REGION_ENDPOINT
+  envsubst >tmp-job.yaml <restore/harbor/restore-harbor-job.yaml
   ./bin/ck8s ops kubectl sc create configmap -n harbor restore-harbor --from-file=restore/harbor/restore-harbor.sh --dry-run=client -o yaml | ./bin/ck8s ops kubectl sc apply -f -
 elif [ "${STORAGE_TYPE}" == "azure" ]; then
   echo "Setting up for Azure restore..."
 
   if [ "${AZURE_RCLONE_FIXUP_FLAG}" = true ]; then
-    echo "User requested Azure Rclone data move. Executing job..."
-    # Rclone move data if applicable. This is for scenarios where Harbor is restored in Azure
-    # from a bucket previously used as an rclone destination from a non-Azure source (e.g. S3),
-    # which can cause path issues for Harbor image data in Azure.
-    export S3_BUCKET=$(yq '.objectStorage.buckets.harbor' "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml")
-    export AZURE_ACCOUNT=$(yq '.objectStorage.azure.storageAccountName' "${CK8S_CONFIG_PATH}/common-config.yaml")
-    export AZURE_KEY=$(sops -d --extract '["objectStorage"]["azure"]["storageAccountKey"]' "${CK8S_CONFIG_PATH}/secrets.yaml")
-    envsubst > tmp-rclone-job.yaml < restore/harbor/harbor-rclone-azure.yaml
+    echo "Running Azure rclone fixup job..."
+    S3_BUCKET=""
+    AZURE_ACCOUNT=""
+    AZURE_KEY=""
+    S3_BUCKET=$(yq '.objectStorage.buckets.harbor' "${CK8S_CONFIG_PATH}/defaults/sc-config.yaml")
+    AZURE_ACCOUNT=$(yq '.objectStorage.azure.storageAccountName' "${CK8S_CONFIG_PATH}/common-config.yaml")
+    AZURE_KEY=$(sops -d --extract '["objectStorage"]["azure"]["storageAccountKey"]' "${CK8S_CONFIG_PATH}/secrets.yaml")
+    export S3_BUCKET
+    export AZURE_ACCOUNT
+    export AZURE_KEY
+    envsubst >tmp-rclone-job.yaml <restore/harbor/harbor-rclone-azure.yaml
     ./bin/ck8s ops kubectl sc apply -f tmp-rclone-job.yaml
     echo "Waiting for Rclone data move job to complete..."
     ./bin/ck8s ops kubectl sc wait --for=condition=complete job -n harbor harbor-restore-rclone-move --timeout=-1s
@@ -137,7 +144,7 @@ elif [ "${STORAGE_TYPE}" == "azure" ]; then
   fi
 
   echo "Preparing Harbor database restore for Azure..."
-  envsubst > tmp-job.yaml < restore/harbor/restore-harbor-job-azure.yaml
+  envsubst >tmp-job.yaml <restore/harbor/restore-harbor-job-azure.yaml
   ./bin/ck8s ops kubectl sc create configmap -n harbor restore-harbor --from-file=restore/harbor/restore-harbor.sh --dry-run=client -o yaml | ./bin/ck8s ops kubectl sc apply -f -
 else
   echo "Error: Invalid storage type '${STORAGE_TYPE}'. Must be 's3' or 'azure'."
@@ -160,7 +167,7 @@ echo "Cleaning up restore artifacts..."
 ./bin/ck8s ops kubectl sc delete -n harbor -f restore/harbor/network-policies-harbor.yaml
 ./bin/ck8s ops kubectl sc delete -n harbor -f tmp-job.yaml
 ./bin/ck8s ops kubectl sc delete configmap -n harbor restore-harbor
-rm -f tmp-job.yaml # Ensure removal even if delete fails
+rm -f tmp-job.yaml        # Ensure removal even if delete fails
 rm -f tmp-rclone-job.yaml # Ensure removal even if delete fails
 
 echo "Harbor restore from ${STORAGE_TYPE} completed successfully."

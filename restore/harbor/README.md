@@ -25,7 +25,7 @@ It automatically detects your `objectStorage.type` (s3 or azure) from `${CK8S_CO
     - A numeric ID (e.g., `1747441979`). The script will form the path as `backups/ID.tgz`.
     - A filename (e.g., `1747441979.tgz`). The script will form the path as `backups/filename`.
     - A full path (e.g., `backups/1747441979.tgz`).
-    If omitted, the latest backup will be used.
+        If omitted, the latest backup will be used.
 - **`--azure-rclone-fixup`**: (Optional, Azure Storage Type Only) If your `objectStorage.type` is `azure` and this flag is specified, the script runs an Rclone job to correct potential path issues for Harbor image data. This is typically needed if you are restoring in Azure from a backup that was an rclone destination from a non-Azure source (e.g., S3). See the "Azure Rclone Data Move" section below for more details.
 
 ### Listing Available Backups
@@ -48,28 +48,33 @@ s3cmd --config <(sops -d ${CK8S_CONFIG_PATH}/.state/s3cfg.ini) ls s3://$(yq '.ob
 export AZURE_LOCATION=$(yq '.objectStorage.azure.region' "${CK8S_CONFIG_PATH}/common-config.yaml" ) # Or your specific Azure location
 ./scripts/azure/storage-manager.sh list-harbor-backups
 ```
-*(Note: `storage-manager.sh` might need `AZURE_ACCOUNT_NAME` and `AZURE_CONTAINER_NAME` to be set or derived correctly within the script or environment for listing backups. The restore script handles these for the restore process itself based on `CK8S_CONFIG_PATH` values.)*
+
+_(Note: `storage-manager.sh` might need `AZURE_ACCOUNT_NAME` and `AZURE_CONTAINER_NAME` to be set or derived correctly within the script or environment for listing backups. The restore script handles these for the restore process itself based on `CK8S_CONFIG_PATH` values.)_
 
 </details>
 
 ### Example
 
 To restore the latest backup (storage type will be auto-detected):
+
 ```bash
 ./bin/ck8s harbor-restore
 ```
 
 To restore a specific backup using its numeric ID (storage type will be auto-detected):
+
 ```bash
 ./bin/ck8s harbor-restore --backup-id 1747614779
 ```
 
 To restore a specific backup using its filename (storage type will be auto-detected):
+
 ```bash
 ./bin/ck8s harbor-restore --backup-id 1747528228.tgz
 ```
 
 To restore an Azure backup and run the rclone path fixup job:
+
 ```bash
 ./bin/ck8s harbor-restore --backup-id <your_backup_id> --azure-rclone-fixup
 ```
@@ -110,7 +115,8 @@ In swift Harbor stores most of the image data under `files/docker/` while in s3 
 
 If you do not do this, then if you try to pull an old image you will get errors like: `Error response from daemon: manifest for <image> not found: manifest unknown: manifest unknown`
 
-*(Note: The `./bin/ck8s harbor-restore` command currently supports S3 and Azure. Swift specific interactions are not built into the script.)*
+_(Note: The `./bin/ck8s harbor-restore` command currently supports S3 and Azure. Swift specific interactions are not built into the script.)_
+
 </details>
 
 <details>
@@ -121,6 +127,7 @@ The `./bin/ck8s harbor-restore` command attempts to handle this by running an rc
 If you use this flag in the appropriate Azure scenario, you do not need to perform these manual steps.
 
 The original manual steps were:
+
 ```bash
 # export S3_BUCKET=$(yq \'.objectStorage.buckets.harbor\' \"${CK8S_CONFIG_PATH}/defaults/sc-config.yaml\" )
 # export AZURE_ACCOUNT=$(yq \'.objectStorage.azure.storageAccountName\' \"${CK8S_CONFIG_PATH}/common-config.yaml\" )
@@ -131,6 +138,7 @@ The original manual steps were:
 # ./bin/ck8s ops kubectl sc delete -f tmp-rclone-job.yaml
 # rm -v tmp-rclone-job.yaml
 ```
+
 </details>
 
 ## Deprecated: Old Manual Restore Steps
@@ -183,6 +191,7 @@ Setup the necessary job.yaml and configmap:
 # envsubst > tmp-job.yaml < restore/harbor/restore-harbor-job.yaml
 # ./bin/ck8s ops kubectl sc create configmap -n harbor restore-harbor --from-file=restore/harbor/restore-harbor.sh
 ```
+
 </details>
 
 <details>
@@ -194,6 +203,7 @@ Setup the necessary job.yaml and configmap:
 # envsubst > tmp-job.yaml < restore/harbor/restore-harbor-job-azure.yaml
 # ./bin/ck8s ops kubectl sc create configmap -n harbor restore-harbor --from-file=restore/harbor/restore-harbor.sh
 ```
+
 </details>
 
 <details>
@@ -227,4 +237,5 @@ Clean up:
 # ./bin/ck8s ops kubectl sc delete configmap -n harbor restore-harbor
 # rm -v tmp-job.yaml
 ```
+
 </details>
