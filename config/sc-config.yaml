@@ -487,6 +487,9 @@ prometheus:
   diskAlerts:
     perf:
       enabled: true
+      queueSizeThreshold: 5
+      writeWaitTimeThreshold: 1
+      readWaitTimeThreshold: 1
 
 dex:
   replicaCount: 2
