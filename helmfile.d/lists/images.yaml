@@ -74,3 +74,10 @@ images:
   thanos:
     image: ghcr.io/elastisys/bitnami/thanos:1.63.0
     configReloader: quay.io/prometheus-operator/prometheus-config-reloader:v0.50.0
+  velero:
+    image: docker.io/velero/velero:v1.13.0
+    pluginCsi: docker.io/velero/velero-plugin-for-csi:v0.7.1
+    pluginAws: docker.io/velero/velero-plugin-for-aws:v1.9.0
+    pluginGcp: docker.io/velero/velero-plugin-for-gcp:v1.9.1
+    pluginAzure: docker.io/velero/velero-plugin-for-microsoft-azure:v1.9.2
+    kubectl: ghcr.io/elastisys/bitnami/kubectl:1.29.11

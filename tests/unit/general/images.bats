@@ -26,8 +26,11 @@ setup_file() {
   yq.set sc .opensearch.snapshot.enabled 'true'
   yq.set sc .tektonPipelines.enabled 'true'
   yq.set sc .thanos.enabled 'true'
+  yq.set sc .velero.enabled 'true'
+  yq.set wc .velero.enabled 'true'
 
   _setup_rclone sc sync
+  _setup_rclone wc sync
 }
 
 setup() {
@@ -298,6 +301,8 @@ _extract_image() {
 _setup_rclone() {
   local _cluster="$1"
   local _scope="$2"
+
+  yq.set "${_cluster}" ".objectStorage.type" '"s3"'
   yq.set "${_cluster}" ".objectStorage.${_scope}.enabled" 'true'
   yq.set "${_cluster}" ".objectStorage.${_scope}.s3.region" '"foo"'
   yq.set "${_cluster}" ".objectStorage.${_scope}.s3.regionEndpoint" '"bar"'
