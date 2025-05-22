@@ -335,6 +335,30 @@
       "helmfile_selector": "app=thanos",
       "container_name": "config-reloader",
       "template_file": "sc/thanos/templates/ruler/statefulset.yaml"
+    },
+    {
+      "image_property": "velero.image",
+      "helmfile_selector": "app=velero",
+      "container_name": "node-agent",
+      "template_file": "sc/velero/templates/node-agent-daemonset.yaml"
+    },
+    {
+      "image_property": "velero.pluginAws",
+      "helmfile_selector": "app=velero",
+      "container_name": "velero-plugin-for-aws",
+      "template_file": "sc/velero/templates/deployment.yaml"
+    },
+    {
+      "image_property": "velero.image",
+      "helmfile_selector": "app=velero",
+      "container_name": "node-agent",
+      "template_file": "wc/velero/templates/node-agent-daemonset.yaml"
+    },
+    {
+      "image_property": "velero.pluginAws",
+      "helmfile_selector": "app=velero",
+      "container_name": "velero-plugin-for-aws",
+      "template_file": "wc/velero/templates/deployment.yaml"
     }
   ]
 }

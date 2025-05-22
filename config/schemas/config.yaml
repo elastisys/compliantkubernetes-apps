@@ -8278,6 +8278,24 @@ properties:
             $ref: '#/$defs/containerImage'
           configReloader:
             $ref: '#/$defs/containerImage'
+      velero:
+        title: velero stack image configuration
+        description: velero stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          image:
+            $ref: '#/$defs/containerImage'
+          pluginCsi:
+            $ref: '#/$defs/containerImage'
+          pluginAws:
+            $ref: '#/$defs/containerImage'
+          pluginGcp:
+            $ref: '#/$defs/containerImage'
+          pluginAzure:
+            $ref: '#/$defs/containerImage'
+          kubectl:
+            $ref: '#/$defs/containerImage'
 additionalProperties:
   title: Additional Properties
   description: Configure additional properties not covered by the schema.
