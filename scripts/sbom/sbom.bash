@@ -658,7 +658,15 @@ sbom_update() {
   tmp_output_sbom_file=$(mktemp --suffix=-output-sbom.json)
   # append_trap "rm ${tmp_output_sbom_file} >/dev/null 2>&1" EXIT
 
-  yq eval-all 'select(fileIndex == 0) * select(fileIndex == 1)' "${SBOM_FILE}" "${tmp_sbom_file}" > "${tmp_output_sbom_file}"
+  # query reference: https://mikefarah.gitbook.io/yq/operators/multiply-merge#merge-arrays-of-objects-together-matching-on-a-key
+  idPath=".evidence.occurrences[0].location"  originalPath=".components"  otherPath=".components" yq eval-all '
+  (
+    (( (eval(strenv(originalPath)) + eval(strenv(otherPath)))  | .[] | {(eval(strenv(idPath))):  .}) as $item ireduce ({}; . * $item )) as $uniqueMap
+    | ( $uniqueMap  | to_entries | .[]) as $item ireduce([]; . + $item.value)
+  ) as $mergedArray
+  | select(fi == 0) | (eval(strenv(originalPath))) = $mergedArray
+  ' "${SBOM_FILE}" "${tmp_sbom_file}" > "${tmp_output_sbom_file}"
+
   diff -U3 --color=always "${SBOM_FILE}" "${tmp_output_sbom_file}" && return
   log_warning_no_newline "Do you want to replace SBOM file? (y/N): "
   read -r reply
