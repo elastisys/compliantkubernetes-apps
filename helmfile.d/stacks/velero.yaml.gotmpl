@@ -42,7 +42,7 @@ templates:
       - velero/podsecuritypolicy
     values:
       {{ if .Values | get "ck8sManagementCluster.enabled" false }}
-      - values/velero-sc.yaml.gotmpl
+      - values/velero/sc.yaml.gotmpl
       {{ else if .Values | get "ck8sWorkloadCluster.enabled" false }}
-      - values/velero-wc.yaml.gotmpl
+      - values/velero/wc.yaml.gotmpl
       {{ end }}
