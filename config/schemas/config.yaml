@@ -4632,15 +4632,15 @@ properties:
           perfQueueSizeThreshold:
             title: Disk Alerts Perf Queue Size
             type: number
-            default: 0.5
+            default: 5
           perfReadWaitTimeThreshold:
             title: Disk Alerts Perf Read Wait
             type: number
-            default: 0.01
+            default: 1
           perfWriteWaitTimeThreshold:
             title: Disk Alerts Perf Write Wait
             type: number
-            default: 0.1
+            default: 1
       s3BucketAlerts:
         title: S3 Bucket Alerts
         description: Definitions for S3 bucket alerts.
