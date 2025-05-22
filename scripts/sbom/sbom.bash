@@ -21,15 +21,16 @@ SBOM_FILE="${ROOT}/docs/sbom.json"
 SBOM_TEMPLATE_FILE="${ROOT}/docs/sbom.template.json"
 
 # TODO: setting config path here to be able to source common.bash
-tmp_config_path=$(mktemp -d --suffix -config-path)
+tmp_config_path=$(mktemp -d --suffix -sbom-config-path)
 export CK8S_CONFIG_PATH="${tmp_config_path}"
 
 # shellcheck source=bin/common.bash
 source "${ROOT}/bin/common.bash"
+append_trap "rm -rf ${tmp_config_path} >/dev/null 2>&1" EXIT
 # TODO: sources test scripts to set up new Welkin config, this could be generalized to not rely on test path
 source "${ROOT}/tests/common/bats/env.bash"
+source "${ROOT}/tests/common/bats/gpg.bash"
 source "${ROOT}/tests/common/bats/yq.bash"
-append_trap "rm -rf ${tmp_config_path} >/dev/null 2>&1" EXIT
 
 usage() {
   echo "COMMANDS:" >&2
@@ -47,10 +48,12 @@ usage() {
   exit 1
 }
 
-# TODO: currently requires CK8S_PGP_FP to be set, look into creating temp key similar to bats tests?
 init_welkin_config() {
+  log_info "Initializing Welkin config used for generating Welkin"
   export PATH="${ROOT}/bin:${PATH}"
-  env.setup
+  gpg.setup_one >/dev/null 2>&1
+  # append_trap "gpg.teardown" EXIT
+  env.setup >/dev/null 2>&1
   env.init "${@}"
 }
 
@@ -395,7 +398,7 @@ _generate_helmfile_template_file() {
 
 # adds container images for a specific resource type and chart release based on its location to a input sbom file
 _add_container_images_from_template() {
-  local location sbom_file template_file chart_name type query
+  local chart_location chart_name chart_version location sbom_file template_file query
   sbom_file="${1}"
   template_file="${2}"
   chart="${3}"
@@ -454,7 +457,7 @@ _add_container_images_for_component() {
 
 # loops over all charts included in the sbom and adds templated container images to a input sbom file
 _add_container_images() {
-  local sbom_file
+  local chart sbom_file template_file
   if [[ "$#" -lt 1 ]] || [[ "$#" -gt 2 ]]; then
     log_fatal "usage: _add_container_images <sbom-file>"
   fi
