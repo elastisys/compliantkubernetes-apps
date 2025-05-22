@@ -284,17 +284,25 @@ _prepare_sbom() {
   done
 }
 
-_get_upstream_license_for_component() {
-  local chart chart_name chart_version sbom_file
+# get licenses for specific input component
+_add_license_for_component() {
+  local chart chart_location chart_name chart_version sbom_file
   sbom_file="${1}"
   chart="${2}"
 
-  chart_name=$(yq ".name" "${chart}")
-  chart_version=$(yq ".version" "${chart}")
+  chart_location="${ROOT}/$(yq ".location" <<<"${chart}")/Chart.yaml"
+  chart_name=$(yq ".name" <<<"${chart}")
+  chart_version=$(yq ".version" <<<"${chart}")
+
+  # if chart exists as part of
+  if [[ "${chart_location}" == *"helmfile.d/charts"* ]]; then
+    _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "Apache-2.0")"
+    return
+  fi
 
   # check if chart.yaml contains license in annotations
-  annotation=$(yq ".annotations.licenses" "${chart}")
-  annotation_artifacthub=$(yq '.annotations."artifacthub.io/license"' "${chart}")
+  annotation=$(yq ".annotations.licenses" "${chart_location}")
+  annotation_artifacthub=$(yq '.annotations."artifacthub.io/license"' "${chart_location}")
 
   if [[ -n "${annotation}" && "${annotation}" != "null" ]]; then
     _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "${annotation}")"
@@ -304,7 +312,7 @@ _get_upstream_license_for_component() {
 
   # if no license in annotations, try to get from source (i.e. github)
   else
-    mapfile -t sources < <(yq '.sources[]' "${chart}")
+    mapfile -t sources < <(yq '.sources[]' "${chart_location}")
     if [[ "${#sources[@]}" -eq 0 ]] || [[ "${sources[*]}" == "null" ]]; then
       return
     else
@@ -334,10 +342,11 @@ _get_upstream_license_for_component() {
   fi
 }
 
-_get_licenses() {
+# gets licenses for all charts added as components in input sbom file
+_add_licenses() {
   local chart_name chart_version sbom_file
   if [[ "$#" -ne 1 ]]; then
-    log_fatal "usage: _get_licenses <sbom-file>"
+    log_fatal "usage: _add_licenses <sbom-file>"
   fi
 
   sbom_file="${1}"
@@ -346,23 +355,11 @@ _get_licenses() {
   fi
   log_info "Getting licenses"
 
-  # Upstream charts
   # TODO: (maybe) filter out unused charts before processing?
-  mapfile -t upstream_charts < <(find "${HELMFILE_FOLDER}/upstream" -name "Chart.yaml")
+  mapfile -t all_charts < <(sbom_get_charts "${sbom_file}")
 
-  for chart in "${upstream_charts[@]}"; do
-    _get_upstream_license_for_component "${sbom_file}" "${chart}"
-  done
-
-  # Welkin charts
-  mapfile -t welkin_charts < <(find "${HELMFILE_FOLDER}/charts" -name "Chart.yaml")
-
-  for chart in "${welkin_charts[@]}"; do
-    chart_name=$(yq ".name" "${chart}")
-    chart_version=$(yq ".version" "${chart}")
-
-    # TODO: licenses for the containers
-    _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "Apache-2.0")"
+  for chart in "${all_charts[@]}"; do
+    _add_license_for_component "${sbom_file}" "${chart}"
   done
 }
 
@@ -401,12 +398,14 @@ _add_container_images_from_template() {
   local location sbom_file template_file chart_name type query
   sbom_file="${1}"
   template_file="${2}"
-  chart_name="${3}"
-  chart_version="${4}"
-  location="${5}"
-  type="${6}"
+  chart="${3}"
+  type="${4}"
 
-  chart_query="(.metadata.annotations.release == \"${location}\")"
+  chart_name=$(yq ".name" <<<"${chart}")
+  chart_version=$(yq ".version" <<<"${chart}")
+  chart_location=$(yq ".location" <<<"${chart}")
+
+  chart_query="(.metadata.annotations.release == \"${chart_location}\")"
 
   if [[ "${type}" == "pod" ]]; then
     query="select(.kind == \"Pod\" and ${chart_query}) | .spec | ((.initContainers[] | .image), (.containers[] | .image))"
@@ -455,9 +454,9 @@ _add_container_images_for_component() {
 
 # loops over all charts included in the sbom and adds templated container images to a input sbom file
 _add_container_images() {
-  local chart_location chart_name chart_version location sbom_file
+  local sbom_file
   if [[ "$#" -lt 1 ]] || [[ "$#" -gt 2 ]]; then
-    log_fatal "usage: _add_container_images <sbom-file> [location]"
+    log_fatal "usage: _add_container_images <sbom-file>"
   fi
 
   sbom_file="${1}"
@@ -477,28 +476,36 @@ _add_container_images() {
   mapfile -t all_charts < <(sbom_get_charts "${sbom_file}")
 
   for chart in "${all_charts[@]}"; do
-    chart_name=$(yq ".name" <<<"${chart}")
-    chart_version=$(yq ".version" <<<"${chart}")
-    chart_location=$(yq ".location" <<<"${chart}")
-
-    _add_container_images_for_component "${sbom_file}" "${template_file}" "${chart_name}" "${chart_version}" "${chart_location}"
+    _add_container_images_for_component "${sbom_file}" "${template_file}" "${chart}"
   done
+}
+
+_add_location_for_component() {
+  local chart_name chart_version location sbom_file
+  sbom_file="${1}"
+  chart="${2}"
+
+  chart_name=$(yq ".name" "${chart}")
+  chart_version=$(yq ".version" "${chart}")
+  location="${chart#"${ROOT}/"}"
+  location="${location%/Chart.yaml}"
+  _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "evidence" "$(_format_location_object "${location}")"
 }
 
 # adds chart locations for all components in a input sbom file
 _add_locations() {
-  local chart_name chart_version location sbom_file
+  local chart sbom_file
   sbom_file="${1}"
 
   log_info "Getting locations"
   mapfile -t all_charts < <(find "${HELMFILE_FOLDER}" -name "Chart.yaml")
   for chart in "${all_charts[@]}"; do
-    chart_name=$(yq ".name" "${chart}")
-    chart_version=$(yq ".version" "${chart}")
-    location="${chart#"${ROOT}/"}"
-    location="${location%/Chart.yaml}"
-    _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "evidence" "$(_format_location_object "${location}")"
+    _add_location_for_component "${sbom_file}" "${chart}"
   done
+
+  # some charts added as dependencies in other charts gets added twice with cdxgen
+  # such dependency charts will not always have a location added to them, so we remove them here
+  yq -i 'del(.components[] | select(.evidence == null))' "${sbom_file}"
 }
 
 sbom_remove() {
@@ -613,7 +620,7 @@ _test_github_token() {
 }
 
 sbom_update() {
-  local chart chart_name chart_version location tmp_sbom_file
+  local full_path_location location tmp_output_sbom_file tmp_sbom_file
   if [[ "$#" -ne 1 ]]; then
     usage
   fi
@@ -636,9 +643,11 @@ sbom_update() {
   export CK8S_SKIP_VALIDATION=true
 
   _prepare_sbom "${tmp_sbom_file}" --location "${full_path_location}"
-  _add_locations "${tmp_sbom_file}"
-  # TODO: for welkin charts
-  _get_upstream_license_for_component "${tmp_sbom_file}" "${full_path_location}/Chart.yaml"
+
+  _add_location_for_component "${tmp_sbom_file}" "${full_path_location}/Chart.yaml"
+
+  _add_licenses "${tmp_sbom_file}"
+
   _add_container_images "${tmp_sbom_file}" "${full_path_location}"
 
   CK8S_AUTO_APPROVE=false
@@ -647,6 +656,7 @@ sbom_update() {
   tmp_output_sbom_file=$(mktemp --suffix=-output-sbom.json)
   append_trap "rm ${tmp_output_sbom_file} >/dev/null 2>&1" EXIT
 
+  # TODO: currently does not update e.g. SBOM project version with this query due to the depth it merges at
   # query reference: https://mikefarah.gitbook.io/yq/operators/multiply-merge#merge-arrays-of-objects-together-matching-on-a-key
   # shellcheck disable=SC2016
   idPath=".evidence.occurrences[0].location"  originalPath=".components"  otherPath=".components" yq eval-all '
@@ -657,7 +667,7 @@ sbom_update() {
   | select(fi == 0) | (eval(strenv(originalPath))) = $mergedArray
   ' "${SBOM_FILE}" "${tmp_sbom_file}" > "${tmp_output_sbom_file}"
 
-  diff -U3 --color=always "${SBOM_FILE}" "${tmp_output_sbom_file}" && return
+  diff -U3 --color=always "${SBOM_FILE}" "${tmp_output_sbom_file}" && log_info "No change" && return
   log_warning_no_newline "Do you want to replace SBOM file? (y/N): "
   read -r reply
   if [[ "${reply}" == "y" ]]; then
@@ -686,9 +696,9 @@ sbom_generate() {
 
   _prepare_sbom "${tmp_sbom_file}" "${@}"
 
-  _get_licenses "${tmp_sbom_file}"
-
   _add_locations "${tmp_sbom_file}"
+
+  _add_licenses "${tmp_sbom_file}"
 
   _add_container_images "${tmp_sbom_file}"
 
@@ -696,7 +706,7 @@ sbom_generate() {
   CK8S_SKIP_VALIDATION=false
   sbom_cyclonedx_validation "${tmp_sbom_file}"
 
-  diff -U3 --color=always "${SBOM_FILE}" "${tmp_sbom_file}" && return
+  diff -U3 --color=always "${SBOM_FILE}" "${tmp_sbom_file}" && log_info "No change" && return
   log_warning_no_newline "Do you want to replace SBOM file? (y/N): "
   read -r reply
   if [[ "${reply}" == "y" ]]; then

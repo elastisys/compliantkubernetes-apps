@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:8bcd3011-e9e3-4b5a-ab7b-26e40e368135",
-  "version": 4,
+  "serialNumber": "urn:uuid:be1fd67a-05c0-4b1b-9a02-fcbc7e6f453d",
+  "version": 5,
   "metadata": {
-    "timestamp": "2025-05-22T11:28:14Z",
+    "timestamp": "2025-05-22T13:23:40Z",
     "tools": {
       "components": [
         {
@@ -36,10 +36,10 @@
     "component": {
       "group": "",
       "name": "welkin-apps",
-      "version": "ae78e733107fe1e16792e63bbe2fc3255e139d71",
+      "version": "fa08ec692437dc5755d70fcf58948ae74537c8fb",
       "type": "application",
-      "bom-ref": "pkg:application/welkin-apps@ae78e733107fe1e16792e63bbe2fc3255e139d71",
-      "purl": "pkg:application/welkin-apps@ae78e733107fe1e16792e63bbe2fc3255e139d71"
+      "bom-ref": "pkg:application/welkin-apps@fa08ec692437dc5755d70fcf58948ae74537c8fb",
+      "purl": "pkg:application/welkin-apps@fa08ec692437dc5755d70fcf58948ae74537c8fb"
     },
     "properties": [
       {
@@ -72,20 +72,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/autoscaling-monitoring"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -104,13 +104,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -118,6 +111,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "ghcr.io/elastisys/calico-accountant",
@@ -144,20 +144,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/calico-default-deny"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -176,20 +176,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/calico-felix-metrics"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -214,13 +214,6 @@
       "supplier": {
         "name": "The cert-manager Authors"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -228,6 +221,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "quay.io/jetstack/cert-manager-cainjector",
@@ -272,20 +272,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/cluster-admin-rbac"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -310,20 +310,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/upstream/bitnami/fluentd/charts/common"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -348,20 +348,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/upstream/bitnami/thanos/charts/common"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -437,13 +437,6 @@
       "supplier": {
         "name": "Dex IdP Contributors"
       },
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -451,6 +444,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "ghcr.io/dexidp/dex",
@@ -477,20 +477,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/external-dns-endpoints"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -509,20 +509,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/external-dns-secrets"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -578,13 +578,6 @@
       "supplier": {
         "name": "The Falco Authors"
       },
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -592,6 +585,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "appropriate/curl",
@@ -648,20 +648,20 @@
       "supplier": {
         "name": "The Falco Authors"
       },
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/upstream/falcosecurity/falco/charts/falcosidekick"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -680,13 +680,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -694,6 +687,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "busybox",
@@ -726,13 +726,6 @@
       "supplier": {
         "name": "Fluentd Project"
       },
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -740,6 +733,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "ghcr.io/elastisys/fluentd-forwarder",
@@ -772,13 +772,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -786,6 +779,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "ghcr.io/elastisys/fluentd-aggregator",
@@ -812,20 +812,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/gatekeeper/constraints"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -844,20 +844,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/gatekeeper/metrics"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -876,20 +876,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/gatekeeper/mutations"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -908,13 +908,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -922,6 +915,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "ghcr.io/elastisys/bitnami/kubectl",
@@ -999,20 +999,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/upstream/nvidia/gpu-operator"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -1031,20 +1031,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/grafana-dashboards"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -1063,13 +1063,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -1077,6 +1070,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "quay.io/prometheuscommunity/prom-label-proxy",
@@ -1133,20 +1133,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/grafana"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -1171,13 +1171,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -1185,6 +1178,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "docker.io/grafana/grafana",
@@ -1216,13 +1216,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -1230,6 +1223,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "ghcr.io/elastisys/backup-postgres",
@@ -1256,20 +1256,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/harbor/harbor-certs"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -1297,13 +1297,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -1311,6 +1304,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "goharbor/harbor-core",
@@ -1385,20 +1385,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/hnc/config-and-crds"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -1417,13 +1417,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -1431,6 +1424,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "ghcr.io/elastisys/hnc-manager",
@@ -1457,20 +1457,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/ingress-nginx-probe-ingress"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -1495,13 +1495,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -1509,6 +1502,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "registry.k8s.io/defaultbackend-amd64",
@@ -1546,13 +1546,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -1560,6 +1553,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "ghcr.io/elastisys/curl-jq",
@@ -1592,20 +1592,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/upstream/falcosecurity/falco/charts/k8s-metacollector"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -1630,13 +1630,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -1644,6 +1637,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "quay.io/prometheus-operator/prometheus-operator",
@@ -1700,13 +1700,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -1714,6 +1707,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "registry.k8s.io/ingress-nginx/kube-webhook-certgen",
@@ -1746,20 +1746,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/kube-state-metrics"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -1778,20 +1778,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/kubeapi-metrics"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -1810,20 +1810,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/kured-secret"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -1848,20 +1848,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/upstream/kubereboot/kured"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -1886,20 +1886,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/upstream/kyverno/kyverno"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -1918,20 +1918,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/issuers"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -1950,13 +1950,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -1964,6 +1957,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "ghcr.io/elastisys/compliantkubernetes-apps-log-manager",
@@ -1999,13 +1999,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -2013,6 +2006,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "registry.k8s.io/metrics-server/metrics-server",
@@ -2049,20 +2049,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/upstream/bitnami/thanos/charts/minio"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -2087,20 +2087,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "name": "GNU Affero General Public License v3.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/upstream/minio/minio"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "name": "GNU Affero General Public License v3.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -2119,20 +2119,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/namespaces"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -2151,20 +2151,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/networkpolicy/generator"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -2186,20 +2186,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/networkpolicy/service-cluster"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -2218,20 +2218,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/networkpolicy/workload-cluster"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -2256,43 +2256,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/upstream/nvidia/gpu-operator/charts/node-feature-discovery"
           }
         ]
-      }
-    },
-    {
-      "group": "",
-      "name": "node-feature-discovery",
-      "version": "v0.16.6",
-      "purl": "pkg:helm/node-feature-discovery@v0.16.6",
-      "externalReferences": [
+      },
+      "licenses": [
         {
-          "type": "vcs",
-          "url": "https://kubernetes-sigs.github.io/node-feature-discovery/charts"
+          "license": {
+            "name": "Apache License 2.0"
+          }
         }
-      ],
-      "type": "library",
-      "bom-ref": "pkg:helm/node-feature-discovery@v0.16.6",
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
-        }
-      ],
-      "supplier": {
-        "name": "set-me"
-      }
+      ]
     },
     {
       "group": "",
@@ -2310,13 +2287,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -2324,6 +2294,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "registry.k8s.io/dns/k8s-dns-node-cache",
@@ -2350,13 +2327,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -2364,6 +2334,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "ghcr.io/elastisys/curl-jq",
@@ -2390,13 +2367,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -2404,6 +2374,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "ghcr.io/elastisys/bitnami/elasticsearch-curator",
@@ -2463,20 +2440,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/opensearch/secrets"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -2495,13 +2472,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -2509,6 +2479,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "opensearchproject/opensearch",
@@ -2535,13 +2512,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -2549,6 +2519,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "ghcr.io/elastisys/curl-jq",
@@ -2581,13 +2558,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -2595,6 +2565,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "ghcr.io/elastisys/curl-jq",
@@ -2627,20 +2604,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/openstack-monitoring"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -2659,20 +2636,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/gatekeeper/podsecuritypolicies"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -2691,20 +2668,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/prometheus-alerts"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -2729,13 +2706,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -2743,6 +2713,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "quay.io/prometheus/blackbox-exporter",
@@ -2814,20 +2791,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/prometheus-node-exporter"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -2846,20 +2823,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/prometheus-servicemonitor"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -2909,20 +2886,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/rclone"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -2941,13 +2918,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -2955,6 +2925,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "ghcr.io/elastisys/s3-exporter",
@@ -2987,20 +2964,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/tekton-pipelines"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -3019,20 +2996,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/thanos/ingress-secret"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -3051,20 +3028,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/thanos/ruler"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -3089,13 +3066,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -3103,6 +3073,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "ghcr.io/elastisys/bitnami/thanos",
@@ -3141,20 +3118,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/upstream/projectcalico/tigera-operator"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -3176,13 +3153,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -3190,6 +3160,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "mirror.gcr.io/aquasec/trivy-operator",
@@ -3216,13 +3193,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -3230,6 +3200,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "set-me",
@@ -3256,20 +3233,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/user-crds"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -3288,20 +3265,20 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/charts/user-rbac"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -3326,13 +3303,6 @@
       "supplier": {
         "name": "set-me"
       },
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ],
       "evidence": {
         "occurrences": [
           {
@@ -3340,6 +3310,13 @@
           }
         ]
       },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ],
       "components": [
         {
           "name": "velero/velero-plugin-for-aws",
@@ -3359,7 +3336,7 @@
   "dependencies": [],
   "compositions": [
     {
-      "bom-ref": "pkg:application/welkin-apps@ae78e733107fe1e16792e63bbe2fc3255e139d71",
+      "bom-ref": "pkg:application/welkin-apps@fa08ec692437dc5755d70fcf58948ae74537c8fb",
       "aggregate": "incomplete"
     }
   ],
@@ -3367,7 +3344,7 @@
     {
       "bom-ref": "metadata-annotations",
       "subjects": [
-        "pkg:application/welkin-apps@ae78e733107fe1e16792e63bbe2fc3255e139d71"
+        "pkg:application/welkin-apps@fa08ec692437dc5755d70fcf58948ae74537c8fb"
       ],
       "annotator": {
         "component": {
@@ -3385,8 +3362,8 @@
           ]
         }
       },
-      "timestamp": "2025-05-22T11:28:14Z",
-      "text": "This Software Bill-of-Materials (SBOM) document was created on Thursday, May 22, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'welkin-apps' with version 'ae78e733107fe1e16792e63bbe2fc3255e139d71'. There are 85 components."
+      "timestamp": "2025-05-22T13:23:40Z",
+      "text": "This Software Bill-of-Materials (SBOM) document was created on Thursday, May 22, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'welkin-apps' with version 'fa08ec692437dc5755d70fcf58948ae74537c8fb'. There are 85 components."
     }
   ]
 }
