@@ -296,7 +296,7 @@ _get_upstream_license_for_component() {
 
   # check if chart.yaml contains license in annotations
   annotation=$(yq ".annotations.licenses" "${chart}")
-  annotation_artifacthub=$(yq ".annotations.'artifacthub.io/license'" "${chart}")
+  annotation_artifacthub=$(yq '.annotations."artifacthub.io/license"' "${chart}")
 
   if [[ -n "${annotation}" && "${annotation}" != "null" ]]; then
     _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "${annotation}")"
