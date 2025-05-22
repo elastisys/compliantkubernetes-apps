@@ -656,18 +656,23 @@ sbom_update() {
   tmp_output_sbom_file=$(mktemp --suffix=-output-sbom.json)
   append_trap "rm ${tmp_output_sbom_file} >/dev/null 2>&1" EXIT
 
-  # TODO: currently does not update e.g. SBOM project version with this query due to the depth it merges at
   # query reference: https://mikefarah.gitbook.io/yq/operators/multiply-merge#merge-arrays-of-objects-together-matching-on-a-key
   # shellcheck disable=SC2016
-  idPath=".evidence.occurrences[0].location"  originalPath=".components"  otherPath=".components" yq eval-all '
+  idPath=".evidence.occurrences[0].location"  components=".components" yq eval-all '
   (
-    (( (eval(strenv(originalPath)) + eval(strenv(otherPath)))  | .[] | {(eval(strenv(idPath))):  .}) as $item ireduce ({}; . * $item )) as $uniqueMap
+    (( (eval(strenv(components)) + eval(strenv(components)))  | .[] | {(eval(strenv(idPath))):  .}) as $item ireduce ({}; . * $item )) as $uniqueMap
     | ( $uniqueMap  | to_entries | .[]) as $item ireduce([]; . + $item.value)
   ) as $mergedArray
-  | select(fi == 0) | (eval(strenv(originalPath))) = $mergedArray
+  | select(fi == 0) | (eval(strenv(components))) = $mergedArray
   ' "${SBOM_FILE}" "${tmp_sbom_file}" > "${tmp_output_sbom_file}"
 
   diff -U3 --color=always "${SBOM_FILE}" "${tmp_output_sbom_file}" && log_info "No change" && return
+
+  # need to delete components to not override first element in components array
+  yq -i 'del(.components)' "${tmp_sbom_file}"
+  # merges with cdxgen template to get timestamp and project version updated
+  yq -i eval-all 'select(fileIndex == 0) *d select(fileIndex == 1)' "${tmp_output_sbom_file}" "${tmp_sbom_file}"
+
   log_warning_no_newline "Do you want to replace SBOM file? (y/N): "
   read -r reply
   if [[ "${reply}" == "y" ]]; then
