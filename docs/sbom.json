@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:f1620fed-7b34-4a76-93ba-6b2bce8089c8",
-  "version": 3,
+  "serialNumber": "urn:uuid:8bcd3011-e9e3-4b5a-ab7b-26e40e368135",
+  "version": 4,
   "metadata": {
-    "timestamp": "2025-05-19T07:14:30Z",
+    "timestamp": "2025-05-22T11:28:14Z",
     "tools": {
       "components": [
         {
@@ -36,10 +36,10 @@
     "component": {
       "group": "",
       "name": "welkin-apps",
-      "version": "9b7956036f65bf47c38bc7a72951ffa9a49abde3",
+      "version": "ae78e733107fe1e16792e63bbe2fc3255e139d71",
       "type": "application",
-      "bom-ref": "pkg:application/welkin-apps@9b7956036f65bf47c38bc7a72951ffa9a49abde3",
-      "purl": "pkg:application/welkin-apps@9b7956036f65bf47c38bc7a72951ffa9a49abde3"
+      "bom-ref": "pkg:application/welkin-apps@ae78e733107fe1e16792e63bbe2fc3255e139d71",
+      "purl": "pkg:application/welkin-apps@ae78e733107fe1e16792e63bbe2fc3255e139d71"
     },
     "properties": [
       {
@@ -217,7 +217,7 @@
       "licenses": [
         {
           "license": {
-            "name": "Apache License 2.0"
+            "id": "Apache-2.0"
           }
         }
       ],
@@ -361,29 +361,6 @@
             "location": "helmfile.d/upstream/bitnami/thanos/charts/common"
           }
         ]
-      }
-    },
-    {
-      "group": "",
-      "name": "common",
-      "version": "2.x.x",
-      "purl": "pkg:helm/common@2.x.x",
-      "externalReferences": [
-        {
-          "type": "vcs",
-          "url": "oci://registry-1.docker.io/bitnamicharts"
-        }
-      ],
-      "type": "library",
-      "bom-ref": "pkg:helm/common@2.x.x",
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
-        }
-      ],
-      "supplier": {
-        "name": "set-me"
       }
     },
     {
@@ -1159,7 +1136,7 @@
       "licenses": [
         {
           "license": {
-            "name": "GNU Affero General Public License v3.0"
+            "id": "Apache-2.0"
           }
         }
       ],
@@ -1197,7 +1174,7 @@
       "licenses": [
         {
           "license": {
-            "name": "GNU Affero General Public License v3.0"
+            "id": "Apache-2.0"
           }
         }
       ],
@@ -1656,7 +1633,7 @@
       "licenses": [
         {
           "license": {
-            "name": "Apache License 2.0"
+            "id": "Apache-2.0"
           }
         }
       ],
@@ -1736,7 +1713,15 @@
             "location": "helmfile.d/charts/kube-state-metrics-extra-resource-metrics"
           }
         ]
-      }
+      },
+      "components": [
+        {
+          "name": "registry.k8s.io/ingress-nginx/kube-webhook-certgen",
+          "version": "v20221220-controller-v1.5.1-58-g787ea74b6",
+          "type": "container",
+          "bom-ref": "pkg:oci/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6"
+        }
+      ]
     },
     {
       "group": "",
@@ -1761,6 +1746,13 @@
       "supplier": {
         "name": "set-me"
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "evidence": {
         "occurrences": [
           {
@@ -1869,15 +1861,7 @@
             "location": "helmfile.d/upstream/kubereboot/kured"
           }
         ]
-      },
-      "components": [
-        {
-          "name": "ghcr.io/kubereboot/kured",
-          "version": "1.17.0",
-          "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/kubereboot/kured:1.17.0"
-        }
-      ]
+      }
     },
     {
       "group": "",
@@ -2078,29 +2062,6 @@
             "location": "helmfile.d/upstream/bitnami/thanos/charts/minio"
           }
         ]
-      }
-    },
-    {
-      "group": "",
-      "name": "minio",
-      "version": "15.x.x",
-      "purl": "pkg:helm/minio@15.x.x",
-      "externalReferences": [
-        {
-          "type": "vcs",
-          "url": "oci://registry-1.docker.io/bitnamicharts"
-        }
-      ],
-      "type": "library",
-      "bom-ref": "pkg:helm/minio@15.x.x",
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
-        }
-      ],
-      "supplier": {
-        "name": "set-me"
       }
     },
     {
@@ -2853,6 +2814,13 @@
       "supplier": {
         "name": "set-me"
       },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
       "evidence": {
         "occurrences": [
           {
@@ -2954,15 +2922,7 @@
             "location": "helmfile.d/charts/rclone"
           }
         ]
-      },
-      "components": [
-        {
-          "name": "ghcr.io/elastisys/rclone-sync",
-          "version": "1.63.0",
-          "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/elastisys/rclone-sync:1.63.0"
-        }
-      ]
+      }
     },
     {
       "group": "",
@@ -3272,10 +3232,10 @@
       },
       "components": [
         {
-          "name": "null",
-          "version": "null",
+          "name": "set-me",
+          "version": "set-me",
           "type": "container",
-          "bom-ref": "pkg:oci/null"
+          "bom-ref": "pkg:oci/set-me"
         }
       ]
     },
@@ -3399,7 +3359,7 @@
   "dependencies": [],
   "compositions": [
     {
-      "bom-ref": "pkg:application/welkin-apps@9b7956036f65bf47c38bc7a72951ffa9a49abde3",
+      "bom-ref": "pkg:application/welkin-apps@ae78e733107fe1e16792e63bbe2fc3255e139d71",
       "aggregate": "incomplete"
     }
   ],
@@ -3407,7 +3367,7 @@
     {
       "bom-ref": "metadata-annotations",
       "subjects": [
-        "pkg:application/welkin-apps@9b7956036f65bf47c38bc7a72951ffa9a49abde3"
+        "pkg:application/welkin-apps@ae78e733107fe1e16792e63bbe2fc3255e139d71"
       ],
       "annotator": {
         "component": {
@@ -3425,8 +3385,8 @@
           ]
         }
       },
-      "timestamp": "2025-05-19T07:14:30Z",
-      "text": "This Software Bill-of-Materials (SBOM) document was created on Monday, May 19, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'welkin-apps' with version '9b7956036f65bf47c38bc7a72951ffa9a49abde3'. There are 87 components."
+      "timestamp": "2025-05-22T11:28:14Z",
+      "text": "This Software Bill-of-Materials (SBOM) document was created on Thursday, May 22, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'welkin-apps' with version 'ae78e733107fe1e16792e63bbe2fc3255e139d71'. There are 85 components."
     }
   ]
 }

@@ -10,6 +10,8 @@
 # - fragments
 #   - look at e.g. if git diff for a chart (location), should prompt to verify that evaluation and supplier is still correct
 #   - possibility to update one fragment/chart-location
+# - currently, chart location is the primary key that maps SBOM components to releases in Welkin, however, some places uses chart name + chart version for this mapping
+#   - change commands to utilize the chart location in most places?
 set -euo pipefail
 
 HERE="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
@@ -40,7 +42,7 @@ usage() {
   echo "  get-containers                                          get all container images in sbom" >&2
   echo "  get-unset                                               get names of components with set-me's or missing licenses" >&2
   echo "  remove <component-name> <component-version> <key>       remove key for a component" >&2
-  echo "  update                                                  TODO: update"
+  echo "  update <location>                                       update SBOM for a single component using chart location"
   echo "  validate                                                validate SBOM using cyclonedx-cli" >&2
   exit 1
 }
@@ -210,7 +212,7 @@ _format_container_component_object() {
 _prepare_sbom() {
   local location project_version sbom_file
   if [[ "$#" -lt 1 ]] || [[ "$#" -gt 3 ]]; then
-    log_fatal "usage: _prepare_sbom <sbom-file> [--version] [--location]"
+    log_fatal "usage: _prepare_sbom <sbom-file> [--version version] [--location location]"
   fi
 
   # TODO: hardcoded provider and installer for now, look into running for all combinations (either merge or create unique SBOMs for each?)
@@ -236,7 +238,7 @@ _prepare_sbom() {
           shift
           ;;
       *)
-          log_fatal "usage: _prepare_sbom <sbom-file> [--version] [--location]"
+          log_fatal "usage: _prepare_sbom <sbom-file> [--version version] [--location location]"
           ;;
     esac
     shift
@@ -250,12 +252,8 @@ _prepare_sbom() {
   fi
 
   if [[ -n "${location}" ]]; then
-    full_path_location="${ROOT}/helmfile.d/${location}"
-    if [[ ! -d "${full_path_location}" ]]; then
-      log_fatal "${full_path_location} is not a valid directory"
-    fi
     # TODO: verify that location contains helm chart and is in the Welkin apps repo
-    cdxgen --project-name "welkin-apps" --project-version "${project_version}" --filter '.*' --filter '.x.x' -t helm "${full_path_location}" --output "${sbom_file}"
+    cdxgen --project-name "welkin-apps" --project-version "${project_version}" --filter '.*' --filter '.x.x' -t helm "${location}" --output "${sbom_file}"
   else
     cdxgen --project-name "welkin-apps" --project-version "${project_version}" --filter '.*' --filter '.x.x' -t helm "${HELMFILE_FOLDER}" --output "${sbom_file}"
   fi
@@ -377,7 +375,7 @@ _generate_helmfile_template_file() {
 
   select_query='.[] | select(.enabled == true and .installed == true) | {"location": .chart, "name": .name}'
   if [[ "$#" -gt 1 ]]; then
-    location="${2}"
+    location="${2#"${ROOT}/helmfile.d"}"
     select_query=".[] | select(.enabled == true and .installed == true and .chart == \"${location}\") | {\"location\": .chart, \"name\": .name}"
   fi
 
@@ -602,24 +600,6 @@ sbom_edit() {
   log_info "Updated ${key} for ${component_name}"
 }
 
-sbom_update_licenses() {
-  local sbom_file query
-  sbom_file="${1}"
-  shift
-
-  if [[ "$#" -gt 0 ]]; then
-    log_fatal "Update license per-component not implemented"
-  else
-    log_info "Updating all licenses in SBOM"
-    CK8S_AUTO_APPROVE=true CK8S_SKIP_VALIDATION=true _get_licenses "${sbom_file}"
-  fi
-
-  # TODO: need a better merge query
-  query=". *? load(\"${sbom_file}\")"
-  _yq_run_query "${SBOM_FILE}" "${query}"
-  yq -o json -i '.version += 1' "${SBOM_FILE}"
-}
-
 _test_github_token() {
   log_info "Testing GITHUB_TOKEN"
   : "${GITHUB_TOKEN:?Missing GITHUB_TOKEN}"
@@ -638,6 +618,15 @@ sbom_update() {
     usage
   fi
 
+  location="${1}"
+  full_path_location="${ROOT}/${location}"
+  if [[ ! -d "${full_path_location}" ]]; then
+    log_fatal "${full_path_location} is not a valid directory"
+  fi
+  if [[ ! -f "${full_path_location}/Chart.yaml" ]]; then
+    log_fatal "${full_path_location} is not a valid Helm chart directory"
+  fi
+
   tmp_sbom_file=$(mktemp --suffix=-update-sbom.json)
   append_trap "rm ${tmp_sbom_file} >/dev/null 2>&1" EXIT
 
@@ -645,20 +634,21 @@ sbom_update() {
 
   export CK8S_AUTO_APPROVE=true
   export CK8S_SKIP_VALIDATION=true
-  # sbom_update_licenses "${tmp_sbom_file}" "${@}"
 
-  location="${1}"
-  _prepare_sbom "${tmp_sbom_file}" --location "${location}"
+  _prepare_sbom "${tmp_sbom_file}" --location "${full_path_location}"
   _add_locations "${tmp_sbom_file}"
-  _add_container_images "${tmp_sbom_file}" "${location}"
+  # TODO: for welkin charts
+  _get_upstream_license_for_component "${tmp_sbom_file}" "${full_path_location}/Chart.yaml"
+  _add_container_images "${tmp_sbom_file}" "${full_path_location}"
 
   CK8S_AUTO_APPROVE=false
   CK8S_SKIP_VALIDATION=false
 
   tmp_output_sbom_file=$(mktemp --suffix=-output-sbom.json)
-  # append_trap "rm ${tmp_output_sbom_file} >/dev/null 2>&1" EXIT
+  append_trap "rm ${tmp_output_sbom_file} >/dev/null 2>&1" EXIT
 
   # query reference: https://mikefarah.gitbook.io/yq/operators/multiply-merge#merge-arrays-of-objects-together-matching-on-a-key
+  # shellcheck disable=SC2016
   idPath=".evidence.occurrences[0].location"  originalPath=".components"  otherPath=".components" yq eval-all '
   (
     (( (eval(strenv(originalPath)) + eval(strenv(otherPath)))  | .[] | {(eval(strenv(idPath))):  .}) as $item ireduce ({}; . * $item )) as $uniqueMap
