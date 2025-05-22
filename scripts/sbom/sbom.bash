@@ -255,9 +255,9 @@ _prepare_sbom() {
       log_fatal "${full_path_location} is not a valid directory"
     fi
     # TODO: verify that location contains helm chart and is in the Welkin apps repo
-    cdxgen --project-name "welkin-apps" --project-version "${project_version}" --filter '.*' -t helm "${full_path_location}" --output "${sbom_file}"
+    cdxgen --project-name "welkin-apps" --project-version "${project_version}" --filter '.*' --filter '.x.x' -t helm "${full_path_location}" --output "${sbom_file}"
   else
-    cdxgen --project-name "welkin-apps" --project-version "${project_version}" --filter '.*' -t helm "${HELMFILE_FOLDER}" --output "${sbom_file}"
+    cdxgen --project-name "welkin-apps" --project-version "${project_version}" --filter '.*' --filter '.x.x' -t helm "${HELMFILE_FOLDER}" --output "${sbom_file}"
   fi
 
   sbom_version=$(yq -r -o json ".version" "${SBOM_FILE}")
