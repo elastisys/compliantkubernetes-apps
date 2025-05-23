@@ -20,16 +20,17 @@ setup_file() {
   yq.set sc .fluentd.enabled 'true'
   yq.set sc .gpu.enabled 'true'
   yq.set sc .harbor.backup.enabled 'true'
-  yq.set wc .hnc.enabled 'true'
   yq.set sc .kured.enabled 'true'
   yq.set sc .kyverno.enabled 'true'
   yq.set sc .opensearch.snapshot.enabled 'true'
   yq.set sc .tektonPipelines.enabled 'true'
   yq.set sc .thanos.enabled 'true'
+  yq.set sc .thanos.receiver.enabled 'true'
   yq.set sc .velero.enabled 'true'
-  yq.set wc .velero.enabled 'true'
-
   _setup_rclone sc sync
+
+  yq.set wc .hnc.enabled 'true'
+  yq.set wc .velero.enabled 'true'
   _setup_rclone wc sync
 }
 
