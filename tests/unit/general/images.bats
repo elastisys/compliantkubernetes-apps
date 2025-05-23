@@ -27,6 +27,8 @@ setup_file() {
   yq.set sc .thanos.enabled 'true'
   yq.set sc .thanos.receiver.enabled 'true'
   yq.set sc .velero.enabled 'true'
+  yq.set sc .metricsServer.enabled 'true'
+  yq.set sc .trivy.enabled 'true'
   _setup_rclone sc sync
 
   yq.set wc .hnc.enabled 'true'
@@ -42,7 +44,7 @@ setup() {
   env.private
 
   export _templates_output="${CK8S_CONFIG_PATH}/tmp/images-templates"
-  export _optional_registries='(docker\.io/)?(nvcr\.io/nvidia/)?(ghcr\.io/)?(quay\.io/)?(registry\.k8s\.io/)?'
+  export _optional_registries='(docker\.io/)?(nvcr\.io/nvidia/)?(ghcr\.io/)?(quay\.io/)?(registry\.k8s\.io/)?(mirror\.gcr\.io/)?'
 
   read -r -a _image_properties < <(_get_test_prop image_property)
   read -r -a _helmfile_selectors < <(_get_test_prop helmfile_selector)

@@ -437,6 +437,18 @@
       "helmfile_selector": "app=monitoring",
       "container_name": "s3-exporter",
       "template_file": "sc/s3-exporter/templates/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.metricsServer",
+      "helmfile_selector": "app=metrics-server",
+      "container_name": "metrics-server",
+      "template_file": "sc/metrics-server/templates/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.trivyOperator",
+      "helmfile_selector": "app=trivy-operator",
+      "container_name": "trivy-operator",
+      "template_file": "sc/trivy-operator/templates/deployment.yaml"
     }
   ]
 }

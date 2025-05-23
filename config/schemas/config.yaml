@@ -8248,6 +8248,10 @@ properties:
             $ref: '#/$defs/containerImage'
           s3Exporter:
             $ref: '#/$defs/containerImage'
+          metricsServer:
+            $ref: '#/$defs/containerImage'
+          trivyOperator:
+            $ref: '#/$defs/containerImage'
       nodeLocalDNS:
         title: node-local-dns stack image configuration
         description: node-local-dns stack image configuration
