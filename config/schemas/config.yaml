@@ -8220,6 +8220,34 @@ properties:
             $ref: '#/$defs/containerImage'
           crdsMigration:
             $ref: '#/$defs/containerImage'
+      monitoring:
+        title: monitoring stack image configuration
+        description: monitoring stack image configuration
+        type: object
+        additionalProperties: false
+        properties:
+          nodeExporter:
+            $ref: '#/$defs/containerImage'
+          kubeStateMetrics:
+            $ref: '#/$defs/containerImage'
+          prometheusOperator:
+            $ref: '#/$defs/containerImage'
+          alertManager:
+            $ref: '#/$defs/containerImage'
+          prometheus:
+            $ref: '#/$defs/containerImage'
+          admissionWebhooksPatch:
+            $ref: '#/$defs/containerImage'
+          grafana:
+            $ref: '#/$defs/containerImage'
+          grafanaSidecar:
+            $ref: '#/$defs/containerImage'
+          blackboxExporter:
+            $ref: '#/$defs/containerImage'
+          grafanaLabelEnforcer:
+            $ref: '#/$defs/containerImage'
+          s3Exporter:
+            $ref: '#/$defs/containerImage'
       nodeLocalDNS:
         title: node-local-dns stack image configuration
         description: node-local-dns stack image configuration

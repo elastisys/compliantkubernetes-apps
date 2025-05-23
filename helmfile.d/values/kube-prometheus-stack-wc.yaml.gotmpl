@@ -1,3 +1,7 @@
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
 defaultRules:
   # Provided by prometheus-alerts instead
   create: false
@@ -57,11 +61,58 @@ kubeScheduler:
 
 prometheusOperator:
   resources: {{- toYaml .Values.prometheusOperator.resources | nindent 4 }}
+  {{- with .Values.images | dig "monitoring" "prometheusOperator" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  image:
+    {{- with .registry }}
+    registry: {{ . }}
+    {{- end }}
+    {{- with join "/" (compact (list .repository .image)) }}
+    repository: {{ . }}
+    {{- end }}
+    {{- if or .tag .digest }}
+    tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+    {{- end }}
+  {{- end }}
+  {{- end }}
 
   prometheusConfigReloader:
     resources: {{- toYaml .Values.prometheusOperator.prometheusConfigReloader.resources | nindent 6 }}
 
+  {{- with .Values.images | dig "monitoring" "admissionWebhooksPatch" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  admissionWebhooks:
+    patch:
+      image:
+        {{- with .registry }}
+        registry: {{ . }}
+        {{- end }}
+        {{- with join "/" (compact (list .repository .image)) }}
+        repository: {{ . }}
+        {{- end }}
+        {{- if or .tag .digest }}
+        tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+        {{- end }}
+  {{- end }}
+  {{- end }}
+
+
 kube-state-metrics:
+  {{- with .Values.images | dig "monitoring" "kubeStateMetrics" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  image:
+    {{- with .registry }}
+    registry: {{ . }}
+    {{- end }}
+    {{- with join "/" (compact (list .repository .image)) }}
+    repository: {{ . }}
+    {{- end }}
+    {{- if or .tag .digest }}
+    tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+    {{- end }}
+  {{- end }}
+  {{- end }}
+
   selfMonitor:
     enabled: true
   resources: {{- toYaml .Values.kubeStateMetrics.resources | nindent 4 }}
@@ -84,6 +135,23 @@ prometheus-node-exporter:
           sourceLabels:
           - __meta_kubernetes_pod_node_name
           targetLabel: instance
+  {{- with .Values.images | dig "monitoring" "nodeExporter" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  image:
+    {{- with .registry }}
+    registry: {{ . }}
+    {{- end }}
+    {{- with join "/" (compact (list .repository .image)) }}
+    repository: {{ . }}
+    {{- end }}
+    {{- with .tag }}
+    tag: {{ . }}
+    {{- end }}
+    {{- with .digest }}
+    digest: {{ . }}
+    {{- end }}
+  {{- end }}
+  {{- end }}
 
 kubeApiServer:
   serviceMonitor:
@@ -156,6 +224,21 @@ prometheus:
     nodeSelector: {{- toYaml .Values.prometheus.nodeSelector | nindent 6 }}
     affinity:     {{- toYaml .Values.prometheus.affinity | nindent 6 }}
     tolerations:  {{- toYaml .Values.prometheus.tolerations | nindent 6 }}
+
+    {{- with .Values.images | dig "monitoring" "prometheus" "" }}
+    {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+    image:
+      {{- with .registry }}
+      registry: {{ . }}
+      {{- end }}
+      {{- with join "/" (compact (list .repository .image)) }}
+      repository: {{ . }}
+      {{- end }}
+      {{- if or .tag .digest }}
+      tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+      {{- end }}
+    {{- end }}
+    {{- end }}
 
     ## How long to retain metrics
     ##

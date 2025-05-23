@@ -359,6 +359,84 @@
       "helmfile_selector": "app=velero",
       "container_name": "velero-plugin-for-aws",
       "template_file": "wc/velero/templates/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.nodeExporter",
+      "helmfile_selector": "app=prometheus",
+      "container_name": "node-exporter",
+      "template_file": "sc/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml"
+    },
+    {
+      "image_property": "monitoring.nodeExporter",
+      "helmfile_selector": "app=prometheus",
+      "container_name": "node-exporter",
+      "template_file": "wc/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml"
+    },
+    {
+      "image_property": "monitoring.kubeStateMetrics",
+      "helmfile_selector": "app=prometheus",
+      "container_name": "kube-state-metrics",
+      "template_file": "sc/kube-prometheus-stack/charts/kube-state-metrics/templates/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.kubeStateMetrics",
+      "helmfile_selector": "app=prometheus",
+      "container_name": "kube-state-metrics",
+      "template_file": "wc/kube-prometheus-stack/charts/kube-state-metrics/templates/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.prometheusOperator",
+      "helmfile_selector": "app=prometheus",
+      "container_name": "kube-prometheus-stack",
+      "template_file": "sc/kube-prometheus-stack/templates/prometheus-operator/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.prometheusOperator",
+      "helmfile_selector": "app=prometheus",
+      "container_name": "kube-prometheus-stack",
+      "template_file": "wc/kube-prometheus-stack/templates/prometheus-operator/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.admissionWebhooksPatch",
+      "helmfile_selector": "app=prometheus",
+      "container_name": "patch",
+      "template_file": "sc/kube-prometheus-stack/templates/prometheus-operator/admission-webhooks/job-patch/job-patchWebhook.yaml"
+    },
+    {
+      "image_property": "monitoring.grafana",
+      "helmfile_selector": "app=grafana",
+      "container_name": "grafana",
+      "template_file": "sc/grafana/templates/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.grafanaSidecar",
+      "helmfile_selector": "app=grafana",
+      "container_name": "grafana-sc-dashboard",
+      "template_file": "sc/grafana/templates/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.blackboxExporter",
+      "helmfile_selector": "app=prometheus",
+      "container_name": "blackbox-exporter",
+      "template_file": "sc/prometheus-blackbox-exporter/templates/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.blackboxExporter",
+      "helmfile_selector": "app=prometheus",
+      "container_name": "blackbox-exporter",
+      "template_file": "wc/prometheus-blackbox-exporter/templates/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.grafanaLabelEnforcer",
+      "helmfile_selector": "app=grafana",
+      "container_name": "prom-label-enforcer",
+      "template_file": "sc/grafana-label-enforcer/templates/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.s3Exporter",
+      "helmfile_selector": "app=monitoring",
+      "container_name": "s3-exporter",
+      "template_file": "sc/s3-exporter/templates/deployment.yaml"
     }
   ]
 }

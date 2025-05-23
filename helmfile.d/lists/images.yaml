@@ -55,6 +55,18 @@ images:
     init: ghcr.io/kyverno/kyverno:v1.13.4
     webhooksCleanup: docker.io/bitnami/kubectl:1.30.2
     crdsMigration: ghcr.io/kyverno/kyverno-cli:v1.13.4
+  monitoring:
+    nodeExporter: quay.io/prometheus/node-exporter:v1.9.1
+    kubeStateMetrics: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.25.0
+    prometheusOperator: quay.io/prometheus-operator/prometheus-operator:v0.81.0
+    alertManager: quay.io/prometheus/alertmanager:v0.28.1
+    prometheus: quay.io/prometheus/prometheus:v3.2.1
+    admissionWebhooksPatch: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2
+    grafana: docker.io/grafana/grafana:11.5.1
+    grafanaSidecar: quay.io/kiwigrid/k8s-sidecar:1.30.0
+    blackboxExporter: quay.io/prometheus/blackbox-exporter:v0.24.0
+    grafanaLabelEnforcer: quay.io/prometheuscommunity/prom-label-proxy:v0.11.0
+    s3Exporter: ghcr.io/elastisys/s3-exporter:0.5.0
   nodeLocalDNS:
     image: registry.k8s.io/dns/k8s-dns-node-cache:1.25.0
   opensearch:
