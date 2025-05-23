@@ -2,3 +2,20 @@ resources: {{- toYaml .Values.grafanaLabelEnforcer.resources | nindent 4 }}
 
 upstreamUrl: "http://thanos-query-query-frontend.thanos:9090"
 enforcementLabel: "tenant_id"
+
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
+
+{{- with .Values.images | dig "monitoring" "grafanaLabelEnforcer" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+image:
+  {{- with include "gen.reg-rep-img" . }}
+  repository: {{ . }}
+  {{- end }}
+  {{- if or .tag .digest }}
+  tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+  {{- end }}
+{{- end }}
+{{- end }}
