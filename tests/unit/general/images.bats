@@ -41,6 +41,7 @@ setup() {
   env.private
 
   export _templates_output="${CK8S_CONFIG_PATH}/tmp/images-templates"
+  export _optional_registries='(docker\.io/)?(nvcr\.io/nvidia/)?(ghcr\.io/)?(quay\.io/)?(registry\.k8s\.io/)?'
 
   read -r -a _image_properties < <(_get_test_prop image_property)
   read -r -a _helmfile_selectors < <(_get_test_prop helmfile_selector)
@@ -93,7 +94,7 @@ should_use_our_image() {
   for ((i = 0; i < ${#_container_names[@]}; i++)); do
     run --separate-stderr _extract_image "${_container_names[i]}" "${_template_files[i]}"
 
-    assert_output --regexp '^(docker\.io/)?(nvcr\.io/nvidia/)?(ghcr\.io/)?a-custom-image.*$'
+    assert_output --regexp '^'"$_optional_registries"'a-custom-image.*$'
   done
 }
 
@@ -104,7 +105,7 @@ should_use_our_image_and_tag() {
   for ((i = 0; i < ${#_container_names[@]}; i++)); do
     run --separate-stderr _extract_image "${_container_names[i]}" "${_template_files[i]}"
 
-    assert_output --regexp '^(docker\.io/)?(nvcr\.io/nvidia/)?(ghcr\.io/)?a-custom-image:v1\.2\.3$'
+    assert_output --regexp '^'"$_optional_registries"'a-custom-image:v1\.2\.3$'
   done
 }
 
@@ -115,7 +116,7 @@ should_use_our_image_tag_and_digest() {
   for ((i = 0; i < ${#_container_names[@]}; i++)); do
     run --separate-stderr _extract_image "${_container_names[i]}" "${_template_files[i]}"
 
-    assert_output --regexp '^(docker\.io/)?(nvcr\.io/nvidia/)?(ghcr\.io/)?a-custom-image:v1\.2\.3@sha256:babafacecaca$'
+    assert_output --regexp '^'"$_optional_registries"'a-custom-image:v1\.2\.3@sha256:babafacecaca$'
   done
 }
 
@@ -126,7 +127,7 @@ should_use_our_repository_image_tag_and_digest() {
   for ((i = 0; i < ${#_container_names[@]}; i++)); do
     run --separate-stderr _extract_image "${_container_names[i]}" "${_template_files[i]}"
 
-    assert_output --regexp '^(docker\.io/)?(nvcr\.io/nvidia/)?(ghcr\.io/)?a-custom-repo/a-custom-image:v1\.2\.3@sha256:babafacecaca$'
+    assert_output --regexp '^'"$_optional_registries"'a-custom-repo/a-custom-image:v1\.2\.3@sha256:babafacecaca$'
   done
 }
 
@@ -173,7 +174,7 @@ should_use_their_own_repository_even_when_global_is_enabled() {
   for ((i = 0; i < ${#_container_names[@]}; i++)); do
     run --separate-stderr _extract_image "${_container_names[i]}" "${_template_files[i]}"
 
-    assert_output --regexp '^(docker\.io/)?(nvcr\.io/nvidia/)?(ghcr\.io/)?a-custom-repository/a-custom-image:v1\.2\.3'
+    assert_output --regexp '^'"$_optional_registries"'a-custom-repository/a-custom-image:v1\.2\.3'
   done
 }
 
@@ -185,7 +186,7 @@ should_use_the_global_repository_when_it_doesnt_specify_one() {
   for ((i = 0; i < ${#_container_names[@]}; i++)); do
     run --separate-stderr _extract_image "${_container_names[i]}" "${_template_files[i]}"
 
-    assert_output --regexp '^(docker\.io/)?(nvcr\.io/nvidia/)?(ghcr\.io/)?the-global-repository/a-custom-image:v1\.2\.3'
+    assert_output --regexp '^'"$_optional_registries"'the-global-repository/a-custom-image:v1\.2\.3'
   done
 }
 
