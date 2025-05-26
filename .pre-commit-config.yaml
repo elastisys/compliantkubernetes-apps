@@ -113,6 +113,6 @@ repos:
     hooks:
       - id: markdownlint-cli2
         name: lint markdown files
-        exclude: ^changelog/|^docs/sbom.md$|^helmfile\.d/charts/opensearch/configurer/files/|^helmfile\.d/upstream/|^images/elasticsearch-curator/
+        exclude: ^changelog/|^docs/sbom-v0.37/sbom.md$|^helmfile\.d/charts/opensearch/configurer/files/|^helmfile\.d/upstream/|^images/elasticsearch-curator/
         args:
           - --fix
