@@ -95,7 +95,7 @@ repos:
         types: [shell]
         language: script
         require_serial: true
-        entry: bin/ck8s sbom diff
+        entry: scripts/sbom/sbom.bash diff
         verbose: true
 
   - repo: https://github.com/codespell-project/codespell
