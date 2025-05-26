@@ -165,6 +165,13 @@ main() {
 
   "${action}"
 
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
+    check_node_label "sc" elastisys.io/node-group
+  fi
+  if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
+    check_node_label "wc" elastisys.io/node-group
+  fi
+
   log_info "${action} complete"
 }
 
