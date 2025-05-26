@@ -117,7 +117,7 @@ _sbom_edit_component() {
   fi
 
   yq -e -o json ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\") | .${key}" "${sbom_file}" >"${tmp_change}"
-  "${EDITOR}" "${tmp_change}"
+  "${EDITOR:-}" "${tmp_change}"
 
   query="with(.components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\"); .${key} = $(jq -c '.' "${tmp_change}"))"
 
