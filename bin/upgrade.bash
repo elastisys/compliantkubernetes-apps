@@ -157,20 +157,15 @@ main() {
   if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
     config_load "sc"
     check_version "sc" "${action}"
+    check_node_label "sc" elastisys.io/node-group
   fi
   if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
     config_load "wc"
     check_version "wc" "${action}"
+    check_node_label "wc" elastisys.io/node-group
   fi
 
   "${action}"
-
-  if [[ "${CK8S_CLUSTER:-}" =~ ^(sc|both)$ ]]; then
-    check_node_label "sc" elastisys.io/node-group
-  fi
-  if [[ "${CK8S_CLUSTER:-}" =~ ^(wc|both)$ ]]; then
-    check_node_label "wc" elastisys.io/node-group
-  fi
 
   log_info "${action} complete"
 }
