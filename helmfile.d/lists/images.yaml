@@ -18,7 +18,7 @@ images:
     sidekick: docker.io/falcosecurity/falcosidekick:2.31.1
   fluentd:
     aggregator: ghcr.io/elastisys/fluentd-aggregator:v7.1.1-ck8s2
-    elasticsearch: ghcr.io/elastisys/fluentd-forwarder:v4.7.5-ck8s2
+    elasticsearch: ghcr.io/elastisys/fluentd-forwarder:v4.7.5-ck8s1
     logManager: ghcr.io/elastisys/compliantkubernetes-apps-log-manager:0.3.2
   gatekeeper:
     image: docker.io/openpolicyagent/gatekeeper:v3.18.2
@@ -47,7 +47,7 @@ images:
     controllerChroot: registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e
     defaultBackend: registry.k8s.io/defaultbackend-amd64:1.5
     admissionWebhooksPatch: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2@sha256:e8825994b7a2c7497375a9b945f386506ca6a3eda80b89b74ef2db743f66a5ea
-    fileCopier: "docker.io/library/busybox:1.36"
+    fileCopier: docker.io/library/busybox:1.36
   kured:
     image: ghcr.io/kubereboot/kured:1.17.0
   kyverno:
@@ -57,7 +57,7 @@ images:
     crdsMigration: ghcr.io/kyverno/kyverno-cli:v1.13.4
   monitoring:
     nodeExporter: quay.io/prometheus/node-exporter:v1.9.1
-    kubeStateMetrics: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.25.0
+    kubeStateMetrics: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.15.0
     prometheusOperator: quay.io/prometheus-operator/prometheus-operator:v0.81.0
     alertManager: quay.io/prometheus/alertmanager:v0.28.1
     prometheus: quay.io/prometheus/prometheus:v3.2.1
@@ -86,7 +86,7 @@ images:
     remoteResolvers: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/resolvers:v0.45.0@sha256:5bd5240ccd89e0b81796aa8b8bbb4feb2162e63dda1cb0a95e315c9fadeb7ec8
     webhook: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/webhook:v0.45.0@sha256:07390c988b1c651c4810e9f7b15a88dfce8030845a429cf19b762a0d50e18ca7
   thanos:
-    image: ghcr.io/elastisys/bitnami/thanos:1.63.0
+    image: ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8
     configReloader: quay.io/prometheus-operator/prometheus-config-reloader:v0.50.0
   velero:
     image: docker.io/velero/velero:v1.13.0
