@@ -728,7 +728,7 @@ sbom_generate() {
 
 sbom_diff() {
   local chart_name chart_version found_diff location
-  mapfile -t diff_files < <(git diff --name-only | grep "helmfile.d/")
+  mapfile -t diff_files < <(git diff --staged --name-only | grep "helmfile.d/")
   mapfile -t all_charts < <(sbom_get_charts "${SBOM_FILE}")
 
   for chart in "${all_charts[@]}"; do
