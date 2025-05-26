@@ -54,7 +54,7 @@ teardown() {
 @test "sbom script add component properties with incorrect object format should fail cyclonedx validation" {
   export CK8S_AUTO_APPROVE=false
   export CK8S_SKIP_VALIDATION=false
-  run sbom.bash add velero "${velero_version}" properties '{"unsupported-key-name": "test", "unsupported-value": "test"}' <<< n
+  run sbom.bash add velero "${velero_version}" properties '{"unsupported-key-name": "test", "unsupported-value": "test"}' <<<n
   assert_output --partial 'Validation failed:'
   assert_output --regexp 'Required properties .* are not present'
 }

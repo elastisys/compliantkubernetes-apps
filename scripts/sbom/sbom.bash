@@ -230,19 +230,19 @@ _prepare_sbom() {
   shift
   project_version=""
   location=""
-  while [ "${#}" -gt 0 ] ; do
+  while [ "${#}" -gt 0 ]; do
     case "${1}" in
-      --version)
-          project_version="${2}"
-          shift
-          ;;
-      --location)
-          location="${2}"
-          shift
-          ;;
-      *)
-          log_fatal "usage: _prepare_sbom <sbom-file> [--version version] [--location location]"
-          ;;
+    --version)
+      project_version="${2}"
+      shift
+      ;;
+    --location)
+      location="${2}"
+      shift
+      ;;
+    *)
+      log_fatal "usage: _prepare_sbom <sbom-file> [--version version] [--location location]"
+      ;;
     esac
     shift
   done
@@ -661,13 +661,13 @@ sbom_update() {
 
   # query reference: https://mikefarah.gitbook.io/yq/operators/multiply-merge#merge-arrays-of-objects-together-matching-on-a-key
   # shellcheck disable=SC2016
-  idPath=".evidence.occurrences[0].location"  components=".components" yq eval-all '
+  idPath=".evidence.occurrences[0].location" components=".components" yq eval-all '
   (
     (( (eval(strenv(components)) + eval(strenv(components)))  | .[] | {(eval(strenv(idPath))):  .}) as $item ireduce ({}; . * $item )) as $uniqueMap
     | ( $uniqueMap  | to_entries | .[]) as $item ireduce([]; . + $item.value)
   ) as $mergedArray
   | select(fi == 0) | (eval(strenv(components))) = $mergedArray
-  ' "${SBOM_FILE}" "${tmp_sbom_file}" > "${tmp_output_sbom_file}"
+  ' "${SBOM_FILE}" "${tmp_sbom_file}" >"${tmp_output_sbom_file}"
 
   diff -U3 --color=always "${SBOM_FILE}" "${tmp_output_sbom_file}" && log_info "No change" && return
 
