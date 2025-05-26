@@ -650,7 +650,7 @@ check_node_label() {
 
   local -a nodes_missing_node_group_label
 
-  readarray -t nodes_missing_node_group_label <<<"$(with_kubeconfig "${config["kube_config_${cluster}"]}" kubectl get no -l "!${label}" -o yaml | yq '.items[] | .metadata.name')"
+  readarray -t nodes_missing_node_group_label <<<"$(with_kubeconfig "${config["kube_config_${cluster}"]}" kubectl get node -o name | cut --delimiter / --fields 2-)"
 
   if [ "${#nodes_missing_node_group_label[@]}" -ne 0 ]; then
     log_warning "---"
