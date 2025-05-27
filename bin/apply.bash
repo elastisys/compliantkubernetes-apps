@@ -57,13 +57,11 @@ apps_apply() {
     log_info "---"
     local current_version
     current_version="$(get_apps_version "${2}" 2>/dev/null || true)"
-    if [ -n "${current_version}" ]; then
-      log_info "Current version is ${current_version}"
-    else
+    if [ -z "${current_version}" ]; then
       current_version="$(get_repo_version)"
       set_apps_version "${2}" "${current_version}"
-      log_info "Current version is ${current_version}"
     fi
+    log_info "Current version is ${current_version}"
     log_info "Successful Apps ${action} on ${2/_/ }!"
   else
     log_error "---"
