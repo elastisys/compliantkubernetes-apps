@@ -115,7 +115,7 @@ teardown() {
   ck8s ops kubectl sc apply -f - <<EOF
 apiVersion: v1
 data:
-  version: v0.41
+  version: v0.42
 kind: ConfigMap
 metadata:
   name: apps-meta
