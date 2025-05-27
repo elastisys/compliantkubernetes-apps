@@ -1,5 +1,5 @@
 ---
-from: v0.43
+from: v0.46
 to: main
 ---
 
@@ -36,7 +36,7 @@ to: main
 
 - [ ] Disable alert notifications during the upgrade. e.g using [Alertmanager silences](https://prometheus.io/docs/alerting/latest/alertmanager/#silences).
 
-## Automatic method
+## Steps
 
 1. Switch to the main branch and pull the latest changes:
 
@@ -72,53 +72,6 @@ to: main
 
     ```bash
     ./bin/ck8s upgrade both "${CK8S_CLUSTER}" apply
-    ```
-
-## Manual method
-
-> [!warning]
-> When running migration snippets manually you must be sure to set the target cluster, this must be set and exported for both the prepare and apply upgrade steps!
-
-1. Set upgrade target
-
-    Set to upgrade `both` the service cluster and workload cluster together, or `sc` or `wc` to upgrade them separately.
-
-    ```bash
-    export CK8S_CLUSTER="<both|sc|wc>"
-    ```
-
-### Prepare upgrade
-
-> _Non-disruptive, done before maintenance window._
-
-1. Switch to the main branch and pull the latest changes:
-
-    ```bash
-    git switch main
-    git pull
-    ```
-
-1. Update configuration:
-
-    This will take a backup into `backups/` before modifying any files.
-
-    ```bash
-    ./migration/main/prepare/50-init.sh
-
-    # Check if any NetworkPolicy IPs need to be updated
-    ./bin/ck8s update-ips "${CK8S_CLUSTER}" dry-run
-    # Apply the changes if you agree with them
-    ./bin/ck8s update-ips "${CK8S_CLUSTER}" apply
-    ```
-
-### Apply upgrade - _disruptive_
-
-> **Disruptive, done during maintenance window.**
-
-1. Upgrade applications:
-
-    ```bash
-    ./migration/main/apply/80-apply.sh execute
     ```
 
 ## Postrequisites
