@@ -76,42 +76,6 @@ teardown() {
   assert_output --partial "v0.42"
 }
 
-# COMMANDS
-#
-# ck8s init
-# ck8s apply
-# ck8s upgrade prepare
-# ck8s upgrade apply
-#
-# ck8s init
-# next:
-#   ck8s apply
-#   ck8s upgrade prepare
-# not:
-#   ck8s upgrade apply
-#   ck8s init ?
-#
-# ck8s apply
-# next:
-#   ck8s apply
-#   ck8s upgrade prepare
-# not:
-#   ck8s upgrade apply
-#   ck8s init ?
-#
-# ck8s upgrade prepare
-# next:
-#   ck8s upgrade apply
-# not:
-#   ck8s apply
-#   ck8s init ?
-#
-# ck8s upgrade apply
-# next:
-#   ck8s apply ?
-#
-# any other combo must throw error
-
 @test "no upgrade apply without upgrade prepare" {
   # test 2
 
