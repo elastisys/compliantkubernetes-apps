@@ -302,7 +302,7 @@ check_version() {
     fi
 
     # Ensure not in the middle of upgrading
-    if get_prepared_version &>/dev/null; then
+    if get_prepared_version "${1}" &>/dev/null; then
       log_warn "Migration already in progress"
       if [[ -t 1 ]]; then
         log_warn_no_newline "Do you want to continue [y/N]: "
