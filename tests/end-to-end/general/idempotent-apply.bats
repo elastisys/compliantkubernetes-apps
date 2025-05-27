@@ -5,6 +5,9 @@
 setup_file() {
   # for --separate-stderr argument on 'run'
   bats_require_minimum_version 1.11.1
+
+  export BATS_NO_PARALLELIZE_WITHIN_FILE=true
+  export CK8S_AUTO_APPROVE="true"
 }
 
 setup() {
