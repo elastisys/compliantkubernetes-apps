@@ -47,8 +47,6 @@ EOF
 }
 
 teardown() {
-  # reset
-
   env.teardown
 }
 
