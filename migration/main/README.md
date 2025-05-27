@@ -71,7 +71,7 @@ to: main
     > **Disruptive, done during maintenance window.**
 
     ```bash
-    ./bin/ck8s upgrade both "${CK8S_CLUSTER}" apply
+    ./bin/ck8s upgrade "${CK8S_CLUSTER}" main apply
     ```
 
 ## Postrequisites
