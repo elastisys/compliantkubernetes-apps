@@ -28,7 +28,6 @@ while [[ $# -gt 0 ]]; do
       shift 2
     else
       log_fatal "--backup-id requires a value"
-      usage
     fi
     ;;
   --azure-rclone-fixup)
@@ -40,7 +39,6 @@ while [[ $# -gt 0 ]]; do
     ;;
   *)
     log_fatal "Unknown argument: $1"
-    usage
     ;;
   esac
 done
@@ -58,7 +56,7 @@ log_warning "This script will restore Harbor from a backup, which will overwrite
 log_warning "This includes all images, charts, users, projects, and configurations."
 ask_abort
 
-check_tools
+check_tools "$@"
 
 log_info "Loading configuration..."
 config_load "sc"
