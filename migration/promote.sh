@@ -16,6 +16,8 @@ usage() {
 }
 
 create() {
+  local target_version="${1:-}" target_migration="${2:-}"
+
   # check if the target migration already exists
   if [[ -d "${target_migration}" ]]; then
     if log.continue "migration $(esc.ylw "${target_version}") already exists, do you want to recreate it?"; then
@@ -75,6 +77,8 @@ create() {
 }
 
 prune() {
+  local target_version="${1:-}"
+
   # find current migration directories
   local -a directories
   readarray -t directories < <(find "${ROOT}/migration" -maxdepth 1 -type d -name 'v*')
@@ -107,12 +111,12 @@ main() {
 
   ver.parse next "${series}"
 
-  local target_version="v${ver["next-major"]}.${ver["next-minor"]}"
-  local target_migration="${ROOT}/migration/${target_version}"
+  local version="v${ver["next-major"]}.${ver["next-minor"]}"
+  local migration="${ROOT}/migration/${version}"
 
-  create
+  create "${version}" "${migration}"
 
-  prune
+  prune "${version}"
 }
 
 main "${@}"
