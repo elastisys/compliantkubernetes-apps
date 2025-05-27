@@ -116,16 +116,16 @@ If any fixes are necessary, add a manual changelog entry and push them to the st
 
 When the QA process is finished the code should be in a state where it's ready to be released.
 
-Mark the staging pull request ready for review.
-
-## Release
-
 Update the SBOM, ensure it gets validated and carefully look at the diff and address any manual overrides needed:
 
 ```sh
 ./bin/ck8s sbom generate vX.Y.Z
 ./bin/ck8s sbom get-unset   # update any components listed
 ```
+
+Mark the staging pull request ready for review.
+
+## Release
 
 When the staging branch has been merged, finalize the release by tagging the HEAD of the release branch and push the tag.
 
