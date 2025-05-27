@@ -13,7 +13,7 @@ Notice to developers on writing migration steps:
     - are written for every major and minor version and placed in a subdirectory of the migration directory with the name `main/`,
         - during release this is promoted to the next release series `vX.Y/`,
     - are written to be idempotent and usable no matter which patch version you are upgrading from and to,
-    - are documented in `main/README.md` to be able to run them manually,
+    - are written to target either all versions or one version of Welkin,
     - are divided into prepare and apply steps:
         - Prepare steps:
             - are placed in the `prepare/` directory,
@@ -30,14 +30,14 @@ Notice to developers on writing migration steps:
 
 [Prepare snippets](main/prepare) are supposed to update the environment's configuration to the target version, an example snippet is the init step which runs the `ck8s init` command.
 [Apply snippets](main/apply) are supposed to update the environment's applications to the target versions, and example snippet is the apply step which run `helmfile upgrade` on all releases that have changed.
-It is expected that releases upgraded in other snippets are excluded from the apply snippet.
+It is expected that releases upgraded in other snippets targeting all versions are excluded from the general apply snippet.
 
 > [!tip]
-> This can be done by adding label expression of releases into the `skipped*` arrays of the `80-apply.sh` snippet:
+> This can be done by adding label expression of releases into the `skipped*` arrays of the `80-apply-all-versions.sh` snippet:
 >
 > ```diff
-> --- a/migration/main/apply/80-apply.sh
-> +++ b/migration/main/apply/80-apply.sh
+> --- a/migration/main/apply/80-apply-all-versions.sh
+> +++ b/migration/main/apply/80-apply-all-versions.sh
 > @@ -9,12 +9,15 @@ source "${ROOT}/scripts/migration/lib.sh"
 >  # Example: "app!=something"
 >  declare -a skipped
@@ -70,7 +70,8 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 > Example: if a major upgrade of a component requires that another component is temporarily removed, then it should **only** remove the component if there is a major upgrade in the first place, if there is a minor upgrade then it should be applied without removing the component.
 
 We also need them to be idempotent to be able to reuse them between release series, for example to update Grafana, OpenSearch, Prometheus, or Thanos, if not covered by the general apply snippet.
-Some snippets will still be specific to a specific version and those snippets should be named with the suffix `-version-specific.sh` to easily identify them.
+Snippets reusable for all versions must be named with the suffix `-all-versions.sh` and snippets specific to one versions must be named with the suffix `-one-version.sh`, else the automation will not know what to keep.
+This is enforced by pre-commit.
 
 ## Preparing migration steps for releases
 
@@ -81,7 +82,4 @@ To do this run:
 ./migration/promote.sh vX.Y
 ```
 
-This script will create a new directory for the `vX.Y` release series from the `main` directory, and prune old directories to only include the latest five releases.
-
-Once the new directory is created you must manually remove snippets and steps that was specific for the new release named with the suffix `-version-specific.sh`, be sure to remove any exclusions from them set in the `80-apply.sh` snippet based on the tip in the previous section.
-General migration steps, such as snippets for upgrading Grafana, OpenSearch, Prometheus, or Thanos, may be retained as long as they are verified beforehand that they are needed and only run when required, and fall back to generic upgrade steps if not required.
+This script will create a new directory for the `vX.Y` release series from the `main` directory, prune one version specific snippets, and prune old directories to only include the latest five releases.
