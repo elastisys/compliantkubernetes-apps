@@ -20,19 +20,32 @@ create() {
 
   # check if the target migration already exists
   if [[ -d "${target_migration}" ]]; then
-    if log.continue "migration $(esc.ylw "${target_version}") already exists, do you want to recreate it?"; then
-      log.warn "removing migration $(esc.ylw "${target_version}")"
-      rm -r "${target_migration}"
-    else
-      log.warn "skipping recreation"
-      return
-    fi
+    log.fatal "migration $(esc.red "${target_version}") already exists, if the creation of it is incomplete remove it and restore the main migration from git before retrying!"
   fi
 
-  if [[ ! -d "${target_migration}" ]]; then
-    log.info "copying migration directory for $(esc.blu "${target_version}")"
-    cp -Tr "${ROOT}/migration/main" "${target_migration}"
-  fi
+  log.info "copying migration directory for $(esc.blu "${target_version}")"
+  cp -Tr "${ROOT}/migration/main" "${target_migration}"
+
+  local -a snippets
+  local snippet
+
+  # rename all-versions in next
+  readarray -t snippets < <(find "${target_migration}" -maxdepth 2 -type f -name '*-all-versions.sh')
+  for snippet in "${snippets[@]}"; do
+    mv "${snippet}" "${snippet/%"-all-versions.sh"/".sh"}"
+  done
+
+  # rename one-version in next
+  readarray -t snippets < <(find "${target_migration}" -maxdepth 2 -type f -name '*-one-version.sh')
+  for snippet in "${snippets[@]}"; do
+    mv "${snippet}" "${snippet/%"-one-version.sh"/".sh"}"
+  done
+
+  # prune one-version in main
+  readarray -t snippets < <(find "${ROOT}/migration/main" -maxdepth 2 -type f -name '*-one-version.sh')
+  for snippet in "${snippets[@]}"; do
+    rm "${snippet}"
+  done
 
   # find current migration directories
   local -a directories
