@@ -325,7 +325,6 @@ check_version() {
     # ;;
   esac
 
-
   if [[ ! "${VERSION["${1}-config"]}" =~ v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
     log_warn "reducing version validation of ${1}-config for version \"${VERSION["${1}-config"]}\""
   else
