@@ -107,22 +107,14 @@ teardown() {
   assert_output --partial "Upgrade ongoing"
 }
 
-@test "prevent apply using older config" {
+@test "prevent apply using older apps version" {
   # test 4
   #
   # pretend we already upgraded
   run yq -i '.global.ck8sVersion="v0.42.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
-  ck8s ops kubectl sc apply -f - <<EOF
-apiVersion: v1
-data:
-  version: v0.42
-kind: ConfigMap
-metadata:
-  name: apps-meta
-  namespace: kube-system
-EOF
+  run ck8s ops kubectl sc patch -n kube-system configmap apps-meta --type=merge --patch '{"data":{"version":"v0.42"}}'
 
-  # downgrade
+  # accidentally downgrade apps
   gitversion.mock_static "v0.41.0"
   run ck8s apply sc
   assert_failure
