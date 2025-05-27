@@ -148,7 +148,7 @@ check_tools() {
   }
 
   check_minor "$(echo "${req}" | jq -r '.["github.com/mikefarah/yq/v4"].version')" "$(yq --version)" yq
-  check_minor "$(echo "${req}" | jq -r '.["kubectl"].version')" "$(kubectl version -oyaml 2>/dev/null | yq '.clientVersion.gitVersion')" kubectl
+  check_minor "$(echo "${req}" | jq -r '.["kubectl"].version')" "$(kubectl version --client=true -oyaml 2>/dev/null | yq '.clientVersion.gitVersion')" kubectl
   check_minor "$(echo "${req}" | jq -r '.["helm.sh/helm/v3"].version')" "$(helm version --template='{{.Version}}')" helm
   check_minor "$(echo "${req}" | jq -r '.["github.com/helmfile/helmfile"].version')" "$(helmfile --version)" helmfile
   check_minor "$(echo "${req}" | jq -r '.["github.com/databus23/helm-diff/v3"].version')" "$(helm plugin list | grep diff)" "helm diff plugin"
