@@ -12,7 +12,7 @@ declare -A VERSION
 SC_KUBECONFIG_FILE=".state/kube_config_sc.yaml"
 WC_KUBECONFIG_FILE=".state/kube_config_wc.yaml"
 
-IMAGE_LIST="${THIS}/../../helmfile.d/lists/images.yaml"
+IMAGE_LIST="${ROOT}/helmfile.d/lists/images.yaml"
 
 declare -a SC_CONFIG_FILES
 SC_CONFIG_FILES=(
