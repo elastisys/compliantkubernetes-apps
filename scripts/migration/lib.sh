@@ -283,9 +283,10 @@ check_version() {
     fi
   fi
 
-  # Make sure **config** and **cluster** is on the same (old) version
   cluster_version="$(get_apps_version "${1}" >/dev/null 2>&1 || true)"
-  if [[ "${2}" == "prepare" ]]; then
+  case "${2:-}" in
+  prepare)
+    # Make sure **config** and **cluster** is on the same (old) version
     if [[ -n "${cluster_version}" ]] && [[ "${cluster_version}" != "${VERSION["${1}-config"]%.*}" ]]; then
       log_warn "Version mismatch, cluster ${cluster_version}, config ${VERSION["${1}-config"]%.*}"
       if [[ -t 1 ]]; then
@@ -314,12 +315,17 @@ check_version() {
         exit 1
       fi
     fi
+    ;;
+    # apply)
+    # In this case, what do we know?
+    # git: new version
+    # config: new version
+    # cluster: old version
+    # cluster: new version
+    # ;;
+  esac
 
-    # Make sure that **.global.ck8sVersion** is not updated until prepare is done
-  fi
 
-  # **Config** must be previous minor or patch in the same minor
-  # The following?
   if [[ ! "${VERSION["${1}-config"]}" =~ v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
     log_warn "reducing version validation of ${1}-config for version \"${VERSION["${1}-config"]}\""
   else
