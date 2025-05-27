@@ -67,7 +67,7 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
 > [!important]
 > Since the migration snippets should be idempotent and usable from and to any patch version, it is important that they only perform actions when needed, especially in the case of destructive actions!
 >
-> Example: if a major upgrade of a component requires that another component is temporarily removed, then it should **only** remove the component if there is a major upgrade in the first place, if there is a minor upgrade then it should be applied without removing the component.
+> Example: if a major or minor upgrade of a component requires that another component is temporarily removed, then it should **only** remove the component if there is a major or minor upgrade in the first place, if there is a patch upgrade then it should be applied without removing the component.
 
 We also need them to be idempotent to be able to reuse them between release series, for example to update Grafana, OpenSearch, Prometheus, or Thanos, if not covered by the general apply snippet.
 Snippets reusable for all versions must be named with the suffix `-all-versions.sh` and snippets specific to one versions must be named with the suffix `-one-version.sh`, else the automation will not know what to keep.
