@@ -167,7 +167,7 @@ version) # all|both|sc|wc
   shift
   [[ "${1}" =~ ^(all|both|config|wc|sc)$ ]] || usage
   if [[ "${1}" =~ ^(all|config)$ ]]; then
-    log_info "config version:" "$(yq4 '.global.ck8sVersion' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")"
+    log_info "config version:" "$(yq '.global.ck8sVersion' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml")"
   fi
   if [[ "${1}" =~ ^(all|both|sc)$ ]]; then
     log_info "sc version:" "$(get_apps_version "sc")"

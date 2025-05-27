@@ -453,7 +453,7 @@ record_upgrade_prepare_done() {
     --namespace kube-system apps-upgrade \
     --from-literal "version=${CK8S_TARGET_VERSION}" \
     --from-literal "timestamp=${apps_config_timestamp}" |
-    yq4 '.metadata.labels["app.kubernetes.io/managed-by"] = "apps-upgrade"' - |
+    yq '.metadata.labels["app.kubernetes.io/managed-by"] = "apps-upgrade"' - |
     kubectl_do "${1}" create --filename -; then
 
     ts="${apps_config_timestamp}" \
@@ -474,13 +474,13 @@ ensure_upgrade_prepared() {
   local apps_config_timestamp
 
   apps_upgrade="$(kubectl_do "${1}" get --namespace kube-system cm apps-upgrade --output=yaml)"
-  apps_version="$(yq4 '.data.version' <<<"${apps_upgrade}")"
+  apps_version="$(yq '.data.version' <<<"${apps_upgrade}")"
 
   if [[ "${apps_version}" != "${CK8S_TARGET_VERSION}" ]] >/dev/null; then
     log_fatal "version mismatch, upgrading to ${CK8S_TARGET_VERSION} but cluster ${1} was prepared for ${apps_version}"
   fi
 
-  apps_config_timestamp="$(yq4 '.data.timestamp' <<<"${apps_upgrade}")"
+  apps_config_timestamp="$(yq '.data.timestamp' <<<"${apps_upgrade}")"
   apps_cluster_timestamp="$(yq_dig common '.global.ck8sConfigSerial')"
   if [[ "${apps_config_timestamp}" != "${apps_cluster_timestamp}" ]]; then
     log_fatal "Config timestamp mismatch, ${apps_cluster_timestamp} in ${1} but ${apps_config_timestamp} in config"
@@ -492,12 +492,12 @@ record_upgrade_apply_step() {
   # Was this needed?
   local apps_upgrade
   apps_upgrade="$(kubectl_do "${1}" get --namespace kube-system cm apps-upgrade --output=yaml)"
-  if ! yq4 --exit-status 'select(.data.version == strenv(CK8S_TARGET_VERSION))' <<<"${apps_upgrade}" >/dev/null; then
+  if ! yq --exit-status 'select(.data.version == strenv(CK8S_TARGET_VERSION))' <<<"${apps_upgrade}" >/dev/null; then
     log_fatal "version mismatch, upgrading to ${CK8S_TARGET_VERSION} but cluster ${1} was prepared for $(
-      yq4 '.data.version' <<<"${apps_upgrade}"
+      yq '.data.version' <<<"${apps_upgrade}"
     )"
   fi
-  apps_upgrade="$(last_step="${2##*/}" yq4 --exit-status '.data.last_apply_step = strenv(last_step)' <<<"${apps_upgrade}")"
+  apps_upgrade="$(last_step="${2##*/}" yq --exit-status '.data.last_apply_step = strenv(last_step)' <<<"${apps_upgrade}")"
   log_info "Recording upgrade checkpoint"
   if ! kubectl_do "${1}" replace --filename - <<<"${apps_upgrade}" >/dev/null; then
     log_fatal "could not record completed upgrade step in ${1}"
@@ -509,7 +509,7 @@ record_upgrade_apply_step() {
 record_upgrade_done() {
   # Record the upgraded-to version. Create if it does not already exist.
   log_info "Recording new apps version in cluster"
-  if ! kubectl_do "${1}" patch --namespace kube-system cm apps-meta --type=merge --patch "$(yq4 --null-input --output-format json '.data.version = strenv(CK8S_TARGET_VERSION)')"; then
+  if ! kubectl_do "${1}" patch --namespace kube-system cm apps-meta --type=merge --patch "$(yq --null-input --output-format json '.data.version = strenv(CK8S_TARGET_VERSION)')"; then
     if ! kubectl_do "${1}" create configmap --namespace kube-system apps-meta --from-literal "version=${CK8S_TARGET_VERSION}"; then
       log_fatal "could not record new apps version in ${1}"
     fi
