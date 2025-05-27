@@ -84,4 +84,4 @@ To do this run:
 This script will create a new directory for the `vX.Y` release series from the `main` directory, and prune old directories to only include the latest five releases.
 
 Once the new directory is created you must manually remove snippets and steps that was specific for the new release named with the suffix `-version-specific.sh`, be sure to remove any exclusions from them set in the `80-apply.sh` snippet based on the tip in the previous section.
-General migration steps, such as snippets for upgrading Grafana, OpenSearch, Prometheus, or Thanos, may be retained as long as they verify beforehand they run that they are needed, and fall back to a generic upgrade steps if not required.
+General migration steps, such as snippets for upgrading Grafana, OpenSearch, Prometheus, or Thanos, may be retained as long as they are verified beforehand that they are needed and only run when required, and fall back to generic upgrade steps if not required.
