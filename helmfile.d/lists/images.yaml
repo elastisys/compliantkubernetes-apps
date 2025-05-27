@@ -43,10 +43,10 @@ images:
   hnc:
     image: ghcr.io/elastisys/hnc-manager:v1.1.0
   ingressNginx:
-    controller: registry.k8s.io/ingress-nginx/controller:v1.12.1@sha256:d2fbc4ec70d8aa2050dd91a91506e998765e86c96f32cffb56c503c9c34eed5b
-    controllerChroot: registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e
+    controller: registry.k8s.io/ingress-nginx/controller:v1.12.1
+    controllerChroot: registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1
     defaultBackend: registry.k8s.io/defaultbackend-amd64:1.5
-    admissionWebhooksPatch: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2@sha256:e8825994b7a2c7497375a9b945f386506ca6a3eda80b89b74ef2db743f66a5ea
+    admissionWebhooksPatch: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2
     fileCopier: docker.io/library/busybox:1.36
   kured:
     image: ghcr.io/kubereboot/kured:1.17.0
@@ -82,9 +82,9 @@ images:
   rclone:
     image: ghcr.io/elastisys/rclone-sync:1.63.0
   tekton:
-    controller: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/controller:v0.45.0@sha256:8a302dab54484bbb83d46ff9455b077ea51c1c189641dcda12575f8301bfb257
-    remoteResolvers: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/resolvers:v0.45.0@sha256:5bd5240ccd89e0b81796aa8b8bbb4feb2162e63dda1cb0a95e315c9fadeb7ec8
-    webhook: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/webhook:v0.45.0@sha256:07390c988b1c651c4810e9f7b15a88dfce8030845a429cf19b762a0d50e18ca7
+    controller: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/controller:v0.45.0
+    remoteResolvers: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/resolvers:v0.45.0
+    webhook: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/webhook:v0.45.0
   thanos:
     image: ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8
     configReloader: quay.io/prometheus-operator/prometheus-config-reloader:v0.50.0
