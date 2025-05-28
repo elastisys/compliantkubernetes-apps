@@ -13,9 +13,3 @@ gitversion.setup_mocks() {
 gitversion.mock_static() {
   mock_set_output "${mock_git}" "${1}"
 }
-
-# from, to
-gitversion.mock_upgrade() {
-  mock_set_output "${mock_git}" "${1}"
-  mock_set_output "${mock_git}" "${2}"
-}
