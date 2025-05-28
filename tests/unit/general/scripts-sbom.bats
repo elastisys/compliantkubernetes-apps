@@ -3,23 +3,28 @@
 # bats file_tags=scripts-sbom
 
 sbom_backup=$(mktemp --suffix=-sbom.json)
+velero_chart_backup=$(mktemp --suffix=-velero-chart.json)
 
 setup() {
   load "../../bats.lib.bash"
   load_assert
   load_file
 
-  cp "${ROOT}/docs/sbom.json" "${sbom_backup}"
-
   PATH=:${ROOT}/scripts/sbom:${PATH}
 
-  export CK8S_AUTO_APPROVE=true
-  VELERO_CHART="${ROOT}/helmfile.d/upstream/vmware-tanzu/velero/Chart.yaml"
+  export CK8S_AUTO_APPROVE=false
+  export CK8S_SKIP_VALIDATION=false
+  VELERO_CHART_RELATIVE_FOLDER=helmfile.d/upstream/vmware-tanzu/velero
+  VELERO_CHART="${ROOT}/${VELERO_CHART_RELATIVE_FOLDER}/Chart.yaml"
   velero_version=$(yq '.version' "${VELERO_CHART}")
+
+  cp "${ROOT}/docs/sbom.json" "${sbom_backup}"
+  cp "${VELERO_CHART}" "${velero_chart_backup}"
 }
 
 teardown() {
-  mv "${sbom_backup}" "${ROOT}/docs/sbom.json"
+  mv --force "${sbom_backup}" "${ROOT}/docs/sbom.json"
+  mv --force "${velero_chart_backup}" "${VELERO_CHART}"
 }
 
 @test "sbom script should show usage if no command is given" {
@@ -39,6 +44,12 @@ teardown() {
   assert_failure
 }
 
+@test "sbom script validate should be successful" {
+  run sbom.bash validate
+  assert_success
+  assert_output --partial 'BOM validated successfully.'
+}
+
 @test "sbom script add component with unsupported key" {
   run sbom.bash add velero "${velero_version}" unsupported-key '{"name": "test", "value": "test"}'
   assert_failure
@@ -46,28 +57,33 @@ teardown() {
 }
 
 @test "sbom script add component properties with correct object format" {
+  export CK8S_AUTO_APPROVE=true
   run sbom.bash add velero "${velero_version}" properties '{"name": "test", "value": "test"}'
   assert_success
   assert_output --partial 'Updated properties'
 }
 
 @test "sbom script add component properties with incorrect object format should fail cyclonedx validation" {
-  export CK8S_AUTO_APPROVE=false
-  export CK8S_SKIP_VALIDATION=false
   run sbom.bash add velero "${velero_version}" properties '{"unsupported-key-name": "test", "unsupported-value": "test"}' <<<n
   assert_output --partial 'Validation failed:'
   assert_output --regexp 'Required properties .* are not present'
 }
 
-# TODO: change this if generate command is changed to not require GITHUB_TOKEN
 @test "sbom script generate requires GITHUB_TOKEN" {
   GITHUB_TOKEN="" run sbom.bash generate
   assert_failure
   assert_output --partial "Missing GITHUB_TOKEN"
 }
 
-@test "sbom script validate should be successful" {
-  run sbom.bash validate
+@test "sbom script update requires GITHUB_TOKEN" {
+  GITHUB_TOKEN="" run sbom.bash update "${VELERO_CHART_RELATIVE_FOLDER}"
+  assert_failure
+  assert_output --partial "Missing GITHUB_TOKEN"
+}
+
+@test "sbom script update with no change should work" {
+  export CK8S_SKIP_VALIDATION=true
+  GITHUB_TOKEN="test" run sbom.bash update "${VELERO_CHART_RELATIVE_FOLDER}"
   assert_success
-  assert_output --partial "BOM validated successfully."
+  assert_output --partial "No change"
 }
