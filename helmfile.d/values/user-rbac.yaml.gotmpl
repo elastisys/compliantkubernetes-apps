@@ -14,6 +14,7 @@ groups: {{ toYaml .Values.user.adminGroups | nindent 2 }}
 serviceAccounts: {{ toYaml .Values.user.serviceAccounts | nindent 2 }}
 createNamespaces: {{ .Values.user.createNamespaces }}
 enableFalcoViewer: {{ toYaml .Values.falco.enabled | nindent 2 }}
+alertmanagerNamespace: {{ .Values.prometheus.devAlertmanager.namespace }}
 
 hnc:
   enabled: {{ .Values.hnc.enabled }}
