@@ -615,11 +615,13 @@ _test_github_token() {
   : "${GITHUB_TOKEN:?Missing GITHUB_TOKEN}"
 
   # test GITHUB token
-  curl --silent --fail --show-error --output /dev/null \
-    -H "Accept: application/vnd.github+json" \
-    -H "X-GitHub-Api-Version: 2022-11-28" \
-    -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-    "https://api.github.com/repos/elastisys/compliantkubernetes-apps"
+  if ! ${CK8S_SKIP_VALIDATION:-}; then
+    curl --silent --fail --show-error --output /dev/null \
+      -H "Accept: application/vnd.github+json" \
+      -H "X-GitHub-Api-Version: 2022-11-28" \
+      -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+      "https://api.github.com/repos/elastisys/compliantkubernetes-apps"
+  fi
 }
 
 sbom_update() {
@@ -669,7 +671,9 @@ sbom_update() {
   | select(fi == 0) | (eval(strenv(components))) = $mergedArray
   ' "${SBOM_FILE}" "${tmp_sbom_file}" >"${tmp_output_sbom_file}"
 
-  diff -U3 --color=always "${SBOM_FILE}" "${tmp_output_sbom_file}" && log_info "No change" && return
+  sbom_cyclonedx_validation "${tmp_output_sbom_file}"
+
+  diff -U3 --color=always "${SBOM_FILE}" "${tmp_output_sbom_file}" && log_info "No change" && exit 0
 
   # need to delete components to not override first element in components array
   yq -i 'del(.components)' "${tmp_sbom_file}"
@@ -682,7 +686,7 @@ sbom_update() {
     mv "${tmp_output_sbom_file}" "${SBOM_FILE}"
     yq -o json -i '.version += 1' "${SBOM_FILE}"
     log_info "SBOM file replaced"
-    return
+    exit 0
   fi
   log_info "Skipped replacing SBOM"
 }
@@ -714,14 +718,14 @@ sbom_generate() {
   CK8S_SKIP_VALIDATION=false
   sbom_cyclonedx_validation "${tmp_sbom_file}"
 
-  diff -U3 --color=always "${SBOM_FILE}" "${tmp_sbom_file}" && log_info "No change" && return
+  diff -U3 --color=always "${SBOM_FILE}" "${tmp_sbom_file}" && log_info "No change" && exit 0
   log_warning_no_newline "Do you want to replace SBOM file? (y/N): "
   read -r reply
   if [[ "${reply}" == "y" ]]; then
     mv "${tmp_sbom_file}" "${SBOM_FILE}"
     yq -o json -i '.version += 1' "${SBOM_FILE}"
     log_info "SBOM file replaced"
-    return
+    exit 0
   fi
   log_info "Skipped replacing SBOM"
 }
