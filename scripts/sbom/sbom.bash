@@ -48,7 +48,7 @@ usage() {
   exit 1
 }
 
-init_welkin_config() {
+_init_welkin_config() {
   log_info "Initializing Welkin config used for generating Welkin"
   export PATH="${ROOT}/bin:${PATH}"
   gpg.setup_one >/dev/null 2>&1
@@ -219,12 +219,10 @@ _prepare_sbom() {
   fi
 
   # TODO: hardcoded provider and installer for now, look into running for all combinations (either merge or create unique SBOMs for each?)
-  init_welkin_config baremetal kubespray prod
+  _init_welkin_config baremetal kubespray prod
 
   sbom_file="${1}"
-  if [[ ! -f "${sbom_file}" ]]; then
-    log_fatal "SBOM file ${sbom_file} does not exist"
-  fi
+
   log_info "Preparing SBOM"
 
   shift
@@ -255,7 +253,6 @@ _prepare_sbom() {
   fi
 
   if [[ -n "${location}" ]]; then
-    # TODO: verify that location contains helm chart and is in the Welkin apps repo
     cdxgen --project-name "welkin-apps" --project-version "${project_version}" --filter '.*' --filter '.x.x' -t helm "${location}" --output "${sbom_file}"
   else
     cdxgen --project-name "welkin-apps" --project-version "${project_version}" --filter '.*' --filter '.x.x' -t helm "${HELMFILE_FOLDER}" --output "${sbom_file}"
@@ -297,7 +294,7 @@ _add_license_for_component() {
   chart_name=$(yq ".name" <<<"${chart}")
   chart_version=$(yq ".version" <<<"${chart}")
 
-  # if chart exists as part of
+  # if chart exists as part of Welkins own charts, adds Apache-2.0 license
   if [[ "${chart_location}" == *"helmfile.d/charts"* ]]; then
     _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "Apache-2.0")"
     return
@@ -353,9 +350,7 @@ _add_licenses() {
   fi
 
   sbom_file="${1}"
-  if [[ ! -f "${sbom_file}" ]]; then
-    log_fatal "SBOM file ${sbom_file} does not exist"
-  fi
+
   log_info "Getting licenses"
 
   # TODO: (maybe) filter out unused charts before processing?
@@ -463,9 +458,6 @@ _add_container_images() {
   fi
 
   sbom_file="${1}"
-  if [[ ! -f "${sbom_file}" ]]; then
-    log_fatal "SBOM file ${sbom_file} does not exist"
-  fi
 
   template_file=$(mktemp --suffix=-sbom-template-file)
   append_trap "rm ${template_file} >/dev/null 2>&1" EXIT
@@ -566,18 +558,19 @@ sbom_get() {
 }
 
 sbom_get_unset() {
+  output_query=' { "name": .name, "version": .version, "location": .evidence.occurrences[0].location}'
   log_info "Getting components without licenses"
-  yq -I=0 -o json -r '[.components[] | select(.licenses[].license.name | contains("set-me")) | { "name": .name, "version": .version}] | .[]' "${SBOM_FILE}"
-  yq -I=0 -o json -r '[.components[] | select(.licenses | length == 0) | { "name": .name, "version": .version}] | .[]' "${SBOM_FILE}"
-  yq -I=0 -o json -r '[.components[] | select(has("licenses") == "false") | { "name": .name, "version": .version}] | .[]' "${SBOM_FILE}"
+  yq -I=0 -o json -r "[.components[] | select(.licenses[].license.name | contains(\"set-me\")) | ${output_query}] | .[]" "${SBOM_FILE}"
+  yq -I=0 -o json -r "[.components[] | select(.licenses | length == 0) | ${output_query}] | .[]" "${SBOM_FILE}"
+  yq -I=0 -o json -r "[.components[] | select(has(\"licenses\") == \"false\") | ${output_query}] | .[]" "${SBOM_FILE}"
 
   echo
   log_info "Getting components without Elastisys evaluation"
-  yq -I=0 -o json -r '[.components[] | select(.properties[].value == "set-me")  | { "name": .name, "version": .version}] | .[]' "${SBOM_FILE}"
+  yq -I=0 -o json -r "[.components[] | select(.properties[].value == \"set-me\")  | ${output_query}] | .[]" "${SBOM_FILE}"
 
   echo
   log_info "Getting components without supplier"
-  yq -I=0 -o json -r '[.components[] | select(.supplier.name == "set-me")  | { "name": .name, "version": .version}] | .[]' "${SBOM_FILE}"
+  yq -I=0 -o json -r "[.components[] | select(.supplier.name == \"set-me\")  | ${output_query}] | .[]" "${SBOM_FILE}"
 }
 
 sbom_get_charts() {
