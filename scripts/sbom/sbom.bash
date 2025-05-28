@@ -731,34 +731,42 @@ sbom_generate() {
 }
 
 sbom_diff() {
-  local chart_name chart_version found_diff location
+  local found_diff location
   mapfile -t diff_files < <(git diff --staged --name-only | grep "helmfile.d/")
   mapfile -t all_charts < <(sbom_get_charts "${SBOM_FILE}")
 
   for chart in "${all_charts[@]}"; do
     found_diff=false
-    chart_name=$(yq '.name' <<<"${chart}")
-    chart_version=$(yq '.version' <<<"${chart}")
+    sbom_component_name=$(yq '.name' <<<"${chart}")
+    sbom_component_version=$(yq '.version' <<<"${chart}")
     location=$(yq '.location' <<<"${chart}")
 
     for diff_file in "${diff_files[@]}"; do
       if [[ "${diff_file}" == *${location}* ]]; then
-        found_diff=true
-        continue
+        chart_name="$(yq '.name' "${ROOT}/${location}/Chart.yaml")"
+        chart_version="$(yq '.version' "${ROOT}/${location}/Chart.yaml")"
+        if [[ "${chart_version}" != "${sbom_component_version}" ]]; then
+          found_diff=true
+          log_warning "Chart version does not match SBOM: ${chart_version} != ${sbom_component_version}"
+          break
+        elif [[ "${chart_name}" != "${sbom_component_name}" ]]; then
+          found_diff=true
+          log_warning "Chart name does not match SBOM: ${chart_name} != ${sbom_component_name}"
+          break
+        fi
       fi
     done
 
     if [[ "${found_diff}" == true ]]; then
-      log_warning "Changes found in ${location}"
-      log_warning "Verify that the Elastisys evaluation is still valid"
-      sbom_get "${chart_name}" "${chart_version}" "properties"
-      log_warning "Verify that the Supplier is up to date"
-      sbom_get "${chart_name}" "${chart_version}" "supplier"
+      log_warning "Run the following to update the SBOM:"
+      log_warning "./scripts/sbom/sbom.bash update ${location}"
     fi
   done
 
   if [[ "${found_diff}" == false ]]; then
     log_info "No chart changes found"
+  else
+    exit 1
   fi
 }
 
