@@ -4,21 +4,36 @@
 
 setup_file() {
   load "../../bats.lib.bash"
+  load_common "env.bash"
+  load_common "gpg.bash"
+  load_common "yq.bash"
+  load_mock
+
+  gpg.setup
+  env.setup
+  env.init baremetal kubespray prod
+  yq -i '.global.ck8sVersion = "v0.42"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
+
+  mock_kubectl="$(mock_create)"
+  export mock_kubectl
+  kubectl() {
+    # shellcheck disable=SC2317
+    "${mock_kubectl}" "${@}"
+  }
+  export -f kubectl
+  mock_set_output "${mock_kubectl}" "v0.42"
+}
+
+teardown_file() {
+  env.teardown
+  gpg.teardown
 }
 
 setup() {
   load "../../bats.lib.bash"
-  load_common "env.bash"
   load_assert
-  load_file
-
-  CK8S_CONFIG_PATH="$(mktemp --directory)"
-  export CK8S_CONFIG_PATH
-  export CK8S_ENVIRONMENT_NAME="unit-test"
-  export CK8S_CLOUD_PROVIDER="baremetal"
-  export CK8S_K8S_INSTALLER="kubespray"
-  export CK8S_FLAVOR="dev"
 }
+
 
 @test "negative test should show usage" {
   run ck8s version
@@ -29,32 +44,32 @@ setup() {
 @test "ck8s version all" {
   run ck8s version all
   assert_success
-  assert_output --partial "config version: "
-  assert_output --partial "sc version: "
-  assert_output --partial "wc version: "
+  assert_output --partial "config version: v0.42"
+  assert_output --partial "sc version: v0.42"
+  assert_output --partial "wc version: v0.42"
 }
 
 @test "ck8s version both" {
   run ck8s version both
   assert_success
-  assert_output --partial "sc version: "
-  assert_output --partial "wc version: "
+  assert_output --partial "sc version: v0.42"
+  assert_output --partial "wc version: v0.42"
 }
 
 @test "ck8s version config" {
   run ck8s version config
   assert_success
-  assert_output --partial "config version: "
+  assert_output --partial "config version: v0.42"
 }
 
 @test "ck8s version sc" {
   run ck8s version sc
   assert_success
-  assert_output --partial "sc version: "
+  assert_output --partial "sc version: v0.42"
 }
 
 @test "ck8s version wc" {
   run ck8s version wc
   assert_success
-  assert_output --partial "wc version: "
+  assert_output --partial "wc version: v0.42"
 }
