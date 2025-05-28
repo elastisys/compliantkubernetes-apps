@@ -575,7 +575,7 @@ thanos:
     # It needs to write to (REPLICATION_FACTOR + 1)/2 nodes for success.
     # For more info: https://thanos.io/v0.24/proposals-done/201812-thanos-remote-receive.md/#replication
     replicationFactor: 1
-    replicaCount: 1
+    replicaCount: 3
     resources:
       requests:
         cpu: 150m
@@ -584,7 +584,7 @@ thanos:
         cpu: 1000m
         memory: 1Gi
     receiveHashringsAlgorithm: ketama
-    receiveMaxConcurrency: 20
+    receiveMaxConcurrency: 5
     extraFlags: [] #use extraflags when you want to add more command line flags to the component.
   ruler:
     # Enables the ruler component
