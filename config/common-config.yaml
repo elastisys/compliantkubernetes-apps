@@ -584,7 +584,6 @@ ingressNginx:
 
     ## Enable validation of Nginx annotations on Ingress resources.
     ## Only does runtime validation and produces error logs for invalid ingress annotations.
-    ## TODO: Revisit this feature in future upgrade
     enableAnnotationValidations: true
 
     #  Ref: https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/cli-arguments.md
