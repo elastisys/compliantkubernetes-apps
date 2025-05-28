@@ -34,7 +34,6 @@ setup() {
   load_assert
 }
 
-
 @test "negative test should show usage" {
   run ck8s version
   assert_failure
