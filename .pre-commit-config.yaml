@@ -96,7 +96,13 @@ repos:
         language: script
         require_serial: true
         entry: scripts/sbom/sbom.bash diff
-        verbose: true
+
+      - id: sbom-validate
+        name: SBOM CycloneDX validation
+        types: [shell]
+        language: script
+        require_serial: true
+        entry: scripts/sbom/sbom.bash validate
 
   - repo: https://github.com/codespell-project/codespell
     rev: v2.3.0
