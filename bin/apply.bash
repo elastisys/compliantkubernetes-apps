@@ -89,8 +89,8 @@ wc)
 esac
 
 update_ips_dryrun "$1" "${environment}"
-config_load "$1"
-validate_version "${1}"
 check_upgrade "$1"
+config_load "$1"
+validate_version "${1}" # XXX config_load also calls validate_version
 [[ -z "${CK8S_CI_SKIP_APPLY:-}" ]] || exit 0 # Improve mockability in the future
 apps_apply "$1" "${environment}" "${@:2}"

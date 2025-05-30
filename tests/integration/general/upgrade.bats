@@ -99,7 +99,6 @@ teardown() {
   run ck8s apply sc
   assert_failure
   assert_output --partial "Upgrade ongoing"
-  # FIXME halts on version check instead of in-progress upgrade check
 }
 
 @test "prevent a ck8s apply after ck8s upgrade prepare but prepare is not merged" {
