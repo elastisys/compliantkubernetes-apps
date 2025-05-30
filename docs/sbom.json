@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:43e124c6-2893-4b86-842e-1eac2778c126",
-  "version": 9,
+  "serialNumber": "urn:uuid:84200bcb-dfa6-46d0-8852-a068ebc8dbff",
+  "version": 10,
   "metadata": {
-    "timestamp": "2025-05-30T07:44:15Z",
+    "timestamp": "2025-05-30T10:30:55Z",
     "tools": {
       "components": [
         {
@@ -36,10 +36,10 @@
     "component": {
       "group": "",
       "name": "welkin-apps",
-      "version": "83694765587a2b3a79fd2dbae39080e80a60ee83",
+      "version": "58fa5552aa8eb67e843355ad8e43d26dd5503be4",
       "type": "application",
-      "bom-ref": "pkg:application/welkin-apps@83694765587a2b3a79fd2dbae39080e80a60ee83",
-      "purl": "pkg:application/welkin-apps@83694765587a2b3a79fd2dbae39080e80a60ee83"
+      "bom-ref": "pkg:application/welkin-apps@58fa5552aa8eb67e843355ad8e43d26dd5503be4",
+      "purl": "pkg:application/welkin-apps@58fa5552aa8eb67e843355ad8e43d26dd5503be4"
     },
     "properties": [
       {
@@ -63,6 +63,13 @@
       "tags": [
         "service"
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/autoscaling-monitoring"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -71,13 +78,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/autoscaling-monitoring"
-          }
-        ]
       },
       "licenses": [
         {
@@ -95,6 +95,13 @@
       "purl": "pkg:helm/calico-accountant@0.1.1",
       "type": "library",
       "bom-ref": "pkg:helm/calico-accountant@0.1.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/calico-accountant"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -103,13 +110,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/calico-accountant"
-          }
-        ]
       },
       "licenses": [
         {
@@ -135,6 +135,13 @@
       "purl": "pkg:helm/calico-default-deny@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/calico-default-deny@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/calico-default-deny"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -143,13 +150,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/calico-default-deny"
-          }
-        ]
       },
       "licenses": [
         {
@@ -167,6 +167,13 @@
       "purl": "pkg:helm/calico-felix-metrics@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/calico-felix-metrics@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/calico-felix-metrics"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -175,13 +182,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/calico-felix-metrics"
-          }
-        ]
       },
       "licenses": [
         {
@@ -205,6 +205,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/cert-manager@v1.17.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/jetstack/cert-manager"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -213,13 +220,6 @@
       ],
       "supplier": {
         "name": "The cert-manager Authors"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/jetstack/cert-manager"
-          }
-        ]
       },
       "licenses": [
         {
@@ -263,6 +263,13 @@
       "purl": "pkg:helm/cluster-admin-rbac@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/cluster-admin-rbac@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/cluster-admin-rbac"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -271,13 +278,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/cluster-admin-rbac"
-          }
-        ]
       },
       "licenses": [
         {
@@ -301,6 +301,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/common@2.29.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/bitnami/fluentd/charts/common"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -309,13 +316,6 @@
       ],
       "supplier": {
         "name": "Broadcom Inc."
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/bitnami/fluentd/charts/common"
-          }
-        ]
       },
       "licenses": [
         {
@@ -339,6 +339,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/common@2.30.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/bitnami/thanos/charts/common"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -347,13 +354,6 @@
       ],
       "supplier": {
         "name": "Broadcom Inc."
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/bitnami/thanos/charts/common"
-          }
-        ]
       },
       "licenses": [
         {
@@ -370,6 +370,13 @@
       "purl": "pkg:helm/crds@0.0.0",
       "type": "library",
       "bom-ref": "pkg:helm/crds@0.0.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/crds"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -378,21 +385,7 @@
       ],
       "supplier": {
         "name": "Prometheus Authors"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/crds"
-          }
-        ]
-      },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ]
+      }
     },
     {
       "group": "",
@@ -401,6 +394,13 @@
       "purl": "pkg:helm/crds@3.3.6",
       "type": "library",
       "bom-ref": "pkg:helm/crds@3.3.6",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/kyverno/kyverno/charts/crds"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -409,21 +409,7 @@
       ],
       "supplier": {
         "name": "The Kyverno Authors"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/kyverno/kyverno/charts/crds"
-          }
-        ]
-      },
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ]
+      }
     },
     {
       "group": "",
@@ -442,6 +428,13 @@
       "tags": [
         "connect"
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/dexidp/dex"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -450,13 +443,6 @@
       ],
       "supplier": {
         "name": "Dex IdP Contributors"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/dexidp/dex"
-          }
-        ]
       },
       "licenses": [
         {
@@ -482,6 +468,13 @@
       "purl": "pkg:helm/external-dns-endpoints@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/external-dns-endpoints@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/external-dns-endpoints"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -490,13 +483,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/external-dns-endpoints"
-          }
-        ]
       },
       "licenses": [
         {
@@ -514,6 +500,13 @@
       "purl": "pkg:helm/external-dns-secrets@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/external-dns-secrets@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/external-dns-secrets"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -522,13 +515,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/external-dns-secrets"
-          }
-        ]
       },
       "licenses": [
         {
@@ -552,6 +538,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/external-dns@1.14.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/kubernetes-external-dns/external-dns"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -560,13 +553,6 @@
       ],
       "supplier": {
         "name": "The Linux Foundation"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/kubernetes-external-dns/external-dns"
-          }
-        ]
       },
       "licenses": [
         {
@@ -590,6 +576,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/falco@4.20.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/falcosecurity/falco"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -598,13 +591,6 @@
       ],
       "supplier": {
         "name": "The Falco Authors"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/falcosecurity/falco"
-          }
-        ]
       },
       "licenses": [
         {
@@ -660,6 +646,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/falcosidekick@0.9.8",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/falcosecurity/falco/charts/falcosidekick"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -668,13 +661,6 @@
       ],
       "supplier": {
         "name": "The Falco Authors"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/falcosecurity/falco/charts/falcosidekick"
-          }
-        ]
       },
       "licenses": [
         {
@@ -692,6 +678,13 @@
       "purl": "pkg:helm/file-copier@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/file-copier@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/file-copier"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -700,13 +693,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/file-copier"
-          }
-        ]
       },
       "licenses": [
         {
@@ -738,6 +724,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/fluentd-elasticsearch@13.12.2",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/kokuwa/fluentd-elasticsearch"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -747,17 +740,10 @@
       "supplier": {
         "name": "Fluentd Project"
       },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/kokuwa/fluentd-elasticsearch"
-          }
-        ]
-      },
       "licenses": [
         {
           "license": {
-            "name": "Apache License 2.0"
+            "name": "GNU General Public License v3.0"
           }
         }
       ],
@@ -784,6 +770,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/fluentd@7.1.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/bitnami/fluentd"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -792,13 +785,6 @@
       ],
       "supplier": {
         "name": "Broadcom Inc."
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/bitnami/fluentd"
-          }
-        ]
       },
       "licenses": [
         {
@@ -824,6 +810,13 @@
       "purl": "pkg:helm/gatekeeper-constraints@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/gatekeeper-constraints@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/gatekeeper/constraints"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -832,13 +825,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/gatekeeper/constraints"
-          }
-        ]
       },
       "licenses": [
         {
@@ -856,6 +842,13 @@
       "purl": "pkg:helm/gatekeeper-metrics@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/gatekeeper-metrics@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/gatekeeper/metrics"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -864,13 +857,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/gatekeeper/metrics"
-          }
-        ]
       },
       "licenses": [
         {
@@ -888,6 +874,13 @@
       "purl": "pkg:helm/gatekeeper-mutations@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/gatekeeper-mutations@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/gatekeeper/mutations"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -896,13 +889,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/gatekeeper/mutations"
-          }
-        ]
       },
       "licenses": [
         {
@@ -920,6 +906,13 @@
       "purl": "pkg:helm/gatekeeper-templates@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/gatekeeper-templates@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/gatekeeper/templates"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -928,13 +921,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/gatekeeper/templates"
-          }
-        ]
       },
       "licenses": [
         {
@@ -966,6 +952,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/gatekeeper@3.18.2",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/open-policy-agent-gatekeeper/gatekeeper"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -975,13 +968,13 @@
       "supplier": {
         "name": "Open Policy Agent contributors"
       },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/open-policy-agent-gatekeeper/gatekeeper"
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
           }
-        ]
-      },
+        }
+      ],
       "components": [
         {
           "name": "openpolicyagent/gatekeeper",
@@ -994,13 +987,6 @@
           "version": "v3.18.2",
           "type": "container",
           "bom-ref": "pkg:oci/openpolicyagent/gatekeeper-crds:v3.18.2"
-        }
-      ],
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
         }
       ]
     },
@@ -1018,6 +1004,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/gpu-operator@v24.9.2",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/nvidia/gpu-operator"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1026,13 +1019,6 @@
       ],
       "supplier": {
         "name": "NVIDIA Corporation"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/nvidia/gpu-operator"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1050,6 +1036,13 @@
       "purl": "pkg:helm/grafana-dashboards@0.3.0",
       "type": "library",
       "bom-ref": "pkg:helm/grafana-dashboards@0.3.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/grafana-dashboards"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1058,13 +1051,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/grafana-dashboards"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1082,6 +1068,13 @@
       "purl": "pkg:helm/grafana-label-enforcer@0.2.0",
       "type": "library",
       "bom-ref": "pkg:helm/grafana-label-enforcer@0.2.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/grafana-label-enforcer"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1090,13 +1083,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/grafana-label-enforcer"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1121,15 +1107,6 @@
       "purl": "pkg:helm/grafana@3.3.6",
       "type": "library",
       "bom-ref": "pkg:helm/grafana@3.3.6",
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
-        }
-      ],
-      "supplier": {
-        "name": "Grafana Labs"
-      },
       "evidence": {
         "occurrences": [
           {
@@ -1137,28 +1114,6 @@
           }
         ]
       },
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ]
-    },
-    {
-      "group": "",
-      "name": "grafana",
-      "version": "8.8.2",
-      "description": "The leading tool for querying and visualizing time series and metrics.",
-      "purl": "pkg:helm/grafana@8.8.2",
-      "externalReferences": [
-        {
-          "type": "website",
-          "url": "https://grafana.com"
-        }
-      ],
-      "type": "library",
-      "bom-ref": "pkg:helm/grafana@8.8.2",
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1167,13 +1122,37 @@
       ],
       "supplier": {
         "name": "Grafana Labs"
-      },
+      }
+    },
+    {
+      "group": "",
+      "name": "grafana",
+      "version": "8.11.4",
+      "description": "The leading tool for querying and visualizing time series and metrics.",
+      "purl": "pkg:helm/grafana@8.11.4",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://grafana.com"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/grafana@8.11.4",
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/grafana"
           }
         ]
+      },
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
+      "supplier": {
+        "name": "Grafana Labs"
       },
       "licenses": [
         {
@@ -1197,6 +1176,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/grafana@8.9.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/grafana/grafana"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1205,13 +1191,6 @@
       ],
       "supplier": {
         "name": "Grafana Labs"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/grafana/grafana"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1242,6 +1221,13 @@
       "purl": "pkg:helm/harbor-backup@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/harbor-backup@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/harbor/harbor-backup"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1250,13 +1236,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/harbor/harbor-backup"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1282,6 +1261,13 @@
       "purl": "pkg:helm/harbor-certs@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/harbor-certs@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/harbor/harbor-certs"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1290,13 +1276,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/harbor/harbor-certs"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1323,6 +1302,13 @@
       "tags": [
         "cloud"
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/goharbor/harbor"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1331,13 +1317,6 @@
       ],
       "supplier": {
         "name": "Harbor Authors"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/goharbor/harbor"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1411,6 +1390,13 @@
       "purl": "pkg:helm/hnc-config@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/hnc-config@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/hnc/config-and-crds"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1419,13 +1405,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/hnc/config-and-crds"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1443,6 +1422,13 @@
       "purl": "pkg:helm/hnc@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/hnc@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/hnc/controller"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1451,13 +1437,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/hnc/controller"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1483,6 +1462,13 @@
       "purl": "pkg:helm/ingress-nginx-probe-ingress@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/ingress-nginx-probe-ingress@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/ingress-nginx-probe-ingress"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1491,13 +1477,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/ingress-nginx-probe-ingress"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1521,6 +1500,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/ingress-nginx@4.12.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/kubernetes-ingress-nginx/ingress-nginx"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1529,13 +1515,6 @@
       ],
       "supplier": {
         "name": "Kubernetes"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/kubernetes-ingress-nginx/ingress-nginx"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1572,6 +1551,13 @@
       "purl": "pkg:helm/init-harbor@0.2.0",
       "type": "library",
       "bom-ref": "pkg:helm/init-harbor@0.2.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/harbor/init-harbor"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1580,13 +1566,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/harbor/init-harbor"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1618,6 +1597,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/k8s-metacollector@0.1.10",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/falcosecurity/falco/charts/k8s-metacollector"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1626,13 +1612,6 @@
       ],
       "supplier": {
         "name": "The Falco Authors"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/falcosecurity/falco/charts/k8s-metacollector"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1645,9 +1624,9 @@
     {
       "group": "",
       "name": "kube-prometheus-stack",
-      "version": "67.11.0",
+      "version": "70.6.0",
       "description": "kube-prometheus-stack collects Kubernetes manifests, Grafana dashboards, and Prometheus rules combined with documentation and scripts to provide easy to operate end-to-end Kubernetes cluster monitoring with Prometheus using the Prometheus Operator.",
-      "purl": "pkg:helm/kube-prometheus-stack@67.11.0",
+      "purl": "pkg:helm/kube-prometheus-stack@70.6.0",
       "externalReferences": [
         {
           "type": "vcs",
@@ -1655,7 +1634,14 @@
         }
       ],
       "type": "library",
-      "bom-ref": "pkg:helm/kube-prometheus-stack@67.11.0",
+      "bom-ref": "pkg:helm/kube-prometheus-stack@70.6.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1664,13 +1650,6 @@
       ],
       "supplier": {
         "name": "Prometheus Authors"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1682,39 +1661,39 @@
       "components": [
         {
           "name": "quay.io/prometheus-operator/prometheus-operator",
-          "version": "v0.79.2",
+          "version": "v0.81.0",
           "type": "container",
-          "bom-ref": "pkg:oci/quay.io/prometheus-operator/prometheus-operator:v0.79.2"
+          "bom-ref": "pkg:oci/quay.io/prometheus-operator/prometheus-operator:v0.81.0"
         },
         {
           "name": "registry.k8s.io/kube-state-metrics/kube-state-metrics",
-          "version": "v2.14.0",
+          "version": "v2.15.0",
           "type": "container",
-          "bom-ref": "pkg:oci/registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.14.0"
+          "bom-ref": "pkg:oci/registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.15.0"
         },
         {
           "name": "registry.k8s.io/ingress-nginx/kube-webhook-certgen",
-          "version": "v20221220-controller-v1.5.1-58-g787ea74b6",
+          "version": "v1.5.2",
           "type": "container",
-          "bom-ref": "pkg:oci/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6"
+          "bom-ref": "pkg:oci/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2"
         },
         {
           "name": "quay.io/prometheus/node-exporter",
-          "version": "v1.8.2",
+          "version": "v1.9.1",
           "type": "container",
-          "bom-ref": "pkg:oci/quay.io/prometheus/node-exporter:v1.8.2"
+          "bom-ref": "pkg:oci/quay.io/prometheus/node-exporter:v1.9.1"
         },
         {
           "name": "quay.io/prometheus/alertmanager",
-          "version": "v0.27.0",
+          "version": "v0.28.1",
           "type": "container",
-          "bom-ref": "pkg:oci/quay.io/prometheus/alertmanager:v0.27.0"
+          "bom-ref": "pkg:oci/quay.io/prometheus/alertmanager:v0.28.1"
         },
         {
           "name": "quay.io/prometheus/prometheus",
-          "version": "v3.1.0",
+          "version": "v3.2.1",
           "type": "container",
-          "bom-ref": "pkg:oci/quay.io/prometheus/prometheus:v3.1.0"
+          "bom-ref": "pkg:oci/quay.io/prometheus/prometheus:v3.2.1"
         }
       ]
     },
@@ -1726,6 +1705,13 @@
       "purl": "pkg:helm/kube-state-metrics-extra-resource-metrics@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/kube-state-metrics-extra-resource-metrics@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/kube-state-metrics-extra-resource-metrics"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1734,13 +1720,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/kube-state-metrics-extra-resource-metrics"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1752,18 +1731,18 @@
       "components": [
         {
           "name": "registry.k8s.io/ingress-nginx/kube-webhook-certgen",
-          "version": "v20221220-controller-v1.5.1-58-g787ea74b6",
+          "version": "v1.5.2",
           "type": "container",
-          "bom-ref": "pkg:oci/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20221220-controller-v1.5.1-58-g787ea74b6"
+          "bom-ref": "pkg:oci/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2"
         }
       ]
     },
     {
       "group": "",
       "name": "kube-state-metrics",
-      "version": "5.28.0",
+      "version": "5.31.2",
       "description": "Install kube-state-metrics to generate and expose cluster-level metrics",
-      "purl": "pkg:helm/kube-state-metrics@5.28.0",
+      "purl": "pkg:helm/kube-state-metrics@5.31.2",
       "externalReferences": [
         {
           "type": "vcs",
@@ -1771,7 +1750,14 @@
         }
       ],
       "type": "library",
-      "bom-ref": "pkg:helm/kube-state-metrics@5.28.0",
+      "bom-ref": "pkg:helm/kube-state-metrics@5.31.2",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/kube-state-metrics"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1780,13 +1766,6 @@
       ],
       "supplier": {
         "name": "Prometheus Authors"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/kube-state-metrics"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1804,6 +1783,13 @@
       "purl": "pkg:helm/kubeapi-metrics@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/kubeapi-metrics@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/kubeapi-metrics"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1812,13 +1798,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/kubeapi-metrics"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1836,6 +1815,13 @@
       "purl": "pkg:helm/kured-secret@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/kured-secret@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/kured-secret"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1844,13 +1830,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/kured-secret"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1874,6 +1853,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/kured@5.6.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/kubereboot/kured"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1882,13 +1868,6 @@
       ],
       "supplier": {
         "name": "The Kured authors"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/kubereboot/kured"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1912,6 +1891,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/kyverno@3.3.6",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/kyverno/kyverno"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1920,13 +1906,6 @@
       ],
       "supplier": {
         "name": "The Kyverno Authors"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/kyverno/kyverno"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1944,6 +1923,13 @@
       "purl": "pkg:helm/letsencrypt@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/letsencrypt@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/issuers"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1952,13 +1938,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/issuers"
-          }
-        ]
       },
       "licenses": [
         {
@@ -1976,6 +1955,13 @@
       "purl": "pkg:helm/log-manager@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/log-manager@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/log-manager"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -1984,13 +1970,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/log-manager"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2025,6 +2004,13 @@
       "tags": [
         "resource"
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/kubernetes-metrics-server/metrics-server"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2033,13 +2019,6 @@
       ],
       "supplier": {
         "name": "Kubernetes SIG"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/kubernetes-metrics-server/metrics-server"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2075,6 +2054,13 @@
         "cloud",
         "log"
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/bitnami/thanos/charts/minio"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2083,13 +2069,6 @@
       ],
       "supplier": {
         "name": "Broadcom Inc."
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/bitnami/thanos/charts/minio"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2113,6 +2092,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/minio@5.0.14",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/minio/minio"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2121,13 +2107,6 @@
       ],
       "supplier": {
         "name": "MinIO, Inc."
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/minio/minio"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2145,6 +2124,13 @@
       "purl": "pkg:helm/namespaces@0.1.1",
       "type": "library",
       "bom-ref": "pkg:helm/namespaces@0.1.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/namespaces"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2153,13 +2139,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/namespaces"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2177,6 +2156,13 @@
       "purl": "pkg:helm/networkpolicy-generator@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/networkpolicy-generator@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/networkpolicy/generator"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2185,13 +2171,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/networkpolicy/generator"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2212,6 +2191,13 @@
       "tags": [
         "service"
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/networkpolicy/service-cluster"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2220,13 +2206,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/networkpolicy/service-cluster"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2244,6 +2223,13 @@
       "purl": "pkg:helm/networkpolicy-workload@0.2.0",
       "type": "library",
       "bom-ref": "pkg:helm/networkpolicy-workload@0.2.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/networkpolicy/workload-cluster"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2252,13 +2238,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/networkpolicy/workload-cluster"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2282,6 +2261,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/node-feature-discovery@0.16.6",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/nvidia/gpu-operator/charts/node-feature-discovery"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2290,13 +2276,6 @@
       ],
       "supplier": {
         "name": "Kubernetes SIG"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/nvidia/gpu-operator/charts/node-feature-discovery"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2313,6 +2292,13 @@
       "purl": "pkg:helm/node-local-dns@0.1.1",
       "type": "library",
       "bom-ref": "pkg:helm/node-local-dns@0.1.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/node-local-dns"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2321,13 +2307,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/node-local-dns"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2353,6 +2332,13 @@
       "purl": "pkg:helm/opensearch-configurer@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/opensearch-configurer@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/opensearch/configurer"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2361,13 +2347,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/opensearch/configurer"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2393,6 +2372,13 @@
       "purl": "pkg:helm/opensearch-curator@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/opensearch-curator@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/opensearch/curator"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2401,13 +2387,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/opensearch/curator"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2433,6 +2412,13 @@
       "purl": "pkg:helm/opensearch-dashboards@2.26.0",
       "type": "library",
       "bom-ref": "pkg:helm/opensearch-dashboards@2.26.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/opensearch-project/opensearch-dashboards"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2442,26 +2428,12 @@
       "supplier": {
         "name": "The Linux Foundation"
       },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/opensearch-project/opensearch-dashboards"
-          }
-        ]
-      },
       "components": [
         {
           "name": "opensearchproject/opensearch-dashboards",
           "version": "2.18.0",
           "type": "container",
           "bom-ref": "pkg:oci/opensearchproject/opensearch-dashboards:2.18.0"
-        }
-      ],
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
         }
       ]
     },
@@ -2473,6 +2445,13 @@
       "purl": "pkg:helm/opensearch-secrets@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/opensearch-secrets@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/opensearch/secrets"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2481,13 +2460,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/opensearch/secrets"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2505,6 +2477,13 @@
       "purl": "pkg:helm/opensearch-securityadmin@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/opensearch-securityadmin@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/opensearch/securityadmin"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2513,13 +2492,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/opensearch/securityadmin"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2545,6 +2517,13 @@
       "purl": "pkg:helm/opensearch-slm@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/opensearch-slm@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/opensearch/slm"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2553,13 +2532,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/opensearch/slm"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2591,6 +2563,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/opensearch@2.30.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/opensearch-project/opensearch"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2599,13 +2578,6 @@
       ],
       "supplier": {
         "name": "The Linux Foundation"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/opensearch-project/opensearch"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2637,6 +2609,13 @@
       "purl": "pkg:helm/openstack-monitoring@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/openstack-monitoring@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/openstack-monitoring"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2645,13 +2624,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/openstack-monitoring"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2669,6 +2641,13 @@
       "purl": "pkg:helm/podsecuritypolicies@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/podsecuritypolicies@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/gatekeeper/podsecuritypolicies"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2677,13 +2656,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/gatekeeper/podsecuritypolicies"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2701,6 +2673,13 @@
       "purl": "pkg:helm/prometheus-alerts@0.1.1",
       "type": "library",
       "bom-ref": "pkg:helm/prometheus-alerts@0.1.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/prometheus-alerts"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2709,13 +2688,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/prometheus-alerts"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2739,6 +2711,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/prometheus-blackbox-exporter@8.13.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/prometheus-community/prometheus-blackbox-exporter"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2747,13 +2726,6 @@
       ],
       "supplier": {
         "name": "Prometheus Authors"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/prometheus-community/prometheus-blackbox-exporter"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2785,15 +2757,6 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/prometheus-elasticsearch-exporter@6.1.0",
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
-        }
-      ],
-      "supplier": {
-        "name": "Prometheus Authors"
-      },
       "evidence": {
         "occurrences": [
           {
@@ -2801,36 +2764,6 @@
           }
         ]
       },
-      "components": [
-        {
-          "name": "quay.io/prometheuscommunity/elasticsearch-exporter",
-          "version": "v1.7.0",
-          "type": "container",
-          "bom-ref": "pkg:oci/quay.io/prometheuscommunity/elasticsearch-exporter:v1.7.0"
-        }
-      ],
-      "licenses": [
-        {
-          "license": {
-            "name": "Apache License 2.0"
-          }
-        }
-      ]
-    },
-    {
-      "group": "",
-      "name": "prometheus-node-exporter",
-      "version": "4.43.1",
-      "description": "A Helm chart for prometheus node-exporter",
-      "purl": "pkg:helm/prometheus-node-exporter@4.43.1",
-      "externalReferences": [
-        {
-          "type": "vcs",
-          "url": "https://github.com/prometheus/node_exporter/"
-        }
-      ],
-      "type": "library",
-      "bom-ref": "pkg:helm/prometheus-node-exporter@4.43.1",
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2840,12 +2773,51 @@
       "supplier": {
         "name": "Prometheus Authors"
       },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ],
+      "components": [
+        {
+          "name": "quay.io/prometheuscommunity/elasticsearch-exporter",
+          "version": "v1.7.0",
+          "type": "container",
+          "bom-ref": "pkg:oci/quay.io/prometheuscommunity/elasticsearch-exporter:v1.7.0"
+        }
+      ]
+    },
+    {
+      "group": "",
+      "name": "prometheus-node-exporter",
+      "version": "4.45.2",
+      "description": "A Helm chart for prometheus node-exporter",
+      "purl": "pkg:helm/prometheus-node-exporter@4.45.2",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/prometheus/node_exporter/"
+        }
+      ],
+      "type": "library",
+      "bom-ref": "pkg:helm/prometheus-node-exporter@4.45.2",
       "evidence": {
         "occurrences": [
           {
             "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/prometheus-node-exporter"
           }
         ]
+      },
+      "properties": [
+        {
+          "name": "Elastisys evaluation",
+          "value": "set-me"
+        }
+      ],
+      "supplier": {
+        "name": "Prometheus Authors"
       },
       "licenses": [
         {
@@ -2863,6 +2835,13 @@
       "purl": "pkg:helm/prometheus-servicemonitor@0.1.1",
       "type": "library",
       "bom-ref": "pkg:helm/prometheus-servicemonitor@0.1.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/prometheus-servicemonitor"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2871,13 +2850,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/prometheus-servicemonitor"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2890,9 +2862,9 @@
     {
       "group": "",
       "name": "prometheus-windows-exporter",
-      "version": "0.7.1",
+      "version": "0.9.2",
       "description": "A Helm chart for prometheus windows-exporter",
-      "purl": "pkg:helm/prometheus-windows-exporter@0.7.1",
+      "purl": "pkg:helm/prometheus-windows-exporter@0.9.2",
       "externalReferences": [
         {
           "type": "vcs",
@@ -2900,7 +2872,14 @@
         }
       ],
       "type": "library",
-      "bom-ref": "pkg:helm/prometheus-windows-exporter@0.7.1",
+      "bom-ref": "pkg:helm/prometheus-windows-exporter@0.9.2",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/prometheus-windows-exporter"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2910,17 +2889,10 @@
       "supplier": {
         "name": "Prometheus Authors"
       },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/prometheus-windows-exporter"
-          }
-        ]
-      },
       "licenses": [
         {
           "license": {
-            "id": "Apache-2.0"
+            "name": "MIT License"
           }
         }
       ]
@@ -2933,6 +2905,13 @@
       "purl": "pkg:helm/rclone@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/rclone@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/rclone"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2941,13 +2920,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/rclone"
-          }
-        ]
       },
       "licenses": [
         {
@@ -2965,6 +2937,13 @@
       "purl": "pkg:helm/s3-exporter@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/s3-exporter@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/s3-exporter"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -2973,13 +2952,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/s3-exporter"
-          }
-        ]
       },
       "licenses": [
         {
@@ -3011,6 +2983,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/tekton-pipelines@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/tekton-pipelines"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -3019,13 +2998,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/tekton-pipelines"
-          }
-        ]
       },
       "licenses": [
         {
@@ -3043,6 +3015,13 @@
       "purl": "pkg:helm/thanos-ingress-secret@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/thanos-ingress-secret@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/thanos/ingress-secret"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -3051,13 +3030,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/thanos/ingress-secret"
-          }
-        ]
       },
       "licenses": [
         {
@@ -3075,6 +3047,13 @@
       "purl": "pkg:helm/thanos-ruler@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/thanos-ruler@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/thanos/ruler"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -3083,13 +3062,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/thanos/ruler"
-          }
-        ]
       },
       "licenses": [
         {
@@ -3113,6 +3085,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/thanos@15.13.1",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/bitnami/thanos"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -3121,13 +3100,6 @@
       ],
       "supplier": {
         "name": "Broadcom Inc."
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/bitnami/thanos"
-          }
-        ]
       },
       "licenses": [
         {
@@ -3165,6 +3137,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/tigera-operator@v3.26.4",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/projectcalico/tigera-operator"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -3173,13 +3152,6 @@
       ],
       "supplier": {
         "name": "Tigera, Inc."
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/projectcalico/tigera-operator"
-          }
-        ]
       },
       "licenses": [
         {
@@ -3200,6 +3172,13 @@
       "tags": [
         "security"
       ],
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/aquasecurity/trivy-operator"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -3208,13 +3187,6 @@
       ],
       "supplier": {
         "name": "Aqua Security Software Ltd"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/aquasecurity/trivy-operator"
-          }
-        ]
       },
       "licenses": [
         {
@@ -3240,6 +3212,13 @@
       "purl": "pkg:helm/user-alertmanager@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/user-alertmanager@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/user-alertmanager"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -3248,13 +3227,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/user-alertmanager"
-          }
-        ]
       },
       "licenses": [
         {
@@ -3280,6 +3252,13 @@
       "purl": "pkg:helm/user-crds@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/user-crds@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/user-crds"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -3288,13 +3267,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/user-crds"
-          }
-        ]
       },
       "licenses": [
         {
@@ -3312,6 +3284,13 @@
       "purl": "pkg:helm/user-rbac@0.1.0",
       "type": "library",
       "bom-ref": "pkg:helm/user-rbac@0.1.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/charts/user-rbac"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -3320,13 +3299,6 @@
       ],
       "supplier": {
         "name": "Elastisys"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/user-rbac"
-          }
-        ]
       },
       "licenses": [
         {
@@ -3350,6 +3322,13 @@
       ],
       "type": "library",
       "bom-ref": "pkg:helm/velero@6.0.0",
+      "evidence": {
+        "occurrences": [
+          {
+            "location": "helmfile.d/upstream/vmware-tanzu/velero"
+          }
+        ]
+      },
       "properties": [
         {
           "name": "Elastisys evaluation",
@@ -3358,13 +3337,6 @@
       ],
       "supplier": {
         "name": "Velero Authors"
-      },
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/upstream/vmware-tanzu/velero"
-          }
-        ]
       },
       "licenses": [
         {
@@ -3392,7 +3364,7 @@
   "dependencies": [],
   "compositions": [
     {
-      "bom-ref": "pkg:application/welkin-apps@fa08ec692437dc5755d70fcf58948ae74537c8fb",
+      "bom-ref": "pkg:application/welkin-apps@58fa5552aa8eb67e843355ad8e43d26dd5503be4",
       "aggregate": "incomplete"
     }
   ],
@@ -3400,7 +3372,7 @@
     {
       "bom-ref": "metadata-annotations",
       "subjects": [
-        "pkg:application/welkin-apps@83694765587a2b3a79fd2dbae39080e80a60ee83"
+        "pkg:application/welkin-apps@58fa5552aa8eb67e843355ad8e43d26dd5503be4"
       ],
       "annotator": {
         "component": {
@@ -3418,8 +3390,8 @@
           ]
         }
       },
-      "timestamp": "2025-05-30T07:44:15Z",
-      "text": "This Software Bill-of-Materials (SBOM) document was created on Friday, May 30, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'welkin-apps' with version '83694765587a2b3a79fd2dbae39080e80a60ee83'. There are 1 components."
+      "timestamp": "2025-05-30T10:30:55Z",
+      "text": "This Software Bill-of-Materials (SBOM) document was created on Friday, May 30, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'welkin-apps' with version '58fa5552aa8eb67e843355ad8e43d26dd5503be4'. There are 85 components."
     }
   ]
 }
