@@ -39,7 +39,7 @@ usage() {
   echo "  diff                                            checks if any changes in git requires sbom to be updated" >&2
   echo "  edit <location> <key>                           edit object under key for a component using $EDITOR" >&2
   echo "  generate                                        generate new cyclonedx sbom. Requires GITHUB_TOKEN to be set to avoid GitHub rate limits" >&2
-  echo "  get <component-name> [component-version] [key]  get component from sbom, optionally query for a provided key" >&2
+  echo "  get <location> [key]                            get component from sbom, optionally query for a provided key" >&2
   echo "  get-charts                                      get all charts in sbom" >&2
   echo "  get-containers                                  get all container images in sbom" >&2
   echo "  get-unset                                       get names of components with set-me's or missing licenses" >&2
@@ -274,9 +274,7 @@ _prepare_sbom() {
 
   # adding "Elastisys evaluation" & "supplier" objects that currently needs to be configured manually
   for component in "${components[@]}"; do
-    component_name=$(echo "${component}" | jq -r '.name')
-    component_version=$(echo "${component}" | jq -r '.version')
-    location=$(echo "${component}" | jq -r '.location')
+    location=$(jq -r '.location' <<<"${component}")
 
     # check if component already has an elastisys evaluation
     elastisys_evaluation=$(yq -o json -r ".components[] | select(.evidence.occurrences[0].location == \"${location}\").properties[] | select(.name == \"Elastisys evaluation\").value" "${SBOM_FILE}")
@@ -548,21 +546,17 @@ sbom_add() {
 }
 
 sbom_get() {
-  if [[ "$#" -lt 1 ]]; then
+  local key location query sbom_file
+  if [[ "$#" -lt 2 ]] || [[ "$#" -gt 3 ]]; then
     usage
   fi
 
-  local component_name component_version key query
-
-  component_name="${1}"
-  query=".components[] | select(.name == \"${component_name}\" )"
-  if [[ "$#" -gt 1 ]]; then
-    component_version="${2}"
-    query=".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\")"
-  fi
+  sbom_file="${1}"
+  location="${2}"
+  query=".components[] | select(.evidence.occurrences[0].location == \"${location}\")"
   if [[ "$#" -gt 2 ]]; then
     key="${3}"
-    query=".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\") | .${key}"
+    query=".components[] | select(.evidence.occurrences[0].location == \"${location}\") | .${key}"
   fi
 
   yq -e -o json "${query}" "${sbom_file}"
@@ -598,7 +592,7 @@ sbom_get_unset() {
 sbom_get_charts() {
   local query sbom_file
   sbom_file="${1}"
-  query='[.components[] | { "name": .name, "version": .version, "location": .evidence.occurrences[0].location}] | .[]'
+  query='[.components[] | { "name": .name, "version": .version, "location": .evidence.occurrences[0].location }] | .[]'
 
   yq -e -o json -I=0 "${query}" "${sbom_file}"
 }
@@ -806,7 +800,7 @@ generate)
   ;;
 get)
   shift
-  sbom_get "${@}"
+  sbom_get "${SBOM_FILE}" "${@}"
   ;;
 get-charts)
   shift
