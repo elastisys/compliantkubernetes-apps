@@ -82,7 +82,7 @@ teardown() {
   assert_output --partial "invalid upgrade path"
 }
 
-@test "no ck8s apply without ck8s upgrade" {
+@test "prevent apply without upgrade apply after upgrade prepare" {
   # test 3
 
   gitversion.mock_static "v0.42.0"
@@ -101,22 +101,8 @@ teardown() {
   assert_output --partial "Upgrade ongoing"
 }
 
-@test "prevent apply using older apps version" {
+@test "prevent a ck8s apply after ck8s upgrade prepare but prepare is not merged" {
   # test 4
-  #
-  # pretend we already upgraded
-  run yq -i '.global.ck8sVersion="v0.42.0"' "${CK8S_CONFIG_PATH}/defaults/common-config.yaml"
-  run ck8s ops kubectl sc patch -n kube-system configmap apps-meta --type=merge --patch '{"data":{"version":"v0.42"}}'
-
-  # accidentally downgrade apps
-  gitversion.mock_static "v0.41.0"
-  run ck8s apply sc
-  assert_failure
-  assert_output --partial "Version mismatch. Run upgrade to update config."
-}
-
-@test "prevent apply using unmerged config" {
-  # test 5
 
   gitversion.mock_static "v0.42.0"
   run ck8s version config
@@ -133,4 +119,14 @@ teardown() {
   assert_failure
   assert_output --partial "Config timestamp mismatch"
 
+}
+
+@test "prevent a ck8s apply on an old config after ck8s upgrade apply" {
+  run ck8s ops kubectl sc patch -n kube-system configmap apps-meta --type=merge --patch '{"data":{"version":"v0.42"}}'
+
+  # accidentally downgrade apps
+  gitversion.mock_static "v0.41.0"
+  run ck8s apply sc
+  assert_failure
+  assert_output --partial "Version mismatch. Run upgrade to update config."
 }
