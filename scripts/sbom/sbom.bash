@@ -321,7 +321,11 @@ _add_license_for_component() {
           # TODO: currently only supports GitHub source, this is not necessarily guaranteed
           continue
         fi
+
+        # parsing the github repo to be able to use it through the github api endpoint
         repo=${source##*github.com/}
+        repo=$(awk -F'/' '{print $1 "/" $2}' <<<"${repo}")
+        repo=${repo%.git}
 
         # API rate limits :grimacing:
         mapfile -t licenses_in_git < <(curl -L -s \
