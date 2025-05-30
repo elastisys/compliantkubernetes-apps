@@ -345,6 +345,14 @@ validate_version() {
     log_error "Welkin Apps version: ${version}"
     exit 1
   fi
+  cluster_version=$(get_apps_version "${1}" || true)
+  if [[ -n "${cluster_version}" ]] && [[ "${cluster_version}" != "${version%.*}" ]]; then
+    # TODO double check whether patch version is included here
+    log_error "ERROR: Version mismatch. Run upgrade to upgrade cluster."
+    log_error "Cluster is running Welkin Apps version: ${cluster_version}"
+    log_error "Welkin Apps version checked out: ${version}" # TODO wording?
+    exit 1
+  fi
 }
 
 # Make sure that all required configuration options are set in the config.
