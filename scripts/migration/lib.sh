@@ -487,8 +487,8 @@ ensure_upgrade_prepared() {
 }
 
 # Usage: record_upgrade_apply_step sc|wc step-description
+# Records the last migration snippet that ran successfully, to allow where a failed migration stopped
 record_upgrade_apply_step() {
-  # Was this needed?
   local apps_upgrade
   apps_upgrade="$(kubectl_do "${1}" get --namespace kube-system cm apps-upgrade --output=yaml)"
   if ! yq --exit-status 'select(.data.version == strenv(CK8S_TARGET_VERSION))' <<<"${apps_upgrade}" >/dev/null; then
