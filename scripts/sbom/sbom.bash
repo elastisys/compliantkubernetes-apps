@@ -533,7 +533,7 @@ sbom_remove() {
 }
 
 sbom_add() {
-  if [[ "$#" -ne 3 ]]; then
+  if [[ "$#" -lt 3 ]]; then
     usage
   fi
 
@@ -746,6 +746,7 @@ sbom_diff() {
   mapfile -t diff_files < <(git diff --staged --name-only | grep "helmfile.d/")
   mapfile -t all_charts < <(sbom_get_charts "${SBOM_FILE}")
 
+  should_fail=false
   for chart in "${all_charts[@]}"; do
     found_diff=false
     sbom_component_name=$(yq '.name' <<<"${chart}")
@@ -758,23 +759,24 @@ sbom_diff() {
         chart_version="$(yq '.version' "${ROOT}/${location}/Chart.yaml")"
         if [[ "${chart_version}" != "${sbom_component_version}" ]]; then
           found_diff=true
-          log_warning "Chart version does not match SBOM: ${chart_version} != ${sbom_component_version}"
+          log_warning "Chart version \"${chart_version}\" does not match SBOM \"${sbom_component_version}\""
           break
         elif [[ "${chart_name}" != "${sbom_component_name}" ]]; then
           found_diff=true
-          log_warning "Chart name does not match SBOM: ${chart_name} != ${sbom_component_name}"
+          log_warning "Chart name \"${chart_name}\" does not match SBOM \"${sbom_component_name}\""
           break
         fi
       fi
     done
 
     if [[ "${found_diff}" == true ]]; then
+      should_fail=true
       log_warning "Run the following to update the SBOM:"
       log_warning "./scripts/sbom/sbom.bash update ${location}"
     fi
   done
 
-  if [[ "${found_diff}" == false ]]; then
+  if [[ "${should_fail}" == false ]]; then
     log_info "No chart changes found"
   else
     exit 1
