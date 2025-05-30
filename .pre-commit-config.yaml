@@ -104,6 +104,13 @@ repos:
         require_serial: true
         entry: scripts/sbom/sbom.bash validate
 
+      - id: sbom-get-unset
+        name: SBOM get unset
+        types: [shell]
+        language: script
+        require_serial: true
+        entry: scripts/sbom/sbom.bash get-unset
+
   - repo: https://github.com/codespell-project/codespell
     rev: v2.3.0
     hooks:
