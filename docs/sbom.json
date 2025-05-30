@@ -2,7 +2,7 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "serialNumber": "urn:uuid:43e124c6-2893-4b86-842e-1eac2778c126",
-  "version": 8,
+  "version": 9,
   "metadata": {
     "timestamp": "2025-05-30T07:44:15Z",
     "tools": {
@@ -2455,6 +2455,13 @@
           "version": "2.18.0",
           "type": "container",
           "bom-ref": "pkg:oci/opensearchproject/opensearch-dashboards:2.18.0"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
         }
       ]
     },
