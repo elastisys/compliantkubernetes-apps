@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:be1fd67a-05c0-4b1b-9a02-fcbc7e6f453d",
-  "version": 5,
+  "serialNumber": "urn:uuid:43e124c6-2893-4b86-842e-1eac2778c126",
+  "version": 8,
   "metadata": {
-    "timestamp": "2025-05-22T13:23:40Z",
+    "timestamp": "2025-05-30T07:44:15Z",
     "tools": {
       "components": [
         {
@@ -36,10 +36,10 @@
     "component": {
       "group": "",
       "name": "welkin-apps",
-      "version": "fa08ec692437dc5755d70fcf58948ae74537c8fb",
+      "version": "83694765587a2b3a79fd2dbae39080e80a60ee83",
       "type": "application",
-      "bom-ref": "pkg:application/welkin-apps@fa08ec692437dc5755d70fcf58948ae74537c8fb",
-      "purl": "pkg:application/welkin-apps@fa08ec692437dc5755d70fcf58948ae74537c8fb"
+      "bom-ref": "pkg:application/welkin-apps@83694765587a2b3a79fd2dbae39080e80a60ee83",
+      "purl": "pkg:application/welkin-apps@83694765587a2b3a79fd2dbae39080e80a60ee83"
     },
     "properties": [
       {
@@ -70,7 +70,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -102,7 +102,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -142,7 +142,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -174,7 +174,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -270,7 +270,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -385,7 +385,14 @@
             "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/crds"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -409,7 +416,14 @@
             "location": "helmfile.d/upstream/kyverno/kyverno/charts/crds"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -475,7 +489,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -507,7 +521,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -553,7 +567,14 @@
             "location": "helmfile.d/upstream/kubernetes-external-dns/external-dns"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -678,7 +699,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -810,7 +831,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -842,7 +863,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -874,7 +895,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -906,7 +927,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -974,6 +995,13 @@
           "type": "container",
           "bom-ref": "pkg:oci/openpolicyagent/gatekeeper-crds:v3.18.2"
         }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
       ]
     },
     {
@@ -1029,7 +1057,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -1061,7 +1089,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -1108,7 +1136,14 @@
             "location": "helmfile.d/upstream/kyverno/kyverno/charts/grafana"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -1214,7 +1249,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -1254,7 +1289,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -1383,7 +1418,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -1415,7 +1450,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -1455,7 +1490,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -1544,7 +1579,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -1698,7 +1733,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -1776,7 +1811,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -1808,7 +1843,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -1916,7 +1951,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -1948,7 +1983,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -2117,7 +2152,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -2149,7 +2184,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -2184,7 +2219,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -2216,7 +2251,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -2285,7 +2320,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -2325,7 +2360,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -2365,7 +2400,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -2438,7 +2473,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -2470,7 +2505,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -2510,7 +2545,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -2602,7 +2637,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -2634,7 +2669,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -2666,7 +2701,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -2766,6 +2801,13 @@
           "type": "container",
           "bom-ref": "pkg:oci/quay.io/prometheuscommunity/elasticsearch-exporter:v1.7.0"
         }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
       ]
     },
     {
@@ -2821,7 +2863,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -2867,7 +2909,14 @@
             "location": "helmfile.d/upstream/prometheus-community/kube-prometheus-stack/charts/prometheus-windows-exporter"
           }
         ]
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -2884,7 +2933,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -2916,7 +2965,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -2962,7 +3011,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -2994,7 +3043,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -3026,7 +3075,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -3191,7 +3240,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -3231,7 +3280,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -3263,7 +3312,7 @@
         }
       ],
       "supplier": {
-        "name": "set-me"
+        "name": "Elastisys"
       },
       "evidence": {
         "occurrences": [
@@ -3344,7 +3393,7 @@
     {
       "bom-ref": "metadata-annotations",
       "subjects": [
-        "pkg:application/welkin-apps@fa08ec692437dc5755d70fcf58948ae74537c8fb"
+        "pkg:application/welkin-apps@83694765587a2b3a79fd2dbae39080e80a60ee83"
       ],
       "annotator": {
         "component": {
@@ -3362,8 +3411,8 @@
           ]
         }
       },
-      "timestamp": "2025-05-22T13:23:40Z",
-      "text": "This Software Bill-of-Materials (SBOM) document was created on Thursday, May 22, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'welkin-apps' with version 'fa08ec692437dc5755d70fcf58948ae74537c8fb'. There are 85 components."
+      "timestamp": "2025-05-30T07:44:15Z",
+      "text": "This Software Bill-of-Materials (SBOM) document was created on Friday, May 30, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'welkin-apps' with version '83694765587a2b3a79fd2dbae39080e80a60ee83'. There are 1 components."
     }
   ]
 }
