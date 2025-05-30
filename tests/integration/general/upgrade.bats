@@ -128,5 +128,5 @@ teardown() {
   gitversion.mock_static "v0.41.0"
   run ck8s apply sc
   assert_failure
-  assert_output --partial "Version mismatch. Run upgrade to update config."
+  assert_output --partial "Version mismatch. Run upgrade to update cluster."
 }
