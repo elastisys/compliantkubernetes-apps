@@ -134,16 +134,19 @@ _sbom_add_component() {
   key="${3}"
   value="${4}"
 
-  if [[ ! "${key}" =~ ^(licenses|properties|supplier)$ ]]; then
-    log_fatal "unsupported key \"${key}\", currently only supports \"licenses|properties|supplier\""
+  if [[ ! "${key}" =~ ^(components|licenses|properties|supplier)$ ]]; then
+    log_fatal "unsupported key \"${key}\", currently only supports \"components|licenses|evidence|properties|supplier\""
   fi
 
   # change the query depending on if the key is a known array type in cyclonedx 1.6 spec
   value_type="[]"
-  if [[ "${key}" == licenses ]]; then
+  if [[ "${key}" == components ]]; then
+    append_query="|= (. + $(_format_container_component_object "${value}") | unique_by([.name, .version]))"
+  elif [[ "${key}" == licenses ]]; then
     append_query="|= (. + $(_format_license_object "${value}") | unique_by([.name, .version]))"
   elif [[ "${key}" == properties ]]; then
-    append_query="|= (. + $(_format_property_object "${value}") | unique_by([.name, .version]))"
+    property_value="${5}"
+    append_query="|= (. + $(_format_property_object "${value}" "${property_value}") | unique_by([.name, .version]))"
   elif [[ "${key}" == supplier ]]; then
     value_type="{}"
     append_query="= $(_format_supplier_object "${value}")"
@@ -217,7 +220,7 @@ _format_container_component_object() {
 }
 
 _prepare_sbom() {
-  local location project_version sbom_file
+  local full_path_location location project_version sbom_file
   if [[ "$#" -lt 1 ]] || [[ "$#" -gt 3 ]]; then
     log_fatal "usage: _prepare_sbom <sbom-file> [--version version] [--location location]"
   fi
@@ -231,7 +234,7 @@ _prepare_sbom() {
 
   shift
   project_version=""
-  location=""
+  full_path_location=""
   while [ "${#}" -gt 0 ]; do
     case "${1}" in
     --version)
@@ -239,7 +242,7 @@ _prepare_sbom() {
       shift
       ;;
     --location)
-      location="${2}"
+      full_path_location="${2}"
       shift
       ;;
     *)
@@ -256,10 +259,12 @@ _prepare_sbom() {
     fi
   fi
 
-  if [[ -n "${location}" ]]; then
-    cdxgen --project-name "welkin-apps" --project-version "${project_version}" --filter '.*' --filter '.x.x' -t helm "${location}" --output "${sbom_file}"
+  if [[ -n "${full_path_location}" ]]; then
+    cdxgen --project-name "welkin-apps" --project-version "${project_version}" --filter '.*' --filter '.x.x' -t helm "${full_path_location}" --output "${sbom_file}"
+    _add_location_for_component "${sbom_file}" "${full_path_location}/Chart.yaml"
   else
     cdxgen --project-name "welkin-apps" --project-version "${project_version}" --filter '.*' --filter '.x.x' -t helm "${HELMFILE_FOLDER}" --output "${sbom_file}"
+    _add_locations "${sbom_file}"
   fi
 
   sbom_version=$(yq -r -o json ".version" "${SBOM_FILE}")
@@ -272,35 +277,34 @@ _prepare_sbom() {
   for component in "${components[@]}"; do
     component_name=$(echo "${component}" | jq -r '.name')
     component_version=$(echo "${component}" | jq -r '.version')
+    location=$(echo "${component}" | jq -r '.location')
 
     # check if component already has an elastisys evaluation
-    elastisys_evaluation=$(yq -o json -I=0 ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\").properties[] | select(.name == \"Elastisys evaluation\")" "${SBOM_FILE}")
+    elastisys_evaluation=$(yq -o json -r ".components[] | select(.evidence.occurrences[0].location == \"${location}\").properties[] | select(.name == \"Elastisys evaluation\").value" "${SBOM_FILE}")
     if [[ -z "${elastisys_evaluation}" ]] || [[ "${elastisys_evaluation}" == null ]]; then
-      elastisys_evaluation="$(_format_elastisys_evaluation_object "set-me")"
+      elastisys_evaluation="set-me"
     fi
-    _sbom_add_component "${sbom_file}" "${component_name}" "${component_version}" "properties" "${elastisys_evaluation}"
+    _sbom_add_component "${sbom_file}" "${location}" "properties" "Elastisys evaluation" "${elastisys_evaluation}"
 
-    supplier=$(yq -o json -I=0 ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\").supplier" "${SBOM_FILE}")
-    if [[ -z "${supplier}" ]] || [[ "${supplier}" == null ]]; then
-      supplier="$(_format_supplier_object "set-me")"
-    fi
-    _sbom_add_component "${sbom_file}" "${component_name}" "${component_version}" "supplier" "${supplier}"
+    supplier=$(yq -o json -r ".components[] | select(.evidence.occurrences[0].location == \"${location}\").supplier.name" "${SBOM_FILE}")
+    _sbom_add_component "${sbom_file}" "${location}" "supplier" "${supplier}"
   done
 }
 
 # get licenses for specific input component
 _add_license_for_component() {
-  local chart chart_location chart_name chart_version sbom_file
+  local chart chart_location chart_name chart_version location sbom_file
   sbom_file="${1}"
   chart="${2}"
 
-  chart_location="${ROOT}/$(yq ".location" <<<"${chart}")/Chart.yaml"
+  location="$(yq ".location" <<<"${chart}")"
+  chart_location="${ROOT}/${location}/Chart.yaml"
   chart_name=$(yq ".name" <<<"${chart}")
   chart_version=$(yq ".version" <<<"${chart}")
 
   # if chart exists as part of Welkins own charts, adds Apache-2.0 license
   if [[ "${chart_location}" == *"helmfile.d/charts"* ]]; then
-    _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "Apache-2.0")"
+    _sbom_add_component "${sbom_file}" "${location}" "licenses" "Apache-2.0"
     return
   fi
 
@@ -309,10 +313,10 @@ _add_license_for_component() {
   annotation_artifacthub=$(yq '.annotations."artifacthub.io/license"' "${chart_location}")
 
   if [[ -n "${annotation}" && "${annotation}" != "null" ]]; then
-    _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "${annotation}")"
+    _sbom_add_component "${sbom_file}" "${location}" "licenses" "${annotation}"
 
   elif [[ -n "${annotation_artifacthub}" && "${annotation_artifacthub}" != "null" ]]; then
-    _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "${annotation_artifacthub}")"
+    _sbom_add_component "${sbom_file}" "${location}" "licenses" "${annotation_artifacthub}"
 
   # if no license in annotations, try to get from source (i.e. github)
   else
@@ -342,7 +346,7 @@ _add_license_for_component() {
           continue
         else
           for license in "${licenses_in_git[@]}"; do
-            _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "licenses" "$(_format_license_object "${license}")"
+            _sbom_add_component "${sbom_file}" "${location}" "licenses" "${license}"
           done
         fi
       done
@@ -442,7 +446,7 @@ _add_container_images_from_template() {
     if [[ "${container}" == "null" ]]; then
       container="set-me"
     fi
-    _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "components" "$(_format_container_component_object "${container}")"
+    _sbom_add_component "${sbom_file}" "${chart_location}" "components" "${container}"
   done
 }
 
@@ -492,7 +496,8 @@ _add_location_for_component() {
   chart_version=$(yq ".version" "${chart}")
   location="${chart#"${ROOT}/"}"
   location="${location%/Chart.yaml}"
-  _sbom_add_component "${sbom_file}" "${chart_name}" "${chart_version}" "evidence" "$(_format_location_object "${location}")"
+  query="with(.components[] | select(.name == \"${chart_name}\" and .version == \"${chart_version}\"); .evidence |= (. + $(_format_location_object "${location}")))"
+  _yq_run_query "${sbom_file}" "${query}"
 }
 
 # adds chart locations for all components in a input sbom file
@@ -529,19 +534,18 @@ sbom_remove() {
 }
 
 sbom_add() {
-  if [[ "$#" -ne 4 ]]; then
+  if [[ "$#" -ne 3 ]]; then
     usage
   fi
 
-  local component_name component_version key
+  local location key
 
-  component_name="${1}"
-  component_version="${2}"
-  key="${3}"
+  location="${1}"
+  key="${2}"
 
   _sbom_add_component "${SBOM_FILE}" "${@}"
   yq -o json -i '.version += 1' "${SBOM_FILE}"
-  log_info "Updated ${key} for ${component_name}@${component_version}"
+  log_info "Updated ${key} for ${location}"
 }
 
 sbom_get() {
@@ -650,8 +654,6 @@ sbom_update() {
 
   _prepare_sbom "${tmp_sbom_file}" --location "${full_path_location}"
 
-  _add_location_for_component "${tmp_sbom_file}" "${full_path_location}/Chart.yaml"
-
   _add_licenses "${tmp_sbom_file}"
 
   _add_container_images "${tmp_sbom_file}" "${full_path_location}"
@@ -708,8 +710,6 @@ sbom_generate() {
   fi
 
   _prepare_sbom "${tmp_sbom_file}" "${@}"
-
-  _add_locations "${tmp_sbom_file}"
 
   _add_licenses "${tmp_sbom_file}"
 
