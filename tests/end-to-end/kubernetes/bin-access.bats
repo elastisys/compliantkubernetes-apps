@@ -1,0 +1,55 @@
+#!/usr/bin/env bats
+
+# bats file_tags=kubernetes
+
+setup() {
+  load "../../bats.lib.bash"
+  load_assert
+  load_file
+
+  export CK8S_AUTO_APPROVE=true
+  CK8S_PGP_FP=$(yq4 '.creation_rules[].pgp' "${CK8S_CONFIG_PATH}/.sops.yaml")
+  export CK8S_PGP_FP
+}
+
+@test "admin can log in" {
+  with_test_kubeconfig wc admin
+  clear_kubeconfig_cache admin
+  echo "Go to http://localhost:8000 and log in as platform administrator" >&3
+  run kubectl get nodes
+  assert_success
+}
+
+@test "static user can list access" {
+  with_test_kubeconfig wc static
+  clear_kubeconfig_cache static
+  echo "Go to http://localhost:8000 and log in with static Email user" >&3
+  run kubectl -n staging auth can-i --list
+  assert_success
+}
+
+@test "static user can delegate admin access" {
+  with_test_kubeconfig wc static
+  run kubectl -n staging patch rolebinding extra-workload-admins -p '{"subjects":[{"apiGroup":"rbac.authorization.k8s.io","kind":"User","name":"jane"}]}'
+  assert_success
+}
+
+@test "static user can delegate view access" {
+  with_test_kubeconfig wc static
+  run kubectl patch clusterrolebinding extra-user-view -p '{"subjects":[{"apiGroup":"rbac.authorization.k8s.io","kind":"User","name":"jane"}]}'
+  assert_success
+}
+
+@test "static user cannot run pod as root" {
+  with_test_kubeconfig wc static
+  kubectl delete -n staging -f "${APPS_PATH}/tests/end-to-end/kubernetes/allow-root-nginx.yaml" || true
+  kubectl apply -n staging -f "${APPS_PATH}/tests/end-to-end/kubernetes/allow-root-nginx.yaml"
+  reason=$(kubectl -n staging get pod root-nginx -o=jsonpath='{.status.containerStatuses[0].state.waiting.reason}')
+  while [[ ${reason} == "ContainerCreating" ]] || [[ ${reason} == "" ]]; do
+    sleep 1
+    reason=$(kubectl -n staging get pod root-nginx -o=jsonpath='{.status.containerStatuses[0].state.waiting.reason}')
+  done
+
+  run kubectl -n staging get pod root-nginx -o=jsonpath='{.status.containerStatuses[0].state.waiting.reason}'
+  assert_output "CreateContainerConfigError"
+}
