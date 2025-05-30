@@ -35,17 +35,17 @@ source "${ROOT}/tests/common/bats/yq.bash"
 
 usage() {
   echo "COMMANDS:" >&2
-  echo "  add <location> <key> <value> [property-value]           add key-value pair to a component" >&2
-  echo "  diff                                                    checks if any changes in git requires sbom to be updated" >&2
-  echo "  edit <component-name> <component-version> <key>         edit object under key for a component using $EDITOR" >&2
-  echo "  generate                                                generate new cyclonedx sbom. Requires GITHUB_TOKEN to be set to avoid GitHub rate limits" >&2
-  echo "  get <component-name> [component-version] [key]          get component from sbom, optionally query for a provided key" >&2
-  echo "  get-charts                                              get all charts in sbom" >&2
-  echo "  get-containers                                          get all container images in sbom" >&2
-  echo "  get-unset                                               get names of components with set-me's or missing licenses" >&2
-  echo "  remove <component-name> <component-version> <key>       remove key for a component" >&2
-  echo "  update <location>                                       update SBOM for a single component using chart location"
-  echo "  validate                                                validate SBOM using cyclonedx-cli" >&2
+  echo "  add <location> <key> <value> [property-value]   add key-value pair to a component" >&2
+  echo "  diff                                            checks if any changes in git requires sbom to be updated" >&2
+  echo "  edit <location> <key>                           edit object under key for a component using $EDITOR" >&2
+  echo "  generate                                        generate new cyclonedx sbom. Requires GITHUB_TOKEN to be set to avoid GitHub rate limits" >&2
+  echo "  get <component-name> [component-version] [key]  get component from sbom, optionally query for a provided key" >&2
+  echo "  get-charts                                      get all charts in sbom" >&2
+  echo "  get-containers                                  get all container images in sbom" >&2
+  echo "  get-unset                                       get names of components with set-me's or missing licenses" >&2
+  echo "  remove <location> <value>                       remove a property for a component" >&2
+  echo "  update <location>                               update SBOM for a single component using chart location"
+  echo "  validate                                        validate SBOM using cyclonedx-cli" >&2
   exit 1
 }
 
@@ -101,26 +101,25 @@ _yq_run_query() {
 
 # function for updating values of existing components in a input sbom file
 _sbom_edit_component() {
-  local component_name component_version key sbom_file tmp_sbom_file query
+  local key location sbom_file tmp_sbom_file query
 
   sbom_file="${1}"
-  component_name="${2}"
-  component_version="${3}"
-  key="${4}"
+  location="${2}"
+  key="${3}"
 
-  tmp_change=$(mktemp "--suffix=-update-${component_name}-sbom.json")
+  tmp_change=$(mktemp "--suffix=-edit-sbom.json")
   append_trap "rm ${tmp_change} >/dev/null 2>&1" EXIT
 
   # check if key that should be updated exists
-  has_key=$(yq -e -o json ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\") | has(\"${key}\")" "${sbom_file}")
+  has_key=$(yq -e -o json ".components[] | select(.evidence.occurrences[0].location == \"${location}\") | has(\"${key}\")" "${sbom_file}")
   if [[ "${has_key}" == false ]]; then
     log_fatal "${key} not found"
   fi
 
-  yq -e -o json ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\") | .${key}" "${sbom_file}" >"${tmp_change}"
+  yq -e -o json ".components[] | select(.evidence.occurrences[0].location == \"${location}\") | .${key}" "${sbom_file}" >"${tmp_change}"
   "${EDITOR:-}" "${tmp_change}"
 
-  query="with(.components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\"); .${key} = $(jq -c '.' "${tmp_change}"))"
+  query="with(.components[] | select(.evidence.occurrences[0].location == \"${location}\"); .${key} = $(jq -c '.' "${tmp_change}"))"
 
   _yq_run_query "${sbom_file}" "${query}"
 }
@@ -516,21 +515,21 @@ _add_locations() {
   yq -i 'del(.components[] | select(.evidence == null))' "${sbom_file}"
 }
 
+# supports removing an entry from the properties field of a sbom component
 sbom_remove() {
-  if [[ "$#" -ne 4 ]]; then
+  if [[ "$#" -ne 2 ]]; then
     usage
   fi
 
-  local component_name component_version key value
+  local location value
 
-  component_name="${1}"
-  component_version="${2}"
-  key="${3}"
-  value="${4}"
+  location="${1}"
+  value="${2}"
 
-  query="with(.components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\").${key}; del(.[] | select(.name == \"${value}\")))"
+  query="with(.components[] | select(.evidence.occurrences[0].location == \"${location}\").properties; del(.[] | select(.name == \"${value}\")))"
 
   _yq_run_query "${SBOM_FILE}" "${query}"
+  yq -o json -i '.version += 1' "${SBOM_FILE}"
 }
 
 sbom_add() {
@@ -612,18 +611,18 @@ sbom_get_containers() {
 }
 
 sbom_edit() {
-  if [[ "$#" -ne 3 ]]; then
+  if [[ "$#" -ne 2 ]]; then
     usage
   fi
 
-  local component_name key
+  local location key
 
-  component_name="${1}"
+  location="${1}"
   key="${2}"
 
   _sbom_edit_component "${SBOM_FILE}" "${@}"
   yq -o json -i '.version += 1' "${SBOM_FILE}"
-  log_info "Updated ${key} for ${component_name}"
+  log_info "Updated ${key} for ${location}"
 }
 
 _test_github_token() {
