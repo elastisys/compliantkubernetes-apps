@@ -12,6 +12,7 @@
 #   - possibility to update one fragment/chart-location
 # - currently, chart location is the primary key that maps SBOM components to releases in Welkin, however, some places uses chart name + chart version for this mapping
 #   - change commands to utilize the chart location in most places?
+# - consistently update timestamp? e.g. when running sbom add or edit
 set -euo pipefail
 
 HERE="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
@@ -34,7 +35,7 @@ source "${ROOT}/tests/common/bats/yq.bash"
 
 usage() {
   echo "COMMANDS:" >&2
-  echo "  add <component-name> <component-version> <key> <value>  add key-value pair to a component" >&2
+  echo "  add <location> <key> <value>                            add key-value pair to a component" >&2
   echo "  diff                                                    checks if any changes in git requires sbom to be updated" >&2
   echo "  edit <component-name> <component-version> <key>         edit object under key for a component using $EDITOR" >&2
   echo "  generate                                                generate new cyclonedx sbom. Requires GITHUB_TOKEN to be set to avoid GitHub rate limits" >&2
@@ -126,33 +127,36 @@ _sbom_edit_component() {
 
 # function for adding new values to existing components in a input sbom file given a key
 _sbom_add_component() {
-  local component_name component_version key sbom_file tmp_sbom_file value query
+  local location key sbom_file tmp_sbom_file value query
 
   sbom_file="${1}"
-  component_name="${2}"
-  component_version="${3}"
-  key="${4}"
-  value="${5}"
+  location="${2}"
+  key="${3}"
+  value="${4}"
 
-  if [[ ! "${key}" =~ ^(components|evidence|licenses|properties|supplier)$ ]]; then
-    log_fatal "unsupported key \"${key}\", currently only supports \"components|evidence|licenses|properties|supplier\""
+  if [[ ! "${key}" =~ ^(licenses|properties|supplier)$ ]]; then
+    log_fatal "unsupported key \"${key}\", currently only supports \"licenses|properties|supplier\""
   fi
 
   # change the query depending on if the key is a known array type in cyclonedx 1.6 spec
-  append_query="= ${value}"
-  value_type="{}"
-  if [[ "${key}" =~ ^(components|licenses|properties)$ ]]; then
-    value_type="[]"
-    append_query="|= (. + ${value} | unique_by([.name, .version]))"
+  value_type="[]"
+  if [[ "${key}" == licenses ]]; then
+    append_query="|= (. + $(_format_license_object "${value}") | unique_by([.name, .version]))"
+  elif [[ "${key}" == properties ]]; then
+    append_query="|= (. + $(_format_property_object "${value}") | unique_by([.name, .version]))"
+  elif [[ "${key}" == supplier ]]; then
+    value_type="{}"
+    append_query="= $(_format_supplier_object "${value}")"
   fi
 
   # check if key that should be updated exists
-  has_key=$(yq -o json ".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\") | has(\"${key}\")" "${sbom_file}")
+  has_key=$(yq -o json ".components[] | select(.evidence.occurrences[0].location == \"${location}\") | has(\"${key}\")" "${sbom_file}")
+
   if [[ "${has_key}" == false ]]; then
-    _yq_run_query "${sbom_file}" "with(.components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\"); .${key} = ${value_type})"
+    CK8S_AUTO_APPROVE=true _yq_run_query "${sbom_file}" "with(.components[] | select(.evidence.occurrences[0].location == \"${location}\"); .${key} = ${value_type})"
   fi
 
-  query="with(.components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\"); .${key} ${append_query})"
+  query="with(.components[] | select(.evidence.occurrences[0].location == \"${location}\"); .${key} ${append_query})"
 
   _yq_run_query "${sbom_file}" "${query}"
 }
