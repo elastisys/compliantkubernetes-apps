@@ -35,7 +35,7 @@ source "${ROOT}/tests/common/bats/yq.bash"
 
 usage() {
   echo "COMMANDS:" >&2
-  echo "  add <location> <key> <value>                            add key-value pair to a component" >&2
+  echo "  add <location> <key> <value> [property-value]           add key-value pair to a component" >&2
   echo "  diff                                                    checks if any changes in git requires sbom to be updated" >&2
   echo "  edit <component-name> <component-version> <key>         edit object under key for a component using $EDITOR" >&2
   echo "  generate                                                generate new cyclonedx sbom. Requires GITHUB_TOKEN to be set to avoid GitHub rate limits" >&2
@@ -571,18 +571,29 @@ sbom_get() {
 
 sbom_get_unset() {
   output_query=' { "name": .name, "version": .version, "location": .evidence.occurrences[0].location}'
+
+  local licenses=()
+  mapfile -t -O "${#licenses[@]}" licenses < <(yq -I=0 -o json -r "[.components[] | select(.licenses[].license.name | contains(\"set-me\")) | ${output_query}] | .[]" "${SBOM_FILE}")
+  mapfile -t -O "${#licenses[@]}" licenses < <(yq -I=0 -o json -r "[.components[] | select(.licenses | length == 0) | ${output_query}] | .[]" "${SBOM_FILE}")
+  mapfile -t -O "${#licenses[@]}" licenses < <(yq -I=0 -o json -r "[.components[] | select(has(\"licenses\") == \"false\") | ${output_query}] | .[]" "${SBOM_FILE}")
   log_info "Getting components without licenses"
-  yq -I=0 -o json -r "[.components[] | select(.licenses[].license.name | contains(\"set-me\")) | ${output_query}] | .[]" "${SBOM_FILE}"
-  yq -I=0 -o json -r "[.components[] | select(.licenses | length == 0) | ${output_query}] | .[]" "${SBOM_FILE}"
-  yq -I=0 -o json -r "[.components[] | select(has(\"licenses\") == \"false\") | ${output_query}] | .[]" "${SBOM_FILE}"
+  jq -c <<<"${licenses[@]}"
 
   echo
+  local elastisys_evaluations=()
+  mapfile -t -O "${#elastisys_evaluations[@]}" elastisys_evaluations < <(yq -I=0 -o json -r "[.components[] | select(.properties[].value == \"set-me\")  | ${output_query}] | .[]" "${SBOM_FILE}")
   log_info "Getting components without Elastisys evaluation"
-  yq -I=0 -o json -r "[.components[] | select(.properties[].value == \"set-me\")  | ${output_query}] | .[]" "${SBOM_FILE}"
+  jq -c <<<"${elastisys_evaluations[@]}"
 
   echo
+  local suppliers=()
   log_info "Getting components without supplier"
-  yq -I=0 -o json -r "[.components[] | select(.supplier.name == \"set-me\")  | ${output_query}] | .[]" "${SBOM_FILE}"
+  mapfile -t -O "${#suppliers[@]}" suppliers < <(yq -I=0 -o json -r "[.components[] | select(.supplier.name == \"set-me\")  | ${output_query}] | .[]" "${SBOM_FILE}")
+  jq -c <<<"${suppliers[@]}"
+
+  if [[ "${#licenses[@]}" -gt 0 ]] || [[ "${#elastisys_evaluations[@]}" -gt 0 ]] || [[ "${#suppliers[@]}" -gt 0 ]]; then
+    exit 1
+  fi
 }
 
 sbom_get_charts() {
