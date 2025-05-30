@@ -16,7 +16,6 @@ setup() {
   export CK8S_SKIP_VALIDATION=false
   VELERO_CHART_RELATIVE_FOLDER=helmfile.d/upstream/vmware-tanzu/velero
   VELERO_CHART="${ROOT}/${VELERO_CHART_RELATIVE_FOLDER}/Chart.yaml"
-  velero_version=$(yq '.version' "${VELERO_CHART}")
 
   cp "${ROOT}/docs/sbom.json" "${sbom_backup}"
   cp "${VELERO_CHART}" "${velero_chart_backup}"
@@ -34,7 +33,7 @@ teardown() {
 }
 
 @test "sbom script get existing component" {
-  run sbom.bash get velero
+  run sbom.bash get "${VELERO_CHART_RELATIVE_FOLDER}"
   assert_success
   assert_output --partial '"name": "velero"'
 }
@@ -51,22 +50,16 @@ teardown() {
 }
 
 @test "sbom script add component with unsupported key" {
-  run sbom.bash add velero "${velero_version}" unsupported-key '{"name": "test", "value": "test"}'
+  run sbom.bash add "${VELERO_CHART_RELATIVE_FOLDER}" unsupported-key "foo"
   assert_failure
   assert_output --partial 'unsupported key'
 }
 
-@test "sbom script add component properties with correct object format" {
+@test "sbom script add component with supported key properties" {
   export CK8S_AUTO_APPROVE=true
-  run sbom.bash add velero "${velero_version}" properties '{"name": "test", "value": "test"}'
+  run sbom.bash add "${VELERO_CHART_RELATIVE_FOLDER}" properties "foo" "bar"
   assert_success
   assert_output --partial 'Updated properties'
-}
-
-@test "sbom script add component properties with incorrect object format should fail cyclonedx validation" {
-  run sbom.bash add velero "${velero_version}" properties '{"unsupported-key-name": "test", "unsupported-value": "test"}' <<<n
-  assert_output --partial 'Validation failed:'
-  assert_output --regexp 'Required properties .* are not present'
 }
 
 @test "sbom script generate requires GITHUB_TOKEN" {

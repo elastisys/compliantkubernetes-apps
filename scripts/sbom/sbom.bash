@@ -565,7 +565,7 @@ sbom_get() {
     query=".components[] | select(.name == \"${component_name}\" and .version == \"${component_version}\") | .${key}"
   fi
 
-  yq -e -o json "${query}" "${SBOM_FILE}"
+  yq -e -o json "${query}" "${sbom_file}"
 }
 
 sbom_get_unset() {
