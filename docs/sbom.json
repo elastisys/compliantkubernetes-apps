@@ -2,7 +2,7 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "serialNumber": "urn:uuid:84200bcb-dfa6-46d0-8852-a068ebc8dbff",
-  "version": 10,
+  "version": 14,
   "metadata": {
     "timestamp": "2025-05-30T10:30:55Z",
     "tools": {
@@ -385,7 +385,14 @@
       ],
       "supplier": {
         "name": "Prometheus Authors"
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -409,7 +416,14 @@
       ],
       "supplier": {
         "name": "The Kyverno Authors"
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -1122,7 +1136,14 @@
       ],
       "supplier": {
         "name": "Grafana Labs"
-      }
+      },
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
+        }
+      ]
     },
     {
       "group": "",
@@ -2434,6 +2455,13 @@
           "version": "2.18.0",
           "type": "container",
           "bom-ref": "pkg:oci/opensearchproject/opensearch-dashboards:2.18.0"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Apache License 2.0"
+          }
         }
       ]
     },
