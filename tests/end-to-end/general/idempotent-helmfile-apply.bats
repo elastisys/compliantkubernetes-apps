@@ -44,5 +44,5 @@ setup() {
 
 _apply() {
   local -r cluster="${1}"
-  ck8s ops helmfile "${cluster}" apply
+  ck8s ops helmfile "${cluster}" apply --concurrency="$(nproc)" --suppress-diff
 }
