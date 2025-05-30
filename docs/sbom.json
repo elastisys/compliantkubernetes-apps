@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:84200bcb-dfa6-46d0-8852-a068ebc8dbff",
-  "version": 14,
+  "serialNumber": "urn:uuid:e4dde7b0-4fd3-45fb-afbd-7463507daced",
+  "version": 15,
   "metadata": {
-    "timestamp": "2025-05-30T10:30:55Z",
+    "timestamp": "2025-05-30T14:25:13Z",
     "tools": {
       "components": [
         {
@@ -36,10 +36,10 @@
     "component": {
       "group": "",
       "name": "welkin-apps",
-      "version": "58fa5552aa8eb67e843355ad8e43d26dd5503be4",
+      "version": "e443a0d5b9a7ace0164947155de72f623f06b5cc",
       "type": "application",
-      "bom-ref": "pkg:application/welkin-apps@58fa5552aa8eb67e843355ad8e43d26dd5503be4",
-      "purl": "pkg:application/welkin-apps@58fa5552aa8eb67e843355ad8e43d26dd5503be4"
+      "bom-ref": "pkg:application/welkin-apps@e443a0d5b9a7ace0164947155de72f623f06b5cc",
+      "purl": "pkg:application/welkin-apps@e443a0d5b9a7ace0164947155de72f623f06b5cc"
     },
     "properties": [
       {
@@ -3389,10 +3389,442 @@
       ]
     }
   ],
-  "dependencies": [],
+  "dependencies": [
+    {
+      "ref": "pkg:helm/autoscaling-monitoring@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/calico-accountant@0.1.1",
+      "dependsOn": [
+        "pkg:oci/ghcr.io/elastisys/calico-accountant:0.1.6-ck8s2"
+      ]
+    },
+    {
+      "ref": "pkg:helm/calico-default-deny@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/calico-felix-metrics@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/cert-manager@v1.17.1",
+      "dependsOn": [
+        "pkg:oci/quay.io/jetstack/cert-manager-cainjector:v1.17.1",
+        "pkg:oci/quay.io/jetstack/cert-manager-controller:v1.17.1",
+        "pkg:oci/quay.io/jetstack/cert-manager-webhook:v1.17.1",
+        "pkg:oci/quay.io/jetstack/cert-manager-startupapicheck:v1.17.1"
+      ]
+    },
+    {
+      "ref": "pkg:helm/cluster-admin-rbac@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/common@2.29.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/common@2.30.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/crds@0.0.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/crds@3.3.6",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/dex@0.18.0",
+      "dependsOn": [
+        "pkg:oci/ghcr.io/dexidp/dex:v2.40.0"
+      ]
+    },
+    {
+      "ref": "pkg:helm/external-dns-endpoints@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/external-dns-secrets@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/external-dns@1.14.4",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/falco@4.20.0",
+      "dependsOn": [
+        "pkg:oci/appropriate/curl",
+        "pkg:oci/docker.io/falcosecurity/falcosidekick:2.31.1",
+        "pkg:oci/docker.io/falcosecurity/falco:0.40.0-debian",
+        "pkg:oci/docker.io/falcosecurity/falcoctl:0.11.0",
+        "pkg:oci/docker.io/falcosecurity/falco-driver-loader:0.40.0"
+      ]
+    },
+    {
+      "ref": "pkg:helm/falcosidekick@0.9.8",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/file-copier@0.1.0",
+      "dependsOn": [
+        "pkg:oci/busybox:1.36"
+      ]
+    },
+    {
+      "ref": "pkg:helm/fluentd-elasticsearch@13.12.2",
+      "dependsOn": [
+        "pkg:oci/ghcr.io/elastisys/fluentd-forwarder:v4.7.5-ck8s1"
+      ]
+    },
+    {
+      "ref": "pkg:helm/fluentd@7.1.1",
+      "dependsOn": [
+        "pkg:oci/ghcr.io/elastisys/fluentd-aggregator:v7.1.1-ck8s1"
+      ]
+    },
+    {
+      "ref": "pkg:helm/gatekeeper-constraints@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/gatekeeper-metrics@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/gatekeeper-mutations@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/gatekeeper-templates@0.1.0",
+      "dependsOn": [
+        "pkg:oci/ghcr.io/elastisys/bitnami/kubectl:1.29.11"
+      ]
+    },
+    {
+      "ref": "pkg:helm/gatekeeper@3.18.2",
+      "dependsOn": [
+        "pkg:oci/openpolicyagent/gatekeeper:v3.18.2",
+        "pkg:oci/openpolicyagent/gatekeeper-crds:v3.18.2"
+      ]
+    },
+    {
+      "ref": "pkg:helm/gpu-operator@v24.9.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/grafana-dashboards@0.3.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/grafana-label-enforcer@0.2.0",
+      "dependsOn": [
+        "pkg:oci/quay.io/prometheuscommunity/prom-label-proxy:v0.11.0"
+      ]
+    },
+    {
+      "ref": "pkg:helm/grafana@3.3.6",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/grafana@8.11.4",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/grafana@8.9.1",
+      "dependsOn": [
+        "pkg:oci/docker.io/grafana/grafana:11.5.1",
+        "pkg:oci/quay.io/kiwigrid/k8s-sidecar:1.30.0"
+      ]
+    },
+    {
+      "ref": "pkg:helm/harbor-backup@0.1.0",
+      "dependsOn": [
+        "pkg:oci/ghcr.io/elastisys/backup-postgres:1.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:helm/harbor-certs@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/harbor@1.16.1",
+      "dependsOn": [
+        "pkg:oci/goharbor/harbor-core:v2.12.1",
+        "pkg:oci/goharbor/harbor-exporter:v2.12.1",
+        "pkg:oci/goharbor/harbor-jobservice:v2.12.1",
+        "pkg:oci/goharbor/harbor-portal:v2.12.1",
+        "pkg:oci/goharbor/harbor-registryctl:v2.12.1",
+        "pkg:oci/goharbor/registry-photon:v2.12.1",
+        "pkg:oci/goharbor/harbor-db:v2.12.1",
+        "pkg:oci/goharbor/redis-photon:v2.12.1",
+        "pkg:oci/goharbor/trivy-adapter-photon:v2.12.1"
+      ]
+    },
+    {
+      "ref": "pkg:helm/hnc-config@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/hnc@0.1.0",
+      "dependsOn": [
+        "pkg:oci/ghcr.io/elastisys/hnc-manager:v1.1.0"
+      ]
+    },
+    {
+      "ref": "pkg:helm/ingress-nginx-probe-ingress@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/ingress-nginx@4.12.3",
+      "dependsOn": [
+        "pkg:oci/registry.k8s.io/defaultbackend-amd64:1.5",
+        "pkg:oci/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2@sha256:e8825994b7a2c7497375a9b945f386506ca6a3eda80b89b74ef2db743f66a5ea",
+        "pkg:oci/registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e"
+      ]
+    },
+    {
+      "ref": "pkg:helm/init-harbor@0.2.0",
+      "dependsOn": [
+        "pkg:oci/ghcr.io/elastisys/curl-jq:1.0.0"
+      ]
+    },
+    {
+      "ref": "pkg:helm/k8s-metacollector@0.1.10",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/kube-prometheus-stack@70.6.0",
+      "dependsOn": [
+        "pkg:oci/quay.io/prometheus-operator/prometheus-operator:v0.81.0",
+        "pkg:oci/registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.15.0",
+        "pkg:oci/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2",
+        "pkg:oci/quay.io/prometheus/node-exporter:v1.9.1",
+        "pkg:oci/quay.io/prometheus/alertmanager:v0.28.1",
+        "pkg:oci/quay.io/prometheus/prometheus:v3.2.1"
+      ]
+    },
+    {
+      "ref": "pkg:helm/kube-state-metrics-extra-resource-metrics@0.1.0",
+      "dependsOn": [
+        "pkg:oci/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2"
+      ]
+    },
+    {
+      "ref": "pkg:helm/kube-state-metrics@5.31.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/kubeapi-metrics@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/kured-secret@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/kured@5.6.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/kyverno@3.3.6",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/letsencrypt@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/log-manager@0.1.0",
+      "dependsOn": [
+        "pkg:oci/ghcr.io/elastisys/compliantkubernetes-apps-log-manager:0.3.2"
+      ]
+    },
+    {
+      "ref": "pkg:helm/metrics-server@3.12.1",
+      "dependsOn": [
+        "pkg:oci/registry.k8s.io/metrics-server/metrics-server:v0.7.1"
+      ]
+    },
+    {
+      "ref": "pkg:helm/minio@15.0.5",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/minio@5.0.14",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/namespaces@0.1.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/networkpolicy-generator@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/networkpolicy-service@0.2.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/networkpolicy-workload@0.2.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/node-feature-discovery@0.16.6",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/node-local-dns@0.1.1",
+      "dependsOn": [
+        "pkg:oci/registry.k8s.io/dns/k8s-dns-node-cache:1.25.0"
+      ]
+    },
+    {
+      "ref": "pkg:helm/opensearch-configurer@0.1.0",
+      "dependsOn": [
+        "pkg:oci/ghcr.io/elastisys/curl-jq:1.0.0"
+      ]
+    },
+    {
+      "ref": "pkg:helm/opensearch-curator@0.1.0",
+      "dependsOn": [
+        "pkg:oci/ghcr.io/elastisys/bitnami/elasticsearch-curator:5.8.4-debian-10-r235"
+      ]
+    },
+    {
+      "ref": "pkg:helm/opensearch-dashboards@2.26.0",
+      "dependsOn": [
+        "pkg:oci/opensearchproject/opensearch-dashboards:2.18.0"
+      ]
+    },
+    {
+      "ref": "pkg:helm/opensearch-secrets@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/opensearch-securityadmin@0.1.0",
+      "dependsOn": [
+        "pkg:oci/opensearchproject/opensearch:2.18.0"
+      ]
+    },
+    {
+      "ref": "pkg:helm/opensearch-slm@0.1.0",
+      "dependsOn": [
+        "pkg:oci/ghcr.io/elastisys/curl-jq:1.0.0"
+      ]
+    },
+    {
+      "ref": "pkg:helm/opensearch@2.30.1",
+      "dependsOn": [
+        "pkg:oci/ghcr.io/elastisys/curl-jq:1.0.0",
+        "pkg:oci/opensearchproject/opensearch:2.18.0"
+      ]
+    },
+    {
+      "ref": "pkg:helm/openstack-monitoring@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/podsecuritypolicies@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/prometheus-alerts@0.1.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/prometheus-blackbox-exporter@8.13.0",
+      "dependsOn": [
+        "pkg:oci/quay.io/prometheus/blackbox-exporter:v0.24.0"
+      ]
+    },
+    {
+      "ref": "pkg:helm/prometheus-elasticsearch-exporter@6.1.0",
+      "dependsOn": [
+        "pkg:oci/quay.io/prometheuscommunity/elasticsearch-exporter:v1.7.0"
+      ]
+    },
+    {
+      "ref": "pkg:helm/prometheus-node-exporter@4.45.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/prometheus-servicemonitor@0.1.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/prometheus-windows-exporter@0.9.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/rclone@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/s3-exporter@0.1.0",
+      "dependsOn": [
+        "pkg:oci/ghcr.io/elastisys/s3-exporter:0.5.0"
+      ]
+    },
+    {
+      "ref": "pkg:helm/tekton-pipelines@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/thanos-ingress-secret@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/thanos-ruler@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/thanos@15.13.1",
+      "dependsOn": [
+        "pkg:oci/ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8",
+        "pkg:oci/quay.io/prometheus-operator/prometheus-config-reloader:v0.50.0"
+      ]
+    },
+    {
+      "ref": "pkg:helm/tigera-operator@v3.26.4",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/trivy-operator@0.26.0",
+      "dependsOn": [
+        "pkg:oci/mirror.gcr.io/aquasec/trivy-operator:0.24.0"
+      ]
+    },
+    {
+      "ref": "pkg:helm/user-alertmanager@0.1.0",
+      "dependsOn": [
+        "pkg:oci/set-me"
+      ]
+    },
+    {
+      "ref": "pkg:helm/user-crds@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/user-rbac@0.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:helm/velero@6.0.0",
+      "dependsOn": [
+        "pkg:oci/velero/velero-plugin-for-aws:v1.9.0",
+        "pkg:oci/velero/velero:v1.13.0"
+      ]
+    }
+  ],
   "compositions": [
     {
-      "bom-ref": "pkg:application/welkin-apps@58fa5552aa8eb67e843355ad8e43d26dd5503be4",
+      "bom-ref": "pkg:application/welkin-apps@e443a0d5b9a7ace0164947155de72f623f06b5cc",
       "aggregate": "incomplete"
     }
   ],
@@ -3400,7 +3832,7 @@
     {
       "bom-ref": "metadata-annotations",
       "subjects": [
-        "pkg:application/welkin-apps@58fa5552aa8eb67e843355ad8e43d26dd5503be4"
+        "pkg:application/welkin-apps@e443a0d5b9a7ace0164947155de72f623f06b5cc"
       ],
       "annotator": {
         "component": {
@@ -3418,8 +3850,8 @@
           ]
         }
       },
-      "timestamp": "2025-05-30T10:30:55Z",
-      "text": "This Software Bill-of-Materials (SBOM) document was created on Friday, May 30, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'welkin-apps' with version '58fa5552aa8eb67e843355ad8e43d26dd5503be4'. There are 85 components."
+      "timestamp": "2025-05-30T14:25:13Z",
+      "text": "This Software Bill-of-Materials (SBOM) document was created on Friday, May 30, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'welkin-apps' with version 'e443a0d5b9a7ace0164947155de72f623f06b5cc'. There are 85 components."
     }
   ]
 }
