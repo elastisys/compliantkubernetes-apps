@@ -423,7 +423,7 @@ unlock_upgrade() {
 
 # Get currently prepared version
 get_prepared_version() {
-  kubectl_do "${1}" get cm --namespace kube-system apps-upgrade --output=jsonpath --template="{.data.version}"
+  kubectl_do "${1}" get configmap --namespace kube-system apps-upgrade --output=jsonpath --template="{.data.version}"
 }
 
 check_prepared_version() {
