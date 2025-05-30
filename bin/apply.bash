@@ -59,7 +59,11 @@ apps_apply() {
     current_version="$(get_apps_version "${2}" 2>/dev/null || true)"
     if [ -z "${current_version}" ]; then
       current_version="$(get_repo_version)"
-      set_apps_version "${2}" "${current_version}"
+      if [[ "${current_version}" == v* ]]; then
+        set_apps_version "${2}" "${current_version}"
+      else
+        current_version="git"
+      fi
     fi
     log_info "Current version is ${current_version}"
     log_info "Successful Apps ${action} on ${2/_/ }!"
