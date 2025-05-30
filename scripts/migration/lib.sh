@@ -472,7 +472,7 @@ ensure_upgrade_prepared() {
   local apps_cluster_timestamp
   local apps_config_timestamp
 
-  apps_upgrade="$(kubectl_do "${1}" get --namespace kube-system cm apps-upgrade --output=yaml)"
+  apps_upgrade="$(kubectl_do "${1}" get --namespace kube-system configmap apps-upgrade --output=yaml)"
   apps_version="$(yq '.data.version' <<<"${apps_upgrade}")"
 
   if [[ "${apps_version}" != "${CK8S_TARGET_VERSION}" ]] >/dev/null; then
@@ -490,7 +490,7 @@ ensure_upgrade_prepared() {
 # Records the last migration snippet that ran successfully, to allow where a failed migration stopped
 record_upgrade_apply_step() {
   local apps_upgrade
-  apps_upgrade="$(kubectl_do "${1}" get --namespace kube-system cm apps-upgrade --output=yaml)"
+  apps_upgrade="$(kubectl_do "${1}" get --namespace kube-system configmap apps-upgrade --output=yaml)"
   if ! yq --exit-status 'select(.data.version == strenv(CK8S_TARGET_VERSION))' <<<"${apps_upgrade}" >/dev/null; then
     log_fatal "version mismatch, upgrading to ${CK8S_TARGET_VERSION} but cluster ${1} was prepared for $(
       yq '.data.version' <<<"${apps_upgrade}"
@@ -508,7 +508,7 @@ record_upgrade_apply_step() {
 record_upgrade_done() {
   # Record the upgraded-to version. Create if it does not already exist.
   log_info "Recording new apps version in cluster"
-  if ! kubectl_do "${1}" patch --namespace kube-system cm apps-meta --type=merge --patch "$(yq --null-input --output-format json '.data.version = strenv(CK8S_TARGET_VERSION)')"; then
+  if ! kubectl_do "${1}" patch --namespace kube-system configmap apps-meta --type=merge --patch "$(yq --null-input --output-format json '.data.version = strenv(CK8S_TARGET_VERSION)')"; then
     if ! kubectl_do "${1}" create configmap --namespace kube-system apps-meta --from-literal "version=${CK8S_TARGET_VERSION}"; then
       log_fatal "could not record new apps version in ${1}"
     fi
