@@ -413,7 +413,7 @@ append_trap() {
 
 # usage: [[ "$(get_apps_version)" == "0.x" ]]
 get_apps_version() {
-  kubectl_do "${1}" get cm --namespace kube-system apps-meta --output=jsonpath --template="{.data.version}"
+  kubectl_do "${1}" get configmap --namespace kube-system apps-meta --output=jsonpath --template="{.data.version}"
 }
 
 unlock_upgrade() {
