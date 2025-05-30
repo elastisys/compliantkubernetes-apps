@@ -218,6 +218,13 @@ _format_container_component_object() {
   echo "{\"name\": \"${name}\", \"version\": \"${version}\", \"type\": \"container\", \"bom-ref\": \"${bom_ref}\"}"
 }
 
+# format component json object for a container image
+# ref: https://cyclonedx.org/docs/1.6/json/#components
+_format_dependency_object() {
+  local component_bom_ref="${1}"
+  echo "{\"ref\": \"${component_bom_ref}\", \"dependsOn\": []}"
+}
+
 _prepare_sbom() {
   local full_path_location location project_version sbom_file
   if [[ "$#" -lt 1 ]] || [[ "$#" -gt 3 ]]; then
@@ -285,6 +292,32 @@ _prepare_sbom() {
 
     supplier=$(yq -o json -r ".components[] | select(.evidence.occurrences[0].location == \"${location}\").supplier.name" "${SBOM_FILE}")
     _sbom_add_component "${sbom_file}" "${location}" "supplier" "${supplier}"
+  done
+}
+
+_add_dependencies() {
+  local sbom_file="${1}"
+
+  log_info "Updating container dependencies"
+
+  mapfile -t components < <(sbom_get_charts "${sbom_file}")
+  for component in "${components[@]}"; do
+    location=$(jq -r '.location' <<<"${component}")
+    component_bom_ref=$(sbom_get "${sbom_file}" "${location}" | jq -r '."bom-ref"')
+
+    # check if a dependency exists for component ref
+    has_ref=$(yq ".dependencies[] | select(.ref == \"${component_bom_ref}\")" "${sbom_file}")
+
+    if [[ -z "${has_ref}" ]]; then
+      query=".dependencies |= (. + $(_format_dependency_object "${component_bom_ref}") | unique_by(.ref))"
+      CK8S_AUTO_APPROVE=true _yq_run_query "${sbom_file}" "${query}"
+    fi
+
+    mapfile -t container_bom_refs < <(sbom_get "${sbom_file}" "${location}" components | jq -r '.[]? | ."bom-ref"')
+    for container_bom_ref in "${container_bom_refs[@]}"; do
+      query="with(.dependencies[] | select(.ref == \"${component_bom_ref}\").dependsOn; . |= (. + \"${container_bom_ref}\") | unique)"
+      _yq_run_query "${sbom_file}" "${query}"
+    done
   done
 }
 
@@ -559,7 +592,7 @@ sbom_get() {
     query=".components[] | select(.evidence.occurrences[0].location == \"${location}\") | .${key}"
   fi
 
-  yq -e -o json "${query}" "${sbom_file}"
+  yq -o json "${query}" "${sbom_file}"
 }
 
 sbom_get_unset() {
@@ -662,6 +695,8 @@ sbom_update() {
 
   _add_container_images "${tmp_sbom_file}" "${full_path_location}"
 
+  _add_dependencies "${tmp_sbom_file}"
+
   CK8S_AUTO_APPROVE=false
   CK8S_SKIP_VALIDATION=false
 
@@ -718,6 +753,8 @@ sbom_generate() {
   _add_licenses "${tmp_sbom_file}"
 
   _add_container_images "${tmp_sbom_file}"
+
+  _add_dependencies "${tmp_sbom_file}"
 
   CK8S_AUTO_APPROVE=false
   CK8S_SKIP_VALIDATION=false
