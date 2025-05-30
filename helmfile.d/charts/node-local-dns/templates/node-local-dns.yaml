@@ -145,7 +145,7 @@ spec:
         operator: "Exists"
       containers:
       - name: node-cache
-        image: registry.k8s.io/dns/k8s-dns-node-cache:1.25.0
+        image: {{ .Values.image.repository }}{{ with .Values.image.tag }}:{{ . }}{{ end }}
         resources: {{- toYaml .Values.resources | nindent 10 }}
         args: [ "-localip", "{{ .Values.localIP }},{{ .Values.clusterDNS }}", "-conf", "/etc/Corefile", "-upstreamsvc", "kube-dns-upstream"]
         securityContext:

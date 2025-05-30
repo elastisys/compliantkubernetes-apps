@@ -60,3 +60,10 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Container image uri
+*/}}
+{{- define "tekton-pipelines.image" -}}
+{{ .repository }}{{ with .tag }}:{{ . }}{{ end }}
+{{- end }}
