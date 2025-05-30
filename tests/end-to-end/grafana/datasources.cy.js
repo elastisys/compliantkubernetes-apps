@@ -102,7 +102,7 @@ describe("grafana dev datasources", function() {
 
     // Cypress does not like trailing dots
     cy.yqDig("sc", ".grafana.user.trailingDots")
-      .should((value) => assert(value !== "true", ".grafana.ops.trailingDots in sc config must not be 'true'"))
+      .should((value) => assert(value !== "true", ".grafana.user.trailingDots in sc config must not be 'true'"))
   })
 
   beforeEach(function() {
