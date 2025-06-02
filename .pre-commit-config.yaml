@@ -104,11 +104,15 @@ repos:
         types: [shell]
         language: script
         require_serial: true
+        files: 'docs\/sbom\.json'
+        always_run: true
+        pass_filenames: false
         entry: scripts/run-from-container.sh
         args:
           - --network=none
-          - docker.io/cyclonedx/cyclonedx-cli:0.27.2
+          - docker.io/cyclonedx/cyclonedx-cli@sha256:829c9ea8f2104698bc3c1228575bfa495f6cc4ec151329323c013ca94408477f
           - validate
+          - --fail-on-errors
           - --input-file
           - docs/sbom.json
 
