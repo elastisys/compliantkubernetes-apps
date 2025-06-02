@@ -699,28 +699,6 @@ sbom_update() {
   CK8S_AUTO_APPROVE=false
   CK8S_SKIP_VALIDATION=false
 
-  # prompt for manually set elastisys evaluation property
-  if ! "${CK8S_AUTO_APPROVE}"; then
-    log_warning "Is the Elastisys evaluation still valid?"
-    sbom_get "${tmp_sbom_file}" "${location}" "properties"
-    log_warning_no_newline "Do you want to continue and edit? (y/N): "
-    read -r reply
-    if [[ "${reply}" =~ ^[yY]$ ]]; then
-      _sbom_edit_component "${tmp_sbom_file}" "${location}" properties
-    fi
-  fi
-
-  # prompt for manually set supplier
-  if ! "${CK8S_AUTO_APPROVE}"; then
-    log_warning "Is the supplier still valid?"
-    sbom_get "${tmp_sbom_file}" "${location}" "supplier"
-    log_warning_no_newline "Do you want to continue and edit? (y/N): "
-    read -r reply
-    if [[ "${reply}" =~ ^[yY]$ ]]; then
-      _sbom_edit_component "${tmp_sbom_file}" "${location}" supplier
-    fi
-  fi
-
   tmp_output_sbom_file=$(mktemp --suffix=-output-sbom.json)
   append_trap "rm ${tmp_output_sbom_file} >/dev/null 2>&1" EXIT
 
@@ -744,6 +722,24 @@ sbom_update() {
   sbom_cyclonedx_validation "${tmp_output_sbom_file}"
 
   diff -U3 --color=always "${SBOM_FILE}" "${tmp_output_sbom_file}" && log_info "No change" && exit 0
+
+  # prompt for manually set elastisys evaluation property
+  log_warning "Is the Elastisys evaluation still valid?"
+  sbom_get "${tmp_output_sbom_file}" "${location}" "properties"
+  log_warning_no_newline "Do you want to continue and edit? (y/N): "
+  read -r reply
+  if [[ "${reply}" =~ ^[yY]$ ]]; then
+    CK8S_AUTO_APPROVE=true _sbom_edit_component "${tmp_output_sbom_file}" "${location}" properties
+  fi
+
+  # prompt for manually set supplier
+  log_warning "Is the supplier still valid?"
+  sbom_get "${tmp_output_sbom_file}" "${location}" "supplier"
+  log_warning_no_newline "Do you want to continue and edit? (y/N): "
+  read -r reply
+  if [[ "${reply}" =~ ^[yY]$ ]]; then
+    CK8S_AUTO_APPROVE=true _sbom_edit_component "${tmp_output_sbom_file}" "${location}" supplier
+  fi
 
   # need to delete components and dependencies to not override first element in components array
   yq -i 'del(.components)' "${tmp_sbom_file}"
