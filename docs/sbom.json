@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:e4dde7b0-4fd3-45fb-afbd-7463507daced",
-  "version": 15,
+  "serialNumber": "urn:uuid:1f4e617b-4577-48ac-8f93-42caf2db83cf",
+  "version": 16,
   "metadata": {
-    "timestamp": "2025-05-30T14:25:13Z",
+    "timestamp": "2025-06-02T08:52:44Z",
     "tools": {
       "components": [
         {
@@ -36,10 +36,10 @@
     "component": {
       "group": "",
       "name": "welkin-apps",
-      "version": "e443a0d5b9a7ace0164947155de72f623f06b5cc",
+      "version": "b432174225686bc33494a5f6bb233c458ea633b3",
       "type": "application",
-      "bom-ref": "pkg:application/welkin-apps@e443a0d5b9a7ace0164947155de72f623f06b5cc",
-      "purl": "pkg:application/welkin-apps@e443a0d5b9a7ace0164947155de72f623f06b5cc"
+      "bom-ref": "pkg:application/welkin-apps@b432174225686bc33494a5f6bb233c458ea633b3",
+      "purl": "pkg:application/welkin-apps@b432174225686bc33494a5f6bb233c458ea633b3"
     },
     "properties": [
       {
@@ -3580,7 +3580,7 @@
       "dependsOn": []
     },
     {
-      "ref": "pkg:helm/ingress-nginx@4.12.3",
+      "ref": "pkg:helm/ingress-nginx@4.12.1",
       "dependsOn": [
         "pkg:oci/registry.k8s.io/defaultbackend-amd64:1.5",
         "pkg:oci/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2@sha256:e8825994b7a2c7497375a9b945f386506ca6a3eda80b89b74ef2db743f66a5ea",
@@ -3824,7 +3824,7 @@
   ],
   "compositions": [
     {
-      "bom-ref": "pkg:application/welkin-apps@e443a0d5b9a7ace0164947155de72f623f06b5cc",
+      "bom-ref": "pkg:application/welkin-apps@b432174225686bc33494a5f6bb233c458ea633b3",
       "aggregate": "incomplete"
     }
   ],
@@ -3832,7 +3832,7 @@
     {
       "bom-ref": "metadata-annotations",
       "subjects": [
-        "pkg:application/welkin-apps@e443a0d5b9a7ace0164947155de72f623f06b5cc"
+        "pkg:application/welkin-apps@b432174225686bc33494a5f6bb233c458ea633b3"
       ],
       "annotator": {
         "component": {
@@ -3850,8 +3850,8 @@
           ]
         }
       },
-      "timestamp": "2025-05-30T14:25:13Z",
-      "text": "This Software Bill-of-Materials (SBOM) document was created on Friday, May 30, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'welkin-apps' with version 'e443a0d5b9a7ace0164947155de72f623f06b5cc'. There are 85 components."
+      "timestamp": "2025-06-02T08:52:44Z",
+      "text": "This Software Bill-of-Materials (SBOM) document was created on Monday, June 2, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'welkin-apps' with version 'b432174225686bc33494a5f6bb233c458ea633b3'. There are 85 components."
     }
   ]
 }
