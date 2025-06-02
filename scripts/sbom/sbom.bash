@@ -10,8 +10,6 @@
 # - fragments
 #   - look at e.g. if git diff for a chart (location), should prompt to verify that evaluation and supplier is still correct
 #   - possibility to update one fragment/chart-location
-# - currently, chart location is the primary key that maps SBOM components to releases in Welkin, however, some places uses chart name + chart version for this mapping
-#   - change commands to utilize the chart location in most places?
 # - consistently update timestamp? e.g. when running sbom add or edit
 set -euo pipefail
 
@@ -700,6 +698,28 @@ sbom_update() {
 
   CK8S_AUTO_APPROVE=false
   CK8S_SKIP_VALIDATION=false
+
+  # prompt for manually set elastisys evaluation property
+  if ! "${CK8S_AUTO_APPROVE}"; then
+    log_warning "Is the Elastisys evaluation still valid?"
+    sbom_get "${tmp_sbom_file}" "${location}" "properties"
+    log_warning_no_newline "Do you want to continue and edit? (y/N): "
+    read -r reply
+    if [[ "${reply}" =~ ^[yY]$ ]]; then
+      _sbom_edit_component "${tmp_sbom_file}" "${location}" properties
+    fi
+  fi
+
+  # prompt for manually set supplier
+  if ! "${CK8S_AUTO_APPROVE}"; then
+    log_warning "Is the supplier still valid?"
+    sbom_get "${tmp_sbom_file}" "${location}" "supplier"
+    log_warning_no_newline "Do you want to continue and edit? (y/N): "
+    read -r reply
+    if [[ "${reply}" =~ ^[yY]$ ]]; then
+      _sbom_edit_component "${tmp_sbom_file}" "${location}" supplier
+    fi
+  fi
 
   tmp_output_sbom_file=$(mktemp --suffix=-output-sbom.json)
   append_trap "rm ${tmp_output_sbom_file} >/dev/null 2>&1" EXIT
