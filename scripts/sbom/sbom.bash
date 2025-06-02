@@ -96,7 +96,7 @@ _yq_run_query() {
     ask_continue
   fi
 
-  yq -i -o json "${query}" "${sbom_file}"
+  yq -o json -i "${query}" "${sbom_file}"
 }
 
 # function for updating values of existing components in a input sbom file
@@ -301,6 +301,7 @@ _add_dependencies() {
   log_info "Updating container dependencies"
 
   mapfile -t components < <(sbom_get_charts "${sbom_file}")
+
   for component in "${components[@]}"; do
     location=$(jq -r '.location' <<<"${component}")
     component_bom_ref=$(sbom_get "${sbom_file}" "${location}" | jq -r '."bom-ref"')
@@ -412,7 +413,7 @@ _generate_helmfile_template_file() {
 
   select_query='.[] | select(.enabled == true and .installed == true) | {"location": .chart, "name": .name}'
   if [[ "$#" -gt 1 ]]; then
-    location="${2#"${ROOT}/helmfile.d"}"
+    location="${2#"${ROOT}/helmfile.d/"}"
     select_query=".[] | select(.enabled == true and .installed == true and .chart == \"${location}\") | {\"location\": .chart, \"name\": .name}"
   fi
 
@@ -592,7 +593,7 @@ sbom_get() {
     query=".components[] | select(.evidence.occurrences[0].location == \"${location}\") | .${key}"
   fi
 
-  yq -o json "${query}" "${sbom_file}"
+  yq -e -o json "${query}" "${sbom_file}"
 }
 
 sbom_get_unset() {
@@ -703,24 +704,32 @@ sbom_update() {
   tmp_output_sbom_file=$(mktemp --suffix=-output-sbom.json)
   append_trap "rm ${tmp_output_sbom_file} >/dev/null 2>&1" EXIT
 
+  # merge components array based on location key
   # query reference: https://mikefarah.gitbook.io/yq/operators/multiply-merge#merge-arrays-of-objects-together-matching-on-a-key
   # shellcheck disable=SC2016
   idPath=".evidence.occurrences[0].location" components=".components" yq eval-all '
   (
-    (( (eval(strenv(components)) + eval(strenv(components)))  | .[] | {(eval(strenv(idPath))):  .}) as $item ireduce ({}; . * $item )) as $uniqueMap
+    (( .components[] | {(eval(strenv(idPath))):  .}) as $item ireduce ({}; . * $item )) as $uniqueMap
     | ( $uniqueMap  | to_entries | .[]) as $item ireduce([]; . + $item.value)
   ) as $mergedArray
   | select(fi == 0) | (eval(strenv(components))) = $mergedArray
   ' "${SBOM_FILE}" "${tmp_sbom_file}" >"${tmp_output_sbom_file}"
 
+  # when the version changes, the bom-ref gets changed, hence, the dependency for the old version needs to be deleted manually
+  old_bom_ref=$(sbom_get "${SBOM_FILE}" "${location}" | jq -r '."bom-ref"')
+
+  # merge old dependency for component with new
+  yq -i "with(.dependencies[]; select(.ref == \"${old_bom_ref}\") = load(\"${tmp_sbom_file}\").dependencies[0])" "${tmp_output_sbom_file}"
+
   sbom_cyclonedx_validation "${tmp_output_sbom_file}"
 
   diff -U3 --color=always "${SBOM_FILE}" "${tmp_output_sbom_file}" && log_info "No change" && exit 0
 
-  # need to delete components to not override first element in components array
+  # need to delete components and dependencies to not override first element in components array
   yq -i 'del(.components)' "${tmp_sbom_file}"
+  yq -i 'del(.dependencies)' "${tmp_sbom_file}"
   # merges with cdxgen template to get timestamp and project version updated
-  yq -i eval-all 'select(fileIndex == 0) *d select(fileIndex == 1)' "${tmp_output_sbom_file}" "${tmp_sbom_file}"
+  yq -o json -i eval-all 'select(fileIndex == 0) *d select(fileIndex == 1)' "${tmp_output_sbom_file}" "${tmp_sbom_file}"
 
   log_warning_no_newline "Do you want to replace SBOM file? (y/N): "
   read -r reply
