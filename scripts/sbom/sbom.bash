@@ -7,9 +7,6 @@
 #   - any other objects added manually will be removed when running generate
 # - include images for all configurations? (e.g. different cloud providers can have unique images/charts)
 # - include licenses for images?
-# - fragments
-#   - look at e.g. if git diff for a chart (location), should prompt to verify that evaluation and supplier is still correct
-#   - possibility to update one fragment/chart-location
 # - consistently update timestamp? e.g. when running sbom add or edit
 set -euo pipefail
 
@@ -54,6 +51,9 @@ _init_welkin_config() {
   # append_trap "gpg.teardown" EXIT
   env.setup >/dev/null 2>&1
   env.init "${@}"
+  yq.set 'common' '.kured.enabled' 'true'
+  yq.set 'common' '.kyverno.enabled' 'true'
+  yq.set 'common' '.gpu.enabled' 'true'
 }
 
 sbom_cyclonedx_validation() {

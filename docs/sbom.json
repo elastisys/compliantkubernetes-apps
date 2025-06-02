@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:1f4e617b-4577-48ac-8f93-42caf2db83cf",
-  "version": 16,
+  "serialNumber": "urn:uuid:f58303bb-0d6c-4eb6-8ee2-e94a936ac424",
+  "version": 17,
   "metadata": {
-    "timestamp": "2025-06-02T08:52:44Z",
+    "timestamp": "2025-06-02T14:47:24Z",
     "tools": {
       "components": [
         {
@@ -36,10 +36,10 @@
     "component": {
       "group": "",
       "name": "welkin-apps",
-      "version": "b432174225686bc33494a5f6bb233c458ea633b3",
+      "version": "46feddf04eb88f01d865d2507a448808ea813639",
       "type": "application",
-      "bom-ref": "pkg:application/welkin-apps@b432174225686bc33494a5f6bb233c458ea633b3",
-      "purl": "pkg:application/welkin-apps@b432174225686bc33494a5f6bb233c458ea633b3"
+      "bom-ref": "pkg:application/welkin-apps@46feddf04eb88f01d865d2507a448808ea813639",
+      "purl": "pkg:application/welkin-apps@46feddf04eb88f01d865d2507a448808ea813639"
     },
     "properties": [
       {
@@ -1040,6 +1040,20 @@
             "name": "Apache License 2.0"
           }
         }
+      ],
+      "components": [
+        {
+          "name": "nvcr.io/nvidia/gpu-operator",
+          "version": "v24.9.2",
+          "type": "container",
+          "bom-ref": "pkg:oci/nvcr.io/nvidia/gpu-operator:v24.9.2"
+        },
+        {
+          "name": "registry.k8s.io/nfd/node-feature-discovery",
+          "version": "v0.16.6",
+          "type": "container",
+          "bom-ref": "pkg:oci/registry.k8s.io/nfd/node-feature-discovery:v0.16.6"
+        }
       ]
     },
     {
@@ -1896,6 +1910,14 @@
             "name": "Apache License 2.0"
           }
         }
+      ],
+      "components": [
+        {
+          "name": "ghcr.io/kubereboot/kured",
+          "version": "1.17.0",
+          "type": "container",
+          "bom-ref": "pkg:oci/ghcr.io/kubereboot/kured:1.17.0"
+        }
       ]
     },
     {
@@ -1933,6 +1955,38 @@
           "license": {
             "name": "Apache License 2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "busybox",
+          "version": "1.35",
+          "type": "container",
+          "bom-ref": "pkg:oci/busybox:1.35"
+        },
+        {
+          "name": "ghcr.io/kyverno/kyvernopre",
+          "version": "v1.13.4",
+          "type": "container",
+          "bom-ref": "pkg:oci/ghcr.io/kyverno/kyvernopre:v1.13.4"
+        },
+        {
+          "name": "ghcr.io/kyverno/kyverno",
+          "version": "v1.13.4",
+          "type": "container",
+          "bom-ref": "pkg:oci/ghcr.io/kyverno/kyverno:v1.13.4"
+        },
+        {
+          "name": "bitnami/kubectl",
+          "version": "1.30.2",
+          "type": "container",
+          "bom-ref": "pkg:oci/bitnami/kubectl:1.30.2"
+        },
+        {
+          "name": "ghcr.io/kyverno/kyverno-cli",
+          "version": "v1.13.4",
+          "type": "container",
+          "bom-ref": "pkg:oci/ghcr.io/kyverno/kyverno-cli:v1.13.4"
         }
       ]
     },
@@ -3514,7 +3568,10 @@
     },
     {
       "ref": "pkg:helm/gpu-operator@v24.9.2",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:oci/nvcr.io/nvidia/gpu-operator:v24.9.2",
+        "pkg:oci/registry.k8s.io/nfd/node-feature-discovery:v0.16.6"
+      ]
     },
     {
       "ref": "pkg:helm/grafana-dashboards@0.3.0",
@@ -3628,11 +3685,19 @@
     },
     {
       "ref": "pkg:helm/kured@5.6.0",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:oci/ghcr.io/kubereboot/kured:1.17.0"
+      ]
     },
     {
       "ref": "pkg:helm/kyverno@3.3.6",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:oci/busybox:1.35",
+        "pkg:oci/ghcr.io/kyverno/kyvernopre:v1.13.4",
+        "pkg:oci/ghcr.io/kyverno/kyverno:v1.13.4",
+        "pkg:oci/bitnami/kubectl:1.30.2",
+        "pkg:oci/ghcr.io/kyverno/kyverno-cli:v1.13.4"
+      ]
     },
     {
       "ref": "pkg:helm/letsencrypt@0.1.0",
@@ -3824,7 +3889,7 @@
   ],
   "compositions": [
     {
-      "bom-ref": "pkg:application/welkin-apps@b432174225686bc33494a5f6bb233c458ea633b3",
+      "bom-ref": "pkg:application/welkin-apps@46feddf04eb88f01d865d2507a448808ea813639",
       "aggregate": "incomplete"
     }
   ],
@@ -3832,7 +3897,7 @@
     {
       "bom-ref": "metadata-annotations",
       "subjects": [
-        "pkg:application/welkin-apps@b432174225686bc33494a5f6bb233c458ea633b3"
+        "pkg:application/welkin-apps@46feddf04eb88f01d865d2507a448808ea813639"
       ],
       "annotator": {
         "component": {
@@ -3850,8 +3915,8 @@
           ]
         }
       },
-      "timestamp": "2025-06-02T08:52:44Z",
-      "text": "This Software Bill-of-Materials (SBOM) document was created on Monday, June 2, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'welkin-apps' with version 'b432174225686bc33494a5f6bb233c458ea633b3'. There are 85 components."
+      "timestamp": "2025-06-02T14:47:24Z",
+      "text": "This Software Bill-of-Materials (SBOM) document was created on Monday, June 2, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'welkin-apps' with version '46feddf04eb88f01d865d2507a448808ea813639'. There are 85 components."
     }
   ]
 }
