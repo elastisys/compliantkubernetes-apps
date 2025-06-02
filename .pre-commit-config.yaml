@@ -95,14 +95,22 @@ repos:
         types: [shell]
         language: script
         require_serial: true
-        entry: scripts/sbom/sbom.bash diff
+        entry: scripts/sbom/sbom.bash
+        args:
+          - diff
 
       - id: sbom-validate
         name: SBOM CycloneDX validation
         types: [shell]
         language: script
         require_serial: true
-        entry: scripts/sbom/sbom.bash validate
+        entry: scripts/run-from-container.sh
+        args:
+          - --network=none
+          - docker.io/cyclonedx/cyclonedx-cli:0.27.2
+          - validate
+          - --input-file
+          - docs/sbom.json
 
       # - id: sbom-get-unset
       #   name: SBOM get unset
