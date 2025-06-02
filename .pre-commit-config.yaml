@@ -90,6 +90,39 @@ repos:
           - docker.io/mvdan/shfmt:v3.10.0@sha256:d19cc37644449fe9a488f234d2c0cf0b770eaf6a5a40e30103e8099013ef8f9e
           - -w
 
+      - id: sbom-diff
+        name: SBOM diff
+        types: [shell]
+        language: script
+        require_serial: true
+        entry: scripts/sbom/sbom.bash
+        args:
+          - diff
+
+      - id: sbom-validate
+        name: SBOM CycloneDX validation
+        types: [shell]
+        language: script
+        require_serial: true
+        files: 'docs\/sbom\.json'
+        always_run: true
+        pass_filenames: false
+        entry: scripts/run-from-container.sh
+        args:
+          - --network=none
+          - docker.io/cyclonedx/cyclonedx-cli@sha256:829c9ea8f2104698bc3c1228575bfa495f6cc4ec151329323c013ca94408477f
+          - validate
+          - --fail-on-errors
+          - --input-file
+          - docs/sbom.json
+
+      # - id: sbom-get-unset
+      #   name: SBOM get unset
+      #   types: [shell]
+      #   language: script
+      #   require_serial: true
+      #   entry: scripts/sbom/sbom.bash get-unset
+
   - repo: https://github.com/codespell-project/codespell
     rev: v2.3.0
     hooks:
@@ -105,6 +138,6 @@ repos:
     hooks:
       - id: markdownlint-cli2
         name: lint markdown files
-        exclude: ^changelog/|^docs/sbom.md$|^helmfile\.d/charts/opensearch/configurer/files/|^helmfile\.d/upstream/|^images/elasticsearch-curator/
+        exclude: ^changelog/|^docs/sbom-v0.37/sbom.md$|^helmfile\.d/charts/opensearch/configurer/files/|^helmfile\.d/upstream/|^images/elasticsearch-curator/
         args:
           - --fix

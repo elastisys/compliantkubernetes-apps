@@ -11,6 +11,7 @@ source "${here}/common.bash"
 usage() {
   echo "COMMANDS:" 1>&2
   echo "  apply <wc|sc> [--sync] [--concurrency=<num>]    deploy the apps" 1>&2
+  echo "  check-requirements                              check the locally installed tool versions" 1>&2
   echo "  clean <wc|sc>                                   Cleans the cluster of apps" 1>&2
   echo "  completion <bash|fish>                          output shell completion code for bash/fish" 1>&2
   echo "  diagnostics <wc|sc> [--help]                    Runs diagnostics of apps" 1>&2
@@ -36,7 +37,6 @@ usage() {
   echo "  upgrade <wc|sc|both> <vX.Y> apply               runs all apply steps upgrading the environment" 1>&2
   echo "  upgrade <wc|sc|both> <vX.Y> prepare             runs all prepare steps upgrading the configuration" 1>&2
   echo "  validate <wc|sc>                                validates config files" 1>&2
-  echo "  check-requirements                              check the locally installed tool versions" 1>&2
   exit 1
 }
 

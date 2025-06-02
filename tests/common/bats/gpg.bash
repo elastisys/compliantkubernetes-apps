@@ -49,6 +49,16 @@ gpg.setup() {
   export CK8S_PGP_FP
 }
 
+gpg.setup_one() {
+  GNUPGHOME="$(mktemp --directory)"
+  export GNUPGHOME
+
+  gpg.auto_generate_key_retry "Key one"
+
+  CK8S_PGP_FP="$(gpg --list-secret-keys --with-colons | grep -A1 '^sec' | grep '^fpr' | awk -F: '{print $10}' | paste -sd "," -)"
+  export CK8S_PGP_FP
+}
+
 # Deletes the temporary gpg home
 gpg.teardown() {
   rm -rf "${GNUPGHOME}"
