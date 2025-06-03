@@ -15,6 +15,8 @@ skipped_sc=(
 )
 declare -a skipped_wc
 skipped_wc=(
+  "app!=prometheus"
+  "app!=app=dev-rbac"
 )
 
 run() {

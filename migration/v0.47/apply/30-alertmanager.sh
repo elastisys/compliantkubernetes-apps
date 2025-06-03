@@ -37,7 +37,7 @@ run() {
         -o jsonpath='{.data.alertmanager\.yaml}' | base64 -d >alertmanager.yaml
 
       if [[ ! -s alertmanager.yaml ]]; then
-        log_fatal "Extracted alertmanager.yaml is empty or missing."
+        log_warn "Extracted alertmanager.yaml is empty or missing — likely already migrated."
       fi
 
       # Patch the new kube-prometheus-stack secret with the old config
