@@ -26,41 +26,43 @@ run() {
       log_info "Applying kube-prometheus-stack chart in WC..."
       helmfile_apply wc app=prometheus
 
-      #upgrading user-rbac to add roles for alertmanager
       log_info "Applying dev-rbac chart in WC..."
       helmfile_apply wc app=dev-rbac
 
-      #Extract alertmanager config from old secret
       log_info "Extracting alertmanager.yaml from old secret..."
 
       kubectl_do wc get secret alertmanager-alertmanager -n alertmanager \
-        -o jsonpath='{.data.alertmanager\.yaml}' | base64 -d >alertmanager.yaml
+        -o jsonpath='{.data.alertmanager\.yaml}' 2>/dev/null | base64 -d >alertmanager.yaml || true
 
       if [[ ! -s alertmanager.yaml ]]; then
-        log_warn "Extracted alertmanager.yaml is empty or missing — likely already migrated."
+        log_warn "alertmanager.yaml is empty or missing — likely already migrated."
       fi
 
-      # Patch the new kube-prometheus-stack secret with the old config
-      log_info "Patching new kube-prometheus-stack Alertmanager secret..."
+      # Patch the new secret with old config, only if alertmanager.yaml exists and is non-empty
+      if [[ -s alertmanager.yaml ]]; then
+        log_info "Patching new kube-prometheus-stack Alertmanager secret..."
 
-      kubectl_do wc patch secret alertmanager-kube-prometheus-stack-alertmanager -n alertmanager -p "{\"data\":{\"alertmanager.yaml\":\"$(base64 -w 0 <alertmanager.yaml)\"}}"
+        kubectl_do wc patch secret alertmanager-kube-prometheus-stack-alertmanager -n alertmanager \
+          -p "{\"data\":{\"alertmanager.yaml\":\"$(base64 -w 0 <alertmanager.yaml)\"}}"
 
-      patch_exit=$?
+        patch_exit=$?
 
-      if [[ $patch_exit -eq 0 ]]; then
-        log_info "Secret patched successfully."
+        if [[ $patch_exit -eq 0 ]]; then
+          log_info "Secret patched successfully."
 
-        # Delete the old secret
-        log_info "Deleting old alertmanager-alertmanager secret..."
-        kubectl_delete wc secret alertmanager alertmanager-alertmanager
-        log_info "Old secret deleted."
+          # Delete the old secret
+          log_info "Deleting old alertmanager-alertmanager secret..."
+          kubectl_delete wc secret alertmanager alertmanager-alertmanager
+          log_info "Old secret deleted."
 
-        # Cleanup
-        rm alertmanager.yaml
+          # Cleanup
+          rm alertmanager.yaml
+        else
+          log_error "Failed to patch the kube-prometheus-stack secret. Skipping deletion of old secret."
+        fi
       else
-        log_error "Failed to patch the kube-prometheus-stack secret. Skipping deletion of old secret."
+        log_warn "Skipping patch: alertmanager.yaml is missing or empty — likely already migrated."
       fi
-
     fi
     ;;
   rollback)
