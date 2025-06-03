@@ -2,17 +2,17 @@
 /* @elastisys/product-architect
 
 
-/.github/ @elastisys/goto-pipeline-qa-release
-/.vscode/ @elastisys/goto-pipeline-qa-release
+/.github/ @elastisys/goto-qa
+/.vscode/ @elastisys/goto-qa
 
 /bin/ @elastisys/goto-scripts
 
-/changelog/ @elastisys/goto-pipeline-qa-release
+/changelog/ @elastisys/goto-qa
 
 /completion/ @elastisys/goto-scripts
 
-/docs/sbom* @elastisys/goto-pipeline-qa-release
-/docs/application-developer-dev-kubeconifg.md @elastisys/goto-pipeline-qa-release
+/docs/sbom* @elastisys/goto-qa
+/docs/application-developer-dev-kubeconifg.md @elastisys/goto-qa
 
 /helmfile.d/bases/ @elastisys/goto-scripts
 
@@ -85,7 +85,7 @@
 /helmfile.d/stacks/harbor.yaml @elastisys/goto-container-registry
 /helmfile.d/stacks/ingress-nginx.yaml @elastisys/goto-ingress-auth
 /helmfile.d/stacks/kured.yaml @elastisys/goto-security
-/helmfile.d/stacks/local.yaml @elastisys/goto-pipeline-qa-release
+/helmfile.d/stacks/local.yaml @elastisys/goto-qa
 /helmfile.d/stacks/monitoring-grafana.yaml @elastisys/goto-monitoring-stack
 /helmfile.d/stacks/monitoring-prometheus.yaml @elastisys/goto-monitoring-stack
 /helmfile.d/stacks/monitoring.yaml @elastisys/goto-monitoring-stack
@@ -120,7 +120,7 @@
 /helmfile.d/upstream/kubernetes-ingress-nginx/ @elastisys/goto-ingress-auth
 /helmfile.d/upstream/kubernetes-metrics-server/ @elastisys/goto-monitoring-stack
 /helmfile.d/upstream/kyverno/ @elastisys/goto-access-control
-/helmfile.d/upstream/minio/ @elastisys/goto-pipeline-qa-release
+/helmfile.d/upstream/minio/ @elastisys/goto-qa
 /helmfile.d/upstream/open-policy-agent-gatekeeper/ @elastisys/goto-access-control
 /helmfile.d/upstream/opensearch-project/ @elastisys/goto-logging-stack
 /helmfile.d/upstream/projectcalico/ @elastisys/goto-networking
@@ -181,7 +181,7 @@
 /helmfile.d/values/kyverno.yaml.gotmpl @elastisys/goto-access-control
 /helmfile.d/values/letsencrypt.yaml.gotmpl @elastisys/goto-ingress-auth
 /helmfile.d/values/metrics-server.yaml.gotmpl @elastisys/goto-monitoring-stack
-/helmfile.d/values/minio.yaml.gotmpl @elastisys/goto-pipeline-qa-release
+/helmfile.d/values/minio.yaml.gotmpl @elastisys/goto-qa
 /helmfile.d/values/node-local-dns.yaml.gotmpl @elastisys/goto-networking
 /helmfile.d/values/openstack-monitoring.yaml.gotmpl @elastisys/goto-kubespray
 /helmfile.d/values/prometheus-alerts-sc.yaml.gotmpl @elastisys/goto-monitoring-stack
@@ -225,11 +225,11 @@
 # curl-jq/
 #
 
-/migration/ @elastisys/goto-pipeline-qa-release
+/migration/ @elastisys/goto-qa
 
-/pipeline/ @elastisys/goto-pipeline-qa-release
+/pipeline/ @elastisys/goto-qa
 
-/release/ @elastisys/goto-pipeline-qa-release
+/release/ @elastisys/goto-qa
 
 /restore/harbor/ @elastisys/goto-container-registry
 /restore/rclone/ @elastisys/goto-backups
@@ -242,21 +242,21 @@
 
 /scripts/ @elastisys/goto-scripts
 /scripts/azure/ @elastisys/goto-azure
-/scripts/bom/ @elastisys/goto-pipeline-qa-release
+/scripts/bom/ @elastisys/goto-qa
 /scripts/grafana-dashboards @elastisys/goto-monitoring-stack
-/scripts/migration/ @elastisys/goto-pipeline-qa-release
-/scripts/report/ @elastisys/goto-pipeline-qa-release
-/scripts/sbom/ @elastisys/goto-pipeline-qa-release
+/scripts/migration/ @elastisys/goto-qa
+/scripts/report/ @elastisys/goto-qa
+/scripts/sbom/ @elastisys/goto-qa
 
 
-/tests/ @elastisys/goto-pipeline-qa-release
+/tests/ @elastisys/goto-qa
 
 #
 # /
 #
 
-/.editorconfig @elastisys/goto-pipeline-qa-release
-/.pre-commit-config.yaml @elastisys/goto-pipeline-qa-release
+/.editorconfig @elastisys/goto-qa
+/.pre-commit-config.yaml @elastisys/goto-qa
 /DEVELOPMENT.md @elastisys/goto-scripts
 /LICENSE @cristiklein
 /README.md @elastisys/goto-public-docs
