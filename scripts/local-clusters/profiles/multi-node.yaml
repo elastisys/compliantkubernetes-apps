@@ -8,6 +8,8 @@ networking:
   serviceSubnet: 10.96.0.0/12
 nodes:
   - role: control-plane
+    labels:
+      elastisys.io/node-group: control-plane
   - role: worker
     extraPortMappings:
       - containerPort: 30080
@@ -18,5 +20,11 @@ nodes:
         hostPort: 443
         listenAddress: ${CK8S_LOCAL_LISTEN_ADDRESS}
         protocol: TCP
+    labels:
+      elastisys.io/node-group: worker
   - role: worker
+    labels:
+      elastisys.io/node-group: worker
   - role: worker
+    labels:
+      elastisys.io/node-group: worker
