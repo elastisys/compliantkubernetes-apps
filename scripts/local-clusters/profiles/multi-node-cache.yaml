@@ -16,6 +16,8 @@ nodes:
       - containerPath: /etc/containerd/certs.d
         hostPath: ${ROOT}/scripts/local-clusters/registries
         readOnly: true
+    labels:
+      elastisys.io/node-group: control-plane
   - role: worker
     extraMounts:
       - containerPath: /etc/containerd/certs.d
@@ -30,13 +32,19 @@ nodes:
         hostPort: 443
         listenAddress: ${CK8S_LOCAL_LISTEN_ADDRESS}
         protocol: TCP
+    labels:
+      elastisys.io/node-group: worker
   - role: worker
     extraMounts:
       - containerPath: /etc/containerd/certs.d
         hostPath: ${ROOT}/scripts/local-clusters/registries
         readOnly: true
+    labels:
+      elastisys.io/node-group: worker
   - role: worker
     extraMounts:
       - containerPath: /etc/containerd/certs.d
         hostPath: ${ROOT}/scripts/local-clusters/registries
         readOnly: true
+    labels:
+      elastisys.io/node-group: worker

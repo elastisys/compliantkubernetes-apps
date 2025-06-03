@@ -9,6 +9,9 @@ ROOT="$(readlink -f "${here}/../")"
 CK8S_STACK="$(basename "$0")"
 export CK8S_STACK
 
+# shellcheck source=bin/common.bash
+source "${here}/common.bash"
+
 # shellcheck source=scripts/migration/lib.sh
 CK8S_ROOT_SCRIPT="true" source "${ROOT}/scripts/migration/lib.sh"
 
