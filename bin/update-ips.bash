@@ -485,15 +485,16 @@ allow_nodes() {
 
 # Updates the configuration to allow the subnet.
 #
-# Usage: allow_subnet <cluster> <config_option>
+# Usage: allow_subnet <cluster> <config_option> <label>
 allow_subnet() {
   local cluster="${1}"
   local config_option="${2}"
+  local label="${3}"
 
   # Allowing the subnet is currently only supported for clusters setup with
   # CAPI on OpenStack. Fallback on allowing individual nodes otherwise.
   if [ "$(yq_read "${cluster}" '.global.ck8sK8sInstaller' "")" != "capi" ] || [ "$(yq_read "${cluster}" '.global.ck8sCloudProvider' "")" != "openstack" ]; then
-    allow_nodes "${cluster}" "${config_option}" ""
+    allow_nodes "${cluster}" "${config_option}" "${label}"
     return
   fi
 
@@ -521,7 +522,13 @@ allow_subnet() {
 
   # Fallback on allowing individual nodes if the cluster is still not found.
   if ! "${here}/ops.bash" kubectl sc -n capi-cluster get openstackcluster "${capi_cluster_name}"; then
-    allow_nodes "${cluster}" "${config_option}" ""
+    allow_nodes "${cluster}" "${config_option}" "${label}"
+    return
+  fi
+
+  if [ "$(kubectl -n capi-cluster get openstackcluster "${capi_cluster_name}" -o jsonpath='{.status.network.subnets}' | jq length)" -gt "1" ]; then
+    log_warning "Found more than one subnet. This is currently not supported by update-ips. Falling back on allowing indivudal node IPs."
+    allow_nodes "${cluster}" "${config_option}" "${label}"
     return
   fi
 
@@ -529,7 +536,7 @@ allow_subnet() {
   subnet_cidr=$("${here}/ops.bash" kubectl sc -n capi-cluster get openstackcluster "${capi_cluster_name}" -o jsonpath='{.status.network.subnets[0].cidr}')
 
   local -a tunnel_ips
-  readarray -t tunnel_ips <<<"$(get_tunnel_ips "${cluster}" "" | tr ' ' '\n')"
+  readarray -t tunnel_ips <<<"$(get_tunnel_ips "${cluster}" "${label}" | tr ' ' '\n')"
 
   local -a cidrs
   readarray -t cidrs <<<"$(process_ips_to_cidrs "${config_file}" "${config_option}" "${tunnel_ips[@]}")"
@@ -739,8 +746,8 @@ fi
 allow_ingress
 
 if [[ "${check_cluster}" =~ ^(sc|both)$ ]]; then
-  allow_nodes "sc" '.networkPolicies.global.scApiserver.ips' "node-role.kubernetes.io/control-plane="
-  allow_subnet "sc" '.networkPolicies.global.scNodes.ips'
+  allow_subnet "sc" '.networkPolicies.global.scApiserver.ips' "node-role.kubernetes.io/control-plane="
+  allow_subnet "sc" '.networkPolicies.global.scNodes.ips' ""
 
   if swift_enabled; then
     sync_swift '.objectStorage.swift' '.networkPolicies.global.objectStorageSwift'
@@ -748,8 +755,8 @@ if [[ "${check_cluster}" =~ ^(sc|both)$ ]]; then
 fi
 
 if [[ "${check_cluster}" =~ ^(wc|both)$ ]]; then
-  allow_nodes "wc" '.networkPolicies.global.wcApiserver.ips' "node-role.kubernetes.io/control-plane="
-  allow_subnet "wc" '.networkPolicies.global.wcNodes.ips'
+  allow_subnet "wc" '.networkPolicies.global.wcApiserver.ips' "node-role.kubernetes.io/control-plane="
+  allow_subnet "wc" '.networkPolicies.global.wcNodes.ips' ""
 fi
 
 if rclone_enabled; then
