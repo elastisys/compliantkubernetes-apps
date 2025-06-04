@@ -521,7 +521,7 @@ allow_subnet() {
   fi
 
   # Fallback on allowing individual nodes if the cluster is still not found.
-  if ! "${here}/ops.bash" kubectl sc -n capi-cluster get openstackcluster "${capi_cluster_name}"; then
+  if ! "${here}/ops.bash" kubectl sc -n capi-cluster get openstackcluster "${capi_cluster_name}" >/dev/null 2>&1; then
     allow_nodes "${cluster}" "${config_option}" "${label}"
     return
   fi
