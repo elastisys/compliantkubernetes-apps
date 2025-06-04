@@ -2431,6 +2431,12 @@ properties:
 
               Generally `false` when using AWS, Exoscale, and UpCloud and `true` for other providers.
             type: boolean
+          v2Auth:
+            title: S3 v2 authentication
+            description: |-
+              Force the use of v2 authentication, will default to using v4 authentication otherwise.
+            type: boolean
+            default: false
       swift:
         additionalProperties: false
         title: Swift Backend Config
