@@ -15,12 +15,12 @@ setup() {
   load_assert
 }
 
-declare -a _clusters=("sc" "wc")
+declare -a clusters=("sc" "wc")
 
-for _cluster in "${_clusters[@]}"; do
+for cluster in "${clusters[@]}"; do
   bats_test_function \
-    --description "${_cluster^^} apps checks should pass" \
-    -- apps_checks "${_cluster}"
+    --description "${cluster^^} apps checks should pass" \
+    -- apps_checks "${cluster}"
 done
 
 apps_checks() {

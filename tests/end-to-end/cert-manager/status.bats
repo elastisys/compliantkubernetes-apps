@@ -15,12 +15,12 @@ setup() {
   load_assert
 }
 
-declare -a _clusters=("sc" "wc")
+declare -a clusters=("sc" "wc")
 
-for _cluster in "${_clusters[@]}"; do
+for cluster in "${clusters[@]}"; do
   bats_test_function \
-    --description "${_cluster^^} cert-manager status should be OK" \
-    -- cert_manager_should_be_ok "${_cluster}"
+    --description "${cluster^^} cert-manager status should be OK" \
+    -- cert_manager_should_be_ok "${cluster}"
 done
 
 cert_manager_should_be_ok() {
