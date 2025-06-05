@@ -56,13 +56,13 @@ while [ "${#}" -gt 0 ]; do
 done
 
 log_self_managed_notice() {
-  log_warning "WARNING: Notice for self-managed customers:"
+  log_warning "WARNING: Notice for Welkin Enterprise customers:"
 
-  echo -e "\tIf you are an Elastisys self-managed customer, you can send diagnostic data to Elastisys." 1>&2
+  echo -e "\tIf you are an Elastisys Welkin Enterprise customer, you can send diagnostic data to Elastisys." 1>&2
   echo -e "\tMake sure to store GPG keys retrieved during onboarding in a file named:\n" 1>&2
   echo -e "\t\${CK8S_CONFIG_PATH}/diagnostics_receiver.gpg\n" 1>&2
 
-  echo -e "\tIf you are an Elastisys self-managed customer, you get support by contacting sme-support@elastisys.com\n" 1>&2
+  echo -e "\tIf you are an Elastisys Welkin Enterprise customer, you get support by contacting welkin-enterprise-support@elastisys.com\n" 1>&2
 
   usage
 }
