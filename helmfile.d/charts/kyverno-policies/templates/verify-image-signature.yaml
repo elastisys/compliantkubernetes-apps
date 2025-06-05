@@ -48,7 +48,7 @@ spec:
                   publicKeys: {{`"{{ entries.data.attestors }}"`}}
                   rekor:
                     ignoreTlog: {{ .Values.verifyImageSignature.ignoreRekorTlog }}
-              {{- else if eq .Values.verifyImageSignature.certificates "Notary" }}
+              {{- else if eq .Values.verifyImageSignature.type "Notary" }}
               - certificates:
                   cert: {{`"{{ entries.data.attestors }}"`}}
               {{- end }}
