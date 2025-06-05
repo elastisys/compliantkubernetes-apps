@@ -434,8 +434,6 @@ grafanaLabelEnforcer:
       memory: 20Mi
 
 prometheus:
-  retention:
-    alertmanager: 72h
   s3BucketAlerts:
     # alert on each individual bucket
     size:
@@ -454,23 +452,8 @@ prometheus:
     exclude: []
   # Todo remove dependency on alertmanager from service cluster
   alertmanagerSpec:
-    replicas: 2
     groupBy:
       - '...'
-    resources:
-      requests:
-        cpu: 10m
-        memory: 50Mi
-      limits:
-        cpu: 50m
-        memory: 100Mi
-    storage:
-      volumeClaimTemplate:
-        spec:
-          accessModes: ["ReadWriteOnce"]
-          resources:
-            requests:
-              storage: 1Gi
     topologySpreadConstraints:
       - labelSelector:
           matchLabels:
@@ -479,7 +462,6 @@ prometheus:
         maxSkew: 1
         topologyKey: kubernetes.io/hostname
         whenUnsatisfiable: DoNotSchedule
-    affinity: {}
     #image:
     # registry: registry.example.com
     # repository: prometheus/alertmanager

@@ -8,13 +8,13 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: alertmanager-configurer
-  namespace: alertmanager
+  namespace: {{ .Values.alertmanagerNamespace }}
 rules:
 # Allow editing the alertmanager-alertmanager secret
 - apiGroups:
   - ""
   resourceNames:
-  - alertmanager-alertmanager
+  - alertmanager-kube-prometheus-stack-alertmanager
   resources:
   - secrets
   verbs:
@@ -34,19 +34,6 @@ rules:
   - get
   - create
   - delete
-# Allow editing the user-alertmanager-auth secret
-- apiGroups:
-  - ""
-  resourceNames:
-  - user-alertmanager-auth
-  resources:
-  - secrets
-  verbs:
-  - get
-  - list
-  - watch
-  - update
-  - patch
 # Allow creating rolebindings (to give others permission to configure alertmanager)
 - apiGroups:
   - rbac.authorization.k8s.io
@@ -69,6 +56,17 @@ rules:
   - roles
   verbs:
   - bind
+# Allow getting pods
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  resourceNames:
+  - alertmanager-kube-prometheus-stack-alertmanager-0
+  - alertmanager-kube-prometheus-stack-alertmanager-1
+# Allow creating port-forward
 - apiGroups:
   - ""
   resources:
@@ -76,4 +74,5 @@ rules:
   verbs:
   - create
   resourceNames:
-  - alertmanager-alertmanager-0
+  - alertmanager-kube-prometheus-stack-alertmanager-0
+  - alertmanager-kube-prometheus-stack-alertmanager-1
