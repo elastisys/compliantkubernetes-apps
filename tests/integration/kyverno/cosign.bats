@@ -11,6 +11,7 @@ setup_file() {
   yq.set wc '.kyverno.enabled' true
   yq.set wc '.kyverno.policies.verifyImageSignature.enabled' true
   yq.set wc '.kyverno.policies.verifyImageSignature.type' '"Cosign"'
+  yq.set wc '.kyverno.policies.verifyImageSignature.ignoreRekorTlog' true
   yq.set wc '.kyverno.policies.verifyImageSignature.attestors' \
 '"-----BEGIN PUBLIC KEY-----
 MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEoL0XMcv0rXFo41ZDoVJHzHaelPn9
