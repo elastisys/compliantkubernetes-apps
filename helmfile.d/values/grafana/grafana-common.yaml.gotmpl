@@ -21,9 +21,42 @@ persistence:
     - ReadWriteOnce
   lookupVolumeName: false
 
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
 sidecar:
   dashboards:
     enabled: true
+  {{- with .Values.images | dig "monitoring" "grafanaSidecar" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  image:
+    {{- with .registry }}
+    registry: {{ . }}
+    {{- end }}
+    {{- with join "/" (compact (list .repository .image)) }}
+    repository: {{ . }}
+    {{- end }}
+    {{- if or .tag .digest }}
+    tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+    {{- end }}
+  {{- end }}
+  {{- end }}
+
+{{- with .Values.images | dig "monitoring" "grafana" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+image:
+  {{- with .registry }}
+  registry: {{ . }}
+  {{- end }}
+  {{- with join "/" (compact (list .repository .image)) }}
+  repository: {{ . }}
+  {{- end }}
+  {{- if or .tag .digest }}
+  tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+  {{- end }}
+{{- end }}
+{{- end }}
 
 grafana.ini:
   analytics:

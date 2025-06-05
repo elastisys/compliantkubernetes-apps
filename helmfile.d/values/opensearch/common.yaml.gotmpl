@@ -5,6 +5,11 @@
 {{ fail "\nERROR: Using 0 replicas with dedicated client pods is not supported by OpenSearch" }}
 {{ end }}
 
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
+
 clusterName: {{ .Values.opensearch.clusterName }}
 
 masterService: {{ .Values.opensearch.clusterName }}-master
@@ -120,7 +125,13 @@ extraEnvs:
 # However this relies on the unsafe sysctl to be allowed in kubelet, which it is not by default.
 extraInitContainers:
   - name: init-sysctl
+    {{- with .Values.images | dig "opensearch" "initSysctl" "" }}
+    {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+    image: "{{- include "gen.container_uri" . }}"
+    {{- end }}
+    {{- else }}
     image: ghcr.io/elastisys/curl-jq:1.0.0
+    {{- end }}
     command:
       - sysctl
       - -w
@@ -186,3 +197,20 @@ plugins:
     {{- toYaml . | nindent 4 }}
     {{- end }}
 {{- end}}
+
+{{- with .Values.images | dig "opensearch" "image" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+majorVersion: 2
+
+global:
+  dockerRegistry: ""
+
+image:
+  {{- with include "gen.reg-rep-img" . }}
+  repository: {{ . }}
+  {{- end }}
+  {{- if or .tag .digest }}
+  tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+  {{- end }}
+{{- end }}
+{{- end }}

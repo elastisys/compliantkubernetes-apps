@@ -1,3 +1,8 @@
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
+
 namespaceOverride: kyverno
 
 admissionController:
@@ -7,7 +12,38 @@ admissionController:
       maxUnavailable: 1
     type: RollingUpdate
   container:
+    {{- with .Values.images | dig "kyverno" "main" "" }}
+    {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+    image:
+      {{- with .registry }}
+      registry: {{ . }}
+      {{- end}}
+      {{- if or .repository .image }}
+      repository: {{ join "/" (compact (list .repository .image)) }}
+      {{- end }}
+      {{- if or .tag .digest }}
+      tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+      {{- end }}
+    {{- end }}
+    {{- end }}
     resources: {{- toYaml .Values.kyverno.resources | nindent 8 }}
+
+  {{- with .Values.images | dig "kyverno" "init" "" }}
+  {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+  initContainer:
+    image:
+      {{- with .registry }}
+      registry: {{ . }}
+      {{- end}}
+      {{- if or .repository .image }}
+      repository: {{ join "/" (compact (list .repository .image)) }}
+      {{- end }}
+      {{- if or .tag .digest }}
+      tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+      {{- end }}
+  {{- end }}
+  {{- end }}
+
   nodeSelector: {{- toYaml .Values.kyverno.nodeSelector | nindent 4 }}
   podAffinity:  {{- toYaml .Values.kyverno.podAffinity | nindent 4 }}
   nodeAffinity: {{- toYaml .Values.kyverno.nodeAffinity | nindent 4 }}
@@ -51,3 +87,35 @@ crds:
       - policies.kyverno.io
       - policyexceptions.kyverno.io
       - updaterequests.kyverno.io
+    {{- with .Values.images | dig "kyverno" "crdsMigration" "" }}
+    {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+    image:
+      {{- with .registry }}
+      registry: {{ . }}
+      {{- end}}
+      {{- if or .repository .image }}
+      repository: {{ join "/" (compact (list .repository .image)) }}
+      {{- end }}
+      {{- if or .tag .digest }}
+      tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+      {{- end }}
+    {{- end }}
+    {{- end }}
+
+
+
+{{- with .Values.images | dig "kyverno" "webhooksCleanup" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+webhooksCleanup:
+  image:
+    {{- with .registry }}
+    registry: {{ . }}
+    {{- end}}
+    {{- if or .repository .image }}
+    repository: {{ join "/" (compact (list .repository .image)) }}
+    {{- end }}
+    {{- if or .tag .digest }}
+    tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+    {{- end }}
+{{- end }}
+{{- end }}

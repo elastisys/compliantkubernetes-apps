@@ -171,3 +171,19 @@ securityConfig:
 activeDeadlineSeconds: {{ .Values.opensearch.securityadmin.activeDeadlineSeconds }}
 
 resources: {{- toYaml .Values.opensearch.securityadmin.resources | nindent 2 }}
+
+{{- $global := dict
+  "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+  "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+}}
+{{- with .Values.images | dig "opensearch" "image" "" }}
+{{- with merge (include "container_uri.parse" . | fromJson) $global }}
+image:
+  {{- with include "gen.reg-rep-img" . }}
+  repository: {{ . }}
+  {{- end }}
+  {{- if or .tag .digest }}
+  tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+  {{- end }}
+{{- end }}
+{{- end }}
