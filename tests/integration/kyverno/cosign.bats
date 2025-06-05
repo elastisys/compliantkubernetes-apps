@@ -13,8 +13,8 @@ setup_file() {
   yq.set wc '.kyverno.policies.verifyImageSignature.type' '"Cosign"'
   yq.set wc '.kyverno.policies.verifyImageSignature.attestors' \
 '"-----BEGIN PUBLIC KEY-----
-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8nXRh950IZbRj8Ra/N9sbqOPZrfM
-5/KAQN0/KjHcorm/J5yctVd7iEcnessRQjU917hmKO6JWVGHpDguIyakZA==
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEoL0XMcv0rXFo41ZDoVJHzHaelPn9
+EZIWF76W/2/z5DCrHWSetz8FjJjvUq5Niw7JxfQRyZte+VISWcLcsUUfnA==
 -----END PUBLIC KEY-----
 "'
 
