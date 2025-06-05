@@ -28,6 +28,7 @@ alertmanager:
       secretName: alertmanager-certs
   {{ end }}
   config:
+    inhibit_rules: []
     route:
       group_by: {{ toYaml .Values.prometheus.alertmanagerSpec.groupBy | nindent 8 }}
   alertmanagerSpec:

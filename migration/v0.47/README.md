@@ -124,6 +124,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s update-ips ${CK8S_CLUSTER} apply
     ```
 
+1. This will remove user.alertmanager from default common, wc config files and add new values devAlertmanager in the defaults.
+
+    ```bash
+    ./migration/v0.47/prepare/10-alertmanager.sh
+    ```
+
 ### Apply upgrade - _disruptive_
 
 > _Done during maintenance window._
