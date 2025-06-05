@@ -11,6 +11,7 @@ setup_file() {
   yq.set wc '.kyverno.enabled' true
   yq.set wc '.kyverno.policies.verifyImageSignature.enabled' true
   yq.set wc '.kyverno.policies.verifyImageSignature.type' '"Notary"'
+  yq.set wc '.kyverno.policies.verifyImageSignature.ignoreRekorTlog' true
   yq.set wc '.kyverno.policies.verifyImageSignature.attestors' \
 '"-----BEGIN CERTIFICATE-----
 MIIDhDCCAmygAwIBAgIUQDXugI95YJTsy4cKf0fb2F6DMhYwDQYJKoZIhvcNAQEL
@@ -35,6 +36,10 @@ E/h1SgwfB3awlula/iFTpuLFqpVr7SimJ3CsWajbXU13k/lawPJ1+g==
 -----END CERTIFICATE-----
 "'
 
+  kubectl create namespace unverifiedspace
+  kubectl create namespace securespace
+  kubectl label namespace securespace hnc.x-k8s.io/included-namespace=true
+
   ck8s ops helmfile wc apply --include-transitive-needs --output simple -l app=kyverno
 }
 
@@ -43,22 +48,33 @@ setup() {
   load_assert
 }
 
-@test "signed image allowed" {
-  run kubectl run test-signed --image=ghcr.io/elastisys/test-verify-image:signed
+teardown_file() {
+  kubectl delete namespace unverifiedspace securespace
+}
+
+@test "can deploy a pod with a signed image" {
+  run kubectl run test-signed --interactive --rm --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
   assert_success
-  # a signed image is allowed
 }
 
-@test "an unsigned image can't run" {
-  # an unsigned image is forbidden
-  # TODO push an unsigned image to ghcr
-  run kubectl run test-unsigned --image=ghcr.io/elastisys/curl-jq:1.0.0 sleep 0
+@test "can NOT deploy a pod with an unsigned image" {
+  run kubectl run test-unsigned --namespace=securespace --image=ghcr.io/elastisys/curl-jq:1.0.0 sleep 0
   assert_failure
-  # TODO assert output
+  assert_output --partial "verify-image-signature: 'failed to verify image"
 }
 
+@test "unsigned in some namespace where it is disabled" {
+  run kubectl run test-unsigned --namespace=unverifiedspace --image=ghcr.io/elastisys/curl-jq:1.0.0 sleep 0
+  assert_success
+}
+
+@test "can deploy a deployment with a singed image" {
+  run kubectl create deployment secure-deploy --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
+  assert_success
+
+  run kubectl set image deployment secure-deploy --namespace=securespace secure-deploy=ghcr.io/elastisys/curl-jq:1.0.0
+}
 # TODO @test "multiple keys requires multiple signatures" {}
 # TODO @test "signed by untrusted key" {}
 # TODO @test "signed both trusted and untrusted key?" {}
 # TODO @test "deployment?" {}
-# TODO @test "unsigned in some namespace where it is disabled" {}

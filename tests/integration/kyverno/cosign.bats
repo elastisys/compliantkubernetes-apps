@@ -19,6 +19,7 @@ EZIWF76W/2/z5DCrHWSetz8FjJjvUq5Niw7JxfQRyZte+VISWcLcsUUfnA==
 -----END PUBLIC KEY-----
 "'
 
+  kubectl create namespace unverifiedspace
   kubectl create namespace securespace
   kubectl label namespace securespace hnc.x-k8s.io/included-namespace=true
 
@@ -31,26 +32,39 @@ setup() {
 }
 
 teardown_file() {
-  kubectl delete namespace securespace
+  kubectl delete namespace unverifiedspace securespace
 }
 
-@test "signed image allowed" {
-  run kubectl run test-signed --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
+@test "can deploy a pod with a signed image" {
+  run kubectl run test-signed --interactive --rm --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
   assert_success
 }
 
-@test "an unsigned image can't run" {
+@test "can NOT deploy a pod with an unsigned image" {
   run kubectl run test-unsigned --namespace=securespace --image=ghcr.io/elastisys/curl-jq:1.0.0 sleep 0
   assert_failure
-# TODO assert output --partial="what does it say here?"
+  assert_output --partial "verify-image-signature: 'failed to verify image"
 }
+
+@test "unsigned in some namespace where it is disabled" {
+  run kubectl run test-unsigned --namespace=unverifiedspace --image=ghcr.io/elastisys/curl-jq:1.0.0 sleep 0
+  assert_success
+}
+
+@test "can deploy a deployment with a singed image" {
+  run kubectl create deployment secure-deploy --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
+  assert_success
+
+  run kubectl set image deployment secure-deploy --namespace=securespace secure-deploy=ghcr.io/elastisys/curl-jq:1.0.0
+}
+
+#@test "can NOT change image of a running pod to an " {}
+#   run kubectl run test-signed --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
+#   assert_success
+#   run kubectl set image pods test-signed --image
+#}
 
 # TODO @test "multiple keys requires multiple signatures" {}
 # TODO @test "signed by untrusted key" {}
 # TODO @test "signed both trusted and untrusted key?" {}
 # TODO @test "deployment?" {}
-
-@test "unsigned in some namespace where it is disabled" {
-  run kubectl run test-unsigned --namespace=default --image=ghcr.io/elastisys/curl-jq:1.0.0 sleep 0
-  assert_success
-}
