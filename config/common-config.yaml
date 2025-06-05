@@ -95,17 +95,6 @@ objectStorage:
     velero: ${CK8S_ENVIRONMENT_NAME}-velero
     thanos: ${CK8S_ENVIRONMENT_NAME}-thanos
 
-## User configuration.
-user:
-  ## User controlled alertmanager configuration.
-  alertmanager:
-    enabled: true
-
-    ## Todo remove dependencies on alertmanager from service cluster
-    ## Create basic-auth protected ingress to alertmanager
-    ingress:
-      enabled: false
-
 alerts:
   # Configure runbook URLs for alerts, can be configured on an alert group level or
   # per individual alert
@@ -399,7 +388,27 @@ openstackMonitoring:
 
 prometheus:
   replicas: 1
-
+  devAlertmanager:
+    enabled: true
+  alertmanagerSpec:
+    affinity: {}
+    tolerations: []
+    replicas: 2
+    resources:
+      requests:
+        cpu: 10m
+        memory: 50Mi
+      limits:
+        cpu: 50m
+        memory: 100Mi
+    storage:
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
   topologySpreadConstraints:
   - labelSelector:
       matchLabels:
@@ -417,7 +426,7 @@ prometheus:
   retention:
     size: 4GiB
     age: 3d
-
+    alertmanager: 72h
   resources:
     requests:
       memory: 1Gi

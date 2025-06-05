@@ -42,6 +42,12 @@ policies:
                 kubernetes.io/metadata.name: monitoring
               podSelectorLabels:
                 app.kubernetes.io/name: prometheus
+            {{- if eq .Values.prometheus.devAlertmanager.ingressEnabled true }}
+            - namespaceSelectorLabels:
+                kubernetes.io/metadata.name: ingress-nginx
+              podSelectorLabels:
+                 app.kubernetes.io/name: ingress-nginx
+            {{- end }}
           ports:
             - tcp: 9093
         - name: ingress-rule-user-namespaces
