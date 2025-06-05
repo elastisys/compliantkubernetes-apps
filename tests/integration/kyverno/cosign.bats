@@ -36,7 +36,7 @@ teardown_file() {
 }
 
 @test "can deploy a pod with a signed image" {
-  run kubectl run test-signed --interactive --rm --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
+  run kubectl run test-signed --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
   assert_success
 }
 
