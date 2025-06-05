@@ -109,6 +109,12 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     export CK8S_CLUSTER=<wc|sc|both>
     ```
 
+1. This will move user.alertmanager from  wc config files to move under new configvalues.
+
+    ```bash
+    ./migration/v0.47/prepare/10-alertmanager.sh
+    ```
+
 1. Update apps configuration:
 
     This will take a backup into `backups/` before modifying any files.
@@ -122,12 +128,6 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s update-ips ${CK8S_CLUSTER} dry-run
     # if you agree with the changes apply
     ./bin/ck8s update-ips ${CK8S_CLUSTER} apply
-    ```
-
-1. This will remove user.alertmanager from default common, wc config files and add new values devAlertmanager in the defaults.
-
-    ```bash
-    ./migration/v0.47/prepare/10-alertmanager.sh
     ```
 
 ### Apply upgrade - _disruptive_
