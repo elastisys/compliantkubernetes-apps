@@ -10,7 +10,6 @@ enable_user_grafana=$(yq -e '.grafana.user.enabled' "${CONFIG_FILE}" 2>/dev/null
 enable_fluentd=$(yq -e '.fluentd.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_fluentd_audit=$(yq -e '.fluentd.audit.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_fluentd_logs=$(yq -e '.fluentd.scLogs.enabled' "${CONFIG_FILE}" 2>/dev/null)
-enable_opensearch_snapshot=$(yq -e '.opensearch.snapshot.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_velero=$(yq -e '.velero.enabled' "${CONFIG_FILE}" 2>/dev/null)
 enable_os_data_sts=$(yq -e '.opensearch.dataNode.dedicatedPods' "${CONFIG_FILE}" 2>/dev/null)
 enable_os_client_sts=$(yq -e '.opensearch.clientNode.dedicatedPods' "${CONFIG_FILE}" 2>/dev/null)
@@ -194,11 +193,6 @@ cronjobs=(
 )
 if "${enable_harbor}" && "${enable_harbor_backup}"; then
   cronjobs+=("harbor harbor-backup-cronjob")
-fi
-if "${enable_opensearch_snapshot}"; then
-  cronjobs+=(
-    "opensearch-system opensearch-slm"
-  )
 fi
 if "${enable_fluentd_audit}"; then
   cluster_name="$(yq '.global.clusterName' "${CONFIG_FILE}" 2>/dev/null)"
