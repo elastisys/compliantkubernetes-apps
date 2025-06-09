@@ -119,8 +119,8 @@ When the QA process is finished the code should be in a state where it's ready t
 Update the SBOM, ensure it gets validated and carefully look at the diff and address any manual overrides needed:
 
 ```sh
-./bin/ck8s sbom generate vX.Y.Z
-./bin/ck8s sbom get-unset   # update any components listed
+./scripts/sbom/sbom.bash generate --version vX.Y.Z
+./scripts/sbom/sbom.bash get-unset   # update any components listed
 ```
 
 Mark the staging pull request ready for review.
