@@ -526,7 +526,7 @@ allow_subnet() {
     return
   fi
 
-  if [ "$(kubectl -n capi-cluster get openstackcluster "${capi_cluster_name}" -o jsonpath='{.status.network.subnets}' | jq length)" -gt "1" ]; then
+  if [ "$("${here}/ops.bash" kubectl sc -n capi-cluster get openstackcluster "${capi_cluster_name}" -o jsonpath='{.status.network.subnets}' | jq length)" -gt "1" ]; then
     log_warning "Found more than one subnet. This is currently not supported by update-ips. Falling back on allowing indivudal node IPs."
     allow_nodes "${cluster}" "${config_option}" "${label}"
     return
