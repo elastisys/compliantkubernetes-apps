@@ -79,11 +79,6 @@ teardown() {
   assert_failure
 }
 
-#@test "can NOT change image of a running pod to an " {}
-#   run kubectl run test-signed --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
-#   assert_success
-#   run kubectl set image pods test-signed --image
-#}
 
 # TODO @test "multiple keys requires multiple signatures" {}
 # TODO @test "signed by untrusted key" {}
