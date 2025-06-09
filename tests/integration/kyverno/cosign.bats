@@ -38,6 +38,8 @@ teardown_file() {
 }
 
 teardown() {
+  kubectl delete deployment --namespace=unverifiedspace --all
+  kubectl delete pod --namespace=unverifiedspace --all
   kubectl delete deployment --namespace=securespace --all
   kubectl delete pod --namespace=securespace --all
 }

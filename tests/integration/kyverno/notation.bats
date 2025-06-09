@@ -55,6 +55,8 @@ teardown_file() {
 }
 
 teardown() {
+  kubectl delete deployment --namespace=unverifiedspace --all
+  kubectl delete pod --namespace=unverifiedspace --all
   kubectl delete deployment --namespace=securespace --all
   kubectl delete pod --namespace=securespace --all
 }
@@ -93,6 +95,8 @@ teardown() {
   run kubectl set image deployment secure-deploy --namespace=securespace secure-deploy=ghcr.io/elastisys/curl-jq:1.0.0
   assert_failure
 }
+
+
 # TODO @test "multiple keys requires multiple signatures" {}
 # TODO @test "signed by untrusted key" {}
 # TODO @test "signed both trusted and untrusted key?" {}
