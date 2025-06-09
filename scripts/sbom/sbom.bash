@@ -351,7 +351,10 @@ _add_license_for_component() {
   else
     mapfile -t sources < <(yq '.sources[]' "${chart_location}")
     if [[ "${#sources[@]}" -eq 0 ]] || [[ "${sources[*]}" == "null" ]]; then
-      return
+      mapfile -t licenses < <(yq -o json -r ".components[] | select(.evidence.occurrences[0].location == \"${location}\").licenses[].license | .name // .id" "${SBOM_FILE}")
+      for license in "${licenses[@]}"; do
+        _sbom_add_component "${sbom_file}" "${location}" "licenses" "${license}"
+      done
     else
       for source in "${sources[@]}"; do
         if [[ "${source}" != *"github.com"* ]]; then
@@ -371,9 +374,7 @@ _add_license_for_component() {
           -H "Authorization: Bearer ${GITHUB_TOKEN}" \
           "https://api.github.com/repos/${repo}" | jq -r '.license.name')
 
-        if [[ "${licenses_in_git[*]}" == "null" ]]; then
-          continue
-        else
+        if [[ "${licenses_in_git[*]}" != "null" ]]; then
           for license in "${licenses_in_git[@]}"; do
             _sbom_add_component "${sbom_file}" "${location}" "licenses" "${license}"
           done
