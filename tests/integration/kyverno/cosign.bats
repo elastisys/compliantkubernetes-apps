@@ -24,6 +24,8 @@ EZIWF76W/2/z5DCrHWSetz8FjJjvUq5Niw7JxfQRyZte+VISWcLcsUUfnA==
   kubectl label namespace securespace hnc.x-k8s.io/included-namespace=true
 
   ck8s ops helmfile wc apply --include-transitive-needs --output simple -l app=kyverno
+
+  log.trace "Cosign"
 }
 
 setup() {

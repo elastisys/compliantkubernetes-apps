@@ -41,6 +41,8 @@ E/h1SgwfB3awlula/iFTpuLFqpVr7SimJ3CsWajbXU13k/lawPJ1+g==
   kubectl label namespace securespace hnc.x-k8s.io/included-namespace=true
 
   ck8s ops helmfile wc apply --include-transitive-needs --output simple -l app=kyverno
+
+  log.trace "Notary"
 }
 
 setup() {
