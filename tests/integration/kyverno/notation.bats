@@ -78,10 +78,21 @@ teardown() {
 @test "can deploy a deployment with a singed image" {
   run kubectl create deployment secure-deploy --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
   assert_success
+}
+
+@test "can NOT deploy a deployment with an unsigned image" {
+  run kubectl create deployment test-unsigned --namespace=securespace --image=ghcr.io/elastisys/curl-jq:1.0.0
+  assert_failure
+  assert_output --partial "verify-image-signature: 'failed to verify image"
+}
+
+@test "can NOT change a deployment to an unsigned image" {
+  run kubectl create deployment secure-deploy --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
+  assert_success
 
   run kubectl set image deployment secure-deploy --namespace=securespace secure-deploy=ghcr.io/elastisys/curl-jq:1.0.0
+  assert_failure
 }
 # TODO @test "multiple keys requires multiple signatures" {}
 # TODO @test "signed by untrusted key" {}
 # TODO @test "signed both trusted and untrusted key?" {}
-# TODO @test "deployment?" {}
