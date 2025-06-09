@@ -109,12 +109,12 @@ _sbom_edit_component() {
   append_trap "rm ${tmp_change} >/dev/null 2>&1" EXIT
 
   # check if key that should be updated exists
-  has_key=$(yq -e -o json ".components[] | select(.evidence.occurrences[0].location == \"${location}\") | has(\"${key}\")" "${sbom_file}")
+  has_key=$(jq -e ".components[] | select(.evidence.occurrences[0].location == \"${location}\") | has(\"${key}\")" "${sbom_file}")
   if [[ "${has_key}" == false ]]; then
     log_fatal "${key} not found"
   fi
 
-  yq -e -o json ".components[] | select(.evidence.occurrences[0].location == \"${location}\") | .${key}" "${sbom_file}" >"${tmp_change}"
+  jq -e ".components[] | select(.evidence.occurrences[0].location == \"${location}\") | .${key}" "${sbom_file}" >"${tmp_change}"
   "${EDITOR:-}" "${tmp_change}"
 
   query="with(.components[] | select(.evidence.occurrences[0].location == \"${location}\"); .${key} = $(jq -c '.' "${tmp_change}"))"
@@ -150,7 +150,7 @@ _sbom_add_component() {
   fi
 
   # check if key that should be updated exists
-  has_key=$(yq -o json ".components[] | select(.evidence.occurrences[0].location == \"${location}\") | has(\"${key}\")" "${sbom_file}")
+  has_key=$(jq ".components[] | select(.evidence.occurrences[0].location == \"${location}\") | has(\"${key}\")" "${sbom_file}")
 
   if [[ "${has_key}" == false ]]; then
     CK8S_AUTO_APPROVE=true _yq_run_query "${sbom_file}" "with(.components[] | select(.evidence.occurrences[0].location == \"${location}\"); .${key} = ${value_type})"
@@ -164,7 +164,7 @@ _sbom_add_component() {
 # checks if a license is listed as a supported license id
 _id_or_name_license() {
   local license="${1}"
-  if [[ $(curl --silent https://cyclonedx.org/schema/spdx.schema.json | yq -r ".enum | contains([\"${license}\"])") == "true" ]]; then
+  if [[ $(curl --silent https://cyclonedx.org/schema/spdx.schema.json | jq -r ".enum | contains([\"${license}\"])") == "true" ]]; then
     echo "id"
     return
   fi
@@ -271,7 +271,7 @@ _prepare_sbom() {
     _add_locations "${sbom_file}"
   fi
 
-  sbom_version=$(yq -r -o json ".version" "${SBOM_FILE}")
+  sbom_version=$(jq -r ".version" "${SBOM_FILE}")
   yq -o json -i ".version = ${sbom_version}" "${sbom_file}"
   yq -o json -i ". *= load(\"${SBOM_TEMPLATE_FILE}\")" "${sbom_file}"
 
@@ -282,13 +282,13 @@ _prepare_sbom() {
     location=$(jq -r '.location' <<<"${component}")
 
     # check if component already has an elastisys evaluation
-    elastisys_evaluation=$(yq -o json -r ".components[] | select(.evidence.occurrences[0].location == \"${location}\").properties[] | select(.name == \"Elastisys evaluation\").value" "${SBOM_FILE}")
+    elastisys_evaluation=$(jq -r ".components[] | select(.evidence.occurrences[0].location == \"${location}\").properties[] | select(.name == \"Elastisys evaluation\").value" "${SBOM_FILE}")
     if [[ -z "${elastisys_evaluation}" ]] || [[ "${elastisys_evaluation}" == null ]]; then
       elastisys_evaluation="set-me"
     fi
     _sbom_add_component "${sbom_file}" "${location}" "properties" "Elastisys evaluation" "${elastisys_evaluation}"
 
-    supplier=$(yq -o json -r ".components[] | select(.evidence.occurrences[0].location == \"${location}\").supplier.name" "${SBOM_FILE}")
+    supplier=$(jq -r ".components[] | select(.evidence.occurrences[0].location == \"${location}\").supplier.name" "${SBOM_FILE}")
     _sbom_add_component "${sbom_file}" "${location}" "supplier" "${supplier}"
   done
 }
@@ -305,7 +305,7 @@ _add_dependencies() {
     component_bom_ref=$(sbom_get "${sbom_file}" "${location}" | jq -r '."bom-ref"')
 
     # check if a dependency exists for component ref
-    has_ref=$(yq ".dependencies[] | select(.ref == \"${component_bom_ref}\")" "${sbom_file}")
+    has_ref=$(jq ".dependencies[] | select(.ref == \"${component_bom_ref}\")" "${sbom_file}")
 
     if [[ -z "${has_ref}" ]]; then
       query=".dependencies |= (. + $(_format_dependency_object "${component_bom_ref}") | unique_by(.ref))"
@@ -327,24 +327,24 @@ _add_dependencies() {
 
 # get licenses for specific input component
 _add_license_for_component() {
-  local chart chart_location chart_name chart_version location sbom_file
+  local chart chart_file chart_name chart_version location sbom_file
   sbom_file="${1}"
   chart="${2}"
 
-  location="$(yq ".location" <<<"${chart}")"
-  chart_location="${ROOT}/${location}/Chart.yaml"
-  chart_name=$(yq ".name" <<<"${chart}")
-  chart_version=$(yq ".version" <<<"${chart}")
+  location="$(jq -r ".location" <<<"${chart}")"
+  chart_file="${ROOT}/${location}/Chart.yaml"
+  chart_name=$(jq -r ".name" <<<"${chart}")
+  chart_version=$(jq -r ".version" <<<"${chart}")
 
   # if chart exists as part of Welkins own charts, adds Apache-2.0 license
-  if [[ "${chart_location}" == *"helmfile.d/charts"* ]]; then
+  if [[ "${chart_file}" == *"helmfile.d/charts"* ]]; then
     _sbom_add_component "${sbom_file}" "${location}" "licenses" "Apache-2.0"
     return
   fi
 
   # check if chart.yaml contains license in annotations
-  annotation=$(yq ".annotations.licenses" "${chart_location}")
-  annotation_artifacthub=$(yq '.annotations."artifacthub.io/license"' "${chart_location}")
+  annotation=$(yq ".annotations.licenses" "${chart_file}")
+  annotation_artifacthub=$(yq '.annotations."artifacthub.io/license"' "${chart_file}")
 
   if [[ -n "${annotation}" && "${annotation}" != "null" ]]; then
     _sbom_add_component "${sbom_file}" "${location}" "licenses" "${annotation}"
@@ -354,9 +354,9 @@ _add_license_for_component() {
 
   # if no license in annotations, try to get from source (i.e. github)
   else
-    mapfile -t sources < <(yq '.sources[]' "${chart_location}")
+    mapfile -t sources < <(yq '.sources[]' "${chart_file}")
     if [[ "${#sources[@]}" -eq 0 ]] || [[ "${sources[*]}" == "null" ]]; then
-      mapfile -t licenses < <(yq -o json -r ".components[] | select(.evidence.occurrences[0].location == \"${location}\").licenses[].license | .name // .id" "${SBOM_FILE}")
+      mapfile -t licenses < <(jq -r ".components[] | select(.evidence.occurrences[0].location == \"${location}\").licenses[].license | .name // .id" "${SBOM_FILE}")
       for license in "${licenses[@]}"; do
         _sbom_add_component "${sbom_file}" "${location}" "licenses" "${license}"
       done
@@ -422,18 +422,18 @@ _generate_helmfile_template_file() {
   fi
 
   log_info "  - Workload"
-  mapfile -t releases_workload < <(helmfile -f "${HELMFILE_FOLDER}" -e workload_cluster list --output json 2>/dev/null | yq -I=0 -o json "${select_query}")
+  mapfile -t releases_workload < <(helmfile -f "${HELMFILE_FOLDER}" -e workload_cluster list --output json 2>/dev/null | jq -c "${select_query}")
   for release in "${releases_workload[@]}"; do
-    release_name=$(yq '.name' <<<"${release}")
-    release_location="helmfile.d/$(yq '.location' <<<"${release}")"
+    release_name=$(jq -r '.name' <<<"${release}")
+    release_location="helmfile.d/$(jq -r '.location' <<<"${release}")"
     helmfile -f "${HELMFILE_FOLDER}" -e workload_cluster template -l "name=${release_name}" 2>/dev/null | yq ".metadata.annotations.release = \"${release_location}\"" >>"${template_file}"
   done
 
   log_info "  - Service"
-  mapfile -t releases_service < <(helmfile -f "${HELMFILE_FOLDER}" -e service_cluster list --output json 2>/dev/null | yq -I=0 -o json "${select_query}")
+  mapfile -t releases_service < <(helmfile -f "${HELMFILE_FOLDER}" -e service_cluster list --output json 2>/dev/null | jq -c "${select_query}")
   for release in "${releases_service[@]}"; do
-    release_name=$(yq '.name' <<<"${release}")
-    release_location="helmfile.d/$(yq '.location' <<<"${release}")"
+    release_name=$(jq -r '.name' <<<"${release}")
+    release_location="helmfile.d/$(jq -r '.location' <<<"${release}")"
     helmfile -f "${HELMFILE_FOLDER}" -e service_cluster template -l "name=${release_name}" 2>/dev/null | yq ".metadata.annotations.release = \"${release_location}\"" >>"${template_file}"
   done
 }
@@ -446,9 +446,9 @@ _add_container_images_from_template() {
   chart="${3}"
   type="${4}"
 
-  chart_name=$(yq ".name" <<<"${chart}")
-  chart_version=$(yq ".version" <<<"${chart}")
-  chart_location=$(yq ".location" <<<"${chart}")
+  chart_name=$(jq -r ".name" <<<"${chart}")
+  chart_version=$(jq -r ".version" <<<"${chart}")
+  chart_location=$(jq -r ".location" <<<"${chart}")
 
   chart_query="(.metadata.annotations.release == \"${chart_location}\")"
 
@@ -523,13 +523,13 @@ _add_container_images() {
 }
 
 _add_location_for_component() {
-  local chart_name chart_version location sbom_file
+  local chart_file chart_name chart_version location sbom_file
   sbom_file="${1}"
-  chart="${2}"
+  chart_file="${2}"
 
-  chart_name=$(yq ".name" "${chart}")
-  chart_version=$(yq ".version" "${chart}")
-  location="${chart#"${ROOT}/"}"
+  chart_name=$(yq ".name" "${chart_file}")
+  chart_version=$(yq ".version" "${chart_file}")
+  location="${chart_file#"${ROOT}/"}"
   location="${location%/Chart.yaml}"
   query="with(.components[] | select(.name == \"${chart_name}\" and .version == \"${chart_version}\"); .evidence |= (. + $(_format_location_object "${location}")))"
   _yq_run_query "${sbom_file}" "${query}"
@@ -542,8 +542,8 @@ _add_locations() {
 
   log_info "Getting locations"
   mapfile -t all_charts < <(find "${HELMFILE_FOLDER}" -name "Chart.yaml")
-  for chart in "${all_charts[@]}"; do
-    _add_location_for_component "${sbom_file}" "${chart}"
+  for chart_file in "${all_charts[@]}"; do
+    _add_location_for_component "${sbom_file}" "${chart_file}"
   done
 
   # some charts added as dependencies in other charts gets added twice with cdxgen
@@ -597,29 +597,29 @@ sbom_get() {
     query=".components[] | select(.evidence.occurrences[0].location == \"${location}\") | .${key}"
   fi
 
-  yq -e -o json "${query}" "${sbom_file}"
+  jq -e "${query}" "${sbom_file}"
 }
 
 sbom_get_unset() {
   output_query=' { "name": .name, "version": .version, "location": .evidence.occurrences[0].location}'
 
   local licenses=()
-  mapfile -t -O "${#licenses[@]}" licenses < <(yq -I=0 -o json -r "[.components[] | select(.licenses[].license.name | contains(\"set-me\")) | ${output_query}] | .[]" "${SBOM_FILE}")
-  mapfile -t -O "${#licenses[@]}" licenses < <(yq -I=0 -o json -r "[.components[] | select(.licenses | length == 0) | ${output_query}] | .[]" "${SBOM_FILE}")
-  mapfile -t -O "${#licenses[@]}" licenses < <(yq -I=0 -o json -r "[.components[] | select(has(\"licenses\") == \"false\") | ${output_query}] | .[]" "${SBOM_FILE}")
+  mapfile -t -O "${#licenses[@]}" licenses < <(jq -c -r "[.components[] | select(.licenses[].license.name | contains(\"set-me\")) | ${output_query}] | .[]" "${SBOM_FILE}")
+  mapfile -t -O "${#licenses[@]}" licenses < <(jq -c -r "[.components[] | select(.licenses | length == 0) | ${output_query}] | .[]" "${SBOM_FILE}")
+  mapfile -t -O "${#licenses[@]}" licenses < <(jq -c -r "[.components[] | select(has(\"licenses\") == \"false\") | ${output_query}] | .[]" "${SBOM_FILE}")
   log_info "Getting components without licenses"
   jq -c <<<"${licenses[@]}"
 
   echo
   local elastisys_evaluations=()
-  mapfile -t -O "${#elastisys_evaluations[@]}" elastisys_evaluations < <(yq -I=0 -o json -r "[.components[] | select(.properties[].value == \"set-me\")  | ${output_query}] | .[]" "${SBOM_FILE}")
+  mapfile -t -O "${#elastisys_evaluations[@]}" elastisys_evaluations < <(jq -c -r "[.components[] | select(.properties[].value == \"set-me\")  | ${output_query}] | .[]" "${SBOM_FILE}")
   log_info "Getting components without Elastisys evaluation"
   jq -c <<<"${elastisys_evaluations[@]}"
 
   echo
   local suppliers=()
   log_info "Getting components without supplier"
-  mapfile -t -O "${#suppliers[@]}" suppliers < <(yq -I=0 -o json -r "[.components[] | select(.supplier.name == \"set-me\")  | ${output_query}] | .[]" "${SBOM_FILE}")
+  mapfile -t -O "${#suppliers[@]}" suppliers < <(jq -c -r "[.components[] | select(.supplier.name == \"set-me\")  | ${output_query}] | .[]" "${SBOM_FILE}")
   jq -c <<<"${suppliers[@]}"
 
   if [[ "${#licenses[@]}" -gt 0 ]] || [[ "${#elastisys_evaluations[@]}" -gt 0 ]] || [[ "${#suppliers[@]}" -gt 0 ]]; then
@@ -632,14 +632,14 @@ sbom_get_charts() {
   sbom_file="${1}"
   query='[.components[] | { "name": .name, "version": .version, "location": .evidence.occurrences[0].location }] | .[]'
 
-  yq -e -o json -I=0 "${query}" "${sbom_file}"
+  jq -e -c "${query}" "${sbom_file}"
 }
 
 sbom_get_containers() {
   local query
   query='.components[] | [.components[] | { "name": .name, "version": .version}] | .[]'
 
-  yq -e -o json --colors -I=0 "${query}" "${SBOM_FILE}" | sort -u
+  jq -e --color-output -c "${query}" "${SBOM_FILE}" | sort -u
 }
 
 sbom_edit() {
@@ -804,21 +804,22 @@ sbom_generate() {
 }
 
 sbom_diff() {
-  local found_diff location
+  local chart_file chart_name chart_version found_diff location
   mapfile -t diff_files < <(git diff --staged --name-only | grep "helmfile.d/")
   mapfile -t all_charts < <(sbom_get_charts "${SBOM_FILE}")
 
   should_fail=false
   for chart in "${all_charts[@]}"; do
     found_diff=false
-    sbom_component_name=$(yq '.name' <<<"${chart}")
-    sbom_component_version=$(yq '.version' <<<"${chart}")
-    location=$(yq '.location' <<<"${chart}")
+    sbom_component_name=$(jq '.name' <<<"${chart}")
+    sbom_component_version=$(jq '.version' <<<"${chart}")
+    location=$(jq '.location' <<<"${chart}")
+    chart_file="${ROOT}/${location}/Chart.yaml"
 
     for diff_file in "${diff_files[@]}"; do
       if [[ "${diff_file}" == *${location}* ]]; then
-        chart_name="$(yq '.name' "${ROOT}/${location}/Chart.yaml")"
-        chart_version="$(yq '.version' "${ROOT}/${location}/Chart.yaml")"
+        chart_name="$(yq '.name' "${chart_file}")"
+        chart_version="$(yq '.version' "${chart_file}")"
         if [[ "${chart_version}" != "${sbom_component_version}" ]]; then
           found_diff=true
           log_warning "Chart version \"${chart_version}\" does not match SBOM \"${sbom_component_version}\""
