@@ -37,6 +37,11 @@ teardown_file() {
   kubectl delete namespace unverifiedspace securespace
 }
 
+teardown() {
+  kubectl delete deployment --namespace=securespace --all
+  kubectl delete pod --namespace=securespace --all
+}
+
 @test "can deploy a pod with a signed image" {
   run kubectl run test-signed --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
   assert_success
