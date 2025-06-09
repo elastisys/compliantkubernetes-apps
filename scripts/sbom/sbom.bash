@@ -39,7 +39,7 @@ usage() {
   echo "  get-containers                                  get all container images in sbom" >&2
   echo "  get-unset                                       get names of components with set-me's or missing licenses" >&2
   echo "  remove <location> <value>                       remove a property for a component" >&2
-  echo "  update <location>                               update SBOM for a single component using chart location"
+  echo "  update <location>                               update SBOM for a single component using chart location. Requires GITHUB_TOKEN to be set to avoid GitHub rate limits" >&2
   echo "  validate                                        validate SBOM using cyclonedx-cli" >&2
   exit 1
 }
@@ -312,10 +312,15 @@ _add_dependencies() {
       CK8S_AUTO_APPROVE=true _yq_run_query "${sbom_file}" "${query}"
     fi
 
+    # check if components key exist for helm chart component
+    if [[ $(sbom_get "${sbom_file}" "${location}" components 2>/dev/null) == null ]]; then
+      continue
+    fi
+
     mapfile -t container_bom_refs < <(sbom_get "${sbom_file}" "${location}" components | jq -r '.[]? | ."bom-ref"')
     for container_bom_ref in "${container_bom_refs[@]}"; do
       query="with(.dependencies[] | select(.ref == \"${component_bom_ref}\").dependsOn; . |= (. + \"${container_bom_ref}\") | unique)"
-      _yq_run_query "${sbom_file}" "${query}"
+      _yq_run_query "${sbom_file}" "${query}" >/dev/null 2>&1
     done
   done
 }
