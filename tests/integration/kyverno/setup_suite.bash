@@ -14,4 +14,3 @@ teardown_suite() {
 
   auto_teardown wc
 }
-
