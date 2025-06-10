@@ -8,6 +8,7 @@
 # - include images for all configurations? (e.g. different cloud providers can have unique images/charts)
 # - include licenses for images?
 # - consistently update timestamp? e.g. when running sbom add or edit
+# - diff comparison is sensitive to ordering of json objects
 set -euo pipefail
 
 HERE="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
@@ -209,11 +210,36 @@ _format_elastisys_evaluation_object() {
 # format component json object for a container image
 # ref: https://cyclonedx.org/docs/1.6/json/#components
 _format_container_component_object() {
-  local container="${1}"
+  local bom_ref container name parts product vendor version
+  container="${1}"
   name="${container%%:*}"
   version="${container##*:}"
   bom_ref="pkg:oci/${container}"
-  echo "{\"name\": \"${name}\", \"version\": \"${version}\", \"type\": \"container\", \"bom-ref\": \"${bom_ref}\"}"
+
+  parts=()
+  IFS='/' read -ra parts <<<"${name}"
+
+  local start_index=0
+
+  # check if first part is a registry domain
+  if [[ "${parts[0]}" == *.* ]]; then
+    start_index=1
+  fi
+
+  relevant_parts=("${parts[@]:$start_index}")
+  nr_of_parts="${#relevant_parts[@]}"
+
+  # parse vendor and product based on whether or not image name contains a repository
+  if [[ "${nr_of_parts}" -gt 1 ]]; then
+    vendor="${relevant_parts[$((nr_of_parts - 2))]}"
+    product="${relevant_parts[$((nr_of_parts - 1))]}"
+  else
+    vendor="${relevant_parts[0]}"
+    product="${relevant_parts[0]}"
+  fi
+
+  cpe="cpe:2.3:a:${vendor}:${product}:${version}:*:*:*:*:*:*:*"
+  echo "{\"name\": \"${name}\", \"version\": \"${version}\", \"type\": \"container\", \"bom-ref\": \"${bom_ref}\", \"cpe\": \"${cpe}\"}"
 }
 
 # format component json object for a container image

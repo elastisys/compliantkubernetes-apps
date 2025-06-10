@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:f58303bb-0d6c-4eb6-8ee2-e94a936ac424",
-  "version": 17,
+  "serialNumber": "urn:uuid:4c8c74c4-6026-40c7-b96c-867b003f8e93",
+  "version": 18,
   "metadata": {
-    "timestamp": "2025-06-02T14:47:24Z",
+    "timestamp": "2025-06-10T09:34:02Z",
     "tools": {
       "components": [
         {
@@ -36,10 +36,10 @@
     "component": {
       "group": "",
       "name": "welkin-apps",
-      "version": "46feddf04eb88f01d865d2507a448808ea813639",
+      "version": "9f554be7fee7b9f053cc39540077ff961965d8ba",
       "type": "application",
-      "bom-ref": "pkg:application/welkin-apps@46feddf04eb88f01d865d2507a448808ea813639",
-      "purl": "pkg:application/welkin-apps@46feddf04eb88f01d865d2507a448808ea813639"
+      "bom-ref": "pkg:application/welkin-apps@9f554be7fee7b9f053cc39540077ff961965d8ba",
+      "purl": "pkg:application/welkin-apps@9f554be7fee7b9f053cc39540077ff961965d8ba"
     },
     "properties": [
       {
@@ -123,7 +123,8 @@
           "name": "ghcr.io/elastisys/calico-accountant",
           "version": "0.1.6-ck8s2",
           "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/elastisys/calico-accountant:0.1.6-ck8s2"
+          "bom-ref": "pkg:oci/ghcr.io/elastisys/calico-accountant:0.1.6-ck8s2",
+          "cpe": "cpe:2.3:a:elastisys:calico-accountant:0.1.6-ck8s2:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -233,25 +234,29 @@
           "name": "quay.io/jetstack/cert-manager-cainjector",
           "version": "v1.17.1",
           "type": "container",
-          "bom-ref": "pkg:oci/quay.io/jetstack/cert-manager-cainjector:v1.17.1"
+          "bom-ref": "pkg:oci/quay.io/jetstack/cert-manager-cainjector:v1.17.1",
+          "cpe": "cpe:2.3:a:jetstack:cert-manager-cainjector:v1.17.1:*:*:*:*:*:*:*"
         },
         {
           "name": "quay.io/jetstack/cert-manager-controller",
           "version": "v1.17.1",
           "type": "container",
-          "bom-ref": "pkg:oci/quay.io/jetstack/cert-manager-controller:v1.17.1"
-        },
-        {
-          "name": "quay.io/jetstack/cert-manager-webhook",
-          "version": "v1.17.1",
-          "type": "container",
-          "bom-ref": "pkg:oci/quay.io/jetstack/cert-manager-webhook:v1.17.1"
+          "bom-ref": "pkg:oci/quay.io/jetstack/cert-manager-controller:v1.17.1",
+          "cpe": "cpe:2.3:a:jetstack:cert-manager-controller:v1.17.1:*:*:*:*:*:*:*"
         },
         {
           "name": "quay.io/jetstack/cert-manager-startupapicheck",
           "version": "v1.17.1",
           "type": "container",
-          "bom-ref": "pkg:oci/quay.io/jetstack/cert-manager-startupapicheck:v1.17.1"
+          "bom-ref": "pkg:oci/quay.io/jetstack/cert-manager-startupapicheck:v1.17.1",
+          "cpe": "cpe:2.3:a:jetstack:cert-manager-startupapicheck:v1.17.1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "quay.io/jetstack/cert-manager-webhook",
+          "version": "v1.17.1",
+          "type": "container",
+          "bom-ref": "pkg:oci/quay.io/jetstack/cert-manager-webhook:v1.17.1",
+          "cpe": "cpe:2.3:a:jetstack:cert-manager-webhook:v1.17.1:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -470,7 +475,8 @@
           "name": "ghcr.io/dexidp/dex",
           "version": "v2.40.0",
           "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/dexidp/dex:v2.40.0"
+          "bom-ref": "pkg:oci/ghcr.io/dexidp/dex:v2.40.0",
+          "cpe": "cpe:2.3:a:dexidp:dex:v2.40.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -618,31 +624,36 @@
           "name": "appropriate/curl",
           "version": "appropriate/curl",
           "type": "container",
-          "bom-ref": "pkg:oci/appropriate/curl"
-        },
-        {
-          "name": "docker.io/falcosecurity/falcosidekick",
-          "version": "2.31.1",
-          "type": "container",
-          "bom-ref": "pkg:oci/docker.io/falcosecurity/falcosidekick:2.31.1"
+          "bom-ref": "pkg:oci/appropriate/curl",
+          "cpe": "cpe:2.3:a:appropriate:curl:appropriate/curl:*:*:*:*:*:*:*"
         },
         {
           "name": "docker.io/falcosecurity/falco",
           "version": "0.40.0-debian",
           "type": "container",
-          "bom-ref": "pkg:oci/docker.io/falcosecurity/falco:0.40.0-debian"
+          "bom-ref": "pkg:oci/docker.io/falcosecurity/falco:0.40.0-debian",
+          "cpe": "cpe:2.3:a:falcosecurity:falco:0.40.0-debian:*:*:*:*:*:*:*"
         },
         {
           "name": "docker.io/falcosecurity/falcoctl",
           "version": "0.11.0",
           "type": "container",
-          "bom-ref": "pkg:oci/docker.io/falcosecurity/falcoctl:0.11.0"
+          "bom-ref": "pkg:oci/docker.io/falcosecurity/falcoctl:0.11.0",
+          "cpe": "cpe:2.3:a:falcosecurity:falcoctl:0.11.0:*:*:*:*:*:*:*"
         },
         {
           "name": "docker.io/falcosecurity/falco-driver-loader",
           "version": "0.40.0",
           "type": "container",
-          "bom-ref": "pkg:oci/docker.io/falcosecurity/falco-driver-loader:0.40.0"
+          "bom-ref": "pkg:oci/docker.io/falcosecurity/falco-driver-loader:0.40.0",
+          "cpe": "cpe:2.3:a:falcosecurity:falco-driver-loader:0.40.0:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "docker.io/falcosecurity/falcosidekick",
+          "version": "2.31.1",
+          "type": "container",
+          "bom-ref": "pkg:oci/docker.io/falcosecurity/falcosidekick:2.31.1",
+          "cpe": "cpe:2.3:a:falcosecurity:falcosidekick:2.31.1:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -720,7 +731,8 @@
           "name": "busybox",
           "version": "1.36",
           "type": "container",
-          "bom-ref": "pkg:oci/busybox:1.36"
+          "bom-ref": "pkg:oci/busybox:1.36",
+          "cpe": "cpe:2.3:a:busybox:busybox:1.36:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -766,7 +778,8 @@
           "name": "ghcr.io/elastisys/fluentd-forwarder",
           "version": "v4.7.5-ck8s1",
           "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/elastisys/fluentd-forwarder:v4.7.5-ck8s1"
+          "bom-ref": "pkg:oci/ghcr.io/elastisys/fluentd-forwarder:v4.7.5-ck8s1",
+          "cpe": "cpe:2.3:a:elastisys:fluentd-forwarder:v4.7.5-ck8s1:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -812,7 +825,8 @@
           "name": "ghcr.io/elastisys/fluentd-aggregator",
           "version": "v7.1.1-ck8s1",
           "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/elastisys/fluentd-aggregator:v7.1.1-ck8s1"
+          "bom-ref": "pkg:oci/ghcr.io/elastisys/fluentd-aggregator:v7.1.1-ck8s1",
+          "cpe": "cpe:2.3:a:elastisys:fluentd-aggregator:v7.1.1-ck8s1:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -948,7 +962,8 @@
           "name": "ghcr.io/elastisys/bitnami/kubectl",
           "version": "1.29.11",
           "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/elastisys/bitnami/kubectl:1.29.11"
+          "bom-ref": "pkg:oci/ghcr.io/elastisys/bitnami/kubectl:1.29.11",
+          "cpe": "cpe:2.3:a:bitnami:kubectl:1.29.11:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -991,16 +1006,18 @@
       ],
       "components": [
         {
-          "name": "openpolicyagent/gatekeeper",
-          "version": "v3.18.2",
-          "type": "container",
-          "bom-ref": "pkg:oci/openpolicyagent/gatekeeper:v3.18.2"
-        },
-        {
           "name": "openpolicyagent/gatekeeper-crds",
           "version": "v3.18.2",
           "type": "container",
-          "bom-ref": "pkg:oci/openpolicyagent/gatekeeper-crds:v3.18.2"
+          "bom-ref": "pkg:oci/openpolicyagent/gatekeeper-crds:v3.18.2",
+          "cpe": "cpe:2.3:a:openpolicyagent:gatekeeper-crds:v3.18.2:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "openpolicyagent/gatekeeper",
+          "version": "v3.18.2",
+          "type": "container",
+          "bom-ref": "pkg:oci/openpolicyagent/gatekeeper:v3.18.2",
+          "cpe": "cpe:2.3:a:openpolicyagent:gatekeeper:v3.18.2:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -1046,13 +1063,15 @@
           "name": "nvcr.io/nvidia/gpu-operator",
           "version": "v24.9.2",
           "type": "container",
-          "bom-ref": "pkg:oci/nvcr.io/nvidia/gpu-operator:v24.9.2"
+          "bom-ref": "pkg:oci/nvcr.io/nvidia/gpu-operator:v24.9.2",
+          "cpe": "cpe:2.3:a:nvidia:gpu-operator:v24.9.2:*:*:*:*:*:*:*"
         },
         {
           "name": "registry.k8s.io/nfd/node-feature-discovery",
           "version": "v0.16.6",
           "type": "container",
-          "bom-ref": "pkg:oci/registry.k8s.io/nfd/node-feature-discovery:v0.16.6"
+          "bom-ref": "pkg:oci/registry.k8s.io/nfd/node-feature-discovery:v0.16.6",
+          "cpe": "cpe:2.3:a:nfd:node-feature-discovery:v0.16.6:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -1124,7 +1143,8 @@
           "name": "quay.io/prometheuscommunity/prom-label-proxy",
           "version": "v0.11.0",
           "type": "container",
-          "bom-ref": "pkg:oci/quay.io/prometheuscommunity/prom-label-proxy:v0.11.0"
+          "bom-ref": "pkg:oci/quay.io/prometheuscommunity/prom-label-proxy:v0.11.0",
+          "cpe": "cpe:2.3:a:prometheuscommunity:prom-label-proxy:v0.11.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -1239,13 +1259,15 @@
           "name": "docker.io/grafana/grafana",
           "version": "11.5.1",
           "type": "container",
-          "bom-ref": "pkg:oci/docker.io/grafana/grafana:11.5.1"
+          "bom-ref": "pkg:oci/docker.io/grafana/grafana:11.5.1",
+          "cpe": "cpe:2.3:a:grafana:grafana:11.5.1:*:*:*:*:*:*:*"
         },
         {
           "name": "quay.io/kiwigrid/k8s-sidecar",
           "version": "1.30.0",
           "type": "container",
-          "bom-ref": "pkg:oci/quay.io/kiwigrid/k8s-sidecar:1.30.0"
+          "bom-ref": "pkg:oci/quay.io/kiwigrid/k8s-sidecar:1.30.0",
+          "cpe": "cpe:2.3:a:kiwigrid:k8s-sidecar:1.30.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -1284,7 +1306,8 @@
           "name": "ghcr.io/elastisys/backup-postgres",
           "version": "1.5.0",
           "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/elastisys/backup-postgres:1.5.0"
+          "bom-ref": "pkg:oci/ghcr.io/elastisys/backup-postgres:1.5.0",
+          "cpe": "cpe:2.3:a:elastisys:backup-postgres:1.5.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -1365,55 +1388,64 @@
           "name": "goharbor/harbor-core",
           "version": "v2.12.1",
           "type": "container",
-          "bom-ref": "pkg:oci/goharbor/harbor-core:v2.12.1"
-        },
-        {
-          "name": "goharbor/harbor-exporter",
-          "version": "v2.12.1",
-          "type": "container",
-          "bom-ref": "pkg:oci/goharbor/harbor-exporter:v2.12.1"
-        },
-        {
-          "name": "goharbor/harbor-jobservice",
-          "version": "v2.12.1",
-          "type": "container",
-          "bom-ref": "pkg:oci/goharbor/harbor-jobservice:v2.12.1"
-        },
-        {
-          "name": "goharbor/harbor-portal",
-          "version": "v2.12.1",
-          "type": "container",
-          "bom-ref": "pkg:oci/goharbor/harbor-portal:v2.12.1"
-        },
-        {
-          "name": "goharbor/harbor-registryctl",
-          "version": "v2.12.1",
-          "type": "container",
-          "bom-ref": "pkg:oci/goharbor/harbor-registryctl:v2.12.1"
-        },
-        {
-          "name": "goharbor/registry-photon",
-          "version": "v2.12.1",
-          "type": "container",
-          "bom-ref": "pkg:oci/goharbor/registry-photon:v2.12.1"
+          "bom-ref": "pkg:oci/goharbor/harbor-core:v2.12.1",
+          "cpe": "cpe:2.3:a:goharbor:harbor-core:v2.12.1:*:*:*:*:*:*:*"
         },
         {
           "name": "goharbor/harbor-db",
           "version": "v2.12.1",
           "type": "container",
-          "bom-ref": "pkg:oci/goharbor/harbor-db:v2.12.1"
+          "bom-ref": "pkg:oci/goharbor/harbor-db:v2.12.1",
+          "cpe": "cpe:2.3:a:goharbor:harbor-db:v2.12.1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "goharbor/harbor-exporter",
+          "version": "v2.12.1",
+          "type": "container",
+          "bom-ref": "pkg:oci/goharbor/harbor-exporter:v2.12.1",
+          "cpe": "cpe:2.3:a:goharbor:harbor-exporter:v2.12.1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "goharbor/harbor-jobservice",
+          "version": "v2.12.1",
+          "type": "container",
+          "bom-ref": "pkg:oci/goharbor/harbor-jobservice:v2.12.1",
+          "cpe": "cpe:2.3:a:goharbor:harbor-jobservice:v2.12.1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "goharbor/harbor-portal",
+          "version": "v2.12.1",
+          "type": "container",
+          "bom-ref": "pkg:oci/goharbor/harbor-portal:v2.12.1",
+          "cpe": "cpe:2.3:a:goharbor:harbor-portal:v2.12.1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "goharbor/harbor-registryctl",
+          "version": "v2.12.1",
+          "type": "container",
+          "bom-ref": "pkg:oci/goharbor/harbor-registryctl:v2.12.1",
+          "cpe": "cpe:2.3:a:goharbor:harbor-registryctl:v2.12.1:*:*:*:*:*:*:*"
         },
         {
           "name": "goharbor/redis-photon",
           "version": "v2.12.1",
           "type": "container",
-          "bom-ref": "pkg:oci/goharbor/redis-photon:v2.12.1"
+          "bom-ref": "pkg:oci/goharbor/redis-photon:v2.12.1",
+          "cpe": "cpe:2.3:a:goharbor:redis-photon:v2.12.1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "goharbor/registry-photon",
+          "version": "v2.12.1",
+          "type": "container",
+          "bom-ref": "pkg:oci/goharbor/registry-photon:v2.12.1",
+          "cpe": "cpe:2.3:a:goharbor:registry-photon:v2.12.1:*:*:*:*:*:*:*"
         },
         {
           "name": "goharbor/trivy-adapter-photon",
           "version": "v2.12.1",
           "type": "container",
-          "bom-ref": "pkg:oci/goharbor/trivy-adapter-photon:v2.12.1"
+          "bom-ref": "pkg:oci/goharbor/trivy-adapter-photon:v2.12.1",
+          "cpe": "cpe:2.3:a:goharbor:trivy-adapter-photon:v2.12.1:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -1485,7 +1517,8 @@
           "name": "ghcr.io/elastisys/hnc-manager",
           "version": "v1.1.0",
           "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/elastisys/hnc-manager:v1.1.0"
+          "bom-ref": "pkg:oci/ghcr.io/elastisys/hnc-manager:v1.1.0",
+          "cpe": "cpe:2.3:a:elastisys:hnc-manager:v1.1.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -1563,19 +1596,22 @@
           "name": "registry.k8s.io/defaultbackend-amd64",
           "version": "1.5",
           "type": "container",
-          "bom-ref": "pkg:oci/registry.k8s.io/defaultbackend-amd64:1.5"
-        },
-        {
-          "name": "registry.k8s.io/ingress-nginx/kube-webhook-certgen",
-          "version": "e8825994b7a2c7497375a9b945f386506ca6a3eda80b89b74ef2db743f66a5ea",
-          "type": "container",
-          "bom-ref": "pkg:oci/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2@sha256:e8825994b7a2c7497375a9b945f386506ca6a3eda80b89b74ef2db743f66a5ea"
+          "bom-ref": "pkg:oci/registry.k8s.io/defaultbackend-amd64:1.5",
+          "cpe": "cpe:2.3:a:defaultbackend-amd64:defaultbackend-amd64:1.5:*:*:*:*:*:*:*"
         },
         {
           "name": "registry.k8s.io/ingress-nginx/controller-chroot",
           "version": "90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e",
           "type": "container",
-          "bom-ref": "pkg:oci/registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e"
+          "bom-ref": "pkg:oci/registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e",
+          "cpe": "cpe:2.3:a:ingress-nginx:controller-chroot:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "registry.k8s.io/ingress-nginx/kube-webhook-certgen",
+          "version": "e8825994b7a2c7497375a9b945f386506ca6a3eda80b89b74ef2db743f66a5ea",
+          "type": "container",
+          "bom-ref": "pkg:oci/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2@sha256:e8825994b7a2c7497375a9b945f386506ca6a3eda80b89b74ef2db743f66a5ea",
+          "cpe": "cpe:2.3:a:ingress-nginx:kube-webhook-certgen:e8825994b7a2c7497375a9b945f386506ca6a3eda80b89b74ef2db743f66a5ea:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -1614,7 +1650,8 @@
           "name": "ghcr.io/elastisys/curl-jq",
           "version": "1.0.0",
           "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/elastisys/curl-jq:1.0.0"
+          "bom-ref": "pkg:oci/ghcr.io/elastisys/curl-jq:1.0.0",
+          "cpe": "cpe:2.3:a:elastisys:curl-jq:1.0.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -1695,40 +1732,46 @@
       ],
       "components": [
         {
-          "name": "quay.io/prometheus-operator/prometheus-operator",
-          "version": "v0.81.0",
+          "name": "quay.io/prometheus/alertmanager",
+          "version": "v0.28.1",
           "type": "container",
-          "bom-ref": "pkg:oci/quay.io/prometheus-operator/prometheus-operator:v0.81.0"
-        },
-        {
-          "name": "registry.k8s.io/kube-state-metrics/kube-state-metrics",
-          "version": "v2.15.0",
-          "type": "container",
-          "bom-ref": "pkg:oci/registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.15.0"
-        },
-        {
-          "name": "registry.k8s.io/ingress-nginx/kube-webhook-certgen",
-          "version": "v1.5.2",
-          "type": "container",
-          "bom-ref": "pkg:oci/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2"
+          "bom-ref": "pkg:oci/quay.io/prometheus/alertmanager:v0.28.1",
+          "cpe": "cpe:2.3:a:prometheus:alertmanager:v0.28.1:*:*:*:*:*:*:*"
         },
         {
           "name": "quay.io/prometheus/node-exporter",
           "version": "v1.9.1",
           "type": "container",
-          "bom-ref": "pkg:oci/quay.io/prometheus/node-exporter:v1.9.1"
+          "bom-ref": "pkg:oci/quay.io/prometheus/node-exporter:v1.9.1",
+          "cpe": "cpe:2.3:a:prometheus:node-exporter:v1.9.1:*:*:*:*:*:*:*"
         },
         {
-          "name": "quay.io/prometheus/alertmanager",
-          "version": "v0.28.1",
+          "name": "quay.io/prometheus-operator/prometheus-operator",
+          "version": "v0.81.0",
           "type": "container",
-          "bom-ref": "pkg:oci/quay.io/prometheus/alertmanager:v0.28.1"
+          "bom-ref": "pkg:oci/quay.io/prometheus-operator/prometheus-operator:v0.81.0",
+          "cpe": "cpe:2.3:a:prometheus-operator:prometheus-operator:v0.81.0:*:*:*:*:*:*:*"
         },
         {
           "name": "quay.io/prometheus/prometheus",
           "version": "v3.2.1",
           "type": "container",
-          "bom-ref": "pkg:oci/quay.io/prometheus/prometheus:v3.2.1"
+          "bom-ref": "pkg:oci/quay.io/prometheus/prometheus:v3.2.1",
+          "cpe": "cpe:2.3:a:prometheus:prometheus:v3.2.1:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "registry.k8s.io/ingress-nginx/kube-webhook-certgen",
+          "version": "v1.5.2",
+          "type": "container",
+          "bom-ref": "pkg:oci/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2",
+          "cpe": "cpe:2.3:a:ingress-nginx:kube-webhook-certgen:v1.5.2:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "registry.k8s.io/kube-state-metrics/kube-state-metrics",
+          "version": "v2.15.0",
+          "type": "container",
+          "bom-ref": "pkg:oci/registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.15.0",
+          "cpe": "cpe:2.3:a:kube-state-metrics:kube-state-metrics:v2.15.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -1768,7 +1811,8 @@
           "name": "registry.k8s.io/ingress-nginx/kube-webhook-certgen",
           "version": "v1.5.2",
           "type": "container",
-          "bom-ref": "pkg:oci/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2"
+          "bom-ref": "pkg:oci/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2",
+          "cpe": "cpe:2.3:a:ingress-nginx:kube-webhook-certgen:v1.5.2:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -1916,7 +1960,8 @@
           "name": "ghcr.io/kubereboot/kured",
           "version": "1.17.0",
           "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/kubereboot/kured:1.17.0"
+          "bom-ref": "pkg:oci/ghcr.io/kubereboot/kured:1.17.0",
+          "cpe": "cpe:2.3:a:kubereboot:kured:1.17.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -1959,34 +2004,39 @@
       ],
       "components": [
         {
-          "name": "busybox",
-          "version": "1.35",
-          "type": "container",
-          "bom-ref": "pkg:oci/busybox:1.35"
-        },
-        {
-          "name": "ghcr.io/kyverno/kyvernopre",
-          "version": "v1.13.4",
-          "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/kyverno/kyvernopre:v1.13.4"
-        },
-        {
-          "name": "ghcr.io/kyverno/kyverno",
-          "version": "v1.13.4",
-          "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/kyverno/kyverno:v1.13.4"
-        },
-        {
           "name": "bitnami/kubectl",
           "version": "1.30.2",
           "type": "container",
-          "bom-ref": "pkg:oci/bitnami/kubectl:1.30.2"
+          "bom-ref": "pkg:oci/bitnami/kubectl:1.30.2",
+          "cpe": "cpe:2.3:a:bitnami:kubectl:1.30.2:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "busybox",
+          "version": "1.35",
+          "type": "container",
+          "bom-ref": "pkg:oci/busybox:1.35",
+          "cpe": "cpe:2.3:a:busybox:busybox:1.35:*:*:*:*:*:*:*"
         },
         {
           "name": "ghcr.io/kyverno/kyverno-cli",
           "version": "v1.13.4",
           "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/kyverno/kyverno-cli:v1.13.4"
+          "bom-ref": "pkg:oci/ghcr.io/kyverno/kyverno-cli:v1.13.4",
+          "cpe": "cpe:2.3:a:kyverno:kyverno-cli:v1.13.4:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "ghcr.io/kyverno/kyvernopre",
+          "version": "v1.13.4",
+          "type": "container",
+          "bom-ref": "pkg:oci/ghcr.io/kyverno/kyvernopre:v1.13.4",
+          "cpe": "cpe:2.3:a:kyverno:kyvernopre:v1.13.4:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "ghcr.io/kyverno/kyverno",
+          "version": "v1.13.4",
+          "type": "container",
+          "bom-ref": "pkg:oci/ghcr.io/kyverno/kyverno:v1.13.4",
+          "cpe": "cpe:2.3:a:kyverno:kyverno:v1.13.4:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -2058,7 +2108,8 @@
           "name": "ghcr.io/elastisys/compliantkubernetes-apps-log-manager",
           "version": "0.3.2",
           "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/elastisys/compliantkubernetes-apps-log-manager:0.3.2"
+          "bom-ref": "pkg:oci/ghcr.io/elastisys/compliantkubernetes-apps-log-manager:0.3.2",
+          "cpe": "cpe:2.3:a:elastisys:compliantkubernetes-apps-log-manager:0.3.2:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -2107,7 +2158,8 @@
           "name": "registry.k8s.io/metrics-server/metrics-server",
           "version": "v0.7.1",
           "type": "container",
-          "bom-ref": "pkg:oci/registry.k8s.io/metrics-server/metrics-server:v0.7.1"
+          "bom-ref": "pkg:oci/registry.k8s.io/metrics-server/metrics-server:v0.7.1",
+          "cpe": "cpe:2.3:a:metrics-server:metrics-server:v0.7.1:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -2395,7 +2447,8 @@
           "name": "registry.k8s.io/dns/k8s-dns-node-cache",
           "version": "1.25.0",
           "type": "container",
-          "bom-ref": "pkg:oci/registry.k8s.io/dns/k8s-dns-node-cache:1.25.0"
+          "bom-ref": "pkg:oci/registry.k8s.io/dns/k8s-dns-node-cache:1.25.0",
+          "cpe": "cpe:2.3:a:dns:k8s-dns-node-cache:1.25.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -2435,7 +2488,8 @@
           "name": "ghcr.io/elastisys/curl-jq",
           "version": "1.0.0",
           "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/elastisys/curl-jq:1.0.0"
+          "bom-ref": "pkg:oci/ghcr.io/elastisys/curl-jq:1.0.0",
+          "cpe": "cpe:2.3:a:elastisys:curl-jq:1.0.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -2475,7 +2529,8 @@
           "name": "ghcr.io/elastisys/bitnami/elasticsearch-curator",
           "version": "5.8.4-debian-10-r235",
           "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/elastisys/bitnami/elasticsearch-curator:5.8.4-debian-10-r235"
+          "bom-ref": "pkg:oci/ghcr.io/elastisys/bitnami/elasticsearch-curator:5.8.4-debian-10-r235",
+          "cpe": "cpe:2.3:a:bitnami:elasticsearch-curator:5.8.4-debian-10-r235:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -2503,19 +2558,20 @@
       "supplier": {
         "name": "The Linux Foundation"
       },
-      "components": [
-        {
-          "name": "opensearchproject/opensearch-dashboards",
-          "version": "2.18.0",
-          "type": "container",
-          "bom-ref": "pkg:oci/opensearchproject/opensearch-dashboards:2.18.0"
-        }
-      ],
       "licenses": [
         {
           "license": {
             "name": "Apache License 2.0"
           }
+        }
+      ],
+      "components": [
+        {
+          "name": "opensearchproject/opensearch-dashboards",
+          "version": "2.18.0",
+          "type": "container",
+          "bom-ref": "pkg:oci/opensearchproject/opensearch-dashboards:2.18.0",
+          "cpe": "cpe:2.3:a:opensearchproject:opensearch-dashboards:2.18.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -2587,7 +2643,8 @@
           "name": "opensearchproject/opensearch",
           "version": "2.18.0",
           "type": "container",
-          "bom-ref": "pkg:oci/opensearchproject/opensearch:2.18.0"
+          "bom-ref": "pkg:oci/opensearchproject/opensearch:2.18.0",
+          "cpe": "cpe:2.3:a:opensearchproject:opensearch:2.18.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -2627,7 +2684,8 @@
           "name": "ghcr.io/elastisys/curl-jq",
           "version": "1.0.0",
           "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/elastisys/curl-jq:1.0.0"
+          "bom-ref": "pkg:oci/ghcr.io/elastisys/curl-jq:1.0.0",
+          "cpe": "cpe:2.3:a:elastisys:curl-jq:1.0.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -2673,13 +2731,15 @@
           "name": "ghcr.io/elastisys/curl-jq",
           "version": "1.0.0",
           "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/elastisys/curl-jq:1.0.0"
+          "bom-ref": "pkg:oci/ghcr.io/elastisys/curl-jq:1.0.0",
+          "cpe": "cpe:2.3:a:elastisys:curl-jq:1.0.0:*:*:*:*:*:*:*"
         },
         {
           "name": "opensearchproject/opensearch",
           "version": "2.18.0",
           "type": "container",
-          "bom-ref": "pkg:oci/opensearchproject/opensearch:2.18.0"
+          "bom-ref": "pkg:oci/opensearchproject/opensearch:2.18.0",
+          "cpe": "cpe:2.3:a:opensearchproject:opensearch:2.18.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -2821,7 +2881,8 @@
           "name": "quay.io/prometheus/blackbox-exporter",
           "version": "v0.24.0",
           "type": "container",
-          "bom-ref": "pkg:oci/quay.io/prometheus/blackbox-exporter:v0.24.0"
+          "bom-ref": "pkg:oci/quay.io/prometheus/blackbox-exporter:v0.24.0",
+          "cpe": "cpe:2.3:a:prometheus:blackbox-exporter:v0.24.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -2867,7 +2928,8 @@
           "name": "quay.io/prometheuscommunity/elasticsearch-exporter",
           "version": "v1.7.0",
           "type": "container",
-          "bom-ref": "pkg:oci/quay.io/prometheuscommunity/elasticsearch-exporter:v1.7.0"
+          "bom-ref": "pkg:oci/quay.io/prometheuscommunity/elasticsearch-exporter:v1.7.0",
+          "cpe": "cpe:2.3:a:prometheuscommunity:elasticsearch-exporter:v1.7.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -3047,7 +3109,8 @@
           "name": "ghcr.io/elastisys/s3-exporter",
           "version": "0.5.0",
           "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/elastisys/s3-exporter:0.5.0"
+          "bom-ref": "pkg:oci/ghcr.io/elastisys/s3-exporter:0.5.0",
+          "cpe": "cpe:2.3:a:elastisys:s3-exporter:0.5.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -3195,13 +3258,15 @@
           "name": "ghcr.io/elastisys/bitnami/thanos",
           "version": "0.37.2-debian-12-r8",
           "type": "container",
-          "bom-ref": "pkg:oci/ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8"
+          "bom-ref": "pkg:oci/ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8",
+          "cpe": "cpe:2.3:a:bitnami:thanos:0.37.2-debian-12-r8:*:*:*:*:*:*:*"
         },
         {
           "name": "quay.io/prometheus-operator/prometheus-config-reloader",
           "version": "v0.50.0",
           "type": "container",
-          "bom-ref": "pkg:oci/quay.io/prometheus-operator/prometheus-config-reloader:v0.50.0"
+          "bom-ref": "pkg:oci/quay.io/prometheus-operator/prometheus-config-reloader:v0.50.0",
+          "cpe": "cpe:2.3:a:prometheus-operator:prometheus-config-reloader:v0.50.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -3282,7 +3347,8 @@
           "name": "mirror.gcr.io/aquasec/trivy-operator",
           "version": "0.24.0",
           "type": "container",
-          "bom-ref": "pkg:oci/mirror.gcr.io/aquasec/trivy-operator:0.24.0"
+          "bom-ref": "pkg:oci/mirror.gcr.io/aquasec/trivy-operator:0.24.0",
+          "cpe": "cpe:2.3:a:aquasec:trivy-operator:0.24.0:*:*:*:*:*:*:*"
         }
       ]
     },
@@ -3315,14 +3381,6 @@
           "license": {
             "id": "Apache-2.0"
           }
-        }
-      ],
-      "components": [
-        {
-          "name": "set-me",
-          "version": "set-me",
-          "type": "container",
-          "bom-ref": "pkg:oci/set-me"
         }
       ]
     },
@@ -3432,13 +3490,15 @@
           "name": "velero/velero-plugin-for-aws",
           "version": "v1.9.0",
           "type": "container",
-          "bom-ref": "pkg:oci/velero/velero-plugin-for-aws:v1.9.0"
+          "bom-ref": "pkg:oci/velero/velero-plugin-for-aws:v1.9.0",
+          "cpe": "cpe:2.3:a:velero:velero-plugin-for-aws:v1.9.0:*:*:*:*:*:*:*"
         },
         {
           "name": "velero/velero",
           "version": "v1.13.0",
           "type": "container",
-          "bom-ref": "pkg:oci/velero/velero:v1.13.0"
+          "bom-ref": "pkg:oci/velero/velero:v1.13.0",
+          "cpe": "cpe:2.3:a:velero:velero:v1.13.0:*:*:*:*:*:*:*"
         }
       ]
     }
@@ -3467,8 +3527,8 @@
       "dependsOn": [
         "pkg:oci/quay.io/jetstack/cert-manager-cainjector:v1.17.1",
         "pkg:oci/quay.io/jetstack/cert-manager-controller:v1.17.1",
-        "pkg:oci/quay.io/jetstack/cert-manager-webhook:v1.17.1",
-        "pkg:oci/quay.io/jetstack/cert-manager-startupapicheck:v1.17.1"
+        "pkg:oci/quay.io/jetstack/cert-manager-startupapicheck:v1.17.1",
+        "pkg:oci/quay.io/jetstack/cert-manager-webhook:v1.17.1"
       ]
     },
     {
@@ -3513,10 +3573,10 @@
       "ref": "pkg:helm/falco@4.20.0",
       "dependsOn": [
         "pkg:oci/appropriate/curl",
-        "pkg:oci/docker.io/falcosecurity/falcosidekick:2.31.1",
         "pkg:oci/docker.io/falcosecurity/falco:0.40.0-debian",
         "pkg:oci/docker.io/falcosecurity/falcoctl:0.11.0",
-        "pkg:oci/docker.io/falcosecurity/falco-driver-loader:0.40.0"
+        "pkg:oci/docker.io/falcosecurity/falco-driver-loader:0.40.0",
+        "pkg:oci/docker.io/falcosecurity/falcosidekick:2.31.1"
       ]
     },
     {
@@ -3562,8 +3622,8 @@
     {
       "ref": "pkg:helm/gatekeeper@3.18.2",
       "dependsOn": [
-        "pkg:oci/openpolicyagent/gatekeeper:v3.18.2",
-        "pkg:oci/openpolicyagent/gatekeeper-crds:v3.18.2"
+        "pkg:oci/openpolicyagent/gatekeeper-crds:v3.18.2",
+        "pkg:oci/openpolicyagent/gatekeeper:v3.18.2"
       ]
     },
     {
@@ -3612,13 +3672,13 @@
       "ref": "pkg:helm/harbor@1.16.1",
       "dependsOn": [
         "pkg:oci/goharbor/harbor-core:v2.12.1",
+        "pkg:oci/goharbor/harbor-db:v2.12.1",
         "pkg:oci/goharbor/harbor-exporter:v2.12.1",
         "pkg:oci/goharbor/harbor-jobservice:v2.12.1",
         "pkg:oci/goharbor/harbor-portal:v2.12.1",
         "pkg:oci/goharbor/harbor-registryctl:v2.12.1",
-        "pkg:oci/goharbor/registry-photon:v2.12.1",
-        "pkg:oci/goharbor/harbor-db:v2.12.1",
         "pkg:oci/goharbor/redis-photon:v2.12.1",
+        "pkg:oci/goharbor/registry-photon:v2.12.1",
         "pkg:oci/goharbor/trivy-adapter-photon:v2.12.1"
       ]
     },
@@ -3640,8 +3700,8 @@
       "ref": "pkg:helm/ingress-nginx@4.12.1",
       "dependsOn": [
         "pkg:oci/registry.k8s.io/defaultbackend-amd64:1.5",
-        "pkg:oci/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2@sha256:e8825994b7a2c7497375a9b945f386506ca6a3eda80b89b74ef2db743f66a5ea",
-        "pkg:oci/registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e"
+        "pkg:oci/registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e",
+        "pkg:oci/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2@sha256:e8825994b7a2c7497375a9b945f386506ca6a3eda80b89b74ef2db743f66a5ea"
       ]
     },
     {
@@ -3657,12 +3717,12 @@
     {
       "ref": "pkg:helm/kube-prometheus-stack@70.6.0",
       "dependsOn": [
-        "pkg:oci/quay.io/prometheus-operator/prometheus-operator:v0.81.0",
-        "pkg:oci/registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.15.0",
-        "pkg:oci/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2",
-        "pkg:oci/quay.io/prometheus/node-exporter:v1.9.1",
         "pkg:oci/quay.io/prometheus/alertmanager:v0.28.1",
-        "pkg:oci/quay.io/prometheus/prometheus:v3.2.1"
+        "pkg:oci/quay.io/prometheus/node-exporter:v1.9.1",
+        "pkg:oci/quay.io/prometheus-operator/prometheus-operator:v0.81.0",
+        "pkg:oci/quay.io/prometheus/prometheus:v3.2.1",
+        "pkg:oci/registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2",
+        "pkg:oci/registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.15.0"
       ]
     },
     {
@@ -3692,11 +3752,11 @@
     {
       "ref": "pkg:helm/kyverno@3.3.6",
       "dependsOn": [
-        "pkg:oci/busybox:1.35",
-        "pkg:oci/ghcr.io/kyverno/kyvernopre:v1.13.4",
-        "pkg:oci/ghcr.io/kyverno/kyverno:v1.13.4",
         "pkg:oci/bitnami/kubectl:1.30.2",
-        "pkg:oci/ghcr.io/kyverno/kyverno-cli:v1.13.4"
+        "pkg:oci/busybox:1.35",
+        "pkg:oci/ghcr.io/kyverno/kyverno-cli:v1.13.4",
+        "pkg:oci/ghcr.io/kyverno/kyvernopre:v1.13.4",
+        "pkg:oci/ghcr.io/kyverno/kyverno:v1.13.4"
       ]
     },
     {
@@ -3867,9 +3927,7 @@
     },
     {
       "ref": "pkg:helm/user-alertmanager@0.1.0",
-      "dependsOn": [
-        "pkg:oci/set-me"
-      ]
+      "dependsOn": []
     },
     {
       "ref": "pkg:helm/user-crds@0.1.0",
@@ -3889,7 +3947,7 @@
   ],
   "compositions": [
     {
-      "bom-ref": "pkg:application/welkin-apps@46feddf04eb88f01d865d2507a448808ea813639",
+      "bom-ref": "pkg:application/welkin-apps@9f554be7fee7b9f053cc39540077ff961965d8ba",
       "aggregate": "incomplete"
     }
   ],
@@ -3897,7 +3955,7 @@
     {
       "bom-ref": "metadata-annotations",
       "subjects": [
-        "pkg:application/welkin-apps@46feddf04eb88f01d865d2507a448808ea813639"
+        "pkg:application/welkin-apps@9f554be7fee7b9f053cc39540077ff961965d8ba"
       ],
       "annotator": {
         "component": {
@@ -3915,8 +3973,8 @@
           ]
         }
       },
-      "timestamp": "2025-06-02T14:47:24Z",
-      "text": "This Software Bill-of-Materials (SBOM) document was created on Monday, June 2, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'welkin-apps' with version '46feddf04eb88f01d865d2507a448808ea813639'. There are 85 components."
+      "timestamp": "2025-06-10T09:34:02Z",
+      "text": "This Software Bill-of-Materials (SBOM) document was created on Tuesday, June 10, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'welkin-apps' with version '9f554be7fee7b9f053cc39540077ff961965d8ba'. There are 85 components."
     }
   ]
 }
