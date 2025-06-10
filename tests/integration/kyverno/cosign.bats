@@ -58,7 +58,7 @@ teardown() {
   assert_success
 }
 
-@test "CAN deploy a deployment with a singed image" {
+@test "CAN deploy a deployment with a signed image" {
   run kubectl create deployment secure-deploy --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
   assert_success
 }
