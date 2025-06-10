@@ -96,7 +96,11 @@ teardown() {
   assert_failure
 }
 
+@test "can NOT run image signed by untrusted key" {
+  run kubectl create deployment test-unsigned --namespace=securespace --image=sha256:98d47bd2f419a75c3e9976e67131df18f7f64dba4db132293ece0a9b12017185
+  assert_failure
+  assert_output --partial "verify-image-signature: 'failed to verify image"
+}
 
 # TODO @test "multiple keys requires multiple signatures" {}
-# TODO @test "signed by untrusted key" {}
 # TODO @test "signed both trusted and untrusted key?" {}
