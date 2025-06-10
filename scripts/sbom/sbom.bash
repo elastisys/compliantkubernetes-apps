@@ -150,14 +150,7 @@ _sbom_add_component() {
     append_query="= $(_format_supplier_object "${value}")"
   fi
 
-  # check if key that should be updated exists
-  has_key=$(jq ".components[] | select(.evidence.occurrences[0].location == \"${location}\") | has(\"${key}\")" "${sbom_file}")
-
-  if [[ "${has_key}" == false ]]; then
-    CK8S_AUTO_APPROVE=true _yq_run_query "${sbom_file}" "with(.components[] | select(.evidence.occurrences[0].location == \"${location}\"); .${key} = ${value_type})"
-  fi
-
-  query="with(.components[] | select(.evidence.occurrences[0].location == \"${location}\"); .${key} ${append_query})"
+  query="with(.components[] | select(.evidence.occurrences[0].location == \"${location}\"); with(select(has(\"${key}\") | not); .${key} = ${value_type}) | .${key} ${append_query})"
 
   _yq_run_query "${sbom_file}" "${query}"
 }
