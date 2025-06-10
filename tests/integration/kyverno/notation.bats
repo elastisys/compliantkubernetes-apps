@@ -3,7 +3,7 @@
 # Test only validation, not signing and such
 
 setup_file() {
-  # Configure to use Notary
+  log.trace "Configuring for Notary"
 
   load "../../bats.lib.bash"
   load_common "yq.bash"
@@ -42,7 +42,6 @@ E/h1SgwfB3awlula/iFTpuLFqpVr7SimJ3CsWajbXU13k/lawPJ1+g==
 
   ck8s ops helmfile wc apply --include-transitive-needs --output simple -l app=kyverno
 
-  log.trace "Notary"
 }
 
 setup() {
@@ -72,7 +71,7 @@ teardown() {
   assert_output --partial "verify-image-signature: 'failed to verify image"
 }
 
-@test "unsigned in some namespace where it is disabled" {
+@test "can deploy an unsigned unsigned image  in namespace where verification is not enabled" {
   run kubectl run test-unsigned --namespace=unverifiedspace --image=ghcr.io/elastisys/curl-jq:1.0.0 sleep 0
   assert_success
 }

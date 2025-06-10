@@ -3,7 +3,7 @@
 # Test only validation, not signing and such
 
 setup_file() {
-  # Configure to use Cosign
+  log.trace "Configuring for Cosign"
 
   load "../../bats.lib.bash"
   load_common "yq.bash"
@@ -25,7 +25,6 @@ EZIWF76W/2/z5DCrHWSetz8FjJjvUq5Niw7JxfQRyZte+VISWcLcsUUfnA==
 
   ck8s ops helmfile wc apply --include-transitive-needs --output simple -l app=kyverno
 
-  log.trace "Cosign"
 }
 
 setup() {
@@ -55,7 +54,7 @@ teardown() {
   assert_output --partial "verify-image-signature: 'failed to verify image"
 }
 
-@test "unsigned in some namespace where it is disabled" {
+@test "can deploy an unsigned unsigned image  in namespace where verification is not enabled" {
   run kubectl run test-unsigned --namespace=unverifiedspace --image=ghcr.io/elastisys/curl-jq:1.0.0 sleep 0
   assert_success
 }
