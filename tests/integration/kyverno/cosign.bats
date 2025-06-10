@@ -43,7 +43,7 @@ teardown() {
   kubectl delete pod --namespace=securespace --all
 }
 
-@test "can deploy a pod with a signed image" {
+@test "CAN deploy a pod with a signed image" {
   run kubectl run test-signed --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
   assert_success
 }
@@ -54,12 +54,12 @@ teardown() {
   assert_output --partial "verify-image-signature: 'failed to verify image"
 }
 
-@test "can deploy an unsigned unsigned image  in namespace where verification is not enabled" {
+@test "CAN deploy an unsigned unsigned image  in namespace where verification is not enabled" {
   run kubectl run test-unsigned --namespace=unverifiedspace --image=ghcr.io/elastisys/curl-jq:1.0.0 sleep 0
   assert_success
 }
 
-@test "can deploy a deployment with a singed image" {
+@test "CAN deploy a deployment with a singed image" {
   run kubectl create deployment secure-deploy --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
   assert_success
 }
