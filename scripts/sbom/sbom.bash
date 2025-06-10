@@ -444,57 +444,21 @@ _add_container_images_from_template() {
   sbom_file="${1}"
   template_file="${2}"
   chart="${3}"
-  type="${4}"
 
   chart_name=$(jq -r ".name" <<<"${chart}")
   chart_version=$(jq -r ".version" <<<"${chart}")
   chart_location=$(jq -r ".location" <<<"${chart}")
 
   chart_query="(.metadata.annotations.release == \"${chart_location}\")"
+  kinds_query="(.kind == \"Alertmanager\" or .kind == \"CronJob\" or .kind == \"DaemonSet\" or .kind == \"Deployment\" or .kind == \"Job\" or .kind == \"Pod\" or .kind == \"Prometheus\" or .kind == \"StatefulSet\")"
+  select_query="select(${kinds_query} and ${chart_query})"
+  # TODO: add special case for e.g. ClusterPolicy CRD which has image and version as separate keys
 
-  if [[ "${type}" == "pod" ]]; then
-    query="select(.kind == \"Pod\" and ${chart_query}) | .spec | ((.initContainers[] | .image), (.containers[] | .image))"
-  elif [[ "${type}" == "cronjob" ]]; then
-    query="select(.kind == \"CronJob\" and ${chart_query}) | .spec.jobTemplate.spec.template.spec | ((.initContainers[] | .image), (.containers[] | .image))"
-  elif [[ "${type}" == "daemonset" ]]; then
-    query="select(.kind == \"DaemonSet\" and ${chart_query}) | .spec.template.spec | ((.initContainers[] | .image), (.containers[] | .image))"
-  elif [[ "${type}" == "deployment" ]]; then
-    query="select(.kind == \"Deployment\" and ${chart_query}) | .spec.template.spec | ((.initContainers[] | .image), (.containers[] | .image))"
-  elif [[ "${type}" == "job" ]]; then
-    query="select(.kind == \"Job\" and ${chart_query}) | .spec.template.spec | ((.initContainers[] | .image), (.containers[] | .image))"
-  elif [[ "${type}" == "statefulset" ]]; then
-    query="select(.kind == \"StatefulSet\" and ${chart_query}) | .spec.template.spec | ((.initContainers[] | .image), (.containers[] | .image))"
-  elif [[ "${type}" == "alertmanager" ]]; then
-    # TODO: user-alertmanager Alertmanager resource deployed in its own chart currently does not include the image in the template (switching to kps solves this)
-    query="select(.kind == \"Alertmanager\" and ${chart_query}) | .spec.image"
-  elif [[ "${type}" == "prometheus" ]]; then
-    query="select(.kind == \"Prometheus\" and ${chart_query}) | .spec.image"
-  fi
-
-  mapfile -t containers < <(yq "${query}" "${template_file}" | sed '/---/d' | sort -u)
-
-  if [[ ${#containers[@]} -eq 0 ]]; then
-    return
-  fi
+  mapfile -t containers < <(yq "${select_query} | .. | select(has(\"image\")) | .image" "${template_file}" | sed '/---/d' | sort -u)
 
   for container in "${containers[@]}"; do
-    if [[ "${container}" == "null" ]]; then
-      container="set-me"
-    fi
     _sbom_add_component "${sbom_file}" "${chart_location}" "components" "${container}"
   done
-}
-
-# add images for each type for a chart release
-_add_container_images_for_component() {
-  _add_container_images_from_template "${@}" "cronjob"
-  _add_container_images_from_template "${@}" "pod"
-  _add_container_images_from_template "${@}" "deployment"
-  _add_container_images_from_template "${@}" "job"
-  _add_container_images_from_template "${@}" "daemonset"
-  _add_container_images_from_template "${@}" "statefulset"
-  _add_container_images_from_template "${@}" "alertmanager"
-  _add_container_images_from_template "${@}" "prometheus"
 }
 
 # loops over all charts included in the sbom and adds templated container images to a input sbom file
@@ -518,7 +482,7 @@ _add_container_images() {
   mapfile -t all_charts < <(sbom_get_charts "${sbom_file}")
 
   for chart in "${all_charts[@]}"; do
-    _add_container_images_for_component "${sbom_file}" "${template_file}" "${chart}"
+    _add_container_images_from_template "${sbom_file}" "${template_file}" "${chart}"
   done
 }
 
