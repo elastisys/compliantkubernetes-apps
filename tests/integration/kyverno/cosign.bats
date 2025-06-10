@@ -3,11 +3,10 @@
 # Test only validation, not signing and such
 
 setup_file() {
-  log.trace "Configuring for Cosign"
-
   load "../../bats.lib.bash"
   load_common "yq.bash"
 
+  log.trace "Configuring for Cosign"
   yq.set wc '.kyverno.enabled' true
   yq.set wc '.kyverno.policies.verifyImageSignature.enabled' true
   yq.set wc '.kyverno.policies.verifyImageSignature.type' '"Cosign"'
