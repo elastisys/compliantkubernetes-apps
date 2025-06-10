@@ -103,3 +103,4 @@ teardown() {
 
 # TODO @test "multiple keys requires multiple signatures" {}
 # TODO @test "signed both trusted and untrusted key?" {}
+# TODO @test "attestor is a CA cert, signed by leaf cert?"
