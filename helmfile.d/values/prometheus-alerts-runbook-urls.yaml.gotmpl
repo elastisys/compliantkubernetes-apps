@@ -49,6 +49,20 @@ runbookUrls:
     {{- dict "name" "ClusterApiMachineDeploymentNotFullyReady" "config" .clusterApi | include "tpl.missing-runbook" }}
     {{- dict "name" "ClusterApiMachineDeploymentMajorityNotReady" "config" .clusterApi | include "tpl.missing-runbook" }}
     {{- dict "name" "ClusterApiMachineConditionNotTrue" "config" .clusterApi | include "tpl.missing-runbook" }}
+  clusterAutoscaler:
+    {{- dict "name" "ClusterAutoscalerClusterNotSafeToAutoscale" "config" .clusterAutoscaler | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterAutoscalerInactive" "config" .clusterAutoscaler | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterAutoscalerUnschedulablePodsHigh" "config" .clusterAutoscaler | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterAutoscalerFailedScaleUp" "config" .clusterAutoscaler | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterAutoscalerFailedGPUScaleUp" "config" .clusterAutoscaler | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterAutoscalerNodeGroupUnhealthy" "config" .clusterAutoscaler | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterAutoscalerNodeGroupBackoff" "config" .clusterAutoscaler | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterAutoscalerUnremovableNodesStuck" "config" .clusterAutoscaler | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterAutoscalerClusterAutoscalerErrors" "config" .clusterAutoscaler | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterAutoscalerPendingNodeDeletionsHigh" "config" .clusterAutoscaler | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterAutoscalerScaleUpTooLong" "config" .clusterAutoscaler | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterAutoscalerScaleDownTooLong" "config" .clusterAutoscaler | include "tpl.missing-runbook" }}
+    {{- dict "name" "ClusterAutoscalerMainLoopTooLong" "config" .clusterAutoscaler | include "tpl.missing-runbook" }}
   clusterCapacityManagement:
     {{- dict "name" "NodeFilesystemSpaceFillingUp" "subpath" "node" "config" .clusterCapacityManagement | include "tpl.prometheus-operator" }}
     {{- dict "name" "PersistentVolumeXPercentInThreeDays" "subpath" "kubernetes" "override" "kubepersistentvolumefillingup" "config" .clusterCapacityManagement | include "tpl.prometheus-operator" }}

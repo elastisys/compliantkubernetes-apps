@@ -9,6 +9,10 @@ spec:
   endpoints:
   - interval: 30s
     port: http
+    relabelings:
+      - targetLabel: cluster
+        replacement: {{ .Values.clusterName }}
+        action: replace
   namespaceSelector:
     matchNames:
     - capi-cluster
