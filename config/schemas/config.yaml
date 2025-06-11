@@ -4207,6 +4207,8 @@ properties:
             $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
           clusterApi:
             $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
+          clusterAutoscaler:
+            $ref: '#/properties/alerts/properties/runbookUrls/$defs/noUpstreamRunbook'
           clusterCapacityManagement:
             $ref: '#/properties/alerts/properties/runbookUrls/$defs/upstreamRunbook'
           configReloaders:
