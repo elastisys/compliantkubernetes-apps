@@ -82,6 +82,3 @@ teardown() {
   assert_failure
   assert_output --partial "verify-image-signature: 'failed to verify image"
 }
-
-# TODO @test "multiple keys requires multiple signatures" {}
-# TODO @test "signed both trusted and untrusted key?" {}
