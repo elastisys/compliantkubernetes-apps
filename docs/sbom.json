@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:4c8c74c4-6026-40c7-b96c-867b003f8e93",
-  "version": 18,
+  "serialNumber": "urn:uuid:9d9d8149-e737-4d5d-bbfd-40dca559bd8e",
+  "version": 19,
   "metadata": {
-    "timestamp": "2025-06-10T09:34:02Z",
+    "timestamp": "2025-06-11T08:47:17Z",
     "tools": {
       "components": [
         {
@@ -36,10 +36,10 @@
     "component": {
       "group": "",
       "name": "welkin-apps",
-      "version": "9f554be7fee7b9f053cc39540077ff961965d8ba",
+      "version": "7a753f7629124af8f1054b7cdffcf9b763f07719",
       "type": "application",
-      "bom-ref": "pkg:application/welkin-apps@9f554be7fee7b9f053cc39540077ff961965d8ba",
-      "purl": "pkg:application/welkin-apps@9f554be7fee7b9f053cc39540077ff961965d8ba"
+      "bom-ref": "pkg:application/welkin-apps@7a753f7629124af8f1054b7cdffcf9b763f07719",
+      "purl": "pkg:application/welkin-apps@7a753f7629124af8f1054b7cdffcf9b763f07719"
     },
     "properties": [
       {
@@ -3354,38 +3354,6 @@
     },
     {
       "group": "",
-      "name": "user-alertmanager",
-      "version": "0.1.0",
-      "description": "A Helm chart for Kubernetes",
-      "purl": "pkg:helm/user-alertmanager@0.1.0",
-      "type": "library",
-      "bom-ref": "pkg:helm/user-alertmanager@0.1.0",
-      "evidence": {
-        "occurrences": [
-          {
-            "location": "helmfile.d/charts/user-alertmanager"
-          }
-        ]
-      },
-      "properties": [
-        {
-          "name": "Elastisys evaluation",
-          "value": "set-me"
-        }
-      ],
-      "supplier": {
-        "name": "Elastisys"
-      },
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ]
-    },
-    {
-      "group": "",
       "name": "user-crds",
       "version": "0.1.0",
       "description": "A Helm chart for Kubernetes",
@@ -3926,10 +3894,6 @@
       ]
     },
     {
-      "ref": "pkg:helm/user-alertmanager@0.1.0",
-      "dependsOn": []
-    },
-    {
       "ref": "pkg:helm/user-crds@0.1.0",
       "dependsOn": []
     },
@@ -3947,7 +3911,7 @@
   ],
   "compositions": [
     {
-      "bom-ref": "pkg:application/welkin-apps@9f554be7fee7b9f053cc39540077ff961965d8ba",
+      "bom-ref": "pkg:application/welkin-apps@7a753f7629124af8f1054b7cdffcf9b763f07719",
       "aggregate": "incomplete"
     }
   ],
@@ -3955,7 +3919,7 @@
     {
       "bom-ref": "metadata-annotations",
       "subjects": [
-        "pkg:application/welkin-apps@9f554be7fee7b9f053cc39540077ff961965d8ba"
+        "pkg:application/welkin-apps@7a753f7629124af8f1054b7cdffcf9b763f07719"
       ],
       "annotator": {
         "component": {
@@ -3973,8 +3937,8 @@
           ]
         }
       },
-      "timestamp": "2025-06-10T09:34:02Z",
-      "text": "This Software Bill-of-Materials (SBOM) document was created on Tuesday, June 10, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'welkin-apps' with version '9f554be7fee7b9f053cc39540077ff961965d8ba'. There are 85 components."
+      "timestamp": "2025-06-11T08:47:17Z",
+      "text": "This Software Bill-of-Materials (SBOM) document was created on Wednesday, June 11, 2025 with cdxgen. The data was captured during the build lifecycle phase. The document describes an application named 'welkin-apps' with version '7a753f7629124af8f1054b7cdffcf9b763f07719'. There are 84 components."
     }
   ]
 }
