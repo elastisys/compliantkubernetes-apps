@@ -620,9 +620,9 @@ sbom_get_charts() {
 
 sbom_get_containers() {
   local query
-  query='.components[] | [.components[] | { "name": .name, "version": .version}] | .[]'
+  query='.components[] | select(has("components")) | [.components[] | { "name": .name, "version": .version}] | unique_by([.name, .version]) | sort_by([.name, .version]) | .[]'
 
-  jq -e --color-output -c "${query}" "${SBOM_FILE}" | sort -u
+  jq -e -c "${query}" "${SBOM_FILE}"
 }
 
 sbom_edit() {
@@ -787,39 +787,29 @@ sbom_generate() {
 }
 
 sbom_diff() {
-  local chart_file chart_name chart_version found_diff location
-  mapfile -t diff_files < <(git diff --staged --name-only | grep "helmfile.d/")
-  mapfile -t all_charts < <(sbom_get_charts "${SBOM_FILE}")
+  local chart_file chart_name chart_version location
+  mapfile -t all_chart_components < <(sbom_get_charts "${SBOM_FILE}")
 
   should_fail=false
-  for chart in "${all_charts[@]}"; do
-    found_diff=false
-    sbom_component_name=$(jq '.name' <<<"${chart}")
-    sbom_component_version=$(jq '.version' <<<"${chart}")
-    location=$(jq '.location' <<<"${chart}")
+  for chart in "${all_chart_components[@]}"; do
+    sbom_component_name=$(jq -r '.name' <<<"${chart}")
+    sbom_component_version=$(jq -r '.version' <<<"${chart}")
+    location=$(jq -r '.location' <<<"${chart}")
     chart_file="${ROOT}/${location}/Chart.yaml"
 
-    for diff_file in "${diff_files[@]}"; do
-      if [[ "${diff_file}" == *${location}* ]]; then
-        chart_name="$(yq '.name' "${chart_file}")"
-        chart_version="$(yq '.version' "${chart_file}")"
-        if [[ "${chart_version}" != "${sbom_component_version}" ]]; then
-          found_diff=true
-          log_warning "Chart version \"${chart_version}\" does not match SBOM \"${sbom_component_version}\""
-          break
-        elif [[ "${chart_name}" != "${sbom_component_name}" ]]; then
-          found_diff=true
-          log_warning "Chart name \"${chart_name}\" does not match SBOM \"${sbom_component_name}\""
-          break
-        fi
-      fi
-    done
-
-    if [[ "${found_diff}" == true ]]; then
-      should_fail=true
-      log_warning "Run the following to update the SBOM:"
-      log_warning "./scripts/sbom/sbom.bash update ${location}"
+    chart_name="$(yq '.name' "${chart_file}")"
+    chart_version="$(yq '.version' "${chart_file}")"
+    if [[ "${chart_version}" != "${sbom_component_version}" ]]; then
+      log_warning "Chart version \"${chart_version}\" does not match SBOM \"${sbom_component_version}\""
+    elif [[ "${chart_name}" != "${sbom_component_name}" ]]; then
+      log_warning "Chart name \"${chart_name}\" does not match SBOM \"${sbom_component_name}\""
+    else
+      continue
     fi
+
+    should_fail=true
+    log_warning "Run the following to update the SBOM:"
+    log_warning "./scripts/sbom/sbom.bash update ${location}"
   done
 
   if [[ "${should_fail}" == false ]]; then
