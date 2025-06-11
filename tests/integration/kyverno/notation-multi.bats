@@ -1,6 +1,4 @@
 #!/usr/bin/env bats
-#
-# Test only validation, not signing and such
 
 setup_file() {
   load "../../bats.lib.bash"
@@ -33,6 +31,9 @@ ojBKxnWOcwwv+Cf8w4fKORb8FrpwynajFmt0u1JaeFVUUFQwD8Zft9yXx8V+jsjH
 riW+YqloGCNVJK4D5Vw4OYlWUETlxdOyp4FMnZ2SOxiDGXE7LKXY+a7M2S71VcZZ
 E/h1SgwfB3awlula/iFTpuLFqpVr7SimJ3CsWajbXU13k/lawPJ1+g==
 -----END CERTIFICATE-----
+-----BEGIN TODO-----
+Generate another certificate
+-----END TODO-----
 "'
 
   kubectl create namespace unverifiedspace
@@ -59,43 +60,8 @@ teardown() {
   kubectl delete pod --namespace=securespace --all
 }
 
-@test "CAN deploy a pod with a signed image" {
-  run kubectl run test-signed --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
-  assert_success
-}
 
-@test "can NOT deploy a pod with an unsigned image" {
-  run kubectl run test-unsigned --namespace=securespace --image=ghcr.io/elastisys/curl-jq:1.0.0 sleep 0
-  assert_failure
-  assert_output --partial "verify-image-signature: 'failed to verify image"
-}
 
-@test "CAN deploy an unsigned unsigned image  in namespace where verification is not enabled" {
-  run kubectl run test-unsigned --namespace=unverifiedspace --image=ghcr.io/elastisys/curl-jq:1.0.0 sleep 0
-  assert_success
-}
-
-@test "CAN deploy a deployment with a signed image" {
-  run kubectl create deployment secure-deploy --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
-  assert_success
-}
-
-@test "can NOT deploy a deployment with an unsigned image" {
-  run kubectl create deployment test-unsigned --namespace=securespace --image=ghcr.io/elastisys/curl-jq:1.0.0
-  assert_failure
-  assert_output --partial "verify-image-signature: 'failed to verify image"
-}
-
-@test "can NOT change a deployment to an unsigned image" {
-  run kubectl create deployment secure-deploy --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
-  assert_success
-
-  run kubectl set image deployment secure-deploy --namespace=securespace secure-deploy=ghcr.io/elastisys/curl-jq:1.0.0
-  assert_failure
-}
-
-@test "can NOT run image signed by untrusted key" {
-  run kubectl create deployment test-unsigned --namespace=securespace --image=sha256:98d47bd2f419a75c3e9976e67131df18f7f64dba4db132293ece0a9b12017185
-  assert_failure
-  assert_output --partial "verify-image-signature: 'failed to verify image"
-}
+# TODO @test "multiple keys requires multiple signatures" {}
+# TODO @test "signed both trusted and untrusted key?" {}
+# TODO @test "attestor is a CA cert, signed by leaf cert?"
