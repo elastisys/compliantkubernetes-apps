@@ -34,7 +34,7 @@
       expr: sum(rate(cluster_autoscaler_failed_scale_ups_total[5m])) by (cluster, reason) > 0
       for: 1m
       labels:
-        severity: high
+        severity: critical
       annotations:
         summary: "Cluster Autoscaler failed to scale up"
         description: "The Cluster Autoscaler for cluster {{"`{{ $labels.cluster }}`"}} encountered an error while attempting to scale up new nodes. Reason: {{"{{ $labels.reason }}"}}"
@@ -44,7 +44,7 @@
       expr: sum(rate(cluster_autoscaler_failed_gpu_scale_ups_total[5m])) by (cluster, reason, gpu_resource_name, gpu_name) > 0
       for: 1m
       labels:
-        severity: high
+        severity: critical
       annotations:
         summary: "Cluster Autoscaler failed to scale up GPU nodes"
         description: "The Cluster Autoscaler for cluster {{"`{{ $labels.cluster }}`"}} encountered an error while attempting to scale up GPU nodes. Reason: {{"{{ $labels.reason }}"}}, GPU Resource: {{"{{ $labels.gpu_resource_name }}"}}, GPU Name: {{"{{ $labels.gpu_name }}"}}"
