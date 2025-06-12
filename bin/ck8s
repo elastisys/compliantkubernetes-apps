@@ -38,6 +38,7 @@ usage() {
   echo "  upgrade <wc|sc|both> unlock                     reset an upgrade to allow trying again" 1>&2
   echo "  validate <wc|sc>                                validates config files" 1>&2
   echo "  check-requirements                              check the locally installed tool versions" 1>&2
+  echo "  harbor-restore [--backup-id <value>] [--azure-rclone-fixup]   restores Harbor using detected storage type" 1>&2
   echo "  version <all|both|config|sc|wc>                 shows apps version" 1>&2
   exit 1
 }
@@ -162,6 +163,11 @@ diagnostics)
   [[ "${2}" =~ ^(wc|sc)$ ]] || usage
   shift
   "${here}/diagnostics.bash" "${@}"
+  ;;
+harbor-restore)
+  check_tools
+  shift
+  "${here}/harbor-restore.sh" "${@}"
   ;;
 version) # all|both|sc|wc
   shift
