@@ -105,3 +105,18 @@ This will output each container image name and version in `ndjson` format, e.g:
 ```json
 {"name":"velero/velero","version":"v1.13.0"}
 ```
+
+## Elastisys Evaluation
+
+The SBOM includes a custom field called `Elastisys evaluation`.
+This includes our assessment of the suitability of the component for Welkin, based on the risks described on [this page](https://elastisys.io/welkin/adr/#how-are-architectural-decisions-taken).
+
+They should be interpreted as follows:
+
+- Okey: This is a high-quality component, solid security disclosures, open-source license, governed by multiple vendors, unlikely to be abandoned in the foreseeable future. Examples of such components include:
+    - components produced by Elastisys;
+    - CNCF sandbox, incubating and graduated projects, whose health is not questioned.
+- Acceptable: This component brings some risks -- e.g., it is backed by a single author -- but due to this component being easy-to-replace or providing non-critical functionality we accept the risk. Examples of such components include:
+    - Min.IO if used for local development or testing.
+- Not Okey: This component brings huge risks -- e.g., it is abandoned, its license has changed, etc. Escalate to the Product Team ASAP to discuss replacing it. Examples of such components include:
+    - Redis (which we have already replaced).
