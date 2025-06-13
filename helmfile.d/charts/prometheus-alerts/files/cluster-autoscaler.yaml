@@ -72,7 +72,7 @@
 
     - alert: ClusterAutoscalerUnneededNodesNotScaledDown
       expr: cluster_autoscaler_unneeded_nodes_count > 0
-      for: 24h
+      for: 6h
       labels:
         severity: warning
       annotations:
