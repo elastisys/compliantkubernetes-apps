@@ -69,7 +69,7 @@ The SBOM script includes some useful `get` commands that can be used to retrieve
 
 ### Getting unset required fields
 
-Some fields currently needs to be updated manually in the SBOM, these includes the `Elastisys evaluation` and `supplier`, but also some fields like `licenses` might not be retrieved automatically through the `generate` or `update` commands due to the charts not providing sufficient information.
+Some fields currently needs to be updated manually in the SBOM, these includes the [`Elastisys evaluation`](#elastisys-evaluation) and `supplier`, but also some fields like `licenses` might not be retrieved automatically through the `generate` or `update` commands due to the charts not providing sufficient information.
 To get a list of the components that are missing such fields, it is possible to run the following:
 
 ```sh
