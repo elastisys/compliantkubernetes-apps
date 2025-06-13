@@ -41,7 +41,7 @@ teardown() {
 }
 
 @test "CAN deploy a pod with a signed image" {
-  run kubectl run test-signed --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:a
+  run kubectl run test-signed --namespace=securespace --image=ghcr.io/elastisys/kyverno-test-image:a
   assert_success
 }
 
@@ -57,7 +57,7 @@ teardown() {
 }
 
 @test "CAN deploy a deployment with a signed image" {
-  run kubectl create deployment secure-deploy --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:a
+  run kubectl create deployment secure-deploy --namespace=securespace --image=ghcr.io/elastisys/kyverno-test-image:a
   assert_success
 }
 
@@ -68,7 +68,7 @@ teardown() {
 }
 
 @test "can NOT change a deployment to an unsigned image" {
-  run kubectl create deployment secure-deploy --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:a
+  run kubectl create deployment secure-deploy --namespace=securespace --image=ghcr.io/elastisys/kyverno-test-image:a
   assert_success
 
   run kubectl set image deployment secure-deploy --namespace=securespace secure-deploy=ghcr.io/elastisys/curl-jq:1.0.0
@@ -76,7 +76,7 @@ teardown() {
 }
 
 @test "can NOT run image signed by untrusted key" {
-  run kubectl create deployment test-unsigned --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:c
+  run kubectl create deployment test-unsigned --namespace=securespace --image=ghcr.io/elastisys/kyverno-test-image:c
   assert_failure
   assert_output --partial "verify-image-signature: 'failed to verify image"
 }

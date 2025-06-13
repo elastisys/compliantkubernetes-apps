@@ -79,18 +79,18 @@ teardown() {
 }
 
 @test "can NOT deploy image signed by only one key" {
-  run kubectl run test-signed --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:a
+  run kubectl run test-signed --namespace=securespace --image=ghcr.io/elastisys/kyverno-test-image:a
   assert_failure
   assert_output --partial "verify-image-signature: 'failed to verify image"
 }
 
-@test "CAN deploy image signed by only two keys" {
-  run kubectl run test-signed --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:a-b
+@test "CAN deploy image signed by two keys" {
+  run kubectl run test-signed --namespace=securespace --image=ghcr.io/elastisys/kyverno-test-image:a-b
   assert_success
 }
 
-@test "can NOT deploy image signed by only one _trusted_ key" {
-  run kubectl run test-signed --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:a-c
+@test "can NOT deploy image signed by one trusted key and one untrusted key" {
+  run kubectl run test-signed --namespace=securespace --image=ghcr.io/elastisys/kyverno-test-image:a-c
   assert_failure
   assert_output --partial "verify-image-signature: 'failed to verify image"
 }
