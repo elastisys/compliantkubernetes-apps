@@ -41,7 +41,7 @@
         runbook_url: {{ .Values.runbookUrls.clusterAutoscaler.ClusterAutoscalerUnschedulablePodsHigh }}
 
     - alert: ClusterAutoscalerFailedScaleUp
-      expr: sum(rate(cluster_autoscaler_failed_scale_ups_total[5m])) by (cluster, reason) > 0
+      expr: sum(rate(cluster_autoscaler_failed_scale_ups_total[60m])) by (cluster, reason) > 0
       for: 1m
       labels:
         severity: critical
@@ -51,7 +51,7 @@
         runbook_url: {{ .Values.runbookUrls.clusterAutoscaler.ClusterAutoscalerFailedScaleUp }}
 
     - alert: ClusterAutoscalerFailedGPUScaleUp
-      expr: sum(rate(cluster_autoscaler_failed_gpu_scale_ups_total[5m])) by (cluster, reason, gpu_resource_name, gpu_name) > 0
+      expr: sum(rate(cluster_autoscaler_failed_gpu_scale_ups_total[60m])) by (cluster, reason, gpu_resource_name, gpu_name) > 0
       for: 1m
       labels:
         severity: critical
