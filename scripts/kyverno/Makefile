@@ -23,6 +23,7 @@ notation-%.cnf: notation.cnf
 
 # Cosign
 cosign-%.pub cosign-%.key:
+	@echo Press Enter twice to assign a blank password to the test keys
 	cosign generate-key-pair --output-key-prefix cosign-$*
 
 # Test images
