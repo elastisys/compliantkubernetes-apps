@@ -1,6 +1,4 @@
 #!/usr/bin/env bats
-#
-# Test only validation, not signing and such
 
 setup_file() {
   load "../../bats.lib.bash"
@@ -11,10 +9,11 @@ setup_file() {
   yq.set wc '.kyverno.policies.verifyImageSignature.enabled' true
   yq.set wc '.kyverno.policies.verifyImageSignature.type' '"Cosign"'
   yq.set wc '.kyverno.policies.verifyImageSignature.ignoreRekorTlog' true
+  # Key a
   yq.set wc '.kyverno.policies.verifyImageSignature.attestors' \
     '"-----BEGIN PUBLIC KEY-----
-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEoL0XMcv0rXFo41ZDoVJHzHaelPn9
-EZIWF76W/2/z5DCrHWSetz8FjJjvUq5Niw7JxfQRyZte+VISWcLcsUUfnA==
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIHjN39hDmjvcpwNviJCdrhPozIKX
+lfk+eUg2z5b8uhtDJtdDGkeRF+5Bg1LUBDtvsrHbmck2xEe1psIlvaWRyw==
 -----END PUBLIC KEY-----
 "'
 
@@ -23,7 +22,6 @@ EZIWF76W/2/z5DCrHWSetz8FjJjvUq5Niw7JxfQRyZte+VISWcLcsUUfnA==
   kubectl label namespace securespace hnc.x-k8s.io/included-namespace=true
 
   ck8s ops helmfile wc apply --include-transitive-needs --output simple -l app=kyverno
-
 }
 
 setup() {
@@ -43,7 +41,7 @@ teardown() {
 }
 
 @test "CAN deploy a pod with a signed image" {
-  run kubectl run test-signed --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
+  run kubectl run test-signed --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:a
   assert_success
 }
 
@@ -53,13 +51,13 @@ teardown() {
   assert_output --partial "verify-image-signature: 'failed to verify image"
 }
 
-@test "CAN deploy an unsigned unsigned image  in namespace where verification is not enabled" {
+@test "CAN deploy an unsigned unsigned image in namespace where verification is not enabled" {
   run kubectl run test-unsigned --namespace=unverifiedspace --image=ghcr.io/elastisys/curl-jq:1.0.0 sleep 0
   assert_success
 }
 
 @test "CAN deploy a deployment with a signed image" {
-  run kubectl create deployment secure-deploy --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
+  run kubectl create deployment secure-deploy --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:a
   assert_success
 }
 
@@ -70,7 +68,7 @@ teardown() {
 }
 
 @test "can NOT change a deployment to an unsigned image" {
-  run kubectl create deployment secure-deploy --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
+  run kubectl create deployment secure-deploy --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:a
   assert_success
 
   run kubectl set image deployment secure-deploy --namespace=securespace secure-deploy=ghcr.io/elastisys/curl-jq:1.0.0
@@ -78,7 +76,7 @@ teardown() {
 }
 
 @test "can NOT run image signed by untrusted key" {
-  run kubectl create deployment test-unsigned --namespace=securespace --image=sha256:98d47bd2f419a75c3e9976e67131df18f7f64dba4db132293ece0a9b12017185
+  run kubectl create deployment test-unsigned --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:c
   assert_failure
   assert_output --partial "verify-image-signature: 'failed to verify image"
 }

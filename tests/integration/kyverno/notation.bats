@@ -1,6 +1,4 @@
 #!/usr/bin/env bats
-#
-# Test only validation, not signing and such
 
 setup_file() {
   load "../../bats.lib.bash"
@@ -11,27 +9,28 @@ setup_file() {
   yq.set wc '.kyverno.policies.verifyImageSignature.enabled' true
   yq.set wc '.kyverno.policies.verifyImageSignature.type' '"Notary"'
   yq.set wc '.kyverno.policies.verifyImageSignature.ignoreRekorTlog' true
+  # Key a
   yq.set wc '.kyverno.policies.verifyImageSignature.attestors' \
     '"-----BEGIN CERTIFICATE-----
-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
+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
 -----END CERTIFICATE-----
 "'
 
@@ -40,7 +39,6 @@ E/h1SgwfB3awlula/iFTpuLFqpVr7SimJ3CsWajbXU13k/lawPJ1+g==
   kubectl label namespace securespace hnc.x-k8s.io/included-namespace=true
 
   ck8s ops helmfile wc apply --include-transitive-needs --output simple -l app=kyverno
-
 }
 
 setup() {
@@ -60,7 +58,7 @@ teardown() {
 }
 
 @test "CAN deploy a pod with a signed image" {
-  run kubectl run test-signed --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
+  run kubectl run test-signed --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:a
   assert_success
 }
 
@@ -70,13 +68,13 @@ teardown() {
   assert_output --partial "verify-image-signature: 'failed to verify image"
 }
 
-@test "CAN deploy an unsigned unsigned image  in namespace where verification is not enabled" {
+@test "CAN deploy an unsigned unsigned image in namespace where verification is not enabled" {
   run kubectl run test-unsigned --namespace=unverifiedspace --image=ghcr.io/elastisys/curl-jq:1.0.0 sleep 0
   assert_success
 }
 
 @test "CAN deploy a deployment with a signed image" {
-  run kubectl create deployment secure-deploy --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
+  run kubectl create deployment secure-deploy --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:a
   assert_success
 }
 
@@ -87,7 +85,7 @@ teardown() {
 }
 
 @test "can NOT change a deployment to an unsigned image" {
-  run kubectl create deployment secure-deploy --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:signed
+  run kubectl create deployment secure-deploy --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:a
   assert_success
 
   run kubectl set image deployment secure-deploy --namespace=securespace secure-deploy=ghcr.io/elastisys/curl-jq:1.0.0
@@ -95,7 +93,7 @@ teardown() {
 }
 
 @test "can NOT run image signed by untrusted key" {
-  run kubectl create deployment test-unsigned --namespace=securespace --image=sha256:98d47bd2f419a75c3e9976e67131df18f7f64dba4db132293ece0a9b12017185
+  run kubectl create deployment test-unsigned --namespace=securespace --image=ghcr.io/elastisys/test-verify-image:c
   assert_failure
   assert_output --partial "verify-image-signature: 'failed to verify image"
 }
