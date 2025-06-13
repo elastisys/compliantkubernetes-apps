@@ -145,7 +145,7 @@
       expr: histogram_quantile(0.99, sum by (le, cluster) (rate(cluster_autoscaler_function_duration_seconds_bucket{function="main"}[5m]))) > 120
       for: 5m
       labels:
-        severity: critical
+        severity: high
       annotations:
         summary: "Cluster Autoscaler main loop is taking too long"
         description: "The 99th percentile of the {{"`{{ $labels.cluster }}`"}} Cluster Autoscaler's main loop duration has exceeded 120 seconds."
