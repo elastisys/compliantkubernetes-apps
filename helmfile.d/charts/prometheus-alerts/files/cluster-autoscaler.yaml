@@ -1,0 +1,152 @@
+- name: cluster-autoscaler
+  rules:
+    - alert: ClusterAutoscalerClusterNotSafeToAutoscale
+      expr: cluster_autoscaler_cluster_safe_to_autoscale != 1
+      for: 15m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Autoscaling is not safe"
+        description: "Cluster Autoscaler for cluster {{"`{{ $labels.cluster }}`"}} has deemed it unsafe to autoscale for 15 minutes. This is primarily triggered when the number of unready nodes pass a configured threshold. It can also be triggered when the cluster is empty and scaling from zero nodes is not allowed."
+        runbook_url: {{ .Values.runbookUrls.clusterAutoscaler.ClusterAutoscalerClusterNotSafeToAutoscale }}
+
+    - alert: ClusterAutoscalerInactive
+      expr: time() - cluster_autoscaler_last_activity{activity="main"} > 300
+      for: 1m
+      labels:
+        severity: high
+      annotations:
+        summary: "No Cluster Autoscaler main loop activity"
+        description: "The main loop of the Cluster Autoscaler for cluster {{"`{{ $labels.cluster }}`"}} has not updated its last activity in over 5 minutes which means it might be stuck or not running."
+        runbook_url: {{ .Values.runbookUrls.clusterAutoscaler.ClusterAutoscalerInactive }}
+
+    - alert: ClusterAutoscalerInactiveLong
+      expr: time() - cluster_autoscaler_last_activity{activity="main"} > 3600
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "No Cluster Autoscaler main loop activity for a long time"
+        description: "The main loop of the Cluster Autoscaler for cluster {{"`{{ $labels.cluster }}`"}} has not updated its last activity in over 1 hour which means it might be stuck or not running."
+        runbook_url: {{ .Values.runbookUrls.clusterAutoscaler.ClusterAutoscalerInactive }}
+
+    - alert: ClusterAutoscalerUnschedulablePodsHigh
+      expr: cluster_autoscaler_unschedulable_pods_count{type="unschedulable"} > 0
+      for: 30m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Pods are currently unschedulable"
+        description: "There are unschedulable pods in the cluster {{"`{{ $labels.cluster }}`"}}. The Cluster Autoscaler should address this by scaling up, if possible."
+        runbook_url: {{ .Values.runbookUrls.clusterAutoscaler.ClusterAutoscalerUnschedulablePodsHigh }}
+
+    - alert: ClusterAutoscalerFailedScaleUp
+      expr: sum(rate(cluster_autoscaler_failed_scale_ups_total[60m])) by (cluster, reason) > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Cluster Autoscaler failed to scale up"
+        description: "The Cluster Autoscaler for cluster {{"`{{ $labels.cluster }}`"}} encountered an error while attempting to scale up new nodes. Reason: {{"{{ $labels.reason }}"}}"
+        runbook_url: {{ .Values.runbookUrls.clusterAutoscaler.ClusterAutoscalerFailedScaleUp }}
+
+    - alert: ClusterAutoscalerFailedGPUScaleUp
+      expr: sum(rate(cluster_autoscaler_failed_gpu_scale_ups_total[60m])) by (cluster, reason, gpu_resource_name, gpu_name) > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Cluster Autoscaler failed to scale up GPU nodes"
+        description: "The Cluster Autoscaler for cluster {{"`{{ $labels.cluster }}`"}} encountered an error while attempting to scale up GPU nodes. Reason: {{"{{ $labels.reason }}"}}, GPU Resource: {{"{{ $labels.gpu_resource_name }}"}}, GPU Name: {{"{{ $labels.gpu_name }}"}}"
+        runbook_url: {{ .Values.runbookUrls.clusterAutoscaler.ClusterAutoscalerFailedGPUScaleUp }}
+
+    - alert: ClusterAutoscalerNodeGroupUnhealthy
+      expr: cluster_autoscaler_node_group_healthiness == 0
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Unhealthy node group"
+        description: "The node group {{"{{ $labels.node_group }}"}} in cluster {{"`{{ $labels.cluster }}`"}} is reporting as unhealthy which might prevent autoscaling operations for this group."
+        runbook_url: {{ .Values.runbookUrls.clusterAutoscaler.ClusterAutoscalerNodeGroupUnhealthy }}
+
+    - alert: ClusterAutoscalerNodeGroupBackoff
+      expr: cluster_autoscaler_node_group_backoff_status == 1
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "A node group is in backoff state"
+        description: "The node group {{"{{ $labels.node_group }}"}} in cluster {{"`{{ $labels.cluster }}`"}} is currently in a backoff state due to reason: {{"{{ $labels.reason }}"}}. This means that the Cluster Autoscaler will not try to scale it up."
+        runbook_url: {{ .Values.runbookUrls.clusterAutoscaler.ClusterAutoscalerNodeGroupBackoff }}
+
+    - alert: ClusterAutoscalerUnneededNodesNotScaledDown
+      expr: cluster_autoscaler_unneeded_nodes_count > 0
+      for: 6h
+      labels:
+        severity: warning
+      annotations:
+        summary: "Cluster Autoscaler reports unneeded nodes that are not being scaled down"
+        description: "There are {{"{{ $value }}"}} nodes in cluster {{"`{{ $labels.cluster }}`"}} identified as unneeded by the Cluster Autoscaler, but they have not been scaled down for 24 hours."
+
+    # TODO: The reason label is just the reason constant integer, needs to be fixed upstream. Perhaps a new label like "reason_str" or propose to change it to the name of the constant.
+    # TODO: Doesn't tell you which node it is. Needs to be fixed upstream.
+    # - alert: ClusterAutoscalerUnremovableNodesStuck
+    #   expr: cluster_autoscaler_unremovable_nodes_count > 0
+    #   for: 15m
+    #   labels:
+    #     severity: warning
+    #   annotations:
+    #     summary: "Cluster Autoscaler reports unremovable nodes"
+    #     description: "There are {{"{{ $value }}"}} node(s) that the Cluster Autoscaler cannot remove due to reason: {{"{{ $labels.reason }}"}}."
+    #     runbook_url: {{ .Values.runbookUrls.clusterAutoscaler.ClusterAutoscalerUnremovableNodesStuck }}
+
+    - alert: ClusterAutoscalerClusterAutoscalerErrors
+      expr: sum(rate(cluster_autoscaler_errors_total[5m])) by (cluster, type) > 0
+      for: 1m
+      labels:
+        severity: high
+      annotations:
+        summary: "Cluster Autoscaler is reporting errors"
+        description: "The Cluster Autoscaler for cluster {{"`{{ $labels.cluster }}`"}} is experiencing errors of type {{"{{ $labels.type }}"}}."
+        runbook_url: {{ .Values.runbookUrls.clusterAutoscaler.ClusterAutoscalerClusterAutoscalerErrors }}
+
+    - alert: ClusterAutoscalerPendingNodeDeletionsHigh
+      expr: cluster_autoscaler_pending_node_deletions > 0
+      for: 30m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Nodes are stuck in pending deletion state"
+        description: "There are {{"{{ $value }}"}} nodes in cluster {{"`{{ $labels.cluster }}`"}} that have completed scale-down but are still pending deletion."
+        runbook_url: {{ .Values.runbookUrls.clusterAutoscaler.ClusterAutoscalerPendingNodeDeletionsHigh }}
+
+    - alert: ClusterAutoscalerScaleUpTooLong
+      expr: histogram_quantile(0.99, sum by (le, cluster) (rate(cluster_autoscaler_function_duration_seconds_bucket{function="scaleUp"}[5m]))) > 60
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Cluster Autoscaler scale up function is taking too long"
+        description: "The 99th percentile of the {{"`{{ $labels.cluster }}`"}} Cluster Autoscaler's scaleUp function duration has exceeded 60 seconds."
+        runbook_url: {{ .Values.runbookUrls.clusterAutoscaler.ClusterAutoscalerScaleUpTooLong }}
+
+    - alert: ClusterAutoscalerScaleDownTooLong
+      expr: histogram_quantile(0.99, sum by (le, cluster) (rate(cluster_autoscaler_function_duration_seconds_bucket{function="scaleDown"}[5m]))) > 60
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Cluster Autoscaler scale down function is taking too long"
+        description: "The 99th percentile of the {{"`{{ $labels.cluster }}`"}} Cluster Autoscaler's scaleDown function duration has exceeded 60 seconds."
+        runbook_url: {{ .Values.runbookUrls.clusterAutoscaler.ClusterAutoscalerScaleDownTooLong }}
+
+    - alert: ClusterAutoscalerMainLoopTooLong
+      expr: histogram_quantile(0.99, sum by (le, cluster) (rate(cluster_autoscaler_function_duration_seconds_bucket{function="main"}[5m]))) > 120
+      for: 5m
+      labels:
+        severity: high
+      annotations:
+        summary: "Cluster Autoscaler main loop is taking too long"
+        description: "The 99th percentile of the {{"`{{ $labels.cluster }}`"}} Cluster Autoscaler's main loop duration has exceeded 120 seconds."
+        runbook_url: {{ .Values.runbookUrls.clusterAutoscaler.ClusterAutoscalerMainLoopTooLong }}
