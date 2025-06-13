@@ -3,13 +3,13 @@ DOCKER=docker
 help: README.md
 	@cat README.md
 
-keys: keys-cosign keys-notation
+keys: keys-cosign keys-notation install-notation
 
 keys-cosign: cosign-a.pub cosign-b.pub cosign-c.pub
-keys-notation: notation-a.crt notation-b.crt notation-c.crt
+keys-notation: notation-a.crt notation-b.crt notation-c.crt install-notation
 
 install-notation: notation-a.crt notation-a.key notation-b.crt notation-b.key notation-c.crt notation-c.key
-	@cp -v $^ ~/.config/notation/localkeys/
+	@cp --no-clobber --update --verbose $^ ~/.config/notation/localkeys/
 
 # Notation (regular X.509)
 notation-%.key:
@@ -30,7 +30,9 @@ VARIANTS=a b a-b a-c c
 
 build: $(patsubst %,image-cosign-%,$(VARIANTS)) $(patsubst %,image-notation-%,$(VARIANTS))
 
-sign: $(patsubst %,signed-cosign-%,$(VARIANTS)) $(patsubst %,signed-notation-%,$(VARIANTS))
+sign: sign-cosign sign-notation
+sign-cosign: $(patsubst %,signed-cosign-%,$(VARIANTS))
+sign-notation: $(patsubst %,signed-notation-%,$(VARIANTS))
 
 image-%:
 	$(DOCKER) build -f Containerfile --build-arg VARIANT=$* -t ghcr.io/elastisys/kyverno-test-image:$*
@@ -50,6 +52,6 @@ signed-notation-%: image-% all-notation
 	done
 	@touch $@
 
-.PHONY: help keys keys-cosign keys-notation install-notation build sign
+.PHONY: help keys keys-cosign keys-notation install-notation build sign sign-notation sign-cosign
 
 .ONESHELL:
