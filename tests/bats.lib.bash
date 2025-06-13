@@ -106,6 +106,33 @@ with_kubeconfig() {
   export DETIK_CLIENT_NAME="kubectl"
 }
 
+# sets the kubeconfig to use
+# usage: with_kubeconfig <cluster> <static|admin>
+with_test_kubeconfig() {
+  if ! [[ "${1:-}" =~ ^(sc|wc)$ ]]; then
+    fail "invalid or missing cluster argument"
+  fi
+
+  if ! [[ "${2:-}" =~ ^(static|admin)$ ]]; then
+    fail "invalid or missing user argument (static/admin)"
+  fi
+
+  BASE_KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_$1.yaml"
+  export KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_$1_$2.yaml"
+  if ! [[ -f "${KUBECONFIG}" ]]; then
+    yq4 '.users[0].user.exec.args += "'"--token-cache-dir=~/.kube/cache/oidc-login/test-${2}"'"' <"${BASE_KUBECONFIG}" >"${KUBECONFIG}"
+  fi
+  export DETIK_CLIENT_NAME="kubectl"
+}
+
+clear_kubeconfig_cache() {
+  if ! [[ "${1:-}" =~ ^(static|admin)$ ]]; then
+    fail "invalid or missing user argument (static/admin)"
+  fi
+
+  rm -rf "${HOME}/.kube/cache/oidc-login/test-${1}"
+}
+
 # sets the namespace to use
 # usage: with_namespace <namespace>
 with_namespace() {
