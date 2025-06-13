@@ -742,6 +742,251 @@ verify.github() {
   mapping.verify "${@}"
 }
 
+latest.helm-plugin() {
+  if ! command -v helm &>/dev/null; then
+    note "helm not available, skipping running latest on helm-plugin packages"
+    return
+  fi
+
+  local package
+  for package in $(tr ' ' '\n' <<<"${@}"); do
+    local ref type namespace name version response
+    package.resolve "${package}"
+
+    case "${namespace}" in
+    github.com/*)
+      if ! command -v curl &>/dev/null; then
+        error "${ref}: curl not available, skipping"
+        continue
+      elif ! command -v jq &>/dev/null; then
+        error "${ref}: jq not available, skipping"
+        continue
+      fi
+
+      response=$(curl -Ls "https://api.github.com/repos/${namespace##"github.com/"}/${name}/releases/latest")
+      version="$(jq -r '.tag_name' <<<"${response}")"
+
+      set.latest "${package}" "${version}"
+      ;;
+
+    *)
+      error "${ref}: unsupported location, skipping"
+      continue
+      ;;
+    esac
+  done
+}
+
+install.helm-plugin() {
+  if ! command -v helm &>/dev/null; then
+    note "helm not available, skipping running install on helm-plugin packages"
+    return
+  elif ! command -v yq &>/dev/null; then
+    note "yq not available, skipping running install on helm-plugin packages"
+    return
+  fi
+
+  local helm_plugins
+  helm_plugins="$(helm env HELM_PLUGINS | grep -v "WARNING")"
+
+  local package
+  for package in $(tr ' ' '\n' <<<"${@}"); do
+    local ref type namespace name version current_name="" current_version="" current_checksum="" target_version="" target_checksum=""
+    package.resolve "${package}"
+
+    target_version="${version#"v"}"
+
+    local -A qualifier
+    parse.qualifier "${package}"
+    local -a checksum
+    parse.checksum
+
+    target_checksum="${checksum[0]:-}"
+
+    if [[ -d "${helm_plugins}/${name}" ]]; then
+      current_name="$(yq ".name" "${helm_plugins}/${name}/plugin.yaml")"
+      current_version="$(yq ".version" "${helm_plugins}/${name}/plugin.yaml")"
+
+      if [[ -d "${helm_plugins}/${name}/.git" ]]; then
+        current_checksum="$(git -C "${helm_plugins}/${name}" rev-parse --show-object-format):$(git -C "${helm_plugins}/${name}" rev-parse --verify HEAD)"
+      fi
+    elif [[ -d "${helm_plugins}/${name}.git" ]]; then
+      current_name="$(yq ".name" "${helm_plugins}/${name}/plugin.yaml")"
+      current_version="$(yq ".version" "${helm_plugins}/${name}.git/plugin.yaml")"
+
+      if [[ -d "${helm_plugins}/${name}.git/.git" ]]; then
+        current_checksum="$(git -C "${helm_plugins}/${name}" rev-parse --show-object-format):$(git -C "${helm_plugins}/${name}" rev-parse --verify HEAD)"
+      fi
+    fi
+
+    if [[ "${current_version:-}" == "${target_version}" ]]; then
+      if [[ "${current_checksum:-}" != "${target_checksum}" ]] && [[ -n "${target_checksum}" ]]; then
+        error "${ref}: found matching version ${version} with mismatching checksum, take caution!"
+        exit 1
+      fi
+      note "${ref}: found matching version ${version}, skipping"
+      continue
+    fi
+
+    if [[ -n "${current_name:-}" ]]; then
+      note "- uninstalling old package ${ref}"
+      helm plugin uninstall "${current_name}" >/dev/null
+    fi
+
+    note "- installing new package ${ref}"
+    case "${namespace}" in
+    github.com/*)
+      if [[ -n "${target_version}" ]]; then
+        helm plugin install "https://${namespace}/${name}" --version "${target_version}" >/dev/null
+      else
+        error "${ref}: missing version, continuing"
+        helm plugin install "https://${namespace}/${name}" >/dev/null
+      fi
+      ;;
+
+    *)
+      error "${ref}: unsupported location, skipping"
+      continue
+      ;;
+    esac
+
+    if [[ -d "${helm_plugins}/${name}" ]]; then
+      current_name="$(yq ".name" "${helm_plugins}/${name}/plugin.yaml")"
+      current_version="$(yq ".version" "${helm_plugins}/${name}/plugin.yaml")"
+
+      if [[ -d "${helm_plugins}/${name}/.git" ]]; then
+        current_checksum="$(git -C "${helm_plugins}/${name}" rev-parse --show-object-format):$(git -C "${helm_plugins}/${name}" rev-parse --verify HEAD)"
+      fi
+    elif [[ -d "${helm_plugins}/${name}.git" ]]; then
+      current_name="$(yq ".name" "${helm_plugins}/${name}/plugin.yaml")"
+      current_version="$(yq ".version" "${helm_plugins}/${name}.git/plugin.yaml")"
+
+      if [[ -d "${helm_plugins}/${name}.git/.git" ]]; then
+        current_checksum="$(git -C "${helm_plugins}/${name}" rev-parse --show-object-format):$(git -C "${helm_plugins}/${name}" rev-parse --verify HEAD)"
+      fi
+    fi
+
+    if [[ -z "${target_checksum}" ]]; then
+      error "${ref}: missing checksum, continuing"
+    elif [[ "${current_checksum}" != "${target_checksum}" ]]; then
+      error "${ref}: mismatching checksum, take caution!"
+      exit 1
+    fi
+  done
+}
+
+pin.helm-plugin() {
+  if ! command -v helm &>/dev/null; then
+    note "helm not available, skipping running install on helm-plugin packages"
+    return
+  elif ! command -v yq &>/dev/null; then
+    note "yq not available, skipping running install on helm-plugin packages"
+    return
+  fi
+
+  local helm_plugins
+  helm_plugins="$(helm env HELM_PLUGINS | grep -v "WARNING")"
+
+  local package
+  for package in $(tr ' ' '\n' <<<"${@}"); do
+    local ref type namespace name version current_name="" current_version="" current_checksum="" target_version=""
+    package.resolve "${package}"
+
+    target_version="${version#"v"}"
+
+    if [[ -d "${helm_plugins}/${name}" ]]; then
+      current_name="$(yq ".name" "${helm_plugins}/${name}/plugin.yaml")"
+      current_version="$(yq ".version" "${helm_plugins}/${name}/plugin.yaml")"
+
+      if [[ -d "${helm_plugins}/${name}/.git" ]]; then
+        current_checksum="$(git -C "${helm_plugins}/${name}" rev-parse --show-object-format):$(git -C "${helm_plugins}/${name}" rev-parse --verify HEAD)"
+      fi
+    elif [[ -d "${helm_plugins}/${name}.git" ]]; then
+      current_name="$(yq ".name" "${helm_plugins}/${name}/plugin.yaml")"
+      current_version="$(yq ".version" "${helm_plugins}/${name}.git/plugin.yaml")"
+
+      if [[ -d "${helm_plugins}/${name}.git/.git" ]]; then
+        current_checksum="$(git -C "${helm_plugins}/${name}" rev-parse --show-object-format):$(git -C "${helm_plugins}/${name}" rev-parse --verify HEAD)"
+      fi
+    fi
+
+    if [[ -z "${current_version:-}" ]]; then
+      error "${ref}: missing package, skipping"
+      continue
+    elif [[ "${current_version}" != "${target_version}" ]]; then
+      error "${ref}: mismatching version, skipping"
+      continue
+    fi
+
+    note "- pining package ${ref}"
+    local -A qualifier
+    parse.qualifier "${package}"
+    qualifier["checksum"]="${current_checksum}"
+    build.qualifier "${package}"
+  done
+}
+
+verify.helm-plugin() {
+  if ! command -v helm &>/dev/null; then
+    note "helm not available, skipping running install on helm-plugin packages"
+    return
+  elif ! command -v yq &>/dev/null; then
+    note "yq not available, skipping running install on helm-plugin packages"
+    return
+  fi
+
+  local helm_plugins
+  helm_plugins="$(helm env HELM_PLUGINS | grep -v "WARNING")"
+
+  local package
+  for package in $(tr ' ' '\n' <<<"${@}"); do
+    local ref type namespace name version current_name="" current_version="" current_checksum="" target_version=""
+    package.resolve "${package}"
+
+    target_version="${version#"v"}"
+
+    local -A qualifier
+    parse.qualifier "${package}"
+    local -a checksum
+    parse.checksum
+
+    target_checksum="${checksum[0]:-}"
+
+    if [[ -z "${target_checksum}" ]]; then
+      error "missing checksum on ${package}"
+      continue
+    fi
+
+    if [[ -d "${helm_plugins}/${name}" ]]; then
+      current_name="$(yq ".name" "${helm_plugins}/${name}/plugin.yaml")"
+      current_version="$(yq ".version" "${helm_plugins}/${name}/plugin.yaml")"
+
+      if [[ -d "${helm_plugins}/${name}/.git" ]]; then
+        current_checksum="$(git -C "${helm_plugins}/${name}" rev-parse --show-object-format):$(git -C "${helm_plugins}/${name}" rev-parse --verify HEAD)"
+      fi
+    elif [[ -d "${helm_plugins}/${name}.git" ]]; then
+      current_name="$(yq ".name" "${helm_plugins}/${name}/plugin.yaml")"
+      current_version="$(yq ".version" "${helm_plugins}/${name}.git/plugin.yaml")"
+
+      if [[ -d "${helm_plugins}/${name}.git/.git" ]]; then
+        current_checksum="$(git -C "${helm_plugins}/${name}" rev-parse --show-object-format):$(git -C "${helm_plugins}/${name}" rev-parse --verify HEAD)"
+      fi
+    fi
+
+    note "- verifying package ${ref}"
+    if [[ -z "${current_version:-}" ]]; then
+      error "${ref}: missing package, skipping"
+      continue
+    elif [[ "${current_version}" != "${target_version}" ]]; then
+      error "${ref}: mismatching version, skipping"
+      continue
+    elif [[ "${current_checksum}" != "${target_checksum}" ]]; then
+      error "${ref}: mismatching checksum, take caution!"
+      exit 1
+    fi
+  done
+}
+
 # resolve packages for purls
 #
 # input:
