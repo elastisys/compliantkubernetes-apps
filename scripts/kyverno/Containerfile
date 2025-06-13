@@ -1,0 +1,5 @@
+FROM docker.io/library/busybox:1.36.0
+ARG VARIANT
+WORKDIR /tmp/
+RUN echo This is image $VARIANT > variant.txt
+CMD cat variant.txt
