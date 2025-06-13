@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: {{ include "grafana-label-enforcer.fullname" . }}
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "grafana-label-enforcer.labels" $ | nindent 4 }}
 spec:
   ports:
   - name: promql

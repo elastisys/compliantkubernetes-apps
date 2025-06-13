@@ -116,6 +116,13 @@ If any fixes are necessary, add a manual changelog entry and push them to the st
 
 When the QA process is finished the code should be in a state where it's ready to be released.
 
+Update the SBOM, ensure it gets validated and carefully look at the diff and address any manual overrides needed:
+
+```sh
+./scripts/sbom/sbom.bash generate --version vX.Y.Z
+./scripts/sbom/sbom.bash get-unset   # update any components listed
+```
+
 Mark the staging pull request ready for review.
 
 ## Release

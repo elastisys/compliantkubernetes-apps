@@ -20,6 +20,7 @@ mapfile -t ck8s_k8s_installers < <(find "${root_path}/config/k8s-installers" -mi
 ck8s_k8s_installers+=("none")
 
 CK8S_AUTO_APPROVE=${CK8S_AUTO_APPROVE:-"false"}
+CK8S_SKIP_VALIDATION=${CK8S_SKIP_VALIDATION:-"false"}
 
 # Create CK8S_CONFIG_PATH if it does not exist and make it absolute
 mkdir -p "${CK8S_CONFIG_PATH}"
@@ -100,6 +101,14 @@ ask_abort() {
   fi
 }
 
+ask_continue() {
+  log_warning_no_newline "Do you want to continue? (y/N): "
+  read -r reply
+  if [[ ! "${reply}" =~ ^[yY]$ ]]; then
+    exit 0
+  fi
+}
+
 # Checks that all dependencies are available and critical ones for matching minor version.
 check_tools() {
   # Skip in tests
@@ -148,7 +157,7 @@ check_tools() {
   }
 
   check_minor "$(echo "${req}" | jq -r '.["github.com/mikefarah/yq/v4"].version')" "$(yq --version)" yq
-  check_minor "$(echo "${req}" | jq -r '.["kubectl"].version')" "$(kubectl version -oyaml 2>/dev/null | yq '.clientVersion.gitVersion')" kubectl
+  check_minor "$(echo "${req}" | jq -r '.["kubectl"].version')" "$(kubectl version --client=true -oyaml 2>/dev/null | yq '.clientVersion.gitVersion')" kubectl
   check_minor "$(echo "${req}" | jq -r '.["helm.sh/helm/v3"].version')" "$(helm version --template='{{.Version}}')" helm
   check_minor "$(echo "${req}" | jq -r '.["github.com/helmfile/helmfile"].version')" "$(helmfile --version)" helmfile
   check_minor "$(echo "${req}" | jq -r '.["github.com/databus23/helm-diff/v3"].version')" "$(helm plugin list | grep diff)" "helm diff plugin"
@@ -506,7 +515,7 @@ validate_sops_config() {
 config_load() {
   load_config "$1"
 
-  if [[ "--skip-validation" != "${2:-''}" ]]; then
+  if [[ "--skip-validation" != "${2:-''}" && "${CK8S_SKIP_VALIDATION:-}" != "true" ]]; then
     validate_version "$1"
     validate_config "$1" "${2:-''}"
     validate_sops_config
