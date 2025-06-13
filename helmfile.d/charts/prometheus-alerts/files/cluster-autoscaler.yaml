@@ -20,6 +20,16 @@
         description: "The main loop of the Cluster Autoscaler for cluster {{"`{{ $labels.cluster }}`"}} has not updated its last activity in over 5 minutes which means it might be stuck or not running."
         runbook_url: {{ .Values.runbookUrls.clusterAutoscaler.ClusterAutoscalerInactive }}
 
+    - alert: ClusterAutoscalerInactiveLong
+      expr: time() - cluster_autoscaler_last_activity{activity="main"} > 3600
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "No Cluster Autoscaler main loop activity for a long time"
+        description: "The main loop of the Cluster Autoscaler for cluster {{"`{{ $labels.cluster }}`"}} has not updated its last activity in over 1 hour which means it might be stuck or not running."
+        runbook_url: {{ .Values.runbookUrls.clusterAutoscaler.ClusterAutoscalerInactive }}
+
     - alert: ClusterAutoscalerUnschedulablePodsHigh
       expr: cluster_autoscaler_unschedulable_pods_count{type="unschedulable"} > 0
       for: 30m
