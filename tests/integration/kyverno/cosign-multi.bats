@@ -58,5 +58,5 @@ teardown() {
 @test "can NOT deploy image signed by one trusted key and one untrusted key" {
   run kubectl run test-signed --namespace=securespace --image=ghcr.io/elastisys/kyverno-test-image:a-c
   assert_failure
-  assert_output --partial "verify-image-signature: 'failed to verify image"
+  assert_output --partial "was blocked due to the following policies"
 }

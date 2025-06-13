@@ -48,7 +48,7 @@ signed-cosign-%: image-% keys-cosign
 
 signed-notation-%: image-% keys-notation
 	for key in $(subst -, ,$*); do
-	notation sign -k $$key ghcr.io/elastisys/kyverno-test-image:$*
+	notation sign -k notation-$$key ghcr.io/elastisys/kyverno-test-image:$*
 	done
 	@touch $@
 
