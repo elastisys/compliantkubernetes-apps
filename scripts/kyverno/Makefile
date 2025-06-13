@@ -26,18 +26,11 @@ cosign-%.pub cosign-%.key:
 	@echo Press Enter twice to assign a blank password to the test keys
 	cosign generate-key-pair --output-key-prefix cosign-$*
 
-# Test images
-# TODO
-# for each of cosign and notation
-# one image signed by key A for single singner test
-# one image signed by key A and key B for multi-singner test
-# one image signed by key A and key C for negative multi-signer test
-# one image signed by key C for negative tests
+VARIANTS=a b a-b a-c c
 
-build: image-cosign-a image-cosign-a-b image-cosign-a-c image-cosign-c image-notation-a image-notation-a-b image-notation-a-c image-notation-c
+build: $(patsubst image-cosign-%,%,$(VARIANTS)) $(patsubst image-notation-%,%,$(VARIANTS))
 
-sign: signed-cosign-a signed-cosign-a-b signed-cosign-a-c signed-cosign-c signed-notation-a signed-notation-a-b signed-notation-a-c signed-notation-c
-
+sign: $(patsubst signed-cosign-%,%,$(VARIANTS)) $(patsubst signed-notation-%,%,$(VARIANTS))
 
 image-%:
 	$(DOCKER) build -f Containerfile --build-arg VARIANT=$* -t ghcr.io/elastisys/kyverno-test-image:$*
@@ -46,13 +39,13 @@ image-%:
 
 signed-cosign-%: image-% all-cosign
 	for key in $(subst -, ,$*); do
-	echo cosign sign --key $$key --tlog-upload=false ghcr.io/elastisys/kyverno-test-image:$*
+	cosign sign --key $$key --tlog-upload=false ghcr.io/elastisys/kyverno-test-image:$*
 	done
 	@touch $@
 
 signed-notation-%: image-% all-notation
 	for key in $(subst -, ,$*); do
-	echo notation sign -k $$key ghcr.io/elastisys/kyverno-test-image:$*
+	notation sign -k $$key ghcr.io/elastisys/kyverno-test-image:$*
 	done
 	@touch $@
 
