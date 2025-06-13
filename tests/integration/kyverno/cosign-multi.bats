@@ -18,10 +18,10 @@ EZIWF76W/2/z5DCrHWSetz8FjJjvUq5Niw7JxfQRyZte+VISWcLcsUUfnA==
 TODO GENERATE THIS KEY
 -----END PUBLIC KEY-----
 "'
-# TODO generate 2 extra keys, one trusted, one untrusted
-# Alice - trusted
-# Bob - trusted
-# Carol - not trusted
+  # TODO generate 2 extra keys, one trusted, one untrusted
+  # Alice - trusted
+  # Bob - trusted
+  # Carol - not trusted
 
   kubectl create namespace unverifiedspace
   kubectl create namespace securespace
@@ -47,15 +47,14 @@ teardown() {
   kubectl delete pod --namespace=securespace --all
 }
 
-
 @test "can NOT deploy image signed by only one key" {
-: TODO create pod image=A
+  : TODO create pod image=A
 }
 
 @test "can NOT deploy image signed by only one _trusted_ key" {
-: TODO create pod image=AC
+  : TODO create pod image=AC
 }
 
 @test "CAN deploy image signed by only two keys" {
-: TODO create pod image=AB
+  : TODO create pod image=AB
 }
