@@ -22,7 +22,7 @@
 
     - alert: ClusterAutoscalerUnschedulablePodsHigh
       expr: cluster_autoscaler_unschedulable_pods_count{type="unschedulable"} > 0
-      for: 5m
+      for: 30m
       labels:
         severity: warning
       annotations:
