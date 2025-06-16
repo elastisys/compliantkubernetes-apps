@@ -103,7 +103,7 @@
       "template_file": "sc/fluentd/templates/aggregator-statefulset.yaml"
     },
     {
-      "image_property": "fluentd.elasticsearch",
+      "image_property": "fluentd.forwarder",
       "helmfile_selector": "app=fluentd",
       "container_name": "fluentd-forwarder",
       "template_file": "sc/fluentd-elasticsearch/templates/daemonset.yaml"

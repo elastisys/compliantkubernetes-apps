@@ -4,7 +4,7 @@ nameOverride: fluentd
   "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
   "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
 }}
-{{- with .Values.images | dig "fluentd" "elasticsearch" "" }}
+{{- with .Values.images | dig "fluentd" "forwarder" "" }}
 {{- with merge (include "container_uri.parse" . | fromJson) $global }}
 image:
   {{- with include "gen.reg-rep-img" . }}

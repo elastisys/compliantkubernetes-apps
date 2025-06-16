@@ -18,7 +18,7 @@ images:
     sidekick: docker.io/falcosecurity/falcosidekick:2.31.1
   fluentd:
     aggregator: ghcr.io/elastisys/fluentd-aggregator:v7.1.1-ck8s2
-    elasticsearch: ghcr.io/elastisys/fluentd-forwarder:v4.7.5-ck8s1
+    forwarder: ghcr.io/elastisys/fluentd-forwarder:v4.7.5-ck8s1
     logManager: ghcr.io/elastisys/compliantkubernetes-apps-log-manager:0.3.2
   gatekeeper:
     image: docker.io/openpolicyagent/gatekeeper:v3.18.2

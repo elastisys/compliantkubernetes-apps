@@ -8118,7 +8118,7 @@ properties:
         properties:
           aggregator:
             $ref: '#/$defs/containerImage'
-          elasticsearch:
+          forwarder:
             $ref: '#/$defs/containerImage'
           logManager:
             $ref: '#/$defs/containerImage'
