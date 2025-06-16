@@ -257,7 +257,7 @@ _prepare_sbom() {
 
   shift
   project_version=""
-  full_path_location=""
+  full_path_location="${HELMFILE_FOLDER}"
   while [ "${#}" -gt 0 ]; do
     case "${1}" in
     --version)
@@ -282,13 +282,8 @@ _prepare_sbom() {
     fi
   fi
 
-  if [[ -n "${full_path_location}" ]]; then
-    cdxgen --project-name "welkin-apps" --project-version "${project_version}" --filter '.*' --filter '.x.x' -t helm "${full_path_location}" --output "${sbom_file}"
-    _add_location_for_component "${sbom_file}" "${full_path_location}/Chart.yaml"
-  else
-    cdxgen --project-name "welkin-apps" --project-version "${project_version}" --filter '.*' --filter '.x.x' -t helm "${HELMFILE_FOLDER}" --output "${sbom_file}"
-    _add_locations "${sbom_file}"
-  fi
+  cdxgen --project-name "welkin-apps" --project-version "${project_version}" --filter '.*' --filter '.x.x' -t helm "${full_path_location}" --output "${sbom_file}"
+  _add_locations "${sbom_file}" "${full_path_location}"
 
   sbom_version=$(jq -r ".version" "${SBOM_FILE}")
   yq -o json -i ".version = ${sbom_version}" "${sbom_file}"
@@ -308,6 +303,9 @@ _prepare_sbom() {
     _sbom_add_component "${sbom_file}" "${location}" "properties" "Elastisys evaluation" "${elastisys_evaluation}"
 
     supplier=$(jq -r ".components[] | select(.evidence.occurrences[0].location == \"${location}\").supplier.name" "${SBOM_FILE}")
+    if [[ -z "${supplier}" ]] || [[ "${supplier}" == null ]]; then
+      supplier="set-me"
+    fi
     _sbom_add_component "${sbom_file}" "${location}" "supplier" "${supplier}"
   done
 }
@@ -419,7 +417,6 @@ _add_licenses() {
 
   log_info "Getting licenses"
 
-  # TODO: (maybe) filter out unused charts before processing?
   mapfile -t all_charts < <(sbom_get_charts "${sbom_file}")
 
   for chart in "${all_charts[@]}"; do
@@ -522,9 +519,10 @@ _add_location_for_component() {
 _add_locations() {
   local chart sbom_file
   sbom_file="${1}"
+  location="${2}"
 
   log_info "Getting locations"
-  mapfile -t all_charts < <(find "${HELMFILE_FOLDER}" -name "Chart.yaml")
+  mapfile -t all_charts < <(find "${location}" -name "Chart.yaml")
   for chart_file in "${all_charts[@]}"; do
     _add_location_for_component "${sbom_file}" "${chart_file}"
   done
@@ -587,9 +585,8 @@ sbom_get_unset() {
   output_query=' { "name": .name, "version": .version, "location": .evidence.occurrences[0].location}'
 
   local licenses=()
-  mapfile -t -O "${#licenses[@]}" licenses < <(jq -c -r "[.components[] | select(.licenses[].license.name | contains(\"set-me\")) | ${output_query}] | .[]" "${SBOM_FILE}")
-  mapfile -t -O "${#licenses[@]}" licenses < <(jq -c -r "[.components[] | select(.licenses | length == 0) | ${output_query}] | .[]" "${SBOM_FILE}")
   mapfile -t -O "${#licenses[@]}" licenses < <(jq -c -r "[.components[] | select(has(\"licenses\") == \"false\") | ${output_query}] | .[]" "${SBOM_FILE}")
+  mapfile -t -O "${#licenses[@]}" licenses < <(jq -c -r "[.components[] | select(.licenses | length == 0) | ${output_query}] | .[]" "${SBOM_FILE}")
   log_info "Getting components without licenses"
   jq -c <<<"${licenses[@]}"
 
