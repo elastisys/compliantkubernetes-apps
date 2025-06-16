@@ -209,7 +209,7 @@ alertmanager:
     topologySpreadConstraints: {{- toYaml .Values.prometheus.alertmanagerSpec.topologySpreadConstraints | nindent 6 }}
     affinity: {{- toYaml .Values.prometheus.alertmanagerSpec.affinity | nindent 6 }}
 
-{{- with .Values.images | dig "monitoring" "alertmanager" "" }}
+    {{- with .Values.images | dig "monitoring" "alertmanager" "" }}
     {{- with merge (include "container_uri.parse" . | fromJson) $global }}
     image:
       {{- with .registry }}
@@ -222,11 +222,11 @@ alertmanager:
       tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
       {{- end }}
     {{- end }}
-{{- else }}
-{{- if .Values | get "prometheus.alertmanagerSpec.image" nil }}
+    {{- else }}
+    {{- if .Values | get "prometheus.alertmanagerSpec.image" nil }}
     image: {{- toYaml .Values.prometheus.alertmanagerSpec.image | nindent 6 }}
-{{- end }}
-{{- end }}
+    {{- end }}
+    {{- end }}
 
 kubeControllerManager:
   enabled: false

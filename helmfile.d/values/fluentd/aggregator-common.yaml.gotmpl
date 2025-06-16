@@ -42,7 +42,7 @@ image:
   pullPolicy: IfNotPresent
   {{- with .registry }}
   registry: {{ . }}
-  {{- end}}
+  {{- end }}
   {{- with join "/" (compact (list .repository .image)) }}
   repository: {{ . }}
   {{- end }}

@@ -169,7 +169,7 @@ postInstall:
     image:
       {{- with include "gen.reg-rep-img" .}}
       repository: {{ . }}
-      {{- end}}
+      {{- end }}
       {{- if or .tag .digest }}
       tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
       {{- end }}
