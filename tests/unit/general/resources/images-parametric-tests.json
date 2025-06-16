@@ -145,7 +145,7 @@
       "template_file": "sc/gatekeeper-templates/templates/wait/job.yaml"
     },
     {
-      "image_property": "gpuOperator.nfd",
+      "image_property": "gpuOperator.nodeFeatureDiscovery",
       "helmfile_selector": "app=gpu-operator",
       "container_name": "worker",
       "template_file": "sc/gpu-operator/charts/node-feature-discovery/templates/worker.yaml"

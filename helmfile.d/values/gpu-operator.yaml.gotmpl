@@ -28,7 +28,7 @@ operator:
 {{- end }}
 
 node-feature-discovery:
-  {{- with .Values.images | dig "gpuOperator" "nfd" "" }}
+  {{- with .Values.images | dig "gpuOperator" "nodeFeatureDiscovery" "" }}
   {{- with merge (include "container_uri.parse" . | fromJson) $global }}
   image:
     {{- with include "gen.reg-rep-img" . }}

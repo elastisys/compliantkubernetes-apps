@@ -8144,7 +8144,7 @@ properties:
         properties:
           operator:
             $ref: '#/$defs/containerImage'
-          nfd:
+          nodeFeatureDiscovery:
             $ref: '#/$defs/containerImage'
       harbor:
         title: harbor stack image configuration

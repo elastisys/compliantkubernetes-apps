@@ -27,7 +27,7 @@ images:
     kubectl: docker.io/bitnami/kubectl:1.25
   gpuOperator:
     operator: nvcr.io/nvidia/gpu-operator:v24.9.2
-    nfd: registry.k8s.io/nfd/node-feature-discovery:v0.16.6
+    nodeFeatureDiscovery: registry.k8s.io/nfd/node-feature-discovery:v0.16.6
   harbor:
     core: docker.io/goharbor/harbor-core:v2.12.1
     exporter: docker.io/goharbor/harbor-exporter:v2.12.1
