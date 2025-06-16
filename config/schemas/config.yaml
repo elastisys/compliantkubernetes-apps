@@ -8232,6 +8232,8 @@ properties:
             $ref: '#/$defs/containerImage'
           prometheusOperator:
             $ref: '#/$defs/containerImage'
+          configReloader:
+            $ref: '#/$defs/containerImage'
           alertmanager:
             $ref: '#/$defs/containerImage'
           prometheus:
@@ -8307,8 +8309,6 @@ properties:
         additionalProperties: false
         properties:
           image:
-            $ref: '#/$defs/containerImage'
-          configReloader:
             $ref: '#/$defs/containerImage'
       velero:
         title: velero stack image configuration

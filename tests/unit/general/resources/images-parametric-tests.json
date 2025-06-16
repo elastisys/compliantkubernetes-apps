@@ -331,7 +331,7 @@
       "template_file": "sc/thanos/templates/bucketweb/deployment.yaml"
     },
     {
-      "image_property": "thanos.configReloader",
+      "image_property": "monitoring.configReloader",
       "helmfile_selector": "app=thanos",
       "container_name": "config-reloader",
       "template_file": "sc/thanos/templates/ruler/statefulset.yaml"

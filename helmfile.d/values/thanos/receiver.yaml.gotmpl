@@ -179,7 +179,7 @@ ruler:
   # Taken from what a thanos-ruler would get from the prometheus operator.
   sidecars:
     - name: config-reloader
-      {{- with .Values.images | dig "thanos" "configReloader" "" }}
+      {{- with .Values.images | dig "monitoring" "configReloader" "" }}
       {{- with merge (include "container_uri.parse" . | fromJson) $global }}
       image: "{{- include "gen.container_uri" . }}"
       {{- end }}

@@ -255,6 +255,20 @@ prometheusOperator:
 
   prometheusConfigReloader:
     resources: {{- toYaml .Values.prometheusOperator.prometheusConfigReloader.resources | nindent 6 }}
+    {{- with .Values.images | dig "monitoring" "configReloader" "" }}
+    {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+    image:
+      {{- with .registry }}
+      registry: {{ . }}
+      {{- end }}
+      {{- with join "/" (compact (list .repository .image)) }}
+      repository: {{ . }}
+      {{- end }}
+      {{- if or .tag .digest }}
+      tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
+      {{- end }}
+    {{- end }}
+    {{- end }}
 
   {{- with .Values.images | dig "monitoring" "admissionWebhooksPatch" "" }}
   {{- with merge (include "container_uri.parse" . | fromJson) $global }}

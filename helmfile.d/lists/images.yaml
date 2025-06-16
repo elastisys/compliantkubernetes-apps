@@ -59,6 +59,7 @@ images:
     nodeExporter: quay.io/prometheus/node-exporter:v1.9.1
     kubeStateMetrics: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.15.0
     prometheusOperator: quay.io/prometheus-operator/prometheus-operator:v0.81.0
+    configReloader: quay.io/prometheus-operator/prometheus-config-reloader:v0.81.0
     alertmanager: quay.io/prometheus/alertmanager:v0.28.1
     prometheus: quay.io/prometheus/prometheus:v3.2.1
     admissionWebhooksPatch: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2
@@ -87,7 +88,6 @@ images:
     webhook: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/webhook:v0.45.0
   thanos:
     image: ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8
-    configReloader: quay.io/prometheus-operator/prometheus-config-reloader:v0.50.0
   velero:
     image: docker.io/velero/velero:v1.13.0
     pluginCsi: docker.io/velero/velero-plugin-for-csi:v0.7.1
