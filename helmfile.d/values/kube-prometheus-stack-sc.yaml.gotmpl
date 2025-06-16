@@ -209,7 +209,7 @@ alertmanager:
     topologySpreadConstraints: {{- toYaml .Values.prometheus.alertmanagerSpec.topologySpreadConstraints | nindent 6 }}
     affinity: {{- toYaml .Values.prometheus.alertmanagerSpec.affinity | nindent 6 }}
 
-{{- with .Values.images | dig "monitoring" "alertManager" "" }}
+{{- with .Values.images | dig "monitoring" "alertmanager" "" }}
     {{- with merge (include "container_uri.parse" . | fromJson) $global }}
     image:
       {{- with .registry }}
