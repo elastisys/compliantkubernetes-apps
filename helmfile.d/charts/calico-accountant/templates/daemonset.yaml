@@ -61,7 +61,7 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}{{ with .Values.image.digest }}@{{ . }}{{ end }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           name: "calico-accountant"
           ports:
           - containerPort: 9009

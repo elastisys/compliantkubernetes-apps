@@ -8,11 +8,8 @@ tolerations: {{- toYaml .Values.calicoAccountant.tolerations | nindent 2 }}
 {{- with .Values.images | dig "calico" "accountant" "" }}
 {{- with merge (include "container_uri.parse" . | fromJson) $global }}
 image:
-  {{- with .tag }}
-  tag: {{ . }}
-  {{- end }}
-  {{- with .digest }}
-  digest: {{ . }}
+  {{- if or .tag .digest }}
+  tag: "{{ .tag }}{{ if .digest }}@{{ .digest }}{{ end }}"
   {{- end }}
   {{- with include "gen.reg-rep-img" . }}
   repository: {{ . }}
