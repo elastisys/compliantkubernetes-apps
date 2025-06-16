@@ -620,7 +620,7 @@ sbom_get_charts() {
 
 sbom_get_containers() {
   local query
-  query='.components[] | select(has("components")) | [.components[] | { "name": .name, "version": .version}] | unique_by([.name, .version]) | sort_by([.name, .version]) | .[]'
+  query='[.components[] | select(has("components")) | .components[] | { "name": .name, "version": .version} ] | unique_by([.name, .version]) | .[]'
 
   jq -e -c "${query}" "${SBOM_FILE}"
 }
