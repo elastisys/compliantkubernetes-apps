@@ -20,7 +20,7 @@ hostZone:
   "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
   "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
 }}
-{{- with .Values.images | dig "nodeLocalDNS" "image" "" }}
+{{- with .Values.images | dig "nodeLocalDns" "image" "" }}
 {{- with merge (include "container_uri.parse" . | fromJson) $global }}
 image:
   {{- with include "gen.reg-rep-img" . }}

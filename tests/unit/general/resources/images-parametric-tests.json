@@ -253,7 +253,7 @@
       "template_file": "sc/kyverno/templates/hooks/post-upgrade-migrate-resources.yaml"
     },
     {
-      "image_property": "nodeLocalDNS.image",
+      "image_property": "nodeLocalDns.image",
       "helmfile_selector": "app=node-local-dns",
       "container_name": "node-cache",
       "template_file": "sc/node-local-dns/templates/node-local-dns.yaml"
