@@ -2,11 +2,11 @@
 
 The Welkin SBOM is located as a JSON file here: [sbom.json](./sbom.json)
 
-Follows the CycloneDX v1.6 specification (JSON): <https://cyclonedx.org/docs/1.6/json/>
+The SBOM follows the CycloneDX v1.6 specification (JSON): <https://cyclonedx.org/docs/1.6/json/>
 
 ## Updating charts and SBOM components
 
-When updating Helm charts, the SBOM should be updated to reflect these changes to keep it up to date.
+When updating Helm charts in this repository, the SBOM should be updated to reflect these changes to keep it up to date.
 There are pre-commit hooks in place to ensure maintainers remembers to update the SBOM.
 The SBOM hooks should include the Chart/SBOM component location which is then used to run the `sbom update` command with.
 To run the command, `GITHUB_TOKEN` environment variable needs to be set, as the command does requests to the GitHub API to retrieve licenses for components.
@@ -25,7 +25,7 @@ SBOM diff................................................................Failed
 ```
 
 During releases, the whole SBOM should be updated in case any licenses have changed, or in the case that the SBOM has not been properly updated during updates to the main branch.
-This is done by running the `sbom generate` command which goes through all charts found in [`helmfile.d`](../helmfile.d/) folder and retrieves information automatically upstream, provided that the `GITHUB_TOKEN` environment variable is set.
+This is done by running the `sbom generate` command which goes through all charts found in the [`helmfile.d`](../helmfile.d/) folder and retrieves information from upstream, provided that the `GITHUB_TOKEN` environment variable is set.
 
 ## Manually modifying the SBOM
 
@@ -65,11 +65,11 @@ BOM validated successfully.
 
 ## Retrieving information from the SBOM
 
-The SBOM script includes some useful `get` commands that can be used to retrieve lists of charts, containers, locations, or to describe a particular component.
+The SBOM script includes some useful `get` commands that can be used to retrieve lists of charts, containers, locations, or to extract information for a particular component.
 
 ### Getting unset required fields
 
-Some fields currently needs to be updated manually in the SBOM, these includes the [`Elastisys evaluation`](#elastisys-evaluation) and `supplier`, but also some fields like `licenses` might not be retrieved automatically through the `generate` or `update` commands due to the charts not providing sufficient information.
+Some fields currently needs to be updated manually in the SBOM, these includes the [`Elastisys evaluation`](#elastisys-evaluation) and `supplier`, but also some fields like `licenses` might not be retrieved automatically through the `generate` or `update` commands due to the charts not providing sufficient information about these.
 To get a list of the components that are missing such fields, it is possible to run the following:
 
 ```sh
