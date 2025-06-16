@@ -12,8 +12,8 @@ global:
   imageRegistry: ""
 
 image:
-  registry: ""
-  {{- with include "gen.reg-rep-img" . }}
+  registry: "{{ .registry }}"
+  {{- with include "gen.rep-img" . }}
   repository: {{ . }}
   {{- end }}
   {{- if or .tag .digest }}
