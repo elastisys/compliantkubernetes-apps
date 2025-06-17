@@ -41,7 +41,7 @@ spec:
         - type: {{ .Values.verifyImageSignature.type }}
           failureAction: Enforce
           imageReferences: ["*"]
-          attestor:
+          attestors:
             - entries:
               {{- if eq .Values.verifyImageSignature.type "Cosign" }}
               - keys:
