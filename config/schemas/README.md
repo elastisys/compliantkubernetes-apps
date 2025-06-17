@@ -71,7 +71,7 @@ Lists, `type: array`, has schema for its items in `items`.
 
 Scalar types can have various constraints and validation hints, e.g. length and range constraints, `format: email` etc. <!-- how much of json-schema-validation to duplicate? -->
 
-The tool `bin/genschema.py` can be used to generate a schema from a YAML snippet.
+The tool `scripts/genschema.py` can be used to generate a schema from a YAML snippet.
 
 ```bash
 cat > conf-snippet.yaml <<EOF
@@ -80,7 +80,7 @@ service:
   features:
   - nice
 EOF
-./bin/genschema.py ./conf-snippet.yaml | tee ./conf-snippet.yaml
+./scripts/genschema.py ./conf-snippet.yaml | tee ./conf-snippet.yaml
 ```
 
 The output can be tweaked and inserted into `config/schemas/config.yaml` under `.properties`.

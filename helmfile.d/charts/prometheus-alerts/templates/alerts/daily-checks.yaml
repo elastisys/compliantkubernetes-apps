@@ -1,4 +1,9 @@
 {{- if and .Values.defaultRules.create .Values.defaultRules.rules.dailyChecks}}
+{{- $bucketNames := list }}
+{{- range .Values.s3BucketAlerts.buckets }}
+  {{- $bucketNames = append $bucketNames .name }}
+{{- end }}
+{{- $fullExclude := concat $bucketNames .Values.s3BucketAlerts.exclude }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -17,6 +22,37 @@ spec:
   groups:
   - name: daily-checks
     rules:
+{{- if .Values.s3BucketAlerts.buckets }}
+  {{- $root := . }}
+  {{- range .Values.s3BucketAlerts.buckets }}
+    {{- if .size.enabled }}
+    - alert: S3BucketSizeOver{{.size.percent}}Percent-{{ .name }}
+      annotations:
+        message: Over {{.size.percent}} percent of the total s3bucket size limit is used in bucket {{`{{ $labels.bucket }}`}}.
+        runbook_url: {{ $root.Values.runbookUrls.dailyChecks.S3BucketSizeOverXPercent }}
+      expr: |-
+        (
+          sum(avg_over_time(s3_objects_size_sum_bytes{bucket="{{ .name }}",prefix!~".+"}[1h])) by (bucket) >= ({{ .size.sizeQuotaGB }} * (1024^3)) * ({{ .size.percent }} / 100)
+        )
+      for: 1h
+      labels:
+        severity: warning
+    {{- end }}
+    {{- if .objects.enabled }}
+    - alert: S3BucketObjectsOver{{.objects.percent}}Percent-{{ .name }}
+      annotations:
+        message: Over {{.objects.percent}} percent of the total s3bucket object limit is used in bucket {{`{{ $labels.bucket }}`}}.
+        runbook_url: {{ $root.Values.runbookUrls.dailyChecks.S3BucketObjectsOverXPercent }}
+      expr: |-
+        (
+          sum(avg_over_time(s3_objects{bucket="{{ .name }}"}[1h])) by (bucket) > {{ .objects.count }} * ({{ .objects.percent }} / 100)
+        )
+      for: 2h
+      labels:
+        severity: warning
+    {{- end }}
+  {{- end }}
+{{- end }}
 {{- if .Values.s3BucketAlerts.size.enabled }}
     - alert: S3BucketSizeOver{{.Values.s3BucketAlerts.size.percent}}Percent
       annotations:
@@ -24,7 +60,7 @@ spec:
         runbook_url: {{ .Values.runbookUrls.dailyChecks.S3BucketSizeOverXPercent }}
       expr: |-
         (
-          sum(s3_objects_size_sum_bytes{bucket!~"{{ join "|" .Values.s3BucketAlerts.exclude }}",prefix!~".+"}) by (bucket) >= ({{ .Values.s3BucketAlerts.size.sizeQuotaGB }} * (1024^3)) * ({{ .Values.s3BucketAlerts.size.percent }} / 100)
+          sum(avg_over_time(s3_objects_size_sum_bytes{bucket!~"{{ join "|" $fullExclude }}",prefix!~".+"}[1h])) by (bucket) >= ({{ .Values.s3BucketAlerts.size.sizeQuotaGB }} * (1024^3)) * ({{ .Values.s3BucketAlerts.size.percent }} / 100)
         )
       for: 1h
       labels:
@@ -50,7 +86,7 @@ spec:
         runbook_url: {{ .Values.runbookUrls.dailyChecks.S3BucketObjectsOverXPercent }}
       expr: |-
         (
-          sum(s3_objects{bucket!~"{{ join "|" .Values.s3BucketAlerts.exclude }}"}) by (bucket) > {{ .Values.s3BucketAlerts.objects.count }} * ({{ .Values.s3BucketAlerts.objects.percent }} / 100)
+          sum(avg_over_time(s3_objects{bucket!~"{{ join "|" $fullExclude }}"}[1h])) by (bucket) > {{ .Values.s3BucketAlerts.objects.count }} * ({{ .Values.s3BucketAlerts.objects.percent }} / 100)
         )
       for: 2h
       labels:
