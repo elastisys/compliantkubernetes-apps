@@ -4,6 +4,27 @@ module.exports = defineConfig({
   env: process.env,
   e2e: {
     setupNodeEvents(on, config) {
+      const { spawn } = require('child_process');
+
+      on('task', {
+        log(message) {
+          console.log(message)
+          return null
+        },
+        kubectlLogin(kubeconfig) {
+          return new Promise((resolve, reject) => {
+            process.env.KUBECONFIG = kubeconfig
+            var scriptOutput = "";
+            var child = spawn("kubectl", ["get", "node"],
+              {
+                stdio: "ignore",
+                detached: true
+              }
+            ).unref();
+            resolve(null)
+          })
+        }
+      })
       config.env = {
         ...process.env,
         ...config.env
