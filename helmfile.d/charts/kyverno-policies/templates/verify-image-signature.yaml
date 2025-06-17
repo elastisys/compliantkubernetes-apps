@@ -1,6 +1,6 @@
 {{- if .Values.verifyImageSignature.enabled -}}
-{{- if not .Values.verifyImageSignature.attestors }}
-{{- fail "attestors must not be unset" }}
+{{- if not .Values.verifyImageSignature.attestor }}
+{{- fail "attestor must not be unset" }}
 {{- end }}
 apiVersion: v1
 kind: ConfigMap
@@ -8,8 +8,8 @@ metadata:
   name: com.elastisys.policies.verify-image-signature
   namespace: kyverno
 data:
-  {{- with .Values.verifyImageSignature.attestors }}
-  attestors: |
+  {{- with .Values.verifyImageSignature.attestor }}
+  attestor: |
     {{- . | nindent 4 }}
   {{- end }}
 ---
@@ -41,15 +41,15 @@ spec:
         - type: {{ .Values.verifyImageSignature.type }}
           failureAction: Enforce
           imageReferences: ["*"]
-          attestors:
+          attestor:
             - entries:
               {{- if eq .Values.verifyImageSignature.type "Cosign" }}
               - keys:
-                  publicKeys: {{`"{{ entries.data.attestors }}"`}}
+                  publicKeys: {{`"{{ entries.data.attestor }}"`}}
                   rekor:
                     ignoreTlog: {{ .Values.verifyImageSignature.ignoreRekorTlog }}
               {{- else if eq .Values.verifyImageSignature.type "Notary" }}
               - certificates:
-                  cert: {{`"{{ entries.data.attestors }}"`}}
+                  cert: {{`"{{ entries.data.attestor }}"`}}
               {{- end }}
 {{- end }}
