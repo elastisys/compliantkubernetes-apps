@@ -450,6 +450,18 @@ prometheus:
       percent: 80
       count: 1638400
     exclude: []
+    # Custom per-bucket alerts
+    buckets: []
+    #  - name: <cluster>-thanos # This gets excluded from regular object storage alerts
+    #    size:
+    #      enabled: false
+    #      percent: 80
+    #      sizeQuotaGB: 1000
+    #    objects:
+    #      enabled: false
+    #      percent: 80
+    #      count: 1638400
+
   # Todo remove dependency on alertmanager from service cluster
   alertmanagerSpec:
     groupBy:
