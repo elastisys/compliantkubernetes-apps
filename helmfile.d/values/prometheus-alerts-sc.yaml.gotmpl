@@ -82,6 +82,7 @@ s3BucketAlerts:
     percent: {{ .Values.prometheus.s3BucketAlerts.objects.percent }}
     count: {{ .Values.prometheus.s3BucketAlerts.objects.count }}
   exclude: {{ toYaml .Values.prometheus.s3BucketAlerts.exclude | nindent 4 }}
+  buckets: {{ toYaml .Values.prometheus.s3BucketAlerts.buckets | nindent 4 }}
 
 buckets:
   harbor: {{ .Values.objectStorage.buckets.harbor }}
