@@ -49,6 +49,8 @@ templates:
       app: metrics-server
     values:
       - values/metrics-server.yaml.gotmpl
+    wait: true
+    timeout: 300
 
   autoscaling-monitoring:
     disableValidationOnInstall: true

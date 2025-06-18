@@ -33,12 +33,14 @@ templates:
       - values/podsecuritypolicies/common/falco.yaml.gotmpl
 
   falco-main:
+    disableValidation: true
     inherit:
       - template: falco
       - template: falco-chart
     installed: {{ .Values | get "falco.enabled" false }}
     name: falco
     needs:
+      - monitoring/kube-prometheus-stack # creates servicemonitors
       {{- if .Values | get "networkPolicies.falco.enabled" false }}
       - falco/networkpolicy
       {{- end }}
