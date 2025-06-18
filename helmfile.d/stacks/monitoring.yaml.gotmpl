@@ -51,7 +51,7 @@ templates:
       - values/metrics-server.yaml.gotmpl
 
   autoscaling-monitoring:
-    disableValidationOnInstall: true
+    disableValidation: true
     condition: ck8sManagementCluster.enabled
     inherit: [ template: monitoring ]
     installed: {{ .Values | get "global.ck8sK8sInstaller" "none" | eq "capi" }}
@@ -64,7 +64,7 @@ templates:
       - values/autoscaling-monitoring.yaml.gotmpl
 
   openstack-monitoring:
-    disableValidationOnInstall: true
+    disableValidation: true
     inherit: [ template: monitoring ]
     installed: {{ .Values | get "openstackMonitoring.enabled" false }}
     chart: charts/openstack-monitoring
@@ -83,7 +83,7 @@ templates:
       - values/openstack-monitoring.yaml.gotmpl
 
   trivy-operator:
-    disableValidationOnInstall: true # creates own custom resources
+    disableValidation: true # creates own custom resources
     inherit:
       - template: monitoring
       - template: trivy-operator-chart
@@ -97,7 +97,7 @@ templates:
       - values/trivy/trivy-operator.yaml.gotmpl
 
   s3-exporter:
-    disableValidationOnInstall: true
+    disableValidation: true
     condition: ck8sManagementCluster.enabled
     inherit: [ template: monitoring ]
     installed: {{ and (.Values | get "s3Exporter.enabled" false) (.Values | get "objectStorage.type" "" | eq "s3") }}

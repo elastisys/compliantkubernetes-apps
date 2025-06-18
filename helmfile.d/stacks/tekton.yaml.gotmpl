@@ -30,7 +30,7 @@ templates:
       - values/podsecuritypolicies/service/tekton-pipelines.yaml.gotmpl
 
   tekton-pipelines:
-    disableValidationOnInstall: true
+    disableValidation: true
     condition: ck8sManagementCluster.enabled
     inherit: [ template: tekton ]
     chart: charts/tekton-pipelines

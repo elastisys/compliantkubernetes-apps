@@ -49,7 +49,7 @@ templates:
       - values/thanos/objectstorage-secret.yaml.gotmpl
 
   thanos-query:
-    disableValidationOnInstall: true
+    disableValidation: true
     inherit:
       - template: thanos
       - template: thanos-chart
@@ -65,7 +65,7 @@ templates:
       - values/thanos/query.yaml.gotmpl
 
   thanos-receiver:
-    disableValidationOnInstall: true
+    disableValidation: true
     inherit:
       - template: thanos
       - template: thanos-chart
@@ -82,7 +82,7 @@ templates:
       - values/thanos/receiver.yaml.gotmpl
 
   thanos-ruler:
-    disableValidationOnInstall: true
+    disableValidation: true
     inherit: [ template: thanos ]
     installed: {{ and (.Values | get "thanos.enabled" false) (.Values | get "thanos.ruler.enabled" false) }}
     chart: charts/thanos/ruler

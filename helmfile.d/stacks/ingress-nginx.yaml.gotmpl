@@ -27,7 +27,7 @@ templates:
       - values/podsecuritypolicies/common/ingress-nginx.yaml.gotmpl
 
   ingress-nginx-controller:
-    disableValidationOnInstall: true
+    disableValidation: true
     inherit:
       - template: ingress-nginx
       - template: ingress-nginx-chart

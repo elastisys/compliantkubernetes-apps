@@ -1,7 +1,7 @@
 ---
 templates:
   tigera:
-    disableValidationOnInstall: true
+    disableValidation: true
     condition: ck8sLocalCluster.enabled
     inherit: [ template: tigera-operator-chart ]
     installed: {{ .Values | get "ck8sLocalCluster.enabled" false }}

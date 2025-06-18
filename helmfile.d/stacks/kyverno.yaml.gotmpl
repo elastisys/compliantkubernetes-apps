@@ -30,7 +30,7 @@ templates:
       - values/networkpolicies/common/kyverno.yaml.gotmpl
 
   kyverno-policies:
-    disableValidationOnInstall: true
+    disableValidation: true
     inherit:
       - template: kyverno
     chart: charts/kyverno-policies

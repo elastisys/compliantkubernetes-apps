@@ -7,7 +7,7 @@ templates:
       app: prometheus
 
   kube-prometheus-stack:
-    disableValidationOnInstall: true # creates own custom resources
+    disableValidation: true # creates own custom resources
     inherit:
       - template: prometheus
       - template: kube-prometheus-stack-chart
@@ -31,7 +31,7 @@ templates:
     wait: true
 
   prometheus-blackbox-exporter:
-    disableValidationOnInstall: true
+    disableValidation: true
     inherit:
       - template: prometheus
       - template: prometheus-blackbox-exporter-chart
@@ -47,7 +47,7 @@ templates:
       {{- end }}
 
   prometheus-sc-monitors:
-    disableValidationOnInstall: true
+    disableValidation: true
     condition: ck8sManagementCluster.enabled
     inherit: [ template: prometheus ]
     installed: {{ .Values | get "ck8sManagementCluster.enabled" false }}
@@ -60,7 +60,7 @@ templates:
       - values/sc-servicemonitor.yaml.gotmpl
 
   prometheus-sc-rules:
-    disableValidationOnInstall: true
+    disableValidation: true
     condition: ck8sManagementCluster.enabled
     inherit: [ template: prometheus ]
     installed: {{ .Values | get "ck8sManagementCluster.enabled" false }}
@@ -74,7 +74,7 @@ templates:
       - values/prometheus-alerts-runbook-urls.yaml.gotmpl
 
   prometheus-wc-monitors:
-    disableValidationOnInstall: true
+    disableValidation: true
     condition: ck8sWorkloadCluster.enabled
     inherit: [ template: prometheus ]
     installed: {{ .Values | get "ck8sWorkloadCluster.enabled" false }}
@@ -87,7 +87,7 @@ templates:
       - values/wc-servicemonitor.yaml.gotmpl
 
   prometheus-wc-rules:
-    disableValidationOnInstall: true
+    disableValidation: true
     condition: ck8sWorkloadCluster.enabled
     inherit: [ template: prometheus ]
     installed: {{ .Values | get "ck8sWorkloadCluster.enabled" false }}

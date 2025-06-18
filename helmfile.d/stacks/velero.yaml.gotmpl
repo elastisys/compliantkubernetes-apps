@@ -30,7 +30,7 @@ templates:
       - values/podsecuritypolicies/common/velero.yaml.gotmpl
 
   velero-main:
-    disableValidationOnInstall: true # creates own custom resources
+    disableValidation: true # creates own custom resources
     inherit:
       - template: velero
       - template: velero-chart

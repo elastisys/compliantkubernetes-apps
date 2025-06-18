@@ -20,7 +20,7 @@ templates:
       - values/networkpolicies/workload/hnc.yaml.gotmpl
 
   hnc-resources:
-    disableValidationOnInstall: true # creates own resources
+    disableValidation: true # creates own resources
     inherit: [ template: hnc ]
     chart: charts/hnc/config-and-crds
     version: 0.1.0
@@ -31,7 +31,7 @@ templates:
       - values/hnc/controller.yaml.gotmpl
 
   hnc-controller:
-    disableValidationOnInstall: true
+    disableValidation: true
     inherit: [ template: hnc ]
     chart: charts/hnc/controller
     version: 0.1.0

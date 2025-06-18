@@ -30,7 +30,7 @@ templates:
       - values/podsecuritypolicies/service/harbor.yaml.gotmpl
 
   harbor-certs:
-    disableValidationOnInstall: true
+    disableValidation: true
     inherit: [ template: harbor ]
     installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "harbor.enabled" false) }}
     chart: charts/harbor/harbor-certs
@@ -42,7 +42,7 @@ templates:
       - values/harbor/harbor-certs.yaml.gotmpl
 
   harbor-main:
-    disableValidationOnInstall: true
+    disableValidation: true
     inherit:
       - template: harbor
       - template: harbor-chart

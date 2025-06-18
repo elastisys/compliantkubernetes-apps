@@ -35,7 +35,7 @@ templates:
       - values/podsecuritypolicies/common/fluentd.yaml.gotmpl
 
   fluentd-aggregator:
-    disableValidationOnInstall: true
+    disableValidation: true
     inherit:
       - template: fluentd
       - template: fluentd-chart
@@ -60,7 +60,7 @@ templates:
       {{ end }}
 
   fluentd-forwarder:
-    disableValidationOnInstall: true
+    disableValidation: true
     inherit:
       - template: fluentd
       - template: fluentd-elasticsearch-chart
@@ -86,7 +86,7 @@ templates:
       {{ end }}
 
   fluentd-user:
-    disableValidationOnInstall: true
+    disableValidation: true
     condition: ck8sWorkloadCluster.enabled
     inherit:
       - template: fluentd

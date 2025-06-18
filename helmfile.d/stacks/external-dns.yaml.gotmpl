@@ -31,7 +31,7 @@ templates:
     - values/external-dns/external-dns.yaml.gotmpl
 
   external-dns-main:
-    disableValidationOnInstall: true
+    disableValidation: true
     inherit:
       - template: external-dns
       - template: external-dns-chart
@@ -46,7 +46,7 @@ templates:
       - values/external-dns/external-dns.yaml.gotmpl
 
   external-dns-endpoints:
-    disableValidationOnInstall: true
+    disableValidation: true
     inherit: [ template: external-dns ]
     installed: {{ and (.Values | get "externalDns.enabled" false) (.Values | get "externalDns.sources.crd" false) }}
     chart: charts/external-dns-endpoints

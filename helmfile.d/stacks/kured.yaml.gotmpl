@@ -28,7 +28,7 @@ templates:
     - values/kured.yaml.gotmpl
 
   kured-main:
-    disableValidationOnInstall: true
+    disableValidation: true
     installed: {{ .Values | get "kured.enabled" false }}
     inherit:
       - template: kured

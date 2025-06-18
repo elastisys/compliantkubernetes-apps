@@ -11,7 +11,7 @@ templates:
       app: calico
 
   calico-accountant:
-    disableValidationOnInstall: true
+    disableValidation: true
     inherit: [ template: calico ]
     installed: {{ .Values | get "calicoAccountant.enabled" false }}
     chart: charts/calico-accountant
@@ -33,7 +33,7 @@ templates:
       - values/calico-default-deny.yaml.gotmpl
 
   calico-felix-metrics:
-    disableValidationOnInstall: true
+    disableValidation: true
     inherit: [ template: calico ]
     installed: {{ .Values | get "calicoFelixMetrics.enabled" false }}
     chart: charts/calico-felix-metrics

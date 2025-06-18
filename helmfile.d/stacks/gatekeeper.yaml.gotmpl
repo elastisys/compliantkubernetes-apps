@@ -19,7 +19,7 @@ templates:
     wait: true
 
   gatekeeper-templates:
-    disableValidationOnInstall: true
+    disableValidation: true
     inherit: [ template: gatekeeper ]
     chart: charts/gatekeeper/templates
     version: 0.1.0
@@ -31,7 +31,7 @@ templates:
     wait: true
 
   gatekeeper-mutations:
-    disableValidationOnInstall: true
+    disableValidation: true
     inherit: [ template: gatekeeper ]
     installed: {{ .Values  | get "opa.mutations.enabled" false }}
     chart: charts/gatekeeper/mutations
@@ -43,7 +43,7 @@ templates:
       - values/gatekeeper/mutations.yaml.gotmpl
 
   gatekeeper-constraints:
-    disableValidationOnInstall: true
+    disableValidation: true
     inherit: [ template: gatekeeper ]
     chart: charts/gatekeeper/constraints
     version: 0.1.0
@@ -55,7 +55,7 @@ templates:
       - values/userCRDs/userCRDs.yaml.gotmpl
 
   gatekeeper-metrics:
-    disableValidationOnInstall: true
+    disableValidation: true
     inherit: [ template: gatekeeper ]
     chart: charts/gatekeeper/metrics
     version: 0.1.0
