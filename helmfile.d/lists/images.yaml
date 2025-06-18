@@ -1,7 +1,97 @@
 ---
 images:
+  calico:
+    accountant: ghcr.io/elastisys/calico-accountant:0.1.6-ck8s2
+  certManager:
+    controller: quay.io/jetstack/cert-manager-controller:v1.17.1
+    webhook: quay.io/jetstack/cert-manager-webhook:v1.17.1
+    cainjector: quay.io/jetstack/cert-manager-cainjector:v1.17.1
+    startupapicheck: quay.io/jetstack/cert-manager-startupapicheck:v1.17.1
+  dex:
+    image: ghcr.io/dexidp/dex:v2.40.0
+  externalDns:
+    image: registry.k8s.io/external-dns/external-dns:v0.14.2
+  falco:
+    image: docker.io/falcosecurity/falco:0.40.0-debian
+    driverLoaderInit: docker.io/falcosecurity/falco-driver-loader:0.40.0
+    falcoctl: docker.io/falcosecurity/falcoctl:0.11.0
+    sidekick: docker.io/falcosecurity/falcosidekick:2.31.1
+  fluentd:
+    aggregator: ghcr.io/elastisys/fluentd-aggregator:v7.1.1-ck8s2
+    forwarder: ghcr.io/elastisys/fluentd-forwarder:v4.7.5-ck8s1
+    logManager: ghcr.io/elastisys/compliantkubernetes-apps-log-manager:0.3.2
+  gatekeeper:
+    image: docker.io/openpolicyagent/gatekeeper:v3.18.2
+    preInstallCRDs: docker.io/openpolicyagent/gatekeeper-crds:v3.18.2
+    postInstallLabelNamespace: docker.io/openpolicyagent/gatekeeper-crds:v3.18.2
+    kubectl: docker.io/bitnami/kubectl:1.25
+  gpuOperator:
+    operator: nvcr.io/nvidia/gpu-operator:v24.9.2
+    nodeFeatureDiscovery: registry.k8s.io/nfd/node-feature-discovery:v0.16.6
+  harbor:
+    core: docker.io/goharbor/harbor-core:v2.12.1
+    exporter: docker.io/goharbor/harbor-exporter:v2.12.1
+    jobservice: docker.io/goharbor/harbor-jobservice:v2.12.1
+    portal: docker.io/goharbor/harbor-portal:v2.12.1
+    registry: docker.io/goharbor/registry-photon:v2.12.1
+    registryController: docker.io/goharbor/harbor-registryctl:v2.12.1
+    database: docker.io/goharbor/harbor-db:v2.12.1
+    redis: docker.io/goharbor/redis-photon:v2.12.1
+    trivyAdapter: docker.io/goharbor/trivy-adapter-photon:v2.12.1
+    initJob: ghcr.io/elastisys/curl-jq:1.0.0
+    backupJob: ghcr.io/elastisys/backup-postgres:1.5.0
+  hnc:
+    image: ghcr.io/elastisys/hnc-manager:v1.1.0
   ingressNginx:
-    controller: registry.k8s.io/ingress-nginx/controller:v1.12.1@sha256:d2fbc4ec70d8aa2050dd91a91506e998765e86c96f32cffb56c503c9c34eed5b
-    controllerChroot: registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1@sha256:90155c86548e0bb95b3abf1971cd687d8f5d43f340cfca0ad3484e2b8351096e
+    controller: registry.k8s.io/ingress-nginx/controller:v1.12.1
+    controllerChroot: registry.k8s.io/ingress-nginx/controller-chroot:v1.12.1
     defaultBackend: registry.k8s.io/defaultbackend-amd64:1.5
-    admissionWebhooksPatch: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2@sha256:e8825994b7a2c7497375a9b945f386506ca6a3eda80b89b74ef2db743f66a5ea
+    admissionWebhooksPatch: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2
+    fileCopier: docker.io/library/busybox:1.36
+  kured:
+    image: ghcr.io/kubereboot/kured:1.17.0
+  kyverno:
+    main: ghcr.io/kyverno/kyverno:v1.13.4
+    init: ghcr.io/kyverno/kyverno:v1.13.4
+    webhooksCleanup: docker.io/bitnami/kubectl:1.30.2
+    crdsMigration: ghcr.io/kyverno/kyverno-cli:v1.13.4
+  monitoring:
+    nodeExporter: quay.io/prometheus/node-exporter:v1.9.1
+    kubeStateMetrics: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.15.0
+    prometheusOperator: quay.io/prometheus-operator/prometheus-operator:v0.81.0
+    configReloader: quay.io/prometheus-operator/prometheus-config-reloader:v0.81.0
+    alertmanager: quay.io/prometheus/alertmanager:v0.28.1
+    prometheus: quay.io/prometheus/prometheus:v3.2.1
+    admissionWebhooksPatch: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.5.2
+    grafana: docker.io/grafana/grafana:11.5.1
+    grafanaSidecar: quay.io/kiwigrid/k8s-sidecar:1.30.0
+    blackboxExporter: quay.io/prometheus/blackbox-exporter:v0.24.0
+    grafanaLabelEnforcer: quay.io/prometheuscommunity/prom-label-proxy:v0.11.0
+    s3Exporter: ghcr.io/elastisys/s3-exporter:0.5.0
+    metricsServer: registry.k8s.io/metrics-server/metrics-server:v0.7.1
+    trivyOperator: mirror.gcr.io/aquasec/trivy-operator:0.24.0
+  nodeLocalDns:
+    image: registry.k8s.io/dns/k8s-dns-node-cache:1.25.0
+  opensearch:
+    image: docker.io/opensearchproject/opensearch:2.18.0
+    initSysctl: ghcr.io/elastisys/curl-jq:1.0.0
+    dashboards: docker.io/opensearchproject/opensearch-dashboards:2.18.0
+    configurerJob: ghcr.io/elastisys/curl-jq:1.0.0
+    slmCronjob: ghcr.io/elastisys/curl-jq:1.0.0
+    curatorCronjob: ghcr.io/elastisys/bitnami/elasticsearch-curator:5.8.4-debian-10-r235
+    exporter: quay.io/prometheuscommunity/elasticsearch-exporter:v1.7.0
+  rclone:
+    image: ghcr.io/elastisys/rclone-sync:1.63.0
+  tekton:
+    controller: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/controller:v0.45.0
+    remoteResolvers: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/resolvers:v0.45.0
+    webhook: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/webhook:v0.45.0
+  thanos:
+    image: ghcr.io/elastisys/bitnami/thanos:0.37.2-debian-12-r8
+  velero:
+    image: docker.io/velero/velero:v1.13.0
+    pluginCsi: docker.io/velero/velero-plugin-for-csi:v0.7.1
+    pluginAws: docker.io/velero/velero-plugin-for-aws:v1.9.0
+    pluginGcp: docker.io/velero/velero-plugin-for-gcp:v1.9.1
+    pluginAzure: docker.io/velero/velero-plugin-for-microsoft-azure:v1.9.2
+    kubectl: ghcr.io/elastisys/bitnami/kubectl:1.29.11

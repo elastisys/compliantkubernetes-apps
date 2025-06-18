@@ -33,7 +33,7 @@ spec:
         fsGroup: 10000
       containers:
       - name: opensearch-configurer
-        image: {{ .Values.image }}
+        image: {{ .Values.image.repository }}{{ with .Values.image.tag }}:{{ . }}{{ end }}
         command: ['/bin/bash', '/files/configurer.sh']
         securityContext:
           runAsUser: 10000

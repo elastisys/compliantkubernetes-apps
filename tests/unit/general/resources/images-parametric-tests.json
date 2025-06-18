@@ -4,19 +4,451 @@
       "image_property": "ingressNginx.controllerChroot",
       "helmfile_selector": "app=ingress-nginx",
       "container_name": "controller",
-      "template_file": "ingress-nginx/templates/controller-daemonset.yaml"
+      "template_file": "sc/ingress-nginx/templates/controller-daemonset.yaml"
     },
     {
       "image_property": "ingressNginx.defaultBackend",
       "helmfile_selector": "app=ingress-nginx",
       "container_name": "ingress-nginx-default-backend",
-      "template_file": "ingress-nginx/templates/default-backend-deployment.yaml"
+      "template_file": "sc/ingress-nginx/templates/default-backend-deployment.yaml"
     },
     {
       "image_property": "ingressNginx.admissionWebhooksPatch",
       "helmfile_selector": "app=ingress-nginx",
       "container_name": "patch",
-      "template_file": "ingress-nginx/templates/admission-webhooks/job-patch/job-patchWebhook.yaml"
+      "template_file": "sc/ingress-nginx/templates/admission-webhooks/job-patch/job-patchWebhook.yaml"
+    },
+    {
+      "image_property": "ingressNginx.fileCopier",
+      "helmfile_selector": "app=ingress-nginx",
+      "container_name": "file-copier",
+      "template_file": "sc/file-copier/templates/ingress-nginx-chroot-ds.yaml"
+    },
+    {
+      "image_property": "calico.accountant",
+      "helmfile_selector": "app=calico",
+      "container_name": "calico-accountant",
+      "template_file": "sc/calico-accountant/templates/daemonset.yaml"
+    },
+    {
+      "image_property": "certManager.controller",
+      "helmfile_selector": "app=cert-manager",
+      "container_name": "cert-manager-controller",
+      "template_file": "sc/cert-manager/templates/deployment.yaml"
+    },
+    {
+      "image_property": "certManager.webhook",
+      "helmfile_selector": "app=cert-manager",
+      "container_name": "cert-manager-webhook",
+      "template_file": "sc/cert-manager/templates/webhook-deployment.yaml"
+    },
+    {
+      "image_property": "certManager.cainjector",
+      "helmfile_selector": "app=cert-manager",
+      "container_name": "cert-manager-cainjector",
+      "template_file": "sc/cert-manager/templates/cainjector-deployment.yaml"
+    },
+    {
+      "image_property": "certManager.startupapicheck",
+      "helmfile_selector": "app=cert-manager",
+      "container_name": "cert-manager-startupapicheck",
+      "template_file": "sc/cert-manager/templates/startupapicheck-job.yaml"
+    },
+    {
+      "image_property": "dex.image",
+      "helmfile_selector": "app=dex",
+      "container_name": "dex",
+      "template_file": "sc/dex/templates/deployment.yaml"
+    },
+    {
+      "image_property": "externalDns.image",
+      "helmfile_selector": "app=external-dns",
+      "container_name": "external-dns",
+      "template_file": "sc/external-dns/templates/deployment.yaml"
+    },
+    {
+      "image_property": "falco.image",
+      "helmfile_selector": "app=falco",
+      "container_name": "falco",
+      "template_file": "sc/falco/templates/daemonset.yaml"
+    },
+    {
+      "image_property": "falco.driverLoaderInit",
+      "helmfile_selector": "app=falco",
+      "container_name": "falco-driver-loader",
+      "template_file": "sc/falco/templates/daemonset.yaml"
+    },
+    {
+      "image_property": "falco.falcoctl",
+      "helmfile_selector": "app=falco",
+      "container_name": "falcoctl-artifact-install",
+      "template_file": "sc/falco/templates/daemonset.yaml"
+    },
+    {
+      "image_property": "falco.sidekick",
+      "helmfile_selector": "app=falco",
+      "container_name": "falcosidekick",
+      "template_file": "sc/falco/charts/falcosidekick/templates/deployment.yaml"
+    },
+    {
+      "image_property": "fluentd.aggregator",
+      "helmfile_selector": "app=fluentd",
+      "container_name": "tmp-dir-permissions",
+      "template_file": "sc/fluentd/templates/aggregator-statefulset.yaml"
+    },
+    {
+      "image_property": "fluentd.aggregator",
+      "helmfile_selector": "app=fluentd",
+      "container_name": "fluentd",
+      "template_file": "sc/fluentd/templates/aggregator-statefulset.yaml"
+    },
+    {
+      "image_property": "fluentd.forwarder",
+      "helmfile_selector": "app=fluentd",
+      "container_name": "fluentd-forwarder",
+      "template_file": "sc/fluentd-elasticsearch/templates/daemonset.yaml"
+    },
+    {
+      "image_property": "fluentd.logManager",
+      "helmfile_selector": "app=fluentd",
+      "container_name": "compaction",
+      "template_file": "sc/log-manager/templates/cronjob-compaction.yaml"
+    },
+    {
+      "image_property": "fluentd.logManager",
+      "helmfile_selector": "app=fluentd",
+      "container_name": "retention",
+      "template_file": "sc/log-manager/templates/cronjob-retention.yaml"
+    },
+    {
+      "image_property": "gatekeeper.image",
+      "helmfile_selector": "app=gatekeeper",
+      "container_name": "manager",
+      "template_file": "sc/gatekeeper/templates/gatekeeper-audit-deployment.yaml"
+    },
+    {
+      "image_property": "gatekeeper.preInstallCRDs",
+      "helmfile_selector": "app=gatekeeper",
+      "container_name": "crds-upgrade",
+      "template_file": "sc/gatekeeper/templates/upgrade-crds-hook.yaml"
+    },
+    {
+      "image_property": "gatekeeper.postInstallLabelNamespace",
+      "helmfile_selector": "app=gatekeeper",
+      "container_name": "kubectl-label",
+      "template_file": "sc/gatekeeper/templates/namespace-post-install.yaml"
+    },
+    {
+      "image_property": "gatekeeper.kubectl",
+      "helmfile_selector": "app=gatekeeper",
+      "container_name": "wait",
+      "template_file": "sc/gatekeeper-templates/templates/wait/job.yaml"
+    },
+    {
+      "image_property": "gpuOperator.nodeFeatureDiscovery",
+      "helmfile_selector": "app=gpu-operator",
+      "container_name": "worker",
+      "template_file": "sc/gpu-operator/charts/node-feature-discovery/templates/worker.yaml"
+    },
+    {
+      "image_property": "gpuOperator.operator",
+      "helmfile_selector": "app=gpu-operator",
+      "container_name": "gpu-operator",
+      "template_file": "sc/gpu-operator/templates/operator.yaml"
+    },
+    {
+      "image_property": "harbor.core",
+      "helmfile_selector": "app=harbor",
+      "container_name": "core",
+      "template_file": "sc/harbor/templates/core/core-dpl.yaml"
+    },
+    {
+      "image_property": "harbor.exporter",
+      "helmfile_selector": "app=harbor",
+      "container_name": "exporter",
+      "template_file": "sc/harbor/templates/exporter/exporter-dpl.yaml"
+    },
+    {
+      "image_property": "harbor.jobservice",
+      "helmfile_selector": "app=harbor",
+      "container_name": "jobservice",
+      "template_file": "sc/harbor/templates/jobservice/jobservice-dpl.yaml"
+    },
+    {
+      "image_property": "harbor.registry",
+      "helmfile_selector": "app=harbor",
+      "container_name": "registry",
+      "template_file": "sc/harbor/templates/registry/registry-dpl.yaml"
+    },
+    {
+      "image_property": "harbor.registryController",
+      "helmfile_selector": "app=harbor",
+      "container_name": "registryctl",
+      "template_file": "sc/harbor/templates/registry/registry-dpl.yaml"
+    },
+    {
+      "image_property": "harbor.database",
+      "helmfile_selector": "app=harbor",
+      "container_name": "database",
+      "template_file": "sc/harbor/templates/database/database-ss.yaml"
+    },
+    {
+      "image_property": "harbor.redis",
+      "helmfile_selector": "app=harbor",
+      "container_name": "redis",
+      "template_file": "sc/harbor/templates/redis/statefulset.yaml"
+    },
+    {
+      "image_property": "harbor.trivyAdapter",
+      "helmfile_selector": "app=harbor",
+      "container_name": "trivy",
+      "template_file": "sc/harbor/templates/trivy/trivy-sts.yaml"
+    },
+    {
+      "image_property": "harbor.initJob",
+      "helmfile_selector": "app=harbor",
+      "container_name": "run",
+      "template_file": "sc/init-harbor/templates/init-harbor-job.yaml"
+    },
+    {
+      "image_property": "harbor.backupJob",
+      "helmfile_selector": "app=harbor",
+      "container_name": "run",
+      "template_file": "sc/harbor-backup/templates/harbor-backup-job.yaml"
+    },
+    {
+      "image_property": "hnc.image",
+      "helmfile_selector": "app=hnc",
+      "container_name": "hnc-controller-manager",
+      "template_file": "wc/hnc/templates/manager-deployment.yaml"
+    },
+    {
+      "image_property": "kured.image",
+      "helmfile_selector": "app=kured",
+      "container_name": "kured",
+      "template_file": "sc/kured/templates/daemonset.yaml"
+    },
+    {
+      "image_property": "kyverno.main",
+      "helmfile_selector": "app=kyverno",
+      "container_name": "kyverno",
+      "template_file": "sc/kyverno/templates/admission-controller/deployment.yaml"
+    },
+    {
+      "image_property": "kyverno.init",
+      "helmfile_selector": "app=kyverno",
+      "container_name": "kyverno-pre",
+      "template_file": "sc/kyverno/templates/admission-controller/deployment.yaml"
+    },
+    {
+      "image_property": "kyverno.webhooksCleanup",
+      "helmfile_selector": "app=kyverno",
+      "container_name": "kubectl",
+      "template_file": "sc/kyverno/templates/hooks/post-delete-configmap.yaml"
+    },
+    {
+      "image_property": "kyverno.crdsMigration",
+      "helmfile_selector": "app=kyverno",
+      "container_name": "kubectl",
+      "template_file": "sc/kyverno/templates/hooks/post-upgrade-migrate-resources.yaml"
+    },
+    {
+      "image_property": "nodeLocalDns.image",
+      "helmfile_selector": "app=node-local-dns",
+      "container_name": "node-cache",
+      "template_file": "sc/node-local-dns/templates/node-local-dns.yaml"
+    },
+    {
+      "image_property": "opensearch.image",
+      "helmfile_selector": "app=opensearch",
+      "container_name": "opensearch",
+      "template_file": "sc/opensearch/templates/statefulset.yaml"
+    },
+    {
+      "image_property": "opensearch.initSysctl",
+      "helmfile_selector": "app=opensearch",
+      "container_name": "init-sysctl",
+      "template_file": "sc/opensearch/templates/statefulset.yaml"
+    },
+    {
+      "image_property": "opensearch.dashboards",
+      "helmfile_selector": "app=opensearch",
+      "container_name": "dashboards",
+      "template_file": "sc/opensearch-dashboards/templates/deployment.yaml"
+    },
+    {
+      "image_property": "opensearch.configurerJob",
+      "helmfile_selector": "app=opensearch",
+      "container_name": "opensearch-configurer",
+      "template_file": "sc/opensearch-configurer/templates/job.yaml"
+    },
+    {
+      "image_property": "opensearch.slmCronjob",
+      "helmfile_selector": "app=opensearch",
+      "container_name": "run",
+      "template_file": "sc/opensearch-slm/templates/cronjob.yaml"
+    },
+    {
+      "image_property": "opensearch.curatorCronjob",
+      "helmfile_selector": "app=opensearch",
+      "container_name": "opensearch-curator",
+      "template_file": "sc/opensearch-curator/templates/cronjob.yaml"
+    },
+    {
+      "image_property": "opensearch.exporter",
+      "helmfile_selector": "app=opensearch",
+      "container_name": "exporter",
+      "template_file": "sc/prometheus-elasticsearch-exporter/templates/deployment.yaml"
+    },
+    {
+      "image_property": "rclone.image",
+      "helmfile_selector": "app=rclone",
+      "container_name": "rclone",
+      "template_file": "sc/rclone/templates/cronjobs.yaml"
+    },
+    {
+      "image_property": "tekton.controller",
+      "helmfile_selector": "app=tekton",
+      "container_name": "tekton-pipelines-controller",
+      "template_file": "sc/tekton-pipelines/templates/controller/deployment.yaml"
+    },
+    {
+      "image_property": "tekton.remoteResolvers",
+      "helmfile_selector": "app=tekton",
+      "container_name": "controller",
+      "template_file": "sc/tekton-pipelines/templates/remote-resolvers/deployment.yaml"
+    },
+    {
+      "image_property": "tekton.webhook",
+      "helmfile_selector": "app=tekton",
+      "container_name": "webhook",
+      "template_file": "sc/tekton-pipelines/templates/webhook/deployment.yaml"
+    },
+    {
+      "image_property": "thanos.image",
+      "helmfile_selector": "app=thanos",
+      "container_name": "bucketweb",
+      "template_file": "sc/thanos/templates/bucketweb/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.configReloader",
+      "helmfile_selector": "app=thanos",
+      "container_name": "config-reloader",
+      "template_file": "sc/thanos/templates/ruler/statefulset.yaml"
+    },
+    {
+      "image_property": "velero.image",
+      "helmfile_selector": "app=velero",
+      "container_name": "node-agent",
+      "template_file": "sc/velero/templates/node-agent-daemonset.yaml"
+    },
+    {
+      "image_property": "velero.pluginAws",
+      "helmfile_selector": "app=velero",
+      "container_name": "velero-plugin-for-aws",
+      "template_file": "sc/velero/templates/deployment.yaml"
+    },
+    {
+      "image_property": "velero.image",
+      "helmfile_selector": "app=velero",
+      "container_name": "node-agent",
+      "template_file": "wc/velero/templates/node-agent-daemonset.yaml"
+    },
+    {
+      "image_property": "velero.pluginAws",
+      "helmfile_selector": "app=velero",
+      "container_name": "velero-plugin-for-aws",
+      "template_file": "wc/velero/templates/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.nodeExporter",
+      "helmfile_selector": "app=prometheus",
+      "container_name": "node-exporter",
+      "template_file": "sc/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml"
+    },
+    {
+      "image_property": "monitoring.nodeExporter",
+      "helmfile_selector": "app=prometheus",
+      "container_name": "node-exporter",
+      "template_file": "wc/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml"
+    },
+    {
+      "image_property": "monitoring.kubeStateMetrics",
+      "helmfile_selector": "app=prometheus",
+      "container_name": "kube-state-metrics",
+      "template_file": "sc/kube-prometheus-stack/charts/kube-state-metrics/templates/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.kubeStateMetrics",
+      "helmfile_selector": "app=prometheus",
+      "container_name": "kube-state-metrics",
+      "template_file": "wc/kube-prometheus-stack/charts/kube-state-metrics/templates/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.prometheusOperator",
+      "helmfile_selector": "app=prometheus",
+      "container_name": "kube-prometheus-stack",
+      "template_file": "sc/kube-prometheus-stack/templates/prometheus-operator/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.prometheusOperator",
+      "helmfile_selector": "app=prometheus",
+      "container_name": "kube-prometheus-stack",
+      "template_file": "wc/kube-prometheus-stack/templates/prometheus-operator/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.admissionWebhooksPatch",
+      "helmfile_selector": "app=prometheus",
+      "container_name": "patch",
+      "template_file": "sc/kube-prometheus-stack/templates/prometheus-operator/admission-webhooks/job-patch/job-patchWebhook.yaml"
+    },
+    {
+      "image_property": "monitoring.grafana",
+      "helmfile_selector": "app=grafana",
+      "container_name": "grafana",
+      "template_file": "sc/grafana/templates/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.grafanaSidecar",
+      "helmfile_selector": "app=grafana",
+      "container_name": "grafana-sc-dashboard",
+      "template_file": "sc/grafana/templates/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.blackboxExporter",
+      "helmfile_selector": "app=prometheus",
+      "container_name": "blackbox-exporter",
+      "template_file": "sc/prometheus-blackbox-exporter/templates/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.blackboxExporter",
+      "helmfile_selector": "app=prometheus",
+      "container_name": "blackbox-exporter",
+      "template_file": "wc/prometheus-blackbox-exporter/templates/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.grafanaLabelEnforcer",
+      "helmfile_selector": "app=grafana",
+      "container_name": "prom-label-enforcer",
+      "template_file": "sc/grafana-label-enforcer/templates/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.s3Exporter",
+      "helmfile_selector": "app=monitoring",
+      "container_name": "s3-exporter",
+      "template_file": "sc/s3-exporter/templates/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.metricsServer",
+      "helmfile_selector": "app=metrics-server",
+      "container_name": "metrics-server",
+      "template_file": "sc/metrics-server/templates/deployment.yaml"
+    },
+    {
+      "image_property": "monitoring.trivyOperator",
+      "helmfile_selector": "app=trivy-operator",
+      "container_name": "trivy-operator",
+      "template_file": "sc/trivy-operator/templates/deployment.yaml"
     }
   ]
 }

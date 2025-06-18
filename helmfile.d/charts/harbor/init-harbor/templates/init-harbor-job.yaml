@@ -17,7 +17,7 @@ spec:
         fsGroup: 10000
       containers:
         - name: run
-          image: ghcr.io/elastisys/curl-jq:1.0.0
+          image: "{{ .Values.image.repository }}{{- with .Values.image.tag }}:{{ . }}{{ end }}"
           command: ['/bin/bash', '/scripts/init-harbor.sh']
           securityContext:
             allowPrivilegeEscalation: false

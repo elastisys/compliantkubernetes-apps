@@ -1,9 +1,5 @@
 existingObjstoreSecret: thanos-objectstorage-secret-objstore-secret
 
-image:
-  registry: ghcr.io
-  repository: elastisys/bitnami/thanos
-
 compactor:
   enabled: true
 
@@ -176,10 +172,20 @@ ruler:
     seccompProfile:
       type: RuntimeDefault
 
+  {{- $global := dict
+    "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
+    "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)
+  }}
   # Taken from what a thanos-ruler would get from the prometheus operator.
   sidecars:
     - name: config-reloader
+      {{- with .Values.images | dig "monitoring" "configReloader" "" }}
+      {{- with merge (include "container_uri.parse" . | fromJson) $global }}
+      image: "{{- include "gen.container_uri" . }}"
+      {{- end }}
+      {{- else }}
       image: quay.io/prometheus-operator/prometheus-config-reloader:v0.50.0
+      {{- end }}
       imagePullPolicy: IfNotPresent
       command:
       - /bin/prometheus-config-reloader
