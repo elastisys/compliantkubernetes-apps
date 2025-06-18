@@ -20,6 +20,7 @@ templates:
       - values/networkpolicies/common/cert-manager.yaml.gotmpl
 
   cert-manager-controller:
+    disableValidation: true
     disableValidationOnInstall: true
     inherit:
       - template: cert-manager
@@ -33,8 +34,11 @@ templates:
       - monitoring/kube-prometheus-stack # creates servicemonitors
     values:
       - values/cert-manager.yaml.gotmpl
+    wait: true
+    timeout: 300
 
   cert-manager-issuers:
+    disableValidation: true
     disableValidationOnInstall: true
     inherit: [ template: cert-manager ]
     installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
@@ -45,3 +49,5 @@ templates:
       - cert-manager/cert-manager # creates issuers
     values:
       - values/letsencrypt.yaml.gotmpl
+    wait: true
+    timeout: 180
