@@ -51,6 +51,8 @@ templates:
       - monitoring/kube-prometheus-stack # creates servicemonitors
     values:
       - values/metrics-server.yaml.gotmpl
+    wait: true
+    timeout: 300
 
   autoscaling-monitoring:
     disableValidationOnInstall: true
