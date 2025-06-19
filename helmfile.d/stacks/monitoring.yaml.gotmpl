@@ -47,6 +47,8 @@ templates:
     name: metrics-server
     labels:
       app: metrics-server
+    needs:
+      - monitoring/kube-prometheus-stack # creates servicemonitors
     values:
       - values/metrics-server.yaml.gotmpl
 
@@ -92,7 +94,7 @@ templates:
     labels:
       app: trivy-operator
     needs:
-      - monitoring/kube-prometheus-stack
+      - monitoring/kube-prometheus-stack # creates servicemonitors
     values:
       - values/trivy/trivy-operator.yaml.gotmpl
 

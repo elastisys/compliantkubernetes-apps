@@ -36,6 +36,7 @@ templates:
     installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "opensearch.enabled" false) }}
     name: opensearch-master
     needs:
+      - monitoring/kube-prometheus-stack # creates servicemonitors
       {{- if .Values | get "opensearch.sso.enabled" false }}
       - dex/dex
       {{- end }}
@@ -54,6 +55,7 @@ templates:
     installed: {{ and (.Values | get "opensearch.enabled" false) (.Values | get "opensearch.clientNode.dedicatedPods" false) }}
     name: opensearch-client
     needs:
+      - monitoring/kube-prometheus-stack # creates servicemonitors
       - kube-system/service-cluster-np
       - opensearch-system/opensearch-master
       - opensearch-system/podsecuritypolicy
@@ -69,6 +71,7 @@ templates:
     installed: {{ and (.Values | get "opensearch.enabled" false) (.Values | get "opensearch.dataNode.dedicatedPods" false) }}
     name: opensearch-data
     needs:
+      - monitoring/kube-prometheus-stack # creates servicemonitors
       - kube-system/service-cluster-np
       - opensearch-system/opensearch-master
       - opensearch-system/podsecuritypolicy
@@ -84,6 +87,7 @@ templates:
     installed: {{ and (.Values | get "ck8sManagementCluster.enabled" false) (.Values | get "opensearch.enabled" false) }}
     name: opensearch-dashboards
     needs:
+      - monitoring/kube-prometheus-stack # creates servicemonitors
       {{- if .Values | get "opensearch.sso.enabled" false }}
       - dex/dex
       {{- end }}

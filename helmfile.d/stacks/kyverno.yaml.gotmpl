@@ -14,6 +14,8 @@ templates:
       - template: kyverno
       - template: kyverno-chart
     installed: {{ .Values | get "kyverno.enabled" false }}
+    needs:
+      - monitoring/kube-prometheus-stack # creates servicemonitors
     values:
       - values/kyverno.yaml.gotmpl
     wait: true

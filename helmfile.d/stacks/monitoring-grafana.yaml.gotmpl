@@ -30,6 +30,7 @@ templates:
     installed: {{ .Values | get "grafana.user.enabled" false }}
     name: user-grafana
     needs:
+      - monitoring/kube-prometheus-stack # creates servicemonitors
       {{- if .Values | get "networkPolicies.monitoring.enabled" false }}
       - monitoring/networkpolicy
       {{- end }}
