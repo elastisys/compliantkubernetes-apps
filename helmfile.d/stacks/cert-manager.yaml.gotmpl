@@ -21,6 +21,7 @@ templates:
 
   cert-manager-controller:
     disableValidation: true
+    disableValidationOnInstall: true
     inherit:
       - template: cert-manager
       - template: cert-manager-chart
@@ -38,6 +39,7 @@ templates:
 
   cert-manager-issuers:
     disableValidation: true
+    disableValidationOnInstall: true
     inherit: [ template: cert-manager ]
     installed: {{ .Values | get "ck8sAnyCluster.enabled" false }}
     chart: charts/issuers
