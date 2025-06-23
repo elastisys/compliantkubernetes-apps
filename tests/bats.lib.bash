@@ -120,7 +120,7 @@ with_test_kubeconfig() {
   BASE_KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_$1.yaml"
   export KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_$1_$2.yaml"
   if ! [[ -f "${KUBECONFIG}" ]]; then
-    yq4 '.users[0].user.exec.args += "'"--token-cache-dir=~/.kube/cache/oidc-login/test-${2}"'"' <"${BASE_KUBECONFIG}" >"${KUBECONFIG}"
+    yq '.users[0].user.exec.args += "'"--token-cache-dir=~/.kube/cache/oidc-login/test-${2}"'"' <"${BASE_KUBECONFIG}" >"${KUBECONFIG}"
   fi
   export DETIK_CLIENT_NAME="kubectl"
 }
@@ -234,7 +234,7 @@ auto_teardown() {
 # usage: cypress_setup <path-to-cypress-spec>
 cypress_setup() {
   if ! [[ -f "${1:-}" ]]; then
-    log_fatal "invalid or missing file argument"
+    log.fatal "invalid or missing file argument"
   fi
 
   CYPRESS_REPORT="$(mktemp)"

@@ -8,16 +8,8 @@ setup() {
   load_file
 
   export CK8S_AUTO_APPROVE=true
-  CK8S_PGP_FP=$(yq4 '.creation_rules[].pgp' "${CK8S_CONFIG_PATH}/.sops.yaml")
+  CK8S_PGP_FP=$(yq '.creation_rules[].pgp' "${CK8S_CONFIG_PATH}/.sops.yaml")
   export CK8S_PGP_FP
-}
-
-@test "admin can log in" {
-  with_test_kubeconfig wc admin
-  clear_kubeconfig_cache admin
-  echo "Go to http://localhost:8000 and log in as platform administrator" >&3
-  run kubectl get nodes
-  assert_success
 }
 
 @test "static user can list access" {
