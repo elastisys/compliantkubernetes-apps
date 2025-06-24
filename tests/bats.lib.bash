@@ -113,8 +113,8 @@ with_test_kubeconfig() {
     fail "invalid or missing cluster argument"
   fi
 
-  if ! [[ "${2:-}" =~ ^(static|admin)$ ]]; then
-    fail "invalid or missing user argument (static/admin)"
+  if [[ -z "${2:-}" ]]; then
+    fail "missing user argument (e.g. static-dev/static-admin)"
   fi
 
   BASE_KUBECONFIG="${CK8S_CONFIG_PATH}/.state/kube_config_$1.yaml"
@@ -126,8 +126,8 @@ with_test_kubeconfig() {
 }
 
 clear_kubeconfig_cache() {
-  if ! [[ "${1:-}" =~ ^(static|admin)$ ]]; then
-    fail "invalid or missing user argument (static/admin)"
+  if [[ -z "${1:-}" ]]; then
+    fail "missing user argument (e.g. static-dev/static-admin)"
   fi
 
   rm -rf "${HOME}/.kube/cache/oidc-login/test-${1}"
