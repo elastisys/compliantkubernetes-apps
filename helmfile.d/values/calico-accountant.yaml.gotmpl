@@ -1,6 +1,6 @@
-backend: {{ .Values.calicoAccountant.backend }}
-resources: {{- toYaml .Values.calicoAccountant.resources | nindent 2 }}
-tolerations: {{- toYaml .Values.calicoAccountant.tolerations | nindent 2 }}
+backend: {{ .Values.networkPlugin.calico.calicoAccountant.backend }}
+resources: {{- toYaml .Values.networkPlugin.calico.calicoAccountant.resources | nindent 2 }}
+tolerations: {{- toYaml .Values.networkPlugin.calico.calicoAccountant.tolerations | nindent 2 }}
 {{- $global := dict
   "registry" (ternary (dig "uri" "" .Values.images.global.registry) "" .Values.images.global.registry.enabled)
   "repository" (ternary (dig "uri" "" .Values.images.global.repository) "" .Values.images.global.repository.enabled)

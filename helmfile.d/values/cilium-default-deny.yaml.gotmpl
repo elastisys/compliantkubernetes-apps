@@ -1,0 +1,3 @@
+egressPolicies: {{- toYaml .Values.networkPolicies.additionalEgressPolicies | nindent 2 }}
+
+ingressPolicies: {{- toYaml .Values.networkPolicies.additionalIngressPolicies | nindent 2 }}
