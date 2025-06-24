@@ -808,27 +808,34 @@ metricsServer:
   tolerations: []
   affinity: {}
 
-calicoAccountant:
-  enabled: true
-  # Backend for networkpolicy rules - Ubuntu 20.04 and older use iptables - Ubuntu 22.04 and newer use nftables
-  backend: nftables
-  tolerations:
-    - key: node-role.kubernetes.io/master
-      operator: Exists
-      effect: NoSchedule
-    - key: node-role.kubernetes.io/control-plane
-      operator: Exists
-      effect: NoSchedule
-  resources:
-    limits:
-      cpu: 100m
-      memory: 128Mi
-    requests:
-      cpu: 50m
-      memory: 64Mi
+networkPlugin:
+  # Choose networkPlugin type between calico and cilium, currently we have the default set to calico
+  type: calico
+  calico:
+    calicoAccountant:
+      # Backend for networkpolicy rules - Ubuntu 20.04 and older use iptables - Ubuntu 22.04 and newer use nftables
+      # Can be only enabled if .networkPlugin.type is "calico"
+      enabled: true
+      backend: nftables
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 50m
+          memory: 64Mi
 
-calicoFelixMetrics:
-  enabled: true
+    calicoFelixMetrics:
+      # For collecting metrics about calico
+      # Can be only enabled if .networkPlugin.type is "calico"
+      enabled: true
 
 clusterAdmin:
   users:
@@ -1055,7 +1062,6 @@ kured:
 
 networkPolicies:
   enableAlerting: true
-  # Default deny requires Calico as network plugin
   defaultDeny: false
   allowedNameSpaces: []
   additionalEgressPolicies: []

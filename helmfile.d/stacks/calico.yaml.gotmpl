@@ -13,7 +13,7 @@ templates:
   calico-accountant:
     disableValidationOnInstall: true
     inherit: [ template: calico ]
-    installed: {{ .Values | get "calicoAccountant.enabled" false }}
+    installed: {{ and (.Values | get "networkPlugin.calico.calicoAccountant.enabled" false) (.Values | get "networkPlugin.type" | eq "calico") }}
     chart: charts/calico-accountant
     version: 0.1.0
     name: calico-accountant
@@ -24,7 +24,7 @@ templates:
 
   calico-default-deny:
     inherit: [ template: calico ]
-    installed: {{ .Values | get "networkPolicies.defaultDeny" false }}
+    installed: {{  and (.Values | get "networkPolicies.defaultDeny" false) (.Values | get "networkPlugin.type" | eq "calico") }}
     chart: charts/calico-default-deny
     version: 0.1.0
     namespace: kube-system
@@ -35,7 +35,7 @@ templates:
   calico-felix-metrics:
     disableValidationOnInstall: true
     inherit: [ template: calico ]
-    installed: {{ .Values | get "calicoFelixMetrics.enabled" false }}
+    installed: {{ and (.Values | get "networkPlugin.calico.calicoFelixMetrics.enabled" false) (.Values | get "networkPlugin.type" | eq "calico") }}
     chart: charts/calico-felix-metrics
     version: 0.1.0
     name: calico-felix-metrics
