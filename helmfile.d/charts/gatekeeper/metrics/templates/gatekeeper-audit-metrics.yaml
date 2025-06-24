@@ -8,6 +8,12 @@ metadata:
     type: metrics
   name: {{ .Release.Name }}-audit
 spec:
+  {{- if .Values.auditMetricsService.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ .Values.auditMetricsService.ipFamilyPolicy }}
+  {{- end }}
+  {{- if .Values.auditMetricsService.ipFamily }}
+  ipFamilies: {{ toYaml .Values.auditMetricsService.ipFamilies | nindent 4 }}
+  {{- end }}
   ports:
   - port: 8888
     name: metrics

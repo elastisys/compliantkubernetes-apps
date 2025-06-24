@@ -1,5 +1,10 @@
 opensearchHosts: https://{{ .Values.opensearch.clusterName }}-master:9200
 
+service:
+  ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+  # TODO: Make sure upstream support this instead
+  # ipFamilies: toYaml .Values.global.ipFamilies | nindent 4
+
 config:
   opensearch_dashboards.yml:
     server:

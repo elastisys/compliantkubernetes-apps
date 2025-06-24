@@ -41,3 +41,5 @@ templates:
     name: calico-felix-metrics
     needs:
       - monitoring/kube-prometheus-stack # creates servicemonitors
+    values:
+      - values/calico-felix-metrics.yaml.gotmpl

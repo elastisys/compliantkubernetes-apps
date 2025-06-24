@@ -90,6 +90,26 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s upgrade both v0.48 apply
     ```
 
+1. Update all services if you enabled the enforcement of ipFamilyPolicy and ipFamilies
+
+    > [!WANING]
+    > This should only be done if you have enabled the enforcement of ipFamilyPolicy and ipFamilies.
+    > You can check this by looking at the values `.global.enforceIPFamilyPolicy` and `.global.enforceIPFamilies` and see if any of those is set to `true`
+    > After you've ran this you can't revert to `SingleStack` without recreating the service.
+
+    If you are updating to `PreferDualStack` you can use the following snippet to update all services that hasn't been updated by config.
+
+    ```bash
+    CLUSTER="sc" # Or wc
+
+    bin/ck8s ops kubectl "${CLUSTER}" get svc -A -o=custom-columns='NAMESPACE:.metadata.namespace,NAME:.metadata.name,POLICY:.spec.ipFamilyPolicy' | \
+        # Filter out SingleStack services
+        grep SingleStack | \
+        # Print namespace and name of service
+        awk '{print $1 " " $2}' | \
+        xargs -L1 kubectl patch svc -p '{"spec":{"ipFamilyPolicy":"PreferDualStack","ipFamilies":["IPv4","IPv6"]}}' --type=merge -n
+    ```
+
 ## Manual method
 
 ### Prepare upgrade - _non-disruptive_
@@ -161,6 +181,26 @@ As with all scripts in this repository `CK8S_CONFIG_PATH` is expected to be set.
     ./bin/ck8s apply {sc|wc}
     # or
     ./migration/v0.48/apply/80-apply.sh execute
+    ```
+
+1. Update all services if you enabled the enforcement of ipFamilyPolicy and ipFamilies
+
+    > [!WANING]
+    > This should only be done if you have enabled the enforcement of ipFamilyPolicy and ipFamilies.
+    > You can check this by looking at the values `.global.enforceIPFamilyPolicy` and `.global.enforceIPFamilies` and see if any of those is set to `true`
+    > After you've ran this you can't revert to `SingleStack` without recreating the service.
+
+    If you are updating to `PreferDualStack` you can use the following snippet to update all services that hasn't been updated by config.
+
+    ```bash
+    CLUSTER="sc" # Or wc
+
+    bin/ck8s ops kubectl "${CLUSTER}" get svc -A -o=custom-columns='NAMESPACE:.metadata.namespace,NAME:.metadata.name,POLICY:.spec.ipFamilyPolicy' | \
+        # Filter out SingleStack services
+        grep SingleStack | \
+        # Print namespace and name of service
+        awk '{print $1 " " $2}' | \
+        xargs -L1 kubectl patch svc -p '{"spec":{"ipFamilyPolicy":"PreferDualStack","ipFamilies":["IPv4","IPv6"]}}' --type=merge -n
     ```
 
 ## Postrequisite

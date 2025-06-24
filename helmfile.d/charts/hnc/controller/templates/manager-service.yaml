@@ -11,6 +11,12 @@ metadata:
   name: {{ include "hnc.fullname" . }}-controller-manager-metrics-service
 spec:
   type: ClusterIP
+  {{- if .Values.managerService.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ .Values.managerService.ipFamilyPolicy }}
+  {{- end }}
+  {{- if .Values.managerService.ipFamilies }}
+  ipFamilies: {{ toYaml .Values.managerService.ipFamilies | nindent 4 }}
+  {{- end }}
   selector:
     {{- include "hnc.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: {{ .Chart.Name }}-controller-manager
