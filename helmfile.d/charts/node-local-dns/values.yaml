@@ -10,10 +10,12 @@ resources:
     memory: 40Mi
 
 service:
-  ipFamilyPolicy: SingleStack
+  ipFamilyPolicy: ""
+  ipFamilies:
 
 metricsService:
-  ipFamilyPolicy: SingleStack
+  ipFamilyPolicy: ""
+  ipFamilies: []
 
 hostZone:
   extraConfig: #|

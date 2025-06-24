@@ -16,4 +16,5 @@ tolerations:
   - key: node-role.kubernetes.io/control-plane
     effect: NoSchedule
 service:
-  ipFamilyPolicy: SingleStack
+  ipFamilyPolicy: ""
+  ipFamilies: []

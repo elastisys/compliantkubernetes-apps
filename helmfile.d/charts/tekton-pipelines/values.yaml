@@ -14,7 +14,8 @@ controller:
     tag: "v0.45.0@sha256:8a302dab54484bbb83d46ff9455b077ea51c1c189641dcda12575f8301bfb257"
 
   service:
-    ipFamilyPolicy: SingleStack
+    ipFamilyPolicy: ""
+    ipFamilies: []
 
 webhook:
   replicas: 1
@@ -32,7 +33,8 @@ webhook:
     tag: "v0.45.0@sha256:07390c988b1c651c4810e9f7b15a88dfce8030845a429cf19b762a0d50e18ca7"
 
   service:
-    ipFamilyPolicy: SingleStack
+    ipFamilyPolicy: ""
+    ipFamilies: []
 
 remoteResolvers:
   replicas: 1

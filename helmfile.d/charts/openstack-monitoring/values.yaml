@@ -7,4 +7,5 @@ serviceMonitor:
   labels: {}
   namespace: ""
 service:
-  ipFamilyPolicy: SingleStack
+  ipFamilyPolicy: ""
+  ipFamilies: []
