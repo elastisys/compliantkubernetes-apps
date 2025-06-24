@@ -3,25 +3,113 @@ tolerations: {{- toYaml .Values.fluentd.forwarder.tolerations | nindent 2 }}
 nodeSelector: {{- toYaml .Values.fluentd.forwarder.nodeSelector | nindent 2 }}
 affinity: {{- toYaml .Values.fluentd.forwarder.affinity | nindent 2 }}
 
+{{- if .Values.opensearch.enabled }}
+elasticsearch:
+  outputType: "opensearch"
+  logLevel: "info"
+
+  scheme: https
+  hosts: ["opensearch-master.opensearch-system:9200"]
+
+  sslVerify: false # {{ .Values.global.verifyTls }}
+  auth:
+    enabled: true
+    user: fluentd
+    password: null
+
+  reloadOnFailure: true
+  log400Reason: true
+
+  requestTimeout: {{ .Values.fluentd.forwarder.requestTimeout }}
+
+extraObjects:
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: {{ .Release.Name }}-opensearch-credentials
+    type: Opaque
+    stringData:
+      password: {{ .Values.opensearch.fluentdPassword }}
+
+secret:
+- name: OUTPUT_PASSWORD
+  secret_name: {{ .Release.Name }}-opensearch-credentials
+  secret_key: password
+{{- end }}
+
 extraConfigMaps:
+  22-labels.conf: |-
+    # Split kubernetes
+    {{- if .Values.fluentd.saveScLogs.enable }}
+    <match kubernetes.**>
+      @type copy
+      <store>
+        @type relabel
+        @label @OPENSEARCH
+      </store>
+      <store>
+        @type relabel
+        @label @S3
+      </store>
+    </match>
+    {{- end }}
+
+    <match **>
+      @type copy
+      <store>
+        @type relabel
+        @label @S3
+      </store>
+    </match>
+
   30-output.conf: |-
     # Forward
-    <match **>
-      @id output-forwarding
-      @type forward
-      send_timeout 60s
-      recover_wait 10s
-      hard_timeout 60s
+    <label @S3>
+      <match **>
+        @id output-forwarding
+        @type forward
+        send_timeout 60s
+        recover_wait 10s
+        hard_timeout 60s
 
-      <server>
-        name aggregator
-        host fluentd-aggregator-aggregator
-        port 24224
-        weight 60
-      </server>
+        <server>
+          name aggregator
+          host fluentd-aggregator-aggregator
+          port 24224
+          weight 60
+        </server>
 
-      <buffer>
-        @include buffer.prop
-        path /var/log/fluentd-buffers/audit
-      </buffer>
-    </match>
+        <buffer>
+          @include buffer.prop
+          path /var/log/fluentd-buffers/audit
+        </buffer>
+      </match>
+    </label>
+    {{- if .Values.fluentd.saveScLogs.enable }}
+    <label @OPENSEARCH>
+      <filter **>
+        @type grep
+        <regexp>
+          key $.kubernetes.namespace_name
+          pattern {{ .Values.fluentd.saveScLogs.namespacePattern }}
+        </regexp>
+        {{- range $key, $pattern := .Values.fluentd.saveScLogs.labelPatterns }}
+        <regexp>
+          key $.kubernetes.labels.{{ $key }}
+          pattern {{ $pattern }}
+        </regexp>
+        {{- end }}
+      </filter>
+      <match **>
+        @id opensearch-output
+        @include opensearch-store.prop
+
+        index_name sc-logs
+        <buffer>
+          @include buffer.prop
+
+          path /var/log/fluentd-buffers/kubernetes.kubernetes.sclogs.buffer
+        </buffer>
+      </match>
+    </label>
+    {{- end }}
