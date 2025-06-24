@@ -1,5 +1,9 @@
 adminPassword: {{ .Values.user.grafanaPassword }}
 
+service:
+  ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+  ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 4 }}
+
 ingress:
   {{ if and .Values.externalTrafficPolicy.local .Values.externalTrafficPolicy.whitelistRange.userGrafana }}
   annotations:

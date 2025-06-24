@@ -14,6 +14,11 @@ clusterName: {{ .Values.opensearch.clusterName }}
 
 masterService: {{ .Values.opensearch.clusterName }}-master
 
+service:
+  ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+  # TODO: Make sure upstream support this instead
+  # ipFamilies: toYaml .Values.global.ipFamilies | nindent 4
+
 config:
   opensearch.yml: |
     cluster:

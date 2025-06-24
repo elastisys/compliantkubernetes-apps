@@ -22,6 +22,11 @@ kube-state-metrics:
   {{- end }}
   {{- end }}
 
+  service:
+    ipDualStack:
+      enabled: true
+      ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+      ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 8 }}
   selfMonitor:
     enabled: true
   resources: {{- toYaml .Values.kubeStateMetrics.resources | nindent 4 }}
@@ -90,6 +95,10 @@ kubeEtcd:
     port: 4001
     targetPort: 4001
     {{- end }}
+    ipDualStack:
+      enabled: true
+      ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+      ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 8 }}
 
 alertmanager:
   {{- with .Values.images | dig "monitoring" "kubeStateMetrics" "" }}
@@ -201,6 +210,12 @@ alertmanager:
     {{- toYaml . | nindent 4 }}
     {{- end }}
 
+  service:
+    ipDualStack:
+      enabled: true
+      ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+      ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 8 }}
+
   alertmanagerSpec:
     replicas: {{ .Values.prometheus.alertmanagerSpec.replicas }}
     retention: {{ .Values.prometheus.retention.alertmanager }}
@@ -235,6 +250,20 @@ kubeScheduler:
 
 grafana:
   enabled: false
+
+kubeProxy:
+  service:
+    ipDualStack:
+      enabled: true
+      ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+      ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 8 }}
+
+coreDns:
+  service:
+    ipDualStack:
+      enabled: true
+      ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+      ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 8 }}
 
 prometheusOperator:
   resources: {{- toYaml .Values.prometheusOperator.resources | nindent 4 }}
@@ -286,6 +315,12 @@ prometheusOperator:
         {{- end }}
   {{- end }}
   {{- end }}
+
+  service:
+    ipDualStack:
+      enabled: true
+      ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+      ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 8 }}
 
 prometheus:
   prometheusSpec:
@@ -362,6 +397,11 @@ prometheus:
             requests:
               storage: {{ .Values.prometheus.storage.size }}
     {{- end }}
+  service:
+    ipDualStack:
+      enabled: true
+      ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+      ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 8 }}
 
 prometheus-node-exporter:
   resources: {{- toYaml .Values.prometheusNodeExporter.resources | nindent 4 }}
@@ -390,3 +430,9 @@ prometheus-node-exporter:
     {{- end }}
   {{- end }}
   {{- end }}
+
+  service:
+    ipDualStack:
+      enabled: true
+      ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+      ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 8 }}

@@ -8,3 +8,7 @@ ingress:
   extraAnnotations:
     nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.externalTrafficPolicy.whitelistRange.kubeapiMetrics }}
   {{ end }}
+
+service:
+  ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+  ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 6 }}

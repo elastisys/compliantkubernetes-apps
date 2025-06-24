@@ -1429,6 +1429,52 @@ properties:
         type: string
         examples:
           - "2025-04-29T08:34:21+00:00"
+      enforceIPFamilyPolicy:
+        title: Enforce ipFamilyPolicy to all services that doesn't explicitly set it.
+        description: |-
+          Enforce ipFamilyPolicy to all services that doesn't explicitly set it.
+          This is done using a mutating webhook to all services that doesn't set this.
+          The value it sets is taken from `.global.ipFamilyPolicy`
+        type: boolean
+        default: false
+      enforceIPFamilies:
+        title: Enforce ipFamilies to all services that doesn't explicitly set it.
+        description: |-
+          Enforce ipFamilyPolicy to all services that doesn't explicitly set it.
+          This is done using a mutating webhook to all services that doesn't set this.
+          The value it sets is taken from `.global.ipFamilies`
+        type: boolean
+        default: false
+      ipFamilyPolicy:
+        title: Global setting for ipFamilyPolicy for services
+        description: |-
+          Used to set the ipFamilyPolicy for all configurable services.
+        type: string
+        enum:
+          - SingleStack
+          - PreferDualStack
+          - RequireDualStack
+        meta:enum:
+          SingleStack: Single-stack service. The control plane allocates a cluster IP for the Service, using the first configured service cluster IP range.
+          PreferDualStack: Allocates both IPv4 and IPv6 cluster IPs for the Service when dual-stack is enabled. If dual-stack is not enabled or supported, it falls back to single-stack behavior.
+          RequireDualStack: Allocates Service `.spec.clusterIPs` from both IPv4 and IPv6 address ranges when dual-stack is enabled. If dual-stack is not enabled or supported, the Service API object creation fails.
+        default: "SingleStack"
+        examples:
+          - SingleStack
+          - PreferDualStack
+          - RequireDualStack
+      ipFamilies:
+        title: Global setting for ipFamilies for services
+        description: |-
+          Used to set the ipFamilyPolicy for all configurable services.
+        items:
+          type: string
+          enum:
+            - "IPv4"
+            - "IPv6"
+        type: array
+        uniqueItems: true
+        default: ["IPv4"]
     additionalProperties: false
   clusterApi:
     additionalProperties: false

@@ -8,6 +8,11 @@ defaultRules:
 
 {{- if .Values.prometheus.devAlertmanager.enabled }}
 alertmanager:
+  service:
+    ipDualStack:
+      enabled: true
+      ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+      ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 8 }}
   namespaceOverride: {{ .Values.prometheus.devAlertmanager.namespace }}
   {{ if eq .Values.prometheus.devAlertmanager.ingressEnabled true }}
   extraSecret:
@@ -52,6 +57,20 @@ alertmanager:
 
 grafana:
   enabled: false
+
+kubeProxy:
+  service:
+    ipDualStack:
+      enabled: true
+      ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+      ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 8 }}
+
+coreDns:
+  service:
+    ipDualStack:
+      enabled: true
+      ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+      ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 8 }}
 
 kubeControllerManager:
   enabled: false
@@ -110,6 +129,11 @@ prometheusOperator:
   {{- end }}
   {{- end }}
 
+  service:
+    ipDualStack:
+      enabled: true
+      ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+      ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 8 }}
 
 kube-state-metrics:
   {{- with .Values.images | dig "monitoring" "kubeStateMetrics" "" }}
@@ -126,6 +150,12 @@ kube-state-metrics:
     {{- end }}
   {{- end }}
   {{- end }}
+
+  service:
+    ipDualStack:
+      enabled: true
+      ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+      ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 8 }}
 
   selfMonitor:
     enabled: true
@@ -167,6 +197,12 @@ prometheus-node-exporter:
   {{- end }}
   {{- end }}
 
+  service:
+    ipDualStack:
+      enabled: true
+      ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+      ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 8 }}
+
 kubeApiServer:
   serviceMonitor:
     metricRelabelings:
@@ -183,6 +219,10 @@ kubeEtcd:
     port: 4001
     targetPort: 4001
     {{ end }}
+    ipDualStack:
+      enabled: true
+      ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+      ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 8 }}
 
 prometheus:
   ingress:
@@ -320,3 +360,8 @@ prometheus:
     {{- with .Values.prometheus.additionalScrapeConfigs }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
+  service:
+    ipDualStack:
+      enabled: true
+      ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+      ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 8 }}

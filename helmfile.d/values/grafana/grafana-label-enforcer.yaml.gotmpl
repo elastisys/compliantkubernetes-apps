@@ -19,3 +19,7 @@ image:
   {{- end }}
 {{- end }}
 {{- end }}
+
+service:
+  ipFamilyPolicy: {{ .Values.global.ipFamilyPolicy }}
+  ipFamilies: {{ toYaml .Values.global.ipFamilies | nindent 6 }}

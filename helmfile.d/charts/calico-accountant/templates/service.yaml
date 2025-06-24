@@ -19,6 +19,12 @@ metadata:
       app: "calico-accountant"
   name: calico-accountant-metrics
 spec:
+  {{- if .Values.service.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ .Values.service.ipFamilyPolicy }}
+  {{- end }}
+  {{- if .Values.service.ipFamilies }}
+  ipFamilies: {{ toYaml .Values.service.ipFamilies | nindent 4 }}
+  {{- end }}
   ports:
   - port: 9009
     name: metrics
