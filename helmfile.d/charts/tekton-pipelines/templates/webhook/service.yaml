@@ -16,6 +16,7 @@ metadata:
   {{- include "tekton-pipelines.labels" . | nindent 4 }}
 spec:
   type: ClusterIP
+  ipFamilyPolicy: {{ .Values.webhook.service.ipFamilyPolicy }}
   selector:
     app.kubernetes.io/component: webhook
     app.kubernetes.io/instance: default

@@ -6,3 +6,5 @@ openstackMonitoring:
 serviceMonitor:
   labels: {}
   namespace: ""
+service:
+  ipFamilyPolicy: SingleStack

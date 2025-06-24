@@ -4,6 +4,7 @@ metadata:
   name: {{ include "grafana-label-enforcer.fullname" . }}
   namespace: {{ .Release.Namespace }}
 spec:
+  ipFamilyPolicy: {{ .Values.service.ipFamilyPolicy }}
   ports:
   - name: promql
     port: 9090

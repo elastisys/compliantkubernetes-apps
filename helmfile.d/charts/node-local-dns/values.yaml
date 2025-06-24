@@ -9,6 +9,12 @@ resources:
     cpu: 25m
     memory: 40Mi
 
+service:
+  ipFamilyPolicy: SingleStack
+
+metricsService:
+  ipFamilyPolicy: SingleStack
+
 hostZone:
   extraConfig: #|
     # template ANY ANY {

@@ -19,6 +19,7 @@ metadata:
       app: "calico-accountant"
   name: calico-accountant-metrics
 spec:
+  ipFamilyPolicy: {{ .Values.service.ipFamilyPolicy }}
   ports:
   - port: 9009
     name: metrics

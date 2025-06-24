@@ -73,6 +73,7 @@ managerDeployment:
 managerService:
   annotations: {}
   port: 8080
+  ipFamilyPolicy: SingleStack
 
 webhook:
   annotations: {}
@@ -99,6 +100,7 @@ webhookDeployment:
 
 webhookService:
   port: 443
+  ipFamilyPolicy: SingleStack
 
 certificate:
   create: true

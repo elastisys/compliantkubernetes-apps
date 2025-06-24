@@ -12,3 +12,6 @@ enforcementLabel: ""
 image:
   tag: ""
   repository: quay.io/prometheuscommunity/prom-label-proxy
+
+service:
+  ipFamilyPolicy: SingleStack

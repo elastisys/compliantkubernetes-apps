@@ -11,6 +11,7 @@ metadata:
   name: {{ include "hnc.fullname" . }}-controller-manager-metrics-service
 spec:
   type: ClusterIP
+  ipFamilyPolicy: {{ .Values.managerService.ipFamilyPolicy }}
   selector:
     {{- include "hnc.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: {{ .Chart.Name }}-controller-manager

@@ -19,6 +19,7 @@ metadata:
       app: "calico-felix-metrics"
   name: calico-felix-metrics-svc
 spec:
+  ipFamilyPolicy: {{ .Values.service.ipFamilyPolicy }}
   ports:
   - port: 9091
     name: metrics

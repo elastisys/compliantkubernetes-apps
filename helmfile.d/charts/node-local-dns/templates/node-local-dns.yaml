@@ -31,6 +31,7 @@ metadata:
     addonmanager.kubernetes.io/mode: Reconcile
     kubernetes.io/name: "KubeDNSUpstream"
 spec:
+  ipFamilyPolicy: {{ .Values.service.ipFamilyPolicy }}
   ports:
   - name: dns
     port: 53
@@ -205,6 +206,7 @@ metadata:
     k8s-app: node-local-dns
   name: node-local-dns
 spec:
+  ipFamilyPolicy: {{ .Values.metricsService.ipFamilyPolicy }}
   clusterIP: None
   ports:
     - name: metrics

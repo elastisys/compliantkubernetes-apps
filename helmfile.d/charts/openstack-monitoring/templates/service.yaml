@@ -6,6 +6,7 @@ metadata:
     {{- include "openstack-monitoring.labels" . | nindent 4}}
   name: {{ include "openstack-monitoring.fullname" . }}
 spec:
+  ipFamilyPolicy: {{ .Values.service.ipFamilyPolicy }}
   ports:
   - name: http
     port: 10258

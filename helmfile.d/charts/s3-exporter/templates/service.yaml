@@ -6,6 +6,7 @@ metadata:
     {{- include "s3-exporter.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
+  ipFamilyPolicy: {{ .Values.service.ipFamilyPolicy }}
   ports:
     - port: {{ .Values.service.port }}
       targetPort: http
