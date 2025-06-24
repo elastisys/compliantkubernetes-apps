@@ -3,7 +3,7 @@
 setup_file() {
   load "../../bats.lib.bash"
 
-  cypress_setup "${ROOT}/tests/end-to-end/kubernetes/authentication-2.cy.js"
+  cypress_setup "${ROOT}/tests/end-to-end/kubernetes/authentication-dev.cy.js"
 }
 
 setup() {
@@ -12,7 +12,7 @@ setup() {
 }
 
 teardown_file() {
-  cypress_teardown "${ROOT}/tests/end-to-end/kubernetes/authentication-2.cy.js"
+  cypress_teardown "${ROOT}/tests/end-to-end/kubernetes/authentication-dev.cy.js"
 }
 
 @test "kubernetes authentication can login via extra static dex user" {
