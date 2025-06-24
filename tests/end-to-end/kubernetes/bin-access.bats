@@ -51,4 +51,5 @@ setup() {
 
   run kubectl -n staging get pod root-nginx -o=jsonpath='{.status.containerStatuses[0].state.waiting.reason}'
   assert_output "CreateContainerConfigError"
+  kubectl delete -n staging -f "${APPS_PATH}/tests/end-to-end/kubernetes/allow-root-nginx.yaml" || true
 }
