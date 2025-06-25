@@ -6349,39 +6349,84 @@ properties:
       - subdomain
       - indexPerNamespace
       - dashboards
-  calicoAccountant:
-    title: Calico Accountant
-    description: Configure Calico accountant, used to collect metrics about packets affected by Network Policies when using Calico.
+  networkPlugin:
+    title: Network Plugin
+    description: Configure the network plugin used in the cluster.
+    type: object
     additionalProperties: false
     properties:
-      backend:
-        title: Calico Accountant Backend
+      type:
+        title: Network plugin type
+        description: Configure the type of network plugin
         type: string
         enum:
-          - iptables
-          - nftables
-        meta:enum:
-          iptables: The classical kernel netfilter interface. Use with Ubuntu 20.04 and older
-          nftables: More modern netfilter interface. Use with Ubuntu 22.04 and newer
-        default: nftables
-      enabled:
-        default: true
-        type: boolean
-      resources:
-        $ref: '#/$defs/kubernetesResourceRequirements'
-      tolerations:
-        $ref: '#/$defs/kubernetesTolerations'
-    type: object
-  calicoFelixMetrics:
-    title: Calico Felix Metrics
-    description: Configure Calico Felix metrics, used to collect metrics about Calico.
-    type: object
-    additionalProperties: false
-    properties:
-      enabled:
-        title: Calico Felix Metrics Enabled
-        type: boolean
-        default: true
+          - calico
+          - cilium
+      calico:
+        title: Calico network plugin
+        description: Configuration when network plugin is set to calico
+        type: object
+        additionalProperties: false
+        properties:
+          calicoAccountant:
+            title: Calico Accountant
+            description: Configure Calico accountant, used to collect metrics about packets affected by Network Policies when using Calico.
+            additionalProperties: false
+            properties:
+              backend:
+                title: Calico Accountant Backend
+                type: string
+                enum:
+                  - iptables
+                  - nftables
+                meta:enum:
+                  iptables: The classical kernel netfilter interface. Use with Ubuntu 20.04 and older
+                  nftables: More modern netfilter interface. Use with Ubuntu 22.04 and newer
+                default: nftables
+              enabled:
+                default: true
+                type: boolean
+              resources:
+                $ref: '#/$defs/kubernetesResourceRequirements'
+              tolerations:
+                $ref: '#/$defs/kubernetesTolerations'
+            type: object
+          calicoFelixMetrics:
+            title: Calico Felix Metrics
+            description: Configure Calico Felix metrics, used to collect metrics about Calico.
+            type: object
+            additionalProperties: false
+            properties:
+              enabled:
+                title: Calico Felix Metrics Enabled
+                type: boolean
+                default: true
+        required:
+          - calicoAccountant
+          - calicoFelixMetrics
+    required:
+      - type
+      - calico
+    if:
+      properties:
+        calico:
+          anyOf:
+          - properties:
+              calicoAccountant:
+                properties:
+                  enabled:
+                    type: boolean
+                    const: true
+          - properties:
+              calicoFelixMetrics:
+                properties:
+                  enabled:
+                    type: boolean
+                    const: true
+    then:
+      properties:
+        type:
+          const: "calico"
   certmanager:
     title: cert-manager Config
     description: Configure cert-manager, used to provision certificates either self-signed or via Let's Encrypt.
