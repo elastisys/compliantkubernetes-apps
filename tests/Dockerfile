@@ -43,7 +43,7 @@ RUN curl -LOs "https://github.com/helmfile/helmfile/releases/download/v${HELMFIL
 ENV JSONSCHEMA2MD_VERSION="8.0.2"
 RUN npm install --global "@adobe/jsonschema2md@${JSONSCHEMA2MD_VERSION}"
 
-ARG KUBECTL_VERSION="1.31.7"
+ARG KUBECTL_VERSION="1.31.9"
 RUN curl -LOs "https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
     install -Tm 755 kubectl /usr/local/bin/kubectl && \
     rm kubectl
