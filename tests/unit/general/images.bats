@@ -22,6 +22,7 @@ setup_file() {
   yq.set sc .harbor.backup.enabled 'true'
   yq.set sc .kured.enabled 'true'
   yq.set sc .kyverno.enabled 'true'
+  yq.set sc .kyverno.policies.verifyImageSignature.enabled 'false'
   yq.set sc .opensearch.snapshot.enabled 'true'
   yq.set sc .tektonPipelines.enabled 'true'
   yq.set sc .thanos.enabled 'true'
